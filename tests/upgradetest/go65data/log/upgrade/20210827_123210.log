@@ -1,0 +1,196 @@
+[community/tasks] Running callable function
+Migrating project jobs to tasks
+
+..........
+
+Done migrating project jobs to taskscommunity/tasks updated from 4 to 5
+[community/tasks] Excuting query: ALTER TABLE `tasks_task`  ADD `progressChange` TINYINT(2) NULL
+community/tasks updated from 5 to 6
+[community/tasks] Excuting query: ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS `startTime` TIME NULL DEFAULT NULL
+community/tasks updated from 6 to 7
+[legacy/sync] Excuting query: 
+legacy/sync updated from 50 to 51
+[legacy/sync] Excuting query: alter table sync_tasklist_user change tasklist_id tasklistId int(11) unsigned auto_increment;
+legacy/sync updated from 51 to 52
+[legacy/sync] Excuting query: alter table sync_tasklist_user change user_id userId int(11) default 0 not null;
+legacy/sync updated from 52 to 53
+[legacy/sync] Excuting query: alter table sync_tasklist_user change default_tasklist isDefault boolean default 0 not null;
+legacy/sync updated from 53 to 54
+[legacy/sync] Excuting query: DELETE FROM `sync_tasklist_user` WHERE `userId` NOT IN(SELECT `id` FROM `core_user`);
+legacy/sync updated from 54 to 55
+[legacy/sync] Excuting query: alter table sync_tasklist_user
+	add constraint sync_tasklist_user_core_user_id_fk
+		foreign key (userId) references core_user (id)
+			on delete cascade;
+legacy/sync updated from 55 to 56
+[legacy/sync] Excuting query: DELETE FROM `sync_tasklist_user` WHERE `tasklistId` NOT IN(SELECT `id` FROM `tasks_tasklist`);
+legacy/sync updated from 56 to 57
+[legacy/sync] Excuting query: alter table sync_tasklist_user
+	add constraint sync_tasklist_user_tasks_tasklist_id_fk
+		foreign key (tasklistId) references tasks_tasklist (id)
+			on delete cascade;
+legacy/sync updated from 57 to 58
+[community/tasks] Excuting query: alter table tasks_tasklist
+	add projectId int null;
+IGNORE: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'projectId'
+community/tasks updated from 7 to 8
+[community/addressbook] Excuting query: ALTER TABLE `addressbook_user_settings` ADD `lastAddressBookId` INT(11) null;
+community/addressbook updated from 67 to 68
+[community/addressbook] Excuting query: alter table addressbook_user_settings
+	add startIn enum('allcontacts', 'starred', 'default', 'remember') default 'allcontacts' not null;
+community/addressbook updated from 68 to 69
+[community/tasks] Excuting query: create table if not exists tasks_user_settings
+(
+    userId int null,
+    defaultTasklistId int(11) unsigned null,
+    rememberLastItems boolean not null default false,
+    lastTasklistIds varchar(255) null,
+    constraint tasks_user_settings_pk
+        primary key (userId),
+    constraint tasks_user_settings_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+community/tasks updated from 8 to 9
+[community/tasks] Excuting query: alter table tasks_task drop foreign key tasks_task_ibfk_1;
+community/tasks updated from 9 to 10
+[community/tasks] Excuting query: alter table tasks_task
+	add constraint tasks_task_ibfk_1
+		foreign key (tasklistId) references tasks_tasklist (id)
+			on DELETE cascade;
+community/tasks updated from 10 to 11
+[community/tasks] Excuting query: alter table tasks_user_settings
+	add constraint tasks_user_settings_tasks_tasklist_id_fk
+		foreign key (defaultTasklistId) references tasks_tasklist (id)
+			on delete set null;
+community/tasks updated from 11 to 12
+[legacy/projects2] Excuting query: create index pr2_hours_task_id_index
+	on pr2_hours (task_id);
+legacy/projects2 updated from 401 to 402
+[core/core] Excuting query: ALTER TABLE `core_pdf_block`
+  ADD PRIMARY KEY (`id`) USING BTREE,
+  ADD KEY `pdfTemplateId` (`pdfTemplateId`);
+IGNORE: SQLSTATE[42000]: Syntax error or access violation: 1061 Duplicate key name 'pdfTemplateId'
+core/core updated from 244 to 245
+[core/core] Excuting query: ALTER TABLE `core_pdf_template`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `moduleId` (`moduleId`),
+  ADD KEY `stationaryBlobId` (`stationaryBlobId`);
+IGNORE: SQLSTATE[42000]: Syntax error or access violation: 1061 Duplicate key name 'moduleId'
+core/core updated from 245 to 246
+[core/core] Excuting query: ALTER TABLE `core_pdf_block`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+core/core updated from 246 to 247
+[core/core] Excuting query: ALTER TABLE `core_pdf_template`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+core/core updated from 247 to 248
+[core/core] Excuting query: ALTER TABLE `core_pdf_block`
+  ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;
+IGNORE: SQLSTATE[HY000]: General error: 1005 Can't create table `groupoffice_module_permissions`.`core_pdf_block` (errno: 121 "Duplicate key on write or update")
+core/core updated from 248 to 249
+[core/core] Excuting query: ALTER TABLE `core_pdf_template`
+  ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);
+IGNORE: SQLSTATE[HY000]: General error: 1005 Can't create table `groupoffice_module_permissions`.`core_pdf_template` (errno: 121 "Duplicate key on write or update")
+core/core updated from 249 to 250
+[core/core] Excuting query: ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;
+core/core updated from 250 to 251
+[core/core] Excuting query: alter table core_alert change alertId tag varchar(50) null;
+core/core updated from 251 to 252
+[core/core] Excuting query: create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
+	on core_alert (entityTypeId, entityId, tag, userId);
+
+core/core updated from 252 to 253
+[core/core] Excuting query: create table core_auth_remember_me
+(
+	id int auto_increment,
+    token varchar(190) collate ascii_bin null,
+    series varchar(190) collate ascii_bin null,
+    userId int not null,
+    expiresAt datetime null,
+    constraint core_auth_remember_me_pk
+        primary key (id)
+);
+core/core updated from 253 to 254
+[core/core] Excuting query: create index core_auth_remember_me_series_index
+    on core_auth_remember_me (series);
+core/core updated from 254 to 255
+[core/core] Excuting query: alter table core_auth_remember_me
+    add constraint core_auth_remember_me_core_user_id_fk
+        foreign key (userId) references core_user (id);
+core/core updated from 255 to 256
+[core/core] Excuting query: alter table core_auth_remember_me
+    add `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL;
+core/core updated from 256 to 257
+[core/core] Excuting query: alter table core_auth_remember_me
+    add `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
+core/core updated from 257 to 258
+[core/core] Excuting query: alter table core_auth_remember_me
+	add platform varchar(190) COLLATE utf8mb4_unicode_ci null after userAgent;
+core/core updated from 258 to 259
+[core/core] Excuting query: alter table core_auth_remember_me
+	add browser varchar(190) COLLATE utf8mb4_unicode_ci null after platform;
+core/core updated from 259 to 260
+[community/tasks] Excuting query: create index tasks_task_progress_index
+	on tasks_task (progress);
+community/tasks updated from 12 to 13
+[core/core] Excuting query: alter table core_alert drop foreign key fk_alert_user;
+core/core updated from 260 to 261
+[core/core] Excuting query: alter table core_alert
+	add constraint fk_alert_user
+		foreign key (userId) references core_user (id)
+			on delete cascade;
+core/core updated from 261 to 262
+[core/core] Excuting query: CREATE TABLE `core_permission` (
+  `moduleId` INT NOT NULL,
+  `groupId` INT NOT NULL,
+  `rights` BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`moduleId`, `groupId`),
+  INDEX `fk_permission_group_idx` (`groupId` ASC),
+  CONSTRAINT `fk_permission_module`
+      FOREIGN KEY (`moduleId`)
+          REFERENCES `core_module` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION,
+  CONSTRAINT `fk_permission_group`
+      FOREIGN KEY (`groupId`)
+          REFERENCES `core_group` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION);
+IGNORE: SQLSTATE[42S01]: Base table or view already exists: 1050 Table 'core_permission' already exists
+core/core updated from 262 to 263
+[core/core] Excuting query: INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), a.entityId FROM core_acl_group ag 
+join core_acl a on a.id = ag.aclId 
+join core_entity e on e.id = a.entityTypeId
+WHERE e.name = 'Module';
+core/core updated from 263 to 264
+[core/core] Excuting query: UPDATE core_permission p
+join core_acl_group ag on ag.groupId = p.groupId
+join core_acl a on a.id = ag.aclId
+join core_module m on a.entityId = m.id
+SET rights = IF(ag.level=10,0,IF(ag.level=40,1,3))
+WHERE a.entityId = p.moduleId AND  m.name = 'projects2';
+core/core updated from 264 to 265
+[community/tasks] Excuting query: ALTER TABLE `tasks_category` DROP FOREIGN KEY `tasks_category_ibfk_1`;
+community/tasks updated from 13 to 14
+[community/tasks] Excuting query: ALTER TABLE `tasks_category` CHANGE COLUMN `createdBy` `ownerId` INT(11) NULL ;
+community/tasks updated from 14 to 15
+[community/tasks] Excuting query: ALTER TABLE `tasks_category` ADD CONSTRAINT `tasks_category_ibfk_1` FOREIGN KEY (`ownerId`) REFERENCES `core_user` (`id`);
+community/tasks updated from 15 to 16
+[community/tasks] Excuting query: ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS `location` TEXT NULL;
+community/tasks updated from 16 to 17
+Rebuilding cache
+Registering all entities
+
+Upgrading all instances
+-------------------------------
+
+Upgrading instance: test.group-office.com: !!! FAILED !!!
+Upgrading instance: test2.group-office.com: !!! FAILED !!!
+Upgrading instance: test3.group-office.com: !!! FAILED !!!
+
+
+WARNING: There are 3 failed upgrades. Please investigate!
+
+Done!

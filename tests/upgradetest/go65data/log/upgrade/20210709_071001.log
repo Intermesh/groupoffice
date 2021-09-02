@@ -1,0 +1,5 @@
+[community/googleauthenticator] Excuting query: insert into core_acl_group select aclId, '2', 10 from core_module where package='community' and name ='googleauthenticator'
+community/googleauthenticator updated from 2 to 3
+Rebuilding cache
+Registering all entities
+Done!

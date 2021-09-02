@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+UID:28@localhost:8080
+LANGUAGE:en
+PRODID:-//Intermesh//NONSGML Group-Office 6.5.69//EN
+N:Demo 1;From;;;
+FN:From Demo 1
+REV:1626781655
+TITLE:
+NOTE:
+X-GO-GENDER:
+END:VCARD

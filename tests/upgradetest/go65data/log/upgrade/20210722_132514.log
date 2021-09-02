@@ -1,0 +1,189 @@
+[core/core] Excuting query: CREATE TABLE `core_permission` (
+  `moduleId` INT NOT NULL,
+  `groupId` INT NOT NULL,
+  `rights` BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`moduleId`, `groupId`),
+  INDEX `fk_permission_group_idx` (`groupId` ASC),
+  CONSTRAINT `fk_permission_module`
+      FOREIGN KEY (`moduleId`)
+          REFERENCES `core_module` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION,
+  CONSTRAINT `fk_permission_group`
+      FOREIGN KEY (`groupId`)
+          REFERENCES `core_group` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION);
+core/core updated from 241 to 242
+[core/core] Excuting query: INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), a.entityId FROM core_acl_group ag 
+join core_acl a on a.id = ag.aclId 
+join core_entity e on e.id = a.entityTypeId
+WHERE e.name = 'Module';
+core/core updated from 242 to 243
+[core/core] Excuting query: UPDATE core_permission p
+join core_acl_group ag on ag.groupId = p.groupId
+join core_acl a on a.id = ag.aclId
+join core_module m on a.entityId = m.id
+SET rights = IF(ag.level=10,0,IF(ag.level=40,1,3))
+WHERE a.entityId = p.moduleId AND  m.name = 'projects2';
+core/core updated from 243 to 244
+Rebuilding cache
+Registering all entities
+
+Error in /usr/local/share/src/www/go/core/model/Permission.php at line 30: Call to a member function module() on null at 2021-07-22T13:25:17+00:00
+
+#0 /usr/local/share/src/www/go/core/data/Model.php(310): go\core\model\Permission->getRights()
+#1 /usr/local/share/src/www/go/core/data/Model.php(183): go\core\data\Model->getValue('rights')
+#2 /usr/local/share/src/www/go/core/data/Model.php(176): go\core\data\Model->propToArray('rights')
+#3 /usr/local/share/src/www/go/core/orm/Property.php(2033): go\core\data\Model->toArray(Array)
+#4 /usr/local/share/src/www/go/core/data/Model.php(319): go\core\orm\Property->toArray()
+#5 [internal function]: go\core\data\Model->jsonSerialize()
+#6 /usr/local/share/src/www/go/modules/community/history/Module.php(128): json_encode(Array)
+#7 /usr/local/share/src/www/go/modules/community/history/Module.php(68): go\modules\community\history\Module::logEntity(Object(go\core\model\Module), 'update')
+#8 [internal function]: go\modules\community\history\Module::onEntitySave(Object(go\core\model\Module))
+#9 /usr/local/share/src/www/go/core/event/Listeners.php(118): call_user_func_array(Array, Array)
+#10 /usr/local/share/src/www/go/core/event/Listeners.php(132): go\core\event\Listeners->fireEvent('go\\core\\jmap\\En...', 'go\\core\\orm\\Pro...', 'save', Array)
+#11 /usr/local/share/src/www/go/core/event/EventEmitterTrait.php(69): go\core\event\Listeners->fireEvent('go\\core\\model\\M...', 'go\\core\\orm\\Pro...', 'save', Array)
+#12 /usr/local/share/src/www/go/core/orm/Entity.php(306): go\core\orm\Property::fireEvent('save', Object(go\core\model\Module))
+#13 /usr/local/share/src/www/go/core/Installer.php(479): go\core\orm\Entity->save()
+#14 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#15 {main}
+
+
+Debug dump: 
+
+Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Session writing closed
+Not using cache. This will be slow!
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Flushing cache
+GO\Base\Observable::cacheListeners
+setIgnoreAclPermissions(true)
+addListener(delete,GO\Tasks\TasksModule, deleteUser) => GO\Base\Model\User
+addListener(delete,GO\Calendar\CalendarModule, deleteUser) => GO\Base\Model\User
+addListener(dismiss,GO\Calendar\Model\Event, reminderDismissed) => GO\Base\Model\Reminder
+addListener(reminderdisplay,GO\Email\EmailModule, reminderDisplay) => GO\Core\Controller\ReminderController
+addListener(delete,GO\Email\EmailModule, deleteUser) => GO\Base\Model\User
+addListener(store,GO\Files\FilesModule, afterBatchEditStore) => GO\Core\Controller\BatchEditController
+addListener(submit,GO\Sieve\SieveModule, saveOutOfOfficeMessage) => GO\Email\Controller\AccountController
+addListener(load,GO\Sieve\SieveModule, loadOutOfOfficeMessage) => GO\Email\Controller\AccountController
+addListener(checkmodelfolder,GO\Projects2\Projects2Module, createParentFolders) => GO\Files\Controller\FolderController
+addListener(delete,GO\Projects2\Projects2Module, deleteUser) => GO\Base\Model\User
+setIgnoreAclPermissions(true)
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+ErrorHandler::exceptionHandler() called with Error
+Error in /usr/local/share/src/www/go/core/model/Permission.php at line 30: Call to a member function module() on null
+#0 /usr/local/share/src/www/go/core/data/Model.php(310): go\core\model\Permission->getRights()
+#1 /usr/local/share/src/www/go/core/data/Model.php(183): go\core\data\Model->getValue('rights')
+#2 /usr/local/share/src/www/go/core/data/Model.php(176): go\core\data\Model->propToArray('rights')
+#3 /usr/local/share/src/www/go/core/orm/Property.php(2033): go\core\data\Model->toArray(Array)
+#4 /usr/local/share/src/www/go/core/data/Model.php(319): go\core\orm\Property->toArray()
+#5 [internal function]: go\core\data\Model->jsonSerialize()
+#6 /usr/local/share/src/www/go/modules/community/history/Module.php(128): json_encode(Array)
+#7 /usr/local/share/src/www/go/modules/community/history/Module.php(68): go\modules\community\history\Module::logEntity(Object(go\core\model\Module), 'update')
+#8 [internal function]: go\modules\community\history\Module::onEntitySave(Object(go\core\model\Module))
+#9 /usr/local/share/src/www/go/core/event/Listeners.php(118): call_user_func_array(Array, Array)
+#10 /usr/local/share/src/www/go/core/event/Listeners.php(132): go\core\event\Listeners->fireEvent('go\\core\\jmap\\En...', 'go\\core\\orm\\Pro...', 'save', Array)
+#11 /usr/local/share/src/www/go/core/event/EventEmitterTrait.php(69): go\core\event\Listeners->fireEvent('go\\core\\model\\M...', 'go\\core\\orm\\Pro...', 'save', Array)
+#12 /usr/local/share/src/www/go/core/orm/Entity.php(306): go\core\orm\Property::fireEvent('save', Object(go\core\model\Module))
+#13 /usr/local/share/src/www/go/core/Installer.php(479): go\core\orm\Entity->save()
+#14 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#15 {main}

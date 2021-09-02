@@ -522,6 +522,10 @@ class Instance extends Entity {
 		if(!isset($this->instanceDbConn)) {		
 			
 			$config = $this->getInstanceConfig();
+
+			if(empty($config['db_name'])) {
+				throw new Exception("Config not found");
+			}
 			
 			$dsn = 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
 			$this->instanceDbConn = new \go\core\db\Connection($dsn, $config['db_user'], $config['db_pass']);

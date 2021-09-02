@@ -1,0 +1,37 @@
+Rebuilding cache
+Registering all entities
+<b>Error:</b> PDOException in /usr/local/share/src/www/go/core/db/Query.php at line 661: SQLSTATE[HY000]: General error: could not call class constructor
+
+#0 /usr/local/share/src/www/go/core/db/Query.php(661): PDOStatement->fetchAll()
+#1 /usr/local/share/src/www/go/core/Installer.php(466): go\core\db\Query->all()
+#2 /usr/local/share/src/www/install/upgrade.php(77): go\core\Installer->upgrade()
+#3 {main}</pre></div><div style="clear:both;margin-bottom:20px;"></div><div class="card"><h2>Debugger output</h2><pre>Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Session writing closed
+Not using cache. This will be slow!
+Flushing cache
+GO\Base\Observable::cacheListeners
+setIgnoreAclPermissions(true)
+addListener(delete,GO\Tasks\TasksModule, deleteUser) => GO\Base\Model\User
+addListener(delete,GO\Calendar\CalendarModule, deleteUser) => GO\Base\Model\User
+addListener(dismiss,GO\Calendar\Model\Event, reminderDismissed) => GO\Base\Model\Reminder
+addListener(reminderdisplay,GO\Email\EmailModule, reminderDisplay) => GO\Core\Controller\ReminderController
+addListener(delete,GO\Email\EmailModule, deleteUser) => GO\Base\Model\User
+addListener(store,GO\Files\FilesModule, afterBatchEditStore) => GO\Core\Controller\BatchEditController
+addListener(submit,GO\Sieve\SieveModule, saveOutOfOfficeMessage) => GO\Email\Controller\AccountController
+addListener(load,GO\Sieve\SieveModule, loadOutOfOfficeMessage) => GO\Email\Controller\AccountController
+addListener(checkmodelfolder,GO\Projects2\Projects2Module, createParentFolders) => GO\Files\Controller\FolderController
+addListener(delete,GO\Projects2\Projects2Module, deleteUser) => GO\Base\Model\User
+setIgnoreAclPermissions(true)
+SQL FAILED: SHOW FULL COLUMNS FROM `core_permission`;
+PDOException in /usr/local/share/src/www/go/core/db/Query.php at line 661: SQLSTATE[HY000]: General error: could not call class constructor
+Previous: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'groupoffice_module_permissions.core_permission' doesn't exist
+#0 /usr/local/share/src/www/go/core/db/Query.php(661): PDOStatement->fetchAll()
+#1 /usr/local/share/src/www/go/core/Installer.php(466): go\core\db\Query->all()
+#2 /usr/local/share/src/www/install/upgrade.php(77): go\core\Installer->upgrade()
+#3 {main}</pre></div></section>
+<footer>&copy; Intermesh - <a href="https://www.group-office.com">https://www.group-office.com</a></footer>
+
+</body>
+</html>

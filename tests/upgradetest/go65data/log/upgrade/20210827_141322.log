@@ -1,0 +1,20 @@
+[core/core] Excuting query: alter table core_module drop foreign key acl;
+IGNORE: SQLSTATE[42000]: Syntax error or access violation: 1091 Can't DROP FOREIGN KEY `acl`; check that it exists
+core/core updated from 265 to 266
+[core/core] Excuting query: alter table core_module drop column aclId;
+IGNORE: SQLSTATE[42000]: Syntax error or access violation: 1091 Can't DROP COLUMN `aclId`; check that it exists
+core/core updated from 266 to 267
+Rebuilding cache
+Registering all entities
+
+Upgrading all instances
+-------------------------------
+
+Upgrading instance: test.group-office.com: !!! FAILED !!!
+Upgrading instance: test2.group-office.com: !!! FAILED !!!
+Upgrading instance: test3.group-office.com: !!! FAILED !!!
+
+
+WARNING: There are 3 failed upgrades. Please investigate!
+
+Done!

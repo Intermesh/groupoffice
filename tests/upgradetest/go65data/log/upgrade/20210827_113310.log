@@ -1,0 +1,12 @@
+Rebuilding cache
+Registering all entities
+
+Upgrading all instances
+-------------------------------
+
+Upgrading instance: test.group-office.com: ok
+Upgrading instance: test2.group-office.com: ok
+Upgrading instance: test3.group-office.com: ok
+Skipping not installed instance: test1.group-office.com
+All OK!
+Done!

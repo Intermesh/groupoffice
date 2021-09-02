@@ -1,0 +1,20 @@
+
+ParseError in /usr/local/share/src/www/go/core/install/updates.php at line 1090: syntax error, unexpected 'table' (T_STRING) at 2021-08-27T14:12:47+00:00
+
+#0 /usr/local/share/src/www/go/core/Installer.php(443): go\core\Installer->upgradeModules()
+#1 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#2 {main}
+
+
+Debug dump: 
+
+Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Session writing closed
+Not using cache. This will be slow!
+ErrorHandler::exceptionHandler() called with ParseError
+ParseError in /usr/local/share/src/www/go/core/install/updates.php at line 1090: syntax error, unexpected 'table' (T_STRING)
+#0 /usr/local/share/src/www/go/core/Installer.php(443): go\core\Installer->upgradeModules()
+#1 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#2 {main}

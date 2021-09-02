@@ -1,0 +1,15 @@
+Skipping module tasks because it's not available.
+[legacy/sync] Excuting query: DELETE FROM `sync_tasklist_user` WHERE `tasklistId` NOT IN(SELECT `id` FROM `tasks_tasklist`);
+<b>Error:</b> Exception in /usr/local/share/src/www/go/core/Installer.php at line 678: 42S02: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'test2_group_office_com.tasks_tasklist' doesn't exist
+Query: DELETE FROM `sync_tasklist_user` WHERE `tasklistId` NOT IN(SELECT `id` FROM `tasks_tasklist`);
+Package: legacy
+Module: sync
+Module installed version: 56
+Module source version: 57
+ABORTING: Please contact support
+
+</pre></div></section>
+<footer>&copy; Intermesh - <a href="https://www.group-office.com">https://www.group-office.com</a></footer>
+
+</body>
+</html>

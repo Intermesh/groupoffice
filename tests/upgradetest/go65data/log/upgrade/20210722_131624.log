@@ -1,0 +1,149 @@
+Rebuilding cache
+Registering all entities
+<b>Error:</b> PDOException in /usr/local/share/src/www/go/core/db/Connection.php at line 138: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'groupoffice_module_permissions.core_permission' doesn't exist
+
+#0 /usr/local/share/src/www/go/core/db/Connection.php(138): PDO->query('SHOW FULL COLUM...')
+#1 /usr/local/share/src/www/go/core/db/Table.php(131): go\core\db\Connection->query('SHOW FULL COLUM...')
+#2 /usr/local/share/src/www/go/core/db/Table.php(77): go\core\db\Table->init()
+#3 /usr/local/share/src/www/go/core/orm/MappedTable.php(51): go\core\db\Table->__construct('core_permission', Object(go\core\db\Connection))
+#4 /usr/local/share/src/www/go/core/orm/Mapping.php(81): go\core\orm\MappedTable->__construct('core_permission', 'core_permission', NULL, Array, Array)
+#5 /usr/local/share/src/www/go/core/model/Permission.php(20): go\core\orm\Mapping->addTable('core_permission')
+#6 /usr/local/share/src/www/go/core/orm/Property.php(517): go\core\model\Permission::defineMapping()
+#7 /usr/local/share/src/www/go/core/orm/Property.php(710): go\core\orm\Property::getMapping()
+#8 /usr/local/share/src/www/go/core/orm/Property.php(356): go\core\orm\Property::internalFind(Array, false, Object(go\core\model\Module))
+#9 /usr/local/share/src/www/go/core/orm/Property.php(269): go\core\orm\Property::queryRelation('go\\core\\model\\P...', Array, Object(go\core\orm\Relation), false, Object(go\core\model\Module))
+#10 /usr/local/share/src/www/go/core/orm/Property.php(137): go\core\orm\Property->initRelations()
+#11 [internal function]: go\core\orm\Property->__construct(false, Array, false, NULL)
+#12 /usr/local/share/src/www/go/core/db/Query.php(651): PDOStatement->fetch()
+#13 /usr/local/share/src/www/go/core/model/Module.php(391): go\core\db\Query->single()
+#14 /usr/local/share/src/www/go/core/Installer.php(474): go\core\model\Module::findByName('core', 'core')
+#15 /usr/local/share/src/www/install/upgrade.php(77): go\core\Installer->upgrade()
+#16 {main}</pre></div><div style="clear:both;margin-bottom:20px;"></div><div class="card"><h2>Debugger output</h2><pre>Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Session writing closed
+Not using cache. This will be slow!
+Flushing cache
+GO\Base\Observable::cacheListeners
+setIgnoreAclPermissions(true)
+addListener(delete,GO\Tasks\TasksModule, deleteUser) => GO\Base\Model\User
+addListener(delete,GO\Calendar\CalendarModule, deleteUser) => GO\Base\Model\User
+addListener(dismiss,GO\Calendar\Model\Event, reminderDismissed) => GO\Base\Model\Reminder
+addListener(reminderdisplay,GO\Email\EmailModule, reminderDisplay) => GO\Core\Controller\ReminderController
+addListener(delete,GO\Email\EmailModule, deleteUser) => GO\Base\Model\User
+addListener(store,GO\Files\FilesModule, afterBatchEditStore) => GO\Core\Controller\BatchEditController
+addListener(submit,GO\Sieve\SieveModule, saveOutOfOfficeMessage) => GO\Email\Controller\AccountController
+addListener(load,GO\Sieve\SieveModule, loadOutOfOfficeMessage) => GO\Email\Controller\AccountController
+addListener(checkmodelfolder,GO\Projects2\Projects2Module, createParentFolders) => GO\Files\Controller\FolderController
+addListener(delete,GO\Projects2\Projects2Module, deleteUser) => GO\Base\Model\User
+setIgnoreAclPermissions(true)
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+SQL FAILED: SHOW FULL COLUMNS FROM `core_permission`;
+PDOException in /usr/local/share/src/www/go/core/db/Connection.php at line 138: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'groupoffice_module_permissions.core_permission' doesn't exist
+#0 /usr/local/share/src/www/go/core/db/Connection.php(138): PDO->query('SHOW FULL COLUM...')
+#1 /usr/local/share/src/www/go/core/db/Table.php(131): go\core\db\Connection->query('SHOW FULL COLUM...')
+#2 /usr/local/share/src/www/go/core/db/Table.php(77): go\core\db\Table->init()
+#3 /usr/local/share/src/www/go/core/orm/MappedTable.php(51): go\core\db\Table->__construct('core_permission', Object(go\core\db\Connection))
+#4 /usr/local/share/src/www/go/core/orm/Mapping.php(81): go\core\orm\MappedTable->__construct('core_permission', 'core_permission', NULL, Array, Array)
+#5 /usr/local/share/src/www/go/core/model/Permission.php(20): go\core\orm\Mapping->addTable('core_permission')
+#6 /usr/local/share/src/www/go/core/orm/Property.php(517): go\core\model\Permission::defineMapping()
+#7 /usr/local/share/src/www/go/core/orm/Property.php(710): go\core\orm\Property::getMapping()
+#8 /usr/local/share/src/www/go/core/orm/Property.php(356): go\core\orm\Property::internalFind(Array, false, Object(go\core\model\Module))
+#9 /usr/local/share/src/www/go/core/orm/Property.php(269): go\core\orm\Property::queryRelation('go\\core\\model\\P...', Array, Object(go\core\orm\Relation), false, Object(go\core\model\Module))
+#10 /usr/local/share/src/www/go/core/orm/Property.php(137): go\core\orm\Property->initRelations()
+#11 [internal function]: go\core\orm\Property->__construct(false, Array, false, NULL)
+#12 /usr/local/share/src/www/go/core/db/Query.php(651): PDOStatement->fetch()
+#13 /usr/local/share/src/www/go/core/model/Module.php(391): go\core\db\Query->single()
+#14 /usr/local/share/src/www/go/core/Installer.php(474): go\core\model\Module::findByName('core', 'core')
+#15 /usr/local/share/src/www/install/upgrade.php(77): go\core\Installer->upgrade()
+#16 {main}</pre></div></section>
+<footer>&copy; Intermesh - <a href="https://www.group-office.com">https://www.group-office.com</a></footer>
+
+</body>
+</html>
