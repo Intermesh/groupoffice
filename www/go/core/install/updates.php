@@ -1074,17 +1074,14 @@ $updates['202107221420'][] = "CREATE TABLE `core_permission` (
           ON UPDATE NO ACTION);";
 
 // migratie module acl permission to action permission
-$updates['202107221420'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), a.entityId FROM core_acl_group ag 
-join core_acl a on a.id = ag.aclId 
-join core_entity e on e.id = a.entityTypeId
-WHERE e.name = 'Module';";
+$updates['202107221420'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), m.id FROM core_acl_group ag 
+join core_module m on ag.aclId = m.aclId;";
 // projects2 has finance permissions
 $updates['202107221420'][] = "UPDATE core_permission p
 join core_acl_group ag on ag.groupId = p.groupId
-join core_acl a on a.id = ag.aclId
-join core_module m on a.entityId = m.id
+join core_module m on ag.aclId = m.aclId
 SET rights = IF(ag.level=10,0,IF(ag.level=40,1,3))
-WHERE a.entityId = p.moduleId AND  m.name = 'projects2';";
+WHERE m.id = p.moduleId AND m.name = 'projects2';";
 
 
 $updates['202108271613'][] = "alter table core_module drop foreign key acl;";
