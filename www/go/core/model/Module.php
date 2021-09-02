@@ -21,11 +21,9 @@ class Module extends Entity {
 	public $permissions = [];
 
 	// for backwards compatibility
-	public function getPermissionLevel() {
-		if(\GO::user()->isAdmin())
-			return 50;
+	public function getPermissionLevel($userId = null) {
 
-		$rights = $this->getUserRights();
+		$rights = $this->getUserRights($userId);
 
 		if($this->name == 'projects2' && $rights->mayFinance) { // a single exception for this compat method
 			return 40;
@@ -129,20 +127,42 @@ class Module extends Entity {
 			->addMap('permissions', Permission::class, ['id'=>'moduleId']);
 	}
 
-	public function getUserRights() {
+	private function adminRights() {
+		$rights = ["mayRead" => true];
+		foreach($this->module()->getRights() as $name => $bit){
+			$rights[$name] = true;
+		}
+		return (object) $rights;
+	}
+
+	/**
+	 * Get's the rights of a user
+	 *
+	 * @param $userId The user ID to query. defaults to current authorized user.
+	 * @return array|object ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
+	 */
+	public function getUserRights($userId = null) {
+
+		if(!isset($userId)) {
+			$userId = go()->getAuthState()->getUserId();
+			$isAdmin = go()->getAuthState()->isAdmin();
+		} else{
+			$isAdmin = User::isAdminById($userId);
+
+		}
 
 		if(!$this->isAvailable()) {
-			return ['mayRead' => go()->getAuthState()->isAdmin()];
+			return ['mayRead' => $isAdmin];
 		}
 
-		if(go()->getAuthState()->isAdmin()) {
-			$rights = ["mayRead" => true];
-			foreach($this->module()->getRights() as $name => $bit){
-				$rights[$name] = true;
-			}
-			return (object) $rights;
+		if($isAdmin) {
+			return $this->adminRights();
 		}
 
+		return $this->userRights($userId);
+	}
+
+	private function userRights($userId) {
 		$r = go()->getDbConnection()->selectSingleValue("MAX(rights)")
 			->from("core_permission")
 			->where('moduleId', '=', $this->id)
@@ -150,7 +170,7 @@ class Module extends Entity {
 				go()->getDbConnection()
 					->select("groupId")
 					->from("core_user_group")
-					->where(['userId' => go()->getAuthState()->getUserId()])
+					->where(['userId' => $userId])
 			)->single();
 
 		if($r === null) {

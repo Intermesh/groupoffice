@@ -46,7 +46,7 @@ abstract class AbstractUserDefaultModel extends \GO\Base\Db\ActiveRecord {
 			$modules = \GO::modules()->getAllModules();
 			
 			while ($module=array_shift($modules)) {
-			  $permissionLevel=$user_id ? Acl::getUserPermissionLevel($module->acl_id, $user_id) : 1;
+			  $permissionLevel=$user_id ? $module->getPermissionLevel($user_id): 1;
 				if($permissionLevel){
 				  if($module->moduleManager instanceof \GO\Base\Module ){
 					  $classes = $module->moduleManager->findClasses('model');

@@ -47,11 +47,19 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		return parent::model($className);
 	}
 
-	public function getPermissionLevel() {
+	public function getPermissionLevel($userId = null) {
 		if(\GO::user()->isAdmin())
 			return 50;
 
-		$userId =\GO::user()->id;
+		if(!isset($userId)) {
+			$userId = GO::user()->id;
+			if(\go\core\model\User::isAdminById($userId)) {
+				return 50;
+			}
+		} else{
+			if(\GO::user()->isAdmin())
+				return 50;
+		}
 		$moduleId = $this->id;
 
 		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".$userId.") AND moduleId = ".$moduleId.";";
