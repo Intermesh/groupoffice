@@ -1,3 +1,5 @@
+- Email: Unknown recipients dialog maximized on mobile
+
 24-08-2021 6.5.74
 - Studio: Initial config had "id" for autoExpandColumn instead of "showID".
 - Core: Custom fields can be rendered as text in templates with entity.customFields.asText.foo
