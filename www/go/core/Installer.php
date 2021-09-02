@@ -692,7 +692,7 @@ class Installer {
 					//$moduleModel = GO\Base\Model\Module::model()->findByName($module);
 					//refetch module to see if package was updated
 					if (!$module->package) {
-						$module = model\Module::findById($moduleId);
+						$module = model\Module::findById($moduleId, ['id', 'name', 'package', 'version', 'enabled']);
 						$newBackendUpgrade = $module->package != null;
 						if ($newBackendUpgrade) {
 							$module->version = $counts[$moduleId] = 0;
