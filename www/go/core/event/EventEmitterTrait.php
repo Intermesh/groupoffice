@@ -50,6 +50,10 @@ trait EventEmitterTrait {
 	
 	/**
 	 * Fire an event
+	 *
+	 * If you want to send (non object) variables by references you have to wrap it in an array:
+	 *
+	 * ['title' => &$title, 'body' => &$body]
 	 * 
 	 * @param int $event Defined in constants prefixed by EVENT_
 	 * @param mixed $args Multiple extra arguments to be passed to the listener functions.

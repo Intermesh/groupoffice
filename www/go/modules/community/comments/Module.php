@@ -29,7 +29,7 @@ class Module extends core\Module
 		Entity::on(Entity::EVENT_ALERT_PROPS, static::class, 'onAlertProps');
 	}
 
-	public static function onAlertProps(Entity $entity, core\model\Alert $alert, &$title, &$body)
+	public static function onAlertProps(Entity $entity, core\model\Alert $alert, $props)
 	{
 		if ($alert->tag != "comment") {
 			return;
@@ -37,7 +37,7 @@ class Module extends core\Module
 		$data = $alert->getData();
 		$creator = core\model\User::findById($data->createdBy, ['displayName']);
 
-		$body = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ":\n\n" . $alert->getData()->excerpt;
+		$props['body'] = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ":\n\n" . $alert->getData()->excerpt;
 	}
 
 	protected function beforeInstall(\go\core\model\Module $model)

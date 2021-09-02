@@ -108,7 +108,7 @@ class Listeners extends Singleton {
 	 * @param mixed[] $args
 	 * @return boolean
 	 */
-	public function fireEvent($calledClass, $traitUser, $event, $args) {	
+	public function fireEvent($calledClass, $traitUser, $event, $args) {
 		
 		$this->checkInit();
 

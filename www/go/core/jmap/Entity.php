@@ -752,7 +752,7 @@ abstract class Entity  extends OrmEntity {
 		$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
 		go()->getLanguage()->setLanguage($user->language);
 
-		self::fireEvent(self::EVENT_ALERT_PROPS, $this, $alert, $title, $body);
+		self::fireEvent(self::EVENT_ALERT_PROPS, $this, $alert, ['title' => &$title, 'body' => &$body]);
 
 		if(!isset($body)) {
 
