@@ -81,7 +81,7 @@ class Alert extends SingleOwnerEntity
 	 * @return Alert
 	 */
 	public function setData(array $data) {
-		$this->data = json_encode(array_merge($this->getData(), $data));
+		$this->data = json_encode(array_merge((array) $this->getData(), $data));
 
 		return $this;
 	}
