@@ -1086,3 +1086,8 @@ WHERE m.id = p.moduleId AND m.name = 'projects2';";
 
 $updates['202108271613'][] = "alter table core_module drop foreign key acl;";
 $updates['202108271613'][] = "alter table core_module drop column aclId;";
+
+
+$updates['202109021333'][] = "alter table core_alert
+	add sendMail boolean default false not null;";
+

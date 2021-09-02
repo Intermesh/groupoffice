@@ -994,6 +994,7 @@ CREATE TABLE `core_alert` (
     tag varchar(50) null,
   `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
   `data` text null,
+  sendMail boolean default false not null,
   PRIMARY KEY (`id`),
   INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
   INDEX `fk_alert_user_idx` (`userId` ASC),

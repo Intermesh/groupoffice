@@ -55,7 +55,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 				totalProperty: "count",
 				root: "results",
 				fields:['id','name','model_id','model_name','model_type_id',
-					'type','local_time', 'iconCls','time','snooze_time','text']
+					'type','local_time', 'iconCls','time','snooze_time','text', 'entity']
 			}),
 			groupField: 'type',
 			remoteSort: true,
@@ -91,13 +91,15 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					body += "\n" + record.data.text;
 				}
 
-				var ico = record.data.iconCls.split('\\').pop();
+
+				const iconCls = go.Entities.getLinkIcon(record.data.entity);
+
 				var reminderPanel = {
 					statusIcon: "reminder",
 					itemId: id,
 					record: record,
 					title: record.data.type,
-					iconCls: 'entity ' + ico,
+					iconCls: iconCls,
 					html: Ext.util.Format.nl2br(body),
 					notificationBody:  body,
 

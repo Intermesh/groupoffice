@@ -52,19 +52,14 @@ trait EventEmitterTrait {
 	 * Fire an event
 	 * 
 	 * @param int $event Defined in constants prefixed by EVENT_
-	 * @param mixed $args Multiple extra arguments to be passed to the listener functions
+	 * @param mixed $args Multiple extra arguments to be passed to the listener functions.
 	 * @return boolean
 	 */
-	public static function fireEvent($event){
+	public static function fireEvent($event, &...$args){
 		
 		if(EventEmitterTrait::$disableEvents) {
 			return true;
 		}
-		
-		$args = func_get_args();
-		
-		//shift $event
-		array_shift($args);
 		
 		if(!Listeners::get()->fireEvent(static::class, self::class, $event, $args)) {
 			return false;

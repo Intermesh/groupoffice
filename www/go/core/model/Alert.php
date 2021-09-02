@@ -2,9 +2,11 @@
 
 namespace go\core\model;
 
+use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\SingleOwnerEntity;
 
 use go\core\db\Criteria;
+use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
 
@@ -16,9 +18,6 @@ class Alert extends SingleOwnerEntity
 
 	public $entityId;
 
-	public $title;
-	public $body;
-
 	public $userId;
 	public $triggerAt;
 
@@ -26,6 +25,8 @@ class Alert extends SingleOwnerEntity
 	public $tag;
 
 	protected $data;
+
+	public $sendMail = false;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
@@ -51,11 +52,27 @@ class Alert extends SingleOwnerEntity
 	/**
 	 * Get arbitrary notification data
 	 *
-	 * @return array
+	 * @return StdClass
 	 */
 	public function getData() {
-		return empty($this->data) ? [] : json_decode($this->data, true);
+		return empty($this->data) ? (Object) [] : json_decode($this->data, false);
 	}
+
+	/**
+	 * Find the entity this alert belongs to.
+	 *
+	 * @return Entity|ActiveRecord
+	 */
+	public function findEntity() {
+		$e = EntityType::findById($this->entityTypeId);
+		$cls = $e->getClassName();
+		if(is_a($cls, ActiveRecord::class, true)) {
+			return $cls::model()->findByPk($this->entityId);
+		} else {
+			return $cls::findById($this->entityId);
+		}
+	}
+
 
 	/**
 	 * Set arbitrary notification data
@@ -71,19 +88,24 @@ class Alert extends SingleOwnerEntity
 
 	protected function internalSave()
 	{
-		if($this->isNew() && isset($this->tag)) {
-			//skip dismiss action below in internal delete
-			$query = Query::normalize([
-				'entityTypeId' => $this->entityTypeId,
-				'entityId' => $this->entityId,
-				'tag' => $this->tag,
-				'userId' => $this->userId
-			])
-				// Skip dismiss update in internalDelete below
-				->setData(['preventDismiss' => true]);
+		if($this->isNew()) {
 
-			if(!static::delete($query)) {
-				return false;
+			$this->sendMail = User::findById($this->userId, ['mail_reminders'])->mail_reminders;
+
+			if(isset($this->tag)) {
+				//skip dismiss action below in internal delete
+				$query = Query::normalize([
+					'entityTypeId' => $this->entityTypeId,
+					'entityId' => $this->entityId,
+					'tag' => $this->tag,
+					'userId' => $this->userId
+				])
+					// Skip dismiss update in internalDelete below
+					->setData(['preventDismiss' => true]);
+
+				if (!static::delete($query)) {
+					return false;
+				}
 			}
 		}
 		return parent::internalSave();
@@ -111,6 +133,28 @@ class Alert extends SingleOwnerEntity
 		}
 
 		return parent::internalDelete($query);
+	}
+
+	private $props;
+
+	private function getProps() {
+		if(!isset($this->props)) {
+			$e = $this->findEntity();
+			if (!$e) {
+				$this->props = ['title' => null, 'body' => null];
+			} else{
+				$this->props = $e->alertProps($this);
+			}
+		}
+
+		return $this->props;
+	}
+
+	public function getTitle() {
+		return $this->getProps()['title'];
+	}
+	public function getBody() {
+		return $this->getProps()['body'];
 	}
 
 }

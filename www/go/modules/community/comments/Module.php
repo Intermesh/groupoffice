@@ -10,9 +10,11 @@ use go\core\model\Group;
 use go\core\model\Module as GoModule;
 use go\modules\community\comments\model\Comment;
 
-class Module extends core\Module {	
+class Module extends core\Module
+{
 
-	public function getAuthor() {
+	public function getAuthor()
+	{
 		return "Intermesh BV";
 	}
 
@@ -20,11 +22,23 @@ class Module extends core\Module {
 	{
 		return true;
 	}
-	
-	public function defineListeners() {
+
+	public function defineListeners()
+	{
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'garbageCollection');
+		Entity::on(Entity::EVENT_ALERT_PROPS, static::class, 'onAlertProps');
 	}
 
+	public static function onAlertProps(Entity $entity, core\model\Alert $alert, &$title, &$body)
+	{
+		if ($alert->tag != "comment") {
+			return;
+		}
+		$data = $alert->getData();
+		$creator = core\model\User::findById($data->createdBy, ['displayName']);
+
+		$body = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ":\n\n" . $alert->getData()->excerpt;
+	}
 
 	protected function beforeInstall(\go\core\model\Module $model)
 	{

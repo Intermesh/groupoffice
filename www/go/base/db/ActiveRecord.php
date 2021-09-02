@@ -45,6 +45,7 @@ use GO;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
+use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\model\Alert;
 use go\core\model\Link;
@@ -5626,5 +5627,24 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public static function dismissAlerts(array $alerts) {
 
+	}
+
+	public function alertProps(Alert $alert) {
+
+		$body = null;
+		$title = null;
+
+		self::fireEvent(Entity::EVENT_ALERT_PROPS, $this, $alert, $title, $body);
+
+		if(!isset($body)) {
+			$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
+			$body = $alert->triggerAt->toUserFormat(true, $user);
+		}
+
+		if(!isset($title)) {
+			$title = $alert->findEntity()->title() ?? null;
+		}
+
+		return ['title' => $title, 'body' => $body];
 	}
 }

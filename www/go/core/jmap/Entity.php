@@ -5,6 +5,7 @@ namespace go\core\jmap;
 use Exception;
 use go\core\model\Alert;
 use go\core\model\Module;
+use go\core\model\User;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
@@ -734,6 +735,38 @@ abstract class Entity  extends OrmEntity {
 	 */
 	public static function dismissAlerts(array $alerts) {
 
+	}
+
+
+	public function alertTitle(Alert $alert) {
+
+	}
+
+	const EVENT_ALERT_PROPS = 'alertprops';
+
+	public function alertProps(Alert $alert) {
+
+		$body = null;
+		$title = null;
+
+		$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
+		go()->getLanguage()->setLanguage($user->language);
+
+		self::fireEvent(self::EVENT_ALERT_PROPS, $this, $alert, $title, $body);
+
+		if(!isset($body)) {
+
+			$body = $alert->triggerAt->toUserFormat(true, $user);
+		}
+
+		if(!isset($title)) {
+			$title = $alert->findEntity()->title() ?? null;
+		}
+
+
+		go()->getLanguage()->setLanguage(go()->getAuthState()->getUser(['language'])->language);
+
+		return ['title' => $title, 'body' => $body];
 	}
 
 }
