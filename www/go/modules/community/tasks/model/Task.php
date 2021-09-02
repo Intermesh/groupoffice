@@ -625,7 +625,7 @@ class Task extends AclItemEntity {
 		$data = $alert->getData();
 		$assigner = User::findById($data->assignedBy, ['displayName']);
 
-		$body = str_replace('{assigner}', $assigner->displayName, go()->t("You were assigned to this task by {assignedBy}"));
+		$body = str_replace('{assigner}', $assigner->displayName, go()->t("You were assigned to this task by {assigner}"));
 		$title = $alert->findEntity()->title() ?? null;
 
 		return ['title' => $title, 'body' => $body];
