@@ -109,13 +109,15 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						name: 'username',
 						disabled: true,
 						fieldLabel: t('Username'),
+						autocomplete: "new-password",
 						hint: "cn=Administrator,dc=com"
 					}, {
 						xtype: 'textfield',
 						name: 'password',
 						disabled: true,
 						fieldLabel: t('Password'),
-						inputType:"password"
+						inputType:"password",
+						autocomplete: "new-password"
 					},{
 						xtype: "checkbox",
 						fieldLabel: t("Follow referrals"),
