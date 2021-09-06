@@ -167,7 +167,7 @@ class TemplateParser {
 		$this->addFilter('entity', [$this, "filterEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('nl2br', "nl2br");
-		$this->addFilter('t', "translate");
+		$this->addFilter('t', [$this, "filterTranslate"]);
 
 		$this->addModel('now', new DateTime());	
 	}
