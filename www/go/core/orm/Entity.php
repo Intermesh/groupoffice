@@ -599,7 +599,7 @@ abstract class Entity extends Property {
    */
 	public function findAclId() {
 
-		return null;
+		return Acl::getReadOnlyAclId();
 //
 //		$moduleId = static::entityType()->getModuleId();
 //
