@@ -680,6 +680,9 @@ abstract class EntityController extends Controller {
    */
 	private function updateEntities($update, &$result) {
 		foreach ($update as $id => $properties) {
+			if(empty($properties)) {
+				$properties = [];
+			}
 			$entity = $this->getEntity($id);			
 			if (!$entity) {
 				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Item not found"));

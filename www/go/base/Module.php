@@ -70,6 +70,10 @@ class Module extends Observable {
 		return $this->name();
 	}
 
+	public function getRights() {
+		return ['mayManage' => 1];
+	}
+
 
 	public function __toString() {
 		return 'legacy/' . $this->getName();

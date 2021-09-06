@@ -1,4 +1,7 @@
-go.oauth.SystemSettingsPanel = Ext.extend(Ext.Panel, {
+go.oauth.SystemSettingsPanel = Ext.extend(go.systemsettings.Panel, {
+	hasPermission: function() {
+		return go.User.isAdmin;
+	},
 	iconCls: 'ic-vpn-key',
 	itemId: "oauth2", //makes it routable
 	layout: "border",

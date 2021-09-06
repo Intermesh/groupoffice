@@ -103,7 +103,8 @@ class ModuleController extends AbstractJsonController{
 					'author'=>$module->getAuthor(),
 					'description'=>$module->getDescription(),
 					'icon'=>$module->getIcon(),
-					'aclId'=>$model ? $model->getAclId() : 0,
+					'rights'=>array_keys($module->getRights()),
+					//'aclId'=>$model ? $model->getAclId() : 0,
 
 					'localizedPackage'=>ucfirst($module->getPackage()),
 					'package'=>$module->getPackage(),
@@ -135,7 +136,8 @@ class ModuleController extends AbstractJsonController{
 					'author'=>$module->author(),
 					'description'=>$module->description(),
 					'icon'=>$module->icon(),
-					'aclId'=>$model ? $model->getAcl_id() : 0,
+					//'aclId'=>$model ? $model->getAcl_id() : 0,
+					'rights'=> array_keys($module->getRights()),
 //					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
 //							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
 					'package' => 'legacy',

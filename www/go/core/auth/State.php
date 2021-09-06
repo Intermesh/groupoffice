@@ -33,21 +33,21 @@ abstract class State {
 	 */
 	abstract public function isAdmin();
 
-	private static $classPermissionLevels = [];
+	private static $classRights = [];
 
 	/**
 	 * Get the permission level of the module this controller belongs to.
 	 * 
 	 * @return int
 	 */
-	public function getClassPermissionLevel($cls) {
-		if(!isset(self::$classPermissionLevels[$cls])) {
-			$mod = Module::findByClass($cls, ['aclId', 'permissionLevel']);
-			self::$classPermissionLevels[$cls]= $mod->getPermissionLevel();
+	public function getClassRights($cls) {
+		if(!isset(self::$classRights[$cls])) {
+			$mod = Module::findByClass($cls, ['id', 'name', 'package']);
+			self::$classRights[$cls]= $mod->getUserRights();
 		}
 
 
-		return self::$classPermissionLevels[$cls];
+		return self::$classRights[$cls];
 	}
 
 	/**

@@ -523,10 +523,10 @@ class Instance extends Entity {
 			
 			$config = $this->getInstanceConfig();
 
-			if(!isset($config['db_name'])) {
-				throw new \go\core\http\Exception("No valid config found!");
+			if(empty($config['db_name'])) {
+				throw new Exception("Config not found");
 			}
-			
+
 			$dsn = 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
 			$this->instanceDbConn = new \go\core\db\Connection($dsn, $config['db_user'], $config['db_pass']);
 		}
@@ -571,7 +571,8 @@ class Instance extends Entity {
 	public function isInstalled() {
 		try {
 			return $this->getInstanceDbConnection()->getDatabase()->hasTable('core_module');
-		} catch( \Exception $e) {
+		} catch(Exception $e) {
+			ErrorHandler::logException($e);
 			return false;
 		}
 	}

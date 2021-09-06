@@ -1,0 +1,134 @@
+Rebuilding cache
+Registering all entities
+<b>Error:</b> Exception in /usr/local/share/src/www/go/core/orm/Property.php at line 644: Can't set not existing property 'groupId' in 'go\core\model\Permission'
+
+#0 /usr/local/share/src/www/go/core/Installer.php(476): go\core\orm\Property->__set('groupId', 2)
+#1 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#2 {main}</pre></div><div style="clear:both;margin-bottom:20px;"></div><div class="card"><h2>Debugger output</h2><pre>Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Session writing closed
+Session writing closed
+Not using cache. This will be slow!
+Flushing cache
+GO\Base\Observable::cacheListeners
+setIgnoreAclPermissions(true)
+addListener(submit,GO\Sieve\SieveModule, saveOutOfOfficeMessage) => GO\Email\Controller\AccountController
+addListener(load,GO\Sieve\SieveModule, loadOutOfOfficeMessage) => GO\Email\Controller\AccountController
+addListener(store,GO\Files\FilesModule, afterBatchEditStore) => GO\Core\Controller\BatchEditController
+addListener(reminderdisplay,GO\Email\EmailModule, reminderDisplay) => GO\Core\Controller\ReminderController
+addListener(delete,GO\Email\EmailModule, deleteUser) => GO\Base\Model\User
+addListener(delete,GO\Calendar\CalendarModule, deleteUser) => GO\Base\Model\User
+addListener(dismiss,GO\Calendar\Model\Event, reminderDismissed) => GO\Base\Model\Reminder
+addListener(checkmodelfolder,GO\Projects2\Projects2Module, createParentFolders) => GO\Files\Controller\FolderController
+addListener(delete,GO\Projects2\Projects2Module, deleteUser) => GO\Base\Model\User
+addListener(load,GO\Freebusypermissions\FreebusypermissionsModule, has_freebusy_access) => GO\Calendar\Model\Event
+setIgnoreAclPermissions(true)
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+ClassFinder find() used.
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+ClassFinder find() used.
+Exception in /usr/local/share/src/www/go/core/orm/Property.php at line 644: Can't set not existing property 'groupId' in 'go\core\model\Permission'
+#0 /usr/local/share/src/www/go/core/Installer.php(476): go\core\orm\Property->__set('groupId', 2)
+#1 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#2 {main}</pre></div></section>
+<footer>&copy; Intermesh - <a href="https://www.group-office.com">https://www.group-office.com</a></footer>
+
+</body>
+</html>

@@ -57,7 +57,7 @@ CronJobSchedule::runNext();
  * @throws Exception
  */
 function findNextCron(){
-	$currentTime = new DateTimeAlias();
+	$currentTime = new DateTimeAlias("now", new DateTimeZone("UTC"));
 
 		$findParams = FindParams::newInstance()
 			->single()

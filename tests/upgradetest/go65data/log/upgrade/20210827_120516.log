@@ -1,0 +1,49 @@
+[community/tasks] Running callable function
+Migrating project jobs to tasks
+
+<b>Error:</b> PDOException in /usr/local/share/src/www/go/core/db/Statement.php at line 96: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'aclId' cannot be null
+
+#0 /usr/local/share/src/www/go/core/db/Statement.php(96): PDOStatement->execute(NULL)
+#1 /usr/local/share/src/www/go/modules/community/tasks/install/Migrator.php(51): go\core\db\Statement->execute()
+#2 /usr/local/share/src/www/go/modules/community/tasks/install/updates.php(74): go\modules\community\tasks\install\Migrator->job2task()
+#3 [internal function]: go\core\Installer->{closure}()
+#4 /usr/local/share/src/www/go/core/Installer.php(627): call_user_func(Object(Closure))
+#5 /usr/local/share/src/www/go/core/Installer.php(443): go\core\Installer->upgradeModules()
+#6 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#7 {main}</pre></div><div style="clear:both;margin-bottom:20px;"></div><div class="card"><h2>Debugger output</h2><pre>Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Session writing closed
+Not using cache. This will be slow!
+SQL FAILURE: INSERT INTO `tasks_tasklist`  (
+	`role`,
+	`name`,
+	`createdBy`,
+	`aclId`,
+	`projectId`,
+	`version`,
+	`ownerId`
+)
+VALUES 
+(
+	3,
+	'[001] Develop Rocket 2000',
+	1,
+	NULL,
+	2,
+	1,
+	1
+)
+PDOException in /usr/local/share/src/www/go/core/db/Statement.php at line 96: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'aclId' cannot be null
+#0 /usr/local/share/src/www/go/core/db/Statement.php(96): PDOStatement->execute(NULL)
+#1 /usr/local/share/src/www/go/modules/community/tasks/install/Migrator.php(51): go\core\db\Statement->execute()
+#2 /usr/local/share/src/www/go/modules/community/tasks/install/updates.php(74): go\modules\community\tasks\install\Migrator->job2task()
+#3 [internal function]: go\core\Installer->{closure}()
+#4 /usr/local/share/src/www/go/core/Installer.php(627): call_user_func(Object(Closure))
+#5 /usr/local/share/src/www/go/core/Installer.php(443): go\core\Installer->upgradeModules()
+#6 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#7 {main}</pre></div></section>
+<footer>&copy; Intermesh - <a href="https://www.group-office.com">https://www.group-office.com</a></footer>
+
+</body>
+</html>

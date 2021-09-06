@@ -1,0 +1,50 @@
+[legacy/tasks] Excuting query: update core_module set package='community', version=0 where name='tasks'
+legacy/tasks updated from 60 to 61
+
+
+A module was refactored. Rerunning...
+
+[community/tasks] Running callable function
+community/tasks updated from 0 to 1
+[community/tasks] Running callable function
+community/tasks updated from 1 to 2
+[community/tasks] Running callable function
+community/tasks updated from 2 to 3
+[community/tasks] Excuting query: ALTER TABLE `tasks_task` CHANGE COLUMN `description` `description` TEXT NULL DEFAULT '';
+community/tasks updated from 3 to 4
+[community/notes] Excuting query: ALTER TABLE `notes_user_settings` ADD (`rememberLastItems` TINYINT(1) DEFAULT 0, `lastNoteBookIds` VARCHAR(255) DEFAULT '');
+community/notes updated from 57 to 58
+[community/tasks] Running callable function
+Migrating project jobs to tasks
+
+<b>Error:</b> Exception in /usr/local/share/src/www/go/core/orm/Property.php at line 602: Can't get not existing property 'name' in 'GO\Projects2\Model\ProjectEntity'
+
+#0 /usr/local/share/src/www/go/modules/community/tasks/install/Migrator.php(44): go\core\orm\Property->__get('name')
+#1 /usr/local/share/src/www/go/modules/community/tasks/install/updates.php(74): go\modules\community\tasks\install\Migrator->job2task()
+#2 [internal function]: go\core\Installer->{closure}()
+#3 /usr/local/share/src/www/go/core/Installer.php(627): call_user_func(Object(Closure))
+#4 /usr/local/share/src/www/go/core/Installer.php(443): go\core\Installer->upgradeModules()
+#5 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#6 {main}</pre></div><div style="clear:both;margin-bottom:20px;"></div><div class="card"><h2>Debugger output</h2><pre>Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Session writing closed
+Not using cache. This will be slow!
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+Exception in /usr/local/share/src/www/go/core/orm/Property.php at line 602: Can't get not existing property 'name' in 'GO\Projects2\Model\ProjectEntity'
+#0 /usr/local/share/src/www/go/modules/community/tasks/install/Migrator.php(44): go\core\orm\Property->__get('name')
+#1 /usr/local/share/src/www/go/modules/community/tasks/install/updates.php(74): go\modules\community\tasks\install\Migrator->job2task()
+#2 [internal function]: go\core\Installer->{closure}()
+#3 /usr/local/share/src/www/go/core/Installer.php(627): call_user_func(Object(Closure))
+#4 /usr/local/share/src/www/go/core/Installer.php(443): go\core\Installer->upgradeModules()
+#5 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#6 {main}</pre></div></section>
+<footer>&copy; Intermesh - <a href="https://www.group-office.com">https://www.group-office.com</a></footer>
+
+</body>
+</html>

@@ -33,7 +33,7 @@ class Module extends core\Module
 
 	static function logActiveRecord(ActiveRecord $record, $action) {
 
-		if(!self::$enabled) {
+		if(!self::$enabled || core\Installer::isInProgress()) {
 			return;
 		}
 
@@ -85,7 +85,7 @@ class Module extends core\Module
 	}
 
 	private static function logEntity(Entity $entity, $action) {
-		if(!self::$enabled) {
+		if(!self::$enabled || core\Installer::isInProgress()) {
 			return;
 		}
 

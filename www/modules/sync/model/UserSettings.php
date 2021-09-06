@@ -67,19 +67,19 @@ class UserSettings extends Property
 
 			if (empty($this->addressBooks)) {
 				if (isset($user->addressBookSettings) && ($addressBookId = $user->addressBookSettings->getDefaultAddressBookId())) {
-					$this->addressBooks[] = (new UserAddressBook())->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
+					$this->addressBooks[] = (new UserAddressBook($this))->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
 				}
 			}
 
 			if (empty($this->noteBooks)) {
 				if (isset($user->notesSettings) && ($noteBookId = $user->notesSettings->getDefaultNoteBookId())) {
-					$this->noteBooks[] = (new UserNoteBook())->setValues(['noteBookId' => $noteBookId, 'isDefault' => true]);
+					$this->noteBooks[] = (new UserNoteBook($this))->setValues(['noteBookId' => $noteBookId, 'isDefault' => true]);
 				}
 			}
 
 			if (empty($this->tasklists)) {
 				if (isset($user->tasksSettings) && ($tasklistId = $user->tasksSettings->getDefaultTasklistId())) {
-					$this->tasklists[] = (new UserTasklist())->setValues(['tasklistId' => $tasklistId, 'isDefault' => true]);
+					$this->tasklists[] = (new UserTasklist($this))->setValues(['tasklistId' => $tasklistId, 'isDefault' => true]);
 				}
 			}
 

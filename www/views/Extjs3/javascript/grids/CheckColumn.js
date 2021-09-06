@@ -37,11 +37,15 @@ GO.grid.CheckColumn = Ext.extend(Ext.grid.Column, {
 				var clickedEl = e.getTarget();
 
 				if (clickedEl.className != 'x-grid3-check-col-on' && clickedEl.className != 'x-grid3-check-col') {
-					return Ext.grid.ActionColumn.superclass.processEvent.apply(this, arguments);
+					return GO.grid.CheckColumn.superclass.processEvent.apply(this, arguments);
 				}
 			}
 
 			var record = grid.store.getAt(rowIndex);
+
+			if(!record) {
+				return false;
+			}
 
 			if (!this.isDisabled(record))
 			{
@@ -53,7 +57,7 @@ GO.grid.CheckColumn = Ext.extend(Ext.grid.Column, {
 
 			return false; // Cancel row selection.
 		} else {
-			return Ext.grid.ActionColumn.superclass.processEvent.apply(this, arguments);
+			return GO.grid.CheckColumn.superclass.processEvent.apply(this, arguments);
 		}
 	},
 
@@ -75,3 +79,4 @@ GO.grid.CheckColumn = Ext.extend(Ext.grid.Column, {
 	init: Ext.emptyFn
 });
 
+Ext.grid.Column.types.checkcolumn = GO.grid.CheckColumn;

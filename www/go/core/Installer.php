@@ -23,12 +23,13 @@ use PDOException;
 use go\core\model\Module as GoCoreModule;
 use GO\Base\Db\ActiveRecord;
 use go\core\model\Acl;
+use PHPUnit\Framework\ExpectationFailedException;
 
 class Installer {
 	
 	use event\EventEmitterTrait;
 	
-	const MIN_UPGRADABLE_VERSION = "6.4.191";
+	const MIN_UPGRADABLE_VERSION = "6.5.73";
 	
 	const EVENT_UPGRADE = 'upgrade';
 
@@ -145,7 +146,9 @@ class Installer {
 
 		foreach ($installModules as $installModule) {
 			if(!$installModule->isInstalled()) {
-				$installModule->install();
+				if(!$installModule->install()) {
+					throw new Exception("Failed to install module " .get_class($installModule));
+				}
 			}
 		}
 
@@ -205,12 +208,14 @@ class Installer {
 		$module->name = 'core';
 		$module->package = 'core';
 		$module->version = App::get()->getUpdateCount();
+
+		//Share core with everyone
+		$module->permissions[Group::ID_EVERYONE] = (new model\Permission($module))
+			->setRights(['mayRead' => true]);
 		if(!$module->save()) {
 			throw new \Exception("Could not save core module: " . var_export($module->getValidationErrors(), true));
 		}
 
-		//Share core with everyone
-		$module->findAcl()->addGroup(Group::ID_EVERYONE)->save();
 
 		$this->createGarbageCollection();
 
@@ -457,7 +462,7 @@ class Installer {
 		go()->rebuildCache();
 
 		echo "Registering all entities\n";		
-		$modules = model\Module::find()->where(['enabled' => true])->all();
+		$modules = model\Module::find(['id', 'name', 'package', 'version', 'enabled'])->where(['enabled' => true])->all();
 		foreach($modules as $module) {
 			if(isset($module->package) && $module->isAvailable()) {
 				$module->module()->registerEntities();
@@ -466,11 +471,16 @@ class Installer {
 	
 		// Make sure core module is accessible for everyone
 		$module  = GoCoreModule::findByName("core", "core");
-		$acl = $module->findAcl();
-		if(!$acl->hasGroup(Group::ID_EVERYONE)) {
-			$acl->addGroup(Group::ID_EVERYONE);
-			$acl->save();
+		if(!isset($module->permisions[Group::ID_EVERYONE])) {
+			$everyone = new model\Permission($module);
+			$module->permissions[Group::ID_EVERYONE] = $everyone;
+			$module->save();
 		}
+//		$acl = $module->findAcl();
+//		if(!$acl->hasGroup(Group::ID_EVERYONE)) {
+//			$acl->addGroup(Group::ID_EVERYONE);
+//			$acl->save();
+//		}
 
 		$this->fireEvent(static::EVENT_UPGRADE);
 
@@ -550,7 +560,7 @@ class Installer {
 	private function upgradeModules() {
 		$u = [];
 
-		$modules = model\Module::find()->all();		
+		$modules = model\Module::find(['id', 'name', 'package', 'version', 'enabled'])->all();
 
 		$modulesById = [];
 		/* @var $module model\Module */
@@ -682,7 +692,7 @@ class Installer {
 					//$moduleModel = GO\Base\Model\Module::model()->findByName($module);
 					//refetch module to see if package was updated
 					if (!$module->package) {
-						$module = model\Module::findById($moduleId);
+						$module = model\Module::findById($moduleId, ['id', 'name', 'package', 'version', 'enabled']);
 						$newBackendUpgrade = $module->package != null;
 						if ($newBackendUpgrade) {
 							$module->version = $counts[$moduleId] = 0;

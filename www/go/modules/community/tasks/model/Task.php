@@ -616,4 +616,18 @@ class Task extends AclItemEntity {
 
 		return false;
 	}
+
+	public function alertProps(CoreAlert $alert)
+	{
+		if($alert->tag != 'assigned') {
+			return parent::alertProps($alert);
+		}
+		$data = $alert->getData();
+		$assigner = User::findById($data->assignedBy, ['displayName']);
+
+		$body = str_replace('{assigner}', $assigner->displayName, go()->t("You were assigned to this task by {assigner}"));
+		$title = $alert->findEntity()->title() ?? null;
+
+		return ['title' => $title, 'body' => $body];
+	}
 }

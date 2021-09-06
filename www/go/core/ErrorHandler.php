@@ -45,18 +45,23 @@ class ErrorHandler {
 
 //		$this->debug("shutdown");
 	}
-	
+
 	/**
 	 * Log exception to PHP logging system and debug the exception in GO
-	 * 
+	 *
 	 * @param \Exception $e
+	 * @param string $context Extra information about where the exception occurred
 	 * @return string The string that was logged
 	 */
-	public static function logException($e) {
+	public static function logException($e, $context = null) {
 		$cls = get_class($e);
 		
 		$errorString = $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
-		
+
+		if(isset($context)) {
+			$errorString .= ', ' . $context;
+		}
+
 		if(!Environment::get()->isCli()) {
 			error_log($errorString, 0);
 		}

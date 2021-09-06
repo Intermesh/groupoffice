@@ -1,0 +1,38 @@
+[legacy/tasks] Excuting query: update core_module set package='community', version=0 where name='tasks'
+legacy/tasks updated from 60 to 61
+
+
+A module was refactored. Rerunning...
+
+Skipping module tasks because it's not available.
+[community/notes] Excuting query: ALTER TABLE `notes_user_settings` ADD (`rememberLastItems` TINYINT(1) DEFAULT 0, `lastNoteBookIds` VARCHAR(255) DEFAULT '');
+community/notes updated from 57 to 58
+[legacy/sync] Excuting query: 
+legacy/sync updated from 50 to 51
+[legacy/sync] Excuting query: alter table sync_tasklist_user change tasklist_id tasklistId int(11) unsigned auto_increment;
+legacy/sync updated from 51 to 52
+[legacy/sync] Excuting query: alter table sync_tasklist_user change user_id userId int(11) default 0 not null;
+legacy/sync updated from 52 to 53
+[legacy/sync] Excuting query: alter table sync_tasklist_user change default_tasklist isDefault boolean default 0 not null;
+legacy/sync updated from 53 to 54
+[legacy/sync] Excuting query: DELETE FROM `sync_tasklist_user` WHERE `userId` NOT IN(SELECT `id` FROM `core_user`);
+legacy/sync updated from 54 to 55
+[legacy/sync] Excuting query: alter table sync_tasklist_user
+	add constraint sync_tasklist_user_core_user_id_fk
+		foreign key (userId) references core_user (id)
+			on delete cascade;
+legacy/sync updated from 55 to 56
+[legacy/sync] Excuting query: DELETE FROM `sync_tasklist_user` WHERE `tasklistId` NOT IN(SELECT `id` FROM `tasks_tasklist`);
+<b>Error:</b> Exception in /usr/local/share/src/www/go/core/Installer.php at line 678: 42S02: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'test_group_office_com.tasks_tasklist' doesn't exist
+Query: DELETE FROM `sync_tasklist_user` WHERE `tasklistId` NOT IN(SELECT `id` FROM `tasks_tasklist`);
+Package: legacy
+Module: sync
+Module installed version: 56
+Module source version: 57
+ABORTING: Please contact support
+
+</pre></div></section>
+<footer>&copy; Intermesh - <a href="https://www.group-office.com">https://www.group-office.com</a></footer>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+
+Error in /usr/local/share/src/www/promodules/projects2/Projects2Module.php at line 55: Class 'go\core\model\UserDisplay' not found at 2021-08-27T11:16:04+00:00
+
+#0 /usr/local/share/src/www/go/core/event/Listeners.php(89): GO\Projects2\Projects2Module::defineListeners()
+#1 /usr/local/share/src/www/go/core/event/Listeners.php(60): go\core\event\Listeners->init()
+#2 /usr/local/share/src/www/go/core/event/Listeners.php(113): go\core\event\Listeners->checkInit()
+#3 /usr/local/share/src/www/go/core/event/EventEmitterTrait.php(69): go\core\event\Listeners->fireEvent('go\\core\\model\\M...', 'go\\core\\orm\\Pro...', 'mapping', Array)
+#4 /usr/local/share/src/www/go/core/orm/Property.php(518): go\core\orm\Property::fireEvent('mapping', Object(go\core\orm\Mapping))
+#5 /usr/local/share/src/www/go/core/orm/Property.php(710): go\core\orm\Property::getMapping()
+#6 /usr/local/share/src/www/go/core/orm/Entity.php(133): go\core\orm\Property::internalFind(Array, false)
+#7 /usr/local/share/src/www/go/core/Installer.php(565): go\core\orm\Entity::find(Array)
+#8 /usr/local/share/src/www/go/core/Installer.php(449): go\core\Installer->upgradeModules()
+#9 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#10 {main}
+
+
+Debug dump: 
+
+Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Session writing closed
+Session writing closed
+Not using cache. This will be slow!
+ErrorHandler::exceptionHandler() called with Error
+Error in /usr/local/share/src/www/promodules/projects2/Projects2Module.php at line 55: Class 'go\core\model\UserDisplay' not found
+#0 /usr/local/share/src/www/go/core/event/Listeners.php(89): GO\Projects2\Projects2Module::defineListeners()
+#1 /usr/local/share/src/www/go/core/event/Listeners.php(60): go\core\event\Listeners->init()
+#2 /usr/local/share/src/www/go/core/event/Listeners.php(113): go\core\event\Listeners->checkInit()
+#3 /usr/local/share/src/www/go/core/event/EventEmitterTrait.php(69): go\core\event\Listeners->fireEvent('go\\core\\model\\M...', 'go\\core\\orm\\Pro...', 'mapping', Array)
+#4 /usr/local/share/src/www/go/core/orm/Property.php(518): go\core\orm\Property::fireEvent('mapping', Object(go\core\orm\Mapping))
+#5 /usr/local/share/src/www/go/core/orm/Property.php(710): go\core\orm\Property::getMapping()
+#6 /usr/local/share/src/www/go/core/orm/Entity.php(133): go\core\orm\Property::internalFind(Array, false)
+#7 /usr/local/share/src/www/go/core/Installer.php(565): go\core\orm\Entity::find(Array)
+#8 /usr/local/share/src/www/go/core/Installer.php(449): go\core\Installer->upgradeModules()
+#9 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#10 {main}

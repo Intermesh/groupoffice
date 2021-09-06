@@ -4,14 +4,13 @@ namespace go\core\model;
 use Exception;
 use go\core;
 use go\core\db\Criteria;
-use go\core\model\Acl;
-use go\core\acl\model\AclOwnerEntity;
+use go\core\jmap\Entity;
 use go\core\App;
 use go\core\orm\Query;
 use go\core\Settings;
 use go\core\validate\ErrorCode;
 
-class Module extends AclOwnerEntity {
+class Module extends Entity {
 	public $id;
 	public $name;
 	public $package;
@@ -19,14 +18,18 @@ class Module extends AclOwnerEntity {
 	public $admin_menu;
 	public $version;
 	public $enabled;
+	public $permissions = [];
 
+	// for backwards compatibility
+	public function getPermissionLevel($userId = null) {
 
-	/**
-	 * This is here for compatibility with old modules management page that's not refactored yet. Remove when refactored.
-	 * @deprecated
-	 */
-	public function getAclId() {
-		return $this->aclId;
+		$rights = $this->getUserRights($userId);
+
+		if($this->name == 'projects2' && $rights->mayFinance) { // a single exception for this compat method
+			return 40;
+		}
+
+		return !empty($rights->mayManage) ? 50 : 10;
 	}
 
 	protected function canCreate()
@@ -85,25 +88,23 @@ class Module extends AclOwnerEntity {
 			go()->rebuildCache();
 		}
 
+		// TODO: do groups needs modules or can we set multiple module with new group permissions
 		//When module groups change the groups change too. Because the have a "modules" property.
-		$aclChanges = $this->getAclChanges();
-		if(!empty($aclChanges)) {
-			Group::entityType()
-				->changes(
-					go()->getDbConnection()
-						->select('id as entityId, aclId, "0" as destroyed')
-						->from('core_group')
-						->where('id', 'IN', array_keys($aclChanges)
-					)
-				);
-		}
+//		$aclChanges = $this->getAclChanges();
+//		if(!empty($aclChanges)) {
+//			Group::entityType()
+//				->changes(
+//					go()->getDbConnection()
+//						->select('id as entityId, aclId, "0" as destroyed')
+//						->from('core_group')
+//						->where('id', 'IN', array_keys($aclChanges)
+//					)
+//				);
+//		}
 		
 		return true;
 	}
 
-	public function package(){
-		return self::PACKAGE_COMMUNITY;
-	}
 	
 	private function nextSortOrder() {
 		$query = new Query();			
@@ -122,7 +123,73 @@ class Module extends AclOwnerEntity {
 	
 
 	protected static function defineMapping() {
-		return parent::defineMapping()->addTable('core_module', 'm');
+		return parent::defineMapping()->addTable('core_module', 'm')
+			->addMap('permissions', Permission::class, ['id'=>'moduleId']);
+	}
+
+	private function adminRights() {
+		$rights = ["mayRead" => true];
+		foreach($this->module()->getRights() as $name => $bit){
+			$rights[$name] = true;
+		}
+		return (object) $rights;
+	}
+
+	/**
+	 * Get's the rights of a user
+	 *
+	 * @param $userId The user ID to query. defaults to current authorized user.
+	 * @return array|object ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
+	 */
+	public function getUserRights($userId = null) {
+
+		if(!isset($userId)) {
+			$userId = go()->getAuthState()->getUserId();
+			$isAdmin = go()->getAuthState()->isAdmin();
+		} else{
+			$isAdmin = User::isAdminById($userId);
+
+		}
+
+		if(!$this->isAvailable()) {
+			return ['mayRead' => $isAdmin];
+		}
+
+		if($isAdmin) {
+			return $this->adminRights();
+		}
+
+		return $this->userRights($userId);
+	}
+
+	private function userRights($userId) {
+		$r = go()->getDbConnection()->selectSingleValue("MAX(rights)")
+			->from("core_permission")
+			->where('moduleId', '=', $this->id)
+			->where("groupId", "IN",
+				go()->getDbConnection()
+					->select("groupId")
+					->from("core_user_group")
+					->where(['userId' => $userId])
+			)->single();
+
+		if($r === null) {
+			$rights = ["mayRead" => false];
+			foreach($this->module()->getRights() as $name => $bit){
+				$rights[$name] = false;
+			}
+			return (object) $rights;
+		}
+
+		$r = decbin($r);
+
+		$rights = ["mayRead" => true];
+
+		foreach ($this->module()->getRights() as $name => $bit) {
+			$rights[$name] = !!($r & $bit);
+		}
+
+		return (object) $rights;
 	}
 
 	protected static function defineFilters() {
@@ -293,8 +360,8 @@ class Module extends AclOwnerEntity {
 	 * Get all installed and available modules.
 	 * @return self[]
 	 */
-	public static function getInstalled() {
-		$modules = Module::find()->where(['enabled' => true])->all();
+	public static function getInstalled($properties = []) {
+		$modules = Module::find($properties)->where(['enabled' => true])->all();
 		
 		$available = [];
 		foreach($modules as $module) {
@@ -304,6 +371,33 @@ class Module extends AclOwnerEntity {
 		}
 		
 		return $available;
+	}
+
+	/**
+	 * @param $rights int bitwise rights
+	 * @return array permission name => true for on / false for off
+	 */
+	public function may($rights) {
+		$module = $this->module();
+		$capabilities = $module->getRights();
+		$result = [];
+		foreach($capabilities as $str => $bit) {
+			if(go()->getAuthState()->isAdmin() ||  ($rights & $bit)) {
+				$result[$str] = true;
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * @return string[] static list of available rights
+	 */
+	public function getRights() {
+		if(!$this->isAvailable()) {
+			return [];
+		}
+		$module = $this->module();
+		return array_keys($module->getRights());
 	}
 	
 	/**
@@ -337,7 +431,7 @@ class Module extends AclOwnerEntity {
 	 * @param bool $enabled Set to null for both enabled and disabled
 	 * @return self
 	 */
-	public static function findByName($package, $name, $enabled = true) {
+	public static function findByName($package, $name, $enabled = true, $props = []) {
 		if($package == "legacy") {
 			$package = null;
 		}
@@ -347,11 +441,13 @@ class Module extends AclOwnerEntity {
 			$mod = self::$modulesByName[$cache];
 		} else {
 
-			$query = static::find()->where(['package' => $package, 'name' => $name]);
+			$query = static::find($props)->where(['package' => $package, 'name' => $name]);
 
 			$mod = $query->single();
 
-			self::$modulesByName[$cache] = $mod;
+			if(empty($props)) {
+				self::$modulesByName[$cache] = $mod;
+			}
 		}
 
 		if(!$mod) {
@@ -373,7 +469,10 @@ class Module extends AclOwnerEntity {
 	 * @return bool
 	 */
 	public static function isInstalled($package, $name) {
-		return static::findByName($package, $name) != false;
+		if($package == "legacy") {
+			$package = null;
+		}
+		return static::find()->where(['package' => $package, 'name' => $name])->selectSingleValue('id')->single() != false;
 	}
 	
 	/**

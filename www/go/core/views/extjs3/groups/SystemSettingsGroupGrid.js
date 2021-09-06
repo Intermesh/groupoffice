@@ -13,6 +13,10 @@
  */
 
 go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
+	hasPermission: function() {
+		const module = go.Modules.get(this.package, this.module);
+		return module.userRights.mayChangeGroups;
+	},
 	iconCls: 'ic-group',
 	itemId: "groups", //makes it routable
 	initComponent: function () {
@@ -43,6 +47,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 						'text'					
 					]
 				}, {
+					disabled: !go.Modules.get("core", "core").userRights.mayChangeGroups,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
@@ -115,6 +120,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 		this.moreMenu = new Ext.menu.Menu({
 			items: [
 				{
+					disabled: !go.Modules.get("core", "core").userRights.mayChangeGroups,
 					itemId: "view",
 					iconCls: 'ic-edit',
 					text: t("Edit"),
@@ -126,6 +132,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				},
 				"-",
 				{
+					disabled: !go.Modules.get("core", "core").userRights.mayChangeGroups,
 					itemId: "delete",
 					iconCls: 'ic-delete',
 					text: t("Delete"),

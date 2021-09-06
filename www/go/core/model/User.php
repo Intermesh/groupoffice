@@ -321,7 +321,7 @@ class User extends Entity {
 
 	protected function canCreate()
 	{
-		return go()->getAuthState()->isAdmin();
+		return go()->getModel()->getUserRights()->mayChangeUsers;
 	}
 	
 	protected function init() {

@@ -1,0 +1,15 @@
+[legacy/projects2] Excuting query: update core_entity set clientName='ProjectStatus', name='Status' where name = 'ProjectStatus' and moduleId = (select id from core_module where name='projects2' and package is null);
+legacy/projects2 updated from 398 to 399
+[legacy/tickets] Excuting query: update ignore core_entity set clientName='TicketType', name='Type' where name = 'TicketType' and moduleId = (select id from core_module where name='tickets' and package is null);
+legacy/tickets updated from 163 to 164
+[legacy/tickets] Excuting query: update ignore core_entity set clientName='TicketStatus', name='Status' where name = 'TicketStatus' and moduleId = (select id from core_module where name='tickets' and package is null);
+legacy/tickets updated from 164 to 165
+[legacy/projects2] Excuting query: update core_entity set name='ProjectTemplate' where name = 'Template' and moduleId = (select id from core_module where name='projects2' and package is null);
+legacy/projects2 updated from 398 to 400
+[legacy/projects2] Excuting query: update core_entity set clientName='ProjectTemplate', name='Template' where name = 'ProjectTemplate' and moduleId = (select id from core_module where name='projects2' and package is null);
+legacy/projects2 updated from 400 to 401
+[legacy/files] Excuting query: update ignore core_entity set name='Template', clientName='FilesTemplate' where name = 'FilesTemplate' and moduleId = (select id from core_module where name='files' and package is null);
+legacy/files updated from 136 to 137
+Rebuilding cache
+Registering all entities
+Done!

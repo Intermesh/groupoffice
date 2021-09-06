@@ -45,6 +45,8 @@ use GO;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
+use go\core\jmap\Entity;
+use go\core\model\Acl;
 use go\core\model\Alert;
 use go\core\model\Link;
 use go\core\model\User;
@@ -900,8 +902,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function findAclId() {
 		if (!$this->aclField()) {
-			$moduleName = $this->getModule();
-			return \GO::modules()->{$moduleName}->aclId;
+			//TODO: Is this right?
+			return Acl::getReadOnlyAclId();
+//			$moduleName = $this->getModule();
+//			return \GO::modules()->{$moduleName}->aclId;
 		}
 
 		//removed caching of _acl_id because the relation is cached already and when the relation changes the wrong acl_id is returned,
@@ -5623,5 +5627,24 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public static function dismissAlerts(array $alerts) {
 
+	}
+
+	public function alertProps(Alert $alert) {
+
+		$body = null;
+		$title = null;
+
+		self::fireEvent(Entity::EVENT_ALERT_PROPS, $this, $alert, $title, $body);
+
+		if(!isset($body)) {
+			$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
+			$body = $alert->triggerAt->toUserFormat(true, $user);
+		}
+
+		if(!isset($title)) {
+			$title = $alert->findEntity()->title() ?? null;
+		}
+
+		return ['title' => $title, 'body' => $body];
 	}
 }

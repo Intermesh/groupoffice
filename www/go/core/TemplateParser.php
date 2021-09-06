@@ -167,6 +167,7 @@ class TemplateParser {
 		$this->addFilter('entity', [$this, "filterEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('nl2br', "nl2br");
+		$this->addFilter('t', "translate");
 
 		$this->addModel('now', new DateTime());	
 	}
@@ -178,6 +179,10 @@ class TemplateParser {
 			$this->_currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone' ]);
 		}
 		return $this->_currentUser;
+	}
+
+	private function filterTranslate($text, $package = 'core', $module = 'core') {
+		return go()->t($text, $package, $module);
 	}
 	
 	private function filterDate(DateTime $date = null, $format = null) {
@@ -304,7 +309,7 @@ class TemplateParser {
 		
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
-			throw new Exception("Open and close tags don't match");
+			throw new Exception("Invalid template open and close tags of [if] and/or [each] don't match");
 		}
 		
 		$tags = [];		

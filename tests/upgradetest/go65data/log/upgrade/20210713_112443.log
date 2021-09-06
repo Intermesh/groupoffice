@@ -1,0 +1,59 @@
+Rebuilding cache
+<b>Error:</b> ErrorException in /usr/local/share/src/www/go/core/cache/Apcu.php at line 58: apcu_store(): &quot;pk&quot; returned as member variable from __sleep() but does not exist
+
+#0 [internal function]: go\core\ErrorHandler::errorHandler(8, 'apcu_store(): &...', '/usr/local/shar...', 58, Array)
+#1 /usr/local/share/src/www/go/core/cache/Apcu.php(58): apcu_store('groupoffice-map...', Object(go\core\orm\Mapping), 0)
+#2 /usr/local/share/src/www/go/core/orm/Property.php(515): go\core\cache\Apcu->set('mapping-go\\core...', Object(go\core\orm\Mapping))
+#3 /usr/local/share/src/www/go/core/orm/Property.php(550): go\core\orm\Property::getMapping()
+#4 /usr/local/share/src/www/go/core/orm/Property.php(780): go\core\orm\Property::getApiProperties()
+#5 /usr/local/share/src/www/go/core/orm/Property.php(128): go\core\orm\Property::getRequiredProperties()
+#6 /usr/local/share/src/www/go/core/event/Listeners.php(75): go\core\orm\Property->__construct(false, Array, false)
+#7 /usr/local/share/src/www/go/core/App.php(531): go\core\event\Listeners->init()
+#8 /usr/local/share/src/www/go/core/Installer.php(463): go\core\App->rebuildCache()
+#9 /usr/local/share/src/www/install/upgrade.php(77): go\core\Installer->upgrade()
+#10 {main}</pre></div><div style="clear:both;margin-bottom:20px;"></div><div class="card"><h2>Debugger output</h2><pre>Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Event 'go\core\model\User::mapping' calls listener go\modules\community\addressbook\Module::onMap
+Event 'go\core\model\User::mapping' calls listener go\modules\business\business\Module::onMap
+Event 'go\core\model\User::mapping' calls listener go\modules\community\googleauthenticator\Module::onMap
+Event 'go\core\model\User::mapping' calls listener go\modules\community\notes\Module::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Calendar\CalendarModule::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Email\EmailModule::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Sync\SyncModule::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Tasks\TasksModule::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Timeregistration2\Timeregistration2Module::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Projects2\Projects2Module::onMap
+Session writing closed
+Not using cache. This will be slow!
+Flushing cache
+GO\Base\Observable::cacheListeners
+setIgnoreAclPermissions(true)
+addListener(delete,GO\Tasks\TasksModule, deleteUser) => GO\Base\Model\User
+addListener(delete,GO\Calendar\CalendarModule, deleteUser) => GO\Base\Model\User
+addListener(dismiss,GO\Calendar\Model\Event, reminderDismissed) => GO\Base\Model\Reminder
+addListener(reminderdisplay,GO\Email\EmailModule, reminderDisplay) => GO\Core\Controller\ReminderController
+addListener(delete,GO\Email\EmailModule, deleteUser) => GO\Base\Model\User
+addListener(store,GO\Files\FilesModule, afterBatchEditStore) => GO\Core\Controller\BatchEditController
+addListener(submit,GO\Sieve\SieveModule, saveOutOfOfficeMessage) => GO\Email\Controller\AccountController
+addListener(load,GO\Sieve\SieveModule, loadOutOfOfficeMessage) => GO\Email\Controller\AccountController
+addListener(checkmodelfolder,GO\Projects2\Projects2Module, createParentFolders) => GO\Files\Controller\FolderController
+addListener(delete,GO\Projects2\Projects2Module, deleteUser) => GO\Base\Model\User
+setIgnoreAclPermissions(true)
+ErrorHandler:errorHandler called 8
+ErrorException in /usr/local/share/src/www/go/core/cache/Apcu.php at line 58: apcu_store(): &quot;pk&quot; returned as member variable from __sleep() but does not exist
+#0 [internal function]: go\core\ErrorHandler::errorHandler(8, 'apcu_store(): &...', '/usr/local/shar...', 58, Array)
+#1 /usr/local/share/src/www/go/core/cache/Apcu.php(58): apcu_store('groupoffice-map...', Object(go\core\orm\Mapping), 0)
+#2 /usr/local/share/src/www/go/core/orm/Property.php(515): go\core\cache\Apcu->set('mapping-go\\core...', Object(go\core\orm\Mapping))
+#3 /usr/local/share/src/www/go/core/orm/Property.php(550): go\core\orm\Property::getMapping()
+#4 /usr/local/share/src/www/go/core/orm/Property.php(780): go\core\orm\Property::getApiProperties()
+#5 /usr/local/share/src/www/go/core/orm/Property.php(128): go\core\orm\Property::getRequiredProperties()
+#6 /usr/local/share/src/www/go/core/event/Listeners.php(75): go\core\orm\Property->__construct(false, Array, false)
+#7 /usr/local/share/src/www/go/core/App.php(531): go\core\event\Listeners->init()
+#8 /usr/local/share/src/www/go/core/Installer.php(463): go\core\App->rebuildCache()
+#9 /usr/local/share/src/www/install/upgrade.php(77): go\core\Installer->upgrade()
+#10 {main}</pre></div></section>
+<footer>&copy; Intermesh - <a href="https://www.group-office.com">https://www.group-office.com</a></footer>
+
+</body>
+</html>

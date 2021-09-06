@@ -1,0 +1,5 @@
+[legacy/files] Excuting query: update core_entity set name='FilesTemplate' where name = 'Template' and moduleId = (select id from core_module where name='files' and package is null);
+legacy/files updated from 135 to 136
+Rebuilding cache
+Registering all entities
+Done!

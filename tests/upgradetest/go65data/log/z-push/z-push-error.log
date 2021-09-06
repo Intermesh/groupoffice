@@ -1,0 +1,1 @@
+31/08/2021 09:50:55 [  141] [FATAL] [#unknown] FatalException: FixFileOwner: /var/lib/groupoffice/log/z-push must be owned by the nginx/apache/php user instead of root for debian based systems and by root:z-push for RHEL-based systems - code: 0 - file: /usr/local/share/src/www/modules/z-push/vendor/z-push/lib/utils/utils.php:899

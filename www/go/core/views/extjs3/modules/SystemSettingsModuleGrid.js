@@ -1,4 +1,7 @@
-go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
+go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
+	hasPermission: function() {
+		return go.User.isAdmin;
+	},
 	iconCls: 'ic-extension',
 	autoExpandColumn: 'name',
 	//layout: 'fit',
@@ -21,7 +24,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 
 		this.store = new GO.data.JsonStore({
 			url: GO.url("modules/module/store"),
-			fields:['name', 'package', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'icon', 'enabled', 'warning','author', 'buyEnabled','not_installable', 'isRefactored','installed'],
+			fields:['name', 'package', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'rights', 'icon', 'enabled', 'warning','author', 'buyEnabled','not_installable', 'isRefactored','installed'],
 			remoteSort: false,
 			idProperty: 'name'
 
@@ -59,6 +62,15 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 				window.open('https://www.group-office.com/shop/');
 			},
 			scope: this
+		},{
+			text:t('System') + ' ' +t('Permissions'),
+			iconCls: 'ic-group',
+			handler: function() {
+				const corePermissionDlg = new go.modules.GroupRights();
+				go.Db.store('Module').single(1).then((core) =>
+					corePermissionDlg.show(core, ['mayChangeUsers', 'mayChangeGroups', 'mayChangeCustomFields'])
+				)
+			}
 		},this.trialButton = new Ext.Button({
 			iconCls: 'ic-settings',
 			text: t("30 day trial license", "modules"),
@@ -219,7 +231,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 							record: r,
 							handler: function(btn) {
 								var record = btn.record;
-								this.showPermissions(record.data.name, record.data.package, record.data.aclId);
+
+								this.showRights(record.data.id, record.data.rights);
 							},
 							scope: this
 						}, {
@@ -246,21 +259,34 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 
 	},
 
-	showPermissions: function(moduleId, pkg, acl_id) {
-		let name = t('name', moduleId, pkg);
-		if (!this.permissionsWin) {
-			this.permissionsWin = new go.modules.PermissionsWindow();
-			this.permissionsWin.on('hide', function() {
-				// Loop through the recently installed modules, allowing the user to
-				// set the permissions, module by module.
-				if (this.installedModules && this.installedModules.length) {
-					var r = this.installedModules.shift();
-					debugger;
-					this.permissionsWin.show(r.id,r.package, r.name, r.acl_id);
-				}
-			}, this);
-		}
-		this.permissionsWin.show(moduleId, pkg, name, acl_id);
+	showRights: function( id, rights) {
+		const dlg = new go.modules.GroupRights();
+		go.Db.store('Module').single(id).then((module) =>
+			dlg.show(module, rights)
+		);
+	},
+
+
+	// showPermissions: function(moduleId, pkg, acl_id) {
+	// 	let name = t('name', moduleId, pkg);
+	// 	if (!this.permissionsWin) {
+	// 		this.permissionsWin = new go.modules.PermissionsWindow();
+	// 		this.permissionsWin.on('hide', function() {
+	// 			// Loop through the recently installed modules, allowing the user to
+	// 			// set the permissions, module by module.
+	// 			if (this.installedModules && this.installedModules.length) {
+	// 				var r = this.installedModules.shift();
+	// 				debugger;
+	// 				this.permissionsWin.show(r.id,r.package, r.name, r.acl_id);
+	// 			}
+	// 		}, this);
+	// 	}
+	// 	this.permissionsWin.show(moduleId, pkg, name, acl_id);
+	// },
+
+	warningRenderer: function(name, cell, record) {
+		return record.data.warning != '' ?
+			'<div class="go-icon go-warning-msg" ext:qtip="' + Ext.util.Format.htmlEncode(record.data.warning) + '"></div>' : '';
 	},
 
 	enableModule: function(record) {
@@ -279,12 +305,12 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 			scope: this,
 			success: function(response, options, result) {
 
-				if (result.aclId) {
+				if (result.id) {
 					record.set('aclId', result.aclId);
 					record.set('id', result.id);
 					record.set("enabled", record.data.enabled);
 					if (record.data.enabled) {
-						this.showPermissions(record.data.name, record.data.package, record.data.aclId);
+						this.showRights(result.id, record.data.rights);
 						//this.store.load();
 					}
 				}
@@ -339,9 +365,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 
 				if(success){
 					if(record.data.enabled && record.isModified("enabled")) {
-						// record.set('aclId', response['created'][record.data.id].aclId);
-						this.showPermissions(record.data.name, record.data.package, record.data.aclId);
 						this.store.load();
+						this.showRights(record.data.id, record.data.rights);
+
 					}
 					record.commit();
 				} else
@@ -365,8 +391,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 						record.set('enabled', true);
 						record.set('id', response['list'][0].id);
 						record.set('aclId', response['list'][0].aclId);
-						this.showPermissions(record.data.name, record.data.package, record.data.aclId);
-						record.commit();
+							this.showRights(record.data.id, record.data.rights);
+							record.commit();
 					} else
 					{
 						Ext.MessageBox.alert(t("Error"), response.message);
@@ -415,13 +441,13 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 	},
 
 	deleteModule: function(record) {
-		Ext.MessageBox.confirm(t("Delete"), t("All data will be lost! Are you sure you want to delete module '{item}'?").replace('{item}', record.data.name), function(cmd) {
+		Ext.MessageBox.confirm(t("Delete"), t("All data will be lost! Are you sure you want to delete module '{item}'?").replace('{item}', record.data.name), function (cmd) {
 			console.log(cmd);
-			if(cmd != 'yes') {
+			if (cmd != 'yes') {
 				return;
 			}
 
-			if(record.data.isRefactored) {
+			if (record.data.isRefactored) {
 
 				go.Jmap.request({
 					method: "Module/uninstall",
@@ -429,21 +455,20 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 						name: record.data.name,
 						package: record.data.package
 					},
-					callback: function() {
+					callback: function () {
 						record.set('enabled', false);
 						record.set('id', null);
 						record.commit();
 					},
 					scope: this
 				});
-			}else
-			{
+			} else {
 				GO.request({
 					url: "modules/module/delete",
 					params: {
 						id: record.data.id
 					},
-					callback: function(){
+					callback: function () {
 						record.set('enabled', false);
 						record.set('id', null);
 						record.commit();
@@ -453,5 +478,6 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 			}
 
 		}, this);
+
 	}
 });

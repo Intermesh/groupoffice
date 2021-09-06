@@ -282,7 +282,7 @@ class Token extends Entity {
 		// For backwards compatibility, set the server session for the old code
 		$this->oldLogin();
 
-		$this->classPermissionLevels = [];
+		$this->classRights = [];
 
 		User::fireEvent(User::EVENT_LOGIN, $user);
 		
@@ -458,21 +458,21 @@ class Token extends Entity {
 
 
 
-	private $classPermissionLevels = [];
+	private $classRights = [];
 
 	/**
 	 * Get the permission level of the module this controller belongs to.
 	 * 
 	 * @return int
 	 */
-	public function getClassPermissionLevel($cls) {
-		if(!isset($this->classPermissionLevels[$cls])) {
-			$mod = Module::findByClass($cls, ['aclId', 'permissionLevel']);
-			$this->classPermissionLevels[$cls]= $mod->getPermissionLevel();	
+	public function getClassRights($cls) {
+		if(!isset($this->classRights[$cls])) {
+			$mod = Module::findByClass($cls, ['id', 'name', 'package']);
+			$this->classRights[$cls]= $mod->getUserRights();
 			go()->getCache()->set('token-'.$this->accessToken,$this);		
 		}
 
-		return $this->classPermissionLevels[$cls];
+		return $this->classRights[$cls];
 	}
 
 

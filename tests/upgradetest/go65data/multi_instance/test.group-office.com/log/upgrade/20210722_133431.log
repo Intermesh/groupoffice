@@ -1,0 +1,32 @@
+[core/core] Excuting query: CREATE TABLE `core_permission` (
+  `moduleId` INT NOT NULL,
+  `groupId` INT NOT NULL,
+  `rights` BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`moduleId`, `groupId`),
+  INDEX `fk_permission_group_idx` (`groupId` ASC),
+  CONSTRAINT `fk_permission_module`
+      FOREIGN KEY (`moduleId`)
+          REFERENCES `core_module` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION,
+  CONSTRAINT `fk_permission_group`
+      FOREIGN KEY (`groupId`)
+          REFERENCES `core_group` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION);
+core/core updated from 241 to 242
+[core/core] Excuting query: INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), a.entityId FROM core_acl_group ag 
+join core_acl a on a.id = ag.aclId 
+join core_entity e on e.id = a.entityTypeId
+WHERE e.name = 'Module';
+core/core updated from 242 to 243
+[core/core] Excuting query: UPDATE core_permission p
+join core_acl_group ag on ag.groupId = p.groupId
+join core_acl a on a.id = ag.aclId
+join core_module m on a.entityId = m.id
+SET rights = IF(ag.level=10,0,IF(ag.level=40,1,3))
+WHERE a.entityId = p.moduleId AND  m.name = 'projects2';
+core/core updated from 243 to 244
+Rebuilding cache
+Registering all entities
+Done!

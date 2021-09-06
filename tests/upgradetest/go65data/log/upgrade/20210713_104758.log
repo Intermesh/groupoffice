@@ -1,0 +1,51 @@
+Rebuilding cache
+<b>Error:</b> ErrorException in /usr/local/share/src/www/go/core/cache/Apcu.php at line 58: apcu_store(): __sleep should return an array only containing the names of instance-variables to serialize
+
+#0 [internal function]: go\core\ErrorHandler::errorHandler(8, 'apcu_store(): _...', '/usr/local/shar...', 58, Array)
+#1 /usr/local/share/src/www/go/core/cache/Apcu.php(58): apcu_store('groupoffice-dbC...', Array, 0)
+#2 /usr/local/share/src/www/go/core/db/Table.php(138): go\core\cache\Apcu->set('dbColumns_group...', Array)
+#3 /usr/local/share/src/www/go/core/db/Table.php(77): go\core\db\Table->init()
+#4 /usr/local/share/src/www/go/core/db/Table.php(36): go\core\db\Table->__construct('core_setting', Object(go\core\db\Connection))
+#5 /usr/local/share/src/www/go/core/db/QueryBuilder.php(103): go\core\db\Table::getInstance('core_setting', Object(go\core\db\Connection))
+#6 /usr/local/share/src/www/go/core/db/QueryBuilder.php(145): go\core\db\QueryBuilder->setTableName('core_setting')
+#7 /usr/local/share/src/www/go/core/db/Connection.php(461): go\core\db\QueryBuilder->buildInsert('core_setting', Array, Array, 'REPLACE')
+#8 /usr/local/share/src/www/go/core/Settings.php(216): go\core\db\Connection->replace('core_setting', Array)
+#9 /usr/local/share/src/www/go/core/Settings.php(194): go\core\Settings->update('smtpPassword', NULL)
+#10 /usr/local/share/src/www/go/core/model/Settings.php(546): go\core\Settings->save()
+#11 /usr/local/share/src/www/go/core/Installer.php(461): go\core\model\Settings->save()
+#12 /usr/local/share/src/www/install/upgrade.php(77): go\core\Installer->upgrade()
+#13 {main}</pre></div><div style="clear:both;margin-bottom:20px;"></div><div class="card"><h2>Debugger output</h2><pre>Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Event 'go\core\model\User::mapping' calls listener go\modules\community\addressbook\Module::onMap
+Event 'go\core\model\User::mapping' calls listener go\modules\business\business\Module::onMap
+Event 'go\core\model\User::mapping' calls listener go\modules\community\googleauthenticator\Module::onMap
+Event 'go\core\model\User::mapping' calls listener go\modules\community\notes\Module::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Calendar\CalendarModule::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Email\EmailModule::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Sync\SyncModule::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Tasks\TasksModule::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Timeregistration2\Timeregistration2Module::onMap
+Event 'go\core\model\User::mapping' calls listener GO\Projects2\Projects2Module::onMap
+Session writing closed
+Not using cache. This will be slow!
+ErrorHandler:errorHandler called 8
+ErrorException in /usr/local/share/src/www/go/core/cache/Apcu.php at line 58: apcu_store(): __sleep should return an array only containing the names of instance-variables to serialize
+#0 [internal function]: go\core\ErrorHandler::errorHandler(8, 'apcu_store(): _...', '/usr/local/shar...', 58, Array)
+#1 /usr/local/share/src/www/go/core/cache/Apcu.php(58): apcu_store('groupoffice-dbC...', Array, 0)
+#2 /usr/local/share/src/www/go/core/db/Table.php(138): go\core\cache\Apcu->set('dbColumns_group...', Array)
+#3 /usr/local/share/src/www/go/core/db/Table.php(77): go\core\db\Table->init()
+#4 /usr/local/share/src/www/go/core/db/Table.php(36): go\core\db\Table->__construct('core_setting', Object(go\core\db\Connection))
+#5 /usr/local/share/src/www/go/core/db/QueryBuilder.php(103): go\core\db\Table::getInstance('core_setting', Object(go\core\db\Connection))
+#6 /usr/local/share/src/www/go/core/db/QueryBuilder.php(145): go\core\db\QueryBuilder->setTableName('core_setting')
+#7 /usr/local/share/src/www/go/core/db/Connection.php(461): go\core\db\QueryBuilder->buildInsert('core_setting', Array, Array, 'REPLACE')
+#8 /usr/local/share/src/www/go/core/Settings.php(216): go\core\db\Connection->replace('core_setting', Array)
+#9 /usr/local/share/src/www/go/core/Settings.php(194): go\core\Settings->update('smtpPassword', NULL)
+#10 /usr/local/share/src/www/go/core/model/Settings.php(546): go\core\Settings->save()
+#11 /usr/local/share/src/www/go/core/Installer.php(461): go\core\model\Settings->save()
+#12 /usr/local/share/src/www/install/upgrade.php(77): go\core\Installer->upgrade()
+#13 {main}</pre></div></section>
+<footer>&copy; Intermesh - <a href="https://www.group-office.com">https://www.group-office.com</a></footer>
+
+</body>
+</html>

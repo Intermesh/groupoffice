@@ -112,14 +112,20 @@ abstract class Property extends Model {
 	protected $readOnly = false;
 
 	/**
+	 * @var Property a reference to the entity this property belongs to
+	 */
+	protected $owner = null;
+
+	/**
 	 * Constructor
 	 *
+	 * @param Property $owner
 	 * @param boolean $isNew Indicates if this model is saved to the database.
 	 * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
 	 * @param bool $readOnly Entities can be fetched readonly to improve performance
 	 * @throws Exception
 	 */
-	public function __construct($isNew = true, $fetchProperties = [], $readOnly = false) {
+	public function __construct($owner, $isNew = true, $fetchProperties = [], $readOnly = false) {
 		$this->isNew = $isNew;
 
 		if (empty($fetchProperties)) {
@@ -128,6 +134,7 @@ abstract class Property extends Model {
 
 		$this->fetchProperties = $fetchProperties;
 		$this->readOnly = $readOnly;
+		$this->owner = $owner;
 		$this->selectedProperties = array_unique(array_merge($this->getRequiredProperties(), $this->fetchProperties));
 
 		$this->initDatabaseColumns($this->isNew);
@@ -227,7 +234,7 @@ abstract class Property extends Model {
 						$prop = null;
 					} else
 					{
-						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly);
+						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 						$prop = $stmt->fetch();
 						$stmt->closeCursor();	
 						if(!$prop) {
@@ -236,7 +243,7 @@ abstract class Property extends Model {
 					}
 
 					if(!$prop && $relation->autoCreate) {
-						$prop = new $cls;
+						$prop = new $cls($this);
 						$this->applyRelationKeys($relation, $prop);
 					}
 					$this->{$relation->name} = $prop;
@@ -248,7 +255,7 @@ abstract class Property extends Model {
 						$prop = [];
 					} else
 					{
-						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly);
+						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 
 						$prop = $stmt->fetchAll();
 						$stmt->closeCursor();	
@@ -263,7 +270,7 @@ abstract class Property extends Model {
 						$prop = null;
 					} else
 					{
-						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly);
+						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 						$prop = $stmt->fetchAll();
 						$stmt->closeCursor();	
 						if(empty($prop)) {
@@ -339,7 +346,7 @@ abstract class Property extends Model {
    * @return Statement|mixed
    * @throws Exception
    */
-	private static function queryRelation($cls, array $where, Relation $relation, $readOnly) {
+	private static function queryRelation($cls, array $where, Relation $relation, $readOnly, $owner) {
 
 		$cacheKey = static::class.':'.$relation->name;
 
@@ -349,7 +356,7 @@ abstract class Property extends Model {
 
       /** @var Query $query */
       /** @var self $cls */
-      $query = $cls::internalFind([], $readOnly);
+      $query = $cls::internalFind([], $readOnly, $owner);
 
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
@@ -425,6 +432,7 @@ abstract class Property extends Model {
 	 */
 	private function watchProperties() {
 
+
 		$cacheKey = 'watch-props-' . static::class;
 
 		$ret = App::get()->getCache()->get($cacheKey);
@@ -442,6 +450,9 @@ abstract class Property extends Model {
 			}
 		}
 
+		$exclude = ['isNew', 'oldProps', 'fetchProperties', 'selectedProperties', 'owner'];
+		$p = array_diff($p, $exclude);
+
 		App::get()->getCache()->set($cacheKey, $p);
 
 		return array_unique($p);
@@ -454,7 +465,9 @@ abstract class Property extends Model {
 	private function trackModifications() {
 		foreach ($this->watchProperties() as $propName) {
 			$v = $this->$propName;
-			$this->oldProps[$propName] = is_object($v) ? clone $v : $v;
+
+			//if value is a property then don't copy since we will use ->isModified() to track
+			$this->oldProps[$propName] = ($v instanceof self ) ? null : $v;
 		}
 	}
 
@@ -699,9 +712,10 @@ abstract class Property extends Model {
 	 * @param array $fetchProperties
 	 * @param bool $readOnly
 	 * @return static|Query
+	 * @param Property $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
 	 * @throws Exception
 	 */
-	protected static function internalFind(array $fetchProperties = [], $readOnly = false) {
+	protected static function internalFind(array $fetchProperties = [], $readOnly = false, $owner = null) {
 
 		$cacheKey = static::class . '-' . implode("-", $fetchProperties);
 		$cacheKey = $readOnly ? $cacheKey . '-ro' : $cacheKey . '-rw';
@@ -724,7 +738,7 @@ abstract class Property extends Model {
 
 		$query = (new Query())
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())						
-						->setModel(static::class, $fetchProperties, $readOnly);
+						->setModel(static::class, $fetchProperties, $readOnly, $owner);
 
 		self::joinAdditionalTables($tables, $query);
 		self::buildSelect($query, $fetchProperties, $readOnly);
@@ -1531,9 +1545,11 @@ abstract class Property extends Model {
 			$this->applyRelationKeys($relation, $newProp);
 
 			// This wen't bad when creating new map values with "ext-gen1" as key.
-//			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
-//				$newProp->$propName = $value;
-//			}
+			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
+				if(empty($newProp->$propName)) {
+					$newProp->$propName = $value;
+				}
+			}
 
 			if (!$newProp->internalSave()) {
 				$this->relatedValidationErrors = $newProp->getValidationErrors();
@@ -1656,7 +1672,7 @@ abstract class Property extends Model {
 		
 		try {
 			if ($recordIsNew) {
-				
+
 				foreach($table->getConstantValues() as $colName => $value) {
 					$modifiedForTable[$colName] = $value;
 				}
@@ -1854,7 +1870,7 @@ abstract class Property extends Model {
 
 		go()->debug("Deleted " . $stmt->rowCount() ." models of type " .static::class);
 
-		if(count($blobIds)) {			
+		if(count($blobIds)) {
 			$blobs = Blob::find()->where('id', '=', $blobIds);
 			foreach($blobs as $blob) {
 				$blob->setStaleIfUnused();
@@ -2133,7 +2149,7 @@ abstract class Property extends Model {
 			foreach ($value as $patch) {
 
 				//check if we can find an existing model to patch.
-				$temp = new $relation->entityName;
+				$temp = new $relation->entityName($this);
 				$temp->setValues($patch);
 				$id = $temp->id();
 
@@ -2179,13 +2195,16 @@ abstract class Property extends Model {
 
 					$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);
 
-					if (is_bool($patch)) {
+					//Why?
+//					if (is_bool($patch)) {
 						// if($relation->type == Relation::TYPE_MAP) {
 						//Only change key to values when using booleans. Key can also be made up by the client.
 						foreach ($this->mapKeyToValues($id, $relation) as $key => $value) {
-							$this->$propName[$id]->$key = $value;
+							if(empty($this->$propName[$id]->$key)) {
+								$this->$propName[$id]->$key = $value;
+							}
 						}
-					}
+//					}
 				}
 			}
 		}
@@ -2241,7 +2260,7 @@ abstract class Property extends Model {
 		}
 
 		if (is_array($value)) {
-			$o = new $cls;
+			$o = new $cls($this);
 			/** @var self $o */
 			$o->setValues($value);
 
@@ -2393,7 +2412,13 @@ abstract class Property extends Model {
    * @throws Exception
    */
 	protected function internalCopy() {
-		$copy = new static;
+
+		if($this instanceof Entity) {
+			$copy = new static();
+		} else
+		{
+			$copy = new static($this);
+		}
 
 		//copy public and protected columns except for auto increments.
 		$props = $this->getApiProperties();

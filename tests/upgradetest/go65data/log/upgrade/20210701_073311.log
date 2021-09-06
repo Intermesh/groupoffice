@@ -1,0 +1,5 @@
+[core/core] Excuting query: alter table core_auth_token modify userAgent varchar(190) null;
+core/core updated from 239 to 240
+Rebuilding cache
+Registering all entities
+Done!

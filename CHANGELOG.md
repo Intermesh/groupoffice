@@ -8,14 +8,21 @@ Core: Alert system to notify users about comments, assigned tasks etc.
 Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
 Core: New module chooser menu
 Core: System Settings -> Modules redesigned and searchable.
+Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
+      custom fields.
 ----
 
 
+- Email: Unknown recipients dialog maximized on mobile
+- Email: Fixed display of unsubscribed folder with two levels of subfolders
+
+24-08-2021 6.5.74
 - Studio: Initial config had "id" for autoExpandColumn instead of "showID".
 - Core: Custom fields can be rendered as text in templates with entity.customFields.asText.foo
 - Postfixadmin: fixed cleanup script of deleted mailboxes
 - Email: Fixed red messages in sent items
 - Core: Fixed html editor styles in Compact theme
+- Email: Fixed broken base64 encoded message in rare case
 
 23-08-2021 6.5.73
 - Timeregistration: Do not clone invoice_id upon cloning a time entry

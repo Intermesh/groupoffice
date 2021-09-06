@@ -21,13 +21,27 @@ class User extends EntityController {
 
 	protected function canUpdate(Entity $entity) {
 		
-		if(!go()->getAuthState()->isAdmin()) {
-			if($entity->isModified('groups')) {
-				return false;
-			}
+		if($this->rights->mayChangeUsers) {
+			// Level is not used for users. When user management is enabled only check read permissions
+			return $entity->hasPermissionLevel(model\Acl::LEVEL_READ);
 		}
+
+		if($entity->isModified('groups')) {
+			return false;
+		}
+
 		
 		return parent::canUpdate($entity);
+	}
+
+	protected function canDestroy(Entity $entity)
+	{
+		return $this->rights->mayChangeUsers;
+	}
+
+	protected function canCreate(Entity $entity)
+	{
+		return $this->rights->mayChangeUsers;
 	}
 	
 	/**

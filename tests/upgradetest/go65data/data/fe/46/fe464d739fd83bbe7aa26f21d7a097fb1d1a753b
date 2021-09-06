@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+UID:12@host.docker.internal:8080
+LANGUAGE:en
+PRODID:-//Intermesh//NONSGML Group-Office 6.5.69//EN
+N:ABC & Co;;;;
+FN:ABC & Co
+REV:1626699974
+TITLE:
+NOTE:
+X-GO-GENDER:
+END:VCARD

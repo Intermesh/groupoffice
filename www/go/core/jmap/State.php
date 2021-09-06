@@ -191,11 +191,28 @@ class State extends AbstractState {
 			'eventSourceUrl' => $this->getEventSourceUrl(),
 			'userId' => $this->getUserId(),
 		];
+		$this->addModuleCapabilities($response);
 
 		//todo optimize
 		$response['state'] = OldState::model()->getFullClientState($this->getUserId());
 
 		return $response;
+	}
+
+	private function addModuleCapabilities(&$response) {
+		$modules = \go\core\model\Module::getInstalled();
+		$groupedRights = "SELECT moduleId, BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".go()->getAuthState()->getUserId().") GROUP BY moduleId;";
+		$rights = go()->getDbConnection()->query($groupedRights)->fetchAll(\PDO::FETCH_KEY_PAIR);
+		foreach ($modules as $module) {
+			if(go()->getAuthState()->isAdmin()) {
+				$p = $module->may(PHP_INT_MAX);
+			} else if(isset($rights[$module->id])) {
+				$p = $module->may($rights[$module->id]);
+			}
+			if(!empty($p)) {
+				$response['capabilities']->{'go:' . ($module->package ?? 'legacy') . ':' . $module->name} = $p;
+			}
+		}
 	}
 	
 	private function clientSettings() {
@@ -275,8 +292,8 @@ class State extends AbstractState {
 	 * 
 	 * @return int
 	 */
-	public function getClassPermissionLevel($cls) {
-		return $this->getToken()->getClassPermissionLevel($cls);
+	public function getClassRights($cls) {
+		return $this->getToken()->getClassRights($cls);
 	}
 
 }

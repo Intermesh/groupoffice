@@ -18,7 +18,7 @@
 
 			this.store = new go.data.Store({
 				entityStore: "Alert",
-				fields: ['id', 'entity', 'entityId', 'data', 'tag', 'triggerAt', 'userId'],
+				fields: ['id', 'entity', 'entityId', 'data', 'tag', 'triggerAt', 'userId', 'title', 'body'],
 				filters: {
 					user: {userId: go.User.id}
 				}
@@ -54,8 +54,8 @@
 				const c = {
 					statusIcon: 'reminder',
 					itemId: id,
-					title: entity.title || entity.name || entity.description,
-					html: go.util.Format.dateTime(alert.triggerAt),
+					title: alert.title,
+					html: go.util.textToHtml(alert.body),
 					iconCls: iconCls,
 					buttonAlign: "right",
 					listeners: {
@@ -82,7 +82,7 @@
 
 
 				if(!c.notificationBody) {
-					c.notificationBody = c.html;
+					c.notificationBody = alert.body;
 				}
 
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};

@@ -3,6 +3,12 @@
 namespace GO\Base\Cron;
 
 
+use go\core\ErrorHandler;
+use go\core\model\Alert;
+use go\core\model\User;
+use go\core\orm\exception\SaveException;
+use go\core\util\DateTime;
+
 class EmailReminders extends AbstractCron {
 
 	/**
@@ -106,6 +112,45 @@ class EmailReminders extends AbstractCron {
 			}
 
 			date_default_timezone_set(\GO::user()->timezone);
+
+			$alerts = Alert::find()
+				->where('triggerAt', '<=', new DateTime("now", new \DateTimeZone("UTC")))
+				->where('sendMail', '=', true);
+
+			foreach($alerts as $alert) {
+				try {
+					$subject = \go()->t("Alert") . ': ' . $alert->getTitle();
+
+					$user = User::findById($alert->userId, ['id', 'displayName', 'email', 'timezone', 'dateFormat', 'timeFormat']);
+
+					go()->getLanguage()->setLanguage($user->language);
+
+					//$body = go()->t("Time") . ': ' . $alert->triggerAt->toUserFormat(true, $user) . "\n\n";
+					$body = $alert->getBody() ."\n\n";
+					$body .= go()->getSettings()->URL;
+
+//					date_default_timezone_set(\GO::user()->timezone);
+
+					go()
+						->getMailer()
+						->compose()
+						->setSubject($subject)
+						->setBody($body)
+						->setTo($user->email, $user->displayName)
+						->send();
+
+					$alert->sendMail = false;
+					if(!$alert->save()) {
+						throw new SaveException($alert);
+					}
+
+				} catch(\Throwable $e) {
+
+					ErrorHandler::logException($e, "Failed sending alert e-mail ". $alert->id);
+				}
+			}
+
+			go()->getLanguage()->setLanguage(go()->getAuthState()->getUser(['language'])->language);
 		}
 	}
 	

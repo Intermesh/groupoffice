@@ -99,9 +99,7 @@ links/LinksDetailPanel.js
 links/FilterLinkEntityCombo.js
 
 
-oauth/ClientGrid.js
-oauth/ClientDialog.js
-oauth/SystemSettingsPanel.js
+
 
 Router.js
 PasswordPrompt.js
@@ -130,10 +128,6 @@ detail/CreateModifyPanel.js
 permissions/SharePanel.js
 permissions/ShareWindow.js
 
-defaultpermissions/DefaultPermissionsPanel.js
-defaultpermissions/SystemSettingsPanel.js
-defaultpermissions/ShareWindow.js
-
 
 usersettings/VisibleToPanel.js
 usersettings/AccountSettingsPanel.js
@@ -147,6 +141,16 @@ systemsettings/NotificationsPanel.js
 systemsettings/AuthenticationPanel.js
 systemsettings/Dialog.js
 systemsettings/AuthAllowGroupGrid.js
+
+oauth/ClientGrid.js
+oauth/ClientDialog.js
+oauth/SystemSettingsPanel.js
+
+
+defaultpermissions/DefaultPermissionsPanel.js
+defaultpermissions/SystemSettingsPanel.js
+defaultpermissions/ShareWindow.js
+
 
 Wizard.js
 Array.js
@@ -176,6 +180,7 @@ cron/SystemSettingsCronGrid.js
 
 tools/SystemSettingsTools.js
 
+groups/ModulePermissionCombo.js
 groups/SystemSettingsGroupGrid.js
 groups/GroupDialog.js
 groups/GroupUserGrid.js
@@ -244,6 +249,7 @@ search/SearchField.js
 
 modules/SystemSettingsModuleGrid.js
 modules/PermissionsWindow.js
+modules/GroupRights.js
 
 
 filter/Conditions.js

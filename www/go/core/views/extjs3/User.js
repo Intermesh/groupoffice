@@ -30,8 +30,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 	onLoad : function(session) {
 		console.warn(session);
 
-		go.Jmap.capabilities = session.capabilities;
-
+		this.capabilities = go.Jmap.capabilities = session.capabilities;
 		this.session = session;
 
 	    this.apiUrl = session.apiUrl;

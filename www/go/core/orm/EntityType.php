@@ -7,6 +7,7 @@ use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Query;
+use go\core\ErrorHandler;
 use go\core\model\Module;
 use go\core\jmap;
 use go\core\model\Acl;
@@ -93,8 +94,8 @@ class EntityType implements \go\core\data\ArrayableInterface {
    * @return Module
    * @throws Exception
    */
-	public function getModule() {
-		return Module::findById($this->moduleId);
+	public function getModule($props = []) {
+		return Module::findById($this->moduleId, $props);
 	}
 
   /**
@@ -110,7 +111,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		$c = self::getCache();	
 		
 		if(!isset($c['name'][$clientName])) {
-			$module = Module::findByClass($className);
+			$module = Module::findByClass($className, ['id']);
 		
 			if(!$module) {
 				throw new Exception("No module found for ". $className);
@@ -119,8 +120,14 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
 			$record['name'] = self::classNameToShortName($className);
-            $record['clientName'] = $clientName;
-			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
+			$record['clientName'] = $clientName;
+			try {
+				App::get()->getDbConnection()->insert('core_entity', $record)->execute();
+			} catch(\PDOException $e) {
+				ErrorHandler::log("Failed to register new entity type for class '$className'.");
+				go()->debug($c);
+				throw $e;
+			}
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
 
 			go()->getCache()->delete('entity-types');
@@ -137,7 +144,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 
 		if(go()->getDebugger()->enabled) {
 			//do extra check if entity type belongs to the module
-			$module = Module::findByClass($className);
+			$module = Module::findByClass($className, ['id']);
 			if($c['models'][$c['name'][$clientName]]->moduleId != $module->id) {
 				throw new Exception("Entity $className conflicts with : " .$c['models'][$c['name'][$clientName]]->getClassName() .". Please return unique client name with getClientName()");
 			}

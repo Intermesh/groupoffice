@@ -14,7 +14,7 @@ const INSTALL_NEW = 0;
 const INSTALL_UPGRADE = 1;
 const INSTALL_NONE = 2;
 
-$installDb = INSTALL_UPGRADE;
+$installDb = INSTALL_NEW;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
@@ -92,11 +92,11 @@ try {
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {
     echo "Running upgrade: ";
-	  $importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go64.sql';
+	  $importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go65.sql';
     echo "Running: " . $importCmd . "\n";
 	  system($importCmd);
 
-	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/go64data/* ' . $dataFolder->getPath();
+	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/go65data/* ' . $dataFolder->getPath();
 	  echo "Running: " . $copyCmd . "\n";
 	  system($copyCmd);
 

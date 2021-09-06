@@ -1,0 +1,75 @@
+[core/core] Excuting query: alter table core_customfields_field modify relatedFieldCondition text default null;
+core/core updated from 240 to 241
+<b>Error:</b> PDOException in /usr/local/share/src/www/go/core/db/Connection.php at line 153: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'groupoffice_module_permissions.core_permission' doesn't exist
+
+#0 /usr/local/share/src/www/go/core/db/Connection.php(153): PDO->query('SHOW FULL COLUM...')
+#1 /usr/local/share/src/www/go/core/db/Table.php(138): go\core\db\Connection->query('SHOW FULL COLUM...')
+#2 /usr/local/share/src/www/go/core/db/Table.php(84): go\core\db\Table->init()
+#3 /usr/local/share/src/www/go/core/orm/MappedTable.php(51): go\core\db\Table->__construct('core_permission', Object(go\core\db\Connection))
+#4 /usr/local/share/src/www/go/core/orm/Mapping.php(81): go\core\orm\MappedTable->__construct('core_permission', 'core_permission', NULL, Array, Array)
+#5 /usr/local/share/src/www/go/core/model/Permission.php(20): go\core\orm\Mapping->addTable('core_permission')
+#6 /usr/local/share/src/www/go/core/orm/Property.php(517): go\core\model\Permission::defineMapping()
+#7 /usr/local/share/src/www/go/core/orm/Property.php(710): go\core\orm\Property::getMapping()
+#8 /usr/local/share/src/www/go/core/orm/Property.php(356): go\core\orm\Property::internalFind(Array, false, Object(go\core\model\Module))
+#9 /usr/local/share/src/www/go/core/orm/Property.php(269): go\core\orm\Property::queryRelation('go\\core\\model\\P...', Array, Object(go\core\orm\Relation), false, Object(go\core\model\Module))
+#10 /usr/local/share/src/www/go/core/orm/Property.php(137): go\core\orm\Property->initRelations()
+#11 [internal function]: go\core\orm\Property->__construct(false, Array, false, NULL)
+#12 /usr/local/share/src/www/go/core/db/Query.php(651): PDOStatement->fetch()
+#13 /usr/local/share/src/www/go/core/model/Module.php(246): go\core\db\Query->single()
+#14 /usr/local/share/src/www/go/core/orm/EntityType.php(140): go\core\model\Module::findByClass('go\\core\\model\\M...')
+#15 /usr/local/share/src/www/go/core/orm/Entity.php(565): go\core\orm\EntityType::findByClassName('go\\core\\model\\M...')
+#16 /usr/local/share/src/www/go/modules/community/history/model/LogEntry.php(207): go\core\orm\Entity::entityType()
+#17 /usr/local/share/src/www/go/modules/community/history/Module.php(101): go\modules\community\history\model\LogEntry->setEntity(Object(go\core\model\Module))
+#18 /usr/local/share/src/www/go/modules/community/history/Module.php(68): go\modules\community\history\Module::logEntity(Object(go\core\model\Module), 'update')
+#19 [internal function]: go\modules\community\history\Module::onEntitySave(Object(go\core\model\Module))
+#20 /usr/local/share/src/www/go/core/event/Listeners.php(118): call_user_func_array(Array, Array)
+#21 /usr/local/share/src/www/go/core/event/Listeners.php(132): go\core\event\Listeners->fireEvent('go\\core\\jmap\\En...', 'go\\core\\orm\\Pro...', 'save', Array)
+#22 /usr/local/share/src/www/go/core/event/EventEmitterTrait.php(69): go\core\event\Listeners->fireEvent('go\\core\\model\\M...', 'go\\core\\orm\\Pro...', 'save', Array)
+#23 /usr/local/share/src/www/go/core/orm/Entity.php(306): go\core\orm\Property::fireEvent('save', Object(go\core\model\Module))
+#24 /usr/local/share/src/www/go/core/Installer.php(711): go\core\orm\Entity->save()
+#25 /usr/local/share/src/www/go/core/Installer.php(449): go\core\Installer->upgradeModules()
+#26 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#27 {main}</pre></div><div style="clear:both;margin-bottom:20px;"></div><div class="card"><h2>Debugger output</h2><pre>Not using cache. This will be slow!
+Using \GO\Base\Cache\Apcu cache
+Not using cache. This will be slow!
+Session writing closed
+Not using cache. This will be slow!
+Event 'go\core\jmap\Entity::save' calls listener go\modules\community\history\Module::onEntitySave
+GO\Base\Model\Method not found!
+GO\Base\Model\Blob not found!
+SQL FAILED: SHOW FULL COLUMNS FROM `core_permission`;
+Rolling back save operation for go\core\model\Module
+ROLLBACK DB TRANSACTION
+PDOException in /usr/local/share/src/www/go/core/db/Connection.php at line 153: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'groupoffice_module_permissions.core_permission' doesn't exist
+#0 /usr/local/share/src/www/go/core/db/Connection.php(153): PDO->query('SHOW FULL COLUM...')
+#1 /usr/local/share/src/www/go/core/db/Table.php(138): go\core\db\Connection->query('SHOW FULL COLUM...')
+#2 /usr/local/share/src/www/go/core/db/Table.php(84): go\core\db\Table->init()
+#3 /usr/local/share/src/www/go/core/orm/MappedTable.php(51): go\core\db\Table->__construct('core_permission', Object(go\core\db\Connection))
+#4 /usr/local/share/src/www/go/core/orm/Mapping.php(81): go\core\orm\MappedTable->__construct('core_permission', 'core_permission', NULL, Array, Array)
+#5 /usr/local/share/src/www/go/core/model/Permission.php(20): go\core\orm\Mapping->addTable('core_permission')
+#6 /usr/local/share/src/www/go/core/orm/Property.php(517): go\core\model\Permission::defineMapping()
+#7 /usr/local/share/src/www/go/core/orm/Property.php(710): go\core\orm\Property::getMapping()
+#8 /usr/local/share/src/www/go/core/orm/Property.php(356): go\core\orm\Property::internalFind(Array, false, Object(go\core\model\Module))
+#9 /usr/local/share/src/www/go/core/orm/Property.php(269): go\core\orm\Property::queryRelation('go\\core\\model\\P...', Array, Object(go\core\orm\Relation), false, Object(go\core\model\Module))
+#10 /usr/local/share/src/www/go/core/orm/Property.php(137): go\core\orm\Property->initRelations()
+#11 [internal function]: go\core\orm\Property->__construct(false, Array, false, NULL)
+#12 /usr/local/share/src/www/go/core/db/Query.php(651): PDOStatement->fetch()
+#13 /usr/local/share/src/www/go/core/model/Module.php(246): go\core\db\Query->single()
+#14 /usr/local/share/src/www/go/core/orm/EntityType.php(140): go\core\model\Module::findByClass('go\\core\\model\\M...')
+#15 /usr/local/share/src/www/go/core/orm/Entity.php(565): go\core\orm\EntityType::findByClassName('go\\core\\model\\M...')
+#16 /usr/local/share/src/www/go/modules/community/history/model/LogEntry.php(207): go\core\orm\Entity::entityType()
+#17 /usr/local/share/src/www/go/modules/community/history/Module.php(101): go\modules\community\history\model\LogEntry->setEntity(Object(go\core\model\Module))
+#18 /usr/local/share/src/www/go/modules/community/history/Module.php(68): go\modules\community\history\Module::logEntity(Object(go\core\model\Module), 'update')
+#19 [internal function]: go\modules\community\history\Module::onEntitySave(Object(go\core\model\Module))
+#20 /usr/local/share/src/www/go/core/event/Listeners.php(118): call_user_func_array(Array, Array)
+#21 /usr/local/share/src/www/go/core/event/Listeners.php(132): go\core\event\Listeners->fireEvent('go\\core\\jmap\\En...', 'go\\core\\orm\\Pro...', 'save', Array)
+#22 /usr/local/share/src/www/go/core/event/EventEmitterTrait.php(69): go\core\event\Listeners->fireEvent('go\\core\\model\\M...', 'go\\core\\orm\\Pro...', 'save', Array)
+#23 /usr/local/share/src/www/go/core/orm/Entity.php(306): go\core\orm\Property::fireEvent('save', Object(go\core\model\Module))
+#24 /usr/local/share/src/www/go/core/Installer.php(711): go\core\orm\Entity->save()
+#25 /usr/local/share/src/www/go/core/Installer.php(449): go\core\Installer->upgradeModules()
+#26 /usr/local/share/src/www/install/upgrade.php(82): go\core\Installer->upgrade()
+#27 {main}</pre></div></section>
+<footer>&copy; Intermesh - <a href="https://www.group-office.com">https://www.group-office.com</a></footer>
+
+</body>
+</html>

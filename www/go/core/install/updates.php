@@ -1056,16 +1056,53 @@ $updates['202107160929'][] = "alter table core_alert
 			on delete cascade;";
 
 
+$updates['202107221420'][] = "CREATE TABLE `core_permission` (
+  `moduleId` INT NOT NULL,
+  `groupId` INT NOT NULL,
+  `rights` BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`moduleId`, `groupId`),
+  INDEX `fk_permission_group_idx` (`groupId` ASC),
+  CONSTRAINT `fk_permission_module`
+      FOREIGN KEY (`moduleId`)
+          REFERENCES `core_module` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION,
+  CONSTRAINT `fk_permission_group`
+      FOREIGN KEY (`groupId`)
+          REFERENCES `core_group` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION);";
+
+// migratie module acl permission to action permission
+$updates['202107221420'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), m.id FROM core_acl_group ag 
+join core_module m on ag.aclId = m.aclId;";
+// projects2 has finance permissions
+$updates['202107221420'][] = "UPDATE core_permission p
+join core_acl_group ag on ag.groupId = p.groupId
+join core_module m on ag.aclId = m.aclId
+SET rights = IF(ag.level=10,0,IF(ag.level=40,1,3))
+WHERE m.id = p.moduleId AND m.name = 'projects2';";
+
+
+$updates['202108271613'][] = "alter table core_module drop foreign key acl;";
+$updates['202108271613'][] = "alter table core_module drop column aclId;";
+
+
+$updates['202109021333'][] = "alter table core_alert
+	add sendMail boolean default false not null;";
 
 
 
-$updates['202108271038'][] = "alter table core_pdf_block modify x int null;";
 
-$updates['202108271038'][] = "alter table core_pdf_block modify y int null;";
 
-$updates['202108271038'][] = "alter table core_pdf_block modify width int null;";
 
-$updates['202108271038'][] = "alter table core_pdf_block modify height int null;";
+$updates['202109021333'][] = "alter table core_pdf_block modify x int null;";
 
-$updates['202108271038'][] = "alter table core_pdf_template
+$updates['202109021333'][] = "alter table core_pdf_block modify y int null;";
+
+$updates['202109021333'][] = "alter table core_pdf_block modify width int null;";
+
+$updates['202109021333'][] = "alter table core_pdf_block modify height int null;";
+
+$updates['202109021333'][] = "alter table core_pdf_template
 	add `key` varchar(20) default null null after moduleId;";

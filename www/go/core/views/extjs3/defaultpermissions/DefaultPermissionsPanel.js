@@ -1,4 +1,5 @@
 go.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
+
 	
 	initComponent: function () {
 		

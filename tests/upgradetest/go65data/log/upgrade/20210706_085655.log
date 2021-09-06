@@ -1,0 +1,5 @@
+[core/core] Excuting query: alter table core_customfields_field modify relatedFieldCondition text default '' not null;
+core/core updated from 240 to 241
+Rebuilding cache
+Registering all entities
+Done!

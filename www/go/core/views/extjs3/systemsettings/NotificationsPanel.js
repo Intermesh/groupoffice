@@ -1,4 +1,7 @@
 go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
+	hasPermission: function() {
+		return go.User.isAdmin;
+	},
 	initComponent: function () {
 		
 		Ext.apply(this, {

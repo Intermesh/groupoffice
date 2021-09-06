@@ -5,6 +5,7 @@ namespace go\core\jmap;
 use Exception;
 use go\core\model\Alert;
 use go\core\model\Module;
+use go\core\model\User;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
@@ -84,7 +85,9 @@ abstract class Entity  extends OrmEntity {
 			$this->change();
 		}
 
-		$this->checkFilesFolder();
+		if(static::supportsFiles()) {
+			$this->checkFilesFolder();
+		}
 
 		$this->saveTmpFiles();
 
@@ -147,6 +150,7 @@ abstract class Entity  extends OrmEntity {
 	 * @throws \GO\Base\Exception\AccessDenied
 	 */
 	private function checkFilesFolder($force = false) {
+
 		if(!self::$checkFilesFolder || empty($this->filesFolderId)) {
 			return true;
 		}
@@ -181,7 +185,7 @@ abstract class Entity  extends OrmEntity {
 	}
 
 	protected static function checkFiles() {
-		if(property_exists(static::class, 'filesFolderId') && Module::isInstalled('legacy', 'files')) {
+		if(static::supportsFiles()) {
 			$tables = static::getMapping()->getTables();
 			$table = array_values($tables)[0]->getName();
 
@@ -221,7 +225,7 @@ abstract class Entity  extends OrmEntity {
 	 * @return bool
 	 */
 	private static function supportsFiles() {
-		return property_exists(static::class, 'filesFolderId');
+		return property_exists(static::class, 'filesFolderId') && Module::isInstalled("legacy", "files");
 	}
 
 	/**
@@ -731,6 +735,38 @@ abstract class Entity  extends OrmEntity {
 	 */
 	public static function dismissAlerts(array $alerts) {
 
+	}
+
+
+	public function alertTitle(Alert $alert) {
+
+	}
+
+	const EVENT_ALERT_PROPS = 'alertprops';
+
+	public function alertProps(Alert $alert) {
+
+		$body = null;
+		$title = null;
+
+		$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
+		go()->getLanguage()->setLanguage($user->language);
+
+		self::fireEvent(self::EVENT_ALERT_PROPS, $this, $alert, ['title' => &$title, 'body' => &$body]);
+
+		if(!isset($body)) {
+
+			$body = $alert->triggerAt->toUserFormat(true, $user);
+		}
+
+		if(!isset($title)) {
+			$title = $alert->findEntity()->title() ?? null;
+		}
+
+
+		go()->getLanguage()->setLanguage(go()->getAuthState()->getUser(['language'])->language);
+
+		return ['title' => $title, 'body' => $body];
 	}
 
 }

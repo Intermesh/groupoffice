@@ -184,7 +184,6 @@ CREATE TABLE `core_module` (
   `version` int(11) NOT NULL,
   `sort_order` int(11) NOT NULL DEFAULT 0,
   `admin_menu` tinyint(1) NOT NULL DEFAULT 0,
-  `aclId` int(11) NOT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
   `modifiedAt` datetime DEFAULT NULL,
   `modSeq` int(11) DEFAULT NULL,
@@ -524,8 +523,7 @@ ALTER TABLE `core_link`
 
 ALTER TABLE `core_module`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `aclId` (`aclId`);
+  ADD UNIQUE KEY `name` (`name`);
 
 ALTER TABLE `core_search`
   ADD PRIMARY KEY (`id`),
@@ -736,8 +734,6 @@ ALTER TABLE `core_link`
   ADD CONSTRAINT `fromEntity` FOREIGN KEY (`fromEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `toEntity` FOREIGN KEY (`toEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `core_module`
-  ADD CONSTRAINT `acl` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
 
 ALTER TABLE `core_search`
   ADD CONSTRAINT `core_search_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
@@ -998,6 +994,7 @@ CREATE TABLE `core_alert` (
     tag varchar(50) null,
   `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
   `data` text null,
+  sendMail boolean default false not null,
   PRIMARY KEY (`id`),
   INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
   INDEX `fk_alert_user_idx` (`userId` ASC),
@@ -1140,3 +1137,19 @@ create index core_auth_remember_me_series_index
 alter table core_auth_remember_me
     add constraint core_auth_remember_me_core_user_id_fk
         foreign key (userId) references core_user (id);
+CREATE TABLE `core_permission` (
+  `moduleId` INT NOT NULL,
+  `groupId` INT NOT NULL,
+  `rights` BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`moduleId`, `groupId`),
+  INDEX `fk_permission_group_idx` (`groupId` ASC),
+  CONSTRAINT `fk_permission_module`
+      FOREIGN KEY (`moduleId`)
+          REFERENCES `core_module` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION,
+  CONSTRAINT `fk_permission_group`
+      FOREIGN KEY (`groupId`)
+          REFERENCES `core_group` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION);
