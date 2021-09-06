@@ -14,6 +14,7 @@ Core: modules can have specific permission types. We use it in the core to allow
 
 
 - Email: Unknown recipients dialog maximized on mobile
+- Email: Fixed display of unsubscribed folder with two levels of subfolders
 
 24-08-2021 6.5.74
 - Studio: Initial config had "id" for autoExpandColumn instead of "showID".
