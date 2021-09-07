@@ -48,6 +48,10 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	}
 
 	public function getPermissionLevel($userId = null) {
+		if(!\GO::user()) {
+			return 0;
+		}
+
 		if(\GO::user()->isAdmin())
 			return 50;
 
