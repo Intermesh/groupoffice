@@ -96,8 +96,7 @@ go.panels.ScrollLoader = {
 		const store = this.store;
 		if (this.allRecordsLoaded || this.store.loading){
 			return;
-		}	
-
+		}
 
 		if(this.scrollUp) {
 			
