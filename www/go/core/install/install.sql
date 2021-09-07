@@ -853,7 +853,6 @@ CREATE TABLE `core_email_template_attachment` (
 
 ALTER TABLE `core_email_template`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
   ADD KEY `aclId` (`aclId`),
   ADD KEY `moduleId` (`moduleId`);
 
