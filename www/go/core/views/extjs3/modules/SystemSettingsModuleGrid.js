@@ -126,7 +126,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 		}];
 
 		this.store.on('update', this.draw,this);
-		this.store.on('datachanged', this.draw,this);
+		this.store.on('load', this.draw,this);
 
 		this.on('afterrender', function() {
 			this.store.load();
@@ -135,9 +135,13 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 		go.modules.SystemSettingsModuleGrid.superclass.initComponent.call(this);
 	},
 
-	draw: function(store) {
+	draw: function() {
+
+		const store = this.store;
 
 		this.trialButton.setVisible(!store.reader.jsonData.has_license);
+
+		const scrollPos = this.body.dom.scrollTop;
 
 		this.removeAll();
 
@@ -257,6 +261,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 		}
 		this.doLayout();
 
+		this.body.dom.scrollTop = scrollPos;
+
 	},
 
 	showRights: function( id, rights) {
@@ -295,6 +301,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 			return this.submitJmap(record);
 		}
 
+		this.getEl().mask(t("Saving..."));
+
 		GO.request({
 			maskEl:this.getEl(),
 			url: 'modules/module/update',
@@ -315,6 +323,11 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 					}
 				}
 				record.commit();
+
+				this.draw();
+				this.getEl().unmask();
+
+
 			}
 		});
 	},
@@ -327,6 +340,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 
 		var url = GO.url('modules/module/updateModuleModel');
 
+		this.getEl().mask(t("Saving..."));
 		Ext.Ajax.request({
 			method:'POST',
 			url: url,
@@ -346,6 +360,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 					}
 					record.commit();
 				}
+
+				this.draw();
+				this.getEl().unmask();
 			}
 		});
 	},
@@ -353,6 +370,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 	submitJmap : function(record) {
 
 		var params = {};
+
+		this.getEl().mask(t("Saving..."));
 
 
 		if(record.data.id) {
@@ -376,7 +395,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 					this.store.load();
 				}
 
-			}, this);
+			}, this).finally(() => {
+				this.getEl().unmask();
+			});
 		} else
 		{
 
@@ -400,6 +421,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 					}
 				},
 				scope: this
+			}).finally(() => {
+				this.getEl().unmask();
 			});
 
 		}
@@ -442,11 +465,12 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 
 	deleteModule: function(record) {
 		Ext.MessageBox.confirm(t("Delete"), t("All data will be lost! Are you sure you want to delete module '{item}'?").replace('{item}', record.data.name), function (cmd) {
-			console.log(cmd);
+
 			if (cmd != 'yes') {
 				return;
 			}
 
+			this.getEl().mask(t("Saving..."));
 			if (record.data.isRefactored) {
 
 				go.Jmap.request({
@@ -459,6 +483,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 						record.set('enabled', false);
 						record.set('id', null);
 						record.commit();
+
+						this.getEl().unmask();
 					},
 					scope: this
 				});
@@ -472,6 +498,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 						record.set('enabled', false);
 						record.set('id', null);
 						record.commit();
+
+						this.getEl().unmask();
 					},
 					scope: this
 				});

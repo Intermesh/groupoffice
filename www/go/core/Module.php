@@ -158,11 +158,8 @@ abstract class Module extends Singleton {
 			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 
 			$this->installDatabase();
-			go()->getDbConnection()->resumeTransactions();
 
-			if(!Installer::isInstalling()) {
-				go()->rebuildCache(true);
-			}
+			go()->getDbConnection()->resumeTransactions();
 
 			go()->getDbConnection()->beginTransaction();
 
@@ -174,6 +171,10 @@ abstract class Module extends Singleton {
 			if(!$this->registerEntities()) {
 				$this->rollBack();				
 				return false;
+			}
+
+			if(!Installer::isInstalling()) {
+				go()->rebuildCache();
 			}
 
 			if(!$this->afterInstall($model)) {
@@ -239,7 +240,7 @@ abstract class Module extends Singleton {
 		}
 
 		if(!Installer::isInstalling()) {
-			go()->rebuildCache(true);
+			go()->rebuildCache();
 		}
 
 
