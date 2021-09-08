@@ -344,11 +344,29 @@ class Mapping {
 	 * @param Query $query
 	 * @return $this
 	 */
-	
-	
-	public function setQuery(Query $query) {
-		$this->query = $query;
-		
+	public function setQuery(Query $query)
+	{
+		if (!empty($this->query)) {
+			$this->query->select($query->getSelect(), true);
+			foreach ($query->getJoins() as $join) {
+				$this->query->join(
+					$join['src'],
+					$join['joinTableAlias'],
+					$join['on'],
+					$join['type'],
+					$join['indexHint']
+				);
+			}
+			if (count($query->getGroupBy()) > 0) {
+				$this->query->groupBy($query->getGroupBy(), true);
+			}
+			if (count($query->getOrderBy()) > 0) {
+				$this->query->orderBy($query->getOrderBy(), true);
+			}
+		} else {
+			$this->query = $query;
+		}
+
 		return $this;
 	}
 	
