@@ -387,12 +387,12 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 		
 		if(!this.onBeforeSubmit()) {
-			return Promise.reject("onBeforeSubmit returned false");
+			return Promise.reject({message: "onBeforeSubmit returned false"});
 		}
 
 		if (!this.isValid()) {
 			var error = this.showFirstInvalidField();
-			return Promise.reject(error);
+			return Promise.reject({message: error});
 		}
 
 		var isNew = !this.currentId;
