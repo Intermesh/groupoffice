@@ -120,7 +120,7 @@ class LogEntry extends AclOwnerEntity {
 
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('history_log_entry', 'l')
-			->setQuery(
+			->addQuery(
 				(new Query())
 					->select("e.clientName AS entity")
 					->join('core_entity', 'e', 'e.id = l.entityTypeId')

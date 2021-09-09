@@ -34,7 +34,10 @@ class Mapping {
 	private $columns = [];
 	
 	private $relations = [];
-	
+
+	/**
+	 * @var Query
+	 */
 	private $query;
 
 	/**
@@ -331,40 +334,38 @@ class Mapping {
 		
 		return $this->relations[$name];
 	}
-	
+
+
 	/**
 	 * Add additional DB query options
-	 * 
-	 * For example:
-	 * 
-	 * ```
-	 * $mapping->setQuery((new Query())->select("SUM(b.id) AS sumOfTableBIds")->join('test_b', 'bc', 'bc.id=a.id')->groupBy(['a.id']))
-	 * ```
 	 *
+	 * @deprecated use addQuery instead
 	 * @param Query $query
 	 * @return $this
 	 */
 	public function setQuery(Query $query)
 	{
+		return $this->addQuery($query);
+	}
+
+
+	/**
+	 * Add additional DB Query options, merge with current query options if possible
+	 *
+	 * For example:
+	 * ```
+	 * $mapping->addQuery((new Query())->select("SUM(b.id) AS sumOfTableBIds")->join('test_b', 'bc', 'bc.id=a.id')->groupBy(['a.id']))
+	 * ```
+	 *
+	 * @param Query $q
+	 * @return $this
+	 */
+	public function addQuery(Query $q)
+	{
 		if (!empty($this->query)) {
-			$this->query->select($query->getSelect(), true);
-			foreach ($query->getJoins() as $join) {
-				$this->query->join(
-					$join['src'],
-					$join['joinTableAlias'],
-					$join['on'],
-					$join['type'],
-					$join['indexHint']
-				);
-			}
-			if (count($query->getGroupBy()) > 0) {
-				$this->query->groupBy($query->getGroupBy(), true);
-			}
-			if (count($query->getOrderBy()) > 0) {
-				$this->query->orderBy($query->getOrderBy(), true);
-			}
+			$this->query->mergeWith($q);
 		} else {
-			$this->query = $query;
+			$this->query = $q;
 		}
 
 		return $this;

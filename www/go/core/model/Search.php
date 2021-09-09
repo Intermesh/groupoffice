@@ -112,7 +112,7 @@ class Search extends AclOwnerEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 										->addTable('core_search', 'search')
-										->setQuery(
+										->addQuery(
 														(new Query())
 														->select("e.clientName AS entity")
 														->join('core_entity', 'e', 'e.id = search.entityTypeId')

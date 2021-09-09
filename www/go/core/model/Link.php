@@ -184,7 +184,7 @@ class Link extends AclItemEntity
 	protected static function defineMapping() {
 		return parent::defineMapping()
 										->addTable('core_link', 'l')
-										->setQuery(
+										->addQuery(
 														(new Query())
 														->select("eFrom.clientName AS fromEntity, eTo.clientName AS toEntity, search.name as toName, search.description as toDescription, search.aclId, search.id as toSearchId")
 														->join('core_entity', 'eFrom', 'eFrom.id = l.fromEntityTypeId')
