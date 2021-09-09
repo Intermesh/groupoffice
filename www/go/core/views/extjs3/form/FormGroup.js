@@ -204,12 +204,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				//iconCls: this.addButtonIconCls,
 				text: this.addButtonText || this.btnCfg.text || t("Add"),
 				handler: function() {
-					var wrap = this.addPanel();
-					this.doLayout();
-					
-					wrap.formField.focus();
-
-					this.fireEvent("newitem", this, wrap);
+					this.addRow();
 				
 				},
 				scope: this
@@ -233,6 +228,15 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		}
 //		return false;
 //	},
+
+	addRow : function(auto) {
+		var wrap = this.addPanel(auto);
+		this.doLayout();
+
+		wrap.formField.focus();
+
+		this.fireEvent("newitem", this, wrap);
+	},
 	
 	createNewItem : function(auto) {
 		var item = Ext.ComponentMgr.create(this.itemCfg);
@@ -242,10 +246,23 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 
 		item.auto = auto;
+
+
 		
 		return item;
 	},
-	
+
+	checkForNewRow : function(delBtn, e) {
+
+		const c = delBtn.findParentByType("formgroupitemcontainer");
+
+		if(c.rowIndex == this.items.length - 1) {
+
+			this.addRow(true);
+		}
+
+	},
+
 	each : function(fn, scope){
 		var items = [].concat(this.items.items); // each safe for removal
 		for(var i = 0, len = items.length; i < len; i++){
@@ -270,6 +287,18 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			}
 		}),
 			rowId  = Ext.id();
+
+		if(this.startWithItem) {
+			const focusCatch = new Ext.form.TextField({
+				submit: false,
+				width: 0,
+				height: 0,
+				style: "padding: 0; border:0"
+			})
+
+			focusCatch.on('focus', this.checkForNewRow, this);
+			items.push(focusCatch);
+		}
 
 		if(this.editable) {
 			items.push(delBtn);
@@ -353,7 +382,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		if(this.dirty) {
 			return true;
 		}
-		
+
 		var dirty = false;
 		this.items.each(function(wrap) {
 			if(wrap.formField.isDirty()) {
@@ -439,9 +468,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 		var f = this.getAllFormFields();
 
-
 		for(var i = 0, l = f.length; i < l; i++) {
-			if(!(i == (l - 1) && f[i].auto && !f[i].isDirty()) && !f[i].isValid(preventMark)) {
+			if(i == (l - 1) && f[i].auto && !f[i].isDirty()) {
+				//skip auto new fields if not dirty
+				continue;
+			}
+
+			if(!f[i].isValid(preventMark)) {
 				return false;
 			}
 		}
@@ -466,7 +499,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		var f = this.getAllFormFields();
 
 		for(var i = 0, l = f.length; i < l; i++) {
-			if(!(i == (l - 1) && f[i].auto && !f[i].isDirty()) && !f[i].validate()) {
+
+			if(i == (l - 1) && f[i].auto && !f[i].isDirty()) {
+				//skip auto new fields if not dirty
+				continue;
+			}
+
+			if(!f[i].validate()) {
 					return false;
 			}
 		}
