@@ -513,7 +513,7 @@ class Link extends AclItemEntity
 				$copy->fromId = $to->id;
 
 				if (!$copy->save()) {
-					throw new SaveException();
+					throw new SaveException($copy);
 				}
 			}
 		} catch(\Exception $e) {
