@@ -1957,7 +1957,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		GO::session()->closeWriting();
 
-		$file = new \GO\Base\Fs\File('/dummypath/'.$params['filename']);
+		$file = new \GO\Base\Fs\File(go()->getTmpFolder()->getPath(). '/' . $params['filename']);
 
 		$account = Account::model()->findByPk($params['account_id']);
 		//$imapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);

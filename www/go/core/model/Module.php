@@ -324,7 +324,8 @@ class Module extends Entity {
 		}
 		
 		if(!$module) {
-			throw new Exception("Module not found for " . $className);
+			throw new Exception("Module $name not found for ".$className);
+			
 		}
 
 		return $module;
@@ -399,7 +400,7 @@ class Module extends Entity {
 		$module = $this->module();
 		return array_keys($module->getRights());
 	}
-	
+
 	/**
 	 * Check if a module is available
 	 * 

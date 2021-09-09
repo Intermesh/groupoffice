@@ -7245,7 +7245,7 @@ Ext.Element.addMethods({
             });
             return me;
         }
-        me.on(eventName, fn);
+        me.on(eventName, fn, me, {passive: true});
         return me;
     },
 
@@ -16339,14 +16339,13 @@ Ext.layout.boxOverflow.Scroller = Ext.extend(Ext.layout.boxOverflow.None, {
     
     
     createWheelListener: function() {
-        this.layout.innerCt.on({
-            scope     : this,
-            mousewheel: function(e) {
+        this.layout.innerCt.on('mousewheel', function(e) {
                 e.stopEvent();
 
                 this.scrollBy(e.getWheelDelta() * this.wheelIncrement * -1, false);
-            }
-        });
+            }, this,
+						 {passive: true}
+        );
     },
     
     
@@ -19285,7 +19284,7 @@ Ext.DatePicker = Ext.extend(Ext.BoxComponent, {
                 scope: this
             });
         }
-        this.mon(this.eventEl, 'mousewheel', this.handleMouseWheel, this);
+        this.mon(this.eventEl, 'mousewheel', this.handleMouseWheel, this, {passive: true});
         this.mon(this.eventEl, 'click', this.handleDateClick,  this, {delegate: 'a.x-date-date'});
         this.mon(this.mbtn, 'click', this.showMonthPicker, this);
         this.onEnable(true);
@@ -42079,9 +42078,11 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         }
         this.mon(Ext.getDoc(), {
             scope: this,
-            mousewheel: this.collapseIf,
+            // mousewheel: this.collapseIf,
             mousedown: this.collapseIf
         });
+
+				this.mon(Ext.getDoc(), "mousewheel", this.collapseIf, this, {passive: true});
         this.fireEvent('expand', this);
     },
 
@@ -50848,7 +50849,7 @@ Ext.grid.EditorGridPanel = Ext.extend(Ext.grid.GridPanel, {
     initEvents : function(){
         Ext.grid.EditorGridPanel.superclass.initEvents.call(this);
 
-        this.getGridEl().on('mousewheel', this.stopEditing.createDelegate(this, [true]), this);
+        this.getGridEl().on('mousewheel', this.stopEditing.createDelegate(this, [true]), this, {passive: true});
         this.on('columnresize', this.stopEditing, this, [true]);
 
         if(this.clicksToEdit == 1){
