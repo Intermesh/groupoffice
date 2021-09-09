@@ -419,10 +419,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 						Ext.MessageBox.alert(t("Error"), response.message);
 						this.store.load();
 					}
+					this.getEl().unmask();
 				},
 				scope: this
-			}).finally(() => {
-				this.getEl().unmask();
 			});
 
 		}
