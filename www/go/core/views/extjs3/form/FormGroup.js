@@ -124,7 +124,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	initSortable : function() {
 		var me = this;
 		this.dropZone = new Ext.dd.DropZone(this.getEl(), {
-			ddGroup: "form-group-sortable",
+			ddGroup: "form-group-sortable-" + this.getId(),
 			getTargetFromEvent: function(e) {
 				return e.getTarget('.go-form-group-row');
 			},
@@ -252,13 +252,16 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		return item;
 	},
 
-	checkForNewRow : function(delBtn, e) {
+	checkForNewRow : function(focusCatcher, e) {
 
-		const c = delBtn.findParentByType("formgroupitemcontainer");
+		const c = focusCatcher.findParentByType("formgroupitemcontainer");
 
-		if(c.rowIndex == this.items.length - 1) {
+		if(c.rowIndex == this.items.length - 1 && c.formField.isDirty()) {
 
 			this.addRow(true);
+		} else
+		{
+			c.items.get('del-btn').focus();
 		}
 
 	},
@@ -275,6 +278,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	addPanel : function(auto, index) {
 		var formField = this.createNewItem(auto), me = this, items = [formField], delBtn = new Ext.Button({
 			//disabled: formField.disabled,
+			itemId: 'del-btn',
 			xtype: "button",
 			cls: "small",
 			iconCls: 'ic-delete',
