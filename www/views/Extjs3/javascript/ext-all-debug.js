@@ -30957,7 +30957,11 @@ Ext.Button = Ext.extend(Ext.BoxComponent, {
             
             'menutriggerover',
             
-            'menutriggerout'
+            'menutriggerout',
+
+					'focus',
+
+					'blur'
         );
         
         if(Ext.isString(this.toggleGroup)){
@@ -31345,10 +31349,13 @@ Ext.Button = Ext.extend(Ext.BoxComponent, {
         if(!this.disabled){
             this.el.addClass('x-btn-focus');
         }
+
+				this.fireEvent('focus', this, e);
     },
     
     onBlur : function(e){
         this.el.removeClass('x-btn-focus');
+			this.fireEvent('blur', this, e);
     },
 
     
