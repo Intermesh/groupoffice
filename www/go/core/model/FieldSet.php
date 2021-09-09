@@ -89,7 +89,7 @@ class FieldSet extends AclOwnerEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('core_customfields_field_set', 'fs')
-						->setQuery((new Query())->select("e.name AS entity")->join('core_entity', 'e', 'e.id = fs.entityId'));						
+						->addQuery((new Query())->select("e.name AS entity")->join('core_entity', 'e', 'e.id = fs.entityId'));
 	}
 	
 	public function getEntity() {

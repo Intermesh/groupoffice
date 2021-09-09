@@ -186,22 +186,12 @@ class Task extends AclItemEntity {
 	}
 
 	protected static function defineMapping() {
-		$mapping = parent::defineMapping()
+		return parent::defineMapping()
 			->addTable("tasks_task", "task")
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
-
-		if(Module::isInstalled("legacy", "projects2")) {
-			$mapping->setQuery((new \go\core\db\Query())
-				->join('pr2_hours', 'prh', 'prh.task_id = task.id', 'left')
-				->select('COALESCE(SUM(prh.duration) * 60, 0) AS timeBooked')
-				->groupBy(['task.id'])
-			);
-		}
-
-		return $mapping;
 	}
 
 	public static function converters() {

@@ -35,7 +35,7 @@ class Method extends Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 		->addTable('core_auth_method', 'am')
-		->setQuery(
+		->addQuery(
 						(new \go\core\db\Query)
 						->join('core_module', 'mod', 'am.moduleId = mod.id AND mod.enabled = true')
 						); //always join enabled modules so disabled modules are not used.

@@ -300,22 +300,7 @@ abstract class Entity extends Property {
 
 		return $query;
 	}
-	
-//	
-//	public function getId() {		
-//		$tables = static::getMapping()->getTables();
-//		$primaryTable = array_shift($tables);
-//		$pkOfPrimaryTable = $primaryTable->getPrimaryKey();
-//		
-//		$id = [];
-//		
-//		foreach($pkOfPrimaryTable as $key) {
-//			$id[] = $this->{$key};
-//		}
-//		
-//		
-//		return implode("-", $id);		
-//	}
+
 
   /**
    * Save the entity

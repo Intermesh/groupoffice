@@ -34,7 +34,7 @@ class B extends A {
 	protected static function defineMapping() {
 		$mapping = parent::defineMapping()
 			->addTable('test_b', 'b', ['id' => 'id'], null, ['userId' => go()->getUserId()])
-			->setQuery((new Query())->select("SUM(b.id) AS sumOfTableBIds")->join('test_b', 'bc', 'bc.id=a.id')->groupBy(['a.id']));
+			->addQuery((new Query())->select("SUM(b.id) AS sumOfTableBIds")->join('test_b', 'bc', 'bc.id=a.id')->groupBy(['a.id']));
 		
 		return $mapping;
 	}

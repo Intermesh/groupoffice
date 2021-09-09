@@ -61,7 +61,7 @@ class Comment extends AclItemEntity {
 			->addTable("comments_comment", 'c')
 			->addScalar('labels', 'comments_comment_label', ['id' => 'commentId'])
 			->addScalar('images', 'comments_comment_image', ['id' => 'commentId'])
-			->setQuery(
+			->addQuery(
 				(new Query())
 					->select("e.clientName AS entity")
 					->join('core_entity', 'e', 'e.id = c.entityTypeId')

@@ -61,7 +61,7 @@ class DateTime extends PHPDateTime implements ArrayableInterface, \JsonSerializa
 	}
 
 	/**
-	 * Overridden becausde it should return static. Apperently this has been fixed in PHP 8
+	 * Overridden because it should return static. Apparently this has been fixed in PHP 8
 	 * https://bugs.php.net/bug.php?id=79975
 	 *
 	 * @param string $format
