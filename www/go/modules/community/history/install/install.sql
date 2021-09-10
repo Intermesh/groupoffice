@@ -32,3 +32,5 @@ CREATE TABLE IF NOT EXISTS `history_log_entry` (
 ENGINE = InnoDB;
 
 ALTER TABLE `history_log_entry` ADD INDEX(`entityId`);
+create index history_log_entry_createdAt_index
+    on history_log_entry (createdAt);
