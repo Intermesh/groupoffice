@@ -74,11 +74,21 @@ try {
 	}
 }
 catch(\Exception $e) {
+
+	\go\core\ErrorHandler::logException($e);
+
 	Response::get()->setStatus(500, "Upload failed");
 	Response::get()->setContentType("application/problem+json");
-	Response::get()->output([
+
+	$response = [
 		"title" => "Upload failed",
 		"detail" => $e->getMessage(),
 		"status" => 500
-	]);
+	];
+
+	if(go()->getDebugger()->enabled) {
+		$response['debug'] = go()->getDebugger()->getEntries();
+	}
+
+	Response::get()->output($response);
 }

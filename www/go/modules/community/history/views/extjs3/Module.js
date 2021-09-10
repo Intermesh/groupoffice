@@ -14,5 +14,8 @@ go.Modules.register("community", "history", {
 		"login",
 		"logout"
 	],
-	initModule: function () {}
+	initModule: function () {},
+	systemSettingsPanels: [
+		"go.modules.community.history.SystemSettingsPanel"
+	]
 });

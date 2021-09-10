@@ -65,12 +65,16 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			this.doLayout();
 		}, this);
 
-		this.on("afterrender", this.onAfterRender, this);
+		this.on("added", () => {
+			setTimeout(() => {
+				this.setupFilter();
+			});
+			}, this);
 
 		go.customfields.FormFieldSet.superclass.initComponent.call(this);
 	},
 
-	onAfterRender: function() {
+	setupFilter: function() {
 		//find entity panel
 		var form = this.findParentByType("form");
 
