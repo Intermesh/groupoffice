@@ -3,3 +3,4 @@ MainPanel.js
 LogEntryGrid.js
 HistoryDetailPanel.js
 TypeGrid.js
+SystemSettingsPanel.js

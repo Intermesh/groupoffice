@@ -232,7 +232,9 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		$changes = clone $query;
 
-		$changes->select('id as entityId, aclId, "1" as destroyed');
+		$tableAlias = $query->getTableAlias();
+
+		$changes->select($tableAlias.'.id as entityId, '.$tableAlias.'.aclId, "1" as destroyed');
 		
 		return static::entityType()->changes($changes);
 	}

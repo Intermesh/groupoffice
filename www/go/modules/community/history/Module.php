@@ -8,6 +8,7 @@ use go\core;
 use go\core\jmap\Entity;
 use go\core\model\User;
 use go\modules\community\history\model\LogEntry;
+use go\modules\community\history\model\Settings;
 
 class Module extends core\Module
 {
@@ -29,6 +30,8 @@ class Module extends core\Module
 		User::on(User::EVENT_LOGIN, static::class, 'onLogin');
 		User::on(User::EVENT_LOGOUT, static::class, 'onLogout');
 		User::on(User::EVENT_BADLOGIN, static::class, 'onBadLogin');
+
+		core\cron\GarbageCollection::on(core\cron\GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
 	}
 
 	static function logActiveRecord(ActiveRecord $record, $action) {
@@ -180,4 +183,21 @@ class Module extends core\Module
 			throw new \Exception("Could not save log");
 		}
 	}
+
+	public static function onGarbageCollection() {
+		$years = (int) Module::get()->getSettings()->deleteAfterYears;
+
+		if(!empty($years)) {
+			LogEntry::delete(LogEntry::find()->where('createdAt', '<', (new core\util\DateTime("-" . $years . " years"))));
+		}
+	}
+
+	/**
+	 * @return core\Settings|Settings
+	 */
+	public function getSettings()
+	{
+		return Settings::get();
+	}
+
 }
