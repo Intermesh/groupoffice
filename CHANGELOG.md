@@ -1,5 +1,6 @@
 - Email: Unknown recipients dialog maximized on mobile
 - Email: Fixed display of unsubscribed folder with two levels of subfolders
+- History: Delete history after one year by default. Years are configurable in system settings.
 
 24-08-2021 6.5.74
 - Studio: Initial config had "id" for autoExpandColumn instead of "showID".
