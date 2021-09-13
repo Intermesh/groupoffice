@@ -32,7 +32,7 @@ return array (
   'Company' => 'Empresa',
   'Permissions' => 'Permisos',
   'Login' => 'Ingresar',
-  'Look & Feel' => 'Aspecto y temas',
+  'Look & feel' => 'Aspecto y temas',
   'Settings' => 'Configuraciones',
   'Email for new enabled users' => 'E-mail para nuevos usuarios',
   'Email for new disabled users' => 'E-mail para nuevos usuarios con discapacidad',

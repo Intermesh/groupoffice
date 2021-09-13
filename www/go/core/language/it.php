@@ -24,7 +24,7 @@ return array (
 	'Company' => 'Azienda',
 	'Permissions' => 'Permessi',
 	'Login' => 'Accesso',
-	'Look & Feel' => 'Aspetto',
+	'Look & feel' => 'Aspetto',
 	'Settings' => 'Impostazioni',
 	'Email for new enabled users' => 'Email per i nuovi utenti abilitati',
 	'Email for new disabled users' => 'Email per i nuovi utenti disabilitati',

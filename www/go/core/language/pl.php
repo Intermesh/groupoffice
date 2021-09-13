@@ -26,7 +26,7 @@ return array (
   'Password' => 'Hasło',
   'Company' => 'Firma',
   'Permissions' => 'Uprawnienia',
-  'Look & Feel' => 'Wygląd',
+  'Look & feel' => 'Wygląd',
   'Settings' => 'Ustawienia',
   'Email for new enabled users' => 'Email dla nowo aktywowanych użytkowników',
   'Email for new disabled users' => 'Email dla deaktywowanych użytkowników',

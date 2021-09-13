@@ -1154,7 +1154,7 @@ END;
 			}
 		}
 		
-		// Check for smilies to be enabled by the user (settings->Look & Feel-> Show Smilies)
+		// Check for smilies to be enabled by the user (settings->Look & feel-> Show Smilies)
 		if(\GO::user() && \GO::user()->show_smilies)
 			$html = StringHelper::replaceEmoticons($html,true);
 
