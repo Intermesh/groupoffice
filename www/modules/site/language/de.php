@@ -43,4 +43,5 @@ return array (
   'Meta' => 'Metadaten',
   'Global properties' => 'Globale Einstellungen',
   'Template' => 'Vorlage',
+  'Multi File' => 'Mehrere Dateien',
 );

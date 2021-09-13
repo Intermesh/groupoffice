@@ -12,4 +12,5 @@ return array (
   'IMAP Authenticator' => 'IMAP Authentifizierung',
   'Domains' => 'Domänen',
   'Use IMAP credentials' => 'IMAP Zugangsdaten benutzen',
+  'Users must login with their full e-mail adress. Enable this option if the IMAP expects. the username without domain.' => 'Benutzer müssen sich mit ihrer vollständigen E-Mail-Adresse anmelden. Aktivieren Sie diese Option, wenn das IMAP den Benutzernamen ohne Domäne erwartet.',
 );

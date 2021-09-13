@@ -606,28 +606,17 @@ All rights reserved.<br />',
   'months' => 'Monate',
   'short_months' => 
   array (
-    1 => 'Jan',
-    2 => 'Feb',
     3 => 'Mrz',
-    4 => 'Apr',
     5 => 'Mai',
-    6 => 'Jun',
-    7 => 'Jul',
-    8 => 'Aug',
-    9 => 'Sep',
     10 => 'Okt',
-    11 => 'Nov',
     12 => 'Dez',
   ),
   'short_days' => 
   array (
     0 => 'So',
-    1 => 'Mo',
     2 => 'Di',
     3 => 'Mi',
     4 => 'Do',
-    5 => 'Fr',
-    6 => 'Sa',
   ),
   'full_days' => 
   array (
@@ -1337,7 +1326,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'loading...' => 'Lade…',
   'Use $config' => 
   array (
-    '\'debug\'' => 'Verwenden Sie $config[\'debug\']=true; nur bei Entwicklung und Problemlösung. Es verlangsamt " + t(\'produkt_name',
+    '\'debug\'' => 'Verwenden Sie $config[\'debug\']=true; nur bei der Entwicklung und Problemlösung.',
   ),
   'Is organization' => 'Ist eine Organisation',
   'Registration number' => 'Register-Nummer',
@@ -1415,7 +1404,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Update event' => 'Ereignis aktualisieren',
   'Prefixes' => 'Präfixe',
   'Suffixes' => 'Suffixe',
-  'Prefix' => 'Präfixe',
+  'Prefix' => 'Präfix',
   'Field will be hidden by default in grids. Users can enable it through the grid column menu.' => 'Das Feld wird in Grids standardmäßig ausgeblendet. Benutzer können es über das Menü der Rasterspalte aktivieren.',
   'Validation' => 'Validierung',
   'Import fieldsets from JSON-file' => 'Feldsätze aus JSON-Datei importieren',
@@ -1478,7 +1467,15 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Bottom' => 'Unten',
   '{finished} of {total}' => '{finished} von {total}',
   'files' => 'Dateien',
-	"When this is on and items are moved by dragging, confirmation is requested" => "Wenn diese Option aktiviert ist und Einträge durch Ziehen verschoben werden, wird eine Bestätigung angefordert",
-	"Show confirmation dialog on move" => "Zeige Bestätigungsdialog beim Verschieben",
-	"Are you sure you want to move the item(s)?" => 'Sind Sie sicher, dass Sie die Einträge verschieben möchten?'
+  'When this is on and items are moved by dragging, confirmation is requested' => 'Wenn diese Option aktiviert ist und Einträge durch Ziehen verschoben werden, wird eine Bestätigung angefordert',
+  'Show confirmation dialog on move' => 'Zeige Bestätigungsdialog beim Verschieben',
+  'Are you sure you want to move the item(s)?' => 'Sind Sie sicher, dass Sie die Einträge verschieben möchten?',
+  'Register' => 'Registrieren',
+  'Module' => 'Module',
+  'This name is used in the database and can only contain alphanumeric characters and underscores. It\'s only visible to exports and the API.' => 'Dieser Name wird in der Datenbank verwendet und darf nur alphanumerische Zeichen und Unterstriche enthalten. Er ist nur für Exporte und die API sichtbar.',
+  'Authorized clients' => 'Authorisierte Clients',
+  'Platform' => 'Plattform',
+  'Logout all' => 'Alle ausloggen',
+  'Logout users when inactive for more than this number of seconds. This will also disable the \'Remember my login\' checkbox in the login dialog. 0 disables this setting.' => 'Benutzer abmelden, wenn sie länger als diese Anzahl von Sekunden inaktiv sind. Dadurch wird auch das Kontrollkästchen "Anmeldung merken" im Anmeldedialog deaktiviert. 0 deaktiviert diese Einstellung.',
+  'Could not open a window. Please allow popup windows in your browser.' => 'Ein Fenster konnte nicht geöffnet werden. Bitte erlauben Sie Popup-Fenster in Ihrem Browser.',
 );

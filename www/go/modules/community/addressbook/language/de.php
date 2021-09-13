@@ -30,6 +30,7 @@ return array (
     'home' => 'Privat',
     'mobile' => 'Mobil',
     'workmobile' => 'Arbeit Mobil',
+    'fax' => 'Fax',
     'workfax' => 'Arbeit Fax',
   ),
   'addressTypes' => 
@@ -44,6 +45,7 @@ return array (
   array (
     'birthday' => 'Geburtstag',
     'anniversary' => 'Jahrestag',
+    'action' => 'Aktion',
   ),
   'Debtor number' => 'Kundennummer',
   'Star' => 'Stern',
@@ -129,4 +131,7 @@ return array (
   'Photo blob ID' => 'Foto-Blob-ID',
   'Restrict export to administrators' => 'Export auf Administratoren beschränken',
   'Date of birth' => 'Geburtstag',
+  'Allow new' => 'Neu erlauben',
+  'Are you sure that you would like to import this VCard?' => 'Sind Sie sicher, dass Sie diese VCard importieren möchten?',
+  'Importing...' => 'Importiere…',
 );

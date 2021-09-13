@@ -18,4 +18,9 @@ return array (
   'Google authenticator' => 'Google Athentifizierung',
   'Disable google authenticator' => 'Google Authentifizierung deaktivieren',
   'Provide your current password before you can enable Google authenticator.' => 'Geben Sie Ihr aktuelles Passwort an, bevor Sie die Google Authentifizierung aktivieren können.',
+  'Enforce two factor authentication for users in a specific group' => 'Zwei-Faktor-Authentifizierung für Benutzer in einer bestimmten Gruppe erzwingen',
+  'Block Group-Office usage until setup is done' => 'Block {product_name} usage until setup is done',
+  'Count down this number of seconds until the user can cancel the setup' => 'Zählt die Anzahl der Sekunden herunter, bis der Benutzer die Einrichtung abbrechen kann',
+  'Your system administrator requires you to setup two factor authentication' => 'Ihr Systemadministrator verlangt von Ihnen die Einrichtung der Zwei-Faktor-Authentifizierung',
+  'Setup later' => 'Später aufsetzen',
 );
