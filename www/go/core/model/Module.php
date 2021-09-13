@@ -257,8 +257,7 @@ class Module extends AclOwnerEntity {
 		}
 		
 		if(!$module) {
-			throw new Exception("Module $name not found for ".$className);
-			
+			throw new Exception("Module '" . ($package ?? "legacy") . "/" . $name . "' not found for ".$className);
 		}
 		return $module;
 	}
