@@ -1,3 +1,6 @@
+13-11-2021 6.4.244
+- Savemailas: Fixed check database for email links
+
 30-08-2021 6.4.243
 - Core: Fixed php 7.0 compatibility issue
 
