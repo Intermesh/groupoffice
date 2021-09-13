@@ -1,3 +1,4 @@
+13-09-2021 6.5.75
 - Email: Unknown recipients dialog maximized on mobile
 - Email: Fixed display of unsubscribed folder with two levels of subfolders
 - History: Delete history after one year by default. Years are configurable in system settings.
