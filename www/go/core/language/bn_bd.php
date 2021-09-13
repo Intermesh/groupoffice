@@ -27,7 +27,7 @@ return array (
   'Company' => 'কোম্পানি',
   'Permissions' => 'অনুমতিসমূহ',
   'Login' => 'প্রবেশ',
-  'Look & Feel' => 'দর্শনদারি',
+  'Look & feel' => 'দর্শনদারি',
   'Settings' => 'নিয়ামক',
   'Email for new enabled users' => 'নতুন সক্রিয় ব্যবহারকারিদের জন্য ইমেইল',
   'Email for new disabled users' => 'নতুন নিষ্ক্রিয় ব্যবহারকারিদের জন্য ই-মেইল',

@@ -26,7 +26,7 @@ return array (
   'Company' => 'Cég',
   'Permissions' => 'Engedélyek',
   'Login' => 'Belépés',
-  'Look & Feel' => 'Nézet',
+  'Look & feel' => 'Nézet',
   'Settings' => 'Beállítások',
   'Email for new enabled users' => 'E-mail a frissen engedélyezett felhasználóknak',
   'Email for new disabled users' => 'E-mail a frissen letiltott felhasználóknak',

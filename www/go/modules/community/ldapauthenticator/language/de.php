@@ -28,4 +28,5 @@ return array (
   'Use e-mail instead of LDAP username as IMAP username' => 'E-Mail statt LDAP-Benutzername als IMAP-Benutzername verwenden',
   'For Microsoft ActiveDirectory use \'(objectCategory=InetOrgPerson)\'' => 'Für Microsoft ActiveDirectory verwenden Sie \'(objectCategory=InetOrgPerson)\'.',
   'For Microsoft ActiveDirectory use \'(objectCategory=group)\'' => 'Für Microsoft ActiveDirectory verwenden Sie \'(objectCategory=group)\'.',
+  'LDAP Authenticator' => 'LDAP Authentifizierung',
 );

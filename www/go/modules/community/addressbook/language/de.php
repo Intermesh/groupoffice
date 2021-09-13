@@ -30,6 +30,7 @@ return array (
     'home' => 'Privat',
     'mobile' => 'Mobil',
     'workmobile' => 'Arbeit Mobil',
+    'fax' => 'Fax',
     'workfax' => 'Arbeit Fax',
   ),
   'addressTypes' => 
@@ -44,6 +45,7 @@ return array (
   array (
     'birthday' => 'Geburtstag',
     'anniversary' => 'Jahrestag',
+    'action' => 'Sonstige',
   ),
   'Debtor number' => 'Kundennummer',
   'Star' => 'Stern',
@@ -52,8 +54,8 @@ return array (
   'Enable for' => 'Aktivieren für',
   'Only show this field set for selected address books' => 'Dieses Feld wird nur für ausgewählte Adressbücher angezeigt.',
   'Address books' => 'Adressbücher',
-  'Add street address' => 'Strasse hinzufügen',
-  'Street' => 'Strasse',
+  'Add street address' => 'Straße hinzufügen',
+  'Street' => 'Straße',
   'Street 2' => 'Hausnummer',
   'ZIP code' => 'PLZ',
   'Add group' => 'Gruppe hinzufügen',
@@ -129,4 +131,6 @@ return array (
   'Photo blob ID' => 'Foto-Blob-ID',
   'Restrict export to administrators' => 'Export auf Administratoren beschränken',
   'Date of birth' => 'Geburtstag',
+  'Show more...' => 'Mehr…',
+  'Importing...' => 'Importiere…',
 );

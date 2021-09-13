@@ -128,7 +128,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				border: true,
 				style: "margin: " + dp(16) + "px",
 				items: [this.noteBookSelect],
-				title: t("Notebooks", "community", "notes")
+				title: t("Notebooks", "notes", "community")
 			});
 		}
 		
@@ -156,7 +156,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				border: true,
 				style: "margin: " + dp(16) + "px",
 				items: [this.addressBookSelect],
-				title: t("Address books", "community", "addressbook"),
+				title: t("Address books", "addressbook", "community"),
 			});
 		}
 
@@ -184,7 +184,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				border: true,
 				style: "margin: " + dp(16) + "px",
 				items: [this.tasklistSelect],
-				title: t("Tasklists", "community", "tasks"),
+				title: t("Tasklists", "tasks", "community"),
 			});
 		}
 	

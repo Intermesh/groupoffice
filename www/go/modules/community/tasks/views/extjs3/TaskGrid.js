@@ -155,8 +155,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
 					}
 				},{
-					width:dp(112),
-					header: t("% complete", "tasks"),
+					width:dp(150),
+					header: t('% complete', "tasks", "community"),
 					dataIndex: 'percentComplete',
 					renderer:function (value, meta, rec, row, col, store){
 						return '<div class="go-progressbar"><div style="width:'+Math.ceil(value)+'%"></div></div>';

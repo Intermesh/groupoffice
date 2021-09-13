@@ -22,7 +22,7 @@ return array (
   'Company' => 'Şirket',
   'Permissions' => 'İzinler',
   'Login' => 'Giriş',
-  'Look & Feel' => 'Görünüş & Tema',
+  'Look & feel' => 'Görünüş & Tema',
   'Settings' => 'Ayarlar',
   'Email for new enabled users' => 'Yeni erişen kull. için E-posta',
   'Email for new disabled users' => 'Yeni erişimi engellenenler için E-posta',
