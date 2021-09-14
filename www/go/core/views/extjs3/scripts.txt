@@ -291,7 +291,7 @@ pdftemplate/BlocksField.js
 chart/ChartComponent.js
 chart/LineChart.js
 chart/PieChart.js
-
+chart/BarChart.js
 
 license/LicenseDialog.js
 
