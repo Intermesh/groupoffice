@@ -135,10 +135,5 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 		}
 		return true;
 	}
-	
-	protected function beforeUpdateRecord($params, &$record, $model) {
-		if ($record['id']==\GO::config()->group_root)
-			throw new \GO\Base\Exception\AccessDenied();
-		return true;
-	}
+
 }
