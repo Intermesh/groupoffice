@@ -1,3 +1,5 @@
+- OnlyOffice: Was broken when using default review mode 'original'. Changed it to 'markup'
+
 13-09-2021 6.5.76
 - Savemailas: Fixed check database for email links
 
