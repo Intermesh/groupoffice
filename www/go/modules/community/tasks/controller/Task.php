@@ -57,7 +57,7 @@ class Task extends EntityController {
 		/** @var Entity $entity */
 		$entity = new $cls;
 
-		if(isset($properties['projectId']) && isset($properties['tasklistId']) && $properties['tasklistId']  == -1 ) {
+		if (isset($properties['projectId']) && empty($properties['tasklistId'])) {
 			$properties['tasklistId'] = model\Tasklist::createForProject($properties['projectId']);
 		}
 		$entity->setValues($properties);
