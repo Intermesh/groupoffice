@@ -30,10 +30,14 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		});
 
 		this.store.on('load',function(){
-			if(!this.store.reader.jsonData.has_license)
+
+			const coreMod = go.Modules.get("core", "core");
+
+			if(!coreMod.settings.license) {
 				this.trialButton.show();
-			else
+			}else {
 				this.trialButton.hide();
+			}
 
 		}, this);
 
@@ -46,31 +50,31 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 						this.store.reload();
 					},
 					scope: this
-				},{
-					iconCls: 'ic-settings',
-					text: t("Buy licenses", "modules"),
-					hidden: GO.settings.config.product_name != 'Group-Office',
-					handler: function() {				
-						window.open('https://www.group-office.com/shop/');					
-					},
-					scope: this
 				},
+
+				// {
+				// 	iconCls: 'ic-settings',
+				// 	text: t("Buy licenses", "modules"),
+				// 	hidden: GO.settings.config.product_name != 'Group-Office',
+				// 	handler: function() {
+				// 		window.open('https://www.group-office.com/shop/');
+				// 	},
+				// 	scope: this
+				// },
 
 
 				this.trialButton = new Ext.Button({
-					iconCls: 'ic-settings',
-					text: t("30 day trial license", "modules"),
+					iconCls: 'ic-star',
+					cls: "accent",
+					text: t("Trial license", "modules"),
 					hidden:true,
 					handler: function() {
-						Ext.MessageBox.confirm(
-							t("30 day trial license", "modules"),
-							t("Get a free 30 day trial with unlimited users and all available modules. Click 'Yes' to continue to our shop and get your trial license. If you don't have a shop account you'll need to register.", "modules"),
-							function(btn){
-								if(btn==='yes'){
-									window.open('https://www.group-office.com/30-day-trial?hostname='+document.domain,'groupoffice-shop');
-								}
-							}
-						);
+
+
+						const licenseDialog = new go.license.LicenseDialog();
+						licenseDialog.show();
+
+
 
 					},
 					scope: this
