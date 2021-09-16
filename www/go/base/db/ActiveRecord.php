@@ -45,6 +45,7 @@ use GO;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
+use go\core\model\Acl;
 use go\core\model\Link;
 use go\core\model\User;
 use go\core\orm\SearchableTrait;
@@ -3570,12 +3571,20 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$user_id = GO::user() ? GO::user()->id : 1;
 
 		$acl = new \GO\Base\Model\Acl();
+
 		$acl->usedIn = $this->tableName().'.'.$this->aclField();
 		$acl->ownedBy=$user_id;
 		$acl->entityTypeId = $this->entityType()->getId();
 		$acl->entityId = $this->id;
 		if(!$acl->save()) {
 			throw new \Exception("Could not save ACL: ".var_export($this->getValidationErrors(), true));
+		}
+
+
+		$defaultAclId = static::entityType()->getDefaultAclId();
+		if($defaultAclId) {
+			$defaultAcl = \GO\Base\Model\Acl::model()->findByPk($defaultAclId);
+			$defaultAcl->copyPermissions($acl);
 		}
 
 		$this->{$this->aclField()}=$acl->id;
