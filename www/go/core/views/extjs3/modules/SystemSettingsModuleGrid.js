@@ -29,17 +29,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			remoteSort:false
 		});
 
-		this.store.on('load',function(){
 
-			const coreMod = go.Modules.get("core", "core");
-
-			if(!coreMod.settings.license) {
-				this.trialButton.show();
-			}else {
-				this.trialButton.hide();
-			}
-
-		}, this);
 
 		this.tbar = new Ext.Toolbar({
 			items: [
@@ -195,6 +185,15 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				this.showPermissions(moduleRecord.data.name, moduleRecord.data.package, t(moduleRecord.data.name, moduleRecord.data.name), moduleRecord.data.aclId);
 			}
 		}, this);
+
+
+		const coreMod = go.Modules.get("core", "core");
+
+		if(!coreMod.settings.license) {
+			this.trialButton.show();
+		}else {
+			this.trialButton.hide();
+		}
 
 		go.modules.SystemSettingsModuleGrid.superclass.initComponent.call(this);
 		
