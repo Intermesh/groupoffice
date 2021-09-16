@@ -399,6 +399,34 @@ class Spreadsheet extends AbstractConverter {
 
 			$headers = $this->addSubHeaders($headers, $name, $value, false, $forMapping);
 		}
+
+		$exclude = $entityCls::atypicalApiProperties();
+		$exclude[] = 'customFields';
+		$exclude[] = 'acl';
+		$exclude[] = 'permissionLevel';
+
+		$props = $entityCls::getApiProperties();
+		foreach($props as $name => $prop) {
+
+			if($prop['getter']) {
+
+				if(in_array($name, $exclude)) {
+					continue;
+				}
+
+				if($forMapping) {
+					$headers[$name] = ['name' => $name, 'label' => $name, 'many' => false];
+				} else{
+					//client specified which columns to export
+					if(!empty($this->clientParams['columns']) && !in_array($name, $this->clientParams['columns'])) {
+						continue;
+					}
+
+					$headers[] = ['name' => $name, 'label' => $name, 'many' => false];
+				}
+			}
+		}
+
 		if(method_exists($entityCls, 'getCustomFields')) {
 			$fields = Field::findByEntity($entityCls::entityType()->getId());
 			$customFieldProps = [];

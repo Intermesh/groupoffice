@@ -198,6 +198,7 @@ abstract class EntityController extends Controller {
 		$state = $this->getState();
 
 		//enable SQL debugging here
+		$oldDebug = go()->getDbConnection()->debug;
 		go()->getDbConnection()->debug = go()->getDebugger()->enabled;
 		
 		$p = $this->paramsQuery($params);
@@ -265,6 +266,8 @@ abstract class EntityController extends Controller {
 			} else{
 				throw $e;
 			}
+		} finally {
+			go()->getDbConnection()->debug = $oldDebug;
 		}
 		
 		return $response;

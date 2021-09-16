@@ -436,7 +436,7 @@ class Blob extends orm\Entity {
 					]);
 	}
 
-	protected static function atypicalApiProperties()
+	public static function atypicalApiProperties()
 	{
 		return array_merge(parent::atypicalApiProperties(), ['file']);
 	}

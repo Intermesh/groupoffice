@@ -924,7 +924,7 @@ class Contact extends AclItemEntity {
 		return $this->findOrganizations()->all();
 	}
 
-	protected static function atypicalApiProperties()
+	public static function atypicalApiProperties()
 	{
 		return array_merge(parent::atypicalApiProperties(), ['organizations']);
 	}
