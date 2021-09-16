@@ -1,5 +1,6 @@
 
 
+
 6.6
 
 Tasks: Completely rewritten module
@@ -12,11 +13,17 @@ Core: modules can have specific permission types. We use it in the core to allow
       custom fields.
 ----
 
+- OnlyOffice: Was broken when using default review mode 'original'. Changed it to 'markup'
 
+13-09-2021 6.5.76
+- Savemailas: Fixed check database for email links
+
+13-09-2021 6.5.75
 - Email: Unknown recipients dialog maximized on mobile
 - Email: Fixed display of unsubscribed folder with two levels of subfolders
 - History: Delete history after one year by default. Years are configurable in system settings.
 - Core: Improve data range fields with quarters and month selection for the past 7 years.
+- Core: Updated German translation
 
 24-08-2021 6.5.74
 - Studio: Initial config had "id" for autoExpandColumn instead of "showID".

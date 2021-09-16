@@ -338,4 +338,5 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Add recipients' => 'Empfänger hinzufügen',
   'Are you sure that you would like to import this VCard?' => 'Sind Sie sicher, dass Sie diese VCard importieren möchten?',
   'Importing...' => 'Importiere…',
+  'Open with' => 'Öffnen mit',
 );
