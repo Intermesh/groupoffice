@@ -3,20 +3,20 @@
 
 go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 	title: t("User settings"),
-	autoScroll: true,
+
 	modal: true,
 	width: dp(800),
-	height: dp(600),
-	layout: 'fit',
+	height: dp(700),
+	layout: "fit",
 	initComponent: function () {
 
 		this.formPanel = new go.systemsettings.Panel({
 			items: [
 				{
-					layout: "hbox",
+					layout: "column",
 					items: [
 						{
-							flex: 1,
+							columnWidth: .6,
 							xtype: "fieldset",
 							title: t("Regional"),
 							labelWidth: dp(160),
@@ -88,9 +88,9 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 						},
 
 						{
-							flex: 1,
+							columnWidth: .4,
 							xtype: "fieldset",
-							labelWidth: dp(240),
+							labelWidth: dp(180),
 							defaults: {width: dp(50)},
 							title: t('Formatting'),
 							items: [
@@ -164,12 +164,13 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 		this.items = [this.formPanel];
 
 		this.bbar = ['->', {
-				text: t("Save"),
-				handler: function () {
-					this.submit();
-				},
-				scope: this
-			}];
+			cls:  "primary",
+			text: t("Save"),
+			handler: function () {
+				this.submit();
+			},
+			scope: this
+		}];
 
 		go.users.UserDefaultsWindow.superclass.initComponent.call(this);
 	},
