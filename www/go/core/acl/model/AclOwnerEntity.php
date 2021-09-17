@@ -37,7 +37,7 @@ abstract class AclOwnerEntity extends AclEntity {
 
 	protected function internalSave() {
 		
-		if($this->isNew() && !isset($this->{static::$aclColumnName})) {
+		if(!isset($this->{static::$aclColumnName})) {
 			$this->createAcl();
 		}
 
