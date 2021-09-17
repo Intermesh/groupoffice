@@ -20,13 +20,17 @@ go.grid.GridTrait = {
 	lastSelectedIndex: false,
 	currentSelectedIndex: false,
 
+	enableDelete: true,
+
 	initGridTrait : function() {
 		if (!this.keys)
 		{
 			this.keys = [];
 		}
-	
-		this.initDeleteKey();		
+
+		if(this.enableDelete) {
+			this.initDeleteKey();
+		}
 		if(this.getSelectionModel().getSelected) {
 			this.initNav();
 		}
@@ -97,19 +101,23 @@ go.grid.GridTrait = {
 				scope: this
 			},
 			this.selectedLabel,
-			'->',
-			{
+			'->'
+
+		];
+
+		if(this.enableDelete) {
+			items.push({
 				iconCls: 'ic-delete',
 				tooltip: t("Delete"),
 				handler: function() {
 					this.deleteSelected();
 				},
 				scope: this
-			}
-		];
+			});
+		}
 
 		if(this.multiSelectToolbarItems) {
-			var args = [3,0].concat(this.multiSelectToolbarItems);
+			var args = [items.length - 1,0].concat(this.multiSelectToolbarItems);
 			Array.prototype.splice.apply(items, args);
 		}
 
@@ -278,6 +286,10 @@ go.grid.GridTrait = {
 	},
 
 	deleteSelected: function () {
+
+		if(!this.enableDelete) {
+			return;
+		}
 
 		var selectedRecords = this.getSelectionModel().getSelections(), count = selectedRecords.length, strConfirm;
 

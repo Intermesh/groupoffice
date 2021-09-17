@@ -21,6 +21,10 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 	value: null,
 
+	enableDelete: false,
+
+	disableSelection: true,
+
 	initComponent: function () {
 		
 		var checkColumn = new GO.grid.CheckColumn({
