@@ -3,6 +3,7 @@
 - Files: Create shared folder by default on install
 - Core: Fixed error when tabbing in profile tab in user settings
 - Core: Default permissions did not work in legacy activerecord models
+- Core: Fixed share panel not loading groups
 
 13-09-2021 6.5.76
 - Savemailas: Fixed check database for email links
