@@ -4,6 +4,8 @@ go.chart.BarChart = Ext.extend(go.chart.ChartComponent, {
 	 go.chart.BarChart.superclass.initComponent.call(this);
 	},
 
+	chartType: "Bar",
+
 	/**
 	 * @var {Array}
 	 */
@@ -12,25 +14,8 @@ go.chart.BarChart = Ext.extend(go.chart.ChartComponent, {
 	/**
 	 * @var {Object}
 	 */
-	options:null,
+	options:null
 	
-	update: function(series){
 
-		var data = {
-			series: series
-		};
-
-		if( this.labels ) {
-			data.labels =  this.labels;
-		}
-		
-		if(!this.chart) {
-			this.chart = new Chartist.Bar("#" + this.el.id, data, this.options || {});
-		} else
-		{
-			this.chart.update(data);
-		}
-		
-	}
 	
 });
