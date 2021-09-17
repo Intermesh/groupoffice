@@ -19,11 +19,9 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	 */
 	addLevel: go.permissionLevels.read,
 
+	value: null,
+
 	initComponent: function () {
-		
-		if(!this.value) {
-			this.value = [];
-		}
 		
 		var checkColumn = new GO.grid.CheckColumn({
 			width: dp(64),
@@ -187,8 +185,6 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		
 		go.permissions.SharePanel.superclass.initComponent.call(this);
 
-
-
 		this.on("cellclick", function(grid, rowIndex, columnIndex, e) {
 			var record = grid.getStore().getAt(rowIndex);  // Get the Record
 			var fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
@@ -198,6 +194,23 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			}
 			
 		}, this);
+
+
+		this.on("added", () => {
+			setTimeout(() => {
+
+				const form = this.findParentByType("entityform");
+				if (form) {
+					form.on("load", function (f, v) {
+						this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
+					}, this);
+				}
+
+				if(this.value === null) {
+					this.value = form.entityStore.entity.defaultAcl;
+				}
+			})
+		});
 
 	},
 	
@@ -293,25 +306,16 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 		go.permissions.SharePanel.superclass.afterRender.call(this);
 
-		var form = this.findParentByType("entityform");
-
-		if(form) {
-			this.value = form.entityStore.entity.defaultAcl;
-
-			form.on("load", function(f, v) {
-				this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
-			}, this);
-		}
 
 
 		//Check form currentId becuase when form is loading then it will load the store on setValue later.
 		//Set timeout is used to make sure the check will follow after a load call.
-		var me = this;
-		setTimeout(function() {
+
+		setTimeout(() => {
 			//if(!go.util.empty(me.value) && !form.currentId) {
-				me.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
+				this.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
 			//}
-		}, 0);		
+		});
 	},
 	
 	isFormField: true,
@@ -327,12 +331,12 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	},
 
 	reset : function() {
-		this.setValue([]);
+		this.setValue(null);
 		this.dirty = false;
 	},
 
 	setValue: function (groups) {
-		this._isDirty = false;		
+		this._isDirty = false;
 		this.value = groups;
 		if(this.rendered) {
 			this.store.load().catch(function () {
