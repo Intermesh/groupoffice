@@ -1,3 +1,5 @@
+- Core: disable selection and delete in grids. Applied to group members and sharing panel.
+
 16-09-2021 6.5.77
 - OnlyOffice: Was broken when using default review mode 'original'. Changed it to 'markup'
 - Files: Create shared folder by default on install
