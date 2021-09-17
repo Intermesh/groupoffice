@@ -25,7 +25,7 @@ class Module extends Entity {
 
 		$rights = $this->getUserRights($userId);
 
-		if($this->name == 'projects2' && $rights->mayFinance) { // a single exception for this compat method
+		if($this->name == 'projects2' && $rights->mayFinance && !$rights->mayManage) { // a single exception for this compat method
 			return 40;
 		}
 
@@ -324,8 +324,7 @@ class Module extends Entity {
 		}
 		
 		if(!$module) {
-			throw new Exception("Module $name not found for ".$className);
-			
+			throw new Exception("Module '" . ($package ?? "legacy") . "/" . $name . "' not found for ".$className);
 		}
 
 		return $module;

@@ -21,4 +21,6 @@ return array (
   'Has links to...' => 'Hat Verknüpfungen mit…',
   'Encrypted data' => 'Verschlüsselte Daten',
   'Enter password to decrypt' => 'Passwort eingeben zum entschlüsseln',
+  'Display options for notebooks' => 'Optionen für Notizbücher anzeigen',
+  'Remember last selected note book' => 'Das zuletzt ausgewählte Notizbuch merken',
 );

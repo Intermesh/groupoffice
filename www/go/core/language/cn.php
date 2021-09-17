@@ -21,7 +21,7 @@ return array (
   'Company' => '公司',
   'Permissions' => '权限',
   'Login' => '登录',
-  'Look & Feel' => '外观',
+  'Look & feel' => '外观',
   'Settings' => '设置',
   'Email for new enabled users' => '启用新 Email 用户',
   'Email for new disabled users' => '禁用新 Email 用户',

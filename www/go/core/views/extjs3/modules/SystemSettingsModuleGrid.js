@@ -55,14 +55,6 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 			},
 			scope: this
 		},{
-			iconCls: 'ic-settings',
-			text: t("Buy licenses", "modules"),
-			hidden: GO.settings.config.product_name != 'Group-Office',
-			handler: function() {
-				window.open('https://www.group-office.com/shop/');
-			},
-			scope: this
-		},{
 			text:t('System') + ' ' +t('Permissions'),
 			iconCls: 'ic-group',
 			handler: function() {
@@ -72,20 +64,13 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 				)
 			}
 		},this.trialButton = new Ext.Button({
-			iconCls: 'ic-settings',
-			text: t("30 day trial license", "modules"),
+			iconCls: 'ic-star',
+			cls: "accent",
+			text: t("Trial license", "modules"),
 			hidden:true,
 			handler: function() {
-				Ext.MessageBox.confirm(
-					t("30 day trial license", "modules"),
-					t("Get a free 30 day trial with unlimited users and all available modules. Click 'Yes' to continue to our shop and get your trial license. If you don't have a shop account you'll need to register.", "modules"),
-					function(btn){
-						if(btn==='yes'){
-							window.open('https://www.group-office.com/30-day-trial?hostname='+document.domain,'groupoffice-shop');
-						}
-					}
-				);
-
+				const licenseDialog = new go.license.LicenseDialog();
+				licenseDialog.show();
 			},
 			scope: this
 		}),' ',{
@@ -133,6 +118,14 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 		},this);
 
 		go.modules.SystemSettingsModuleGrid.superclass.initComponent.call(this);
+
+		const coreMod = go.Modules.get("core", "core");
+
+		if(!coreMod.settings.license) {
+			this.trialButton.show();
+		}else {
+			this.trialButton.hide();
+		}
 	},
 
 	draw: function() {

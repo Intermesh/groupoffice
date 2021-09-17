@@ -61,7 +61,7 @@ function noThanks() {
 		<form method="POST" action="" onsubmit="submitButton.disabled = true;">
 			<fieldset>
 				<h2>Install license</h2>
-				<p>Install your purchased license or try all the features for free and obtain a 60 day trial license from <a target="_blank" class="normal-link" href="https://www.group-office.com">www.group-office.com</a>. Register for an account and get your license now.</p>
+				<p>Try the extra features for free and obtain a 60 day trial license from  <a target="_blank" class="normal-link" href="https://www.group-office.com">www.group-office.com</a>. Register for an account and get your license now. By purchasing a license you will get support and extra features. Find out more on our website.</p>
 
                 <button type="button" class="primary" onclick="getLicense()">Get license now</button>
 

@@ -599,7 +599,7 @@ class Task extends AclItemEntity {
 			$theirStartSecs = isset($task->startTime) ? Time::toSeconds($task->startTime) : 0;
 			$theirEndSecs = isset($task->startTime) ? $theirStartSecs + $task->estimatedDuration ?? 0 : 0;
 
-			if($theirStartSecs <= $selfEndSecs && $theirEndSecs >= $selfStartSecs) {
+			if($theirStartSecs < $selfEndSecs && $theirEndSecs > $selfStartSecs) {
 				return true;
 			}
 		}

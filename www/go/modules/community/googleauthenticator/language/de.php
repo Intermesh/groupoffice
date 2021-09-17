@@ -18,4 +18,5 @@ return array (
   'Google authenticator' => 'Google Athentifizierung',
   'Disable google authenticator' => 'Google Authentifizierung deaktivieren',
   'Provide your current password before you can enable Google authenticator.' => 'Geben Sie Ihr aktuelles Passwort an, bevor Sie die Google Authentifizierung aktivieren können.',
+  'Block Group-Office usage until setup is done' => 'Block {product_name} usage until setup is done',
 );

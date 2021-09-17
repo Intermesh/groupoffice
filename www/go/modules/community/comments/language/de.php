@@ -7,4 +7,5 @@ return array (
   '{author} wrote at {date}' => '{author} schrieb an {date}',
   'Edited by {author} at {date}' => 'Bearbeitet von {author} am {date}',
   'The date was changed to {date}' => 'Das Datum wurde auf {date} geändert',
+  'A comment was made by {creator}' => '{creator} hat einen Kommentar geschrieben',
 );

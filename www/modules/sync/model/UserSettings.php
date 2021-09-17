@@ -38,6 +38,14 @@ class UserSettings extends Property
 	public $noteBooks = [];
 
 	public $addressBooks = [];
+	private $doSetup = false;
+
+	protected function init()
+	{
+		if($this->isNew()) {
+			$this->doSetup = true;
+		}
+	}
 
 	public $tasklists = [];
 
@@ -93,7 +101,8 @@ class UserSettings extends Property
 
 	public function toArray($properties = [])
 	{
-		$this->setup();
+		if($this->doSetup)
+			$this->setup();
 
 		return parent::toArray($properties);
 	}
