@@ -768,10 +768,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				}, this);
 			}
 
-			if(!coreMod.settings.licenseDenied && !coreMod.settings.license) {
-				const licenseDialog = new go.license.LicenseDialog();
-				licenseDialog.show();
-			}
+			// if(!coreMod.settings.licenseDenied && !coreMod.settings.license) {
+			// 	const licenseDialog = new go.license.LicenseDialog();
+			// 	licenseDialog.show();
+			// }
 		}
 	},
 //

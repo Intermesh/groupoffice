@@ -13,7 +13,12 @@ Core: modules can have specific permission types. We use it in the core to allow
       custom fields.
 ----
 
+16-09-2021 6.5.77
 - OnlyOffice: Was broken when using default review mode 'original'. Changed it to 'markup'
+- Files: Create shared folder by default on install
+- Core: Fixed error when tabbing in profile tab in user settings
+- Core: Default permissions did not work in legacy activerecord models
+- Core: Fixed share panel not loading groups
 
 13-09-2021 6.5.76
 - Savemailas: Fixed check database for email links

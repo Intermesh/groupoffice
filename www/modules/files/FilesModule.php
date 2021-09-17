@@ -21,6 +21,7 @@
 
 namespace GO\Files;
 
+use go\core\model\Group;
 use go\core\model\User;
 use go\core\util\ClassFinder;
 use GO\Files\Filehandler\FilehandlerInterface;
@@ -173,6 +174,16 @@ class FilesModule extends \GO\Base\Module{
 		$template->extension='odt';
 		$template->save();	
 		$template->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::READ_PERMISSION);
+
+
+		//create public shared folder
+		$admin = \GO\Base\Model\User::model()->findByPk(1);
+
+		$shared = Folder::model()->findHomeFolder($admin)->addFolder(go()->t("Public"));
+		$acl = $shared->setNewAcl(1);
+		$acl->addGroup(Group::ID_INTERNAL, \GO\Base\Model\Acl::DELETE_PERMISSION);
+		$shared->save();
+
 	}
 	
 	
