@@ -8,12 +8,10 @@
 namespace go\modules\community\tasks\model;
 
 use go\core\acl\model\AclItemEntity;
-use go\core\db\Expression;
 use go\core\model\Alert as CoreAlert;
-use go\core\model\Module;
+use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
 use go\core\model\User;
-use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
@@ -613,7 +611,7 @@ class Task extends AclItemEntity {
 			return parent::alertProps($alert);
 		}
 		$data = $alert->getData();
-		$assigner = User::findById($data->assignedBy, ['displayName']);
+		$assigner = UserDisplay::findById($data->assignedBy, ['displayName']);
 
 		$body = str_replace('{assigner}', $assigner->displayName, go()->t("You were assigned to this task by {assigner}"));
 		$title = $alert->findEntity()->title() ?? null;

@@ -27,6 +27,7 @@ class Module extends core\Module
 	{
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'garbageCollection');
 		Entity::on(Entity::EVENT_ALERT_PROPS, static::class, 'onAlertProps');
+
 	}
 
 	public static function onAlertProps(Entity $entity, core\model\Alert $alert, $props)
@@ -35,9 +36,9 @@ class Module extends core\Module
 			return;
 		}
 		$data = $alert->getData();
-		$creator = core\model\User::findById($data->createdBy, ['displayName']);
+		$creator = core\model\UserDisplay::findById($data->createdBy, ['displayName']);
 
-		$props['body'] = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ":\n\n" . $alert->getData()->excerpt;
+		$props['body'] = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ": <br /><br /><i>" . $alert->getData()->excerpt + "</i>";
 	}
 
 	protected function beforeInstall(\go\core\model\Module $model)

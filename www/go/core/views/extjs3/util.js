@@ -378,6 +378,11 @@ go.util =  (function () {
 					)
 			);
 		},
+
+		htmlToText: function(html) {
+			let doc = new DOMParser().parseFromString(html, 'text/html');
+			return doc.body.textContent || "";
+		},
 		
 		addSlashes : function( str ) {
 			return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');

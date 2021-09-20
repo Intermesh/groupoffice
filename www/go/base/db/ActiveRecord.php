@@ -50,6 +50,7 @@ use go\core\model\Acl;
 use go\core\model\Alert;
 use go\core\model\Link;
 use go\core\model\User;
+use go\core\model\UserDisplay;
 use go\core\orm\SearchableTrait;
 
 abstract class ActiveRecord extends \GO\Base\Model{
@@ -5642,8 +5643,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$body = null;
 		$title = null;
 
-		self::fireEvent(Entity::EVENT_ALERT_PROPS, $this, $alert, $title, $body);
-
+		if ($alert->tag == "comment") {
+			// hack for comments
+			$data = $alert->getData();
+			$creator = UserDisplay::findById($data->createdBy, ['displayName']);
+			$body = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ":\n\n" . $alert->getData()->excerpt;
+		}
 		if(!isset($body)) {
 			$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
 			$body = $alert->triggerAt->toUserFormat(true, $user);

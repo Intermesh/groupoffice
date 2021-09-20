@@ -55,7 +55,7 @@
 					statusIcon: 'reminder',
 					itemId: id,
 					title: alert.title,
-					html: go.util.textToHtml(alert.body),
+					html: alert.body,
 					iconCls: iconCls,
 					buttonAlign: "right",
 					listeners: {
@@ -82,7 +82,7 @@
 
 
 				if(!c.notificationBody) {
-					c.notificationBody = alert.body;
+					c.notificationBody =  go.util.htmlToText(alert.body);
 				}
 
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
