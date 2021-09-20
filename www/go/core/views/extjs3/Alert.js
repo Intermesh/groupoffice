@@ -83,6 +83,7 @@
 
 				if(!c.notificationBody) {
 					c.notificationBody =  go.util.htmlToText(alert.body);
+					console.warn(c.notificationBody);
 				}
 
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
