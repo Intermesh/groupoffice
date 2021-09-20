@@ -1,5 +1,5 @@
-
-
+XX-09-20216.6.10
+- Time Registration: Filter employees on currently selected date instead of current date
 
 6.6
 
