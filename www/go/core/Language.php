@@ -147,7 +147,7 @@ class Language {
 		$format = go()->getLanguage()->getAddressFormat($countryCode);
 
 		$format = str_replace('{address}', $address['street'], $format);
-		$format = str_replace('{address_no}', $address['street2'], $format);
+		$format = str_replace('{address_no}', $address['street2'] ?? "", $format);
 		$format = str_replace('{city}', $address['city'], $format);
 		$format = str_replace('{zip}', $address['zipCode'], $format);
 		$format = str_replace('{state}', $address['state'], $format);
