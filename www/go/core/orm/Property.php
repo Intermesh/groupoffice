@@ -452,7 +452,8 @@ abstract class Property extends Model {
 	}
 
 	/**
-	 * Override this function to initialize your model
+	 * Override this function to initialize your model.
+	 * When this method is executed the property already tracks modifications that will be saved if needed.
 	 */
 	protected function init() {
 		
