@@ -5647,7 +5647,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			// hack for comments
 			$data = $alert->getData();
 			$creator = UserDisplay::findById($data->createdBy, ['displayName']);
-			$body = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ":\n\n" . $alert->getData()->excerpt;
+			$body = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ":<br /><br /><i>" . $alert->getData()->excerpt . "</i>";
 		}
 		if(!isset($body)) {
 			$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
