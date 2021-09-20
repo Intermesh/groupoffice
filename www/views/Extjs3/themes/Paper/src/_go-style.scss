@@ -929,6 +929,7 @@ hr {
 	color: color($fg, 'text');
 	text-shadow: 0px 0px 4px white;
 	border:1px solid color($fg, 'divider');
+	line-height: dp(24);
 
 	.x-panel-header-text & {
 		margin: dp(8);
