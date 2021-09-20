@@ -431,14 +431,15 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			if (isset($params['resources'])) {
 
 				foreach ($params['resources'] as $resource_calendar_id => $enabled) {
-
-					if (!$isNewEvent)
+					if (!$isNewEvent) {
 						$resourceEvent = \GO\Calendar\Model\Event::model()->findResourceForEvent($model->id, $resource_calendar_id);
-					else
+					} else {
 						$resourceEvent = false;
+					}
 
-					if (empty($resourceEvent))
+					if (empty($resourceEvent)) {
 						$resourceEvent = new \GO\Calendar\Model\Event();
+					}
 
 					$resourceEvent->resource_event_id = $model->id;
 					$resourceEvent->calendar_id = $resource_calendar_id;
@@ -451,9 +452,17 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$resourceEvent->private = $model->private;
 					$resourceEvent->busy = !$resourceEvent->calendar->group->show_not_as_busy;
 
+					if (!empty($model->location)) {
+						$resourceEvent->location = $model->location;
+					}
 
-					if (isset($params['resource_options'][$resource_calendar_id]))
+					if (!empty($model->description)) {
+						$resourceEvent->description = $model->description;
+					}
+
+					if (isset($params['resource_options'][$resource_calendar_id])) {
 						$resourceEvent->setCustomFields($params['resource_options'][$resource_calendar_id]);
+					}
 
 					$resourceEvent->save(true);
 
