@@ -1,5 +1,6 @@
 XX-09-20216.6.10
 - Time Registration: Filter employees on currently selected date instead of current date
+- Projects: Time entries - filter employees on current project ID
 
 6.6
 
