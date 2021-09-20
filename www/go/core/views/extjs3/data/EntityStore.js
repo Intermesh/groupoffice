@@ -291,12 +291,13 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 						//unofficial response but we use it to process no more than 100000 changes. A resync is
 						//more efficient in the webclient in that case.
 						if(changes.totalChanges > 10000) {
-							console.error("Too many changes " + changes.totalChanges + " > 10000 ");
+							const errorMsg = "Too many changes for '" + me.entity.name + "' in state '" + me.state + "' " + changes.totalChanges + " > 10000";
+							console.error(errorMsg);
 							return me.clearState().then(function(response) {
 								if(cb) {
 									cb.call(scope || me, me, false);
 								}
-								return Promise.reject({type: "cannotcalculatechanges", detail: "Too many changes"})
+								return Promise.reject({type: "cannotcalculatechanges", detail: errorMsg, message: errorMsg})
 							});
 						}
 						return me.getUpdates(cb, scope);
