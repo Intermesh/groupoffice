@@ -72,15 +72,15 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise<T>}
 	 */
 	initState : function() {
-			
-		if(this.initialized) {			
+
+		if(this.initialized) {
 			return this.initialized;
 		}
 		
 		this.stateStore = new go.browserStorage.Store(this.entity.name);
 		this.metaStore = new go.browserStorage.Store(this.entity.name + "-meta");
 
-		// this.initialized = this.clearState().then(function() {return Promise.all([			
+		// this.initialized = this.clearState().then(function() {return Promise.all([
 		this.initialized = Promise.all([
 			this.metaStore.getItem('notFound').then((v) => {
 				this.notFound = v || [];
@@ -313,12 +313,13 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 						//unofficial response but we use it to process no more than 100000 changes. A resync is
 						//more efficient in the webclient in that case.
 						if(changes.totalChanges > 10000) {
-							console.error("Too many changes " + changes.totalChanges + " > 10000 ");
+							const errorMsg = "Too many changes for '" + this.entity.name + "' in state '" + this.state + "' " + changes.totalChanges + " > 10000";
+							console.error(errorMsg);
 							return this.clearState().then((response)  => {
 								if(cb) {
 									cb.call(scope || this, this, false);
 								}
-								return Promise.reject({type: "cannotcalculatechanges", detail: "Too many changes"})
+								return Promise.reject({type: "cannotcalculatechanges", detail: errorMsg, message: errorMsg})
 							});
 						}
 						return this.getUpdates(cb, scope);
