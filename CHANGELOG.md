@@ -15,6 +15,7 @@ Core: modules can have specific permission types. We use it in the core to allow
 ----
 
 - Core: disable selection and delete in grids. Applied to group members and sharing panel.
+- Core: Safari 15 theme color meta tag added
 - Projects2: Time registration dialog filters employees by project
 - Calendar: when creating resource event, use location and description as well.
 
