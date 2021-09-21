@@ -1,5 +1,7 @@
 - Core: disable selection and delete in grids. Applied to group members and sharing panel.
 - Core: Safari 15 theme color meta tag added
+- Projects2: Time registration dialog filters employees by project
+- Calendar: when creating resource event, use location and description as well.
 
 16-09-2021 6.5.77
 - OnlyOffice: Was broken when using default review mode 'original'. Changed it to 'markup'
