@@ -21,7 +21,7 @@ $lang = GO::language()->getLanguage(); ?>
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= GO::view()->getTheme()->getUrl(); ?>img/favicon/apple-touch-icon.png">
     <meta name="theme-color" content="<?= $primaryColor; ?>" />
-
+    <meta name="msapplication-TileColor" content="<?= $primaryColor; ?>">
     <?php
 
 	require(GO::config()->root_path.'views/Extjs3/default_scripts.inc.php');
@@ -40,9 +40,6 @@ $lang = GO::language()->getLanguage(); ?>
 	<link rel="manifest" href="<?= GO::view()->getTheme()->getUrl(); ?>img/favicon/site.webmanifest">
 	<link rel="mask-icon" href="<?= GO::view()->getTheme()->getUrl(); ?>img/favicon/safari-pinned-tab.svg" color="#888888">
 	<?php } ?>
-
-	<meta name="msapplication-TileColor" content="#2b5797">
-	<meta name="theme-color" content="#ffffff">
 
 	<title><?= go()->getSettings()->title; ?></title>
 	<?php
