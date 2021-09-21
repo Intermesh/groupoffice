@@ -472,7 +472,8 @@ abstract class Property extends Model {
 	}
 
 	/**
-	 * Override this function to initialize your model
+	 * Override this function to initialize your model.
+	 * When this method is executed the property already tracks modifications that will be saved if needed.
 	 */
 	protected function init() {
 		
@@ -798,7 +799,7 @@ abstract class Property extends Model {
    * @return string[]
    * @throws Exception
    */
-	protected static function getRequiredProperties() {	
+	protected static final function getRequiredProperties() {
 
 		$cls = static::class;
 
@@ -806,15 +807,19 @@ abstract class Property extends Model {
 
 		$required = go()->getCache()->get($cacheKey);
 
-		if($required != false) {
+		if($required !== null) {
 			return $required;
 		}
 
 		$props = static::getApiProperties();
 
-		$required = static::getPrimaryKey();
+		$required = array_merge(static::getPrimaryKey(), static::internalRequiredProperties());
+
+		//include these for title() in log entries
+		$titleProps = ['title', 'name', 'subject', 'description', 'displayName'];
+
 		foreach($props as $name => $meta) {
-			if($meta['access'] === self::PROP_PROTECTED && !empty($meta['db'])) {
+			if(in_array($name, $titleProps) || ($meta['access'] === self::PROP_PROTECTED && !empty($meta['db']))) {
 				$required[] = $name;
 			}
 		}
@@ -824,6 +829,15 @@ abstract class Property extends Model {
 		go()->getCache()->set($cacheKey, $required);
 		
 		return $required;
+	}
+
+	/**
+	 * Override to always select these properties
+	 *
+	 * @return string[]
+	 */
+	protected static function internalRequiredProperties() {
+		return [];
 	}
 
 	/**

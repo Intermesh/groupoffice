@@ -275,11 +275,8 @@ class Contact extends AclItemEntity {
 		$this->starred = empty($starred) ? null : true;
 	}
 
-	protected static function getRequiredProperties() {	
-		$p = parent::getRequiredProperties();
-		$p[] = 'isOrganization';
-
-		return $p;
+	protected static function internalRequiredProperties() {
+		return ['isOrganization'];
 	}
 
 	public function buildFilesPath() {

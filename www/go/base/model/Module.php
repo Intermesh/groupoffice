@@ -77,7 +77,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		}
 
 		if($this->name == 'projects2' && $rights == 3) { // a single exception for this compat method
-			return 40;
+			return 45;
 		}
 		return 0;
 	}

@@ -16,17 +16,18 @@ abstract class Controller {
 		$this->authenticate();
 	}
 
-	protected function authenticate() {  
-    if (!go()->getAuthState()->isAuthenticated()) {			
-      throw new Exception(401, "Unauthorized");
+	protected function authenticate()
+	{
+		if (!go()->getAuthState()->isAuthenticated()) {
+			throw new Exception(401, "Unauthorized");
 		}
 
-    $this->rights = $this->getClassRights();
+		$this->rights = $this->getClassRights();
 
-    if(!$this->checkModulePermissions()) {
-	    $mod = Module::findByClass(static::class, ['name', 'package']);
-	    throw new Exception(403, str_replace('{module}', ($mod->package ?? "legacy") . "/" . $mod->name, go()->t("Forbidden, you don't have access to module '{module}'.")));
-    }
+		if (!$this->checkModulePermissions()) {
+			$mod = Module::findByClass(static::class, ['name', 'package']);
+			throw new Exception(403, str_replace('{module}', ($mod->package ?? "legacy") . "/" . $mod->name, go()->t("Forbidden, you don't have access to module '{module}'.")));
+		}
 
 	}
 

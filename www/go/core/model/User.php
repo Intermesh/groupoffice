@@ -471,7 +471,7 @@ class User extends Entity {
 	
 	protected function internalValidate() {
 
-		if(!isset($this->homeDir)) {
+		if(!isset($this->homeDir) && in_array("homeDir", $this->selectedProperties)) {
 			$this->homeDir = "users/" . $this->username;
 		}
 

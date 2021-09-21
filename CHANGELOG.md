@@ -1,5 +1,6 @@
-
-
+XX-09-20216.6.10
+- Time Registration: Filter employees on currently selected date instead of current date
+- Projects: Time entries - filter employees on current project ID
 
 6.6
 
@@ -12,6 +13,11 @@ Core: System Settings -> Modules redesigned and searchable.
 Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 ----
+
+- Core: disable selection and delete in grids. Applied to group members and sharing panel.
+- Core: Safari 15 theme color meta tag added
+- Projects2: Time registration dialog filters employees by project
+- Calendar: when creating resource event, use location and description as well.
 
 16-09-2021 6.5.77
 - OnlyOffice: Was broken when using default review mode 'original'. Changed it to 'markup'

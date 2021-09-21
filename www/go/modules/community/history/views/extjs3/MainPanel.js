@@ -102,7 +102,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 								},
 								scope: this
 							}
-						}), new go.users.UserCombo({
+						}), new go.users.UserComboReset({
 							hideLabel: true,
 							emptyText: t('All users'),
 							allowBlank: true,
