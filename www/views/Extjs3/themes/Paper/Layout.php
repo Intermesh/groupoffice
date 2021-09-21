@@ -3,6 +3,9 @@
 use go\core\App;
 use go\core\webclient\Extjs3;
 
+if(!isset($primaryColor)) {
+	$primaryColor = (go()->getSettings()->primaryColor ?? 'rgb(2, 119, 189)');
+}
 $webclient = Extjs3::get();
 $lang = GO::language()->getLanguage(); ?>
 <!DOCTYPE html>
@@ -17,8 +20,9 @@ $lang = GO::language()->getLanguage(); ?>
 	<meta name="apple-mobile-web-app-title" content="<?= go()->getSettings()->title; ?>">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= GO::view()->getTheme()->getUrl(); ?>img/favicon/apple-touch-icon.png">
+    <meta name="theme-color" content="<?= $primaryColor; ?>" />
 
-	<?php
+    <?php
 
 	require(GO::config()->root_path.'views/Extjs3/default_scripts.inc.php');
 
@@ -54,7 +58,8 @@ $lang = GO::language()->getLanguage(); ?>
 	GO::router()->getController()->fireEvent('head');
 	go()->fireEvent(App::EVENT_HEAD);
 	?>
-	<style>
+
+   <style>
         <?php
 
         if(go()->getSettings()->logoId) {
