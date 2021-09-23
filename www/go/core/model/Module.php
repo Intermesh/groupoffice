@@ -101,9 +101,6 @@ class Module extends AclOwnerEntity {
 		return true;
 	}
 
-	public function package(){
-		return self::PACKAGE_COMMUNITY;
-	}
 	
 	private function nextSortOrder() {
 		$query = new Query();			
