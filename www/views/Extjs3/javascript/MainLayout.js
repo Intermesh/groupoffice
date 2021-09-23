@@ -700,6 +700,39 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				});
 			}
 		}
+
+
+		this.userMenuLink.menu.insert(6, this.installBtn = new Ext.menu.Item({
+			iconCls: 'ic-download-for-offline',
+			text: t("Install on your desktop"),
+			hidden: true,
+			handler: function () {
+
+				// hide our user interface that shows our A2HS button
+				this.installBtn.hide();
+				this.userMenuLink.menu.doLayout();
+				// Show the prompt
+				this.deferredPrompt.prompt();
+				// Wait for the user to respond to the prompt
+				this.deferredPrompt.userChoice.then((choiceResult) => {
+					if (choiceResult.outcome === 'accepted') {
+						console.log('User accepted the A2HS prompt');
+					} else {
+						console.log('User dismissed the A2HS prompt');
+					}
+					this.deferredPrompt = null;
+				});
+			},
+			scope: this
+		}));
+
+
+
+
+
+
+
+
 		var c = go.User.capabilities['go:core:core'] || {};
 
 		this.systemSettingsWindow = new go.systemsettings.Dialog({
@@ -737,6 +770,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		},5000);
 		
 	},
+
+
 	
 	
 	openSystemSettings : function() {
@@ -878,3 +913,15 @@ GO.mainLayout = new GO.MainLayout();
 
 // needed in pre v6.4
 GO.mainLayout.on('callto', GO.util.callToHandler);
+
+
+window.addEventListener('beforeinstallprompt', (e) => {
+
+	// Prevent Chrome 67 and earlier from automatically showing the prompt
+	e.preventDefault();
+	// Stash the event so it can be triggered later.
+	GO.mainLayout.deferredInstallPrompt = e;
+	// Update UI to notify the user they can add to home screen
+	GO.mainLayout.installBtn.show();
+
+});
