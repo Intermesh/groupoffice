@@ -5,8 +5,8 @@ use \GO\Base\Model\State as OldState;
 use go\core\model\Token;
 use go\core\auth\State as AbstractState;
 use go\core\http\Response;
-use go\core\model\Settings;
 use go\core\model\User;
+use stdClass;
 
 class State extends AbstractState {
 	
@@ -289,10 +289,12 @@ class State extends AbstractState {
 
 	/**
 	 * Get the permission level of the module this controller belongs to.
-	 * 
-	 * @return int
+	 *
+	 * @param string $cls
+	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
 	 */
-	public function getClassRights($cls) {
+	public function getClassRights($cls): stdClass
+	{
 		return $this->getToken()->getClassRights($cls);
 	}
 

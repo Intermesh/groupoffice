@@ -9,6 +9,7 @@ use go\core\App;
 use go\core\orm\Query;
 use go\core\Settings;
 use go\core\validate\ErrorCode;
+use stdClass;
 
 class Module extends Entity {
 	public $id;
@@ -138,10 +139,11 @@ class Module extends Entity {
 	/**
 	 * Get's the rights of a user
 	 *
-	 * @param $userId The user ID to query. defaults to current authorized user.
-	 * @return array|object ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
+	 * @param int|null $userId The user ID to query. defaults to current authorized user.
+	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
 	 */
-	public function getUserRights($userId = null) {
+	public function getUserRights(int $userId = null) : stdClass
+	{
 
 		if(!isset($userId)) {
 			$userId = go()->getAuthState()->getUserId();
@@ -152,7 +154,7 @@ class Module extends Entity {
 		}
 
 		if(!$this->isAvailable()) {
-			return ['mayRead' => $isAdmin];
+			return (object) ['mayRead' => $isAdmin];
 		}
 
 		if($isAdmin) {
@@ -217,6 +219,7 @@ class Module extends Entity {
 		
 		if(!isset($this->module)) {
 			$cls = $this->getModuleClass();
+			/** @var \go\core\Module $cls */
 			$this->module = $cls::get();
 		}
 		
@@ -429,7 +432,7 @@ class Module extends Entity {
 	 * @param string $package
 	 * @param string $name
 	 * @param bool $enabled Set to null for both enabled and disabled
-	 * @return self
+	 * @return self|false
 	 */
 	public static function findByName($package, $name, $enabled = true, $props = []) {
 		if($package == "legacy") {
@@ -494,7 +497,7 @@ class Module extends Entity {
 	
 	/**
 	 * Returns all module entities with info
-	 * @return EntityType[]
+	 * @return core\orm\EntityType[]
 	 */
 	public function getEntities() :array
 	{
