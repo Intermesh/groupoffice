@@ -4,6 +4,7 @@ namespace go\core {
 
 use Exception;
 use GO\Base\Observable;
+use GO;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
 use go\core\db\Connection;
@@ -14,16 +15,16 @@ use go\core\event\EventEmitterTrait;
 use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Blob;
-	use go\core\fs\File;
-	use go\core\fs\Folder;
+use go\core\fs\Folder;
 use go\core\jmap\Request;
 use go\core\jmap\State;
 use go\core\mail\Mailer;
-	use go\core\model\User;
-	use go\core\orm\Property;
+use go\core\orm\Property;
 use go\core\util\ArrayObject;
 use go\core\webclient\Extjs3;
+use go\core\model\User;
 use go\core\model\Settings;
+
 use Faker;
 
 use const GO_CONFIG_FILE;
@@ -88,6 +89,7 @@ use const GO_CONFIG_FILE;
 		private $version;
 
 		protected function __construct() {
+			parent::__construct();
 			date_default_timezone_set("UTC");
 
 			mb_internal_encoding("UTF-8");
@@ -110,13 +112,14 @@ use const GO_CONFIG_FILE;
 				'mayChangeCustomFields'
 			];
 		}
-		
+
 		/**
 		 * Required for app being a go\core extend
 		 * 
 		 * @return string
 		 */
-		public function getAuthor() {
+		public function getAuthor(): string
+		{
 			return "Intermesh BV";
 		}
 
@@ -125,7 +128,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return string
 		 */
-		public static function getName() {
+		public static function getName(): string
+		{
 			return "core";
 		}
 
@@ -134,7 +138,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return string
 		 */
-		public static function getPackage() {
+		public static function getPackage(): string
+		{
 			return "core";
 		}
 
@@ -143,7 +148,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return string eg. 6.4.1
 		 */
-		public function getVersion() {
+		public function getVersion(): string
+		{
 			if(!isset($this->version)) {
 				$this->version = require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
 			}
@@ -155,7 +161,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return string eg. 6.4
 		 */
-		public function getMajorVersion() {
+		public function getMajorVersion(): string
+		{
 			
 			return substr($this->getVersion(), 0, strrpos($this->getVersion(), '.') );
 		}
@@ -173,7 +180,8 @@ use const GO_CONFIG_FILE;
 		 * ```
 		 * @return Mailer
 		 */
-		public function getMailer() {
+		public function getMailer(): Mailer
+		{
 			if (!isset($this->mailer)) {
 				$this->mailer = new Mailer();
 			}
@@ -185,7 +193,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return Installer
 		 */
-		public function getInstaller() {
+		public function getInstaller(): Installer
+		{
 			if (!isset($this->installer)) {
 				$this->installer = new Installer();
 			}
@@ -196,9 +205,10 @@ use const GO_CONFIG_FILE;
 		 * Get the data folder
 		 *
 		 * @return Folder
-		 * @throws ConfigurationException
+		 * @throws Exception
 		 */
-		public function getDataFolder() {
+		public function getDataFolder(): Folder
+		{
 			return new Folder($this->getConfig()['file_storage_path']);
 		}
 
@@ -217,7 +227,7 @@ use const GO_CONFIG_FILE;
 					try {
 						$this->storageQuota = disk_total_space($this->getConfig()['file_storage_path']);
 					}
-					catch(\Exception $e) {
+					catch(Exception $e) {
 						go()->warn("Could not determine total disk space: ". $e->getMessage());
 						$this->storageQuota = 0;
 					}
@@ -242,13 +252,13 @@ use const GO_CONFIG_FILE;
 					try {
 						$this->storageFreeSpace = disk_free_space($this->getConfig()['file_storage_path']);
 					}
-					catch(\Exception $e) {
+					catch(Exception $e) {
 						go()->warn("Could not determine free disk space: ". $e->getMessage());
 						$this->storageFreeSpace = 0;
 					}
 				} else
 				{
-					$usage = \GO::config()->get_setting('file_storage_usage');				 
+					$usage = GO::config()->get_setting('file_storage_usage');
 					$this->storageFreeSpace = $quota - $usage;
 				}
 			}
@@ -261,8 +271,10 @@ use const GO_CONFIG_FILE;
 		 *
 		 * @return Folder
 		 * @throws ConfigurationException
+		 * @throws Exception
 		 */
-		public function getTmpFolder() {
+		public function getTmpFolder(): Folder
+		{
 			return new Folder($this->getConfig()['tmpdir']);
 		}
 
@@ -416,8 +428,9 @@ use const GO_CONFIG_FILE;
 
 		/**
 		 * Get the database connection
-		 * 
+		 *
 		 * @return Connection
+		 * @throws ConfigurationException
 		 */
 		public function getDbConnection() {
 			if (!isset($this->dbConnection)) {
@@ -530,7 +543,7 @@ use const GO_CONFIG_FILE;
 
 			$this->rebuildCacheOnDestruct = false;
 			
-			\GO::clearCache(); //legacy
+			GO::clearCache(); //legacy
 
 			go()->getCache()->flush(false);
 			Table::destroyInstances();

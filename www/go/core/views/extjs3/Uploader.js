@@ -169,7 +169,7 @@
 			go.Uploader.uploadQueue.totalBytes += file.size;
 			go.Uploader.uploadQueue.items.push(queueItem);
 
-			if(this.index == 0) {
+			if(this.index === 0) {
 				this.doUpload();
 			}
 
@@ -184,7 +184,7 @@
 				go.Notifier.remove(uploadNotification);
 			}
 			uploadNotification = null;
-			if(go.Uploader.uploadQueue.failed == 0) {
+			if(go.Uploader.uploadQueue.failed === 0) {
 				go.Notifier.hideNotifications();
 			}
 			this.resetUploadQueue();
@@ -200,7 +200,7 @@
 				return this.finish();
 			}
 
-			if(this.index == 0) {
+			if(this.index === 0) {
 				this.startedAt = new Date();
 			}
 
@@ -249,7 +249,7 @@
 					}
 					cfg.progress && cfg.progress.call(cfg.scope || this, e);
 				},
-				failure: function (response, options) {
+				failure: function (response) {
 
 					if(response.isAbort) {
 						return;
@@ -261,7 +261,7 @@
 					if (cfg.failure && response.responseText) {
 						data = Ext.decode(response.responseText);
 					} else if (response.status === 413) { // "Request Entity Too Large"
-						text += t('File too large');
+						text += t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(go.Jmap.capabilities.maxSizeUpload))
 					} else if (!response.isAbort) {
 						data = Ext.decode(response.responseText);
 						if(data && data.detail) {

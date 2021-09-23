@@ -67,7 +67,7 @@ class Environment extends Singleton {
 	 * Converts shorthand memory notation value to bytes
 	 * From http://php.net/manual/en/function.ini-get.php
 	 *
-	 * @param $val Memory size shorthand notation string
+	 * @param string $val Memory size shorthand notation string
 	 */
 	public static function configToBytes($val) {
 		$val = trim($val);
@@ -107,8 +107,9 @@ class Environment extends Singleton {
 	
 	/**
 	 * Get install path without trailing slash
+	 * eg /usr/share/groupoffice
 	 * 
-	 * @return string eg /usr/share/groupoffice
+	 * @return string
 	 */
 	public function getInstallPath() {
 		return dirname(dirname(__DIR__));

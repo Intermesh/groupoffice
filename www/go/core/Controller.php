@@ -3,23 +3,24 @@
 namespace go\core;
 
 use go\core\http\Exception;
-use go\core\http\Request;
-use go\core\model\Module;
-use go\core\model\Acl;
 
-abstract class Controller { 
+abstract class Controller {
 
 	/**
 	 * Only authenticated users can access
+	 * @throws Exception
 	 */
 	public function __construct() {
 		$this->authenticate();
 	}
 
-	protected function authenticate()
+	/**
+	 * @throws Exception
+	 */
+	protected function authenticate() {
 	{
-		if (!go()->getAuthState()->isAuthenticated()) {
-			throw new Exception(401, "Unauthorized");
+    if (!go()->getAuthState()->isAuthenticated()) {
+      throw new Exception(401, "Unauthorized");
 		}
 
 		$this->rights = $this->getClassRights();
