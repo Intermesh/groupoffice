@@ -286,7 +286,6 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 	},
 
 	load : function(folderId) {
-		debugger;
 		this.folderId = folderId;
 
 		if (this.folderId) {
