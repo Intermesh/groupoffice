@@ -380,14 +380,19 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		text: t('Files', 'files'),
 		iconCls: 'ic-file-upload',
 		handler: function() {
+			let folder_id = this.folder_id;
 			go.util.openFileDialog({
 				multiple: true,
 				directory: false,
 				autoUpload: true,
 				listeners: {
 					uploadComplete: function(blobs) {
+						console.warn(folder_id);
 						blobs = this.transformBlobs(blobs);
-						this.sendOverwrite({upload:true,blobs:Ext.encode(blobs)});
+						this.sendOverwrite({
+							upload:true,
+							blobs:Ext.encode(blobs),
+							destination_folder_id: folder_id});
 					},
 					scope: this
 				}
@@ -401,6 +406,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		iconCls: 'ic-file-upload',
 		disabled: Ext.isIE,
 		handler: function() {
+			const folder_id = this.folder_id;
 			go.util.openFileDialog({
 				multiple: false,
 				directory: true,
@@ -408,7 +414,10 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 				listeners: {
 					uploadComplete: function(blobs){
 						blobs = this.transformBlobs(blobs);
-						this.sendOverwrite({upload:true,blobs:Ext.encode(blobs)});
+						this.sendOverwrite({
+							upload:true,
+							blobs:Ext.encode(blobs),
+							destination_folder_id: folder_id});
 					},
 					scope:this
 				}
@@ -719,10 +728,10 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	});
 
 	this.cardPanel.on('afterrender', function() {
-		GO.files.DnDFileUpload(function (blobs) {
+		GO.files.DnDFileUpload(function (blobs, folder_id) {
 			blobs = this.transformBlobs(blobs);
-			this.sendOverwrite({upload: true, blobs: Ext.encode(blobs)});
-		}.bind(this), this.cardPanel.body)();
+			this.sendOverwrite({upload: true, blobs: Ext.encode(blobs), destination_folder_id: folder_id});
+		}.bind(this), this.cardPanel.body)(this);
 	},this);
 
 	this.eastPanel = new Ext.Panel({
@@ -1644,7 +1653,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	paste : function(pasteMode, destination, records)
 	{
-		// debugger;
 		var paste_sources = Array();
 		//var folderSelected = false;
 		for(var i=0;i<records.length;i++)
@@ -1939,6 +1947,10 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		this.fireEvent('beforeFolderIdSet');
 		  
 		this.folder_id = id;
+
+		if(this.dndUpload) {
+			this.dndUpload.folder_id = id;
+		}
 		//this.gridStore.baseParams['id']=this.thumbsStore.baseParams['id']=id;
 		if(forceReload || this.getActiveGridStore().baseParams['folder_id'] != id) {
 			

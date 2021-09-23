@@ -264,10 +264,10 @@ go.util =  (function () {
 		 * @param {object} cfg
 		 */
 		openFileDialog: function(cfg) {
-			if (!this.uploadDialog) {
-				this.uploadDialog = document.createElement("input");
-				this.uploadDialog.setAttribute("type", "file");
-				this.uploadDialog.onchange = function (e) {
+			//if (!this.uploadDialog) {
+				const uploadDialog = document.createElement("input");
+				uploadDialog.setAttribute("type", "file");
+				uploadDialog.onchange = function (e) {
 					
 					var uploadCount = this.files.length, blobs = [];
 					
@@ -308,28 +308,28 @@ go.util =  (function () {
 					
 					this.value = "";
 				};
-			}
-			this.uploadDialog.cfg = cfg;
-			this.uploadDialog.removeAttribute('webkitdirectory');
-			this.uploadDialog.removeAttribute('directory');
-			this.uploadDialog.removeAttribute('multiple');
+		//}
+			uploadDialog.cfg = cfg;
+			uploadDialog.removeAttribute('webkitdirectory');
+			uploadDialog.removeAttribute('directory');
+			uploadDialog.removeAttribute('multiple');
 
 			if(cfg.accept) {
-				this.uploadDialog.setAttribute('accept', cfg.accept);
+				uploadDialog.setAttribute('accept', cfg.accept);
 			}else
 			{
-				this.uploadDialog.removeAttribute('accept');
+				uploadDialog.removeAttribute('accept');
 			}
 
 			if(cfg.directory) {
-				this.uploadDialog.setAttribute('webkitdirectory', true);
-				this.uploadDialog.setAttribute('directory', true);
+				uploadDialog.setAttribute('webkitdirectory', true);
+				uploadDialog.setAttribute('directory', true);
 			}
 			if(cfg.multiple) {
-				this.uploadDialog.setAttribute('multiple', true);
+				uploadDialog.setAttribute('multiple', true);
 			}
 			
-			this.uploadDialog.click();
+			uploadDialog.click();
 		},
 
 		viewFile : function(url) {
