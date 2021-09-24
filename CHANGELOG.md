@@ -1,4 +1,5 @@
 24-09-2021 6.5.78
+- SMIME: keep multiple certificates so older emails can still be decrypted. Always use newest to encrypt/sign
 - Core: disable selection and delete in grids. Applied to group members and sharing panel.
 - Core: Safari 15 theme color meta tag added
 - Projects2: Time registration dialog filters employees by project
