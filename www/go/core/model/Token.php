@@ -6,13 +6,12 @@ use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
 use go\core\Environment;
-use go\core\auth\Method;
+use stdClass;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
-use go\core\model\Module;
 
 class Token extends Entity {
 	
@@ -463,9 +462,10 @@ class Token extends Entity {
 	/**
 	 * Get the permission level of the module this controller belongs to.
 	 * 
-	 * @return int
+	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
 	 */
-	public function getClassRights($cls) {
+	public function getClassRights($cls): stdClass
+	{
 		if(!isset($this->classRights[$cls])) {
 			$mod = Module::findByClass($cls, ['id', 'name', 'package']);
 			$this->classRights[$cls]= $mod->getUserRights();

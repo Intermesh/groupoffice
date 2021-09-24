@@ -27,7 +27,7 @@ class Folder extends Base {
 	/**
 	 * Get the temporary files folder or obitonally a subfolder of it.
 	 * 
-	 * @var StringHelper $sub Optionally create a sub folder
+	 * @var string $sub Optionally create a sub folder
 	 * @return Folder 
 	 */
 	public static function tempFolder($sub=''){
@@ -44,7 +44,7 @@ class Folder extends Base {
 	 * Get folder directory listing.
 	 * 
 	 * @param boolean $getHidden
-	 * @param boolean|StringHelper $sort 'mtime','ctime' or 'name'
+	 * @param boolean|string $sort 'mtime','ctime' or 'name'
 	 * @return File or Folder
 	 */
 	public function ls($getHidden=false, $sort=false) {

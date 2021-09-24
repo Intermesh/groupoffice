@@ -62,7 +62,7 @@ var $billing_clear_payment_method_on_duplicate = true;
  * Enable this Group-Office installation?
  *
  * @deprecated Block non admin logins
- * @var     StringHelper
+ * @var     string
  * @access  public
  */
 	var $enabled = true;
@@ -93,7 +93,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 *			 (Please see: $smtp_account_id)
 	 *			 and when $smtp_account_smime_sign is set to true
 	 *
-	 * @var StringHelper
+	 * @var string
 	 */
 	var $smtp_account_smime_password = "";
 
@@ -101,7 +101,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * 
 	 * @deprecated We'll cache the headers
 	 * 
-	 * @var Set the client side sort of imap to receive all messages with the DATE or R_DATE flag.
+	 * @var  boolean Set the client side sort of imap to receive all messages with the DATE or R_DATE flag.
 	 * If set to false (Default) then it will use the sort key 'ARRIVAL'
 	 * Usually done when client_side_sort is used in combination with an Microsoft Exchange Server.
 	 */
@@ -110,7 +110,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * The Group-Office server ID
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $id = 'groupoffice';
@@ -208,7 +208,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Default VAT percentage
 	 *
 	 * @deprecated Should move to billing
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $default_vat = 21;
@@ -217,7 +217,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default currency
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	public function getdefault_currency() {
@@ -228,7 +228,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Default date format
 	 *
 	 *  @deprecated is in system settings
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	public function getDefault_date_format() {
@@ -242,7 +242,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Default date separator
 	 *
 	 *  @deprecated is in system settings
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	public function getdefault_date_separator() {
@@ -253,7 +253,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default time format
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 
@@ -265,7 +265,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Default name formatting and sorting. Can be last_name or first_name
 	 *
 	 * @deprecated Should move to address book
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $default_sort_name = "displayName";
@@ -275,7 +275,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Default first day of the week 0=sunday 1=monday
 	 *
 	 * @deprecated Should move to address book
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	public function getDefault_first_weekday() {
@@ -285,7 +285,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default decimal separator for numbers
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	public function getdefault_decimal_separator() {
@@ -295,7 +295,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default thousands separator for numbers
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	public function getdefault_thousands_separator() {
@@ -305,7 +305,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default list separator for import and export
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	public function getdefault_list_separator() {
@@ -315,7 +315,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default text separator for import and export
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	public function getdefault_text_separator() {
@@ -329,7 +329,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default theme
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $theme = 'Paper';
@@ -337,7 +337,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default theme
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $defaultView = 'Extjs3';
@@ -403,7 +403,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 	/**
 	 * The default font to be used in the generated PDF files.
-	 * @var StringHelper
+	 * @var string
 	 */
 	public $tcpdf_font = "freesans";
 
@@ -443,7 +443,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Comma separated list of allowed modules. Leave empty to allow all modules.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $allowed_modules = '';
@@ -453,7 +453,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Add self-registered users to these user groups
 	 * Group names are separated by a comma.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $register_user_groups = '';
@@ -462,7 +462,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Self-registered users will be visible to these user groups
 	 * Group names are separated by a comma.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $register_visible_user_groups = "GROUP_EVERYONE";
@@ -478,7 +478,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * 
 	 * @deprecated since 6.3
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $host = '/groupoffice/';
@@ -486,7 +486,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Set Access-Control-Allow-Origin: * header for example.
 	 *
-	 * @var StringHelper
+	 * @var string
 	 */
 	var $extra_headers=array();
 
@@ -511,7 +511,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * 
 	 * @deprecated Auto detected
 	 * 
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $root_path = '';
@@ -519,7 +519,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * The path to store temporary files with trailing slash.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $tmpdir = '/tmp/groupoffice/';
@@ -553,35 +553,35 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * The database type to use. Currently only MySQL is supported
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $db_type = 'mysql';
 	/**
 	 * The host of the database
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $db_host = '';
 	/**
 	 * The name of the database
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $db_name = '';
 	/**
 	 * The username to connect to the database
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $db_user = '';
 	/**
 	 * The password to connect to the database
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $db_pass = '';
@@ -589,7 +589,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Specifies the port number to attempt to connect to the MySQL server.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $db_port = 3306;
@@ -597,7 +597,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Specifies the socket or named pipe that should be used.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $db_socket = '';
@@ -605,7 +605,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Specifies the charset that needs to be used for the database.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $db_charset = "'utf8mb4' COLLATE 'utf8mb4_unicode_ci'";
@@ -615,7 +615,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Useful in clustering mode. Defaults to "1". Set to the number of clustered
 	 * nodes.
 	 *
-	 * @var StringHelper
+	 * @var string
 	 * @access public
 	 */
 
@@ -625,7 +625,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 *
 	 * Give each node an incremented number.
 	 *
-	 * @var StringHelper
+	 * @var string
 	 * @access public
 	 */
 
@@ -642,7 +642,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * this directory should be writable by apache. Also choose a partition that
 	 * has enough diskspace.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $file_storage_path = '/home/groupoffice/';
@@ -660,7 +660,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * The maximum file size the filebrowser attempts to upload. Be aware that
 	 * the php.ini file must be set accordingly (http://www.php.net).
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $max_file_size = 1000 * 1024 * 1024;
@@ -696,7 +696,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * In some cases it fails and uses an invalid IPv6 IP like ::1. You can
 	 * override it here.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $smtp_local_domain = '';
@@ -723,7 +723,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * We stumbled upon a dovecot server that crashed when sending a command
 	 * using LIST-EXTENDED. With this option we can workaround that issue.
 	 *
-	 * @var StringHelper
+	 * @var string
 	 */
 	var $disable_imap_capabilities="";
 
@@ -735,7 +735,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 *
 	 * Will restrict those IP's to 10 e-mails per day.
 	 *
-	 * @var unknown_type
+	 * @var string
 	 */
 
 	var $restrict_smtp_hosts = '';
@@ -754,21 +754,21 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 	/**
 	 * Command to create ZIP archive
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $cmd_zip = '/usr/bin/zip';
 
 	/**
 	 * Command to unpack ZIP archive
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $cmd_unzip = '/usr/bin/unzip';
 
 	/**
 	 * Command to control TAR archives
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $cmd_tar = '/bin/tar';
@@ -777,14 +777,14 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Command to set system passwords. Used by passwd.users.class.inc.
 	 * SUDO must be set up!
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $cmd_chpasswd = '/usr/sbin/chpasswd';
 
 	/**
 	 * Command to SUDO
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $cmd_sudo = '/usr/bin/sudo';
@@ -792,7 +792,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Command to convert xml to wbxml
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $cmd_xml2wbxml = '/usr/bin/xml2wbxml';
@@ -800,7 +800,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Command to convert wbxml to xml
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $cmd_wbxml2xml = '/usr/bin/wbxml2xml';
@@ -808,7 +808,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Command to unpack winmail.dat files
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $cmd_tnef = '/usr/bin/tnef';
@@ -816,7 +816,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Command to execute the php command line interface
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $cmd_php = 'php';
@@ -901,7 +901,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Disable security check for cross domain forgeries
 	 *
-	 * @var <type>
+	 * @var boolean
 	 */
 
 	var $disable_security_token_check=false;
@@ -910,7 +910,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * The number of items displayed in the navigation panels (Calendars, addressbooks etc.)
 	 * Don't set this number too high because it may slow the browser and server down.
 	 *
-	 * @var type
+	 * @var int
 	 */
 
 	var $nav_page_size=50;
@@ -922,7 +922,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * This curl function will be used:
 	 * curl_setopt($ch, CURLOPT_PROXY, "http://proxy.com:8080");
 	 *
-	 * @var StringHelper
+	 * @var string
 	 */
 	var $curl_proxy="";
 	
@@ -960,7 +960,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Enable zlib compression for faster downloading of scripts and css
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $zlib_compress = true;
@@ -974,7 +974,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 	/**
 	 * Product name. If changed all Group-Office references will disappear.
-	 * @var StringHelper
+	 * @var string
 	 */
 
 	var $product_name='GroupOffice';
@@ -1009,14 +1009,14 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * The administrator user group ID
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $group_root = '1';
 	/**
 	 * The everyone user group ID
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $group_everyone = '2';
@@ -1024,7 +1024,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * The internal user group ID
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $group_internal = '3';
@@ -1032,7 +1032,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Date formats to be used. Only Y, m and d are supported.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $date_formats = array(
@@ -1044,7 +1044,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Date separators to be used.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 
@@ -1056,7 +1056,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Time formats to be used.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $time_formats = array(
@@ -1067,14 +1067,14 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Relative path to the modules directory with no slash at start and end
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  private
 	 */
 	var $module_path = 'modules';
 	/**
 	 * Relative URL to the administrator directory with no slash at start and end
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  private
 	 */
 
@@ -1086,7 +1086,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 *
 	 * No menu item is generated if left empty.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $support_link = 'https://www.group-office.com/support/';
@@ -1096,7 +1096,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 *
 	 * No menu item is generated if left empty.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $report_bug_link = 'http://sourceforge.net/tracker/?group_id=76359&atid=547651';
@@ -1104,28 +1104,28 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Relative path to the classes directory with no slash at start and end
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  private
 	 */
 	var $class_path = 'classes';
 	/**
 	 * Relative path to the controls directory with no slash at start and end
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  private
 	 */
 	var $control_path = 'controls';
 	/**
 	 * Relative URL to the controls directory with no slash at start and end
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  private
 	 */
 	var $control_url = 'controls';
 	/**
 	 * Relative path to the themes directory with no slash at start and end
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  private
 	 */
 	var $theme_path = 'themes';
@@ -1133,7 +1133,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Relative URL to the themes directory with no slash at start and end
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  private
 	 */
 	var $theme_url = 'themes';
@@ -1141,7 +1141,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Relative path to the language directory with no slash at start and end
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  private
 	 */
 	var $language_path = 'language';
@@ -1150,7 +1150,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Original tmpdir. The user_id is appended (/tmp/1/) to the normal tmpdir.
 	 * In some cases you don't want that.
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $orig_tmpdir = '';
@@ -1159,7 +1159,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Path with trailing slash where cached scripts are generated.
 	 * Defaults to $this->tmpdir/cache/
 	 *
-	 * @var StringHelper
+	 * @var string
 	 */
 	var $cachefolder='';
 
@@ -1183,7 +1183,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Full URL to the Group-Office assets folder with trailing slash
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $assets_url = '';
@@ -1191,7 +1191,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Full Path to the Group-Office assets folder with trailing slash
 	 *
-	 * @var     StringHelper
+	 * @var     string
 	 * @access  public
 	 */
 	var $assets_path = '';
@@ -1507,7 +1507,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * If it is not set, then use noreply@ {webmaster_email domain name}
 	 * When the webmaster email is not set, then this will be noreply@example.com
 	 * 
-	 * @return     StringHelper
+	 * @return     string
 	 */
 	public function getNoreply_email(){
 
@@ -1583,7 +1583,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 
 	public function getMajorVersion(){
-		return substr($this->version,0,3);;
+		return substr($this->version,0,3);
 	}
 
 	/**
@@ -1612,7 +1612,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Get the cache folder for cached scripts.
 	 *
-	 * @return \Fs\Folder
+	 * @return Fs\Folder
 	 */
 	public function getCacheFolder($autoCreate=true){
 
@@ -1701,7 +1701,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * The first location is more secure because the sensitive information is kept
 	 * outside the document root.
 	 *
-	 * @return StringHelper Path to configuration file
+	 * @return string Path to configuration file
 	 */
 
 	public function get_config_file() {		
@@ -1748,7 +1748,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Gets a custom saved setting from the database
 	 *
-	 * @param StringHelper $name Configuration key name
+	 * @param string $name Configuration key name
    * @param integer $user_id Id of the user you want to get a setting from - defaults to 0 for the default setting,
 	 * @param mixed $default The default value that will be returned when the setting cannot be found
 	 *
@@ -1809,8 +1809,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Saves a custom setting to the database
 	 *
-	 * @param 	StringHelper $name Configuration key name
-	 * @param 	StringHelper $value Configuration key value
+	 * @param 	string $name Configuration key name
+	 * @param 	string $value Configuration key value
 	 * @param integer $user_id Id of user you want to load the setting for
      * defaults to 0 for the default setting (not user specific)
 	 * @return bool Returns true on succes
@@ -1833,7 +1833,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Deletes a custom setting from the database
 	 *
-	 * @param 	StringHelper $name Configuration key name
+	 * @param 	string $name Configuration key name
      * @params integer $user_id The is of the user you want to delete a setting from
      * defaults to 0 for the default setting,
      * if set to false settings for every user inclusing default will be deleted

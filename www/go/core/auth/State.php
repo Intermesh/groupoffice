@@ -2,6 +2,8 @@
 
 namespace go\core\auth;
 use go\core\model\Module;
+use go\core\model\User;
+use stdClass;
 
 abstract class State {
 	/**
@@ -14,7 +16,7 @@ abstract class State {
 	/**
 	 * Get the logged in user
 	 * 
-	 * @return go\core\model\User|null
+	 * @return User|null
 	 */
 	abstract function getUser();
 	
@@ -38,9 +40,9 @@ abstract class State {
 	/**
 	 * Get the permission level of the module this controller belongs to.
 	 * 
-	 * @return int
+	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
 	 */
-	public function getClassRights($cls) {
+	public function getClassRights($cls) : stdClass {
 		if(!isset(self::$classRights[$cls])) {
 			$mod = Module::findByClass($cls, ['id', 'name', 'package']);
 			self::$classRights[$cls]= $mod->getUserRights();

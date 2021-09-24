@@ -455,7 +455,7 @@ class RRuleIterator implements Iterator {
             if ($this->byHour) {
                 if ($this->currentDate->format('G') == '23') {
                     // to obey the interval rule
-                    $this->currentDate = $this->currentDate->modify('+' . $this->interval - 1 . ' days');
+                    $this->currentDate = $this->currentDate->modify('+' . ($this->interval - 1) . ' days');
                 }
 
                 $this->currentDate = $this->currentDate->modify('+1 hours');
@@ -521,7 +521,7 @@ class RRuleIterator implements Iterator {
 
             // We need to roll over to the next week
             if ($currentDay === $firstDay && (!$this->byHour || $currentHour == '0')) {
-                $this->currentDate = $this->currentDate->modify('+' . $this->interval - 1 . ' weeks');
+                $this->currentDate = $this->currentDate->modify('+' . ($this->interval - 1) . ' weeks');
 
                 // We need to go to the first day of this week, but only if we
                 // are not already on this first day of this week.

@@ -1,40 +1,11 @@
-.btn-pub-certs {
-	background-image:url('images/pubcerts.png') !important;
-}
-
 .smi-sign-notification{
-	background:url('images/signed.png') no-repeat;
-	padding-left:20px;
-	cursor:pointer;
 	text-decoration:underline;
-/*	margin:4px 0px;*/
-	margin-top:4px;
-	padding:0px 0px 4px 20px;
+	cursor:pointer;
+}
+.smi-encrypt-notification i, .smi-sign-notification i {
+	margin-right: 6px;
 }
 
-.smi-encrypt-notification{
-	background:url('images/smime.png') no-repeat;
-	margin-top:4px;
-	padding:0px 0px 4px 20px;
-}
-
-.smi-valid{
-	background:url(images/valid.png) no-repeat;
-	padding:0px 0px 10px 20px;
-	font-size: 16px;
-	line-height: 16px;
-}
-
-.smi-invalid{
-	background:url(images/invalid.png) no-repeat;
-	padding:0px 0px 10px 20px;
-	font-size: 16px;
-	line-height: 16px;
-}
-
-.smi-certemailmismatch{
-	background:url(images/certemailmismatch.png) no-repeat;
-	padding:0px 0px 10px 20px;
-	font-size: 16px;
-	line-height: 16px;
-}
+.smi-invalid { color:red;}
+.smi-valid { color:green;}
+.smi-certemailmismatch{ color:orange;}

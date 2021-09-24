@@ -387,12 +387,13 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 		
 		if(!this.onBeforeSubmit()) {
-			return Promise.reject({message: "onBeforeSubmit returned false"});
+			console.warn("onBeforeSubmit returned false");
+			return Promise.reject({message: t("You have errors in your form. The invalid fields are marked.")});
 		}
 
 		if (!this.isValid()) {
-			var error = this.showFirstInvalidField();
-			return Promise.reject({message: error});
+			this.showFirstInvalidField();
+			return Promise.reject({message: t("You have errors in your form. The invalid fields are marked.")});
 		}
 
 		var isNew = !this.currentId;
@@ -420,7 +421,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}).catch(function(error) {
 
 			const firstError = me.showFirstInvalidField();
-			return Promise.reject(firstError ? {message: firstError} : error);
+			return Promise.reject(firstError ? {message: t("You have errors in your form. The invalid fields are marked.")} : error);
 		}).finally(function() {
 			me.actionComplete();
 		})
