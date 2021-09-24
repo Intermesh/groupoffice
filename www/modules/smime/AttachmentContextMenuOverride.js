@@ -24,7 +24,7 @@ GO.moduleManager.onModuleReady('email',function(){
 		importAttachment: function(attachment,panel) {
 			//account_id mailbox uid number encoding sender
 			GO.request({
-				url: 'smime/certificate/importAttachment',
+				url: 'smime/publicCertificate/importAttachment',
 				params:{
 					uid: panel.uid,
 					mailbox: panel.mailbox,

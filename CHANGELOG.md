@@ -14,10 +14,12 @@ Core: modules can have specific permission types. We use it in the core to allow
       custom fields.
 ----
 
+24-09-2021 6.5.78
 - Core: disable selection and delete in grids. Applied to group members and sharing panel.
 - Core: Safari 15 theme color meta tag added
 - Projects2: Time registration dialog filters employees by project
 - Calendar: when creating resource event, use location and description as well.
+- Core: Fixed searching on UTF-8 characters (Cyrillic)
 
 16-09-2021 6.5.77
 - OnlyOffice: Was broken when using default review mode 'original'. Changed it to 'markup'

@@ -95,13 +95,6 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	
 	initComponent: function () {
 
-		var tpl = new Ext.XTemplate(
-						'<tpl for=".">',
-						'<div class="go-chip">{' + this.displayField + '} <button type="button" class="icon">delete</button></div>',
-						'</tpl>',
-						'<div class="x-clear"></div>'
-						);		
-	
 		this.dataView = new go.form.ChipsView({
 			valueField: this.valueField,
 			displayField: this.displayField
@@ -234,15 +227,25 @@ go.form.Chips = Ext.extend(Ext.Container, {
 
 		return v;
 	},
-	markInvalid: function (msg) {		
+	markInvalid: function (msg) {
+
 		if(this.comboBox) {
 			this.comboBox.markInvalid(msg);
+			if(!this.comboBox.rendered && !this.markedInvalid) {
+				this.comboBox.on('afterrender', function() {
+					this.comboBox.markInvalid(msg);
+				}, this);
+			}
 		}
+
+		this.markedInvalid = msg;
 	},
 	clearInvalid: function () {
 		if(this.comboBox) {
 			this.comboBox.clearInvalid();
 		}
+
+		this.markedInvalid = false;
 	},
 	createComboBox: function () {
 		if(this.store) {
@@ -292,7 +295,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			allowNew: this.allowNew
 		});		
 		
-		this.comboBox.on('select', function(combo, record, index) {
+		this.comboBox.on('select', function(combo, record) {
 			this.dataView.store.add([record]);
 			combo.reset();
 		}, this);
@@ -319,7 +322,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		return true;
 	},
 
-	isValid: function (preventMark) {
+	isValid: function () {
 		return this.disabled || this.allowBlank || !go.util.empty(this.getValue());
 	}
 

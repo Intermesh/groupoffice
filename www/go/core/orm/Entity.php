@@ -355,10 +355,10 @@ abstract class Entity extends Property {
 	{
 		if(method_exists($this, 'getCustomFields')) {
 			if(!$this->getCustomFields()->validate()) {
-				return false;
+				return;
 			}
 		}
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
 
   /**
@@ -434,7 +434,7 @@ abstract class Entity extends Property {
 	/**
 	 * Delete the entity
 	 *
-	 * @param Query|Entity $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
+	 * @param Query|Entity|array $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
 	 *  Or pass ['id' => $id];
 	 *
@@ -1020,8 +1020,9 @@ abstract class Entity extends Property {
 	 * Map of file types to a converter class for importing and exporting.
 	 * 
 	 * Override to add more.
-	 * 
-	 * @return AbstractConverter[]
+	 *
+	 * @see AbstractConverter
+	 * @return string[] Of type AbstractConverter
 	 */
 	public static function converters() {
 		return [Json::class];
@@ -1092,6 +1093,7 @@ abstract class Entity extends Property {
    * @param Entity $entity
    * @return bool
    * @throws Exception
+   * @noinspection PhpUndefinedMethodInspection
    */
 	public function merge(self $entity) {
 
@@ -1108,7 +1110,7 @@ abstract class Entity extends Property {
 			$this->mergeProp($entity, $name, $p);
 		}
 
-		if(method_exists($this, 'getCustomFields')) {
+		if(method_exists($entity, 'getCustomFields')) {
 			$cf = $entity->getCustomFields();
 			foreach($cf as $name => $v) {
 				if(empty($v)) {
