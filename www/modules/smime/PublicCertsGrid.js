@@ -22,7 +22,7 @@ GO.smime.PublicCertsGrid = function(config){
 		//autoLoad:true
 	});
 	
-	var columnModel =  new Ext.grid.ColumnModel({
+	var columnModel = new Ext.grid.ColumnModel({
 		defaults:{
 			sortable:true
 		},
@@ -69,25 +69,10 @@ GO.smime.PublicCertsGrid = function(config){
 		scope:this,
 		rowdblclick:function(grid, rowIndex){
 			var record = grid.getStore().getAt(rowIndex);
-			
-			if(!this.certWin){
-				this.certWin = new GO.Window({
-					title:t("SMIME Certificate", "smime"),
-					width:500,
-					height:300,
-					closeAction:'hide',
-					layout:'fit',
-					items:[this.certPanel = new Ext.Panel({
-						bodyStyle:'padding:10px'
-					})]
-				});
-			}
-												
-			this.certWin.show();
-			
+
 			GO.request({
 				maskEl:this.certPanel.getEl(),
-				url: "smime/certificate/verify",
+				url: "smime/publicCertificate/verify",
 				params:{
 					cert_id:record.id,
 					email:record.data.email
@@ -95,7 +80,9 @@ GO.smime.PublicCertsGrid = function(config){
 				scope: this,
 				success: function(options, response, result)
 				{
-					this.certPanel.update(result.html);				
+					let dlg = new GO.smime.CertificateDetailWindow();
+					dlg.show();
+					dlg.load(record.data.email, result);
 				}							
 			});
 		}
@@ -119,7 +106,7 @@ Ext.extend(GO.smime.PublicCertsGrid, GO.grid.GridPanel,{
 				},
 				upload: function(response) {
 					GO.request({
-						url:'smime/certificate/ImportCertificate',
+						url:'smime/publicCertificate/import',
 						params:{
 							blobId: response.blobId,
 							email: email
@@ -168,7 +155,7 @@ GO.moduleManager.onModuleReady('email',function(){
 		initComponent : GO.email.MessagesGrid.prototype.initComponent.createSequence(function(){
 			this.settingsMenu.add('-');
 			this.settingsMenu.add({
-				iconCls:'ic-person',
+				iconCls:'ic-verified-user',
 				text:t("Public SMIME certificates", "smime"),
 				handler:function(){
 					if(!this.pubCertsWin)

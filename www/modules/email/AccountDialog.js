@@ -672,6 +672,7 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 	},
 
 	loadAccount : function(account_id) {
+		this.account_id = account_id;
 		this.propertiesPanel.form.load({
 			url : GO.url("email/account/load"),
 			params : {
