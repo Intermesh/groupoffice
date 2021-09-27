@@ -34,5 +34,33 @@ class RssFeed extends \GO\Base\Db\ActiveRecord {
 		$this->columns['url']['gotype']='html';
 		return parent::init();
 	}
-	
+
+	public function validate()
+	{
+		$parsed = parse_url($this->url, PHP_URL_HOST);
+		$address = gethostbyname($parsed);
+
+		if(!filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+			$this->setValidationError('url', go()->t("Private URL's are not allowed"));
+			return parent::validate();
+		}
+
+		if (function_exists('curl_init')) {
+			$httpclient = new \GO\Base\Util\HttpClient();
+			$xml = $httpclient->request($this->url);
+		} else {
+			if (!\GO\Base\Fs\File::checkPathInput($this->url))
+				throw new \Exception("Invalid request");
+
+			$xml = @file_get_contents($this->url);
+		}
+
+		if (!$xml || !preg_match('/<rss.*<\/rss>/i', $xml)) {
+
+			$this->setValidationError('url', go()->t('The supplied URL is not an RSS feed'));
+		}
+
+		return parent::validate();
+	}
+
 }

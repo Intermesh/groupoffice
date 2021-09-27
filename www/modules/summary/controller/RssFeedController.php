@@ -11,6 +11,7 @@
 
 namespace GO\Summary\Controller;
 
+use GO\Base\Exception\Validation;
 
 class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 
@@ -31,7 +32,9 @@ class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 				$feedModel = new \GO\Summary\Model\RssFeed();
 			
 			$feedModel->setAttributes($feed);
-			$feedModel->save();
+			if(!$feedModel->save()) {
+				throw new Validation($feedModel->getValidationError('url'));
+			}
 			$feed['id'] = $feedModel->id;
 
 			$ids[] = $feed['id'];
@@ -86,7 +89,12 @@ class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 				$xml = @file_get_contents($feed);
 			}
 
-			if ($xml) {				
+			if ($xml) {
+
+				if(!preg_match('/<rss.*<\/rss>/i', $xml)) {
+					throw new \Exception("No RSS feed");
+				}
+
 				//fix relative images
 				preg_match('/(.*:\/\/[^\/]+)\//',$feed, $matches);				
 				$baseUrl = $matches[1];				
