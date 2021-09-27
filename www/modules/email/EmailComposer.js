@@ -900,7 +900,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 //			if(templateRecordIndex>-1)
 //				config.template_id=this.templatesStore.getAt(templateRecordIndex).get('template_id');
 //		}
-
 		//check the right template menu item.
 		if(this.templatesStore && this.templatesMenu && this.templatesMenu.items){
 			var templateId = config.template_id || this.getDefaultTemplateId();
@@ -1012,7 +1011,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			//this.htmlEditor.SpellCheck = false;
 		} else {
 
-			this.initTemplateMenu(config);
+
 			
 			//keep attachments when switchting from text <> html
 			this.reset();
@@ -1116,7 +1115,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				params.addresslist_id = config.addresslist_id;
 			}
 			
-			
+
 			if(typeof(config.template_id)=='undefined'){
 				config.template_id=this.getDefaultTemplateId();
 			}
@@ -1195,9 +1194,11 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 							this.lastLoadParams.alias_id = action.result.data.alias_id
 						if(action.result.data.template_id) {
 							this.lastLoadParams.template_id = action.result.data.template_id
-							this.initTemplateMenu(); // set template menu 
-//							this.initTemplateMenu({template_id: this.lastLoadParams.template_id}); // set template menu 
+							// this.initTemplateMenu(); // set template menu
+
 						}
+
+						this.initTemplateMenu({template_id: this.lastLoadParams.template_id}); // set template menu
 							
 //						action.result.data.account_id
 
@@ -1215,6 +1216,8 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				//in case users selects new default template.
 				this.lastLoadUrl = GO.url("email/message/template");
 				this.lastLoadParams = params;
+
+				this.initTemplateMenu(config);
 				this.afterShowAndLoad(config);
 				
 			}

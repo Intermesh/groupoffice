@@ -79,36 +79,42 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$columnModel->formatColumn('user_name', '$model->user->name');
 		return parent::formatColumns($columnModel);
 	}
-	
-	private $_defaultTemplate;
+
 	
 	public function actionEmailSelection($params){	
 				
 		// 'type' is only set by the client if a template should be selected as default.
 		// The user can choose to set the default template for an email account or
 		// for himself (current user).
-		if ((!empty($params['type']) && $params['type']=='default_for_account') || (!empty($params['account_id']) && isset($params['default_template_id']))) {
+		if (!empty($params['account_id'])) {
 			$defTempForAccount = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($params['account_id']);
 			if(!$defTempForAccount){
 				$defTempForAccount= new \GO\Email\Model\DefaultTemplateForAccount();
 				$defTempForAccount->account_id = $params['account_id'];
 				$defTempForAccount->save();
 			}
-		} else {
-			$defTempForUser = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
-			if(!$defTempForUser){
-				$defTempForUser= new \GO\Email\Model\DefaultTemplate();
-				$defTempForUser->user_id = \GO::user()->id;
-				$defTempForUser->save();
-			}
 		}
+
+
+		$defTempForUser = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
+		if(!$defTempForUser){
+			$defTempForUser= new \GO\Email\Model\DefaultTemplate();
+			$defTempForUser->user_id = \GO::user()->id;
+			$defTempForUser->save();
+		}
+
 		
-		$this->_defaultTemplate = !empty($defTempForAccount) ? $defTempForAccount : $defTempForUser;
+		$this->_defaultTemplate = !empty($params['account_id']) && $defTempForAccount->template_id ? $defTempForAccount : $defTempForUser;
 		
 		if(isset($params['default_template_id']))
 		{
-			$this->_defaultTemplate->template_id=$params['default_template_id'];
-			$this->_defaultTemplate->save();
+			if ((!empty($params['type']) && $params['type']=='default_for_account') && (!empty($params['account_id']))) {
+				$defTempForAccount->template_id=$params['default_template_id'];
+				$defTempForAccount->save();
+			} else{
+				$defTempForUser->template_id=$params['default_template_id'];
+				$defTempForUser->save();
+			}
 		}
 		
 		$findParams = \GO\Base\Db\FindParams::newInstance()->order('name');			
@@ -173,7 +179,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$response = $store->getData();
 			
 		$response['total']++;
-		$response['results'][] = array('id'=>-1,'name'=>'-- '.\GO::t("User default template", "addressbook").' --','group'=>'','text'=>'','template_id'=>'','checked'=>false);
+		$response['results'][] = array('id'=>0,'name'=>'-- '.\GO::t("User default template", "addressbook").' --','group'=>'','text'=>'','template_id'=>'','checked'=>false);
 		return $response;
 	}
 	
