@@ -1,3 +1,5 @@
+- Calendar: Show week number on mobile views
+
 27-09-2021 6.5.79
 - SMIME: Upgrade could fail with integrity constraint error
 
