@@ -145,6 +145,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	clearState : function() {
 		console.warn("State cleared for " + this.entity.name);
+
 		this.state = null;
 		this.data = {};	
 		
@@ -153,9 +154,13 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		return Promise.all([
 			this.metaStore.clear(),
 			this.stateStore.clear(),
-			this.metaStore.setItem("apiVersion", go.User.apiVersion),
-			this.metaStore.setItem("apiUser", go.User.username)
-		]);
+
+		]).then(() => {
+			return Promise.all([
+				this.metaStore.setItem("apiVersion", go.User.apiVersion),
+				this.metaStore.setItem("apiUser", go.User.username)
+			]);
+		})
 		
 	},
 
