@@ -16148,7 +16148,10 @@ Ext.layout.boxOverflow.Menu = Ext.extend(Ext.layout.boxOverflow.None, {
 
     
     addComponentToMenu : function(menu, component) {
-        if (component instanceof Ext.Toolbar.Separator) {
+
+				if(component.addComponentToMenu) {
+					component.addComponentToMenu(menu, component);
+				} else if (component instanceof Ext.Toolbar.Separator) {
             menu.add('-');
 
         } else if (Ext.isFunction(component.isXType)) {
@@ -17354,7 +17357,9 @@ Ext.layout.ToolbarLayout = Ext.extend(Ext.layout.ContainerLayout, {
 
     
     addComponentToMenu : function(menu, component) {
-        if (component instanceof Ext.Toolbar.Separator) {
+				if(component.addComponentToMenu) {
+					component.addComponentToMenu(menu, component);
+				} else if (component instanceof Ext.Toolbar.Separator) {
             menu.add('-');
 
         } else if (Ext.isFunction(component.isXType)) {

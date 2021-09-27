@@ -28,6 +28,7 @@ ADD COLUMN `valid_until` DATETIME NOT NULL DEFAULT "2000-01-01 11:11:11" AFTER `
 ADD COLUMN `valid_since` DATETIME NOT NULL DEFAULT "2000-01-01 00:00:00" AFTER `valid_until`,
 ADD COLUMN `provided_by` VARCHAR(128) NOT NULL DEFAULT "Unknown" AFTER `valid_since`;';
 
+$updates['202107211515'][] = 'DELETE FROM `smi_account_settings` WHERE account_id NOT IN (SELECT id FROM em_accounts);';
 $updates['202107211515'][] = 'ALTER TABLE `smi_account_settings` 
 ADD CONSTRAINT `fk_account_id_to_email_account`
   FOREIGN KEY (`account_id`)
@@ -35,6 +36,7 @@ ADD CONSTRAINT `fk_account_id_to_email_account`
   ON DELETE CASCADE
   ON UPDATE NO ACTION;';
 
+$updates['202107211515'][] = 'DELETE FROM `smi_pkcs12` WHERE account_id NOT IN (SELECT id FROM em_accounts);';
 $updates['202107211515'][] = 'ALTER TABLE `smi_pkcs12` ADD INDEX `fk_pks_cert_account_id_email_account_idx` (`account_id` ASC);';
 $updates['202107211515'][] = 'ALTER TABLE `smi_pkcs12` 
 ADD CONSTRAINT `fk_pks_cert_account_id_email_account`

@@ -14,7 +14,15 @@ Core: modules can have specific permission types. We use it in the core to allow
       custom fields.
 ----
 
+- Calendar: Show week number on mobile views
+- Tickets: fixed saving rates
+- Email: Wrong template selected in composer
+
+27-09-2021 6.5.79
+- SMIME: Upgrade could fail with integrity constraint error
+
 24-09-2021 6.5.78
+- SMIME: keep multiple certificates so older emails can still be decrypted. Always use newest to encrypt/sign
 - Core: disable selection and delete in grids. Applied to group members and sharing panel.
 - Core: Safari 15 theme color meta tag added
 - Projects2: Time registration dialog filters employees by project

@@ -53,7 +53,7 @@ class AliasController extends \GO\Base\Controller\AbstractModelController {
 		unset($record['signature']);
 		
 		$defaultAccountTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->account_id);
-			if($defaultAccountTemplateModel){
+			if($defaultAccountTemplateModel && $defaultAccountTemplateModel->template_id){
 				$record['template_id']=$defaultAccountTemplateModel->template_id;
 			}else{
 				$defaultUserTemplateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
