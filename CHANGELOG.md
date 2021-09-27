@@ -1,3 +1,6 @@
+27-09-2021 6.5.79
+- SMIME: Upgrade could fail with integrity constraint error
+
 24-09-2021 6.5.78
 - SMIME: keep multiple certificates so older emails can still be decrypted. Always use newest to encrypt/sign
 - Core: disable selection and delete in grids. Applied to group members and sharing panel.
