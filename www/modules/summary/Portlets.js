@@ -50,12 +50,19 @@ GO.mainLayout.onReady(function(){
 									url: GO.url('summary/rssFeed/saveFeeds'),
 									params: params,
 									callback: function(options, success, response){
+
 										if(!success)
 										{
 											Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
 										}else
 										{
 											var responseParams = Ext.decode(response.responseText);
+
+											if(!responseParams.success) {
+												Ext.MessageBox.alert(t("Error"), responseParams.feedback);
+												return;
+											}
+
 											this.WebFeedsGrid.store.reload();
 											this.manageWebFeedsWindow.hide();
 											rssTabPanel.items.each(function(p){ // Walk through tabs
