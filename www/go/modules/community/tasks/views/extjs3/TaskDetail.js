@@ -124,30 +124,6 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			items: items
 		};
 
-		this.buttons = [{
-			iconCls: 'ic-forward',
-			text:t("Continue task", "tasks"),
-			handler:function(){
-				this.continueTaskDialog = new go.modules.community.tasks.ContinueTaskDialog({
-					listeners:{
-						submit:function(){
-							this.reload();
-							var tasksModulePanel =GO.mainLayout.getModulePanel('task');
-							if(tasksModulePanel && tasksModulePanel.rendered){
-								//tasksModulePanel.gridPanel.store.reload();
-							}
-						},
-						scope:this
-					},
-					baseParams:{
-						permissionLevel: GO.permissionLevels.create
-					},
-				});
-				this.continueTaskDialog.load(this.data.id).show();
-			},
-			scope:this
-			//disabled:true
-		}];
 		return new Ext.Toolbar(tbarCfg);
 	}
 });
