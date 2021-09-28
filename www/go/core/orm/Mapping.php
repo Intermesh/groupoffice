@@ -227,9 +227,9 @@ class Mapping {
 	 * If the property does have a primary key. The client can sent it along to retain it. In this case the sort order must
 	 * be stored in an int column. The framework does this automatically when you specify this. See the $options parameter.
 	 *
-	 * @param string $name
-	 * @param string $propertyName
-	 * @param array $keys
+	 * @param string $name Name of the property
+	 * @param string $propertyName The name of the Property model
+	 * @param array $keys The keys of the relation. eg. ['id' => 'articleId']
 	 * @param array $options pass ['orderBy' => 'sortOrder'] to save the sort order in this int column. This property can
 	 *   be a protected property because the client does not need to know of it's existence.
 	 *
