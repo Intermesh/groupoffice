@@ -30,8 +30,8 @@ class Widget extends \GO\Site\Components\Widget {
 			if(empty($this->max_file_size))
 				$this->max_file_size = \GO::config()->max_file_size;
 
-			\Site::scripts()->registerGapiScript('jquery');
-			\Site::scripts()->registerGapiScript('jquery-ui');
+//			\Site::scripts()->registerGapiScript('jquery');
+//			\Site::scripts()->registerGapiScript('jquery-ui');
 
 			$assetUrl = \Site::assetManager()->publish(\GO::config()->root_path.'modules/site/widget/plupload/assets');
 
