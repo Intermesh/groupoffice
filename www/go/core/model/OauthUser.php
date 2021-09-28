@@ -36,6 +36,7 @@ class OauthUser implements UserEntityInterface, ClaimSetInterface
 	public function getClaims()
 	{
 		return [
+			"id" => $this->user->id(),
 			// profile
 			'name' => $this->user->displayName,
 			'family_name' => '',

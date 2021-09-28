@@ -248,14 +248,7 @@ class OAuthController {
 		return $token;
 	}
 
-	/**
-	 * @return MessageTraitAlias
-	 * @throws OAuthServerException
-	 */
-	public function userinfo()
-	{
-		$request = ServerRequest::fromGlobals();
-		$response = new Response();
+	private function validateRequest($request) {
 
 		$accessToken = null;
 		$authorizationHeaders = $request->getHeader('Authorization');
@@ -276,7 +269,17 @@ class OAuthController {
 			throw OAuthServerException::accessDenied('Access token is invalid');
 		}
 
-		$token = $this->validateAccessToken($accessToken);
+		return $this->validateAccessToken($accessToken);
+	}
+	/**
+	 * @return MessageTraitAlias
+	 * @throws OAuthServerException
+	 */
+	public function userinfo()
+	{
+		$token = $this->validateRequest(ServerRequest::fromGlobals());
+
+		$response = new Response();
 
 		$userId = $token->getClaim('sub');
 
@@ -420,4 +423,5 @@ class OAuthController {
 	->addRoute('/token/', 'POST', OAuthController::class, 'token')
 	->addRoute('/\.well-known\/openid-configuration/', 'GET', OAuthController::class, 'openIdConfiguration')
 	->addRoute('/certs/', 'GET', OAuthController::class, 'certs')
+	->addRoute('/jmap/', 'POST', OAuthController::class, 'jmap')
 	->run();
