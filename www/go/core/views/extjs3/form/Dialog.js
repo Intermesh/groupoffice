@@ -14,7 +14,13 @@ go.form.Dialog = Ext.extend(go.Window, {
 	modal: true,
 	maximizable: !GO.util.isMobileOrTablet(),
 	entityStore: null,
+
+	/**
+	 * The current ID of the loaded entity
+	 * @var int
+	 */
 	currentId: null,
+
 	buttonAlign: 'left',
 	layout: "fit",
 	showCustomfields:true,
