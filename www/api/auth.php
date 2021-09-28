@@ -24,7 +24,7 @@ function output($data = [], $status = 200, $statusMsg = null) {
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 	Response::get()->setHeader('Pragma', 'no-cache');
 
-	Response::get()->setStatus($status, $statusMsg);
+	Response::get()->setStatus($status, str_replace("\n", " - " , $statusMsg));
 	Response::get()->sendHeaders();
 
 	go()->getDebugger()->groupEnd();
@@ -56,8 +56,15 @@ function finishLogin(Token $token) {
 
 
 try {
+
+
 //Create the app with the config.php file
 	App::get()->setAuthState(new State());
+
+	if (Request::get()->getMethod() == "OPTIONS") {
+		output();
+	}
+
 	go()->getDebugger()->group("auth");
 	$auth = new Authenticate();
 

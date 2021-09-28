@@ -289,6 +289,12 @@ class Settings extends core\Settings {
 
 
 	/**
+	 * @var string
+	 */
+	public $corsAllowOrigin = "http://localhost:8010";
+
+
+	/**
 	 * Keep log in core_change for this number of days.
 	 * 
 	 * When a client has not logged in for this period the sync data will be deleted and resynchronized.

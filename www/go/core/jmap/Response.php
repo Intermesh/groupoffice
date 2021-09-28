@@ -24,6 +24,7 @@ class Response extends \go\core\http\Response {
 	protected function sendSecurityHeaders()
 	{
 		//no headers needed for JMAP
+		$this->sendCorsHeaders();
 	}
 
 	/**
