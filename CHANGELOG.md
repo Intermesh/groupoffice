@@ -1,3 +1,4 @@
+- Comments: fixed comment panel not loading the last items when more than 40
 - Calendar: Show week number on mobile views
 - Tickets: fixed saving rates
 - Email: Wrong template selected in composer
