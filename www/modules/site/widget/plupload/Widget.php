@@ -42,9 +42,9 @@ class Widget extends \GO\Site\Components\Widget {
 			\Site::scripts()->registerScriptFile($assetUrl.'/assets/js/jquery.plupload.queue/jquery.plupload.queue.js'); 
 
 			$langFile = '/assets/js/i18n/'.\GO::language()->getLanguage().'.js';
-//			if(file_exists(\Site::assetManager()->getBasePath().$langFile)){
+			if(file_exists(\Site::assetManager()->getBasePath().$langFile)){
 				\Site::scripts()->registerScriptFile($assetUrl.$langFile); 
-//			}
+			}
 		}
 		catch(\Exception $e){
 			echo '<h2 style="color:red;">AN ERROR HAS OCCURED</h2>';
