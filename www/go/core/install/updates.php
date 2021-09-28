@@ -943,3 +943,4 @@ $updates['202105111132'][] = "alter table core_auth_token
 
 $updates['202107010929'][] = "alter table core_auth_token modify userAgent varchar(190) null;";
 $updates['202107010929'][] = "alter table core_customfields_field modify relatedFieldCondition text default null;";
+$updates['202109280842'][] = "alter table core_user modify username varchar(190) not null;";
