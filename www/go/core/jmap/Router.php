@@ -252,8 +252,18 @@ class Router {
 		$arrayMode = false;
 		while ($part = array_shift($pathParts)) {
 			if ($part == '*') {
+				$ret = [];
 				foreach ($result as $val) {
-					$ret[] = $this->resolvePath($pathParts, $val);
+					$res = $this->resolvePath($pathParts, $val);
+					// According to JMAP spec:
+					// If the result of applying the rest of the pointer tokens to each item was itself an array, the contents of
+					// this array are added to the output rather than the array itself (i.e., the result is flattened from an
+					// array of arrays to a single array).
+					if(is_array($res)) {
+						$ret = array_merge($ret, $res);
+					} else {
+						$ret[] = $res;
+					}
 				}
 				return $ret;
 			}
