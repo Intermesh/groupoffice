@@ -5,6 +5,7 @@
 - Summary: Fix for ssrf vulnerability CVE-2021-28060
 - Core: username raised to 190 characters
 - Tickets: Filter agents
+- Core: pwa display mode changed to minimal-ui on ios so downloads work better :(
 
 27-09-2021 6.5.79
 - SMIME: Upgrade could fail with integrity constraint error
