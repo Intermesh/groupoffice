@@ -8,6 +8,7 @@ use GO\Base\Util\Number;
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
+use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\InvalidResultReference;
 use go\core\orm\EntityType;
 use JsonSerializable;
@@ -104,9 +105,7 @@ class Router {
 				$error["trace"] = explode("\n", $e->getTraceAsString());
 			}
 		
-			Response::get()->addResponse([
-					'error', $error
-			]);
+			Response::get()->addError($error);
 		} catch (\Throwable $e) {
 			$error = ["message" => $e->getMessage()];
 			
@@ -209,6 +208,12 @@ class Router {
 		$controllerMethod = $this->findControllerAction($method);
 		$controller = new $controllerMethod[0];
 
+		if(!isset($params)) {
+			$params = [];
+		} else if(!is_array($params)) {
+			throw new InvalidArguments("params argument should be an object with {key: value}");
+		}
+
 		$params = $this->resolveResultReferences($params);
 
 		return call_user_func([$controller, $controllerMethod[1]], $params);
@@ -219,6 +224,7 @@ class Router {
 	 * @param type $params
 	 */
 	private function resolveResultReferences($params) {
+
 		foreach ($params as $name => $resultReference) {
 			if (substr($name, 0, 1) == '#') {
 				$result = $this->findResultOf($resultReference['resultOf']);
