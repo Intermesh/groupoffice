@@ -76,14 +76,14 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return bool
 	 * @throws Exception
 	 */
-	private function saveAcl() {
+	protected function saveAcl() {
 		if(!isset($this->setAcl)) {
 			return true;
 		}
 
-		$a = $this->findAcl();
-
 		$this->checkManagePermission();
+
+		$a = $this->findAcl();
 
 		foreach($this->setAcl as $groupId => $level) {
 			$a->addGroup($groupId, $level);
@@ -197,7 +197,10 @@ abstract class AclOwnerEntity extends AclEntity {
 		$this->{static::$aclColumnName} = $this->acl->id;
 	}
 
-
+	protected function isAclChanged()
+	{
+		return $this->isModified([static::$aclColumnName]);
+	}
 
 	private function setAclProps() {
 		$aclColumn = $this->getMapping()->getColumn(static::$aclColumnName);
@@ -365,7 +368,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	public static function findAcls() {
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
-		return (new Query)->selectSingleValue(static::$aclColumnName)->from($firstTable->getName());
+		return (new Query)->selectSingleValue(static::$aclColumnName)->distinct()->from($firstTable->getName());
 	}
 	
 	public function findAclId() {
@@ -390,6 +393,16 @@ abstract class AclOwnerEntity extends AclEntity {
 		parent::check();
 	}
 
+	/**
+	 * Executed when a database check is performed
+	 *
+	 * It registers the table and for which entity the acl is used and updates the ownedBy from
+	 * createdBy if present.
+	 *
+	 * When ACL's are no longer used they may be cleaned up.
+	 *
+	 * @throws \go\core\exception\ConfigurationException
+	 */
 	public static function checkAcls() {
 		$table = static::getMapping()->getPrimaryTable();
 
@@ -418,15 +431,33 @@ abstract class AclOwnerEntity extends AclEntity {
 			$updates['acl.ownedBy'] = new Expression('coalesce(entity.createdBy, 1)');
 		}
 
+		$updateQuery = static::getCheckAclUpdateQuery();
+
 		$stmt = go()->getDbConnection()->update(
 			'core_acl',
 			$updates,
-			(new Query())
-				->tableAlias('acl')
-				->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id'));
+			$updateQuery);
 
 		if(!$stmt->execute()) {
 			throw new Exception("Could not update ACL");
 		}
+	}
+
+	/**
+	 * Builds the query to update ACL's on the database check
+	 *
+	 * @return Query
+	 * @throws Exception
+	 */
+	protected static function getCheckAclUpdateQuery() {
+		$table = static::getMapping()->getPrimaryTable();
+		$updateQuery = 	(new Query())
+			->tableAlias('acl')
+			->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id');
+		return $updateQuery;
+	}
+
+	protected function removeAclOnDelete() {
+		return true;
 	}
 }

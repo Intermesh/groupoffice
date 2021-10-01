@@ -3,6 +3,7 @@
 namespace go\modules\community\history\model;
 
 use GO\Base\Db\ActiveRecord;
+use go\core\acl\model\AclEntity;
 use go\core\db\Criteria;
 use go\core\http\Request;
 use go\core\http\Response;
@@ -207,7 +208,7 @@ class LogEntry extends AclOwnerEntity {
 		$this->entityTypeId = $entity->entityType()->getId();
 		$this->entity = $entity->entityType()->getName();
 		$this->entityId = $entity->id();
-		$this->removeAcl = $entity instanceof AclOwnerEntity || ($entity instanceof ActiveRecord && !$entity->IsJoinedAclField);
+		$this->removeAcl = ($entity instanceof AclEntity && $entity->removeAclOnDelete()) || ($entity instanceof ActiveRecord && !$entity->IsJoinedAclField);
 		$this->description = $entity->title();
 		$this->cutPropertiesToColumnLength();
 		$this->setAclId($entity->findAclId());

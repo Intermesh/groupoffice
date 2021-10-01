@@ -11,6 +11,13 @@ use go\core\model\Acl;
 abstract class AclEntity extends Entity {
 
 
+	/**
+	 * Fires when the ACL has changed.
+	 *
+	 * Not when changes were made to the acl but when the complete list has been replaced when for example
+	 * a contact has been moved to another address book.	 *
+	 */
+	const EVENT_ACL_CHANGED = 'aclchanged';
 
 	protected $permissionLevel;
 	
@@ -143,6 +150,28 @@ abstract class AclEntity extends Entity {
 							static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
 						});
 	}
+
+
+	/**
+	 * Return true when the ACL of the entity changes so the EVENT_ACL_CHANGED event will fire
+	 *
+	 * @return boolean
+	 */
+	abstract protected function isAclChanged();
+
+	protected function internalSave()
+	{
+		if(!$this->isNew() && $this->isAclChanged()) {
+			static::fireEvent(self::EVENT_ACL_CHANGED, $this);
+		}
+
+		return parent::internalSave();
+	}
+
+	protected function removeAclOnDelete() {
+		return false;
+	}
+
 
 	/**
 	 * Get the table alias holding the aclId
