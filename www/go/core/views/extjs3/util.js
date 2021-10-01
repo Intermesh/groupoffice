@@ -334,9 +334,9 @@ go.util =  (function () {
 
 		viewFile : function(url) {
 
-			if(Ext.isSafari && window.navigator.standalone) {
-				url = "filewrap.php?url=" + encodeURIComponent(url);
-			}
+			// if(Ext.isSafari && window.navigator.standalone) {
+			// 	url = "filewrap.php?url=" + encodeURIComponent(url);
+			// }
 
 			const win = window.open(url);
 
@@ -356,14 +356,14 @@ go.util =  (function () {
 		 * @param {string} url
 		 */
 		downloadFile: function(url) {
-			if(Ext.isSafari && window.navigator.standalone) {
-				//somehow this is the only way a download works on a web application on the iphone.
-				const win = window.open("filewrap.php?url=" + encodeURIComponent(url));
-				win.focus();
-
-
-			} else
-			{
+			// if(Ext.isSafari && window.navigator.standalone) {
+			// 	//somehow this is the only way a download works on a web application on the iphone.
+			// 	const win = window.open("filewrap.php?url=" + encodeURIComponent(url));
+			// 	win.focus();
+			//
+			//
+			// } else
+			// {
 				// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
 				if(!downloadFrame) {
 					// downloadFrame = document.createElement('iframe');
@@ -378,7 +378,7 @@ go.util =  (function () {
 				// downloadFrame.src = url;
 				downloadFrame.href = url;
 				downloadFrame.click();
-			}
+			 // }
 
 		},
 		
