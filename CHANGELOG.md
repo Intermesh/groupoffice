@@ -1,3 +1,4 @@
+04-10-2021 6.5.80
 - Comments: fixed comment panel not loading the last items when more than 40
 - Calendar: Show week number on mobile views
 - Tickets: fixed saving rates
