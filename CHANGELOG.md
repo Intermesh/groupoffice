@@ -6,6 +6,7 @@
 - Core: username raised to 190 characters
 - Tickets: Filter agents
 - Core: pwa display mode changed to minimal-ui on ios so downloads work better :(
+- Tickets: Replace {ticket:rate}
 
 27-09-2021 6.5.79
 - SMIME: Upgrade could fail with integrity constraint error
