@@ -106,7 +106,7 @@ if(go()->getSettings()->logoId) {
 
 <div class="toolbar">
 <button onclick="window.close()"><i class="icon">close</i>Close</button>
-<a class="button" href="<?= $url; ?>" download><i class="icon">save</i>Download</a>
+<a class="button" target="_blank" href="<?= $url; ?>" ><i class="icon">save</i>Download</a>
 </div>
 
 <div style="top: 48px;left:0;right:0;bottom:0;position:absolute">

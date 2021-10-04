@@ -8,6 +8,7 @@ use GO\Base\Util\Number;
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
+use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\InvalidResultReference;
 use go\core\orm\EntityType;
 use JsonSerializable;
@@ -104,9 +105,7 @@ class Router {
 				$error["trace"] = explode("\n", $e->getTraceAsString());
 			}
 		
-			Response::get()->addResponse([
-					'error', $error
-			]);
+			Response::get()->addError($error);
 		} catch (\Throwable $e) {
 			$error = ["message" => $e->getMessage()];
 			
@@ -209,6 +208,12 @@ class Router {
 		$controllerMethod = $this->findControllerAction($method);
 		$controller = new $controllerMethod[0];
 
+		if(!isset($params)) {
+			$params = [];
+		} else if(!is_array($params)) {
+			throw new InvalidArguments("params argument should be an object with {key: value}");
+		}
+
 		$params = $this->resolveResultReferences($params);
 
 		return call_user_func([$controller, $controllerMethod[1]], $params);
@@ -219,6 +224,7 @@ class Router {
 	 * @param type $params
 	 */
 	private function resolveResultReferences($params) {
+
 		foreach ($params as $name => $resultReference) {
 			if (substr($name, 0, 1) == '#') {
 				$result = $this->findResultOf($resultReference['resultOf']);
@@ -252,8 +258,18 @@ class Router {
 		$arrayMode = false;
 		while ($part = array_shift($pathParts)) {
 			if ($part == '*') {
+				$ret = [];
 				foreach ($result as $val) {
-					$ret[] = $this->resolvePath($pathParts, $val);
+					$res = $this->resolvePath($pathParts, $val);
+					// According to JMAP spec:
+					// If the result of applying the rest of the pointer tokens to each item was itself an array, the contents of
+					// this array are added to the output rather than the array itself (i.e., the result is flattened from an
+					// array of arrays to a single array).
+					if(is_array($res)) {
+						$ret = array_merge($ret, $res);
+					} else {
+						$ret[] = $res;
+					}
 				}
 				return $ret;
 			}

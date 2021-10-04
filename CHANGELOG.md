@@ -1,3 +1,4 @@
+
 XX-09-20216.6.10
 - Time Registration: Filter employees on currently selected date instead of current date
 - Projects: Time entries - filter employees on current project ID
@@ -14,12 +15,16 @@ Core: modules can have specific permission types. We use it in the core to allow
       custom fields.
 ----
 
+04-10-2021 6.5.80
+- Comments: fixed comment panel not loading the last items when more than 40
 - Calendar: Show week number on mobile views
 - Tickets: fixed saving rates
 - Email: Wrong template selected in composer
 - Summary: Fix for ssrf vulnerability CVE-2021-28060
 - Core: username raised to 190 characters
 - Tickets: Filter agents
+- Core: pwa display mode changed to minimal-ui on ios so downloads work better :(
+- Tickets: Replace {ticket:rate}
 
 27-09-2021 6.5.79
 - SMIME: Upgrade could fail with integrity constraint error

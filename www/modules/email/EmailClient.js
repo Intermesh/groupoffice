@@ -1537,7 +1537,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 					// }
 
 					if(go.Modules.isAvailable('legacy', 'files')) {
-						return GO.files.openEmailAttachment(attachment, panel, false);
+						return GO.files.openEmailAttachment(attachment, panel, GO.util.isMobileOrTablet());
 					} else {
 						go.util.viewFile(attachment.url);
 					}
