@@ -1,4 +1,7 @@
-13-11-2021 6.4.244
+6.4.245
+- Savemailas: override mtime to email date
+
+13-09-2021 6.4.244
 - Savemailas: Fixed check database for email links
 
 30-08-2021 6.4.243

@@ -164,7 +164,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		if(go.Entities.get(this.entityStore).customFields) {
 			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
 			fieldsets.forEach(function(fs) {
-				//console.log(fs);
+				console.log(fs);
 				if(fs.fieldSet.isTab) {
 					fs.title = null;
 					fs.collapsible = false;
@@ -175,8 +175,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 						items: [fs]
 					});
 					this.addPanel(pnl);
-				}else
-				{
+				} else {
 					items.push(fs);
 				}
 			}, this);
@@ -425,10 +424,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 				return true;
 			}
 		});
-
-		fieldSet.show();
-		fieldSet.setDisabled(false);
-
+		if(fieldSet) {
+			fieldSet.show();
+			fieldSet.setDisabled(false);
+		}
 
 		// Focus make server side errors dissappear 
 		// firstFieldWithError.focus();

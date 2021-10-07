@@ -65,14 +65,19 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			this.doLayout();
 		}, this);
 
-		this.on("afterrender", this.onAfterRender, this);
+		this.on("added", function() {
+			var me = this;
+			setTimeout(function() {
+				me.setupFilter();
+			},0);
+		}, this);
 
 		go.customfields.FormFieldSet.superclass.initComponent.call(this);
 	},
 
-	onAfterRender: function() {
+	setupFilter: function() {
 		//find entity panel
-		var form = this.findParentByType("form"), me = this;
+		var form = this.findParentByType("form");
 
 		this.formTabPanel = this.findParentByType('tabpanel');
 
@@ -80,14 +85,12 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			console.error("No go.form.EntityPanel found for filtering");
 			return;
 		}
-
 		var me = this;
 
 		//Add a beforeaction event listener that will send the custom field data JSON encoded.
 		//The old framework will use this to save custom fields.
 		if (!form.changeListenersAdded) {
-
-			form.changeListenersAdded  = true;
+			form.changeListenersAdded = true;
 
 			if (form.getXType() == "entityform") {
 
@@ -98,8 +101,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 				this.filter(form.getValues());
 				form.isValid();
-
-
 
 				form.getForm().items.each(function (field)  {
 					field.on('change',function(field) {
@@ -145,7 +146,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				});
 			}
 
-
 		}
 
 		if (form.getXType() != "entityform") {
@@ -166,7 +166,11 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	 * @returns {undefined}
 	 */
 	filter: function (entity) {
+		console.log(this.fieldSet.filter);
 		for (var name in this.fieldSet.filter) {
+			if(name == 'isOrganization') {
+				debugger;
+			}
 			var v = this.fieldSet.filter[name];
 
 			if (Ext.isArray(v)) {
@@ -174,8 +178,8 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					this.setFilterVisible(false);
 					return;
 				}
-			} else
-			{
+			} else {
+				// debugger;
 				if (v != entity[name]) {
 					this.setFilterVisible(false);
 					return;
@@ -184,7 +188,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		}		
 		this.setFilterVisible(true);
 	},
-	
+
 	setFilterVisible : function(v) {
 		//disable recursive so validators don't apply on hidden items
 		function setDisabled(ct, v) {
