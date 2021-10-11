@@ -58,7 +58,14 @@ try {
 
 		$blob = Blob::fromTmp($tmpFile);
 		$blob->name = $filename;
-		$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModified'));
+		
+		// Some files come without X-File-LastModified header. Assigning current time to those without
+                if (Request::get()->getHeader('X-File-LastModified')=='') {
+                        $blob->modifiedAt = new \go\core\util\DateTime('@' . time());			
+                } else {
+                        $blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModified'));
+                }
+                
 		//$blob->type = Request::get()->getContentType(); cant be trusted use extension instead
 	}
 
