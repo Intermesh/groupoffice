@@ -379,8 +379,10 @@ class File extends Base{
 			}
 		}else
 		{		
-			if(rename($this->path, $newPath))
-			{
+                        $success = file_exists($newPath) || ($this->copy($destination, $newFileName) != false);
+                        if($success)
+                        {
+                                $this->delete();
 				$this->path = $newPath;
 				return true;
 			}
