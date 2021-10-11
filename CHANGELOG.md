@@ -1,3 +1,6 @@
+6.5.81 
+- Calendar: If not empty, show location data for all-day events in month and day grids
+
 04-10-2021 6.5.80
 - Comments: fixed comment panel not loading the last items when more than 40
 - Calendar: Show week number on mobile views
