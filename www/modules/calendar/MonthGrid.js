@@ -579,40 +579,18 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 					}
 				}
 
-				if(obj.isCopy)
-				{
-					if(calendar_visible)
-					{
-//						if(event.repeats)
-//						{
+				if(obj.isCopy) {
+					if(calendar_visible) {
 							this.store.reload();
-//						}else
-//						{
-//							var newEvent = GO.util.clone(event);
-
-//							delete(newEvent.id);
-//
-//							newEvent.event_id = new_event_id;
-//							newEvent.startDate = Date.parseDate(newEvent.start_time, this.dateTimeFormat).add(Date.DAY, obj.offset);
-//							newEvent.endDate = Date.parseDate(newEvent.end_time, this.dateTimeFormat).add(Date.DAY, obj.offset);
-//							newEvent.start_time=newEvent.startDate.format(this.dateTimeFormat);
-//							newEvent.end_time=newEvent.endDate.format(this.dateTimeFormat);
-//
-//							this.addMonthGridEvent(newEvent);
-//						}
 					}
-				}else
-				{
-					if(obj.repeats)
-					{
+				}else {
+					if(obj.repeats) {
 						this.store.reload();
-					}else
-					{
+					}else {
 						this.removeEvent(event.domId);
 						delete event.domId;
 
-						if(calendar_visible)
-						{							
+						if(calendar_visible) {
 							event.startDate = Date.parseDate(event.start_time, this.dateTimeFormat).add(Date.DAY, obj.offset);
 							event.endDate = Date.parseDate(event.end_time, this.dateTimeFormat).add(Date.DAY, obj.offset);
 							event.start_time=event.startDate.format(this.dateTimeFormat);
@@ -633,8 +611,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 	
 	addMonthGridEvent : function (eventData)
 	{
-		if(eventData.id  == undefined)
-		{
+		if(eventData.id  == undefined) {
 			eventData.id = this.nextId++;
 		}
 		//the start of the day the event starts
@@ -676,20 +653,17 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 
 			var col = Ext.get('d'+date.format('Ymd'));
 
-			if(col)
-			{
+			if(col) {
 				var text = '';
 				if(GO.calendar.showStatuses && !GO.util.empty(eventData.status_color))
 					text += '<span class="x-calGrid-event-status" style="background-color:#'+eventData.status_color+';"></span>';				
 
 				if(daySpan==1){
-					if(GO.util.empty(eventData.all_day_event))
-					{
+					if(GO.util.empty(eventData.all_day_event)) {
 						text += eventData.startDate.format(GO.settings.time_format)+'&nbsp;';
 					}
 					text += eventData['name'];
-				}else
-				{
+				} else {
 					if(i==0){
 						text += '<div class="cal-arrow-left"></div>'
 						if(GO.util.empty(eventData.all_day_event))
@@ -697,8 +671,9 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 						text += eventData['name'];
 					}else if(i==daySpan-1){
 						text += eventData['name']+'&nbsp;';
-						if(GO.util.empty(eventData.all_day_event))
+						if(GO.util.empty(eventData.all_day_event)) {
 							text += eventData.endDate.format(GO.settings.time_format);
+						}
 						text += '<div class="cal-arrow-right"></div>';
 					}else
 					{
@@ -708,9 +683,9 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 				
 				var cls = "x-calGrid-month-event-container cal-event-partstatus-"+eventData.partstatus;
 
-//				if(eventData.link_count>0){
-//					cls +=' cal-has-links'
-//				}
+				if(!Ext.isEmpty(eventData.location)) {
+					text += " @ " + eventData.location;
+				}
 
 				if(eventData.link_count>0){
 					text +='<span class="cal-has-links"></span>';
@@ -738,72 +713,57 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 				};
 				
 				var dateStr = date.format('Ymd');
-				if(!this.gridEvents[dateStr])
-				{
+				if(!this.gridEvents[dateStr]) {
 					this.gridEvents[dateStr]=[];
 				}
 				
 				var eventBefore = false;
 				
-				if(eventData.all_day_event){
+				if(eventData.all_day_event) {
 					for(var x=0;x<this.gridEvents[dateStr].length;x++){
 						var domId = this.gridEvents[dateStr][x].id;
 						var existingEvent = this.remoteEvents[domId];
-	//					console.log(d.name+" "+d.startDate+' > '+eventData.name+" "+eventData.startDate);
 						if(existingEvent && existingEvent.name>eventData.name){
 							eventBefore=Ext.get(domId);
 							break;
 						}
 					}
 				}
-				
-				
-				var event = eventBefore ? Ext.DomHelper.insertBefore(eventBefore,	domCfg, true) : Ext.DomHelper.append(col,	domCfg, true);
 
-				
+				var event = eventBefore ? Ext.DomHelper.insertBefore(eventBefore,	domCfg, true) : Ext.DomHelper.append(col,	domCfg, true);
 
 				this.gridEvents[dateStr].push(event);
 
 				this.registerEvent(eventData.domId, eventData);
 
-				//if(!eventData.read_only)
-				//{
-					event.on('click', function(e, eventEl){
-						eventEl = Ext.get(eventEl).findParent('div.x-calGrid-month-event-container', 2, true);
+				event.on('click', function(e, eventEl){
+					eventEl = Ext.get(eventEl).findParent('div.x-calGrid-month-event-container', 2, true);
 
-						this.selectEventElement(eventEl);
-						this.clickedEventId=eventEl.id;
+					this.selectEventElement(eventEl);
+					this.clickedEventId=eventEl.id;
 
-						e.stopEvent();
-					}, this);
-				//}
+					e.stopEvent();
+				}, this);
 
 				event.on('dblclick', function(e, eventEl){
 
 					eventEl = Ext.get(eventEl).findParent('div.x-calGrid-month-event-container', 2, true);
 
-//					this.clickedEventId=eventEl.id;
-
-					//this.eventDoubleClicked=true;
 					var event = this._elementToEvent(eventEl);
 
-					if(event['repeats'] && this.writePermission)
-					{
-//						if(!event.read_only)
-							this.handleRecurringEvent("eventDblClick", event, {});
-					}else
-					{
+					if(event['repeats'] && this.writePermission) {
+						this.handleRecurringEvent("eventDblClick", event, {});
+					} else {
 						this.fireEvent("eventDblClick", this, event, {
 							singleInstance : this.writePermission
-							});
+						});
 					}
 					
 					e.stopEvent();
 
 				}, this);
 
-				event.on('contextmenu', function(e, eventEl)
-				{
+				event.on('contextmenu', function(e, eventEl) {
 					var container = Ext.get(eventEl).findParent('div.x-calGrid-month-event-container', 2, true);
 
 					this.selectEventElement(container);
@@ -820,15 +780,15 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 							this.taskContextMenu.showAt(e.getXY());
 						}
 					} else {
-	//					var event = this._elementIdToEvent(this.clickedEventId);
 						this.showContextMenu(e, theEventData);
 					}
 				},this);
 			}
 		}
 
-		if(!this.loading)
+		if(!this.loading) {
 			this.checkOverflow();
+		}
 
 		return domIds;
 	},
@@ -849,13 +809,10 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 	removeEvent : function(domId){
 		var ids = this.getRelatedDomElements(domId);
 
-		if(ids)
-		{
-			for(var i=0;i<ids.length;i++)
-			{
+		if(ids) {
+			for(var i=0;i<ids.length;i++) {
 				var el = Ext.get(ids[i]);
-				if(el)
-				{
+				if(el) {
 					el.removeAllListeners();
 					el.remove();
 				}
@@ -866,25 +823,20 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 		this.checkOverflow();
 	},
 
-	unregisterDomId : function(domId)
-	{
+	unregisterDomId : function(domId) {
 		delete this.remoteEvents[domId];
 
 		var found = false;
 
-		for(var e in this.domIds)
-		{
-			for(var i=0;i<this.domIds[e].length;i++)
-			{
-				if(this.domIds[e][i]==domId)
-				{
+		for(var e in this.domIds) {
+			for(var i=0;i<this.domIds[e].length;i++) {
+				if(this.domIds[e][i]==domId) {
 					this.domIds[e].splice(i,1);
 					found=true;
 					break;
 				}
 			}
-			if(found)
-			{
+			if(found) {
 				break;
 			}
 		}
@@ -904,12 +856,10 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 		this.currentFireEvent=fireEvent;
 		this.currentActionData = actionData;
 
-		if(!this.recurrenceDialog)
-		{
+		if(!this.recurrenceDialog) {
 			this.recurrenceDialog = new GO.calendar.RecurrenceDialog();
 
-			this.recurrenceDialog.on('single', function()
-			{
+			this.recurrenceDialog.on('single', function() {
 				this.currentActionData.singleInstance=true;
 
 				var remoteEvent = this.currentRecurringEvent;
@@ -917,8 +867,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 
 				var domIds=[];
 
-				if(this.currentActionData.offsetDays)
-				{
+				if(this.currentActionData.offsetDays) {
 					this.removeEvent(remoteEvent.domId);
 					newEvent.repeats=false;
 					newEvent.startDate = newEvent.startDate.add(Date.DAY, this.currentActionData.offsetDays);
@@ -933,8 +882,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 				this.recurrenceDialog.hide();
 			},this)
 
-			this.recurrenceDialog.on('thisandfuture', function()
-			{
+			this.recurrenceDialog.on('thisandfuture', function() {
 				this.currentActionData.singleInstance= true;
 				this.currentActionData.thisAndFuture = true;
 
@@ -942,16 +890,14 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 				this.recurrenceDialog.hide();
 			},this)
 
-			this.recurrenceDialog.on('entire', function()
-			{
+			this.recurrenceDialog.on('entire', function() {
 				this.currentActionData.singleInstance=false;
 
 				this.fireEvent(this.currentFireEvent, this, this.currentRecurringEvent, this.currentActionData);
 				this.recurrenceDialog.hide();
 			},this)
 
-			this.recurrenceDialog.on('cancel', function()
-			{
+			this.recurrenceDialog.on('cancel', function() {
 				this.recurrenceDialog.hide();
 				this.reload();
 			},this)
@@ -996,13 +942,10 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 		this.periodDisplay=this.configuredDate.format('F, Y');
 
 
-		if(this.loadRequired || (!oldEndDate || !oldStartDate || oldEndDate.getElapsed(this.endDate)!=0 || oldStartDate.getElapsed(this.startDate)!=0))
-		{
-			if(load)
-			{
+		if(this.loadRequired || (!oldEndDate || !oldStartDate || oldEndDate.getElapsed(this.endDate)!=0 || oldStartDate.getElapsed(this.startDate)!=0)) {
+			if(load) {
 				this.store.reload();
-			}else
-			{
+			} else {
 				this.loadRequired=true;
 			}
 		}
@@ -1020,11 +963,6 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 
 	reload : function()
 	{
-		/*this.clearGrid();
-  	if(!this.monthView)
-  	{
-  		this.createHeadings();
-  	}    	*/
 		this.load();
 	},
 
@@ -1074,12 +1012,6 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 	{
 		this.remoteEvents[domId]=eventData;
 		this.remoteEventsById[eventData.id]=eventData;
-	/*if(!this.eventIdToDomId[eventData.event_id])
-		{
-			this.eventIdToDomId[eventData.event_id]=[];
-		}
-		this.eventIdToDomId[eventData.event_id].push(domId);*/
-
 	},
 
 	getEventDomElements : function(id)
@@ -1091,14 +1023,12 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 	{
 		var eventData = this.remoteEvents[eventDomId];
 
-		if(!eventData)
-		{
+		if(!eventData) {
 			return false;
 		}
 		var domElements = this.getEventDomElements(eventData.id);
 
-		if(!domElements)
-		{
+		if(!domElements) {
 			domElements = [eventDomId];
 		}
 		return domElements;
@@ -1133,8 +1063,7 @@ Ext.extend(GO.calendar.dd.MonthDragZone, Ext.dd.DragZone, {
 		if(!this.monthGrid.writePermission || this.monthGrid.remoteEvents[this.dragData.item.id]['private'] || this.monthGrid.remoteEvents[this.dragData.item.id]['read_only'])
 		{
 			return false;
-		}else
-		{
+		}else {
 			this.ddel.innerHTML = this.dragData.item.dom.innerHTML;
 			this.ddel.className = this.dragData.item.dom.className;
 			this.ddel.style.width = this.dragData.item.getWidth() + "px";
@@ -1214,11 +1143,9 @@ Ext.extend(GO.calendar.dd.MonthDragZone, Ext.dd.DragZone, {
 		return data.item.getXY();
 	},
 	getDragData: function(e) {
-		if(!this.monthGrid.writePermission)
-		{
+		if(!this.monthGrid.writePermission) {
 			return false;
-		}else
-		{
+		} else {
 			var target = Ext.get(e.getTarget());
 
 			if(target.hasClass('x-calGrid-month-event-container') && this.monthGrid.remoteEvents[target.id]['read_only'])
@@ -1235,8 +1162,7 @@ Ext.extend(GO.calendar.dd.MonthDragZone, Ext.dd.DragZone, {
 					item:target,
 					dragDate: dragDate
 				};
-			}else
-			{
+			} else {
 				return false;
 			}
 		}
@@ -1250,11 +1176,9 @@ GO.calendar.dd.MonthDropTarget = function(el, config) {
 Ext.extend(GO.calendar.dd.MonthDropTarget, Ext.dd.DropTarget, {
 	notifyDrop: function(dd, e, data) {
 		var remoteEvent = this.scope._elementIdToEvent(data.item.id);
-		if(!this.scope.writePermission || remoteEvent.read_only)
-		{
+		if(!this.scope.writePermission || remoteEvent.read_only) {
 			return false;
-		}else
-		{
+		}else {
 			var target = Ext.get(e.getTarget()).findParent('div.cal-monthGrid-cell', 3, true);
 
 			data.dropDate = Date.parseDate(target.id.substr(1),'Ymd');
@@ -1264,10 +1188,8 @@ Ext.extend(GO.calendar.dd.MonthDropTarget, Ext.dd.DropTarget, {
 			this.el.removeClass(this.overClass);
 			target.appendChild(data.item);
 
-			if(this.onNotifyDrop)
-			{
-				if(!this.scope)
-				{
+			if(this.onNotifyDrop) {
+				if(!this.scope) {
 					this.scope=this;
 				}
 
@@ -1281,28 +1203,22 @@ Ext.extend(GO.calendar.dd.MonthDropTarget, Ext.dd.DropTarget, {
 	notifyOver : function(dd, e, data){
 		var tdOver = Ext.get(e.getTarget()).findParent('div.cal-monthGrid-cell', 3, true);
 
-		if(tdOver)
-		{
-			if(dd.lastTdOverId!=tdOver.id)
-			{
+		if(tdOver) {
+			if(dd.lastTdOverId!=tdOver.id) {
 				var currentTd=tdOver;
-				for(var i=0;i<dd.proxyDragPos;i++)
-				{
-					if(currentTd)
-					{
+				for(var i=0;i<dd.proxyDragPos;i++) {
+					if(currentTd) {
 						var nextTd = currentTd.prev('div.cal-monthGrid-cell');
 						currentTd = nextTd;
 					}
-					if(nextTd)
-					{
+					if(nextTd) {
 						dd.eventProxies[i].insertAfter(nextTd.first());
 						dd.eventProxies[i].setStyle({
 							'position' : 'static',
 							'top': '',
 							'display':'block'
 						});
-					}else
-					{
+					}else {
 						dd.eventProxies[i].setStyle({
 							'position' : 'absolute',
 							'top':-10000,
@@ -1313,25 +1229,21 @@ Ext.extend(GO.calendar.dd.MonthDropTarget, Ext.dd.DropTarget, {
 
 				dd.eventProxies[i].insertAfter(tdOver.first());
 				var currentTd=tdOver;
-				for(var i=dd.proxyDragPos+1;i<dd.eventProxies.length;i++)
-				{
-					if(currentTd)
-					{
+				for(var i=dd.proxyDragPos+1;i<dd.eventProxies.length;i++) {
+					if(currentTd) {
 						var nextTd = currentTd.next('div.cal-monthGrid-cell');
 
 						currentTd = nextTd;
 					}
 
-					if(nextTd)
-					{
+					if(nextTd) {
 						dd.eventProxies[i].insertAfter(nextTd.first());
 						dd.eventProxies[i].setStyle({
 							'position' : 'static',
 							'top': '',
 							'display':'block'
 						});
-					}else
-					{
+					}else {
 						dd.eventProxies[i].setStyle({
 							'position' : 'absolute',
 							'top':-10000,

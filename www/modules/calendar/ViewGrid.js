@@ -230,15 +230,14 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
            
 				
 		var timeOfDay = {
-							'allday': t("Day", "calendar"),
-              'morning': t("Morning", "calendar"),
-              'afternoon': t("Afternoon", "calendar"),
-              'evening': t("Evening", "calendar")
-            };
+			'allday': t("Day", "calendar"),
+			'morning': t("Morning", "calendar"),
+			'afternoon': t("Afternoon", "calendar"),
+			'evening': t("Evening", "calendar")
+        };
 						
 		//for(var calendar_id in this.jsonData)
-		for(var i=0,max=this.jsonData.results.length;i<max;i++)
-		{
+		for(var i=0,max=this.jsonData.results.length;i<max;i++) {
 			
 			var gridRow =  Ext.DomHelper.append(this.tbody,
 			{
@@ -385,25 +384,6 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 				break;
 			}
 		}
-		
-	/*found=false;
-		
-		for(var e in this.eventIdToDomId)
-		{
-			for(var i=0;i<this.eventIdToDomId[e].length;i++)
-			{
-				if(this.eventIdToDomId[e][i]==domId)
-				{
-					this.eventIdToDomId[e].splice(i,1);
-					found=true;
-					break;
-				}
-			}
-			if(found)
-			{
-				break;
-			}
-		}*/
 	},
 	
 	setNewEventId : function(domIds, new_event_id){
@@ -634,8 +614,7 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 	
 	addViewGridEvent : function (eventData)
 	{
-		if(eventData.id  == undefined)
-		{
+		if(eventData.id  == undefined) {
 			eventData.id = this.nextId++;
 		}		
 		
@@ -651,8 +630,7 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 		var daySpan = Math.round((eventEndTime-eventStartTime)/86400)+1;
 		
 		var domIds=[];;
-		for(var i=0;i<daySpan;i++)
-		{
+		for(var i=0;i<daySpan;i++) {
 			var date = eventStartDay.add(Date.DAY, i);
 			
 			
@@ -661,10 +639,8 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 			domIds.push(domId);
 			
 			//related events for dragging
-			if(daySpan>1)
-			{
-				if(!this.domIds[eventData.id])
-				{
+			if(daySpan>1) {
+				if(!this.domIds[eventData.id]) {
 					this.domIds[eventData.id]=[];
 				}				
 				this.domIds[eventData.id].push(domId);
@@ -691,9 +667,9 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 			
 				var cls = "x-viewGrid-event-container  cal-event-partstatus-"+eventData.partstatus;
 
-//				if(eventData.link_count>0){
-//					cls +=' cal-has-links'
-//				}
+				if(!Ext.isEmpty(eventData.location)) {
+					text += " @ " + eventData.location;
+				}
 
 				if(eventData.link_count>0){
 					text +='<span class="cal-has-links"></span>';
@@ -1006,13 +982,6 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 	registerEvent : function(domId, eventData)
 	{
 		this.remoteEvents[domId]=eventData;
-  	
-	/*if(!this.domIds[eventData.event_id])
-		{
-			this.domIds[eventData.event_id]=[];
-		}
-	
-		this.domIds[eventData.event_id].push(domId);*/
 	},
   
 	getEventDomElements : function(id)
@@ -1041,24 +1010,7 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 	{
 		this.remoteEvents[elementId].domId=elementId;
 		return this.remoteEvents[elementId];
-	}/*,
-
-    // private
-    destroy : function(){
-    	
-    	this.store.un("beforeload", this.reload, this);
-        this.store.un("datachanged", this.reload, this);
-        this.store.un("clear", this.reload, this);
-        
-        this.el.update('');
-		
-		GO.grid.CalendarGrid.superclass.destroy.call(this);
-		
-		delete this.el;
-		this.rendered=false;
-		
-    }*/
-
+	}
 });
 
 
@@ -1265,7 +1217,6 @@ Ext.extend(GO.calendar.dd.ViewDropTarget, Ext.dd.DropTarget, {
 					}
 		        	
 					tdOver.insertFirst(dd.eventProxies[i]);
-					//dd.eventProxies[i].insertAfter(tdOver.first());
 					var currentTd=tdOver;
 					for(var i=dd.proxyDragPos+1;i<dd.eventProxies.length;i++)
 					{

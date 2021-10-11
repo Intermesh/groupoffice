@@ -168,25 +168,11 @@ GO.calendar.MainPanel = function(config){
 	});
 
 	this.calendarsStore.on('load', function(){
-		if(this.state.displayType!='view' && this.group_id==1)
-		{
-			/*var record = this.calendarsStore.getById(this.state.calendars[0]);
-			if(!record)
-			{
-				record = this.calendarsStore.getAt(0);				
-			}*/
-			//this.state.calendars = [record.data.id];
+		if(this.state.displayType!='view' && this.group_id==1) {
 			this.state.applyFilter=true;
 			this.setDisplay(this.state);
 		}
 	}, this);
-
-//	if(go.Modules.isAvailable("legacy", "projects")){
-//		this.projectCalendarsStore.on('load', function(){
-//			this.projectCalendarsList.setVisible(this.projectCalendarsStore.data.length);
-//			this.calendarListPanel.doLayout();
-//		}, this);
-//	}
 
 	this.viewsStore.on('load', function(){
 		this.viewsList.setVisible(this.viewsStore.data.length);
