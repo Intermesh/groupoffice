@@ -185,16 +185,22 @@ class Instance extends Entity {
 	}
 	
 	private function getDbName() {
-		return str_replace(['.','-'], '_', $this->hostname);
+		return str_replace(['.','-'], '_', $this->hostname);		
 	}
 
 	private function getStudioPackage() {
 		return str_replace('-', "", explode(".", $this->hostname)[0]);
 	}
 	
-	private function getDbUser() {
-		return substr($this->getDbName(), 0, 16);
+	private function getDbUser() {		
+		return substr($this->getDbName(), 0, 10).rand(5, 9999);
 	}
+
+        private function getDbUserFromConfig() {
+                $config=$this->getInstanceConfig();
+                return $config["db_user"];
+        }
+
 	
 	protected function internalSave() {		
 		
@@ -697,7 +703,7 @@ class Instance extends Entity {
 				}
 				$instance->getDataFolder()->move($dest);
 			
-				$instance->dropDatabaseUser($instance->getDbUser());
+				$instance->dropDatabaseUser($instance->getDbUserFromConfig());
 				$instance->dropDatabase($instance->getDbName());
 			}catch(Exception $e) {
 				ErrorHandler::log("Error deleting instance: ". $instance->hostname);
