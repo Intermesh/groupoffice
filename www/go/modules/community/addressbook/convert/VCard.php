@@ -487,6 +487,8 @@ class VCard extends AbstractConverter {
 	protected function nextImportRecord()
 	{
 		$this->card = $this->splitter->getNext();
+		
+		if (!isset($this->card->VERSION)) return false;
 
 		if ($this->card->VERSION != "3.0") {
 			$this->card = $this->card->convert(\Sabre\VObject\Document::VCARD30);
