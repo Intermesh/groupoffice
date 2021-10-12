@@ -24,6 +24,9 @@ class Category extends Entity {
 	/** @var int could be NULL for global categories */
 	public $ownerId;
 
+	/** @var int when not null this category is only visible when the tasklist is selected (no ACL checking allowed)  */
+	public $tasklistId;
+
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("tasks_category", "category");
@@ -56,7 +59,13 @@ class Category extends Entity {
 		return parent::defineFilters()
 			->add('ownerId', function(Criteria $criteria, $value) {
 				$criteria->where('ownerId', '=', $value)->orWhere('ownerId', 'IS', null);
-			});
+			})
+			->add('tasklistId', function(Criteria $criteria, $value) {
+				if($value !== null) {
+					$criteria->where('tasklistId', '=', $value);
+				}
+				$criteria->orWhere('tasklistId', '=', null);
+			}, null);
 	}
 
 }

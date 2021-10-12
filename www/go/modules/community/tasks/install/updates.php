@@ -121,3 +121,13 @@ $updates['202107251024'][] = "ALTER TABLE `tasks_category` CHANGE COLUMN `create
 $updates['202107251024'][] = "ALTER TABLE `tasks_category` ADD CONSTRAINT `tasks_category_ibfk_1` FOREIGN KEY (`ownerId`) REFERENCES `core_user` (`id`);";
 
 $updates['202108101005'][] = "ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS `location` TEXT NULL;";
+
+$updates['202109301005'][] = "ALTER TABLE `tasks_category`
+ADD COLUMN `tasklistId` INT(11) NULL DEFAULT NULL AFTER `ownerId`,
+ADD INDEX `tasks_category_tasklist_ibfk_9_idx` (`tasklistId` ASC);";
+
+$updates['202109301006'][] = "ALTER TABLE `tasks_category`
+ADD CONSTRAINT `tasks_category_tasklist_ibfk_9`
+  FOREIGN KEY (`tasklistId`)
+  REFERENCES `tasks_tasklist` (`createdBy`)
+  ON DELETE CASCADE;";

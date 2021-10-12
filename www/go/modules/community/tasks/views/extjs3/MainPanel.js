@@ -516,9 +516,17 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	},
 
+
+	filterCategories : function(ids) {
+		var filter = !ids.length ? null : {tasklistId: ids};
+		this.categoriesGrid.store.setFilter('tasklist',filter).load();
+	},
+
 	onTasklistSelectionChange : function (ids, sm) {
 
 		this.checkCreateTaskList();
+
+		this.filterCategories(ids);
 
 		this.taskGrid.store.setFilter("role", ids.length == 0 ? {role:  go.modules.community.tasks.listTypes.List} : null);
 
