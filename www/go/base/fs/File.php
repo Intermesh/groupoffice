@@ -352,9 +352,7 @@ class File extends Base{
 	 */
 	public function move(Base $destination, $newFileName=false, $isUploadedFile=false,$appendNumberToNameIfDestinationExists=false){
 
-		if ($destination->exists()) {
-			throw new Exception("File exists in move!");
-		}
+
 
 		if($destination->isFile()){
 			$newFileName=$destination->name();
@@ -371,6 +369,10 @@ class File extends Base{
 			$file = new File($newPath);
 			$file->appendNumberToNameIfExists();
 			$newPath = $file->path();
+		} else{
+			if (file_exists($newPath)) {
+				throw new \Exception("File exists in move!");
+			}
 		}
 		
 		if($isUploadedFile){
@@ -385,7 +387,7 @@ class File extends Base{
 		{
 			try {
 				$success = rename($this->path, $newPath);
-			} catch(Exception $e) {
+			} catch(\Exception $e) {
 				//renaming across partitions doesn't work
 				$success = $this->copy($destination, $newFileName) != false;
 				if($success) {

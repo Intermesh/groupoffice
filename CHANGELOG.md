@@ -15,7 +15,7 @@ Core: modules can have specific permission types. We use it in the core to allow
       custom fields.
 ----
 
-6.5.81
+18-10-2021 6.5.81
 - Calendar: If not empty, show location data for all-day events in month and day grids
 - Linked email: set cdate and mdate for linked emails to IMAP send date.
 - Studio: add 'Duplicate' button.
@@ -25,6 +25,10 @@ Core: modules can have specific permission types. We use it in the core to allow
 - Files: Move file to another partition could fail
 - Core: Check if last modified header is present on file upload
 - Core: Foo/get response returns results sorted by the ids param
+- Files: Fixed thumbnailer
+- Core: Fixed search multiple terms in older modules
+- Tickets: Fixed {ticket:rate} template tag
+- Email: Fixed email display issue
 
 04-10-2021 6.5.80
 - Comments: fixed comment panel not loading the last items when more than 40
