@@ -9,6 +9,7 @@
 - Core: Check if last modified header is present on file upload
 - Core: Foo/get response returns results sorted by the ids param
 - Files: Fixed thumbnailer
+- Tickets: Fixed {ticket:rate} template tagdsfdshf
 
 
 04-10-2021 6.5.80
