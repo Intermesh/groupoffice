@@ -2,6 +2,12 @@
 - Calendar: If not empty, show location data for all-day events in month and day grids
 - Linked email: set cdate and mdate for linked emails to IMAP send date. 
 - Studio: add 'Duplicate' button.
+- Core: Made sure no newlines are set in the HTTP status header text.
+- Email: Fixed spelling error in IMAP authentication failure
+- Address book: Check for vcard version on import
+- Files: Move file to another partition could fail
+- Core: Check if last modified header is present on file upload
+- Core: Foo/get response returns results sorted by the ids param
 
 04-10-2021 6.5.80
 - Comments: fixed comment panel not loading the last items when more than 40
