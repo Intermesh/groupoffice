@@ -1140,11 +1140,21 @@ END;
 
 		);
 
+//		 $html = "<div onclick=\"yo\" online='1' test='onclick' onclick=\"yo\"></div>\n\n\n" . $html;
+
 		$html = preg_replace($to_removed_array, '', $html);
 		//Remove any attribute starting with "on" or xmlns. Had to do this always becuase many mails contain weird tags like online="1".
 		//These were detected as xss attacks by detectXSS().
-		$html = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>\s]+([^>]*+>)#iu', '$1$2', $html);
-	
+
+//		$regex = '#(<[^>\s]*)\s(?:on|xmlns)[^>\s]+#iu';
+//		preg_match_all($regex, $html, $matched_tags, PREG_SET_ORDER);
+//		preg_replace($regex, '$1', $html);
+
+		$html = preg_replace_callback('#<([^>]+)>#u', function($matches) {
+			return "<" . preg_replace('#\s(?:on|xmlns)[^\s]+#iu', "", $matches[1]) . ">";
+		}, $html);
+
+
 		//remove high z-indexes
 		$matched_tags = array();
 		preg_match_all( "/(z-index)[\s]*:[\s]*([0-9]+)[\s]*/u", $html, $matched_tags, PREG_SET_ORDER );
