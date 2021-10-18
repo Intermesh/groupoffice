@@ -11,6 +11,7 @@ use go\core\model\Token;
 use go\core\jmap\Request;
 use go\core\http\Response;
 use go\core\model\User;
+use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 
 /**
@@ -230,5 +231,8 @@ try {
 	output([], 503, $e->getMessage());
 } catch (Exception $e) {
 	ErrorHandler::logException($e);
-	output([], 500, $e->getMessage());
+
+	// make sure there's no newline in the status text
+	$text = StringUtil::normalizeCrlf($e->getMessage(), " - ");
+	output([], 500, $text);
 }

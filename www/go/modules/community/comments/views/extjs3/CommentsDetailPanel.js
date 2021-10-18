@@ -56,6 +56,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				{name: "labels", type: "relation"}
 			],
 			entityStore: "Comment",
+			baseParams: {sort: [{property: "date", isAscending:false}]},
 			remoteSort: true
 		});
 		
@@ -146,9 +147,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 		var badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
 		this.setTitle(t("Comments") + badge);
-		var prevStr;
-	//	this.initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight;
-		 this.initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
+		var prevStr = null;
+
+		var dom = this.commentsContainer.getEl().dom;
+		this.curScrollPos = dom.scrollTop;
+		this.curScrollHeight = dom.scrollHeight;// - dom.clientHeight;
 
 		this.commentsContainer.removeAll();
 
@@ -208,19 +211,19 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			// 	cls: 'go-html-formatted ' + mineCls,
 			// 	html: "<div class='content'>" + r.get('text') + "</div><div class='tags "+mineCls+"'>"+labelText+"</div>"
 			// });
-			this.commentsContainer.add({
+			this.commentsContainer.insert(0,{
 				xtype:"container",
 				cls:'go-messages',
 				items: [{
-						xtype:'box',
-						autoEl: 'h6',
-						hidden: prevStr == go.util.Format.date(r.get('date')),
-						html: go.util.Format.date(r.get('date'))
-					},{
-						xtype:'container',
-						autoEl: {tag: 'div','title': qtip},
-						items: [avatar,readMore]
-					}
+					xtype:'container',
+					autoEl: {tag: 'div','title': qtip},
+					items: [avatar,readMore]
+				},{
+					xtype:'box',
+					autoEl: 'h6',
+					hidden: prevStr === null || prevStr == go.util.Format.date(r.get('date')),
+					html: prevStr//go.util.Format.date(r.get('date'))
+				}
 				]
 			});
 			readMore.on('render',function(me){me.getEl().on("contextmenu", function(e, target, obj){
@@ -236,22 +239,14 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		}, this);
 		
 		this.doLayout();
-		var height = 7; // padding on composer
-		this.commentsContainer.items.each(function(item,i) {
-			height += item.getOuterSize().height;
-		});
-		var _this = this;
-		setTimeout(function(){
-			
-
-			_this.body.setHeight(Math.max(50,Math.min(_this.growMaxHeight,height + _this.composer.getHeight())));
-			_this.doLayout();
-			_this.scrollDown();
-		});
+		this.scrollDown();
 
 	},
 	scrollDown : function() {
-		var scroll = this.commentsContainer.getEl();
-		scroll.scroll("b", this.initScrollTop + (scroll.dom.scrollHeight));
+		var dom = this.commentsContainer.getEl().dom;
+		dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
+
+		//console.log(scroll.dom.scrollTop, scroll.dom.scrollHeight, this.initScrollHeight, this.initScrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
+		//scroll.scroll("b", scroll.dom.scrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
 	}
 });

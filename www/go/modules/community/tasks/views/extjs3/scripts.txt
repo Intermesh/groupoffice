@@ -2,7 +2,6 @@ Module.js
 MainPanel.js
 TasklistsGrid.js
 TaskGrid.js
-ContinueTaskDialog.js
 CategoriesGrid.js
 CategoryDialog.js
 TaskDetail.js

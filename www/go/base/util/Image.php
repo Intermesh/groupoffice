@@ -58,6 +58,9 @@ class Image {
 		}
 		
 		$image_info = getimagesize($filename);
+		if(!$image_info) {
+			return false;
+		}
 		$this->image_type = $image_info[2];
 		
 		$this->_original_filename=$filename;

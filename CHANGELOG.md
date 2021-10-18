@@ -1,3 +1,4 @@
+
 XX-09-20216.6.10
 - Time Registration: Filter employees on currently selected date instead of current date
 - Projects: Time entries - filter employees on current project ID
@@ -14,7 +15,37 @@ Core: modules can have specific permission types. We use it in the core to allow
       custom fields.
 ----
 
+18-10-2021 6.5.81
+- Calendar: If not empty, show location data for all-day events in month and day grids
+- Linked email: set cdate and mdate for linked emails to IMAP send date.
+- Studio: add 'Duplicate' button.
+- Core: Made sure no newlines are set in the HTTP status header text.
+- Email: Fixed spelling error in IMAP authentication failure
+- Address book: Check for vcard version on import
+- Files: Move file to another partition could fail
+- Core: Check if last modified header is present on file upload
+- Core: Foo/get response returns results sorted by the ids param
+- Files: Fixed thumbnailer
+- Core: Fixed search multiple terms in older modules
+- Tickets: Fixed {ticket:rate} template tag
+- Email: Fixed email display issue
+
+04-10-2021 6.5.80
+- Comments: fixed comment panel not loading the last items when more than 40
+- Calendar: Show week number on mobile views
+- Tickets: fixed saving rates
+- Email: Wrong template selected in composer
+- Summary: Fix for ssrf vulnerability CVE-2021-28060
+- Core: username raised to 190 characters
+- Tickets: Filter agents
+- Core: pwa display mode changed to minimal-ui on ios so downloads work better :(
+- Tickets: Replace {ticket:rate}
+
+27-09-2021 6.5.79
+- SMIME: Upgrade could fail with integrity constraint error
+
 24-09-2021 6.5.78
+- SMIME: keep multiple certificates so older emails can still be decrypted. Always use newest to encrypt/sign
 - Core: disable selection and delete in grids. Applied to group members and sharing panel.
 - Core: Safari 15 theme color meta tag added
 - Projects2: Time registration dialog filters employees by project

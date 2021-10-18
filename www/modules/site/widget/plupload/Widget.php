@@ -30,8 +30,8 @@ class Widget extends \GO\Site\Components\Widget {
 			if(empty($this->max_file_size))
 				$this->max_file_size = \GO::config()->max_file_size;
 
-			\Site::scripts()->registerGapiScript('jquery');
-			\Site::scripts()->registerGapiScript('jquery-ui');
+//			\Site::scripts()->registerGapiScript('jquery');
+//			\Site::scripts()->registerGapiScript('jquery-ui');
 
 			$assetUrl = \Site::assetManager()->publish(\GO::config()->root_path.'modules/site/widget/plupload/assets');
 
@@ -42,9 +42,9 @@ class Widget extends \GO\Site\Components\Widget {
 			\Site::scripts()->registerScriptFile($assetUrl.'/assets/js/jquery.plupload.queue/jquery.plupload.queue.js'); 
 
 			$langFile = '/assets/js/i18n/'.\GO::language()->getLanguage().'.js';
-//			if(file_exists(\Site::assetManager()->getBasePath().$langFile)){
+			if(file_exists(\Site::assetManager()->getBasePath().$langFile)){
 				\Site::scripts()->registerScriptFile($assetUrl.$langFile); 
-//			}
+			}
 		}
 		catch(\Exception $e){
 			echo '<h2 style="color:red;">AN ERROR HAS OCCURED</h2>';

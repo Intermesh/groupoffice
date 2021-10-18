@@ -333,7 +333,19 @@ go.util =  (function () {
 		},
 
 		viewFile : function(url) {
-			window.open(url);
+
+			// if(Ext.isSafari && window.navigator.standalone) {
+			// 	url = "filewrap.php?url=" + encodeURIComponent(url);
+			// }
+
+			const win = window.open(url);
+
+			if(!win) {
+				Ext.Msg.alert(t("Error"), t("Could not open a window. Please allow popup windows in your browser."))
+				return;
+			}
+			win.focus();
+
 		},
 
 		/**
@@ -342,13 +354,14 @@ go.util =  (function () {
 		 * @param {string} url
 		 */
 		downloadFile: function(url) {
-			if(window.navigator.standalone) {
-				//somehow this is the only way a download works on a web application on the iphone.
-				var win = window.open( "about:blank", "_system");
-				win.focus();
-				win.location = url;
-			} else
-			{
+			// if(Ext.isSafari && window.navigator.standalone) {
+			// 	//somehow this is the only way a download works on a web application on the iphone.
+			// 	const win = window.open("filewrap.php?url=" + encodeURIComponent(url));
+			// 	win.focus();
+			//
+			//
+			// } else
+			// {
 				// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
 				if(!downloadFrame) {
 					// downloadFrame = document.createElement('iframe');
@@ -363,7 +376,7 @@ go.util =  (function () {
 				//downloadFrame.src = url;
 				downloadFrame.href = url;
 				downloadFrame.click();
-			}
+			 // }
 
 		},
 		
@@ -383,7 +396,7 @@ go.util =  (function () {
 			let doc = new DOMParser().parseFromString(html, 'text/html');
 			return doc.body.textContent || "";
 		},
-		
+
 		addSlashes : function( str ) {
 			return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 		},

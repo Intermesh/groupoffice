@@ -49,16 +49,17 @@ go.browserStorage = {
 							 }).catch(function(error) {
 								 console.error("Upgrade failed. Deleting database and disabling storage.");
 								 me.enabled = true;
-								 me.deleteDatabase();
-								 me.enabled = false;
-								 reject(error);
+								 me.deleteDatabase().then(() => {
+									 me.enabled = false;
+									 reject(error);
+								 });
 							 });
 						 }
 
 						 openreq.result.onversionchange = function(e) {
 							 console.warn("Version change");
-							 openreq.result.close();
 							 me.conn = null;
+							 openreq.result.close();
 						 }
 						 resolve(openreq.result);
 					 }

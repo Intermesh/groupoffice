@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `smi_account_settings` (
     `account_id` int(11) NOT NULL,
     `always_sign` tinyint(1) NOT NULL,
     PRIMARY KEY (`account_id`),
-    CONSTRAINT `fk_account_id_to_email_account`
+    CONSTRAINT `fk_smi_settings_account_id_to_email_account`
         FOREIGN KEY (`account_id`)
             REFERENCES `em_accounts` (`id`)
             ON DELETE CASCADE

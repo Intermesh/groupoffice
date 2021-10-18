@@ -314,7 +314,10 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	},
 	
 	refreshActiveDisplayPanels : function(){
-		var activeTab = GO.mainLayout.tabPanel.getActiveTab();			
+		var activeTab = GO.mainLayout.tabPanel.getActiveTab();
+		if(!activeTab) {
+			return true;
+		}
 		var dp = activeTab.findBy(function(comp){
 			if(comp.isDisplayPanel)
 				return true;
