@@ -98,7 +98,7 @@ class Imap extends ImapBodyStruct {
 //		}
 
 		if(empty($password)){
-			throw new ImapAuthenticationFailedException('Authententication failed for user '.$username.' on IMAP server '.$this->server);
+			throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
 		}
 
 		$this->ssl = $ssl;
@@ -269,7 +269,7 @@ class Imap extends ImapBodyStruct {
 //				if(!\GO::config()->debug)
 //					$this->errors[]=$response;
 
-				throw new ImapAuthenticationFailedException('Authententication failed for user '.$username.' on IMAP server '.$this->server."\n\n".$response);
+				throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
 
 			}
 		}

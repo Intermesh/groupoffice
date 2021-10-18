@@ -168,10 +168,11 @@ class Response extends Singleton{
 
 	/**
 	 * Set HTTP status header
-	 * 
+	 *
 	 * @param int $httpCode
+	 * @param string|null $text Status text. May not contain new lines in headers.
 	 */
-	public function setStatus($httpCode, $text = null) {
+	public function setStatus($httpCode, string $text = null) {
 
 		if (!isset($text)) {
 			$text = http\Exception::$codes[$httpCode];
