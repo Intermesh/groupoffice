@@ -281,9 +281,11 @@ class Store extends AbstractStore {
 		//When you start a query with a wildcard mysql can't use indexes.
 		//Correction: users can't live without the wildcard at the start.
 		
-		if(!empty($requestParams['query']))
-			$findParams->searchQuery ('%'.preg_replace ('/[\s*]+/','%', $requestParams['query']).'%');
-		
+		if(!empty($requestParams['query'])) {
+//			$findParams->searchQuery ('%'.preg_replace ('/[\s*]+/','%', $requestParams['query']).'%');
+			$findParams->searchQuery(preg_replace('/[\s*]+/', ' ', $requestParams['query']));
+		}
+
 		if(isset($requestParams['limit']))
 			$findParams->limit ($requestParams['limit']);
 		else
