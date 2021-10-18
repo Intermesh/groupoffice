@@ -1,4 +1,4 @@
-6.5.81 
+18-10-2021 6.5.81
 - Calendar: If not empty, show location data for all-day events in month and day grids
 - Linked email: set cdate and mdate for linked emails to IMAP send date. 
 - Studio: add 'Duplicate' button.
