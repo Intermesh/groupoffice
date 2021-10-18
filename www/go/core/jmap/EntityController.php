@@ -346,6 +346,11 @@ abstract class EntityController extends Controller {
 		if(isset($params['ids']) && !is_array($params['ids'])) {
 			throw new InvalidArguments("ids must be of type array");
 		}
+
+		if(!empty($params['ids'])) {
+			$params['ids'] = array_unique($params['ids']);
+		}
+
 		if(!isset($params['properties'])) {
 			$params['properties'] = [];
 		}
@@ -406,14 +411,23 @@ abstract class EntityController extends Controller {
 
 		$query = $this->getGetQuery($p);
 
-		$foundIds = [];
+		$unsorted = [];
 		$result['list'] = [];
 		foreach($query as $e) {
 			$arr = $e->toArray();
 			$arr['id'] = $e->id();
-			$result['list'][] = $arr;
+			$unsorted[$arr['id']] = $arr;
 			$foundIds[] = $arr['id'];
 		}
+
+		if(!empty($p['ids'])) {
+			$result['list'] = array_map(function ($v) use ($unsorted) {
+				return $unsorted[$v];
+			}, $p['ids']);
+		} else{
+			$result['list'] = array_values($unsorted);
+		}
+
 
 		$result['notFound'] = isset($p['ids']) ? array_values(array_diff($p['ids'], $foundIds)) : [];
 
