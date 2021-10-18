@@ -128,7 +128,7 @@ class Version extends \GO\Base\Db\ActiveRecord {
 			$quotaUser->calculatedDiskUsage(0 - $this->size_bytes)->save(true); //user quota
 		}
 
-		\GO::config()->save_setting("file_storage_usage", \GO::config()->get_setting('file_storage_usage', 0, 0) - $this->size_bytes);
+		\GO::config()->save_setting("file_storage_usage", (int) \GO::config()->get_setting('file_storage_usage', 0, 0) - $this->size_bytes);
 
 		return parent::beforeDelete();
 	}

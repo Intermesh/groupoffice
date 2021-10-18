@@ -826,7 +826,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 						if(currentEndRow>-1) {
 							domIds.push(this.addGridEvent(eventData, i, currentStartRow, currentEndRow, recalculateAppointments));
 						}
-					} else {
+					}else {
 						domIds.push(this.addAllDayEvent(eventData, i, i));
 					}
 				}
