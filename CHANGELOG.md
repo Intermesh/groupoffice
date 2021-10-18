@@ -11,7 +11,7 @@
 - Files: Fixed thumbnailer
 - Core: Fixed search multiple terms in older modules
 - Tickets: Fixed {ticket:rate} template tag
-
+- Email: Fixed email display issue
 
 04-10-2021 6.5.80
 - Comments: fixed comment panel not loading the last items when more than 40
