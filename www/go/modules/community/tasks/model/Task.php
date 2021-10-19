@@ -7,7 +7,7 @@
 
 namespace go\modules\community\tasks\model;
 
-use go\core\acl\model\AclItemEntity;
+use go\core\acl\model\AclInheritEntity;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
@@ -23,7 +23,7 @@ use go\modules\community\tasks\convert\VCalendar;
 /**
  * Task model
  */
-class Task extends AclItemEntity {
+class Task extends AclInheritEntity {
 
 	const PRIORITY_LOW = 9;
 	const PRIORITY_HIGH = 1;

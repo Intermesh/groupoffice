@@ -131,3 +131,16 @@ ADD CONSTRAINT `tasks_category_tasklist_ibfk_9`
   FOREIGN KEY (`tasklistId`)
   REFERENCES `tasks_tasklist` (`createdBy`)
   ON DELETE CASCADE;";
+
+
+
+$updates['202110191314'][] = "alter table tasks_task
+	add aclId int null;";
+
+$updates['202110191314'][] = "update tasks_task t set t.aclId = (select aclId from tasks_tasklist where id = t.tasklistId);";
+
+$updates['202110191314'][] = "alter table tasks_task
+	add constraint tasks_task_core_acl_id_fk
+		foreign key (aclId) references core_acl (id);";
+
+
