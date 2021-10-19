@@ -1,6 +1,9 @@
 <?php
 namespace go\core\util;
 
+use go\core\ErrorHandler;
+use InvalidArgumentException;
+
 class JSON {
   /**
    * Encode data to JSON
@@ -25,44 +28,42 @@ class JSON {
    * 
    * @return string
    */
-  public static function encode($value, $options = 0, $depth = 512) {
-    $string = json_encode($value, $options);
-		
-    if($string === false) {
-        self::handleEncodeError($value);
+  public static function encode($value, int $options = 0, int $depth = 512): string
+  {
+    $string = json_encode($value, $options, $depth);
+
+    if($string === false && json_last_error() == JSON_ERROR_UTF8) {
+
+			ErrorHandler::log("JSON had invalid UTF8 characters. Trying to cleanup.");
+	    //try to clean up data
+	    $value = self::cleanup($value);
+	    $string = json_encode($value, $options, $depth);
+    }
+
+	  if($string === false) {
+		   $error = "JSON encoding error: " . json_last_error_msg() .".";
+			 throw new InvalidArgumentException($error);
     }
     
     return $string;
   }
 
-  private static function handleEncodeError($data) {
-    $error = "JSON encoding error: " . json_last_error_msg() .".";
-
-    $string = var_export($data, true);
-    $regex = '/(
-      [\xC0-\xC1] # Invalid UTF-8 Bytes
-      | [\xF5-\xFF] # Invalid UTF-8 Bytes
-      | \xE0[\x80-\x9F] # Overlong encoding of prior code point
-      | \xF0[\x80-\x8F] # Overlong encoding of prior code point
-      | [\xC2-\xDF](?![\x80-\xBF]) # Invalid UTF-8 Sequence Start
-      | [\xE0-\xEF](?![\x80-\xBF]{2}) # Invalid UTF-8 Sequence Start
-      | [\xF0-\xF4](?![\x80-\xBF]{3}) # Invalid UTF-8 Sequence Start
-      | (?<=[\x00-\x7F\xF5-\xFF])[\x80-\xBF] # Invalid UTF-8 Sequence Middle
-      | (?<![\xC2-\xDF]|[\xE0-\xEF]|[\xE0-\xEF][\x80-\xBF]|[\xF0-\xF4]|[\xF0-\xF4][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF]{2})[\x80-\xBF] # Overlong Sequence
-      | (?<=[\xE0-\xEF])[\x80-\xBF](?![\x80-\xBF]) # Short 3 byte sequence
-      | (?<=[\xF0-\xF4])[\x80-\xBF](?![\x80-\xBF]{2}) # Short 4 byte sequence
-      | (?<=[\xF0-\xF4][\x80-\xBF])[\x80-\xBF](?![\x80-\xBF]) # Short 4 byte sequence (2)
-    )/x';
-
-    if(preg_match($regex, $string, $matches, PREG_OFFSET_CAPTURE)) {
-      $pos = $matches[0][1];
-      $fragment = mb_substr($string, max(0, $pos - 50), 100);
-
-      $error .= "\nFound invalid UTF-8: " . $fragment;
-    }
-
-    throw new \InvalidArgumentException($error);
-  }
+	/**
+	 * In some cases there can be invalid characters inside the data
+	 * @param $mixed
+	 *
+	 * @return array|mixed|string
+	 */
+	private static function cleanup( $mixed ) {
+		if (is_array($mixed)) {
+			foreach ($mixed as $key => $value) {
+				$mixed[$key] = self::cleanup($value);
+			}
+		} elseif (is_string($mixed)) {
+			return StringUtil::cleanUtf8($mixed);
+		}
+		return $mixed;
+	}
 
 /**
  * Wrapper for json_decode that throws when an error occurs.
@@ -70,14 +71,14 @@ class JSON {
  * @param string $json    JSON data to parse
  * @param bool $assoc     When true, returned objects will be converted
  *                        into associative arrays.
- * @param int    $depth   User specified recursion depth.
- * @param int    $options Bitmask of JSON decode options.
+ * @param int $depth   User specified recursion depth.
+ * @param int $options Bitmask of JSON decode options.
  *
  * @return mixed
  * @throws \InvalidArgumentException if the JSON cannot be decoded.
  * @link http://www.php.net/manual/en/function.json-decode.php
  */
-  public static function decode($json, $assoc = false, $depth = 512, $options = 0) {
+  public static function decode(string $json, bool $assoc, int $depth = 512, int $options = 0) {
     $data = \json_decode($json, $assoc, $depth, $options);
     if (JSON_ERROR_NONE !== json_last_error()) {
         throw new \InvalidArgumentException(
