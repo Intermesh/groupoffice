@@ -1,5 +1,6 @@
 - Core: cleanup response data if json_encode fails with UTF8 error
 - Leavedays: upon migration, make sure that project employee data is used. If not, perform migration as if the projects module is not installed.
+- Leavedays: fix work hour rendering in leave day dialog
 
 18-10-2021 6.5.81
 - Calendar: If not empty, show location data for all-day events in month and day grids
