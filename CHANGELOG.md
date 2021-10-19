@@ -15,6 +15,8 @@ Core: modules can have specific permission types. We use it in the core to allow
       custom fields.
 ----
 
+- Core: cleanup response data if json_encode fails with UTF8 error
+
 18-10-2021 6.5.81
 - Calendar: If not empty, show location data for all-day events in month and day grids
 - Linked email: set cdate and mdate for linked emails to IMAP send date.

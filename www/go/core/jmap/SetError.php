@@ -2,6 +2,8 @@
 namespace go\core\jmap;
 
 class SetError extends \go\core\data\Model {
+
+	const ERROR_SERVER_FAIL = "serverFail";
 	
 	public function __construct($type, $description = null, $properties = null) {
 		$this->type = $type;

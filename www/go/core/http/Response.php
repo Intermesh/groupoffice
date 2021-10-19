@@ -4,6 +4,8 @@ namespace go\core\http;
 
 use DateTime;
 use go\core\http;
+use go\core\jmap\ProblemDetails;
+use go\core\jmap\SetError;
 use go\core\Singleton;
 use go\core\util\StringUtil;
 use go\core\util\JSON;
@@ -319,9 +321,16 @@ class Response extends Singleton{
 	public function output($data = null) {
 		if (isset($data)) {
 			if(is_array($data)) {
-				$data = JSON::encode($data);
-				if(!$this->getHeader('content-type')) {
+				if (!$this->getHeader('content-type')) {
 					$this->setContentType('application/json; charset=UTF-8');
+				}
+
+				try {
+					$data = JSON::encode($data);
+
+				} catch(\Exception $e) {
+					$error = new ProblemDetails(SetError::ERROR_SERVER_FAIL, 500, $e->getMessage());
+					$data = JSON::encode($error);
 				}
 			} 
 			$this->sendHeaders();
