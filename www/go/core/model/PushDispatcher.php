@@ -36,7 +36,7 @@ class PushDispatcher
 
 		if(isset($types)) {
 			$entityNames = explode(",", $_GET['types']);
-			$query->where('e.name', 'IN', $entityNames);
+			$query->where('e.clientName', 'IN', $entityNames);
 		}
 		$entities = EntityType::findAll($query);
 		foreach($entities as $e) {
