@@ -1,4 +1,5 @@
 - Core: cleanup response data if json_encode fails with UTF8 error
+- Core: fix translation sir / madam in translation
 - Leavedays: upon migration, make sure that project employee data is used. If not, perform migration as if the projects module is not installed.
 - Leavedays: fix work hour rendering in leave day dialog
 - Leavedays: fix error message in leave day model
