@@ -944,3 +944,6 @@ $updates['202105111132'][] = "alter table core_auth_token
 $updates['202107010929'][] = "alter table core_auth_token modify userAgent varchar(190) null;";
 $updates['202107010929'][] = "alter table core_customfields_field modify relatedFieldCondition text default null;";
 $updates['202109280842'][] = "alter table core_user modify username varchar(190) not null;";
+
+// use photoBlobId in user profile as avatarId for User
+$updates['202110211653'][] = "UPDATE core_user u JOIN addressbook_contact c ON c.goUserId = u.id SET u.avatarId = c.photoBlobId WHERE u.avatarId IS NULL AND c.photoBlobId IS NOT NULL;";
