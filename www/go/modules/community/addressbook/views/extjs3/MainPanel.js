@@ -68,6 +68,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 	createAddressBookTree : function() {
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
 			region:  "north",
+			stateId:'ab-tree',
 			split: true,
 			containerScroll: true,
 			autoScroll: true,
