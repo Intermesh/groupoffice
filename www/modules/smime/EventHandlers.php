@@ -120,6 +120,10 @@ class EventHandlers {
 
 		$outfile = $cert->setPassword($password)->decryptFile($infile);
 
+		if($outfile === false) {
+			$response['askPassword'] = true;
+			return;
+		}
 		if(is_string($outfile)) { // failed decrypting
 			$response['htmlbody'] = $outfile;
 			return;

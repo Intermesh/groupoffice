@@ -72,8 +72,7 @@ class Certificate extends \GO\Base\Db\ActiveRecord {
 
 		if (empty($certs)) {
 			//password invalid
-			$response['askPassword'] = true;
-			GO::debug("Invalid password");
+			\GO::debug("Invalid password");
 			return false;
 		}
 
@@ -82,11 +81,11 @@ class Certificate extends \GO\Base\Db\ActiveRecord {
 		$file->delete();
 
 		if (!$return || !$outfile->exists() || !$outfile->size()) {
-			$result = GO::t("SMIME Decryption of this message failed.", "smime") . '<br />';
+			$result = \GO::t("SMIME Decryption of this message failed.", "smime") . '<br />';
 			while ($str = openssl_error_string()) {
 				$result.='<br />' . $str;
 			}
-			GO::debug("Decryption failed");
+			\GO::debug($result);
 			return $result;
 		}
 
