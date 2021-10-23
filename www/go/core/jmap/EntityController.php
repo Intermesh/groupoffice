@@ -429,9 +429,9 @@ abstract class EntityController extends Controller {
 		}
 
 		if(!empty($p['ids'])) {
-			$result['list'] = array_map(function ($v) use ($unsorted) {
+			$result['list'] = array_values(array_map(function ($v) use ($unsorted) {
 				return $unsorted[$v];
-			}, $p['ids']);
+			}, $p['ids']));
 		} else{
 			$result['list'] = array_values($unsorted);
 		}
