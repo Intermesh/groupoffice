@@ -66,6 +66,7 @@
 - Email: Fixed red messages in sent items
 - Core: Fixed html editor styles in Compact theme
 - Email: Fixed broken base64 encoded message in rare case
+- Studio: fix error when ID field is set as autoexpand
 
 23-08-2021 6.5.73
 - Timeregistration: Do not clone invoice_id upon cloning a time entry
