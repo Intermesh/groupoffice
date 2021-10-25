@@ -804,7 +804,7 @@ class User extends Entity {
 
 		$this->contact->photoBlobId = $this->avatarId;
 		if (!isset($this->contact->emailAddresses[0])) {
-			$this->contact->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress())->setValues(['email' => $this->email])];
+			$this->contact->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress($this->contact))->setValues(['email' => $this->email])];
 		}
 		if (empty($this->contact->name) || $this->isModified(['displayName'])) {
 			$this->contact->name = $this->displayName;
