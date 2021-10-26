@@ -161,14 +161,7 @@ class ColumnModel {
 			$column->setSortAlias($sortAlias);
 		
 		$this->addColumn($column);
-//		$this->_columns[$column]['format'] = $format;
-//		$this->_columns[$column]['extraVars'] = $extraVars;
-//		$this->_columns[$column]['label'] = empty($label) ? $column : $label;
-//
-//		if (!empty($sortfield)) {
-//			$this->_sortFieldsAliases[$column] = $sortfield;
-//		}
-		
+
 		return $this;
 	}
 	
