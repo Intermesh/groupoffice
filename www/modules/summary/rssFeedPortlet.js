@@ -171,7 +171,7 @@ Ext.extend(GO.portlets.rssFeedPortlet, GO.grid.GridPanel, {
 			feed: url
 		};
 		
-    this.store.load();
+        this.store.load();
 	},
 
 	// within this function "this" is actually the GridView
