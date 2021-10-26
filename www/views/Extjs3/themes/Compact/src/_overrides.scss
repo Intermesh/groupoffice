@@ -143,3 +143,7 @@ table.x-calGrid-headings-table {
 //html editor icons in outline set:
 .x-edit-forecolor:before, img.x-edit-forecolor + span::before {content: 'color_lens';}
 .x-edit-backcolor:before, img.x-edit-backcolor + span::before {content: 'format_paint';}
+
+// fix icon that is different in outline theme
+.ic-file-download:before {content: 'download' !important; }
+.ic-file-upload:before {content: 'upload' !important; }
