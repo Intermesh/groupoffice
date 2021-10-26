@@ -91,7 +91,7 @@ class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 
 			if ($xml) {
 
-				if(!preg_match('/<rss.*<\/rss>/i', $xml)) {
+				if(!preg_match('/<rss.*<\/rss>/i', str_replace(["\r","\n"],'', $xml))) {
 					throw new \Exception("No RSS feed");
 				}
 

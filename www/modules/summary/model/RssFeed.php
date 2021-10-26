@@ -55,7 +55,7 @@ class RssFeed extends \GO\Base\Db\ActiveRecord {
 			$xml = @file_get_contents($this->url);
 		}
 
-		if (!$xml || !preg_match('/<rss.*<\/rss>/i', $xml)) {
+		if (!$xml || !preg_match('/<rss.*<\/rss>/i', str_replace(["\r","\n"],'', $xml))) {
 
 			$this->setValidationError('url', go()->t('The supplied URL is not an RSS feed'));
 		}

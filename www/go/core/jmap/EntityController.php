@@ -351,6 +351,9 @@ abstract class EntityController extends Controller {
 
 		if(!empty($params['ids'])) {
 			$params['ids'] = array_unique($params['ids']);
+			$params['ids'] = array_filter($params['ids'], function($id) {
+				return !empty($id);
+			});
 		}
 
 		if(!isset($params['properties'])) {
@@ -423,9 +426,9 @@ abstract class EntityController extends Controller {
 		}
 
 		if(!empty($p['ids'])) {
-			$result['list'] = array_map(function ($v) use ($unsorted) {
+			$result['list'] = array_values(array_map(function ($v) use ($unsorted) {
 				return $unsorted[$v];
-			}, $p['ids']);
+			}, $p['ids']));
 		} else{
 			$result['list'] = array_values($unsorted);
 		}

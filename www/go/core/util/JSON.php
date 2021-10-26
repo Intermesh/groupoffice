@@ -78,7 +78,7 @@ class JSON {
  * @throws \InvalidArgumentException if the JSON cannot be decoded.
  * @link http://www.php.net/manual/en/function.json-decode.php
  */
-  public static function decode(string $json, bool $assoc, int $depth = 512, int $options = 0) {
+  public static function decode(string $json, bool $assoc = false, int $depth = 512, int $options = 0) {
     $data = \json_decode($json, $assoc, $depth, $options);
     if (JSON_ERROR_NONE !== json_last_error()) {
         throw new \InvalidArgumentException(
