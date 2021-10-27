@@ -1,3 +1,4 @@
+- Billing: more friendly error handling when having connection issues
 - Calendar: fix QuickTip for information icon
 - Core: cleanup response data if json_encode fails with UTF8 error
 - Core: fix translation sir / madam in translation
