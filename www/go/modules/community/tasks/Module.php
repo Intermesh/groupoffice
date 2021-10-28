@@ -39,6 +39,12 @@ class Module extends core\Module {
 		$mapping->addHasOne('tasksSettings', UserSettings::class, ['id' => 'userId'], true);
 	}
 
+	protected function rights() {
+		return [
+			'mayChangeTasklists', // allows Tasklist/set (hide ui elements that use this)
+			'mayChangeCategories', // allows TaskCategory/set (hide ui elements that use this)
+		];
+	}
 
 	protected function beforeInstall(\go\core\model\Module $model)
 	{

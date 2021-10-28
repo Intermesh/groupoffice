@@ -1,7 +1,11 @@
 <?php
 return [
 	'name' => 'Taken',
-	'description' => 'Taken module',
+	'description' => 'Maak en beheer taken, plaats ze in lijsten, plan je dag en deel ze met andere gebruikers.',
+
+	'mayChangeTasklists'=> 'Takenlijsten bewerken',
+	'mayChangeCategories' => 'Categorieën bewerken',
+
 	'Select task list' => 'Selecteer takenlijst',
 	'Select category' => 'Selecteer categorie',
 	'Task' => 'Taak',

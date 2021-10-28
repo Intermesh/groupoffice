@@ -2,6 +2,7 @@
 
 namespace go\modules\community\notes\controller;
 
+use go\core\exception\Forbidden;
 use go\core\jmap\EntityController;
 use go\modules\community\notes\model;
 
@@ -44,6 +45,8 @@ class NoteBook extends EntityController {
 	 * @param array $params
 	 */
 	public function set($params) {
+		if(!$this->rights->mayChangeNotebooks)
+			throw new Forbidden();
 		return $this->defaultSet($params);
 	}
 	

@@ -41,6 +41,12 @@ class Module extends core\Module {
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
+	protected function rights() {
+		return [
+			'mayChangeAddressbooks', // allows AddressBook/set (hide ui elements that use this)
+		];
+	}
+
 	public function autoInstall()
 	{
 		return true;

@@ -6,6 +6,7 @@
  */
 namespace go\modules\community\tasks\controller;
 
+use go\core\exception\Forbidden;
 use go\core\jmap\EntityController;
 use go\modules\community\tasks\model;
 
@@ -24,6 +25,8 @@ class Category extends EntityController {
 	}
 
 	public function set($params) {
+		if(!$this->rights->mayChangeCategories)
+			throw new Forbidden();
 		return $this->defaultSet($params);
 	}
 

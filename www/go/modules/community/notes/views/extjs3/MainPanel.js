@@ -142,7 +142,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}, '->', {
 					xtype: "tbsearch"
 				},{
-					disabled: !go.Modules.isAvailable("community", "notes", go.permissionLevels.manage),
+					hidden: !go.Modules.get("community", 'notes').userRights.mayChangeNotebooks,
+					//disabled: !go.Modules.isAvailable("community", "notes", go.permissionLevels.manage),
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {

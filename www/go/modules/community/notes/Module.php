@@ -19,6 +19,12 @@ class Module extends core\Module {
 		return "Intermesh BV";
 	}
 
+	protected function rights() {
+		return [
+			'mayChangeNotebooks', // allows Nootbook/set (hide ui elements that use this)
+		];
+	}
+
 	public function autoInstall()
 	{
 		return true;
