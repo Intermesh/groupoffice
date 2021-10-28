@@ -38,10 +38,7 @@ class Module extends EntityController {
 
 	protected function canUpdate(Entity $entity)
 	{
-		if($entity->name == "core" && $entity->package == "core") {
-			return go()->getAuthState()->isAdmin();
-		}
-		return $entity->getUserRights()->mayManage;
+		return go()->getAuthState()->isAdmin();
 	}
 
 	protected function canCreate(Entity $entity)
