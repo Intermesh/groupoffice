@@ -319,6 +319,10 @@ go.grid.GridTrait = {
 
 	selectNextAfterDelete : function() {
 
+		// Do not go to the next item, if mobile we want to stay in the grid view
+		if(GO.util.isMobileOrTablet())
+			return;
+
 		var index = -1;
 
 		index = this.moveDirection == 'up' ? this.currentSelectedIndex - 1 : this.currentSelectedIndex;

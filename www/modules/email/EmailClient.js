@@ -672,7 +672,14 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 					this.messagePanel.body.print();
 				},
 				scope: this
-			})
+			}),
+				{xtype:'button',
+				iconCls:'ic-delete',
+				overflowText:t('Delete'),
+				handler: (btn) => {
+					this.messagesGrid.deleteSelected();
+					this.westPanel.show();
+				}}
 //			this.closeMessageButton = new Ext.Button({
 //				hidden:true,
 //				iconCls: 'ic-close',
