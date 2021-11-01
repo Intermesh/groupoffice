@@ -1,3 +1,4 @@
+01-11-2021 6.5.82
 - Billing: more friendly error handling when having connection issues
 - Core: hide VisibleToPanel in User settings unless you are an admin
 - Calendar: fix QuickTip for information icon
