@@ -45,54 +45,24 @@ class AbstractModelController extends AbstractController {
 		return empty($params['id']) ? false : $params['id'];
 	}
 	
-	
-//	private function _extractCustomfieldValues(&$attributes){
-//		$v = [];
-//		foreach($attributes as $key=>$value)
-//		{
-//			if(substr($key,0,13)=='customFields_'){
-//				$v[substr($key,13)] = $attributes[$key];
-//				unset($attributes[$key]);
-//			}
-//		}
-//		return $v;
-//	}
-	
 
 	/**
 	 * The default action when the form in an edit dialog is submitted.
 	 */
-	protected function actionSubmit($params) {
+	protected function actionSubmit($params)
+	{
 
-//		$modelName = $this->model;
-//		$pk = $this->getPrimaryKeyFromParams($params);
-//		$model=false;
-//		if ($pk)
-//			$model = \GO::getModel($modelName)->findByPk($pk);
-//		
-//		if(!$model){
-//			$model = new $modelName;
-//			$model->user_id=\GO::user()->id;
-//		}
-		
 		$model = $this->getModelFromParams($params);
 
 		$ret = $this->beforeSubmit($response, $model, $params);
 		
 		if($ret!==false)
 		{		
-			
-			//$customFields = $this->_extractCustomfieldValues($params);
-//			var_dump($customFields);
 			$model->setAttributes($params);
 			
-//			if(!empty($customFields)) {
-//				$model->setCustomFields($customFields);
-//			}
-
 			$modifiedAttributes = $model->getModifiedAttributes();
 			if($model->save() ){
-				$response['success'] = true; //$model->save();
+				$response['success'] = true;
 
 				$response['id'] = $model->pk;
 

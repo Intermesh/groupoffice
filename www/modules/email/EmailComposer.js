@@ -119,7 +119,9 @@ GO.email.EmailComposer = function(config) {
 							ids: ids
 						}
 					}).then(function(result) {										
-			
+						if(!result.list) {
+							return;
+						}
 						result.list.forEach(function(contact) {
 							if(!contact.emailAddresses[0]) {
 								return;
@@ -142,8 +144,11 @@ GO.email.EmailComposer = function(config) {
 							properties: ["displayName", "email"],
 							ids: ids
 						}
-					}).then(function(result) {										
-			
+					}).then(function(result) {
+						if(!result.list) {
+							return;
+						}
+
 						result.list.forEach(function(user) {
 							if(!go.util.empty(v)) {
 								v += ", ";

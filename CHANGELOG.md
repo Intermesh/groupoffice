@@ -18,6 +18,9 @@ Core: modules can have specific permission types. We use it in the core to allow
       custom fields.
 ----
 
+01-11-2021 6.5.82
+- Billing: more friendly error handling when having connection issues
+- Core: hide VisibleToPanel in User settings unless you are an admin
 - Calendar: fix QuickTip for information icon
 - Core: cleanup response data if json_encode fails with UTF8 error
 - Core: fix translation sir / madam in translation
@@ -26,6 +29,7 @@ Core: modules can have specific permission types. We use it in the core to allow
 - Leavedays: fix error message in leave day model
 - Linked email: Set all existing cdate and mdate fields to IMAP send data
 - Summary: fix parsing of RSS feeds with newlines
+- Email: prevent error when adding empty list to recipient fields
 
 18-10-2021 6.5.81
 - Calendar: If not empty, show location data for all-day events in month and day grids
