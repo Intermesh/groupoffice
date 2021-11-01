@@ -8,6 +8,7 @@
 - Leavedays: fix error message in leave day model
 - Linked email: Set all existing cdate and mdate fields to IMAP send data
 - Summary: fix parsing of RSS feeds with newlines
+- Email: prevent error when adding empty list to recipient fields
 
 18-10-2021 6.5.81
 - Calendar: If not empty, show location data for all-day events in month and day grids
