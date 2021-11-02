@@ -71,7 +71,7 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 	public function actionReload($params){
 		$event = empty($params['event_id']) ? false : \GO\Calendar\Model\Event::model()->findByPk($params['event_id']);
 
-		$participantAttrs=json_decode($params['participants']);
+		$participantAttrs=json_decode($params['participants'], true);
 
 		$store = new \GO\Base\Data\ArrayStore();
 		

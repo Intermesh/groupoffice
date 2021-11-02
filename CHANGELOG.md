@@ -1,5 +1,7 @@
+02-11-2021 6.5.83
 - Business: Fix display of total hours in agreement grid
 - Leavedays: Import all active users as employees in migration script
+- Calendar: Error when reloading participants or changing time
 
 01-11-2021 6.5.82
 - Billing: more friendly error handling when having connection issues
