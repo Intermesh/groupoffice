@@ -16,3 +16,4 @@ TasklistCombo.js
 TaskCombo.js
 ProgressCombo.js
 SettingsPanel.js
+ContinueTaskDialog.js
