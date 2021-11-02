@@ -18,6 +18,9 @@ Core: modules can have specific permission types. We use it in the core to allow
       custom fields.
 ----
 
+02-11-2021 6.5.83
+- Calendar: Error when reloading participants or changing time
+
 01-11-2021 6.5.82
 - Billing: more friendly error handling when having connection issues
 - Core: hide VisibleToPanel in User settings unless you are an admin
