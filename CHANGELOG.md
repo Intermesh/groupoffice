@@ -1,3 +1,6 @@
+- Business: Fix display of total hours in agreement grid
+- Leavedays: Import all active users as employees in migration script
+
 01-11-2021 6.5.82
 - Billing: more friendly error handling when having connection issues
 - Core: hide VisibleToPanel in User settings unless you are an admin
