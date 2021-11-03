@@ -1,3 +1,6 @@
+6.5.85
+- Calendar: remove location data from month grid for reasons of screen real estate
+
 02-11-2021 6.5.83
 - Business: Fix display of total hours in agreement grid
 - Leavedays: Import all active users as employees in migration script
