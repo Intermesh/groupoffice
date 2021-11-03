@@ -284,6 +284,7 @@ class Response extends Singleton{
 			$this->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
 			$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization');
 			$this->setHeader('Access-Control-Max-Age', "1728000");
+			$this->setHeader('Access-Control-Allow-Credentials', 'true');
 		}
 	}
 
