@@ -282,7 +282,7 @@ class Response extends Singleton{
 		if(go()->getSettings()->corsAllowOrigin) {
 			$this->setHeader('Access-Control-Allow-Origin', go()->getSettings()->corsAllowOrigin);
 			$this->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
-			$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization');
+			$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization, X-File-Name, X-File-LastModified');
 			$this->setHeader('Access-Control-Max-Age', "1728000");
 			$this->setHeader('Access-Control-Allow-Credentials', 'true');
 		}
