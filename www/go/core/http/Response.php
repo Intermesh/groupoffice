@@ -40,11 +40,11 @@ use go\core\webclient\CSP;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class Response extends Singleton{
-	
+
 //	public function __construct() {
 //		$this->setHeader('Cache-Control', 'private');
 //		$this->removeHeader('Pragma');
-//		
+//
 //		$this->setHeader('Access-Control-Allow-Origin', '*');
 //		$this->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
 //		$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization, X-XSRFToken');
@@ -285,6 +285,16 @@ class Response extends Singleton{
 		if ($this->isCached()) {
 			$this->setStatus(304);
 			exit();
+		}
+	}
+
+	protected function sendCorsHeaders() {
+		if(go()->getSettings()->corsAllowOrigin) {
+			$this->setHeader('Access-Control-Allow-Origin', go()->getSettings()->corsAllowOrigin);
+			$this->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
+			$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization');
+			$this->setHeader('Access-Control-Max-Age', "1728000");
+			$this->setHeader('Access-Control-Allow-Credentials', 'true');
 		}
 	}
 
