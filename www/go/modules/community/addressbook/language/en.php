@@ -2,7 +2,9 @@
 return [
 		"name" => "Address Book",
 		"description" => "Store contacts and organizations",
-		
+
+		'mayChangeAddressbooks' => 'Change address books',
+
 		"emailTypes" => [
 				"work" => "Work",
 				"home" => "Home",

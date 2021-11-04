@@ -282,7 +282,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					xtype: 'tbtitle',
 					text: t('Categories')
 				}, '->', {
-					//disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
+					hidden: !go.Modules.get("community", 'tasks').userRights.mayChangeCategories,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
@@ -316,7 +316,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}, '->', {
 					xtype: "tbsearch"
 				},{
-					//disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
+					hidden: !go.Modules.get("community", 'tasks').userRights.mayChangeTasklists,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {

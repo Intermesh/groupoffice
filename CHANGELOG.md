@@ -1,21 +1,42 @@
 
+6.6.11
+- Core: Fix error upon saving user profile data
+
 XX-09-20216.6.10
 - Time Registration: Filter employees on currently selected date instead of current date
 - Projects: Time entries - filter employees on current project ID
 
 6.6
 
-Tasks: Completely rewritten module
-Core: Set alternative lost password URL
-Core: Alert system to notify users about comments, assigned tasks etc.
-Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
-Core: New module chooser menu
-Core: System Settings -> Modules redesigned and searchable.
-Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
+- Tasks: Completely rewritten module
+- Core: Set alternative lost password URL
+- Core: Alert system to notify users about comments, assigned tasks etc.
+- Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
+- Core: New module chooser menu
+- Core: System Settings -> Modules redesigned and searchable.
+- Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
-----
 
+6.5.85
+- Calendar: remove location data from month grid for reasons of screen real estate
+
+02-11-2021 6.5.83
+- Business: Fix display of total hours in agreement grid
+- Leavedays: Import all active users as employees in migration script
+- Calendar: Error when reloading participants or changing time
+
+01-11-2021 6.5.82
+- Billing: more friendly error handling when having connection issues
+- Core: hide VisibleToPanel in User settings unless you are an admin
+- Calendar: fix QuickTip for information icon
 - Core: cleanup response data if json_encode fails with UTF8 error
+- Core: fix translation sir / madam in translation
+- Leavedays: upon migration, make sure that project employee data is used. If not, perform migration as if the projects module is not installed.
+- Leavedays: fix work hour rendering in leave day dialog
+- Leavedays: fix error message in leave day model
+- Linked email: Set all existing cdate and mdate fields to IMAP send data
+- Summary: fix parsing of RSS feeds with newlines
+- Email: prevent error when adding empty list to recipient fields
 
 18-10-2021 6.5.81
 - Calendar: If not empty, show location data for all-day events in month and day grids
@@ -78,6 +99,7 @@ Core: modules can have specific permission types. We use it in the core to allow
 - Email: Fixed red messages in sent items
 - Core: Fixed html editor styles in Compact theme
 - Email: Fixed broken base64 encoded message in rare case
+- Studio: fix error when ID field is set as autoexpand
 
 23-08-2021 6.5.73
 - Timeregistration: Do not clone invoice_id upon cloning a time entry

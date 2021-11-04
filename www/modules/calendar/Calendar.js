@@ -648,7 +648,11 @@ GO.calendar.MainPanel = function(config){
 	'->',
 	this.calendarTitle = new Ext.Button({
 		iconCls: 'ic-info',
-		disabled: true,
+		// Both will prevent qtip from popping up.
+		// disabled: true, cls: 'x-item-disabled',
+		style: {
+			color: '#777777'
+		},
 		tooltip: 'Calendar'
 	}),
 	this.printButton = new Ext.Button({

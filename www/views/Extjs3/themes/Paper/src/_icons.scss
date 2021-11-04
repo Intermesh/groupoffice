@@ -332,7 +332,12 @@ $filetype: (
 }
 
 .filetype {
-	background-size: dp(24) dp(24);
+	display: inline-block;
+	min-height: dp(24);
+	min-width: dp(24);
+	vertical-align: middle;
+	background-size: contain;
+	background-position: center center;
 	background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 	background-repeat: no-repeat;
 	&-link {
@@ -343,7 +348,6 @@ $filetype: (
 		white-space: nowrap;
 		line-height: dp(24);
 		padding: dp(8) dp(16) dp(8) dp(40);
-		display: inline-block;
 	}
 }
 

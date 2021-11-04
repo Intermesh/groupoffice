@@ -12,6 +12,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	},
 	multiSelectToolbarEnabled : false,
 	hideHeaders: true,
+	hideMenuButton: false,
 	filteredStore: null,
 	filterName: null,
 	initComponent: function () {
@@ -128,6 +129,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 		var actions = new Ext.ux.grid.RowActions({
 			menuDisabled: true,
 			hideable: false,
+			hidden: this.hideMenuButton,
 			draggable: false,
 			fixed: true,
 			header: '',

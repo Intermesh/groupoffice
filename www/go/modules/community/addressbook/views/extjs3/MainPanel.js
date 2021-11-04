@@ -69,8 +69,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 	createAddressBookTree : function() {
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
 			region:  "north",
+			stateId:'ab-tree',
 			split: true,
 			enableDrop: true,
+			readOnly: !go.Modules.get("community", 'addressbook').userRights.mayChangeAddressbooks,
 			ddGroup: "addressbook",
 			ddAppendOnly: true,
 			tbar: [{
@@ -79,7 +81,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				}, '->',{
 					xtype: "tbsearch"
 				}, {
-					disabled: !go.Modules.isAvailable("community", "addressbook", go.permissionLevels.manage),
+					hidden: !go.Modules.get("community", 'addressbook').userRights.mayChangeAddressbooks,
 					iconCls: 'ic-add',
 					tooltip: t("Add"),
 					handler: function () {

@@ -61,6 +61,26 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 				ctrlenter: function() {
 					this.sendBtn.handler.call(this);
 				},
+
+
+				attach: ( field, response, file, imgEl) => {
+
+
+					if(imgEl) {
+						return;
+					}
+
+
+					this.attachmentBox.setValue(this.attachmentBox.getValue().concat([{
+						blobId: response.blobId,
+						name: response.name
+					}]))
+
+					this.onSync()
+
+				},
+
+
 				scope: this
 			}
 		});
@@ -91,6 +111,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		});
 		
 		this.items = [
+
 			this.addBtn,
 			this.middleBox = new Ext.Container({
 				region:"center",
@@ -112,7 +133,23 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 						style:'padding-bottom:4px',
 						store: this.store
 					}),
-					this.attachmentBox = new Ext.Container()
+					this.attachmentBox = new go.form.FormGroup({
+						hideBbar: true,
+						name:"attachments",
+						startWithItem: false,
+						itemCfg : {
+							items: [{
+								hideLabel: true,
+								xtype: "plainfield",
+								name: "name",
+								submit: true
+							},{
+								hideLabel: true,
+								xtype: "hidden",
+								name: "blobId"
+							}]
+						}
+					})
 				]
 			}),
 			this.sendBtn

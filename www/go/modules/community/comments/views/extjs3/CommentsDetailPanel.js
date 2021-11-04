@@ -53,7 +53,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				{name: "modifier", type: "relation"},
 				'text',
 				{name: "permissionLevel", type: "int"},
-				{name: "labels", type: "relation"}
+				{name: "labels", type: "relation"},
+				{name: "attachments"}
 			],
 			entityStore: "Comment",
 			baseParams: {sort: [{property: "date", isAscending:false}]},
@@ -206,6 +207,14 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			});
 			readMore.setText(r.get('text'));
 			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
+
+			if(r.data.attachments && r.data.attachments.length) {
+				let atts = "";
+				r.data.attachments.forEach(a => {
+					atts += `<a class="attachment" target="_blank" title="${a.name}" href="${go.Jmap.downloadUrl(a.blobId)}"><span class="filetype filetype-${a.name.substring(a.name.lastIndexOf(".") + 1)}"></span>${a.name}</a>`;
+				})
+				readMore.insert(2, {xtype: 'box', html: atts, cls: "attachments"});
+			}
 
 			// var readMore = new Ext.BoxComponent({
 			// 	cls: 'go-html-formatted ' + mineCls,

@@ -18,7 +18,7 @@ class Alert extends UserProperty
 {
 
 	const ActionDisplay = 1;
-	const ActionsEmail = 2;
+	const ActionEmail = 2;
 
 	/** @var int PK */
 	public $id;

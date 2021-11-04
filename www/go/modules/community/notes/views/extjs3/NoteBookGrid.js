@@ -2,7 +2,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.NavGrid, {
 
 	initComponent: function () {
 		Ext.apply(this, {
-
+			hideMenuButton: !go.Modules.get("community", 'notes').userRights.mayChangeNotebooks,
 			menuItems: [
 				{
 					itemId: "edit",

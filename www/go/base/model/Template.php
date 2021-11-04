@@ -207,7 +207,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	
 	public static function getContactAttributes(Contact $contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
 		$attributes[$tagPrefix . 'salutation'] = $contact->getSalutation();
-		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
+		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('Sir') : \GO::t('Madam');
 		$attributes[$tagPrefix . 'title'] = $contact->prefixes;
 		$attributes[$tagPrefix . 'suffixes'] = $contact->suffixes;
 		$attributes[$tagPrefix . 'first_name'] = $contact->firstName;
@@ -335,7 +335,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			$attributes = $this->_addTagPrefixAndRemoveEmptyValues($attributes, 'user:');
 			$attributes = array_merge($attributes, $this->getContactAttributes($contact, 'user:', 'usercompany:'));			
 
-			$attributes['user:sirmadam']=$contact->gender=="M" ? \GO::t('Sir','addressbook', 'community') : \GO::t('Madam', 'addressbook', 'community');
+			$attributes['user:sirmadam']=$contact->gender=="M" ? \GO::t('Sir') : \GO::t('Madam');
 			
 			$company = false;
 			if(isset($contact->getOrganizationIds()[0])) {

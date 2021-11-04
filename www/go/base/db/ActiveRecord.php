@@ -2472,22 +2472,22 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * @param array $attributes attributes to set on this object
 	 */
 
-	public function setAttributes($attributes, $format=null){
-		
-		if(!isset($format)){
+	public function setAttributes(array $attributes, $format = null)
+	{
+		if (!isset($format)) {
 			$format = ActiveRecord::$formatAttributesByDefault;
 		}
-		
-		if($format)
-			$attributes = $this->formatInputValues($attributes);
 
-		foreach($attributes as $key=>$value){
+		if ($format) {
+			$attributes = $this->formatInputValues($attributes);
+		}
+		foreach ($attributes as $key => $value) {
 
 			//only set writable properties. It should either be a column or setter method.
-			if(isset($this->columns[$key]) || property_exists($this, $key) || method_exists($this, 'set'.$key)){
-				$this->$key=$value;
-			}elseif(is_array($value) && $this->getRelation($key)){
-				$this->_joinRelationAttr[$key]=$value;
+			if (isset($this->columns[$key]) || property_exists($this, $key) || method_exists($this, 'set' . $key)) {
+				$this->$key = $value;
+			} elseif (is_array($value) && $this->getRelation($key)) {
+				$this->_joinRelationAttr[$key] = $value;
 			}
 		}
 	}

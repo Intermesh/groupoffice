@@ -109,8 +109,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.addPanel(go.usersettings.AccountSettingsPanel);
 		this.addPanel(go.usersettings.LookAndFeelPanel);
 
-		this.addPanel(go.usersettings.VisibleToPanel);
-		
+		if(go.User.isAdmin) {
+			this.addPanel(go.usersettings.VisibleToPanel);
+		}
+
 		// this.loadModulePanels();
 		
 		var customFieldSets = go.customfields.CustomFields.getFormFieldSets("User").filter(function(fs){return fs.fieldSet.isTab;})
@@ -290,7 +292,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			}
 		},this);
 
-		//		//this.id is null when new
+		// this.id is null when new
 		if(this.currentUserId) {
 			id = this.currentUserId;
 			params.update = {};

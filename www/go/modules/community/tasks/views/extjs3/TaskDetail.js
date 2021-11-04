@@ -41,6 +41,14 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 						return fieldDummy.parseRule(rrule);
 					}
 				})
+			}],
+			buttons: [{
+				iconCls: 'ic-forward',
+				text:t("Continue task", "tasks"),
+				handler:() => {
+					const continueTaskDialog = new go.modules.community.tasks.ContinueTaskDialog();
+					continueTaskDialog.load(this.currentId).show();
+				}
 			}]
 		});
 		
@@ -89,7 +97,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 					},
 					'-',
 					{
-						iconCls: "btn-print",
+						iconCls: "ic-print",
 						text: t("Print"),
 						handler: function () {
 							this.body.print({title: this.data.name});
