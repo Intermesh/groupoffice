@@ -387,11 +387,17 @@ class Blob extends orm\Entity {
 //			return [];
 //		}
 
-		if(!preg_match_all('/"http[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
-			return [];
+		$matches = [];
+
+		if(preg_match_all('/"http[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $urlMatches)) {
+			$matches = $urlMatches[1];
 		}
-		
-		return array_unique($matches[1]);
+
+		if(preg_match_all('/data-blob-id="([^"]*)"/', $html, $dataBlobIdMatches)){
+			$matches = array_merge($matches, $dataBlobIdMatches[1]);
+		}
+
+		return array_unique($matches);
 	}
 	
 	/**
@@ -417,7 +423,11 @@ class Blob extends orm\Entity {
 	 * @return string Replaced HTML
 	 */
 	public static function replaceSrcInHtml($html, $blobId, $src) {		
-		$replaced =  preg_replace('/(<img [^>]*src=")[^>]*blob='.$blobId.'("[^>]*>)/i', '$1'.$src.'$2', $html);
+//		$replaced =  preg_replace('/(<img [^>]*src=")[^>]*blob='.$blobId.'("[^>]*>)/i', '$1'.$src.'$2', $html);
+
+		$replaced = preg_replace_callback('/<img [^>]*' . $blobId . '[^>]*>/i', function($matches) use ($src) {
+			return preg_replace('/src="[^"]*"/i', 'src="' .$src .'"', $matches[0]);
+		});
 
 		return $replaced;
 	}
