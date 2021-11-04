@@ -17,7 +17,12 @@ XX-09-20216.6.10
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+6.5.85
+- Calendar: remove location data from month grid for reasons of screen real estate
+
 02-11-2021 6.5.83
+- Business: Fix display of total hours in agreement grid
+- Leavedays: Import all active users as employees in migration script
 - Calendar: Error when reloading participants or changing time
 
 01-11-2021 6.5.82
