@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS `comments_attachment`;
+DROP TABLE IF EXISTS `comments_comment_attachment`;
 DROP TABLE IF EXISTS `comments_comment_label`;
 DROP TABLE IF EXISTS `comments_label`;
 DROP TABLE IF EXISTS `comments_comment`;

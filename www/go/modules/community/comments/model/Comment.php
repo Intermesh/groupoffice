@@ -57,11 +57,17 @@ class Comment extends AclItemEntity {
 	 */
 	protected $images = [];
 
+	/**
+	 * @var CommentAttachment[]
+	 */
+	public $attachments = [];
+
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("comments_comment", 'c')
 			->addScalar('labels', 'comments_comment_label', ['id' => 'commentId'])
 			->addScalar('images', 'comments_comment_image', ['id' => 'commentId'])
+			->addArray('attachments', CommentAttachment::class, ['id' => 'commentId'])
 			->addQuery(
 				(new Query())
 					->select("e.clientName AS entity")

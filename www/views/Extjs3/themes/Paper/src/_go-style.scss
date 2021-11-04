@@ -1936,6 +1936,29 @@ table[id^="comments-ext"] b {
 		margin: 0;
 	}
 
+	.attachments {
+		padding: 0 dp(16) !important;
+	}
+	.attachment {
+		display: inline-block;
+		height: dp(24);
+		&:not(:first-child) {
+			margin-left: dp(8);
+		}
+		max-width: 100%;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		&:link, &:visited {
+			color: color($fg, "text");
+			text-decoration: none;
+		}
+
+		.filetype {
+			margin-right: dp(8);
+		}
+	}
+
 	.text-crop {
 		.more {
 			border-bottom-left-radius: dp(8);
