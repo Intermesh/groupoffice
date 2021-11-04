@@ -8,15 +8,14 @@ XX-09-20216.6.10
 
 6.6
 
-Tasks: Completely rewritten module
-Core: Set alternative lost password URL
-Core: Alert system to notify users about comments, assigned tasks etc.
-Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
-Core: New module chooser menu
-Core: System Settings -> Modules redesigned and searchable.
-Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
+- Tasks: Completely rewritten module
+- Core: Set alternative lost password URL
+- Core: Alert system to notify users about comments, assigned tasks etc.
+- Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
+- Core: New module chooser menu
+- Core: System Settings -> Modules redesigned and searchable.
+- Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
-----
 
 02-11-2021 6.5.83
 - Calendar: Error when reloading participants or changing time
