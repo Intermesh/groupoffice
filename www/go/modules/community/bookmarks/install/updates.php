@@ -10,5 +10,6 @@ $updates['201907161224'][] = 'ALTER TABLE `bookmarks_category` DROP FOREIGN KEY 
 $updates['201907161224'][] = 'ALTER TABLE `bookmarks_category` DROP FOREIGN KEY `bookmarks_category_ibfk_2`;';
 $updates['201907161224'][] = 'ALTER TABLE `bookmarks_category` ADD CONSTRAINT `bookmarks_category_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;';
 
+$updates['202110051051'][] = 'UPDATE bookmarks_bookmark SET logo = NULL WHERE logo NOT IN (SELECT id FROM core_blob);';
 $updates['202110051051'][] = 'ALTER TABLE `bookmarks_bookmark` CHANGE COLUMN `logo` `logo` BINARY(40) NULL DEFAULT NULL , ADD INDEX `core_blob_bookmark_logo_idx` (`logo` ASC);';
 $updates['202110051051'][] = 'ALTER TABLE `bookmarks_bookmark` ADD CONSTRAINT `core_blob_bookmark_logo` FOREIGN KEY (`logo`) REFERENCES `core_blob` (`id`) ON DELETE RESTRICT ON UPDATE NO ACTION;';
