@@ -18,6 +18,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	buttonAlign: 'left',
 	layout: "fit",
 	showCustomfields:true,
+	showLinks: true,
 
 	/**
 	 * When the entity is modified by another user / process ask to load these changes
@@ -85,7 +86,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		go.form.Dialog.superclass.initComponent.call(this);		
 		
-		if(this.entityStore.entity.links && this.entityStore.entity.links.length) {
+		if(this.showLinks && this.entityStore.entity.links && this.entityStore.entity.links.length) {
 			this.addCreateLinkButton();
 		}
 
