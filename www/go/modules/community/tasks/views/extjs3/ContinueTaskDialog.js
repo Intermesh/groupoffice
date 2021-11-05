@@ -18,6 +18,7 @@ go.modules.community.tasks.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 	title: t("Continue task", "tasks"),
 	entityStore: 'Task',
 	showLinks: false,
+	showCustomfields: false,
 	formPanelLayout:'border',
 	maximizable:false,
 
@@ -27,6 +28,7 @@ go.modules.community.tasks.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 		this.formPanel.values.alerts = [{
 			trigger: {when: this.datePicker.getValue().format('Y-m-d') + ' ' +  this.timeField.getValue()}
 		}];
+		this.formPanel.values.due = this.datePicker.getValue().format('Y-m-d')
 
 		// add comment
 		const comment = this.commentField.getValue();
