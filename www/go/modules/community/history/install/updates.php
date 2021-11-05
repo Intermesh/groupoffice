@@ -7,3 +7,6 @@ $updates['202104261531'][] = "alter table history_log_entry
 
 $updates['202109101136'][] = "create index history_log_entry_createdAt_index
 	on history_log_entry (createdAt);";
+
+//older bug caused accidental deletion of acls
+$updates['202111050931'][] = "update history_log_entry set removeAcl = 0;";

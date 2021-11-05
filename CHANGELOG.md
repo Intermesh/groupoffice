@@ -18,7 +18,9 @@ XX-09-20216.6.10
       custom fields.
 
 6.5.85
+05-11-2021 6.5.84
 - Calendar: remove location data from month grid for reasons of screen real estate
+- History: Old bug caused removal of permissions after one year
 
 02-11-2021 6.5.83
 - Business: Fix display of total hours in agreement grid
