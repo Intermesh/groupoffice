@@ -281,8 +281,6 @@ class Token extends Entity {
 		// For backwards compatibility, set the server session for the old code
 		$this->oldLogin();
 
-		$this->classRights = [];
-
 		User::fireEvent(User::EVENT_LOGIN, $user);
 		
 		// Create accessToken and set expire time
@@ -455,24 +453,22 @@ class Token extends Entity {
 		return parent::internalDelete($query);
 	}
 
-
-
-	private $classRights = [];
-
 	/**
 	 * Get the permission level of the module this controller belongs to.
-	 * 
+	 *
+	 * @todo: improve performance by cache rights per user?
 	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
 	 */
-	public function getClassRights($cls): stdClass
+	public function getClassRights($cls)
 	{
-		if(!isset($this->classRights[$cls])) {
+		//if(!isset($this->classRights[$cls])) {
 			$mod = Module::findByClass($cls, ['id', 'name', 'package']);
-			$this->classRights[$cls]= $mod->getUserRights();
-			go()->getCache()->set('token-'.$this->accessToken,$this);		
-		}
+			return  $mod->getUserRights();
+//			$this->classRights[$cls]= $mod->getUserRights();
+//			go()->getCache()->set('token-'.$this->accessToken,$this);
+		//}
 
-		return $this->classRights[$cls];
+		//return $this->classRights[$cls];
 	}
 
 

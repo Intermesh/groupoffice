@@ -79,6 +79,7 @@ class Module extends Entity {
 		if(!parent::internalSave()) {
 			return false;
 		}
+		go()->getCache()->set('module-' . $this->package.'/'.$this->name, $this);
 		
 		$settings = $this->getSettings();
 		if($settings && !$settings->save()) {
@@ -298,7 +299,7 @@ class Module extends Entity {
 		switch($className) {	
 			
 			case strpos($className, "go\\core") === 0 || strpos($className, "GO\\Base") === 0:
-				$module = Module::find($properties)->where(['name' => "core", "package" => "core"])->single();				
+				$module = self::findByName('core', 'core', null, $properties);
 				break;
 			
 			default:				
@@ -315,14 +316,13 @@ class Module extends Entity {
 					$name = $classNameParts[3];
 				}
 				
-				$module = Module::find($properties)->where(['name' => $name, 'package' => $package])->single();
-				
+				$module = self::findByName($package, $name, null, $properties);
 				// Needed for modules which are partly refactored.
 				// For example: The email account entity is required in the n ew framework
 				// and the email module itself is not refactored yet.
 				// Can be removed when all is refactored.
 				if(!$module) {
-					$module = Module::find($properties)->where(['name' => $name, 'package' => null])->single();
+					$module = self::findByName('legacy', $name, null, $properties);
 				}
 		}
 		
@@ -435,21 +435,19 @@ class Module extends Entity {
 	 * @return self|false
 	 */
 	public static function findByName($package, $name, $enabled = true, $props = []) {
+		$cache = $package."/". $name;
+
 		if($package == "legacy") {
 			$package = null;
 		}
 
-		$cache = $package."/". $name;
-		if(isset(self::$modulesByName[$cache])) {
-			$mod = self::$modulesByName[$cache];
-		} else {
+		$mod = go()->getCache()->get('module-' . $cache);
+		if(empty($mod)) {
 
-			$query = static::find($props)->where(['package' => $package, 'name' => $name]);
+			$mod = static::find($props)->where(['package' => $package, 'name' => $name])->single();
 
-			$mod = $query->single();
-
-			if(empty($props)) {
-				self::$modulesByName[$cache] = $mod;
+			if(empty($props) && !empty($mod)) {
+				go()->getCache()->set('module-' . $cache, $mod);
 			}
 		}
 
