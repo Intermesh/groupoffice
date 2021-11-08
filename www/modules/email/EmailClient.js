@@ -303,12 +303,17 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		text: t("Move to spam folder", "email"),
 		handler: function(){
 			 var records = this.messagesGrid.selModel.getSelections();
-			 if(records) {
-					 Ext.each(records, function(record) {
-						 GO.email.moveToSpam(record.get('uid'), record.get('mailbox'), this.account_id);
-
-					 }, this);
+			 if(!records) {
+				 return;
 			 }
+			 const uids = [];
+			 const mailbox = records[0].get("mailbox");
+
+			 Ext.each(records, function(record) {
+				 uids.push(record.get('uid'));
+			 }, this);
+
+				GO.email.moveToSpam(uids, mailbox, this.account_id);
 
 		},
 		scope: this,
@@ -1954,7 +1959,7 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 					params: {
 						account_id: fromAccountId,
 						from_mailbox_name: mailboxName,
-						mail_uid: mailUid
+						mail_uid: JSON.stringify(mailUid)
 					},
 					success: function() {
 //						GO.email.emailClient.topMessagesGrid.store.load();
