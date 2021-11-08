@@ -1,3 +1,7 @@
+- Googleauthenticator: Fix unhelpful error message after successfully enabling authenticator
+- Leavedays: Import manager data upon upgrade 6.4 > 6.5 and up
+- Leavedays: Display managers in year overview grid
+
 05-11-2021 6.5.84
 - Calendar: remove location data from month grid for reasons of screen real estate
 - History: Old bug caused removal of permissions after one year

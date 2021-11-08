@@ -25,6 +25,8 @@ go.util =  (function () {
 			return JSON.parse(JSON.stringify(obj));
 		},
 
+		isMobileOrTablet: GO.util.isMobileOrTablet,
+
 		/**
 		 * Grabs the first char of the first and last word.
 		 *
