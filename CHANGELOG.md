@@ -4,6 +4,7 @@
 - Googleauthenticator: Incorrect image path for two factor authentication #727
 - Calendarexport: Fixed:[Calendar export Module] Available even if no permission on it #739
 - Email: Fixed: 6.5.X: move mutltiple mails to SPAM with right-click does not work #707
+- Core: Sort groups by checked status in User's Groups
 
 05-11-2021 6.5.84
 - Calendar: remove location data from month grid for reasons of screen real estate
