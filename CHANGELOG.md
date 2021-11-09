@@ -5,6 +5,9 @@
 - Calendarexport: Fixed:[Calendar export Module] Available even if no permission on it #739
 - Email: Fixed: 6.5.X: move mutltiple mails to SPAM with right-click does not work #707
 - Core: Sort groups by checked status in User's Groups
+- Jistimeet: New module that integrates Jistimeet in the calendar
+- Core: updated Dutch translation
+- Email: Email from template source selection fixed
 
 05-11-2021 6.5.84
 - Calendar: remove location data from month grid for reasons of screen real estate
@@ -42,9 +45,6 @@
 - Core: Fixed search multiple terms in older modules
 - Tickets: Fixed {ticket:rate} template tag
 - Email: Fixed email display issue
-- Jistimeet: New module that integrates Jistimeet in the calendar
-- Core: updated Dutch translation
-- Email: Email from template source selection fixed
 
 
 04-10-2021 6.5.80
