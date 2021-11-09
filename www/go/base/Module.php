@@ -411,7 +411,8 @@ class Module extends Observable {
 	 * 
 	 * @return boolean
 	 */
-	public function enable() {		
+	public function enable() {
+		$this->registerEntities();
 		return true;
 	}
 
