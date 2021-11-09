@@ -808,6 +808,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$store->getColumnModel()->formatColumn('locked', '$model->isLocked()');
 			$store->getColumnModel()->formatColumn('locked_user_id', '$model->locked_user_id');
 			$store->getColumnModel()->formatColumn('folder_id', '$model->folder_id');
+			$store->getColumnModel()->formatColumn('username', '$model->user->displayName');
+			$store->getColumnModel()->formatColumn('musername', '$model->mUser->displayName');
 
 			$findParams = $store->getDefaultParams($params)
 							->limit($fileLimit)
