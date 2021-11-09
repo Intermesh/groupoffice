@@ -15,6 +15,7 @@ GO.moduleManager.onModuleReady('calendar',function(){
 				if (meetUri.substr(-1) != '/') meetUri += '/';
 				this.jitsiButton = new Ext.Button({
 					//name: 'jitsiMeet'
+					iconCls: 'ic-video-call',
 					text: t("Add online meeting link"),
 					handler: function(btn) {
 
