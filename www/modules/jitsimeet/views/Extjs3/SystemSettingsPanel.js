@@ -3,20 +3,20 @@ GO.jitsimeet.SystemSettingsPanel = Ext.extend(go.systemsettings.Panel, {
     initComponent: function () {
 
         Ext.apply(this, {
-            title: t('Jitse meet', 'jitsimeet', 'legacy'),
+            title: t('Jitsi meet', 'jitsimeet', 'legacy'),
             autoScroll: true,
-            iconCls: 'ic-video',
+            iconCls: 'ic-video-call',
             items: [
                 {
                     xtype: 'fieldset',
-                        title: t('Jitsi'),
-                    defaults: {
+                        title: t('Jitsi meet'),
+                        defaults: {
                         anchor: '100%',
                     },
                     items: [
                         {
                             xtype: 'textfield',
-                            fieldLabel: t('Jitsi uri', 'jitsimeet', 'legacy'),
+                            fieldLabel: t('Server URL', 'jitsimeet', 'legacy'),
                             name: 'jitsiUri',
                         },
                     ]

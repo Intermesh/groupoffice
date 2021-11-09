@@ -9,8 +9,13 @@ use GO\Calendar\Controller\EventController;
 
 class JitsimeetModule extends \GO\Base\Module{
 
+	public function autoInstall()
+	{
+		return true;
+	}
+
 	public function package() {
-		return self::PACKAGE_IN_DEVELOPMENT;
+		return self::PACKAGE_COMMUNITY;
 	}
 	
 	public function depends(){

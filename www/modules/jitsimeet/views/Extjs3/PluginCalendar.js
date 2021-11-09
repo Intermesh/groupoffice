@@ -15,14 +15,23 @@ GO.moduleManager.onModuleReady('calendar',function(){
 				if (meetUri.substr(-1) != '/') meetUri += '/';
 				this.jitsiButton = new Ext.Button({
 					//name: 'jitsiMeet'
-					text: 'Add link for video meeting',
+					text: t("Add online meeting link"),
 					handler: function(btn) {
-						let descriptionField = btn.ownerCt.previousSibling(),
+
+						const form = this.findParentByType("form").form,
+							descriptionField = form.findField('description'),
 							jitsiLink = meetUri+(Math.random() + 1).toString(36).substring(2);
-						descriptionField.setValue(descriptionField.getValue()+"\n"+jitsiLink)
+
+						const desc = descriptionField.getValue();
+						descriptionField.setValue((desc ? desc + "\n" : "") + t("Online meeting link") + ":\n\n" + jitsiLink + "\n\n");
+
+						const loc = form.findField("location");
+						if(!loc.getValue()){
+							loc.setValue(t("Online meeting"));
+						}
 					}
 				})
-				this.propertiesPanel.insert(-1, new Ext.Container({fieldLabel: '&nbsp;',items:[this.jitsiButton]}));
+				this.propertiesPanel.insert(-1, new Ext.Container({fieldLabel: '&nbsp;', labelSeparator: "",items:[this.jitsiButton]}));
 			}
 			
 		}),
