@@ -27,7 +27,7 @@ return array (
   'Reading from your clipboard isn\'t allowed' => 'Toegang tot het klembord is niet verleend',
   'Your system administrator requires you to setup two factor authentication' => 'Uw systeem beheerder heeft u verplicht om Two Factor Authenticatie in te stellen',
   'Enforce two factor authentication for users in a specific group' => 'Verplicht Two Factor authenticatie voor gebruikers in een specifieke groep',
-  'Block Group-Office usage until setup is done' => 'Block {product_name} usage until setup is done',
+  'Block Group-Office usage until setup is done' => 'Blokkeer {product_name} gebruik tot de installatie is voltooid',
   'Count down' => 'Tel af',
   'Count down this number of seconds until the user can cancel the setup' => 'Tel dit aantal seconden af totdat de gebruiker kan annueleren',
 );
