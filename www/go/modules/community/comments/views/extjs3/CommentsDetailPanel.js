@@ -8,7 +8,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	//
 	collapsible: true,
 	animCollapse: false, //htmleditor doesn't work with animCollapse
-
+	showComposer: true,
 	hideMode: "offsets", //required for htmleditor
 	collapseFirst:false,
 	titleCollapse: true,
@@ -108,14 +108,15 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			this.commentsContainer = new cntrClass({
 				region:'center',
 				autoScroll:true
-			}),
-			this.composer = new go.modules.comments.Composer({
+			})
+		];
+		if(this.showComposer) {
+			this.items.push(this.composer = new go.modules.comments.Composer({
 				margins: {left: dp(8), right: dp(8),bottom:dp(8),top:0},
 				region:'south',
 				height:60
-			})
-		];
-					
+			}));
+		}
 		go.modules.comments.CommentsDetailPanel.superclass.initComponent.call(this);
 	},
 
@@ -128,8 +129,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		
 		this.entityId = id;
 		this.entity = type;
-		this.composer.initEntity(this.entityId, this.entity, this.section);
-
+		if(this.composer) {
+			this.composer.initEntity(this.entityId, this.entity, this.section);
+		}
 		this.store.setFilter('entity', {
 			entity: this.entity,
 			entityId: this.entityId,
