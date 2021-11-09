@@ -16,7 +16,7 @@ GO.moduleManager.onModuleReady('calendar',function(){
 				this.jitsiButton = new Ext.Button({
 					//name: 'jitsiMeet'
 					iconCls: 'ic-video-call',
-					text: t("Add online meeting link"),
+					text: t("Add online meeting link", "jitsimeet"),
 					handler: function(btn) {
 
 						const form = this.findParentByType("form").form,
@@ -24,11 +24,11 @@ GO.moduleManager.onModuleReady('calendar',function(){
 							jitsiLink = meetUri+(Math.random() + 1).toString(36).substring(2);
 
 						const desc = descriptionField.getValue();
-						descriptionField.setValue((desc ? desc + "\n" : "") + t("Online meeting link") + ":\n\n" + jitsiLink + "\n\n");
+						descriptionField.setValue((desc ? desc + "\n" : "") + t("Online meeting link", "jitsimeet") + ":\n\n" + jitsiLink + "\n\n");
 
 						const loc = form.findField("location");
 						if(!loc.getValue()){
-							loc.setValue(t("Online meeting"));
+							loc.setValue(t("Online meeting", "jitsimeet"));
 						}
 					}
 				})
