@@ -44,6 +44,7 @@
 - Email: Fixed email display issue
 - Jistimeet: New module that integrates Jistimeet in the calendar
 - Core: updated Dutch translation
+- Email: Email from template source selection fixed
 
 
 04-10-2021 6.5.80
