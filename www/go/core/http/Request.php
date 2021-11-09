@@ -314,10 +314,15 @@ class Request extends Singleton{
 	 * @return string
 	 */
 	public function getFullUrl() {
-		$url =  $this->isHttps() ? 'https://' : 'http://';
-		$url .= $this->getHost(false) . $this->getUri();
+		return $this->getProtocol(). '//' .$this->getHost(false) . $this->getUri();
+	}
 
-		return $url;
+	public function getBaseUrl() {
+		return $this->getProtocol(). '//' .$this->getHost(false);
+	}
+
+	public function getProtocol() {
+		return $this->isHttps() ? 'https:' : 'http:';
 	}
 
 //	/**
