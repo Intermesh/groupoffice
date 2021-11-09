@@ -8,6 +8,7 @@
 - Jistimeet: New module that integrates Jistimeet in the calendar
 - Core: updated Dutch translation
 - Email: Email from template source selection fixed
+- Email: Fixed: 6.5.40 No auto-link when opening e-mail from ticket #686
 
 05-11-2021 6.5.84
 - Calendar: remove location data from month grid for reasons of screen real estate
