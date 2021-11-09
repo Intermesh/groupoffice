@@ -23,4 +23,11 @@ return array (
   'Disable google authenticator' => 'Google Authenticator uitschakelen',
   'Provide your current password before you can enable Google authenticator.' => 'Voer uw huidige wachtwoord in om Google Authenticator in te schakelen',
   'Scan the QR code below with the Google authenticator app on your mobile device, after that fill in the field below with the code generated in the app.' => 'Scan de QR code hieronder met de OTP of Google Authenticator App op uw mobiele telefoon. Voer daarna de code in om te bevestigen.',
+  'Setup later' => 'Stel later in',
+  'Reading from your clipboard isn\'t allowed' => 'Toegang tot het klembord is niet verleend',
+  'Your system administrator requires you to setup two factor authentication' => 'Uw systeem beheerder heeft u verplicht om Two Factor Authenticatie in te stellen',
+  'Enforce two factor authentication for users in a specific group' => 'Verplicht Two Factor authenticatie voor gebruikers in een specifieke groep',
+  'Block Group-Office usage until setup is done' => 'Block {product_name} usage until setup is done',
+  'Count down' => 'Tel af',
+  'Count down this number of seconds until the user can cancel the setup' => 'Tel dit aantal seconden af totdat de gebruiker kan annueleren',
 );
