@@ -9,13 +9,14 @@ CREATE TABLE IF NOT EXISTS `smi_certs` (
 
 DROP TABLE IF EXISTS `smi_pkcs12`;
 CREATE TABLE IF NOT EXISTS `smi_pkcs12` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `account_id` int(11) NOT NULL,
   `cert` blob,
   `serial` VARCHAR(100) NOT NULL,
   `valid_until` DATETIME NOT NULL,
   `valid_since` DATETIME NOT NULL,
   `provided_by` VARCHAR(128) NOT NULL,
-  PRIMARY KEY (`account_id`),
+  PRIMARY KEY (`id`),
   INDEX `fk_pks_cert_account_id_email_account_idx` (`account_id` ASC),
   CONSTRAINT `fk_account_id_to_email_account`
       FOREIGN KEY (`account_id`)
