@@ -1,3 +1,4 @@
+- Core: hide positive test messages from installer
 - Googleauthenticator: Fix unhelpful error message after successfully enabling authenticator
 - Leavedays: Import manager data upon upgrade 6.4 > 6.5 and up
 - Leavedays: Display managers in year overview grid

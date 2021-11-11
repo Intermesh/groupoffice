@@ -13,7 +13,6 @@ require('header.php');
 <section>
 	<form method="POST" action="" onsubmit="submitButton.disabled = true;">
 		<fieldset>
-			
 			<h2><?= go()->t("System requirements test"); ?></h2>
 			
 			<?php 
@@ -22,10 +21,7 @@ require('header.php');
 			?>
             <button class="primary right" name="submitButton" type="submit" <?php echo $ok ? "" : "disabled"; ?>><?= go()->t('Continue'); ?></button>
 		</fieldset>
-
-
 	</form>
-
 </section>
 
 <?php
