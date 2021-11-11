@@ -53,17 +53,25 @@ if(!function_exists('format_size'))
 	}
 }
 
-function ini_is_enabled($name){
+/**
+ * @param string $name
+ * @return bool
+ */
+function ini_is_enabled(string $name) :bool
+{
 	$v = ini_get($name);
 	
 	return $v==1 || strtolower($v)=='on';
 }
 
-function ini_return_bytes($val) {
-	
-		$last = strtolower(substr(trim($val), -1));
-	
-		$val = (int)substr(trim($val), 0, -1);
+/**
+ * @param string $val
+ * @return int
+ */
+function ini_return_bytes(string $val) :int
+{
+	$last = strtolower(substr(trim($val), -1));
+	$val = (int)substr(trim($val), 0, -1);
 		
     switch($last) {
         // The 'G' modifier is available since PHP 5.1.0
@@ -78,14 +86,15 @@ function ini_return_bytes($val) {
     return $val;
 }
 
-function test_system(){
+/**
+ * @return array
+ */
+function test_system() :array
+{
 
 	global $product_name;
 	
 	$tests=array();
-
-
-	
 
 	$test['name']='PHP apcu support';
 	$test['showSuccessFeedback'] = false;
@@ -132,12 +141,6 @@ function test_system(){
 	$test['feedback']='Fatal error: Your PHP version is too old to run '.$product_name.'. PHP 7.2 or higher is required';
 	$test['fatal']=true;
 
-//	$tests[]=$test;
-//	$test['name']='Session Cookies';
-//	$test['pass']=ini_get('session.cookie_httponly')!=1;
-//	$test['feedback']='Warning: session.cookie_httponly is set to 1. We recommend setting it to 0 because this can give problems with file uploads.';
-//	$test['fatal']=false;
-
 	$tests[]=$test;
 
 	$test['name']='Output buffering';
@@ -172,8 +175,6 @@ function test_system(){
 	$test['feedback']='Fatal: the php intl extension is required.';
 	$test['fatal']=true;
 	$tests[]=$test;
-
-	//echo ini_get('mbstring.func_overload');
 
 	$test['name']='mbstring function overloading';
 	$test['showSuccessFeedback'] = false;
@@ -304,14 +305,6 @@ function test_system(){
 	$test['feedback']='Warning: PHP error logging is disabled in php.ini. It\'s recommended that this feature is enabled in a production environment.';
 	$test['fatal']=false;
 
-	/*$tests[]=$test;
-	$test['name']='Error display';
-	$test['pass']=ini_get('display_errors')!='1';
-	$test['feedback']='Warning: PHP error display is enabled in php.ini. It\'s recommended that this feature is disabled because it can cause unnessecary interface crashes.';
-	$test['fatal']=false;*/
-
-	
-
 	$tests[]=$test;
 	$test['name']='MultiByte string functions';
 	$test['pass']=function_exists('mb_detect_encoding');
@@ -356,11 +349,9 @@ function test_system(){
 	$tests[]=$test;
 	$test['name']='TNEF';
 	$test['showSuccessFeedback'] = false;
-	if(class_exists('GO'))
-	{
+	if (class_exists('GO')) {
 		$tnef = whereis('tnef') ? whereis('tnef') : \GO::config()->cmd_tnef;
-	}else
-	{
+	} else {
 		$tnef = whereis('tnef') ? whereis('tnef') : '/usr/bin/tnef';
 	}
 	$test['pass']=@is_executable($tnef);
@@ -370,11 +361,9 @@ function test_system(){
 	$tests[]=$test;
 	$test['name'] = 'pdfinfo';
 	$test['showSuccessFeedback'] = false;
-	if(class_exists('GO'))
-	{
+	if (class_exists('GO')) {
 		$pdfinfo = whereis('pdfinfo') ? whereis('pdfinfo') : \GO::config()->cmd_pdfinfo; 
-	}else
-	{
+	} else {
 		$pdfinfo = whereis('pdfinfo') ? whereis('pdfinfo') : '/usr/bin/pdfinfo'; // The debian default path for pdfinfo
 	}
 	$test['pass']=@is_executable($pdfinfo);
@@ -391,11 +380,9 @@ function test_system(){
 	
 	
 	$test['name']='Ioncube version check';
-	
 	$testResultArray = ioncube_version_tester();
-	
-	$test['showSuccessFeedback'] = true;
-	$test['pass']= ($testResultArray['status'] == 'OK') ? true : false;	
+	$test['showSuccessFeedback'] = false;
+	$test['pass']= ($testResultArray['status'] === 'OK');
 	$test['feedback']= $testResultArray['problem'].(!empty($testResultArray['problem']) ? ' - ' : '').$testResultArray['solution'];
 	$test['fatal']=false;
 	
@@ -421,92 +408,14 @@ function test_system(){
 
 	$tests[]=$test;	
 	
-	
-	$url = "http".(!empty($_SERVER['HTTPS'])?"s":"")."://".$_SERVER['HTTP_HOST'];
-	
-
-	/*
-	try {
-		$headers = get_headers($url.'/caldav');	
-	}catch(\Exception $e) {
-		$headers = false;
-	}
-	$test['name']='CalDAV alias';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']=$headers && (strpos($headers[0], '401')!==false || strpos($headers[0], '200')!==false);
-	$test['feedback']="Note: The alias /caldav was not detected. Please create: Alias /caldav /groupoffice/modules/caldav/calendar.php.";
-	$test['fatal']=false;
-
-	$tests[]=$test;	
-	
-	try {
-	$headers = get_headers($url.'/.well-known/caldav');	
-	}catch(\Exception $e) {
-		$headers = false;
-	}
-	
-	$test['name']='CalDAV autodiscovery';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']=$headers && (strpos($headers[0], '301')!==false|| strpos($headers[0], '200')!==false);
-	$test['feedback']="Note: The redirect /.well-known/caldav was not detected. Please create a redirect: Redirect 301 /.well-known/caldav /caldav";
-	$test['fatal']=false;
-
-	$tests[]=$test;	
-	
-	try {
-	$headers = get_headers($url.'/carddav');	
-	}catch(\Exception $e) {
-		$headers = false;
-	}
-	$test['name']='CardDAV alias';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']=$headers && (strpos($headers[0], '401')!==false || strpos($headers[0], '200')!==false);;
-	$test['feedback']="Note: The alias /carddav was not detected. Please create: Alias /carddav /groupoffice/modules/carddav/addressbook.php.";
-	$test['fatal']=false;
-
-	$tests[]=$test;	
-	
-	try {
-	$headers = get_headers($url.'/.well-known/carddav');	
-	}catch(\Exception $e) {
-		$headers = false;
-	}
-	$test['name']='CardDAV autodiscovery';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']=$headers && (strpos($headers[0], '301')!==false || strpos($headers[0], '200')!==false);
-	$test['feedback']="Note: The redirect /.well-known/carddav was not detected. Please create a redirect: Redirect 301 /.well-known/carddav /carddav";
-	$test['fatal']=false;
-
-	$tests[]=$test;	
-	
-	try {
-	$headers = get_headers($url.'/Microsoft-Server-ActiveSync');	
-	}catch(\Exception $e) {
-		$headers = false;
-	}
-	
-//	var_dump($headers);
-	$test['name']='Microsoft-Server-ActiveSync alias';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']=$headers && (strpos($headers[0], '401')!==false || strpos($headers[0], '200')!==false);
-	$test['feedback']="Note: The alias /Microsoft-Server-ActiveSync was not detected. Please create: Alias /Microsoft-Server-ActiveSync /groupoffice/modules/z-push/index.php.";
-	$test['fatal']=false;
-
-	$tests[]=$test;	
-	
-	*/
-
 	$test['name']='MySQLnd driver';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']= extension_loaded('mysqlnd');
 	$test['feedback']= "PHP is not using the mysqlnd driver. Please install MySQLi.";
 	$test['fatal']=true;
-	
 
 	$tests[]=$test;
-	
-	
-	
+
 	$test['name']='Shared Memory Functions';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']= function_exists('sem_get') && function_exists('shm_attach') && function_exists('sem_acquire') && function_exists('shm_get_var');
@@ -514,7 +423,6 @@ function test_system(){
 	$test['fatal']=false;
 
 	$tests[]=$test;
-	
 	
 	$test['name']='Process Control Extensions';
 	$test['showSuccessFeedback'] = false;
@@ -533,21 +441,9 @@ function test_system(){
 	$tests[]=$test;
 	
 	
-	
-	
-	if(class_exists('GO')){
+	if(class_exists('GO')) {
 		
-//		$test['name']='Writable license file';
-//		$test['pass']=GO::getLicenseFile()->exists() && GO::getLicenseFile()->isWritable();					
-//		$test['feedback']="Fatal: the license file ".GO::getLicenseFile()->path()." is not writable. Please make it writable for the webserver.";
-//		$test['fatal']=true;
-//
-//		$tests[]=$test;	
-		
-		$root = dirname(dirname(__FILE__));
-
-		if($ioncubeWorks)
-		{
+		if($ioncubeWorks) {
 			$tests[]=$test;
 
 			$moduleFolder = Environment::get()->getInstallFolder()->getFolder('go' . DIRECTORY_SEPARATOR . 'modules');
@@ -617,40 +513,46 @@ function test_system(){
 	return $tests;
 }
 
-function output_system_test(){
+/**
+ * @return bool
+ */
+function output_system_test() :bool
+{
 	global $product_name;
 
 	$tests = test_system();
-	
+
+	// If the test script is called from the system administration tools (thus not included), it is safe to show the
+	// full output. 
+	$showFullOutput = !class_exists("go\core\App");
+
 	$fatal = false;
-	
-	foreach($tests as $test)
-	{
-		echo '<p>'.$test['name'].': ';
-		if(!$test['pass'])
-		{
-			echo '<span style="color:red">'.$test['feedback'].'</span>';
-			
-			if($test['fatal'])
-				$fatal=true;
-		}else
-		{
-			echo '<span style="color:green">OK</span>';
-			
-			if(!empty($test['showSuccessFeedback'])){
-				echo ' <span style="color:green"><small>( '.$test['feedback'].' )</small></span>';
+
+	foreach($tests as $test) {
+
+		if($showFullOutput || !$test['pass'] || !empty($test['showSuccessFeedback'])) {
+			echo '<p>'.$test['name'].': ';
+			if(!$test['pass']) {
+				echo '<span style="color:red">'.$test['feedback'].'</span>';
+
+				if($test['fatal']) {
+					$fatal=true;
+				}
+			} else {
+				echo '<span style="color:green">OK</span>';
+
+				if(!empty($test['showSuccessFeedback'])){
+					echo ' <span style="color:green"><small>( '.$test['feedback'].' )</small></span>';
+				}
 			}
 
+			echo '</p>';
 		}
-		
-		echo '</p>';
-	}	
+	}
 
-	if($fatal)
-	{
+	if($fatal) {
 		echo '<p style="color:red">Fatal errors occured. '.$product_name.' will not run properly with current system setup!</p>';
-	}else
-	{
+	} else {
 		echo '<p><b>Passed!</b> '.$product_name.' should run on this machine</p>';
 	}
 	
@@ -676,10 +578,12 @@ function output_system_test(){
 }
 
 
-//
-// Detect some system parameters
-//
-function ic_system_info()
+/**
+ * Detect some system parameters
+ *
+ * @return array
+ */
+function ic_system_info() :array
 {
 	$thread_safe = false;
 	$debug_build = false;
@@ -741,14 +645,8 @@ function ioncube_loader_version_array () {
  * 
  * @return array
  */
-function ioncube_version_tester(){
-	
-	$test = array(
-		'status'	=>'OK',
-		'problem'	=>'',
-		'solution'=>'No additional configuration required.'
-	);
-	
+function ioncube_version_tester() :array
+{
 	if(!ioncube_tester()){
 		$test = array(
 			'status'	=>'ERROR',
@@ -764,21 +662,17 @@ function ioncube_version_tester(){
 		$ioncube_loader_version = ioncube_loader_version_array();
 
 	  if ($ioncube_loader_version['major'] < 5 ) {// || ($ioncube_loader_version['major'] == 4 && $ioncube_loader_version['minor'] < 6) ) {
-			
 			$test = array(
 				'status'	=>'ERROR',
 				'problem'	=>'Installed: version '. $ioncube_loader_version['version'],
 				'solution'=>'Ioncube loader is installed but needs to be updated. Group-Office will only work reliably with ioncube loader version 5.0 or later. The most recent version of the loader can be found <a href="http://www.ioncube.com/loaders.php" target="_blank">here</a>.'
 			);
-			
 	  } else {
-			
 			$test = array(
 				'status'	=>'OK',
 				'problem'	=>'Installed: version '. $ioncube_loader_version['version'],
 				'solution'=>'No additional configuration required.'
 			);
-			
 	  }
 	} else {
 		$sys_info = ic_system_info();
@@ -824,10 +718,12 @@ function ioncube_version_tester(){
 	return $test;
 }
 
-function ioncube_tester()
+/**
+ * @return bool
+ */
+function ioncube_tester() :bool
 {
-	if(extension_loaded('ionCube Loader'))
-	{
+	if(extension_loaded('ionCube Loader')) {
 		return true;
 	}
 
@@ -939,24 +835,29 @@ function ioncube_tester()
 	return false;
 }
 
-function is__writable($path) {
+/* JH20211111 : Appears to be unused.
+function is__writable($path) :bool
+{
 	//will work in despite of Windows ACLs bug
 	//NOTE: use a trailing slash for folders!!!
 	//see http://bugs.php.net/bug.php?id=27609
 	//see http://bugs.php.net/bug.php?id=30931
 
-	if ($path[strlen($path)-1] == '/') // recursively return a temporary file path
-	return is__writable($path.uniqid(mt_rand()).'.tmp');
-	else if (is_dir($path))
-	return is__writable($path.'/'.uniqid(mt_rand()).'.tmp');
+	if ($path[strlen($path)-1] == '/') {// recursively return a temporary file path
+		return is__writable($path . uniqid(mt_rand()) . '.tmp');
+	} else if (is_dir($path)) {
+		return is__writable($path.'/'.uniqid(mt_rand()).'.tmp');
+	}
 	// check tmp file for read/write capabilities
 	$rm = file_exists($path);
 	$f = @fopen($path, 'a');
-	if ($f===false)
-	return false;
+	if ($f===false) {
+		return false;
+	}
 	fclose($f);
-	if (!$rm)
-	unlink($path);
+	if (!$rm) {
+		unlink($path);
+	}
 	return true;
 }
 
@@ -973,49 +874,44 @@ function save_config($config_obj)
 
 	$values = get_object_vars($config_obj);
 
-	foreach($values as $key=>$value)
-	{
-		if($key == 'version')
-		break;
+	foreach($values as $key=>$value) {
+		if($key == 'version') {
+			break;
+		}
 			
-			
-		if(!is_object($value))
-		{
+		if(!is_object($value)) {
 			$config[$key]=$value;
 		}
 	}
 
 
 	$config_data = "<?php\n";
-	foreach($config as $key=>$value)
-	{
-		if($value===true)
-		{
+	foreach($config as $key=>$value) {
+		if($value===true) {
 			$config_data .= '$config[\''.$key.'\']=true;'."\n";
-		}elseif($value===false)
-		{
+		} elseif($value===false) {
 			$config_data .= '$config[\''.$key.'\']=false;'."\n";
-		}else
-		{
+		} else {
 			$config_data .= '$config[\''.$key.'\']="'.$value.'";'."\n";
 		}
 	}
 	return file_put_contents($CONFIG_FILE, $config_data);
 }
 
+*/
 
-
-function whereis($cmd)
+/**
+ * @param string $cmd
+ * @return false|mixed|string
+ */
+function whereis(string $cmd)
 {
-	if(strtoupper(substr(PHP_OS, 0, 3)) != 'WIN')
-	{
+	if(strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
 		exec('whereis '.$cmd, $return);
 
-		if(isset($return[0]))
-		{
+		if(isset($return[0])) {
 			$locations = explode(' ', $return[0]);
-			if(isset($locations[1]))
-			{
+			if(isset($locations[1])) {
 				return $locations[1];
 			}
 		}
@@ -1024,11 +920,11 @@ function whereis($cmd)
 }
 
 
-function systemIsOk() {
+function systemIsOk() :bool
+{
 	$tests = test_system();
 	
-	foreach($tests as $test)
-	{
+	foreach($tests as $test) {
 		if(!$test['pass'] && $test['fatal']) {
 			return false;
 		}
@@ -1037,7 +933,12 @@ function systemIsOk() {
 	return true;
 }
 
-function return_bytes($val) {
+/**
+ * @param string $val
+ * @return int
+ */
+function return_bytes(string $val) :int
+{
 
 	$last = strtolower(substr(trim($val), -1));
 	
@@ -1056,8 +957,7 @@ function return_bytes($val) {
 }
 //
 ////check if we are included
-if(!class_exists("go\core\App"))
-{
+if(!class_exists("go\core\App")) {
 	echo '<h1 style="font-family: Arial, Helvetica;font-size: 18px;">'.$product_name.' test script</h1><div style="font-family: Arial, Helvetica;font-size: 12px;"> ';
 	output_system_test();
 	echo "</div>";
