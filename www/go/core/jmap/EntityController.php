@@ -13,7 +13,6 @@ use go\core\data\convert\AbstractConverter;
 use go\core\db\Criteria;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
-use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
 use go\core\orm\Query;

@@ -199,7 +199,6 @@ go.Jmap = {
 	 * @returns {Boolean}
 	 */
 	sse : function() {
-		// return;
 		try {
 			if (!window.EventSource) {
 				console.debug("Browser doesn't support EventSource");
