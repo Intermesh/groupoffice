@@ -14,8 +14,6 @@
 GO.email.AccountDialog = function(config) {
 	Ext.apply(this, config);
 
-//	var sslCb;
-
 	var advancedItems = [ new Ext.form.TextField({
 		fieldLabel : t("Root mailbox", "email"),
 		name : 'mbroot'
@@ -78,7 +76,6 @@ GO.email.AccountDialog = function(config) {
 		hideLabel:false,
 		fieldLabel:''
 	});
-		
 
 	var incomingTab = {
 		title : t("Incoming mail", "email"),
@@ -122,7 +119,6 @@ GO.email.AccountDialog = function(config) {
 			boxLabel: t("Permanently store password", "email"),
 			checked: true,
 			name: 'store_password',
-//			allowBlank: true,
 			hideLabel:true,
 			hidden: true //this function only works with imap auth at the moment.
 		}),
@@ -130,7 +126,6 @@ GO.email.AccountDialog = function(config) {
 			fieldLabel : t("Password"),
 			name : 'password',
 			inputType : 'password',
-//			allowBlank : false,
 			listeners : {
 				change : function() {
 					this.refreshNeeded = true;
@@ -245,8 +240,7 @@ GO.email.AccountDialog = function(config) {
 			forceSelection : true
 		}),
 		this.smtpAllowSelfSignedCheck,
-		{
-			xtype:'xcheckbox',
+		this.useSmtpAuthentication = new Ext.ux.form.XCheckbox({
 			checked: false,
 			name: 'smtp_auth',
 			hideLabel:true,
@@ -258,7 +252,7 @@ GO.email.AccountDialog = function(config) {
 				},
 				scope:this
 			}
-		},this.smtpUsername= new Ext.form.TextField({
+		}),this.smtpUsername= new Ext.form.TextField({
 			fieldLabel : t("Username"),
 			name : 'smtp_username',
 			disabled:true
@@ -388,6 +382,23 @@ GO.email.AccountDialog = function(config) {
 							this.placeSignatureBelowReplyCbx = new Ext.ux.form.XCheckbox({
 								boxLabel: t("On reply/forward: Place signature always at the end of the mail.", "email"),
 								name: 'signature_below_reply',
+							}),
+							this.forceSmtpLoginCbx = new Ext.ux.form.XCheckbox({
+								boxLabel: t("SMTP login uses IMAP credentials", "email","communtiy"),
+								name: 'force_smtp_login',
+								handler: function(cb, checked) {
+									if(checked) {
+										this.smtpUsername.hide();
+										this.smtpPassword.hide();
+										this.useSmtpAuthentication.hide();
+									} else {
+										this.smtpUsername.show();
+										this.smtpPassword.show();
+										this.useSmtpAuthentication.show();
+									}
+
+								},
+								scope: this
 							})
 						]
 					}
@@ -409,7 +420,6 @@ GO.email.AccountDialog = function(config) {
 	  levelLabels:levelLabels
 	});
 
-	//this.permissionsTab.disabled = false;
 	var serverTab = {
 		title: t('Server', 'email'),
 		autoScroll: true,
@@ -429,7 +439,6 @@ GO.email.AccountDialog = function(config) {
 						collapsed : true,
 						autoHeight : true,
 						autoWidth : true,
-						// defaults: {anchor: '100%'},
 						defaultType : 'textfield',
 						labelWidth : 75,
 						labelAlign : 'left',
@@ -441,7 +450,7 @@ GO.email.AccountDialog = function(config) {
 		outgoingTab
 		]
 	};
-	console.log(serverTab);
+
 	this.filterGrid = new GO.email.FilterGrid();
 	this.labelsTab = new GO.email.LabelsGrid();
 

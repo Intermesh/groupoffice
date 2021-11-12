@@ -50,6 +50,7 @@ use GO;
  * @property int $sieve_port
  * @property boolean $sieve_tls
  * @property boolean $sieve_usetls
+ * @property boolean $force_smtp_login
  */
 class Account extends \GO\Base\Db\ActiveRecord {
 	
@@ -160,25 +161,15 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	
 	protected function beforeSave() {
 		if($this->isModified('password')){	
-//			$decrypted = \GO\Base\Util\Crypt::decrypt($this->getOldAttributeValue('password'));
-//			
-//			if($decrypted==$this->password){
-//				$this->resetAttribute('password');
-//			}else
-//			{
-				$encrypted = \GO\Base\Util\Crypt::encrypt($this->password);		
-				if($encrypted){
-					$this->password = $encrypted;
-					$this->password_encrypted=2;//deprecated. remove when email is mvc style.
-				}
-//			}
-			
+			$encrypted = \GO\Base\Util\Crypt::encrypt($this->password);
+			if($encrypted){
+				$this->password = $encrypted;
+				$this->password_encrypted=2;//deprecated. remove when email is mvc style.
+			}
+
 			unset(GO::session()->values['emailModule']['accountPasswords'][$this->id]);
 		}
 
-//		if (!empty($this->id) && !empty(GO::session()->values['emailModule']['accountPasswords'][$this->id]))
-//			unset(GO::session()->values['emailModule']['accountPasswords'][$this->id]);
-		
 		if($this->isModified('smtp_password')){
 			$encrypted = \GO\Base\Util\Crypt::encrypt($this->smtp_password);		
 			if($encrypted)
@@ -417,31 +408,6 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		}else
 			return false;
 	}
-	
-//	private function _getCacheKey(){
-//		$user_id = \GO::user() ? \GO::user()->id : 0;
-//		return $user_id.':'.$this->id.':uidnext';
-//	}
-	
-//	protected function getHasNewMessages(){
-//		
-//		\GO::debug("getHasNewMessages UIDNext ".(isset($this->_imap->selected_mailbox['uidnext']) ? $this->_imap->selected_mailbox['uidnext'] : ""));
-//		
-//		if(isset($this->_imap->selected_mailbox['name']) && $this->_imap->selected_mailbox['name']=='INBOX' && !empty($this->_imap->selected_mailbox['uidnext'])){
-//			
-//			$cacheKey = $this->_getCacheKey();
-//			
-//			$uidnext = $value = \GO::cache()->get($cacheKey);
-//			
-//			\GO::cache()->set($cacheKey, $this->_imap->selected_mailbox['uidnext']);					
-//			
-//			if($uidnext!==false && $uidnext!=$this->_imap->selected_mailbox['uidnext']){
-//				return true;
-//			}			
-//		}
-//			
-//		return false;
-//	}
 
 
 	/**
@@ -482,8 +448,6 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function getAutoCheckMailboxes(){
 		$checkMailboxArray = empty($this->check_mailboxes) ? array() : explode(',',$this->check_mailboxes);
-//		if(!in_array("INBOX", $checkMailboxArray))
-//			$checkMailboxArray[]="INBOX";
 		return $checkMailboxArray;
 	}
 
@@ -510,7 +474,6 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		$rootMailboxes = array();
 	
 		$folders = $imap->list_folders($subscribed,$withStatus,"","{$this->mbroot}%", true);
-//		\GO::debug($folders);
 		foreach($folders as $folder){
 			$mailbox = new ImapMailbox($this,$folder);
 			$rootMailboxes[]=$mailbox;
@@ -538,8 +501,6 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		$imap = $this->openImapConnection();
 		
 		$folders = $imap->list_folders(true, $withStatus,'','*',true);
-		
-		//$node= array('name'=>'','children'=>array());
 		
 		$rootMailboxes = array();
 		
@@ -569,29 +530,26 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		$attr = parent::defaultAttributes();
 		
 		$attr['check_mailboxes']="INBOX";
-//		if (\GO::modules()->isInstalled('sieve')) {
-			$attr['sieve_port'] = !empty(\GO::config()->sieve_port) ? \GO::config()->sieve_port : '4190';
-			if (isset(\GO::config()->sieve_usetls))
-				$attr['sieve_usetls'] = !empty(\GO::config()->sieve_usetls);
-			else
-				$attr['sieve_usetls'] = true;
-//		}	
+		$attr['sieve_port'] = !empty(\GO::config()->sieve_port) ? \GO::config()->sieve_port : '4190';
+		if (isset(\GO::config()->sieve_usetls)) {
+			$attr['sieve_usetls'] = !empty(\GO::config()->sieve_usetls);
+		} else {
+			$attr['sieve_usetls'] = true;
+		}
 		return $attr;
 	}
 
 	public function getDefaultTemplate() {
-//		if (\GO::modules()->addressbook) {
-			$defaultAccountTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($this->id);
-			if (!$defaultAccountTemplateModel) {
-				$defaultUserTemplateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
-				if (!$defaultUserTemplateModel)
-					return false;
-				else
-					return $defaultUserTemplateModel;
-			} else {
-				return $defaultAccountTemplateModel;
-			}
-
+		$defaultAccountTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($this->id);
+		if (!$defaultAccountTemplateModel) {
+			$defaultUserTemplateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
+			if (!$defaultUserTemplateModel)
+				return false;
+			else
+				return $defaultUserTemplateModel;
+		} else {
+			return $defaultAccountTemplateModel;
+		}
 	}
 	
 }
