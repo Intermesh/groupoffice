@@ -1,4 +1,5 @@
 6.5.86
+- Calendar: Bypass cancellation email for events with deactivated users
 - Calendar: do not export private events if not owner of said events
 
 15-11-2021 6.5.85
