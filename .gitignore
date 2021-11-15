@@ -49,6 +49,7 @@ forum
 !/www/modules/groups
 !/www/modules/imapauth
 !/www/modules/ipwhitelist
+!/www/modules/jitsimeet
 !/www/modules/ldapauth
 !/www/modules/log
 !/www/modules/manualsite

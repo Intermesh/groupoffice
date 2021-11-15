@@ -18,6 +18,28 @@ XX-09-20216.6.10
       custom fields.
 
 6.5.85
+15-11-2021 6.5.85
+- Projects2: bugfix in query for Project cost Reports
+- Core: set default user theme to Paper if not set already
+- Core: hide positive test messages from installer
+- Googleauthenticator: Fix unhelpful error message after successfully enabling authenticator
+- Leavedays: Import manager data upon upgrade 6.4 > 6.5 and up
+- Leavedays: Display managers in year overview grid
+- Googleauthenticator: Incorrect image path for two factor authentication #727
+- Calendarexport: Fixed:[Calendar export Module] Available even if no permission on it #739
+- Email: Fixed: 6.5.X: move mutltiple mails to SPAM with right-click does not work #707
+- Core: Sort groups by checked status in User's Groups
+- Jistimeet: New module that integrates Jistimeet in the calendar
+- Core: updated Dutch translation
+- Email: Email from template source selection fixed
+- Email: Fixed: 6.5.40 No auto-link when opening e-mail from ticket #686
+- Filesearch: Content preview in separate collapsible panel
+- Email / Core: remove empty margins from paragraph tag
+- Addressbook: Show address book in contact selection field
+- Core: Updated German translation
+- Onlyoffice: Didn't work on sub path like /groupoffice
+- WOPI: Didn't work on sub path like /groupoffice
+
 05-11-2021 6.5.84
 - Calendar: remove location data from month grid for reasons of screen real estate
 - History: Old bug caused removal of permissions after one year
@@ -54,6 +76,7 @@ XX-09-20216.6.10
 - Core: Fixed search multiple terms in older modules
 - Tickets: Fixed {ticket:rate} template tag
 - Email: Fixed email display issue
+
 
 04-10-2021 6.5.80
 - Comments: fixed comment panel not loading the last items when more than 40

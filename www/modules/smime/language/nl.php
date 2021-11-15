@@ -28,7 +28,7 @@ return array (
   'description' => 'Uitbreiding van de e-mail module met SMIME ondertekeking en versleuteling.',
   'The Group-Office password was incorrect.' => 'Het {product_name} wachtwoord was onjuist.',
   'Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!' => 'Uw SMIME sleutelwachtwoord komt overeen met uw {product_name} wachtwoord. Dit is uit beveiligingsoogpunt niet toegestaan!',
-  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Om een nieuw PCSK12 certificaat te uploaden, moet u uw GroupOffice wachtwoord invoeren. Uit beveiligingsoogpunt mag dit wachtwoord niet overeenkomen met die van uw PCSK12 certificaat. Geen wachtwoord is ook niet toegestaan.',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Om een nieuw PCSK12 certificaat te uploaden, moet u uw {product_name} wachtwoord invoeren. Uit beveiligingsoogpunt mag dit wachtwoord niet overeenkomen met die van uw PCSK12 certificaat. Geen wachtwoord is ook niet toegestaan.',
   'Add to SMIME certificates' => 'Toevoegen aan SMIMe certificaten',
   'Certificate added' => 'Certificaat toegevoegd',
   'SMIME certificate was added for' => 'SMIME certificaat was toegevoegd voor',

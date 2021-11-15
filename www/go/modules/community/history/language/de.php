@@ -10,4 +10,5 @@ return array (
   'Action' => 'Aktion',
   'Entity' => 'Entität',
   'Item was never modified' => 'Eintrag wurde nie geändert',
+  'Delete entries after' => 'Einträge löschen nach',
 );

@@ -482,14 +482,13 @@ class Module extends Entity {
 	 * @return Settings
 	 */
 	public function getSettings() {
-		if(!isset($this->package)) {
-			return null;
-		}
-
 		if(!$this->isAvailable()) {
 			return null;
 		}
-		
+		$module = $this->module();
+		if(!method_exists($module, 'getSettings')) {
+			return null;
+		}
 		return $this->module()->getSettings();
 	}
 	
