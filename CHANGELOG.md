@@ -1,3 +1,4 @@
+15-11-2021 6.5.85
 - Projects2: bugfix in query for Project cost Reports
 - Core: set default user theme to Paper if not set already
 - Core: hide positive test messages from installer
@@ -16,6 +17,8 @@
 - Email / Core: remove empty margins from paragraph tag
 - Addressbook: Show address book in contact selection field
 - Core: Updated German translation
+- Onlyoffice: Didn't work on sub path like /groupoffice
+- WOPI: Didn't work on sub path like /groupoffice
 
 05-11-2021 6.5.84
 - Calendar: remove location data from month grid for reasons of screen real estate
