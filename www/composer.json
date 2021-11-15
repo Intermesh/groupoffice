@@ -39,7 +39,8 @@
     "phpoffice/phpspreadsheet": "^1.15",
     "lcobucci/jwt": "3.3.3",
     "firebase/php-jwt": "^5.2",
-    "donatj/phpuseragentparser": "^1.4"
+    "donatj/phpuseragentparser": "^1.4",
+    "league/oauth2-google": "^4.0"
   },
   "license": "AGPL",
   "authors": [

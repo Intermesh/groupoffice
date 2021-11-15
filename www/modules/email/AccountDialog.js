@@ -43,6 +43,44 @@ GO.email.AccountDialog = function(config) {
 		);
 	}
 
+	// TODO: Put this properly in an override function in Googleoauth2
+	if(go.Modules.isAvailable("community", "googleoauth2")) {
+		this.btnOpenAuthDialog = new Ext.Button({
+			iconCls: '',
+			label: 'OAuth2',
+		});
+		this.selectAuthMethodCombo = new Ext.form.ComboBox({
+			fieldLabel: t("Authentication Method"),
+			hiddenName: 'authenticationMethod',
+			valueField: 'id',
+			displayField: 'text',
+			triggerAction: 'all',
+			allowBlank: false,
+			mode : 'local',
+			editable : false,
+			selectOnFocus : true,
+			forceSelection : true,
+			width: 300,
+			value: 'credentials',
+			store: new Ext.data.SimpleStore({
+				fields: ['id', 'text'],
+				data: [
+					['credentials', t("User name and password")],
+					['OAuth2', t("Google OAuth2")]
+				]
+			}),
+			listeners: {
+				'select': function (combo, record, index) {
+					if(record.data.id !== "credentials") {
+						this.tabPanel.hideTabStripItem(1);
+					} else {
+						this.tabPanel.unhideTabStripItem(1)
+					}
+				},
+				scope: this
+			}
+		});
+	}
 				
 		this.templatesCombo = new GO.form.ComboBox({
 			fieldLabel : t("Default e-mail template", "email"),
@@ -80,7 +118,7 @@ GO.email.AccountDialog = function(config) {
 	});
 		
 
-	var incomingTab = {
+	this.incomingTab = {
 		title : t("Incoming mail", "email"),
 		layout : 'form',
 		defaults : {
@@ -160,9 +198,9 @@ GO.email.AccountDialog = function(config) {
 		this.imapAllowSelfSignedCheck]
 	};
 
-	// end incomming tab
+	// end incoming tab
 
-	var properties_items = [
+	this.properties_items = [
 	this.selectUser = new GO.form.SelectUser({
 		fieldLabel : t("User"),
 		disabled : !GO.settings.has_admin_permission,
@@ -195,7 +233,11 @@ GO.email.AccountDialog = function(config) {
 	}
 	];
 
-	properties_items.push(this.templatesCombo);
+	this.properties_items.push(this.templatesCombo);
+
+	if(go.Modules.isAvailable("community", "googleoauth2")) {
+		this.properties_items.push(this.selectAuthMethodCombo);
+	}
 
 	this.smtpAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
 		boxLabel: t("Allow self signed certificate when using SSL or TLS", "email"),
@@ -204,7 +246,7 @@ GO.email.AccountDialog = function(config) {
 		fieldLabel:''
 	});
 	
-	var outgoingTab = {
+	this.outgoingTab = {
 		title : t("Outgoing mail", "email"),
 		layout : 'form',
 		xtype:'fieldset',
@@ -345,7 +387,7 @@ GO.email.AccountDialog = function(config) {
 		})]
 	});
 	
-	var propertiesTab = {
+	this.propertiesTab = {
 		title : t("Properties"),
 		autoScroll: true,
 		layout:'table',
@@ -359,7 +401,7 @@ GO.email.AccountDialog = function(config) {
 				autoHeight : true,
 				cls : 'go-form-panel',
 				labelWidth : 100,
-				items :properties_items
+				items :this.properties_items
 			},{ 
 				rowspan: 2,
 				defaults: {xtype:'fieldset'},
@@ -410,7 +452,7 @@ GO.email.AccountDialog = function(config) {
 	});
 
 	//this.permissionsTab.disabled = false;
-	var serverTab = {
+	this.serverTab = {
 		title: t('Server', 'email'),
 		autoScroll: true,
 		disabled: (!GO.settings.modules.email.write_permission),
@@ -420,7 +462,7 @@ GO.email.AccountDialog = function(config) {
 				rowspan: 2,
 				defaults: {xtype:'fieldset'},
 				items: [
-					incomingTab,
+					this.incomingTab,
 					{
 						xtype : 'fieldset',
 						title : t("Advanced", "email"),
@@ -438,16 +480,17 @@ GO.email.AccountDialog = function(config) {
 					}
 				]
 		},
-		outgoingTab
+		this.outgoingTab
 		]
 	};
-	console.log(serverTab);
+
+	console.log(this.serverTab);
 	this.filterGrid = new GO.email.FilterGrid();
 	this.labelsTab = new GO.email.LabelsGrid();
 
 	var items = [
-		propertiesTab,
-		serverTab,
+		this.propertiesTab,
+		this.serverTab,
 		this.filterGrid,
 		this.labelsTab,
 		this.permissionsTab
