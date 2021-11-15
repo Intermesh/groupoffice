@@ -15,6 +15,7 @@
 - Filesearch: Content preview in separate collapsible panel
 - Email / Core: remove empty margins from paragraph tag
 - Addressbook: Show address book in contact selection field
+- Core: Updated German translation
 
 05-11-2021 6.5.84
 - Calendar: remove location data from month grid for reasons of screen real estate

@@ -1478,4 +1478,5 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Logout all' => 'Alle ausloggen',
   'Logout users when inactive for more than this number of seconds. This will also disable the \'Remember my login\' checkbox in the login dialog. 0 disables this setting.' => 'Benutzer abmelden, wenn sie länger als diese Anzahl von Sekunden inaktiv sind. Dadurch wird auch das Kontrollkästchen "Anmeldung merken" im Anmeldedialog deaktiviert. 0 deaktiviert diese Einstellung.',
   'Could not open a window. Please allow popup windows in your browser.' => 'Ein Fenster konnte nicht geöffnet werden. Bitte erlauben Sie Popup-Fenster in Ihrem Browser.',
+  'Trial license' => 'Testlizenz',
 );
