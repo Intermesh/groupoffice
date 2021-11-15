@@ -50,7 +50,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 							return go.modules.community.addressbook.renderName(data);
 						}
 					},
-					"photoBlobId", {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender', 'color'],
+					"photoBlobId", {name: "addressbook", type: "relation"}, {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender', 'color'],
 				entityStore: "Contact",
 				sortInfo: {
 					field: go.User.addressBookSettings.sortBy,
@@ -69,7 +69,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 					 <div class="wrap">\
 						 <div><tpl if="!values.id"><b>' + t("Create new") + ':</b> </tpl>{name}</div>\
 						 <tpl if="values.emailAddresses && values.emailAddresses[0]"><small>{[values.emailAddresses[0].email]}</small></tpl>\\n\
-						 <small>{[values.organizations ? values.organizations.column("name").join(", ") : ""]}</small>\
+						 <small>{[values.organizations && values.organizations.length ? values.organizations.column("name").join(", ") + " - " : ""]}{values.addressbook.name}</small>\
 					 </div>\
 				 </div></div>',
 				'</tpl>', {
