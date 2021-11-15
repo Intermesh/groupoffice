@@ -1,3 +1,6 @@
+6.5.86
+- Calendar: do not export private events if not owner of said events
+
 15-11-2021 6.5.85
 - Projects2: bugfix in query for Project cost Reports
 - Core: set default user theme to Paper if not set already
