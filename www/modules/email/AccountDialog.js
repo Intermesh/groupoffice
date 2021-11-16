@@ -35,7 +35,6 @@ GO.email.AccountDialog = function(config) {
 				boxLabel: t("Use secure connection for (Sieve) email filters", "sieve"),
 				checked:GO.sieve.sieveTls,
 				name: 'sieve_usetls',
-//				allowBlank: true,
 				hideLabel:true
 			})
 		);
@@ -240,6 +239,25 @@ GO.email.AccountDialog = function(config) {
 			forceSelection : true
 		}),
 		this.smtpAllowSelfSignedCheck,
+		this.imapCredentialsCbx = new Ext.ux.form.XCheckbox({
+			hideLabel: true,
+			boxLabel: t("Use IMAP credentials", "email","communtiy"),
+			name: 'force_smtp_login',
+			handler: function(cb, checked) {
+				if(checked) {
+					this.smtpUsername.hide();
+					this.smtpPassword.hide();
+					this.useSmtpAuthentication.hide();
+				} else {
+					this.smtpUsername.show();
+					this.smtpPassword.show();
+					this.useSmtpAuthentication.show();
+				}
+
+			},
+			scope: this
+		}),
+
 		this.useSmtpAuthentication = new Ext.ux.form.XCheckbox({
 			checked: false,
 			name: 'smtp_auth',
@@ -260,7 +278,6 @@ GO.email.AccountDialog = function(config) {
 		this.smtpPasswordStore = new Ext.ux.form.XCheckbox({
 			checked: true,
 			name: 'store_smtp_password',
-//			allowBlank: true,
 			hideLabel:true,
 			hidden: true
 		}),
@@ -382,23 +399,6 @@ GO.email.AccountDialog = function(config) {
 							this.placeSignatureBelowReplyCbx = new Ext.ux.form.XCheckbox({
 								boxLabel: t("On reply/forward: Place signature always at the end of the mail.", "email"),
 								name: 'signature_below_reply',
-							}),
-							this.forceSmtpLoginCbx = new Ext.ux.form.XCheckbox({
-								boxLabel: t("SMTP login uses IMAP credentials", "email","communtiy"),
-								name: 'force_smtp_login',
-								handler: function(cb, checked) {
-									if(checked) {
-										this.smtpUsername.hide();
-										this.smtpPassword.hide();
-										this.useSmtpAuthentication.hide();
-									} else {
-										this.smtpUsername.show();
-										this.smtpPassword.show();
-										this.useSmtpAuthentication.show();
-									}
-
-								},
-								scope: this
 							})
 						]
 					}

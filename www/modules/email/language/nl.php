@@ -302,4 +302,6 @@ Instellingen -> Accounts -> Dubbelklik account -> Mappen.',
   '<p>To set Group-Office as your default e-mail program please <a class="normal-link" href="http://www.Group-Office.com/wiki/E-mail#Set_Group-Office_as_your_default_e-mail_client" target="_blank">read the instructions</a>.</p><p>Then if you are using Windows you must download and run <a class="normal-link" href="{url}">this register file</a></p>' => '<p>Om {product_name} als uw standaard e-mail programma in te stellen voor Windows kunt u dit <a class="normal-link" href="{url}">registerbestand</a> uitvoeren.</p>',
   'Store replies in the same folder as the original message' => 'Store replies in the same folder as the original message',
   'Allow the use of a self signed certificate when using SSL or TLS' => 'Sta het gebruik van self signed certificates toe bij een SSL of TLS verbinding',
+	'Use IMAP credentials' => 'Gebruik IMAP inloggegevens',
+	'' => ''
 );
