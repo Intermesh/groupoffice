@@ -1,5 +1,6 @@
 6.4.245
 - Savemailas: override mtime to email date
+- Calendar: backport prevent error when event is cancelled for disabled user
 
 13-09-2021 6.4.244
 - Savemailas: Fixed check database for email links

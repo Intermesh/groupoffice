@@ -2577,17 +2577,20 @@ The following is the error message:
 
 		while ($participant = $stmt->fetch()) {		
 			//don't invite organizer
-			if($participant->is_organizer)
+			if($participant->is_organizer) {
 				continue;
-
+			}
 			
 			// Set the language of the email to the language of the participant.
 			$language = false;
 			if(!empty($participant->user_id)){
 				$user = \GO\Base\Model\User::model()->findByPk($participant->user_id, false, true);
-				
-				if($user)
+				if (!$user->enabled) {
+					continue;
+				}
+				if($user) {
 					\GO::language()->setLanguage($user->language);
+				}
 			}
 
 			$subject =  \GO::t("Cancellation", "calendar").': '.$this->name;
