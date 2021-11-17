@@ -3,6 +3,8 @@
 - Calendar: do not export private events if not owner of said events
 - Leavedays: Only import most recent manager data
 - Addressbook: Bugfix: show address book in contact selection field
+- Leavedays: Leave out disabled activity types in year panel
+- Business: Activity dialog bigger
 
 
 15-11-2021 6.5.85
