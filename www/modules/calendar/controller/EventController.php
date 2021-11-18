@@ -1454,16 +1454,16 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	protected function actionDelete($params){
 		
 		$event = \GO\Calendar\Model\Event::model()->findByPk($params['id']);
-		if(!$event)
+		if(!$event) {
 			throw new \GO\Base\Exception\NotFound();
-		
+		}
 		if(!isset($params['send_cancel_notice']) && $event->hasOtherParticipants()){
 			return array(
 					'askForCancelNotice'=>true,
 					'is_organizer'=>$event->is_organizer,
 					'success'=>true
 			);
-		}  else {			
+		} else {
 			if(!empty($params['exception_date'])) {
 				if(!empty($params['thisAndFuture']) && $params['thisAndFuture'] == 'true') {
 					$event->repeat_end_time = $params['exception_date']-1;

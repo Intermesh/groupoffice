@@ -36,11 +36,14 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 				'isUserGroupFor',
 				{name: 'users', type: "relation", limit: 5},
 				{
-					name: 'selected', 
+					name: 'selected',
 					type: {
 						convert: function (v, data) {
 							return me.value.indexOf(data.id) > -1;
 						}
+					},
+					sortType: function (checked) {
+						return checked ? 1 : 0;
 					}
 				},
 				{
@@ -51,7 +54,6 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 						}
 					}
 				}
-//				{name: 'user', type: go.data.types.User, key: 'isUserGroupFor'},
 			],
 			entityStore: "Group"
 		});
@@ -64,7 +66,7 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 
 		Ext.apply(this, {		
 			plugins: [checkColumn],
-			tbar: [ '->', 
+			tbar:['->',
 				{
 					xtype: 'tbsearch',
 					filters: [
@@ -105,10 +107,9 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 				autoFill: true,
 				totalDisplay: true
 			}
-			// config options for stateful behavior
-//			stateful: true,
-//			stateId: 'users-grid'
 		});
+
+		this.store.on("beforeload", this.onBeforeStoreLoad, this);
 
 		go.users.UserGroupGrid.superclass.initComponent.call(this);		
 
@@ -128,29 +129,6 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 		this._isDirty = true;
 	},
 	
-//	onLoadComplete : function (user) {
-//		this.user = user;
-//		
-//		var me = this;
-//		this.value =[];
-//		this.user.groups.forEach(function(group) {
-//			me.value.push(group.groupId);
-//		});
-//		
-//		
-//		if(this.rendered) {
-//			this.store.load();
-//		} else if(!this.loading)
-//		{
-//			this.loading = true;
-//			this.on('render', function() {
-//				this.loading = false; 
-//				this.store.load();
-//			}, this, {single: true});
-//		}
-//	}
-//	
-	
 	isFormField: true,
 
 	getName: function() {
@@ -169,10 +147,40 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 		this.value = groups;	
 		
 		if(this.rendered) {
-			this.store.load();
+			this.store.load().catch(function () {});
 		}
 	},
-	
+
+	onBeforeStoreLoad : function(store, options) {
+		//don't add selected on search, or when they are already loaded or when gridpanel is trying to fill the page.
+		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
+			return true;
+		}
+
+		go.Db.store("Group").get(this.value, function(entities) {
+			entities.columnSort('name', true);
+
+			this.store.loadData({records: entities}, true);
+			// this.store.sortData();
+
+			this.store.setFilter('exclude', {
+				exclude: this.value
+			});
+
+			const me = this;
+
+			this.store.load({
+				add: true,
+				selectedLoaded: true
+			}).then(function() {
+				//when reload is called by SSE we need this removed.
+				delete me.store.lastOptions.selectedLoaded;
+			});
+
+		}, this);
+
+		return false;
+	},
 	getValue: function () {		
 		return this.value;
 	},
@@ -195,5 +203,3 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 	}
 	
 });
-
-

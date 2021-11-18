@@ -207,20 +207,7 @@ class FindParams{
 		return $this;
 		
 	}
-	
-	/**
-	 * Appends a string to the select fields. Prepends a comma to the string if
-	 * the FindParams's select fields are empty before calling this function.
-	 * @param String $string
-	 * @return String The fields to SQL select on.
-	 */
-//	public function appendToSelect($string) {
-//		if (!empty($this->_params['fields']))
-//			$this->_params['fields'] .=  ', '.$string;
-//		else
-//			$this->_params['fields'] = $string;
-//		return $this->_params['fields'];
-//	}
+
 	
 	/**
 	 * Insert a plain join SQL string

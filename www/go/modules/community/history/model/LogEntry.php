@@ -12,6 +12,7 @@ use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\acl\model\AclOwnerEntity;
+use GO\Files\Model\Folder;
 
 /**
  * Class LogEntry
@@ -208,7 +209,7 @@ class LogEntry extends AclOwnerEntity {
 		$this->entityTypeId = $entity->entityType()->getId();
 		$this->entity = $entity->entityType()->getName();
 		$this->entityId = $entity->id();
-		$this->removeAcl = ($entity instanceof AclEntity && $entity->removeAclOnDelete()) || ($entity instanceof ActiveRecord && !$entity->IsJoinedAclField);
+		$this->removeAcl = $entity instanceof AclOwnerEntity || ($entity instanceof ActiveRecord && $entity->aclField() && (!$entity->isJoinedAclField || $entity->isAclOverwritten() || ($entity instanceof  Folder && !empty($entity->acl_id) && !$entity->readonly)));
 		$this->description = $entity->title();
 		$this->cutPropertiesToColumnLength();
 		$this->setAclId($entity->findAclId());
@@ -221,5 +222,13 @@ class LogEntry extends AclOwnerEntity {
 	protected static function checkAcl()
 	{
 		//don't update acl records usedin is history
+	}
+
+	protected function internalSave()
+	{
+		if($this->action != self::$actionMap['delete']) {
+			$this->removeAcl = false;
+		}
+		return parent::internalSave();
 	}
 }

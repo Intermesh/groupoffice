@@ -202,11 +202,11 @@ class Googleauthenticator extends Property {
 			return null;
 		}
 		
-		$name = empty($name)?App::get()->getSettings()->title:$name;
+		$name = empty($name) ? "qr.png" : $name;
 		$secret = empty($secret)?$this->secret:$secret;
 
 		$level = QR_ECLEVEL_M;
-		
+
 		if(!empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false){
 			switch($params['level']){
 				case 'L':
@@ -232,7 +232,7 @@ class Googleauthenticator extends Property {
 		
 		$tmpFile = \go\core\fs\File::tempFile($name);
 		
-		\go\core\util\QRcode::png($otpUrl, $tmpFile->getPath(),QR_ECLEVEL_M,8);
+		\go\core\util\QRcode::png($otpUrl, $tmpFile->getPath(),$level,8);
 				
 		$qrBlob = \go\core\fs\Blob::fromTmp($tmpFile);
 		$qrBlob->setValues(array(

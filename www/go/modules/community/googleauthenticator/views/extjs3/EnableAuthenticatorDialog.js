@@ -57,7 +57,8 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 
 	actionComplete : function() {
 		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.actionComplete.call(this);
-		if(this.setupLaterButton) {
+		// if(this.setupLaterButton) { //<- Will return an error while still saving authenticator code correctly
+		if(this.setupLaterButton && this.setupLaterButton.el.dom) {
 			this.setupLaterButton.setDisabled(this.countDown > 0);
 		}
 	},

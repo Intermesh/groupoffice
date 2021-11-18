@@ -50,7 +50,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 							return go.modules.community.addressbook.renderName(data);
 						}
 					},
-					"photoBlobId", {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender', 'color'],
+					"photoBlobId", {name: "addressbook", type: "relation"}, {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender', 'color'],
 				entityStore: "Contact",
 				sortInfo: {
 					field: go.User.addressBookSettings.sortBy,
@@ -69,7 +69,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 					 <div class="wrap">\
 						 <div><tpl if="!values.id"><b>' + t("Create new") + ':</b> </tpl>{name}</div>\
 						 <tpl if="values.emailAddresses && values.emailAddresses[0]"><small>{[values.emailAddresses[0].email]}</small></tpl>\\n\
-						 <small>{[values.organizations ? values.organizations.column("name").join(", ") : ""]}</small>\
+						 {[this.getSmallPrint(values)]}\
 					 </div>\
 				 </div></div>',
 				'</tpl>', {
@@ -81,6 +81,20 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 				},
 				getStyle: function (v) {
 					return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;background-color: #" + v.color;
+				},
+				getSmallPrint: function (v) {
+					let retstr = ""
+					if(v.organizations && v.organizations.length) {
+						retstr += v.organizations.column("name").join(", ");
+						retstr += " - ";
+					}
+					if(v.addressbook && v.addressbook.name) {
+						retstr += v.addressbook.name;
+					}
+					if(retstr.length) {
+						retstr = "<small>"+retstr+"</small>";
+					}
+					return retstr;
 				}
 			}
 		 );

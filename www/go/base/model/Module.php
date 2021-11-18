@@ -2,6 +2,7 @@
 namespace GO\Base\Model;
 
 use GO;
+use go\core\model\User;
 use go\modules\business\license\exception\LicenseException;
 
 /*
@@ -69,17 +70,83 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".$userId.") AND moduleId = ".$moduleId.";";
 
 		$rights = \go()->getDbConnection()->query($groupedRights)->fetch(\PDO::FETCH_COLUMN);
-		if($rights < 1) {
-			return 10;
+		if($rights === false) {
+			return 0;
 		}
-		if($rights == 1) { // we only have mayManage for old modules
+		if($rights & 1) { // we only have mayManage for old modules
 			return 50;
 		}
 
-		if($this->name == 'projects2' && $rights == 3) { // a single exception for this compat method
+		if($this->name == 'projects2' && ($rights & 2)) { // a single exception for this compat method
 			return 45;
 		}
-		return 0;
+		return 10;
+	}
+
+	private function adminRights() {
+		$rights = ["mayRead" => true];
+		foreach($this->getModuleManager()->getRights() as $name => $bit){
+			$rights[$name] = true;
+		}
+		return (object) $rights;
+	}
+
+	private function userRights($userId) {
+		$r = go()->getDbConnection()->selectSingleValue("MAX(rights)")
+			->from("core_permission")
+			->where('moduleId', '=', $this->id)
+			->where("groupId", "IN",
+				go()->getDbConnection()
+					->select("groupId")
+					->from("core_user_group")
+					->where(['userId' => $userId])
+			)->single();
+
+		if($r === null) {
+			$rights = ["mayRead" => false];
+			foreach($this->getModuleManager()->getRights() as $name => $bit){
+				$rights[$name] = false;
+			}
+			return (object) $rights;
+		}
+
+		$r = decbin($r);
+
+		$rights = ["mayRead" => true];
+
+		foreach ($this->getModuleManager()->getRights() as $name => $bit) {
+			$rights[$name] = !!($r & $bit);
+		}
+
+		return (object) $rights;
+	}
+
+	/**
+	 * Get's the rights of a user
+	 *
+	 * @param int|null $userId The user ID to query. defaults to current authorized user.
+	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
+	 */
+	public function getUserRights(int $userId = null)
+	{
+
+		if(!isset($userId)) {
+			$userId = go()->getAuthState()->getUserId();
+			$isAdmin = go()->getAuthState()->isAdmin();
+		} else{
+			$isAdmin = User::isAdminById($userId);
+
+		}
+
+		if(!$this->isAvailable()) {
+			return (object) ['mayRead' => $isAdmin];
+		}
+
+		if($isAdmin) {
+			return $this->adminRights();
+		}
+
+		return $this->userRights($userId);
 	}
 	
 	protected function nextSortOrder() {

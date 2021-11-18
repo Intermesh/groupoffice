@@ -18,7 +18,7 @@ return array (
   '...execute the following actions' => '...voer de volgende handelingen uit',
   'Clear' => 'Legen',
   'Activate filterset' => 'Activeer filterset',
-	'Activate' => 'Activeer',
+  'Activate' => 'Activeer',
   'Reply every x days' => 'Beantwoord om de (x dagen)',
   'Send mail to these email addresses' => 'Stuur emailbericht naar deze emailadressen',
   'Send mail to these email addresses (separated by comma)' => 'Stuur emailbericht naar deze emailadressen (gescheiden door komma)',

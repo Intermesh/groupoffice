@@ -17,7 +17,11 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 
 		var actions = this.initRowActions();
 
-		this.columns.push(actions);
+		if(this.columns) {
+			this.columns.push(actions);
+		} else {
+			this.colModel.columns.push(actions);
+		}
 
 		this.plugins = this.plugins || [];
 		this.plugins.push(actions);

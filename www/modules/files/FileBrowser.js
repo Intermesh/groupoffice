@@ -171,7 +171,7 @@ GO.files.FileBrowser = function(config){
 
 
 	var fields ={
-		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date']
+		fields:['type_id', 'id','name','type', 'size', 'mtime', 'ctime', 'username','musername', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date']
 			.concat(go.customfields.CustomFields.getFieldDefinitions("File"))
 			.concat(go.customfields.CustomFields.getFieldDefinitions("Folder")),
 		columns:[{
@@ -193,6 +193,13 @@ GO.files.FileBrowser = function(config){
 			hidden:true,
 			width:100
 		},{
+			id:'path',
+			header:t("Path"),
+			dataIndex: 'path',
+			sortable:true,
+			hidden:true,
+			width:200
+		},{
 			id:'size',
 			header:t("Size"),
 			dataIndex: 'size',
@@ -207,6 +214,26 @@ GO.files.FileBrowser = function(config){
 			header:t("Modified at"),
 			dataIndex: 'mtime'
 			// width: dp(200)
+		},{
+			xtype: "datecolumn",
+			id:'ctime',
+			header:t("Created at"),
+			dataIndex: 'ctime'
+			// width: dp(200)
+		},{
+			id:'username',
+			header:t("Creator"),
+			dataIndex: 'username',
+			sortable:true,
+			hidden:true,
+			width:200
+		},{
+			id:'musername',
+			header:t("Modifier"),
+			dataIndex: 'musername',
+			sortable:true,
+			hidden:true,
+			width:200
 		}, {
 			id: 'id',
 			header: 'ID',
