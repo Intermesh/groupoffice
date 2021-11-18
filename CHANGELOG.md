@@ -17,14 +17,14 @@ XX-09-20216.6.10
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
-6.5.85
-6.5.86
+18-11-2021 6.5.86
 - Calendar: Bypass cancellation email for events with deactivated users
 - Calendar: do not export private events if not owner of said events
 - Leavedays: Only import most recent manager data
 - Addressbook: Bugfix: show address book in contact selection field
 - Leavedays: Leave out disabled activity types in year panel
 - Business: Activity dialog bigger
+- Email: Avoid Safari and Firefox popup block
 
 
 15-11-2021 6.5.85
