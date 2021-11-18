@@ -18,6 +18,15 @@ XX-09-20216.6.10
       custom fields.
 
 6.5.85
+6.5.86
+- Calendar: Bypass cancellation email for events with deactivated users
+- Calendar: do not export private events if not owner of said events
+- Leavedays: Only import most recent manager data
+- Addressbook: Bugfix: show address book in contact selection field
+- Leavedays: Leave out disabled activity types in year panel
+- Business: Activity dialog bigger
+
+
 15-11-2021 6.5.85
 - Projects2: bugfix in query for Project cost Reports
 - Core: set default user theme to Paper if not set already

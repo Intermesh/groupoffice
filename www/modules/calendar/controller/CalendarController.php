@@ -334,21 +334,20 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		
 		$calendar = \GO\Calendar\Model\Calendar::model()->findByPk($params["calendar_id"],false, true);
 		
-		if(!$calendar->public && !$calendar->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION))
+		if(!$calendar->public && !$calendar->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 			throw new \GO\Base\Exception\AccessDenied();
-		
-//		$c = new \GO\Base\VObject\VCalendar();				
-//		$c->add(new \GO\Base\VObject\VTimezone());
-		
+		}
+
 		$months_in_past = isset($params['months_in_past']) ? intval($params['months_in_past']) : 0;
 		
 		$findParams = \GO\Base\Db\FindParams::newInstance()->select("t.*")->order('start_time','ASC');
 		$findParams->getCriteria()->addCondition("calendar_id", $params["calendar_id"]);
 		
-		if(!empty($params['months_in_past']))		
+		if(!empty($params['months_in_past'])) {
 			$stmt = Event::model()->findForPeriod($findParams, \GO\Base\Util\Date::date_add(time(), 0, -$months_in_past));
-		else
-			$stmt = Event::model()->find($findParams);		
+		}else {
+			$stmt = Event::model()->find($findParams);
+		}
 		if(empty($params['no_download']) && !$this->isCli()) {
 			\GO\Base\Util\Http::outputDownloadHeaders(new \GO\Base\FS\File($calendar->name.'.ics'));
 		}
@@ -358,6 +357,9 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		echo $t->serialize();
 		
 		while($event = $stmt->fetch()){
+			if($event->isPrivate()) {
+				continue;
+			}
 			$v = $event->toVObject();
 			echo $v->serialize();
 		}
