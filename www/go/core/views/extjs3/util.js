@@ -340,14 +340,29 @@ go.util =  (function () {
 			// 	url = "filewrap.php?url=" + encodeURIComponent(url);
 			// }
 
-			const win = window.open(url);
+			const win = this.getDownloadTargetWindow();
 
 			if(!win) {
 				Ext.Msg.alert(t("Error"), t("Could not open a window. Please allow popup windows in your browser."))
 				return;
 			}
 			win.focus();
+			win.location.replace(url);
 
+		},
+
+		getDownloadTargetWindow : function() {
+			try {
+				if (!this.downloadTarget || this.downloadTarget.closed || this.downloadTarget.location.href != "about:blank") {
+					this.downloadTarget = window.open("about:blank", "_blank");
+				}
+			} catch(e) {
+				// for firefox complaining about Uncaught DOMException: Permission denied to access property Symbol.toPrimitive on cross-origin object
+				// even though it is the same origin !?
+				this.downloadTarget = window.open("about:blank", "_blank");
+			}
+
+			return this.downloadTarget;
 		},
 
 
@@ -358,30 +373,19 @@ go.util =  (function () {
 		 * @param {string} url
 		 */
 		downloadFile: function(url) {
-			// if(Ext.isSafari && window.navigator.standalone) {
-			// 	//somehow this is the only way a download works on a web application on the iphone.
-			// 	const win = window.open("filewrap.php?url=" + encodeURIComponent(url));
-			// 	win.focus();
-			//
-			//
-			// } else
-			// {
-				// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
-				if(!downloadFrame) {
-					// downloadFrame = document.createElement('iframe');
-					// downloadFrame.id="downloader";
-					// downloadFrame.style.display = 'none';
-					// document.body.appendChild(downloadFrame);
-					var downloadFrame = document.createElement('a');
-					downloadFrame.target = '_blank';
-					downloadFrame.toggleAttribute("download");
 
-				}
-				// downloadFrame.src = url;
-				downloadFrame.href = url;
-				downloadFrame.click();
-			 // }
+			// for safari and firefox. The popup must be made befor any async requests
+			if(go.util.downloadTarget)
+				go.util.downloadTarget.close();
 
+			if(!downloadFrame) {
+				var downloadFrame = document.createElement('a');
+				downloadFrame.target = '_blank';
+				downloadFrame.toggleAttribute("download");
+
+			}
+			downloadFrame.href = url;
+			downloadFrame.click();
 		},
 		
 		textToHtml : function(text) {
