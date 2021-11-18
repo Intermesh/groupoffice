@@ -6,6 +6,7 @@
 - Leavedays: Leave out disabled activity types in year panel
 - Business: Activity dialog bigger
 - Email: Avoid Safari and Firefox popup block
+- Jitsi meet: Fixed jitsi meet error when not having permissions
 
 
 15-11-2021 6.5.85
