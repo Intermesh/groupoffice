@@ -95,6 +95,14 @@ abstract class Entity extends Property {
 	const EVENT_SORT = "sort";
 
 	/**
+	 * Fires when permission level is requested
+	 *
+	 * @param Entity $entity;
+	 * @param Array ['permissionLevel' => &$permissionLevel] You can set the permission level by reference to override
+	 */
+	const EVENT_PERMISSION_LEVEL = 'permissionlevel';
+
+	/**
 	 * Constructor
 	 *
 	 * @param boolean $isNew Indicates if this model is saved to the database.
@@ -532,6 +540,13 @@ abstract class Entity extends Property {
 	 * @return int
 	 */
 	public function getPermissionLevel() {
+
+		$permissionLevel = null;
+		static::fireEvent(self::EVENT_PERMISSION_LEVEL, $this, ["permissionLevel" => &$permissionLevel]);
+		if(isset($permissionLevel)) {
+			return $permissionLevel;
+		}
+
 		if($this->isNew()) {
 			return $this->canCreate() ? Acl::LEVEL_CREATE : false;
 		}
