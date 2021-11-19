@@ -2,6 +2,8 @@
 - Core: Fixed: Using MariaDB cluster doesnt work #742
 - Business: optionally copy agreement values into new agreement record
 - Calendar: Fixed: [Inviting participants] no consideration of the answer #738
+- Email: Fixed: Managing folders (right click) while viewing emails in another folder #659
+- Email: Fixed: Go scrolls up on new email #658
 
 18-11-2021 6.5.86
 - Calendar: Bypass cancellation email for events with deactivated users

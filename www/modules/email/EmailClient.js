@@ -1307,7 +1307,9 @@ GO.mainLayout.onReady(function(){
 				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
 				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
 				{
-					ep.messagesGrid.store.reload();
+					ep.messagesGrid.store.reload({
+						keepScrollPosition: true
+					});
 				}
 			}
 		}
