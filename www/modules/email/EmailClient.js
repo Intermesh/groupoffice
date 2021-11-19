@@ -280,6 +280,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				});
 
 				GO.email.showComposer({
+					values: addEmailAsAttachmentList.length == 1 ? {subject: "Fwd: " + records[0].data.subject} : undefined,
 					account_id: this.account_id,
 					addEmailAsAttachmentList: addEmailAsAttachmentList
 				});
