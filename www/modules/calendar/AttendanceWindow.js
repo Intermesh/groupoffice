@@ -6,7 +6,7 @@ GO.calendar.AttendanceWindow = Ext.extend(GO.dialog.TabbedFormDialog, {
 			title:t("Attendance", "calendar"),
 			height: 460,
 			
-			width: 400,
+			width: 600,
 			modal:true,
 			enableApplyButton:false,
 			formControllerUrl: 'calendar/attendance'
@@ -25,6 +25,10 @@ GO.calendar.AttendanceWindow = Ext.extend(GO.dialog.TabbedFormDialog, {
 	
 	afterLoad : function(remoteModelId, config, action){
 		this.infoPanel.update(action.result.data.info)
+		if(!this.origTitle) {
+			this.origTitle = this.title;
+		}
+		this.setTitle(this.origTitle + ": " + Ext.util.Format.htmlEncode(action.result.data.name) + " &lt;" +Ext.util.Format.htmlEncode(action.result.data.email) + "&gt;");
 	},
 	buildForm : function(){
 		
