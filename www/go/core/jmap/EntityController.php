@@ -3,6 +3,7 @@
 namespace go\core\jmap;
 
 use Exception;
+use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
@@ -634,6 +635,9 @@ abstract class EntityController extends Controller {
 				//refetch from server when mapping has a query object.
 				if($entity::getMapping()->getQuery() != null) {
 					$entity = $this->getEntity($entity->id());
+					if(!$entity) {
+						throw new NotFound("Item was created but not found?");
+					}
 				}
 
 				$entityProps = new ArrayObject($entity->toArray());
