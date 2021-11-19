@@ -634,6 +634,9 @@ class Message extends \Swift_Message{
 					$file = \Swift_Attachment::fromPath($tmpFile->path());
 					$file->setContentType($tmpFile->mimeType());
 					$file->setFilename($att->fileName);
+					if($tmpFile->mimeType() == "message/rfc822") {
+						$file->setEncoder(new \Swift_Mime_ContentEncoder_PlainContentEncoder("7bit"));
+					}
 					$this->attach($file);
 					
 					//$tmpFile->delete();
