@@ -21,7 +21,7 @@ abstract class SingleOwnerEntity extends Entity
 		$query->andWhere($query->getTableAlias() . '.userId', $userId);
 	}
 
-	public function getPermissionLevel()
+	protected function internalGetPermissionLevel()
 	{
 		return $this->userId == go()->getAuthState()->getUserId() ? Acl::LEVEL_MANAGE : false;
 	}

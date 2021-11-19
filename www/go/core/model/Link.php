@@ -399,7 +399,7 @@ class Link extends AclItemEntity
 	 * 
 	 * @return int
 	 */
-	public function getPermissionLevel() {
+	protected function internalGetPermissionLevel() {
 		if($this->isNew() && empty($this->aclId)) {
 			$e = $this->findToEntity();
 			if(!$e) {

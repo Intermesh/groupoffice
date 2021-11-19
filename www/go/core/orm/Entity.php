@@ -97,10 +97,25 @@ abstract class Entity extends Property {
 	/**
 	 * Fires when permission level is requested
 	 *
+	 *
 	 * @param Entity $entity;
 	 * @param Array ['permissionLevel' => &$permissionLevel] You can set the permission level by reference to override
 	 */
 	const EVENT_PERMISSION_LEVEL = 'permissionlevel';
+
+
+	/**
+	 * Fires when filtering on permission level.
+	 *
+	 * Normal behaviour can be overriden by returning false in your listener.
+	 *
+	 * @param Criteria $criteria
+	 * @param int $value
+	 * @param Query $query
+	 * @param $filter
+	 *
+	 */
+	const EVENT_FILTER_PERMISSION_LEVEL = "filterpermissionlevel";
 
 	/**
 	 * Constructor
@@ -536,7 +551,9 @@ abstract class Entity extends Property {
 	 *
 	 * Note: when overriding this function you also need to override applyAclToQuery() so that queries return only
 	 * readable entities.
-	 * 
+	 *
+	 * @final
+	 * @todo make final but there's a backwards compatibility override in model/Module.php
 	 * @return int
 	 */
 	public function getPermissionLevel() {
@@ -547,6 +564,10 @@ abstract class Entity extends Property {
 			return $permissionLevel;
 		}
 
+		return $this->internalGetPermissionLevel();
+	}
+
+	protected function internalGetPermissionLevel() {
 		if($this->isNew()) {
 			return $this->canCreate() ? Acl::LEVEL_CREATE : false;
 		}
@@ -682,7 +703,25 @@ abstract class Entity extends Property {
 
 		$filters = new Filters();
 
-		$filters->add('text', function (Criteria $criteria, $value, Query $query) {
+		$filters
+			->add("permissionLevelUserId", function() {
+				//dummy used in permissionLevel filter.
+			})
+			->add("permissionLevelGroups", function() {
+				//dummy used in permissionLevel filter.
+			})
+			->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
+
+				if(self::fireEvent(self::EVENT_FILTER_PERMISSION_LEVEL, $criteria, $value, $query, $filter) === false) {
+					// event may override this by returning false
+					return;
+				}
+
+				//Permission level is always added to the main query so that it's always applied with AND
+				static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
+			})
+
+			->add('text', function (Criteria $criteria, $value, Query $query) {
 			if (!is_array($value)) {
 				$value = [$value];
 			}

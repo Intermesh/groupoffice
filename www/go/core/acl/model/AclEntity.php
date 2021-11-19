@@ -19,6 +19,7 @@ abstract class AclEntity extends Entity {
 	 */
 	const EVENT_ACL_CHANGED = 'aclchanged';
 
+
 	protected $permissionLevel;
 	
 	/**
@@ -136,20 +137,7 @@ abstract class AclEntity extends Entity {
 		
 		return $result;
 	}
-	
-	protected static function defineFilters() {
-		return parent::defineFilters()
-						->add("permissionLevelUserId", function() {
-							//dummy used in permissionLevel filter.
-						})
-						->add("permissionLevelGroups", function() {
-							//dummy used in permissionLevel filter.
-						})
-						->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
-							//Permission level is always added to the main query so that it's always applied with AND
-							static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
-						});
-	}
+
 
 
 	/**

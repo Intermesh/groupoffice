@@ -550,7 +550,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		return parent::afterSave($wasNew);
 	}
 	
-	public function getPermissionLevel() {
+	protected function internalGetPermissionLevel() {
 		
 		$level = parent::getPermissionLevel();
 		if($level == \GO\Base\Model\Acl::WRITE_PERMISSION && $this->acl->usedIn != 'fs_folders.acl_id') {

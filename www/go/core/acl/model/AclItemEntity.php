@@ -290,7 +290,7 @@ abstract class AclItemEntity extends AclEntity {
 	/**
 	 * @inheritDoc
 	 */
-	public function getPermissionLevel() {
+	protected function internalGetPermissionLevel() {
 
 		if(!isset($this->permissionLevel)) {
 			$aclEntity = $this->getAclEntity();

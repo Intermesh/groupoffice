@@ -309,7 +309,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * 
 	 * @return int
 	 */
-	public function getPermissionLevel() {
+	protected function internalGetPermissionLevel() {
 
 		if($this->isNew() && !$this->{static::$aclColumnName}) {
 			return parent::getPermissionLevel();

@@ -229,6 +229,10 @@ abstract class EntityController extends Controller {
 				'canCalculateUpdates' => false
 			];
 
+			if(go()->getDebugger()->enabled) {
+				$response['query'] = (string) $idsQuery;
+			}
+
 			if(isset($hasMore)) {
 				$response['hasMore'] = $hasMore;
 			}
@@ -387,7 +391,8 @@ abstract class EntityController extends Controller {
 		}
 		
 		//filter permissions
-		$cls::applyAclToQuery($query, Acl::LEVEL_READ);
+		$query->filter(['permissionLevel' => Acl::LEVEL_READ]);
+
 		
 		return $query;	
 	}
