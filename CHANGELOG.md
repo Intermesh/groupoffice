@@ -17,6 +17,18 @@ XX-09-20216.6.10
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+19-11-2021 6.5.87
+- Billing: Handle max length in product catalog
+- Core: Fixed: Using MariaDB cluster doesnt work #742
+- Business: optionally copy agreement values into new agreement record
+- Calendar: Fixed: [Inviting participants] no consideration of the answer #738
+- Email: Fixed: Managing folders (right click) while viewing emails in another folder #659
+- Email: Fixed: Go scrolls up on new email #658
+- Email: Forwarding as attachment has a blank subject #578
+- Email: Fixed: issue forwarding as attachment #676
+- Start page: Some rss feeds didn't work with <rdf></rdf>
+- Filesearch: When not having permissions files gave an error.
+
 18-11-2021 6.5.86
 - Calendar: Bypass cancellation email for events with deactivated users
 - Calendar: do not export private events if not owner of said events

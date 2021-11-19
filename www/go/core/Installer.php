@@ -247,11 +247,14 @@ class Installer {
 	}
 	
 	private function installGroups() {
+		$id = 1;
 		foreach (["Admins", "Everyone", "Internal"] as $groupName) {
 			$group = new Group();
+			//fixed ID for cluster setups. See https://github.com/Intermesh/groupoffice/issues/742
+			$group->id = $id++;
 			$group->name = $groupName;
 			if (!$group->save()) {
-				throw new Exception("Could not create group");
+				throw new Exception("Could not create group: " . $group->getValidationErrorsAsString());
 			}
 		}
 	}

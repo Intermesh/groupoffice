@@ -12,6 +12,7 @@
 namespace GO\Summary\Controller;
 
 use GO\Base\Exception\Validation;
+use GO\Summary\Model\RssFeed;
 
 class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 
@@ -91,7 +92,7 @@ class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 
 			if ($xml) {
 
-				if(!preg_match('/<rss.*<\/rss>/i', str_replace(["\r","\n"],'', $xml))) {
+				if(!RssFeed::isRSS($xml)) {
 					throw new \Exception("No RSS feed");
 				}
 

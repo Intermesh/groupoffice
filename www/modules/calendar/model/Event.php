@@ -2458,16 +2458,27 @@ The following is the error message:
 		if(!isset(self::$aliases[$this->calendar->user_id])) {
 			self::$aliases[$this->calendar->user_id] = \GO\Email\Model\Alias::model()->find(
 				GO\Base\Db\FindParams::newInstance()
+					->joinRelation('account')
 					->select('email')
-					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
-					->ignoreAdminGroup()
+					->ignoreAcl()
+					->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('user_id', $this->calendar->user_id,'=', 'account'))
+
+//					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
+//					->ignoreAdminGroup()
 			)->fetchAll(\PDO::FETCH_COLUMN, 0);
 		}
 
-		return Participant::model()->findSingleByAttributes(array(
+		if(!empty(self::$aliases[$this->calendar->user_id])) {
+			return Participant::model()->findSingleByAttributes(array(
 				'email' => self::$aliases[$this->calendar->user_id],
-				'event_id'=>$this->id
-		));
+				'event_id' => $this->id
+			));
+		} else{
+			return Participant::model()->findSingleByAttributes(array(
+				'user_id' => $this->calendar->user_id,
+				'event_id' => $this->id
+			));
+		}
 	}
 	
 	/**

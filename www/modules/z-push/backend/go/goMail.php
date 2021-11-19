@@ -1,4 +1,5 @@
 <?php
+require_once(__DIR__."/goMailInvite.php");
 
 class goMail extends GoBaseBackendDiff {
 
@@ -163,7 +164,7 @@ class goMail extends GoBaseBackendDiff {
 				 //http://talk.sonymobile.com/t5/Xperia-Z1-Compact/Z1-Compact-Problem-With-EAS/m-p/866755#11220
 				 //zpush_always_send_attachments config setting is for testing this carefully.
 				 if($bpReturnType!=SYNC_BODYPREFERENCE_MIME || !empty(\GO::config()->zpush_always_send_attachments)){
-					 $message->asattachments = $this->_getASAttachments($imapMessage,$id,$mailbox, $bpReturnType != SYNC_BODYPREFERENCE_PLAIN ? $asBodyData : null);
+					 $message->asattachments = $this->_getASAttachments($imapMessage,$id,$mailbox, $bpReturnType != SYNC_BODYPREFERENCE_PLAIN ? $asBodyData : null, $message);
 				 }
 
 				// truncate body, if requested
@@ -329,25 +330,26 @@ class goMail extends GoBaseBackendDiff {
 	 * @param String $mailbox
 	 * @return array attachment array
 	 */
-	private function _getASAttachments($imapMessage,$msgId,$mailbox, $body){
+	private function _getASAttachments($imapMessage,$msgId,$mailbox, $body, &$output){
 		$asAttachments = array();
 		$attachments = $imapMessage->getAttachments();
 		
 		foreach ($attachments as $attachment) {
-			
-			if($attachment->size>$this->_getMaxAttachmentSize()){
+			if (is_calendar($attachment)) {
+				ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->GetMessage(): text/calendar part found, trying to convert"));
+				$output->meetingrequest = new SyncMeetingRequest();
+				parse_meeting_calendar($attachment, $output, $mailbox == $this->getImapAccount()->sent);
+			} else if($attachment->size>$this->_getMaxAttachmentSize()){
 				array_push($this->_tooBigAttachments, array('name'=>$attachment->name,'size'=>$attachment->size));
-			}else
-			{
+			} else {
 				$attach = new SyncBaseAttachment();
 				$attach->displayname = $attachment->name;
 				$attach->filereference = $this->_encodeFileReference($msgId,$attachment,$mailbox);
 				$attach->method = 1;
 				$attach->estimatedDataSize = $attachment->getEstimatedSize();
 
-				if(!isset($body)) {
-					$inline = false;
-				} else{
+				$inline = false;
+				if (!empty($attachment->content_id) && isset($body)) {
 					$inline = $attachment->isInline() && strpos($body, $attachment->content_id) !== false;
 				}
 
