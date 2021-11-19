@@ -2,6 +2,7 @@
 - Billing: Handle max length in product catalog
 - Core: Fixed: Using MariaDB cluster doesnt work #742
 - Business: optionally copy agreement values into new agreement record
+- Business / Leavedays: Make agreements editable by managers
 - Calendar: Fixed: [Inviting participants] no consideration of the answer #738
 - Email: Fixed: Managing folders (right click) while viewing emails in another folder #659
 - Email: Fixed: Go scrolls up on new email #658
