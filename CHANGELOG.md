@@ -1,5 +1,6 @@
 - Billing: Handle max length in product catalog
 - Core: Fixed: Using MariaDB cluster doesnt work #742
+- Business: optionally copy agreement values into new agreement record
 
 18-11-2021 6.5.86
 - Calendar: Bypass cancellation email for events with deactivated users
