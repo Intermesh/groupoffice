@@ -55,12 +55,17 @@ class RssFeed extends \GO\Base\Db\ActiveRecord {
 			$xml = @file_get_contents($this->url);
 		}
 
-		if (!$xml || !preg_match('/<rss.*<\/rss>/i', str_replace(["\r","\n"],'', $xml))) {
+		if (!$xml || !self::isRSS($xml)){
 
 			$this->setValidationError('url', go()->t('The supplied URL is not an RSS feed'));
 		}
 
 		return parent::validate();
+	}
+
+	public static function isRSS($string) {
+		return preg_match('/<rss.*<\/rss>/i', str_replace(["\r","\n"],'', $string)) ||
+		preg_match('/<rdf:RDF.*<\/rdf:RDF>/i', str_replace(["\r","\n"],'', $string));
 	}
 
 }
