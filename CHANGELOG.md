@@ -6,6 +6,7 @@
 - Email: Fixed: Go scrolls up on new email #658
 - Email: Forwarding as attachment has a blank subject #578
 - Email: Fixed: issue forwarding as attachment #676
+- Start page: Some rss feeds didn't work with <rdf></rdf>
 
 18-11-2021 6.5.86
 - Calendar: Bypass cancellation email for events with deactivated users
