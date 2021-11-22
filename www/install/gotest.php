@@ -450,8 +450,9 @@ function test_system() :array
 			$test['name'] = 'Modules directory writable';
 			$test['showSuccessFeedback'] = false;
 			$test['fatal'] = false;
-			$test['pass'] = $moduleFolder->isWritable();
-			$test['feedback'] = 'Warning: Modules subdirectory is not writable. You will not be able to use GroupOffice Studio.';
+			$test['pass'] = $moduleFolder->isWritable() || $moduleFolder->getFolder('studio')->isWritable();
+			$test['feedback'] = "Warning: 'modules' subdirectory is not writable. You will not be able to use GroupOffice Studio.";
+
 			$tests[] = $test;
 
 		}
