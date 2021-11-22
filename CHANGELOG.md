@@ -1,6 +1,7 @@
 - Core: Strings started with an = were detected as formulas in the excel export causing errors.
 - Core: use settimeout on focus restore so enter in prompt dialog doesn't execute parent button again
 - Core: Entity store save gave error on new items
+- Core: Raise PHP memory limit on excel export to 2G
 
 19-11-2021 6.5.87
 - Billing: Handle max length in product catalog

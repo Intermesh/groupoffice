@@ -116,6 +116,9 @@ class Spreadsheet extends AbstractConverter {
 		$this->delimiter = $user->listSeparator;
 		$this->enclosure = $user->textSeparator;
 
+		//try to set high memory limit as phpoffice likes to eat RAM
+		go()->getEnvironment()->setMemoryLimit("2G");
+
 
 		static::fireEvent(static::EVENT_INIT, $this);
 	}
@@ -202,7 +205,7 @@ class Spreadsheet extends AbstractConverter {
 			}
 
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
-//			$writer->setPreCalculateFormulas(false);
+			$writer->setPreCalculateFormulas(false);
 			$writer->save($this->tempFile->getPath());
 
 		}
