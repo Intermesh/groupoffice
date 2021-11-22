@@ -5,6 +5,7 @@
 - Projects2: Bugfix in Export time registration grid
 - Multi instance: Fix for all modules being enabled by default
 - Addressbook: make sure that in contact detail panel, linked contacts are rendered first
+- Email: Display issue with email having body inside head.
 
 19-11-2021 6.5.87
 - Billing: Handle max length in product catalog
