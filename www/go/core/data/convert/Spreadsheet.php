@@ -196,6 +196,7 @@ class Spreadsheet extends AbstractConverter {
 			}
 
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
+			$writer->setPreCalculateFormulas(false);
 			$writer->save($this->tempFile->getPath());
 
 		}
