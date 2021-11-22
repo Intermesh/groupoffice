@@ -3,7 +3,8 @@
 - Core: Entity store save gave error on new items
 - Core: Raise PHP memory limit on excel export to 2G
 - Projects2: Bugfix in Export time registration grid
-- Multi instance: Fix for all modules being enabled by defaul
+- Multi instance: Fix for all modules being enabled by default
+- Addressbook: make sure that in contact detail panel, linked contacts are rendered first
 
 19-11-2021 6.5.87
 - Billing: Handle max length in product catalog
