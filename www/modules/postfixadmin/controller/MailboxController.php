@@ -4,13 +4,16 @@
 namespace GO\Postfixadmin\Controller;
 
 
+use GO\Base\Fs\Folder;
+use GO\Postfixadmin\Model\Mailbox;
+
 class MailboxController extends \GO\Base\Controller\AbstractModelController {
 
 	protected $model = 'GO\Postfixadmin\Model\Mailbox';
 	
 	
 	protected function allowGuests() {
-		return array("cacheusage","setpassword","submit"); //handled by serverclient_token
+		return array("cacheusage","setpassword","submit", "cleanup"); //handled by serverclient_token
 	}
 		
 	protected function getStoreParams($params) {
@@ -151,6 +154,80 @@ class MailboxController extends \GO\Base\Controller\AbstractModelController {
 			echo 'Calculating size of '.$mailboxModel->getMaildirFolder()->path()."\n";
 			$mailboxModel->cacheUsage();
 			echo \GO\Base\Util\Number::formatSize($mailboxModel->usage*1024)."\n";
+		}
+
+	}
+
+
+	public function actionCleanup($mailboxRoot = '/home/vmail/', $dryRun = 1) {
+		if(!$this->isCli()) {
+			echo "Try running script from the CLI \n";
+			echo "Usage: php groupofficecli.php -r=postfixadmin/maildir/cleanup";
+			return;
+		}
+
+		$this->mailboxRoot = rtrim($mailboxRoot, '/') . '/';
+		$this->trashRoot = $this->mailboxRoot . '_trash_/';
+
+		// create the trash folder
+		if (!is_dir($this->trashRoot)) {
+			mkdir($this->trashRoot, 0777, true);
+		}
+
+		$trashFolder = new Folder($this->trashRoot);
+
+		$root = new Folder($this->mailboxRoot);
+
+		foreach ($root->ls() as $domainFolder) {
+
+			if(!$domainFolder->isFolder()) {
+				continue;
+			}
+
+			if($domainFolder->name() == "_trash_") {
+				continue;
+			}
+
+			foreach($domainFolder->ls() as $homeFolder) {
+				if(!$homeFolder->isFolder()) {
+					continue;
+				}
+
+				$homedir = str_replace($this->mailboxRoot, "", $homeFolder->path()) . "/";
+//				$existsInDatabase = (new Query())
+//					->selectSingleValue("id")
+//					->from("pa_mailboxes")
+//					->where(['homedir' => $homedir])
+//					->single();
+
+				$existsInDatabase = Mailbox::model()->findSingleByAttribute('homedir', $homedir);
+
+				if($existsInDatabase) {
+					echo "EXISTS: " . $homedir ."\n";
+				} else {
+
+					$mailboxTrashFolder = $trashFolder->createChild($homedir, false);
+
+					if($mailboxTrashFolder->exists()) {
+						$mailboxTrashFolder = $trashFolder->createChild($homedir . "-" . date("Y-m-d h:i:sa"), false);
+					}
+
+					if(!$dryRun) {
+						echo "TRASH: " . $homedir ." -> " . $mailboxTrashFolder . "\n";
+						$homeFolder->move($mailboxTrashFolder->parent(), $mailboxTrashFolder->name());
+					} else {
+						echo "TRASH (Dry run): " . $homedir . " -> " . $mailboxTrashFolder . "\n";
+					}
+				}
+			}
+
+			if(!count($domainFolder->ls())) {
+				echo "TRASH: " . $domainFolder->path() ."\n";
+				if(!$dryRun) {
+					$domainFolder->delete();
+				}
+			}
+
 		}
 
 	}
