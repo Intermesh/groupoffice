@@ -1,3 +1,5 @@
+- Core: Strings started with an = were detected as formulas in the excel export causing errors.
+
 19-11-2021 6.5.87
 - Billing: Handle max length in product catalog
 - Core: Fixed: Using MariaDB cluster doesnt work #742
