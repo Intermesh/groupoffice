@@ -1,3 +1,4 @@
+22-11-2021 6.5.88
 - Core: Strings started with an = were detected as formulas in the excel export causing errors.
 - Core: use settimeout on focus restore so enter in prompt dialog doesn't execute parent button again
 - Core: Entity store save gave error on new items
@@ -7,6 +8,7 @@
 - Addressbook: make sure that in contact detail panel, linked contacts are rendered first
 - Email: Display issue with email having body inside head.
 - Core: Check if auth state is present. Fixes 500 error with caldav when using ldapauthenticator or imapauthenticator
+- Jitsi meet: Used some email module code by mistake
 
 19-11-2021 6.5.87
 - Billing: Handle max length in product catalog
@@ -20,6 +22,7 @@
 - Email: Fixed: issue forwarding as attachment #676
 - Start page: Some rss feeds didn't work with <rdf></rdf>
 - Filesearch: When not having permissions files gave an error.
+
 
 18-11-2021 6.5.86
 - Calendar: Bypass cancellation email for events with deactivated users
