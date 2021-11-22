@@ -297,7 +297,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 			if(a.link.entity == "Contact" && b.link.entity != "Contact") {
 				return -1;
 			}
-			return 0;
+			return 1;
 		});
 		this.addComments();
 		this.addFiles();

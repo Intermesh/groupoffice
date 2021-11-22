@@ -17,10 +17,23 @@ XX-09-20216.6.10
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+22-11-2021 6.5.88
+- Core: Strings started with an = were detected as formulas in the excel export causing errors.
+- Core: use settimeout on focus restore so enter in prompt dialog doesn't execute parent button again
+- Core: Entity store save gave error on new items
+- Core: Raise PHP memory limit on excel export to 2G
+- Projects2: Bugfix in Export time registration grid
+- Multi instance: Fix for all modules being enabled by default
+- Addressbook: make sure that in contact detail panel, linked contacts are rendered first
+- Email: Display issue with email having body inside head.
+- Core: Check if auth state is present. Fixes 500 error with caldav when using ldapauthenticator or imapauthenticator
+- Jitsi meet: Used some email module code by mistake
+
 19-11-2021 6.5.87
 - Billing: Handle max length in product catalog
 - Core: Fixed: Using MariaDB cluster doesnt work #742
 - Business: optionally copy agreement values into new agreement record
+- Business / Leavedays: Make agreements editable by managers
 - Calendar: Fixed: [Inviting participants] no consideration of the answer #738
 - Email: Fixed: Managing folders (right click) while viewing emails in another folder #659
 - Email: Fixed: Go scrolls up on new email #658
@@ -28,6 +41,7 @@ XX-09-20216.6.10
 - Email: Fixed: issue forwarding as attachment #676
 - Start page: Some rss feeds didn't work with <rdf></rdf>
 - Filesearch: When not having permissions files gave an error.
+
 
 18-11-2021 6.5.86
 - Calendar: Bypass cancellation email for events with deactivated users

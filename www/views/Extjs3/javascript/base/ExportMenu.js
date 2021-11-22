@@ -4,11 +4,8 @@ GO.base.ExportMenu = Ext.extend(Ext.Button,{
 	currentGridColumns:false,
 	
 	constructor : function(config){
-		
 		this.className = config.className;
 		GO.base.ExportMenu.superclass.constructor.call(this);	
-
-		
 	},
 	
 	/**
@@ -29,9 +26,7 @@ GO.base.ExportMenu = Ext.extend(Ext.Button,{
 		});
 		
 		for(var i = 0; i < columns.length; i++){
-			
 			var colName = columns[i].dataIndex.toString();
-			
 			if(colName.substring(0, 4) == "col_"){
 				var cfColname = 'customfields.'+columns[i].dataIndex;
 				cgColumns.push(cfColname);
@@ -163,7 +158,6 @@ GO.base.ExportMenu = Ext.extend(Ext.Button,{
 	},
 	
 	doExport : function(item){
-		
 		var data = {
 			class_name:item.class_name,
 			export_columns:item.export_columns,
@@ -173,12 +167,9 @@ GO.base.ExportMenu = Ext.extend(Ext.Button,{
 			view:item.view,
 			id: item.id			
 		};
-	
-		
+
 		window.open(GO.url("core/export/export", data));
-		
 	}
-	
 });
 
 
@@ -191,14 +182,10 @@ GO.base.ExportMenuItem = Ext.extend(Ext.menu.Item,{
 	currentGridColumns:false,
 	
 	constructor : function(config){
-		
-		this.className = config.className;		
-				
-		GO.base.ExportMenuItem.superclass.constructor.call(this);			
-
+		this.className = config.className;
+		GO.base.ExportMenuItem.superclass.constructor.call(this);
 	},
-	
-	
+
 	/**
 	 * Use this function to change the className after the menu is created.
 	 * 
@@ -217,9 +204,7 @@ GO.base.ExportMenuItem = Ext.extend(Ext.menu.Item,{
 		});
 		
 		for(var i = 0; i < columns.length; i++){
-			
 			var colName = columns[i].dataIndex.toString();
-			
 			if(colName.substring(0, 4) == "col_"){
 				var cfColname = 'customfields.'+columns[i].dataIndex;
 				cgColumns.push(cfColname);
@@ -304,7 +289,6 @@ GO.base.ExportMenuItem = Ext.extend(Ext.menu.Item,{
 			text: t("Currently on screen"),
 			iconCls: 'ic-screen-share',
 			handler: function(item,event){
-
 				if(!GO.base.currentGridExportDialog){
 					GO.base.currentGridExportDialog = new GO.base.CurrentGridExportDialog();
 				}
@@ -361,10 +345,7 @@ GO.base.ExportMenuItem = Ext.extend(Ext.menu.Item,{
 			view:item.view,
 			id: item.id			
 		};
-	
-		
+
 		window.open(GO.url("core/export/export", data));
-		
 	}
-	
 });
