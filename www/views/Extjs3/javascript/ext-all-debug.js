@@ -27572,14 +27572,20 @@ Ext.Window = Ext.extend(Ext.Panel, {
             this.activeEl = document.activeElement;
 		}, this);
 		
-		this.on("close", function() {	
-            if(this.activeEl)		
-			    this.activeEl.focus();
+		this.on("close", function() {
+			if(this.activeEl) {
+				setTimeout(() => {
+					this.activeEl.focus();
+				});
+			}
 		}, this);
 		
 		this.on("hide", function() {
-            if(this.activeEl)				
-			    this.activeEl.focus();
+			if(this.activeEl) {
+				setTimeout(() => {
+					this.activeEl.focus();
+				});
+			}
 		}, this);
 	},
     

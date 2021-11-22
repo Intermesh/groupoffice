@@ -1,5 +1,4 @@
 go.Modules.register("legacy", 'jitsimeet', {
-	mainPanel: GO.email.EmailClient,
 	title: t("Jitsi"),
 	systemSettingsPanels: ["GO.jitsimeet.SystemSettingsPanel"]
 });
