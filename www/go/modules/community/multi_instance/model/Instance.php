@@ -416,7 +416,7 @@ class Instance extends Entity {
 				]
 			];
 
-			$instanceConfig['allowed_modules'] = array_map(function($mod) {return $mod['package'].'/'.$mod['module'];}, $this->getAllowedModules());
+			$instanceConfig['allowed_modules'] = array_map(function($mod) {return $mod['package'].'/'.$mod['module'];}, array_filter($this->getAllowedModules(), function($mod) {return $mod['allowed'];}));
 			$instanceConfig['allowed_modules'][] = $this->getStudioPackage() . "/*";
 
 			$this->setInstanceConfig($instanceConfig);
