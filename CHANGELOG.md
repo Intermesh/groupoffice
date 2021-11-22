@@ -1,3 +1,6 @@
+- Business: added sortOrder field to business_activity, made sortable by dragging and dropping
+- Leavedays: order report by business_activity.sortOrder
+
 22-11-2021 6.5.88
 - Core: Strings started with an = were detected as formulas in the excel export causing errors.
 - Core: use settimeout on focus restore so enter in prompt dialog doesn't execute parent button again
