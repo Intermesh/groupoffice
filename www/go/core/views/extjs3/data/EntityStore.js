@@ -704,7 +704,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		return this.set(p).then((response) => {
 			if(op == 'create') {
 				if(response.created && id in response.created) {
-					return this.single(id);
+					return this.single(response.created[id].id);
 				} else
 				{
 					return Promise.reject({message: t("Failed to save"), response: response});
