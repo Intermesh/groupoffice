@@ -6,6 +6,7 @@
 - Multi instance: Fix for all modules being enabled by default
 - Addressbook: make sure that in contact detail panel, linked contacts are rendered first
 - Email: Display issue with email having body inside head.
+- Core: Check if auth state is present. Fixes 500 error with caldav when using ldapauthenticator or imapauthenticator
 
 19-11-2021 6.5.87
 - Billing: Handle max length in product catalog
