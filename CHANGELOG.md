@@ -2,6 +2,7 @@
 - Core: use settimeout on focus restore so enter in prompt dialog doesn't execute parent button again
 - Core: Entity store save gave error on new items
 - Core: Raise PHP memory limit on excel export to 2G
+- Projects2: Bugfix in Export time registration grid
 
 19-11-2021 6.5.87
 - Billing: Handle max length in product catalog
