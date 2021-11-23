@@ -493,6 +493,12 @@ class AbstractModelController extends AbstractController {
 			while($workflowModel = $workflowModelstmnt->fetch()){
 
 				$currentStep = $workflowModel->step;
+				if((!$currentStep && $workflowModel->step_id != '-1') || empty($workflowModel->process)) {
+					// we have an incomplete workflow with a missing step.
+					// delete outself and continue;
+					$workflowModel->delete();
+					continue;
+				}
 
 				$workflowResponse = $workflowModel->getAttributes('html');
 
