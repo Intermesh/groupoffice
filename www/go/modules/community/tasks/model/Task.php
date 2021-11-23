@@ -183,6 +183,12 @@ class Task extends AclInheritEntity {
 		return ['tasklistId' => 'id'];
 	}
 
+	protected static function internalRequiredProperties()
+	{
+		//Needed for support module permissions
+		return array_merge(parent::internalRequiredProperties(), ['createdBy']);
+	}
+
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("tasks_task", "task")
