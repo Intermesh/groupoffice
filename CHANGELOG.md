@@ -1,3 +1,4 @@
+- Remove obsolete timeentrydata module
 - Business: added sortOrder field to business_activity, made sortable by dragging and dropping
 - Leavedays: order report by business_activity.sortOrder
 
