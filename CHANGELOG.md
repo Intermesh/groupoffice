@@ -1,4 +1,3 @@
-
 6.6.11
 - Core: Fix error upon saving user profile data
 
@@ -16,6 +15,11 @@ XX-09-20216.6.10
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+
+
+- Business: added sortOrder field to business_activity, made sortable by dragging and dropping
+- Leavedays: order report by business_activity.sortOrder
 
 22-11-2021 6.5.88
 - Core: Strings started with an = were detected as formulas in the excel export causing errors.
