@@ -390,10 +390,6 @@ abstract class EntityController extends Controller {
 			$query = $cls::findByIds($params['ids'], $params['properties'], static::$getReadOnly);
 		}
 		
-		//filter permissions
-		$query->filter(['permissionLevel' => Acl::LEVEL_READ]);
-
-		
 		return $query;	
 	}
 
@@ -428,10 +424,12 @@ abstract class EntityController extends Controller {
 		$foundIds = [];
 		$result['list'] = [];
 		foreach($query as $e) {
-			$arr = $e->toArray();
-			$arr['id'] = $e->id();
-			$unsorted[$arr['id']] = $arr;
-			$foundIds[] = $arr['id'];
+			if($e->hasPermissionLevel(Acl::LEVEL_READ)) {
+				$arr = $e->toArray();
+				$arr['id'] = $e->id();
+				$unsorted[$arr['id']] = $arr;
+				$foundIds[] = $arr['id'];
+			}
 		}
 
 		if(!empty($p['ids'])) {
