@@ -83,7 +83,7 @@ function ini_return_bytes(string $val) :int
             $val *= 1024;
     }
 
-    return $val;
+    return (int) $val;
 }
 
 /**
