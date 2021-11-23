@@ -82,6 +82,7 @@ abstract class Entity extends Property {
 	 * 
 	 * The event listener is called with the {@see Filters} object.
 	 * @see self::defineFilters()
+	 * @see \go\modules\business\newsletters\Module::onContactFilter()
 	 */
 	const EVENT_FILTER = "filter";
 
@@ -710,15 +711,15 @@ abstract class Entity extends Property {
 			->add("permissionLevelGroups", function() {
 				//dummy used in permissionLevel filter.
 			})
-			->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
+			->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filterCondition, $filters) {
 
-				if(self::fireEvent(self::EVENT_FILTER_PERMISSION_LEVEL, $criteria, $value, $query, $filter) === false) {
+				if(self::fireEvent(self::EVENT_FILTER_PERMISSION_LEVEL, $criteria, $value, $query, $filterCondition, $filters) === false) {
 					// event may override this by returning false
 					return;
 				}
 
 				//Permission level is always added to the main query so that it's always applied with AND
-				static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
+				static::applyAclToQuery($query, $value, $filterCondition['permissionLevelUserId'] ?? null, $filterCondition['permissionLevelGroups'] ?? null);
 			})
 
 			->add('text', function (Criteria $criteria, $value, Query $query) {

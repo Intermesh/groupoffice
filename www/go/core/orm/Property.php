@@ -832,7 +832,9 @@ abstract class Property extends Model {
 	}
 
 	/**
-	 * Override to always select these properties
+	 * Override to always select these properties.
+	 *
+	 * This is cached so after changing this run /install/upgrade.php to reset the cache.
 	 *
 	 * @return string[]
 	 */

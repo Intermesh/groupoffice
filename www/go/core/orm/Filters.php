@@ -17,7 +17,6 @@ class Filters {
 	
 	private $filters = [];
 
-	private $usedFilters = [];
 
 	const NO_DEFAULT = '__NO_DEFAULT__';
 
@@ -28,7 +27,7 @@ class Filters {
 	 * See also addText(), addNumber() and addDate() for different types
 	 * 
 	 * @param string $name The name of the filter.
-	 * @param Callable $fn The filter function will be called with Criteria $criteria, $value, Query $query, array $filter 
+	 * @param Callable $fn The filter function will be called with Criteria $criteria, $value, Query $query, array $filterCondition, Filters $filter
 	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
 	 * 
 	 * @return $this
@@ -72,7 +71,7 @@ class Filters {
 
 		foreach($this->filters as $name => $value) {
 
-			if(in_array($name, $this->usedFilters)) {
+			if(in_array($name, $query->usedFilters)) {
 				continue;
 			}
 
@@ -89,14 +88,6 @@ class Filters {
 
 	}
 
-	/**
-	 * Check if filter was used by last apply() call
-	 *
-	 * @return boolean
-	 */
-	public function isUsed($name) {
-		return in_array(strtolower($name), $this->usedFilters);
-	}
 
 	/**
 	 * Apply given filters to query object
@@ -108,8 +99,7 @@ class Filters {
 	 * @throws Exception
 	 */
 	public function apply(Query $query, array $filter)  {
-		//keep track of used filters because they can be nested in sub conditions
-		$this->usedFilters = [];
+
 		$criteria = new Criteria();
 		$this->internalApply($query, $filter, $criteria);
 
@@ -180,7 +170,7 @@ class Filters {
 				throw new UnsupportedFilter();
 			}
 
-			$this->usedFilters[] = $name;
+			$query->usedFilters[] = $name;
 
 			$filterConfig = $this->filters[$name];
 			
@@ -189,25 +179,25 @@ class Filters {
 				case 'number':					
 					$range = $this->checkRange($value);
 					if($range) {
-						call_user_func($filterConfig['fn'], $criteria, '>=', (int) $range[0], $query, $filter);
-						call_user_func($filterConfig['fn'], $criteria, '<=', (int) $range[1], $query, $filter);
+						call_user_func($filterConfig['fn'], $criteria, '>=', (int) $range[0], $query, $filter, $this);
+						call_user_func($filterConfig['fn'], $criteria, '<=', (int) $range[1], $query, $filter, $this);
 					} else
 					{
 						$v = self::parseNumericValue($value);
-						call_user_func($filterConfig['fn'], $criteria, $v['comparator'], (int) $v['query'], $query, $filter);
+						call_user_func($filterConfig['fn'], $criteria, $v['comparator'], (int) $v['query'], $query, $filter, $this);
 					}
 					break;
 					
 				case 'date':					
 					$range = $this->checkDateRange($value);
 					if($range) {
-						call_user_func($filterConfig['fn'], $criteria, '>=', $range[0], $query, $filter);
-						call_user_func($filterConfig['fn'], $criteria, $range['endHasTime'] ? '<=' : '<', $range[1], $query, $filter);
+						call_user_func($filterConfig['fn'], $criteria, '>=', $range[0], $query, $filter, $this);
+						call_user_func($filterConfig['fn'], $criteria, $range['endHasTime'] ? '<=' : '<', $range[1], $query, $filter, $this);
 					} else
 					{
 						$v = self::parseNumericValue($value);
 						$v["query"] = new DateTime($v["query"]);
-						call_user_func($filterConfig['fn'], $criteria, $v['comparator'], $v["query"], $query, $filter);
+						call_user_func($filterConfig['fn'], $criteria, $v['comparator'], $v["query"], $query, $filter, $this);
 					}
 					break;
 					
@@ -215,11 +205,11 @@ class Filters {
 					if(!is_array($value)){
 						$value = [$value];
 					}
-					call_user_func($filterConfig['fn'], $criteria, "LIKE", $value, $query, $filter);
+					call_user_func($filterConfig['fn'], $criteria, "LIKE", $value, $query, $filter, $this);
 					break;
 				
 				case 'generic':
-					call_user_func($filterConfig['fn'], $criteria, $value, $query, $filter);
+					call_user_func($filterConfig['fn'], $criteria, $value, $query, $filter, $this);
 					break;
 			}
 			
@@ -232,7 +222,13 @@ class Filters {
 	 * Supports ranges 1..4 between 1 and 4 and >=, <> != = operators
 	 * 
 	 * @param string $name
-	 * @param Closure $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
+	 * @param Closure $fn Called with:
+	 *    Criteria $criteria,
+	 *    $comparator,
+	 *    $value,
+	 *    Query $query,
+	 *    array $filterCondition, // Not the full filter request but. The filter condition currently being processed. See JMAP spec.
+	 *    Filters $filters // this filters object
 	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
 	 * 
 	 * @return $this

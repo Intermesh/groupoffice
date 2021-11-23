@@ -68,9 +68,19 @@ class Query extends DbQuery {
 	public function filter(array $filters) {
 		$cls = $this->model;
 		$cls::filter($this, $filters);
-
 		return $this;
 	}
+
+	/**
+	 * Check if filter was used by last apply() call
+	 *
+	 * @return boolean
+	 */
+	public function isFilterUsed($name) {
+		return in_array(strtolower($name), $this->usedFilters);
+	}
+
+	public $usedFilters = [];
 
   /**
    * Select models linked to the given entity
