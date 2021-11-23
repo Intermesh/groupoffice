@@ -273,7 +273,7 @@ class Router {
 				$result = $result->jsonSerialize();
 			}
 			
-			if (!array_key_exists($part, $result)) {
+			if (!is_array($result) || !array_key_exists($part, $result)) {
 				throw new InvalidResultReference("Could not resolve path part " . $part);
 			}
 
