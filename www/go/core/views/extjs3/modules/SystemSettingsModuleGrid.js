@@ -59,7 +59,10 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 			iconCls: 'ic-group',
 			handler: function() {
 				const corePermissionDlg = new go.modules.GroupRights();
-				go.Db.store('Module').single(1).then((core) =>
+				const coreModule = go.Db.store('Module').findBy(function(rec) {
+					return (rec.name === 'core' && rec.package === 'core');
+				},this)
+				go.Db.store('Module').single(coreModule.id).then((core) =>
 					corePermissionDlg.show(core, ['mayChangeUsers', 'mayChangeGroups', 'mayChangeCustomFields'])
 				)
 			}
