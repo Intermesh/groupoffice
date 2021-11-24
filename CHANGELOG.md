@@ -1,6 +1,7 @@
 6.6.11
 - Core: Fix error upon saving user profile data
 - Core: Fix system settings module grid in case core module does not have id 1
+- Addressbook: drop restrictExportToAdmins setting in favor of mayExportContacts group module permission
 
 XX-09-20216.6.10
 - Time Registration: Filter employees on currently selected date instead of current date

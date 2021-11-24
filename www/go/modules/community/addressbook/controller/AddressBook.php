@@ -50,8 +50,9 @@ class AddressBook extends EntityController {
 	 * @param array $params
 	 */
 	public function set($params) {
-		if(!$this->rights->mayChangeAddressbooks)
+		if(!$this->rights->mayChangeAddressbooks) {
 			throw new Forbidden();
+		}
 		return $this->defaultSet($params);
 	}
 	

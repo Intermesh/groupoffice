@@ -4,6 +4,7 @@ return [
 		"description" => "Store contacts and organizations",
 
 		'mayChangeAddressbooks' => 'Change address books',
+		'mayExportContacts' => 'Export contacts',
 
 		"emailTypes" => [
 				"work" => "Work",
