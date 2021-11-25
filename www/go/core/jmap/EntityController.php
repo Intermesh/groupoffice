@@ -112,7 +112,7 @@ abstract class EntityController extends Controller {
 		$query->filter($params['filter']);
 
 		// Only return readable ID's
-		if($cls::getFilters()->hasFilter('permissionLevel') &&  !$query->isFilterUsed('permissionLevel')) {
+		if($cls::getFilters()->hasFilter('permissionLevel') && !$cls::getFilters()->isUsed('permissionLevel')) {
 			$query->filter(['permissionLevel' => Acl::LEVEL_READ]);
 		}
 		return $query;
