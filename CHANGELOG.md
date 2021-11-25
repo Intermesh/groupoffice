@@ -3,6 +3,7 @@
 - Leavedays: order report by business_activity.sortOrder
 - Comments: insert date header above first comment
 - Core: Denying notifications in a private Firefox window froze the browser.
+- Core / E-mail: Different list style type in sub unordered lists
 
 22-11-2021 6.5.88
 - Core: Strings started with an = were detected as formulas in the excel export causing errors.
