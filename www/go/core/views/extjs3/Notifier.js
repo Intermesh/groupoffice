@@ -261,7 +261,9 @@
 
 					case 'default':
 						return this.requestNotifyPermission().then((permission) => {
-							return this.notify(msg);
+							if(permission == "granted") {
+								return this.notify(msg);
+							}
 						});
 						break;
 					case 'granted':

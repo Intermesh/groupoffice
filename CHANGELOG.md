@@ -1,5 +1,6 @@
 - Business: added sortOrder field to business_activity, made sortable by dragging and dropping
 - Leavedays: order report by business_activity.sortOrder
+- Core: Denying notifications in a private Firefox window froze the browser.
 
 22-11-2021 6.5.88
 - Core: Strings started with an = were detected as formulas in the excel export causing errors.
