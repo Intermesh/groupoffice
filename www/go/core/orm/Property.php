@@ -348,34 +348,23 @@ abstract class Property extends Model {
    */
 	private static function queryRelation($cls, array $where, Relation $relation, $readOnly, $owner) {
 
-		$cacheKey = static::class.':'.$relation->name;
+		/** @var Query $query */
+		/** @var self $cls */
+		$query = $cls::internalFind([], $readOnly, $owner);
 
-		$cacheKey = $readOnly ? $cacheKey . '-ro' : $cacheKey . '-rw';
-
-		if(!isset(self::$cachedRelations[$cacheKey])) {
-
-      /** @var Query $query */
-      /** @var self $cls */
-      $query = $cls::internalFind([], $readOnly, $owner);
-
-			foreach($where as $field => $value) {
-				$query->andWhere($field . '= :'.$field);
-			}
-
-			if(is_a($relation->entityName, UserProperty::class, true)){
-				$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
-			}
-
-			if(!empty($relation->orderBy)) {
-				$query->orderBy([$relation->orderBy => 'ASC']);
-			}
-
-			$stmt = $query->createStatement();
-			self::$cachedRelations[$cacheKey] = $stmt;
-		} else
-		{
-			$stmt = self::$cachedRelations[$cacheKey];			
+		foreach($where as $field => $value) {
+			$query->andWhere($field . '= :'.$field);
 		}
+
+		if(is_a($relation->entityName, UserProperty::class, true)){
+			$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
+		}
+
+		if(!empty($relation->orderBy)) {
+			$query->orderBy([$relation->orderBy => 'ASC']);
+		}
+
+		$stmt = $query->createStatement();
 
 		foreach($where as $field => $value) {
 			$stmt->bindValue(':'.$field, $value);
@@ -718,13 +707,6 @@ abstract class Property extends Model {
 	 */
 	protected static function internalFind(array $fetchProperties = [], $readOnly = false, $owner = null) {
 
-		$cacheKey = static::class . '-' . implode("-", $fetchProperties);
-		$cacheKey = $readOnly ? $cacheKey . '-ro' : $cacheKey . '-rw';
-
-		if(isset(self::$findCache[$cacheKey])) {
-			return clone self::$findCache[$cacheKey];
-		}
-
 		$tables = self::getMapping()->getTables();
 
 		if(empty($tables)) {
@@ -743,9 +725,6 @@ abstract class Property extends Model {
 
 		self::joinAdditionalTables($tables, $query);
 		self::buildSelect($query, $fetchProperties, $readOnly);
-
-
-		self::$findCache[$cacheKey] = $query;
 
 		return clone $query;
 	}
