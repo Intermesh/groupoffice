@@ -131,3 +131,11 @@ ADD CONSTRAINT `tasks_category_tasklist_ibfk_9`
   FOREIGN KEY (`tasklistId`)
   REFERENCES `tasks_tasklist` (`createdBy`)
   ON DELETE CASCADE;";
+
+
+$updates['202111251126'][] = "alter table tasks_category drop foreign key tasks_category_ibfk_1;";
+
+$updates['202111251126'][] = "alter table tasks_category
+	add constraint tasks_category_ibfk_1
+		foreign key (ownerId) references core_user (id)
+			on delete cascade;";
