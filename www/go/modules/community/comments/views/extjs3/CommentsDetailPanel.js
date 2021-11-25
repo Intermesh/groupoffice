@@ -147,21 +147,20 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		}
 		o = o || {};
 
-		var badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
+		let badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
 		this.setTitle(t("Comments") + badge);
-		var prevStr = null;
+		let prevStr = null;
 
-		var dom = this.commentsContainer.getEl().dom;
+		let dom = this.commentsContainer.getEl().dom;
 		this.curScrollPos = dom.scrollTop;
 		this.curScrollHeight = dom.scrollHeight;// - dom.clientHeight;
 
 		this.commentsContainer.removeAll();
 
 		this.store.each(function(r) {
-			
-			var labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
+			let labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
 
-			var creator = r.get("creator");
+			let creator = r.get("creator");
 			if(!creator) {
 				creator = {
 					displayName: t("Unknown user")
@@ -169,11 +168,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			}
 
 
-			var qtip = t('{author} wrote at {date}')
+			let qtip = t('{author} wrote at {date}')
 				.replace('{author}', Ext.util.Format.htmlEncode(creator.displayName))
 				.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat));
 
-			var modifier = r.get("modifier");
+			let modifier = r.get("modifier");
 			if(!modifier) {
 				modifier = {
 					displayName: t("Unknown user")
@@ -191,7 +190,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 					.replace('{date}', Ext.util.Format.date(r.get('date'),go.User.dateTimeFormat));
 			}
 
-			var avatar = {
+			let avatar = {
 				xtype:'box',
 				autoEl: {tag: 'span'},
 				cls: 'photo '+mineCls
@@ -199,11 +198,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 			avatar.html = go.util.avatar(creator.displayName,creator.avatarId);
 
-			for(var i = 0, l = r.data.labels.length; i < l; i++){
+			for(let i = 0, l = r.data.labels.length; i < l; i++){
 				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
 			}
 
-			var readMore = new go.detail.ReadMore({
+			let readMore = new go.detail.ReadMore({
 				cls: 'go-html-formatted ' + mineCls
 			});
 			readMore.setText(r.get('text'));
@@ -224,10 +223,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 					xtype:'box',
 					autoEl: 'h6',
 					hidden: prevStr === null || prevStr == go.util.Format.date(r.get('date')),
-					html: prevStr//go.util.Format.date(r.get('date'))
+					html: prevStr
 				}
 				]
 			});
+
 			readMore.on('render',function(me){me.getEl().on("contextmenu", function(e, target, obj){
 				e.stopEvent();		
 				
@@ -237,9 +237,21 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				}
 
 			}, this);},this);
+
 			prevStr = go.util.Format.date(r.get('date'));
 		}, this);
-		
+
+		// Put a date on top
+		this.commentsContainer.insert(0,{
+			xtype:"container",
+			cls:'go-messages',
+			items: [{
+				xtype:'box',
+				autoEl: 'h6',
+				html: prevStr
+			}
+			]
+		});
 		this.doLayout();
 		this.scrollDown();
 

@@ -1,5 +1,7 @@
+- Remove obsolete timeentrydata module
 - Business: added sortOrder field to business_activity, made sortable by dragging and dropping
 - Leavedays: order report by business_activity.sortOrder
+- Comments: insert date header above first comment
 - Core: Denying notifications in a private Firefox window froze the browser.
 
 22-11-2021 6.5.88

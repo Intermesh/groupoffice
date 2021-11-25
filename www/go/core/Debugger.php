@@ -106,8 +106,6 @@ class Debugger {
 		$this->entries[] = ['groupCollapsed', $name];
 		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
 		$this->groupStartTime = $this->getTimeStamp();
-
-		$this->writeLog('start', $name . ' '. date('Y-m-d H:i:s'));
 	}
 
 	public function groupEnd(){
@@ -120,8 +118,6 @@ class Debugger {
 		$this->currentGroup .= ", Peak memory usage: " . number_format(memory_get_peak_usage() / (1024 * 1024), 2) . 'MB';			
 
 		$this->entries[] = ['groupEnd', null];
-
-		$this->writeLog('end', $this->currentGroup);
 	}
 
 	/**
@@ -150,12 +146,12 @@ class Debugger {
 		$this->internalLog($mixed, self::LEVEL_INFO, $traceBackSteps);
 	}
 	
-	public function debug($mixed, $traceBackSteps = 0) {
-		$this->log($mixed, $traceBackSteps);
+	public function debug($mixed, $traceBackSteps = 0, $writeFile = true) {
+		$this->log($mixed, $traceBackSteps, $writeFile);
 	}
 	
-	public function log($mixed, $traceBackSteps = 0) {
-		$this->internalLog($mixed, self::LEVEL_LOG, $traceBackSteps);
+	public function log($mixed, $traceBackSteps = 0, $writeFile = true) {
+		$this->internalLog($mixed, self::LEVEL_LOG, $traceBackSteps, $writeFile);
 	}
 	
 
@@ -169,7 +165,7 @@ class Debugger {
 	 * @param callable|string|object $mixed
 	 * @param string $level The type of message. Types can be arbitrary and can be enabled and disabled for output. {@see self::$enabledTypes}
 	 */
-	private function internalLog($mixed, $level = self::LEVEL_LOG, $traceBackSteps = 0) {
+	private function internalLog($mixed, $level = self::LEVEL_LOG, $traceBackSteps = 0, $writeFile = true) {
 
 		if(!$this->enabled) {
 			return;
@@ -214,9 +210,9 @@ class Debugger {
 		}
 		
 		//$entry = "[" . $this->getTimeStamp() . "][" . $caller['class'] . ":".$lastCaller['line']."] " . $mixed;
-
-		$this->writeLog($level, $mixed, $caller['class'], $lastCaller['line']);
-		
+		if($writeFile) {
+			$this->writeLog($level, $mixed, $caller['class'], $lastCaller['line']);
+		}
 		$this->entries[] = [$level, $mixed, $caller['class'], $lastCaller['line']];
 		
 	}

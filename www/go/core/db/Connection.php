@@ -147,7 +147,7 @@ class Connection {
 	 */
 	public function query($sql) {
 		if($this->debug) {
-			go()->getDebugger()->debug($sql);
+			go()->getDebugger()->debug($sql, 1 ,false);
 		}
 		try {
 			return $this->getPdo()->query($sql);
@@ -169,7 +169,7 @@ class Connection {
 	 */
 	public function exec($sql) {
 		if($this->debug) {
-			go()->getDebugger()->debug($sql, 1);
+			go()->getDebugger()->debug($sql, 1, false);
 		}
 		try {
 			return $this->getPdo()->exec($sql);
