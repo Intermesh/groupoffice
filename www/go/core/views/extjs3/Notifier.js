@@ -208,7 +208,7 @@
 					// set Desktop.Notification on Group-Office notification so we can close it when closing it in GO.
 					msgPanel.notification = notification
 				}).catch((e) => {
-					console.warn("Notification failed: " + e);
+					//console.warn("Notification failed: " + e);
 				});
 
 				this.notifiedAlerts[msgPanel.itemId] = true;
