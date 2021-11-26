@@ -51,6 +51,9 @@ class Module extends \go\core\Module {
 	}
 
 	public static function checkUrl() {
+		if(go()->getDebugger()->enabled) {
+			return true;
+		}
 		$configUrl = go()->getSettings()->URL;
 		$p = parse_url($configUrl, PHP_URL_HOST);
 

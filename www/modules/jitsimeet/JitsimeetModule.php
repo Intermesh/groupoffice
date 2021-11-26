@@ -50,4 +50,5 @@ class JitsimeetModule extends \GO\Base\Module{
 	public function getSettings() {
 		return Settings::get();
 	}
+
 }

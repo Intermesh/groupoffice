@@ -100,7 +100,7 @@ class Group extends AclOwnerEntity {
 
 	protected function internalValidate()
 	{
-		if($this->id === self::ID_ADMINS && !in_array(1, $this->users)) {
+		if(!$this->isNew() && $this->id === self::ID_ADMINS && !in_array(1, $this->users)) {
 			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the admin user from the administrators group"));
 		}
 

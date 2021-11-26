@@ -84,9 +84,9 @@ class Router {
 		
 		if($method != "community/dev/Debugger/get") {
 			//App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
-			go()->getDebugger()->group($method .',  ID: '. $clientCallId );				
-			go()->getDebugger()->debug("request:");
-			go()->getDebugger()->debug($params);			
+			go()->getDebugger()->group($method .',  ID: '. $clientCallId);
+			go()->getDebugger()->debug("request:",0, false);
+			go()->getDebugger()->debug($params, 0, false);
 		}
 		
 		try {
@@ -273,7 +273,7 @@ class Router {
 				$result = $result->jsonSerialize();
 			}
 			
-			if (!array_key_exists($part, $result)) {
+			if (!is_array($result) || !array_key_exists($part, $result)) {
 				throw new InvalidResultReference("Could not resolve path part " . $part);
 			}
 

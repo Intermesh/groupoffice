@@ -27,6 +27,8 @@ class AttendanceController extends AbstractController{
 			throw new Exception("The organizer of this event is missing");
 		
 		$response = array("success"=>true, 'data'=>array(
+				'name' =>  $participant->name,
+				'email' =>  $participant->email,
 				'notify_organizer'=>true,
 				'status'=>$participant->status, 
 				'organizer'=>$organizer->name,
@@ -73,7 +75,9 @@ class AttendanceController extends AbstractController{
 		$participant=$event->getParticipantOfCalendar();
 		if($params['status']!=$participant->status){
 			$participant->status=$params['status'];
-			$participant->save();
+			if(!$participant->save()) {
+				throw new Exception("Could not save participant: ". implode(", ", $participant->getValidationErrors()));
+			}
 		
 			if(!empty($params['notify_organizer']))
 				$event->replyToOrganizer();

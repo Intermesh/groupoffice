@@ -2458,16 +2458,27 @@ The following is the error message:
 		if(!isset(self::$aliases[$this->calendar->user_id])) {
 			self::$aliases[$this->calendar->user_id] = \GO\Email\Model\Alias::model()->find(
 				GO\Base\Db\FindParams::newInstance()
+					->joinRelation('account')
 					->select('email')
-					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
-					->ignoreAdminGroup()
+					->ignoreAcl()
+					->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('user_id', $this->calendar->user_id,'=', 'account'))
+
+//					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
+//					->ignoreAdminGroup()
 			)->fetchAll(\PDO::FETCH_COLUMN, 0);
 		}
 
-		return Participant::model()->findSingleByAttributes(array(
+		if(!empty(self::$aliases[$this->calendar->user_id])) {
+			return Participant::model()->findSingleByAttributes(array(
 				'email' => self::$aliases[$this->calendar->user_id],
-				'event_id'=>$this->id
-		));
+				'event_id' => $this->id
+			));
+		} else{
+			return Participant::model()->findSingleByAttributes(array(
+				'user_id' => $this->calendar->user_id,
+				'event_id' => $this->id
+			));
+		}
 	}
 	
 	/**
@@ -2496,13 +2507,8 @@ The following is the error message:
 		return Participant::model()->find($findParams);			
 		
 	}
-	
-	
-//	public function sendReply(){
-//		if($this->is_organizer)
-//			throw new \Exception("Meeting reply can only be send from the organizer's event");
-//	}	
-	
+
+
 	/**
 	 * Update's the participant status on all related meeting events and optionally sends a notification by e-mail to the organizer.
 	 * This function has to be called on an event that belongs to the participant and not the organizer.
@@ -2572,25 +2578,26 @@ The following is the error message:
 	}
 	
 	
-	public function sendCancelNotice(){
-//		if(!$this->is_organizer)
-//			throw new \Exception("Meeting request can only be send from the organizer's event");
-		
+	public function sendCancelNotice()
+	{
 		$stmt = $this->participants;
 
 		while ($participant = $stmt->fetch()) {		
 			//don't invite organizer
-			if($participant->is_organizer)
+			if($participant->is_organizer) {
 				continue;
-
+			}
 			
 			// Set the language of the email to the language of the participant.
 			$language = false;
 			if(!empty($participant->user_id)){
 				$user = \GO\Base\Model\User::model()->findByPk($participant->user_id, false, true);
-				
-				if($user)
+				if (!$user->enabled) {
+					continue;
+				}
+				if($user) {
 					\GO::language()->setLanguage($user->language);
+				}
 			}
 
 			$subject =  \GO::t("Cancellation", "calendar").': '.$this->name;

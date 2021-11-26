@@ -768,7 +768,7 @@ GO.calendar.MainPanel = function(config){
 							},
 							scope: this
 						},me.periodInfoPanel2 = new Ext.Container({
-							html: me.periodInfoPanel.getEl().dom.innerText,
+							html: me.periodInfoPanel.getEl() ? me.periodInfoPanel.getEl().dom.innerText : me.periodInfoPanel.html,
 							plain:true,
 							border:false,
 							cls:'cal-period'
@@ -1221,8 +1221,13 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				html = displayDate.format('W')+' - '+displayDate.add(Date.DAY,this.days).format('W');
 			}
 		}*/
-		
-		this.periodInfoPanel.getEl().update(this.getActivePanel().periodDisplay);
+
+		if(this.periodInfoPanel.getEl()) {
+			this.periodInfoPanel.getEl().update(this.getActivePanel().periodDisplay);
+		} else
+		{
+			this.periodInfoPanel.html = this.getActivePanel().periodDisplay;
+		}
 		this.fireEvent("periodchange", this, this.getActivePanel().periodDisplay)
 	},
 	

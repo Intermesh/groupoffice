@@ -110,7 +110,7 @@ abstract class EntityController extends Controller {
 		$query->filter($params['filter']);
 
 		// Only return readable ID's
-		if($cls::getFilters()->hasFilter('permissionLevel') &&  !$cls::getFilters()->isUsed('permissionLevel')) {
+		if($cls::getFilters()->hasFilter('permissionLevel') && !$cls::getFilters()->isUsed('permissionLevel')) {
 			$query->filter(['permissionLevel' => Acl::LEVEL_READ]);
 		}
 		return $query;
@@ -414,6 +414,7 @@ abstract class EntityController extends Controller {
 		$query = $this->getGetQuery($p);
 
 		$unsorted = [];
+		$foundIds = [];
 		$result['list'] = [];
 		foreach($query as $e) {
 			$arr = $e->toArray();
@@ -423,9 +424,19 @@ abstract class EntityController extends Controller {
 		}
 
 		if(!empty($p['ids'])) {
-			$result['list'] = array_values(array_map(function ($v) use ($unsorted) {
-				return $unsorted[$v];
-			}, $p['ids']));
+			// Sort the result by given ids.
+			$result['list'] = array_values(
+				array_filter(
+					array_map(function ($v) use ($unsorted) {
+						//if not in sorted then the ID's were not found.
+						return $unsorted[$v] ?? null;
+					}, $p['ids']),
+
+					function($id) {
+						return $id != null;
+					}
+				)
+			);
 		} else{
 			$result['list'] = array_values($unsorted);
 		}

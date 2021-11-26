@@ -46,6 +46,10 @@ class Environment extends Singleton {
 	public function getMemoryLimit() {
 		return self::configToBytes(ini_get('memory_limit'));
 	}
+
+	public function setMemoryLimit($limit) {
+		ini_set('memory_limit', $limit);
+	}
 	
 	/**
 	 * Get the maximum size of a file upload

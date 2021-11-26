@@ -280,6 +280,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				});
 
 				GO.email.showComposer({
+					values: addEmailAsAttachmentList.length == 1 ? {subject: "Fwd: " + records[0].data.subject} : undefined,
 					account_id: this.account_id,
 					addEmailAsAttachmentList: addEmailAsAttachmentList
 				});
@@ -1307,7 +1308,9 @@ GO.mainLayout.onReady(function(){
 				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
 				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
 				{
-					ep.messagesGrid.store.reload();
+					ep.messagesGrid.store.reload({
+						keepScrollPosition: true
+					});
 				}
 			}
 		}
@@ -1543,13 +1546,13 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 					}
 
 				default:
-					// if(Ext.isSafari) {
-						//must be opened before any async processes happen
-					//	go.util.getDownloadTargetWindow();
-					// }
+					if(Ext.isSafari || Ext.isGecko) {
+						// must be opened before any async processes happen
+						go.util.getDownloadTargetWindow();
+					}
 
 					if(go.Modules.isAvailable('legacy', 'files')) {
-						return GO.files.openEmailAttachment(attachment, panel, GO.util.isMobileOrTablet());
+						return GO.files.openEmailAttachment(attachment, panel, false);
 					} else {
 						go.util.viewFile(attachment.url);
 					}
