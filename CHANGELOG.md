@@ -1,6 +1,7 @@
-
 6.6.11
 - Core: Fix error upon saving user profile data
+- Core: Fix system settings module grid in case core module does not have id 1
+- Addressbook: drop restrictExportToAdmins system setting in favor of mayExportContacts group module permission
 
 XX-09-20216.6.10
 - Time Registration: Filter employees on currently selected date instead of current date
@@ -16,6 +17,17 @@ XX-09-20216.6.10
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+
+
+26-11-2021 6.5.89
+- Remove obsolete timeentrydata module
+- Business: added sortOrder field to business_activity, made sortable by dragging and dropping
+- Leavedays: order report by business_activity.sortOrder
+- Comments: insert date header above first comment
+- Core: Denying notifications in a private Firefox window froze the browser.
+- Core / E-mail: Different list style type in sub unordered lists
+- Email: Prevent double click on attachment and keep temp files longer so opened attachments are downloadable when multiple are opened
 
 22-11-2021 6.5.88
 - Core: Strings started with an = were detected as formulas in the excel export causing errors.

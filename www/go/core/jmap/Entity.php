@@ -225,7 +225,7 @@ abstract class Entity  extends OrmEntity {
 	 * @return bool
 	 */
 	private static function supportsFiles() {
-		return property_exists(static::class, 'filesFolderId') && Module::isInstalled("legacy", "files");
+		return property_exists(static::class, 'filesFolderId') && Module::isInstalled("legacy", "files", true);
 	}
 
 	/**

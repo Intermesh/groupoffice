@@ -79,7 +79,8 @@ GO.files.OpenFileWindow = Ext.extend(GO.Window, {
 				Ext.getBody().unmask();
 
 				//Doesn't work reliable on mobile to auto eval without a click event
-				if(!GO.util.isMobileOrTablet() && this.list.store.getCount()==1)
+				// if(!GO.util.isMobileOrTablet() && this.list.store.getCount()==1)
+				if(this.list.store.getCount()==1)
 				{
 					var record = this.list.store.getAt(0);			
 					eval(record.data.handler);

@@ -467,13 +467,20 @@ class Module extends Entity {
 	 *
 	 * @param string $package
 	 * @param string $name
+	 * @param null|boolean $enabled If set, then the module's enabled flag will be matched
 	 * @return bool
+	 * @throws Exception
 	 */
-	public static function isInstalled($package, $name) {
+	public static function isInstalled($package, $name, $enabled = null) {
 		if($package == "legacy") {
 			$package = null;
 		}
-		return static::find()->where(['package' => $package, 'name' => $name])->selectSingleValue('id')->single() != false;
+		$where = ['package' => $package, 'name' => $name];
+
+		if(isset($enabled)) {
+			$where['enabled'] = $enabled;
+		}
+		return static::find()->where($where)->selectSingleValue('id')->single() != false;
 	}
 	
 	/**

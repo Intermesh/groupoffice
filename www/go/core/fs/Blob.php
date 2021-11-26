@@ -427,7 +427,7 @@ class Blob extends orm\Entity {
 
 		$replaced = preg_replace_callback('/<img [^>]*' . $blobId . '[^>]*>/i', function($matches) use ($src) {
 			return preg_replace('/src="[^"]*"/i', 'src="' .$src .'"', $matches[0]);
-		});
+		}, $html);
 
 		return $replaced;
 	}

@@ -133,13 +133,21 @@ ADD CONSTRAINT `tasks_category_tasklist_ibfk_9`
   ON DELETE CASCADE;";
 
 
+$updates['202111251126'][] = "alter table tasks_category drop foreign key tasks_category_ibfk_1;";
 
-$updates['202110191314'][] = "alter table tasks_task
+$updates['202111251126'][] = "alter table tasks_category
+	add constraint tasks_category_ibfk_1
+		foreign key (ownerId) references core_user (id)
+			on delete cascade;";
+
+
+
+$updates['202111251126'][] = "alter table tasks_task
 	add aclId int null;";
 
-$updates['202110191314'][] = "update tasks_task t set t.aclId = (select aclId from tasks_tasklist where id = t.tasklistId);";
+$updates['202111251126'][] = "update tasks_task t set t.aclId = (select aclId from tasks_tasklist where id = t.tasklistId);";
 
-$updates['202110191314'][] = "alter table tasks_task
+$updates['202111251126'][] = "alter table tasks_task
 	add constraint tasks_task_core_acl_id_fk
 		foreign key (aclId) references core_acl (id);";
 

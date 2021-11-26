@@ -791,6 +791,15 @@ abstract class Entity extends Property {
 				->groupBy(['id']);
 		});
 
+		$filters->addText('comment', function (Criteria $criteria, $comparator, $value, Query $query) {
+			if (!$query->isJoined('comments_comment', 'comment')) {
+				$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
+			}
+
+			$query->groupBy(['id']);
+			$criteria->where('comment.text ', $comparator, $value);
+		});
+
 
 		/*
 			find all items with link to:

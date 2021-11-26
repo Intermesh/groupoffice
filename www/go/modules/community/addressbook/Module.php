@@ -44,6 +44,7 @@ class Module extends core\Module {
 	protected function rights() {
 		return [
 			'mayChangeAddressbooks', // allows AddressBook/set (hide ui elements that use this)
+			'mayExportContacts', // Allows users to export contacts
 		];
 	}
 

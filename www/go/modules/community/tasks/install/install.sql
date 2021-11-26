@@ -144,16 +144,16 @@ CREATE TABLE IF NOT EXISTS `tasks_category` (
   `tasklistId` INT(11) NULL,
   PRIMARY KEY (`id`),
   INDEX `user_id` (`ownerId` ASC),
-  CONSTRAINT `tasks_category_ibfk_1`
-    FOREIGN KEY (`ownerId`)
-    REFERENCES `core_user` (`id`)
-        ON DELETE CASCADE,
-  CONSTRAINT `tasks_category_tasklist_ibfk_9`
-      FOREIGN KEY (`tasklistId`)
-          REFERENCES `tasks_tasklist` (`id`))
+  constraint tasks_category_ibfk_1
+      foreign key (ownerId) references core_user (id)
+          on delete cascade,
+  constraint tasks_category_tasklist_ibfk_9
+      foreign key (tasklistId) references tasks_tasklist (createdBy)
+          on delete cascade)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
+
 
 
 -- -----------------------------------------------------

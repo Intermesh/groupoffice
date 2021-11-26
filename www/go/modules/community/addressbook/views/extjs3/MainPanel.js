@@ -627,12 +627,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 	setAddressBookId: function (addressBookId) {
 		this.addButton.setDisabled(false);
-
-		var defaultDisabled = !go.Modules.isAvailable("community","addressbook",go.permissionLevels.manage) &&
-			go.Modules.get("community", "addressbook").settings.restrictExportToAdmins;
+		const mayExportContacts = go.Modules.get("community", 'addressbook').userRights.mayExportContacts;
 
 		this.importButton.setDisabled(false); // Only export is restricted to the restrictExportToAdmins setting!
-		this.exportButton.setDisabled(defaultDisabled);
+		this.exportButton.setDisabled(!mayExportContacts);
 		if (addressBookId) {
 			this.addAddressBookId = addressBookId;
 			
@@ -643,14 +641,14 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		} else {
 			this.grid.store.setFilter("addressbooks", null);
 			
-			var firstAbNode = this.addressBookTree.getRootNode().childNodes[1];
+			let firstAbNode = this.addressBookTree.getRootNode().childNodes[2];
 			if (firstAbNode) {
 				this.addAddressBookId = go.User.addressBookSettings && go.User.addressBookSettings.defaultAddressBookId ? go.User.addressBookSettings.defaultAddressBookId : firstAbNode.attributes.data.id;
 			} else {
 				this.addButton.setDisabled(true);
 			}
 		}
-		var me = this;
+		const me = this;
 		this.grid.store.load().then(function (result) {
 			if (addressBookId) {
 				go.Db.store('AddressBook').single(addressBookId).then(function (ab) {

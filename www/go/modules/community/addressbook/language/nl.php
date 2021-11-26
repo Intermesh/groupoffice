@@ -4,6 +4,7 @@ return array (
 	"description" => "Bewaar contacten en organisaties",
 
 	'mayChangeAddressbooks' => 'Adresboeken wijzigen',
+	'mayExportContacts' => 'Contacten exporteren',
 
   'salutationTemplate' => 'Geachte [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]heer/mevrouw[else][if {{contact.gender}}=="M"]heer[else]mevrouw[/if][/if][/if][if {{contact.middleName}}] {{contact.middleName}}[/if] {{contact.lastName}}',
   'Contact' => 'Contactpersoon',
