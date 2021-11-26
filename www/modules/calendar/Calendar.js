@@ -1221,8 +1221,13 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				html = displayDate.format('W')+' - '+displayDate.add(Date.DAY,this.days).format('W');
 			}
 		}*/
-		
-		this.periodInfoPanel.getEl().update(this.getActivePanel().periodDisplay);
+
+		if(this.periodInfoPanel.getEl()) {
+			this.periodInfoPanel.getEl().update(this.getActivePanel().periodDisplay);
+		} else
+		{
+			this.periodInfoPanel.html = this.getActivePanel().periodDisplay;
+		}
 		this.fireEvent("periodchange", this, this.getActivePanel().periodDisplay)
 	},
 	

@@ -439,7 +439,13 @@ class Instance extends Entity {
 			$this->getModulePackageFolder()->delete();
 			
 			parent::internalDelete((new Query())->from(self::getMapping()->getPrimaryTable()->getName())->where(['id' => $this->id]));
-			
+
+			// User permissions incorrect
+			if($e instanceof \PDOException && strpos($e->getMessage(), 1044) !== false) {
+				ErrorHandler::logException($e);
+				throw new Exception("Please setup the correct permissions for the database user. See https://groupoffice.readthedocs.io/en/latest/install/extras/multi_instance.html");
+			}
+
 			throw $e;
 		}
 	}

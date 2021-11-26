@@ -31,6 +31,12 @@ ul{
 	list-style-position: outside;
 	margin: 0;
 	padding: 0 0 0 2em;
+	> ul {
+		list-style-type: circle;
+		> ul {
+			list-style-type: square;
+		}
+	}
 }
 
 ol {
