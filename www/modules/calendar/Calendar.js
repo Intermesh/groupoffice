@@ -768,7 +768,7 @@ GO.calendar.MainPanel = function(config){
 							},
 							scope: this
 						},me.periodInfoPanel2 = new Ext.Container({
-							html: me.periodInfoPanel.getEl().dom.innerText,
+							html: me.periodInfoPanel.getEl() ? me.periodInfoPanel.getEl().dom.innerText : me.periodInfoPanel.html,
 							plain:true,
 							border:false,
 							cls:'cal-period'
