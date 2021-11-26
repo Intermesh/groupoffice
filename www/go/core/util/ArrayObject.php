@@ -114,7 +114,7 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 			return new \stdClass;	
 		} 
 
-		return $this;
+		return $this->getArray();
 	}
 
 	

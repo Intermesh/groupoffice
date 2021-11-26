@@ -3,6 +3,7 @@
 namespace go\core\jmap;
 
 use Exception;
+use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\jmap\exception\UnsupportedSort;
@@ -22,8 +23,17 @@ use PDO;
 use PDOException;
 use ReflectionException;
 
-abstract class EntityController extends Controller {	
-	
+abstract class EntityController extends Controller {
+
+	use EventEmitterTrait;
+
+	const EVENT_BEFORE_QUERY = "beforequery";
+	const EVENT_QUERY = "query";
+	const EVENT_BEFORE_SET = "beforeset";
+	const EVENT_SET = "set";
+	const EVENT_BEFORE_GET = "beforeget";
+	const EVENT_GET = "get";
+
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
@@ -163,8 +173,6 @@ abstract class EntityController extends Controller {
 			}
 		}
 
-		$cls = $this->entityClass();
-
 		if(!isset($params['accountId'])) {
 			$params['accountId'] = null;
 		}
@@ -178,7 +186,7 @@ abstract class EntityController extends Controller {
 			$params['limit']++;
 		}
 		
-		return $params;
+		return new ArrayObject($params);
 	}
 
 	protected function getDefaultQueryFilter() {
@@ -204,16 +212,10 @@ abstract class EntityController extends Controller {
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
 		$idsQuery->fetchMode(PDO::FETCH_COLUMN, 0);
-		
-		$ids = [];		
+
+		static::fireEvent(self::EVENT_BEFORE_QUERY, $this, $p, $idsQuery);
 
 		try {
-//			foreach ($idsQuery as $record) {
-//				if (!isset($count)) {
-//					$count = count($record);
-//				}
-//				$ids[] = $count ? $record[0] : implode('-', $record);
-//			}
 
 			$ids = $idsQuery->all();
 
@@ -221,13 +223,13 @@ abstract class EntityController extends Controller {
 				$hasMore = !!array_pop($ids);
 			}
 
-			$response = [
+			$response = new ArrayObject([
 				'accountId' => $p['accountId'],
 				'state' => $state,
 				'ids' => $ids,
 				'notfound' => [],
 				'canCalculateUpdates' => false
-			];
+			]);
 
 			if(go()->getDebugger()->enabled) {
 				$response['query'] = (string) $idsQuery;
@@ -273,6 +275,8 @@ abstract class EntityController extends Controller {
 		} finally {
 			go()->getDbConnection()->debug = $oldDebug;
 		}
+
+		static::fireEvent(self::EVENT_QUERY, $this, $p, $response);
 		
 		return $response;
 	}
@@ -371,7 +375,7 @@ abstract class EntityController extends Controller {
 			$params['accountId'] = [];
 		}
 		
-		return $params;
+		return new ArrayObject($params);
 	}
 
   /**
@@ -406,12 +410,12 @@ abstract class EntityController extends Controller {
 
 		$p = $this->paramsGet($params);
 
-		$result = [
+		$result = new ArrayObject([
 			'accountId' => $p['accountId'],
 			'state' => $this->getState(),
 			'list' => [],
 			'notFound' => []
-		];
+		]);
 
 		//empty array should return empty result. but ids == null should return all.
 		if(isset($p['ids']) && !count($p['ids'])) {
@@ -419,6 +423,8 @@ abstract class EntityController extends Controller {
 		}
 
 		$query = $this->getGetQuery($p);
+
+		static::fireEvent(self::EVENT_BEFORE_GET, $this, $p, $query);
 
 		$unsorted = [];
 		$foundIds = [];
@@ -452,6 +458,9 @@ abstract class EntityController extends Controller {
 
 
 		$result['notFound'] = isset($p['ids']) ? array_values(array_diff($p['ids'], $foundIds)) : [];
+
+
+		static::fireEvent(self::EVENT_GET, $this, $p, $result);
 
 		return $result;
 	}
@@ -521,7 +530,7 @@ abstract class EntityController extends Controller {
 			throw new InvalidArguments("You can't set more than " . Capabilities::get()->maxObjectsInGet . " objects");
 		}
 		
-		return $params;
+		return new ArrayObject($params);
 	}
 
 
@@ -598,13 +607,15 @@ abstract class EntityController extends Controller {
 
 		$p = $this->paramsSet($params);
 
+		static::fireEvent(self::EVENT_BEFORE_SET, $this, $p);
+
 		$oldState = $this->getState();
 
 		if (isset($p['ifInState']) && $p['ifInState'] != $oldState) {
 			throw new StateMismatch();
 		}
 
-		$result = [
+		$result = new ArrayObject([
 				'accountId' => $p['accountId'],
 				'created' => null,
 				'updated' => null,
@@ -612,7 +623,7 @@ abstract class EntityController extends Controller {
 				'notCreated' => null,
 				'notUpdated' => null,
 				'notDestroyed' => null,
-		];
+		]);
 
 		$this->createEntitites($p['create'], $result);
 		$this->updateEntities($p['update'], $result);
@@ -622,6 +633,9 @@ abstract class EntityController extends Controller {
 
 		$result['oldState'] = $oldState;
 		$result['newState'] = $this->getState();
+
+
+		static::fireEvent(self::EVENT_SET, $this, $p);
 
 		return $result;
 	}
