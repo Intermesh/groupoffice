@@ -266,72 +266,74 @@ go.util =  (function () {
 		 * @param {object} cfg
 		 */
 		openFileDialog: function(cfg) {
-			//if (!this.uploadDialog) {
-				const uploadDialog = document.createElement("input");
-				uploadDialog.setAttribute("type", "file");
-				uploadDialog.onchange = function (e) {
-					
-					var uploadCount = this.files.length, blobs = [];
-					
-					if(!uploadCount) {
-						return;
-					}
-					
-					if(this.cfg.listeners.select) { 
-						this.cfg.listeners.select.call(this.cfg.listeners.scope||this, this.files); 
-					}
-					
-					if(!this.cfg.autoUpload) {						
-						return;
-					}
-					
-					for (var i = 0; i < this.files.length; i++) {
-						go.Jmap.upload(this.files[i], {
-							success: function(response, file) {
-								if(this.cfg.listeners.upload) {
-									this.cfg.listeners.upload.call(this.cfg.listeners.scope||this, response);
-								}
-								if(cfg.directory) {
-									var path = file.webkitRelativePath.split('/');
-									path.pop(); // filename
-									response.subfolder = path;
-								}
-								blobs.push(response);
-							},
-							callback: function(response) {
-								uploadCount--;
-								if(uploadCount === 0 && this.cfg.listeners.uploadComplete) {
-									this.cfg.listeners.uploadComplete.call(this.cfg.listeners.scope||this, blobs);
-								}
-							},
-							scope: this
-						});
-					}
-					
-					this.value = "";
-				};
-		//}
-			uploadDialog.cfg = cfg;
-			uploadDialog.removeAttribute('webkitdirectory');
-			uploadDialog.removeAttribute('directory');
-			uploadDialog.removeAttribute('multiple');
+			if (!this.uploadDialog) {
+				this.uploadDialog = document.createElement("input");
+				this.uploadDialog.setAttribute("type", "file");
+				this.uploadDialog.addEventListener("change", function (e) {
+						var uploadCount = this.files.length, blobs = [];
+
+						if(!uploadCount) {
+							return;
+						}
+
+						if(this.cfg.listeners.select) {
+							this.cfg.listeners.select.call(this.cfg.listeners.scope||this, this.files);
+						}
+
+						if(!this.cfg.autoUpload) {
+							return;
+						}
+
+						for (var i = 0; i < this.files.length; i++) {
+							go.Jmap.upload(this.files[i], {
+								success: function(response, file) {
+									if(this.cfg.listeners.upload) {
+										this.cfg.listeners.upload.call(this.cfg.listeners.scope||this, response);
+									}
+									if(this.cfg.directory) {
+										var path = file.webkitRelativePath.split('/');
+										path.pop(); // filename
+										response.subfolder = path;
+									}
+									blobs.push(response);
+								},
+								callback: function(response) {
+									uploadCount--;
+									if(uploadCount === 0 && this.cfg.listeners.uploadComplete) {
+										this.cfg.listeners.uploadComplete.call(this.cfg.listeners.scope||this, blobs);
+									}
+								},
+								scope: this
+							});
+						}
+
+						this.value = "";
+					});
+
+					document.body.appendChild(this.uploadDialog);
+			}
+			this.uploadDialog.cfg = cfg;
+			this.uploadDialog.removeAttribute('webkitdirectory');
+			this.uploadDialog.removeAttribute('directory');
+			this.uploadDialog.removeAttribute('multiple');
 
 			if(cfg.accept) {
-				uploadDialog.setAttribute('accept', cfg.accept);
+				this.uploadDialog.setAttribute('accept', cfg.accept);
 			}else
 			{
-				uploadDialog.removeAttribute('accept');
+				this.uploadDialog.removeAttribute('accept');
 			}
 
 			if(cfg.directory) {
-				uploadDialog.setAttribute('webkitdirectory', true);
-				uploadDialog.setAttribute('directory', true);
+				this.uploadDialog.setAttribute('webkitdirectory', true);
+				this.uploadDialog.setAttribute('directory', true);
 			}
 			if(cfg.multiple) {
-				uploadDialog.setAttribute('multiple', true);
+				this.uploadDialog.setAttribute('multiple', true);
 			}
-			
-			uploadDialog.click();
+
+
+			this.uploadDialog.click();
 		},
 
 		viewFile : function(url) {
