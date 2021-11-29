@@ -208,10 +208,10 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					form.on("load", function (f, v) {
 						this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
 					}, this);
-				}
-
-				if(this.value === null) {
-					this.value = form.entityStore.entity.defaultAcl;
+				
+					if(this.value === null) {
+						this.value = form.entityStore.entity.defaultAcl;
+					}
 				}
 			})
 		});
