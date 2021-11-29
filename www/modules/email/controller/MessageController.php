@@ -2342,8 +2342,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$imap->get_status($spamFolder)){
 			$imap->create_folder($spamFolder);
 		}
+
+		$params['mail_uid'] = json_decode($params['mail_uid']);
+		$uids = is_array($params['mail_uid']) ? $params['mail_uid'] : array($params['mail_uid']);
 							
-		if (!$imap->move(array($params['mail_uid']), $spamFolder)) {
+		if (!$imap->move($uids, $spamFolder)) {
 			$imap->disconnect();
 			throw new \Exception('Could not move message to "'.$spamFolder.'" folder. Does it exist?');
 		}

@@ -582,7 +582,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		} else {
 			this.grid.store.setFilter("addressbooks", null);
 			
-			var firstAbNode = this.addressBookTree.getRootNode().childNodes[1];
+			var firstAbNode = this.addressBookTree.getRootNode().childNodes[2];
 			if (firstAbNode) {
 				this.addAddressBookId = go.User.addressBookSettings && go.User.addressBookSettings.defaultAddressBookId ? go.User.addressBookSettings.defaultAddressBookId : firstAbNode.attributes.data.id;
 			} else {

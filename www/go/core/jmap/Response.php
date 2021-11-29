@@ -30,15 +30,13 @@ class Response extends \go\core\http\Response {
 	 * Output a response
 	 * 
 	 * @param array $responseData eg. ['resultName, ['data']];
-	 * @return type
-	 * @throws Exception
 	 */
 	public function addResponse($responseData = null) {		
 		$this->data[] = [$this->methodName,  $responseData, $this->clientCallId];
 		
 		if($this->methodName != "community/dev/Debugger/get") {
-			go()->getDebugger()->debug("response:");
-			go()->getDebugger()->debug($responseData);	
+			go()->getDebugger()->debug("response:",0, false);
+			go()->getDebugger()->debug($responseData,0, false);
 		}			
 	}
 	
@@ -46,8 +44,6 @@ class Response extends \go\core\http\Response {
 	 * Output an error
 	 * 
 	 * @param array $responseData eg. ['resultName, ['data']];
-	 * @return type
-	 * @throws Exception
 	 */
 	public function addError($responseData = null) {		
 		$this->data[] = ["error",  $responseData, $this->clientCallId];

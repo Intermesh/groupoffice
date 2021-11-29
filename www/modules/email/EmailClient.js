@@ -280,6 +280,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				});
 
 				GO.email.showComposer({
+					values: addEmailAsAttachmentList.length == 1 ? {subject: "Fwd: " + records[0].data.subject} : undefined,
 					account_id: this.account_id,
 					addEmailAsAttachmentList: addEmailAsAttachmentList
 				});
@@ -303,12 +304,17 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		text: t("Move to spam folder", "email"),
 		handler: function(){
 			 var records = this.messagesGrid.selModel.getSelections();
-			 if(records) {
-					 Ext.each(records, function(record) {
-						 GO.email.moveToSpam(record.get('uid'), record.get('mailbox'), this.account_id);
-
-					 }, this);
+			 if(!records) {
+				 return;
 			 }
+			 const uids = [];
+			 const mailbox = records[0].get("mailbox");
+
+			 Ext.each(records, function(record) {
+				 uids.push(record.get('uid'));
+			 }, this);
+
+				GO.email.moveToSpam(uids, mailbox, this.account_id);
 
 		},
 		scope: this,
@@ -1028,10 +1034,12 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		{
 			var node = this.treePanel.getNodeById(nodeId);
 
-			if(unseen)
-				node.getUI().addClass('ml-folder-unseen');
-			else
-				node.getUI().removeClass('ml-folder-unseen');
+			if(node) {
+				if (unseen)
+					node.getUI().addClass('ml-folder-unseen');
+				else
+					node.getUI().removeClass('ml-folder-unseen');
+			}
 
 			var statusText = statusEl.dom.innerHTML;
 			var current = statusText=='' ? 0 : parseInt(statusText);
@@ -1302,7 +1310,9 @@ GO.mainLayout.onReady(function(){
 				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
 				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
 				{
-					ep.messagesGrid.store.reload();
+					ep.messagesGrid.store.reload({
+						keepScrollPosition: true
+					});
 				}
 			}
 		}
@@ -1430,8 +1440,6 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 			return;
 		}
 
-
-
 		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml'))
 		{
 			GO.email.showMessageAttachment(0, {
@@ -1538,13 +1546,13 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 					}
 
 				default:
-					// if(Ext.isSafari) {
-						//must be opened before any async processes happen
-					//	go.util.getDownloadTargetWindow();
-					// }
+					if(Ext.isSafari || Ext.isGecko) {
+						// must be opened before any async processes happen
+						go.util.getDownloadTargetWindow();
+					}
 
-					if(go.Modules.isAvailable('legacy', 'files')) {
-						return GO.files.openEmailAttachment(attachment, panel, GO.util.isMobileOrTablet());
+					if(go.Modules.isAvailable('legacy', 'files') && attachment.name.toLowerCase() != 'winmail.dat') {
+						return GO.files.openEmailAttachment(attachment, panel, false);
 					} else {
 						go.util.viewFile(attachment.url);
 					}
@@ -1954,7 +1962,7 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 					params: {
 						account_id: fromAccountId,
 						from_mailbox_name: mailboxName,
-						mail_uid: mailUid
+						mail_uid: JSON.stringify(mailUid)
 					},
 					success: function() {
 //						GO.email.emailClient.topMessagesGrid.store.load();

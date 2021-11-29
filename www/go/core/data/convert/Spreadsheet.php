@@ -116,6 +116,9 @@ class Spreadsheet extends AbstractConverter {
 		$this->delimiter = $user->listSeparator;
 		$this->enclosure = $user->textSeparator;
 
+		//try to set high memory limit as phpoffice likes to eat RAM
+		go()->getEnvironment()->setMemoryLimit("2G");
+
 
 		static::fireEvent(static::EVENT_INIT, $this);
 	}
@@ -137,8 +140,14 @@ class Spreadsheet extends AbstractConverter {
 
 	protected function arrayToSpreadSheet($index, $array) {
 		for($colIndex = 0, $count = count($array);$colIndex < $count; $colIndex++) {
+			$v = $array[$colIndex];
 			//add 1 to index for headers
-			$this->spreadsheet->getActiveSheet()->setCellValueByColumnAndRow($colIndex + 1, $index, $array[$colIndex]);
+			if(is_string($v) && $v[0] == '=') {
+				//prevent formula detection
+				$this->spreadsheet->getActiveSheet()->setCellValueExplicitByColumnAndRow($colIndex + 1, $index, $v, DataType::TYPE_STRING);
+			} else {
+				$this->spreadsheet->getActiveSheet()->setCellValueByColumnAndRow($colIndex + 1, $index, $v);
+			}
 		}
 	}
 
@@ -196,6 +205,7 @@ class Spreadsheet extends AbstractConverter {
 			}
 
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
+			$writer->setPreCalculateFormulas(false);
 			$writer->save($this->tempFile->getPath());
 
 		}

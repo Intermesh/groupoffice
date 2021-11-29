@@ -947,3 +947,7 @@ $updates['202109280842'][] = "alter table core_user modify username varchar(190)
 
 // use photoBlobId in user profile as avatarId for User
 $updates['202110211653'][] = "UPDATE core_user u JOIN addressbook_contact c ON c.goUserId = u.id SET u.avatarId = c.photoBlobId WHERE u.avatarId IS NULL AND c.photoBlobId IS NOT NULL;";
+
+// Some older modules try to retrieve theme files from obsolete themes. This will trigger an error. Set the default theme
+// to 'Paper'
+$updates['202111151100'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";

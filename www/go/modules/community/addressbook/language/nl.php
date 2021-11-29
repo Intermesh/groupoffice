@@ -31,10 +31,8 @@ return array (
   'emailTypes' => 
   array (
     'work' => 'Werk',
-    'visit' => 'Bezoek',
     'home' => 'Thuis',
     'billing' => 'Factuur',
-	  'delivery' => 'Levering',
   ),
   'phoneTypes' => 
   array (
@@ -52,12 +50,13 @@ return array (
     'postal' => 'Post',
     'work' => 'Werk',
     'home' => 'Thuis',
+    'delivery' => 'Levering',
   ),
   'dateTypes' => 
   array (
     'birthday' => 'Verjaardag',
     'anniversary' => 'Trouwdag',
-	  "action" => "Actie"
+    'action' => 'Actie',
   ),
   'Star' => 'Favoriet',
   'Add group' => 'Groep toevoegen',
@@ -110,7 +109,7 @@ return array (
   'Has e-mail addresses' => 'Heeft e-mail adressen',
   'Create personal address book for each user' => 'Maak een persoonlijk adresboek aan voor nieuwe gebruikers',
   'Automatically link e-mail to contacts' => 'Koppel e-mail automatisch aan contactpersonen',
-  'Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too.' => 'Waarschuwing: Dit kopieert e-mail naar de Group-Office schijftuimte en zorgt dus voor een toename daarin. De e-mail wordt ook zichtbaar aan iedereen die toegang heeft tot het adresboek!',
+  'Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too.' => 'Waarschuwing: Dit kopieert e-mail naar de {product_name} schijftuimte en zorgt dus voor een toename daarin. De e-mail wordt ook zichtbaar aan iedereen die toegang heeft tot het adresboek!',
   'Dates' => 'Data',
   'URL\'s' => 'URL’s',
   'Addresses' => 'Adressen',
@@ -122,8 +121,24 @@ return array (
   'Failed to add contacts to the group' => 'Fout bij het toevoegen van contacten aan de groep',
   'Information' => 'Informatie',
   'Name bank' => 'Naam bank',
-	'Upcoming birthdays' => 'Komende verjaardagen',
-	'Birthday' => 'Verjaardag',
-	'Birthdays' => 'Verjaardagen',
-	'Age' => 'Leeftijd'
+  'Upcoming birthdays' => 'Komende verjaardagen',
+  'Birthday' => 'Verjaardag',
+  'Birthdays' => 'Verjaardagen',
+  'Age' => 'Leeftijd',
+  'Action date' => 'Actiedatum',
+  'Page' => 'Pagina',
+  'Page format' => 'Pagina formaat',
+  'Rows' => 'Rijen',
+  'Page margins' => 'Pagina marges',
+  'Top' => 'Boven',
+  'Bottom' => 'Onder',
+  'Font' => 'Lettertype',
+  'Family' => 'Familie',
+  'Label margins' => 'Label marges',
+  'Template' => 'Sjabloon',
+  'Date of birth' => 'Geboortedatum',
+  'Are you sure that you would like to import this VCard?' => 'Weet u zeker dat u deze contactkaart wilt importeren?',
+  'Importing...' => 'Bezig met importeren…',
+  'Restrict export to administrators' => 'Beperk export tot beheerders',
+  'Allow new' => 'Sta nieuwe toe',
 );

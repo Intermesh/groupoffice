@@ -1,3 +1,92 @@
+29-11-2021 6.5.90
+- Leavedays: Manager column was sortable but is not supported by the server
+- Email: Check if node was found to prevent node.getUI() error
+- Email: Fix for winmail.dat attachments
+- Core: Fixed upload on iOS devices
+- Email: Empty window on ios devices when opening attachments
+- Addressbook: Index phonenumbers so they can be found on partials
+- Core: Sort links on modified at date descending
+
+26-11-2021 6.5.89
+- Remove obsolete timeentrydata module
+- Business: added sortOrder field to business_activity, made sortable by dragging and dropping
+- Leavedays: order report by business_activity.sortOrder
+- Comments: insert date header above first comment
+- Core: Denying notifications in a private Firefox window froze the browser.
+- Core / E-mail: Different list style type in sub unordered lists
+- Email: Prevent double click on attachment and keep temp files longer so opened attachments are downloadable when multiple are opened
+
+22-11-2021 6.5.88
+- Core: Strings started with an = were detected as formulas in the excel export causing errors.
+- Core: use settimeout on focus restore so enter in prompt dialog doesn't execute parent button again
+- Core: Entity store save gave error on new items
+- Core: Raise PHP memory limit on excel export to 2G
+- Projects2: Bugfix in Export time registration grid
+- Multi instance: Fix for all modules being enabled by default
+- Addressbook: make sure that in contact detail panel, linked contacts are rendered first
+- Email: Display issue with email having body inside head.
+- Core: Check if auth state is present. Fixes 500 error with caldav when using ldapauthenticator or imapauthenticator
+- Jitsi meet: Used some email module code by mistake
+
+19-11-2021 6.5.87
+- Billing: Handle max length in product catalog
+- Core: Fixed: Using MariaDB cluster doesnt work #742
+- Business: optionally copy agreement values into new agreement record
+- Business / Leavedays: Make agreements editable by managers
+- Calendar: Fixed: [Inviting participants] no consideration of the answer #738
+- Email: Fixed: Managing folders (right click) while viewing emails in another folder #659
+- Email: Fixed: Go scrolls up on new email #658
+- Email: Forwarding as attachment has a blank subject #578
+- Email: Fixed: issue forwarding as attachment #676
+- Start page: Some rss feeds didn't work with <rdf></rdf>
+- Filesearch: When not having permissions files gave an error.
+
+
+18-11-2021 6.5.86
+- Calendar: Bypass cancellation email for events with deactivated users
+- Calendar: do not export private events if not owner of said events
+- Leavedays: Only import most recent manager data
+- Addressbook: Bugfix: show address book in contact selection field
+- Leavedays: Leave out disabled activity types in year panel
+- Business: Activity dialog bigger
+- Email: Avoid Safari and Firefox popup block
+- Jitsi meet: Fixed jitsi meet error when not having permissions
+
+
+15-11-2021 6.5.85
+- Projects2: bugfix in query for Project cost Reports
+- Core: set default user theme to Paper if not set already
+- Core: hide positive test messages from installer
+- Googleauthenticator: Fix unhelpful error message after successfully enabling authenticator
+- Leavedays: Import manager data upon upgrade 6.4 > 6.5 and up
+- Leavedays: Display managers in year overview grid
+- Googleauthenticator: Incorrect image path for two factor authentication #727
+- Calendarexport: Fixed:[Calendar export Module] Available even if no permission on it #739
+- Email: Fixed: 6.5.X: move mutltiple mails to SPAM with right-click does not work #707
+- Core: Sort groups by checked status in User's Groups
+- Jistimeet: New module that integrates Jistimeet in the calendar
+- Core: updated Dutch translation
+- Email: Email from template source selection fixed
+- Email: Fixed: 6.5.40 No auto-link when opening e-mail from ticket #686
+- Filesearch: Content preview in separate collapsible panel
+- Email / Core: remove empty margins from paragraph tag
+- Addressbook: Show address book in contact selection field
+- Core: Updated German translation
+- Onlyoffice: Didn't work on sub path like /groupoffice
+- WOPI: Didn't work on sub path like /groupoffice
+
+05-11-2021 6.5.84
+- Calendar: remove location data from month grid for reasons of screen real estate
+- History: Old bug caused removal of permissions after one year
+
+02-11-2021 6.5.83
+- Business: Fix display of total hours in agreement grid
+- Leavedays: Import all active users as employees in migration script
+- Calendar: Error when reloading participants or changing time
+
+01-11-2021 6.5.82
+- Billing: more friendly error handling when having connection issues
+- Core: hide VisibleToPanel in User settings unless you are an admin
 - Calendar: fix QuickTip for information icon
 - Core: cleanup response data if json_encode fails with UTF8 error
 - Core: fix translation sir / madam in translation
@@ -6,6 +95,7 @@
 - Leavedays: fix error message in leave day model
 - Linked email: Set all existing cdate and mdate fields to IMAP send data
 - Summary: fix parsing of RSS feeds with newlines
+- Email: prevent error when adding empty list to recipient fields
 
 18-10-2021 6.5.81
 - Calendar: If not empty, show location data for all-day events in month and day grids
@@ -21,6 +111,7 @@
 - Core: Fixed search multiple terms in older modules
 - Tickets: Fixed {ticket:rate} template tag
 - Email: Fixed email display issue
+
 
 04-10-2021 6.5.80
 - Comments: fixed comment panel not loading the last items when more than 40

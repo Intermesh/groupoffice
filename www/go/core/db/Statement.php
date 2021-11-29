@@ -98,7 +98,7 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 				$duration  = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
 
 				$sql = QueryBuilder::debugBuild($this->build);
-				go()->debug($sql . ' (' . $duration . 'ms)', 5);
+				go()->debug(str_replace(["\n","\t"], "", $sql) . "\n(" . $duration . 'ms)', 5);
 			}
 			if($ret === false) {
 				go()->error("SQL FAILURE: " . $this);

@@ -161,13 +161,13 @@ GO.email.AccountsTree = function(config){
 		if(node.attributes.permission_level < GO.permissionLevels.create)
 		  return false;
 
-		var selModel = this.getSelectionModel();
-		
-		if(!selModel.isSelected(node))
-		{
-			selModel.clearSelections();
-			selModel.select(node);
-		}
+		// var selModel = this.getSelectionModel();
+		//
+		// if(!selModel.isSelected(node))
+		// {
+		// 	selModel.clearSelections();
+		// 	selModel.select(node);
+		// }
 		
 		var coords = e.getXY();
 
