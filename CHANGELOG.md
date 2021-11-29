@@ -3,6 +3,7 @@
 - Email: Fix for winmail.dat attachments
 - Core: Fixed upload on iOS devices
 - Email: Empty window on ios devices when opening attachments
+- Addressbook: Index phonenumbers so they can be found on partials
 
 26-11-2021 6.5.89
 - Remove obsolete timeentrydata module
