@@ -1,3 +1,5 @@
+- Leavedays: Manager column was sortable but is not supported by the server
+
 26-11-2021 6.5.89
 - Remove obsolete timeentrydata module
 - Business: added sortOrder field to business_activity, made sortable by dragging and dropping
