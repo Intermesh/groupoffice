@@ -1034,10 +1034,12 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		{
 			var node = this.treePanel.getNodeById(nodeId);
 
-			if(unseen)
-				node.getUI().addClass('ml-folder-unseen');
-			else
-				node.getUI().removeClass('ml-folder-unseen');
+			if(node) {
+				if (unseen)
+					node.getUI().addClass('ml-folder-unseen');
+				else
+					node.getUI().removeClass('ml-folder-unseen');
+			}
 
 			var statusText = statusEl.dom.innerHTML;
 			var current = statusText=='' ? 0 : parseInt(statusText);
