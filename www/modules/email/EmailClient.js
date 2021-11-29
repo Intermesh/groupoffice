@@ -1440,8 +1440,6 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 			return;
 		}
 
-
-
 		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml'))
 		{
 			GO.email.showMessageAttachment(0, {
