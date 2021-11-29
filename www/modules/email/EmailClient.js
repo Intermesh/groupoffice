@@ -1553,7 +1553,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 						go.util.getDownloadTargetWindow();
 					}
 
-					if(go.Modules.isAvailable('legacy', 'files')) {
+					if(go.Modules.isAvailable('legacy', 'files') && attachment.name.toLowerCase() != 'winmail.dat') {
 						return GO.files.openEmailAttachment(attachment, panel, false);
 					} else {
 						go.util.viewFile(attachment.url);
