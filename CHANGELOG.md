@@ -1,4 +1,5 @@
 - Leavedays: Manager column was sortable but is not supported by the server
+- Email: Check if node was found to prevent node.getUI() error
 
 26-11-2021 6.5.89
 - Remove obsolete timeentrydata module
