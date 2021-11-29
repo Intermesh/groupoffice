@@ -24,8 +24,7 @@ class Link extends EntityController {
 		
 		if(empty($p['sort'])) {
 			$p['sort'] = [
-			//	["property" => "eTo.name", "isAscending"=> true],
-				["property" => "createdAt", "isAscending"=> false]
+				["property" => "search.modifiedAt", "isAscending"=> false]
 			];
 		}
 		
