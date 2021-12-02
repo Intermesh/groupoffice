@@ -54,30 +54,30 @@ class Mapping {
 	 * 
 	 * @param string $for Property class name this mapping is for
 	 */
-	public function __construct($for) {
+	public function __construct(string $for) {
 		$this->for = $for;
 	}
 
-  /**
-   * Adds a table to the model
-   *
-   * @param string $name The table name
-   * @param string $alias The table alias to use in the queries
-   * @param array $keys If null then it's assumed the key name is identical in
-   *   this and the last added table. eg. ['id' => 'id']
-   * @param array $columns Leave this null if you want to automatically build
-   *   this based on the properties the model has. If you're extending a model
-   *   then this is not possinble and you must supply all columns you do want to
-   *   make available in the model.
-   * @param array $constantValues If the table that is joined needs to have
-   *   constant values. For example the keys are ['folderId' => 'folderId'] but
-   *   the joined table always needs to have a value
-   *   ['type' => "foo"] then you can set it with this parameter.
-   * @return $this
-   * @throws ReflectionException
-   */
-	public function addTable($name, $alias = null, array $keys = null, array $columns = null, array $constantValues = []) {
-		
+	/**
+	 * Adds a table to the model
+	 *
+	 * @param string $name The table name
+	 * @param string|null $alias The table alias to use in the queries
+	 * @param array|null $keys If null then it's assumed the key name is identical in
+	 *   this and the last added table. eg. ['id' => 'id']
+	 * @param array|null $columns Leave this null if you want to automatically build
+	 *   this based on the properties the model has. If you're extending a model
+	 *   then this is not possinble and you must supply all columns you do want to
+	 *   make available in the model.
+	 * @param array $constantValues If the table that is joined needs to have
+	 *   constant values. For example the keys are ['folderId' => 'folderId'] but
+	 *   the joined table always needs to have a value
+	 *   ['type' => "foo"] then you can set it with this parameter.
+	 * @return $this
+	 * @throws ReflectionException
+	 */
+	public function addTable(string $name, string $alias = null, array $keys = null, array $columns = null, array $constantValues = []): Mapping
+	{
 		if(!$alias) {
 			$alias = $name;
 		}
@@ -107,7 +107,8 @@ class Mapping {
    * @return Mapping
    * @throws Exception
    */
-	public function addUserTable($name, $alias, array $keys = null, array $columns = null, array $constantValues = []) {
+	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []): Mapping
+	{
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
 		$this->tables[$name]->isUserTable = true;
 		$this->hasUserTable = true;
@@ -126,7 +127,8 @@ class Mapping {
    * @return array
    * @throws ReflectionException
    */
-	private function buildColumns() {
+	private function buildColumns(): array
+	{
 		$reflectionClass = new ReflectionClass($this->for);
 		$rProps = $reflectionClass->getProperties();
 		$props = [];
@@ -142,7 +144,8 @@ class Mapping {
 	 * 
 	 * @return MappedTable[]
 	 */
-	public function getTables() {
+	public function getTables(): array
+	{
 		return $this->tables;
 	}	
 	
@@ -152,7 +155,8 @@ class Mapping {
 	 * @param string $name
 	 * @return MappedTable
 	 */
-	public function getTable($name) {
+	public function getTable(string $name): MappedTable
+	{
 		return $this->tables[$name];
 	}
 
@@ -176,14 +180,15 @@ class Mapping {
    * @return string[] path's of properties
    * @throws Exception
    */
-	public function hasTable($name, $path = [], &$paths = []) {
+	public function hasTable($name, array $path = [], array &$paths = []): array
+	{
 		
 		if(isset($this->tables[$name])) {
 			$paths[] = $path;
 		}
 
 		foreach($this->getRelations() as $r) {
-			if(!isset($r->entityName)) {
+			if(!isset($r->propertyName)) {
 				//for scalar
 				if($r->tableName == $name) {
 					$paths[] = array_merge($path, [$r->name]);
@@ -191,7 +196,7 @@ class Mapping {
 				continue;
 			}
 			/** @var Property $cls */
-			$cls = $r->entityName;
+			$cls = $r->propertyName;
 			$cls::getMapping()->hasTable($name, array_merge($path, [$r->name]), $paths);			
 		}
 
@@ -200,17 +205,19 @@ class Mapping {
 
 	/**
 	 * Add has one relation
-	 * 
+	 *
 	 * @param string $name
 	 * @param string $propertyName
 	 * @param array $keys
 	 * @param bool $autoCreate If not found then automatically create an empty object
-	 * 
+	 *
 	 * @return $this;
+	 * @throws Exception
 	 */
-	public function addHasOne($name, $propertyName, array $keys, $autoCreate = false) {
+	public function addHasOne(string $name, string $propertyName, array $keys, bool $autoCreate = false): Mapping
+	{
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_HAS_ONE);
-		$this->relations[$name]->setEntityName($propertyName);
+		$this->relations[$name]->setPropertyName($propertyName);
 		$this->relations[$name]->autoCreate = $autoCreate;
 		return $this;
 	}
@@ -233,9 +240,10 @@ class Mapping {
 	 * @return $this;
 	 * @throws Exception
 	 */
-	public function addArray($name, $propertyName, array $keys, array $options = []) {
+	public function addArray(string $name, string $propertyName, array $keys, array $options = []): Mapping
+	{
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_ARRAY);
-		$this->relations[$name]->setEntityName($propertyName);
+		$this->relations[$name]->setPropertyName($propertyName);
 		foreach($options as $option => $value) {
 			$this->relations[$name]->$option = $value;
 		}
@@ -254,9 +262,10 @@ class Mapping {
 	 * @return $this;
 	 * @throws Exception
 	 */
-	public function addMap($name, $propertyName, array $keys) {
+	public function addMap(string $name, string $propertyName, array $keys): Mapping
+	{
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_MAP);
-		$this->relations[$name]->setEntityName($propertyName);
+		$this->relations[$name]->setPropertyName($propertyName);
 		return $this;
 	}
 
@@ -273,7 +282,8 @@ class Mapping {
 	 * 
 	 * @return $this;
 	 */
-	public function addScalar($name, $tableName, array $keys) {
+	public function addScalar(string $name, string $tableName, array $keys): Mapping
+	{
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_SCALAR);
 		$this->relations[$name]->setTableName($tableName);
 		return $this;
@@ -284,11 +294,13 @@ class Mapping {
 	 * 
 	 * @return Relation[]
 	 */
-	public function getRelations() {
+	public function getRelations(): array
+	{
 		return $this->relations;
 	}
 
-	private function hasUserTable() {
+	private function hasUserTable(): bool
+	{
 		foreach($this->tables as $table) {
 			if($table->isUserTable) {
 				return true;
@@ -303,14 +315,15 @@ class Mapping {
 	 *
 	 * @return boolean
 	 */
-	public function hasUserTableRelation() {
+	public function hasUserTableRelation(): bool
+	{
 
 		if(!$this->hasUserTable()) {
 			return false;
 		}
 
 		foreach($this->getRelations() as $relation) {
-			if(is_a($relation->entityName, UserProperty::class, true)){
+			if(is_a($relation->propertyName, UserProperty::class, true)){
 				return true;
 			}
 		}
@@ -324,7 +337,7 @@ class Mapping {
 	 * @param string $name
 	 * @return Relation|boolean
 	 */
-	public function getRelation($name) {
+	public function getRelation(string $name) {
 		if(!isset($this->relations[$name])) {
 			return false;
 		}
@@ -340,7 +353,7 @@ class Mapping {
 	 * @param Query $query
 	 * @return $this
 	 */
-	public function setQuery(Query $query)
+	public function setQuery(Query $query): Mapping
 	{
 		return $this->addQuery($query);
 	}
@@ -357,7 +370,7 @@ class Mapping {
 	 * @param Query $q
 	 * @return $this
 	 */
-	public function addQuery(Query $q)
+	public function addQuery(Query $q): Mapping
 	{
 		if (!empty($this->query)) {
 			$this->query->mergeWith($q);
@@ -369,10 +382,13 @@ class Mapping {
 	}
 	
 	/**
-	 * 
-	 * @return Query
+	 * Get the mappings query object.
+	 *
+	 * @see addQuery()
+	 * @return Query|null
 	 */
-	public function getQuery() {
+	public function getQuery()
+	{
 		return $this->query;
 	}
 	
@@ -383,7 +399,7 @@ class Mapping {
 	 * @param string $propName
 	 * @return boolean|Column
 	 */
-	public function getColumn($propName) {
+	public function getColumn(string $propName) {
 		return $this->columns[$propName] ?? false;
 	}
 
@@ -392,7 +408,8 @@ class Mapping {
 	 *
 	 * @return Column[]
 	 */
-	public function getColumns() {
+	public function getColumns(): array
+	{
 		return array_values($this->columns);
 	}
 
@@ -401,12 +418,11 @@ class Mapping {
 	 *
 	 * @return string[]
 	 */
-	public function getColumnNames() {
-		$names =  array_map(function($c) {
+	public function getColumnNames(): array
+	{
+		return array_map(function($c) {
 			return $c->name;
 		}, $this->getColumns());
-
-		return $names;
 	}
 	
 	/**
@@ -415,7 +431,8 @@ class Mapping {
 	 * @param string $name
 	 * @return boolean
 	 */
-	public function hasProperty($name) {
+	public function hasProperty(string $name): bool
+	{
 		return $this->getRelation($name) != false || $this->getColumn($name) != false;
 	}
 
@@ -443,9 +460,10 @@ class Mapping {
 	 * Get all mapped property objects in a key value array. This is a mix of columns 
 	 * and relations.
 	 * 
-	 * @return Column[] | Relation
+	 * @return Column[] | Relation[]
 	 */
-	public function getProperties() {
+	public function getProperties(): array
+	{
 		$props = [];
 		foreach($this->getTables() as $table) {
 			foreach($table->getMappedColumns() as $col) {

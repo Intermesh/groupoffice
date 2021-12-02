@@ -299,7 +299,7 @@ abstract class Entity  extends OrmEntity {
         $newKeys = isset($modified[$r->name][0]) ? array_keys($modified[$r->name][0]) : [];
         $oldKeys = isset($modified[$r->name][1]) ? array_keys($modified[$r->name][1]) : [];
         $ids = array_merge(array_diff($newKeys, $oldKeys), array_diff($oldKeys, $newKeys));
-        $tableName = $r->entityName::getMapping()->getPrimaryTable()->getName();
+        $tableName = $r->propertyName::getMapping()->getPrimaryTable()->getName();
       }
 
 			if(empty($ids)) {

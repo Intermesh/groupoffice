@@ -10,11 +10,11 @@ use function GO;
 
 class Authenticator extends PrimaryAuthenticator {
 	
-	public static function id() {
+	public static function id() : string{
 		return "imap";
 	}
 
-	public static function isAvailableFor($username) {		
+	public static function isAvailableFor(string $username) :bool{
 		return static::findServer($username) != false;
 	}
 	

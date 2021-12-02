@@ -226,7 +226,7 @@ abstract class Property extends Model {
    */
 	private function initRelations() {		
 		foreach ($this->getFetchedRelations() as $relation) {
-			$cls = $relation->entityName;
+			$cls = $relation->propertyName;
 
 			$where = $this->buildRelationWhere($relation);
 
@@ -352,7 +352,7 @@ abstract class Property extends Model {
 			$query->andWhere($field . '= :'.$field);
 		}
 
-		if(is_a($relation->entityName, UserProperty::class, true)){
+		if(is_a($relation->propertyName, UserProperty::class, true)){
 			$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
 		}
 
@@ -1368,7 +1368,7 @@ abstract class Property extends Model {
 		$models = $this->{$relation->name} ?? [];		
 		$this->relatedValidationErrorIndex = 0;
 
-		$hasPk = !empty($relation->entityName::getPrimaryKey());
+		$hasPk = !empty($relation->propertyName::getPrimaryKey());
 		if($hasPk) {
 			$this->removeRelated($relation, $models, $modified[$relation->name][1]);
 		} else{
@@ -1417,7 +1417,7 @@ abstract class Property extends Model {
 	 */
 	private function removeAllRelated(Relation $relation): bool
 	{
-		$cls = $relation->entityName;
+		$cls = $relation->propertyName;
 		$where = $this->buildRelationWhere($relation);
 		$query = new Query();
 		$query->where($where);
@@ -1435,7 +1435,7 @@ abstract class Property extends Model {
    */
 	private function removeRelated(Relation $relation, array $models, ?array $oldModels): bool
 	{
-		$cls = $relation->entityName;
+		$cls = $relation->propertyName;
 		$where = $this->buildRelationWhere($relation);
 		$query = new Query();
 		$query->where($where);
@@ -2157,7 +2157,7 @@ abstract class Property extends Model {
 		if(isset($value)) {
 			foreach ($value as $patch) {
 				//check if we can find an existing model to patch.
-				$temp = new $relation->entityName($this);
+				$temp = new $relation->propertyName($this);
 				$temp->setValues($patch);
 				$id = $temp->id();
 
@@ -2234,7 +2234,7 @@ abstract class Property extends Model {
 	{
 		$values = explode("-", $id);
 
-		$cls = $relation->entityName;
+		$cls = $relation->propertyName;
 
 		$pk = $cls::getPrimaryKey();
 		
@@ -2260,7 +2260,7 @@ abstract class Property extends Model {
    */
 	private function internalNormalizeRelation(Relation $relation, $value): ?Property
 	{
-		$cls = $relation->entityName;
+		$cls = $relation->propertyName;
 		if ($value instanceof $cls) {
 			throw new InvalidArgumentException("Deprecated use of setValues with object");
 		}
@@ -2278,7 +2278,7 @@ abstract class Property extends Model {
 		} else if (is_null($value)) {
 			return null;
 		} else {
-			throw new InvalidArgumentException("Invalid value given to relation '" . $relation->name . "'. Should be an array or an object of type '" . $relation->entityName . "': " . var_export($value, true));
+			throw new InvalidArgumentException("Invalid value given to relation '" . $relation->name . "'. Should be an array or an object of type '" . $relation->propertyName . "': " . var_export($value, true));
 		}
 	}
 

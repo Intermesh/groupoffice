@@ -459,7 +459,7 @@ class Spreadsheet extends AbstractConverter {
 			return $headers;
 		}
 
-		$cls = $prop->entityName;
+		$cls = $prop->propertyName;
 		$properties = $cls::getMapping()->getProperties();
 
 		//Don't add multiple columns for has many if we need the headers for mapping
@@ -519,7 +519,7 @@ class Spreadsheet extends AbstractConverter {
 
     return go()->getDbConnection()
       ->selectSingleValue('coalesce(count(*), 0) AS count')
-      ->from($relation->entityName::getMapping()->getPrimaryTable()->getName(), 't')
+      ->from($relation->propertyName::getMapping()->getPrimaryTable()->getName(), 't')
       ->where($fk, 'IN', $entitiesSub)
       ->groupBy(['t.' . $fk])
       ->orderBy(['count' => 'DESC'])
