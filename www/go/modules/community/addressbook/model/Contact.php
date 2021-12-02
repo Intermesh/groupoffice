@@ -890,7 +890,7 @@ class Contact extends AclItemEntity {
 	 * @return self[]|Query
 	 * @throws Exception
 	 */
-	public function findOrganizations(array $properties = []): array
+	public function findOrganizations(array $properties = [])
 	{
 		return self::findByLink($this, $properties)
 			->andWhere('c.isOrganization = true');
