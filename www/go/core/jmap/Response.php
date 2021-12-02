@@ -2,6 +2,7 @@
 namespace go\core\jmap;
 
 use go\core\http\Response as HttpResponse;
+use go\core\util\ArrayObject;
 
 /**
  * JMAP Response object
@@ -32,9 +33,9 @@ class Response extends HttpResponse
 	/**
 	 * Output a response
 	 * 
-	 * @param array|null $responseData eg. ['resultName, ['data']];
+	 * @param array|null|ArrayObject $responseData eg. ['resultName, ['data']];
 	 */
-	public function addResponse(array $responseData = null) {
+	public function addResponse($responseData = null) {
 		$this->data[] = [$this->methodName,  $responseData, $this->clientCallId];
 		
 		if($this->methodName != "community/dev/Debugger/get") {
