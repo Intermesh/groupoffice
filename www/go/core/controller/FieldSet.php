@@ -164,7 +164,6 @@ class FieldSet extends EntityController {
 	 *
 	 * @param $params
 	 * @return array
-	 * @throws \go\core\exception\ConfigurationException
 	 */
 	public function importFromJson($params)
 	{

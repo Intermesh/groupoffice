@@ -149,7 +149,7 @@ class EmailTemplate extends AclOwnerEntity
 		}
 	}
 
-	public function toArray($properties = [])
+	public function toArray(array $properties = null): array
 	{
 		$array =  parent::toArray($properties);
 
@@ -167,7 +167,6 @@ class EmailTemplate extends AclOwnerEntity
 	 *
 	 * @param TemplateParser $templateParser
 	 * @return \go\core\mail\Message
-	 * @throws \go\core\exception\ConfigurationException
 	 */
 	public function toMessage(TemplateParser $templateParser) {
   	$message = go()->getMailer()->compose();

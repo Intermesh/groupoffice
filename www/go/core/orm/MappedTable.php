@@ -78,7 +78,7 @@ class MappedTable extends Table {
 		return $this->mappedColumns;
 	}
 	
-	public function getColumn($name) {
+	public function getColumn(string $name) : ?Column {
 		$cols = $this->getMappedColumns();
 		return $cols[$name] ?? null;
 	}

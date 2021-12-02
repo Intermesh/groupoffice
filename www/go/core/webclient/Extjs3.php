@@ -204,7 +204,6 @@ class Extjs3 {
 	 * Get available theme names as array
 	 *
 	 * @return string[]
-	 * @throws \go\core\exception\ConfigurationException
 	 */
 	public function getThemes() {
 		$themes = go()->getCache()->get("themes");

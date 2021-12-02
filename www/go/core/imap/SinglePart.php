@@ -261,8 +261,9 @@ class SinglePart extends Part{
 
 	
 	
-	public function toArray($attributes = ['filename', 'encoding','size','partNumber', 'id', 'type','subtype']) {
-		return parent::toArray($attributes);
+	public function toArray(array $properties = null): array
+	{
+		return parent::toArray($properties);
 	}
 	
 	

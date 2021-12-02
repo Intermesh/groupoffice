@@ -71,14 +71,8 @@ class Debugger {
 	private $entries = [];
 	
 	public function __construct() {
-		try {
-			if(!empty(go()->getConfig()['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')) {
-				$this->enable(go()->getConfig()['debug_log']);
-			}
-
-		} catch (\go\core\exception\ConfigurationException $e) {
-			//GO is not configured / installed yet.
-			$this->enabled = true;
+		if(!empty(go()->getConfig()['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')) {
+			$this->enable(go()->getConfig()['debug_log']);
 		}
 	}
 

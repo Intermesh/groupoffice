@@ -4,7 +4,6 @@ namespace go\core\db;
 
 use Exception;
 use go\core\App;
-use go\core\Debugger;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -50,7 +49,7 @@ class Connection {
 				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
 				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'",
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-				PDO::ATTR_PERSISTENT => false, //doesn't work with ATTR_STATEMENT_CLASS but should not have much benefits eanyway
+				PDO::ATTR_PERSISTENT => false, //doesn't work with ATTR_STATEMENT_CLASS but should not have many benefits anyway
 				PDO::ATTR_STATEMENT_CLASS => [Statement::class],
 				PDO::ATTR_EMULATE_PREPARES => false, //for native data types int, bool etc.
 				PDO::ATTR_STRINGIFY_FETCHES => false
@@ -75,7 +74,8 @@ class Connection {
 	 *
 	 * @return PDO Database connection object
 	 */
-	public function getPDO() {
+	public function getPDO(): PDO
+	{
 		if (!isset($this->pdo)) {
 			$this->setPDO();
 		}
@@ -89,7 +89,8 @@ class Connection {
 	 *
 	 * @return Database
 	 */
-	public function getDatabase() {
+	public function getDatabase(): Database
+	{
 		if(!isset($this->database)) {
 			$this->database = new Database($this);
 		}
@@ -145,7 +146,8 @@ class Connection {
 	 * @param string $sql
 	 * @return PDOStatement
 	 */
-	public function query($sql) {
+	public function query(string $sql): PDOStatement
+	{
 		if($this->debug) {
 			go()->getDebugger()->debug($sql, 1 ,false);
 		}
@@ -164,10 +166,11 @@ class Connection {
 	 * @param string $sql <p>The SQL statement to prepare and execute.</p> <p>Data inside the query should be properly escaped.</p>
 	 * @return int <p><b>PDO::exec()</b> returns the number of rows that were modified or deleted by the SQL statement you issued. If no rows were affected, <b>PDO::exec()</b> returns <i>0</i>.</p><p><b>Warning</b></p><p>This function may return Boolean <b><code>FALSE</code></b>, but may also return a non-Boolean value which evaluates to <b><code>FALSE</code></b>. Please read the section on Booleans for more information. Use the === operator for testing the return value of this function.</p><p>The following example incorrectly relies on the return value of <b>PDO::exec()</b>, wherein a statement that affected 0 rows results in a call to <code>die()</code>:</p> <code> &lt;&#63;php<br>$db-&gt;exec()&nbsp;or&nbsp;die(print_r($db-&gt;errorInfo(),&nbsp;true));&nbsp;//&nbsp;incorrect<br>&#63;&gt;  </code>
 	 * @link http://php.net/manual/en/pdo.exec.php
-	 * @see PDO::prepare(), PDO::query(), PDOStatement::execute()
-	 * @since PHP 5 >= 5.1.0, PHP 7, PECL pdo >= 0.1.0
+	 *
+	 * @throws PDOException
 	 */
-	public function exec($sql) {
+	public function exec(string $sql): int
+	{
 		if($this->debug) {
 			go()->getDebugger()->debug($sql, 1, false);
 		}
@@ -184,8 +187,9 @@ class Connection {
 	/**
 	 * UNLOCK TABLES explicitly releases any table locks held by the current session
 	 */
-	public function unlockTables() {
-		return $this->getPdo()->exec("UNLOCK TABLES")  !== false;
+	public function unlockTables(): bool
+	{
+		return $this->getPdo()->exec("UNLOCK TABLES") !== false;
 	}
 
 	private $transactionSavePointLevel = 0;
@@ -195,12 +199,9 @@ class Connection {
 	 * 
 	 * @return boolean
 	 */
-	public function beginTransaction() {
-//		\go\core\App::get()->debug("Begin DB transation");		
-//		\go\core\App::get()->getDebugger()->debugCalledFrom();
+	public function beginTransaction(): bool
+	{
 		if($this->transactionSavePointLevel == 0) {
-			//$ret = null;
-			//if (!$this->inTransaction())
 			if($this->debug) {
 				go()->debug("START DB TRANSACTION", 1);
 			}
@@ -208,11 +209,6 @@ class Connection {
 
 		}else
 		{
-			// $sql = "SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			// if($this->debug) {
-			// 	go()->debug($sql, 1);
-			// }
-			// $ret = $this->exec($sql) !== false;	
 			$ret = true;		
 		}		
 		
@@ -222,16 +218,16 @@ class Connection {
 
 	private $resumeLevels = 0;
 
-	public function isPaused() {
+	public function isPaused(): bool
+	{
 	  return $this->resumeLevels > 0;
   }
 
   /**
-   * Commit's the transaction but remembers the nesting of transaction nesting level. Must be resumed with resumeTransactions().
+   * Commits the transaction but remembers the nesting of transaction nesting level. Must be resumed with resumeTransactions().
    * This is used by custom fields that do database structure changes. MySQL commits transactions automatically when the database
    * structure changes.
    *
-   * @throws Exception
    */
 	public function pauseTransactions() {
 	  if($this->isPaused()) {
@@ -260,7 +256,8 @@ class Connection {
    * @return boolean
    * @throws Exception
    */
-	public function rollBack() {
+	public function rollBack(): bool
+	{
 		if($this->transactionSavePointLevel == 0) {
 			throw new Exception("Not in transaction!");
 		}
@@ -283,18 +280,20 @@ class Connection {
    * Commit the database transaction
    *
    * @return boolean
-   * @throws Exception
+   * @throws PDOException
    */
-	public function commit() {
+	public function commit(): bool
+	{
 
 //		\go\core\App::get()->debug("Commit DB transation");
 //		\go\core\App::get()->getDebugger()->debugCalledFrom();
 		
 		if($this->transactionSavePointLevel == 0) {
-			throw new Exception("Not in transaction!");
+			throw new PDOException("Not in transaction!");
 		}
-		
+
 		$this->transactionSavePointLevel--;
+
 		if($this->transactionSavePointLevel == 0) {
 			if($this->debug) {
 				go()->debug("COMMIT DB TRANSACTION", 1);				
@@ -302,6 +301,7 @@ class Connection {
 			return $this->getPdo()->commit();
 		}else
 		{
+
 			// $sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
 			// if($this->debug) {
 			// 	go()->debug($sql, 1);				
@@ -316,22 +316,23 @@ class Connection {
 	 * 
 	 * @return boolean
 	 */
-	public function inTransaction() {
+	public function inTransaction(): bool
+	{
 		return $this->getPdo()->inTransaction();
 	}
 
 	/**
 	 * Lock the table of this model and also for the 't' alias.
-	 * 
+	 *
 	 * The locks array should be indexed by model name and the value is an array with two optional values.
-	 * THe first is a boolean that enables a write lock and the second is a table alias.
-	 * 
+	 * THe first is a boolean that enables a write-lock and the second is a table alias.
+	 *
 	 * @param array $locks eg. [go\cores\Users\Model\User::tableName() => [true, 't']]
 	 *
-	 * @return boolean
+	 * @throws PDOException
 	 */
-	public function lock($locks) {
-
+	public function lock(array $locks)
+	{
 		$sql = "LOCK TABLES ";
 
 		foreach ($locks as $tableName => $lockInfo) {
@@ -347,26 +348,25 @@ class Connection {
 
 		$sql = rtrim($sql, ', ');
 
-//		App::get()->debug($sql);
-		return App::get()->getDbConnection()->exec($sql) !== false;
+		App::get()->getDbConnection()->exec($sql);
 	}
 
-  /**
-   * Create a delete statement
-   *
-   * @param string $tableName
-   * @param Query $query
-   * @return Statement
-   * @throws Exception
-   * @example
-   * ```
-   * $success = App::get()
-   *        ->getDbConnection()
-   *        ->delete("test_a", ['id' => 1])
-   *        ->execute();
-   * ```
-   */
-	public function delete($tableName, $query = null) {
+	/**
+	 * Create a delete statement
+	 *
+	 * @param string $tableName
+	 * @param Query|array|string|null $query
+	 * @return Statement
+	 * @example
+	 * ```
+	 * $success = App::get()
+	 *        ->getDbConnection()
+	 *        ->delete("test_a", ['id' => 1])
+	 *        ->execute();
+	 * ```
+	 */
+	public function delete(string $tableName, $query = null): Statement
+	{
 		$query = Query::normalize($query);
 
 		$queryBuilder = new QueryBuilder($this);
@@ -413,7 +413,8 @@ class Connection {
    * ````
    *
    */
-	public function insert($tableName, $data, $columns = []) {
+	public function insert(string $tableName, $data, array $columns = []): Statement
+	{
 
 		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildInsert($tableName, $data, $columns);
@@ -434,7 +435,8 @@ class Connection {
    * @throws Exception
    * @see insert()
    */
-	public function insertIgnore($tableName, $data, $columns = []) {
+	public function insertIgnore(string $tableName, $data, array $columns = []): Statement
+	{
 
 		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "INSERT IGNORE");
@@ -455,7 +457,8 @@ class Connection {
    * @throws Exception
    * @see insert()
    */
-	public function replace($tableName, $data, $columns = []) {
+	public function replace(string $tableName, $data, array $columns = []): Statement
+	{
 
 		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "REPLACE");
@@ -497,7 +500,8 @@ class Connection {
    * ````
    *
    */
-	public function update($tableName, $data, $query = null) {
+	public function update(string $tableName, $data, $query = null): Statement
+	{
 		$query = Query::normalize($query);
 
 		$queryBuilder = new QueryBuilder($this);
@@ -516,7 +520,8 @@ class Connection {
    * @throws Exception
    * @see update()
    */
-	public function updateIgnore($tableName, $data, $query = null) {
+	public function updateIgnore($tableName, $data, $query = null): Statement
+	{
 		$query = Query::normalize($query);
 
 		$queryBuilder = new QueryBuilder($this);
@@ -543,7 +548,8 @@ class Connection {
    *
    * @see Query
    */
-	public function select($select = "*") {
+	public function select(string $select = "*"): Query
+	{
 		$query = new Query();
 		return $query->setDbConnection($this)->select($select);
 	}
@@ -557,7 +563,8 @@ class Connection {
 	 * @param string $select
 	 * @return Query
 	 */
-	public function selectSingleValue($select) {
+	public function selectSingleValue(string $select): Query
+	{
 		$query = new Query();
 		return $query->setDbConnection($this)->selectSingleValue($select);
 	}
@@ -569,11 +576,16 @@ class Connection {
    *
    * @param array $build
    * @return Statement
+   * @throws PDOException
    */
-	public function createStatement($build) {
+	public function createStatement(array $build): Statement
+	{
 		try {
 			$build['start'] = go()->getDebugger()->getMicroTime();			
 			$stmt = $this->getPDO()->prepare($build['sql']);
+			/**
+			 * @var Statement $stmt;
+			 */
 			$stmt->setBuild($build);						
 
 			foreach ($build['params'] as $p) {
@@ -582,6 +594,9 @@ class Connection {
 				// }
 				$stmt->bindValue($p['paramTag'], $p['value'], $p['pdoType']);
 			}
+			/**
+			 * @var Statement $stmt;
+			 */
 			return $stmt;
 		}catch(PDOException $e) {
 			go()->error("Failed SQL: ". QueryBuilder::debugBuild($build));

@@ -3,9 +3,7 @@
 namespace go\core\fs;
 
 use Exception;
-use go\core\App;
 use go\core\db\Table;
-use go\core\exception\ConfigurationException;
 use go\core\orm\Query;
 use go\core\orm;
 use go\core\util\DateTime;
@@ -105,7 +103,6 @@ class Blob extends orm\Entity {
 	 * ```
 	 * @link https://groupoffice-developer.readthedocs.io/en/latest/blob.html
 	 * @return array [['table'=>'foo', 'column' => 'blobId']]
-	 * @throws ConfigurationException
 	 */
 	public static function getReferences() {
 		
@@ -345,7 +342,6 @@ class Blob extends orm\Entity {
 	 * Return file system path of blob data
 	 *
 	 * @return string
-	 * @throws ConfigurationException
 	 */
 	public function path() {
 		return self::buildPath($this->id);
@@ -360,9 +356,9 @@ class Blob extends orm\Entity {
 	 * Get blob data as file system file object
 	 *
 	 * @return File
-	 * @throws ConfigurationException
 	 */
-	public function getFile() {
+	public function getFile(): File
+	{
 		return new File($this->path());
 	}
 	

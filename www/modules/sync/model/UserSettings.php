@@ -99,7 +99,7 @@ class UserSettings extends Property
 		}
 	}
 
-	public function toArray($properties = [])
+	public function toArray(array $properties = null): array
 	{
 		if($this->doSetup)
 			$this->setup();

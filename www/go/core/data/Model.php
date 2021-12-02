@@ -44,15 +44,14 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * 1. Readable in the API if they have access public or getter = true
 	 * 2. Writable in the API if they have access public or setter = true
 	 *
-	 * @example GEt writable property names
+	 * @return array
+	 *@example GEt writable property names
 	 *
 	 * $writablePropNames = array_keys(array_filter($this->getApiProperties(), function($r) {return ($r['setter'] || $r['access'] = self::PROP_PUBLIC);}));
 	 *
-	 * @return array
-	 * @throws \ReflectionException
-	 * @throws \go\core\exception\ConfigurationException
-	 */
-	public static function getApiProperties() {
+	 	 */
+	public static function getApiProperties(): array
+	{
 		$cacheKey = 'api-props-' . static::class;
 		
 		$ret = App::get()->getCache()->get($cacheKey);
@@ -160,11 +159,12 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
   /**
    * Convert model into array for API output.
    *
-   * @param string[] $properties
+   * @param string[]|null $properties
    * @return array
    * @throws \ReflectionException
    */
-	public function toArray($properties = []) {
+	public function toArray(array $properties = null): array
+	{
 
 		$arr = [];
 		
@@ -210,7 +210,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 				$arr[$key] = static::convertValueToArray($v);
 			}
 			return $arr;
-		} else { //if (is_null($value) || is_scalar($value) || $value instanceof \StdClass) {
+		} else if($value instanceof DateTime) { //if (is_null($value) || is_scalar($value) || $value instanceof \StdClass) {
+			return (string) $value;
+		} else {
 			return $value;
 		} 
 		// else {

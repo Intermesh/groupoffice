@@ -7,7 +7,6 @@ use go\core\db\Connection;
 use go\core\db\Criteria;
 use go\core\db\Utils;
 use go\core\ErrorHandler;
-use go\core\exception\ConfigurationException;
 use go\core\fs\File;
 use go\core\fs\Folder;
 use go\core\http\Client;
@@ -202,9 +201,6 @@ class Instance extends Entity {
 		return go()->getDataFolder()->getFolder('multi_instance/_trash_')->create();
 	}
 
-	/**
-	 * @throws ConfigurationException
-	 */
 	private function getTempFolder(): Folder
 	{
 		return go()->getTmpFolder()->getFolder('multi_instance/' . $this->hostname);
@@ -458,32 +454,23 @@ class Instance extends Entity {
 		return go()->getEnvironment()->getInstallFolder()->getFolder("go/modules/" . $this->getStudioPackage());
 	}
 
-	/**
-	 * @throws ConfigurationException
-	 */
 	private function dropDatabase($dbName): void
 	{
 		go()->getDbConnection()->query("DROP DATABASE IF EXISTS `".$dbName."`");
 	}
 
-	/**
-	 * @throws ConfigurationException
-	 */
+
 	private function createDatabase($dbName): void
 	{
 		go()->getDbConnection()->query("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
 	}
 
-	/**
-	 * @throws ConfigurationException
-	 */
+
 	private function dropDatabaseUser($dbUser) {
 		go()->getDbConnection()->query("DROP USER '" . $dbUser . "'@'%'");
 	}
 
-	/**
-	 * @throws ConfigurationException
-	 */
+
 	private function createDatabaseUser($dbName, $dbUsername, $dbPassword)
 	{
 		$sql = "CREATE USER '" . $dbUsername . "' IDENTIFIED BY '" . $dbPassword . "'";

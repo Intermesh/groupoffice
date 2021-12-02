@@ -5,8 +5,9 @@ use DateTime as PHPDateTime;
 use DateTimeZone;
 use go\core\data\ArrayableInterface;
 use go\core\model\User;
+use JsonSerializable;
 
-class DateTime extends PHPDateTime implements ArrayableInterface, \JsonSerializable {
+class DateTime extends PHPDateTime implements JsonSerializable {
 
 	public $hasTime = true;
 	
@@ -17,9 +18,10 @@ class DateTime extends PHPDateTime implements ArrayableInterface, \JsonSerializa
 
 	const FORMAT_API_DATE_ONLY = "Y-m-d";
 
-	public function toArray($properties = null) {
-		return $this->format($this->hasTime ? self::FORMAT_API : self::FORMAT_API_DATE_ONLY);
-	}
+//	public function toArray(array $properties = null): array
+//	{
+//		return $this->format($this->hasTime ? self::FORMAT_API : self::FORMAT_API_DATE_ONLY);
+//	}
 
 	public function jsonSerialize() {
 		return $this->format($this->hasTime ? self::FORMAT_API : self::FORMAT_API_DATE_ONLY);

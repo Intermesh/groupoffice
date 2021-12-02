@@ -691,7 +691,8 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		return $a->save();
 	}
 
-	public function toArray($properties = null) {
+	public function toArray(array $properties = null): array
+	{
 		return [
 				"name" => $this->getName(),
 				"isAclOwner" => $this->isAclOwner(),

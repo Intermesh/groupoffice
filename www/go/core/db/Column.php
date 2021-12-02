@@ -6,7 +6,6 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
-use go\core\customfield\Date;
 use go\core\util\DateTime as GoDateTime;
 
 /**
@@ -154,7 +153,8 @@ class Column {
 	 * 
 	 * @return string
 	 */
-	public function getCreateSQL() {
+	public function getCreateSQL(): string
+	{
 		$sql = $this->dataType;		
 		
 		if(!$this->nullAllowed) {
@@ -304,7 +304,8 @@ class Column {
 	 * 
 	 * @return Table
 	 */
-	public function getTable() {
+	public function getTable(): Table
+	{
 		return $this->table;
 	}
 

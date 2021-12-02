@@ -3,9 +3,7 @@
 namespace go\core\db;
 
 use Exception;
-use go\core\db\Column;
-use go\core\db\Criteria;
-use go\core\util\ArrayUtil;
+use InvalidArgumentException;
 
 /**
  * QueryBuilder
@@ -58,7 +56,7 @@ class QueryBuilder {
 
 	/**
 	 * Prefix of the bind parameter tag
-	 * @var type
+	 * @var string
 	 */
 	private static $paramPrefix = ':go';
 
@@ -69,12 +67,6 @@ class QueryBuilder {
 	 * @var Table[]
 	 */
 	protected $aliasMap = [];
-
-	/**
-	 *
-	 * @var Table 
-	 */
-	private $table;
 
 
 	/**
@@ -91,45 +83,45 @@ class QueryBuilder {
    * Constructor
    *
    * @param string $tableName The table to operate on
-   * @throws Exception
    */
-	public function setTableName($tableName) {
+	public function setTableName(string $tableName) {
 		
-		if(!isset($tableName)) {
-			throw new \Exception("No from() table set for the select query");
-			
-		}
+//		if(!isset($tableName)) {
+//			throw new Exception("No from() table set for the select query");
+//
+//		}
 		$this->tableName = $tableName;
-		$this->table = Table::getInstance($tableName, $this->conn);
 	}
 
-	/**
-	 * Used when building sub queries for when aliases of the main query are used
-	 * in the subquery.
-	 *
-	 * @param array $aliasMap
-	 */
-	public function mergeAliasMap($aliasMap) {
-		$this->aliasMap = array_merge($this->aliasMap, $aliasMap);
-	}
+//	/**
+//	 * Used when building sub queries for when aliases of the main query are used
+//	 * in the subquery.
+//	 *
+//	 * @param array $aliasMap
+//	 */
+//	public function mergeAliasMap(array $aliasMap) {
+//		$this->aliasMap = array_merge($this->aliasMap, $aliasMap);
+//	}
 
 	/**
 	 * Get the query parameters
 	 *
 	 * @return Query
 	 */
-	public function getQuery() {
+	public function getQuery(): Query
+	{
 		return $this->query;
 	}
 
-	/**
-	 * Get the name of the record this query builder is for.
-	 *
-	 * @return string
-	 */
-	public function getTableName() {
-		return $this->tableName;
-	}
+//	/**
+//	 * Get the name of the record this query builder is for.
+//	 *
+//	 * @return string
+//	 */
+//	public function getTableName(): string
+//	{
+//		return $this->tableName;
+//	}
 
   /**
    * @param $tableName
@@ -139,7 +131,8 @@ class QueryBuilder {
    * @return array
    * @throws Exception
    */
-	public function buildInsert($tableName, $data, $columns = [], $command = "INSERT") {
+	public function buildInsert($tableName, $data, array $columns = [], string $command = "INSERT"): array
+	{
 
 		$this->reset();
 		$this->setTableName($tableName);
@@ -147,9 +140,9 @@ class QueryBuilder {
 
 		$sql = $command . " ";
 
-		$sql .= "INTO `{$this->tableName}` ";
+		$sql .= "INTO `$this->tableName` ";
 
-		if ($data instanceof \go\core\db\Query) {			
+		if ($data instanceof Query) {
 			if(!empty($columns)) {
 				$sql .= " (`" . implode("`, `", $columns ) . "`)\n";
 			}
@@ -195,7 +188,8 @@ class QueryBuilder {
 		return ['sql' => $sql, 'params' => $this->buildBindParameters];
 	}
 
-	public function buildUpdate($tableName, $data, Query $query, $command = "UPDATE") {
+	public function buildUpdate($tableName, $data, Query $query, $command = "UPDATE"): array
+	{
 
 		$this->reset();
 
@@ -228,11 +222,11 @@ class QueryBuilder {
 				}
 			}
 			$set = implode(",\n\t", $updates);
-		} else if ($data instanceof Expression) {
+		} else {
 			$set = (string) $data;
 		}
 		
-		$sql = $command . " `{$this->tableName}` `" . $this->tableAlias . "`";
+		$sql = $command . " `$this->tableName` `" . $this->tableAlias . "`";
 		
 		foreach ($this->query->getJoins() as $join) {
 			$sql .= "\n" . $this->join($join, "");
@@ -249,7 +243,8 @@ class QueryBuilder {
 		return ['sql' => $sql, 'params' => $this->buildBindParameters];
 	}
 
-	public function buildDelete($tableName, Query $query) {
+	public function buildDelete($tableName, Query $query): array
+	{
 
 		$this->setTableName($tableName);
 		$this->reset();
@@ -282,7 +277,8 @@ class QueryBuilder {
 	/**
 	 * Build the select SQL and params
 	 */
-	public function buildSelect(Query $query = null, $prefix = "") {
+	public function buildSelect(Query $query = null, $prefix = ""): array
+	{
 
 		$unions = $query->getUnions();
 		
@@ -321,7 +317,7 @@ class QueryBuilder {
 		
 	}
 	
-	protected function internalBuildSelect(Query $query, $prefix = '')
+	protected function internalBuildSelect(Query $query, $prefix = ''): array
 	{
 		$this->reset();
 
@@ -388,14 +384,14 @@ class QueryBuilder {
 
 		return ['sql' => $sql, 'params' => $this->buildBindParameters];
 	}
-	
+
 	/**
 	 * Will replace all :paramName tags with the values. Used for debugging the SQL string.
 	 *
 	 * @param array $build
-	 * @param string
+	 * @return array|mixed|string|string[]
 	 */
-	public static function debugBuild($build) {
+	public static function debugBuild(array $build) {
 		$sql = $build['sql'];
 		$binds = [];
 		if(isset($build['params'])) {
@@ -419,7 +415,8 @@ class QueryBuilder {
 		return $sql;
 	}
 
-	protected function buildSelectFields() {
+	protected function buildSelectFields(): string
+	{
 		$select = "SELECT ";
 
 		if ($this->query->getCalcFoundRows()) {
@@ -449,25 +446,24 @@ class QueryBuilder {
 	 * @param string $tableAlias
 	 * @param string $column
 	 * @return Column
-	 * @throws Exception
+	 * @throws InvalidArgumentException
 	 */
-	private function findColumn($tableAlias, $column) {
+	private function findColumn(string $tableAlias, string $column): Column
+	{
 
 		if (!isset($this->aliasMap[$tableAlias])) {
-
-//			var_dump($this);
-			throw new Exception("Alias '" . $tableAlias . "'  not found in the aliasMap for " . $column);
+			throw new InvalidArgumentException("Alias '" . $tableAlias . "'  not found in the aliasMap for " . $column);
 		}
 
 		$col = $this->aliasMap[$tableAlias]->getColumn($column);
-		$col = $this->aliasMap[$tableAlias]->getColumn($column);
 		if ($col === null) {
-			throw new Exception("Column '" . $column . "' not found in table " . $this->aliasMap[$tableAlias]->getName());
+			throw new InvalidArgumentException("Column '" . $column . "' not found in table " . $this->aliasMap[$tableAlias]->getName());
 		}
 		return $col;
 	}
 
-	private function buildGroupBy() {
+	private function buildGroupBy(): string
+	{
 
 		$qroupBy = $this->query->getGroupBy();
 
@@ -494,12 +490,13 @@ class QueryBuilder {
 
 	/**
 	 * Build the where part of the SQL string
-	 * 
-	 * @param \go\core\db\Criteria $query
+	 *
+	 * @param array $conditions
 	 * @param string $prefix Simple string prefix not really functional but only used to add some tab spaces to the SQL string for pretty formatting.
-	 * @param string
+	 * @return string
 	 */
-	protected function buildWhere(array $conditions, $prefix = "") {
+	protected function buildWhere(array $conditions, string $prefix = ""): string
+	{
 		$this->firstWhereCondition = true;	
 
 		$where = "";
@@ -517,13 +514,12 @@ class QueryBuilder {
 	 * {@see Criteria::where()}
 	 *
 	 *
-	 * @param string|array|Criteria $condition
+	 * @param array $condition
 	 * @param string $prefix
 	 * @return string
-	 * @throws Exception
 	 */
-	private function buildCondition($condition, $prefix = "") {
-
+	private function buildCondition(array $condition, string $prefix = ""): string
+	{
 		switch ($condition[0]) {
 			case 'column':
 				return $this->buildColumn($condition, $prefix);
@@ -535,14 +531,16 @@ class QueryBuilder {
 
 	/**
 	 * Tokens is always:
-	 * 
-	 * return ["tokens", AND/OR, string/expression/query/criteria];		
-	 * 
-	 * @param type $tokens
-	 * @param type $prefix
+	 *
+	 * return ["tokens", AND/OR, string/expression/query/criteria];
+	 *
+	 * @param array $tokens
+	 * @param string $prefix
 	 * @return string
+	 * @throws InvalidArgumentException
 	 */
-	private function buildTokens($tokens, $prefix) {
+	private function buildTokens(array $tokens, string $prefix): string
+	{
 		$str = "";
 		
 		if(stripos($tokens[0], "NOT_OR_NULL") !== false) {
@@ -563,7 +561,8 @@ class QueryBuilder {
 		return $str;
 	}
 
-	private function buildToken($token, $prefix) {
+	private function buildToken($token, $prefix): string
+	{
 		if (is_string($token)) {
 			return $token;
 		} else {
@@ -582,11 +581,12 @@ class QueryBuilder {
 				return "(" . $where  . "\n" . $prefix . ")";
 			}
 			
-			throw new \Exception("Invalid token?");
+			throw new InvalidArgumentException("Invalid token?");
 		}
 	}
 	
-	private function buildColumnArrayValue($logicalOperator, $columnName, $comparisonOperator, $value) {
+	private function buildColumnArrayValue($logicalOperator, $columnName, $comparisonOperator, $value): string
+	{
 		//If the value is an array and it's not an IN query we do:		
 		// (foo like array1 OR foo like array2)
 
@@ -606,10 +606,11 @@ class QueryBuilder {
 			$str .= $this->buildColumn([null, $i == 0 ? "" : "OR", $columnName, $comparisonOperator, $value[$i]], "");
 		}
 
-		return $str .= ")";
+		return $str . ")";
 	}
 
-	private function buildColumn($condition, $prefix) {
+	private function buildColumn($condition, $prefix): string
+	{
 
 		list(, $logicalOperator, $columnName, $comparisonOperator, $value) = $condition;
 		
@@ -639,7 +640,7 @@ class QueryBuilder {
 			foreach($this->aliasMap as $table) {
 				$tables[] = $table->getName();
 			}
-			throw new \Exception("Invalid column name '" . $columnName . "'. Not a column of any table: ".implode(', ', $tables));
+			throw new InvalidArgumentException("Invalid column name '" . $columnName . "'. Not a column of any table: ".implode(', ', $tables));
 		}
 
 		$tokens[] = $this->quoteTableName($columnParts[0]) . '.' . $this->quoteColumnName($columnParts[1]); //column name
@@ -650,11 +651,11 @@ class QueryBuilder {
 			} elseif ($comparisonOperator == '!=' || $comparisonOperator == 'IS NOT') {
 				$tokens[] = "IS NOT NULL";
 			} else {
-				throw new Exception('Null value not possible with comparator: ' . $comparisonOperator);
+				throw new InvalidArgumentException('Null value not possible with comparator: ' . $comparisonOperator);
 			}
 		} else if (is_array($value)) {
 			$this->buildColumnIn($value, $columnParts, $comparisonOperator, $tokens);
-		} else if ($value instanceof \go\core\db\Query) {
+		} else if ($value instanceof Query) {
 			$tokens[] = $comparisonOperator;
 			$tokens[] = $value;
 		} else {
@@ -692,7 +693,8 @@ class QueryBuilder {
 		}
 	}
 
-	private function buildSubQuery(\go\core\db\Query $query, $prefix) {
+	private function buildSubQuery(Query $query, $prefix): string
+	{
 
 		//subquery
 		if ($query->getTableAlias() == 't' && $this->getQuery()->getTableAlias() == 't') {
@@ -715,7 +717,8 @@ class QueryBuilder {
 		return $str;
 	}
 
-	private function splitTableAndColumn($tableAndCol) {
+	private function splitTableAndColumn($tableAndCol): array
+	{
 		$dot = strpos($tableAndCol, '.');
 		
 		if ($dot !== false) {
@@ -745,10 +748,10 @@ class QueryBuilder {
 	 * Put's quotes around the table name and checks for injections
 	 *
 	 * @param string $tableName
-	 * @param string
-	 * @throws Exception
+	 * @return string
 	 */
-	protected function quoteTableName($tableName) {
+	protected function quoteTableName(string $tableName): string
+	{
 		return Utils::quoteTableName($tableName);
 	}
 
@@ -761,7 +764,8 @@ class QueryBuilder {
 	 * @param string $columnName column name
 	 * @param string the properly quoted column name
 	 */
-	protected function quoteColumnName($columnName) {
+	protected function quoteColumnName(string $columnName): string
+	{
 		return $this->quoteTableName($columnName);
 	}
 
@@ -769,9 +773,10 @@ class QueryBuilder {
 	 * Splits table and column on the . separator and quotes them both.
 	 *
 	 * @param string $columnName
-	 * @param string
+	 * @return string
 	 */
-	protected function quoteTableAndColumnName($columnName) {
+	protected function quoteTableAndColumnName(string $columnName): string
+	{
 
 		$parts = $this->splitTableAndColumn($columnName);
 
@@ -782,10 +787,11 @@ class QueryBuilder {
 		}
 	}
 
-	private function buildInValues($columnParts, $values) {
+	private function buildInValues($columnParts, $values): string
+	{
 
 		if (empty($values)) {
-			throw new \Exception("IN condition can not be empty!");
+			throw new InvalidArgumentException("IN condition can not be empty!");
 		}
 
 		$str = "(";
@@ -797,12 +803,11 @@ class QueryBuilder {
 			$str .= $paramTag . ', ';
 		}
 
-		$str = rtrim($str, ', ') . ")";
-
-		return $str;
+		return rtrim($str, ', ') . ")";
 	}
 
-	private function buildOrderBy($forUnion = false) {
+	private function buildOrderBy($forUnion = false): string
+	{
 		$oBy = $forUnion ? $this->query->getUnionOrderBy() : $this->query->getOrderBy();
 		if (empty($oBy)) {
 			return '';
@@ -823,7 +828,8 @@ class QueryBuilder {
 		return trim($orderBy, ' ,');
 	}
 
-	private function buildHaving() {
+	private function buildHaving(): string
+	{
 
 		$h = $this->query->getHaving();
 		if (empty($h)) {
@@ -849,15 +855,17 @@ class QueryBuilder {
 	 *
 	 * @param string The next available parameter prefix.
 	 */
-	private function getParamTag() {
+	private function getParamTag(): string
+	{
 		self::$paramCount++;
 		return self::$paramPrefix . self::$paramCount;
 	}
 
-	private function join($config, $prefix) {
+	private function join($config, $prefix): string
+	{
 		$join = "";
 
-		if ($config['src'] instanceof \go\core\db\Query) {
+		if ($config['src'] instanceof Query) {
 			$builder = new QueryBuilder($this->conn);
 			$builder->aliasMap = $this->aliasMap;
 

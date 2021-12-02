@@ -5,12 +5,10 @@ namespace go\core\db;
 use Exception;
 use go\core\App;
 use go\core\data\ArrayableInterface;
-use go\core\db\Criteria;
 use IteratorAggregate;
 use JsonSerializable;
 use PDO;
-use ReflectionClass;
-use Traversable;
+use PDOException;
 
 /**
  * The Query class to select database records
@@ -63,11 +61,13 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this->indexHintList;
 	}
 
-	public function getTableAlias() {
-		return isset($this->tableAlias) ? $this->tableAlias : 't';
+	public function getTableAlias(): string
+	{
+		return $this->tableAlias ?? 't';
 	}
 
-	public function getHaving() {
+	public function getHaving(): array
+	{
 		return $this->having;
 	}
 
@@ -75,18 +75,21 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this->distinct;
 	}
 
-	public function getSelect() {
+	public function getSelect(): array
+	{
 		if (empty($this->select)) {
 			$this->select = ['*'];
 		}
 		return $this->select;
 	}
 
-	public function getOrderBy() {
+	public function getOrderBy(): array
+	{
 		return $this->orderBy;
 	}
 
-	public function getGroupBy() {
+	public function getGroupBy(): array
+	{
 		return $this->groupBy;
 	}
 
@@ -94,19 +97,23 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this->limit;
 	}
 
-	public function getOffset() {
+	public function getOffset(): int
+	{
 		return $this->offset;
 	}
 
-	public function getJoins() {
+	public function getJoins(): array
+	{
 		return $this->joins;
 	}
 	
-	public function getUnions() {
+	public function getUnions(): array
+	{
 		return $this->unions;
 	}
 	
-	public function getUnionOffset() {
+	public function getUnionOffset(): int
+	{
 		return $this->unionOffset;
 	}
 	
@@ -114,11 +121,13 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this->unionLimit;
 	}
 	
-	public function getUnionOrderBy() {
+	public function getUnionOrderBy(): array
+	{
 		return $this->unionOrderBy;
 	}
 
-	public function getCalcFoundRows() {
+	public function getCalcFoundRows(): bool
+	{
 		return $this->calcFoundRows;
 	}
 
@@ -127,15 +136,18 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 *
 	 * @return int
 	 */
-	public function foundRows() {
+	public function foundRows(): int
+	{
 		return (int) go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
 	}
 
-	public function getNoCache() {
+	public function getNoCache(): bool
+	{
 		return $this->noCache;
 	}
 
-	public function getFetchMode() {
+	public function getFetchMode(): array
+	{
 		if (!isset($this->fetchMode)) {
 			return [PDO::FETCH_ASSOC];
 		}
@@ -150,10 +162,11 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * Set the table name / subquery source and alias
 	 * 
 	 * @param string|Query $source Table name or Subquery
-	 * @param string $tableAlias Will default to 't' if not set
+	 * @param string|null $tableAlias Will default to 't' if not set
 	 * @return $this
 	 */
-	public function from($source, $tableAlias = null) {
+	public function from($source, string $tableAlias = null): Query
+	{
 		$this->tableName = $source;
 		return $this->tableAlias($tableAlias);
 	}
@@ -172,7 +185,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param mixed $arg2
 	 * @return static
 	 */
-	public function fetchMode($mode, $arg1 = null, $arg2 = null) {
+	public function fetchMode(int $mode, $arg1 = null, $arg2 = null): Query
+	{
 		$this->fetchMode = [$mode];
 
 		if (isset($arg1)) {
@@ -195,8 +209,9 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param string $select
 	 * @return static
 	 */
-	public function selectSingleValue($select) {
-		return $this->fetchMode(PDO::FETCH_COLUMN, 0)->select($select, false);
+	public function selectSingleValue(string $select): Query
+	{
+		return $this->fetchMode(PDO::FETCH_COLUMN, 0)->select($select);
 	}
 
 	/**
@@ -205,7 +220,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param boolean $useDistinct
 	 * @return static
 	 */
-	public function distinct($useDistinct = true) {
+	public function distinct(bool $useDistinct = true): Query
+	{
 		$this->distinct = $useDistinct;
 		return $this;
 	}
@@ -216,7 +232,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param Query $query
 	 * @return static
 	 */
-	public function mergeWith(Query $query) {
+	public function mergeWith(Query $query): Query
+	{
 
 		//Used to generate propnames
 		// $reflection = new ReflectionClass(Query::class);
@@ -242,8 +259,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 			'joins', 
 			'forUpdate', 
 			'tableName', 
-			'unions',  
-			'debug' );
+			'unions'
+			 );
 
 		foreach ($propNames as $key) {
 			$value = $query->$key;
@@ -270,7 +287,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param string|array $select Pass null to reset.
 	 * @return static
 	 */
-	public function select($select = '*', $append = false) {
+	public function select($select = '*', $append = false): Query
+	{
 
 		if(!isset($select)) {
 			$this->select = [];
@@ -293,7 +311,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * 
 	 * @return static
 	 */
-	public function calcFoundRows($v = true) {
+	public function calcFoundRows(bool $v = true): Query
+	{
 		$this->calcFoundRows = $v;
 
 		return $this;
@@ -306,7 +325,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 *
 	 * @return static
 	 */
-	public function noCache($v = true) {
+	public function noCache(bool $v = true): Query
+	{
 		$this->noCache = $v;
 
 		return $this;
@@ -320,10 +340,11 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * Calling limit(), offset() and orderBy() after the union will apply to the 
 	 * global union scope and not the individual query.
 	 * 
-	 * @param \go\core\db\Query $query
+	 * @param Query $query
 	 * @return $this
 	 */
-	public function union(Query $query) {
+	public function union(Query $query): Query
+	{
 		$this->unions[] = $query;
 		
 		return $this;
@@ -332,10 +353,11 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	/**
 	 * Set the main table alias.
 	 * 
-	 * @param string $alias
+	 * @param string|null $alias
 	 * @return $this
 	 */
-	public function tableAlias($alias) {
+	public function tableAlias(?string $alias): Query
+	{
 		$this->tableAlias = $alias;
 		return $this;
 	}
@@ -347,7 +369,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * 
 	 * @return static
 	 */
-	public function orderBy(array $by, $append = false) {
+	public function orderBy(array $by, $append = false): Query
+	{
 		if(empty($this->unions)) {
 			$this->orderBy = $append ? array_merge($this->orderBy, $by) : $by;
 		} else
@@ -363,7 +386,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param array $columns eg. array('t.id');
 	 * @return static
 	 */
-	public function groupBy(array $columns, $append = false) {
+	public function groupBy(array $columns, $append = false): Query
+	{
 		$this->groupBy = $append ? array_merge($this->groupBy, $columns) : $columns;
 		return $this;
 	}
@@ -374,7 +398,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function having($condition, $operator = null, $value = null) {
+	public function having($condition, $operator = null, $value = null): Query
+	{
 		return $this->andHaving($condition, $operator, $value);
 	}
 
@@ -386,7 +411,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function andHaving($condition, $operator = null, $value = null) {
+	public function andHaving($condition, $operator = null, $value = null): Query
+	{
 		$this->having[] = $this->internalWhere($condition, $operator, $value, 'AND');
 		return $this;
 	}
@@ -399,7 +425,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function orHaving($condition, $operator = null, $value = null) {
+	public function orHaving($condition, $operator = null, $value = null): Query
+	{
 		$this->having[] = $this->internalWhere($condition, $operator, $value, 'OR');
 		return $this;
 	}
@@ -431,14 +458,15 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    *        );
    * ```
    *
-   * @param string|\go\core\db\Query $tableName The record class name or sub query to join
+   * @param string|Query $tableName The record class name or sub query to join
    * @param mixed $joinTableAlias Leave empty for none.
    * @param Criteria|array|string $on The criteria used in the ON clause {@see Criteria::normalize()}
    * @param string $type The join type. INNER, LEFT or RIGHT
    * @return static
    * @throws Exception
    */
-	public function join($tableName, $joinTableAlias, $on, $type = 'INNER', $indexHint = null) {
+	public function join($tableName, $joinTableAlias, $on, string $type = 'INNER', $indexHint = null): Query
+	{
 
 		$this->joins[] = [
 				'src' => $tableName,
@@ -458,7 +486,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param string $hintList eg. "USE INDEX (col1_index,col2_index)"
 	 * @return $this
 	 */
-	public function useIndex($hintList) {
+	public function useIndex(string $hintList): Query
+	{
 		$this->indexHintList = $hintList;
 
 		return $this;
@@ -468,10 +497,11 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * Check if table is joined
 	 * 
 	 * @param string $tableName
-	 * @param string $joinTableAlias If given the alias of the existing join must match too.
+	 * @param string|null $joinTableAlias If given the alias of the existing join must match too.
 	 * @return boolean
 	 */
-	public function isJoined($tableName, $joinTableAlias = null) {
+	public function isJoined(string $tableName, string $joinTableAlias = null): bool
+	{
 		foreach($this->joins as $join) {
 			if($join['src'] != $tableName) {
 				continue;
@@ -493,10 +523,11 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * Remove joined table
 	 *
 	 * @param string $tableName
-	 * @param string $joinTableAlias If given the alias of the existing join must match too.
+	 * @param string|null $joinTableAlias If given the alias of the existing join must match too.
 	 * @return static
 	 */
-	public function removeJoin($tableName, $joinTableAlias = null) {
+	public function removeJoin(string $tableName, string $joinTableAlias = null): Query
+	{
 		$new = [];
 		foreach($this->joins as $join) {
 			if($join['src'] == $tableName && (!isset($joinTableAlias) || $joinTableAlias == $join['joinTableAlias'])) {
@@ -517,12 +548,13 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param int $offset
 	 * @return static
 	 */
-	public function offset($offset = 0) {
+	public function offset(int $offset = 0): Query
+	{
 		if(empty($this->unions)) {
-			$this->offset = (int) $offset;
+			$this->offset = $offset;
 		} else
 		{
-			$this->unionOffset = (int) $offset;
+			$this->unionOffset = $offset;
 		}
 		return $this;
 	}
@@ -533,12 +565,13 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param int $limit
 	 * @return static
 	 */
-	public function limit($limit = 0) {
+	public function limit(int $limit = 0): Query
+	{
 		if(empty($this->unions)) {
-			$this->limit = (int) $limit;
+			$this->limit = $limit;
 		} else
 		{			
-			$this->unionLimit = (int) $limit;	
+			$this->unionLimit = $limit;
 		}
 		return $this;
 	}
@@ -564,7 +597,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param Connection $conn
 	 * @return $this
 	 */
-	public function setDbConnection(Connection $conn) {
+	public function setDbConnection(Connection $conn): Query
+	{
 		$this->dbConn = $conn;
 		
 		return $this;
@@ -575,7 +609,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * 
 	 * @return Connection
 	 */
-	public function getDbConnection() {
+	public function getDbConnection(): Connection
+	{
 		if(!isset($this->dbConn)) {
 			$this->dbConn = App::get()->getDbConnection();
 		}
@@ -583,7 +618,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this->dbConn;
 	}
 
-	public function createStatement() {
+	public function createStatement(): Statement
+	{
 
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		$build = $queryBuilder->buildSelect($this);
@@ -600,22 +636,21 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * Executes the query and returns the statement
    *
    * @return Statement Returns false on failure.
-   * @throws Exception
+   * @throws PDOException
    */
-	public function execute() {
+	public function execute(): Statement
+	{
 		
 		try {
-			$stmt = $this->createStatement();	
-			$ret = $stmt->execute();
-			if ($ret === false) {
-				go()->error(var_export($ret, true));
-				go()->error($stmt->errorInfo());
-				throw new Exception("Could not execute statement. Error code: ". $stmt->errorCode());
-			}
-		} catch(Exception $e) {
+			$stmt = $this->createStatement();
+			/**
+			 * @var Statement $stmt
+			 */
+			$stmt->execute();
+		} catch(PDOException $e) {
 			try {
 				go()->error("SQL FAILED: " . $this->__toString());
-			} catch(Exception $e2) {
+			} catch(PDOException $e2) {
 				go()->error("SQL FAILED AND FAILED TO BUILD STRING " . $e2->getMessage());
 			}
 			
@@ -623,19 +658,19 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		}
 		return $stmt;
 	}
-	
-	private $debug = false;
-
-	/**
-	 * Output query to debugger
-	 * 
-	 * @return $this
-	 */
-	public function debug() {
-		$this->debug = true;
-		
-		return $this;
-	}
+//
+//	private $debug = false;
+//
+//	/**
+//	 * Output query to debugger
+//	 *
+//	 * @return $this
+//	 */
+//	public function debug() {
+//		$this->debug = true;
+//
+//		return $this;
+//	}
 
   /**
    * Executes the query and returns a single object
@@ -645,7 +680,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * @throws Exception
    */
 	public function single() {		
-		return $this->offset(0)
+		return $this->offset()
 						->limit(1)
 						->execute()
 						->fetch();
@@ -654,10 +689,10 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
   /**
    * Get all records as an array
    *
-   * @return mixed[]
+   * @return array
    * @throws Exception
    */
-	public function all() {
+	public function all() : array {
 		return $this->execute()->fetchAll();
 	}
 
@@ -666,7 +701,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * 
 	 * @return array eg ['sql' => 'select...', 'params' => []]
 	 */
-	public function build() {
+	public function build(): array
+	{
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		return $queryBuilder->buildSelect($this);
 	}
@@ -678,7 +714,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param bool $value
 	 * @return $this
 	 */
-	public function forUpdate($value = true) {
+	public function forUpdate(bool $value = true): Query
+	{
 		$this->forUpdate = $value;
 		return $this;
 	}
@@ -690,31 +727,34 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
   /**
    * Executes the query
    *
-   * @return Statement|Traversable
+   * @return Statement
    * @throws Exception
    */
-	public function getIterator() {
+	public function getIterator(): Statement
+	{
 		return $this->execute();
 	}
 
   /**
    * Serializes the query to JSON by executing it and fetching into an array
    *
-   * @return array|mixed
+   * @return array
    * @throws Exception
    */
-	public function jsonSerialize() {
+	public function jsonSerialize(): array
+	{
 		return $this->toArray();
 	}
 
   /**
    * Convert all results of this query to arrays
    *
-   * @param array $properties
+   * @param array|null $properties
    * @return array
    * @throws Exception
    */
-  public function toArray($properties = null) {
+  public function toArray(array $properties = null): array
+  {
 		$arr = [];
 		foreach($this->execute() as $entity) {
 			if($entity instanceof ArrayableInterface) {

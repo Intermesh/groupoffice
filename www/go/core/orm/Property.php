@@ -548,10 +548,11 @@ abstract class Property extends Model {
   /**
    * Get all API properties
    *
-   * @return array|mixed
+   * @return array
    * @throws Exception
    */
-	public static function getApiProperties() {		
+	public static function getApiProperties(): array
+	{
 		$cacheKey = 'property-getApiProperties-' . static::class;
 
 		$props = go()->getCache()->get($cacheKey);
@@ -2064,7 +2065,8 @@ abstract class Property extends Model {
 		}
 	}
 
-	public function toArray($properties = []) {
+	public function toArray(array $properties = null): array
+	{
 		if (empty($properties)) {
 			$properties = $this->fetchProperties;
 		}
