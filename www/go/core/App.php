@@ -505,7 +505,7 @@ use Faker;
 		 * @return ModuleModel | false
 		 * @throws Exception
 		 */
-		public function getModule(string $package, string $name)
+		public function getModule(?string $package, string $name)
 		{
 			$cacheKey = 'getModule-' . $package .'-'.$name;
 
