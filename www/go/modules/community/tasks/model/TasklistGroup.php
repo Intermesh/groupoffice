@@ -3,6 +3,7 @@
 
 namespace go\modules\community\tasks\model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\validate\ErrorCode;
 
@@ -25,7 +26,7 @@ class TasklistGroup extends Property
 	/** @var Progress if set the progress of a task will change when the task goes into this column */
 	protected $progressChange;
 
-	protected static function defineMapping()
+	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 			->addTable("tasks_tasklist_group", "group");

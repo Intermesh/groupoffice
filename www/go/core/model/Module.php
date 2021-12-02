@@ -6,6 +6,8 @@ use go\core;
 use go\core\db\Criteria;
 use go\core\jmap\Entity;
 use go\core\App;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\Settings;
 use go\core\validate\ErrorCode;
@@ -33,19 +35,20 @@ class Module extends Entity {
 		return !empty($rights->mayManage) ? 50 : 10;
 	}
 
-	protected function canCreate()
+	protected function canCreate(): bool
 	{
 		return go()->getAuthState()->isAdmin();
 	}
 	
-	protected static function textFilterColumns()
+	protected static function textFilterColumns(): array
 	{
 		return ['name', 'package'];
 	}
 
 	public $checkDepencencies = true;
 	
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 
 		if($this->isModified(['enabled']) || $this->isNew()) {
 
@@ -124,7 +127,8 @@ class Module extends Entity {
 	}
 	
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('core_module', 'm')
 			->addMap('permissions', Permission::class, ['id'=>'moduleId']);
 	}
@@ -195,7 +199,8 @@ class Module extends Entity {
 		return (object) $rights;
 	}
 
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()->add("enabled", function(Criteria $criteria, $value) {
 			if($value === null) {
 				return;
@@ -349,7 +354,8 @@ class Module extends Entity {
 		return parent::internalValidate();
 	}
 	
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 
 		$query->andWhere('package != "core"');
 
@@ -469,7 +475,6 @@ class Module extends Entity {
 	 * @param string $name
 	 * @param null|boolean $enabled If set, then the module's enabled flag will be matched
 	 * @return bool
-	 * @throws Exception
 	 */
 	public static function isInstalled($package, $name, $enabled = null) {
 		if($package == "legacy") {

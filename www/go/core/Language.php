@@ -53,7 +53,6 @@ class Language {
 	 *
 	 * @param string|null $isoCode when not given it's detected from the browser
 	 * @return string|false Old language setting
-	 * @throws Exception
 	 */
 	public function setLanguage($isoCode = null) {
 		$old = $this->getIsoCode();

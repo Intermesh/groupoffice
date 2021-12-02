@@ -1,6 +1,7 @@
 <?php
 namespace go\core\model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 
 
@@ -68,7 +69,7 @@ class PdfBlock extends Property {
 	 */							
 	public $content;
 
-	protected static function defineMapping()
+	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 			->addTable('core_pdf_block');

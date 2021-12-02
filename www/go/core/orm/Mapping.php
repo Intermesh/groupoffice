@@ -161,12 +161,9 @@ class Mapping {
    * Get the first table from the mapping
    *
    * @return MappedTable
-   * @throws Exception
    */
-	public function getPrimaryTable() {
-		if(empty($this->tables)) {
-			throw new Exception("No table mapped");
-		}
+	public function getPrimaryTable(): MappedTable
+	{
 		return array_values($this->tables)[0];
 	}
 

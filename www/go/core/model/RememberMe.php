@@ -7,6 +7,7 @@ use go\core\exception\RememberMeTheft;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\orm\exception\SaveException;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
@@ -93,7 +94,8 @@ class RememberMe extends Entity {
 	const LIFETIME = 'P7D';
 
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 		->addTable('core_auth_remember_me', 'r');
 	}

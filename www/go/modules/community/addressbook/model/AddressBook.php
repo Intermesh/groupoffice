@@ -2,6 +2,7 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\fs\File;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\modules\community\addressbook\Module;
 use go\core\model\Acl;
@@ -69,30 +70,33 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 		parent::init();
 	}
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("addressbook_addressbook", "a")
 						->addScalar('groups', 'addressbook_group', ['id' => 'addressBookId']);
 	}
 
-	protected function canCreate()
+	protected function canCreate(): bool
 	{
 		return \go\core\model\Module::findByName('community', 'addressbook')->hasPermissionLevel(Acl::LEVEL_MANAGE);
 	}
 
 
-	public function buildFilesPath() {
+	public function buildFilesPath(): string
+	{
 
 		Module::checkRootFolder();
 
 		return "addressbook/" . File::stripInvalidChars($this->name);
 	}
 
-	protected static function filesPathProperties() {
+	protected static function filesPathProperties(): array
+	{
 		return ['name'];
 	}
 
-	protected static function textFilterColumns()
+	protected static function textFilterColumns(): array
 	{
 		return ['name'];
 	}
@@ -152,7 +156,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 		return $addressBook;
 	}
 
-	protected static function internalDelete(Query $query)
+	protected static function internalDelete(Query $query): bool
 	{
 		if(!Contact::delete(['addressBookId' => $query])) {
 			return false;
@@ -165,7 +169,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 		return parent::internalDelete($query);
 	}
 
-	public static function sort(Query $query, array $sort)
+	public static function sort(Query $query, array $sort): Query
 	{
 		if(empty($sort)) {
 			$sort['name'] = 'ASC';

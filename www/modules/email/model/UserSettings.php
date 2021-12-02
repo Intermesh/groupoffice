@@ -1,6 +1,7 @@
 <?php
 namespace GO\Email\Model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use function GO;
 
@@ -21,7 +22,8 @@ class UserSettings extends Property {
 	public $sort_email_addresses_by_time;
 	public $defaultTemplateId;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('core_user');
 	}
 	
@@ -55,7 +57,8 @@ class UserSettings extends Property {
 	
 	
 	
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		\GO::config()->save_setting('email_defaultTemplateId', $this->defaultTemplateId, $this->id);
 		\GO::config()->save_setting('email_use_plain_text_markup', !empty($this->use_html_markup) ? '0' : '1', $this->id);
 		\GO::config()->save_setting('email_show_from', !empty($this->show_from) ? 1 : 0, $this->id);

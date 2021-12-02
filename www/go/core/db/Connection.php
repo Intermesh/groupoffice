@@ -473,7 +473,7 @@ class Connection {
    * @param $data
    * @param Query|string|array $query {@see Query::normalize()}
    * @return Statement
-   * @throws Exception
+   * @throws PDOException
    * @example with join
    * ```
    * go()->getDbConnection()->update(

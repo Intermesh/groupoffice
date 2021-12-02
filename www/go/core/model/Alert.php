@@ -8,6 +8,8 @@ use go\core\acl\model\SingleOwnerEntity;
 use go\core\db\Criteria;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 
 class Alert extends SingleOwnerEntity
@@ -28,7 +30,8 @@ class Alert extends SingleOwnerEntity
 
 	public $sendMail = false;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 			->addTable("core_alert", "alert");
 	}
@@ -41,7 +44,7 @@ class Alert extends SingleOwnerEntity
 		$this->entityTypeId = EntityType::findByName($name)->getId();
 	}
 
-	protected static function defineFilters()
+	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
 			->add('userId', function(Criteria $criteria, $value) {
@@ -86,7 +89,7 @@ class Alert extends SingleOwnerEntity
 		return $this;
 	}
 
-	protected function internalSave()
+	protected function internalSave(): bool
 	{
 		if($this->isNew()) {
 
@@ -111,7 +114,7 @@ class Alert extends SingleOwnerEntity
 		return parent::internalSave();
 	}
 
-	protected static function internalDelete(Query $query)
+	protected static function internalDelete(Query $query): bool
 	{
 		if(empty($query->getData()['preventDismiss'])) {
 			$alerts = Alert::find()->mergeWith($query);

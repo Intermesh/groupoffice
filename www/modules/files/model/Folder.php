@@ -15,6 +15,7 @@
 
 namespace GO\Files\Model;
 
+use Exception;
 use GO;
 use go\core\fs\Folder as GoFolder;
 use go\core\model\Acl;
@@ -248,7 +249,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			while ($currentFolder = $currentFolder->parent) {
 
 				if(in_array($currentFolder->id, $ids))
-					throw new \Exception("Infinite folder loop detected in ".$this->_path." ".implode(",", $ids));
+					throw new Exception("Infinite folder loop detected in ".$this->_path." ".implode(",", $ids));
 				else
 					$ids[]=$currentFolder->id;
 
@@ -269,7 +270,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		while ($currentFolder = $currentFolder->parent) {
 
 			if(in_array($currentFolder->id, $ids))
-				throw new \Exception("Infinite folder loop detected in ".$this->_path." ".implode(",", $ids));
+				throw new Exception("Infinite folder loop detected in ".$this->_path." ".implode(",", $ids));
 			else
 				$ids[]=$currentFolder->id;
 
@@ -398,13 +399,13 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if($this->isNew){
 			
 			if(!$this->fsFolder->firstExistingParent()->isWritable()){
-				throw new \Exception("Folder ".$this->fsFolder->firstExistingParent()->stripFileStoragePath()." (Creating ".$this->name.") is read only on the filesystem. Please check the file system permissions (hint: chown -R www-data:www-data /home/groupoffice)");
+				throw new Exception("Folder ".$this->fsFolder->firstExistingParent()->stripFileStoragePath()." (Creating ".$this->name.") is read only on the filesystem. Please check the file system permissions (hint: chown -R www-data:www-data /home/groupoffice)");
 			}
 		}else
 		{
 			if($this->isModified('name') || $this->isModified('parent_id')){			
 				if($this->_getOldFsFolder() && $this->_getOldFsFolder()->exists() && !$this->_getOldFsFolder()->isWritable())
-					throw new \Exception("Folder ".$this->path." is read only on the filesystem. Please check the file system permissions (hint: chown -R www-data:www-data /home/groupoffice)");
+					throw new Exception("Folder ".$this->path." is read only on the filesystem. Please check the file system permissions (hint: chown -R www-data:www-data /home/groupoffice)");
 			}
 		}
 
@@ -416,7 +417,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if($this->parent){
 			$existingFolder = $this->parent->hasFolder($this->name);
 			if($existingFolder && $existingFolder->id!=$this->id)
-				throw new \Exception(\GO::t("The folder already exists", "files").': '.$this->path);
+				throw new Exception(\GO::t("The folder already exists", "files").': '.$this->path);
 		}
 		
 		if($this->isNew && empty($this->quota_user_id)){
@@ -485,7 +486,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 					$newFsFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path . dirname($newRelPath));
 
 					if (!$fsFolder->move($newFsFolder))
-						throw new \Exception("Could not rename folder on the filesystem");
+						throw new Exception("Could not rename folder on the filesystem");
 
 					$this->notifyUsers(
 						array(
@@ -564,7 +565,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	public function delete($ignoreAcl = false) {
 
 		if(!$ignoreAcl && $this->readonly){
-			throw new \Exception(\GO::t("You can't delete this system folder", "files"));
+			throw new Exception(\GO::t("You can't delete this system folder", "files"));
 		}
 
 		return parent::delete($ignoreAcl);
@@ -660,7 +661,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 					$folder->name = $folderName;
 					$folder->parent_id = $parent_id;
 					if(!$folder->save()){
-						throw new \Exception('Could not create folder: '.var_export($folder->getValidationErrors(), true));
+						throw new Exception('Could not create folder: '.var_export($folder->getValidationErrors(), true));
 					}
 				}elseif(!empty($autoCreateAttributes))
 				{
@@ -780,7 +781,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 *
 	 * @param null $userId
 	 * @return false|Folder
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function tmpFolder($userId = null) {
 		if(!isset($userId)) {
@@ -791,7 +792,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if(!$folder->acl_id || Acl::getUserPermissionLevel($folder->acl_id, $userId) != Acl::LEVEL_MANAGE) {
 			$folder->setNewAcl($userId);
 			if(!$folder->save()) {
-				throw new \Exception("Could not create temporary folder");
+				throw new Exception("Could not create temporary folder");
 			}
 		}
 
@@ -977,7 +978,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	public function checkFsSync(){
 
 		if(!$this->fsFolder->exists()) {
-			throw new \Exception("Folder " . $this->path . " doesn't exist on the filesystem! Please run a database check.");
+			throw new Exception("Folder " . $this->path . " doesn't exist on the filesystem! Please run a database check.");
 		}
 
 		\GO::debug('checkFsSync '.$this->path.' : '.$this->mtime.' < '.$this->fsFolder->mtime());
@@ -1209,7 +1210,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				if(!$this->fsFolder->copy($destinationFsFolder, $newName)) {
 					return false;
 				}
-			} catch(\Exception $e) {
+			} catch(Exception $e) {
 				$copy->delete();
 				throw $e;
 			}
@@ -1338,6 +1339,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * Move all the files and folders from a given source folder into this folder.
 	 *
 	 * @param Folder $sourceFolder
+	 * @param bool $mergeFolders
+	 * @throws Exception
 	 */
 	public function moveContentsFrom(Folder $sourceFolder, $mergeFolders=false){
 
@@ -1352,20 +1355,20 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$subfolder->parent_id=$this->id;
 				$subfolder->appendNumberToNameIfExists();
 				if(!$subfolder->save(true)){
-					throw new \Exception("Could not save folder ".$subfolder->name." ".implode("\n", $subfolder->getValidationErrors()));
+					throw new Exception("Could not save folder ".$subfolder->name." ".implode("\n", $subfolder->getValidationErrors()));
 				}
 			}else
 			{
 				if(($existingFolder = $this->hasFolder($subfolder->name))){
 					$existingFolder->moveContentsFrom($subfolder, true);
 					if(!$subfolder->delete(true)){
-						throw new \Exception("Could not delete folder ".$subfolder->name);
+						throw new Exception("Could not delete folder ".$subfolder->name);
 					}
 				}else
 				{
 					$subfolder->parent_id=$this->id;
 					if(!$subfolder->save(true)){
-						throw new \Exception("Could not save folder ".$subfolder->name." ".implode("\n", $subfolder->getValidationErrors()));
+						throw new Exception("Could not save folder ".$subfolder->name." ".implode("\n", $subfolder->getValidationErrors()));
 					}
 				}
 			}
@@ -1377,7 +1380,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$file->folder_id=$this->id;
 			$file->appendNumberToNameIfExists();
 			if(!$file->save()){
-				throw new \Exception("Could not save file ".$file->name." ".implode("\n", $file->getValidationErrors()));
+				throw new Exception("Could not save file ".$file->name." ".implode("\n", $file->getValidationErrors()));
 			}
 		}
 	}
@@ -1553,7 +1556,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('readonly'=>1));
 
 		if(!$folder){
-			throw new \Exception("Failed to create folder ".$filesPath);
+			throw new Exception("Failed to create folder ".$filesPath);
 		}
 //      if (!empty($model->acl_id))
 //          $folder->acl_id = $model->acl_id;
@@ -1567,7 +1570,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$entity->filesFolderId = $folder->id;
 		if($saveToEntity && !$entity->save()) {
-			throw new \Exception("Could not save entity!");
+			throw new Exception("Could not save entity!");
 		}
 		
 		return $folder;

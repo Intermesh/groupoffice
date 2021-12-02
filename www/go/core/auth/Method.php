@@ -32,7 +32,8 @@ class Method extends Entity {
 	
 	private $authenticator;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 		->addTable('core_auth_method', 'am')
 		->addQuery(

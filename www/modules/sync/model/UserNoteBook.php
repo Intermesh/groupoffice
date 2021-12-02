@@ -1,6 +1,7 @@
 <?php
 namespace GO\Sync\Model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 
 class UserNoteBook extends Property {
@@ -22,7 +23,8 @@ class UserNoteBook extends Property {
 	 * @var boolean
 	 */
 	public $isDefault;
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('sync_user_note_book');
 	}
 }

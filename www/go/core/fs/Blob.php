@@ -4,6 +4,8 @@ namespace go\core\fs;
 
 use Exception;
 use go\core\db\Table;
+use go\core\orm\exception\SaveException;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm;
 use go\core\util\DateTime;
@@ -164,13 +166,14 @@ class Blob extends orm\Entity {
 	 * Set the blob stale if it's not used in any of the referencing tables.
 	 *
 	 * @return bool true if blob is stale
-	 * @throws Exception
+	 * @throws SaveException
 	 */
-	public function setStaleIfUnused() {		
+	public function setStaleIfUnused(): bool
+	{
 		$this->staleAt = $this->isUsed() ? null : new DateTime();
 		
 		if(!$this->save()) {
-			throw new Exception("Couldn't save blob");
+			throw new SaveException($this);
 		}
 		return isset($this->staleAt);
 	}
@@ -241,7 +244,8 @@ class Blob extends orm\Entity {
 		return $blob;
 	}
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('core_blob', 'b');
 	}
 
@@ -261,7 +265,8 @@ class Blob extends orm\Entity {
 		}
 	}
 
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		if (!is_dir(dirname($this->path()))) {
 			mkdir(dirname($this->path()), 0775, true);
 		}
@@ -290,7 +295,8 @@ class Blob extends orm\Entity {
 	 * @return boolean
 	 * @throws Exception
 	 */
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 
 		$new = [];
 		$paths = [];
@@ -442,7 +448,7 @@ class Blob extends orm\Entity {
 					]);
 	}
 
-	protected static function atypicalApiProperties()
+	protected static function atypicalApiProperties(): array
 	{
 		return array_merge(parent::atypicalApiProperties(), ['file']);
 	}

@@ -463,7 +463,6 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * @param Criteria|array|string $on The criteria used in the ON clause {@see Criteria::normalize()}
    * @param string $type The join type. INNER, LEFT or RIGHT
    * @return static
-   * @throws Exception
    */
 	public function join($tableName, $joinTableAlias, $on, string $type = 'INNER', $indexHint = null): Query
 	{
@@ -677,7 +676,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    *
    * @return mixed|boolean The queries record, column or object. Returns false
    *   when nothing is found
-   * @throws Exception
+   * @throws PDOException
    */
 	public function single() {		
 		return $this->offset()
@@ -690,7 +689,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * Get all records as an array
    *
    * @return array
-   * @throws Exception
+   * @throws PDOException
    */
 	public function all() : array {
 		return $this->execute()->fetchAll();

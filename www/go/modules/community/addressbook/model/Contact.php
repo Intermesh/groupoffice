@@ -8,6 +8,9 @@ use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\Entity;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
@@ -275,11 +278,13 @@ class Contact extends AclItemEntity {
 		$this->starred = empty($starred) ? null : true;
 	}
 
-	protected static function internalRequiredProperties() {
+	protected static function internalRequiredProperties(): array
+	{
 		return ['isOrganization'];
 	}
 
-	public function buildFilesPath() {
+	public function buildFilesPath(): string
+	{
 		if($this->isOrganization) {
 			$new_folder_name = File::stripInvalidChars($this->name).' ('.$this->id.')';
 		} else{
@@ -317,7 +322,8 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @return string[]
 	 */
-	protected static function filesPathProperties() {
+	protected static function filesPathProperties(): array
+	{
 		return ['addressBookId', 'name', 'lastName', 'firstName'];
 	}
 	
@@ -346,18 +352,21 @@ class Contact extends AclItemEntity {
 	protected $uri;
 	
 	
-	protected static function aclEntityClass(): string {
+	protected static function aclEntityClass(): string
+	{
 		return AddressBook::class;
 	}
 
-	protected static function aclEntityKeys(): array {
+	protected static function aclEntityKeys(): array
+	{
 		return ['addressBookId' => 'id'];
 	}
 
   /**
    * @inheritDoc
    */
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("addressbook_contact", 'c')
 						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
@@ -428,7 +437,8 @@ class Contact extends AclItemEntity {
 						->where(['e.number' => $number]);
 	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 
 		return parent::defineFilters()
 										->add("addressBookId", function(Criteria $criteria, $value) {
@@ -694,7 +704,7 @@ class Contact extends AclItemEntity {
 										
 	}
 
-	public static function sort(Query $query, array $sort)
+	public static function sort(Query $query, array $sort): Query
 	{
 		if(isset($sort['firstName'])) {
 			$sort['name'] = $sort['firstName'];
@@ -731,7 +741,8 @@ class Contact extends AclItemEntity {
 	/**
 	 * @inheritDoc
 	 */
-	public static function converters() {
+	public static function converters(): array
+	{
 		return array_merge(parent::converters(), [VCard::class, Spreadsheet::class]);
 	}
 	
@@ -802,7 +813,8 @@ class Contact extends AclItemEntity {
 		$this->uri = $uri;
 	}
 		
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		if(!parent::internalSave()) {
 			return false;
 		}
@@ -921,7 +933,7 @@ class Contact extends AclItemEntity {
 		return $this->findOrganizations()->all();
 	}
 
-	protected static function atypicalApiProperties()
+	protected static function atypicalApiProperties(): array
 	{
 		return array_merge(parent::atypicalApiProperties(), ['organizations']);
 	}
@@ -973,7 +985,8 @@ class Contact extends AclItemEntity {
 		return $addressBook->name . $jobTitle . $orgStr;
 	}
 
-	public function title() {
+	public function title(): string
+	{
 		return $this->name;
 	}
 
@@ -1288,7 +1301,7 @@ class Contact extends AclItemEntity {
 	/**
 	 * @inheritDoc
 	 */
-  protected function mergeProp($entity, $name, $p)
+  protected function mergeProp(Entity $entity, string $name, array $p)
   {
   	//Groups can't be merged if addressbook is different.
   	if($name == "groups" && $entity->addressBookId != $this->getOldValue("addressBookId")) {

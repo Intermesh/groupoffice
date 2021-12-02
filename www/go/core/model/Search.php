@@ -8,6 +8,8 @@ use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\orm\EntityType;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
@@ -25,7 +27,7 @@ class Search extends AclOwnerEntity {
 	protected $entity;
 	protected $moduleId;
 
-	public static function loggable()
+	public static function loggable(): bool
 	{
 		return false;
 	}
@@ -45,7 +47,7 @@ class Search extends AclOwnerEntity {
 		//don't call parent as it's messes up core_acl references!
 	}
 
-	protected static function getDefaultFetchProperties()
+	protected static function getDefaultFetchProperties() : array
 	{
 		//Acl prop is not needed for search results
 		return array_diff(parent::getDefaultFetchProperties(), ['acl']);
@@ -61,11 +63,12 @@ class Search extends AclOwnerEntity {
 	}
 	
 	//don't delete acl on search
-	protected static function getAclsToDelete(Query $query) {
+	protected static function getAclsToDelete(Query $query) : array
+	{
 		return [];
 	}
 
-	public function findAclId() {
+	public function findAclId() : int {
 		return $this->aclId;
 	}
 	
@@ -109,7 +112,8 @@ class Search extends AclOwnerEntity {
 	 */
 	public $modifiedAt;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 										->addTable('core_search', 'search')
 										->addQuery(
@@ -125,13 +129,15 @@ class Search extends AclOwnerEntity {
 	 * @param Query $query
 	 * @param int $level
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	{
 		Acl::applyToQuery($query, 'search.aclId', $level, $userId, $groups);
 		
 		return $query;
 	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 						->add("link", function(Criteria $criteria, $value, Query $query) {
 							

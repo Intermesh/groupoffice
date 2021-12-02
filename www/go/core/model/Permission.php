@@ -4,6 +4,7 @@
 namespace go\core\model;
 
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 
 /**
@@ -16,7 +17,8 @@ class Permission extends Property {
 	public $groupId;
 	protected $rights;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable("core_permission");
 	}
 

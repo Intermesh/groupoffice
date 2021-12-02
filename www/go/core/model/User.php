@@ -16,12 +16,15 @@ use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\convert\UserSpreadsheet;
 use go\core\customfield\Date;
+use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\ErrorHandler;
 use go\core\Installer;
 use go\core\mail\Message;
 use go\core\mail\Util;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
@@ -274,7 +277,8 @@ class User extends Entity {
 	 */
 	private $passwordVerified = true;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
@@ -305,7 +309,7 @@ class User extends Entity {
 		$this->getPersonalGroup()->setValues($values);
 	}
 	
-	public function setValues(array $values)
+	public function setValues(array $values) : Model
 	{
 		$this->passwordVerified = false;
 		return parent::setValues($values);
@@ -319,7 +323,7 @@ class User extends Entity {
 		$this->archive = $v;
 	}
 
-	protected function canCreate()
+	protected function canCreate(): bool
 	{
 		return go()->getModel()->getUserRights()->mayChangeUsers;
 	}
@@ -587,11 +591,13 @@ class User extends Entity {
 		return parent::getPermissionLevel();
 	}
 	
-	protected static function textFilterColumns() {
+	protected static function textFilterColumns(): array
+	{
 		return ['username', 'displayName', 'email'];
 	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
       ->add('permissionLevel', function(Criteria $criteria, $value, Query $query) {
         if(!$query->isJoined('core_group', 'g')) {
@@ -700,7 +706,8 @@ class User extends Entity {
 		}
 	}
 	
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		
 		if(isset($this->plainPassword)) {
 			$this->password = $this->passwordHash($this->plainPassword);
@@ -911,7 +918,8 @@ class User extends Entity {
 		}
 	}
 	
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 
 		$query->andWhere('id != 1');
 				
@@ -1011,7 +1019,7 @@ class User extends Entity {
 	/**
 	 * @inheritDoc
 	 */
-	public static function converters()
+	public static function converters(): array
 	{
 		return array_merge(parent::converters(), [UserSpreadsheet::class]);
 	}

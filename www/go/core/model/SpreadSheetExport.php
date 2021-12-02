@@ -6,6 +6,8 @@ use go\core\db\Criteria;
 use go\core\ErrorHandler;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\util\JSON;
 
 class SpreadSheetExport extends Entity
@@ -16,12 +18,13 @@ class SpreadSheetExport extends Entity
 	protected $columns;
 	protected $entityTypeId;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 			->addTable("core_spreadsheet_export", "export");
 	}
 
-	protected static function defineFilters()
+	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
 			->add("userId", function(Criteria $criteria, $userId) {

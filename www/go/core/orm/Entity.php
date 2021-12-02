@@ -1,20 +1,26 @@
-<?php
+<?php /** @noinspection PhpUndefinedMethodInspection */
+/** @noinspection PhpUndefinedMethodInspection */
+/** @noinspection PhpUndefinedMethodInspection */
+
+/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 
 namespace go\core\orm;
 
 use Exception;
 use GO\Base\Db\ActiveRecord;
-use GO\Base\Exception\AccessDenied;
 use go\core\data\convert\AbstractConverter;
 use go\core\data\convert\Json;
+use go\core\db\Column;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use GO\Files\Model\Folder;
+use PDO;
 use function go;
 
 /**
@@ -115,7 +121,6 @@ abstract class Entity extends Property {
 	 * @param array $properties Specify the columns for optimal performance. You can also use the mapping to only fetch table columns Note::getMapping()->getColumnNames()
 	 * @param bool $readOnly Readonly has less overhead
 	 * @return static[]|Query
-	 * @throws Exception
 	 * @example
 	 * ````
 	 * $notes = Note::find()->where(['name' => 'Foo']);
@@ -138,11 +143,7 @@ abstract class Entity extends Property {
 	 *
 	 * @see Criteria::where()
 	 */
-	public static final function find(array $properties = [], $readOnly = false) {
-		
-		if(count($properties) && !isset($properties[0])) {
-			throw new Exception("Invalid properties given to Entity::find()");
-		}
+	public static final function find(array $properties = [], bool $readOnly = false) {
 		return static::internalFind($properties, $readOnly);
 	}
 
@@ -153,10 +154,10 @@ abstract class Entity extends Property {
 	 * @param string $id
 	 * @param array $values Values to apply if it needs to be created.
 	 * @return static
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	public static function findOrCreate($id, $values = []) {
-
+	public static function findOrCreate(string $id, array $values = []): Entity
+	{
 		$entity = static::findById($id);
 		if($entity) {
 			return $entity;
@@ -167,7 +168,7 @@ abstract class Entity extends Property {
 		$entity->setValues($values);
 
 		if(!$entity->save()) {
-			throw new \Exception("Couldn't save  '" . static::class . "' : " . $entity->getValidationErrorsAsString());
+			throw new SaveException($entity);
 		}
 
 		return $entity;
@@ -189,11 +190,10 @@ abstract class Entity extends Property {
 	 * @param string $id
 	 * @param string[] $properties
 	 * @param bool $readOnly
-	 * @return static
-	 * @throws Exception
+	 * @return static | false
 	 */
-	public static final function findById($id, array $properties = [], $readOnly = false) {
-
+	public static final function findById(string $id, array $properties = [], bool $readOnly = false)
+	{
 		return static::internalFindById($id, $properties, $readOnly);
 	}
 
@@ -207,7 +207,7 @@ abstract class Entity extends Property {
 	 * @return bool
 	 * @throws Exception
 	 */
-	public static function exists($id)
+	public static function exists($id): bool
 	{
 
 		if(empty($id)) {
@@ -246,10 +246,10 @@ abstract class Entity extends Property {
 	 * @param array $ids
 	 * @param array $properties
 	 * @param bool $readOnly
-	 * @return Entity|\go\core\orm\Query
+	 * @return static[]|Query
 	 * @throws Exception
 	 */
-	public static final function findByIds(array $ids, array $properties = [], $readOnly = false) {
+	public static final function findByIds(array $ids, array $properties = [], bool $readOnly = false) {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
 		$keys = $primaryTable->getPrimaryKey();
@@ -288,8 +288,9 @@ abstract class Entity extends Property {
 	 * @return Query|static[]
 	 * @throws Exception
 	 */
-	public static function findByLink($entity, $properties = [], $readOnly = false) {
+	public static function findByLink($entity, array $properties = [], bool $readOnly = false) {
 		$query = static::find($properties, $readOnly);
+		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 		$query->join(
 			'core_link',
 			'l',
@@ -308,7 +309,8 @@ abstract class Entity extends Property {
    * @return boolean
    * @throws Exception
    */
-	public final function save() {	
+	public final function save(): bool
+	{
 
 		$this->isSaving = true;
 
@@ -347,7 +349,8 @@ abstract class Entity extends Property {
 	 * 
 	 * @return bool
 	 */
-	public function isSaving() {
+	public function isSaving(): bool
+	{
 		return $this->isSaving;
 	}
 
@@ -370,7 +373,8 @@ abstract class Entity extends Property {
    * @return boolean
    * @throws Exception
    */
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		if(!parent::internalSave()) {
 			App::get()->debug(static::class."::internalSave() returned false");
 			return false;
@@ -413,7 +417,8 @@ abstract class Entity extends Property {
 	 * @return Query
 	 * @throws Exception
 	 */
-	protected static function normalizeDeleteQuery($query) {
+	protected static function normalizeDeleteQuery($query): Query
+	{
 
 		if($query instanceof Entity) {
 			$query = $query->primaryKeyValues();
@@ -445,7 +450,8 @@ abstract class Entity extends Property {
 	 * @return boolean
 	 * @throws Exception
 	 */
-	public static final function delete($query) {
+	public static final function delete($query): bool
+	{
 
 		$query = self::normalizeDeleteQuery($query);
 
@@ -493,7 +499,8 @@ abstract class Entity extends Property {
   /**
    * @inheritDoc
    */
-	protected function commit() {
+	protected function commit(): bool
+	{
 		parent::commit();
 
 		//$this->isDeleting = false;
@@ -505,7 +512,8 @@ abstract class Entity extends Property {
   /**
    * @inheritDoc
    */
-	protected function rollback() {
+	protected function rollback(): bool
+	{
 		App::get()->debug("Rolling back save operation for " . static::class, 1);
 		parent::rollBack();
 		// $this->isDeleting = false;
@@ -519,7 +527,8 @@ abstract class Entity extends Property {
 	 * @param int $level
 	 * @return boolean
 	 */
-	public final function hasPermissionLevel($level = Acl::LEVEL_READ) {
+	public final function hasPermissionLevel(int $level = Acl::LEVEL_READ): bool
+	{
 		return $level <= $this->getPermissionLevel();
 	}
 	
@@ -537,14 +546,14 @@ abstract class Entity extends Property {
 		}
 		return go()->getAuthState() && go()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 	}
-	
+
 	/**
 	 * Check if the current user is allowed to create new entities
-	 * 
-	 * @param array $values The values that will be applied to the new model
+	 *
 	 * @return boolean
 	 */
-	protected function canCreate() {
+	protected function canCreate(): bool
+	{
 		return true;
 	}
 
@@ -553,11 +562,12 @@ abstract class Entity extends Property {
 	 * 
 	 * @param Query $query
 	 * @param int $level
-	 * @param int $userId Leave to null for the current user
-	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
+	 * @param int|null $userId Leave to null for the current user
+	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	{
 		return $query;
 	}
 
@@ -571,7 +581,8 @@ abstract class Entity extends Property {
 	 * 
 	 * @return Query
 	 */
-	public static function findAcls() {
+	public static function findAcls(): ?Query
+	{
 		return null;
 	}
 
@@ -580,15 +591,11 @@ abstract class Entity extends Property {
    * Defaults to the module permissions it belongs to.
    *
    * @return int
-   * @throws Exception
+   * @throws SaveException
    */
-	public function findAclId() {
-
+	public function findAclId(): int
+	{
 		return Acl::getReadOnlyAclId();
-//
-//		$moduleId = static::entityType()->getModuleId();
-//
-//		return Module::findById($moduleId)->findAclId();
 	}
 
 
@@ -597,9 +604,9 @@ abstract class Entity extends Property {
    * routing short routes like "Note/get"
    *
    * @return EntityType
-   * @throws Exception
    */
-	public static function entityType() {		
+	public static function entityType(): EntityType
+	{
 
 		$cls = static::class;
 		$cacheKey = 'entity-type-' . $cls;
@@ -608,7 +615,6 @@ abstract class Entity extends Property {
 		if($t !== null) {
 			return $t;
 		}
-	
 
 		$t = EntityType::findByClassName($cls);
 		go()->getCache()->set($cacheKey, $t, false);			
@@ -625,7 +631,8 @@ abstract class Entity extends Property {
    * "CommentCategory" for example as client name. By default the class name without namespace is used as clientName().
    * @return string
    */
-  public static function getClientName() {
+  public static function getClientName(): string
+  {
 		$cls = static::class;
     return substr($cls, strrpos($cls, '\\') + 1);
   }
@@ -663,7 +670,8 @@ abstract class Entity extends Property {
    * @link https://jmap.io/spec-core.html#/query
    *
    */
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 
 		$filters = new Filters();
 
@@ -732,7 +740,7 @@ abstract class Entity extends Property {
 			$tag = ":commentedAt" . uniqid();
 
 			$query->having('MAX(comment.date) ' . $comparator . ' ' . $tag)
-				->bind($tag, $value->format(\go\core\db\Column::DATETIME_FORMAT))
+				->bind($tag, $value->format(Column::DATETIME_FORMAT))
 				->groupBy(['id']);
 		});
 
@@ -762,7 +770,7 @@ abstract class Entity extends Property {
 			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
 
 			$query->join('core_link', $linkAlias, $on, "LEFT");
-			$criteria->where('toId', '!=', null);
+			$criteria->where('toId', '!=');
 
 			if (!empty($value['id'])) {
 				$criteria->andWhere('fromId', '=', $value['id']);
@@ -783,13 +791,13 @@ abstract class Entity extends Property {
 	 */
 	private static function defineLegacyFilters(Filters $filters) {
 		if (static::getMapping()->getColumn('ctime')) {
-			$filters->addDate('createdAt', function (Criteria $criteria, $comparator, DateTime $value, Query $query) {
+			$filters->addDate('createdAt', function (Criteria $criteria, $comparator, DateTime $value) {
 				$criteria->andWhere('ctime', $comparator, $value->format("U"));
 			});
 		}
 
 		if (static::getMapping()->getColumn('mtime')) {
-			$filters->addDate('modifiedAt', function (Criteria $criteria, $comparator, DateTime $value, Query $query) {
+			$filters->addDate('modifiedAt', function (Criteria $criteria, $comparator, DateTime $value) {
 				$criteria->andWhere('mtime', $comparator, $value->format("U"));
 			});
 		}
@@ -829,7 +837,8 @@ abstract class Entity extends Property {
    * @return Query
    * @throws Exception
    */
-	public static function filter(Query $query, array $filter) {
+	public static function filter(Query $query, array $filter): Query
+	{
 		static::getFilters()->apply($query, $filter);
 		return $query;
 	}
@@ -838,7 +847,8 @@ abstract class Entity extends Property {
 	 * @return Filters
 	 * @throws Exception
 	 */
-	public static function getFilters() {
+	public static function getFilters(): Filters
+	{
 		$cls = static::class;
 
 		if(!isset(self::$filters[$cls])) {
@@ -853,7 +863,8 @@ abstract class Entity extends Property {
 	 * 
 	 * @return string[]
 	 */
-	protected static function textFilterColumns() {
+	protected static function textFilterColumns(): array
+	{
 		return [];
 	}
 
@@ -865,7 +876,8 @@ abstract class Entity extends Property {
 	 * @return bool
 	 * @throws Exception
 	 */
-	protected static function useSearchableTraitForSearch(Query $query) {
+	protected static function useSearchableTraitForSearch(Query $query): bool
+	{
 		// Join search cache on when searchable trait is used
 		if(!method_exists(static::class, 'getSearchKeywords')) {
 			return false;
@@ -890,7 +902,8 @@ abstract class Entity extends Property {
    * @return Criteria
    * @throws Exception
    */
-	protected static function search(Criteria $criteria, $expression, Query $query) {
+	protected static function search(Criteria $criteria, string $expression, Query $query): Criteria
+	{
 
 		$columns = static::textFilterColumns();
 
@@ -975,9 +988,8 @@ abstract class Entity extends Property {
    * ```
    *
    */
-	public static function sort(Query $query, array $sort) {	
-		
-
+	public static function sort(Query $query, array $sort): Query
+	{
 		if(isset($sort['modifier'])) {
 			$query->join('core_user', 'modifier', 'modifier.id = '.$query->getTableAlias() . '.modifiedBy');
 			$query->orderBy(['modifier.displayName' => $sort['modifier']], true);
@@ -1010,7 +1022,8 @@ abstract class Entity extends Property {
 	 * 
 	 * @return string
 	 */
-	public static function getState () {
+	public static function getState (): ?string
+	{
 		return null;
 	}
 
@@ -1020,7 +1033,8 @@ abstract class Entity extends Property {
 	 * @return static
 	 * @throws Exception
 	 */
-	public function copy() {
+	public function copy(): Entity
+	{
 		return $this->internalCopy();
 	}
 	
@@ -1030,10 +1044,11 @@ abstract class Entity extends Property {
 	 * 
 	 * Override to add more.
 	 *
-	 * @see AbstractConverter
 	 * @return string[] Of type AbstractConverter
+	 	 *@see AbstractConverter
 	 */
-	public static function converters() {
+	public static function converters(): array
+	{
 		return [Json::class];
 	}
 
@@ -1059,7 +1074,7 @@ abstract class Entity extends Property {
 	 * @param array $p
 	 * @throws Exception
 	 */
-	protected function mergeProp($entity, $name, $p) {
+	protected function mergeProp(Entity $entity, string $name, array $p) {
 		$col = static::getMapping()->getColumn($name);
 		if(!isset($p['access']) || ($col && $col->autoIncrement == true)) {
 			return;
@@ -1081,10 +1096,6 @@ abstract class Entity extends Property {
 					$this->$name = array_unique(array_merge($this->$name, $entity->$name));
 					break;
 
-				case Relation::TYPE_ARRAY:
-					$this->$name = array_merge($this->$name, $entity->$name);
-					break;
-
 				default:
 					$this->$name = array_merge($this->$name, $entity->$name);
 
@@ -1104,7 +1115,8 @@ abstract class Entity extends Property {
    * @throws Exception
    * @noinspection PhpUndefinedMethodInspection
    */
-	public function merge(self $entity) {
+	public function merge(self $entity): bool
+	{
 
 		if($this->equals($entity)) {
 			throw new Exception("Can't merge with myself!");
@@ -1183,7 +1195,7 @@ abstract class Entity extends Property {
 
   /**
    * @param Entity $entity
-   * @throws AccessDenied
+   * @throws Exception
    */
 	private function mergeFiles(self $entity) {
 		if(!Module::isInstalled('legacy', 'files') && $entity->getMapping()->getColumn('filesFolderId')) {
@@ -1228,8 +1240,9 @@ abstract class Entity extends Property {
    * @return array [['column'=>'contactId', 'table'=>'foo']]
    * @throws Exception
    */
-	protected static function getTableReferences() {
-		$cacheKey = "refs-table-" . static::class;;
+	protected static function getTableReferences(): array
+	{
+		$cacheKey = "refs-table-" . static::class;
 		$refs = go()->getCache()->get($cacheKey);
 		if($refs === null) {
 			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
@@ -1242,7 +1255,7 @@ abstract class Entity extends Property {
 					" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
 
 				$stmt = go()->getDbConnection()->getPDO()->query($sql);
-				$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+				$refs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			}
 			finally{
 				go()->getDbConnection()->exec("USE `" . $dbName . "`");	
@@ -1264,7 +1277,8 @@ abstract class Entity extends Property {
 	 *
 	 * @return string
 	 */
-	public function title() {
+	public function title(): string
+	{
 		if(property_exists($this,'name')) {
 			return $this->name;
 		}

@@ -3,6 +3,7 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\model\User;
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\modules\community\addressbook\model\Settings as AddresBookModuleSettings;
 use go\core\model;
@@ -38,7 +39,8 @@ class UserSettings extends Property {
 	public $lastAddressBookId;
 
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable("addressbook_user_settings", "abs");
 	}
 

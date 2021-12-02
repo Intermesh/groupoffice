@@ -2,7 +2,8 @@
 
 namespace go\core\validate;
 
-use go\core\App;
+
+use Exception;
 
 trait ValidationTrait {
 
@@ -10,10 +11,11 @@ trait ValidationTrait {
 
 	/**
 	 * You can override this function to implement validation in your model.
-	 * 
-	 * @return boolean
+	 *
+	 * @return bool
+	 * @throws Exception
 	 */
-	public final function validate() {
+	public final function validate(): bool {
 
 		$this->internalValidate();
 
@@ -27,7 +29,8 @@ trait ValidationTrait {
 	 * 
 	 * @return array eg. [['code' => $code, 'description' => $description, 'data' => $data]]
 	 */
-	public function getValidationErrors() {
+	public function getValidationErrors(): array
+	{
 		return $this->validationErrors;
 	}
 
@@ -36,7 +39,8 @@ trait ValidationTrait {
 	 *
 	 * @return string
 	 */
-	public function getValidationErrorsAsString() {
+	public function getValidationErrorsAsString(): string
+	{
 
 		$s = "";
 		foreach($this->validationErrors as $key => $value) {
@@ -51,7 +55,7 @@ trait ValidationTrait {
 	 * If the attribute has no error then fals will be returned
 	 * 
 	 * @param string $key
-	 * @return array eg. array('code'=>'maxLength','info'=>array('length'=>10)) 
+	 * @return array|false eg. array('code'=>'maxLength','info'=>array('length'=>10))
 	 */
 	public function getValidationError($key) {
 		$validationErrors = $this->getValidationErrors();
@@ -70,10 +74,10 @@ trait ValidationTrait {
 	 * 
 	 * @param string $key 
 	 * @param int $code  Error code. {@see \go\core\validate\ErrorCode} class for general constants
-	 * @param string $description Override the default description. Pure info for the API developer. Clients shouldn't use this.
+	 * @param string|null $description Override the default description. Pure info for the API developer. Clients shouldn't use this.
 	 * @param array $data Arbitrary data for output to the client
 	 */
-	public function setValidationError($key, $code, $description = null, $data = []) {
+	public function setValidationError(string $key, int $code, string $description = null, array $data = []) {
 
 		if (!isset($description)) {
 			$description = ErrorCode::getDescription($code);
@@ -86,10 +90,11 @@ trait ValidationTrait {
 
 	/**
 	 * Returns a value indicating whether there is any validation error.
-	 * @param string $key attribute name. Use null to check all attributes.
-	 * @return boolean whether there is any error.
+	 * @param string|null $key attribute name. Use null to check all attributes.
+	 * @return bool whether there is any error.
 	 */
-	public function hasValidationErrors($key = null) {
+	public function hasValidationErrors(string $key = null): bool
+	{
 		$validationErrors = $this->getValidationErrors();
 
 		if ($key === null) {

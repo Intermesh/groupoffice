@@ -145,7 +145,7 @@ class MemoryFile extends File{
 		$this->path=$name;
 	}
 	
-	public function appendNumberToNameIfExists() {
+	public function appendNumberToNameIfExists():string {
 		return $this->path;
 	}
 	

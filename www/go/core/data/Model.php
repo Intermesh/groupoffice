@@ -4,12 +4,13 @@ namespace go\core\data;
 
 use Exception;
 use go\core\App;
-use go\core\data\exception\NotArrayable;
 use go\core\util\DateTime;
+use InvalidArgumentException;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionMethod;
 use go\core\util\ArrayObject;
+
 
 /**
  * The abstract model class. 
@@ -45,11 +46,11 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * 2. Writable in the API if they have access public or setter = true
 	 *
 	 * @return array
-	 *@example GEt writable property names
+	 * @example GEt writable property names
 	 *
 	 * $writablePropNames = array_keys(array_filter($this->getApiProperties(), function($r) {return ($r['setter'] || $r['access'] = self::PROP_PUBLIC);}));
 	 *
-	 	 */
+	 */
 	public static function getApiProperties(): array
 	{
 		$cacheKey = 'api-props-' . static::class;
@@ -64,18 +65,15 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		$methods = $reflectionObject->getMethods(ReflectionMethod::IS_PUBLIC);
 
 		foreach ($methods as $method) {
-			/* @var $method ReflectionMethod */
 
 			if ($method->isStatic()) {
 				continue;
 			}
-
 			
 			if (substr($method->getName(), 0, 3) == 'get') {
 
 				$params = $method->getParameters();
 				foreach ($params as $p) {
-					/* @var $p ReflectionParameter */
 					if (!$p->isDefaultValueAvailable()) {
 						continue 2;
 					}
@@ -126,9 +124,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
    * Get the readable property names as array
    *
    * @return string[]
-   * @throws \ReflectionException
    */
-	protected static function getReadableProperties() {
+	protected static function getReadableProperties(): array
+	{
 		return array_keys(array_filter(static::getApiProperties(), function($props){
 			return $props['getter'] || $props['access'] == self::PROP_PUBLIC;
 		}));
@@ -138,15 +136,16 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
    * Get the readable property names as array
    *
    * @return string[]
-   * @throws \ReflectionException
    */
-	protected static function getWritableProperties() {
+	protected static function getWritableProperties(): array
+	{
 		return array_keys(array_filter(static::getApiProperties(), function($props){
 			return $props['setter'] || $props['access'] == self::PROP_PUBLIC;
 		}));
 	}
 
-	protected static function isProtectedProperty($name) {
+	protected static function isProtectedProperty($name): bool
+	{
 		$props = static::getApiProperties();
 
 		if(!isset($props[$name])) {
@@ -161,11 +160,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
    *
    * @param string[]|null $properties
    * @return array
-   * @throws \ReflectionException
    */
 	public function toArray(array $properties = null): array
 	{
-
 		$arr = [];
 		
 		if(empty($properties)) {
@@ -179,6 +176,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		return $arr;
 	}
 
+
 	protected function propToArray($name) {
 		$value = $this->getValue($name);
 		return $this->convertValueToArray($value);
@@ -186,11 +184,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 
 	/**
 	 * Converts value to an array if supported
-	 * 
-	 * 
+
 	 * @param mixed $value
-	 * @return DateTime
-	 * @throws NotArrayable
+	 * @return mixed
 	 */
 	public static function convertValueToArray($value) {
 		if ($value instanceof ArrayableInterface) {
@@ -214,10 +210,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			return (string) $value;
 		} else {
 			return $value;
-		} 
-		// else {
-		// 	throw new NotArrayable();
-		// }
+		}
 	}
 
 
@@ -238,11 +231,12 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
    * ```````````````````````````````````````````````````````````````````````````
    *
    *
-   * @param array $values ["propNamne" => "value"]
-   * @return \static
-   * @throws Exception
+   * @param array $values ["propName" => "value"]
+   * @return static
+   * @throws InvalidArgumentException
    */
-	public function setValues(array $values) {
+	public function setValues(array $values): Model
+	{
 		foreach($values as $name => $value) {
 			$this->setValue($name, $value);
 		}
@@ -258,14 +252,15 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
    * @param string $propName
    * @param mixed $value
    * @return $this
-   * @throws Exception
+   * @throws InvalidArgumentException
    */
-	public function setValue($propName, $value) {
+	public function setValue(string $propName, $value): Model
+	{
 
 		$props = $this->getApiProperties();
 
 		if(!isset($props[$propName])) {
-			throw new Exception("Not existing property $propName for " . static::class);
+			throw new InvalidArgumentException("Not existing property $propName for " . static::class);
 		}
 
 		if($props[$propName]['setter']) {
@@ -276,7 +271,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		}	else if($props[$propName]['getter']) {
 			go()->warn("Ignoring setting of read only property ". $propName ." for " . static::class);
 		} else{
-			throw new Exception("Invalid property ". $propName ." for " . static::class);
+			throw new InvalidArgumentException("Invalid property ". $propName ." for " . static::class);
 		}
 
 		return $this;
@@ -289,22 +284,22 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	protected function normalizeValue($propName, $value) {
+	protected function normalizeValue(string $propName, $value) {
 		return $value;
 	}
 
   /**
-   * Get's a public property. Also uses getters functions.
+   * Gets a public property. Also uses getters functions.
    *
    * @param string $propName
    * @return mixed
-   * @throws Exception
+   * @throws InvalidArgumentException
    */
-	public function getValue($propName) {
+	public function getValue(string $propName) {
 		$props = $this->getApiProperties();
 		
 		if(!isset($props[$propName])) {
-			throw new Exception("Not existing property $propName in " . static::class);
+			throw new InvalidArgumentException("Not existing property $propName in " . static::class);
 		}
 
 		if($props[$propName]['getter']) {
@@ -313,11 +308,12 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		} elseif($props[$propName]['access'] === self::PROP_PUBLIC){
 			return $this->{$propName};
 		}	else{
-			throw new Exception("Can't get write only property ". $propName . " in " . static::class);
+			throw new InvalidArgumentException("Can't get write only property ". $propName . " in " . static::class);
 		}
 	}
 	
-	public function jsonSerialize() {
+	public function jsonSerialize(): array
+	{
 		return $this->toArray();
 	}
 	
@@ -328,7 +324,8 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * 
 	 * @return string
 	 */
-	public static function getClassName() {
+	public static function getClassName(): string
+	{
 		$cls = static::class;
 		return substr($cls, strrpos($cls, '\\') + 1);
 	}

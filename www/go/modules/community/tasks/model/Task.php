@@ -13,6 +13,8 @@ use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
 use go\core\orm\Query;
@@ -175,15 +177,18 @@ class Task extends AclItemEntity {
 	 */
 	protected $timeBooked;
 
-	protected static function aclEntityClass(){
+	protected static function aclEntityClass(): string
+	{
 		return Tasklist::class;
 	}
 
-	protected static function aclEntityKeys(){
+	protected static function aclEntityKeys(): array
+	{
 		return ['tasklistId' => 'id'];
 	}
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 			->addTable("tasks_task", "task")
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
@@ -192,7 +197,8 @@ class Task extends AclItemEntity {
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 	}
 
-	public static function converters() {
+	public static function converters(): array
+	{
 		return array_merge(parent::converters(), [VCalendar::class, Spreadsheet::class]);
 	}
 
@@ -227,7 +233,8 @@ class Task extends AclItemEntity {
 		$this->recurrenceRule = $rrule;
 	}
 
-	protected static function textFilterColumns() {
+	protected static function textFilterColumns(): array
+	{
 		return ['title', 'description'];
 	}
 
@@ -248,7 +255,7 @@ class Task extends AclItemEntity {
 	protected function getSearchDescription(){
 		$tasklist = Tasklist::findById($this->tasklistId);
 		$desc = $tasklist->name;
-		if(!empty($this->responsibleUserId) && ($user = User::findById($this->responsibleUserId,['displayName']))) {
+		if(!empty($this->responsibleUserId) && ($user = User::findById($this->responsibleUserId, ['displayName']))) {
 			$desc .= ' - '.$user->displayName;
 		} else{
 			$desc .= ' - ' . go()->t("Unassigned", "community", "tasks");
@@ -257,7 +264,8 @@ class Task extends AclItemEntity {
 		return $desc;
 	}
 
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 
 		return parent::defineFilters()
 			->add('tasklistId', function(Criteria $criteria, $value, Query $query) {
@@ -329,7 +337,7 @@ class Task extends AclItemEntity {
 		return parent::internalValidate();
 	}
 
-	protected function internalSave()
+	protected function internalSave(): bool
 	{
 		if ($this->isNew()) {
 			$this->uid = \go\core\util\UUID::v4();
@@ -484,7 +492,7 @@ class Task extends AclItemEntity {
 		return $rule->current();
 	}
 
-	public static function sort(Query $query, array $sort)
+	public static function sort(Query $query, array $sort): Query
 	{
 		if(isset($sort['groupOrder'])) {
 			$query->join('tasks_tasklist_group', 'listGroup', 'listGroup.id = task.groupId', 'LEFT');
@@ -605,7 +613,7 @@ class Task extends AclItemEntity {
 		return false;
 	}
 
-	public function alertProps(CoreAlert $alert)
+	public function alertProps(CoreAlert $alert): array
 	{
 		if($alert->tag != 'assigned') {
 			return parent::alertProps($alert);

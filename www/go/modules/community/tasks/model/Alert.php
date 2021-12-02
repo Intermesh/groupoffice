@@ -7,6 +7,7 @@
 
 namespace go\modules\community\tasks\model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\orm\UserProperty;
 use go\core\util\DateTime;
@@ -51,7 +52,7 @@ class Alert extends UserProperty
 	/** @var string 'display' or 'email' */
 	protected $action = self::ActionDisplay;
 
-	protected static function defineMapping()
+	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()->addTable("tasks_alert", "alert");
 	}

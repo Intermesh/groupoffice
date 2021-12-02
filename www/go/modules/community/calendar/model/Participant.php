@@ -2,6 +2,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 
 /**
@@ -92,7 +93,8 @@ class Participant extends Property
 
     public $linkIds;
 
-    protected static function defineMapping() {
+    protected static function defineMapping(): Mapping
+    {
         return parent::defineMapping()->addTable("calendar_participant", "participant");
     }
 }

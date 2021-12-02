@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\comments\model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 
 /**
@@ -29,7 +30,8 @@ class CommentAttachment extends Property {
 
 	public $name;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 			->addTable("comments_comment_attachment");
 	}

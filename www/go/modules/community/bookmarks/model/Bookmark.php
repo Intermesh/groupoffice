@@ -3,6 +3,8 @@ namespace go\modules\community\bookmarks\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\modules\community\bookmarks\controller\Bookmark as GoBookmark;
 
@@ -70,12 +72,14 @@ class Bookmark extends AclItemEntity {
 	 */							
 	public $behaveAsModule = false;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("bookmarks_bookmark", "bookmarks");
 	}
 
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()->add('categoryId', function(Criteria $criteria, $value, Query $query, array $filter){
 			$criteria->andWhere('categoryId', '=', $value);
 		})->add('behaveAsModule', function(
@@ -85,7 +89,8 @@ class Bookmark extends AclItemEntity {
 		});
 	}
 
-	protected static function textFilterColumns() {
+	protected static function textFilterColumns(): array
+	{
 		return ['name', 'description'];
 	}
 
@@ -102,7 +107,8 @@ class Bookmark extends AclItemEntity {
 		}
 	}
 
-	protected static function aclEntityClass() {
+	protected static function aclEntityClass(): string
+	{
 		return Category::class;
 	}
 
@@ -111,7 +117,8 @@ class Bookmark extends AclItemEntity {
 	 * 
 	 * @return array eg. ['folderId' => 'id']
 	 */
-	protected static function aclEntityKeys() {
+	protected static function aclEntityKeys(): array
+	{
 		return ['categoryId' => 'id'];
 	}
 }

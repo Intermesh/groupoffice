@@ -1,6 +1,8 @@
 <?php
 namespace go\modules\community\test\model;
 
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\validate\ErrorCode;
 
@@ -31,7 +33,8 @@ class B extends A {
 	public $userId;
 	
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		$mapping = parent::defineMapping()
 			->addTable('test_b', 'b', ['id' => 'id'], null, ['userId' => go()->getUserId()])
 			->addQuery((new Query())->select("SUM(b.id) AS sumOfTableBIds")->join('test_b', 'bc', 'bc.id=a.id')->groupBy(['a.id']));
@@ -49,10 +52,11 @@ class B extends A {
 	 * @return C
 	 */
 	public function getC() {
-		return C::findById($this->cId);
+		return $this->cId ? C::findById($this->cId) : null;
 	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 						->add("propA", function(Query $query, $value, array $filter) {
 							$query->andWhere('propA', 'LIKE', $filter['propB'] . "%");
@@ -70,7 +74,8 @@ class B extends A {
 						});
 	}
 
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 
 		if($this->testSaveOtherModel) {
 			$other = new self;

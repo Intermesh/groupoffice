@@ -4,6 +4,8 @@ namespace go\core\model;
 
 use go\core\db\Criteria;
 use go\core\jmap\Entity;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 
@@ -39,18 +41,20 @@ class UserDisplay extends Entity {
 	 */
 	public $email;
 
-	protected static function textFilterColumns()
+	protected static function textFilterColumns(): array
 	{
 		return ['username', 'displayName', 'email'];
 	}
 
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 			->addTable('core_user', 'u');
 	}
 
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 			->add('permissionLevel', function(Criteria $criteria, $value, Query $query) {
 				if(!$query->isJoined('core_group', 'g')) {

@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\addressbook\model;
 						
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 						
 /**
@@ -19,7 +20,8 @@ class ContactCustomFields extends Property {
 	 */							
 	public $id;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("addressbook_contact_custom_fields");
 	}

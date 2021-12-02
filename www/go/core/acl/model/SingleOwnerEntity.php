@@ -16,9 +16,18 @@ abstract class SingleOwnerEntity extends Entity
 	 */
 	public $userId;
 
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null)
+	/**
+	 * @param Query $query
+	 * @param int $level
+	 * @param int|null $userId
+	 * @param array|null $groups
+	 * @return Query
+	 */
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null) : Query
 	{
 		$query->andWhere($query->getTableAlias() . '.userId', $userId);
+
+		return $query;
 	}
 
 	public function getPermissionLevel()

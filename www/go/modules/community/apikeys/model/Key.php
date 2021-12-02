@@ -2,6 +2,7 @@
 namespace go\modules\community\apikeys\model;
 
 use go\core\model\Token;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 
 class Key extends \go\core\jmap\Entity {
@@ -10,12 +11,14 @@ class Key extends \go\core\jmap\Entity {
 	public $accessToken;
 	public $createdAt;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable('apikeys_key', 'key');						
 	}
 	
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		
 		if($this->isNew()) {
 			$token = new Token();
@@ -32,7 +35,8 @@ class Key extends \go\core\jmap\Entity {
 		return parent::internalSave();
 	}
 	
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 		$q = clone $query;
 		$q->select('accessToken');
 

@@ -8,6 +8,8 @@ use go\core\model\Alert as CoreAlert;
 use go\core\model\UserDisplay;
 use go\core\orm\exception\SaveException;
 use go\core\model\Search;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\util\DateTime;
@@ -62,7 +64,8 @@ class Comment extends AclItemEntity {
 	 */
 	public $attachments = [];
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 			->addTable("comments_comment", 'c')
 			->addScalar('labels', 'comments_comment_label', ['id' => 'commentId'])
@@ -101,7 +104,8 @@ class Comment extends AclItemEntity {
 		return $this;
 	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 			->add('entityId', function(Criteria $criteria, $value) {
 				$criteria->where('c.entityId', '=', $value);
@@ -116,7 +120,8 @@ class Comment extends AclItemEntity {
 			}, null);
 	}
 	
-	public static function sort(Query $query, array $sort) {	
+	public static function sort(Query $query, array $sort): Query
+	{
 		if(empty($sort)) {
 			$sort = ['c.date' => 'ASC'];
 		}
@@ -185,10 +190,11 @@ class Comment extends AclItemEntity {
 	 * 
 	 * @param Query $query
 	 * @param int $level
-	 * @param int $userId Leave to null for the current user
+	 * @param int|null $userId Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	{
 		
 		return $query;
 	}
@@ -206,7 +212,7 @@ class Comment extends AclItemEntity {
 		return parent::internalValidate();
 	}
 
-	protected function internalSave()
+	protected function internalSave(): bool
 	{
 
 //		if($this->isNew()) {
@@ -250,7 +256,7 @@ class Comment extends AclItemEntity {
 //		}
 //	}
 
-	public function title()
+	public function title(): string
 	{
 		$entity = $this->findEntity();
 
@@ -262,12 +268,12 @@ class Comment extends AclItemEntity {
 		}
 	}
 
-	protected static function aclEntityClass()
+	protected static function aclEntityClass(): string
 	{
 		return Search::class;
 	}
 
-	protected static function aclEntityKeys()
+	protected static function aclEntityKeys(): array
 	{
 		return ['entityId' => 'entityId', 'entityTypeId' => 'entityTypeId'];
 	}

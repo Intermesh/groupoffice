@@ -7,6 +7,8 @@ use go\core\customfield\Base;
 use go\core\db\Criteria;
 use go\core\db\Table;
 use go\core\orm\EntityType;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
@@ -134,15 +136,18 @@ class Field extends AclItemEntity {
 	private $dataType;
 	
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('core_customfields_field', 'f');
 	}
 
-	protected static function aclEntityClass() {
+	protected static function aclEntityClass(): string
+	{
 		return FieldSet::class;
 	}
 
-	protected static function aclEntityKeys() {
+	protected static function aclEntityKeys(): array
+	{
 		return ['fieldSetId' => 'id'];
 	}
 	
@@ -280,7 +285,8 @@ class Field extends AclItemEntity {
 		$this->getDataType()->setValues($values);
 	}
 
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		if(!parent::internalSave()) {
 			return false;
 		}
@@ -324,7 +330,8 @@ class Field extends AclItemEntity {
 		go()->getCache()->delete($cacheKey);
 	}
 
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 		try {
 			go()->getDbConnection()->pauseTransactions();
 			$fields = Field::find()->mergeWith($query);
@@ -365,7 +372,8 @@ class Field extends AclItemEntity {
 		return $this->tableName;
 	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 						->add('fieldSetId', function (Criteria $criteria, $value){
 							$criteria->andWhere(['fieldSetId' => $value]);

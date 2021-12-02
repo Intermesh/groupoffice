@@ -1,9 +1,9 @@
-<?php
+<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
 
 namespace go\core\acl\model;
 
 use Exception;
-use go\core\exception\Forbidden;
+use GO\Base\Db\ActiveRecord;
 use go\core\model\Acl;
 use go\core\model\User;
 use go\core\orm\Query;
@@ -40,29 +40,30 @@ abstract class AclItemEntity extends AclEntity {
 	 * 
 	 * @return string 
 	 */
-	abstract protected static function aclEntityClass();
+	abstract protected static function aclEntityClass(): string;
 
 	/**
 	 * Get the keys for joining the aclEntityClass table.
 	 * 
 	 * @return array eg. ['folderId' => 'id']
 	 */
-	abstract protected static function aclEntityKeys();
+	abstract protected static function aclEntityKeys(): array;
 
 	/**
 	 * Applies conditions to the query so that only entities with the given permission level are fetched.
 	 *
 	 * @param Query $query
 	 * @param int $level
-	 * @param int $userId Defaults to current user ID
-	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
+	 * @param int|null $userId Defaults to current user ID
+	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @return Query
 	 * @throws Exception
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	{
 
 		if(User::isAdminById($userId ?? go()->getAuthState()->getUserId())) {
-			return;
+			return $query;
 		}
 		/**
 		 * SELECT SQL_CALC_FOUND_ROWS SQL_NO_CACHE c.id
@@ -165,7 +166,8 @@ abstract class AclItemEntity extends AclEntity {
 	 * @return boolean
 	 * @throws Exception
 	 */
-	protected static function logDeleteChanges(Query $query) {
+	protected static function logDeleteChanges(Query $query): bool
+	{
 
 		$table = self::getMapping()->getPrimaryTable();
 		$changes = clone $query;
@@ -186,7 +188,8 @@ abstract class AclItemEntity extends AclEntity {
 	 * @return string Alias for the acl column. For example: "addressbook.aclId"
 	 * @throws Exception
 	 */
-	public static function joinAclEntity(DbQuery $query, $fromAlias = null) {
+	public static function joinAclEntity(DbQuery $query, $fromAlias = null): string
+	{
 		$cls = static::aclEntityClass();
 
 		/* @var $cls Entity */
@@ -202,6 +205,10 @@ abstract class AclItemEntity extends AclEntity {
 			$keys[] = $fromAlias . '.' . $from . ' = ' . $column->table->getAlias() . ' . '. $to;
 		}
 
+		if(!$query->isJoined($column->table->getName(), $column->table->getAlias())) {
+			$query->join($column->table->getName(), $column->table->getAlias(), implode(' AND ', $keys));
+		}
+
 		// Override didn't work because on delete it did need to be joined.
 //		if($query->isJoined($column->table->getName(), $column->table->getAlias())) {
 //			throw new \Exception(
@@ -209,11 +216,6 @@ abstract class AclItemEntity extends AclEntity {
 //				"` was already joined with alias `" .  $column->table->getAlias() .
 //				"` in class " . static::class . ". If you joined this table via defineMapping() then override the method joinAclEntity() and return '" . $column->table->getAlias() . '.' . $cls::$aclColumnName ."'.") ;
 //		}
-
-		if(!$query->isJoined($column->table->getName(), $column->table->getAlias())) {
-			$query->join($column->table->getName(), $column->table->getAlias(), implode(' AND ', $keys));
-		}
-		
 		
 		//If this is another AclItemEntity then recurse
 		if(is_a($cls, AclItemEntity::class, true)) {
@@ -228,10 +230,11 @@ abstract class AclItemEntity extends AclEntity {
 
 			return $column->table->getAlias() . '.' . $cls::$aclColumnName;
 		}
-	}	
+	}
 
 	/**
 	 * Get the table alias holding the aclId
+	 * @throws Exception
 	 */
 	public static function getAclEntityTableAlias() {
 
@@ -253,13 +256,15 @@ abstract class AclItemEntity extends AclEntity {
 			return $aclColumn->table->getAlias();
 		}
 	}
-	
+
 	/**
 	 * Get the entity that holds the acl id.
-	 * 
-	 * @return Entity
+	 *
+	 * @return Entity|ActiveRecord
+	 * @throws Exception
 	 */
-	protected function getAclEntity() {
+	protected function getAclEntity()
+	{
 		$cls = static::aclEntityClass();
 
 		/* @var $cls Entity */
@@ -287,7 +292,7 @@ abstract class AclItemEntity extends AclEntity {
 		return $this->isModified(array_keys(static::aclEntityKeys()));
 	}
 
-	protected function internalSave()
+	protected function internalSave(): bool
 	{
 		if(!$this->isNew() && $this->isAclChanged()) {
 			static::fireEvent(self::EVENT_ACL_CHANGED, $this);
@@ -298,6 +303,7 @@ abstract class AclItemEntity extends AclEntity {
 
 	/**
 	 * @inheritDoc
+	 * @throws Exception
 	 */
 	public function getPermissionLevel() {
 
@@ -320,10 +326,10 @@ abstract class AclItemEntity extends AclEntity {
 	 * 
 	 * @return Query
 	 */
-	public static function findAcls() {
-
+	public static function findAcls(): Query
+	{
 		$cls = static::aclEntityClass();
-
+		/** @var Entity $cls */
 		return $cls::findAcls();
 	}
 
@@ -333,7 +339,8 @@ abstract class AclItemEntity extends AclEntity {
 	 * @return int
 	 * @throws Exception
 	 */
-	public function findAclId() {
+	public function findAclId(): int
+	{
 		return $this->getAclEntity()->findAclId();
 	}
 
