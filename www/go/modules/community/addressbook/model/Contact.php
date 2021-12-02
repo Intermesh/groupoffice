@@ -8,6 +8,8 @@ use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Entity;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
@@ -350,18 +352,20 @@ class Contact extends AclItemEntity {
 	protected $uri;
 	
 	
-	protected static function aclEntityClass(): string {
+	protected static function aclEntityClass(): string
+	{
 		return AddressBook::class;
 	}
 
-	protected static function aclEntityKeys(): array {
+	protected static function aclEntityKeys(): array
+	{
 		return ['addressBookId' => 'id'];
 	}
 
   /**
    * @inheritDoc
    */
-	protected static function defineMapping(): \go\core\orm\Mapping
+	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 						->addTable("addressbook_contact", 'c')
@@ -434,7 +438,7 @@ class Contact extends AclItemEntity {
 						->where(['e.number' => $number]);
 	}
 	
-	protected static function defineFilters(): \go\core\orm\Filters
+	protected static function defineFilters(): Filters
 	{
 
 		return parent::defineFilters()
@@ -937,7 +941,7 @@ class Contact extends AclItemEntity {
 		return $this->findOrganizations()->all();
 	}
 
-	public static function atypicalApiProperties()
+	public static function atypicalApiProperties() : array
 	{
 		return array_merge(parent::atypicalApiProperties(), ['organizations']);
 	}
@@ -1006,7 +1010,8 @@ class Contact extends AclItemEntity {
 			$keywords[] = $e->email;
 		}
 		foreach($this->phoneNumbers as $e) {
-			$keywords[] = preg_replace("/[^0-9+]/", "", $e->number);
+			$santiziedNumber = preg_replace("/[^0-9+]/", "", $e->number);
+			$keywords = array_merge($keywords, SearchableTrait::numberToKeywords($santiziedNumber));
 		}
 		if(!$this->isOrganization) {
 			$keywords = array_merge($keywords, $this->findOrganizations()->selectSingleValue('name')->all());
@@ -1312,7 +1317,7 @@ class Contact extends AclItemEntity {
 	 * @param array $p
 	 * @throws Exception
 	 */
-  protected function mergeProp(Entity $entity, $name, $p)
+  protected function mergeProp(Entity $entity, string $name, array $p)
   {
   	//Groups can't be merged if addressbook is different.
   	if($name == "groups" && $entity->addressBookId != $this->getOldValue("addressBookId")) {

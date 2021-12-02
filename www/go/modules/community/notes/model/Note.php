@@ -5,6 +5,8 @@ use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\model\EmailTemplateAttachment;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
@@ -53,17 +55,20 @@ class Note extends AclItemEntity {
 	 */
 	protected $images = [];
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("notes_note", "n")
 						->addScalar('images', 'notes_note_image', ['id' => 'noteId']);
 	}
 
-	protected static function aclEntityClass() {
+	protected static function aclEntityClass(): string
+	{
 		return NoteBook::class;
 	}
 
-	protected static function aclEntityKeys() {
+	protected static function aclEntityKeys(): array
+	{
 		return ['noteBookId' => 'id'];
 	}
 
@@ -71,7 +76,8 @@ class Note extends AclItemEntity {
 		return preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
 	}
 
-	public function title() {
+	public function title(): string
+	{
 		return $this->name;
 	}
 
@@ -80,11 +86,13 @@ class Note extends AclItemEntity {
 	 * 
 	 * @return string[]
 	 */
-	protected static function textFilterColumns() {
+	protected static function textFilterColumns(): array
+	{
 		return ['name', 'content'];
 	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 						->add('noteBookId', function(Criteria $criteria, $value) {
 							if(!empty($value)) {
@@ -110,7 +118,7 @@ class Note extends AclItemEntity {
 	}
 
 
-	protected function internalSave()
+	protected function internalSave(): bool
 	{
 		$this->images = Blob::parseFromHtml($this->content);
 		return parent::internalSave();
@@ -120,7 +128,7 @@ class Note extends AclItemEntity {
 	/**
 	 * @inheritDoc
 	 */
-	public static function converters()
+	public static function converters(): array
 	{
 		return array_merge(parent::converters(), [Spreadsheet::class]);
 	}

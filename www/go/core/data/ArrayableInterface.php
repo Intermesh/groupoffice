@@ -11,12 +11,12 @@ namespace go\core\data;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 interface ArrayableInterface {
-	
+
 	/**
 	 * Convert this model to an array for the API
-	 * 
-	 * @param string $properties
+	 *
+	 * @param string[]|null $properties
 	 * @return array Key value array of the object properties
 	 */
-	public function toArray($properties = null);
+	public function toArray(array $properties = null): array;
 }

@@ -9,6 +9,7 @@
  */
 namespace GO\Calendar\Model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use GO\Calendar\Controller\EventController;
 /**
@@ -30,7 +31,8 @@ class UserSettings extends Property {
 	public $check_conflict;
 	public $user_id;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable("cal_settings", "cals");
 	}
 	

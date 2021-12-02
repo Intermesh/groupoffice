@@ -2,9 +2,9 @@
 
 namespace go\core\fs;
 
-use Exception;
 use go\core\App;
 use go\core\util\DateTime;
+use InvalidArgumentException;
 
 /**
  * Base class for files and folders on the filesystem
@@ -27,34 +27,19 @@ abstract class FileSystemObject {
 	 * Constructor of a file or folder
 	 *
 	 * @param string $path The absolute path must be suplied
-	 * @throws Exception
+	 * @throws InvalidArgumentException
 	 */
-	public function __construct($path) {
+	public function __construct(string $path) {
 
 		$path = rtrim($path, '/');
-//		\go\core\App::get()->debug("FS construct $path");
 
 		if (empty($path)) {
-			throw new Exception("Path may not be empty in Base");
+			throw new InvalidArgumentException("Path may not be empty in Base");
 		}
-
-		//normalize path slashes
-//		if(\go\core\App::get()->server()->isWindows())
-//			$path=str_replace('\\','/', $path);
-
 
 		if (!$this->checkPathInput($path)) {
-			throw new Exception("The supplied path '$path' was invalid");
+			throw new InvalidArgumentException("The supplied path '$path' was invalid");
 		}
-
-//		$parent = dirname($path);
-//		if ($parent != '/') {
-//			$this->path = $parent;
-//		} else {
-//			$this->path = '';
-//		}
-//
-//		$this->path .= '/' . self::utf8Basename($path);
 
 		$this->path = $path;
 	}

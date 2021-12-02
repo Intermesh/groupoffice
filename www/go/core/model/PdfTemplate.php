@@ -6,6 +6,8 @@ use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
 use \go\core\model\PdfBlock;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 
 /**
  * The Pdf model
@@ -104,14 +106,16 @@ class PdfTemplate extends Entity {
 	 */
 	public $blocks = [];
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 			->addTable('core_pdf_template')
 			->addArray('blocks', PdfBlock::class, ['id' => 'pdfTemplateId']);
 
 	}
 
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 			->add('module', function (Criteria $criteria, $module){
 				$module = Module::findByName($module['package'], $module['name']);

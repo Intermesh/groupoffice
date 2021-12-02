@@ -20,6 +20,15 @@ XX-09-20216.6.10
 
 
 
+29-11-2021 6.5.90
+- Leavedays: Manager column was sortable but is not supported by the server
+- Email: Check if node was found to prevent node.getUI() error
+- Email: Fix for winmail.dat attachments
+- Core: Fixed upload on iOS devices
+- Email: Empty window on ios devices when opening attachments
+- Addressbook: Index phonenumbers so they can be found on partials
+- Core: Sort links on modified at date descending
+
 26-11-2021 6.5.89
 - Remove obsolete timeentrydata module
 - Business: added sortOrder field to business_activity, made sortable by dragging and dropping

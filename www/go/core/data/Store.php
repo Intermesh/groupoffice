@@ -3,6 +3,7 @@
 namespace go\core\data;
 
 use Closure;
+use Countable;
 use Exception;
 use IteratorAggregate;
 use Traversable;
@@ -38,7 +39,7 @@ use Traversable;
   }
  * ```````````````````````````````````````````````````````````````````````````
  */
-class Store implements IteratorAggregate, ArrayableInterface, \Countable  {
+class Store implements IteratorAggregate, ArrayableInterface, Countable  {
 
 	/**
 	 * The traversable object in the store.
@@ -54,10 +55,9 @@ class Store implements IteratorAggregate, ArrayableInterface, \Countable  {
 	/**
 	 * Constructor of the store
 	 *
-	 * @param Finder|array $traversable
-	 * @throws Exception
+	 * @param Traversable|null $traversable
 	 */
-	public function __construct($traversable = null) {
+	public function __construct(Traversable $traversable = null) {
 		$this->traversable = $traversable;
 	}
 
@@ -78,7 +78,7 @@ class Store implements IteratorAggregate, ArrayableInterface, \Countable  {
 	 * @param string $storeField Name of the field in all store records
 	 * @param Closure $function The function is called with the {@see Model} as argument
 	 */
-	public function format($storeField, Closure $function) {
+	public function format(string $storeField, Closure $function) {
 		$this->formatters[$storeField] = $function;
 	}	
 
@@ -90,17 +90,18 @@ class Store implements IteratorAggregate, ArrayableInterface, \Countable  {
 		return $record;
 	}
 
-	
+
 	/**
 	 * Convert collection to API array
-	 * 
+	 *
 	 * {@see \go\core\data\Model::toArray()}
-	 * 
-	 * @param string $properties
+	 *
+	 * @param array|null $properties
 	 * @return array
 	 */
 	
-	public function toArray($properties = []) {
+	public function toArray(array $properties = null): array
+	{
 		$records = [];
 		
 		foreach ($this->getIterator() as $model) {
@@ -118,7 +119,7 @@ class Store implements IteratorAggregate, ArrayableInterface, \Countable  {
 
 	/**
 	 * 
-	 * @return \Traversable
+	 * @return Traversable
 	 */
 	public function getIterator() {
 		return $this->traversable;
@@ -128,13 +129,17 @@ class Store implements IteratorAggregate, ArrayableInterface, \Countable  {
 	 * Get the next record of the store iterator
 	 * 
 	 * @return $this
+	 * @noinspection PhpPossiblePolymorphicInvocationInspection
+	 * @noinspection PhpPossiblePolymorphicInvocationInspection
 	 */
-	public function next() {		
+	public function next(): Store
+	{
 		$this->getIterator()->next();
 		return $this->getIterator()->current();
 	}
 
-	public function count() {
+	public function count(): int
+	{
 		return is_array($this->traversable) ? count($this->traversable) : iterator_count($this->traversable);
 	}
 

@@ -12,6 +12,7 @@ use go\core\model\Module;
 use go\core\jmap;
 use go\core\model\Acl;
 use InvalidArgumentException;
+use PDOException;
 
 /**
  * The EntityType class
@@ -123,7 +124,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$record['clientName'] = $clientName;
 			try {
 				App::get()->getDbConnection()->insert('core_entity', $record)->execute();
-			} catch(\PDOException $e) {
+			} catch(PDOException $e) {
 				ErrorHandler::log("Failed to register new entity type for class '$className'.");
 				go()->debug($c);
 				throw $e;
@@ -156,7 +157,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
    * The highest mod sequence used for JMAP data sync
    *
    * @return int
-   * @throws Exception
+   * @throws PDOException
    */
 	public function getHighestModSeq() {
 		if(isset($this->highestModSeq)) {
@@ -474,7 +475,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
    * Get the modSeq for the user specific properties.
    *
    * @return string
-   * @throws Exception
+   * @throws PDOException
    */
 	public function getHighestUserModSeq() {
 		if(!isset($this->highestUserModSeq)) {
@@ -691,7 +692,8 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		return $a->save();
 	}
 
-	public function toArray($properties = null) {
+	public function toArray(array $properties = null): array
+	{
 		return [
 				"name" => $this->getName(),
 				"isAclOwner" => $this->isAclOwner(),

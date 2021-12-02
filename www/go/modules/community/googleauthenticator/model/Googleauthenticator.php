@@ -4,6 +4,7 @@ namespace go\modules\community\googleauthenticator\model;
 
 use Exception;
 use go\core\App;
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR.'util'.DIRECTORY_SEPARATOR.'QRcode.php';
@@ -25,7 +26,8 @@ class Googleauthenticator extends Property {
 	
 	protected $codeLength = 6;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable("googleauth_secret");
 	}
 	
@@ -55,7 +57,8 @@ class Googleauthenticator extends Property {
 		return parent::internalValidate();
 	}
 	
-	protected function internalSave(){
+	protected function internalSave(): bool
+	{
 		
 		if(empty($this->secret)) {
 			$this->secret = $this->createSecret();

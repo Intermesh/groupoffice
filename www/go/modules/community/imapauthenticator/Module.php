@@ -22,7 +22,8 @@ class Module extends core\Module implements DomainProvider {
 		return parent::afterInstall($model);
 	}
 	
-	public static function getDomainNames() {
+	public static function getDomainNames(): array
+	{
 		return (new Query)
 						->selectSingleValue('name')
 						->from('imapauth_server_domain')

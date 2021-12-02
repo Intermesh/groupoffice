@@ -1,12 +1,15 @@
 <?php
 namespace go\core\jmap;
 
+use go\core\http\Response as HttpResponse;
+
 /**
  * JMAP Response object
  * 
  * Uses application/json and formats every method output according to the JSON spec.
  */
-class Response extends \go\core\http\Response {
+class Response extends HttpResponse
+{
 	
 	private $clientCallId;
 	
@@ -30,9 +33,9 @@ class Response extends \go\core\http\Response {
 	/**
 	 * Output a response
 	 * 
-	 * @param array $responseData eg. ['resultName, ['data']];
+	 * @param array|null $responseData eg. ['resultName, ['data']];
 	 */
-	public function addResponse($responseData = null) {		
+	public function addResponse(array $responseData = null) {
 		$this->data[] = [$this->methodName,  $responseData, $this->clientCallId];
 		
 		if($this->methodName != "community/dev/Debugger/get") {
@@ -44,9 +47,9 @@ class Response extends \go\core\http\Response {
 	/**
 	 * Output an error
 	 * 
-	 * @param array $responseData eg. ['resultName, ['data']];
+	 * @param array|null $responseData eg. ['resultName, ['data']];
 	 */
-	public function addError($responseData = null) {		
+	public function addError(array $responseData = null) {
 		$this->data[] = ["error",  $responseData, $this->clientCallId];
 	}
 	
@@ -61,7 +64,8 @@ class Response extends \go\core\http\Response {
 	 * 
 	 * @return array
 	 */
-	public function getData() {
+	public function getData(): array
+	{
 		return $this->data;
 	}
 	

@@ -5,9 +5,7 @@ use Exception;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\orm\Query;
-use go\core\exception\Forbidden;
 use go\core\db\Expression;
-use ReflectionException;
 
 /**
  * The AclEntity
@@ -34,8 +32,8 @@ abstract class AclOwnerEntity extends AclEntity {
 
 	public static $aclColumnName = 'aclId';
 
-
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		
 		if(!isset($this->{static::$aclColumnName})) {
 			$this->createAcl();
@@ -66,7 +64,8 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * 
 	 * @return array [groupId => [newLevel, oldLevel]]
 	 */
-	protected function getAclChanges() {
+	protected function getAclChanges(): array
+	{
 		return $this->aclChanges;
 	}
 
@@ -76,7 +75,8 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return bool
 	 * @throws Exception
 	 */
-	protected function saveAcl() {
+	protected function saveAcl(): bool
+	{
 		if(!isset($this->setAcl)) {
 			return true;
 		}
@@ -113,7 +113,8 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return array eg. ["2" => 50, "3" => 10]
 	 * @throws Exception
 	 */
-	public function getAcl() {
+	public function getAcl(): ?array
+	{
 		$a = $this->findAcl();
 
 		if(empty($a->groups)) {
@@ -136,7 +137,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	/**
 	 * Set the ACL
 	 * 
-	 * @param string $acl An array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
+	 * @param array $acl An array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
 	 * 
 	 * @example
 	 * ```
@@ -153,20 +154,12 @@ abstract class AclOwnerEntity extends AclEntity {
 	/**
 	 * Permissions are set via AclOwnerEntity models through setAcl(). When this property is used it will configure the Acl models.
 	 * This permission is not checked in the controller as usual but checked on save here.
-	 * @throws Exception
-	 * @return void
+
+	 * @return bool
 	 */
-	protected function checkManagePermission() {
+	protected function checkManagePermission(): bool
+	{
 		return $this->hasPermissionLevel(Acl::LEVEL_MANAGE);
-//		if($this->findAcl()->ownedBy == go()->getUserId()) {
-//			return;
-//		}
-//
-//		if(!$this->findAcl()->hasPermissionLevel(Acl::LEVEL_MANAGE)) {
-//			throw new Forbidden("You are not allowed to manage permissions on this ACL");
-//		}
-//
-//		return;
 	}
 
 	/**
@@ -202,6 +195,10 @@ abstract class AclOwnerEntity extends AclEntity {
 		return $this->isModified([static::$aclColumnName]);
 	}
 
+
+	/**
+	 * @throws Exception
+	 */
 	private function setAclProps() {
 		$aclColumn = $this->getMapping()->getColumn(static::$aclColumnName);
 
@@ -232,7 +229,8 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return boolean
 	 * @throws Exception
 	 */
-	protected static function logDeleteChanges(Query $query) {
+	protected static function logDeleteChanges(Query $query): bool
+	{
 
 		$changes = clone $query;
 
@@ -243,7 +241,8 @@ abstract class AclOwnerEntity extends AclEntity {
 		return static::entityType()->changes($changes);
 	}
 	
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 
 		$aclsToDelete = static::getAclsToDelete($query);
 
@@ -272,10 +271,11 @@ abstract class AclOwnerEntity extends AclEntity {
 
 	/**
 	 * @param Query $query
-	 * @return mixed[]
+	 * @return array
 	 * @throws Exception
 	 */
-	protected static function getAclsToDelete(Query $query) {
+	protected static function getAclsToDelete(Query $query): array
+	{
 
 		if(!empty(self::$keepAcls[static::class])) {
 			return [];
@@ -293,7 +293,8 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return Acl
 	 * @throws Exception
 	 */
-	public function findAcl() {
+	public function findAcl(): ?Acl
+	{
 		if(empty($this->{static::$aclColumnName})) {
 			return null;
 		}
@@ -309,7 +310,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * 
 	 * @return int
 	 */
-	protected function internalGetPermissionLevel() {
+	protected function internalGetPermissionLevel() : int {
 
 		if($this->isNew() && !$this->{static::$aclColumnName}) {
 			return parent::getPermissionLevel();
@@ -340,12 +341,13 @@ abstract class AclOwnerEntity extends AclEntity {
 	 *
 	 * @param Query $query
 	 * @param int $level
-	 * @param int $userId
-	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
+	 * @param int|null $userId
+	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @return Query
 	 * @throws Exception
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {			
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	{
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
 		$tableAlias = $firstTable->getAlias();
@@ -365,13 +367,14 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @see \go\core\jmap\EntityController::getUpdates()
 	 *
 	 */
-	public static function findAcls() {
+	public static function findAcls(): Query
+	{
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
 		return (new Query)->selectSingleValue(static::$aclColumnName)->distinct()->from($firstTable->getName());
 	}
 	
-	public function findAclId() {
+	public function findAclId():int {
 		return $this->{static::$aclColumnName};
 	}
 
@@ -380,11 +383,13 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @throws Exception
 	 */
 	public static function getAclEntityTableAlias() {
+		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 		return static::getMapping()->getColumn(static::$aclColumnName)->table->getAlias();
 	}
 
 	/**
 	 * Check database integrity
+	 * @throws Exception
 	 */
 	public static function check()
 	{
@@ -401,7 +406,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 *
 	 * When ACL's are no longer used they may be cleaned up.
 	 *
-	 * @throws \go\core\exception\ConfigurationException
+	 * @throws Exception
 	 */
 	public static function checkAcls() {
 		$table = static::getMapping()->getPrimaryTable();

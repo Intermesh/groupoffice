@@ -5,9 +5,13 @@ use GO\Base\Mail\SmimeMessage;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\TemplateParser;
 use go\core\validate\ErrorCode;
 use go\modules\community\addressbook\model\EmailAddress;
+use Swift_Attachment;
+use Swift_EmbeddedFile;
 
 /**
  * E-mail template model
@@ -72,7 +76,7 @@ class EmailTemplate extends AclOwnerEntity
 	public $attachments = [];
 
 
-	protected static function defineMapping()
+	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()		
 			->addTable("core_email_template", "newsletter")
@@ -80,7 +84,8 @@ class EmailTemplate extends AclOwnerEntity
 	}
 
 
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 			->add('module', function (Criteria $criteria, $module){
         $module = Module::findByName($module['package'], $module['name']);
@@ -91,11 +96,12 @@ class EmailTemplate extends AclOwnerEntity
 			})
 			->add('key', function (Criteria $criteria, $value){
 				$criteria->where(['key' => $value]);
-			});;
+			});
 					
 	}
 
-	protected static function textFilterColumns() {
+	protected static function textFilterColumns(): array
+	{
 		return ['name'];
 	}
 	
@@ -115,7 +121,7 @@ class EmailTemplate extends AclOwnerEntity
     $this->moduleId = $module->id;
   }
 
-	protected function internalSave()
+	protected function internalSave(): bool
 	{		
 		$this->parseImages();
 
@@ -138,7 +144,7 @@ class EmailTemplate extends AclOwnerEntity
 				$existing[$blobId]->inline = true;
 				$this->attachments[] = $existing[$blobId];
 			} else {
-				$this->attachments[] = (new EmailTemplateAttachment())->setValues(['blobId' => $blobId, 'name' => $blob->name, 'inline' => true]);
+				$this->attachments[] = (new EmailTemplateAttachment($this))->setValues(['blobId' => $blobId, 'name' => $blob->name, 'inline' => true]);
 			}			
 		}
 
@@ -149,7 +155,7 @@ class EmailTemplate extends AclOwnerEntity
 		}
 	}
 
-	public function toArray($properties = [])
+	public function toArray(array $properties = null): array
 	{
 		$array =  parent::toArray($properties);
 
@@ -167,7 +173,6 @@ class EmailTemplate extends AclOwnerEntity
 	 *
 	 * @param TemplateParser $templateParser
 	 * @return \go\core\mail\Message
-	 * @throws \go\core\exception\ConfigurationException
 	 */
 	public function toMessage(TemplateParser $templateParser) {
   	$message = go()->getMailer()->compose();

@@ -2,6 +2,7 @@
 namespace go\modules\community\addressbook\model;
 						
 use go\core\model\User;
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 						
 /**
@@ -77,7 +78,8 @@ class Address extends Property {
 	public $latitude;
 	public $longitude;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("addressbook_address");
 	}

@@ -6,6 +6,7 @@ use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
 use go\core\Environment;
+use go\core\orm\Mapping;
 use stdClass;
 use go\core\http\Request;
 use go\core\http\Response;
@@ -104,7 +105,8 @@ class Token extends Entity {
 	 */
 	const LOGIN_LIFETIME = 'PT10M';
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 		->addTable('core_auth_token', 'token');
 	}
@@ -436,7 +438,7 @@ class Token extends Entity {
 				->andWhere('expiresAt', '<', new DateTime()));
 	}
 
-	protected static function internalDelete(\go\core\orm\Query $query)
+	protected static function internalDelete(\go\core\orm\Query $query): bool
 	{
 		foreach(self::find()->mergeWith($query)->selectSingleValue('accessToken') as $accessToken) {
 			go()->getCache()->delete('token-' . $accessToken);

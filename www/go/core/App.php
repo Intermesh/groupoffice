@@ -13,7 +13,6 @@ use go\core\db\Query;
 use go\core\db\Table;
 use go\core\event\EventEmitterTrait;
 use go\core\event\Listeners;
-use go\core\exception\ConfigurationException;
 use go\core\fs\Blob;
 use go\core\fs\Folder;
 use go\core\jmap\Request;
@@ -212,15 +211,18 @@ use const GO_CONFIG_FILE;
 			return new Folder($this->getConfig()['file_storage_path']);
 		}
 
+		/**
+		 * @var int
+		 */
 		private $storageQuota;
 
 		/**
 		 * Get total space of the data folder in bytes
 		 *
-		 * @return float
-		 * @throws ConfigurationException
+		 * @return int
 		 */
-		public function getStorageQuota() {
+		public function getStorageQuota(): int
+		{
 			if(!isset($this->storageQuota)) {
 				$this->storageQuota = $this->getConfig()['quota'];
 				if(empty($this->storageQuota)) {
@@ -242,10 +244,10 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get free space in bytes
 		 *
-		 * @return float
-		 * @throws ConfigurationException
+		 * @return int
 		 */
-		public function getStorageFreeSpace() {
+		public function getStorageFreeSpace(): int
+		{
 			if(!isset($this->storageFreeSpace)) {
 				$quota = $this->getConfig()['quota'];
 				if(empty($quota)) {
@@ -270,8 +272,7 @@ use const GO_CONFIG_FILE;
 		 * Get the temporary files folder
 		 *
 		 * @return Folder
-		 * @throws ConfigurationException
-		 * @throws Exception
+		 * @throws InvalidArgumentException
 		 */
 		public function getTmpFolder(): Folder
 		{
@@ -317,7 +318,7 @@ use const GO_CONFIG_FILE;
 				if (file_exists($globalConfigFile)) {
 					require($globalConfigFile);
 				}
-			}catch(\Exception $e) {
+			}catch(Exception $e) {
 				//openbasedir might complain here. Ignore.
 				
 			}
@@ -346,9 +347,9 @@ use const GO_CONFIG_FILE;
      * Get the configuration data from config.php and globalconfig.inc.php
      *
      * @return array
-     * @throws ConfigurationException
      */
-		public function getConfig() {
+		public function getConfig(): array
+		{
 
 			if (isset($this->config)) {
 				return $this->config;
@@ -430,9 +431,9 @@ use const GO_CONFIG_FILE;
 		 * Get the database connection
 		 *
 		 * @return Connection
-		 * @throws ConfigurationException
 		 */
-		public function getDbConnection() {
+		public function getDbConnection(): Connection
+		{
 			if (!isset($this->dbConnection)) {
 				$config = $this->getConfig();
 				$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port']  . ';dbname=' . $config['db_name'];
@@ -471,13 +472,12 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get a simple key value caching object
 		 *
-		 * @return Cache\Apcu
-		 * @throws ConfigurationException
+		 * @return CacheInterface
 		 */
-		public function getCache() {
+		public function getCache(): CacheInterface
+		{
 			if (!isset($this->cache)) {				
 				$cls = $this->getConfig()['cache'];
-				// go()->log("Using cache: " . $cls);
 				$this->cache = new $cls;
 			}
 			return $this->cache;
@@ -491,10 +491,11 @@ use const GO_CONFIG_FILE;
 		 *
 		 * @param string $package Set to null for legacy modules
 		 * @param string $name
-		 * @return \go\core\model\Module
+		 * @return model\Module
 		 * @throws Exception
 		 */
-		public function getModule($package, $name) {
+		public function getModule($package, $name): model\Module
+		{
 
 			$cacheKey = 'getModule-' . $package .'-'.$name;
 
@@ -532,7 +533,6 @@ use const GO_CONFIG_FILE;
 		 * Destroys all cache and reinitializes event listeners and sync state.
 		 *
 		 * @param boolean $onDestruct
-		 * @throws ConfigurationException
 		 */
 		public function rebuildCache($onDestruct = false) {
 			
@@ -565,7 +565,9 @@ use const GO_CONFIG_FILE;
 		
 		public function __destruct() {
 			if($this->rebuildCacheOnDestruct) {
+
 				$this->rebuildCache();
+
 			}
 		}
 
@@ -574,7 +576,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return Debugger
 		 */
-		public function getDebugger() {
+		public function getDebugger(): Debugger
+		{
 			if (!isset($this->debugger)) {
 				$this->debugger = new Debugger();
 			}
@@ -730,18 +733,18 @@ use const GO_CONFIG_FILE;
 						return $workingFile;
 					}
 				}
-				catch(\Exception $e) {
+				catch(Exception $e) {
 					//ignore open_basedir error
 				}
 			}
 			
-			$workingFile = dirname(dirname(__DIR__)) . '/' . $name;
+			$workingFile = dirname(__DIR__, 2) . '/' . $name;
 			try {
 				if (file_exists($workingFile)) {
 					return $workingFile;
 				}
 			}
-			catch(\Exception $e) {
+			catch(Exception $e) {
 				//ignore open_basedir error
 			}
 
@@ -751,7 +754,7 @@ use const GO_CONFIG_FILE;
 					return $workingFile;
 				}
 			}
-			catch(\Exception $e) {
+			catch(Exception $e) {
 				//ignore open_basedir error
 			}
 			
@@ -822,7 +825,6 @@ use const GO_CONFIG_FILE;
 
 		public function demo(Faker\Generator $faker) {
 
-return;
 
 			for($i = 0; $i < 10; $i++) {
 				echo ".";

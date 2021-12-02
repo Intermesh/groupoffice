@@ -2,16 +2,12 @@
 namespace go\core\data\convert;
 
 use Exception;
-use go\core\db\Query as Query2;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
-use go\core\model\Acl;
 use go\core\orm\Entity;
 use go\core\orm\Query;
-use setasign\Fpdi\PdfParser\Type\PdfBoolean;
-use Traversable;
 
 /**
  * Abstract converter class
@@ -92,7 +88,7 @@ abstract class AbstractConverter {
 	 * @param string $extension eg. "csv"
 	 * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
 	 */
-	public function __construct($extension, $entityClass) {
+	public function __construct(string $extension, string $entityClass) {
 		$this->extension = strtolower($extension);
 		$this->entityClass = $entityClass;
 		$this->init();
@@ -108,14 +104,15 @@ abstract class AbstractConverter {
 	 *
 	 * @return string[]
 	 */
-	abstract public static function supportedExtensions();
+	abstract public static function supportedExtensions(): array;
 
 	/**
 	 * Check if this converter supports the given extension
 	 * @param string $extension eg. "csv"
 	 * @return bool
 	 */
-	public static function supportsExtension($extension) {
+	public static function supportsExtension(string $extension): bool
+	{
 		return in_array(strtolower($extension), static::supportedExtensions());
 	}
 	
@@ -124,7 +121,8 @@ abstract class AbstractConverter {
 	 * 
 	 * @return string eg, JSON or CSV
 	 */
-	public function getName() {
+	public function getName(): string
+	{
 		$classParts = explode("\\", static::class);
 		return array_pop($classParts);
 	}
@@ -134,7 +132,8 @@ abstract class AbstractConverter {
 	 * 
 	 * @return string eg. "csv"
 	 */
-	public function getFileExtension() {
+	public function getFileExtension(): string
+	{
 		return $this->extension;
 	}
 
@@ -147,7 +146,8 @@ abstract class AbstractConverter {
    * @return array ['count', 'errors', 'success']
    * @throws Exception
    */
-	public final function importFile(File $file, $params = array()) {
+	public final function importFile(File $file, array $params = array()): array
+	{
 		$response = ['count' => 0, 'errors' => [], 'success' => true];
 
 		$this->clientParams = $params;
@@ -210,7 +210,7 @@ abstract class AbstractConverter {
 	 *
 	 * @return bool
 	 */
-	abstract protected function nextImportRecord();
+	abstract protected function nextImportRecord(): bool;
 
 	protected function finishImport() {
 
@@ -241,7 +241,8 @@ abstract class AbstractConverter {
 	 * @return Blob
 	 * @throws Exception
 	 */
-	public final function exportToBlob(Query $entities, array $params = []) {
+	public final function exportToBlob(Query $entities, array $params = []): Blob
+	{
 
 		$this->clientParams = $params;
 		$this->entitiesQuery = $entities;
@@ -268,7 +269,8 @@ abstract class AbstractConverter {
    *
    * @return Query
    */
-	protected function getEntitiesQuery(){
+	protected function getEntitiesQuery(): Query
+	{
 	  return $this->entitiesQuery;
   }
 
@@ -279,7 +281,8 @@ abstract class AbstractConverter {
 	 */
 	abstract protected function initExport();
 
-	protected function afterSave(Entity $entity) {
+	protected function afterSave(Entity $entity): bool
+	{
 		return true;
 	}
 
@@ -289,13 +292,13 @@ abstract class AbstractConverter {
 	 * @param Entity $entity
 	 * @return bool
 	 */
-	abstract protected function exportEntity(Entity $entity);
+	abstract protected function exportEntity(Entity $entity): bool;
 
 	/**
 	 * Finish the export retuning a Blob with the data
 	 *
 	 * @return Blob
 	 */
-	abstract protected function finishExport();
+	abstract protected function finishExport(): Blob;
 
 }

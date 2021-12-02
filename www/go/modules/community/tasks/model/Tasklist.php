@@ -10,6 +10,8 @@ namespace go\modules\community\tasks\model;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\model\Acl;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use GO\Projects2\Model\ProjectEntity;
@@ -74,7 +76,7 @@ class Tasklist extends AclOwnerEntity
 
 	public $projectId = null;
 
-	protected static function defineFilters()
+	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
 			->add('role', function (Criteria $criteria, $value) {
@@ -88,12 +90,12 @@ class Tasklist extends AclOwnerEntity
 
 	}
 
-	protected static function textFilterColumns()
+	protected static function textFilterColumns(): array
 	{
 		return ['name'];
 	}
 
-	protected static function defineMapping()
+	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 			->addTable("tasks_tasklist", "tasklist")
@@ -101,7 +103,7 @@ class Tasklist extends AclOwnerEntity
 			->addArray('groups', TasklistGroup::class, ['id' => 'tasklistId'], ['orderBy'=>'sortOrder']);
 	}
 
-	protected function internalSave()
+	protected function internalSave(): bool
 	{
 		if ($this->isNew()) {
 

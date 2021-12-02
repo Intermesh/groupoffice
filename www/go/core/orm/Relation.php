@@ -27,12 +27,11 @@ class Relation {
 
 	/**
 	 * The class name of the {@see Property} this relation points to.
+	 * The class name of the {@see Property} this relation points to.
 	 *
-	 * @todo rename to propertyName. This must actually be a Property class.
-	 * 
-	 * @var Property
+	 * @var string
 	 */
-	public $entityName;
+	public $propertyName;
 
 	/**
 	 * Associative array with key map
@@ -87,25 +86,25 @@ class Relation {
 
   /**
    * Set the entity name.
-   * @todo rename to propertyName. This must actually be a Property class.
-   *
-   * @param $entityName
+   * @param $propertyName
    * @return $this
    * @throws Exception
+   *@todo rename to propertyName. This must actually be a Property class.
+   *
    */
-	public function setEntityName ($entityName) {
-		if(!class_exists($entityName)) {
-			throw new Exception($entityName . ' class not found');
+	public function setPropertyName($propertyName) {
+		if(!class_exists($propertyName)) {
+			throw new Exception($propertyName . ' class not found');
 		}
-		if(!is_subclass_of($entityName, Property::class, true)) {
-			throw new Exception($entityName . ' must extend '. Property::class);
-		}
-		
-		if(is_subclass_of($entityName, Entity::class, true)) {
-			throw new Exception($entityName . ' may not be an '. Entity::class .'. Only '. Property::class .' objects can be mapped.');
+		if(!is_subclass_of($propertyName, Property::class, true)) {
+			throw new Exception($propertyName . ' must extend '. Property::class);
 		}
 		
-		$this->entityName = $entityName;
+		if(is_subclass_of($propertyName, Entity::class, true)) {
+			throw new Exception($propertyName . ' may not be an '. Entity::class .'. Only '. Property::class .' objects can be mapped.');
+		}
+		
+		$this->propertyName = $propertyName;
 
 		return $this;
 	}

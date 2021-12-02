@@ -1,7 +1,7 @@
 <?php
 namespace go\core\db;
 
-use Exception;
+use InvalidArgumentException;
 
 /**
  * Create "where", "having" or "join on" part of the query for {@see \go\core\db\Query}
@@ -31,9 +31,10 @@ class Criteria {
 	 * 
 	 * @param array|string|static $criteria
 	 * @return static
-	 * @throws Exception
+	 * @throws InvalidArgumentException
 	 */
-	public static function normalize($criteria = null) {
+	public static function normalize($criteria = null): Criteria
+	{
 		if (!isset($criteria)) {
 			return new static;
 		}
@@ -43,7 +44,7 @@ class Criteria {
 		}
 		
 		if(is_object($criteria)) {
-			throw new Exception("Invalid query object passed: ".get_class($criteria).". Should be an go\core\orm\Query object, array or string.");
+			throw new InvalidArgumentException("Invalid query object passed: ".get_class($criteria).". Should be an go\core\orm\Query object, array or string.");
 		}
 		
 		return (new static)->where($criteria);
@@ -56,7 +57,8 @@ class Criteria {
 	 * 
 	 * @return array 
 	 */	
-	public function getWhere() {
+	public function getWhere(): array
+	{
 		return $this->where;
 	}
 	
@@ -65,7 +67,8 @@ class Criteria {
 	 * 
 	 * @return array eg. ['paramTag' => ':someTag', 'value' => 'Some value', 'pdoType' => PDO::PARAM_STR]
 	 */
-	public function getBindParameters() {
+	public function getBindParameters(): array
+	{
 		return $this->bindParameters;
 	}	
 
@@ -157,24 +160,26 @@ class Criteria {
 	 * ```
 	 * 
 	 * @param string|array|Criteria $condition
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param string|null $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * 
 	 * @return static
 	 */
-	public function where($condition, $comparisonOperator = null, $value = null) {
+	public function where($condition, string $comparisonOperator = null, $value = null): Criteria
+	{
 		return $this->andWhere($condition, $comparisonOperator, $value);
 	}
 	
-	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {			
+	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator): array
+	{
 		
 		if(is_array($condition)) {
 			$count = count($condition);
 			if($count > 1) {
 				$sub = new Criteria();
-				foreach($condition as $colName => $value) {
-					$op = is_array($value) || $value instanceof Query ? 'IN' : '=';
-					$sub->andWhere($colName, $op, $value);
+				foreach($condition as $colName => $conditionValue) {
+					$op = is_array($conditionValue) || $conditionValue instanceof Query ? 'IN' : '=';
+					$sub->andWhere($colName, $op, $conditionValue);
 				}			
 				$condition = $sub;
 			} else if ($count === 1) {
@@ -199,34 +204,39 @@ class Criteria {
 		
 	}
 	
-	protected function internalWhereExists(Query $subQuery, $not = false, $logicalOperator = "AND") {
+	protected function internalWhereExists(Query $subQuery, $not = false, $logicalOperator = "AND"): Criteria
+	{
 		$this->where[] = ["tokens", $logicalOperator, $not ? "NOT EXISTS" : "EXISTS", $subQuery];
 		return $this;
 	}
 	
-	public function whereExists(Query $subQuery, $not = false) {
+	public function whereExists(Query $subQuery, $not = false): Criteria
+	{
 		return $this->andWhereExists($subQuery, $not);
 	}
 	
-	public function andWhereExists(Query $subQuery, $not = false) {
+	public function andWhereExists(Query $subQuery, $not = false): Criteria
+	{
 		return $this->internalWhereExists($subQuery, $not);
 	}
 	
-	public function orWhereExists(Query $subQuery, $not = false) {
+	public function orWhereExists(Query $subQuery, $not = false): Criteria
+	{
 		return $this->internalWhereExists($subQuery, $not , "OR");
 	}
 
 	/**
 	 * Add where condition with AND (..)
-	 * 
+	 *
 	 * {@see where()}
-	 * 
-	 * @param String|array|Criteria $column
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 *
+	 * @param string|array|Criteria $column
+	 * @param string|null $operator
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function andWhere($column, $operator = null, $value = null) {
+	public function andWhere($column, string $operator = null, $value = null): Criteria
+	{
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND');
 		return $this;
 	}
@@ -241,11 +251,12 @@ class Criteria {
 	 * {@see where()}
 	 *
 	 * @param String|array|Criteria $column
-	 * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param string|null $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function andWhereNot($column, $operator = null, $value = null) {
+	public function andWhereNot($column, string $operator = null, $value = null): Criteria
+	{
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND NOT');
 		return $this;
 	}
@@ -266,11 +277,12 @@ class Criteria {
 	 * {@see where()}
 	 * 
 	 * @param String|array|Criteria $column
-	 * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param string|null $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function andWhereNotOrNull($column, $operator = null, $value = null) {
+	public function andWhereNotOrNull($column, string $operator = null, $value = null): Criteria
+	{
 		//NOT_OR_NULL will wrap an IFNULL(..., false) around it so it will also match NULL values
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND NOT_OR_NULL');
 		return $this;
@@ -282,11 +294,12 @@ class Criteria {
 	 * {@see where()}
 	 * 
 	 * @param String|array|Criteria $column
-	 * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param string|null $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function orWhereNot($column, $operator = null, $value = null) {
+	public function orWhereNot($column, string $operator = null, $value = null): Criteria
+	{
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR NOT');
 		return $this;
 	}
@@ -307,11 +320,12 @@ class Criteria {
 	 * {@see where()}
 	 * 
 	 * @param String|array|Criteria $column
-	 * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param string|null $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function orWhereNotOrNull($column, $operator = null, $value = null) {
+	public function orWhereNotOrNull($column, string $operator = null, $value = null): Criteria
+	{
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR NOT_OR_NULL');
 		return $this;
 	}
@@ -322,11 +336,12 @@ class Criteria {
 	 * {@see where()}
 	 *
    * @param String|array|Criteria $column
-   * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+   * @param string|null $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
    * @param mixed $value
 	 * @return $this
 	 */
-	public function orWhere($column, $operator = null, $value = null) {
+	public function orWhere($column, string $operator = null, $value = null): Criteria
+	{
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR');
 		return $this;
 	}
@@ -337,7 +352,8 @@ class Criteria {
 	 * 
 	 * @return self
 	 */
-	public function clearWhere() {
+	public function clearWhere(): Criteria
+	{
 		$this->where = [];
 
 		return $this;
@@ -360,10 +376,11 @@ class Criteria {
 	 * 
 	 * @param string|array $tag eg. ":userId" or [':userId' => 1]
 	 * @param mixed $value
-	 * @param int $pdoType {@see \PDO} Autodetected based on the type of $value if omitted.
+	 * @param int|null $pdoType {@see \PDO} Autodetected based on the type of $value if omitted.
 	 * @return $this
 	 */
-	public function bind($tag, $value = null, $pdoType = null) {
+	public function bind($tag, $value = null, int $pdoType = null): Criteria
+	{
 		
 		if(is_array($tag)) {
 			foreach($tag as $key => $value) {
@@ -387,7 +404,8 @@ class Criteria {
 	 * Generate unique tag to use in {@see bind()}
 	 * @return string
 	 */
-	public function bindTag() {
+	public function bindTag(): string
+	{
 		return 'qp' . self::$bindTag++;
 	}
 	
@@ -396,7 +414,8 @@ class Criteria {
 	 * 
 	 * @return bool
 	 */
-	public function hasConditions() {
+	public function hasConditions(): bool
+	{
 		return !empty($this->where);
 	}
 }

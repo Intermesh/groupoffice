@@ -2,7 +2,9 @@
 namespace go\core\acl\model;
 
 use go\core\db\Criteria;
+use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
+use go\core\orm\Filters;
 use go\core\orm\Query;
 use PDO;
 use function GO;
@@ -21,28 +23,20 @@ abstract class AclEntity extends Entity {
 
 
 	protected $permissionLevel;
-	
+
 	/**
 	 * Get the current state of this entity
-	 * 
+	 *
 	 * @todo ACL state should be per entity and not global. eg. Notebook should return highest mod seq of acl's used by note books.
+	 * @param null $entityState
 	 * @return string
 	 */
-	public static function getState($entityState = null) {
+	public static function getState($entityState = null): string
+	{
 		return parent::getState($entityState) . ':' . Acl::entityType()->getHighestModSeq();
 	}
-	
-	
-	protected static function getChangesQuery($sinceModSeq) {
-		$changes = parent::getChangesQuery($sinceModSeq);
-		
-		//apply permissions to changes query
-		Acl::applyToQuery($changes, "change.aclId");
-		
-		return $changes;
-	}
 
-	protected static function getEntityChangesQuery($sinceModSeq)
+	protected static function getEntityChangesQuery($sinceModSeq): Query
 	{
 		$query = parent::getEntityChangesQuery($sinceModSeq);
 
@@ -51,7 +45,8 @@ abstract class AclEntity extends Entity {
 		return $query;
 	}
 
-	public static function getChanges($sinceState, $maxChanges) {
+	public static function getChanges(string $sinceState, int $maxChanges): array
+	{
 
 		$result = parent::getChanges($sinceState, $maxChanges);
 
@@ -67,13 +62,13 @@ abstract class AclEntity extends Entity {
 		
 		//Detect permission changes for AclItemEntities. For example notes that depend on notebook permissions.		
 		$acls = static::findAcls();	
-		if($acls) {
-			$oldAclIds = Acl::wereGranted(go()->getUserId(), $states[2]['modSeq'], $acls)->all();
-			$currentAclIds = Acl::areGranted(go()->getUserId(), $acls)->all();
-			$changedAcls = array_merge(array_diff($oldAclIds, $currentAclIds), array_diff($currentAclIds, $oldAclIds));	
+		if(!$acls) {
+			return $result;
 		}
-		
-		
+		$oldAclIds = Acl::wereGranted(go()->getUserId(), $states[2]['modSeq'], $acls)->all();
+		$currentAclIds = Acl::areGranted(go()->getUserId(), $acls)->all();
+		$changedAcls = array_merge(array_diff($oldAclIds, $currentAclIds), array_diff($currentAclIds, $oldAclIds));
+
 		//add AclItemEntity changes based on permissions		
 		if(empty($changedAcls)) {
 
@@ -154,6 +149,20 @@ abstract class AclEntity extends Entity {
 		}
 
 		return parent::internalSave();
+
+	protected static function defineFilters(): Filters
+	{
+		return parent::defineFilters()
+						->add("permissionLevelUserId", function() {
+							//dummy used in permissionLevel filter.
+						})
+						->add("permissionLevelGroups", function() {
+							//dummy used in permissionLevel filter.
+						})
+						->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
+							//Permission level is always added to the main query so that it's always applied with AND
+							static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
+						});
 	}
 
 	protected function removeAclOnDelete() {

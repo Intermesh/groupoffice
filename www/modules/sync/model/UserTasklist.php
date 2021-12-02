@@ -1,6 +1,7 @@
 <?php
 namespace GO\Sync\Model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 
 class UserTasklist extends Property {
@@ -23,7 +24,8 @@ class UserTasklist extends Property {
 	 */
 	public $isDefault;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('sync_tasklist_user');
 	}
 }

@@ -10,6 +10,7 @@
 namespace go\core\model;
 
 use go\core\orm\Entity;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
@@ -24,10 +25,10 @@ class OauthAuthCode extends Entity implements AuthCodeEntityInterface
     public $id;
 
     /**
-     * @return \go\core\orm\Mapping
+     * @return Mapping
      * @throws \ReflectionException
      */
-    protected static function defineMapping()
+    protected static function defineMapping(): Mapping
     {
         return parent::defineMapping()
             ->addTable('core_oauth_auth_codes');

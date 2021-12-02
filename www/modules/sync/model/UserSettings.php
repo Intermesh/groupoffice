@@ -11,6 +11,7 @@
 namespace GO\Sync\Model;
 
 use go\core\model\Module;
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use GO\Base\Model\User as GOUser;
 use go\core\model\User;
@@ -49,7 +50,7 @@ class UserSettings extends Property
 
 	public $tasklists = [];
 
-	protected static function defineMapping()
+	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 			->addTable("sync_settings", "syncs")
@@ -99,7 +100,7 @@ class UserSettings extends Property
 		}
 	}
 
-	public function toArray($properties = [])
+	public function toArray(array $properties = null): array
 	{
 		if($this->doSetup)
 			$this->setup();

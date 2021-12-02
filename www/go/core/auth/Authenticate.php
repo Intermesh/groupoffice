@@ -2,22 +2,17 @@
 
 namespace go\core\auth;
 
-use go\core\App;
+use Exception;
 use go\core\db\Column;
-use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
-use go\core\exception\Unavaiable;
 use go\core\exception\Unavailable;
-use go\core\jmap\State;
 use go\core\model\AuthAllowGroup;
 use go\core\model\RememberMe;
 use go\core\model\Token;
 use go\core\model\User;
-use go\core\model\Log;
 use go\core\jmap\Request;
-use go\core\http\Response;
 use go\core\util\DateTime;
-use go\core\validate\ErrorCode;
+use go\core\jmap\State as JmapState;
 
 /**
  * Class Authenticate
@@ -39,7 +34,7 @@ class Authenticate {
 	/**
 	 * Get the primary authenticator used with password login.
 	 *
-	 * @return PrimaryAuthenticator
+	 * @return PrimaryAuthenticator|false
 	 */
 	public function getPrimaryAuthenticatorForUser($username) {
 		$this->populateAuthenticators();
@@ -52,7 +47,8 @@ class Authenticate {
 		return false;
 	}
 
-	public function getSecondaryAuthenticatorsForUser($username) {
+	public function getSecondaryAuthenticatorsForUser($username): array
+	{
 		$auths = [];
 		foreach ($this->getSecondaryAuthenticators() as $authenticator) {
 			if ($authenticator->isAvailableFor($username)) {
@@ -68,10 +64,9 @@ class Authenticate {
 	 * Get all the primary authenticators
 	 *
 	 * @return PrimaryAuthenticator[]
-	 * @throws \Exception
 	 */
-	public function getPrimaryAuthenticators() {
-
+	public function getPrimaryAuthenticators(): array
+	{
 		$this->populateAuthenticators();
 
 		return $this->primaryAuthenticators;
@@ -81,9 +76,9 @@ class Authenticate {
 	 * Get all the primary authenticators
 	 *
 	 * @return SecondaryAuthenticator[]
-	 * @throws \Exception
 	 */
-	public function getSecondaryAuthenticators() {
+	public function getSecondaryAuthenticators(): array
+	{
 
 		$this->populateAuthenticators();
 
@@ -102,7 +97,7 @@ class Authenticate {
 				} else {
 					$this->secondaryAuthenticators[] = $authenticator;
 				}
-			};
+			}
 		}
 	}
 
@@ -112,9 +107,10 @@ class Authenticate {
 	 *
 	 * @param $username
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	private function isLocalUser($username) {
+	private function isLocalUser($username): bool
+	{
 		return go()->getDbConnection()
 			->selectSingleValue('id')
 			->from('core_auth_password', 'p')
@@ -132,7 +128,7 @@ class Authenticate {
 	 * @param $username
 	 * @param $password
 	 * @return false|User
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function passwordLogin($username, $password) {
 
@@ -163,7 +159,7 @@ class Authenticate {
 
 		if (!$user = $authenticator->authenticate($username, $password)) {
 
-			User::fireEvent(User::EVENT_BADLOGIN, $username, $user ? $user : null);
+			User::fireEvent(User::EVENT_BADLOGIN, $username, $user ?? null);
 
 			return false;
 		}
@@ -194,11 +190,13 @@ class Authenticate {
 	/**
 	 * @return PrimaryAuthenticator
 	 */
-	public function getUsedPasswordAuthenticator() {
+	public function getUsedPasswordAuthenticator(): PrimaryAuthenticator
+	{
 		return $this->usedPasswordAuthenticator;
 	}
 
-	public function sendRecoveryMail($email) {
+	public function sendRecoveryMail($email): bool
+	{
 		$user = User::find()->where(['email' => $email])->orWhere(['recoveryEmail' => $email])->single();
 		if (empty($user)) {
 			go()->debug("User not found");
@@ -206,7 +204,7 @@ class Authenticate {
 		}
 
 		$primary = $this->getPrimaryAuthenticatorForUser($user->username);
-		if(!($primary instanceof \go\core\auth\Password)) {
+		if(!($primary instanceof Password)) {
 			go()->debug("Authenticator doesn't support recovery");
 			return false;
 		}
@@ -231,10 +229,13 @@ class Authenticate {
 		return $user;
 	}
 
-	public function logout() {
-
+	/**
+	 * @throws Exception
+	 */
+	public function logout(): bool
+	{
 		RememberMe::unsetCookie();
-		$state = new \go\core\jmap\State();
+		$state = new JmapState();
 		$token = $state->getToken();
 		if(!$token) {
 			return false;
@@ -244,7 +245,6 @@ class Authenticate {
 
 		$token->oldLogout();
 		Token::delete($token->primaryKeyValues());
-
 
 		return true;
 	}

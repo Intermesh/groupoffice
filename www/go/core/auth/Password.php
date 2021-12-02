@@ -5,7 +5,8 @@ use go\core\model\User;
 
 class Password extends PrimaryAuthenticator {	
 	
-	public static function isAvailableFor($username) {		
+	public static function isAvailableFor(string $username): bool
+	{
 		return User::find()->selectSingleValue('id')->where(['username' => $username])->andWhere('password', '!=', 'null')->single() !== false;
 	}
 	

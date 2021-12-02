@@ -49,11 +49,12 @@ class ErrorHandler {
 	/**
 	 * Log exception to PHP logging system and debug the exception in GO
 	 *
-	 * @param \Exception $e
-	 * @param string $context Extra information about where the exception occurred
+	 * @param Throwable $e
+	 * @param string|null $context Extra information about where the exception occurred
 	 * @return string The string that was logged
 	 */
-	public static function logException($e, $context = null) {
+	public static function logException(Throwable $e, string $context = null): string
+	{
 		$cls = get_class($e);
 		
 		$errorString = $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
@@ -84,7 +85,8 @@ class ErrorHandler {
 	/**
 	 * Send a messaqe to the error log
 	 */
-	public static function log($str) {
+	public static function log($str): bool
+	{
 		go()->error($str);
 		return error_log($str, 0);
 	}
@@ -94,7 +96,7 @@ class ErrorHandler {
 	 * support php 5.6 as well.
 	 * @param Throwable $e
 	 */
-	public function exceptionHandler($e) {	
+	public function exceptionHandler(Throwable $e) {
 		go()->debug("ErrorHandler::exceptionHandler() called with " . get_class($e));
 
 		$errorString = self::logException($e);
@@ -129,12 +131,12 @@ class ErrorHandler {
    * @return void
    * @throws ErrorException
    */
-	public static function errorHandler($errno, $errstr, $errfile, $errline) {
+	public static function errorHandler(int $errno, string $errstr, string $errfile, int $errline) {
 		go()->debug("ErrorHandler:errorHandler called $errno");
 
 		// check if error should be reported according to PHP settings
 		if (!(error_reporting() & $errno)) {
-		  return false;
+		  return;
 		}
 
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);

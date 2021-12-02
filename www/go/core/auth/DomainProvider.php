@@ -15,5 +15,5 @@ interface DomainProvider {
 	 * 
 	 * @return string[]
 	 */
-	public static function getDomainNames();
+	public static function getDomainNames(): array;
 }

@@ -1,6 +1,7 @@
 <?php
 namespace GO\Freebusypermissions\Model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use function GO;
 
@@ -14,11 +15,13 @@ class UserSettings extends Property {
 	public $user_id;
 	public $acl_id;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('fb_acl');
 	}	
 	
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		
 		if(!isset($this->acl_id)) {
 			$acl = new \GO\Base\Model\Acl();

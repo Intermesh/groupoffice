@@ -14,7 +14,7 @@ class Spreadsheet extends convert\Spreadsheet {
 
 	private $organizations = true;
 
-	protected function nextImportRecord()
+	protected function nextImportRecord(): bool
 	{
 		$hasNext = parent::nextImportRecord();
 

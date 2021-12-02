@@ -1,10 +1,9 @@
 <?php
-
 namespace go\core\db;
 
-use Exception;
 use go\core\App;
-use go\core\orm\Record;
+use go\core\data\Model;
+use InvalidArgumentException;
 use PDO;
 
 /**
@@ -31,20 +30,20 @@ class Table {
 	protected $conn;
 
 	protected $dsn;
-	
+
 	/**
 	 * Get a table instance
-	 * 
+	 *
 	 * @param string $name
+	 * @param Connection|null $conn
 	 * @return self
 	 */
-	public static function getInstance($name, Connection $conn = null) {
+	public static function getInstance(string $name, Connection $conn = null): Table
+	{
 		
 		if(!isset($conn)) {
 			$conn = go()->getDbConnection();
 		}
-
-
 
 		$cacheKey = $conn->getDsn() . '-' . $name;
 		if(!isset(self::$cache[$cacheKey])) {
@@ -75,29 +74,31 @@ class Table {
 		}
 		self::$cache = [];
 	}
-	
 
+
+	/**
+	 * @throws InvalidArgumentException
+	 */
 	public function __construct($name, Connection $conn) {
 		$this->name = $name;
 		$this->conn = $conn;
 		$this->dsn = $conn->getDsn();
 		$this->init();
 
-		// $this->columns = array_map(function($c) {
-		// 	$c->table = $this; //is cleared in __sleep()
-		// 	return $c;
-		// }, $this->columns);
 	}	
 	
 	/**
-	 * Get's the name of the table
+	 * Gets the name of the table
+	 *
 	 * @return string
 	 */
-	public function getName() {
+	public function getName(): string
+	{
 		return $this->name;
 	}
 
-	private function getCacheKey() {
+	private function getCacheKey(): string
+	{
 		return 'dbColumns_' . $this->dsn . '_' . $this->name;
 	}
 
@@ -106,19 +107,12 @@ class Table {
 	 */
 	private function clearCache() {
 		go()->getCache()->delete($this->getCacheKey());
-		// $this->columns = null;
-		// $this->pk = [];
-
-		// $this->init();
 	}
 
-  /**
-   * @throws Exception
-   */
 	private function init() {
 		
 		if (isset($this->columns)) {
-			return $this->columns;
+			return;
 		}
 		
 		$cacheKey = $this->getCacheKey();
@@ -144,30 +138,28 @@ class Table {
 
 		$this->conn = null;
 
-
 		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk, 'indexes' => $this->indexes]);
 
-
-		return;
 	}
 	
 	/**
 	 * A column name may not have the name of a Record property name.
 	 * 
-	 * @param type $fieldName
-	 * @throws Exception
+	 * @param string $fieldName
+	 * @throws InvalidArgumentException
 	 */
-	private function checkReservedName($fieldName) {
+	private function checkReservedName(string $fieldName) {
 		if(strpos($fieldName, '@') !== false) {
-			throw new \Exception("The @ char is reserved for framework usage.");
+			throw new InvalidArgumentException("The @ char is reserved for framework usage.");
 		}
 		
-		if(property_exists(Record::class, $fieldName)) {
-			throw new \Exception("The name '$fieldName' is reserved. Please choose another column name.");
+		if(property_exists(Model::class, $fieldName)) {
+			throw new InvalidArgumentException("The name '$fieldName' is reserved. Please choose another column name.");
 		}
 	}
 
-	private function createColumn($field) {
+	private function createColumn($field): Column
+	{
 		
 		$this->checkReservedName($field['Field']);
 		
@@ -197,7 +189,7 @@ class Table {
 		}
 		
 		if($c->default == 'CURRENT_TIMESTAMP') {
-			throw new \Exception("Please don't use CURRENT_TIMESTAMP as default mysql value. It's only supported in MySQL 5.6+");
+			throw new InvalidArgumentException("Please don't use CURRENT_TIMESTAMP as default mysql value. It's only supported in MySQL 5.6+");
 		}
 		
 		switch ($c->dbType) {
@@ -307,7 +299,8 @@ class Table {
 	 * @param string $name
 	 * @return array
 	 */
-	public function getIndex($name) {
+	public function getIndex(string $name): array
+	{
 		return $this->indexes[strtolower($name)];
 	}
 
@@ -317,7 +310,8 @@ class Table {
 	 * @param string $name
 	 * @return bool
 	 */
-	public function hasIndex($name) {
+	public function hasIndex(string $name): bool
+	{
 		return isset($this->indexes[strtolower($name)]);
 	}
 
@@ -328,7 +322,8 @@ class Table {
 	 * 
 	 * @return string[]
 	 */
-	public function getColumnNames() {
+	public function getColumnNames(): array
+	{
 		return array_keys($this->getColumns());
 	}
 	
@@ -339,7 +334,8 @@ class Table {
 	 * @param string $name
 	 * @return boolean
 	 */
-	public function hasColumn($name) {
+	public function hasColumn(string $name): bool
+	{
 		return isset($this->columns[$name]);
 	}
 	
@@ -349,7 +345,8 @@ class Table {
 	 * @param string $name
 	 * @return Column
 	 */
-	public function getColumn($name) {
+	public function getColumn(string $name): ?Column
+	{
 		if(!isset($this->columns[$name])) {
 			return null;
 		}
@@ -365,7 +362,8 @@ class Table {
 	 * 
 	 * @return Column[]
 	 */
-	public function getColumns() {
+	public function getColumns(): array
+	{
 		return $this->columns;
 	}	
 	
@@ -391,7 +389,8 @@ class Table {
 	 *
 	 * @return string[] eg. ['id']
 	 */
-	public function getPrimaryKey() {		
+	public function getPrimaryKey(): array
+	{
 		return $this->pk;
 	}
 

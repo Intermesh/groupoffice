@@ -9,6 +9,8 @@ namespace go\modules\community\tasks\model;
 use go\core\db\Criteria;
 use go\core\jmap\Entity;
 use go\core\model\Acl;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 
 /**
  * Category model
@@ -27,7 +29,8 @@ class Category extends Entity {
 	/** @var int when not null this category is only visible when the tasklist is selected (no ACL checking allowed)  */
 	public $tasklistId;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 			->addTable("tasks_category", "category");
 	}
@@ -46,15 +49,17 @@ class Category extends Entity {
 		return parent::internalValidate();
 	}
 
-	public static function getClientName() {
+	public static function getClientName(): string
+	{
 		return "TaskCategory";
 	}
 
-	protected static function textFilterColumns() {
+	protected static function textFilterColumns(): array
+	{
 		return ['name'];
 	}
 
-	protected static function defineFilters()
+	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
 			->add('ownerId', function(Criteria $criteria, $value) {

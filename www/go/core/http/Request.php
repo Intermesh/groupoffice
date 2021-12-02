@@ -28,7 +28,7 @@ class Request extends Singleton{
 	/**
 	 * The body of the request. Only JSON is supported at the moment.
 	 * 
-	 * @var mixed[]
+	 * @var array
 	 */
 	private $body;	
 
@@ -45,7 +45,8 @@ class Request extends Singleton{
 	 * 
 	 * @return array ['paramName' => 'value']
 	 */
-	public function getQueryParams() {
+	public function getQueryParams(): array
+	{
 		return $_GET;
 	}
 
@@ -65,7 +66,8 @@ class Request extends Singleton{
    * @param string[]
    * @return array
    */
-	public function getAccept() {
+	public function getAccept(): array
+	{
 
 		if(empty($_SERVER['HTTP_ACCEPT'])) {
 			return [];
@@ -80,7 +82,8 @@ class Request extends Singleton{
 	 * 
 	 * @return string[]
 	 */
-	public function getAcceptLanguages() {
+	public function getAcceptLanguages(): array
+	{
 		if(empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 			return [];
 		}
@@ -103,7 +106,8 @@ class Request extends Singleton{
 	 * 
 	 * @return array
 	 */
-	public function getHeaders() {		
+	public function getHeaders(): array
+	{
 		
 		if (!isset($this->headers)) {
 			if(!function_exists('apache_request_headers'))
@@ -116,7 +120,8 @@ class Request extends Singleton{
 		return $this->headers;
 	}
 	
-	private function getNonApacheHeaders() {
+	private function getNonApacheHeaders(): array
+	{
 		$headers = array();
 		$copy_server = array(
 				'CONTENT_TYPE' => 'content-type',
@@ -138,7 +143,7 @@ class Request extends Singleton{
 			if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
 				$headers['authorization'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
 			} elseif (isset($_SERVER['PHP_AUTH_USER'])) {
-				$basic_pass = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
+				$basic_pass = $_SERVER['PHP_AUTH_PW'] ?? '';
 				$headers['authorization'] = 'Basic ' . base64_encode($_SERVER['PHP_AUTH_USER'] . ':' . $basic_pass);
 			} elseif (isset($_SERVER['PHP_AUTH_DIGEST'])) {
 				$headers['authorization'] = $_SERVER['PHP_AUTH_DIGEST'];
@@ -149,28 +154,31 @@ class Request extends Singleton{
 
 	/**
 	 * Get request header value
-	 * 
+	 *
 	 * @param string $name
-	 * @param string
+	 * @return mixed|string|null
 	 */
-	public function getHeader($name) {
+	public function getHeader(string $name) {
 		$name = strtolower($name);
 		$headers = $this->getHeaders();
-		return isset($headers[$name]) ? $headers[$name] : null;
+		return $headers[$name] ?? null;
 	}
 
 	/**
 	 * Get the request payload
-	 * 
-	 * The data send in the body of the request. 
+	 *
+	 * The data send in the body of the request.
 	 * We support:
-	 * 
+	 *
 	 * #application/x-www-form-urlencoded
 	 * #multipart/form-data
 	 * #application/json
 	 * #application/xml or text/xml
-	 * 
+	 *
 	 * @return stdClass
+	 * @throws Exception
+	 * @throws Exception
+	 * @throws Exception
 	 */
 	public function getBody() {
 		if (!isset($this->body)) {			
@@ -200,7 +208,8 @@ class Request extends Singleton{
    *
    * @return string
    */
-	public function getRawBody() {
+	public function getRawBody(): string
+	{
 		if(!isset($this->rawBody)) {
 			$this->rawBody = file_get_contents('php://input');
 		}
@@ -214,7 +223,7 @@ class Request extends Singleton{
 	 * @preturn string
 	 */
 	public function getContentType() {
-		return isset($_SERVER["CONTENT_TYPE"]) ? $_SERVER["CONTENT_TYPE"] : '';
+		return $_SERVER["CONTENT_TYPE"] ?? '';
 	}
 
 	/**
@@ -222,7 +231,8 @@ class Request extends Singleton{
 	 * 
 	 * @return string PUT, POST, DELETE, GET, PATCH, HEAD
 	 */
-	public function getMethod() {
+	public function getMethod(): string
+	{
 		return strtoupper($_SERVER['REQUEST_METHOD']);
 	}
 
@@ -231,25 +241,28 @@ class Request extends Singleton{
 	 *
 	 * @return boolean
 	 */
-	public function isJson() {
+	public function isJson(): bool
+	{
 		return strpos($this->getContentType(), 'application/json') !== false;
 	}
 	
-	/**
-	 * Check if the request posted a JSON body
-	 *
-	 * @return boolean
-	 */
-	private function isXml() {
-		return strpos($this->getContentType(), '/xml') !== false;
-	}
+//	/**
+//	 * Check if the request posted a JSON body
+//	 *
+//	 * @return boolean
+//	 */
+//	private function isXml(): bool
+//	{
+//		return strpos($this->getContentType(), '/xml') !== false;
+//	}
 
 	/**
 	 * Check if this request SSL secured
 	 *
 	 * @return boolean
 	 */
-	public function isHttps() {
+	public function isHttps(): bool
+	{
 		if(!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off') {
 			return true;
 		}
@@ -268,7 +281,8 @@ class Request extends Singleton{
 	 * @param bool $stripPort remove :1234 from result
 	 * @return string eg. localhost:6480
 	 */
-	public function getHost($stripPort = true) {
+	public function getHost(bool $stripPort = true): string
+	{
 
 		if(!isset($this->host)) {
 			$possibleHostSources = array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST', 'SERVER_NAME', 'SERVER_ADDR');
@@ -304,7 +318,8 @@ class Request extends Singleton{
 	 *
 	 * @return string
 	 */
-	public function getUri() {
+	public function getUri(): string
+	{
 		return $_SERVER['REQUEST_URI'];
 	}
 
@@ -313,15 +328,18 @@ class Request extends Singleton{
 	 *
 	 * @return string
 	 */
-	public function getFullUrl() {
+	public function getFullUrl(): string
+	{
 		return $this->getProtocol(). '//' .$this->getHost(false) . $this->getUri();
 	}
 
-	public function getBaseUrl() {
+	public function getBaseUrl(): string
+	{
 		return $this->getProtocol(). '//' .$this->getHost(false);
 	}
 
-	public function getProtocol() {
+	public function getProtocol(): string
+	{
 		return $this->isHttps() ? 'https:' : 'http:';
 	}
 
@@ -359,7 +377,8 @@ class Request extends Singleton{
    *
    * @return string
    */
-	public function getRemoteIpAddress() {
+	public function getRemoteIpAddress(): ?string
+	{
     if(!empty($_SERVER['HTTP_CLIENT_IP'])){
       //ip from share internet
       return $_SERVER['HTTP_CLIENT_IP'];
@@ -376,7 +395,8 @@ class Request extends Singleton{
    *    * 
    * @return boolean
    */
-  public function isXHR() {
+  public function isXHR(): bool
+  {
     return isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && $_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest";
   }
 

@@ -3,27 +3,21 @@ namespace go\core\orm;
 
 use Exception;
 use go\core\db\Criteria;
-use go\core\model\Acl;
 use go\core\db\Query as DbQuery;
 use PDO;
 
 /**
- * @inheritDoc
+ *
  *
  * @package go\core\orm
  */
 class Query extends DbQuery {
   /**
-   * @var Entity
+   * @var string
    */
 	private $model;
 
-  /**
-   * @var array
-   */
-	private $fetchProperties;
-
-  /**
+	/**
    * Set's the entity or property model this query is for.
    *
    * Used internally by go\core\orm\Property::internalFind();
@@ -34,12 +28,13 @@ class Query extends DbQuery {
    * @param Property|null $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
    * @return $this
    */
-	public function setModel(string $cls, array $fetchProperties = [], bool $readOnly, $owner = null) {
+	public function setModel(string $cls, array $fetchProperties = [], bool $readOnly = false, Property $owner = null): Query
+	{
 		$this->model = $cls;
-		$this->fetchProperties = $fetchProperties;
+		$fetchProperties1 = $fetchProperties;
 		$this->readOnly = $readOnly;
 
-		$args = [false, $this->fetchProperties, $this->readOnly];
+		$args = [false, $fetchProperties1, $this->readOnly];
 
 		if(isset($owner)) {
 			array_unshift($args, $owner);
@@ -53,7 +48,8 @@ class Query extends DbQuery {
 	 * 
 	 * @return string
 	 */
-	public function getModel() {
+	public function getModel(): string
+	{
 		return $this->model;
 	}
 
@@ -65,8 +61,12 @@ class Query extends DbQuery {
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function filter(array $filters) {
+	public function filter(array $filters): Query
+	{
 		$cls = $this->model;
+		/**
+		 * @var Entity $cls
+		 */
 		$cls::filter($this, $filters);
 		return $this;
 	}
@@ -89,10 +89,16 @@ class Query extends DbQuery {
    * @return $this
    * @throws Exception
    */
-	public function withLink(Entity $entity) {
+	public function withLink(Entity $entity): Query
+	{
 		
 		$c = new Criteria();
 		$cls = $this->model;
+		/**
+		 * @var Entity $cls
+		 */
+
+		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 		$c->where(['link.fromEntityTypeId' => $entity->entityType()->getId(),
 				'link.fromId' => $entity->id,
 				'link.toEntityTypeId' => $cls::entityType()->getId()
@@ -108,8 +114,13 @@ class Query extends DbQuery {
    * @return $this
    * @throws Exception
    */
-	public function joinCustomFields($alias = 'customFields') {
+	public function joinCustomFields(string $alias = 'customFields'): Query
+	{
 		$cls = $this->model;
+		/**
+		 * @var Entity $cls
+		 */
+		/** @noinspection PhpUndefinedMethodInspection */
 		$this->join($cls::customFieldsTableName(), $alias, $alias . '.id = '.$this->getTableAlias().'.id', 'LEFT');
 
 		return $this;
@@ -122,7 +133,8 @@ class Query extends DbQuery {
    * @return $this;
    * @throws Exception
    */
-	public function joinProperties(array $path) {
+	public function joinProperties(array $path): Query
+	{
 		$cls = $this->model;
 		$alias = $this->getTableAlias();
 
@@ -130,8 +142,8 @@ class Query extends DbQuery {
 			$relation = $cls::getMapping()->getRelation($part);
 			/** @var Relation $relation */
 
-			if(isset($relation->entityName)) {
-				$cls = $relation->entityName;
+			if(isset($relation->propertyName)) {
+				$cls = $relation->propertyName;
 				
 				//TODO: What if the property has more than one table in the mapping? Also might be a problem in Entity::changeReferencedEntities()
 				$table = array_values($cls::getMapping()->getTables())[0]->getName();
@@ -159,7 +171,8 @@ class Query extends DbQuery {
    */
 	private $readOnly = false;
 
-	public function getReadOnly() {
+	public function getReadOnly(): bool
+	{
 		return $this->readOnly;
 	}
 
@@ -173,7 +186,8 @@ class Query extends DbQuery {
 	 * @param array $data
 	 * @return $this
 	 */
-	public function setData(array $data) {
+	public function setData(array $data): Query
+	{
 
 		$this->data = array_merge($this->data, $data);
 
@@ -186,7 +200,8 @@ class Query extends DbQuery {
 	 * @see setData()
 	 * @return array
 	 */
-	public function getData() {
+	public function getData(): array
+	{
 		return $this->data;
 	}
 

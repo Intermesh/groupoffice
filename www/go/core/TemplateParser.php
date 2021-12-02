@@ -217,7 +217,7 @@ class TemplateParser {
 
 		$entityType = EntityType::findByName($entityName);
 		$entityCls = $entityType->getClassName();
-		$entities = $entityCls::findByLink($entity,[], true);
+		$entities = $entityCls::findByLink($entity, [], true);
 
 		return $entities;
 	}

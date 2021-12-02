@@ -2,6 +2,8 @@
 namespace go\modules\community\test\model;
 
 
+use go\core\orm\Mapping;
+
 class AHasOne extends \go\core\orm\Property {
 	
 	protected $id;
@@ -10,7 +12,8 @@ class AHasOne extends \go\core\orm\Property {
 	
 	public $propA;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('test_a_has_one', 'h');
 	}
 }

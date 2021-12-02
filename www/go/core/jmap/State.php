@@ -120,7 +120,8 @@ class State extends AbstractState {
 		return $success;
 	}
 	
-	public function isAuthenticated() {
+	public function isAuthenticated(): bool
+	{
 		return $this->getToken() !== false;
 	}
 	
@@ -146,25 +147,30 @@ class State extends AbstractState {
 		}
 	}
 
-	protected function getBaseUrl() {
+	protected function getBaseUrl(): string
+	{
 		$url = Request::get()->isHttps() ? 'https://' : 'http://';
 		$url .= Request::get()->getHost(false) . dirname($_SERVER['PHP_SELF']);
 		return $url;
 	}
 
-	public function getPageUrl() {
+	public function getPageUrl(): string
+	{
 		return $this->getBaseUrl(). "/page.php";
 	}
 	
-	public function getApiUrl() {
+	public function getApiUrl(): string
+	{
 		return $this->getBaseUrl() . '/jmap.php';
 	}
 	
-	public function getUploadUrl() {
+	public function getUploadUrl(): string
+	{
 		return $this->getBaseUrl(). '/upload.php';
 	}
 	
-	public function getEventSourceUrl() {
+	public function getEventSourceUrl(): ?string
+	{
 		return go()->getConfig()['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
 	}
 
@@ -252,9 +258,10 @@ class State extends AbstractState {
 	
 	/**
 	 * Get the user ID
-	 * @return int
+	 * @return int|null
 	 */
-	public function getUserId() {
+	public function getUserId(): ?int
+	{
 		return $this->getToken() ? $this->getToken()->userId : null;
 	}
 	
@@ -262,9 +269,10 @@ class State extends AbstractState {
 	 * Get the logged in user
 	 * 
 	 * @param array $properties the properties to fetch
-	 * @return User
+	 * @return User|null
 	 */
-	public function getUser(array $properties = []) {		
+	public function getUser(array $properties = []): ?\go\core\model\User
+	{
 		return $this->getToken() ? $this->getToken()->getUser($properties) : null;
 	}
 
@@ -274,7 +282,8 @@ class State extends AbstractState {
 	 * 
 	 * @return bool
 	 */
-	public function isAdmin() {
+	public function isAdmin(): bool
+	{
 		if($this->getUserId() == User::ID_SUPER_ADMIN) {
 			return true;
 		}

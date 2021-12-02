@@ -38,7 +38,6 @@ class File extends FileSystemObject {
    * Get the parent folder object
    *
    * @return Folder Parent folder object
-   * @throws Exception
    */
 	public function getFolder() {
 		$parentPath = dirname($this->path);		
@@ -150,9 +149,9 @@ class File extends FileSystemObject {
    * Checks if a filename exists and renames it.
    *
    * @return string  New filepath
-   * @throws Exception
    */
-	public function appendNumberToNameIfExists() {
+	public function appendNumberToNameIfExists(): string
+	{
 		$dir = $this->getFolder()->getPath();
 		$origName = $this->getNameWithoutExtension();
 		$extension = $this->getExtension();

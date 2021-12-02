@@ -3,6 +3,8 @@
 namespace go\core\model;
 
 use go\core\acl\model\AclOwnerEntity;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 
 /**
@@ -77,7 +79,7 @@ class FieldSet extends AclOwnerEntity {
 		return empty($this->filter) || $this->filter == '[]'  ? new \stdClass() : json_decode($this->filter, true);
 	}
 
-	protected function canCreate()
+	protected function canCreate(): bool
 	{
 		return go()->getAuthState()->isAdmin();
 	}
@@ -86,7 +88,8 @@ class FieldSet extends AclOwnerEntity {
 		$this->filter = json_encode($filter);
 	}
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable('core_customfields_field_set', 'fs')
 						->addQuery((new Query())->select("e.name AS entity")->join('core_entity', 'e', 'e.id = fs.entityId'));
@@ -102,7 +105,8 @@ class FieldSet extends AclOwnerEntity {
 		$this->entityId = $e->getId();
 	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 						->add('entities', function(\go\core\db\Criteria $criteria, $value) {
 							//$ids = \go\core\orm\EntityType::namesToIds($value);			
@@ -110,7 +114,8 @@ class FieldSet extends AclOwnerEntity {
 						});
 	}
 	
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 		
 		if(!Field::delete(['fieldSetId' => $query])) {
 			throw new \Exception("Could not delete fields");

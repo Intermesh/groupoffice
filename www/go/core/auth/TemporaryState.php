@@ -24,7 +24,8 @@ class TemporaryState extends AbstractState {
 	private $user;
 	private $userId;	
 	
-	public function getUser(array $properties = []) {
+	public function getUser(array $properties = []): ?\go\core\model\User
+	{
 		if(!empty($properties)) {
 			return $this->user ?? User::findById($this->userId, $properties);
 		}
@@ -35,11 +36,13 @@ class TemporaryState extends AbstractState {
 		return $this->user;
 	}
 
-	public function isAuthenticated() {
+	public function isAuthenticated(): bool
+	{
 		return !empty($this->userId);
 	}
 
-	public function getUserId() {
+	public function getUserId(): ?int
+	{
 		return $this->userId;
 	}
 	
@@ -64,7 +67,8 @@ class TemporaryState extends AbstractState {
 	 * 
 	 * @return bool
 	 */
-	public function isAdmin() {
+	public function isAdmin(): bool
+	{
 		if($this->userId == User::ID_SUPER_ADMIN) {
 			return true;
 		}
@@ -76,7 +80,8 @@ class TemporaryState extends AbstractState {
 		return $user->isAdmin();
 	}
 
-	protected function getBaseUrl() {
+	protected function getBaseUrl(): string
+	{
 		return go()->getSettings()->URL . 'api/';
 	}
 }

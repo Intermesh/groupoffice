@@ -9,6 +9,8 @@ use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\exception\SaveException;
 use go\core\db\Query as DbQuery;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -181,7 +183,8 @@ class Link extends AclItemEntity
 	 */
 	public $createdAt;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 										->addTable('core_link', 'l')
 										->addQuery(
@@ -199,7 +202,7 @@ class Link extends AclItemEntity
 	 * @param Query $query
 	 * @return bool
 	 */
-	protected static function useSearchableTraitForSearch(Query $query)
+	protected static function useSearchableTraitForSearch(Query $query) : bool
 	{
 		return true;
 	}
@@ -336,7 +339,8 @@ class Link extends AclItemEntity
 		}
 	}
 	
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		if(!parent::internalSave()) {
 			return false;
 		}
@@ -374,7 +378,8 @@ class Link extends AclItemEntity
 //		}
 //	}
 //
-	protected static function internalDelete(Query $query) {		
+	protected static function internalDelete(Query $query): bool
+	{
 
 		//delete the reverse links
 		$join = new Query();
@@ -388,7 +393,8 @@ class Link extends AclItemEntity
 
 	}
 	
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	{
 		$level = Acl::LEVEL_READ;
 		//return parent::applyAclToQuery($query, $level, $userId, $groups);
 		Acl::applyToQuery($query, 'search.aclId', $level, $userId, $groups);
@@ -425,7 +431,8 @@ class Link extends AclItemEntity
 //		return ['name' => $this->toName, 'description' => $this->toDescription];
 //	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 						->add('entityId', function (Criteria $crtiteria, $value){
 							$crtiteria->where('fromId', '=', $value);
@@ -467,7 +474,7 @@ class Link extends AclItemEntity
 	}
 
 
-	public static function sort(\go\core\orm\Query $query, array $sort)
+	public static function sort(\go\core\orm\Query $query, array $sort): Query
 	{
 		if(isset($sort['modifiedAt'])) {
 			$sort['search.modifiedAt'] = $sort['modifiedAt'];
@@ -481,7 +488,7 @@ class Link extends AclItemEntity
 		return parent::sort($query, $sort);
 	}
 
-	protected static function aclEntityClass()
+	protected static function aclEntityClass(): string
 	{
 		return Search::class;
 	}
@@ -491,7 +498,7 @@ class Link extends AclItemEntity
 		return $this->findFromEntity();
 	}
 
-	protected static function aclEntityKeys()
+	protected static function aclEntityKeys(): array
 	{
 		return ['toId' => 'entityId', 'toEntityTypeId' => 'entityTypeId'];
 	}

@@ -4,6 +4,7 @@ namespace go\modules\community\tasks\model;
 
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\model;
 use go\core\util\JSON;
@@ -33,11 +34,12 @@ class UserSettings extends Property {
 	protected $lastTasklistIds;
 
 	/**
-	 * @return \go\core\orm\Mapping
+	 * @return Mapping
 	 * @throws \ReflectionException
 	 */
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable("tasks_user_settings", "tus");
 	}
 

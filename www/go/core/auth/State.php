@@ -1,6 +1,7 @@
 <?php
 
 namespace go\core\auth;
+use Exception;
 use go\core\model\Module;
 use go\core\model\User;
 use stdClass;
@@ -11,14 +12,14 @@ abstract class State {
 	 * 
 	 * @return int|null
 	 */
-	abstract function getUserId();
+	abstract function getUserId(): ?int;
 	
 	/**
 	 * Get the logged in user
 	 * 
 	 * @return User|null
 	 */
-	abstract function getUser();
+	abstract function getUser(): ?User;
 	
 	
 	/**
@@ -26,21 +27,22 @@ abstract class State {
 	 * 
 	 * @return boolean
 	 */
-	abstract function isAuthenticated();
+	abstract function isAuthenticated(): bool;
 
 	/**
 	 * Check if the logged in user is an admin
 	 * 
 	 * @return bool
 	 */
-	abstract public function isAdmin();
+	abstract public function isAdmin(): bool;
 
 	private static $classRights = [];
 
 	/**
 	 * Get the permission level of the module this controller belongs to.
-	 * 
+	 *
 	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
+	 * @throws Exception
 	 */
 	public function getClassRights($cls) : stdClass {
 		if(!isset(self::$classRights[$cls])) {
@@ -57,9 +59,10 @@ abstract class State {
 	 *
 	 * @return string
 	 */
-	abstract protected function getBaseUrl();
+	abstract protected function getBaseUrl(): string;
 
-	public function getDownloadUrl($blobId) {
+	public function getDownloadUrl($blobId): string
+	{
 		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
 	}
 
@@ -68,19 +71,23 @@ abstract class State {
 	 *
 	 * @return string
 	 */
-	public function getPageUrl() {
+	public function getPageUrl(): string
+	{
 		return $this->getBaseUrl(). "/page.php";
 	}
 
-	public function getApiUrl() {
+	public function getApiUrl(): string
+	{
 		return $this->getBaseUrl() . '/jmap.php';
 	}
 
-	public function getUploadUrl() {
+	public function getUploadUrl(): string
+	{
 		return $this->getBaseUrl(). '/upload.php';
 	}
 
-	public function getEventSourceUrl() {
+	public function getEventSourceUrl(): ?string
+	{
 		return go()->getConfig()['core']['general']['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
 	}
 

@@ -2,8 +2,10 @@
 
 namespace go\core\auth;
 
+use go\core\db\Query;
 use go\core\orm\Entity;
 use go\core\orm\Mapping;
+use go\core\util\ClassFinder;
 
 class Method extends Entity {
 	
@@ -32,11 +34,12 @@ class Method extends Entity {
 	
 	private $authenticator;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 		->addTable('core_auth_method', 'am')
 		->addQuery(
-						(new \go\core\db\Query)
+						(new Query)
 						->join('core_module', 'mod', 'am.moduleId = mod.id AND mod.enabled = true')
 						); //always join enabled modules so disabled modules are not used.
 	}
@@ -51,7 +54,7 @@ class Method extends Entity {
 		$authenticators = go()->getCache()->get("authenticators");
 		
 		if($authenticators === null) {
-			$classFinder = new \go\core\util\ClassFinder();
+			$classFinder = new ClassFinder();
 			$authenticators = $classFinder->findByParent(BaseAuthenticator::class);
 
 			$arr = [];

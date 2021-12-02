@@ -18,7 +18,8 @@ class Json extends AbstractConverter {
 	protected $record;
 
 
-	protected function exportEntity(Entity $entity) {
+	protected function exportEntity(Entity $entity): bool
+	{
 				
 		if($this->index == 0) {
 			fputs($this->fp, "[\n");
@@ -35,7 +36,8 @@ class Json extends AbstractConverter {
 		}
 	}
 
-	public function getFileExtension() {
+	public function getFileExtension(): string
+	{
 		return 'json';
 	}
 
@@ -43,7 +45,7 @@ class Json extends AbstractConverter {
 	/**
 	 * @inheritDoc
 	 */
-	public static function supportedExtensions()
+	public static function supportedExtensions(): array
 	{
 		return ['json'];
 	}
@@ -53,7 +55,7 @@ class Json extends AbstractConverter {
 		$this->data = GoJSON::decode($file->getContents(), true);
 	}
 
-	protected function nextImportRecord()
+	protected function nextImportRecord(): bool
 	{
 		$this->record =  array_shift($this->data);
 		unset($this->record['id']);
@@ -84,7 +86,7 @@ class Json extends AbstractConverter {
 		$this->fp = $this->tempFile->open('w+');
 	}
 
-	protected function finishExport()
+	protected function finishExport(): Blob
 	{
 		$cls = $this->entityClass;
 		$blob = Blob::fromTmp($this->tempFile);
