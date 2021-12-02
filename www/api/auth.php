@@ -11,6 +11,7 @@ use go\core\model\Token;
 use go\core\jmap\Request;
 use go\core\http\Response;
 use go\core\model\User;
+use go\core\orm\exception\SaveException;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 
@@ -85,6 +86,30 @@ try {
 	}
 
 	switch ($data['action']) {
+
+		case 'register':
+
+			if(!go()->getSettings()->allowRegistration) {
+				output([], 403, 'Registration is not allowed');
+				exit();
+			}
+
+			$user = new User();
+			$user->displayName = $data['displayName'];
+			$user->username = $user->email = $user->recoveryEmail = $data['email'];
+			$user->setPassword($data['password']);
+			if(!$user->save()) {
+				throw new SaveException($user);
+			}
+
+			$token = new Token();
+			$token->userId = $user->id;
+			$token->setAuthenticated();
+			$token->setCookie();
+
+			finishLogin($token);
+
+			break;
 		case 'forgotten':
 			$auth->sendRecoveryMail($data['email']);
 			//Don't show if user was found or not for security

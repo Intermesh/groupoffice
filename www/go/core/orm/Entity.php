@@ -1114,7 +1114,7 @@ abstract class Entity extends Property {
 	 * @param array $p
 	 * @throws Exception
 	 */
-	protected function mergeProp($entity, $name, $p) {
+	protected function mergeProp(self $entity, $name, $p) {
 		$col = static::getMapping()->getColumn($name);
 		if(!isset($p['access']) || ($col && $col->autoIncrement == true)) {
 			return;

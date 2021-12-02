@@ -3,6 +3,7 @@
 namespace go\core;
 
 use Exception;
+use go\core\data\Model;
 use go\core\orm\EntityType;
 use go\core\db\Query;
 use go\core\db\Statement;
@@ -837,7 +838,7 @@ class TemplateParser {
 	 * Add a key value array or object to add for the parser.
 	 * 
 	 * @param string $name
-	 * @param array|stdClass $model 
+	 * @param array|Model|stdClass $model
 	 * @return TemplateParser
 	 */
 	public function addModel($name, $model) {

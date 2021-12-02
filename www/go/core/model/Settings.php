@@ -295,6 +295,14 @@ class Settings extends core\Settings {
 
 
 	/**
+	 * Allow registration via the auth.php endpoint
+	 *
+	 * @var bool
+	 */
+	public $allowRegistration = false;
+
+
+	/**
 	 * Keep log in core_change for this number of days.
 	 * 
 	 * When a client has not logged in for this period the sync data will be deleted and resynchronized.

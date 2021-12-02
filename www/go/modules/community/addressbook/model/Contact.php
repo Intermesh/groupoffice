@@ -3,11 +3,11 @@ namespace go\modules\community\addressbook\model;
 
 use Exception;
 use go\core\acl\model\AclItemEntity;
-use go\core\data\convert\Xlsx;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\Entity;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
@@ -246,7 +246,7 @@ class Contact extends AclItemEntity {
 	
 	/**
 	 *
-	 * @var ContactGroup[] 
+	 * @var int[]
 	 */
 	public $groups = [];
 
@@ -267,7 +267,8 @@ class Contact extends AclItemEntity {
 	 */
 	protected $starred = null;
 
-	public function getStarred() {
+	public function getStarred(): bool
+	{
 		return !!$this->starred;
 	}
 
@@ -275,11 +276,13 @@ class Contact extends AclItemEntity {
 		$this->starred = empty($starred) ? null : true;
 	}
 
-	protected static function internalRequiredProperties() {
+	protected static function internalRequiredProperties(): array
+	{
 		return ['isOrganization'];
 	}
 
-	public function buildFilesPath() {
+	public function buildFilesPath(): string
+	{
 		if($this->isOrganization) {
 			$new_folder_name = File::stripInvalidChars($this->name).' ('.$this->id.')';
 		} else{
@@ -317,7 +320,8 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @return string[]
 	 */
-	protected static function filesPathProperties() {
+	protected static function filesPathProperties(): array
+	{
 		return ['addressBookId', 'name', 'lastName', 'firstName'];
 	}
 	
@@ -357,7 +361,8 @@ class Contact extends AclItemEntity {
   /**
    * @inheritDoc
    */
-	protected static function defineMapping() {
+	protected static function defineMapping(): \go\core\orm\Mapping
+	{
 		return parent::defineMapping()
 						->addTable("addressbook_contact", 'c')
 						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
@@ -392,7 +397,7 @@ class Contact extends AclItemEntity {
    * @return static|false
    * @throws Exception
    */
-	public static function findForUser($userId, $properties = []) {
+	public static function findForUser(int $userId, array $properties = []) {
 		if(empty($userId)) {
 			return false;
 		}
@@ -421,14 +426,16 @@ class Contact extends AclItemEntity {
    * @return Query
    * @throws Exception
    */
-	public static function findByPhone($number) {
+	public static function findByPhone($number): Query
+	{
 		return static::find()
 						->join("addressbook_phone_number", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
 						->where(['e.number' => $number]);
 	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): \go\core\orm\Filters
+	{
 
 		return parent::defineFilters()
 										->add("addressBookId", function(Criteria $criteria, $value) {
@@ -474,7 +481,7 @@ class Contact extends AclItemEntity {
 
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_email_address', 'em')) {
-												$query->join('addressbook_email_address', 'em', 'em.contactId = c.id', "INNER");
+												$query->join('addressbook_email_address', 'em', 'em.contactId = c.id');
 											}
 
 											$criteria->where('em.email', $comparator, $value);
@@ -609,21 +616,21 @@ class Contact extends AclItemEntity {
 										})
 										->addDate("dateofbirth", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'dob')) {
-												$query->join('addressbook_date', 'dob', 'dob.contactId = c.id', "INNER");
+												$query->join('addressbook_date', 'dob', 'dob.contactId = c.id');
 											}
 											$criteria->where('dob.type', '=', Date::TYPE_BIRTHDAY)
 												->andWhere('dob.date',$comparator, $value);
 										})
 										->addDate("actionDate", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'actionDate')) {
-												$query->join('addressbook_date', 'actionDate', 'actionDate.contactId = c.id', "INNER");
+												$query->join('addressbook_date', 'actionDate', 'actionDate.contactId = c.id');
 											}
 											$criteria->where('actionDate.type', '=', Date::TYPE_ACTION)
 												->andWhere('actionDate.date',$comparator, $value);
 										})
 										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'bdate')) {
-												$query->join('addressbook_date', 'bdate', 'bdate.contactId = c.id AND bdate.type = "'.Date::TYPE_BIRTHDAY .'"', "INNER");
+												$query->join('addressbook_date', 'bdate', 'bdate.contactId = c.id AND bdate.type = "'.Date::TYPE_BIRTHDAY .'"');
 											}
 
 											$date = $value->format(Column::DATE_FORMAT);
@@ -639,7 +646,7 @@ class Contact extends AclItemEntity {
 											$query->join('core_user_group', 'ug', 'ug.userId = c.goUserId');
 											$criteria->where(['ug.groupId' => $value]);
 										})->add('isUser', function(Criteria $criteria, $value, Query $query) {
-											$criteria->where('c.goUserId', empty($value) ? '=' : '!=', null);
+											$criteria->where('c.goUserId', empty($value) ? '=' : '!=');
 											
 										})->add('duplicate', function(Criteria $criteria, $value, Query $query) {
 
@@ -694,7 +701,7 @@ class Contact extends AclItemEntity {
 										
 	}
 
-	public static function sort(Query $query, array $sort)
+	public static function sort(Query $query, array $sort): Query
 	{
 		if(isset($sort['firstName'])) {
 			$sort['name'] = $sort['firstName'];
@@ -714,7 +721,7 @@ class Contact extends AclItemEntity {
 		};
 
 		if(isset($sort['addressBook'])) {
-			$query->join('addressbook_addressbook', 'abSort', 'abSort.id = c.addressBookId', 'INNER');
+			$query->join('addressbook_addressbook', 'abSort', 'abSort.id = c.addressBookId');
 			$sort['abSort.name'] = $sort['addressBook'];
 			unset($sort['addressBook']);
 		}
@@ -731,11 +738,13 @@ class Contact extends AclItemEntity {
 	/**
 	 * @inheritDoc
 	 */
-	public static function converters() {
+	public static function converters(): array
+	{
 		return array_merge(parent::converters(), [VCard::class, Spreadsheet::class]);
 	}
 	
-	public function getUid() {
+	public function getUid(): ?string
+	{
 		
 		if(empty($this->uid)) {
 			if(!isset($this->id)) {
@@ -763,7 +772,8 @@ class Contact extends AclItemEntity {
 		return $this->uid;		
 	}
 
-	private function generateUid() {
+	private function generateUid(): string
+	{
 		$url = trim(go()->getSettings()->URL, '/');
 		$uid = substr($url, strpos($url, '://') + 3);
 		$uid = str_replace('/', '-', $uid );
@@ -775,11 +785,13 @@ class Contact extends AclItemEntity {
 		$this->uid = $uid;
 	}
 
-	public function hasUid() {
+	public function hasUid(): bool
+	{
 		return !empty($this->uid);
 	}
 
-	public function getUri() {
+	public function getUri(): ?string
+	{
 		if(empty($this->uri)) {
 			$uid = $this->getUid(); //generates uri as well
 			if(!isset($uid)) {
@@ -790,7 +802,8 @@ class Contact extends AclItemEntity {
 		return $this->uri;
 	}
 
-	private function saveUri() {
+	private function saveUri(): bool
+	{
 		return go()->getDbConnection()
 			->update('addressbook_contact',
 				['uid' => $this->uid, 'uri' => $this->uri],
@@ -802,7 +815,8 @@ class Contact extends AclItemEntity {
 		$this->uri = $uri;
 	}
 		
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		if(!parent::internalSave()) {
 			return false;
 		}
@@ -821,7 +835,8 @@ class Contact extends AclItemEntity {
 		
 	}
 
-	private function updateEmployees() {
+	private function updateEmployees(): bool
+	{
 		$employees = $this->findEmployees(['jobTitle', 'addressBookId', 'id', 'name']);
 		foreach($employees as $e) {
 			if(!$e->saveSearch(true)) {
@@ -861,24 +876,26 @@ class Contact extends AclItemEntity {
 			}
 		}
 		
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
 
 	/**
 	 * Find all linked organizations
 	 *
 	 * @param array $properties
-	 * @return self[]
+	 * @return self[]|Query
 	 * @throws Exception
 	 */
-	public function findOrganizations($properties = []){
+	public function findOrganizations(array $properties = []): array
+	{
 		return self::findByLink($this, $properties)
 			->andWhere('c.isOrganization = true');
 	}
 
 	private static $organizationIdsStmt;
 
-	private static function prepareFindOrganizations() {
+	private static function prepareFindOrganizations(): \go\core\db\Statement
+	{
 		if(!isset(self::$organizationIdsStmt)) {
 			self::$organizationIdsStmt = self::find()
 				->selectSingleValue('c.id')
@@ -915,7 +932,6 @@ class Contact extends AclItemEntity {
 	 * Used in templates. Not returned to API by default.
 	 *
 	 * @return Contact[]
-	 * @throws Exception
 	 */
 	public function getOrganizations() {
 		return $this->findOrganizations()->all();
@@ -973,15 +989,17 @@ class Contact extends AclItemEntity {
 		return $addressBook->name . $jobTitle . $orgStr;
 	}
 
-	public function title() {
+	public function title(): string
+	{
 		return $this->name;
 	}
 
-	protected function getSearchFilter() {
+	protected function getSearchFilter(): string
+	{
 		return $this->isOrganization ? 'isOrganization' : 'isContact';
 	}
 
-	protected function getSearchKeywords()
+	protected function getSearchKeywords(): array
 	{
 		$keywords = [$this->name, $this->debtorNumber, $this->jobTitle];
 		foreach($this->emailAddresses as $e) {
@@ -1061,7 +1079,8 @@ class Contact extends AclItemEntity {
 	 *
 	 * @return int
 	 */
-	public function getAge() {
+	public function getAge(): int
+	{
 		$bday = $this->getBirthday();
 		if($bday === '') {
 			return 0;
@@ -1074,7 +1093,8 @@ class Contact extends AclItemEntity {
 	/**
 	 * @return string
 	 */
-	public function getAddressBook() {
+	public function getAddressBook(): string
+	{
 		return AddressBook::findById($this->addressBookId)->name;
 	}
 
@@ -1162,7 +1182,7 @@ class Contact extends AclItemEntity {
 	 * @param boolean $returnAny
 	 * @return EmailAddress|boolean
 	 */
-	public function findUrlByType($type, $returnAny = true) {
+	public function findUrlByType(string $type, bool $returnAny = true) {
 		return $this->findPropByType("urls", $type, $returnAny);
 	}
 
@@ -1174,7 +1194,7 @@ class Contact extends AclItemEntity {
 	 * @param boolean $returnAny
 	 * @return EmailAddress|boolean
 	 */
-	public function findEmailByType($type, $returnAny = true) {
+	public function findEmailByType(string $type, bool $returnAny = true) {
 		return $this->findPropByType("emailAddresses", $type, $returnAny);
 	}
 	
@@ -1183,9 +1203,9 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @param string $type
 	 * @param boolean $returnAny
-	 * @return PhoneNumbers|boolean
+	 * @return PhoneNumber|boolean
 	 */
-	public function findPhoneNumberByType($type, $returnAny = true) {
+	public function findPhoneNumberByType(string $type, bool $returnAny = true) {
 		return $this->findPropByType("phoneNumbers", $type, $returnAny);
 	}
 	
@@ -1196,7 +1216,7 @@ class Contact extends AclItemEntity {
 	 * @param boolean $returnAny
 	 * @return Address|boolean
 	 */
-	public function findAddressByType($type, $returnAny = true) {
+	public function findAddressByType(string $type, bool $returnAny = true) {
 		return $this->findPropByType("addresses", $type, $returnAny);
 	}
 	
@@ -1207,7 +1227,7 @@ class Contact extends AclItemEntity {
 	 * @param boolean $returnAny
 	 * @return Date|boolean
 	 */
-	public function findDateByType($type, $returnAny = true) {
+	public function findDateByType(string $type, bool $returnAny = true) {
 		return $this->findPropByType("dates", $type, $returnAny);
 	}
 	
@@ -1222,7 +1242,7 @@ class Contact extends AclItemEntity {
 			return false;
 		}
 		
-		return isset($this->$propName[0]) ? $this->$propName[0] : false;
+		return $this->$propName[0] ?? false;
 	}
 
   /**
@@ -1232,11 +1252,12 @@ class Contact extends AclItemEntity {
    * @param Message $message
    * @return bool
    */
-	public function decorateMessage(Message $message) {
+	public function decorateMessage(Message $message) : bool {
 		if(!isset($this->emailAddresses[0])) {
 			return false;
 		}
 		$message->setTo($this->emailAddresses[0]->email, $this->name);
+		return true;
 	}
 
 //
@@ -1284,17 +1305,21 @@ class Contact extends AclItemEntity {
 //	  $this->color = $v;
 //  }
 
+
 	/**
-	 * @inheritDoc
+	 * @param Contact $entity
+	 * @param string $name
+	 * @param array $p
+	 * @throws Exception
 	 */
-  protected function mergeProp($entity, $name, $p)
+  protected function mergeProp(Entity $entity, $name, $p)
   {
   	//Groups can't be merged if addressbook is different.
   	if($name == "groups" && $entity->addressBookId != $this->getOldValue("addressBookId")) {
   		$this->groups = $entity->groups;
 	  }
 
-	  return parent::mergeProp($entity, $name, $p);
+	  parent::mergeProp($entity, $name, $p);
   }
 
   public static function check()
@@ -1304,7 +1329,7 @@ class Contact extends AclItemEntity {
   	foreach($contacts as $contact) {
   		$contact->save();
 	  }
-	  return parent::check();
+	  parent::check();
   }
 
 }
