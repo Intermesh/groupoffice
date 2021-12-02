@@ -10,6 +10,8 @@ use go\core\orm\Mapping;
 use go\core\TemplateParser;
 use go\core\validate\ErrorCode;
 use go\modules\community\addressbook\model\EmailAddress;
+use Swift_Attachment;
+use Swift_EmbeddedFile;
 
 /**
  * E-mail template model
@@ -94,7 +96,7 @@ class EmailTemplate extends AclOwnerEntity
 			})
 			->add('key', function (Criteria $criteria, $value){
 				$criteria->where(['key' => $value]);
-			});;
+			});
 					
 	}
 
@@ -142,7 +144,7 @@ class EmailTemplate extends AclOwnerEntity
 				$existing[$blobId]->inline = true;
 				$this->attachments[] = $existing[$blobId];
 			} else {
-				$this->attachments[] = (new EmailTemplateAttachment())->setValues(['blobId' => $blobId, 'name' => $blob->name, 'inline' => true]);
+				$this->attachments[] = (new EmailTemplateAttachment($this))->setValues(['blobId' => $blobId, 'name' => $blob->name, 'inline' => true]);
 			}			
 		}
 
