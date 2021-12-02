@@ -339,6 +339,13 @@ class Settings extends core\Settings {
 	 * @var string
 	 */
 	public $logoId;
+
+	/**
+	 * Allow API calls in browser
+	 *
+	 * @var string
+	 */
+	public $corsAllowOrigin;
 	
 	
 	/**

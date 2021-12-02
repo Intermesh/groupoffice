@@ -2,10 +2,10 @@
 namespace go\core\jmap;
 
 use go\core\Environment;
-use go\core\Singleton;
 use go\core\SingletonTrait;
+use stdClass;
 
-class Capabilities extends \stdClass {
+class Capabilities extends stdClass {
 	use SingletonTrait;
 	/**
 	 * The maximum file size, in bytes, that the server will accept for a 

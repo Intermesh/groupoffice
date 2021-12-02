@@ -2,6 +2,8 @@
 
 namespace go\core;
 
+use go\core\fs\Folder;
+
 /**
  * Server information class.
  * 
@@ -16,7 +18,8 @@ class Environment extends Singleton {
 	 * 
 	 * @return boolean
 	 */
-	public function isWindows() {
+	public function isWindows(): bool
+	{
 		return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 	}
 	
@@ -25,7 +28,8 @@ class Environment extends Singleton {
 	 * 
 	 * @return boolean
 	 */
-	public function isCli() {
+	public function isCli(): bool
+	{
 		return PHP_SAPI === 'cli';
 	}
 
@@ -34,7 +38,8 @@ class Environment extends Singleton {
 	 *
 	 * @return boolean
 	 */
-	public function isCron() {
+	public function isCron(): bool
+	{
 		return basename($_SERVER['PHP_SELF']) == 'cron.php';
 	}
 
@@ -43,7 +48,8 @@ class Environment extends Singleton {
 	 * 
 	 * @return int
 	 */
-	public function getMemoryLimit() {
+	public function getMemoryLimit(): int
+	{
 		return self::configToBytes(ini_get('memory_limit'));
 	}
 
@@ -63,7 +69,8 @@ class Environment extends Singleton {
 	 * 
 	 * @return int
 	 */
-	public function getMaxUploadSize() {
+	public function getMaxUploadSize(): int
+	{
 		return min(self::configToBytes(ini_get('post_max_size')), self::configToBytes(ini_get('upload_max_filesize')));
 	}
 
@@ -72,8 +79,10 @@ class Environment extends Singleton {
 	 * From http://php.net/manual/en/function.ini-get.php
 	 *
 	 * @param string $val Memory size shorthand notation string
+	 * @noinspection PhpMissingBreakStatementInspection
 	 */
-	public static function configToBytes($val) {
+	public static function configToBytes(string $val): int
+	{
 		$val = trim($val);
 		$last = strtolower(substr($val,-1));
 		$val = substr($val, 0, -1);
@@ -98,9 +107,10 @@ class Environment extends Singleton {
 	/**
 	 * Get the folder where Group-Office is installed
 	 * 
-	 * @return \go\core\fs\Folder
+	 * @return Folder
 	 */
-	public function getInstallFolder() {
+	public function getInstallFolder(): Folder
+	{
 		
 		if(!isset($this->installFolder)) {
 			$this->installFolder = new fs\Folder($this->getInstallPath());
@@ -115,8 +125,9 @@ class Environment extends Singleton {
 	 * 
 	 * @return string
 	 */
-	public function getInstallPath() {
-		return dirname(dirname(__DIR__));
+	public function getInstallPath(): string
+	{
+		return dirname(__DIR__, 2);
 	}
 
 	/**
@@ -124,7 +135,8 @@ class Environment extends Singleton {
 	 *
 	 * @return bool
 	 */
-	public function hasIoncube() {
+	public function hasIoncube(): bool
+	{
 		return extension_loaded('ionCube Loader');
 	}
 

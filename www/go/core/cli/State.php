@@ -11,7 +11,8 @@ class State extends TemporaryState {
 		$this->setUserId($userId);
 	}
 
-	public function isAuthenticated() {
+	public function isAuthenticated(): bool
+	{
 		return parent::isAuthenticated();// && Environment::get()->isCli();
 	}
 }

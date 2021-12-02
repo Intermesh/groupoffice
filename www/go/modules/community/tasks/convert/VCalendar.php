@@ -156,7 +156,7 @@ class VCalendar extends AbstractConverter {
 		fputs($this->fp, (new \GO\Base\VObject\VTimezone())->serialize());
 	}
 
-	protected function finishExport()
+	protected function finishExport(): Blob
 	{
 		fputs($this->fp, "END:VCALENDAR\r\n");
 
@@ -170,7 +170,8 @@ class VCalendar extends AbstractConverter {
 		return $blob;
 	}
 
-	protected function exportEntity(Entity $entity) {
+	protected function exportEntity(Entity $entity): bool
+	{
 		$data = $this->export($entity);
 		fputs($this->fp, $data);
 	}
@@ -183,7 +184,8 @@ class VCalendar extends AbstractConverter {
 		}
 	}
 
-	public function getFileExtension() {
+	public function getFileExtension(): string
+	{
 		return 'ics';
 	}
 
@@ -194,7 +196,8 @@ class VCalendar extends AbstractConverter {
 		$this->importSplitter = new VCalendarSplitter(StringUtil::cleanUtf8($contents), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
 	}
-	protected function nextImportRecord() {
+	protected function nextImportRecord(): bool
+	{
 		$this->currentRecord = $this->importSplitter->getNext();
 		return $this->currentRecord;
 	}
@@ -355,7 +358,7 @@ class VCalendar extends AbstractConverter {
 		return $task;
 	}
 
-	public static function supportedExtensions()
+	public static function supportedExtensions(): array
 	{
 		return ['ics'];
 	}

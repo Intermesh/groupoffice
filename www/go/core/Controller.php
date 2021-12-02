@@ -32,7 +32,7 @@ abstract class Controller {
 
 	protected $rights;
 
-	protected function checkModulePermissions() {
+	protected function checkModulePermissions() :bool {
 		return $this->rights->mayRead;
 	}
 

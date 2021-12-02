@@ -299,8 +299,8 @@ class Module extends Entity {
 	 * @return self
 	 * @throws Exception
 	 */
-	public static function findByClass($className, $properties = []) {
-		
+	public static function findByClass($className, $properties = []): Module
+	{
 		switch($className) {	
 			
 			case strpos($className, "go\\core") === 0 || strpos($className, "GO\\Base") === 0:

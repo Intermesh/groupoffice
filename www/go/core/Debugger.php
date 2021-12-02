@@ -1,6 +1,8 @@
 <?php
 namespace go\core;
 
+use Closure;
+use Exception;
 use go\core\data\ArrayableInterface;
 use go\core\data\Model;
 
@@ -69,13 +71,19 @@ class Debugger {
 	 * @var array
 	 */
 	private $entries = [];
-	
+
+	/**
+	 * @throws Exception
+	 */
 	public function __construct() {
 		if(!empty(go()->getConfig()['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')) {
 			$this->enable(go()->getConfig()['debug_log']);
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function enable($log = true) {
 		$this->enabled = true;
 		if($log) {
@@ -119,9 +127,9 @@ class Debugger {
 	 * 
 	 * @return float seconds
 	 */
-	public function getMicroTime() {
+	public function getMicroTime() : float {
 		if(!$this->enabled) {
-			return;
+			return 0;
 		}
 		// list ($usec, $sec) = explode(" ", microtime());
 		// return ((float) $usec + (float) $sec);
@@ -155,17 +163,17 @@ class Debugger {
 	 * You can also provide a closure function so code will only be executed when
 	 * debugging is enabled.
 	 *
-	 * @todo if for some reason an error occurs here then an infinite loop is created
 	 * @param callable|string|object $mixed
 	 * @param string $level The type of message. Types can be arbitrary and can be enabled and disabled for output. {@see self::$enabledTypes}
+	 *@todo if for some reason an error occurs here then an infinite loop is created
 	 */
-	private function internalLog($mixed, $level = self::LEVEL_LOG, $traceBackSteps = 0, $writeFile = true) {
+	private function internalLog($mixed, string $level = self::LEVEL_LOG, $traceBackSteps = 0, $writeFile = true) {
 
 		if(!$this->enabled) {
 			return;
 		}		
 		
-		if($mixed instanceof \Closure) {
+		if($mixed instanceof Closure) {
 			$mixed = call_user_func($mixed);
 		}elseif(is_object($mixed) && method_exists($mixed, '__toString')) {
 			$mixed = (string) $mixed;
@@ -254,7 +262,7 @@ class Debugger {
 	 * 
 	 * @param string $message
 	 */
-	public function debugTiming($message) {
+	public function debugTiming(string $message) {
 		if(!$this->enabled) {
 			return;
 		}
@@ -268,7 +276,7 @@ class Debugger {
 	 */
 	public function getTimeStamp() {
 		if(!$this->enabled) {
-			return;
+			return 0;
 		}
 		return ($this->getMicroTime() * 1000) - ($_SERVER["REQUEST_TIME_FLOAT"] * 1000);
 	}
@@ -312,7 +320,8 @@ class Debugger {
 	 * 
 	 * @return array
 	 */
-	public function getEntries() {
+	public function getEntries(): array
+	{
 		return $this->entries;
 	}
 	
@@ -329,7 +338,8 @@ class Debugger {
 	 * @param mixed $var
 	 * @return string
 	 */
-	public static function getType($var) {
+	public static function getType($var): string
+	{
 		if(is_object($var)) {
 			return get_class($var);
 		}else

@@ -3,6 +3,7 @@
 namespace go\core;
 
 use ErrorException;
+use Exception;
 use go\core\util\DateTime;
 use Throwable;
 
@@ -49,7 +50,7 @@ class ErrorHandler {
 	/**
 	 * Log exception to PHP logging system and debug the exception in GO
 	 *
-	 * @param \Exception $e
+	 * @param Exception $e
 	 * @param string $context Extra information about where the exception occurred
 	 * @return string The string that was logged
 	 */

@@ -9,6 +9,7 @@ use go\core\fs\File;
 use go\core\model\Acl;
 use go\core\model\Field;
 use go\core\orm\Entity;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\Relation;
@@ -103,7 +104,7 @@ class Spreadsheet extends AbstractConverter {
 	/**
 	 * @inheritDoc
 	 */
-	public static function supportedExtensions()
+	public static function supportedExtensions(): array
 	{
 		return ['csv', 'xlsx'];
 	}
@@ -159,7 +160,8 @@ class Spreadsheet extends AbstractConverter {
 		}
 	}
 
-	protected function exportEntity(Entity $entity) {
+	protected function exportEntity(Entity $entity): bool
+	{
 
 		if ($this->index == 0) {
 			$this->writeRecord(array_column($this->getHeaders($entity), 'name'));
@@ -181,7 +183,7 @@ class Spreadsheet extends AbstractConverter {
 	}
 
 
-	protected function finishExport()
+	protected function finishExport(): Blob
 	{
 		if($this->extension != 'csv') {
 
@@ -214,7 +216,7 @@ class Spreadsheet extends AbstractConverter {
 		$blob = Blob::fromTmp($this->tempFile);
 		$blob->name = $cls::entityType()->getName() . "-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
 		if(!$blob->save()) {
-			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+			throw new SaveException($blob);
 		}
 
 		return $blob;
@@ -560,7 +562,7 @@ class Spreadsheet extends AbstractConverter {
 
 	protected $record;
 
-	protected function nextImportRecord()
+	protected function nextImportRecord(): bool
 	{
 		if($this->index == 0) {
 			//skip headers

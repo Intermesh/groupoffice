@@ -1,6 +1,7 @@
 <?php
 namespace go\core\convert;
 
+use Exception;
 use go\core\data\convert\Spreadsheet;
 use go\core\model\Module;
 use go\core\orm\Entity;
@@ -19,9 +20,7 @@ class UserSpreadsheet extends Spreadsheet {
 	}
 
   public function exportCreateEmailAccount(Entity $entity, array $templateValues, $columnName) {
-    if(!Module::isInstalled('community', 'serverclient')) {
-      return "0";
-    }
+    return "0";
   }
 
   public function importCreateEmailAccount(Entity $entity, $value, $values) {
@@ -29,22 +28,22 @@ class UserSpreadsheet extends Spreadsheet {
     $this->postFixAdminPassword = false;
 
     if(empty($value) || !Module::isInstalled('community', 'serverclient')) {
-      return true;
+      return;
     }
     
 
     if(empty($values['password'])) {
-      throw new \Exception("Field 'password' is required for createMailAccount");
+      throw new Exception("Field 'password' is required for createMailAccount");
     }
 
     if(empty($values['email'])) {
-      throw new \Exception("Field 'email' is required for createMailAccount");
+      throw new Exception("Field 'email' is required for createMailAccount");
     }
     
     $this->postFixAdminDomain = explode('@', $values['email'])[1];
 
     if(!in_array($this->postFixAdminDomain, GoModule::getDomains())) {
-      throw new \Exception("Domain ". $this->postFixAdminDomain ." is not listed in the server client domains!");
+      throw new Exception("Domain ". $this->postFixAdminDomain ." is not listed in the server client domains!");
     }
     $this->postFixAdminPassword = $values['password'];
   }
@@ -55,9 +54,9 @@ class UserSpreadsheet extends Spreadsheet {
 	/**
 	 * @param Entity $entity
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	protected function afterSave(Entity $entity)
+	protected function afterSave(Entity $entity): bool
 	{
 		if ($this->postFixAdminDomain) {
 			$postfixAdmin = new MailDomain($this->postFixAdminPassword);
