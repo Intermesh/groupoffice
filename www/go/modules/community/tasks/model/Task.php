@@ -187,7 +187,7 @@ class Task extends AclInheritEntity {
 		return ['tasklistId' => 'id'];
 	}
 
-	protected static function internalRequiredProperties()
+	protected static function internalRequiredProperties() : array
 	{
 		//Needed for support module permissions
 		return array_merge(parent::internalRequiredProperties(), ['createdBy']);

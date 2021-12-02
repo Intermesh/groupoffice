@@ -287,7 +287,7 @@ abstract class AclItemEntity extends AclEntity {
 		return $aclEntity;
 	}
 
-	protected static function internalRequiredProperties()
+	protected static function internalRequiredProperties() : array
 	{
 		return array_keys(static::aclEntityKeys());
 	}

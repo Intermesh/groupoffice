@@ -142,13 +142,14 @@ abstract class AclEntity extends Entity {
 	 */
 	abstract protected function isAclChanged();
 
-	protected function internalSave()
+	protected function internalSave() : bool
 	{
-		if(!$this->isNew() && $this->isAclChanged()) {
+		if (!$this->isNew() && $this->isAclChanged()) {
 			static::fireEvent(self::EVENT_ACL_CHANGED, $this);
 		}
 
 		return parent::internalSave();
+	}
 
 	protected static function defineFilters(): Filters
 	{

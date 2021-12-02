@@ -354,13 +354,6 @@ class Settings extends core\Settings {
 	 */
 	public $logoId;
 
-	/**
-	 * Allow API calls in browser
-	 *
-	 * @var string
-	 */
-	public $corsAllowOrigin;
-	
 	
 	/**
 	 * Get's the transparent color based on the primary color.
