@@ -533,7 +533,7 @@ class Connection {
   /**
    * Create a select statement.
    *
-   * @param string $select
+   * @param string|string[] $select
    * @return Query
    * @example
    * ```
@@ -548,7 +548,7 @@ class Connection {
    *
    * @see Query
    */
-	public function select(string $select = "*"): Query
+	public function select($select = "*"): Query
 	{
 		$query = new Query();
 		return $query->setDbConnection($this)->select($select);
