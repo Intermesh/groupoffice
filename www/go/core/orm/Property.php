@@ -526,11 +526,11 @@ abstract class Property extends Model {
 		return self::$mapping[$cls];
 	}
 
-  /**
-   * Get ID which is are the primary keys combined with a "-".
-   *
-   * @return string eg. "1" or with multiple keys: "1-2"
-   */
+	/**
+	 * Get ID which is are the primary keys combined with a "-".
+	 *
+	 * @return string eg. "1" or with multiple keys: "1-2"
+	 */
 	public function id() {
 		if(property_exists($this, 'id')) {
 			return $this->id;
@@ -1433,7 +1433,7 @@ abstract class Property extends Model {
    * @return bool
    * @throws Exception
    */
-	private function removeRelated(Relation $relation, array $models, $oldModels): bool
+	private function removeRelated(Relation $relation, array $models, ?array $oldModels): bool
 	{
 		$cls = $relation->entityName;
 		$where = $this->buildRelationWhere($relation);
@@ -1950,8 +1950,6 @@ abstract class Property extends Model {
    *
    * @param Column $column
    * @param $value
-
-   * @noinspection PhpInconsistentReturnPointsInspection
    */
 	private function validateColumn(Column $column, $value): void
 	{
@@ -2298,11 +2296,9 @@ abstract class Property extends Model {
    * Get the primary key value
    *
    * @return array eg ['id' => 1]
-   * @throws Exception
    */
 	public function primaryKeyValues(): array
 	{
-		
 		$keys = $this->getPrimaryKey();
 		$v = [];
 		foreach($keys as $key) {			
