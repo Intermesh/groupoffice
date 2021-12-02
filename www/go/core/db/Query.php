@@ -284,7 +284,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 *
 	 * Remember the default table alias is 't'.
 	 *
-	 * @param string|array $select Pass null to reset.
+	 * @param string|string[] $select Pass null to reset.
 	 * @return static
 	 */
 	public function select($select = '*', $append = false): Query
