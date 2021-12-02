@@ -129,7 +129,6 @@ class QueryBuilder {
    * @param array $columns
    * @param string $command
    * @return array
-   * @throws Exception
    */
 	public function buildInsert($tableName, $data, array $columns = [], string $command = "INSERT"): array
 	{

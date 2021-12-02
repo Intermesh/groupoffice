@@ -385,7 +385,7 @@ class Connection {
    *  selected in the correct order.
    *
    * @return Statement
-   * @throws Exception
+   * @throws PDOException
    * @example
    * ```
    * $data = [

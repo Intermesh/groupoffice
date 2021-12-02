@@ -2,6 +2,7 @@
 
 namespace go\core\fs;
 
+use Exception;
 use go\core\App;
 use go\core\util\DateTime;
 use InvalidArgumentException;
@@ -48,9 +49,9 @@ abstract class FileSystemObject {
 	/**
 	 * Return absolute filesystem path
 	 *
-	 * @param string
+	 * @return string
 	 */
-	public function getPath() {
+	public function getPath() : string{
 		return $this->path;
 	}
 
@@ -58,6 +59,7 @@ abstract class FileSystemObject {
 	 * Return the modification unix timestamp
 	 *
 	 * @return DateTime
+	 * @throws Exception
 	 */
 	public function getModifiedAt() {
 		return new DateTime('@' . filemtime($this->path));
@@ -329,7 +331,7 @@ abstract class FileSystemObject {
 	 */
 	public function getRelativePath(Folder $fromFolder) {
 		if (!$this->isDescendantOf($fromFolder)) {
-			throw new \Exception("The given folder is not an ancestor of this folder or file: " . $fromFolder .' '.$this->path);
+			throw new Exception("The given folder is not an ancestor of this folder or file: " . $fromFolder .' '.$this->path);
 		} else {
 			return substr($this->getPath(), strlen($fromFolder->getPath()) + 1);
 		}
