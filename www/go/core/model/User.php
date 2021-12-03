@@ -497,6 +497,10 @@ class User extends Entity {
 			$this->homeDir = "users/" . $this->username;
 		}
 
+		if(empty($this->recoveryEmail)) {
+			$this->recoveryEmail = $this->email;
+		}
+
 		if($this->isModified(['username'])) {
 
 			if(!preg_match(self::USERNAME_REGEX, $this->username)) {
@@ -650,10 +654,10 @@ class User extends Entity {
    */
 	public function isAdmin(): bool
 	{
-		return (new Query)
+		return !!(new Query)
 			->select()
 			->from('core_user_group')
-			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single() !== false;
+			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single();
 	}
 
 	/**
@@ -665,10 +669,10 @@ class User extends Entity {
 			return true;
 		}
 
-		return (new Query)
+		return !!(new Query)
 				->select()
 				->from('core_user_group')
-				->where(['groupId' => Group::ID_ADMINS, 'userId' => $userId])->single() !== false;
+				->where(['groupId' => Group::ID_ADMINS, 'userId' => $userId])->single();
 	}
 
   /**

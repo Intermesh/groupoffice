@@ -7,7 +7,7 @@ class Password extends PrimaryAuthenticator {
 	
 	public static function isAvailableFor(string $username): bool
 	{
-		return User::find()->selectSingleValue('id')->where(['username' => $username])->andWhere('password', '!=', 'null')->single() !== false;
+		return !!User::find()->selectSingleValue('id')->where(['username' => $username])->andWhere('password', '!=', 'null')->single();
 	}
 	
 	/**

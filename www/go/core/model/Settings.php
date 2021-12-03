@@ -291,7 +291,7 @@ class Settings extends core\Settings {
 	/**
 	 * @var string
 	 */
-	public $corsAllowOrigin = "http://localhost:8010";
+	public $corsAllowOrigin = "";
 
 
 	/**
