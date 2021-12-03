@@ -5,16 +5,49 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	entityStore: "Task",
 	stateId: 'ta-tasks-detail',
 	relations: ["tasklist", "responsible"],
+	cls: "go-detail-view tasks-task",
 
 	initComponent: function () {
 
 
 		this.tbar = this.initToolbar();
 
+		this.progressMenu = new Ext.menu.Menu({
+			cls: "x-menu-no-icons",
+			items: [
+				{
+					text: t("Needs action"),
+					handler: () => {
+						this.changeProgress("needs-action");
+					}
+				},{
+					text: t("In Progress"),
+					handler: () => {
+						this.changeProgress("in-progress");
+					}
+				},{
+					text: t("Completed"),
+					handler: () => {
+						this.changeProgress("completed");
+					}
+				},{
+					text: t("Failed"),
+					handler: () => {
+						this.changeProgress("failed");
+					}
+				},{
+					text: t("Cancelled"),
+					handler: () => {
+						this.changeProgress("cancelled");
+					}
+				}
+			]
+		});
+
 		Ext.apply(this, {
 			items: [{
 				tpl: new Ext.XTemplate('<h3 class="title s8" style="{[values.color ? \'color:#\'+values.color : \'\']}">{title}</h3>\
-					<h4 class="status" >{[go.modules.community.tasks.progress[values.progress]]}</h4>\
+					<h4 class="status tasks-task-status-{progress}">{[go.modules.community.tasks.progress[values.progress]]}</h4>\
 				<p class="s6 pad">\
 					<label>'+t("Start at")+'</label><span>{[go.util.Format.date(values.start) || "-"]}</span><br><br>\
 					<label>'+t("Tasklist")+'</label><span><tpl for="tasklist">{name}</tpl></span><br><br>\
@@ -42,8 +75,22 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 						var fieldDummy = new go.form.RecurrenceField();
 						return fieldDummy.parseRule(rrule);
 					}
-				})
+				}),
+				listeners : {
+					afterrender: (item) => {
+						item.getEl().on("click", (e) => {
+							if(e.target.tagName != 'H4') {
+								return;
+							}
+
+
+							this.progressMenu.showAt(e.xy);
+
+						});
+					}
+				}
 			}],
+
 			buttons: [{
 				iconCls: 'ic-forward',
 				text:t("Continue task", "tasks"),
@@ -61,7 +108,19 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		this.addLinks();
 		this.addFiles();
 		this.addHistory();
+
+		this.on("destroy" , () => {
+			this.progressMenu.destroy();
+		})
 	},
+
+
+	changeProgress : function(progress) {
+		go.Db.store("Task").save({
+			progress: progress
+		}, this.data.id);
+	},
+
 
 	onLoad: function () {
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);

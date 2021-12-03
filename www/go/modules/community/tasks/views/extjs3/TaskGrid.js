@@ -110,6 +110,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						return v;
 					}
 				},{
+					hideable: false,
 					id: 'icons',
 					width: dp(60),
 					renderer: function(v,m,rec) {
@@ -162,11 +163,21 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
 					}
 				},{
+					id:"percentComplete",
 					width:dp(150),
 					header: t('% complete', "tasks", "community"),
 					dataIndex: 'percentComplete',
 					renderer:function (value, meta, rec, row, col, store){
 						return '<div class="go-progressbar"><div style="width:'+Math.ceil(value)+'%"></div></div>';
+					}
+				},{
+					hidden: true,
+					id:"progress",
+					width:dp(150),
+					header: t('Progress', "tasks", "community"),
+					dataIndex: 'progress',
+					renderer:function (value, meta, rec, row, col, store){
+						return `<div class="status tasks-task-status-${value}">${go.modules.community.tasks.progress[value]}</div>`;
 					}
 				},{
 					xtype:"datecolumn",
