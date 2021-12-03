@@ -1,7 +1,5 @@
-<?php /** @noinspection PhpUndefinedMethodInspection */
+<?php
 /** @noinspection PhpUndefinedMethodInspection */
-/** @noinspection PhpUndefinedMethodInspection */
-
 /** @noinspection PhpPossiblePolymorphicInvocationInspection */
 
 namespace go\core\orm;
