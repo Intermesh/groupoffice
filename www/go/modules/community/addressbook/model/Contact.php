@@ -649,7 +649,11 @@ class Contact extends AclItemEntity {
 											$query->join('core_user_group', 'ug', 'ug.userId = c.goUserId');
 											$criteria->where(['ug.groupId' => $value]);
 										})->add('isUser', function(Criteria $criteria, $value, Query $query) {
-											$criteria->where('c.goUserId', empty($value) ? '=' : '!=', null);
+											if(is_bool($value)) {
+												$criteria->where('c.goUserId', empty($value) ? '=' : '!=', null);
+											} else{
+												$criteria->where('c.goUserId',  '=' , $value);
+											}
 											
 										})->add('duplicate', function(Criteria $criteria, $value, Query $query) {
 

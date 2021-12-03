@@ -1278,23 +1278,23 @@ abstract class Entity extends Property {
 	 */
 	public function title(): string
 	{
-		if(property_exists($this,'name')) {
+		if(property_exists($this,'name') && !empty($this->name)) {
 			return $this->name;
 		}
 
-		if(property_exists($this,'title')) {
+		if(property_exists($this,'title') && !empty($this->title)) {
 			return $this->title;
 		}
 
-		if(property_exists($this,'subject')) {
+		if(property_exists($this,'subject') && !empty($this->subject)) {
 			return $this->subject;
 		}
 
-		if(property_exists($this,'description')) {
+		if(property_exists($this,'description') && !empty($this->description)) {
 			return $this->description;
 		}
 
-		if(property_exists($this,'displayName')) {
+		if(property_exists($this,'displayName') && !empty($this->displayName)) {
 			return $this->displayName;
 		}
 

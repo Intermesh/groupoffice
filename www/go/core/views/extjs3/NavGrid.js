@@ -88,9 +88,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 			if(record) {
 				selected.push(record);
 			}
-		})
-
-		console.warn(selected, selectedIds);
+		});
 
 		const select = () => {
 			// console.warn(selected);

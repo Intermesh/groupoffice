@@ -886,7 +886,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @param {object} params {@link https://jmap.io/spec-core.html#query
 	 * @param {function} cb
 	 * @param {object} scope
-	 * @returns {String} Client call ID
+	 * @returns {Promise<any>} Client call ID
 	 */
 	query : function(params, cb, scope) {
 

@@ -199,6 +199,31 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 			avatar.html = go.util.avatar(creator.displayName,creator.avatarId);
 
+			avatar.style = {
+				cursor: "pointer"
+			}
+			avatar.listeners = {
+				afterrender : (cmp) => {
+					console.log(creator);
+					cmp.getEl().on("click" , async () => {
+						//lookup in address book
+						const ids = await go.Db.store("Contact").query({
+							filter: {
+								isUser: creator.id
+							}
+						}).then(r=>r.ids);
+
+						if(!ids.length) {
+							Ext.MessageBox.alert(t("Not found"), t("Could not find this user in the address book for you."));
+						} else
+						{
+							go.Entities.get("Contact").goto(ids[0]);
+						}
+					})
+				}
+			}
+
+
 			for(let i = 0, l = r.data.labels.length; i < l; i++){
 				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
 			}
