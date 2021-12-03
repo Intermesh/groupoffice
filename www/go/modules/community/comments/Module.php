@@ -36,6 +36,7 @@ class Module extends core\Module
 			return;
 		}
 		$data = $alert->getData();
+
 		$creator = core\model\UserDisplay::findById($data->createdBy, ['displayName']);
 
 		$props['body'] = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ": <br /><br />\n\n<i>" . $alert->getData()->excerpt . "</i>";

@@ -24,10 +24,12 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 					<label>'+t("Due at")+'</label><span>{[go.util.Format.date(values.due) || "-"]}</span><br><br>\
 					<tpl if="values.responsible"><label>'+t("Responsible")+'</label><span>{[go.util.avatar(values.responsible.displayName, values.responsible.avatarId)]} {[values.responsible.displayName]}</span><br><br></tpl>\
 				</p>\
+				<tpl if="values.percentComplete">\
 				<div class="s12 pad">\
 					<label>'+t("Percent complete")+'</label>\
 					<div class="go-progressbar" style="clear:both"><div style="width:{[Math.ceil(values.percentComplete)]}%"></div></div>\
 				</div>\
+				</tpl>\
 				<tpl if="!GO.util.empty(description)"><p class="s12 pad">\
 					<label>'+t('Description')+'</label>\
 					<span>{[go.util.textToHtml(values.description)]}</span>\
@@ -65,6 +67,8 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
 		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
 
+		this.assignMeBtn.setVisible(!this.data.responsibleUserId);
+
 		go.modules.community.tasks.TaskDetail.superclass.onLoad.call(this);
 	},
 
@@ -73,6 +77,16 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		var items = this.tbar || [];
 
 		items = items.concat([
+			this.assignMeBtn = new Ext.Button({
+				text: t("Assign me"),
+				scope: this,
+				handler: function() {
+					go.Db.store("Task").save({
+						responsibleUserId: go.User.id,
+						progress: "in-progress"
+					}, this.data.id);
+				}
+			}),
 			'->',
 			{
 				itemId: "edit",

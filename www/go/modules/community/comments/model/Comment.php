@@ -127,7 +127,9 @@ class Comment extends AclItemEntity {
 		}
 
 		return parent::sort($query, $sort);		
-	}	
+	}
+
+	private $relatedEntity;
 	
 	/**
 	 * Find the entity this comment belongs to.
@@ -135,13 +137,18 @@ class Comment extends AclItemEntity {
 	 * @return Entity|ActiveRecord
 	 */
 	public function findEntity() {
-		$e = EntityType::findById($this->entityTypeId);
-		$cls = $e->getClassName();
-		if(is_a($cls, ActiveRecord::class, true)) {
-			return $cls::model()->findByPk($this->entityId);			
-		} else {
-			return $cls::findById($this->entityId);					
+
+		if(!isset($this->relatedEntity)) {
+			$e = EntityType::findById($this->entityTypeId);
+			$cls = $e->getClassName();
+			if (is_a($cls, ActiveRecord::class, true)) {
+				$this->relatedEntity = $cls::model()->findByPk($this->entityId);
+			} else {
+				$this->relatedEntity = $cls::findById($this->entityId);
+			}
 		}
+
+		return $this->relatedEntity;
 	}
 
 	protected function getAclEntity()
@@ -167,7 +174,8 @@ class Comment extends AclItemEntity {
 	 *
 	 * @return int
 	 */
-	public function getPermissionLevel() {
+	public function getPermissionLevel(): int
+	{
 
 		if(go()->getAuthState()->isAdmin()) {
 			return Acl::LEVEL_MANAGE;
@@ -214,12 +222,24 @@ class Comment extends AclItemEntity {
 
 	protected function internalSave(): bool
 	{
+		$this->images = Blob::parseFromHtml($this->text);
+
+		if(!parent::internalSave()) {
+			return false;
+		}
 
 //		if($this->isNew()) {
 //			$this->createAlerts();
 //		}
-		$this->images = Blob::parseFromHtml($this->text);
-		return parent::internalSave();
+
+		if($this->isNew()) {
+			$entity = $this->findEntity();
+			if(method_exists($entity, 'onCommentAdded')) {
+				$entity->onCommentAdded($this);
+			}
+		}
+
+		return true;
 	}
 //
 //	private function createAlerts() {

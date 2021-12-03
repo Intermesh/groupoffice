@@ -35,7 +35,8 @@ class Category extends Entity {
 			->addTable("tasks_category", "category");
 	}
 
-	public function getPermissionLevel() {
+	public function getPermissionLevel(): int
+	{
 		return ($this->ownerId === go()->getUserId() || \go\core\model\Module::findByName('community', 'tasks')->hasPermissionLevel(50)) ?  Acl::LEVEL_MANAGE : 0; // validate will make sure global categories aren't changed if no permission
 	}
 
