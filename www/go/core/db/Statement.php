@@ -81,7 +81,8 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 	 *
 	 * Binding more values than specified is not possible; if more keys exist in input_parameters than in the SQL specified in the PDO::prepare(), then the statement will fail and an error is emitted.
 	 *
-	 * @return bool
+	 * @throws PDOException
+	 * @return bool Always returns true but must be compatible with PHP function
 	 */
 	public function execute($params = null): bool
 	{

@@ -68,14 +68,15 @@ class Response extends HttpResponse
 	{
 		return $this->data;
 	}
-	
+
 	/**
-	 * The client call ID is passed by the router. It needs to be appended to 
+	 * The client call ID is passed by the router. It needs to be appended to
 	 * every response.
-	 * 
+	 *
+	 * @param string $methodName
 	 * @param string $clientCallId
 	 */
-	public function setClientCall($methodName, $clientCallId) {
+	public function setClientCall(string $methodName, string $clientCallId) {
 		$this->clientCallId = $clientCallId;
 		$this->methodName = $methodName;
 	}
@@ -86,6 +87,6 @@ class Response extends HttpResponse
 			$this->addResponse($data);
 		}
 	
-		return parent::output($this->data);
+		parent::output($this->data);
 	}
 }

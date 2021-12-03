@@ -115,7 +115,7 @@ class Search extends EntityController {
 		return $this->defaultQuery($params);
 	}
 
-	protected function getQueryQuery(array $params)
+	protected function getQueryQuery(array $params): Query
 	{
 		$hasIndex = go()->getDatabase()->getTable('core_search')->hasIndex("core_search_entityTypeId_filter_modifiedAt_aclId_index");
 

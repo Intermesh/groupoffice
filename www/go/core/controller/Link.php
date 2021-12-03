@@ -6,6 +6,7 @@ use go\core\App;
 use go\core\jmap\EntityController;
 use go\core\model;
 use go\core\orm\EntityType;
+use go\core\orm\Query;
 
 
 class Link extends EntityController {
@@ -20,7 +21,8 @@ class Link extends EntityController {
 		return model\Link::class;
 	}
 	
-	protected function paramsQuery(array $params) {
+	protected function paramsQuery(array $params): array
+	{
 		$p =  parent::paramsQuery($params);
 		
 		if(empty($p['sort'])) {
@@ -32,7 +34,7 @@ class Link extends EntityController {
 		return $p;
 	}
 
-	protected function getQueryQuery(array $params)
+	protected function getQueryQuery(array $params): Query
 	{
 		$q = parent::getQueryQuery($params)
 			->groupBy([])

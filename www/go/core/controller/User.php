@@ -14,7 +14,7 @@ use go\core\model;
 
 class User extends EntityController {
 
-	protected function getDefaultQueryFilter()
+	protected function getDefaultQueryFilter() : array
 	{
 		return ['showDisabled'=> false];
 	}

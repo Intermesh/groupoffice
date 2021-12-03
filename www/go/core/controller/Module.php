@@ -58,7 +58,7 @@ class Module extends EntityController {
 		return go()->getAuthState()->isAdmin();
 	}
 
-	protected function getQueryQuery(array $params)
+	protected function getQueryQuery(array $params): Query
 	{
 		return $this->filterPermissions(parent::getQueryQuery($params))->orderBy(['sort_order' => 'ASC']);
 	}

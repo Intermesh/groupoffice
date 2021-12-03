@@ -5,6 +5,7 @@ namespace go\core\controller;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\model;
+use go\core\orm\Query;
 
 
 class Field extends EntityController {
@@ -41,7 +42,8 @@ class Field extends EntityController {
 						->where(['m.enabled' => true]);
 	}
 	
-	protected function getQueryQuery(array $params) {
+	protected function getQueryQuery(array $params): Query
+	{
 		return $this->checkEnabledModule(parent::getQueryQuery($params)->orderBy(['sortOrder' => 'ASC', 'id' => 'ASC']));
 						
 	}

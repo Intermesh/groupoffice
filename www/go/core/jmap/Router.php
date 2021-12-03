@@ -3,16 +3,15 @@
 namespace go\core\jmap;
 
 use Exception as CoreException;
-use GO;
-use GO\Base\Util\Number;
-use go\core\App;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
-use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\InvalidResultReference;
 use go\core\orm\EntityType;
+use go\core\util\ArrayObject;
+use InvalidArgumentException;
+use JsonException;
 use JsonSerializable;
-use go\core\http;
+use Throwable;
 
 /**
  * JMAP compatible router
@@ -31,39 +30,36 @@ use go\core\http;
  */
 class Router {
 
-	private $clientCallId;
-
-	public function getClientCallId() {
-		return $this->clientCallId;
-	}
-
-	public function error($type, $status, $detail) {	
-		$r = http\Response::get();
-		$r->setStatus($status, $detail);
-		$r->sendHeaders();
-		$r->output([
-			"type" => $type,
-			"status" => $status,
-			"detail" => $detail
-		]);
-	}
+//	public function error($type, $status, $detail) {
+//		$r = http\Response::get();
+//		$r->setStatus($status, $detail);
+//		$r->sendHeaders();
+//		$r->output([
+//			"type" => $type,
+//			"status" => $status,
+//			"detail" => $detail
+//		]);
+//		exit();
+//	}
 
 	/**
 	 * Run the router
-	 * 
-	 * Takes the request and loops through each method call. For each method a 
+	 *
+	 * Takes the request and loops through each method call. For each method a
 	 * controller method is looked up.
-	 * 
+	 *
 	 * community/notes/Note/get maps to go\modules\community\notes\controller\Note::get()
+	 * @throws JsonException
+	 * @throws Exception
 	 */
 	public function run() {	
 
 		$body = Request::get()->getBody();
 		
-		if(!is_array($body)) {
-			return $this->error("urn:ietf:params:jmap:error:notRequest", 400, "The request parsed as JSON but did not match the type signature of the Request object.");
-			throw new Exception(400, 'Bad request');
-		}
+//		if(!is_array($body)) {
+//			return $this->error("urn:ietf:params:jmap:error:notRequest", 400, "The request parsed as JSON but did not match the type signature of the Request object.");
+//
+//		}
 
 		while($method = array_shift($body)) {
 			$this->callMethod($method);
@@ -73,6 +69,11 @@ class Router {
 		Response::get()->output();
 	}
 
+	/**
+	 * Calls the controller method
+	 *
+	 * @throws Exception
+	 */
 	private function callMethod(array $body) {
 		if (count($body) != 3) {
 			throw new Exception(400, 'Bad request');
@@ -106,7 +107,7 @@ class Router {
 			}
 		
 			Response::get()->addError($error);
-		} catch (\Throwable $e) {
+		} catch (Throwable $e) {
 			$error = ["message" => $e->getMessage()];
 			
 			if(go()->getDebugger()->enabled) {
@@ -127,7 +128,12 @@ class Router {
 		}
 	}
 
-	private function findControllerAction($method) {
+	/**
+	 * @throws Exception
+	 * @throws CoreException
+	 */
+	private function findControllerAction(string $method): array
+	{
 		$parts = explode('/', $method);
 
 		if (count($parts) == 2) {
@@ -189,17 +195,18 @@ class Router {
 //	}
 
 	/**
-	 * Runs controller method 
-	 * 
+	 * Runs controller method
+	 *
 	 * community/notes/Note/get maps to go\modules\community\notes\controller\Note::get()
-	 * 
-	 * @param string $methodName
+	 *
+	 * @param $method
+	 * @param $params
+	 * @return JsonSerializable | array | ArrayObject
+	 * @throws Exception|InvalidResultReference
 	 * @params array $routerParams A merge of route and query params
-	 * @throws Exception
-	 * @return JsonSerializable
 	 */
-	protected function callAction($method, $params) {
-
+	protected function callAction($method, $params) 
+	{
 		// Special testing method that echoes the params
 		if($method == "Core/echo") {
 			return $params;
@@ -211,7 +218,7 @@ class Router {
 		if(!isset($params)) {
 			$params = [];
 		} else if(!is_array($params)) {
-			throw new InvalidArguments("params argument should be an object with {key: value}");
+			throw new InvalidArgumentException("params argument should be an object with {key: value}");
 		}
 
 		$params = $this->resolveResultReferences($params);
@@ -221,9 +228,11 @@ class Router {
 
 	/**
 	 * @link http://jmap.io/spec-core.html#references-to-previous-method-results
-	 * @param type $params
+	 * @param array $params
+	 * @return array
+	 * @throws InvalidResultReference
 	 */
-	private function resolveResultReferences($params) {
+	private function resolveResultReferences(array $params) : array {
 
 		foreach ($params as $name => $resultReference) {
 			if (substr($name, 0, 1) == '#') {
@@ -237,6 +246,9 @@ class Router {
 		return $params;
 	}
 
+	/**
+	 * @throws InvalidResultReference
+	 */
 	private function findResultOf($resultOf) {
 		$results = Response::get()->getData();
 		
@@ -254,8 +266,11 @@ class Router {
 		throw new InvalidResultReference("Client call id ".$resultOf." does not exist.");
 	}
 
+	/**
+	 * @throws InvalidResultReference
+	 */
 	private function resolvePath($pathParts, $result) {
-		$arrayMode = false;
+
 		while ($part = array_shift($pathParts)) {
 			if ($part == '*') {
 				$ret = [];
