@@ -34,10 +34,12 @@
 			 </div>\
 			</tpl>',
 
-		initComponent: function() {
-			this.value = go.User.id;
-			this.supr().initComponent.call(this);
-		}
+		// initComponent: function() {
+		// 	if(!("value" in this.initialConfig)) {
+		// 		this.value = go.User.id;
+		// 	}
+		// 	this.supr().initComponent.call(this);
+		// }
 	};
 
 	go.users.UserCombo = Ext.extend(go.form.ComboBox, cfg);
