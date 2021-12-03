@@ -5662,7 +5662,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		return ['title' => $title, 'body' => $body];
 	}
 
-	public function getURL() {
+	public function url() {
 
 		$url = static::fireEvent(self::EVENT_URL, $this);
 

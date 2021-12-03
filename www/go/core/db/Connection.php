@@ -254,12 +254,12 @@ class Connection {
    * Rollback the DB transaction
    *
    * @return boolean
-   * @throws Exception
+   * @throws PDOException
    */
 	public function rollBack(): bool
 	{
 		if($this->transactionSavePointLevel == 0) {
-			throw new Exception("Not in transaction!");
+			throw new PDOException("Not in transaction!");
 		}
 		
 		$this->transactionSavePointLevel--;	

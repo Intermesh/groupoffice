@@ -805,7 +805,7 @@ abstract class Entity  extends OrmEntity {
 	}
 
 
-	public function getURL() {
+	public function url() {
 
 		$url = static::fireEvent(self::EVENT_URL, $this);
 
@@ -813,7 +813,7 @@ abstract class Entity  extends OrmEntity {
 			return $url;
 		}
 
-		return go()->getSettings()->URL . '#' + strtolower(static::entityType()->getName()) + "/" + $this->id();
+		return go()->getSettings()->URL . '#' . strtolower(static::entityType()->getName()) . "/" . $this->id();
 	}
 
 }

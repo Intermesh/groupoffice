@@ -134,7 +134,13 @@ class Listeners extends Singleton {
 		if($calledClass != $traitUser) { // && $event != Property::EVENT_MAPPING) {
 			$parent = get_parent_class($calledClass);
 			if($parent) {
-				return $this->fireEvent($parent, $traitUser, $event, $args);
+				$parentReturn = $this->fireEvent($parent, $traitUser, $event, $args);
+				if($parentReturn === false) {
+					return false;
+				}
+				if($parentReturn) {
+					$return = $parentReturn;
+				}
 			}
 		}
 		return $return;

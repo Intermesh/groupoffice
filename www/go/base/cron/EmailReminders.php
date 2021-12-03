@@ -56,8 +56,9 @@ class EmailReminders extends AbstractCron {
 		
 		\GO::session()->runAsRoot();
 		$usersStmt = \GO\Base\Model\User::model()->findByAttribute('mail_reminders', 1);
+
 		while ($userModel = $usersStmt->fetch()) {
-			
+
 			\GO::debug("Sending mail reminders to ".$userModel->username);
 			
 			$remindersStmt = \GO\Base\Model\Reminder::model()->find(
@@ -114,8 +115,11 @@ class EmailReminders extends AbstractCron {
 			date_default_timezone_set(\GO::user()->timezone);
 
 			$alerts = Alert::find()
+				->where('userId', '=', $userModel->id)
 				->where('triggerAt', '<=', new DateTime("now", new \DateTimeZone("UTC")))
 				->where('sendMail', '=', true);
+
+			echo $alerts ."\n";
 
 			foreach($alerts as $alert) {
 				try {
@@ -126,8 +130,9 @@ class EmailReminders extends AbstractCron {
 					go()->getLanguage()->setLanguage($user->language);
 
 					//$body = go()->t("Time") . ': ' . $alert->triggerAt->toUserFormat(true, $user) . "\n\n";
-					$body = $alert->getBody() ."\n\n";
-					$body .= $alert->findEntity()->getURL();
+					$body = $alert->getBody() ."<br /><br/>";
+					$url = $alert->findEntity()->url();
+					$body .= '<a href="' . $url . '">' . $url . '</a>';
 
 //					date_default_timezone_set(\GO::user()->timezone);
 
@@ -135,7 +140,7 @@ class EmailReminders extends AbstractCron {
 						->getMailer()
 						->compose()
 						->setSubject($subject)
-						->setBody($body)
+						->setBody($body, 'text/html')
 						->setTo($user->email, $user->displayName)
 						->send();
 
