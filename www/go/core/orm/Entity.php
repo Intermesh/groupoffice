@@ -188,9 +188,9 @@ abstract class Entity extends Property {
 	 * @param string $id
 	 * @param string[] $properties
 	 * @param bool $readOnly
-	 * @return static | false
+	 * @return ?static
 	 */
-	public static final function findById(string $id, array $properties = [], bool $readOnly = false)
+	public static final function findById(string $id, array $properties = [], bool $readOnly = false): ?Entity
 	{
 		return static::internalFindById($id, $properties, $readOnly);
 	}
@@ -538,9 +538,10 @@ abstract class Entity extends Property {
 	 * 
 	 * @return int
 	 */
-	public function getPermissionLevel() {
+	public function getPermissionLevel(): int
+	{
 		if($this->isNew()) {
-			return $this->canCreate() ? Acl::LEVEL_CREATE : false;
+			return $this->canCreate() ? Acl::LEVEL_CREATE : 0;
 		}
 		return go()->getAuthState() && go()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 	}

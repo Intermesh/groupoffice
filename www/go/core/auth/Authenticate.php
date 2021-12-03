@@ -157,9 +157,9 @@ class Authenticate {
 
 		go()->log("Trying: " . get_class($authenticator));
 
-		if (!$user = $authenticator->authenticate($username, $password)) {
+		if (!($user = $authenticator->authenticate($username, $password))) {
 
-			User::fireEvent(User::EVENT_BADLOGIN, $username, $user ?? null);
+			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
 
 			return false;
 		}

@@ -24,7 +24,8 @@ class Module extends Entity {
 	public $permissions = [];
 
 	// for backwards compatibility
-	public function getPermissionLevel($userId = null) {
+	public function getPermissionLevel($userId = null): int
+	{
 
 		$rights = $this->getUserRights($userId);
 
