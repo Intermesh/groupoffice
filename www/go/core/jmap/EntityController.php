@@ -73,7 +73,7 @@ abstract class EntityController extends Controller {
 	protected static $getReadOnly = true;
 
 	/**
-	 * Get's the query for the Foo/query JMAP method
+	 * Gets the query for the Foo/query JMAP method
 	 *
 	 * @param array $params
 	 * @return Query
