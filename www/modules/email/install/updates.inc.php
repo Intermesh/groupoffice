@@ -206,3 +206,5 @@ $updates['201905111651'][] = "DROP TABLE `email_template`;";
 $updates['201906271420'][] = "DELETE FROM go_state WHERE name='em-pnl-west'";
 
 $updates['202002280914'][] = "ALTER TABLE `em_contacts_last_mail_times` ADD INDEX(`last_mail_time`);";
+
+$updates['202112031315'][] = "ALTER TABLE `em_accounts` ADD KEY (`id`), ADD KEY(`user_id`);";

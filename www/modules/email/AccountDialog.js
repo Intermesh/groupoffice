@@ -45,10 +45,10 @@ GO.email.AccountDialog = function(config) {
 
 	// TODO: Put this properly in an override function in Googleoauth2
 	if(go.Modules.isAvailable("community", "googleoauth2")) {
-		this.btnOpenAuthDialog = new Ext.Button({
-			iconCls: '',
-			label: 'OAuth2',
-		});
+		// this.btnOpenAuthDialog = new Ext.Button({
+		// 	iconCls: 'ic-shield',
+		// 	text: 'OAuth2',
+		// });
 		this.selectAuthMethodCombo = new Ext.form.ComboBox({
 			fieldLabel: t("Authentication Method"),
 			hiddenName: 'authenticationMethod',
@@ -73,8 +73,10 @@ GO.email.AccountDialog = function(config) {
 				'select': function (combo, record, index) {
 					if(record.data.id !== "credentials") {
 						this.tabPanel.hideTabStripItem(1);
+						this.btnOpenAuthDialog.show();
 					} else {
 						this.tabPanel.unhideTabStripItem(1)
+						this.btnOpenAuthDialog.hide();
 					}
 				},
 				scope: this
@@ -237,6 +239,7 @@ GO.email.AccountDialog = function(config) {
 
 	if(go.Modules.isAvailable("community", "googleoauth2")) {
 		this.properties_items.push(this.selectAuthMethodCombo);
+		// this.properties_items.push(this.btnOpenAuthDialog);
 	}
 
 	this.smtpAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
@@ -599,7 +602,42 @@ GO.email.AccountDialog = function(config) {
 				this.foldersDialog.show(this.account_id);
 
 			}
-		},'->',{
+		},
+		this.btnOpenAuthDialog = new Ext.Button({
+			iconCls: 'btn-token',
+			text: 'OAuth2',
+			handler : function() {
+				go.Jmap.request({
+					method: 'community/googleoauth2/Oauth2Account/auth',
+					params: {accountId: this.account_id},
+					callback: function(options, success, response) {
+						debugger;
+						if (!response.success) {
+							// Ext.Msg.show({
+							// 	title: t('Postcode API'),
+							// 	msg: response.feedBack,
+							// 	ok: true
+							// });
+							// me.resetFields(fieldSet);
+
+						} else {
+							// fieldSet.zipCode.setValue(response.address.postcode);
+							// fieldSet.street.setValue(response.address.street);
+							// fieldSet.city.setValue(response.address.city);
+							// fieldSet.state.setValue(response.address.province);
+						}
+					}
+				});
+				// if (!this.consentDialog) {
+				// 	this.consentDialog = new go.modules.community.googleoauth2.ConsentDialog();
+				// }
+				// this.consentDialog.show({accountId: this.account_id});
+			},
+			hidden: true,
+			scope : this
+
+		})
+		,'->',{
 			text : t("Apply"),
 			handler : function() {
 				this.save(false);

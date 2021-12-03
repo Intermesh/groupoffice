@@ -1,2 +1,3 @@
 Module.js
 EmailOverrides.js
+ConsentDialog.js
