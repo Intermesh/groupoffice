@@ -19,7 +19,8 @@ class User extends EntityController {
 		return ['showDisabled'=> false];
 	}
 
-	protected function canUpdate(Entity $entity) {
+	protected function canUpdate(Entity $entity): bool
+	{
 		
 		if($this->rights->mayChangeUsers) {
 			// Level is not used for users. When user management is enabled only check read permissions
@@ -34,12 +35,12 @@ class User extends EntityController {
 		return parent::canUpdate($entity);
 	}
 
-	protected function canDestroy(Entity $entity)
+	protected function canDestroy(Entity $entity): bool
 	{
 		return $this->rights->mayChangeUsers;
 	}
 
-	protected function canCreate(Entity $entity)
+	protected function canCreate(Entity $entity): bool
 	{
 		return $this->rights->mayChangeUsers;
 	}
@@ -49,7 +50,8 @@ class User extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\User::class;
 	}
 	

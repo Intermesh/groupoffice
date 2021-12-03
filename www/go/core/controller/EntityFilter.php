@@ -18,7 +18,8 @@ class EntityFilter extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\EntityFilter::class;
 	}	
 	

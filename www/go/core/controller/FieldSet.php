@@ -10,17 +10,17 @@ use go\core\model;
 
 class FieldSet extends EntityController {
 
-	protected function canUpdate(Entity $entity)
+	protected function canUpdate(Entity $entity): bool
 	{
 		return $this->rights->mayChangeCustomFields;
 	}
 
-	protected function canDestroy(Entity $entity)
+	protected function canDestroy(Entity $entity): bool
 	{
 		return $this->rights->mayChangeCustomFields;
 	}
 
-	protected function canCreate(Entity $entity)
+	protected function canCreate(Entity $entity): bool
 	{
 		return $this->rights->mayChangeCustomFields;
 	}
@@ -29,7 +29,8 @@ class FieldSet extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\FieldSet::class;
 	}
 	
@@ -38,10 +39,11 @@ class FieldSet extends EntityController {
 						->where(['m.enabled' => true]);
 	}
 
-	protected function getQueryQuery($params) {
+	protected function getQueryQuery(array $params) {
 		return $this->checkEnabledModule(parent::getQueryQuery($params)->orderBy(['sortOrder' => 'ASC', 'id' => 'ASC']));
 	}
-	protected function getGetQuery($params) {
+	protected function getGetQuery(array $params): \go\core\orm\Query
+	{
 		return $this->checkEnabledModule(parent::getGetQuery($params)->orderBy(['sortOrder' => 'ASC', 'id' => 'ASC']));
 	}
 	

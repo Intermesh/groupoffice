@@ -7,7 +7,8 @@ use go\modules\community\ldapauthenticator\model;
 
 class Server extends \go\core\jmap\EntityController {
 	
-	protected function entityClass(): string {
+	protected function entityClass(): string
+	{
 		return model\Server::class;
 	}
 	

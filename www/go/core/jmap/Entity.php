@@ -321,7 +321,7 @@ abstract class Entity  extends OrmEntity {
    * Marks changes for query already prepared for selecting the right ID's
    *
    * @param Query $query
-   * @param string $cls
+   * @param class-string<Entity> $cls
    * @throws Exception
    */
 	private static function changesQuery(Query $query, string $cls) {
@@ -339,9 +339,6 @@ abstract class Entity  extends OrmEntity {
 
     $query->select('"0" AS destroyed', true);
 
-		/**
-		 * @var Entity $cls
-		 */
 		$type = $cls::entityType();
 		$type->changes($query);
   }

@@ -14,7 +14,7 @@ use go\modules\community\tasks\model;
 class Tasklist extends EntityController
 {
 
-	protected function entityClass()
+	protected function entityClass(): string
 	{
 		return model\Tasklist::class;
 	}

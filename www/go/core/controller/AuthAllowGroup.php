@@ -19,9 +19,10 @@ class AuthAllowGroup extends EntityController {
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
-	 * @return model\AuthAllowGroup
+	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\AuthAllowGroup::class;
 	}	
 	

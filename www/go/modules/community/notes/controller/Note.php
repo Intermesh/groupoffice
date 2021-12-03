@@ -13,7 +13,8 @@ class Note extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Note::class;
 	}
 	

@@ -8,11 +8,12 @@ use go\modules\community\history\model;
 
 class LogEntry extends jmap\EntityController
 {
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\LogEntry::class;
 	}
 
-	protected function getQueryQuery($params)
+	protected function getQueryQuery(array $params)
 	{
 		return parent::getQueryQuery($params)->removeJoin('core_entity', 'e');
 	}

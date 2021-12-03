@@ -15,7 +15,8 @@ class Link extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Link::class;
 	}
 	
@@ -31,7 +32,7 @@ class Link extends EntityController {
 		return $p;
 	}
 
-	protected function getQueryQuery($params)
+	protected function getQueryQuery(array $params)
 	{
 		$q = parent::getQueryQuery($params)
 			->groupBy([])
@@ -90,7 +91,7 @@ class Link extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
-	protected function getEntity($id, array $properties = [])
+	protected function getEntity(string $id, array $properties = [])
 	{
 		if(!is_numeric($id)) {
 			//Support "Task-1-Contact-2" for identifying a task link

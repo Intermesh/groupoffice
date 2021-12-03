@@ -18,7 +18,8 @@ class Category extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Category::class;
 	}	
 	

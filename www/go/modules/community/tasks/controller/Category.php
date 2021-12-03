@@ -12,7 +12,8 @@ use go\modules\community\tasks\model;
 
 class Category extends EntityController {
 
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Category::class;
 	}	
 

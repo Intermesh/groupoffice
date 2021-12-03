@@ -11,9 +11,10 @@ use go\core\model;
 class EmailTemplate extends EntityController {
 
   /**
-   * @return Entity
+   * @return string
    */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\EmailTemplate::class;
 	}
 
