@@ -639,6 +639,9 @@ class Task extends AclItemEntity {
 		if($comment->createdBy != $this->responsibleUserId && $this->progress != Progress::NeedsAction) {
 			$this->progress = Progress::NeedsAction;
 			$this->save();
+		} else if($this->progress = Progress::NeedsAction && $comment->createdBy == $this->responsibleUserId) {
+			$this->progress = Progress::InProcess;
+			$this->save();
 		}
 
 

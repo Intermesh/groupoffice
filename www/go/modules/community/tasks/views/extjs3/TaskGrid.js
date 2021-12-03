@@ -23,7 +23,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'modifier', type: "relation"},
 				{name: 'tasklist', type: "relation"},
 				'percentComplete',
-				'progress',{
+				'progress',
+				{
 					name: "complete",
 					convert: function(v, data) {
 						return data.progress == 'completed';
@@ -79,6 +80,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			return go.util.Format.date(v);
 		};
 
+		const now = new Date();
+
 		this.columns = [
 				this.checkColumn,
 				{
@@ -98,6 +101,10 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v,m,rec) {
 						if(rec.json.color) {
 							m.style += 'color:#'+rec.json.color+';';
+						}
+
+						if(rec.data.progress == "needs-action" && rec.get("start") <= now) {
+							m.style += 'font-weight: bold;';
 						}
 
 						return v;
