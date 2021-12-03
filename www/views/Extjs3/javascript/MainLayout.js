@@ -546,12 +546,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		this.rendered = true;
 		this.fireEvent("beforerender", this);
 
-		function getUserImgStyle() {
-			if(!go.User.avatarId) {
-				return "";
-			}
-			return 'background-image:url('+go.Jmap.thumbUrl(go.User.avatarId, {w: 40, h: 40, zc: 1})+');'
-		}
+		// function getUserImgStyle() {
+		// 	if(!go.User.avatarId) {
+		// 		return "";
+		// 	}
+		// 	return 'background-image:url('+go.Jmap.thumbUrl(go.User.avatarId, {w: 40, h: 40, zc: 1})+');'
+		// }
 
 				var topPanel = new Ext.Panel({
 					id:"mainNorthPanel",
@@ -562,7 +562,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							<div id="status-bar" class="x-hide-display"></div>\
 							<div id="search_query"></div>\
 							<div id="start-menu-link" ></div>\
-							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'"></a>\
+							<a id="user-menu" class="user-img"></a>\
 						</div>\
 					</div>',
 					//height: dp(64),
@@ -614,10 +614,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				var userBtn = Ext.get('user-menu');
 				var userMenuTpl = userBtn.dom.innerHTML;
 				this.userMenuLink = new Ext.Button({
-					text: userMenuTpl,
+					text: go.util.avatar(go.User.displayName, go.User.avatarId),
 					renderTo: userBtn,
 					clickEvent: 'mousedown',
-					template: new Ext.XTemplate('<div style="border-radius:50%"><button></button></div>'),
+					template: new Ext.XTemplate('<div><button></button></div>'),
 					menu: new Ext.menu.Menu({
 						items: [
 							{

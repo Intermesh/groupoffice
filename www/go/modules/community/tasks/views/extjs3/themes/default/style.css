@@ -1,3 +1,33 @@
 .projects-late {
     color: red;
 }
+
+.tasks-task .status {
+    cursor: pointer;
+}
+
+
+.tasks-task-status-needs-action {
+    background-color: #FDD170FF;
+    fill: #FDD170FF;
+}
+
+.tasks-task-status-in-progress {
+    background-color: #91d9ff;
+    fill: #91D9FFFF;
+}
+
+.tasks-task-status-completed  {
+    background-color: #d7ff91;
+    fill: #d7ff91;
+}
+
+.tasks-task-status-failed {
+    background-color: #ffb891;
+    fill: #ffb891;
+}
+
+.tasks-task-status-cancelled {
+    background-color: #f1f1f1;
+    fill: #f1f1f1;
+}

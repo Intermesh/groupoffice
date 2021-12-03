@@ -8,6 +8,8 @@
 namespace go\modules\community\tasks\model;
 
 use go\core\acl\model\AclInheritEntity;
+use Exception;
+use go\core\acl\model\AclItemEntity;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
@@ -18,8 +20,9 @@ use go\core\orm\Mapping;
 use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
 use go\core\orm\Query;
-use go\core\util\{DateTime,Time};
+use go\core\util\{DateTime, StringUtil, Time};
 use go\core\validate\ErrorCode;
+use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\VCalendar;
 
 /**
@@ -422,14 +425,14 @@ class Task extends AclInheritEntity {
 		foreach($this->alerts as $alert) {
 			$coreAlert = $this->createAlert($alert->at($this), $alert->id);
 			if(!$coreAlert->save()) {
-				throw new \Exception(var_export($coreAlert->getValidationErrors(),true));
+				throw new Exception(var_export($coreAlert->getValidationErrors(),true));
 			}
 		}
 	}
 
 	/**
 	 * @param Alert[] $alerts
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function dismissAlerts(array $alerts)
 	{
@@ -484,7 +487,7 @@ class Task extends AclInheritEntity {
 			$nextTask->due->add($diff);
 		}
 		if(!$nextTask->save()) {
-			throw new \Exception("Could not save next task: ". var_export($nextTask->getValidationErrors(), true));
+			throw new Exception("Could not save next task: ". var_export($nextTask->getValidationErrors(), true));
 		}
 	}
 
@@ -630,5 +633,46 @@ class Task extends AclInheritEntity {
 		$title = $alert->findEntity()->title() ?? null;
 
 		return ['title' => $title, 'body' => $body];
+	}
+
+
+	/**
+	 * @throws SaveException
+	 * @throws Exception
+	 */
+	public function onCommentAdded(Comment $comment) {
+
+		if($comment->createdBy != $this->responsibleUserId && $this->progress != Progress::NeedsAction) {
+			$this->progress = Progress::NeedsAction;
+			$this->save();
+		} else if($this->progress = Progress::NeedsAction && $comment->createdBy == $this->responsibleUserId) {
+			$this->progress = Progress::InProcess;
+			$this->save();
+		}
+
+
+		$excerpt = StringUtil::cutString(strip_tags($comment->text), 50);
+
+		$commenters = Comment::findFor($this)->selectSingleValue("createdBy")->distinct()->all();
+		if($this->responsibleUserId && !in_array($this->responsibleUserId, $commenters)) {
+			$commenters[] = $this->responsibleUserId;
+		}
+
+		$commenters = array_filter($commenters, function($c) use($comment) {return $c != $comment->createdBy;});
+
+		foreach($commenters as $userId) {
+			$alert = $this->createAlert(new DateTime(), 'comment', $userId)
+				->setData([
+					'type' => 'comment',
+					'createdBy' => $comment->createdBy,
+					'excerpt' => $excerpt
+				]);
+
+			if (!$alert->save()) {
+				throw new SaveException($alert);
+			}
+		}
+
+
 	}
 }

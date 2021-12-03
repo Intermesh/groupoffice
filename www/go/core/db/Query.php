@@ -674,15 +674,17 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
   /**
    * Executes the query and returns a single object
    *
-   * @return mixed|boolean The queries record, column or object. Returns false
+   * @return mixed The queries record, column or object. Returns null
    *   when nothing is found
    * @throws PDOException
    */
 	public function single() {		
-		return $this->offset()
+		$entity =  $this->offset()
 						->limit(1)
 						->execute()
 						->fetch();
+
+		return $entity ?: null;
 	}
 
   /**

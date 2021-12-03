@@ -341,7 +341,7 @@ a {
 	right: 0;
 	position: absolute;
 	z-index: 1;
-	padding-right: dp(16);
+	padding-right: dp(8);
 	/* padding: 20px 20px 20px 0px; */
 	/* height: 46px; */
 }
@@ -837,37 +837,39 @@ button {
 }
 
 .user-img {
-	@extend .avatar;
+	//@extend .avatar;
 	position:absolute;	
 	right: dp(16);
-	top: dp(8);
+	top: dp(14);
 	z-index:15;
-	border: 1px solid white;
-	width: dp(48);
-	height: dp(48);
+	.avatar {
+		border: 1px solid white;
+	}
+	//width: dp(48);
+	//height: dp(48);
 	&.login-avatar{
 		top: dp(16);
 	}	
-	&:hover + div {
-		display: block;
-	}
-	+ div {
-		padding-top:dp(48);
-		z-index:14;
-		@extend .z1;
-		color: color($fg, 'text');
-		position:absolute;
-		top: dp(20);
-		right:dp(8);
-		width: dp(256);
-		background-color: color($bg, 'card');
-		button a {
-			color: color($fg, 'icon');
-			&:hover{
-				color: color($fg, 'text');
-			}
-		}
-	}
+	//&:hover + div {
+	//	display: block;
+	//}
+	//+ div {
+	//	padding-top:dp(48);
+	//	z-index:14;
+	//	@extend .z1;
+	//	color: color($fg, 'text');
+	//	position:absolute;
+	//	top: dp(20);
+	//	right:dp(8);
+	//	width: dp(256);
+	//	background-color: color($bg, 'card');
+	//	button a {
+	//		color: color($fg, 'icon');
+	//		&:hover{
+	//			color: color($fg, 'text');
+	//		}
+	//	}
+	//}
 
 }
 hr {

@@ -174,7 +174,7 @@ class EntityType implements ArrayableInterface {
 			->where(["id" => $this->id])			
 			->single();
 
-		return $this->highestModSeq;
+		return $this->highestModSeq ?? 0;
 	}
 
 	/**
@@ -485,11 +485,11 @@ class EntityType implements ArrayableInterface {
    */
 	public function getHighestUserModSeq() : int {
 		if(!isset($this->highestUserModSeq)) {
-			$this->highestUserModSeq = (int) (new Query())
+			$this->highestUserModSeq = (new Query())
 						->selectSingleValue("highestModSeq")
 						->from("core_change_user_modseq")
 						->where(["entityTypeId" => $this->id, "userId" => go()->getUserId()])
-						->single();					
+						->single() ?? 0;
 		}
 		return $this->highestUserModSeq;
 	}
