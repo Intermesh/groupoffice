@@ -45,25 +45,25 @@ abstract class EntityController extends Controller {
 		return lcfirst(substr($cls, strrpos($cls, '\\') + 1));
 	}
 	
-	/**
-	 * Creates a short plural name 
-	 * 
-	 * @see getShortName()
-	 * 
-	 * @return string
-	 */
-	protected function getShortPluralName(): string
-	{
-		
-		$shortName = $this->getShortName();
-		
-		if(substr($shortName, -1) == 'y') {
-			return substr($shortName, 0, -1) . 'ies';
-		} else
-		{
-			return $shortName . 's';
-		}
-	}
+//	/**
+//	 * Creates a short plural name
+//	 *
+//	 * @see getShortName()
+//	 *
+//	 * @return string
+//	 */
+//	protected function getShortPluralName(): string
+//	{
+//
+//		$shortName = $this->getShortName();
+//
+//		if(substr($shortName, -1) == 'y') {
+//			return substr($shortName, 0, -1) . 'ies';
+//		} else
+//		{
+//			return $shortName . 's';
+//		}
+//	}
 
 	/**
 	 * Querying readonly has a slight performance benefit
