@@ -635,27 +635,35 @@ class Task extends AclItemEntity {
 	 * @throws Exception
 	 */
 	public function onCommentAdded(Comment $comment) {
-		if($comment->createdBy == $this->responsibleUserId) {
-			return;
-		}
 
-		if($this->progress != Progress::NeedsAction) {
+		if($comment->createdBy != $this->responsibleUserId && $this->progress != Progress::NeedsAction) {
 			$this->progress = Progress::NeedsAction;
 			$this->save();
 		}
 
-		if($this->responsibleUserId) {
-			$alert = $this->createAlert(new DateTime(), 'comment', $this->responsibleUserId)
+
+		$excerpt = StringUtil::cutString(strip_tags($comment->text), 50);
+
+		$commenters = Comment::findFor($this)->selectSingleValue("createdBy")->distinct()->all();
+		if($this->responsibleUserId && !in_array($this->responsibleUserId, $commenters)) {
+			$commenters[] = $this->responsibleUserId;
+		}
+
+		$commenters = array_filter($commenters, function($c) use($comment) {return $c != $comment->createdBy;});
+
+		foreach($commenters as $userId) {
+			$alert = $this->createAlert(new DateTime(), 'comment', $userId)
 				->setData([
 					'type' => 'comment',
 					'createdBy' => $comment->createdBy,
-					'excerpt' => StringUtil::cutString(strip_tags($comment->text), 50)
+					'excerpt' => $excerpt
 				]);
 
 			if (!$alert->save()) {
 				throw new SaveException($alert);
 			}
 		}
+
 
 	}
 }
