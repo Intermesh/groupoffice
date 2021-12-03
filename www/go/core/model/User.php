@@ -447,8 +447,8 @@ class User extends Entity {
 		}
 		return false;
 	}
-	
-	private function validatePasswordChange() {		
+
+	private function validatePasswordChange() {
 		
 		if($this->passwordVerified) {
 			return true;
@@ -477,6 +477,10 @@ class User extends Entity {
 
 		if(!isset($this->homeDir) && in_array("homeDir", $this->selectedProperties)) {
 			$this->homeDir = "users/" . $this->username;
+		}
+
+		if(empty($this->recoveryEmail)) {
+			$this->recoveryEmail = $this->email;
 		}
 
 		if($this->isModified(['username'])) {
@@ -561,7 +565,7 @@ class User extends Entity {
 			$this->setValidationError('password', ErrorCode::FORBIDDEN, go()->t("You're not allowed to create more than x users"));
 		}
 	}
-	
+
 	private function maxUsersReached() {
 	  if(empty(go()->getConfig()['max_users'])) {
 	    return false;
@@ -622,11 +626,12 @@ class User extends Entity {
    * @return boolean
    * @throws Exception
    */
-	public function isAdmin() {
-		return (new Query)
-			->select('*')
+	public function isAdmin(): bool
+	{
+		return !!(new Query)
+			->select()
 			->from('core_user_group')
-			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single() !== null;
+			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single();
 	}
 
 	public static function isAdminById($userId) {
@@ -634,10 +639,10 @@ class User extends Entity {
 			return true;
 		}
 
-		return (new Query)
-				->select('*')
+		return !!(new Query)
+				->select()
 				->from('core_user_group')
-				->where(['groupId' => Group::ID_ADMINS, 'userId' => $userId])->single() !== null;
+				->where(['groupId' => Group::ID_ADMINS, 'userId' => $userId])->single();
 	}
 
   /**
@@ -798,7 +803,7 @@ class User extends Entity {
 	public static function passwordHash($password) {
 		return password_hash($password, PASSWORD_DEFAULT);
 	}
-	
+
 	private function saveContact() {
 		
 //		if(!isset($this->contact) ){// || $this->isModified(['displayName', 'email', 'avatarId'])) {
@@ -852,8 +857,8 @@ class User extends Entity {
 			}
 		}
 	}
-	
-	
+
+
 	public function legacyOnSave() {
 		//for old framework. Remove when all is refactored!
 		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels($this->id);			
@@ -894,8 +899,8 @@ class User extends Entity {
 	public function hasModule($package, $name) {
 		return Module::isAvailableFor($package, $name, $this->id);		
 	}
-	
-	
+
+
 	/**
 	 * Get the user disk quota in bytes
 	 * @return int amount of bytes the user may use
@@ -908,7 +913,7 @@ class User extends Entity {
 			return go()->getStorageQuota();
 		}
 	}
-	
+
 	public function getStorageFreeSpace() {
 		if(!empty($this->disk_quota)) {
 			return $this->disk_quota*1024*1024 - $this->disk_usage;
@@ -938,8 +943,8 @@ class User extends Entity {
 
 		return go()->getDbConnection()->commit();
 	}
-	
-	
+
+
 	public static function legacyOnDelete(Query $query) {
 
 			foreach($query as $id) {
@@ -987,7 +992,7 @@ class User extends Entity {
 	 * @var \go\modules\community\addressbook\model\Contact
 	 */
 	private $contact;
-	
+
 	public function getProfile() {
 		if(!Module::isInstalled('community', 'addressbook')) {
 			return null;
@@ -996,12 +1001,12 @@ class User extends Entity {
 		$contact = \go\modules\community\addressbook\model\Contact::findForUser($this->id);
 		if(!$contact) {
 			$contact = new \go\modules\community\addressbook\model\Contact();
-			$contact->addressBookId = go()->getSettings()->userAddressBook()->id;				
+			$contact->addressBookId = go()->getSettings()->userAddressBook()->id;
 		}
 		
 		return $contact;
 	}
-	
+
 	public function setProfile($values) {
 		if(!Module::isInstalled('community', 'addressbook')) {
 			throw new Exception("Can't set profile without address book module.");

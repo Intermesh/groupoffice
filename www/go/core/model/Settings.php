@@ -289,6 +289,20 @@ class Settings extends core\Settings {
 
 
 	/**
+	 * @var string
+	 */
+	public $corsAllowOrigin = "";
+
+
+	/**
+	 * Allow registration via the auth.php endpoint
+	 *
+	 * @var bool
+	 */
+	public $allowRegistration = false;
+
+
+	/**
 	 * Keep log in core_change for this number of days.
 	 * 
 	 * When a client has not logged in for this period the sync data will be deleted and resynchronized.
@@ -340,13 +354,6 @@ class Settings extends core\Settings {
 	 */
 	public $logoId;
 
-	/**
-	 * Allow API calls in browser
-	 *
-	 * @var string
-	 */
-	public $corsAllowOrigin;
-	
 	
 	/**
 	 * Get's the transparent color based on the primary color.
