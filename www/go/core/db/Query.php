@@ -679,10 +679,12 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * @throws PDOException
    */
 	public function single() {		
-		return $this->offset()
+		$entity =  $this->offset()
 						->limit(1)
 						->execute()
-						->fetch() ?? null;
+						->fetch();
+
+		return $entity ?: null;
 	}
 
   /**
