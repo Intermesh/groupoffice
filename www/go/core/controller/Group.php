@@ -11,17 +11,18 @@ use go\core\jmap\EntityController;
 
 class Group extends EntityController {
 	
-	protected function canUpdate(Entity $entity) {
+	protected function canUpdate(Entity $entity): bool
+	{
 		
 		return $this->rights->mayChangeGroups;
 	}
 
-	protected function canDestroy(Entity $entity)
+	protected function canDestroy(Entity $entity): bool
 	{
 		return $this->rights->mayChangeGroups;
 	}
 
-	protected function canCreate(Entity $entity)
+	protected function canCreate(Entity $entity): bool
 	{
 		return $this->rights->mayChangeGroups;
 	}
@@ -31,7 +32,8 @@ class Group extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Group::class;
 	}
 

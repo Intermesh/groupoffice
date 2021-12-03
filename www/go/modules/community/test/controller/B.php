@@ -6,7 +6,8 @@ use go\modules\community\test\model;
 
 class B extends EntityController {
 
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\B::class;
 	}
 

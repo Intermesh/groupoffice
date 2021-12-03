@@ -3,7 +3,9 @@ namespace go\core\http;
 
 use Exception;
 use go\core\Singleton;
+use go\core\util\JSON;
 use go\core\util\StringUtil;
+use JsonException;
 use stdClass;
 
 
@@ -175,12 +177,10 @@ class Request extends Singleton{
 	 * #application/json
 	 * #application/xml or text/xml
 	 *
-	 * @return stdClass
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
+	 * @return array
+	 * @throws JsonException
 	 */
-	public function getBody() {
+	public function getBody() : array {
 		if (!isset($this->body)) {			
 			//If it's a form post (application/x-www-form-urlencoded or multipart/form-data) with HTML then PHP already built the data
 			if(!empty($_POST)) {
@@ -190,12 +190,7 @@ class Request extends Singleton{
 				if(empty($this->getRawBody())) {
 					$this->body = [];
 				}else {
-					$this->body = json_decode($this->getRawBody(), true);
-
-					// Check if the post is filled with an array. Otherwise make it an empty array.
-					if(!isset($this->body)){				
-						throw new Exception("JSON decoding error: '".json_last_error_msg()."'.\n\nJSON data from client: \n\n".var_export($this->getRawBody(), true));
-					}
+					$this->body = JSON::decode($this->getRawBody(), true);
 				}
 			}
 		}

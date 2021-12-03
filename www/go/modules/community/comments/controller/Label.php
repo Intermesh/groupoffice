@@ -8,7 +8,8 @@ use go\modules\community\comments\model;
 
 class Label extends EntityController {
 	
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Label::class;
 	}
 	

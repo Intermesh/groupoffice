@@ -12,7 +12,8 @@ use go\modules\community\tasks\model;
 
 class Task extends EntityController {
 
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Task::class;
 	}
 
@@ -49,7 +50,7 @@ class Task extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
-	protected function create(array $properties)
+	protected function create(array $properties): \go\core\jmap\Entity
 	{
 
 		$cls = $this->entityClass();

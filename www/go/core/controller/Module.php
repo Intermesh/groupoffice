@@ -18,7 +18,8 @@ class Module extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Module::class;
 	}
 
@@ -36,20 +37,12 @@ class Module extends EntityController {
 		return $query;
 	}
 
-	protected function canUpdate(Entity $entity)
+	protected function canUpdate(Entity $entity): bool
 	{
 		return go()->getAuthState()->isAdmin();
 	}
 
-	protected function canCreate(Entity $entity)
-	{
-		if($entity->name == "core" && $entity->package == "core") {
-			return false;
-		}
-		return go()->getAuthState()->isAdmin();
-	}
-
-	protected function canDestroy(Entity $entity)
+	protected function canCreate(Entity $entity): bool
 	{
 		if($entity->name == "core" && $entity->package == "core") {
 			return false;
@@ -57,12 +50,20 @@ class Module extends EntityController {
 		return go()->getAuthState()->isAdmin();
 	}
 
-	protected function getQueryQuery($params)
+	protected function canDestroy(Entity $entity): bool
+	{
+		if($entity->name == "core" && $entity->package == "core") {
+			return false;
+		}
+		return go()->getAuthState()->isAdmin();
+	}
+
+	protected function getQueryQuery(array $params): Query
 	{
 		return $this->filterPermissions(parent::getQueryQuery($params))->orderBy(['sort_order' => 'ASC']);
 	}
 
-	protected function getGetQuery($params)
+	protected function getGetQuery(array $params): \go\core\orm\Query
 	{
 		return $this->filterPermissions(parent::getGetQuery($params))->orderBy(['sort_order' => 'ASC']);
 	}

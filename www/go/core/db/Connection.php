@@ -454,7 +454,7 @@ class Connection {
    *  selected in the correct order.
    *
    * @return Statement
-   * @throws Exception
+   * @throws PDOException
    * @see insert()
    */
 	public function replace(string $tableName, $data, array $columns = []): Statement

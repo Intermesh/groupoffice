@@ -12,7 +12,8 @@ class EmailTemplate extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return \GO\Email\Model\EmailTemplate::class;
 	}
 	

@@ -1,11 +1,14 @@
 <?php
 namespace go\core\jmap;
 
-use \GO\Base\Model\State as OldState;
+use Exception;
+use GO\Base\Model\State as OldState;
+use go\core\model\Module;
 use go\core\model\Token;
 use go\core\auth\State as AbstractState;
 use go\core\http\Response;
 use go\core\model\User;
+use PDO;
 use stdClass;
 
 class State extends AbstractState {
@@ -52,11 +55,12 @@ class State extends AbstractState {
 	 * @var Token 
 	 */
 	private $token;
-	
+
 	/**
 	 * Get the authorization token by reading the request header "Authorization"
-	 * 
-	 * @return boolean|Token 
+	 *
+	 * @return boolean|Token
+	 * @throws Exception
 	 */
 	public function getToken() {
 		
@@ -100,11 +104,13 @@ class State extends AbstractState {
 
 	/**
 	 * Change authenticated user to somebody else.
-	 * 
+	 *
 	 * @param int $userId
 	 * @return bool
+	 * @throws Exception
 	 */
-	public function changeUser($userId) {
+	public function changeUser(int $userId): bool
+	{
 		$token = $this->getToken();
 		$token->userId = $userId;
 		$success = $token->setAuthenticated();
@@ -119,15 +125,19 @@ class State extends AbstractState {
 
 		return $success;
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	public function isAuthenticated(): bool
 	{
 		return $this->getToken() !== false;
 	}
-	
+
 	/**
 	 * Return the JMAP session data.
 	 * Called when the user makes an authenticated GET request
+	 * @throws Exception
 	 */
 	public function outputSession() {		
 		
@@ -147,6 +157,7 @@ class State extends AbstractState {
 		}
 	}
 
+	/** @noinspection HttpUrlsUsage */
 	protected function getBaseUrl(): string
 	{
 		$url = Request::get()->isHttps() ? 'https://' : 'http://';
@@ -175,7 +186,11 @@ class State extends AbstractState {
 	}
 
 
-	public function getSession() {
+	/**
+	 * @throws Exception
+	 */
+	public function getSession(): array
+	{
 		$response = [
 			'version' => go()->getVersion(),
 			'cacheClearedAt' => go()->getSettings()->cacheClearedAt,
@@ -205,10 +220,10 @@ class State extends AbstractState {
 		return $response;
 	}
 
-	private function addModuleCapabilities(&$response) {
-		$modules = \go\core\model\Module::getInstalled();
+	private function addModuleCapabilities(array $response) {
+		$modules = Module::getInstalled();
 		$groupedRights = "SELECT moduleId, BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".go()->getAuthState()->getUserId().") GROUP BY moduleId;";
-		$rights = go()->getDbConnection()->query($groupedRights)->fetchAll(\PDO::FETCH_KEY_PAIR);
+		$rights = go()->getDbConnection()->query($groupedRights)->fetchAll(PDO::FETCH_KEY_PAIR);
 		foreach ($modules as $module) {
 			if(go()->getAuthState()->isAdmin()) {
 				$p = $module->may(PHP_INT_MAX);
@@ -221,57 +236,66 @@ class State extends AbstractState {
 		}
 	}
 	
-	private function clientSettings() {
-		$user = \GO::user();
-		return [
-			'state' => OldState::model()->getFullClientState($user->id)
-			,'user_id' => $user->id
-			,'avatarId' => $user->avatarId
-			,'has_admin_permission' => $user->isAdmin()
-			,'username' => $user->username
-			,'displayName' => $user->displayName
-			,'email' => $user->email
-			,'thousands_separator' => $user->thousandsSeparator
-			,'decimal_separator' => $user->decimalSeparator
-			,'date_format' => $user->completeDateFormat
-			,'time_format' => $user->timeFormat
-			,'currency' => $user->currency
-			,'lastlogin' => $user->getLastlogin()
-			,'max_rows_list' => $user->max_rows_list
-			,'timezone' => $user->timezone
-			,'start_module' => $user->start_module
-			,'theme' => $user->theme
-			,'mute_sound' => $user->mute_sound
-			,'mute_reminder_sound' => $user->mute_reminder_sound
-			,'mute_new_mail_sound' => $user->mute_new_mail_sound
-			,'popup_reminders' => $user->popup_reminders
-			,'popup_emails' => $user->popup_emails
-			,'show_smilies' => $user->show_smilies
-			,'auto_punctuation' => $user->auto_punctuation
-			,'first_weekday' => $user->firstWeekday
-			,'sort_name' => $user->sort_name
-			,'list_separator' => $user->listSeparator
-			,'text_separator' => $user->textSeparator
-			,'modules' => \GO::view()->exportModules()
-		];
-	}
-	
+//	private function clientSettings(): array
+//	{
+//		$user = GO::user();
+//		return [
+//			'state' => OldState::model()->getFullClientState($user->id)
+//			,'user_id' => $user->id
+//			,'avatarId' => $user->avatarId
+//			,'has_admin_permission' => $user->isAdmin()
+//			,'username' => $user->username
+//			,'displayName' => $user->displayName
+//			,'email' => $user->email
+//			,'thousands_separator' => $user->thousandsSeparator
+//			,'decimal_separator' => $user->decimalSeparator
+//			,'date_format' => $user->completeDateFormat
+//			,'time_format' => $user->timeFormat
+//			,'currency' => $user->currency
+//			,'lastlogin' => $user->getLastlogin()
+//			,'max_rows_list' => $user->max_rows_list
+//			,'timezone' => $user->timezone
+//			,'start_module' => $user->start_module
+//			,'theme' => $user->theme
+//			,'mute_sound' => $user->mute_sound
+//			,'mute_reminder_sound' => $user->mute_reminder_sound
+//			,'mute_new_mail_sound' => $user->mute_new_mail_sound
+//			,'popup_reminders' => $user->popup_reminders
+//			,'popup_emails' => $user->popup_emails
+//			,'show_smilies' => $user->show_smilies
+//			,'auto_punctuation' => $user->auto_punctuation
+//			,'first_weekday' => $user->firstWeekday
+//			,'sort_name' => $user->sort_name
+//			,'list_separator' => $user->listSeparator
+//			,'text_separator' => $user->textSeparator
+//			,'modules' => GO::view()->exportModules()
+//		];
+//	}
+
 	/**
 	 * Get the user ID
 	 * @return int|null
+	 * @throws Exception
+	 * @throws Exception
+	 * @throws Exception
+	 * @throws Exception
 	 */
 	public function getUserId(): ?int
 	{
 		return $this->getToken() ? $this->getToken()->userId : null;
 	}
-	
+
 	/**
 	 * Get the logged in user
-	 * 
+	 *
 	 * @param array $properties the properties to fetch
 	 * @return User|null
+	 * @throws Exception
+	 * @throws Exception
+	 * @throws Exception
+	 * @throws Exception
 	 */
-	public function getUser(array $properties = []): ?\go\core\model\User
+	public function getUser(array $properties = []): ?User
 	{
 		return $this->getToken() ? $this->getToken()->getUser($properties) : null;
 	}
@@ -279,8 +303,9 @@ class State extends AbstractState {
 
 	/**
 	 * Check if logged in user is admin
-	 * 
+	 *
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function isAdmin(): bool
 	{
@@ -301,6 +326,7 @@ class State extends AbstractState {
 	 *
 	 * @param string $cls
 	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
+	 * @throws Exception
 	 */
 	public function getClassRights($cls): stdClass
 	{

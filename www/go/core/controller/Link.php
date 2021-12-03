@@ -6,6 +6,7 @@ use go\core\App;
 use go\core\jmap\EntityController;
 use go\core\model;
 use go\core\orm\EntityType;
+use go\core\orm\Query;
 
 
 class Link extends EntityController {
@@ -15,11 +16,13 @@ class Link extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Link::class;
 	}
 	
-	protected function paramsQuery(array $params) {
+	protected function paramsQuery(array $params): array
+	{
 		$p =  parent::paramsQuery($params);
 		
 		if(empty($p['sort'])) {
@@ -31,7 +34,7 @@ class Link extends EntityController {
 		return $p;
 	}
 
-	protected function getQueryQuery($params)
+	protected function getQueryQuery(array $params): Query
 	{
 		$q = parent::getQueryQuery($params)
 			->groupBy([])
@@ -90,7 +93,7 @@ class Link extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
-	protected function getEntity($id, array $properties = [])
+	protected function getEntity(string $id, array $properties = [])
 	{
 		if(!is_numeric($id)) {
 			//Support "Task-1-Contact-2" for identifying a task link
