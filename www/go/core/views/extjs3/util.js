@@ -18,6 +18,8 @@ go.Colors = [
 go.util =  (function () {
 	var downloadFrame;
 
+	let primaryColorRemoved = false;
+
 
 	return {
 
@@ -62,6 +64,17 @@ go.util =  (function () {
 				for(var i=0,j=0; i<name.length; i++) {
 					j += name.charCodeAt(i);
 				}
+
+				// We don't want the header color to be used in avatar
+				if(!primaryColorRemoved) {
+					const pc = go.Modules.get("core", "core").settings.primaryColor || "0277BD";
+					const pcIndex = go.Colors.indexOf(pc);
+					if (pcIndex > -1) {
+						go.Colors.splice(pcIndex, 1);
+					}
+					primaryColorRemoved = true;
+				}
+
 				style = 'background-image:none;background-color: #'+go.Colors[j % go.Colors.length];
 			} else {
 				content = '&nbsp;';
