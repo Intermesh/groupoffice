@@ -95,12 +95,12 @@ try {
 			}
 
 			$user = new User();
-			$user->displayName = $data['displayName'];
-			$user->username = $user->email = $user->recoveryEmail = $data['email'];
-			$user->setPassword($data['password']);
+			$user->setValues($data['user']);
 			if(!$user->save()) {
 				throw new SaveException($user);
 			}
+
+
 
 			$token = new Token();
 			$token->userId = $user->id;
