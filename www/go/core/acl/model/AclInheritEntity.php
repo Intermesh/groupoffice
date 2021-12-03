@@ -108,10 +108,10 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 
 	}
 
-	protected function saveAcl() : bool
+	protected function saveAcl()
 	{
 		if(!isset($this->setAcl)) {
-			return true;
+			return;
 		}
 
 		$this->checkManagePermission();
@@ -128,9 +128,7 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 			if($a->isModified()) {
 				// we need our own ACL now.
 				parent::createAcl();
-				return parent::saveAcl();
-			} else{
-				return true;
+				parent::saveAcl();
 			}
 
 		}

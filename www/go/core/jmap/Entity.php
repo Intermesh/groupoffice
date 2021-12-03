@@ -5,6 +5,7 @@ namespace go\core\jmap;
 use DateTimeInterface;
 use Exception;
 use GO\Base\Exception\AccessDenied;
+use go\core\App;
 use go\core\model\Alert;
 use go\core\model\Module;
 use go\core\model\User;
@@ -26,8 +27,13 @@ use GO\Files\Model\Folder;
  * multiple database tables. It can be extended with has one related tables and
  * it can also have properties in other tables.
  */
-abstract class Entity  extends OrmEntity {	
-	
+abstract class Entity  extends OrmEntity {
+
+	/**
+	 * Fires when an URL for the entity is generated
+	 */
+	const EVENT_URL = "url";
+
 	/**
 	 * Track changes in the core_change log for the JMAP protocol.
 	 * Disabled during install and upgrade.
@@ -82,6 +88,7 @@ abstract class Entity  extends OrmEntity {
 	{
 		
 		if(!parent::internalSave()) {
+			App::get()->debug(static::class."::internalSave() returned false");
 			return false;
 		}
 
@@ -795,6 +802,18 @@ abstract class Entity  extends OrmEntity {
 		go()->getLanguage()->setLanguage(go()->getAuthState()->getUser(['language'])->language);
 
 		return ['title' => $title, 'body' => $body];
+	}
+
+
+	public function getURL() {
+
+		$url = static::fireEvent(self::EVENT_URL, $this);
+
+		if(!empty($url)) {
+			return $url;
+		}
+
+		return go()->getSettings()->URL . '#' + strtolower(static::entityType()->getName()) + "/" + $this->id();
 	}
 
 }

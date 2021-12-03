@@ -54,6 +54,7 @@ use go\core\model\UserDisplay;
 use go\core\orm\SearchableTrait;
 
 abstract class ActiveRecord extends \GO\Base\Model{
+	const EVENT_URL = "url";
 
 	/**
 	 * The mode for this model on how to output the attribute data.
@@ -5659,5 +5660,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		return ['title' => $title, 'body' => $body];
+	}
+
+	public function getURL() {
+
+		$url = static::fireEvent(self::EVENT_URL, $this);
+
+		if(!empty($url)) {
+			return $url;
+		}
+
+		return go()->getSettings()->URL . '#' + strtolower(static::entityType()->getName()) + "/" + $this->id();
 	}
 }

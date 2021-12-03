@@ -105,12 +105,14 @@ class Listeners extends Singleton {
 	 * 
 	 * @param string $calledClass
 	 * @param int $event
-	 * @param mixed[] $args
-	 * @return boolean
+	 * @param mixed $args
+	 * @return mixed Returns the last listener return value or false if one of the listeners explicitly returns false
 	 */
 	public function fireEvent($calledClass, $traitUser, $event, $args) {
 		
 		$this->checkInit();
+
+		$return = null;
 
 		if (isset($this->listeners[$calledClass][$event])) {
 			foreach ($this->listeners[$calledClass][$event] as $listener) {	
@@ -135,6 +137,6 @@ class Listeners extends Singleton {
 				return $this->fireEvent($parent, $traitUser, $event, $args);
 			}
 		}
-		return true;
+		return $return;
 	}
 }

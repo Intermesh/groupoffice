@@ -4,6 +4,7 @@ namespace go\core\acl\model;
 use Exception;
 use go\core\model\Acl;
 use go\core\App;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\core\db\Expression;
 
@@ -39,10 +40,8 @@ abstract class AclOwnerEntity extends AclEntity {
 			$this->createAcl();
 		}
 
-		if(!$this->saveAcl()) {
-			return false;
-		}
-		
+		$this->saveAcl();
+
 		if(!parent::internalSave()) {
 			return false;
 		}
@@ -50,7 +49,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		if($this->isNew() && isset($this->acl)) {
 			$this->acl->entityId = $this->id;
 			if(!$this->acl->save()) {
-				return false;
+				throw new SaveException($this->acl);
 			}
 		}
 
@@ -75,10 +74,10 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return bool
 	 * @throws Exception
 	 */
-	protected function saveAcl(): bool
+	protected function saveAcl()
 	{
 		if(!isset($this->setAcl)) {
-			return true;
+			return;
 		}
 
 		$this->checkManagePermission();
@@ -104,7 +103,9 @@ abstract class AclOwnerEntity extends AclEntity {
 			}
 		}
 
-		return $a->save();
+		if(!$a->save()) {
+			throw new SaveException($a);
+		}
 	}
 
 	/**

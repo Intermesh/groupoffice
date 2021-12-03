@@ -3,6 +3,7 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\model\User;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\modules\community\addressbook\model\Settings as AddresBookModuleSettings;
@@ -60,8 +61,8 @@ class UserSettings extends Property {
 				$addressBook->createdBy = $this->userId;
 				$addressBook->name = User::findById($this->userId, ['displayName'])->displayName;
 				if(!$addressBook->save()) {
-					throw new \Exception("Could not create default address book");
-				}				
+					throw new SaveException($addressBook);
+				}
 			}
 		} else {
 			$addressBook = AddressBook::find(['id'])->filter(['permissionLevel' => Acl::LEVEL_WRITE, 'permissionLevelUserId' => $this->userId])->single();			

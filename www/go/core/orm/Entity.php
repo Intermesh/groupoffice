@@ -341,7 +341,8 @@ abstract class Entity extends Property {
 
 		try {
 			
-			if (!$this->fireEvent(self::EVENT_BEFORE_SAVE, $this)) {
+			if ($this->fireEvent(self::EVENT_BEFORE_SAVE, $this) === false) {
+
 				$this->rollback();
 				return false;
 			}
@@ -352,7 +353,7 @@ abstract class Entity extends Property {
 				return false;
 			}		
 			
-			if (!$this->fireEvent(self::EVENT_SAVE, $this)) {
+			if ($this->fireEvent(self::EVENT_SAVE, $this) === false) {
 				$this->rollback();
 				return false;
 			}
@@ -481,7 +482,7 @@ abstract class Entity extends Property {
 
 		try {
 
-			if(!static::fireEvent(static::EVENT_BEFORE_DELETE, $query, static::class)) {
+			if(static::fireEvent(static::EVENT_BEFORE_DELETE, $query, static::class) === false) {
 				go()->getDbConnection()->rollBack();
 				return false;
 			}
@@ -506,7 +507,7 @@ abstract class Entity extends Property {
 				return false;
 			}
 
-			if(!static::fireEvent(static::EVENT_DELETE, $query, static::class)) {
+			if(static::fireEvent(static::EVENT_DELETE, $query, static::class) === false) {
 				go()->getDbConnection()->rollBack();
 				return false;			
 			}
@@ -566,9 +567,9 @@ abstract class Entity extends Property {
 	 */
 	public function getPermissionLevel() {
 
-		$permissionLevel = null;
-		static::fireEvent(self::EVENT_PERMISSION_LEVEL, $this, ["permissionLevel" => &$permissionLevel]);
-		if(isset($permissionLevel)) {
+		$permissionLevel = static::fireEvent(self::EVENT_PERMISSION_LEVEL, $this, ["permissionLevel" => &$permissionLevel]);
+
+		if(is_int($permissionLevel)) {
 			return $permissionLevel;
 		}
 

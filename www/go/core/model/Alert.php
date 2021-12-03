@@ -2,6 +2,7 @@
 
 namespace go\core\model;
 
+use GO\Base\Cron\EmailReminders;
 use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\SingleOwnerEntity;
 
@@ -28,6 +29,13 @@ class Alert extends SingleOwnerEntity
 
 	protected $data;
 
+	/**
+	 * Set to true if user has mail reminders enabled
+	 * The cron  job sends them
+	 *
+	 * @see EmailReminders
+	 * @var bool
+	 */
 	public $sendMail = false;
 
 	protected static function defineMapping(): Mapping
@@ -61,19 +69,27 @@ class Alert extends SingleOwnerEntity
 		return empty($this->data) ? (Object) [] : json_decode($this->data, false);
 	}
 
+
+	private $relatedEntity;
+
 	/**
 	 * Find the entity this alert belongs to.
 	 *
 	 * @return Entity|ActiveRecord
 	 */
 	public function findEntity() {
-		$e = EntityType::findById($this->entityTypeId);
-		$cls = $e->getClassName();
-		if(is_a($cls, ActiveRecord::class, true)) {
-			return $cls::model()->findByPk($this->entityId);
-		} else {
-			return $cls::findById($this->entityId);
+
+		if(!isset($this->relatedEntity)) {
+			$e = EntityType::findById($this->entityTypeId);
+			$cls = $e->getClassName();
+			if (is_a($cls, ActiveRecord::class, true)) {
+				$this->relatedEntity = $cls::model()->findByPk($this->entityId);
+			} else {
+				$this->relatedEntity = $cls::findById($this->entityId);
+			}
 		}
+
+		return $this->relatedEntity;
 	}
 
 
@@ -111,7 +127,11 @@ class Alert extends SingleOwnerEntity
 				}
 			}
 		}
-		return parent::internalSave();
+		if(!parent::internalSave()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected static function internalDelete(Query $query): bool
@@ -158,6 +178,11 @@ class Alert extends SingleOwnerEntity
 	}
 	public function getBody() {
 		return $this->getProps()['body'];
+	}
+
+	public function getURL() {
+		$e = $this->findEntity();
+		return $e ? $e->getURL() : null;
 	}
 
 }

@@ -127,7 +127,7 @@ class EmailReminders extends AbstractCron {
 
 					//$body = go()->t("Time") . ': ' . $alert->triggerAt->toUserFormat(true, $user) . "\n\n";
 					$body = $alert->getBody() ."\n\n";
-					$body .= go()->getSettings()->URL;
+					$body .= $alert->findEntity()->getURL();
 
 //					date_default_timezone_set(\GO::user()->timezone);
 
