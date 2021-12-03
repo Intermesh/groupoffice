@@ -86,11 +86,11 @@ abstract class EntityController extends Controller {
 	/**
 	 * Gets the query for the Foo/query JMAP method
 	 *
-	 * @param array $params
+	 * @param ArrayObject $params
 	 * @return Query
 	 * @throws Exception
 	 */
-	protected function getQueryQuery(array $params): Query
+	protected function getQueryQuery(ArrayObject $params): Query
 	{
 		$cls = $this->entityClass();
 
@@ -135,10 +135,10 @@ abstract class EntityController extends Controller {
 	 * Takes the request arguments, validates them and fills it with defaults.
 	 * 
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws InvalidArguments
 	 */
-	protected function paramsQuery(array $params): array
+	protected function paramsQuery(array $params): ArrayObject
 	{
 		if(!isset($params['limit'])) {
 			$params['limit'] = 0;
@@ -201,11 +201,11 @@ abstract class EntityController extends Controller {
    * Handles the Foo entity's  "getFooList" command
    *
    * @param array $params
-   * @return array
+   * @return ArrayObject
    * @throws InvalidArguments
    * @throws Exception
    */
-	protected function defaultQuery(array $params): array
+	protected function defaultQuery(array $params): ArrayObject
 	{
 
 		$state = $this->getState();
@@ -359,10 +359,10 @@ abstract class EntityController extends Controller {
 	 * Takes the request arguments, validates them and fills it with defaults.
 	 * 
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws InvalidArgumentException
 	 */
-	protected function paramsGet(array $params): array
+	protected function paramsGet(array $params): ArrayObject
 	{
 		if(isset($params['ids']) && !is_array($params['ids'])) {
 			throw new InvalidArgumentException("ids must be of type array");
@@ -388,11 +388,11 @@ abstract class EntityController extends Controller {
 
   /**
    * Override to add more query options for the "get" method.
-   * @param array $params
+   * @param ArrayObject $params
    * @return Query
    * @throws Exception
    */
-	protected function getGetQuery(array $params): Query
+	protected function getGetQuery(ArrayObject $params): Query
 	{
 		$cls = $this->entityClass();
 		
@@ -411,10 +411,11 @@ abstract class EntityController extends Controller {
 	 * Handles the Foo entity's getFoo command
 	 *
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws Exception
 	 */
-	protected function defaultGet(array $params) : array {
+	protected function defaultGet(array $params) : ArrayObject
+	{
 
 		$p = $this->paramsGet($params);
 
@@ -508,10 +509,10 @@ abstract class EntityController extends Controller {
 	 * Takes the request arguments, validates them and fills it with defaults.
 	 * 
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws InvalidArguments
 	 */
-	protected function paramsSet(array $params): array
+	protected function paramsSet(array $params): ArrayObject
 	{
 		if(!isset($params['accountId'])) {
 			$params['accountId'] = null;
@@ -604,12 +605,12 @@ abstract class EntityController extends Controller {
    * Handles the Foo entity setFoos command
    *
    * @param array $params
-   * @return array
+   * @return ArrayObject
    * @throws InvalidArguments
    * @throws StateMismatch
    * @throws Exception
    */
-	protected function defaultSet(array $params): array
+	protected function defaultSet(array $params): ArrayObject
 	{
 
 		$this->trackSaves();
@@ -652,12 +653,11 @@ abstract class EntityController extends Controller {
   /**
    * Create entities
    *
-   * @param $create
-   * @param $result
-   * @throws ReflectionException
+   * @param array $create
+   * @param ArrayObject $result
    * @throws Exception
    */
-	private function createEntitites($create, &$result) {
+	private function createEntitites(array $create, ArrayObject $result) {
 		foreach ($create as $clientId => $properties) {
 
 			$entity = $this->create($properties);
@@ -738,7 +738,7 @@ abstract class EntityController extends Controller {
    * @param array $result
    * @throws Exception
    */
-	private function updateEntities(array $update, array &$result) {
+	private function updateEntities(array $update, ArrayObject $result) {
 		foreach ($update as $id => $properties) {
 			if(empty($properties)) {
 				$properties = [];
@@ -790,11 +790,11 @@ abstract class EntityController extends Controller {
    * Destroys entities
    *
    * @param int[] $destroy
-   * @param array $result
+   * @param ArrayObject $result
    * @throws InvalidArguments
    * @throws Exception
    */
-	private function destroyEntities(array $destroy, array &$result) {
+	private function destroyEntities(array $destroy, ArrayObject $result) {
 
 		$doDestroy = [];
 		foreach ($destroy as $id) {
@@ -883,10 +883,10 @@ abstract class EntityController extends Controller {
 
   /**
    * @param $params
-   * @return array
+   * @return ArrayObject
    * @throws InvalidArguments
    */
-	protected function paramsExport($params): array
+	protected function paramsExport($params): ArrayObject
 	{
 		
 		if(!isset($params['extension'])) {
@@ -898,10 +898,10 @@ abstract class EntityController extends Controller {
 
   /**
    * @param $params
-   * @return mixed
+   * @return ArrayObject
    * @throws InvalidArguments
    */
-	protected function paramsImport($params){		
+	protected function paramsImport($params) : ArrayObject {
 		
 		if(!isset($params['blobId'])) {
 			throw new InvalidArguments("'blobId' parameter is required");
@@ -911,7 +911,7 @@ abstract class EntityController extends Controller {
 			$params['values'] = [];
 		}
 		
-		return $params;
+		return new ArrayObject($params);
 	}
 	
 	/**
@@ -940,7 +940,7 @@ abstract class EntityController extends Controller {
 			$file = $blob->getFile();
 		}
 
-		$response = $converter->importFile($file, $params);
+		$response = $converter->importFile($file, $params->getArray());
 		
 		if(!$response) {
 			throw new Exception("Invalid response from import converter");
@@ -1038,7 +1038,7 @@ abstract class EntityController extends Controller {
 				
 		$entities = $this->getGetQuery($params);
 
-		$blob = $convertor->exportToBlob($entities, $params);
+		$blob = $convertor->exportToBlob($entities, $params->getArray());
 		
 		return ['blobId' => $blob->id, 'blob' => $blob->toArray()];
 	}

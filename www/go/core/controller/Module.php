@@ -9,6 +9,7 @@ use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\Response;
 use go\core\model;
 use go\core\orm\Query;
+use go\core\util\ArrayObject;
 
 
 class Module extends EntityController {
@@ -58,12 +59,12 @@ class Module extends EntityController {
 		return go()->getAuthState()->isAdmin();
 	}
 
-	protected function getQueryQuery(array $params): Query
+	protected function getQueryQuery(ArrayObject $params): Query
 	{
 		return $this->filterPermissions(parent::getQueryQuery($params))->orderBy(['sort_order' => 'ASC']);
 	}
 
-	protected function getGetQuery(array $params): \go\core\orm\Query
+	protected function getGetQuery(ArrayObject $params): \go\core\orm\Query
 	{
 		return $this->filterPermissions(parent::getGetQuery($params))->orderBy(['sort_order' => 'ASC']);
 	}
