@@ -1063,6 +1063,7 @@ class User extends Entity {
 		$contact = Contact::findForUser($this->id);
 		if(!$contact) {
 			$contact = new Contact();
+			$contact->goUserId = $this->id;
 			$contact->addressBookId = go()->getSettings()->userAddressBook()->id;
 			if($this->email) {
 				$contact->emailAddresses[0] = (new EmailAddress($contact))->setValues(['email' => $this->email]);
