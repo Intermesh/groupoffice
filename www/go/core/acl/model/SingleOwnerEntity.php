@@ -30,7 +30,7 @@ abstract class SingleOwnerEntity extends Entity
 		return $query;
 	}
 
-	protected function internalGetPermissionLevel()
+	protected function internalGetPermissionLevel(): int
 	{
 		return $this->userId == go()->getAuthState()->getUserId() ? Acl::LEVEL_MANAGE : false;
 	}

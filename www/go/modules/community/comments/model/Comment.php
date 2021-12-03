@@ -174,7 +174,8 @@ class Comment extends AclItemEntity {
 	 *
 	 * @return int
 	 */
-	protected function internalGetPermissionLevel() {
+	protected function internalGetPermissionLevel(): int
+	{
 
 		if(go()->getAuthState()->isAdmin()) {
 			return Acl::LEVEL_MANAGE;

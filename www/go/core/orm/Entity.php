@@ -575,7 +575,8 @@ abstract class Entity extends Property {
 		return $this->internalGetPermissionLevel();
 	}
 
-	protected function internalGetPermissionLevel() {
+	protected function internalGetPermissionLevel(): int
+	{
 		if($this->isNew()) {
 			return $this->canCreate() ? Acl::LEVEL_CREATE : 0;
 		}

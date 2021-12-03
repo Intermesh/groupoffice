@@ -608,7 +608,7 @@ class User extends Entity {
 	}
 
 
-	protected function internalGetPermissionLevel()
+	protected function internalGetPermissionLevel(): int
 	{
 		if($this->id == App::get()->getAuthState()->getUserId()) {
 			return Acl::LEVEL_WRITE;
