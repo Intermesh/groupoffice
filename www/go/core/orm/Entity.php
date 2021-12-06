@@ -598,15 +598,15 @@ abstract class Entity extends Property {
 	}
 
 
-  /**
-   * Gets an ID from the database for this class used in database relations and
-   * routing short routes like "Note/get"
-   *
-   * @return EntityType
-   */
+	/**
+	 * Gets an ID from the database for this class used in database relations and
+	 * routing short routes like "Note/get"
+	 *
+	 * @return EntityType
+	 * @throws Exception
+	 */
 	public static function entityType(): EntityType
 	{
-
 		$cls = static::class;
 		$cacheKey = 'entity-type-' . $cls;
 

@@ -295,9 +295,9 @@ class User extends Entity {
    * Get the user's personal group used for granting permissions
    *
    * @return Group
-   * @throws Exception
    */
-	public function getPersonalGroup() {
+	public function getPersonalGroup(): Group
+	{
 		if(empty($this->personalGroup)){
 			$this->personalGroup = Group::find()->where(['isUserGroupFor' => $this->id])->single();
 		}

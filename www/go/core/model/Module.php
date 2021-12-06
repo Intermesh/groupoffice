@@ -295,12 +295,13 @@ class Module extends Entity {
 	/**
 	 * Finds a module based on the given class name
 	 * returns null if it belongs to the core.
-	 * 
+	 *
 	 * @param string $className
+	 * @param array $properties
 	 * @return self
 	 * @throws Exception
 	 */
-	public static function findByClass($className, $properties = []): Module
+	public static function findByClass(string $className, array $properties = []): Module
 	{
 		switch($className) {	
 			
@@ -333,7 +334,7 @@ class Module extends Entity {
 		}
 		
 		if(!$module) {
-			throw new Exception("Module '" . ($package ?? "legacy") . "/" . $name . "' not found for ".$className);
+			throw new Exception("Module '" . ($package ?? "legacy") . "/" . ($name ?? "core"). "' not found for ".$className);
 		}
 
 		return $module;

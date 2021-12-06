@@ -102,13 +102,13 @@ class EntityType implements ArrayableInterface {
 		return Module::findById($this->moduleId, $props);
 	}
 
-  /**
-   * Find by PHP API class name
-   *
-   * @param class-string<Entity> $className
-   * @return ?EntityType
-   * @throws Exception
-   */
+	/**
+	 * Find by PHP API class name
+	 *
+	 * @param class-string<Entity> $className
+	 * @return ?EntityType
+	 * @throws Exception
+	 */
 	public static function findByClassName(string $className) : ?EntityType {
 
 		$clientName = $className::getClientName();
@@ -116,10 +116,6 @@ class EntityType implements ArrayableInterface {
 		
 		if(!isset($c['name'][$clientName])) {
 			$module = Module::findByClass($className, ['id']);
-		
-			if(!$module) {
-				throw new Exception("No module found for ". $className);
-			}
 
 			$record = [];
 			$record['moduleId'] = $module->id;

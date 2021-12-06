@@ -67,7 +67,7 @@ class Mapping {
 	 *   this and the last added table. eg. ['id' => 'id']
 	 * @param array|null $columns Leave this null if you want to automatically build
 	 *   this based on the properties the model has. If you're extending a model
-	 *   then this is not possinble and you must supply all columns you do want to
+	 *   then this is not possible and you must supply all columns you do want to
 	 *   make available in the model.
 	 * @param array $constantValues If the table that is joined needs to have
 	 *   constant values. For example the keys are ['folderId' => 'folderId'] but

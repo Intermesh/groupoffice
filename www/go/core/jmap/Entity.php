@@ -12,7 +12,6 @@ use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
 use PDO;
-use go\core\orm\EntityType;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\acl\model\AclItemEntity;
 use go\core\orm\Relation as GoRelation;
@@ -519,10 +518,6 @@ abstract class Entity  extends OrmEntity {
 		
 		$result = [				
 			'oldState' => $sinceState,
-			'newState' => null,
-			'hasMoreChanges' => false,
-			'totalChanges' => 0,//unofficial response but we use it to process no more than 100000 changes. A resync is
-			//more efficient in the webclient in that case.
 			'changed' => [],
 			'removed' => []
 		];		
@@ -550,13 +545,12 @@ abstract class Entity  extends OrmEntity {
 			}
 		}
 
+		//unofficial response but we use it to process no more than 100000 changes. A resync is
+		//more efficient in the webclient in that case.
 		$result['totalChanges'] = $changesQuery->foundRows();
 		
-		if($changes->rowCount() > $maxChanges && $count){
-			
+		if($changes->rowCount() > $maxChanges && $count) {
 			$states[1]['offset'] += $maxChanges;
-			
-			$result['hasMoreChanges'] = true;
 			$result['newState'] = static::intermediateState($states);
 		} else
 		{
@@ -569,7 +563,7 @@ abstract class Entity  extends OrmEntity {
 	}
 
   /**
-   * Check if this entities has user properties
+   * Check if this entity has user properties
    *
    * User properties can vary between users. For example "starred" of a contact
    * can be different between users.
