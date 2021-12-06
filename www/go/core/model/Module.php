@@ -429,7 +429,7 @@ class Module extends Entity {
 		$query = static::find()->where(['package' => $package, 'name' => $name, 'enabled' => true]);
 		static::applyAclToQuery($query, $level, $userId);
 		
-		return $query->single() !== false;
+		return $query->single() !== null;
 	}
 
 	private static $modulesByName = [];
@@ -487,7 +487,7 @@ class Module extends Entity {
 		if(isset($enabled)) {
 			$where['enabled'] = $enabled;
 		}
-		return static::find()->where($where)->selectSingleValue('id')->single() != false;
+		return static::find()->where($where)->selectSingleValue('id')->single() != null;
 	}
 	
 	/**

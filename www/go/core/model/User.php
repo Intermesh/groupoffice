@@ -470,7 +470,7 @@ class User extends Entity {
 			return false;
 		}						
 		
-		return App::get()->getAuthState()->isAdmin();		
+		return App::get()->getAuthState()->isAdmin();
 	}
 	
 	protected function internalValidate() {
@@ -626,7 +626,7 @@ class User extends Entity {
 		return (new Query)
 			->select('*')
 			->from('core_user_group')
-			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single() !== false;
+			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single() !== null;
 	}
 
 	public static function isAdminById($userId) {
@@ -637,7 +637,7 @@ class User extends Entity {
 		return (new Query)
 				->select('*')
 				->from('core_user_group')
-				->where(['groupId' => Group::ID_ADMINS, 'userId' => $userId])->single() !== false;
+				->where(['groupId' => Group::ID_ADMINS, 'userId' => $userId])->single() !== null;
 	}
 
   /**
