@@ -1,3 +1,5 @@
+- Leavedays: Fix error in year export
+
 29-11-2021 6.5.90
 - Leavedays: Manager column was sortable but is not supported by the server
 - Email: Check if node was found to prevent node.getUI() error
