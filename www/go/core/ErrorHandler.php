@@ -92,8 +92,8 @@ class ErrorHandler {
 	}
 
 	/**
-	 * PHP7 has new throwable interface. We can't use type hinting if we want to 
-	 * support php 5.6 as well.
+	 * Handles uncaught exceptions
+	 *
 	 * @param Throwable $e
 	 */
 	public function exceptionHandler(Throwable $e) {
@@ -110,7 +110,7 @@ class ErrorHandler {
 			header('Content-Type: text/plain');
 		}
 		
-		echo "\n" . $errorString . " at ".date(DateTime::FORMAT_API)."\n\n";	
+		echo "Uncaught exception: " . $errorString . " at ".date(DateTime::FORMAT_API)."\n\n";
 			
 		if(go()->getDebugger()->enabled) {
 

@@ -2,6 +2,7 @@
 namespace go\core\model;
 
 use DateInterval;
+use Exception;
 use go\core\Environment;
 use go\core\exception\RememberMeTheft;
 use go\core\http\Request;
@@ -11,6 +12,7 @@ use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
+use ReflectionException;
 
 /**
  * Class RememberMe
@@ -93,7 +95,10 @@ class RememberMe extends Entity {
 	 */
 	const LIFETIME = 'P7D';
 
-	
+
+	/**
+	 * @throws ReflectionException
+	 */
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -131,10 +136,18 @@ class RememberMe extends Entity {
 		$this->browser = $ua_info['browser'];
 	}
 
-	private static function generateToken(){
+	/**
+	 * @return string
+	 * @throws Exception
+	 */
+	private static function generateToken(): string
+	{
 		return uniqid().bin2hex(random_bytes(16));
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function setNewToken() {
 		$this->unhashedToken = static::generateToken();
 		$this->token = password_hash($this->unhashedToken, PASSWORD_DEFAULT);
@@ -145,8 +158,8 @@ class RememberMe extends Entity {
 	 * 
 	 * @return boolean
 	 */
-	public function isExpired(){
-
+	public function isExpired(): bool
+	{
 		if(!isset($this->expiresAt)) {
 			return false;
 		}
@@ -160,8 +173,25 @@ class RememberMe extends Entity {
 		$this->expiresAt = $expireDate;		
 	}
 
+	/**
+	 * Get the token for the client with the unhashed value
+	 *
+	 * @return string
+	 * @throws Exception
+	 */
+	public function getToken(): string
+	{
+		if(!isset($this->unhashedToken)) {
+			throw new Exception("You can only get the token when it was just created");
+		}
+		return $this->series . ':' . $this->unhashedToken;
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public function setCookie() {
-		Response::get()->setCookie('goRememberMe', $this->series . ':' . $this->unhashedToken, [
+		Response::get()->setCookie('goRememberMe', $this->getToken(), [
 			'expires' => $this->expiresAt->format("U"),
 			"path" => "/",
 			"samesite" => "Lax",
@@ -185,7 +215,7 @@ class RememberMe extends Entity {
 	 * Verify remember me cookie
 	 *
 	 * @return bool|static
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function verify($value = null) {
 
@@ -201,6 +231,8 @@ class RememberMe extends Entity {
 		$rememberMe = static::find()
 			->where('series','=', $cookieParts[0])
 			->single();
+
+		/** @var static $rememberMe */
 
 		if(!$rememberMe) {
 			return false;
@@ -234,7 +266,7 @@ class RememberMe extends Entity {
 	 *
 	 * @see GarbageCollection
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function collectGarbage() {
 		return static::delete(

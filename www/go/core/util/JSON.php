@@ -29,6 +29,7 @@ class JSON {
    * Set the maximum depth. Must be greater than zero.
    * 
    * @return string
+   * @throws InvalidArgumentException
    */
   public static function encode($value, int $options = 0, int $depth = 512): string
   {

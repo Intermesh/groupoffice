@@ -297,7 +297,6 @@ class User extends Entity {
    * Get the user's personal group used for granting permissions
    *
    * @return Group
-   * @throws Exception
    */
 	public function getPersonalGroup(): Group
 	{
@@ -488,7 +487,7 @@ class User extends Entity {
 			return false;
 		}						
 		
-		return App::get()->getAuthState()->isAdmin();		
+		return App::get()->getAuthState()->isAdmin();
 	}
 	
 	protected function internalValidate() {
@@ -584,9 +583,6 @@ class User extends Entity {
 		}
 	}
 
-	/**
-	 * @throws ConfigurationException
-	 */
 	private function maxUsersReached(): bool
 	{
 	  if(empty(go()->getConfig()['max_users'])) {
@@ -840,9 +836,6 @@ class User extends Entity {
 		return password_hash($password, PASSWORD_DEFAULT);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	private function saveContact(): bool
 	{
 		
@@ -902,9 +895,6 @@ class User extends Entity {
 	}
 
 
-	/**
-	 * @throws \GO\Base\Exception\AccessDenied
-	 */
 	public function legacyOnSave() {
 		//for old framework. Remove when all is refactored!
 		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels($this->id);			
@@ -965,9 +955,6 @@ class User extends Entity {
 		}
 	}
 
-	/**
-	 * @throws ConfigurationException
-	 */
 	public function getStorageFreeSpace() {
 		if(!empty($this->disk_quota)) {
 			return $this->disk_quota*1024*1024 - $this->disk_usage;
@@ -999,11 +986,7 @@ class User extends Entity {
 	}
 
 
-	/**
-	 * @throws \GO\Base\Exception\AccessDenied
-	 */
-	public static function legacyOnDelete(Query $query): bool
-	{
+	public static function legacyOnDelete(Query $query) {
 
 			foreach($query as $id) {
 				$user = LegacyUser::model()->findByPk($id, false, true);
@@ -1052,9 +1035,6 @@ class User extends Entity {
 	 */
 	private $contact;
 
-	/**
-	 * @throws Exception
-	 */
 	public function getProfile() {
 		if(!Module::isInstalled('community', 'addressbook')) {
 			return null;
@@ -1076,9 +1056,6 @@ class User extends Entity {
 		return $contact;
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public function setProfile($values) {
 		if(!Module::isInstalled('community', 'addressbook')) {
 			throw new Exception("Can't set profile without address book module.");

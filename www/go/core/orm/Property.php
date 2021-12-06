@@ -453,9 +453,7 @@ abstract class Property extends Model {
 	private function trackModifications() {
 		foreach ($this->watchProperties() as $propName) {
 			$v = $this->$propName;
-
-			//if value is a property then don't copy since we will use ->isModified() to track
-			$this->oldProps[$propName] = ($v instanceof self ) ? null : $v;
+			$this->oldProps[$propName] = $v;
 		}
 	}
 
@@ -962,7 +960,12 @@ abstract class Property extends Model {
 		return $a->format('U') != $b->format('U');
 	}
 
-	private function internalGetModified($properties = [], $forIsModified = false) {
+	/**
+	 * @param array|string $properties
+	 * @param bool $forIsModified
+	 * @return array|bool eg. ["propName" => [newval, oldval]]
+	 */
+	private function internalGetModified($properties = [], bool $forIsModified = false) {
 
 		if(!is_array($properties)) {
 			$properties = [$properties];

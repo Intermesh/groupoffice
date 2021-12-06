@@ -27,11 +27,11 @@ class TemporaryState extends AbstractState {
 	public function getUser(array $properties = []): ?\go\core\model\User
 	{
 		if(!empty($properties)) {
-			return $this->user ?? User::findById($this->userId, $properties);
+			return $this->user ?? $this->userId ? User::findById($this->userId, $properties) : null;
 		}
 
 		if(!$this->user) {
-			$this->user = User::findById($this->userId);
+			$this->user =  $this->userId ? User::findById($this->userId) : null;
 		}
 		return $this->user;
 	}
