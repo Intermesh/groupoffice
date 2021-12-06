@@ -171,7 +171,7 @@ class Module extends Entity {
 	}
 
 	private function userRights($userId) {
-		$r = go()->getDbConnection()->selectSingleValue("MAX(rights)")
+		$query = go()->getDbConnection()->selectSingleValue("MAX(rights)")
 			->from("core_permission")
 			->where('moduleId', '=', $this->id)
 			->where("groupId", "IN",
@@ -179,7 +179,10 @@ class Module extends Entity {
 					->select("groupId")
 					->from("core_user_group")
 					->where(['userId' => $userId])
-			)->single();
+			);
+
+
+		$r = $query->single();
 
 		if($r === null) {
 			$rights = ["mayRead" => false];

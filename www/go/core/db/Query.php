@@ -684,7 +684,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 						->execute()
 						->fetch();
 
-		return $entity ?: null;
+		return $entity === false ? null : $entity;
 	}
 
   /**
