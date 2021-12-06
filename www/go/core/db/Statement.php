@@ -69,6 +69,20 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 		}
 	}
 
+	/**
+	 * Output query to debugger
+	 *
+	 * @return $this
+	 */
+	public function debug() {
+
+		if(go()->getDebugger()->enabled) {
+			go()->debug((string)$this);
+		}
+
+		return $this;
+	}
+
   /**
    * Executes a prepared statement
    *
