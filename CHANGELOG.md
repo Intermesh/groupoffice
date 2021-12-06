@@ -1,4 +1,5 @@
 - Leavedays: Fix error in year export
+- Googleauthenticator: Use title for QR image so app takes over name
 
 29-11-2021 6.5.90
 - Leavedays: Manager column was sortable but is not supported by the server
