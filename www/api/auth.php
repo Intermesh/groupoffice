@@ -7,20 +7,21 @@ use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\Unavailable;
 use go\core\jmap\State;
+use go\core\model\RememberMe;
 use go\core\model\Token;
 use go\core\jmap\Request;
 use go\core\http\Response;
 use go\core\model\User;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
+use go\core\util\JSON;
 
 /**
  * @param array $data
  * @param int $status
- * @param null $statusMsg
- * @throws Exception
+ * @param ?string $statusMsg
  */
-function output($data = [], $status = 200, $statusMsg = null) {
+function output(array $data = [], int $status = 200, string $statusMsg = null) {
 
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 	Response::get()->setHeader('Pragma', 'no-cache');
@@ -30,25 +31,32 @@ function output($data = [], $status = 200, $statusMsg = null) {
 
 	go()->getDebugger()->groupEnd();
 	$data['debug'] = go()->getDebugger()->getEntries();
-	
-	//var_dump($data);
-	
-	$json = json_encode($data);
-	if(!$json) {
-		throw new Exception("Failed to encode JSON: " . json_last_error_msg());
-	}	
-	Response::get()->output($json);
+
+	try {
+		$json = JSON::encode($data);
+		Response::get()->output($json);
+	} catch(Exception $e) {
+		Response::get()->setStatus(500, $e->getMessage());
+
+		echo $e->getMessage();
+
+		ErrorHandler::logException($e);
+	}
 
 	exit();
 }
 
-function finishLogin(Token $token) {
+function finishLogin(Token $token, string $rememberMeToken = null) {
 	$authState = new State();
 	$authState->setToken($token);
 	go()->setAuthState($authState);
 	$response = $authState->getSession();
 
 	$response['accessToken'] = $token->accessToken;
+
+	if($rememberMeToken != null) {
+		$response['rememberMeToken'] = $rememberMeToken;
+	}
 
 	$token->setCookie();
 
@@ -102,6 +110,7 @@ try {
 			output();
 			break;
 
+		case 'login':
 		default:
 
 			if (isset($data['accessToken'])) {
@@ -112,7 +121,7 @@ try {
 			} else if(isset($data['rememberMeToken'])) {
 				// Process remember me persistent cookie. This is not used by the browser. The browser verifies the remember me token in index.php with a cookie.
 				// The assistant uses this method.
-				if(($rememberMe = \go\core\model\RememberMe::verify($data['rememberMeToken']))) {
+				if(($rememberMe = RememberMe::verify($data['rememberMeToken']))) {
 					$rememberMe->setCookie();
 
 					$token = new Token();
@@ -120,7 +129,7 @@ try {
 					$token->setAuthenticated();
 					$token->setCookie();
 
-					finishLogin($token);
+					finishLogin($token, $rememberMe->getToken());
 				} else {
 					output(["error" => "Invalid remember me token"], 400, "Invalid remember me token");
 				}
@@ -174,17 +183,23 @@ try {
 				throw new Exception("Could not save token: " . var_export($token->getValidationErrors(), true));
 			}
 
+
+
 			if ($token->isAuthenticated()) {
+
+				$rememberMeToken = null;
 				if(!empty($data['rememberLogin'])) {
-					$rememberMe = new \go\core\model\RememberMe();
+					$rememberMe = new RememberMe();
 					$rememberMe->userId = $token->userId;
 					if(!$rememberMe->save()) {
 						throw new \go\core\orm\exception\SaveException($rememberMe);
 					}
 					$rememberMe->setCookie();
+
+					$rememberMeToken = $rememberMe->getToken();
 				}
 
-				finishLogin($token);
+				finishLogin($token, $rememberMeToken);
 			}
 
 			$response = [

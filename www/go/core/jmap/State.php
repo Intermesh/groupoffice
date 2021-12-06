@@ -3,6 +3,7 @@ namespace go\core\jmap;
 
 use Exception;
 use GO\Base\Model\State as OldState;
+use go\core\ErrorHandler;
 use go\core\model\Module;
 use go\core\model\Token;
 use go\core\auth\State as AbstractState;
@@ -60,7 +61,6 @@ class State extends AbstractState {
 	 * Get the authorization token by reading the request header "Authorization"
 	 *
 	 * @return boolean|Token
-	 * @throws Exception
 	 */
 	public function getToken() {
 		
@@ -87,8 +87,12 @@ class State extends AbstractState {
 				return false;
 			}		
 
-			if($this->token->isExpired()) {				
-				$this->token->delete($this->token->primaryKeyValues());				
+			if($this->token->isExpired()) {
+				try {
+					$this->token->delete($this->token->primaryKeyValues());
+				} catch(Exception $e) {
+					ErrorHandler::logException($e);
+				}
 				$this->token = false;
 			} else{
 				go()->getCache()->set('token-' . $tokenStr, $this->token);
@@ -187,7 +191,7 @@ class State extends AbstractState {
 
 
 	/**
-	 * @throws Exception
+	 *
 	 */
 	public function getSession(): array
 	{
@@ -275,10 +279,6 @@ class State extends AbstractState {
 	/**
 	 * Get the user ID
 	 * @return int|null
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
 	 */
 	public function getUserId(): ?int
 	{
