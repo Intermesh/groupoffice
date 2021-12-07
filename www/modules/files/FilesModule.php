@@ -21,6 +21,7 @@
 
 namespace GO\Files;
 
+use Faker\Generator;
 use go\core\model\Group;
 use go\core\model\User;
 use go\core\util\ClassFinder;
@@ -255,5 +256,32 @@ class FilesModule extends \GO\Base\Module{
 //		$response['results'] = array_values($response['results']);
 //		
 	}
-	
+
+	public function demo(Generator $faker)
+	{
+
+		$demo = \GO\Base\Model\User::model()->findSingleByAttribute('username', 'demo');
+
+		$demoHome = \GO\Files\Model\Folder::model()->findHomeFolder($demo);
+		$file = new \GO\Base\Fs\File(\GO::modules()->files->path.'install/templates/empty.docx');
+		$copy = $file->copy($demoHome->fsFolder);
+
+		$file = new \GO\Base\Fs\File(\GO::modules()->files->path.'install/templates/empty.odt');
+		$copy = $file->copy($demoHome->fsFolder);
+
+
+		$file = new \GO\Base\Fs\File(\GO::modules()->files->path . 'demo/Demo letter.docx');
+		$copy = $file->copy($demoHome->fsFolder);
+
+
+		$file = new \GO\Base\Fs\File(\GO::modules()->files->path . 'demo/wecoyote.png');
+		$copy = $file->copy($demoHome->fsFolder);
+
+		$file = new \GO\Base\Fs\File(\GO::modules()->files->path . 'demo/noperson.jpg');
+		$copy = $file->copy($demoHome->fsFolder);
+
+		//add files to db.
+		$demoHome->syncFilesystem();
+	}
+
 }
