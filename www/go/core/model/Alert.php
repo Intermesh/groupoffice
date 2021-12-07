@@ -14,6 +14,8 @@ use go\core\orm\Query;
 
 class Alert extends SingleOwnerEntity
 {
+	public static $enabled = true;
+
 	public $id;
 
 	protected $entityTypeId;
@@ -91,6 +93,10 @@ class Alert extends SingleOwnerEntity
 
 	protected function internalSave(): bool
 	{
+		if(!self::$enabled) {
+			throw new \BadMethodCallException("Alerts are disabled. Please check this before creating alerts");
+		}
+
 		if($this->isNew()) {
 
 			$this->sendMail = User::findById($this->userId, ['mail_reminders'])->mail_reminders;

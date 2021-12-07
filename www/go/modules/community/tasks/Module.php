@@ -76,6 +76,14 @@ class Module extends core\Module {
 
 	public function demo(Generator $faker)
 	{
+		$tasklists = Tasklist::find();
+
+		foreach($tasklists as $tasklist) {
+			$this->demoTasks($faker, $tasklist);
+		}
+	}
+
+	public function demoTasks(Generator $faker, Tasklist $tasklist, bool $withLinks = true) {
 
 		$titles = [
 			"Finish tasks module",
@@ -111,34 +119,31 @@ class Module extends core\Module {
 		$titleCount = count($titles);
 
 
-		$tasklists = Tasklist::find();
+		$count = $faker->numberBetween(3, 20);
+		for($i = 0; $i < $count; $i ++ ) {
+			echo ".";
+			$task = new Task();
+			$task->title = $titles[$faker->numberBetween(0, $titleCount - 1)];
+			$task->description = $faker->realtext;
+			$task->createdBy = $tasklist->createdBy;
+			$task->responsibleUserId = $task->createdBy;
+			$task->start = $faker->dateTimeBetween("-1 years", "now");
+			$task->due =  $faker->dateTimeBetween($task->start, "now");
+			$task->tasklistId = $tasklist->id;
+			$task->percentComplete = $faker->randomElement([0, 20, 50, 80, 100]);
 
-		foreach($tasklists as $tasklist) {
+			$task->createdAt = $faker->dateTimeBetween("-1 years", "now");
+			$task->modifiedAt = $faker->dateTimeBetween($task->createdAt, "now");
 
-			$count = $faker->numberBetween(3, 20);
-			for($i = 0; $i < $count; $i ++ ) {
-				echo ".";
-				$task = new Task();
-				$task->title = $titles[$faker->numberBetween(0, $titleCount - 1)];
-				$task->description = $faker->realtext;
-				$task->createdBy = $tasklist->createdBy;
-				$task->responsibleUserId = $task->createdBy;
-				$task->start = $faker->dateTimeBetween("-1 years", "now");
-				$task->due =  $faker->dateTimeBetween($task->start, "now");
-				$task->tasklistId = $tasklist->id;
-				$task->percentComplete = $faker->randomElement([0, 20, 50, 80, 100]);
+			if(!$task->save()) {
+				throw new core\orm\exception\SaveException($task);
+			}
 
-				$task->createdAt = $faker->dateTimeBetween("-1 years", "now");
-				$task->modifiedAt = $faker->dateTimeBetween($task->createdAt, "now");
+			if($withLinks && core\model\Module::isInstalled("community", "comments")) {
+				\go\modules\community\comments\Module::demoComments($faker, $task);
+			}
 
-				if(!$task->save()) {
-					throw new core\orm\exception\SaveException($task);
-				}
-
-				if(core\model\Module::isInstalled("community", "comments")) {
-					\go\modules\community\comments\Module::demoComments($faker, $task);
-				}
-
+			if($withLinks) {
 				model\Link::demo($faker, $task);
 			}
 		}

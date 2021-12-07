@@ -9,12 +9,14 @@ use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\File;
 use go\core\jmap\Entity;
+use go\core\model\Alert;
 use go\core\model\CronJobSchedule;
 use go\core\event\Listeners;
 use go\core\model\Module;
 use Faker;
 
 
+use go\modules\community\history\Module as HistoryModule;
 use function GO;
 
 class System extends Controller {
@@ -175,7 +177,7 @@ class System extends Controller {
 	 *
 	 * @example
 	 * ```
-	 * docker-compose exec groupoffice-tasks ./www/cli.php core/System/demo
+	 * docker-compose exec --user www-data groupoffice-tasks ./www/cli.php core/System/demo
 	 * ```
 	 * @return void
 	 */
@@ -184,12 +186,11 @@ class System extends Controller {
 		$faker = Faker\Factory::create();
 
 		Entity::$trackChanges = false;
-		\go\modules\community\history\Module::$enabled = false;
-		//go()->getDebugger()->enabled = false;
+		HistoryModule::$enabled = false;
+		go()->getDebugger()->enabled = false;
+		Alert::$enabled = false;
 
-//		$modules = Module::find();
-
-		$modules = [Module::findByName("legacy", "files")];
+		$modules = Module::find();
 
 		foreach($modules as $module) {
 			if(!$module->isAvailable()) {

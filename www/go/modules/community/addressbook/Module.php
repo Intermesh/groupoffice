@@ -252,6 +252,10 @@ class Module extends core\Module {
 
 		Link::demo($faker, $contact);
 
+		if(\go\core\model\Module::isInstalled("legacy", "savemailas")) {
+			\GO\Savemailas\SavemailasModule::get()->demoMail($faker, $contact);
+		}
+
 		return $contact;
 	}
 

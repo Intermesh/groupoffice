@@ -9,6 +9,7 @@ namespace go\modules\community\tasks\model;
 
 use Exception;
 use go\core\acl\model\AclItemEntity;
+use go\core\model\Alert;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
@@ -373,7 +374,7 @@ class Task extends AclItemEntity {
 			return false;
 		}
 
-		if($this->isModified('responsibleUserId')) {
+		if($this->isModified('responsibleUserId') && CoreAlert::$enabled) {
 
 			if (isset($this->responsibleUserId)) {
 
@@ -642,6 +643,10 @@ class Task extends AclItemEntity {
 		} else if($this->progress = Progress::NeedsAction && $comment->createdBy == $this->responsibleUserId) {
 			$this->progress = Progress::InProcess;
 			$this->save();
+		}
+
+		if(!CoreAlert::$enabled ) {
+			return;
 		}
 
 
