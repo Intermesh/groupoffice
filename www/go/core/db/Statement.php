@@ -77,8 +77,8 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 	 *
 	 * @return $this
 	 */
-	public function debug() {
-
+	public function debug(): Statement
+	{
 		if(go()->getDebugger()->enabled) {
 			go()->debug((string)$this);
 		}
