@@ -9,6 +9,7 @@ use Faker;
 use go\core\model\Group;
 use go\core\model\Module as GoModule;
 use go\modules\community\comments\model\Comment;
+use go\modules\humblebuildings\cvgenerator\model\Generator;
 
 class Module extends core\Module
 {
@@ -80,6 +81,30 @@ class Module extends core\Module
 //		}
 	}
 
+	private static $demoTexts;
+
+	private static function demoText(Faker\Generator $faker) : string{
+		if(!isset($demoTexts)) {
+			static::$demoTexts = [];
+			for($i = 0; $i < 20; $i++) {
+				static::$demoTexts [] = nl2br($faker->realtext);
+			}
+		}
+
+		return static::$demoTexts [$faker->numberBetween(0, count(static::$demoTexts) - 1 )];
+
+	}
+
+	private static $demoUsers;
+
+	/**
+	 * @return User[]
+	 */
+	private static function demoUsers(): array
+	{
+		return self::$demoUsers ?? (self::$demoUsers = core\model\User::find(['id'])->limit(10)->all());
+	}
+
 	/**
 	 * Create some demo comments
 	 *
@@ -89,12 +114,11 @@ class Module extends core\Module
 	 */
 	public static function demoComments(Faker\Generator $faker, $entity) {
 
-		gc_collect_cycles();
+//		gc_collect_cycles();
 
 		$faker = Faker\Factory::create();
 
-		$users = core\model\User::find(['id'])->limit(10)->all();
-
+		$users = self::demoUsers();
 		$userCount = count($users) - 1;
 
 		$commentCount = $faker->numberBetween(1, 5);
@@ -106,7 +130,7 @@ class Module extends core\Module
 
 			$comment = new Comment();
 			$comment->setEntity($entity);
-			$comment->text = nl2br($faker->realtext);
+			$comment->text = self::demoText($faker);
 			$comment->createdBy = $user->id;
 			$comment->date = $date;
 

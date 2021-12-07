@@ -2,8 +2,8 @@
 
 namespace go\core\orm;
 
-use Exception;
 use go\core\db\Table;
+use InvalidArgumentException;
 
 /**
  * Relation class

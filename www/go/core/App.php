@@ -866,7 +866,6 @@ use Faker;
 		 */
 		public function demo(Faker\Generator $faker) {
 
-
 			go()->getSettings()->passwordMinLength = 4;
 
 			$demo = User::find()->where('username', '=', 'demo')->single();

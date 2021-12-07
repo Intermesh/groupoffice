@@ -56,6 +56,14 @@ class Environment extends Singleton {
 	public function setMemoryLimit($limit) {
 		ini_set('memory_limit', $limit);
 	}
+
+	/**
+	 * @param int $time In seconds
+	 * @return void
+	 */
+	public function setMaxExecutionTime(int $time) {
+		ini_set('max_execution_time', $time);
+	}
 	
 	/**
 	 * Get the maximum size of a file upload

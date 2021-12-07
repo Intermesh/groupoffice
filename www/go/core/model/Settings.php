@@ -505,6 +505,13 @@ class Settings extends core\Settings {
 	 * @var bool
 	 */
 	public $welcomeShown = false;
+
+
+	/**
+	 *
+	 * @var bool
+	 */
+	public $demoDataAsked = false;
 	
 	/**
 	 * New users will be member of these groups

@@ -9,7 +9,6 @@ namespace go\modules\community\tasks\model;
 
 use Exception;
 use go\core\acl\model\AclItemEntity;
-use go\core\model\Alert;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;

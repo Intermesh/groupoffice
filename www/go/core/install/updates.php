@@ -1094,3 +1094,4 @@ $updates['202110211653'][] = "alter table core_module drop column aclId;";
 $updates['202110211653'][] = "alter table core_alert
 	add sendMail boolean default false not null;";
 
+$updates['202112071611'][] = "insert ignore into core_setting values((select id from core_module where name='core'), 'demoDataAsked', 1)";
