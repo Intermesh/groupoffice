@@ -437,16 +437,15 @@ abstract class AbstractController extends Observable {
 		}
 		catch (\Throwable $e) {
 			
-			GO::debug("EXCEPTION: ".(string) $e);
-			
-			\go\core\ErrorHandler::logException($e);
+
+			$debug = \go\core\ErrorHandler::logException($e);
 			
 			$response = new JsonResponse();
 			
 			$response['success'] = false;
 			
 			$response['feedback'] = !empty($response['feedback']) ? $response['feedback']."\r\n\r\n" : '';
-			$response['feedback'] .= $e->getMessage();	
+			$response['feedback'] .= $e->getMessage();
 			
 			$response['exceptionCode'] = $e->getCode();
 					
@@ -456,6 +455,7 @@ abstract class AbstractController extends Observable {
 				$response['redirectToLogin']=true;
 
 			if(GO::config()->debug){
+				$response['message']=$debug;
 				$response['trace']=explode("\n", $e->getTraceAsString());
 				//$response['trace']= $e->getTrace();
 			}

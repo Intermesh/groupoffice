@@ -39,7 +39,7 @@ class Module extends core\Module
 
 		$creator = core\model\UserDisplay::findById($data->createdBy, ['displayName']);
 
-		$props['body'] = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ": <br /><br />\n\n<i>" . $alert->getData()->excerpt . "</i>";
+		$props['body'] = str_replace("{creator}", $creator ? $creator->displayName : go()->t("Unknown"), go()->t("A comment was made by {creator}", "community", "comments")) . ": <br /><br />\n\n<i>" . $alert->getData()->excerpt . "</i>";
 	}
 
 	protected function beforeInstall(\go\core\model\Module $model): bool
