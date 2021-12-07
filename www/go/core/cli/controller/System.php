@@ -187,7 +187,6 @@ class System extends Controller {
 
 		Entity::$trackChanges = false;
 		HistoryModule::$enabled = false;
-		go()->getDebugger()->enabled = false;
 		Alert::$enabled = false;
 
 		$modules = Module::find();
@@ -205,6 +204,10 @@ class System extends Controller {
 
 		// for resyncing
 		go()->rebuildCache();
+
+		Entity::$trackChanges = true;
+		HistoryModule::$enabled = true;
+		Alert::$enabled = true;
 
 		echo "\n\nAll done!\n\n";
 	}

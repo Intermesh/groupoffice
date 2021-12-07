@@ -6,6 +6,7 @@ ini_set('display_startup_errors', '1');
 
 use go\core;
 use go\core\App;
+use go\core\cli\controller\System;
 use go\core\cli\State;
 use GO\Base\Model\Module;
 use GO\Demodata\Controller\DemodataController;
@@ -90,8 +91,8 @@ try {
 
 		echo "Installing demo data\n";
 
-		$c = new DemodataController();
-		$c->run('create');
+		$ctrl = new System();
+		$ctrl->demo();
 
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {

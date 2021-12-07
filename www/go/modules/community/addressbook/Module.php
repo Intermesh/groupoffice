@@ -240,7 +240,7 @@ class Module extends core\Module {
 		$a->state = $faker->state;
 		$a->country = $faker->country;
 
-		$contact->notes = $faker->realtext;
+//		$contact->notes = $faker->realtext;
 
 		if(!$contact->save()) {
 			throw new core\orm\exception\SaveException($contact);

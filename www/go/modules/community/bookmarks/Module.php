@@ -60,6 +60,8 @@ class Module extends core\Module {
 		$bookmark->loadMetaData();
 		$bookmark->save();
 
+		return true;
+
 	}
 
 

@@ -7,6 +7,7 @@
 
 namespace go\modules\community\tasks\model;
 
+use Defuse\Crypto\Core;
 use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\model\Alert as CoreAlert;
@@ -404,6 +405,11 @@ class Task extends AclItemEntity {
 
 
 	private function updateAlerts($modified) {
+
+		if(!CoreAlert::$enabled)
+		{
+			return;
+		}
 
 		if(isset($modified[1])) {
 			foreach ($modified[1] as $model) {
