@@ -3,6 +3,7 @@ namespace go\core\model;
 
 use Exception;
 use GO;
+use GO\Base\Model\AbstractSettingsCollection;
 use GO\Base\Module as LegacyModule;
 use go\core;
 use go\core\db\Criteria;
@@ -502,9 +503,9 @@ class Module extends Entity {
 	/**
 	 * Get module settings
 	 * 
-	 * @return Settings|null
+	 * @return Settings|AbstractSettingsCollection|null
 	 */
-	public function getSettings(): ?Settings
+	public function getSettings()
 	{
 		if(!$this->isAvailable()) {
 			return null;
