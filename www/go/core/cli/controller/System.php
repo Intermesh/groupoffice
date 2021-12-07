@@ -169,6 +169,16 @@ class System extends Controller {
 		return $unknown;
 	}
 
+
+	/**
+	 * Generates demo data
+	 *
+	 * @example
+	 * ```
+	 * docker-compose exec groupoffice-tasks ./www/cli.php core/System/demo
+	 * ```
+	 * @return void
+	 */
 	public function demo() {
 
 		$faker = Faker\Factory::create();
@@ -177,7 +187,9 @@ class System extends Controller {
 		\go\modules\community\history\Module::$enabled = false;
 		//go()->getDebugger()->enabled = false;
 
-		$modules = Module::find();
+//		$modules = Module::find();
+
+		$modules = [Module::findByName("legacy", "calendar")];
 
 		foreach($modules as $module) {
 			if(!$module->isAvailable()) {

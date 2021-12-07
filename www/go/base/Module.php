@@ -1,6 +1,7 @@
 <?php
 namespace GO\Base;
 
+use Faker\Generator;
 use go\core\Installer;
 
 /**
@@ -718,7 +719,7 @@ class Module extends Observable {
 	/**
 	 * Generate data for demo purposes
 	 */
-	public function demo() {
+	public function demo(Generator $faker) {
 
 	}
 

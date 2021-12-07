@@ -214,11 +214,11 @@ class Module extends core\Module {
 
 			$count = $faker->numberBetween(0, 3);
 			for($i = 0; $i < $count; $i++) {
-				$contact->phoneNumbers[$i] = (new PhoneNumber())->setValues(['number' => $faker->phoneNumber, 'type' => PhoneNumber::TYPE_MOBILE]);
+				$contact->phoneNumbers[$i] = (new PhoneNumber($contact))->setValues(['number' => $faker->phoneNumber, 'type' => PhoneNumber::TYPE_MOBILE]);
 			}
 			$count = $faker->numberBetween(0, 3);
 			for($i = 0; $i < $count; $i++) {
-				$contact->emailAddresses[$i] = (new EmailAddress())->setValues(['email' => $faker->email, 'type' => EmailAddress::TYPE_HOME]);
+				$contact->emailAddresses[$i] = (new EmailAddress($contact))->setValues(['email' => $faker->email, 'type' => EmailAddress::TYPE_HOME]);
 			}
 
 			$contact->addresses[0] = $a = new Address($contact);
