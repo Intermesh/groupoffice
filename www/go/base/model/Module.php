@@ -168,7 +168,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Install's a module with all it's dependencies
 	 * 
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @return \GO\Base\Model\Module
 	 * @throws \GO\Base\Exception\Save
 	 */

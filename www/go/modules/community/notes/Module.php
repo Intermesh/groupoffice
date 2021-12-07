@@ -15,23 +15,26 @@ use go\modules\community\notes\model\UserSettings;
 
 class Module extends core\Module {	
 
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV";
 	}
 
-	protected function rights() {
+	protected function rights(): array
+	{
 		return [
 			'mayChangeNotebooks', // allows Nootbook/set (hide ui elements that use this)
 		];
 	}
 
-	public function autoInstall()
+	public function autoInstall(): bool
 	{
 		return true;
 	}
 
 	
-	protected function afterInstall(ModuleModel $model) {	
+	protected function afterInstall(ModuleModel $model): bool
+	{
 		
 		$noteBook = new NoteBook();
 		$noteBook->name = go()->t("Shared");
@@ -45,7 +48,7 @@ class Module extends core\Module {
 	}
 
 
-	protected function beforeInstall(\go\core\model\Module $model)
+	protected function beforeInstall(\go\core\model\Module $model): bool
 	{
 		// Share module with Internal group
 		$model->permissions[Group::ID_INTERNAL] = (new \go\core\model\Permission($model))

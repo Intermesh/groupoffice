@@ -12,17 +12,18 @@ use go\core\model\Module as GoModule;
  */
 class Module extends core\Module {
 							
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
-	public function autoInstall()
+	public function autoInstall(): bool
 	{
 		return true;
 	}
 
 
-	protected function beforeInstall(\go\core\model\Module $model)
+	protected function beforeInstall(\go\core\model\Module $model): bool
 	{
 		// Share module with Internal group
 		$model->permissions[Group::ID_INTERNAL] = (new \go\core\model\Permission($model))

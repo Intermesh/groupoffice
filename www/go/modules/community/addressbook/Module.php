@@ -37,18 +37,20 @@ use Faker;
  */
 class Module extends core\Module {
 							
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
-	protected function rights() {
+	protected function rights(): array
+	{
 		return [
 			'mayChangeAddressbooks', // allows AddressBook/set (hide ui elements that use this)
 			'mayExportContacts', // Allows users to export contacts
 		];
 	}
 
-	public function autoInstall()
+	public function autoInstall(): bool
 	{
 		return true;
 	}
@@ -105,7 +107,7 @@ class Module extends core\Module {
 			}
 		}
 	}
-	protected function beforeInstall(\go\core\model\Module $model)
+	protected function beforeInstall(\go\core\model\Module $model): bool
 	{
 		// Share module with Internal group
 		$model->permissions[Group::ID_INTERNAL] = (new \go\core\model\Permission($model))
@@ -115,7 +117,7 @@ class Module extends core\Module {
 	}
 
 
-	protected function afterInstall(\go\core\model\Module $model)
+	protected function afterInstall(\go\core\model\Module $model): bool
 	{
 		// create Shared address book
 		$addressBook = new AddressBook();
@@ -131,7 +133,7 @@ class Module extends core\Module {
 		return parent::afterInstall($model);
 	}
 
-	public function getSettings()
+	public function getSettings(): ?\go\core\Settings
 	{
 		return Settings::get();
 	}

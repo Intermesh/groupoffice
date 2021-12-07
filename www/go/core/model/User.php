@@ -254,7 +254,8 @@ class User extends Entity {
 
 	protected $permissionLevel;
 	
-	public function getDateTimeFormat() {
+	public function getDateTimeFormat(): string
+	{
 		return $this->dateFormat . ' ' . $this->timeFormat;
 	}
 
@@ -599,7 +600,10 @@ class User extends Entity {
 	{
 		return ['username', 'displayName', 'email'];
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
@@ -624,7 +628,6 @@ class User extends Entity {
    * Check if use is an admin
    *
    * @return boolean
-   * @throws Exception
    */
 	public function isAdmin(): bool
 	{
@@ -634,7 +637,8 @@ class User extends Entity {
 			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single();
 	}
 
-	public static function isAdminById($userId) {
+	public static function isAdminById($userId): bool
+	{
 		if($userId == User::ID_SUPER_ADMIN) {
 			return true;
 		}
@@ -648,9 +652,9 @@ class User extends Entity {
   /**
    * Alias for making isAdmin() a public property
    * @return bool
-   * @throws Exception
    */
-	public function getIsAdmin() {
+	public function getIsAdmin(): bool
+	{
 		return $this->isAdmin();
 	}
 
@@ -660,8 +664,8 @@ class User extends Entity {
 	 * 
 	 * @return BaseAuthenticator[]
 	 */
-	public function getAuthenticators() {
-
+	public function getAuthenticators(): array
+	{
 		$authenticators = [];
 
 		$auth = new Authenticate();

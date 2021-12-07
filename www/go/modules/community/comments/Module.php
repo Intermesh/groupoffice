@@ -13,12 +13,12 @@ use go\modules\community\comments\model\Comment;
 class Module extends core\Module
 {
 
-	public function getAuthor()
+	public function getAuthor(): string
 	{
 		return "Intermesh BV";
 	}
 
-	public function autoInstall()
+	public function autoInstall(): bool
 	{
 		return true;
 	}
@@ -42,7 +42,7 @@ class Module extends core\Module
 		$props['body'] = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ": <br /><br />\n\n<i>" . $alert->getData()->excerpt . "</i>";
 	}
 
-	protected function beforeInstall(\go\core\model\Module $model)
+	protected function beforeInstall(\go\core\model\Module $model): bool
 	{
 		// Share module with Internal group
 		$model->permissions[Group::ID_INTERNAL] = (new \go\core\model\Permission($model))

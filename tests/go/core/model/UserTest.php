@@ -43,6 +43,16 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals(false, $success);
 	}
 
+	public function testIsAdmin() {
+		$admin = User::findById(1);
+
+		$this->assertEquals(true, $admin->getIsAdmin());
+
+		$user = User::find()->where(['username' => 'test1'])->single();
+
+		$this->assertEquals(false, $user->getIsAdmin());
+	}
+
 
 	public function testDelete() {
 		$success  = User::delete(['username' => ['test1', 'test2']]);

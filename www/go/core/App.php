@@ -11,7 +11,8 @@ use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-use go\core\event\EventEmitterTrait;
+	use go\core\db\Utils;
+	use go\core\event\EventEmitterTrait;
 use go\core\event\Listeners;
 use go\core\fs\Blob;
 use go\core\fs\Folder;
@@ -28,6 +29,7 @@ use go\core\model\Settings;
 use Faker;
 
 	use InvalidArgumentException;
+	use PDOException;
 	use const GO_CONFIG_FILE;
 
 	/**
@@ -454,6 +456,20 @@ use Faker;
 			return $this->dbConnection;
 		}
 
+		public function isInstalled(): bool
+		{
+			try {
+				return parent::isInstalled();
+			} catch(PDOException $e) {
+
+				if(strpos($e->getMessage(), '[1049]') !== false) {
+					// database does not exists
+					return false;
+				}
+				throw $e;
+			}
+		}
+
 		/**
 		 *
 		 * @var Database
@@ -681,9 +697,9 @@ use Faker;
 		/**
 		 * Get the application settings
 		 * 
-		 * @return Settings
+		 * @return Settings|null
 		 */
-		public function getSettings(): Settings
+		public function getSettings(): ?Settings
 		{
 			return Settings::get();
 		}

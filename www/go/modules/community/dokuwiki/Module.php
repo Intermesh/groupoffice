@@ -11,7 +11,7 @@ class Module extends \go\core\Module
      *
      * @return string
      */
-    public function getAuthor()
+    public function getAuthor(): string
     {
         return 'Michal Charvat';
     }
@@ -27,9 +27,9 @@ class Module extends \go\core\Module
     }
 
     /**
-     * @return \go\modules\community\dokuwiki\model\Settings
+     * @return \go\modules\community\dokuwiki\model\Settings|null
      */
-    public function getSettings()
+    public function getSettings(): ?\go\core\Settings
     {
         return Settings::get();
     }

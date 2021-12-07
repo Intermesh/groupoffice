@@ -14,43 +14,47 @@ const INSTALL_NEW = 0;
 const INSTALL_UPGRADE = 1;
 const INSTALL_NONE = 2;
 
-$installDb = INSTALL_NEW;
-
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
 
 $dataFolder = new \go\core\fs\Folder(__DIR__ . '/data');
 
-
 require(__DIR__ . "/config.php");
 $config['file_storage_path'] = $dataFolder->getPath();
 $config['tmpdir'] = $dataFolder->getFolder('tmp')->getPath();
 
-if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
-	$dataFolder->delete();
-	$dataFolder->create();
-
-	//connect to server without database
-	$pdo = new PDO('mysql:host='. $config['db_host'], $config['db_user'], $config['db_pass']);
-
-	try {
-		echo "Dropping database 'groupoffice-phpunit'\n";
-		$pdo->query("DROP DATABASE groupoffice_phpunit");
-	}catch(\Exception $e) {
-
-	}
-
-	echo "Creating database 'groupoffice-phpunit'\n";
-	$pdo->query("CREATE DATABASE groupoffice_phpunit");
-	$pdo = null;
-}
-
-//Install fresh DB
-App::get(); //for autoload
 try {
+	//for autoload
+	App::get();
 	$c = new core\util\ArrayObject(go()->getConfig());
 	$c->mergeRecursive($config);
 	go()->setConfig($c->getArray());
+
+	// Install new if db doesn't exist otherwise use existing
+	$installDb = !go()->isInstalled() ? INSTALL_NEW : INSTALL_NONE;
+
+//	For testing upgrades use:
+//	$installDb = INSTALL_UPGRADE;
+
+	if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
+		$dataFolder->delete();
+		$dataFolder->create();
+
+		//connect to server without database
+		$pdo = new PDO('mysql:host='. $config['db_host'], $config['db_user'], $config['db_pass']);
+
+		try {
+			echo "Dropping database 'groupoffice-phpunit'\n";
+			$pdo->query("DROP DATABASE groupoffice_phpunit");
+		}catch(\Exception $e) {
+
+		}
+
+		echo "Creating database 'groupoffice-phpunit'\n";
+		$pdo->query("CREATE DATABASE groupoffice_phpunit");
+		$pdo = null;
+	}
+
 
 	if($installDb == INSTALL_NEW) {
 
@@ -110,7 +114,9 @@ try {
 	    $mod->install();
     }
 
-  }
+  } else {
+		echo "Using existing database 'groupoffice_phpunit'\n";
+	}
 	go()->rebuildCache();
 
 	go()->setAuthState(new State());

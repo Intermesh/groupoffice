@@ -8,7 +8,8 @@ use go\core;
 use go\core\App;
 
 class Module extends core\Module {
-	public function getAuthor(){
+	public function getAuthor(): string
+	{
 		return 'Intermesh BV';
 	}
 

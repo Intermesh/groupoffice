@@ -642,9 +642,6 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		
 		try {
 			$stmt = $this->createStatement();
-			/**
-			 * @var Statement $stmt
-			 */
 			$stmt->execute();
 		} catch(PDOException $e) {
 			try {

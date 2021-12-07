@@ -347,7 +347,7 @@ class Module extends Entity {
 		
 		if(!$this->isNew()) {
 			if($this->package == 'core' && $this->isModified('enabled')) {
-				throw new \Exception("You can't disable core modules");		
+				throw new Exception("You can't disable core modules");
 			}
 			
 			if($this->isModified(['name', 'package'])) {
@@ -356,7 +356,7 @@ class Module extends Entity {
 		}
 		
 		
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
 	
 	protected static function internalDelete(Query $query): bool
@@ -374,7 +374,8 @@ class Module extends Entity {
 	 * Get all installed and available modules.
 	 * @return self[]
 	 */
-	public static function getInstalled($properties = []) {
+	public static function getInstalled($properties = []): array
+	{
 		$modules = Module::find($properties)->where(['enabled' => true])->all();
 		
 		$available = [];
@@ -391,7 +392,8 @@ class Module extends Entity {
 	 * @param $rights int bitwise rights
 	 * @return array permission name => true for on / false for off
 	 */
-	public function may($rights) {
+	public function may($rights): array
+	{
 		$module = $this->module();
 		$capabilities = $module->getRights();
 		$result = [];
@@ -406,7 +408,8 @@ class Module extends Entity {
 	/**
 	 * @return string[] static list of available rights
 	 */
-	public function getRights() {
+	public function getRights(): array
+	{
 		if(!$this->isAvailable()) {
 			return [];
 		}
@@ -419,11 +422,12 @@ class Module extends Entity {
 	 * 
 	 * @param string $package
 	 * @param string $name
-	 * @param int $userId
+	 * @param int|null $userId
 	 * @param int $level
 	 * @return boolean
 	 */
-	public static function isAvailableFor($package, $name, $userId = null, $level = Acl::LEVEL_READ) {
+	public static function isAvailableFor(string $package, string $name, int $userId = null, int $level = Acl::LEVEL_READ): bool
+	{
 
 		if($package == "legacy") {
 			$package = null;
@@ -436,16 +440,17 @@ class Module extends Entity {
 	}
 
 	private static $modulesByName = [];
-	
+
 	/**
 	 * Find a module by package and name
-	 * 
-	 * @param string $package
+	 *
+	 * @param string|null $package Legacy modules can be found with null or "legacy"
 	 * @param string $name
-	 * @param bool $enabled Set to null for both enabled and disabled
-	 * @return self|false
+	 * @param bool|null $enabled Set to null for both enabled and disabled
+	 * @param array $props
+	 * @return ?self
 	 */
-	public static function findByName($package, $name, $enabled = true, $props = []) {
+	public static function findByName(?string $package, string $name, ?bool $enabled = true, array $props = []) : ?self {
 		$cache = $package."/". $name;
 
 		if($package == "legacy") {
@@ -463,11 +468,11 @@ class Module extends Entity {
 		}
 
 		if(!$mod) {
-			return false;
+			return null;
 		}
 
 		if(isset($enabled)) {
-			return $mod->enabled == $enabled ? $mod : false;
+			return $mod->enabled == $enabled ? $mod : null;
 		} else{
 			return $mod;
 		}
@@ -481,7 +486,8 @@ class Module extends Entity {
 	 * @param null|boolean $enabled If set, then the module's enabled flag will be matched
 	 * @return bool
 	 */
-	public static function isInstalled($package, $name, $enabled = null) {
+	public static function isInstalled(string $package, string $name, bool $enabled = null): bool
+	{
 		if($package == "legacy") {
 			$package = null;
 		}
@@ -490,15 +496,16 @@ class Module extends Entity {
 		if(isset($enabled)) {
 			$where['enabled'] = $enabled;
 		}
-		return static::find()->where($where)->selectSingleValue('id')->single() != null;
+		return !!static::find()->where($where)->selectSingleValue('id')->single();
 	}
 	
 	/**
 	 * Get module settings
 	 * 
-	 * @return Settings
+	 * @return Settings|null
 	 */
-	public function getSettings() {
+	public function getSettings(): ?Settings
+	{
 		if(!$this->isAvailable()) {
 			return null;
 		}

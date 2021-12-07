@@ -19,11 +19,12 @@ use go\modules\community\tasks\model\UserSettings;
 
 class Module extends core\Module {
 							
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
-	public function autoInstall()
+	public function autoInstall(): bool
 	{
 		return true;
 	}
@@ -39,14 +40,15 @@ class Module extends core\Module {
 		$mapping->addHasOne('tasksSettings', UserSettings::class, ['id' => 'userId'], true);
 	}
 
-	protected function rights() {
+	protected function rights(): array
+	{
 		return [
 			'mayChangeTasklists', // allows Tasklist/set (hide ui elements that use this)
 			'mayChangeCategories', // allows TaskCategory/set (hide ui elements that use this)
 		];
 	}
 
-	protected function beforeInstall(\go\core\model\Module $model)
+	protected function beforeInstall(\go\core\model\Module $model): bool
 	{
 		// Share module with Internal group
 		$model->permissions[Group::ID_INTERNAL] = (new \go\core\model\Permission($model))
