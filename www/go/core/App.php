@@ -21,7 +21,8 @@ use go\core\mail\Mailer;
 use go\core\model\Module as ModuleModel;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
-use go\core\util\ArrayObject;
+	use go\core\Settings as CoreSettings;
+	use go\core\util\ArrayObject;
 use go\core\webclient\Extjs3;
 use go\core\model\User;
 use go\core\model\Settings;
@@ -699,7 +700,7 @@ use Faker;
 		 * 
 		 * @return Settings|null
 		 */
-		public function getSettings(): ?Settings
+		public function getSettings(): ?CoreSettings
 		{
 			return Settings::get();
 		}
