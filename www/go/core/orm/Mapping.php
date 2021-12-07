@@ -6,8 +6,10 @@ use Exception;
 use go\core\db\Column;
 use go\core\db\Query;
 use go\core\db\Table;
+use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionException;
+use Sabre\DAV\Xml\Element\Prop;
 
 /**
  * Mapping object 
@@ -20,7 +22,7 @@ class Mapping {
 	/**
 	 * Property class name this mapping is for
 	 * 
-	 * @var string 
+	 * @var class-string<Property>
 	 */
 	private $for;
 
@@ -52,7 +54,7 @@ class Mapping {
 	/**
 	 * Constructor
 	 * 
-	 * @param string $for Property class name this mapping is for
+	 * @param class-string<Property> $for Property class name this mapping is for
 	 */
 	public function __construct(string $for) {
 		$this->for = $for;
@@ -74,7 +76,6 @@ class Mapping {
 	 *   the joined table always needs to have a value
 	 *   ['type' => "foo"] then you can set it with this parameter.
 	 * @return $this
-	 * @throws ReflectionException
 	 */
 	public function addTable(string $name, string $alias = null, array $keys = null, array $columns = null, array $constantValues = []): Mapping
 	{
@@ -125,11 +126,14 @@ class Mapping {
 
   /**
    * @return array
-   * @throws ReflectionException
    */
 	private function buildColumns(): array
 	{
-		$reflectionClass = new ReflectionClass($this->for);
+		try {
+			$reflectionClass = new ReflectionClass($this->for);
+		} catch(ReflectionException $e) {
+			throw new InvalidArgumentException("Class '" . $this->for . "' could not be loaded. Does it exist?");
+		}
 		$rProps = $reflectionClass->getProperties();
 		$props = [];
 		foreach ($rProps as $prop) {
@@ -238,7 +242,6 @@ class Mapping {
 	 *   be a protected property because the client does not need to know of it's existence.
 	 *
 	 * @return $this;
-	 * @throws Exception
 	 */
 	public function addArray(string $name, string $propertyName, array $keys, array $options = []): Mapping
 	{
@@ -260,7 +263,6 @@ class Mapping {
 	 * @param array $keys
 	 *
 	 * @return $this;
-	 * @throws Exception
 	 */
 	public function addMap(string $name, string $propertyName, array $keys): Mapping
 	{

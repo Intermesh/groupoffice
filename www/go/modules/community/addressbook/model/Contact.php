@@ -397,13 +397,12 @@ class Contact extends AclItemEntity {
    * the contact is present.
    *
    * @param int $userId
-   * @param array $properties
-   * @return static|false
-   * @throws Exception
+   * @param string[] $properties
+   * @return ?static
    */
-	public static function findForUser($userId, $properties = []) {
+	public static function findForUser(int $userId, array $properties = []) {
 		if(empty($userId)) {
-			return false;
+			return null;
 		}
 		return static::find($properties)->where('goUserId', '=', $userId)->single();
 	}

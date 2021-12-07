@@ -123,7 +123,7 @@ abstract class Property extends Model {
 	 * @param boolean $isNew Indicates if this model is saved to the database.
 	 * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
 	 * @param bool $readOnly Entities can be fetched readonly to improve performance
-	 * @throws Exception
+	 *
 	 * @noinspection PhpMissingParamTypeInspection
 	 */
 	public function __construct($owner, bool $isNew = true, array $fetchProperties = [], bool $readOnly = false) {
@@ -175,7 +175,6 @@ abstract class Property extends Model {
    * Loads defaults from the database or casts the database value to the right type in PHP
    *
    * @param boolean $loadDefault
-   * @throws Exception
    */
 	private function initDatabaseColumns(bool $loadDefault) {
 		$m = static::getMapping();
@@ -203,11 +202,9 @@ abstract class Property extends Model {
    * Returns all relations that were requested in "fetchProperties".
    *
    * @return Relation[]
-   * @throws Exception
    */
 	private function getFetchedRelations(): array
 	{
-
 		$fetchedRelations = [];
 
 		$relations = $this->getMapping()->getRelations();		
@@ -222,7 +219,6 @@ abstract class Property extends Model {
 
   /**
    * Fetches the related properties when requested
-   * @throws Exception
    */
 	private function initRelations() {		
 		foreach ($this->getFetchedRelations() as $relation) {
@@ -415,7 +411,6 @@ abstract class Property extends Model {
 	 * By default all non-static public and protected properties + dynamically mapped properties.
 	 *
 	 * @return array
-	 * @throws Exception
 	 */
 	private function watchProperties(): array
 	{
@@ -448,7 +443,6 @@ abstract class Property extends Model {
 
   /**
    * Copies all properties so isModified() can detect changes.
-   * @throws Exception
    */
 	private function trackModifications() {
 		foreach ($this->watchProperties() as $propName) {
@@ -1046,11 +1040,10 @@ abstract class Property extends Model {
 	 * 
 	 * @param string $propName
 	 * @return mixed
-	 * @throws Exception
 	 */
 	public function getOldValue(string $propName) {
 		if(!array_key_exists($propName, $this->oldProps)){
-			throw new Exception("Property " . $propName . " does not exist");
+			throw new InvalidArgumentException("Property " . $propName . " does not exist");
 		}
 		return $this->oldProps[$propName];
 	}

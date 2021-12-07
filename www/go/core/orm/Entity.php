@@ -116,7 +116,7 @@ abstract class Entity extends Property {
 	 *
 	 * Returns a query object that's also directly iterable:
 	 *
-	 * @param array $properties Specify the columns for optimal performance. You can also use the mapping to only fetch table columns Note::getMapping()->getColumnNames()
+	 * @param string[] $properties Specify the columns for optimal performance. You can also use the mapping to only fetch table columns Note::getMapping()->getColumnNames()
 	 * @param bool $readOnly Readonly has less overhead
 	 * @return static[]|Query
 	 * @example

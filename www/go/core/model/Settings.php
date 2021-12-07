@@ -411,9 +411,10 @@ class Settings extends core\Settings {
 	 * @var int 
 	 */
 	public $userAddressBookId = null;
-	
+
 	/**
 	 * @return AddressBook
+	 * @throws Exception
 	 */
 	public function userAddressBook() {
 		if(!Module::findByName('community', 'addressbook')) {
@@ -432,14 +433,14 @@ class Settings extends core\Settings {
 			$addressBook->name = go()->t("Users");		
 
 			if(!$addressBook->save()) {
-				throw new \Exception("Could not save address book");
+				throw new Exception("Could not save address book");
 			}
 			$this->userAddressBookId = $addressBook->id;
 
 			//Share users address book with internal
 			$addressBook->findAcl()->addGroup(Group::ID_INTERNAL)->save();
 			if(!$this->save()) {
-				throw new \Exception("Could not save core settings");
+				throw new Exception("Could not save core settings");
 			}
 			go()->getDbConnection()->commit();
 		}
@@ -573,11 +574,11 @@ class Settings extends core\Settings {
 			if(isset($this->license)) {
 				$data = License::getLicenseData();
 				if (!$data) {
-					throw new \Exception("License data was corrupted");
+					throw new Exception("License data was corrupted");
 				}
 
 				if (!License::validate($data)) {
-					throw new \Exception(License::$validationError);
+					throw new Exception(License::$validationError);
 				}
 			}
 

@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use go\core\util\DateTime as GoDateTime;
+use LogicException;
 
 /**
  * Represents a Record database column attribute.
@@ -253,11 +254,11 @@ class Column {
 
   /**
    * Output formatting for the database.
+   *
    * Currently only used for date fields because we want ISO 8601 for I/O.
    *
    * @param mixed $value
    * @return mixed
-   * @throws Exception
    */
 	public function castFromDb($value) {
 
@@ -287,7 +288,11 @@ class Column {
 				}
 
 				if(!($value instanceof GoDateTime)) {
-					$value = new GoDateTime($value, new DateTimeZone("UTC"));
+					try {
+						$value = new GoDateTime($value, new DateTimeZone("UTC"));
+					}catch(Exception $e) {
+						throw new LogicException("Could not read date from database: " . $e->getMessage());
+					}
 				}
 
 				$value->hasTime = $this->dbType == 'datetime';

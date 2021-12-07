@@ -2,8 +2,11 @@
 namespace go\core\model;
 
 use Exception;
+use GO;
+use GO\Base\Module as LegacyModule;
 use go\core;
 use go\core\db\Criteria;
+use go\core\fs\Folder;
 use go\core\jmap\Entity;
 use go\core\App;
 use go\core\orm\Filters;
@@ -52,23 +55,16 @@ class Module extends Entity {
 	{
 
 		if($this->isModified(['enabled']) || $this->isNew()) {
-
-			//set cache
-			self::$modulesByName[$this->package .'/'.$this->name] = $this;
-
 			if($this->enabled) {
 				if($this->checkDepencencies) {
 					core\Module::installDependencies($this->module());
 				}
-				self::$modulesByName[$this->package.'/'.$this->name] = $this;
 			}else
 			{
-				unset(self::$modulesByName[$this->package.'/'.$this->name]);
-
 				if ($this->checkDepencencies) {
 					$mods = core\Module::getModulesThatDependOn($this->module());
 					if (!empty($mods)) {
-						$this->setValidationError('name', ErrorCode::DEPENDENCY_NOT_SATISFIED, sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."), implode(', ', $mods)));
+						$this->setValidationError('name', ErrorCode::DEPENDENCY_NOT_SATISFIED, sprintf(GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."), implode(', ', $mods)));
 
 						return false;
 					}
@@ -134,7 +130,8 @@ class Module extends Entity {
 			->addMap('permissions', Permission::class, ['id'=>'moduleId']);
 	}
 
-	private function adminRights() {
+	private function adminRights(): object
+	{
 		$rights = ["mayRead" => true];
 		foreach($this->module()->getRights() as $name => $bit){
 			$rights[$name] = true;
@@ -147,6 +144,7 @@ class Module extends Entity {
 	 *
 	 * @param int|null $userId The user ID to query. defaults to current authorized user.
 	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
+	 * @noinspection DuplicatedCode
 	 */
 	public function getUserRights(int $userId = null) : stdClass
 	{
@@ -170,7 +168,8 @@ class Module extends Entity {
 		return $this->userRights($userId);
 	}
 
-	private function userRights($userId) {
+	private function userRights($userId): object
+	{
 		$query = go()->getDbConnection()->selectSingleValue("MAX(rights)")
 			->from("core_permission")
 			->where('moduleId', '=', $this->id)
@@ -222,21 +221,26 @@ class Module extends Entity {
 	 * 
 	 * @return core\Module
 	 */
-	public function module() {
+	public function module(): core\Module
+	{
 		if($this->package == "core" && $this->name == "core") {
 			return App::get();
 		}
 		
 		if(!isset($this->module)) {
 			$cls = $this->getModuleClass();
-			/** @var \go\core\Module $cls */
+			/** @var core\Module $cls */
 			$this->module = $cls::get();
 		}
 		
 		return $this->module;
-	}	
-	
-	private function getModuleClass() {
+	}
+
+	/**
+	 * @return class-string<self>|class-string<LegacyModule>
+	 */
+	private function getModuleClass(): string
+	{
 		if(!isset($this->package)) {
 			//legacy module
 			return "GO\\" . $this->name ."\\" . $this->name ."Module";
@@ -247,9 +251,10 @@ class Module extends Entity {
 	/**
 	 * Get the folder of the module
 	 *
-	 * @return core\fs\Folder
+	 * @return Folder
 	 */
-	public function folder() {
+	public function folder(): Folder
+	{
 		$root = go()->getEnvironment()->getInstallFolder();
 		if(!isset($this->package)) {
 			return $root->getFolder("/modules/" . $this->name . "/");
@@ -263,7 +268,8 @@ class Module extends Entity {
 	 * 
 	 * @return bool
 	 */
-	public function isAvailable() {
+	public function isAvailable(): bool
+	{
 		
 		if(!isset($this->package)) {
 			$moduleFile = $this->folder()->getFile(ucfirst($this->name) . "Module.php");
@@ -361,12 +367,8 @@ class Module extends Entity {
 	
 	protected static function internalDelete(Query $query): bool
 	{
-
 		$query->andWhere('package != "core"');
 
-		//clear cache
-		self::$modulesByName = [];
-		
 		return parent::internalDelete($query);
 	}
 	
@@ -392,7 +394,7 @@ class Module extends Entity {
 	 * @param $rights int bitwise rights
 	 * @return array permission name => true for on / false for off
 	 */
-	public function may($rights): array
+	public function may(int $rights): array
 	{
 		$module = $this->module();
 		$capabilities = $module->getRights();
@@ -438,8 +440,6 @@ class Module extends Entity {
 		
 		return !!$query->single();
 	}
-
-	private static $modulesByName = [];
 
 	/**
 	 * Find a module by package and name
