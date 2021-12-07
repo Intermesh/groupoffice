@@ -219,9 +219,9 @@ class Module extends Entity {
 	/**
 	 * Get the module base file object
 	 * 
-	 * @return core\Module
+	 * @return core\Module|LegacyModule
 	 */
-	public function module(): core\Module
+	public function module()
 	{
 		if($this->package == "core" && $this->name == "core") {
 			return App::get();
@@ -229,7 +229,7 @@ class Module extends Entity {
 		
 		if(!isset($this->module)) {
 			$cls = $this->getModuleClass();
-			/** @var core\Module $cls */
+			/** @var core\Module|LegacyModule $cls */
 			$this->module = $cls::get();
 		}
 		

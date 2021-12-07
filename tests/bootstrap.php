@@ -31,7 +31,7 @@ try {
 	go()->setConfig($c->getArray());
 
 	// Install new if db doesn't exist otherwise use existing
-	$installDb = !go()->isInstalled() ? INSTALL_NEW : INSTALL_NONE;
+	$installDb = INSTALL_NEW;//!go()->isInstalled() ? INSTALL_NEW : INSTALL_NONE;
 
 //	For testing upgrades use:
 //	$installDb = INSTALL_UPGRADE;
