@@ -118,13 +118,10 @@ class Module extends core\Module {
 
 		$titleCount = count($titles);
 
-
-		$count = $faker->numberBetween(3, 20);
-		for($i = 0; $i < $count; $i ++ ) {
+		for($i = 0; $i < 5; $i ++ ) {
 			echo ".";
 			$task = new Task();
 			$task->title = $titles[$faker->numberBetween(0, $titleCount - 1)];
-			$task->description = $faker->realtext;
 			$task->createdBy = $tasklist->createdBy;
 			$task->responsibleUserId = $task->createdBy;
 			$task->start = $faker->dateTimeBetween("-1 years", "now");

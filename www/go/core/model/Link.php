@@ -546,7 +546,7 @@ class Link extends AclItemEntity
 			->from('core_search')->single();
 
 		$offset = $faker->numberBetween(0, $searchCount);
-		$limit = min($searchCount - $offset, 4);
+		$limit = min($searchCount - $offset, 2);
 
 		$search = Search::find()->limit($limit)->offset($offset);
 

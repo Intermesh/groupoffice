@@ -191,6 +191,7 @@ class System extends Controller {
 		Alert::$enabled = false;
 
 		$modules = Module::find();
+		$modules = [Module::findByName("community", "tasks")];
 
 		foreach($modules as $module) {
 			if(!$module->isAvailable()) {

@@ -84,7 +84,7 @@ class Module extends core\Module
 	private static $demoTexts;
 
 	private static function demoText(Faker\Generator $faker) : string{
-		if(!isset($demoTexts)) {
+		if(!isset(static::$demoTexts )) {
 			static::$demoTexts = [];
 			for($i = 0; $i < 20; $i++) {
 				static::$demoTexts [] = nl2br($faker->realtext);
