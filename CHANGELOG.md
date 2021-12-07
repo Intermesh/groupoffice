@@ -1,3 +1,4 @@
+07-12-2021 6.5.91
 - Leavedays: Fix error in year export
 - Googleauthenticator: Use title for QR image so app takes over name
 - Tickets: Incorrect agents in the list when filtering
