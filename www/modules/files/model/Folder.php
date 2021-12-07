@@ -903,7 +903,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 						}else
 						{
 							//this will update timestamp and size of file
-							if($file->mtime != $file->fsFile->mtime()){
+
+							//todo: how can it be that $file->fsFile->exists() is needed here?
+							if($file->fsFile->exists() && $file->mtime != $file->fsFile->mtime()){
 								$file->save();
 							}
 						}
