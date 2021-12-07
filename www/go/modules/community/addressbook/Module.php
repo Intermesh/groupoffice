@@ -164,87 +164,104 @@ class Module extends core\Module {
 	}
 
 
-	public function demo(Generator $faker) {
-
-
-
-		$addressBook = AddressBook::find()->single();
-
-		for ($n = 0; $n < 10; $n++) {
-			echo ".";
-			$company = new Contact();
+	public function demoCompany(Generator $faker): Contact
+	{
+		$company = new Contact();
 //			$blob = core\fs\Blob::fromTmp(new core\fs\File($faker->image));
 //			$company->photoBlobId = $blob->id;
-			$company->isOrganization = true;
-			$company->addressBookId = $addressBook->id;
-			$company->name = $faker->company;
-			$company->jobTitle = $faker->bs;
+		$company->isOrganization = true;
+		$company->addressBookId = self::demoAddressBook()->id;
+		$company->name = $faker->company;
+		$company->jobTitle = $faker->bs;
 
-			$count = $faker->numberBetween(0, 3);
-			for($i = 0; $i < $count; $i++) {
-				$company->phoneNumbers[$i] = (new PhoneNumber($company))->setValues(['number' => $faker->phoneNumber, 'type' => PhoneNumber::TYPE_MOBILE]);
-			}
-			$count = $faker->numberBetween(0, 3);
-			for($i = 0; $i < $count; $i++) {
-				$company->emailAddresses[$i] = (new EmailAddress($company))->setValues(['email' => $faker->email, 'type' => EmailAddress::TYPE_HOME]);
-			}
+		$count = $faker->numberBetween(0, 3);
+		for($i = 0; $i < $count; $i++) {
+			$company->phoneNumbers[$i] = (new PhoneNumber($company))->setValues(['number' => $faker->phoneNumber, 'type' => PhoneNumber::TYPE_MOBILE]);
+		}
+		$count = $faker->numberBetween(0, 3);
+		for($i = 0; $i < $count; $i++) {
+			$company->emailAddresses[$i] = (new EmailAddress($company))->setValues(['email' => $faker->email, 'type' => EmailAddress::TYPE_HOME]);
+		}
 
-			$company->addresses[0] = $a = new Address($company);
+		$company->addresses[0] = $a = new Address($company);
 
-			$a->street = $faker->streetName;
-			$a->street2 = $faker->streetAddress;
-			$a->city = $faker->city;
-			$a->zipCode = $faker->postcode;
-			$a->state = $faker->state;
-			$a->country = $faker->country;
+		$a->street = $faker->streetName;
+		$a->street2 = $faker->streetAddress;
+		$a->city = $faker->city;
+		$a->zipCode = $faker->postcode;
+		$a->state = $faker->state;
+		$a->country = $faker->country;
 
-			$company->notes = $faker->realtext;
-			if(!$company->save()) {
-				var_dump($company->getValidationErrors());
-				exit();
-			}
+		$company->notes = $faker->realtext;
+		if(!$company->save()) {
+			throw new core\orm\exception\SaveException($company);
+		}
 
-			$contact = new Contact();
+		Link::demo($faker, $company);
+
+		if(core\model\Module::isInstalled("community", "comments")) {
+			\go\modules\community\comments\Module::demoComments($faker, $company);
+		}
+
+		return $company;
+	}
+
+	private static $demoAddressBook;
+
+	private static function demoAddressBook() {
+		return self::$demoAddressBook ?? (self::$demoAddressBook = AddressBook::find()->single());
+	}
+
+	public function demoContact(Generator $faker): Contact
+	{
+		$contact = new Contact();
 //			$blob = core\fs\Blob::fromTmp(new core\fs\File($faker->image(null, 640, 480, 'people')));
 //			$company->photoBlobId = $blob->id;
 
-			$contact->addressBookId = $addressBook->id;
-			$contact->firstName = $faker->firstName;
-			$contact->lastName = $faker->lastName;
+		$contact->addressBookId = self::demoAddressBook()->id;
+		$contact->firstName = $faker->firstName;
+		$contact->lastName = $faker->lastName;
 
-			$count = $faker->numberBetween(0, 3);
-			for($i = 0; $i < $count; $i++) {
-				$contact->phoneNumbers[$i] = (new PhoneNumber($contact))->setValues(['number' => $faker->phoneNumber, 'type' => PhoneNumber::TYPE_MOBILE]);
-			}
-			$count = $faker->numberBetween(0, 3);
-			for($i = 0; $i < $count; $i++) {
-				$contact->emailAddresses[$i] = (new EmailAddress($contact))->setValues(['email' => $faker->email, 'type' => EmailAddress::TYPE_HOME]);
-			}
+		$count = $faker->numberBetween(0, 3);
+		for($i = 0; $i < $count; $i++) {
+			$contact->phoneNumbers[$i] = (new PhoneNumber($contact))->setValues(['number' => $faker->phoneNumber, 'type' => PhoneNumber::TYPE_MOBILE]);
+		}
+		$count = $faker->numberBetween(0, 3);
+		for($i = 0; $i < $count; $i++) {
+			$contact->emailAddresses[$i] = (new EmailAddress($contact))->setValues(['email' => $faker->email, 'type' => EmailAddress::TYPE_HOME]);
+		}
 
-			$contact->addresses[0] = $a = new Address($contact);
+		$contact->addresses[0] = $a = new Address($contact);
 
-			$a->street = $faker->streetName;
-			$a->street2 = $faker->streetAddress;
-			$a->city = $faker->city;
-			$a->zipCode = $faker->postcode;
-			$a->state = $faker->state;
-			$a->country = $faker->country;
+		$a->street = $faker->streetName;
+		$a->street2 = $faker->streetAddress;
+		$a->city = $faker->city;
+		$a->zipCode = $faker->postcode;
+		$a->state = $faker->state;
+		$a->country = $faker->country;
 
-			$contact->notes = $faker->realtext;
+		$contact->notes = $faker->realtext;
 
-			if(!$contact->save()) {
-				var_dump($company->getValidationErrors());
-				exit();
-			}
+		if(!$contact->save()) {
+			throw new core\orm\exception\SaveException($contact);
+		}
 
-			if(core\model\Module::isInstalled("community", "comments")) {
-				\go\modules\community\comments\Module::demoComments($faker, $contact);
-				\go\modules\community\comments\Module::demoComments($faker, $company);
-			}
+		if(core\model\Module::isInstalled("community", "comments")) {
+			\go\modules\community\comments\Module::demoComments($faker, $contact);
+		}
 
-			Link::demo($faker, $contact);
-			Link::demo($faker, $company);
+		Link::demo($faker, $contact);
 
+		return $contact;
+	}
+
+
+	public function demo(Generator $faker) {
+		for ($n = 0; $n < 10; $n++) {
+			echo ".";
+
+			$company = $this->demoCompany($faker);
+			$contact = $this->demoContact($faker);
 
 			Link::create($contact, $company, null, true);
 		}
