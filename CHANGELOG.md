@@ -21,6 +21,13 @@ XX-09-20216.6.10
 
 
 
+07-12-2021 6.5.91
+- Leavedays: Fix error in year export
+- Googleauthenticator: Use title for QR image so app takes over name
+- Tickets: Incorrect agents in the list when filtering
+- Summary: Fixed 6.4.235 + 6.5.45 - Start page open URL if scrollbar active #747
+- Addressbook / Core: Fixed error on login with LDAP and DAV when address book profile wasn't set yet.
+
 29-11-2021 6.5.90
 - Leavedays: Manager column was sortable but is not supported by the server
 - Email: Check if node was found to prevent node.getUI() error

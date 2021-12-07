@@ -184,7 +184,7 @@ class TemplateParser {
 	private function filterTranslate($text, $package = 'core', $module = 'core') {
 		return go()->t($text, $package, $module);
 	}
-	
+
 	private function filterDate(DateTime $date = null, $format = null) {
 
 		if(!isset($date)) {
@@ -200,23 +200,23 @@ class TemplateParser {
 		return $date->format($format);
 	}
 
-	private function filterEntity($id, $entityName) {
+	private function filterEntity($id, $entityName, $properties = null) {
 		$et = EntityType::findByName($entityName);
 		if(!$et) {
 			return null;
 		}
 		$cls = $et->getClassName();
 
-		$e = $cls::findById($id);
+		$e = $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
 
 		return $e;
 	}
 
-	private function filterLinks(Entity $entity, $entityName) {
+	private function filterLinks(Entity $entity, $entityName, $properties = null) {
 
 		$entityType = EntityType::findByName($entityName);
 		$entityCls = $entityType->getClassName();
-		$entities = $entityCls::findByLink($entity, [], true);
+		$entities = $entityCls::findByLink($entity,!empty($properties) ? explode(",", $properties) : [], true);
 
 		return $entities;
 	}
@@ -305,7 +305,7 @@ class TemplateParser {
 		preg_match_all('/\[(each|if)/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[\/(each|if)\]/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {

@@ -8,12 +8,42 @@ use go\core\TemplateParser;
 class TemplateField extends TextArea {
 
 
+	public function onFieldSave()
+	{
+		if(!parent::onFieldSave()) {
+			return false;
+		}
+
+		if(!$this->field->isNew()) {
+			$this->clearData();
+		}
+
+		return true;
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	private function clearData() {
+
+		go()->getDbConnection()
+			->update($this->field->tableName(), [$this->field->databaseName => null])
+			->debug()
+			->execute();
+
+	}
+
+	private static $parser;
+
+	private static function parser() {
+		return self::$parser ?? (self::$parser = new TemplateParser());
+	}
 
 	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record)
 	{
 		$tpl = $this->field->getOption('template');
 
-		$tplParser = new TemplateParser();
+		$tplParser = static::parser();
 		$tplParser->addModel('entity', $entity);
 
 		try {

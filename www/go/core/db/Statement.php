@@ -73,6 +73,20 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 	}
 
 	/**
+	 * Output query to debugger
+	 *
+	 * @return $this
+	 */
+	public function debug() {
+
+		if(go()->getDebugger()->enabled) {
+			go()->debug((string)$this);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Executes a prepared statement
 	 *
 	 * @param array|null $params An array of values with as many elements as there are bound parameters in the SQL statement being executed. All values are treated as PDO::PARAM_STR.

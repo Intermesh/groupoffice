@@ -68,7 +68,7 @@ GO.summary.AnnouncementsViewGrid = function(config){
 	config.disableSelection=true;
 
 	config.listeners={
-		rowclick : function( grid , rowIndex, e ) {		
+		rowclick : function( grid , rowIndex, e ) {
 
 			if(e.target.tagName=='A')
 			{
@@ -101,6 +101,8 @@ GO.summary.AnnouncementsViewGrid = function(config){
 	GO.summary.AnnouncementsViewGrid.superclass.constructor.call(this, config);
 };
 Ext.extend(GO.summary.AnnouncementsViewGrid, GO.grid.GridPanel,{
+
+	processEvent: function() {},
 	afterRender : function(){
 		GO.summary.AnnouncementsViewGrid.superclass.afterRender.call(this);
 		
@@ -110,7 +112,8 @@ Ext.extend(GO.summary.AnnouncementsViewGrid, GO.grid.GridPanel,{
 			},
 			scope:this,
 			interval:180000
-		});  
+		});
+
 	}
 	
 });
