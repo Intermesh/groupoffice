@@ -189,7 +189,7 @@ class System extends Controller {
 
 //		$modules = Module::find();
 
-		$modules = [Module::findByName("legacy", "calendar")];
+		$modules = [Module::findByName("legacy", "billing")];
 
 		foreach($modules as $module) {
 			if(!$module->isAvailable()) {

@@ -145,60 +145,60 @@ class CalendarModule extends \GO\Base\Module{
 
 		$locations = ['Online', 'Office', 'Customer', ''];
 
-//		foreach(GOUser::model()->find() as $user) {
-//
-//			$calendar = Calendar::model()->getDefault($user);
-//
-//			$calendar->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::READ_PERMISSION);
-//
-//			for($i = 0; $i < 20; $i++) {
-//
-//				$time = Date::date_add(Date::get_last_sunday(time()), $faker->numberBetween(1, 21));
-//
-//				$event = new Event();
-//				$event->name = $faker->company;
-//				$event->location = $locations[$faker->numberBetween(0, 3)];
-//				$event->start_time = Date::clear_time($time, $faker->numberBetween(7,20));
-//				$event->end_time = $event->start_time + 3600;
-//				$event->user_id = $user->id;
-//				$event->calendar_id = Calendar::model()->getDefault($user)->id;
-//				$event->save();
-//
-//				$participant = new Participant();
-//				$participant->is_organizer = true;
-//				$participant->email = $user->email;
-//				$participant->name = $user->displayName;
-//				$participant->user_id = $user->id;
-//				$event->addParticipant($participant);
-//
-//				$user2 = $users[$faker->numberBetween(0, $userCount)];
-//				$user3 = $users[$faker->numberBetween(0, $userCount)];
-//
-//				if($user2->id != $user->id) {
-//					$participant = new Participant();
-//					$participant->email = $user2->email;
-//					$participant->name = $user2->displayName;
-//					$participant->user_id = $user2->id;
-//					$event->addParticipant($participant);
-//				}
-//
-//				if($user3->id != $user->id) {
-//					$participant = new Participant();
-//					$participant->email = $user3->email;
-//					$participant->name = $user3->displayName;
-//					$participant->user_id = $user3->id;
-//					$event->addParticipant($participant);
-//				}
-//
-//				if (ModuleModel::isInstalled("community", "comments")) {
-//					Module::demoComments($faker, $event);
-//				}
-//
-//				Link::demo($faker, $event);
-//
-//				echo ".";
-//			}
-//		}
+		foreach(GOUser::model()->find() as $user) {
+
+			$calendar = Calendar::model()->getDefault($user);
+
+			$calendar->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::READ_PERMISSION);
+
+			for($i = 0; $i < 20; $i++) {
+
+				$time = Date::date_add(Date::get_last_sunday(time()), $faker->numberBetween(1, 21));
+
+				$event = new Event();
+				$event->name = $faker->company;
+				$event->location = $locations[$faker->numberBetween(0, 3)];
+				$event->start_time = Date::clear_time($time, $faker->numberBetween(7,20));
+				$event->end_time = $event->start_time + 3600;
+				$event->user_id = $user->id;
+				$event->calendar_id = Calendar::model()->getDefault($user)->id;
+				$event->save();
+
+				$participant = new Participant();
+				$participant->is_organizer = true;
+				$participant->email = $user->email;
+				$participant->name = $user->displayName;
+				$participant->user_id = $user->id;
+				$event->addParticipant($participant);
+
+				$user2 = $users[$faker->numberBetween(0, $userCount)];
+				$user3 = $users[$faker->numberBetween(0, $userCount)];
+
+				if($user2->id != $user->id) {
+					$participant = new Participant();
+					$participant->email = $user2->email;
+					$participant->name = $user2->displayName;
+					$participant->user_id = $user2->id;
+					$event->addParticipant($participant);
+				}
+
+				if($user3->id != $user->id) {
+					$participant = new Participant();
+					$participant->email = $user3->email;
+					$participant->name = $user3->displayName;
+					$participant->user_id = $user3->id;
+					$event->addParticipant($participant);
+				}
+
+				if (ModuleModel::isInstalled("community", "comments")) {
+					Module::demoComments($faker, $event);
+				}
+
+				Link::demo($faker, $event);
+
+				echo ".";
+			}
+		}
 
 
 

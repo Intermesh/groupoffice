@@ -867,6 +867,26 @@ use Faker;
 		public function demo(Faker\Generator $faker) {
 
 
+			go()->getSettings()->passwordMinLength = 4;
+
+			$demo = User::find()->where('username', '=', 'demo')->single();
+			if(!$demo) {
+				$user = new User();
+				$user->username = "demo";
+				$user->displayName = $faker->name;
+				$user->email = $user->recoveryEmail = $user->username . '@group-office.com';
+				$user->setPassword("demo");
+
+				if (!$user->save()) {
+					throw new SaveException($user);
+				}
+
+
+				// Generates tasklists, notebooks etc.
+				$user->toArray();
+			}
+
+
 			for($i = 0; $i < 10; $i++) {
 				echo ".";
 				$user = new User();
