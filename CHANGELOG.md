@@ -1,4 +1,5 @@
 6.6.11
+- Addressbook: Fix findForUser method for empty userId 
 - Leavedays: Fix exception in year export
 - Core: Fix error upon saving user profile data
 - Core: Fix system settings module grid in case core module does not have id 1
