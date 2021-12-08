@@ -1,4 +1,5 @@
 07-12-2021 6.5.91
+- Billing: CS translations
 - Leavedays: Fix error in year export
 - Googleauthenticator: Use title for QR image so app takes over name
 - Tickets: Incorrect agents in the list when filtering
