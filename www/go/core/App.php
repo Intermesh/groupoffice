@@ -883,26 +883,26 @@ use Faker;
 
 				// Generates tasklists, notebooks etc.
 				$user->toArray();
-			}
 
 
-			for($i = 0; $i < 10; $i++) {
-				echo ".";
-				$user = new User();
+				for ($i = 0; $i < 10; $i++) {
+					echo ".";
+					$user = new User();
 //				$blob = Blob::fromTmp(new File($faker->image(null, 640, 480, 'people')));
 //				$blob->save();
 //				$user->avatarId = $blob->id;
-				$user->username = $faker->username;
-				$user->displayName = $faker->name;
-				$user->email = $user->recoveryEmail = $user->username . '@' . $faker->domainName;
-				$user->setPassword($faker->password);
+					$user->username = $faker->username;
+					$user->displayName = $faker->name;
+					$user->email = $user->recoveryEmail = $user->username . '@' . $faker->domainName;
+					$user->setPassword($faker->password);
 
-				if(!$user->save()) {
-					throw new SaveException($user);
+					if (!$user->save()) {
+						throw new SaveException($user);
+					}
+
+					// Generates tasklists, notebooks etc.
+					$user->toArray();
 				}
-
-				// Generates tasklists, notebooks etc.
-				$user->toArray();
 			}
 		}
 	}

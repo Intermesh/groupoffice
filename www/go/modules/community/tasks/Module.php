@@ -76,7 +76,7 @@ class Module extends core\Module {
 
 	public function demo(Generator $faker)
 	{
-		$tasklists = Tasklist::find();
+		$tasklists = Tasklist::find()->where(['role' => Tasklist::List]);
 
 		foreach($tasklists as $tasklist) {
 			$this->demoTasks($faker, $tasklist);
