@@ -725,11 +725,62 @@ abstract class Module extends Singleton {
 	 */
 	public function isAvailable(): bool
 	{
-		if(!ModuleCollection::isAllowed($this->getName(), $this->getPackage())) {
+		if(!self::isAllowed($this->getName(), $this->getPackage())) {
 			return false;
 		}
 
 		return $this->isLicensed();
+	}
+	private static $allowedModules;
+
+	/**
+	 * Check if a given module is allowed to use by the config.php value "allowed_modules".
+	 *
+	 * @param string $name
+	 * @param string|null $package
+	 * @param string|array $allowedModules If not given the current configuration file is used.
+	 * @return bool
+	 */
+	public static function isAllowed(string $name, string $package = null, $allowedModules = null): bool
+	{
+
+		if(!isset($allowedModules)) {
+			if (!isset(self::$allowedModules)) {
+				self::$allowedModules = self::normalizeAllowedModules(go()->getConfig()['allowed_modules']);
+			}
+			$allowedModules = self::$allowedModules;
+		} else {
+			$allowedModules = self::normalizeAllowedModules($allowedModules);
+		}
+
+		if (empty($allowedModules)) {
+			return true;
+		}
+
+		if(isset($package) && $package != "legacy") {
+			$name = $package . "/" . $name;
+			return in_array($name, $allowedModules) || in_array($package . "/*", $allowedModules);
+		} else{
+			return in_array($name, $allowedModules) || in_array('legacy/' . $name, $allowedModules) || in_array(  "legacy/*", $allowedModules);
+		}
+	}
+
+	/**
+	 * @param $allowedModules
+	 * @return string[]
+	 */
+	private static function normalizeAllowedModules($allowedModules) : array {
+		if( empty($allowedModules)) {
+			return [];
+		}
+
+		if(!is_array($allowedModules)) {
+			$allowedModules = explode(',', $allowedModules);
+		}
+
+		$allowedModules[] = 'core/core';
+
+		return $allowedModules;
 	}
 	
 	/**
