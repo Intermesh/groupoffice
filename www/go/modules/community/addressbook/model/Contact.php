@@ -396,15 +396,12 @@ class Contact extends AclItemEntity {
    * A contact can optionally be connected to a user. It's not guaranteed that
    * the contact is present.
    *
-   * @param int|null $userId
+   * @param int $userId
    * @param array[] $properties
    * @return ?static
    */
 
-	public static function findForUser(?int $userId = null, array $properties = []) {
-		if(empty($userId)) {
-			return null;
-		}
+	public static function findForUser(int $userId, array $properties = []) {
 		return static::find($properties)->where('goUserId', '=', $userId)->single();
 	}
 

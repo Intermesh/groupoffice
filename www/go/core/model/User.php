@@ -1044,7 +1044,7 @@ class User extends Entity {
 			return null;
 		}
 		
-		$contact = Contact::findForUser($this->id);
+		$contact = !$this->isNew() ? Contact::findForUser($this->id) : null;
 		if(!$contact) {
 			$contact = new Contact();
 			$contact->addressBookId = go()->getSettings()->userAddressBook()->id;
