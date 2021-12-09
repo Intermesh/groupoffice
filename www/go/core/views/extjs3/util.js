@@ -268,6 +268,7 @@ go.util =  (function () {
 		openFileDialog: function(cfg) {
 			if (!this.uploadDialog) {
 				this.uploadDialog = document.createElement("input");
+				this.uploadDialog.style.display = "none";
 				this.uploadDialog.setAttribute("type", "file");
 				this.uploadDialog.addEventListener("change", function (e) {
 						var uploadCount = this.files.length, blobs = [];
@@ -310,6 +311,7 @@ go.util =  (function () {
 						this.value = "";
 					});
 
+					// must be added to the DOM for iOS!
 					document.body.appendChild(this.uploadDialog);
 			}
 			this.uploadDialog.cfg = cfg;
