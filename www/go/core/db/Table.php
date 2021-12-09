@@ -296,12 +296,11 @@ class Table {
 	 * Get index information by name
 	 * 
 	 * @link https://dev.mysql.com/doc/refman/8.0/en/show-index.html
+	 * @return array|null
 	 * @param string $name
-	 * @return array
 	 */
-	public function getIndex(string $name): array
-	{
-		return $this->indexes[strtolower($name)];
+	public function getIndex($name) : ?array {
+		return $this->indexes[strtolower($name)] ?? null;
 	}
 
 	/**
@@ -315,7 +314,7 @@ class Table {
 		return isset($this->indexes[strtolower($name)]);
 	}
 
-	
+
 	
 	/**
 	 * Get all column names

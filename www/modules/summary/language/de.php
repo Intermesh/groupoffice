@@ -23,4 +23,5 @@ return array (
   'name' => 'Übersicht',
   'description' => 'Modul zum Anpassen der Startübersicht',
   'Start page' => 'Übersicht',
+  'webfeeds' => 'Web-Feeds',
 );

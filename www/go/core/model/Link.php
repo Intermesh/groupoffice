@@ -12,6 +12,7 @@ use go\core\orm\exception\SaveException;
 use go\core\db\Query as DbQuery;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\db\Table;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -340,7 +341,14 @@ class Link extends AclItemEntity
 			$this->setValidationError("description", ErrorCode::INVALID_INPUT, "Description field too long");
 		}
 	}
-	
+
+	protected function insertTableRecord(Table $table, array $record) {
+		$stmt = go()->getDbConnection()->insertIgnore($table->getName(), $record);
+		if (!$stmt->execute()) {
+			throw new Exception("Could not execute insert query");
+		}
+	}
+
 	protected function internalSave(): bool
 	{
 		if(!parent::internalSave()) {

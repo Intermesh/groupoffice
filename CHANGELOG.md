@@ -1,5 +1,5 @@
 6.6.11
-- Addressbook: Fix findForUser method for empty userId 
+- Addressbook: Fix findForUser method for empty userId
 - Leavedays: Fix exception in year export
 - Core: Fix error upon saving user profile data
 - Core: Fix system settings module grid in case core module does not have id 1
@@ -23,6 +23,9 @@ XX-09-20216.6.10
 
 
 07-12-2021 6.5.91
+09-12-2021 6.5.91
+- Core: Updated German Translations thanks to Peter!
+- Billing: CS translations
 - Leavedays: Fix error in year export
 - Googleauthenticator: Use title for QR image so app takes over name
 - Tickets: Incorrect agents in the list when filtering
@@ -457,6 +460,17 @@ XX-09-20216.6.10
 
 
 
+6.4.245
+- Savemailas: override mtime to email date
+- Calendar: backport prevent error when event is cancelled for disabled user
+
+13-09-2021 6.4.244
+- Savemailas: Fixed check database for email links
+
+30-08-2021 6.4.243
+- Core: Fixed php 7.0 compatibility issue
+
+26-08-2021 6.4.242
 - Email: strpos() error when deleting folders with disabled Trash folder
 - Tickets: Enable disabling using of alternative URL
 - Tickets: Settings dialog bigger in order to display 'Show external page button'
@@ -465,6 +479,7 @@ XX-09-20216.6.10
 - Timeregistrations: do not copy income_id upon cloning a time entry
 - Core: 0.00 was always displayed in number fields
 - Core: Fixed custom field column delete when creating a new column with a name that already existed.
+- Notesencrypt: Error after save
 
 22-07-2021 6.4.241
 - Projects: Fixed upgrade error in projects where pr2_settings doesn't exist
