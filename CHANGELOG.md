@@ -22,7 +22,6 @@ XX-09-20216.6.10
 
 
 
-07-12-2021 6.5.91
 09-12-2021 6.5.91
 - Core: Updated German Translations thanks to Peter!
 - Billing: CS translations
