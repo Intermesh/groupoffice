@@ -1,7 +1,6 @@
+09-12-2021 6.5.91
+- Core: Updated German Translations thanks to Peter!
 - Billing: CS translations
-
-
-07-12-2021 6.5.91
 - Leavedays: Fix error in year export
 - Googleauthenticator: Use title for QR image so app takes over name
 - Tickets: Incorrect agents in the list when filtering
