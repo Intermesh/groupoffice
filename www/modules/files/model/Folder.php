@@ -16,6 +16,7 @@
 namespace GO\Files\Model;
 
 use GO;
+use Guzzle\Common\Exception\ExceptionCollection;
 
 /**
  * The Folder model
@@ -385,7 +386,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			while(!$shared_folder->isSomeonesHomeFolder() && $shared_folder->parent_id!=0) {
 				$shared_folder = $shared_folder->parent;
 			}
-			$this->quota_user_id = $shared_folder->user_id;
+			try {
+				$this->quota_user_id = $shared_folder->user_id;
+			} catch(\Exception $e) {
+				//when migrating this column might not exist
+			}
 		}
 
 		return parent::beforeSave();
