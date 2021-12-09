@@ -2,6 +2,8 @@
 namespace go\core\util;
 
 use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Exception\BadFormatException;
+use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
 use Defuse\Crypto\Key;
 use Exception;
 use GO;
@@ -10,17 +12,16 @@ use go\core\fs\File;
 
 class Crypt {
 
-	/** Encryption Procedure
+	/**
+	 * Encrypt text
 	 *
-	 * 	@param   mixed    msg      message/data
-	 * 	@param   string   k        encryption key
-	 * 	@param   boolean  base64   base64 encode result
-	 *
-	 * 	@return  string   ciphertext or
-	 *           boolean  false on error
+	 * @param string $plaintext
+	 * @param string|null $password
+	 * @return string
+	 * @throws EnvironmentIsBrokenException
 	 */
-	public static function encrypt($plaintext, $password = null) {
-
+	public static function encrypt(string $plaintext, string $password = null): string
+	{
 		if (!isset($password)) {
 			$key = self::getKey();
 			return "{GOCRYPT2}" . Crypto::encrypt($plaintext, $key);
@@ -31,14 +32,15 @@ class Crypt {
 
 	/** Decryption Procedure
 	 *
-	 * 	@param   string   msg      output from encrypt()
-	 * 	@param   string   k        encryption key
-	 * 	@param   boolean  base64   base64 decode msg
+	 * @param string   msg      output from encrypt()
+	 * @param string   k        encryption key
+	 * @param boolean  base64   base64 decode msg
 	 *
-	 * 	@return  string   original message/data or
+	 * @return  string   original message/data or
 	 *           boolean  false on error
+	 * @throws Exception
 	 */
-	public static function decrypt($ciphertext, $password = null) {
+	public static function decrypt(string $ciphertext, $password = null) : string {
 
 		if (empty($ciphertext)) {
 			return "";
@@ -54,7 +56,7 @@ class Crypt {
 				} else {
 					$plaintext = Crypto::decryptWithPassword(substr($ciphertext, 10), $password);
 				}
-			} catch (\Exception $ex) {
+			} catch (Exception $ex) {
 				ErrorHandler::log("Failed to decrypt!");
 				ErrorHandler::logException($ex);
 				$plaintext = '';
@@ -69,10 +71,13 @@ class Crypt {
 
 	/**
 	 * Get the private server key
+	 *
 	 * @return Key
+	 * @throws BadFormatException
+	 * @throws EnvironmentIsBrokenException
 	 */
-	private static function getKey() {
-
+	private static function getKey(): Key
+	{
 		if (!isset(self::$key)) {
 			$file = go()->getDataFolder()->getFile('defuse-crypto.txt');
 
@@ -92,18 +97,19 @@ class Crypt {
 	/**
 	 * Old deprecated mcrypt base decrypt.
 	 * 
-	 * @param type $msg
-	 * @param type $k
-	 * @param type $base64
-	 * @return boolean
+	 * @param string $msg
+	 * @param string $k
+	 * @param bool $base64
+	 * @return string|bool
 	 * @throws Exception
 	 */
-	private static function decrypt1($msg, $k, $base64 = true) {
+	private static function decrypt1(string $msg, string $k, bool $base64 = true)
+	{
 
 		//mbstring.func_overload will mess up substring with this function
 		
 		if(ini_get('mbstring.func_overload') > 0) {
-			throw new \Exception("Can't decrypt because mbstring.func_overload is enabled");
+			throw new Exception("Can't decrypt because mbstring.func_overload is enabled");
 		}
 
 		$msg = str_replace("{GOCRYPT}", "", $msg, $count);
@@ -186,7 +192,7 @@ class Crypt {
 		if ($key_file->exists()) {
 			$key = $key_file->getContents();
 		} else {
-			throw new \Exception("Encryoption key for old method not found!");
+			throw new Exception("Encryoption key for old method not found!");
 		}
 		return $key;
 	}

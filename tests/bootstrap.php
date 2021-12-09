@@ -89,10 +89,10 @@ try {
 		go()->rebuildCache();
 		GO::$ignoreAclPermissions = false;
 
-		echo "Installing demo data\n";
-
-		$ctrl = new System();
-		$ctrl->demo();
+//		echo "Installing demo data\n";
+//
+//		$ctrl = new System();
+//		$ctrl->demo();
 
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {

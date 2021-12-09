@@ -22,6 +22,10 @@ trait ValidationTrait {
 		return !$this->hasValidationErrors();
 	}
 
+	/**
+	 * Validates the object. Use {@see setValidationError()} to mark errors.
+	 * @return void
+	 */
 	abstract protected function internalValidate();
 
 	/**

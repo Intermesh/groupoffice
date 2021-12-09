@@ -2,6 +2,7 @@
 namespace go\core\util;
 
 use JsonSerializable;
+use stdClass;
 
 class ArrayObject extends \ArrayObject implements JsonSerializable {
 
@@ -30,7 +31,7 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 	 * Note that if you want to evaluate false you need to use '===' because this 
 	 * may return key 0 which evaluates to false too.
 	 * 
-	 * @param \go\core\util\callable $fn
+	 * @param callable $fn
 	 * @return mixed
 	 */
 	public function findKeyBy(callable $fn) {		
@@ -49,7 +50,8 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 	 * 
 	 * @return array
 	 */
-	public function getArray() {
+	public function getArray(): array
+	{
 		return array_map( function($item){
         return $item instanceof self ? $item->getArray() : $item;
     }, $this->getArrayCopy() );
@@ -65,7 +67,8 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 	 * @param array|ArrayObject $arr
 	 * @return self
 	 */
-	public function mergeRecursive($arr) {
+	public function mergeRecursive($arr): ArrayObject
+	{
 		foreach ($arr as $key => $value) {
 			if (is_array($value) && isset($this[$key]) && is_array($this[$key])) {
 
@@ -85,7 +88,8 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 	 * @param array $arr
 	 * @return array
 	 */
-	public function diff(array $arr) {
+	public function diff(array $arr): array
+	{
 		$diff = [];
 		foreach ($this as $key => $value) {
 			if (!array_key_exists($key, $arr) || !$this->equals($arr[$key],  $value)) {
@@ -96,7 +100,8 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 		return $diff;
 	}
 	
-	private function equals($a, $b) {
+	private function equals($a, $b): bool
+	{
 		if(is_array($a) && is_array($b)) {
 			$aObj = new static($a);
 			$bObj = new static($b);
@@ -111,7 +116,7 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 	{
 		if($this->serializeJsonAsObject && empty($this)) 
 		{
-			return new \stdClass;	
+			return new stdClass;
 		} 
 
 		return $this;
