@@ -162,9 +162,9 @@ class goMail extends GoBaseBackendDiff {
 				 //Attachments probably need to be sent even with MIME type:
 				 //http://talk.sonymobile.com/t5/Xperia-Z1-Compact/Z1-Compact-Problem-With-EAS/m-p/866755#11220
 				 //zpush_always_send_attachments config setting is for testing this carefully.
-				 if($bpReturnType!=SYNC_BODYPREFERENCE_MIME || !empty(\GO::config()->zpush_always_send_attachments)){
+//				 if($bpReturnType!=SYNC_BODYPREFERENCE_MIME || !empty(\GO::config()->zpush_always_send_attachments)){
 					 $message->asattachments = $this->_getASAttachments($imapMessage,$id,$mailbox, $bpReturnType != SYNC_BODYPREFERENCE_PLAIN ? $asBodyData : null);
-				 }
+//				 }
 
 				// truncate body, if requested
 				//MS: Not sure if !empty($truncsize) is needed here. Testing for Robert S.
