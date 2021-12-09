@@ -12,7 +12,7 @@ use go\core\model;
 class System extends Controller {
 	public function demo() {
 
-		go()->getEnvironment()->setMaxExecutionTime(180);
+		go()->getEnvironment()->setMaxExecutionTime(240);
 
 		ob_start();
 		$cliCtrl = new CliSystemCtrl();

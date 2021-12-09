@@ -7,6 +7,7 @@ use go\core\Controller;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
+use go\core\exception\Forbidden;
 use go\core\fs\File;
 use go\core\jmap\Entity;
 use go\core\model\Alert;
@@ -175,11 +176,12 @@ class System extends Controller {
 	/**
 	 * Generates demo data
 	 *
+	 * @return void
+	 * @throws Forbidden
 	 * @example
 	 * ```
 	 * docker-compose exec --user www-data groupoffice-tasks ./www/cli.php core/System/demo
 	 * ```
-	 * @return void
 	 */
 	public function demo() {
 
@@ -201,6 +203,9 @@ class System extends Controller {
 
 			echo "\n\nDone\n\n";
 		}
+
+		go()->getSettings()->demoDataAsked = true;
+		go()->getSettings()->save();
 
 		// for resyncing
 		go()->rebuildCache();

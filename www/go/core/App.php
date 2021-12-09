@@ -873,7 +873,7 @@ use Faker;
 				$user = new User();
 				$user->username = "demo";
 				$user->displayName = $faker->name;
-				$user->email = $user->recoveryEmail = $user->username . '@group-office.com';
+				$user->email = $user->recoveryEmail = 'demo@group-office.com';
 				$user->setPassword("demo");
 
 				if (!$user->save()) {
