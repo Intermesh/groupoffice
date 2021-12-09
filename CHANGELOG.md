@@ -109,7 +109,7 @@
 
 18-10-2021 6.5.81
 - Calendar: If not empty, show location data for all-day events in month and day grids
-- Linked email: set cdate and mdate for linked emails to IMAP send date. 
+- Linked email: set cdate and mdate for linked emails to IMAP send date.
 - Studio: add 'Duplicate' button.
 - Core: Made sure no newlines are set in the HTTP status header text.
 - Email: Fixed spelling error in IMAP authentication failure
@@ -436,6 +436,17 @@
 
 
 
+6.4.245
+- Savemailas: override mtime to email date
+- Calendar: backport prevent error when event is cancelled for disabled user
+
+13-09-2021 6.4.244
+- Savemailas: Fixed check database for email links
+
+30-08-2021 6.4.243
+- Core: Fixed php 7.0 compatibility issue
+
+26-08-2021 6.4.242
 - Email: strpos() error when deleting folders with disabled Trash folder
 - Tickets: Enable disabling using of alternative URL
 - Tickets: Settings dialog bigger in order to display 'Show external page button'
@@ -444,6 +455,7 @@
 - Timeregistrations: do not copy income_id upon cloning a time entry
 - Core: 0.00 was always displayed in number fields
 - Core: Fixed custom field column delete when creating a new column with a name that already existed.
+- Notesencrypt: Error after save
 
 22-07-2021 6.4.241
 - Projects: Fixed upgrade error in projects where pr2_settings doesn't exist

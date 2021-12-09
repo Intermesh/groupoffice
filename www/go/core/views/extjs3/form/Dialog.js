@@ -170,7 +170,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		if(go.Entities.get(this.entityStore).customFields) {
 			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
 			fieldsets.forEach(function(fs) {
-				//console.log(fs);
+				console.log(fs);
 				if(fs.fieldSet.isTab) {
 					fs.title = null;
 					fs.collapsible = false;
@@ -204,11 +204,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 		this.panels.push(this.panels.splice(sharePanelIndex, 1)[0]);
 
 	},
-	
+
 	createTabPanel : function(items) {
 
 		this.movePermissionsPanelToEnd();
-		
+
 		if(items.length) {
 			this.panels.unshift(this.mainPanel = new Ext.Panel({
 				title: t("General"),

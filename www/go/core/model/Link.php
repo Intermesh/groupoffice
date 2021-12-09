@@ -7,6 +7,7 @@ use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\db\Query as DbQuery;
+use go\core\db\Table;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -330,6 +331,13 @@ class Link extends AclItemEntity
 		}
 		if(!empty($this->description) && strlen($this->description) > 190) {
 			$this->setValidationError("description", ErrorCode::INVALID_INPUT, "Description field too long");
+		}
+	}
+
+	protected function insertTableRecord(Table $table, array $record) {
+		$stmt = go()->getDbConnection()->insertIgnore($table->getName(), $record);
+		if (!$stmt->execute()) {
+			throw new Exception("Could not execute insert query");
 		}
 	}
 	

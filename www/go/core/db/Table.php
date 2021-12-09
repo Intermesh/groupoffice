@@ -31,7 +31,7 @@ class Table {
 	protected $conn;
 
 	protected $dsn;
-	
+
 	/**
 	 * Get a table instance
 	 * 
@@ -75,7 +75,7 @@ class Table {
 		}
 		self::$cache = [];
 	}
-	
+
 
 	public function __construct($name, Connection $conn) {
 		$this->name = $name;
@@ -304,11 +304,11 @@ class Table {
 	 * Get index information by name
 	 * 
 	 * @link https://dev.mysql.com/doc/refman/8.0/en/show-index.html
+	 * @return array|null
 	 * @param string $name
-	 * @return array
 	 */
 	public function getIndex($name) {
-		return $this->indexes[strtolower($name)];
+		return $this->indexes[strtolower($name)] ?? null;
 	}
 
 	/**
@@ -321,7 +321,7 @@ class Table {
 		return isset($this->indexes[strtolower($name)]);
 	}
 
-	
+
 	
 	/**
 	 * Get all column names
