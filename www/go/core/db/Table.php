@@ -296,10 +296,10 @@ class Table {
 	 * Get index information by name
 	 * 
 	 * @link https://dev.mysql.com/doc/refman/8.0/en/show-index.html
-	 * @return array
+	 * @return array|null
 	 */
 	public function getIndex($name) {
-		return $this->indexes[strtolower($name)];
+		return $this->indexes[strtolower($name)] ?? null;
 	}
 
 	
