@@ -1,7 +1,7 @@
 CREATE TABLE `addressbook_address` (
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `street` text null COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` text null COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `zipCode` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `state` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,

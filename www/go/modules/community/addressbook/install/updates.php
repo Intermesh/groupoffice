@@ -151,7 +151,7 @@ $updates['202106171331'][] = "alter table addressbook_user_settings
 	add startIn enum('allcontacts', 'starred', 'default', 'remember') default 'allcontacts' not null;";
 
 $updates['202112101348'][] = "alter table addressbook_address
-    modify street text null;";
+    add address text null;";
 
 $updates['202112101348'][] = function() {
 
@@ -162,9 +162,9 @@ $updates['202112101348'][] = function() {
 			->from("addressbook_address");
 		foreach ($addresses as $address) {
 
-			$street = go()->getLanguage()->formatAddress($address['countryCode'], ['street' => $address['street'], 'street2' => $address['street2']], false);
+			$a = go()->getLanguage()->formatAddress($address['countryCode'], ['street' => $address['street'], 'street2' => $address['street2']], false);
 
-			go()->getDbConnection()->update("addressbook_address", ['street' => $street], ['id' => $address['id']])->execute();
+			go()->getDbConnection()->update("addressbook_address", ['address' => $a], ['id' => $address['id']])->execute();
 		}
 	} finally
 	{

@@ -185,7 +185,7 @@ class Module extends core\Module {
 
 		$company->addresses[0] = $a = new Address($company);
 
-		$a->street = $faker->streetAddress;
+		$a->address = $faker->streetAddress;
 		$a->city = $faker->city;
 		$a->zipCode = $faker->postcode;
 		$a->state = $faker->state;
@@ -232,8 +232,8 @@ class Module extends core\Module {
 
 		$contact->addresses[0] = $a = new Address($contact);
 
-		$a->street = $faker->streetName;
-		$a->street2 = $faker->streetAddress;
+		$a->address = $faker->streetAddress;
+//		$a->street2 = $faker->streetAddress;
 		$a->city = $faker->city;
 		$a->zipCode = $faker->postcode;
 		$a->state = $faker->state;

@@ -75,7 +75,7 @@ class ContactConvertor {
 				Address::TYPE_POSTAL => [
 						[
 								"zipCode" => "otherpostalcode",
-								"street" => "otherstreet",
+								"address" => "otherstreet",
 								"city" => 'othercity',
 								"state" => "otherstate",
 								"country" => "othercountry"
@@ -84,7 +84,7 @@ class ContactConvertor {
 				Address::TYPE_HOME => [
 						[
 								"zipCode" => "homepostalcode",
-								"street" => "homestreet",
+								"address" => "homestreet",
 								"city" => 'homecity',
 								"state" => "homestate",
 								"country" => "homecountry"
@@ -93,7 +93,7 @@ class ContactConvertor {
 				Address::TYPE_WORK => [
 						[
 								"zipCode" => "businesspostalcode",
-								"street" => "businessstreet",
+								"address" => "businessstreet",
 								"city" => 'businesscity',
 								"state" => "businessstate",
 								"country" => "businesscountry"

@@ -37,7 +37,7 @@ class Address extends Property {
 	 * 
 	 * @var string
 	 */							
-	public $street = '';
+	public $address = '';
 
 	/**
 	 * 
@@ -109,7 +109,7 @@ class Address extends Property {
 	
 	public function getFormatted()
 	{
-		return go()->getLanguage()->formatAddress($this->countryCode, $this->toArray(['street', 'city', 'zipCode', 'state']));
+		return go()->getLanguage()->formatAddress($this->countryCode, $this->toArray(['address', 'city', 'zipCode', 'state']));
 	}
 	
 //	public function getCombinedStreet() {
