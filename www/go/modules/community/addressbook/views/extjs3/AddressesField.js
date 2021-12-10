@@ -33,7 +33,7 @@
 			}, {
 				xtype: "textarea",
 				grow: true,
-				fieldLabel: t("Street"),
+				fieldLabel: t("Address"),
 				name: "address",
 				anchor: "100%",
 				setFocus: true
