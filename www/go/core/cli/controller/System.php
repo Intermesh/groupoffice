@@ -69,12 +69,12 @@ class System extends Controller {
 
 			$response = $http->get(go()->getSettings()->URL . '/install/clearcache.php');
 			if($response['status'] != 200) {
-				echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "/install/' in the browser.\n";
+				echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "install/' in the browser.\n";
 			} else{
 				echo "Cache cleared via webserver\n";
 			}
 		} catch(Exception $e) {
-			echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "/install/' in the browser.\n";
+			echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "install/' in the browser.\n";
 		}
 		
 		echo "Done!\n";
