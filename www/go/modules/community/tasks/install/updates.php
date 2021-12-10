@@ -149,6 +149,6 @@ $updates['202111251126'][] = "update tasks_task t set t.aclId = (select aclId fr
 
 $updates['202111251126'][] = "alter table tasks_task
 	add constraint tasks_task_core_acl_id_fk
-		foreign key (aclId) references core_acl (id);";
+		foreign key (aclId) references core_acl (id)  ON DELETE RESTRICT;";
 
 

@@ -603,8 +603,8 @@ class Connection {
 			return $stmt;
 		}catch(PDOException $e) {
 			go()->error("Failed SQL: ". QueryBuilder::debugBuild($build));
-            go()->error($e->getMessage());
-            go()->error($e->getTraceAsString());
+      go()->error($e->getMessage());
+      go()->error($e->getTraceAsString());
 			throw $e;
 		}
 	}
