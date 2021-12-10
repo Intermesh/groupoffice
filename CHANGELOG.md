@@ -1,3 +1,5 @@
+- Core: Clear cache via webserver if running upgrade on the command line.
+
 09-12-2021 6.5.92
 - ActiveSync: Reverted Michael z-push calendar stuff because it's unfinished and causing problems
 
