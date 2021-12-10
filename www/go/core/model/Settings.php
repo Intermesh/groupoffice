@@ -312,11 +312,26 @@ class Settings extends core\Settings {
 	 */
 	public $URL;
 
-
 	/**
 	 * @var string
 	 */
-	public $corsAllowOrigin = "";
+	protected $corsAllowOrigin = "";
+
+	public function setCorsAllowOrigin($origins) {
+		if(empty($origins)) {
+			$this->corsAllowOrigin = "";
+		} else{
+			$origins = array_map(function($host) {
+				return rtrim($host, '/');
+			}, $origins);
+
+			$this->corsAllowOrigin = implode(" ", $origins);
+		}
+	}
+
+	public function getCorsAllowOrigin() : array {
+		return empty($this->corsAllowOrigin) ? [] : explode(" ", $this->corsAllowOrigin);
+	}
 
 
 	/**
