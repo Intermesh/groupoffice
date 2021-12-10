@@ -3,11 +3,9 @@
 namespace go\core;
 
 use Exception;
-use GO;
 use go\core\data\Model;
 use go\core\db\Query;
 use go\core\exception\Forbidden;
-use go\core\Module;
 
 /**
  * Settings model 
@@ -21,11 +19,14 @@ use go\core\Module;
 abstract class Settings extends Model {
 
   private static $instance = [];
+
 	/**
 	 * 
 	 * @return static
+	 * @noinspection PhpMissingReturnTypeInspection
 	 */
-	public static function get() {
+	public static function get()
+	{
     $cls = static::class;
 
 	  if(!isset(self::$instance[$cls])) {
@@ -50,7 +51,10 @@ abstract class Settings extends Model {
 		self::$instance = [];
 	}
 
-	protected function getModuleId() {
+	/**
+	 * @throws Exception
+	 */
+	protected function getModuleId() : int{
 		$moduleId = (new Query)
 			->selectSingleValue('id')
 			->from('core_module')
@@ -61,24 +65,27 @@ abstract class Settings extends Model {
 			->fetch();
 		
 		if(!$moduleId) {
-			throw new \Exception ("Could not find module " .  $this->getModuleName() . "/" . $this->getModulePackageName());
+			throw new Exception ("Could not find module " .  $this->getModuleName() . "/" . $this->getModulePackageName());
 		}
 		
 		return $moduleId;
 	}
 	
-	protected function getModuleName() {
+	protected function getModuleName(): string
+	{
 		return explode("\\", static::class)[3];
 	}
 	
-	protected function getModulePackageName() {
+	protected function getModulePackageName(): string
+	{
 		return explode("\\", static::class)[2];
 	}
 	
 	private $oldData;
 
 
-	private static function dbIsReady() {
+	private static function dbIsReady(): bool
+	{
 		$ready = go()->getCache()->get('has_table_core_setting');
 		if($ready) {
 			return true;
@@ -96,11 +103,11 @@ abstract class Settings extends Model {
 
 		return false;
 	}
-	
+
 	/**
 	 * Constructor
-	 * 
-	 * @param int $moduleId If null is given the "core" module is used.
+	 *
+	 * @throws Exception
 	 */
 	protected function __construct() {
 
@@ -161,30 +168,32 @@ abstract class Settings extends Model {
 	}
 	
 	
-	private $readOnlyKeys = [];
-	
-	public function getReadOnlyKeys() {
+	private $readOnlyKeys;
+
+	/** @noinspection PhpUnused */
+	public function getReadOnlyKeys(): array
+	{
 		return $this->readOnlyKeys;
 	}
-	
-//	public function __destruct() {
-//		$this->save();
-//	}
-	
-	private function getSettingProperties() {
-		$props =  array_filter(get_object_vars($this), function($key) {
+
+	private function getSettingProperties(): array
+	{
+		return array_filter(get_object_vars($this), function($key) {
 			return $key !== 'oldData' && $key !== 'readOnlyKeys';
-		}, ARRAY_FILTER_USE_KEY);		
-		
-		return $props;
+		}, ARRAY_FILTER_USE_KEY);
 	}
 
-	protected function isModified($name) {
+	protected function isModified($name): bool
+	{
 		return (!array_key_exists($name, $this->oldData) && isset($this->$name)) || (isset($this->$name) && $this->$name != $this->oldData[$name]);
 	}
-	
-	public function save() {
 
+	/**
+	 * @throws Forbidden
+	 * @throws Exception
+	 */
+	public function save(): bool
+	{
 		foreach($this->getSettingProperties() as $name => $value) {
 			if(!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
 				if(in_array($name, $this->readOnlyKeys)) {
@@ -201,13 +210,16 @@ abstract class Settings extends Model {
 		
 		return true;
 	}
-	
-	private function update($name, $value) {
+
+	/**
+	 * @throws Exception
+	 */
+	private function update(string $name, $value) {
 		
 		$moduleId = $this->getModuleId();
 
 		if(!$moduleId) {
-			throw new \Exception("Could not find module for settings model ". static::class);
+			throw new Exception("Could not find module for settings model ". static::class);
 		}
 		
 		if (!App::get()->getDbConnection()->replace('core_setting', [
