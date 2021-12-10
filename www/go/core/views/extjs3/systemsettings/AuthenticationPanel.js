@@ -66,10 +66,20 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 					title: t("API settings"),
 					items: [
 						{
-							xtype: "textarea",
-							fieldLabel: t("CORS domains"),
-							hint: t("Allow Cross Origin Requests from these domains (Separate by space)"),
+							xtype: "box",
+							autoEl: "p",
+							html: t("Allow Cross Origin Requests from these origins")
+						},
+						{
+							xtype: "formgroup",
+							hideLabel: false,
+							fieldLabel: t("CORS origins"),
+
 							name: "corsAllowOrigin",
+							itemCfg: {
+								xtype: "textfield",
+								hideLabel: true
+							},
 							anchor: "100%"
 						}, {
 							xtype: "checkbox",
