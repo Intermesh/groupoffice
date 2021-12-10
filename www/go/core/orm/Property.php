@@ -976,7 +976,9 @@ abstract class Property extends Model {
 		} else{
 
 			//only check fetched properties
-			$properties = array_intersect($properties, $this->fetchProperties);
+
+			//Why ????
+			//$properties = array_intersect($properties, $this->fetchProperties);
 		}
 
 		$modified = [];
