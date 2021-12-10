@@ -2404,7 +2404,7 @@ abstract class Property extends Model {
 		foreach($tables as $table) {
 			foreach ($table->getColumns() as $column) {
         if (($column->pdoType == PDO::PARAM_STR) && $column->length && isset($this->{$column->name})) {
-					$this->{$column->name} = StringUtil::cutString($this->{$column->name}, $column->length, false, null);
+					$this->{$column->name} = StringUtil::cutString($this->{$column->name}, $column->length, false, "");
 				}
 			}
 		}
