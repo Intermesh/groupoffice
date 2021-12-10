@@ -1,10 +1,11 @@
 <?php
 namespace go\core\model;
 
+use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
 use Exception;
-use GO;
 use go\core;
-use go\core\http\Request;
+use go\core\exception\Forbidden;
+use go\core\jmap\Request as JmapRequest;
 use go\core\util\Crypt;
 use go\modules\business\license\model\License;
 use go\modules\community\addressbook\model\AddressBook;
@@ -12,7 +13,10 @@ use go\modules\community\addressbook\model\AddressBook;
 class Settings extends core\Settings {
 
 	use core\validate\ValidationTrait;
-	
+
+	/**
+	 * @throws Exception
+	 */
 	protected function __construct() {
 		parent::__construct();
 		
@@ -33,7 +37,7 @@ class Settings extends core\Settings {
 				$this->save();
 			}catch(Exception $e) {
 				
-				//ignore error on install becasuse core module is not there yet
+				//ignore error on install because core module is not there yet
 				if(!core\Installer::isInProgress()) {
 					throw $e;
 				}
@@ -41,24 +45,31 @@ class Settings extends core\Settings {
 		}
 	}
 	
-	protected function getModuleName() {
+	protected function getModuleName(): string
+	{
 		return "core";
 	}
 	
-	protected function getModulePackageName() {
+	protected function getModulePackageName(): string
+	{
 		return "core";
+	}
+
+	private function hasLanguage(string $lang): bool
+	{
+		return core\Environment::get()->getInstallFolder()->getFile('go/modules/core/language/'.$lang.'.php')->exists();
 	}
 	
 	private function getDefaultLanguage() {		
-		//can't use Language here because an infite loop will occur as it depends on this model.
+		//can't use Language here because an infinite loop will occur as it depends on this model.
 		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
 			return $_GET['SET_LANGUAGE'];
 		}
 		
-		$browserLanguages= Request::get()->getAcceptLanguages();
+		$browserLanguages= JmapRequest::get()->getAcceptLanguages();
 		foreach($browserLanguages as $lang){
 			$lang = str_replace('-','_',explode(';', $lang)[0]);
-			if(core\Environment::get()->getInstallFolder()->getFile('go/modules/core/language/'.$lang.'.php')->exists()){
+			if($this->hasLanguage($lang)){
 				return $lang;
 			}
 		}
@@ -72,7 +83,8 @@ class Settings extends core\Settings {
 	 * 
 	 * @return string
 	 */
-	private function detectURL() {
+	private function detectURL(): ?string
+	{
 
 		//check if this is ran on a webserver
 		if(!isset($_SERVER['REQUEST_METHOD'])) {
@@ -85,8 +97,8 @@ class Settings extends core\Settings {
 			$path = dirname($path);
 		}
 
-		$url = \go\core\jmap\Request::get()->isHttps() ? 'https://' : 'http://';
-		$url .= Request::get()->getHost(false) . $path;
+		$url = JmapRequest::get()->isHttps() ? 'https://' : 'http://';
+		$url .= JmapRequest::get()->getHost(false) . $path;
 		
 		return $url;
 	}
@@ -143,28 +155,37 @@ class Settings extends core\Settings {
 	 * @var string
 	 */
 	protected $smtpPassword = null;
-	
-	
-	public function decryptSmtpPassword() {
-		return Crypt::decrypt($this->smtpPassword);
+
+
+	/**
+	 * @throws Exception
+	 */
+	public function decryptSmtpPassword(): ?string
+	{
+		return $this->smtpPassword ? Crypt::decrypt($this->smtpPassword) : null;
 	}
-	
-	public function setSmtpPassword($value) {
-		$this->smtpPassword = Crypt::encrypt($value);
+
+	/**
+	 * @throws EnvironmentIsBrokenException
+	 */
+	public function setSmtpPassword(?string $value) {
+		$this->smtpPassword = empty($value) ? null : Crypt::encrypt($value);
 	}
 	
 	
 	protected $locale;
-	
+
 	/**
 	 * Get locale for the system. We need a UTF8 locale so command line functions
 	 * work with UTF8.
-	 * 
+	 *
 	 * initialized in old framework GO.php. What should we do with it later?
-	 * 
+	 *
 	 * @return string
+	 * @throws Forbidden
 	 */
-	public function getLocale() {
+	public function getLocale(): string
+	{
 
 		if(go()->getInstaller()->isInProgress()) {
 			return 'C.UTF-8';
@@ -201,7 +222,11 @@ class Settings extends core\Settings {
 		$this->locale = $locale;
 	}
 
-	public function resetLocale() {
+	/**
+	 * @throws Forbidden
+	 */
+	public function resetLocale(): string
+	{
 		$this->locale = null;
 		return $this->getLocale();
 	}
@@ -287,11 +312,26 @@ class Settings extends core\Settings {
 	 */
 	public $URL;
 
-
 	/**
 	 * @var string
 	 */
-	public $corsAllowOrigin = "";
+	protected $corsAllowOrigin = "";
+
+	public function setCorsAllowOrigin($origins) {
+		if(empty($origins)) {
+			$this->corsAllowOrigin = "";
+		} else{
+			$origins = array_map(function($host) {
+				return rtrim($host, '/');
+			}, $origins);
+
+			$this->corsAllowOrigin = implode(" ", $origins);
+		}
+	}
+
+	public function getCorsAllowOrigin() : array {
+		return empty($this->corsAllowOrigin) ? [] : explode(" ", $this->corsAllowOrigin);
+	}
 
 
 	/**
@@ -360,7 +400,8 @@ class Settings extends core\Settings {
 	 * 
 	 * @return string
 	 */
-	public function getPrimaryColorTransparent() {
+	public function getPrimaryColorTransparent(): string
+	{
 		list($r, $g, $b) = sscanf($this->primaryColor, "%02x%02x%02x");
 		
 		return "rgba($r, $g, $b, .16)";
@@ -518,20 +559,22 @@ class Settings extends core\Settings {
 	 * 
 	 * @return int[]
 	 */
-	public function getDefaultGroups() {		
+	public function getDefaultGroups(): array
+	{
 		return array_map("intval", (new core\db\Query)
 						->selectSingleValue('groupId')
 						->from("core_group_default_group")
 						->all());
 
 	}
-	
+
 	/**
 	 * Set default groups for new groups
-	 * 
+	 *
 	 * @param array $groups eg [['groupId' => 1]]
+	 * @throws Exception
 	 */
-	public function setDefaultGroups($groups) {	
+	public function setDefaultGroups(array $groups) {
 		
 		go()->getDbConnection()->exec("TRUNCATE TABLE core_group_default_group");
 		
@@ -543,9 +586,9 @@ class Settings extends core\Settings {
 	}
 	
 	
-	public function save() {
-
-		if(!$this->internalValidate()){
+	public function save(): bool
+	{
+		if(!$this->validate()){
 			return false;
 		}
 
@@ -575,6 +618,9 @@ class Settings extends core\Settings {
 		return parent::save();
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function internalValidate()
 	{
 		if($this->isModified('license')) {
@@ -593,7 +639,5 @@ class Settings extends core\Settings {
 				go()->rebuildCache();
 			}
 		}
-
-		return true;
 	}
 }
