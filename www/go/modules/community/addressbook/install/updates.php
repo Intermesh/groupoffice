@@ -149,3 +149,28 @@ $updates['202106171331'][] = "ALTER TABLE `addressbook_user_settings` ADD `lastA
 
 $updates['202106171331'][] = "alter table addressbook_user_settings
 	add startIn enum('allcontacts', 'starred', 'default', 'remember') default 'allcontacts' not null;";
+
+$updates['202112101348'][] = "alter table addressbook_address
+    modify street text null;";
+
+$updates['202112101348'][] = function() {
+
+	go()->getDbConnection()->exec("alter table addressbook_address ADD id INT AUTO_INCREMENT PRIMARY KEY;");
+	\go\core\db\Table::destroyInstances();
+	try {
+		$addresses = go()->getDbConnection()->select('id,street,street2,countryCode')
+			->from("addressbook_address");
+		foreach ($addresses as $address) {
+
+			$street = go()->getLanguage()->formatAddress($address['countryCode'], ['street' => $address['street'], 'street2' => $address['street2']], false);
+
+			go()->getDbConnection()->update("addressbook_address", ['street' => $street], ['id' => $address['id']])->execute();
+		}
+	} finally
+	{
+		go()->getDbConnection()->exec("alter table addressbook_address drop id;");
+	}
+
+
+
+};

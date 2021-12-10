@@ -219,7 +219,7 @@ go.util =  (function () {
 
 		streetAddress: function (config) {
 
-			var adr = config.street + " " + config.street2;			
+			var adr = config.street;
 			if(config.zipCode) {
 				adr += ", " + config.zipCode.replace(/ /g, ''); 
 			}

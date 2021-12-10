@@ -38,12 +38,6 @@ class Address extends Property {
 	 * @var string
 	 */							
 	public $street = '';
-	
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $street2 = '';
 
 	/**
 	 * 
@@ -115,26 +109,26 @@ class Address extends Property {
 	
 	public function getFormatted()
 	{
-		return go()->getLanguage()->formatAddress($this->countryCode, $this->toArray(['street','street2', 'city', 'zipCode', 'state']));
+		return go()->getLanguage()->formatAddress($this->countryCode, $this->toArray(['street', 'city', 'zipCode', 'state']));
 	}
 	
-	public function getCombinedStreet() {
-		return trim($this->street . ' ' . $this->street2);
-	}
+//	public function getCombinedStreet() {
+//		return trim($this->street . ' ' . $this->street2);
+//	}
 	
-	public function setCombinedStreet($v) {
-		$lastSpace = strrpos($v, ' ');
-		if($lastSpace === false) {
-			$lastSpace = strrpos($v, "\n");
-		}
-		if($lastSpace === false) {
-			$this->street = $v;
-			$this->street2 = null;
-		} else
-		{
-			$this->street = substr($v, 0, $lastSpace);
-			$this->street2 = substr($v, $lastSpace + 1);
-		}
-	}
+//	public function setCombinedStreet($v) {
+//		$lastSpace = strrpos($v, ' ');
+//		if($lastSpace === false) {
+//			$lastSpace = strrpos($v, "\n");
+//		}
+//		if($lastSpace === false) {
+//			$this->street = $v;
+//			$this->street2 = null;
+//		} else
+//		{
+//			$this->street = substr($v, 0, $lastSpace);
+//			$this->street2 = substr($v, $lastSpace + 1);
+//		}
+//	}
 
 }

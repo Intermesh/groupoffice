@@ -104,7 +104,9 @@ class Language {
 	}
 
 	private $af;
-	public function getAddressFormat($isoCode) {
+	public function getAddressFormat(string $isoCode) {
+
+		$isoCode = strtoupper($isoCode);
 
 		if(!isset($this->af)) {
 			require(\go\core\Environment::get()->getInstallFolder() . '/language/addressformats.php');
@@ -116,18 +118,25 @@ class Language {
 
 	private static $defaultCountryIso;
 
-	private static function isDefaultCountry($countryCode) {
+	public static function isDefaultCountry($countryCode): bool
+	{
+		return self::defaultCountry() == $countryCode;
+	}
+
+	/**
+	 * Get default country ISO code
+	 *
+	 * @return string
+	 */
+	public static function defaultCountry() : string {
 		if(!isset(self::$defaultCountryIso)) {
 			$user = go()->getAuthState()->getUser(['timezone']);
 			if(!$user) {
 				$user = User::findById(1, ['timezone']);
 			}
 			self::$defaultCountryIso = $user->getCountry();
-//			$countries = go()->t('countries');
-//			self::$defaultCountryText = $countries[self::$defaultCountryIso] ?? "";
 		}
-
-		return self::$defaultCountryIso == $countryCode;
+		return self::$defaultCountryIso;
 	}
 
 
@@ -136,22 +145,31 @@ class Language {
 	 *
 	 * @param $countryCode
 	 * @param $address array with street, street2, city, zipCode and state
+	 * @param boolean|null $showCountry When null it will be false if the country isthe system default
 	 * @return string
 	 */
-	public function formatAddress($countryCode, $address)
+	public function formatAddress($countryCode, $address, bool $showCountry = null)
 	{
-		if (empty($address['street']) && empty($address['city']) && empty($address['state'])) {
+		if(empty($countryCode)) {
+			$countryCode = self::defaultCountry();
+		}
+
+		if (empty($address['street']) && empty($address['street2']) && empty($address['city']) && empty($address['state'])) {
 			return "";
 		}
 		$format = go()->getLanguage()->getAddressFormat($countryCode);
 
-		$format = str_replace('{address}', $address['street'], $format);
+		$format = str_replace('{address}', $address['street'] ?? "", $format);
 		$format = str_replace('{address_no}', $address['street2'] ?? "", $format);
-		$format = str_replace('{city}', $address['city'], $format);
-		$format = str_replace('{zip}', $address['zipCode'], $format);
-		$format = str_replace('{state}', $address['state'], $format);
+		$format = str_replace('{city}', $address['city'] ?? "", $format);
+		$format = str_replace('{zip}', $address['zipCode'] ?? "", $format);
+		$format = str_replace('{state}', $address['state'] ?? "", $format);
 
-		if (self::isDefaultCountry($countryCode)) {
+		if(!isset($showCountry)) {
+			$showCountry = self::isDefaultCountry($countryCode);
+		}
+
+		if (!$showCountry) {
 			$format = str_replace('{country}', "", $format);
 		}else{
 			$countries = go()->t('countries');
@@ -159,7 +177,8 @@ class Language {
 			$format = str_replace('{country}', $country, $format);
 		}
 
-		return preg_replace("/\n+/", "\n", $format);
+		$format = preg_replace("/\s\n/", "\n", $format);
+		return trim(preg_replace("/[\n]+/", "\n", $format));
 	}
 
 	/**

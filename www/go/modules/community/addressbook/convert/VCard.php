@@ -119,7 +119,7 @@ class VCard extends AbstractConverter {
 		foreach ($contact->addresses as $address) {
 			//ADR: [post-office-box, apartment, street, locality, region, postal, country]
 			$vcard->add(
-							'ADR', ['', $address->street2, $address->street, $address->city, $address->state, $address->zipCode, $address->country], ['TYPE' => [$address->type]]
+							'ADR', ['', '', $address->street, $address->city, $address->state, $address->zipCode, $address->country], ['TYPE' => [$address->type]]
 			);
 		}
 		if (!$contact->isOrganization) {
@@ -337,16 +337,19 @@ class VCard extends AbstractConverter {
 			$addr = [];
 			
 			//iOS Accepts street2 but sends back {street}\n{street2} in the street value :(
-			if(empty($a[1])){
-				$parts = explode("\n", $a[2]);
-				if(count($parts) > 1) {
-					$a[1] = array_pop($parts);
-					$a[2] = implode("\n", $parts);
-				}
-			}			
+//			if(empty($a[1])){
+//				$parts = explode("\n", $a[2]);
+//				if(count($parts) > 1) {
+//					$a[1] = array_pop($parts);
+//					$a[2] = implode("\n", $parts);
+//				}
+//			}
 			
-			$addr['street2'] = $a[1] ?? null;
+
 			$addr['street'] = $a[2] ?? null;
+			if(!empty($a[1])) {
+				$addr['street'] .= "\n" . $a[1];
+			}
 			$addr['city'] = $a[3] ?? null;
 			$addr['state'] = $a[4] ?? null;
 			$addr['zipCode'] = $a[5] ?? null;
