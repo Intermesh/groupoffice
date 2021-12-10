@@ -1,6 +1,7 @@
 <?php
 namespace go\core\cli\controller;
 
+use Exception;
 use GO\Base\Observable;
 use go\core\cache\None;
 use go\core\Controller;
@@ -11,6 +12,7 @@ use go\core\exception\Forbidden;
 use go\core\fs\File;
 use go\core\jmap\Entity;
 use go\core\model\Alert;
+use go\core\http\Client;
 use go\core\model\CronJobSchedule;
 use go\core\event\Listeners;
 use go\core\model\Module;
@@ -54,19 +56,34 @@ class System extends Controller {
 
 	/**
 	 * docker-compose exec --user www-data groupoffice-master php ./www/cli.php core/System/upgrade
+	 * @throws Exception
 	 */
 	public function upgrade() {
 
 		Observable::cacheListeners();
 		Listeners::get()->init();
 
-		go()->setCache(new None());
 		go()->getInstaller()->isValidDb();
 		Table::destroyInstances();
 		\GO::session()->runAsRoot();	
 		date_default_timezone_set("UTC");
 		go()->getInstaller()->upgrade();
-		
+
+		try {
+			$http = new Client();
+			$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
+			$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
+
+			$response = $http->get(go()->getSettings()->URL . '/install/clearcache.php');
+			if($response['status'] != 200) {
+				echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "/install/' in the browser.\n";
+			} else{
+				echo "Cache cleared via webserver\n";
+			}
+		} catch(Exception $e) {
+			echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "/install/' in the browser.\n";
+		}
+
 		echo "Done!\n";
 	}
 
