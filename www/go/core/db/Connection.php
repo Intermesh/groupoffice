@@ -581,7 +581,10 @@ class Connection {
 	public function createStatement(array $build): Statement
 	{
 		try {
-			$build['start'] = go()->getDebugger()->getMicroTime();			
+			if($this->debug) {
+				$build['start'] = go()->getDebugger()->getMicroTime();
+			}
+
 			$stmt = $this->getPDO()->prepare($build['sql']);
 			/**
 			 * @var Statement $stmt;

@@ -20,6 +20,7 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\validate\ValidationTrait;
 use InvalidArgumentException;
+use LogicException;
 use PDO;
 use PDOException;
 use ReflectionClass;
@@ -123,7 +124,7 @@ abstract class Property extends Model {
 	 * @param boolean $isNew Indicates if this model is saved to the database.
 	 * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
 	 * @param bool $readOnly Entities can be fetched readonly to improve performance
-	 * @throws Exception
+	 *
 	 * @noinspection PhpMissingParamTypeInspection
 	 */
 	public function __construct($owner, bool $isNew = true, array $fetchProperties = [], bool $readOnly = false) {
@@ -175,7 +176,6 @@ abstract class Property extends Model {
    * Loads defaults from the database or casts the database value to the right type in PHP
    *
    * @param boolean $loadDefault
-   * @throws Exception
    */
 	private function initDatabaseColumns(bool $loadDefault) {
 		$m = static::getMapping();
@@ -203,11 +203,9 @@ abstract class Property extends Model {
    * Returns all relations that were requested in "fetchProperties".
    *
    * @return Relation[]
-   * @throws Exception
    */
 	private function getFetchedRelations(): array
 	{
-
 		$fetchedRelations = [];
 
 		$relations = $this->getMapping()->getRelations();		
@@ -222,7 +220,6 @@ abstract class Property extends Model {
 
   /**
    * Fetches the related properties when requested
-   * @throws Exception
    */
 	private function initRelations() {		
 		foreach ($this->getFetchedRelations() as $relation) {
@@ -310,7 +307,6 @@ abstract class Property extends Model {
    * @param $where
    * @param Relation $relation
    * @return Statement|mixed
-   * @throws Exception
    */
 	private static function queryScalar($where, Relation $relation) {
 		$cacheKey = static::class.':'.$relation->name;
@@ -387,7 +383,6 @@ abstract class Property extends Model {
    * @param Property $v
    * @param Relation $relation
    * @return string
-   * @throws Exception
    */
 	private function buildMapKey(Property $v, Relation $relation): string
 	{
@@ -415,7 +410,6 @@ abstract class Property extends Model {
 	 * By default all non-static public and protected properties + dynamically mapped properties.
 	 *
 	 * @return array
-	 * @throws Exception
 	 */
 	private function watchProperties(): array
 	{
@@ -448,7 +442,6 @@ abstract class Property extends Model {
 
   /**
    * Copies all properties so isModified() can detect changes.
-   * @throws Exception
    */
 	private function trackModifications() {
 		foreach ($this->watchProperties() as $propName) {
@@ -517,6 +510,8 @@ abstract class Property extends Model {
 		if(self::$mapping[$cls] === null) {
 			self::$mapping[$cls] = static::defineMapping();
 
+			self::$mapping[$cls]->dynamic = true;
+
 			static::fireEvent(self::EVENT_MAPPING, self::$mapping[$cls]);
 			
 			go()->getCache()->set($cacheKey, self::$mapping[$cls]);
@@ -583,6 +578,11 @@ abstract class Property extends Model {
 	public function &__get($name) {
 		$prop = static::getMapping()->getProperty($name);
 		if($prop) {
+
+			if(!$prop->dynamic && go()->getDebugger()->enabled) {
+				throw new LogicException("You should define '$name' in " . static::class);
+			}
+
 			if(!isset($this->dynamicProperties[$name])) {
 //				if($prop instanceof Relation && !in_array($name, $this->fetchProperties)) {
 //					throw new Exception("Relation '$name' was not fetched so can't be accessed");
@@ -1049,11 +1049,10 @@ abstract class Property extends Model {
 	 * 
 	 * @param string $propName
 	 * @return mixed
-	 * @throws Exception
 	 */
 	public function getOldValue(string $propName) {
 		if(!array_key_exists($propName, $this->oldProps)){
-			throw new Exception("Property " . $propName . " does not exist");
+			throw new InvalidArgumentException("Property " . $propName . " does not exist");
 		}
 		return $this->oldProps[$propName];
 	}
@@ -1740,7 +1739,7 @@ abstract class Property extends Model {
 			if ($uniqueKey) {				
 				$index = $table->getIndex($uniqueKey);
 
-				$this->setValidationError($index['Column_name'], ErrorCode::UNIQUE);				
+				$this->setValidationError($index ? $index['Column_name'] : $uniqueKey, ErrorCode::UNIQUE);
 				return false;
 			} else {
 				if(isset($stmt)) {
@@ -1955,7 +1954,7 @@ abstract class Property extends Model {
    * Check's if the database conditions are met.
    *
    * @param Column $column
-   * @param $value
+   * @param mixed $value
    */
 	private function validateColumn(Column $column, $value): void
 	{
@@ -1977,10 +1976,6 @@ abstract class Property extends Model {
 				break;
 
 			case 'enum':
-				if(!$column->required && $value == null) {
-					return;
-				}
-
 				if(!preg_match('/enum\((.*)\)/i', $column->dataType, $matches)) {
 					$this->setValidationError($column->name, ErrorCode::GENERAL, "Enum column has no values specified in database");
 					return;
@@ -2381,11 +2376,11 @@ abstract class Property extends Model {
   /**
    * Checks if the given property or entity is equal to this
    *
-   * @param self $property
+   * @param mixed $property
    * @return boolean
    * @throws Exception
    */
-	public function equals(Property $property): bool
+	public function equals($property): bool
 	{
 		if(get_class($property) != get_class($this)) {
 			return false;
@@ -2414,7 +2409,7 @@ abstract class Property extends Model {
 		foreach($tables as $table) {
 			foreach ($table->getColumns() as $column) {
         if (($column->pdoType == PDO::PARAM_STR) && $column->length && isset($this->{$column->name})) {
-					$this->{$column->name} = StringUtil::cutString($this->{$column->name}, $column->length, false, null);
+					$this->{$column->name} = StringUtil::cutString($this->{$column->name}, $column->length, false, "");
 				}
 			}
 		}

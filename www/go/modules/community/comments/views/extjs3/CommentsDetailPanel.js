@@ -204,7 +204,6 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			}
 			avatar.listeners = {
 				afterrender : (cmp) => {
-					console.log(creator);
 					cmp.getEl().on("click" , async () => {
 						//lookup in address book
 						const ids = await go.Db.store("Contact").query({

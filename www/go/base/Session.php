@@ -91,6 +91,11 @@ class Session extends Observable{
 		
 		
 		$this->values = &$_SESSION['GO_SESSION'];
+
+		// copy auth from new framework
+		if(empty($this->values['user_id']) && go()->getAuthState() && go()->getAuthState()->getUserId()) {
+			$this->values['user_id'] = go()->getAuthState()->getUserId();
+		}
 		
 		if(!isset($this->values['security_token'])){
 			
@@ -229,8 +234,8 @@ class Session extends Observable{
 	public function user(){
 		if(empty($this->values['user_id'])){
 			// Check Bearer token before returning null
-			$state = new \go\core\jmap\State();
-			if(!empty($state->getUserId())) {
+			$state = go()->getAuthState();
+			if($state && !empty($state->getUserId())) {
 				$this->values['user_id'] = $state->getUserId();
 				return Model\User::model()->findByPk($state->getUserId(), array(), true);
 			}

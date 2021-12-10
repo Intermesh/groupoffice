@@ -3,12 +3,18 @@ namespace go\core\util;
 
 use DateTime as PHPDateTime;
 use DateTimeZone;
+use Exception;
 use go\core\data\ArrayableInterface;
 use go\core\model\User;
 use JsonSerializable;
 
 class DateTime extends PHPDateTime implements JsonSerializable {
 
+	/**
+	 * Indicates if the date should format with or without time.
+	 *
+	 * @var bool
+	 */
 	public $hasTime = true;
 	
 	/**
@@ -16,12 +22,10 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	 */
 	const FORMAT_API = "c";
 
+	/**
+	 * API format for a date without time
+	 */
 	const FORMAT_API_DATE_ONLY = "Y-m-d";
-
-//	public function toArray(array $properties = null): array
-//	{
-//		return $this->format($this->hasTime ? self::FORMAT_API : self::FORMAT_API_DATE_ONLY);
-//	}
 
 	public function jsonSerialize() {
 		return $this->format($this->hasTime ? self::FORMAT_API : self::FORMAT_API_DATE_ONLY);
@@ -33,7 +37,7 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 
 	private static $currentUser;
 
-	private static function currentUser() {
+	private static function currentUser() : User {
 		if(!isset(self::$currentUser)) {
 			self::$currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat' ]);
 			if(!self::$currentUser) {
@@ -43,7 +47,7 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 		return self::$currentUser;
 	}
 
-	public function toUserFormat($withTime = false, $user = null)
+	public function toUserFormat(bool $withTime = false, User $user = null): string
 	{
 		if(!isset($user)) {
 			$user = self::currentUser();
@@ -55,7 +59,7 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 		$f = $user->dateFormat;
 		if($withTime) {
 			$date = clone $this;
-			$date->setTimezone(new \DateTimeZone($user->timezone));
+			$date->setTimezone(new DateTimeZone($user->timezone));
 			$f .= ' ' . $user->timeFormat;
 			return $date->format($f);
 		}
@@ -69,10 +73,10 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	 * @param string $format
 	 * @param string $datetime
 	 * @param DateTimeZone|null $timezone
-	 * @return PHPDateTime|false|static
-	 * @throws \Exception
+	 * @return static
+	 * @throws Exception
 	 */
-	public static function createFromFormat($format, $datetime, DateTimeZone $timezone = null)
+	public static function createFromFormat($format, $datetime, DateTimeZone $timezone = null): DateTime
 	{
 		return new static("@" . parent::createFromFormat($format, $datetime, $timezone)->format("U"));
 	}

@@ -19,11 +19,12 @@ use go\modules\community\tasks\model\UserSettings;
 
 class Module extends core\Module {
 							
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
-	public function autoInstall()
+	public function autoInstall(): bool
 	{
 		return true;
 	}
@@ -39,14 +40,15 @@ class Module extends core\Module {
 		$mapping->addHasOne('tasksSettings', UserSettings::class, ['id' => 'userId'], true);
 	}
 
-	protected function rights() {
+	protected function rights(): array
+	{
 		return [
 			'mayChangeTasklists', // allows Tasklist/set (hide ui elements that use this)
 			'mayChangeCategories', // allows TaskCategory/set (hide ui elements that use this)
 		];
 	}
 
-	protected function beforeInstall(\go\core\model\Module $model)
+	protected function beforeInstall(\go\core\model\Module $model): bool
 	{
 		// Share module with Internal group
 		$model->permissions[Group::ID_INTERNAL] = (new \go\core\model\Permission($model))
@@ -74,6 +76,14 @@ class Module extends core\Module {
 
 	public function demo(Generator $faker)
 	{
+		$tasklists = Tasklist::find()->where(['role' => Tasklist::List]);
+
+		foreach($tasklists as $tasklist) {
+			$this->demoTasks($faker, $tasklist);
+		}
+	}
+
+	public function demoTasks(Generator $faker, Tasklist $tasklist, bool $withLinks = true) {
 
 		$titles = [
 			"Finish tasks module",
@@ -108,35 +118,29 @@ class Module extends core\Module {
 
 		$titleCount = count($titles);
 
+		for($i = 0; $i < 5; $i ++ ) {
+			echo ".";
+			$task = new Task();
+			$task->title = $titles[$faker->numberBetween(0, $titleCount - 1)];
+			$task->createdBy = $tasklist->createdBy;
+			$task->responsibleUserId = $task->createdBy;
+			$task->start = $faker->dateTimeBetween("-1 years", "now");
+			$task->due =  $faker->dateTimeBetween($task->start, "now");
+			$task->tasklistId = $tasklist->id;
+			$task->percentComplete = $faker->randomElement([0, 20, 50, 80, 100]);
 
-		$tasklists = Tasklist::find();
+			$task->createdAt = $faker->dateTimeBetween("-1 years", "now");
+			$task->modifiedAt = $faker->dateTimeBetween($task->createdAt, "now");
 
-		foreach($tasklists as $tasklist) {
+			if(!$task->save()) {
+				throw new core\orm\exception\SaveException($task);
+			}
 
-			$count = $faker->numberBetween(3, 20);
-			for($i = 0; $i < $count; $i ++ ) {
-				echo ".";
-				$task = new Task();
-				$task->title = $titles[$faker->numberBetween(0, $titleCount - 1)];
-				$task->description = $faker->realtext;
-				$task->createdBy = $tasklist->createdBy;
-				$task->responsibleUserId = $task->createdBy;
-				$task->start = $faker->dateTimeBetween("-1 years", "now");
-				$task->due =  $faker->dateTimeBetween($task->start, "now");
-				$task->tasklistId = $tasklist->id;
-				$task->percentComplete = $faker->randomElement([0, 20, 50, 80, 100]);
+			if($withLinks && core\model\Module::isInstalled("community", "comments")) {
+				\go\modules\community\comments\Module::demoComments($faker, $task);
+			}
 
-				$task->createdAt = $faker->dateTimeBetween("-1 years", "now");
-				$task->modifiedAt = $faker->dateTimeBetween($task->createdAt, "now");
-
-				if(!$task->save()) {
-					throw new core\orm\exception\SaveException($task);
-				}
-
-				if(core\model\Module::isInstalled("community", "comments")) {
-					\go\modules\community\comments\Module::demoComments($faker, $task);
-				}
-
+			if($withLinks) {
 				model\Link::demo($faker, $task);
 			}
 		}

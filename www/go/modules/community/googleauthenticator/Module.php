@@ -4,6 +4,7 @@ namespace go\modules\community\googleauthenticator;
 use go\core;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
+use go\core\Settings;
 use go\modules\community\googleauthenticator\model;
 use go\core\model\Group;
 use go\core\model\Module as ModuleModel;
@@ -11,11 +12,12 @@ use go\core\model\User;
 
 class Module extends core\Module {
 
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV";
 	}
 
-	public function autoInstall()
+	public function autoInstall(): bool
 	{
 		return true;
 	}
@@ -30,7 +32,8 @@ class Module extends core\Module {
 		return true;
 	}
 
-	protected function afterInstall(ModuleModel $model) {
+	protected function afterInstall(ModuleModel $model): bool
+	{
 		
 		if(!Googleauthenticator::register()) {
 			return false;
@@ -40,7 +43,7 @@ class Module extends core\Module {
 	}
 
 
-	protected function beforeInstall(\go\core\model\Module $model)
+	protected function beforeInstall(\go\core\model\Module $model): bool
 	{
 		// Share module with Internal group
 		$model->permissions[Group::ID_INTERNAL] = (new \go\core\model\Permission($model))
@@ -50,7 +53,7 @@ class Module extends core\Module {
 	}
 
 
-	public function getSettings()
+	public function getSettings(): ?Settings
 	{
 		return model\Settings::get();
 	}

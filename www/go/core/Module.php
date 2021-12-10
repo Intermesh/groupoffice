@@ -4,11 +4,15 @@ namespace go\core;
 
 use Exception;
 use Faker\Generator;
+use GO\Base\Model\Module as LegacyModuleModel;
+use GO\Base\Module as LegacyModule;
+use GO\Base\ModuleCollection;
+use go\core\Module as CoreModule;
+use LegacyModuleCollection;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Utils;
 use go\core\exception\NotFound;
 use go\core\fs\File;
-use go\core\fs\FileSystemObject;
 use go\core\fs\Folder;
 use go\core\model;
 use go\core\jmap\Entity;
@@ -38,9 +42,10 @@ abstract class Module extends Singleton {
 	 * Find module class file by name
 	 * 
 	 * @param string $moduleName
-	 * @return self|false
+	 * @return ?self
 	 */
-	public static function findByName($moduleName) {
+	public static function findByName(string $moduleName): ?Module
+	{
 		$mods = self::findAvailable();
 		
 		foreach($mods as $mod) {
@@ -49,21 +54,22 @@ abstract class Module extends Singleton {
 			}
 		}
 		
-		return false;
+		return null;
 	}
 
 
 	/**
 	 * Find available module class names
 	 *
-	 * @return string[] eg. ['go\modules\community\addressbook\Module', 'go\modules\community\notes\Module']
+	 * @return class-string<self>[] eg. ['go\modules\community\addressbook\Module', 'go\modules\community\notes\Module']
 	 */
-	public static function findAvailable() {
+	public static function findAvailable(): array
+	{
 		//for new framework
-		$classFinder = new \go\core\util\ClassFinder(false);
+		$classFinder = new ClassFinder(false);
 		$classFinder->addNamespace("go\\modules");
 
-		return $classFinder->findByParent(\go\core\Module::class);
+		return $classFinder->findByParent(CoreModule::class);
 	}
 
 	/**
@@ -71,7 +77,8 @@ abstract class Module extends Singleton {
 	 *
 	 * @return bool
 	 */
-	public function autoInstall() {
+	public function autoInstall(): bool
+	{
 		return false;
 	}
 
@@ -80,14 +87,16 @@ abstract class Module extends Singleton {
 	 *
 	 * @return bool
 	 */
-	public function isInstallable() {
+	public function isInstallable(): bool
+	{
 		return $this->isLicensed();
 	}
 
 	/**
 	 * For example "groupoffice-pro"
 	 */
-	public function requiredLicense(){
+	public function requiredLicense(): ?string
+	{
 		return null;
 	}
 
@@ -96,7 +105,8 @@ abstract class Module extends Singleton {
 	 *
 	 * @return bool
 	 */
-	public function isLicensed() {
+	public function isLicensed(): bool
+	{
 		
 		$license = $this->requiredLicense();
 		if(!isset($license)) {
@@ -111,7 +121,7 @@ abstract class Module extends Singleton {
 		
 	}
 
-	private static function sourceIsEncoded() {
+	private static function sourceIsEncoded() : bool {
 
 		$isEncoded = go()->getCache()->get('source-is-encoded');
 
@@ -135,7 +145,7 @@ abstract class Module extends Singleton {
 	public final function install() {
 
 		if(model\Module::findByName($this->getPackage(), $this->getName(), null)) {
-			throw new \Exception("This module has already been installed!");
+			throw new Exception("This module has already been installed!");
 		}
 
 		try{
@@ -219,15 +229,13 @@ abstract class Module extends Singleton {
 	 * @throws NotFound
 	 * @throws Exception
 	 */
-	public function uninstall() {
-		
+	public function uninstall(): bool
+	{
 		if(!$this->beforeUninstall()) {
 			return false;
 		}
 		
-		if(!$this->uninstallDatabase()) {
-			return false;
-		}
+		$this->uninstallDatabase();
 		
 		$model = model\Module::find()->where(['name' => static::getName(), 'package' => static::getPackage()])->single();
 		if(!$model) {
@@ -260,7 +268,8 @@ abstract class Module extends Singleton {
 	 * will be deleted by Mysql because of a cascading relation.
 	 * @throws Exception
 	 */
-	public function registerEntities() {
+	public function registerEntities(): bool
+	{
 		$entities = $this->getClassFinder()->findByParent(Entity::class);
 		if(!count($entities)) {
 			return true;
@@ -291,26 +300,25 @@ abstract class Module extends Singleton {
 
 	/**
 	 * Installs the database for the module. This happens before the core_module entry has been inserted.
-	 * @return boolean
+	 *
 	 * @throws Exception
 	 */
-	private function installDatabase() {
+	private function installDatabase()
+	{
 		$sqlFile = $this->getFolder()->getFile('install/install.sql');
 		
 		if ($sqlFile->exists()) {
 			Utils::runSQLFile($sqlFile);			
 		}
-				
-		return true;
 	}
 
 	/**
 	 * This will delete the module's database tables
 	 *
-	 * @return boolean
 	 * @throws Exception
 	 */
-	private function uninstallDatabase() {
+	private function uninstallDatabase()
+	{
 		$sqlFile = $this->getFolder()->getFile('install/uninstall.sql');
 		
 		if ($sqlFile->exists()) {
@@ -319,7 +327,17 @@ abstract class Module extends Singleton {
 			Utils::runSQLFile($sqlFile);
 			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 		}
-		
+	}
+
+	/**
+	 * Override to implement installation routines after the database has been
+	 * created. Share the module with group "Internal" for example.
+	 *
+	 * @param model\Module $model
+	 * @return bool
+	 */
+	protected function afterInstall(model\Module $model): bool
+	{
 		return true;
 	}
 
@@ -330,18 +348,8 @@ abstract class Module extends Singleton {
 	 * @param model\Module $model
 	 * @return bool
 	 */
-	protected function afterInstall(model\Module $model) {
-		return true;
-	}
-
-	/**
-	 * Override to implement installation routines after the database has been
-	 * created. Share the module with group "Internal" for example.
-	 *
-	 * @param model\Module $model
-	 * @return bool
-	 */
-	protected function beforeInstall(model\Module $model) {
+	protected function beforeInstall(model\Module $model): bool
+	{
 		return true;
 	}
 	
@@ -349,7 +357,8 @@ abstract class Module extends Singleton {
 	 * Override to implement uninstallation routines before the database will be destroyed.
 	 * @return bool
 	 */
-	protected function beforeUninstall() {
+	protected function beforeUninstall(): bool
+	{
 		return true;
 	}
 	
@@ -358,7 +367,8 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return ClassFinder
 	 */
-	public function getClassFinder() {
+	public function getClassFinder(): ClassFinder
+	{
 		$classFinder = new ClassFinder(false);
 		$classFinder->addNamespace(substr(static::class, 0, strrpos(static::class, "\\")));
 		
@@ -370,7 +380,8 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return File
 	 */
-	public function getUpdatesFile() {
+	public function getUpdatesFile(): File
+	{
 		return $this->getFolder()->getFile('install/updates.php');
 	}
 	
@@ -379,7 +390,8 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return int
 	 */
-	public function getUpdateCount() {
+	public function getUpdateCount(): int
+	{
 		$updateFile = $this->getUpdatesFile();
 		
 		$count = 0;
@@ -387,7 +399,8 @@ abstract class Module extends Singleton {
 			require($updateFile->getPath());
 			
 			if(isset($updates)){
-				foreach($updates as $timestamp=>$queries)
+				/** @noinspection PhpUnusedLocalVariableInspection */
+				foreach($updates as $timestamp=> $queries)
 					$count+=count($queries);
 			}
 		}
@@ -406,14 +419,15 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return string eg. "Intermesh BV <info@intermesh.nl>";
 	 */
-	abstract function getAuthor();
+	abstract function getAuthor(): string;
 
 	/**
 	 * The names of the properties that can be set as permission. The value will be a label (to be translated by client)
 	 * When this is not overriden there are no extra permissions. Groups van still be added
 	 * @return array name => label
 	 */
-	public function getRights() {
+	public function getRights(): array
+	{
 		$types = $this->rights();
 		$result = [];
 		foreach($types as $i => $name) {
@@ -423,27 +437,32 @@ abstract class Module extends Singleton {
 	}
 
 	// default backwards compatible
-	protected function rights() {
+	protected function rights(): array
+	{
 		return ['mayManage'];
 	}
 	/**
 	 * Get dependent modules.
 	 * 
-	 * @return array[] eg. ["community/notes"]
+	 * @return array e.g. ["community/notes"]
 	 */
-	public function getDependencies() {
+	public function getDependencies(): array
+	{
 		return [];
 	}
 
 	/**
 	 *
+	 * @param static[]|LegacyModule $module
+	 * @return static[]|LegacyModule[]
+	 *
+	 * @throws LicenseException
+	 * @throws Exception
 	 * @todo make non static when old framework modules are gone.
 	 *
-	 * @param static|GO\Base\Module $module
-	 * @return static|GO\Base\Module[]
-	 *
 	 */
-	public static function resolveDependencies($module) {
+	public static function resolveDependencies($module): array
+	{
 		$resolved = [];
 		foreach($module->getDependencies() as $dependency) {
 			$d = explode("/",  $dependency);
@@ -476,8 +495,10 @@ abstract class Module extends Singleton {
 	}
 
 	/**
-	 * @param static|GO\Base\Module $module
-
+	 * Install modules that depend on the given module
+	 * 
+	 * @param static|LegacyModule $module
+	 * @throws Exception
 	 */
 	public static function installDependencies($module) {
 		foreach(self::resolveDependencies($module) as $dependency) {
@@ -491,7 +512,7 @@ abstract class Module extends Singleton {
 						throw new Exception("Could not install '" . get_class($dependency) . "'");
 					}
 				} else{
-					if (!\GO\Base\Model\Module::install($dependency->getName(), true)) {
+					if (!LegacyModuleModel::install($dependency->getName(), true)) {
 						throw new Exception("Could not install '" . get_class($dependency) . "'");
 					}
 				}
@@ -507,10 +528,13 @@ abstract class Module extends Singleton {
 
 
 	/**
-	 * @param static|GO\Base\Module $module
-	 * @return static|GO\Base\Module[]
+	 * Find the modules that depend on the given module
+	 *
+	 * @param static|LegacyModule $module
+	 * @return static[]|LegacyModule[]
 	 */
-	public static function getModulesThatDependOn($module) {
+	public static function getModulesThatDependOn($module): array
+	{
 
 		$depStr = $module->getPackage() . '/' . $module->getName();
 
@@ -533,14 +557,13 @@ abstract class Module extends Singleton {
 		return $modules;
 	}
 
-
-
 	/**
 	 * get conflicting modules.
 	 * 
 	 * @return string[] eg. ["community/notes"]
 	 */
-	public function getConflicts() {
+	public function getConflicts(): array
+	{
 		return [];
 	}
 
@@ -549,7 +572,8 @@ abstract class Module extends Singleton {
 	 * @deprecated
 	 * @return string
 	 */
-	public function path() {
+	public function path(): string
+	{
 		return $this->getPath() . '/';
 	}
 
@@ -558,7 +582,8 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return string
 	 */
-	public static function getPath() {
+	public static function getPath(): string
+	{
 		return Environment::get()->getInstallFolder() . '/' . dirname(str_replace('\\', '/', static::class));
 	}
 
@@ -566,9 +591,9 @@ abstract class Module extends Singleton {
 	 * Get the folder of this module
 	 *
 	 * @return Folder
-	 * @throws Exception
 	 */
-	public static function getFolder() {
+	public static function getFolder(): Folder
+	{
 		return new Folder(static::getPath());
 	}
 	
@@ -578,7 +603,8 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return string
 	 */
-	public static function getName() {
+	public static function getName(): string
+	{
 		$parts = explode("\\", static::class);
 		
 		return $parts[3];
@@ -590,7 +616,8 @@ abstract class Module extends Singleton {
 	 * @deprecated since version number
 	 * @return string
 	 */
-	public static function name() {
+	public static function name(): string
+	{
 		return self::getName();
 	}
 	
@@ -602,7 +629,8 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return string
 	 */
-	public static function getPackage() {
+	public static function getPackage(): string
+	{
 		$parts = explode("\\", static::class);		
 		return $parts[2];
 	}
@@ -612,7 +640,8 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return string
 	 */
-	public static function getTitle() {
+	public static function getTitle(): string
+	{
 		
 		$pkg = static::getPackage();
 		$name = static::getName();
@@ -631,7 +660,8 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return string
 	 */
-	public static function getDescription() {
+	public static function getDescription(): string
+	{
 		
 		$pkg = static::getPackage();
 		$name = static::getName();
@@ -649,7 +679,8 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return string
 	 */
-	public static function getIcon() {
+	public static function getIcon(): string
+	{
 		$icon = static::getFolder()->getFile('icon.png');
 		
 		if(!$icon->exists()) {
@@ -660,14 +691,15 @@ abstract class Module extends Singleton {
 	}
 
 	private $model;
-	
+
 	/**
 	 * Get the module entity model
-	 * 
-	 * @return model\Module
+	 *
+	 * @param array $props
+	 * @return ?model\Module
 	 */
-	public function getModel($props = []) {
-
+	public function getModel(array $props = []): ?model\Module
+	{
 		if(!$this->model) {
 			$this->model = model\Module::findByName($this->getPackage(), $this->getName(), null, $props);
 		}
@@ -680,8 +712,9 @@ abstract class Module extends Singleton {
 	 *
 	 * @return bool
 	 */
-	public function isInstalled() {
-		return $this->getModel() != false;
+	public function isInstalled(): bool
+	{
+		return !!$this->getModel();
 	}
 
 	/**
@@ -691,13 +724,64 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return bool
 	 */
-	public function isAvailable() {
-
-		if(!\GO\Base\ModuleCollection::isAllowed($this->getName(), $this->getPackage())) {
+	public function isAvailable(): bool
+	{
+		if(!self::isAllowed($this->getName(), $this->getPackage())) {
 			return false;
 		}
 
 		return $this->isLicensed();
+	}
+	private static $allowedModules;
+
+	/**
+	 * Check if a given module is allowed to use by the config.php value "allowed_modules".
+	 *
+	 * @param string $name
+	 * @param string|null $package
+	 * @param string|array $allowedModules If not given the current configuration file is used.
+	 * @return bool
+	 */
+	public static function isAllowed(string $name, string $package = null, $allowedModules = null): bool
+	{
+
+		if(!isset($allowedModules)) {
+			if (!isset(self::$allowedModules)) {
+				self::$allowedModules = self::normalizeAllowedModules(go()->getConfig()['allowed_modules']);
+			}
+			$allowedModules = self::$allowedModules;
+		} else {
+			$allowedModules = self::normalizeAllowedModules($allowedModules);
+		}
+
+		if (empty($allowedModules)) {
+			return true;
+		}
+
+		if(isset($package) && $package != "legacy") {
+			$name = $package . "/" . $name;
+			return in_array($name, $allowedModules) || in_array($package . "/*", $allowedModules);
+		} else{
+			return in_array($name, $allowedModules) || in_array('legacy/' . $name, $allowedModules) || in_array(  "legacy/*", $allowedModules);
+		}
+	}
+
+	/**
+	 * @param $allowedModules
+	 * @return string[]
+	 */
+	private static function normalizeAllowedModules($allowedModules) : array {
+		if( empty($allowedModules)) {
+			return [];
+		}
+
+		if(!is_array($allowedModules)) {
+			$allowedModules = explode(',', $allowedModules);
+		}
+
+		$allowedModules[] = 'core/core';
+
+		return $allowedModules;
 	}
 	
 	/**
@@ -706,9 +790,10 @@ abstract class Module extends Singleton {
 	 * A module must override this function and implement a \go\core\Settings object
 	 * to store settings.
 	 * 
-	 * @return Settings
+	 * @return Settings|null
 	 */
-	public function getSettings() {
+	public function getSettings(): ?Settings
+	{
 		return null;
 	}
 

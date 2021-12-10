@@ -9,7 +9,6 @@ namespace go\modules\community\tasks\model;
 
 use go\core\acl\model\AclInheritEntity;
 use Exception;
-use go\core\acl\model\AclItemEntity;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
@@ -179,6 +178,12 @@ class Task extends AclInheritEntity {
 	 * @var int
 	 */
 	protected $timeBooked;
+
+	/**
+	 * @var TasklistGroup[]
+	 */
+	public $group = [];
+
 
 	protected static function aclEntityClass(): string
 	{
@@ -379,7 +384,7 @@ class Task extends AclInheritEntity {
 			return false;
 		}
 
-		if($this->isModified('responsibleUserId')) {
+		if($this->isModified('responsibleUserId') && CoreAlert::$enabled) {
 
 			if (isset($this->responsibleUserId)) {
 
@@ -410,6 +415,11 @@ class Task extends AclInheritEntity {
 
 
 	private function updateAlerts($modified) {
+
+		if(!CoreAlert::$enabled)
+		{
+			return;
+		}
 
 		if(isset($modified[1])) {
 			foreach ($modified[1] as $model) {
@@ -648,6 +658,10 @@ class Task extends AclInheritEntity {
 		} else if($this->progress = Progress::NeedsAction && $comment->createdBy == $this->responsibleUserId) {
 			$this->progress = Progress::InProcess;
 			$this->save();
+		}
+
+		if(!CoreAlert::$enabled ) {
+			return;
 		}
 
 

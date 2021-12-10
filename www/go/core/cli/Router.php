@@ -6,6 +6,7 @@ use Exception;
 use go\core\Controller;
 use go\core\exception\NotFound;
 use go\core\jmap\exception\InvalidArguments;
+use ReflectionException;
 use ReflectionMethod;
 use function str_split;
 
@@ -40,8 +41,8 @@ class Router {
 	 * 
 	 * @return array 
 	 */
-	public static function parseArgs() {
-		
+	public static function parseArgs(): array
+	{
 		if(!isset(self::$args)) {
 			global $argv;
 
@@ -55,7 +56,7 @@ class Router {
 						$eqPos = strpos($arg, '=');
 						if ($eqPos === false) {
 							$key = substr($arg, 2);
-							self::$args[$key] = isset(self::$args[$key]) ? self::$args[$key] : true;
+							self::$args[$key] = self::$args[$key] ?? true;
 						} else {
 							$key = substr($arg, 2, $eqPos - 2);
 							self::$args[$key] = substr($arg, $eqPos + 1);
@@ -68,7 +69,7 @@ class Router {
 							$chars = str_split(substr($arg, 1));
 							foreach ($chars as $char) {
 								$key = $char;
-								self::$args[$key] = isset(self::$args[$key]) ? self::$args[$key] : true;
+								self::$args[$key] = self::$args[$key] ?? true;
 							}
 						}
 					} else {
@@ -81,6 +82,12 @@ class Router {
 		return self::$args;
 	}
 
+	/**
+	 * @throws InvalidArguments
+	 * @throws NotFound
+	 * @throws ReflectionException
+	 * @throws Exception
+	 */
 	public function run() {
 		$args = $this->parseArgs();
 
@@ -112,7 +119,11 @@ class Router {
 		$this->callMethod($ctrl, $method, $args);
 	}
 
-	private function getMethodParams($controller, $methodName) {	
+	/**
+	 * @throws ReflectionException
+	 */
+	private function getMethodParams($controller, $methodName): array
+	{
 
 		$method = new ReflectionMethod($controller, $methodName);
 		$rParams = $method->getParameters();
@@ -129,13 +140,16 @@ class Router {
 
 	/**
 	 * Runs controller method with URL query and route params.
-	 * 
+	 *
 	 * For an explanation about route params {@see Router::routeParams}
-	 * 
+	 *
+	 * @param Controller $controller
 	 * @param string $methodName
-	 * @params array $routerParams A merge of route and query params
+	 * @param array $requestParams A merge of route and query params
+	 * @throws InvalidArguments
+	 * @throws ReflectionException
 	 */
-	private function callMethod(Controller $controller, $methodName, array $requestParams) {
+	private function callMethod(Controller $controller, string $methodName, array $requestParams) {
 
 		//call method with all parameters from the $_REQUEST object.
 		$methodArgs = [];
@@ -144,7 +158,7 @@ class Router {
 				throw new InvalidArguments("Bad request. Missing argument '" . $paramName . "' for action method '" . get_class($controller) . "->" . $methodName . "'");
 			}
 
-			$methodArgs[] = isset($requestParams[$paramName]) ? $requestParams[$paramName] : $paramMeta['default'];
+			$methodArgs[] = $requestParams[$paramName] ?? $paramMeta['default'];
 		}
 
 		call_user_func_array([$controller, $methodName], $methodArgs);

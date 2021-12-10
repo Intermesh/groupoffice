@@ -125,12 +125,12 @@ class Authenticate {
 	 * Our web interface may require secondary authenticator like OTP. But some other protocols like DAV and ActiveSync
 	 * only require a username and password.
 	 *
-	 * @param $username
-	 * @param $password
+	 * @param string $username
+	 * @param string $password
 	 * @return false|User
 	 * @throws Exception
 	 */
-	public function passwordLogin($username, $password) {
+	public function passwordLogin(string $username, string $password) {
 
 		// When the user is local don't use
 		if(!$this->isLocalUser($username) && !strstr($username, '@') && go()->getSettings()->defaultAuthenticationDomain) {

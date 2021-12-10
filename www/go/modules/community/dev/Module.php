@@ -6,11 +6,12 @@ use go\modules\community\dev\model\DummyAuthenticator;
 
 class Module extends \go\core\Module {
 	
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV";
 	}
 
-	protected function afterInstall(model\Module $model)
+	protected function afterInstall(model\Module $model): bool
 	{
 //		DummyAuthenticator::register();
 

@@ -22,36 +22,25 @@ class Disk implements CacheInterface {
 	
 	private $cache;
 
-	public function __construct() {		
+	/**
+	 * @throws Exception
+	 */
+	public function __construct() {
 		$this->folder = App::get()->getDataFolder()->getFolder('cache2');
 		$this->folder->create();
-	}	
-	/**
-	 * Can't use framework settings because it uses the QueryBuilder which uses cache and results in infinte loop.
-	 */
-	private function getDataFolder() {
-		$sql = "SELECT value FROM core_setting s inner join core_module m on s.moduleId = m.id where m.name='core' AND m.package='community' and s.name='dataPath';";
-		$pdo = App::get()->getDbConnection()->getPDO();
-		$stmt = $pdo->query($sql);
-		return new \go\core\fs\Folder($stmt->fetch(\PDO::FETCH_COLUMN, 0));
 	}
 
 	/**
 	 * Store any value in the cache
-	 * 
+	 *
 	 * @param string $key
 	 * @param mixed $value Will be serialized
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
 	 * @param int $ttl Time to live in seconds
+	 * @throws Exception
 	 */
-	public function set($key, $value, $persist = true, $ttl = 0) {
+	public function set(string $key, $value, bool $persist = true, int $ttl = 0) {
 
-		//go()->debug("CACHE: ". $key);
-		//don't set false values because unserialize returns false on failure.
-		if ($key === false) {
-			return true;
-		}
-		
 		$key = str_replace('\\', '-', $key);
 
 		if($persist) {
@@ -62,7 +51,7 @@ class Disk implements CacheInterface {
 				$data = ['e' => time() + $ttl, "v" => $value];
 			}
 			if(!$file->putContents(serialize($data))) {
-				throw new \Exception("Could not write to cache!");
+				throw new Exception("Could not write to cache!");
 			}
 		}
 		
@@ -77,7 +66,7 @@ class Disk implements CacheInterface {
 	 * @param string $key 
 	 * @return mixed null if it doesn't exist
 	 */
-	public function get($key) {
+	public function get(string $key) {
 		
 		$key = str_replace('\\', '-', $key);
 
@@ -105,7 +94,7 @@ class Disk implements CacheInterface {
 			}
 			$this->cache[$key] = $v;
 		}
-		catch(\Exception $e) {
+		catch(Exception $e) {
 			ErrorHandler::log("Could not unserialize cache from file " . $key.' error: '. $e->getMessage());
 			$this->delete($key);
 			return null;
@@ -119,7 +108,7 @@ class Disk implements CacheInterface {
 	 * 
 	 * @param string $key 
 	 */
-	public function delete($key) {
+	public function delete(string $key) {
 		$key = File::stripInvalidChars($key, '-');
 		
 		unset($this->cache[$key]);
@@ -131,20 +120,19 @@ class Disk implements CacheInterface {
 	private $flushOnDestruct = false;
 
 	/**
-	 * Flush all values 
-	 * 
-	 * @param bool $onDestruct Delay flush until current script run ends by 
-	 * default so cached values can still be used. For example cached record 
+	 * Flush all values
+	 *
+	 * @param bool $onDestruct Delay flush until current script run ends by
+	 * default so cached values can still be used. For example cached record
 	 * relations will function until the script ends.
-	 * 
-	 * @return bool
+	 *
+	 * @throws Exception
 	 */
-	public function flush($onDestruct = true) {
-		
-//		throw new \Exception("Flush?");
+	public function flush(bool $onDestruct = true) {
+
 		if ($onDestruct) {
 			$this->flushOnDestruct = true;
-			return true;
+			return;
 		}
 		
 		go()->debug("Flushing cache");
@@ -156,8 +144,6 @@ class Disk implements CacheInterface {
 		$this->folder->chmod(0777);
 		
 		$this->flushOnDestruct = false;
-		
-		return true;
 	}
 
 	public function __destruct() {
@@ -166,7 +152,11 @@ class Disk implements CacheInterface {
 		}
 	}
 
-	public static function isSupported() {
+	/**
+	 * @throws Exception
+	 */
+	public static function isSupported(): bool
+	{
 		$folder = App::get()->getSettings()->getDataFolder();
 		
 		if(!$folder->isWritable()) {

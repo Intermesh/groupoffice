@@ -122,7 +122,8 @@ class ErrorCode {
 	 * @param int $code
 	 * @return string
 	 */
-	static function getDescription($code) {		
-		return isset(self::$descriptions[$code]) ? self::$descriptions[$code] : '';
+	static function getDescription(int $code): string
+	{
+		return self::$descriptions[$code] ?? '';
 	}
 }

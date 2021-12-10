@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 namespace go\core\model;
 
@@ -8,10 +8,14 @@ use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
 use GO\Calendar\Model\Calendar;
+use GO\Calendar\Model\Calendar;
+use GO\Calendar\Model\UserSettings as CalendarUserSettings;
 use go\core\App;
 use go\core\auth\Authenticate;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\DomainProvider;
+use go\core\auth\DomainProvider;
+use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\convert\UserSpreadsheet;
 use go\core\customfield\Date;
@@ -22,6 +26,7 @@ use go\core\exception\ConfigurationException;
 use go\core\Installer;
 use go\core\mail\Message;
 use go\core\mail\Util;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
@@ -35,10 +40,19 @@ use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\EmailAddress;
+use go\modules\community\addressbook\model\UserSettings;
 use go\modules\community\notes\model\NoteBook;
+use go\modules\community\notes\model\UserSettings as NotesUserSettings;
 use go\modules\community\tasks\model\Tasklist;
+use go\modules\community\tasks\model\UserSettings as TasksUserSettings;
 
 
+/**
+ * @property ?TasksUserSettings $tasksSettings
+ * @property ?NotesUserSettings $notesSettings
+ * @property ?UserSettings $addressBookSettings
+ * @property ?CalendarUserSettings $calendarSettings
+ */
 class User extends Entity {
 	
 	use CustomFieldsTrait;
@@ -221,7 +235,7 @@ class User extends Entity {
 	protected $theme;
 	public $firstWeekday;
 	public $sort_name;
-	
+
 	public $mute_sound;
 	public $mute_reminder_sound;
 	public $mute_new_mail_sound;
@@ -261,7 +275,7 @@ class User extends Entity {
 	}
 
 	/**
-	 *
+	 * The user password hashed
 	 * @var string
 	 */
 	protected $password;
@@ -314,7 +328,7 @@ class User extends Entity {
 		$this->getPersonalGroup()->setValues($values);
 	}
 	
-	public function setValues(array $values): User
+	public function setValues(array $values) : Model
 	{
 		$this->passwordVerified = false;
 		return parent::setValues($values);
@@ -335,7 +349,8 @@ class User extends Entity {
 	{
 		return go()->getModel()->getUserRights()->mayChangeUsers;
 	}
-	
+
+	/** @noinspection PhpCastIsUnnecessaryInspection */
 	protected function init() {
 		parent::init();
 		
@@ -384,7 +399,6 @@ class User extends Entity {
    */
 	public function checkPassword(string $password): bool
 	{
-
 		$auth = new Authenticate();
 		$success = $auth->passwordLogin($this->username, $password);
 
@@ -435,7 +449,6 @@ class User extends Entity {
    * Used by authenticators (IMAP or LDAP) so they can clear it if it's not needed.
    *
    * @return bool
-   * @throws Exception
    */
 	public function clearPassword(): bool
 	{
@@ -461,9 +474,6 @@ class User extends Entity {
 		return false;
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	private function validatePasswordChange(): bool
 	{
 		
@@ -595,9 +605,6 @@ class User extends Entity {
 		return $countActive >= go()->getConfig()['max_users'];
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	private static function count(): int
 	{
 		return (int) (new Query())
@@ -621,7 +628,10 @@ class User extends Entity {
 	{
 		return ['username', 'displayName', 'email'];
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
@@ -646,7 +656,6 @@ class User extends Entity {
    * Check if use is an admin
    *
    * @return boolean
-   * @throws Exception
    */
 	public function isAdmin(): bool
 	{
@@ -656,9 +665,6 @@ class User extends Entity {
 			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single();
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public static function isAdminById($userId): bool
 	{
 		if($userId == User::ID_SUPER_ADMIN) {
@@ -674,7 +680,6 @@ class User extends Entity {
   /**
    * Alias for making isAdmin() a public property
    * @return bool
-   * @throws Exception
    */
 	public function getIsAdmin(): bool
 	{
@@ -689,7 +694,6 @@ class User extends Entity {
 	 */
 	public function getAuthenticators(): array
 	{
-
 		$authenticators = [];
 
 		$auth = new Authenticate();
@@ -822,8 +826,6 @@ class User extends Entity {
 			throw new Exception("Failed to move home dir from " . $oldDir . "  to " .$this->homeDir);
 		}
 	}
-
-
 	
 	/**
 	 * Hash a password for users
@@ -836,13 +838,11 @@ class User extends Entity {
 		return password_hash($password, PASSWORD_DEFAULT);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function saveContact(): bool
 	{
-		
-//		if(!isset($this->contact) ){// || $this->isModified(['displayName', 'email', 'avatarId'])) {
-//			$this->contact = $this->getProfile();
-//		}
-
 		if (!isset($this->contact)) {
 			return true;
 		}
@@ -864,6 +864,7 @@ class User extends Entity {
 
 
 	/**
+	 * @throws SaveException
 	 * @throws Exception
 	 */
 	private function createPersonalGroup()
@@ -876,7 +877,7 @@ class User extends Entity {
 				$personalGroup->users[] = $this->id;
 
 				if (!$personalGroup->save()) {
-					throw new Exception("Could not create home group");
+					throw new SaveException($personalGroup);
 				}
 
 				$this->personalGroup = $personalGroup;
@@ -884,7 +885,9 @@ class User extends Entity {
 				$personalGroup = $this->getPersonalGroup();
 				if ($this->isModified('username')) {
 					$personalGroup->name = $this->username;
-					$personalGroup->save();
+					if (!$personalGroup->save()) {
+						throw new SaveException($personalGroup);
+					}
 				}
 			}
 
@@ -897,7 +900,8 @@ class User extends Entity {
 
 	public function legacyOnSave() {
 		//for old framework. Remove when all is refactored!
-		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels($this->id);			
+		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels($this->id);
+		/** @noinspection PhpUnhandledExceptionInspection */
 		$user = LegacyUser::model()->findByPk($this->id, false, true);
 		foreach($defaultModels as $model){
 			$model->getDefault($user);
@@ -916,7 +920,6 @@ class User extends Entity {
 	 */
 	public function addGroup(int $groupId): User
 	{
-		
 		if(!in_array($groupId, $this->groups)) {
 			$this->groups[] = $groupId;
 		}
@@ -928,12 +931,12 @@ class User extends Entity {
 	/**
 	 * Check if this user has a module
 	 * 
-	 * @param string $package
+	 * @param ?string $package
 	 * @param string $name
 	 * 
 	 * @return boolean
 	 */
-	public function hasModule(string $package, string $name): bool
+	public function hasModule(?string $package,string $name): bool
 	{
 		return Module::isAvailableFor($package, $name, $this->id);		
 	}
@@ -986,9 +989,11 @@ class User extends Entity {
 	}
 
 
-	public static function legacyOnDelete(Query $query) {
+	public static function legacyOnDelete(Query $query): bool
+	{
 
 			foreach($query as $id) {
+				/** @noinspection PhpUnhandledExceptionInspection */
 				$user = LegacyUser::model()->findByPk($id, false, true);
 				LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
 				//delete all acl records		
@@ -1035,12 +1040,16 @@ class User extends Entity {
 	 */
 	private $contact;
 
-	public function getProfile() {
+	/**
+	 * @throws Exception
+	 */
+	public function getProfile(): ?Contact
+	{
 		if(!Module::isInstalled('community', 'addressbook')) {
 			return null;
 		}
-		
-		$contact = Contact::findForUser($this->id);
+
+		$contact = !$this->isNew() ? Contact::findForUser($this->id) : null;
 		if(!$contact) {
 			$contact = new Contact();
 			$contact->goUserId = $this->id;
@@ -1056,6 +1065,9 @@ class User extends Entity {
 		return $contact;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function setProfile($values) {
 		if(!Module::isInstalled('community', 'addressbook')) {
 			throw new Exception("Can't set profile without address book module.");
@@ -1084,13 +1096,19 @@ class User extends Entity {
 	 *
 	 * @param Message $message
 	 */
-	public function decorateMessage(Message $message) {
+	public function decorateMessage(Message $message)
+	{
 		$message->setTo($this->email, $this->displayName);
 	}
 
 	private $country;
 
-	public function getCountry() {
+	/**
+	 * Get ISO country code by using the timezone
+	 *
+	 * @return string|null
+	 */
+	public function getCountry() : ?string {
 		if(!isset($this->country)) {
 			$tz = new DateTimeZone($this->timezone);
 			$i = $tz->getLocation();
@@ -1108,39 +1126,40 @@ class User extends Entity {
 	 * this for community items. It is not entirely certain for other objects if they should be archived.
 	 *
 	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws \GO\Base\Exception\AccessDenied
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
+	 * @todo Make this modular?
 	 */
 	private function archiveUser()
 	{
 		$aclIds = [];
 
-		if ($defAddressBookId = $this->addressBookSettings->getDefaultAddressBookId()) {
-			$addressBook = AddressBook::findById($defAddressBookId);
-			$aclIds[] = $addressBook->findAclId();
-			AddressBook::entityType()->change($addressBook);
+		if(Module::isInstalled("community", "addressbook")) {
+			if ($defAddressBookId = $this->addressBookSettings->getDefaultAddressBookId()) {
+				$addressBook = AddressBook::findById($defAddressBookId);
+				$aclIds[] = $addressBook->findAclId();
+				AddressBook::entityType()->change($addressBook);
+			}
 		}
-		if ($defNoteBookId = $this->notesSettings->getDefaultNoteBookId()) {
-			$noteBook = NoteBook::findById($defNoteBookId);
-			$aclIds[] = $noteBook->findAclId();
-			NoteBook::entityType()->change($noteBook);
+
+		if(Module::isInstalled("community", "notes")) {
+			if ($defNoteBookId = $this->notesSettings->getDefaultNoteBookId()) {
+				$noteBook = NoteBook::findById($defNoteBookId);
+				$aclIds[] = $noteBook->findAclId();
+				NoteBook::entityType()->change($noteBook);
+			}
 		}
-		if ($defTaskListId = $this->tasksSettings->getDefaultTasklistId()) {
-			$aclIds[] = Tasklist::findById($defTaskListId)->aclId;
+
+		if(Module::isInstalled("community", "tasks")) {
+			if ($defTaskListId = $this->tasksSettings->getDefaultTasklistId()) {
+				$aclIds[] = Tasklist::findById($defTaskListId)->aclId;
+			}
 		}
-		if ($calendarId = $this->calendarSettings->calendar_id) {
-			$aclIds[] = Calendar::model()->findByPk($calendarId)->findAclId();
+
+		if(Module::isInstalled("legacy", "calendar")) {
+			if ($calendarId = $this->calendarSettings->calendar_id) {
+				$aclIds[] = Calendar::model()->findByPk($calendarId)->findAclId();
+			}
 		}
+
 		$grpId = $this->getPersonalGroup()->id();
 		foreach (Acl::findByIds($aclIds) as $rec) {
 			foreach ($rec->groups as $aclGrp) {
@@ -1168,6 +1187,8 @@ class User extends Entity {
 		}
 	}
 
+	private $getAuthorizedClients;
+
 	/**
 	 * Get authorized clients with ['remoteIpAddress', 'platform', 'browser']
 	 * @return array[]
@@ -1175,32 +1196,29 @@ class User extends Entity {
 	 */
 	public function getAuthorizedClients(): array
 	{
-		$clients =
-			go()->getDbConnection()->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
-			->from(
-				go()->getDbConnection()
-				->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
-				->from('core_auth_token')
-				->where('userId', '=', $this->id)
-				->andWhere('expiresAt', '>', new DateTime())
-				->groupBy(['remoteIpAddress', 'platform', 'browser'])
-				->union(
-					go()->getDbConnection()
-						->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
-						->distinct()
-						->from('core_auth_remember_me')
-						->where('userId', '=', $this->id)
-						->andWhere('expiresAt', '>', new DateTime())
-						->groupBy(['remoteIpAddress', 'platform', 'browser'])
-				)
-			)->groupBy(['remoteIpAddress', 'platform', 'browser']);
+		if(!isset($this->getAuthorizedClients)) {
+			$this->getAuthorizedClients =
+				go()->getDbConnection()->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
+					->from(
+						go()->getDbConnection()
+							->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
+							->from('core_auth_token')
+							->where('userId', '=', $this->id)
+							->andWhere('expiresAt', '>', new DateTime())
+							->groupBy(['remoteIpAddress', 'platform', 'browser'])
+							->union(
+								go()->getDbConnection()
+									->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
+									->distinct()
+									->from('core_auth_remember_me')
+									->where('userId', '=', $this->id)
+									->andWhere('expiresAt', '>', new DateTime())
+									->groupBy(['remoteIpAddress', 'platform', 'browser'])
+							)
+					)->groupBy(['remoteIpAddress', 'platform', 'browser'])
+				->all();
 
-
-		go()->debug($clients);
-
-		$clients = $clients->all();
-
-		foreach($clients as &$client) {
+			foreach ($this->getAuthorizedClients as &$client) {
 //			try {
 //				$geo = Geolocation::locate($client['remoteIpAddress']);
 //				$client['countryCode'] = $geo['countryCode'];
@@ -1209,10 +1227,11 @@ class User extends Entity {
 //				$client['countryCode'] = null;
 //			}
 
-			$client['expiresAt'] = (DateTime::createFromFormat(Column::DATETIME_FORMAT, $client['expiresAt']));
+				$client['expiresAt'] = (DateTime::createFromFormat(Column::DATETIME_FORMAT, $client['expiresAt']));
+			}
 		}
 
-		return $clients;
+		return $this->getAuthorizedClients;
 	}
 
 	private $authorizedClients;
@@ -1246,7 +1265,4 @@ class User extends Entity {
 
 		return Token::delete($query) && RememberMe::delete($query);
 	}
-
-
-
 }

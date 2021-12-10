@@ -803,6 +803,24 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				}, this);
 			}
 
+			if(!coreMod.settings.demoDataAsked) {
+				Ext.MessageBox.confirm(t("Demo"), t("Do you want to generate some fake demonstration data?"), (btn) => {
+
+					go.Db.store("Module").save({
+						settings: {
+							demoDataAsked: true
+						}
+					}, coreMod.id);
+
+					if(btn == 'yes') {
+						Ext.getBody().mask(t("Loading..."));
+						go.Jmap.request({method: "core/System/demo"}).finally(() => {
+							Ext.getBody().unmask();
+						});
+					}
+				}, this);
+			}
+
 			// if(!coreMod.settings.licenseDenied && !coreMod.settings.license) {
 			// 	const licenseDialog = new go.license.LicenseDialog();
 			// 	licenseDialog.show();

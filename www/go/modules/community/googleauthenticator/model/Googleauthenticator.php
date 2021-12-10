@@ -3,8 +3,8 @@
 namespace go\modules\community\googleauthenticator\model;
 
 use Exception;
-use go\core\App;
 use go\core\orm\Mapping;
+use go\core\fs\File;
 use go\core\orm\Property;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR.'util'.DIRECTORY_SEPARATOR.'QRcode.php';
@@ -205,7 +205,7 @@ class Googleauthenticator extends Property {
 			return null;
 		}
 		
-		$name = empty($name) ? "qr.png" : $name;
+		$name = empty($name) ? File::stripInvalidChars(go()->getSettings()->title) : $name;
 		$secret = empty($secret)?$this->secret:$secret;
 
 		$level = QR_ECLEVEL_M;

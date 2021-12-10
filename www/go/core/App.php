@@ -11,7 +11,8 @@ use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-use go\core\event\EventEmitterTrait;
+	use go\core\db\Utils;
+	use go\core\event\EventEmitterTrait;
 use go\core\event\Listeners;
 use go\core\fs\Blob;
 use go\core\fs\Folder;
@@ -20,7 +21,8 @@ use go\core\mail\Mailer;
 use go\core\model\Module as ModuleModel;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
-use go\core\util\ArrayObject;
+	use go\core\Settings as CoreSettings;
+	use go\core\util\ArrayObject;
 use go\core\webclient\Extjs3;
 use go\core\model\User;
 use go\core\model\Settings;
@@ -28,6 +30,7 @@ use go\core\model\Settings;
 use Faker;
 
 	use InvalidArgumentException;
+	use PDOException;
 	use const GO_CONFIG_FILE;
 
 	/**
@@ -454,6 +457,20 @@ use Faker;
 			return $this->dbConnection;
 		}
 
+		public function isInstalled(): bool
+		{
+			try {
+				return parent::isInstalled();
+			} catch(PDOException $e) {
+
+				if(strpos($e->getMessage(), '[1049]') !== false) {
+					// database does not exists
+					return false;
+				}
+				throw $e;
+			}
+		}
+
 		/**
 		 *
 		 * @var Database
@@ -556,7 +573,7 @@ use Faker;
 			
 			GO::clearCache(); //legacy
 
-			go()->getCache()->flush(false);
+			go()->getCache()->flush(true, false);
 			Table::destroyInstances();
 			Property::clearCache();
 
@@ -681,9 +698,9 @@ use Faker;
 		/**
 		 * Get the application settings
 		 * 
-		 * @return Settings
+		 * @return Settings|null
 		 */
-		public function getSettings(): Settings
+		public function getSettings(): ?CoreSettings
 		{
 			return Settings::get();
 		}
@@ -849,24 +866,43 @@ use Faker;
 		 */
 		public function demo(Faker\Generator $faker) {
 
+			go()->getSettings()->passwordMinLength = 4;
 
-			for($i = 0; $i < 10; $i++) {
-				echo ".";
+			$demo = User::find()->where('username', '=', 'demo')->single();
+			if(!$demo) {
 				$user = new User();
-//				$blob = Blob::fromTmp(new File($faker->image(null, 640, 480, 'people')));
-//				$blob->save();
-//				$user->avatarId = $blob->id;
-				$user->username = $faker->username;
+				$user->username = "demo";
 				$user->displayName = $faker->name;
-				$user->email = $user->recoveryEmail = $user->username . '@' . $faker->domainName;
-				$user->setPassword($faker->password);
+				$user->email = $user->recoveryEmail = 'demo@group-office.com';
+				$user->setPassword("demo");
 
-				if(!$user->save()) {
+				if (!$user->save()) {
 					throw new SaveException($user);
 				}
 
+
 				// Generates tasklists, notebooks etc.
 				$user->toArray();
+
+
+				for ($i = 0; $i < 10; $i++) {
+					echo ".";
+					$user = new User();
+//				$blob = Blob::fromTmp(new File($faker->image(null, 640, 480, 'people')));
+//				$blob->save();
+//				$user->avatarId = $blob->id;
+					$user->username = $faker->username;
+					$user->displayName = $faker->name;
+					$user->email = $user->recoveryEmail = $user->username . '@' . $faker->domainName;
+					$user->setPassword($faker->password);
+
+					if (!$user->save()) {
+						throw new SaveException($user);
+					}
+
+					// Generates tasklists, notebooks etc.
+					$user->toArray();
+				}
 			}
 		}
 	}

@@ -13,11 +13,13 @@ use go\core\fs\Blob;
 
 class Module extends core\Module implements DomainProvider {
 
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV";
 	}
 	
-	protected function afterInstall(CoreModule $model) {
+	protected function afterInstall(CoreModule $model): bool
+	{
 		
 		if(!Authenticator::register()) {
 			return false;

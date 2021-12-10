@@ -2,8 +2,12 @@
 namespace go\core\model;
 
 use Exception;
+use GO;
+use GO\Base\Model\AbstractSettingsCollection;
+use GO\Base\Module as LegacyModule;
 use go\core;
 use go\core\db\Criteria;
+use go\core\fs\Folder;
 use go\core\jmap\Entity;
 use go\core\App;
 use go\core\orm\Filters;
@@ -52,23 +56,16 @@ class Module extends Entity {
 	{
 
 		if($this->isModified(['enabled']) || $this->isNew()) {
-
-			//set cache
-			self::$modulesByName[$this->package .'/'.$this->name] = $this;
-
 			if($this->enabled) {
 				if($this->checkDepencencies) {
 					core\Module::installDependencies($this->module());
 				}
-				self::$modulesByName[$this->package.'/'.$this->name] = $this;
 			}else
 			{
-				unset(self::$modulesByName[$this->package.'/'.$this->name]);
-
 				if ($this->checkDepencencies) {
 					$mods = core\Module::getModulesThatDependOn($this->module());
 					if (!empty($mods)) {
-						$this->setValidationError('name', ErrorCode::DEPENDENCY_NOT_SATISFIED, sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."), implode(', ', $mods)));
+						$this->setValidationError('name', ErrorCode::DEPENDENCY_NOT_SATISFIED, sprintf(GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."), implode(', ', $mods)));
 
 						return false;
 					}
@@ -134,7 +131,8 @@ class Module extends Entity {
 			->addMap('permissions', Permission::class, ['id'=>'moduleId']);
 	}
 
-	private function adminRights() {
+	private function adminRights(): object
+	{
 		$rights = ["mayRead" => true];
 		foreach($this->module()->getRights() as $name => $bit){
 			$rights[$name] = true;
@@ -147,6 +145,7 @@ class Module extends Entity {
 	 *
 	 * @param int|null $userId The user ID to query. defaults to current authorized user.
 	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
+	 * @noinspection DuplicatedCode
 	 */
 	public function getUserRights(int $userId = null) : stdClass
 	{
@@ -170,7 +169,8 @@ class Module extends Entity {
 		return $this->userRights($userId);
 	}
 
-	private function userRights($userId) {
+	private function userRights($userId): object
+	{
 		$query = go()->getDbConnection()->selectSingleValue("MAX(rights)")
 			->from("core_permission")
 			->where('moduleId', '=', $this->id)
@@ -220,23 +220,28 @@ class Module extends Entity {
 	/**
 	 * Get the module base file object
 	 * 
-	 * @return core\Module
+	 * @return core\Module|LegacyModule
 	 */
-	public function module() {
+	public function module()
+	{
 		if($this->package == "core" && $this->name == "core") {
 			return App::get();
 		}
 		
 		if(!isset($this->module)) {
 			$cls = $this->getModuleClass();
-			/** @var \go\core\Module $cls */
+			/** @var core\Module|LegacyModule $cls */
 			$this->module = $cls::get();
 		}
 		
 		return $this->module;
-	}	
-	
-	private function getModuleClass() {
+	}
+
+	/**
+	 * @return class-string<self>|class-string<LegacyModule>
+	 */
+	private function getModuleClass(): string
+	{
 		if(!isset($this->package)) {
 			//legacy module
 			return "GO\\" . $this->name ."\\" . $this->name ."Module";
@@ -247,9 +252,10 @@ class Module extends Entity {
 	/**
 	 * Get the folder of the module
 	 *
-	 * @return core\fs\Folder
+	 * @return Folder
 	 */
-	public function folder() {
+	public function folder(): Folder
+	{
 		$root = go()->getEnvironment()->getInstallFolder();
 		if(!isset($this->package)) {
 			return $root->getFolder("/modules/" . $this->name . "/");
@@ -263,7 +269,8 @@ class Module extends Entity {
 	 * 
 	 * @return bool
 	 */
-	public function isAvailable() {
+	public function isAvailable(): bool
+	{
 		
 		if(!isset($this->package)) {
 			$moduleFile = $this->folder()->getFile(ucfirst($this->name) . "Module.php");
@@ -347,7 +354,7 @@ class Module extends Entity {
 		
 		if(!$this->isNew()) {
 			if($this->package == 'core' && $this->isModified('enabled')) {
-				throw new \Exception("You can't disable core modules");		
+				throw new Exception("You can't disable core modules");
 			}
 			
 			if($this->isModified(['name', 'package'])) {
@@ -356,17 +363,13 @@ class Module extends Entity {
 		}
 		
 		
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
 	
 	protected static function internalDelete(Query $query): bool
 	{
-
 		$query->andWhere('package != "core"');
 
-		//clear cache
-		self::$modulesByName = [];
-		
 		return parent::internalDelete($query);
 	}
 	
@@ -374,7 +377,8 @@ class Module extends Entity {
 	 * Get all installed and available modules.
 	 * @return self[]
 	 */
-	public static function getInstalled($properties = []) {
+	public static function getInstalled($properties = []): array
+	{
 		$modules = Module::find($properties)->where(['enabled' => true])->all();
 		
 		$available = [];
@@ -391,7 +395,8 @@ class Module extends Entity {
 	 * @param $rights int bitwise rights
 	 * @return array permission name => true for on / false for off
 	 */
-	public function may($rights) {
+	public function may(int $rights): array
+	{
 		$module = $this->module();
 		$capabilities = $module->getRights();
 		$result = [];
@@ -406,7 +411,8 @@ class Module extends Entity {
 	/**
 	 * @return string[] static list of available rights
 	 */
-	public function getRights() {
+	public function getRights(): array
+	{
 		if(!$this->isAvailable()) {
 			return [];
 		}
@@ -419,11 +425,12 @@ class Module extends Entity {
 	 * 
 	 * @param string $package
 	 * @param string $name
-	 * @param int $userId
+	 * @param int|null $userId
 	 * @param int $level
 	 * @return boolean
 	 */
-	public static function isAvailableFor($package, $name, $userId = null, $level = Acl::LEVEL_READ) {
+	public static function isAvailableFor(string $package, string $name, int $userId = null, int $level = Acl::LEVEL_READ): bool
+	{
 
 		if($package == "legacy") {
 			$package = null;
@@ -435,17 +442,16 @@ class Module extends Entity {
 		return !!$query->single();
 	}
 
-	private static $modulesByName = [];
-	
 	/**
 	 * Find a module by package and name
-	 * 
-	 * @param string $package
+	 *
+	 * @param string|null $package Legacy modules can be found with null or "legacy"
 	 * @param string $name
-	 * @param bool $enabled Set to null for both enabled and disabled
-	 * @return self|false
+	 * @param bool|null $enabled Set to null for both enabled and disabled
+	 * @param array $props
+	 * @return ?self
 	 */
-	public static function findByName($package, $name, $enabled = true, $props = []) {
+	public static function findByName(?string $package, string $name, ?bool $enabled = true, array $props = []) : ?self {
 		$cache = $package."/". $name;
 
 		if($package == "legacy") {
@@ -463,11 +469,11 @@ class Module extends Entity {
 		}
 
 		if(!$mod) {
-			return false;
+			return null;
 		}
 
 		if(isset($enabled)) {
-			return $mod->enabled == $enabled ? $mod : false;
+			return $mod->enabled == $enabled ? $mod : null;
 		} else{
 			return $mod;
 		}
@@ -481,7 +487,8 @@ class Module extends Entity {
 	 * @param null|boolean $enabled If set, then the module's enabled flag will be matched
 	 * @return bool
 	 */
-	public static function isInstalled($package, $name, $enabled = null) {
+	public static function isInstalled(string $package, string $name, bool $enabled = null): bool
+	{
 		if($package == "legacy") {
 			$package = null;
 		}
@@ -490,15 +497,16 @@ class Module extends Entity {
 		if(isset($enabled)) {
 			$where['enabled'] = $enabled;
 		}
-		return static::find()->where($where)->selectSingleValue('id')->single() != null;
+		return !!static::find()->where($where)->selectSingleValue('id')->single();
 	}
 	
 	/**
 	 * Get module settings
 	 * 
-	 * @return Settings
+	 * @return Settings|AbstractSettingsCollection|null
 	 */
-	public function getSettings() {
+	public function getSettings()
+	{
 		if(!$this->isAvailable()) {
 			return null;
 		}

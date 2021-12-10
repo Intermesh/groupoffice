@@ -904,7 +904,10 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 						}else
 						{
 							//this will update timestamp and size of file
-							if($file->mtime != $file->fsFile->mtime()){
+
+							//todo: how can it be that $file->fsFile->exists() is needed here?
+							// it happens when the file on disk has a trailing space and the db name doesn't.
+							if($file->fsFile->exists() && $file->mtime != $file->fsFile->mtime()){
 								$file->save();
 							}
 						}

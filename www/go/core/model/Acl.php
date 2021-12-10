@@ -1,17 +1,15 @@
 <?php
 namespace go\core\model;
 
+use Exception;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\Entity;
 use go\core\jmap\Entity as JmapEntity;
-use go\core\model\Group;
-use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\DateTime;
-use go\core\validate\ErrorCode;
 use go\core\exception\Forbidden;
 
 /**
@@ -70,7 +68,7 @@ class Acl extends Entity {
 	 * @var AclGroup[] 
 	 */
 	public $groups = [];
-	
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -102,7 +100,10 @@ class Acl extends Entity {
 		
 		return $this->logChanges();		
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function logChanges() {
 		
 		if(!JmapEntity::$trackChanges) {
@@ -161,20 +162,21 @@ class Acl extends Entity {
 		
 		return true;		
 	}
-	
+
 	/**
 	 * Add a group to the ACL
-	 * 
+	 *
+	 * @param int $groupId
+	 * @param int $level
+	 * @return $this
+	 *
 	 * @example
 	 * ```
 	 * $acl->addGroup(Group::ID_INTERNAL)->save();
 	 * ```
-	 * 
-	 * @param int $groupId
-	 * @param int $level
-	 * @return $this
 	 */
-	public function addGroup($groupId, $level = self::LEVEL_READ) {
+	public function addGroup($groupId, $level = self::LEVEL_READ): Acl
+	{
 
 		if(empty($level)) {
 			return $this->removeGroup($groupId);

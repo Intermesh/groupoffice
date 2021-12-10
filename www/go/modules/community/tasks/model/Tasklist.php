@@ -7,6 +7,7 @@
 
 namespace go\modules\community\tasks\model;
 
+use Exception;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\model\Acl;
@@ -131,10 +132,10 @@ class Tasklist extends AclOwnerEntity
 	 * Create a task list for a project and return its id
 	 *
 	 * @param int $projectId
-	 * @return int
-	 * @throws \Exception
+	 * @return Tasklist
+	 * @throws Exception
 	 */
-	public static function createForProject(int $projectId) :int
+	public static function createForProject(int $projectId) :Tasklist
 	{
 		$project = ProjectEntity::findById($projectId, ['id', 'name', 'acl_id']);
 
@@ -147,7 +148,7 @@ class Tasklist extends AclOwnerEntity
 			'projectId' => $projectId
 		]);
 		$tasklist->save();
-		return $tasklist->id;
+		return $tasklist;
 
 	}
 }

@@ -15,12 +15,13 @@ class Module extends core\Module
 
 	public static $enabled = true;
 
-	public function autoInstall()
+	public function autoInstall(): bool
 	{
 		return true;
 	}
 
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
@@ -193,9 +194,9 @@ class Module extends core\Module
 	}
 
 	/**
-	 * @return core\Settings|Settings
+	 * @return Settings|null
 	 */
-	public function getSettings()
+	public function getSettings(): ?\go\core\Settings
 	{
 		return Settings::get();
 	}

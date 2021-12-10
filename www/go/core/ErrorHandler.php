@@ -51,7 +51,7 @@ class ErrorHandler {
 	 *
 	 * @param Throwable $e
 	 * @param string|null $context Extra information about where the exception occurred
-	 * @return string The string that was logged
+	 * @return string The string that was logged. This contains sensitive information like the server path so use only for debugging!
 	 */
 	public static function logException(Throwable $e, string $context = null): string
 	{

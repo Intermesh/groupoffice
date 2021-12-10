@@ -6,21 +6,21 @@ use go\core\data\ArrayableInterface;
 /**
  * URL Object
  * 
- * Used to contruct URL's
+ * Used to construct URL's
  */
-class Url implements ArrayableInterface{
+class Url implements ArrayableInterface {
 	
 	private $location;
 	
 	private $params;
 	
 	/**
-	 * Create an URL object
+	 * Create a URL object
 	 * 
 	 * @param string $location eg. http://localhost/ or /relative
 	 * @param array $params
 	 */
-	public function __construct($location, array $params = []) {
+	public function __construct(string $location, array $params = []) {
 		$this->location = $location;
 		$this->params = $params;
 	}
@@ -31,7 +31,7 @@ class Url implements ArrayableInterface{
 	 * @param string $name
 	 * @param string $value
 	 */
-	public function addParam($name, $value) {
+	public function addParam(string $name, string $value) {
 		$this->params[$name] = $value;
 	}
 	
@@ -40,7 +40,7 @@ class Url implements ArrayableInterface{
 	 * 
 	 * @param string $name
 	 */
-	public function removeParam($name) {
+	public function removeParam(string $name) {
 		unset($this->params[$name]);
 	}
 	
@@ -70,9 +70,10 @@ class Url implements ArrayableInterface{
 	 * Parse URL with params into URL object
 	 * 
 	 * @param string $url
-	 * @return \self
+	 * @return self
 	 */
-	public static function parse($url) {
+	public static function parse($url): Url
+	{
 		
 		$pos = strpos($url, '?');
 		if(!$pos) {

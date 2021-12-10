@@ -4,6 +4,9 @@ namespace go\core;
 
 use Exception;
 use GO;
+use GO\Base\Exception\AccessDenied;
+use GO\Base\Mail\Message;
+use GO\Base\Model\Template;
 use go\core\auth\Password;
 use go\core\auth\TemporaryState;
 use go\core\cache\None;
@@ -19,6 +22,7 @@ use go\core\model\User;
 use go\core\orm\Entity;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
+use PDO;
 use PDOException;
 use go\core\model\Module as GoCoreModule;
 use GO\Base\Db\ActiveRecord;
@@ -41,7 +45,8 @@ class Installer {
 	 * 
 	 * @return bool
 	 */
-	public static function isInProgress() {
+	public static function isInProgress(): bool
+	{
 		return static::isUpgrading() || static::isInstalling();
 	}
 
@@ -50,7 +55,8 @@ class Installer {
 	 * 
 	 * @return bool
 	 */
-	public static function isInstalling() {
+	public static function isInstalling(): bool
+	{
 		return self::$isInstalling || (basename(dirname($_SERVER['PHP_SELF'])) == 'install' && basename($_SERVER['PHP_SELF']) != 'upgrade.php');
 	}
 
@@ -59,19 +65,27 @@ class Installer {
 	 * 
 	 * @return bool
 	 */
-	public static function isUpgrading() {
+	public static function isUpgrading(): bool
+	{
 		return self::$isUpgrading || basename($_SERVER['PHP_SELF']) == 'upgrade.php';
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function enableGarbageCollection() {
 		$job = model\CronJobSchedule::findByName("GarbageCollection", "core", "core");
 		if(!$job) {
-			$job = $this->createGarbageCollection();
+			$this->createGarbageCollection();
 		}
 
 	}
 
-	private function createGarbageCollection() {
+	/**
+	 * @throws Exception
+	 */
+	private function createGarbageCollection(): model\CronJobSchedule
+	{
 
 		$module = model\Module::findByName("core", "core");
 
@@ -91,16 +105,16 @@ class Installer {
 	/**
 	 * 
 	 * @param array $adminValues
-	 * @param Module[] $installModules
+	 * @param Module[]|null $installModules
 	 * @throws Exception
 	 */
-	public function install(array $adminValues = [], $installModules = null) {
+	public function install(array $adminValues = [], array $installModules = null) {
 
 		ini_set("max_execution_time", 0);
 		
 
 		//don't cache on install
-		App::get()->getCache()->flush(false);
+		App::get()->getCache()->flush(true, false);
 		$cacheCls = get_class(App::get()->getCache());
 		App::get()->setCache(new None());
 
@@ -163,13 +177,15 @@ class Installer {
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
 		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+		self::$isInstalling = false;
 	}
 
 	/**
-	 * @return \go\core\Module[]
+	 * @return Module[]
 	 */
-	private function getAutoInstallModules() {
-		$availableModules = \go\core\Module::findAvailable();
+	private function getAutoInstallModules(): array
+	{
+		$availableModules = Module::findAvailable();
 		$installModules = [];
 		foreach($availableModules as $modCls) {
 			$mod = $modCls::get();
@@ -180,8 +196,14 @@ class Installer {
 
 		return $installModules;
 	}
-	
-	
+
+
+	/**
+	 * @throws orm\exception\SaveException
+	 * @throws Exception
+	 * @throws Exception
+	 * @throws Exception
+	 */
 	private function registerCoreEntities() {
 		$classFinder = new ClassFinder(false);
 		$classFinder->addNamespace("go\\core");
@@ -190,7 +212,7 @@ class Installer {
 
 		foreach ($entities as $entity) {
 			if (!$entity::entityType()) {
-				return false;
+				return;
 			}
 		}
 
@@ -201,7 +223,10 @@ class Installer {
 		//groups readble to everyone
 		Group::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function installCoreModule() {
 
 		$module = new model\Module();
@@ -213,18 +238,22 @@ class Installer {
 		$module->permissions[Group::ID_EVERYONE] = (new model\Permission($module))
 			->setRights(['mayRead' => true]);
 		if(!$module->save()) {
-			throw new \Exception("Could not save core module: " . var_export($module->getValidationErrors(), true));
+			throw new Exception("Could not save core module: " . var_export($module->getValidationErrors(), true));
 		}
 
 
 		$this->createGarbageCollection();
 
 		if(!Password::register()) {
-			throw new \Exception("Failed to register Password authenticator");
+			throw new Exception("Failed to register Password authenticator");
 		}
 	}
-	
-	private function installAdminUser($adminValues) {
+
+	/**
+	 * @throws Exception
+	 */
+	private function installAdminUser($adminValues): User
+	{
 		$admin = new User();
 		$admin->displayName = "System administrator";
 		$admin->username = "admin";
@@ -245,7 +274,10 @@ class Installer {
 
 		return $admin;
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function installGroups() {
 		$id = 1;
 		foreach (["Admins", "Everyone", "Internal"] as $groupName) {
@@ -258,47 +290,55 @@ class Installer {
 			}
 		}
 	}
-	
+
+	/**
+	 * @throws AccessDenied
+	 */
 	private function installEmailTemplate() {
-		$message = new \GO\Base\Mail\Message();
+		$message = new Message();
 		$message->setHtmlAlternateBody('Hi<gotpl if="contact:firstName"> {contact:firstName},</gotpl><br />
 <br />
 {body}<br />
 <br />
-'.\go()->t("Best regards").'<br />
+'. go()->t("Best regards").'<br />
 <br />
 <br />
 {user:displayName}<br />');
 		
-		$template = new \GO\Base\Model\Template();
+		$template = new Template();
 		$template->setAttributes(array(
 			'content' => $message->toString(),
 			'name' => go()->t("Default"),
-			'type' => \GO\Base\Model\Template::TYPE_EMAIL,
+			'type' => Template::TYPE_EMAIL,
 			'user_id' => 1
 		));
 		$template->save(true);
-		$template->acl->addGroup(\GO::config()->group_internal);
+		/** @noinspection PhpUndefinedFieldInspection */
+		$template->acl->addGroup(GO::config()->group_internal);
 	}
 
 
+	/**
+	 * @throws Exception
+	 */
 	public function isValidDb() {
 		if (!go()->getDatabase()->hasTable("core_module")) {
-			throw new \Exception("This is not a Group-Office 6.3+ database. Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
+			throw new Exception("This is not a Group-Office 6.3+ database. Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
 		}
 
 		if (version_compare(go()->getSettings()->databaseVersion, self::MIN_UPGRADABLE_VERSION) === -1) {
-			throw new \Exception("Your version is " . go()->getSettings()->databaseVersion . ". Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
+			throw new Exception("Your version is " . go()->getSettings()->databaseVersion . ". Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
 		}
 
-		$clientVersion = go()->getDbConnection()->getPDO()->getAttribute(\PDO::ATTR_CLIENT_VERSION);
+		$clientVersion = go()->getDbConnection()->getPDO()->getAttribute(PDO::ATTR_CLIENT_VERSION);
 		if (strpos($clientVersion, 'mysqlnd') === false) {
-			throw new \Exception("PDO is not using the mysqlnd driver. Please make sure PDO uses mysqlnd. It's now using: " . $clientVersion);
+			throw new Exception("PDO is not using the mysqlnd driver. Please make sure PDO uses mysqlnd. It's now using: " . $clientVersion);
 
 		}
 	}
 
-	public function getUnavailableModules() {
+	public function getUnavailableModules(): array
+	{
 		$modules = (new Query)
 						->select('name, package')
 						->from('core_module')
@@ -316,25 +356,13 @@ class Installer {
 
 			if (isset($module['package']) && $module['package'] != 'legacy') {
 				$moduleCls = "go\\modules\\" . $module['package'] . "\\" . $module['name'] . "\\Module";
-
-				if (!class_exists($moduleCls)) {
-					$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
-					continue;
-				}
-
 			} else
 			{
-
 				$moduleCls = "GO\\" . ucfirst($module['name']) . "\\" . ucfirst($module['name']) . "Module";
-
-				// if (is_dir(__DIR__ . '/../go/modules/core/' . $module['name']) || is_dir(__DIR__ . '/../go/modules/community/' . $module['name'])) {
-				// 	continue;
-				// }
-
-				if (!class_exists($moduleCls)) {
-					$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
-					continue;
-				}			
+			}
+			if (!class_exists($moduleCls)) {
+				$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
+				continue;
 			}
 
 			$mod = $moduleCls::get();
@@ -354,7 +382,8 @@ class Installer {
 	 * @return bool true if modules were disabled
 	 * @throws Exception
 	 */
-	public function disableUnavailableModules() {
+	public function disableUnavailableModules(): bool
+	{
 
 		$unavailable = $this->getUnavailableModules();
 		if(count($unavailable)) {
@@ -372,6 +401,9 @@ class Installer {
 		return false;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function initLogFile() {
 		$logDir = go()->getDataFolder()->getFolder('log/upgrade/')->create();
 
@@ -379,7 +411,7 @@ class Installer {
 		static::$logFile = $logDir->getFile(date('Ymd_His') . '.log');
 
 		if(!static::$logFile->isWritable()){
-			throw new \Exception('Fatal error: Could not write to log file');
+			throw new Exception('Fatal error: Could not write to log file');
 		}
 
 		echo "Upgrade output will be logged into: " . static::$logFile->getRelativePath(go()->getDataFolder()) ."\n\n";
@@ -398,17 +430,20 @@ class Installer {
 		return $buffer;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function upgrade() {
 		self::$isUpgrading = true;
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));
-		\GO::session()->runAsRoot();
+		GO::session()->runAsRoot();
 		GO::$ignoreAclPermissions = true;
 		
 
 		$this->isValidDb();
-		go()->getCache()->flush(false);
-		\GO::clearCache(); //legacy framework
+		go()->getCache()->flush(true, false);
+		GO::clearCache(); //legacy framework
 		go()->setCache(new None());
 		
 //		$unavailable = go()->getInstaller()->getUnavailableModules();
@@ -420,7 +455,7 @@ class Installer {
 
 		$lock = new Lock("upgrade");
 		if (!$lock->lock()) {
-			throw new \Exception("Upgrade is already in progress");
+			throw new Exception("Upgrade is already in progress");
 		}
 
 		$this->initLogFile();
@@ -491,6 +526,8 @@ class Installer {
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
 
+		self::$isUpgrading = false;
+
 		$this->enableGarbageCollection();
 		echo "Done!\n";
 
@@ -560,6 +597,9 @@ class Installer {
 		return $file;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function upgradeModules() {
 		$u = [];
 
@@ -601,7 +641,7 @@ class Installer {
 
 		$aModuleWasUpgradedToNewBackend = false;		
 		
-		foreach ($u as $timestamp => $updateQuerySet) {
+		foreach ($u as $updateQuerySet) {
 
 			foreach ($updateQuerySet as $moduleId => $queries) {
 
@@ -628,7 +668,7 @@ class Installer {
 						
 						//upgrades may have modified tables so rebuild model and table cache
 						Table::destroyInstances();
-						go()->getCache()->flush(false);
+						go()->getCache()->flush(true, false);
 										
 						echo $modStr . "Running callable function\n";
 						call_user_func($query);
@@ -636,7 +676,7 @@ class Installer {
 						
 						//upgrades may have modified tables so rebuild model and table cache
 						Table::destroyInstances();
-						go()->getCache()->flush(false);
+						go()->getCache()->flush(true, false);
 						
 						$root = go()->getEnvironment()->getInstallFolder();
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));
@@ -711,7 +751,7 @@ class Installer {
 					//exit();
 
 					if (!$module->save()) {
-						throw new \Exception("Failed to save module");
+						throw new Exception("Failed to save module");
 					}
 					if($aModuleWasUpgradedToNewBackend) {
 						return false;
@@ -723,10 +763,10 @@ class Installer {
 		return true;//!$aModuleWasUpgradedToNewBackend;
 	}
 
-	private function setDefaultCollation() {
-		$sql = "ALTER DATABASE `".go()->getConfig()['db_name']."` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
-		go()->getDbConnection()->exec($sql);
-	}
+//	private function setDefaultCollation() {
+//		$sql = "ALTER DATABASE `".go()->getConfig()['db_name']."` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+//		go()->getDbConnection()->exec($sql);
+//	}
 
 	public static function fixCollations() {
 		go()->getDbConnection()->exec("SET foreign_key_checks = 0");

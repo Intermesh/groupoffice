@@ -2,8 +2,8 @@
 
 namespace go\core\orm;
 
-use Exception;
 use go\core\db\Table;
+use InvalidArgumentException;
 
 /**
  * Relation class
@@ -16,6 +16,13 @@ class Relation {
 	const TYPE_ARRAY = 1;
 	const TYPE_MAP = 2;
 	const TYPE_SCALAR = 3;
+
+
+	/**
+	 * @see Mapping::$dynamic;
+	 * @var bool
+	 */
+	public $dynamic = false;
 
 
 	/**
@@ -85,22 +92,21 @@ class Relation {
 
   /**
    * Set the entity name.
-   * @param $propertyName
-   * @return $this
-   * @throws Exception
-   *@todo rename to propertyName. This must actually be a Property class.
    *
+   * @param class-string<Property> $propertyName
+   * @return $this
    */
-	public function setPropertyName($propertyName) {
+	public function setPropertyName(string $propertyName): Relation
+	{
 		if(!class_exists($propertyName)) {
-			throw new Exception($propertyName . ' class not found');
+			throw new InvalidArgumentException($propertyName . ' class not found');
 		}
 		if(!is_subclass_of($propertyName, Property::class, true)) {
-			throw new Exception($propertyName . ' must extend '. Property::class);
+			throw new InvalidArgumentException($propertyName . ' must extend '. Property::class);
 		}
 		
 		if(is_subclass_of($propertyName, Entity::class, true)) {
-			throw new Exception($propertyName . ' may not be an '. Entity::class .'. Only '. Property::class .' objects can be mapped.');
+			throw new InvalidArgumentException($propertyName . ' may not be an '. Entity::class .'. Only '. Property::class .' objects can be mapped.');
 		}
 		
 		$this->propertyName = $propertyName;

@@ -2,6 +2,7 @@
 
 namespace go\core\model;
 
+use Exception;
 use Faker\Generator;
 use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclItemEntity;
@@ -11,6 +12,7 @@ use go\core\orm\exception\SaveException;
 use go\core\db\Query as DbQuery;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\db\Table;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -118,7 +120,7 @@ class Link extends AclItemEntity
 	 * Find the entity it links to
 	 *
 	 * @return \go\core\orm\Entity|ActiveRecord
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function findToEntity() {
 		$e = EntityType::findByName($this->toEntity);
@@ -135,7 +137,7 @@ class Link extends AclItemEntity
 	 * Find the entity it links from
 	 *
 	 * @return \go\core\orm\Entity|ActiveRecord
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function findFromEntity() {
 		$e = EntityType::findByName($this->fromEntity);
@@ -210,11 +212,12 @@ class Link extends AclItemEntity
 
 	/**
 	 * Create a link between two entities
-	 * 
+	 *
 	 * @param Entity|ActiveRecord $a
 	 * @param Entity|ActiveRecord $b
 	 * @param string $description
 	 * @return Link
+	 * @throws Exception
 	 */
 	public static function create($a, $b, $description = null, $checkExisting = true) {
 		
@@ -234,7 +237,7 @@ class Link extends AclItemEntity
 		$link->aclId = $a->findAclId();
 		
 		if(!$link->save()) {
-			throw new \Exception("Couldn't create link: ". var_export($link->getValidationErrors(), true));
+			throw new SaveException($link);
 		}
 		
 		return $link;
@@ -338,7 +341,14 @@ class Link extends AclItemEntity
 			$this->setValidationError("description", ErrorCode::INVALID_INPUT, "Description field too long");
 		}
 	}
-	
+
+	protected function insertTableRecord(Table $table, array $record) {
+		$stmt = go()->getDbConnection()->insertIgnore($table->getName(), $record);
+		if (!$stmt->execute()) {
+			throw new Exception("Could not execute insert query");
+		}
+	}
+
 	protected function internalSave(): bool
 	{
 		if(!parent::internalSave()) {
@@ -410,7 +420,7 @@ class Link extends AclItemEntity
 		if($this->isNew() && empty($this->aclId)) {
 			$e = $this->findToEntity();
 			if(!$e) {
-				throw new \Exception("Could not find to entity in link");
+				throw new Exception("Could not find to entity in link");
 			}
 			$this->aclId = $e->findAclId();
 		}
@@ -442,7 +452,7 @@ class Link extends AclItemEntity
 
 							$e = EntityType::findByName($value);
 							if(!$e) {
-								throw new \Exception("Entity type " . $value .' not found');
+								throw new Exception("Entity type " . $value .' not found');
 							}
 
 							$criteria->where(['l.fromEntityTypeId' => $e->getId()]);
@@ -458,7 +468,7 @@ class Link extends AclItemEntity
 							foreach($value as $e) {
 								$et = EntityType::findByName($e['name']);
 								if(!$et) {
-									throw new \Exception("Entity type " . $e['name'] .' not found');
+									throw new Exception("Entity type " . $e['name'] .' not found');
 								}
 								$w = ['l.toEntityTypeId' => $et->getId()];
 								if(isset($e['filter'])) {
@@ -524,7 +534,7 @@ class Link extends AclItemEntity
 					throw new SaveException($copy);
 				}
 			}
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			go()->getDbConnection()->rollBack();
 			throw $e;
 		}
@@ -533,12 +543,18 @@ class Link extends AclItemEntity
 	}
 
 
+	/**
+	 * @param Generator $faker
+	 * @param Entity|ActiveRecord $model
+	 * @return void
+	 * @throws Exception
+	 */
 	public static function demo(Generator $faker, $model) {
 		$searchCount = go()->getDbConnection()->selectSingleValue('count(*)')
 			->from('core_search')->single();
 
 		$offset = $faker->numberBetween(0, $searchCount);
-		$limit = min($searchCount - $offset, 4);
+		$limit = min($searchCount - $offset, 2);
 
 		$search = Search::find()->limit($limit)->offset($offset);
 

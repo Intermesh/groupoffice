@@ -215,11 +215,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 		this.panels.push(this.panels.splice(sharePanelIndex, 1)[0]);
 
 	},
-	
+
 	createTabPanel : function(items) {
 
 		this.movePermissionsPanelToEnd();
-		
+
 		if(items.length) {
 			this.panels.unshift(this.mainPanel = new Ext.Panel({
 				title: t("General"),

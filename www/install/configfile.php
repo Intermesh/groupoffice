@@ -18,7 +18,7 @@ function dbConnect($config){
 		return $pdo;
 	}
 	try{		
-		$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port'] . ';dbname=' . $config['db_name'];
+		$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
 		$pdo = new PDO($dsn, $config['db_user'], $config['db_pass']);
 	}
 	catch(Exception $e){

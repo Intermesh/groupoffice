@@ -16,6 +16,21 @@ class QueryTest extends TestCase {
 		$this->assertEquals(true, $success);
 	}
 
+
+	public function testSingle() {
+		$result = go()->getDbConnection()->select('*')->from('test_a')->where('false')->single();
+
+		$this->assertEquals(null, $result);
+
+	}
+
+	public function testAll() {
+		$result = go()->getDbConnection()->select('*')->from('test_a')->where('false')->all();
+
+		$this->assertEquals([], $result);
+
+	}
+
 	public function testInsert() {
 
 		$data = [
@@ -65,9 +80,8 @@ class QueryTest extends TestCase {
 						->offset(0)
 						->orderBy(['id' => 'ASC']);
 
-		$stmt = $query->execute();
 
-		$record = $stmt->fetch();
+		$record = $query->single();
 
 		//Query should return typed data because of PDO::ATTR_EMULATE_PREPARES
 		$this->assertInternalType("int", $record['id']);
@@ -79,9 +93,7 @@ class QueryTest extends TestCase {
 						->from('test_a')
 						->where(['id' => 1]);
 
-		$stmt = $query->execute();
-
-		$record = $stmt->fetch();
+		$record = $query->single();
 
 		$this->assertEquals(1, $record['id']);
 
@@ -90,9 +102,7 @@ class QueryTest extends TestCase {
 										->from('test_a')
 										->where('id = :id')->bind(':id', 1);
 
-		$stmt = $query->execute();
-
-		$record = $stmt->fetch();
+		$record = $query->single();
 
 		$this->assertEquals(1, $record['id']);
 	}
@@ -104,9 +114,7 @@ class QueryTest extends TestCase {
 						->join("test_b", "b", "a.id = b.id")
 						->where('id', '=', 1);
 
-		$stmt = $query->execute();
-
-		$record = $stmt->fetch();
+		$record = $query->single();
 
 		$this->assertEquals("string 2", $record['propB']);
 	}
@@ -122,13 +130,9 @@ class QueryTest extends TestCase {
 										->from("test_b", 'sub_b')
 						);
 
-		$stmt = $query->execute();
-
-		$record = $stmt->fetch();
+		$record = $query->single();
 
 		$this->assertEquals("string 2", $record['propB']);
-
-
 
 
 		$query = (new Query())
@@ -142,9 +146,7 @@ class QueryTest extends TestCase {
 						)
 						->where('id', '=', 1);
 
-		$stmt = $query->execute();
-
-		$record = $stmt->fetch();
+		$record = $query->single();
 
 		$this->assertEquals("string 2", $record['propB']);
 
@@ -159,9 +161,7 @@ class QueryTest extends TestCase {
 							->where("sub_b.id = a.id")
 		);
 
-		$stmt = $query->execute();
-
-		$record = $stmt->fetch();
+		$record = $query->single();
 
 		$this->assertEquals("string 3", $record['propA']);
 	}
@@ -177,9 +177,7 @@ class QueryTest extends TestCase {
 										->andWhere("id", '>', 1)
 										);
 
-		$stmt = $query->execute();
-
-		$record = $stmt->fetch();
+		$record = $query->single();
 
 		$this->assertEquals(1, $record['id']);
 	}

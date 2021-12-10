@@ -133,4 +133,7 @@ return array (
   'Date of birth' => 'Geburtstag',
   'Show more...' => 'Mehr…',
   'Importing...' => 'Importiere…',
+  'Allow new' => 'Neu erlauben',
+  'Are you sure that you would like to import this VCard?' => 'Sind Sie sicher, dass Sie diese VCard importieren möchten?',
+  'Importing...' => 'Importiere?',
 );
