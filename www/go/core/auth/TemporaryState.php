@@ -2,7 +2,6 @@
 namespace go\core\auth;
 
 use go\core\auth\State as AbstractState;
-use go\core\jmap\Request;
 use go\core\model\User;
 
 /**
@@ -14,7 +13,7 @@ use go\core\model\User;
  */
 class TemporaryState extends AbstractState {
 
-	public function __construct($userId = null)
+	public function __construct(int $userId = null)
 	{
 		if(isset($userId)) {
 			$this->setUserId($userId);
@@ -24,7 +23,7 @@ class TemporaryState extends AbstractState {
 	private $user;
 	private $userId;	
 	
-	public function getUser(array $properties = []): ?\go\core\model\User
+	public function getUser(array $properties = []): ?User
 	{
 		if(!empty($properties)) {
 			return $this->user ?? $this->userId ? User::findById($this->userId, $properties) : null;
@@ -46,19 +45,14 @@ class TemporaryState extends AbstractState {
 		return $this->userId;
 	}
 	
-	public function setUserId($userId) {
+	public function setUserId(?int $userId): TemporaryState
+	{
 		$this->userId = $userId;
-
-		if(!isset(\GO::session()->values['user_id']) || \GO::session()->values['user_id'] != $userId) {
-			\GO::session()->runAs($userId);
-			//runas in old framework changes to user timezone.
-			date_default_timezone_set("UTC");
-		}
-
 		return $this;
 	}
 
-	public function setUser(User $user) {
+	public function setUser(User $user): TemporaryState
+	{
 		$this->user = $user;
 		return $this->setUserId($user->id);
 	}

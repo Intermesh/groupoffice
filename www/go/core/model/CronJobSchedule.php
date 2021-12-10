@@ -198,7 +198,6 @@ class CronJobSchedule extends Entity {
 	 * @param string $package
 	 * @param string $module
 	 * @return CronJobSchedule|false
-	 * @throws Exception
 	 */
 	public static function findByName($name, $package = "core", $module = "core") {
 		$module = \go\core\model\Module::findByName($package, $module);
