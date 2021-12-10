@@ -41,7 +41,7 @@ class Migrate63to64 {
 	public function run() {
 		
 		//clear cache for ClassFinder fail in custom field type somehow.
-		go()->getCache()->flush();
+		go()->getCache()->flush(true);
 		Table::destroyInstances();
 
 		Entity::$checkFilesFolder = false;

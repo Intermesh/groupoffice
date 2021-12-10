@@ -114,7 +114,7 @@ class Installer {
 		
 
 		//don't cache on install
-		App::get()->getCache()->flush(false);
+		App::get()->getCache()->flush(true, false);
 		$cacheCls = get_class(App::get()->getCache());
 		App::get()->setCache(new None());
 
@@ -442,7 +442,7 @@ class Installer {
 		
 
 		$this->isValidDb();
-		go()->getCache()->flush(false);
+		go()->getCache()->flush(true, false);
 		GO::clearCache(); //legacy framework
 		go()->setCache(new None());
 		
@@ -668,7 +668,7 @@ class Installer {
 						
 						//upgrades may have modified tables so rebuild model and table cache
 						Table::destroyInstances();
-						go()->getCache()->flush(false);
+						go()->getCache()->flush(true, false);
 										
 						echo $modStr . "Running callable function\n";
 						call_user_func($query);
@@ -676,7 +676,7 @@ class Installer {
 						
 						//upgrades may have modified tables so rebuild model and table cache
 						Table::destroyInstances();
-						go()->getCache()->flush(false);
+						go()->getCache()->flush(true, false);
 						
 						$root = go()->getEnvironment()->getInstallFolder();
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));

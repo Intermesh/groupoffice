@@ -573,7 +573,7 @@ use Faker;
 			
 			GO::clearCache(); //legacy
 
-			go()->getCache()->flush(false);
+			go()->getCache()->flush(true, false);
 			Table::destroyInstances();
 			Property::clearCache();
 

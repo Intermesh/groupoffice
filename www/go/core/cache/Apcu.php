@@ -1,6 +1,9 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
+
 namespace go\core\cache;
 
+
+use Exception;
 
 /**
  * Cache implementation that uses serialized objects in files on disk.
@@ -26,7 +29,8 @@ class Apcu implements CacheInterface {
 	/**
 	 * @return Disk
 	 */
-	private function getDiskCache() {
+	private function getDiskCache(): Disk
+	{
 		if(!isset($this->disk)) {
 			$this->disk = new Disk();
 		}
@@ -36,23 +40,19 @@ class Apcu implements CacheInterface {
 
 	/**
 	 * Store any value in the cache
-	 * 
+	 *
 	 * @param string $key
 	 * @param mixed $value Will be serialized
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
 	 * @param int $ttl Time to live in seconds
+	 * @return void
+	 * @throws Exception
 	 */
-	public function set($key, $value, $persist = true, $ttl = 0) {
+	public function set(string $key, $value, bool $persist = true, int $ttl = 0) {
 
 		if(PHP_SAPI === 'cli') {
-			return $this->getDiskCache()->set($key, $value, $persist, $ttl);
+			$this->getDiskCache()->set($key, $value, $persist, $ttl);
 		}
-
-		//don't set false values because unserialize returns false on failure.
-		if ($key === false) {
-			return true;
-		}
-
 
 		if($persist) {
 			apcu_store($this->prefix . '-' .$key, $value, $ttl);
@@ -69,7 +69,7 @@ class Apcu implements CacheInterface {
 	 * @param string $key 
 	 * @return mixed null if it doesn't exist
 	 */
-	public function get($key) {
+	public function get(string $key) {
 
 		if(PHP_SAPI === 'cli') {
 			return $this->getDiskCache()->get($key);
@@ -95,10 +95,10 @@ class Apcu implements CacheInterface {
 	 * 
 	 * @param string $key 
 	 */
-	public function delete($key) {
+	public function delete(string $key) {
 		
 		if(PHP_SAPI === 'cli') {
-			return $this->getDiskCache()->delete($key);
+			$this->getDiskCache()->delete($key);
 		}
 
 		unset($this->cache[$key]);
@@ -108,38 +108,40 @@ class Apcu implements CacheInterface {
 	private $flushOnDestruct = false;
 
 	/**
-	 * Flush all values 
-	 * 
-	 * @param bool $onDestruct Delay flush until current script run ends by 
-	 * default so cached values can still be used. For example cached record 
+	 * Flush all values
+	 *
+	 * @param bool $onDestruct Delay flush until current script run ends by
+	 * default so cached values can still be used. For example cached record
 	 * relations will function until the script ends.
-	 * 
-	 * @return bool
+	 *
+	 * @throws Exception
 	 */
-	public function flush($onDestruct = true) {
-		
-//		throw new \Exception("Flush?");
+	public function flush(bool $onDestruct = true) {
+
 		if ($onDestruct) {
 			
 			$this->getDiskCache()->flush(true);
 
 			$this->flushOnDestruct = true;
-			return true;
+			return;
 		}
 		$this->cache = [];
-//	var_dump(apcu_cache_info());
-		apcu_clear_cache();		
+		apcu_clear_cache();
 
 		$this->getDiskCache()->flush(false);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function __destruct() {
 		if ($this->flushOnDestruct) {
 			$this->flush(false);
 		}
 	}
 
-	public static function isSupported() {
+	public static function isSupported(): bool
+	{
 		return extension_loaded('apcu');
 	}
 }
