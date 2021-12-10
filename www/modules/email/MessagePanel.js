@@ -150,11 +150,11 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<tpl if="iCalendar.invitation">'+
 
 					'<tpl if="!GO.util.empty(iCalendar.invitation.is_processed)">'+
-						'<a id="em-icalendar-open-'+this.bodyId+'" class="go-model-icon-GO_Calendar_Model_Event normal-link" style="padding-left:20px;background-repeat:no-repeat;" class="go-model-icon-GO\\Calendar\\Model\\Event message-icalendar-icon">'+t("This message contains an appointment invitation that was already processed.", "email")+'</a>'+
+						'<a id="em-icalendar-open-'+this.bodyId+'" class="go-model-icon-GO_Calendar_Model_Event normal-link" style="padding-left:20px;background-repeat:no-repeat;background-size: 16px 16px" class="go-model-icon-GO\\Calendar\\Model\\Event message-icalendar-icon">'+t("This message contains an appointment invitation that was already processed.", "email")+'</a>'+
 					'</tpl>'+
 					'<tpl if="iCalendar.invitation.is_invitation">'+
 
-								'<a id="em-icalendar-accept-invitation-'+this.bodyId+'" class="go-model-icon-GO_Calendar_Model_Event normal-link" style="padding-left:20px;background-repeat:no-repeat;" class="go-model-icon-GO\\Calendar\\Model\\Event message-icalendar-icon">'+t("Indicate whether you participate in this event", "calendar")+'</a>'+
+								'<a id="em-icalendar-accept-invitation-'+this.bodyId+'" class="go-model-icon-GO_Calendar_Model_Event normal-link" style="padding-left:20px;background-repeat:no-repeat;background-size: 16px 16px" class="go-model-icon-GO\\Calendar\\Model\\Event message-icalendar-icon">'+t("Indicate whether you participate in this event", "calendar")+'</a>'+
 
 					'</tpl>'+
 
