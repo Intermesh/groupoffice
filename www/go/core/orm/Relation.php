@@ -19,6 +19,13 @@ class Relation {
 
 
 	/**
+	 * @see Mapping::$dynamic;
+	 * @var bool
+	 */
+	public $dynamic = false;
+
+
+	/**
 	 * The name of the relation
 	 * 
 	 * @var string 

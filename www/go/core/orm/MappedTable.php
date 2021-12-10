@@ -6,10 +6,16 @@ use go\core\db\Table;
 use go\core\db\Connection;
 
 class MappedTable extends Table {
+
+	/**
+	 * @see Mapping::$dynamic;
+	 * @var bool
+	 */
+	public $dynamic = false;
 	
 	/**
 	 * The table alias used in the mapping
-	 * @var sring
+	 * @var string
 	 */
 	private $alias;
 	
@@ -20,9 +26,9 @@ class MappedTable extends Table {
 	private $keys;
 		
 	
-	private $mappedColumns = [];
+	private $mappedColumns;
 	
-	private $constantValues = [];
+	private $constantValues;
 	
 	/**
 	 * When set to true this table will be joined with AND userId = <CURRENTUSERID>
@@ -36,7 +42,7 @@ class MappedTable extends Table {
 	 * 
 	 * @param string $name The table name
 	 * @param string $alias The table alias to use in the queries
-	 * @param array $keys If empty then it's assumed the key name is identical in 
+	 * @param array|null $keys If empty then it's assumed the key name is identical in
 	 *   this and the last added table. eg. ['id' => 'id']
 	 * @params array $columns Leave this empty if you want to automatically build 
 	 *   this based on the properties the model has. If you're extending a model 
@@ -47,7 +53,7 @@ class MappedTable extends Table {
 	 *   the joined table always needs to have a value 
 	 *   ['type' => "foo"] then you can set it with this parameter.
 	 */
-	public function __construct($name, $alias, $keys = null, array $columns = [], array $constantValues = [], Connection $conn = null) {
+	public function __construct(string $name, string $alias, array $keys = null, array $columns = [], array $constantValues = [], Connection $conn = null) {
 		parent::__construct($name, $conn ?? go()->getDbConnection());
 		
 		$this->alias = $alias;
@@ -74,7 +80,8 @@ class MappedTable extends Table {
 	 * 
 	 * @return Column[]
 	 */
-	public function getMappedColumns() {
+	public function getMappedColumns(): array
+	{
 		return $this->mappedColumns;
 	}
 	
@@ -83,7 +90,8 @@ class MappedTable extends Table {
 		return $cols[$name] ?? null;
 	}
 	
-	private function buildDefaultKeys() {
+	private function buildDefaultKeys(): array
+	{
 		$keys = [];
 		foreach ($this->getPrimaryKey() as $pkName) {
 			$keys[$pkName] = $pkName;
@@ -99,7 +107,8 @@ class MappedTable extends Table {
 	 * 
 	 * @return array ['col' => 'value']
 	 */
-	public function getConstantValues() {
+	public function getConstantValues(): array
+	{
 		return $this->constantValues;
 	}
 	
@@ -108,7 +117,7 @@ class MappedTable extends Table {
 	 * 
 	 * @return string
 	 */
-	public function getAlias() {
+	public function getAlias() : string {
 		return $this->alias;
 	}
 	
@@ -117,7 +126,8 @@ class MappedTable extends Table {
 	 * 
 	 * @return array eg ['id' => 'userId']
 	 */
-	public function getKeys() {
+	public function getKeys(): array
+	{
 		return $this->keys;
 	}
 

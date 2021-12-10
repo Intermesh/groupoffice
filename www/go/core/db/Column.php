@@ -36,6 +36,12 @@ use LogicException;
 class Column {
 
 	/**
+	 * @see Mapping::$dynamic;
+	 * @var bool
+	 */
+	public $dynamic = false;
+
+	/**
 	 * false if non unique or an array of columns that should be unique in combination with this column.
 	 * 
 	 * @var bool|array 

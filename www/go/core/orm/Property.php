@@ -20,6 +20,7 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\validate\ValidationTrait;
 use InvalidArgumentException;
+use LogicException;
 use PDO;
 use PDOException;
 use ReflectionClass;
@@ -306,7 +307,6 @@ abstract class Property extends Model {
    * @param $where
    * @param Relation $relation
    * @return Statement|mixed
-   * @throws Exception
    */
 	private static function queryScalar($where, Relation $relation) {
 		$cacheKey = static::class.':'.$relation->name;
@@ -383,7 +383,6 @@ abstract class Property extends Model {
    * @param Property $v
    * @param Relation $relation
    * @return string
-   * @throws Exception
    */
 	private function buildMapKey(Property $v, Relation $relation): string
 	{
@@ -510,6 +509,8 @@ abstract class Property extends Model {
 		if(self::$mapping[$cls] === null) {
 			self::$mapping[$cls] = static::defineMapping();
 
+			self::$mapping[$cls]->dynamic = true;
+
 			static::fireEvent(self::EVENT_MAPPING, self::$mapping[$cls]);
 			
 			go()->getCache()->set($cacheKey, self::$mapping[$cls]);
@@ -576,6 +577,11 @@ abstract class Property extends Model {
 	public function &__get($name) {
 		$prop = static::getMapping()->getProperty($name);
 		if($prop) {
+
+			if(!$prop->dynamic && go()->getDebugger()->enabled) {
+				throw new LogicException("You should define '$name' in " . static::class);
+			}
+
 			if(!isset($this->dynamicProperties[$name])) {
 //				if($prop instanceof Relation && !in_array($name, $this->fetchProperties)) {
 //					throw new Exception("Relation '$name' was not fetched so can't be accessed");
@@ -1945,7 +1951,7 @@ abstract class Property extends Model {
    * Check's if the database conditions are met.
    *
    * @param Column $column
-   * @param $value
+   * @param mixed $value
    */
 	private function validateColumn(Column $column, $value): void
 	{
@@ -1967,10 +1973,6 @@ abstract class Property extends Model {
 				break;
 
 			case 'enum':
-				if(!$column->required && $value == null) {
-					return;
-				}
-
 				if(!preg_match('/enum\((.*)\)/i', $column->dataType, $matches)) {
 					$this->setValidationError($column->name, ErrorCode::GENERAL, "Enum column has no values specified in database");
 					return;

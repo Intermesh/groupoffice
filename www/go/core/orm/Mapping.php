@@ -7,6 +7,7 @@ use go\core\db\Column;
 use go\core\db\Query;
 use go\core\db\Table;
 use InvalidArgumentException;
+use LogicException;
 use ReflectionClass;
 use ReflectionException;
 use Sabre\DAV\Xml\Element\Prop;
@@ -17,7 +18,16 @@ use Sabre\DAV\Xml\Element\Prop;
  * It maps tables to objects properties.
  * The mapping object is cached. So when you make changes you need to run /install/upgrade.php
  */
-class Mapping {	
+class Mapping {
+
+
+	/**
+	 * Dynamic relations or tables can be added by the {@see Property::EVENT_MAPPING} event.
+	 * We use this bool to keep track of dynamic relations so we can report an error on undefined relation properties in
+	 * {@see Property::__get()}
+	 * @var bool
+	 */
+	public $dynamic = false;
 	
 	/**
 	 * Property class name this mapping is for
@@ -83,7 +93,9 @@ class Mapping {
 			$alias = $name;
 		}
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
+		$this->tables[$name]->dynamic = $this->dynamic;
 		foreach($this->tables[$name]->getMappedColumns() as $col) {
+			$col->dynamic = $this->dynamic;
 			if(!isset($this->columns[$col->name] )) { //if two identical columns are mapped the first one will be used. Can happen with "id" when A extends B.
 				$this->columns[$col->name] = $col;
 			}
@@ -106,19 +118,19 @@ class Mapping {
    * @param string[] $columns
    * @param string[] $constantValues
    * @return Mapping
-   * @throws Exception
    */
 	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []): Mapping
 	{
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
 		$this->tables[$name]->isUserTable = true;
 		$this->hasUserTable = true;
+
 		if(!Table::getInstance($name)->getColumn('modSeq')) {
-			throw new Exception("The table ".$name." must have a 'modSeq' column of type INT");
+			throw new LogicException("The table ".$name." must have a 'modSeq' column of type INT");
 		}
 		
 		if(!Table::getInstance($name)->getColumn('userId')) {
-			throw new Exception("The table ".$name." must have a 'userId' column of type INT");
+			throw new LogicException("The table ".$name." must have a 'userId' column of type INT");
 		}
 		
 		return $this;
@@ -223,6 +235,7 @@ class Mapping {
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_HAS_ONE);
 		$this->relations[$name]->setPropertyName($propertyName);
 		$this->relations[$name]->autoCreate = $autoCreate;
+		$this->relations[$name]->dynamic = $this->dynamic;
 		return $this;
 	}
 
@@ -247,6 +260,7 @@ class Mapping {
 	{
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_ARRAY);
 		$this->relations[$name]->setPropertyName($propertyName);
+		$this->relations[$name]->dynamic = $this->dynamic;
 		foreach($options as $option => $value) {
 			$this->relations[$name]->$option = $value;
 		}
@@ -268,6 +282,7 @@ class Mapping {
 	{
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_MAP);
 		$this->relations[$name]->setPropertyName($propertyName);
+		$this->relations[$name]->dynamic = $this->dynamic;
 		return $this;
 	}
 
@@ -288,6 +303,7 @@ class Mapping {
 	{
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_SCALAR);
 		$this->relations[$name]->setTableName($tableName);
+		$this->relations[$name]->dynamic = $this->dynamic;
 		return $this;
 	}
 	

@@ -79,7 +79,7 @@ class Table {
 	/**
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct($name, Connection $conn) {
+	public function __construct(string $name, Connection $conn) {
 		$this->name = $name;
 		$this->conn = $conn;
 		$this->dsn = $conn->getDsn();

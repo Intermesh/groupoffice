@@ -180,6 +180,12 @@ class Task extends AclItemEntity {
 	 */
 	protected $timeBooked;
 
+	/**
+	 * @var TasklistGroup[]
+	 */
+	public $group = [];
+
+
 	protected static function aclEntityClass(): string
 	{
 		return Tasklist::class;
