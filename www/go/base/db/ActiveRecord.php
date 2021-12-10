@@ -5670,6 +5670,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return $url;
 		}
 
-		return go()->getSettings()->URL . '#' + strtolower(static::entityType()->getName()) + "/" + $this->id();
+		return go()->getSettings()->URL . '#' . strtolower(static::entityType()->getName()) . "/" . $this->id();
 	}
 }
