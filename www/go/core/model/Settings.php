@@ -54,6 +54,11 @@ class Settings extends core\Settings {
 	{
 		return "core";
 	}
+
+	private function hasLanguage(string $lang): bool
+	{
+		return core\Environment::get()->getInstallFolder()->getFile('go/modules/core/language/'.$lang.'.php')->exists();
+	}
 	
 	private function getDefaultLanguage() {		
 		//can't use Language here because an infinite loop will occur as it depends on this model.
@@ -64,7 +69,7 @@ class Settings extends core\Settings {
 		$browserLanguages= JmapRequest::get()->getAcceptLanguages();
 		foreach($browserLanguages as $lang){
 			$lang = str_replace('-','_',explode(';', $lang)[0]);
-			if(core\Environment::get()->getInstallFolder()->getFile('go/modules/core/language/'.$lang.'.php')->exists()){
+			if($this->hasLanguage($lang)){
 				return $lang;
 			}
 		}
