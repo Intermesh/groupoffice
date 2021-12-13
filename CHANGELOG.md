@@ -444,8 +444,10 @@
 
 
 6.4.245
+09-12-2021 6.4.245
 - Savemailas: override mtime to email date
 - Calendar: backport prevent error when event is cancelled for disabled user
+- Core: Fixed database upgrade problem when trying to get index that was created during the upgrade
 
 13-09-2021 6.4.244
 - Savemailas: Fixed check database for email links
