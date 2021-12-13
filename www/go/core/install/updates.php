@@ -949,6 +949,11 @@ $updates['202110211653'][] = "UPDATE core_user u JOIN addressbook_contact c ON c
 
 // Some older modules try to retrieve theme files from obsolete themes. This will trigger an error. Set the default theme
 // to 'Paper'
+$updates['202111151100'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
+
+// recalculate becuase of substitute days
+$updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+
 $updates['202110211653'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
 
 

@@ -22,7 +22,13 @@ XX-09-20216.6.10
 
 
 
+13-12-2021 6.5.93
 - Core: Clear cache via webserver if running upgrade on the command line.
+- Files: Fixed infinte loop when printing from ImageViewer.js in Safari
+- Core: Fixed UK holidays
+- Core: Spreadsheet export could error out with 'Uninitialized string offset: 0'
+- Core / Projects: Fixed SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'entityId' cannot be null
+- Business: fixed user delete by setting constraints cascading on delete
 
 09-12-2021 6.5.92
 - ActiveSync: Reverted Michael z-push calendar stuff because it's unfinished and causing problems
@@ -465,8 +471,10 @@ XX-09-20216.6.10
 
 
 6.4.245
+09-12-2021 6.4.245
 - Savemailas: override mtime to email date
 - Calendar: backport prevent error when event is cancelled for disabled user
+- Core: Fixed database upgrade problem when trying to get index that was created during the upgrade
 
 13-09-2021 6.4.244
 - Savemailas: Fixed check database for email links

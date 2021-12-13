@@ -342,13 +342,6 @@ class Link extends AclItemEntity
 		}
 	}
 
-	protected function insertTableRecord(Table $table, array $record) {
-		$stmt = go()->getDbConnection()->insertIgnore($table->getName(), $record);
-		if (!$stmt->execute()) {
-			throw new Exception("Could not execute insert query");
-		}
-	}
-
 	protected function internalSave(): bool
 	{
 		if(!parent::internalSave()) {

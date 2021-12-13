@@ -50,7 +50,7 @@ class Settings extends core\Settings {
 		return "core";
 	}
 	
-	protected function getModulePackageName(): string
+	protected function getModulePackageName(): ?string
 	{
 		return "core";
 	}

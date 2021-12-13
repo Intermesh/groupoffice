@@ -70,13 +70,23 @@ abstract class Settings extends Model {
 		
 		return $moduleId;
 	}
-	
+
+	/**
+	 * Get module name
+	 *
+	 * @return string
+	 */
 	protected function getModuleName(): string
 	{
 		return explode("\\", static::class)[3];
 	}
-	
-	protected function getModulePackageName(): string
+
+	/**
+	 * Get the module package name
+	 * Is nullable for backwards compatibility with old framework
+	 * @return string|null
+	 */
+	protected function getModulePackageName(): ?string
 	{
 		return explode("\\", static::class)[2];
 	}
