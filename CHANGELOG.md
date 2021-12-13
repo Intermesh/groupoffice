@@ -1,5 +1,7 @@
 - Core: Clear cache via webserver if running upgrade on the command line.
 - Files: Fixed infinte loop when printing from ImageViewer.js in Safari
+- Core: Fixed UK holidays
+
 
 09-12-2021 6.5.92
 - ActiveSync: Reverted Michael z-push calendar stuff because it's unfinished and causing problems
