@@ -1,3 +1,4 @@
+13-12-2021 6.5.93
 - Core: Clear cache via webserver if running upgrade on the command line.
 - Files: Fixed infinte loop when printing from ImageViewer.js in Safari
 - Core: Fixed UK holidays
