@@ -2,6 +2,7 @@
 - Files: Fixed infinte loop when printing from ImageViewer.js in Safari
 - Core: Fixed UK holidays
 - Core: Spreadsheet export could error out with 'Uninitialized string offset: 0'
+- Core / Projects: Fixed SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'entityId' cannot be null
 
 09-12-2021 6.5.92
 - ActiveSync: Reverted Michael z-push calendar stuff because it's unfinished and causing problems
