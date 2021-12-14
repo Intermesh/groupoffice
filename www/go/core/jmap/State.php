@@ -169,26 +169,6 @@ class State extends AbstractState {
 		return $url;
 	}
 
-	public function getPageUrl(): string
-	{
-		return $this->getBaseUrl(). "/page.php";
-	}
-	
-	public function getApiUrl(): string
-	{
-		return $this->getBaseUrl() . '/jmap.php';
-	}
-	
-	public function getUploadUrl(): string
-	{
-		return $this->getBaseUrl(). '/upload.php';
-	}
-	
-	public function getEventSourceUrl(): ?string
-	{
-		return go()->getConfig()['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
-	}
-
 
 	/**
 	 *

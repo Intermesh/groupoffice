@@ -88,7 +88,7 @@ abstract class State {
 
 	public function getEventSourceUrl(): ?string
 	{
-		return go()->getConfig()['core']['general']['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
+		return go()->getConfig()['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
 	}
 
 }
