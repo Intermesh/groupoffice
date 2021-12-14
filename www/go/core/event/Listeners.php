@@ -106,9 +106,9 @@ class Listeners extends Singleton {
 	 * @param string $traitUser
 	 * @param string $event
 	 * @param array $args
-	 * @return boolean
+	 * @return mixed Returns the last listener return value or false if one of the listeners explicitly returns false
 	 */
-	public function fireEvent(string $calledClass, string $traitUser, string $event, array $args): bool
+	public function fireEvent(string $calledClass, string $traitUser, string $event, array $args)
 	{
 		$this->checkInit();
 
