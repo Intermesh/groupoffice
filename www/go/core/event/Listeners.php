@@ -28,14 +28,13 @@ class Listeners extends Singleton {
 
 	/**
 	 * Add an event listener
-	 * 
-	 * @param int $event Defined in constants prefixed by EVENT_
-	 * @param callable $fn 
-	 * @return int $index Can be used for removing the listener.
+	 *
+	 * @param string $firingClass
+	 * @param string $event Defined in constants prefixed by EVENT_
+	 * @param string $listenerClass
+	 * @param string $method
 	 */
-	public function add($firingClass, $event, $listenerClass, $method) {
-		
-//		App::get()->debug(func_get_args());
+	public function add(string $firingClass, string $event, string $listenerClass, string $method) {
 
 		$this->checkInit();
 
@@ -102,14 +101,15 @@ class Listeners extends Singleton {
 
 	/**
 	 * Fire an event and execute all listeners
-	 * 
+	 *
 	 * @param string $calledClass
-	 * @param int $event
-	 * @param mixed $args
-	 * @return mixed Returns the last listener return value or false if one of the listeners explicitly returns false
+	 * @param string $traitUser
+	 * @param string $event
+	 * @param array $args
+	 * @return boolean
 	 */
-	public function fireEvent($calledClass, $traitUser, $event, $args) {
-		
+	public function fireEvent(string $calledClass, string $traitUser, string $event, array $args): bool
+	{
 		$this->checkInit();
 
 		$return = null;

@@ -10,6 +10,7 @@ use go\core\orm\Query;
 use go\core\orm;
 use go\core\util\DateTime;
 
+use PDO;
 use ReflectionException;
 use function GO;
 
@@ -106,7 +107,8 @@ class Blob extends orm\Entity {
 	 * @link https://groupoffice-developer.readthedocs.io/en/latest/blob.html
 	 * @return array [['table'=>'foo', 'column' => 'blobId']]
 	 */
-	public static function getReferences() {
+	public static function getReferences(): array
+	{
 		
 		$refs = go()->getCache()->get("blob-refs");
 		if($refs === null) {
@@ -115,9 +117,10 @@ class Blob extends orm\Entity {
 			
 			try {
 				//somehow bindvalue didn't work here
+				/** @noinspection SqlResolve */
 				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
 				$stmt = go()->getDbConnection()->query($sql);
-				$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);		
+				$refs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			}
 			finally{
 				go()->getDbConnection()->exec("USE `" . $dbName . "`");		
@@ -135,18 +138,16 @@ class Blob extends orm\Entity {
 	 * It uses foreign key relations to check this.
 	 *
 	 * @return boolean
-	 * @throws Exception
 	 */
-	public function isUsed() {
-
+	public function isUsed(): bool
+	{
 		//TODO: logo must be referenced somewhere. maybe core_settings was a bad idea because it's not relational.
 		if($this->id == go()->getSettings()->logoId) {
 			return true;
 		}
 
 		$refs = $this->getReferences();	
-		
-		$exists = false;
+
 		foreach($refs as $ref) {
 			$exists = (new Query)
 							->selectSingleValue($ref['column'])
@@ -167,6 +168,7 @@ class Blob extends orm\Entity {
 	 *
 	 * @return bool true if blob is stale
 	 * @throws SaveException
+	 * @throws Exception
 	 */
 	public function setStaleIfUnused(): bool
 	{
@@ -184,10 +186,12 @@ class Blob extends orm\Entity {
 	 * The Blob needs to be save after calling this function.
 	 *
 	 * @param File $file
+	 * @param bool $removeFile
 	 * @return self
 	 * @throws Exception
 	 */
-	public static function fromFile(File $file, $removeFile = false) {
+	public static function fromFile(File $file, bool $removeFile = false): Blob
+	{
 		$hash = bin2hex(sha1_file($file->getPath(), true));
 		$blob = self::findById($hash);
 		if (empty($blob)) {
@@ -218,8 +222,10 @@ class Blob extends orm\Entity {
 	 *
 	 * @param File $file
 	 * @return self
+	 * @throws Exception
 	 */
-	public static function fromTmp(File $file) {
+	public static function fromTmp(File $file): Blob
+	{
 		return self::fromFile($file, true);
 	}
 
@@ -228,9 +234,9 @@ class Blob extends orm\Entity {
 	 *
 	 * @param string $string
 	 * @return self
-	 * @throws ReflectionException
 	 */
-	public static function fromString($string) {
+	public static function fromString(string $string): Blob
+	{
 		$hash = bin2hex(sha1($string, true));
 		$blob = self::findById($hash);
 		if (empty($blob)) {
@@ -250,9 +256,9 @@ class Blob extends orm\Entity {
 
 	/**
 	 * @return MetaData
-	 * @throws ReflectionException
 	 */
-	public function getMetaData() {
+	public function getMetaData(): MetaData
+	{
 		return new MetaData($this);
 	}
 
@@ -291,7 +297,9 @@ class Blob extends orm\Entity {
 	 * Checks if blob is in use. If it's used it will not delete but return true.
 	 * It will remove the file on disk.
 	 *
+	 * @param Query $query
 	 * @return boolean
+	 * @throws SaveException
 	 * @throws Exception
 	 */
 	protected static function internalDelete(Query $query): bool
@@ -300,7 +308,7 @@ class Blob extends orm\Entity {
 		$new = [];
 		$paths = [];
 
-		foreach(Blob::find()->mergeWith($query) as $blob) {;
+		foreach(Blob::find()->mergeWith($query) as $blob) {
 			if(!$blob->isUsed()) {
 				$new[] = $blob->id;
 				$paths[] = $blob->path();
@@ -347,12 +355,18 @@ class Blob extends orm\Entity {
 	 * Return file system path of blob data
 	 *
 	 * @return string
+	 * @throws Exception
 	 */
-	public function path() {
+	public function path(): string
+	{
 		return self::buildPath($this->id);
 	}
 
-	static function buildPath($id) {
+	/**
+	 * @throws Exception
+	 */
+	static function buildPath($id): string
+	{
 		$dir = substr($id,0,2) . DIRECTORY_SEPARATOR .substr($id,2,2). DIRECTORY_SEPARATOR;
 		return go()->getDataFolder()->getPath() . DIRECTORY_SEPARATOR . 'data'. DIRECTORY_SEPARATOR . $dir . $id;
 	}
@@ -361,6 +375,7 @@ class Blob extends orm\Entity {
 	 * Get blob data as file system file object
 	 *
 	 * @return File
+	 * @throws Exception
 	 */
 	public function getFile(): File
 	{
@@ -373,7 +388,8 @@ class Blob extends orm\Entity {
 	 * @param string $blobId
 	 * @return string
 	 */
-	public static function url($blobId) {
+	public static function url(string $blobId): string
+	{
 		return go()->getSettings()->URL . 'api/download.php?blob=' . $blobId;
 	}
 	
@@ -383,7 +399,8 @@ class Blob extends orm\Entity {
 	 * @param string $html
 	 * @return string[] Array of blob ID's
 	 */
-	public static function parseFromHtml($html) {
+	public static function parseFromHtml(string $html): array
+	{
 //		if(!preg_match_all('/<img [^>]*src="[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
 //			return [];
 //		}
@@ -400,41 +417,41 @@ class Blob extends orm\Entity {
 
 		return array_unique($matches);
 	}
-	
+
 	/**
-	 * Find image tags with a blobId download URL in "src" and replace them with a 
+	 * Find image tags with a blobId download URL in "src" and replace them with a
 	 * new "src" attribute.
-	 * 
+	 *
 	 * Useful when attaching inline images for example:
-	 * 
+	 *
 	 * ````
 	 * $blobIds = \go\core\fs\Blob::parseFromHtml($body);
 	 * foreach($blobIds as $blobId) {
-	 * 	$blob = \go\core\fs\Blob::findById($blobId);
-	 * 	
-	 * 	$img = \Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
-	 * 	$img->setContentType($blob->type);
-	 * 	$contentId = $this->embed($img);
-	 * 	$body = \go\core\fs\Blob::replaceSrcInHtml($body, $blobId, $contentId);
+	 *  $blob = \go\core\fs\Blob::findById($blobId);
+	 *
+	 *  $img = \Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
+	 *  $img->setContentType($blob->type);
+	 *  $contentId = $this->embed($img);
+	 *  $body = \go\core\fs\Blob::replaceSrcInHtml($body, $blobId, $contentId);
 	 * }
-	 * 
+	 *
 	 * @param string $html The HTML subject
 	 * @param string $blobId The blob ID to find and replace
-	 * @param string $newSrc The new "src" attribute for the blob
+	 * @param string $src
 	 * @return string Replaced HTML
 	 */
-	public static function replaceSrcInHtml($html, $blobId, $src) {		
+	public static function replaceSrcInHtml(string $html, string $blobId, string $src): string
+	{
 //		$replaced =  preg_replace('/(<img [^>]*src=")[^>]*blob='.$blobId.'("[^>]*>)/i', '$1'.$src.'$2', $html);
 
-		$replaced = preg_replace_callback('/<img [^>]*' . $blobId . '[^>]*>/i', function($matches) use ($src) {
+		return preg_replace_callback('/<img [^>]*' . $blobId . '[^>]*>/i', function($matches) use ($src) {
 			return preg_replace('/src="[^"]*"/i', 'src="' .$src .'"', $matches[0]);
 		}, $html);
-
-		return $replaced;
 	}
-	
+
 	/**
 	 * Output for download
+	 * @throws Exception
 	 */
 	public function output($inline = false) {
 		$disp = $inline ? 'inline' : 'attachment';

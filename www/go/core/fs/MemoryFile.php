@@ -23,14 +23,14 @@ class MemoryFile extends File{
 		return parent::__construct($filename);
 	}
 	
-	public function getContents($offset = 0, $maxlen = null) {
+	public function getContents(int $offset = 0, int $maxlen = null) {
 		return $this->data;
 	}
 	public function contents() {
 		return $this->data;
 	}
 	
-	public function putContents($data, $flags = null, $context = null) {
+	public function putContents($data, int $flags = null, $context = null) {
 		if($flags = FILE_APPEND){
 			$this->data .= $data;
 		}else
@@ -39,19 +39,23 @@ class MemoryFile extends File{
 		}
 	}
 	
-	public function getSize() {
+	public function getSize(): int
+	{
 		return strlen($this->data);
 	}
 	
-	public function getModifiedAt() {
+	public function getModifiedAt(): \go\core\util\DateTime
+	{
 		return new DateTime();
 	}
 	
-	public function getCreatedAt() {
+	public function getCreatedAt(): \go\core\util\DateTime
+	{
 		return new DateTime();
 	}
 	
-	public function exists() {
+	public function exists(): bool
+	{
 		return true;
 	}
 	
@@ -81,7 +85,8 @@ class MemoryFile extends File{
 	 * 
 	 * @return boolean 
 	 */
-	public function isWritable(){
+	public function isWritable(): bool
+	{
 		return true;
 	}
 		
@@ -90,7 +95,8 @@ class MemoryFile extends File{
 	 * @param string $user
 	 * @return boolean 
 	 */
-	public function chown($user){
+	public function chown(string $user): bool
+	{
 		return false;
 	}
 	
@@ -100,7 +106,8 @@ class MemoryFile extends File{
 	 * @param string $group
 	 * @return boolean 
 	 */
-	public function chgrp($group){
+	public function chgrp(string $group): bool
+	{
 		return false;
 	}
 	
@@ -115,7 +122,8 @@ class MemoryFile extends File{
 	 * 
 	 * @return boolean 
 	 */
-	public function chmod($permissionsMode){
+	public function chmod(int $permissionsMode): bool
+	{
 		return false;
 	}
 	
@@ -124,11 +132,13 @@ class MemoryFile extends File{
 	 * 
 	 * @return boolean 
 	 */
-	public function delete(){
+	public function delete(): bool
+	{
 		return false;
 	}
 	
-	public function isFolder() {
+	public function isFolder(): bool
+	{
 		return false;
 	}
 	
@@ -137,7 +147,8 @@ class MemoryFile extends File{
 	 * 
 	 * @return boolean 
 	 */
-	public function isFile(){
+	public function isFile(): bool
+	{
 		return true;
 	}
 	
@@ -149,7 +160,7 @@ class MemoryFile extends File{
 		return $this->path;
 	}
 	
-	public function output($sendHeaders = true, $useCache = true, array $headers = [], $inline = true) {
+	public function output(bool $sendHeaders = true, bool $useCache = true, array $headers = [], bool $inline = true) {
 		echo $this->data;
 	}
 	
