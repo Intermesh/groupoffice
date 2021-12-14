@@ -158,7 +158,7 @@ go.data.StoreTrait = {
 		}
 
 		changed.forEach((id) => {
-			if(this.proxy.watchRelations[entityStore.entity.name].indexOf(id) > -1) {
+			if(this.proxy && this.proxy.watchRelations[entityStore.entity.name] && this.proxy.watchRelations[entityStore.entity.name].indexOf(id) > -1) {
 				const o = go.util.clone(this.lastOptions);
 				o.params = o.params || {};
 				o.params.position = 0;
