@@ -12,12 +12,12 @@ class Settings extends core\Settings
 	 */
 	public $jitsiUri = 'https://meet.jit.si/';
 
-	protected function getModulePackageName(): ?string
+	public static function getModulePackageName(): ?string
 	{
 		return null; // backwards compat
 	}
 
-	protected function getModuleName(): string
+	public static function getModuleName(): string
 	{
 		return 'jitsimeet'; // backwards compat
 	}

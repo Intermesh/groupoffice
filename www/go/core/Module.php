@@ -790,9 +790,9 @@ abstract class Module extends Singleton {
 	 * A module must override this function and implement a \go\core\Settings object
 	 * to store settings.
 	 * 
-	 * @return Settings|null
+	 * @return Settings|SettingsEntity|null
 	 */
-	public function getSettings(): ?Settings
+	public function getSettings()
 	{
 		return null;
 	}

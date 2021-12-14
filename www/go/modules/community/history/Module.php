@@ -194,9 +194,9 @@ class Module extends core\Module
 	}
 
 	/**
-	 * @return Settings|null
+	 * @return
 	 */
-	public function getSettings(): ?\go\core\Settings
+	public function getSettings()
 	{
 		return Settings::get();
 	}

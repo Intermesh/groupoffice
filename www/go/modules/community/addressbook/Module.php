@@ -133,7 +133,7 @@ class Module extends core\Module {
 		return parent::afterInstall($model);
 	}
 
-	public function getSettings(): ?\go\core\Settings
+	public function getSettings()
 	{
 		return Settings::get();
 	}

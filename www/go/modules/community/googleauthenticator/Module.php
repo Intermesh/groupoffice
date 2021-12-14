@@ -53,7 +53,7 @@ class Module extends core\Module {
 	}
 
 
-	public function getSettings(): ?Settings
+	public function getSettings()
 	{
 		return model\Settings::get();
 	}

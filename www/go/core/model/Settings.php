@@ -44,16 +44,6 @@ class Settings extends core\Settings {
 			}
 		}
 	}
-	
-	protected function getModuleName(): string
-	{
-		return "core";
-	}
-	
-	protected function getModulePackageName(): ?string
-	{
-		return "core";
-	}
 
 	private function hasLanguage(string $lang): bool
 	{

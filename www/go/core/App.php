@@ -698,9 +698,9 @@ use Faker;
 		/**
 		 * Get the application settings
 		 * 
-		 * @return Settings|null
+		 * @return
 		 */
-		public function getSettings(): ?CoreSettings
+		public function getSettings()
 		{
 			return Settings::get();
 		}

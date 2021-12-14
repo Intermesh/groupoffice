@@ -59,37 +59,19 @@ abstract class Settings extends Model {
 			->selectSingleValue('id')
 			->from('core_module')
 			->where([
-					'name' => $this->getModuleName(), 
-					'package' => $this->getModulePackageName()])
+					'name' => static::getModuleName(),
+					'package' => static::getModulePackageName()])
 			->execute()
 			->fetch();
 		
 		if(!$moduleId) {
-			throw new Exception ("Could not find module " .  $this->getModuleName() . "/" . $this->getModulePackageName());
+			throw new Exception ("Could not find module " .  static::getModuleName() . "/" . static::getModulePackageName());
 		}
 		
 		return $moduleId;
 	}
 
-	/**
-	 * Get module name
-	 *
-	 * @return string
-	 */
-	protected function getModuleName(): string
-	{
-		return explode("\\", static::class)[3];
-	}
 
-	/**
-	 * Get the module package name
-	 * Is nullable for backwards compatibility with old framework
-	 * @return string|null
-	 */
-	protected function getModulePackageName(): ?string
-	{
-		return explode("\\", static::class)[2];
-	}
 	
 	private $oldData;
 
@@ -121,16 +103,17 @@ abstract class Settings extends Model {
 	 */
 	protected function __construct() {
 
-		$props = array_keys($this->getSettingProperties());	
-		
-		$record = array_filter($this->loadFromConfigFile(), function($key) use ($props) { return in_array($key, $props);}, ARRAY_FILTER_USE_KEY);
-		$this->readOnlyKeys = array_keys($record);
-		
-		$this->setValues($record);
+		$config = self::loadPropertiesFromConfigFile();
+		$this->readOnlyKeys = array_keys($config);
+		$this->setValues($config);
 
 
 		if(static::dbIsReady()) {
-			$selectProps = array_diff($props, $this->readOnlyKeys);
+
+			$selectProps = array_filter(static::getApiProperties(), function($p, $propName) {
+				// only defined props
+				return isset($p['access']) && !in_array($propName, $this->readOnlyKeys);
+			}, ARRAY_FILTER_USE_BOTH);
 
 			if (!empty($selectProps)) {
 				$stmt = (new Query)
@@ -138,7 +121,7 @@ abstract class Settings extends Model {
 					->from('core_setting')
 					->where([
 						'moduleId' => $this->getModuleId(),
-						'name' => $selectProps
+						'name' => array_keys($selectProps)
 					])
 					->execute();
 
@@ -152,30 +135,7 @@ abstract class Settings extends Model {
 		$this->oldData = (array) $this;
 	}
 	
-	private function loadFromConfigFile() {
-		$config = go()->getConfig();
-		
-		$pkgName = $this->getModulePackageName();
-		
-		
-		if(!isset($config[$pkgName])) {
-			return [];
-		}
-		
-		if($pkgName == "core") {
-			$c = $config[$pkgName];
-		} else
-		{
-			$modName = $this->getModuleName();
 
-			if(!isset($config[$pkgName][$modName])) {
-				return [];
-			}
-			$c = $config[$pkgName][$modName];
-		}
-		
-		return $c;		
-	}
 	
 	
 	private $readOnlyKeys;

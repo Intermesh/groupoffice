@@ -27,9 +27,9 @@ class Module extends \go\core\Module
     }
 
     /**
-     * @return \go\modules\community\dokuwiki\model\Settings|null
+     * @return
      */
-    public function getSettings(): ?\go\core\Settings
+    public function getSettings()
     {
         return Settings::get();
     }
