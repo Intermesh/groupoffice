@@ -100,7 +100,7 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 		$q = clone $query;
 		$ownerAclAlias = static::joinAclEntity($q);
 
-		$q->where($query->getTableAlias() . '.' .static::$aclColumnName . " != " . $ownerAclAlias );
+		$q->groupWhere()->where($query->getTableAlias() . '.' .static::$aclColumnName . " != " . $ownerAclAlias );
 
 		$q->select($query->getTableAlias() . '.' . static::$aclColumnName);
 
@@ -190,9 +190,6 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 		}
 	}
 
-	protected function removeAclOnDelete() {
-		return $this->hasOwnAcl();
-	}
 
 	protected static function getCheckAclUpdateQuery() {
 		$updateQuery = parent::getCheckAclUpdateQuery();

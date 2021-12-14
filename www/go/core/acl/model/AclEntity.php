@@ -151,12 +151,6 @@ abstract class AclEntity extends Entity {
 		return parent::internalSave();
 	}
 
-
-	protected function removeAclOnDelete() {
-		return false;
-	}
-
-
 	/**
 	 * Get the table alias holding the aclId
 	 */

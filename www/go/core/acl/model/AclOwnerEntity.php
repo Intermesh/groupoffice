@@ -464,7 +464,4 @@ abstract class AclOwnerEntity extends AclEntity {
 		return $updateQuery;
 	}
 
-	protected function removeAclOnDelete() {
-		return true;
-	}
 }
