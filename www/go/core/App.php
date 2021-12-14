@@ -695,11 +695,6 @@ use Faker;
 			return null;
 		}
 
-		/**
-		 * Get the application settings
-		 * 
-		 * @return
-		 */
 		public function getSettings()
 		{
 			return Settings::get();

@@ -26,9 +26,6 @@ class Module extends \go\core\Module
         return 'info@michalcharvat.cz';
     }
 
-    /**
-     * @return
-     */
     public function getSettings()
     {
         return Settings::get();

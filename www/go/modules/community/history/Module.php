@@ -193,9 +193,6 @@ class Module extends core\Module
 		}
 	}
 
-	/**
-	 * @return
-	 */
 	public function getSettings()
 	{
 		return Settings::get();

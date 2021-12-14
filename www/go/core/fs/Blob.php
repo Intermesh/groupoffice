@@ -185,7 +185,7 @@ class Blob extends orm\Entity {
 	 *
 	 * @param File $file
 	 * @return self
-	 * @throws ReflectionException
+	 * @throws Exception
 	 */
 	public static function fromFile(File $file, $removeFile = false) {
 		$hash = bin2hex(sha1_file($file->getPath(), true));
@@ -218,7 +218,6 @@ class Blob extends orm\Entity {
 	 *
 	 * @param File $file
 	 * @return self
-	 * @throws ReflectionException
 	 */
 	public static function fromTmp(File $file) {
 		return self::fromFile($file, true);
