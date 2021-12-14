@@ -537,9 +537,7 @@ abstract class Property extends Model {
 	}
 
   /**
-   * Get all API properties
-   *
-   * @return array
+   * @inheritDoc
    */
 	public static function getApiProperties(): array
 	{
@@ -714,7 +712,7 @@ abstract class Property extends Model {
 		}
 
 		$query = (new Query())
-						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())						
+						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())
 						->setModel(static::class, $fetchProperties, $readOnly, $owner);
 
 		self::joinAdditionalTables($tables, $query);
@@ -2344,9 +2342,8 @@ abstract class Property extends Model {
 	 */
 	protected static function definePrimaryKey(): array
 	{
-		$tables = static::getMapping()->getTables();
-		$primaryTable = array_shift($tables);
-		return $primaryTable->getPrimaryKey();
+		$primaryTable = static::getMapping()->getPrimaryTable();
+		return $primaryTable ? $primaryTable->getPrimaryKey() : [];
 	}
 
   /**

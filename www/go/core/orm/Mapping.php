@@ -180,11 +180,11 @@ class Mapping {
   /**
    * Get the first table from the mapping
    *
-   * @return MappedTable
+   * @return MappedTable|null
    */
-	public function getPrimaryTable(): MappedTable
+	public function getPrimaryTable(): ?MappedTable
 	{
-		return array_values($this->tables)[0];
+		return array_values($this->tables)[0] ?? null;
 	}
 
   /**
