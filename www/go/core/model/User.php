@@ -227,7 +227,7 @@ class User extends Entity {
 	public $timezone;
 	public $start_module;
 	public $language;
-	protected $theme;
+	public $theme;
 	public $firstWeekday;
 	public $sort_name;
 
