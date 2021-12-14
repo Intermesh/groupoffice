@@ -810,4 +810,5 @@ abstract class Entity  extends OrmEntity {
 		return go()->getSettings()->URL . '#' . strtolower(static::entityType()->getName()) . "/" . $this->id();
 	}
 
+
 }
