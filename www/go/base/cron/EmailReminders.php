@@ -8,6 +8,7 @@ use go\core\model\Alert;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
+use Throwable;
 
 class EmailReminders extends AbstractCron {
 
@@ -119,11 +120,11 @@ class EmailReminders extends AbstractCron {
 				->where('triggerAt', '<=', new DateTime("now", new \DateTimeZone("UTC")))
 				->where('sendMail', '=', true);
 
-			echo $alerts ."\n";
+//			echo $alerts ."\n";
 
 			foreach($alerts as $alert) {
 				try {
-					$subject = \go()->t("Alert") . ': ' . $alert->getTitle();
+					$subject = go()->t("Alert") . ': ' . $alert->getTitle();
 
 					$user = User::findById($alert->userId, ['id', 'displayName', 'email', 'timezone', 'dateFormat', 'timeFormat']);
 
@@ -149,7 +150,7 @@ class EmailReminders extends AbstractCron {
 						throw new SaveException($alert);
 					}
 
-				} catch(\Throwable $e) {
+				} catch(Throwable $e) {
 
 					ErrorHandler::logException($e, "Failed sending alert e-mail ". $alert->id);
 				}

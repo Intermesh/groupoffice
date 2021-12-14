@@ -631,6 +631,9 @@ class Task extends AclInheritEntity {
 		return false;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function alertProps(CoreAlert $alert): array
 	{
 		if($alert->tag != 'assigned') {
@@ -640,7 +643,13 @@ class Task extends AclInheritEntity {
 		$assigner = UserDisplay::findById($data->assignedBy, ['displayName']);
 
 		$body = str_replace('{assigner}', $assigner->displayName, go()->t("You were assigned to this task by {assigner}"));
-		$title = $alert->findEntity()->title() ?? null;
+		$task = $alert->findEntity();
+		if($task) {
+			$uid = '['. str_pad($task->entityType()->getId(),3, '0') .':'.str_pad($task->id(),3, '0') . ']';
+			$title = $task->title() . " " . $uid;
+		} else{
+			$title = "Missing task?";
+		}
 
 		return ['title' => $title, 'body' => $body];
 	}
