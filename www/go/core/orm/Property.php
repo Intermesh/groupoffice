@@ -227,10 +227,12 @@ abstract class Property extends Model {
 
 			$where = $this->buildRelationWhere($relation);
 
+			$shouldQuery = !$this->isNew() || !count($where);
+
 			switch($relation->type) {
 
 				case Relation::TYPE_HAS_ONE:
-					if($this->isNew() ) {
+					if(!$shouldQuery) {
 						$prop = null;
 					} else
 					{
@@ -251,7 +253,7 @@ abstract class Property extends Model {
 
 				case Relation::TYPE_ARRAY:
 
-					if($this->isNew() ) {
+					if(!$shouldQuery) {
 						$prop = [];
 					} else
 					{
@@ -266,7 +268,7 @@ abstract class Property extends Model {
 
 				case Relation::TYPE_MAP:
 
-					if($this->isNew() ) {
+					if(!$shouldQuery) {
 						$prop = null;
 					} else
 					{
@@ -290,7 +292,7 @@ abstract class Property extends Model {
 
 				case Relation::TYPE_SCALAR:
 
-					if($this->isNew()) {
+					if(!$shouldQuery) {
 						$scalar = [];
 					} else {
 						$stmt = $this->queryScalar($where, $relation);
@@ -2400,7 +2402,6 @@ abstract class Property extends Model {
 	/**
 	 * Cuts all properties to make sure they are not longer than the database can store.
 	 * Useful when importing or syncing
-   * @throws Exception
 	 */
 	public function cutPropertiesToColumnLength() {
 		
