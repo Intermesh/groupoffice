@@ -12,7 +12,7 @@ go.browserStorage = {
 		const isSafari = /Safari\//.test(navigator.userAgent) &&
 			!/Chrom(e|ium)\//.test(navigator.userAgent);
 		// No point putting other browsers through this mess.
-		if(!isSafari){
+		if(!isSafari || !indexedDB.databases){
 			return Promise.resolve();
 		}
 		let intervalId;

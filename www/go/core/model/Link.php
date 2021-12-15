@@ -7,6 +7,7 @@ use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\db\Query as DbQuery;
+use go\core\db\Table;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;

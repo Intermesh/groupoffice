@@ -1,3 +1,35 @@
+- Business: temporarily display transferable leave types in the agreement dialog
+- Leavedays: filter out possible leavedays before first work date (in case of rehiring)
+
+13-12-2021 6.5.93
+- Core: Clear cache via webserver if running upgrade on the command line.
+- Files: Fixed infinte loop when printing from ImageViewer.js in Safari
+- Core: Fixed UK holidays
+- Core: Spreadsheet export could error out with 'Uninitialized string offset: 0'
+- Core / Projects: Fixed SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'entityId' cannot be null
+- Business: fixed user delete by setting constraints cascading on delete
+
+09-12-2021 6.5.92
+- ActiveSync: Reverted Michael z-push calendar stuff because it's unfinished and causing problems
+
+09-12-2021 6.5.91
+- Core: Updated German Translations thanks to Peter!
+- Billing: CS translations
+- Leavedays: Fix error in year export
+- Googleauthenticator: Use title for QR image so app takes over name
+- Tickets: Incorrect agents in the list when filtering
+- Summary: Fixed 6.4.235 + 6.5.45 - Start page open URL if scrollbar active #747
+- Addressbook / Core: Fixed error on login with LDAP and DAV when address book profile wasn't set yet.
+
+29-11-2021 6.5.90
+- Leavedays: Manager column was sortable but is not supported by the server
+- Email: Check if node was found to prevent node.getUI() error
+- Email: Fix for winmail.dat attachments
+- Core: Fixed upload on iOS devices
+- Email: Empty window on ios devices when opening attachments
+- Addressbook: Index phonenumbers so they can be found on partials
+- Core: Sort links on modified at date descending
+
 26-11-2021 6.5.89
 - Remove obsolete timeentrydata module
 - Business: added sortOrder field to business_activity, made sortable by dragging and dropping
@@ -90,7 +122,7 @@
 
 18-10-2021 6.5.81
 - Calendar: If not empty, show location data for all-day events in month and day grids
-- Linked email: set cdate and mdate for linked emails to IMAP send date. 
+- Linked email: set cdate and mdate for linked emails to IMAP send date.
 - Studio: add 'Duplicate' button.
 - Core: Made sure no newlines are set in the HTTP status header text.
 - Email: Fixed spelling error in IMAP authentication failure
@@ -417,6 +449,19 @@
 
 
 
+6.4.245
+09-12-2021 6.4.245
+- Savemailas: override mtime to email date
+- Calendar: backport prevent error when event is cancelled for disabled user
+- Core: Fixed database upgrade problem when trying to get index that was created during the upgrade
+
+13-09-2021 6.4.244
+- Savemailas: Fixed check database for email links
+
+30-08-2021 6.4.243
+- Core: Fixed php 7.0 compatibility issue
+
+26-08-2021 6.4.242
 - Email: strpos() error when deleting folders with disabled Trash folder
 - Tickets: Enable disabling using of alternative URL
 - Tickets: Settings dialog bigger in order to display 'Show external page button'
@@ -425,6 +470,7 @@
 - Timeregistrations: do not copy income_id upon cloning a time entry
 - Core: 0.00 was always displayed in number fields
 - Core: Fixed custom field column delete when creating a new column with a name that already existed.
+- Notesencrypt: Error after save
 
 22-07-2021 6.4.241
 - Projects: Fixed upgrade error in projects where pr2_settings doesn't exist

@@ -147,4 +147,6 @@ The following changes were made by %s:
   'Save as PDF' => 'Als PDF speichern',
   'Download as PDF' => 'Als PDF laden',
   'Sorry, something went wrong' => 'Sorry, irgendwas ist schief gelaufen',
+  'Creator' => 'Ersteller',
+  'Modifier' => 'Bearbeiter',
 );

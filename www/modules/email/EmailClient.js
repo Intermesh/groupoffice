@@ -1034,10 +1034,12 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		{
 			var node = this.treePanel.getNodeById(nodeId);
 
-			if(unseen)
-				node.getUI().addClass('ml-folder-unseen');
-			else
-				node.getUI().removeClass('ml-folder-unseen');
+			if(node) {
+				if (unseen)
+					node.getUI().addClass('ml-folder-unseen');
+				else
+					node.getUI().removeClass('ml-folder-unseen');
+			}
 
 			var statusText = statusEl.dom.innerHTML;
 			var current = statusText=='' ? 0 : parseInt(statusText);
@@ -1438,8 +1440,6 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 			return;
 		}
 
-
-
 		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml'))
 		{
 			GO.email.showMessageAttachment(0, {
@@ -1551,7 +1551,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 						go.util.getDownloadTargetWindow();
 					}
 
-					if(go.Modules.isAvailable('legacy', 'files')) {
+					if(go.Modules.isAvailable('legacy', 'files') && attachment.name.toLowerCase() != 'winmail.dat') {
 						return GO.files.openEmailAttachment(attachment, panel, false);
 					} else {
 						go.util.viewFile(attachment.url);

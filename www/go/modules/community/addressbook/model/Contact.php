@@ -988,7 +988,8 @@ class Contact extends AclItemEntity {
 			$keywords[] = $e->email;
 		}
 		foreach($this->phoneNumbers as $e) {
-			$keywords[] = preg_replace("/[^0-9+]/", "", $e->number);
+			$santiziedNumber = preg_replace("/[^0-9+]/", "", $e->number);
+			$keywords = array_merge($keywords, SearchableTrait::numberToKeywords($santiziedNumber));
 		}
 		if(!$this->isOrganization) {
 			$keywords = array_merge($keywords, $this->findOrganizations()->selectSingleValue('name')->all());

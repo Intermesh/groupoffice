@@ -114,7 +114,7 @@ class Address extends Property {
 	private static $defaultCountryText;
 	private static function isDefaultCountry(Address $address) {
 		if(!isset(self::$defaultCountryIso)) {
-			$user = go()->getAuthState()->getUser(['timezone']);
+			$user = go()->getAuthState() ? go()->getAuthState()->getUser(['timezone']) : null;
 			if(!$user) {
 				$user = User::findById(1, ['timezone']);
 			}
