@@ -23,6 +23,7 @@ namespace GO\Base\Util;
 
 
 use go\core\ErrorHandler;
+use go\core\util\StringUtil;
 
 class StringHelper {
 	
@@ -278,221 +279,10 @@ class StringHelper {
 //		return $utf8string;
 //	}
 
-	public static function clean_utf8($str, $source_charset='UTF-8') {
+	public static function clean_utf8($str, $source_charset=null) {
 		
-		//must use html_entity_decode here other wise some weird utf8 might be decoded later
-		//$str = html_entity_decode($str, ENT_COMPAT, $source_charset);			
-		
-		//fix incorrect win-1252 to Windows-1252
-		$source_charset = preg_replace('/win-([0-9]+)/i','WINDOWS-$1', $source_charset);
-		
-		//fix for euro signs in windows-1252 encoding. We convert it to iso-8859-15.
-		$source_charset=strtoupper($source_charset);
-		if($source_charset=='ISO-8859-1' || $source_charset=='ISO-8859-15' || $source_charset=='WINDOWS-1252')
-			$str = str_replace("\x80","€", $str);
-		
-		// UNICODE IS NOT A VALID CHARSET SO WE USE THE UTF-8 
-		if($source_charset == 'UNICODE')
-			$source_charset = 'UTF-8';
-		
-
-//		wtf?
-//		$str = str_replace("€","&euro;", $str);
-		
-		$source_charset = self::fixCharset($source_charset);
-		try {
-			$c = iconv($source_charset, 'UTF-8//IGNORE', $str);
-		} catch(\Exception $e) {
-			//Does not always work. We suppress the:
-			//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31
-		}
-
-		if(!empty($c))
-		{
-			$str=$c;
-		}else{
-			if(function_exists('mb_detect_encoding'))
-			{
-				$from_charset = mb_detect_encoding($str, "auto");
-			}else
-			{
-				$from_charset = "ISO-8859-1";
-			}
-			$from_charset=strtolower($from_charset);
-			
-			if($from_charset!=$source_charset)
-				$str=self::clean_utf8($str, $from_charset);
-		}
-							
-		//Check if preg validates it as UTF8
-		if(function_exists('mb_check_encoding') && mb_check_encoding($str,'utf8')){
-			
-			return $str;
-		}else{
-		//remove non utf8. taken from http://stackoverflow.com/questions/1401317/remove-non-utf8-characters-from-string
-				$regex = <<<'END'
-/
-  (
-    (?: [\x00-\x7F]                 # single-byte sequences   0xxxxxxx
-    |   [\xC0-\xDF][\x80-\xBF]      # double-byte sequences   110xxxxx 10xxxxxx
-    |   [\xE0-\xEF][\x80-\xBF]{2}   # triple-byte sequences   1110xxxx 10xxxxxx * 2
-    |   [\xF0-\xF7][\x80-\xBF]{3}   # quadruple-byte sequence 11110xxx 10xxxxxx * 3 
-    ){1,100}                        # ...one or more times
-  )
-| .                                 # anything else
-/x
-END;
-		
-			return preg_replace($regex, '$1', $str);
-			
-		}
-//		//Not valid still so we are going to validate each utf byte sequence with
-//		//help from Henri Sivonen http://hsivonen.iki.fi/php-utf8/
-//		
-//
-//		$mState = 0;     // cached expected number of octets after the current octet
-//		// until the beginning of the next UTF8 character sequence
-//		$mUcs4  = 0;     // cached Unicode character
-//		$mBytes = 1;     // cached expected number of octets in the current sequence
-//
-//		$out = '';
-//		$chr = '';
-//
-//		$len = strlen($str);
-//
-//		for($i = 0; $i < $len; $i++) {
-//
-//			$chr.=$str{$i};
-//
-//			$in = ord($str{$i});
-//			if ( $mState == 0) {
-//
-//
-//
-//			// When mState is zero we expect either a US-ASCII character or a
-//			// multi-octet sequence.
-//				if (0 == (0x80 & ($in))) {
-//				// US-ASCII, pass straight through.
-//					$mBytes = 1;
-//
-//					$out .= $chr;
-//
-//					$chr='';
-//
-//				} elseif (0xC0 == (0xE0 & ($in))) {
-//				// First octet of 2 octet sequence
-//					$mUcs4 = ($in);
-//					$mUcs4 = ($mUcs4 & 0x1F) << 6;
-//					$mState = 1;
-//					$mBytes = 2;
-//
-//				} elseif (0xE0 == (0xF0 & ($in))) {
-//				// First octet of 3 octet sequence
-//					$mUcs4 = ($in);
-//					$mUcs4 = ($mUcs4 & 0x0F) << 12;
-//					$mState = 2;
-//					$mBytes = 3;
-//
-//				} elseif (0xF0 == (0xF8 & ($in))) {
-//				// First octet of 4 octet sequence
-//					$mUcs4 = ($in);
-//					$mUcs4 = ($mUcs4 & 0x07) << 18;
-//					$mState = 3;
-//					$mBytes = 4;
-//
-//				} elseif (0xF8 == (0xFC & ($in))) {
-//							 /* First octet of 5 octet sequence.
-//							 *
-//							 * This is illegal because the encoded codepoint must be either
-//							 * (a) not the shortest form or
-//							 * (b) outside the Unicode range of 0-0x10FFFF.
-//							 * Rather than trying to resynchronize, we will carry on until the end
-//							 * of the sequence and let the later error handling code catch it.
-//							 */
-//					$mUcs4 = ($in);
-//					$mUcs4 = ($mUcs4 & 0x03) << 24;
-//					$mState = 4;
-//					$mBytes = 5;
-//
-//
-//				} elseif (0xFC == (0xFE & ($in))) {
-//				// First octet of 6 octet sequence, see comments for 5 octet sequence.
-//					$mUcs4 = ($in);
-//					$mUcs4 = ($mUcs4 & 1) << 30;
-//					$mState = 5;
-//					$mBytes = 6;
-//
-//				} else {
-//							 /* Current octet is neither in the US-ASCII range nor a legal first
-//								* octet of a multi-octet sequence.
-//								*/
-//					//return FALSE;
-//					$out .= '?';
-//
-//				}
-//
-//			} else {
-//
-//			// When mState is non-zero, we expect a continuation of the multi-octet
-//			// sequence
-//				if (0x80 == (0xC0 & ($in))) {
-//
-//				// Legal continuation.
-//					$shift = ($mState - 1) * 6;
-//					$tmp = $in;
-//					$tmp = ($tmp & 0x0000003F) << $shift;
-//					$mUcs4 |= $tmp;
-//
-//					/**
-//					 * End of the multi-octet sequence. mUcs4 now contains the final
-//					 * Unicode codepoint to be output
-//					 */
-//					if (0 == --$mState) {
-//
-//									 /*
-//									 * Check for illegal sequences and codepoints.
-//									 */
-//					// From Unicode 3.1, non-shortest form is illegal
-//						if (((2 == $mBytes) && ($mUcs4 < 0x0080)) ||
-//								((3 == $mBytes) && ($mUcs4 < 0x0800)) ||
-//								((4 == $mBytes) && ($mUcs4 < 0x10000)) ||
-//								(4 < $mBytes) ||
-//								// From Unicode 3.2, surrogate characters are illegal
-//								(($mUcs4 & 0xFFFFF800) == 0xD800) ||
-//								// Codepoints outside the Unicode range are illegal
-//								($mUcs4 > 0x10FFFF)) {
-//
-//							//return FALSE;
-//							$out .= '?';
-//
-//						}else
-//						{
-//							//echo $chr."\n";
-//							$out .= $chr;
-//						}
-//
-//						//initialize UTF8 cache
-//						$mState = 0;
-//						$mUcs4  = 0;
-//						$mBytes = 1;
-//						$chr='';
-//					}
-//
-//				} else {
-//				/**
-//				 *((0xC0 & (*in) != 0x80) && (mState != 0))
-//				 * Incomplete multi-octet sequence.
-//				 */
-//
-//					//return FALSE;
-//					$out .= '?';
-//				}
-//			}
-//		}
-//		
-//		return $out;
+			return StringUtil::cleanUtf8($str, $source_charset);
 	}
-	
 	/**
 	 * Check if string has UTF8 characters
 	 * 
@@ -514,16 +304,7 @@ END;
 	 */
 
 	public static function replaceOnce($search, $replace, $subject, &$found=false) {
-		$firstChar = strpos($subject, $search);
-		if($firstChar !== false) {
-			$found=true;
-			$beforeStr = substr($subject,0,$firstChar);
-			$afterStr = substr($subject, $firstChar + strlen($search));
-			return $beforeStr.$replace.$afterStr;
-		} else {
-			$found=false;
-			return $subject;
-		}
+		return StringUtil::replaceOnce($search, $replace, $subject, &$found);
 	}
 
 	/**
@@ -1289,55 +1070,7 @@ END;
 	 * @throws Exception 
 	 */
 	public static function detectXSS($string) {
-		
-		if (!is_string($string)) {
-			\GO::debug($string);
-			throw new \Exception('Passed parameter is not a string.');
-		}
-
-// Keep a copy of the original string before cleaning up
-		$orig = $string;
-
-// URL decode
-		$string = urldecode($string);
-
-// Convert Hexadecimals
-//		$string = preg_replace('!(&#|\\\)[xX]([0-9a-fA-F]+);?!e', 'chr(hexdec("$2"))', $string);		
-		$string = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', function ($matches) {return chr(hexdec($matches[2]));}, $string);
-
-// Clean up entities
-		$string = preg_replace('!(&#0+[0-9]+)!', '$1;', $string);
-
-// Decode entities
-		$string = html_entity_decode($string, ENT_NOQUOTES, 'UTF-8');
-
-// Strip whitespace characters
-		$string = preg_replace('!\s!', '', $string);
-
-// Set the patterns we'll test against
-		$patterns = array(
-// Match any attribute starting with "on" or xmlns
-				//'#(<[^>]+[\x00-\x20\"\'\/])(on|xmlns)[^>]*>?#iUu',
-				'#(<[^>]+[\s])(on|xmlns)[^>]*>?#iUu',
-// Match javascript:, livescript:, vbscript: and mocha: protocols
-				'!((java|live|vb)script|mocha):(\w)*!iUu',
-				'#-moz-binding[\x00-\x20]*:#u',
-// Match style attributes
-				'#(<[^>]*+[\x00-\x20\"\'\/])*style=[^>]*(expression|behavior)[^>]*>?#iUu',
-// Match unneeded tags
-				'#</*(applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)\s[^>]*>?#i'
-		);
-
-		foreach ($patterns as $pattern) {
-// Test both the original string and clean string
-			if (preg_match($pattern, $string, $matches) || preg_match($pattern, $orig, $matches)){
-				\GO::debug("XSS pattern matched: ".$pattern);
-				//\GO::debug($matches);
-				return true;			
-			}
-		}
-
-		return false;
+		return StringUtil::detectXSS($string);
 	}
 
 	/**

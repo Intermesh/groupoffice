@@ -22,6 +22,12 @@ XX-09-20216.6.10
 
 
 
+- Business: temporarily display transferable leave types in the agreement dialog
+- Leavedays: filter out possible leavedays before first work date (in case of rehiring)
+- EMail: Make sure IMAP file names are always normalized UTF8 strings
+- Core: Show UK substitute days next to fixed days.
+- Core / email: Fixed editor performance on very large documents
+
 13-12-2021 6.5.93
 - Core: Clear cache via webserver if running upgrade on the command line.
 - Files: Fixed infinte loop when printing from ImageViewer.js in Safari

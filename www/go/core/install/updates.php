@@ -953,18 +953,20 @@ $updates['202111151100'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `them
 
 // recalculate becuase of substitute days
 $updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+// recalculate becuase of substitute days (again)
+$updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
 
-$updates['202110211653'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
+$updates['202112131205'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
 
 
 
 
 // MASTER UPDATES
 
-$updates['202110211653'][] = "alter table core_alert
+$updates['202112131205'][] = "alter table core_alert
 	add data text null;";
 
-$updates['202110211653'][] = "CREATE TABLE `core_pdf_block` (
+$updates['202112131205'][] = "CREATE TABLE `core_pdf_block` (
 `id` bigint(20) UNSIGNED NOT NULL,
   `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
   `x` int(11) DEFAULT NULL,
@@ -976,7 +978,7 @@ $updates['202110211653'][] = "CREATE TABLE `core_pdf_block` (
   `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-$updates['202110211653'][] = "CREATE TABLE `core_pdf_template` (
+$updates['202112131205'][] = "CREATE TABLE `core_pdf_template` (
 `id` bigint(20) UNSIGNED NOT NULL,
   `moduleId` int(11) NOT NULL,
   `key` varchar(20) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
@@ -992,40 +994,40 @@ $updates['202110211653'][] = "CREATE TABLE `core_pdf_template` (
   `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-$updates['202110211653'][] = "ALTER TABLE `core_pdf_block`
+$updates['202112131205'][] = "ALTER TABLE `core_pdf_block`
   ADD PRIMARY KEY (`id`) USING BTREE,
   ADD KEY `pdfTemplateId` (`pdfTemplateId`);";
 
-$updates['202110211653'][] = "ALTER TABLE `core_pdf_template`
+$updates['202112131205'][] = "ALTER TABLE `core_pdf_template`
   ADD PRIMARY KEY (`id`),
   ADD KEY `moduleId` (`moduleId`),
   ADD KEY `stationaryBlobId` (`stationaryBlobId`);";
 
-$updates['202110211653'][] = "ALTER TABLE `core_pdf_block`
+$updates['202112131205'][] = "ALTER TABLE `core_pdf_block`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
 
-$updates['202110211653'][] = "ALTER TABLE `core_pdf_template`
+$updates['202112131205'][] = "ALTER TABLE `core_pdf_template`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
 
-$updates['202110211653'][] = "ALTER TABLE `core_pdf_block`
+$updates['202112131205'][] = "ALTER TABLE `core_pdf_block`
   ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;";
 
-$updates['202110211653'][] = "ALTER TABLE `core_pdf_template`
+$updates['202112131205'][] = "ALTER TABLE `core_pdf_template`
   ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);";
 
 
-$updates['202110211653'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;";
+$updates['202112131205'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;";
 
 
-$updates['202110211653'][] = "alter table core_alert change alertId tag varchar(50) null;";
-$updates['202110211653'][] = "create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
+$updates['202112131205'][] = "alter table core_alert change alertId tag varchar(50) null;";
+$updates['202112131205'][] = "create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
 	on core_alert (entityTypeId, entityId, tag, userId);
 ";
 
 
 
-$updates['202110211653'][] = "create table core_auth_remember_me
+$updates['202112131205'][] = "create table core_auth_remember_me
 (
 	id int auto_increment,
     token varchar(190) collate ascii_bin null,
@@ -1036,35 +1038,35 @@ $updates['202110211653'][] = "create table core_auth_remember_me
         primary key (id)
 );";
 
-$updates['202110211653'][] = "create index core_auth_remember_me_series_index
+$updates['202112131205'][] = "create index core_auth_remember_me_series_index
     on core_auth_remember_me (series);";
 
-$updates['202110211653'][] = "alter table core_auth_remember_me
+$updates['202112131205'][] = "alter table core_auth_remember_me
     add constraint core_auth_remember_me_core_user_id_fk
         foreign key (userId) references core_user (id);";
 
-$updates['202110211653'][] = "alter table core_auth_remember_me
+$updates['202112131205'][] = "alter table core_auth_remember_me
     add `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL;";
 
-$updates['202110211653'][] = "alter table core_auth_remember_me
+$updates['202112131205'][] = "alter table core_auth_remember_me
     add `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL";
 
 $updates['202110211653'][] = "alter table core_auth_remember_me
 	add platform varchar(190) COLLATE utf8mb4_unicode_ci null after userAgent;";
 
-$updates['202110211653'][] = "alter table core_auth_remember_me
+$updates['202112131205'][] = "alter table core_auth_remember_me
 	add browser varchar(190) COLLATE utf8mb4_unicode_ci null after platform;";
 
 
-$updates['202110211653'][] = "alter table core_alert drop foreign key fk_alert_user;";
+$updates['202112131205'][] = "alter table core_alert drop foreign key fk_alert_user;";
 
-$updates['202110211653'][] = "alter table core_alert
+$updates['202112131205'][] = "alter table core_alert
 	add constraint fk_alert_user
 		foreign key (userId) references core_user (id)
 			on delete cascade;";
 
 
-$updates['202110211653'][] = "CREATE TABLE `core_permission` (
+$updates['202112131205'][] = "CREATE TABLE `core_permission` (
   `moduleId` INT NOT NULL,
   `groupId` INT NOT NULL,
   `rights` BIGINT NOT NULL DEFAULT 0,
@@ -1082,24 +1084,24 @@ $updates['202110211653'][] = "CREATE TABLE `core_permission` (
           ON UPDATE NO ACTION);";
 
 // migratie module acl permission to action permission
-$updates['202110211653'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), m.id FROM core_acl_group ag 
+$updates['202112131205'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), m.id FROM core_acl_group ag 
 join core_module m on ag.aclId = m.aclId;";
 // projects2 has finance permissions
-$updates['202110211653'][] = "UPDATE core_permission p
+$updates['202112131205'][] = "UPDATE core_permission p
 join core_acl_group ag on ag.groupId = p.groupId
 join core_module m on ag.aclId = m.aclId
 SET rights = IF(ag.level=10,0,IF(ag.level=40,1,3))
 WHERE m.id = p.moduleId AND m.name = 'projects2';";
 
 
-$updates['202110211653'][] = "alter table core_module drop foreign key acl;";
-$updates['202110211653'][] = "alter table core_module drop column aclId;";
+$updates['202112131205'][] = "alter table core_module drop foreign key acl;";
+$updates['202112131205'][] = "alter table core_module drop column aclId;";
 
 
-$updates['202110211653'][] = "alter table core_alert
+$updates['202112131205'][] = "alter table core_alert
 	add sendMail boolean default false not null;";
 
-$updates['202112071611'][] = "insert ignore into core_setting values((select id from core_module where name='core'), 'demoDataAsked', 1)";
+$updates['202112131205'][] = "insert ignore into core_setting values((select id from core_module where name='core'), 'demoDataAsked', 1)";
 
 
 

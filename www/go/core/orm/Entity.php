@@ -20,6 +20,7 @@ use go\core\model\Module;
 use GO\Files\Model\Folder;
 use PDO;
 use function go;
+use go\core\db\Query as DbQuery;
 
 /**
  * Entity model
@@ -436,7 +437,7 @@ abstract class Entity extends Property {
 	/**
 	 * Normalize a query value passed to delete()
 	 *
-	 * @param $query
+	 * @param mixed $query
 	 * @return Query
 	 * @throws Exception
 	 */
@@ -462,7 +463,7 @@ abstract class Entity extends Property {
 	/**
 	 * Delete the entity
 	 *
-	 * @param Query|Entity|array $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
+	 * @param DbQuery|Entity|array $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
 	 *  Or pass ['id' => $id];
 	 *
@@ -957,7 +958,7 @@ abstract class Entity extends Property {
    * @return Criteria
    * @throws Exception
    */
-	protected static function search(Criteria $criteria, string $expression, Query $query): Criteria
+	protected static function search(Criteria $criteria, string $expression, DbQuery $query): Criteria
 	{
 
 		$columns = static::textFilterColumns();
@@ -1305,6 +1306,7 @@ abstract class Entity extends Property {
 			try {
 				go()->getDbConnection()->exec("USE information_schema");
 				//somehow bindvalue didn't work here
+				/** @noinspection SqlResolve */
 				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
 					"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . 
 					" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
