@@ -19,8 +19,6 @@ class Search extends EntityController {
 
 	const EVENT_SEARCH_EMAIL = "searchemail";
 
-	use EventEmitterTrait;
-
 	protected function entityClass(): string
 	{
 		return model\Search::class;
