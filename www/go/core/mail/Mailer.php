@@ -36,7 +36,13 @@ class Mailer {
 	 * @return \go\core\mail\Message
 	 */
 	public function compose() {
-		return new Message($this);
+		$message = new Message($this);
+
+		if($this->emailAccount) {
+			$alias = $this->emailAccount->getDefaultAlias();
+			$message->setFrom($alias->email, $alias->name);
+		}
+		return $message;
 	}
 
 	/**
