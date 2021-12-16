@@ -5,6 +5,7 @@ namespace go\core;
 use DateTimeZone;
 use Exception;
 use go\core\data\Model;
+use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\db\Query;
 use go\core\orm\Entity;
@@ -175,7 +176,7 @@ class TemplateParser {
 
 	private $_currentUser;
 
-	protected function _currentUser(): ?model\User
+	protected function _currentUser(): ?User
 	{
 		if(!isset($this->_currentUser)) {
 			$this->_currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone' ]);
