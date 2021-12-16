@@ -3,20 +3,23 @@
 namespace go\modules\community\googleoauth2\controller;
 
 
-use go\core\jmap\EntityController;
-use go\core\jmap\Response;
-use go\core\webclient\CSP;
+use go\core\Controller;
 use go\modules\business\license\exception\LicenseException;
 use go\modules\community\email\model\Account;
 use go\modules\community\googleoauth2\model;
 use League\OAuth2\Client\Provider\Google;
 
-class Oauth2Account extends EntityController
+final class Oauth2Account extends Controller
 {
 
 	public function entityClass()
 	{
 		return model\Oauth2Account::class;
+	}
+
+	public function callback()
+	{
+		die('woef');
 	}
 
 
@@ -35,7 +38,7 @@ class Oauth2Account extends EntityController
 		$provider = new Google([
 			'clientId' => $acctSettings->clientId,
 			'clientSecret' => $acctSettings->clientSecret,
-			'redirectUri' => '' // TODO?
+			'redirectUri' => 'http://localhost:8000/api/jmap.php' // TODO?
 		]);
 
 		if (!empty($_GET['error'])) {
@@ -47,14 +50,11 @@ class Oauth2Account extends EntityController
 
 			// If we don't have an authorization code then get one
 			$authUrl = $provider->getAuthorizationUrl();
-			CSP::get()->add("default-src", 'https://accounts.google.com')
-				->add('connect-src', 'https://accounts.google.com');
 
 			$_SESSION['oauth2state'] = $provider->getState();
 			$r = \go\core\http\Response::get();
 			$r->setHeader('Location', $authUrl);
 			$r->sendHeaders();
-//			header('Location: ' . $authUrl);
 			exit;
 
 		} elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {

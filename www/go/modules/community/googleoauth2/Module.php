@@ -3,6 +3,7 @@ namespace go\modules\community\googleoauth2;
 							
 use go\core;
 use go\core\orm\Property;
+use go\core\webclient\CSP;
 use go\modules\community\email\model\Account;
 use go\modules\community\googleoauth2\model\Oauth2Account;
 
@@ -23,6 +24,7 @@ class Module extends core\Module {
 	public function defineListeners()
 	{
 		Account::on(Property::EVENT_MAPPING, static::class, 'onMap');
+		CSP::on(Csp::EVENT_CREATE,  static::class, 'onCspCreate');
 	}
 
 
@@ -31,4 +33,12 @@ class Module extends core\Module {
 		$mapping->addHasOne('googleOauth2', Oauth2Account::class, ['id' => 'accountId'], false);
 	}
 
+
+	public static function onCspCreate(CSP $csp)
+	{
+		$csp->add('default-src',  trim('https://accounts.google.com', '/'))
+			->add("connect-src", "'self'")
+			->add("connect-src", trim('https://accounts.google.com', '/'));
+
+	}
 }

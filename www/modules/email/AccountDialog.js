@@ -45,10 +45,7 @@ GO.email.AccountDialog = function(config) {
 
 	// TODO: Put this properly in an override function in Googleoauth2
 	if(go.Modules.isAvailable("community", "googleoauth2")) {
-		// this.btnOpenAuthDialog = new Ext.Button({
-		// 	iconCls: 'ic-shield',
-		// 	text: 'OAuth2',
-		// });
+		debugger;
 		this.selectAuthMethodCombo = new Ext.form.ComboBox({
 			fieldLabel: t("Authentication Method"),
 			hiddenName: 'authenticationMethod',
@@ -607,6 +604,7 @@ GO.email.AccountDialog = function(config) {
 			iconCls: 'btn-token',
 			text: 'OAuth2',
 			handler : function() {
+				window.open(GO.Url('community/googleoauth2/Oauth2Account/auth'))
 				go.Jmap.request({
 					method: 'community/googleoauth2/Oauth2Account/auth',
 					params: {accountId: this.account_id},
