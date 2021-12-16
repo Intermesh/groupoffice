@@ -2,6 +2,7 @@
 namespace go\core\db;
 
 use InvalidArgumentException;
+use LogicException;
 
 /**
  * Create "where", "having" or "join on" part of the query for {@see \go\core\db\Query}
@@ -172,15 +173,19 @@ class Criteria {
 	
 	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator): array
 	{
-		
 		if(is_array($condition)) {
+
+			if(go()->getDebugger()->enabled && empty($condition)) {
+				throw new LogicException("You can't pass an empty array as first where() argument");
+			}
+
 			$count = count($condition);
 			if($count > 1) {
 				$sub = new Criteria();
 				foreach($condition as $colName => $conditionValue) {
 					$op = is_array($conditionValue) || $conditionValue instanceof Query ? 'IN' : '=';
 					$sub->andWhere($colName, $op, $conditionValue);
-				}			
+				}
 				$condition = $sub;
 			} else if ($count === 1) {
 				reset($condition);
@@ -190,7 +195,7 @@ class Criteria {
 				$op = is_array($value) || $value instanceof Query ? 'IN' : '=';
 				return ["column", $logicalOperator, key($condition), $op, $value];
 			}
-		} 
+		}
 		
 		if(!isset($comparisonOperator) && (is_string($condition) || $condition instanceof Criteria)) {
 			//condition is raw string

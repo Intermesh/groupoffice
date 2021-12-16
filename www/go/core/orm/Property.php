@@ -973,13 +973,14 @@ abstract class Property extends Model {
 
 		if(empty($properties)) {
 			$properties = array_keys($this->oldProps);
-		} else{
+		}
+//		else{
 
 			//only check fetched properties
 
 			//Why ????
 			//$properties = array_intersect($properties, $this->fetchProperties);
-		}
+//		}
 
 		$modified = [];
 
@@ -1443,9 +1444,13 @@ abstract class Property extends Model {
 	private function removeRelated(Relation $relation, array $models, ?array $oldModels): bool
 	{
 		$cls = $relation->propertyName;
-		$where = $this->buildRelationWhere($relation);
+
 		$query = new Query();
-		$query->where($where);
+
+		$where = $this->buildRelationWhere($relation);
+		if(!empty($where)) {
+			$query->where($where);
+		}
 
 		if(!isset($oldModels)) {
 			return true;
