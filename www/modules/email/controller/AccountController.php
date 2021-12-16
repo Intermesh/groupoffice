@@ -16,6 +16,17 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 
+	protected function actionDisplay($params) {
+		$modelName = $this->model;
+		$model = \GO::getModel($modelName)->findByPk($this->getPrimaryKeyFromParams($params));
+
+		if(!$model)
+			throw new \GO\Base\Exception\NotFound();
+
+		return ['success' => true, 'data' => ['username' => $model->username]];
+	}
+
+
 //	protected function actionTest($params){
 //
 //		\GO::$disableModelCache=true;
