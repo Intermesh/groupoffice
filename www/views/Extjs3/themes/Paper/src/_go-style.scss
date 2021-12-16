@@ -1941,6 +1941,10 @@ table[id^="comments-ext"] b {
 
 .go-messages {
 
+	img {
+		max-width: 100%;
+	}
+
 	.avatar {
 		margin: 0;
 	}
