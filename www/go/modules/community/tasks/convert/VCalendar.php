@@ -148,7 +148,7 @@ class VCalendar extends AbstractConverter {
 
 	private $tempFile;
 	private $fp;
-	protected function initExport()
+	protected function initExport(): void
 	{
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
@@ -170,7 +170,7 @@ class VCalendar extends AbstractConverter {
 		return $blob;
 	}
 
-	protected function exportEntity(Entity $entity): bool
+	protected function exportEntity(Entity $entity): void
 	{
 		$data = $this->export($entity);
 		fputs($this->fp, $data);
@@ -191,7 +191,8 @@ class VCalendar extends AbstractConverter {
 
 	private $importSplitter;
 	private $currentRecord;
-	protected function initImport(File $file) {
+	protected function initImport(File $file): void
+	{
 		$contents = $file->getContents();
 		$this->importSplitter = new VCalendarSplitter(StringUtil::cleanUtf8($contents), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 

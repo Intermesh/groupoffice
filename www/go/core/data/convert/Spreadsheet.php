@@ -124,7 +124,7 @@ class Spreadsheet extends AbstractConverter {
 		static::fireEvent(static::EVENT_INIT, $this);
 	}
 
-	protected function initExport()
+	protected function initExport(): void
 	{
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
@@ -160,7 +160,7 @@ class Spreadsheet extends AbstractConverter {
 		}
 	}
 
-	protected function exportEntity(Entity $entity): bool
+	protected function exportEntity(Entity $entity): void
 	{
 
 		if ($this->index == 0) {
@@ -543,7 +543,7 @@ class Spreadsheet extends AbstractConverter {
 
 
 
-	protected function initImport(File $file)
+	protected function initImport(File $file): void
 	{
 		if($this->extension == 'csv') {
 			$this->fp = $file->open('r');
@@ -607,7 +607,7 @@ class Spreadsheet extends AbstractConverter {
 		}
 	}
 
-	protected function finishImport()
+	protected function finishImport(): void
 	{
 		if($this->extension == 'csv') {
 			fclose($this->fp);

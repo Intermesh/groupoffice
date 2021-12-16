@@ -170,13 +170,13 @@ class VCard extends AbstractConverter {
 			}
 	}
 
-	protected function initExport()
+	protected function initExport(): void
 	{
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
 	}
 
-	protected function exportEntity(Entity $entity): bool
+	protected function exportEntity(Entity $entity): void
 	{
 		$str = $this->export($entity);
 		fputs($this->fp, $str);
@@ -510,7 +510,7 @@ class VCard extends AbstractConverter {
 
 	protected $values;
 
-	protected function initImport(File $file)
+	protected function initImport(File $file): void
 	{
 		$this->splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 		if(!isset( $this->clientParams['values']))
@@ -524,7 +524,7 @@ class VCard extends AbstractConverter {
 
 	}
 
-	protected function finishImport()
+	protected function finishImport(): void
 	{
 		unset($this->splitter);
 	}
