@@ -182,13 +182,9 @@ class Alert extends SingleOwnerEntity
 	public function getTitle() {
 		return $this->getProps()['title'];
 	}
+
 	public function getBody() {
 		return $this->getProps()['body'];
-	}
-
-	public function getURL() {
-		$e = $this->findEntity();
-		return $e ? $e->getURL() : null;
 	}
 
 }
