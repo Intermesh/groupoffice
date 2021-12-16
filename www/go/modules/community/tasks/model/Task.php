@@ -645,8 +645,8 @@ class Task extends AclInheritEntity {
 		$body = str_replace('{assigner}', $assigner->displayName, go()->t("You were assigned to this task by {assigner}"));
 		$task = $alert->findEntity();
 		if($task) {
-			$uid = '['. str_pad($task->entityType()->getId(),3, '0') .':'.str_pad($task->id(),3, '0') . ']';
-			$title = $task->title() . " " . $uid;
+
+			$title = $task->title();
 		} else{
 			$title = "Missing task?";
 		}
