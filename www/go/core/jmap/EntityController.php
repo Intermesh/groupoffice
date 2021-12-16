@@ -735,7 +735,7 @@ abstract class EntityController extends Controller {
    * Updates the entities
    *
    * @param array $update
-   * @param array $result
+   * @param ArrayObject $result
    * @throws Exception
    */
 	private function updateEntities(array $update, ArrayObject $result) {
@@ -837,7 +837,7 @@ abstract class EntityController extends Controller {
 	 * @return array
 	 * @throws InvalidArguments
 	 */
-	protected function paramsGetUpdates(array $params): array
+	protected function paramsGetUpdates(array $params): ArrayObject
 	{
 		
 		if(!isset($params['maxChanges'])) {
@@ -856,7 +856,7 @@ abstract class EntityController extends Controller {
 			$params['accountId'] = null;
 		}
 		
-		return $params;
+		return new ArrayObject($params);
 		
 	}
 
@@ -869,7 +869,7 @@ abstract class EntityController extends Controller {
    * @throws InvalidArguments
    * @throws Exception
    */
-	protected function defaultChanges(array $params): array
+	protected function defaultChanges(array $params): ArrayObject
 	{
 		$p = $this->paramsGetUpdates($params);	
 		$cls = $this->entityClass();		
@@ -878,7 +878,7 @@ abstract class EntityController extends Controller {
 
 		$result['accountId'] = $p['accountId'];
 
-		return $result;
+		return new ArrayObject($result);
 	}
 
   /**
@@ -921,7 +921,7 @@ abstract class EntityController extends Controller {
 	 * @return array
 	 * @throws Exception
 	 */
-	protected function defaultImport(array $params): array
+	protected function defaultImport(array $params): ArrayObject
 	{
 
 		ini_set('max_execution_time', 10 * 60);
@@ -946,11 +946,11 @@ abstract class EntityController extends Controller {
 			throw new Exception("Invalid response from import converter");
 		}
 		
-		return $response;
+		return new ArrayObject($response);
 	}
 
 
-	protected function defaultExportColumns($params): array
+	protected function defaultExportColumns($params): ArrayObject
 	{
 		$converter = $this->findConverter($params['extension']);
 
@@ -960,7 +960,7 @@ abstract class EntityController extends Controller {
 			unset($mapping['customFields']);
 		}
 
-		return $mapping;
+		return new ArrayObject($mapping);
 	}
 	
 	/**
@@ -970,7 +970,7 @@ abstract class EntityController extends Controller {
 	 * @return array
 	 * @throws Exception
 	 */
-	protected function defaultImportCSVMapping(array $params): array
+	protected function defaultImportCSVMapping(array $params): ArrayObject
 	{
 		$blob = Blob::findById($params['blobId']);
 
@@ -992,7 +992,7 @@ abstract class EntityController extends Controller {
 			throw new Exception("Invalid response from import convertor");
 		}
 		
-		return $response;
+		return new ArrayObject($response);
 	}
 
 	/**
@@ -1027,7 +1027,7 @@ abstract class EntityController extends Controller {
    * @see AbstractConverter
    *
    */
-	protected function defaultExport(array $params): array
+	protected function defaultExport(array $params): ArrayObject
 	{
 
 		ini_set('max_execution_time', 10 * 60);
@@ -1040,7 +1040,7 @@ abstract class EntityController extends Controller {
 
 		$blob = $convertor->exportToBlob($entities, $params->getArray());
 		
-		return ['blobId' => $blob->id, 'blob' => $blob->toArray()];
+		return new ArrayObject(['blobId' => $blob->id, 'blob' => $blob->toArray()]);
 	}
 
   /**
@@ -1053,7 +1053,7 @@ abstract class EntityController extends Controller {
    * @throws InvalidArguments
    * @throws Exception
    */
-	protected function defaultMerge($params): array
+	protected function defaultMerge($params): ArrayObject
 	{
 		if(empty($params['ids'])) {
 			throw new InvalidArguments('ids is required');
@@ -1088,11 +1088,11 @@ abstract class EntityController extends Controller {
 
 		go()->getDbConnection()->commit();
 
-		return [
+		return new ArrayObject([
 			"updated" => [$primaryId => $entity],
 			"destroyed" => $params['ids'],
 			'oldState' => $oldState,
 			'newState' => $this->getState()
-		];
+		]);
 	}
 }
