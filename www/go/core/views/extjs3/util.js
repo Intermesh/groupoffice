@@ -590,7 +590,71 @@ go.util =  (function () {
 		}
 
 		return a;
-	}
+	},
+
+		blobCache : {},
+
+		getBlobURL : function(blobId) {
+			let fetchOptions = {
+				method: 'GET',
+				headers: {
+					'Authorization': 'Bearer ' + go.User.accessToken
+				}
+			}
+
+
+		if(!this.blobCache[blobId]) {
+			let type;
+			this.blobCache[blobId] = fetch(go.Jmap.downloadUrl(blobId), fetchOptions)
+				.then( r => {
+
+					type = r.headers.get("Content-Type") || undefined
+
+					return r.arrayBuffer()
+
+				})
+				.then( ab => URL.createObjectURL( new Blob( [ ab ], { type: type } ) ) );
+		}
+
+		return this.blobCache[blobId];
+	},
+
+		/**
+		 * Replaces all img tags with a blob ID source from group-office with an objectURL
+		 *
+		 * @param el
+		 * @return Promise that resolves when all images are fully loaded
+		 */
+		replaceBlobImages : function (el) {
+
+			const promises = [];
+			el.querySelectorAll("img").forEach((img) => {
+
+				let blobId = img.dataset.blobId;
+				if(!blobId) {
+					const regex = new RegExp('blob=([^">\'&\?].*)');
+					const matches = regex.exec(img.src);
+					if(matches && matches[1]) {
+						blobId = matches[1];
+					}
+				}
+
+				if(blobId) {
+
+					img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+
+					promises.push(this.getBlobURL(blobId).then(src => {
+
+						img.src = src;
+					}).then(() => {
+						//wait till image is fully loaded
+						return new Promise(resolve => { img.onload = img.onerror = resolve; })
+					}));
+				}
+			});
+
+			return Promise.all(promises);
+		}
 	};
 })();
 

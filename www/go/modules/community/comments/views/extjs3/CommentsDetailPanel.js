@@ -261,15 +261,23 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				]
 			});
 
-			readMore.on('render',function(me){me.getEl().on("contextmenu", function(e, target, obj){
-				e.stopEvent();		
-				
-				if(r.data.permissionLevel > go.permissionLevels.read) {
-					this.contextMenu.record = r;
-					this.contextMenu.showAt(e.xy);
-				}
+			readMore.on('afterrender',function(me){
 
-			}, this);},this);
+				me.getEl().on("contextmenu", function(e, target, obj){
+					e.stopEvent();
+
+					if(r.data.permissionLevel > go.permissionLevels.read) {
+						this.contextMenu.record = r;
+						this.contextMenu.showAt(e.xy);
+					}
+				}, this);
+
+			},this);
+
+			readMore.getComponent("content").on("afterrender" , (content) => {
+
+				go.util.replaceBlobImages(content.getEl().dom);
+			})
 
 			prevStr = go.util.Format.date(r.get('date'));
 		}, this);
