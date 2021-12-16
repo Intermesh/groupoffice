@@ -251,7 +251,7 @@ class Task extends AclInheritEntity {
 		return ['title', 'description'];
 	}
 
-	protected function getSearchKeywords()
+	protected function getSearchKeywords(): ?array
 	{
 		$keywords = [$this->title, $this->description];
 		if($this->responsibleUserId) {
@@ -265,7 +265,8 @@ class Task extends AclInheritEntity {
 		return $keywords;
 	}
 
-	protected function getSearchDescription(){
+	protected function getSearchDescription(): string
+	{
 		$tasklist = Tasklist::findById($this->tasklistId);
 		$desc = $tasklist->name;
 		if(!empty($this->responsibleUserId) && ($user = User::findById($this->responsibleUserId, ['displayName']))) {
