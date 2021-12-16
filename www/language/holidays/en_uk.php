@@ -1,12 +1,18 @@
 <?php
+// holidays with fixed date
+$input_holidays['fix']['01-01'] = 'New Year\'s Day';
+$input_holidays['fix']['12-25'] = 'Christmas Day';
+$input_holidays['fix']['12-26'] = 'Boxing Day';
+
+
 // holidays with variable date (christian holidays computation is based on the date of easter day)
 $input_holidays['var']['-2'] = 'Good Friday';
 $input_holidays['var']['0'] = 'Easter Sunday';
 $input_holidays['var']['1'] = 'Easter Monday';
 
-$input_holidays['fn'][] = array('New Years Day',array('GOHolidaysUK', 'newyear'));
-$input_holidays['fn'][] = array('Christmas Day',array('GOHolidaysUK', 'christmas'));
-$input_holidays['fn'][] = array('Boxing Day',array('GOHolidaysUK', 'boxingday'));
+$input_holidays['fn'][] = array('New Year\'s Day (substitute)',array('GOHolidaysUK', 'newyear'));
+$input_holidays['fn'][] = array('Christmas Day (substitute)',array('GOHolidaysUK', 'christmas'));
+$input_holidays['fn'][] = array('Boxing Day (substitute)',array('GOHolidaysUK', 'boxingday'));
 
 $input_holidays['fn'][] = array('Summer bank holiday',array('GOHolidaysUK', 'summerBank'));
 $input_holidays['fn'][] = array('Spring bank holiday',array('GOHolidaysUK', 'springBank'));
@@ -34,20 +40,20 @@ if (!class_exists('GOHolidaysUK')) {
 
 		public static function christmas($year) {
 			$date = new DateTime($year . '-12-25');
-			return self::substitute($date, 2)->format("Y-m-d");
+			return self::substitute($date, 2);
 		}
 
 		public static function boxingday($year) {
 			$date = new DateTime($year . '-12-26');
-			return self::substitute($date, 2)->format("Y-m-d");
+			return self::substitute($date, 2);
 		}
 
 		public static function newyear($year) {
 			$date = new DateTime($year . '-01-01');
-			return self::substitute($date)->format("Y-m-d");
+			return self::substitute($date);
 		}
 
-		private static function substitute(DateTime $date, int $moveDays = null) :DateTime {
+		private static function substitute(DateTime $date, int $moveDays = null) : ?string {
 			$dayOfWeek = $date->format("w");
 			if($dayOfWeek == 0 || $dayOfWeek == 6) {
 				if(!isset($moveDays)) {
@@ -55,9 +61,11 @@ if (!class_exists('GOHolidaysUK')) {
 				}
 				$date->add(new DateInterval("P" . $moveDays . "D"));
 
+				return $date->format("Y-m-d");
+
 			}
 
-			return $date;
+			return null;
 
 		}
 	}

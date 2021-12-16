@@ -953,6 +953,8 @@ $updates['202111151100'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `them
 
 // recalculate becuase of substitute days
 $updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+// recalculate becuase of substitute days (again)
+$updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
 
 $updates['202110211653'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
 
