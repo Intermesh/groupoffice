@@ -124,7 +124,7 @@ END;
 			$str = preg_replace($regex, '$1', $str);
 		}	
 		
-		return \go\core\util\StringUtil::normalize($str);
+		return StringUtil::normalize($str);
 		
 	}
 	
@@ -211,7 +211,7 @@ END;
 			if (($pos = strrpos($temp, ' '))) {
 				return $substrFunc($temp, 0, $pos) . $append;
 			} else {
-				return $temp = $substrFunc($str, 0, $maxLength) . $append;
+				return $substrFunc($str, 0, $maxLength) . $append;
 			}
 		} else {
 			return $temp . $append;
@@ -231,8 +231,8 @@ END;
 	{
 
 		if ($convertLinks) {
-			$text = preg_replace("/\b(https?:\/\/[\pL0-9\.&\-\/@#;`~=%?:_\+,\)\(]+)\b/ui", '{lt}a href={quot}$1{quot} target={quot}_blank{quot}{gt}$1{lt}/a{gt}', $text . "\n");
-			$text = preg_replace("/\b([\pL0-9\._\-]+@[\pL0-9\.\-_]+\.[a-z]{2,4})(\s)/ui", "{lt}a href={quot}mailto:$1{quot}{gt}$1{lt}/a{gt}$2", $text);
+			$text = preg_replace("/\b(https?:\/\/[\pL0-9.&\-\/@#;`~=%?:_+,)(]+)\b/ui", '{lt}a href={quot}$1{quot} target={quot}_blank{quot}{gt}$1{lt}/a{gt}', $text . "\n");
+			$text = preg_replace("/\b([\pL0-9._\-]+@[\pL0-9.\-_]+\.[a-z]{2,4})(\s)/ui", "{lt}a href={quot}mailto:$1{quot}{gt}$1{lt}/a{gt}$2", $text);
 		}
 
 		//replace repeating spaces with &nbsp;		
@@ -266,79 +266,6 @@ END;
 		$html = new Html2Text($html);
 		
 		return trim($html->getText());
-	}
-
-
-	/**
-	 * Change HTML links to Group-Office links. For example mailto: links will call
-	 * the Group-Office e-mail module if installed.
-	 *
-	 * @param string HTML formatted string
-	 * @return string
-	 */
-
-	public static function convertLinks($html): string
-	{
-		$baseUrl = '';
-		if(preg_match('/base href="([^"]+)"/', $html, $matches)){
-			if(isset($matches[1]))
-			{
-				$baseUrl = $matches[1];
-			}
-		}
-
-		
-//		Don't strip new lines or it will mess up <pre> tags
-//		$html = str_replace("\r", '', $html);
-//		$html = str_replace("\n",' ', $html);
-//		
-		//strip line breaks inside html tags
-		$html = preg_replace_callback('/<[^>]+>/sm',function($matches){
-			$replacement = str_replace("\r", '', $matches[0]);
-			return str_replace("\n",'  ', $replacement);
-		}, $html);
-
-		$regexp="/<a[^>]*href=\s*([\"']?)(http|https|ftp|bf2)(:\/\/)(.+?)>/i";
-		$html = preg_replace($regexp, "<a target=$1_blank$1 href=$1$2$3$4>", $html);
-		
-		if(!empty($baseUrl)){
-			$regexp="/<a[^>]*href=\s*('|\")(?![a-z]+:)/i";
-			$html = preg_replace($regexp, "<a target=$1_blank$1 href=$1".$baseUrl, $html);
-		}
-		
-//		var_dump($html);
-		
-//		preg_match("/[^='\"a-z0-9\/\\\\\(>](https?:\/\/[\pL0-9\.&\-\/@#;`~=%?:_\+,\)\(]+)/ui", $html, $matches);
-//		var_dump($matches);
-		
-		//replace URL's without anchor tags to links
-		//$regexp="/<a.+?href=([\"']?)".str_replace('/','\\/', \GO::config()->full_url)."(.+?)>/i";
-		//$html = preg_replace($regexp, "<a target=$1main$1 class=$1blue$1 href=$1".\GO::config()->host."$2$3>", $html);
-
-		//Following line breaks links on mobile phones
-		//$html =str_replace(\GO::config()->full_url, \GO::config()->host, $html);
-		
-		return preg_replace("/[^='\"a-z0-9\/\\\\\(>](https?:\/\/[\pL0-9\.&\-\/@#;`~=%?:_\+,\)\(]+)/ui", '<a href="$1" target="_blank">$0</a>', $html);
-	}
-
-
-  /**
-   * Replace string in html. It will leave strings inside html tags alone.
-   *
-   * @param string $search
-   * @param string $replacement
-   * @param string $html
-   * @return string
-   */
-	public static function htmlReplace(string $search, string $replacement, string $html): string
-	{
-		$html = preg_replace_callback('/<[^>]*(' . preg_quote($search) . ')[^>]*>/uis', function($matches) {
-			return stripslashes(str_replace($matches[1], '{TEMP}', $matches[0]));
-		}, $html);
-		$html = preg_replace('/([^a-z0-9])' . preg_quote($search) . '([^a-z0-9])/i', "\\1" . $replacement . "\\2", $html);
-
-		//$html = str_ireplace($search, $replacement, $html);
-		return str_replace('{TEMP}', $search, $html);
 	}
 
 	/**
@@ -396,40 +323,6 @@ END;
 		return false;
 	}
 
-  /**
-   * Filter possible XSS attacks
-   *
-   * @param string $string
-   * @param string
-   * @return string
-   */
-	public static function filterXSS(string $string): string
-	{
-		// Fix &entity\n;
-		$string = str_replace(array('&amp;', '&lt;', '&gt;'), array('&amp;amp;', '&amp;lt;', '&amp;gt;'), $string);
-		$string = preg_replace('/(&#*\w+)[\x00-\x20]+;/u', '$1;', $string);
-		$string = preg_replace('/(&#x*[0-9A-F]+);*/iu', '$1;', $string);
-		$string = html_entity_decode($string, ENT_COMPAT, 'UTF-8');
-
-		// Remove any attribute starting with "on" or xmlns
-		$string = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>]*+>#iu', '$1>', $string);
-		// Remove javascript: and vbscript: protocols
-		$string = preg_replace('#([a-z]*)[\x00-\x20]*=[\x00-\x20]*([`\'"]*)[\x00-\x20]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2nojavascript...', $string);
-		$string = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2novbscript...', $string);
-		$string = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u', '$1=$2nomozbinding...', $string);
-
-//
-//		// Only works in IE: <span style="width: expression(alert('Ping!'));"></span>
-		$string = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?expression[\x00-\x20]*\([^>]*+>#i', '$1>', $string);
-		$string = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?behaviour[\x00-\x20]*\([^>]*+>#i', '$1>', $string);
-
-		//the next line removed valid stuff from the body
-		//$data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:*[^>]*+>#iu', '$1>', $data);
-		// Remove namespaced elements (we do not need them)
-		return preg_replace('#</*\w+:\w[^>]*+>#i', '', $string);
-	}
-
-
 	/**
 	 * Check the length of a string. Works with UTF8 too.
 	 * 
@@ -440,29 +333,6 @@ END;
 	{
 		return mb_strlen($str, 'UTF-8');
 	}
-
-	/**
-	 * Get part of string
-	 * @link https://php.net/manual/en/function.mb-substr.php
-	 * @param $string
-	 * @param int $start <p>
-	 * The first position used in str.
-	 * </p>
-	 * @param null $length [optional] <p>
-	 * The maximum length of the returned string.
-	 * </p>
-	 * @return string mb_substr returns the portion of
-	 * str specified by the
-	 * start and
-	 * length parameters.
-	 * @since 4.0.6
-	 * @since 5.0
-	 */
-	public static function substr($string, int $start, $length = null): string
-	{
-		return function_exists("mb_substr") ? mb_substr($string, $start, $length) : substr($string, $start, $length);
-	}
-
 
   /**
    * Turn string with underscores into lowerCamelCase
@@ -495,25 +365,9 @@ END;
    */
 	public static function upperCamelCasify(string $str): string
 	{
-		
 		$str = str_replace('-','_', strtolower($str));		
 		$parts = explode('_', $str);
 		return implode('', array_map('ucfirst', $parts));
-	}
-	
-	/**
-	 * Remove BOM character
-	 * 
-	 * @param string $str
-	 * @return string
-	 */
-	public static function removeBOMCharacter(string $str): string
-	{
-		if (substr($str, 0, 3) == chr(hexdec('EF')) . chr(hexdec('BB')) . chr(hexdec('BF'))) {
-			return substr($str, 3);
-		} else {
-			return $str;
-		}
 	}
 	
 	/**

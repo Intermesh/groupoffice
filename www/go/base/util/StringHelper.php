@@ -304,16 +304,7 @@ class StringHelper {
 	 */
 
 	public static function replaceOnce($search, $replace, $subject, &$found=false) {
-		$firstChar = strpos($subject, $search);
-		if($firstChar !== false) {
-			$found=true;
-			$beforeStr = substr($subject,0,$firstChar);
-			$afterStr = substr($subject, $firstChar + strlen($search));
-			return $beforeStr.$replace.$afterStr;
-		} else {
-			$found=false;
-			return $subject;
-		}
+		return StringUtil::replaceOnce($search, $replace, $subject, &$found);
 	}
 
 	/**
@@ -1079,55 +1070,7 @@ class StringHelper {
 	 * @throws Exception 
 	 */
 	public static function detectXSS($string) {
-		
-		if (!is_string($string)) {
-			\GO::debug($string);
-			throw new \Exception('Passed parameter is not a string.');
-		}
-
-// Keep a copy of the original string before cleaning up
-		$orig = $string;
-
-// URL decode
-		$string = urldecode($string);
-
-// Convert Hexadecimals
-//		$string = preg_replace('!(&#|\\\)[xX]([0-9a-fA-F]+);?!e', 'chr(hexdec("$2"))', $string);		
-		$string = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', function ($matches) {return chr(hexdec($matches[2]));}, $string);
-
-// Clean up entities
-		$string = preg_replace('!(&#0+[0-9]+)!', '$1;', $string);
-
-// Decode entities
-		$string = html_entity_decode($string, ENT_NOQUOTES, 'UTF-8');
-
-// Strip whitespace characters
-		$string = preg_replace('!\s!', '', $string);
-
-// Set the patterns we'll test against
-		$patterns = array(
-// Match any attribute starting with "on" or xmlns
-				//'#(<[^>]+[\x00-\x20\"\'\/])(on|xmlns)[^>]*>?#iUu',
-				'#(<[^>]+[\s])(on|xmlns)[^>]*>?#iUu',
-// Match javascript:, livescript:, vbscript: and mocha: protocols
-				'!((java|live|vb)script|mocha):(\w)*!iUu',
-				'#-moz-binding[\x00-\x20]*:#u',
-// Match style attributes
-				'#(<[^>]*+[\x00-\x20\"\'\/])*style=[^>]*(expression|behavior)[^>]*>?#iUu',
-// Match unneeded tags
-				'#</*(applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)\s[^>]*>?#i'
-		);
-
-		foreach ($patterns as $pattern) {
-// Test both the original string and clean string
-			if (preg_match($pattern, $string, $matches) || preg_match($pattern, $orig, $matches)){
-				\GO::debug("XSS pattern matched: ".$pattern);
-				//\GO::debug($matches);
-				return true;			
-			}
-		}
-
-		return false;
+		return StringUtil::detectXSS($string);
 	}
 
 	/**
