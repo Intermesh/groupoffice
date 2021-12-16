@@ -203,7 +203,7 @@ abstract class AbstractConverter {
 	 *
 	 * @param File $file
 	 */
-	abstract protected function initImport(File $file);
+	abstract protected function initImport(File $file): void;
 
 	/**
 	 * Reads next record from file. Returns true on success or false when done.
@@ -212,7 +212,8 @@ abstract class AbstractConverter {
 	 */
 	abstract protected function nextImportRecord(): bool;
 
-	protected function finishImport() {
+	protected function finishImport(): void
+	{
 
 	}
 
@@ -229,17 +230,15 @@ abstract class AbstractConverter {
 	abstract protected function importEntity();
 
 
-
 	/** start of export */
 
 
 	/**
 	 * Export entities to a blob
 	 *
-
 	 * @param Query|array $entities
+	 * @param array $params
 	 * @return Blob
-	 * @throws Exception
 	 */
 	public final function exportToBlob(Query $entities, array $params = []): Blob
 	{
@@ -279,7 +278,7 @@ abstract class AbstractConverter {
 	 *
 	 * @return void
 	 */
-	abstract protected function initExport();
+	abstract protected function initExport(): void;
 
 	protected function afterSave(Entity $entity): bool
 	{
@@ -290,9 +289,9 @@ abstract class AbstractConverter {
 	 * Export the given entity
 	 *
 	 * @param Entity $entity
-	 * @return bool
+	 * @return void
 	 */
-	abstract protected function exportEntity(Entity $entity): bool;
+	abstract protected function exportEntity(Entity $entity): void;
 
 	/**
 	 * Finish the export retuning a Blob with the data
