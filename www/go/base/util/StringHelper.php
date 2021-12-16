@@ -304,7 +304,7 @@ class StringHelper {
 	 */
 
 	public static function replaceOnce($search, $replace, $subject, &$found=false) {
-		return StringUtil::replaceOnce($search, $replace, $subject, &$found);
+		return StringUtil::replaceOnce($search, $replace, $subject, $found);
 	}
 
 	/**
