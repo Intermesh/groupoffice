@@ -742,18 +742,18 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	fixKeys: function () { // load time branching for fastest keydown performance
 
 			return function (e) {
+				var k = e.getKey();
 
-				var k = e.getKey(), doc = this.getDoc();
 				if(
 					Ext.isWebKit && e.shiftKey && k == e.ENTER &&
-					(doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist'))
+					(this.getDoc().queryCommandState('insertorderedlist') || this.getDoc().queryCommandState('insertunorderedlist'))
 				) {
 					e.stopEvent();
 					this.execCmd('InsertHtml',Ext.isGecko ? '<br />' : '<br /><br />');
 					this.deferFocus();
 				} else if (k == e.TAB) {
 					e.preventDefault();
-					if (doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist')) {
+					if (this.getDoc().queryCommandState('insertorderedlist') || this.getDoc().queryCommandState('insertunorderedlist')) {
 						this.execCmd(e.shiftKey ? 'outdent' : 'indent');
 					}else {
 						this.execCmd('InsertText', '\t');
