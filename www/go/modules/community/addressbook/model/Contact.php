@@ -967,7 +967,8 @@ class Contact extends AclItemEntity {
 		return true;
 	}
 
-	public function getSearchDescription() {
+	public function getSearchDescription(): string
+	{
 		$addressBook = AddressBook::findById($this->addressBookId, ['name']);
 
 		$orgStr = "";	
@@ -991,11 +992,12 @@ class Contact extends AclItemEntity {
 		return $this->name;
 	}
 
-	protected function getSearchFilter() {
+	protected function getSearchFilter(): ?string
+	{
 		return $this->isOrganization ? 'isOrganization' : 'isContact';
 	}
 
-	protected function getSearchKeywords()
+	protected function getSearchKeywords(): ?array
 	{
 		$keywords = [$this->name, $this->debtorNumber, $this->jobTitle];
 		foreach($this->emailAddresses as $e) {

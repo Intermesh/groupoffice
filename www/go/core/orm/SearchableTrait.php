@@ -1,9 +1,16 @@
 <?php
 namespace go\core\orm;
 
+use DateTime;
+use Exception;
 use go\core\db\Criteria;
+use go\core\db\Query as OrmQuery;
+use go\core\db\Statement;
+use go\core\ErrorHandler;
 use go\core\model\Link;
 use go\core\model\Search;
+use go\core\util\ClassFinder;
+use function go;
 
 /**
  * Entities can use this trait to make it show up in the global search function
@@ -19,34 +26,37 @@ trait SearchableTrait {
 	 * 
 	 * @return string
 	 */
-	abstract public function getSearchDescription();
+	abstract public function getSearchDescription(): string;
 	
 	/**
 	 * All the keywords that can be searched on.
 	 *
 	 * Note: for larger text fields it might be useful to use {@see self::splitTextKeywords()} on it.
 	 * 
-	 * @return string[]
+	 * @return string[]|null
 	 */
-	protected function getSearchKeywords() {
+	protected function getSearchKeywords(): ?array
+	{
 		return null;
 	}
 	
 	/**
 	 * You can return an optional search filter here.
 	 * 
-	 * @return string
+	 * @return string|null
 	 */
-	protected function getSearchFilter() {
+	protected function getSearchFilter(): ?string
+	{
 		return null;
 	}
 
 	/**
 	 * Split text by non word characters to get useful search keywords.
-	 * @param $text
+	 * @param string $text
 	 * @return string[]
 	 */
-	public static function splitTextKeywords($text) {
+	public static function splitTextKeywords(string $text): array
+	{
 
 		if(empty($text)) {
 			return [];
@@ -95,11 +105,12 @@ trait SearchableTrait {
 	 *
 	 * %234 because it can't use an index
 	 *
-	 * @param $number
+	 * @param string|int $number
 	 * @param int $minSearchLength
 	 * @return array
 	 */
-	public static function numberToKeywords($number, $minSearchLength = 3) {
+	public static function numberToKeywords($number, int $minSearchLength = 3): array
+	{
 		$keywords = [$number];
 
 		while(strlen($number) > $minSearchLength) {
@@ -116,16 +127,13 @@ trait SearchableTrait {
 	 *
 	 * @param Criteria $criteria
 	 * @param Query $query
-	 * @param $searchPhrase
-	 * @throws \Exception
+	 * @param string $searchPhrase
+	 * @throws Exception
 	 */
-	public static function addCriteria(Criteria $criteria, Query $query, $searchPhrase) {
+	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase) {
 		$i = 0;
 		$words = SearchableTrait::splitTextKeywords($searchPhrase);
 		$words = array_unique($words);
-
-
-		//$query->noCache();
 
 		foreach($words as $word) {
 			$query->join(
@@ -145,22 +153,28 @@ trait SearchableTrait {
 	 *
 	 * @param bool $checkExisting If certain there's no existing record then this can be set to false
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	public function saveSearch($checkExisting = true) {
+	public function saveSearch(bool $checkExisting = true): bool
+	{
 
 		if(!static::$updateSearch) {
 			return true;
 		}
 
-		$search = $checkExisting ? \go\core\model\Search::find()->where('entityTypeId','=', static::entityType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
+		$search = $checkExisting ?
+			Search::find()
+				->where('entityTypeId','=', static::entityType()->getId())
+				->andWhere('entityId', '=', $this->id)->single()
+			: false;
+
 		if(!$search) {
-			$search = new \go\core\model\Search();
+			$search = new Search();
 			$search->setEntity(static::entityType());
 		}
 		
 		if(empty($this->id)) {
-			throw new \Exception("ID is not set");
+			throw new Exception("ID is not set");
 		}
 		
 		$search->entityId = $this->id;
@@ -168,7 +182,7 @@ trait SearchableTrait {
 		$search->name = $this->title();
 		$search->description = $this->getSearchDescription();
 		$search->filter = $this->getSearchFilter();
-		$search->modifiedAt = property_exists($this, 'modifiedAt') ? $this->modifiedAt : new \DateTime();
+		$search->modifiedAt = property_exists($this, 'modifiedAt') ? $this->modifiedAt : new DateTime();
 		
 //		$search->createdAt = $this->createdAt;
 		
@@ -210,7 +224,7 @@ trait SearchableTrait {
 		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
 		if(!$search->internalSave()) {
-			throw new \Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
+			throw new Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
 		}
 
 		if(!$isNew) {
@@ -233,9 +247,12 @@ trait SearchableTrait {
 	}
 
 
-	
-	public static function deleteSearchAndLinks(Query $query) {
-		$delSearchStmt = \go()->getDbConnection()
+	/**
+	 * @throws Exception
+	 */
+	public static function deleteSearchAndLinks(Query $query): bool
+	{
+		$delSearchStmt = go()->getDbConnection()
 			->delete('core_search',
 				(new Query)
 					->where(['entityTypeId' => static::entityType()->getId()])
@@ -258,20 +275,23 @@ trait SearchableTrait {
 		
 		return true;
 	}
-	
-	
+
+
 	/**
-	 * 
-	 * @param string $cls
-	 * @return \go\core\db\Statement
+	 *
+	 * @param class-string<Entity> $cls
+	 * @param int $offset
+	 * @return Statement
+	 * @throws Exception
 	 */
-	private static function queryMissingSearchCache($cls, $offset = 0) {
+	private static function queryMissingSearchCache(string $cls, int $offset = 0): Statement
+	{
 		
 		$limit = 1000;
 
 		/** @var Entity $cls */
 		$query = $cls::find();
-		/* @var $query \go\core\db\Query */
+		/* @var $query OrmQuery */
 		$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT");
 		$query->andWhere('search.id IS NULL')
 
@@ -282,7 +302,10 @@ trait SearchableTrait {
 
 		return $query->execute();
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private static function rebuildSearchForEntity($cls) {
 		echo $cls."\n";
 		
@@ -315,9 +338,9 @@ trait SearchableTrait {
 					$m->saveSearch(false);
 					echo ".";
 
-				} catch (\Exception $e) {
+				} catch (Exception $e) {
 					echo "Error: " . $m->id() . ' '. $m->title() ." : " . $e->getMessage() ."\n";
-					\go\core\ErrorHandler::logException($e);
+					ErrorHandler::logException($e);
 
 					$offset++;
 				}
@@ -333,9 +356,12 @@ trait SearchableTrait {
 
 
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	public static function rebuildSearch() {
-		$classFinder = new \go\core\util\ClassFinder();
+		$classFinder = new ClassFinder();
 		$entities = $classFinder->findByTrait(SearchableTrait::class);
 		
 		foreach($entities as $cls) {

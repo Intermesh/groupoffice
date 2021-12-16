@@ -84,7 +84,7 @@ class Relation {
    *
    * @param int $type
    */
-	public function __construct($name, array $keys, $type = self::TYPE_HAS_ONE) {
+	public function __construct(string $name, array $keys, int $type = self::TYPE_HAS_ONE) {
 		$this->name = $name;
 		$this->keys = $keys;
 		$this->type = $type;
@@ -114,7 +114,7 @@ class Relation {
 		return $this;
 	}
 
-	public function setTableName($name) 
+	public function setTableName($name): Relation
 	{
 		$this->tableName = $name;
 
@@ -126,7 +126,8 @@ class Relation {
 	 *
 	 * @return string
 	 */
-	public function getScalarColumn() {
+	public function getScalarColumn(): string
+	{
 		$table = Table::getInstance($this->tableName, go()->getDbConnection());
 		$diff = array_diff($table->getPrimaryKey(), $this->keys);
 

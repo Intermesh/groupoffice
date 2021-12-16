@@ -72,7 +72,8 @@ class Note extends AclItemEntity {
 		return ['noteBookId' => 'id'];
 	}
 
-	protected function getSearchDescription() {
+	protected function getSearchDescription(): string
+	{
 		return preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
 	}
 
