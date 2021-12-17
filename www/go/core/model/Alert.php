@@ -2,8 +2,11 @@
 
 namespace go\core\model;
 
+use BadMethodCallException;
+use Exception;
 use GO\Base\Cron\EmailReminders;
 use GO\Base\Db\ActiveRecord;
+use GO\Base\Exception\AccessDenied;
 use go\core\acl\model\SingleOwnerEntity;
 
 use go\core\db\Criteria;
@@ -12,6 +15,10 @@ use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\JSON;
+use go\modules\community\comments\model\Comment;
+use JsonException;
+use stdClass;
 
 class Alert extends SingleOwnerEntity
 {
@@ -46,12 +53,38 @@ class Alert extends SingleOwnerEntity
 			->addTable("core_alert", "alert");
 	}
 
-	public function getEntity() {
+	/**
+	 * @throws Exception
+	 */
+	public function getEntity(): string
+	{
 		return EntityType::findById($this->entityTypeId)->getName();
 	}
 
-	public function setEntity($name) {
-		$this->entityTypeId = EntityType::findByName($name)->getId();
+
+	/**
+	 * Set the entity type
+	 *
+	 * @param mixed $entity "note", Entity $note or Entitytype instance
+	 * @throws Exception
+	 *
+	 * @return self
+	 */
+	public function setEntity($entity) {
+
+		if($entity instanceof Entity || $entity instanceof ActiveRecord) {
+			$this->entityTypeId = $entity->entityType()->getId();
+			$this->entityId = $entity->id;
+			return $this;
+		}
+
+		if(!($entity instanceof EntityType)) {
+			$entity = EntityType::findByName($entity);
+		}
+		$this->entity = $entity->getName();
+		$this->entityTypeId = $entity->getId();
+
+		return $this;
 	}
 
 	protected static function defineFilters(): Filters
@@ -66,9 +99,10 @@ class Alert extends SingleOwnerEntity
 	 * Get arbitrary notification data
 	 *
 	 * @return StdClass
+	 * @throws JsonException
 	 */
 	public function getData() {
-		return empty($this->data) ? (Object) [] : json_decode($this->data, false);
+		return empty($this->data) ? (Object) [] : JSON::decode($this->data, false);
 	}
 
 
@@ -78,6 +112,8 @@ class Alert extends SingleOwnerEntity
 	 * Find the entity this alert belongs to.
 	 *
 	 * @return Entity|ActiveRecord
+	 * @throws AccessDenied
+	 * @throws Exception
 	 */
 	public function findEntity() {
 
@@ -98,11 +134,16 @@ class Alert extends SingleOwnerEntity
 	/**
 	 * Set arbitrary notification data
 	 *
+	 * If this data contains a "title" and "description" property, then this will be
+	 * used as such.
+	 *
 	 * @param array $data
 	 * @return Alert
+	 * @throws JsonException
 	 */
-	public function setData(array $data) {
-		$this->data = json_encode(array_merge((array) $this->getData(), $data));
+	public function setData(array $data): Alert
+	{
+		$this->data = JSON::encode(array_merge((array) $this->getData(), $data));
 
 		return $this;
 	}
@@ -110,7 +151,7 @@ class Alert extends SingleOwnerEntity
 	protected function internalSave(): bool
 	{
 		if(!self::$enabled) {
-			throw new \BadMethodCallException("Alerts are disabled. Please check this before creating alerts");
+			throw new BadMethodCallException("Alerts are disabled. Please check this before creating alerts");
 		}
 
 		if($this->isNew()) {
@@ -166,13 +207,26 @@ class Alert extends SingleOwnerEntity
 
 	private $props;
 
-	private function getProps() {
+	/**
+	 * @throws AccessDenied
+	 * @throws JsonException
+	 */
+	private function getProps(): array
+	{
 		if(!isset($this->props)) {
-			$e = $this->findEntity();
-			if (!$e) {
-				$this->props = ['title' => null, 'body' => null];
-			} else{
-				$this->props = $e->alertProps($this);
+
+			$data = $this->getData();
+
+			if(!empty($data->title) && !empty($data->body)) {
+				$this->props = ['title' => $data->title, 'body' => $data->body];
+			} else {
+
+				$e = $this->findEntity();
+				if (!$e) {
+					$this->props = ['title' => null, 'body' => null];
+				} else {
+					$this->props = $e->alertProps($this);
+				}
 			}
 		}
 

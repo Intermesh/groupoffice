@@ -363,7 +363,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	}
 	
 	/**
-	 * Get's the class name without the namespace
+	 * Gets the class name without the namespace
 	 * 
 	 * eg. class go\modules\community\notes\model\Note becomes just "note"
 	 * 

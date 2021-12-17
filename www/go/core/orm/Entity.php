@@ -226,7 +226,7 @@ abstract class Entity extends Property {
 	 * Check if an ID exists in the database in the most efficient way. It also caches the result
 	 * during the same request.
 	 *
-	 * @param $id
+	 * @param string|int|null $id
 	 * @return bool
 	 * @throws Exception
 	 */

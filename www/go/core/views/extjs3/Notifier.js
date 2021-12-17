@@ -172,6 +172,7 @@
 			}
 
 			if(this._messages[msg.itemId]) {
+				this._messages[msg.itemId].replaced = true;
 				this._messages[msg.itemId].destroy();
 			}
 			this._messages[msg.itemId] = msgPanel;

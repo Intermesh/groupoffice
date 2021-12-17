@@ -36,16 +36,16 @@
 		},
 
 		show : function(alert) {
-			const now = new Date(), id = 'core-alert-' + alert.id;
+			const now = new Date(), id = 'core-alert-' + (alert.tag || alert.id);
 
-			if(new Date(alert.triggerAt) > now) {
-				go.Notifier.removeById(id);
-				return;
-			}
-
-			if(go.Notifier.getById(id)) {
-				return;
-			}
+			// if(new Date(alert.triggerAt) > now) {
+			// 	go.Notifier.removeById(id);
+			// 	return;
+			// }
+			//
+			// if(go.Notifier.removeById(id)) {
+			// 	return;
+			// }
 
 			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
 
@@ -55,12 +55,13 @@
 					statusIcon: 'reminder',
 					itemId: id,
 					title: alert.title,
-					html: alert.body,
+					items: [{html: alert.body}],
 					iconCls: iconCls,
 					buttonAlign: "right",
 					listeners: {
 						destroy: (panel) => {
-							go.Db.store("Alert").destroy(alert.id);
+							if(!panel.replaced)
+								go.Db.store("Alert").destroy(alert.id);
 						}
 					},
 					handler: () => {
@@ -79,6 +80,13 @@
 						}
 					}]
 				};
+
+				if("progress" in alert.data) {
+					c.items.push(new Ext.ProgressBar({
+						text: t("Progress") + " " + alert.data.progress + "%",
+						value: alert.data.progress / 100
+					}))
+				}
 
 
 				if(!c.notificationBody) {
