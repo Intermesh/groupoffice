@@ -180,7 +180,6 @@ class Spreadsheet extends AbstractConverter {
 		}
 
 		$this->writeRecord($record);
-		return true;
 	}
 
 
