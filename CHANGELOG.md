@@ -1,3 +1,5 @@
+
+- Business: add finish date field to employee agreement record, update last agreement field when employee's quit date is changed
 - Business: temporarily display transferable leave types in the agreement dialog
 - Leavedays: filter out possible leavedays before first work date (in case of rehiring)
 
