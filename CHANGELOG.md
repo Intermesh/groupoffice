@@ -1,4 +1,6 @@
 
+- Leavedays: Tweak year view to not display any numbers if an employee does not in a certain month
+- Leavedays: Support for re-hiring employees
 - Business: add finish date field to employee agreement record, update last agreement field when employee's quit date is changed
 
 - 17-12-2021 6.5.94
