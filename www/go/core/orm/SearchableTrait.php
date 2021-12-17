@@ -52,10 +52,10 @@ trait SearchableTrait {
 
 	/**
 	 * Split text by non word characters to get useful search keywords.
-	 * @param string $text
+	 * @param ?string $text
 	 * @return string[]
 	 */
-	public static function splitTextKeywords(string $text): array
+	public static function splitTextKeywords(?string $text): array
 	{
 
 		if(empty($text)) {
