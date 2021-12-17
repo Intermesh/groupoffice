@@ -1,3 +1,4 @@
+17-12-2021 6.5.94
 - Email: Refresh button doesn't change account and message list view
 - Business: temporarily display transferable leave types in the agreement dialog
 - Leavedays: filter out possible leavedays before first work date (in case of rehiring)
