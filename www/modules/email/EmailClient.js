@@ -577,11 +577,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 		}, this, {single: true});
 
-
-
-
-
-
 	}, this);
 
 
@@ -1046,17 +1041,17 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.messagesGrid.store.baseParams['account_id']=account_id;
 		this.messagesGrid.store.baseParams['mailbox']=mailbox;
 
-		if(reload) {
-			this.messagesGrid.store.reload({
-				keepScrollPosition: true
-			})
-		} else {
+		// if(reload) {
+		// 	this.messagesGrid.store.reload({
+		// 		keepScrollPosition: true
+		// 	})
+		// } else {
 			this.messagesGrid.store.load({
 				params: {
 					start: 0
 				}
 			});
-		}
+		// }
 
 		this.treePanel.setUsage(usage);
 	},
