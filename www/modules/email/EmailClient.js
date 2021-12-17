@@ -519,23 +519,61 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	});
 
 	//select the first inbox to be displayed in the messages grid
-	this.treePanel.getRootNode().on('load', function(node) {
+	this.treePanel.getRootNode().on('load', function(rootNode) {
 		this.body.unmask();
-		if(node.childNodes[0]) {
-			var firstAccountNode=false;
-			for(var i=0;i<node.childNodes.length;i++){
-				firstAccountNode = node.childNodes[i];
-				if(firstAccountNode.expanded) {
-					firstAccountNode.on('load', function(node){
-						if(node.childNodes[0]){
-							//don't know why but it doesn't work without a 10ms delay.
-							this.treePanel.getSelectionModel().select.defer(10,this.treePanel.getSelectionModel(), [node.childNodes[0]]);
-						}
-					},this, {single: true});
+		//restore already selected account
+		let accountNode;
+		if(this.account_id) {
+			const accountNodeId = btoa('account_' + this.account_id);
+			accountNode = this.treePanel.getNodeById(accountNodeId);
+		}
+		if(!accountNode) {
+			// fallback on first
+			for(var i=0;i<rootNode.childNodes.length;i++){
+				let child = rootNode.childNodes[i];
+				if(child.expanded) {
+					accountNode = child;
 					break;
 				}
 			}
 		}
+
+		if(!accountNode) {
+			this.messagesStore.removeAll();
+			return; //no accounts
+		}
+
+		accountNode.on("load", function() {
+
+			let mailboxNode;
+			//restore already selected mailbox
+			if(this.mailbox) {
+				const mailboxNodeId = btoa('f_' + this.account_id + "_" + this.mailbox);
+				mailboxNode = this.treePanel.getNodeById(mailboxNodeId);
+			}
+
+			if(!mailboxNode) {
+				mailboxNode = accountNode.childNodes[0];
+			}
+
+			if(mailboxNode) {
+				mailboxNode.on('load', function(){
+
+					//don't know why but it doesn't work without a 10ms delay.
+					this.treePanel.getSelectionModel().select.defer(10,this.treePanel.getSelectionModel(), [mailboxNode]);
+
+				},this, {single: true});
+			} else {
+				this.messagesStore.removeAll();
+			}
+
+		}, this, {single: true});
+
+
+
+
+
+
 	}, this);
 
 
@@ -981,7 +1019,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 	setAccount : function(account_id,mailbox, usage)
 	{
-		if(account_id!=this.account_id || this.mailbox!=mailbox)
+		const reload = account_id==this.account_id && this.mailbox==mailbox;
+		if(!reload)
 		{
 			this.messagePanel.reset();
 			this.messagesGrid.getSelectionModel().clearSelections();
@@ -998,12 +1037,18 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.messagesGrid.store.baseParams['task']='messages';
 		this.messagesGrid.store.baseParams['account_id']=account_id;
 		this.messagesGrid.store.baseParams['mailbox']=mailbox;
-		this.messagesGrid.store.load({
-			params:{
-				start:0
-			}
-		});
-		//this.messagesGrid.store.load();
+
+		if(reload) {
+			this.messagesGrid.store.reload({
+				keepScrollPosition: true
+			})
+		} else {
+			this.messagesGrid.store.load({
+				params: {
+					start: 0
+				}
+			});
+		}
 
 		this.treePanel.setUsage(usage);
 	},
@@ -1088,7 +1133,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this.treePanel.loader.baseParams.refresh=true;
 
 		this.treePanel.root.reload();
-		this.messagesStore.removeAll();
+		// this.messagesStore.removeAll();
 
 		if(refresh)
 			delete this.treePanel.loader.baseParams.refresh;

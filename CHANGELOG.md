@@ -1,3 +1,4 @@
+- Email: Refresh button doesn't change account and message list view
 - Business: temporarily display transferable leave types in the agreement dialog
 - Leavedays: filter out possible leavedays before first work date (in case of rehiring)
 - EMail: Make sure IMAP file names are always normalized UTF8 strings
