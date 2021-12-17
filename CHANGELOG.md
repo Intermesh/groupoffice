@@ -1,5 +1,8 @@
 
 - Business: add finish date field to employee agreement record, update last agreement field when employee's quit date is changed
+
+- 17-12-2021 6.5.94
+- Email: Refresh button doesn't change account and message list view
 - Business: temporarily display transferable leave types in the agreement dialog
 - Leavedays: filter out possible leavedays before first work date (in case of rehiring)
 - EMail: Make sure IMAP file names are always normalized UTF8 strings
