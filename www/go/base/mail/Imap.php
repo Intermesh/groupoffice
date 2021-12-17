@@ -15,6 +15,9 @@ class Imap extends ImapBodyStruct {
 	const SORT_SUBJECT='SUBJECT';
 	const SORT_SIZE='SIZE';
 
+	/**
+	 * @var resource|bool
+	 */
 	var $handle=false;
 
 	var $ssl=false;
@@ -2988,9 +2991,9 @@ class Imap extends ImapBodyStruct {
 	/**
 	 * Append a message to a mailbox
 	 *
-	 * @param StringHelper $mailbox
-	 * @param StringHelper|\Swift_Message $data
-	 * @param StringHelper $flags See set_message_flag
+	 * @param string $mailbox
+	 * @param string|\Swift_Message $data
+	 * @param string $flags See set_message_flag
 	 * @return boolean
 	 */
 	public function append_message($mailbox, $data, $flags=""){
