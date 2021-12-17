@@ -117,7 +117,7 @@ END;
 			$str = preg_replace($regex, '$1', $str);
 		}	
 		
-		return $str;
+		return \go\core\util\StringUtil::normalize($str);
 		
 	}
 	
@@ -255,91 +255,6 @@ END;
 		$html = new Html2Text($html);
 		
 		return trim($html->getText());
-	}
-
-  /**
-   * Convert Dangerous HTML to safe HTML for display inside of Group-Office
-   *
-   * This also removes everything outside the body and replaces mailto links
-   *
-   * @param string $html HTML string
-   * @param string HTML formatted string
-   * @return string
-   */
-	public static function sanitizeHtml($html) {
-
-		//needed for very large strings when data is embedded in the html with an img tag
-		ini_set('pcre.backtrack_limit', (int) ini_get('pcre.backtrack_limit') + 1000000);
-
-		//don't do this because it will mess up <pre></pre> tags
-		//$html = str_replace("\r", '', $html);
-		//$html = str_replace("\n",' ', $html);
-		//remove strange white spaces in tags first
-		//sometimes things like this happen <style> </ style >
-//		Doesn't work well because some mails hav body tags all over the place :(
-//		$body_startpos = stripos($html, '<body');
-//		$body_endpos = strripos($html, '</body');
-//		if($body_startpos){
-//			if($body_endpos)
-//				$html = substr($html, $body_startpos, $body_endpos-$body_startpos);
-//			else
-//				$html = substr($html, $body_startpos);
-//		}
-		
-		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u", "</$1>", $html);
-
-		$to_removed_array = array(
-			"'<!DOCTYPE[^>]*>'usi",
-			"'<!--.*-->'Uusi",
-			"'<html[^>]*>'usi",
-			"'</html>'usi",
-			"'<body[^>]*>'usi",
-			"'</body>'usi",
-			"'<meta[^>]*>'usi",
-			"'<link[^>]*>'usi",
-			"'<title>.*?</title>'usi",
-			"'<head[^>]*>.*?</head>'usi",
-			"'<head[^>]*>'usi",
-			"'<base[^>]*>'usi",
-			"'<meta[^>]*>'usi",
-			"'<bgsound[^>]*>'usi",
-			/* MS Word junk */
-			"'<xml[^>]*>.*?</xml>'usi",
-			"'<\/?o:[^>]*>'usi",
-			"'<\/?v:[^>]*>'usi",
-			"'<\/?st1:[^>]*>'usi",
-			"'<\?xml[^>]*>'usi",
-			"'<style[^>]*>.*?</style>'usi",
-			"'<script[^>]*>.*?</script>'usi",
-			"'<iframe[^>]*>.*?</iframe>'usi",
-			"'<object[^>]*>.*?</object>'usi",
-			"'<embed[^>]*>.*?</embed>'usi",
-			"'<applet[^>]*>.*?</applet>'usi",
-			"'<form[^>]*>'usi",
-			"'<input[^>]*>'usi",
-			"'<select[^>]*>.*?</select>'usi",
-			"'<textarea[^>]*>.*?</textarea>'usi",
-			"'</form>'usi"
-		);
-
-		$html = preg_replace($to_removed_array, '', $html);
-
-		//Remove any attribute starting with "on" or xmlns. Had to do this always becuase many mails contain weird tags like online="1". 
-		//These were detected as xss attacks by detectXSS().
-		//
-		//this one messed up a base64 img data src
-//		$html = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>]*+>#iu', '$1>', $html);
-
-//		remove high z-indexes
-//		$matched_tags = array();
-//		preg_match_all("/(z-index)[\s]*:[\s]*([0-9]+)[\s]*;/u", $html, $matched_tags, PREG_SET_ORDER);
-//		foreach ($matched_tags as $tag) {
-//			if ($tag[2] > 8000) {
-//				$html = str_replace($tag[0], 'z-index:8000;', $html);
-//			}
-//		}
-
-		return $html;
 	}
 
 
