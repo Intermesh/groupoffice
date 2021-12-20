@@ -166,7 +166,7 @@ class Imap extends ImapBodyStruct {
 			fclose($this->handle);
 
 			foreach($this->errors as $error){
-				error_log("IMAP error ". $this->username .'@' . $this->host .': ' . $error);
+				error_log("IMAP error ". $this->username .'@' . $this->server .': ' . $error);
 			}
 
 			$this->handle=false;

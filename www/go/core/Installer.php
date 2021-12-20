@@ -255,6 +255,7 @@ class Installer {
 	private function installAdminUser($adminValues): User
 	{
 		$admin = new User();
+		$admin->id = 1; //fixed ID for clustered setups
 		$admin->displayName = "System administrator";
 		$admin->username = "admin";
 		$admin->email = "admin@localhost.localdomain";
