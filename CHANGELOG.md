@@ -1,6 +1,7 @@
 - Core: Fix admin user to ID=1 to make sure it gets this ID even in clustered setups.
 - Email: Bug in error message causing email listing to fail in some cases.
 - Email: Default template is configurable in User settings -> Email
+- Core: Disable spell check on Chrome 96 as it's very slow on larger e-mails.
 
 17-12-2021 6.5.94
 - Email: Refresh button doesn't change account and message list view
