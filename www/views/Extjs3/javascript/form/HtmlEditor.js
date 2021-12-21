@@ -204,13 +204,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			return;
 		}
 
-		var me = this, doc = this.getDoc(), savedRange, win = this.getWin();
-
-
 		clearTimeout(this.debounceTimeout);
-		this.debounceTimeout = setTimeout(function () {
-			me.storeCursorPosition();
-			var h = me.getEditorBody().innerHTML;
+		this.debounceTimeout = setTimeout( () => {
+			this.storeCursorPosition();
+			var h = this.getEditorBody().innerHTML;
 			var anchored = Autolinker.link(h, {
 				stripPrefix: false,
 				stripTrailingSlash: false,
@@ -220,11 +217,11 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			});
 
 			if(h != anchored) {
-				me.getEditorBody().innerHTML = anchored;
-				me.restoreCursorPosition();
+				this.getEditorBody().innerHTML = anchored;
+				this.restoreCursorPosition();
 			}else
 			{
-				me.forgetCursorPosition();
+				this.forgetCursorPosition();
 			}
 
 		}, 500);
@@ -759,34 +756,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 						this.execCmd('InsertText', '\t');
 					}
 					this.deferFocus();
-				}else if(Ext.isMac){
-
-					if(e.ctrlKey){
-						var c = e.getCharCode(), cmd;
-
-						if(c > 0) {
-							c = String.fromCharCode(c).toLowerCase();
-
-							switch(c){
-								case 'b':
-									cmd = 'bold';
-									break;
-								case 'i':
-									cmd = 'italic';
-									break;
-								case 'u':
-									cmd = 'underline';
-									break;
-							}
-							if(cmd){
-								this.win.focus();
-								this.execCmd(cmd);
-								this.deferFocus();
-								e.preventDefault();
-							}
-						}
-					}
-
 				}
 			};
 

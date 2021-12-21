@@ -44485,7 +44485,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
                 buffer:100
             });
 
-            if(Ext.isGecko){
+            if(Ext.isGecko || Ext.isMac){
                 Ext.EventManager.on(doc, 'keypress', this.applyCommand, this);
             }
             if(Ext.isWebKit || Ext.isOpera){
