@@ -1,9 +1,11 @@
 
+17-12-2021 6.5.94
+- Core: Fix admin user to ID=1 to make sure it gets this ID even in clustered setups.
+- Email: Bug in error message causing email listing to fail in some cases.
+- Email: Default template is configurable in User settings -> Email
 - Leavedays: Tweak year view to not display any numbers if an employee does not in a certain month
 - Leavedays: Support for re-hiring employees
 - Business: add finish date field to employee agreement record, update last agreement field when employee's quit date is changed
-
-- 17-12-2021 6.5.94
 - Email: Refresh button doesn't change account and message list view
 - Business: temporarily display transferable leave types in the agreement dialog
 - Leavedays: filter out possible leavedays before first work date (in case of rehiring)
