@@ -460,7 +460,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 			go.Db.store("FieldSet").set({
 				destroy: fieldSetIds
-			}).finally(function() {
+			}).finally(() => {
 				this.getEl().unmask();
 			});
 		}
@@ -470,7 +470,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 			go.Db.store("Field").set({
 				destroy: fieldIds
-			}).finally(function() {
+			}).finally(() => {
 				this.getEl().unmask();
 			});
 		}
