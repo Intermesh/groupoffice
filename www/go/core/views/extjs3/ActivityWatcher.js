@@ -44,7 +44,7 @@ go.ActivityWatcher = (function() {
 				return;
 			}
 
-			var now = Math.floor(Date.now() / 1000);;
+			var now = Math.floor(Date.now() / 1000);
 
 			var secondsSinceLastActivity = now - localStorage.lastActivity;
 			//console.log(secondsSinceLastActivity + ' seconds since the user was last active');
@@ -59,6 +59,10 @@ go.ActivityWatcher = (function() {
 		},
 
 		registerDocument: function(doc) {
+
+			if(this.maxInactivity < 1) {
+				return;
+			}
 			//An array of DOM events that should be interpreted as
 			//user activity.
 			var activityEvents = [
@@ -66,11 +70,14 @@ go.ActivityWatcher = (function() {
 				'scroll', 'touchstart'
 			], me = this;
 
+
+			const delayed = new Ext.util.DelayedTask(this.activity, this);
+
 			//add these events to the document.
 			//register the activity function as the listener parameter.
 			activityEvents.forEach(function(eventName) {
 				doc.addEventListener(eventName, function() {
-					me.activity();
+					delayed.delay(1000);
 				}, true);
 			});
 		}

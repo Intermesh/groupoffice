@@ -103,6 +103,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 
 
+
 		},this);
 
 		this.on('activate', function() {
@@ -168,6 +169,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		//Following is needed when using animateTarget in windows. But since that doesn't perform well we should look at using css transitions instead of js animations
 		//this.getToolbar().doLayout();
 		var doc = this.getEditorBody();
+
 		doc.addEventListener('paste', this.onPaste.createDelegate(this));
 		doc.addEventListener('drop', this.onDrop.createDelegate(this));
 		doc.addEventListener('keyup', this.onKeyUp.createDelegate(this));
@@ -188,11 +190,12 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			Ext.EventManager.on(doc, 'keydown', this.fixKeys, this);
 		}
 
-	},
+		if(Ext.isChrome && navigator.appVersion.indexOf("Chrome/96.") > -1) {
+			console.warn("Disable spell check because it's slow on Chrome v96.")
 
-	applyCommand : function(e){
+			doc.spellcheck = false;
+		}
 
-		//implemented in fixKeys
 	},
 
 	debounceTimeout : null,
@@ -206,6 +209,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 		clearTimeout(this.debounceTimeout);
 		this.debounceTimeout = setTimeout( () => {
+			clearTimeout(this.debounceTimeout);
 			this.storeCursorPosition();
 			var h = this.getEditorBody().innerHTML;
 			var anchored = Autolinker.link(h, {
@@ -736,13 +740,11 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	// 	var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
 	// 	return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">' + this.getEditorFrameStyle() + '</style></head><body></body></html>', this.iframePad, h);
 	// },
-	fixKeys: function () { // load time branching for fastest keydown performance
+	fixKeys: function (e) { // load time branching for fastest keydown performance
 
-			return function (e) {
-
-				var k = e.getKey(), doc = this.getDoc();
+				var k = e.getKey(), doc;
 				if(
-					Ext.isWebKit && e.shiftKey && k == e.ENTER &&
+					Ext.isWebKit && e.shiftKey && k == e.ENTER && (doc = this.getDoc()) &&
 					(doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist'))
 				) {
 					e.stopEvent();
@@ -750,6 +752,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					this.deferFocus();
 				} else if (k == e.TAB) {
 					e.preventDefault();
+					doc = this.getDoc();
 					if (doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist')) {
 						this.execCmd(e.shiftKey ? 'outdent' : 'indent');
 					}else {
@@ -757,9 +760,9 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					}
 					this.deferFocus();
 				}
-			};
 
-	}(),
+
+	},
 
 	//Overwritten to fix font size bug in chrome
 	adjustFont: function (btn) {
