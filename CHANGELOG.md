@@ -6,6 +6,7 @@
 - Email: Attachments with filenames longer than the db column length 190 could not be opened. The filename will be shortened to the db length now.
 - Files: Maximum file name length raised to 260 chars.
 - Google authenticator: Don't request password to setup if current user is an admin
+- Email: fixed memory limit error on some emails with bad utf8
 
 17-12-2021 6.5.94
 - Core: Fix admin user to ID=1 to make sure it gets this ID even in clustered setups.
