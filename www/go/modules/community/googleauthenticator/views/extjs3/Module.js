@@ -63,7 +63,7 @@ go.modules.community.googleauthenticator.enable = (user, password, countDown, bl
 	}
 
 
-	if(!user.isAdmin && !password) {
+	if(!go.User.isAdmin && !password) {
 
 		let msg = t("Provide your current password before you can enable Google authenticator.");
 
