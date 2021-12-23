@@ -122,10 +122,15 @@ class StringUtil {
 END;
 
 			$str = preg_replace($regex, '$1', $str);
-		}	
-		
-		return StringUtil::normalize($str);
-		
+		}
+
+		$normalized = \Normalizer::normalize($str, \Normalizer::FORM_C);
+		if($normalized === false) {
+			return $str;
+		} else{
+			return $normalized;
+		}
+
 	}
 	
 	private static function convertToUTF8($str, $fromCharset) {
@@ -133,7 +138,8 @@ END;
 		$toCharset = 'UTF-8';
 		
 		if ($fromCharset == $toCharset) {
-			return $str;
+			// cleanup invalid chars
+			return mb_convert_encoding($str, 'UTF-8', 'UTF-8');
 		}
 		try {
 			if(in_array($fromCharset, array_map("strtoupper", mb_list_encodings()))) {								

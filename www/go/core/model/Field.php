@@ -218,10 +218,10 @@ class Field extends AclItemEntity {
 		if($this->defaultModified || $this->isNew()) {
 			return $this->default;
 		}
-		
-		$c = Table::getInstance($this->tableName())->getColumn($this->databaseName);
-		
-		if(!$c) {
+		if(isset($this->databaseName)) {
+			$c = Table::getInstance($this->tableName())->getColumn($this->databaseName);
+		}
+		if(empty($c)) {
 			go()->debug("Column for custom field ".$this->databaseName." not found in ". $this->tableName());
 			return null;
 		}
@@ -244,10 +244,10 @@ class Field extends AclItemEntity {
 		if($this->uniqueModified || $this->isNew()) {
 			return $this->unique;
 		}
-		
-		$c = Table::getInstance($this->tableName())->getColumn($this->databaseName);
-		
-		if(!$c) {
+		if(isset($this->databaseName)) {
+			$c = Table::getInstance($this->tableName())->getColumn($this->databaseName);
+		}
+		if(empty($c)) {
 			go()->debug("Column for custom field ".$this->databaseName." not found in ". $this->tableName());
 			return false;
 		}

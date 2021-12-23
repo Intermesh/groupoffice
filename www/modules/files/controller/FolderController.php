@@ -1641,7 +1641,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 						$file = new \GO\Base\Fs\File(\GO::config()->tmpdir.$tmp_file['tmp_file']);
 						$file->move(new \GO\Base\Fs\Folder(\GO::config()->file_storage_path . $folder->path));
-
+						$file->shortenFileName();
 						$folder->addFile($file->name());
 					}
 				}

@@ -54,7 +54,10 @@ class SQL {
 			}
 			if ($char == ';' && !$in_string) {
 				$offset = $i - $start;
-				$queries[] = substr($sql, $start, $offset);
+				$query = substr($sql, $start, $offset);
+				if(!empty($query)) {
+					$queries[] = $query;
+				}
 
 				$start = $i + 1;
 			}

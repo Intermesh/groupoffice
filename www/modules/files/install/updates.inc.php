@@ -292,3 +292,8 @@ $updates['202102111534'][] = "alter table fs_bookmarks
 $updates['202107120932'][] = "update core_entity set name='FilesTemplate' where name = 'Template' and moduleId = (select id from core_module where name='files' and package is null);";
 
 $updates['202107120932'][] = "update ignore core_entity set name='Template', clientName='FilesTemplate' where name = 'FilesTemplate' and moduleId = (select id from core_module where name='files' and package is null);";
+$updates['202112231349'][] = "ALTER TABLE `fs_files` ROW_FORMAT=DYNAMIC;";
+$updates['202112231349'][] = "ALTER TABLE `fs_files` ROW_FORMAT=DYNAMIC;";
+$updates['202112231349'][] = "alter table fs_files
+    modify name varchar(260) collate utf8mb4_bin not null;";
+
