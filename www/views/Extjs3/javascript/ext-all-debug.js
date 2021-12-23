@@ -44162,13 +44162,13 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
     },
 
     
-    getDoc : function() {
-        return this._getDoc || (this._getDoc = this.iframe.contentDocument || this.getWin().document);
+    getDoc : function(){
+        return Ext.isIE ? this.getWin().document : (this.iframe.contentDocument || this.getWin().document);
     },
 
-
+    
     getWin : function(){
-        return this._getWin || (this._getWin = window.frames[this.iframe.name]);
+        return Ext.isIE ? this.iframe.contentWindow : window.frames[this.iframe.name];
     },
 
     
@@ -44177,7 +44177,9 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
         this.el.dom.style.border = '0 none';
         this.el.dom.setAttribute('tabIndex', -1);
         this.el.addClass('x-hidden');
-
+        if(Ext.isIE){ 
+            this.el.applyStyles('margin-top:-1px;margin-bottom:-1px;');
+        }
         this.wrap = this.el.wrap({
             cls:'x-html-editor-wrap', cn:{cls:'x-html-editor-tb'}
         });
@@ -44485,10 +44487,10 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
                 buffer:100
             });
 
-            if(Ext.isGecko){
+            if(Ext.isGecko || Ext.isSafari){
                 Ext.EventManager.on(doc, 'keypress', this.applyCommand, this);
             }
-            if(Ext.isWebKit || Ext.isOpera){
+            if(Ext.isIE || Ext.isWebKit || Ext.isOpera){
                 Ext.EventManager.on(doc, 'keydown', this.fixKeys, this);
             }
             Ext.EventManager.on(window, 'unload', this.beforeDestroy, this);

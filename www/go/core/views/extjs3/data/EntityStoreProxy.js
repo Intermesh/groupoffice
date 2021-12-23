@@ -130,18 +130,6 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			//		try {
 			result = o.reader.readRecords(response);
 
-
-//		} catch (e) {
-//			// @deprecated: fire old loadexception for backwards-compat.
-//			// TODO remove
-//			this.fireEvent('loadexception', this, o, response, e);
-//			
-//			console.log(e);
-//
-//			this.fireEvent('exception', this, 'response', action, o, response, e);
-//			o.request.callback.call(o.request.scope, null, o.request.arg, false);
-//			return;
-//		}
 			if (result.success === false) {
 				// @deprecated: fire old loadexception for backwards-compat.
 				// TODO remove

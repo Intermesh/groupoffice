@@ -135,6 +135,23 @@ class File extends Base{
 	public function extension() {
 		return self::getExtension($this->name());
 	}
+
+	public function shortenFileName($maxLength = 260) {
+
+		if(mb_strlen($this->name()) > $maxLength) {
+			$ext = $this->extension();
+			$maxLength -= (strlen($ext) + 1);
+			$filename = mb_substr($this->nameWithoutExtension(), 0, $maxLength);
+
+			if($ext) {
+				$filename .= '.' . $ext;
+			}
+
+			return $this->rename($filename);
+		}
+
+		return true;
+	}
 	
 	/**
 	 * Get the extension of a filename

@@ -6,6 +6,7 @@ namespace GO\Files\Controller;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
 use go\core\http\Client;
+use go\core\util\StringUtil;
 use GO\Email\Model\Account;
 use GO\Files\Model\File;
 use go\core\fs\Blob;
@@ -349,6 +350,9 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 				throw new Exception("IO error");
 			}
 		}
+		$maxLength = go()->getDatabase()->getTable("fs_files")->getColumn("name")->length;
+		$file->shortenFileName($maxLength);
+
 		$dbFile = $tmpFolder->hasFile($file->name());
 		if(!$dbFile) {
 			$dbFile = $tmpFolder->addFile($file->name(), true);

@@ -23,7 +23,7 @@ CREATE TABLE `fs_files` (
   `delete_when_expired` tinyint(1) NOT NULL DEFAULT 0,
   `content_expire_date` int(11) DEFAULT NULL,
   `version` INT UNSIGNED NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci  ROW_FORMAT=DYNAMIC;;
 
 
 --
@@ -36,7 +36,7 @@ CREATE TABLE `fs_folders` (
   `user_id` int(11) NOT NULL DEFAULT 0,
   `id` int(11) NOT NULL,
   `parent_id` int(11) NOT NULL,
-  `name` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(260) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `visible` tinyint(1) NOT NULL DEFAULT 0,
   `acl_id` int(11) NOT NULL DEFAULT 0,
   `comment` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE `fs_folders` (
   `readonly` tinyint(1) NOT NULL DEFAULT 0,
   `cm_state` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `apply_state` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci  ROW_FORMAT=DYNAMIC;
 
 
 ALTER TABLE `fs_files`

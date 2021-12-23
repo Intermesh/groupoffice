@@ -773,7 +773,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if($file->save($ignoreAcl))
 			return $file;
 		else
-			return false;
+			throw new \Exception("Could not add file. Validation errors: ". implode( ", ", $file->getValidationErrors()));
 	}
 
 	/**
