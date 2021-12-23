@@ -439,14 +439,14 @@ abstract class AbstractController extends Observable {
 			
 			GO::debug("EXCEPTION: ".(string) $e);
 			
-			\go\core\ErrorHandler::logException($e);
+			$msg = \go\core\ErrorHandler::logException($e);
 			
 			$response = new JsonResponse();
 			
 			$response['success'] = false;
 			
 			$response['feedback'] = !empty($response['feedback']) ? $response['feedback']."\r\n\r\n" : '';
-			$response['feedback'] .= $e->getMessage();	
+			$response['feedback'] .= go()->getDebugger()->enabled ? $msg : $e->getMessage();
 			
 			$response['exceptionCode'] = $e->getCode();
 					

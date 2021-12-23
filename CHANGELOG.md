@@ -3,6 +3,8 @@
 - Leavedays: Support for re-hiring employees
 - Business: add finish date field to employee agreement record, update last agreement field when employee's quit date is changed
 - Leavedays: filter out possible leavedays before first work date (in case of rehiring)
+- Email: Attachments with filenames longer than the db column length 190 could not be opened. The filename will be shortened to the db length now.
+- Files: Maximum file name length raised to 260 chars.
 
 17-12-2021 6.5.94
 - Core: Fix admin user to ID=1 to make sure it gets this ID even in clustered setups.
