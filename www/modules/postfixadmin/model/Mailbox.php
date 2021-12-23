@@ -119,10 +119,17 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 		return new \GO\Base\Fs\Folder('/home/vmail/'.$this->maildir);
 	}
 	
-	public function cacheUsage(){		
-		$this->usage = $this->enabled ? $this->getUsageFromDovecot() : false;
+	public function cacheUsage(){
+
+		// to prevent lots of "du" calls
+		if(!$this->enabled) {
+			return true;
+		}
+
+		$this->usage = $this->getUsageFromDovecot();
 		
 		if($this->usage === false) {
+			GO::debug("Getting usage from doveadm command failed!");
 			$this->usage = $this->getMaildirFolder()->calculateSize()/1024;
 		}
 		
