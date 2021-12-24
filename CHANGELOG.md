@@ -1,3 +1,6 @@
+- Leavedays: Add leave day budget combobox to leave day request
+- Leavedays: minor bugfix agreementId in year employee grid
+
 23-12-2021 6.5.95
 - Leavedays: Tweak year view to not display any numbers if an employee does not in a certain month
 - Leavedays: Support for re-hiring employees
