@@ -1,3 +1,5 @@
+- Business: hid transferable leave day types in favor of Special leave types
+- Business: Fixed minor mistake in activities grid
 - Leavedays: Add leave day budget combobox to leave day request
 - Leavedays: minor bugfix agreementId in year employee grid
 
