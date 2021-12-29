@@ -45,7 +45,6 @@ GO.email.AccountDialog = function(config) {
 
 	// TODO: Put this properly in an override function in Googleoauth2
 	if(go.Modules.isAvailable("community", "googleoauth2")) {
-		debugger;
 		this.selectAuthMethodCombo = new Ext.form.ComboBox({
 			fieldLabel: t("Authentication Method"),
 			hiddenName: 'authenticationMethod',
@@ -521,13 +520,6 @@ GO.email.AccountDialog = function(config) {
 
 	});
 
-	/*typeField.on('select', function(combo, record, index) {
-
-		var value = index == 1 ? '110' : '143';
-
-		this.propertiesPanel.form.findField('port').setValue(value);
-	}, this);*/
-
 	this.encryptionField.on('select', function(combo, record, index) {
 		var value = record.data.value == 'ssl' ? '465' : '587';
 		
@@ -540,18 +532,7 @@ GO.email.AccountDialog = function(config) {
 		this.propertiesPanel.form.findField('port')
 		.setValue(value);
 	}, this);
-	
-	
 
-//	sslCb.on('check', function(checkbox, checked) {
-//		//if (typeField.getValue() == 'imap') {
-//			var port = checked ? 993 : 143;
-//			this.propertiesPanel.form.findField('port').setValue(port);
-//		/*} else {
-//			var port = checked ? 995 : 110;
-//			this.propertiesPanel.form.findField('port').setValue(port);
-//		}*/
-//	}, this);
 
 	this.selectUser.on('select', function(combo, record, index) {
 		if(GO.util.empty(this.account_id)){
@@ -604,32 +585,31 @@ GO.email.AccountDialog = function(config) {
 			iconCls: 'btn-token',
 			text: 'OAuth2',
 			handler : function() {
-				window.open(GO.Url('community/googleoauth2/Oauth2Account/auth'))
+				console.clear();
+				let url = GO.url("googleauthorize",{accountId: this.account_id});
+				console.log(url);
+				window.open(url, 'do_da_google_auth_thingy');
+				// This works, but will trigger a CORS error. Naturally, since oauth does not like Ajax
+				/*
 				go.Jmap.request({
-					method: 'community/googleoauth2/Oauth2Account/auth',
-					params: {accountId: this.account_id},
-					callback: function(options, success, response) {
-						debugger;
-						if (!response.success) {
-							// Ext.Msg.show({
-							// 	title: t('Postcode API'),
-							// 	msg: response.feedBack,
-							// 	ok: true
-							// });
-							// me.resetFields(fieldSet);
+					method: "community/googleoauth2/Oauth2Account/auth",
+					params: {
+						accountId: this.account_id
+					},
+					scope: this
+				}).then( function(options, success, response) {
+					console.clear();
+					console.log(options);
+					console.log(success);
+					console.log(response);
+					// this.getForm().setValues(response);
+					// if (!this.consentDialog) {
+					// 	this.consentDialog = new go.modules.community.googleoauth2.ConsentDialog();
+					// }
+					// this.consentDialog.show({accountId: this.account_id});
 
-						} else {
-							// fieldSet.zipCode.setValue(response.address.postcode);
-							// fieldSet.street.setValue(response.address.street);
-							// fieldSet.city.setValue(response.address.city);
-							// fieldSet.state.setValue(response.address.province);
-						}
-					}
 				});
-				// if (!this.consentDialog) {
-				// 	this.consentDialog = new go.modules.community.googleoauth2.ConsentDialog();
-				// }
-				// this.consentDialog.show({accountId: this.account_id});
+				 */
 			},
 			hidden: true,
 			scope : this
@@ -733,13 +713,6 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			this.setAccountId(0);
 			this.foldersTab.setDisabled(true);
 			this.permissionsTab.setAcl(0);
-
-			// default values
-
-			// this.selectUser.setValue(GO.settings['user_id']);
-			// this.selectUser.setRawValue(GO.settings['name']);
-			// this.selectUser.lastSelectionText=GO.settings['name'];
-
 			this.propertiesPanel.form.findField('name')
 			.setValue(GO.settings['name']);
 			this.propertiesPanel.form.findField('email')
@@ -776,11 +749,6 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 				}
 
 				this.permissionsTab.setAcl(action.result.data.acl_id);
-				
-//				if (this.templatesCombo) {
-//					this.templatesCombo.store.load();
-//					this.templatesCombo.setRemoteText(action.result.remoteComboTexts['default_template_id']);
-//				}
 			},
 			scope : this
 		});

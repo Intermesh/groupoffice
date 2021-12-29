@@ -4,7 +4,6 @@ namespace go\modules\community\googleoauth2\controller;
 
 
 use go\core\Controller;
-use go\modules\business\license\exception\LicenseException;
 use go\modules\community\email\model\Account;
 use go\modules\community\googleoauth2\model;
 use League\OAuth2\Client\Provider\Google;
@@ -23,11 +22,23 @@ final class Oauth2Account extends Controller
 	}
 
 
+	public function test()
+	{
+		die('1 2 4');
+	}
+
+	/**
+	 * Authenticate using google Oauth settings for current account ID
+	 *
+	 * @param array $params
+	 * @throws \GO\Base\Exception\MissingParameter
+	 * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
+	 */
 	public function auth(array $params)
 	{
 		$accountId = isset($params['accountId']) ? $params['accountId'] : null;
-		if(!$accountId) {
-			throw new LicenseException("Unknown or invalid account data");
+		if (!$accountId) {
+			throw new \GO\Base\Exception\MissingParameter(go()->t("Missing parameter"));
 		}
 
 		$acct = Account::findById($accountId);
@@ -96,6 +107,4 @@ final class Oauth2Account extends Controller
 			echo $token->getExpires();
 		}
 	}
-
-
 }
