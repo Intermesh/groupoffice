@@ -15,7 +15,9 @@
 namespace GO\Email\Model;
 
 use GO;
-
+use GO\Base\Mail\Imap;
+use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
+use \GO\Base\Mail\Exception\MailboxNotFound;
 /**
  * The LinkedEmail model
  *
@@ -51,7 +53,8 @@ use GO;
  * @property boolean $sieve_tls
  * @property boolean $sieve_usetls
  */
-class Account extends \GO\Base\Db\ActiveRecord {
+class Account extends \GO\Base\Db\ActiveRecord
+{
 	
 	const ACL_DELEGATED_PERMISSION=15;
 	
@@ -160,25 +163,15 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	
 	protected function beforeSave() {
 		if($this->isModified('password')){	
-//			$decrypted = \GO\Base\Util\Crypt::decrypt($this->getOldAttributeValue('password'));
-//			
-//			if($decrypted==$this->password){
-//				$this->resetAttribute('password');
-//			}else
-//			{
-				$encrypted = \GO\Base\Util\Crypt::encrypt($this->password);		
-				if($encrypted){
-					$this->password = $encrypted;
-					$this->password_encrypted=2;//deprecated. remove when email is mvc style.
-				}
-//			}
-			
+			$encrypted = \GO\Base\Util\Crypt::encrypt($this->password);
+			if($encrypted){
+				$this->password = $encrypted;
+				$this->password_encrypted=2;//deprecated. remove when email is mvc style.
+			}
+
 			unset(GO::session()->values['emailModule']['accountPasswords'][$this->id]);
 		}
 
-//		if (!empty($this->id) && !empty(GO::session()->values['emailModule']['accountPasswords'][$this->id]))
-//			unset(GO::session()->values['emailModule']['accountPasswords'][$this->id]);
-		
 		if($this->isModified('smtp_password')){
 			$encrypted = \GO\Base\Util\Crypt::encrypt($this->smtp_password);		
 			if($encrypted)
@@ -236,9 +229,7 @@ class Account extends \GO\Base\Db\ActiveRecord {
 
 		if ($wasNew) {
 			Label::model()->createDefaultLabels($this->id);
-		}
-		
-		if($wasNew) {
+
 			$user = \go\core\model\User::findById($this->user_id);
 			if($user->isAdmin()) {
 				//add admin group
@@ -319,8 +310,7 @@ class Account extends \GO\Base\Db\ActiveRecord {
 			if (empty($this->password) &&	method_exists('Request','GetAuthPassword') && Request::GetAuthUser()==$this->username) {
 				
 				$decrypted = Request::GetAuthPassword();
-			}else
-			{			
+			}else {
 				if(empty($this->password)) {
 					return "";
 				}
@@ -352,39 +342,36 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Open a connection to the imap server.
 	 *
-	 * @param StringHelper $mailbox
-	 * @return \GO\Base\Mail\Imap
+	 * @param string $mailbox
+	 * @return Imap
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 * @throws ImapAuthenticationFailedException
 	 */
-	public function openImapConnection($mailbox = 'INBOX')
+	public function openImapConnection($mailbox = 'INBOX') :Imap
 	{
-
-		if (empty($mailbox)) {
-			$mailbox = "INBOX";
-		}
-
 		$imap = $this->justConnect();
 
 		if (!$imap->select_mailbox($mailbox)) {
 			throw new \GO\Base\Mail\Exception\MailboxNotFound($mailbox, $imap);
-			//throw new \Exception ("Could not open IMAP mailbox $mailbox\nIMAP error: ".$imap->last_error());
 		}
 		return $imap;
 	}
 	
 	/**
 	 * Connect to the IMAP server without selecting a mailbox
-	 * 
-	 * @return \GO\Base\Mail\Imap
+	 *
+	 * @throws ImapAuthenticationFailedException
+	 * @return Imap
 	 */
-	public function justConnect(){
-		if(empty($this->_imap)){
-			$this->_imap = new \GO\Base\Mail\Imap();	
+	public function justConnect() :Imap
+	{
+		if (empty($this->_imap)) {
+			$this->_imap = new Imap();
 			$this->_imap->ignoreInvalidCertificates = $this->imap_allow_self_signed;
-			$useTLS = $this->imap_encryption == 'tls'?true:false;
-			$useSSL = $this->imap_encryption == 'ssl'?true:false;
+			$useTLS = $this->imap_encryption == 'tls' ? true : false;
+			$useSSL = $this->imap_encryption == 'ssl' ? true : false;
 			$this->_imap->connect($this->host, $this->port, $this->username, $this->decryptPassword(), $useSSL, $useTLS);
-		}else
-		{
+		} else {
 			$this->_imap->checkConnection();
 		}
 
@@ -394,7 +381,8 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Close the connection to imap
 	 */
-	public function closeImapConnection(){
+	public function closeImapConnection()
+	{
 		if(!empty($this->_imap)){
 			$this->_imap->disconnect();
 			$this->_imap=null;		
@@ -409,40 +397,15 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Get the imap connection if it's open.
 	 * 
-	 * @return \GO\Base\Mail\Imap 
+	 * @return Imap|false
 	 */
-	public function getImapConnection(){
+	public function getImapConnection()
+	{
 		if(isset($this->_imap)){
 			return $this->_imap;
-		}else
-			return false;
+		}
+		return false;
 	}
-	
-//	private function _getCacheKey(){
-//		$user_id = \GO::user() ? \GO::user()->id : 0;
-//		return $user_id.':'.$this->id.':uidnext';
-//	}
-	
-//	protected function getHasNewMessages(){
-//		
-//		\GO::debug("getHasNewMessages UIDNext ".(isset($this->_imap->selected_mailbox['uidnext']) ? $this->_imap->selected_mailbox['uidnext'] : ""));
-//		
-//		if(isset($this->_imap->selected_mailbox['name']) && $this->_imap->selected_mailbox['name']=='INBOX' && !empty($this->_imap->selected_mailbox['uidnext'])){
-//			
-//			$cacheKey = $this->_getCacheKey();
-//			
-//			$uidnext = $value = \GO::cache()->get($cacheKey);
-//			
-//			\GO::cache()->set($cacheKey, $this->_imap->selected_mailbox['uidnext']);					
-//			
-//			if($uidnext!==false && $uidnext!=$this->_imap->selected_mailbox['uidnext']){
-//				return true;
-//			}			
-//		}
-//			
-//		return false;
-//	}
-
 
 	/**
 	 * Find an account by e-mail address.
@@ -450,7 +413,8 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	 * @param StringHelper $email
 	 * @return Account
 	 */
-	public function findByEmail($email){
+	public function findByEmail($email)
+	{
 
 		$joinCriteria = \GO\Base\Db\FindCriteria::newInstance()
 						->addRawCondition('t.id', 'a.account_id');
@@ -468,7 +432,8 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	 *
 	 * @return Alias
 	 */
-	public function getDefaultAlias(){
+	public function getDefaultAlias()
+	{
 		return Alias::model()->findSingleByAttributes(array(
 				'default'=>1,
 				'account_id'=>$this->id
@@ -480,10 +445,9 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	 * 
 	 * @return array
 	 */
-	public function getAutoCheckMailboxes(){
+	public function getAutoCheckMailboxes() :array
+	{
 		$checkMailboxArray = empty($this->check_mailboxes) ? array() : explode(',',$this->check_mailboxes);
-//		if(!in_array("INBOX", $checkMailboxArray))
-//			$checkMailboxArray[]="INBOX";
 		return $checkMailboxArray;
 	}
 
@@ -499,18 +463,22 @@ class Account extends \GO\Base\Db\ActiveRecord {
 
 		return $a;
 	}
-	
+
 	/**
-	 *
-	 * @return \ImapMailbox 
+	 * @param bool $withStatus
+	 * @param bool|null $subscribed
+	 * @return array
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 * @throws ImapAuthenticationFailedException
 	 */
-	public function getRootMailboxes($withStatus=false, $subscribed=false){
+	public function getRootMailboxes(bool $withStatus = false, ?bool $subscribed = false) :array
+	{
 		$imap = $this->openImapConnection();
 		
 		$rootMailboxes = array();
 	
 		$folders = $imap->list_folders($subscribed,$withStatus,"","{$this->mbroot}%", true);
-//		\GO::debug($folders);
+
 		foreach($folders as $folder){
 			$mailbox = new ImapMailbox($this,$folder);
 			$rootMailboxes[]=$mailbox;
@@ -518,11 +486,11 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		
 		$namespaces = $imap ->get_namespaces();
 		
-		foreach($namespaces as $namespace){
-			if($namespace['name']!=''){
-				$namespace['noselect']=  strtoupper($namespace['name'])!='INBOX';
-				$namespace['subscribed']=true;
-				$rootMailboxes[]=new ImapMailbox($this, $namespace);
+		foreach ($namespaces as $namespace) {
+			if ($namespace['name'] != '') {
+				$namespace['noselect'] =  strtoupper($namespace['name'])!='INBOX';
+				$namespace['subscribed'] = true;
+				$rootMailboxes[] = new ImapMailbox($this, $namespace);
 			}
 		}
 		
@@ -532,14 +500,17 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	
 	/**
 	 *
-	 * @return \ImapMailbox 
+	 * @param bool $hierarchy
+	 * @param bool $withStatus
+	 * @return array
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 * @throws ImapAuthenticationFailedException
 	 */
-	public function getAllMailboxes($hierarchy=true, $withStatus=false){
+	public function getAllMailboxes(bool $hierarchy=true, bool $withStatus=false) :array
+	{
 		$imap = $this->openImapConnection();
 		
 		$folders = $imap->list_folders(true, $withStatus,'','*',true);
-		
-		//$node= array('name'=>'','children'=>array());
 		
 		$rootMailboxes = array();
 		
@@ -552,11 +523,10 @@ class Account extends \GO\Base\Db\ActiveRecord {
 				$parentName = $mailbox->getParentName();
 				if($parentName===false){
 					$rootMailboxes[]=$mailbox;
-				}else{
+				} else {
 					$mailboxModels[$parentName]->addChild($mailbox);
 				}
-			}else
-			{
+			} else {
 				$rootMailboxes[]=$mailbox;
 			}
 			
@@ -564,34 +534,36 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		
 		return $rootMailboxes;
 	}
-	
-	public function defaultAttributes() {
+
+	/**
+	 * @return array|GO\Base\Db\Array
+	 */
+	public function defaultAttributes()
+	{
 		$attr = parent::defaultAttributes();
 		
 		$attr['check_mailboxes']="INBOX";
-//		if (\GO::modules()->isInstalled('sieve')) {
-			$attr['sieve_port'] = !empty(\GO::config()->sieve_port) ? \GO::config()->sieve_port : '4190';
-			if (isset(\GO::config()->sieve_usetls))
-				$attr['sieve_usetls'] = !empty(\GO::config()->sieve_usetls);
-			else
-				$attr['sieve_usetls'] = true;
-//		}	
+		$attr['sieve_port'] = !empty(\GO::config()->sieve_port) ? \GO::config()->sieve_port : '4190';
+		if (isset(\GO::config()->sieve_usetls)) {
+			$attr['sieve_usetls'] = !empty(\GO::config()->sieve_usetls);
+		} else {
+			$attr['sieve_usetls'] = true;
+		}
 		return $attr;
 	}
 
-	public function getDefaultTemplate() {
-//		if (\GO::modules()->addressbook) {
-			$defaultAccountTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($this->id);
-			if (!$defaultAccountTemplateModel) {
-				$defaultUserTemplateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
-				if (!$defaultUserTemplateModel)
-					return false;
-				else
-					return $defaultUserTemplateModel;
+	public function getDefaultTemplate()
+	{
+		$defaultAccountTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($this->id);
+		if (!$defaultAccountTemplateModel) {
+			$defaultUserTemplateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
+			if (!$defaultUserTemplateModel) {
+				return false;
 			} else {
-				return $defaultAccountTemplateModel;
+				return $defaultUserTemplateModel;
 			}
-
+		} else {
+			return $defaultAccountTemplateModel;
+		}
 	}
-	
 }

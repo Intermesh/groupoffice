@@ -196,25 +196,33 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 		
 		return $response;
 	}
-	
-	protected function actionStore($params){
-		
+
+	/**
+	 * @param array $params
+	 * @return array
+	 * @throws \GO\Base\Exception\AccessDenied
+	 * @throws \GO\Base\Mail\Exception\ImapAuthenticationFailedException
+	 * @throws \GO\Base\Mail\Exception\MailboxNotFound
+	 */
+	protected function actionStore(array $params): array
+	{
+
 		\GO::session()->closeWriting();
-		
+
 		$response = array(
-				"results"=>array(),
-				"success"=>true
+			"results" => array(),
+			"success" => true
 		);
-		
+
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 		$mailboxes = $account->getAllMailboxes(false, false);
-		foreach($mailboxes as $mailbox){
-			$response['results'][]=array('name'=>$mailbox->name, 'account_id'=>$params['account_id']);
+		foreach ($mailboxes as $mailbox) {
+			$response['results'][] = array('name' => $mailbox->name, 'account_id' => $params['account_id']);
 		}
-		
+
 		$response['trash'] = $account->trash;
-		
-		return $response;		
+
+		return $response;
 	}
 	
 	

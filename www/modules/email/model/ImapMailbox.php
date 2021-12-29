@@ -33,19 +33,11 @@ class ImapMailbox extends \GO\Base\Model {
 	 */
 	private $_attributes;
 
-	public function __construct(Account $account, $attributes) {
+	public function __construct(Account $account, $attributes)
+	{
 		$this->_account = $account;
 
-		//\GO::debug("GO\Email\Model\ImapMailbox:".var_export($attributes,true));
-
 		$this->_attributes = $attributes;
-
-//		if(isset($this->_attributes['name']))
-//			$this->_attributes['name']=\GO\Base\Mail\Utils::utf7_decode($this->_attributes["name"]);
-
-		//throw new \Exception(var_export($attributes, true));
-
-		//$this->_children = array();
 	}
 
 	public function __isset($name) {
@@ -83,8 +75,6 @@ class ImapMailbox extends \GO\Base\Model {
 			}
 		}
 
-		//\GO::debug($this->_attributes['haschildren'])	;
-
 		//oh oh, bad mailserver can't tell us if it has children. Let's find out the expensive way
 		$folders = $this->getAccount()->openImapConnection()->list_folders($asSubscribedMailbox, false,"",$this->name.$this->delimiter.'%');
 		//store values for caching
@@ -94,59 +84,51 @@ class ImapMailbox extends \GO\Base\Model {
 
 	}
 
-	public function getSubscribed(){
-
+	public function getSubscribed() :bool
+	{
 		//todo make compatible with servers that can't return subscribed flag
-
 		return !empty($this->_attributes['subscribed']);
 
 	}
 
-	public function areFlagsPermitted()
+	public function areFlagsPermitted() :bool
 	{
 		return !empty(GO::config()->email_enable_labels);
-
-		/**
-		 * Use config until we found better way how detect flags from IMAP headers
-		 */
-		if(!isset($this->_attributes["permittedFlags"])) {
-			$this->_attributes["permittedFlags"]=$this->getAccount()->openImapConnection ()->permittedFlags;
-		}
-		return $this->_attributes["permittedFlags"];
 	}
 
 	public function getDelimiter(){
-		if(!isset($this->_attributes["delimiter"]))
-			$this->_attributes["delimiter"]=$this->getAccount()->openImapConnection ()->get_mailbox_delimiter ();
-
+		if(!isset($this->_attributes["delimiter"])) {
+			$this->_attributes["delimiter"] = $this->getAccount()->openImapConnection()->get_mailbox_delimiter();
+		}
 		return $this->_attributes["delimiter"];
 	}
 
-	public function getParentName() {
+	public function getParentName() :string
+	{
 		$pos = strrpos($this->name, $this->delimiter);
 
-		if ($pos === false)
+		if ($pos === false) {
 			return false;
+		}
 
 		return substr($this->name, 0, $pos);
 	}
 
-//	public function getName($decode=false){
-//		return $decode ? \GO\Base\Mail\Utils::utf7_decode($this->_attributes["name"]) : $this->_attributes["name"];
-//	}
 
-	public function getBaseName() {
+	public function getBaseName() :string
+	{
 		$name = $this->name;
 		$pos = strrpos($name, $this->delimiter);
 
-		if ($pos !== false)
-			$name= substr($this->name, $pos + 1);
-
+		if ($pos !== false) {
+			$name = substr($this->name, $pos + 1);
+		}
 
 		return $name;
 	}
 
-	public function getDisplayName() {
+	public function getDisplayName() :string
+	{
 		switch ($this->name) {
 			case 'INBOX':
 				return \GO::t("Inbox", "email");
@@ -168,35 +150,36 @@ class ImapMailbox extends \GO\Base\Model {
 		}
 	}
 
-	public function addChild(ImapMailbox $mailbox) {
+	public function addChild(ImapMailbox $mailbox)
+	{
 		if(!isset($this->_children)){
 			$this->_children = array();
 		}
 		$this->_children[] = $mailbox;
 	}
 
-	public function isRootMailbox(){
-		//throw new \Exception($this->name.$this->delimiter.' = '.$this->getAccount()->mbroot);
+	public function isRootMailbox() :bool
+	{
 		return $this->name.$this->delimiter==$this->getAccount()->mbroot;
 	}
 
 	/**
 	 * Get all child nodes of mailbox
-	 * @param boolean $subscribed Only get subscribed folders
-	 * @param boolean $withStatus Get the status of the folder (Unseen and message count)
+	 * @param boolean|null $subscribed Only get subscribed folders
+	 * @param boolean|null $withStatus Get the status of the folder (Unseen and message count)
 	 * @return ImapMailbox[] the mailbox folders
 	 */
-	public function getChildren($subscribed=false, $withStatus=true) {
+	public function getChildren(?bool $subscribed = false, ?bool $withStatus = true)
+	{
 		if(!isset($this->_children)){
 
 			$imap = $this->getAccount()->openImapConnection();
 
 			$this->_children = array();
 
-			if(!$this->isRootMailbox())
-			{
+			if(!$this->isRootMailbox()) {
 				$folders = $imap->list_folders($subscribed,$withStatus,"","$this->name$this->delimiter%");
-				foreach($folders as $folder){
+				foreach ($folders as $folder) {
 					if (rtrim($folder['name'], $this->delimiter) != $this->name) {
 						$mailbox = new ImapMailbox($this->account,$folder);
 						$this->_children[]=$mailbox;
@@ -213,18 +196,27 @@ class ImapMailbox extends \GO\Base\Model {
 	 *
 	 * @return Account
 	 */
-	public function getAccount() {
+	public function getAccount()
+	{
 		return $this->_account;
 	}
 
-//	public function isSent(){
-//		return $this->name==$this->_account->sent;
-//	}
 
-	public function rename($name){
+	/**
+	 * Rename a mailbox
+	 *
+	 * @param string $name
+	 * @return bool
+	 * @throws GO\Base\Exception\AccessDenied
+	 * @throws GO\Base\Mail\Exception\ImapAuthenticationFailedException
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 */
+	public function rename(string $name) :bool
+	{
 
-	  if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION)
+	  if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
 		  throw new \GO\Base\Exception\AccessDenied();
+	  }
 
 		$name = trim($name);
 		$this->_validateName($name);
@@ -232,36 +224,44 @@ class ImapMailbox extends \GO\Base\Model {
 		$parentName = $this->getParentName();
 		$newMailbox = empty($parentName) ? $name : $parentName.$this->delimiter.$name;
 
-//		throw new \Exception($this->name." -> ".$newMailbox);
-		
 		if($this->getAccount()->openImapConnection()->rename_folder($this->name, $newMailbox)) {
 			$this->_attributes['name'] = $newMailbox;
-			
 			return true;
 		}
 		return false;
 	}
 
-	public function delete(){
-	  if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION)
-		 throw new \GO\Base\Exception\AccessDenied();
+
+	/**
+	 * @return bool
+	 * @throws GO\Base\Exception\AccessDenied
+	 * @throws GO\Base\Mail\Exception\ImapAuthenticationFailedException
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 */
+	public function delete() :bool
+	{
+	  if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
+		  throw new \GO\Base\Exception\AccessDenied();
+	  }
 		
 		if($this->getHasChildren()) {
-			
 			foreach ($this->getChildren() as $mailBox) {
-				
-				
 				if(!$mailBox->delete()) {
 					return false;
 				}
 			}
-			
 		}
 		
 	  return $this->getAccount()->openImapConnection()->delete_folder($this->name);
 	}
 
-	public function truncate()
+	/**
+	 * @return bool
+	 * @throws GO\Base\Exception\AccessDenied
+	 * @throws GO\Base\Mail\Exception\ImapAuthenticationFailedException
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 */
+	public function truncate() :bool
 	{
 		if ($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
 			throw new \GO\Base\Exception\AccessDenied();
@@ -278,7 +278,13 @@ class ImapMailbox extends \GO\Base\Model {
 		return $imap->delete($sort);
 	}
 
-	private function _validateName($name){
+	/**
+	 * @param string $name
+	 * @return bool
+	 * @throws \Exception
+	 */
+	private function _validateName(string $name) :bool
+	{
 		$illegalChars = '/';
 
 		if($this->getDelimiter()!='/'){
@@ -287,26 +293,40 @@ class ImapMailbox extends \GO\Base\Model {
 
 		if(preg_match('/['.preg_quote($illegalChars,'/').']/', $name)){
 			throw new \Exception(sprintf(\GO::t("The name contained one of the following illegal characters %s"),': '.$illegalChars));
-		}else
-		{
-			return true;
 		}
+		return true;
 	}
 
-	public function createChild($name, $subscribe=true){
-	  if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION)
+	/**
+	 * @param string $name
+	 * @param bool|null $subscribe
+	 * @return bool
+	 * @throws GO\Base\Exception\AccessDenied
+	 * @throws GO\Base\Mail\Exception\ImapAuthenticationFailedException
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 */
+	public function createChild(string $name, ?bool $subscribe=true) :bool
+	{
+		if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
 		  throw new \GO\Base\Exception\AccessDenied();
+		}
 		$name = trim($name);
 		$newMailbox = empty($this->name) ? $name : $this->name.$this->delimiter.$name;
 
 		$this->_validateName($name);
 
-		//throw new \Exception($newMailbox);
-
 		return $this->getAccount()->openImapConnection()->create_folder($newMailbox, $subscribe);
 	}
 
-	public function move(ImapMailbox $targetMailbox){
+	/**
+	 * @param ImapMailbox $targetMailbox
+	 * @return bool
+	 * @throws GO\Base\Exception\AccessDenied
+	 * @throws GO\Base\Mail\Exception\ImapAuthenticationFailedException
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 */
+	public function move(ImapMailbox $targetMailbox) :bool
+	{
 		if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
 			throw new \GO\Base\Exception\AccessDenied();
 		}
@@ -327,24 +347,43 @@ class ImapMailbox extends \GO\Base\Model {
 		return true;
 	}
 
-	public function setSubscribed($value){
-		if($value)
-			$this->_attributes['subscribed'] =  $this->getAccount()->openImapConnection()->subscribe($this->name);
-		else
+	/**
+	 * @param bool $value
+	 * @throws GO\Base\Mail\Exception\ImapAuthenticationFailedException
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 */
+	public function setSubscribed(bool $value)
+	{
+		if($value) {
+			$this->_attributes['subscribed'] = $this->getAccount()->openImapConnection()->subscribe($this->name);
+		} else {
 			$this->_attributes['subscribed'] = !$this->getAccount()->openImapConnection()->unsubscribe($this->name);
+		}
 	}
 
-	public function subscribe(){
+	/**
+	 * @return bool
+	 */
+	public function subscribe() :bool
+	{
 		$this->subscribed=true;
 		return $this->subscribed;
 	}
 
-	public function unsubscribe(){
+	/**
+	 * @return bool
+	 */
+	public function unsubscribe() :bool
+	{
 		$this->subscribed=false;
 		return !$this->subscribed;
 	}
 
-	public function __toString() {
+	/**
+	 * @return mixed
+	 */
+	public function __toString()
+	{
 		return $this->_attributes['name'];
 	}
 
