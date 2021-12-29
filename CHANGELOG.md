@@ -1,5 +1,28 @@
-- Business: temporarily display transferable leave types in the agreement dialog
+- Business: hid transferable leave day types in favor of Special leave types
+- Business: Fixed minor mistake in activities grid
+- Leavedays: Add leave day budget combobox to leave day request
+- Leavedays: minor bugfix agreementId in year employee grid
+
+23-12-2021 6.5.95
+- Leavedays: Tweak year view to not display any numbers if an employee does not in a certain month
+- Leavedays: Support for re-hiring employees
+- Business: add finish date field to employee agreement record, update last agreement field when employee's quit date is changed
 - Leavedays: filter out possible leavedays before first work date (in case of rehiring)
+- Email: Attachments with filenames longer than the db column length 190 could not be opened. The filename will be shortened to the db length now.
+- Files: Maximum file name length raised to 260 chars.
+- Google authenticator: Don't request password to setup if current user is an admin
+- Email: fixed memory limit error on some emails with bad utf8
+
+17-12-2021 6.5.94
+- Core: Fix admin user to ID=1 to make sure it gets this ID even in clustered setups.
+- Email: Bug in error message causing email listing to fail in some cases.
+- Email: Default template is configurable in User settings -> Email
+- Core: Disable spell check on Chrome 96 as it's very slow on larger e-mails.
+- Email: Refresh button doesn't change account and message list view
+- Business: temporarily display transferable leave types in the agreement dialog
+- EMail: Make sure IMAP file names are always normalized UTF8 strings
+- Core: Show UK substitute days next to fixed days.
+- Core / email: Fixed editor performance on very large documents
 
 13-12-2021 6.5.93
 - Core: Clear cache via webserver if running upgrade on the command line.

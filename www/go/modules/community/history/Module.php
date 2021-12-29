@@ -88,7 +88,7 @@ class Module extends core\Module
 	}
 
 	private static function logEntity(Entity $entity, $action) {
-		if(!self::$enabled) {
+		if(!self::$enabled || core\Installer::isInProgress()) {
 			return;
 		}
 
