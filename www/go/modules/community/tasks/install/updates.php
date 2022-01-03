@@ -88,7 +88,7 @@ $updates['202106101432'][] = "alter table tasks_tasklist
 
 $updates['202106181401'][] = "create table if not exists tasks_user_settings
 (
-    userId int null,
+    userId int not null,
     defaultTasklistId int(11) unsigned null,
     rememberLastItems boolean not null default false,
     lastTasklistIds varchar(255) null,
