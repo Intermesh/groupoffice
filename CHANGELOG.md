@@ -22,6 +22,11 @@ XX-09-20216.6.10
 
 
 
+- Business: hid transferable leave day types in favor of Special leave types
+- Business: Fixed minor mistake in activities grid
+- Leavedays: Add leave day budget combobox to leave day request
+- Leavedays: minor bugfix agreementId in year employee grid
+
 23-12-2021 6.5.95
 - Leavedays: Tweak year view to not display any numbers if an employee does not in a certain month
 - Leavedays: Support for re-hiring employees
