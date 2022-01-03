@@ -246,7 +246,7 @@ class Instance extends Entity {
 			}
 		}
 		
-		if($this->isModified(['storageQuota', 'userMax', 'enabled'])) {
+		if($this->isModified(['storageQuota', 'usersMax', 'enabled'])) {
 			$instanceConfig['quota'] = $this->storageQuota / 1024;
 			$instanceConfig['max_users'] = $this->usersMax;
 			$instanceConfig['enabled'] = $this->enabled;
