@@ -1,16 +1,4 @@
-6.6.11
-- Addressbook: Fix findForUser method for empty userId
-- Leavedays: Fix exception in year export
-- Core: Fix error upon saving user profile data
-- Core: Fix system settings module grid in case core module does not have id 1
-- Addressbook: drop restrictExportToAdmins system setting in favor of mayExportContacts group module permission
-
-XX-09-20216.6.10
-- Time Registration: Filter employees on currently selected date instead of current date
-- Projects: Time entries - filter employees on current project ID
-
-6.6
-
+6.6.25
 - Tasks: Completely rewritten module
 - Core: Set alternative lost password URL
 - Core: Alert system to notify users about comments, assigned tasks etc.
