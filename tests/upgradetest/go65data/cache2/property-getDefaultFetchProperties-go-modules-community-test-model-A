@@ -1,0 +1,1 @@
+a:10:{i:0;s:15:"permissionLevel";i:5;s:2:"id";i:6;s:9:"createdAt";i:7;s:10:"modifiedAt";i:8;s:5:"propA";i:9;s:7:"hasMany";i:10;s:6:"hasOne";i:11;s:3:"map";i:12;s:5:"propD";i:13;s:7:"dynamic";}

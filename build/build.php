@@ -150,9 +150,9 @@ class Builder
             $this->buildDebianPackage();
 
             if(!$this->test) {
-//	            $this->createGithubRelease();
+	            $this->createGithubRelease();
 	            $this->addToDebianRepository();
-//	            $this->sendTarToSF();
+	            $this->sendTarToSF();
             }
 
 
