@@ -1,3 +1,4 @@
+03-01-2022 6.5.96
 - Business: hid transferable leave day types in favor of Special leave types
 - Business: Fixed minor mistake in activities grid
 - Leavedays: Add leave day budget combobox to leave day request
