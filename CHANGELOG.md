@@ -9,6 +9,9 @@
       custom fields.
 
 
+6.5.97
+- Business: hide 'Budgetable' checkbox for special leave types
+
 03-01-2022 6.5.96
 - Business: hid transferable leave day types in favor of Special leave types
 - Business: Fixed minor mistake in activities grid
