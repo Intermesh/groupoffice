@@ -1,4 +1,4 @@
-6.6.25
+03-01-2022 6.6.25
 - Tasks: Completely rewritten module
 - Core: Set alternative lost password URL
 - Core: Alert system to notify users about comments, assigned tasks etc.
@@ -7,7 +7,6 @@
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
-
 
 
 03-01-2022 6.5.96
