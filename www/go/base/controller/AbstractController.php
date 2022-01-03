@@ -456,7 +456,6 @@ abstract class AbstractController extends Observable {
 				$response['redirectToLogin']=true;
 
 			if(GO::config()->debug){
-				$response['message']=$debug;
 				$response['trace']=explode("\n", $e->getTraceAsString());
 				//$response['trace']= $e->getTrace();
 			}
