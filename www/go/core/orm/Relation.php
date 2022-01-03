@@ -4,6 +4,7 @@ namespace go\core\orm;
 
 use go\core\db\Table;
 use InvalidArgumentException;
+use LogicException;
 
 /**
  * Relation class
@@ -128,8 +129,12 @@ class Relation {
 	 */
 	public function getScalarColumn(): string
 	{
-		$table = Table::getInstance($this->tableName, go()->getDbConnection());
+		$table = Table::getInstance($this->tableName);
 		$diff = array_diff($table->getPrimaryKey(), $this->keys);
+
+		if(empty($diff)) {
+			throw new LogicException("Can't determine column for scalar relation " . $this->propertyName . "->" . $this->name ." . Please check the given keys.");
+		}
 
 		return array_shift($diff);
 	}
