@@ -15,6 +15,9 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 	scrollLoader: false,
 
+	groupId: null,
+
+
 	initComponent: function () {
 
 		if (!this.value) {
@@ -368,10 +371,21 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 	getValue: function () {
 		let v = {};
 		this.store.getModifiedRecords().forEach((r) => {
-			v[r.id] = {permissions: r.data.permissions};
+			v[r.id] = {permissions: this.replaceNewGroupId(r.data.permissions)};
 		});
 
 		return v;
+	},
+
+	replaceNewGroupId : function(permissions) {
+
+		if(permissions[null]) {
+			permissions[this.groupId] = permissions[null];
+
+			delete permissions[null];
+		}
+
+		return permissions;
 	},
 
 	markInvalid: function (msg) {
