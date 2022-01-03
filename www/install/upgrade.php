@@ -97,7 +97,7 @@ try {
 		echo '<div id="success"></div>';
 
 	} 
-} catch (Exception $e) {
+} catch (Throwable $e) {
 	
 	echo "<b>Error:</b> ". ErrorHandler::logException($e)."\n\n";
 	
