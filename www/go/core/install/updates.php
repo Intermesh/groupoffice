@@ -1051,7 +1051,7 @@ $updates['202112131205'][] = "alter table core_auth_remember_me
 $updates['202112131205'][] = "alter table core_auth_remember_me
     add `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL";
 
-$updates['202110211653'][] = "alter table core_auth_remember_me
+$updates['202112131205'][] = "alter table core_auth_remember_me
 	add platform varchar(190) COLLATE utf8mb4_unicode_ci null after userAgent;";
 
 $updates['202112131205'][] = "alter table core_auth_remember_me
