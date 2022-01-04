@@ -365,17 +365,19 @@ class Criteria {
 	 * So change:
 	 *
 	 * ```
-	 * where foo = 1 and bar = 1
+	 * where foo = 1 or bar = 1
 	 * ```
 	 *
 	 * into:
 	 * ```
-	 * where (foo = 1 and bar = 1)
+	 * where (foo = 1 or bar = 1)
 	 * ```
+	 * This is useful when you want to append some conditions to an existing query that uses OR and you need some AND conditions
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function groupWhere(){
+	public function groupWhere(): Criteria
+	{
 		$criteria = new Criteria();
 		$criteria->where = $this->where;
 		$this->clearWhere();
