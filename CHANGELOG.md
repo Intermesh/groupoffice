@@ -59,6 +59,8 @@
 
 26-11-2021 6.5.89
 - Remove obsolete timeentrydata module
+- Core: Keep debug.log file cleaner by not writing all the request and response parameters.
+- Addressbook: added Comment filter
 - Business: added sortOrder field to business_activity, made sortable by dragging and dropping
 - Leavedays: order report by business_activity.sortOrder
 - Comments: insert date header above first comment
