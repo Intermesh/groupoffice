@@ -1,11 +1,23 @@
 <?php
+use GO\Base\Cron\CronJob;
+use GO\Base\Model\Module;
+use GO\Base\Observable;
+use go\core\ErrorHandler;
+use go\core\event\EventEmitterTrait;
+use go\core\mail\Util;
+use go\core\App;
+use go\core;
+use go\core\model\User;
+
 require('../vendor/autoload.php');
-\go\core\App::get();
+App::get();
 
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 
-
+// needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
+// system.
+EventEmitterTrait::$disableEvents = true;
 require("gotest.php");
 
 if(!systemIsOk()) {
@@ -13,25 +25,10 @@ if(!systemIsOk()) {
 	exit();
 }
 
-
-use GO\Base\Cron\CronJob;
-use GO\Base\Model\Module;
-use GO\Base\Observable;
-use go\core\mail\Util;
-use go\core\validate\ErrorCode;
-use go\modules\community\bookmarks\Module as BookmarksModule;
-use go\modules\community\comments\Module as CommentsModule;
-use go\core\App;
-use go\core\jmap\State;
-use go\core;
-use go\modules\community\googleauthenticator\Module as GAModule;
-use go\modules\community\notes\Module as NotesModule;
-use go\modules\community\addressbook\Module as AddressBookModule;
-
-
-function dbIsEmpty() {
+function dbIsEmpty(): bool
+{
 	//global $pdo;
-	/* @var $pdo \PDO; */
+	/* @var $pdo PDO; */
 	
 	$stmt = App::get()->getDbConnection()->query("SHOW TABLES");
 	$stmt->execute();
@@ -62,7 +59,7 @@ if (!empty($_POST)) {
 //		go()->getDbConnection()->exec("USE test");
 
 
-        if(!preg_match(core\model\User::USERNAME_REGEX, $_POST['username'])) {
+        if(!preg_match(User::USERNAME_REGEX, $_POST['username'])) {
             throw new Exception(go()->t("You have invalid characters in the username") . " (a-z, 0-9, -, _, ., @).");
         }
 
@@ -99,10 +96,10 @@ if (!empty($_POST)) {
 			    try {
                     Module::install($moduleController->name());
                 }
-                catch(\Exception $e) {
+                catch(Exception $e) {
 			        //could be a license error due to an unlicensed module depending
                   //on a licensed module
-			        core\ErrorHandler::logException($e);
+			        ErrorHandler::logException($e);
                 }
 			}
 		}
@@ -140,7 +137,7 @@ if (!empty($_POST)) {
 		Observable::cacheListeners();
 
 
-		\go\core\model\User::findById(1)->legacyOnSave();
+		User::findById(1)->legacyOnSave();
 
 		header("Location: finished.php");
 		exit();
@@ -176,7 +173,7 @@ require('header.php');
 
 			<p>
 				<label>E-mail</label>
-				<input type="email" name="email" value="<?= $_POST['email'] ?? ""; ?>" required />
+				<input type="email" name="email" value="<?= $_POST['email'] ?? ""; ?>" required>
 				
 			</p>
 			<p>
@@ -187,12 +184,12 @@ require('header.php');
 			
 			<p>
 				<label>Password</label>
-				<input type="password" name="password" autocomplete="new-password" pattern=".{6,}" value="<?= $_POST['password'] ?? ""; ?>" title="Minimum length is 6 chars" required />
+				<input type="password" name="password" autocomplete="new-password" pattern=".{6,}" value="<?= $_POST['password'] ?? ""; ?>" title="Minimum length is 6 chars" required>
 			</p>
 
 			<p>
 				<label>Confirm</label>
-				<input type="password" name="passwordConfirm" autocomplete="new-password" pattern=".{6,}" title="Minimum length is 6 chars"  value="<?= $_POST['passwordConfirm'] ?? ""; ?>" required />
+				<input type="password" name="passwordConfirm" autocomplete="new-password" pattern=".{6,}" title="Minimum length is 6 chars"  value="<?= $_POST['passwordConfirm'] ?? ""; ?>" required>
 			</p>
 
             <button class="right primary" name="submitButton" type="submit">Install</button>

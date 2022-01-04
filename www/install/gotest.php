@@ -14,7 +14,7 @@
 
 use go\core\Environment;
 
-$product_name = class_exists('GO') ? \GO::config()->product_name : 'Group-Office';
+$product_name = 'Group-Office';
 
 /**
 * Format a size to a human readable format.
