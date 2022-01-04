@@ -1207,7 +1207,7 @@ Ukoliko niste zatražili novu lozinku izbrišite ovu poruku.',
   'Enter your email address' => 'Unesite svoju adresu e-pošte',
   'A server error occurred.' => 'Došlo je do greške na poslužitelju.',
   'Recovery e-mail sent' => 'Poslana je e-pošta za oporavak',
-  'product_name' => 'GroupOffice',
+
   'Use $config' => 
   array (
     '\'debug\'' => 'Koristite $config[\'debug\']=true; samo prilikom razvoja i rješavanja problema. Značajno usporava " + t(\'product_name',

@@ -21,9 +21,6 @@ class Password extends PrimaryAuthenticator {
 			return false;
 		}
 		if(!$user->passwordVerify($password)) {
-
-			User::fireEvent(User::EVENT_BADLOGIN, $user);
-
 			return false;
 		}
 	

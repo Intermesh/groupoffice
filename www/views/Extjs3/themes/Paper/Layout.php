@@ -3,6 +3,9 @@
 use go\core\App;
 use go\core\webclient\Extjs3;
 
+if(!isset($primaryColor)) {
+	$primaryColor = (go()->getSettings()->primaryColor ?? 'rgb(2, 119, 189)');
+}
 $webclient = Extjs3::get();
 $lang = GO::language()->getLanguage(); ?>
 <!DOCTYPE html>
@@ -13,12 +16,13 @@ $lang = GO::language()->getLanguage(); ?>
 	<meta name="HandheldFriendly" content="true"/>
 	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 	<meta http-equiv="x-ua-compatible" content="IE=edge">
-	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="no">
 	<meta name="apple-mobile-web-app-title" content="<?= go()->getSettings()->title; ?>">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= GO::view()->getTheme()->getUrl(); ?>img/favicon/apple-touch-icon.png">
-
-	<?php
+    <meta name="theme-color" content="<?= $primaryColor; ?>" />
+    <meta name="msapplication-TileColor" content="<?= $primaryColor; ?>">
+    <?php
 
 	require(GO::config()->root_path.'views/Extjs3/default_scripts.inc.php');
 
@@ -37,9 +41,6 @@ $lang = GO::language()->getLanguage(); ?>
 	<link rel="mask-icon" href="<?= GO::view()->getTheme()->getUrl(); ?>img/favicon/safari-pinned-tab.svg" color="#888888">
 	<?php } ?>
 
-	<meta name="msapplication-TileColor" content="#2b5797">
-	<meta name="theme-color" content="#ffffff">
-
 	<title><?= go()->getSettings()->title; ?></title>
 	<?php
 	$cssMtime = filemtime(__DIR__ . "/style.css");
@@ -54,7 +55,8 @@ $lang = GO::language()->getLanguage(); ?>
 	GO::router()->getController()->fireEvent('head');
 	go()->fireEvent(App::EVENT_HEAD);
 	?>
-	<style>
+
+   <style>
         <?php
 
         if(go()->getSettings()->logoId) {
@@ -106,5 +108,8 @@ $lang = GO::language()->getLanguage(); ?>
 <!--	<div id="scripts-container">-->
 <!--		-->
 <!--	</div>-->
+    <script type="text/javascript">
+		 GO.util.density = GO.util.isMobileOrTablet() ? 160 :  <?= isset($density) ? $density : 140?>;
+    </script>
 </body>
 </html>

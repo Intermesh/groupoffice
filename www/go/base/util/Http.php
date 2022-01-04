@@ -192,7 +192,8 @@ class Http {
 	 * @return boolean
 	 */
 	public static function isHttps(){
-		return !empty($_SERVER['HTTPS']) && strcasecmp($_SERVER['HTTPS'],'off');
+		return \go\core\http\Request::get()->isHttps();
+		//return !empty($_SERVER['HTTPS']) && strcasecmp($_SERVER['HTTPS'],'off');
 	}
 	
 	

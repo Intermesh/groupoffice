@@ -47,10 +47,18 @@ GO.moduleManager.onModuleReady('email',function(){
 			})]);
 		
 			this.on('afterShowAndLoad',function(){
-				this.signCheck.setChecked(false);
-				this.encryptCheck.setChecked(false);
-				this.sendParams['encrypt_smime'] ="0";
-				this.sendParams['sign_smime'] ="0";				
+
+
+				if(!this.sendParams.encrypt_smime) {
+					this.sendParams.encrypt_smime = "0";
+				}
+
+				if(!this.sendParams.sign_smime) {
+					this.sendParams.sign_smime = "0";
+				}
+
+				this.signCheck.setChecked(this.sendParams.sign_smime);
+				this.encryptCheck.setChecked(this.sendParams.encrypt_smime);
 
 				this.checkSmimeSupport();
 			}, this);
@@ -132,9 +140,9 @@ GO.moduleManager.onModuleReady('email',function(){
 				this.signCheck.setChecked(false);
 				this.sendParams['sign_smime'] ="0";
 			} else {
-				// Record has an smime cert and always sign is set to false
-				this.signCheck.setChecked(false);
-				this.sendParams['sign_smime'] ="0";	
+				// // Record has an smime cert and always sign is set to false
+				// this.signCheck.setChecked(false);
+				// this.sendParams['sign_smime'] ="0";
 			}
 		}
 	}

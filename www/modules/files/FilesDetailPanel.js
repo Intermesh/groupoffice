@@ -44,7 +44,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			itemSelector: 'a',
 			listeners: {
 				afterrender:function(me) {
-					GO.files.DnDFileUpload(this.uploadComplete.bind(this), me.container)();
+					GO.files.DnDFileUpload(this.uploadComplete.bind(this), me.container)(this);
 
 				},
 				click: this.onClick,

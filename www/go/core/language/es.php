@@ -1101,7 +1101,7 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
   'Your password was changed successfully' => 'Su contraseña fue cambiada exitosamente',
   'Sorry, something went wrong. Please try again.' => 'Perdón, algo salió mal. Inténtelo de nuevo.',
   'This password recovery link is invalid' => 'Este enlace de recuperación de contraseña no es válido',
-  'product_name' => 'product_name',
+
   'Use $config' => 
   array (
     '\'debug\'' => 'Use $config[\'debug\']=true; only with development and problem solving. It slows " + t(\'product_name',

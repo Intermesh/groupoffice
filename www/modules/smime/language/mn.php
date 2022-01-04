@@ -1,0 +1,22 @@
+<?php
+return array (
+  'SMIME settings' => 'SMIME тохиргоо',
+  'PKCS12 certificate' => 'PKCS12 гэрчилгээ',
+  'You have uploaded a certificate already. SMIME support is enabled for this account.' => 'Та аль хэдийн гэрчилгээ оруулсан байна. SMIME дэмжлэг энэ бүртгэлд идэвхижсэн байна.',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Шинэ PKCS12 гэрчилгээ байршуулахын тулд та өөрийн Group-Office нууц үгээ оруулна уу . Аюулгүй байдлын үүднээс Group-Office-ийн нууц үг таны PCSK12 сертификатаас өөр байх ёстой. Түүнчлэн нууц үг оруулахгүй байхыг хориглоно.',
+  'Select new PKCS12 Certificate' => 'Шинэ PKCS12 гэрчилгээ сонгоно уу',
+  'Delete certificate' => 'Гэрчилгээ устгах',
+  'Download certificate' => 'Гэрчилгээ татаж авах',
+  'Always sign messages' => 'Үргэлж зурваст гарын үсэг зурах',
+  'SMIME Certificate' => 'SMIME гэрчилгээ',
+  'Public SMIME certificates' => 'Public SMIME гэрчилгээ',
+  'This message is encrypted.' => 'Энэ зурвас нь шифрлэгдсэн байдаг.',
+  'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'Энэ зурвас тоон гарын үсэгтэй байна. Гарын үсгийг баталгаажуулах, гэрчилгээг импортлохын тулд энд дарна уу.',
+  'Add to SMIME certificates' => 'SMIME гэрчилгээ нэмэх',
+  'Certificate added' => 'Гэрчилгээ нэмэгдсэн',
+  'SMIME certificate was added for' => 'SMIME гэрчилгээ нь нэмэгдсэн байна',
+  'Could not add SMIME certificate for' => 'SMIME гэрчилгээ нэмж чадсангүй',
+  'Sign with SMIME' => 'SMIME ашиглан гарын үсэг зурах',
+  'Encrypt with SMIME' => 'SMIME ашиглан шифрлэх',
+  'Please enter the password of your SMIME certificate.' => 'SMIME сертификатынхаа нууц үгийг оруулна уу.',
+);

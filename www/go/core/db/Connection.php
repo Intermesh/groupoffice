@@ -40,7 +40,7 @@ class Connection {
 	 * 
 	 * @var bool 
 	 */
-	public $debug = true;
+	public $debug = false;
 	
 	public function __construct($dsn, $username, $password) {
 		$this->dsn = $dsn;
@@ -80,6 +80,21 @@ class Connection {
 			$this->setPDO();
 		}
 		return $this->pdo;
+	}
+
+	private $database;
+
+	/**
+	 * Get the database instance
+	 *
+	 * @return Database
+	 */
+	public function getDatabase() {
+		if(!isset($this->database)) {
+			$this->database = new Database($this);
+		}
+
+		return $this->database;
 	}
 
 	/**
@@ -132,7 +147,7 @@ class Connection {
 	 */
 	public function query($sql) {
 		if($this->debug) {
-			go()->getDebugger()->debug($sql);
+			go()->getDebugger()->debug($sql, 1 ,false);
 		}
 		try {
 			return $this->getPdo()->query($sql);
@@ -154,7 +169,7 @@ class Connection {
 	 */
 	public function exec($sql) {
 		if($this->debug) {
-			go()->getDebugger()->debug($sql, 1);
+			go()->getDebugger()->debug($sql, 1, false);
 		}
 		try {
 			return $this->getPdo()->exec($sql);

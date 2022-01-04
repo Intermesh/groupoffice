@@ -3,6 +3,7 @@ namespace go\core\orm;
 
 use go\core\db\Criteria;
 use go\core\model\Link;
+use go\core\model\Search;
 
 /**
  * Entities can use this trait to make it show up in the global search function
@@ -10,6 +11,8 @@ use go\core\model\Link;
  * @property array $customFields 
  */
 trait SearchableTrait {
+
+	public static $updateSearch = true;
 	
 	/**
 	 * The description in the search results
@@ -52,33 +55,86 @@ trait SearchableTrait {
 		//Split on non word chars followed by whitespace or end of string. This wat initials like J.K. or french dates
 		//01.01.2020 can be found too.
 //		$keywords = mb_split('[^\w\-_\+\\\\\/:](\s|$)*', mb_strtolower($text), -1);
-		$text= preg_replace('/[^\w\-_\+\\\\\/\s:@]/', '', mb_strtolower($text));
+		$text = preg_replace('/[^\w\-_+\\\\\/\s:@]/u', '', mb_strtolower($text));
+		$text = preg_replace('/[-]+/u', '-', $text);
+		$text = preg_replace('/[_]+/u', '_', $text);
 		$keywords = mb_split("\s+", $text);
 
 		//filter small words
-		$keywords = array_filter($keywords, function($word) {
-			return strlen($word) > 1;
-		});
-
+		if(count($keywords) > 1) {
+			$keywords = array_filter($keywords, function ($word) {
+				return strlen($word) > 2;
+			});
+		}
 
 		return $keywords;
 	}
 
+	/**
+	 * Split numbers into multipe partials so we can match them using an index
+	 * eg.
+	 *
+	 * ticket no
+	 *
+	 * 2002-12341234
+	 *
+	 * Will be found on:
+	 *
+	 * 002-12341234
+	 * 02-12341234
+	 * 2-12341234
+	 * -12341234
+	 * 12341234
+	 * 2341234
+	 * 341234
+	 * 41234
+	 * 1234
+	 * 234
+	 *
+	 * this is faster then searchgin for
+	 *
+	 * %234 because it can't use an index
+	 *
+	 * @param $number
+	 * @param int $minSearchLength
+	 * @return array
+	 */
+	public static function numberToKeywords($number, $minSearchLength = 3) {
+		$keywords = [$number];
+
+		while(strlen($number) > $minSearchLength) {
+			$number = substr($number, 1);
+			$keywords[] = $number;
+		}
+
+		return $keywords;
+
+	}
+
+	/**
+	 * Prepares the query for a search
+	 *
+	 * @param Criteria $criteria
+	 * @param Query $query
+	 * @param $searchPhrase
+	 * @throws \Exception
+	 */
 	public static function addCriteria(Criteria $criteria, Query $query, $searchPhrase) {
 		$i = 0;
 		$words = SearchableTrait::splitTextKeywords($searchPhrase);
 		$words = array_unique($words);
 
+
+		//$query->noCache();
+
 		foreach($words as $word) {
-			$query->join("core_search_word", 'w'.$i, 'w'.$i.'.searchId = search.id');
-			//$query->join("core_search_word_reverse", 'wr'.$i, 'wr'.$i.'.searchId = s.id');
+			$query->join(
+				"core_search_word",
+				'w'.$i, 'w'.$i.'.searchId = search.id',
+				'INNER'
+			);
 
-			$c = new Criteria();
-			$c
-				->where('w'.$i.'.word', 'LIKE', $word . '%')
-				->orWhere('w'.$i.'.drow', 'LIKE', strrev($word) . '%');
-
-			$criteria->where($c);
+			$criteria->where('w'.$i.'.word', 'LIKE', $word . '%');
 
 			$i++;
 		}
@@ -92,6 +148,11 @@ trait SearchableTrait {
 	 * @throws \Exception
 	 */
 	public function saveSearch($checkExisting = true) {
+
+		if(!static::$updateSearch) {
+			return true;
+		}
+
 		$search = $checkExisting ? \go\core\model\Search::find()->where('entityTypeId','=', static::entityType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
 		if(!$search) {
 			$search = new \go\core\model\Search();
@@ -118,10 +179,12 @@ trait SearchableTrait {
 
 		$links = (new Query())
 			->select('description')
+			->distinct()
 			->from('core_link')
 			->where('(toEntityTypeId = :e1 AND toId = :e2)')
-			->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
-			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id, ':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
+			//->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
+			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id]);
+				//':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
 		foreach($links->all() as $link) {
 			if(!empty($link['description']) && is_string($link['description'])) {
 				$keywords[] = $link['description'];
@@ -140,6 +203,10 @@ trait SearchableTrait {
 
 		$keywords = array_unique($arr);
 
+		if(!empty($this->id) && !in_array($this->id, $keywords)) {
+			$keywords[] = $this->id;
+		}
+
 		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
 		if(!$search->internalSave()) {
@@ -156,7 +223,7 @@ trait SearchableTrait {
 
 		//array values to make sure index is sequential
 		$keywords = array_values(array_map(function ($word) use ($search) {
-			return ['searchId' => $search->id, 'word'=> $word, 'drow' => strrev($word)];
+			return ['searchId' => $search->id, 'word'=> $word];
 		}, $keywords));
 
 		return go()->getDbConnection()->insertIgnore(
@@ -180,16 +247,11 @@ trait SearchableTrait {
 			return false;
 		}
 
+		go()->debug("Deleted " . $delSearchStmt->rowCount() ." search results");
+
 		if(!Link::delete((new Query)
 			->where(['fromEntityTypeId' => static::entityType()->getId()])
 			->andWhere('fromId', 'IN', $query)
-		)) {
-			return false;
-		}
-
-		if(!Link::delete((new Query)
-			->where(['toEntityTypeId' => static::entityType()->getId()])
-			->andWhere('toId', 'IN', $query)
 		)) {
 			return false;
 		}
@@ -205,15 +267,19 @@ trait SearchableTrait {
 	 */
 	private static function queryMissingSearchCache($cls, $offset = 0) {
 		
-		$limit = 100;
-			
+		$limit = 1000;
+
+		/** @var Entity $cls */
 		$query = $cls::find();
 		/* @var $query \go\core\db\Query */
 		$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT");
 		$query->andWhere('search.id IS NULL')
+
+//			$query->where('id', 'not in', Search::find()->selectSingleValue('entityId')->where('entityTypeId', '=', $cls::entityType()->getId()))
 							->limit($limit)
 							->offset($offset);
-		
+
+
 		return $query->execute();
 	}
 	
@@ -228,6 +294,8 @@ trait SearchableTrait {
 			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue($cls::getMapping()->getPrimaryTable()->getAlias() . '.id'))
 		);
 		$stmt->execute();
+
+		go()->getDbConnection()->exec("commit");
 
 		echo "Deleted ". $stmt->rowCount() . " entries\n";
 
@@ -255,10 +323,15 @@ trait SearchableTrait {
 				}
 			}
 			echo "\n";
+			go()->getDbConnection()->exec("commit");
 
 			$stmt = self::queryMissingSearchCache($cls, $offset);
 		}
-	
+
+
+		go()->getDbConnection()->exec("commit");
+
+
 	}
 	
 	public static function rebuildSearch() {

@@ -1,3 +1,5 @@
+@use "sass:math";
+
 :root {
   --c-primary: #{map-get($vars, c-primary)};
   --c-primary-tp: #{map-get($vars, c-primary-tp)};
@@ -595,6 +597,11 @@ a {
 		padding: 0 0 0 dp(8);
 		background-color: rgba(255,255,255,0.1);
 		color: white;
+
+		&::placeholder {
+			color: #dedede;
+			font-style: italic;
+		}
 		
 		&.x-form-invalid {
 			background-color: #e57373;
@@ -632,7 +639,7 @@ a {
 			color: color($fg,'secondary-text');
 			>i, .x-tool {
 				transform: scale(.8);
-				margin-top: dp(-4);
+				margin-top: dp(12);
 			}
 			.x-tool {
 				transform: scale(.8);
@@ -645,9 +652,8 @@ a {
 			color: color($fg,'secondary-text');
 			font-size: dp(16);
 		}
-		.x-panel-bwrap {
+		.x-panel-body {
 			padding: dp(8) dp(16);
-			em {float:right;}
 		}
 	}
 }
@@ -666,9 +672,15 @@ a {
 	i.entity::before{margin-top: dp(-22);}
 }
 .notificationArea {
-	z-index: 1000000 !important;
+	//higher than window 9003 and lower than menu's 15000
+	z-index: 10000 !important;
 	@include var('background-color', c-primary);
-	.x-panel-header,.x-panel-header-text { border-top:0; color:white; }
+	.x-panel-header,.x-panel-header-text {
+		border-top:0; color:white;
+		.x-tool:hover {
+			color: color($grey-material, 300);
+		}
+	}
 }
 @keyframes blink {
 	0% {opacity: 0;}
@@ -1177,7 +1189,7 @@ tr.go-grid-row {
 		  display: block;
 		  content: "";
 		  width: 100%;
-		  padding-top: (9 / 16) * 100%;
+		  padding-top: math.div(9 , 16) * 100%;
 		}
 	}
 		
@@ -1437,19 +1449,30 @@ table[id^="comments-ext"] b {
 	border-bottom: 1px solid color($fg, 'line');
 }
 
-.x-window.go-form-panel .x-panel-body, 
-.x-window.go-form-panel .x-window-body, 
+.x-window.go-form-panel .x-panel-body,
+.x-window.go-form-panel .x-window-body,
 .x-column.go-form-panel .x-panel-body,
 .x-form-label-left.go-form-panel > div > .x-panel-body,
-.go-form-panel .x-panel-body,
-.go-error-dialog{
+.go-form-panel .x-panel-body, .go-error-dialog{
 	padding: dp(8) dp(16);
 }
+
 .go-error-dialog {
-	font-size: 10px;
+	font-size: dp(14);
 	font-family: monospace;
 	line-height: 1.4em;
+	white-space: nowrap;
+
+
 }
+
+.go-text-dialog {
+	.x-window-body {
+		padding: dp(16);
+		background-color: color($bg, 'card');
+	}
+}
+
 #container { // error container
 	margin: dp(24);
 	padding: dp(16);
@@ -1503,11 +1526,6 @@ table[id^="comments-ext"] b {
 
 	.x-toolbar:first-of-type {
 		border-bottom: 0;
-	}
-
-
-	.x-panel-body {
-		padding-bottom: dp(8);
 	}
 }
 
@@ -1582,6 +1600,10 @@ table[id^="comments-ext"] b {
 		.x-panel-body {
 			min-height: dp(64);
 		}
+	}
+
+	.x-grid3-row .ux-row-action {
+		opacity: 1;
 	}
 
 }
@@ -1673,10 +1695,10 @@ table[id^="comments-ext"] b {
 		@extend %icon;
 		float: right;
 	}
-	&.success { background-color: lighten($cSuccess, 55%);  }
-	&.danger { background-color: lighten($cDanger,45%);}
-	&.warning { background-color: lighten($cWarning, 47%);}
-	&.summary { background-color: color($bg, 'background'); }
+	//&.success { background-color: lighten($cSuccess, 55%);  }
+	//&.danger { background-color: lighten($cDanger,45%);}
+	//&.warning { background-color: lighten($cWarning, 47%);}
+	//&.summary { background-color: color($bg, 'background'); }
 }
 
 
@@ -1805,71 +1827,76 @@ table[id^="comments-ext"] b {
 	}
 }
 
+/**
+ * Resets ExtJS style to normal HTML defaults for displaying the HTML editor values or e-mails
+ */
 .go-html-formatted {
+
 	@extend %font-body1;
-}
 
-//.go-html-formatted div, .go-html-formatted dl, .go-html-formatted dt, .go-html-formatted dd, .go-html-formatted ul, .go-html-formatted ol, .go-html-formatted li, .go-html-formatted h1, .go-html-formatted h2, .go-html-formatted h3, .go-html-formatted h4, .go-html-formatted h5, .go-html-formatted h6, .go-html-formatted pre, .go-html-formatted form, .go-html-formatted fieldset, .go-html-formatted input, .go-html-formatted p, .go-html-formatted blockquote, .go-html-formatted th, .go-html-formatted td, .go-html-formatted span {
-//    font: inherit;
-//}
+	blockquote {
+		display: block;
+		margin: 1em 40px;
+		pading: 0px 10px;
+	}
 
-.go-html-formatted  blockquote {  
-  display: block;  
-  margin: 1em 40px;  
-  pading:0px 10px;
-}
+	td {
+		display: table-cell;
+	}
 
-.go-html-formatted td {   
-   display: table-cell;  
-/*   vertical-align: inherit;  
-   text-align: inherit; */
- }  
-   
-.go-html-formatted th {  
-   display: table-cell;  
-   vertical-align: inherit;  
-   font-weight: bold;  
-   padding: 1px;  
- }
+	th {
+		display: table-cell;
+		vertical-align: inherit;
+		font-weight: bold;
+		padding: 1px;
+	}
 
-   
-.go-html-formatted ul,.go-html-formatted  menu, .go-html-formatted dir {  
-	display: block;
-	list-style-type: disc;
-	list-style-position: inside;
-	margin: 0;
-	padding: 0 0 0 2em;
- }  
-   
-.go-html-formatted ol {  
-	display: block;
-	list-style-type: decimal;
-	list-style-position: inside;
-	margin: 0;
-	padding: 0 0 0 2em;
-
-	> ol {
-		list-style-type: lower-alpha;
-		> ol {
-			list-style-type: lower-roman;
+	ul, menu, dir {
+		display: block;
+		list-style-type: disc;
+		list-style-position: outside;
+		margin: 0;
+		padding: 0 0 0 2em;
+		> ul {
+			list-style-type: circle;
+			> ul {
+				list-style-type: square;
+			}
 		}
 	}
- }  
-   
-.go-html-formatted li {  
-   display: list-item;  
- }
- 
-.go-html-formatted p {  
-   margin: dp(8) 0px;
- }
 
-.go-html-formatted a:link, .go-html-formatted a:visited, .go-html-formatted a:active{
-	text-decoration:underline;
-	color: $cAnchor;
-}
-.go-html-formatted a:visited{
-	color:purple;
+	ol {
+		display: block;
+		list-style-type: decimal;
+		list-style-position: outside;
+		margin: 0;
+		padding: 0 0 0 2em;
+
+		> ol {
+			list-style-type: lower-alpha;
+
+			> ol {
+				list-style-type: lower-roman;
+			}
+		}
+	}
+
+	li {
+		display: list-item;
+	}
+
+	p {
+		margin: dp(8) 0px;
+	}
+
+	a:link, a:visited, a:active {
+		text-decoration: underline;
+		color: $cAnchor;
+	}
+
+	a:visited {
+		color: purple;
+	}
 }
 
 .normal-link {
@@ -1988,7 +2015,6 @@ table[id^="comments-ext"] b {
 	em {
 		cursor:pointer;
 		display: block;
-		padding: 3.5px;
 		border: 0;
 		float: left;
 		width:dp(32);
@@ -1997,8 +2023,17 @@ table[id^="comments-ext"] b {
 		font-size:22px;
 	}
 }
+.comments-container {
+	min-height: dp(150);
+	> div {
+		max-height: dp(744);
+		min-height: dp(32);
+	}
+}
 .new-message {
+	margin: dp(8);
 	border: 1px solid color($fg,'line');// rgba(black, 0.12);
+	min-height: dp(32);
 	border-radius: dp(16);
 	overflow:hidden;
 		.x-panel-body {
@@ -2187,8 +2222,9 @@ table[id^="comments-ext"] b {
 	display: inline-block;
 	@extend .x-btn;
 	min-height: dp(32);
-	line-height: dp(24);
-	padding: 2px dp(8);
+	line-height: dp(28);
+	padding: dp(2) dp(8);
+	margin: 0;
 
 	&:hover, &:focus {
 		transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
@@ -2199,6 +2235,13 @@ table[id^="comments-ext"] b {
 		&:hover, &:focus {
 			transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
 			@include var(background-color, c-accent);
+		}
+	}
+
+	&.accent {
+		&:hover, &:focus {
+			transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-primary);
 		}
 	}
 }
@@ -2243,6 +2286,7 @@ table[id^="comments-ext"] b {
 
 	button, a.button {
 		@extend .go-button;
+		text-decoration: none;
 	}
 
 	h2 {
@@ -2268,23 +2312,21 @@ table[id^="comments-ext"] b {
 		color: #666;
 	}
 
-	input:not([type=checkbox]):not([type=radio]) {
-		color: rgba(0, 0, 0, 0.87);
+	textarea, input:not([type=checkbox]):not([type=radio]) {
+
+		@extend %font-data;
+		color: color($fg, 'text');
+		min-height: dp(32);
+		line-height: dp(20);
+		//line-height: dp(18);
+		transition: border-color 100ms linear, box-shadow 225ms linear;
+		border-radius: dp(4);
 		width: 100%;
-		padding: 0 0 8px;
-		border: none;
-		transition: background-color 180ms cubic-bezier(0.4, 0, 0.2, 1), transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
-		border-bottom: 2px solid rgba(0, 0, 0, 0.12);
-		background: none;
-		font-size: inherit;
-		-webkit-appearance: none; }
-	input:focus {
-		outline: none;
-		border-bottom: 2px solid #212121; }
-	input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
-		transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s;
-		transition-delay: background-color 5000s, color 5000s;
-		-webkit-text-fill-color: #2a2a2a;
+		background-color:color($bg, 'box');
+		border: 1px solid color($fg, 'track');
+		display: inline-block;
+		padding: dp(6) dp(8);
+
 	}
 
 	pre {
@@ -2294,6 +2336,35 @@ table[id^="comments-ext"] b {
 	*[disabled] {
 		opacity: 0.65;
 		cursor: not-allowed;
+	}
+
+	.mask-message{
+		display: none;
+		position: absolute;
+		height: dp(56);
+		width: dp(200);
+		top: 50%;
+		left: 50%;
+		margin-top: dp(-24);
+		margin-left: dp(-100);
+		background-color: white;
+		border: 1px solid color($fg, 'line');
+		text-align: center;
+		padding: dp(16);
+		border-radius: 4px;
+	}
+
+	.mask {
+		>*:not(.mask-message) {
+			visibility: hidden;
+		}
+		position: relative;
+		background-color: color($bg, 'background');
+		pointer-events: none;
+		.mask-message {
+			display: block;
+		}
+
 	}
 }
 
@@ -2346,7 +2417,7 @@ body.go-compact {
 	.go-main-tab-panel.x-tab-panel > .x-tab-panel-header {
 		position: absolute;
 		top: dp(-56);
-		left: dp(224);
+		left: dp(272);
 		right: dp(272);
 		width: auto !important;
 		height: 0;
@@ -2355,5 +2426,11 @@ body.go-compact {
 
 	.go-main-tab-panel {
 		bottom: 0;
+	}
+}
+
+.x-form {
+	p {
+		@extend %font-caption;
 	}
 }

@@ -15,13 +15,22 @@ go.grid.GridTrait = {
 
 	multiSelectToolbarEnabled: true,
 
+	moveDirection: 'up',
+
+	lastSelectedIndex: false,
+	currentSelectedIndex: false,
+
+	enableDelete: true,
+
 	initGridTrait : function() {
 		if (!this.keys)
 		{
 			this.keys = [];
 		}
-	
-		this.initDeleteKey();		
+
+		if(this.enableDelete) {
+			this.initDeleteKey();
+		}
 		if(this.getSelectionModel().getSelected) {
 			this.initNav();
 		}
@@ -42,7 +51,10 @@ go.grid.GridTrait = {
 			if(response.message == "unsupportedSort") {
 				console.warn("Clearing invalid sort state:", store.sortInfo);
 				store.sortInfo = {};
-				store.reload();
+				//caused infinite loop while developing
+				if(!GO.debug) {
+					store.reload();
+				}
 
 				//cancel further exception handling
 				return false;
@@ -51,6 +63,16 @@ go.grid.GridTrait = {
 
 		if(this.multiSelectToolbarEnabled && this.getTopToolbar() && !this.getSelectionModel().singleSelect) {
 			this.initMultiSelectToolbar();
+		}
+
+		//select row when action button is clicked
+		if(this.getView().actionConfig) {
+
+			this.on('viewready', function(){
+				this.getView().actionBtn.on('click', function(btn) {
+					this.getSelectionModel().selectRow(btn.rowIndex);
+				}, this);
+			}, this, {single: true});
 		}
 	},
 
@@ -79,19 +101,23 @@ go.grid.GridTrait = {
 				scope: this
 			},
 			this.selectedLabel,
-			'->',
-			{
+			'->'
+
+		];
+
+		if(this.enableDelete) {
+			items.push({
 				iconCls: 'ic-delete',
 				tooltip: t("Delete"),
 				handler: function() {
 					this.deleteSelected();
 				},
 				scope: this
-			}
-		];
+			});
+		}
 
 		if(this.multiSelectToolbarItems) {
-			var args = [3,0].concat(this.multiSelectToolbarItems);
+			var args = [items.length - 1,0].concat(this.multiSelectToolbarItems);
 			Array.prototype.splice.apply(items, args);
 		}
 
@@ -203,6 +229,14 @@ go.grid.GridTrait = {
 	//It buffers keyboard actions and it doesn't fire when ctrl or shift is used for multiselection
 	initNav : function() {
 		this.addEvents({navigate: true});
+
+		this.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
+			if(this.currentSelectedIndex != this.lastSelectedIndex) {
+				this.lastSelectedIndex = this.currentSelectedIndex;
+			}
+			this.currentSelectedIndex = rowIndex;
+		}, this);
+
 		this.on('rowclick', function(grid, rowIndex, e){			
 
 			if(!e.ctrlKey && !e.shiftKey)
@@ -225,7 +259,7 @@ go.grid.GridTrait = {
 				}
 			}			
 		}, this, {
-			buffer: 100
+			buffer: 300
 		});
 	},
 	
@@ -253,6 +287,10 @@ go.grid.GridTrait = {
 
 	deleteSelected: function () {
 
+		if(!this.enableDelete) {
+			return;
+		}
+
 		var selectedRecords = this.getSelectionModel().getSelections(), count = selectedRecords.length, strConfirm;
 
 		switch (count)
@@ -278,15 +316,65 @@ go.grid.GridTrait = {
 			
 		}, this);
 	},
+
+	selectNextAfterDelete : function() {
+
+		// Do not go to the next item, if mobile we want to stay in the grid view
+		if(GO.util.isMobileOrTablet())
+			return;
+
+		var index = -1;
+
+		index = this.moveDirection == 'up' ? this.currentSelectedIndex - 1 : this.currentSelectedIndex;
+
+		if(index > -1 && index < this.store.getCount()) {
+			this.getSelectionModel().selectRow(index);
+		} else
+		{
+			this.moveDirection == 'up' ? this.getSelectionModel().selectFirstRow() : this.getSelectionModel().selectLastRow();
+		}
+
+		//make sure moveDirections stays the same after delete
+		if(this.moveDirection == 'up') {
+			this.lastSelectedIndex = this.currentSelectedIndex + 1;
+		} else
+		{
+			this.lastSelectedIndex = this.currentSelectedIndex - 1;
+		}
+
+		var record = this.getSelectionModel().getSelected();
+
+		if(record) {
+			var rowIndex = this.store.indexOf(record);
+			this.fireEvent('navigate', this, rowIndex, record);
+		}
+	},
+
+
 	
 	doDelete : function(selectedRecords) {
 
 		var me = this;
 		this.getEl().mask(t("Deleting..."));
 
+		//set to first record to make navigation work properly after delete
+		this.moveDirection = this.lastSelectedIndex !== false && this.lastSelectedIndex < this.currentSelectedIndex ? 'down' : 'up';
+		selectedRecords.forEach(function(r) {
+			var rowIndex =  this.getStore().indexOf(r);
+			// console.warn(r, rowIndex);
+			if(rowIndex < this.currentSelectedIndex) {
+				this.currentSelectedIndex = rowIndex;
+			}
+		}, this);
+
 		var prom = this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")
 		}).then(function(result){
+
+			setTimeout(function() {
+				me.selectNextAfterDelete();
+			});
+
 			if(!result.notDestroyed) {
 				return;
 			}
@@ -340,6 +428,20 @@ go.grid.GridTrait = {
 				this.headerMenu.add(item)
 			}
 		}
+		//Sort menu alphabetically
+		this.headerMenu.items.sort("ASC", function(a, b){
+			// Use toUpperCase() to ignore character casing
+			var colA = a.text.toUpperCase();
+			var colB = b.text.toUpperCase();
+
+			var comparison = 0;
+			if (colA > colB) {
+				comparison = 1;
+			} else if (colA < colB) {
+				comparison = -1;
+			}
+			return comparison;
+		});
 		this.headerMenu.show(el, "tr-br?")
 	}
 }

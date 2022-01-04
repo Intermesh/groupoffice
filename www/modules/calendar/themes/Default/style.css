@@ -74,7 +74,7 @@ border-collapse:collapse;
 }
 
 .time-over{
-	/*background-color:rgba(0,0,255, .16) !important;*/
+	background-color:rgba(0,0,255, .16) !important;
 }
 
 .free {
@@ -311,7 +311,6 @@ border-collapse:collapse;
 
 .x-calGrid-event-container .x-resizable-handle-south, .x-calGrid-event-container .x-resizable-handle{
 	background:transparent;
-	background-image: url(../../../../views/Extjs3/ext/resources/images/default/s.gif);
 }
 
 .x-calGrid-all-day-event-container {

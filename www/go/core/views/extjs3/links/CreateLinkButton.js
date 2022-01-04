@@ -7,6 +7,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	totalCount: 0,
 	cancelAdd: false,
 	addLink : function(entity, entityId) {
+
+
 		
 		var me = this;
 		me.cancelAdd = false;
@@ -26,6 +28,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 				"toEntity": entity,
 				"toSearchId": response.ids[0]
 			};
+
+			console.log(newLink, me.linkGrid.store.setFilter("link"));
 
 			me.newLinks.push(newLink);
 			me.linkGrid.store.loadData({"records" :[newLink]}, true);
@@ -107,7 +111,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 				filter: {}
 			}
 		});
-		
+
+		this.disableEditableDescription = this.disableEditableDescription || false;
 		this.linkGrid = new go.grid.EditorGridPanel({
 			name: 'linkGrid',
 			clicktToEdit: 1,
@@ -132,7 +137,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					sortable: false,
 					dataIndex: "description",
 					width: dp(200),
-					editable: true,
+					editable: !this.disableEditableDescription,
 					hidable: false,
 					editor: new Ext.form.TextField({
 						allowBlank: true,
@@ -297,11 +302,15 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	},
 	
 	reset : function() {
+
+		console.log("reset",this.linkGrid.store.setFilter("link"));
 		
 		// Clear the new attached links list
 		this.newLinks = [];		
 		this.linkGrid.store.removeAll();
 		this.linkGrid.store.setFilter("link", null);
+		this.linkGrid.store.loaded = false; //otherwise changes will reload with all links in request when this button is
+		//hidden and reused.
 		this.setCount(0);		
 		//this.menu.un("show", this.load);
 	},

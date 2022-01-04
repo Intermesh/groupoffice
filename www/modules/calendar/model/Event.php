@@ -551,7 +551,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 	
 		public function getRelevantMeetingAttributes(){
-		return array("name","start_time","end_time","location","description","calendar_id","rrule","repeat_end_time");
+		return array("name","start_time","end_time","location","description","calendar_id","rrule","repeat_end_time", "all_day_event");
 	}
 
 	
@@ -803,7 +803,8 @@ class Event extends \GO\Base\Db\ActiveRecord {
 					'description'=>$this->description,
 					'rrule'=>$this->rrule,
 					'status'=>$this->status,
-					'repeat_end_time'=>$this->repeat_end_time
+					'repeat_end_time'=>$this->repeat_end_time,
+					'reminder' => $this->reminder
 							);
 			
 			if($this->isModified(array_keys($updateAttr))){
@@ -1448,12 +1449,15 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 		//$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 
-		$cfRecord = $this->getCustomFields()->toArray();
+		$cfRecord = $this->getCustomFields()->returnAsText(true)->toArray();
 
 		if (!empty($cfRecord)) {
 		$fieldsets = \go\core\model\FieldSet::find()->filter(['entities' => ['Event']]);
 
 			foreach($fieldsets as $fieldset) {
+				if($fieldset->getPermissionLevel() < \GO\Base\Model\Acl::READ_PERMISSION) {
+					continue;
+				}
 				$html .= '<tr><td colspan="2"><b>'.($fieldset->name).'</td></tr>';
 
 				$fields = \go\core\model\Field::find()->where(['fieldSetId' => $fieldset->id]);
@@ -2454,16 +2458,27 @@ The following is the error message:
 		if(!isset(self::$aliases[$this->calendar->user_id])) {
 			self::$aliases[$this->calendar->user_id] = \GO\Email\Model\Alias::model()->find(
 				GO\Base\Db\FindParams::newInstance()
+					->joinRelation('account')
 					->select('email')
-					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
-					->ignoreAdminGroup()
+					->ignoreAcl()
+					->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('user_id', $this->calendar->user_id,'=', 'account'))
+
+//					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
+//					->ignoreAdminGroup()
 			)->fetchAll(\PDO::FETCH_COLUMN, 0);
 		}
 
-		return Participant::model()->findSingleByAttributes(array(
+		if(!empty(self::$aliases[$this->calendar->user_id])) {
+			return Participant::model()->findSingleByAttributes(array(
 				'email' => self::$aliases[$this->calendar->user_id],
-				'event_id'=>$this->id
-		));
+				'event_id' => $this->id
+			));
+		} else{
+			return Participant::model()->findSingleByAttributes(array(
+				'user_id' => $this->calendar->user_id,
+				'event_id' => $this->id
+			));
+		}
 	}
 	
 	/**
@@ -2492,13 +2507,8 @@ The following is the error message:
 		return Participant::model()->find($findParams);			
 		
 	}
-	
-	
-//	public function sendReply(){
-//		if($this->is_organizer)
-//			throw new \Exception("Meeting reply can only be send from the organizer's event");
-//	}	
-	
+
+
 	/**
 	 * Update's the participant status on all related meeting events and optionally sends a notification by e-mail to the organizer.
 	 * This function has to be called on an event that belongs to the participant and not the organizer.
@@ -2551,7 +2561,7 @@ The following is the error message:
 			$a = new Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REPLY"');
 			$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 			$a->setDisposition("inline");
-			$a->setContentType("text/calendar;method=CANCEL;charset=utf-8");
+			$a->setContentType("text/calendar;method=REPLY;charset=utf-8");
 			$message->attach($a);
 			
 			//for outlook 2003 compatibility
@@ -2568,25 +2578,26 @@ The following is the error message:
 	}
 	
 	
-	public function sendCancelNotice(){
-//		if(!$this->is_organizer)
-//			throw new \Exception("Meeting request can only be send from the organizer's event");
-		
+	public function sendCancelNotice()
+	{
 		$stmt = $this->participants;
 
 		while ($participant = $stmt->fetch()) {		
 			//don't invite organizer
-			if($participant->is_organizer)
+			if($participant->is_organizer) {
 				continue;
-
+			}
 			
 			// Set the language of the email to the language of the participant.
 			$language = false;
 			if(!empty($participant->user_id)){
 				$user = \GO\Base\Model\User::model()->findByPk($participant->user_id, false, true);
-				
-				if($user)
+				if (!$user->enabled) {
+					continue;
+				}
+				if($user) {
 					\GO::language()->setLanguage($user->language);
+				}
 			}
 
 			$subject =  \GO::t("Cancellation", "calendar").': '.$this->name;

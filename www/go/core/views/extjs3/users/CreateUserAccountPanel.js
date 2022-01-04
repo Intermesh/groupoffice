@@ -25,7 +25,10 @@ go.users.CreateUserAccountPanel = Ext.extend(Ext.form.FormPanel, {
 						name: 'username',
 						fieldLabel: t("Username"),
 						anchor: '100%',
-						allowBlank: false
+						allowBlank: false,
+						autocomplete: "off",
+						regex: /^[A-Za-z0-9_\-\.\@]*$/,
+						regexText: t("You have invalid characters in the username") + " (a-z, 0-9, -, _, ., @)."
 					}, {
 						xtype: 'textfield',
 						name: 'displayName',

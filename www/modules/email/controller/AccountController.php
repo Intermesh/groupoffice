@@ -130,19 +130,19 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		if ( isset($params['default_account_template_id'])) {
-			if ($params['default_account_template_id']==-1 || empty($params['default_account_template_id'])) {
-				$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-				if ($defaultTemplateModel)
-					$defaultTemplateModel->delete();
-			} elseif ($params['default_account_template_id']>0) {
+//			if ($params['default_account_template_id']==-1 || empty($params['default_account_template_id'])) {
+//				$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+//				if ($defaultTemplateModel)
+//					$defaultTemplateModel->delete();
+//			} elseif ($params['default_account_template_id']>0) {
 				$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
 				if (!$defaultTemplateModel) {
 					$defaultTemplateModel = new \GO\Email\Model\DefaultTemplateForAccount();
 					$defaultTemplateModel->account_id = $model->id;
 				}
-				$defaultTemplateModel->template_id = $params['default_account_template_id'];
+				$defaultTemplateModel->template_id = (int) $params['default_account_template_id'];
 				$defaultTemplateModel->save();
-			}
+//			}
 		}
 
 		return parent::afterSubmit($response, $model, $params, $modifiedAttributes);

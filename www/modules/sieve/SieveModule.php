@@ -38,20 +38,20 @@ class SieveModule extends Module{
 	 * 
 	 */
 	public static function loadOutOfOfficeMessage($self,&$response,&$model,&$params){
-		
-		$sieve = new \GO\Sieve\Util\Sieve();
-		$connected = $sieve->connect($model->username,$model->decryptPassword(),$model->host,$model->sieve_port,null,!empty($model->sieve_usetls),array(),true);
-
-		if(empty($connected))	{
-			
-			\GO::debug('DON\'T LOAD OOO_SIEVE');
-			
-			return;
-			throw new \Exception('Sorry, manage sieve filtering not supported on '.$model->host.' using port '.$model->sieve_port);
-		}
-		
-		\GO::debug('LOAD OOO_SIEVE');
 		try {
+			$sieve = new \GO\Sieve\Util\Sieve();
+			$connected = $sieve->connect($model->username,$model->decryptPassword(),$model->host,$model->sieve_port,null,!empty($model->sieve_usetls),array(),true);
+
+			if(empty($connected))	{
+
+				\GO::debug('DON\'T LOAD OOO_SIEVE');
+
+				return;
+				throw new \Exception('Sorry, manage sieve filtering not supported on '.$model->host.' using port '.$model->sieve_port);
+			}
+
+			\GO::debug('LOAD OOO_SIEVE');
+
 			$sieveScriptName = $sieve->get_active($model->id);
 
 			$sieve->load($sieveScriptName);

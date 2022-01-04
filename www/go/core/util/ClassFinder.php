@@ -148,28 +148,43 @@ class ClassFinder {
 		return $r;
 	}
 
-	private function hasLicense(File $file, $namespace) {
+	public static function canBeDecoded(File $file) {
 
-		//check for pro license on business package
-		if(!strstr($namespace, "go\\modules") || $file->getName() == 'Module.php') {
+		if(go()->getEnvironment()->hasIoncube()) {
 			return true;
+		} else{
+			return !static::fileIsEncoded($file);
 		}
-
-		$parts = explode("\\", $namespace);
-
-		$moduleCls= "go\\modules\\". $parts[2]."\\".$parts[3]."\\Module";
-		try {
-			return !class_exists($moduleCls) || $moduleCls::get()->isLicensed();
-		}
-		catch(\Throwable $e) {
-			go()->debug("Class '$moduleCls' couldn't be loaded: " . $e->getMessage());
-			return false;
-		}
+//		//check for pro license on business package
+//		if(!$this->fileIsEncoded($file) {
+//			return true;
+//		}
+//
+//		if(!)
+//		{
+//			return false;
+//		}
+//
+//		$parts = explode("\\", $namespace);
+//
+//		$moduleCls= "go\\modules\\". $parts[2]."\\".$parts[3]."\\Module";
+//		try {
+//			return !class_exists($moduleCls) || $moduleCls::get()->isLicensed();
+//		}
+//		catch(\Throwable $e) {
+//			go()->debug("Class '$moduleCls' couldn't be loaded: " . $e->getMessage());
+//			return false;
+//		}
 
 	}
 
-	private function folderToClassNames(Folder $folder, $namespace) {	
+	public static function fileIsEncoded(File $file) {
+		//Check if file is encoded
+		$data = $file->getContents(0, 20);
+		return strpos($data, '<?php //004fb') !== false;
+	}
 
+	private function folderToClassNames(Folder $folder, $namespace) {
 		$classes = [];
 		foreach ($folder->getFiles() as $file) {
 
@@ -182,7 +197,7 @@ class ClassFinder {
 					continue;
 				}
 
-				if(!$this->hasLicense($file, $namespace)) {
+				if(!static::canBeDecoded($file)) {
 					continue;
 				}
 

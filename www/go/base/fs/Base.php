@@ -30,7 +30,7 @@ abstract class Base{
 	/**
 	 * Constructor of a file or folder
 	 * 
-	 * @param StringHelper $path The absolute path must be suplied
+	 * @param string $path The absolute path must be suplied
 	 * @throws Exception
 	 */
 	public function __construct($path) {
@@ -59,7 +59,7 @@ abstract class Base{
 	/**
 	 * Create a folder or file from a path string
 	 * 
-	 * @param StringHelper $path
+	 * @param string $path
 	 * @return File|Folder
 	 */
 	public static function createFromPath($path){
@@ -101,7 +101,7 @@ abstract class Base{
 	/**
 	 * Get a child file or folder.
 	 * 
-	 * @param StringHelper $filename
+	 * @param string$filename
 	 * @return File|Folder|boolean 
 	 */
 	public function child($filename){
@@ -119,7 +119,7 @@ abstract class Base{
 	/** 
 	 * Create a new file object. Filesystem file is not created automatically.
 	 * 
-	 * @param StringHelper $filename
+	 * @param string$filename
 	 * @param boolean $isFile
 	 * @return \File|\Folder 
 	 */
@@ -212,7 +212,7 @@ abstract class Base{
 		
 	/**
 	 * Change owner
-	 * @param StringHelper $user
+	 * @param string$user
 	 * @return boolean 
 	 */
 	public function chown($user){
@@ -222,7 +222,7 @@ abstract class Base{
 	/**
 	 * Change group
 	 * 
-	 * @param StringHelper $group
+	 * @param string$group
 	 * @return boolean 
 	 */
 	public function chgrp($group){
@@ -303,8 +303,8 @@ abstract class Base{
 	/**
 	 * Remove unwanted characters from a string so it can safely be used as a filename.
 	 * 
-	 * @param StringHelper $filename
-	 * @return StringHelper 
+	 * @param string$filename
+	 * @return string
 	 */
 	public static function stripInvalidChars($filename, $replace=''){
 		$filename = trim(preg_replace(self::INVALID_CHARS,$replace, $filename));
@@ -372,7 +372,7 @@ abstract class Base{
 	/**
 	 * Get the path without \GO::config()->file_storage_path.
 	 * 
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function stripFileStoragePath(){
 		return str_replace(\GO::config()->file_storage_path,'', $this->path());
@@ -381,7 +381,7 @@ abstract class Base{
 	/**
 	 * Get the path without \GO::config()->root_path.
 	 * 
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function stripRootPath(){
 		return str_replace(\GO::config()->root_path,'', $this->path());
@@ -390,7 +390,7 @@ abstract class Base{
 	/**
 	 * Get the path without \GO::config()->tmpdir.
 	 * 
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function stripTempPath(){
 		return str_replace(\GO::config()->tmpdir,'', $this->path());

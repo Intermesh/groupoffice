@@ -4,6 +4,7 @@ namespace go\modules\community\googleauthenticator\model;
 
 use Exception;
 use go\core\App;
+use go\core\fs\File;
 use go\core\orm\Property;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR.'util'.DIRECTORY_SEPARATOR.'QRcode.php';
@@ -202,11 +203,11 @@ class Googleauthenticator extends Property {
 			return null;
 		}
 		
-		$name = empty($name)?App::get()->getSettings()->title:$name;
+		$name = empty($name) ? File::stripInvalidChars(go()->getSettings()->title) : $name;
 		$secret = empty($secret)?$this->secret:$secret;
 
 		$level = QR_ECLEVEL_M;
-		
+
 		if(!empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false){
 			switch($params['level']){
 				case 'L':
@@ -232,7 +233,7 @@ class Googleauthenticator extends Property {
 		
 		$tmpFile = \go\core\fs\File::tempFile($name);
 		
-		\go\core\util\QRcode::png($otpUrl, $tmpFile->getPath(),QR_ECLEVEL_M,8);
+		\go\core\util\QRcode::png($otpUrl, $tmpFile->getPath(),$level,8);
 				
 		$qrBlob = \go\core\fs\Blob::fromTmp($tmpFile);
 		$qrBlob->setValues(array(

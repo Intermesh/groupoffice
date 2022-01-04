@@ -29,7 +29,8 @@ class GoBaseBackendDiff extends \BackendDiff {
 				}
 			}else
 			{
-				ZLog::Write(LOGLEVEL_FATAL, 'No e-mail account. Settings: '.var_export($settings->getAttributes(), true));
+				ZLog::Write(LOGLEVEL_INFO, 'No e-mail account. Settings: '.var_export($settings->getAttributes(), true));
+				return false;
 			}
 		}
 		return self::$_account;

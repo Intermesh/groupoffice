@@ -98,7 +98,7 @@ class Imap extends ImapBodyStruct {
 //		}
 
 		if(empty($password)){
-			throw new ImapAuthenticationFailedException('Authententication failed for user '.$username.' on IMAP server '.$this->server);
+			throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
 		}
 
 		$this->ssl = $ssl;
@@ -166,7 +166,7 @@ class Imap extends ImapBodyStruct {
 			fclose($this->handle);
 
 			foreach($this->errors as $error){
-				error_log("IMAP error: ".$error);
+				error_log("IMAP error ". $this->username .'@' . $this->server .': ' . $error);
 			}
 
 			$this->handle=false;
@@ -269,7 +269,7 @@ class Imap extends ImapBodyStruct {
 //				if(!\GO::config()->debug)
 //					$this->errors[]=$response;
 
-				throw new ImapAuthenticationFailedException('Authententication failed for user '.$username.' on IMAP server '.$this->server."\n\n".$response);
+				throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
 
 			}
 		}
@@ -1611,7 +1611,9 @@ class Imap extends ImapBodyStruct {
 								while (isset($vals[$i + $n]) && $vals[$i + $n] != ')') {
 									$prop = str_replace('-','_',strtolower(substr($vals[$i + $n],1)));
 									//\GO::debug($prop);
-									if(isset($message[$prop])) {
+
+									//It can be a user named a label $labels
+									if(isset($message[$prop]) && $prop != 'labels') {
 										$message[$prop]=true;
 									} else {
 										$message['labels'][] = strtolower($vals[$i + $n]);
@@ -2284,6 +2286,12 @@ class Imap extends ImapBodyStruct {
 			return $this->_uudecode($uid, $part_no, $peek, $fp);
 		}
 
+
+//		if(strtolower($encoding) == 'base64') {
+//			$part = $this->get_message_part($uid, $part_no, $encoding, $peek);
+//			//return base64_decode($part);
+//		}
+
 		$str = '';
 		$this->get_message_part_start($uid, $part_no, $peek);
 
@@ -2294,7 +2302,7 @@ class Imap extends ImapBodyStruct {
 
 			switch (strtolower($encoding)) {
 				case 'base64':
-					$line = trim($leftOver.$line);
+					$line = trim($leftOver).trim($line);
 					$leftOver = "";
 
 					if(strlen($line) % 4 == 0){

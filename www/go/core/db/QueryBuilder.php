@@ -342,6 +342,11 @@ class QueryBuilder {
 			$select .= ' `' . $this->tableAlias . "`";
 		}
 
+		$hintList = $query->getIndexHintList();
+		if($hintList) {
+			$select .= " " . $hintList;
+		}
+
 		$where = $this->buildWhere($this->query->getWhere(), $prefix);
 
 		if (!empty($where)) {
@@ -862,6 +867,9 @@ class QueryBuilder {
 			$join .= '`' . $config['joinTableAlias'] . '` ';
 		}
 
+		if (!empty($config['indexHint'])) {
+			$join .=  $config['indexHint'] . ' ';
+		}
 
 		//import new params
 		$this->buildBindParameters = array_merge($this->buildBindParameters, $config['on']->getBindParameters());

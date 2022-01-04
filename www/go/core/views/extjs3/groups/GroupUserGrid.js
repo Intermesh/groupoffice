@@ -17,6 +17,9 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	 * The form field name
 	 */
 	name: "users",
+	enableDelete: false,
+
+	disableSelection: true,
 	
 	initComponent: function () {
 		
@@ -172,10 +175,6 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		return false;
 	},
 	
-//	onStoreLoad : function() {
-//		this.store.sortData();
-//	},
-	
 	getValue: function () {
 		return this.selectedUsers;
 	},
@@ -197,5 +196,4 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		return true;
 	}
 });
-
 

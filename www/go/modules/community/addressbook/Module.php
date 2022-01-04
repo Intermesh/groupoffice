@@ -84,7 +84,8 @@ class Module extends core\Module {
 	public static function onUserBeforeSave(User $user)
 	{
 		if (!$user->isNew() && $user->isModified('displayName')) {
-			$ab = AddressBook::findById($user->addressBookSettings->getDefaultAddressBookId());
+			$oldName = $user->getOldValue('displayName');
+			$ab = AddressBook::find()->where(['createdBy' => $user->id, 'name' => $oldName])->single();
 			if ($ab) {
 				$ab->name = $user->displayName;
 				$ab->save();
@@ -126,10 +127,10 @@ class Module extends core\Module {
 			return false;
 		}
 
-		$roAcl = Acl::getReadOnlyAcl();
-		$folder = Folder::model()->findByPath('addressbook', true, ['acl_id' => $roAcl->id]);
-		if($folder->acl_id != $roAcl->id) {
-			$folder->acl_id = $roAcl->id;
+		$roAclId = Acl::getReadOnlyAclId();
+		$folder = Folder::model()->findByPath('addressbook', true, ['acl_id' => $roAclId]);
+		if($folder->acl_id != $roAclId) {
+			$folder->acl_id = $roAclId;
 			$folder->save(true);
 		}
 

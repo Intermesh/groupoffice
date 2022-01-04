@@ -49,7 +49,15 @@ go.customfields.type.Date = Ext.extend(go.customfields.type.Text, {
 	getFieldType: function () {
 		return "date";
 	},
-	
+
+	getColumn: function(field) {
+
+		const def = go.customfields.type.Date.superclass.getColumn.call(this, field);
+		def.dateOnly = true;
+
+		return def;
+	},
+
 	/**
 	 * See https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.grid.Column-cfg-xtype
 	 * @returns {String}

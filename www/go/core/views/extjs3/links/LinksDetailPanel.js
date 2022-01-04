@@ -9,7 +9,8 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 			baseParams: {
 				limit: this.limit,
 				position: 0,
-				calculateTotal:true
+				calculateTotal: false,
+				calculateHasMore: true
 			},
 			filters: {
 				toEntity: {entities: [{name: this.link.entity, filter: this.link.filter}]}
@@ -31,7 +32,11 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 					if(!this.origTitle) {
 						this.origTitle = this.title;
 					}
-					var badge = "<span class='badge'>" + this.store.getTotalCount() + "</span>";
+					var count = this.store.getTotalCount();
+					if(this.store.hasMore) {
+						count += '+';
+					}
+					var badge = "<span class='badge'>" + count + "</span>";
 					this.setTitle(this.origTitle + badge);
 				},
 				scope: this
@@ -62,7 +67,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 				return "";
 			},
 			printMore : function(values) {
-				if(store.getCount() < store.getTotalCount()) {
+				if(store.hasMore) {
 					return "<a class=\"show-more\">" + t("Show more...") + "</a>";
 				} else
 				{

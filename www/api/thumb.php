@@ -19,7 +19,7 @@ use go\core\jmap\State;
 use go\core\util\Image;
 
 if (!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
-	http_response_code(403);
+	http_response_code(401);
 	exit("Unauthorized.");
 }
 

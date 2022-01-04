@@ -179,9 +179,6 @@ class GoImporter implements IImportChanges {
 			$id = $this->backend->GetBackendFolder($id);
 		}
 
-		if($id == "GroupOfficeTasks") {
-			return false;
-		}
 
 		$this->icc = $this->backend->getBackend($backendid.$this->backend->config['delimiter'].$id)->GetImporter();
 		$resFolder = $this->icc->ImportFolderChange($folder);

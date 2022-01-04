@@ -105,19 +105,31 @@ go.Jmap = {
 		}
 		return url;
 	},
-	
-	get: function(cb, scope) {
-		Ext.Ajax.request({
-			url: this.getApiUrl(),
-			method: 'GET',
-			callback: function (opts, success, response) {
-				var data;
-				if(success && response.responseText) {
-					data = Ext.decode(response.responseText);
+
+	/**
+	 * Returns session object
+	 *
+	 * @returns {Promise<unknown>}
+	 */
+	get: function() {
+
+		return new Promise((resolve, reject) => {
+			Ext.Ajax.request({
+				url: this.getApiUrl(),
+				method: 'GET',
+				callback: function (opts, success, response) {
+
+					if(success) {
+						var data = Ext.decode(response.responseText);
+
+						resolve(data);
+					} else
+					{
+						reject(response);
+					}
 				}
-				cb.call(scope, data, opts, success, response);
-			}
-		});
+			});
+		})
 	},
 	
 	downloadUrl: function(blobId, inline) {
@@ -187,7 +199,6 @@ go.Jmap = {
 	 * @returns {Boolean}
 	 */
 	sse : function() {
-		// return;
 		try {
 			if (!window.EventSource) {
 				console.debug("Browser doesn't support EventSource");
@@ -245,9 +256,13 @@ go.Jmap = {
 						}]
 					});
 				});
-
-
 			},false);
+
+			window.addEventListener('beforeunload', () => {
+				console.log("Closing SSE")
+				source.close();
+			});
+
 		}
 		catch(e) {
 			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
@@ -272,7 +287,7 @@ go.Jmap = {
 	request: function (options) {
 		if(!options.method) {
 			throw "method is required";
-		}		
+		}
 
 		if (this.timeout) {
 			clearTimeout(this.timeout);

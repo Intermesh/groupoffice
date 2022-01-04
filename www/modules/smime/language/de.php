@@ -40,4 +40,11 @@ return array (
   'SMIME certificate was added for' => 'SMIME-Zertifikat wurde hinzugefügt für',
   'Could not add SMIME certificate for' => 'Das SMIME-Zertifikat konnte nicht hinzugefügt werden für',
   'This message is encrypted.' => 'Diese Nachricht ist verschlüsselt',
+  'Old SMIME certificates are needed to decrypt old e-mail' => 'Alte SMIME Zertifikate werden für die Entschlüsselung alter E-Mail benötigt',
+  'Are you sure you want to delete this?' => 'Sind Sie sicher dies zu löschen?',
+  'Upload certificate' => 'Zertifikat hochladen',
+  'PKCS12 certificates' => 'PKCS12 Zertifikate',
+  'valid' => 'gültig',
+  'since' => 'seit',
+  'Certificate' => 'Zertifikat',
 );

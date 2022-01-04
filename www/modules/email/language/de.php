@@ -90,6 +90,7 @@ return array (
   '{blocked_images} external images were blocked for your security.' => '{blocked_images} externe Bilder wurden aus Sicherheitsgründen blockiert.',
   'Click here to unblock them' => 'Zur Ansicht hier klicken',
   'You didn\'t fill in a subject. Are you sure you want to send this message without a subject?' => 'Sie haben keinen Betreff eingetragen. Sind Sie sicher, dass Ihre Nachricht ohne Betreff gesendet werden soll?',
+  'You didn\'t fill in a subject. Are you sure you want to save this message without a subject?' => 'Sie haben keinen Betreff eingetragen. Sind Sie sicher, dass Ihre Nachricht ohne Betreff gespeichert werden soll?',
   'Search through {product_name}' => '{product_name} durchsuchen',
   'Toggle message window position' => 'Nachrichtenansicht umschalten',
   'Close the upload dialog first or wait for the upload to finish' => 'Schließen Sie zuerst den Upload-Dialog oder warten Sie, bis der Upload beendet ist',
@@ -334,4 +335,8 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Sort on last contact mail time' => 'Nach letzter Kontakt-Mail-Zeit sortieren',
   'Show from field by default' => 'Standardmäßig aus Feld anzeigen',
   'Search items' => 'Elemente durchsuchen',
+  'Add recipients' => 'Empfänger hinzufügen',
+  'Are you sure that you would like to import this VCard?' => 'Sind Sie sicher, dass Sie diese VCard importieren möchten?',
+  'Importing...' => 'Importiere?',
+  'Open with' => 'Öffnen mit',
 );

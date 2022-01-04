@@ -17,7 +17,6 @@ GO.files.OpenFileWindow = Ext.extend(GO.Window, {
 			var record = dataview.store.getAt(index);			
 			eval(record.data.handler);
 			
-			
 			if(this.rememberCB.getValue()){
 				GO.request({
 					url:'files/file/saveHandler',
@@ -78,6 +77,7 @@ GO.files.OpenFileWindow = Ext.extend(GO.Window, {
 			},
 			callback:function(){
 				Ext.getBody().unmask();
+
 				if(this.list.store.getCount()==1)
 				{
 					var record = this.list.store.getAt(0);			

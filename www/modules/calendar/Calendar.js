@@ -168,25 +168,11 @@ GO.calendar.MainPanel = function(config){
 	});
 
 	this.calendarsStore.on('load', function(){
-		if(this.state.displayType!='view' && this.group_id==1)
-		{
-			/*var record = this.calendarsStore.getById(this.state.calendars[0]);
-			if(!record)
-			{
-				record = this.calendarsStore.getAt(0);				
-			}*/
-			//this.state.calendars = [record.data.id];
+		if(this.state.displayType!='view' && this.group_id==1) {
 			this.state.applyFilter=true;
 			this.setDisplay(this.state);
 		}
 	}, this);
-
-//	if(go.Modules.isAvailable("legacy", "projects")){
-//		this.projectCalendarsStore.on('load', function(){
-//			this.projectCalendarsList.setVisible(this.projectCalendarsStore.data.length);
-//			this.calendarListPanel.doLayout();
-//		}, this);
-//	}
 
 	this.viewsStore.on('load', function(){
 		this.viewsList.setVisible(this.viewsStore.data.length);
@@ -543,6 +529,8 @@ GO.calendar.MainPanel = function(config){
 		cls: 'cal-display-panel',
 		items: [this.daysGrid, this.monthGrid, this.viewGrid, this.listGrid]
 	});
+
+	var me = this;
 			
 	var tbar = [{
 		iconCls: 'ic-add',
@@ -660,7 +648,11 @@ GO.calendar.MainPanel = function(config){
 	'->',
 	this.calendarTitle = new Ext.Button({
 		iconCls: 'ic-info',
-		disabled: true,
+		// Both will prevent qtip from popping up.
+		// disabled: true, cls: 'x-item-disabled',
+		style: {
+			color: '#777777'
+		},
 		tooltip: 'Calendar'
 	}),
 	this.printButton = new Ext.Button({
@@ -753,28 +745,82 @@ GO.calendar.MainPanel = function(config){
 			})
 		}),
 		{
-			iconCls: 'ic-keyboard-arrow-left',
-			handler: function(){
-				this.setDisplay({
-					date: this.getActivePanel().previousDate()
-				});
+			xtype: "container",
+			layout: "toolbar",
+			addComponentToMenu: function(menu, cmp) {
+
+				function updatePeriod(cal, period) {
+					me.periodInfoPanel2.update(period);
+				}
+
+				menu.add({
+					xtype: "container",
+					overflowComponent: true,
+					layout: "toolbar",
+					items: [
+						{
+							xtype:"button",
+							iconCls: 'ic-keyboard-arrow-left',
+							handler: function(){
+								me.setDisplay({
+									date: this.getActivePanel().previousDate()
+								});
+							},
+							scope: this
+						},me.periodInfoPanel2 = new Ext.Container({
+							html: me.periodInfoPanel.getEl() ? me.periodInfoPanel.getEl().dom.innerText : me.periodInfoPanel.html,
+							plain:true,
+							border:false,
+							cls:'cal-period'
+						}),{
+							xtype:"button",
+							iconCls: 'ic-keyboard-arrow-right',
+							important: true,
+							handler: function(){
+								me.setDisplay({
+									date: me.getActivePanel().nextDate()
+								});
+							},
+							scope: this
+						}
+					]
+
+				})
+
+				me.periodInfoPanel2.mon(me, "periodchange", updatePeriod);
+
+
 			},
-			scope: this
-		},this.periodInfoPanel = new Ext.Panel({
-			html: '',
-			plain:true,
-			border:false,
-			cls:'cal-period'
-		}),{
-			iconCls: 'ic-keyboard-arrow-right',
-			important: true,
-			handler: function(){
-				this.setDisplay({
-					date: this.getActivePanel().nextDate()
-				});
-			},
-			scope: this
+			items: [
+				{
+					xtype:"button",
+					iconCls: 'ic-keyboard-arrow-left',
+					handler: function(){
+						this.setDisplay({
+							date: this.getActivePanel().previousDate()
+						});
+					},
+					scope: this
+				},this.periodInfoPanel = new Ext.Container({
+					html: '',
+					plain:true,
+					border:false,
+					cls:'cal-period'
+				}),{
+					xtype:"button",
+					iconCls: 'ic-keyboard-arrow-right',
+					important: true,
+					handler: function(){
+						this.setDisplay({
+							date: this.getActivePanel().nextDate()
+						});
+					},
+					scope: this
+				}
+			]
+
 		}
+
 	];
 	
 	
@@ -1175,8 +1221,14 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				html = displayDate.format('W')+' - '+displayDate.add(Date.DAY,this.days).format('W');
 			}
 		}*/
-		
-		this.periodInfoPanel.body.update(this.getActivePanel().periodDisplay);
+
+		if(this.periodInfoPanel.getEl()) {
+			this.periodInfoPanel.getEl().update(this.getActivePanel().periodDisplay);
+		} else
+		{
+			this.periodInfoPanel.html = this.getActivePanel().periodDisplay;
+		}
+		this.fireEvent("periodchange", this, this.getActivePanel().periodDisplay)
 	},
 	
 	
@@ -1344,8 +1396,14 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			
 				record = this.viewsStore.getById(config.view_id);
 
-				config.merge=record.get('merge');
-				config.owncolor=record.get('owncolor');
+				if(record) {
+					config.merge = record.get('merge');
+					config.owncolor = record.get('owncolor');
+				} else
+				{
+					delete config.view_id;
+					delete this.state.view_id;
+				}
 			}
 		}
 
@@ -2446,4 +2504,18 @@ GO.calendar.showInfo = function (eventId) {
 	win.show();
 	eventPanel.load(eventId);
 	
+}
+
+GO.calendar.importIcs = function(config) {
+	GO.calendar.showEventDialog({
+		url: GO.url('calendar/event/loadICS'),
+		params: {
+			file_id: config.id
+			// account_id: panel.account_id,
+			// mailbox: panel.mailbox,
+			// uid: panel.uid,
+			// number: attachment.number,
+			// encoding: attachment.encoding
+		}
+	});
 }

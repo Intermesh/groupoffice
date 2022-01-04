@@ -1,14 +1,15 @@
 GO.files.DnDFileUpload = function(doneCallback, element) {
 
-	var uploadCount = 0,
-		blobs = [];
 
-	function upload(nodes, subfolder) {
-		uploadCount += nodes.length;
-		Array.prototype.forEach.call(nodes, function(node, i) {
+
+	function upload(nodes, subfolder, folder_id) {
+		var uploadCount = nodes.length,
+			blobs = [];
+
+		Array.prototype.forEach.call(nodes, function(node) {
 			if(node && node.isDirectory) {
 				node.createReader().readEntries(function(subnodes) {
-					upload(subnodes, node.fullPath.replace(/^\//,"").split('/'));
+					upload(subnodes, node.fullPath.replace(/^\//,"").split('/'), folder_id);
 				});
 				uploadCount--; // dont upload folders
 				return;
@@ -25,11 +26,11 @@ GO.files.DnDFileUpload = function(doneCallback, element) {
 						}
 						blobs.push(response);
 					},
-					callback: function (response) {
+					callback: function () {
 						uploadCount--;
 						if (uploadCount === 0) {
-							doneCallback(blobs);
-							blobs = [];
+							doneCallback(blobs, folder_id);
+
 						}
 					}
 				});
@@ -37,7 +38,7 @@ GO.files.DnDFileUpload = function(doneCallback, element) {
 		});
 	}
 
-	return function() {
+	return function(fb) {
 		var childCount = 0;
 		element.dom.addEventListener('dragenter', function (e) {
 			e.preventDefault();
@@ -72,7 +73,7 @@ GO.files.DnDFileUpload = function(doneCallback, element) {
 					entries.push(e.dataTransfer.items[i].getAsEntry());
 				}
 			}
-			upload(entries);
+			upload(entries, null, fb.folder_id || fb.folderId);
 		});
 	};
 };

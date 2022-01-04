@@ -69,6 +69,20 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 		}
 	}
 
+	/**
+	 * Output query to debugger
+	 *
+	 * @return $this
+	 */
+	public function debug() {
+
+		if(go()->getDebugger()->enabled) {
+			go()->debug((string)$this);
+		}
+
+		return $this;
+	}
+
   /**
    * Executes a prepared statement
    *
@@ -96,7 +110,9 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 			$ret = parent::execute($input_parameters);
 			if(go()->getDebugger()->enabled && go()->getDbConnection()->debug && isset($this->build)) {
 				$duration  = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
-				go()->debug(QueryBuilder::debugBuild($this->build).' ('.$duration.'ms)', 3);			
+
+				$sql = QueryBuilder::debugBuild($this->build);
+				go()->debug(str_replace(["\n","\t"], [" ", ""], $sql) . "\n(" . $duration . 'ms)', 5);
 			}
 			if($ret === false) {
 				go()->error("SQL FAILURE: " . $this);

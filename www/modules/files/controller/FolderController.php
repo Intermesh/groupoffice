@@ -808,6 +808,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$store->getColumnModel()->formatColumn('locked', '$model->isLocked()');
 			$store->getColumnModel()->formatColumn('locked_user_id', '$model->locked_user_id');
 			$store->getColumnModel()->formatColumn('folder_id', '$model->folder_id');
+			$store->getColumnModel()->formatColumn('username', '$model->user->displayName');
+			$store->getColumnModel()->formatColumn('musername', '$model->mUser->displayName');
 
 			$findParams = $store->getDefaultParams($params)
 							->limit($fileLimit)
@@ -1173,11 +1175,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$folderId =  $this->checkModelFolder($model, true, !empty($params['mustExist']));
 		$folder = Folder::model()->findByPk($folderId);
 
-		return [
+		$response = [
 			'success' => true,
 			'files_folder_id' => $folderId,
 			'path' => $folder->path
 		];
+		$this->fireEvent('afterCheckModelFolder', [$model, $folder, &$response]);
+
+		return $response;
 	}
 
 	/**
@@ -1208,8 +1213,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					
 			$model->files_folder_id = $this->_checkExistingModelFolder($model, $folder, $mustExist);
 
-			if ($saveModel && $model->isModified())
+			if ($saveModel && $model->isModified()) {
 				$model->save(true);
+			}
 		} elseif ($model->alwaysCreateFilesFolder() || $mustExist) {
 			
 			GO::debug('Folder does not exist in database. Will create it.');
@@ -1635,7 +1641,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 						$file = new \GO\Base\Fs\File(\GO::config()->tmpdir.$tmp_file['tmp_file']);
 						$file->move(new \GO\Base\Fs\Folder(\GO::config()->file_storage_path . $folder->path));
-
+						$file->shortenFileName();
 						$folder->addFile($file->name());
 					}
 				}
@@ -1710,4 +1716,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		echo $this->render('delete', array('model' => $model));
 	}
+
+	/**
+	 * @param $model
+	 * @return mixed
+	 */
+	protected function checkLoadPermissionLevel($model)
+	{
+		return $model->checkPermissionLevel($model->isNew() ?\GO\Base\Model\Acl::CREATE_PERMISSION : \GO\Base\Model\Acl::READ_PERMISSION);
+	}
+
 }

@@ -80,7 +80,7 @@ class goContact extends GoBaseBackendDiff {
 
 		if (!$contact) {
 			$contact = new Contact();
-			$contact->addressBookId = $this->convertor->getDefaultAddressBook()->id;
+			$contact->addressBookId = $folderid;//$this->convertor->getDefaultAddressBook()->id;
 		} else
 		{
 			ZLog::Write(LOGLEVEL_DEBUG, "Found contact");
@@ -136,8 +136,9 @@ class goContact extends GoBaseBackendDiff {
 		
 		$list = Contact::find()
 						->select('c.id, UNIX_TIMESTAMP(c.modifiedAt) AS `mod`, "1" AS flags')
-						->join("sync_addressbook_user", "u", "u.addressBookId = c.addressBookId")
-						->andWhere('u.userId', '=', go()->getAuthState()->getUserId())
+//						->join("sync_addressbook_user", "u", "u.addressBookId = c.addressBookId")
+//						->andWhere('u.userId', '=', go()->getAuthState()->getUserId())
+						->andWhere('c.addressBookId', '=', $folderid)
 						->andWhere(['c.isOrganization' => false])	 //Does not work reliably on ios
 						->fetchMode(PDO::FETCH_ASSOC)
 						->filter([
@@ -155,7 +156,8 @@ class goContact extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
-		if ($id != BackendGoConfig::CONTACTBACKENDFOLDER) {
+		$addressBook = \go\modules\community\addressbook\model\AddressBook::findById($id);
+		if(!$addressBook) {
 			ZLog::Write(LOGLEVEL_WARN, "Contact folder '$id' not found");
 			return false;
 		}
@@ -163,7 +165,8 @@ class goContact extends GoBaseBackendDiff {
 		$folder = new SyncFolder();
 		$folder->serverid = $id;
 		$folder->parentid = "0";
-		$folder->displayname = 'Contacts';
+		$folder->displayname = $addressBook->name;
+
 		$folder->type = SYNC_FOLDER_TYPE_CONTACT;
 
 		return $folder;
@@ -176,15 +179,36 @@ class goContact extends GoBaseBackendDiff {
 	 */
 	public function GetFolderList() {
 		$folders = array();
-		$folder = $this->StatFolder(BackendGoConfig::CONTACTBACKENDFOLDER);
-		$folders[] = $folder;
+
+		$addressBooks = \go\modules\community\addressbook\model\AddressBook::find()
+			->selectSingleValue('a.id')
+			->join("sync_addressbook_user", "u", "u.addressBookId = a.id")
+			->andWhere('u.userId', '=', go()->getAuthState()->getUserId())
+			->filter([
+				"permissionLevel" => Acl::LEVEL_READ
+			])->all();
+
+		foreach($addressBooks as $id) {
+			$folder = $this->StatFolder($id);
+			$folders[] = $folder;
+		}
 
 		return $folders;
 	}
 	
 	public function getNotification($folder = null) {
-		Contact::entityType()->clearCache();
-		return Contact::getState();
+		$record = Contact::find()
+			->fetchMode(PDO::FETCH_ASSOC)
+			->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
+//						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
+//						->where(['s.userId' => go()->getUserId()])
+			->where('c.addressBookId','=',$folder)
+			->single();
+
+		$newstate = 'M'.$record['modifiedAt'].':C'.$record['count'];
+		ZLog::Write(LOGLEVEL_DEBUG,'goContact->getNotification('.$folder.') State: '.$newstate);
+
+		return $newstate;
 	}
 
 }

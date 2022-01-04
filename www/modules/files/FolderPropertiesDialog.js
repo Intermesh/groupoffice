@@ -253,7 +253,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 			this.render(Ext.getBody());
 
 		this.suspendCheckEvent = true;
-		
+
 		this.formPanel.form.load({
 			url: GO.url('files/folder/load'),
 			params: {
@@ -345,13 +345,25 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 	setPermission : function(is_someones_home_dir, permission_level, readonly)
 	{
 		//readonly flag is set for project, contact, company etc. folders.
-			
 		var form = this.formPanel.form;
 		form.findField('name').setDisabled(is_someones_home_dir || readonly || permission_level<GO.permissionLevels.write);
 		form.findField('share').setDisabled(is_someones_home_dir || readonly || permission_level<GO.permissionLevels.manage);
 		form.findField('apply_state').setDisabled(permission_level<GO.permissionLevels.manage && !GO.settings.has_admin_permission);
-		if(!this.readPermissionsTab.disabled)
+		if(!this.readPermissionsTab.disabled) {
 			this.readPermissionsTab.setDisabled(!is_someones_home_dir && readonly);
+		}
+
+		//Use set timeout here because the load event will filter custom field tabs and will re-enable them
+		setTimeout(function() {
+			form.items.each(function(itm){
+				if (!itm.name) {
+					return;
+				}
+				if(itm.name.substring(0,13) === 'customFields.') {
+					form.findField(itm.name).setDisabled(is_someones_home_dir || readonly || permission_level<GO.permissionLevels.write);
+				}
+			});
+		})
 
 		this.commentsPanel.setDisabled(readonly || permission_level<GO.permissionLevels.write);
 		

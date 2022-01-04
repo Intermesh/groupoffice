@@ -23,13 +23,24 @@ class Search extends AclOwnerEntity {
 	protected $entity;
 	protected $moduleId;
 
+	public static function loggable()
+	{
+		return false;
+	}
+
+
 	public static function check()
 	{
 		//remove search cache with invalid aclId's. Can happen in old framework.
 		go()->getDbConnection()->exec("delete s from core_search s left join core_acl a on a.id = s.aclId where a.id is null");
 
+
+		return parent::check();
+	}
+
+	protected static function checkAcl()
+	{
 		//don't call parent as it's messes up core_acl references!
-		return true;
 	}
 
 	protected static function getDefaultFetchProperties()
@@ -144,7 +155,7 @@ class Search extends AclOwnerEntity {
 								if(is_string($e)) {
 									$e = ['name' => $e];
 								}
-								$w = ['e.name' => $e['name']];
+								$w = ['entityTypeId' =>  EntityType::findByName($e['name'])->getId()];
 								if(isset($e['filter'])) {
 									$w['filter'] = $e['filter'];
 								}
@@ -160,11 +171,11 @@ class Search extends AclOwnerEntity {
 						});					
 	}
 
-	public static function sort(\go\core\orm\Query $query, array $sort)
-	{
-		//no sorting. Too big tables!
-		return $query;
-	}
+//	public static function sort(\go\core\orm\Query $query, array $sort)
+//	{
+//		//no sorting. Too big tables!
+//		return $query;
+//	}
 
 //	 public static function convertQuery($value) {
 //

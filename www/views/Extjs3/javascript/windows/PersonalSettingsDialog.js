@@ -72,6 +72,6 @@ GO.PersonalSettingsDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	},
 	afterSubmit : function(action) {	
 		// Reload Groupoffice to use the new settings
-		document.location = GO.url('');
+		go.reload();
 	}
 });

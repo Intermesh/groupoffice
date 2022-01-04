@@ -50,10 +50,17 @@ class CronJobSchedule extends Entity {
 		return parent::defineMapping()->addTable('core_cron_job');
 	}
 
+	public static function loggable()
+	{
+		return false;
+	}
+
+
 	protected function internalValidate() {
 
 		if (isset($this->expression) && !CronExpression::isValidExpression($this->expression)) {
 			$this->setValidationError('expression', ErrorCode::MALFORMED);
+			return false;
 		}
 		
 		if($this->isModified('name')) {

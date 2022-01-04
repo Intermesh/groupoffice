@@ -38,7 +38,7 @@ class Number extends Base {
 	}
 
 	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity)
-  {
-  	return $value;
-  }
+	{
+		return $value;
+	}
 }

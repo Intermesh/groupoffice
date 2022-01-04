@@ -123,8 +123,7 @@ GO.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		Ext.form.ComboBox.superclass.setValue.call(this, text);
 
 		this.value = v;
-//		GO.form.ComboBox.superclass.setValue.call(this, v);
-		
+
 		if(this.idValuePair){
 			if(!GO.util.empty(v)){
 				v=v.split(':');

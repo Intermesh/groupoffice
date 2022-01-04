@@ -24,7 +24,7 @@ GO.files.RecentFilesGrid = Ext.extend(GO.grid.GridPanel,{
 		config.view=new Ext.grid.GroupingView({
 			scrollOffset: 2,
 			hideGroupedColumn:true,
-			emptyText: t("noItems")
+			emptyText: t("No items to display")
 		})
 		
 		config.autoExpandColumn='path';

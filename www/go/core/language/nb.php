@@ -1015,7 +1015,7 @@ Hvis du ikke har bedt om et nytt passord kan du bare slette denne e-posten.',
   'Repeat every' => 'Gjenta hver',
   'Repeat until' => 'gjenta til og med',
   'At days' => 'På dag',
-  'product_name' => 'GroupOffice',
+
   'Text with ' => 
   array (
     '{1}' => 'Send meldingen med [{1}] stavefeil',

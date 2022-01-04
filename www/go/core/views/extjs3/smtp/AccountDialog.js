@@ -52,12 +52,14 @@ go.smtp.AccountDialog = Ext.extend(go.form.Dialog, {
 			{
 				xtype: 'textfield',
 				name: 'username',
-				fieldLabel: t('Username')
+				fieldLabel: t('Username'),
+				autocomplete: "new-password"
 			}, {
 				xtype: 'textfield',
 				name: 'password',
 				fieldLabel: t('Password'),
-				inputType: "password"
+				inputType: "password",
+				autocomplete: "new-password"
 			}, {
 				xtype: 'combo',
 				name: 'encryption',

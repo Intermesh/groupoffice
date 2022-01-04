@@ -1,3 +1,9 @@
+2021/04/02 6.5.39
+
+Please read the release notes here:
+
+https://groupoffice.blogspot.com/2021/04/group-office-65-released.html
+
 2019/06/11 6.4.21
 
 Please read the release notes here:

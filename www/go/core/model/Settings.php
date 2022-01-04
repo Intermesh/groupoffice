@@ -6,9 +6,12 @@ use GO;
 use go\core;
 use go\core\http\Request;
 use go\core\util\Crypt;
+use go\modules\business\license\model\License;
 use go\modules\community\addressbook\model\AddressBook;
 
 class Settings extends core\Settings {
+
+	use core\validate\ValidationTrait;
 	
 	protected function __construct() {
 		parent::__construct();
@@ -221,6 +224,12 @@ class Settings extends core\Settings {
 	 * @var boolean 
 	 */
 	public $maintenanceMode = false;
+
+	/**
+	 * When true the user interface will show a confirm dialog before moving item with drag and drop
+	 * @var bool
+	 */
+	public $defaultConfirmOnMove = false;
 	
 	
 	/**
@@ -450,7 +459,30 @@ class Settings extends core\Settings {
 	 * Default setting for users to have short date and times in lists.
 	 * @var boolean
 	 */
-	public $defaultShortDateInList = true;	
+	public $defaultShortDateInList = true;
+
+
+	/**
+	 * License for Group-Office
+	 *
+	 * @var string
+	 */
+	public $license = null;
+
+	/**
+	 * Set to true when the license dialog has been presented and the user denied.
+	 *
+	 * @var bool
+	 */
+	public $licenseDenied = false;
+
+
+	/**
+	 * Set to true when the welcome dialog has been presented and the user denied.
+	 *
+	 * @var bool
+	 */
+	public $welcomeShown = false;
 	
 	/**
 	 * New users will be member of these groups
@@ -484,6 +516,10 @@ class Settings extends core\Settings {
 	
 	public function save() {
 
+		if(!$this->internalValidate()){
+			return false;
+		}
+
 		if(isset($this->logoId)) {
 			//todo settings should have real columns with real keys?
 			$blob = core\fs\Blob::findById($this->logoId);
@@ -492,8 +528,6 @@ class Settings extends core\Settings {
 				$blob->save();
 			}
 		}
-
-
 		
 		//for old framework config caching in GO\Base\Config
 		if(isset($_SESSION)) {
@@ -504,7 +538,33 @@ class Settings extends core\Settings {
 		if(isset($this->URL)) {
 			$this->URL = rtrim($this->URL, '/ ').'/';
 		}
+
+		if($this->isModified('maintenanceMode') && $this->maintenanceMode) {
+			Token::logoutEveryoneButAdmins();
+		}
 		
 		return parent::save();
+	}
+
+	protected function internalValidate()
+	{
+		if($this->isModified('license')) {
+			if(isset($this->license)) {
+				$data = License::getLicenseData();
+				if (!$data) {
+					throw new \Exception("License data was corrupted");
+				}
+
+				if (!License::validate($data)) {
+					throw new \Exception(License::$validationError);
+				}
+			}
+
+			if(go()->getInstaller()->disableUnavailableModules()){
+				go()->rebuildCache();
+			}
+		}
+
+		return true;
 	}
 }

@@ -70,15 +70,17 @@ class ImapMailbox extends \GO\Base\Model {
 
 		//todo make compatible with servers that can't return subscribed flag
 
-		if(isset($this->_attributes['haschildren']) && $this->_attributes['haschildren']) {
-			return true;
-		}
-		if(isset($this->_attributes['hasnochildren']) && $this->_attributes['hasnochildren']) {
-			return false;
-		}
+		if(!$asSubscribedMailbox) {
+			if (isset($this->_attributes['haschildren']) && $this->_attributes['haschildren']) {
+				return true;
+			}
+			if (isset($this->_attributes['hasnochildren']) && $this->_attributes['hasnochildren']) {
+				return false;
+			}
 
-		if(isset($this->_attributes['noinferiors']) && $this->_attributes['noinferiors']) {
-			return false;
+			if (isset($this->_attributes['noinferiors']) && $this->_attributes['noinferiors']) {
+				return false;
+			}
 		}
 
 		//\GO::debug($this->_attributes['haschildren'])	;

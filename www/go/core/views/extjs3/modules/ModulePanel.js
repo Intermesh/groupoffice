@@ -47,14 +47,26 @@ go.modules.ModulePanel = Ext.extend(Ext.Panel, {
 		var grids = this.findBy(function(item) {
 			return (item.isXType("gogrid") || item.isXType("goeditorgrid")) && item.store && item.store.entityStore && item.store.entityStore.entity === entity;
 		});
+
+		function select(g, id) {
+			var index = g.store.indexOfId(id);
+
+			if(index > -1 && !g.getSelectionModel().isSelected(index)) {
+				g.getSelectionModel().selectRow(index);
+			}
+		}
 		
 		grids.forEach(function(g) {
-			var selected = [];
-			var record = g.store.getById(id);
-			if(record) {
-				selected.push(record);
+
+			if(!g.store.loaded) {
+				g.store.on('load', function() {
+					select(g, id);
+				}, this, {single: true});
+			} else
+			{
+				select(g, id);
 			}
-			g.getSelectionModel().selectRecords(selected);
+
 		});		
 	}
 });

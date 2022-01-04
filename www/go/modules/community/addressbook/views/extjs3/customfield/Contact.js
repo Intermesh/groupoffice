@@ -33,7 +33,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 		}
 		
 		go.Db.store("Contact").single(value).then(function(contact) {
-			cmp.setValue('<a href="#' + go.Entities.get("Contact").getRouterPath(contact.id) + '">' + contact.name + '</a>');
+			cmp.setValue('<a href="#' + go.Entities.get("Contact").getRouterPath(contact.id) + '">' + go.modules.community.addressbook.renderName(contact) + '</a>');
 		}).catch(function() {
 			cmp.setValue(t("Not found or no access"));
 		}). finally(function() {
@@ -55,6 +55,8 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 		c.xtype = "contactcombo";
 		c.isOrganization = customfield.options.isOrganization; 
 		c.hiddenName = c.name;
+		c.permissionLevel = go.permissionLevels.read;
+		c.allowNew = customfield.options.allowNew;
 
 		if(!go.util.empty(customfield.options.addressBookId)) {
 			c.addressBookId = customfield.options.addressBookId;
@@ -97,7 +99,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 	getColumn : function(field) {		
 		var c = go.modules.community.addressbook.customfield.Contact.superclass.getColumn.call(this, field);	
 		c.renderer = function(v) {
-			return v ? v.name : "";
+			return v ? go.modules.community.addressbook.renderName(v) : "";
 		};
 		return c;
 	},

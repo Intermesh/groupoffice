@@ -2,20 +2,18 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	entityId:null, 
 	entity:null,
 	section: null,
-	height: dp(150),
-
-	growMaxHeight: dp(800),
 	title: t("Comments"),
 	//
 	/// Collapsilbe was turn off because of height recaculation issues in HtmlEditor
 	//
 	collapsible: true,
 	animCollapse: false, //htmleditor doesn't work with animCollapse
-
+	showComposer: true,
 	hideMode: "offsets", //required for htmleditor
 	collapseFirst:false,
-	layout:'border',	
 	titleCollapse: true,
+	bodyCssClass: 'comments-container',
+	autoHeight: true,
 	stateId: "comments-detail",
 	initComponent: function () {
 
@@ -58,6 +56,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				{name: "labels", type: "relation"}
 			],
 			entityStore: "Comment",
+			baseParams: {sort: [{property: "date", isAscending:false}]},
 			remoteSort: true
 		});
 		
@@ -109,14 +108,15 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			this.commentsContainer = new cntrClass({
 				region:'center',
 				autoScroll:true
-			}),
-			this.composer = new go.modules.comments.Composer({
+			})
+		];
+		if(this.showComposer) {
+			this.items.push(this.composer = new go.modules.comments.Composer({
 				margins: {left: dp(8), right: dp(8),bottom:dp(8),top:0},
 				region:'south',
 				height:60
-			})
-		];
-					
+			}));
+		}
 		go.modules.comments.CommentsDetailPanel.superclass.initComponent.call(this);
 	},
 
@@ -129,8 +129,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		
 		this.entityId = id;
 		this.entity = type;
-		this.composer.initEntity(this.entityId, this.entity, this.section);
-
+		if(this.composer) {
+			this.composer.initEntity(this.entityId, this.entity, this.section);
+		}
 		this.store.setFilter('entity', {
 			entity: this.entity,
 			entityId: this.entityId,
@@ -146,19 +147,20 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		}
 		o = o || {};
 
-		var badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
+		let badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
 		this.setTitle(t("Comments") + badge);
-		var prevStr;
-	//	this.initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight;
-		 this.initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
+		let prevStr = null;
+
+		let dom = this.commentsContainer.getEl().dom;
+		this.curScrollPos = dom.scrollTop;
+		this.curScrollHeight = dom.scrollHeight;// - dom.clientHeight;
 
 		this.commentsContainer.removeAll();
 
 		this.store.each(function(r) {
-			
-			var labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
+			let labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
 
-			var creator = r.get("creator");
+			let creator = r.get("creator");
 			if(!creator) {
 				creator = {
 					displayName: t("Unknown user")
@@ -166,11 +168,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			}
 
 
-			var qtip = t('{author} wrote at {date}')
+			let qtip = t('{author} wrote at {date}')
 				.replace('{author}', Ext.util.Format.htmlEncode(creator.displayName))
 				.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat));
 
-			var modifier = r.get("modifier");
+			let modifier = r.get("modifier");
 			if(!modifier) {
 				modifier = {
 					displayName: t("Unknown user")
@@ -188,7 +190,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 					.replace('{date}', Ext.util.Format.date(r.get('date'),go.User.dateTimeFormat));
 			}
 
-			var avatar = {
+			let avatar = {
 				xtype:'box',
 				autoEl: {tag: 'span'},
 				cls: 'photo '+mineCls
@@ -196,11 +198,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 			avatar.html = go.util.avatar(creator.displayName,creator.avatarId);
 
-			for(var i = 0, l = r.data.labels.length; i < l; i++){
+			for(let i = 0, l = r.data.labels.length; i < l; i++){
 				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
 			}
 
-			var readMore = new go.detail.ReadMore({
+			let readMore = new go.detail.ReadMore({
 				cls: 'go-html-formatted ' + mineCls
 			});
 			readMore.setText(r.get('text'));
@@ -210,21 +212,22 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			// 	cls: 'go-html-formatted ' + mineCls,
 			// 	html: "<div class='content'>" + r.get('text') + "</div><div class='tags "+mineCls+"'>"+labelText+"</div>"
 			// });
-			this.commentsContainer.add({
+			this.commentsContainer.insert(0,{
 				xtype:"container",
 				cls:'go-messages',
 				items: [{
-						xtype:'box',
-						autoEl: 'h6',
-						hidden: prevStr == go.util.Format.date(r.get('date')),
-						html: go.util.Format.date(r.get('date'))
-					},{
-						xtype:'container',
-						autoEl: {tag: 'div','title': qtip},
-						items: [avatar,readMore]
-					}
+					xtype:'container',
+					autoEl: {tag: 'div','title': qtip},
+					items: [avatar,readMore]
+				},{
+					xtype:'box',
+					autoEl: 'h6',
+					hidden: prevStr === null || prevStr == go.util.Format.date(r.get('date')),
+					html: prevStr
+				}
 				]
 			});
+
 			readMore.on('render',function(me){me.getEl().on("contextmenu", function(e, target, obj){
 				e.stopEvent();		
 				
@@ -234,26 +237,30 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				}
 
 			}, this);},this);
+
 			prevStr = go.util.Format.date(r.get('date'));
 		}, this);
-		
-		this.doLayout();
-		var height = 7; // padding on composer
-		this.commentsContainer.items.each(function(item,i) {
-			height += item.getOuterSize().height;
-		});
-		var _this = this;
-		setTimeout(function(){
-			
 
-			_this.body.setHeight(Math.max(50,Math.min(_this.growMaxHeight,height + _this.composer.getHeight())));
-			_this.doLayout();
-			_this.scrollDown();
+		// Put a date on top
+		this.commentsContainer.insert(0,{
+			xtype:"container",
+			cls:'go-messages',
+			items: [{
+				xtype:'box',
+				autoEl: 'h6',
+				html: prevStr
+			}
+			]
 		});
+		this.doLayout();
+		this.scrollDown();
 
 	},
 	scrollDown : function() {
-		var scroll = this.commentsContainer.getEl();
-		scroll.scroll("b", this.initScrollTop + (scroll.dom.scrollHeight));
+		var dom = this.commentsContainer.getEl().dom;
+		dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
+
+		//console.log(scroll.dom.scrollTop, scroll.dom.scrollHeight, this.initScrollHeight, this.initScrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
+		//scroll.scroll("b", scroll.dom.scrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
 	}
 });

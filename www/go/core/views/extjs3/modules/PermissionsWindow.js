@@ -28,17 +28,22 @@ go.modules.PermissionsWindow = Ext.extend(GO.Window,{
 			buttons : [{
 				text : t("Ok"),
 				handler : function() {
-					GO.request({
-						timeout : 2 * 60 * 1000,
-						url : 'modules/module/checkDefaultModels',
-						params : {
-							moduleId : this.module_id
-						},
-						success : function(response, options, result) {
-							this.hide();
-						},
-						scope : this
-					});
+
+					if(!this.pkg || this.pkg == 'legacy') {
+						GO.request({
+							timeout: 2 * 60 * 1000,
+							url: 'modules/module/checkDefaultModels',
+							params: {
+								moduleId: this.module_id
+							},
+							success: function (response, options, result) {
+								this.hide();
+							},
+							scope: this
+						});
+					} else {
+						this.hide();
+					}
 				},
 				scope : this
 			}]
@@ -47,8 +52,9 @@ go.modules.PermissionsWindow = Ext.extend(GO.Window,{
 		
 		go.modules.PermissionsWindow.superclass.initComponent.call(this);
 	},
-	show: function(moduleId, name, acl_id) {
+	show: function(moduleId,pkg, name, acl_id) {
 		this.module_id=moduleId;
+		this.pkg = pkg;
 		
 		this.setTitle(t("Permissions") + ' ' + name);		
 		go.modules.PermissionsWindow.superclass.show.call(this);		

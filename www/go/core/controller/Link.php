@@ -22,14 +22,31 @@ class Link extends EntityController {
 		
 		if(empty($p['sort'])) {
 			$p['sort'] = [
-			//	["property" => "eTo.name", "isAscending"=> true],
-				["property" => "createdAt", "isAscending"=> false]
+				["property" => "search.modifiedAt", "isAscending"=> false]
 			];
 		}
 		
 		return $p;
 	}
-	
+
+	protected function getQueryQuery($params)
+	{
+		$q = parent::getQueryQuery($params)
+			->groupBy([])
+			->distinct();
+
+		$order = $q->getOrderBy();
+		if(empty($order['eTo.name'])) {
+			$q->removeJoin('core_entity', 'eTo');
+		}
+
+		if(empty($order['eFrom.name'])) {
+			$q->removeJoin('core_entity', 'eFrom');
+		}
+
+		return $q;
+	}
+
 	/**
 	 * Handles the Foo entity's Foo/query command
 	 * 

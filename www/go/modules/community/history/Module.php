@@ -8,11 +8,17 @@ use go\core;
 use go\core\jmap\Entity;
 use go\core\model\User;
 use go\modules\community\history\model\LogEntry;
+use go\modules\community\history\model\Settings;
 
 class Module extends core\Module
 {
 
 	public static $enabled = true;
+
+	public function autoInstall()
+	{
+		return true;
+	}
 
 	public function getAuthor() {
 		return "Intermesh BV <info@intermesh.nl>";
@@ -24,6 +30,8 @@ class Module extends core\Module
 		User::on(User::EVENT_LOGIN, static::class, 'onLogin');
 		User::on(User::EVENT_LOGOUT, static::class, 'onLogout');
 		User::on(User::EVENT_BADLOGIN, static::class, 'onBadLogin');
+
+		core\cron\GarbageCollection::on(core\cron\GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
 	}
 
 	static function logActiveRecord(ActiveRecord $record, $action) {
@@ -46,8 +54,16 @@ class Module extends core\Module
 		}
 		$log->changes = json_encode($changes);
 
+		$l = LogEntry::getMapping()->getColumn('changes')->length;
+		if(mb_strlen($log->changes) > $l) {
+			foreach($changes as $key => $v) {
+				$changes[$key] = '... changes were too big to log ...';
+			}
+			$log->changes = json_encode($changes);
+		}
+
 		if(!$log->save()) {
-			throw new \Exception("Could not save log");
+			\go\core\ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
 		}
 	}
 
@@ -72,7 +88,11 @@ class Module extends core\Module
 	}
 
 	private static function logEntity(Entity $entity, $action) {
-		if(!self::$enabled) {
+		if(!self::$enabled || core\Installer::isInProgress()) {
+			return;
+		}
+
+		if(!$entity::loggable()) {
 			return;
 		}
 
@@ -92,6 +112,8 @@ class Module extends core\Module
 			unset($changes['createdBy']);
 			unset($changes['createdAt']);
 			unset($changes['modifiedBy']);
+			unset($changes['permissionLevel']);
+			unset($changes['filesFolderId']);
 
 			if(empty($changes)) {
 				return;
@@ -112,9 +134,16 @@ class Module extends core\Module
 			$log->changes = null;
 		}
 
+		$l = LogEntry::getMapping()->getColumn('changes')->length;
+		if(mb_strlen($log->changes) > $l) {
+			foreach($changes as $key => $v) {
+				$changes[$key] = '... changes were too big to log ...';
+			}
+			$log->changes = json_encode($changes);
+		}
 
 		if(!$log->save()) {
-			throw new \Exception ("Could not save log: " . var_export($log->getValidationErrors(), true));
+			\go\core\ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
 		}
 	}
 
@@ -124,18 +153,24 @@ class Module extends core\Module
 		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('login');
 		$log->changes = null;
-		$log->setAclId($user->findAclId());
-		$log->save();
+		if(!$log->save()){
+			throw new \Exception("Could not save log");
+		}
 	}
 
-	public static function onBadLogin(User $user) {
+	public static function onBadLogin($username, User $user = null) {
 		$log = new LogEntry();
-		$log->setEntity($user);
-		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
+		if(isset($user)) {
+			$log->setEntity($user);
+		} else{
+			$log->entityTypeId = User::entityType()->getId();
+		}
+		$log->description = $username. ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('badlogin');
 		$log->changes = null;
-		$log->setAclId($user->findAclId());
-		$log->save();
+		if(!$log->save()){
+			throw new \Exception("Could not save log");
+		}
 	}
 
 	public static function onLogout(User $user) {
@@ -144,7 +179,25 @@ class Module extends core\Module
 		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('logout');
 		$log->changes = null;
-		$log->setAclId($user->findAclId());
-		$log->save();
+		if(!$log->save()){
+			throw new \Exception("Could not save log");
+		}
 	}
+
+	public static function onGarbageCollection() {
+		$years = (int) Module::get()->getSettings()->deleteAfterYears;
+
+		if(!empty($years)) {
+			LogEntry::delete(LogEntry::find()->where('createdAt', '<', (new core\util\DateTime("-" . $years . " years"))));
+		}
+	}
+
+	/**
+	 * @return core\Settings|Settings
+	 */
+	public function getSettings()
+	{
+		return Settings::get();
+	}
+
 }

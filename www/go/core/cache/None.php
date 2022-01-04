@@ -26,8 +26,9 @@ class None implements CacheInterface {
 	 * @param string $key
 	 * @param mixed $value Will be serialized
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
+	 * @param int $ttl Time to live in seconds
 	 */
-	public function set($key, $value, $persist = true) {
+	public function set($key, $value, $persist = true, $ttl = 0) {
 		$this->cache[$key] = $value;
 		return true;
 	}

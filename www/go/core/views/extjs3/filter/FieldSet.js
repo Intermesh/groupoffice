@@ -5,7 +5,7 @@ go.filter.FieldSet = Ext.extend(Ext.form.FieldSet, {
 	initComponent: function () {		
 
 		this.items = [
-			{
+			this.conditionsField = new go.form.FormContainer({
 				xtype: "formcontainer",
 				name: "filter",
 				hideLabel: true,
@@ -33,7 +33,7 @@ go.filter.FieldSet = Ext.extend(Ext.form.FieldSet, {
 						entity: this.entity
 					}
 				]
-			}
+			})
 		];
 		
 		go.filter.FieldSet.superclass.initComponent.call(this);

@@ -447,10 +447,10 @@ GO.email.AccountDialog = function(config) {
 
 	var items = [
 		propertiesTab,
-		serverTab, 
-		this.permissionsTab,
+		serverTab,
 		this.filterGrid,
-		this.labelsTab
+		this.labelsTab,
+		this.permissionsTab
 	];
 	
 	this.propertiesPanel = new Ext.form.FormPanel({
@@ -672,6 +672,7 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 	},
 
 	loadAccount : function(account_id) {
+		this.account_id = account_id;
 		this.propertiesPanel.form.load({
 			url : GO.url("email/account/load"),
 			params : {

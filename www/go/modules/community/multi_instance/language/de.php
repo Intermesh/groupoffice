@@ -20,4 +20,7 @@ return array (
   'Maximum users' => 'Maximale Benutzer',
   'Storage usage' => 'Speicherplatznutzung',
   'Deactivate' => 'Deaktivieren',
+  'Trial' => 'Versuch',
+  'Modules' => 'Module',
+  'Allowed' => 'Erlaubt',
 );

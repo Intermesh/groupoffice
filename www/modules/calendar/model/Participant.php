@@ -367,7 +367,9 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 				$participant->event->touch(); // Touch the event to update its mtime.
 				
 				$participant->status=$this->status;
-				$participant->save();				
+				if(!$participant->save()) {
+					throw new \Exception("Could not save participant: ". implode(", ", $participant->getValidationErrors()));
+				}
 			}
 			
 			//$this->event->touch(); // Touch the event to update the modification date.

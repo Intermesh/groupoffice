@@ -20,6 +20,11 @@ GO.tasks.TaskListsGrid = function(config){
 	});
 	
 	GO.tasks.TaskListsGrid.superclass.constructor.call(this, config);
+
+	this.getBottomToolbar().add('->',{
+		xtype: 'tbsearch',
+		store: this.calendarsStore
+	})
 };
 
 

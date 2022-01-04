@@ -22,6 +22,9 @@
 namespace GO\Base\Util;
 
 
+use go\core\ErrorHandler;
+use go\core\util\StringUtil;
+
 class StringHelper {
 	
 	/**
@@ -276,221 +279,10 @@ class StringHelper {
 //		return $utf8string;
 //	}
 
-	public static function clean_utf8($str, $source_charset='UTF-8') {
+	public static function clean_utf8($str, $source_charset=null) {
 		
-		//must use html_entity_decode here other wise some weird utf8 might be decoded later
-		//$str = html_entity_decode($str, ENT_COMPAT, $source_charset);			
-		
-		//fix incorrect win-1252 to Windows-1252
-		$source_charset = preg_replace('/win-([0-9]+)/i','WINDOWS-$1', $source_charset);
-		
-		//fix for euro signs in windows-1252 encoding. We convert it to iso-8859-15.
-		$source_charset=strtoupper($source_charset);
-		if($source_charset=='ISO-8859-1' || $source_charset=='ISO-8859-15' || $source_charset=='WINDOWS-1252')
-			$str = str_replace("\x80","€", $str);
-		
-		// UNICODE IS NOT A VALID CHARSET SO WE USE THE UTF-8 
-		if($source_charset == 'UNICODE')
-			$source_charset = 'UTF-8';
-		
-
-		
-		$str = str_replace("€","&euro;", $str);
-		
-		$source_charset = self::fixCharset($source_charset);
-		try {
-			$c = iconv($source_charset, 'UTF-8//IGNORE', $str);
-		} catch(\Exception $e) {
-			//Does not always work. We suppress the:
-			//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31
-		}
-
-		if(!empty($c))
-		{
-			$str=$c;
-		}else{
-			if(function_exists('mb_detect_encoding'))
-			{
-				$from_charset = mb_detect_encoding($str, "auto");
-			}else
-			{
-				$from_charset = "ISO-8859-1";
-			}
-			$from_charset=strtolower($from_charset);
-			
-			if($from_charset!=$source_charset)
-				$str=self::clean_utf8($str, $from_charset);
-		}
-							
-		//Check if preg validates it as UTF8
-		if(function_exists('mb_check_encoding') && mb_check_encoding($str,'utf8')){
-			
-			return $str;
-		}else{
-		//remove non utf8. taken from http://stackoverflow.com/questions/1401317/remove-non-utf8-characters-from-string
-				$regex = <<<'END'
-/
-  (
-    (?: [\x00-\x7F]                 # single-byte sequences   0xxxxxxx
-    |   [\xC0-\xDF][\x80-\xBF]      # double-byte sequences   110xxxxx 10xxxxxx
-    |   [\xE0-\xEF][\x80-\xBF]{2}   # triple-byte sequences   1110xxxx 10xxxxxx * 2
-    |   [\xF0-\xF7][\x80-\xBF]{3}   # quadruple-byte sequence 11110xxx 10xxxxxx * 3 
-    ){1,100}                        # ...one or more times
-  )
-| .                                 # anything else
-/x
-END;
-		
-			return preg_replace($regex, '$1', $str);
-			
-		}
-//		//Not valid still so we are going to validate each utf byte sequence with
-//		//help from Henri Sivonen http://hsivonen.iki.fi/php-utf8/
-//		
-//
-//		$mState = 0;     // cached expected number of octets after the current octet
-//		// until the beginning of the next UTF8 character sequence
-//		$mUcs4  = 0;     // cached Unicode character
-//		$mBytes = 1;     // cached expected number of octets in the current sequence
-//
-//		$out = '';
-//		$chr = '';
-//
-//		$len = strlen($str);
-//
-//		for($i = 0; $i < $len; $i++) {
-//
-//			$chr.=$str{$i};
-//
-//			$in = ord($str{$i});
-//			if ( $mState == 0) {
-//
-//
-//
-//			// When mState is zero we expect either a US-ASCII character or a
-//			// multi-octet sequence.
-//				if (0 == (0x80 & ($in))) {
-//				// US-ASCII, pass straight through.
-//					$mBytes = 1;
-//
-//					$out .= $chr;
-//
-//					$chr='';
-//
-//				} elseif (0xC0 == (0xE0 & ($in))) {
-//				// First octet of 2 octet sequence
-//					$mUcs4 = ($in);
-//					$mUcs4 = ($mUcs4 & 0x1F) << 6;
-//					$mState = 1;
-//					$mBytes = 2;
-//
-//				} elseif (0xE0 == (0xF0 & ($in))) {
-//				// First octet of 3 octet sequence
-//					$mUcs4 = ($in);
-//					$mUcs4 = ($mUcs4 & 0x0F) << 12;
-//					$mState = 2;
-//					$mBytes = 3;
-//
-//				} elseif (0xF0 == (0xF8 & ($in))) {
-//				// First octet of 4 octet sequence
-//					$mUcs4 = ($in);
-//					$mUcs4 = ($mUcs4 & 0x07) << 18;
-//					$mState = 3;
-//					$mBytes = 4;
-//
-//				} elseif (0xF8 == (0xFC & ($in))) {
-//							 /* First octet of 5 octet sequence.
-//							 *
-//							 * This is illegal because the encoded codepoint must be either
-//							 * (a) not the shortest form or
-//							 * (b) outside the Unicode range of 0-0x10FFFF.
-//							 * Rather than trying to resynchronize, we will carry on until the end
-//							 * of the sequence and let the later error handling code catch it.
-//							 */
-//					$mUcs4 = ($in);
-//					$mUcs4 = ($mUcs4 & 0x03) << 24;
-//					$mState = 4;
-//					$mBytes = 5;
-//
-//
-//				} elseif (0xFC == (0xFE & ($in))) {
-//				// First octet of 6 octet sequence, see comments for 5 octet sequence.
-//					$mUcs4 = ($in);
-//					$mUcs4 = ($mUcs4 & 1) << 30;
-//					$mState = 5;
-//					$mBytes = 6;
-//
-//				} else {
-//							 /* Current octet is neither in the US-ASCII range nor a legal first
-//								* octet of a multi-octet sequence.
-//								*/
-//					//return FALSE;
-//					$out .= '?';
-//
-//				}
-//
-//			} else {
-//
-//			// When mState is non-zero, we expect a continuation of the multi-octet
-//			// sequence
-//				if (0x80 == (0xC0 & ($in))) {
-//
-//				// Legal continuation.
-//					$shift = ($mState - 1) * 6;
-//					$tmp = $in;
-//					$tmp = ($tmp & 0x0000003F) << $shift;
-//					$mUcs4 |= $tmp;
-//
-//					/**
-//					 * End of the multi-octet sequence. mUcs4 now contains the final
-//					 * Unicode codepoint to be output
-//					 */
-//					if (0 == --$mState) {
-//
-//									 /*
-//									 * Check for illegal sequences and codepoints.
-//									 */
-//					// From Unicode 3.1, non-shortest form is illegal
-//						if (((2 == $mBytes) && ($mUcs4 < 0x0080)) ||
-//								((3 == $mBytes) && ($mUcs4 < 0x0800)) ||
-//								((4 == $mBytes) && ($mUcs4 < 0x10000)) ||
-//								(4 < $mBytes) ||
-//								// From Unicode 3.2, surrogate characters are illegal
-//								(($mUcs4 & 0xFFFFF800) == 0xD800) ||
-//								// Codepoints outside the Unicode range are illegal
-//								($mUcs4 > 0x10FFFF)) {
-//
-//							//return FALSE;
-//							$out .= '?';
-//
-//						}else
-//						{
-//							//echo $chr."\n";
-//							$out .= $chr;
-//						}
-//
-//						//initialize UTF8 cache
-//						$mState = 0;
-//						$mUcs4  = 0;
-//						$mBytes = 1;
-//						$chr='';
-//					}
-//
-//				} else {
-//				/**
-//				 *((0xC0 & (*in) != 0x80) && (mState != 0))
-//				 * Incomplete multi-octet sequence.
-//				 */
-//
-//					//return FALSE;
-//					$out .= '?';
-//				}
-//			}
-//		}
-//		
-//		return $out;
+			return StringUtil::cleanUtf8($str, $source_charset);
 	}
-	
 	/**
 	 * Check if string has UTF8 characters
 	 * 
@@ -977,12 +769,20 @@ END;
 			}
 		}
 
-		return self::prefixCSSSelectors($css, '.'.$prefix);
+		$style = self::prefixCSSSelectors($css, '.'.$prefix);
+
+		//apply body style on root element
+		$bodyStyle = self::extractBodyStyle($html);
+		if(!empty($bodyStyle)) {
+			$style = '.'.$prefix . ' {' . $bodyStyle . "};\n";
+		}
+
+		return $style;
 	}
 
 	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
 		# Wipe all block comments
-		$css = preg_replace('!/\*.*?\*/!s', '', $css);
+//		$css = preg_replace('!/\*.*?\*/!s', '', $css);
 
 		$parts = explode('}', $css);
 		$mediaQueryStarted = false;
@@ -1035,6 +835,37 @@ END;
 
 	}
 
+	private static function extractBodyStyle($html) {
+		$style = "";
+
+		if(!preg_match("'<body [^>]*>'usi", $html, $matches)) {
+			return $style;
+		}
+
+		try {
+			$d = new \DOMDocument();
+			$d->loadHTML("<html>" . $matches[0] . '</body></html>');
+			$bodyEls = $d->getElementsByTagName('body');
+			if(!$bodyEls->length) {
+				return $style;
+			}
+			$bodyEl = $bodyEls->item(0);
+		} catch (\Exception $e) {
+			ErrorHandler::logException($e);
+			return $style;
+		}
+
+		if($bodyEl->hasAttribute("bgcolor")) {
+			$style .= "background-color: " . $bodyEl->getAttribute("bgcolor").";";
+		}
+
+		if($bodyEl->hasAttribute("style")) {
+			$style .= $bodyEl->getAttribute("style");
+		}
+
+		return $style;
+	}
+
 	/**
 	 * Convert Dangerous HTML to safe HTML for display inside of Group-Office
 	 *
@@ -1044,35 +875,24 @@ END;
 	 * @access public
 	 * @return StringHelper HTML formatted string
 	 */
-	public static function sanitizeHtml($html) {
+	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
 	
 		//needed for very large strings when data is embedded in the html with an img tag
 		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
 
-		//don't do this because it will mess up <pre></pre> tags
-		//$html = str_replace("\r", '', $html);
-		//$html = str_replace("\n",' ', $html);
 
 		//remove strange white spaces in tags first
 		//sometimes things like this happen <style> </ style >
-		
-		
-//		Doesn't work well because some mails hav body tags all over the place :(
-//		$body_startpos = stripos($html, '<body');
-//		$body_endpos = strripos($html, '</body');
-//		if($body_startpos){
-//			if($body_endpos)
-//				$html = substr($html, $body_startpos, $body_endpos-$body_startpos);
-//			else
-//				$html = substr($html, $body_startpos);
-//		}
-
-		$prefix = 'msg-' . uniqid();
-
-		$styles = self::extractStyles($html, $prefix);
-
 		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
-		
+		//remove comments because they might interfere
+		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
+		$html = preg_replace('!/\*.*?\*/!s', '', $html);
+
+		if($preserveHtmlStyle) {
+			$prefix = 'groupoffice-msg-' . uniqid();
+			$styles = self::extractStyles($html, $prefix);
+		}
+
 		$to_removed_array = array (
 		"'<!DOCTYPE[^>]*>'usi",
 		"'<html[^>]*>'usi",
@@ -1082,8 +902,9 @@ END;
 		"'<meta[^>]*>'usi",
 		"'<link[^>]*>'usi",
 		"'<title>.*?</title>'usi",
-		"'<head[^>]*>.*?</head>'usi",
+//		"'<head[^>]*>.*?</head>'usi", //Amazon had body inside the head !?
 		"'<head[^>]*>'usi",
+			"'</head[^>]*>'usi",
 		"'<base[^>]*>'usi",
 		"'<meta[^>]*>'usi",
 		"'<bgsound[^>]*>'usi",
@@ -1106,15 +927,24 @@ END;
 		//"'<select[^>]*>.*?</select>'usi",
 		//"'<textarea[^>]*>.*?</textarea>'usi",
 		"'</form>'usi",
-		"'<!--.*-->'Uusi",
+
 		);
 
+//		 $html = "<div onclick=\"yo\" online='1' test='onclick' onclick=\"yo\"></div>\n\n\n" . $html;
+
 		$html = preg_replace($to_removed_array, '', $html);
-		
-		//Remove any attribute starting with "on" or xmlns. Had to do this always becuase many mails contain weird tags like online="1". 
+		//Remove any attribute starting with "on" or xmlns. Had to do this always becuase many mails contain weird tags like online="1".
 		//These were detected as xss attacks by detectXSS().
-		$html = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[a-z]+[^>]*+>#iu', '$1>', $html);
-	
+
+//		$regex = '#(<[^>\s]*)\s(?:on|xmlns)[^>\s]+#iu';
+//		preg_match_all($regex, $html, $matched_tags, PREG_SET_ORDER);
+//		preg_replace($regex, '$1', $html);
+
+		$html = preg_replace_callback('#<([^>]+)>#u', function($matches) {
+			return "<" . preg_replace('#\s(?:on|xmlns)[^\s]+#iu', "", $matches[1]) . ">";
+		}, $html);
+
+
 		//remove high z-indexes
 		$matched_tags = array();
 		preg_match_all( "/(z-index)[\s]*:[\s]*([0-9]+)[\s]*/u", $html, $matched_tags, PREG_SET_ORDER );
@@ -1129,8 +959,11 @@ END;
 			$html = StringHelper::replaceEmoticons($html,true);
 
 		if(!empty($styles)) {
-			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="'.$prefix.'">'. $html .'</div>';
+			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="msg '.$prefix.'">'. $html .'</div>';
+		} else if($preserveHtmlStyle) {
+			$html = '<div class="msg">'. $html .'</div>';
 		}
+
 		return $html;
 	}
 	

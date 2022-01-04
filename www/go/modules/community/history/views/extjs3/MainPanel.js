@@ -26,8 +26,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 			this.grid, //first is default in narrow mode
 			this.sidePanel
 		];
-
-		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);
+		this.callParent();
 
 		this.grid.on('viewready', function() {
 			this.dateRangeField.setThisWeek();
@@ -103,7 +102,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 								},
 								scope: this
 							}
-						}), new go.users.UserCombo({
+						}), new go.users.UserComboReset({
 							hideLabel: true,
 							emptyText: t('All users'),
 							allowBlank: true,

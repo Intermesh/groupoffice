@@ -3,18 +3,35 @@
 namespace go\core;
 
 use Exception;
+use go\core\cache\None;
 use go\core\fs\File;
 use go\core\jmap\Request;
 use go\core\model\Module;
+use go\core\model\User;
 
 class Language {
-
 	/**
 	 *
 	 * @var string eg "en-US".
 	 */
 	private $isoCode;
 	private $data = [];
+
+	/**
+	 * Replace {product_name} with Group-Office or $config['product_name']
+	 *
+	 * Exporting language disables this.
+	 *
+	 * @var bool
+	 */
+	private $replaceProductName = true;
+
+
+	public function initExport() {
+		$this->replaceProductName = false;
+		$this->data = [];
+		go()->setCache(new None());
+	}
 
 
 	
@@ -158,11 +175,9 @@ class Language {
 			}
 
 			$file = $this->findLangOverride($isoCode, $package, $module);
-			if ($file->exists()) {
+			if ($file && $file->exists()) {
 				$langData->mergeRecursive($this->loadFile($file));
 			}
-			
-			$productName = go()->getConfig()['core']['branding']['name'];
 
 			foreach ($langData as $key => $translation) {
 				
@@ -174,13 +189,13 @@ class Language {
 				$langData[$key]  = $this->replaceBrand($langData[$key]);
 			}
 
-			$this->data[$package][$module] = $langData->getArray();	
-			go()->getCache()->set($cacheKey, $this->data[$package][$module]);		
+			$this->data[$package][$module] = $langData->getArray();
+			go()->getCache()->set($cacheKey, $this->data[$package][$module]);
 		}
 	}
 
 	private function replaceBrand($str) {
-		$productName = go()->getConfig()['core']['branding']['name'];
+		$productName = $this->replaceProductName ? go()->getConfig()['product_name'] : "{product_name}";
 		return str_replace(
 			[
 				"{product_name}",
@@ -247,7 +262,12 @@ class Language {
 	 */
 	private function findLangOverride($lang, $package, $module) {
 
-		$folder = go()->getDataFolder()->getFolder('users/admin/language/' . $package . '/' .$module);
+		if(Installer::isInstalling()) {
+			return false;
+		}
+		$admin = User::findById(1, ['homeDir']);
+
+		$folder = go()->getDataFolder()->getFolder($admin->homeDir. '/language/' . $package . '/' .$module);
 		
 		return $folder->getFile($lang . '.php');
 	}

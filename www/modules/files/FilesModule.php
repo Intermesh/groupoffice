@@ -21,6 +21,7 @@
 
 namespace GO\Files;
 
+use go\core\model\Group;
 use go\core\model\User;
 use go\core\util\ClassFinder;
 use GO\Files\Filehandler\FilehandlerInterface;
@@ -33,9 +34,7 @@ class FilesModule extends \GO\Base\Module{
 	
 	
 	public static function initListeners() {
-		\GO\Base\Model\User::model()->addListener('save', "GO\Files\FilesModule", "saveUser");
-		\GO\Base\Model\User::model()->addListener('delete', "GO\Files\FilesModule", "deleteUser");
-		
+
 		$c = new \GO\Core\Controller\BatchEditController();
 		
 		$c->addListener('store', "GO\Files\FilesModule", "afterBatchEditStore");
@@ -50,10 +49,7 @@ class FilesModule extends \GO\Base\Module{
 		
 		while($user = $stmt->fetch()){
 			$folder = Model\Folder::model()->findHomeFolder($user);
-			//$folder->syncFilesystem();
-			
-			//$folder = Model\Folder::model()->findByPath('users/'.$user->username, true);
-			
+
 			//In some cases the acl id of the home folder was copied from the user. We will correct that here.
 			if(!$folder->acl){
 				$folder->setNewAcl($user->id);				
@@ -97,26 +93,14 @@ class FilesModule extends \GO\Base\Module{
 		}
 	}
 
-	public static function saveUser($user, $wasNew)
-	{
-		if ($wasNew) {
-			$folder = Model\Folder::model()->findHomeFolder($user);
-		} elseif ($user->isModified('username')) {
-			$folder = Model\Folder::model()->findByPath('users/' . $user->getOldAttributeValue('username'));
-			if ($folder) {
-				$folder->name = $user->username;
-				$folder->systemSave = true;
-				$folder->save();
-			}
-		}
-	}
-	
+
+
 	public static function deleteUser($user) {
-		$folder = Model\Folder::model()->findByPath('users/'.$user->username, true);
+		$folder = Model\Folder::model()->findByPath($user->homeDir);
 		if($folder)
 			$folder->delete(true);
 	}
-	
+
 	public function autoInstall() {
 		return true;
 	}
@@ -190,6 +174,16 @@ class FilesModule extends \GO\Base\Module{
 		$template->extension='odt';
 		$template->save();	
 		$template->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::READ_PERMISSION);
+
+
+		//create public shared folder
+		$admin = \GO\Base\Model\User::model()->findByPk(1);
+
+		$shared = Folder::model()->findHomeFolder($admin)->addFolder(go()->t("Public"));
+		$acl = $shared->setNewAcl(1);
+		$acl->addGroup(Group::ID_INTERNAL, \GO\Base\Model\Acl::DELETE_PERMISSION);
+		$shared->save();
+
 	}
 	
 	

@@ -101,7 +101,7 @@ class ActiveStatement implements \IteratorAggregate {
 			if (method_exists($m, $function))
 				try {
 					if ($verbose) {
-						$function . " " . $m->className() . "\n";
+						echo $function . " " . $m->className() . "\n";
 						flush();
 					}
 					$m->$function();

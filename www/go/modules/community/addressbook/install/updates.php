@@ -129,3 +129,14 @@ $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`modif
 $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`lastName`);";
 
 $updates['202011271105'][] = "update addressbook_contact set lastName = name where isOrganization = true;";
+
+$updates['202105171220'][] = "create index addressbook_contact_addressBookId_lastName_index
+	on addressbook_contact (addressBookId, lastName);";
+
+$updates['202105171220'][] = "create index addressbook_contact_addressBookId_name_index
+	on addressbook_contact (addressBookId, name);";
+
+
+
+$updates['202106171331'][] = "create index addressbook_contact_isOrganization_index
+	on addressbook_contact (isOrganization);";

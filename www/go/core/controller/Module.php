@@ -30,6 +30,40 @@ class Module extends EntityController {
 	{
 		return parent::getGetQuery($params)->orderBy(['sort_order' => 'ASC']);
 	}
+
+	public function installLicensed(){
+		$modules = \GO::modules()->getAvailableModules();
+
+		foreach ($modules as $moduleClass) {
+
+			$moduleController = $moduleClass::get();
+
+			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
+				if($moduleController->isInstalled()) {
+					$model = $moduleController->getModel();
+					$model->enabled = true;
+					try {
+						$model->save();
+					} catch(\Throwable $e) {
+						go()->log($e);
+					}
+
+				} else {
+					if ($moduleController instanceof \go\core\Module) {
+						if ($moduleController->requiredLicense()) {
+							$moduleController->install();
+						}
+					} else {
+						if ($moduleController->appCenter() && !\GO\Base\Model\Module::install($moduleController->name())) {
+							throw new \Exception("Could not save module " . $moduleController->name());
+						}
+					}
+				}
+			}
+		}
+
+		return ['success' => true];
+	}
 	
 	public function install($params) {
 		

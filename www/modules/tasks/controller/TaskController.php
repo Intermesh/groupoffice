@@ -58,6 +58,9 @@ class TaskController extends \GO\Base\Controller\AbstractModelController{
 			$createdRule = $rRule->createJSONOutput();
 
 			$response['data'] = array_merge($response['data'],$createdRule);
+		}else
+		{
+			$response['data']['repeat_forever'] = 1;
 		}
 		
 		$response['data']['remind_before'] = $user->taskSettings->reminder_days;

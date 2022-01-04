@@ -148,19 +148,19 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 				if(!e.altKey) {
 					me.remove(dragItem, true);
-
 					if (dropRow.rowIndex > data.dragIndex) {
 						dropRow.rowIndex--;
 					}
-
-				} else
-				{
+				} else {
 					//todo id configurable?
 					delete v.id;
 				}
 
 				var p = me.addPanel(false, dropRow.rowIndex);
 				p.formField.setValue(v);
+
+				// Trigger an update upon saving
+				me.dirty = true;
 
 				me.items.each(function(i, rowIndex) {
 					i.rowIndex = rowIndex;
@@ -178,6 +178,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 	
 	initBbar: function() {
+
+		if(this.bbar) {
+			return;
+		}
+
 		this.bbar = [
 			Ext.apply(this.btnCfg,{
 				//iconCls: this.addButtonIconCls,

@@ -3,8 +3,9 @@
 	"short_name": "Group-Office",
 	"description": "Group-Office groupware",
 	"orientation": "any",
-	"version": "6.4",
+	"version": "6.5",
 	"start_url": "/",
+	"scope": "/",
 	"icons": [
         {
             "src": "android-chrome-192x192.png",
@@ -17,7 +18,7 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
-    "display": "standalone"
+    "theme_color": "#0277bd",
+    "background_color": "#0277bd",
+    "display": "minimal-ui"
 }

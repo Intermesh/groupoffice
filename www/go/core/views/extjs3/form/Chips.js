@@ -95,13 +95,6 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	
 	initComponent: function () {
 
-		var tpl = new Ext.XTemplate(
-						'<tpl for=".">',
-						'<div class="go-chip">{' + this.displayField + '} <button type="button" class="icon">delete</button></div>',
-						'</tpl>',
-						'<div class="x-clear"></div>'
-						);		
-	
 		this.dataView = new go.form.ChipsView({
 			valueField: this.valueField,
 			displayField: this.displayField
@@ -186,9 +179,13 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	},
 	
 	setValue: function (values) {
-		
+
 		if(!values) {
 			values = this.map ? {} : [];
+		}
+
+		if(this.comboBox) {
+			this.comboBox.clearInvalid();
 		}
 		
 		if(this.entityStore) {	
@@ -200,13 +197,14 @@ go.form.Chips = Ext.extend(Ext.Container, {
 					this.dataView.store.loadData({records: entities}, true);
 					this._isDirty = false;
 			}, this);
-		} else
-		{
+		} else {
 			var me = this;
+			// 	me.dataView.store.removeAll();
 			values.forEach(function(v){
 				var index = me.comboStore.find(me.valueField, v);
-				
-				if(index > -1) {
+				var dataViewIndex = me.dataView.store.find(me.valueField,v);
+				// Prevent double dataview rendering in certain edge cases
+				if(index > -1 && dataViewIndex === -1) {
 					me.dataView.store.add([me.comboStore.getAt(index)]);
 				}
 			});
@@ -229,17 +227,25 @@ go.form.Chips = Ext.extend(Ext.Container, {
 
 		return v;
 	},
-	markInvalid: function (msg) {		
+	markInvalid: function (msg) {
+
 		if(this.comboBox) {
-			this.comboBox.getEl().addClass('x-form-invalid');
+			this.comboBox.markInvalid(msg);
+			if(!this.comboBox.rendered && !this.markedInvalid) {
+				this.comboBox.on('afterrender', function() {
+					this.comboBox.markInvalid(msg);
+				}, this);
+			}
 		}
-		Ext.form.MessageTargets.qtip.mark(	this.comboBox, msg);
+
+		this.markedInvalid = msg;
 	},
 	clearInvalid: function () {
 		if(this.comboBox) {
-			this.comboBox.getEl().removeClass('x-form-invalid');
+			this.comboBox.clearInvalid();
 		}
-		Ext.form.MessageTargets.qtip.clear(this.comboBox);
+
+		this.markedInvalid = false;
 	},
 	createComboBox: function () {
 		if(this.store) {
@@ -289,7 +295,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			allowNew: this.allowNew
 		});		
 		
-		this.comboBox.on('select', function(combo, record, index) {
+		this.comboBox.on('select', function(combo, record) {
 			this.dataView.store.add([record]);
 			combo.reset();
 		}, this);
@@ -305,6 +311,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	
 	validate: function () {
 
+		if(this.disabled) {
+			return true;
+		}
+
 		if(!this.allowBlank && go.util.empty(this.getValue())) {
 			this.markInvalid(Ext.form.TextField.prototype.blankText);
 			return false;
@@ -312,8 +322,8 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		return true;
 	},
 
-	isValid: function (preventMark) {
-		return this.allowBlank || !go.util.empty(this.getValue());
+	isValid: function () {
+		return this.disabled || this.allowBlank || !go.util.empty(this.getValue());
 	}
 
 });

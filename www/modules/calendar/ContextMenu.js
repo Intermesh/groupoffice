@@ -150,20 +150,15 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 		}
 		
 		var deleteEnabled=false;
-//		if(isOrganizer){
-//			deleteEnabled=true;
-//		} else{ 
-//			deleteEnabled=!this.event.read_only;
-//		}
-		
 		if(this.event && isEvent && this.event.permission_level >= GO.permissionLevels.writeAndDelete){
-				deleteEnabled=true;
+			deleteEnabled=true;
 		}
-		
+
 		this.actionDelete.setDisabled(!deleteEnabled);
 		
-		if(this.actionAddTimeRegistration)
+		if(this.actionAddTimeRegistration) {
 			this.actionAddTimeRegistration.setDisabled(!event.event_id);
+		}
 	},
 	
 	showCreateMailDialog : function() {

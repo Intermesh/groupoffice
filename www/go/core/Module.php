@@ -3,13 +3,17 @@
 namespace go\core;
 
 use Exception;
+use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Utils;
 use go\core\exception\NotFound;
 use go\core\fs\File;
+use go\core\fs\FileSystemObject;
 use go\core\fs\Folder;
 use go\core\model;
 use go\core\jmap\Entity;
 use go\core\util\ClassFinder;
+use go\modules\business\license\exception\LicenseException;
+use go\modules\business\license\model\License;
 use function GO;
 
 /**
@@ -93,29 +97,31 @@ abstract class Module extends Singleton {
 	 */
 	public function isLicensed() {
 		
-		$lic = $this->requiredLicense();
-		if(!isset($lic)) {
+		$license = $this->requiredLicense();
+		if(!isset($license)) {
 			return true;
 		}
 
-		$file = go()->getEnvironment()->getInstallFolder()->getFile('licensechecks/'.$lic. '.php');
-
-		//Check if file is encoded
-		$data = $file->getContents(0, 100);
-		if(strpos($data, '<?php //004fb') === false) {	
-			return true;
-		}
-
-		if(!extension_loaded('ionCube Loader')) {
+		if(!go()->getEnvironment()->hasIoncube() && static::sourceIsEncoded()) {
 			return false;
 		}
 
-		if(!go()->getEnvironment()->getInstallFolder()->getFile($lic . '-' . substr(go()->getVersion(), 0, 3) .'-license.txt')->exists()) {
-			return false;
-		}
-
-		return require($file->getPath());
+		return License::has($license);
 		
+	}
+
+	private static function sourceIsEncoded() {
+
+		$isEncoded = go()->getCache()->get('source-is-encoded');
+
+		if($isEncoded === null) {
+			$isEncoded = ClassFinder::fileIsEncoded(new File(dirname(__DIR__) . '/modules/business/license/model/License.php'));
+			go()->getCache()->set('source-is-encoded', $isEncoded);
+		}
+
+		return $isEncoded;
+
+
 	}
 
 
@@ -127,20 +133,24 @@ abstract class Module extends Singleton {
 	 */
 	public final function install() {
 
-		try{
+		if(model\Module::findByName($this->getPackage(), $this->getName(), null)) {
+			throw new \Exception("This module has already been installed!");
+		}
 
-			if(model\Module::findByName($this->getPackage(), $this->getName(), null)) {
-				throw new \Exception("This module has already been installed!");
-			}
+		try{
 
 			go()->getDbConnection()->pauseTransactions();
 
 			self::installDependencies($this);
 
+			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+
 			$this->installDatabase();
 			go()->getDbConnection()->resumeTransactions();
 
-			go()->rebuildCache(true);
+			if(!Installer::isInstalling()) {
+				go()->rebuildCache(true);
+			}
 
 			go()->getDbConnection()->beginTransaction();
 		
@@ -221,8 +231,11 @@ abstract class Module extends Singleton {
 		if(!$model->save()) {
 			return false;
 		}
-		
-		go()->rebuildCache(true);
+
+		if(!Installer::isInstalling()) {
+			go()->rebuildCache(true);
+		}
+
 
 		if(!model\Module::delete(['name' => static::getName(), 'package' => static::getPackage()])) {
 			return false;
@@ -247,6 +260,9 @@ abstract class Module extends Singleton {
 		}
 		
 		$moduleModel = $this->getModel();
+		if(!$moduleModel) {
+			throw new Exception("Module not installed " . static::class);
+		}
 		foreach($entities as $entity) {
 			$type = $entity::entityType();
 			if(!$type) {
@@ -412,7 +428,7 @@ abstract class Module extends Singleton {
 			$manager = new $cls;
 
 			if(!$manager->isLicensed()) {
-				throw new Exception("Module $dependency is not licensed!");
+				throw new LicenseException("Module $dependency is not licensed!");
 			}
 
 			if(!in_array($manager, $resolved)) {
@@ -435,7 +451,7 @@ abstract class Module extends Singleton {
 			if (!$installed) {
 
 				if($dependency instanceof self) {
-					if (!$dependency->install()) {
+					if (!$dependency->isInstallable() || !$dependency->install()) {
 						throw new Exception("Could not install '" . get_class($dependency) . "'");
 					}
 				} else{
@@ -617,7 +633,7 @@ abstract class Module extends Singleton {
 	public function getModel() {
 
 		if(!$this->model) {
-			$this->model = model\Module::findByName($this->getPackage(), $this->getName());
+			$this->model = model\Module::findByName($this->getPackage(), $this->getName(), null);
 		}
 
 		return $this->model;
@@ -633,18 +649,19 @@ abstract class Module extends Singleton {
 	}
 
 	/**
-	 * Check if this module is installed, available and licensed
+	 * Check if this module is allowed via config.php and licensed.
+	 *
+	 * It does not check it's installed!
 	 * 
 	 * @return bool
 	 */
 	public function isAvailable() {
 
-		$model = $this->getModel();
-		if(!$model) {
+		if(!\GO\Base\ModuleCollection::isAllowed($this->getName(), $this->getPackage())) {
 			return false;
 		}
 
-		return $model->isAvailable();
+		return $this->isLicensed();
 	}
 	
 	/**
@@ -667,6 +684,15 @@ abstract class Module extends Singleton {
 		foreach($entities as $entity) {
 			echo "Checking " . $entity . "\n";
 			$entity::check();
+			echo "Done\n";
+		}
+	}
+
+	public function checkAcls() {
+		$entities = $this->getClassFinder()->findByParent(AclOwnerEntity::class);
+		foreach($entities as $entity) {
+			echo "Checking " . $entity . "\n";
+			$entity::checkAcls();
 			echo "Done\n";
 		}
 	}

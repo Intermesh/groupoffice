@@ -30,7 +30,11 @@ class Writer extends Reader{
 	 * @return int The length of the written string, or false on failure.
 	 */
 	public function putRecord($fields){
-		$this->setFP('a+');
+
+		if(!$this->fp) {
+			$this->setFP('a+');
+			fputs($this->fp, chr(239) . chr(187) . chr(191));
+		}
 //		foreach ($fields as $k => $field)
 //			$fields[$k] = str_replace(array($this->delimiter,$this->enclosure),array(' ',''),$field);
 

@@ -53,7 +53,7 @@ class Authenticator extends PrimaryAuthenticator {
 		return Server::find()
 						->join('ldapauth_server_domain', 'd', 's.id = d.serverId')
 						->where(['d.name' => $domain])
-						->orWhere(['d.name' => '*'])
+						//->orWhere(['d.name' => '*'])
 						->single();
 	}	
 	
@@ -67,8 +67,10 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		$connection = $server->connect();
+
+		$query = $server->getAuthenticationQuery($ldapUsername);
 		
-		$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $ldapUsername)->fetch();
+		$record = Record::find($connection, $server->peopleDN, $query)->fetch();
 		
 		if(!$record) {
 			return false;

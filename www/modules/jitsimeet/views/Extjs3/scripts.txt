@@ -1,0 +1,2 @@
+modules/jitsimeet/views/Extjs3/SystemSettingsPanel.js
+modules/jitsimeet/views/Extjs3/PluginCalendar.js

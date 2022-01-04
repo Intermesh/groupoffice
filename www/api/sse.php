@@ -17,7 +17,7 @@ require("../vendor/autoload.php");
 App::get()->setAuthState(new State());
 
 if(!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
-	http_response_code(403);
+	http_response_code(401);
 	exit("Unauthorized.");
 }
 
@@ -25,7 +25,7 @@ if(!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
 @session_write_close();
 
 //Check availability
-if(!go()->getConfig()['core']['general']['sseEnabled'] || (function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active())) {
+if(!go()->getConfig()['sseEnabled'] || (function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active())) {
 	// Service Unavailable
 	http_response_code(503);
 	echo "Server Sent Events not available";

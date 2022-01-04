@@ -15,6 +15,11 @@
 				]
 
 			},{
+			 xtype: 'checkbox',
+			 fieldLabel: t("Allow new"),
+			 name: "options.allowNew",
+			 value: true
+		 },{
 			 anchor: '100%',
 			 xtype: "chips",
 			 entityStore: "AddressBook",

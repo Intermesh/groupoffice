@@ -16,7 +16,7 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 		}, this);
 		
 		this.on("added", function() {
-			//manually register form fields
+			//manually register form fields for settings panel
 			this.formcontainer = this.findParentByType('formcontainer');
 			
 			if(this.formcontainer) {
@@ -88,6 +88,15 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 		return this.nameMenu;
 	},
 	focusNextEl : function() {
+
+		if(this.formcontainer) {
+			// in user settings
+			const fs = this.formcontainer.items.itemAt(0);
+			const jobTitle = fs.items.itemAt(1);
+			jobTitle.focus();
+			return;
+		}
+
 		var found = false;
 		var entityForm = this.findParentByType("entityform");
 		entityForm.form.items.each(function(item) {

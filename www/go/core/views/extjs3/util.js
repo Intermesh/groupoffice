@@ -7,6 +7,10 @@ go.print = function(tmpl, data) {
 
 };
 
+go.reload = function() {
+	window.location.replace(window.location.pathname);
+};
+
 go.Colors = [
 	'C62828', 'AD1457', '6A1B9A', '4527A0', '283593', '1565C0', '0277BD', '00838F',
 	'00695C', '2E7D32', '558B2F', '9E9D24', 'F9A825', 'FF8F00', 'EF6C00', '424242'];
@@ -20,6 +24,8 @@ go.util =  (function () {
 		clone: function(obj) {
 			return JSON.parse(JSON.stringify(obj));
 		},
+
+		isMobileOrTablet: GO.util.isMobileOrTablet,
 
 		/**
 		 * Grabs the first char of the first and last word.
@@ -262,48 +268,51 @@ go.util =  (function () {
 		openFileDialog: function(cfg) {
 			if (!this.uploadDialog) {
 				this.uploadDialog = document.createElement("input");
+				this.uploadDialog.style.display = "none";
 				this.uploadDialog.setAttribute("type", "file");
-				this.uploadDialog.onchange = function (e) {
-					
-					var uploadCount = this.files.length, blobs = [];
-					
-					if(!uploadCount) {
-						return;
-					}
-					
-					if(this.cfg.listeners.select) { 
-						this.cfg.listeners.select.call(this.cfg.listeners.scope||this, this.files); 
-					}
-					
-					if(!this.cfg.autoUpload) {						
-						return;
-					}
-					
-					for (var i = 0; i < this.files.length; i++) {
-						go.Jmap.upload(this.files[i], {
-							success: function(response, file) {
-								if(this.cfg.listeners.upload) {
-									this.cfg.listeners.upload.call(this.cfg.listeners.scope||this, response);
-								}
-								if(cfg.directory) {
-									var path = file.webkitRelativePath.split('/');
-									path.pop(); // filename
-									response.subfolder = path;
-								}
-								blobs.push(response);
-							},
-							callback: function(response) {
-								uploadCount--;
-								if(uploadCount === 0 && this.cfg.listeners.uploadComplete) {
-									this.cfg.listeners.uploadComplete.call(this.cfg.listeners.scope||this, blobs);
-								}
-							},
-							scope: this
-						});
-					}
-					
-					this.value = "";
-				};
+				this.uploadDialog.addEventListener("change", function (e) {
+						var uploadCount = this.files.length, blobs = [];
+
+						if(!uploadCount) {
+							return;
+						}
+
+						if(this.cfg.listeners.select) {
+							this.cfg.listeners.select.call(this.cfg.listeners.scope||this, this.files);
+						}
+
+						if(!this.cfg.autoUpload) {
+							return;
+						}
+
+						for (var i = 0; i < this.files.length; i++) {
+							go.Jmap.upload(this.files[i], {
+								success: function(response, file) {
+									if(this.cfg.listeners.upload) {
+										this.cfg.listeners.upload.call(this.cfg.listeners.scope||this, response);
+									}
+									if(this.cfg.directory) {
+										var path = file.webkitRelativePath.split('/');
+										path.pop(); // filename
+										response.subfolder = path;
+									}
+									blobs.push(response);
+								},
+								callback: function(response) {
+									uploadCount--;
+									if(uploadCount === 0 && this.cfg.listeners.uploadComplete) {
+										this.cfg.listeners.uploadComplete.call(this.cfg.listeners.scope||this, blobs);
+									}
+								},
+								scope: this
+							});
+						}
+
+						this.value = "";
+					});
+
+					// must be added to the DOM for iOS!
+					document.body.appendChild(this.uploadDialog);
 			}
 			this.uploadDialog.cfg = cfg;
 			this.uploadDialog.removeAttribute('webkitdirectory');
@@ -324,13 +333,43 @@ go.util =  (function () {
 			if(cfg.multiple) {
 				this.uploadDialog.setAttribute('multiple', true);
 			}
-			
+
+
 			this.uploadDialog.click();
 		},
 
 		viewFile : function(url) {
-			window.open(url);
+
+			// if(Ext.isSafari && window.navigator.standalone) {
+			// 	url = "filewrap.php?url=" + encodeURIComponent(url);
+			// }
+
+			const win = this.getDownloadTargetWindow();
+
+			if(!win) {
+				Ext.Msg.alert(t("Error"), t("Could not open a window. Please allow popup windows in your browser."))
+				return;
+			}
+			win.focus();
+			win.location.replace(url);
+
 		},
+
+		getDownloadTargetWindow : function() {
+			try {
+				if (!this.downloadTarget || this.downloadTarget.closed || this.downloadTarget.location.href != "about:blank") {
+					this.downloadTarget = window.open("about:blank", "_blank");
+				}
+			} catch(e) {
+				// for firefox complaining about Uncaught DOMException: Permission denied to access property Symbol.toPrimitive on cross-origin object
+				// even though it is the same origin !?
+				this.downloadTarget = window.open("about:blank", "_blank");
+			}
+
+			return this.downloadTarget;
+		},
+
+
 
 		/**
 		 * Download an URL
@@ -338,29 +377,19 @@ go.util =  (function () {
 		 * @param {string} url
 		 */
 		downloadFile: function(url) {
-			if(window.navigator.standalone) {
-				//somehow this is the only way a download works on a web application on the iphone.
-				var win = window.open( "about:blank", "_system");
-				win.focus();
-				win.location = url;
-			} else
-			{
-				// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
-				if(!downloadFrame) {
-					// downloadFrame = document.createElement('iframe');
-					// downloadFrame.id="downloader";
-					// downloadFrame.style.display = 'none';
-					// document.body.appendChild(downloadFrame);
-					var downloadFrame = document.createElement('a');
-					downloadFrame.target = '_blank';
-					downloadFrame.toggleAttribute("download");
 
-				}
-				//downloadFrame.src = url;
-				downloadFrame.href = url;
-				downloadFrame.click();
+			// for safari and firefox. The popup must be made befor any async requests
+			if(go.util.downloadTarget)
+				go.util.downloadTarget.close();
+
+			if(!downloadFrame) {
+				var downloadFrame = document.createElement('a');
+				downloadFrame.target = '_blank';
+				downloadFrame.toggleAttribute("download");
+
 			}
-
+			downloadFrame.href = url;
+			downloadFrame.click();
 		},
 		
 		textToHtml : function(text) {

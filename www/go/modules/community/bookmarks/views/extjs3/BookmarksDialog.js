@@ -15,7 +15,7 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 	entityStore: "Bookmark",
 	title: t("Bookmark"),
 	initFormItems: function () {
-		var thumbExample = null;
+
 		var items = [{
 			xtype: "fieldset",
 			items: [new go.modules.community.bookmarks.BookmarkCombo(), 
@@ -33,21 +33,7 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 				listeners:{
 					change: function(field,newValue, oldValue){
 						this.el.mask(t("Loading..."));
-
-						go.Jmap.request({
-							method: "community/bookmarks/Bookmark/description",
-							params: {
-								url: newValue
-							},
-							callback: function(options, success, result) {
-								this.websiteTitle.setValue(result.title);
-								this.websiteDescription.setValue(result.description);
-								thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(result.logo) + ')';
-								this.thumbField.setValue(result.logo);
-								this.el.unmask();								
-							},
-							scope: this
-						});
+						this.fetchPageInfo(newValue);
 					},
 					scope:this
 				}
@@ -67,12 +53,12 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 			this.thumbField = new Ext.form.Hidden({
 				name: 'logo',
 				setValue: function(value) {
-					thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(value) + ')';
+					this.nextSibling().getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(value) + ')';
 					Ext.form.Hidden.prototype.setValue.call(this, value);
 				}
 			}),
-			thumbExample = new Ext.Button({
-				fieldLabel: t("Logo"), 
+			this.thumbExample = new Ext.Button({
+				fieldLabel: t("Logo"),
 				dialog: this,
 				style: {
 					width:'32px',
@@ -83,14 +69,14 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 					border:'1px solid black'
 				},
 				listeners: {
-					click: function() {
+					click: function(me) {
 						go.util.openFileDialog({
 							multiple: false,
 							accept: "image/*",
 							autoUpload: true,
 							listeners: {
 								upload: function(response) {
-									thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(response.blobId) + ')';
+									me.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(response.blobId) + ')';
 									this.thumbField.setValue(response.blobId);
 								},
 								scope: this
@@ -123,5 +109,41 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 		},this)
 				
 		return items;
+	},
+
+	fetchPageInfo(newValue) {
+		// this will no longer work because the Content Security Policy will no longer allow requesting other domains
+		// fetch(newValue,{credentials: 'omit', mode: 'no-cors'}).then(response => response.text()).then(text => {
+		// 	let matches = text.match(/<head>(.*)<\/head>/i);
+		// 	// grab trimmed head
+		// 	const head = matches[0].replace("\r", '').replace("\n", ' ').replace(/<\/[\s]*([\w]*)[\s]*>/g, "</$1>");
+		//
+		// 	matches = head.match(/<title>(.*)<\/title>/i);
+		// 	this.websiteTitle.setValue(matches[1].trim());
+		//
+		// 	matches = head.match(/<meta name="description" content="([^"]+)">/i);
+		// 	this.websiteDescription.setValue(matches[1].trim());
+		//
+		// 	this.el.unmask();
+		// }).catch(rejected => {
+		// 	console.log(rejected);
+		// 	this.el.unmask();
+		// });
+
+		go.Jmap.request({
+			method: "community/bookmarks/Bookmark/description",
+			params: {
+				url: newValue
+			},
+			callback: function(options, success, result) {
+				this.websiteTitle.setValue(result.title);
+				this.websiteDescription.setValue(result.description);
+				this.thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(result.logo) + ')';
+				this.thumbField.setValue(result.logo);
+
+				this.el.unmask();
+			},
+			scope: this
+		});
 	}
 });

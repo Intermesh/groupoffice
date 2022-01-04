@@ -34,6 +34,17 @@ GO.email.AttachmentContextMenu = function(config)
 	config.items=[this.downloadButton];
 	if(GO.files && !config.removeSaveButton)
 	{
+		this.openWithButton = new Ext.menu.Item({
+			iconCls: 'ic-launch',
+			text: t("Open with", "files"),
+			handler: function(){
+				GO.files.openEmailAttachment(this.attachment,this.messagePanel, true);
+			},
+			scope: this
+		});
+		config.items.push(this.openWithButton);
+
+
 		this.saveButton = new Ext.menu.Item({
 					iconCls: 'ic-save',
 					text: t("Save to personal folder", "email"),

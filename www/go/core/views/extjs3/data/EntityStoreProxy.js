@@ -61,6 +61,20 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			}];
 			delete params.dir;
 		}
+
+		if(params.groupBy) {
+			if(!params.sort){
+				params.sort = [];
+			}
+
+			params.sort.unshift({
+				property: params.groupBy,
+				isAscending: params.groupDir == "ASC"
+			});
+
+			delete params.groupBy;
+			delete params.groupDir;
+		}
 		
 		var me = this;
 		var promise = this.entityStore.query(params);
@@ -69,6 +83,8 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		var clientCallId = promise.callId;
 
 		promise.then(function (response) {
+
+			me.store.hasMore = response.hasMore;
 
 			var getPromise = me.entityStore.get(response.ids).then(function(result) {
 
@@ -114,18 +130,6 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			//		try {
 			result = o.reader.readRecords(response);
 
-
-//		} catch (e) {
-//			// @deprecated: fire old loadexception for backwards-compat.
-//			// TODO remove
-//			this.fireEvent('loadexception', this, o, response, e);
-//			
-//			console.log(e);
-//
-//			this.fireEvent('exception', this, 'response', action, o, response, e);
-//			o.request.callback.call(o.request.scope, null, o.request.arg, false);
-//			return;
-//		}
 			if (result.success === false) {
 				// @deprecated: fire old loadexception for backwards-compat.
 				// TODO remove

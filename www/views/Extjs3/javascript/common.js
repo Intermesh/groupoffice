@@ -212,6 +212,18 @@ GO.url = function(relativeUrl, params){
  * exportVariables = {
  * varName: mixed
  * }
+ *
+ * GO.request({
+				url:'files/file/display',
+				maskEl:panel.ownerCt.getEl(),
+				params:{
+					id: panel.data.id
+				},
+				success:function(response, options, result){
+					GO.email.emailFiles(result.data, this);
+				},
+				scope: this
+			});
  * 
  */
 GO.request = function(config){

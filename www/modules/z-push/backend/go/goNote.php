@@ -100,7 +100,7 @@ class goNote extends GoBaseBackendDiff {
 
 		if(!$note) {
 			$note = new Note ();
-			$note->noteBookId = (new \go\core\db\Query)->selectSingleValue('noteBookId')->from('sync_user_note_book')->where(['userId' => go()->getUserId()])->orderBy(['isDefault' => 'DESC'])->single();
+			$note->noteBookId = $folderid;//(new \go\core\db\Query)->selectSingleValue('noteBookId')->from('sync_user_note_book')->where(['userId' => go()->getUserId()])->orderBy(['isDefault' => 'DESC'])->single();
 		}
 
 		if(!$note->hasPermissionLevel(Acl::LEVEL_WRITE)) {
@@ -116,7 +116,12 @@ class goNote extends GoBaseBackendDiff {
 			}
 		}
 
-		$note->name	= !empty($message->subject) ? $message->subject : StringUtil::cutString(strip_tags($note->content), 20);
+		if(!empty($message->subject))
+		{
+			$note->name	=  $message->subject;
+		} else if($note->isNew()) {
+			$note->name = StringUtil::cutString(strip_tags($note->content), 20);
+		}
 
 		$note->cutPropertiesToColumnLength();
 
@@ -164,8 +169,9 @@ class goNote extends GoBaseBackendDiff {
 		$query = Note::find()
 						->select('id,unix_timestamp(modifiedAt) AS `mod`, "1" AS `flags`')
 						->fetchMode(PDO::FETCH_ASSOC)
-						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
-						->where(['s.userId' => go()->getUserId(), 'password' => ""]);
+						->where('noteBookId', '=', $folderid);
+//						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
+//						->where(['s.userId' => go()->getUserId(), 'password' => ""]);
 //		ZLog::Write(LOGLEVEL_DEBUG, $query->debugQueryString);
 		$notes = $query->all();	
 		
@@ -184,7 +190,8 @@ class goNote extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
-		if ($id != BackendGoConfig::NOTESBACKENDFOLDER) {
+		$notebook = \go\modules\community\notes\model\NoteBook::findById($id);
+		if(!$notebook) {
 			ZLog::Write(LOGLEVEL_WARN, "Note folder '$id' not found");
 			return false;
 		}
@@ -192,7 +199,7 @@ class goNote extends GoBaseBackendDiff {
 		$folder = new SyncFolder();
 		$folder->serverid = $id;
 		$folder->parentid = "0";
-		$folder->displayname = 'Notes';
+		$folder->displayname = $notebook->name;
 		$folder->type = SYNC_FOLDER_TYPE_NOTE;
 
 		return $folder;
@@ -205,8 +212,18 @@ class goNote extends GoBaseBackendDiff {
 	 */
 	public function GetFolderList() {
 		$folders = array();
-		$folder = $this->StatFolder(BackendGoConfig::NOTESBACKENDFOLDER);
-		$folders[] = $folder;
+		$notebooks = \go\modules\community\notes\model\NoteBook::find()
+			->selectSingleValue('nb.id')
+			->join("sync_user_note_book", "u", "u.noteBookId = nb.id")
+			->andWhere('u.userId', '=', go()->getAuthState()->getUserId())
+			->filter([
+				"permissionLevel" => Acl::LEVEL_READ
+			])->all();
+
+		foreach($notebooks as $id) {
+			$folder = $this->StatFolder($id);
+			$folders[] = $folder;
+		}
 
 		return $folders;
 	}
@@ -217,12 +234,13 @@ class goNote extends GoBaseBackendDiff {
 		$record = Note::find()
 						->fetchMode(PDO::FETCH_ASSOC)
 						->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
-						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
-						->where(['s.userId' => go()->getUserId()])
+//						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
+//						->where(['s.userId' => go()->getUserId()])
+						->where('n.noteBookId','=',$folder)
 						->single();
 		
 		$newstate = 'M'.$record['modifiedAt'].':C'.$record['count'];
-		ZLog::Write(LOGLEVEL_DEBUG,'goNote->getNotification() State: '.$newstate);
+		ZLog::Write(LOGLEVEL_DEBUG,'goNote->getNotification('.$folder.') State: '.$newstate);
 
 		return $newstate;
 	}

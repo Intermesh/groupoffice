@@ -44,8 +44,11 @@ function cd($dir)
 
 class Builder
 {
+    public $test = false;
 
-	public $branch = "6.5";
+	private $majorVersion = "6.5";
+
+	private $gitBranch = '6.5.x';
 
 	/**
 	 *
@@ -63,7 +66,7 @@ class Builder
 	 *
 	 * @var int
 	 */
-	private $version;
+	private $minorVersion;
 	/**
 	 *
 	 * @var string groupoffice-6.3.8-php-70
@@ -121,46 +124,38 @@ class Builder
 	public function build()
 	{
 		$this->pullSource();
-		$this->version = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
+		$this->minorVersion = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
 
-		//$this->packageName = "groupoffice-" . $this->branch . "." . $this->version;
-
-//		if($this->branch != "master") {
-//			//	$this->tag();
-//		}
 
 		foreach ($this->variants as $options) {
 			$this->distro = $options['name'];
 
-			$this->packageName = "groupoffice-" . $this->branch . "." . $this->version . $options["archiveSuffix"];
+			$this->packageName = "groupoffice-" . $this->majorVersion . "." . $this->minorVersion . $options["archiveSuffix"];
 
 			$this->encoderOptions = $options['encoderOptions'];
 
-			$this->buildDir = __DIR__ . "/deploy/build/" . $this->branch . "/" . $options['name'];
+			$this->buildDir = __DIR__ . "/deploy/build/" . $this->majorVersion . "/" . $options['name'];
 
 			run("rm -rf " . $this->buildDir);
 			run("mkdir -p " . $this->buildDir);
 
-			$this->encodedDir = __DIR__ . "/deploy/encoded/" . $this->branch . "/" . $options['name'];
+			$this->encodedDir = __DIR__ . "/deploy/encoded/" . $this->majorVersion . "/" . $options['name'];
 
 			run("rm -rf " . $this->encodedDir);
 			run("mkdir -p " . $this->encodedDir);
 
 			$this->buildFromSource();
 
-			if ($this->branch == 'master') {
-				echo "Skipping SourceForge upload and Debian package because we're building master\n";
-			} else
-			{
-				$this->buildDebianPackage();
 
-//                $this->createGithubRelease();
+            $this->buildDebianPackage();
 
-				$this->addToDebianRepository();
+            if(!$this->test) {
+	            $this->createGithubRelease();
+	            $this->addToDebianRepository();
+	            $this->sendTarToSF();
+            }
 
-//				$this->sendTarToSF();
 
-			}
 		}
 	}
 
@@ -168,41 +163,33 @@ class Builder
 	{
 		run("mkdir -p " . $this->sourceDir);
 
-//		if (!is_dir($this->sourceDir . "/groupoffice")) {
-//			cd($this->sourceDir);
-//			run("git clone " . $this->communityRepos);
-//		}
-
 		cd(dirname(__DIR__));
 
-		$branch = $this->branch == 'master' ? $this->branch : $this->branch . '.x';
-//
 		run("git fetch");
-		run("git checkout " . $branch);
+		run("git checkout " . $this->gitBranch);
 		run("git pull");
 
 		cd($this->sourceDir);
 
 		if (!is_dir($this->sourceDir . "/promodules")) {
-			run("git clone " . $this->proRepos);
+			run("git clone " . $this->proRepos . " -b " .$this->gitBranch);
 		}
 
 		cd($this->sourceDir . "/promodules");
 
 		run("git fetch");
-		run("git checkout " . $branch);
+		run("git checkout " . $this->gitBranch);
 		run("git pull");
-
 
 		cd($this->sourceDir);
 		if (!is_dir($this->sourceDir . "/business")) {
-			run("git clone git@git.intermesh.nl:groupoffice/business.git");
+			run("git clone git@git.intermesh.nl:groupoffice/business.git -b " .$this->gitBranch);
 		}
 
 		cd($this->sourceDir . "/business");
 
 		run("git fetch");
-		run("git checkout " . $branch);
+		run("git checkout " . $this->gitBranch);
 		run("git pull");
 	}
 
@@ -217,7 +204,7 @@ class Builder
 		$sassFiles = run('find . -regex ".*/[^_]*\.scss"');
 
 		foreach ($sassFiles as $sassFile) {
-			run("sassc $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
+			run("sass --no-source-map $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
 		}
 
 		$this->encode();
@@ -231,30 +218,10 @@ class Builder
 	{
 		foreach ($this->proModules as $module) {
 			run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" --exclude "Site*Controller.php" ' .
-				'--copy "vendor/" --with-license groupoffice-pro-' . $this->branch . '-license.txt ' .
-				'--passphrase go' . $this->ioncubePassword . $this->branch . ' ' . $this->sourceDir . '/promodules/' . $module . ' ' .
+				'--copy "vendor/" ' . $this->sourceDir . '/promodules/' . $module . ' ' .
 				'--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
 		}
 
-		$documentsModules = ["workflow", "filesearch"];
-
-		foreach ($documentsModules as $module) {
-			run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' .
-				'--copy "vendor/" --with-license documents-' . $this->branch . '-license.txt ' .
-				'--passphrase do' . $this->ioncubePassword . $this->branch . ' ' . $this->sourceDir . '/promodules/' . $module . ' ' .
-				'--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
-		}
-
-
-        $module = 'billing';
-        run($this->encoder ." ". $this->encoderOptions. ' --replace-target --encode "*.inc" ' .
-            '--copy "vendor/" --with-license billing-' . $this->branch . '-license.txt ' .
-            '--passphrase bs'. $this->ioncubePassword . $this->branch . ' ' . $this->sourceDir . '/promodules/' . $module . ' ' .
-            '--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
-
-
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --license-check script ' . $this->sourceDir . '/promodules/professional ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
 
 		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' . $this->sourceDir . '/promodules/tickets/model ' .
 			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/');
@@ -268,30 +235,15 @@ class Builder
 			if (is_dir($this->sourceDir . '/promodules/' . $module . '/language')) {
 				run('cp ' . $this->sourceDir . '/promodules/' . $module . '/language/* ' . $this->buildDir . "/" . $this->packageName . '/modules/' . $module . '/language/');
 			}
-
-			if (is_dir($this->sourceDir . '/promodules/' . $module . '/install')) {
-				run('cp -r ' . $this->sourceDir . '/promodules/' . $module . '/install/* ' . $this->buildDir . "/" . $this->packageName . '/modules/' . $module . '/install/');
-			}
-
-			if (file_exists($this->sourceDir . '/promodules/' . $module . '/' . ucfirst($module) . 'Module.php')) {
-				run('cp ' . $this->sourceDir . '/promodules/' . $module . '/' . ucfirst($module) . 'Module.php ' . $this->buildDir . "/" . $this->packageName . '/modules/' . $module . '/');
-			}
 		}
 
-		run('cp ' . $this->sourceDir . '/promodules/professional/Module.php ' . $this->buildDir . "/" . $this->packageName . '/modules/professional');
 		run('cp ' . $this->sourceDir . '/promodules/projects2/report/* ' . $this->buildDir . "/" . $this->packageName . '/modules/projects2/report/');
 		run('cp ' . $this->sourceDir . '/promodules/billing/Pdf.php ' . $this->buildDir . "/" . $this->packageName . '/modules/billing/Pdf.php');
 
 
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' .
-			'--with-license groupoffice-pro-' . $this->branch . '-license.txt ' .
-			'--passphrase go' . $this->ioncubePassword . $this->branch . ' ' . dirname(__DIR__) . '/www/licensechecks/groupoffice-pro.php ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/licensechecks');
-
 		//business package
 		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' .
-			'--with-license groupoffice-pro-' . $this->branch . '-license.txt ' .
-			'--passphrase go' . $this->ioncubePassword . $this->branch . ' ' . $this->sourceDir . '/business ' .
+			$this->sourceDir . '/business ' .
 			'--into ' . $this->buildDir . "/" . $this->packageName . '/go/modules');
 
 		$businessDir = new DirectoryIterator($this->sourceDir . '/business');
@@ -306,14 +258,20 @@ class Builder
 
 			$moduleFile = $this->sourceDir . '/business/' . $moduleName . '/Module.php';
 
-			if (strpos(file_get_contents($moduleFile), "requiredLicense") === false) {
+			if (file_exists($moduleFile) && strpos(file_get_contents($moduleFile), "requiredLicense") === false) {
 				throw new Exception($moduleFile . " must contain a 'requiredLicense()' function override.");
 			}
 
-			run('cp ' . $moduleFile . ' ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/');
-			run('cp ' . $this->sourceDir . '/business/' . $moduleName . '/language/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/language/');
-			run('cp -r ' . $this->sourceDir . '/business/' . $moduleName . '/install/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/install/');
-		}
+	        if (is_dir($this->sourceDir . '/business/' . $moduleName . '/language')) {
+                run('cp ' . $this->sourceDir . '/business/' . $moduleName . '/language/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/language/');
+            }
+
+	        if (is_dir($this->sourceDir . '/business/' . $moduleName . '/install')) {
+                run('cp -r ' . $this->sourceDir . '/business/' . $moduleName . '/install/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/install/');
+            }
+
+	        //run ('cp ' . $moduleFile .' ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/');
+        }
 
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');
 
@@ -326,7 +284,7 @@ class Builder
 		cd($this->buildDir);
 
 
-		run("scp " . $this->packageName . ".tar.gz mschering@frs.sourceforge.net:/home/frs/project/group-office/$this->branch/");
+		run("scp " . $this->packageName . ".tar.gz mschering@frs.sourceforge.net:/home/frs/project/group-office/$this->majorVersion/");
 	}
 
 	private function createGithubRelease() {
@@ -338,14 +296,12 @@ class Builder
 		$client = new \Github\Client();
 		$client->authenticate($this->github['PERSONAL_ACCESS_TOKEN'], null, \Github\Client::AUTH_ACCESS_TOKEN);
 
-		$tagName = 'v' . $this->branch . "." . $this->version;
-		$branch = $this->branch . ".x";
+		$tagName = 'v' . $this->majorVersion . "." . $this->minorVersion;
 
 		$r = $client->api('repo')->releases();
 
-
 		if (!isset($this->githubRelease)) {
-			$this->githubRelease = $r->create($this->github['USERNAME'], $this->github['REPOSITORY'], array('tag_name' => $tagName, 'target_commitish' => $branch, 'body' => 'Use the php-70 tar.gz file for PHP 7.0 and the php-71 file for all newer versions of PHP. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'));
+			$this->githubRelease = $r->create($this->github['USERNAME'], $this->github['REPOSITORY'], array('tag_name' => $tagName, 'name'=> $tagName, 'target_commitish' => $this->gitBranch, 'body' => 'Use the ' . $this->packageName . '.tar.gz file for installations. It contains all the code, libraries and compiled code. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'));
 		}
 
 		$asset = $r->assets()->create(
@@ -358,19 +314,6 @@ class Builder
 		);
 
 	}
-
-
-//	private function tag() {
-//		cd($this->sourceDir . "/promodules");
-//
-//
-//		run("git tag -a v" . $this->branch . "." . $this->version . ' -m "Build v' . $this->branch . "." . $this->version . '"');
-//		run("git push --tags");
-//
-//		cd($this->sourceDir . "/groupoffice");
-//		run("git tag -a v" . $this->branch . "." . $this->version . ' -m "Build v' . $this->branch . "." . $this->version . '"');
-//		run("git push --tags");
-//	}
 
 	private function buildDebianPackage()
 	{
@@ -392,7 +335,7 @@ class Builder
 		run("mkdir " . $debTarget . "/etc/groupoffice");
 
 		file_put_contents($debTarget . '/debian/changelog', str_replace(
-			array('{package}', '{version}', '{date}'), array("groupoffice", $this->branch . '.' . $this->version, $date), $tpl
+			array('{package}', '{version}', '{date}'), array("groupoffice", $this->majorVersion . '.' . $this->minorVersion, $date), $tpl
 		));
 
 		run("cp -r " . $this->buildDir . "/" . $this->packageName . " " . $debTarget . "/usr/share/groupoffice");
@@ -408,7 +351,7 @@ class Builder
 			run("cp " . $this->sourceDir . "/debian-groupoffice/reprepro/distributions " . $this->repreproDir . "/conf");
 		}
 
-		run("reprepro -b " . $this->repreproDir . " include " . $this->distro . " " . $this->buildDir . "/groupoffice_" . $this->branch . "." . $this->version . "-" . $this->distro . "_amd64.changes");
+		run("reprepro -b " . $this->repreproDir . " include " . $this->distro . " " . $this->buildDir . "/groupoffice_" . $this->majorVersion . "." . $this->minorVersion . "-" . $this->distro . "_amd64.changes");
 	}
 
 }
@@ -416,8 +359,10 @@ class Builder
 
 $builder = new Builder($config);
 
-if (isset($argv[1])) {
-	$builder->branch = $argv[1];
+
+if (isset($argv[1]) && $argv[1] == "test") {
+	$builder->test = true;
 }
 
 $builder->build();
+

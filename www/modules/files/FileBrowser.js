@@ -125,8 +125,9 @@ GO.files.FileBrowser = function(config){
 			record.data['type_id']='d:'+e.data.node.id;
 			var selections = [record];
 		}
-
-		this.paste('cut', e.target.id, selections);
+		go.User.confirmOnMove ?
+			Ext.Msg.confirm(t('Confirm'), t('Are you sure you want to move the item(s)?'), function(btn) { if(btn == 'yes') this.paste('cut', e.target.id, selections);}, this) :
+			this.paste('cut', e.target.id, selections);
 	},
 	this);
 
@@ -170,7 +171,7 @@ GO.files.FileBrowser = function(config){
 
 
 	var fields ={
-		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date']
+		fields:['type_id', 'id','name','type', 'size', 'mtime', 'ctime', 'username','musername', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date']
 			.concat(go.customfields.CustomFields.getFieldDefinitions("File"))
 			.concat(go.customfields.CustomFields.getFieldDefinitions("Folder")),
 		columns:[{
@@ -192,6 +193,13 @@ GO.files.FileBrowser = function(config){
 			hidden:true,
 			width:100
 		},{
+			id:'path',
+			header:t("Path"),
+			dataIndex: 'path',
+			sortable:true,
+			hidden:true,
+			width:200
+		},{
 			id:'size',
 			header:t("Size"),
 			dataIndex: 'size',
@@ -206,6 +214,26 @@ GO.files.FileBrowser = function(config){
 			header:t("Modified at"),
 			dataIndex: 'mtime'
 			// width: dp(200)
+		},{
+			xtype: "datecolumn",
+			id:'ctime',
+			header:t("Created at"),
+			dataIndex: 'ctime'
+			// width: dp(200)
+		},{
+			id:'username',
+			header:t("Creator"),
+			dataIndex: 'username',
+			sortable:true,
+			hidden:true,
+			width:200
+		},{
+			id:'musername',
+			header:t("Modifier"),
+			dataIndex: 'musername',
+			sortable:true,
+			hidden:true,
+			width:200
 		}, {
 			id: 'id',
 			header: 'ID',
@@ -379,14 +407,19 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		text: t('Files', 'files'),
 		iconCls: 'ic-file-upload',
 		handler: function() {
+			let folder_id = this.folder_id;
 			go.util.openFileDialog({
 				multiple: true,
 				directory: false,
 				autoUpload: true,
 				listeners: {
 					uploadComplete: function(blobs) {
+						console.warn(folder_id);
 						blobs = this.transformBlobs(blobs);
-						this.sendOverwrite({upload:true,blobs:Ext.encode(blobs)});
+						this.sendOverwrite({
+							upload:true,
+							blobs:Ext.encode(blobs),
+							destination_folder_id: folder_id});
 					},
 					scope: this
 				}
@@ -400,6 +433,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		iconCls: 'ic-file-upload',
 		disabled: Ext.isIE,
 		handler: function() {
+			const folder_id = this.folder_id;
 			go.util.openFileDialog({
 				multiple: false,
 				directory: true,
@@ -407,7 +441,10 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 				listeners: {
 					uploadComplete: function(blobs){
 						blobs = this.transformBlobs(blobs);
-						this.sendOverwrite({upload:true,blobs:Ext.encode(blobs)});
+						this.sendOverwrite({
+							upload:true,
+							blobs:Ext.encode(blobs),
+							destination_folder_id: folder_id});
 					},
 					scope:this
 				}
@@ -676,7 +713,9 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	}, this);
 
 	this.thumbsPanel.on('drop', function(targetID, dragRecords){
-		this.paste('cut', targetID, dragRecords);
+		go.User.confirmOnMove ?
+			Ext.Msg.confirm(t('Confirm'), t('Are you sure you want to move the item(s)?'), function(btn) { if(btn == 'yes') this.paste('cut', targetID, dragRecords);}, this) :
+			this.paste('cut', targetID, dragRecords);
 	}, this);
 
 	this.cardPanel = new Ext.Panel({
@@ -716,10 +755,10 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	});
 
 	this.cardPanel.on('afterrender', function() {
-		GO.files.DnDFileUpload(function (blobs) {
+		GO.files.DnDFileUpload(function (blobs, folder_id) {
 			blobs = this.transformBlobs(blobs);
-			this.sendOverwrite({upload: true, blobs: Ext.encode(blobs)});
-		}.bind(this), this.cardPanel.body)();
+			this.sendOverwrite({upload: true, blobs: Ext.encode(blobs), destination_folder_id: folder_id});
+		}.bind(this), this.cardPanel.body)(this);
 	},this);
 
 	this.eastPanel = new Ext.Panel({
@@ -1622,7 +1661,9 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 						return false;
 					}
 				}
-				this.paste('cut', dropRecord.data.id, data.selections);
+				go.User.confirmOnMove ?
+					Ext.Msg.confirm(t('Confirm'), t('Are you sure you want to move the item(s)?'), function(btn) { if(btn == 'yes') this.paste('cut', dropRecord.data.id, data.selections);}, this) :
+					this.paste('cut', dropRecord.data.id, data.selections);
 			}
 		}else
 		{
@@ -1639,7 +1680,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	paste : function(pasteMode, destination, records)
 	{
-		// debugger;
 		var paste_sources = Array();
 		//var folderSelected = false;
 		for(var i=0;i<records.length;i++)
@@ -1934,6 +1974,10 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		this.fireEvent('beforeFolderIdSet');
 		  
 		this.folder_id = id;
+
+		if(this.dndUpload) {
+			this.dndUpload.folder_id = id;
+		}
 		//this.gridStore.baseParams['id']=this.thumbsStore.baseParams['id']=id;
 		if(forceReload || this.getActiveGridStore().baseParams['folder_id'] != id) {
 			
@@ -2104,12 +2148,55 @@ GO.request({
 	});
 }
 
+/**
+ * @example:
+ *
+ * {
+				id:this.records[0].data.id,
+				all:'1' //show all handlers instead of using the default
+			}
+ *
+ * @param config
+ */
 GO.files.openFile = function(config)
 {		
 	if(!GO.files.openFileWindow){
 		GO.files.openFileWindow =  new GO.files.OpenFileWindow();
 	}
 	GO.files.openFileWindow.show(config);
+}
+
+GO.files.openEmailAttachment = function(attachment, panel, choosehandler)
+{
+	Ext.getBody().mask(t("Loading..."));
+	var params = {
+		account_id: panel.account_id,
+		mailbox: panel.mailbox,
+		uid: panel.uid,
+		number: attachment.number,
+		uuencoded_partnumber: attachment.uuencoded_partnumber,
+		encoding: attachment.encoding,
+		type: attachment.type,
+		subtype: attachment.subtype,
+		filename: attachment.name,
+		charset: attachment.charset,
+		sender: panel.data.sender, //for gnupg and smime,
+		filepath: panel.data.path ? panel.data.path : ''
+	}
+	GO.request({
+		url: "files/file/saveAttachmentToTmp",
+		params: params,
+		callback: function() {
+			Ext.getBody().unmask();
+		},
+		success: function(response, options, result) {
+			Ext.getBody().unmask();
+			GO.files.openFile({
+				id: result.data.id,
+				all: choosehandler ? "1" : "0"
+			});
+		}
+	})
 }
 
 

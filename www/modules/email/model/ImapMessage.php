@@ -548,7 +548,7 @@ class ImapMessage extends ComposerMessage {
 			for($i=0,$max=count($inlineImages);$i<$max;$i++){
 				$body=str_replace('{inline_'.$i.'}', $inlineImages[$i], $body);
 			}
-			return $body;
+			return '<div class="msg">' . $body . '</div>';
 		} else {
 			if(empty($this->_plainBody)){
 				return $this->getHtmlBody(true,$noMaxBodySize);

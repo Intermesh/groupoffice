@@ -24,9 +24,13 @@ class Utils {
 			for ($i = 0, $c = count($queries); $i < $c; $i++) {
 				if(!empty($queries[$i])) {
 					if($verbose) {
-						echo "Executing SQL: " . $queries[$i] ."\n";
+						echo "Executing SQL: " . $queries[$i] . " - ";
 					}
-					App::get()->getDbConnection()->exec($queries[$i]);
+					$affected = App::get()->getDbConnection()->exec($queries[$i]);
+
+					if($verbose) {
+						echo $affected . " affected rows\n";
+					}
 				}
 			}
 		} catch (PDOException $e) {

@@ -1,3 +1,5 @@
+@use "sass:math";
+
 //--------------------------------------------------------------
 // 0. Density independent pixels
 //--------------------------------------------------------------
@@ -9,8 +11,9 @@ $font-scale: 1 !default;
 $resourcePath: './' !default;
 
 @function dp($width) {
-  @return (($width * $density) / 160) *1px;
+  @return math.div(($width * $density) , 160) * 1px;
 }
+
 @function sp($size) {
   @return ceil(dp($size) * $font-scale);
 }

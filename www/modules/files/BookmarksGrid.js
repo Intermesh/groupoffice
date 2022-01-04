@@ -9,7 +9,7 @@ GO.files.BookmarksGrid = function(config) {
 	config.split = true;
 	config.paging = false;
 	config.cls = 'go-grid3-hide-headers';
-	config.height = 200;
+	config.autoHeight = true;
 	config.store = new GO.data.JsonStore({
 		url:GO.url("files/bookmark/store"),
 		id: 'folder_id',

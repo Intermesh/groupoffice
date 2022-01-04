@@ -95,7 +95,6 @@ GO.files.ImageViewer = Ext.extend(go.Window, {
 				win.document.open();
 				win.document.write(PrintHtml(this.viewerImages[this.currentImgIndex].src, this.viewerImages[this.currentImgIndex].name));
 				win.document.close();
-				win.onbeforeunload = closePrint;
 				win.onafterprint = closePrint;
 			
 			},

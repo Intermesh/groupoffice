@@ -13,9 +13,12 @@ use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\Relation;
 use go\core\util\DateTime as GoDateTime;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet as PhpSpreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
 use Sabre\VObject\Property\VCard\DateTime;
@@ -113,6 +116,9 @@ class Spreadsheet extends AbstractConverter {
 		$this->delimiter = $user->listSeparator;
 		$this->enclosure = $user->textSeparator;
 
+		//try to set high memory limit as phpoffice likes to eat RAM
+		go()->getEnvironment()->setMemoryLimit("2G");
+
 
 		static::fireEvent(static::EVENT_INIT, $this);
 	}
@@ -125,14 +131,23 @@ class Spreadsheet extends AbstractConverter {
 		if($this->extension != 'csv') {
 			$this->spreadsheet = new PhpSpreadsheet();
 			$this->spreadSheetIndex = 1;
+		}else{
+			//add UTF-8 BOM char for excel to recognize UTF-8 in the CSV
+			fputs($this->fp, chr(239) . chr(187) . chr(191));
 		}
 	}
 
 
 	protected function arrayToSpreadSheet($index, $array) {
 		for($colIndex = 0, $count = count($array);$colIndex < $count; $colIndex++) {
+			$v = $array[$colIndex];
 			//add 1 to index for headers
-			$this->spreadsheet->getActiveSheet()->setCellValueByColumnAndRow($colIndex + 1, $index, $array[$colIndex]);
+			if(is_string($v) && isset($v[0]) && $v[0] == '=') {
+				//prevent formula detection
+				$this->spreadsheet->getActiveSheet()->setCellValueExplicitByColumnAndRow($colIndex + 1, $index, $v, DataType::TYPE_STRING);
+			} else {
+				$this->spreadsheet->getActiveSheet()->setCellValueByColumnAndRow($colIndex + 1, $index, $v);
+			}
 		}
 	}
 
@@ -190,6 +205,7 @@ class Spreadsheet extends AbstractConverter {
 			}
 
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
+			$writer->setPreCalculateFormulas(false);
 			$writer->save($this->tempFile->getPath());
 
 		}
@@ -537,8 +553,8 @@ class Spreadsheet extends AbstractConverter {
 			$this->spreadsheetRowIterator = $this->spreadsheet->getActiveSheet()->getRowIterator();
 		}
 
-		if(isset($params['updateBy'])) {
-			$this->updateBy = $params['updateBy'];
+		if(isset($this->clientParams['updateBy'])) {
+			$this->updateBy = $this->clientParams['updateBy'];
 		}
 	}
 
@@ -575,7 +591,13 @@ class Spreadsheet extends AbstractConverter {
 			$cellIterator->setIterateOnlyExistingCells(FALSE); // This loops through all cells,
 			$cells = [];
 			foreach ($cellIterator as $cell) {
-				$cells[] = $cell->getValue();
+				if(\PhpOffice\PhpSpreadsheet\Shared\Date::isDateTime($cell)) {
+					$v = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($cell->getValue());
+				} else{
+					$v = $cell->getValue();
+				}
+
+				$cells[] = $v;
 			}
 			return $cells;
 		} else{
@@ -712,6 +734,7 @@ class Spreadsheet extends AbstractConverter {
 					$item = $this->convertRecordToProperties($record, $map, $c['properties'] ?? []);
 					if($item) {
 						$v[$propName] = $item;
+						$hasCsvData = true;
 					}
 				}
 			}else {

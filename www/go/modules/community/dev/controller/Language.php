@@ -2,6 +2,7 @@
 
 namespace go\modules\community\dev	\controller;
 
+use go\core\cache\None;
 use go\core\Controller;
 use go\core\Environment;
 use go\core\fs\Blob;
@@ -26,14 +27,18 @@ class Language extends Controller {
 	}
 
 	public function export($params) {
+
+		go()->getLanguage()->initExport();
 		go()->getLanguage()->setLanguage($params['language']);
 
 //for checking arrays() in english translation
 		$this->en = new LangModel();
+		$this->en->initExport();
 		$this->en->setLanguage("en");
 
 //to check if intermesh has defined it as a core translation
 		$this->nl = new LangModel();
+		$this->nl->initExport();
 		$this->nl->setLanguage("nl");
 
 		$rootFolder = Environment::get()->getInstallFolder();
@@ -44,6 +49,9 @@ class Language extends Controller {
 		$csvFile = File::tempFile('csv');
 
 		$this->handle = $csvFile->open('w+');
+
+		//add UTF-8 BOM char for excel to recognize UTF-8 in the CSV
+		fputs($this->handle, chr(239) . chr(187) . chr(191));
 
 		fputcsv($this->handle, [
 				"package",
@@ -66,7 +74,7 @@ class Language extends Controller {
 		foreach ($packageFolders as $packageFolder) {
 			foreach ($packageFolder->getFolders() as $moduleFolder) {
 				
-				if(!$moduleFolder->exists()){
+				if($moduleFolder->isLink() && !$moduleFolder->getLinkTarget()){
 					//broken symlink
 					continue;
 				}

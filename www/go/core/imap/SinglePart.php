@@ -222,10 +222,6 @@ class SinglePart extends Part{
 			
 			if ($this->subtype == 'plain') {				
 				$body = StringUtil::textToHtml($body);
-			}else
-			{
-				$body = StringUtil::sanitizeHtml($body);
-				$body = StringUtil::convertLinks($body);
 			}
 		}else if($this->type=='image')
 		{

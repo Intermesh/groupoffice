@@ -1,6 +1,6 @@
 
 go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
-	
+	autoScroll: true,
 	afterRender: function() {
 		go.systemsettings.Panel.superclass.afterRender.call(this);
 		
@@ -57,3 +57,5 @@ go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
 
 	
 });
+
+Ext.reg("systemsettingspanel", go.systemsettings.Panel );

@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `pa_aliases` (
   `mtime` int(11) NOT NULL default '0',
   `active` enum('0','1') NOT NULL default '1',
   PRIMARY KEY  (`id`),
-  KEY `address` (`address`),
+  unique `address` (`address`),
   KEY `domain_id` (`domain_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Postfix Admin - Virtual Aliases';
 
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `pa_domains` (
   `active` BOOLEAN NOT NULL DEFAULT '1',
   `acl_id` int(11) NOT NULL,
   PRIMARY KEY  (`id`),
-  KEY `domain` (`domain`)
+  unique `domain` (`domain`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Postfix Admin - Virtual Domains';
 
 
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `pa_mailboxes` (
   `active` BOOLEAN NOT NULL DEFAULT '1',
   `usage` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
-  KEY `username` (`username`),
+  unique `username` (`username`),
   KEY `go_installation_id` (`go_installation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Postfix Admin - Virtual Mailboxes';
 

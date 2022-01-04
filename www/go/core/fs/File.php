@@ -355,6 +355,11 @@ class File extends FileSystemObject {
 					$r->setETag($this->getMd5Hash());
 				}
 				$r->abortIfCached();
+			} else{
+				$r->setHeader('Cache-Control','no-cache, must-revalidate, post-check=0, pre-check=0'); //prevent caching
+				$r->setHeader('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT'); //resolves problem with IE GET requests
+				$r->setHeader('Pragma', 'no-cache');
+				$r->removeHeader('Last-Modified');
 			}
 		}		
 		

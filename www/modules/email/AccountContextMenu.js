@@ -1,9 +1,13 @@
 GO.email.AccountContextMenu = Ext.extend(Ext.menu.Menu,{
 
+	node: null,
+
 	setNode : function(node){
 		this.addFolderButton.setDisabled(node.attributes.noinferiors);
 		// Disable the properties menu item when you have no manage permission
 		this.propertiesBtn.setDisabled((node.attributes.permission_level < GO.permissionLevels.manage));
+
+		this.node = node;
 	},
 	initComponent : function(){
 		
@@ -16,8 +20,7 @@ GO.email.AccountContextMenu = Ext.extend(Ext.menu.Menu,{
 				Ext.MessageBox.prompt(t("Name"), t("Enter the folder name:", "email"), function(button, text){
 					if(button=='ok')
 					{
-						var sm = this.treePanel.getSelectionModel();
-						var node = sm.getSelectedNode();
+						const node = this.node;
 				
 						GO.request({
 							url: "email/folder/create",
@@ -48,8 +51,7 @@ GO.email.AccountContextMenu = Ext.extend(Ext.menu.Menu,{
 				if (!this.foldersDialog) {
 					this.foldersDialog = new GO.email.FoldersDialog();
 				}
-				var sm = this.treePanel.getSelectionModel();
-				var node = sm.getSelectedNode();
+				const node = this.node;
 				this.foldersDialog.show(node.attributes.account_id);
 			}
 		},
@@ -57,8 +59,7 @@ GO.email.AccountContextMenu = Ext.extend(Ext.menu.Menu,{
 			iconCls: 'btn-edit',
 			text: t("Properties"),
 			handler:function(a,b){
-				var sm = this.treePanel.getSelectionModel();
-				var node = sm.getSelectedNode();
+				const node = this.node;
 
 				if(!this.accountDialog){
 					this.accountDialog = new GO.email.AccountDialog();

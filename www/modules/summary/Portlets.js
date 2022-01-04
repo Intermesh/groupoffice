@@ -13,13 +13,14 @@
 GO.summary.portlets=[];
 
 GO.mainLayout.onReady(function(){
-	var rssTabPanel = new Ext.TabPanel({doLayoutOnTabChange:true});
+	var rssTabPanel = new Ext.TabPanel({doLayoutOnTabChange:true, autoHeight: true});
 	
 	GO.summary.portlets['portlet-rss-reader']=new GO.summary.Portlet({
 		id: 'portlet-rss-reader',
 		//iconCls: 'rss-icon',
 		title: t("News", "summary"),
-		layout:'fit',
+		autoHeight: true,
+
 		tools: [{
 			id: 'gear',
 			handler: function(){
@@ -49,12 +50,19 @@ GO.mainLayout.onReady(function(){
 									url: GO.url('summary/rssFeed/saveFeeds'),
 									params: params,
 									callback: function(options, success, response){
+
 										if(!success)
 										{
 											Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
 										}else
 										{
 											var responseParams = Ext.decode(response.responseText);
+
+											if(!responseParams.success) {
+												Ext.MessageBox.alert(t("Error"), responseParams.feedback);
+												return;
+											}
+
 											this.WebFeedsGrid.store.reload();
 											this.manageWebFeedsWindow.hide();
 											rssTabPanel.items.each(function(p){ // Walk through tabs
@@ -76,6 +84,7 @@ GO.mainLayout.onReady(function(){
 												if(i != 'remove')
 												{
 													rssTabPanel.add(new GO.portlets.rssFeedPortlet({
+														autoHeight: true,
 														feed_id: responseParams.data[i].id,
 														feed: responseParams.data[i].url,
 														title: responseParams.data[i].title,
@@ -121,8 +130,7 @@ GO.mainLayout.onReady(function(){
 				panel.removePortlet();
 			}
 		}],
-		items: rssTabPanel,
-		height:300
+		items: rssTabPanel
 	});
 
 	GO.summary.portlets['portlet-rss-reader'].on('render',function(){
@@ -152,6 +160,8 @@ GO.mainLayout.onReady(function(){
 					{
 						for(var i=0;i<rssTabPanels.results.length;i++){
 							rssTabPanel.add(new GO.portlets.rssFeedPortlet({
+								autoHeight: true,
+								style:'max-height: 600px;overflow-y:auto;overflow-x: hidden',
 								feed_id: rssTabPanels.results[i].id,
 								feed: rssTabPanels.results[i].url,
 								title: rssTabPanels.results[i].title,

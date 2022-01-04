@@ -51,7 +51,7 @@ class Message extends \Swift_Message{
 		parent::__construct($subject, $body, $contentType, $charset);
 
     $headers = $this->getHeaders();
-    $headers->addTextHeader("X-Group-Office-Title", go()->getSettings()->title);
+    $headers->addTextHeader("X-Mailer", "Group-Office (" . go()->getVersion() . ")");
 
 		// See Mailer.php at line 105 for header encoding
 		if(GO::config()->swift_email_body_force_to_base64) {
@@ -132,25 +132,6 @@ class Message extends \Swift_Message{
 		if(!empty($structure->headers['subject'])){
 			$this->setSubject($structure->headers['subject']);
 		}
-		
-		if(isset($structure->headers['disposition-notification-to']))
-		{
-			//$mail->ConfirmReadingTo = $structure->headers['disposition-notification-to'];
-		}
-		
-		
-		//fix for [20150125 05:43:24] PHP Warning: strpos() expects parameter 1 to be string, array given in /usr/share/groupoffice/go/base/mail/Message.php on line 105
-		if(isset($structure->headers['to']) && is_array($structure->headers['to'])){
-			$structure->headers['to'] = implode(',', $structure->headers['to']);
-		}
-		
-		if(isset($structure->headers['cc']) && is_array($structure->headers['cc'])){
-			$structure->headers['cc'] = implode(',', $structure->headers['cc']);
-		}
-		
-		if(isset($structure->headers['bcc']) && is_array($structure->headers['bcc'])){
-			$structure->headers['bcc'] = implode(',', $structure->headers['bcc']);
-		}
 
 		$to = isset($structure->headers['to']) && strpos($structure->headers['to'],'undisclosed')===false ? $structure->headers['to'] : '';
 		$cc = isset($structure->headers['cc']) && strpos($structure->headers['cc'],'undisclosed')===false ? $structure->headers['cc'] : '';
@@ -162,7 +143,7 @@ class Message extends \Swift_Message{
 		$bcc = str_replace('mailto:','', $bcc);
 	
 		$toList = new EmailRecipients($to);
-		$to =$toList->getAddresses();
+		$to = $toList->getAddresses();
 		foreach($to as $email=>$personal){
 			try{
 				$this->addTo($email, $personal);
@@ -191,8 +172,8 @@ class Message extends \Swift_Message{
 			}
 		}
 
-		if(isset($structure->headers['from'])){
-			
+		if(isset($structure->headers['from'])) {
+
 			$fromList = new EmailRecipients(str_replace('mailto:','',$structure->headers['from']));
 			$from =$fromList->getAddress();
 		
@@ -259,8 +240,9 @@ class Message extends \Swift_Message{
 		$this->setBody($htmlBody, 'text/html','UTF-8');
 			
 		//add text version of the HTML body
-		$htmlToText = new \GO\Base\Util\Html2Text($htmlBody);
-		$part= $this->addPart($htmlToText->get_text(), 'text/plain','UTF-8');
+		$htmlToText = new \GO\Base\Util\Html2Text(str_replace('<div><br></div>', '<br>', $htmlBody));
+		$plainText = $htmlToText->get_text();
+		$part= $this->addPart($plainText, 'text/plain','UTF-8');
 		
 		
 		//Override qupted-prinatble encdoding with base64 because it uses much less memory on larger bodies. See also:
@@ -323,6 +305,10 @@ class Message extends \Swift_Message{
 	
 	private function _getParts($structure, $part_number_prefix='')
 	{
+		// Apple sends contentID's that SwiftMailer doesn't like. So we replace them with new onces but we have to replace
+		// this in the body too.
+
+		$cidReplacements = [];
 		if (isset($structure->parts))
 		{
 			//$part_number=0;
@@ -378,20 +364,24 @@ class Message extends \Swift_Message{
             $part->ctype_secondary = 'plain';
           }
 
-					$mime_type = $part->ctype_primary.'/'.$part->ctype_secondary;
+					$mime_type = $this->buildContentType($part);
 
           //only embed if we can find the content-id in the body
 					if(isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && strpos($this->_loadedBody, $content_id) !== false)
 					{
 						$img = new \Swift_EmbeddedFile($part->body, $filename, $mime_type);
 						$img->setContentType($mime_type);
-						
+
 						//Only set valid ID's. Iphone sends invalid content ID's sometimes.
 						if (preg_match('/^.+@.+$/D',$content_id))
 						{
 							$img->setId($content_id);
+							$this->embed($img);
+						} else{
+							$this->embed($img);
+							$cidReplacements[$content_id] = $img->getId();
 						}
-						$this->embed($img);
+
 					}else
 					{
 						$attachment = new \Swift_Attachment($part->body, $filename,$mime_type);
@@ -420,6 +410,24 @@ class Message extends \Swift_Message{
 			}
 			$this->_loadedBody .= $text_part;
 		}
+
+		foreach($cidReplacements as $old => $new) {
+			$this->_loadedBody = str_replace($old, $new, $this->_loadedBody);
+		}
+	}
+
+	private function buildContentType($part) {
+		$mime_type = $part->ctype_primary.'/'.$part->ctype_secondary;
+		if(!empty($part->ctype_parameters)) {
+			foreach ($part->ctype_parameters as $name => $value) {
+				if ($name == 'name') {
+					continue;
+				}
+				$mime_type .= ';' . $name . '=' . $value;
+			}
+		}
+
+		return $mime_type;
 	}
 	
 	private function _hasHtmlPart($structure){
@@ -626,6 +634,9 @@ class Message extends \Swift_Message{
 					$file = \Swift_Attachment::fromPath($tmpFile->path());
 					$file->setContentType($tmpFile->mimeType());
 					$file->setFilename($att->fileName);
+					if($tmpFile->mimeType() == "message/rfc822") {
+						$file->setEncoder(new \Swift_Mime_ContentEncoder_PlainContentEncoder("7bit"));
+					}
 					$this->attach($file);
 					
 					//$tmpFile->delete();

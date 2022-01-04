@@ -19,7 +19,7 @@ go.customfields.type.EncryptedText = Ext.extend(go.customfields.type.Text, {
 				this.valueCmp.on("render", function() {
 					this.valueCmp.getEl().on("click", function() {
 						go.util.copyTextToClipboard(this.value);
-						go.Notifier.flyout({html: t("Value copied to clipboard"), time: 2000});
+						go.Notifier.flyout({description: t("Value copied to clipboard"), time: 2000});
 					}, this);
 				}, this);
 			},

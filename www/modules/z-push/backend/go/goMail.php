@@ -114,12 +114,9 @@ class goMail extends GoBaseBackendDiff {
 
 			$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentparameters->GetBodyPreference(), array(SYNC_BODYPREFERENCE_MIME, SYNC_BODYPREFERENCE_PLAIN, SYNC_BODYPREFERENCE_HTML));		
 			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetMessage::bpReturnType = '.$bpReturnType);
-			
 
 			 if (Request::GetProtocolVersion() >= 12.0) {
-				 
 
-				 
 				$message->asbody = new SyncBaseBody();
 				$asBodyData = null;
 				switch ($bpReturnType) {
@@ -140,8 +137,8 @@ class goMail extends GoBaseBackendDiff {
 							ZLog::Write(LOGLEVEL_DEBUG, 'Recreating MIME source');
 							
 							try{
-							$sendMessage = \GO\Base\Mail\Message::newInstance()->loadMimeMessage($source, true);
-							$asBodyData = $sendMessage->toString();
+								$sendMessage = \GO\Base\Mail\Message::newInstance()->loadMimeMessage($source, true);
+								$asBodyData = $sendMessage->toString();
 							} catch (Exception $e){
 								ZLog::Write(LOGLEVEL_ERROR, "Failed to recreate mime source. Falling back to original mime. Subject: ".$imapMessage->subject." Exception: ".$e->getMessage());
 								$asBodyData = $source;
@@ -165,9 +162,9 @@ class goMail extends GoBaseBackendDiff {
 				 //Attachments probably need to be sent even with MIME type:
 				 //http://talk.sonymobile.com/t5/Xperia-Z1-Compact/Z1-Compact-Problem-With-EAS/m-p/866755#11220
 				 //zpush_always_send_attachments config setting is for testing this carefully.
-				 if($bpReturnType!=SYNC_BODYPREFERENCE_MIME || !empty(\GO::config()->zpush_always_send_attachments)){
+//				 if($bpReturnType!=SYNC_BODYPREFERENCE_MIME || !empty(\GO::config()->zpush_always_send_attachments)){
 					 $message->asattachments = $this->_getASAttachments($imapMessage,$id,$mailbox, $bpReturnType != SYNC_BODYPREFERENCE_PLAIN ? $asBodyData : null);
-				 }
+//				 }
 
 				// truncate body, if requested
 				//MS: Not sure if !empty($truncsize) is needed here. Testing for Robert S.
@@ -1171,10 +1168,9 @@ class goMail extends GoBaseBackendDiff {
 			if ($status) {
 				$state = "M:" . $status['messages'] . "-U:" . $status['unseen'];
 			}
-			
-			
-			ZLog::Write(LOGLEVEL_DEBUG,'State: '.$state);
-			
+
+			ZLog::Write(LOGLEVEL_DEBUG,'goMail->getNotification('.$f.') State: '.$state);
+
 			//disconnect from imap because otherwise we may exceed the max number of connections
 			$imap->disconnect();
 		}

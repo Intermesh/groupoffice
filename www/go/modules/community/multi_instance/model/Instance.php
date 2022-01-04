@@ -2,17 +2,26 @@
 namespace go\modules\community\multi_instance\model;
 
 use Exception;
+use GO\Base\ModuleCollection;
+use go\core\db\Connection;
 use go\core\db\Criteria;
+use go\core\db\Utils;
 use go\core\ErrorHandler;
+use go\core\exception\ConfigurationException;
 use go\core\fs\File;
+use go\core\fs\Folder;
 use go\core\http\Client;
 use go\core\http\Request;
 use go\core\jmap\Entity;
+use go\core\Module;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
-use go\modules\community\multi_instance\Module;
 use function GO;
+use GO;
+use GO\Base\Module as BaseModule;
 
 class Instance extends Entity {
 	
@@ -68,17 +77,19 @@ class Instance extends Entity {
 	
 	protected $welcomeMessage;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable('multi_instance_instance');
 	}
 
-	protected static function textFilterColumns()
+	protected static function textFilterColumns(): array
 	{
 		return ['hostname', 'adminEmail', 'adminDisplayName'];
 	}
 
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 			->add('enabled', function(Criteria $c, $value){
 				$c->andWhere(['enabled' => $value]);
@@ -96,8 +107,10 @@ class Instance extends Entity {
 		return substr($this->version, 0, strrpos($this->version, '.'));
 	}
 
-	
-	
+
+	/**
+	 * @throws Exception
+	 */
 	protected function init() {
 		parent::init();
 		
@@ -107,7 +120,7 @@ class Instance extends Entity {
 				$this->getInstanceDbData();
 				
 				if($this->isModified() && !$this->save()) {
-					throw new \Exception("Could not save instance data! ". var_export($this->getValidationErrors(), true));
+					throw new Exception("Could not save instance data! ". var_export($this->getValidationErrors(), true));
 				}
 			}
 		}
@@ -122,7 +135,7 @@ class Instance extends Entity {
 				$this->setValidationError('hostname', ErrorCode::REQUIRED, 'The hostname field is required');
 			}
 
-			if(!preg_match('/^[a-z0-9-_\.]*$/', $this->hostname)) {
+			if(!preg_match('/^[a-z0-9-_.]*$/', $this->hostname)) {
 				$this->setValidationError('hostname', ErrorCode::MALFORMED, 'The hostname was malformed');
 			}
 
@@ -130,7 +143,7 @@ class Instance extends Entity {
 				$this->setValidationError('hostname', ErrorCode::UNIQUE, 'This hostname is not available (Database exists).');
 			}
 
-			if(\go\core\db\Utils::databaseExists($this->getDbName())) {
+			if(Utils::databaseExists($this->getDbName())) {
 				$this->setValidationError('hostname', ErrorCode::UNIQUE, 'This hostname is not available (Database exists).');
 			}
 
@@ -161,26 +174,39 @@ class Instance extends Entity {
 			}
 		}
 		
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
-	
+
 	/**
 	 * Get configuration file
 	 * @return File
+	 * @throws Exception
 	 */
-	public function getConfigFile() {
+	public function getConfigFile(): File
+	{
 		return new File('/etc/groupoffice/multi_instance/' . $this->hostname . '/config.php');
 	}
-	
-	private function getDataFolder() {
+
+	/**
+	 * @throws Exception
+	 */
+	private function getDataFolder(): Folder
+	{
 		return go()->getDataFolder()->getFolder('multi_instance/' . $this->hostname);
 	}
-	
-	private function getTrashFolder() {
+
+	/**
+	 * @throws Exception
+	 */
+	public static function getTrashFolder() {
 		return go()->getDataFolder()->getFolder('multi_instance/_trash_')->create();
 	}
-	
-	private function getTempFolder() {
+
+	/**
+	 * @throws ConfigurationException
+	 */
+	private function getTempFolder(): Folder
+	{
 		return go()->getTmpFolder()->getFolder('multi_instance/' . $this->hostname);
 	}
 	
@@ -196,7 +222,8 @@ class Instance extends Entity {
 		return substr($this->getDbName(), 0, 16);
 	}
 	
-	protected function internalSave() {		
+	protected function internalSave(): bool
+	{
 		
 		if(!parent::internalSave()) {
 			return false;
@@ -211,7 +238,7 @@ class Instance extends Entity {
 		$globalConfig = $this->getGlobalConfig();
 		$mergedConfig = array_merge($globalConfig, $instanceConfig);
 
-		$studioAllowed = \GO\Base\ModuleCollection::isAllowed("studio", "business", $mergedConfig['allowed_modules'] ?? []);
+		$studioAllowed = ModuleCollection::isAllowed("studio", "business", $mergedConfig['allowed_modules'] ?? []);
 
 		if($studioAllowed) {
 			if(!$this->getModulePackageFolder()->create()) {
@@ -219,7 +246,7 @@ class Instance extends Entity {
 			}
 		} else{
 			if($this->getModulePackageFolder()->exists() && $this->getModulePackageFolder()->isEmpty()) {
-				//$this->getModulePackageFolder()->delete();
+				$this->getModulePackageFolder()->delete();
 			}
 		}
 		
@@ -228,6 +255,7 @@ class Instance extends Entity {
 			$instanceConfig['max_users'] = $this->usersMax;
 			$instanceConfig['enabled'] = $this->enabled;
 			$this->setInstanceConfig($instanceConfig);
+			$this->writeConfig();
 		}
 		
 		//$this->createWelcomeMessage();
@@ -247,7 +275,10 @@ class Instance extends Entity {
 		
 		$this->save();
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function copySystemSettings() {
 		$core = go()->getSettings()->toArray();
 
@@ -290,8 +321,11 @@ class Instance extends Entity {
 			$this->getInstanceDbConnection()
 							->replace('core_setting', ['name' => $name, 'value' => $core[$name], "moduleId" => $coreModuleId])->execute();
 		}
-	}	
-	
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	private function createWelcomeMessage() {
 		
 		if(isset($this->welcomeMessage)) {
@@ -304,12 +338,12 @@ class Instance extends Entity {
 			
 			$aclId = $this->getInstanceDbConnection()->getPDO()->lastInsertId();
 			
-			$this->getInstanceDbConnection()
-							->insert("core_acl_group", [
-									'aclId' => $aclId,
-									'groupId' => 1,
-									'level' => 50
-							])->execute();
+//			$this->getInstanceDbConnection()
+//							->insert("core_acl_group", [
+//									'aclId' => $aclId,
+//									'groupId' => 1,
+//									'level' => 50
+//							])->execute();
 			
 			$this->getInstanceDbConnection()
 							->insert("core_acl_group", [
@@ -333,12 +367,23 @@ class Instance extends Entity {
 		$this->welcomeMessage = null;
 		
 	}
-	
-	
+
+
+	/**
+	 * @throws Exception
+	 */
 	private function createInstance() {
-		$dbName =  $this->getDbName();
-		$dbUsername = $this->getDbUser();	
-		$dbPassword = bin2hex(random_bytes(8));
+
+		$instanceConfig = $this->getInstanceConfig();
+
+		$instanceConfig['db_name'] = $this->getDbName();
+		if(!isset($instanceConfig['db_user'])) {
+			$instanceConfig['db_user'] = $this->getDbUser();
+		}
+		if(!isset($instanceConfig['db_pass'])) {
+			$instanceConfig['db_pass'] = bin2hex(random_bytes(8));
+		}
+
 		$dataFolder = $this->getDataFolder();
 		$tmpFolder = $this->getTempFolder();	
 		$configFile = $this->getConfigFile();
@@ -353,93 +398,129 @@ class Instance extends Entity {
 				throw new Exception("Could not create temporary files folder");
 			}
 		
-			$this->createDatabase($dbName);
+			$this->createDatabase($instanceConfig['db_name']);
 			$databaseCreated = true;
-			$this->createDatabaseUser($dbName, $dbUsername, $dbPassword);
+			$this->createDatabaseUser($instanceConfig['db_name'], $instanceConfig['db_user'], $instanceConfig['db_pass']);
 			$databaseUserCreated = true;
-			
-			if(!$configFile->putContents($this->createConfigFile($dbName, $dbUsername, $dbPassword, $tmpFolder->getPath(), $dataFolder->getPath()))) {
-				throw new Exception("Could not write to config file");
+
+			if(!isset($instanceConfig['db_host'])) {
+				$instanceConfig['db_host'] = go()->getConfig()['db_host'];
 			}
 
-		} catch(\Exception $e) {
+			$instanceConfig['tmpdir'] = $tmpFolder->getPath();
+			$instanceConfig['file_storage_path'] = $dataFolder->getPath();
+			$instanceConfig['servermanager'] = go()->findConfigFile();
+			$instanceConfig['business'] = [
+				'studio' => [
+					'package' => $this->getStudioPackage()
+				]
+			];
+
+			$instanceConfig['allowed_modules'] = array_map(function($mod) {return $mod['package'].'/'.$mod['module'];}, array_filter($this->getAllowedModules(), function($mod) {return $mod['allowed'];}));
+			$instanceConfig['allowed_modules'][] = $this->getStudioPackage() . "/*";
+
+			$this->setInstanceConfig($instanceConfig);
+			$this->writeConfig();
+
+		} catch(Exception $e) {
 			
 			//cleanup
 			$tmpFolder->delete();
 			$dataFolder->delete();
 			$configFile->getFolder()->delete();
 			if($databaseCreated) {
-				$this->dropDatabase($dbName);
+				$this->dropDatabase($instanceConfig['db_name']);
 			}
 
 			if($databaseUserCreated) {
-				$this->dropDatabaseUser($dbUsername);
+				$this->dropDatabaseUser($instanceConfig['db_user']);
 			}
 
 			$this->getModulePackageFolder()->delete();
 			
 			parent::internalDelete((new Query())->from(self::getMapping()->getPrimaryTable()->getName())->where(['id' => $this->id]));
-			
+
+			// User permissions incorrect
+			if($e instanceof \PDOException && strpos($e->getMessage(), 1044) !== false) {
+				ErrorHandler::logException($e);
+				throw new Exception("Please setup the correct permissions for the database user. See https://groupoffice.readthedocs.io/en/latest/install/extras/multi_instance.html");
+			}
+
 			throw $e;
 		}
 	}
 
 	/**
-	 * @return \go\core\fs\Folder
+	 * @return Folder
 	 */
-	private function getModulePackageFolder() {
+	private function getModulePackageFolder(): Folder
+	{
 		return go()->getEnvironment()->getInstallFolder()->getFolder("go/modules/" . $this->getStudioPackage());
 	}
-	
-	private function dropDatabase($dbName) {		
-		return go()->getDbConnection()->query("DROP DATABASE IF EXISTS `".$dbName."`");
+
+	/**
+	 * @throws ConfigurationException
+	 */
+	private function dropDatabase($dbName): void
+	{
+		go()->getDbConnection()->query("DROP DATABASE IF EXISTS `".$dbName."`");
 	}
-	
-	private function createDatabase($dbName) {		
-		return go()->getDbConnection()->query("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
+
+	/**
+	 * @throws ConfigurationException
+	 */
+	private function createDatabase($dbName): void
+	{
+		go()->getDbConnection()->query("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
 	}
-	
+
+	/**
+	 * @throws ConfigurationException
+	 */
 	private function dropDatabaseUser($dbUser) {
 		go()->getDbConnection()->query("DROP USER '" . $dbUser . "'@'%'");
 	}
-	
-	private function createDatabaseUser($dbName, $dbUsername, $dbPassword) {
-		$sql = "GRANT ALL PRIVILEGES ON `" . $dbName . "`.*	TO ".
-								"'".$dbUsername."'@'%' ".
-								"IDENTIFIED BY '" . $dbPassword . "' WITH GRANT OPTION";			
 
+	/**
+	 * @throws ConfigurationException
+	 */
+	private function createDatabaseUser($dbName, $dbUsername, $dbPassword)
+	{
+		$sql = "CREATE USER '" . $dbUsername . "' IDENTIFIED BY '" . $dbPassword . "'";
 		go()->getDbConnection()->query($sql);
-		go()->getDbConnection()->query('FLUSH PRIVILEGES');		
+		$sql = "GRANT ALL PRIVILEGES ON `" . $dbName . "`.* TO '" . $dbUsername . "'@'%'";
+		go()->getDbConnection()->query($sql);
+		go()->getDbConnection()->query('FLUSH PRIVILEGES');
 	}
 	
-	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
-		
-		$tpl = Module::getFolder()->getFile('config.php.tpl');
-		
-		$dsn = \go\core\db\Utils::parseDSN(go()->getConfig()['core']['db']['dsn']);
-
-		
-		return str_replace([
-				'{dbHost}',
-				'{dbName}',
-				'{dbUsername}',
-				'{dbPassword}',
-				'{tmpPath}',
-				'{dataPath}',
-				'{servermanager}',
-				'{studioPackage}',
-		], [
-				$dsn['options']['host'],
-				$dbName,
-				$dbUsername,
-				$dbPassword,
-				$tmpPath,
-				$dataPath,
-				go()->findConfigFile(),
-				$this->getStudioPackage()
-		],
-		$tpl->getContents());		
-	}
+//	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
+//
+//		$tpl = Module::getFolder()->getFile('config.php.tpl');
+//
+//		$dsn = \go\core\db\Utils::parseDSN(go()->getConfig()['core']['db']['dsn']);
+//
+//
+//		return str_replace([
+//				'{dbHost}',
+//				'{dbName}',
+//				'{dbUsername}',
+//				'{dbPassword}',
+//				'{tmpPath}',
+//				'{dataPath}',
+//				'{servermanager}',
+//				'{studioPackage}',
+//		], [
+//				$dsn['options']['host'],
+//				$dbName,
+//				$dbUsername,
+//				$dbPassword,
+//				$tmpPath,
+//				$dataPath,
+//				go()->findConfigFile(),
+//				$this->getStudioPackage()
+//		],
+//		$tpl->getContents());
+//	}
 	
 	private $instanceDbConn;
 	
@@ -447,29 +528,40 @@ class Instance extends Entity {
 	private $instanceConfig;
 	private $globalConfig;
 	
-	private function getInstanceConfig() {
+	private function getInstanceConfig(): array
+	{
 		if(!isset($this->instanceConfig)) {
 			try {
 				include($this->getConfigFile()->getPath());
 			} catch(Exception $e) {
-				throw new \Exception("config file missing for instance : " . $this->hostname);
+				ErrorHandler::log("Config file missing for instance : " . $this->hostname);
+				$config = [];
 			}
+			/** @noinspection PhpUndefinedVariableInspection */
 			$this->instanceConfig = $config;
 		}		
 		return $this->instanceConfig;
 	}
 	
-	private function setInstanceConfig($config) {
-		$this->getConfigFile()->putContents("<?php\n\$config = " . var_export($config, true) . ";\n");
-		
+	public function setInstanceConfig($config) {
+		$this->instanceConfig = $config;
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function writeConfig() {
+		if(!$this->getConfigFile()->putContents("<?php\n\$config = " . var_export($this->getInstanceConfig(), true) . ";\n")) {
+			throw new Exception("Could not write to config.php file");
+		}
+
 		if(function_exists("opcache_invalidate")) {
 			opcache_invalidate($this->getConfigFile()->getPath());
 		}
-		
-		$this->instanceConfig = $config;
 	}
 	
-	private function getGlobalConfig() {
+	private function getGlobalConfig(): array
+	{
 		
 		if(!isset($this->globalConfig)) {
 			$globalConfigFile = "/etc/groupoffice/globalconfig.inc.php";
@@ -487,21 +579,25 @@ class Instance extends Entity {
 	
 	/**
 	 * 
-	 * @return \go\core\db\Connection
+	 * @return Connection
 	 */
-	private function getInstanceDbConnection() {
+	private function getInstanceDbConnection(): Connection
+	{
 		if(!isset($this->instanceDbConn)) {		
 			
 			$config = $this->getInstanceConfig();
 			
 			$dsn = 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
-			$this->instanceDbConn = new \go\core\db\Connection($dsn, $config['db_user'], $config['db_pass']);
+			$this->instanceDbConn = new Connection($dsn, $config['db_user'], $config['db_pass']);
 		}
 		
 		return $this->instanceDbConn;
 	}
-	
 
+
+	/**
+	 * @throws Exception
+	 */
 	public function createAccessToken() {
 		$now = new DateTime();
 		$expiresAt = new DateTime("+1 hour");
@@ -516,12 +612,28 @@ class Instance extends Entity {
 				"lastActiveAt" => $now,
 				"remoteIpAddress" => $_SERVER['REMOTE_ADDR']
 		];
-		
+
+		if($this->getInstanceDbConnection()->getDatabase()->getTable("core_auth_token")->hasColumn('platform')) {
+			//available since 6.5
+			$data["platform"] = go()->getAuthState()->getToken()->platform;
+			$data["browser"] = go()->getAuthState()->getToken()->browser;
+		}
+
 		if(!$this->getInstanceDbConnection()->insert('core_auth_token', $data)->execute()) {
-			throw new \Exception("Failed to create access token");
+			throw new Exception("Failed to create access token");
 		}
 		
 		return $data['accessToken'];	
+	}
+
+	/**
+	 * Check if the installation was performed.
+	 *
+	 * @return bool
+	 */
+	public function isInstalled(): bool
+	{
+		return $this->getInstanceDbConnection()->getDatabase()->hasTable('core_module');
 	}
 	
 	private function getInstanceDbData(){
@@ -539,7 +651,7 @@ class Instance extends Entity {
 			
 			$this->loginCount = (int) $record['loginCount'];
 			$this->userCount = (int) $record['userCount'];
-			$this->lastLogin = !empty($record['lastLogin']) ? new \go\core\util\DateTime($record['lastLogin']) : null;
+			$this->lastLogin = !empty($record['lastLogin']) ? new DateTime($record['lastLogin']) : null;
 			
 			$record = (new \go\core\db\Query())
 						->setDbConnection($this->getInstanceDbConnection())
@@ -570,7 +682,7 @@ class Instance extends Entity {
 			$this->storageQuota = isset($config['quota']) ? $config['quota'] * 1024 : null; 
 			$this->enabled = $config['enabled'] ?? true;
 		}
-		catch(\Exception $e) {
+		catch(Exception $e) {
 			//ignore
 		}
 	}	
@@ -578,13 +690,11 @@ class Instance extends Entity {
 	
 	/**
 	 * Create a mysql dump of the installation database.
-	 * 
-	 * @param string $outputDir
-	 * @param string $filename Optional filename. If omitted then $config['db_name'] will be used.
-	 * @return boolean
+	 *
 	 * @throws Exception
 	 */
-	private function mysqldump(){
+	private function mysqldump(): void
+	{
 		
 		$c = $this->getInstanceConfig();
 		
@@ -603,17 +713,44 @@ class Instance extends Entity {
 		if(!$file->exists()) {
 			throw new Exception("Could not create MySQL dump");
 		}
-		
+
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function restoreDump(File $dumpFile): bool
+	{
+		$c = $this->getInstanceConfig();
+		$cmd = "mysql --host=" . ($c['db_host'] ?? "localhost") . " --port=" . ($c['db_port'] ?? 3306) . " --user=" . $c['db_user'] . " --password=" . $c['db_pass'] . " " . $c['db_name'] . " < \"" . $dumpFile->getPath() . "\"";
+		//go()->debug($cmd);
+		exec($cmd, $output, $retVar);
+
+		if($retVar != 0) {
+			throw new Exception("Mysqldump error: " .$retVar ." : ". implode("\n", $output));
+		}
+
 		return true;
 	}
 	
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 
 		$instances = Instance::find()->mergeWith($query);
 
 		foreach($instances as $instance) {
 			try {
-				$instance->getTempFolder()->delete();
+				//load instance config just before moving the config file. Moving the config file disables
+				// the installation and prevents further changes.
+				$instance->getInstanceConfig();
+				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
+
+				try {
+					$instance->getTempFolder()->delete();
+				}catch(Exception $e) {
+					//ignore because a running sync process might have filled up the temp dir again.
+					ErrorHandler::log("Could not delete temp folder: " . $e->getMessage());
+				}
 
 				$instance->mysqldump();
 
@@ -622,10 +759,9 @@ class Instance extends Entity {
 					$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE'));
 				}
 
-				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
 				$instance->getConfigFile()->getFolder()->delete();
 
-				$dest = $instance->getTrashFolder()->getFolder($instance->getDataFolder()->getName());
+				$dest = self::getTrashFolder()->getFolder($instance->getDataFolder()->getName());
 				if ($dest->exists()) {
 					$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
 				}
@@ -655,7 +791,11 @@ class Instance extends Entity {
 	}
 
 
-	public function upgrade() {
+	/**
+	 * @throws Exception
+	 */
+	public function upgrade(): bool
+	{
 		$http = new Client();
 
 		$proto = Request::get()->isHttps() ? 'https://' : 'http://';
@@ -672,9 +812,10 @@ class Instance extends Entity {
 
 	private static $availableModules;
 
-	private static function getAvailableModules() {
+	private static function getAvailableModules(): array
+	{
 		if(!isset(self::$availableModules)) {
-			self::$availableModules =  \GO::modules()->getAvailableModules(true);
+			self::$availableModules =  GO::modules()->getAvailableModules(true);
 		}
 
 		return self::$availableModules;
@@ -685,9 +826,10 @@ class Instance extends Entity {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getAllowedModules()
+	public function getAllowedModules(): array
 	{
 		$modules = self::getAvailableModules();
+
 		$instanceConfig = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 		$checkAllowed = false;
 		if (array_key_exists('allowed_modules', $instanceConfig)) {
@@ -697,8 +839,9 @@ class Instance extends Entity {
 		$id = 0;
 		foreach ($modules as $module) {
 			$mod = $module::get();
-			if ($mod instanceof \GO\Base\Module) {
+			if ($mod instanceof BaseModule) {
 				$key = $mod->package() . $mod->name();
+				// old Framework
 				// old Framework
 				$avMod = [
 					'id' => $id,
@@ -708,7 +851,7 @@ class Instance extends Entity {
 					'icon' => $mod->icon(),
 					'localizedPackage' => ucfirst($mod->package())
 				];
-			} elseif ($mod instanceof \go\core\Module) {
+			} elseif ($mod instanceof Module) {
 				$key = ucfirst($mod->getPackage()) . $mod->getName();
 				// new Framework
 				$avMod = [
@@ -721,7 +864,7 @@ class Instance extends Entity {
 				];
 			}
 			if ($checkAllowed) {
-				$avMod['allowed'] = \GO\Base\ModuleCollection::isAllowed($avMod['module'], $avMod['package'], $instanceConfig['allowed_modules']);
+				$avMod['allowed'] = ModuleCollection::isAllowed($avMod['module'], $avMod['package'], $instanceConfig['allowed_modules']);
 			} else {
 				$avMod['allowed'] = true;
 			}
@@ -729,14 +872,13 @@ class Instance extends Entity {
 			$id++;
 		}
 
-		$retMods = [];
-		foreach ($returnMods as $key => $mod) {
-			$retMods[] = $mod;
-		}
 
-		return $retMods;
+		return array_values($returnMods);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function setAllowedModules($allowedModules)
 	{
 		if($this->isNew()) {
@@ -745,7 +887,9 @@ class Instance extends Entity {
 
 		$config = $this->getInstanceConfig();
 		$config['allowed_modules'] = $allowedModules;
+		$config['allowed_modules'][] = $this->getStudioPackage() . "/*";
 		$this->setInstanceConfig($config);
+		$this->writeConfig();
 
 	}
 

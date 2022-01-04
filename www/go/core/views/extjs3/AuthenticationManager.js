@@ -27,7 +27,7 @@ go.AuthenticationManager = (function () {
 		 * 
 		 * @type {Array} string
 		 */
-		userMethods: [],
+		userAuthenticators: [],
 		
 		rememberLogin:false,
 
@@ -78,18 +78,12 @@ go.AuthenticationManager = (function () {
 				url: this.getAuthUrl(),
 				jsonData: clientData,
 				callback: function (options, success, response) {
-
-
 					var result = Ext.decode(response.responseText);
-
 					if(result.debug) {
 						go.Jmap.processDebugResponse(result.debug, 'auth');
-					} else {
-						debugger;
 					}
-
           
-          this.userMethods = result.methods || [];
+          this.userAuthenticators = result.authenticators || [];
 					this.loginToken = result.loginToken;
 					this.username = result.username;
 					
@@ -119,7 +113,7 @@ go.AuthenticationManager = (function () {
 					}
 
 					if (result.accessToken) {
-						this.onAuthenticated(result);
+						this.onAuthenticated(result, username, password);
 					}
 				},
 				scope: this
@@ -142,20 +136,20 @@ go.AuthenticationManager = (function () {
 						method: "DELETE",
 						callback: function() {
 							go.User.clearAccessToken();
-							document.location = BaseHref;
+							go.reload();
 						}
 					});
 				});
 			}
 		},
 
-		doAuthentication: function (methods, cb, scope) {
+		doAuthentication: function (authenticators, cb, scope) {
 
 			var loginData = {
 				loginToken: this.loginToken, //while the user is authenticating only loginToken is set 
 				accessToken: this.accessToken, //after authentication the access token is retrieved. It can be stored for remembering the login when a user closes the browser.
 				rememberLogin: this.rememberLogin,
-				methods: methods
+				authenticators: authenticators
 			};
 
 			Ext.Ajax.request({
@@ -163,8 +157,6 @@ go.AuthenticationManager = (function () {
 				jsonData: loginData,
 				callback: function (options, success, response) {
 					var result = response.responseText ? Ext.decode(response.responseText) : {}, me = this;
-
-									
 					
 					if(!success) {
 						switch(response.status) {
@@ -183,6 +175,9 @@ go.AuthenticationManager = (function () {
 						this.onAuthenticated(result).then(function() {
 							cb.call(scope || me, me, success, result);	
 						});
+					} else
+					{
+						cb.call(scope || me, me, success, result);
 					}
 
 				},
@@ -197,7 +192,7 @@ go.AuthenticationManager = (function () {
 			this.loginPanel.render(document.body);
 		},
 
-		onAuthenticated: function (result) {
+		onAuthenticated: function (result, username, password) {
 			
 			go.User.setAccessToken(result.accessToken, go.AuthenticationManager.rememberLogin);
 
@@ -206,18 +201,47 @@ go.AuthenticationManager = (function () {
 				this.loginPanel = null;
 			}
 
-			var me = this;
 
-			return go.User.loadSession(result).then(function() {
-				me.fireEvent("authenticated", me, result);
+			return go.User.onLoad(result).then(() => {
 
 				if(go.User.theme != GO.settings.config.theme) {
-					document.location = document.location;
+					go.reload();
 					return;
 				}
-			
-				GO.mainLayout.onAuthentication();
+
+				GO.mainLayout.onAuthentication(password).then(() => {
+					this.fireEvent("authenticated", this, result, username, password);
+				})
 			});		
+		},
+
+		/**
+		 * Password prompt
+		 *
+ 		 * @param title
+		 * @param message
+		 * @return {Promise}
+		 */
+		passwordPrompt : function(title, message) {
+			return new Promise((resolve, reject) =>
+			{
+				const passwordPrompt = new go.PasswordPrompt({
+					width: dp(450),
+					text: message,
+					title: title,
+					iconCls: 'ic-security',
+					listeners: {
+						'ok': function (password) {
+							resolve(password);
+						},
+						'cancel': function () {
+							reject();
+						},
+						scope: this
+					}
+				});
+				passwordPrompt.show();
+			});
 		}
 	});
 

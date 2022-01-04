@@ -300,16 +300,24 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				->mergeWith(
 					\GO\Base\Db\FindCriteria::newInstance()
 						->addCondition('first_date', $event->end_time, '<=')
-						->addCondition('last_date', $event->start_time, '>=','t',false)
+						->addRawCondition('(t.last_date + 86400) >=' . intval($event->start_time))
 				);
+			$findParams->debugSql();
 
 			$stmt = Leaveday::model()->find($findParams);
+
 			foreach($stmt as $item) {
 				// Now we have to take the start time and duration of the leave day into account. These are saved in
 				// a peculiar way, so we have to make a hack.
-				$itemStartTime = (new DateTime())->setTimeStamp($item->first_date);
-				$tsItemStart = GODate::to_unixtime($itemStartTime->format('Y-m-d'). ' '. $item->from_time. ':00');
-				$tsItemEnd = GODate::dateTime_add($tsItemStart,0, (($item->n_hours + $item->n_nat_holiday_hours) * 60));
+
+				if(!empty($item->from_time)) {
+					$itemStartTime = (new DateTime())->setTimeStamp($item->first_date);
+					$tsItemStart = GODate::to_unixtime($itemStartTime->format('Y-m-d') . ' ' . $item->from_time . ':00');
+					$tsItemEnd = GODate::dateTime_add($tsItemStart, 0, (($item->n_hours + $item->n_nat_holiday_hours) * 60));
+				} else{
+					$tsItemStart = $item->first_date;
+					$tsItemEnd = GODate::dateTime_add($item->first_date, 0, 0, 0, 1);
+				}
 				if($tsItemStart < $event->end_time && $tsItemEnd > $event->start_time) {
 					$num_conflicts++;
 				}
@@ -423,14 +431,15 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			if (isset($params['resources'])) {
 
 				foreach ($params['resources'] as $resource_calendar_id => $enabled) {
-
-					if (!$isNewEvent)
+					if (!$isNewEvent) {
 						$resourceEvent = \GO\Calendar\Model\Event::model()->findResourceForEvent($model->id, $resource_calendar_id);
-					else
+					} else {
 						$resourceEvent = false;
+					}
 
-					if (empty($resourceEvent))
+					if (empty($resourceEvent)) {
 						$resourceEvent = new \GO\Calendar\Model\Event();
+					}
 
 					$resourceEvent->resource_event_id = $model->id;
 					$resourceEvent->calendar_id = $resource_calendar_id;
@@ -443,9 +452,17 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$resourceEvent->private = $model->private;
 					$resourceEvent->busy = !$resourceEvent->calendar->group->show_not_as_busy;
 
+					if (!empty($model->location)) {
+						$resourceEvent->location = $model->location;
+					}
 
-					if (isset($params['resource_options'][$resource_calendar_id]))
+					if (!empty($model->description)) {
+						$resourceEvent->description = $model->description;
+					}
+
+					if (isset($params['resource_options'][$resource_calendar_id])) {
 						$resourceEvent->setCustomFields($params['resource_options'][$resource_calendar_id]);
+					}
 
 					$resourceEvent->save(true);
 
@@ -720,6 +737,9 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			$createdRule = $rRule->createJSONOutput();
 
 			$response['data'] = array_merge($response['data'], $createdRule);
+		} else
+		{
+			$response['data']['repeat_forever'] = 1;
 		}
 		
 //		$model->setAttribute('calendar_id', $params['calendar_id']);
@@ -949,11 +969,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		else
 			$startTime = date('Y-m-d h:m',time());
 		
-		if(!empty($params['end_time']))
+		if(!empty($params['end_time'])) {
 			$endTime = $params['end_time'];
-		else
-			$endTime = date('Y-m-d h:m',strtotime(date("Y-m-d", strtotime($startTime)) . " +3 months"));
-		
+		} else {
+			$endTime = date('Y-m-d h:m', strtotime(date("Y-m-d", strtotime($startTime)) . " +3 months"));
+		}
 		// Check for the given calendars if they have events in the given period
 		if(!empty($params['view_id'])){
 				$view = \GO\Calendar\Model\View::model()->findByPk($params['view_id']);
@@ -1003,9 +1023,9 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			// Get the calendar model that $calendarIdis used for these events
 			try{
 				$calendar = \GO\Calendar\Model\Calendar::model()->findByPk($calendarId);
-				if(!$calendar)
+				if(!$calendar) {
 					throw new \GO\Base\Exception\NotFound();
-				
+				}
 				$calendarModels[]=$calendar;
 				
 				
@@ -1017,10 +1037,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 				// Set the colors for each calendar
 				$calendar->displayColor = $colors[$colorIndex];
-				if($colorIndex < count($colors)-1)
+				if($colorIndex < count($colors)-1) {
 					$colorIndex++;
-				else
-					$colorIndex=0;
+				} else {
+					$colorIndex = 0;
+				}
 
 
 				if($response['calendar_count'] > 1 && $this->overrideColors){
@@ -1281,12 +1302,15 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$resultCount = 0;
 
 		
-		if(!$calendar->user && empty($calendar->user->holidayset))
+		if(!$calendar->user && empty($calendar->user->holidayset)) {
 			return $response;
-		
-		
-		//$holidays = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($startTime, $endTime, $calendar->user->language);
-		$holidays = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($startTime, $endTime, $calendar->user->holidayset);
+		}
+
+		$userLocale = $calendar->user->holidayset; // Use explicitly set holidayset by default
+		if (empty($userLocale)) {
+			$userLocale = $calendar->user->language; // Fall back on the selected language.
+		}
+		$holidays = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($startTime, $endTime, $userLocale);
 
 		if($holidays){
 			while($holiday = $holidays->fetch()){ 
@@ -1534,16 +1558,16 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	protected function actionDelete($params){
 		
 		$event = \GO\Calendar\Model\Event::model()->findByPk($params['id']);
-		if(!$event)
+		if(!$event) {
 			throw new \GO\Base\Exception\NotFound();
-		
+		}
 		if(!isset($params['send_cancel_notice']) && $event->hasOtherParticipants()){
 			return array(
 					'askForCancelNotice'=>true,
 					'is_organizer'=>$event->is_organizer,
 					'success'=>true
 			);
-		}  else {			
+		} else {
 			if(!empty($params['exception_date'])) {
 				if(!empty($params['thisAndFuture']) && $params['thisAndFuture'] == 'true') {
 					$event->repeat_end_time = $params['exception_date']-1;
@@ -1703,8 +1727,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		//update participant statuses from main event if possible
 		$organizerEvent = $event->getOrganizerEvent();
 		if($organizerEvent) {
-			\GO::getDbConnection()->query("DELETE FROM cal_participants WHERE event_id = ".$event->id);
-			\GO::getDbConnection()->query("INSERT INTO cal_participants (event_id, name, email, user_id, contact_id, status, last_modified, is_organizer, role) SELECT '".$event->id."', name, email, user_id, contact_id, status, last_modified, is_organizer, role FROM cal_participants p2 WHERE p2.event_id = ".$organizerEvent->id);
+			\GO::getDbConnection()->query("DELETE FROM cal_participants WHERE event_id = ".$event->id." AND user_id !=".\go()->getUserId());
+			\GO::getDbConnection()->query("INSERT INTO cal_participants (event_id, name, email, user_id, contact_id, status, last_modified, is_organizer, role) SELECT '".$event->id."', name, email, user_id, contact_id, status, last_modified, is_organizer, role FROM cal_participants p2 WHERE p2.event_id = ".$organizerEvent->id." AND user_id !=".\go()->getUserId());
 		}
 
 //		if(!$participant)
@@ -2069,10 +2093,14 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$response = array( 'success' => true );
 
 
-		$account = Account::model()->findByPk($params['account_id']);
-		$imap = $account->openImapConnection($params['mailbox']);
-		$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
-
+		if(!empty($params['file_id'])) {
+			$file = \GO\Files\Model\File::model()->findByPk($params['file_id']);
+			$data = $file->fsFile->getContents();
+		}else{
+			$account = Account::model()->findByPk($params['account_id']);
+			$imap = $account->openImapConnection($params['mailbox']);
+			$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
+		}
 		$vcal = \GO\Base\VObject\Reader::read($data);
 
 		$vevents = $vcal->select("VEVENT");

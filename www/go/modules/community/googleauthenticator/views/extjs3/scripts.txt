@@ -1,3 +1,5 @@
+Module.js
 Settings.js
+SystemSettings.js
 EnableAuthenticatorDialog.js
 GoogleauthenticatorPanel.js

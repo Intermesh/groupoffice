@@ -1,4 +1,5 @@
 polyfills.js
+Element.js
 
 Jmap.js
 Uploader.js
@@ -22,6 +23,7 @@ Modules.js
 
 panels/ScrollLoader.js
 grid/GridView.js
+grid/GroupingView.js
 grid/GridTrait.js
 grid/plugin/Sortable.js
 grid/GridPanel.js
@@ -165,6 +167,7 @@ Module.js
 
 cron/Stores.js
 cron/CronDialog.js
+cron/NewCronDialog.js
 cron/ParametersPanel.js
 cron/PeriodGrid.js
 cron/SystemSettingsCronGrid.js
@@ -280,3 +283,6 @@ pdftemplate/BlocksField.js
 chart/ChartComponent.js
 chart/LineChart.js
 chart/PieChart.js
+
+
+license/LicenseDialog.js

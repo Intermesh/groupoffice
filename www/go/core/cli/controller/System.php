@@ -1,11 +1,18 @@
 <?php
 namespace go\core\cli\controller;
 
+use Exception;
+use GO\Base\Observable;
 use go\core\cache\None;
 use go\core\Controller;
 use go\core\db\Table;
+use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
+use go\core\fs\File;
+use go\core\http\Client;
+use go\core\http\Request;
 use go\core\model\CronJobSchedule;
+use go\core\event\Listeners;
 use go\core\model\Module;
 
 use function GO;
@@ -27,32 +34,55 @@ class System extends Controller {
 		$schedule->moduleId =$module->id;
 		$schedule->name = $name;
 		$schedule->expression = "* * * * *";
+		$schedule->description = "Temporary CLI job " . uniqid();
 
 		$cls = $schedule->getCronClass();
-		
-		$o = new $cls;
-		$o->run($schedule);
+
+		try {
+			$o = new $cls;
+			$o->run($schedule);
+		} finally {
+			CronJobSchedule::delete($schedule->primaryKeyValues());
+		}
+
 	}
 
 	/**
 	 * docker-compose exec --user www-data groupoffice-master php ./www/cli.php core/System/upgrade
+	 * @throws Exception
 	 */
 	public function upgrade() {
 
-		go()->rebuildCache();
-		go()->setCache(new None());
+		Observable::cacheListeners();
+		Listeners::get()->init();
+
 		go()->getInstaller()->isValidDb();
 		Table::destroyInstances();
 		\GO::session()->runAsRoot();	
 		date_default_timezone_set("UTC");
 		go()->getInstaller()->upgrade();
+
+		try {
+			$http = new Client();
+			$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
+			$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
+
+			$response = $http->get(go()->getSettings()->URL . '/install/clearcache.php');
+			if($response['status'] != 200) {
+				echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "install/' in the browser.\n";
+			} else{
+				echo "Cache cleared via webserver\n";
+			}
+		} catch(Exception $e) {
+			echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "install/' in the browser.\n";
+		}
 		
 		echo "Done!\n";
 	}
 
 
 	/**
-	 *  docker-compose exec --user www-data groupoffice-64 php ./www/cli.php core/System/cleanup
+	 *  docker-compose exec --user www-data groupoffice php ./www/cli.php core/System/cleanup
 	 */
 	public function cleanup() {
 
@@ -65,11 +95,9 @@ class System extends Controller {
 		}
 
 		echo "Cleaning up....\n";
-		//Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
+		Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
 
 		$this->cleanupAcls();
-
-
 
 		$this->fireEvent(self::EVENT_CLEANUP);
 
@@ -79,6 +107,9 @@ class System extends Controller {
 
 	private function cleanupAcls() {
 
+		// for memory problems
+		go()->getDebugger()->disabled = false;
+
 		echo "Cleaning up unused ACL's\n";
 
 //		go()->getDatabase()->getTable('core_acl')->backup();
@@ -87,16 +118,30 @@ class System extends Controller {
 		go()->getDbConnection()->exec("update core_acl set usedIn = null, entityTypeId = null, entityId = null");
 		go()->getDbConnection()->exec("update core_acl set usedIn = 'core_entity.defaultAclId' where id in (select defaultAclId from core_entity)");
 
-		echo "Checking database\n";
-		$mc = new \GO\Core\Controller\MaintenanceController();
-		$mc->run("checkDatabase");
 
+		echo "Checking database\n";
+
+		$modules = Module::find();
+
+		foreach($modules as $module) {
+			if(!$module->isAvailable()) {
+				continue;
+			}
+			echo "Checking module ". ($modules->package ?? "legacy") . "/" .$module->name ."\n";
+			$module->module()->checkAcls();
+		}
+
+		echo "\n\n";
+
+		//hack for folders which are skipped in the checkDatabase
 		go()->getDbConnection()->exec(
 			"update core_acl a inner join fs_folders f on f.acl_id = a.id set usedIn = 'fs_folders.acl_id', entityTypeId = ". \GO\Files\Model\Folder::entityType()->getId() .
 			", entityId = f.id where usedIn is null"
 		);
 
-		go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+	//	$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+
+		//echo "Delete " . $deleteCount ." unused ACL's\n";
 
 	}
 

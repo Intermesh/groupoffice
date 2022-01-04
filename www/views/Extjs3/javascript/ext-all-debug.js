@@ -7245,7 +7245,7 @@ Ext.Element.addMethods({
             });
             return me;
         }
-        me.on(eventName, fn);
+        me.on(eventName, fn, me, {passive: true});
         return me;
     },
 
@@ -11774,9 +11774,9 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
             this.focusTask.delay(Ext.isNumber(delay) ? delay : 10);
             return this;
         }
-        if(this.rendered && !this.isDestroyed){
+        if(this.rendered && !this.isDestroyed && this.el.isInViewport()){
             this.el.focus();
-            if(selectText === true){
+            if(selectText === true && this.el.dom.select){
                 this.el.dom.select();
             }
         }
@@ -16148,7 +16148,10 @@ Ext.layout.boxOverflow.Menu = Ext.extend(Ext.layout.boxOverflow.None, {
 
     
     addComponentToMenu : function(menu, component) {
-        if (component instanceof Ext.Toolbar.Separator) {
+
+				if(component.addComponentToMenu) {
+					component.addComponentToMenu(menu, component);
+				} else if (component instanceof Ext.Toolbar.Separator) {
             menu.add('-');
 
         } else if (Ext.isFunction(component.isXType)) {
@@ -16339,14 +16342,13 @@ Ext.layout.boxOverflow.Scroller = Ext.extend(Ext.layout.boxOverflow.None, {
     
     
     createWheelListener: function() {
-        this.layout.innerCt.on({
-            scope     : this,
-            mousewheel: function(e) {
+        this.layout.innerCt.on('mousewheel', function(e) {
                 e.stopEvent();
 
                 this.scrollBy(e.getWheelDelta() * this.wheelIncrement * -1, false);
-            }
-        });
+            }, this,
+						 {passive: true}
+        );
     },
     
     
@@ -17355,7 +17357,9 @@ Ext.layout.ToolbarLayout = Ext.extend(Ext.layout.ContainerLayout, {
 
     
     addComponentToMenu : function(menu, component) {
-        if (component instanceof Ext.Toolbar.Separator) {
+				if(component.addComponentToMenu) {
+					component.addComponentToMenu(menu, component);
+				} else if (component instanceof Ext.Toolbar.Separator) {
             menu.add('-');
 
         } else if (Ext.isFunction(component.isXType)) {
@@ -19285,7 +19289,7 @@ Ext.DatePicker = Ext.extend(Ext.BoxComponent, {
                 scope: this
             });
         }
-        this.mon(this.eventEl, 'mousewheel', this.handleMouseWheel, this);
+        this.mon(this.eventEl, 'mousewheel', this.handleMouseWheel, this, {passive: true});
         this.mon(this.eventEl, 'click', this.handleDateClick,  this, {delegate: 'a.x-date-date'});
         this.mon(this.mbtn, 'click', this.showMonthPicker, this);
         this.onEnable(true);
@@ -27568,14 +27572,20 @@ Ext.Window = Ext.extend(Ext.Panel, {
             this.activeEl = document.activeElement;
 		}, this);
 		
-		this.on("close", function() {	
-            if(this.activeEl)		
-			    this.activeEl.focus();
+		this.on("close", function() {
+			if(this.activeEl) {
+				setTimeout(() => {
+					this.activeEl.focus();
+				});
+			}
 		}, this);
 		
 		this.on("hide", function() {
-            if(this.activeEl)				
-			    this.activeEl.focus();
+			if(this.activeEl) {
+				setTimeout(() => {
+					this.activeEl.focus();
+				});
+			}
 		}, this);
 	},
     
@@ -42079,9 +42089,11 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         }
         this.mon(Ext.getDoc(), {
             scope: this,
-            mousewheel: this.collapseIf,
+            // mousewheel: this.collapseIf,
             mousedown: this.collapseIf
         });
+
+				this.mon(Ext.getDoc(), "mousewheel", this.collapseIf, this, {passive: true});
         this.fireEvent('expand', this);
     },
 
@@ -43189,6 +43201,7 @@ Ext.form.BasicForm = Ext.extend(Ext.util.Observable, {
         var valid = true;
         this.items.each(function(f){
            if(!f.validate()){
+           		console.warn("Invalid field: ", f);
                valid = false;
            }
         });
@@ -44447,14 +44460,14 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
         
         try{
             var dbody = this.getEditorBody(),
-                ss = this.el.getStyles('font-size', 'font-family', 'background-image', 'background-repeat', 'background-color', 'color'),
+                //ss = this.el.getStyles('font-size', 'font-family', 'background-image', 'background-repeat', 'background-color', 'color'),
                 doc,
                 fn;
 
-            ss['background-attachment'] = 'fixed'; 
+            //ss['background-attachment'] = 'fixed';
             dbody.bgProperties = 'fixed'; 
 
-            Ext.DomHelper.applyStyles(dbody, ss);
+            //Ext.DomHelper.applyStyles(dbody, ss);
 
             doc = this.getDoc();
 
@@ -44474,7 +44487,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
                 buffer:100
             });
 
-            if(Ext.isGecko){
+            if(Ext.isGecko || Ext.isSafari){
                 Ext.EventManager.on(doc, 'keypress', this.applyCommand, this);
             }
             if(Ext.isIE || Ext.isWebKit || Ext.isOpera){
@@ -46855,6 +46868,7 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
 
     
     syncHeaderScroll : function() {
+
         var innerHd    = this.innerHd,
             scrollLeft = this.scroller.dom.scrollLeft;
         
@@ -47246,10 +47260,16 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
         
         if (grid.autoHeight) {
             scrollStyle = scroller.dom.style;
-            scrollStyle.overflow = 'visible';
+            scrollStyle.overflow = 'auto';
             
             if (Ext.isWebKit) {
-                scrollStyle.position = 'static';
+               // scrollStyle.position = 'static';
+            }
+	this.el.setWidth(gridWidth);
+scroller.setWidth(gridWidth);
+            
+            if (this.innerHd) {
+                this.innerHd.style.width = (gridWidth) + "px";
             }
         } else {
             this.el.setSize(gridWidth, gridHeight);
@@ -50840,7 +50860,7 @@ Ext.grid.EditorGridPanel = Ext.extend(Ext.grid.GridPanel, {
     initEvents : function(){
         Ext.grid.EditorGridPanel.superclass.initEvents.call(this);
 
-        this.getGridEl().on('mousewheel', this.stopEditing.createDelegate(this, [true]), this);
+        this.getGridEl().on('mousewheel', this.stopEditing.createDelegate(this, [true]), this, {passive: true});
         this.on('columnresize', this.stopEditing, this, [true]);
 
         if(this.clicksToEdit == 1){

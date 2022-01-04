@@ -1,5 +1,5 @@
 GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
-	
+	node: null,
 	hasAcl : function(node){
 		
 		var inboxNode = this.treePanel.findInboxNode(node);
@@ -10,6 +10,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 	},
 	
 	setNode : function(node){
+		this.node = node;
 		this.addFolderButton.setDisabled(node.attributes.noinferiors);
 		
 		this.shareBtn.setVisible(this.hasAcl(node));
@@ -29,8 +30,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 				Ext.MessageBox.prompt(t("Name"), t("Enter the folder name:", "email"), function(button, text){
 					if(button=='ok')
 					{
-						var sm = this.treePanel.getSelectionModel();
-						var node = sm.getSelectedNode();
+						const node = this.node;
 				
 						GO.request({
 							url: "email/folder/create",
@@ -60,8 +60,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			text: t("Rename folder", "email"),
 			handler: function()
 			{
-				var sm = this.treePanel.getSelectionModel();
-				var node = sm.getSelectedNode();
+				const node = this.node;
 
 				if(!node || !node.attributes.mailbox)
 				{
@@ -74,8 +73,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 					Ext.MessageBox.prompt(t("Name"), t("Enter the folder name:", "email"), function(button, text){
 						if(button=='ok')
 						{
-							var sm = this.treePanel.getSelectionModel();
-							var node = sm.getSelectedNode();
+							const node = this.node;
 
 							GO.request({								
 								maskEl: Ext.getBody(),
@@ -124,8 +122,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			scope:this,
 			handler: function()
 			{
-				var sm = this.treePanel.getSelectionModel();
-				var node = sm.getSelectedNode();
+				const node = this.node;
 
 				var tpl = new Ext.Template(t("Are you sure you want to mark all messages in folder '{name}' as read?", "email"));
 
@@ -143,6 +140,9 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 								if(node.attributes.mailbox==GO.mainLayout.getModulePanel("email").messagesGrid.store.baseParams.mailbox)
 								{
 									GO.mainLayout.getModulePanel("email").messagesGrid.store.load();
+								} else
+								{
+									GO.mainLayout.getModulePanel("email").updateFolderStatus(node.attributes.mailbox, 0);
 								}
 							},
 							scope: this
@@ -160,7 +160,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 				if (typeof(this.moveOldMailDialog)=='undefined') {
 					this.moveOldMailDialog = new GO.email.MoveOldMailDialog();
 				}
-				this.moveOldMailDialog.setNode(this.treePanel.getSelectionModel().getSelectedNode());
+				this.moveOldMailDialog.setNode(this.node);
 				this.moveOldMailDialog.show();
 			}
 		}),this.emptyFolderButton = new Ext.menu.Item({
@@ -168,8 +168,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			text: t("Empty folder", "email"),
 			handler: function(){
 
-				var sm = this.treePanel.getSelectionModel();
-				var node = sm.getSelectedNode();
+				const node = this.node;
 
 				var template = new Ext.Template(t("Are you sure you want to EMPTY '{name}'?", "email"));
 
@@ -205,8 +204,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			cls: 'x-btn-text-icon',
 			scope: this,
 			handler: function(){
-				var sm = this.treePanel.getSelectionModel();
-				var node = sm.getSelectedNode();
+				const node = this.node;
 				var protected_mbs = ["INBOX", "Trash", "Sent"];
 				if(!node|| node.attributes.folder_id<1) {
 					Ext.MessageBox.alert(t("Error"), t("Select a folder to delete please", "email"));
@@ -258,8 +256,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 				if(!this.imapAclDialog)
 					this.imapAclDialog = new GO.email.ImapAclDialog();
 
-				var sm = this.treePanel.getSelectionModel();
-				var node = sm.getSelectedNode();
+				const node = this.node;
 
 				this.imapAclDialog.setParams(node.attributes.account_id,node.attributes.mailbox, node.text);
 				this.imapAclDialog.show();
@@ -274,16 +271,14 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 				if (!this.foldersDialog) {
 					this.foldersDialog = new GO.email.FoldersDialog();
 				}
-				var sm = this.treePanel.getSelectionModel();
-				var node = sm.getSelectedNode();
+				const node = this.node;
 				this.foldersDialog.show(node.attributes.account_id);
 			}
 		},'-', this.propertiesBtn = new Ext.menu.Item({
 			iconCls: 'btn-edit',
 			text: t("Properties"),
 			handler:function(a,b){
-				var sm = this.treePanel.getSelectionModel();
-				var node = sm.getSelectedNode();
+				const node = this.node;
 				
 				if (!GO.email.folderDialog)
 					GO.email.folderDialog = new GO.email.FolderDialog();

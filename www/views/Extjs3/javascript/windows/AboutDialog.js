@@ -34,14 +34,14 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			formControllerUrl:'core',
 			loadAction:'about',
 			layout:'fit',
-			height: dp(300),
+			autoHeight:true,
 			width: dp(480),
 			resizable: false,
 			closeAction:'hide',
 			title:t("About GroupOffice"),
-			buttons: []
+			buttons: null
     });
-		
+
 		 
 		GO.dialog.AboutDialog.superclass.initComponent.call(this);
 	},
@@ -57,13 +57,17 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	buildForm : function(){		
 		this.addPanel(new Ext.Panel({
 			border:false,
-			padding: dp(16),
+			// padding: dp(16),
 			items: [
-				{xtype: 'box', cls: "go-about-logo"},
-				new GO.form.PlainField({
-					name:'about',
-					hideLabel: true					
-				}),
+
+				new Ext.form.FieldSet({
+						items: [
+							{xtype: 'box', cls: "go-about-logo"},
+							new GO.form.PlainField({
+							name: 'about',
+							hideLabel: true
+						})]
+					}),
 				this.usageFS = new Ext.form.FieldSet({
 					hidden:true,
 					style:'margin-top:10px',

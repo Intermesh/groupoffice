@@ -6,8 +6,8 @@ go.customfields.type.SelectOptionsTree = function(config){
 
 	Ext.apply(config, {
 		animate:false,
-		enableDrag:true,
-		autoScroll: true,
+		enableDD:true,
+		autoScroll: true
 	});
 
 	config.bbar=[ '->',{
@@ -75,16 +75,15 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 	
 	setValue : function(options) {
 		// set the root node
-    var root = new Ext.tree.AsyncTreeNode({
+        var root = new Ext.tree.AsyncTreeNode({
 			text: 'Root',
 			draggable:false,
 			id:'root',
 			children: this.apiToTree(options),
 			expanded: true,
 			checked: true
-    });
-
-    this.setRootNode(root);
+        });
+        this.setRootNode(root);
 	},
 	
 	apiToTree : function(options) {
@@ -122,8 +121,10 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 			v.push({
 				id: child.attributes.serverId || null,
 				text: child.text,
+				sortOrder: child.sortOrder,
 				enabled: child.attributes.checked,
-				children: me.treeToAPI(child)
+				children: me.treeToAPI(child),
+				allowChildren: false
 			});
 		});
 		

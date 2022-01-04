@@ -68,6 +68,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 	createAddressBookTree : function() {
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
 			region:  "north",
+			stateId:'ab-tree',
 			split: true,
 			containerScroll: true,
 			autoScroll: true,
@@ -118,7 +119,13 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				return;
 			}
 
+			this.grid.store.setFilter("starred", null);
+
 			if (node.id === "all") {
+				this.setAddressBookId(null);
+			} else if (node.id === "starred") {
+
+				this.grid.store.setFilter("starred", {starred: true});
 				this.setAddressBookId(null);
 			} else if (node.attributes.entity.name === "AddressBook") {
 				this.setAddressBookId(node.attributes.data.id);
@@ -168,7 +175,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					xtype: 'tbsearch'
 				},
 				this.addButton = new Ext.Button({
-					//disabled: true,
 					iconCls: 'ic-add',
 					cls: "primary",
 					tooltip: t('Add'),
@@ -203,10 +209,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				}),
 				{
 					iconCls: 'ic-more-vert',
-					menu: [{
+					menu: [this.importButton = new Ext.menu.Item({
 							iconCls: 'ic-cloud-upload',
 							text: t("Import"),
-							disabled: !go.Modules.isAvailable("community","addressbook",go.permissionLevels.manage) && go.Modules.get("community", "addressbook").settings.restrictExportToAdmins,
 							handler: function() {
 								go.util.importFile(
 												'Contact', 
@@ -370,8 +375,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 												});
 							},
 							scope: this
-						}, {
-							disabled: !go.Modules.isAvailable("community","addressbook",50,go.User) && go.Modules.get("community", "addressbook").settings.restrictExportToAdmins,
+						}), this.exportButton = new Ext.menu.Item({
 							iconCls: 'ic-cloud-download',
 							text: t("Export"),
 							menu: [
@@ -435,7 +439,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 								}
 
 							]							
-						},
+						}),
 						"-",
 
 						{
@@ -562,6 +566,12 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 	setAddressBookId: function (addressBookId) {
 		this.addButton.setDisabled(false);
+
+		var defaultDisabled = !go.Modules.isAvailable("community","addressbook",go.permissionLevels.manage) &&
+			go.Modules.get("community", "addressbook").settings.restrictExportToAdmins;
+
+		this.importButton.setDisabled(false); // Only export is restricted to the restrictExportToAdmins setting!
+		this.exportButton.setDisabled(defaultDisabled);
 		if (addressBookId) {
 			this.addAddressBookId = addressBookId;
 			
@@ -569,20 +579,28 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				addressBookId: addressBookId
 			});
 			
-		} else
-		{
+		} else {
 			this.grid.store.setFilter("addressbooks", null);
 			
-			var firstAbNode = this.addressBookTree.getRootNode().childNodes[1];
+			var firstAbNode = this.addressBookTree.getRootNode().childNodes[2];
 			if (firstAbNode) {
 				this.addAddressBookId = go.User.addressBookSettings && go.User.addressBookSettings.defaultAddressBookId ? go.User.addressBookSettings.defaultAddressBookId : firstAbNode.attributes.data.id;
-			} else
-			{
+			} else {
 				this.addButton.setDisabled(true);
 			}
 		}
-		
-		this.grid.store.load();
+		var me = this;
+		this.grid.store.load().then(function (result) {
+			if (addressBookId) {
+				go.Db.store('AddressBook').single(addressBookId).then(function (ab) {
+					if (ab.permissionLevel < go.permissionLevels.write) {
+						me.addButton.setDisabled(true);
+						me.importButton.setDisabled(true);
+						me.exportButton.setDisabled(true);
+					}
+				});
+			}
+		});
 	},
 
 	setGroupId: function (groupId, addressBookId) {
@@ -617,45 +635,52 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 		//loop through dragged grid records
 
-		go.Db.store("Contact").get(e.source.dragData.selections.map(function(r){return r.id})).then(function(result) {
-			result.entities.forEach(function (c) {
-				var contact = {};
+		function cb() {
+			go.Db.store("Contact").get(e.source.dragData.selections.map(function (r) {
+				return r.id
+			})).then(function (result) {
+				result.entities.forEach(function (c) {
+					var contact = {};
 
-				if (e.target.attributes.entity.name === "AddressBook") {
-					removeFromGrid = c.addressBookId !== e.target.attributes.data.id;
-					contact.addressBookId = e.target.attributes.data.id;
-					contact.groups = []; //clear groups when changing address book
-				} else
-				{
-					removeFromGrid = c.addressBookId != e.target.attributes.data.addressBookId;
-					//clear groups when changing address book
-					contact.groups = c.addressBookId == e.target.attributes.data.addressBookId ? go.util.clone(c.groups) : [];
-					contact.addressBookId = e.target.attributes.data.addressBookId;
+					if (e.target.attributes.entity.name === "AddressBook") {
+						removeFromGrid = c.addressBookId !== e.target.attributes.data.id;
+						contact.addressBookId = e.target.attributes.data.id;
+						contact.groups = []; //clear groups when changing address book
+					} else {
+						removeFromGrid = c.addressBookId != e.target.attributes.data.addressBookId;
+						//clear groups when changing address book
+						contact.groups = c.addressBookId == e.target.attributes.data.addressBookId ? go.util.clone(c.groups) : [];
+						contact.addressBookId = e.target.attributes.data.addressBookId;
 
-					var groupId = e.target.attributes.data.id;
-					if (contact.groups.indexOf(groupId) > -1) {
-						return; //already in the groups
+						var groupId = e.target.attributes.data.id;
+						if (contact.groups.indexOf(groupId) > -1) {
+							return; //already in the groups
+						}
+						contact.groups.push(groupId);
 					}
-					contact.groups.push(groupId);
+
+					updates[c.id] = contact;
+				});
+
+				//console.log(updates);
+
+				if (removeFromGrid) {
+					me.grid.store.remove(e.source.dragData.selections);
 				}
 
-				updates[c.id] = contact;
+				go.Db.store("Contact").set({
+					update: updates
+				}).then(function (response) {
+					if (!go.util.empty(response.notUpdated)) {
+						Ext.MessageBox.alert(t("Error"), t("Failed to add contacts to the group"));
+					}
+				})
 			});
+		}
 
-			//console.log(updates);
-
-			if (removeFromGrid) {
-				me.grid.store.remove(e.source.dragData.selections);
-			}
-
-			go.Db.store("Contact").set({
-				update: updates
-			}).then(function(response) {
-				if(!go.util.empty(response.notUpdated)) {
-					Ext.MessageBox.alert(t("Error"), t("Failed to add contacts to the group"));
-				}
-			})
-		});
+		go.User.confirmOnMove ?
+			Ext.Msg.confirm(t('Confirm'), t('Are you sure you want to move the item(s)?'), function(btn) { if(btn == 'yes') cb.call(this)}, this) :
+			cb.call(this);
 
 
 

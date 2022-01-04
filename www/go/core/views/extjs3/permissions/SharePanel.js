@@ -14,11 +14,18 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	
 	trackMouseOver: true,
 
+	/**
+	 * Default level when groups are checked
+	 */
+	addLevel: go.permissionLevels.read,
+
+	value: null,
+
+	enableDelete: false,
+
+	disableSelection: true,
+
 	initComponent: function () {
-		
-		if(!this.value) {
-			this.value = [];
-		}
 		
 		var checkColumn = new GO.grid.CheckColumn({
 			width: dp(64),
@@ -29,9 +36,6 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			listeners: {
 				change: this.onCheckChange,
 				scope: this
-			},
-			isDisabled : function(record) {
-				return record.data.id === 1;
 			}
 		});
 		
@@ -55,7 +59,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					name: 'level', 
 					type: {
 						convert: function (v, data) {							
-							return me.value[data.id];
+							return me.value ? me.value[data.id] : null;
 						}
 					}
 				},
@@ -184,11 +188,6 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
 		
 		go.permissions.SharePanel.superclass.initComponent.call(this);
-		
-		this.on("beforeedit", function(e) {
-			return e.record.data.id !== 1; //cancel edit for admins group
-		}, this);
-
 
 		this.on("cellclick", function(grid, rowIndex, columnIndex, e) {
 			var record = grid.getStore().getAt(rowIndex);  // Get the Record
@@ -199,6 +198,23 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			}
 			
 		}, this);
+
+
+		this.on("added", () => {
+			setTimeout(() => {
+
+				const form = this.findParentByType("entityform");
+				if (form) {
+					form.on("load", function (f, v) {
+						this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
+					}, this);
+				}
+
+				if(this.value === null) {
+					this.value = form.entityStore.entity.defaultAcl;
+				}
+			})
+		});
 
 	},
 	
@@ -212,7 +228,10 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	},
 	
 	onCheckChange : function(record, newValue) {
-		if(newValue) {			
+		if(this.value == null) {
+			this.value = {};
+		}
+		if(newValue) {
 			record.set('level', this.addLevel);
 			this.value[record.data.id] = record.data.level;
 		} else
@@ -283,9 +302,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				};
 				
 		
-		if(!this.addLevel)
-			this.addLevel = go.permissionLevels.read;
-		
+
 		return new go.form.ComboBox(permissionLevelConfig);
 	},
 	
@@ -293,25 +310,16 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 		go.permissions.SharePanel.superclass.afterRender.call(this);
 
-		var form = this.findParentByType("entityform");
 
-		if(!form) {
-			return;
-		}
-		this.value = form.entityStore.entity.defaultAcl;
-
-		form.on("load", function(f, v) {
-			this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
-		}, this);
 
 		//Check form currentId becuase when form is loading then it will load the store on setValue later.
 		//Set timeout is used to make sure the check will follow after a load call.
-		var me = this;
-		setTimeout(function() {
-			if(!go.util.empty(me.value) && !form.currentId) {				
-				me.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
-			}
-		}, 0);		
+
+		setTimeout(() => {
+			//if(!go.util.empty(me.value) && !form.currentId) {
+				this.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
+			//}
+		});
 	},
 	
 	isFormField: true,
@@ -327,14 +335,17 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	},
 
 	reset : function() {
-		this.setValue([]);
+		this.setValue(null);
 		this.dirty = false;
 	},
 
 	setValue: function (groups) {
-		this._isDirty = false;		
+		this._isDirty = false;
 		this.value = groups;
-		this.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
+		if(this.rendered) {
+			this.store.load().catch(function () {
+			}); //ignore failed load becuase onBeforeStoreLoad can return false
+		}
 	},
 	
 	getSelectedGroupIds : function() {
@@ -359,6 +370,8 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			var selectedGroupIds = this.getSelectedGroupIds();
 			this.store.removeAll();
 		}
+
+		this.getEl().mask(t("Loading.."));
 		
 		go.Db.store("Group").get(selectedGroupIds, function(entities) {
 			this.store.loadData({records: entities}, true);
@@ -373,7 +386,9 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			}).then(function() {
 				//when reload is called by SSE we need this removed.
 				delete me.store.lastOptions.selectedLoaded;
-			});
+			}).finally(function() {
+				me.getEl().unmask();
+			})
 		}, this);
 		
 		return false;

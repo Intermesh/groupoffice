@@ -38,6 +38,10 @@
 
 .go-addressbook-url-panel {
   text-align: right;
+  position: absolute;
+  display: inline-block;
+  right: dp(8);
+  float: right;
   line-height: dp(20);
 }
 

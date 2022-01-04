@@ -17,8 +17,8 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
 		this.title = t("Groups");
 		this.store = new go.data.Store({
-			baseParams: {
-				filter: {
+			filters: {
+				hideUsers: {
 					//excludeEveryone: true,
 					hideUsers: true
 				}

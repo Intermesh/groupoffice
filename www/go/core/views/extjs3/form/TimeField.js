@@ -1,6 +1,9 @@
 go.form.TimeField = Ext.extend(Ext.form.TextField, {
 	width: dp(96),
 	defaultAutoCreate : {tag: 'input', type: 'time', size: '20', autocomplete: 'off'},
+	// set true to get/set integer seconds/minutes value instead of time string
+	asInteger: true,
+	// set true to get/set value in minutes instead of seconds
 	inMinutes: false,
 
 	initComponent: function() {
@@ -23,22 +26,34 @@ go.form.TimeField = Ext.extend(Ext.form.TextField, {
 		go.form.TimeField.superclass.onBlur.call(this);
 	},
 
-	setMinutes: function(minutes) {
-		var duration = go.util.Format.duration(minutes);
+	setSeconds: function(seconds) {
+		var duration = go.util.Format.duration(seconds, true, false);
 		if(duration.length < 5) {
 			duration = '0'+duration;
 		}
 		this.setRawValue(duration);
 	},
 
-	getMinutes: function() {
+	setMinutes: function(minutes) {
+		this.setSeconds(minutes*60);
+	},
+
+	getSeconds: function() {
+		return this.getMinutes() * 60; // this field cant display/set seconds
+	},
+
+	getMinutes: function(minutes) {
 		return go.util.Format.minutes(this.getRawValue());
 	},
 
 	setValue : function(v) {
 		if(!go.util.empty(v)) {
-			if(this.inMinutes) {
-				this.setMinutes(v);
+			if(this.asInteger) {
+				if(this.inMinutes) {
+					this.setMinutes(v);
+				} else {
+					this.setSeconds(v);
+				}
 				return;
 			}
 			var parts = v.split(":");
@@ -51,10 +66,14 @@ go.form.TimeField = Ext.extend(Ext.form.TextField, {
 	},
 
 	getValue: function() {
-		var v = this.getRawValue();
-		if(this.inMinutes) {
-			return this.getMinutes();
+		if(this.asInteger) {
+			if(this.inMinutes) {
+				return this.getMinutes();
+			} else {
+				return this.getSeconds();
+			}
 		}
+		var v = this.getRawValue();
 		if(!v) {
 			return;
 		}

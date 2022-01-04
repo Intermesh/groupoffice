@@ -62,12 +62,13 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 	 * array_merge_recursive from php does not handle string elements right. 
 	 * It does not overwrite them but it creates unwanted sub arrays.
 	 * 
-	 * @param array $arr
+	 * @param array|ArrayObject $arr
 	 * @return self
 	 */
-	public function mergeRecursive(array $arr) {
+	public function mergeRecursive($arr) {
 		foreach ($arr as $key => $value) {
-			if (is_array($value) && isset($this[$key])) {				
+			if (is_array($value) && isset($this[$key]) && is_array($this[$key])) {
+
 				$this[$key] = new self($this[$key]);
 				$this[$key]->mergeRecursive($value);
 			} else {

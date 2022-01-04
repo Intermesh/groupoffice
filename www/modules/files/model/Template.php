@@ -32,7 +32,12 @@ namespace GO\files\Model;
 class Template extends \GO\Base\Db\ActiveRecord {
 
 	public static $trimOnSave = false;
-	
+
+	public static function getClientName()
+	{
+		return "FilesTemplate";
+	}
+
 	/**
 	 * Returns a static model of itself
 	 * 

@@ -13,7 +13,18 @@ go.login.RecoveryDialog = Ext.extend(go.Window, {
 			items:[{
 				xtype:'fieldset',
 				labelWidth: dp(200),
-				items:[this.recoveryText = new Ext.BoxComponent({
+				items:[
+					new Ext.Button({
+						hidden: true,
+						hideMode: "offsets",
+						type: "submit",
+						handler: function() {
+							this.submit();
+						},
+						scope: this
+					}),
+
+					this.recoveryText = new Ext.BoxComponent({
 						html: t("Loading"),
 						cls: 'login-text-comp'
 					}),
@@ -46,60 +57,68 @@ go.login.RecoveryDialog = Ext.extend(go.Window, {
 	
 		this.buttons = [{
 			text: t('Change'),
-			handler:function() {
-				
-				if(this.passwordField.getValue() != this.confirmPasswordField.getValue()) {
-					this.confirmPasswordField.markInvalid(t("The passwords didn't match"));
-					return;
-				}
-				
-				if(!this.passwordField.isValid() || !this.confirmPasswordField.isValid()) {
-					return;
-				}
-				
-				Ext.Ajax.request({
-					url: go.AuthenticationManager.getAuthUrl(),
-					jsonData: {
-						recover: true,
-						hash: this.hashField.getValue(),
-						newPassword: this.passwordField.getValue()
-					},
-					callback: function(options, success, response){
-						var result = Ext.decode(response.responseText);
-						if(success && result.passwordChanged){ // Password has been change successfully
-							go.Router.setPath("");
-							
-							if(this.redirectUrl) {
-								document.location = this.redirectUrl;
-							} else
-							{
-								
-								this.close();
-								GO.mainLayout.login();
-								Ext.MessageBox.alert(t("Success"), t("Your password was changed successfully"));
-							}
-						} else
-						{
-							//mark validation errors
-							for(name in result.validationErrors) {
-								var field = this.formPanel.getForm().findField(name);
-								if(field) {
-									field.markInvalid(result.validationErrors[name].description);
-								}
-							}
-
-							Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + response.statusText);
-						}
-					},
-					scope: this	
-				});
-			},
+			handler:this.submit,
 			scope:this
 		}];
 
 		go.login.RecoveryDialog.superclass.initComponent.call(this);
 	},
-	
+
+	focus: function() {
+		this.passwordField.focus();
+	},
+
+	submit: function() {
+
+		if(this.passwordField.getValue() != this.confirmPasswordField.getValue()) {
+			this.confirmPasswordField.markInvalid(t("The passwords didn't match"));
+			return;
+		}
+
+		if(!this.passwordField.isValid() || !this.confirmPasswordField.isValid()) {
+			return;
+		}
+
+		Ext.Ajax.request({
+			url: go.AuthenticationManager.getAuthUrl(),
+			jsonData: {
+				action: "recover",
+				hash: this.hashField.getValue(),
+				newPassword: this.passwordField.getValue()
+			},
+			callback: function(options, success, response){
+				var result = Ext.decode(response.responseText);
+				if(success && result.passwordChanged){ // Password has been change successfully
+
+
+					if(this.redirectUrl) {
+						document.location = this.redirectUrl;
+					} else
+					{
+
+						this.close();
+
+						Ext.MessageBox.alert(t("Success"), t("Your password was changed successfully"), function() {
+							go.Router.goto("");
+						});
+					}
+				} else
+				{
+					//mark validation errors
+					for(name in result.validationErrors) {
+						var field = this.formPanel.getForm().findField(name);
+						if(field) {
+							field.markInvalid(result.validationErrors[name].description);
+						}
+					}
+
+					Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + response.statusText);
+				}
+			},
+			scope: this
+		});
+	},
+
 	show : function(hash, redirectUrl) {
 		go.login.RecoveryDialog.superclass.show.call(this);
 		
@@ -108,7 +127,7 @@ go.login.RecoveryDialog = Ext.extend(go.Window, {
 		Ext.Ajax.request({
 			url: go.AuthenticationManager.getAuthUrl(),
 			jsonData: {
-				recover: true,
+				action: "recover",
 				hash: hash
 			},
 			callback: function(options, success, response){

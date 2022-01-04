@@ -1,0 +1,23 @@
+<?php
+return array (
+  'Mailbox' => 'Caixa de correio',
+  'Quota (MB)' => 'Quota (MB)',
+  'Automatic reply' => 'Resposta automática',
+  'Enable automatic reply' => 'Ativar resposta automática',
+  'Body' => 'Corpo',
+  'Max aliases' => 'Máx. de apelidos',
+  'Max mailboxes' => 'Máx. de caixas de correio',
+  'Max quota (MB)' => 'Máx. de cota (MB)',
+  'Default quota (MB)' => 'Padrão para cota (MB)',
+  'Backup MX' => 'MX Reserva',
+  'Mailboxes' => 'Caixas de correio',
+  'Usage' => 'Uso',
+  'E-mail domains' => 'Domínios de e-mail',
+  'Aliases' => 'Apelidos',
+  'Goto' => 'Ir para',
+  'Alias' => 'Apelido',
+  'Use \'*\' for a catch all alias (not recommended).' => 'Use \'*\' para apanhar tudo (não recomendado).',
+  'For multiple recipients use a comma separated list eg. alias1@domain.com,alias2@domain.com' => 'Para vários destinatários, use uma lista separada por vírgulas, por exemplo: alias1@ dominio.com, alias2@ dominio.com',
+  'Used quota' => 'Quota usada',
+  'Postfix admin' => 'Administrador Postfix',
+);

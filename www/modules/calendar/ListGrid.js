@@ -47,9 +47,12 @@ GO.calendar.ListGrid = function(config)
 			'read_only',
 //			'has_other_participants',
 			'participant_ids',
+			'permission_level',
 			'ctime',
 			'mtime',
 			'username',
+			'user_id',
+			'is_organizer',
 			'musername',
 			'resources',
 			'model_name'
@@ -66,7 +69,7 @@ GO.calendar.ListGrid = function(config)
 		remoteSort:true
 	});
 	
-	config.paging=false,
+	config.paging=false;
 	config.autoExpandColumn='listview-calendar-name-heading';
 	config.autoExpandMax=2500;
 	config.enableColumnHide=false;

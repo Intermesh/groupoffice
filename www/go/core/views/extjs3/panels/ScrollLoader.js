@@ -28,7 +28,11 @@ go.panels.ScrollLoader = {
 			}, this, {single: true});
 
 			this.store.on("load", function(store, records, o){
+				// Set page size to limit parameter
 				var limit = o.params && o.params.limit ? o.params.limit: this.pageSize;
+				if(limit !== this.pageSize) {
+					this.pageSize = limit;
+				}
 				this.allRecordsLoaded = (records.length < limit);
 				//If this element or any parent is hidden then  this.el.dom.offsetParent == null
 				if(this.rendered && this.el.dom.offsetParent) {
@@ -82,23 +86,6 @@ go.panels.ScrollLoader = {
 	},
 
 	/**
-	 * Only show loadmask if loading the first page or when scrolling down
-	 * @param firstPage
-	 */
-	toggleLoadMask : function(firstPage) {
-
-		if(this.loadMask) {
-			var disable = !firstPage && this.slScroller.scrollHeight - this.slScroller.scrollTop - this.slScroller.offsetHeight > 100;
-
-			if(disable) {
-				this.loadMask.disable();
-			}else{
-				this.loadMask.enable();
-			}
-		} 
-	},
-	
-	/**
 	 * Loads more data if the end off the scroll area is reached
 	 * @returns {undefined}
 	 */
@@ -126,15 +113,9 @@ go.panels.ScrollLoader = {
 
 				if(this.isGridPanel()) {
 					this.getView().scrollToTopOnLoad = false;
-					//this.toggleLoadMask();
 				}
 
-				me.toggleLoadMask(o.params.position == 0);
-				store.load(o).then(function() {
-					if(me.loadMask) {
-						me.loadMask.enable();
-					}
-				});
+				store.load(o)
 			}
 		} else {			
 
@@ -151,14 +132,8 @@ go.panels.ScrollLoader = {
 				o.params.limit = this.pageSize;
 				o.paging = true;
 				o.keepScrollPosition = true;
-
-				me.toggleLoadMask(o.params.position == 0);
 				
-				store.load(o).then(function() {
-					if(me.loadMask) {
-						me.loadMask.enable();
-					}
-				});
+				store.load(o);
 
 			}
 		}

@@ -28,6 +28,8 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		}
 
 		this.grid.store.setFilter('search', filter);
+
+		go.searchLinkFilter = v;
 		
 		this.grid.store.load();
 	},
@@ -115,13 +117,20 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			]
 		});
 
-
-
 		go.links.CreateLinkWindow.superclass.initComponent.call(this);
+
+		//wait for entity selection
+		this.entityGrid.on("viewready", function() {
+			if(go.searchLinkFilter) {
+				this.searchField.setValue(go.searchLinkFilter);
+				this.search(go.searchLinkFilter);
+				this.searchField.focus(true);
+			}
+		}, this);
 	},
 	
 	focus : function() {
-		this.searchField.focus();
+		this.searchField.focus(true);
 	},
 
 	link: function () {

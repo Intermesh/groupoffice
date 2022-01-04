@@ -27,7 +27,7 @@ go.login.BaseLoginPanel = Ext.extend(Ext.FormPanel, {
 	 * @return {undefined}
 	 */				
 	setErrors: function(errors){
-		
+		GO.errorDialog.show(errors.join("<br />"));
 	},
 	
 	/**

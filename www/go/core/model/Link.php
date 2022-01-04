@@ -6,6 +6,8 @@ use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\db\Query as DbQuery;
+use go\core\db\Table;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -142,7 +144,7 @@ class Link extends AclItemEntity
 		}
 	}
 
-	
+
 	public function setToEntity($entityName) {
 		$e = EntityType::findByName($entityName);
 		$this->toEntity = $e->getName();
@@ -189,10 +191,17 @@ class Link extends AclItemEntity
 		);
 	}
 
+	/**
+	 * Override because it should not join core_search because we already do this in the mapping
+	 *
+	 * @param Query $query
+	 * @return bool
+	 */
 	protected static function useSearchableTraitForSearch(Query $query)
 	{
 		return true;
 	}
+
 
 	/**
 	 * Create a link between two entities
@@ -233,7 +242,7 @@ class Link extends AclItemEntity
 	 * @param Entity|ActiveRecord  $b
 	 * @return boolean
 	 */
-	public static function exists($a, $b) {
+	public static function linkExists($a, $b) {
 		return static::findLink($a, $b) !== false;
 	}
 	/**
@@ -264,7 +273,7 @@ class Link extends AclItemEntity
 			'fromId' => $a->id
 		]);
 	}
-	
+
 	/**
 	 * Delete a link between two entities
 	 * 
@@ -389,9 +398,12 @@ class Link extends AclItemEntity
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		if(!isset($this->aclId)) {
-			$search = Search::find(['aclId'])->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
-			$this->aclId = $search->findAclId();
+		if($this->isNew() && empty($this->aclId)) {
+			$e = $this->findToEntity();
+			if(!$e) {
+				throw new \Exception("Could not find to entity in link");
+			}
+			$this->aclId = $e->findAclId();
 		}
 
 		if(!isset($this->permissionLevel)) {
@@ -417,7 +429,13 @@ class Link extends AclItemEntity
 							$crtiteria->where('fromId', '=', $value);
 						})
 						->add('entity', function (Criteria $criteria, $value){
-							$criteria->where(['eFrom.clientName' => $value]);		
+
+							$e = EntityType::findByName($value);
+							if(!$e) {
+								throw new \Exception("Entity type " . $value .' not found');
+							}
+
+							$criteria->where(['l.fromEntityTypeId' => $e->getId()]);
 						})
 						->add('entities', function (Criteria $criteria, $value){
 							// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
@@ -428,7 +446,11 @@ class Link extends AclItemEntity
 							$sub = (new Criteria);
 
 							foreach($value as $e) {
-								$w = ['eTo.clientName' => $e['name']];
+								$et = EntityType::findByName($e['name']);
+								if(!$et) {
+									throw new \Exception("Entity type " . $e['name'] .' not found');
+								}
+								$w = ['l.toEntityTypeId' => $et->getId()];
 								if(isset($e['filter'])) {
 									$w['filter'] = $e['filter'];
 								}

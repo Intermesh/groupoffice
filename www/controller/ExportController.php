@@ -201,25 +201,6 @@ class ExportController extends AbstractController {
 		$response['success'] =true;
 		echo $this->render('json', $response);
 	}
-	
-//	
-//	/**
-//	 * Get the exporttypes that can be used
-//	 * 
-//	 * @param array $params
-//	 * @return array 
-//	 */
-//	protected function actionTypes($params) {
-//		$response = array();		
-//		$response['outputTypes'] = $this->_getExportTypes(\GO::config()->root_path.'go/base/export/');
-//		
-//		if(!empty($params['exportClassPath']))
-//			$response['outputTypes'] = array_merge($response['outputTypes'], $this->_getExportTypes(\GO::config()->root_path.$params['exportClassPath']));
-//		
-//		$response['success'] =true;
-//		return $response;
-//	}
-//	
 
 	
 	/**
@@ -248,12 +229,6 @@ class ExportController extends AbstractController {
 				$classname = $classPath.$exporter->nameWithoutExtension();
 				if($classname != 'GO\Base\Export\ExportInterface' && $classname != 'GO\Base\Export\Settings')
 				{
-					//$export = new $classname('temp');
-					
-					//this is only compatible with php 5.3:
-					//$classname::$showInView
-					//so we use ReflectionClass
-					
 					$class = new \ReflectionClass($classname);
 					$showInView=$class->getStaticPropertyValue('showInView');
 					$name = $class->getStaticPropertyValue('name');

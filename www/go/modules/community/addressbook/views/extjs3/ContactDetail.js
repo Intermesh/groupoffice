@@ -24,6 +24,11 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					detailView.avatar.update(go.util.avatar(detailView.data.name, detailView.data.photoBlobId, icon))
 				},
 				items:[
+				// 	{
+				// 	cls: 'go-addressbook-url-panel',
+				// 	xtype: "box",
+				// 	tpl: '<tpl for="urls">&nbsp;&nbsp;<a target="_blank" href="{[go.modules.community.addressbook.Utils.transformUrl(values.url, values.type)]}" class="go-addressbook-url {type}"></a></tpl>'
+				// },
 				{
 					xtype: 'container',
 					layout: "hbox",
@@ -59,23 +64,20 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						}),
 					
 						this.namePanel = new Ext.BoxComponent({
-							style: "display: table;height:100%;",
-							tpl: '<div style="vertical-align: middle;display:table-cell;">' +
+							style: "height:100%;",
+							flex: 1,
+							tpl: '<div class="go-addressbook-url-panel"><tpl for="urls">&nbsp;&nbsp;<a target="_blank" href="{[go.modules.community.addressbook.Utils.transformUrl(values.url, values.type)]}" class="go-addressbook-url {type}"></a></tpl></div>'+
+								'<div style="vertical-align: middle;display:table-cell;">' +
 								'<h3 <tpl if="color">style=\"color: #{color};\"</tpl>>' +
 								'<tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl>' +
 								'</h3>' +
 								'<h4>{jobTitle} <tpl if="values.department">- {department}</tpl></h4>' +
 								'</div>'
-						}),						
-						this.urlPanel = new Ext.BoxComponent({
-							flex: 1,
-							cls: 'go-addressbook-url-panel',
-							xtype: "box",
-							tpl: '<tpl for="urls">&nbsp;&nbsp;<a target="_blank" href="{[go.modules.community.addressbook.Utils.transformUrl(values.url, values.type)]}" class="go-addressbook-url {type}"></a></tpl>'
 						})
+
 					]
 					
-				}, 				
+				},
 
 				this.emailAddresses = new Ext.BoxComponent({
 					xtype: "box",
@@ -279,7 +281,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					}],
 					onLoad: function (detailView) {						
 						this.setVisible(!!detailView.data.notes);
-						this.items.first().setText('<div style="white-space: pre-wrap">' + Ext.util.Format.htmlEncode(detailView.data.notes) + "</div>");
+						this.items.first().setText(go.util.textToHtml(detailView.data.notes) );
 					}
 				}
 			]
@@ -295,7 +297,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 			if(a.link.entity == "Contact" && b.link.entity != "Contact") {
 				return -1;
 			}
-			return 0;
+			return 1;
 		});
 		this.addComments();
 		this.addFiles();
@@ -308,7 +310,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
 		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
-		// this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
+		this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
 		go.modules.community.addressbook.ContactDetail.superclass.onLoad.call(this);
 	},
 
@@ -340,20 +342,20 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 			this.moreMenu ={
 				iconCls: 'ic-more-vert',
 				menu: [
-					// this.starItem = new Ext.menu.Item({
-					// 	iconCls: "ic-star",
-					// 	text: t("Star"),
-					// 	handler: function () {
-					// 		var update = {};
-					// 		update[this.currentId] = {starred: this.data.starred ? null : true};
-					//
-					// 		go.Db.store("Contact").set({
-					// 			update: update
-					// 		});
-					// 	},
-					// 	scope: this
-					// }),
-					// '-',
+					this.starItem = new Ext.menu.Item({
+						iconCls: "ic-star",
+						text: t("Star"),
+						handler: function () {
+							var update = {};
+							update[this.currentId] = {starred: this.data.starred ? null : true};
+
+							go.Db.store("Contact").set({
+								update: update
+							});
+						},
+						scope: this
+					}),
+					'-',
 					{
 						iconCls: "ic-print",
 						text: t("Print"),

@@ -47,7 +47,7 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 	setThisMonth :  function() {
 		var todayStart = (new Date()).clearTime(),
 			thisMonthStart = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1),
-			thisMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth() + 1, 1).add(Date.DAY, -1);
+			thisMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth() + 1, 0);
 		this.startDatePicker.setValue(thisMonthStart);
 		this.endDatePicker.setValue(thisMonthEnd);
 		this.onEndDateSelect();
@@ -56,27 +56,40 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 	setLastMonth :  function() {
 		var todayStart = (new Date()).clearTime(),
 			lastMonthStart = new Date(todayStart.getFullYear(), todayStart.getMonth()-1, 1),
-			lastMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1).add(Date.DAY, -1);
+			lastMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth(), 0);
 		this.startDatePicker.setValue(lastMonthStart);
 		this.endDatePicker.setValue(lastMonthEnd);
 		this.onEndDateSelect();
 	},
 
 	setThisYear :  function() {
-		var todayStart = (new Date()).clearTime(),
-			thisYearStart = new Date(todayStart.getFullYear() , 0, 1),
-			thisYearEnd = new Date(todayStart.getFullYear() +1 , 0, 1).add(Date.DAY, -1);
-		this.startDatePicker.setValue(thisYearStart);
-		this.endDatePicker.setValue(thisYearEnd);
+		this.setYear((new Date()).getFullYear());
+	},
+
+
+	setYear :  function(year) {
+		const	yearStart = new Date(year , 0, 1),
+			yearEnd = new Date(year + 1 , 0, 0);
+		this.startDatePicker.setValue(yearStart);
+		this.endDatePicker.setValue(yearEnd);
 		this.onEndDateSelect();
 	},
 
-	setLastYear :  function() {
-		var todayStart = (new Date()).clearTime(),
-			lastYearStart = new Date(todayStart.getFullYear() , 0, 1),
-			lastYearEnd = new Date(todayStart.getFullYear() +1 , 0, 1).add(Date.DAY, -1);
-		this.startDatePicker.setValue(lastYearStart);
-		this.endDatePicker.setValue(lastYearEnd);
+	setMonth : function(year, month) {
+		const	yearStart = new Date(year , month, 1),
+			yearEnd = new Date(year , month + 1, 0);
+		this.startDatePicker.setValue(yearStart);
+		this.endDatePicker.setValue(yearEnd);
+		this.onEndDateSelect();
+	},
+
+	setQuarter : function(year, q) {
+		q--;
+		const	start = new Date(year , q * 3, 1);
+		const end = new Date(year, q * 3 + 3, 0);
+
+		this.startDatePicker.setValue(start);
+		this.endDatePicker.setValue(end);
 		this.onEndDateSelect();
 	},
 
@@ -95,6 +108,21 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 		this.endDatePicker.on("select", this.onEndDateSelect, this);
 
 
+		const years = [];
+
+		for(let year = (new Date()).getFullYear() - 1, minYear = year - 8; year > minYear; year--) {
+			years.push({
+				text: year,
+				handler: function(item) {
+					this.setYear(item.text);
+				},
+				menu: new go.form.DateRangeFieldYearMenu({
+					year: year,
+					field: this
+				}),
+				scope: this
+			})
+		}
 
 		this.menu = new Ext.menu.Menu({
 			cls: "x-menu-no-icons",
@@ -125,12 +153,19 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 			},{
 				text: t("This year"),
 				handler: this.setThisYear,
+				scope: this,
+				menu: new go.form.DateRangeFieldYearMenu({
+					year: (new Date()).getFullYear(),
+					field: this
+				})
+			},{
+				text: t("Year"),
+				menu: {
+					cls: "x-menu-no-icons",
+					items: years
+				},
 				scope: this
 			},{
-				text: t("Last year"),
-				handler: this.setLastYear,
-				scope: this
-			}, {
 				text: t("Custom"),
 				menu: [{
 					xtype: "container",
@@ -246,3 +281,137 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 });
 
 Ext.reg("godaterangefield", go.form.DateRangeField);
+
+
+go.form.DateRangeFieldYearMenu = Ext.extend(Ext.menu.Menu, {
+	year: null,
+	field: null,
+	cls: "x-menu-no-icons",
+	initComponent : function() {
+
+		this.items = [
+				{
+					text: "Q1",
+					handler: function () {
+						this.field.setQuarter(this.year, 1);
+					},
+					scope: this,
+					menu: {
+						cls: "x-menu-no-icons",
+						scope: this,
+						items: [{
+							text: t("full_months")[1],
+							handler: function() {
+								this.field.setMonth(this.year, 0);
+							},
+							scope: this
+						},{
+							text: t("full_months")[2],
+							handler: function() {
+								this.field.setMonth(this.year, 1);
+							},
+							scope: this
+						},{
+							text: t("full_months")[3],
+							handler: function() {
+								this.field.setMonth(this.year, 3);
+							},
+							scope: this
+						}]
+					}
+				},
+				{
+					text: "Q2",
+					handler: function () {
+						this.field.setQuarter(this.year, 2);
+					},
+					scope: this,
+					menu: {
+						cls: "x-menu-no-icons",
+						scope: this,
+						items: [{
+							text: t("full_months")[4],
+							handler: function() {
+								this.field.setMonth(this.year, 3);
+							},
+							scope: this
+						},{
+							text: t("full_months")[5],
+							handler: function() {
+								this.field.setMonth(this.year, 4);
+							},
+							scope: this
+						},{
+							text: t("full_months")[6],
+							handler: function() {
+								this.field.setMonth(this.year, 5);
+							},
+							scope: this
+						}]
+					}
+				},
+				{
+					text: "Q3",
+					handler: function () {
+						this.field.setQuarter(this.year, 3);
+					},
+					scope: this,
+					menu: {
+						cls: "x-menu-no-icons",
+						scope: this,
+						items: [{
+							text: t("full_months")[7],
+							handler: function() {
+								this.field.setMonth(this.year, 6);
+							},
+							scope: this
+						},{
+							text: t("full_months")[8],
+							handler: function() {
+								this.field.setMonth(this.year, 7);
+							},
+							scope: this
+						},{
+							text: t("full_months")[9],
+							handler: function() {
+								this.field.setMonth(this.year, 8);
+							},
+							scope: this
+						}]
+					}
+				},
+				{
+					text: "Q4",
+					handler: function () {
+						this.field.setQuarter(this.year, 4);
+					},
+					scope: this,
+					menu: {
+						cls: "x-menu-no-icons",
+						scope: this,
+						items: [{
+							text: t("full_months")[10],
+							handler: function() {
+								this.field.setMonth(this.year, 9);
+							},
+							scope: this
+						},{
+							text: t("full_months")[11],
+							handler: function() {
+								this.field.setMonth(this.year, 10);
+							},
+							scope: this
+						},{
+							text: t("full_months")[12],
+							handler: function() {
+								this.field.setMonth(this.year, 11);
+							},
+							scope: this
+						}]
+					}
+				}
+			];
+
+			go.form.DateRangeFieldYearMenu.superclass.initComponent.call(this);
+		}
+})

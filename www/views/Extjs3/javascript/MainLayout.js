@@ -91,20 +91,18 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			if(go.User.accessToken){
 				Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + go.User.accessToken;
-				go.User.authenticate(function(data, options, success, response){
+				go.User.authenticate().then((user) => {
 					
-					if(success) {
-						me.on('render', function() {
-							me.fireEvent('boot', me);
-						}, me, {single:true});
-						me.onAuthentication(); // <- start Group-Office
-					} else {
-						go.User.clearAccessToken();
+					me.on('render', function() {
+						me.fireEvent('boot', me);
+					}, me, {single:true});
+					me.onAuthentication(); // <- start Group-Office
+				}).catch(() => {
+					go.User.clearAccessToken();
 
-						me.fireEvent("boot", me);
-						go.Router.check();
-					}
-				});
+					me.fireEvent("boot", me);
+					go.Router.check();
+				})
 			} else {
 				me.fireEvent("boot", me); // In the router there is an event attached.
 
@@ -326,7 +324,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		//this.initModule(moduleName);
 	},
 
-	onAuthentication: function () {
+	onAuthentication: function (password) {
 
 		//check if authRedirecUrl was given.
 		var urlParams = new URLSearchParams(window.location.search);
@@ -348,7 +346,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		Ext.getBody().mask(t("Loading..."));
 
-		go.Modules.init().then(function() {
+		return go.Modules.init().then(function() {
 			go.User.loadLegacyModules();
 			Promise.all([
 				go.customfields.CustomFields.init(),				
@@ -357,7 +355,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				go.Entities.init();
 				me.addDefaultRoutes();
 
-				me.fireEvent('authenticated', this);
+				me.fireEvent('authenticated', this, go.User, password);
 
 				me.renderUI();
 				Ext.getBody().unmask();
@@ -583,7 +581,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					layout: 'border',
 					split: false,
 					border: false,
-					items: [topPanel, this.tabPanel, notificationArea]
+					items: [{
+						region: "center",
+						layout: "border",
+						split: false,
+						border: false,
+						items: [topPanel, this.tabPanel]
+					},  notificationArea]
 				});
 
 
@@ -670,7 +674,21 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		});
 
 
+
 		if(go.User.isAdmin) {
+
+			if(go.Modules.get("core", "core").settings.readOnlyKeys.indexOf('license') == -1) {
+				this.userMenuLink.menu.insert(6, {
+					iconCls: 'ic-app-registration',
+					text: t("Register"),
+					handler: function () {
+						const licenseDialog = new go.license.LicenseDialog();
+						licenseDialog.show();
+					},
+					scope: this
+				});
+			}
+
 			this.userMenuLink.menu.insert(3, {
 				text: t("System settings"),
 				iconCls: 'ic-settings',
@@ -716,16 +734,29 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	welcome : function() {
-		if(go.User.id==1 && go.User.loginCount == 1 && !localStorage.welcomeShown) {
 
-			localStorage.welcomeShown = true;
+		if(go.User.id == 1)
+		{
+			const coreMod = go.Modules.get("core", "core");
 
-			Ext.MessageBox.alert(t("Welcome!"), t("Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog."), function() {
-				go.systemsettingsDialog = new go.systemsettings.Dialog();						
-				go.systemsettingsDialog.show();
-			});
-			
-			
+			if(!coreMod.settings.welcomeShown) {
+				Ext.MessageBox.alert(t("Welcome!"), t("Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog."), () => {
+
+					go.Db.store("Module").save({
+						settings: {
+							welcomeShown: true
+						}
+					}, coreMod.id);
+
+					go.systemsettingsDialog = new go.systemsettings.Dialog();
+					go.systemsettingsDialog.show();
+				});
+			}
+
+			// if(!coreMod.settings.licenseDenied && !coreMod.settings.license) {
+			// 	const licenseDialog = new go.license.LicenseDialog();
+			// 	licenseDialog.show();
+			// }
 		}
 	},
 //

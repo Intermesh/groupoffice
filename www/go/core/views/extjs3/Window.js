@@ -9,10 +9,13 @@ go.Window = Ext.extend(Ext.Window, {
 	animCollapse: false, //htmleditor doesn't work with animCollapse
 	
 	initComponent : function(){
-		
-		
+
 		if(this.animTarget) {
 			console.warn("animTarget on window causes wierd render issues");
+		}
+
+		if(this.maximized) {
+			this.autoHeight = false;
 		}
 		
 		//make sure window fits screen

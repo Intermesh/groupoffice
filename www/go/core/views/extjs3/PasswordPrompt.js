@@ -1,13 +1,11 @@
 go.PasswordPrompt = Ext.extend(go.Window, {
-
+	width: dp(400),
+	text: t('Provide your password.'),
+	title: t('Password required'),
+	modal: true,
+	layout: "fit",
+	maximized: false,
 	initComponent: function () {
-		
-		Ext.applyIf(this, {
-			text: t('Provide your password.'),
-			title: t('Password required'),
-			modal:true,
-			width: dp(400)
-		});
 		
 		this.formPanel = new Ext.FormPanel({
 			layout: 'form',
@@ -15,6 +13,16 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 				this.passwordFieldset = new Ext.form.FieldSet({
 //					labelWidth: dp(120),
 					items: [
+						//Add a hidden submit button so the form will submit on enter
+						new Ext.Button({
+							hidden: true,
+							hideMode: "offsets",
+							type: "submit",
+							handler: function() {
+								this.okPressed();
+							},
+							scope: this
+						}),
 						this.passwordText = new Ext.Container({
 							html: this.text,
 							style: {
@@ -26,15 +34,9 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 							hideLabel:true,
 							name: 'password',
 							inputType: 'password',
+							autocomplete: "current-password",
 							allowBlank: false,
-							anchor: '100%',
-							listeners: {
-								afterrender: function(cmp) {
-									cmp.el.set({
-										autocomplete: "current-password"
-									});
-								}
-							}
+							anchor: '100%'
 						})
 					]
 				})
@@ -48,15 +50,11 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 				this.formPanel
 			],
 			buttons: [{
-					text: t("Continue"),
-					handler: this.okPressed,
-					scope: this
-				}],
-			keys: [{
-					key: Ext.EventObject.ENTER,
-					handler: this.okPressed,
-					scope: this
-				}]
+				cls:"primary",
+				text: t("Continue"),
+				handler: this.okPressed,
+				scope: this
+			}]
 		});
 		
 		this.addEvents({

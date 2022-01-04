@@ -33,21 +33,29 @@ abstract class AclEntity extends Entity {
 		
 		return $changes;
 	}
-	
+
+	protected static function getEntityChangesQuery($sinceModSeq)
+	{
+		$query = parent::getEntityChangesQuery($sinceModSeq);
+
+		Acl::applyToQuery($query, 'change.aclId');
+
+		return $query;
+	}
+
 	public static function getChanges($sinceState, $maxChanges) {
-		//state has entity modseq and acl modseq so we can detect permission changes
-		$states = static::parseState($sinceState);
-		
-		
-		$result = parent::getChanges($sinceState, $maxChanges);	
-		$result['oldState'] = $sinceState;
-		
-		if($result['hasMoreChanges']) {			
-			//allready at max
+
+		$result = parent::getChanges($sinceState, $maxChanges);
+
+		//return is admin because ACL's don't apply to admins or when we're at the max of changes
+		if(go()->getAuthState()->isAdmin() || $result['hasMoreChanges']) {
 			return $result;
 		}
 		
-		$maxChanges -= (count($result['changed']) + count($result['removed']));		
+		$maxChanges -= (count($result['changed']) + count($result['removed']));
+
+		//state has entity modseq and acl modseq so we can detect permission changes
+		$states = static::parseState($sinceState);
 		
 		//Detect permission changes for AclItemEntities. For example notes that depend on notebook permissions.		
 		$acls = static::findAcls();	
@@ -63,8 +71,6 @@ abstract class AclEntity extends Entity {
 
 			return $result;
 		}
-			
-		$entityType = static::entityType();		
 
 		$isAclItem = is_a(static::class, AclItemEntity::class, true);			
 
@@ -98,7 +104,7 @@ abstract class AclEntity extends Entity {
 			if(in_array($id, $result['changed']) || in_array($id, $result['removed'])) {
 				continue;
 			}
-			
+
 			if(in_array($aclId, $currentAclIds)) {
 				$result['changed'][] = $id;
 			} else
@@ -108,7 +114,7 @@ abstract class AclEntity extends Entity {
 
 			$i++;
 
-			if($i == $maxChanges) {				
+			if($i == $maxChanges) {
 				break;
 			}
 			
@@ -135,7 +141,7 @@ abstract class AclEntity extends Entity {
 						->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
 							//Permission level is always added to the main query so that it's always applied with AND
 							static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
-						}, Acl::LEVEL_READ);
+						});
 	}
 
 	/**

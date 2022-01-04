@@ -58,8 +58,11 @@ try {
 
 		$blob = Blob::fromTmp($tmpFile);
 		$blob->name = $filename;
-		$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModified'));
-		//$blob->type = Request::get()->getContentType(); cant be trusted use extension instead
+		if (Request::get()->getHeader('X-File-LastModified') == null) {
+			$blob->modifiedAt = new \go\core\util\DateTime();
+		} else {
+			$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModified'));
+		}
 	}
 
 
@@ -74,11 +77,21 @@ try {
 	}
 }
 catch(\Exception $e) {
+
+	\go\core\ErrorHandler::logException($e);
+
 	Response::get()->setStatus(500, "Upload failed");
 	Response::get()->setContentType("application/problem+json");
-	Response::get()->output([
+
+	$response = [
 		"title" => "Upload failed",
 		"detail" => $e->getMessage(),
 		"status" => 500
-	]);
+	];
+
+	if(go()->getDebugger()->enabled) {
+		$response['debug'] = go()->getDebugger()->getEntries();
+	}
+
+	Response::get()->output($response);
 }

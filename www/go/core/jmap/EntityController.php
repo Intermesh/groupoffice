@@ -13,7 +13,6 @@ use go\core\data\convert\AbstractConverter;
 use go\core\db\Criteria;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
-use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
 use go\core\orm\Query;
@@ -109,7 +108,11 @@ abstract class EntityController extends Controller {
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
 
 		$query->filter($params['filter']);
-		
+
+		// Only return readable ID's
+		if($cls::getFilters()->hasFilter('permissionLevel') && !$cls::getFilters()->isUsed('permissionLevel')) {
+			$query->filter(['permissionLevel' => Acl::LEVEL_READ]);
+		}
 		return $query;
 	}
 	
@@ -156,12 +159,21 @@ abstract class EntityController extends Controller {
 				throw new InvalidArguments("Parameter 'filter' must be an array");
 			}
 		}
-		
+
+		$cls = $this->entityClass();
+
 		if(!isset($params['accountId'])) {
 			$params['accountId'] = null;
 		}
 		
 		$params['calculateTotal'] = !empty($params['calculateTotal']) ? true : false;
+
+		$params['calculateHasMore'] = !empty($params['calculateHasMore']) && $params['limit'] > 0 ? true : false;
+
+		//a faster alternative to calculateTotal just indicating that there are more entities. We do that by selecting one more than required.
+		if($params['calculateHasMore']) {
+			$params['limit']++;
+		}
 		
 		return $params;
 	}
@@ -180,12 +192,14 @@ abstract class EntityController extends Controller {
    */
 	protected function defaultQuery($params) {
 
+		$state = $this->getState();
+
+		//enable SQL debugging here
+		go()->getDbConnection()->debug = go()->getDebugger()->enabled;
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
 		$idsQuery->fetchMode(PDO::FETCH_NUM);
-		
-		$state = $this->getState();
 		
 		$ids = [];		
 
@@ -197,6 +211,10 @@ abstract class EntityController extends Controller {
 				$ids[] = $count ? $record[0] : implode('-', $record);
 			}
 
+			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
+				$hasMore = !!array_pop($ids);
+			}
+
 			$response = [
 				'accountId' => $p['accountId'],
 				'state' => $state,
@@ -204,6 +222,10 @@ abstract class EntityController extends Controller {
 				'notfound' => [],
 				'canCalculateUpdates' => false
 			];
+
+			if(isset($hasMore)) {
+				$response['hasMore'] = $hasMore;
+			}
 
 			if ($p['calculateTotal']) {
 
@@ -323,6 +345,14 @@ abstract class EntityController extends Controller {
 		if(isset($params['ids']) && !is_array($params['ids'])) {
 			throw new InvalidArguments("ids must be of type array");
 		}
+
+		if(!empty($params['ids'])) {
+			$params['ids'] = array_unique($params['ids']);
+			$params['ids'] = array_filter($params['ids'], function($id) {
+				return !empty($id);
+			});
+		}
+
 		if(!isset($params['properties'])) {
 			$params['properties'] = [];
 		}
@@ -380,21 +410,37 @@ abstract class EntityController extends Controller {
 		if(isset($p['ids']) && !count($p['ids'])) {
 			return $result;
 		}
-		go()->getDebugger()->debugTiming('before query');
+
 		$query = $this->getGetQuery($p);
 
-		go()->getDebugger()->debugTiming('after query');
-
+		$unsorted = [];
 		$foundIds = [];
 		$result['list'] = [];
 		foreach($query as $e) {
 			$arr = $e->toArray();
 			$arr['id'] = $e->id();
-			$result['list'][] = $arr;
+			$unsorted[$arr['id']] = $arr;
 			$foundIds[] = $arr['id'];
-
-			go()->getDebugger()->debugTiming('item to array');
 		}
+
+		if(!empty($p['ids'])) {
+			// Sort the result by given ids.
+			$result['list'] = array_values(
+				array_filter(
+					array_map(function ($v) use ($unsorted) {
+						//if not in sorted then the ID's were not found.
+						return $unsorted[$v] ?? null;
+					}, $p['ids']),
+
+					function($id) {
+						return $id != null;
+					}
+				)
+			);
+		} else{
+			$result['list'] = array_values($unsorted);
+		}
+
 
 		$result['notFound'] = isset($p['ids']) ? array_values(array_diff($p['ids'], $foundIds)) : [];
 
@@ -851,7 +897,7 @@ abstract class EntityController extends Controller {
 			$file = $blob->getFile();
 		}
 
-    $response = $converter->importFile($file, $params);
+		$response = $converter->importFile($file, $params);
 		
 		if(!$response) {
 			throw new Exception("Invalid response from import converter");

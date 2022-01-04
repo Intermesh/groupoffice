@@ -7,6 +7,18 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * Simple RESTful router
+ *
+ * It works with:
+ *
+ * script.php/edit/1/1
+ *
+ * Or access pretty with /script/edit/1/1 with an alias:
+ *
+ * Alias /script script.php
+ *
+ * Or with a rewrite rule:
+ *
+ * RewriteRule ^/script(.*)$ script.php [E=PATH_INFO:/$1]
  * 
  * @example
  * ```
@@ -74,16 +86,24 @@ class Router {
       $response = call_user_func_array([$c, $route['method']], $route['params']);		
       
     } catch(\go\core\exception\Forbidden $e) {
-      Response::get()->setStatus(401, $e->getMessage());      
+    	if(!headers_sent()) {
+		    Response::get()->setStatus(401, $e->getMessage());
+	    }
       ErrorHandler::logException($e);
     } catch(\go\core\exception\NotFound $e) {
-      Response::get()->setStatus(404, $e->getMessage());      
+	    if(!headers_sent()) {
+		    Response::get()->setStatus(404, $e->getMessage());
+	    }
       ErrorHandler::logException($e);      
     } catch(\go\core\http\Exception $e) {
-      Response::get()->setStatus($e->code, $e->getMessage());
+	    if(!headers_sent()) {
+		    Response::get()->setStatus($e->code, $e->getMessage());
+	    }
       ErrorHandler::logException($e);      
     } catch(\Exception $e) {
-      Response::get()->setStatus(500, $e->getMessage());
+	    if(!headers_sent()) {
+		    Response::get()->setStatus(500, str_replace("\n", " - ",$e->getMessage()));
+	    }
 
       echo '<h1>' . $e->getMessage() .'</h1>';
       echo '<pre>';

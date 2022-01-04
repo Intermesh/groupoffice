@@ -3,8 +3,8 @@ go.cron.cronStore = new GO.data.JsonStore({
 	root: 'results',
 	id: 'id',
 	totalProperty:'total',
-	fields: ['id','name','active','minutes', 'hours','error', 'monthdays', 'months', 'weekdays','years','job','nextrun','lastrun','completedat'],
-	remoteSort: true,
+	fields: ['id','name','active','expression', 'hours','error', 'monthdays', 'months', 'weekdays','years','job','nextrun','lastrun','completedat'],
+	remoteSort: false,
 	model:"GO\\Base\\Cron\\CronJob"
 });
 	

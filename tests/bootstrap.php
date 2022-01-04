@@ -22,18 +22,16 @@ $autoLoader->add('go\\', __DIR__);
 $dataFolder = new \go\core\fs\Folder(__DIR__ . '/data');
 
 
-$config = parse_ini_file(__DIR__ . '/config.ini', true);
-$config['general']['dataPath'] = $dataFolder->getPath();
-$config['general']['tmpPath'] = $dataFolder->getFolder('tmp')->getPath();
-$config['branding']['name'] = 'Group-Office';
+require(__DIR__ . "/config.php");
+$config['file_storage_path'] = $dataFolder->getPath();
+$config['tmpdir'] = $dataFolder->getFolder('tmp')->getPath();
 
 if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
 	$dataFolder->delete();
 	$dataFolder->create();
 
 	//connect to server without database
-	$dsn = \go\core\db\Utils::parseDSN($config['db']['dsn']);	
-	$pdo = new PDO('mysql:host='. $dsn['options']['host'], $config['db']['username'], $config['db']['password']);
+	$pdo = new PDO('mysql:host='. $config['db_host'], $config['db_user'], $config['db_pass']);
 
 	try {
 		echo "Dropping database 'groupoffice-phpunit'\n";
@@ -50,9 +48,10 @@ if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
 //Install fresh DB
 App::get(); //for autoload
 try {
-	go()->setConfig(["core" => $config, 'cache' => \go\core\cache\Apcu::class]);
-	//App::get()->getCache()->flush(false);
-	
+	$c = new core\util\ArrayObject(go()->getConfig());
+	$c->mergeRecursive($config);
+	go()->setConfig($c->getArray());
+
 	if($installDb == INSTALL_NEW) {
 
 	  echo "Running install\n";
@@ -64,13 +63,9 @@ try {
 		];
 
 		$installer = go()->getInstaller();
-		$installer->install($admin, [
-				\go\modules\community\notes\Module::get(),
-				\go\modules\community\test\Module::get(),
-				\go\modules\community\addressbook\Module::get(),
-				\go\modules\community\comments\Module::get(),
-				]);
+		$installer->install($admin);
 
+		\go\modules\community\test\Module::get()->install();
 
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;
@@ -86,6 +81,7 @@ try {
 				Module::install($moduleController->name());
 			}
 		}
+		go()->rebuildCache();
 		GO::$ignoreAclPermissions = false;
 
 		echo "Installing demo data\n";
@@ -96,7 +92,7 @@ try {
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {
     echo "Running upgrade: ";
-	  $importCmd = 'mysql -h ' .  escapeshellarg($dsn['options']['host']) . ' -u '.escapeshellarg($config['db']['username']) . ' -p'.escapeshellarg($config['db']['password']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go64.sql';
+	  $importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go64.sql';
     echo "Running: " . $importCmd . "\n";
 	  system($importCmd);
 
@@ -114,9 +110,8 @@ try {
 	    $mod->install();
     }
 
-  }else {
-		go()->rebuildCache();
-	}
+  }
+	go()->rebuildCache();
 
 	go()->setAuthState(new State());
 

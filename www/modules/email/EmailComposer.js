@@ -119,7 +119,9 @@ GO.email.EmailComposer = function(config) {
 							ids: ids
 						}
 					}).then(function(result) {										
-			
+						if(!result.list) {
+							return;
+						}
 						result.list.forEach(function(contact) {
 							if(!contact.emailAddresses[0]) {
 								return;
@@ -142,8 +144,11 @@ GO.email.EmailComposer = function(config) {
 							properties: ["displayName", "email"],
 							ids: ids
 						}
-					}).then(function(result) {										
-			
+					}).then(function(result) {
+						if(!result.list) {
+							return;
+						}
+
 						result.list.forEach(function(user) {
 							if(!go.util.empty(v)) {
 								v += ", ";
@@ -367,7 +372,8 @@ GO.email.EmailComposer = function(config) {
 	'->',
 		this.createLinkButton = new go.links.CreateLinkButton({
 			text: "",
-			iconCls: "ic-link"
+			iconCls: "ic-link",
+			disableEditableDescription: true
 		})
 	];
 
@@ -641,11 +647,6 @@ GO.email.EmailComposer = function(config) {
 			
 		}, this);
 		
-	
-
-	var focusFn = function() {
-		this.toCombo.focus();
-	};
 
 	GO.email.EmailComposer.superclass.constructor.call(this, {
 		title : t("Compose an e-mail message", "email"),
@@ -657,10 +658,8 @@ GO.email.EmailComposer = function(config) {
 		maximizable : true,
 		collapsible : true,
 		animCollapse : false,
-		//plain : true,
 		closeAction : 'hide',
 		buttonAlign : 'center',
-		focus : focusFn.createDelegate(this),
 		tbar : tbar,
 		items : this.formPanel
 	});
@@ -682,6 +681,14 @@ GO.email.EmailComposer = function(config) {
 };
 
 Ext.extend(GO.email.EmailComposer, GO.Window, {
+
+	focus: function() {
+		if (this.toCombo.getValue() == '') {
+			this.toCombo.focus();
+		} else {
+			this.emailEditor.focus();
+		}
+	},
 
 	stateId : 'email-composer',
 	
@@ -898,7 +905,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 //			if(templateRecordIndex>-1)
 //				config.template_id=this.templatesStore.getAt(templateRecordIndex).get('template_id');
 //		}
-
 		//check the right template menu item.
 		if(this.templatesStore && this.templatesMenu && this.templatesMenu.items){
 			var templateId = config.template_id || this.getDefaultTemplateId();
@@ -1010,7 +1016,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			//this.htmlEditor.SpellCheck = false;
 		} else {
 
-			this.initTemplateMenu(config);
+
 			
 			//keep attachments when switchting from text <> html
 			this.reset();
@@ -1114,7 +1120,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				params.addresslist_id = config.addresslist_id;
 			}
 			
-			
+
 			if(typeof(config.template_id)=='undefined'){
 				config.template_id=this.getDefaultTemplateId();
 			}
@@ -1193,9 +1199,11 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 							this.lastLoadParams.alias_id = action.result.data.alias_id
 						if(action.result.data.template_id) {
 							this.lastLoadParams.template_id = action.result.data.template_id
-							this.initTemplateMenu(); // set template menu 
-//							this.initTemplateMenu({template_id: this.lastLoadParams.template_id}); // set template menu 
+							// this.initTemplateMenu(); // set template menu
+
 						}
+
+						this.initTemplateMenu({template_id: this.lastLoadParams.template_id}); // set template menu
 							
 //						action.result.data.account_id
 
@@ -1213,6 +1221,8 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				//in case users selects new default template.
 				this.lastLoadUrl = GO.url("email/message/template");
 				this.lastLoadParams = params;
+
+				this.initTemplateMenu(config);
 				this.afterShowAndLoad(config);
 				
 			}
@@ -1291,11 +1301,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		GO.email.EmailComposer.superclass.show.call(this);
 
 
-		if (this.toCombo.getValue() == '') {
-			this.toCombo.focus();
-		} else {
-			this.emailEditor.focus();
-		}
+		this.focus();
 
 		if(this.showConfig.entity && this.showConfig.entityId) {
 			this.setLinkEntity(config);
@@ -1351,12 +1357,11 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.saveButton.setDisabled(true);
 		this.sendButton.setDisabled(true);
 
-		if (autoSave || this.subjectField.getValue() != ''
-			|| confirm(t("You didn't fill in a subject. Are you sure you want to send this message without a subject?", "email"))) {
-			
+		var strNoSubjectMsg = draft ?
+			t("You didn't fill in a subject. Are you sure you want to save this message without a subject?", "email")
+			: t("You didn't fill in a subject. Are you sure you want to send this message without a subject?", "email");
 
-			// extra sync to make sure all is in there.
-			//this.htmlEditor.syncValue();
+		if (autoSave || this.subjectField.getValue() != '' || confirm(strNoSubjectMsg)) {
 
 			var waitMsg=null;
 			if(!autoSave){

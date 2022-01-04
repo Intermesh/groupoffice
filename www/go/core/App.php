@@ -3,25 +3,27 @@
 namespace go\core {
 
 use Exception;
-use GO;
-use GO\Base\Observable;
+	use GO;
+	use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
-	use go\core\cache\Memcached;
-	use go\core\db\Connection;
+use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\event\EventEmitterTrait;
 use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
-	use go\core\fs\Blob;
-	use go\core\fs\Folder;
+use go\core\fs\Blob;
+use go\core\fs\Folder;
 use go\core\jmap\Request;
 use go\core\jmap\State;
 use go\core\mail\Mailer;
+use go\core\orm\Property;
+use go\core\util\ArrayObject;
 use go\core\webclient\Extjs3;
 use go\core\model\Settings;
+
 use const GO_CONFIG_FILE;
 
 	/**
@@ -84,6 +86,7 @@ use const GO_CONFIG_FILE;
 		private $version;
 
 		protected function __construct() {
+			parent::__construct();
 			date_default_timezone_set("UTC");
 
 			mb_internal_encoding("UTF-8");
@@ -100,7 +103,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return string
 		 */
-		public function getAuthor() {
+		public function getAuthor(): string
+		{
 			return "Intermesh BV";
 		}
 
@@ -109,7 +113,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return string
 		 */
-		public static function getName() {
+		public static function getName(): string
+		{
 			return "core";
 		}
 
@@ -118,7 +123,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return string
 		 */
-		public static function getPackage() {
+		public static function getPackage(): string
+		{
 			return "core";
 		}
 
@@ -127,7 +133,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return string eg. 6.4.1
 		 */
-		public function getVersion() {
+		public function getVersion(): string
+		{
 			if(!isset($this->version)) {
 				$this->version = require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
 			}
@@ -139,7 +146,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return string eg. 6.4
 		 */
-		public function getMajorVersion() {
+		public function getMajorVersion(): string
+		{
 			
 			return substr($this->getVersion(), 0, strrpos($this->getVersion(), '.') );
 		}
@@ -157,7 +165,8 @@ use const GO_CONFIG_FILE;
 		 * ```
 		 * @return Mailer
 		 */
-		public function getMailer() {
+		public function getMailer(): Mailer
+		{
 			if (!isset($this->mailer)) {
 				$this->mailer = new Mailer();
 			}
@@ -169,7 +178,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return Installer
 		 */
-		public function getInstaller() {
+		public function getInstaller(): Installer
+		{
 			if (!isset($this->installer)) {
 				$this->installer = new Installer();
 			}
@@ -180,10 +190,11 @@ use const GO_CONFIG_FILE;
 		 * Get the data folder
 		 *
 		 * @return Folder
-		 * @throws ConfigurationException
+		 * @throws Exception
 		 */
-		public function getDataFolder() {
-			return new Folder($this->getConfig()['core']['general']['dataPath']);
+		public function getDataFolder(): Folder
+		{
+			return new Folder($this->getConfig()['file_storage_path']);
 		}
 
 		private $storageQuota;
@@ -196,12 +207,12 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getStorageQuota() {
 			if(!isset($this->storageQuota)) {
-				$this->storageQuota = $this->getConfig()['core']['limits']['storageQuota'];
+				$this->storageQuota = $this->getConfig()['quota'];
 				if(empty($this->storageQuota)) {
 					try {
-						$this->storageQuota = disk_total_space($this->getConfig()['core']['general']['dataPath']);
+						$this->storageQuota = disk_total_space($this->getConfig()['file_storage_path']);
 					}
-					catch(\Exception $e) {
+					catch(Exception $e) {
 						go()->warn("Could not determine total disk space: ". $e->getMessage());
 						$this->storageQuota = 0;
 					}
@@ -221,18 +232,18 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getStorageFreeSpace() {
 			if(!isset($this->storageFreeSpace)) {
-				$quota = $this->getConfig()['core']['limits']['storageQuota'];
+				$quota = $this->getConfig()['quota'];
 				if(empty($quota)) {
 					try {
-						$this->storageFreeSpace = disk_free_space($this->getConfig()['core']['general']['dataPath']);
+						$this->storageFreeSpace = disk_free_space($this->getConfig()['file_storage_path']);
 					}
-					catch(\Exception $e) {
+					catch(Exception $e) {
 						go()->warn("Could not determine free disk space: ". $e->getMessage());
 						$this->storageFreeSpace = 0;
 					}
 				} else
 				{
-					$usage = \GO::config()->get_setting('file_storage_usage');				 
+					$usage = GO::config()->get_setting('file_storage_usage');
 					$this->storageFreeSpace = $quota - $usage;
 				}
 			}
@@ -245,9 +256,11 @@ use const GO_CONFIG_FILE;
 		 *
 		 * @return Folder
 		 * @throws ConfigurationException
+		 * @throws Exception
 		 */
-		public function getTmpFolder() {
-			return new Folder($this->getConfig()['core']['general']['tmpPath']);
+		public function getTmpFolder(): Folder
+		{
+			return new Folder($this->getConfig()['tmpdir']);
 		}
 
 		private $config;
@@ -315,20 +328,8 @@ use const GO_CONFIG_FILE;
 
 
     /**
-     * Get the configuration data
+     * Get the configuration data from config.php and globalconfig.inc.php
      *
-     * ```
-     *
-     * "general" => [
-     * "dataPath" => "/foo/bar"
-     * ],
-     * "db" => [
-     * "dsn" => 'mysql:host=localhost;dbname=groupoffice,
-     * "username" => "user",
-     * "password" => "secret"
-     * ]
-     * ]
-     * ```
      * @return array
      * @throws ConfigurationException
      */
@@ -351,57 +352,52 @@ use const GO_CONFIG_FILE;
 			// 	}
 			// }
 			
-			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
+			//$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
+
+			//defaults
+			$config = new ArrayObject([
+				"frameAncestors" => "",
+				"theme" => "Paper",
+				"allow_themes" => true,
+				"file_storage_path" => '/home/groupoffice',
+				"tmpdir" => sys_get_temp_dir() . '/groupoffice',
+				"debug" => false,
+				"debugEmail" => false,
+				"servermanager" => false,
+				"sseEnabled" => true,
+				"max_users" => 0,
+				'quota' => 0,
+				"allowed_modules" => "",
+				"product_name" => "Group-Office",
+
+				"db_host" => "localhost",
+				"db_port" => 3306,
+				"db_name" => "groupoffice",
+				"db_user" => "groupoffice",
+				"db_pass" => ""
+			]);
+
+			$config->mergeRecursive($this->getGlobalConfig());
+			$config->mergeRecursive($this->getInstanceConfig());
 
 			if(!isset($config['debug_log'])) {
 				$config['debug_log'] = !empty($config['debug']);
 			}
 			
-			$this->config = (new util\ArrayObject([
-					"frameAncestors" => $config['frameAncestors'] ?? "",
-					"core" => [
-							"general" => [
-									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
-									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-									"debug" => $config['debug'] ?? null,
-									"debugLog" => $config['debug_log'],
-									
-									"servermanager" => $config['servermanager'] ?? false,
-
-									"sseEnabled" => $config['sseEnabled'] ?? true
-							],
-							"db" => [
-									"host" => ($config['db_host'] ?? "localhost"),
-									"port" => $config['db_port'] ?? 3306,
-									"name" => $config['db_name'] ?? 'groupoffice',
-									"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
-									"username" => $config['db_user'] ?? "groupoffice",
-									"password" => $config['db_pass'] ?? ""
-							],
-							"limits" => [
-									"maxUsers" => $config['max_users'] ?? 0,
-									"storageQuota" => $config['quota'] ?? 0,
-									"allowedModules" => $config['allowed_modules'] ?? ""
-							],
-							"branding" => [
-								"name" => $config['product_name'] ?? "GroupOffice"
-							],						
-					],
-
-			]))->mergeRecursive($config)->getArray();
-			
-			if(!isset($this->config['cache'])) {
+			if(!isset($config['cache'])) {
 				if(cache\Apcu::isSupported()) {
-					$this->config['cache'] = cache\Apcu::class;
+					$config['cache'] = cache\Apcu::class;
 				} else
 				{
-					$this->config['cache'] = cache\Disk::class;
+					$config['cache'] = cache\Disk::class;
 				}
 			}
 
 			if(Request::get()->getHeader('X-Debug') == "1") {
-				$this->config['core']['general']['debug'] = true;
+				$config['debug'] = true;
 			}
+
+			$this->config = $config->getArray();
 
 			$this->initTCPDF();
 
@@ -412,22 +408,21 @@ use const GO_CONFIG_FILE;
 		 * The TCPDF cache path must be set before autoloading it from vendor.
 		 */
 		private function initTCPDF() {
-
-			define("K_PATH_CACHE", $this->config['core']['general']['tmpPath'] . "/");
-
+			define("K_PATH_CACHE", $this->config['tmpdir'] . "/");
 		}
 
 		/**
 		 * Get the database connection
-		 * 
+		 *
 		 * @return Connection
+		 * @throws ConfigurationException
 		 */
 		public function getDbConnection() {
-
 			if (!isset($this->dbConnection)) {
-				$db = $this->getConfig()['core']['db'];
+				$config = $this->getConfig();
+				$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port']  . ';dbname=' . $config['db_name'];
 				$this->dbConnection = new Connection(
-								$db['dsn'], $db['username'], $db['password']
+					$dsn, $config['db_user'], $config['db_pass']
 				);
 			}
 			return $this->dbConnection;
@@ -521,19 +516,23 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Destroys all cache and reinitializes event listeners and sync state.
 		 *
-		 * @param false $onDestruct
+		 * @param boolean $onDestruct
 		 * @throws ConfigurationException
 		 */
 		public function rebuildCache($onDestruct = false) {
 			
 			if($onDestruct) {				
 				$this->rebuildCacheOnDestruct = $onDestruct;
-			}			
+				return;
+			}
+
+			$this->rebuildCacheOnDestruct = false;
 			
-			\GO::clearCache(); //legacy
+			GO::clearCache(); //legacy
 
 			go()->getCache()->flush(false);
 			Table::destroyInstances();
+			Property::clearCache();
 
 			$webclient = Extjs3::get();
 			$webclient->flushCache();
@@ -752,7 +751,11 @@ use const GO_CONFIG_FILE;
 			go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
 			go()->getDbConnection()->exec("TRUNCATE TABLE core_change");
 			go()->getDbConnection()->exec("TRUNCATE TABLE core_acl_group_changes");
+
+			// Disable keys otherwise this might take very long!
+			go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0;");
 			go()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
+			go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1;");
 		}
 
 		/**

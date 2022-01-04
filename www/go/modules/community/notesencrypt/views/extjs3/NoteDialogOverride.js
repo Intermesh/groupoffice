@@ -71,9 +71,11 @@ Ext.onReady(function() {
 			this.passwordField.setVisible(false);
 			this.confirmPasswordField.setVisible(false);
 
-			this.formPanel.ownerCt.doLayout();
+			//this.formPanel.ownerCt.doLayout();
 			var contentField = this.find('name', 'content')[0];
-			this.findByType("fieldset")[0].items.insert(2,this.checkEncrypt = new Ext.form.Checkbox(
+			var firstFieldSet = this.findByType("fieldset")[0];
+			firstFieldSet.items.itemAt(1).anchor = '0 -120';
+			firstFieldSet.items.insert(2,this.checkEncrypt = new Ext.form.Checkbox(
 				{
 					xtype: 'checkbox',
 					name: 'encryptcheck',
@@ -94,6 +96,8 @@ Ext.onReady(function() {
 							this.confirmPasswordField.setVisible(checked);
 							this.passwordField.setDisabled(!checked);
 							this.confirmPasswordField.setDisabled(!checked);
+
+							this.doLayout();
 						},
 						scope: this
 					},
@@ -110,7 +114,7 @@ Ext.onReady(function() {
 
 				if(contentField.getRawValue().indexOf('<img') > -1) {
 					Ext.MessageBox.alert(t("Error"), t("Sorry, you can't use images in encrypted notes"));
-					return false;
+					return Promise.reject(t("Sorry, you can't use images in encrypted notes"));
 				}
 
 				var passfield = this.passwordField.getValue();
@@ -122,7 +126,7 @@ Ext.onReady(function() {
 				} else {
 					var plaintext = contentField.getRawValue(), password = this.passwordField.getValue();
 
-					go.modules.community.notes.aesGcmEncrypt(plaintext, password).then(function(text){
+					return go.modules.community.notes.aesGcmEncrypt(plaintext, password).then(function(text){
 
 						this.formPanel.values.content = "{ENCRYPTED}" + text;
 						if(!go.modules.community.notes.decrypted || !go.modules.community.notes.decrypted[this.currentId]) {
@@ -131,8 +135,7 @@ Ext.onReady(function() {
 
 						var me = this;
 
-						go.modules.community.notes.NoteDialog.superclass.submit.call(this).then(function() {
-							debugger;
+						return go.modules.community.notes.NoteDialog.superclass.submit.call(this).then(function() {
 							go.modules.community.notes.decrypted[me.currentId] = {};
 							go.modules.community.notes.decrypted[me.currentId].content = plaintext;
 							go.modules.community.notes.decrypted[me.currentId].password = password;
@@ -141,7 +144,7 @@ Ext.onReady(function() {
 				}
 
 			} else {
-				go.modules.community.notes.NoteDialog.superclass.submit.call(this);
+				return go.modules.community.notes.NoteDialog.superclass.submit.call(this);
 			}
 		}
 	});

@@ -29,13 +29,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			remoteSort:false
 		});
 
-		this.store.on('load',function(){
-			if(!this.store.reader.jsonData.has_license)
-				this.trialButton.show();
-			else
-				this.trialButton.hide();
 
-		}, this);
 
 		this.tbar = new Ext.Toolbar({
 			items: [
@@ -43,34 +37,34 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					iconCls: 'ic-refresh',
 					tooltip: t("Refresh"),
 					handler: function() {
-						this.store.load();
-					},
-					scope: this
-				},{
-					iconCls: 'ic-settings',
-					text: t("Buy licenses", "modules"),
-					hidden: GO.settings.config.product_name != 'Group-Office',
-					handler: function() {				
-						window.open('https://www.group-office.com/shop/');					
+						this.store.reload();
 					},
 					scope: this
 				},
 
+				// {
+				// 	iconCls: 'ic-settings',
+				// 	text: t("Buy licenses", "modules"),
+				// 	hidden: GO.settings.config.product_name != 'Group-Office',
+				// 	handler: function() {
+				// 		window.open('https://www.group-office.com/shop/');
+				// 	},
+				// 	scope: this
+				// },
+
 
 				this.trialButton = new Ext.Button({
-					iconCls: 'ic-settings',
-					text: t("30 day trial license", "modules"),
+					iconCls: 'ic-star',
+					cls: "accent",
+					text: t("Trial license", "modules"),
 					hidden:true,
 					handler: function() {
-						Ext.MessageBox.confirm(
-							t("30 day trial license", "modules"),
-							t("Get a free 30 day trial with unlimited users and all available modules. Click 'Yes' to continue to our shop and get your trial license. If you don't have a shop account you'll need to register.", "modules"),
-							function(btn){
-								if(btn==='yes'){
-									window.open('https://www.group-office.com/30-day-trial?hostname='+document.domain,'groupoffice-shop');
-								}
-							}
-						);
+
+
+						const licenseDialog = new go.license.LicenseDialog();
+						licenseDialog.show();
+
+
 
 					},
 					scope: this
@@ -106,7 +100,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 								record.set("enabled", checked);
 
 								if (checked) {
-									this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
+									this.showPermissions(record.data.name,record.data.package,t(record.data.name, record.data.name), record.data.aclId);
 									//this.store.load();
 								}
 							}
@@ -188,9 +182,18 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			var moduleRecord = grid.store.getAt(rowIndex);
 
 			if (moduleRecord.data.aclId) {
-				this.showPermissions(moduleRecord.data.name, t(moduleRecord.data.name, moduleRecord.data.name), moduleRecord.data.aclId);
+				this.showPermissions(moduleRecord.data.name, moduleRecord.data.package, t(moduleRecord.data.name, moduleRecord.data.name), moduleRecord.data.aclId);
 			}
 		}, this);
+
+
+		const coreMod = go.Modules.get("core", "core");
+
+		if(!coreMod.settings.license) {
+			this.trialButton.show();
+		}else {
+			this.trialButton.hide();
+		}
 
 		go.modules.SystemSettingsModuleGrid.superclass.initComponent.call(this);
 		
@@ -237,7 +240,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 	},
 
-	showPermissions: function(moduleId, name, acl_id) {
+	showPermissions: function(moduleId, pkg, name, acl_id) {
 		if (!this.permissionsWin) {
 			this.permissionsWin = new go.modules.PermissionsWindow();
 			this.permissionsWin.on('hide', function() {
@@ -249,7 +252,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				}
 			}, this);
 		}
-		this.permissionsWin.show(moduleId, name, acl_id);
+		this.permissionsWin.show(moduleId,pkg, name, acl_id);
 	},
 	warningRenderer: function(name, cell, record) {
 		return record.data.warning != '' ?
@@ -287,13 +290,16 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 				if (!responseParams.success) {
 					GO.errorDialog.show(responseParams.feedback);
-					this.store.load();
+
 				}else{
 					if(responseParams.id){
 						record.set('id', responseParams.id);
 					}
 					record.commit();
 				}
+				this.store.load({
+					keepScrollPosition: true
+				});
 			}
 		});
 	},
@@ -314,10 +320,10 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			};
 			go.Db.store("Module").set(params, function(options, success, response) {
 				this.getEl().unmask();
-				if(success && response.updated && response.updated[record.data.id]){
+				if(success && response.updated && (record.data.id in response.updated)){
 					if(record.data.enabled && record.isModified("enabled")) {						
 						// record.set('aclId', response['created'][record.data.id].aclId);
-						this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
+						this.showPermissions(record.data.name, record.data.package, t(record.data.name, record.data.name), record.data.aclId);
 					}
 
 					record.commit();
@@ -332,7 +338,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					Ext.MessageBox.alert(t("Error"), msg);
 
 				}
-				this.store.load();
+				this.store.load({
+					keepScrollPosition: true
+				});
 
 			}, this);
 		} else
@@ -351,7 +359,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 						record.set('enabled', true);										
 						record.set('id', response['list'][0].id);
 						record.set('aclId', response['list'][0].aclId);
-						this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);					
+						this.showPermissions(record.data.name,record.data.package, t(record.data.name, record.data.name), record.data.aclId);
 						record.commit();
 					} else
 					{
@@ -359,7 +367,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 						Ext.MessageBox.alert(t("Error"), msg);
 					}
-					this.store.load();
+					this.store.load({
+						keepScrollPosition: true
+					});
 				},
 				scope: this
 			});
@@ -419,7 +429,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 						text: t("Permissions"),
 						handler: function() {
 							var record =this.moreMenu.record;
-							this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);					
+							this.showPermissions(record.data.name, record.data.package, t(record.data.name, record.data.name), record.data.aclId);
 						},
 						scope: this						
 					},

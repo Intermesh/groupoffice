@@ -157,6 +157,14 @@ $app-icons: (
 	@extend %font-body2;
 }
 
+i.icon.em-priority_high {
+	color: #bb0000;
+}
+
+i.icon.em-low_priority {
+	color: #00ccff;
+}
+
 
 .x-tree-node .ml-folder-unseen a .em-folder-status { // badge
 	@extend %badge;
@@ -196,10 +204,7 @@ $app-icons: (
 }
 
 .message-body {
-	padding: dp(16);
 	background-color: white;
-	color: black;
-
 	position: relative;	
 	
 	p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
@@ -210,6 +215,10 @@ $app-icons: (
 		margin-left:36.0pt;
 		margin-bottom:.0001pt;
 		font-size:11.0pt;
+	}
+
+	.msg {
+		padding: dp(16);
 	}
 }
 

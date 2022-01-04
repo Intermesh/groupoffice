@@ -145,6 +145,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	clearState : function() {
 		console.warn("State cleared for " + this.entity.name);
+
 		this.state = null;
 		this.data = {};	
 		
@@ -153,9 +154,13 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		return Promise.all([
 			this.metaStore.clear(),
 			this.stateStore.clear(),
-			this.metaStore.setItem("apiVersion", go.User.apiVersion),
-			this.metaStore.setItem("apiUser", go.User.username)
-		]);
+
+		]).then(() => {
+			return Promise.all([
+				this.metaStore.setItem("apiVersion", go.User.apiVersion),
+				this.metaStore.setItem("apiUser", go.User.username)
+			]);
+		})
 		
 	},
 
@@ -274,7 +279,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 		me.getUpdatesPromise = me.getState().then(function(state){
 			
-			console.log("getUpdates", me.entity.name, state);
+			// console.log("getUpdates", me.entity.name, state);
 		
 			if(!state) {
 				console.info("No state yet so won't fetch updates");
@@ -291,12 +296,13 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 						//unofficial response but we use it to process no more than 100000 changes. A resync is
 						//more efficient in the webclient in that case.
 						if(changes.totalChanges > 10000) {
-							console.error("Too many changes " + changes.totalChanges + " > 10000 ");
+							const errorMsg = "Too many changes for '" + me.entity.name + "' in state '" + me.state + "' " + changes.totalChanges + " > 10000";
+							console.error(errorMsg);
 							return me.clearState().then(function(response) {
 								if(cb) {
 									cb.call(scope || me, me, false);
 								}
-								return Promise.reject({type: "cannotcalculatechanges", detail: "Too many changes"})
+								return Promise.reject({type: "cannotcalculatechanges", detail: errorMsg, message: errorMsg})
 							});
 						}
 						return me.getUpdates(cb, scope);
@@ -695,21 +701,21 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		p[op] = {};
 		p[op][id] = entity;
 
-		return this.set(p).then(function(response) {
+		return this.set(p).then((response) => {
 			if(op == 'create') {
 				if(response.created && id in response.created) {
-					return response.created[id];
+					return this.single(response.created[id].id);
 				} else
 				{
-					return Promise.reject(response);
+					return Promise.reject({message: t("Failed to save"), response: response});
 				}
 			} else
 			{
 				if(response.updated && id in response.updated) {
-					return response.updated[id];
+					return this.single(id);
 				} else
 				{
-					return Promise.reject(response);
+					return Promise.reject({message: t("Failed to save"), response: response});
 				}
 			}
 		});

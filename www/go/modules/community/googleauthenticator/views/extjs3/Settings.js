@@ -1,19 +1,20 @@
-Ext.ns("go.googleauthenticator");
-
 Ext.onReady(function () {
 	Ext.override(go.usersettings.AccountSettingsPanel, {
 		initComponent: go.usersettings.AccountSettingsPanel.prototype.initComponent.createSequence(function () {
-			this.googleAuthenticatorFieldset = new go.googleauthenticator.AuthenticatorSettingsFieldset();
-			this.add(this.googleAuthenticatorFieldset);
+			if(!go.Modules.isAvailable("community", "googleauthenticator")) {
+				return;
+			}
+			this.googleAuthenticatorFieldset = new go.modules.community.googleauthenticator.AuthenticatorSettingsFieldset();
+			this.insert(3, this.googleAuthenticatorFieldset);
 			})
 		});
 	});
 	
-	go.googleauthenticator.AuthenticatorSettingsFieldset = Ext.extend(Ext.form.FieldSet, {
+	go.modules.community.googleauthenticator.AuthenticatorSettingsFieldset = Ext.extend(Ext.form.FieldSet, {
 		entityStore:"User",
 		currentUser: null,
 		labelWidth: dp(152),
-		title: t('Google authenticator', 'googleauthenticator'),
+		title: t('Google authenticator'),
 		
 		onChanges : function(entityStore, added, changed, destroyed) {
 			if(this.currentUser && changed[this.currentUser.id] && ("googleauthenticator" in changed[this.currentUser.id])){
@@ -23,20 +24,18 @@ Ext.onReady(function () {
 		
 		initComponent: function() {
 			this.enableAuthenticatorBtn = new Ext.Button({
-				text:t('Enable google authenticator', 'googleauthenticator'),
+				text:t('Enable google authenticator'),
 				hidden:false,
-				handler:function(){	
-					var me = this;
-					me.requestSecret(me.currentUser, function(userId){						
-						var enableDialog = new go.googleauthenticator.EnableAuthenticatorDialog();
-						enableDialog.load(userId).show();
-					});
+				handler:function(){
+
+					go.modules.community.googleauthenticator.enable(this.currentUser);
+
 				},
 				scope: this
 			});
 			
 			this.disableAuthenticatorBtn = new Ext.Button({
-				text:t('Disable google authenticator', 'googleauthenticator'),
+				text:t('Disable google authenticator'),
 				hidden:true,
 				handler:function(){
 					var me = this;
@@ -52,7 +51,7 @@ Ext.onReady(function () {
 				this.disableAuthenticatorBtn
 			];
 			
-			go.googleauthenticator.AuthenticatorSettingsFieldset.superclass.initComponent.call(this);
+			go.modules.community.googleauthenticator.AuthenticatorSettingsFieldset.superclass.initComponent.call(this);
 		},
 		
 		onLoad : function(user){
@@ -68,22 +67,21 @@ Ext.onReady(function () {
 			var me = this;
 			
 			function execute(currentPassword){
-				var params = {"update": {}},
-					data = {
+				var data = {
 						googleauthenticator: null
 					};
 				if(currentPassword) {
 					data.currentPassword = currentPassword;
 				}
-				params.update[user.id] = data;
-
-				go.Db.store("User").set(params, function (options, success, response) {
-					if (success && !GO.util.empty(response.updated)) {
-						callback.call(this,user.id);
-					} else {
-						// When the password is not correct, call itself again to try again
-						me.disableAuthenticator(user, callback);
+				go.Db.store("User").save(data, user.id).then(function() {
+					callback.call(this,user.id);
+				}).catch(function(error) {
+					if(error.message && !error.response) {
+						GO.errorDialog.show(error.message);
 					}
+
+					// When the password is not correct, call itself again to try again
+					me.disableAuthenticator(user, callback);
 				});
 			}
 			
@@ -92,60 +90,15 @@ Ext.onReady(function () {
 				execute.call(this);
 				return;
 			} else {
-				var passwordPrompt = new go.PasswordPrompt({
-					width: dp(450),
-					text: t("When disabling Google autenticator this step will be removed from the login process.", 'googleauthenticator') + "<br><br>" + t("Provide your current password to disable Google authenticator.", 'googleauthenticator'),
-					title: t('Disable Google authenticator', 'googleauthenticator'),
-					listeners: {
-						'ok': function(value){
-							execute.call(this,value);
-						},
-						'cancel': function () {
-							return false;
-						},
-						scope: this
-					}
+
+				go.AuthenticationManager.passwordPrompt(
+					t('Disable Google authenticator'),
+					t("When disabling Google autenticator this step will be removed from the login process.") + "<br><br>" + t("Provide your current password to disable Google authenticator.")
+				). then((password) => {
+					execute.call(this,password);
 				});
 
-				passwordPrompt.show();
 			}
-		},
-
-		requestSecret : function(user, callback){
-				var me = this;
-			
-				var passwordPrompt = new go.PasswordPrompt({
-					width: dp(450),
-					text: t("Provide your current password before you can enable Google authenticator.", 'googleauthenticator'),
-					title: t('Enable Google authenticator', 'googleauthenticator'),
-					iconCls: 'ic-security',
-					listeners: {
-						'ok': function(value){
-							var params = {"update": {}};
-							params.update[user.id] = {
-								currentPassword: value,
-								googleauthenticator: {
-									requestSecret:true
-								}
-							};
-
-							go.Db.store("User").set(params, function (options, success, response) {
-								if (success && !GO.util.empty(response.updated)) {
-									// When password is checked successfully, then show the QR dialog
-									callback.call(this,user.id);
-								} else {
-									// When the password is not correct, call itself again to try again
-									me.requestSecret(user, callback);
-								}
-							});
-						},
-						'cancel': function () {
-							return false;
-						},
-						scope: this
-					}
-				});
-				passwordPrompt.show();
 		}
 	});
 	

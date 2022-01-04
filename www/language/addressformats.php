@@ -32,7 +32,10 @@ $af['FR']='{address_no} {address}
 {zip} {city}
 {state} {country}';
 
-$af['GB']='{address_no} {address}
+// GB addresses never save house numbers separately. The addr2 field is normally a neighburhood er suburb.
+// THank you Jonny Coulter for clearing this up
+$af['GB']='{address}
+{address_no}
 {city}
 {state}
 {zip}

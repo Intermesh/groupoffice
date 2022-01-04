@@ -5,6 +5,7 @@ use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
 use Exception;
 use GO;
+use go\core\ErrorHandler;
 use go\core\fs\File;
 
 class Crypt {
@@ -54,6 +55,8 @@ class Crypt {
 					$plaintext = Crypto::decryptWithPassword(substr($ciphertext, 10), $password);
 				}
 			} catch (\Exception $ex) {
+				ErrorHandler::log("Failed to decrypt!");
+				ErrorHandler::logException($ex);
 				$plaintext = '';
 			}
 			return $plaintext;

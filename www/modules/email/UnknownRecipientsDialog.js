@@ -11,7 +11,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
  		
-GO.email.UnknownRecipientsDialog = Ext.extend(Ext.Window, {
+GO.email.UnknownRecipientsDialog = Ext.extend(go.Window, {
 	
 	initComponent : function(){
 		this.store = new GO.data.JsonStore({

@@ -90,5 +90,5 @@ if(go()->getSettings()->logoId) {
     <div class="go-app-logo"></div>
 </header>
 
-<section>
+<section class="go-html-formatted">
 

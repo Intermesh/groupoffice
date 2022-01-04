@@ -257,7 +257,27 @@ abstract class FileSystemObject {
 
 		return $filename;
 	}
-	
+
+	/**
+	 * Check if this folder is a symbolic link
+	 *
+	 * @return bool Returns the canonicalized absolute pathname on success. The resulting path will have no symbolic link, /./ or /../ components. Trailing delimiters, such as \ and /, are also removed.
+	 *  realpath() returns false on failure, e.g. if the file does not exist.
+	 */
+	public function isLink() {
+		return is_link($this->path);
+	}
+
+	/**
+	 * expands all symbolic links and resolves references to /./, /../ and extra / characters in the input path and returns the canonicalized absolute pathname.
+	 *
+	 * @return string|bool false on
+	 */
+	public function getLinkTarget() {
+		return realpath($this->path);
+	}
+
+
 	/**
 	 * Check if this object is a folder.
 	 *

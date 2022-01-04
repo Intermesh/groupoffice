@@ -2,7 +2,6 @@
 
 namespace go\core\model;
 
-use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\exception\Forbidden;
@@ -101,7 +100,7 @@ class Group extends AclOwnerEntity {
 
 	protected function internalValidate()
 	{
-		if($this->id === self::ID_ADMINS && !in_array(1, $this->users)) {
+		if(!$this->isNew() && $this->id === self::ID_ADMINS && !in_array(1, $this->users)) {
 			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the admin user from the administrators group"));
 		}
 
@@ -236,7 +235,7 @@ class Group extends AclOwnerEntity {
 		}
 		$user = User::findById($userId, ['username']);
 		if(!$user) {
-			throw new \Exeption("Invalid userId given");
+			throw new \Exception("Invalid userId given");
 		}
 		$personalGroup = new Group();
 		$personalGroup->name = $user->username;

@@ -7,6 +7,7 @@ use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Query;
+use go\core\ErrorHandler;
 use go\core\model\Module;
 use go\core\jmap;
 use go\core\model\Acl;
@@ -31,7 +32,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	private $id;
 	private $name;
 	private $moduleId;	
-  private $clientName;
+	private $clientName;
 	private $defaultAclId;
 
 	private static $cache;
@@ -119,8 +120,14 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
 			$record['name'] = self::classNameToShortName($className);
-      $record['clientName'] = $clientName;
-			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
+			$record['clientName'] = $clientName;
+			try {
+				App::get()->getDbConnection()->insert('core_entity', $record)->execute();
+			} catch(\PDOException $e) {
+				ErrorHandler::log("Failed to register new entity type for class '$className'.");
+				go()->debug($c);
+				throw $e;
+			}
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
 
 			go()->getCache()->delete('entity-types');
@@ -133,6 +140,14 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$e->name = $record['name'];
 
 			return $e;
+		}
+
+		if(go()->getDebugger()->enabled) {
+			//do extra check if entity type belongs to the module
+			$module = Module::findByClass($className);
+			if($c['models'][$c['name'][$clientName]]->moduleId != $module->id) {
+				throw new Exception("Entity $className conflicts with : " .$c['models'][$c['name'][$clientName]]->getClassName() .". Please return unique client name with getClientName()");
+			}
 		}
 		return $c['models'][$c['name'][$clientName]] ?? false;
 	}
@@ -350,9 +365,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		if(!jmap\Entity::$trackChanges) {
 			return true;
 		}
-		
-		go()->getDbConnection()->beginTransaction();
-		
+
 		$this->highestModSeq = $this->nextModSeq();		
 		
 		if(!is_array($changedEntities)) {
@@ -376,23 +389,16 @@ class EntityType implements \go\core\data\ArrayableInterface {
 				}, $changedEntities);
 			}
 		}
-		
-		try {
-			$stmt = go()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
-			$stmt->execute();
-		} catch(Exception $e) {
-			go()->getDbConnection()->rollBack();
-			throw $e;
+
+		//It's possible that this won't write any change. This leads to a modSeq with no changes at all?
+		$stmt = go()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
+		$stmt->execute();
+
+		if(!$stmt->rowCount()) {
+			go()->warn("Empty changes!");
 		}
-		
-		// Will not work without savepoints
-		// if(!$stmt->rowCount()) {
-		// 	//if no changes were written then rollback the modSeq increment.
-		// 	go()->getDbConnection()->rollBack();
-		// } else
-		// {
-			return go()->getDbConnection()->commit();
-		// }				
+
+		return true;
 
 	}
 

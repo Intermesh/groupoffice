@@ -45,54 +45,24 @@ class AbstractModelController extends AbstractController {
 		return empty($params['id']) ? false : $params['id'];
 	}
 	
-	
-//	private function _extractCustomfieldValues(&$attributes){
-//		$v = [];
-//		foreach($attributes as $key=>$value)
-//		{
-//			if(substr($key,0,13)=='customFields_'){
-//				$v[substr($key,13)] = $attributes[$key];
-//				unset($attributes[$key]);
-//			}
-//		}
-//		return $v;
-//	}
-	
 
 	/**
 	 * The default action when the form in an edit dialog is submitted.
 	 */
-	protected function actionSubmit($params) {
+	protected function actionSubmit($params)
+	{
 
-//		$modelName = $this->model;
-//		$pk = $this->getPrimaryKeyFromParams($params);
-//		$model=false;
-//		if ($pk)
-//			$model = \GO::getModel($modelName)->findByPk($pk);
-//		
-//		if(!$model){
-//			$model = new $modelName;
-//			$model->user_id=\GO::user()->id;
-//		}
-		
 		$model = $this->getModelFromParams($params);
 
 		$ret = $this->beforeSubmit($response, $model, $params);
 		
 		if($ret!==false)
 		{		
-			
-			//$customFields = $this->_extractCustomfieldValues($params);
-//			var_dump($customFields);
 			$model->setAttributes($params);
 			
-//			if(!empty($customFields)) {
-//				$model->setCustomFields($customFields);
-//			}
-
 			$modifiedAttributes = $model->getModifiedAttributes();
 			if($model->save() ){
-				$response['success'] = true; //$model->save();
+				$response['success'] = true;
 
 				$response['id'] = $model->pk;
 
@@ -203,16 +173,15 @@ class AbstractModelController extends AbstractController {
 	 * Action to load a single record.
 	 */
 	protected function actionLoad($params) {
-		
-		//$modelName::model() does not work on php 5.2!
-		
+
 		$model = $this->getModelFromParams($params);
 		
 		$response = array();
-		
-		if(!$model->checkPermissionLevel($model->isNew?\GO\Base\Model\Acl::CREATE_PERMISSION:\GO\Base\Model\Acl::WRITE_PERMISSION))
+
+		if(!$this->checkLoadPermissionLevel($model)){
 			throw new \GO\Base\Exception\AccessDenied();
-		
+		}
+
 		$response = $this->beforeLoad($response, $model, $params);
 
 		$response['data'] = !empty($response['data']) ? array_merge($response['data'],$model->getAttributes()) : $model->getAttributes();
@@ -524,6 +493,12 @@ class AbstractModelController extends AbstractController {
 			while($workflowModel = $workflowModelstmnt->fetch()){
 
 				$currentStep = $workflowModel->step;
+				if((!$currentStep && $workflowModel->step_id != '-1') || empty($workflowModel->process)) {
+					// we have an incomplete workflow with a missing step.
+					// delete outself and continue;
+					$workflowModel->delete();
+					continue;
+				}
 
 				$workflowResponse = $workflowModel->getAttributes('html');
 
@@ -1326,5 +1301,13 @@ class AbstractModelController extends AbstractController {
 			
 			
 	}
-	
+
+	/**
+	 * @param $model
+	 * @return mixed
+	 */
+	protected function checkLoadPermissionLevel($model)
+	{
+		return $model->checkPermissionLevel($model->isNew() ?\GO\Base\Model\Acl::CREATE_PERMISSION : \GO\Base\Model\Acl::WRITE_PERMISSION);
+	}
 }

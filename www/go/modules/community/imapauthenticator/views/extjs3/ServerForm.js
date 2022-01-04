@@ -131,12 +131,14 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					}, {
 						xtype: 'textfield',
 						name: 'smtpUsername',
-						fieldLabel: t('Username')
+						fieldLabel: t('Username'),
+						autocomplete: "new-password"
 					}, {
 						xtype: 'textfield',
 						name: 'smtpPassword',
 						fieldLabel: t('Password'),
-						inputType:"password"
+						inputType:"password",
+						autocomplete: "new-password"
 					}, {
 						xtype: 'combo',
 						name: 'smtpEncryption',

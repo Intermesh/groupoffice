@@ -27,7 +27,7 @@ Ext.override(Ext.data.Connection, {
 GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;
 function dp(size) {
 	return ((size * GO.util.density) / 160);
-};
+}
 /*
  *When upgrading extjs don't forget to check htmleditor overrides in E-mail composer
  */

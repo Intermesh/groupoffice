@@ -87,6 +87,7 @@ class Folder extends FileSystemObject {
 		return TRUE;
 	}
 
+
 	/**
 	 * Get folder directory listing.
 	 *
@@ -453,7 +454,7 @@ class Folder extends FileSystemObject {
 
 			if($isFolder) {
 				//Do exists check for broken links
-				if(!$child->exists()) {
+				if($child->isLink() && !$child->getLinkTarget()) {
 					continue;
 				}
 

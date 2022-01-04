@@ -21,12 +21,21 @@ class Environment extends Singleton {
 	}
 	
 	/**
-	 * Check if we are ran with the Command Line Interface
+	 * Check if we are executed with the Command Line Interface
 	 * 
 	 * @return boolean
 	 */
 	public function isCli() {
 		return PHP_SAPI === 'cli';
+	}
+
+	/**
+	 * Check if we are executed within the cron environment
+	 *
+	 * @return boolean
+	 */
+	public function isCron() {
+		return basename($_SERVER['PHP_SELF']) == 'cron.php';
 	}
 
 	/**
@@ -36,6 +45,10 @@ class Environment extends Singleton {
 	 */
 	public function getMemoryLimit() {
 		return self::configToBytes(ini_get('memory_limit'));
+	}
+
+	public function setMemoryLimit($limit) {
+		ini_set('memory_limit', $limit);
 	}
 	
 	/**
@@ -58,7 +71,7 @@ class Environment extends Singleton {
 	 * Converts shorthand memory notation value to bytes
 	 * From http://php.net/manual/en/function.ini-get.php
 	 *
-	 * @param $val Memory size shorthand notation string
+	 * @param string $val Memory size shorthand notation string
 	 */
 	public static function configToBytes($val) {
 		$val = trim($val);
@@ -98,11 +111,21 @@ class Environment extends Singleton {
 	
 	/**
 	 * Get install path without trailing slash
+	 * eg /usr/share/groupoffice
 	 * 
-	 * @return string eg /usr/share/groupoffice
+	 * @return string
 	 */
 	public function getInstallPath() {
 		return dirname(dirname(__DIR__));
+	}
+
+	/**
+	 * Check if the Ioncube loader has been installed.
+	 *
+	 * @return bool
+	 */
+	public function hasIoncube() {
+		return extension_loaded('ionCube Loader');
 	}
 
 }

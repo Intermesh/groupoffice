@@ -488,6 +488,11 @@ class VCard extends AbstractConverter {
 	{
 		$this->card = $this->splitter->getNext();
 
+		if (!isset($this->card->VERSION)) {
+			ErrorHandler::log("VCARD error. Card without a version!");
+			return false;
+		}
+
 		if ($this->card->VERSION != "3.0") {
 			$this->card = $this->card->convert(\Sabre\VObject\Document::VCARD30);
 		}

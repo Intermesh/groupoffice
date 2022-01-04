@@ -14,7 +14,7 @@ class NoteBook extends AclOwnerEntity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("notes_note_book");
+						->addTable("notes_note_book", "nb");
 	}
 
 	protected function canCreate()
