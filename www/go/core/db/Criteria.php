@@ -370,30 +370,6 @@ class Criteria {
 	 * So change:
 	 *
 	 * ```
-	 * where foo = 1 and bar = 1
-	 * ```
-	 *
-	 * into:
-	 * ```
-	 * where (foo = 1 and bar = 1)
-	 * ```
-	 *
-	 * @return $this
-	 */
-	public function groupWhere(){
-		$criteria = new Criteria();
-		$criteria->where = $this->where;
-		$this->clearWhere();
-		$this->where($criteria);
-		return $this;
-	}
-
-	/**
-	 * Group existing where conditions in new Criteria object.
-	 *
-	 * So change:
-	 *
-	 * ```
 	 * where foo = 1 or bar = 1
 	 * ```
 	 *
