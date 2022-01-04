@@ -17,7 +17,7 @@ class Utils {
 	 * @param false $verbose
 	 * @throws Exception
 	 */
-	public static function runSQLFile(File $file, $verbose = false) {
+	public static function runSQLFile(File $file, bool $verbose = false) {
 		$queries = self::getSqlQueries($file);
 
 		try {
@@ -47,7 +47,8 @@ class Utils {
    * @return array An array of SQL strings
    * @throws Exception
    */
-	public static function getSqlQueries(File $file) {
+	public static function getSqlQueries(File $file): array
+	{
 		$sql = '';
 		$queries = array();
 
@@ -89,11 +90,12 @@ class Utils {
 
 	/**
 	 * Check if a database exists
-	 * 
-	 * @param string $tableName
-	 * @return boolean 
+	 *
+	 * @param $databaseName
+	 * @return boolean
 	 */
-	public static function databaseExists($databaseName) {
+	public static function databaseExists($databaseName): bool
+	{
 		$stmt = App::get()->getDbConnection()->query('SHOW DATABASES');
 		while ($r = $stmt->fetch()) {
 			if ($r[0] == $databaseName) {
@@ -111,7 +113,8 @@ class Utils {
 	 * @param string $tableName
 	 * @return boolean 
 	 */
-	public static function tableExists($tableName) {
+	public static function tableExists(string $tableName): bool
+	{
 
 		$stmt = App::get()->getDbConnection()->query('SHOW TABLES');
 		$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
@@ -127,7 +130,8 @@ class Utils {
 	 * @param string $columnName
 	 * @return boolean
 	 */
-	public static function columnExists($tableName, $columnName) {
+	public static function columnExists(string $tableName, string $columnName): bool
+	{
 		$sql = "SHOW FIELDS FROM `" . $tableName . "`";
 		$stmt = App::get()->getDbConnection()->query($sql);
 		while ($record = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -146,7 +150,8 @@ class Utils {
 	 * @param mixed $variable
 	 * @return int
 	 */
-	public static function getPdoParamType($variable) {
+	public static function getPdoParamType($variable): int
+	{
 		if (is_bool($variable)) {
 			return PDO::PARAM_BOOL;
 		} elseif (is_int($variable)) {
@@ -162,9 +167,10 @@ class Utils {
    * Parse DSN connection string
    * 
    * @param string $dsn eg mysql:host=db;port=8306;dbname=groupoffice
-   * @return ['scheme' => 'mysql', 'options' => ['host' => 'db']]
+   * @return array eg. ['scheme' => 'mysql', 'options' => ['host' => 'db']]
    */
-  public static function parseDSN($dsn) {
+  public static function parseDSN(string $dsn): array
+  {
     $dsn = substr($dsn, 6); //strip mysql:
     $parts = str_getcsv($dsn, ';');
     $options = [];
@@ -180,7 +186,8 @@ class Utils {
   }
 	
 	
-	public static function quoteTableName($name) {
+	public static function quoteTableName($name): string
+	{
 		//disallow \ ` and \00  : http://stackoverflow.com/questions/1542627/escaping-field-names-in-pdo-statements
 		// if (preg_match("/[`\\\\\\000,]/", $name)) {
 		// 	throw new Exception("Invalid characters found in column name: " . $name);
@@ -189,12 +196,13 @@ class Utils {
 		return '`' . str_replace('`', '``', $name) . '`';
 	}
 	
-	public static function quoteColumnName($name) {
+	public static function quoteColumnName($name): string
+	{
 		return self::quoteTableName($name);
 	}
 	
 	
-	public static function isUniqueKeyException(\PDOException $e) {
+	public static function isUniqueKeyException(PDOException $e) {
 		//Unique index error = 23000
 		if ($e->getCode() != 23000) {
 			return false;
@@ -204,8 +212,7 @@ class Utils {
 		//App::get()->debug($msg);
 
 		if(preg_match("/key '(.*)'/", $msg, $matches)) {
-			$key = $matches[1];
-			return $key;
+			return $matches[1];
 		}
 
 		return false;

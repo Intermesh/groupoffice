@@ -24,7 +24,17 @@ class Sync extends Controller {
   private $domains;
 
 
-  public function test($id) {
+	/**
+	 * Test a single username
+	 *
+	 * eg.
+	 * sudo -u www-data php /usr/share/groupoffice/cli.php community/ldapauthenticator/Sync/test --id=1 --username=john --debug
+	 *
+	 * @param $id
+	 * @param $username
+	 * @throws NotFound
+	 */
+  public function test($id, $username) {
 	  //objectClass	inetOrgPerson)
 	  $server = Server::findById($id);
 	  if(!$server) {
@@ -37,10 +47,16 @@ class Sync extends Controller {
 
 	  echo "Connected\n";
 
-	  $records = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=*");
+	  $this->domains  = array_map(function($d) {return $d->name;}, $server->domains);
+
+	  $records = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $username);
 
 	  foreach($records as $record) {
 	  	echo $record->getDn() . "\n";
+
+		  $user = $this->ldapRecordToUser($record, $server, false);
+
+			echo "User: " .$user->username ."\n";
 	  }
   }
 
@@ -75,48 +91,11 @@ class Sync extends Controller {
     
     $i = 0;
     foreach($records as $record) {
-      $i++;
-      $username = $this->getGOUserName($record,$server);
-      
-      if (empty($username)) {
-        $this->output("Skipping record. Could not determine username for record: " . $record->getDn());
-        continue;
-      }
-
-      $user = User::find()->where(['username' => $username]);
-      
-      if(!empty($record->mail[0])) {
-        $user->orWhere(['email' => $record->mail[0]]);
-      }
-      $user = $user->single();
-
-      if (!$user) {
-        $this->output("Creating user '" . $username . "'");
-
-        $user = new User();
-        $user->username = $username;
-        
-      } else {
-        $this->output("User '" . $username . "' exists");
-      }
-
-      Module::ldapRecordToUser($username, $record, $user);
-
-      $this->fireEvent(self::EVENT_SYNC_USER, $user, $record);
-
-      if (!$dryRun) {
-        if($user->isModified() && !$user->save()) {
-          echo "Error saving user: " . var_export($user->getValidationErrors(), true);
-          continue;
-        }
-
-        go()->getDbConnection()
-          ->replace('ldapauth_server_user_sync', ['serverId' => $id, 'userId' => $user->id])->execute();
-      }      
-
-			$this->output("Synced " . $username);		
-
-			$usersInLDAP[] = $user->id;
+	    $i++;
+			$user = $this->ldapRecordToUser($record, $server, $dryRun);
+			if($user) {
+				$usersInLDAP[] = $user->id;
+			}
 		}
 
 		if ($delete) {
@@ -125,6 +104,51 @@ class Sync extends Controller {
 
     $this->output("Done\n\n");
   }
+
+	private function ldapRecordToUser(Record $record, Server $server, $dryRun) {
+
+		$username = $this->getGOUserName($record,$server);
+
+		if (empty($username)) {
+			$this->output("Skipping record. Could not determine username for record: " . $record->getDn());
+			return false;
+		}
+
+		$user = User::find()->where(['username' => $username]);
+
+		if(!empty($record->mail[0])) {
+			$user->orWhere(['email' => $record->mail[0]]);
+		}
+		$user = $user->single();
+
+		if (!$user) {
+			$this->output("Creating user '" . $username . "'");
+
+			$user = new User();
+			$user->username = $username;
+
+		} else {
+			$this->output("User '" . $username . "' exists");
+		}
+
+		Module::ldapRecordToUser($username, $record, $user);
+
+		$this->fireEvent(self::EVENT_SYNC_USER, $user, $record);
+
+		if (!$dryRun) {
+			if($user->isModified() && !$user->save()) {
+				echo "Error saving user: " . var_export($user->getValidationErrors(), true);
+				return false;
+			}
+
+			go()->getDbConnection()
+				->replace('ldapauth_server_user_sync', ['serverId' => $this->serverId, 'userId' => $user->id])->execute();
+		}
+
+		$this->output("Synced " . $username);
+
+		return $user;
+	}
 
   private function getGOUserName(Record $record, Server $server) {
     $username = $record->{$server->usernameAttribute}[0] ?? null;

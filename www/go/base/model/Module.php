@@ -2,6 +2,7 @@
 namespace GO\Base\Model;
 
 use GO;
+use go\core\model\User;
 use go\modules\business\license\exception\LicenseException;
 
 /*
@@ -46,6 +47,107 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	{	
 		return parent::model($className);
 	}
+
+	public function getPermissionLevel($userId = null) {
+		if(!\GO::user()) {
+			return 0;
+		}
+
+		if(\GO::user()->isAdmin())
+			return 50;
+
+		if(!isset($userId)) {
+			$userId = GO::user()->id;
+			if(\go\core\model\User::isAdminById($userId)) {
+				return 50;
+			}
+		} else{
+			if(\GO::user()->isAdmin())
+				return 50;
+		}
+		$moduleId = $this->id;
+
+		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".$userId.") AND moduleId = ".$moduleId.";";
+
+		$rights = \go()->getDbConnection()->query($groupedRights)->fetch(\PDO::FETCH_COLUMN);
+		if($rights === false) {
+			return 0;
+		}
+		if($rights & 1) { // we only have mayManage for old modules
+			return 50;
+		}
+
+		if($this->name == 'projects2' && ($rights & 2)) { // a single exception for this compat method
+			return 45;
+		}
+		return 10;
+	}
+
+	private function adminRights() {
+		$rights = ["mayRead" => true];
+		foreach($this->getModuleManager()->getRights() as $name => $bit){
+			$rights[$name] = true;
+		}
+		return (object) $rights;
+	}
+
+	private function userRights($userId) {
+		$r = go()->getDbConnection()->selectSingleValue("MAX(rights)")
+			->from("core_permission")
+			->where('moduleId', '=', $this->id)
+			->where("groupId", "IN",
+				go()->getDbConnection()
+					->select("groupId")
+					->from("core_user_group")
+					->where(['userId' => $userId])
+			)->single();
+
+		if($r === null) {
+			$rights = ["mayRead" => false];
+			foreach($this->getModuleManager()->getRights() as $name => $bit){
+				$rights[$name] = false;
+			}
+			return (object) $rights;
+		}
+
+		$r = decbin($r);
+
+		$rights = ["mayRead" => true];
+
+		foreach ($this->getModuleManager()->getRights() as $name => $bit) {
+			$rights[$name] = !!($r & $bit);
+		}
+
+		return (object) $rights;
+	}
+
+	/**
+	 * Get's the rights of a user
+	 *
+	 * @param int|null $userId The user ID to query. defaults to current authorized user.
+	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
+	 */
+	public function getUserRights(int $userId = null)
+	{
+
+		if(!isset($userId)) {
+			$userId = go()->getAuthState()->getUserId();
+			$isAdmin = go()->getAuthState()->isAdmin();
+		} else{
+			$isAdmin = User::isAdminById($userId);
+
+		}
+
+		if(!$this->isAvailable()) {
+			return (object) ['mayRead' => $isAdmin];
+		}
+
+		if($isAdmin) {
+			return $this->adminRights();
+		}
+
+		return $this->userRights($userId);
+	}
 	
 	protected function nextSortOrder() {
 		$query = new \go\core\db\Query();			
@@ -66,7 +168,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Install's a module with all it's dependencies
 	 * 
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @return \GO\Base\Model\Module
 	 * @throws \GO\Base\Exception\Save
 	 */
@@ -103,9 +205,6 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		return $module;
 	}
 
-	public function aclField() {
-		return 'aclId';
-	}
 
 	public function tableName() {
 		return 'core_module';
@@ -192,8 +291,10 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	
 	protected function afterSave($wasNew) {
 		
-		if(!$this->admin_menu && $wasNew)
-			$this->acl->addGroup(\GO::config()->group_internal);
+		if(!$this->admin_menu && $wasNew) {
+			go()->getDbConnection()->insert('core_permission', ['moduleId' => $this->id, 'groupId' => \go\core\model\Group::ID_INTERNAL])->execute();
+		}
+
 		
 		if($wasNew){			
 			if($this->moduleManager)
@@ -216,26 +317,23 @@ class Module extends \GO\Base\Db\ActiveRecord {
 				}
 			}
 		}
+
+		$users = User::model()->find(
+			(new \GO\Base\Db\FindParams())
+				->join('core_user_group', 'u.id = ug.userId', 'ug')
+				->join('core_permission', 'p.groupId = ug.groupId', 'ug')
+				->getCriteria()->addRawCondition('p.moduleId = '.$this->id)
+			);
 		
-		$this->acl->getAuthorizedUsers(
-						$this->aclId, 
-						Acl::READ_PERMISSION, 
-						function($user, $models){		
-							foreach ($models as $model)
-								$model->getDefault($user);		
-						}, array($models));
+
+		foreach($users as $user) {
+			foreach ($models as $model) {
+				$model->getDefault($user);
+			}
+		}
 	}
 	
-	/**
-	 * @deprecated since 6.3
-	 * Added to be backwards compatible
-	 * 
-	 * @return ACL ID
-	 */
-	public function getAcl_id(){
-		return $this->aclId;
-	}
-	
+
 	protected function beforeDelete() {
 		
 		

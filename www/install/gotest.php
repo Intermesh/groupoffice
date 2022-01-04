@@ -14,7 +14,7 @@
 
 use go\core\Environment;
 
-$product_name = class_exists('GO') ? \GO::config()->product_name : 'Group-Office';
+$product_name = 'Group-Office';
 
 /**
 * Format a size to a human readable format.
@@ -407,7 +407,7 @@ function test_system() :array
 	$test['fatal']=true;
 
 	$tests[]=$test;	
-	
+
 	$test['name']='MySQLnd driver';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']= extension_loaded('mysqlnd');
@@ -423,7 +423,7 @@ function test_system() :array
 	$test['fatal']=false;
 
 	$tests[]=$test;
-	
+
 	$test['name']='Process Control Extensions';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']= function_exists('posix_getuid');
@@ -524,7 +524,7 @@ function output_system_test() :bool
 	$tests = test_system();
 
 	// If the test script is called from the system administration tools (thus not included), it is safe to show the
-	// full output. 
+	// full output.
 	$showFullOutput = !class_exists("go\core\App");
 
 	$fatal = false;

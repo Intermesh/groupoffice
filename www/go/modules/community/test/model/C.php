@@ -10,7 +10,8 @@ class C extends Entity {
 	
 	public $name;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('test_c');
 	}
 

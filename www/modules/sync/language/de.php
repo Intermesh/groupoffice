@@ -26,4 +26,5 @@ return array (
   '<h1>Group-Office SyncML Server</h1><p>This is the Group-Office SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with Group-Office.</p>' => '<h1>GroupOffice SyncML Server</h1><p>Dies ist der GroupOffice SyncML Server. Benutzen Sie ein SyncML kompatibles Gerät und stellen Sie eine Verbindung mit dieser URL her, um das Gerät mit GroupOffice zu synchronisieren.</p>',
   'Notebooks' => 'Notizbücher',
   'Address books' => 'Adressbücher',
+  'Tasklists' => 'Aufgabenlisten',
 );

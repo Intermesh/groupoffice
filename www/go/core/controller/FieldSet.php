@@ -4,17 +4,34 @@ namespace go\core\controller;
 
 use go\core\customfield\Base;
 use go\core\fs\Blob;
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\model;
+use go\core\orm\Query;
 
 class FieldSet extends EntityController {
 
+	protected function canUpdate(Entity $entity): bool
+	{
+		return $this->rights->mayChangeCustomFields;
+	}
+
+	protected function canDestroy(Entity $entity): bool
+	{
+		return $this->rights->mayChangeCustomFields;
+	}
+
+	protected function canCreate(Entity $entity): bool
+	{
+		return $this->rights->mayChangeCustomFields;
+	}
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\FieldSet::class;
 	}
 	
@@ -23,10 +40,12 @@ class FieldSet extends EntityController {
 						->where(['m.enabled' => true]);
 	}
 
-	protected function getQueryQuery($params) {
+	protected function getQueryQuery(array $params): Query
+	{
 		return $this->checkEnabledModule(parent::getQueryQuery($params)->orderBy(['sortOrder' => 'ASC', 'id' => 'ASC']));
 	}
-	protected function getGetQuery($params) {
+	protected function getGetQuery(array $params): \go\core\orm\Query
+	{
 		return $this->checkEnabledModule(parent::getGetQuery($params)->orderBy(['sortOrder' => 'ASC', 'id' => 'ASC']));
 	}
 	
@@ -149,7 +168,6 @@ class FieldSet extends EntityController {
 	 *
 	 * @param $params
 	 * @return array
-	 * @throws \go\core\exception\ConfigurationException
 	 */
 	public function importFromJson($params)
 	{

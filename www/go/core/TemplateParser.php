@@ -1,14 +1,15 @@
-<?php
+<?php /** @noinspection PhpSameParameterValueInspection */
 
 namespace go\core;
 
+use DateTimeZone;
 use Exception;
+use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\db\Query;
-use go\core\db\Statement;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
-use stdClass;
+use Throwable;
 use Traversable;
 use function GO;
 
@@ -99,23 +100,59 @@ use function GO;
  *
  * @example Using [assign] to lookup a Contact entity with id = 1
  *
+ * ```
+
  * [assign contact = 1 | entity:Contact]
+ * ```
  *
  * @example Using [assign] to lookup a Contact entity with id = 1
  *
+ * ```
  * [assign contact = 1 | entity:Contact]
+ * ```
  *
  * @example Using [assign] to lookup a linked Contact entity with id = 1
  *
+ * ```
  * [assign firstContactLink = someEntityVar | links:Contact | first]
  *
  * {{firstContactLink.name}}
+ * ```
+ *
+ * @example Using [assign] to do some basic math
+ *
+ * Note that inside the [each] block we access total with parent.total
+ *
+ * ```
+ * [assign total = 0]
+ *
+ * [each invoice in invoices]
+ *  <tr>
+ *    <td>{{invoice.number}}</td>
+ *    <td>{{invoice.date|date:d-m-Y}}</td>
+ *    <td>{{invoice.expiresAt|date:d-m-Y}}</td>
+ *    <td align="right">{{business.finance.currency}} {{invoice.totalPrice|number}}</td>
+ *    <td align="right">{{business.finance.currency}} {{invoice.paidAmount|number}}</td>
+ *    [assign balance = {{invoice.totalPrice}} - {{invoice.paidAmount}} ]
+ *    [assign parent.total = {{parent.total}} + {{balance}}]
+ *    <td align="right">{{business.finance.currency}} {{balance|number}}</td>
+ *  </tr>
+ * [/each]
+ *
+ * {{business.finance.currency}} {{total|number}}
+ * </tr>
+ * ````
  *
  */
 class TemplateParser {	
 
 	private $models = [];
 
+	/**
+	 * Values in IF expressions will be enlosed with quotes.
+	 *
+	 * @var bool
+	 */
 	public $encloseVars = false;
 
 	public $enableBlocks = true;
@@ -131,20 +168,28 @@ class TemplateParser {
 		$this->addFilter('entity', [$this, "filterEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('nl2br', "nl2br");
+		$this->addFilter('t', [$this, "filterTranslate"]);
 
 		$this->addModel('now', new DateTime());	
 	}
 
 	private $_currentUser;
 
-	protected function _currentUser() {
+	protected function _currentUser(): ?User
+	{
 		if(!isset($this->_currentUser)) {
 			$this->_currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone' ]);
 		}
 		return $this->_currentUser;
 	}
-	
-	private function filterDate(DateTime $date = null, $format = null) {
+
+	/** @noinspection PhpSameParameterValueInspection */
+	private function filterTranslate($text, $package = 'core', $module = 'core') {
+		return go()->t($text, $package, $module);
+	}
+
+	private function filterDate(DateTime $date = null, $format = null): string
+	{
 
 		if(!isset($date)) {
 			return "";
@@ -154,7 +199,7 @@ class TemplateParser {
 			$format = $this->_currentUser()->dateFormat;
 		}
 
-		$date->setTimezone(new \DateTimeZone($this->_currentUser()->timezone));
+		$date->setTimezone(new DateTimeZone($this->_currentUser()->timezone));
 
 		return $date->format($format);
 	}
@@ -166,38 +211,35 @@ class TemplateParser {
 		}
 		$cls = $et->getClassName();
 
-		$e = $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
-
-		return $e;
+		return $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
 	}
 
 	private function filterLinks(Entity $entity, $entityName, $properties = null) {
 
 		$entityType = EntityType::findByName($entityName);
 		$entityCls = $entityType->getClassName();
-		$entities = $entityCls::findByLink($entity,!empty($properties) ? explode(",", $properties) : [], true);
-
-		return $entities;
+		return $entityCls::findByLink($entity,!empty($properties) ? explode(",", $properties) : [], true);
 	}
 
-	private function filterNumber($number,$decimals=2, $decimalSeparator='.', $thousandsSeparator=',') {
+	private function filterNumber($number,$decimals=2, $decimalSeparator='.', $thousandsSeparator=','): string
+	{
 		return number_format($number,$decimals, $decimalSeparator, $thousandsSeparator);
 	}
 	
-	private function filterFilter($array, $propName, $propValue) {
+	private function filterFilter($array, $propName, $propValue): ?array
+	{
 
 		if(!isset($array)) {
 			return null;
 		}
 
-		$filtered = array_filter($array, function($i) use($propValue, $propName){
+		return array_filter($array, function($i) use($propValue, $propName){
 			return $i->$propName == $propValue;
 		});
-
-		return $filtered;
 	}
 
-	private function filterColumn($array, $propName) {
+	private function filterColumn($array, $propName): ?array
+	{
 
 		if(!isset($array)) {
 			return null;
@@ -212,7 +254,8 @@ class TemplateParser {
 		return $c;
 	}
 
-	private function filterImplode($array, $glue = ', ') {
+	private function filterImplode($array, $glue = ', '): string
+	{
 
 		if(!isset($array)) {
 			return "";
@@ -223,13 +266,17 @@ class TemplateParser {
 
 
 
-	private function filterCount($countable) {
+	private function filterCount($countable): int
+	{
 		if(!isset($countable)) {
 			return 0;
 		}
 		return count($countable);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function filterFirst($items) {
 
 		if(!isset($items)) {
@@ -244,7 +291,7 @@ class TemplateParser {
 			return $items->single();
 		}
 
-		throw new \Exception("Unsupported type for filter 'first'");
+		throw new Exception("Unsupported type for filter 'first'");
 
 
 	}
@@ -255,16 +302,20 @@ class TemplateParser {
 	 * @param string $name
 	 * @param callable $function
 	 */
-	public function addFilter($name, callable $function) {
+	public function addFilter(string $name, callable $function) {
 		$this->filters[$name] = $function;
 	}
-	
-	private function findBlocks($str) {
+
+	/**
+	 * @throws Exception
+	 */
+	private function findBlocks($str): array
+	{
 			
 		preg_match_all('/\[(each|if)/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[\/(each|if)\]/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
@@ -359,7 +410,11 @@ class TemplateParser {
 		return $tags;
 	}
 
-	private function findExpression($startPos, $str) {
+	/**
+	 * @throws Exception
+	 */
+	private function findExpression($startPos, $str): string
+	{
 		$openBrackets = 1;
 
 		$expression = '';
@@ -388,7 +443,7 @@ class TemplateParser {
 			
 		}
 
-		throw new \Exception("Invalid block");
+		throw new Exception("Invalid block");
 
 	}
 	
@@ -411,41 +466,46 @@ class TemplateParser {
 		
 		return $tags;
 	}
+
 	/**
 	 * Parse a template
-	 * 
-	 * @see __construct();
-	 * 
+	 *
 	 * @param string $str
-	 * 
+	 *
 	 * return string
+	 * @throws Exception
+	 * @throws Exception
+	 * @throws Exception
+	 * @see __construct();
+	 *
 	 */
-	public function parse($str) {		
+	public function parse(string $str) {
 		if($this->enableBlocks) {
 			$str = $this->parseBlocks($str);
 		}
 //		$str = preg_replace_callback('/\n?\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*)(?<!\\\\)\\]\n?/', [$this, 'replaceAssign'], $str);
-		$str = preg_replace_callback('/{{.*?}}/', [$this, 'replaceVar'], $str);	
-		return $str;
+		return preg_replace_callback('/{{.*?}}/', [$this, 'replaceVar'], $str);
 	}
 
 
-
+	/**
+	 * @throws Exception
+	 */
 	private function parseBlocks($str) {
 		$tags = $this->findBlocks($str);		
 			
 		for($i = 0;$i < count($tags); $i++) {
 			switch($tags[$i]['tagName']){
 				case  'if':
-				$tags[$i] = $this->replaceIf($tags[$i], $str);
+				$tags[$i] = $this->replaceIf($tags[$i]);
 				break;
 
 				case 'each':
-					$tags[$i] = $this->replaceEach($tags[$i], $str);
+					$tags[$i] = $this->replaceEach($tags[$i]);
 					break;
 
 				case 'assign':
-					$tags[$i] = $this->replaceAssign($tags[$i], $str);
+					$tags[$i] = $this->replaceAssign($tags[$i]);
 					break;
 			}
 		}
@@ -469,27 +529,78 @@ class TemplateParser {
 		
 		$replaced .= substr($str, $offset);
 
-		$replaced = preg_replace("/(.*)\r?\n?$/", "$1", $replaced);
-		return $replaced;
+		return preg_replace("/(.*)\r?\n?$/", "$1", $replaced);
 	}
 
-	private function replaceAssign($tag, $str) {
+	/**
+	 * @throws Exception
+	 */
+	private function replaceAssign($tag) {
 
-		$value = $this->getVarFiltered($tag['expression']);
-		$this->addModel($tag['varName'], $value);
-
+		//assign won't output
 		$tag['replacement'] = "";
+
+		if(is_numeric($tag['expression'])) {
+			//allow assigning a new numeric value for math operations
+			$value = $tag['expression'];
+		} else 	if(preg_match('/{{.*?}}/',$tag['expression'])) {
+			$sum = $this->parse($tag['expression']);
+
+			try{
+				$sum = $this->validateExpression($sum);
+				$value = eval($sum);
+			} catch(Throwable $e) {
+				$value = $e->getMessage();
+			}
+
+		} else {
+			$value = $this->getVarFiltered($tag['expression']);
+		}
+
+		$o = &$this->models;
+
+		$path = explode(".", $tag['varName']);
+
+		$lastPart = array_pop($path);
+
+		foreach($path as $part) {
+			if(is_array($o)) {
+				if (!isset($o[$part])) {
+					//ignore invalid assign
+					return $tag;
+				}
+				$o = &$o[$part];
+			} else{
+				if (!isset($o->$part)) {
+					//ignore invalid assign
+					return $tag;
+				}
+				$o = &$o->$part;
+			}
+		}
+
+		if(is_array($o)) {
+			$o[$lastPart] = $value;
+		} else if(is_object($o)) {
+			$o->$lastPart = $value;
+		}
+
+
 
 		return $tag;
 	}
-	
-	private function replaceEach($tag, $str) {
+
+
+	/**
+	 * @throws Exception
+	 */
+	private function replaceEach($tag) {
 		
 		//example emailAddress in contact.emailAddresses
 		$expressionParts = array_map('trim', explode(' in ', $tag['expression']));
 
 		if(!isset($expressionParts[1])) {
-			throw new \Exception("Invalid expression: ". $tag['expression']);
+			throw new Exception("Invalid expression: ". $tag['expression']);
 		}
 
 		$array = $this->getVarFiltered($expressionParts[1]);
@@ -503,7 +614,8 @@ class TemplateParser {
 		
 		$replacement = '';
 		$eachIndex = 0;
-		$parser = clone $this;		
+		$parser = clone $this;
+		$parser->addModel("parent", $this);
 		foreach($array as $model) {
 			
 			$parser->addModel($varName, $model);		
@@ -519,7 +631,10 @@ class TemplateParser {
 
 	private static $tokens = ['==','!=','>','<', '(', ')', '&&', '||', '*', '/', '%', '-', '+', '!'];
 
-	private function replaceIf($tag, $str) {
+	/**
+	 * @throws Exception
+	 */
+	private function replaceIf($tag) {
 		
 		$this->encloseVars = true;
 		$this->enableBlocks = false;
@@ -530,7 +645,7 @@ class TemplateParser {
 		$expression = $this->validateExpression($parsed);	
 		try {
 			$ret = eval($expression);	
-		} catch(\ParseError $e) {
+		} catch(Throwable $e) {
 			go()->warn('eval() failed '. $e->getMessage());
 			go()->warn($tag['expression']);
 			go()->warn($expression);
@@ -548,8 +663,12 @@ class TemplateParser {
 		
 //		return substr($str, 0, $block['offset']) . $replacement . substr($str, $block['close']['offset'] + $block['close']['tagLength']);
 	}
-	
-	private function validateExpression($expression) {
+
+	/**
+	 * @throws Exception
+	 */
+	private function validateExpression($expression): string
+	{
 		
 		$expression = html_entity_decode($expression);
 
@@ -588,12 +707,18 @@ class TemplateParser {
 		return empty($str) ? 'return false;' : 'return ('.$str.');';
 	} 
 	
-	private function isString ($str) {
+	private function isString ($str): bool
+	{
 		return preg_match('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/s', $str) || preg_match("/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'/s", $str);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function replaceVar($matches) {
-		$str = substr($matches[0], 2, -2);		
+		//take off {{ .. }}
+		$str = substr($matches[0], 2, -2);
+
 		$value =  $this->getVarFiltered($str);
 
 		//If replace value is array use first value for convenience
@@ -609,7 +734,57 @@ class TemplateParser {
 
 		return $value;
 	}
-	
+
+
+//	private function replaceVar($matches) {
+//
+//		//take off {{ .. }}
+//		$str = substr($matches[0], 2, -2);
+//
+//		//split for allowing simple calculations
+//		$parts = preg_split('/([+\-\/\*])/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
+//
+//		$math = "";
+//
+//		$mathExpression = count($parts) > 1;
+//
+//		while($part = array_shift($parts)) {
+//
+//			$varName = trim($part);
+//			$operator = array_shift($parts);
+//
+//			$value = $this->getVarFiltered($varName);
+//
+//			//If replace value is array use first value for convenience
+//			if (is_array($value)) {
+//				$value = array_shift($value);
+//			}
+//
+//			if ($this->encloseVars) {
+//				$value = is_scalar($value) ||
+//				!isset($value) ||
+//				(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
+//			}
+//
+//			if(!$mathExpression) {
+//				return $value;
+//			}
+//
+//			$math .= $value . $operator;
+//		}
+//
+//
+//		try {
+//			return eval($math);
+//		}catch(\Throwable $e) {
+//			return $e->getMessage();
+//		}
+//
+//	}
+
+	/**
+	 * @throws Exception
+	 */
 	private function getVarFiltered($expression) {
 		$filters = explode('|', $expression);
 		
@@ -623,7 +798,7 @@ class TemplateParser {
 			array_unshift($args, $value);
 
 			if(!isset($this->filters[$filterName])) {
-				throw new \Exception("Filter '" . $filterName . "' is undefined");
+				throw new Exception("Filter '" . $filterName . "' is undefined");
 			}
 			$value = call_user_func_array($this->filters[$filterName], $args);
 
@@ -691,7 +866,8 @@ class TemplateParser {
 		return $model;
 	}	
 	
-	public function hasReadableProperty($name) {
+	public function hasReadableProperty($name): bool
+	{
 		return array_key_exists($name, $this->models);
 	}
 
@@ -699,20 +875,25 @@ class TemplateParser {
 	 * Add a key value array or object to add for the parser.
 	 * 
 	 * @param string $name
-	 * @param array|stdClass $model 
+	 * @param mixed $model
 	 * @return TemplateParser
 	 */
-	public function addModel($name, $model) {
+	public function addModel(string $name, $model): TemplateParser
+	{
 		$this->models[$name] = $model;
 
 		return $this;
+	}
+
+	public function __set($name, $value) {
+		$this->addModel($name, $value);
 	}
 
 	public function __isset($name) {
 		return isset($this->models[$name]);
 	}
 
-	public function __get($name) {
+	public function &__get($name) {
 		return $this->models[$name];
 	}
 }

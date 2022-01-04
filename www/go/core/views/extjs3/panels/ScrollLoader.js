@@ -7,6 +7,8 @@
 go.panels.ScrollLoader = {
 		
 	pageSize: 40,
+
+	scrollBoundary: 200,
 	
 	scrollUp: false,  // set to true when you need to loadMore when scrolling up
 	
@@ -91,18 +93,15 @@ go.panels.ScrollLoader = {
 	 */
 	loadMore: function () {
 
-		var store = this.store;
+		const store = this.store;
 		if (this.allRecordsLoaded || this.store.loading){
 			return;
 		}	
 
-		var me = this;
-		
-		var scrollBoundary = (this.slScroller.offsetHeight * 2) ;
 
 		if(this.scrollUp) {
 			
-			if(this.slScroller.scrollTop  < scrollBoundary) {
+			if(this.slScroller.scrollTop  < this.scrollBoundary) {
 				var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
 				o.add = true;
 				o.params = o.params || {};
@@ -119,11 +118,11 @@ go.panels.ScrollLoader = {
 			}
 		} else {			
 
-			var pixelsLeft = this.slScroller.scrollHeight - this.slScroller.scrollTop - this.slScroller.offsetHeight;
-			var shouldLoad = (pixelsLeft < scrollBoundary);
+			const pixelsLeft = this.slScroller.scrollHeight - this.slScroller.scrollTop - this.slScroller.offsetHeight;
+			const shouldLoad = (pixelsLeft < this.scrollBoundary);
 
 			if (shouldLoad) {
-				var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
+				let o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
 				o.add = true;
 				o.params = o.params || {};
 

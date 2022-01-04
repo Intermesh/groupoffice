@@ -3,13 +3,14 @@
 namespace go\core\fs;
 
 use Exception;
-use go\core\App;
 use go\core\db\Table;
-use go\core\exception\ConfigurationException;
+use go\core\orm\exception\SaveException;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm;
 use go\core\util\DateTime;
 
+use PDO;
 use ReflectionException;
 use function GO;
 
@@ -105,9 +106,9 @@ class Blob extends orm\Entity {
 	 * ```
 	 * @link https://groupoffice-developer.readthedocs.io/en/latest/blob.html
 	 * @return array [['table'=>'foo', 'column' => 'blobId']]
-	 * @throws ConfigurationException
 	 */
-	public static function getReferences() {
+	public static function getReferences(): array
+	{
 		
 		$refs = go()->getCache()->get("blob-refs");
 		if($refs === null) {
@@ -116,9 +117,10 @@ class Blob extends orm\Entity {
 			
 			try {
 				//somehow bindvalue didn't work here
+				/** @noinspection SqlResolve */
 				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
 				$stmt = go()->getDbConnection()->query($sql);
-				$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);		
+				$refs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			}
 			finally{
 				go()->getDbConnection()->exec("USE `" . $dbName . "`");		
@@ -136,18 +138,16 @@ class Blob extends orm\Entity {
 	 * It uses foreign key relations to check this.
 	 *
 	 * @return boolean
-	 * @throws Exception
 	 */
-	public function isUsed() {
-
+	public function isUsed(): bool
+	{
 		//TODO: logo must be referenced somewhere. maybe core_settings was a bad idea because it's not relational.
 		if($this->id == go()->getSettings()->logoId) {
 			return true;
 		}
 
 		$refs = $this->getReferences();	
-		
-		$exists = false;
+
 		foreach($refs as $ref) {
 			$exists = (new Query)
 							->selectSingleValue($ref['column'])
@@ -167,13 +167,15 @@ class Blob extends orm\Entity {
 	 * Set the blob stale if it's not used in any of the referencing tables.
 	 *
 	 * @return bool true if blob is stale
+	 * @throws SaveException
 	 * @throws Exception
 	 */
-	public function setStaleIfUnused() {		
+	public function setStaleIfUnused(): bool
+	{
 		$this->staleAt = $this->isUsed() ? null : new DateTime();
 		
 		if(!$this->save()) {
-			throw new Exception("Couldn't save blob");
+			throw new SaveException($this);
 		}
 		return isset($this->staleAt);
 	}
@@ -184,10 +186,12 @@ class Blob extends orm\Entity {
 	 * The Blob needs to be save after calling this function.
 	 *
 	 * @param File $file
+	 * @param bool $removeFile
 	 * @return self
-	 * @throws ReflectionException
+	 * @throws Exception
 	 */
-	public static function fromFile(File $file, $removeFile = false) {
+	public static function fromFile(File $file, bool $removeFile = false): Blob
+	{
 		$hash = bin2hex(sha1_file($file->getPath(), true));
 		$blob = self::findById($hash);
 		if (empty($blob)) {
@@ -218,9 +222,10 @@ class Blob extends orm\Entity {
 	 *
 	 * @param File $file
 	 * @return self
-	 * @throws ReflectionException
+	 * @throws Exception
 	 */
-	public static function fromTmp(File $file) {
+	public static function fromTmp(File $file): Blob
+	{
 		return self::fromFile($file, true);
 	}
 
@@ -229,9 +234,9 @@ class Blob extends orm\Entity {
 	 *
 	 * @param string $string
 	 * @return self
-	 * @throws ReflectionException
 	 */
-	public static function fromString($string) {
+	public static function fromString(string $string): Blob
+	{
 		$hash = bin2hex(sha1($string, true));
 		$blob = self::findById($hash);
 		if (empty($blob)) {
@@ -244,15 +249,16 @@ class Blob extends orm\Entity {
 		return $blob;
 	}
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('core_blob', 'b');
 	}
 
 	/**
 	 * @return MetaData
-	 * @throws ReflectionException
 	 */
-	public function getMetaData() {
+	public function getMetaData(): MetaData
+	{
 		return new MetaData($this);
 	}
 
@@ -264,7 +270,8 @@ class Blob extends orm\Entity {
 		}
 	}
 
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		if (!is_dir(dirname($this->path()))) {
 			mkdir(dirname($this->path()), 0775, true);
 		}
@@ -290,15 +297,18 @@ class Blob extends orm\Entity {
 	 * Checks if blob is in use. If it's used it will not delete but return true.
 	 * It will remove the file on disk.
 	 *
+	 * @param Query $query
 	 * @return boolean
+	 * @throws SaveException
 	 * @throws Exception
 	 */
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 
 		$new = [];
 		$paths = [];
 
-		foreach(Blob::find()->mergeWith($query) as $blob) {;
+		foreach(Blob::find()->mergeWith($query) as $blob) {
 			if(!$blob->isUsed()) {
 				$new[] = $blob->id;
 				$paths[] = $blob->path();
@@ -345,13 +355,18 @@ class Blob extends orm\Entity {
 	 * Return file system path of blob data
 	 *
 	 * @return string
-	 * @throws ConfigurationException
+	 * @throws Exception
 	 */
-	public function path() {
+	public function path(): string
+	{
 		return self::buildPath($this->id);
 	}
 
-	static function buildPath($id) {
+	/**
+	 * @throws Exception
+	 */
+	static function buildPath($id): string
+	{
 		$dir = substr($id,0,2) . DIRECTORY_SEPARATOR .substr($id,2,2). DIRECTORY_SEPARATOR;
 		return go()->getDataFolder()->getPath() . DIRECTORY_SEPARATOR . 'data'. DIRECTORY_SEPARATOR . $dir . $id;
 	}
@@ -360,9 +375,10 @@ class Blob extends orm\Entity {
 	 * Get blob data as file system file object
 	 *
 	 * @return File
-	 * @throws ConfigurationException
+	 * @throws Exception
 	 */
-	public function getFile() {
+	public function getFile(): File
+	{
 		return new File($this->path());
 	}
 	
@@ -372,7 +388,8 @@ class Blob extends orm\Entity {
 	 * @param string $blobId
 	 * @return string
 	 */
-	public static function url($blobId) {
+	public static function url(string $blobId): string
+	{
 		return go()->getSettings()->URL . 'api/download.php?blob=' . $blobId;
 	}
 	
@@ -382,48 +399,59 @@ class Blob extends orm\Entity {
 	 * @param string $html
 	 * @return string[] Array of blob ID's
 	 */
-	public static function parseFromHtml($html) {
+	public static function parseFromHtml(string $html): array
+	{
 //		if(!preg_match_all('/<img [^>]*src="[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
 //			return [];
 //		}
 
-		if(!preg_match_all('/"http[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
-			return [];
+		$matches = [];
+
+		if(preg_match_all('/"http[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $urlMatches)) {
+			$matches = $urlMatches[1];
 		}
-		
-		return array_unique($matches[1]);
+
+		if(preg_match_all('/data-blob-id="([^"]*)"/', $html, $dataBlobIdMatches)){
+			$matches = array_merge($matches, $dataBlobIdMatches[1]);
+		}
+
+		return array_unique($matches);
 	}
-	
+
 	/**
-	 * Find image tags with a blobId download URL in "src" and replace them with a 
+	 * Find image tags with a blobId download URL in "src" and replace them with a
 	 * new "src" attribute.
-	 * 
+	 *
 	 * Useful when attaching inline images for example:
-	 * 
+	 *
 	 * ````
 	 * $blobIds = \go\core\fs\Blob::parseFromHtml($body);
 	 * foreach($blobIds as $blobId) {
-	 * 	$blob = \go\core\fs\Blob::findById($blobId);
-	 * 	
-	 * 	$img = \Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
-	 * 	$img->setContentType($blob->type);
-	 * 	$contentId = $this->embed($img);
-	 * 	$body = \go\core\fs\Blob::replaceSrcInHtml($body, $blobId, $contentId);
+	 *  $blob = \go\core\fs\Blob::findById($blobId);
+	 *
+	 *  $img = \Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
+	 *  $img->setContentType($blob->type);
+	 *  $contentId = $this->embed($img);
+	 *  $body = \go\core\fs\Blob::replaceSrcInHtml($body, $blobId, $contentId);
 	 * }
-	 * 
+	 *
 	 * @param string $html The HTML subject
 	 * @param string $blobId The blob ID to find and replace
-	 * @param string $newSrc The new "src" attribute for the blob
+	 * @param string $src
 	 * @return string Replaced HTML
 	 */
-	public static function replaceSrcInHtml($html, $blobId, $src) {		
-		$replaced =  preg_replace('/(<img [^>]*src=")[^>]*blob='.$blobId.'("[^>]*>)/i', '$1'.$src.'$2', $html);
+	public static function replaceSrcInHtml(string $html, string $blobId, string $src): string
+	{
+//		$replaced =  preg_replace('/(<img [^>]*src=")[^>]*blob='.$blobId.'("[^>]*>)/i', '$1'.$src.'$2', $html);
 
-		return $replaced;
+		return preg_replace_callback('/<img [^>]*' . $blobId . '[^>]*>/i', function($matches) use ($src) {
+			return preg_replace('/src="[^"]*"/i', 'src="' .$src .'"', $matches[0]);
+		}, $html);
 	}
-	
+
 	/**
 	 * Output for download
+	 * @throws Exception
 	 */
 	public function output($inline = false) {
 		$disp = $inline ? 'inline' : 'attachment';
@@ -436,7 +464,7 @@ class Blob extends orm\Entity {
 					]);
 	}
 
-	protected static function atypicalApiProperties()
+	protected static function atypicalApiProperties(): array
 	{
 		return array_merge(parent::atypicalApiProperties(), ['file']);
 	}

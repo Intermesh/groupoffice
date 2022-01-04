@@ -130,3 +130,19 @@ $updates['202003261139'][] = function() {
 $updates['202011161602'][] = "ALTER TABLE `comments_comment` ADD `date` DATETIME NULL AFTER `createdAt`;";
 $updates['202011161602'][] = "update `comments_comment` set `date` = createdAt;";
 $updates['202011161602'][] = "ALTER TABLE `comments_comment` ADD INDEX(`date`);";
+
+$updates['202111041557'][] = "drop table comments_attachment";
+
+$updates['202111041557'][] = "create table comments_comment_attachment
+(
+	id        int unsigned auto_increment
+        primary key,
+    commentId int          not null,
+    blobId    binary(40)   null,
+    name      varchar(190) not null,
+    constraint comments_comment_attachment_comments_comment_id_fk
+        foreign key (commentId) references comments_comment (id)
+            on update cascade,
+    constraint comments_comment_attachment_core_blob_id_fk
+        foreign key (blobId) references core_blob (id)
+);";

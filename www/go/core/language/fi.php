@@ -22,7 +22,7 @@ return array (
   'Company' => 'Yritys',
   'Permissions' => 'Oikeudet',
   'Login' => 'Kirjautuminen',
-  'Look & Feel' => 'Kokeile käytänössä',
+  'Look & feel' => 'Kokeile käytänössä',
   'Settings' => 'Asetukset',
   'Email for new enabled users' => 'Sähköposti uusille aktivoiduille käyttäjille',
   'Email for new disabled users' => 'Sähköposti uusille aktivoimattomille käyttäjille',

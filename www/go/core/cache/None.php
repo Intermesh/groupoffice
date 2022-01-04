@@ -28,7 +28,7 @@ class None implements CacheInterface {
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
 	 * @param int $ttl Time to live in seconds
 	 */
-	public function set($key, $value, $persist = true, $ttl = 0) {
+	public function set(string $key, $value, bool $persist = true, int $ttl = 0) {
 		$this->cache[$key] = $value;
 		return true;
 	}
@@ -39,7 +39,7 @@ class None implements CacheInterface {
 	 * @param string $key
 	 * @return mixed Stored value or NULL if not found 
 	 */
-	public function get($key) {
+	public function get(string $key) {
 		if (isset($this->cache[$key])) {
 			return $this->cache[$key];
 		}
@@ -51,22 +51,24 @@ class None implements CacheInterface {
 	 * 
 	 * @param string $key 
 	 */
-	public function delete($key) {
+	public function delete(string $key) {
 		unset($this->cache[$key]);
 		return true;
 	}
 
 	/**
 	 * Flush all values 
-	 * 
+	 *
+	 * @param bool $onDestruct
 	 * @return boolean
 	 */
-	public function flush() {
+	public function flush(bool $onDestruct = true) {
 		$this->cache = [];
 		return true;
 	}
 
-	public static function isSupported() {
+	public static function isSupported(): bool
+	{
 		return true;
 	}
 

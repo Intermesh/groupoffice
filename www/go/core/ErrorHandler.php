@@ -37,26 +37,30 @@ class ErrorHandler {
 		if ($error) {
 			//Log only fatal errors because other errors should have been logged by the normal error handler
 			if (in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING])) {
-//				$this->printError($error['type'], $error['message'], $error['file'], $error['line']);				
-				
 				$this->exceptionHandler(new ErrorException($error['message'],0,$error['type'],$error['file'], $error['line']));
 			}
 		}
 
 //		$this->debug("shutdown");
 	}
-	
+
 	/**
 	 * Log exception to PHP logging system and debug the exception in GO
-	 * 
-	 * @param \Exception $e
-	 * @return string The string that was logged
+	 *
+	 * @param Throwable $e
+	 * @param string|null $context Extra information about where the exception occurred
+	 * @return string The string that was logged. This contains sensitive information like the server path so use only for debugging!
 	 */
-	public static function logException($e) {
+	public static function logException(Throwable $e, string $context = null): string
+	{
 		$cls = get_class($e);
 		
 		$errorString = $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
-		
+
+		if(isset($context)) {
+			$errorString .= ', ' . $context;
+		}
+
 		if(!Environment::get()->isCli()) {
 			error_log($errorString, 0);
 		}
@@ -79,17 +83,18 @@ class ErrorHandler {
 	/**
 	 * Send a messaqe to the error log
 	 */
-	public static function log($str) {
+	public static function log($str): bool
+	{
 		go()->error($str);
 		return error_log($str, 0);
 	}
 
 	/**
-	 * PHP7 has new throwable interface. We can't use type hinting if we want to 
-	 * support php 5.6 as well.
+	 * Handles uncaught exceptions
+	 *
 	 * @param Throwable $e
 	 */
-	public function exceptionHandler($e) {	
+	public function exceptionHandler(Throwable $e) {
 		go()->debug("ErrorHandler::exceptionHandler() called with " . get_class($e));
 
 		$errorString = self::logException($e);
@@ -103,7 +108,7 @@ class ErrorHandler {
 			header('Content-Type: text/plain');
 		}
 		
-		echo "\n" . $errorString . " at ".date(DateTime::FORMAT_API)."\n\n";	
+		echo "Uncaught exception: " . $errorString . " at ".date(DateTime::FORMAT_API)."\n\n";
 			
 		if(go()->getDebugger()->enabled) {
 
@@ -124,12 +129,12 @@ class ErrorHandler {
    * @return void
    * @throws ErrorException
    */
-	public static function errorHandler($errno, $errstr, $errfile, $errline) {
+	public static function errorHandler(int $errno, string $errstr, string $errfile, int $errline) {
 		go()->debug("ErrorHandler:errorHandler called $errno");
 
 		// check if error should be reported according to PHP settings
 		if (!(error_reporting() & $errno)) {
-		  return false;
+		  return;
 		}
 
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);

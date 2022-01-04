@@ -5,6 +5,7 @@ namespace go\core\model;
 use Cron\CronExpression;
 use GO;
 use go\core\jmap\Entity;
+use go\core\orm\Mapping;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
@@ -46,11 +47,12 @@ class CronJobSchedule extends Entity {
 	
 	public $lastError;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('core_cron_job');
 	}
 
-	public static function loggable()
+	public static function loggable(): bool
 	{
 		return false;
 	}
@@ -196,7 +198,6 @@ class CronJobSchedule extends Entity {
 	 * @param string $package
 	 * @param string $module
 	 * @return CronJobSchedule|false
-	 * @throws Exception
 	 */
 	public static function findByName($name, $package = "core", $module = "core") {
 		$module = \go\core\model\Module::findByName($package, $module);

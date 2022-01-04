@@ -2,7 +2,7 @@
   "name": "intermesh/groupoffice",
   "description": "Group-Office",
   "require": {
-    "php": ">=7.2.0",
+    "php": ">=7.3.0",
     "ext-pcre": "*",
     "ext-mbstring": "*",
     "ext-ctype": "*",
@@ -39,7 +39,9 @@
     "phpoffice/phpspreadsheet": "^1.15",
     "lcobucci/jwt": "3.3.3",
     "firebase/php-jwt": "^5.2",
-    "donatj/phpuseragentparser": "^1.4"
+    "donatj/phpuseragentparser": "^1.4",
+    "fzaninotto/faker": "^1.9",
+    "ext-fileinfo": "*"
   },
   "license": "AGPL",
   "authors": [

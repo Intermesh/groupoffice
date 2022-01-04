@@ -2,17 +2,23 @@
 
 namespace go\core\model;
 
+use Exception;
+use Faker\Generator;
 use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\orm\exception\SaveException;
 use go\core\db\Query as DbQuery;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\db\Table;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use go\modules\community\comments\model\Comment;
 
 /**
  * Link model
@@ -114,7 +120,7 @@ class Link extends AclItemEntity
 	 * Find the entity it links to
 	 *
 	 * @return \go\core\orm\Entity|ActiveRecord
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function findToEntity() {
 		$e = EntityType::findByName($this->toEntity);
@@ -131,7 +137,7 @@ class Link extends AclItemEntity
 	 * Find the entity it links from
 	 *
 	 * @return \go\core\orm\Entity|ActiveRecord
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function findFromEntity() {
 		$e = EntityType::findByName($this->fromEntity);
@@ -179,10 +185,11 @@ class Link extends AclItemEntity
 	 */
 	public $createdAt;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 										->addTable('core_link', 'l')
-										->setQuery(
+										->addQuery(
 														(new Query())
 														->select("eFrom.clientName AS fromEntity, eTo.clientName AS toEntity, search.name as toName, search.description as toDescription, search.aclId, search.id as toSearchId")
 														->join('core_entity', 'eFrom', 'eFrom.id = l.fromEntityTypeId')
@@ -197,7 +204,7 @@ class Link extends AclItemEntity
 	 * @param Query $query
 	 * @return bool
 	 */
-	protected static function useSearchableTraitForSearch(Query $query)
+	protected static function useSearchableTraitForSearch(Query $query) : bool
 	{
 		return true;
 	}
@@ -205,11 +212,12 @@ class Link extends AclItemEntity
 
 	/**
 	 * Create a link between two entities
-	 * 
+	 *
 	 * @param Entity|ActiveRecord $a
 	 * @param Entity|ActiveRecord $b
 	 * @param string $description
 	 * @return Link
+	 * @throws Exception
 	 */
 	public static function create($a, $b, $description = null, $checkExisting = true) {
 		
@@ -229,7 +237,7 @@ class Link extends AclItemEntity
 		$link->aclId = $a->findAclId();
 		
 		if(!$link->save()) {
-			throw new \Exception("Couldn't create link: ". var_export($link->getValidationErrors(), true));
+			throw new SaveException($link);
 		}
 		
 		return $link;
@@ -262,7 +270,7 @@ class Link extends AclItemEntity
 	}
 
 	/**
-	 * Find a link
+	 * Find all links for a given entity
 	 *
 	 * @param Entity|ActiveRecord $a
 	 * @return Link[]
@@ -333,8 +341,9 @@ class Link extends AclItemEntity
 			$this->setValidationError("description", ErrorCode::INVALID_INPUT, "Description field too long");
 		}
 	}
-	
-	protected function internalSave() {
+
+	protected function internalSave(): bool
+	{
 		if(!parent::internalSave()) {
 			return false;
 		}
@@ -372,7 +381,8 @@ class Link extends AclItemEntity
 //		}
 //	}
 //
-	protected static function internalDelete(Query $query) {		
+	protected static function internalDelete(Query $query): bool
+	{
 
 		//delete the reverse links
 		$join = new Query();
@@ -386,7 +396,8 @@ class Link extends AclItemEntity
 
 	}
 	
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	{
 		$level = Acl::LEVEL_READ;
 		//return parent::applyAclToQuery($query, $level, $userId, $groups);
 		Acl::applyToQuery($query, 'search.aclId', $level, $userId, $groups);
@@ -397,11 +408,12 @@ class Link extends AclItemEntity
 	 * 
 	 * @return int
 	 */
-	public function getPermissionLevel() {
+	public function getPermissionLevel(): int
+	{
 		if($this->isNew() && empty($this->aclId)) {
 			$e = $this->findToEntity();
 			if(!$e) {
-				throw new \Exception("Could not find to entity in link");
+				throw new Exception("Could not find to entity in link");
 			}
 			$this->aclId = $e->findAclId();
 		}
@@ -423,7 +435,8 @@ class Link extends AclItemEntity
 //		return ['name' => $this->toName, 'description' => $this->toDescription];
 //	}
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 						->add('entityId', function (Criteria $crtiteria, $value){
 							$crtiteria->where('fromId', '=', $value);
@@ -432,7 +445,7 @@ class Link extends AclItemEntity
 
 							$e = EntityType::findByName($value);
 							if(!$e) {
-								throw new \Exception("Entity type " . $value .' not found');
+								throw new Exception("Entity type " . $value .' not found');
 							}
 
 							$criteria->where(['l.fromEntityTypeId' => $e->getId()]);
@@ -448,7 +461,7 @@ class Link extends AclItemEntity
 							foreach($value as $e) {
 								$et = EntityType::findByName($e['name']);
 								if(!$et) {
-									throw new \Exception("Entity type " . $e['name'] .' not found');
+									throw new Exception("Entity type " . $e['name'] .' not found');
 								}
 								$w = ['l.toEntityTypeId' => $et->getId()];
 								if(isset($e['filter'])) {
@@ -465,7 +478,7 @@ class Link extends AclItemEntity
 	}
 
 
-	public static function sort(\go\core\orm\Query $query, array $sort)
+	public static function sort(\go\core\orm\Query $query, array $sort): Query
 	{
 		if(isset($sort['modifiedAt'])) {
 			$sort['search.modifiedAt'] = $sort['modifiedAt'];
@@ -479,7 +492,7 @@ class Link extends AclItemEntity
 		return parent::sort($query, $sort);
 	}
 
-	protected static function aclEntityClass()
+	protected static function aclEntityClass(): string
 	{
 		return Search::class;
 	}
@@ -489,8 +502,61 @@ class Link extends AclItemEntity
 		return $this->findFromEntity();
 	}
 
-	protected static function aclEntityKeys()
+	protected static function aclEntityKeys(): array
 	{
 		return ['toId' => 'entityId', 'toEntityTypeId' => 'entityTypeId'];
+	}
+
+	/**
+	 * Copy comments from one entity to another.
+	 *
+	 * @param Entity|ActiveRecord $from
+	 * @param Entity|ActiveRecord  $to
+	 * @return bool
+	 * @throws SaveException
+	 */
+	public static function copyTo($from, $to) {
+		go()->getDbConnection()->beginTransaction();
+		try {
+			foreach (Link::findLinks($from) as $link) {
+				$copy = $link->copy();
+				$copy->fromEntityTypeId = $to::entityType()->getId();
+				$copy->fromId = $to->id;
+
+				if (!$copy->save()) {
+					throw new SaveException();
+				}
+			}
+		} catch(Exception $e) {
+			go()->getDbConnection()->rollBack();
+			throw $e;
+		}
+
+		return go()->getDbConnection()->commit();
+	}
+
+
+	/**
+	 * @param Generator $faker
+	 * @param Entity|ActiveRecord $model
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function demo(Generator $faker, $model) {
+		$searchCount = go()->getDbConnection()->selectSingleValue('count(*)')
+			->from('core_search')->single();
+
+		$offset = $faker->numberBetween(0, $searchCount);
+		$limit = min($searchCount - $offset, 2);
+
+		$search = Search::find()->limit($limit)->offset($offset);
+
+		foreach($search as $search) {
+			$entity = $search->findEntity();
+			if($entity && !$entity->equals($model)) {
+				Link::create($entity, $model);
+			}
+		}
+
 	}
 }

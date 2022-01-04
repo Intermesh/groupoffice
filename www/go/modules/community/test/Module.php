@@ -11,7 +11,8 @@ use go\modules\community\test\model\B;
 
 class Module extends core\Module {	
 
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV";
 	}	
 	

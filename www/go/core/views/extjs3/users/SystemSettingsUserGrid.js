@@ -15,7 +15,12 @@
  */
 
 go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
+	hasPermission: function() {
+		const module = go.Modules.get(this.package, this.module);
+		return module.userRights.mayChangeUsers;
+	},
 	iconCls: 'ic-account-box',
+	itemId: "users", //makes it routable
 
 	initColumns: function(fields, columns) {
 		return {fields:fields, columns:columns};
@@ -134,6 +139,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			},{
 				iconCls: 'ic-add',
 				tooltip: t('Add'),
+				disabled: !go.Modules.get("core", "core").userRights.mayChangeUsers,
 				handler: function (e, toolEl) {
 					var dlg = new go.users.CreateUserWizard();
 					dlg.show();
@@ -151,6 +157,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					},'-', {
 						iconCls: 'ic-cloud-upload',
 						text: t("Import"),
+						disabled: !go.Modules.get("core", "core").userRights.mayChangeUsers,
 						handler: function() {
 							go.util.importFile(
 											'User',
@@ -251,6 +258,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					},
 					scope: this
 				},{
+					disabled: !go.User.isAdmin,
 					itemId:"loginAs",
 					iconCls: 'ic-swap-horiz',
 					text: t("Login as this user"),
@@ -278,6 +286,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				},
 				"-"
 				,{
+					disabled: !go.Modules.get("core", "core").userRights.mayChangeUsers,
 					itemId: "archive",
 					iconCls: "ic-archive",
 					text: t("Archive user"),
@@ -313,6 +322,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				}
 				,{
 					itemId:"delete",
+					disabled: !go.Modules.get("core", "core").userRights.mayChangeUsers,
 					iconCls: 'ic-delete',
 					text: t("Delete"),
 					handler: function(item) {
@@ -332,10 +342,10 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 
 					var archiveItm  = menu.find('itemId','archive'), loginItm = menu.find('itemId', 'loginAs');
 					if(archiveItm.length > 0) {
-						archiveItm[0].setDisabled(!record.data.enabled);
+						archiveItm[0].setDisabled(!record.data.enabled || !go.Modules.get("core", "core").userRights.mayChangeUsers);
 					}
 					if(loginItm.length > 0 ) {
-						loginItm[0].setDisabled(!record.data.enabled);
+						loginItm[0].setDisabled(!record.data.enabled || !go.User.isAdmin);
 					}
 				}
 			}

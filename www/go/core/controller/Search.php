@@ -20,7 +20,8 @@ class Search extends EntityController {
 
 	use EventEmitterTrait;
 
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Search::class;
 	}
 
@@ -114,7 +115,7 @@ class Search extends EntityController {
 		return $this->defaultQuery($params);
 	}
 
-	protected function getQueryQuery($params)
+	protected function getQueryQuery(array $params): Query
 	{
 		$hasIndex = go()->getDatabase()->getTable('core_search')->hasIndex("core_search_entityTypeId_filter_modifiedAt_aclId_index");
 

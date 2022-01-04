@@ -56,7 +56,24 @@ go.form.RadioGroup = Ext.extend(Ext.form.RadioGroup, {
 		
 		go.form.RadioGroup.superclass.onRender.call(this, ct, position);
 	},
-	
+
+	getErrors: function() {
+
+
+		var errors = Ext.form.CheckboxGroup.superclass.getErrors.apply(this, arguments);
+
+		if (!this.allowBlank) {
+			var blank = this.getValue() == null;
+
+
+
+			if (blank) errors.push(this.blankText);
+		}
+
+		return errors;
+	},
+
+
 	setValueForItem : function(val){
 		//override to support null values.
 		this.eachItem(function(item){

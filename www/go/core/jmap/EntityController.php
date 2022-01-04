@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
 
 namespace go\core\jmap;
 
@@ -6,17 +6,16 @@ use Exception;
 use go\core\fs\File;
 use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
-use go\core\acl\model\AclEntity;
 use go\core\App;
 use go\core\Controller;
 use go\core\data\convert\AbstractConverter;
-use go\core\db\Criteria;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use InvalidArgumentException;
 use PDO;
 use PDOException;
 use ReflectionException;
@@ -26,9 +25,9 @@ abstract class EntityController extends Controller {
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
-	 * @return Entity
+	 * @return class-string<Entity>
 	 */
-	abstract protected function entityClass();
+	abstract protected function entityClass(): string;
 
 	
 	/**
@@ -40,29 +39,31 @@ abstract class EntityController extends Controller {
 	 * 
 	 * @return string
 	 */
-	protected function getShortName() {
+	protected function getShortName(): string
+	{
 		$cls = $this->entityClass();
 		return lcfirst(substr($cls, strrpos($cls, '\\') + 1));
 	}
 	
-	/**
-	 * Creates a short plural name 
-	 * 
-	 * @see getShortName()
-	 * 
-	 * @return string
-	 */
-	protected function getShortPluralName() {
-		
-		$shortName = $this->getShortName();
-		
-		if(substr($shortName, -1) == 'y') {
-			return substr($shortName, 0, -1) . 'ies';
-		} else
-		{
-			return $shortName . 's';
-		}
-	}
+//	/**
+//	 * Creates a short plural name
+//	 *
+//	 * @see getShortName()
+//	 *
+//	 * @return string
+//	 */
+//	protected function getShortPluralName(): string
+//	{
+//
+//		$shortName = $this->getShortName();
+//
+//		if(substr($shortName, -1) == 'y') {
+//			return substr($shortName, 0, -1) . 'ies';
+//		} else
+//		{
+//			return $shortName . 's';
+//		}
+//	}
 
 	/**
 	 * Querying readonly has a slight performance benefit
@@ -72,13 +73,14 @@ abstract class EntityController extends Controller {
 	protected static $getReadOnly = true;
 
 	/**
-	 * Get's the query for the Foo/query JMAP method
+	 * Gets the query for the Foo/query JMAP method
 	 *
 	 * @param array $params
 	 * @return Query
 	 * @throws Exception
 	 */
-	protected function getQueryQuery($params) {
+	protected function getQueryQuery(array $params): Query
+	{
 		$cls = $this->entityClass();
 
 		$query = $cls::find($cls::getPrimaryKey(false), false)
@@ -91,19 +93,21 @@ abstract class EntityController extends Controller {
 		
 		/* @var $query Query */
 
-		$sort = $this->transformSort($params['sort']);		
-
-		if(!empty($query->getGroupBy())) {
-			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
-			$keys = $cls::getPrimaryKey();
-			foreach($keys as $key) {
-				if(!isset($sort[$key])) {
-					$sort[$key] = 'ASC';
-				}
-			}
-		}
+		$sort = $this->transformSort($params['sort']);
 		
 		$cls::sort($query, $sort);
+
+		if(!empty($query->getGroupBy())) {
+			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
+			$keys = $cls::getPrimaryKey();
+			$pkSort = [];
+			foreach($keys as $key) {
+				if(!isset($sort[$key])) {
+					$pkSort[$key] = 'ASC';
+				}
+			}
+			$query->orderBy($pkSort, true);
+		}
 
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
 
@@ -123,7 +127,8 @@ abstract class EntityController extends Controller {
 	 * @return array
 	 * @throws InvalidArguments
 	 */
-	protected function paramsQuery(array $params) {
+	protected function paramsQuery(array $params): array
+	{
 		if(!isset($params['limit'])) {
 			$params['limit'] = 0;
 		}		
@@ -160,15 +165,13 @@ abstract class EntityController extends Controller {
 			}
 		}
 
-		$cls = $this->entityClass();
-
 		if(!isset($params['accountId'])) {
 			$params['accountId'] = null;
 		}
 		
-		$params['calculateTotal'] = !empty($params['calculateTotal']) ? true : false;
+		$params['calculateTotal'] = !empty($params['calculateTotal']);
 
-		$params['calculateHasMore'] = !empty($params['calculateHasMore']) && $params['limit'] > 0 ? true : false;
+		$params['calculateHasMore'] = !empty($params['calculateHasMore']) && $params['limit'] > 0;
 
 		//a faster alternative to calculateTotal just indicating that there are more entities. We do that by selecting one more than required.
 		if($params['calculateHasMore']) {
@@ -178,7 +181,8 @@ abstract class EntityController extends Controller {
 		return $params;
 	}
 
-	protected function getDefaultQueryFilter() {
+	protected function getDefaultQueryFilter(): array
+	{
 		return [];
 	}
 
@@ -190,7 +194,8 @@ abstract class EntityController extends Controller {
    * @throws InvalidArguments
    * @throws Exception
    */
-	protected function defaultQuery($params) {
+	protected function defaultQuery(array $params): array
+	{
 
 		$state = $this->getState();
 
@@ -199,17 +204,18 @@ abstract class EntityController extends Controller {
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
-		$idsQuery->fetchMode(PDO::FETCH_NUM);
-		
-		$ids = [];		
+		$idsQuery->fetchMode(PDO::FETCH_COLUMN, 0);
+
 
 		try {
-			foreach ($idsQuery as $record) {
-				if (!isset($count)) {
-					$count = count($record);
-				}
-				$ids[] = $count ? $record[0] : implode('-', $record);
-			}
+//			foreach ($idsQuery as $record) {
+//				if (!isset($count)) {
+//					$count = count($record);
+//				}
+//				$ids[] = $count ? $record[0] : implode('-', $record);
+//			}
+
+			$ids = $idsQuery->all();
 
 			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
 				$hasMore = !!array_pop($ids);
@@ -271,7 +277,8 @@ abstract class EntityController extends Controller {
    * @return string
    * @throws Exception
    */
-	protected function getState() {
+	protected function getState(): string
+	{
 		$cls = $this->entityClass();
 		
 		//entities that don't support syncing can be listed and fetched with the read only controller
@@ -279,12 +286,12 @@ abstract class EntityController extends Controller {
 	}
 
 	/**
-	 * Transforms ['name ASC'] into: ['name' => 'ASC']
+	 * Transforms JMAP sort param into: ['name' => 'ASC']
 	 * 
-	 * @param string[] $sort
-	 * @return array[]
+	 * @param array[] $sort
+	 * @return array
 	 */
-	protected function transformSort($sort) {		
+	protected function transformSort(array $sort) : array {
 		if(empty($sort)) {
 			return [];
 		}
@@ -292,12 +299,10 @@ abstract class EntityController extends Controller {
 		$transformed = [];
 
 		foreach ($sort as $s) {
-			if(is_array($s) && isset($s['property'])) {
-				$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending']===false) ? 'DESC' : 'ASC';
-			} else { // for backward compatibility
-				$parts = explode(' ', $s);
-				$transformed[$parts[0]] = $parts[1] ?? 'ASC';
+			if(!isset($s['property'])) {
+				throw new InvalidArgumentException("'sort' parameter is invalid.");
 			}
+			$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending'] === false) ? 'DESC' : 'ASC';
 		}
 		
 		return $transformed;		
@@ -312,7 +317,7 @@ abstract class EntityController extends Controller {
    * @return boolean|Entity
    * @throws Exception
    */
-	protected function getEntity($id, array $properties = []) {
+	protected function getEntity(string $id, array $properties = []) {
 		$cls = $this->entityClass();
 
 		$entity = $cls::findById($id, $properties);
@@ -326,7 +331,7 @@ abstract class EntityController extends Controller {
 		}
 		
 		if(!$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
-			App::get()->debug("Forbidden: ".$cls.": ".$id);
+			App::get()->debug("Forbidden: " . $cls . ": ".$id);
 			return false; //not found
 		}
 
@@ -339,11 +344,12 @@ abstract class EntityController extends Controller {
 	 * 
 	 * @param array $params
 	 * @return array
-	 * @throws InvalidArguments
+	 * @throws InvalidArgumentException
 	 */
-	protected function paramsGet(array $params) {
+	protected function paramsGet(array $params): array
+	{
 		if(isset($params['ids']) && !is_array($params['ids'])) {
-			throw new InvalidArguments("ids must be of type array");
+			throw new InvalidArgumentException("ids must be of type array");
 		}
 
 		if(!empty($params['ids'])) {
@@ -366,11 +372,12 @@ abstract class EntityController extends Controller {
 
   /**
    * Override to add more query options for the "get" method.
-   * @param $params
-   * @return Entity[]
+   * @param array $params
+   * @return Query
    * @throws Exception
    */
-	protected function getGetQuery($params) {
+	protected function getGetQuery(array $params): Query
+	{
 		$cls = $this->entityClass();
 		
 		if(!isset($params['ids'])) {
@@ -387,15 +394,14 @@ abstract class EntityController extends Controller {
 	}
 
 
-  /**
-   * Handles the Foo entity's getFoo command
-   *
-   * @param array $params
-   * @return array
-   * @throws InvalidArguments
-   * @throws Exception
-   */
-	protected function defaultGet($params) {
+	/**
+	 * Handles the Foo entity's getFoo command
+	 *
+	 * @param array $params
+	 * @return array
+	 * @throws Exception
+	 */
+	protected function defaultGet(array $params) : array {
 
 		$p = $this->paramsGet($params);
 
@@ -441,7 +447,6 @@ abstract class EntityController extends Controller {
 			$result['list'] = array_values($unsorted);
 		}
 
-
 		$result['notFound'] = isset($p['ids']) ? array_values(array_diff($p['ids'], $foundIds)) : [];
 
 		return $result;
@@ -486,7 +491,8 @@ abstract class EntityController extends Controller {
 	 * @return array
 	 * @throws InvalidArguments
 	 */
-	protected function paramsSet(array $params) {
+	protected function paramsSet(array $params): array
+	{
 		if(!isset($params['accountId'])) {
 			$params['accountId'] = null;
 		}
@@ -583,7 +589,8 @@ abstract class EntityController extends Controller {
    * @throws StateMismatch
    * @throws Exception
    */
-	protected function defaultSet($params) {
+	protected function defaultSet(array $params): array
+	{
 
 		$this->trackSaves();
 
@@ -661,7 +668,8 @@ abstract class EntityController extends Controller {
    * @param Entity $entity
    * @return boolean
    */
-	protected function canCreate(Entity $entity) {		
+	protected function canCreate(Entity $entity): bool
+	{		
 		return $entity->hasPermissionLevel(Acl::LEVEL_CREATE);
 	}
 
@@ -674,11 +682,10 @@ abstract class EntityController extends Controller {
    * @todo Check permissions
    *
    */
-	protected function create(array $properties) {
-		
+	protected function create(array $properties): Entity
+	{
 		$cls = $this->entityClass();
 
-		/** @var Entity $entity */
 		$entity = new $cls;
 		$entity->setValues($properties); 
 		
@@ -691,7 +698,8 @@ abstract class EntityController extends Controller {
 	 * @param Entity $entity
 	 * @return bool
 	 */
-	protected function canUpdate(Entity $entity) {
+	protected function canUpdate(Entity $entity): bool
+	{
 		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE);
 	}
 
@@ -700,11 +708,13 @@ abstract class EntityController extends Controller {
    *
    * @param array $update
    * @param array $result
-   * @throws ReflectionException
    * @throws Exception
    */
-	private function updateEntities($update, &$result) {
+	private function updateEntities(array $update, array &$result) {
 		foreach ($update as $id => $properties) {
+			if(empty($properties)) {
+				$properties = [];
+			}
 			$entity = $this->getEntity($id);			
 			if (!$entity) {
 				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Item not found"));
@@ -743,19 +753,20 @@ abstract class EntityController extends Controller {
 		}
 	}
 	
-	protected function canDestroy(Entity $entity) {
+	protected function canDestroy(Entity $entity): bool
+	{
 		return $entity->hasPermissionLevel(Acl::LEVEL_DELETE);
 	}
 
   /**
-   * Destroys entityies
+   * Destroys entities
    *
    * @param int[] $destroy
    * @param array $result
    * @throws InvalidArguments
    * @throws Exception
    */
-	private function destroyEntities($destroy, &$result) {
+	private function destroyEntities(array $destroy, array &$result) {
 
 		$doDestroy = [];
 		foreach ($destroy as $id) {
@@ -770,7 +781,7 @@ abstract class EntityController extends Controller {
 				continue;
 			}
 
-			$doDestroy[] = $id;
+			$doDestroy[] = $entity->id();
 		}
 		$cls = $this->entityClass();
 
@@ -798,7 +809,8 @@ abstract class EntityController extends Controller {
 	 * @return array
 	 * @throws InvalidArguments
 	 */
-	protected function paramsGetUpdates(array $params) {
+	protected function paramsGetUpdates(array $params): array
+	{
 		
 		if(!isset($params['maxChanges'])) {
 			$params['maxChanges'] = Capabilities::get()->maxObjectsInGet;
@@ -829,7 +841,8 @@ abstract class EntityController extends Controller {
    * @throws InvalidArguments
    * @throws Exception
    */
-	protected function defaultChanges($params) {						
+	protected function defaultChanges(array $params): array
+	{
 		$p = $this->paramsGetUpdates($params);	
 		$cls = $this->entityClass();		
 		
@@ -845,7 +858,8 @@ abstract class EntityController extends Controller {
    * @return array
    * @throws InvalidArguments
    */
-	protected function paramsExport($params){
+	protected function paramsExport($params): array
+	{
 		
 		if(!isset($params['extension'])) {
 			throw new InvalidArguments("'extension' parameter is required");
@@ -879,7 +893,8 @@ abstract class EntityController extends Controller {
 	 * @return array
 	 * @throws Exception
 	 */
-	protected function defaultImport($params) {
+	protected function defaultImport(array $params): array
+	{
 
 		ini_set('max_execution_time', 10 * 60);
 		
@@ -907,7 +922,8 @@ abstract class EntityController extends Controller {
 	}
 
 
-	protected function defaultExportColumns($params) {
+	protected function defaultExportColumns($params): array
+	{
 		$converter = $this->findConverter($params['extension']);
 
 		$mapping = $converter->getEntityMapping();
@@ -926,12 +942,11 @@ abstract class EntityController extends Controller {
 	 * @return array
 	 * @throws Exception
 	 */
-	protected function defaultImportCSVMapping($params) {
-		
+	protected function defaultImportCSVMapping(array $params): array
+	{
 		$blob = Blob::findById($params['blobId']);
 
 		$extension = (new File($blob->name))->getExtension();
-		$converter = $this->findConverter($extension);
 
 		if($extension == 'csv') {
 			$file = $blob->getFile()->copy(File::tempFile($extension));
@@ -952,14 +967,14 @@ abstract class EntityController extends Controller {
 		return $response;
 	}
 
-  /**
-   *
-   *
-   * @param $contentType
-   * @return AbstractConverter
-   * @throws InvalidArguments
-   */
-	private function findConverter($extension) {
+	/**
+	 * Find a convertor for exporting or importing
+	 *
+	 * @param string $extension
+	 * @return AbstractConverter
+	 */
+	private function findConverter(string $extension): AbstractConverter
+	{
 		
 		$cls = $this->entityClass();		
 		foreach($cls::converters() as $converter) {
@@ -968,9 +983,7 @@ abstract class EntityController extends Controller {
 			}
 		}
 		
-		throw new InvalidArguments("Converter for file extension '" . $extension .'" is not found');
-
-
+		throw new InvalidArgumentException("Converter for file extension '" . $extension .'" is not found');
 	}
 
   /**
@@ -986,7 +999,8 @@ abstract class EntityController extends Controller {
    * @see AbstractConverter
    *
    */
-	protected function defaultExport($params) {
+	protected function defaultExport(array $params): array
+	{
 
 		ini_set('max_execution_time', 10 * 60);
 		
@@ -1011,7 +1025,8 @@ abstract class EntityController extends Controller {
    * @throws InvalidArguments
    * @throws Exception
    */
-	protected function defaultMerge($params) {
+	protected function defaultMerge($params): array
+	{
 		if(empty($params['ids'])) {
 			throw new InvalidArguments('ids is required');
 		}

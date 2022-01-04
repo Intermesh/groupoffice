@@ -7,6 +7,11 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	autoScroll: true,
 	entity: null,
 	values : null,
+
+	/**
+	 * When the entity is modified by another user / process ask to load these changes
+	 */
+	loadExternalChanges: true,
 	
 	initComponent : function() {
 		go.form.EntityPanel.superclass.initComponent.call(this);			
@@ -20,14 +25,16 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
 		//don't update on our own submit
-		if(this.submitting) {
+		if(!this.loadExternalChanges || this.submitting) {
 			return;
 		}
-		var entity = added[this.currentId] || changed[this.currentId] || false;
-		if(entity) {			
-			this.entity = entity;
-			//TODO, This will bluntly overwrite user's modification when modified.
-			this.getForm().setValues(entity);
+
+		if(changed.indexOf(this.currentId) > -1) {
+			Ext.MessageBox.confirm(t("Warning"), t("The entity has been modified by someone else. Do you want to discard your changes and load the changes in this form?"), (btn) => {
+				if(btn == 'yes') {
+					this.load(this.currentId);
+				}
+			});
 		}		
 	},
 	

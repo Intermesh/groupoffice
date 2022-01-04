@@ -8,7 +8,8 @@ use go\core\jmap\Response;
 
 class SmtpAccount extends EntityController {
 
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\SmtpAccount::class;
 	}
 

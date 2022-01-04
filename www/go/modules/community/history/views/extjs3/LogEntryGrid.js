@@ -68,7 +68,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		if(!json) {
 			return [];
 		}
-		html = ['<table class="display-panel" style="table-layout: fixed;word-wrap:break-word;"><tr class="line"><th>'+t('Name')+'</th><th>'+t('Old')+'</th><th>'+t('New')+'</th></tr>'];
+		html = ['<table class="display-panel" style="table-layout: fixed;word-wrap:break-word;"><tr class="line"><th>'+t('Name')+'</th><th>'+t('New')+'</th><th>'+t('Old')+'</th></tr>'];
 		for(var key in json) {
 			html.push('<tr><td>'+key+':</td><td>'+this.renderJsonValue(json[key][1]).join('<br>')+
 				'</td><td>'+this.renderJsonValue(json[key][0]).join('<br>')+'</td></tr>');
@@ -147,7 +147,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 			dataIndex: 'creator',
 			width:300,
 			renderer: function (v) {
-				return v ? v.displayName : "-";
+				return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
 			}
 		},{
 			header: t('Changes'),

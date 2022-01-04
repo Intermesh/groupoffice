@@ -2,7 +2,8 @@
 namespace go\core\util;
 
 use Exception;
-use IFW;
+use go\core\App;
+use go\core\http\Response;
 
 /**
  * Image resizer
@@ -13,17 +14,17 @@ use IFW;
  */
 class Image {
 
-	private $_originalImage;
-	private $_resizedImage;
-	private $_imageType;
-	private $_originalFilename;
+	private $originalImage;
+	private $resizedImage;
+	private $imageType;
+	private $originalFilename;
 
 	private $jpegCompression = 85;
 
 	public $loadSuccess = false;
 	
 	
-	public function __construct($filename) {
+	public function __construct(string $filename) {
 		$this->loadSuccess = $this->load($filename);
 	}
 
@@ -32,8 +33,9 @@ class Image {
 	 *
 	 * @return int
 	 */
-	public function getImageType() {
-		return $this->_imageType;
+	public function getImageType(): int
+	{
+		return $this->imageType;
 	}
 
 	/**
@@ -42,7 +44,8 @@ class Image {
 	 * @param string $filename
 	 * @return boolean
 	 */
-	public function load($filename) {
+	public function load(string $filename): bool
+	{
 
 		if (!function_exists("imagecreatefromjpeg")) {
 			trigger_error("Can't resize image because the PHP GD extension is not installed", E_USER_WARNING);
@@ -50,16 +53,16 @@ class Image {
 		}
 
 		$image_info = getimagesize($filename);
-		$this->_imageType = $image_info[2];
+		$this->imageType = $image_info[2];
 
-		$this->_originalFilename = $filename;
+		$this->originalFilename = $filename;
 
-		if ($this->_imageType == IMAGETYPE_JPEG) {
-			$this->_originalImage = imagecreatefromjpeg($filename);
-		} elseif ($this->_imageType == IMAGETYPE_GIF) {
-			$this->_originalImage = imagecreatefromgif($filename);
-		} elseif ($this->_imageType == IMAGETYPE_PNG) {
-			$this->_originalImage = imagecreatefrompng($filename);
+		if ($this->imageType == IMAGETYPE_JPEG) {
+			$this->originalImage = imagecreatefromjpeg($filename);
+		} elseif ($this->imageType == IMAGETYPE_GIF) {
+			$this->originalImage = imagecreatefromgif($filename);
+		} elseif ($this->imageType == IMAGETYPE_PNG) {
+			$this->originalImage = imagecreatefrompng($filename);
 		} else {
 			return false;
 		}
@@ -69,39 +72,39 @@ class Image {
 	/**
 	 * Set a transparent background for GIF or PNG images
 	 */
-	private function _transperancy() {
-		if ($this->_imageType == IMAGETYPE_GIF || $this->_imageType == IMAGETYPE_PNG) {
-			$trnprt_indx = imagecolortransparent($this->_originalImage);
+	private function transperancy() {
+		if ($this->imageType == IMAGETYPE_GIF || $this->imageType == IMAGETYPE_PNG) {
+			$trnprt_indx = imagecolortransparent($this->originalImage);
 
 			// If we have a specific transparent color
 			if ($trnprt_indx >= 0) {
 
 				// Get the original image's transparent color's RGB values
-				$trnprt_color = imagecolorsforindex($this->_originalImage, $trnprt_indx);
+				$trnprt_color = imagecolorsforindex($this->originalImage, $trnprt_indx);
 
 				// Allocate the same color in the new image resource
-				$trnprt_indx = imagecolorallocate($this->_resizedImage, $trnprt_color['red'], $trnprt_color['green'], $trnprt_color['blue']);
+				$trnprt_indx = imagecolorallocate($this->resizedImage, $trnprt_color['red'], $trnprt_color['green'], $trnprt_color['blue']);
 
 				// Completely fill the background of the new image with allocated color.
-				imagefill($this->_resizedImage, 0, 0, $trnprt_indx);
+				imagefill($this->resizedImage, 0, 0, $trnprt_indx);
 
 				// Set the background color for new image to transparent
-				imagecolortransparent($this->_resizedImage, $trnprt_indx);
+				imagecolortransparent($this->resizedImage, $trnprt_indx);
 			}
 			// Always make a transparent background color for PNGs that don't have one allocated already
-			elseif ($this->_imageType == IMAGETYPE_PNG) {
+			elseif ($this->imageType == IMAGETYPE_PNG) {
 
 				// Turn off transparency blending (temporarily)
-				imagealphablending($this->_resizedImage, false);
+				imagealphablending($this->resizedImage, false);
 
 				// Create a new transparent color for image
-				$color = imagecolorallocatealpha($this->_resizedImage, 0, 0, 0, 127);
+				$color = imagecolorallocatealpha($this->resizedImage, 0, 0, 0, 127);
 
 				// Completely fill the background of the new image with allocated color.
-				imagefill($this->_resizedImage, 0, 0, $color);
+				imagefill($this->resizedImage, 0, 0, $color);
 
 				// Restore transparency blending
-				imagesavealpha($this->_resizedImage, true);
+				imagesavealpha($this->resizedImage, true);
 			}
 		}
 	}
@@ -110,41 +113,42 @@ class Image {
 	 * Output image to browser
 	 *
 	 * @param int $image_type
+	 * @throws Exception
 	 */
 	public function output($image_type = false) {
 		
 		if(ob_get_contents() != '') {			
-			throw new \Exception("Could not output file because output has already been sent. Turn off output buffering to find out where output has been started.");
+			throw new Exception("Could not output file because output has already been sent. Turn off output buffering to find out where output has been started.");
 		}
 		
 		//to send headers
-		\go\core\App::get()->getResponse()->send();
+		Response::get()->sendHeaders();
 		
 		if (!$image_type)
-			$image_type = $this->_imageType;
+			$image_type = $this->imageType;
 
 		if ($image_type == IMAGETYPE_JPEG) {
-			imagejpeg($this->_getImage(), null, $this->jpegCompression);
+			imagejpeg($this->getImage(), null, $this->jpegCompression);
 		} elseif ($image_type == IMAGETYPE_GIF) {
-			imagegif($this->_getImage());
+			imagegif($this->getImage());
 		} elseif ($image_type == IMAGETYPE_PNG) {
-			imagepng($this->_getImage());
+			imagepng($this->getImage());
 		}
 	}
 
-	private function _getImage() {
-		return isset($this->_resizedImage) ? $this->_resizedImage : $this->_originalImage;
+	private function getImage() {
+		return $this->resizedImage ?? $this->originalImage;
 	}
 
 	public function contents() {
 		ob_start();
-		switch($this->_imageType) {
+		switch($this->imageType) {
 			case IMAGETYPE_JPEG: 
-				imagejpeg($this->_getImage(), null, $this->jpegCompression); break;
+				imagejpeg($this->getImage(), null, $this->jpegCompression); break;
 			case IMAGETYPE_GIF: 
-				imagegif($this->_getImage(), null); break;
+				imagegif($this->getImage(), null); break;
 			case IMAGETYPE_PNG: 
-				imagepng($this->_getImage(), null); break;
+				imagepng($this->getImage(), null); break;
 		}
 		$data = ob_get_contents();
 		ob_end_clean();
@@ -155,33 +159,33 @@ class Image {
 	 * Save the imaage to a file
 	 *
 	 * @param string $filename
-	 * @param int $imageType
+	 * @param int|null $imageType
 	 * @param int $compression
-	 * @param oct $permissions file permissions
 	 * @return boolean
 	 */
-	public function save($filename, $imageType = false, $compression = 85) {
+	public function save(string $filename, ?int $imageType = null, int $compression = 85): bool
+	{
 
-		if (isset($this->_resizedImage) || $imageType != $this->_imageType) {
+		if (isset($this->resizedImage) || $imageType != $this->imageType) {
 
-			if (!$imageType){
-				$imageType = $this->_imageType;
+			if (!isset($imageType)) {
+				$imageType = $this->imageType;
 			}
 
 			$ret = false;
 			if ($imageType == IMAGETYPE_JPEG) {
-				$ret = imagejpeg($this->_getImage(), $filename, $compression);
+				$ret = imagejpeg($this->getImage(), $filename, $compression);
 			} elseif ($imageType == IMAGETYPE_GIF) {
-				$ret = imagegif($this->_getImage(), $filename);
+				$ret = imagegif($this->getImage(), $filename);
 			} elseif ($imageType == IMAGETYPE_PNG) {
-				$ret = imagepng($this->_getImage(), $filename);
+				$ret = imagepng($this->getImage(), $filename);
 			}
 
 			if (!$ret)
 				return false;
 		}else {
 			//image type and dimension unchanged. Simply copy original.
-			if (!copy($this->_originalFilename, $filename))
+			if (!copy($this->originalFilename, $filename))
 				return false;
 		}
 
@@ -193,16 +197,18 @@ class Image {
 	 *
 	 * @return int
 	 */
-	public function getWidth() {
-		return imagesx($this->_originalImage);
+	public function getWidth(): int
+	{
+		return imagesx($this->originalImage);
 	}
 
 	/**
 	 * Get the height in pixels
 	 * @return int
 	 */
-	public function getHeight() {
-		return imagesy($this->_originalImage);
+	public function getHeight(): int
+	{
+		return imagesy($this->originalImage);
 	}
 
 	/**
@@ -210,7 +216,8 @@ class Image {
 	 *
 	 * @return bool
 	 */
-	public function landscape() {
+	public function landscape(): bool
+	{
 		return $this->getWidth() > $this->getHeight();
 	}
 
@@ -219,8 +226,10 @@ class Image {
 	 *
 	 * @param int $height
 	 * @return bool
+	 * @throws Exception
 	 */
-	public function resizeToHeight($height) {
+	public function resizeToHeight(int $height): bool
+	{
 		$ratio = $height / $this->getHeight();
 		$width = $this->getWidth() * $ratio;
 
@@ -232,8 +241,10 @@ class Image {
 	 *
 	 * @param int $width
 	 * @return bool
+	 * @throws Exception
 	 */
-	public function resizeToWidth($width) {
+	public function resizeToWidth(int $width): bool
+	{
 		$ratio = $width / $this->getWidth();
 		$height = $this->getheight() * $ratio;
 		return $this->resize($width, $height);
@@ -242,10 +253,12 @@ class Image {
 	/**
 	 * Scale image to given scale factor
 	 *
-	 * @param int $scale eg. 0.5
+	 * @param float $scale eg. 0.5
 	 * @return bool
+	 * @throws Exception
 	 */
-	public function scale($scale) {
+	public function scale(float $scale): bool
+	{
 		$width = $this->getWidth() * $scale / 100;
 		$height = $this->getheight() * $scale / 100;
 		return $this->resize($width, $height);
@@ -258,9 +271,10 @@ class Image {
 	 * @param int $height
 	 *
 	 * @return bool
+	 * @throws Exception
 	 */
-	public function resize($width, $height) {
-
+	public function resize(int $width, int $height): bool
+	{
 		if(empty($width) || empty($height))
 		{
 			throw new Exception("invalid dimensions ".$width."x".$height);
@@ -269,13 +283,13 @@ class Image {
 		$currentWidth = $this->getWidth();
 		$currentHeight = $this->getHeight();
 
-		if(!$this->_resizedImage = imagecreatetruecolor($width, $height)){
+		if(!$this->resizedImage = imagecreatetruecolor($width, $height)){
 			throw new Exception("Could not create image");
 		}
 
-		$this->_transperancy();
+		$this->transperancy();
 
-		return imagecopyresampled($this->_resizedImage, $this->_originalImage, 0, 0, 0, 0, $width, $height, $currentWidth, $currentHeight);
+		return imagecopyresampled($this->resizedImage, $this->originalImage, 0, 0, 0, 0, $width, $height, $currentWidth, $currentHeight);
 	}
 
 	/**
@@ -283,8 +297,14 @@ class Image {
 	 *
 	 * @param int $width
 	 * @param int $height
+	 * @return bool
+	 * @throws Exception
+	 * @throws Exception
+	 * @throws Exception
+	 * @throws Exception
 	 */
-	public function fitBox($width, $height) {
+	public function fitBox(int $width, int $height): bool
+	{
 		if ($this->landscape()) {
 			return $this->resizeToWidth($width);
 		}else {
@@ -301,7 +321,8 @@ class Image {
 	 *
 	 * @return bool
 	 */
-	public function zoomcrop($thumbnailWidth, $thumbnailHeight) { //$imgSrc is a FILE - Returns an image resource.
+	public function zoomcrop(int $thumbnailWidth, int $thumbnailHeight): bool
+	{ //$imgSrc is a FILE - Returns an image resource.
 		$widthOrig = $this->getWidth();
 		$heightOrig = $this->getHeight();
 
@@ -316,12 +337,12 @@ class Image {
 			$newHeight = $thumbnailHeight;
 		}
 
-		$this->_resizedImage = imagecreatetruecolor($thumbnailWidth, $thumbnailHeight);
+		$this->resizedImage = imagecreatetruecolor($thumbnailWidth, $thumbnailHeight);
 
 		$x = ($newWidth - $thumbnailWidth) / -2;
 		$y = ($newHeight - $thumbnailHeight) / -2;
 
-		$this->_transperancy();
-		return imagecopyresampled($this->_resizedImage, $this->_originalImage, $x, $y, 0, 0, $newWidth, $newHeight, $widthOrig, $heightOrig);
+		$this->transperancy();
+		return imagecopyresampled($this->resizedImage, $this->originalImage, $x, $y, 0, 0, $newWidth, $newHeight, $widthOrig, $heightOrig);
 	}
 }

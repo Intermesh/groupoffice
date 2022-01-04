@@ -36,7 +36,7 @@ class Backend extends AbstractBackend {
 		$vcardComp = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 		
 		$contact = new Contact();
-		$contact->addressBookId = $addressBookId;
+		$contact->addressBookId = (int) $addressBookId;
 		$contact->setUid((string) $vcardComp->uid);
 		$contact->setUri($cardUri);
 		
@@ -68,11 +68,6 @@ class Backend extends AbstractBackend {
 		$blob->modifiedAt = $contact->modifiedAt;
 		if(!$blob->save()) {
 			throw new \Exception("could not save vcard blob for contact '" . $contact->id() . "'. Validation error: " . $blob->getValidationErrorsAsString());
-		}
-		
-		if(isset($contact->vcardBlobId)) {
-			$old = \go\core\fs\Blob::findById($contact->vcardBlobId);
-			$old->setStaleIfUnused();
 		}
 		
 		$contact->vcardBlobId = $blob->id;

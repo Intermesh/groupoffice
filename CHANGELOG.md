@@ -1,5 +1,21 @@
+04-01-2022 6.6.26
+- Core: Query error when deleting multiple links at once
+- Studio: Patch studio modules to comply with 6.6 code standards
+- Tasks: Fixed some SQL errors that occurred on MySQL 8
+
+03-01-2022 6.6.25
+- Tasks: Completely rewritten module
+- Core: Set alternative lost password URL
+- Core: Alert system to notify users about comments, assigned tasks etc.
+- Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
+- Core: New module chooser menu
+- Core: System Settings -> Modules redesigned and searchable.
+- Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
+      custom fields.
+
+
 6.5.97
-- Business: hide 'Budgetable' checkbox for special leave types 
+- Business: hide 'Budgetable' checkbox for special leave types
 
 03-01-2022 6.5.96
 - Business: hid transferable leave day types in favor of Special leave types

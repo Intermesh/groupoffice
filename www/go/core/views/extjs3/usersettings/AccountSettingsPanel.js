@@ -158,9 +158,9 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						},{
 							html: t("Browser")
 						}
-						// ,{
-						// 	html: t("Country")
-						// }
+						,{
+							html: t("Expires At")
+						}
 						,
 						{
 							width: dp(34)
@@ -171,6 +171,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					name: "authorizedClients",
 					hideLabel: true,
 					hideBbar: true,
+					startWithItem: false,
 					anchor: "100%",
 					itemCfg: {
 						anchor: "100%",
@@ -193,10 +194,14 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 								return v || t("Unknown");
 							}
 						}
-						// ,{
-						// 	submit: false,
-						// 	name: "countryCode"
-						// }
+						,{
+							submit: false,
+							name: "expiresAt",
+							renderer: function(v) {
+								return (new Date(v)).format(go.User.dateFormat+" " + go.User.timeFormat);
+
+							}
+						}
 						]
 
 					}

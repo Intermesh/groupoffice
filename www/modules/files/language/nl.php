@@ -1,7 +1,7 @@
 <?php
 return array (
   'The folder already exists' => 'De map bestaat al',
-  'Filename %s already exists' => 'De bestandsnaam bestaat al',
+  'Filename %s already exists' => 'De bestandsnaam %s bestaat al',
   'File uploaded successfully' => 'Bestand succesvol ge-upload',
   'Personal' => 'Persoonlijk',
   'Shared' => 'Gedeeld',

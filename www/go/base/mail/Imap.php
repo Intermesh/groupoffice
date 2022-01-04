@@ -223,6 +223,13 @@ class Imap extends ImapBodyStruct {
 				$this->commands[trim($challenge_response)] = \GO\Base\Util\Date::getmicrotime();
 				fputs($this->handle, $challenge_response."\r\n");
 				break;
+
+			case 'xoauth2':
+				$login = 'A'.$this->command_number().' AUTHENTICATE XOAUTH2 ' . $pass . "\r\n";
+				$this->commands[trim(str_replace($pass, 'xxxx', $login))] = \GO\Base\Util\Date::getmicrotime();
+				fputs($this->handle, $login);
+				break;
+
 			default:
 				$login = 'A'.$this->command_number().' LOGIN "'.$this->_escape( $username).'" "'.$this->_escape( $pass). "\"\r\n";
 				$this->commands[trim(str_replace($pass, 'xxxx', $login))] = \GO\Base\Util\Date::getmicrotime();

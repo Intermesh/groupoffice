@@ -13,11 +13,11 @@ use function GO;
 
 class DummyAuthenticator extends SecondaryAuthenticator {
 
-	public static function id() {
+	public static function id()  : string{
 		return "dummy";
 	}
 
-	public static function isAvailableFor($username) {
+	public static function isAvailableFor(string $username) :bool{
 		return true;
 	}
 

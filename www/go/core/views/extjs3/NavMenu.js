@@ -34,12 +34,13 @@ go.NavMenu = Ext.extend(Ext.DataView,{
 	initComponent: function() {
 		
 		Ext.applyIf(this,{
+			trackOver: false,
 			cls: 'go-nav',
 			autoScroll: true,
 			style: {'padding-top':dp(8)+'px'},
 			store:this.store,
 			singleSelect: true,
-			overClass:'x-view-over',
+			//overClass:'x-view-over',
 			itemSelector:'div',
 			tpl:'<tpl for=".">\
 					<div class="{cls}"><i class="icon {iconCls}">{icon}</i>\

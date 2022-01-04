@@ -45,9 +45,12 @@ use GO;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
+use go\core\jmap\Entity;
 use go\core\model\Acl;
+use go\core\model\Alert;
 use go\core\model\Link;
 use go\core\model\User;
+use go\core\model\UserDisplay;
 use go\core\orm\SearchableTrait;
 
 abstract class ActiveRecord extends \GO\Base\Model{
@@ -900,8 +903,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function findAclId() {
 		if (!$this->aclField()) {
-			$moduleName = $this->getModule();
-			return \GO::modules()->{$moduleName}->aclId;
+			//TODO: Is this right?
+			return Acl::getReadOnlyAclId();
+//			$moduleName = $this->getModule();
+//			return \GO::modules()->{$moduleName}->aclId;
 		}
 
 		//removed caching of _acl_id because the relation is cached already and when the relation changes the wrong acl_id is returned,
@@ -1008,7 +1013,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Finds models by attribute and value
 	 * This function uses find() to check permissions!
 	 *
-	 * @param StringHelper $attributeName column name you want to check a value for
+	 * @param string $attributeName column name you want to check a value for
 	 * @param mixed $value the value to find (needs to be exact)
 	 * @param FindParams $findParams Extra parameters to send to the find function.
 	 * @return ActiveStatement
@@ -1047,7 +1052,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Finds a single model by an attribute name and value.
 	 *
-	 * @param StringHelper $attributeName
+	 * @param string $attributeName
 	 * @param mixed $value
 	 * @param FindParams $findParams Extra parameters to send to the find function.
 	 * @return static
@@ -1060,7 +1065,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Finds a single model by an attribute=>value array.
 	 *
-	 * @param StringHelper $attributeName
+	 * @param string $attributeName
 	 * @param mixed $value
 	 * @param array $findParams Extra parameters to send to the find function.
 	 * @return static
@@ -1104,7 +1109,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * @todo FindSingleByAttributes should use this function when this one uses the FindParams object too.
 	 *
-	 * @param StringHelper $attributeName
+	 * @param string $attributeName
 	 * @param mixed $value
 	 * @param FindParams $findParams Extra parameters to send to the find function.
 	 * @return static
@@ -1138,7 +1143,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * This function is used by find.
 	 *
 	 * @param boolean $single
-	 * @param StringHelper $tableAlias
+	 * @param string $tableAlias
 	 * @return StringHelper
 	 */
 	public function getDefaultFindSelectFields($single=false, $tableAlias='t'){
@@ -1313,8 +1318,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		if(empty($params['fields']))
 			$params['fields']=$this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1);
-		else
-			go()->debug($params['fields']);
+//		else
+//			go()->debug($params['fields']);
 
 
 		$fields = $params['fields'].' ';
@@ -2076,7 +2081,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Get the findparams object used to query a defined relation.
 	 *
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @return FindParams
 	 * @throws Exception
 	 */
@@ -2266,7 +2271,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Formats user input for the database.
 	 *
-	 * @param StringHelper $column
+	 * @param string $column
 	 * @param mixed $value
 	 * @return array
 	 */
@@ -2492,7 +2497,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Returns all column attribute values.
 	 * Note, related objects are not returned.
-	 * @param StringHelper $outputType Can be
+	 * @param string $outputType Can be
 	 *
 	 * raw: return values as they are stored in the db
 	 * formatted: return the values formatted for an input form
@@ -2526,7 +2531,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Get a selection of attributes
 	 *
 	 * @param array $attributeNames
-	 * @param StringHelper $outputType
+	 * @param string $outputType
 	 * @return array
 	 */
 	public function getAttributeSelection($attributeNames, $outputType='formatted'){
@@ -2704,7 +2709,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		* Returns a value indicating whether the attribute is required.
 		* This is determined by checking if the attribute is associated with a
 		* {@link CRequiredValidator} validation rule in the current {@link scenario}.
-		* @param StringHelper $attribute attribute name
+		* @param string $attribute attribute name
 		* @return boolean whether the attribute is required
 		*/
 	public function isAttributeRequired($attribute)
@@ -2736,8 +2741,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * 'greater'=>'start_time' //this column must be greater than column start time
 	 * 'greaterorequal'=>'start_time' //this column must be greater or equal to column start time
 	 *
-	 * @param StringHelper $columnName
-	 * @param StringHelper $ruleName
+	 * @param string $columnName
+	 * @param string $ruleName
 	 * @param mixed $value
 	 */
 	public function setValidationRule($columnName, $ruleName, $value){
@@ -3025,7 +3030,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Get the URL to download a file column
 	 *
-	 * @param StringHelper $column
+	 * @param string $column
 	 * @return StringHelper
 	 */
 	public function getFileColumnUrl($column){
@@ -3434,7 +3439,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Will all a log record in go_log
 	 * Made protected to be used in \GO\Files\Model\File
-	 * @param StringHelper $action
+	 * @param string $action
 	 * @param boolean $save set the false to not directly save the create Log record
 	 * @return boolean|\GO\Log\Model\Log returns the created log or succuss status when save is true
 	 */
@@ -3561,7 +3566,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Set a new ACL for this model. You need to save the model after calling this
 	 * function.
 	 *
-	 * @param StringHelper $user_id
+	 * @param string $user_id
 	 * @return \GO\Base\Model\Acl
 	 */
 	public function setNewAcl($user_id=0){
@@ -3622,7 +3627,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Reset attribute to it's original value and clear the modified attribute.
 	 *
-	 * @param StringHelper $name
+	 * @param string $name
 	 */
 	public function resetAttribute($name){
 		$this->$name = $this->getOldAttributeValue($name);
@@ -3814,7 +3819,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Cut an attribute's value to it's maximum length in the database.
 	 *
-	 * @param StringHelper $attributeName
+	 * @param string $attributeName
 	 */
 	public function cutAttributeLength($attributeName){
 		
@@ -4281,7 +4286,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * PHP getter magic method.
 	 * This method is overridden so that AR attributes can be accessed like properties.
-	 * @param StringHelper $name property name
+	 * @param string $name property name
 	 * @return mixed property value
 	 * @see getAttribute
 	 */
@@ -4354,7 +4359,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Do not call this method. This is a PHP magic method that we override
 	 * to implement the named scope feature.
 	 *
-	 * @param StringHelper $name the method name
+	 * @param string $name the method name
 	 * @param array $parameters method parameters
 	 * @return mixed the method return value
 	 */
@@ -4374,7 +4379,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * PHP setter magic method.
 	 * This method is overridden so that AR attributes can be accessed like properties.
 	 *
-	 * @param StringHelper $name property name
+	 * @param string $name property name
 	 * @param mixed $value property value
 	 */
 	public function __set($name,$value)
@@ -4391,7 +4396,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	/**
 	 * Check if this model has a named attribute
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @return boolean
 	 */
 	public function hasAttribute($name){
@@ -4413,7 +4418,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * This method overrides the parent implementation by clearing
 	 * the specified attribute value.
 	 *
-	 * @param StringHelper $name the property name
+	 * @param string $name the property name
 	 */
 	public function __unset($name)
 	{
@@ -4460,7 +4465,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * You may also use $this->AttributeName to set the attribute value.
 	 *
-	 * @param StringHelper $name the attribute name
+	 * @param string $name the attribute name
 	 * @param mixed $value the attribute value.
 	 * @return boolean whether the attribute exists and the assignment is conducted successfully
 	 * @see hasAttribute
@@ -5065,7 +5070,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Duplicate related items to another model.
 	 *
-	 * @param StringHelper $relationName
+	 * @param string $relationName
 	 * @param ActiveRecord $duplicate
 	 * @return boolean
 	 * @throws Exception
@@ -5111,7 +5116,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Lock the database table
 	 *
-	 * @param StringHelper $mode Modes are: "read", "read local", "write", "low priority write"
+	 * @param string $mode Modes are: "read", "read local", "write", "low priority write"
 	 * @return boolean
 	 */
 	public function lockTable($mode="WRITE"){
@@ -5187,7 +5192,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Add a reminder linked to this model
 	 *
-	 * @param StringHelper $name The name of the reminder
+	 * @param string $name The name of the reminder
 	 * @param int $time This needs to be an unixtimestamp
 	 * @param int $user_id The user where this reminder belongs to.
 	 * @param int $vtime The time that will be displayed in the reminder
@@ -5305,7 +5310,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Quickly delete all records by attribute. This function does NOT check the ACL.
 	 *
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @param mixed $value
 	 */
 	public function deleteByAttribute($name, $value){
@@ -5325,7 +5330,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Add a comment to the model. If the comments module is not installed this
 	 * function will return false.
 	 *
-	 * @param StringHelper $text
+	 * @param string $text
 	 * @return boolean
 	 */
 	public function addComment($text){
@@ -5532,7 +5537,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * You can also leave the $relationTypes variable empty to search for all types
 	 *
-	 * @param StringHelper $columnName
+	 * @param string $columnName
 	 * @param array $relationTypes
 	 * @return array With names of the relations Eg. array('categories','users');
 	 */
@@ -5581,5 +5586,78 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$cls = static::class;
 		return substr($cls, strrpos($cls, '\\') + 1);
 	}
-	
+
+
+	/**
+	 * Create an alert for this entity
+	 *
+	 * @param \DateTimeInterface $triggerAt
+	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param int $userId The user this alert is for. Defaults to current user.
+	 * @return \go\core\model\Alert
+	 * @throws Exception
+	 */
+	public function createAlert(\DateTimeInterface $triggerAt,
+	                            $tag,
+	                            $userId = null) {
+		$alert = new \go\core\model\Alert();
+
+		$alert->triggerAt = $triggerAt;
+		$alert->userId = $userId ?? go()->getAuthState()->getUserId();
+		$alert->entityId =  $this->id;
+		$alert->setEntity(static::entityType()->getName());
+		$alert->tag = $tag;
+
+		return $alert;
+	}
+
+	/**
+	 * Delete an alert
+	 *
+	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param int $userId The user this alert is for. Defaults to current user.
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function deleteAlert($tag, $userId = null) {
+		return Alert::delete([
+			'entityTypeId' => self::entityType()->getId(),
+			'entityId' => $this->id,
+			'tag' => $tag,
+			'userId' => $userId ?? go()->getAuthState()->getUserId()
+		]);
+	}
+
+	/**
+	 * Called when reminders are deleted / dismissed
+	 *
+	 *
+	 * @param Alert[] $alerts
+	 */
+	public static function dismissAlerts(array $alerts) {
+
+	}
+
+	public function alertProps(Alert $alert) {
+
+		$body = null;
+		$title = null;
+
+		if ($alert->tag == "comment") {
+			// hack for comments
+			$data = $alert->getData();
+			$creator = UserDisplay::findById($data->createdBy, ['displayName']);
+			$body = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ":<br /><br />\n\n<i>" . $alert->getData()->excerpt . "</i>";
+		}
+		if(!isset($body)) {
+			$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
+			$body = $alert->triggerAt->toUserFormat(true, $user);
+		}
+
+		if(!isset($title)) {
+			$title = $alert->findEntity()->title() ?? null;
+		}
+
+		return ['title' => $title, 'body' => $body];
+	}
 }

@@ -31,6 +31,8 @@ go.emailtemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 					name: 'name',
 					fieldLabel: t("Name")
 				}, {
+					xtype: 'golanguagecombo'
+				},{
 					xtype: 'textfield',
 					name: 'subject',
 					fieldLabel: t("Subject")

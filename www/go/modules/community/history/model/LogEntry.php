@@ -9,6 +9,8 @@ use go\core\http\Response;
 use go\core\db\Expression;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\acl\model\AclOwnerEntity;
 use GO\Files\Model\Folder;
@@ -119,26 +121,27 @@ class LogEntry extends AclOwnerEntity {
 		}
 	}
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('history_log_entry', 'l')
-			->setQuery(
+			->addQuery(
 				(new Query())
 					->select("e.clientName AS entity")
 					->join('core_entity', 'e', 'e.id = l.entityTypeId')
 			);
 	}
 
-	public static function loggable()
+	public static function loggable(): bool
 	{
 		return false;
 	}
 
-	protected static function textFilterColumns()
+	protected static function textFilterColumns(): array
 	{
 		return ['description'];
 	}
 
-	protected static function defineFilters()
+	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
 			->addDate('date', function(Criteria $q, $value){
@@ -173,7 +176,8 @@ class LogEntry extends AclOwnerEntity {
 			});
 	}
 
-	protected static function getAclsToDelete(Query $query) {
+	protected static function getAclsToDelete(Query $query): array
+	{
 
 		$q = clone $query;
 		$q->andWhere('removeAcl', '=',1)
@@ -223,7 +227,7 @@ class LogEntry extends AclOwnerEntity {
 		//don't update acl records usedin is history
 	}
 
-	protected function internalSave()
+	protected function internalSave(): bool
 	{
 		if($this->action != self::$actionMap['delete']) {
 			$this->removeAcl = false;

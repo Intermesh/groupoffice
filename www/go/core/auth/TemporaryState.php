@@ -13,7 +13,7 @@ use go\core\model\User;
  */
 class TemporaryState extends AbstractState {
 
-	public function __construct($userId = null)
+	public function __construct(int $userId = null)
 	{
 		if(isset($userId)) {
 			$this->setUserId($userId);
@@ -23,37 +23,36 @@ class TemporaryState extends AbstractState {
 	private $user;
 	private $userId;	
 	
-	public function getUser(array $properties = []) {
+	public function getUser(array $properties = []): ?User
+	{
 		if(!empty($properties)) {
-			return $this->user ?? User::findById($this->userId, $properties);
+			return $this->user ?? $this->userId ? User::findById($this->userId, $properties) : null;
 		}
 
 		if(!$this->user) {
-			$this->user = User::findById($this->userId);
+			$this->user =  $this->userId ? User::findById($this->userId) : null;
 		}
 		return $this->user;
 	}
 
-	public function isAuthenticated() {
+	public function isAuthenticated(): bool
+	{
 		return !empty($this->userId);
 	}
 
-	public function getUserId() {
+	public function getUserId(): ?int
+	{
 		return $this->userId;
 	}
 	
-	public function setUserId($userId) {
+	public function setUserId(?int $userId): TemporaryState
+	{
 		$this->userId = $userId;
-		if(!isset(\GO::session()->values['user_id']) || \GO::session()->values['user_id'] != $userId) {
-			\GO::session()->runAs($userId);
-			//runas in old framework changes to user timezone.
-			date_default_timezone_set("UTC");
-		}
-		
 		return $this;
 	}
 
-	public function setUser(User $user) {
+	public function setUser(User $user): TemporaryState
+	{
 		$this->user = $user;
 		return $this->setUserId($user->id);
 	}
@@ -63,7 +62,8 @@ class TemporaryState extends AbstractState {
 	 * 
 	 * @return bool
 	 */
-	public function isAdmin() {
+	public function isAdmin(): bool
+	{
 		if($this->userId == User::ID_SUPER_ADMIN) {
 			return true;
 		}
@@ -73,6 +73,11 @@ class TemporaryState extends AbstractState {
 			return false;
 		}
 		return $user->isAdmin();
+	}
+
+	protected function getBaseUrl(): string
+	{
+		return go()->getSettings()->URL . 'api/';
 	}
 }
 

@@ -10,12 +10,14 @@ use go\modules\community\multi_instance\model\Instance;
 
 class Module extends \go\core\Module {
 	
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV";
 	}
 
 
-	protected function afterInstall(\go\core\model\Module $model) {
+	protected function afterInstall(\go\core\model\Module $model): bool
+	{
 		
 		$cron = new \go\core\model\CronJobSchedule();
 		$cron->moduleId = $model->id;
@@ -51,9 +53,12 @@ class Module extends \go\core\Module {
 	}
 
 	public static function checkUrl() {
-		if(go()->getDebugger()->enabled) {
-			return true;
+
+		//Skip localhost for development
+		if(Request::get()->getHost() === 'localhost') {
+			return;
 		}
+
 		$configUrl = go()->getSettings()->URL;
 		$p = parse_url($configUrl, PHP_URL_HOST);
 

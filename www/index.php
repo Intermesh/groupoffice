@@ -58,40 +58,43 @@ try {
   //initialize autoloading of library
   require('GO.php');  
 	
-	if(!empty($_POST['accessToken'])) {
-		$old = date_default_timezone_get();
-		date_default_timezone_set('UTC');
-		//used for direct token login from multi_instance module
-		//this token is used in default_scripts.inc.php too
-		$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
-		if($token) {
-			$token->setAuthenticated();
 
-			Response::get()->setCookie('accessToken', $token->accessToken, [
-				"path" => "/",
-				"samesite" => "Lax",
-				"domain" => Request::get()->getHost()
-			]);
-
-		} else
-		{
-			unset($_POST['accessToken']);
-		}
-
-
-
-		date_default_timezone_set($old);
-	}
 
 	//check if GO is installed
 	if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 
-//		if(GO::user() && isset($_SESSION['GO_SESSION']['after_login_url'])){
-//			$url = GO::session()->values['after_login_url'];
-//			unset(GO::session()->values['after_login_url']);
-//			header('Location: '.$url);
-//			exit();
-//		}
+
+		//Server manager uses this when directly signing in
+		if(!empty($_POST['accessToken'])) {
+			$old = date_default_timezone_get();
+			date_default_timezone_set('UTC');
+			//used for direct token login from multi_instance module
+			//this token is used in default_scripts.inc.php too
+			$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
+			if($token) {
+				$token->setAuthenticated();
+				$token->setCookie();
+
+			} else
+			{
+				unset($_POST['accessToken']);
+			}
+
+			date_default_timezone_set($old);
+		}
+
+		// Process remember me persistent cookie
+		if(!go()->getAuthState()->isAuthenticated() && ($rememberMe = \go\core\model\RememberMe::verify())) {
+			$rememberMe->setCookie();
+
+			$token = new Token();
+			$token->userId = $rememberMe->userId;
+			$token->setAuthenticated();
+			$token->setCookie();
+
+			//for default_scripts.php to pass accessToken to script
+			$_POST['accessToken'] = $token->accessToken;
+		}
 
 		go()->fireEvent(\go\core\App::EVENT_INDEX);
 
@@ -111,6 +114,19 @@ try {
 
 	GO::router()->runController();
 
+} catch(\go\core\exception\RememberMeTheft $e) {
+	$tp = \go\core\webclient\Extjs3::get()->getThemePath();
+	require($tp .'pageHeader.php');
+	?>
+	<section>
+			<fieldset>
+				<h1><?= go()->t("Security warning"); ?></h1>
+				<p><?= go()->t("It looks like someone might have had unauthorized access to your account. You have been logged out everywhere. Please reset your password immediately."); ?></p>
+				<a class="button primary right" href="<?= \go\core\webclient\Extjs3::get()->getBaseUrl(); ?>"><?= go()->t('Continue'); ?></a>
+			</fieldset>
+	</section>
+	<?php
+	require($tp .'pageFooter.php');
 } catch(Error $e) {
   errorHander($e);  
 } catch(Exception $e) {

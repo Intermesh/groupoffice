@@ -128,6 +128,16 @@ class PdfTemplateRenderer extends PdfRenderer {
 		}
 	}
 
+	/**
+	 * Renders the content of the PDF
+	 *
+	 * Use Output() to write the PDF to string or file:
+	 *
+	 * $pdf->render()->Output($file->getPath(), "F");
+	 *
+	 * @return PdfTemplateRenderer
+	 * @throws Exception
+	 */
 	public function render() {
 
 		$this->AddPage();

@@ -74,11 +74,11 @@ CREATE TABLE IF NOT EXISTS `sync_settings` (
 
 DROP TABLE IF EXISTS `sync_tasklist_user`;
 CREATE TABLE IF NOT EXISTS `sync_tasklist_user` (
-  `tasklist_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL DEFAULT '0',
-  `default_tasklist` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`tasklist_id`,`user_id`),
-  KEY `user_id` (`user_id`)
+  `tasklistId` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL DEFAULT '0',
+  `isDefault` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`tasklistId`,`userId`),
+  KEY `userId` (`userId`)
 ) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
@@ -160,3 +160,14 @@ ALTER TABLE `sync_addressbook_user`
 ALTER TABLE `sync_addressbook_user`
   ADD CONSTRAINT `sync_addressbook_user_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `sync_addressbook_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+
+
+alter table sync_tasklist_user
+    add constraint sync_tasklist_user_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade;
+
+alter table sync_tasklist_user
+	add constraint sync_tasklist_user_tasks_tasklist_id_fk
+		foreign key (tasklistId) references tasks_tasklist (id)
+			on delete cascade;

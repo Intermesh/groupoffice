@@ -27,7 +27,7 @@ return array (
   'Company' => 'Фирма',
   'Permissions' => 'Права',
   'Login' => 'Вписване',
-  'Look & Feel' => 'Изглед',
+  'Look & feel' => 'Изглед',
   'Settings' => 'Настройки',
   'Email for new enabled users' => 'Email за ново активирани потребители',
   'Email for new disabled users' => 'Email за ново забранени потребители',

@@ -3,6 +3,8 @@ namespace go\core\util;
 
 use go\core\ErrorHandler;
 use InvalidArgumentException;
+use JsonException;
+use function json_decode;
 
 class JSON {
   /**
@@ -27,6 +29,7 @@ class JSON {
    * Set the maximum depth. Must be greater than zero.
    * 
    * @return string
+   * @throws InvalidArgumentException
    */
   public static function encode($value, int $options = 0, int $depth = 512): string
   {
@@ -75,14 +78,14 @@ class JSON {
  * @param int $options Bitmask of JSON decode options.
  *
  * @return mixed
- * @throws \InvalidArgumentException if the JSON cannot be decoded.
+ * @throws JsonException if the JSON cannot be decoded.
  * @link http://www.php.net/manual/en/function.json-decode.php
  */
   public static function decode(string $json, bool $assoc = false, int $depth = 512, int $options = 0) {
-    $data = \json_decode($json, $assoc, $depth, $options);
+    $data = json_decode($json, $assoc, $depth, $options);
     if (JSON_ERROR_NONE !== json_last_error()) {
-        throw new \InvalidArgumentException(
-            'json_decode error: ' . json_last_error_msg()
+        throw new JsonException(
+            "JSON decoding error: '".json_last_error_msg()."'.\n\nJSON data given: \n\n".var_export($json, true)
         );
     }
 

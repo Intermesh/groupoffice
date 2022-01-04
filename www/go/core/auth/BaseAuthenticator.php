@@ -6,8 +6,9 @@ use Exception;
 use go\core\db\Query;
 use go\core\model\Module;
 use go\core\validate\ValidationTrait;
+use JsonSerializable;
 
-abstract class BaseAuthenticator implements \JsonSerializable {
+abstract class BaseAuthenticator implements JsonSerializable {
 	
 	use ValidationTrait;
 	
@@ -18,11 +19,12 @@ abstract class BaseAuthenticator implements \JsonSerializable {
 	 * 
 	 * @return string
 	 */
-	public static function id() {
+	public static function id() : string
+	{
 		return strtolower(substr(static::class, strrpos(static::class, "\\") + 1));
 	}
 
-	public function jsonSerialize ()
+	public function jsonSerialize (): string
 	{
 		return static::id();
 	}
@@ -37,7 +39,8 @@ abstract class BaseAuthenticator implements \JsonSerializable {
 	 * 
 	 * @throws Exception
 	 */
-	public static function register() {
+	public static function register(): bool
+	{
 		$method = new Method();
 		$module = Module::findByClass(static::class);		
 		$method->moduleId = $module->id;
@@ -49,12 +52,12 @@ abstract class BaseAuthenticator implements \JsonSerializable {
 		
 		return true;
 	}
+
 	/**
 	 * Check if this authenticator is available for the user.
-	 * 
+	 *
 	 * @param string $username
-	 * @param string $domain
 	 */
-	abstract public static function isAvailableFor($username);	
+	abstract public static function isAvailableFor(string $username);
 		
 }

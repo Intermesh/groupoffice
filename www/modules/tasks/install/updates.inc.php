@@ -114,3 +114,5 @@ $updates['201903291350'][] = function() {
 	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->migrateEntity("Task");
 };
+//final server update for old module
+$updates['201903291351'][] = 'update core_module set package=\'community\', version=0 where name=\'tasks\'';

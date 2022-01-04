@@ -1,5 +1,11 @@
 
 go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
+
+	hasPermission: function() {
+		const module = go.Modules.get(this.package, this.module);
+		return module.userRights.mayManage;
+	},
+	
 	autoScroll: true,
 	afterRender: function() {
 		go.systemsettings.Panel.superclass.afterRender.call(this);

@@ -30,7 +30,7 @@ return array (
   'Company' => '公司',
   'Permissions' => '權限',
   'Login' => '登錄',
-  'Look & Feel' => '外觀',
+  'Look & feel' => '外觀',
   'Settings' => '設定',
   'Email for new enabled users' => '啟用新 Email 使用者',
   'Email for new disabled users' => '禁用新 Email 使用者',

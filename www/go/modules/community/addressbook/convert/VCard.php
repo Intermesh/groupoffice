@@ -170,18 +170,19 @@ class VCard extends AbstractConverter {
 			}
 	}
 
-	protected function initExport()
+	protected function initExport(): void
 	{
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
 	}
 
-	protected function exportEntity(Entity $entity) {
+	protected function exportEntity(Entity $entity): void
+	{
 		$str = $this->export($entity);
 		fputs($this->fp, $str);
 	}
 
-	protected function finishExport()
+	protected function finishExport(): Blob
 	{
 		$cls = $this->entityClass;
 		$blob = Blob::fromTmp($this->tempFile);
@@ -468,7 +469,8 @@ class VCard extends AbstractConverter {
 		}
 	}
 
-	public function getFileExtension() {
+	public function getFileExtension(): string
+	{
 		return 'vcf';
 	}
 	
@@ -484,7 +486,7 @@ class VCard extends AbstractConverter {
 
 	private $card;
 
-	protected function nextImportRecord()
+	protected function nextImportRecord(): bool
 	{
 		$this->card = $this->splitter->getNext();
 
@@ -508,7 +510,7 @@ class VCard extends AbstractConverter {
 
 	protected $values;
 
-	protected function initImport(File $file)
+	protected function initImport(File $file): void
 	{
 		$this->splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 		if(!isset( $this->clientParams['values']))
@@ -522,7 +524,7 @@ class VCard extends AbstractConverter {
 
 	}
 
-	protected function finishImport()
+	protected function finishImport(): void
 	{
 		unset($this->splitter);
 	}
@@ -571,7 +573,7 @@ class VCard extends AbstractConverter {
 	/**
 	 * @inheritDoc
 	 */
-	public static function supportedExtensions()
+	public static function supportedExtensions(): array
 	{
 		return ['vcf'];
 	}

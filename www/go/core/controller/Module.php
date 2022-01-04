@@ -3,10 +3,12 @@
 namespace go\core\controller;
 
 use go\core\exception\NotFound;
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\Response;
 use go\core\model;
+use go\core\orm\Query;
 
 
 class Module extends EntityController {
@@ -16,19 +18,54 @@ class Module extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Module::class;
 	}
-	
-		
-	protected function getQueryQuery($params)
-	{
-		return parent::getQueryQuery($params)->orderBy(['sort_order' => 'ASC']);
+
+	private function filterPermissions(Query $query) {
+
+		if(go()->getAuthState()->isAdmin()) {
+			return $query;
+		}
+
+		$query->join("core_permission", "p" , "p.moduleId = m.id")
+			->join("core_user_group", "ug", "ug.groupId = p.groupId AND ug.userId = :userId")
+			->bind(':userId', go()->getAuthState()->getUserId())
+			->groupBy(['m.id']);
+
+		return $query;
 	}
 
-	protected function getGetQuery($params)
+	protected function canUpdate(Entity $entity): bool
 	{
-		return parent::getGetQuery($params)->orderBy(['sort_order' => 'ASC']);
+		return go()->getAuthState()->isAdmin();
+	}
+
+	protected function canCreate(Entity $entity): bool
+	{
+		if($entity->name == "core" && $entity->package == "core") {
+			return false;
+		}
+		return go()->getAuthState()->isAdmin();
+	}
+
+	protected function canDestroy(Entity $entity): bool
+	{
+		if($entity->name == "core" && $entity->package == "core") {
+			return false;
+		}
+		return go()->getAuthState()->isAdmin();
+	}
+
+	protected function getQueryQuery(array $params): Query
+	{
+		return $this->filterPermissions(parent::getQueryQuery($params))->orderBy(['sort_order' => 'ASC']);
+	}
+
+	protected function getGetQuery(array $params): \go\core\orm\Query
+	{
+		return $this->filterPermissions(parent::getGetQuery($params))->orderBy(['sort_order' => 'ASC']);
 	}
 
 	public function installLicensed(){

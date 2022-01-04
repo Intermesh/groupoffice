@@ -93,8 +93,8 @@ GO.util.stringToFunction = function(str) {
  *    overriding constructors is not possible.
  * 
  * @param {string} str
- * @param {string} module
- * @param {string} package
+ * @param {string} [module]
+ * @param {string} [package]
  * @returns {t.l|GO..lang}
  */
 function t(str, module, package, dontFallBack) {

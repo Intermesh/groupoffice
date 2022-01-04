@@ -11,6 +11,7 @@
 namespace GO\Sync\Model;
 
 use go\core\model\Module;
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use GO\Base\Model\User as GOUser;
 use go\core\model\User;
@@ -47,12 +48,15 @@ class UserSettings extends Property
 		}
 	}
 
-	protected static function defineMapping()
+	public $tasklists = [];
+
+	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 			->addTable("sync_settings", "syncs")
 			->addArray('noteBooks', UserNoteBook::class, ['user_id' => 'userId'])
-			->addArray('addressBooks', UserAddressBook::class, ['user_id' => 'userId']);
+			->addArray('addressBooks', UserAddressBook::class, ['user_id' => 'userId'])
+			->addArray('tasklists', UserTasklist::class, ['user_id' => 'userId']);
 	}
 
 
@@ -67,18 +71,24 @@ class UserSettings extends Property
       }
 	  }
 
-		if (empty($this->addressBooks) || empty($this->noteBooks)) {
+		if (empty($this->addressBooks) || empty($this->noteBooks)  || empty($this->tasklists)) {
 			$user = User::findById($this->user_id, ['addressBookSettings', 'notesSettings', 'syncSettings']);
 
 			if (empty($this->addressBooks)) {
 				if (isset($user->addressBookSettings) && ($addressBookId = $user->addressBookSettings->getDefaultAddressBookId())) {
-					$this->addressBooks[] = (new UserAddressBook())->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
+					$this->addressBooks[] = (new UserAddressBook($this))->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
 				}
 			}
 
 			if (empty($this->noteBooks)) {
 				if (isset($user->notesSettings) && ($noteBookId = $user->notesSettings->getDefaultNoteBookId())) {
-					$this->noteBooks[] = (new UserNoteBook())->setValues(['noteBookId' => $noteBookId, 'isDefault' => true]);
+					$this->noteBooks[] = (new UserNoteBook($this))->setValues(['noteBookId' => $noteBookId, 'isDefault' => true]);
+				}
+			}
+
+			if (empty($this->tasklists)) {
+				if (isset($user->tasksSettings) && ($tasklistId = $user->tasksSettings->getDefaultTasklistId())) {
+					$this->tasklists[] = (new UserTasklist($this))->setValues(['tasklistId' => $tasklistId, 'isDefault' => true]);
 				}
 			}
 
@@ -90,7 +100,7 @@ class UserSettings extends Property
 		}
 	}
 
-	public function toArray($properties = [])
+	public function toArray(array $properties = null): array
 	{
 		if($this->doSetup)
 			$this->setup();

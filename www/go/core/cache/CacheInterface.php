@@ -27,7 +27,7 @@ interface CacheInterface {
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
 	 * @param int $ttl Time to live in seconds
 	 */
-	public function set($key, $value, $persist = true, $ttl = 0);
+	public function set(string $key, $value, bool $persist = true, int $ttl = 0);
 
 	/**
 	 * Get a value from the cache
@@ -37,26 +37,26 @@ interface CacheInterface {
 	 * @param string $key
 	 * @return mixed Stored value or NULL if not found  
 	 */
-	public function get($key);
+	public function get(string $key);
 
 	/**
 	 * Delete a value from the cache
 	 * 
 	 * @param string $key 
 	 */
-	public function delete($key);
+	public function delete(string $key);
 
 	/**
 	 * Flush all values 
-	 * 
-	 * @return boolean
+	 *
+	 * @param bool $onDestruct
 	 */
-	public function flush();
+	public function flush(bool $onDestruct = true);
 
 	/**
 	 * Returns true if this system supports this cache driver
 	 * 
 	 * @return boolean
 	 */
-	public static function isSupported();
+	public static function isSupported(): bool;
 }

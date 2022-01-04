@@ -365,11 +365,11 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 		$this->nextrun = $this->_calculateNextRun();
 		
 		//if the cron happens within a minute then substract one minute for immediate testing.
-		if(GO::config()->debug && PHP_SAPI!='cli'){
-			if($this->nextrun<time()+61){
-				$this->nextrun-=60;
-			}
-		}
+//		if(GO::config()->debug && PHP_SAPI!='cli'){
+//			if($this->nextrun<time()+61){
+//				$this->nextrun-=60;
+//			}
+//		}
 		// GO::debug('CRONJOB ('.$this->name.') NEXTRUN : '.date('c', $this->getAttribute('nextrun'));
 		return parent::beforeSave();
 	}

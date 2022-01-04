@@ -2,6 +2,7 @@
 namespace go\modules\community\addressbook\model;
 						
 use go\core\model\User;
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 						
 /**
@@ -77,7 +78,8 @@ class Address extends Property {
 	public $latitude;
 	public $longitude;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("addressbook_address");
 	}
@@ -110,44 +112,10 @@ class Address extends Property {
 		}
 	}
 
-	private static $defaultCountryIso;
-	private static $defaultCountryText;
-	private static function isDefaultCountry(Address $address) {
-		if(!isset(self::$defaultCountryIso)) {
-			$user = go()->getAuthState() ? go()->getAuthState()->getUser(['timezone']) : null;
-			if(!$user) {
-				$user = User::findById(1, ['timezone']);
-			}
-			self::$defaultCountryIso = $user->getCountry();
-			$countries = go()->t('countries');
-			self::$defaultCountryText = $countries[self::$defaultCountryIso] ?? "";
-		}
-
-		return $address->countryCode == self::$defaultCountryIso || $address->country == self::$defaultCountryIso || $address->country == self::$defaultCountryText;
-	}
-	
 	
 	public function getFormatted()
 	{
-
-		if (empty($this->street) && empty($this->city) && empty($this->state)) {
-			return "";
-		}
-		$format = go()->getLanguage()->getAddressFormat($this->countryCode);
-
-		$format = str_replace('{address}', $this->street, $format);
-		$format = str_replace('{address_no}', $this->street2, $format);
-		$format = str_replace('{city}', $this->city, $format);
-		$format = str_replace('{zip}', $this->zipCode, $format);
-		$format = str_replace('{state}', $this->state, $format);
-
-		if (self::isDefaultCountry($this)) {
-			$format = str_replace('{country}', "", $format);
-		}else{
-			$format = str_replace('{country}', $this->country, $format);
-		}
-		
-		return preg_replace("/\n+/", "\n", $format);
+		return go()->getLanguage()->formatAddress($this->countryCode, $this->toArray(['street','street2', 'city', 'zipCode', 'state']));
 	}
 	
 	public function getCombinedStreet() {

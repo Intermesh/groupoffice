@@ -2,8 +2,9 @@
 
 namespace go\core\orm;
 
-use Exception;
 use go\core\db\Table;
+use InvalidArgumentException;
+use LogicException;
 
 /**
  * Relation class
@@ -19,6 +20,13 @@ class Relation {
 
 
 	/**
+	 * @see Mapping::$dynamic;
+	 * @var bool
+	 */
+	public $dynamic = false;
+
+
+	/**
 	 * The name of the relation
 	 * 
 	 * @var string 
@@ -28,11 +36,9 @@ class Relation {
 	/**
 	 * The class name of the {@see Property} this relation points to.
 	 *
-	 * @todo rename to propertyName. This must actually be a Property class.
-	 * 
-	 * @var Property
+	 * @var class-string<Property>
 	 */
-	public $entityName;
+	public $propertyName;
 
 	/**
 	 * Associative array with key map
@@ -79,7 +85,7 @@ class Relation {
    *
    * @param int $type
    */
-	public function __construct($name, array $keys, $type = self::TYPE_HAS_ONE) {
+	public function __construct(string $name, array $keys, int $type = self::TYPE_HAS_ONE) {
 		$this->name = $name;
 		$this->keys = $keys;
 		$this->type = $type;
@@ -87,27 +93,29 @@ class Relation {
 
   /**
    * Set the entity name.
-   * @todo rename to propertyName. This must actually be a Property class.
    *
-   * @param $entityName
+   * @param class-string<Property> $propertyName
    * @return $this
-   * @throws Exception
    */
-	public function setEntityName ($entityName) {
-		if(!is_subclass_of($entityName, Property::class, true)) {
-			throw new Exception($entityName . ' must extend '. Property::class);
+	public function setPropertyName(string $propertyName): Relation
+	{
+		if(!class_exists($propertyName)) {
+			throw new InvalidArgumentException($propertyName . ' class not found');
+		}
+		if(!is_subclass_of($propertyName, Property::class, true)) {
+			throw new InvalidArgumentException($propertyName . ' must extend '. Property::class);
 		}
 		
-		if(is_subclass_of($entityName, Entity::class, true)) {
-			throw new Exception($entityName . ' may not be an '. Entity::class .'. Only '. Property::class .' objects can be mapped.');
+		if(is_subclass_of($propertyName, Entity::class, true)) {
+			throw new InvalidArgumentException($propertyName . ' may not be an '. Entity::class .'. Only '. Property::class .' objects can be mapped.');
 		}
 		
-		$this->entityName = $entityName;
+		$this->propertyName = $propertyName;
 
 		return $this;
 	}
 
-	public function setTableName($name) 
+	public function setTableName($name): Relation
 	{
 		$this->tableName = $name;
 
@@ -119,9 +127,14 @@ class Relation {
 	 *
 	 * @return string
 	 */
-	public function getScalarColumn() {
-		$table = Table::getInstance($this->tableName, go()->getDbConnection());
+	public function getScalarColumn(): string
+	{
+		$table = Table::getInstance($this->tableName);
 		$diff = array_diff($table->getPrimaryKey(), $this->keys);
+
+		if(empty($diff)) {
+			throw new LogicException("Can't determine column for scalar relation " . $this->propertyName . "->" . $this->name ." . Please check the given keys.");
+		}
 
 		return array_shift($diff);
 	}

@@ -53,7 +53,7 @@ class Memcached implements CacheInterface {
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
 	 * @param int $ttl Time to live in seconds
 	 */
-	public function set($key, $value, $persist = true, $ttl = 0) {
+	public function set(string $key, $value, bool $persist = true, int $ttl = 0) {
 
 		//don't set false values because unserialize returns false on failure.
 		if ($key === false) {
@@ -76,7 +76,7 @@ class Memcached implements CacheInterface {
 	 * @param string $key 
 	 * @return mixed null if it doesn't exist
 	 */
-	public function get($key) {
+	public function get(string $key) {
 
 		if(isset($this->cache[$key])) {
 			return $this->cache[$key];
@@ -97,7 +97,7 @@ class Memcached implements CacheInterface {
 	 * 
 	 * @param string $key 
 	 */
-	public function delete($key) {
+	public function delete(string $key) {
 		unset($this->cache[$key]);
 		$this->mem->delete($this->prefix . '-' . $key);
 	}
@@ -110,10 +110,9 @@ class Memcached implements CacheInterface {
 	 * @param bool $onDestruct Delay flush until current script run ends by 
 	 * default so cached values can still be used. For example cached record 
 	 * relations will function until the script ends.
-	 * 
-	 * @return bool
+	 *
 	 */
-	public function flush($onDestruct = true) {
+	public function flush(bool $onDestruct = true) {
 		
 //		throw new \Exception("Flush?");
 		if ($onDestruct) {
@@ -127,11 +126,12 @@ class Memcached implements CacheInterface {
 
 	public function __destruct() {
 		if ($this->flushOnDestruct) {
-			$this->flush(false);
+			$this->flush(true, false);
 		}
 	}
 
-	public static function isSupported() {
+	public static function isSupported(): bool
+	{
 		return extension_loaded('memcached');
 	}
 }

@@ -1,9 +1,12 @@
-<?php
+<?php /** @noinspection ALL */
+
 namespace go\core\http;
 
+use go\core\exception\Forbidden;
 use go\core\exception\NotFound;
 use go\core\ErrorHandler;
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 
 /**
  * Simple RESTful router
@@ -63,20 +66,18 @@ class Router {
     return $this;
   }
 
-  /**
-   * Run the controller method that matches with the route.
-   * 
-   * @return void
-   */
+	/**
+	 * Run the controller method that matches with the route.
+	 *
+	 * @return void
+	 * @throws NotFound
+	 */
   public function run() {
     
     $route = $this->findRoute();
     if(!$route) {
-      
       throw new NotFound();
     }
-
-    
 
     try {
       $c = new $route['controller'];
@@ -95,7 +96,7 @@ class Router {
 		    Response::get()->setStatus(404, $e->getMessage());
 	    }
       ErrorHandler::logException($e);      
-    } catch(\go\core\http\Exception $e) {
+    } catch(Exception $e) {
 	    if(!headers_sent()) {
 		    Response::get()->setStatus($e->code, $e->getMessage());
 	    }
@@ -116,14 +117,14 @@ class Router {
 	  if(isset($response) && $response instanceof \GuzzleHttp\Psr7\Response) {
 		  $this->emitPsr7Response($response);
 	  } else{
-		  Response::get()->output(isset($response) ? $response : null);
+		  Response::get()->output($response ?? null);
 	  }
 
   }
 
   private function emitPsr7Response(ResponseInterface $response){
 	  if (headers_sent()) {
-		  throw new \RuntimeException('Headers were already sent. The response could not be emitted!');
+		  throw new RuntimeException('Headers were already sent. The response could not be emitted!');
 	  }
 
 // Step 1: Send the "status line".

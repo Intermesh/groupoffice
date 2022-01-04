@@ -214,8 +214,6 @@ class JsonView extends AbstractView{
 			if (!isset($response['data']['events']) && \GO::modules()->calendar)
 				$response = $this->_processEventsDisplay($data['model'], $response);
 
-			if (!isset($response['data']['tasks']) && \GO::modules()->tasks)
-				$response = $this->_processTasksDisplay($data['model'], $response);
 		}
 
 		if (\GO::modules()->files && !isset($response['data']['files']))
@@ -460,8 +458,6 @@ class JsonView extends AbstractView{
 		$ignoreModelTypes = array();
 		if (\GO::modules()->calendar)
 			$ignoreModelTypes[] = \GO\Calendar\Model\Event::model()->modelTypeId();
-		if (\GO::modules()->tasks)
-			$ignoreModelTypes[] = \GO\Tasks\Model\Task::model()->modelTypeId();
 
 		$findParams->getCriteria()->addInCondition('model_type_id', $ignoreModelTypes, 't', true, true);
 
@@ -536,40 +532,5 @@ class JsonView extends AbstractView{
 		return $response;
 	}
 
-	private function _processTasksDisplay($model, $response) {
-		//$startOfDay = \GO\Base\Util\Date::clear_time(time());
-
-		$findParams = \GO\Base\Db\FindParams::newInstance()->order('due_time', 'DESC');
-		//$findParams->getCriteria()->addCondition('start_time', $startOfDay, '<=')->addCondition('status', \GO\Tasks\Model\Task::STATUS_COMPLETED, '!=');						
-
-		$stmt = \GO\Tasks\Model\Task::model()->findLinks($model, $findParams);
-
-		$store = \GO\Base\Data\Store::newInstance(\GO\Tasks\Model\Task::model());
-		$store->setStatement($stmt);
-
-		$store->getColumnModel()
-						->setFormatRecordFunction(array($this, 'formatTaskLinkRecord'))
-						->formatColumn('late', '$model->due_time<time() ? 1 : 0;')
-						->formatColumn('tasklist_name', '$model->tasklist->name')
-						->formatColumn('link_count', '$model->countLinks()')
-						->formatColumn('link_description', '$model->link_description');
-
-		$data = $store->getData();
-		$response['data']['tasks'] = $data['results'];
-
-		return $response;
-	}
-
-	public function formatTaskLinkRecord($record, $model, $cm) {
-
-		$statuses = \GO::t("statuses", "tasks");
-
-		$record['status'] = $statuses[$model->status];
-
-		if ($model->percentage_complete > 0 && $model->status != 'COMPLETED')
-			$record['status'].= ' (' . $model->percentage_complete . '%)';
-
-		return $record;
-	}
 
 }

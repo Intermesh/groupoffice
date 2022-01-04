@@ -1,6 +1,7 @@
 <?php
 namespace GO\Base;
 
+use Faker\Generator;
 use go\core\Installer;
 
 /**
@@ -68,6 +69,10 @@ class Module extends Observable {
 	 */
 	public function getName() {
 		return $this->name();
+	}
+
+	public function getRights() {
+		return ['mayManage' => 1];
 	}
 
 
@@ -710,4 +715,12 @@ class Module extends Observable {
 	 */
 	public static function submitSettings($settingsController, &$params, &$response, $user){		
 	}
+
+	/**
+	 * Generate data for demo purposes
+	 */
+	public function demo(Generator $faker) {
+
+	}
+
 }

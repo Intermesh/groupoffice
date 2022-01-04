@@ -3,17 +3,21 @@
 go.grid.DateColumn = Ext.extend(Ext.grid.Column, {
 	align: "right",
 	dateOnly: false,
-	constructor: function(cfg){		
-		Ext.grid.DateColumn.superclass.constructor.call(this, cfg);
+	constructor: function(cfg){
+
 
 		var me = this;
-		this.renderer = function(v) {
-			if(me.dateOnly) {
-				return go.util.Format.date(v);
-			}
+		if(!cfg.renderer) {
+			cfg.renderer = function (v, meta, record) {
+				if (me.dateOnly) {
+					return go.util.Format.date(v);
+				}
 
-			return '<span  style="cursor:pointer" title="' + go.util.Format.dateTime(v) + '">' + go.util.Format.userDateTime(v) + '</span>';
-		};
+				return go.util.Format.shortDateTimeHTML(v);
+			};
+		}
+
+		Ext.grid.DateColumn.superclass.constructor.call(this, cfg);
 		
 		this.resizable = !go.User.shortDateInList;
 		if(this.dateOnly) {

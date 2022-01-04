@@ -24,12 +24,11 @@ class Expression {
 	 * 
 	 * @param string $expression eg. "ISNULL(colName) ASC"
 	 */
-	public function __construct($expression) {
+	public function __construct(string $expression) {
 		$this->expression = $expression;
 	}
 	
 	public function __toString() {
 		return $this->expression;
-						
 	}
 }

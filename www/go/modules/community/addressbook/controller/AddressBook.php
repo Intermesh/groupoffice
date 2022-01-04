@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\addressbook\controller;
 
+use go\core\exception\Forbidden;
 use go\core\jmap\EntityController;
 use go\modules\community\addressbook\model;
 
@@ -18,7 +19,8 @@ class AddressBook extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\AddressBook::class;
 	}	
 	
@@ -49,6 +51,9 @@ class AddressBook extends EntityController {
 	 * @param array $params
 	 */
 	public function set($params) {
+		if(!$this->rights->mayChangeAddressbooks) {
+			throw new Forbidden();
+		}
 		return $this->defaultSet($params);
 	}
 	

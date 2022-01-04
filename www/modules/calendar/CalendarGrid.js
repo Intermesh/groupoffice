@@ -2098,39 +2098,6 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		}
 	},
 
-	/*moveAppointment : function (event_dom_id, oldPos, newPos)
-	{
-
-		var oldDay = this.getDayByX(oldPos[0]);
-		var newDay = this.getDayByX(newPos[0]);
-
-		var columnsContainerY = this.gridTable.getY();
-
-		var i = this.findAppointment(oldDay, event_dom_id);
-
-		this.appointments[oldDay][i].xy=newPos;
-		this.appointments[oldDay][i].xy[1]-=columnsContainerY;
-		this.appointments[oldDay][i].size=this.appointments[oldDay][i].getSize();
-
-		this.remoteEvents[event_dom_id].repeats=false;
-
-		if(oldDay!=newDay)
-		{
-			if(!this.appointments[newDay])
-			{
-				this.appointments[newDay]=[];
-			}
-
-			this.appointments[newDay].push(this.appointments[oldDay][i]);
-			this.appointments[oldDay].splice(i,1);
-			this.calculateAppointments(oldDay);
-			this.calculateAppointments(newDay);
-		}else
-		{
-			this.calculateAppointments(newDay);
-		}
-	},	*/
-
 	startAllDayEventDrag : function(e, eventId) {
 		//don't start dragging when a doubleclick is recorded
 		if(!this.eventMouseUp && this.writePermission)
@@ -2156,8 +2123,6 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 	currentDragDay : false,
 
 	onAllDayEventDragMouseMove : function (e){
-
-		//if(!this.eventMouseUp)
 		if(this.allDayDragEvent)
 		{
 			//update the selector proxy
@@ -2168,8 +2133,6 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 			var day = this.getDayByX(mouseEventPos[0]);
 
-			//var gridLeft = this.gridCells[0][0].xy[0]-4;
-			//var gridRight=this.gridCells[this.days-1][47].xy[0]+4;
 			if(this.currentDragDay != day && this.allDayColumns[day])
 			{
 				this.currentDragDay=day;

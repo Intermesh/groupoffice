@@ -22,11 +22,11 @@ use go\modules\community\ldapauthenticator\Module;
  */
 class Authenticator extends PrimaryAuthenticator {
 	
-	public static function id() {
+	public static function id() : string {
 		return "ldap";
 	}
 
-	public static function isAvailableFor($username) {		
+	public static function isAvailableFor(string $username) : bool {
 		
 		list($username, $domain) = self::splitUserName($username);
 		
