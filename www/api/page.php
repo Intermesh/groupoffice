@@ -43,7 +43,7 @@ if($package == "core") {
 	$ctrlCls = "go\\modules\\" . $package . "\\". $module . "\\Module";
 	if(!class_exists($ctrlCls)) {
 		http_response_code(404);	
-		exit("Controller class '$ctrlCls' not found");
+		exit("Class '$ctrlCls' not found");
 	}
 	
 	$c = $ctrlCls::get();
@@ -51,7 +51,7 @@ if($package == "core") {
 
 if(!method_exists($c, $method)) {
 	http_response_code(404);	
-	exit("Controller method '$method' not found");
+	exit("method '$method' not found in '$ctrlCls'");
 }
 
 call_user_func_array([$c, $method], $parts);

@@ -66,7 +66,7 @@ if($package == "core") {
 	$ctrlCls = "go\\modules\\" . $package . "\\". $module . "\\Module";
 	if(!class_exists($ctrlCls)) {
 		Response::get()->setStatus(404);
-		Response::get()->output("Controller class '$ctrlCls' not found");
+		Response::get()->output("Class '$ctrlCls' not found");
 		exit();
 	}
 	
@@ -75,7 +75,7 @@ if($package == "core") {
 
 if(!method_exists($c, $method)) {
 	Response::get()->setStatus(404);
-	Response::get()->output("Controller method '$method' not found");
+	Response::get()->output("Controller method '$method' not found in '$ctrlCls'");
 	exit();
 }
 
