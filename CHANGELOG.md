@@ -1,4 +1,7 @@
+04-01-2022 6.6.26
 - Core: Query error when deleting multiple links at once
+- Studio: Patch studio modules to comply with 6.6 code standards
+- Tasks: Fixed some SQL errors that occurred on MySQL 8
 
 03-01-2022 6.6.25
 - Tasks: Completely rewritten module
