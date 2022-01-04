@@ -58,13 +58,13 @@ class Module extends Entity {
 	{
 
 		if($this->isModified(['enabled']) || $this->isNew()) {
-			if($this->enabled) {
+			if($this->enabled && $this->isAvailable()) {
 				if($this->checkDepencencies) {
 					core\Module::installDependencies($this->module());
 				}
 			}else
 			{
-				if ($this->checkDepencencies) {
+				if ($this->checkDepencencies && $this->isAvailable()) {
 					$mods = core\Module::getModulesThatDependOn($this->module());
 					if (!empty($mods)) {
 						$this->setValidationError('name', ErrorCode::DEPENDENCY_NOT_SATISFIED, sprintf(GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."), implode(', ', $mods)));

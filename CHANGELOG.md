@@ -1,3 +1,5 @@
+- Core: Query error when deleting multiple links at once
+
 03-01-2022 6.6.25
 - Tasks: Completely rewritten module
 - Core: Set alternative lost password URL
