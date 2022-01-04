@@ -280,8 +280,8 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
-INSERT INTO tasks_portlet_tasklist (`createdBy`, `tasklistId`)
-    SELECT distinct user_id, tasklist_id FROM ta_portlet_tasklists;
+INSERT IGNORE INTO tasks_portlet_tasklist (`createdBy`, `tasklistId`)
+    SELECT DISTINCT user_id, tasklist_id FROM ta_portlet_tasklists;
 
 INSERT INTO tasks_tasklist (`id`, `role`, `name`, `createdBy`, `aclId`, `filesFolderId`, `version`)
     SELECT id, '1', `name`, user_id, acl_id, files_folder_id, version FROM ta_tasklists;
