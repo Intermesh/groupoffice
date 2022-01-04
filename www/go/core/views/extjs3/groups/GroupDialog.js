@@ -18,15 +18,12 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 				this.groupUserGrid.hide();
 			}
 		}, this);
-
-		this.formPanel.on("beforesetvalues", function(form, values) {
-
-		}, this);
 	},
 
 	onSubmit: function(success, groupId) {
 		//for(var id in changedModules) {
 		if(success) {
+			this.groupModuleGrid.groupId = groupId;
 			let changedModules = this.groupModuleGrid.getValue();
 			console.warn(changedModules);
 			go.Db.store('Module').set({update: changedModules});

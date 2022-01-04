@@ -4,7 +4,6 @@ namespace go\modules\community\notes\model;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
-use go\core\model\EmailTemplateAttachment;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;

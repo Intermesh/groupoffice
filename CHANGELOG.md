@@ -1,16 +1,9 @@
-6.6.11
-- Addressbook: Fix findForUser method for empty userId
-- Leavedays: Fix exception in year export
-- Core: Fix error upon saving user profile data
-- Core: Fix system settings module grid in case core module does not have id 1
-- Addressbook: drop restrictExportToAdmins system setting in favor of mayExportContacts group module permission
+04-01-2022 6.6.26
+- Core: Query error when deleting multiple links at once
+- Studio: Patch studio modules to comply with 6.6 code standards
+- Tasks: Fixed some SQL errors that occurred on MySQL 8
 
-XX-09-20216.6.10
-- Time Registration: Filter employees on currently selected date instead of current date
-- Projects: Time entries - filter employees on current project ID
-
-6.6
-
+03-01-2022 6.6.25
 - Tasks: Completely rewritten module
 - Core: Set alternative lost password URL
 - Core: Alert system to notify users about comments, assigned tasks etc.
@@ -21,6 +14,14 @@ XX-09-20216.6.10
       custom fields.
 
 
+6.5.97
+- Business: hide 'Budgetable' checkbox for special leave types
+
+03-01-2022 6.5.96
+- Business: hid transferable leave day types in favor of Special leave types
+- Business: Fixed minor mistake in activities grid
+- Leavedays: Add leave day budget combobox to leave day request
+- Leavedays: minor bugfix agreementId in year employee grid
 
 23-12-2021 6.5.95
 - Leavedays: Tweak year view to not display any numbers if an employee does not in a certain month
@@ -74,6 +75,8 @@ XX-09-20216.6.10
 
 26-11-2021 6.5.89
 - Remove obsolete timeentrydata module
+- Core: Keep debug.log file cleaner by not writing all the request and response parameters.
+- Addressbook: added Comment filter
 - Business: added sortOrder field to business_activity, made sortable by dragging and dropping
 - Leavedays: order report by business_activity.sortOrder
 - Comments: insert date header above first comment

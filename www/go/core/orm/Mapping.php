@@ -276,7 +276,7 @@ class Mapping {
 	 * @param string $propertyName
 	 * @param array $keys
 	 *
-	 * @return $this;
+	 * @return $this
 	 */
 	public function addMap(string $name, string $propertyName, array $keys): Mapping
 	{
@@ -297,7 +297,7 @@ class Mapping {
 	 * @param string $tableName
 	 * @param array $keys
 	 * 
-	 * @return $this;
+	 * @return $this
 	 */
 	public function addScalar(string $name, string $tableName, array $keys): Mapping
 	{

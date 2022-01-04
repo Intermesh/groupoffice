@@ -1,0 +1,1 @@
+a:2:{i:0;a:3:{s:3:"cls";s:18:"go\core\model\User";s:5:"paths";a:1:{i:0;a:1:{i:0;s:13:"notesSettings";}}s:6:"column";s:17:"defaultNoteBookId";}i:1;a:3:{s:3:"cls";s:37:"go\modules\community\notes\model\Note";s:5:"paths";a:1:{i:0;a:0:{}}s:6:"column";s:10:"noteBookId";}}

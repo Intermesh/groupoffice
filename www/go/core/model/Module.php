@@ -10,12 +10,14 @@ use go\core\db\Criteria;
 use go\core\fs\Folder;
 use go\core\jmap\Entity;
 use go\core\App;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\Settings;
 use go\core\validate\ErrorCode;
 use stdClass;
+use Throwable;
 
 class Module extends Entity {
 	public $id;
@@ -56,13 +58,13 @@ class Module extends Entity {
 	{
 
 		if($this->isModified(['enabled']) || $this->isNew()) {
-			if($this->enabled) {
+			if($this->enabled && $this->isAvailable()) {
 				if($this->checkDepencencies) {
 					core\Module::installDependencies($this->module());
 				}
 			}else
 			{
-				if ($this->checkDepencencies) {
+				if ($this->checkDepencencies && $this->isAvailable()) {
 					$mods = core\Module::getModulesThatDependOn($this->module());
 					if (!empty($mods)) {
 						$this->setValidationError('name', ErrorCode::DEPENDENCY_NOT_SATISFIED, sprintf(GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."), implode(', ', $mods)));
@@ -271,34 +273,39 @@ class Module extends Entity {
 	 */
 	public function isAvailable(): bool
 	{
-		
-		if(!isset($this->package)) {
-			$moduleFile = $this->folder()->getFile(ucfirst($this->name) . "Module.php");
-			if(!$moduleFile->exists() || !core\util\ClassFinder::canBeDecoded($moduleFile)) {
-				return false;
-			}
+		try {
+			if (!isset($this->package)) {
+				$moduleFile = $this->folder()->getFile(ucfirst($this->name) . "Module.php");
+				if (!$moduleFile->exists() || !core\util\ClassFinder::canBeDecoded($moduleFile)) {
+					return false;
+				}
 
-			//if module has not been refactored yet package is not set. 
-			//handle this with old class
-			$cls = "GO\\" . ucfirst($this->name) . "\\" . ucfirst($this->name) .'Module';
-			if(!class_exists($cls)){
-				return false;
-			}
-			
-			return (new $cls)->isAvailable();
-		}else {
-			if ($this->package == "core" && $this->name == "core") {
-				return true;
-			}
+				//if module has not been refactored yet package is not set.
+				//handle this with old class
+				$cls = "GO\\" . ucfirst($this->name) . "\\" . ucfirst($this->name) . 'Module';
+				if (!class_exists($cls)) {
+					return false;
+				}
 
-			$moduleFile = $this->folder()->getFile("Module.php");
-			if(!$moduleFile->exists() || !core\util\ClassFinder::canBeDecoded($moduleFile)) {
-				return false;
-			}
+				return (new $cls)->isAvailable();
+			} else {
+				if ($this->package == "core" && $this->name == "core") {
+					return true;
+				}
 
-			//todo, how to handle licenses for future packages?
-			$cls = $this->getModuleClass();
-			return class_exists($cls) && $cls::get()->isAvailable();
+				$moduleFile = $this->folder()->getFile("Module.php");
+				if (!$moduleFile->exists() || !core\util\ClassFinder::canBeDecoded($moduleFile)) {
+					return false;
+				}
+
+				//todo, how to handle licenses for future packages?
+				$cls = $this->getModuleClass();
+				return class_exists($cls) && $cls::get()->isAvailable();
+			}
+		}
+		catch(Throwable $e) {
+			core\ErrorHandler::logException($e);
+			return false;
 		}
 	}
 
@@ -532,6 +539,9 @@ class Module extends Entity {
 		return $es;
 	}
 
+	/**
+	 * @throws SaveException
+	 */
 	public function setEntities($entities) {
 		$current = $this->getEntities();
 

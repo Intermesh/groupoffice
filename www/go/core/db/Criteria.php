@@ -389,6 +389,32 @@ class Criteria {
 	}
 
 	/**
+	 * Group existing where conditions in new Criteria object.
+	 *
+	 * So change:
+	 *
+	 * ```
+	 * where foo = 1 or bar = 1
+	 * ```
+	 *
+	 * into:
+	 * ```
+	 * where (foo = 1 or bar = 1)
+	 * ```
+	 * This is useful when you want to append some conditions to an existing query that uses OR and you need some AND conditions
+	 *
+	 * @return static
+	 */
+	public function groupWhere(): Criteria
+	{
+		$criteria = new Criteria();
+		$criteria->where = $this->where;
+		$this->clearWhere();
+		$this->where($criteria);
+		return $this;
+	}
+
+	/**
 	 * Add a parameter to bind to the SQL query
 	 * 
 	 * ```````````````````````````````````````````````````````````````````````````

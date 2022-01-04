@@ -1,0 +1,1 @@
+a:15:{i:0;s:15:"permissionLevel";i:5;s:2:"id";i:6;s:13:"addressListId";i:7;s:13:"smtpAccountId";i:8;s:4:"body";i:9;s:7:"subject";i:10;s:9:"startedAt";i:11;s:10:"finishedAt";i:12;s:8:"entities";i:13;s:11:"attachments";i:14;s:7:"numSent";i:15;s:8:"numTotal";i:16;s:6:"paused";i:17;s:17:"lastMessageSentAt";i:18;s:9:"createdBy";}

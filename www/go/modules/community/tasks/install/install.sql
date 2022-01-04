@@ -284,7 +284,7 @@ COLLATE = utf8mb4_unicode_ci;
 
 create table tasks_user_settings
 (
-    userId int(11) null,
+    userId int(11) not null,
     defaultTasklistId int(11) unsigned null,
     rememberLastItems boolean not null default false,
     lastTasklistIds varchar(255) null,

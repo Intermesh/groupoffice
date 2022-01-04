@@ -37,8 +37,6 @@ class ErrorHandler {
 		if ($error) {
 			//Log only fatal errors because other errors should have been logged by the normal error handler
 			if (in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING])) {
-//				$this->printError($error['type'], $error['message'], $error['file'], $error['line']);				
-				
 				$this->exceptionHandler(new ErrorException($error['message'],0,$error['type'],$error['file'], $error['line']));
 			}
 		}
