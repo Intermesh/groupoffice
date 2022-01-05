@@ -16,10 +16,10 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist` (
   PRIMARY KEY (`id`),
   INDEX `fkCreatedBy` (`createdBy` ASC),
   INDEX `fkAcl` (`aclId` ASC),
-  CONSTRAINT `fkAcl`
-    FOREIGN KEY (`aclId`)
-    REFERENCES `core_acl` (`id`),
-  CONSTRAINT `fkCreatedBy`
+  CONSTRAINT `tasks_tasklist_ibfk1`
+      FOREIGN KEY (`aclId`)
+          REFERENCES `core_acl` (`id`),
+  CONSTRAINT `tasks_tasklist_ibfk2`
     FOREIGN KEY (`createdBy`)
     REFERENCES `core_user` (`id`))
 ENGINE = InnoDB
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
     INDEX `filesFolderId` (`filesFolderId` ASC),
     INDEX `tasks_task_groupId_idx` (`groupId` ASC),
     INDEX `tasks_vcalendar_blob_idx` (`vcalendarBlobId` ASC),
-    CONSTRAINT `fkModifiedBy`
+    CONSTRAINT `tasks_task_fkModifiedBy`
         FOREIGN KEY (`modifiedBy`)
             REFERENCES `core_user` (`id`)
             ON DELETE SET NULL,
