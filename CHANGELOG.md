@@ -1,3 +1,6 @@
+06-01-2022 6.6.27
+- Core: Fixed several upgrade issues
+
 04-01-2022 6.6.26
 - Core: Query error when deleting multiple links at once
 - Studio: Patch studio modules to comply with 6.6 code standards
