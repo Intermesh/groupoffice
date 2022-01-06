@@ -33,7 +33,7 @@ class Installer {
 	
 	use event\EventEmitterTrait;
 	
-	const MIN_UPGRADABLE_VERSION = "6.5.96";
+	const MIN_UPGRADABLE_VERSION = "6.5.94";
 	
 	const EVENT_UPGRADE = 'upgrade';
 

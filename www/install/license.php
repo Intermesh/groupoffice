@@ -1,25 +1,26 @@
 <?php
 require('../vendor/autoload.php');
-\go\core\App::get();
-\go()->setCache(new \go\core\cache\None());
+
+use go\core\event\EventEmitterTrait;
+use go\core\model\Module;
+use go\modules\business\studio\Module as StudioModule;
+use go\core\App;
+
+App::get();
+go()->setCache(new \go\core\cache\None());
+
+// needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
+// system.
+EventEmitterTrait::$disableEvents = true;
+
+if(Module::isInstalled("business", "studio")) {
+	$studioError = StudioModule::patch65to66();
+}
 
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 
 
-
-
-use GO\Base\Cron\CronJob;
-use GO\Base\Model\Module;
-use GO\Base\Observable;
-use go\modules\community\bookmarks\Module as BookmarksModule;
-use go\modules\community\comments\Module as CommentsModule;
-use go\core\App;
-use go\core\jmap\State;
-use go\core;
-use go\modules\community\googleauthenticator\Module as GAModule;
-use go\modules\community\notes\Module as NotesModule;
-use go\modules\community\addressbook\Module as AddressBookModule;
 
 
 
