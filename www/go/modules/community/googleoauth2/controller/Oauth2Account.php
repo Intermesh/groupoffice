@@ -4,12 +4,15 @@ namespace go\modules\community\googleoauth2\controller;
 
 
 use go\core\Controller;
+use go\core\http\Exception;
 use go\modules\community\email\model\Account;
 use go\modules\community\googleoauth2\model;
 use League\OAuth2\Client\Provider\Google;
 
 final class Oauth2Account extends Controller
 {
+
+	private $provider = null;
 
 	public function entityClass()
 	{
@@ -18,77 +21,44 @@ final class Oauth2Account extends Controller
 
 	public function callback()
 	{
-		die('woef');
-	}
-
-
-	public function test()
-	{
-		die('1 2 4');
-	}
-
-	/**
-	 * Authenticate using google Oauth settings for current account ID
-	 *
-	 * @param array $params
-	 * @throws \GO\Base\Exception\MissingParameter
-	 * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
-	 */
-	public function auth(array $params)
-	{
-		$accountId = isset($params['accountId']) ? $params['accountId'] : null;
-		if (!$accountId) {
-			throw new \GO\Base\Exception\MissingParameter(go()->t("Missing parameter"));
-		}
-
-		$acct = Account::findById($accountId);
-		$acctSettings = $acct->googleOauth2;
-
-		// TODO? Session
-
-		$provider = new Google([
-			'clientId' => $acctSettings->clientId,
-			'clientSecret' => $acctSettings->clientSecret,
-			'redirectUri' => 'http://localhost:8000/api/jmap.php' // TODO?
-		]);
-
 		if (!empty($_GET['error'])) {
+			throw new Exception('Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
+		}
+		$accountId = \GO::session()->values['accountId'];
+		$provider = $this->getProvider($accountId);
 
-			// Got an error, probably user denied access
-			exit('Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'));
-
-		} elseif (empty($_GET['code'])) {
-
-			// If we don't have an authorization code then get one
-			$authUrl = $provider->getAuthorizationUrl();
-
-			$_SESSION['oauth2state'] = $provider->getState();
-			$r = \go\core\http\Response::get();
-			$r->setHeader('Location', $authUrl);
-			$r->sendHeaders();
-			exit;
-
-		} elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+		if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
 
 			// State is invalid, possible CSRF attack in progress
 			unset($_SESSION['oauth2state']);
-			exit('Invalid state');
-
+			throw new Exception('Invalid state');
 		} else {
-
 			// Try to get an access token (using the authorization code grant)
 			$token = $provider->getAccessToken('authorization_code', [
 				'code' => $_GET['code']
 			]);
 
+
+//			$acctSettings = $acct->googleOauth2;
+//
+//			$acctSettings->setValues([
+//				'token' => $token->getToken(),
+//				'refreshToken' => $token->getRefreshToken(),
+//				'expires' => $token->getExpires()
+//			])->save();
+//
 			// Optional: Now you have a token you can look up a users profile data
 			try {
-
+				$acct = Account::findById($accountId);
+				$acct->googleOauth2->token = $token->getToken();
+				$acct->googleOauth2->refreshToken = $token->getRefreshToken();
+				$acct->googleOauth2->expires = $token->getExpires();
+				$acct->save();
 				// We got an access token, let's now get the owner details
 				$ownerDetails = $provider->getResourceOwner($token);
 
 				// Use these details to create a new profile
-				printf('Hello %s!', $ownerDetails->getFirstName());
+				printf('Hello %s!&nbsp;', $ownerDetails->getFirstName());
 
 			} catch (\Exception $e) {
 
@@ -96,15 +66,56 @@ final class Oauth2Account extends Controller
 				exit('Something went wrong: ' . $e->getMessage());
 
 			}
+			echo  '<a href="javascript:window.close()">'. go()->t("Click here") . '</a> ' . go()->t("to close this window");
+			exit(0);
 
-			// Use this to interact with an API on the users behalf
-			echo $token->getToken();
-
-			// Use this to get a new access token if the old one expires
-			echo $token->getRefreshToken();
-
-			// Unix timestamp at which the access token expires
-			echo $token->getExpires();
 		}
+	}
+
+
+	/**
+	 * Authenticate using google Oauth settings for current account ID
+	 *
+	 * @param int $accountId
+	 * @throws \GO\Base\Exception\MissingParameter
+	 * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
+	 */
+	public function auth(int $accountId)
+	{
+		\GO::session()->values['accountId'] = $accountId;
+		$provider = $this->getProvider($accountId);
+
+		if (!empty($_GET['error'])) {
+			throw new Exception('Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
+		}
+
+		// If we don't have an authorization code then get one
+		$authUrl = $provider->getAuthorizationUrl();
+
+		$_SESSION['oauth2state'] = $provider->getState();
+		$r = \go\core\http\Response::get();
+		$r->setHeader('Location', $authUrl);
+		$r->sendHeaders();
+		exit;
+	}
+
+
+	/**
+	 * Prepare ourselves a Google Provider
+	 *
+	 * @param int $accountId
+	 * @return Google
+	 * @throws \Exception
+	 */
+	private function getProvider(int $accountId): Google
+	{
+		$acct = Account::findById($accountId);
+		$acctSettings = $acct->googleOauth2;
+		$url = rtrim(go()->getSettings()->URL, '/');
+		return new Google([
+			'clientId' => $acctSettings->clientId,
+			'clientSecret' => $acctSettings->clientSecret,
+			'redirectUri' => $url . '/gauth/callback'
+		]);
 	}
 }

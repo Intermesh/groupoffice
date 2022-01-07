@@ -12,13 +12,13 @@ use go\modules\community\googleoauth2\model\Oauth2Account;
  * @author Joachim van de Haterd <jvdhaterd@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-class Module extends core\Module {
+class Module extends core\Module
+{
 							
-	public function getAuthor() {
+	public function getAuthor() :string
+	{
 		return "Intermesh BV <info@intermesh.nl>";
 	}
-
-
 
 
 	public function defineListeners()

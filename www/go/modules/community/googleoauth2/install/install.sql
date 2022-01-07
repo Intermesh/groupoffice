@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `oauth2_accounts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE `oauth2_accounts`
+    ADD PRIMARY KEY (`accountId`),
     ADD KEY `accountId` (`accountId`);
 
 ALTER TABLE `oauth2_accounts`

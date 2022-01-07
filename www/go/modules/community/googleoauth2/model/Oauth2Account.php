@@ -28,6 +28,20 @@ class Oauth2Account extends Property
 	 */
 	public $projectId;
 
+	/**
+	 * @var string
+	 */
+	public $token;
+
+	/**
+	 * @var string
+	 */
+	public $refreshToken;
+
+	/**
+	 * @var int Unix timestamp
+	 */
+	public $expires;
 
 	protected static function defineMapping()
 	{

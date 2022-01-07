@@ -19,7 +19,7 @@ use GO\Base\Mail\Imap;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 use \GO\Base\Mail\Exception\MailboxNotFound;
 /**
- * The LinkedEmail model
+ * The Email model
  *
  * @property boolean $ignore_sent_folder
  * @property int $password_encrypted
@@ -52,6 +52,7 @@ use \GO\Base\Mail\Exception\MailboxNotFound;
  * @property int $sieve_port
  * @property boolean $sieve_tls
  * @property boolean $sieve_usetls
+ * @property string $authenticationMethod
  */
 class Account extends \GO\Base\Db\ActiveRecord
 {

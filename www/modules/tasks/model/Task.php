@@ -181,21 +181,6 @@ class Task extends \GO\Base\Db\ActiveRecord {
 		return parent::afterSave($wasNew);
 	}
 	
-//	public function afterLink(\GO\Base\Db\ActiveRecord $model, $isSearchCacheModel, $description = '', $this_folder_id = 0, $model_folder_id = 0, $linkBack = true) {
-//		throw new \Exception();
-//		$modelName = $isSearchCacheModel ? $model->model_name : $model->className;
-//		$modelId = $isSearchCacheModel ? $model->model_id : $model->id;
-//		echo $modelName;
-//		if($modelName=="GO\Projects\Model\Project")
-//		{
-//			$this->project_id=$modelId;
-//			$this->save();
-//		}
-//		
-//		
-//		return parent::afterLink($model, $isSearchCacheModel, $description, $this_folder_id, $model_folder_id, $linkBack);
-//	}
-	
 	protected function afterDelete() {
 		$this->deleteReminders();
 
@@ -440,13 +425,13 @@ class Task extends \GO\Base\Db\ActiveRecord {
 		if($this->reminder>0){
 			
 			$a=$calendar->createComponent('VALARM');
-			
-//			BEGIN:VALARM
-//ACTION:DISPLAY
-//TRIGGER;VALUE=DURATION:-PT5M
-//DESCRIPTION:Default Mozilla Description
-//END:VALARM
-			
+
+			//			BEGIN:VALARM
+			//ACTION:DISPLAY
+			//TRIGGER;VALUE=DURATION:-PT5M
+			//DESCRIPTION:Default Mozilla Description
+			//END:VALARM
+
 			$a->action='DISPLAY';			
 			$a->add('trigger',date('Ymd\THis', $this->reminder), array('value'=>'DATE-TIME'));			
 			$a->description="Alarm";			

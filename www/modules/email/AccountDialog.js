@@ -14,8 +14,6 @@
 GO.email.AccountDialog = function(config) {
 	Ext.apply(this, config);
 
-//	var sslCb;
-
 	var advancedItems = [ new Ext.form.TextField({
 		fieldLabel : t("Root mailbox", "email"),
 		name : 'mbroot'
@@ -57,12 +55,12 @@ GO.email.AccountDialog = function(config) {
 			selectOnFocus : true,
 			forceSelection : true,
 			width: 300,
-			value: 'credentials',
+			value: 'Credentials',
 			store: new Ext.data.SimpleStore({
 				fields: ['id', 'text'],
 				data: [
-					['credentials', t("User name and password")],
-					['OAuth2', t("Google OAuth2")]
+					['Credentials', t("User name and password")],
+					['GoogleOauth2', t("Google OAuth2")]
 				]
 			}),
 			listeners: {
@@ -586,7 +584,7 @@ GO.email.AccountDialog = function(config) {
 			text: 'OAuth2',
 			handler : function() {
 				console.clear();
-				let url = GO.url("googleauthorize",{accountId: this.account_id});
+				const url = 'gauth/authenticate/' + this.account_id;
 				console.log(url);
 				window.open(url, 'do_da_google_auth_thingy');
 				// This works, but will trigger a CORS error. Naturally, since oauth does not like Ajax
@@ -652,8 +650,6 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 				action.result.refreshNeeded = this.refreshNeeded
 				|| this.account_id == 0;
 				if (action.result.id) {
-					//this.account_id = action.result.account_id;
-					// this.foldersTab.setDisabled(false);
 					this.loadAccount(action.result.id);
 				}
 				
