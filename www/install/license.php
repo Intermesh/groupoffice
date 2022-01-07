@@ -13,7 +13,7 @@ go()->setCache(new \go\core\cache\None());
 // system.
 EventEmitterTrait::$disableEvents = true;
 
-if(Module::isInstalled("business", "studio")) {
+if(go()->getDatabase()->hasTable("studio_studio")) {
 	$studioError = StudioModule::patch65to66();
 }
 
