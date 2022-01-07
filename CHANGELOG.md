@@ -1,3 +1,6 @@
+07-01-2022 6.6.28
+- Business: Fixed update query for older mysql versions
+
 06-01-2022 6.6.27
 - Core: Fixed several upgrade issues
 
