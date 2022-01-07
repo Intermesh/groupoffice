@@ -2403,6 +2403,7 @@ table[id^="comments-ext"] b {
 	*[disabled] {
 		opacity: 0.65;
 		cursor: not-allowed;
+		pointer-events: none;
 	}
 
 	.mask-message{
