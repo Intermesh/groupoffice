@@ -1,5 +1,6 @@
 - Fixed Issue: Import into address book is not possible (Issue #775)
 - Core: Suppress too many changes error
+- Business: Delay loading of business and activities in system settings
 
 07-01-2022 6.6.28
 - Business: Fixed update query for older mysql versions
