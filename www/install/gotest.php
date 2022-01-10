@@ -556,6 +556,31 @@ function output_system_test() :bool
 	} else {
 		echo '<p><b>Passed!</b> '.$product_name.' should run on this machine</p>';
 	}
+
+
+
+	function getHost(): string
+	{
+		$possibleHostSources = array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST', 'SERVER_NAME', 'SERVER_ADDR');
+		$sourceTransformations = array(
+			"HTTP_X_FORWARDED_HOST" => function ($value) {
+				$elements = explode(',', $value);
+				return trim(end($elements));
+			}
+		);
+		$host = '';
+		foreach ($possibleHostSources as $source) {
+			if (!empty($host)) break;
+			if (empty($_SERVER[$source])) continue;
+			$host = $_SERVER[$source];
+			if (array_key_exists($source, $sourceTransformations)) {
+				$host = $sourceTransformations[$source]($host);
+			}
+		}
+
+		$host = trim($host);
+		return preg_replace('/:\d+$/', '', $host);
+	}
 	
 	
 	echo '<table style="font:12px Arial"><tr>
@@ -567,7 +592,7 @@ function output_system_test() :bool
 
 <tr>
 	<td valign="top">Server name:</td>
-	<td>'.$_SERVER['SERVER_NAME'].'</td>
+	<td>'.getHost().'</td>
 </tr>
 <tr>
 	<td valign="top">Server IP:</td>
