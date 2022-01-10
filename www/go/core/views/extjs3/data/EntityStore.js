@@ -311,21 +311,17 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					});
 				}
 
+				return this.setState(changes.newState).then(() => {
 
-				this.setState(changes.newState).then(() => {
+					return Promise.reject({type: "cannotcalculatechanges", detail: "test", message: "test"});
+
 					if(changes.hasMoreChanges) {
 
 						//unofficial response but we use it to process no more than 100000 changes. A resync is
 						//more efficient in the webclient in that case.
 						if(changes.totalChanges > 10000) {
 							const errorMsg = "Too many changes for '" + this.entity.name + "' in state '" + this.state + "' " + changes.totalChanges + " > 10000";
-							console.error(errorMsg);
-							return this.clearState().then((response)  => {
-								if(cb) {
-									cb.call(scope || this, this, false);
-								}
-								return Promise.reject({type: "cannotcalculatechanges", detail: errorMsg, message: errorMsg})
-							});
+							return Promise.reject({type: "cannotcalculatechanges", detail: errorMsg, message: errorMsg});
 						}
 						return this.getUpdates(cb, scope);
 					} else
@@ -341,10 +337,15 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				});
 
 			}).catch((response) => {
+				console.error(response);
 				return this.clearState().then((response) => {
+
 					if(cb) {
 						cb.call(scope || this, this, false);
 					}
+
+					this._fireChanges();
+
 					return response;
 				});
 			});
