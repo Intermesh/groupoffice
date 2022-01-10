@@ -139,8 +139,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		});
 
 		this.addressBookTree.getLoader().on('load', (loader, node, response) => {
-			console.warn(response);
-
 			this.loadMoreButton.setVisible(response.queryResponse.hasMore);
 		});
 		
