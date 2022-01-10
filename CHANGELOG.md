@@ -1,3 +1,6 @@
+6.4.246
+- Core: Prevent exception when trying to duplicate existing link
+
 09-12-2021 6.4.245
 - Savemailas: override mtime to email date
 - Calendar: backport prevent error when event is cancelled for disabled user
