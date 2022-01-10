@@ -1,13 +1,14 @@
-<?php
+<?php /** @noinspection PhpUndefinedFieldInspection */
+
 namespace go\modules\community\addressbook\convert;
 
 use Exception;
-use GO;
 use go\core\data\convert\AbstractConverter;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\orm\Entity;
+use go\core\orm\Property as OrmProperty;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\modules\community\addressbook\model\Address;
@@ -17,6 +18,11 @@ use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
 use go\core\model\Link;
 use Sabre\VObject\Component\VCard as VCardComponent;
+use Sabre\VObject\Component\VCard as VObjectVCard;
+use Sabre\VObject\Document;
+use Sabre\VObject\Document as SabreDocument;
+use Sabre\VObject\ParseException;
+use Sabre\VObject\Property;
 use Sabre\VObject\Reader;
 use Sabre\VObject\Splitter\VCard as VCardSplitter;
 
@@ -34,15 +40,14 @@ class VCard extends AbstractConverter {
 		parent::__construct('vcf', Contact::class);
 	}
 
-
-	const EMPTY_NAME = '(no name)';
-
 	/**
-	 * 
+	 *
 	 * @param Contact $contact
-	 * @return VCardComponent
+	 * @return Document
+	 * @throws Exception
 	 */
-	private function getVCard(Contact $contact) {
+	private function getVCard(Contact $contact): Document
+	{
 		
 		if ($contact->vcardBlobId) {
 			//Contact has a stored VCard 
@@ -65,7 +70,7 @@ class VCard extends AbstractConverter {
 		}
 
 		//We have to use 3.0 for the photo property :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
-		return new VCardComponent([
+		return new VObjectVCard([
 				"VERSION" => "3.0",
 				"UID" => $contact->getUid()
 		]);
@@ -74,9 +79,11 @@ class VCard extends AbstractConverter {
 	/**
 	 * Parse an Event object to a VObject
 	 * @param Contact $contact
+	 * @throws Exception
 	 */
 	
-	public function export(Entity $contact) {
+	public function export(Entity $contact): string
+	{
 
 		$vcard = $this->getVCard($contact);
 
@@ -146,7 +153,10 @@ class VCard extends AbstractConverter {
 
 		return $vcard->serialize();
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function exportOrganization(Contact $contact) {
 		
 			$organizations = Contact::find()
@@ -176,12 +186,19 @@ class VCard extends AbstractConverter {
 		$this->fp = $this->tempFile->open('w+');
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function exportEntity(Entity $entity): void
 	{
 		$str = $this->export($entity);
 		fputs($this->fp, $str);
 	}
 
+	/**
+	 * @throws Exception
+	 * @noinspection DuplicatedCode
+	 */
 	protected function finishExport(): Blob
 	{
 		$cls = $this->entityClass;
@@ -195,32 +212,30 @@ class VCard extends AbstractConverter {
 	}
 
 	/**
-	 * 
+	 *
+	 * @param Contact $entity
 	 * @param array $prop
-	 * @param \Sabre\VObject\Property  $vcardProp
-	 * @param string $cls
-	 * @param function $fn
-	 * @return \go\modules\community\addressbook\convert\cls
+	 * @param Property|null $vcardProp
+	 * @param class-string<OrmProperty> $cls
+	 * @param callable $fn
+	 * @return OrmProperty[]
 	 */
-	private function importHasMany(array $prop, $vcardProp, $cls, $fn) {
-
-		if (isset($vcardProp)) {		
+	private function importHasMany(Contact $entity, array $prop, ?Property $vcardProp, string $cls, callable $fn): array {
+		$index = 0;
+		if (!empty($vcardProp)) {
 			foreach ($vcardProp as $index => $value) {
 				if (!isset($prop[$index])) {
-					$prop[$index] = new $cls;
+					$prop[$index] = new $cls($entity);
 				}
 
-				$prop[$index]->type = $this->convertType($value['TYPE']);
+				/** @noinspection PhpPossiblePolymorphicInvocationInspection */
+				$prop[$index]->type = $this->convertType((string) $value['TYPE']);
 				$v = call_user_func($fn, $value);
 				$prop[$index]->setValues($v);
 			}
 			$index++;
-		}else
-		{
-			$index = 0;
 		}
-		
-		
+
 		$c = count($prop);
 		if ($c > $index) {
 			array_splice($prop, $index, $c - $index);
@@ -229,13 +244,16 @@ class VCard extends AbstractConverter {
 		return $prop;
 	}
 
-	private function importDate(Contact $contact, $type, $date) {
+	/**
+	 * @throws Exception
+	 */
+	private function importDate(Contact $contact, string $type, ?Property $date) {
 			
 		$bday = $contact->findDateByType($type, false);
 
 		if (!empty($date)) {
 			if (!$bday) {
-				$bday = new Date();
+				$bday = new Date($contact);
 				$bday->type = $type;
 				$contact->dates[] = $bday;
 			}
@@ -243,7 +261,7 @@ class VCard extends AbstractConverter {
 		} else {
 			if ($bday) {
 				$contact->dates = array_filter($contact->dates, function($d) use($bday) {
-					$d !== $bday;
+					return $d !== $bday;
 				});
 			}
 		}
@@ -253,13 +271,15 @@ class VCard extends AbstractConverter {
 	/**
 	 * Parse a VObject to an Contact object
 	 * @param VCardComponent $vcardComponent
-	 * @param Contact $entity
-	 * @return Contact[]
+	 * @param Entity|null $entity
+	 * @return Contact
+	 * @throws Exception
+	 * @noinspection PhpCastIsUnnecessaryInspection
 	 */
-	public function import(VCardComponent $vcardComponent, Entity $entity = null)
+	public function import(VCardComponent $vcardComponent, Entity $entity = null): Contact
 	{
 		if ($vcardComponent->VERSION != "3.0") {
-			$vcardComponent = $vcardComponent->convert(\Sabre\VObject\Document::VCARD30);
+			$vcardComponent = $vcardComponent->convert(SabreDocument::VCARD30);
 		}
 
 		if (!isset($entity)) {
@@ -307,7 +327,7 @@ class VCard extends AbstractConverter {
 		$this->importDate($entity, Date::TYPE_ANNIVERSARY, $vcardComponent->ANNIVERSARY);
 
 		empty($vcardComponent->NOTE) ?: $entity->notes = (string) $vcardComponent->NOTE;
-		$entity->emailAddresses = $this->importHasMany($entity->emailAddresses, $vcardComponent->EMAIL, EmailAddress::class, function($value) {
+		$entity->emailAddresses = $this->importHasMany($entity, $entity->emailAddresses, $vcardComponent->EMAIL, EmailAddress::class, function($value) {
 			return ['email' => (string) $value];
 		});
 
@@ -328,11 +348,11 @@ class VCard extends AbstractConverter {
 			$entity->firstName = $entity->name;
 		}
 
-		$entity->phoneNumbers = $this->importHasMany($entity->phoneNumbers, $vcardComponent->TEL, PhoneNumber::class, function($value) {
+		$entity->phoneNumbers = $this->importHasMany($entity, $entity->phoneNumbers, $vcardComponent->TEL, PhoneNumber::class, function($value) {
 			return ['number' => (string) $value];
 		});
 
-		$entity->addresses = $this->importHasMany($entity->addresses, $vcardComponent->ADR, Address::class, function($value) {
+		$entity->addresses = $this->importHasMany($entity, $entity->addresses, $vcardComponent->ADR, Address::class, function($value) {
 			$a = $value->getParts();
 			$addr = [];
 			
@@ -366,7 +386,10 @@ class VCard extends AbstractConverter {
 		
 		return $entity;
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function importPhoto(Contact $entity, VCardComponent $vcardComponent) {
 		$vcardComponent = isset($vcardComponent->PHOTO) ? $vcardComponent->PHOTO->getValue() : null;
 		if ($vcardComponent) {
@@ -381,7 +404,8 @@ class VCard extends AbstractConverter {
 		}
 	}
 
-	private function getVCardOrganizations($vcard) {
+	private function getVCardOrganizations(VObjectVCard $vcard): array
+	{
 		$vcardOrganizationNames = [];
 		if(isset($vcard->ORG)) {
 			foreach ($vcard->ORG as $org) {
@@ -400,18 +424,24 @@ class VCard extends AbstractConverter {
 	 * 
 	 * We detect this syntax on import.
 	 * 
-	 * @param type $name
-	 * @return type
+	 * @param string $name
+	 * @return string[]
 	 */
-	private function splitOrganizationName($name) {
+	private function splitOrganizationName(string $name): array {
 		if(preg_match_all('/\[[0-9]+] ([^\[]*)/', $name, $matches)){
 			return array_map('trim', $matches[1]);
 		}
 		
 		return [$name];
 	}
-	
-	private function importOrganizations(Contact $contact, $vcard) {		
+
+	/**
+	 * @param Contact $contact
+	 * @param VObjectVCard $vcard
+	 * @return void
+	 * @throws Exception
+	 */
+	private function importOrganizations(Contact $contact, VObjectVCard $vcard) {
 		
 		$vcardOrganizationNames = $this->getVCardOrganizations($vcard);
 		
@@ -427,7 +457,7 @@ class VCard extends AbstractConverter {
 		foreach ($goOrganizations as $o) {
 			if (!in_array($o->name, $vcardOrganizationNames)) {
 				if(!Link::deleteLink($o, $contact)) {
-					throw new \Exception("Could not unlink organization " . $o->name);
+					throw new Exception("Could not unlink organization " . $o->name);
 				}
 			} else {
 				$goOrganizationsNames[] = $o->name;
@@ -458,8 +488,8 @@ class VCard extends AbstractConverter {
 		}
 	}
 
-	private static function convertType($vCardType) {
-		$types = explode(',', strtolower((string) $vCardType));
+	private static function convertType(string $vCardType): ?string {
+		$types = explode(',', strtolower($vCardType));
 		foreach($types as $type) {
 			
 			//skip internet type.
@@ -467,14 +497,19 @@ class VCard extends AbstractConverter {
 				return $type;
 			}
 		}
+
+		return null;
 	}
 
 	public function getFileExtension(): string
 	{
 		return 'vcf';
 	}
-	
-	protected function importEntity() {
+
+	/**
+	 * @throws Exception
+	 */
+	protected function importEntity(): Contact {
 		//not needed because of import file override
 		$contact = $this->findOrCreateContact($this->card);
 
@@ -484,8 +519,14 @@ class VCard extends AbstractConverter {
 
 	}
 
+	/**
+	 * @var VObjectVCard
+	 */
 	private $card;
 
+	/**
+	 * @throws ParseException
+	 */
 	protected function nextImportRecord(): bool
 	{
 		$this->card = $this->splitter->getNext();
@@ -496,7 +537,7 @@ class VCard extends AbstractConverter {
 		}
 
 		if ($this->card->VERSION != "3.0") {
-			$this->card = $this->card->convert(\Sabre\VObject\Document::VCARD30);
+			$this->card = $this->card->convert(SabreDocument::VCARD30);
 		}
 
 		return $this->card != false;
@@ -510,8 +551,12 @@ class VCard extends AbstractConverter {
 
 	protected $values;
 
+	/**
+	 * @throws Exception
+	 */
 	protected function initImport(File $file): void
 	{
+		/** @noinspection PhpParamsInspection */
 		$this->splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 		if(!isset( $this->clientParams['values']))
 		{
@@ -532,9 +577,8 @@ class VCard extends AbstractConverter {
 	/**
 	 *
 	 * @param VCardComponent $vcardComponent
-	 * @param int $addressBookId
 	 * @return Contact
-	 * @throws \ReflectionException
+	 * @throws Exception
 	 */
 	private function findOrCreateContact(VCardComponent $vcardComponent) {
 		$contact = false;
@@ -559,12 +603,13 @@ class VCard extends AbstractConverter {
 	 * @return Blob
 	 * @throws Exception
 	 */
-	private function saveBlob(VCardComponent $vcardComponent){
+	private function saveBlob(VCardComponent $vcardComponent): Blob
+	{
 		$blob = Blob::fromString($vcardComponent->serialize());
 		$blob->type = 'text/vcard';
 		$blob->name = ($vcardComponent->uid ?? 'nouid' ) . '.vcf';
 		if(!$blob->save()) {
-			throw new \Exception("could not save vcard blob: " . $blob->getValidationErrorsAsString());
+			throw new Exception("could not save vcard blob: " . $blob->getValidationErrorsAsString());
 		}
 		
 		return $blob;
