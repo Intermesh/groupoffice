@@ -54,7 +54,7 @@ class goTask extends GoBaseBackendDiff {
 			$message->complete = $task->getProgress() == Progress::$db[Progress::Completed] ? 1 : 0;
 
 			if($message->complete) {
-				$message->datecompleted = $task->progressUpdated->format("U");
+				$message->datecompleted = $task->progressUpdated ? $task->progressUpdated->format("U") : $task->modifiedAt->format("U");
 			}
 
 			$message->reminderset = empty($task->alerts) ? 0 : 1;
