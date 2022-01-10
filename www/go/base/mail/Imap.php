@@ -28,6 +28,11 @@ class Imap extends ImapBodyStruct
 
 	var $auth='plain';
 
+	/**
+	 * @var null|string
+	 */
+	private $token;
+
 	var $selected_mailbox=false;
 
 	var $touched_folders =array();
@@ -79,19 +84,21 @@ class Imap extends ImapBodyStruct
 	/**
 	 * Connects to the IMAP server and authenticates the user
 	 *
-	 * @param <type> $server
-	 * @param <type> $port
-	 * @param <type> $username
-	 * @param <type> $password
-	 * @param <type> $ssl
-	 * @param <type> $starttls
+	 * @param string $server
+	 * @param int $port
+	 * @param string $username
+	 * @param string $password
+	 * @param bool $ssl
+	 * @param bool $starttls
+	 * @param string $auth
+	 * @param string|null $token
 	 * @return bool
 	 * @throws ImapAuthenticationFailedException
 	 */
 
-	public function connect($server, $port, $username, $password, $ssl=false, $starttls=false, $auth='plain') :bool
+	public function connect(string $server, int $port, string $username, string $password, bool $ssl=false, bool $starttls=false, string $auth='plain', ?string $token= null ) :bool
 	{
-		if(empty($password)){
+		if(empty($password) && strtolower($auth) == 'plain'){
 			throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
 		}
 
@@ -99,16 +106,28 @@ class Imap extends ImapBodyStruct
 		$this->starttls = $starttls;
 		$this->auth = strtolower($auth);
 
+		if($token) {
+			$this->token = $token;
+		}
+
 		$this->server=$server;
 		$this->port=$port;
 		$this->username=$username;
 		$this->password=$password;
 
-		$context_options = array();
+		$context_options = null;//array(); -> Must be an associative array of associative arrays in the format $arr['wrapper']['option'] = $value, or null
 		if($this->ignoreInvalidCertificates) {
 			$context_options = array('ssl' => array(
 					"verify_peer"=>false,
 					"verify_peer_name"=>false
+			));
+		}
+		if($this->auth === 'googleoauth2') {
+			$context_options = array('html' => array(
+				'header' => [
+					'authentication' => 'Bearer ' . $token,
+					'connection' => 'close'
+					]
 			));
 		}
 		$streamContext = stream_context_create($context_options);
@@ -123,13 +142,7 @@ class Imap extends ImapBodyStruct
 			throw new \Exception('Failed to open socket #'.$errorno.'. '.$errorstr);
 		}
 
-		$authed = $this->authenticate($username, $password);
-
-		if(!$authed) {
-			return false;
-		}
-
-		return true;
+		return $this->authenticate($username, $password);
 	}
 
 	/**
@@ -204,8 +217,10 @@ class Imap extends ImapBodyStruct
 				$this->commands[trim($challenge_response)] = \GO\Base\Util\Date::getmicrotime();
 				fputs($this->handle, $challenge_response."\r\n");
 				break;
-			case 'oauth2':
-				// TODO
+			case 'googleoauth2':
+				$str = base64_encode("user=" . $this->username . "^Aauth=Bearer " . $this->token . "^A^A");
+				$cmd = 'A' . $this->command_number() . ' AUTHENTICATE XOAUTH2 ' . $str;
+				fputs($this->handle, $cmd);
 				break;
 			default:
 				$login = 'A'.$this->command_number().' LOGIN "'.$this->_escape( $username).'" "'.$this->_escape( $pass). "\"\r\n";
@@ -220,8 +235,9 @@ class Imap extends ImapBodyStruct
 			$response = array_pop($res);
 
 			//Sometimes an extra empty line comes along
-			if(!$response && count($res)==2)
+			if(!$response && count($res)==2) {
 				$response = array_pop($res);
+			}
 
 			$this->short_responses[$response] = \GO\Base\Util\Date::getmicrotime();
 			if (!$this->auth) {
@@ -232,10 +248,12 @@ class Imap extends ImapBodyStruct
 					$this->banner = $res[0];
 				}
 			}
-			if (stristr($response, 'A'.$this->command_count.' OK')) {
+			if($this->auth === 'googleoauth2' && stristr($response, 'OK Gimap ready')!== false) {
 				$authed = true;
 				$this->state = 'authed';
-
+			} elseif (stristr($response, 'A'.$this->command_count.' OK')) {
+				$authed = true;
+				$this->state = 'authed';
 
 				//some imap servers like dovecot respond with the capability after login.
 				//Set this in the session so we don't need to do an extra capability command.
@@ -817,9 +835,8 @@ class Imap extends ImapBodyStruct
 		$box = $this->utf7_encode($mailbox_name);
 		$this->clean($box, 'mailbox');
 
-//		\GO::debug("Selecting IMAP mailbox $box");
-
 		$command = "SELECT \"$box\"\r\n";
+//		$command = "SELECT \"$box\"";
 
 		$this->send_command($command);
 		$res = $this->get_response(false, true);

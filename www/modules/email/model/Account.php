@@ -18,6 +18,8 @@ use GO;
 use GO\Base\Mail\Imap;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 use \GO\Base\Mail\Exception\MailboxNotFound;
+use go\modules\community\googleoauth2\model\Oauth2Account;
+
 /**
  * The Email model
  *
@@ -58,7 +60,12 @@ class Account extends \GO\Base\Db\ActiveRecord
 {
 	
 	const ACL_DELEGATED_PERMISSION=15;
-	
+
+	/**
+	 * Default value for $this->>authenticationMethod
+	 */
+	const DEFAULT_AUTHENTICATION_METHOD = 'Credentials';
+
 	/**
 	 * Set to false if you don't want the IMAP connection on save.
 	 * 
@@ -140,9 +147,10 @@ class Account extends \GO\Base\Db\ActiveRecord
 	 */
 	public function relations() {
 		return array(
-				'aliases' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\Alias', 'field'=>'account_id','delete'=>true),
-				'filters' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\Filter', 'field'=>'account_id','delete'=>true, 'findParams'=>  \GO\Base\Db\FindParams::newInstance()->order("priority")),
-				'portletFolders' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\PortletFolder', 'field'=>'account_id','delete'=>true)
+			'aliases' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\Alias', 'field'=>'account_id','delete'=>true),
+			'filters' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\Filter', 'field'=>'account_id','delete'=>true, 'findParams'=>  \GO\Base\Db\FindParams::newInstance()->order("priority")),
+			'googleOauth2' => array('type' => self::HAS_ONE, 'model' => 'go\modules\community\googleoauth2\model\Oauth2Account', 'field' => 'accountId', 'delete' => true),
+			'portletFolders' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\PortletFolder', 'field'=>'account_id','delete'=>true)
 		);
 	}
 
@@ -301,8 +309,10 @@ class Account extends \GO\Base\Db\ActiveRecord
 	}
 	
 
-	public function decryptPassword(){
-
+	public function decryptPassword() {
+		if($this->authenticationMethod !== self::DEFAULT_AUTHENTICATION_METHOD) {
+			return '';
+		}
 		if (!empty(GO::session()->values['emailModule']['accountPasswords'][$this->id])) {
 			$decrypted = \GO\Base\Util\Crypt::decrypt(GO::session()->values['emailModule']['accountPasswords'][$this->id]);
 		} else {
@@ -348,7 +358,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 	 * @throws GO\Base\Mail\Exception\MailboxNotFound
 	 * @throws ImapAuthenticationFailedException
 	 */
-	public function openImapConnection($mailbox = 'INBOX') :Imap
+	public function openImapConnection(string $mailbox = 'INBOX') :Imap
 	{
 		$imap = $this->justConnect();
 
@@ -371,7 +381,23 @@ class Account extends \GO\Base\Db\ActiveRecord
 			$this->_imap->ignoreInvalidCertificates = $this->imap_allow_self_signed;
 			$useTLS = $this->imap_encryption == 'tls' ? true : false;
 			$useSSL = $this->imap_encryption == 'ssl' ? true : false;
-			$this->_imap->connect($this->host, $this->port, $this->username, $this->decryptPassword(), $useSSL, $useTLS);
+			$token = null;
+			$auth = 'plain';
+
+			if($this->authenticationMethod !== self::DEFAULT_AUTHENTICATION_METHOD ) {
+				$auth = strtolower($this->authenticationMethod);
+				if($auth === 'googleoauth2') {
+					$rec = go()->getDbConnection()->select('token')
+						->from(Oauth2Account::getMapping()->getPrimaryTable()->getName())
+					->where(['accountId'=> $this->id])
+					->single();
+					if($rec) {
+						$token = $rec['token'];
+					}
+				}
+			}
+
+			$this->_imap->connect($this->host, $this->port, $this->username, $this->decryptPassword(), $useSSL, $useTLS, $auth, $token);
 		} else {
 			$this->_imap->checkConnection();
 		}

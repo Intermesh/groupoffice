@@ -35,7 +35,6 @@ GO.email.AccountDialog = function(config) {
 				boxLabel: t("Use secure connection for (Sieve) email filters", "sieve"),
 				checked:GO.sieve.sieveTls,
 				name: 'sieve_usetls',
-//				allowBlank: true,
 				hideLabel:true
 			})
 		);
@@ -55,7 +54,7 @@ GO.email.AccountDialog = function(config) {
 			selectOnFocus : true,
 			forceSelection : true,
 			width: 300,
-			value: 'Credentials',
+			// value: 'Credentials',
 			store: new Ext.data.SimpleStore({
 				fields: ['id', 'text'],
 				data: [
@@ -65,7 +64,7 @@ GO.email.AccountDialog = function(config) {
 			}),
 			listeners: {
 				'select': function (combo, record, index) {
-					if(record.data.id !== "credentials") {
+					if(record.data.id !== "Credentials") {
 						this.tabPanel.hideTabStripItem(1);
 						this.btnOpenAuthDialog.show();
 					} else {
@@ -78,7 +77,7 @@ GO.email.AccountDialog = function(config) {
 		});
 	}
 				
-		this.templatesCombo = new GO.form.ComboBox({
+	this.templatesCombo = new GO.form.ComboBox({
 			fieldLabel : t("Default e-mail template", "email"),
 			hiddenName : 'default_account_template_id',
 			width: 300,
@@ -448,7 +447,6 @@ GO.email.AccountDialog = function(config) {
 	  levelLabels:levelLabels
 	});
 
-	//this.permissionsTab.disabled = false;
 	this.serverTab = {
 		title: t('Server', 'email'),
 		autoScroll: true,
@@ -583,10 +581,7 @@ GO.email.AccountDialog = function(config) {
 			iconCls: 'btn-token',
 			text: 'OAuth2',
 			handler : function() {
-				console.clear();
-				const url = 'gauth/authenticate/' + this.account_id;
-				console.log(url);
-				window.open(url, 'do_da_google_auth_thingy');
+				window.open('gauth/authenticate/' + this.account_id, 'do_da_google_auth_thingy');
 				// This works, but will trigger a CORS error. Naturally, since oauth does not like Ajax
 				/*
 				go.Jmap.request({
@@ -704,7 +699,6 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			GO.email.subscribedFoldersStore.baseParams.account_id = account_id;
 			GO.email.subscribedFoldersStore.load();
 		} else {
-
 			this.propertiesPanel.form.reset();
 			this.setAccountId(0);
 			this.foldersTab.setDisabled(true);
@@ -745,6 +739,11 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 				}
 
 				this.permissionsTab.setAcl(action.result.data.acl_id);
+
+				if(this.selectAuthMethodCombo.getValue() === 'GoogleOauth2') {
+					this.btnOpenAuthDialog.show();
+				}
+
 			},
 			scope : this
 		});

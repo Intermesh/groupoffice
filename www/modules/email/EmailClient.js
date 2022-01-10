@@ -1115,16 +1115,12 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		var statusText = statusEl.dom.innerHTML;
 
 		var status = 0;
-		if(statusText!='')
-		{
+		if(statusText!='') {
 			status = parseInt(statusText.substring(1, statusText.length-1));
 		}
 		status+=increment;
 
-//		GO.email.totalUnseen+=increment;
-
 		this.updateFolderStatus(mailbox, status);
-//		this.updateNotificationEl();
 	},
 
 
@@ -1136,15 +1132,15 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		//restore scroll position after refresh in the root node load handler above
 		this.treeScrollTop = this.treePanel.body.dom.scrollTop;
 
-		if(refresh)
-			this.treePanel.loader.baseParams.refresh=true;
-
+		if(refresh) {
+			this.treePanel.loader.baseParams.refresh = true;
+		}
 		this.treePanel.root.reload();
 		// this.messagesStore.removeAll();
 
-		if(refresh)
+		if(refresh) {
 			delete this.treePanel.loader.baseParams.refresh;
-	},
+		}},
 
 	showAccountsDialog : function()
 	{

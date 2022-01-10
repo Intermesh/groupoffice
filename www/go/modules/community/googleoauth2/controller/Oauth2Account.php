@@ -12,8 +12,6 @@ use League\OAuth2\Client\Provider\Google;
 final class Oauth2Account extends Controller
 {
 
-	private $provider = null;
-
 	public function entityClass()
 	{
 		return model\Oauth2Account::class;
@@ -27,7 +25,7 @@ final class Oauth2Account extends Controller
 		$accountId = \GO::session()->values['accountId'];
 		$provider = $this->getProvider($accountId);
 
-		if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+		if (empty($_GET['state']) || ($_GET['state'] !== \GO::session()->values['oauth2state'])) {
 
 			// State is invalid, possible CSRF attack in progress
 			unset($_SESSION['oauth2state']);
@@ -38,16 +36,6 @@ final class Oauth2Account extends Controller
 				'code' => $_GET['code']
 			]);
 
-
-//			$acctSettings = $acct->googleOauth2;
-//
-//			$acctSettings->setValues([
-//				'token' => $token->getToken(),
-//				'refreshToken' => $token->getRefreshToken(),
-//				'expires' => $token->getExpires()
-//			])->save();
-//
-			// Optional: Now you have a token you can look up a users profile data
 			try {
 				$acct = Account::findById($accountId);
 				$acct->googleOauth2->token = $token->getToken();
@@ -58,17 +46,14 @@ final class Oauth2Account extends Controller
 				$ownerDetails = $provider->getResourceOwner($token);
 
 				// Use these details to create a new profile
-				printf('Hello %s!&nbsp;', $ownerDetails->getFirstName());
+				printf(go()->t('Hello') . '&nbsp;%s!&nbsp;' . go()->t('OAuth2 authentication was successful.') . '&nbsp;', $ownerDetails->getFirstName());
 
 			} catch (\Exception $e) {
-
 				// Failed to get user details
 				exit('Something went wrong: ' . $e->getMessage());
-
 			}
-			echo  '<a href="javascript:window.close()">'. go()->t("Click here") . '</a> ' . go()->t("to close this window");
+			echo '<a href="javascript:window.close()">' . go()->t("Click here") . '</a> ' . go()->t("to close this window.");
 			exit(0);
-
 		}
 	}
 
