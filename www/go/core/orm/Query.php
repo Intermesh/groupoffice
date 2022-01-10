@@ -72,13 +72,13 @@ class Query extends DbQuery {
 		return $this;
 	}
 
-  /**
-   * Select models linked to the given entity
-   *
-   * @param Entity $entity
-   * @return $this
-   * @throws Exception
-   */
+	/**
+	 * Select models linked to the given entity
+	 *
+	 * @param Entity $entity
+	 * @return $this
+	 * @throws Exception
+	 */
 	public function withLink(Entity $entity): Query
 	{
 		

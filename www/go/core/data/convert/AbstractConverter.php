@@ -72,7 +72,7 @@ abstract class AbstractConverter {
 
 	/**
 	 * The class name of the entity we're importing
-	 * @var string
+	 * @var class-string<Entity>
 	 */
 	protected $entityClass;
 
