@@ -1103,4 +1103,4 @@ $updates['202112131205'][] = "alter table core_alert
 
 $updates['202112131205'][] = "insert ignore into core_setting values((select id from core_module where name='core'), 'demoDataAsked', 1)";
 
-$dupates['202201101250'][] = 'update `core_entity` set clientName = name WHERE clientName is null';
+$updates['202201101250'][] = 'update `core_entity` set clientName = name WHERE clientName is null';

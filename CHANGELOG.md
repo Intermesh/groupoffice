@@ -1,4 +1,6 @@
+11-01-2022 6.6.30
 - Calendar: Added showing tasks in the calendar for new task module.
+- Core: Typo in updates.php fixing upgrade error: ine 61: Return value of go\core\orm\EntityType::getName() must be of the type string, null returned
 
 10-01-2022 6.6.29
 - Fixed Issue: Import into address book is not possible (Issue #775)
