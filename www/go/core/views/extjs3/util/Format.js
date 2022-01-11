@@ -206,6 +206,8 @@
 			if(neg) {
 				value *= -1;
 			}
+
+			value = parseFloat(value);
 			
 			var dec = go.User.decimalSeparator,
 				tho = go.User.thousandsSeparator;

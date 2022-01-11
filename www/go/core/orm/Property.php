@@ -2442,9 +2442,23 @@ abstract class Property extends Model {
 		//copy public and protected columns except for auto increments.
 		$props = $this->getApiProperties();
 		foreach($props as $name => $p) {
+			if(!isset($p['access'])) {
+				continue;
+			}
 			$col = static::getMapping()->getColumn($name);
-			if(isset($p['access']) && (!$col || $col->autoIncrement == false)) {
+			if($col && $col->autoIncrement == false) {
 				$copy->$name = $this->$name;
+			} else {
+				$rel = static::getMapping()->getRelation($name);
+				if($rel) {
+					if(is_array($this->$name)) {
+						foreach($this->$name as $key => $value) {
+							$copy->$name[$key] = $value instanceof self ? $value->internalCopy() : $value;
+						}
+					} else{
+						$copy->$name = $this->$name instanceof self ? $this->$name->internalCopy() : $this->$name;
+					}
+				}
 			}
 		}
 

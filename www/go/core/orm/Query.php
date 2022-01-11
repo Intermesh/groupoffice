@@ -6,15 +6,10 @@ use go\core\db\Criteria;
 use go\core\db\Query as DbQuery;
 use PDO;
 
-/**
- *
- *
- * @package go\core\orm
- */
 class Query extends DbQuery {
-  /**
-   * @var string
-   */
+	/**
+	 * @var class-string<Entity>
+	 */
 	private $model;
 
 	/**
@@ -22,7 +17,7 @@ class Query extends DbQuery {
    *
    * Used internally by go\core\orm\Property::internalFind();
    *
-   * @param string $cls The Entity class name
+   * @param class-string<Entity> $cls The Entity class name
    * @param array $fetchProperties The entity properties to fetch
    * @param bool $readOnly Entity's will be read only. This improves performance.
    * @param Property|null $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
@@ -74,9 +69,11 @@ class Query extends DbQuery {
 	/**
 	 * Check if filter was used by last apply() call
 	 *
+	 * @param $name
 	 * @return boolean
 	 */
-	public function isFilterUsed($name) {
+	public function isFilterUsed($name): bool
+	{
 		return in_array(strtolower($name), $this->usedFilters);
 	}
 

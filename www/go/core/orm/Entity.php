@@ -773,6 +773,10 @@ abstract class Entity extends Property {
 
 
 		if (static::getMapping()->getColumn('createdBy')) {
+			$filters->add("createdByMe", function (Criteria $criteria, $value, Query $query) {
+				//operator must always be = as this filter is also used in conjunction with permission queries
+				$criteria->where('createdBy', '=', go()->getAuthState()->getUserId());
+			});
 			$filters->addText("createdBy", function (Criteria $criteria, $comparator, $value, Query $query) {
 				if (!$query->isJoined('core_user', 'creator')) {
 					$query->join('core_user', 'creator', 'creator.id = ' . $query->getTableAlias() . '.createdBy');
