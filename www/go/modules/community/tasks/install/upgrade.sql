@@ -298,7 +298,7 @@ INSERT INTO tasks_alert (taskId, userId, `when`)
 
 create table if not exists tasks_user_settings
 (
-    userId int null,
+    userId int not null,
     defaultTasklistId int(11) unsigned null,
     rememberLastItems boolean not null default false,
     lastTasklistIds varchar(255) null,

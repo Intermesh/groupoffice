@@ -165,11 +165,11 @@ GO.mainLayout.on('render', function () {
 	},false);
 
 
-	if(!GO.settings.config.debug) {
+	// if(!GO.settings.config.debug) {
 		window.onerror = function (message, source, lineno, colno, error) {
 			GO.errorDialog.show(t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
 		}
-	}
+	// }
 
 	window.addEventListener('unhandledrejection', function (event) {
 

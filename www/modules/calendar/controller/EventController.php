@@ -28,9 +28,11 @@ use GO\Base\Db\FindCriteria;
 use GO\Base\Db\FindParams;
 use GO\Base\Fs\File;
 use GO\Calendar\Model\Event;
+use go\core\db\Criteria;
 use go\core\orm\EntityType;
 use GO\Email\Model\Account;
 use GO\Leavedays\Model\Leaveday;
+use go\modules\community\tasks\model\Task;
 
 class EventController extends \GO\Base\Controller\AbstractModelController {
 
@@ -1081,7 +1083,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				
 					
 				if(\GO::modules()->tasks && empty($params['events_only'])){
-					//$response = $this->_getTaskResponseForPeriod($response,$calendar,$startTime,$endTime);
+					$response = $this->_getTaskResponseForPeriod($response,$calendar,$startTime,$endTime);
 				}				
 				
 				$response = $this->_getEventResponseForPeriod($response,$calendar,$startTime,$endTime, $categories);
@@ -1149,6 +1151,102 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				&$store,
 				&$params));
 		
+		return $response;
+	}
+
+	private function _getTaskResponseForPeriod($response,$calendar,$startTime,$endTime) {
+//
+//		go()->debug($calendar->visible_tasklists->stmt->debugDumpParams());
+
+		$tasklistIds = $calendar->visible_tasklists->stmt->fetchAll(\PDO::FETCH_COLUMN, 1);
+
+		$this->_tasklists = [];
+//		while($tasklist = $tasklists->fetch()){
+//			$lists[$tasklist->id] = $tasklist->name;
+//		}
+
+
+		if(empty($tasklistIds)){
+			$response['count_tasks_only'] = 0;
+			return $response;
+		}
+
+		// If the calendar_tasklist_show is set to 1 task will display only on the start date in the calendar
+		switch(\GO::config()->calendar_tasklist_show) {
+			case 2:  //due date only
+				$dueQ = 'due';
+				$startQ = 'due';
+				break;
+			case 1: // start date only
+				$dueQ = 'start';
+				$startQ = 'start';
+				break;
+			default: // entirely
+				$dueQ = 'due';
+				$startQ = 'start';
+		}
+
+		$tasksStmt = Task::find()
+			->where((new Criteria())
+				->where($startQ, "IS NOT", null)
+				->orWhere($dueQ, 'IS NOT', null))
+			->andWhere((new Criteria())
+				->where($dueQ, ">=", new \DateTime($startTime))
+				->orWhere($dueQ, 'IS', null))
+			->andWhere((new Criteria())
+				->where($startQ, "<=", new \DateTime($endTime))
+				->orWhere($startQ, 'IS', null))
+			->andWhere('tasklistId', 'IN', $tasklistIds);
+
+		// Remove tasks that are completed
+		if(!$calendar->show_completed_tasks) {
+			$tasksStmt->andWhere('percentComplete', '<', 100);
+		}
+
+		$resultCount = 0;
+		$dayString = \GO::t("full_days");
+		foreach($tasksStmt as $task) {
+			/** @var Task $task */
+
+			// If the start_time is empty, then get the due_time as start time.
+			// This displays the task only on the due_date
+			$startTime = empty($task->start) ? $task->due : $task->start;
+			$endTime = empty($task->due) ? $task->start : $task->due;
+
+			$getIndexValue = $endTime;
+			$dayValue = $dayString[$startTime->format('w')].' '.$endTime->format('U');
+
+			// Display the tasks in the calendar on due date or entirely [0=entirely, 1=start date, 2=due date]
+			if(\GO::config()->calendar_tasklist_show==2) {
+				$startTime = $endTime;
+				$dayValue = $dayString[$endTime->format('w')].' '.$endTime->format('U');
+			} elseif(\GO::config()->calendar_tasklist_show==1) {
+				$endTime = $startTime;
+				$getIndexValue = $startTime;
+			}
+
+			$resultCount++;
+
+			$response['results'][$this->_getIndex($response['results'], $getIndexValue->format('U')).'task'.$task->id] = [
+				'id' => $response['count']++,
+				//'link_count' => $task->countLinks(),
+				'name' =>  $task->title.' ('.$task->percentComplete.'%)',
+				'description' => $task->description,
+				'time' => '00:00',
+				'start_time' => $startTime->format('Y-m-d').' 00:00',
+				'end_time' => $endTime->format('Y-m-d').' 23:59',
+				'all_day_event' => 1,
+				'model_name' => 'GO\Tasks\Model\Task', // compat for UI
+				'calendar_id' => $calendar->id, // Must be present to be able to show tasks in the calendar Views
+				'background'=>'EBF1E2',
+				'day' => $dayValue,
+				'read_only' => true,
+				'task_id' => $task->id
+			];
+		}
+
+		// Set the count of the tasks
+		$response['count_tasks_only'] = $resultCount;
 		return $response;
 	}
 	

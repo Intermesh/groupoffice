@@ -1,3 +1,18 @@
+11-01-2022 6.6.30
+- Calendar: Added showing tasks in the calendar for new task module.
+- Core: Typo in updates.php fixing upgrade error: ine 61: Return value of go\core\orm\EntityType::getName() must be of the type string, null returned
+
+10-01-2022 6.6.29
+- Fixed Issue: Import into address book is not possible (Issue #775)
+- Core: Suppress too many changes error
+- Business: Delay loading of business and activities in system settings
+
+07-01-2022 6.6.28
+- Business: Fixed update query for older mysql versions
+
+06-01-2022 6.6.27
+- Core: Fixed several upgrade issues
+
 04-01-2022 6.6.26
 - Core: Query error when deleting multiple links at once
 - Studio: Patch studio modules to comply with 6.6 code standards
@@ -16,6 +31,9 @@
 
 6.5.97
 - Business: hide 'Budgetable' checkbox for special leave types
+
+6.5.97
+- Leavedays: set special_budget_id explicitly to NULL when not in special leave mode
 
 03-01-2022 6.5.96
 - Business: hid transferable leave day types in favor of Special leave types

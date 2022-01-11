@@ -1103,20 +1103,22 @@ $updates['202112131205'][] = "alter table core_alert
 
 $updates['202112131205'][] = "insert ignore into core_setting values((select id from core_module where name='core'), 'demoDataAsked', 1)";
 
+$updates['202201101250'][] = 'update `core_entity` set clientName = name WHERE clientName is null';
 
 
 
 
-$updates['202109021333'][] = "alter table core_pdf_block modify x int null;";
+// Start 6.7
+$updates['202201101250'][] = "alter table core_pdf_block modify x int null;";
 
-$updates['202109021333'][] = "alter table core_pdf_block modify y int null;";
+$updates['202201101250'][] = "alter table core_pdf_block modify y int null;";
 
-$updates['202109021333'][] = "alter table core_pdf_block modify width int null;";
+$updates['202201101250'][] = "alter table core_pdf_block modify width int null;";
 
-$updates['202109021333'][] = "alter table core_pdf_block modify height int null;";
+$updates['202201101250'][] = "alter table core_pdf_block modify height int null;";
 
-$updates['202109021333'][] = "alter table core_pdf_template
+$updates['202201101250'][] = "alter table core_pdf_template
 	add `key` varchar(20) default null null after moduleId;";
 
 
-$updates['202109021333'][] = "drop index name on core_email_template;";
+$updates['202201101250'][] = "drop index name on core_email_template;";

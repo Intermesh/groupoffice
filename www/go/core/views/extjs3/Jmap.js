@@ -237,7 +237,10 @@ go.Jmap = {
 									return;
 								}
 								
-								store.getUpdates();
+								store.getUpdates().catch((e) => {
+									console.warn(e);
+									//ignore changes error, sync will reset on error
+								});
 							});
 						})(store);
 					}

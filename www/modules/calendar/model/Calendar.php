@@ -82,10 +82,10 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 			'events' => array('type' => self::HAS_MANY, 'model' => 'GO\Calendar\Model\Event', 'field' => 'calendar_id', 'delete' => true),
 			'categories' => array('type' => self::HAS_MANY, 'model' => 'GO\Calendar\Model\Category', 'field' => 'calendar_id', 'delete' => true),
 			'tasklist' => array('type' => self::BELONGS_TO, 'model' => 'GO\Tasks\Model\Tasklist', 'field' => 'tasklist_id'),
-			'visible_tasklists' => array('type' => self::MANY_MANY, 'model' => 'GO\Tasks\Model\Tasklist', 'linkModel'=>'GO\Calendar\Model\CalendarTasklist', 'field'=>'calendar_id', 'linksTable' => 'cal_visible_tasklists', 'remoteField'=>'tasklist'),
+			'visible_tasklists' => array('type' => self::HAS_MANY, 'model' => 'GO\Calendar\Model\CalendarTasklist', 'field'=>'calendar_id'),
 			);
 	}
-	
+
 	public function findDefault($userId){
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 						->single()

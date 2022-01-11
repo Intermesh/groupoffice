@@ -1839,9 +1839,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 	
 		switch(event.model_name){
 			case "GO\\Tasks\\Model\\Task":
-				GO.tasks.showTaskDialog({
-					task_id : event.task_id
-				})	
+				go.Router.goto("#task/"+event.task_id);
 			break;
 			
 			case "GO\\Adressbook\\Model\\Contact":
