@@ -1,5 +1,7 @@
+10-01-2022 6.6.29
 - Fixed Issue: Import into address book is not possible (Issue #775)
 - Core: Suppress too many changes error
+- Business: Delay loading of business and activities in system settings
 
 07-01-2022 6.6.28
 - Business: Fixed update query for older mysql versions
@@ -25,6 +27,9 @@
 
 6.5.97
 - Business: hide 'Budgetable' checkbox for special leave types
+
+6.5.97
+- Leavedays: set special_budget_id explicitly to NULL when not in special leave mode
 
 03-01-2022 6.5.96
 - Business: hid transferable leave day types in favor of Special leave types
