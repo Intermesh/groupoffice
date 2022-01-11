@@ -209,9 +209,7 @@ Ext.extend(GO.calendar.ListGrid, Ext.grid.GridPanel, {
 				
 			}else if(record.data.task_id)
 			{
-				GO.tasks.showTaskDialog({
-					task_id : record.data.task_id
-				});
+				go.Router.goto("#task/"+record.data.task_id);
 			}else	if(record.data.contact_id)
 			{
 				go.Router.goto("#contact/"+record.data.contact_id);

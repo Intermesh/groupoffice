@@ -1,3 +1,5 @@
+- Calendar: Added showing tasks in the calendar for new task module.
+
 10-01-2022 6.6.29
 - Fixed Issue: Import into address book is not possible (Issue #775)
 - Core: Suppress too many changes error
