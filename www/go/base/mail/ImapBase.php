@@ -234,10 +234,14 @@ abstract class ImapBase {
 			}
 			$result[$n] = fgets($this->handle, $line_length);
 
-			if(!$result[$n]) {
+			if($result[$n] === false) {
+				if( $error = error_get_last()) {
+					var_dump($error);
+					exit(1);
+				}
 				// Here be an ugly hack
 				if($this->auth === 'googleoauth2') {
-					unset($result[$n]);
+//					unset($result[$n]);
 				}
 				break;
 			}
@@ -248,7 +252,7 @@ abstract class ImapBase {
 				break;
 			}
 			while(substr($result[$n], -2) != "\r\n") {
-				if (!is_resource($this->handle)) {
+				if (!is_resource($this->handle) || feof($this->handle)) {
 					break;
 				}
 				$result[$n] .= fgets($this->handle, $line_length);
@@ -320,6 +324,7 @@ abstract class ImapBase {
 	/* put a prefix on a command and send it to the server */
 	function send_command($command, $piped=false)
 	{
+		stream_set_timeout($this->handle, 10);
 		if ($piped) {
 			$final_command = '';
 			foreach ($command as $v) {
@@ -330,7 +335,7 @@ abstract class ImapBase {
 			$command = 'A'.$this->command_number().' '.$command;
 		}
 		if (!is_resource($this->handle)){
-				throw new \Exception("Lost connection to ".$this->server);
+			throw new \Exception("Lost connection to ".$this->server);
 		}
 		
 		$this->lastCommand=$command;
@@ -346,9 +351,17 @@ abstract class ImapBase {
 		
 		$this->commands[trim($command)] = \GO\Base\Util\Date::getmicrotime();
 	}
-	/* determine if an imap response returned an "OK", returns
-       true or false */
-	function check_response($data, $chunked=false, $trackErrors=true)
+
+
+	/**
+	 * determine if an imap response returned an "OK", returns true or false
+	 *
+	 * @param $data
+	 * @param false $chunked
+	 * @param bool $trackErrors
+	 * @return bool
+	 */
+	function check_response($data, $chunked=false, $trackErrors=true) :bool
 	{
 		$result = false;
 		if ($chunked) {

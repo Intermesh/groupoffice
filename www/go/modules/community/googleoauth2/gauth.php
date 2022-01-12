@@ -24,7 +24,7 @@ if ($tokenStr) {
 	if($token) {
 		$state->setToken($token);
 	} else{
-		\go\core\ErrorHandler::log("OnlyOffice: Access token '" . $accessToken . "' not found!");
+		\go\core\ErrorHandler::log("Gauth: Access token '" . $accessToken . "' not found!");
 	}
 }
 

@@ -17,10 +17,21 @@ final class Oauth2Account extends Controller
 		return model\Oauth2Account::class;
 	}
 
+	/**
+	 * Callback function for use by Google's OAuth2 server
+	 *
+	 * Recieve token, add refreshtoken and expiry date to current OAuth2 account record
+	 *
+	 * @throws Exception
+	 * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
+	 */
 	public function callback()
 	{
 		if (!empty($_GET['error'])) {
 			throw new Exception('Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
+		}
+		if (!isset(\GO::session()->values['accountId'])) {
+			throw new Exception('Invalid parameter');
 		}
 		$accountId = \GO::session()->values['accountId'];
 		$provider = $this->getProvider($accountId);
@@ -77,7 +88,7 @@ final class Oauth2Account extends Controller
 		// If we don't have an authorization code then get one
 		$authUrl = $provider->getAuthorizationUrl();
 
-		$_SESSION['oauth2state'] = $provider->getState();
+		\GO::session()->values['oauth2state'] = $provider->getState();
 		$r = \go\core\http\Response::get();
 		$r->setHeader('Location', $authUrl);
 		$r->sendHeaders();
@@ -100,7 +111,8 @@ final class Oauth2Account extends Controller
 		return new Google([
 			'clientId' => $acctSettings->clientId,
 			'clientSecret' => $acctSettings->clientSecret,
-			'redirectUri' => $url . '/gauth/callback'
+			'redirectUri' => $url . '/gauth/callback',
+			'scopes' => ['https://mail.google.com/']
 		]);
 	}
 }

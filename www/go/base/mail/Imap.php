@@ -122,14 +122,14 @@ class Imap extends ImapBodyStruct
 					"verify_peer_name"=>false
 			));
 		}
-		if($this->auth === 'googleoauth2') {
-			$context_options = array('html' => array(
-				'header' => [
-					'authentication' => 'Bearer ' . $token,
-					'connection' => 'close'
-					]
-			));
-		}
+//		if($this->auth === 'googleoauth2') {
+//			$context_options = array('html' => array(
+//				'header' => [
+//					'authentication' => 'Bearer ' . $token,
+//					'connection' => 'close'
+//					]
+//			));
+//		}
 		$streamContext = stream_context_create($context_options);
 
 		$errorno = null;
@@ -141,6 +141,8 @@ class Imap extends ImapBodyStruct
 		if (!is_resource($this->handle)) {
 			throw new \Exception('Failed to open socket #'.$errorno.'. '.$errorstr);
 		}
+		stream_set_timeout($this->handle, 50);
+
 
 		return $this->authenticate($username, $password);
 	}
@@ -188,6 +190,7 @@ class Imap extends ImapBodyStruct
 		if ($this->starttls) {
 			$command = "STARTTLS\r\n";
 			$this->send_command($command);
+			$this->commands[trim($command)] = \GO\Base\Util\Date::getmicrotime();
 			$response = $this->get_response();
 			if (!empty($response)) {
 				$end = array_pop($response);
@@ -218,8 +221,10 @@ class Imap extends ImapBodyStruct
 				fputs($this->handle, $challenge_response."\r\n");
 				break;
 			case 'googleoauth2':
-				$str = base64_encode("user=" . $this->username . "^Aauth=Bearer " . $this->token . "^A^A");
-				$cmd = 'A' . $this->command_number() . ' AUTHENTICATE XOAUTH2 ' . $str;
+				$str = base64_encode("user=$this->username^Aauth=Bearer $this->token^A^A");
+//				$str = base64_encode("user=$this->username\1auth=Bearer $this->token\1\1");
+				$cmd = 'A' . $this->command_number() . ' AUTHENTICATE XOAUTH2 ' . $str . '\r\n';
+				$this->commands[trim($cmd)] = \GO\Base\Util\Date::getmicrotime();
 				fputs($this->handle, $cmd);
 				break;
 			default:
@@ -624,8 +629,6 @@ class Imap extends ImapBodyStruct
 
 		\GO\Base\Util\ArrayUtil::caseInsensitiveSort($folders);
 
-//		\GO::debug($folders);
-
 		return $folders;
 	}
 
@@ -836,7 +839,6 @@ class Imap extends ImapBodyStruct
 		$this->clean($box, 'mailbox');
 
 		$command = "SELECT \"$box\"\r\n";
-//		$command = "SELECT \"$box\"";
 
 		$this->send_command($command);
 		$res = $this->get_response(false, true);
