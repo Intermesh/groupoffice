@@ -25,8 +25,20 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 		if(success) {
 			this.groupModuleGrid.groupId = groupId;
 			let changedModules = this.groupModuleGrid.getValue();
-			console.warn(changedModules);
-			go.Db.store('Module').set({update: changedModules});
+			go.Db.store('Module').get(Object.keys(changedModules), (modules) => {
+				for(let key in changedModules) {
+					for(let module of modules) {
+						if(module.id == key) {
+							changedModules[key].permissions = {...module.permissions, ...changedModules[key].permissions};
+							break;
+						}
+					}
+				}
+				//console.warn(changedModules);
+				go.Db.store('Module').set({update: changedModules});
+			});
+
+
 		}
 		//}
 	},
