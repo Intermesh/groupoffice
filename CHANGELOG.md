@@ -1,3 +1,5 @@
+- Address book: Bug in address book create permissions
+
 11-01-2022 6.6.30
 - Calendar: Added showing tasks in the calendar for new task module.
 - Core: Typo in updates.php fixing upgrade error: ine 61: Return value of go\core\orm\EntityType::getName() must be of the type string, null returned
