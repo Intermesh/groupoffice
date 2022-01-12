@@ -2,10 +2,10 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\fs\File;
+use go\core\model\Module as CoreModule;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\modules\community\addressbook\Module;
-use go\core\model\Acl;
 
 /**
  * Address book model
@@ -79,7 +79,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 
 	protected function canCreate(): bool
 	{
-		return \go\core\model\Module::findByName('community', 'addressbook')->hasPermissionLevel(Acl::LEVEL_MANAGE);
+		return CoreModule::findByName('community', 'addressbook')->getUserRights()->mayChangeAddressbooks;
 	}
 
 
