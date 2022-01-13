@@ -178,7 +178,7 @@ class Imap extends ImapBodyStruct
 	 * @throws \Exception|ImapAuthenticationFailedException
 	 */
 
-	private function authenticate(string $username, string $pass) :bool
+	private function authenticate(string $username, string $pass): bool
 	{
 		if ($this->starttls) {
 			$command = "STARTTLS\r\n";
@@ -187,41 +187,38 @@ class Imap extends ImapBodyStruct
 			$response = $this->get_response();
 			if (!empty($response)) {
 				$end = array_pop($response);
-				if (substr($end, 0, strlen('A'.$this->command_count.' OK')) == 'A'.$this->command_count.' OK') {
-					if(!stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+				if (substr($end, 0, strlen('A' . $this->command_count . ' OK')) == 'A' . $this->command_count . ' OK') {
+					if (!stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
 						throw new \Exception("Failed to enable TLS on socket");
 					}
 				} else {
-					throw new \Exception("Failed to enable TLS: ".$end);
+					throw new \Exception("Failed to enable TLS: " . $end);
 				}
 			}
 		}
 		switch (strtolower($this->auth)) {
 			case 'cram-md5':
 				$this->banner = fgets($this->handle, 1024);
-				$cram1 = 'A'.$this->command_number().' AUTHENTICATE CRAM-MD5'."\r\n";
-				fputs ($this->handle, $cram1);
+				$cram1 = 'A' . $this->command_number() . ' AUTHENTICATE CRAM-MD5' . "\r\n";
+				fputs($this->handle, $cram1);
 				$this->commands[trim($cram1)] = \GO\Base\Util\Date::getmicrotime();
 				$response = fgets($this->handle, 1024);
 				$this->responses[] = $response;
 				$challenge = base64_decode(substr(trim($response), 1));
-				$pass .= str_repeat(chr(0x00), (64-strlen($pass)));
+				$pass .= str_repeat(chr(0x00), (64 - strlen($pass)));
 				$ipad = str_repeat(chr(0x36), 64);
 				$opad = str_repeat(chr(0x5c), 64);
-				$digest = bin2hex(pack("H*", md5(($pass ^ $opad).pack("H*", md5(($pass ^ $ipad).$challenge)))));
-				$challenge_response = base64_encode($username.' '.$digest);
+				$digest = bin2hex(pack("H*", md5(($pass ^ $opad) . pack("H*", md5(($pass ^ $ipad) . $challenge)))));
+				$challenge_response = base64_encode($username . ' ' . $digest);
 				$this->commands[trim($challenge_response)] = \GO\Base\Util\Date::getmicrotime();
-				fputs($this->handle, $challenge_response."\r\n");
+				fputs($this->handle, $challenge_response . "\r\n");
 				break;
 			case 'googleoauth2':
-				$this->send_command("CAPABILITY\r\n");
-				$res = $this->get_response();
-				$stroehtdxuo= "user=$this->username\1auth=Bearer $this->token\1\1";
-				$str = base64_encode($stroehtdxuo);
-				$this->send_command('AUTHENTICATE XOAUTH2 ' .$str. "\r\n");
+				$str = base64_encode("user=$this->username\1auth=Bearer $this->token\1\1");
+				$this->send_command("AUTHENTICATE XOAUTH2 " . $str . "\r\n");
 				break;
 			default:
-				$login = 'A'.$this->command_number().' LOGIN "'.$this->_escape( $username).'" "'.$this->_escape( $pass). "\"\r\n";
+				$login = 'A' . $this->command_number() . ' LOGIN "' . $this->_escape($username) . '" "' . $this->_escape($pass) . "\"\r\n";
 				$this->commands[trim(str_replace($pass, 'xxxx', $login))] = \GO\Base\Util\Date::getmicrotime();
 				fputs($this->handle, $login);
 				break;
@@ -233,7 +230,7 @@ class Imap extends ImapBodyStruct
 			$response = array_pop($res);
 
 			//Sometimes an extra empty line comes along
-			if(!$response && count($res)==2) {
+			if (!$response && count($res) == 2) {
 				$response = array_pop($res);
 			}
 
@@ -246,26 +243,23 @@ class Imap extends ImapBodyStruct
 					$this->banner = $res[0];
 				}
 			}
-			if($this->auth === 'googleoauth2' && stristr($response, 'OK Gimap ready')!== false) {
-				$authed = true;
-				$this->state = 'authed';
-			} elseif (stristr($response, 'A'.$this->command_count.' OK')) {
+			if (stristr($response, 'A' . $this->command_count . ' OK')) {
 				$authed = true;
 				$this->state = 'authed';
 
 				//some imap servers like dovecot respond with the capability after login.
 				//Set this in the session so we don't need to do an extra capability command.
-				if(($startpos = strpos($response, 'CAPABILITY'))!==false){
-					\GO::debug("Use capability from login");					
-					$endpos=  strpos($response, ']', $startpos);
-					if($endpos){
-						$capability = substr($response, $startpos, $endpos-$startpos);
-						\GO::session()->values['GO_IMAP'][$this->server]['imap_capability']=$capability;
+				if (($startpos = strpos($response, 'CAPABILITY')) !== false) {
+					\GO::debug("Use capability from login");
+					$endpos = strpos($response, ']', $startpos);
+					if ($endpos) {
+						$capability = substr($response, $startpos, $endpos - $startpos);
+						\GO::session()->values['GO_IMAP'][$this->server]['imap_capability'] = $capability;
 					}
 
 				}
 			} else {
-				throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
+				throw new ImapAuthenticationFailedException('Authentication failed for user ' . $username . ' on IMAP server ' . $this->server);
 			}
 		}
 		return $authed;
