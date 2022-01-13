@@ -39,7 +39,7 @@ final class Oauth2Account extends Controller
 		if (empty($_GET['state']) || ($_GET['state'] !== \GO::session()->values['oauth2state'])) {
 
 			// State is invalid, possible CSRF attack in progress
-			unset($_SESSION['oauth2state']);
+			unset(\GO::session()->values['oauth2state']);
 			throw new Exception('Invalid state');
 		} else {
 			// Try to get an access token (using the authorization code grant)
@@ -112,6 +112,7 @@ final class Oauth2Account extends Controller
 			'clientId' => $acctSettings->clientId,
 			'clientSecret' => $acctSettings->clientSecret,
 			'redirectUri' => $url . '/gauth/callback',
+			'accessType'   => 'offline',
 			'scopes' => ['https://mail.google.com/']
 		]);
 	}
