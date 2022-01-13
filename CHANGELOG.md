@@ -1,3 +1,4 @@
+13-01-2022 6.6.31
 - Address book: Bug in address book create permissions
 - ActiveSync: Fixed sync problem and cleaned up code
 
