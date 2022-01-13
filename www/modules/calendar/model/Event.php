@@ -107,14 +107,6 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	 * @var boolean 
 	 */
 	private $_isImport=false;
-	/**
-	 * @var String
-	 */
-	private $rrule;
-	/**
-	 * @var null
-	 */
-	private $repeat_end_time;
 
 
 	public function getUri() {
