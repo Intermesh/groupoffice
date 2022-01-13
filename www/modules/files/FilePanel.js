@@ -36,7 +36,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 		// this.editButton.setText(t("Edit"));
 
 		tbar.splice(1,0,this.downloadButton= new Ext.Button({
-			iconCls: 'btn-save',
+			iconCls: 'ic-save',
 			tooltip: t("Download"),
 			handler: function(){
 				GO.files.downloadFile(this.model_id);
@@ -174,7 +174,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 
 					'<tr>'+
 						'<td>'+t("Size")+':</td>'+
-						'<td>{size}</td>'+
+						'<td>{[values.size==\'-\' ? values.size : Ext.util.Format.fileSize(values.size)]}</td>'+
 						
 					'</tr>'+
 
