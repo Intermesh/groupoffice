@@ -45,7 +45,6 @@ class Imap extends ImapBodyStruct
 
 	var $permittedFlags = false;
 	
-	
 	public $ignoreInvalidCertificates = false;
 
 	public static $systemFlags = array(
@@ -101,6 +100,7 @@ class Imap extends ImapBodyStruct
 		if(empty($password) && strtolower($auth) == 'plain'){
 			throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
 		}
+//		\GO::debug("imap::connect($server, $port, $username, ***, $ssl, $starttls, $auth, ***)");
 
 		$this->ssl = $ssl;
 		$this->starttls = $starttls;
@@ -122,18 +122,11 @@ class Imap extends ImapBodyStruct
 					"verify_peer_name"=>false
 			));
 		}
-//		if($this->auth === 'googleoauth2') {
-//			$context_options = array('html' => array(
-//				'header' => [
-//					'authentication' => 'Bearer ' . $token,
-//					'connection' => 'close'
-//					]
-//			));
-//		}
+
 		$streamContext = stream_context_create($context_options);
 
-		$errorno = null;
-		$errorstr = null;
+		$errorno = 0;
+		$errorstr = '';
 		$remote = $this->ssl ? 'ssl://' : '';			
 		$remote .=  $this->server.":".$this->port;
 
@@ -141,8 +134,8 @@ class Imap extends ImapBodyStruct
 		if (!is_resource($this->handle)) {
 			throw new \Exception('Failed to open socket #'.$errorno.'. '.$errorstr);
 		}
-		stream_set_timeout($this->handle, 50);
-
+		stream_set_timeout($this->handle, 10);
+//		$this->metadata = stream_get_meta_data($this->handle); // for debugging purposes
 
 		return $this->authenticate($username, $password);
 	}
@@ -221,11 +214,11 @@ class Imap extends ImapBodyStruct
 				fputs($this->handle, $challenge_response."\r\n");
 				break;
 			case 'googleoauth2':
-				$str = base64_encode("user=$this->username^Aauth=Bearer $this->token^A^A");
-//				$str = base64_encode("user=$this->username\1auth=Bearer $this->token\1\1");
-				$cmd = 'A' . $this->command_number() . ' AUTHENTICATE XOAUTH2 ' . $str . '\r\n';
-				$this->commands[trim($cmd)] = \GO\Base\Util\Date::getmicrotime();
-				fputs($this->handle, $cmd);
+				$this->send_command("CAPABILITY\r\n");
+				$res = $this->get_response();
+				$stroehtdxuo= "user=$this->username\1auth=Bearer $this->token\1\1";
+				$str = base64_encode($stroehtdxuo);
+				$this->send_command('AUTHENTICATE XOAUTH2 ' .$str. "\r\n");
 				break;
 			default:
 				$login = 'A'.$this->command_number().' LOGIN "'.$this->_escape( $username).'" "'.$this->_escape( $pass). "\"\r\n";
@@ -431,6 +424,7 @@ class Imap extends ImapBodyStruct
 
 	public function list_folders($listSubscribed=true, $withStatus=false, $namespace='', $pattern='*', $isRoot=false)
 	{
+		\GO::debug("list_folders($listSubscribed, $withStatus, $namespace, $pattern)");
 
 		$listCmd = $listSubscribed ? 'LSUB' : 'LIST';
 
@@ -446,6 +440,8 @@ class Imap extends ImapBodyStruct
 			$cmd .= ')';
 		}
 
+//		\GO::debug($cmd);
+
 		$cmd .= "\r\n";
 
 		$this->send_command($cmd);
@@ -459,6 +455,7 @@ class Imap extends ImapBodyStruct
 
 			return $this->list_folders($listSubscribed, $withStatus, $namespace, $pattern, $isRoot);
 		}
+//		\GO::debug($result);
 
 		$delim=false;
 
@@ -628,6 +625,8 @@ class Imap extends ImapBodyStruct
 		}
 
 		\GO\Base\Util\ArrayUtil::caseInsensitiveSort($folders);
+
+		\GO::debug($folders);
 
 		return $folders;
 	}
@@ -813,6 +812,8 @@ class Imap extends ImapBodyStruct
 			$last_folder = $name;
 		}
 
+		//\GO::debug($folders);
+
 		ksort($folders);
 
 		return $folders;
@@ -837,6 +838,8 @@ class Imap extends ImapBodyStruct
 
 		$box = $this->utf7_encode($mailbox_name);
 		$this->clean($box, 'mailbox');
+
+		\GO::debug("Selecting IMAP mailbox $box");
 
 		$command = "SELECT \"$box\"\r\n";
 
@@ -1527,6 +1530,8 @@ class Imap extends ImapBodyStruct
 								$n = 2;
 								while (isset($vals[$i + $n]) && $vals[$i + $n] != ')') {
 									$prop = str_replace('-','_',strtolower(substr($vals[$i + $n],1)));
+									//\GO::debug($prop);
+
 									//It can be a user named a label $labels
 									if(isset($message[$prop]) && $prop != 'labels') {
 										$message[$prop]=true;

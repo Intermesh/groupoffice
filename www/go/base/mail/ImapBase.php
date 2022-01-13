@@ -234,14 +234,9 @@ abstract class ImapBase {
 			}
 			$result[$n] = fgets($this->handle, $line_length);
 
-			if($result[$n] === false) {
+			if( !$result[$n] ) {
 				if( $error = error_get_last()) {
-					var_dump($error);
-					exit(1);
-				}
-				// Here be an ugly hack
-				if($this->auth === 'googleoauth2') {
-//					unset($result[$n]);
+					$this->errors[] = $error;
 				}
 				break;
 			}
@@ -252,7 +247,7 @@ abstract class ImapBase {
 				break;
 			}
 			while(substr($result[$n], -2) != "\r\n") {
-				if (!is_resource($this->handle) || feof($this->handle)) {
+				if (!is_resource($this->handle)) {
 					break;
 				}
 				$result[$n] .= fgets($this->handle, $line_length);
@@ -312,6 +307,7 @@ abstract class ImapBase {
 			}
 		}
 
+		\GO::debug($result); // TODO: Recomment this out!
 		return $result;
 	}
 	/* increment the imap command prefix such that it counts
@@ -321,8 +317,14 @@ abstract class ImapBase {
 		$this->command_count += 1;
 		return $this->command_count;
 	}
-	/* put a prefix on a command and send it to the server */
-	function send_command($command, $piped=false)
+	/**
+	 * put a prefix on a command and send it to the server
+	 *
+	 * @param string $command
+	 * @param bool|null $piped
+	 * @throws \Exception
+	 */
+	function send_command(string $command, ?bool $piped=false)
 	{
 		stream_set_timeout($this->handle, 10);
 		if ($piped) {
