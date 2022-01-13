@@ -717,11 +717,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$message->handleEmailFormInput($params);
-    $recipientCount = $message->countRecipients();
+        $recipientCount = $message->countRecipients();
 
-		if(!$recipientCount)
+		if(!$recipientCount) {
 			throw new \Exception(GO::t("You didn't enter a recipient", "email"));
-
+		}
 		$message->setFrom($alias->email, $alias->name);
 		
 		$mailer = \GO\Base\Mail\Mailer::newGoInstance(\GO\Email\Transport::newGoInstance($account));

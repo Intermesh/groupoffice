@@ -367,6 +367,26 @@ class Account extends \GO\Base\Db\ActiveRecord
 		}
 		return $imap;
 	}
+
+	/**
+	 *
+	 * @return string|null
+	 * @throws \go\core\exception\ConfigurationException
+	 */
+	public function getXOauth2Token()
+	{
+		if (stristr($this->authenticationMethod, 'oauth2') === false ) {
+			return null;
+		}
+		$rec = go()->getDbConnection()->select('token')
+			->from(Oauth2Account::getMapping()->getPrimaryTable()->getName())
+			->where(['accountId'=> $this->id])
+			->single();
+		if($rec) {
+			return $rec['token'];
+		}
+		return null;
+	}
 	
 	/**
 	 * Connect to the IMAP server without selecting a mailbox
@@ -387,13 +407,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 			if($this->authenticationMethod !== self::DEFAULT_AUTHENTICATION_METHOD ) {
 				$auth = strtolower($this->authenticationMethod);
 				if($auth === 'googleoauth2') {
-					$rec = go()->getDbConnection()->select('token')
-						->from(Oauth2Account::getMapping()->getPrimaryTable()->getName())
-					->where(['accountId'=> $this->id])
-					->single();
-					if($rec) {
-						$token = $rec['token'];
-					}
+					$token = $this->getXOauth2Token();
 				}
 			}
 
