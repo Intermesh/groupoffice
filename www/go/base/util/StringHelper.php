@@ -711,11 +711,15 @@ class StringHelper {
 	/**
 	 * Convert plain text to HTML
 	 *
-	 * @param	StringHelper $text Plain text string
+	 * @param	?string $text Plain text string
 	 * @access public
-	 * @return StringHelper HTML formatted string
+	 * @return string HTML formatted string
 	 */
-	public static function text_to_html($text, $convert_links=true) {
+	public static function text_to_html(?string $text, $convert_links=true) {
+
+		if(empty($text)) {
+			return "";
+		}
 	
 		if($convert_links)
 		{

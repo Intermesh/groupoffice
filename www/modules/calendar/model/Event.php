@@ -61,6 +61,11 @@ use Sabre;
 use Swift_Attachment;
 use Swift_Mime_ContentEncoder_PlainContentEncoder;
 
+/**
+ * @property int $start_time
+ *  @property string $rrule
+ * @property int $repeat_end_time
+ */
 class Event extends \GO\Base\Db\ActiveRecord {
 
 	use \go\core\orm\CustomFieldsTrait;
@@ -102,8 +107,16 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	 * @var boolean 
 	 */
 	private $_isImport=false;
-	
-	
+	/**
+	 * @var String
+	 */
+	private $rrule;
+	/**
+	 * @var null
+	 */
+	private $repeat_end_time;
+
+
 	public function getUri() {
 		if(isset($this->_setUri)) {
 			return $this->_setUri;
