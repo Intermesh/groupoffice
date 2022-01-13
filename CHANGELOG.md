@@ -1,4 +1,5 @@
 - Address book: Bug in address book create permissions
+- ActiveSync: Fixed sync problem and cleaned up code
 
 11-01-2022 6.6.30
 - Calendar: Added showing tasks in the calendar for new task module.
