@@ -40,8 +40,11 @@ GO.email.AccountDialog = function(config) {
 		);
 	}
 
-	// TODO: Put this properly in an override function in Googleoauth2
-	if(go.Modules.isAvailable("community", "googleoauth2")) {
+	// TODO: Put this properly in an override function in Oaath2Client
+	debugger;
+	console.clear();
+	console.log(go.Modules);
+	if(go.Modules.isAvailable("community", "oauth2client")) {
 		this.selectAuthMethodCombo = new Ext.form.ComboBox({
 			fieldLabel: t("Authentication Method"),
 			hiddenName: 'authenticationMethod',
@@ -54,7 +57,6 @@ GO.email.AccountDialog = function(config) {
 			selectOnFocus : true,
 			forceSelection : true,
 			width: 300,
-			// value: 'Credentials',
 			store: new Ext.data.SimpleStore({
 				fields: ['id', 'text'],
 				data: [
@@ -230,7 +232,7 @@ GO.email.AccountDialog = function(config) {
 
 	this.properties_items.push(this.templatesCombo);
 
-	if(go.Modules.isAvailable("community", "googleoauth2")) {
+	if(go.Modules.isAvailable("community", "oauth2client")) {
 		this.properties_items.push(this.selectAuthMethodCombo);
 		// this.properties_items.push(this.btnOpenAuthDialog);
 	}
@@ -579,13 +581,13 @@ GO.email.AccountDialog = function(config) {
 		},
 		this.btnOpenAuthDialog = new Ext.Button({
 			iconCls: 'btn-token',
-			text: 'OAuth2',
+			text: 'Refresh token',
 			handler : function() {
-				window.open('gauth/authenticate/' + this.account_id, 'do_da_google_auth_thingy');
+				window.open('gauth/authenticate/' + this.account_id, 'do_da_auth_thingy');
 				// This works, but will trigger a CORS error. Naturally, since oauth does not like Ajax
 				/*
 				go.Jmap.request({
-					method: "community/googleoauth2/Oauth2Account/auth",
+					method: "community/oauth2client/Oauth2Account/auth",
 					params: {
 						accountId: this.account_id
 					},
@@ -597,7 +599,7 @@ GO.email.AccountDialog = function(config) {
 					console.log(response);
 					// this.getForm().setValues(response);
 					// if (!this.consentDialog) {
-					// 	this.consentDialog = new go.modules.community.googleoauth2.ConsentDialog();
+					// 	this.consentDialog = new go.modules.community.oauth2client.ConsentDialog();
 					// }
 					// this.consentDialog.show({accountId: this.account_id});
 

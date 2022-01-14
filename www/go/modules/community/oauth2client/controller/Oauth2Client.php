@@ -1,20 +1,20 @@
 <?php
 
-namespace go\modules\community\googleoauth2\controller;
+namespace go\modules\community\oauth2client\controller;
 
 
 use go\core\Controller;
 use go\core\http\Exception;
-use go\modules\community\email\model\Account;
-use go\modules\community\googleoauth2\model;
+use go\modules\community\oauth2client\model;
+use League\OAuth2\Client\Grant\RefreshToken;
 use League\OAuth2\Client\Provider\Google;
 
-final class Oauth2Account extends Controller
+final class Oauth2Client extends Controller
 {
 
 	public function entityClass()
 	{
-		return model\Oauth2Account::class;
+		return model\Oauth2Client::class;
 	}
 
 	/**
@@ -48,7 +48,7 @@ final class Oauth2Account extends Controller
 			]);
 
 			try {
-				$acct = Account::findById($accountId);
+				$acct = Oauth2Client::findById($accountId);
 				$acct->googleOauth2->token = $token->getToken();
 				$acct->googleOauth2->refreshToken = $token->getRefreshToken();
 				$acct->googleOauth2->expires = $token->getExpires();
@@ -95,6 +95,33 @@ final class Oauth2Account extends Controller
 		exit;
 	}
 
+	/**
+	 * Refresh access token
+	 *
+	 * @param int $accountId
+	 * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
+	 * /
+	public function refreshAccessToken(int $accountId)
+	{
+		\GO::session()->values['accountId'] = $accountId;
+		$acct = Oauth2Client::findById($accountId);
+		$url = rtrim(go()->getSettings()->URL, '/');
+
+		$acctSettings = $acct->googleOauth2;
+		$provider = new Google([
+			'clientId'     => $acctSettings->clientId,
+			'clientSecret' => $acctSettings->clientSecret,
+			'redirectUri'  => $url . '/gauth/callback'
+		]);
+
+		$grant = new RefreshToken();
+		$token = $provider->getAccessToken($grant, ['refresh_token' => $acctSettings->refreshToken]);
+		$acct->googleOauth2->token = $token->getToken();
+		$acct->googleOauth2->expires = $token->getExpires();
+
+		$acct->save();
+	}
+	*/
 
 	/**
 	 * Prepare ourselves a Google Provider
@@ -105,7 +132,7 @@ final class Oauth2Account extends Controller
 	 */
 	private function getProvider(int $accountId): Google
 	{
-		$acct = Account::findById($accountId);
+		$acct = Oauth2Client::findById($accountId);
 		$acctSettings = $acct->googleOauth2;
 		$url = rtrim(go()->getSettings()->URL, '/');
 		return new Google([

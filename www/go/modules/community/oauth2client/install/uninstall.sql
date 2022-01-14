@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS `oauth2client_oauth2client`;

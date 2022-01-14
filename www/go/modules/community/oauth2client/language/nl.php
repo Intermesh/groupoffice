@@ -1,8 +1,8 @@
 <?php
 
 return array(
-	'name' => 'Google Oauth2',
-	'description' => 'A module to configure Google Authentication using Oauth2.',
+	'name' => 'OAuth2',
+	'description' => 'Met deze module configureert u eenvoudig een OAuth2 connectie.',
 	'Click here' => 'Klik hier',
 	'Hello' => 'Hallo',
 	'to close this window.' => 'om dit scherm af te sluiten.',

@@ -1,4 +1,4 @@
-go.modules.community.googleoauth2.ConsentDialog = Ext.extend(go.Window , {
+go.modules.community.oauth2client.ConsentDialog = Ext.extend(go.Window , {
 	modal: true,
 	height: 800,
 	width: 480,

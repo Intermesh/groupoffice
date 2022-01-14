@@ -1,11 +1,11 @@
 <?php
-namespace go\modules\community\googleoauth2;
+namespace go\modules\community\oauth2client;
 							
 use go\core;
 use go\core\orm\Property;
 use go\core\webclient\CSP;
 use go\modules\community\email\model\Account;
-use go\modules\community\googleoauth2\model\Oauth2Account;
+use go\modules\community\oauth2client\model\Oauth2Client;
 
 /**						
  * @copyright (c) 2021, Intermesh BV http://www.intermesh.nl
@@ -30,7 +30,7 @@ class Module extends core\Module
 
 	public static function onMap(core\orm\Mapping $mapping)
 	{
-		$mapping->addHasOne('googleOauth2', Oauth2Account::class, ['id' => 'accountId'], false);
+		$mapping->addHasOne('googleOauth2', Oauth2Client::class, ['id' => 'accountId'], false);
 	}
 
 

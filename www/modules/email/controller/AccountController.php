@@ -260,7 +260,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 			$stmt =  \GO\Email\Model\Account::model()->find($findParams);
 
 			while ($account = $stmt->fetch()) {
-
+				$account->maybeRefreshToken();
 				$alias = $account->getDefaultAlias();
 				if($alias){
 					$nodeId=base64_encode('account_' . $account->id);

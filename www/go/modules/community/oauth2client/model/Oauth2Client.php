@@ -1,12 +1,10 @@
 <?php
 
-namespace go\modules\community\googleoauth2\model;
+namespace go\modules\community\oauth2client\model;
 
-use go\core\data\Model;
-use go\core\http\Client;
 use go\core\orm\Property;
 
-class Oauth2Account extends Property
+class Oauth2Client extends Property
 {
 	/**
 	 * @var int
@@ -46,6 +44,6 @@ class Oauth2Account extends Property
 	protected static function defineMapping()
 	{
 		return parent::defineMapping()
-			->addTable("oauth2_accounts");
+			->addTable("oauth2client_oauth2client");
 	}
 }

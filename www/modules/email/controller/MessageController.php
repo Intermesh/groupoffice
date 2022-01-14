@@ -238,9 +238,9 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 		if(!$account)
 			throw new \GO\Base\Exception\NotFound();
 		/* @var $account Account */
+		$account->maybeRefreshToken();
 
 		$this->_filterMessages($params["mailbox"], $account);
-
 		$imap = $account->openImapConnection($params["mailbox"]);
 
 		$response['permission_level'] = $account->getPermissionLevel();

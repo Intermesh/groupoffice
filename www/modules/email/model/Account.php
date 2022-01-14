@@ -18,7 +18,9 @@ use GO;
 use GO\Base\Mail\Imap;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 use \GO\Base\Mail\Exception\MailboxNotFound;
-use go\modules\community\googleoauth2\model\Oauth2Account;
+use go\modules\community\oauth2client\model\Oauth2Client;
+use League\OAuth2\Client\Grant\RefreshToken;
+use League\OAuth2\Client\Provider\Google;
 
 /**
  * The Email model
@@ -149,7 +151,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 		return array(
 			'aliases' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\Alias', 'field'=>'account_id','delete'=>true),
 			'filters' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\Filter', 'field'=>'account_id','delete'=>true, 'findParams'=>  \GO\Base\Db\FindParams::newInstance()->order("priority")),
-			'googleOauth2' => array('type' => self::HAS_ONE, 'model' => 'go\modules\community\googleoauth2\model\Oauth2Account', 'field' => 'accountId', 'delete' => true),
+			'googleOauth2' => array('type' => self::HAS_ONE, 'model' => 'go\modules\community\oauth2client\model\Oauth2Client', 'field' => 'accountId', 'delete' => true),
 			'portletFolders' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\PortletFolder', 'field'=>'account_id','delete'=>true)
 		);
 	}
@@ -369,6 +371,52 @@ class Account extends \GO\Base\Db\ActiveRecord
 	}
 
 	/**
+	 * Check if access token needs to be refreshed
+	 *
+	 * @todo move to proper class, somewhere in oauthClient
+	 * @todo maybe make part of an event?
+	 * @return bool|null
+	 */
+	public function maybeRefreshToken()
+	{
+		if (stristr($this->authenticationMethod, 'oauth2') === false ) {
+			return null;
+		}
+		$rec = go()->getDbConnection()->select()
+			->from(Oauth2Client::getMapping()->getPrimaryTable()->getName())
+			->where(['accountId'=> $this->id])
+			->single();
+		if(!$rec) {
+			return null;
+		}
+		$expires = $rec['expires'];
+		if($expires >= time()) { // no refresh necessary
+//			go()->debug("No token refresh needed");
+			return null;
+		}
+		$refreshToken = $rec['refreshToken'];
+		if(!$refreshToken) {
+			throw new GO\Base\Exception\SecurityTokenMismatch();
+		}
+		$url = rtrim(go()->getSettings()->URL, '/');
+		$provider = new Google([
+			'clientId' => $rec['clientId'],
+			'clientSecret' => $rec['clientSecret'],
+			'redirectUri' => $url . '/gauth/callback',
+			'accessType'   => 'offline',
+			'scopes' => ['https://mail.google.com/']
+		]);
+
+		$grant = new RefreshToken();
+		$token = $provider->getAccessToken($grant, ['refresh_token' => $refreshToken]);
+		$stmt = go()->getDbConnection()->update('oauth2client_oauth2client',
+			['token' => $token->getToken(), 'expires' => $token->getExpires()],
+			['accountId' => $this->id]
+		);
+		return $stmt->execute();
+	}
+
+	/**
 	 *
 	 * @return string|null
 	 * @throws \go\core\exception\ConfigurationException
@@ -379,7 +427,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 			return null;
 		}
 		$rec = go()->getDbConnection()->select('token')
-			->from(Oauth2Account::getMapping()->getPrimaryTable()->getName())
+			->from(Oauth2Client::getMapping()->getPrimaryTable()->getName())
 			->where(['accountId'=> $this->id])
 			->single();
 		if($rec) {
