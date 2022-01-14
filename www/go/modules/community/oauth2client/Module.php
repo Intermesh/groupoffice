@@ -20,6 +20,10 @@ class Module extends core\Module
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
+	public function getDependencies() :array
+	{
+		return ["legacy/email"];
+	}
 
 	public function defineListeners()
 	{
@@ -30,7 +34,7 @@ class Module extends core\Module
 
 	public static function onMap(core\orm\Mapping $mapping)
 	{
-		$mapping->addHasOne('googleOauth2', Oauth2Client::class, ['id' => 'accountId'], false);
+		$mapping->addHasOne('oauth2Client', Oauth2Client::class, ['id' => 'accountId'], false);
 	}
 
 

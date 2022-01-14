@@ -15,9 +15,9 @@
 namespace GO\Email\Model;
 
 use GO;
-use GO\Base\Mail\Imap;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
-use \GO\Base\Mail\Exception\MailboxNotFound;
+use GO\Base\Mail\Imap;
+use go\modules\community\oauth2client\model\DefaultClient;
 use go\modules\community\oauth2client\model\Oauth2Client;
 use League\OAuth2\Client\Grant\RefreshToken;
 use League\OAuth2\Client\Provider\Google;
@@ -56,17 +56,12 @@ use League\OAuth2\Client\Provider\Google;
  * @property int $sieve_port
  * @property boolean $sieve_tls
  * @property boolean $sieve_usetls
- * @property string $authenticationMethod
+ * @property int $default_client_id
  */
 class Account extends \GO\Base\Db\ActiveRecord
 {
 	
 	const ACL_DELEGATED_PERMISSION=15;
-
-	/**
-	 * Default value for $this->>authenticationMethod
-	 */
-	const DEFAULT_AUTHENTICATION_METHOD = 'Credentials';
 
 	/**
 	 * Set to false if you don't want the IMAP connection on save.
@@ -151,7 +146,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 		return array(
 			'aliases' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\Alias', 'field'=>'account_id','delete'=>true),
 			'filters' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\Filter', 'field'=>'account_id','delete'=>true, 'findParams'=>  \GO\Base\Db\FindParams::newInstance()->order("priority")),
-			'googleOauth2' => array('type' => self::HAS_ONE, 'model' => 'go\modules\community\oauth2client\model\Oauth2Client', 'field' => 'accountId', 'delete' => true),
+			'oauth2Client' => array('type' => self::HAS_ONE, 'model' => 'go\modules\community\oauth2client\model\Oauth2Client', 'field' => 'accountId', 'delete' => true),
 			'portletFolders' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\PortletFolder', 'field'=>'account_id','delete'=>true)
 		);
 	}
@@ -312,7 +307,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 	
 
 	public function decryptPassword() {
-		if($this->authenticationMethod !== self::DEFAULT_AUTHENTICATION_METHOD) {
+		if (!empty($this->default_client_id)) {
 			return '';
 		}
 		if (!empty(GO::session()->values['emailModule']['accountPasswords'][$this->id])) {
@@ -379,7 +374,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 	 */
 	public function maybeRefreshToken()
 	{
-		if (stristr($this->authenticationMethod, 'oauth2') === false ) {
+		if (empty($this->default_client_id) ) {
 			return null;
 		}
 		$rec = go()->getDbConnection()->select()
@@ -390,7 +385,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 			return null;
 		}
 		$expires = $rec['expires'];
-		if($expires >= time()) { // no refresh necessary
+		if($expires >= time()) {
 //			go()->debug("No token refresh needed");
 			return null;
 		}
@@ -423,7 +418,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 	 */
 	public function getXOauth2Token()
 	{
-		if (stristr($this->authenticationMethod, 'oauth2') === false ) {
+		if (empty($this->default_client_id) ) {
 			return null;
 		}
 		$rec = go()->getDbConnection()->select('token')
@@ -452,11 +447,9 @@ class Account extends \GO\Base\Db\ActiveRecord
 			$token = null;
 			$auth = 'plain';
 
-			if($this->authenticationMethod !== self::DEFAULT_AUTHENTICATION_METHOD ) {
-				$auth = strtolower($this->authenticationMethod);
-				if($auth === 'googleoauth2') {
-					$token = $this->getXOauth2Token();
-				}
+			if($this->default_client_id) {
+				$token = $this->getXOauth2Token();
+				$auth = DefaultClient::findById($this->default_client_id)->authenticationMethod;
 			}
 
 			$this->_imap->connect($this->host, $this->port, $this->username, $this->decryptPassword(), $useSSL, $useTLS, $auth, $token);

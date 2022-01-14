@@ -6,7 +6,6 @@ namespace go\modules\community\oauth2client\controller;
 use go\core\Controller;
 use go\core\http\Exception;
 use go\modules\community\oauth2client\model;
-use League\OAuth2\Client\Grant\RefreshToken;
 use League\OAuth2\Client\Provider\Google;
 
 final class Oauth2Client extends Controller
@@ -48,10 +47,10 @@ final class Oauth2Client extends Controller
 			]);
 
 			try {
-				$acct = Oauth2Client::findById($accountId);
-				$acct->googleOauth2->token = $token->getToken();
-				$acct->googleOauth2->refreshToken = $token->getRefreshToken();
-				$acct->googleOauth2->expires = $token->getExpires();
+				$acct = model\Oauth2Client::findById($accountId);
+				$acct->oauth2Client->token = $token->getToken();
+				$acct->oauth2Client->refreshToken = $token->getRefreshToken();
+				$acct->oauth2Client->expires = $token->getExpires();
 				$acct->save();
 				// We got an access token, let's now get the owner details
 				$ownerDetails = $provider->getResourceOwner($token);
@@ -96,36 +95,10 @@ final class Oauth2Client extends Controller
 	}
 
 	/**
-	 * Refresh access token
-	 *
-	 * @param int $accountId
-	 * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
-	 * /
-	public function refreshAccessToken(int $accountId)
-	{
-		\GO::session()->values['accountId'] = $accountId;
-		$acct = Oauth2Client::findById($accountId);
-		$url = rtrim(go()->getSettings()->URL, '/');
-
-		$acctSettings = $acct->googleOauth2;
-		$provider = new Google([
-			'clientId'     => $acctSettings->clientId,
-			'clientSecret' => $acctSettings->clientSecret,
-			'redirectUri'  => $url . '/gauth/callback'
-		]);
-
-		$grant = new RefreshToken();
-		$token = $provider->getAccessToken($grant, ['refresh_token' => $acctSettings->refreshToken]);
-		$acct->googleOauth2->token = $token->getToken();
-		$acct->googleOauth2->expires = $token->getExpires();
-
-		$acct->save();
-	}
-	*/
-
-	/**
 	 * Prepare ourselves a Google Provider
 	 *
+	 * @todo: make generic for multiple oauth2 default clients
+	 * @todo: move to separate class
 	 * @param int $accountId
 	 * @return Google
 	 * @throws \Exception
@@ -133,7 +106,7 @@ final class Oauth2Client extends Controller
 	private function getProvider(int $accountId): Google
 	{
 		$acct = Oauth2Client::findById($accountId);
-		$acctSettings = $acct->googleOauth2;
+		$acctSettings = $acct->oauth2Client;
 		$url = rtrim(go()->getSettings()->URL, '/');
 		return new Google([
 			'clientId' => $acctSettings->clientId,

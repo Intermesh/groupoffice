@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS `em_accounts` (
   `do_not_mark_as_read` tinyint(1) NOT NULL DEFAULT '0',
 	`signature_below_reply` tinyint(1) NOT NULL DEFAULT '0',
 	`full_reply_headers` tinyint(1) NOT NULL DEFAULT '0',
+	`default_client_id` INT(11) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB ;

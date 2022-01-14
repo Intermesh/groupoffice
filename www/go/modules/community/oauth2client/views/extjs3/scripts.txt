@@ -1,3 +1,2 @@
 Module.js
-EmailOverrides.js
-ConsentDialog.js
+DefaultClientCombo.js

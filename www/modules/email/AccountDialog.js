@@ -40,39 +40,66 @@ GO.email.AccountDialog = function(config) {
 		);
 	}
 
-	// TODO: Put this properly in an override function in Oaath2Client
-	debugger;
-	console.clear();
-	console.log(go.Modules);
+	// TODO: Put this properly in an override function in OAuth2Client
 	if(go.Modules.isAvailable("community", "oauth2client")) {
-		this.selectAuthMethodCombo = new Ext.form.ComboBox({
-			fieldLabel: t("Authentication Method"),
-			hiddenName: 'authenticationMethod',
-			valueField: 'id',
-			displayField: 'text',
-			triggerAction: 'all',
-			allowBlank: false,
-			mode : 'local',
-			editable : false,
-			selectOnFocus : true,
-			forceSelection : true,
+		advancedItems.push(new Ext.form.TextField({
+			fieldLabel : t("OAuth2 Client ID", 'oauth2client', 'community'),
+			name : 'oauth2Client.clientId',
+			listeners : {
+				change : function() {
+					this.refreshNeeded = true;
+				},
+				scope : this
+			}
+		}));
+
+		advancedItems.push(new Ext.form.TextField({
+			fieldLabel : t("OAuth2 Client Secret", 'oauth2client', 'community'),
+			name : 'oauth2Client.clientSecret',
+			listeners : {
+				change : function() {
+					this.refreshNeeded = true;
+				},
+				scope : this
+			}
+		}));
+
+		advancedItems.push(new Ext.form.TextField({
+			fieldLabel : t("OAuth2 Project Id", 'oauth2client', 'community'),
+			name : 'oauth2Client.projectId',
+			listeners : {
+				change : function() {
+					this.refreshNeeded = true;
+				},
+				scope : this
+			}
+		}));
+
+
+		this.selectAuthMethodCombo = new go.modules.community.oauth2client.DefaultClientCombo({
+			hiddenName: 'default_client_id',
 			width: 300,
-			store: new Ext.data.SimpleStore({
-				fields: ['id', 'text'],
-				data: [
-					['Credentials', t("User name and password")],
-					['GoogleOauth2', t("Google OAuth2")]
-				]
-			}),
 			listeners: {
 				'select': function (combo, record, index) {
-					if(record.data.id !== "Credentials") {
-						this.tabPanel.hideTabStripItem(1);
-						this.btnOpenAuthDialog.show();
-					} else {
-						this.tabPanel.unhideTabStripItem(1)
-						this.btnOpenAuthDialog.hide();
-					}
+					this.btnGetRefreshToken.show();
+					this.incomingTab.hide();
+					this.outgoingTab.hide();
+
+					this.ImapUserNameField.setValue(this.EmailAddressField.getValue());
+					this.ImapPortField.setValue(record.data.imapPort);
+					this.ImapHostField.setValue(record.data.imapHost);
+					this.ImapEncryptionField.setValue(record.data.imapEncryption);
+
+					this.SmtpPortField.setValue(record.data.smtpPort);
+					this.SmtpHostField.setValue(record.data.smtpHost);
+					this.SmtpEncryptionField.setValue(record.data.smtpEncryption);
+					this.refreshNeeded = true;
+				},
+				'clear': function(combo, oldValue, newValue) {
+					this.btnGetRefreshToken.hide();
+					this.incomingTab.show();
+					this.outgoingTab.show();
+					this.refreshNeeded = true;
 				},
 				scope: this
 			}
@@ -80,32 +107,30 @@ GO.email.AccountDialog = function(config) {
 	}
 				
 	this.templatesCombo = new GO.form.ComboBox({
-			fieldLabel : t("Default e-mail template", "email"),
-			hiddenName : 'default_account_template_id',
-			width: 300,
-			store : new GO.data.JsonStore({
-				url : GO.url("email/template/accountTemplatesStore"),
-				baseParams : {
-					'type':"0"
-				},
-				root : 'results',
-				totalProperty : 'total',
-				id : 'id',
-				fields : ['id', 'name', 'group', 'text','template_id','checked'],
-				remoteSort : true
-			}),
-			value : '',
-			valueField : 'id',
-			displayField : 'name',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			editable : false,
-			selectOnFocus : true,
-			forceSelection : true
-		});
-		
-	
+		fieldLabel : t("Default e-mail template", "email"),
+		hiddenName : 'default_account_template_id',
+		width: 300,
+		store : new GO.data.JsonStore({
+			url : GO.url("email/template/accountTemplatesStore"),
+			baseParams : {
+				'type':"0"
+			},
+			root : 'results',
+			totalProperty : 'total',
+			id : 'id',
+			fields : ['id', 'name', 'group', 'text','template_id','checked'],
+			remoteSort : true
+		}),
+		value : '',
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		editable : false,
+		selectOnFocus : true,
+		forceSelection : true
+	});
 
 	this.imapAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
 		boxLabel: t("Allow self signed certificate when using SSL or TLS", "email"),
@@ -115,7 +140,7 @@ GO.email.AccountDialog = function(config) {
 	});
 		
 
-	this.incomingTab = {
+	this.incomingTab = new Ext.Container({
 		title : t("Incoming mail", "email"),
 		layout : 'form',
 		defaults : {
@@ -126,7 +151,8 @@ GO.email.AccountDialog = function(config) {
 		cls : 'go-form-panel',
 		waitMsgTarget : true,
 		labelWidth : 120,
-		items : [new Ext.form.TextField({
+		items : [
+		this.ImapHostField = new Ext.form.TextField({
 			fieldLabel : 'IMAP '+t("Host", "email"),
 			name : 'host',
 			allowBlank : false,
@@ -137,12 +163,13 @@ GO.email.AccountDialog = function(config) {
 				scope : this
 			}
 		}),
-		new Ext.form.TextField({
+		this.ImapPortField = new Ext.form.TextField({
 			fieldLabel : t("Port", "email"),
 			name : 'port',
 			value : '143',
 			allowBlank : false
-		}), new Ext.form.TextField({
+		}),
+		this.ImapUserNameField = new Ext.form.TextField({
 			fieldLabel : t("Username"),
 			name : 'username',
 			allowBlank : false,
@@ -161,7 +188,7 @@ GO.email.AccountDialog = function(config) {
 			hideLabel:true,
 			hidden: true //this function only works with imap auth at the moment.
 		}),
-		new Ext.form.TextField({
+		this.ImapPasswordField = new Ext.form.TextField({
 			fieldLabel : t("Password"),
 			name : 'password',
 			inputType : 'password',
@@ -193,7 +220,7 @@ GO.email.AccountDialog = function(config) {
 			forceSelection : true
 		}),
 		this.imapAllowSelfSignedCheck]
-	};
+	});
 
 	// end incoming tab
 
@@ -208,7 +235,8 @@ GO.email.AccountDialog = function(config) {
 		name : 'name',
 		allowBlank : false,
 		anchor : '100%'
-	}, {
+	},
+	this.EmailAddressField = new Ext.form.TextField({
 		fieldLabel : t("E-mail"),
 		name : 'email',
 		vtype: 'emailAddress',
@@ -221,7 +249,7 @@ GO.email.AccountDialog = function(config) {
 			scope : this
 		},
 		anchor : '100%'
-	}, {
+	}), {
 		xtype : 'textarea',
 		name : 'signature',
 		fieldLabel : t("Signature", "email"),
@@ -234,7 +262,6 @@ GO.email.AccountDialog = function(config) {
 
 	if(go.Modules.isAvailable("community", "oauth2client")) {
 		this.properties_items.push(this.selectAuthMethodCombo);
-		// this.properties_items.push(this.btnOpenAuthDialog);
 	}
 
 	this.smtpAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
@@ -244,7 +271,7 @@ GO.email.AccountDialog = function(config) {
 		fieldLabel:''
 	});
 	
-	this.outgoingTab = {
+	this.outgoingTab = new Ext.Container({
 		title : t("Outgoing mail", "email"),
 		layout : 'form',
 		xtype:'fieldset',
@@ -255,17 +282,17 @@ GO.email.AccountDialog = function(config) {
 		autoHeight : true,
 		cls : 'go-form-panel',
 		labelWidth : 120,
-		items : [new Ext.form.TextField({
+		items : [this.SmtpHostField = new Ext.form.TextField({
 			fieldLabel : t("Host", "email"),
 			name : 'smtp_host',
 			allowBlank : false,
 			value : GO.email.defaultSmtpHost
-		}),new Ext.form.TextField({
+		}),this.SmtpPortField = new Ext.form.TextField({
 			fieldLabel : t("Port", "email"),
 			name : 'smtp_port',
 			value : '25',
 			allowBlank : false
-		}), this.encryptionField = new Ext.form.ComboBox({
+		}), this.SmtpEncryptionField = new Ext.form.ComboBox({
 			fieldLabel : t("Encryption", "email"),
 			hiddenName : 'smtp_encryption',
 			store : new Ext.data.SimpleStore({
@@ -316,7 +343,7 @@ GO.email.AccountDialog = function(config) {
 			inputType : 'password',
 			disabled:true
 		})]
-	};
+	});
 	
 	
 
@@ -481,7 +508,6 @@ GO.email.AccountDialog = function(config) {
 		]
 	};
 
-	console.log(this.serverTab);
 	this.filterGrid = new GO.email.FilterGrid();
 	this.labelsTab = new GO.email.LabelsGrid();
 
@@ -518,7 +544,7 @@ GO.email.AccountDialog = function(config) {
 
 	});
 
-	this.encryptionField.on('select', function(combo, record, index) {
+	this.SmtpEncryptionField.on('select', function(combo, record, index) {
 		var value = record.data.value == 'ssl' ? '465' : '587';
 		
 		this.propertiesPanel.form.findField('smtp_port')
@@ -579,12 +605,12 @@ GO.email.AccountDialog = function(config) {
 
 			}
 		},
-		this.btnOpenAuthDialog = new Ext.Button({
+		this.btnGetRefreshToken = new Ext.Button({
 			iconCls: 'btn-token',
 			text: 'Refresh token',
 			handler : function() {
 				window.open('gauth/authenticate/' + this.account_id, 'do_da_auth_thingy');
-				// This works, but will trigger a CORS error. Naturally, since oauth does not like Ajax
+				// TODO? This works, but will trigger a CORS error. Naturally, since oauth does not like Ajax Possibly in an iframe or something
 				/*
 				go.Jmap.request({
 					method: "community/oauth2client/Oauth2Account/auth",
@@ -742,8 +768,10 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 
 				this.permissionsTab.setAcl(action.result.data.acl_id);
 
-				if(this.selectAuthMethodCombo.getValue() === 'GoogleOauth2') {
-					this.btnOpenAuthDialog.show();
+				if(this.selectAuthMethodCombo.getValue()) {
+					this.btnGetRefreshToken.show();
+					this.incomingTab.hide();
+					this.outgoingTab.hide();
 				}
 
 			},
