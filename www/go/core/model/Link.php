@@ -191,7 +191,6 @@ class Link extends AclItemEntity
 	 * @param Entity|ActiveRecord $a
 	 * @param Entity|ActiveRecord  $b
 	 * @return boolean
-	 * @deprecated (or at least not used)
 	 */
 	public static function linkExists($a, $b) {
 		return static::findLink($a, $b) !== false;
@@ -263,10 +262,6 @@ class Link extends AclItemEntity
 	protected function internalValidate() {
 		
 		parent::internalValidate();
-
-		if($this->isDuplicateLink()) {
-			$this->setValidationError("toId", ErrorCode::UNIQUE, "This link already exists");
-		}
 		
 		if($this->toId == $this->fromId && $this->toEntityTypeId == $this->fromEntityTypeId) {
 			$this->setValidationError("toId", ErrorCode::UNIQUE, "You can't link to the same item");
@@ -432,20 +427,5 @@ class Link extends AclItemEntity
 	protected static function aclEntityKeys()
 	{
 		return ['toId' => 'entityId', 'toEntityTypeId' => 'entityTypeId'];
-	}
-
-	private function isDuplicateLink() :bool
-	{
-		if($this->isNew()) {
-			if(self::find()->where([
-				'toId' => $this->toId,
-				'fromId' => $this->fromId,
-				'toEntityTypeId' => $this->toEntityTypeId,
-				'fromEntityTypeId' => $this->fromEntityTypeId]
-			)->single()) {
-				return true;
-			}
-		}
-		return false;
 	}
 }
