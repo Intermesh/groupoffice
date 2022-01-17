@@ -2,6 +2,7 @@
 - Bookmarks: Fixed integrity constraint error when logo was not found
 - Bookmarks: Improved logo detection and return redirected URL
 - Bookmarks: Improved UI
+- Projects2: Fix tasklist combo when editing project task
 
 13-01-2022 6.6.31
 - Address book: Bug in address book create permissions
