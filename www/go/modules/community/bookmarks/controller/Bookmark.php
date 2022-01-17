@@ -83,6 +83,12 @@ class Bookmark extends EntityController {
 
 				$html = $c->request($params['url']);
 
+				if(!empty($c->lastHeaders['location'])) {
+					$params['url'] = $c->lastHeaders['location'];
+				}
+
+				go()->debug($c->lastHeaders);
+
 				//go_debug($html);
 
 				$html = str_replace("\r", '', $html);
@@ -146,7 +152,8 @@ class Bookmark extends EntityController {
 				$response['logo'] = '';
 			}
 		}
-		
+
+		$response['url'] = $params['url'];
 		$response['title'] = StringUtil::cutString($response['title'], 64, true, "");
 		$response['description'] = StringUtil::cutString($response['description'], 255, true, "");
 		return $response;

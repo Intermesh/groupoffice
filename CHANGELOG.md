@@ -1,3 +1,8 @@
+- Core: Issue #776: invalid return type in App::getStorageQuota()
+- Bookmarks: Fixed integrity constraint error when logo was not found
+- Bookmarks: Improved logo detection and return redirected URL
+- Bookmarks: Improved UI
+
 13-01-2022 6.6.31
 - Address book: Bug in address book create permissions
 - ActiveSync: Fixed sync problem and cleaned up code
