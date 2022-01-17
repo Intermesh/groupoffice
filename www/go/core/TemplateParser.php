@@ -206,11 +206,9 @@ class TemplateParser {
 	}
 
 	private function filterEntity($id, $entityName, $properties = null) {
-
-		if(!$id) {
+		if(empty($id)) {
 			return null;
 		}
-
 		$et = EntityType::findByName($entityName);
 		if(!$et) {
 			return null;

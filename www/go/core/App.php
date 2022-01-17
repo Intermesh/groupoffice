@@ -228,9 +228,9 @@ use Faker;
 		/**
 		 * Get total space of the data folder in bytes
 		 *
-		 * @return int
+		 * @return float
 		 */
-		public function getStorageQuota(): int
+		public function getStorageQuota(): float
 		{
 			if(!isset($this->storageQuota)) {
 				$this->storageQuota = $this->getConfig()['quota'];

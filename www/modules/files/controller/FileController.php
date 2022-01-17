@@ -186,7 +186,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	protected function afterDisplay(&$response, &$model, &$params) {
 
 		$response['data']['path'] = $model->path;
-		$response['data']['size'] = \GO\Base\Util\Number::formatSize($model->fsFile->size());
+		$response['data']['size'] = $model->fsFile->size();
 		$response['data']['extension'] = strtolower($model->fsFile->extension());
 		$response['data']['type'] = \GO::t($response['data']['extension'], 'base', 'filetypes');
 		

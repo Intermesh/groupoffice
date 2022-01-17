@@ -1,3 +1,18 @@
+17-01-2022 6.6.32
+- Core: Issue #776: invalid return type in App::getStorageQuota()
+- Bookmarks: Fixed integrity constraint error when logo was not found
+- Bookmarks: Improved logo detection and return redirected URL
+- Bookmarks: Improved UI
+- ActiveSync: Preserve Message ID, In-Reply-To and References headers. Hopefully fixes In-Reply-To: header is missing #779 too.
+- Projects2: Fix tasklist combo when editing project task
+- Billing: Set empty contact name when removing contact
+- Billing: timezone error in reports showing invoices from one day out of the range.
+- Billing: Report checkboxes were not loaded correctly
+
+13-01-2022 6.6.31
+- Address book: Bug in address book create permissions
+- ActiveSync: Fixed sync problem and cleaned up code
+
 11-01-2022 6.6.30
 - Calendar: Added showing tasks in the calendar for new task module.
 - Core: Typo in updates.php fixing upgrade error: ine 61: Return value of go\core\orm\EntityType::getName() must be of the type string, null returned
@@ -29,11 +44,10 @@
       custom fields.
 
 
-6.5.97
+17-01-2022 6.5.97
 - Business: hide 'Budgetable' checkbox for special leave types
-
-6.5.97
 - Leavedays: set special_budget_id explicitly to NULL when not in special leave mode
+- Business: manage permissions to the module will enable user to edit all agreements
 
 03-01-2022 6.5.96
 - Business: hid transferable leave day types in favor of Special leave types
@@ -512,7 +526,9 @@
 
 
 
-6.4.245
+17-01-2022 6.4.246
+- Core: Fix for error when creating tasks from a project
+
 09-12-2021 6.4.245
 - Savemailas: override mtime to email date
 - Calendar: backport prevent error when event is cancelled for disabled user

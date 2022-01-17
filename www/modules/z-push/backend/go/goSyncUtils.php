@@ -1,22 +1,34 @@
-<?php
+<?php /** @noinspection PhpDeprecationInspection */
+
+use GO\Base\Db\ActiveRecord;
+use GO\Base\Model\User;
+use GO\Base\Util\Date;
+use GO\Base\Util\Icalendar\Rrule;
+use GO\Base\Util\Rtf as RtfAlias;
+use GO\Base\Util\StringHelper;
+use GO\Calendar\Model\Event;
+use go\core\orm\Entity;
+use go\core\util\StringUtil;
+use GO\Sync\Model\Settings as SyncSettings;
 
 class GoSyncUtils {
-
-
 
 
 	/**
 	 * Get the Group-Office Sync settings for the given user
 	 * If no user is given then it will take the settings for the current user
 	 *
-	 * @return \GO\Sync\Model\Settings
+	 * @param ?User $user
+	 * @return SyncSettings
 	 */
-	public static function getUserSettings($user = false) {
+	public static function getUserSettings(?User $user = null): SyncSettings
+	{
 
 		if (empty($user))
-			$user = \GO::user();
+			$user = GO::user();
 
-		return \GO\Sync\Model\Settings::model()->findForUser($user);
+		/** @noinspection PhpUndefinedMethodInspection */
+		return SyncSettings::model()->findForUser($user);
 	}
 	
 //	public static function getEntityModSeq($entity) {
@@ -54,12 +66,12 @@ class GoSyncUtils {
 	/**
 	 * Returns the best match of preferred body preference types.
 	 *
-	 * @param array $bpTypes
-	 *
-	 * @access private
+	 * @param ?array $bpTypes
+	 * @param array $supported
 	 * @return int
 	 */
-	public static function getBodyPreferenceMatch($bpTypes, $supported = array(SYNC_BODYPREFERENCE_PLAIN, SYNC_BODYPREFERENCE_HTML)) {
+	public static function getBodyPreferenceMatch(?array $bpTypes, array $supported = array(SYNC_BODYPREFERENCE_PLAIN, SYNC_BODYPREFERENCE_HTML)): int
+	{
 
 		ZLog::Write(LOGLEVEL_DEBUG, 'GoSyncUtils->getBodyPreferenceMatch() ~~ bpTypes = ' . var_export($bpTypes, true));
 
@@ -85,16 +97,16 @@ class GoSyncUtils {
 	/**
 	 * Get the correct formatted \SyncBaseBody from an attribute of a model from GO.
 	 *
-	 * @param \GO\Base\Db\ActiveRecord $model
-	 * @param StringHelper $attribute
+	 * @param ActiveRecord|Entity $model
+	 * @param string $attribute
 	 * @param int $sbReturnType
-	 * @return \SyncBaseBody
+	 * @return SyncBaseBody
 	 */
-	public static function createASBodyForMessage($model, $attribute, $sbReturnType = SYNC_BODYPREFERENCE_HTML) {
-
+	public static function createASBodyForMessage($model, string $attribute, int $sbReturnType = SYNC_BODYPREFERENCE_HTML): SyncBaseBody
+	{
 		$sbBody = new SyncBaseBody();
 
-		$asBodyData = \GO\Base\Util\StringHelper::normalizeCrlf($model->$attribute);
+		$asBodyData = StringUtil::normalizeCrlf($model->$attribute);
 
 		if(!isset($asBodyData)) {
 			$asBodyData = "";
@@ -106,7 +118,7 @@ class GoSyncUtils {
 			
 			$sbBody->type = SYNC_BODYPREFERENCE_HTML;
 
-			$asBodyData = \GO\Base\Util\StringHelper::text_to_html($asBodyData);
+			$asBodyData = StringHelper::text_to_html($asBodyData);
 		} else {
 			
 			$sbBody->type = SYNC_BODYPREFERENCE_PLAIN;
@@ -125,11 +137,11 @@ class GoSyncUtils {
 	/**
 	 * Get the body text of the message
 	 *
-	 * @param \SyncObject $message
-	 * @return StringHelper
+	 * @param SyncObject $message
+	 * @return string
 	 */
-	public static function getBodyFromMessage($message) {
-
+	public static function getBodyFromMessage(SyncObject $message): string
+	{
 		if (Request::GetProtocolVersion() >= 12.0) {
 			return isset($message->asbody) && isset($message->asbody->data) ? stream_get_contents($message->asbody->data) : "";
 		} else {
@@ -137,11 +149,11 @@ class GoSyncUtils {
 				return $message->body;
 
 			if (isset($message->rtf)) {
-				$rtfParser = new \GO\Base\Util\Rtf();
+				$rtfParser = new RtfAlias();
 				$rtfParser->output('ascii');
 				$rtfParser->loadrtf(base64_decode($message->rtf));
 				$rtfParser->parse();
-				return (string) $rtfParser->out;
+				return $rtfParser->out;
 			}
 		}
 		return "";
@@ -151,8 +163,13 @@ class GoSyncUtils {
 	 * for the tasks table or calendar event table.
 	 */
 
-	public static function importRecurrence($recur, $eventStartTime) {
-		$rrule = '';
+	/**
+	 * @param SyncRecurrence $recur
+	 * @param int $eventStartTime
+	 * @return false|string
+	 * @throws Exception
+	 */
+	public static function importRecurrence(SyncRecurrence $recur, int $eventStartTime) {
 		$freq = "";
 		switch ($recur->type) {
 			case 0:
@@ -162,8 +179,6 @@ class GoSyncUtils {
 				$freq = "WEEKLY";
 				break;
 			case 2:
-				$freq = "MONTHLY";
-				break;
 			case 3:
 				$freq = "MONTHLY";
 				break;
@@ -174,8 +189,7 @@ class GoSyncUtils {
 		}
 
 		if ($freq) {
-
-			$rrule = new \GO\Base\Util\Icalendar\Rrule();
+			$rrule = new Rrule();
 			$rrule->eventStartTime = $eventStartTime;
 			$rrule->freq = $freq;
 			$rrule->interval = $recur->interval;
@@ -194,10 +208,14 @@ class GoSyncUtils {
 		}
 	}
 
-	public static function aSync2weekday($number) {
+	/**
+	 * @throws Exception
+	 */
+	public static function aSync2weekday(int $number): array
+	{
 		$weekdays = array();
 		if ($number >= 128 || $number < 0) {
-			throw new \Exception('The way the recurrence days were coded, is corrupted!');
+			throw new Exception('The way the recurrence days were coded, is corrupted!');
 		}
 		if ($number >= 64) {
 			$number -=64;
@@ -224,13 +242,13 @@ class GoSyncUtils {
 			$weekdays[] = 'MO';
 		}
 		if ($number >= 1) {
-			$number -=1;
 			$weekdays[] = 'SU';
 		}
 		return $weekdays;
 	}
 
-	public static function weekday2ASync($weekdays) {
+	public static function weekday2ASync(array $weekdays): int
+	{
 		//ZLog::Write(LOGLEVEL_DEBUG, var_export($weekdays, true));
 		$ASyncDay = 0;
 		foreach ($weekdays as $weekday) {
@@ -263,11 +281,11 @@ class GoSyncUtils {
 
 	public static function getTimeZoneForClient() {
 
-		if (!isset(\GO::session()->values['activesync_timezone'])) {
+		if (!isset(GO::session()->values['activesync_timezone'])) {
 			$old = date_default_timezone_get();
-			date_default_timezone_set(\GO::user()->timezone);
+			date_default_timezone_set(GO::user()->timezone);
 			
-			$tz = new DateTimeZone(\GO::user()->timezone);
+			$tz = new DateTimeZone(GO::user()->timezone);
 			$transitions = $tz->getTransitions();
 			$start_of_year = mktime(0, 0, 0, 1, 1);
 
@@ -279,8 +297,8 @@ class GoSyncUtils {
 				}
 			}
 
-			if (!isset($dst_end)) {
-				$astz['format'] = "la64vvvvvvvv" . "la64vvvvvvvv" . "l";
+			$astz['format'] = "la64vvvvvvvv" . "la64vvvvvvvv" . "l";
+			if (!isset($dst_end) || !isset($dst_start)) {
 				$astz['bias'] = 0;
 				$astz['stdname'] = $tz->getName();
 				$astz['stdyear'] = 0;
@@ -305,13 +323,12 @@ class GoSyncUtils {
 				$astz['dstdmillis'] = 0;
 				$astz['dstbias'] = 0;
 			} else {
-				$astz['format'] = "la64vvvvvvvv" . "la64vvvvvvvv" . "l";
 				$astz['bias'] = $dst_start['offset'] / -60;
 				$astz['stdname'] = $tz->getName();
 				$astz['stdyear'] = 0;
 				$astz['stdmonth'] = date('n', $dst_start['ts']);
 				$astz['stdday'] = date('w', $dst_start['ts']);
-				$stdweek = \GO\Base\Util\Date::get_occurring_number_of_day_in_month($dst_start['ts']);
+				$stdweek = Date::get_occurring_number_of_day_in_month($dst_start['ts']);
 				if ($stdweek == 4) {
 					$stdweek = 5;
 				}
@@ -327,7 +344,7 @@ class GoSyncUtils {
 				$astz['dstyear'] = 0;
 				$astz['dstmonth'] = date('n', $dst_end['ts']);
 				$astz['dstday'] = date('w', $dst_end['ts']);
-				$dstweek = \GO\Base\Util\Date::get_occurring_number_of_day_in_month($dst_end['ts']);
+				$dstweek = Date::get_occurring_number_of_day_in_month($dst_end['ts']);
 				if ($dstweek == 4) {
 					$dstweek = 5;
 				}
@@ -339,7 +356,7 @@ class GoSyncUtils {
 				$astz['dstbias'] = ($dst_end['offset'] / -60) - $astz['bias'];
 			}
 			date_default_timezone_set($old);
-			\GO::session()->values['activesync_timezone'] = base64_encode(call_user_func_array('pack', $astz));
+			GO::session()->values['activesync_timezone'] = base64_encode(call_user_func_array('pack', $astz));
 		}
 
 		/* $timezone = base64_encode(
@@ -380,21 +397,23 @@ class GoSyncUtils {
 		  0
 		  )); */
 
-		return \GO::session()->values['activesync_timezone'];
+		return GO::session()->values['activesync_timezone'];
 	}
 
-	/* Translates rrule field, repeat_end_time field, and start_time field from
+	/**
+	 * Translates rrule field, repeat_end_time field, and start_time field from
 	 * the calendar events table to a format understandable for ActiveSync.
+	 * @param Event $model
+	 * @return SyncRecurrence
 	 */
-
-	public static function exportRecurrence($model) {
-
+	public static function exportRecurrence(Event $model): SyncRecurrence
+	{
 		$old = date_default_timezone_get();
-		date_default_timezone_set($model->timezone ?? \GO::user()->timezone);
+		date_default_timezone_set($model->timezone ?? GO::user()->timezone);
 
 		$recur = new SyncRecurrence();
 
-		$rrule = new \GO\Base\Util\Icalendar\Rrule();
+		$rrule = new Rrule();
 		$rrule->readIcalendarRruleString($model->start_time, $model->rrule, false);
 
 		$recur->interval = $rrule->interval;
@@ -439,8 +458,9 @@ class GoSyncUtils {
 	 * Parse a RRULE
 	 * @param string $rrulestr
 	 * @param string $type "task" or "event"
+	 * @return SyncRecurrence
 	 */
-	public static function ParseRecurrence($rrulestr, $type) {
+	public static function ParseRecurrence(string $rrulestr, string $type): SyncRecurrence {
 		$recurrence = new SyncRecurrence();
 		if ($type == "task") {
 			$recurrence = new SyncTaskRecurrence();
@@ -529,11 +549,12 @@ class GoSyncUtils {
 	}
 
 	/**
-	 * @param object $rec ActiveSync format rrule
+	 * @param SyncRecurrence $rec ActiveSync format rrule
 	 * @param bool $allday
 	 * @return array JMAP format array of rrule
 	 */
-	public static function GenerateRecurrence($rec, $allday = true) {
+	public static function GenerateRecurrence(SyncRecurrence $rec, bool $allday = true): array
+	{
 		$rrule = [];
 		if (isset($rec->type)) {
 			$freq = "";

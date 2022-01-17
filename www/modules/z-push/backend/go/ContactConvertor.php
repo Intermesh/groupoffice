@@ -5,6 +5,7 @@ use go\core\fs\Blob;
 use go\core\mail\RecipientList;
 use go\core\model\Acl;
 use go\core\model\Link;
+use go\core\orm\Property;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
@@ -102,7 +103,11 @@ class ContactConvertor {
 		];
 	}
 
-	public function GO2AS(Contact $contact, $contentParameters) {
+	/**
+	 * @throws Exception
+	 */
+	public function GO2AS(Contact $contact, ContentParameters $contentParameters): SyncContact
+	{
 		$message = new SyncContact();
 				
 		$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentParameters->GetBodyPreference());
@@ -121,8 +126,8 @@ class ContactConvertor {
 			$message->$asProp = $contact->$goProp;
 		}
 		
-		$this->hasManyToFlat($contact->phoneNumbers, $message, $this->phoneMapping);		
-		$this->hasManyToFlat($contact->dates, $message, $this->dateMapping);		
+		$this->hasManyToFlat($contact->phoneNumbers, $message, $this->phoneMapping);
+		$this->hasManyToFlat($contact->dates, $message, $this->dateMapping);
 		
 		foreach($contact->emailAddresses as $e) {
 			if(!isset($message->email1address)) {
@@ -164,13 +169,12 @@ class ContactConvertor {
 	/**
 	 * Convert GO has many properties with a type to the syncmessage names.
 	 * 
-	 * @param type $items
+	 * @param Property[] $items
 	 * @param SyncContact $message
 	 * @param array $mapping
-	 * @param string $propName
-	 * @return type
+	 * @return void
 	 */
-	private function hasManyToFlat($items, SyncContact $message, array $mapping) {
+	private function hasManyToFlat(array $items, SyncContact $message, array $mapping) {
 		
 		//Loop through all items (eg. phoneMumbers)
 		foreach($items as $i) {
@@ -181,17 +185,19 @@ class ContactConvertor {
 	/**
 	 * Applies phone number to the SyncContact object
 	 * 
-	 * @param PhoneNumber $i
+	 * @param Property $i
 	 * @param SyncContact $message
 	 * @param array $mapping
-	 * @return boolean
+	 * @return void
 	 */
-	private function applyItem($i, $message, $mapping) {
+	private function applyItem(Property $i, SyncContact $message, array $mapping): void
+	{
 //		ZLog::Write(LOGLEVEL_DEBUG, "Applying ". var_export($i->toArray(), true));
-		
+
+		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 		if(!isset($mapping[$i->type])) {
 			//If the type is not mapped then don't sync it.
-			return false;
+			return;
 		}			
 		$m = $mapping[$i->type];		 
 		
@@ -209,26 +215,28 @@ class ContactConvertor {
 						$message->$asProp = $v instanceof DateTime ? $v->format("U") : $v;
 					}
 				}
-				return true;
+				return;
 			} else
 			{
 				ZLog::Write(LOGLEVEL_DEBUG, "Already set: ". $firstPropName);
 			}
 		}
-		
-		return false;
+
 	}
-	
+
 	/**
 	 * Maps AS properties to has many item with a "type" property. For example phone numbers.
 	 *
+	 * @template T
+	 * @param Contact $contact
 	 * @param PhoneNumber[] $items
 	 * @param SyncContact $message
 	 * @param array $mapping
-	 * @param string $cls
-	 * @return PhoneNumber[]
+	 * @param class-string<T> $cls
+	 * @return T[]
 	 */
-	private function flatToHasMany($items, $message, $mapping, $cls) {
+	private function flatToHasMany(Contact $contact, array $items, SyncContact $message, array $mapping, string $cls): array
+	{
 		ZLog::Write(LOGLEVEL_DEBUG, "flatToHasMany");
 		//create array of values by type:
 		//[
@@ -247,7 +255,7 @@ class ContactConvertor {
 		}
 		
 		foreach($values as $type => $valuesOfType) {
-			$items = $this->patchType($items, $type, $valuesOfType, $mapping[$type], $cls);
+			$items = $this->patchType($contact, $items, $type, $valuesOfType, $mapping[$type], $cls);
 		}	
 		
 		return $items;
@@ -257,14 +265,14 @@ class ContactConvertor {
 	 * Uses the mapping to convert AS properties to has many array values.
 	 * 
 	 * eg. "homephone" -> ['type' => 'home', 'number' => 1234']
-	 * @param array $m
-	 * @param type $message
-	 * @return boolean
+	 * @param array $map
+	 * @param SyncContact $message
+	 * @return array|boolean
 	 */
-	private function buildHasManyValues($m, $message) {		
+	private function buildHasManyValues(array $map, SyncContact $message) {
 		$v = [];
 		$found = false;
-		foreach($m as $goProp => $asProp) {
+		foreach($map as $goProp => $asProp) {
 			$v[$goProp] = $message->$asProp;
 			if(!$found && !empty($message->$asProp)) {
 				$found = true;
@@ -275,18 +283,20 @@ class ContactConvertor {
 		}
 		return $v;		
 	}
-	
+
 	/**
 	 * Patches the phonenumbers by type. Leaving numbers that couldn't be synced untouched,
-	 * 
+	 *
+	 * @template T
+	 * @param Contact $contact
 	 * @param PhoneNumber[] $items
 	 * @param string $type eg. "home"
 	 * @param array $values
 	 * @param array $mapping
-	 * @param string $cls
-	 * @return type
+	 * @param class-string<T> $cls
+	 * @return T[]
 	 */
-	private function patchType($items, $type, $values, $mapping, $cls) {
+	private function patchType(Contact $contact, array $items, string $type, array $values, array $mapping, string $cls) : array {
 		
 		//The max number of phone numbers AS supports for this type.
 		$maxValues = count($mapping);
@@ -315,21 +325,21 @@ class ContactConvertor {
 		
 		//Add new phone numbers that are left over from the numbers that were sent to the device.
 		foreach($values as $value) {
-			$items[] = (new $cls)->setValues($value)->setValues(['type' => $type]);
+			$items[] = (new $cls($contact))->setValues($value)->setValues(['type' => $type]);
 		}
 		
 		return $items;
 	}
-	
+
 	/**
 	 * Convert AS SyncContact message to Group-Office Contact
-	 * 
+	 *
 	 * @param SyncContact $message
 	 * @param Contact $contact
-	 * @param type $contentParameters
-	 * @return Contact
+	 * @return ?Contact
+	 * @throws Exception
 	 */
-	public function AS2GO(SyncContact $message, Contact $contact, $contentParameters) {
+	public function AS2GO(SyncContact $message, Contact $contact): ?Contact {
 		
 		try {
 			go()->getDbConnection()->beginTransaction();
@@ -346,10 +356,10 @@ class ContactConvertor {
 				$message->anniversary = new DateTime('@' . $message->anniversary);
 			}
 
-			$contact->phoneNumbers = $this->flatToHasMany($contact->phoneNumbers ?? [], $message, $this->phoneMapping, PhoneNumber::class);		
-			$contact->dates = $this->flatToHasMany($contact->dates ?? [], $message, $this->dateMapping, Date::class);
-			$contact->urls = $this->flatToHasMany($contact->urls ?? [], $message, $this->urlMapping, Url::class);
-			$contact->addresses = $this->flatToHasMany($contact->addresses ?? [], $message, $this->addressMapping, Address::class);
+			$contact->phoneNumbers = $this->flatToHasMany($contact, $contact->phoneNumbers ?? [], $message, $this->phoneMapping, PhoneNumber::class);
+			$contact->dates = $this->flatToHasMany($contact, $contact->dates ?? [], $message, $this->dateMapping, Date::class);
+			$contact->urls = $this->flatToHasMany($contact, $contact->urls ?? [], $message, $this->urlMapping, Url::class);
+			$contact->addresses = $this->flatToHasMany($contact, $contact->addresses ?? [], $message, $this->addressMapping, Address::class);
 
 			$this->setEmailAddresses($message, $contact);
 
@@ -369,8 +379,6 @@ class ContactConvertor {
 				$contact->photoBlobId = null;
 			}
 
-			
-
 			if(!$contact->save()) {
 				throw new Exception("Failed to save contact: " . var_export($contact->getValidationErrors(), true));
 			}
@@ -388,9 +396,12 @@ class ContactConvertor {
 			go()->getDbConnection()->rollBack();
 		}
 		
-		return false;
+		return null;
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function setOrganizations(SyncContact $message, Contact $contact) {
 
 		$asOrganizationNames = empty($message->companyname) ? [] : array_map('trim', explode("|", $message->companyname));
@@ -405,13 +416,12 @@ class ContactConvertor {
 		
 		$goOrganizationsNames = [];
 		foreach($goOrganizations as $o) {
-			if(!in_array($o->name, $asOrganizationNames)) {
-				if(!Link::deleteLink($o, $contact)) {
-					throw new \Exception("Could not unlink organization " . $o->name);
+			if (!in_array($o->name, $asOrganizationNames)) {
+				if (!Link::deleteLink($o, $contact)) {
+					throw new Exception("Could not unlink organization " . $o->name);
 				}
-				ZLog::Write(LOGLEVEL_DEBUG, "Unlink: ".$o->name);
-			} else
-			{
+				ZLog::Write(LOGLEVEL_DEBUG, "Unlink: " . $o->name);
+			} else {
 				$goOrganizationsNames[] = $o->name;
 			}
 		}
@@ -440,26 +450,27 @@ class ContactConvertor {
 			}
 		}		
 	}
-	/**
-	 * Get default address book
-	 * 
-	 * @return AddressBook
-	 * @throws Exception
-	 */
-	public function getDefaultAddressBook() {
-
-		$addressbook = AddressBook::find()
-			->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
-			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
-			->where('su.userId', '=', go()->getAuthState()->getUserId())
-			->orderBy(['su.isDefault' => 'DESC'])
-			->single();
-
-		if (!$addressbook)
-			throw new Exception("FATAL: No default addressbook configured");
-		
-		return $addressbook;
-	}
+//	/**
+//	 * Get default address book
+//	 *
+//	 * @return AddressBook
+//	 * @throws Exception
+//	 */
+//	public function getDefaultAddressBook(): AddressBook
+//	{
+//
+//		$addressbook = AddressBook::find()
+//			->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
+//			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
+//			->where('su.userId', '=', go()->getAuthState()->getUserId())
+//			->orderBy(['su.isDefault' => 'DESC'])
+//			->single();
+//
+//		if (!$addressbook)
+//			throw new Exception("FATAL: No default addressbook configured");
+//
+//		return $addressbook;
+//	}
 	
 	private function setEmailAddresses(SyncContact $message, Contact $contact) {
 		$max = 3;
@@ -492,7 +503,7 @@ class ContactConvertor {
 				$contact->emailAddresses[$i]->email = $clientEmails[$i]->getEmail();
 			} else
 			{
-				$contact->emailAddresses[$i] = (new EmailAddress())->setValues(['type' => 'work', 'email' => $clientEmails[$i]->getEmail()]);
+				$contact->emailAddresses[$i] = (new EmailAddress($contact))->setValues(['type' => 'work', 'email' => $clientEmails[$i]->getEmail()]);
 			}		
 		}
 		
