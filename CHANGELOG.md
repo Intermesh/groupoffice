@@ -43,10 +43,8 @@
       custom fields.
 
 
-6.5.97
+17-01-2022 6.5.97
 - Business: hide 'Budgetable' checkbox for special leave types
-
-6.5.97
 - Leavedays: set special_budget_id explicitly to NULL when not in special leave mode
 - Business: manage permissions to the module will enable user to edit all agreements
 
@@ -527,7 +525,9 @@
 
 
 
-6.4.245
+17-01-2022 6.4.246
+- Core: Fix for error when creating tasks from a project
+
 09-12-2021 6.4.245
 - Savemailas: override mtime to email date
 - Calendar: backport prevent error when event is cancelled for disabled user
