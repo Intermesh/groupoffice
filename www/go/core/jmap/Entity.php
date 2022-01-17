@@ -718,12 +718,12 @@ abstract class Entity  extends OrmEntity {
 	 * Create an alert for this entity
 	 *
 	 * @param DateTimeInterface $triggerAt
-	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param ?string $tag A unique tag for this entity and user. It will replace existing ones.
 	 * @param int|null $userId The user this alert is for. Defaults to current user.
 	 * @return Alert
 	 */
 	public function createAlert(DateTimeInterface $triggerAt,
-	                            string            $tag,
+	                            ?string            $tag = null,
 	                            int               $userId = null): Alert
 	{
 		$alert = new Alert();
