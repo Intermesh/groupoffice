@@ -5,10 +5,11 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	height: dp(600),
 	modal: false,
 
-	// onLoad: function (values) {
-	// 	this.recurrencePanel.onLoad(values.start, values.recurrenceRule);
-	// 	go.modules.community.tasks.TaskDialog.superclass.onLoad.call(this,values);
-	// },
+	onLoad: function (values) {
+		if(go.util.empty(values.id)) {
+			this.tasklistCombo.setValue(go.User.tasksSettings.defaultTasklistId);
+		}
+	},
 	initFormItems: function () {
 
 		// this.taskCombo = new go.modules.community.tasks.TaskCombo({});
@@ -189,9 +190,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						grow: true
 
 					},
-					this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
-						value: go.User.tasksSettings.defaultTasklistId
-					}),
+					this.tasklistCombo = new go.modules.community.tasks.TasklistCombo(),
 					new go.modules.community.tasks.AlertFields()
 				]
 			}]

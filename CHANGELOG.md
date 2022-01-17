@@ -3,6 +3,7 @@
 - Bookmarks: Improved logo detection and return redirected URL
 - Bookmarks: Improved UI
 - ActiveSync: Preserve Message ID, In-Reply-To and References headers. Hopefully fixes In-Reply-To: header is missing #779 too.
+- Projects2: Fix tasklist combo when editing project task
 
 13-01-2022 6.6.31
 - Address book: Bug in address book create permissions
