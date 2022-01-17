@@ -87,13 +87,16 @@ class StringUtil {
   /**
    * Converts and cleans a string to valid UTF-8
    *
-   * @param string $str
+   * @param ?string $str
    * @param string|null $sourceCharset
    * @param string
    * @return string
    */
-	public static function cleanUtf8(string $str, string $sourceCharset = null): string
+	public static function cleanUtf8(?string $str, string $sourceCharset = null): string
 	{
+		if(empty($str)) {
+			return $str;
+		}
 		
 		if(!isset($sourceCharset)){
 			$sourceCharset = mb_detect_encoding($str);
@@ -242,7 +245,7 @@ END;
 		}
 
 		//replace repeating spaces with &nbsp;		
-		$text = htmlspecialchars($text, ENT_COMPAT, 'UTF-8');
+		$text = htmlspecialchars($text, ENT_COMPAT);
 		$text = str_replace('  ', '&nbsp;&nbsp;', $text);
 
 
@@ -267,7 +270,7 @@ END;
 	{
 		
 		//normalize html and remove line breaks
-		$html = StringUtil::normalizeCrlf($html, "\r\n");
+		$html = StringUtil::normalizeCrlf($html);
 		
 		$html = new Html2Text($html);
 		

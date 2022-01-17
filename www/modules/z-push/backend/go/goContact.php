@@ -57,18 +57,19 @@ class goContact extends GoBaseBackendDiff {
 //		ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
 		return $message;		
 	}
-	
-	
+
 
 	/**
 	 * Save the information from the phone to Group-Office.
-	 * 
+	 *
 	 * Direction: PHONE -> SERVER
-	 * 
+	 *
 	 * @param StringHelper $folderid
 	 * @param int $id
 	 * @param SyncContact $message
+	 * @param $contentParameters
 	 * @return array
+	 * @throws StatusException
 	 */
 	public function ChangeMessage($folderid, $id, $message, $contentParameters)
 	{
@@ -90,7 +91,7 @@ class goContact extends GoBaseBackendDiff {
 			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
-		$this->convertor->AS2GO($message, $contact, $contentParameters);
+		$this->convertor->AS2GO($message, $contact);
 	
 		return $this->StatMessage($folderid, $contact->id);		
 
