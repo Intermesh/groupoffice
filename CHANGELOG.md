@@ -1,3 +1,4 @@
+17-01-2022 6.6.32
 - Core: Issue #776: invalid return type in App::getStorageQuota()
 - Bookmarks: Fixed integrity constraint error when logo was not found
 - Bookmarks: Improved logo detection and return redirected URL
