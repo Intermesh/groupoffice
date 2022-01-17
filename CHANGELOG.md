@@ -1,4 +1,4 @@
-6.5.97
+17-01-2022 6.5.97
 - Leavedays: set special_budget_id explicitly to NULL when not in special leave mode
 - Business: manage permissions to the module will enable user to edit all agreements
 
