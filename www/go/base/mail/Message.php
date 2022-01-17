@@ -185,6 +185,20 @@ class Message extends \Swift_Message{
 				}
 			}
 		}
+
+		if(isset($structure->headers['message-id'])) {
+			$this->setId(trim($structure->headers['message-id'], ' <>'));
+		}
+
+		if(isset($structure->headers['in-reply-to'])) {
+			$headers = $this->getHeaders();
+			$headers->addTextHeader('In-Reply-To', $structure->headers['in-reply-to']);
+		}
+
+		if(isset($structure->headers['references'])) {
+			$headers = $this->getHeaders();
+			$headers->addTextHeader('References', $structure->headers['references']);
+		}
 		
 		$this->_getParts($structure);
 		
