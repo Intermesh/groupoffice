@@ -5,6 +5,7 @@
 - ActiveSync: Preserve Message ID, In-Reply-To and References headers. Hopefully fixes In-Reply-To: header is missing #779 too.
 - Projects2: Fix tasklist combo when editing project task
 - Billing: Set empty contact name when removing contact
+- Billing: timezone error in reports showing invoices from one day out of the range.
 
 13-01-2022 6.6.31
 - Address book: Bug in address book create permissions
