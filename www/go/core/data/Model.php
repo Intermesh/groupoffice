@@ -253,7 +253,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			return $arr;
 		} else if($value instanceof DateTime) { //if (is_null($value) || is_scalar($value) || $value instanceof \StdClass) {
 			return (string) $value;
-		} else {
+		} else if($value instanceof \DateTimeInterface) { //if (is_null($value) || is_scalar($value) || $value instanceof \StdClass) {
+			return $value->format(DateTime::FORMAT_API);
+		}else{
 			return $value;
 		}
 	}
