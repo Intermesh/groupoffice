@@ -348,7 +348,7 @@ class goMail extends GoBaseBackendDiff {
 				if(!isset($body)) {
 					$inline = false;
 				} else{
-					$inline = $attachment->isInline() && strpos($body, $attachment->content_id) !== false;
+					$inline = $attachment->isInline() && !empty($attachment->content_id) && strpos($body, $attachment->content_id) !== false;
 				}
 
 				$attach->contentid = $inline ? $attachment->content_id : NULL;
