@@ -2,6 +2,9 @@
 go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
 
 	hasPermission: function() {
+		if(go.User.isAdmin) {
+			return true;
+		}
 		const module = go.Modules.get(this.package, this.module);
 		return module.userRights.mayManage;
 	},
