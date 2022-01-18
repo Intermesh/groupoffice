@@ -1,6 +1,7 @@
 6.6.33
 
 - Projects2: autorefresh task list when deleting project
+- Address book: System settings panel was missing
 
 17-01-2022 6.6.32
 - Core: Issue #776: invalid return type in App::getStorageQuota()
