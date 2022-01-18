@@ -87,6 +87,7 @@ login/UsernamePanel.js
 login/LoginPanel.js
 login/RecoveryDialog.js
 
+links/EntityCombo.js
 links/LinkDetailWindow.js
 links/LinkBrowserMenuItem.js
 links/CreateLinkButton.js
