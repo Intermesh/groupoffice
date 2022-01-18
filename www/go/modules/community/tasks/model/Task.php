@@ -7,19 +7,19 @@
 
 namespace go\modules\community\tasks\model;
 
-use go\core\acl\model\AclInheritEntity;
 use Exception;
+use go\core\acl\model\AclInheritEntity;
+use go\core\db\Criteria;
 use go\core\model\Alert as CoreAlert;
+use go\core\model\User;
 use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
-use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
-use go\core\orm\SearchableTrait;
-use go\core\db\Criteria;
 use go\core\orm\Query;
-use go\core\util\{DateTime, StringUtil, Time};
+use go\core\orm\SearchableTrait;
+use go\core\util\{DateTime, Recurrence, StringUtil, Time};
 use go\core\validate\ErrorCode;
 use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\VCalendar;
@@ -137,7 +137,7 @@ class Task extends AclInheritEntity {
      */
 	//public $recurrenceId;
 
-  /** @var Recurrence */
+  /** @var string */
   protected $recurrenceRule;
 
   /** @var DateTime[PatchObject] map of recurrenceId => Task */

@@ -1,17 +1,16 @@
 <?php
-namespace go\modules\community\tasks\model;
+namespace go\core\util;
 
 use DateTimeInterface;
-use go\core\util\DateTime;
 use Sabre\VObject\DateTimeParser;
+use Sabre\VObject\InvalidDataException;
+use Sabre\VObject\Recur\RRuleIterator;
 
-class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
+class Recurrence extends RRuleIterator {
 	public $interval = 1;
-//	public $rscale = 'gregorian';
-//	public $skip = 'omit';
-//	public $firstDayOfWeek = 'mo';
+
 	/**
-	 * @var NDay[] {day:string, nthOfPeriod: int}
+	 * @var array {day:string, nthOfPeriod: int}
 	 * day = "mo"|"tu"|"we"|"th"|"fr"|"sa"|"su"
 	 * nthOfPeriod can be negative -1 is last day of period
 	 */
@@ -32,15 +31,7 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 	 * @var int[]
 	 */
 	public $byWeekNo;
-//	public $byHour;
-//	public $byMinute;
-//	public $bySecond;
-	/**
-	 * @var int[]
-	 * The occurrences within the recurrence interval to include in the final results.
-	 * Negative values offset from the end of the list of occurrences.
-	 */
-	public $bySetPosition;
+
 	public $count;
 	public $until;
 
@@ -48,13 +39,22 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 	 * Recurrence constructor.
 	 * @param string $rrule RRULE FORMAT AS IN
 	 * @param DateTimeInterface $start
-	 * @throws \Sabre\VObject\InvalidDataException
+	 * @throws InvalidDataException
 	 */
-	public function __construct($rrule, DateTimeInterface $start) {
+	public function __construct(DateTimeInterface $start) {
 		$this->startDate = $start;
-		if($rrule)
-			$this->parseRRule($rrule);
 		$this->currentDate = clone $this->startDate;
+	}
+
+	/**
+	 * @throws InvalidDataException
+	 */
+	public static function fromString(string $rrule, DateTimeInterface $start) : Recurrence
+	{
+		$r = new Recurrence($start);
+		$r->parseRRule($rrule);
+
+		return $r;
 	}
 
 	/**
@@ -62,7 +62,8 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 	 * @param bool $allDay
 	 * @return array
 	 */
-	public function toArray($allDay = true) {
+	public function toArray(bool $allDay = true): array
+	{
 		$data = [];
 		foreach(['frequency', 'interval', 'count',
 				  'byMonth', 'byYearDay', 'byWeekNo', 'byMonthDay'] as $key) {
@@ -79,8 +80,8 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 		if ($this->byDay) {
 			$data['byDay'] = [];
 			foreach ($this->byDay as $day) {
-				$day = ['day' => substr($day, -2)];
 				$nthOfPeriod = substr($day, 0, -2);
+				$day = ['day' => substr($day, -2)];
 				if(!empty($nthOfPeriod)) {
 					$day['nthOfPeriod'] = $nthOfPeriod;
 				}
@@ -91,13 +92,15 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 	}
 
 	/**
-	 * Create rrule itterator from JSON rule format
-	 * @param $rule json data
-	 * @param $start DateTime start of task
+	 * Create rrule iterator from JSON rule format
+	 *
+	 * @param array $rule json data
+	 * @param $start DateTimeInterface start of task
 	 * @return Recurrence
 	 */
-	static function fromArray(array $rule, DateTime $start) {
-		$me = new self(null, $start);
+	static function fromArray(array $rule, DateTimeInterface $start): Recurrence
+	{
+		$me = new self($start);
 		foreach(['frequency', 'interval', 'count',
 					  'byMonth', 'byYearDay', 'byWeekNo', 'byMonthDay'] as $key) {
 			if(!empty($rule[$key])) {
@@ -134,7 +137,8 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 	 * @param boolean $allDay
 	 * @return string
 	 */
-	public function toString($allDay = true) {
+	public function toString(bool $allDay = true): string
+	{
 		$rrule = ["FREQ=".strtoupper($this->frequency)];
 		if($this->interval) {
 			$rrule[] = "INTERVAL=".$this->interval;

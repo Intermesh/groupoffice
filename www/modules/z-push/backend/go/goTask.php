@@ -1,11 +1,11 @@
 <?php
 
-use go\core\model\Module;
-use go\modules\community\tasks\model\Task;
-use go\modules\community\tasks\model\Progress;
-use go\modules\community\tasks\model\Recurrence;
-use go\modules\community\tasks\model\Alert;
 use go\core\model\Acl;
+use go\core\model\Module;
+use go\core\util\Recurrence;
+use go\modules\community\tasks\model\Alert;
+use go\modules\community\tasks\model\Progress;
+use go\modules\community\tasks\model\Task;
 
 class goTask extends GoBaseBackendDiff {
 

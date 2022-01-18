@@ -3,26 +3,18 @@ namespace go\modules\community\tasks\convert;
 
 use Exception;
 use go\core\data\convert\AbstractConverter;
-use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
+use go\core\util\Recurrence;
 use go\core\util\StringUtil;
-use go\modules\community\addressbook\model\Contact;
 use go\modules\community\tasks\model\Alert;
 use go\modules\community\tasks\model\Category;
-use go\modules\community\tasks\model\Progress;
-use go\modules\community\tasks\model\Recurrence;
 use go\modules\community\tasks\model\Task;
 use Sabre\VObject\Component\VCalendar as VCalendarComponent;
-use Sabre\VObject\Component\VCard as VCardComponent;
-use Sabre\VObject\Component\VTimeZone;
-use Sabre\VObject\Property\ICalendar\Recur;
 use Sabre\VObject\Reader;
 use Sabre\VObject\Splitter\ICalendar as VCalendarSplitter;
-
-use function GuzzleHttp\json_encode;
 
 /**
  * VCalendar converter
@@ -289,7 +281,7 @@ class VCalendar extends AbstractConverter {
 			->where('name', 'IN', explode(",",(string)$todo->CATEGORIES))
 			->all();
 		if(!empty($todo->RRULE) && !empty($todo->DTSTART))
-			$rule = (new Recurrence((string)$todo->RRULE, $todo->DTSTART->getDateTime()))->toArray();
+			$rule = Recurrence::fromString((string)$todo->RRULE, $todo->DTSTART->getDateTime())->toArray();
 		else
 			$rule = null;
 		if($task === null) {

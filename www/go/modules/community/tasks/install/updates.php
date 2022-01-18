@@ -1,7 +1,5 @@
 <?php
 
-use GO\Base\Util\Icalendar\Rrule;
-use go\core\orm\Query;
 use go\modules\community\tasks\install\Migrator;
 
 $updates['201911061630'][] = function() {
@@ -13,7 +11,7 @@ $updates['201911061630'][] = function(){
 
 	while($row = $stmt->fetch()) {
 		try {
-			$rrule = new \go\modules\community\tasks\model\Recurrence($row['rrule'], new DateTime("@" . $row["start_time"]));
+			$rrule = \go\core\util\Recurrence::fromString($row['rrule'], new DateTime("@" . $row["start_time"]));
 			$data = ['recurrenceRule' => json_encode($rrule->toArray())];
 			go()->getDbConnection()->updateIgnore('tasks_task', $data, ['id' => $row['id']])->execute();
 		} catch(Exception $e) {
