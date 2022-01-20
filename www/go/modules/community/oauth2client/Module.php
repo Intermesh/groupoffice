@@ -31,6 +31,7 @@ class Module extends core\Module
 	{
 		$c = new AccountController();
 		$c->addListener('load', 'go\modules\community\oauth2client\Module', 'loadAccountSettings');
+		$c->addListener( 'submit', 'go\modules\community\oauth2client\Module', 'saveAccountSettings');
 	}
 
 	public function defineListeners()
@@ -55,6 +56,8 @@ class Module extends core\Module
 	}
 
 	/**
+	 * Upon loading an account, try to load Oauth2 client settings as well
+	 *
 	 * @param $self
 	 * @param array $response
 	 * @param ActiveRecordAccount $model
@@ -70,6 +73,27 @@ class Module extends core\Module
 			$response['data']['clientId'] = $acct->oauth2Client->clientId;
 			$response['data']['projectId'] = $acct->oauth2Client->projectId;
 			$response['data']['refreshToken'] = $acct->oauth2Client->refreshToken;
+		}
+	}
+
+	/**
+	 * After saving an account, save the oauth2 client settings as well
+	 *
+	 * @param AccountController $self
+	 * @param array $response
+	 * @param ActiveRecordAccount $model
+	 * @param array $params
+	 * @param array $modifiedAttributes
+	 * @throws \Exception
+	 */
+	public static function saveAccountSettings(AccountController $self, array &$response, ActiveRecordAccount &$model, array $params, array $modifiedAttributes)
+	{
+		if(isset($params['clientId']) && intval($params['default_client_id']) > 0) {
+			$acct = Account::findById($response['id']);
+			$acct->oauth2Client->clientId = $params['clientId'];
+			$acct->oauth2Client->clientSecret = $params['clientSecret'];
+			$acct->oauth2Client->projectId = $params['projectId'];
+			$acct->save();
 		}
 	}
 }

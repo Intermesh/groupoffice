@@ -643,7 +643,6 @@ GO.email.AccountDialog = function(config) {
 			},
 			scope : this
 		},{
-
 			text : t("Ok"),
 			handler : function() {
 				this.save(true);
@@ -731,12 +730,9 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			this.setAccountId(0);
 			this.foldersTab.setDisabled(true);
 			this.permissionsTab.setAcl(0);
-			this.propertiesPanel.form.findField('name')
-			.setValue(GO.settings['name']);
-			this.propertiesPanel.form.findField('email')
-			.setValue(GO.settings['email']);
-			this.propertiesPanel.form.findField('username')
-			.setValue(GO.settings['username']);
+			this.propertiesPanel.form.findField('name').setValue(GO.settings['name']);
+			this.propertiesPanel.form.findField('email').setValue(GO.settings['email']);
+			this.propertiesPanel.form.findField('username').setValue(GO.settings['username']);
 
 		}
 	},
@@ -751,29 +747,16 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			waitMsg : t("Loading..."),
 			success : function(form, action) {
 				this.refreshNeeded = false;
-
 				this.setAccountId(account_id);
-
 				this.selectUser.setRemoteText(action.result.remoteComboTexts.user_id);
-
 				this.aliasesButton.setDisabled(false);
-
 				this.foldersTab.setDisabled(false);
-
 				if(!action.result.data.email_enable_labels) {
 					this.tabPanel.hideTabStripItem(this.labelsTab);
 				} else {
 					this.tabPanel.unhideTabStripItem(this.labelsTab);
 				}
-
 				this.permissionsTab.setAcl(action.result.data.acl_id);
-
-				if(this.selectAuthMethodCombo.getValue()) {
-					this.btnGetRefreshToken.show();
-					this.incomingTab.hide();
-					this.outgoingTab.hide();
-				}
-
 			},
 			scope : this
 		});

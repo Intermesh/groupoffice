@@ -87,35 +87,30 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 		return parent::beforeSubmit($response, $model, $params);
 	}
 
-	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes) {
-
+	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes)
+	{
 		if (empty($params['id'])) {
 			$model->addAlias($params['email'], $params['name']);
 		} else {
 			$alias = $model->getDefaultAlias();
 			$alias->name = $params['name'];
 
-			if(isset($params['email']))
+			if(isset($params['email'])) {
 				$alias->email = $params['email'];
+			}
 
 			$alias->signature = $params['signature'];
 			$alias->save();
 		}
 
 		if ( isset($params['default_account_template_id'])) {
-//			if ($params['default_account_template_id']==-1 || empty($params['default_account_template_id'])) {
-//				$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-//				if ($defaultTemplateModel)
-//					$defaultTemplateModel->delete();
-//			} elseif ($params['default_account_template_id']>0) {
-				$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-				if (!$defaultTemplateModel) {
-					$defaultTemplateModel = new \GO\Email\Model\DefaultTemplateForAccount();
-					$defaultTemplateModel->account_id = $model->id;
-				}
-				$defaultTemplateModel->template_id = (int) $params['default_account_template_id'];
-				$defaultTemplateModel->save();
-//			}
+			$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+			if (!$defaultTemplateModel) {
+				$defaultTemplateModel = new \GO\Email\Model\DefaultTemplateForAccount();
+				$defaultTemplateModel->account_id = $model->id;
+			}
+			$defaultTemplateModel->template_id = (int) $params['default_account_template_id'];
+			$defaultTemplateModel->save();
 		}
 
 		return parent::afterSubmit($response, $model, $params, $modifiedAttributes);
