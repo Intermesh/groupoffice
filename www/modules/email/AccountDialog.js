@@ -44,7 +44,7 @@ GO.email.AccountDialog = function(config) {
 	if(go.Modules.isAvailable("community", "oauth2client")) {
 		advancedItems.push(new Ext.form.TextField({
 			fieldLabel : t("OAuth2 Client ID", 'oauth2client', 'community'),
-			name : 'oauth2Client.clientId',
+			name : 'clientId',
 			listeners : {
 				change : function() {
 					this.refreshNeeded = true;
@@ -55,7 +55,7 @@ GO.email.AccountDialog = function(config) {
 
 		advancedItems.push(new Ext.form.TextField({
 			fieldLabel : t("OAuth2 Client Secret", 'oauth2client', 'community'),
-			name : 'oauth2Client.clientSecret',
+			name : 'clientSecret',
 			listeners : {
 				change : function() {
 					this.refreshNeeded = true;
@@ -66,7 +66,7 @@ GO.email.AccountDialog = function(config) {
 
 		advancedItems.push(new Ext.form.TextField({
 			fieldLabel : t("OAuth2 Project Id", 'oauth2client', 'community'),
-			name : 'oauth2Client.projectId',
+			name : 'projectId',
 			listeners : {
 				change : function() {
 					this.refreshNeeded = true;

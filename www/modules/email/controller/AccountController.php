@@ -41,7 +41,8 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 		return parent::formatColumns($columnModel);
 	}
 
-	protected function afterLoad(&$response, &$model, &$params) {
+	protected function afterLoad(&$response, &$model, &$params)
+	{
 
 		$response['data']['email_enable_labels'] = !empty(GO::config()->email_enable_labels); 
 
