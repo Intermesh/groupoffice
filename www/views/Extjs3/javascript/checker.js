@@ -126,7 +126,9 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					},{
 						iconCls : 'ic-delete',
 						text: t("Dismiss"),
-						handler: (btn) => {
+						handler: (btn, e) => {
+							//needed to prevent notification area closing
+							e.stopEvent();
 							btn.findParentByType("panel").destroy();
 						},
 						scope: this

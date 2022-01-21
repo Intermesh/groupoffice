@@ -137,6 +137,10 @@
 				msg.itemId = 'notify-' + Ext.id();
 			}
 
+			if(!msg.statusIcon) {
+				msg.statusIcon = 'reminder';
+			}
+
 			if(msg.sound) {
 				this.playSound(msg.sound, msg.itemId);
 			}
@@ -237,6 +241,10 @@
 
 			delete this._messages[msg.itemId];
 			this.updateStatusIcons();
+
+			if(!this.hasMessages()) {
+				this.hideNotifications();
+			}
 		},
 
 		notificationsVisible : function() {
