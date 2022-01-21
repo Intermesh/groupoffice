@@ -4,7 +4,7 @@ namespace go\modules\community\oauth2client\model;
 
 use go\core\orm\Property;
 
-class Oauth2Client extends Property
+final class Oauth2Client extends Property
 {
 	/**
 	 * @var int

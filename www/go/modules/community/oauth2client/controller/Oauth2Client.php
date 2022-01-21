@@ -5,6 +5,7 @@ namespace go\modules\community\oauth2client\controller;
 
 use go\core\Controller;
 use go\core\http\Exception;
+use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model;
 use League\OAuth2\Client\Provider\Google;
 
@@ -39,6 +40,8 @@ final class Oauth2Client extends Controller
 
 			// State is invalid, possible CSRF attack in progress
 			unset(\GO::session()->values['oauth2state']);
+			unset(\GO::session()->values['accountId']);
+			\GO::session()->closeWriting();
 			throw new Exception('Invalid state');
 		} else {
 			// Try to get an access token (using the authorization code grant)
@@ -47,7 +50,7 @@ final class Oauth2Client extends Controller
 			]);
 
 			try {
-				$acct = model\Oauth2Client::findById($accountId);
+				$acct = Account::findById($accountId);
 				$acct->oauth2Client->token = $token->getToken();
 				$acct->oauth2Client->refreshToken = $token->getRefreshToken();
 				$acct->oauth2Client->expires = $token->getExpires();
@@ -62,6 +65,9 @@ final class Oauth2Client extends Controller
 				// Failed to get user details
 				exit('Something went wrong: ' . $e->getMessage());
 			}
+			unset(\GO::session()->values['oauth2state']);
+			unset(\GO::session()->values['accountId']);
+			\GO::session()->closeWriting();
 			echo '<a href="javascript:window.close()">' . go()->t("Click here") . '</a> ' . go()->t("to close this window.");
 			exit(0);
 		}
@@ -88,10 +94,18 @@ final class Oauth2Client extends Controller
 		$authUrl = $provider->getAuthorizationUrl();
 
 		\GO::session()->values['oauth2state'] = $provider->getState();
+		\GO::session()->closeWriting();
 		$r = \go\core\http\Response::get();
 		$r->setHeader('Location', $authUrl);
 		$r->sendHeaders();
-		exit;
+		exit(0);
+	}
+
+	public function test(int $accountId)
+	{
+		$acct = Account::findById($accountId);
+		echo $acct->username;
+		exit(0);
 	}
 
 	/**
@@ -105,13 +119,13 @@ final class Oauth2Client extends Controller
 	 */
 	private function getProvider(int $accountId): Google
 	{
-		$acct = Oauth2Client::findById($accountId);
+		$acct = Account::findById($accountId);
 		$acctSettings = $acct->oauth2Client;
 		$url = rtrim(go()->getSettings()->URL, '/');
 		return new Google([
 			'clientId' => $acctSettings->clientId,
 			'clientSecret' => $acctSettings->clientSecret,
-			'redirectUri' => $url . '/gauth/callback',
+			'redirectUri' => $url . '/go/modules/community/oauth2client/gauth.php/callback',
 			'accessType'   => 'offline',
 			'scopes' => ['https://mail.google.com/']
 		]);

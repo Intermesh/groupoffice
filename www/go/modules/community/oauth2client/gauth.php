@@ -40,4 +40,5 @@ if (!App::get()->getAuthState()->isAuthenticated()) {
 $router = (new Router())
 	->addRoute('/authenticate\/([0-9]+)/', 'GET', Oauth2Client::class, 'auth')
 	->addRoute('/callback/', "GET", Oauth2Client::class, 'callback')
+	->addRoute('/test\/([0-9]+)/', "GET", Oauth2Client::class, 'test')
 	->run();

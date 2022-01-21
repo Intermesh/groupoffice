@@ -609,7 +609,7 @@ GO.email.AccountDialog = function(config) {
 			iconCls: 'btn-token',
 			text: 'Refresh token',
 			handler : function() {
-				window.open('gauth/authenticate/' + this.account_id, 'do_da_auth_thingy');
+				window.open('/go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id, 'do_da_auth_thingy');
 				// TODO? This works, but will trigger a CORS error. Naturally, since oauth does not like Ajax Possibly in an iframe or something
 				/*
 				go.Jmap.request({

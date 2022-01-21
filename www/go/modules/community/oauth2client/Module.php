@@ -1,28 +1,29 @@
 <?php
+
 namespace go\modules\community\oauth2client;
-							
+
 use go\core;
 use go\core\orm\Property;
 use go\core\webclient\CSP;
-use go\modules\community\email\model\Account;
 use GO\Email\Controller\AccountController;
 use GO\Email\Model\Account as ActiveRecordAccount;
+use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model\Oauth2Client;
 
-/**						
+/**
  * @copyright (c) 2021, Intermesh BV http://www.intermesh.nl
  * @author Joachim van de Haterd <jvdhaterd@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class Module extends core\Module
 {
-							
-	public function getAuthor() :string
+
+	public function getAuthor(): string
 	{
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
-	public function getDependencies() :array
+	public function getDependencies(): array
 	{
 		return ["legacy/email"];
 	}
@@ -31,13 +32,13 @@ class Module extends core\Module
 	{
 		$c = new AccountController();
 		$c->addListener('load', 'go\modules\community\oauth2client\Module', 'loadAccountSettings');
-		$c->addListener( 'submit', 'go\modules\community\oauth2client\Module', 'saveAccountSettings');
+		$c->addListener('submit', 'go\modules\community\oauth2client\Module', 'saveAccountSettings');
 	}
 
 	public function defineListeners()
 	{
 		Account::on(Property::EVENT_MAPPING, static::class, 'onMap');
-		CSP::on(Csp::EVENT_CREATE,  static::class, 'onCspCreate');
+		CSP::on(Csp::EVENT_CREATE, static::class, 'onCspCreate');
 	}
 
 
@@ -49,7 +50,7 @@ class Module extends core\Module
 
 	public static function onCspCreate(CSP $csp)
 	{
-		$csp->add('default-src',  trim('https://accounts.google.com', '/'))
+		$csp->add('default-src', trim('https://accounts.google.com', '/'))
 			->add("connect-src", "'self'")
 			->add("connect-src", trim('https://accounts.google.com', '/'));
 
@@ -64,7 +65,7 @@ class Module extends core\Module
 	 * @param array $params
 	 * @throws \Exception
 	 */
-	public static function loadAccountSettings($self, array &$response, ActiveRecordAccount &$model,array &$params)
+	public static function loadAccountSettings($self, array &$response, ActiveRecordAccount &$model, array &$params)
 	{
 		$id = $model->id;
 		$acct = Account::findById($id);
@@ -88,7 +89,7 @@ class Module extends core\Module
 	 */
 	public static function saveAccountSettings(AccountController $self, array &$response, ActiveRecordAccount &$model, array $params, array $modifiedAttributes)
 	{
-		if(isset($params['clientId']) && intval($params['default_client_id']) > 0) {
+		if (isset($params['clientId']) && intval($params['default_client_id']) > 0) {
 			$acct = Account::findById($response['id']);
 			$acct->oauth2Client->clientId = $params['clientId'];
 			$acct->oauth2Client->clientSecret = $params['clientSecret'];
