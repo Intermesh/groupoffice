@@ -52,8 +52,11 @@ final class Oauth2Client extends Controller
 			try {
 				$acct = Account::findById($accountId);
 				$acct->oauth2Client->token = $token->getToken();
-				$acct->oauth2Client->refreshToken = $token->getRefreshToken();
 				$acct->oauth2Client->expires = $token->getExpires();
+
+				if($refreshToken = $token->getRefreshToken()) {
+					$acct->oauth2Client->refreshToken = $refreshToken;
+				}
 				$acct->save();
 				// We got an access token, let's now get the owner details
 				$ownerDetails = $provider->getResourceOwner($token);

@@ -391,7 +391,8 @@ class Account extends \GO\Base\Db\ActiveRecord
 		}
 		$refreshToken = $rec['refreshToken'];
 		if(!$refreshToken) {
-			throw new GO\Base\Exception\SecurityTokenMismatch();
+			//go()->debug("No token refresh found. A new refresh token needs to be generated.");
+			return null;
 		}
 		$url = rtrim(go()->getSettings()->URL, '/');
 		$provider = new Google([

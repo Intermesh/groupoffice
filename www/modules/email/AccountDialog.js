@@ -40,50 +40,16 @@ GO.email.AccountDialog = function(config) {
 		);
 	}
 
-	// TODO: Put this properly in an override function in OAuth2Client
-	if(go.Modules.isAvailable("community", "oauth2client")) {
-		advancedItems.push(new Ext.form.TextField({
-			fieldLabel : t("OAuth2 Client ID", 'oauth2client', 'community'),
-			name : 'clientId',
-			listeners : {
-				change : function() {
-					this.refreshNeeded = true;
-				},
-				scope : this
-			}
-		}));
-
-		advancedItems.push(new Ext.form.TextField({
-			fieldLabel : t("OAuth2 Client Secret", 'oauth2client', 'community'),
-			name : 'clientSecret',
-			listeners : {
-				change : function() {
-					this.refreshNeeded = true;
-				},
-				scope : this
-			}
-		}));
-
-		advancedItems.push(new Ext.form.TextField({
-			fieldLabel : t("OAuth2 Project Id", 'oauth2client', 'community'),
-			name : 'projectId',
-			listeners : {
-				change : function() {
-					this.refreshNeeded = true;
-				},
-				scope : this
-			}
-		}));
-
-
+	// TODO: Put this properly in an override function in OAuth2Client. The structure of this dialog does not appear to allow that
+	if (go.Modules.isAvailable("community", "oauth2client")) {
 		this.selectAuthMethodCombo = new go.modules.community.oauth2client.DefaultClientCombo({
 			hiddenName: 'default_client_id',
 			width: 300,
 			listeners: {
 				'select': function (combo, record, index) {
-					this.btnGetRefreshToken.show();
 					this.incomingTab.hide();
 					this.outgoingTab.hide();
+					this.tabPanel.unhideTabStripItem(this.oauthClientTab);
 
 					this.ImapUserNameField.setValue(this.EmailAddressField.getValue());
 					this.ImapPortField.setValue(record.data.imapPort);
@@ -96,9 +62,9 @@ GO.email.AccountDialog = function(config) {
 					this.refreshNeeded = true;
 				},
 				'clear': function(combo, oldValue, newValue) {
-					this.btnGetRefreshToken.hide();
 					this.incomingTab.show();
 					this.outgoingTab.show();
+					this.tabPanel.hideTabStripItem(this.oauthClientTab);
 					this.refreshNeeded = true;
 				},
 				scope: this
@@ -184,7 +150,6 @@ GO.email.AccountDialog = function(config) {
 			boxLabel: t("Permanently store password", "email"),
 			checked: true,
 			name: 'store_password',
-//			allowBlank: true,
 			hideLabel:true,
 			hidden: true //this function only works with imap auth at the moment.
 		}),
@@ -192,7 +157,6 @@ GO.email.AccountDialog = function(config) {
 			fieldLabel : t("Password"),
 			name : 'password',
 			inputType : 'password',
-//			allowBlank : false,
 			listeners : {
 				change : function() {
 					this.refreshNeeded = true;
@@ -333,7 +297,6 @@ GO.email.AccountDialog = function(config) {
 		this.smtpPasswordStore = new Ext.ux.form.XCheckbox({
 			checked: true,
 			name: 'store_smtp_password',
-//			allowBlank: true,
 			hideLabel:true,
 			hidden: true
 		}),
@@ -344,8 +307,6 @@ GO.email.AccountDialog = function(config) {
 			disabled:true
 		})]
 	});
-	
-	
 
 	GO.email.subscribedFoldersStore = new GO.data.JsonStore({
 		url : GO.url("email/folder/store"),
@@ -604,39 +565,7 @@ GO.email.AccountDialog = function(config) {
 				this.foldersDialog.show(this.account_id);
 
 			}
-		},
-		this.btnGetRefreshToken = new Ext.Button({
-			iconCls: 'btn-token',
-			text: 'Refresh token',
-			handler : function() {
-				window.open('/go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id, 'do_da_auth_thingy');
-				// TODO? This works, but will trigger a CORS error. Naturally, since oauth does not like Ajax Possibly in an iframe or something
-				/*
-				go.Jmap.request({
-					method: "community/oauth2client/Oauth2Account/auth",
-					params: {
-						accountId: this.account_id
-					},
-					scope: this
-				}).then( function(options, success, response) {
-					console.clear();
-					console.log(options);
-					console.log(success);
-					console.log(response);
-					// this.getForm().setValues(response);
-					// if (!this.consentDialog) {
-					// 	this.consentDialog = new go.modules.community.oauth2client.ConsentDialog();
-					// }
-					// this.consentDialog.show({accountId: this.account_id});
-
-				});
-				 */
-			},
-			hidden: true,
-			scope : this
-
-		})
-		,'->',{
+		},'->',{
 			text : t("Apply"),
 			handler : function() {
 				this.save(false);
