@@ -2,6 +2,7 @@
 - ActiveSync: Fixed empty needle error
 - Projects2: autorefresh task list when deleting project
 - Address book: System settings panel was missing
+- Projects2: Unable to set activity type rates
 
 17-01-2022 6.6.32
 - Core: Issue #776: invalid return type in App::getStorageQuota()
