@@ -123,13 +123,15 @@ class GoBaseBackendDiff extends \BackendDiff {
 	public function StatFolder($id) {
 		$folder = $this->GetFolder($id);
 		if(!$folder) {
+			ZLog::Write(LOGLEVEL_DEBUG, "Calendar with $id could not be found");
+
 			return false;
 		}
 		$stat = array();
 		$stat['id'] = $id;
 		$stat['parent'] = $folder->parentid;
-		$stat['mod'] = $folder->displayname;
-		ZLog::Write(LOGLEVEL_DEBUG, 'ZPUSH2::StatFolder'.$id);
+		$stat['mod'] = $folder->displayname ;
+		ZLog::Write(LOGLEVEL_DEBUG, 'ZPUSH2::StatFolder('.$id.')');
 		return $stat;
 	}
 		
