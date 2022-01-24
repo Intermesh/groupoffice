@@ -61,6 +61,7 @@
 
 
 6.5.98
+24-01-2022 6.5.98
 - Business: When copying agreement, leave finish date empty
 - Business: Check whether year budget for leave day type matches current leave days for said type
 - Core: CronJob stack trace was logged even when not in debug mode which is a potential security risk.
@@ -68,6 +69,7 @@
 - Holidays: fix casting bug in holiday calculator
 - ActiveSync: Fixed moving appointments to another calendar
 - ActiveSync: Use default address book for new contacts
+- Email: Fixed infinite loop problem with downloading some attachments from some IMAP servers
 
 17-01-2022 6.5.97
 - Business: hide 'Budgetable' checkbox for special leave types
