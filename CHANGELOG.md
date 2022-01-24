@@ -4,6 +4,7 @@
 - Core: CronJob stack trace was logged even when not in debug mode which is a potential security risk.
 - Core: Catch exception when sending admin notification e-mail so application flow continues
 - Holidays: fix casting bug in holiday calculator
+- ActiveSync: Fixed moving appointments to another calendar
 
 17-01-2022 6.5.97
 - Leavedays: set special_budget_id explicitly to NULL when not in special leave mode

@@ -194,7 +194,11 @@ class GoSyncUtils {
 		}
 	}
 
-	public static function aSync2weekday($number) {
+	/**
+	 * @throws Exception
+	 */
+	public static function aSync2weekday(?int $number): array
+	{
 		$weekdays = array();
 		if ($number >= 128 || $number < 0) {
 			throw new \Exception('The way the recurrence days were coded, is corrupted!');
