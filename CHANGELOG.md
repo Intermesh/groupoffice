@@ -1,4 +1,4 @@
-6.6.33
+24-01-2022 6.6.33
 - ActiveSync: Fixed empty needle error
 - Projects2: autorefresh task list when deleting project
 - Address book: System settings panel was missing
