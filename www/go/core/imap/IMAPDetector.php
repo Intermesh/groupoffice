@@ -2,6 +2,7 @@
 
 namespace go\core\imap;
 
+use go\core\App;
 use go\core\data\Model;
 
 
@@ -59,9 +60,8 @@ class IMAPDetector extends Model {
 	public $smtpAccount;
 	
 	public function __construct() {
-		parent::__construct();
 		
-		$contact = \IFW::app()->getAuth()->user()->contact;
+		$contact = App::get()->getAuthState()->getUser()->contact;
 		
 		if($contact) {
 			$firstEmailAddress = $contact->emailAddresses->single();

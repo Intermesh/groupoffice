@@ -3,6 +3,7 @@
 namespace go\core\controller;
 
 use GO\Base\Db\ActiveRecord;
+use go\core\exception\NotFound;
 use go\core\model;
 use function GO;
 use go\core\jmap\exception\InvalidArguments;

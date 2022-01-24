@@ -68,7 +68,7 @@ class User extends EntityController {
 		$user = model\User::findById($params['userId']);
 		
 		if(!$user->enabled) {
-			throw new Exception("This user is disabled");
+			throw new \Exception("This user is disabled");
 		}
 		
 		$success = go()->getAuthState()->changeUser($params['userId']);

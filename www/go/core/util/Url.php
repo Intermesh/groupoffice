@@ -80,7 +80,7 @@ class Url implements ArrayableInterface {
 			return new self($url);
 		} else {
 			$components = parse_url($url, PHP_URL_QUERY);
-			$params = parse_str($components['query']);
+			parse_str($components['query'], $params);
 			
 			return new self(substr($url,0, $pos), $params);
 		}

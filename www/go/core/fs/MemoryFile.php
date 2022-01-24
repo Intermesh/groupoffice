@@ -20,7 +20,7 @@ class MemoryFile extends File {
 		$this->data = $data;
 		
 		
-		return parent::__construct($filename);
+		parent::__construct($filename);
 	}
 	
 	public function getContents(int $offset = 0, int $maxlen = null) {
@@ -31,7 +31,7 @@ class MemoryFile extends File {
 	}
 	
 	public function putContents($data, int $flags = null, $context = null) {
-		if($flags = FILE_APPEND){
+		if($flags === FILE_APPEND){
 			$this->data .= $data;
 		}else
 		{

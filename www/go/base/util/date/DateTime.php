@@ -282,7 +282,7 @@ class DateTime extends \DateTime {
 		$dtNow = new DateTime();
 		
 		if(!empty($timezone)){
-			$dtNow->setTimezone(new DateTimeZone($timezone));
+			$dtNow->setTimezone(new \DateTimeZone($timezone));
 		}
 		
 		$dtNow->setTimestamp($timestamp);

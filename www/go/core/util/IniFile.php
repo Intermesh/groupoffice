@@ -45,10 +45,10 @@ class IniFile {
 
 	
 	public function readFile($path) {
-		$this->data = parse_ini_file($ini_file, true, INI_SCANNER_TYPED);
+		$this->data = parse_ini_file($path, true, INI_SCANNER_TYPED);
 		
 		if (false === $this->data) {
-			throw new \Exception(sprintf('Unable to parse file ini : %s', $this->path));
+			throw new \Exception(sprintf('Unable to parse file ini : %s', $path));
 		}
 	}
 	

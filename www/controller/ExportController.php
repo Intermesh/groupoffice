@@ -74,6 +74,7 @@ class ExportController extends AbstractController {
 		$this->view = new ExportView();
 		
 		// If the id is set then search the savedExportModel
+		$savedExportModel = null;
 		if(isset($id)){
 			$savedExportModel = SavedExport::model()->findByPk($id);
 		}
@@ -179,7 +180,7 @@ class ExportController extends AbstractController {
 	 * Get the exporttypes that can be used and get the data for the checkboxes
 	 * 
 	 * @param array $params
-	 * @return array 
+	 * @return void
 	 */
 	protected function actionLoad($params){
 		$response = array();		
