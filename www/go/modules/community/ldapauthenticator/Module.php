@@ -1,9 +1,13 @@
-<?php
+<?php /** @noinspection PhpUndefinedFieldInspection */
+
 namespace go\modules\community\ldapauthenticator;
 
+use Closure;
+use Exception;
 use go\core\auth\DomainProvider;
 use go\core\db\Query;
 use go\core;
+use go\core\model\Module as CoreModelModule;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\ldapauthenticator\model\Authenticator;
 use go\core\model\Module as CoreModule;
@@ -17,7 +21,10 @@ class Module extends core\Module implements DomainProvider {
 	{
 		return "Intermesh BV";
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	protected function afterInstall(CoreModule $model): bool
 	{
 		
@@ -36,7 +43,7 @@ class Module extends core\Module implements DomainProvider {
 						->all();
 	}
 
-	public static function mappedValues(Record $record) {
+	public static function mappedValues(Record $record): array {
 		$cfg = go()->getConfig();
 		if(empty($cfg['ldapMapping'])) {
 			$cfg['ldapMapping'] = [
@@ -99,7 +106,7 @@ class Module extends core\Module implements DomainProvider {
 		}
 		$mapping = $cfg['ldapMapping'];
 		foreach($mapping as $local => $ldap) {
-			if($ldap instanceof \Closure) {
+			if($ldap instanceof Closure) {
 				$mapping[$local] = $ldap($record);
 			} else if(isset($record->{$ldap})) {
 				$mapping[$local] = $record->{$ldap}[0];
@@ -111,13 +118,17 @@ class Module extends core\Module implements DomainProvider {
 	}
 
 
-	public static function ldapRecordToUser($username, Record $record, User $user) {
+	/**
+	 * @throws Exception
+	 */
+	public static function ldapRecordToUser($username, Record $record, User $user): User
+	{
 
 		go()->debug("cn: " . $record->cn[0] ?? "NULL");
 		go()->debug("mail: " .$record->mail[0] ?? "NULL");
 
 		if(!isset($record->mail) || !isset($record->mail[0])) {
-			throw new \Exception("User '$username' has no 'mail' attribute set. Can't create a user");
+			throw new Exception("User '$username' has no 'mail' attribute set. Can't create a user");
 		}
 
 		$user->username = $username;
@@ -127,14 +138,14 @@ class Module extends core\Module implements DomainProvider {
 			$blob->type = 'image/jpeg';
 			$blob->name = $username . '.jpg';
 			if(!$blob->save()) {
-				throw new \Exception("Could not save blob");
+				throw new Exception("Could not save blob");
 			}
 			$user->avatarId = $blob->id;
 		}
 
 		$user->displayName = $record->cn[0];		
 		$user->email = $record->mail[0];
-		$user->recoveryEmail = isset($record->mail[1]) ? $record->mail[1] : $record->mail[0];
+		$user->recoveryEmail = $record->mail[1] ?? $record->mail[0];
 
 		$values = self::mappedValues($record);
 
@@ -145,7 +156,7 @@ class Module extends core\Module implements DomainProvider {
 		if(isset($values['displayName'])) $user->displayName = $values['name'] = $values['displayName'];
 		if(isset($values['homeDir'])) $user->homeDir = $values['homeDir'];
 
-		if(\go\core\model\Module::isInstalled('community', 'addressbook')) {
+		if(CoreModelModule::isInstalled('community', 'addressbook')) {
 
 			$phoneNbs = [];
 			if(isset($values['homePhone'])){
@@ -194,7 +205,7 @@ class Module extends core\Module implements DomainProvider {
 					$org->isOrganization = true;
 					$org->addressBookId = go()->getSettings()->userAddressBook()->id;
 					if(!$org->save())  {
-						throw new \Exception("Could not save organization");
+						throw new Exception("Could not save organization");
 					}
 				}
 
