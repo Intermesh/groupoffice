@@ -431,7 +431,7 @@ class Task extends AclItemEntity {
 
 		if(isset($modified[1])) {
 			foreach ($modified[1] as $model) {
-				if (!in_array($model, $modified[0])) {
+				if (!isset($modified[0]) || !in_array($model, $modified[0])) {
 					$this->deleteAlert($model->id);
 				}
 			}
@@ -449,11 +449,16 @@ class Task extends AclItemEntity {
 	}
 
 	/**
-	 * @param CoreAlert[] $alerts
+	 * @inheritDoc
+	 *
 	 * @throws Exception
 	 */
 	public static function dismissAlerts(array $alerts)
 	{
+
+		// When a task is updated with deleted alerts it will circle back here
+		// in that case the update won't affect any rows and the changes will be empty.
+
 		$alertIds = [];
 
 		foreach($alerts as $alert) {
@@ -470,9 +475,12 @@ class Task extends AclItemEntity {
 			->join("tasks_tasklist", "tl", "tl.id = task.taskListId")
 			->join("tasks_alert", "a", "a.taskId = task.id")
 			->where('a.id' , 'in', $alertIds)
-			->groupBy(['task.id']);
+			->groupBy(['task.id'])
+			->all();
 
-		Task::entityType()->changes($changes);
+		if(!empty($changes)) {
+			Task::entityType()->changes($changes);
+		}
 	}
 
 	/**
