@@ -5,6 +5,7 @@
 - Core: Catch exception when sending admin notification e-mail so application flow continues
 - Holidays: fix casting bug in holiday calculator
 - ActiveSync: Fixed moving appointments to another calendar
+- ActiveSync: Use default address book for new contacts
 
 17-01-2022 6.5.97
 - Leavedays: set special_budget_id explicitly to NULL when not in special leave mode
