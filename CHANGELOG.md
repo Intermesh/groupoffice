@@ -7,6 +7,7 @@
 - Core: CronJob stack trace was logged even when not in debug mode which is a potential security risk.
 - Tasks: added excel export and fixed csv export
 - Tasks: updating reminders bug
+- Tasks: if start date is set then use that as default for new alerts
 
 17-01-2022 6.6.32
 - Core: Issue #776: invalid return type in App::getStorageQuota()
