@@ -23,6 +23,43 @@ class goTask extends GoBaseBackendDiff {
 		}
 	}
 
+
+	/**
+	 * Move a mailmessage to an other folder.
+	 *
+	 * @param string $folderid
+	 * @param int $id
+	 * @param string $newfolderid
+	 * @return boolean
+	 */
+	public function MoveMessage($folderid, $id, $newfolderid, $contentparameters) {
+
+		ZLog::Write(LOGLEVEL_DEBUG, "goTask::MoveMessage($folderid, $id, $newfolderid)");
+
+		$task = Task::findById($id);
+
+		if (!$task) {
+			ZLog::Write(LOGLEVEL_WARN, "Task not found with id = " . $id ." in folder ". $folderid);
+
+			return false;
+		} else if($task->getPermissionLevel() < Acl::LEVEL_DELETE){
+			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+		}
+
+		$task->tasklistId = $newfolderid;
+
+		if(!$task->save()) {
+			ZLog::Write(LOGLEVEL_WARN, "Task not saved with id = " . $id ." in folder ". $folderid);
+
+			return false;
+		}
+
+		// required for not duplicating events on iphone!
+		return $task->id . "";
+
+
+	}
+
 	private function makeUTCDate($date) {
 		return $date->format('U'); // todo in UTC
 	}
@@ -230,6 +267,8 @@ class goTask extends GoBaseBackendDiff {
 
 	public function ChangeFolder($folderid, $oldid, $displayname, $type)
 	{
+		ZLog::Write(LOGLEVEL_DEBUG, "ChangeFolder($folderid, $oldid, $displayname, $type)");
+
 		if(!empty($oldid)) {
 
 			//remove t/ from the folder ? Shouldn't this already have been done by the combined backend wrapper?
@@ -251,7 +290,7 @@ class goTask extends GoBaseBackendDiff {
 		}
 
 		if(empty($oldid)) {
-			if(!go()->getDbConnection()->insert('sync_tasklist_user', ['userId' => go()->getUserId(), 'tasklistIOd', $tasklist->id])->execute()) {
+			if(!go()->getDbConnection()->insert('sync_tasklist_user', ['userId' => go()->getUserId(), 'tasklistId' => $tasklist->id])->execute()) {
 				ZLog::Write(LOGLEVEL_DEBUG, "Tasklist with $displayname could not be added to sync profile");
 				return false;
 			}
@@ -267,9 +306,11 @@ class goTask extends GoBaseBackendDiff {
 	 * @return \SyncFolder
 	 */
 	public function GetFolder($id) {
+		ZLog::Write(LOGLEVEL_DEBUG, "GetFolder($id)");
 
 		$tasklist = \go\modules\community\tasks\model\Tasklist::findById($id);
 		if(!$tasklist || !$tasklist->hasPermissionLevel(Acl::LEVEL_READ)) {
+			ZLog::Write(LOGLEVEL_WARN, "GetFolder($id) not found or no permissions");
 			return false;
 		}
 
@@ -317,7 +358,7 @@ class goTask extends GoBaseBackendDiff {
 			->where('tasklistId','=',$folder)
 			->single();
 
-		$newstate = 'M'.$record['modifiedAt'].':C'.$record['count'];
+		$newstate = $record ? 'M'.$record['modifiedAt'].':C'.$record['count'] : "M0:C0";
 		return $newstate;
 	}
 

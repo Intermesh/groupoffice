@@ -206,7 +206,7 @@ class goContact extends GoBaseBackendDiff {
 			->where('c.addressBookId','=',$folder)
 			->single();
 
-		$newstate = 'M'.$record['modifiedAt'].':C'.$record['count'];
+		$newstate = $record ? 'M'.$record['modifiedAt'].':C'.$record['count'] : "M0:C0";
 		ZLog::Write(LOGLEVEL_DEBUG,'goContact->getNotification('.$folder.') State: '.$newstate);
 
 		return $newstate;

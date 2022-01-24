@@ -8,6 +8,7 @@
 - Tasks: added excel export and fixed csv export
 - Tasks: updating reminders bug
 - Tasks: if start date is set then use that as default for new alerts
+- ActiveSync: Fixed moving appointments to another calendar
 
 17-01-2022 6.6.32
 - Core: Issue #776: invalid return type in App::getStorageQuota()
