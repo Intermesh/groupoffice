@@ -6,7 +6,7 @@ use GO;
 use go\core\data\convert;
 use go\modules\community\tasks\model\Task;
 
-class Csv extends convert\Spreadsheet {
+class Spreadsheet extends convert\Spreadsheet {
 
 	/**
 	 * List headers to exclude

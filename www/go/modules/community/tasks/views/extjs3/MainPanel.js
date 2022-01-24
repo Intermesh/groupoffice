@@ -395,21 +395,31 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								menu: [
 									{
 										text: 'vCalendar',
-										iconCls: 'ic-contacts',
+										iconCls: 'filetype filetype-ics',
 										handler: function() {
 											go.util.exportToFile(
 												'Task',
-												Ext.apply(this.taskGrid.store.baseParams, this.taskGrid.store.lastOptions.params, {limit: 0, start: 0}),
+												Object.assign(go.util.clone(this.taskGrid.store.baseParams), this.taskGrid.store.lastOptions.params, {limit: 0, position: 0}),
 												'ics');
 										},
 										scope: this
-									},{
-										text: 'CSV',
-										iconCls: 'ic-description',
+									}, {
+										text: 'Microsoft Excel',
+										iconCls: 'filetype filetype-xls',
 										handler: function() {
 											go.util.exportToFile(
 												'Task',
-												Ext.apply(this.taskGrid.store.baseParams, this.taskGrid.store.lastOptions.params, {limit: 0, start: 0}),
+												Object.assign(go.util.clone(this.taskGrid.store.baseParams), this.taskGrid.store.lastOptions.params, {limit: 0, position: 0}),
+												'xlsx');
+										},
+										scope: this
+									},{
+										text: 'Comma Separated Values',
+										iconCls: 'filetype filetype-csv',
+										handler: function() {
+											go.util.exportToFile(
+												'Task',
+												Object.assign(go.util.clone(this.taskGrid.store.baseParams), this.taskGrid.store.lastOptions.params, {limit: 0, position: 0}),
 												'csv');
 										},
 										scope: this
