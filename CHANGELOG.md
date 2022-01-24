@@ -4,6 +4,7 @@
 - Address book: System settings panel was missing
 - Projects2: Unable to set activity type rates
 - Core: Notification area doesn't close when there are more reminders left
+- Core: CronJob stack trace was logged even when not in debug mode which is a potential security risk.
 
 17-01-2022 6.6.32
 - Core: Issue #776: invalid return type in App::getStorageQuota()

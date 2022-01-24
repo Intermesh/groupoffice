@@ -6,6 +6,7 @@ use ErrorException;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\model\CronJobSchedule;
 use go\core\model\OauthAccessToken;
 use go\core\util\DateTime;
 use go\core\model\CronJob;
@@ -30,7 +31,7 @@ use Throwable;
  */
 class BuildSearchCache extends CronJob {
 
-	public function run(\go\core\model\CronJobSchedule $schedule)
+	public function run(CronJobSchedule $schedule)
 	{
 		$schedule->enabled = false;
 		if(!$schedule->save()) {
