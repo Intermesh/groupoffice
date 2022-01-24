@@ -12,6 +12,7 @@
 - ActiveSync: Fixed tasks sync error
 - ActiveSync: Use default address book for new contacts
 - Email: Fixed infinite loop problem with downloading some attachments from some IMAP servers
+- Studio: enable admin to patch manually from 6.5 to 6.6
 
 17-01-2022 6.6.32
 - Core: Issue #776: invalid return type in App::getStorageQuota()
