@@ -254,6 +254,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			}
 		}
 	},
+
+	nextMapId : function () {
+		return "_NEW_" + (go.form.FormGroup._nextMapId++);
+	},
 	
 	addPanel : function(auto, index) {
 		var formField = this.createNewItem(auto), me = this, items = [formField], delBtn = new Ext.Button({
@@ -384,7 +388,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 		if(this.mapKey) {
 			for(var r in records) {
-				set(records[r]);
+				set(records[r], r);
 			}
 		} else {
 			records.forEach(set);
@@ -418,7 +422,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			if(this.mapKey) {
 				// TODO make minimal PatchObject
 				//if(wrap.formField.isDirty()) {
-					v[wrap.formField.key || Ext.id()] = item.getValue();
+					v[wrap.formField.key || this.nextMapId()] = item.getValue();
 				//}
 			} else {
 				v.push(item.getValue());
@@ -491,6 +495,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 });
 
 Ext.reg('formgroup', go.form.FormGroup);
+
+go.form.FormGroup._nextMapId = 0;
 
 go.form.FormGroupItemContainer = Ext.extend(Ext.Container, {
 
