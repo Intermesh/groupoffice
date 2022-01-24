@@ -633,6 +633,14 @@ abstract class Module extends Singleton {
 		$parts = explode("\\", static::class);		
 		return $parts[2];
 	}
+
+	/**
+	 * @return string
+	 */
+	public static function getLocalizedPackage()
+	{
+		return ucfirst(static::getPackage());
+	}
 	
 	/**
 	 * Get localized module title
