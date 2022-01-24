@@ -2310,34 +2310,26 @@ class Imap extends ImapBodyStruct {
 			switch (strtolower($encoding)) {
 				case 'base64':
 					$line = trim($leftOver).trim($line);
-					$leftOver = "";
 
-					if(strlen($line) % 4 == 0){
+					$length = strlen($line);
+					$mod = strlen($line) % 4;
 
-						if(!$fp){
-							$str .= base64_decode($line);
-						}  else {
-							fputs($fp, base64_decode($line));
-						}
-					}else{
-
-						$buffer = "";
-						while(strlen($line)>4){
-							$buffer .= substr($line, 0, 4);
-							$line = substr($line, 4);
-						}
-
-						if(!$fp){
-							$str .= base64_decode($buffer);
-						}  else {
-							fputs($fp, base64_decode($buffer));
-						}
-
-						if(strlen($line)){
-							$leftOver = $line;
-						}
+					if($mod == 0) {
+						$leftOver = "";
+					} else{
+						$cutPoint = $length - $mod;
+						$leftOver = substr($line, $cutPoint);
+						$line = substr($line, 0, $cutPoint);
 					}
+
+					if(!$fp){
+						$str .= base64_decode($line);
+					}  else {
+						fputs($fp, base64_decode($line));
+					}
+
 					break;
+
 				case 'quoted-printable':
 					if(!$fp){
 						$str .= quoted_printable_decode($line);
@@ -2461,6 +2453,19 @@ class Imap extends ImapBodyStruct {
 	/**
 	 * Start getting a message part for reading it line by line
 	 *
+	 * log][GO\Base\Mail\Imap:2533]
+	R: * 53 FETCH ( UID 173553 BODY[2 ] JVBERi0xLjcNCiW1tbW1DQoxIDAgb2JqDQo8PC9UeXBlL0NhdGFsb2cvUGFn
+	ZXMgMiAwIFIvTGFuZyhpdC1JVCkgL1N0cnVjdFRyZWVSb290IDEzNSAwIFIv
+	TWFya0luZm88PC9NYXJrZWQgdHJ1ZT4+L01ldGFkYXRhIDkzMiAwIFIvVmll
+	d2VyUHJlZmVyZW5jZXMgOTMzIDAgUj4+DQplbmRvYmoNCjIgMCB
+	 *
+	 *
+	 *  NTgvWFJlZlN0bSAyNDMyNDgwPj4NCnN0YXJ0eHJlZg0KMjQ1MzYyMA0KJSVF
+	T0Y=
+	)
+	[log][GO\Base\Mail\Imap:2533] R: A3 OK UID FETCH completed
+
+	 *
 	 * @param <type> $uid
 	 * @param <type> $message_part
 	 * @return <type>
@@ -2493,7 +2498,7 @@ class Imap extends ImapBodyStruct {
 		$this->message_part_size=$size;
 		$this->message_part_read=0;
 
-//		\GO::debug("Part size: ".$size);
+		\GO::debug("Part size: ".$size);
 		return $size;
 	}
 
