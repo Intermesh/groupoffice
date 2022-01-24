@@ -313,8 +313,6 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 				return this.setState(changes.newState).then(() => {
 
-					return Promise.reject({type: "cannotcalculatechanges", detail: "test", message: "test"});
-
 					if(changes.hasMoreChanges) {
 
 						//unofficial response but we use it to process no more than 100000 changes. A resync is
