@@ -10,6 +10,7 @@
 - Tasks: if start date is set then use that as default for new alerts
 - ActiveSync: Fixed moving appointments to another calendar
 - ActiveSync: Fixed tasks sync error
+- ActiveSync: Use default address book for new contacts
 
 17-01-2022 6.6.32
 - Core: Issue #776: invalid return type in App::getStorageQuota()
