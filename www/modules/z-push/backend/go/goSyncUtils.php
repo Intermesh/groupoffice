@@ -211,7 +211,7 @@ class GoSyncUtils {
 	/**
 	 * @throws Exception
 	 */
-	public static function aSync2weekday(int $number): array
+	public static function aSync2weekday(?int $number): array
 	{
 		$weekdays = array();
 		if ($number >= 128 || $number < 0) {
