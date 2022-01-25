@@ -67,7 +67,7 @@ class FilesModule extends \GO\Base\Module{
 		}
 		
 		$folder = Model\Folder::model()->findByPath("log", true);
-		if(!$folder->acl || $folder->acl_id==\GO::modules()->files->acl_id){
+		if(!$folder->acl){
 			$folder->setNewAcl();
 			$folder->readonly=1;
 			$folder->save();
