@@ -41,6 +41,7 @@ class Sync extends Controller {
 
 	  foreach($records as $record) {
 	  	echo $record->getDn() . "\n";
+			var_dump($record->memberOf);
 	  }
   }
 
