@@ -140,7 +140,7 @@ class Session extends Observable{
 	 * Attemts to login with stored cookies on the client.
 	 * This function is called in index.php
 	 * 
-	 * @return Model\User 
+	 * @return ?Model\User
 	 */
 	public function loginWithCookies(){
 		if(empty(\GO::session()->values['user_id']) && !empty($_COOKIE['GO_UN']) && !empty($_COOKIE['GO_UN'])){
@@ -149,7 +149,7 @@ class Session extends Observable{
 				$password = Util\Crypt::decrypt($_COOKIE['GO_PW']);
 			} catch (\Exception $e) {
 				$this->_unsetRemindLoginCookies ();
-				return false;
+				return null;
 			}
 
 			if(!$username){
@@ -165,6 +165,7 @@ class Session extends Observable{
 			else
 				return $user;
 		}
+		return null;
 	}
 	
 	/**

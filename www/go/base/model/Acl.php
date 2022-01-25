@@ -31,6 +31,7 @@ namespace GO\Base\Model;
  * @property int $ownedBy
  * @property int $id
  * @property string $modifiedAt
+ * @property \GO\Base\Model\AclUsersGroups[] $records
  */
 class Acl extends \GO\Base\Db\ActiveRecord {
 	

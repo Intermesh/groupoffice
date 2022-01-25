@@ -344,7 +344,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 			}
 
 			return true;
-		} catch(PDOException $e) {
+		} catch(\PDOException $e) {
 			$uniqueKey = Utils::isUniqueKeyException($e);
 			if ($uniqueKey) {
 				$this->entity->setValidationError('customFields.' . $uniqueKey, ErrorCode::UNIQUE);
