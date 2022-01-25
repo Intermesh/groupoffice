@@ -723,33 +723,7 @@ abstract class Property extends Model {
 		return clone $query;
 	}
 
-	/**
-	 * Find by ID's.
-	 *
-	 * It will search on the primary key field of the first mapped table.
-	 *
-	 * @exanple
-	 * ```
-	 * $note = Note::findById(1);
-	 *
-	 * //If a key has more than one column they can be combined with a "-". eg. "1-2"
-	 * $models = ModelWithDoublePK::findById("1-1");
-	 * ```
-	 *
-	 * @param string $id
-	 * @param string[] $properties
-	 * @param bool $readOnly
-	 * @throws PDOException
-	 * @return static|false
-	 */
-	protected static function internalFindById(string $id, array $properties = [], bool $readOnly = false)
-	{
-		$query = static::internalFind($properties, $readOnly);
-		$keys = static::idToPrimaryKeys($id);
-		$query->where($keys);
-		
-		return $query->single();
-	}
+
 
 	/**
 	 * Changes the string key "1-2" into ['primaryKey1' => 1', 'primaryKey2' => '2]

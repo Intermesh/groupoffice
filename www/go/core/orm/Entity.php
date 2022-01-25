@@ -105,7 +105,7 @@ abstract class Entity extends Property {
 	 *
 	 *
 	 * @param Entity $entity;
-	 * @param Array ['permissionLevel' => &$permissionLevel] You can set the permission level by reference to override
+	 * @param array ['permissionLevel' => &$permissionLevel] You can set the permission level by reference to override
 	 */
 	const EVENT_PERMISSION_LEVEL = 'permissionlevel';
 
@@ -217,7 +217,11 @@ abstract class Entity extends Property {
 	 */
 	public static final function findById(string $id, array $properties = [], bool $readOnly = false): ?Entity
 	{
-		return static::internalFindById($id, $properties, $readOnly);
+		$query = static::internalFind($properties, $readOnly);
+		$keys = static::idToPrimaryKeys($id);
+		$query->where($keys);
+
+		return $query->single();
 	}
 
 	private static $existingIds = [];
