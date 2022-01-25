@@ -1,3 +1,6 @@
+- Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
+- Core: wrong return value in App::getStorageFreeSpace()
+
 24-01-2022 6.6.33
 - ActiveSync: Fixed empty needle error
 - Projects2: autorefresh task list when deleting project
