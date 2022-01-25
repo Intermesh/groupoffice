@@ -59,12 +59,7 @@ go.modules.community.tasks.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 					format: GO.settings.date_format,
 					fieldLabel: t("Date"),
 					value: tomorrow,
-					submit:false,
-					listeners: {
-						"select": (me, date) => {
-							this.formPanel.baseParams.due_time = date.format(GO.settings.date_format);
-						}
-					}
+					submit:false
 				})],
 				width: 240,
 				style: 'margin:auto;'
