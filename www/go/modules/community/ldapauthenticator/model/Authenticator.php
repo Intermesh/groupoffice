@@ -77,12 +77,18 @@ class Authenticator extends PrimaryAuthenticator {
 		$query = $server->getAuthenticationQuery($ldapUsername);
 		
 		$record = Record::find($connection, $server->peopleDN, $query)->fetch();
-		
+
 		if(!$record) {
+			go()->debug("record not found");
 			return false;
 		}
+
+		$dn = $record->getDn();
+
+		go()->debug("Found record: " . $dn);
 		
-		if(!$connection->bind($record->getDn(), $password)) {
+		if(!$connection->bind($dn, $password)) {
+			go()->debug("Bind with password failed");
 			return false;
 		}
 
