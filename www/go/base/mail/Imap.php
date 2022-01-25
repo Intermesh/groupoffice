@@ -44,7 +44,7 @@ class Imap extends ImapBodyStruct
 	var $gmail_server = false;
 
 	var $permittedFlags = false;
-	
+
 	public $ignoreInvalidCertificates = false;
 
 	public static $systemFlags = array(
@@ -2169,9 +2169,6 @@ class Imap extends ImapBodyStruct
 				throw new Exception("Invalid UUEncoded attachment in uid: ".$uid);
 			}
 
-//			if(!isset($startPosAtts)) {
-//				$startPosAtts = $matches[0][1];
-//			}
 			$att = str_replace(array("\r"), "", substr($body, $offset, $endpos));
 
 			$data = convert_uudecode($att);
@@ -2195,8 +2192,10 @@ class Imap extends ImapBodyStruct
 	 * @return StringHelper
 	 */
 
-	public function get_message_part_decoded($uid, $part_no, string $encoding, $charset=false, $peek=false, $cutofflength=false, $fp=false)
-	{
+	public function get_message_part_decoded($uid, $part_no, $encoding, $charset=false, $peek=false, $cutofflength=false, $fp=false) {
+		\GO::debug("get_message_part_decoded($uid, $part_no, $encoding, $charset)");
+		
+		
 		if($encoding == 'uuencode') {
 			return $this->_uudecode($uid, $part_no, $peek, $fp);
 		}
@@ -2210,6 +2209,7 @@ class Imap extends ImapBodyStruct
 		$str = '';
 		$this->get_message_part_start($uid, $part_no, $peek);
 
+
 		$leftOver='';
 
 		while ($line = $this->get_message_part_line()) {
@@ -2217,34 +2217,26 @@ class Imap extends ImapBodyStruct
 			switch (strtolower($encoding)) {
 				case 'base64':
 					$line = trim($leftOver).trim($line);
-					$leftOver = "";
 
-					if(strlen($line) % 4 == 0){
+					$length = strlen($line);
+					$mod = strlen($line) % 4;
 
-						if(!$fp){
-							$str .= base64_decode($line);
-						}  else {
-							fputs($fp, base64_decode($line));
-						}
-					} else {
-
-						$buffer = "";
-						while(strlen($line)>4){
-							$buffer .= substr($line, 0, 4);
-							$line = substr($line, 4);
-						}
-
-						if(!$fp){
-							$str .= base64_decode($buffer);
-						}  else {
-							fputs($fp, base64_decode($buffer));
-						}
-
-						if(strlen($line)){
-							$leftOver = $line;
-						}
+					if($mod == 0) {
+						$leftOver = "";
+					} else{
+						$cutPoint = $length - $mod;
+						$leftOver = substr($line, $cutPoint);
+						$line = substr($line, 0, $cutPoint);
 					}
+
+					if(!$fp){
+						$str .= base64_decode($line);
+					}  else {
+						fputs($fp, base64_decode($line));
+					}
+
 					break;
+
 				case 'quoted-printable':
 					if(!$fp){
 						$str .= quoted_printable_decode($line);
@@ -2266,8 +2258,9 @@ class Imap extends ImapBodyStruct
 			}
 		}
 
-		if(!empty($leftOver)) {
-//			\GO::debug($leftOver);
+		if(!empty($leftOver))
+		{
+			\GO::debug($leftOver);
 
 			if(!$fp){
 				$str .= base64_decode($leftOver);
@@ -2278,6 +2271,7 @@ class Imap extends ImapBodyStruct
 
 
 		if($charset){
+
 			//some clients don't send the charset.
 			if($charset=='us-ascii') {
 				$charset = $this->findCharsetInHtmlBody($str);				
@@ -2328,6 +2322,19 @@ class Imap extends ImapBodyStruct
 
 	/**
 	 * Start getting a message part for reading it line by line
+	 *
+	 * log][GO\Base\Mail\Imap:2533]
+	R: * 53 FETCH ( UID 173553 BODY[2 ] JVBERi0xLjcNCiW1tbW1DQoxIDAgb2JqDQo8PC9UeXBlL0NhdGFsb2cvUGFn
+	ZXMgMiAwIFIvTGFuZyhpdC1JVCkgL1N0cnVjdFRyZWVSb290IDEzNSAwIFIv
+	TWFya0luZm88PC9NYXJrZWQgdHJ1ZT4+L01ldGFkYXRhIDkzMiAwIFIvVmll
+	d2VyUHJlZmVyZW5jZXMgOTMzIDAgUj4+DQplbmRvYmoNCjIgMCB
+	 *
+	 *
+	 *  NTgvWFJlZlN0bSAyNDMyNDgwPj4NCnN0YXJ0eHJlZg0KMjQ1MzYyMA0KJSVF
+	T0Y=
+	)
+	[log][GO\Base\Mail\Imap:2533] R: A3 OK UID FETCH completed
+
 	 *
 	 * @param <type> $uid
 	 * @param int|null $message_part

@@ -1,3 +1,17 @@
+24-01-2022 6.5.98
+- Business: When copying agreement, leave finish date empty
+- Business: Check whether year budget for leave day type matches current leave days for said type
+- Core: CronJob stack trace was logged even when not in debug mode which is a potential security risk.
+- Core: Catch exception when sending admin notification e-mail so application flow continues
+- Holidays: fix casting bug in holiday calculator
+- ActiveSync: Fixed moving appointments to another calendar
+- ActiveSync: Use default address book for new contacts
+- Email: Fixed infinite loop problem with downloading some attachments from some IMAP servers
+
+17-01-2022 6.5.97
+- Leavedays: set special_budget_id explicitly to NULL when not in special leave mode
+- Business: manage permissions to the module will enable user to edit all agreements
+
 03-01-2022 6.5.96
 - Business: hid transferable leave day types in favor of Special leave types
 - Business: Fixed minor mistake in activities grid
@@ -473,7 +487,9 @@
 
 
 
-6.4.245
+17-01-2022 6.4.246
+- Core: Fix for error when creating tasks from a project
+
 09-12-2021 6.4.245
 - Savemailas: override mtime to email date
 - Calendar: backport prevent error when event is cancelled for disabled user

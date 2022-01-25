@@ -532,8 +532,10 @@ class goCalendar extends GoBaseBackendDiff {
 //					throw new \Exception("FATAL: No default calendar configured");
 
 				$event = new \GO\Calendar\Model\Event();
-				$event->calendar_id = $folderid;//$calendar->id;
+
 			}
+
+			$event->calendar_id = $folderid;//$calendar->id;
 
 			$event = $this->_handleAppointment($message, $event);
 			if(!$event)
@@ -548,9 +550,57 @@ class goCalendar extends GoBaseBackendDiff {
 	}
 
 	/**
+	 * Move a mailmessage to an other folder.
+	 *
+	 * @param string $folderid
+	 * @param int $id
+	 * @param string $newfolderid
+	 * @return boolean
+	 */
+	public function MoveMessage($folderid, $id, $newfolderid, $contentparameters) {
+
+		ZLog::Write(LOGLEVEL_DEBUG, "goCalendar::MoveMessage($folderid, $id, $newfolderid)");
+
+		$event = \GO\Calendar\Model\Event::model()->findByPk($id);
+		if(!$event) {
+			ZLog::Write(LOGLEVEL_WARN, "Event not found with id = " . $id ." in folder ". $folderid);
+			return false;
+		}
+
+		if ($event->permissionLevel < \GO\Base\Model\Acl::WRITE_PERMISSION) {
+			ZLog::Write(LOGLEVEL_DEBUG, "Skipping update of read-only event " . $event->name);
+			return false;
+		}
+
+		$event->calendar_id = $newfolderid;
+		if(!$event->save(true)) {
+			ZLog::Write(LOGLEVEL_WARN, "Failed to save event id = " . $event->id);
+
+			return false;
+		}
+
+		// required for not duplicating events on iphone!
+		return $event->id . "";
+
+
+//		$duplicate = $event->duplicate([
+//			"calendar_id" => $newfolderid
+//		], true, true);
+//
+//		if(!$duplicate) {
+//			return false;
+//		}
+//
+//		$event->delete();
+//
+//		return $duplicate->id ."";
+
+	}
+
+	/**
 	 * Get the status of an item
 	 * 
-	 * @param StringHelper $folderid
+	 * @param string $folderid
 	 * @param int $id
 	 * @return array
 	 */
@@ -558,7 +608,9 @@ class goCalendar extends GoBaseBackendDiff {
 
 		$event = \GO\Calendar\Model\Event::model()->findByPk($id);
 		$stat = false;
-		if ($event) {
+
+		//check if message is in the right folder after move
+		if ($event && $event->calendar_id == $folderid) {
 			$stat = array();
 			$stat["id"] = $event->id;
 			$stat["flags"] = 1;
@@ -727,7 +779,7 @@ class goCalendar extends GoBaseBackendDiff {
 	
 	public function getNotification($folder=null) {
 
-		
+
 		$params = \GO\Base\Db\FindParams::newInstance()
 						->ignoreAcl()
 						->single(true, true)
@@ -738,13 +790,13 @@ class goCalendar extends GoBaseBackendDiff {
 //						->addCondition('calendar_id', 's.calendar_id', '=', 't', true, true)
 //						->addCondition('user_id', \GO::user()->id, '=', 's')
 //						, 's');
-		
+
 
 		$record = \GO\Calendar\Model\Event::model()->find($params);
 
 		$lastmtime = isset($record->lastmtime) ? $record->lastmtime : 0;
 		$newstate = 'M'.$lastmtime.':C'.$record->count;
-		
+
 		ZLog::Write(LOGLEVEL_DEBUG,'goCalendar->getNotification('.$folder.') State: '.$newstate);
 
 		return $newstate;

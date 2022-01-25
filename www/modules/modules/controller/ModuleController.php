@@ -90,13 +90,14 @@ class ModuleController extends AbstractJsonController{
 				$availableModules[ucfirst($module->getPackage()) . $module->getName()] = array(
 					'id' => $model ? $model->id : null,
 					'name'=>$module->getName(),
+					'nameWithPackage' => $module->getPackage() . $module->getName(),
 					'localizedName' => $module->getTitle(),
 					'author'=>$module->getAuthor(),
 					'description'=>$module->getDescription(),
 					'icon'=>$module->getIcon(),
 					'aclId'=>$model ? $model->getAclId() : 0,
 
-					'localizedPackage'=>ucfirst($module->getPackage()),
+					'localizedPackage'=> $module->getLocalizedPackage(),
 					'package'=>$module->getPackage(),
 					'enabled'=>$model && $model->enabled,
 					'isRefactored' => true,
@@ -113,6 +114,7 @@ class ModuleController extends AbstractJsonController{
 				$availableModules[$module->package().$module->name()] = array(					
 						'id' => $model ? $model->id : null,
 					'name'=>$module->name(),
+					'nameWithPackage' => $module->package().$module->name(),
 					'localizedName' => $module->localizedName(),
 					'author'=>$module->author(),
 					'description'=>$module->description(),

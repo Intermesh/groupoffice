@@ -13,8 +13,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		var reader = new Ext.data.JsonReader({
 			root: 'results',
 			totalProperty: 'total',
-			fields: ['name', 'package', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable', 'isRefactored','installed'],
-			id: 'name'
+			fields: ['name', 'nameWithPackage', 'package', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable', 'isRefactored','installed'],
+			id: 'nameWithPackage'
 		});
 
 		this.store = new GO.data.GroupingStore({

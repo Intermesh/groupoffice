@@ -80,7 +80,9 @@ class goContact extends GoBaseBackendDiff {
 
 		if (!$contact) {
 			$contact = new Contact();
-			$contact->addressBookId = $folderid;//$this->convertor->getDefaultAddressBook()->id;
+			//address list can't be determined on the iPhone :( and a user reported it's the same for
+			// Android. Therefore we use the default.
+			$contact->addressBookId = $this->convertor->getDefaultAddressBook()->id;
 		} else
 		{
 			ZLog::Write(LOGLEVEL_DEBUG, "Found contact");

@@ -665,9 +665,9 @@ class goMail extends GoBaseBackendDiff {
 	/**
 	 * Move a mailmessage to an other folder.
 	 * 
-	 * @param StringHelper $folderid
+	 * @param string $folderid
 	 * @param int $id
-	 * @param StringHelper $newfolderid
+	 * @param string $newfolderid
 	 * @return boolean
 	 */
 	public function MoveMessage($folderid, $id, $newfolderid, $contentparameters) {
@@ -677,14 +677,21 @@ class goMail extends GoBaseBackendDiff {
 		$imap = $this->_imapLogon($folderid);
 		if(!$imap)
 			return false;
+
+		$uidnext = $imap->get_uidnext();
 		
-		return $imap->move(array($id), $this->_replaceDotWithServerDelimiter($newfolderid));
+		if(!$imap->move(array($id), $this->_replaceDotWithServerDelimiter($newfolderid))) {
+			return false;
+		}
+		ZLog::Write(LOGLEVEL_DEBUG, "goMail::MoveMessage() = " . $uidnext);
+
+		return $uidnext . "";
 	}
 	
 	/**
 	 * Get the status of an item
 	 * 
-	 * @param StringHelper $folderid
+	 * @param string $folderid
 	 * @param int $id
 	 * @return array
 	 */

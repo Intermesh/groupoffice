@@ -3,23 +3,31 @@
 namespace GO\Base\Mail;
 
 
+use go\core\ErrorHandler;
+use Throwable;
+
 class AdminNotifier {
 	
 	/**
 	 * Can be used to notify the administrator by email
 	 * 
-	 * @param StringHelper $subject
-	 * @param StringHelper $message 
+	 * @param string $subject
+	 * @param string $message
 	 */
 	public static function sendMail($subject, $body){
 
-		$message = Message::newInstance();
-		$message->setSubject($subject);
+		try {
+			$message = Message::newInstance();
+			$message->setSubject($subject);
 
-		$message->setBody($body,'text/plain');
-		$message->setFrom(\GO::config()->webmaster_email,\GO::config()->title);
-		$message->addTo(\GO::config()->webmaster_email,'Webmaster');
+			$message->setBody($body, 'text/plain');
+			$message->setFrom(\GO::config()->webmaster_email, \GO::config()->title);
+			$message->addTo(\GO::config()->webmaster_email, 'Webmaster');
 
-		Mailer::newGoInstance()->send($message);
+			Mailer::newGoInstance()->send($message);
+		} catch(Throwable $e) {
+			ErrorHandler::log("Failed to send admin notification e-mail: " . $subject);
+			ErrorHandler::logException($e);
+		}
 	}
 }

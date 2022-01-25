@@ -336,14 +336,11 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 				$cronFile->run($this);
 				$this->error=null;	
 			}catch(\Throwable $e){
-				GO::debug("EXCEPTION: ".(string) $e);
 				$failed=true;
-				
-				\GO\Base\Mail\AdminNotifier::sendMail("CronJob ".$this->name." failed", "EXCEPTION: ".(string) $e);
-				// if we trigger and error again here the cron wont be saved
-				//trigger_error("CronJob ".$this->name." failed. EXCEPTION: ".(string) $e, E_USER_WARNING);
 				\go\core\ErrorHandler::logException($e);
-			
+				
+				\GO\Base\Mail\AdminNotifier::sendMail("CronJob ".$this->name." failed", "EXCEPTION: ". $e->getMessage());
+
 				$this->error = date('c') . ": " .(string)$e;
 
 			}
