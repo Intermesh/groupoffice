@@ -2,13 +2,9 @@
 
 ## Development environment (docker)
 
-When using the official [Group Office development environment](https://github.com/Intermesh/docker-groupoffice-development), you need to add a manual change to your Apache
-configuration:
-
-1. Open a shell to your web environment: `docker-compose exec groupoffice bash` 
-2. Open the apache configuration: `nano /etc/apache2/sites-enabled/000-default.conf`
-3. Add the following lines to the default VirtualHost:
-    > Alias /gauth /usr/local/share/groupoffice/go/modules/community/oauth2client/gauth.php
-4. Reload the apache configuration: `service apache2 reload`
+When using the official [Group Office development environment](https://github.com/Intermesh/docker-groupoffice-development),
+please be sure to set the URL to http://localhost:8000 in the system settings. Localhost is
+the only non-https URL that is commonly accepted by OAuth servers. This applies to at least
+Google and Azure.
 
 ---
