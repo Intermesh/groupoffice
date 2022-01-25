@@ -98,7 +98,7 @@ class Imap extends ImapBodyStruct {
 //		}
 
 		if(empty($password)){
-			throw new ImapAuthenticationFailedException('Authententication failed for user '.$username.' on IMAP server '.$this->server);
+			throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
 		}
 
 		$this->ssl = $ssl;
@@ -137,6 +137,12 @@ class Imap extends ImapBodyStruct {
 			throw new \Exception('Failed to open socket #'.$errorno.'. '.$errorstr);
 		}
 
+		$greeting = trim(fgets($this->handle, 8192));
+		$this->handleGreeting($greeting);
+		if (self::$debug && $greeting) {
+			go()->debug('S: '. $greeting);
+		}
+
 		$authed = $this->authenticate($username, $password);
 
 		if(!$authed)
@@ -148,6 +154,20 @@ class Imap extends ImapBodyStruct {
 
 
 		return true;
+	}
+
+	private function handleGreeting($greeting) {
+		//some imap servers like dovecot respond with the capability after login.
+		//Set this in the session so we don't need to do an extra capability command.
+		if(($startpos = strpos($greeting, 'CAPABILITY'))!==false){
+			\GO::debug("Use capability from login");
+			$endpos=  strpos($greeting, ']', $startpos);
+			if($endpos){
+				$capability = substr($greeting, $startpos, $endpos-$startpos);
+				\GO::session()->values['GO_IMAP'][$this->server]['imap_capability']=$capability;
+			}
+
+		}
 	}
 
 	/**
@@ -166,7 +186,7 @@ class Imap extends ImapBodyStruct {
 			fclose($this->handle);
 
 			foreach($this->errors as $error){
-				error_log("IMAP error: ".$error);
+				error_log("IMAP error ". $this->username .'@' . $this->server .': ' . $error);
 			}
 
 			$this->handle=false;
@@ -252,25 +272,10 @@ class Imap extends ImapBodyStruct {
 				$authed = true;
 				$this->state = 'authed';
 
-
-				//some imap servers like dovecot respond with the capability after login.
-				//Set this in the session so we don't need to do an extra capability command.
-				if(($startpos = strpos($response, 'CAPABILITY'))!==false){
-					\GO::debug("Use capability from login");					
-					$endpos=  strpos($response, ']', $startpos);
-					if($endpos){
-						$capability = substr($response, $startpos, $endpos-$startpos);
-						\GO::session()->values['GO_IMAP'][$this->server]['imap_capability']=$capability;
-					}
-
-				}
+				$this->handleGreeting($response);
 			}else
 			{
-//				if(!\GO::config()->debug)
-//					$this->errors[]=$response;
-
-				throw new ImapAuthenticationFailedException('Authententication failed for user '.$username.' on IMAP server '.$this->server."\n\n".$response);
-
+				throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
 			}
 		}
 		return $authed;
@@ -1611,7 +1616,9 @@ class Imap extends ImapBodyStruct {
 								while (isset($vals[$i + $n]) && $vals[$i + $n] != ')') {
 									$prop = str_replace('-','_',strtolower(substr($vals[$i + $n],1)));
 									//\GO::debug($prop);
-									if(isset($message[$prop])) {
+
+									//It can be a user named a label $labels
+									if(isset($message[$prop]) && $prop != 'labels') {
 										$message[$prop]=true;
 									} else {
 										$message['labels'][] = strtolower($vals[$i + $n]);
@@ -2284,6 +2291,12 @@ class Imap extends ImapBodyStruct {
 			return $this->_uudecode($uid, $part_no, $peek, $fp);
 		}
 
+
+//		if(strtolower($encoding) == 'base64') {
+//			$part = $this->get_message_part($uid, $part_no, $encoding, $peek);
+//			//return base64_decode($part);
+//		}
+
 		$str = '';
 		$this->get_message_part_start($uid, $part_no, $peek);
 
@@ -2294,35 +2307,27 @@ class Imap extends ImapBodyStruct {
 
 			switch (strtolower($encoding)) {
 				case 'base64':
-					$line = trim($leftOver.$line);
-					$leftOver = "";
+					$line = trim($leftOver).trim($line);
 
-					if(strlen($line) % 4 == 0){
+					$length = strlen($line);
+					$mod = strlen($line) % 4;
 
-						if(!$fp){
-							$str .= base64_decode($line);
-						}  else {
-							fputs($fp, base64_decode($line));
-						}
-					}else{
-
-						$buffer = "";
-						while(strlen($line)>4){
-							$buffer .= substr($line, 0, 4);
-							$line = substr($line, 4);
-						}
-
-						if(!$fp){
-							$str .= base64_decode($buffer);
-						}  else {
-							fputs($fp, base64_decode($buffer));
-						}
-
-						if(strlen($line)){
-							$leftOver = $line;
-						}
+					if($mod == 0) {
+						$leftOver = "";
+					} else{
+						$cutPoint = $length - $mod;
+						$leftOver = substr($line, $cutPoint);
+						$line = substr($line, 0, $cutPoint);
 					}
+
+					if(!$fp){
+						$str .= base64_decode($line);
+					}  else {
+						fputs($fp, base64_decode($line));
+					}
+
 					break;
+
 				case 'quoted-printable':
 					if(!$fp){
 						$str .= quoted_printable_decode($line);
@@ -2445,6 +2450,19 @@ class Imap extends ImapBodyStruct {
 
 	/**
 	 * Start getting a message part for reading it line by line
+	 *
+	 * log][GO\Base\Mail\Imap:2533]
+	R: * 53 FETCH ( UID 173553 BODY[2 ] JVBERi0xLjcNCiW1tbW1DQoxIDAgb2JqDQo8PC9UeXBlL0NhdGFsb2cvUGFn
+	ZXMgMiAwIFIvTGFuZyhpdC1JVCkgL1N0cnVjdFRyZWVSb290IDEzNSAwIFIv
+	TWFya0luZm88PC9NYXJrZWQgdHJ1ZT4+L01ldGFkYXRhIDkzMiAwIFIvVmll
+	d2VyUHJlZmVyZW5jZXMgOTMzIDAgUj4+DQplbmRvYmoNCjIgMCB
+	 *
+	 *
+	 *  NTgvWFJlZlN0bSAyNDMyNDgwPj4NCnN0YXJ0eHJlZg0KMjQ1MzYyMA0KJSVF
+	T0Y=
+	)
+	[log][GO\Base\Mail\Imap:2533] R: A3 OK UID FETCH completed
+
 	 *
 	 * @param <type> $uid
 	 * @param <type> $message_part
