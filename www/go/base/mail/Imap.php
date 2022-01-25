@@ -97,8 +97,8 @@ class Imap extends ImapBodyStruct
 
 	public function connect(string $server, int $port, string $username, string $password, bool $ssl=false, bool $starttls=false, string $auth='plain', ?string $token= null ) :bool
 	{
-		if(empty($password) && strtolower($auth) == 'plain'){
-			throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
+		if (empty($password) && strtolower($auth) == 'plain') {
+			throw new ImapAuthenticationFailedException('Authentication failed for user ' . $username . ' on IMAP server ' . $this->server);
 		}
 //		\GO::debug("imap::connect($server, $port, $username, ***, $ssl, $starttls, $auth, ***)");
 
@@ -106,20 +106,20 @@ class Imap extends ImapBodyStruct
 		$this->starttls = $starttls;
 		$this->auth = strtolower($auth);
 
-		if($token) {
+		if ($token) {
 			$this->token = $token;
 		}
 
-		$this->server=$server;
-		$this->port=$port;
-		$this->username=$username;
-		$this->password=$password;
+		$this->server = $server;
+		$this->port = $port;
+		$this->username = $username;
+		$this->password = $password;
 
 		$context_options = null;//array(); -> Must be an associative array of associative arrays in the format $arr['wrapper']['option'] = $value, or null
-		if($this->ignoreInvalidCertificates) {
+		if ($this->ignoreInvalidCertificates) {
 			$context_options = array('ssl' => array(
-					"verify_peer"=>false,
-					"verify_peer_name"=>false
+				"verify_peer" => false,
+				"verify_peer_name" => false
 			));
 		}
 
@@ -127,17 +127,37 @@ class Imap extends ImapBodyStruct
 
 		$errorno = 0;
 		$errorstr = '';
-		$remote = $this->ssl ? 'ssl://' : '';			
-		$remote .=  $this->server.":".$this->port;
+		$remote = $this->ssl ? 'ssl://' : '';
+		$remote .= $this->server . ":" . $this->port;
 
 		$this->handle = stream_socket_client($remote, $errorno, $errorstr, 10, STREAM_CLIENT_CONNECT, $streamContext);
 		if (!is_resource($this->handle)) {
-			throw new \Exception('Failed to open socket #'.$errorno.'. '.$errorstr);
+			throw new \Exception('Failed to open socket #' . $errorno . '. ' . $errorstr);
 		}
 		stream_set_timeout($this->handle, 10);
 //		$this->metadata = stream_get_meta_data($this->handle); // for debugging purposes
-
+		$greeting = trim(fgets($this->handle, 8192));
+		$this->handleGreeting($greeting);
+		if (self::$debug && $greeting) {
+			go()->debug('S: ' . $greeting);
+		}
 		return $this->authenticate($username, $password);
+	}
+
+
+	private function handleGreeting(string $greeting)
+	{
+		//some imap servers like dovecot respond with the capability after login.
+		//Set this in the session so we don't need to do an extra capability command.
+		if(($startpos = strpos($greeting, 'CAPABILITY'))!==false){
+			\GO::debug("Use capability from login");
+			$endpos=  strpos($greeting, ']', $startpos);
+			if($endpos){
+				$capability = substr($greeting, $startpos, $endpos-$startpos);
+				\GO::session()->values['GO_IMAP'][$this->server]['imap_capability']=$capability;
+			}
+
+		}
 	}
 
 	/**
@@ -246,21 +266,10 @@ class Imap extends ImapBodyStruct
 			if (stristr($response, 'A' . $this->command_count . ' OK')) {
 				$authed = true;
 				$this->state = 'authed';
-
-				//some imap servers like dovecot respond with the capability after login.
-				//Set this in the session so we don't need to do an extra capability command.
-				if (($startpos = strpos($response, 'CAPABILITY')) !== false) {
-					\GO::debug("Use capability from login");
-					$endpos = strpos($response, ']', $startpos);
-					if ($endpos) {
-						$capability = substr($response, $startpos, $endpos - $startpos);
-						\GO::session()->values['GO_IMAP'][$this->server]['imap_capability'] = $capability;
-					}
-
-				}
-			} else {
-				throw new ImapAuthenticationFailedException('Authentication failed for user ' . $username . ' on IMAP server ' . $this->server);
+				$this->handleGreeting($response);
 			}
+		} else {
+			throw new ImapAuthenticationFailedException('Authentication failed for user ' . $username . ' on IMAP server ' . $this->server);
 		}
 		return $authed;
 	}

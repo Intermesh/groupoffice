@@ -289,7 +289,7 @@ abstract class ImapBase {
 					$chunked_result[$c] = $chunks;
 				}
 			}
-        } while (substr($result[$n], 0, strlen('A'.$this->command_count.' ')) != 'A'.$this->command_count.' ');
+        } while (!feof($this->handle) && substr($result[$n], 0, strlen('A'.$this->command_count.' ')) != 'A'.$this->command_count.' ');
 
 		$this->responses[] = $result;
 		if ($chunked) {
