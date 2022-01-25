@@ -1,4 +1,5 @@
 - Core: Fixed database check and make sure core module is shared
+- Tasks: Fixed date shift and priority change in tasks migration
 
 25-01-2022 6.6.34
 - Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
