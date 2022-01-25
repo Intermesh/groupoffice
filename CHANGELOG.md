@@ -1,7 +1,4 @@
-6.4.247
-- Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
-
-24-01-2022 6.4.247
+25-01-2022 6.4.247
 - Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
 
 17-01-2022 6.4.246
