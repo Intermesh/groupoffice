@@ -191,7 +191,8 @@ class Structure extends Model {
 					return $this->hasAlternativeBody($part->parts);
 				}
 			}
-		}	
+		}
+		return false;
 	}
 	
 	/**

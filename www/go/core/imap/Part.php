@@ -184,7 +184,7 @@ abstract class Part extends Model {
 		}
 		
 		if(!is_resource($filePointer)){
-			throw new Exception("Invalid file pointer given");
+			throw new \InvalidArgumentException("Invalid file pointer given");
 		}
 		
 		if($sendHeaders){

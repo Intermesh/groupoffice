@@ -192,8 +192,6 @@ class Message extends Model {
 	private $bodyStructureStr;
 
 	public function __construct(Mailbox $mailbox, $uid) {
-		parent::__construct();
-
 		$this->mailbox = $mailbox;
 		$this->uid = (int) $uid;
 	}
@@ -201,12 +199,12 @@ class Message extends Model {
 	/**
 	 * Find a message by uid
 	 * 
-	 * @param \IFW\Db\Connection $connection
+	 * @param Connection $connection
 	 * @param string $mailboxName
 	 * @param int $uid
 	 * @return self
 	 */
-	public static function findByUid(\IFW\Db\Connection $connection, $mailboxName, $uid) {
+	public static function findByUid(Connection $connection, $mailboxName, $uid) {
 		$mailbox = Mailbox::findByName($connection, $mailboxName);
 		return $mailbox->getMessage($uid);
 	}

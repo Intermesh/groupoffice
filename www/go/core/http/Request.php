@@ -28,6 +28,11 @@ use stdClass;
 class Request extends Singleton{
 
 	/**
+	 * @var string|false
+	 */
+	private $rawBody;
+
+	/**
 	 * The body of the request. Only JSON is supported at the moment.
 	 * 
 	 * @var array

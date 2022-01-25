@@ -164,10 +164,10 @@ class Spreadsheet extends AbstractConverter {
 	{
 
 		if ($this->index == 0) {
-			$this->writeRecord(array_column($this->getHeaders($entity), 'name'));
+			$this->writeRecord(array_column($this->getHeaders(), 'name'));
 		}
 
-		$headers = $this->getHeaders($entity);
+		$headers = $this->getHeaders();
 		//set custom fields to text mode
 		if(property_exists($entity, "returnAsText")) {
 			$entity->returnAsText = true;
@@ -628,7 +628,7 @@ class Spreadsheet extends AbstractConverter {
 			return false;
 		}
 
-		$values = $this->convertRecordToProperties($this->record, $this->clientParams['mapping'], $this->getEntityMapping($this->entityClass));
+		$values = $this->convertRecordToProperties($this->record, $this->clientParams['mapping'], $this->getEntityMapping());
 		if(!$values) {
 			return false;
 		}

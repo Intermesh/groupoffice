@@ -107,7 +107,7 @@ class BinaryFileReader
                 $this->$key = intval(bin2hex($this->$key), 16);
                 break;
             case self::FLOAT:
-                $this->$key = floatval(bin2hex($this->$key), 16);
+                $this->$key = (float)bin2hex($this->$key);
                 break;
         }
     }
