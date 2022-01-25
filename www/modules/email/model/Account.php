@@ -15,6 +15,7 @@
 namespace GO\Email\Model;
 
 use GO;
+use GO\Base\Mail\Imap;
 
 /**
  * The LinkedEmail model
@@ -157,7 +158,10 @@ class Account extends \GO\Base\Db\ActiveRecord {
 			}
 		}
 	}
-	
+
+	/**
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 */
 	protected function beforeSave() {
 		if($this->isModified('password')){	
 //			$decrypted = \GO\Base\Util\Crypt::decrypt($this->getOldAttributeValue('password'));
@@ -348,12 +352,14 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		
 		return $decrypted ? $decrypted : $this->smtp_password;
 	}
-	
+
 	/**
 	 * Open a connection to the imap server.
 	 *
 	 * @param StringHelper $mailbox
-	 * @return \GO\Base\Mail\Imap
+	 * @return Imap
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 * @throws GO\Base\Mail\ImapAuthenticationFailedException
 	 */
 	public function openImapConnection($mailbox = 'INBOX')
 	{
@@ -370,15 +376,16 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		}
 		return $imap;
 	}
-	
+
 	/**
 	 * Connect to the IMAP server without selecting a mailbox
-	 * 
-	 * @return \GO\Base\Mail\Imap
+	 *
+	 * @return Imap
+	 * @throws GO\Base\Mail\ImapAuthenticationFailedException
 	 */
 	public function justConnect(){
 		if(empty($this->_imap)){
-			$this->_imap = new \GO\Base\Mail\Imap();	
+			$this->_imap = new Imap();
 			$this->_imap->ignoreInvalidCertificates = $this->imap_allow_self_signed;
 			$useTLS = $this->imap_encryption == 'tls'?true:false;
 			$useSSL = $this->imap_encryption == 'ssl'?true:false;
@@ -409,7 +416,7 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Get the imap connection if it's open.
 	 * 
-	 * @return \GO\Base\Mail\Imap 
+	 * @return Imap
 	 */
 	public function getImapConnection(){
 		if(isset($this->_imap)){

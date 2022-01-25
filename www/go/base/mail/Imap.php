@@ -85,6 +85,7 @@ class Imap extends ImapBodyStruct {
 	 * @param <type> $ssl
 	 * @param <type> $starttls
 	 * @return <type>
+	 * @throws ImapAuthenticationFailedException
 	 */
 
 	public function connect($server, $port, $username, $password, $ssl=false, $starttls=false, $auth='plain') {

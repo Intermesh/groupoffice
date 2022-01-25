@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\ldapauthenticator\model;
 
+use ErrorException as ErrorExceptionAlias;
 use Exception;
 use GO\Base\Mail\ImapAuthenticationFailedException;
 use go\core\model\User;
@@ -44,19 +45,24 @@ class Authenticator extends PrimaryAuthenticator {
 	}
 	
 	/**
-	 * 
-	 * @param string $email
-	 * @return Server|boolean
+	 * Find a server by domain
+	 *
+	 * @param string $domain
+	 * @return ?Server
 	 */
-	private static function findServer($domain) {		
-		
+	private static function findServer(string $domain): ?Server
+	{
 		return Server::find()
 						->join('ldapauth_server_domain', 'd', 's.id = d.serverId')
 						->where(['d.name' => $domain])
 						//->orWhere(['d.name' => '*'])
 						->single();
-	}	
-	
+	}
+
+	/**
+	 * @throws Exception
+	 *
+	 */
 	public function authenticate($username, $password) {
 		
 		list($ldapUsername, $domain) = $this->splitUserName($username);
@@ -81,7 +87,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 
 		if(!isset($record->mail) || !isset($record->mail[0])) {
-			throw new \Exception("User '$username' has no 'mail' attribute set. Can't create a user");
+			throw new Exception("User '$username' has no 'mail' attribute set. Can't create a user");
 		}
 		
 		$user = User::find()->where(['username' => $username])->orWhere('email', '=', $record->mail[0])->single();
@@ -98,7 +104,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		if($user->isModified()) {
 			if(!$user->save()) {
-				throw new \Exception("Could not save user: " . $user->getValidationErrorsAsString());
+				throw new Exception("Could not save user: " . $user->getValidationErrorsAsString());
 			}
 		}
 		
@@ -115,8 +121,11 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		return $user;
 	
-	}		
-	
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	private function setEmailAccount($username, $password, $email, Server $server, User $user) {
 		
 		if(!$user->hasModule('legacy', 'email')) {
@@ -133,6 +142,7 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		$foundForUser = false;
 		foreach($accounts as $account) {
+			/** @var Account $account */
 			if($account->user_id == $user->id) {
 				$foundForUser = true;
 				break;
@@ -140,6 +150,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		if(!$foundForUser) {
+			/** @noinspection DuplicatedCode */
 			$account = new Account();
 			$account->user_id = $user->id;
 			$account->host = $server->imapHostname;
@@ -149,7 +160,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->imap_encryption = $server->imapEncryption ?? "";
 
 			$account->imap_allow_self_signed = !$server->imapValidateCertificate;
-			$account->smtp_allow_self_signed = !$server->imapValidateCertificate;
+			$account->smtp_allow_self_signed = !$server->smtpValidateCertificate;
 			$account->smtp_username = $server->smtpUsername;
 			$account->smtp_password = $server->smtpPassword;
 			$account->smtp_host = $server->smtpHostname;
@@ -175,7 +186,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$wasNew = $account->getIsNew();
 			
 			if(!$account->save(true)){
-				throw new \Exception("Could not save e-mail account: ".implode("\n", $account->getValidationErrors()));				
+				throw new Exception("Could not save e-mail account: ".implode("\n", $account->getValidationErrors()));
 			}
 			
 			if($wasNew) {
