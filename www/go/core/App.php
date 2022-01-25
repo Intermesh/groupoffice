@@ -18,7 +18,8 @@ use go\core\fs\Blob;
 use go\core\fs\Folder;
 use go\core\jmap\Request;
 use go\core\mail\Mailer;
-use go\core\model\Module as ModuleModel;
+	use go\core\model\Group;
+	use go\core\model\Module as ModuleModel;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
 	use go\core\Settings as CoreSettings;
@@ -253,9 +254,9 @@ use Faker;
 		/**
 		 * Get free space in bytes
 		 *
-		 * @return int
+		 * @return float
 		 */
-		public function getStorageFreeSpace(): int
+		public function getStorageFreeSpace(): float
 		{
 			if(!isset($this->storageFreeSpace)) {
 				$quota = $this->getConfig()['quota'];
@@ -899,6 +900,17 @@ use Faker;
 					$user->toArray();
 				}
 			}
+		}
+
+		public function checkDatabase()
+		{
+			echo "Setting core module permissions\n";
+
+			$module = ModuleModel::findByName("core", "core");
+			$module->permissions[Group::ID_EVERYONE] = (new model\Permission($module))
+				->setRights(['mayRead' => true]);
+
+			parent::checkDatabase();
 		}
 	}
 

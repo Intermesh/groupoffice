@@ -45,7 +45,8 @@ class OAuthController {
 	 * @return AuthorizationServer
 	 * @throws Exception
 	 */
-	private function getServer() {
+	private function getServer(): AuthorizationServer
+	{
 
 		if(!isset($this->server)) {
 			// Init our repositories
@@ -81,7 +82,7 @@ class OAuthController {
 
 			// Enable the refresh token grant on the server
 			$refreshGrant = new RefreshTokenGrant($refreshTokenRepository);
-			$refreshGrant->setRefreshTokenTTL(new \DateInterval('P1M'));
+			$refreshGrant->setRefreshTokenTTL(new DateInterval('P1M'));
 
 			$this->server->enableGrantType(
 				$refreshGrant,
@@ -166,7 +167,8 @@ class OAuthController {
 	 * @return FileAlias
 	 * @throws Exception
 	 */
-	private function getPrivateKeyFile() {
+	private function getPrivateKeyFile(): FileAlias
+	{
 		$file = go()->getDataFolder()->getFile('oauth2/private.key');
 		if(!$file->exists()) {
 
@@ -197,7 +199,8 @@ class OAuthController {
 	 * @return FileAlias
 	 * @throws Exception
 	 */
-	private function getPublicKeyFile() {
+	private function getPublicKeyFile(): FileAlias
+	{
 		$file = go()->getDataFolder()->getFile('oauth2/public.key');
 		if(!$file->exists()) {
 			$this->getPrivateKeyFile();
@@ -209,8 +212,10 @@ class OAuthController {
 	 * @param $jwt
 	 * @return TokenAlias
 	 * @throws OAuthServerException
+	 * @throws Exception
 	 */
-	private function validateAccessToken($jwt) {
+	private function validateAccessToken($jwt): TokenAlias
+	{
 		try {
 			// Attempt to parse and validate the JWT
 			$token = (new Parser())->parse($jwt);
@@ -262,7 +267,7 @@ class OAuthController {
 		}
 
 		if (null === $accessToken) {
-			$accessToken = isset($_REQUEST['access_token']) ? $_REQUEST['access_token'] : null;
+			$accessToken = $_REQUEST['access_token'] ?? null;
 		}
 
 		if (null === $accessToken) {
@@ -406,7 +411,7 @@ class OAuthController {
 			return $response
 				->withStatus(200)
 				->withHeader('content-type', 'application/json; charset=UTF-8');
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 
 			go()->debug($exception);
 			$body = new StreamAlias(fopen('php://temp', 'rb+'));

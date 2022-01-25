@@ -57,6 +57,7 @@ class Sync extends Controller {
 		  $user = $this->ldapRecordToUser($record, $server, false);
 
 			echo "User: " .$user->username ."\n";
+			var_dump($record->memberOf);
 	  }
   }
 

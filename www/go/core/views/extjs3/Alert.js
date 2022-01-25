@@ -66,7 +66,6 @@
 					},
 					handler: () => {
 						go.Entities.get(alert.entity).goto(alert.entityId);
-						go.Notifier.hideNotifications();
 					},
 					buttons: [{
 						text: t("Open"),
@@ -75,7 +74,9 @@
 						}
 					}, {
 						text: t("Dismiss"),
-						handler: (btn) => {
+						handler: (btn, e) => {
+							//needed to prevent notification area closing
+							e.stopEvent();
 							btn.findParentByType("panel").destroy();
 						}
 					}]
@@ -115,6 +116,28 @@
 
 	GO.mainLayout.on('render', function () {
 		go.Alerts.init();
+
+		// go.Notifier.msg({
+		// 	title: "Test 1",
+		// 	description: "test desc 1",
+		// 	handler: () => {
+		// 		alert("test 1");
+		// 	},
+		// 	buttons: [{
+		// 		iconCls: 'ic-delete',
+		// 		text: t("Dismiss"),
+		// 		handler: (btn, e) => {
+		// 			//needed to stop notification area from closing
+		// 			e.stopEvent();
+		// 			go.Notifier.removeById("test1");
+		// 		},
+		// 		scope: this
+		// 	}]
+		// 	}, "test1");
+		// go.Notifier.msg({title: "Test 2", description: "test desc 2", handler: () => {
+		// 		alert("test 2");
+		// 	}}, "test2");
+
 	});
 
 

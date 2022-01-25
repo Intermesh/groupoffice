@@ -683,6 +683,12 @@ abstract class Entity  extends OrmEntity {
    */
 	protected static function findEntitiesByTable(string $tableName): array
 	{
+		$cacheKey = "findEntitiesByTable-" . $tableName;
+		$cached = go()->getCache()->get($cacheKey);
+		if(isset($cached)) {
+			return $cached;
+		}
+
 		$cf = new ClassFinder();
 		$allEntities = $cf->findByParent(Entity::class);
 
@@ -700,9 +706,13 @@ abstract class Entity  extends OrmEntity {
 
 		}, $allEntities);
 
-		return array_filter($mapped, function($m) {
+		$result = array_filter($mapped, function($m) {
 			return !empty($m['paths']);
 		});
+
+		go()->getCache()->set($cacheKey, $result);
+
+		return $result;
 	}
 
 

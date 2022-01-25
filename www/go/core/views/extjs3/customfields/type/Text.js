@@ -70,30 +70,24 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			config.maxLength = customfield.options.maxLength;
 		}
 
+
+
 		if (!go.util.empty(customfield.relatedFieldCondition)) {
+			config.listeners = config.listeners || {};
 			config.checkRequiredCondition = this.checkRequiredCondition;
 			config.getConditionString = this.getConditionString;
 			config.getFormValue = this.getFormValue;
+			config.listeners.valid = function(field) {
+				field.checkRequiredCondition();
+			};
 
-			if (customfield.type === 'Select') {
-				config.validate = function () {
-					this.checkRequiredCondition.call(this, customfield);
-					return go.customfields.type.TreeSelectField.prototype.validate.call(this);
-				}
-			} else if (customfield.type === 'MultiSelect') {
-				config.validate = function () {
-					this.checkRequiredCondition.call(this, customfield);
-					return go.form.Chips.prototype.validate.call(this);
-				}
-			} else {
-				config.validateValue = function (value) {
-					this.checkRequiredCondition.call(this, customfield);
-					return Ext.form.Field.prototype.validateValue.call(this, value);
-				}
-			}
+			config.listeners.invalid = function(field) {
+				field.checkRequiredCondition();
+			};
 		}
 
 		return Ext.apply({
+			customfield: customfield,
 			xtype: 'textfield',
 			serverFormats: false, //for backwards compatibility with old framework. Can be removed when all is refactored.
 			name: 'customFields.' + customfield.databaseName,
@@ -101,9 +95,9 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			anchor: '100%',
 			allowBlank: !required,
 			value: customfield.default,
-			hidden: customfield.conditionallyHidden || false,
-			conditionallyHidden: customfield.conditionallyHidden || false,
-			conditionallyRequired: customfield.conditionallyRequired || false
+			hidden: customfield.conditionallyHidden || false
+			// conditionallyHidden: customfield.conditionallyHidden || false,
+			// conditionallyRequired: customfield.conditionallyRequired || false
 		}, config);
 	},
 
@@ -205,45 +199,43 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	/**
 	 * Required condition validator
 	 *
-	 * @param customfield
 	 */
-	checkRequiredCondition: function (customfield) {
+	checkRequiredCondition: function () {
 		this.requiredConditionMatches = false;
 
-		if (Ext.isEmpty(customfield.relatedFieldCondition)) {
+		if (Ext.isEmpty(this.customfield.relatedFieldCondition)) {
 			return false;
 		}
 
-		var strConditionString = this.getConditionString(customfield.relatedFieldCondition);
+		var strConditionString = this.getConditionString(this.customfield.relatedFieldCondition);
 
 		try {
 			var func = new Function(strConditionString);
 			this.requiredConditionMatches = func.call(this);
 		} catch(e) {
-			console.error("Required condition '" + customfield.relatedFieldCondition + "' failed with error: " + e);
+			console.error("Required condition '" + this.customfield.relatedFieldCondition + "' failed with error: " + e);
 		}
 
-		var customFieldCmp = this;
-		if (customfield.conditionallyRequired) {
-			customFieldCmp.allowBlank = !this.requiredConditionMatches;
-			customfield.allowBlank = !this.requiredConditionMatches;
-			customfield.fieldLabel = customfield.name + (this.requiredConditionMatches ? '*' : '');
+		if (this.customfield.conditionallyRequired) {
+			this.allowBlank = !this.requiredConditionMatches;
+			this.customfield.allowBlank = !this.requiredConditionMatches;
+			this.customfield.fieldLabel = this.customfield.name + (this.requiredConditionMatches ? '*' : '');
 			if (this.xtype === 'treeselectfield') {
 				this.items.itemAt(0).allowBlank = !this.requiredConditionMatches;
 			}
 		}
 
-		if (!customfield.conditionallyHidden) {
+		if (!this.customfield.conditionallyHidden) {
 			return this.requiredConditionMatches;
 		}
 
 		if (this.requiredConditionMatches) {
-			customFieldCmp.show();
+			this.show();
 		} else {
-			customFieldCmp.hide();
+			this.hide();
 		}
 
-		customFieldCmp.ownerCt.doLayout();
+		this.ownerCt.doLayout();
 
 		return this.requiredConditionMatches;
 	},

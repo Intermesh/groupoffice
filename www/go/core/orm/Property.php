@@ -948,13 +948,6 @@ abstract class Property extends Model {
 		if(empty($properties)) {
 			$properties = array_keys($this->oldProps);
 		}
-//		else{
-
-			//only check fetched properties
-
-			//Why ????
-			//$properties = array_intersect($properties, $this->fetchProperties);
-//		}
 
 		$modified = [];
 
@@ -1038,6 +1031,7 @@ abstract class Property extends Model {
 	 * Get old values before they were modified
 	 * 
 	 * @return array [Name => value]
+	 * @noinspection PhpUnused
 	 */
 	public function getOldValues(): array
 	{
@@ -1536,7 +1530,8 @@ abstract class Property extends Model {
 
 			$this->applyRelationKeys($relation, $newProp);
 
-			// This wen't bad when creating new map values with "ext-gen1" as key.
+			// This went bad when creating new map values with "ext-gen1" as key.
+			// Fixed it by recognizing _NEW_* as a map key that should not be applied as property
 			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
 				if(empty($newProp->$propName)) {
 					$newProp->$propName = $value;
@@ -2207,13 +2202,18 @@ abstract class Property extends Model {
    * Takes a map key eg. ['1-2' => ['propa' => 'foo']]
    * and converts the key ('1-2') to a key value areay of properties.
    *
-   * @param $id
+   * @param string $id
    * @param Relation $relation
    * @return array
    * @throws Exception
    */
-	private function mapKeyToValues($id, Relation $relation): array
+	private function mapKeyToValues(string $id, Relation $relation): array
 	{
+		if(substr($id, 0, 5) == "_NEW_") {
+			//hacky for new items
+			return [];
+		}
+
 		$values = explode("-", $id);
 
 		$cls = $relation->propertyName;

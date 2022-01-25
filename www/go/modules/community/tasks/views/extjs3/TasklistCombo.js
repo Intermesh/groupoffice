@@ -10,6 +10,7 @@ go.modules.community.tasks.TasklistCombo = Ext.extend(go.form.ComboBox, {
 	editable: true,
 	selectOnFocus: true,
 	forceSelection: true,
+	role: null, // set to "list" or "board" to filter the tasklist store
 	allowBlank: false,
 	store: {
 		xtype: "gostore",
@@ -20,6 +21,12 @@ go.modules.community.tasks.TasklistCombo = Ext.extend(go.form.ComboBox, {
 					permissionLevel: go.permissionLevels.write
 			}
 		}
+	},
+	initComponent: function() {
+		this.supr().initComponent.call(this);
+
+		if(this.initialConfig.role)
+			this.store.setFilter('role', {role: this.initialConfig.role});
 	}
 });
 

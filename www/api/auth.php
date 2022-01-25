@@ -144,6 +144,8 @@ try {
 
 		case 'login':
 		default:
+			/** @var ?Token $token */
+			$token = null;
 
 			if (isset($data['accessToken'])) {
 				$token = Token::find()->where(['accessToken' => $data['accessToken']])->single();

@@ -92,7 +92,7 @@ class Json extends AbstractConverter {
 		$blob = Blob::fromTmp($this->tempFile);
 		$blob->name = $cls::entityType()->getName() . "-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
 		if(!$blob->save()) {
-			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+			throw new \Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
 		}
 
 		return $blob;

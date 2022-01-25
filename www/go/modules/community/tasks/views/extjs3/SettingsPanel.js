@@ -15,7 +15,8 @@ go.modules.community.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 				{
 					xtype: "tasklistcombo",
 					hiddenName: "tasksSettings.defaultTasklistId",
-					fieldLabel: t("Default tasklist"),
+					fieldLabel: t("Defaultdd tasklist"),
+					role: 'list',
 					allowBlank: true
 				},
 				this.defaultTasklistOptions = new go.form.RadioGroup({

@@ -97,7 +97,11 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 				form.on("setvalues", function () {
 					this.filter(form.getValues());
-					form.isValid();
+					// form.isValid();
+					form.getForm().items.each( (field) => {
+						if(field.checkRequiredCondition)
+							field.checkRequiredCondition();
+					});
 				}, this);
 			} else {
 				//Legacy code
@@ -150,7 +154,14 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			}, this);
 
 			this.filter(form.getValues());
-			form.isValid();
+
+			// problem this marks fields invalid immediately and fields loose focus
+			// form.isValid();
+
+			form.getForm().items.each( (field) => {
+				if(field.checkRequiredCondition)
+					field.checkRequiredCondition();
+			});
 
 		} else {
 			form.getForm().on("actioncomplete", function (f, action) {

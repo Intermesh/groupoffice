@@ -450,27 +450,29 @@ class ContactConvertor {
 			}
 		}		
 	}
-//	/**
-//	 * Get default address book
-//	 *
-//	 * @return AddressBook
-//	 * @throws Exception
-//	 */
-//	public function getDefaultAddressBook(): AddressBook
-//	{
-//
-//		$addressbook = AddressBook::find()
-//			->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
-//			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
-//			->where('su.userId', '=', go()->getAuthState()->getUserId())
-//			->orderBy(['su.isDefault' => 'DESC'])
-//			->single();
-//
-//		if (!$addressbook)
-//			throw new Exception("FATAL: No default addressbook configured");
-//
-//		return $addressbook;
-//	}
+
+
+	/**
+	 * Get default address book
+	 *
+	 * @return AddressBook
+	 * @throws Exception
+	 */
+	public function getDefaultAddressBook(): AddressBook
+	{
+
+		$addressbook = AddressBook::find()
+			->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
+			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
+			->where('su.userId', '=', go()->getAuthState()->getUserId())
+			->orderBy(['su.isDefault' => 'DESC'])
+			->single();
+
+		if (!$addressbook)
+			throw new Exception("FATAL: No default addressbook configured");
+
+		return $addressbook;
+	}
 	
 	private function setEmailAddresses(SyncContact $message, Contact $contact) {
 		$max = 3;

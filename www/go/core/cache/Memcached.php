@@ -126,7 +126,7 @@ class Memcached implements CacheInterface {
 
 	public function __destruct() {
 		if ($this->flushOnDestruct) {
-			$this->flush(true, false);
+			$this->flush(true);
 		}
 	}
 

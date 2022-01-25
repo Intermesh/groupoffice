@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 /**
  * @copyright (c) 2019, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
@@ -7,6 +8,7 @@
 
 namespace go\modules\community\tasks\model;
 
+use DateTimeInterface;
 use Exception;
 use go\core\acl\model\AclInheritEntity;
 use go\core\db\Criteria;
@@ -19,10 +21,15 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
-use go\core\util\{DateTime, Recurrence, StringUtil, Time};
+use go\core\util\{DateTime, Recurrence, StringUtil, Time, UUID};
+use go\core\db\Criteria;
+use go\core\orm\Query;
 use go\core\validate\ErrorCode;
 use go\modules\community\comments\model\Comment;
+use go\modules\community\tasks\convert\Spreadsheet;
 use go\modules\community\tasks\convert\VCalendar;
+use go\core\util\JSON;
+use JsonException;
 
 /**
  * Task model
@@ -215,22 +222,27 @@ class Task extends AclInheritEntity {
 		return array_merge(parent::converters(), [VCalendar::class, Spreadsheet::class]);
 	}
 
+	/**
+	 * @throws JsonException
+	 */
 	public function getRecurrenceRule() {
-		return empty($this->recurrenceRule) ? null : json_decode($this->recurrenceRule);
+		return empty($this->recurrenceRule) ? null : JSON::decode($this->recurrenceRule);
 	}
 
 	public function setRecurrenceRule($rrule) {
 		if($rrule !== null) {
-			$rrule = json_encode($rrule);
+			$rrule = JSON::encode($rrule);
 		}
 		$this->recurrenceRule = $rrule;
 	}
 
-	public function getProgress() {
+	public function getProgress(): string
+	{
 		return Progress::$db[$this->progress];
 	}
 
-	public function getTimeBooked() {
+	public function getTimeBooked(): ?int
+	{
 		return $this->timeBooked;
 	}
 
@@ -282,7 +294,7 @@ class Task extends AclInheritEntity {
 	{
 
 		return parent::defineFilters()
-			->add('tasklistId', function(Criteria $criteria, $value, Query $query) {
+			->add('tasklistId', function(Criteria $criteria, $value) {
 				if(!empty($value)) {
 					$criteria->where(['tasklistId' => $value]);
 				}
@@ -327,8 +339,7 @@ class Task extends AclInheritEntity {
 						$value = [$value];
 					}
 					$value = array_map(function($el) {
-						$key = array_search($el, Progress::$db, true);
-						return $key;
+						return array_search($el, Progress::$db, true);
 					}, $value);
 					$criteria->where('progress', '=',$value);
 				}
@@ -348,13 +359,13 @@ class Task extends AclInheritEntity {
 			$this->setValidationError('start', ErrorCode::CONFLICT, 'this task is in conflict with other tasks');
 		}
 
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
 
 	protected function internalSave(): bool
 	{
 		if ($this->isNew()) {
-			$this->uid = \go\core\util\UUID::v4();
+			$this->uid = UUID::v4();
 		}
 
 		if ($this->progress == Progress::Completed) {
@@ -415,6 +426,9 @@ class Task extends AclInheritEntity {
 	}
 
 
+	/**
+	 * @throws Exception
+	 */
 	private function updateAlerts($modified) {
 
 		if(!CoreAlert::$enabled)
@@ -424,7 +438,7 @@ class Task extends AclInheritEntity {
 
 		if(isset($modified[1])) {
 			foreach ($modified[1] as $model) {
-				if (!in_array($model, $modified[0])) {
+				if (!isset($modified[0]) || !in_array($model, $modified[0])) {
 					$this->deleteAlert($model->id);
 				}
 			}
@@ -442,11 +456,16 @@ class Task extends AclInheritEntity {
 	}
 
 	/**
-	 * @param Alert[] $alerts
+	 * @inheritDoc
+	 *
 	 * @throws Exception
 	 */
 	public static function dismissAlerts(array $alerts)
 	{
+
+		// When a task is updated with deleted alerts it will circle back here
+		// in that case the update won't affect any rows and the changes will be empty.
+
 		$alertIds = [];
 
 		foreach($alerts as $alert) {
@@ -463,12 +482,18 @@ class Task extends AclInheritEntity {
 			->join("tasks_tasklist", "tl", "tl.id = task.taskListId")
 			->join("tasks_alert", "a", "a.taskId = task.id")
 			->where('a.id' , 'in', $alertIds)
-			->groupBy(['task.id']);
+			->groupBy(['task.id'])
+			->all();
 
-		Task::entityType()->changes($changes);
+		if(!empty($changes)) {
+			Task::entityType()->changes($changes);
+		}
 	}
 
-	protected function createNewTask(\DateTimeInterface $next) {
+	/**
+	 * @throws Exception
+	 */
+	protected function createNewTask(DateTimeInterface $next) {
 
 		$values = $this->toArray();
 		unset($values['id']);
@@ -503,10 +528,12 @@ class Task extends AclInheritEntity {
 	}
 
 	/**
-	 * @return \DateTime
+	 * @param Recurrence $rrule
+	 * @return ?DateTimeInterface
 	 */
-	protected function getNextRecurrence($rrule){
-		$rule = Recurrence::fromArray((array)$rrule, $this->start);
+	protected function getNextRecurrence(Recurrence $rrule): ?DateTimeInterface
+	{
+		$rule = Recurrence::fromArray((array) $rrule, $this->start);
 		$rule->next();
 		return $rule->current();
 	}
@@ -533,23 +560,27 @@ class Task extends AclInheritEntity {
 		return parent::sort($query, $sort);
 	}
 
-	public function etag() {
+	public function etag(): string
+	{
 		return '"' .$this->vcalendarBlobId . '"';
 	}
 
-	public function getUid() {
+	public function getUid(): string
+	{
 		return $this->uid;		
 	}
 
-	public function setUid($uid) {
+	public function setUid(string $uid) {
 		$this->uid = $uid;
 	}
 
-	public function hasUid() {
+	public function hasUid(): bool
+	{
 		return !empty($this->uid);
 	}
 
-	public function getUri() {
+	public function getUri(): string
+	{
 		if(!isset($this->uri)) {
 			$this->uri = $this->getUid() . '.ics';
 		}
@@ -557,22 +588,22 @@ class Task extends AclInheritEntity {
 		return $this->uri;
 	}
 
-	public function setUri($uri) {
+	public function setUri(string $uri) {
 		$this->uri = $uri;
 	}
 
 	// TODO: Refactor these functions into proper property classes within Humble Planner
-	public function getUserDisplayName()
+	public function getUserDisplayName(): ?string
 	{
 		return $this->displayName;
 	}
 
-	public function getProjectName()
+	public function getProjectName(): ?string
 	{
 		return $this->projectName;
 	}
 
-	public function getProjectId()
+	public function getProjectId(): ?int
 	{
 		return $this->projectId;
 	}
@@ -621,8 +652,8 @@ class Task extends AclInheritEntity {
 			if(!isset($task->startTime)) { // all day task
 				return true;
 			}
-			$theirStartSecs = isset($task->startTime) ? Time::toSeconds($task->startTime) : 0;
-			$theirEndSecs = isset($task->startTime) ? $theirStartSecs + $task->estimatedDuration ?? 0 : 0;
+			$theirStartSecs = Time::toSeconds($task->startTime);
+			$theirEndSecs = $theirStartSecs + ($task->estimatedDuration ?? 0);
 
 			if($theirStartSecs < $selfEndSecs && $theirEndSecs > $selfStartSecs) {
 				return true;

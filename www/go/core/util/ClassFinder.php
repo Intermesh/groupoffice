@@ -9,6 +9,7 @@ use go\core\fs\Folder;
 use go\core\model\Module;
 use ReflectionClass;
 use go\core\fs\File;
+use ReflectionException;
 use Throwable;
 
 /**
@@ -111,6 +112,7 @@ class ClassFinder {
 	public function findByParent(string $name): array
 	{
 		return $this->findBy(function($className) use ($name) {
+			/** @noinspection PhpUnhandledExceptionInspection */
 			$reflection = new ReflectionClass($className);
 			return !$reflection->isTrait()  && !$reflection->isInterface() && !$reflection->isAbstract() && ($reflection->isSubclassOf($name) || in_array($name, $reflection->getInterfaceNames()));
 		});

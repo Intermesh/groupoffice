@@ -8,6 +8,7 @@ use go\core\fs\Blob;
 use go\core\jmap\Entity;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\validate\ErrorCode;
 
 /**
  * The Pdf model

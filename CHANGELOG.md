@@ -1,3 +1,28 @@
+- Core: Fixed database check and make sure core module is shared
+- Tasks: Fixed date shift and priority change in tasks migration
+- Tasks: Fixed fue_time error in continue task dialog
+- Core: When dialog had custom fields the initial field lost focus
+
+25-01-2022 6.6.34
+- Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
+- Core: wrong return value in App::getStorageFreeSpace()
+
+24-01-2022 6.6.33
+- ActiveSync: Fixed empty needle error
+- Projects2: autorefresh task list when deleting project
+- Address book: System settings panel was missing
+- Projects2: Unable to set activity type rates
+- Core: Notification area doesn't close when there are more reminders left
+- Core: CronJob stack trace was logged even when not in debug mode which is a potential security risk.
+- Tasks: added excel export and fixed csv export
+- Tasks: updating reminders bug
+- Tasks: if start date is set then use that as default for new alerts
+- ActiveSync: Fixed moving appointments to another calendar
+- ActiveSync: Fixed tasks sync error
+- ActiveSync: Use default address book for new contacts
+- Email: Fixed infinite loop problem with downloading some attachments from some IMAP servers
+- Studio: enable admin to patch manually from 6.5 to 6.6
+
 17-01-2022 6.6.32
 - Core: Issue #776: invalid return type in App::getStorageQuota()
 - Bookmarks: Fixed integrity constraint error when logo was not found
@@ -43,6 +68,20 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+
+6.5.98
+25-01-2022 6.5.99
+- Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
+
+24-01-2022 6.5.98
+- Business: When copying agreement, leave finish date empty
+- Business: Check whether year budget for leave day type matches current leave days for said type
+- Core: CronJob stack trace was logged even when not in debug mode which is a potential security risk.
+- Core: Catch exception when sending admin notification e-mail so application flow continues
+- Holidays: fix casting bug in holiday calculator
+- ActiveSync: Fixed moving appointments to another calendar
+- ActiveSync: Use default address book for new contacts
+- Email: Fixed infinite loop problem with downloading some attachments from some IMAP servers
 
 17-01-2022 6.5.97
 - Business: hide 'Budgetable' checkbox for special leave types

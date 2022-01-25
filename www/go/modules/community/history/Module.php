@@ -1,12 +1,20 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 
 namespace go\modules\community\history;
 
+use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core;
+use go\core\acl\model\AclOwnerEntity;
+use go\core\cron\GarbageCollection;
+use go\core\ErrorHandler;
+use go\core\http\Request;
 use go\core\jmap\Entity;
+use go\core\model\CronJobSchedule;
+use go\core\model\Search;
 use go\core\model\User;
+use go\core\orm\Query;
 use go\modules\community\history\model\LogEntry;
 use go\modules\community\history\model\Settings;
 
@@ -32,9 +40,12 @@ class Module extends core\Module
 		User::on(User::EVENT_LOGOUT, static::class, 'onLogout');
 		User::on(User::EVENT_BADLOGIN, static::class, 'onBadLogin');
 
-		core\cron\GarbageCollection::on(core\cron\GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
+		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	static function logActiveRecord(ActiveRecord $record, $action) {
 
 		if(!self::$enabled || core\Installer::isInProgress()) {
@@ -64,21 +75,27 @@ class Module extends core\Module
 		}
 
 		if(!$log->save()) {
-			\go\core\ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
+			ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public static function onEntitySave(Entity $entity) {
 		self::logEntity($entity, $entity->isNew() ? 'create' : 'update');
 	}
 
-	public static function onEntityDelete(core\orm\Query $query, $cls) {
-		if(is_a($cls, LogEntry::class, true) || is_a($cls, core\model\Search::class, true)) {
+	/**
+	 * @throws Exception
+	 */
+	public static function onEntityDelete(Query $query, $cls) {
+		if(is_a($cls, LogEntry::class, true) || is_a($cls, Search::class, true)) {
 			return;
 		}
 
 		//Don't delete ACL's because we're taking them over.
-		if(is_a($cls, core\acl\model\AclOwnerEntity::class, true)) {
+		if(is_a($cls, AclOwnerEntity::class, true)) {
 			$cls::keepAcls();
 		}
 
@@ -88,6 +105,9 @@ class Module extends core\Module
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private static function logEntity(Entity $entity, $action) {
 		if(!self::$enabled || core\Installer::isInProgress()) {
 			return;
@@ -97,7 +117,7 @@ class Module extends core\Module
 			return;
 		}
 
-		if($entity instanceof LogEntry || $entity instanceof core\model\Search  || $entity instanceof core\model\CronJobSchedule) {
+		if($entity instanceof LogEntry || $entity instanceof Search  || $entity instanceof CronJobSchedule) {
 			return;
 		}
 
@@ -144,21 +164,27 @@ class Module extends core\Module
 		}
 
 		if(!$log->save()) {
-			\go\core\ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
+			ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public static function onLogin(User $user) {
 		$log = new LogEntry();
 		$log->setEntity($user);
-		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
+		$log->description = $user->username . ' [' . Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('login');
 		$log->changes = null;
 		if(!$log->save()){
-			throw new \Exception("Could not save log");
+			throw new Exception("Could not save log");
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public static function onBadLogin($username, User $user = null) {
 		$log = new LogEntry();
 		if(isset($user)) {
@@ -166,25 +192,31 @@ class Module extends core\Module
 		} else{
 			$log->entityTypeId = User::entityType()->getId();
 		}
-		$log->description = $username. ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
+		$log->description = $username. ' [' . Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('badlogin');
 		$log->changes = null;
 		if(!$log->save()){
-			throw new \Exception("Could not save log");
+			throw new Exception("Could not save log");
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public static function onLogout(User $user) {
 		$log = new LogEntry();
 		$log->setEntity($user);
-		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
+		$log->description = $user->username . ' [' . Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('logout');
 		$log->changes = null;
 		if(!$log->save()){
-			throw new \Exception("Could not save log");
+			throw new Exception("Could not save log");
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public static function onGarbageCollection() {
 		$years = (int) Module::get()->getSettings()->deleteAfterYears;
 

@@ -20,7 +20,20 @@ go.modules.community.tasks.AlertFields = Ext.extend(go.form.FormGroup, {
                 fieldLabel: t("When"),
                 xtype: "datetimefield",
                 name: 'when',
-                hideLabel: true
+                hideLabel: true,
+                listeners: {
+                    afterrender: function(field) {
+                        // if start date is set then use that as default for new alerts
+                        if(!go.util.empty(this.getValue())) {
+                            return;
+                        }
+
+                        const taskDialog = field.findParentByType("window");
+                        const start = taskDialog.formPanel.form.findField("start");
+
+                        this.setDate(start.getValue());
+                    }
+                }
             }]
         }]
     }

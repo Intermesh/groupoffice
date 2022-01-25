@@ -48,7 +48,7 @@ class Lock {
 		$this->lockFp = $lockFile->open('w+');
 		
 		if(!$this->lockFp){
-			throw new Exception("Could not create or open the file for writing.\rPlease check if the folder permissions are correct so the webserver can create and open files in it.\rPath: '" . $this->lockFile->getPath() . "'");
+			throw new Exception("Could not create or open the file for writing.\rPlease check if the folder permissions are correct so the webserver can create and open files in it.\rPath: '" . $lockFile->getPath() . "'");
 		}
 		
 		if (!flock($this->lockFp, LOCK_EX|LOCK_NB, $wouldblock)) {

@@ -287,14 +287,52 @@ INSERT INTO tasks_tasklist (`id`, `role`, `name`, `createdBy`, `aclId`, `filesFo
     SELECT id, '1', `name`, user_id, acl_id, files_folder_id, version FROM ta_tasklists;
 INSERT INTO tasks_category (`id`, `name`, `createdBy`)
     SELECT id, `name`, IF(user_id = 0, NULL, user_id) FROM ta_categories;
+
 INSERT INTO tasks_task (id,uid,tasklistId,createdBy,responsibleUserId, createdAt, modifiedAt, modifiedBy, `start`, due, progress, progressUpdated,
-                        title, description, filesFolderId, priority, percentComplete)
-    SELECT t.id, uuid, tasklist_id, t.user_id,l.user_id, from_unixtime(t.ctime), from_unixtime(t.mtime), t.muser_id, from_unixtime(start_time), from_unixtime(due_time), IF(completion_time, 3, 1) as progress,
-           IF(completion_time, from_unixtime(completion_time), null), t.`name`, description, t.files_folder_id, priority, percentage_complete FROM ta_tasks t JOIN ta_tasklists l ON tasklist_id = l.id;
+                        title, description, filesFolderId, priority, percentComplete) SELECT
+           t.id,
+           uuid,
+           tasklist_id,
+           t.user_id,l.user_id,
+           from_unixtime(t.ctime),
+           from_unixtime(t.mtime),
+           t.muser_id,
+           DATE_ADD(
+               from_unixtime(start_time, "%Y-%m-%d"),
+               INTERVAL IF(HOUR(from_unixtime(start_time)) > 14, 1, 0) DAY
+           ),
+           DATE_ADD(
+               from_unixtime(due_time, "%Y-%m-%d"),
+               INTERVAL IF(HOUR(from_unixtime(due_time)) > 14, 1, 0) DAY
+           ),
+           IF(completion_time, 3, 1) as progress,
+           IF(completion_time, from_unixtime(completion_time), null),
+           t.`name`, description,
+           t.files_folder_id,
+           IF(priority = 0, 9, IF(priority = 2, 1, 0)),
+           percentage_complete FROM ta_tasks t JOIN ta_tasklists l ON tasklist_id = l.id;
+
+# Fix for wrong dates shifted one day
+# update tasks_task tnew inner join ta_tasks told on tnew.id=told.id
+#     set
+#                 tnew.priority = IF(told.priority = 0, 9, IF(told.priority = 2, 1, 0)),
+#                   start = DATE_ADD(
+#                           from_unixtime(start_time, "%Y-%m-%d"),
+#                           INTERVAL IF(HOUR(from_unixtime(start_time)) > 14, 1, 0) DAY
+#                       ),
+#                   due = DATE_ADD(
+#                               from_unixtime(due_time, "%Y-%m-%d"),
+#                               INTERVAL IF(HOUR(from_unixtime(due_time)) > 14, 1, 0) DAY
+#                           );
+
+
 INSERT INTO tasks_task_category (taskId,categoryId)
     SELECT id,category_id FROM ta_tasks;
 INSERT INTO tasks_alert (taskId, userId, `when`)
     SELECT id,reminder,user_id FROM ta_tasks;
+
+
+
 
 create table if not exists tasks_user_settings
 (

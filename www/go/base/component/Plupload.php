@@ -43,6 +43,7 @@ class Plupload {
 //			$fileName = $fileName_a . '_' . $count . $fileName_b;
 //		}
 // Look for the content type header
+		$contentType = '';
 		if (isset($_SERVER["HTTP_CONTENT_TYPE"]))
 			$contentType = $_SERVER["HTTP_CONTENT_TYPE"];
 
