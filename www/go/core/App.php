@@ -253,9 +253,9 @@ use Faker;
 		/**
 		 * Get free space in bytes
 		 *
-		 * @return int
+		 * @return float
 		 */
-		public function getStorageFreeSpace(): int
+		public function getStorageFreeSpace(): float
 		{
 			if(!isset($this->storageFreeSpace)) {
 				$quota = $this->getConfig()['quota'];
