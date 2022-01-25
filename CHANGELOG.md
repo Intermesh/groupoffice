@@ -1,3 +1,5 @@
+- Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
+
 24-01-2022 6.5.98
 - Business: When copying agreement, leave finish date empty
 - Business: Check whether year budget for leave day type matches current leave days for said type
