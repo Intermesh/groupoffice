@@ -286,7 +286,7 @@ abstract class ImapBase {
 				}
 			}
 			
-    } while (!feof($this->handle) && substr($result[$n], 0, strlen('A'.$this->command_count.' ')) != 'A'.$this->command_count.' ');
+    } while (substr($result[$n], 0, strlen('A'.$this->command_count.' ')) != 'A'.$this->command_count.' ');
 //		https://sourceforge.net/p/group-office/bugs/1711/
 //		} while (substr($result[$n], 0, strlen('A'.$this->command_count)) != 'A'.$this->command_count);
 		
