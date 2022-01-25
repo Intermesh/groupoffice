@@ -41,8 +41,7 @@
     "firebase/php-jwt": "^5.2",
     "donatj/phpuseragentparser": "^1.4",
     "fzaninotto/faker": "^1.9",
-    "ext-fileinfo": "*",
-    "ext-ldap": "*"
+    "ext-fileinfo": "*"
   },
   "license": "AGPL",
   "authors": [
