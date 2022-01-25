@@ -22,8 +22,6 @@ use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\{DateTime, Recurrence, StringUtil, Time, UUID};
-use go\core\db\Criteria;
-use go\core\orm\Query;
 use go\core\validate\ErrorCode;
 use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\Spreadsheet;
