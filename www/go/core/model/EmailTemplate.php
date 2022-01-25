@@ -2,6 +2,7 @@
 namespace go\core\model;
 
 use GO\Base\Mail\SmimeMessage;
+use go\core\cron\GarbageCollection;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
@@ -15,6 +16,11 @@ use Swift_EmbeddedFile;
 
 /**
  * E-mail template model
+ *
+ *
+ * Because these models are polymorphic relations they need to be cleaned up by the code.
+ * You could to this with the garbage collection event.
+ * @see GarbageCollection::EVENT_RUN
  *
  * @example
  * ```

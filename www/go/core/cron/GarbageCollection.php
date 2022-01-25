@@ -35,6 +35,9 @@ class GarbageCollection extends CronJob {
 
 	use EventEmitterTrait;
 
+	/**
+	 * Fires when the garbage collection job runs
+	 */
 	const EVENT_RUN = 'run';
 	
 	public function run(\go\core\model\CronJobSchedule $schedule) {
