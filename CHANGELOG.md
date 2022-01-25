@@ -1,3 +1,4 @@
+25-01-2022 6.5.99
 - Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
 
 24-01-2022 6.5.98
