@@ -49,18 +49,23 @@ class VCard extends AbstractConverter {
 			$blob = Blob::findById($contact->vcardBlobId);
 			$file = $blob->getFile();
 			if($file->exists()) {
-				$vcard = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+				try {
+					$vcard = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
-				//remove all supported properties
-				$vcard->remove('EMAIL');
-				$vcard->remove('TEL');
-				$vcard->remove('ADR');
-				$vcard->remove('ORG');
-				$vcard->remove('PHOTO');
-				$vcard->remove('BDAY');
-				$vcard->remove('ANNIVERSARY');
+					//remove all supported properties
+					$vcard->remove('EMAIL');
+					$vcard->remove('TEL');
+					$vcard->remove('ADR');
+					$vcard->remove('ORG');
+					$vcard->remove('PHOTO');
+					$vcard->remove('BDAY');
+					$vcard->remove('ANNIVERSARY');
 
-				return $vcard;
+					return $vcard;
+				} catch(Exception $e) {
+					ErrorHandler::log("Broken vcard for contact with id = " .$contact->id);
+					ErrorHandler::logException($e);
+				}
 			}
 		}
 
