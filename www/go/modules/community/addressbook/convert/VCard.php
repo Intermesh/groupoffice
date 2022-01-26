@@ -63,7 +63,7 @@ class VCard extends AbstractConverter {
 
 					return $vcard;
 				} catch(Exception $e) {
-					ErrorHandler::log("Broken vcard for contact with id = " .$contact->id);
+					ErrorHandler::log("Broken vcard for contact with id = " .$contact->id .' in file ' . $file->getPath());
 					ErrorHandler::logException($e);
 				}
 			}
