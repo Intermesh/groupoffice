@@ -1,3 +1,5 @@
+- Leave days: round leave day allowances to 1 decimal in year overview
+
 25-01-2022 6.5.99
 - Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
 
