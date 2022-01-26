@@ -4,11 +4,9 @@ namespace go\modules\community\oauth2client\controller;
 
 
 use go\core\Controller;
-use go\core\Environment;
 use go\core\http\Exception;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model;
-use go\core\http\Response;
 use League\OAuth2\Client\Provider\Google;
 use go\core\webclient\Extjs3;
 
