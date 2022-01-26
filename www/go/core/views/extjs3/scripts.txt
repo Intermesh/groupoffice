@@ -284,6 +284,7 @@ form/AttachmentsField.js
 form/LanguageCombo.js
 
 emailtemplate/TemplateDialog.js
+emailtemplate/TemplateFieldset.js
 emailtemplate/GridPanel.js
 pdftemplate/TemplateDialog.js
 pdftemplate/GridPanel.js

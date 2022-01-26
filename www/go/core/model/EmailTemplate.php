@@ -112,9 +112,9 @@ class EmailTemplate extends AclOwnerEntity
 	}
 	
 	/**
-	 *  
+	 * @param $module array{package:string, module:string}
 	 */ 
-  public function setModule($module) {
+  public function setModule(array $module) {
 
 		if(is_int($module)) {
 			$this->moduleId = $module;

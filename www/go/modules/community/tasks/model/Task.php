@@ -223,8 +223,8 @@ class Task extends AclInheritEntity {
 	/**
 	 * @throws JsonException
 	 */
-	public function getRecurrenceRule() {
-		return empty($this->recurrenceRule) ? null : JSON::decode($this->recurrenceRule);
+	public function getRecurrenceRule() : ?array {
+		return empty($this->recurrenceRule) ? null : JSON::decode($this->recurrenceRule, true);
 	}
 
 	public function setRecurrenceRule($rrule) {
