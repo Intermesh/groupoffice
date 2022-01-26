@@ -1,3 +1,4 @@
+- Tasks: Added widget for startpage
 - Tasks: When creating tasks from other Contacts, Projects or Orders the subject field will be auto filled.
 - Core: Fixed database check and make sure core module is shared
 - Tasks: Fixed date shift and priority change in tasks migration
