@@ -4,10 +4,13 @@ namespace go\modules\community\oauth2client\controller;
 
 
 use go\core\Controller;
+use go\core\Environment;
 use go\core\http\Exception;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model;
+use go\core\http\Response;
 use League\OAuth2\Client\Provider\Google;
+use go\core\webclient\Extjs3;
 
 final class Oauth2Client extends Controller
 {
@@ -58,12 +61,7 @@ final class Oauth2Client extends Controller
 					$acct->oauth2Client->refreshToken = $refreshToken;
 				}
 				$acct->save();
-				// We got an access token, let's now get the owner details
 				$ownerDetails = $provider->getResourceOwner($token);
-
-				// Use these details to create a new profile
-				printf(go()->t('Hello') . '&nbsp;%s!&nbsp;' . go()->t('OAuth2 authentication was successful.') . '&nbsp;', $ownerDetails->getFirstName());
-
 			} catch (\Exception $e) {
 				// Failed to get user details
 				exit('Something went wrong: ' . $e->getMessage());
@@ -71,8 +69,14 @@ final class Oauth2Client extends Controller
 			unset(\GO::session()->values['oauth2state']);
 			unset(\GO::session()->values['accountId']);
 			\GO::session()->closeWriting();
-			echo '<a href="javascript:window.close()">' . go()->t("Click here") . '</a> ' . go()->t("to close this window.");
-			exit(0);
+
+			$str = '<div class="card"><h3>' . go()->t('Hello').'&nbsp;'.$ownerDetails->getFirstName().'</h3>' .
+				'<p>' . go()->t('OAuth2 authentication was successful.') . '</p>' .
+				'<p><a href="javascript:window.close()">' . go()->t("Click here") . '</a>&nbsp;' .
+				go()->t("to close this window.") . '</p></div>';
+
+			$webClient = Extjs3::get();
+			$webClient->renderPage($str, go()->t('Success'));
 		}
 	}
 

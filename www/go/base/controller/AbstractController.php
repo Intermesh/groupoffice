@@ -249,15 +249,7 @@ abstract class AbstractController extends Observable {
 		
 		return $this->view->render($viewName, $data);		
 	}
-	
-	
-	
-	
-//	protected function renderPartial($data=array()) {
-//		
-//	}
-//	
-//	
+
 	/**
 	 * Adds a permission check on an acl ID for specific controller actions.
 	 * 
@@ -601,8 +593,4 @@ abstract class AbstractController extends Observable {
 			throw new Exception(sprintf(GO::t("The server did not receive the required parameters from your browser. Probably the maximum filesize for upload of %sMB has been exceeded."),$maxFileSize));
 		}
 	}
-	
-//	protected function isAjax(){
-//		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH']==='XMLHttpRequest';
-//	}
 }
