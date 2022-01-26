@@ -38,6 +38,7 @@ class Module extends core\Module {
 
 	public static function onMap(Mapping $mapping) {
 		$mapping->addHasOne('tasksSettings', UserSettings::class, ['id' => 'userId'], true);
+		$mapping->addScalar('taskPortletTaskLists', "tasks_portlet_tasklist", ['id' => 'userId']);
 	}
 
 	protected function rights(): array

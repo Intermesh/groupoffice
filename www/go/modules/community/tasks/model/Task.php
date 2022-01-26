@@ -546,7 +546,7 @@ class Task extends AclItemEntity {
 				$query->join("tasks_tasklist", "tasklist", "tasklist.id = task.tasklistId");
 			}
 			$sort['tasklist.name'] = $sort['tasklist'];
-
+			$sort['due'] = 'DESC';
 			unset($sort['tasklist']);
 		}
 

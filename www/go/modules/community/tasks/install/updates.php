@@ -139,3 +139,7 @@ $updates['202111251126'][] = "alter table tasks_category
 	add constraint tasks_category_ibfk_1
 		foreign key (ownerId) references core_user (id)
 			on delete cascade;";
+
+$updates['202201261056'][] = "ALTER TABLE `tasks_portlet_tasklist` DROP FOREIGN KEY `tasks_portlet_tasklist_ibfk_1`;";
+$updates['202201261056'][] = "ALTER TABLE `tasks_portlet_tasklist` CHANGE COLUMN `createdBy` `userId` INT(11) NOT NULL ;";
+$updates['202201261056'][] = "ALTER TABLE `tasks_portlet_tasklist` ADD CONSTRAINT `tasks_portlet_tasklist_ibfk_1` FOREIGN KEY (`userId`)  REFERENCES `core_user` (`id`) ON DELETE CASCADE;";
