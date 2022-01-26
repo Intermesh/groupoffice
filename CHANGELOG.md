@@ -4,6 +4,7 @@
 - Core: Italian translations updated (thank you Luca Pauluzzi)
 
 25-01-2022 6.5.99
+- Projects: fixed setRemoteComboText is not a function error when editing a project template task
 - Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
 
 24-01-2022 6.5.98
