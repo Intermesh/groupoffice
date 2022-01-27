@@ -143,3 +143,5 @@ $updates['202111251126'][] = "alter table tasks_category
 $updates['202201261056'][] = "ALTER TABLE `tasks_portlet_tasklist` DROP FOREIGN KEY `tasks_portlet_tasklist_ibfk_1`;";
 $updates['202201261056'][] = "ALTER TABLE `tasks_portlet_tasklist` CHANGE COLUMN `createdBy` `userId` INT(11) NOT NULL ;";
 $updates['202201261056'][] = "ALTER TABLE `tasks_portlet_tasklist` ADD CONSTRAINT `tasks_portlet_tasklist_ibfk_1` FOREIGN KEY (`userId`)  REFERENCES `core_user` (`id`) ON DELETE CASCADE;";
+
+$updates['202201271056'][] = "delete from tasks_task_category where categoryId not in (select id from tasks_category)";

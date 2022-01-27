@@ -1,19 +1,25 @@
-<?php
+<?php /** @noinspection HttpUrlsUsage */
+
+/** @noinspection PhpUndefinedFieldInspection */
+
 namespace go\modules\community\carddav;
 
 use Exception;
+use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\ErrorHandler;
+use go\core\orm\exception\SaveException;
+use go\core\util\DateTime;
 use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
-use go\modules\community\addressbook\model\VCard as VCardModel;
 use Sabre\CardDAV\Backend\AbstractBackend;
 use Sabre\CardDAV\Plugin;
 use Sabre\CardDAV\Xml\Property\SupportedAddressData;
 use Sabre\DAV\Exception\Forbidden;
 use Sabre\DAV\Exception\NotFound;
 use Sabre\DAV\PropPatch;
+use Sabre\VObject\Component\VCard as VCardComp;
 use Sabre\VObject\Reader;
 use function GO;
 
@@ -23,7 +29,13 @@ class Backend extends AbstractBackend {
 		
 	}
 
-	public function createCard($addressBookId, $cardUri, $cardData) {
+	/**
+	 * @throws Forbidden
+	 * @throws NotFound
+	 * @throws Exception
+	 */
+	public function createCard($addressBookId, $cardUri, $cardData): string
+	{
 		$addressbook = AddressBook::findById($addressBookId);
 		if(!$addressbook) {
 			throw new NotFound();
@@ -34,7 +46,7 @@ class Backend extends AbstractBackend {
 		}
 		
 		$vcardComp = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
-		
+		/** @var $vcardComp VCardComp */
 		$contact = new Contact();
 		$contact->addressBookId = (int) $addressBookId;
 		$contact->setUid((string) $vcardComp->uid);
@@ -52,14 +64,18 @@ class Backend extends AbstractBackend {
 	public function deleteAddressBook($addressBookId) {
 		
 	}
-	
-	private function createBlob(Contact $contact, $cardData) {
+
+	/**
+	 * @throws Exception
+	 */
+	private function createBlob(Contact $contact, $cardData): Blob
+	{
 		
 		//Important to set exactly the same modifiedAt on both blob and contact. 
 		//We compare these to check if vcards need to be updated.
-		$contact->modifiedAt = new \go\core\util\DateTime();
+		$contact->modifiedAt = new DateTime();
 		
-		$blob = \go\core\fs\Blob::fromString($cardData);
+		$blob = Blob::fromString($cardData);
 		$blob->type = 'text/vcard';
 		$blob->name = $contact->getUri();
 		if(empty($blob->name)) {
@@ -67,7 +83,7 @@ class Backend extends AbstractBackend {
 		}
 		$blob->modifiedAt = $contact->modifiedAt;
 		if(!$blob->save()) {
-			throw new \Exception("could not save vcard blob for contact '" . $contact->id() . "'. Validation error: " . $blob->getValidationErrorsAsString());
+			throw new Exception("could not save vcard blob for contact '" . $contact->id() . "'. Validation error: " . $blob->getValidationErrorsAsString());
 		}
 		
 		$contact->vcardBlobId = $blob->id;
@@ -75,7 +91,12 @@ class Backend extends AbstractBackend {
 		return $blob;
 	}
 
-	public function deleteCard($addressBookId, $cardUri): bool {		
+	/**
+	 * @throws NotFound
+	 * @throws Forbidden
+	 * @throws Exception
+	 */
+	public function deleteCard($addressBookId, $cardUri): bool {
 		$contact = Contact::find(['id', 'addressBookId'])->where(['addressBookId' => $addressBookId, 'uri' => $cardUri])->single();
 		if(!$contact) {
 			throw new NotFound();
@@ -86,7 +107,8 @@ class Backend extends AbstractBackend {
 		return Contact::delete($contact->primaryKeyValues());
 	}
 	
-	private function addressBookToDAV(AddressBook $addressBook, $principalUri) {
+	private function addressBookToDAV(AddressBook $addressBook, $principalUri): array
+	{
 		return array(
 			'id' => $addressBook->id,
 			'uri' => $addressBook->id,
@@ -98,6 +120,9 @@ class Backend extends AbstractBackend {
 		);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function getAddressBooksForUser($principalUri): array {
 		
 		$r = [];
@@ -113,6 +138,12 @@ class Backend extends AbstractBackend {
 		return $r;						
 	}
 
+	/**
+	 * @throws SaveException
+	 * @throws NotFound
+	 * @throws Forbidden
+	 * @throws Exception
+	 */
 	public function getCard($addressBookId, $cardUri): array {
 		
 		$addressbook = AddressBook::findById($addressBookId);
@@ -129,7 +160,7 @@ class Backend extends AbstractBackend {
 			throw new NotFound();
 		}
 		
-		$blob = isset($contact->vcardBlobId) ? \go\core\fs\Blob::findById($contact->vcardBlobId) : false;
+		$blob = isset($contact->vcardBlobId) ? Blob::findById($contact->vcardBlobId) : false;
 		
 		if(!$blob || $blob->modifiedAt < $contact->modifiedAt) {
 			//blob won't be deleted if still used
@@ -147,8 +178,12 @@ class Backend extends AbstractBackend {
 					'etag' => '"' . $contact->vcardBlobId . '"',
 					'size' => $blob->size
 			];
-	}	
-	
+	}
+
+	/**
+	 * @throws SaveException
+	 * @throws Exception
+	 */
 	private function generateCards($addressbookId) {
 		$contacts = Contact::find()
 						->join('core_blob', 'b', 'b.id = c.vcardBlobId', 'LEFT')
@@ -169,12 +204,18 @@ class Backend extends AbstractBackend {
 			
 			if(!$contact->save()) {
 				$blob->setStaleIfUnused();
-				throw new \Exception("Could not save contact");
+				throw new Exception("Could not save contact");
 			}
 		}
 	}
 
-	public function getCards($addressbookId) {
+	/**
+	 * @throws SaveException
+	 * @throws Forbidden
+	 * @throws NotFound
+	 */
+	public function getCards($addressbookId): array
+	{
 		$addressbook = AddressBook::findById($addressbookId);
 		if(!$addressbook) {
 			throw new NotFound();
@@ -199,8 +240,18 @@ class Backend extends AbstractBackend {
 		
 	}
 
-	public function updateCard($addressBookId, $cardUri, $cardData) {
-		
+	/**
+	 * @param $addressBookId
+	 * @param $cardUri
+	 * @param $cardData
+	 * @return string|null
+	 * @throws Forbidden
+	 * @throws NotFound
+	 * @throws SaveException
+	 * @throws Exception
+	 */
+	public function updateCard($addressBookId, $cardUri, $cardData): ?string
+	{
 		$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uri' => $cardUri])->single();
 		if(!$contact) {
 			throw new NotFound();
@@ -215,6 +266,7 @@ class Backend extends AbstractBackend {
 			go()->debug($cardData);
 			$c = new VCard();			
 			$vcardComponent = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+			/** @var $vcardComponent VCardComp */
 			$c->import($vcardComponent, $contact);
 			
 		} catch(Exception $e) {
@@ -222,7 +274,7 @@ class Backend extends AbstractBackend {
 			
 			$blob->setStaleIfUnused();			
 			
-			return false;
+			return null;
 		}
 		//vcardBlobId can serve as etag
 		return '"' . $contact->vcardBlobId . '"';

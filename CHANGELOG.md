@@ -1,9 +1,12 @@
+27-01-2022 6.6.35
 - Tasks: Added widget for startpage
 - Tasks: When creating tasks from other Contacts, Projects or Orders the subject field will be auto filled.
 - Core: Fixed database check and make sure core module is shared
 - Tasks: Fixed date shift and priority change in tasks migration
 - Tasks: Fixed fue_time error in continue task dialog
 - Core: When dialog had custom fields the initial field lost focus
+- Carddav: Fixed corruption in vcards when client sent version 4.0 cards. Causing sync to fail (davx5)
+- Tasks: Fixed recurring tasks error
 
 25-01-2022 6.6.34
 - Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.

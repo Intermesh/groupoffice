@@ -16,6 +16,9 @@ require(__DIR__ . "/../../../../vendor/autoload.php");
 
 //Create the app with the database connection
 App::get();
+
+// allow 2 minutes for vcard generation
+go()->getEnvironment()->setMaxExecutionTime(120);
 /**
  * Copyright Intermesh
  *
