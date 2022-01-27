@@ -218,8 +218,8 @@ class Task extends AclItemEntity {
 	/**
 	 * @throws JsonException
 	 */
-	public function getRecurrenceRule() {
-		return empty($this->recurrenceRule) ? null : JSON::decode($this->recurrenceRule);
+	public function getRecurrenceRule(): ?array {
+		return empty($this->recurrenceRule) ? null : JSON::decode($this->recurrenceRule, true);
 	}
 
 	public function setRecurrenceRule($rrule) {
@@ -521,12 +521,12 @@ class Task extends AclItemEntity {
 	}
 
 	/**
-	 * @param Recurrence $rrule
+	 * @param array $rrule
 	 * @return ?DateTimeInterface
 	 */
-	protected function getNextRecurrence(Recurrence $rrule): ?DateTimeInterface
+	protected function getNextRecurrence(array $rrule): ?DateTimeInterface
 	{
-		$rule = Recurrence::fromArray((array) $rrule, $this->start);
+		$rule = Recurrence::fromArray($rrule, $this->start);
 		$rule->next();
 		return $rule->current();
 	}
