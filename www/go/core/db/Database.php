@@ -1,7 +1,6 @@
 <?php
 namespace go\core\db;
 
-use go\core\App;
 use PDO;
 
 class Database {
@@ -36,13 +35,14 @@ class Database {
 	 * @param string $name
 	 * @return bool
 	 */
-	public function hasTable($name) {
+	public function hasTable(string $name): bool
+	{
 		return in_array($name, $this->getTableNames());
 	}
 
 	private function queryVersion() {
 		if(!isset($this->version)) {
-			$this->version = $this->conn->query("SELECT VERSION()")->fetchColumn(0);
+			$this->version = $this->conn->query("SELECT VERSION()")->fetchColumn();
 		}
 
 		return $this->version;
@@ -56,7 +56,8 @@ class Database {
 	 *
 	 * @return string eg. 10.0.2
 	 */
-	public function getVersion() {
+	public function getVersion(): string
+	{
 		if($this->isMariaDB()) {
 			return explode('-', $this->queryVersion())[0];
 		} else{
@@ -80,7 +81,8 @@ class Database {
 	 * 
 	 * @return Table[]
 	 */
-	public function getTables() {
+	public function getTables(): array
+	{
 		$t = [];
 		
 		foreach($this->getTableNames() as $tableName) {
@@ -96,7 +98,8 @@ class Database {
 	 * @param string $name
 	 * @return Table
 	 */
-	public function getTable($name) {
+	public function getTable(string $name): Table
+	{
 		return Table::getInstance($name, $this->conn);
 	}	
 	
@@ -105,7 +108,8 @@ class Database {
 	 * 
 	 * @return string eg. "user@localhost"
 	 */
-	public function getUser() {
+	public function getUser(): string
+	{
 
 		if(!isset($this->user)) {
 			$sql = "SELECT USER();";
@@ -123,8 +127,8 @@ class Database {
 	 * 
 	 * @return string
 	 */
-	public function getName() {
-
+	public function getName(): string
+	{
 		if(!isset($this->name)) {
 			$sql = "SELECT DATABASE();";
 			$stmt = $this->conn->query($sql);
@@ -137,13 +141,11 @@ class Database {
 	
 	/**
 	 * Set UTF8 collation
-	 * 
-	 * @return bool
 	 */
 	public function setUtf8() {
 		//Set utf8 as collation default
 		$sql = "ALTER DATABASE `" .$this->getName() . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";		
-		return $this->conn->exec($sql) !== false;
+		$this->conn->exec($sql);
 	}
 }
 

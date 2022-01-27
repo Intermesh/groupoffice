@@ -9,11 +9,13 @@ use go\core\model\Module as CoreModule;
 
 class Module extends core\Module implements DomainProvider {
 
-	public function getAuthor() {
+	public function getAuthor(): string
+	{
 		return "Intermesh BV";
 	}
 	
-	protected function afterInstall(CoreModule $model) {
+	protected function afterInstall(CoreModule $model): bool
+	{
 		
 		if(!Authenticator::register()) {
 			return false;
@@ -22,7 +24,8 @@ class Module extends core\Module implements DomainProvider {
 		return parent::afterInstall($model);
 	}
 	
-	public static function getDomainNames() {
+	public static function getDomainNames(): array
+	{
 		return (new Query)
 						->selectSingleValue('name')
 						->from('imapauth_server_domain')

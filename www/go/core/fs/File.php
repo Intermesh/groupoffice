@@ -2,6 +2,7 @@
 namespace go\core\fs;
 
 use Exception;
+use go\core\http\Response;
 use go\core\util\StringUtil;
 
 
@@ -18,7 +19,8 @@ class File extends FileSystemObject {
 	 * Check if the file or folder exists
 	 * @return boolean
 	 */
-	public function exists() {
+	public function exists(): bool
+	{
 		return is_file($this->path);
 	}
 
@@ -29,7 +31,8 @@ class File extends FileSystemObject {
 	 * @param string $extension
 	 * @return static
 	 */
-	public static function tempFile($extension) {
+	public static function tempFile(string $extension): File
+	{
 		 return go()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
 	}
 
@@ -38,9 +41,9 @@ class File extends FileSystemObject {
    * Get the parent folder object
    *
    * @return Folder Parent folder object
-   * @throws Exception
    */
-	public function getFolder() {
+	public function getFolder(): Folder
+	{
 		$parentPath = dirname($this->path);		
 		return new Folder($parentPath);
 	}
@@ -52,8 +55,8 @@ class File extends FileSystemObject {
    * @return bool
    * @throws Exception
    */
-	public function isWritable() {
-		
+	public function isWritable(): bool
+	{
 		if($this->exists()) {
 			return is_writable($this->path);
 		}else
@@ -103,7 +106,8 @@ class File extends FileSystemObject {
 	 *
 	 * @return bool
 	 */
-	public function delete() {
+	public function delete(): bool
+	{
 		if (!file_exists($this->path)) {
 			return true;
 		}else{		
@@ -111,13 +115,13 @@ class File extends FileSystemObject {
 		}
 	}
 
-  /**
-   * Get the extension of a filename
-   *
-   * @param string $filename
-   * @return string
-   */
-	public function getExtension() {
+	/**
+	 * Get the extension of a filename
+	 *
+	 * @return string
+	 */
+	public function getExtension(): string
+	{
 		
 		$filename = $this->getName();
 		
@@ -135,7 +139,8 @@ class File extends FileSystemObject {
 	 * Get the file name with out extension
 	 * @return string
 	 */
-	public function getNameWithoutExtension() {
+	public function getNameWithoutExtension(): string
+	{
 		$filename = $this->getName();
 		$pos = strrpos($filename, '.');
 		
@@ -150,9 +155,9 @@ class File extends FileSystemObject {
    * Checks if a filename exists and renames it.
    *
    * @return string  New filepath
-   * @throws Exception
    */
-	public function appendNumberToNameIfExists() {
+	public function appendNumberToNameIfExists(): string
+	{
 		$dir = $this->getFolder()->getPath();
 		$origName = $this->getNameWithoutExtension();
 		$extension = $this->getExtension();
@@ -164,85 +169,82 @@ class File extends FileSystemObject {
 		return $this->path;
 	}
 
-  /**
-   * Write a string to a file
-   * @link https://php.net/manual/en/function.file-put-contents.php
-   * @param mixed $data <p>
-   * The data to write. Can be either a string, an
-   * array or a stream resource.
-   * </p>
-   * <p>
-   * If data is a stream resource, the
-   * remaining buffer of that stream will be copied to the specified file.
-   * This is similar with using stream_copy_to_stream.
-   * </p>
-   * <p>
-   * You can also specify the data parameter as a single
-   * dimension array. This is equivalent to
-   * file_put_contents($filename, implode('', $array)).
-   * </p>
-   * @param int $flags [optional] <p>
-   * The value of flags can be any combination of
-   * the following flags (with some restrictions), joined with the binary OR
-   * (|) operator.
-   * </p>
-   * <p>
-   * <table>
-   * Available flags
-   * <tr valign="top">
-   * <td>Flag</td>
-   * <td>Description</td>
-   * </tr>
-   * <tr valign="top">
-   * <td>
-   * FILE_USE_INCLUDE_PATH
-   * </td>
-   * <td>
-   * Search for filename in the include directory.
-   * See include_path for more
-   * information.
-   * </td>
-   * </tr>
-   * <tr valign="top">
-   * <td>
-   * FILE_APPEND
-   * </td>
-   * <td>
-   * If file filename already exists, append
-   * the data to the file instead of overwriting it. Mutually
-   * exclusive with LOCK_EX since appends are atomic and thus there
-   * is no reason to lock.
-   * </td>
-   * </tr>
-   * <tr valign="top">
-   * <td>
-   * LOCK_EX
-   * </td>
-   * <td>
-   * Acquire an exclusive lock on the file while proceeding to the
-   * writing. Mutually exclusive with FILE_APPEND.
-   * @since 5.1
-   * </td>
-   * </tr>
-   * </table>
-   * </p>
-   * @param resource $context [optional] <p>
-   * A valid context resource created with
-   * stream_context_create.
-   * </p>
-   * @return int|false The function returns the number of bytes that were written to the file, or
-   * false on failure.
-   * @since 5.0
-   */
-	public function putContents($data, $flags = null, $context = null) {
+	/**
+	 * Write a string to a file
+	 * @link https://php.net/manual/en/function.file-put-contents.php
+	 * @param mixed $data <p>
+	 * The data to write. Can be either a string, an
+	 * array or a stream resource.
+	 * </p>
+	 * <p>
+	 * If data is a stream resource, the
+	 * remaining buffer of that stream will be copied to the specified file.
+	 * This is similar with using stream_copy_to_stream.
+	 * </p>
+	 * <p>
+	 * You can also specify the data parameter as a single
+	 * dimension array. This is equivalent to
+	 * file_put_contents($filename, implode('', $array)).
+	 * </p>
+	 * @param int|null $flags [optional] <p>
+	 * The value of flags can be any combination of
+	 * the following flags (with some restrictions), joined with the binary OR
+	 * (|) operator.
+	 * </p>
+	 * <p>
+	 * <table>
+	 * Available flags
+	 * <tr valign="top">
+	 * <td>Flag</td>
+	 * <td>Description</td>
+	 * </tr>
+	 * <tr valign="top">
+	 * <td>
+	 * FILE_USE_INCLUDE_PATH
+	 * </td>
+	 * <td>
+	 * Search for filename in the include directory.
+	 * See include_path for more
+	 * information.
+	 * </td>
+	 * </tr>
+	 * <tr valign="top">
+	 * <td>
+	 * FILE_APPEND
+	 * </td>
+	 * <td>
+	 * If file filename already exists, append
+	 * the data to the file instead of overwriting it. Mutually
+	 * exclusive with LOCK_EX since appends are atomic and thus there
+	 * is no reason to lock.
+	 * </td>
+	 * </tr>
+	 * <tr valign="top">
+	 * <td>
+	 * LOCK_EX
+	 * </td>
+	 * <td>
+	 * Acquire an exclusive lock on the file while proceeding to the
+	 * writing. Mutually exclusive with FILE_APPEND.
+	 * @since 5.1
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * </p>
+	 * @param resource $context [optional] <p>
+	 * A valid context resource created with
+	 * stream_context_create.
+	 * </p>
+	 * @return int|false The function returns the number of bytes that were written to the file, or
+	 * false on failure.
+	 * @since 5.0
+	 * @throws Exception
+	 */
+	public function putContents($data, int $flags = null, $context = null) {
 		
 		$this->create();
 		
-		if (file_put_contents($this->path, $data, $flags, $context)) {
-			return true;
-		} else {
-			return false;
-		}
+		return file_put_contents($this->path, $data, $flags, $context);
 	}
 
   /**
@@ -252,7 +254,7 @@ class File extends FileSystemObject {
    * @param int $offset [optional] <p>
    * The offset where the reading starts.
    * </p>
-   * @param int $maxlen [optional] <p>
+   * @param int|null $maxlen [optional] <p>
    * Maximum length of data read. The default is to read until end
    * of file is reached.
    * </p>
@@ -260,7 +262,7 @@ class File extends FileSystemObject {
    * @since 4.3
    * @since 5.0
    */
-	public function getContents($offset = 0, $maxlen = null) {		
+	public function getContents(int $offset = 0, int $maxlen = null) {
 		if(isset($maxlen)) {
 			return file_get_contents($this->getPath(), false, null, $offset, $maxlen);	
 		} else{
@@ -273,24 +275,29 @@ class File extends FileSystemObject {
 	 * 
 	 * @see getContentType()
 	 */
-	public function getMimeType() {
+	public function getMimeType(): string
+	{
 		return $this->getContentType();
 	}
-	
+
 	/**
 	 * Find and replace text in a text file
-	 * 
+	 *
 	 * @param string $search
 	 * @param string $replace
-	 * @return bool
+	 * @return string|false The function returns the replaced data or false on failure.
+	 * @throws Exception
 	 */
-	public function replace($search, $replace) {
+	public function replace(string $search, string $replace) {
 		$contents = $this->getContents();
 		$replaced = str_replace($search, $replace, $contents);
 		if($replaced === $contents) {
-			return true;
+			return $replaced;
 		}
-		return $this->putContents($replaced);		
+		if($this->putContents($replaced)) {
+			return $replaced;
+		}
+		return false;
 	}
 
 	/**
@@ -299,7 +306,8 @@ class File extends FileSystemObject {
 	 *
 	 * @return string
 	 */
-	public function getContentType() {
+	public function getContentType(): string
+	{
 		
 		//sometimes these fail and are important to always be right
 		switch($this->getExtension()) {
@@ -315,15 +323,16 @@ class File extends FileSystemObject {
 		
 	}
 
-  /**
-   * Send download headers and output the contents of this file to standard out (browser).
-   * @param boolean $sendHeaders
-   * @param boolean $useCache
-   * @param array $headers key value array of http headers to send
-   * @throws Exception
-   */
-	public function output($sendHeaders = true, $useCache = true, array $headers = [], $inline = false) {		
-		$r = \go\core\http\Response::get();
+	/**
+	 * Send download headers and output the contents of this file to standard out (browser).
+	 * @param boolean $sendHeaders
+	 * @param boolean $useCache
+	 * @param array $headers key value array of http headers to send
+	 * @param bool $inline
+	 * @throws Exception
+	 */
+	public function output(bool $sendHeaders = true, bool $useCache = true, array $headers = [], bool $inline = false) {
+		$r = Response::get();
 	
 		if($sendHeaders) {
 			foreach($headers as $name => $value) {
@@ -376,7 +385,7 @@ class File extends FileSystemObject {
 		$handle = $this->open('rb');
 
 		if (!is_resource($handle))
-			throw new \Exception("Could not read file");
+			throw new Exception("Could not read file");
 
 		while (!feof($handle)) {
 			echo fread($handle, 1024);
@@ -392,7 +401,7 @@ class File extends FileSystemObject {
 	 * @param string $mode
 	 * @return resource
 	 */
-	public function open($mode){
+	public function open(string $mode){
 		
 		//$this->create();
 		
@@ -406,7 +415,8 @@ class File extends FileSystemObject {
    * @return boolean
    * @throws Exception
    */
-	public function move(File $destination) {
+	public function move(File $destination): bool
+	{
 
 		if ($destination->exists()) {
 			throw new Exception("File exists in move!");
@@ -415,11 +425,12 @@ class File extends FileSystemObject {
 		if($destination->getPath() == $this->getPath()) {
 			return true;
 		}
-;
+
 		try {
 			$success = rename($this->path, $destination->getPath());
 		} catch(Exception $e) {
 			//renaming across partitions doesn't work
+			/** @noinspection PhpConditionAlreadyCheckedInspection */
 			$success = $destination->exists() || ($this->copy($destination) != false);
 			if($success) {
 				$this->delete();
@@ -441,9 +452,10 @@ class File extends FileSystemObject {
 	 * 
 	 * @param File $targetLink The link name.
 	 * 
-	 * @return File|bool <b>File</b> on success or <b>FALSE</b> on failure.
+	 * @return bool <b>File</b> on success or <b>FALSE</b> on failure.
 	 */
-	public function createLink(File $targetLink) {
+	public function createLink(File $targetLink): bool
+	{
 		return link($this->getPath(), $targetLink->getPath());
 	}
 
@@ -512,9 +524,10 @@ class File extends FileSystemObject {
 	/**
 	 * Pull 40-char sha1 hex from the binary data
 	 *
-	 * @return string
+	 * @return string|false
 	 */
-	public function getSha1Hash() {
+	public function getSha1Hash()
+	{
 		return sha1_file($this->path);
 	}
 
@@ -524,24 +537,22 @@ class File extends FileSystemObject {
 	 * @param File $file
 	 * @return bool True if the file is different, false if file is the same.
 	 */
-	public function equals(File $file) {
-		if ($this->md5Hash() != $file->md5Hash()){
-			return true;
-		}else{
-			return false;
-		}
+	public function equals(File $file): bool
+	{
+		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
+		return $this->md5Hash() == $file->md5Hash();
 	}
 
 	/**
 	 * Create the file
 	 *
 	 * @param boolean $createPath Create the folders for this file also?
-	 * @param int $time The touch time. If time is not supplied, the current system time is used.
-	 * @param int $atime If present, the access time of the given filename is set to the value of atime. Otherwise, it is set to the value passed to the time parameter. If neither are present, the current system time is used.
+	 * @param int|null $time The touch time. If time is not supplied, the current system time is used.
+	 * @param int|null $atime If present, the access time of the given filename is set to the value of atime. Otherwise, it is set to the value passed to the time parameter. If neither are present, the current system time is used.
 	 * @return self|bool $successful
 	 * @throws Exception
 	 */
-	public function touch($createPath = false, $time = null, $atime = null) {
+	public function touch(bool $createPath = false, int $time = null, int $atime = null) {
 		if ($createPath){
 			$this->getFolder()->create();
 		}
@@ -562,7 +573,10 @@ class File extends FileSystemObject {
 			return false;
 		}
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function create() {
 		if(!$this->exists()) {
 			$this->touch(true);

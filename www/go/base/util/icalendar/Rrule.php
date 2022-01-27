@@ -243,7 +243,7 @@ class Rrule extends \GO\Base\Util\Date\RecurrencePattern
 			if(empty($until))
 				return false;
 			
-			if ($until{0} == '#') {
+			if ($until[0] == '#') {
 				$count = substr($until, 1);
 				if ($count > 0) {
 					$this->_count = $count;

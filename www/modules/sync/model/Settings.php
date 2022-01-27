@@ -38,6 +38,7 @@ use go\core\model\Acl;
 use go\core\model\User;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\notes\model\NoteBook;
+use go\modules\community\tasks\model\Tasklist;
 
 class Settings extends \GO\Base\Db\ActiveRecord{
 	
@@ -65,8 +66,8 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 	public function relations() {
     
     return array(
-				'addressbooks' => array('type'=>self::MANY_MANY, 'model'=>'GO\Addressbook\Model\Addressbook', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserAddressbook'),
-				'tasklists' => array('type'=>self::MANY_MANY, 'model'=>'GO\Tasks\Model\Tasklist', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserTasklist'),
+//				'addressbooks' => array('type'=>self::MANY_MANY, 'model'=>'GO\Addressbook\Model\Addressbook', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserAddressbook'),
+//				'tasklists' => array('type'=>self::MANY_MANY, 'model'=>'GO\Tasks\Model\Tasklist', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserTasklist'),
 				'calendars' => array('type'=>self::MANY_MANY, 'model'=>'GO\Calendar\Model\Calendar', 'field'=>'user_id', 'linkModel'=> 'GO\Sync\Model\UserCalendar'),
 				//'noteCategories' => array('type'=>self::MANY_MANY, 'model'=>'GO\Notes\Model\Category', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserNoteCategory'),
 				'calendar' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Calendar\Model\Calendar', 'field'=>'calendar_id'),
@@ -81,13 +82,20 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 										->addCondition('default_addressbook', 1,'=','link_t'))
 					);
 	}
-	
-	public function getDefaultTasklist(){
-		return $this->tasklists(\GO\Base\Db\FindParams::newInstance()
-						->single()
-						->criteria(\GO\Base\Db\FindCriteria::newInstance()
-										->addCondition('default_tasklist', 1,'=','link_t'))
-					);
+
+	public function getDefaultTasklist() {
+
+		$tasklist = Tasklist::find()
+			->join('sync_tasklist_user', 'su', 'su.tasklist_id = a.id')
+			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
+			->where('su.user_id', '=', go()->getAuthState()->getUserId())
+			->orderBy(['su.default_tasklist' => 'DESC'])
+			->single();
+
+		if (!$tasklist)
+			throw new Exception("FATAL: No default tasklist configured");
+
+		return $tasklist;
 	}
 	
 	public function getDefaultCalendar(){
@@ -157,15 +165,15 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 
 
 
-			if (\GO::modules()->tasks) {
-				$stmt = $this->tasklists();
-				if (!$stmt->rowCount()) {
-					$tasklist = \GO\Tasks\Model\Tasklist::model()->findSingleByAttribute('user_id', $user->id);
-					if ($tasklist) {
-						$settings->addManyMany('tasklists', $tasklist->id, array('default_tasklist' => 1));
-					}
-				}
-			}
+//			if (\GO::modules()->tasks) {
+//				$stmt = $this->tasklists();
+//				if (!$stmt->rowCount()) {
+//					$tasklist = \GO\Tasks\Model\Tasklist::model()->findSingleByAttribute('user_id', $user->id);
+//					if ($tasklist) {
+//						$settings->addManyMany('tasklists', $tasklist->id, array('default_tasklist' => 1));
+//					}
+//				}
+//			}
 
 			if ($save)
 				$settings->save();

@@ -2,6 +2,7 @@
 namespace go\modules\community\ldapauthenticator\model;
 
 use go\core\jmap\Entity;
+use go\core\orm\Mapping;
 
 class Domain extends \go\core\orm\Property {
 	
@@ -9,7 +10,8 @@ class Domain extends \go\core\orm\Property {
 	public $serverId;
 	public $name;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable('ldapauth_server_domain');
 						

@@ -1,9 +1,10 @@
 <?php
 namespace go\core\jmap;
 
+use go\core\data\Model;
 use go\core\util\StringUtil;
 
-class ProblemDetails extends \go\core\data\Model {
+class ProblemDetails extends Model {
 
 	const ERROR_SERVER_FAIL = "serverFail";
 	

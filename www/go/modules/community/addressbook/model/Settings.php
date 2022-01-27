@@ -15,4 +15,8 @@ class Settings extends core\Settings {
 	public $createPersonalAddressBooks = true;
 
 	public $restrictExportToAdmins = false;
+
+	public function getUsersAddressBookId() {
+
+	}
 }

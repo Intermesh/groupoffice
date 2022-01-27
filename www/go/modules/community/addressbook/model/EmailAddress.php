@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\addressbook\model;
 						
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 						
 /**
@@ -36,7 +37,8 @@ class EmailAddress extends Property {
 	 */							
 	public $email;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("addressbook_email_address");
 	}

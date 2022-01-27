@@ -18,7 +18,8 @@ class ContactStar extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\ContactStar::class;
 	}	
 }

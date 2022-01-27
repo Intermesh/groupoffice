@@ -3,6 +3,7 @@ namespace go\core\model;
 
 use go\core\App;
 use go\core\db\Query;
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 
 /**
@@ -29,7 +30,8 @@ class AclGroup extends Property {
 	
 	protected $revokeModSeq;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable('core_acl_group');						
 	}

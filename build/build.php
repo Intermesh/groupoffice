@@ -46,9 +46,9 @@ class Builder
 {
     public $test = false;
 
-	private $majorVersion = "6.5";
+	private $majorVersion = "6.6";
 
-	private $gitBranch = '6.5.x';
+	private $gitBranch = 'master';
 
 	/**
 	 *
@@ -75,7 +75,7 @@ class Builder
 	private $variants = [
 	        [
 		        "archiveSuffix" => "",
-			    "name" => "sixfive",
+			    "name" => "sixsix",
 			    "encoderOptions" => "-71 --allow-reflection-all"
 		    ]
 	];
@@ -211,7 +211,7 @@ class Builder
 
 		cd($this->buildDir);
 		run("tar czf " . $this->packageName . ".tar.gz " . $this->packageName);
-		echo "Created " . $this->packageName . ".tar.gz\n";
+		echo "Created " . $this->buildDir . '/'. $this->packageName . ".tar.gz\n";
 	}
 
 	private function encode()

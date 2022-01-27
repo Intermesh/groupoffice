@@ -10,11 +10,11 @@ use function GO;
 
 class Authenticator extends PrimaryAuthenticator {
 	
-	public static function id() {
+	public static function id() : string{
 		return "imap";
 	}
 
-	public static function isAvailableFor($username) {		
+	public static function isAvailableFor(string $username) :bool{
 		return static::findServer($username) != false;
 	}
 	
@@ -76,8 +76,12 @@ class Authenticator extends PrimaryAuthenticator {
 		return $user;
 	
 	}
-	
-	private function createUser($email) {
+
+	/**
+	 * @throws Exception
+	 */
+	private function createUser($email): User
+	{
 		$user = new User();
 		$user->displayName = explode('@', $email)[0];
 		$user->username = $email;
@@ -89,7 +93,10 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		return $user;
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function setEmailAccount($username, $password, $email, Server $server, User $user) {
 		
 		if(!$user->hasModule('legacy', 'email')) {
@@ -111,6 +118,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		if(!$foundForUser) {
+			/** @noinspection DuplicatedCode */
 			$account = new Account();
 			$account->user_id = $user->id;
 			$account->host = $server->imapHostname;
@@ -120,7 +128,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->imap_encryption = $server->imapEncryption ?? "";
 			
 			$account->imap_allow_self_signed = !$server->imapValidateCertificate;
-			$account->smtp_allow_self_signed = !$server->imapValidateCertificate;
+			$account->smtp_allow_self_signed = !$server->smtpValidateCertificate;
 			$account->smtp_username = $server->smtpUsername;
 			$account->smtp_password = $server->getSmtpPassword();
 			$account->smtp_host = $server->smtpHostname;

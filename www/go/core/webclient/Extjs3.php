@@ -35,7 +35,7 @@ class Extjs3 {
 		$cacheFile = go()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
 		$debug = go()->getDebugger()->enabled && $cacheFile->exists();
 		if ($debug || !$cacheFile->exists()) {
-			$modules = Module::getInstalled();
+			$modules = Module::getInstalled(['id', 'name', 'package']);
 			$css = "";
 			$modifiedAt = null;
 			foreach ($modules as $module) {
@@ -201,7 +201,6 @@ class Extjs3 {
 	 * Get available theme names as array
 	 *
 	 * @return string[]
-	 * @throws \go\core\exception\ConfigurationException
 	 */
 	public function getThemes() {
 		$themes = go()->getCache()->get("themes");

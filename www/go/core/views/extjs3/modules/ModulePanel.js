@@ -5,7 +5,12 @@ go.modules.ModulePanel = Ext.extend(Ext.Panel, {
 	 */
 	routeDefault : function() {
 		if(this.getLayout() instanceof go.layout.ResponsiveLayout) {
-			this.items.first().show();
+			let firstItem = this.items.first();
+			// if(firstItem.isVisible() && firstItem.getLayout() instanceof go.layout.ResponsiveLayout) {
+			// 	firstItem = firstItem.items.first();
+			// }
+
+			firstItem.show();
 		}
 	},
 

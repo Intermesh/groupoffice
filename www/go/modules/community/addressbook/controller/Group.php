@@ -18,7 +18,8 @@ class Group extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Group::class;
 	}	
 	

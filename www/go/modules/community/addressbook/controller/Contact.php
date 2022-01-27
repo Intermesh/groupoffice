@@ -27,12 +27,21 @@ class Contact extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Contact::class;
-	}	
-	
-	
-	
+	}
+
+	//Allow access without access to the module so users can set their profile in their settings
+	protected function authenticate()
+	{
+		if (!go()->getAuthState()->isAuthenticated()) {
+			throw new Exception(401, "Unauthorized");
+		}
+	}
+
+
+
 //	protected function transformSort($sort) {
 //		$sort = parent::transformSort($sort);
 //

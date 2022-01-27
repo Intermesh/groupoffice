@@ -14,7 +14,7 @@
 
 use go\core\Environment;
 
-$product_name = class_exists('GO') ? \GO::config()->product_name : 'Group-Office';
+$product_name = 'Group-Office';
 
 /**
 * Format a size to a human readable format.
@@ -407,7 +407,7 @@ function test_system() :array
 	$test['fatal']=true;
 
 	$tests[]=$test;	
-	
+
 	$test['name']='MySQLnd driver';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']= extension_loaded('mysqlnd');
@@ -423,7 +423,7 @@ function test_system() :array
 	$test['fatal']=false;
 
 	$tests[]=$test;
-	
+
 	$test['name']='Process Control Extensions';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']= function_exists('posix_getuid');
@@ -524,7 +524,7 @@ function output_system_test() :bool
 	$tests = test_system();
 
 	// If the test script is called from the system administration tools (thus not included), it is safe to show the
-	// full output. 
+	// full output.
 	$showFullOutput = !class_exists("go\core\App");
 
 	$fatal = false;
@@ -556,6 +556,31 @@ function output_system_test() :bool
 	} else {
 		echo '<p><b>Passed!</b> '.$product_name.' should run on this machine</p>';
 	}
+
+
+
+	function getHost(): string
+	{
+		$possibleHostSources = array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST', 'SERVER_NAME', 'SERVER_ADDR');
+		$sourceTransformations = array(
+			"HTTP_X_FORWARDED_HOST" => function ($value) {
+				$elements = explode(',', $value);
+				return trim(end($elements));
+			}
+		);
+		$host = '';
+		foreach ($possibleHostSources as $source) {
+			if (!empty($host)) break;
+			if (empty($_SERVER[$source])) continue;
+			$host = $_SERVER[$source];
+			if (array_key_exists($source, $sourceTransformations)) {
+				$host = $sourceTransformations[$source]($host);
+			}
+		}
+
+		$host = trim($host);
+		return preg_replace('/:\d+$/', '', $host);
+	}
 	
 	
 	echo '<table style="font:12px Arial"><tr>
@@ -567,7 +592,7 @@ function output_system_test() :bool
 
 <tr>
 	<td valign="top">Server name:</td>
-	<td>'.$_SERVER['SERVER_NAME'].'</td>
+	<td>'.getHost().'</td>
 </tr>
 <tr>
 	<td valign="top">Server IP:</td>

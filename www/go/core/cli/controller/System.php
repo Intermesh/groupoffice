@@ -8,13 +8,18 @@ use go\core\Controller;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
+use go\core\exception\Forbidden;
 use go\core\fs\File;
+use go\core\jmap\Entity;
+use go\core\model\Alert;
 use go\core\http\Client;
-use go\core\http\Request;
 use go\core\model\CronJobSchedule;
 use go\core\event\Listeners;
 use go\core\model\Module;
+use Faker;
 
+
+use go\modules\community\history\Module as HistoryModule;
 use function GO;
 
 class System extends Controller {
@@ -24,7 +29,9 @@ class System extends Controller {
 	const EVENT_CLEANUP = 'cleanup';
 
 	/**
-	 * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
+	 *
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
 	 */
 	public function runCron($name, $module = "core", $package = "core") {
 
@@ -76,7 +83,7 @@ class System extends Controller {
 		} catch(Exception $e) {
 			echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "install/' in the browser.\n";
 		}
-		
+
 		echo "Done!\n";
 	}
 
@@ -180,6 +187,51 @@ class System extends Controller {
 		}
 
 		return $unknown;
+	}
+
+
+	/**
+	 * Generates demo data
+	 *
+	 * @return void
+	 * @throws Forbidden
+	 * @example
+	 * ```
+	 * docker-compose exec --user www-data groupoffice-tasks ./www/cli.php core/System/demo
+	 * ```
+	 */
+	public function demo() {
+
+		$faker = Faker\Factory::create();
+
+		Entity::$trackChanges = false;
+		HistoryModule::$enabled = false;
+		Alert::$enabled = false;
+
+		$modules = Module::find();
+//		$modules = [Module::findByName("community", "tasks")];
+
+		foreach($modules as $module) {
+			if(!$module->isAvailable()) {
+				continue;
+			}
+			echo "Creating demo for module ". ($module->package ?? "legacy") . "/" .$module->name ."\n";
+			$module->module()->demo($faker);
+
+			echo "\n\nDone\n\n";
+		}
+
+		go()->getSettings()->demoDataAsked = true;
+		go()->getSettings()->save();
+
+		// for resyncing
+		go()->rebuildCache();
+
+		Entity::$trackChanges = true;
+		HistoryModule::$enabled = true;
+		Alert::$enabled = true;
+
+		echo "\n\nAll done!\n\n";
 	}
 
 

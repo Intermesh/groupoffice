@@ -13,7 +13,11 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'modifier', type: "relation"},
 				'permissionLevel'
 			],
-			entityStore: "Note"
+			entityStore: "Note",
+			sortInfo: {
+				field: "modifiedAt",
+				direction: "DESC"
+			}
 		});
 
 		Ext.apply(this, {		

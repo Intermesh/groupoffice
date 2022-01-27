@@ -303,7 +303,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		this.addFiles();
 		this.addHistory();
 
-		this.add(new go.detail.CreateModifyPanel());
+
 	},
 
 	onLoad: function () {
@@ -387,10 +387,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 									if(!success) {
 										Ext.MessageBox.alert(t("Error"), response.message);
 									} else {
-										var c = GO.email.showComposer(),b=response.blob;
-										c.on('dialog_ready', function() {
-											c.emailEditor.attachmentsView.addBlob(b);
-										},this,{single:true});
+										GO.email.showComposer({
+											blobs: [response.blob]
+										});
 									}
 								}
 							});
@@ -424,11 +423,12 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		}
 
 		var tbarCfg = {
+			xtype: "toolbar",
 			disabled: true,
 			items: items
 		};
 
-		return new Ext.Toolbar(tbarCfg);
+		return tbarCfg;
 
 	},
 

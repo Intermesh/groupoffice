@@ -92,24 +92,30 @@ GO.calendar.CalendarDialog = function(config)
 		]
 	});
 
-	if(go.Modules.isAvailable("legacy", "tasks"))
+	if(go.Modules.isAvailable("community", "tasks"))
 	{
 		this.tasklistsTab = new GO.base.model.multiselect.panel({
-      title:t("Visible tasklists", "tasks"),
-      url:'calendar/calendarTasklist',
-      columns:[{header: t("Title"), dataIndex: 'name'}],
-      fields:['id','name'],
-      model_id:0
-    });
+		  title:t("Visible tasklists", "tasks"),
+		  url:'calendar/calendarTasklist',
+		  columns:[{header: t("Title"), dataIndex: 'name'}],
+		  fields:['id','name'],
+		  model_id:0
+		});
 		
-		this.selectTasklist = new GO.form.ComboBoxReset({
-			fieldLabel:'CalDAV '+t("Tasklist", "tasks"),
-				store:new GO.data.JsonStore({
-				url: GO.url('tasks/tasklist/store'),
-				baseParams: {'permissionLevel': GO.permissionLevels.write},
-				fields:['id','name','user_name'],
-				remoteSort:true
-			}),
+		this.selectTasklist = new go.form.ComboBoxReset({
+			fieldLabel:'CalDAV '+t("Tasklist",'tasks', 'community'),
+			store: {
+				xtype: 'gostore',
+				fields: ['id','name','user_name'],
+				entityStore: 'Tasklist',
+				baseParams: {'permissionLevel': GO.permissionLevels.write}
+			},
+			// store:new GO.data.JsonStore({
+			// 	url: GO.url('tasks/tasklist/store'),
+			// 	baseParams: {'permissionLevel': GO.permissionLevels.write},
+			// 	fields:['id','name','user_name'],
+			// 	remoteSort:true
+			// }),
 			displayField: 'name',
 			valueField: 'id',
 			triggerAction:'all',
@@ -262,7 +268,7 @@ GO.calendar.CalendarDialog = function(config)
 
 	var items = [this.propertiesTab];
 	
-	if(go.Modules.isAvailable("legacy", "tasks"))
+	if(go.Modules.isAvailable("community", "tasks"))
 	{
 		items.push(this.tasklistsTab);
 	}
@@ -430,7 +436,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 	
 	loadCalendar : function(calendar_id)
 	{
-		if(go.Modules.isAvailable("legacy", "tasks"))
+		if(go.Modules.isAvailable("community", "tasks"))
 		{
 			this.tasklistsTab.setModelId(calendar_id);
 //			this.tasklistsTab.store.loaded = false;
@@ -470,7 +476,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 		if(this.resource && this.name.getValue() && !this.selectGroup.getValue()) {
 			Ext.MessageBox.alert(t("Error"), t("You have errors in your form. You need to select a group for this resource.", "calendar"));
 		} else {
-			var tasklists = (GO.tasks && !this.resource) ? Ext.encode(this.tasklistsTab.getGridData()) : '';
+			var tasklists = (go.Modules.isAvailable("legacy", "tasks") && !this.resource) ? Ext.encode(this.tasklistsTab.getGridData()) : '';
 		
 			this.formPanel.form.submit({
 				url:GO.url("calendar/calendar/submit"),
@@ -490,7 +496,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 					//this.loadAccount(this.calendar_id);
 					}
 
-					if(go.Modules.isAvailable("legacy", "tasks"))
+					if(go.Modules.isAvailable("community", "tasks"))
 					{
 						this.tasklistsTab.setModelId(action.result.id);
 						this.tasklistsTab.store.commitChanges();
@@ -530,7 +536,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 		f = this.formPanel.form.findField('show_bdays');
 		f.container.up('div.x-form-item').setDisplayed(!resource);
 
-		if(go.Modules.isAvailable("legacy", "tasks"))
+		if(go.Modules.isAvailable("community", "tasks"))
 		{
 			if(resource)
 			{

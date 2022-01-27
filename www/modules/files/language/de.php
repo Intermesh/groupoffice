@@ -32,7 +32,7 @@ return array (
   'New folder' => 'Neuer Ordner',
   'Folder display locked by owner/admin' => 'Ordneranzeige durch Besitzer/Administrator gesperrt',
   'The folder already exists' => 'Der Ordner ist bereits vorhanden',
-  'Filename %s already exists' => 'Dateiname existiert bereits',
+  'Filename %s already exists' => 'Dateiname %s existiert bereits',
   'File uploaded successfully' => 'Datei erfolgreich hochgeladen',
   'Open-Office Text document' => 'Open-Office-Textdokument',
   'Microsoft Word document' => 'Microsoft Word-Dokument',

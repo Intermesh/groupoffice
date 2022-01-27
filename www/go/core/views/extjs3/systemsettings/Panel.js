@@ -1,11 +1,24 @@
 
 go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
+
+	hasPermission: function() {
+		if(go.User.isAdmin) {
+			return true;
+		}
+		const module = go.Modules.get(this.package, this.module);
+		return module.userRights.mayManage;
+	},
+	
 	autoScroll: true,
 	afterRender: function() {
 		go.systemsettings.Panel.superclass.afterRender.call(this);
 		
+		this.loadSettings();
+	},
+
+	loadSettings: function() {
 		var module = go.Modules.get(this.package, this.module);
-		
+
 		if(!module.settings){
 			console.error("Could not load the settings for module: "+this.package+"/"+this.module+". Fields will be empty.");
 			return;

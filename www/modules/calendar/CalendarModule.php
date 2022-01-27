@@ -3,8 +3,12 @@
 
 namespace GO\Calendar;
 
+use Faker\Generator;
+use GO\Base\Model\User as GOUser;
+use GO\Base\Util\Date;
 use GO\Calendar\Model\Calendar;
 use GO\Calendar\Model\Event;
+use GO\Calendar\Model\Participant;
 use GO\Calendar\Model\UserSettings;
 use go\core\db\Criteria;
 use go\core\db\Query;
@@ -12,12 +16,14 @@ use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\Link;
+use go\core\model\Module as ModuleModel;
 use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\util\DateTime;
+use go\modules\community\comments\Module;
 
 class CalendarModule extends \GO\Base\Module{
 	
@@ -130,5 +136,133 @@ class CalendarModule extends \GO\Base\Module{
 			$cal->name = $user->displayName;
 			$cal->save(true);
 		}
+	}
+
+	public function demo(Generator $faker)
+	{
+		$users = User::find(['id', 'displayName', 'email'])->limit(10)->all();
+		$userCount = count($users) - 1;
+
+		$locations = ['Online', 'Office', 'Customer', ''];
+
+		foreach(GOUser::model()->find() as $user) {
+
+			$calendar = Calendar::model()->getDefault($user);
+
+			$calendar->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::READ_PERMISSION);
+
+			for($i = 0; $i < 20; $i++) {
+
+				$time = Date::date_add(Date::get_last_sunday(time()), $faker->numberBetween(1, 21));
+
+				$event = new Event();
+				$event->name = $faker->company;
+				$event->location = $locations[$faker->numberBetween(0, 3)];
+				$event->start_time = Date::clear_time($time, $faker->numberBetween(7,20));
+				$event->end_time = $event->start_time + 3600;
+				$event->user_id = $user->id;
+				$event->calendar_id = Calendar::model()->getDefault($user)->id;
+				$event->save();
+
+				$participant = new Participant();
+				$participant->is_organizer = true;
+				$participant->email = $user->email;
+				$participant->name = $user->displayName;
+				$participant->user_id = $user->id;
+				$event->addParticipant($participant);
+
+				$user2 = $users[$faker->numberBetween(0, $userCount)];
+				$user3 = $users[$faker->numberBetween(0, $userCount)];
+
+				if($user2->id != $user->id) {
+					$participant = new Participant();
+					$participant->email = $user2->email;
+					$participant->name = $user2->displayName;
+					$participant->user_id = $user2->id;
+					$event->addParticipant($participant);
+				}
+
+				if($user3->id != $user->id) {
+					$participant = new Participant();
+					$participant->email = $user3->email;
+					$participant->name = $user3->displayName;
+					$participant->user_id = $user3->id;
+					$event->addParticipant($participant);
+				}
+
+				if (ModuleModel::isInstalled("community", "comments")) {
+					Module::demoComments($faker, $event);
+				}
+
+				Link::demo($faker, $event);
+
+				echo ".";
+			}
+		}
+
+
+
+		$view = \GO\Calendar\Model\View::model()->findSingleByAttribute('name', \GO::t("Everyone"));
+		if(!$view) {
+			$view = new \GO\Calendar\Model\View();
+			$view->name = \GO::t("Everyone");
+			if ($view->save()) {
+				$view->addManyMany('groups', \GO::config()->group_everyone);
+
+				//share view
+				$view->acl->addGroup(\GO::config()->group_internal);
+			}
+		}
+
+
+		$view = \GO\Calendar\Model\View::model()->findSingleByAttribute('name', \GO::t("Everyone").' ('.\GO::t("Merge", "calendar").')');
+		if(!$view) {
+			$view = new \GO\Calendar\Model\View();
+			$view->name = \GO::t("Everyone") . ' (' . \GO::t("Merge", "calendar") . ')';
+			$view->merge = true;
+			$view->owncolor = true;
+			if ($view->save()) {
+				$view->addManyMany('groups', \GO::config()->group_everyone);
+
+				//share view
+				$view->acl->addGroup(\GO::config()->group_internal);
+			}
+		}
+
+
+		//resource groups
+		$resourceGroup = \GO\Calendar\Model\Group::model()->findSingleByAttribute('name', "Meeting rooms");
+		if(!$resourceGroup){
+			$resourceGroup = new \GO\Calendar\Model\Group();
+			$resourceGroup->name="Meeting rooms";
+			$resourceGroup->save();
+
+			//$resourceGroup->acl->addGroup(\GO::config()->group_internal);
+
+
+			//setup elmer as a resource admin
+			$resourceGroup->addManyMany('admins', $users[$faker->numberBetween(0, $userCount)]->id);
+
+		}
+
+		$resourceCalendar = \GO\Calendar\Model\Calendar::model()->findSingleByAttribute('name', 'Road Runner Room');
+		if(!$resourceCalendar){
+			$resourceCalendar = new \GO\Calendar\Model\Calendar();
+			$resourceCalendar->group_id=$resourceGroup->id;
+			$resourceCalendar->name='Road Runner Room';
+			$resourceCalendar->save();
+			$resourceCalendar->acl->addGroup(\GO::config()->group_internal);
+		}
+
+		$resourceCalendar = \GO\Calendar\Model\Calendar::model()->findSingleByAttribute('name', 'Don Coyote Room');
+		if(!$resourceCalendar){
+			$resourceCalendar = new \GO\Calendar\Model\Calendar();
+			$resourceCalendar->group_id=$resourceGroup->id;
+			$resourceCalendar->name='Don Coyote Room';
+			$resourceCalendar->save();
+			$resourceCalendar->acl->addGroup(\GO::config()->group_internal);
+		}
+
+
 	}
 }

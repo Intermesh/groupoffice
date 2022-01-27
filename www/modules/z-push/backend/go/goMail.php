@@ -80,7 +80,7 @@ class goMail extends GoBaseBackendDiff {
 	 * @param StringHelper $folderid
 	 * @param int $id
 	 * @param array $contentparameters
-	 * @return \SyncTask
+	 * @return \SyncMail
 	 */
 	public function GetMessage($folderid, $id, $contentparameters) {
 		//TODO: implement truncation
@@ -348,7 +348,7 @@ class goMail extends GoBaseBackendDiff {
 				if(!isset($body)) {
 					$inline = false;
 				} else{
-					$inline = $attachment->isInline() && strpos($body, $attachment->content_id) !== false;
+					$inline = $attachment->isInline() && !empty($attachment->content_id) && strpos($body, $attachment->content_id) !== false;
 				}
 
 				$attach->contentid = $inline ? $attachment->content_id : NULL;
@@ -964,6 +964,7 @@ class goMail extends GoBaseBackendDiff {
 			}
 			
 			ZLog::Write(LOGLEVEL_DEBUG, 'beforeloadmime');
+//			ZLog::Write(LOGLEVEL_DEBUG, var_export($sm->mime, true));
 			$sendMessage = \GO\Base\Mail\Message::newInstance()->loadMimeMessage($sm->mime);
 			
 			//free up memory

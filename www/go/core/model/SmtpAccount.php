@@ -6,6 +6,8 @@ use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\orm\EntityType;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
@@ -25,7 +27,7 @@ class SmtpAccount extends AclOwnerEntity {
   public $fromName;
   public $fromEmail;
  
-  protected static function defineMapping()
+  protected static function defineMapping(): Mapping
   {
     return parent::defineMapping()
     ->addTable('core_smtp_account', 'account');    
@@ -39,7 +41,8 @@ class SmtpAccount extends AclOwnerEntity {
     $this->moduleId = $module->id;
   }
 	
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 						->add('module', function (Criteria $criteria, $module){
               $module = Module::findByName($module['package'], $module['name']);
@@ -56,7 +59,7 @@ class SmtpAccount extends AclOwnerEntity {
 		$this->password = Crypt::encrypt($value);
 	}
 
-	protected static function textFilterColumns()
+	protected static function textFilterColumns(): array
 	{
 		return ['hostname', 'fromName', 'fromEmail'];
 	}

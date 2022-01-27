@@ -94,12 +94,13 @@
             var last = parts.pop();
 
             for(var i = 0, l = parts.length; i < l; i++) {
-                if(!traverse(obj, parts[i])) {
+                obj = traverse(obj, parts[i]);
+                if(!obj) {
                     return null;
                 }
             }
 
-            return traverse(obj, last, value);
+            return traverse(obj, last);
         }
     };
 

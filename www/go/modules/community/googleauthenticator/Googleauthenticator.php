@@ -31,7 +31,7 @@ class Googleauthenticator extends SecondaryAuthenticator {
 		return true;
 	}
 
-	public static function isAvailableFor($username) {
+	public static function isAvailableFor(string $username) :bool {
 		
 		$id = (new Query)
 						->selectSingleValue('id')

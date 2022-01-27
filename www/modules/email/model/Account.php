@@ -56,7 +56,7 @@ use League\OAuth2\Client\Provider\Google;
  * @property int $sieve_port
  * @property boolean $sieve_tls
  * @property boolean $sieve_usetls
- * @property int $default_client_id
+ * @property int $client_id
  */
 class Account extends \GO\Base\Db\ActiveRecord
 {
@@ -166,7 +166,10 @@ class Account extends \GO\Base\Db\ActiveRecord
 			}
 		}
 	}
-	
+
+	/**
+	 * @throws GO\Base\Mail\Exception\MailboxNotFound
+	 */
 	protected function beforeSave() {
 		if($this->isModified('password')){	
 			$encrypted = \GO\Base\Util\Crypt::encrypt($this->password);
@@ -307,7 +310,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 	
 
 	public function decryptPassword() {
-		if (!empty($this->default_client_id)) {
+		if (!empty($this->client_id)) {
 			return '';
 		}
 		if (!empty(GO::session()->values['emailModule']['accountPasswords'][$this->id])) {
@@ -431,7 +434,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Connect to the IMAP server without selecting a mailbox
 	 *
@@ -594,7 +597,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 		$imap = $this->openImapConnection();
 		
 		$folders = $imap->list_folders(true, $withStatus,'','*',true);
-		
+
 		$rootMailboxes = array();
 		
 		$mailboxModels =array();

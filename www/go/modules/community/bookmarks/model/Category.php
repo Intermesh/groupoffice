@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\bookmarks\model;
 use \go\core\acl\model\AclOwnerEntity;
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 
 /**
@@ -37,16 +38,19 @@ class Category extends AclOwnerEntity {
 	 */							
 	public $name;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("bookmarks_category", "category");
 	}
 
-	public static function getClientName() {
+	public static function getClientName(): string
+	{
 		return "BookmarksCategory";
 	}
 
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 		if(!Bookmark::delete(['categoryId' => $query])) {
 			return false;
 		}

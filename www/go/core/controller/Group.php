@@ -11,23 +11,29 @@ use go\core\jmap\EntityController;
 
 class Group extends EntityController {
 	
-	protected function canUpdate(Entity $entity) {
+	protected function canUpdate(Entity $entity): bool
+	{
 		
-		if(!go()->getAuthState()->isAdmin()) {
-			if($entity->isModified('groups')) {
-				return false;
-			}
-		}
-		
-		return parent::canUpdate($entity);
+		return $this->rights->mayChangeGroups;
 	}
-	
+
+	protected function canDestroy(Entity $entity): bool
+	{
+		return $this->rights->mayChangeGroups;
+	}
+
+	protected function canCreate(Entity $entity): bool
+	{
+		return $this->rights->mayChangeGroups;
+	}
+
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Group::class;
 	}
 

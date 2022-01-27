@@ -1,12 +1,16 @@
 <?php
 namespace go\core\jmap;
 
+use go\core\http\Response as HttpResponse;
+use go\core\util\ArrayObject;
+
 /**
  * JMAP Response object
  * 
  * Uses application/json and formats every method output according to the JSON spec.
  */
-class Response extends \go\core\http\Response {
+class Response extends HttpResponse
+{
 	
 	private $clientCallId;
 	
@@ -29,9 +33,9 @@ class Response extends \go\core\http\Response {
 	/**
 	 * Output a response
 	 * 
-	 * @param array $responseData eg. ['resultName, ['data']];
+	 * @param array|null|ArrayObject $responseData eg. ['resultName, ['data']];
 	 */
-	public function addResponse($responseData = null) {		
+	public function addResponse($responseData = null) {
 		$this->data[] = [$this->methodName,  $responseData, $this->clientCallId];
 		
 		if($this->methodName != "community/dev/Debugger/get") {
@@ -43,9 +47,9 @@ class Response extends \go\core\http\Response {
 	/**
 	 * Output an error
 	 * 
-	 * @param array $responseData eg. ['resultName, ['data']];
+	 * @param array|null $responseData eg. ['resultName, ['data']];
 	 */
-	public function addError($responseData = null) {		
+	public function addError(array $responseData = null) {
 		$this->data[] = ["error",  $responseData, $this->clientCallId];
 	}
 	
@@ -60,17 +64,19 @@ class Response extends \go\core\http\Response {
 	 * 
 	 * @return array
 	 */
-	public function getData() {
+	public function getData(): array
+	{
 		return $this->data;
 	}
-	
+
 	/**
-	 * The client call ID is passed by the router. It needs to be appended to 
+	 * The client call ID is passed by the router. It needs to be appended to
 	 * every response.
-	 * 
+	 *
+	 * @param string $methodName
 	 * @param string $clientCallId
 	 */
-	public function setClientCall($methodName, $clientCallId) {
+	public function setClientCall(string $methodName, string $clientCallId) {
 		$this->clientCallId = $clientCallId;
 		$this->methodName = $methodName;
 	}
@@ -81,6 +87,6 @@ class Response extends \go\core\http\Response {
 			$this->addResponse($data);
 		}
 	
-		return parent::output($this->data);
+		parent::output($this->data);
 	}
 }

@@ -126,7 +126,8 @@ $tools : (
  add: add,
  delete: delete,
  home: home,
- dismiss: delete_sweep
+ dismiss: delete_sweep,
+				menu: more_vert
 );
 .icon {@extend %icon;}
 
@@ -147,7 +148,6 @@ define icons with:
 	content: "description"
 }
 */
-
 
 .x-tool::before, .ux-row-action-item {
 	@extend %icon;
@@ -252,7 +252,7 @@ $btn-icon : (
 	x-edit-subscript: title,
 	x-edit-superscript: functions,
 	'go-edit-insertimage button': insert_photo,
-	//new 
+	//new
 );
 
 
@@ -332,7 +332,12 @@ $filetype: (
 }
 
 .filetype {
-	background-size: dp(24) dp(24);
+	display: inline-block;
+	min-height: dp(24);
+	min-width: dp(24);
+	vertical-align: middle;
+	background-size: contain;
+	background-position: center center;
 	background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 	background-repeat: no-repeat;
 	&-link {
@@ -340,10 +345,9 @@ $filetype: (
 		background-position: dp(8) dp(8);
 		background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 		background-repeat: no-repeat;
-		white-space: nowrap;		
+		white-space: nowrap;
 		line-height: dp(24);
 		padding: dp(8) dp(16) dp(8) dp(40);
-		display: inline-block;
 	}
 }
 
@@ -599,6 +603,7 @@ $material-icons : (
 	done_all,
 	donut_large,
 	donut_small,
+	download_for_offline,
 	drafts,
 	drag_handle,
 	drag_indicator,

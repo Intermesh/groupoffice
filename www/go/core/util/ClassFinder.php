@@ -9,6 +9,8 @@ use go\core\fs\Folder;
 use go\core\model\Module;
 use ReflectionClass;
 use go\core\fs\File;
+use ReflectionException;
+use Throwable;
 
 /**
  * Finds classes within Group-Office.
@@ -25,7 +27,8 @@ class ClassFinder {
 	 * 
 	 * @return string[]
 	 */
-	public static function getDefaultNamespaces() {		
+	public static function getDefaultNamespaces(): array
+	{
 		$ns = go()->getCache()->get("class-finder-default-namespaces");
 		
 		if($ns === null) {
@@ -50,7 +53,7 @@ class ClassFinder {
 	 * 
 	 * @param boolean $useDefaultNamespaces Load go\\core and all installed module namespaces
 	 */
-	public function __construct($useDefaultNamespaces = true) {
+	public function __construct(bool $useDefaultNamespaces = true) {
 		if($useDefaultNamespaces) {			
 			foreach(self::getDefaultNamespaces() as $namespace){
 				$this->addNamespace($namespace);
@@ -59,15 +62,14 @@ class ClassFinder {
 	}
 
 	private $namespaces = [];
-	private $allClasses;
 
 	/**
 	 * Add a namespace to search
-	 * 
+	 *
 	 * @param string $namespace
-	 * @param Folder $folder If not given it will use the installation root + namespace
+	 * @param Folder|null $folder If not given it will use the installation root + namespace
 	 */
-	public function addNamespace($namespace, Folder $folder = null) {		
+	public function addNamespace(string $namespace, Folder $folder = null) {
 		if(!isset($folder)) {
 			$folder = Environment::get()->getInstallFolder()->getFolder(str_replace('\\', '/', $namespace));
 		}		
@@ -79,11 +81,12 @@ class ClassFinder {
 	 * 
 	 * @param string[] Full class name without leading "\" eg. ["IFW\App"]
 	 */
-	public function find() {
+	public function find(): array
+	{
 		
 		go()->debug("ClassFinder find() used.");
 		
-		$this->allClasses = [];
+		$allClasses = [];
 		foreach ($this->namespaces as $namespace => $folder) {
 
 			$classesForNs = App::get()->getCache()->get('ns-classes-'.$namespace);
@@ -93,25 +96,28 @@ class ClassFinder {
 				App::get()->getCache()->set('ns-classes-'.$namespace, $classesForNs);
 			}
 
-			$this->allClasses = array_merge($this->allClasses, $classesForNs);
+			$allClasses = array_merge($allClasses, $classesForNs);
 		}
 
-		sort($this->allClasses);
+		sort($allClasses);
 		
-		return $this->allClasses;
+		return $allClasses;
 	}
 
 	/**
 	 * Find class names that are sub classes of the given class or implement this as an interface
-	 * 
+	 *
 	 * @param string $name Parent class name or interface eg. go\core\orm\Record::class
-	 * @param string[] Full class name eg. ["go\core\App"]
+	 * @return array
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
-	public function findByParent($name) {
+	public function findByParent(string $name): array
+	{
 		return $this->findBy(function($className) use ($name) {
-							$reflection = new ReflectionClass($className);
-							return !$reflection->isTrait()  && !$reflection->isInterface() && !$reflection->isAbstract() && ($reflection->isSubclassOf($name) || in_array($name, $reflection->getInterfaceNames()));
-						});
+			/** @noinspection PhpUnhandledExceptionInspection */
+			$reflection = new ReflectionClass($className);
+			return !$reflection->isTrait()  && !$reflection->isInterface() && !$reflection->isAbstract() && ($reflection->isSubclassOf($name) || in_array($name, $reflection->getInterfaceNames()));
+		});
 	}
 	
 	/**
@@ -120,7 +126,8 @@ class ClassFinder {
 	 * @param string $name Name of the trait eg. go\core\db\Searchable::class
 	 * @return string[] Full class name eg. ["go\core\App"]
 	 */
-	public function findByTrait($name) {
+	public function findByTrait(string $name): array
+	{
 		 return $this->findBy(function($className) use($name){
 			return in_array($name, class_uses($className));
 		});
@@ -128,14 +135,15 @@ class ClassFinder {
 
 	/**
 	 * Find class names by a closure function
-	 * 
+	 *
 	 * If you return true in the closure function it will be included in the results.
 	 * The closure funciton is called with the class name
-	 * 
+	 *
 	 * @param Closure $fn
-	 * @param string[] Full class name eg. ["go\core\App"]
+	 * @return array
 	 */
-	public function findBy(Closure $fn) {
+	public function findBy(Closure $fn): array
+	{
 		$classes = $this->find();
 
 		$r = [];
@@ -148,7 +156,8 @@ class ClassFinder {
 		return $r;
 	}
 
-	public static function canBeDecoded(File $file) {
+	public static function canBeDecoded(File $file): bool
+	{
 
 		if(go()->getEnvironment()->hasIoncube()) {
 			return true;
@@ -178,13 +187,15 @@ class ClassFinder {
 
 	}
 
-	public static function fileIsEncoded(File $file) {
+	public static function fileIsEncoded(File $file): bool
+	{
 		//Check if file is encoded
 		$data = $file->getContents(0, 20);
 		return strpos($data, '<?php //004fb') !== false;
 	}
 
-	private function folderToClassNames(Folder $folder, $namespace) {
+	private function folderToClassNames(Folder $folder, string $namespace): array
+	{
 		$classes = [];
 		foreach ($folder->getFiles() as $file) {
 
@@ -208,7 +219,7 @@ class ClassFinder {
 						continue;
 					}
 				}
-				catch(\Throwable $e) {
+				catch(Throwable $e) {
 					go()->debug("Class '$className' couldn't be loaded: " . $e->getMessage());
 					continue;
 				}

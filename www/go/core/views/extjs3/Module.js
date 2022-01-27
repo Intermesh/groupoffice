@@ -2,13 +2,21 @@ go.Modules.register("core", 'core', {
 	title: t("Core"),
 	entities: [
 		{
-			name: 'Group',
+			name: 'Alert',
 			relations: {
-				users: {store: "User", fk: "users"},
-				user: {store: "User", fk:'isUserGroupFor'}
+				user: {store: "UserDisplay", fk:'userId'}
 			}
 		},
-		'User', 
+		{
+			name: 'Group',
+			relations: {
+				users: {store: "UserDisplay", fk: "users"},
+				user: {store: "UserDisplay", fk:'isUserGroupFor'}
+			}
+		},
+
+		'User',
+		'UserDisplay',
 		'Field', 
 		{
 			name: 'FieldSet', 
@@ -157,11 +165,11 @@ GO.mainLayout.on('render', function () {
 	},false);
 
 
-	if(!GO.settings.config.debug) {
+	// if(!GO.settings.config.debug) {
 		window.onerror = function (message, source, lineno, colno, error) {
 			GO.errorDialog.show(t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
 		}
-	}
+	// }
 
 	window.addEventListener('unhandledrejection', function (event) {
 

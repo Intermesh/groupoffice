@@ -3,8 +3,12 @@
 namespace go\core\model;
 
 use Cron\CronExpression;
+use DateTime as CoreDateTime;
 use GO;
+use go\core\ErrorHandler;
 use go\core\jmap\Entity;
+use go\core\model\Module as ModuleModel;
+use go\core\orm\Mapping;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
@@ -46,11 +50,12 @@ class CronJobSchedule extends Entity {
 	
 	public $lastError;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()->addTable('core_cron_job');
 	}
 
-	public static function loggable()
+	public static function loggable(): bool
 	{
 		return false;
 	}
@@ -60,7 +65,7 @@ class CronJobSchedule extends Entity {
 
 		if (isset($this->expression) && !CronExpression::isValidExpression($this->expression)) {
 			$this->setValidationError('expression', ErrorCode::MALFORMED);
-			return false;
+			return;
 		}
 		
 		if($this->isModified('name')) {
@@ -90,21 +95,23 @@ class CronJobSchedule extends Entity {
 			$this->nextRunAt = null;
 		}
 
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
 	
-	private function getNextRunDate() {
+	private function getNextRunDate(): ?CoreDateTime
+	{
 
 		if (!isset($this->expression)) {
 			return null;
 		}
 		
-		$now = new \DateTime();
+		$now = new CoreDateTime();
 		$cronExpression = CronExpression::factory($this->expression);
 		return $cronExpression->getNextRunDate($now);
 	}
 	
-	public function getCronClass() {
+	public function getCronClass(): string
+	{
 		$module = Module::findById($this->moduleId);
 		
 		if($module->package == "core" && $module->name == "core") {
@@ -113,20 +120,21 @@ class CronJobSchedule extends Entity {
 		
 		return "go\\modules\\" . $module->package . "\\" . $module->name . "\\cron\\" . $this->name;
 	}
-	
-	
+
+
 	/**
 	 * Run the job or schedule it if it has not been scheduled yet.
+	 * @throws Exception
 	 */
 	public function run() {
 		//Set nextRun to null so it won't run more then once at a time
 		$this->nextRunAt = null;
 		//set runningSince to now
-		$this->runningSince = new \DateTime();
+		$this->runningSince = new CoreDateTime();
 		$this->lastError = null;
 
 		if (!$this->save()) {
-			throw new \Exception("Could not save CRON job");
+			throw new Exception("Could not save CRON job");
 		}
 		
 		$cls = $this->getCronClass();
@@ -138,18 +146,18 @@ class CronJobSchedule extends Entity {
 			$cron->run($this);
 			
 		} catch (Exception $ex) {			
-			$errorString = \go\core\ErrorHandler::logException($ex);		
+			$errorString = ErrorHandler::logException($ex);
 			echo $errorString . "\n";
 			$this->lastError = $errorString;
 		}
 
-		$this->lastRunAt = new \DateTime();
+		$this->lastRunAt = new CoreDateTime();
 		$this->runningSince = null;
 
 		$this->nextRunAt = $this->getNextRunDate();
 
 		if (!$this->save()) {
-			throw new \Exception("Could not save CRON job");
+			throw new Exception("Could not save CRON job");
 		}
 	}
 
@@ -162,8 +170,8 @@ class CronJobSchedule extends Entity {
 	 * @return bool true if a job was ran
 	 * @throws Exception
 	 */
-	public static function runNext() {
-
+	public static function runNext(): bool
+	{
 		$jobs = self::find()->where('enabled', '=', true)
 						->andWhere((new Criteria())
 							->andWhere('nextRunAt', '<=', new DateTime())
@@ -178,34 +186,28 @@ class CronJobSchedule extends Entity {
 			$job->run();
 		}
 		return true;
-
-//		if ($job) {
-//			$job->run();
-//
-//			return true;
-//		} else {
-//			go()->debug("No cron job to run a this time");
-//			return false;
-//		}
 	}
 
 	/**
 	 * Find crob job by name
 	 *
-	 * @param $name
+	 * @param string $name
 	 * @param string $package
 	 * @param string $module
-	 * @return CronJobSchedule|false
-	 * @throws Exception
+	 * @return ?CronJobSchedule
 	 */
-	public static function findByName($name, $package = "core", $module = "core") {
-		$module = \go\core\model\Module::findByName($package, $module);
+	public static function findByName(string $name, string $package = "core", string $module = "core"): ?CronJobSchedule
+	{
+		$module = ModuleModel::findByName($package, $module);
 
 		if(!$module) {
-			return false;
+			return null;
 		}
 
-		return static::find()->where('moduleId','=', $module->id)->andWhere('name', '=', $name)->single();
+		return static::find()
+			->where('moduleId','=', $module->id)
+			->andWhere('name', '=', $name)
+			->single();
 	}
 
 }

@@ -18,6 +18,12 @@ go.form.Dialog = Ext.extend(go.Window, {
 	buttonAlign: 'left',
 	layout: "fit",
 	showCustomfields:true,
+	showLinks: true,
+
+	/**
+	 * When the entity is modified by another user / process ask to load these changes
+	 */
+	loadExternalChanges: true,
 
 	/**
 	 * If set then the title bar will be appended with ": "+ value of the field.
@@ -80,7 +86,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		go.form.Dialog.superclass.initComponent.call(this);		
 		
-		if(this.entityStore.entity.links && this.entityStore.entity.links.length) {
+		if(this.showLinks && this.entityStore.entity.links && this.entityStore.entity.links.length) {
 			this.addCreateLinkButton();
 		}
 
@@ -138,7 +144,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 	
 	createFormPanel : function() {
-		
+
 		var items = this.initFormItems() || [];
 		
 		if(this.showCustomfields){
@@ -157,8 +163,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 		} else{
 			items = [this.mainPanel = new Ext.Panel({layout: this.formPanelLayout, autoScroll: true, items: items})];
 		}
-		
+
 		return new go.form.EntityPanel({
+			loadExternalChanges: this.loadExternalChanges,
 			entityStore: this.entityStore,
 			items: items,
 			layout: 'fit',
@@ -170,7 +177,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 		if(go.Entities.get(this.entityStore).customFields) {
 			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
 			fieldsets.forEach(function(fs) {
-				console.log(fs);
 				if(fs.fieldSet.isTab) {
 					fs.title = null;
 					fs.collapsible = false;
@@ -181,8 +187,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 						items: [fs]
 					});
 					this.addPanel(pnl);
-				}else
-				{
+				} else {
 					//in case formPanelLayout is set to column
 					fs.columnWidth = 1;
 					items.push(fs);

@@ -45,6 +45,8 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	
 	hideHeaders: true,
 
+	cls: 'go-multiselect-field',
+
 	constructor: function (config) {
 
 		config = config || {};
@@ -94,11 +96,11 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		
 		Ext.apply(config, {
 
-			bbar: {
-				items: [
+			bbar: [
 //					{xtype: "tbtitle", text: config.title},
 					{
 						iconCls: "ic-add",
+						cls: "primary-icon",
 						text: t("Add"),
 						handler: function () {
 
@@ -112,7 +114,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 						scope: this
 					}
 				]
-			},
+			,
 			store: new go.data.Store({
 				fields: fields
 			}),

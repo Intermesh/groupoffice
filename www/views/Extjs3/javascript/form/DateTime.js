@@ -353,7 +353,6 @@ Ext.ux.form.DateTime = Ext.extend(Ext.form.Field, {
      */
     ,getValue:function() {
         // create new instance of date
-        
         var v = this.dateValue ? go.util.Format.dateToBrowserTZ(new Date(this.dateValue)) : null;
         return v;
     } // eo function getValue
@@ -660,6 +659,9 @@ Ext.ux.form.DateTime = Ext.extend(Ext.form.Field, {
         this.updateDate();
         this.updateTime();
         this.updateHidden();
+
+        //otherwise initvalue will mess date conversion up
+        this.value = this.dateValue;
 
         return;
     } // eo function updateValue

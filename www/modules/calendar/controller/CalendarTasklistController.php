@@ -11,7 +11,7 @@ class CalendarTasklistController extends \GO\Base\Controller\AbstractMultiSelect
 	 * @return String 
 	 */
 	public function modelName() {
-		return 'GO\Tasks\Model\Tasklist';
+		return 'GO\Calendar\Model\TasklistCompat';
 	}
 	
 	/**

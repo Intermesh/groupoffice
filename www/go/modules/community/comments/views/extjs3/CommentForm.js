@@ -25,7 +25,44 @@ go.modules.comments.CommentForm = Ext.extend(go.form.Dialog, {
 					hideLabel: true,
 					anchor: '100%',
 					allowBlank: false,
-					grow: true
+					grow: true,
+					listeners: {
+						ctrlenter: function() {
+							this.sendBtn.handler.call(this);
+						},
+
+						attach: ( field, response, file, imgEl) => {
+							if(imgEl) {
+								return;
+							}
+
+							this.attachmentBox.setValue(this.attachmentBox.getValue().concat([{
+								blobId: response.blobId,
+								name: response.name
+							}]))
+
+							this.onSync()
+						},
+
+						scope: this
+					}
+				}),
+				this.attachmentBox = new go.form.FormGroup({
+					hideBbar: true,
+					name:"attachments",
+					startWithItem: false,
+					itemCfg : {
+						items: [{
+							hideLabel: true,
+							xtype: "plainfield",
+							name: "name",
+							submit: true
+						},{
+							hideLabel: true,
+							xtype: "hidden",
+							name: "blobId"
+						}]
+					}
 				})
 			]
 		}

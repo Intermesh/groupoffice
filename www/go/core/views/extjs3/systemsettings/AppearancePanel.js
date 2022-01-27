@@ -1,8 +1,12 @@
 go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
+	hasPermission: function() {
+		return go.User.isAdmin;
+	},
 	initComponent: function () {
 		var me = this;
 		Ext.apply(this, {
 			title: t('Appearance'),
+			itemId: "appearance", //makes it routable
 			autoScroll: true,
 			iconCls: 'ic-palette',
 			items: [{

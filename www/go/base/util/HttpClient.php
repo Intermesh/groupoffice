@@ -109,7 +109,7 @@ class HttpClient{
 	
 	public function readHeader($ch, $header){
 		if(preg_match('/([\w-]+): (.*)/i', $header, $matches))		
-			$this->lastHeaders[$matches[1]] = trim($matches[2]);
+			$this->lastHeaders[strtolower($matches[1])] = trim($matches[2]);
 		
 		return strlen($header);
 	}
@@ -118,7 +118,7 @@ class HttpClient{
 		$params = array_merge($this->baseParams, $params);
 		
 		$this->lastHeaders=array();
-		
+		curl_setopt($this->_curl, CURLOPT_HEADERFUNCTION, array($this,'readHeader'));
 		curl_setopt($this->_curl, CURLOPT_URL,$url);
 		curl_setopt($this->_curl, CURLOPT_POST, !empty($params));
 		if(!empty($params))
@@ -127,7 +127,7 @@ class HttpClient{
 	
 	public function getLastDownloadedFilename(){
 		
-		if(isset($this->lastHeaders['Content-Disposition']) && preg_match('/filename="(.*)"/', $this->lastHeaders['Content-Disposition'], $matches))
+		if(isset($this->lastHeaders['content-disposition']) && preg_match('/filename="(.*)"/', $this->lastHeaders['content-disposition'], $matches))
 			return $matches[1];
 		
 		$filename = \GO\Base\Fs\File::utf8Basename($this->_lastDownloadUrl);
@@ -157,8 +157,7 @@ class HttpClient{
 		
 
 		curl_setopt($this->_curl, CURLOPT_FILE, $fp);
-		
-		curl_setopt($this->_curl, CURLOPT_HEADERFUNCTION, array($this,'readHeader'));
+
 
 		
 		$response = curl_exec($this->_curl);

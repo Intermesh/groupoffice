@@ -1,7 +1,11 @@
 <?php
+
+use go\core\App;
 use go\core\ErrorHandler;
 use go\core\db\Table;
-use go\core\orm\Query;
+use go\core\event\EventEmitterTrait;
+use go\core\model\Module;
+use go\modules\business\studio\Module as StudioModule;
 
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
@@ -9,8 +13,12 @@ ini_set('implicit_flush', 1);
 try {
 	
 	require('../vendor/autoload.php');
-	\go\core\App::get();
-	\go()->setCache(new \go\core\cache\None());
+	App::get();
+	go()->setCache(new \go\core\cache\None());
+
+	// needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
+	// system.
+	EventEmitterTrait::$disableEvents = true;
 
 	require("gotest.php");
 	if(!systemIsOk()) {
@@ -23,7 +31,9 @@ try {
 		exit();
 	}
 
-
+	if(go()->getDatabase()->hasTable("studio_studio")) {
+		$studioError = StudioModule::patch65to66();
+	}
 
 	require('header.php');
 
@@ -43,6 +53,11 @@ try {
 	if (!isset($_GET['confirmed'])) {
 	
 		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><p>";
+
+		if(isset($studioError)) {
+			echo '<p class="error">'.$studioError.'</p>';
+		}
+
 		echo "Please <b>BACKUP</b> your database and files before proceeding. Your database is going to be upgraded and all caches will be cleared.<br />This operation can only be undone by restoring a backup.<br />";
 		
 		echo 'More details about this upgrade can be found in the <a target="_blank" href="https://github.com/Intermesh/groupoffice/blob/master/CHANGELOG.md">change log</a>.<br /><br />';
@@ -63,6 +78,10 @@ try {
 	
 		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2>";
 
+		if(isset($studioError)) {
+			echo '<p class="error">'.$studioError.'</p>';
+		}
+
 		echo "<p>The following modules are not available because they're missing on disk\n"
 		. "or you've got an <b>invalid or missing license file</b>: </p>"
 		. "<ul><li>" . implode("</li><li>", array_map(function($a){return ($a['package'] ?? "legacy") .'/'.$a['name'];}, $unavailable)) . "</li></ul>\n"
@@ -79,6 +98,11 @@ try {
 
 		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><pre>";
 
+		if(isset($studioError)) {
+			echo '<p class="error">'.$studioError.'</p>';
+		}
+
+		EventEmitterTrait::$disableEvents = false;
 		go()->getInstaller()->upgrade();	
 
 		echo "</pre>";
@@ -97,7 +121,7 @@ try {
 		echo '<div id="success"></div>';
 
 	} 
-} catch (Exception $e) {
+} catch (Throwable $e) {
 	
 	echo "<b>Error:</b> ". ErrorHandler::logException($e)."\n\n";
 	

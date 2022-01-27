@@ -23,7 +23,7 @@ use GO;
 use GO\Base\Db\ActiveRecord;
 use GO\Base\Util\StringHelper;
 use GO\Calendar\Model\Calendar;
-use GO\Tasks\Model\Tasklist;
+
 
 
 /**
@@ -73,25 +73,25 @@ class DavTask extends ActiveRecord {
 		
 		return;
 
-		$tasklist = \GO\Tasks\Model\Tasklist::model()->findByPk($this->tasklistId);		
-		
-		$calendars = Calendar::model()->findByAttribute('tasklist_id', $this->tasklistId);
-		
-		foreach($calendars as $calendar) {
-			$version = $tasklist->version+$calendar->version;
-
-
-			$objectUri = $this->uri;
-			$stmt = GO::getDbConnection()->prepare('INSERT INTO dav_calendar_changes (uri, synctoken, calendarid, operation) VALUES (?, ?, ?, ?)');
-			$stmt->execute([
-					$objectUri,
-					$version,
-					$calendar->id,
-					$operation
-
-			]);
-		}
-		Tasklist::versionUp($calendar->tasklist_id);
+////		$tasklist = \GO\Tasks\Model\Tasklist::model()->findByPk($this->tasklistId);
+//
+//		$calendars = Calendar::model()->findByAttribute('tasklist_id', $this->tasklistId);
+//
+//		foreach($calendars as $calendar) {
+//			$version = $tasklist->version+$calendar->version;
+//
+//
+//			$objectUri = $this->uri;
+//			$stmt = GO::getDbConnection()->prepare('INSERT INTO dav_calendar_changes (uri, synctoken, calendarid, operation) VALUES (?, ?, ?, ?)');
+//			$stmt->execute([
+//					$objectUri,
+//					$version,
+//					$calendar->id,
+//					$operation
+//
+//			]);
+//		}
+//		Tasklist::versionUp($calendar->tasklist_id);
 	}
 
 }

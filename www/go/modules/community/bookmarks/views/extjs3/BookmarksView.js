@@ -27,10 +27,8 @@ go.modules.community.bookmarks.BookmarksView = Ext.extend(Ext.Panel,{
                 '<tpl if="this.is_new_category(values.category.id,xindex,xcount)">', 
                     '<div style="clear:both"></div><h3 class="categorie">{values.category.name} </h3>',
                 '</tpl>',
-                '<div class="thumb-wrap">',
-                '<div class="thumb">',
-                '<div class="thumb-name" style="background-image:url(' + go.Jmap.downloadUrl('{logo}') + ')"><h4>{name}</h4>{[Ext.util.Format.nl2br(values.description)]}</div>',
-                '</div>',	'</div>',
+                '<div class="thumb-wrap" style="background-image:url(' + go.Jmap.downloadUrl('{logo}') + ')"><h4>{name}</h4><p>{[Ext.util.Format.nl2br(values.description)]}</p></div>',
+
                 '</tpl>',
                 {
                     // switchen van categorie

@@ -17,7 +17,7 @@ class LogEntryTest extends TestCase {
 
 		//Directly access by offset
 		for($i = 0; $i < 10000; $i++) {
-			$entity->hasMany[$i] = new AHasMany();
+			$entity->hasMany[$i] = new AHasMany($entity);
 			$entity->hasMany[$i]->propOfHasManyA = "string 5";
 		}
 

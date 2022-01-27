@@ -78,7 +78,7 @@ abstract class ImapBase {
 					$valid = true;
 				}
 				break;
-			case 'uid_list';				
+			case 'uid_list';
 				if (preg_match("/^(?:\d+:\d+|\*:\d+|\d+:\*|\d+)(?:,(?:\d+:\d+|\*:\d+|\d+:\*|\d+))*$/", $val)) {
 					$valid = true;
 				}
@@ -307,7 +307,7 @@ abstract class ImapBase {
 			}
 		}
 
-		\GO::debug($result); // TODO: Recomment this out!
+		// \GO::debug($result); // TODO: Recomment this out!
 		return $result;
 	}
 	/* increment the imap command prefix such that it counts

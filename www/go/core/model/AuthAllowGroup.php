@@ -3,6 +3,7 @@ namespace go\core\model;
 
 use Exception;
 use go\core\jmap\Entity;
+use go\core\orm\Mapping;
 
 /**
  * The Acl class
@@ -32,7 +33,7 @@ class AuthAllowGroup extends Entity
    */
   public $ipPattern;
 
-  protected static function defineMapping()
+  protected static function defineMapping(): Mapping
   {
     return parent::defineMapping()
       ->addTable('core_auth_allow_group', 'ag');

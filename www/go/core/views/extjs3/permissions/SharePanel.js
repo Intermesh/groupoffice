@@ -152,6 +152,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					width: dp(260),
 					hidden: !this.showLevels,
 					hideable: false,
+					sortable: false,
 					renderer:function(v, meta){
 						if(!me.showLevels) {
 							return "";
@@ -160,10 +161,10 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 						meta.style="position:relative";
 						return r ? r.get('text') + "<i class='trigger'>arrow_drop_down</i></div>" : v;
 					},
-					sortable: true
 				},
 				checkColumn,
 				{
+					sortable: false,
 					width: dp(64),
 					dataIndex: "id",
 					renderer: function() {

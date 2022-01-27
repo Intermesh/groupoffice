@@ -1,6 +1,7 @@
 <?php
 namespace go\core\model;
 						
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 						
 /**
@@ -52,7 +53,8 @@ class EmailTemplateAttachment extends Property {
    */
   public $attachment;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("core_email_template_attachment", "attachment");
 	}

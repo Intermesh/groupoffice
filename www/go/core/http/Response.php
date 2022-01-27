@@ -3,6 +3,8 @@
 namespace go\core\http;
 
 use DateTime;
+use DateTime as CoreDateTime;
+use Exception as CoreException;
 use go\core\http;
 use go\core\jmap\ProblemDetails;
 use go\core\jmap\SetError;
@@ -40,11 +42,11 @@ use go\core\webclient\CSP;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class Response extends Singleton{
-	
+
 //	public function __construct() {
 //		$this->setHeader('Cache-Control', 'private');
 //		$this->removeHeader('Pragma');
-//		
+//
 //		$this->setHeader('Access-Control-Allow-Origin', '*');
 //		$this->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
 //		$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization, X-XSRFToken');
@@ -74,7 +76,7 @@ class Response extends Singleton{
 	/**
 	 * The modified at header
 	 * 
-	 * @var \DateTime 
+	 * @var CoreDateTime
 	 */
 	private $modifiedAt;
 	
@@ -91,6 +93,9 @@ class Response extends Singleton{
 
 	private $cspNonce;
 
+	/**
+	 * @throws CoreException
+	 */
 	public function getCspNonce() {
 		if(!isset($this->cspNonce)) {
 			$this->cspNonce = hash("sha256", random_bytes(16));
@@ -110,7 +115,8 @@ class Response extends Singleton{
 	 * @param string|StringUtil[] $value
 	 * @return $this
 	 */
-	public function setHeader($name, $value) {
+	public function setHeader(string $name, $value): Response
+	{
 		$lcname = strtolower($name);
 
 		if (!is_array($value)) {
@@ -128,7 +134,8 @@ class Response extends Singleton{
 	 * @param string $name
 	 * @return $this;
 	 */
-	public function removeHeader($name) {
+	public function removeHeader(string $name): Response
+	{
 
 		$name = strtolower($name);
 
@@ -142,11 +149,11 @@ class Response extends Singleton{
 
 	/**
 	 * Get the header value
-	 * 
+	 *
 	 * @param string $name
-	 * @param string[]
+	 * @return mixed|null
 	 */
-	public function getHeader($name) {
+	public function getHeader(string $name) {
 		$name = strtolower($name);
 
 		if (!isset($this->headers[$name])) {
@@ -162,7 +169,8 @@ class Response extends Singleton{
 	 * @param $name
 	 * @return bool
 	 */
-	public function hasHeader($name) {
+	public function hasHeader($name): bool
+	{
 		$name = strtolower($name);
 
 		return isset($this->headers[$name]);
@@ -174,7 +182,7 @@ class Response extends Singleton{
 	 * @param int $httpCode
 	 * @param string|null $text Status text. May not contain new lines in headers.
 	 */
-	public function setStatus($httpCode, string $text = null) {
+	public function setStatus(int $httpCode, string $text = null) {
 
 		if (!isset($text)) {
 			$text = http\Exception::$codes[$httpCode];
@@ -189,7 +197,7 @@ class Response extends Singleton{
 	 * 
 	 * @param string $url
 	 */
-	public function redirect($url) {
+	public function redirect(string $url) {
 		$this->setHeader('location', $url);
 		exit();
 	}
@@ -210,7 +218,7 @@ class Response extends Singleton{
 	 * 
 	 * @param string $etag
 	 */
-	public function setETag($etag) {
+	public function setETag(string $etag) {
 		$this->etag = $etag;
 		$this->setHeader('ETag', $this->etag);
 	}
@@ -219,7 +227,25 @@ class Response extends Singleton{
 		$this->setHeader("Expires", $expires->format('D, d M Y H:i:s'));
 	}
 
-	public function setCookie($name, $value, $options = []) {
+	/**
+	 * Set cookie
+	 *
+	 * @param string $name
+	 * @param string $value
+	 * @param array $options eg.
+	 *
+	 * ```
+	 * [
+	 * 'expires' => $this->expiresAt->format("U"),
+	 * "path" => "/",
+	 * "samesite" => "Lax",
+	 * "domain" => Request::get()->getHost(),
+	 * "httpOnly" => true
+	 * ]
+	 * ```
+	 *
+	 */
+	public function setCookie(string $name, string $value, array $options = []) {
 
 		if(version_compare(phpversion(), "7.3.0") > -1) {
 			setcookie($name, $value, $options);
@@ -246,14 +272,15 @@ class Response extends Singleton{
 	 * 
 	 * @return boolean
 	 */
-	public function isCached() {
+	public function isCached(): bool
+	{
 
 		if(!$this->enableCache) {
 			return false;
 		}
 		
 		//get the HTTP_IF_MODIFIED_SINCE header if set
-		$ifModifiedSince = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? $_SERVER['HTTP_IF_MODIFIED_SINCE'] : false;
+		$ifModifiedSince = $_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? false;
 		//get the HTTP_IF_NONE_MATCH header if set (etag: unique file hash)
 		$etagHeader = isset($_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH']) : false;
 
@@ -270,7 +297,20 @@ class Response extends Singleton{
 		}
 	}
 
+	protected function sendCorsHeaders() {
+		$origins = go()->getSettings()->getCorsAllowOrigin();
+		if(!empty($origins) && isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $origins)) {
+			$this->setHeader('Access-Control-Allow-Origin', $_SERVER['HTTP_ORIGIN']);
+			$this->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
+			$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization, X-File-Name, X-File-LastModified');
+			$this->setHeader('Access-Control-Max-Age', "1728000");
+			$this->setHeader('Access-Control-Allow-Credentials', 'true');
+		}
+	}
+
 	protected function sendSecurityHeaders() {
+
+		$this->sendCorsHeaders();
 
 		$frameAncestors = go()->getConfig()['frameAncestors'];
 
@@ -286,9 +326,8 @@ class Response extends Singleton{
 	}
 
 	public function sendHeaders() {		
-		foreach ($this->headers as $name => $h) {			
-			foreach ($h[1] as $v) {
-				// go()->debug($h[0] . ': '. $v);
+		foreach ($this->headers as $h) {
+			foreach ($h[1] as $v) {				// go()->debug($h[0] . ': '. $v);
 				header($h[0] . ': ' . $v);
 			}
 		}		
@@ -297,7 +336,7 @@ class Response extends Singleton{
 	/**
 	 * Output headers and body
 	 * 
-	 * @param string $data
+	 * @param string|array|null $data
 	 */
 	public function output($data = null) {
 		if (isset($data)) {
@@ -309,7 +348,7 @@ class Response extends Singleton{
 				try {
 					$data = JSON::encode($data);
 
-				} catch(\Exception $e) {
+				} catch(CoreException $e) {
 					$error = new ProblemDetails(SetError::ERROR_SERVER_FAIL, 500, $e->getMessage());
 					$data = JSON::encode($error);
 				}

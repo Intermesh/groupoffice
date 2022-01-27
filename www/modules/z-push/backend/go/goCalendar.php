@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUndefinedFieldInspection */
 
 class goCalendar extends GoBaseBackendDiff {
 
@@ -421,6 +421,10 @@ class goCalendar extends GoBaseBackendDiff {
 			if (!empty($message->recurrence->until))
 				$event->repeat_end_time = $message->recurrence->until;
 			$event->rrule = GoSyncUtils::importRecurrence($message->recurrence, $event->start_time);
+
+			ZLog::Write(LOGLEVEL_DEBUG, "RRULE: " . $event->rrule);
+		} else{
+			ZLog::Write(LOGLEVEL_DEBUG, "NO RECURRENCE");
 		}
 		
 		$new = $event->isNew;

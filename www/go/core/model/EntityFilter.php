@@ -3,7 +3,10 @@ namespace go\core\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
-						
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
+use go\core\orm\Query;
+
 /**
  * EntityFilter model
  *
@@ -36,7 +39,8 @@ class EntityFilter extends AclOwnerEntity {
 
 	public $type = "fixed";
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable("core_entity_filter", 'f');
 	}
@@ -57,7 +61,8 @@ class EntityFilter extends AclOwnerEntity {
 		$this->entityTypeId = \go\core\orm\EntityType::findByName($name)->getId();
 	}
 
-	protected static function defineFilters() {
+	protected static function defineFilters(): Filters
+	{
 		return parent::defineFilters()
 			->add('entity', function (Criteria $criteria, $value, \go\core\orm\Query $query){
 				$query->join('core_entity', 'e', 'e.id = f.entityTypeId');
@@ -69,7 +74,7 @@ class EntityFilter extends AclOwnerEntity {
 			});
 	}
 
-	public static function sort(\go\core\orm\Query $query, array $sort)
+	public static function sort(\go\core\orm\Query $query, array $sort): Query
 	{
 		if(empty($sort)) {
 			$sort['name'] = 'ASC';

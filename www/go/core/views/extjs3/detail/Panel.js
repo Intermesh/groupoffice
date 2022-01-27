@@ -39,6 +39,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	
 	entityStore: null,
 
+	width: dp(500),
+
 	initComponent: function () {
 		go.detail.Panel.superclass.initComponent.call(this, arguments);			
 
@@ -69,13 +71,10 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		}
 
 		if(entityStore.entity.name === this.entityStore.entity.name) {
-			var entity = added[this.currentId] || changed[this.currentId] || false;
 
-			if(entity) {
-				this.internalLoad(entity);
-			}
-
-			if (destroyed.indexOf(this.currentId) > -1) {
+			if(changed.indexOf(this.currentId) > -1) {
+				this.reload();
+			} else if (destroyed.indexOf(this.currentId) > -1) {
 				this.reset();
 			}
 			return;
@@ -84,12 +83,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			return;
 		}
 
-		for(var id in changed) {
-			if(this.watchRelations[entityStore.entity.name].indexOf(changed[id].id) > -1) {
+		changed.forEach((id) => {
+			if(this.watchRelations[entityStore.entity.name].indexOf(id) > -1) {
 				this.internalLoad(this.data);
 				return;
 			}
-		}
+		});
 	},
 	
 	// listen to relational stores as well
@@ -160,7 +159,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	},
 
 	reload: function () {
-		var id = this.currentId;
+		const id = this.currentId;
 		this.currentId = null;
 		this.load(id);
 	},
@@ -179,31 +178,29 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 		this.data = data;
 
-		var me = this;
-		
 		if(!this.relations.length) {
 			this.onLoad();
 			this.fireEvent('load', this);
 			return Promise.resolve(data);
 		}	
 		
-		return go.Relations.get(me.entityStore, data, this.relations).then(function(result) {
-			me.watchRelations = result.watch;
+		return go.Relations.get(this.entityStore, data, this.relations).then((result) => {
+			this.watchRelations = result.watch;
 			return data;
-		}).catch(function(result) {
+		}).catch((result) => {
 			console.warn("Failed to fetch relation", result);
-		}).finally(function() {
-			me.onLoad();
-			me.fireEvent('load', me);
+		}).finally(() => {
+			this.onLoad();
+			this.fireEvent('load', this);
 		});
 		
 	},
 
 	load: function (id) {
-		var me = this;
+
 		if(this.loading) {
-			return this.loading.then(function() {
-				return me.load(id);
+			return this.loading.then(() => {
+				return this.load(id);
 			});
 		}
 
@@ -212,19 +209,19 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		}
 
 		this.currentId = id;
-		this.loading = this.entityStore.single(id).then(function(entity) {
+		this.loading = this.entityStore.single(id).then((entity) => {
 			try {
-				return me.internalLoad(entity);
+				return this.internalLoad(entity);
 			} catch (e) {
 				Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + e.message);
 				console.error(e);
 				return Promise.reject(e);
 			}
-		}).catch(function(e) {
+		}).catch((e) => {
 			console.error(e);
 			Ext.MessageBox.alert(t("Error"), e.error);
-		}).finally(function() {
-			me.loading = false;
+		}).finally(() => {
+			this.loading = false;
 		});
 
 		return this.loading;
@@ -251,6 +248,9 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	addHistory : function() {
 		if (go.Modules.isAvailable("community", "history")) {
 			this.add(new go.modules.community.history.HistoryDetailPanel());
+		} else
+		{
+			this.add(new go.detail.CreateModifyPanel());
 		}
 	},
 });

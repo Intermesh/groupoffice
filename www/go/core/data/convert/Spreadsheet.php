@@ -9,6 +9,7 @@ use go\core\fs\File;
 use go\core\model\Acl;
 use go\core\model\Field;
 use go\core\orm\Entity;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\Relation;
@@ -103,7 +104,7 @@ class Spreadsheet extends AbstractConverter {
 	/**
 	 * @inheritDoc
 	 */
-	public static function supportedExtensions()
+	public static function supportedExtensions(): array
 	{
 		return ['csv', 'xlsx'];
 	}
@@ -123,7 +124,7 @@ class Spreadsheet extends AbstractConverter {
 		static::fireEvent(static::EVENT_INIT, $this);
 	}
 
-	protected function initExport()
+	protected function initExport(): void
 	{
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
@@ -159,13 +160,14 @@ class Spreadsheet extends AbstractConverter {
 		}
 	}
 
-	protected function exportEntity(Entity $entity) {
+	protected function exportEntity(Entity $entity): void
+	{
 
 		if ($this->index == 0) {
-			$this->writeRecord(array_column($this->getHeaders($entity), 'name'));
+			$this->writeRecord(array_column($this->getHeaders(), 'name'));
 		}
 
-		$headers = $this->getHeaders($entity);
+		$headers = $this->getHeaders();
 		//set custom fields to text mode
 		if(property_exists($entity, "returnAsText")) {
 			$entity->returnAsText = true;
@@ -181,7 +183,7 @@ class Spreadsheet extends AbstractConverter {
 	}
 
 
-	protected function finishExport()
+	protected function finishExport(): Blob
 	{
 		if($this->extension != 'csv') {
 
@@ -214,7 +216,7 @@ class Spreadsheet extends AbstractConverter {
 		$blob = Blob::fromTmp($this->tempFile);
 		$blob->name = $cls::entityType()->getName() . "-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
 		if(!$blob->save()) {
-			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+			throw new SaveException($blob);
 		}
 
 		return $blob;
@@ -459,7 +461,7 @@ class Spreadsheet extends AbstractConverter {
 			return $headers;
 		}
 
-		$cls = $prop->entityName;
+		$cls = $prop->propertyName;
 		$properties = $cls::getMapping()->getProperties();
 
 		//Don't add multiple columns for has many if we need the headers for mapping
@@ -519,7 +521,7 @@ class Spreadsheet extends AbstractConverter {
 
     return go()->getDbConnection()
       ->selectSingleValue('coalesce(count(*), 0) AS count')
-      ->from($relation->entityName::getMapping()->getPrimaryTable()->getName(), 't')
+      ->from($relation->propertyName::getMapping()->getPrimaryTable()->getName(), 't')
       ->where($fk, 'IN', $entitiesSub)
       ->groupBy(['t.' . $fk])
       ->orderBy(['count' => 'DESC'])
@@ -541,7 +543,7 @@ class Spreadsheet extends AbstractConverter {
 
 
 
-	protected function initImport(File $file)
+	protected function initImport(File $file): void
 	{
 		if($this->extension == 'csv') {
 			$this->fp = $file->open('r');
@@ -560,7 +562,7 @@ class Spreadsheet extends AbstractConverter {
 
 	protected $record;
 
-	protected function nextImportRecord()
+	protected function nextImportRecord(): bool
 	{
 		if($this->index == 0) {
 			//skip headers
@@ -605,7 +607,7 @@ class Spreadsheet extends AbstractConverter {
 		}
 	}
 
-	protected function finishImport()
+	protected function finishImport(): void
 	{
 		if($this->extension == 'csv') {
 			fclose($this->fp);
@@ -626,7 +628,7 @@ class Spreadsheet extends AbstractConverter {
 			return false;
 		}
 
-		$values = $this->convertRecordToProperties($this->record, $this->clientParams['mapping'], $this->getEntityMapping($this->entityClass));
+		$values = $this->convertRecordToProperties($this->record, $this->clientParams['mapping'], $this->getEntityMapping());
 		if(!$values) {
 			return false;
 		}

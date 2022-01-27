@@ -8,7 +8,7 @@ use go\core\db\Query;
 
 /**
  * Class PushDispatcher
- * This is use by the sse.php endpoint.
+ * This is used by the sse.php endpoint.
  * It dispatches server sent events to the client
  * It fires an 'interval' event every time it checks for updates
  * @package go\core\model
@@ -73,29 +73,6 @@ class PushDispatcher
 		return $state;
 	}
 
-	private function checkAlert() {
-		// find the alerts that are half an interval before or after NOW()
-		$halfInterval = new \DateInterval('PT'.round($this->interval/2).'S');
-
-		$start = new \go\core\util\DateTime();
-		$end = new \go\core\util\DateTime();
-
-		$start->sub($halfInterval);
-		$end->add($halfInterval);
-
-		$alerts = Alert::find()->where('userId','=', go()->getUserId())
-			->andWhere('triggerAt', '>', $start)
-			->andWhere('triggerAt', '<', $end)->all();
-
-		//$this->sendMessage('test', ['alerts'=>$alerts, 'start'=>$start, 'end'=>$end]);
-		foreach($alerts as $alert) {
-			$data = $alert->toArray();
-			$data['entityType'] = $this->entityTypes[$alert->entityTypeId];
-			unset($data['enittyTypeId']);
-			$this->sendMessage('alert', $data);
-			// delete alert here and remove the triggerAt end time??
-		}
-	}
 
 	private function diff($old, $new) {
 
@@ -134,8 +111,6 @@ class PushDispatcher
 				$this->sendMessage('state', $diff);
 				$changes = $new;
 			}
-
-			$this->checkAlert();
 
 			self::fireEvent(self::EVENT_INTERVAL, $this);
 

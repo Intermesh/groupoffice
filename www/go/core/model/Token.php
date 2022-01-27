@@ -4,13 +4,15 @@ namespace go\core\model;
 use DateInterval;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
+use go\core\cron\GarbageCollection;
 use go\core\Environment;
-use go\core\auth\Method;
+use go\core\orm\Mapping;
+use stdClass;
 use go\core\http\Request;
+use go\core\http\Response;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
-use go\core\model\Module;
 
 class Token extends Entity {
 	
@@ -94,7 +96,7 @@ class Token extends Entity {
 	 * 
 	 * @link http://php.net/manual/en/dateinterval.construct.php
 	 */
-	const LIFETIME = 'P7D';
+	const LIFETIME = 'PT30M';
 	
 	/**
 	 * A date interval for the login lifetime of a token
@@ -103,7 +105,8 @@ class Token extends Entity {
 	 */
 	const LOGIN_LIFETIME = 'PT10M';
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 		->addTable('core_auth_token', 'token');
 	}
@@ -126,7 +129,7 @@ class Token extends Entity {
 	}
 
 	public function activity() {
-		if($this->lastActiveAt < new \DateTime("-5 mins")) {
+		if($this->lastActiveAt < new \DateTime("-1 mins")) {
 			$this->lastActiveAt = new \DateTime();
 
 			//also refresh token
@@ -134,7 +137,13 @@ class Token extends Entity {
 				$this->setExpiryDate();
 			}
 			$this->internalSave();
+
+			go()->getCache()->set('token-' . $this->accessToken, $this);
+
+			return true;
 		}
+
+		return false;
 	}
 	
 	/**
@@ -273,8 +282,6 @@ class Token extends Entity {
 		
 		// For backwards compatibility, set the server session for the old code
 		$this->oldLogin();
-
-		$this->classPermissionLevels = [];
 
 		User::fireEvent(User::EVENT_LOGIN, $user);
 		
@@ -417,6 +424,13 @@ class Token extends Entity {
 		return $response;
 	}
 
+	/**
+	 * Called by GarbageCollection cron job
+	 *
+	 * @see GarbageCollection
+	 * @return bool
+	 * @throws \Exception
+	 */
 	public static function collectGarbage() {
 		return static::delete(
 			(new Query)
@@ -424,45 +438,64 @@ class Token extends Entity {
 				->andWhere('expiresAt', '<', new DateTime()));
 	}
 
-	protected static function internalDelete(\go\core\orm\Query $query)
+	protected static function internalDelete(\go\core\orm\Query $query): bool
 	{
 		foreach(self::find()->mergeWith($query)->selectSingleValue('accessToken') as $accessToken) {
 			go()->getCache()->delete('token-' . $accessToken);
+
+			Response::get()->setCookie('accessToken', "", [
+				'expires' => time() - 3600,
+				"path" => "/",
+				"samesite" => "Lax",
+				"domain" => Request::get()->getHost()
+			]);
+
 		}
 
 		return parent::internalDelete($query);
 	}
 
-
-
-	private $classPermissionLevels = [];
-
 	/**
 	 * Get the permission level of the module this controller belongs to.
-	 * 
-	 * @return int
+	 *
+	 * @todo: improve performance by cache rights per user?
+	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
 	 */
-	public function getClassPermissionLevel($cls) {
-		if(!isset($this->classPermissionLevels[$cls])) {
-			$mod = Module::findByClass($cls, ['aclId', 'permissionLevel']);
-			$this->classPermissionLevels[$cls]= $mod->getPermissionLevel();	
-			go()->getCache()->set('token-'.$this->accessToken,$this);		
-		}
+	public function getClassRights($cls)
+	{
+		//if(!isset($this->classRights[$cls])) {
+			$mod = Module::findByClass($cls, ['id', 'name', 'package']);
+			return  $mod->getUserRights();
+//			$this->classRights[$cls]= $mod->getUserRights();
+//			go()->getCache()->set('token-'.$this->accessToken,$this);
+		//}
 
-		return $this->classPermissionLevels[$cls];
+		//return $this->classRights[$cls];
 	}
 
 
 	/**
 	 * Destroys all tokens except
+	 *
 	 * @return bool
 	 * @throws \Exception
 	 */
 	public static function logoutEveryoneButAdmins() {
 		$admins = (new Query)->select('userId')->from('core_user_group')->where('groupId', '=', Group::ID_ADMINS);
-		return self::delete((new Query)
+		$q = (new Query)
 			->where('expiresAt', '!=', null)
-			->where('userId', 'NOT IN ', $admins));
+			->where('userId', 'NOT IN ', $admins);
+
+		return self::delete($q) && RememberMe::delete($q);
+	}
+
+	public function setCookie() {
+		Response::get()->setCookie('accessToken', $this->accessToken, [
+			'expires' => 0,
+			"path" => "/",
+			"samesite" => "Lax",
+			"domain" => Request::get()->getHost()
+		]);
 	}
 	
 }

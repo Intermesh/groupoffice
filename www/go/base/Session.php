@@ -91,6 +91,11 @@ class Session extends Observable{
 		
 		
 		$this->values = &$_SESSION['GO_SESSION'];
+
+		// copy auth from new framework
+		if(empty($this->values['user_id']) && go()->getAuthState() && go()->getAuthState()->getUserId()) {
+			$this->values['user_id'] = go()->getAuthState()->getUserId();
+		}
 		
 		if(!isset($this->values['security_token'])){
 			
@@ -135,7 +140,7 @@ class Session extends Observable{
 	 * Attemts to login with stored cookies on the client.
 	 * This function is called in index.php
 	 * 
-	 * @return Model\User 
+	 * @return ?Model\User
 	 */
 	public function loginWithCookies(){
 		if(empty(\GO::session()->values['user_id']) && !empty($_COOKIE['GO_UN']) && !empty($_COOKIE['GO_UN'])){
@@ -144,7 +149,7 @@ class Session extends Observable{
 				$password = Util\Crypt::decrypt($_COOKIE['GO_PW']);
 			} catch (\Exception $e) {
 				$this->_unsetRemindLoginCookies ();
-				return false;
+				return null;
 			}
 
 			if(!$username){
@@ -160,6 +165,7 @@ class Session extends Observable{
 			else
 				return $user;
 		}
+		return null;
 	}
 	
 	/**
@@ -229,8 +235,8 @@ class Session extends Observable{
 	public function user(){
 		if(empty($this->values['user_id'])){
 			// Check Bearer token before returning null
-			$state = new \go\core\jmap\State();
-			if(!empty($state->getUserId())) {
+			$state = go()->getAuthState();
+			if($state && !empty($state->getUserId())) {
 				$this->values['user_id'] = $state->getUserId();
 				return Model\User::model()->findByPk($state->getUserId(), array(), true);
 			}

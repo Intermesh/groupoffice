@@ -20,7 +20,8 @@ class Bookmark extends EntityController {
 	 * 
 	 * @return string
 	 */
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\Bookmark::class;
 	}	
 	
@@ -81,6 +82,12 @@ class Bookmark extends EntityController {
 				$c->setCurlOption(CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);			
 
 				$html = $c->request($params['url']);
+
+				if(!empty($c->lastHeaders['location'])) {
+					$params['url'] = $c->lastHeaders['location'];
+				}
+
+				go()->debug($c->lastHeaders);
 
 				//go_debug($html);
 
@@ -145,7 +152,8 @@ class Bookmark extends EntityController {
 				$response['logo'] = '';
 			}
 		}
-		
+
+		$response['url'] = $params['url'];
 		$response['title'] = StringUtil::cutString($response['title'], 64, true, "");
 		$response['description'] = StringUtil::cutString($response['description'], 255, true, "");
 		return $response;

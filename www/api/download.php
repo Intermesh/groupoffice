@@ -14,23 +14,35 @@ require("../vendor/autoload.php");
 
 use go\core\App;
 use go\core\fs\Blob;
+use go\core\jmap\Response;
 use go\core\jmap\State;
+use go\core\jmap\Request;
 
-if(!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
-	http_response_code(401);
-	exit("Unauthorized.");
+App::get();
+if(Request::get()->getMethod() == 'OPTIONS') {
+	Response::get()->output();
+	exit();
+}
+
+if(!go()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
+	Response::get()->setStatus(401);
+	Response::get()->output("Unauthorized.");
+	exit();
 }
 
 if(!isset($_GET['blob'])) {
-	http_response_code(400);	
-	exit("Bad request. Param 'blob' must be given.");
+	Response::get()->setStatus(400);
+	Response::get()->output("Bad request. Param 'blob' must be given.");
+	exit();
 }
+
 
 if(strpos($_GET['blob'], '/') === false) {
 	$blob = Blob::findById($_GET['blob']);
 	if (!$blob) {
-		echo "Not found";
-		http_response_code(404);
+
+		Response::get()->setStatus(404);
+		Response::get()->output("Not found");
 		exit();
 	}
 
@@ -53,18 +65,18 @@ if($package == "core") {
 
 	$ctrlCls = "go\\modules\\" . $package . "\\". $module . "\\Module";
 	if(!class_exists($ctrlCls)) {
-		http_response_code(404);	
-		exit("Controller class '$ctrlCls' not found");
+		Response::get()->setStatus(404);
+		Response::get()->output("Controller class '$ctrlCls' not found");
+		exit();
 	}
 	
 	$c = $ctrlCls::get();
 }
 
-
-
 if(!method_exists($c, $method)) {
-	http_response_code(404);	
-	exit("Controller method '$method' not found");
+	Response::get()->setStatus(404);
+	Response::get()->output("Controller method '$method' not found");
+	exit();
 }
 
 call_user_func_array([$c, $method], $parts);

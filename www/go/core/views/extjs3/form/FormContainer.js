@@ -16,6 +16,7 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 	initComponent: function () {
 		this.additionalFields = [];
 
+		// required when component is added after constructing a component
 		this.on("add", function (e) {
 			//to prevent adding to Ext.form.BasicForm with add event.
 			//Cancels event bubbling
@@ -23,10 +24,6 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		});
 
 		go.form.FormContainer.superclass.initComponent.call(this);
-
-
-
-
 	},
 
 	getName: function () {
@@ -55,8 +52,9 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 			}
 		};
 
-		this.items.each(fn);
-
+		if(this.items) {
+			this.items.each(fn);
+		}
 		
 		return fields;
 	},
@@ -112,6 +110,8 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 				// field.originalValue = field.getValue();
 			}
 		}
+
+		this.fireEvent("setvalue", this, v);
 
 	},
 

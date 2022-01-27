@@ -1,6 +1,7 @@
 <?php
 namespace go\core\model;
 
+use go\core\orm\Mapping;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\Traits\ClientTrait;
 use League\OAuth2\Server\Entities\Traits\EntityTrait;
@@ -13,7 +14,8 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 
 	protected $secret;
 
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 			->addTable('core_oauth_client');
 

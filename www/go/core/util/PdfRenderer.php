@@ -106,9 +106,14 @@ class PdfRenderer extends Fpdi {
 	}
 
 	/**
-	 * Renders the PDF
+	 * Renders the content of the PDF
+	 *
+	 * Use Output() to write the PDF to string or file:
+	 *
+	 * $pdf->render()->Output($file->getPath(), "F");
 	 *
 	 * @return self
+	 * @throws Exception
 	 */
 	public function render() {
 		return $this;

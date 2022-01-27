@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use go\core\util\DateTime as GoDateTime;
+use LogicException;
 
 /**
  * Represents a Record database column attribute.
@@ -33,6 +34,12 @@ use go\core\util\DateTime as GoDateTime;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class Column {
+
+	/**
+	 * @see Mapping::$dynamic;
+	 * @var bool
+	 */
+	public $dynamic = false;
 
 	/**
 	 * false if non unique or an array of columns that should be unique in combination with this column.
@@ -153,7 +160,8 @@ class Column {
 	 * 
 	 * @return string
 	 */
-	public function getCreateSQL() {
+	public function getCreateSQL(): string
+	{
 		$sql = $this->dataType;		
 		
 		if(!$this->nullAllowed) {
@@ -239,7 +247,7 @@ class Column {
 		}
 		
 		switch ($this->dbType) {
-			case 'datetime':				
+			case 'datetime':
 				return $value->format(self::DATETIME_FORMAT);
 
 			case 'date':
@@ -252,11 +260,11 @@ class Column {
 
   /**
    * Output formatting for the database.
+   *
    * Currently only used for date fields because we want ISO 8601 for I/O.
    *
    * @param mixed $value
    * @return mixed
-   * @throws Exception
    */
 	public function castFromDb($value) {
 
@@ -286,7 +294,11 @@ class Column {
 				}
 
 				if(!($value instanceof GoDateTime)) {
-					$value = new GoDateTime($value, new DateTimeZone("UTC"));
+					try {
+						$value = new GoDateTime($value, new DateTimeZone("UTC"));
+					}catch(Exception $e) {
+						throw new LogicException("Could not read date from database: " . $e->getMessage());
+					}
 				}
 
 				$value->hasTime = $this->dbType == 'datetime';
@@ -303,7 +315,8 @@ class Column {
 	 * 
 	 * @return Table
 	 */
-	public function getTable() {
+	public function getTable(): Table
+	{
 		return $this->table;
 	}
 

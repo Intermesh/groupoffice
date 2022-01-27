@@ -1,11 +1,13 @@
-<?php
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace go\core\util;
 
-use ErrorException;
 use Exception;
+use go\core\App;
 use Html2Text\Html2Text;
-use IFW;
+use Normalizer;
+use Throwable;
+use Transliterator;
 
 /**
  * Collection of string functions
@@ -23,7 +25,8 @@ class StringUtil {
    * @param string $crlf
    * @return string
    */
-	public static function normalizeCrlf($text, $crlf = "\r\n") {
+	public static function normalizeCrlf(?string $text, string $crlf = "\r\n"): ?string
+	{
 		if(empty($text)) {
 			return $text;
 		}
@@ -40,15 +43,16 @@ class StringUtil {
   /**
    * Normalize UTF-8 to form C
    *
-   * @param $text
+   * @param string $text
    * @return string
    */
-	public static function normalize($text) {
+	public static function normalize(string $text): string
+	{
 		if(empty($text)) {
 			return $text;
 		}
 
-		$normalized = \Normalizer::normalize($text, \Normalizer::FORM_C);
+		$normalized = Normalizer::normalize($text, Normalizer::FORM_C);
 		if($normalized === false) {
 
 			//try to clean the string
@@ -64,8 +68,9 @@ class StringUtil {
    * @param $text
    * @return bool
    */
-	public static function isNormalized($text) {
-		return \Normalizer::isNormalized($text, \Normalizer::FORM_C);
+	public static function isNormalized($text): bool
+	{
+		return Normalizer::isNormalized($text, Normalizer::FORM_C);
 	}
 
   /**
@@ -74,19 +79,24 @@ class StringUtil {
    * @param string
    * @return string
    */
-	public static function camelCaseToUnderscore($camelCasedString) {
+	public static function camelCaseToUnderscore(string $camelCasedString): string
+	{
 		return strtolower(preg_replace('/(?<=\\w)([A-Z][a-z])/', '_\\1', $camelCasedString));
 	}
 
   /**
    * Converts and cleans a string to valid UTF-8
    *
-   * @param string $str
-   * @param string $sourceCharset
+   * @param ?string $str
+   * @param string|null $sourceCharset
    * @param string
    * @return string
    */
-	public static function cleanUtf8($str, $sourceCharset = null) {
+	public static function cleanUtf8(?string $str, string $sourceCharset = null): string
+	{
+		if(empty($str)) {
+			return $str;
+		}
 		
 		if(!isset($sourceCharset)){
 			$sourceCharset = mb_detect_encoding($str);
@@ -95,7 +105,7 @@ class StringUtil {
 			}
 		}
 		
-		$str = self::convert($str, $sourceCharset, 'UTF-8');
+		$str = self::convertToUTF8($str, $sourceCharset);
 
 		//Check if preg validates it as UTF8
 		if (!mb_check_encoding($str, 'utf8')) {
@@ -126,10 +136,9 @@ END;
 
 	}
 	
-	private static function convert($str, $fromCharset, $toCharset) {
-		
+	private static function convertToUTF8($str, $fromCharset) {
 		$fromCharset = strtoupper($fromCharset);
-		$toCharset = strtoupper($toCharset);
+		$toCharset = 'UTF-8';
 		
 		if ($fromCharset == $toCharset) {
 			// cleanup invalid chars
@@ -142,8 +151,8 @@ END;
 			{
 				$str = iconv($fromCharset, 'UTF-8//TRANSLIT', $str);					
 			}
-		}catch (ErrorException $e) {
-			\go\core\App::get()->debug("Could not convert from ".$fromCharset." to UTF8 ".$e->getMessage());
+		}catch (Throwable $e) {
+			App::get()->debug("Could not convert from ".$fromCharset." to UTF8 ".$e->getMessage());
 		}
 		
 		return $str;
@@ -157,7 +166,8 @@ END;
 	 * @param string $str
 	 * @return boolean
 	 */
-	public static function isUtf8($str) {
+	public static function isUtf8(string $str): bool
+	{
 		return strlen($str) != strlen(utf8_decode($str));
 	}
 
@@ -171,7 +181,8 @@ END;
    * @param string
    * @return string
    */
-	public static function replaceOnce($search, $replace, $subject, &$found = false) {
+	public static function replaceOnce(string $search, string $replace, string $subject, bool &$found = false): string
+	{
 		$firstChar = strpos($subject, $search);
 		if ($firstChar !== false) {
 			$found = true;
@@ -187,11 +198,14 @@ END;
 	/**
 	 * Cut's off a string if it exceeds a given length
 	 *
-	 * @param	string $str The string to chop
-	 * @param	int $maxLength The maximum number of characters in the string
+	 * @param string $str The string to chop
+	 * @param int $maxLength The maximum number of characters in the string
+	 * @param bool $cutWholeWords
+	 * @param string $append
 	 * @return string
 	 */
-	public static function cutString($str, $maxLength, $cutWholeWords = true, $append = '...') {
+	public static function cutString(string $str, int $maxLength, bool $cutWholeWords = true, string $append = '...'): string
+	{
 		if (strlen($str) <= $maxLength) {
 			return $str;
 		}
@@ -206,7 +220,7 @@ END;
 			if (($pos = strrpos($temp, ' '))) {
 				return $substrFunc($temp, 0, $pos) . $append;
 			} else {
-				return $temp = $substrFunc($str, 0, $maxLength) . $append;
+				return $substrFunc($str, 0, $maxLength) . $append;
 			}
 		} else {
 			return $temp . $append;
@@ -222,15 +236,16 @@ END;
    * @param string HTML formatted string
    * @return string
    */
-	public static function textToHtml($text, $convertLinks = true) {
+	public static function textToHtml(string $text, $convertLinks = true): string
+	{
 
 		if ($convertLinks) {
-			$text = preg_replace("/\b(https?:\/\/[\pL0-9\.&\-\/@#;`~=%?:_\+,\)\(]+)\b/ui", '{lt}a href={quot}$1{quot} target={quot}_blank{quot}{gt}$1{lt}/a{gt}', $text . "\n");
-			$text = preg_replace("/\b([\pL0-9\._\-]+@[\pL0-9\.\-_]+\.[a-z]{2,4})(\s)/ui", "{lt}a href={quot}mailto:$1{quot}{gt}$1{lt}/a{gt}$2", $text);
+			$text = preg_replace("/\b(https?:\/\/[\pL0-9.&\-\/@#;`~=%?:_+,)(]+)\b/ui", '{lt}a href={quot}$1{quot} target={quot}_blank{quot}{gt}$1{lt}/a{gt}', $text . "\n");
+			$text = preg_replace("/\b([\pL0-9._\-]+@[\pL0-9.\-_]+\.[a-z]{2,4})(\s)/ui", "{lt}a href={quot}mailto:$1{quot}{gt}$1{lt}/a{gt}$2", $text);
 		}
 
 		//replace repeating spaces with &nbsp;		
-		$text = htmlspecialchars($text, ENT_COMPAT, 'UTF-8');
+		$text = htmlspecialchars($text, ENT_COMPAT);
 		$text = str_replace('  ', '&nbsp;&nbsp;', $text);
 
 
@@ -242,9 +257,7 @@ END;
 
 		$text = str_replace("{quot}", '"', $text);
 		$text = str_replace("{lt}", "<", $text);
-		$text = str_replace("{gt}", ">", $text);
-
-		return $text;
+		return str_replace("{gt}", ">", $text);
 	}
 	
 	/**
@@ -253,90 +266,15 @@ END;
 	 * @param string $html
 	 * @return string
 	 */
-	public static function htmlToText($html) {
+	public static function htmlToText(string $html): string
+	{
 		
 		//normalize html and remove line breaks
-		$html = StringUtil::normalizeCrlf($html, "\r\n");
+		$html = StringUtil::normalizeCrlf($html);
 		
 		$html = new Html2Text($html);
 		
 		return trim($html->getText());
-	}
-
-
-  /**
-   * Change HTML links to Group-Office links. For example mailto: links will call
-   * the Group-Office e-mail module if installed.
-   *
-   * @param string $text Plain text string
-   * @param string HTML formatted string
-   * @return string
-   */
-
-	public static function convertLinks($html)
-	{
-		$baseUrl = '';
-		if(preg_match('/base href="([^"]+)"/', $html, $matches)){
-			if(isset($matches[1]))
-			{
-				$baseUrl = $matches[1];
-			}
-		}
-
-		
-//		Don't strip new lines or it will mess up <pre> tags
-//		$html = str_replace("\r", '', $html);
-//		$html = str_replace("\n",' ', $html);
-//		
-		//strip line breaks inside html tags
-		$html = preg_replace_callback('/<[^>]+>/sm',function($matches){
-			$replacement = str_replace("\r", '', $matches[0]);
-			return str_replace("\n",'  ', $replacement);
-		}, $html);
-
-		$regexp="/<a[^>]*href=\s*([\"']?)(http|https|ftp|bf2)(:\/\/)(.+?)>/i";
-		$html = preg_replace($regexp, "<a target=$1_blank$1 href=$1$2$3$4>", $html);
-		
-		if(!empty($baseUrl)){
-			$regexp="/<a[^>]*href=\s*('|\")(?![a-z]+:)/i";
-			$html = preg_replace($regexp, "<a target=$1_blank$1 href=$1".$baseUrl, $html);
-		}
-		
-//		var_dump($html);
-		
-//		preg_match("/[^='\"a-z0-9\/\\\\\(>](https?:\/\/[\pL0-9\.&\-\/@#;`~=%?:_\+,\)\(]+)/ui", $html, $matches);
-//		var_dump($matches);
-		
-		//replace URL's without anchor tags to links
-		$html = preg_replace("/[^='\"a-z0-9\/\\\\\(>](https?:\/\/[\pL0-9\.&\-\/@#;`~=%?:_\+,\)\(]+)/ui", '<a href="$1" target="_blank">$0</a>', $html);
-			
-
-		//$regexp="/<a.+?href=([\"']?)".str_replace('/','\\/', \GO::config()->full_url)."(.+?)>/i";
-		//$html = preg_replace($regexp, "<a target=$1main$1 class=$1blue$1 href=$1".\GO::config()->host."$2$3>", $html);
-
-		//Following line breaks links on mobile phones
-		//$html =str_replace(\GO::config()->full_url, \GO::config()->host, $html);
-		
-		return $html;
-	}
-
-
-  /**
-   * Replace string in html. It will leave strings inside html tags alone.
-   *
-   * @param string $search
-   * @param string $replacement
-   * @param string $html
-   * @return string
-   */
-	public static function htmlReplace($search, $replacement, $html) {
-		$html = preg_replace_callback('/<[^>]*(' . preg_quote($search) . ')[^>]*>/uis', function($matches) {
-			return stripslashes(str_replace($matches[1], '{TEMP}', $matches[0]));
-		}, $html);
-		$html = preg_replace('/([^a-z0-9])' . preg_quote($search) . '([^a-z0-9])/i', "\\1" . $replacement . "\\2", $html);
-
-		//$html = str_ireplace($search, $replacement, $html);
-		return str_replace('{TEMP}', $search, $html);
 	}
 
 	/**
@@ -346,7 +284,8 @@ END;
 	 * @return boolean
 	 * @throws Exception 
 	 */
-	public static function detectXSS($string) {
+	public static function detectXSS(bool $string): bool
+	{
 
 // Keep a copy of the original string before cleaning up
 		$orig = $string;
@@ -393,87 +332,16 @@ END;
 		return false;
 	}
 
-  /**
-   * Filter possible XSS attacks
-   *
-   * @param string $string
-   * @param string
-   * @return string
-   */
-	public static function filterXSS($string) {
-		// Fix &entity\n;
-		$string = str_replace(array('&amp;', '&lt;', '&gt;'), array('&amp;amp;', '&amp;lt;', '&amp;gt;'), $string);
-		$string = preg_replace('/(&#*\w+)[\x00-\x20]+;/u', '$1;', $string);
-		$string = preg_replace('/(&#x*[0-9A-F]+);*/iu', '$1;', $string);
-		$string = html_entity_decode($string, ENT_COMPAT, 'UTF-8');
-
-		// Remove any attribute starting with "on" or xmlns
-		$string = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>]*+>#iu', '$1>', $string);
-		// Remove javascript: and vbscript: protocols
-		$string = preg_replace('#([a-z]*)[\x00-\x20]*=[\x00-\x20]*([`\'"]*)[\x00-\x20]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2nojavascript...', $string);
-		$string = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2novbscript...', $string);
-		$string = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u', '$1=$2nomozbinding...', $string);
-
-//
-//		// Only works in IE: <span style="width: expression(alert('Ping!'));"></span>
-		$string = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?expression[\x00-\x20]*\([^>]*+>#i', '$1>', $string);
-		$string = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?behaviour[\x00-\x20]*\([^>]*+>#i', '$1>', $string);
-
-		//the next line removed valid stuff from the body
-		//$data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:*[^>]*+>#iu', '$1>', $data);
-		// Remove namespaced elements (we do not need them)
-		$string = preg_replace('#</*\w+:\w[^>]*+>#i', '', $string);
-
-		return $string;
-	}
-
-  /**
-   * Quotes a string with >
-   *
-   * @param string $text
-   * @access public
-   * @param string A string quoted with >
-   * @return string
-   */
-	public static function quote($text) {
-		$text = "> " . ereg_replace("\n", "\n> ", trim($text));
-		return ($text);
-	}
-
 	/**
 	 * Check the length of a string. Works with UTF8 too.
 	 * 
 	 * @param string $str
 	 * @return int 
 	 */
-	public static function length($str) {		
+	public static function length(string $str): int
+	{
 		return mb_strlen($str, 'UTF-8');
 	}
-
-  /**
-   * Get part of string
-   * @link https://php.net/manual/en/function.mb-substr.php
-   * @param string $str <p>
-   * The string being checked.
-   * </p>
-   * @param int $start <p>
-   * The first position used in str.
-   * </p>
-   * @param int $length [optional] <p>
-   * The maximum length of the returned string.
-   * </p>
-   * @param string $encoding [optional] &mbstring.encoding.parameter;
-   * @return string mb_substr returns the portion of
-   * str specified by the
-   * start and
-   * length parameters.
-   * @since 4.0.6
-   * @since 5.0
-   */
-	public static function substr($string, $start, $length = null) {
-		return function_exists("mb_substr") ? mb_substr($string, $start, $length) : substr($string, $start, $length);
-	}
-
 
   /**
    * Turn string with underscores into lowerCamelCase
@@ -484,7 +352,8 @@ END;
    * @param string
    * @return string
    */
-	public static function lowerCamelCasify($str){
+	public static function lowerCamelCasify(string $str): string
+	{
 		
 		$str = str_replace('-','_', strtolower($str));		
 		$parts = explode('_', $str);		
@@ -503,27 +372,11 @@ END;
    * @param string $str
    * @return string
    */
-	public static function upperCamelCasify($str){
-		
+	public static function upperCamelCasify(string $str): string
+	{
 		$str = str_replace('-','_', strtolower($str));		
 		$parts = explode('_', $str);
-		$str = implode('', array_map('ucfirst', $parts));
-		
-		return $str;		
-	}
-	
-	/**
-	 * Remove BOM character
-	 * 
-	 * @param string $str
-	 * @return string
-	 */
-	public static function removeBOMCharacter($str) {
-		if (substr($str, 0, 3) == chr(hexdec('EF')) . chr(hexdec('BB')) . chr(hexdec('BF'))) {
-			return substr($str, 3);
-		} else {
-			return $str;
-		}
+		return implode('', array_map('ucfirst', $parts));
 	}
 	
 	/**
@@ -554,12 +407,14 @@ END;
 	 * @param string $expression
 	 * @return string[]
 	 */
-	public static function explodeSearchExpression($expression) {
+	public static function explodeSearchExpression(string $expression): array
+	{
 		return preg_split("/[\s,]*\\\"([^\\\"]+)\\\"[\s,]*|" . "[\s,]*'([^']+)'[\s,]*|" . "[\s,]+/", $expression, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 	}
 	
 	
-	public static function debugUTF8($str) {		
+	public static function debugUTF8($str): string
+	{
 		$ord = "";
 		for ( $pos=0, $l = strlen($str); $pos < $l; $pos ++ ) {
 		 $byte = substr($str, $pos);
@@ -576,7 +431,8 @@ END;
    * @return string
    * @throws Exception
    */
-	public static function random($length) {
+	public static function random(int $length): string
+	{
 		return bin2hex(random_bytes($length));
 	}
 
@@ -587,11 +443,11 @@ END;
 	 *
 	 * @see https://3v4l.org/CiH8j
 	 */
-	public static function toAscii($str)
+	public static function toAscii($str): string
 	{
 		static $transliterator = null;
 		if ($transliterator === null && class_exists('Transliterator', false)) {
-			$transliterator = \Transliterator::create('Any-Latin; Latin-ASCII');
+			$transliterator = Transliterator::create('Any-Latin; Latin-ASCII');
 		}
 
 		$str = preg_replace('#[^\x09\x0A\x0D\x20-\x7E\xA0-\x{2FF}\x{370}-\x{10FFFF}]#u', '', $str);

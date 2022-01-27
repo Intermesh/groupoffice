@@ -32,8 +32,7 @@ use go\core\fs\File;
 use go\core\util\ClassFinder;
 
 class ModuleCollection extends Model\ModelCollection{
-	
-	private static $allowedModules;
+
 	
 	public function __construct($model='GO\Base\Model\Module'){
 
@@ -50,40 +49,9 @@ class ModuleCollection extends Model\ModelCollection{
 	 */
 	public static function isAllowed($name, $package = null, $allowedModules = null){
 
-		if(!isset($allowedModules)) {
-			if (!isset(self::$allowedModules)) {
-				self::$allowedModules = self::normalizeAllowedModules(\GO::config()->allowed_modules);
-			}
-			$allowedModules = self::$allowedModules;
-		} else {
-			$allowedModules = self::normalizeAllowedModules($allowedModules);
-		}
-
-		if (empty($allowedModules)) {
-			return true;
-		}
-
-		if(isset($package) && $package != "legacy") {
-			$name = $package . "/" . $name;
-			return in_array($name, $allowedModules) || in_array($package . "/*", $allowedModules);
-		} else{
-			return in_array($name, $allowedModules) || in_array('legacy/' . $name, $allowedModules) || in_array(  "legacy/*", $allowedModules);
-		}
+		return \go\core\Module::isAllowed($name, $package, $allowedModules);
 	}
 
-	private static function normalizeAllowedModules($allowedModules) {
-		if( empty($allowedModules)) {
-			return [];
-		}
-
-		if(!is_array($allowedModules)) {
-			$allowedModules = explode(',', $allowedModules);
-		}
-
-		$allowedModules[] = 'core/core';
-
-		return $allowedModules;
-	}
 	
 	/**
 	 * Returns an array of all module classes as string found in the modules folder.

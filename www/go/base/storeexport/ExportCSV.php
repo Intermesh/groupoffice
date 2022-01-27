@@ -27,7 +27,7 @@ class ExportCSV extends AbstractExport {
 	public static $name = "CSV";
 	public static $useOrientation=false;
 	
-	
+	private $_fp;
 	
 	private function _sendHeaders(){		
 		$file = new \GO\Base\Fs\File($this->title.'.csv');

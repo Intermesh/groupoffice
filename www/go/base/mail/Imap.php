@@ -237,6 +237,13 @@ class Imap extends ImapBodyStruct
 				$str = base64_encode("user=$this->username\1auth=Bearer $this->token\1\1");
 				$this->send_command("AUTHENTICATE XOAUTH2 " . $str . "\r\n");
 				break;
+
+			case 'xoauth2': // TODO: ???
+				$login = 'A'.$this->command_number().' AUTHENTICATE XOAUTH2 ' . $pass . "\r\n";
+				$this->commands[trim(str_replace($pass, 'xxxx', $login))] = \GO\Base\Util\Date::getmicrotime();
+				fputs($this->handle, $login);
+				break;
+
 			default:
 				$login = 'A' . $this->command_number() . ' LOGIN "' . $this->_escape($username) . '" "' . $this->_escape($pass) . "\"\r\n";
 				$this->commands[trim(str_replace($pass, 'xxxx', $login))] = \GO\Base\Util\Date::getmicrotime();

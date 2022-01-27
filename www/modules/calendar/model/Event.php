@@ -61,6 +61,11 @@ use Sabre;
 use Swift_Attachment;
 use Swift_Mime_ContentEncoder_PlainContentEncoder;
 
+/**
+ * @property int $start_time
+ *  @property string $rrule
+ * @property int $repeat_end_time
+ */
 class Event extends \GO\Base\Db\ActiveRecord {
 
 	use \go\core\orm\CustomFieldsTrait;
@@ -102,8 +107,8 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	 * @var boolean 
 	 */
 	private $_isImport=false;
-	
-	
+
+
 	public function getUri() {
 		if(isset($this->_setUri)) {
 			return $this->_setUri;
@@ -695,7 +700,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		
 		if($reminder->model_type_id==Event::model()->modelTypeId()){			
 			$event = Event::model()->findByPk($reminder->model_id);
-			if($event && ($nextTime = $event->getNextReminderTime($reminder->time+$event->reminder))){
+			if($event && $event->isRecurring() && ($nextTime = $event->getNextReminderTime($reminder->time+$event->reminder))){
 				$event->addReminder($event->name, $nextTime, $userId, $nextTime+$event->reminder);								
 			}			
 		}

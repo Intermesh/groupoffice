@@ -10,7 +10,7 @@ return array (
   'Deactivate instance' => 'Instanz deaktivieren',
   'Delete instance' => 'Instanz löschen',
   'Activate instance' => 'Instanz aktivieren',
-  'Multi instance' => 'Multiinstanz',
+  'Multi instance' => 'Multi-Instanz',
   'Instance' => 'Instanz',
   'Storage quota' => 'Speicherplatzangebot',
   'Size in GB' => 'Größe in GB',

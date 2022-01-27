@@ -3,28 +3,36 @@
 namespace go\core {
 
 use Exception;
-	use GO;
-	use GO\Base\Observable;
+use GO\Base\Observable;
+use GO;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
 use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-use go\core\event\EventEmitterTrait;
+	use go\core\db\Utils;
+	use go\core\event\EventEmitterTrait;
 use go\core\event\Listeners;
-use go\core\exception\ConfigurationException;
 use go\core\fs\Blob;
 use go\core\fs\Folder;
 use go\core\jmap\Request;
-use go\core\jmap\State;
 use go\core\mail\Mailer;
+	use go\core\model\Group;
+	use go\core\model\Module as ModuleModel;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
-use go\core\util\ArrayObject;
+	use go\core\Settings as CoreSettings;
+	use go\core\util\ArrayObject;
 use go\core\webclient\Extjs3;
+use go\core\model\User;
 use go\core\model\Settings;
 
-use const GO_CONFIG_FILE;
+use Faker;
+
+	use InvalidArgumentException;
+	use PDOException;
+	use const GO_CONFIG_FILE;
 
 	/**
 	 * Application class.
@@ -97,7 +105,21 @@ use const GO_CONFIG_FILE;
 
 			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
-		
+
+		/**
+		 * Capabilities of core module
+		 * @see SystemSettingsModuleGrid.js this array is duplicated because client doens't know core module
+		 * @noinspection PhpUnused
+		 */
+		protected function rights(): array
+		{
+			return [
+				'mayChangeUsers',
+				'mayChangeGroups',
+				'mayChangeCustomFields'
+			];
+		}
+
 		/**
 		 * Required for app being a go\core extend
 		 * 
@@ -136,6 +158,7 @@ use const GO_CONFIG_FILE;
 		public function getVersion(): string
 		{
 			if(!isset($this->version)) {
+				/** @noinspection PhpIncludeInspection */
 				$this->version = require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
 			}
 			return $this->version;
@@ -153,6 +176,7 @@ use const GO_CONFIG_FILE;
 		}
 
 		private function initCompatibility() {
+			/** @noinspection PhpIncludeInspection */
 			require(Environment::get()->getInstallPath() . "/go/GO.php");
 			spl_autoload_register(array('GO', 'autoload'));
 		}
@@ -197,15 +221,18 @@ use const GO_CONFIG_FILE;
 			return new Folder($this->getConfig()['file_storage_path']);
 		}
 
+		/**
+		 * @var int
+		 */
 		private $storageQuota;
 
 		/**
 		 * Get total space of the data folder in bytes
 		 *
 		 * @return float
-		 * @throws ConfigurationException
 		 */
-		public function getStorageQuota() {
+		public function getStorageQuota(): float
+		{
 			if(!isset($this->storageQuota)) {
 				$this->storageQuota = $this->getConfig()['quota'];
 				if(empty($this->storageQuota)) {
@@ -228,9 +255,9 @@ use const GO_CONFIG_FILE;
 		 * Get free space in bytes
 		 *
 		 * @return float
-		 * @throws ConfigurationException
 		 */
-		public function getStorageFreeSpace() {
+		public function getStorageFreeSpace(): float
+		{
 			if(!isset($this->storageFreeSpace)) {
 				$quota = $this->getConfig()['quota'];
 				if(empty($quota)) {
@@ -255,8 +282,7 @@ use const GO_CONFIG_FILE;
 		 * Get the temporary files folder
 		 *
 		 * @return Folder
-		 * @throws ConfigurationException
-		 * @throws Exception
+		 * @throws InvalidArgumentException
 		 */
 		public function getTmpFolder(): Folder
 		{
@@ -290,19 +316,21 @@ use const GO_CONFIG_FILE;
 		 * @param array $config
 		 * @return $this;
 		 */
-		public function setConfig(array $config) {
+		public function setConfig(array $config): App
+		{
 			$this->config = $config;
 			
 			return $this;
 		}
 		
-		private function getGlobalConfig() {
+		private function getGlobalConfig(): array
+		{
 			try {
 				$globalConfigFile = '/etc/groupoffice/globalconfig.inc.php';
 				if (file_exists($globalConfigFile)) {
 					require($globalConfigFile);
 				}
-			}catch(\Exception $e) {
+			}catch(Exception $e) {
 				//openbasedir might complain here. Ignore.
 				
 			}
@@ -310,7 +338,8 @@ use const GO_CONFIG_FILE;
 			return $config ?? [];
 		}
 		
-		private function getInstanceConfig() {
+		private function getInstanceConfig(): array
+		{
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
 				return [];
@@ -331,9 +360,9 @@ use const GO_CONFIG_FILE;
      * Get the configuration data from config.php and globalconfig.inc.php
      *
      * @return array
-     * @throws ConfigurationException
      */
-		public function getConfig() {
+		public function getConfig(): array
+		{
 
 			if (isset($this->config)) {
 				return $this->config;
@@ -406,6 +435,7 @@ use const GO_CONFIG_FILE;
 
 		/**
 		 * The TCPDF cache path must be set before autoloading it from vendor.
+		 * @noinspection PhpUnused
 		 */
 		private function initTCPDF() {
 			define("K_PATH_CACHE", $this->config['tmpdir'] . "/");
@@ -415,9 +445,9 @@ use const GO_CONFIG_FILE;
 		 * Get the database connection
 		 *
 		 * @return Connection
-		 * @throws ConfigurationException
 		 */
-		public function getDbConnection() {
+		public function getDbConnection(): Connection
+		{
 			if (!isset($this->dbConnection)) {
 				$config = $this->getConfig();
 				$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port']  . ';dbname=' . $config['db_name'];
@@ -426,6 +456,20 @@ use const GO_CONFIG_FILE;
 				);
 			}
 			return $this->dbConnection;
+		}
+
+		public function isInstalled(): bool
+		{
+			try {
+				return parent::isInstalled();
+			} catch(PDOException $e) {
+
+				if(strpos($e->getMessage(), '[1049]') !== false) {
+					// database does not exists
+					return false;
+				}
+				throw $e;
+			}
 		}
 
 		/**
@@ -439,7 +483,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return Database
 		 */
-		public function getDatabase() {
+		public function getDatabase(): Database
+		{
 			if (!isset($this->database)) {
 				$this->database = new Database();
 			}
@@ -456,13 +501,12 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get a simple key value caching object
 		 *
-		 * @return Cache\Apcu
-		 * @throws ConfigurationException
+		 * @return CacheInterface
 		 */
-		public function getCache() {
+		public function getCache(): CacheInterface
+		{
 			if (!isset($this->cache)) {				
 				$cls = $this->getConfig()['cache'];
-				// go()->log("Using cache: " . $cls);
 				$this->cache = new $cls;
 			}
 			return $this->cache;
@@ -476,11 +520,11 @@ use const GO_CONFIG_FILE;
 		 *
 		 * @param string $package Set to null for legacy modules
 		 * @param string $name
-		 * @return \go\core\model\Module
+		 * @return ModuleModel | false
 		 * @throws Exception
 		 */
-		public function getModule($package, $name) {
-
+		public function getModule(?string $package, string $name)
+		{
 			$cacheKey = 'getModule-' . $package .'-'.$name;
 
 			$model = go()->getCache()->get($cacheKey);
@@ -489,7 +533,7 @@ use const GO_CONFIG_FILE;
 				return $model;
 			}
 
-			$model = \go\core\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
+			$model = ModuleModel::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
 			if(!$model || !$model->isAvailable()) {
 				$model = false;
 			}
@@ -505,7 +549,8 @@ use const GO_CONFIG_FILE;
 		 * @param CacheInterface $cache
 		 * @return $this
 		 */
-		public function setCache(CacheInterface $cache) {
+		public function setCache(CacheInterface $cache): App
+		{
 			$this->cache = $cache;
 			
 			return $this;
@@ -514,12 +559,11 @@ use const GO_CONFIG_FILE;
 		private $rebuildCacheOnDestruct = false;
 
 		/**
-		 * Destroys all cache and reinitializes event listeners and sync state.
+		 * Destroys all cache and re-initializes event listeners and sync state.
 		 *
 		 * @param boolean $onDestruct
-		 * @throws ConfigurationException
 		 */
-		public function rebuildCache($onDestruct = false) {
+		public function rebuildCache(bool $onDestruct = false) {
 			
 			if($onDestruct) {				
 				$this->rebuildCacheOnDestruct = $onDestruct;
@@ -530,7 +574,7 @@ use const GO_CONFIG_FILE;
 			
 			GO::clearCache(); //legacy
 
-			go()->getCache()->flush(false);
+			go()->getCache()->flush(true, false);
 			Table::destroyInstances();
 			Property::clearCache();
 
@@ -550,7 +594,9 @@ use const GO_CONFIG_FILE;
 		
 		public function __destruct() {
 			if($this->rebuildCacheOnDestruct) {
+
 				$this->rebuildCache();
+
 			}
 		}
 
@@ -559,7 +605,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return Debugger
 		 */
-		public function getDebugger() {
+		public function getDebugger(): Debugger
+		{
 			if (!isset($this->debugger)) {
 				$this->debugger = new Debugger();
 			}
@@ -604,7 +651,8 @@ use const GO_CONFIG_FILE;
 		 * @param AuthState $authState
 		 * @return $this
 		 */
-		public function setAuthState(AuthState $authState) {
+		public function setAuthState(AuthState $authState): App
+		{
 			$this->authState = $authState;
 			
 			return $this;
@@ -613,9 +661,10 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get the authentication handler
 		 * 
-		 * @return State
+		 * @return AuthState
 		 */
-		public function getAuthState() {
+		public function getAuthState(): ?AuthState
+		{
 			return $this->authState;
 		}
 		
@@ -624,7 +673,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return Environment
 		 */
-		public function getEnvironment() {
+		public function getEnvironment(): Environment
+		{
 			return Environment::get();
 		}
 
@@ -638,7 +688,8 @@ use const GO_CONFIG_FILE;
 		 * ```
 		 * @return int
 		 */
-		public function getUserId() {
+		public function getUserId(): ?int
+		{
 			if ($this->getAuthState() instanceof AuthState) {
 				return $this->authState->getUserId();
 			}
@@ -648,9 +699,10 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get the application settings
 		 * 
-		 * @return Settings
+		 * @return Settings|null
 		 */
-		public function getSettings() {
+		public function getSettings(): ?CoreSettings
+		{
 			return Settings::get();
 		}
 
@@ -661,7 +713,7 @@ use const GO_CONFIG_FILE;
 		 * @param String $module Name of the module to find the translation
 		 * @param String $package Only applies if module is set to 'base'
 		 */
-		public function t($str, $package = 'core', $module = 'core') {
+		public function t(string $str, string $package = 'core', string $module = 'core') {
 			return $this->getLanguage()->t($str, $package, $module);
 		}
 		
@@ -671,7 +723,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @return Language
 		 */
-		public function getLanguage() {
+		public function getLanguage(): Language
+		{
 			if(!isset($this->language)) {
 				$this->language = new Language();
 			}
@@ -692,7 +745,7 @@ use const GO_CONFIG_FILE;
 		 * @param string $name
 		 * @return boolean|string
 		 */
-		public static function findConfigFile($name = 'config.php') {
+		public static function findConfigFile(string $name = 'config.php') {
 			
 			if(defined("GO_CONFIG_FILE")) {
 				return GO_CONFIG_FILE;
@@ -715,18 +768,18 @@ use const GO_CONFIG_FILE;
 						return $workingFile;
 					}
 				}
-				catch(\Exception $e) {
+				catch(Exception $e) {
 					//ignore open_basedir error
 				}
 			}
 			
-			$workingFile = dirname(dirname(__DIR__)) . '/' . $name;
+			$workingFile = dirname(__DIR__, 2) . '/' . $name;
 			try {
 				if (file_exists($workingFile)) {
 					return $workingFile;
 				}
 			}
-			catch(\Exception $e) {
+			catch(Exception $e) {
 				//ignore open_basedir error
 			}
 
@@ -736,7 +789,7 @@ use const GO_CONFIG_FILE;
 					return $workingFile;
 				}
 			}
-			catch(\Exception $e) {
+			catch(Exception $e) {
 				//ignore open_basedir error
 			}
 			
@@ -760,8 +813,10 @@ use const GO_CONFIG_FILE;
 
 		/**
 		 * Download method for module icons
-		 * 
+		 *
 		 * /api/download.php?blob=core/moduleIcon/community/addressbook
+		 * @throws Exception
+		 * @noinspection PhpUnused
 		 */
 		public function downloadModuleIcon($package, $name) {
 
@@ -791,6 +846,7 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Display's logo without authentication via /api/page.php/core/logo
 		 * @throws Exception
+		 * @noinspection PhpUnused
 		 */
 		public function pageLogo() {
 			$blob = Blob::findById(App::get()->getSettings()->logoId);
@@ -803,6 +859,64 @@ use const GO_CONFIG_FILE;
 
 			$blob->output(true);
 		}
+
+
+		/**
+		 * @throws Exception
+		 * @noinspection PhpUndefinedFieldInspection
+		 */
+		public function demo(Faker\Generator $faker) {
+
+			go()->getSettings()->passwordMinLength = 4;
+
+			$demo = User::find()->where('username', '=', 'demo')->single();
+			if(!$demo) {
+				$user = new User();
+				$user->username = "demo";
+				$user->displayName = $faker->name;
+				$user->email = $user->recoveryEmail = 'demo@group-office.com';
+				$user->setPassword("demo");
+
+				if (!$user->save()) {
+					throw new SaveException($user);
+				}
+
+
+				// Generates tasklists, notebooks etc.
+				$user->toArray();
+
+
+				for ($i = 0; $i < 10; $i++) {
+					echo ".";
+					$user = new User();
+//				$blob = Blob::fromTmp(new File($faker->image(null, 640, 480, 'people')));
+//				$blob->save();
+//				$user->avatarId = $blob->id;
+					$user->username = $faker->username;
+					$user->displayName = $faker->name;
+					$user->email = $user->recoveryEmail = $user->username . '@' . $faker->domainName;
+					$user->setPassword($faker->password);
+
+					if (!$user->save()) {
+						throw new SaveException($user);
+					}
+
+					// Generates tasklists, notebooks etc.
+					$user->toArray();
+				}
+			}
+		}
+
+		public function checkDatabase()
+		{
+			echo "Setting core module permissions\n";
+
+			$module = ModuleModel::findByName("core", "core");
+			$module->permissions[Group::ID_EVERYONE] = (new model\Permission($module))
+				->setRights(['mayRead' => true]);
+
+			parent::checkDatabase();
+		}
 	}
 
 }
@@ -813,7 +927,8 @@ namespace {
 	/**
 	 * @return go\core\App
 	 */
-	function go() {
+	function go(): App
+	{
 		return App::get();
 	}
 	

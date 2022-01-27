@@ -28,14 +28,13 @@ class Listeners extends Singleton {
 
 	/**
 	 * Add an event listener
-	 * 
-	 * @param int $event Defined in constants prefixed by EVENT_
-	 * @param callable $fn 
-	 * @return int $index Can be used for removing the listener.
+	 *
+	 * @param string $firingClass
+	 * @param string $event Defined in constants prefixed by EVENT_
+	 * @param string $listenerClass
+	 * @param string $method
 	 */
-	public function add($firingClass, $event, $listenerClass, $method) {
-		
-//		App::get()->debug(func_get_args());
+	public function add(string $firingClass, string $event, string $listenerClass, string $method) {
 
 		$this->checkInit();
 
@@ -72,7 +71,7 @@ class Listeners extends Singleton {
 		//disable events to prevent recursion
 		EventEmitterTrait::$disableEvents = true;
 
-		foreach (Module::find()->where(['enabled' => true]) as $module) { /* @var $module Module */
+		foreach (Module::find(['id', 'name', 'package', 'version', 'enabled'])->where(['enabled' => true]) as $module) { /* @var $module Module */
 
 			if(!$module->isAvailable()) {
 				continue;
@@ -102,14 +101,15 @@ class Listeners extends Singleton {
 
 	/**
 	 * Fire an event and execute all listeners
-	 * 
+	 *
 	 * @param string $calledClass
-	 * @param int $event
-	 * @param mixed[] $args
+	 * @param string $traitUser
+	 * @param string $event
+	 * @param array $args
 	 * @return boolean
 	 */
-	public function fireEvent($calledClass, $traitUser, $event, $args) {	
-		
+	public function fireEvent(string $calledClass, string $traitUser, string $event, array $args): bool
+	{
 		$this->checkInit();
 
 		if (isset($this->listeners[$calledClass][$event])) {
@@ -126,7 +126,10 @@ class Listeners extends Singleton {
 		//recurse up to the parents until the class is found that uses the eventemitter trait.
 		//This way you can use go\core\orm\Entity::on(EVENT_SAVE) for all entities.
 
-		if($calledClass != $traitUser && $event != Property::EVENT_MAPPING) {
+		// An exception is made for Property::EVENT_MAPPING because sometimes you don't want to inherit all the
+		// dynamic properties in an extended model.
+
+		if($calledClass != $traitUser) { // && $event != Property::EVENT_MAPPING) {
 			$parent = get_parent_class($calledClass);
 			if($parent) {
 				return $this->fireEvent($parent, $traitUser, $event, $args);

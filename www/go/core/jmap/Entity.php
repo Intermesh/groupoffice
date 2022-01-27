@@ -2,17 +2,16 @@
 
 namespace go\core\jmap;
 
+use DateTimeInterface;
 use Exception;
-use go\core\Installer;
-use go\core\fs\File;
+use GO\Base\Exception\AccessDenied;
+use go\core\model\Alert;
 use go\core\model\Module;
-use go\core\orm\Property;
+use go\core\model\User;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
-use go\core\util\StringUtil;
 use PDO;
-use go\core\orm\EntityType;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\acl\model\AclItemEntity;
 use go\core\orm\Relation as GoRelation;
@@ -42,7 +41,8 @@ abstract class Entity  extends OrmEntity {
 	 *
 	 * @return bool
 	 */
-	public static function loggable() {
+	public static function loggable(): bool
+	{
 		return true;
 	}
 
@@ -56,10 +56,11 @@ abstract class Entity  extends OrmEntity {
 	 * eg."1:2"
 	 *
 	 * @todo ACL state should be per entity and not global. eg. Notebook should return highest mod seq of acl's used by note books.
+	 * @param null $entityState
 	 * @return string
-	 * @throws Exception
 	 */
-	public static function getState($entityState = null) {
+	public static function getState($entityState = null): string
+	{
 		$state = ($entityState ?? static::entityType()->getHighestModSeq()) . ':';
 		
 		$state .= static::getMapping()->hasUserTable  ? static::entityType()->getHighestUserModSeq() : "0";		
@@ -76,7 +77,8 @@ abstract class Entity  extends OrmEntity {
    * @return boolean
    * @throws Exception
    */
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		
 		if(!parent::internalSave()) {
 			return false;
@@ -103,7 +105,7 @@ abstract class Entity  extends OrmEntity {
 	 * @param bool $force
 	 * @throws Exception
 	 */
-	public function change($force = false) {
+	public function change(bool $force = false) {
 		$this->entityType()->checkChange($this, $force);
 		$this->checkChangeForScalarRelations();
 	}
@@ -118,10 +120,13 @@ abstract class Entity  extends OrmEntity {
 	 * ]
 	 * @param array $files
 	 */
-	public function setTmpFiles($files) {
+	public function setTmpFiles(array $files) {
 		$this->tmpFiles = $files;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function saveTmpFiles() {
 		if(empty($this->tmpFiles)) {
 			return;
@@ -148,10 +153,11 @@ abstract class Entity  extends OrmEntity {
 	/**
 	 * @param bool $force Used in database check to force a check
 	 * @return bool
-	 * @throws \GO\Base\Exception\AccessDenied
+	 * @throws AccessDenied
+	 * @noinspection PhpReturnValueOfMethodIsNeverUsedInspection
 	 */
-	private function checkFilesFolder($force = false) {
-
+	private function checkFilesFolder(bool $force = false): bool
+	{
 		if(!self::$checkFilesFolder || empty($this->filesFolderId)) {
 			return true;
 		}
@@ -185,16 +191,18 @@ abstract class Entity  extends OrmEntity {
 		static::checkFiles();
 	}
 
+	/**
+	 * @throws AccessDenied
+	 */
 	protected static function checkFiles() {
 		if(static::supportsFiles()) {
-			$tables = static::getMapping()->getTables();
-			$table = array_values($tables)[0]->getName();
 
 			$filesPathProperties = static::filesPathProperties();
 			if(is_a(static::class, AclOwnerEntity::class, true)) {
 				$filesPathProperties[] = static::$aclColumnName;
 			}
 
+			/** @noinspection PhpRedundantOptionalArgumentInspection */
 			$entities = static::find(array_merge(['id', 'filesFolderId'], $filesPathProperties))
 				->where('filesFolderId', '!=', null);
 //				->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'));
@@ -225,8 +233,9 @@ abstract class Entity  extends OrmEntity {
 	 * 
 	 * @return bool
 	 */
-	private static function supportsFiles() {
-		return property_exists(static::class, 'filesFolderId') && Module::isInstalled("legacy", "files");
+	private static function supportsFiles(): bool
+	{
+		return property_exists(static::class, 'filesFolderId') && Module::isInstalled("legacy", "files", true);
 	}
 
 	/**
@@ -235,7 +244,8 @@ abstract class Entity  extends OrmEntity {
 	 * @return int
 	 * @throws Exception
 	 */
-	public function filesFolderAclId() {
+	public function filesFolderAclId(): int
+	{
 		return $this->findAclId();
 	}
 
@@ -245,7 +255,8 @@ abstract class Entity  extends OrmEntity {
    * @return string
    * @throws Exception
    */
-	public function buildFilesPath() {
+	public function buildFilesPath(): string
+	{
 		$entityType = self::entityType();
 		return $entityType->getModule()->name. '/' . $entityType->getName() . '/' . $this->id();
 	}
@@ -256,7 +267,8 @@ abstract class Entity  extends OrmEntity {
 	 * 
 	 * @return string[]
 	 */
-	protected static function filesPathProperties() {
+	protected static function filesPathProperties(): array
+	{
 		return [];
 	}
 
@@ -286,7 +298,7 @@ abstract class Entity  extends OrmEntity {
         $newKeys = isset($modified[$r->name][0]) ? array_keys($modified[$r->name][0]) : [];
         $oldKeys = isset($modified[$r->name][1]) ? array_keys($modified[$r->name][1]) : [];
         $ids = array_merge(array_diff($newKeys, $oldKeys), array_diff($oldKeys, $newKeys));
-        $tableName = $r->entityName::getMapping()->getPrimaryTable()->getName();
+        $tableName = $r->propertyName::getMapping()->getPrimaryTable()->getName();
       }
 
 			if(empty($ids)) {
@@ -299,7 +311,7 @@ abstract class Entity  extends OrmEntity {
 			foreach($classes as $cls) {
 			  $query = $cls::find();
         $query->where('id', 'IN', $ids);
-        $this->changesQuery($query, $cls, $ids);
+        $this->changesQuery($query, $cls);
 			}			
 		}
 	}
@@ -308,10 +320,10 @@ abstract class Entity  extends OrmEntity {
    * Marks changes for query already prepared for selecting the right ID's
    *
    * @param Query $query
-   * @param Property $cls
+   * @param class-string<Entity> $cls
    * @throws Exception
    */
-	private static function changesQuery(Query $query, $cls) {
+	private static function changesQuery(Query $query, string $cls) {
 
     $query->select($query->getTableAlias() . '.id AS entityId');
 
@@ -326,19 +338,19 @@ abstract class Entity  extends OrmEntity {
 
     $query->select('"0" AS destroyed', true);
 
-    $type = $cls::entityType();
-    /** @var EntityType $type */
-    $type->changes($query);
+		$type = $cls::entityType();
+		$type->changes($query);
   }
 
   /**
-   * Delete's the entitiy. Implements change logging for sync.
+   * Delete's the entiyy. Implements change logging for sync.
    *
    * @param Query $query The query to select entities in the delete statement
    * @return boolean
    * @throws Exception
    */
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 		
 		if(self::$trackChanges) {
 			static::changeReferencedEntities($query);
@@ -364,8 +376,10 @@ abstract class Entity  extends OrmEntity {
    * @return boolean
    * @throws Exception
    */
-	protected static function deleteFilesFolders(Query $query) {
+	protected static function deleteFilesFolders(Query $query): bool
+	{
 		$ids = clone $query;
+		/** @noinspection PhpRedundantOptionalArgumentInspection */
 		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)->all();
 
 		if(empty($ids)) {
@@ -389,7 +403,8 @@ abstract class Entity  extends OrmEntity {
    * @return boolean
    * @throws Exception
    */
-	protected static function logDeleteChanges(Query $query) {
+	protected static function logDeleteChanges(Query $query): bool
+	{
 		$ids = clone $query;
 		$ids->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed');
 		return static::entityType()->changes($ids);
@@ -438,7 +453,8 @@ abstract class Entity  extends OrmEntity {
 	 * @param string $state
 	 * @return array
 	 */
-	protected static function parseState($state) {
+	protected static function parseState(string $state): array
+	{
 		return array_map(function($s) {
 			
 			$modSeqAndOffset = explode("|", $s);
@@ -455,7 +471,8 @@ abstract class Entity  extends OrmEntity {
 	 * @param array $stateArray
 	 * @return string
 	 */
-	protected static function intermediateState($stateArray) {
+	protected static function intermediateState(array $stateArray): string
+	{
 		return implode(":", array_map(function($s) {	
 			return $s['modSeq'] . '|' . $s['offset'];			
 		},$stateArray));
@@ -476,7 +493,8 @@ abstract class Entity  extends OrmEntity {
    * @throws CannotCalculateChanges
    * @throws Exception
    */
-	public static function getChanges($sinceState, $maxChanges) {
+	public static function getChanges(string $sinceState, int $maxChanges): array
+	{
 		
 		$entityType = static::entityType();
 		
@@ -494,17 +512,12 @@ abstract class Entity  extends OrmEntity {
 							->single();
 
 			if(!$change) {			
-				throw new CannotCalculateChanges("Can't calculate changes for state: ". $sinceState .
-					', entity ' . $entityType->getName() );
+				throw new CannotCalculateChanges("Can't calculate changes for '" . $entityType->getName() . "' with state: ". $sinceState .' ('.$states[0]['modSeq'].')');
 			}
 		}	
 		
 		$result = [				
 			'oldState' => $sinceState,
-			'newState' => null,
-			'hasMoreChanges' => false,
-			'totalChanges' => 0,//unofficial response but we use it to process no more than 100000 changes. A resync is
-			//more efficient in the webclient in that case.
 			'changed' => [],
 			'removed' => []
 		];		
@@ -532,13 +545,12 @@ abstract class Entity  extends OrmEntity {
 			}
 		}
 
+		//unofficial response but we use it to process no more than 100000 changes. A resync is
+		//more efficient in the webclient in that case.
 		$result['totalChanges'] = $changesQuery->foundRows();
 		
-		if($changes->rowCount() > $maxChanges && $count){
-			
+		if($changes->rowCount() > $maxChanges && $count) {
 			$states[1]['offset'] += $maxChanges;
-			
-			$result['hasMoreChanges'] = true;
 			$result['newState'] = static::intermediateState($states);
 		} else
 		{
@@ -551,7 +563,7 @@ abstract class Entity  extends OrmEntity {
 	}
 
   /**
-   * Check if this entities has user properties
+   * Check if this entity has user properties
    *
    * User properties can vary between users. For example "starred" of a contact
    * can be different between users.
@@ -559,7 +571,8 @@ abstract class Entity  extends OrmEntity {
    * @return boolean
    * @throws Exception
    */
-	public static function hasUserProperties() {
+	public static function hasUserProperties(): bool
+	{
 		foreach(static::getMapping()->getTables() as $table) {
 			if($table->isUserTable) {
 				return true;
@@ -577,7 +590,8 @@ abstract class Entity  extends OrmEntity {
    * @return string[]
    * @throws Exception
    */
-	public static function getUserProperties() {
+	public static function getUserProperties(): array
+	{
 		$p = [];
 		foreach(static::getMapping()->getTables() as $table) {
 			if($table->isUserTable) {
@@ -593,7 +607,8 @@ abstract class Entity  extends OrmEntity {
    * @return Query
    * @throws Exception
    */
-	protected static function getUserChangesQuery($sinceModSeq) {
+	protected static function getUserChangesQuery($sinceModSeq): Query
+	{
 		return (new Query())
 						->select('entityId, "0" AS destroyed')
 						->from("core_change_user", "change_user")
@@ -609,7 +624,8 @@ abstract class Entity  extends OrmEntity {
    * @return Query
    * @throws Exception
    */
-	protected static function getEntityChangesQuery($sinceModSeq) {
+	protected static function getEntityChangesQuery($sinceModSeq): Query
+	{
     return (new Query)
             ->select('entityId,max(destroyed) AS destroyed')
 	          ->calcFoundRows()
@@ -629,7 +645,8 @@ abstract class Entity  extends OrmEntity {
    * @return array [['cls'=>'Contact', 'column' => 'id', 'paths' => []]]
    * @throws Exception
    */
-	protected static function getEntityReferences() {
+	protected static function getEntityReferences(): array
+	{
 		$cacheKey = "refs-entity-" . static::class;
 		$entityClasses = go()->getCache()->get($cacheKey);
 		if($entityClasses === null) {
@@ -654,10 +671,17 @@ abstract class Entity  extends OrmEntity {
   /**
    * Find's JMAP entities that have the given table name mapped
    *
-   * @param $tableName
-   * @return Array[] [['cls'=>'jmap\Entity', 'paths' => 'contactId']]
+   * @param string $tableName
+   * @return array[] [['cls'=>'jmap\Entity', 'paths' => 'contactId']]
    */
-	protected static function findEntitiesByTable($tableName) {
+	protected static function findEntitiesByTable(string $tableName): array
+	{
+		$cacheKey = "findEntitiesByTable-" . $tableName;
+		$cached = go()->getCache()->get($cacheKey);
+		if(isset($cached)) {
+			return $cached;
+		}
+
 		$cf = new ClassFinder();
 		$allEntities = $cf->findByParent(Entity::class);
 
@@ -675,17 +699,106 @@ abstract class Entity  extends OrmEntity {
 
 		}, $allEntities);
 
-		return array_filter($mapped, function($m) {
+		$result = array_filter($mapped, function($m) {
 			return !empty($m['paths']);
 		});
+
+		go()->getCache()->set($cacheKey, $result);
+
+		return $result;
 	}
 
 
-	public function jsonSerialize()
+	public function jsonSerialize(): array
 	{
 		$arr = $this->toArray();
 		$arr['id'] = $this->id();
 
 		return $arr;
 	}
+
+	/**
+	 * Create an alert for this entity
+	 *
+	 * @param DateTimeInterface $triggerAt
+	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param int|null $userId The user this alert is for. Defaults to current user.
+	 * @return Alert
+	 */
+	public function createAlert(DateTimeInterface $triggerAt,
+	                            string            $tag,
+	                            int               $userId = null): Alert
+	{
+		$alert = new Alert();
+
+		$alert->triggerAt = $triggerAt;
+		$alert->userId = $userId ?? go()->getAuthState()->getUserId();
+		$alert->entityId =  $this->id;
+		$alert->entityTypeId = static::entityType()->getId();
+		$alert->tag = $tag;
+
+		return $alert;
+	}
+
+	/**
+	 * Delete an alert
+	 *
+	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param int|null $userId The user this alert is for. Defaults to current user.
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function deleteAlert(string $tag, int $userId = null): bool
+	{
+		return Alert::delete([
+			'entityTypeId' => self::entityType()->getId(),
+			'entityId' => $this->id,
+			'tag' => $tag,
+			'userId' => $userId ?? go()->getAuthState()->getUserId()
+		]);
+	}
+
+	/**
+	 * Called when reminders are deleted / dismissed
+	 *
+	 *
+	 * @param Alert[] $alerts
+	 */
+	public static function dismissAlerts(array $alerts) {
+
+	}
+
+
+	public function alertTitle(Alert $alert) {
+
+	}
+
+	const EVENT_ALERT_PROPS = 'alertprops';
+
+	public function alertProps(Alert $alert): array
+	{
+
+		$body = null;
+		$title = null;
+
+		$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
+		go()->getLanguage()->setLanguage($user->language);
+
+		self::fireEvent(self::EVENT_ALERT_PROPS, $this, $alert, ['title' => &$title, 'body' => &$body]);
+
+		if(!isset($body)) {
+
+			$body = $alert->triggerAt->toUserFormat(true, $user);
+		}
+
+		if(!isset($title)) {
+			$title = $alert->findEntity()->title() ?? null;
+		}
+
+
+		go()->getLanguage()->setLanguage(go()->getAuthState()->getUser(['language'])->language);
+
+		return ['title' => $title, 'body' => $body];
+	}
+
 }

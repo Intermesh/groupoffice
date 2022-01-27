@@ -15,13 +15,7 @@ Ext.onReady(function () {
 		currentUser: null,
 		labelWidth: dp(152),
 		title: t('Google authenticator'),
-		
-		onChanges : function(entityStore, added, changed, destroyed) {
-			if(this.currentUser && changed[this.currentUser.id] && ("googleauthenticator" in changed[this.currentUser.id])){
-				this.onLoad(changed[this.currentUser.id]);
-			}
-		},
-		
+
 		initComponent: function() {
 			this.enableAuthenticatorBtn = new Ext.Button({
 				text:t('Enable google authenticator'),

@@ -231,32 +231,40 @@ go.Jmap = {
 					if(store) {
 						(function(store) {
 							store.getState().then(function(state) {
+								// console.warn(store.entity.name, state);
 								if(!state || state == data[store.entity.name]) {
 									//don't fetch updates if there's no state yet because it never was used in that case.
 									return;
 								}
 								
-								store.getUpdates();
+								store.getUpdates().catch((e) => {
+									console.warn(e);
+									//ignore changes error, sync will reset on error
+								});
 							});
 						})(store);
 					}
 				}
 			}, false);
 
-			source.addEventListener('alert', function(e) {
-				var data = JSON.parse(e.data);
-				go.Db.store(data.entityType).single(data.entityId).then(function(entity) {
-					go.Notifier.flyout({
-						title: entity.title | entity.name || entity.subject || entity.description,
-						buttons: [{
-							text: 'Open',
-							handler: function() {
-								alert('biem');
-							}
-						}]
-					});
-				});
-			},false);
+			// source.addEventListener('alert', function(e) {
+			// 	var data = JSON.parse(e.data);
+			// 	go.Db.store(data.entityType).single(data.entityId).then(function(entity) {
+			// 		go.Notifier.msg({
+			// 			title: t(data.entityType),
+			// 			html: entity.title || entity.name || entity.subject || entity.description,
+			// 			buttons: [{
+			// 				text: t('Open'),
+			// 				handler: function() {
+			// 					var window = new go.links.LinkDetailWindow({entity:data.entityType});
+			// 					window.load(data.entityId).show();
+			// 				}
+			// 			}]
+			// 		});
+			// 	});
+			//
+			//
+			// },false);
 
 			window.addEventListener('beforeunload', () => {
 				console.log("Closing SSE")

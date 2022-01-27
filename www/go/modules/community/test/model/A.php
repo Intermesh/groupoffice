@@ -52,7 +52,8 @@ class A extends Entity {
 
 	public $map;
 					
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable('test_a', 'a')						
 						->addArray('hasMany', AHasMany::class, ['id' => 'aId'])

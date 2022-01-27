@@ -471,6 +471,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Relative hostname with slash on both start and end
 	 * 
 	 * use go\core\model\Settings:URL
+	 *
+	 * or dynamically determined:
+	 *
+	 * \go\core\webclient\Extjs3::get()->getBaseUrl()
 	 * 
 	 * @deprecated since 6.3
 	 *

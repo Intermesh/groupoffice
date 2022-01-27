@@ -273,7 +273,8 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 		return $text;
 	}
 
-	public function toArray($properties = null) {
+	public function toArray(array $properties = null): array
+	{
 		$fn = $this->returnAsText ? 'dbToText' : 'dbToApi';
 		$record = $this->internalGetCustomFields();
 		foreach($this->getCustomFieldModels() as $field) {
@@ -343,7 +344,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 			}
 
 			return true;
-		} catch(PDOException $e) {
+		} catch(\PDOException $e) {
 			$uniqueKey = Utils::isUniqueKeyException($e);
 			if ($uniqueKey) {
 				$this->entity->setValidationError('customFields.' . $uniqueKey, ErrorCode::UNIQUE);

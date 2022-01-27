@@ -2,6 +2,8 @@
 
 namespace go\core\fs;
 
+use PDOException;
+
 class GarbageCollector {
 
 	const forSystem = true;
@@ -10,21 +12,22 @@ class GarbageCollector {
 
 	public function execute() {
 		
-		$query = \go\core\fs\Blob::find(['id', 'name'])->execute();
+		$query = Blob::find(['id', 'name'])->execute();
 		
 		while($blob = $query->fetch()){
 			try{
 				if($blob->delete()) {
 					echo 'Removed '. $blob->name ."<br>";
 				}
-			} catch(\PDOException $e) {
-				// wont remove blobs that are referrenced
+			} catch(PDOException $e) {
+				// wont remove blobs that are referenced
 			}
 		}
 		//$this->removeEmptyDirs(\go()->getDataFolder()->getPath() .'/data/');
 	}
 	
-	private function removeEmptyDirs($path) {
+	private function removeEmptyDirs($path): bool
+	{
 		$empty=true;
 		foreach (glob($path."/*") as $file) {
 			$empty &= is_dir($file) && $this->removeEmptyDirs($file);

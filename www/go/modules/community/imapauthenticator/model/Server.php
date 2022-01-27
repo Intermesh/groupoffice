@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\imapauthenticator\model;
 
+use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 
@@ -54,18 +55,21 @@ class Server extends Entity {
 	 */
 	public $groups;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping(): Mapping
+	{
 		return parent::defineMapping()
 						->addTable('imapauth_server', 's')
 						->addArray("domains", Domain::class, ['id' => "serverId"])
 						->addArray("groups", Group::class, ['id' => "serverId"]);
 	}
   
-  public static function getClientName() {
+  public static function getClientName(): string
+  {
     return "ImapAuthServer";
   }
 	
-	protected function internalSave() {
+	protected function internalSave(): bool
+	{
 		if($this->isModified("domains")) {
 			go()->getCache()->delete("authentication-domains");
 		}
@@ -73,7 +77,8 @@ class Server extends Entity {
 		return parent::internalSave();
 	}
 	
-	protected static function internalDelete(Query $query) {
+	protected static function internalDelete(Query $query): bool
+	{
 		go()->getCache()->delete("authentication-domains");
 		return parent::internalDelete($query);
 	}

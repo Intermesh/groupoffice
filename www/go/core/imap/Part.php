@@ -184,7 +184,7 @@ abstract class Part extends Model {
 		}
 		
 		if(!is_resource($filePointer)){
-			throw new Exception("Invalid file pointer given");
+			throw new \InvalidArgumentException("Invalid file pointer given");
 		}
 		
 		if($sendHeaders){
@@ -197,7 +197,8 @@ abstract class Part extends Model {
 		$this->getData(true, $streamer);
 	}	
 	
-	public function toArray($attributes = ['filename', 'partNumber','type', 'subtype', 'parts']) {
+	public function toArray(array $attributes = null): array
+	{
 		return parent::toArray($attributes);
 	}
 }

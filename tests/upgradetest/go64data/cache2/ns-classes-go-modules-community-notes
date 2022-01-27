@@ -1,1 +1,0 @@
-a:7:{i:0;s:33:"go\modules\community\notes\Module";i:1;s:42:"go\modules\community\notes\controller\Note";i:2;s:46:"go\modules\community\notes\controller\NoteBook";i:3;s:38:"go\modules\community\notes\convert\Csv";i:4;s:37:"go\modules\community\notes\model\Note";i:5;s:41:"go\modules\community\notes\model\NoteBook";i:6;s:45:"go\modules\community\notes\model\UserSettings";}

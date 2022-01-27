@@ -9,8 +9,8 @@ go.Modules.register("community", 'notes', {
 	entities: [{
 		name: "Note",
 		relations: {
-			creator: { store: "User", fk: "createdBy" },
-			modifier: { store: "User", fk: "createdBy" }
+			creator: { store: "UserDisplay", fk: "createdBy" },
+			modifier: { store: "UserDisplay", fk: "createdBy" }
 		},
 		filters: [
 			{

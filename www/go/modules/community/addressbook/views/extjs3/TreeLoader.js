@@ -3,6 +3,8 @@
 go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 
 	entityStore: "AddressBook",
+
+	pageSize: 20,
 	
 	secondaryTextTpl: '<button class="icon">more_vert</button>',
 	
@@ -28,25 +30,32 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 			}
 		});
 	},
-	
+
+	position: 0,
+
 	getParams: function(node) {
-		return Ext.apply({limit: 1000, sort: [{property: "name", isAscending: true }]}, this.baseParams);
+		return Ext.apply({limit: this.pageSize, position: this.position, calculateHasMore: true, sort: [{property: "name", isAscending: true }]}, this.baseParams);
 	},
 
-	handleResponse : function(r) {
-		r.responseData.unshift({
-			leaf: true,
-			iconCls: "ic-star",
-			text: t("Starred", "addressbook", "community"),
-			id: "starred"
-		});
 
-		r.responseData.unshift({
-						leaf: true,
-						iconCls: "ic-select-all",
-						text: t("All contacts", "addressbook", "community"),
-						id: "all"
-				});
+
+	handleResponse : function(r) {
+
+		if(this.position == 0 && !this.getFilter("tbsearch")) {
+			r.responseData.unshift({
+				leaf: true,
+				iconCls: "ic-star",
+				text: t("Starred", "addressbook", "community"),
+				id: "starred"
+			});
+
+			r.responseData.unshift({
+				leaf: true,
+				iconCls: "ic-select-all",
+				text: t("All contacts", "addressbook", "community"),
+				id: "all"
+			});
+		}
 		go.modules.community.addressbook.TreeLoader.superclass.handleResponse.call(this, r);	
 		
 	},

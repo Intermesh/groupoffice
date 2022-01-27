@@ -27,7 +27,7 @@ return array (
   'Company' => 'Företag',
   'Permissions' => 'Behörigheter',
   'Login' => 'Logga in',
-  'Look & Feel' => 'Utseende & känsla',
+  'Look & feel' => 'Utseende & känsla',
   'Settings' => 'Inställningar',
   'Email for new enabled users' => 'E-post till nya aktiverade användare',
   'Email for new disabled users' => 'E-post till nya inaktiverade användare',

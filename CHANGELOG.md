@@ -1,3 +1,78 @@
+- Tasks: Added widget for startpage
+- Tasks: When creating tasks from other Contacts, Projects or Orders the subject field will be auto filled.
+- Core: Fixed database check and make sure core module is shared
+- Tasks: Fixed date shift and priority change in tasks migration
+- Tasks: Fixed fue_time error in continue task dialog
+- Core: When dialog had custom fields the initial field lost focus
+
+25-01-2022 6.6.34
+- Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
+- Core: wrong return value in App::getStorageFreeSpace()
+
+24-01-2022 6.6.33
+- ActiveSync: Fixed empty needle error
+- Projects2: autorefresh task list when deleting project
+- Address book: System settings panel was missing
+- Projects2: Unable to set activity type rates
+- Core: Notification area doesn't close when there are more reminders left
+- Core: CronJob stack trace was logged even when not in debug mode which is a potential security risk.
+- Tasks: added excel export and fixed csv export
+- Tasks: updating reminders bug
+- Tasks: if start date is set then use that as default for new alerts
+- ActiveSync: Fixed moving appointments to another calendar
+- ActiveSync: Fixed tasks sync error
+- ActiveSync: Use default address book for new contacts
+- Email: Fixed infinite loop problem with downloading some attachments from some IMAP servers
+- Studio: enable admin to patch manually from 6.5 to 6.6
+
+17-01-2022 6.6.32
+- Core: Issue #776: invalid return type in App::getStorageQuota()
+- Bookmarks: Fixed integrity constraint error when logo was not found
+- Bookmarks: Improved logo detection and return redirected URL
+- Bookmarks: Improved UI
+- ActiveSync: Preserve Message ID, In-Reply-To and References headers. Hopefully fixes In-Reply-To: header is missing #779 too.
+- Projects2: Fix tasklist combo when editing project task
+- Billing: Set empty contact name when removing contact
+- Billing: timezone error in reports showing invoices from one day out of the range.
+- Billing: Report checkboxes were not loaded correctly
+
+13-01-2022 6.6.31
+- Address book: Bug in address book create permissions
+- ActiveSync: Fixed sync problem and cleaned up code
+
+11-01-2022 6.6.30
+- Calendar: Added showing tasks in the calendar for new task module.
+- Core: Typo in updates.php fixing upgrade error: ine 61: Return value of go\core\orm\EntityType::getName() must be of the type string, null returned
+
+10-01-2022 6.6.29
+- Fixed Issue: Import into address book is not possible (Issue #775)
+- Core: Suppress too many changes error
+- Business: Delay loading of business and activities in system settings
+
+07-01-2022 6.6.28
+- Business: Fixed update query for older mysql versions
+
+06-01-2022 6.6.27
+- Core: Fixed several upgrade issues
+
+04-01-2022 6.6.26
+- Core: Query error when deleting multiple links at once
+- Studio: Patch studio modules to comply with 6.6 code standards
+- Tasks: Fixed some SQL errors that occurred on MySQL 8
+
+03-01-2022 6.6.25
+- Tasks: Completely rewritten module
+- Core: Set alternative lost password URL
+- Core: Alert system to notify users about comments, assigned tasks etc.
+- Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
+- Core: New module chooser menu
+- Core: System Settings -> Modules redesigned and searchable.
+- Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
+      custom fields.
+
+
+6.5.98
+25-01-2022 6.5.99
 - Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
 
 24-01-2022 6.5.98
@@ -11,6 +86,7 @@
 - Email: Fixed infinite loop problem with downloading some attachments from some IMAP servers
 
 17-01-2022 6.5.97
+- Business: hide 'Budgetable' checkbox for special leave types
 - Leavedays: set special_budget_id explicitly to NULL when not in special leave mode
 - Business: manage permissions to the module will enable user to edit all agreements
 
@@ -72,6 +148,8 @@
 
 26-11-2021 6.5.89
 - Remove obsolete timeentrydata module
+- Core: Keep debug.log file cleaner by not writing all the request and response parameters.
+- Addressbook: added Comment filter
 - Business: added sortOrder field to business_activity, made sortable by dragging and dropping
 - Leavedays: order report by business_activity.sortOrder
 - Comments: insert date header above first comment

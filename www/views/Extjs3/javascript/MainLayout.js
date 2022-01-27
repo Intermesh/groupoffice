@@ -104,6 +104,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					go.Router.check();
 				})
 			} else {
+
+
+
 				me.fireEvent("boot", me); // In the router there is an event attached.
 
 				go.Router.check();
@@ -373,12 +376,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	
 	addDefaultRoutes : function() {
 		var me = this;
+		var c = go.User.capabilities['go:core:core'] || {};
+		go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {
+			me.openSystemSettings().setActiveItem(tabId);
+		});
 
-		if(go.User.isAdmin) {
-			go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {		
-				me.openSystemSettings().setActiveItem(tabId);
-			});
-		}
 
 		//Add these default routes on boot so they are added as last options for sure.
 		//
@@ -421,16 +423,25 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.startMenu = new Ext.menu.Menu({
 			id: 'startMenu',
-			hideOnClick: true
+			enableScrolling: false
 		});
 
-		if(GO.util.isMobileOrTablet()) {
-			this.startMenu.on("show", function() {
-				this.startMenu.setPosition(0,0);
-				this.startMenu.setWidth(Ext.getBody().getWidth());
-				this.startMenu.setHeight(Ext.getBody().getHeight());
-			}, this);
-		}
+		this.startMenu.on('render', () => {
+			this.startMenu.getEl().on('click', (e) => {
+				var t = this.startMenu.findTargetItem(e);
+				if(!t){
+					this.startMenu.hide();
+				}
+			});
+		});
+
+		// if(GO.util.isMobileOrTablet()) {
+		// 	this.startMenu.on("show", function() {
+		// 		this.startMenu.setPosition(0,0);
+		// 		this.startMenu.setWidth(Ext.getBody().getWidth());
+		// 		this.startMenu.setHeight(Ext.getBody().getHeight());
+		// 	}, this);
+		// }
 
 		if (allPanels.length == 0) {
 			items = new Ext.Panel({
@@ -461,7 +472,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				moduleName: allPanels[i].moduleName,
 				text: allPanels[i].title,
 				//iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
-				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+")",
+				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+"&mtime="+go.User.session.cacheClearedAt+")",
 				//icon: ,
 				handler: function (item, e) {
 					this.openModule(item.moduleName);
@@ -535,12 +546,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		this.rendered = true;
 		this.fireEvent("beforerender", this);
 
-		function getUserImgStyle() {
-			if(!go.User.avatarId) {
-				return "";
-			}
-			return 'background-image:url('+go.Jmap.thumbUrl(go.User.avatarId, {w: 40, h: 40, zc: 1})+');'
-		}
+		// function getUserImgStyle() {
+		// 	if(!go.User.avatarId) {
+		// 		return "";
+		// 	}
+		// 	return 'background-image:url('+go.Jmap.thumbUrl(go.User.avatarId, {w: 40, h: 40, zc: 1})+');'
+		// }
 
 				var topPanel = new Ext.Panel({
 					id:"mainNorthPanel",
@@ -551,7 +562,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							<div id="status-bar" class="x-hide-display"></div>\
 							<div id="search_query"></div>\
 							<div id="start-menu-link" ></div>\
-							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'"></a>\
+							<a id="user-menu" class="user-img"></a>\
 						</div>\
 					</div>',
 					//height: dp(64),
@@ -603,10 +614,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				var userBtn = Ext.get('user-menu');
 				var userMenuTpl = userBtn.dom.innerHTML;
 				this.userMenuLink = new Ext.Button({
-					text: userMenuTpl,
+					text: go.util.avatar(go.User.displayName, go.User.avatarId),
 					renderTo: userBtn,
 					clickEvent: 'mousedown',
-					template: new Ext.XTemplate('<div style="border-radius:50%"><button></button></div>'),
+					template: new Ext.XTemplate('<div><button></button></div>'),
 					menu: new Ext.menu.Menu({
 						items: [
 							{
@@ -677,7 +688,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		if(go.User.isAdmin) {
 
-			if(go.Modules.get("core", "core").settings.readOnlyKeys.indexOf('license') == -1) {
+			if (go.Modules.get("core", "core").settings.readOnlyKeys.indexOf('license') == -1) {
 				this.userMenuLink.menu.insert(6, {
 					iconCls: 'ic-app-registration',
 					text: t("Register"),
@@ -688,7 +699,47 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					scope: this
 				});
 			}
+		}
 
+
+		// this.userMenuLink.menu.insert(6, this.installBtn = new Ext.menu.Item({
+		// 	iconCls: 'ic-download-for-offline',
+		// 	text: t("Install on your desktop"),
+		// 	hidden: true,
+		// 	handler: function () {
+		//
+		// 		// hide our user interface that shows our A2HS button
+		// 		this.installBtn.hide();
+		// 		this.userMenuLink.menu.doLayout();
+		// 		// Show the prompt
+		// 		this.deferredPrompt.prompt();
+		// 		// Wait for the user to respond to the prompt
+		// 		this.deferredPrompt.userChoice.then((choiceResult) => {
+		// 			if (choiceResult.outcome === 'accepted') {
+		// 				console.log('User accepted the A2HS prompt');
+		// 			} else {
+		// 				console.log('User dismissed the A2HS prompt');
+		// 			}
+		// 			this.deferredPrompt = null;
+		// 		});
+		// 	},
+		// 	scope: this
+		// }));
+
+
+
+
+
+
+
+
+		var c = go.User.capabilities['go:core:core'] || {};
+
+		this.systemSettingsWindow = new go.systemsettings.Dialog({
+			closeAction: "hide"
+		});
+
+		if(this.systemSettingsWindow.tabPanel.items.getCount()) {
 			this.userMenuLink.menu.insert(3, {
 				text: t("System settings"),
 				iconCls: 'ic-settings',
@@ -713,20 +764,20 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.welcome();
 
-		// Start in 10s to give the browser some time to boot other requests.
+		// Start in 5s to give the browser some time to boot other requests.
 		setTimeout(function() {
 			go.Jmap.sse();
-		},10000);
+		},5000);
 		
 	},
+
+
 	
 	
 	openSystemSettings : function() {
 
 		GO.viewport.items.each(function(i){i.hide()});
-		this.systemSettingsWindow = new go.systemsettings.Dialog({
-			closeAction: "hide"
-		});
+
 
 		this.systemSettingsWindow.show();
 
@@ -748,9 +799,26 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						}
 					}, coreMod.id);
 
-					go.systemsettingsDialog = new go.systemsettings.Dialog();
-					go.systemsettingsDialog.show();
-				});
+						this.systemsettingsDialog.show();
+				}, this);
+			}
+
+			if(!coreMod.settings.demoDataAsked) {
+				Ext.MessageBox.confirm(t("Demo"), t("Do you want to generate some fake demonstration data?"), (btn) => {
+
+					go.Db.store("Module").save({
+						settings: {
+							demoDataAsked: true
+						}
+					}, coreMod.id);
+
+					if(btn == 'yes') {
+						Ext.getBody().mask(t("Loading..."));
+						go.Jmap.request({method: "core/System/demo"}).finally(() => {
+							Ext.getBody().unmask();
+						});
+					}
+				}, this);
 			}
 
 			// if(!coreMod.settings.licenseDenied && !coreMod.settings.license) {
@@ -863,3 +931,15 @@ GO.mainLayout = new GO.MainLayout();
 
 // needed in pre v6.4
 GO.mainLayout.on('callto', GO.util.callToHandler);
+
+//
+// window.addEventListener('beforeinstallprompt', (e) => {
+//
+// 	// Prevent Chrome 67 and earlier from automatically showing the prompt
+// 	e.preventDefault();
+// 	// Stash the event so it can be triggered later.
+// 	GO.mainLayout.deferredInstallPrompt = e;
+// 	// Update UI to notify the user they can add to home screen
+// 	GO.mainLayout.installBtn.show();
+//
+// });

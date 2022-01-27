@@ -139,7 +139,12 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 				this.websiteTitle.setValue(result.title);
 				this.websiteDescription.setValue(result.description);
 				this.thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(result.logo) + ')';
-				this.thumbField.setValue(result.logo);
+
+				if(result.logo) {
+					this.thumbField.setValue(result.logo);
+				}
+
+				this.formPanel.form.findField("content").setValue(result.url);
 
 				this.el.unmask();
 			},

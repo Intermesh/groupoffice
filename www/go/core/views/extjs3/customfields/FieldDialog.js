@@ -144,7 +144,7 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						name: "relatedFieldCondition",
 						fieldLabel: t("Required condition"),
 						anchor: "100%",
-						hint: "eg. 'nameOfStandardOrCustomField = test'",
+						hint: "eg. 'nameOfStandardOrCustomField = test' or 'checkbox = 1'",
 						listeners: {
 							valid: function(elm) {
 								// TODO: Clean out duplicated code

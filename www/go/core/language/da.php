@@ -21,7 +21,7 @@ return array (
   'Password' => 'Kodeord',
   'Company' => 'Virksomhed',
   'Permissions' => 'Tilladelser',
-  'Look & Feel' => 'Udseende & brug',
+  'Look & feel' => 'Udseende & brug',
   'Settings' => 'Indstillinger',
   'Email for new enabled users' => 'E-mail til nyligt aktiverede brugere',
   'Email for new disabled users' => 'E-mail til nyligt deaktiverede brugere',

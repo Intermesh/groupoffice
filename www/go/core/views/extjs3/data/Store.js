@@ -58,7 +58,7 @@
 go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
 	/**
-	 * WIll autodestroy if the component it belongs too is detroyted
+	 * WIll autodestroy if the component it belongs too is destroyed
 	 *
 	 * WARNING: the component is responsible for handling this, If you have a custom component you must destroy it yourself.
 	 */
@@ -85,7 +85,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		if(!Ext.isDefined(config.enableCustomFields) || config.enableCustomFields) {
 			this.addCustomFields(config);
 		}
-		
+
 		go.data.Store.superclass.constructor.call(this, Ext.applyIf(config, {
 			idProperty:  "id",
 			paramNames: {
@@ -106,7 +106,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		var old = this.loading;
 		this.loading = true;
 			
-		if(o.records && this.proxy instanceof go.data.EntityStoreProxy) {
+		if(o.records) {
 			this.proxy.preFetchEntities(o.records, function() {
 				go.data.Store.superclass.loadData.call(this, o, append);	
 				this.loading = old;		

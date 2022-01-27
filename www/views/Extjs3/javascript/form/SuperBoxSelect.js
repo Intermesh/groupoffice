@@ -408,7 +408,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,Ext.form.Comb
 			} else if (this.pinList) {
 				this.multiSelectMode = true;
 			}
-			this.onTriggerClick();
+			setTimeout(()=> this.onTriggerClick()); // fix list not opening
 		}, this);
 	},
 	removeButtonEvents : function() {

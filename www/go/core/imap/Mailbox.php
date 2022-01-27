@@ -1300,8 +1300,9 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 //		return $this->check_response($response);
 	}
 
-	public function toArray($attributes = array('name', 'delimiter', 'flags', 'unseencount', 'messagescount', 'uidnext')) {
-		return parent::toArray($attributes);
+	public function toArray(array $properties = null): array
+	{
+		return parent::toArray($properties);
 	}
 
 	/**

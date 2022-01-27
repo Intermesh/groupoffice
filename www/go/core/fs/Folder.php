@@ -2,6 +2,7 @@
 namespace go\core\fs;
 
 use Exception;
+use go\core\App;
 
 /**
  * A folder object
@@ -56,7 +57,8 @@ class Folder extends FileSystemObject {
 	 * Check if the file or folder exists
 	 * @return boolean
 	 */
-	public function exists() {
+	public function exists(): bool
+	{
 		return is_dir($this->path) || is_link($this->path);
 	}
 
@@ -65,7 +67,8 @@ class Folder extends FileSystemObject {
 	 * 
 	 * @return static
 	 */
-	public static function tempFolder() {
+	public static function tempFolder(): Folder
+	{
 		return go()->getTmpFolder()->getFolder(uniqid(time()));
 	}
 
@@ -74,7 +77,8 @@ class Folder extends FileSystemObject {
 	 *
 	 * @return bool
 	 */
-	public function isEmpty() {
+	public function isEmpty(): bool
+	{
 
 		$handle = opendir($this->getPath());
 		while (false !== ($entry = readdir($handle))) {
@@ -96,7 +100,8 @@ class Folder extends FileSystemObject {
 	 * 
 	 * @return File[]|Folder[]|array[]
 	 */
-	public function getChildren($includeFiles = true, $includeFolders = true) {
+	public function getChildren(bool $includeFiles = true, bool $includeFolders = true): array
+	{
 		if (!$dir = opendir($this->path)) {
 			return []; // Return an empty array to prevent crashing foreach() loops
 		}
@@ -128,7 +133,8 @@ class Folder extends FileSystemObject {
 	 * 
 	 * @return File[]
 	 */
-	public function getFiles() {
+	public function getFiles(): array
+	{
 		return $this->getChildren(true, false);
 	}
 	
@@ -137,48 +143,49 @@ class Folder extends FileSystemObject {
 	 * 
 	 * @return Folder[]
 	 */
-	public function getFolders() {
+	public function getFolders(): array
+	{
 		return $this->getChildren(false, true);
 	}
-	
+
 	/**
 	 * Get a file in this folder
-	 * 
+	 *
 	 * This function does not check if the folder exists.
-	 * 
+	 *
+	 * @param string $relativePath
 	 * @return File
 	 */
-	public function getFile($relativePath) {
+	public function getFile(string $relativePath): File
+	{
 		$childPath = $this->path . '/' . $relativePath;
-		$file = new File($childPath);
-		
-		return $file;
+		return new File($childPath);
 	}
-	
+
 	/**
 	 * Get a subfolder
-	 * 
+	 *
 	 * This function does not check if the folder exists.
-	 * 
+	 *
+	 * @param string $relativePath
 	 * @return Folder
 	 */
-	public function getFolder($relativePath) {
-		$childPath = $this->path . '/' . $relativePath;		
-		$folder = new Folder($childPath);
-		
-		return $folder;
+	public function getFolder(string $relativePath): Folder
+	{
+		$childPath = $this->path . '/' . $relativePath;
+		return new Folder($childPath);
 	}	
 	
 	/**
 	 * Get the parent folder object
 	 *
-	 * @return Folder Parent folder object
+	 * @return Folder|null Parent folder object
 	 */
-	public function getParent() {
+	public function getParent() : ?Folder {
 
 		$parentPath = dirname($this->path);
 		if ($parentPath == $this->path) {
-			return false;
+			return null;
 		}
 
 		return new Folder($parentPath);
@@ -190,7 +197,8 @@ class Folder extends FileSystemObject {
 	 *
 	 * @return boolean
 	 */
-	public function isWritable() {
+	public function isWritable(): bool
+	{
 		
 		if($this->exists()) {
 			return is_writable($this->path);
@@ -205,7 +213,8 @@ class Folder extends FileSystemObject {
 	 *
 	 * @return boolean
 	 */
-	public function delete() {
+	public function delete(): bool
+	{
 		if (!$this->exists()){
 			return true;
 		}
@@ -225,14 +234,17 @@ class Folder extends FileSystemObject {
 
 		return !is_dir($this->path) || rmdir($this->path);
 	}
+
 	/**
 	 * Move the folder to a new location.
 	 *
 	 * Note, it's not moved into this folder but moved as this name into it's parent
 	 *
 	 * @param Folder $destinationFolder This folder may not exist
+	 * @throws Exception
 	 */
-	public function move(Folder $destinationFolder) {
+	public function move(Folder $destinationFolder): bool
+	{
 		if (!$this->exists()) {
 			throw new Exception("Folder '" . $this->getPath() . "' does not exist");
 		}
@@ -240,11 +252,6 @@ class Folder extends FileSystemObject {
 		if ($destinationFolder->exists()) {
 			throw new Exception("Destination folder already exists!");
 		}
-
-//		if(is_link($this->path)){
-//			$link = new File($this->path);
-//			return $link->move(new File($destinationFolder->path()));
-//		}
 
 		if($destinationFolder->isDescendantOf($this)){
 			throw new Exception("Can't move this folder into a child folder!");
@@ -260,7 +267,7 @@ class Folder extends FileSystemObject {
 		$success = false;
 		try{
 			$success = rename($this->getPath(), $newPath);
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			//rename fails accross partitions. Ignore and retry with copy delete.
 			go()->warn("Rename failed. Falling back on copy, delete");
 		}
@@ -298,9 +305,10 @@ class Folder extends FileSystemObject {
 	 *
 	 * @param Folder $destinationFolder This folder may not exist
 	 * @return Folder
+	 * @throws Exception
 	 */
-	public function copy(Folder $destinationFolder) {
-		
+	public function copy(Folder $destinationFolder): Folder
+	{
 		if($destinationFolder->isDescendantOf($this)){
 			throw new Exception("Can't copy this folder into a child folder!");
 		}
@@ -328,35 +336,34 @@ class Folder extends FileSystemObject {
 	/**
 	 * Create the folder
 	 *
-	 * @param int $permissionsMode 
-	 * 
+	 * @param int $permissionsMode
+	 *
 	 * Use umask() to change defaults.
-	 * 
+	 *
 	 * Note that mode is not automatically
 	 * assumed to be an octal value, so strings (such as "g+w") will
 	 * not work properly. To ensure the expected operation,
 	 * you need to prefix mode with a zero (0):
-	 * 
 	 *
-	 * @return self|boolean
+	 *
+	 * @return self
+	 * @throws Exception
 	 */
-	public function create($permissionsMode = 0777) {
-
+	public function create(int $permissionsMode = 0777): Folder
+	{
 		if (is_dir($this->path)) {
 			return $this;
 		}
 
 		try{
-//			var_dump($permissionsMode);
 			if (mkdir($this->path, $permissionsMode, true)) {
 				//needed for concurrency problems
 				clearstatcache();
-
 				return $this;
 			} 
 		}
-		catch(\Exception $e){
-			\go\core\App::get()->debug($e->getMessage());
+		catch(Exception $e){
+			App::get()->debug($e->getMessage());
 		}
 		throw new Exception("Could not create folder " . $this->path);		
 	}
@@ -365,12 +372,12 @@ class Folder extends FileSystemObject {
 	 * Create a symbolic link in this folder
 	 *
 	 * @param Folder $target
-	 * @param string $linkName optional link name. If omitted the name will be the same as the target folder name
+	 * @param string|null $linkName optional link name. If omitted the name will be the same as the target folder name
 	 * @return File
 	 * @throws Exception
 	 */
-	public function createLink(Folder $target, $linkName = null) {
-
+	public function createLink(Folder $target, string $linkName = null): File
+	{
 		if (!isset($linkName)) {
 			$linkName = $target->getName();
 		}
@@ -390,10 +397,10 @@ class Folder extends FileSystemObject {
 	/**
 	 * Checks if a filename exists and renames it.
 	 *
-	 * @param string $filepath The complete path to the file
-	 * @param string  New filepath
+	 * @return string
 	 */
-	public function appendNumberToNameIfExists() {
+	public function appendNumberToNameIfExists(): string
+	{
 		$origPath = $this->path;
 		$x = 1;
 		while ($this->exists()) {
@@ -406,9 +413,9 @@ class Folder extends FileSystemObject {
 	/**
 	 * Calculate size of the directory in bytes.
 	 *
-	 * @return int/false
+	 * @return int | null
 	 */
-	public function calculateSize() {
+	public function calculateSize() : ?int {
 		$cmd = 'du -sb "' . $this->path . '" 2>/dev/null';
 
 		$io = popen($cmd, 'r');
@@ -419,17 +426,15 @@ class Folder extends FileSystemObject {
 				return false;
 			}
 			$size = preg_replace('/[\t\s]+/', ' ', trim($size));
-			$size = substr($size, 0, strpos($size, ' '));
-
-			return $size;
+			return substr($size, 0, strpos($size, ' '));
 		} else {
-			return false;
+			return null;
 		}
 	}
-	
+
 	/**
 	 * Find files and folder matching a regular expression pattern
-	 * 
+	 *
 	 * @param array|string $config If string is given then it's used as $config['regex'].
 	 *  $config is an array that can have:
 	 *  regex: then name must match this with preg_match(); eg '/.*\.sql/'
@@ -441,8 +446,10 @@ class Folder extends FileSystemObject {
 	 * @param boolean $findFolders
 	 * @param boolean $findFiles
 	 * @return File[]|Folder[]
+	 * @throws Exception
 	 */
-	public function find($config = [], $findFolders = true, $findFiles = true) {
+	public function find($config = [], bool $findFolders = true, bool $findFiles = true): array
+	{
 		$result = [];
 
 		if(!is_array($config)) {

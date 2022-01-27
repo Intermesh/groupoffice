@@ -184,7 +184,6 @@ CREATE TABLE `core_module` (
   `version` int(11) NOT NULL,
   `sort_order` int(11) NOT NULL DEFAULT 0,
   `admin_menu` tinyint(1) NOT NULL DEFAULT 0,
-  `aclId` int(11) NOT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
   `modifiedAt` datetime DEFAULT NULL,
   `modSeq` int(11) DEFAULT NULL,
@@ -524,8 +523,7 @@ ALTER TABLE `core_link`
 
 ALTER TABLE `core_module`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `aclId` (`aclId`);
+  ADD UNIQUE KEY `name` (`name`);
 
 ALTER TABLE `core_search`
   ADD PRIMARY KEY (`id`),
@@ -736,8 +734,6 @@ ALTER TABLE `core_link`
   ADD CONSTRAINT `fromEntity` FOREIGN KEY (`fromEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `toEntity` FOREIGN KEY (`toEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `core_module`
-  ADD CONSTRAINT `acl` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
 
 ALTER TABLE `core_search`
   ADD CONSTRAINT `core_search_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
@@ -838,6 +834,8 @@ CREATE TABLE `core_email_template` (
   `id` int(11) NOT NULL,
   `moduleId` int(11) NOT NULL,
   `aclId` int(11) NOT NULL,
+  `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL,
+  `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en',
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `body` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL
@@ -984,14 +982,19 @@ ALTER TABLE `core_oauth_client`
 ALTER TABLE `core_oauth_access_token`
   ADD CONSTRAINT `core_oauth_access_token_ibfk_2` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_oauth_access_token_ibfk_3` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE;
+
+
+
 CREATE TABLE `core_alert` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `entityTypeId` INT NOT NULL,
   `entityId` INT NOT NULL,
   `userId` INT NOT NULL,
   `triggerAt` DATETIME NOT NULL,
-  `alertId` INT NOT NULL,
+    tag varchar(50) null,
   `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
+  `data` text null,
+  sendMail boolean default false not null,
   PRIMARY KEY (`id`),
   INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
   INDEX `fk_alert_user_idx` (`userId` ASC),
@@ -1003,10 +1006,11 @@ CREATE TABLE `core_alert` (
   CONSTRAINT `fk_alert_user`
     FOREIGN KEY (`userId`)
     REFERENCES `core_user` (`id`)
-    ON DELETE RESTRICT
+    ON DELETE cascade
     ON UPDATE NO ACTION);
 
-
+create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
+    on core_alert (entityTypeId, entityId, tag, userId);
 
 CREATE TABLE `core_pdf_block` (
   `id` bigint(20) UNSIGNED NOT NULL,
@@ -1109,3 +1113,42 @@ alter table go_state
     add constraint go_state_core_user_id_fk
         foreign key (user_id) references core_user (id)
             on delete cascade;
+
+
+create table core_auth_remember_me
+(
+    id int auto_increment,
+    token varchar(190) collate ascii_bin null,
+    series varchar(190) collate ascii_bin null,
+    userId int not null,
+    expiresAt datetime null,
+    `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `userAgent` varchar(190) NOT NULL,
+  platform varchar(190) null,
+  browser varchar(190) null,
+    constraint core_auth_remember_me_pk
+        primary key (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+create index core_auth_remember_me_series_index
+    on core_auth_remember_me (series);
+
+alter table core_auth_remember_me
+    add constraint core_auth_remember_me_core_user_id_fk
+        foreign key (userId) references core_user (id);
+CREATE TABLE `core_permission` (
+  `moduleId` INT NOT NULL,
+  `groupId` INT NOT NULL,
+  `rights` BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`moduleId`, `groupId`),
+  INDEX `fk_permission_group_idx` (`groupId` ASC),
+  CONSTRAINT `fk_permission_module`
+      FOREIGN KEY (`moduleId`)
+          REFERENCES `core_module` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION,
+  CONSTRAINT `fk_permission_group`
+      FOREIGN KEY (`groupId`)
+          REFERENCES `core_group` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION);
