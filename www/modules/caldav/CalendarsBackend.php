@@ -551,7 +551,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			\GO::debug('Found event '.$objectUri);
 			$data = ($event->mtime==$event->client_mtime && !empty($event->data)) ? $event->data : $this->exportCalendarEvent($event);
 			//\GO::debug($event->mtime==$event->client_mtime ? "Returning client data (mtime)" : "Returning server data (mtime)");
-			\GO::debug($data);
+			//\GO::debug($data);
 
 			$object = array(
 				'id' => $event->id,
@@ -573,7 +573,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			if ($task) {
 				\GO::debug('Found task '.$objectUri);
 				$data = $this->fromBlob($task);
-				go()->debug($data);
+				//go()->debug($data);
 				$object = array(
 					'id' => $task->id,
 					'uri' => $task->getUri(),
@@ -600,7 +600,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	public function createCalendarObject($calendarId, $objectUri, $calendarData) {
 
 		\GO::debug("createCalendarObject($calendarId,$objectUri,[data)");
-		\GO::debug($calendarData);
+		//\GO::debug($calendarData);
 
 		try{
 
@@ -686,7 +686,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	public function updateCalendarObject($calendarId, $objectUri, $calendarData) {
 
 		\GO::debug("updateCalendarObject($calendarId,$objectUri,[data])");
-		\GO::debug($calendarData);
+//		\GO::debug($calendarData);
 
 		try{
 

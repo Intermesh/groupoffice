@@ -10,6 +10,21 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			this.tasklistCombo.setValue(go.User.tasksSettings.defaultTasklistId);
 		}
 	},
+
+	setLinkEntity : function(cfg) {
+
+		switch(cfg.entity) {
+			case 'Project':
+			case "Contact":
+				this.formPanel.getForm().findField("title").setValue(cfg.data.name);
+				break;
+
+			case 'Order':
+				this.formPanel.getForm().findField("title").setValue(cfg.data.order_id);
+				break;
+		}
+	},
+
 	initFormItems: function () {
 
 		// this.taskCombo = new go.modules.community.tasks.TaskCombo({});

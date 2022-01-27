@@ -164,12 +164,12 @@ COLLATE = utf8mb4_unicode_ci;
 -- Table `tasks_portlet_tasklist`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tasks_portlet_tasklist` (
-  `createdBy` INT(11) NOT NULL,
+  `userId` INT(11) NOT NULL,
   `tasklistId` INT(11) UNSIGNED NOT NULL,
-  PRIMARY KEY (`createdBy`, `tasklistId`),
+  PRIMARY KEY (`userId`, `tasklistId`),
   INDEX `tasklistId` (`tasklistId` ASC),
   CONSTRAINT `tasks_portlet_tasklist_ibfk_1`
-    FOREIGN KEY (`createdBy`)
+    FOREIGN KEY (`userId`)
     REFERENCES `core_user` (`id`)
     ON DELETE CASCADE,
   CONSTRAINT `tasks_portlet_tasklist_ibfk_2`

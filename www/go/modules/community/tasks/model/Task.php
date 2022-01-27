@@ -223,7 +223,7 @@ class Task extends AclInheritEntity {
 	/**
 	 * @throws JsonException
 	 */
-	public function getRecurrenceRule() : ?array {
+	public function getRecurrenceRule(): ?array {
 		return empty($this->recurrenceRule) ? null : JSON::decode($this->recurrenceRule, true);
 	}
 
@@ -526,12 +526,12 @@ class Task extends AclInheritEntity {
 	}
 
 	/**
-	 * @param Recurrence $rrule
+	 * @param array $rrule
 	 * @return ?DateTimeInterface
 	 */
-	protected function getNextRecurrence(Recurrence $rrule): ?DateTimeInterface
+	protected function getNextRecurrence(array $rrule): ?DateTimeInterface
 	{
-		$rule = Recurrence::fromArray((array) $rrule, $this->start);
+		$rule = Recurrence::fromArray($rrule, $this->start);
 		$rule->next();
 		return $rule->current();
 	}
@@ -551,7 +551,7 @@ class Task extends AclInheritEntity {
 				$query->join("tasks_tasklist", "tasklist", "tasklist.id = task.tasklistId");
 			}
 			$sort['tasklist.name'] = $sort['tasklist'];
-
+			$sort['due'] = 'DESC';
 			unset($sort['tasklist']);
 		}
 
