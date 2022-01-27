@@ -57,6 +57,11 @@ class VCard extends AbstractConverter {
 				try {
 					$vcard = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
+					if ($vcard->VERSION != "3.0") {
+						// we can only use 3.0 for photo's somehow :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
+						$vcard = $vcard->convert(SabreDocument::VCARD30);
+					}
+
 					//remove all supported properties
 					$vcard->remove('EMAIL');
 					$vcard->remove('TEL');
