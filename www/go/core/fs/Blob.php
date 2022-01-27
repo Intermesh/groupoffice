@@ -396,14 +396,18 @@ class Blob extends orm\Entity {
 	/**
 	 * Parse blob id's inserted as images in HTML content.
 	 * 
-	 * @param string $html
+	 * @param ?string $html
 	 * @return string[] Array of blob ID's
 	 */
-	public static function parseFromHtml(string $html): array
+	public static function parseFromHtml(?string $html): array
 	{
 //		if(!preg_match_all('/<img [^>]*src="[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
 //			return [];
 //		}
+
+		if(empty($html)) {
+			return [];
+		}
 
 		$matches = [];
 

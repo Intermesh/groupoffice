@@ -8,6 +8,7 @@ use GO;
 use go\core\ErrorHandler;
 use go\core\jmap\Entity;
 use go\core\model\Module as ModuleModel;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
@@ -127,14 +128,12 @@ class CronJobSchedule extends Entity {
 	 * @throws Exception
 	 */
 	public function run() {
-		//Set nextRun to null so it won't run more then once at a time
-		$this->nextRunAt = null;
-		//set runningSince to now
+
 		$this->runningSince = new CoreDateTime();
 		$this->lastError = null;
 
 		if (!$this->save()) {
-			throw new Exception("Could not save CRON job");
+			throw new SaveException($this);
 		}
 		
 		$cls = $this->getCronClass();

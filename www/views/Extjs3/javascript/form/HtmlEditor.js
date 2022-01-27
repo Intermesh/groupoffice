@@ -217,7 +217,12 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				stripTrailingSlash: false,
 				className: "normal-link",
 				newWindow: true,
-				phone: false
+				phone: false,
+				urls: {
+					schemeMatches : true,
+					wwwMatches    : false,
+					tldMatches    : false
+				}
 			});
 
 			if(h != anchored) {

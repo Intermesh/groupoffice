@@ -307,7 +307,7 @@ class TemplateParser {
 	 * @param callable $function
 	 */
 	public function addFilter(string $name, callable $function) {
-		$this->filters[$name] = $function;
+		$this->filters[strtolower($name)] = $function;
 	}
 
 	/**
@@ -798,7 +798,7 @@ class TemplateParser {
 		foreach($filters as $filter) {
 			
 			$args = array_map('trim', str_getcsv($filter, ':', '"'));
-			$filterName = array_shift($args);
+			$filterName = strtolower(array_shift($args));
 			array_unshift($args, $value);
 
 			if(!isset($this->filters[$filterName])) {
