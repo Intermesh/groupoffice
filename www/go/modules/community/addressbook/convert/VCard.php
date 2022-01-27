@@ -17,6 +17,7 @@ use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
 use go\core\model\Link;
 use Sabre\VObject\Component\VCard as VCardComponent;
+use Sabre\VObject\Document as SabreDocument;
 use Sabre\VObject\Reader;
 use Sabre\VObject\Splitter\VCard as VCardSplitter;
 
@@ -51,6 +52,12 @@ class VCard extends AbstractConverter {
 			if($file->exists()) {
 				try {
 					$vcard = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+
+					/** @var $vcard VCardComponent */
+					if ($vcard->VERSION != "3.0") {
+						// we can only use 3.0 for photo's somehow :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
+						$vcard = $vcard->convert(SabreDocument::VCARD30);
+					}
 
 					//remove all supported properties
 					$vcard->remove('EMAIL');
