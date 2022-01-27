@@ -1,3 +1,4 @@
+27-01-2022 6.6.35
 - Tasks: Added widget for startpage
 - Tasks: When creating tasks from other Contacts, Projects or Orders the subject field will be auto filled.
 - Core: Fixed database check and make sure core module is shared
