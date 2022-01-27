@@ -72,9 +72,12 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 		}, this);
 
 		const startRenderer = function(v, meta, record) {
-
-			if(record.data.due && record.data.due.format("Ymd") < (new Date).format("Ymd")) {
+			const now = (new Date).format("Ymd");
+			console.log(record.data.start, now);
+			if(record.data.due && record.data.due.format("Ymd") < now) {
 				meta.css = "danger";
+			} else if(record.data.start && record.data.start.format("Ymd") < now) {
+				meta.css = "success";
 			}
 
 			return go.util.Format.date(v);
@@ -103,9 +106,9 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 							m.style += 'color:#'+rec.json.color+';';
 						}
 
-						if(rec.data.progress == "needs-action" && rec.get("start") <= now) {
-							m.style += 'font-weight: bold;';
-						}
+						// if(rec.data.progress == "needs-action" && rec.get("start") <= now) {
+						// 	m.style += 'font-weight: bold;';
+						// }
 
 						return v;
 					}
@@ -152,8 +155,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'due',
-					renderer: startRenderer,
-					hidden: true
+					renderer: startRenderer
 				},{
 					header: t('Responsible'),
 					width: dp(240),
