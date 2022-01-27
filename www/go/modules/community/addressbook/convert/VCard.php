@@ -18,7 +18,6 @@ use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
 use go\core\model\Link;
 use Sabre\VObject\Component\VCard as VCardComponent;
-use Sabre\VObject\Component\VCard as VObjectVCard;
 use Sabre\VObject\Document;
 use Sabre\VObject\Document as SabreDocument;
 use Sabre\VObject\ParseException;
@@ -43,12 +42,11 @@ class VCard extends AbstractConverter {
 	/**
 	 *
 	 * @param Contact $contact
-	 * @return Document
+	 * @return VCardComponent
 	 * @throws Exception
 	 */
-	private function getVCard(Contact $contact): Document
+	private function getVCard(Contact $contact): VCardComponent
 	{
-		
 		if ($contact->vcardBlobId) {
 			//Contact has a stored VCard 
 			$blob = Blob::findById($contact->vcardBlobId);
@@ -56,7 +54,7 @@ class VCard extends AbstractConverter {
 			if($file->exists()) {
 				try {
 					$vcard = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
-
+					/** @var $vcard VCardComponent */
 					if ($vcard->VERSION != "3.0") {
 						// we can only use 3.0 for photo's somehow :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
 						$vcard = $vcard->convert(SabreDocument::VCARD30);
@@ -80,7 +78,7 @@ class VCard extends AbstractConverter {
 		}
 
 		//We have to use 3.0 for the photo property :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
-		return new VObjectVCard([
+		return new VCardComponent([
 				"VERSION" => "3.0",
 				"UID" => $contact->getUid()
 		]);
@@ -414,7 +412,7 @@ class VCard extends AbstractConverter {
 		}
 	}
 
-	private function getVCardOrganizations(VObjectVCard $vcard): array
+	private function getVCardOrganizations(VCardComponent $vcard): array
 	{
 		$vcardOrganizationNames = [];
 		if(isset($vcard->ORG)) {
@@ -447,11 +445,11 @@ class VCard extends AbstractConverter {
 
 	/**
 	 * @param Contact $contact
-	 * @param VObjectVCard $vcard
+	 * @param VCardComponent $vcard
 	 * @return void
 	 * @throws Exception
 	 */
-	private function importOrganizations(Contact $contact, VObjectVCard $vcard) {
+	private function importOrganizations(Contact $contact, VCardComponent $vcard) {
 		
 		$vcardOrganizationNames = $this->getVCardOrganizations($vcard);
 		
@@ -530,7 +528,7 @@ class VCard extends AbstractConverter {
 	}
 
 	/**
-	 * @var VObjectVCard
+	 * @var VCardComponent
 	 */
 	private $card;
 
