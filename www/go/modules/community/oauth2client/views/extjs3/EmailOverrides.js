@@ -61,7 +61,6 @@ GO.moduleManager.onModuleReady('email',function() {
 			this.doLayout();
 		},
 		loadAccount: GO.email.AccountDialog.prototype.loadAccount.createInterceptor(function (account_id) {
-			this.createOauthClientTab();
 			this.account_id = account_id;
 			this.propertiesPanel.form.load({
 				url : GO.url("email/account/load"),
@@ -97,6 +96,11 @@ GO.moduleManager.onModuleReady('email',function() {
 				scope : this
 			});
 			return false;
+		}),
+
+		show: GO.email.AccountDialog.prototype.loadAccount.createSequence(function (account_id) {
+			debugger;
+			this.createOauthClientTab();
 		})
 	});
 

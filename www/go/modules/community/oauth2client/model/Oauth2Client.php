@@ -2,9 +2,9 @@
 
 namespace go\modules\community\oauth2client\model;
 
-use go\core\orm\Property;
+use go\core\jmap\Entity;
 
-final class Oauth2Client extends Property
+final class Oauth2Client extends Entity
 {
 	/**
 	 * @var int
@@ -29,17 +29,17 @@ final class Oauth2Client extends Property
 	/**
 	 * @var string
 	 */
-	public $token;
+//	public $token;
 
 	/**
 	 * @var string
 	 */
-	public $refreshToken;
+//	public $refreshToken;
 
 	/**
 	 * @var int Unix timestamp
 	 */
-	public $expires;
+//	public $expires;
 
 	protected static function defineMapping()
 	{

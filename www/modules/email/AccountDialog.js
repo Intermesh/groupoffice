@@ -47,6 +47,7 @@ GO.email.AccountDialog = function(config) {
 			width: 300,
 			listeners: {
 				'select': function (combo, record, index) {
+					debugger;
 					this.incomingTab.hide();
 					this.outgoingTab.hide();
 					this.tabPanel.unhideTabStripItem(this.oauthClientTab);

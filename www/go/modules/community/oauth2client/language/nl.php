@@ -1,7 +1,7 @@
 <?php
 
 return array(
-	'name' => 'OAuth2',
+	'name' => 'OAuth2 Client',
 	'description' => 'Met deze module configureert u eenvoudig een OAuth2 connectie.',
 	'Click here' => 'Klik hier',
 	'Hello' => 'Hallo',
@@ -10,5 +10,6 @@ return array(
 	'User name and password' => 'Gebruikersnaam en wachtwoord',
 	'Request or update a refresh token in a separate window.' => 'Vraag een refresh token aan of werk het bij. Hiervoor wordt een nieuw venster geopend.',
 	'OAuth2 Client Settings' => 'OAuth2 Instellingen',
-	'' => '',
+	'OAuth2 Connections' => 'OAuth2 Koppelingen',
+	'' => ''
 );
