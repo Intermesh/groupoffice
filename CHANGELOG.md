@@ -1,3 +1,4 @@
+28-01-2022 6.6.36
 - Tasks: drag and drop tasks to other lists
 - Tasks: show green dates when active, show red when late. removed bold when status is needs action.
 - Tasks: remember filter states
