@@ -41,6 +41,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				fields: ['name', 'icon', 'iconCls', 'inputValue'],
 				data: [
 					[t("Today"), 'content_paste', 'green', 'today'],
+					[t("Due in seven days"), 'filter_7', 'purple', '7days'],
 					[t("All"), 'assignment', 'red', 'all'],
 					// [t("Completed"), 'assignment_turned_in', 'grey', 'completed'],
 					[t("Unscheduled"), 'event_busy', 'blue','unscheduled'],
@@ -140,11 +141,22 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	runModule : function() {
 		this.categoriesGrid.store.load();
 
+		let statusFilter = Ext.state.Manager.get("tasks-status-filter");
+		if(!statusFilter) {
+			statusFilter = 'today';
+		}
+
 		this.filterPanel.on("afterrender", () => {
-			this.filterPanel.selectRange(0,0);
+
+			let index = this.filterPanel.store.find('inputValue', statusFilter);
+			if(index == -1) {
+				index = 0;
+			}
+
+			this.filterPanel.selectRange(index,index);
 
 		});
-		this.setStatusFilter("today");
+		this.setStatusFilter(statusFilter);
 		this.showCompleted(false);
 		this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
 
@@ -177,47 +189,23 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 
 	setStatusFilter : function(inputValue) {
+
 		switch(inputValue) {
 
 			case "today": // tasks today
-				const now = new Date(),
-					nowYmd = now.format("Y-m-d");
 
 				this.taskGrid.store.setFilter("status", {
-					start: "<=" + nowYmd
+					start: "<=now"
 				});
 
 				break;
 
-			// case 2: // tasks too late
-			// 	var now = new Date(),
-			// 	nowYmd = now.format("Y-m-d");
-			// 	this.taskGrid.store.setFilter('status',{
-			// 		late: nowYmd,
-			// 		percentComplete: "<100"
-			// 	});
-			// 	break;
+			case '7days':
+				this.taskGrid.store.setFilter("status", {
+					due: "<=7days"
+				});
+				break;
 
-			// case 3: // non completed tasks
-			// 	this.taskGrid.store.setFilter("status", {
-			// 		percentComplete: "<100"
-			// 	});
-			// 	break;
-
-			// case "completed": // completed tasks
-			// 	this.taskGrid.store.setFilter("status", {
-			// 		complete: true
-			// 	});
-			// 	break;
-
-			// case 5: // future tasks
-			// 	var now = new Date(),
-			// 	nowYmd = now.format("Y-m-d");
-			// 	this.taskGrid.store.setFilter('status',{
-			// 		future: nowYmd,
-			// 		percentComplete: "<100"
-			// 	});
-			// 	break;
 			case "unscheduled":
 				this.taskGrid.store.setFilter('status',{
 					scheduled: false
@@ -230,11 +218,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				});
 				break;
 
-
 			case "all": // all
 				this.taskGrid.store.setFilter("status", null);
 				break;
 		}
+
+		Ext.state.Manager.set("tasks-status-filter", inputValue);
 	},
 
 	createFilterPanel: function () {
