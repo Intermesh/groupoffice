@@ -83,6 +83,8 @@ abstract class EntityController extends Controller {
 	{
 		$cls = $this->entityClass();
 
+		/** @var $cls Entity */
+
 		$query = $cls::find($cls::getPrimaryKey(false), false)
 						->limit($params['limit'])
 						->offset($params['position']);
@@ -289,11 +291,11 @@ abstract class EntityController extends Controller {
 	 * Transforms JMAP sort param into: ['name' => 'ASC']
 	 * 
 	 * @param array[] $sort
-	 * @return array
+	 * @return ArrayObject
 	 */
-	protected function transformSort(array $sort) : array {
+	protected function transformSort(array $sort) : ArrayObject {
 		if(empty($sort)) {
-			return [];
+			return new ArrayObject();
 		}
 		
 		$transformed = [];
@@ -305,7 +307,7 @@ abstract class EntityController extends Controller {
 			$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending'] === false) ? 'DESC' : 'ASC';
 		}
 		
-		return $transformed;		
+		return new ArrayObject($transformed);
 	}
 
 

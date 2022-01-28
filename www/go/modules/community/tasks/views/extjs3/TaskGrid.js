@@ -9,6 +9,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 		this.store = new go.data.GroupingStore({
 			groupField: 'tasklist',
 			remoteGroup:true,
+			remoteSort: true,
 			fields: [
 				'id',
 				'title',
@@ -73,8 +74,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 
 		const startRenderer = function(v, meta, record) {
 			const now = (new Date).format("Ymd");
-			console.log(record.data.start, now);
-			if(record.data.due && record.data.due.format("Ymd") < now) {
+				if(record.data.due && record.data.due.format("Ymd") < now) {
 				meta.css = "danger";
 			} else if(record.data.start && record.data.start.format("Ymd") < now) {
 				meta.css = "success";
