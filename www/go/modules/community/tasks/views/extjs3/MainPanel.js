@@ -51,6 +51,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			})
 		});
 
+		const showCompleted = Ext.state.Manager.get("tasks-show-completed");
+
 		this.sidePanel = new Ext.Panel({
 			width: dp(300),
 			cls: 'go-sidenav',
@@ -83,11 +85,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							hideLabel: true,
 							xtype: "checkbox",
 							boxLabel: t("Show completed"),
-							value: false,
+							checked: showCompleted,
 							listeners: {
 								scope: this,
 								check: function(cb, checked) {
 									this.showCompleted(checked);
+									Ext.state.Manager.set("tasks-show-completed", checked);
 									this.taskGrid.store.load();
 								}
 							}
@@ -157,7 +160,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		});
 		this.setStatusFilter(statusFilter);
-		this.showCompleted(false);
+		this.showCompleted(Ext.state.Manager.get("tasks-show-completed"));
 		this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
 
 		this.setDefaultSelection();
