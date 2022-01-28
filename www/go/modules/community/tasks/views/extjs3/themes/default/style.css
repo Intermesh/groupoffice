@@ -31,3 +31,11 @@
     background-color: #f1f1f1;
     fill: #f1f1f1;
 }
+
+.tasks-category {
+
+}
+
+.tasks-category ~ .tasks-category::before {
+    content: ', ';
+}

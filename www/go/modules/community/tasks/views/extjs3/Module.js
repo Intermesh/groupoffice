@@ -34,8 +34,8 @@ go.Modules.register("community", "tasks", {
 			creator: {store: "UserDisplay", fk: "createdBy"},
 			modifier: {store: "UserDisplay", fk: "modifiedBy"},
 			responsible: {store: 'UserDisplay', fk: 'responsibleUserId'},
-			tasklist: {store: 'Tasklist', fk: 'tasklistId'}
-
+			tasklist: {store: 'Tasklist', fk: 'tasklistId'},
+			categories: {store: "TaskCategory", fk: "categories"},
 		},
 
 		/**

@@ -23,6 +23,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'creator', type: "relation"},
 				{name: 'modifier', type: "relation"},
 				{name: 'tasklist', type: "relation"},
+				{name: 'categories', type: "relation"},
 				'percentComplete',
 				'progress',
 				{
@@ -226,6 +227,18 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'modifier',
 					renderer: function(v) {
 						return v ? v.displayName : "-";
+					},
+					hidden: true
+				},
+				{
+					xtype:"datecolumn",
+					id: 'categories',
+					header: t('Categories'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'categories',
+					renderer: function(v) {
+						return v.map(v=>'<span class="tasks-category">'+Ext.util.Format.htmlEncode(v.name)+'</span>').join("");
 					},
 					hidden: true
 				}

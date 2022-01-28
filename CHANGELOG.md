@@ -2,6 +2,8 @@
 - Tasks: show green dates when active, show red when late. removed bold when status is needs action.
 - Tasks: remember filter states
 - Tasks: Auto update due and start date if the other date changes
+- Tasks: Added due in 7 days filter
+- Tasks: Show categories in detail and grid
 
 27-01-2022 6.6.35
 - Tasks: Added widget for startpage
