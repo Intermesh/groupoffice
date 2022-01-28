@@ -8,7 +8,7 @@ use go\core\webclient\CSP;
 use GO\Email\Controller\AccountController;
 use GO\Email\Model\Account as ActiveRecordAccount;
 use go\modules\community\email\model\Account;
-use go\modules\community\oauth2client\model\Oauth2Client;
+use go\modules\community\oauth2client\model\Oauth2Account;
 
 /**
  * @copyright (c) 2021, Intermesh BV http://www.intermesh.nl
@@ -44,7 +44,7 @@ class Module extends core\Module
 
 	public static function onMap(core\orm\Mapping $mapping)
 	{
-		$mapping->addHasOne('oauth2Client', Oauth2Client::class, ['id' => 'accountId'], false);
+		$mapping->addHasOne('oauth2_account', Oauth2Account::class, ['id' => 'accountId'], false);
 	}
 
 
@@ -69,11 +69,9 @@ class Module extends core\Module
 	{
 		$id = $model->id;
 		$acct = Account::findById($id);
-		if ($acct && $acct->oauth2Client) {
-			$response['data']['clientSecret'] = $acct->oauth2Client->clientSecret;
-			$response['data']['clientId'] = $acct->oauth2Client->clientId;
-			$response['data']['projectId'] = $acct->oauth2Client->projectId;
-			$response['data']['refreshToken'] = $acct->oauth2Client->refreshToken;
+		if ($acct && $acct->oauth2_account) {
+			$model->checkImapConnectionOnSave = false;
+			$response['data']['oauth2_client_id'] = $acct->oauth2_account->oauth2ClientId;
 		}
 	}
 
@@ -89,12 +87,18 @@ class Module extends core\Module
 	 */
 	public static function saveAccountSettings(AccountController $self, array &$response, ActiveRecordAccount &$model, array $params, array $modifiedAttributes)
 	{
-		if (isset($params['clientId']) && intval($params['default_client_id']) > 0) {
+		if (isset($params['oauth2_client_id']) && intval($params['oauth2_client_id']) > 0) {
 			$acct = Account::findById($response['id']);
-			$acct->oauth2Client->clientId = $params['clientId'];
-			$acct->oauth2Client->clientSecret = $params['clientSecret'];
-			$acct->oauth2Client->projectId = $params['projectId'];
-			$acct->save();
+			$oauth2_account = $acct->oauth2_account;
+			if(empty($oauth2_account)) {
+				go()->getDbConnection()->insert('oauth2client_account', [
+					'accountId' => $response['id'],
+					'oauth2ClientId' => $params['oauth2_client_id']
+				])->execute();
+			} elseif($acct->oauth2_account->oauth2ClientId !== $params['oauth2_client_id']) {
+				$acct->oauth2_account->oauth2ClientId = $params['oauth2_client_id'];
+				$acct->save();
+			}
 		}
 	}
 }

@@ -31,7 +31,7 @@ INSERT INTO `oauth2client_default_client` (`id`,`authenticationMethod`,`name`,`i
 VALUES (1, 'GoogleOauth2', 'Google','imap.gmail.com',993, 'ssl','smtp.gmail.com',465, 'ssl');
 
 CREATE TABLE IF NOT EXISTS `oauth2client_account` (
-     `accountId` INT(11) UNSIGNED NOT NULL,
+     `accountId` INT(11) NOT NULL,
      `oauth2ClientId` INT(11) UNSIGNED NOT NULL,
      `token` VARCHAR(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
      `refreshToken` VARCHAR(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -40,7 +40,12 @@ CREATE TABLE IF NOT EXISTS `oauth2client_account` (
 
 ALTER TABLE `oauth2client_account` ADD INDEX (`accountId`);
 
+ALTER TABLE `oauth2client_account` ADD PRIMARY KEY(`accountId`);
+
 ALTER TABLE `oauth2client_account`
     ADD CONSTRAINT `oauth2client_account_ibfk_1` FOREIGN KEY (`oauth2ClientId`) REFERENCES `oauth2client_oauth2client` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `oauth2client_account`
+    ADD CONSTRAINT `oauth2client_account_ibfk_2` FOREIGN KEY (`accountId`) REFERENCES `em_accounts` (`id`) ON DELETE CASCADE;
 # TODO: Do we still need this shit?
 # ALTER TABLE `em_accounts` ADD CONSTRAINT `em_account_defaultclt_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `oauth2client_account` (`id`) ON DELETE CASCADE;

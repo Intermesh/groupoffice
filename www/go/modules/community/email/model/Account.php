@@ -12,7 +12,7 @@ class Account extends AclOwnerEntity {
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-						->addTable("em_accounts")
-						->addQuery((new \go\core\db\Query)->select('acl_id AS aclId')); //temporary hack
+			->addTable("em_accounts")
+			->addQuery((new \go\core\db\Query)->select('acl_id AS aclId')); //temporary hack
 	}
 }

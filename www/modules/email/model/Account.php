@@ -19,6 +19,7 @@ use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 use GO\Base\Mail\Imap;
 use go\modules\community\oauth2client\model\DefaultClient;
 use go\modules\community\oauth2client\model\Oauth2Client;
+use go\modules\community\oauth2client\model\Oauth2Account;
 use League\OAuth2\Client\Grant\RefreshToken;
 use League\OAuth2\Client\Provider\Google;
 
@@ -56,7 +57,6 @@ use League\OAuth2\Client\Provider\Google;
  * @property int $sieve_port
  * @property boolean $sieve_tls
  * @property boolean $sieve_usetls
- * @property int $client_id
  */
 class Account extends \GO\Base\Db\ActiveRecord
 {
@@ -146,7 +146,6 @@ class Account extends \GO\Base\Db\ActiveRecord
 		return array(
 			'aliases' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\Alias', 'field'=>'account_id','delete'=>true),
 			'filters' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\Filter', 'field'=>'account_id','delete'=>true, 'findParams'=>  \GO\Base\Db\FindParams::newInstance()->order("priority")),
-			'oauth2Client' => array('type' => self::HAS_ONE, 'model' => 'go\modules\community\oauth2client\model\Oauth2Client', 'field' => 'accountId', 'delete' => true),
 			'portletFolders' => array('type'=>self::HAS_MANY, 'model'=>'GO\Email\Model\PortletFolder', 'field'=>'account_id','delete'=>true)
 		);
 	}
@@ -310,9 +309,6 @@ class Account extends \GO\Base\Db\ActiveRecord
 	
 
 	public function decryptPassword() {
-		if (!empty($this->client_id)) {
-			return '';
-		}
 		if (!empty(GO::session()->values['emailModule']['accountPasswords'][$this->id])) {
 			$decrypted = \GO\Base\Util\Crypt::decrypt(GO::session()->values['emailModule']['accountPasswords'][$this->id]);
 		} else {
@@ -440,23 +436,29 @@ class Account extends \GO\Base\Db\ActiveRecord
 	 * Connect to the IMAP server without selecting a mailbox
 	 *
 	 * @throws ImapAuthenticationFailedException
-	 * @return Imap
+	 * @return Imap|null
 	 */
-	public function justConnect() :Imap
+	public function justConnect() :?Imap
 	{
+		$token = null;
+		$auth = 'plain';
+		if(go()->getModule('community', 'oauth2client')) {
+			$acct = \go\modules\community\email\model\Account::findById($this->id);
+			$clt = $acct->oauth2_account;
+			if($clt) {
+				if(!$token = $clt->token) {
+					return null;
+				}
+				$defaultClientId = Oauth2Client::findById($clt->oauth2ClientId)->defaultClientId;
+				$auth = strtolower(DefaultClient::findById($defaultClientId)->authenticationMethod);
+			}
+		}
+
 		if (empty($this->_imap)) {
 			$this->_imap = new Imap();
 			$this->_imap->ignoreInvalidCertificates = $this->imap_allow_self_signed;
 			$useTLS = $this->imap_encryption == 'tls' ? true : false;
 			$useSSL = $this->imap_encryption == 'ssl' ? true : false;
-			$token = null;
-			$auth = 'plain';
-
-			// TODO: Refactor
-			if($this->client_id) {
-				$token = $this->getXOauth2Token();
-				$auth = DefaultClient::findById($this->client_id)->authenticationMethod;
-			}
 
 			$this->_imap->connect($this->host, $this->port, $this->username, $this->decryptPassword(), $useSSL, $useTLS, $auth, $token);
 		} else {

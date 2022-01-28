@@ -71,13 +71,20 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 	}
 
 	protected function beforeSubmit(&$response, &$model, &$params) {
-		if(empty($params['password']))
-			unset($params['password']);
+		if(empty($params['password'])) {
+			if(isset($params['oauth2_client_id']) && !empty($params['oauth2_client_id'])) {
+				$params['password'] = uniqid(); // We only need it to save the account record
+				$model->checkImapConnectionOnSave = false;
+			} else {
+				unset($params['password']);
+			}
+		}
 
 		if(isset($params['smtp_auth'])) {
 			if (!empty($params['smtp_auth'])){
-				if(empty($params['smtp_password']))
+				if(empty($params['smtp_password'])) {
 					unset($params['smtp_password']);
+				}
 			} else {
 				$params['smtp_password']="";
 				$params['smtp_username']="";

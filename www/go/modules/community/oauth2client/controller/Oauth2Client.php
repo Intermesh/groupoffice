@@ -72,11 +72,11 @@ final class Oauth2Client extends EntityController
 
 			try {
 				$acct = Account::findById($accountId);
-				$acct->oauth2Client->token = $token->getToken();
-				$acct->oauth2Client->expires = $token->getExpires();
+				$acct->oauth2_account->token = $token->getToken();
+				$acct->oauth2_account->expires = $token->getExpires();
 
 				if ($refreshToken = $token->getRefreshToken()) {
-					$acct->oauth2Client->refreshToken = $refreshToken;
+					$acct->oauth2_account->refreshToken = $refreshToken;
 				}
 				$acct->save();
 				$ownerDetails = $provider->getResourceOwner($token);
@@ -145,11 +145,13 @@ final class Oauth2Client extends EntityController
 	private function getProvider(int $accountId): Google
 	{
 		$acct = Account::findById($accountId);
-		$acctSettings = $acct->oauth2Client;
+		$acctSettings = $acct->oauth2_account;
+		$oauth2tClient = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
+
 		$url = rtrim(go()->getSettings()->URL, '/');
 		return new Google([
-			'clientId' => $acctSettings->clientId,
-			'clientSecret' => $acctSettings->clientSecret,
+			'clientId' => $oauth2tClient->clientId,
+			'clientSecret' => $oauth2tClient->clientSecret,
 			'redirectUri' => $url . '/go/modules/community/oauth2client/gauth.php/callback',
 			'accessType' => 'offline',
 			'scopes' => ['https://mail.google.com/']

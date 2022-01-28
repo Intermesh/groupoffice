@@ -42,34 +42,52 @@ GO.email.AccountDialog = function(config) {
 
 	// TODO: Put this properly in an override function in OAuth2Client. The structure of this dialog does not appear to allow that
 	if (go.Modules.isAvailable("community", "oauth2client")) {
-		this.selectAuthMethodCombo = new go.modules.community.oauth2client.DefaultClientCombo({
-			hiddenName: 'default_client_id',
+		this.oauth2ClientCombo = new go.modules.community.oauth2client.ClientCombo({
+			fieldLabel: t('OAuth2 connection', 'oauth2client', 'community'),
+			hiddenName: 'oauth2_client_id',
 			width: 300,
 			listeners: {
 				'select': function (combo, record, index) {
-					debugger;
 					this.incomingTab.hide();
 					this.outgoingTab.hide();
-					this.tabPanel.unhideTabStripItem(this.oauthClientTab);
+					this.btnGetRefreshToken.show();
 
 					this.ImapUserNameField.setValue(this.EmailAddressField.getValue());
-					this.ImapPortField.setValue(record.data.imapPort);
-					this.ImapHostField.setValue(record.data.imapHost);
-					this.ImapEncryptionField.setValue(record.data.imapEncryption);
+					this.ImapPasswordField.allowBlank = true;
 
-					this.SmtpPortField.setValue(record.data.smtpPort);
-					this.SmtpHostField.setValue(record.data.smtpHost);
-					this.SmtpEncryptionField.setValue(record.data.smtpEncryption);
-					this.refreshNeeded = true;
+					go.Db.store('DefaultClient').single(record.data.defaultClientId).then((entity) => {
+						this.ImapPortField.setValue(entity.imapPort);
+						this.ImapHostField.setValue(entity.imapHost);
+						this.ImapEncryptionField.setValue(entity.imapEncryption);
+
+						this.SmtpPortField.setValue(entity.smtpPort);
+						this.SmtpHostField.setValue(entity.smtpHost);
+						this.SmtpEncryptionField.setValue(entity.smtpEncryption);
+					}).finally(() => {
+						this.refreshNeeded = true;
+					});
 				},
 				'clear': function(combo, oldValue, newValue) {
 					this.incomingTab.show();
 					this.outgoingTab.show();
-					this.tabPanel.hideTabStripItem(this.oauthClientTab);
+					this.ImapPasswordField.allowBlank = false;
+					this.btnGetRefreshToken.hide();
 					this.refreshNeeded = true;
 				},
 				scope: this
 			}
+		});
+		this.btnGetRefreshToken = new Ext.Button({
+			iconCls: 'ic-refresh',
+			text: 'Refresh token',
+			hidden: go.util.empty(this.oauth2ClientCombo.getValue()),
+			anchor: '20%',
+			tooltip: t('Request or update a refresh token in a separate window.','oauth2client','community'),
+			handler : function() {
+				window.open('/go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id, 'do_da_auth_thingy');
+				this.refreshNeeded = true;
+			},
+			scope : this
 		});
 	}
 				
@@ -226,7 +244,8 @@ GO.email.AccountDialog = function(config) {
 	this.properties_items.push(this.templatesCombo);
 
 	if(go.Modules.isAvailable("community", "oauth2client")) {
-		this.properties_items.push(this.selectAuthMethodCombo);
+		this.properties_items.push(this.oauth2ClientCombo);
+		this.properties_items.push(this.btnGetRefreshToken);
 	}
 
 	this.smtpAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({

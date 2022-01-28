@@ -19,5 +19,9 @@ go.modules.community.oauth2client.SystemSettingsPanel = Ext.extend(go.systemsett
 
 		go.modules.community.oauth2client.SystemSettingsPanel.superclass.initComponent.call(this);
 
+	},
+
+	loadSettings: function() {
+		// Y THO?
 	}
 });
