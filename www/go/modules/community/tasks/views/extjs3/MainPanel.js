@@ -298,6 +298,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createTasklistGrid : function() {
 		this.tasklistsGrid = new go.modules.community.tasks.TasklistsGrid({
 
+			enableDragDrop: true,
+			ddGroup: 'TasklistsDD',
+
 			filteredStore: this.taskGrid.store,
 			filterName: 'tasklistId',
 
@@ -317,6 +320,20 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					}
 				}],
 			listeners: {
+				afterrender: function(grid) {
+					new Ext.dd.DropTarget(grid.getView().mainBody, {
+						ddGroup : 'TasklistsDD',
+						notifyDrop :  (source, e, data) => {
+							const selections = source.dragData.selections,
+								dropRowIndex = grid.getView().findRowIndex(e.target),
+								tasklistId = grid.getView().grid.store.data.items[dropRowIndex].id;
+
+							selections.forEach((r) => {
+								go.Db.store("Task").save({tasklistId: tasklistId}, r.id);
+							})
+						}
+					});
+				},
 				rowclick: function(grid, row, e) {
 					if(e.target.className != 'x-grid3-row-checker') {
 						//if row was clicked and not the checkbox then switch to grid in narrow mode
@@ -341,6 +358,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createTaskGrid : function() {
 
 		this.taskGrid = new go.modules.community.tasks.TaskGrid({
+			enableDragDrop: true,
+			ddGroup: 'TasklistsDD',
 			split: true,
 			region: 'center',
 			tbar: [
