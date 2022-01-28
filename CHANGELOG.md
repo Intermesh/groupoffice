@@ -1,3 +1,8 @@
+- Tasks: drag and drop tasks to other lists
+- Tasks: show green dates when active, show red when late. removed bold when status is needs action.
+- Tasks: remember filter states
+- Tasks: Auto update due and start date if the other date changes
+
 27-01-2022 6.6.35
 - Tasks: Added widget for startpage
 - Tasks: When creating tasks from other Contacts, Projects or Orders the subject field will be auto filled.
