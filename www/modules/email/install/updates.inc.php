@@ -209,4 +209,4 @@ $updates['202002280914'][] = "ALTER TABLE `em_contacts_last_mail_times` ADD INDE
 
 $updates['202112031315'][] = "ALTER TABLE `em_accounts` ADD KEY (`id`), ADD KEY(`user_id`);";
 
-$updates['202201081000'][] = "ALTER TABLE `em_accounts` ADD COLUMN `client_id` INT(11) UNSIGNED DEFAULT NULL;";
+//$updates['202201081000'][] = "ALTER TABLE `em_accounts` ADD COLUMN `client_id` INT(11) UNSIGNED DEFAULT NULL;";

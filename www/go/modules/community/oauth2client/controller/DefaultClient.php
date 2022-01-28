@@ -8,7 +8,8 @@ use go\modules\community\oauth2client\model;
 final class DefaultClient extends EntityController
 {
 
-	protected function entityClass() {
+	protected function entityClass(): string
+	{
 		return model\DefaultClient::class;
 	}
 

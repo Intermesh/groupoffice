@@ -3,19 +3,39 @@
 namespace go\modules\community\oauth2client\controller;
 
 
-use go\core\Controller;
 use go\core\http\Exception;
+use go\core\jmap\EntityController;
+use go\core\webclient\Extjs3;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model;
 use League\OAuth2\Client\Provider\Google;
-use go\core\webclient\Extjs3;
 
-final class Oauth2Client extends Controller
+final class Oauth2Client extends EntityController
 {
 
-	public function entityClass()
+	public function entityClass(): string
 	{
 		return model\Oauth2Client::class;
+	}
+
+	public function query(array $params)
+	{
+		return $this->defaultQuery($params);
+	}
+
+	public function get(array $params)
+	{
+		return $this->defaultGet($params);
+	}
+
+	public function set(array $params)
+	{
+		return $this->defaultSet($params);
+	}
+
+	public function changes(array $params)
+	{
+		return $this->defaultChanges($params);
 	}
 
 	/**
@@ -55,7 +75,7 @@ final class Oauth2Client extends Controller
 				$acct->oauth2Client->token = $token->getToken();
 				$acct->oauth2Client->expires = $token->getExpires();
 
-				if($refreshToken = $token->getRefreshToken()) {
+				if ($refreshToken = $token->getRefreshToken()) {
 					$acct->oauth2Client->refreshToken = $refreshToken;
 				}
 				$acct->save();
@@ -68,7 +88,7 @@ final class Oauth2Client extends Controller
 			unset(\GO::session()->values['accountId']);
 			\GO::session()->closeWriting();
 
-			$str = '<div class="card"><h3>' . go()->t('Hello').'&nbsp;'.$ownerDetails->getFirstName().'</h3>' .
+			$str = '<div class="card"><h3>' . go()->t('Hello') . '&nbsp;' . $ownerDetails->getFirstName() . '</h3>' .
 				'<p>' . go()->t('OAuth2 authentication was successful.') . '</p>' .
 				'<p><a href="javascript:window.close()">' . go()->t("Click here") . '</a>&nbsp;' .
 				go()->t("to close this window.") . '</p></div>';
@@ -116,11 +136,11 @@ final class Oauth2Client extends Controller
 	/**
 	 * Prepare ourselves a Google Provider
 	 *
-	 * @todo: make generic for multiple oauth2 default clients
-	 * @todo: move to separate class
 	 * @param int $accountId
 	 * @return Google
 	 * @throws \Exception
+	 * @todo: move to separate class
+	 * @todo: make generic for multiple oauth2 default clients
 	 */
 	private function getProvider(int $accountId): Google
 	{
@@ -131,7 +151,7 @@ final class Oauth2Client extends Controller
 			'clientId' => $acctSettings->clientId,
 			'clientSecret' => $acctSettings->clientSecret,
 			'redirectUri' => $url . '/go/modules/community/oauth2client/gauth.php/callback',
-			'accessType'   => 'offline',
+			'accessType' => 'offline',
 			'scopes' => ['https://mail.google.com/']
 		]);
 	}

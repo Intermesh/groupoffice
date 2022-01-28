@@ -2,12 +2,18 @@
 
 namespace go\modules\community\oauth2client\model;
 
-use go\core\orm\Entity;
+use go\core\jmap\Entity;
+use go\core\orm\Mapping;
 
 final class DefaultClient extends Entity
 {
 	/** @var int */
 	public $id;
+
+	/**
+	 * @var string
+	 */
+	public $name;
 
 	/**
 	 * @var string
@@ -45,10 +51,10 @@ final class DefaultClient extends Entity
 	public $smtpEncryption;
 
 
-	protected static function defineMapping()
+	protected static function defineMapping() :Mapping
 	{
 		return parent::defineMapping()
-			->addTable("oauth2client_default_client", "defaultclient");
+			->addTable("oauth2client_default_client", "defaultClient");
 	}
 
 }

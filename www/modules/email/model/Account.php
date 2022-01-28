@@ -377,7 +377,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 	 */
 	public function maybeRefreshToken()
 	{
-		if (empty($this->default_client_id) ) {
+		if (empty($this->client_id) ) {
 			return null;
 		}
 		$rec = go()->getDbConnection()->select()
@@ -419,14 +419,15 @@ class Account extends \GO\Base\Db\ActiveRecord
 	 *
 	 * @return string|null
 	 * @throws \go\core\exception\ConfigurationException
+	 * @todo: refactor into new database schema
 	 */
 	public function getXOauth2Token()
 	{
-		if (empty($this->default_client_id) ) {
+		if (empty($this->client_id) ) {
 			return null;
 		}
 		$rec = go()->getDbConnection()->select('token')
-			->from(Oauth2Client::getMapping()->getPrimaryTable()->getName())
+			->from(Oauth2Account::getMapping()->getPrimaryTable()->getName())
 			->where(['accountId'=> $this->id])
 			->single();
 		if($rec) {
@@ -451,9 +452,10 @@ class Account extends \GO\Base\Db\ActiveRecord
 			$token = null;
 			$auth = 'plain';
 
-			if($this->default_client_id) {
+			// TODO: Refactor
+			if($this->client_id) {
 				$token = $this->getXOauth2Token();
-				$auth = DefaultClient::findById($this->default_client_id)->authenticationMethod;
+				$auth = DefaultClient::findById($this->client_id)->authenticationMethod;
 			}
 
 			$this->_imap->connect($this->host, $this->port, $this->username, $this->decryptPassword(), $useSSL, $useTLS, $auth, $token);
