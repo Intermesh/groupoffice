@@ -15,4 +15,5 @@ return array (
   'Code' => 'Codice',
   'Code is required' => 'E\' richiesto il codice',
   'Invalid code' => 'Codice non valido',
+  'Block Group-Office usage until setup is done' => 'Block {product_name} usage until setup is done',
 );
