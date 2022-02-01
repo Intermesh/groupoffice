@@ -394,7 +394,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 			return null;
 		}
 		$url = rtrim(go()->getSettings()->URL, '/');
-		// At some point, we should get a provider from generic adapter class based on defaultClientId. 
+		// At some point, we should get a provider from generic adapter class based on defaultClientId.
 		$provider = new Google([
 			'clientId' => $rec['clientId'],
 			'clientSecret' => $rec['clientSecret'],
