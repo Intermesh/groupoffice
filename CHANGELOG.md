@@ -1,3 +1,4 @@
+- Leave days: minor rounding error in holiday calculator
 - Leave days: round leave day allowances to 1 decimal in year overview
 - Core: Italian translations updated (thank you Luca Pauluzzi)
 
