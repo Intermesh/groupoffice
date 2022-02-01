@@ -4,7 +4,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	
 	entityStore: "Task",
 	stateId: 'ta-tasks-detail',
-	relations: ["tasklist", "responsible"],
+	relations: ["tasklist", "responsible", 'categories'],
 	cls: "go-detail-view tasks-task",
 
 	initComponent: function () {
@@ -70,7 +70,15 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				<tpl if="!GO.util.empty(location)"><p class="s12 pad">\
 					<label>'+t('Location')+'</label>\
 					<span>{[go.util.textToHtml(values.location)]}</span>\
-				</p></tpl>',{
+				</p></tpl>\
+				<tpl if="categories.length">\
+					<p class="s12 pad">\
+					<label>'+t('Categories')+'</label>\
+					<span>\
+						<tpl for="categories"><span class="tasks-category">{name}</span></tpl>\
+					</span>\
+					</p>\
+				</tpl>',{
 					rruleToText: function(rrule) {
 						var fieldDummy = new go.form.RecurrenceField();
 						return fieldDummy.parseRule(rrule);

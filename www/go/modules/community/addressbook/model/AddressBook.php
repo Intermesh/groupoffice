@@ -5,6 +5,7 @@ use go\core\fs\File;
 use go\core\model\Module as CoreModule;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\ArrayObject;
 use go\modules\community\addressbook\Module;
 
 /**
@@ -169,7 +170,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 		return parent::internalDelete($query);
 	}
 
-	public static function sort(Query $query, array $sort): Query
+	public static function sort(Query $query, ArrayObject $sort): Query
 	{
 		if(empty($sort)) {
 			$sort['name'] = 'ASC';

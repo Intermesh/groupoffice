@@ -1,6 +1,7 @@
 <?php
 namespace go\core\util;
 
+use go\core\db\Expression;
 use JsonSerializable;
 use stdClass;
 
@@ -120,6 +121,81 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 		} 
 
 		return $this;
+	}
+
+
+	public function unshift($value) {
+		$copy = $this->getArrayCopy();
+		array_unshift($copy, $value);
+		$this->exchangeArray($copy);
+	}
+
+	public function push($value) {
+		$this->offsetSet($this->count(), $value);
+	}
+
+	/**
+	 * Insert key at given index
+	 *
+	 * @param int $index
+	 * @param mixed $value
+	 * @param string|null $key
+	 * @return void
+	 */
+	public function insert(int $index, $value, string $key = null ) {
+		$copy = $this->getArrayCopy();
+		if(isset($key)) {
+			$insert = [$key => $value];
+
+			$new = array_merge(
+				array_slice($copy, 0, $index),
+				$insert,
+				array_slice($copy, $index)
+			);
+			$this->exchangeArray($new);
+		} else {
+			$new = array_merge(
+				array_slice($copy, 0, $index),
+				[$value],
+				array_slice($copy, $index)
+			);
+			$this->exchangeArray($new);
+//			$this->exchangeArray($copy);
+		}
+
+
+	}
+
+	/**
+	 * Rename string array key and maintain position
+	 *
+	 * @param string $old
+	 * @param string $new
+	 * @return bool
+	 */
+	public function renameKey(string $old, string $new): bool
+	{
+		$copy = $this->getArrayCopy();
+		$i = array_search($old, array_keys($copy));
+		if($i === false) {
+			return false;
+		}
+
+		$value = $copy[$old];
+
+		$new = array_merge(
+			array_slice($copy, 0, $i),
+			[$new => $value],
+			array_slice($copy, $i + 1)
+		);
+
+		$this->exchangeArray($new);
+		return true;
+
+	}
+
+	public function keys() : array {
+		return array_keys($this->getArrayCopy());
 	}
 
 	

@@ -21,6 +21,7 @@ use GO\Files\Model\Folder;
 use PDO;
 use function go;
 use go\core\db\Query as DbQuery;
+use go\core\util\ArrayObject;
 
 /**
  * Entity model
@@ -968,7 +969,7 @@ abstract class Entity extends Property {
    *  You can override this to implement custom logic.
    *
    * @param Query $query
-   * @param array $sort eg. ['field' => 'ASC']
+   * @param ArrayObject $sort eg. ['field' => 'ASC']
    * @return Query
    * @throws Exception
    * @example
@@ -988,7 +989,7 @@ abstract class Entity extends Property {
    * ```
    *
    */
-	public static function sort(Query $query, array $sort): Query
+	public static function sort(Query $query, ArrayObject $sort): Query
 	{
 		if(isset($sort['modifier'])) {
 			$query->join('core_user', 'modifier', 'modifier.id = '.$query->getTableAlias() . '.modifiedBy');
@@ -1012,7 +1013,7 @@ abstract class Entity extends Property {
 
 		static::fireEvent(self::EVENT_SORT, $query, $sort);
 		
-		$query->orderBy($sort, true);
+		$query->orderBy($sort->getArrayCopy(), true);
 
 		return $query;
 	}

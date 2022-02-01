@@ -36,7 +36,11 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			fieldLabel : t("Start"),
 			listeners : {
 				setvalue : function(me,val) {
-					me.nextSibling().setMinValue(val);
+					const due = me.nextSibling();
+					//due.setMinValue(val);
+					if(!due.getValue() || due.getValue() < val) {
+						due.setValue(val);
+					}
 					if(!Ext.isEmpty(val)) {
 						this.recurrenceField.setStartDate(Ext.isDate(val) ? val : Date.parseDate(val, me.format));
 					}
@@ -52,8 +56,11 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			itemId: 'due',
 			fieldLabel : t("Due"),
 			listeners : {
-				change : function(me,val) {
-					me.previousSibling().setMaxValue(val);
+				setvalue : function(me,val) {
+					const start = me.previousSibling();
+					if(start.getValue() && start.getValue() > val) {
+						start.setValue(val);
+					}
 				},
 				scope : this
 			}

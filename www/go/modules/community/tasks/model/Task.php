@@ -11,6 +11,7 @@ namespace go\modules\community\tasks\model;
 use DateTimeInterface;
 use Exception;
 use go\core\acl\model\AclItemEntity;
+use go\core\db\Expression;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
@@ -21,13 +22,14 @@ use go\core\orm\Mapping;
 use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
 use go\core\orm\Query;
-use go\core\util\{DateTime, StringUtil, Time, UUID};
+use go\core\util\{ArrayObject, DateTime, StringUtil, Time, UUID};
 use go\core\validate\ErrorCode;
 use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\Spreadsheet;
 use go\modules\community\tasks\convert\VCalendar;
 use go\core\util\JSON;
 use JsonException;
+use PDO;
 
 /**
  * Task model
@@ -472,6 +474,7 @@ class Task extends AclItemEntity {
 
 		$changes = Task::find()
 			->select("task.id, tl.aclId, '0'")
+			->fetchMode(PDO::FETCH_ASSOC)
 			->join("tasks_tasklist", "tl", "tl.id = task.taskListId")
 			->join("tasks_alert", "a", "a.taskId = task.id")
 			->where('a.id' , 'in', $alertIds)
@@ -531,11 +534,11 @@ class Task extends AclItemEntity {
 		return $rule->current();
 	}
 
-	public static function sort(Query $query, array $sort): Query
+	public static function sort(Query $query, ArrayObject $sort): Query
 	{
 		if(isset($sort['groupOrder'])) {
 			$query->join('tasks_tasklist_group', 'listGroup', 'listGroup.id = task.groupId', 'LEFT');
-			$sort['listGroup.sortOrder'] = $sort['groupOrder'];
+			$sort->renameKey('groupOrder', 'listGroup.sortOrder');
 			$sort['id'] = "ASC";
 			unset($sort['groupOrder']);
 		}
@@ -545,10 +548,28 @@ class Task extends AclItemEntity {
 			if(!$query->isJoined("tasks_tasklist", "tasklist")) {
 				$query->join("tasks_tasklist", "tasklist", "tasklist.id = task.tasklistId");
 			}
-			$sort['tasklist.name'] = $sort['tasklist'];
-			$sort['due'] = 'DESC';
-			unset($sort['tasklist']);
+			$sort->renameKey('tasklist','tasklist.name');
 		}
+
+		//sort null dates first
+		if(isset($sort['due'])) {
+
+			$null = strtoupper($sort['due']) == 'ASC' ? 'IS NULL' : 'IS NOT NULL';
+
+			$i = array_search('due', $sort->keys());
+			$sort->insert($i, new Expression($query->getTableAlias() . '.`due` ' . $null));
+
+		}
+
+		if(isset($sort['start'])) {
+
+			$null = strtoupper($sort['start']) == 'ASC' ? 'IS NULL' : 'IS NOT NULL';
+
+			$i = array_search('start', $sort->keys());
+			$sort->insert($i, new Expression($query->getTableAlias() . '.`start` ' . $null));
+		}
+
+
 
 		return parent::sort($query, $sort);
 	}
