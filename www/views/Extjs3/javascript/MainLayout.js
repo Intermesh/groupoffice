@@ -409,6 +409,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	renderUI : function() {
+		var me = this;
 
 		GO.checker = new GO.Checker();
 
@@ -421,19 +422,97 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		var items = [];
 
-		this.startMenu = new Ext.menu.Menu({
-			id: 'startMenu',
-			enableScrolling: false
+		me.startMenuSearchField = new Ext.menu.SearchFieldItem({
+			cls: 'go-menu-search-field',
+			placeholder: t("Module name") + "...",
+			listeners: {
+				keyup: {
+					fn: function(field) {
+						me.startMenu.store.filter('searchText', field.getValue().toLowerCase(), true);
+						me.startMenu.updateMenuItems();
+					},
+					buffer: 200,
+				},
+				clear: function () {
+					me.startMenu.store.clearFilter();
+					me.startMenu.updateMenuItems();
+				},
+				scope: me,
+			}
 		});
 
-		this.startMenu.on('render', () => {
+		me.startMenu = new GO.menu.JsonMenu({
+			id: 'startMenu',
+			enableScrolling: false,
+			store: new Ext.data.JsonStore({
+				root: 'root',
+				proxy: new Ext.data.MemoryProxy(),
+				fields: ['id', 'moduleName', 'text', 'iconCls', 'handler', {
+					name: 'searchText',
+					convert: function (v, data) {
+						let searchString = data.moduleName.replace('-', '').toLowerCase();
+						return searchString + ' ' + data.text.toLowerCase();
+					}
+				}],
+				sortInfo: {
+					field: 'text',
+					direction: 'ASC',
+				},
+			}),
+			listeners: {
+				itemclick : function(item, e) {
+					if (!item.textField) {
+						this.openModule(item.moduleName);
+						this.startMenu.hide();
+					}
+				},
+				scope: me
+			},
+			updateMenuItems: function() {
+				var startMenu = me.startMenu;
+				if(startMenu.rendered){
+
+					startMenu.remove(me.startMenuSearchField, false);
+
+					startMenu.removeAll();
+					startMenu.el.sync();
+
+					var records = startMenu.store.getRange();
+
+					//prepend search field
+					startMenu.insert(0, me.startMenuSearchField);
+
+					for(var i=0, len=records.length; i<len; i++){
+						if (records[i].json.handler) {
+							eval("records[i].json.handler = "+records[i].json.handler);
+						}
+						if (records[i].json.menu) {
+							eval("records[i].json.menu = "+records[i].json.menu);
+						}
+
+						startMenu.add(records[i].json);
+					}
+
+					startMenu.fireEvent('load', startMenu, records);
+					startMenu.loaded = true;
+				}
+
+			}
+		});
+
+		me.startMenu.on('afterrender', (menu) => {
+			menu.updateMenuItems();
+
+			/*
 			this.startMenu.getEl().on('click', (e) => {
 				var t = this.startMenu.findTargetItem(e);
 				if(!t){
 					this.startMenu.hide();
 				}
-			});
+			});*/
 		});
+
+		this.startMenuItems = [];
 
 		// if(GO.util.isMobileOrTablet()) {
 		// 	this.startMenu.on("show", function() {
@@ -486,7 +565,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 				// Check the subMenu property, if it is a submenu then don't add this item to the start menu
 				if (!allPanels[i].inSubmenu) {
-					this.startMenu.add(menuItemConfig);
+					//this.startMenu.add(menuItemConfig);
+					this.startMenuItems.push(menuItemConfig);
 				}
 			} else
 			{
@@ -503,7 +583,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			for (var i = 0; i < subItems.length; i++) {
 				if (!GO.util.empty(subItems[i])) {
-					subMenuItems.push({
+					var subMenuItemConfig = {
 						id: 'go-start-menu-' + subItems[i].moduleName,
 						moduleName: subItems[i].moduleName,
 						text: subItems[i].title,
@@ -512,7 +592,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							this.openModule(item.moduleName);
 						},
 						scope: this
-					});
+					};
+					//subMenuItems.push(subMenuItemConfig);
+					this.startMenuItems.push(subMenuItemConfig);
 				}
 			}
 
@@ -528,17 +610,21 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			Ext.apply(subitemConfig, subMenus[key].subMenuConfig);
 
-			this.startMenu.add(new Ext.menu.Item(subitemConfig));
+			//this.startMenu.add(new Ext.menu.Item(subitemConfig));
+			this.startMenuItems.push(subitemConfig);
 		}
 
 		if (adminMenuItems.length) {
 
-			this.startMenu.add(new Ext.menu.TextItem({id: 'go-start-menu-admin-menu', text: '<div class="menu-title">' + t("Admin menu") + '</div>'}));
+			//this.startMenu.add(new Ext.menu.TextItem({id: 'go-start-menu-admin-menu', text: '<div class="menu-title">' + t("Admin menu") + '</div>'}));
 
 			for (var i = 0; i < adminMenuItems.length; i++) {
-				this.startMenu.add(adminMenuItems[i]);
+				//this.startMenu.add(adminMenuItems[i]);
+				this.startMenuItems.push(adminMenuItems[i]);
 			}
 		}
+
+		this.startMenu.store.loadData({root: this.startMenuItems});
 
 		this.createTabPanel(items);
 

@@ -224,4 +224,4 @@ views/Extjs3/javascript/calendar/WeekEventRenderer.js
 
 views/Extjs3/javascript/links/LinkViewWindow.js
 
-
+views/Extjs3/javascript/TextFieldItem.js

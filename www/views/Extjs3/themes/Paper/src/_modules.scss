@@ -54,6 +54,20 @@
 		text-align:center;
 		//margin: dp(8) dp(12);
 	}
+	li.x-menu-textfield-item {
+		width: 800px;
+		height: 60px;
+		grid-column: 1 / -1;
+		line-height: 50px;
+
+		input {
+			height: 50px;
+		}
+
+		& .x-form-field-wrap .x-form-trigger {
+			height: 50px;
+		}
+	}
 	.x-menu-item-text {
 		@extend %font-data;
 		display:block;
