@@ -393,15 +393,9 @@ class Account extends \GO\Base\Db\ActiveRecord
 			//go()->debug("No token refresh found. A new refresh token needs to be generated.");
 			return null;
 		}
-		$url = rtrim(go()->getSettings()->URL, '/');
-		// At some point, we should get a provider from generic adapter class based on defaultClientId.
-		$provider = new Google([
-			'clientId' => $rec['clientId'],
-			'clientSecret' => $rec['clientSecret'],
-			'redirectUri' => $url . '/gauth/callback',
-			'accessType'   => 'offline',
-			'scopes' => ['https://mail.google.com/']
-		]);
+
+		$oauth2Client = Oauth2Client::findById($rec['oauth2ClientId']);
+		$provider = $oauth2Client->getProvider();
 
 		$grant = new RefreshToken();
 		$token = $provider->getAccessToken($grant, ['refresh_token' => $refreshToken]);
@@ -412,26 +406,6 @@ class Account extends \GO\Base\Db\ActiveRecord
 		return $stmt->execute();
 	}
 
-	/**
-	 *
-	 * @return string|null
-	 * @throws \go\core\exception\ConfigurationException
-	 * @todo: refactor into new database schema
-	 */
-	public function getXOauth2Token()
-	{
-		if (empty($this->client_id) ) {
-			return null;
-		}
-		$rec = go()->getDbConnection()->select('token')
-			->from(Oauth2Account::getMapping()->getPrimaryTable()->getName())
-			->where(['accountId'=> $this->id])
-			->single();
-		if($rec) {
-			return $rec['token'];
-		}
-		return null;
-	}
 
 	/**
 	 * Connect to the IMAP server without selecting a mailbox

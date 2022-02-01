@@ -8,7 +8,6 @@ use go\core\jmap\EntityController;
 use go\core\webclient\Extjs3;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model;
-use League\OAuth2\Client\Provider\Google;
 
 final class Oauth2Client extends EntityController
 {
@@ -103,13 +102,14 @@ final class Oauth2Client extends EntityController
 	 * Authenticate using google Oauth settings for current account ID
 	 *
 	 * @param int $accountId
-	 * @throws \GO\Base\Exception\MissingParameter
-	 * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
+	 * @throws Exception
 	 */
 	public function auth(int $accountId)
 	{
 		\GO::session()->values['accountId'] = $accountId;
-		$provider = $this->getProvider($accountId);
+		if (!$provider = $this->getProvider($accountId)) {
+			throw new Exception('No OAuth2 client settings found for current email account.');
+		}
 
 		if (!empty($_GET['error'])) {
 			throw new Exception('Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
@@ -126,35 +126,22 @@ final class Oauth2Client extends EntityController
 		exit(0);
 	}
 
-	public function test(int $accountId)
-	{
-		$acct = Account::findById($accountId);
-		echo $acct->username;
-		exit(0);
-	}
 
 	/**
-	 * Prepare ourselves a Google Provider
+	 * Find provider for current account ID.
 	 *
 	 * @param int $accountId
-	 * @return Google
-	 * @throws \Exception
-	 * @todo: move to separate class
-	 * @todo: make generic for multiple oauth2 default clients
+	 * @return mixed|null
+	 * @throws \go\core\exception\NotFound
 	 */
-	private function getProvider(int $accountId): Google
+	private function getProvider(int $accountId)
 	{
 		$acct = Account::findById($accountId);
-		$acctSettings = $acct->oauth2_account;
-		$oauth2tClient = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
+		if ($acctSettings = $acct->oauth2_account) {
+			$client = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
 
-		$url = rtrim(go()->getSettings()->URL, '/');
-		return new Google([
-			'clientId' => $oauth2tClient->clientId,
-			'clientSecret' => $oauth2tClient->clientSecret,
-			'redirectUri' => $url . '/go/modules/community/oauth2client/gauth.php/callback',
-			'accessType' => 'offline',
-			'scopes' => ['https://mail.google.com/']
-		]);
+			return $client->getProvider();
+		}
+		return null;
 	}
 }

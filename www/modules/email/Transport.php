@@ -33,18 +33,22 @@ class Transport extends \Swift_SmtpTransport
 	{
 		$encryption = empty($account->smtp_encryption) ? null : $account->smtp_encryption;
 		$o = new self($account->smtp_host, $account->smtp_port, $encryption);
-		
-		if (stripos($account->authenticationMethod, 'oauth') !== false ) {
+		$cltAcct = null;
+		if (go()->getModule('community', 'oauth2client')) {
+			$cltAcct = go()->getDbConnection()->select('token')
+				->from('oauth2client_account')
+				->where(['accountId' => $account->id])
+				->single();
+		}
+		if ($cltAcct) {
 			$o->setAuthMode('XOAUTH2')
 				->setUsername($account->username)
-				->setPassword($account->getXOauth2Token());
+				->setPassword($cltAcct['token']);
 		} else if (!empty($account->smtp_username)){
 			$o->setUsername($account->smtp_username)
 				->setPassword($account->decryptSmtpPassword());
 		}
 
-		// TODO: Build in support for OAUUTH2 SMTP
-		
 		// Allow SSL/TLS and STARTTLS connection with self signed certificates. Enabling this will not check the identity of the server
 		if ($account->smtp_allow_self_signed) {
 			$o->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name'  => false)));
