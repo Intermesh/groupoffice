@@ -9,6 +9,7 @@ use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\Forbidden;
+use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\jmap\Entity;
 use go\core\model\Alert;
@@ -19,6 +20,7 @@ use go\core\model\Module;
 use Faker;
 
 
+use go\core\orm\EntityType;
 use go\modules\community\history\Module as HistoryModule;
 use function GO;
 
@@ -27,6 +29,24 @@ class System extends Controller {
 	use EventEmitterTrait;
 
 	const EVENT_CLEANUP = 'cleanup';
+
+
+	/**
+	 * @throws NotFound
+	 */
+	public function resetSyncState(string $entity = null) {
+		if(!isset($entity)) {
+			EntityType::resetAllSyncState();
+		} else{
+			$et = EntityType::findByName($entity);
+			if(!$et) {
+				throw new NotFound("Entity '$entity' not found");
+			}
+			$et->resetSyncState();
+		}
+
+		echo "Reset done!\n";
+	}
 
 	/**
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync

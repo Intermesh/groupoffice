@@ -20,7 +20,8 @@ use go\core\jmap\Request;
 use go\core\mail\Mailer;
 use go\core\model\Group;
 use go\core\model\Module as ModuleModel;
-use go\core\orm\exception\SaveException;
+	use go\core\orm\EntityType;
+	use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
 use go\core\Settings as CoreSettings;
 use go\core\util\ArrayObject;
@@ -586,7 +587,7 @@ use Faker;
 
 			Listeners::get()->init();
 
-			$this->resetSyncState();
+			EntityType::resetAllSyncState();
 
 			go()->getSettings()->cacheClearedAt = time();
 			/** @noinspection PhpUnhandledExceptionInspection */
@@ -798,20 +799,7 @@ use Faker;
 			return false;
 		}
 		
-		/**
-		 * Resets all entity state so all clients must resync data.
-		 */
-		private function resetSyncState() {
-			//reset all mod seqs
-			go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
-			go()->getDbConnection()->exec("TRUNCATE TABLE core_change");
-			go()->getDbConnection()->exec("TRUNCATE TABLE core_acl_group_changes");
 
-			// Disable keys otherwise this might take very long!
-			go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0;");
-			go()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
-			go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1;");
-		}
 
 		/**
 		 * Download method for module icons
