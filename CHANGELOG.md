@@ -1,4 +1,5 @@
 6.6.37
+- Carddav: return "all" address book with all address book merged for macos because it only supports one address book.
 - Billing: fix error in Document generator order when contact not entered
 - Core: Added new CLI commands to reset the JMAP sync state: https://groupoffice.readthedocs.io/en/latest/system-settings/tools.html
 - Email: case insensitive spoof check
