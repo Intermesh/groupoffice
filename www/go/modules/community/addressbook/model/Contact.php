@@ -766,12 +766,13 @@ class Contact extends AclItemEntity {
 		return $this->uid;		
 	}
 
-	private function generateUid() {
+	private function generateUid(): string
+	{
 		$url = trim(go()->getSettings()->URL, '/');
 		$uid = substr($url, strpos($url, '://') + 3);
-		$uid = str_replace('/', '-', $uid );
+		$uid = str_replace(['/', ':'], ['-', '-'], $uid );
 
-		return $this->id . '@' . $uid;
+		return $this->id . '-' . $uid;
 	}
 
 	public function setUid($uid) {
