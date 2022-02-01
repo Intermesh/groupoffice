@@ -460,6 +460,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				},
 			}),
 			listeners: {
+				show: function() {
+					this.startMenuSearchField.focus(false, 500);
+				},
 				itemclick : function(item, e) {
 					if (!item.textField) {
 						this.openModule(item.moduleName);
