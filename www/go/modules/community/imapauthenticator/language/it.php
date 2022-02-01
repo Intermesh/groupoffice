@@ -2,5 +2,5 @@
 return array (
   'Domains' => 'Domini',
   'Validate certificate' => 'Certificato valido',
-  'Remove domain from username' => 'Rimuovi dominio dall\'username',
+  'Remove domain from username' => 'Rimuovi dominio dall\\\'username',
 );

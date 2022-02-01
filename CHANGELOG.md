@@ -89,6 +89,11 @@
 
 
 6.5.98
+01-02-2022 6.5.100
+- Leave days: minor rounding error in holiday calculator
+- Leave days: round leave day allowances to 1 decimal in year overview
+- Core: Italian translations updated (thank you Luca Pauluzzi)
+
 25-01-2022 6.5.99
 - Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
 

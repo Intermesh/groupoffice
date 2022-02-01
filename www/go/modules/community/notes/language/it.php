@@ -1,7 +1,7 @@
 <?php
 return array (
-  'Notebook' => 'Categoria',
-  'Notebooks' => 'Categorie',
+  'Notebook' => 'Blocco note',
+  'Notebooks' => 'Blocchi note',
   'Notes' => 'Note',
   'category_id' => 'ID categoria',
   'content' => 'Contenuto',
@@ -14,4 +14,8 @@ return array (
   'Add test' => 'Aggiungi test',
   'Invalid password' => 'Password non valida',
   'Filters' => 'Filtri',
+  'Encrypted data' => 'Dati crittografati',
+  'Note book' => 'Blocco note',
+  'Enter password to decrypt' => 'Inserisci password per decrittare',
+  'Default note book' => 'Blocco note predefinito',
 );
