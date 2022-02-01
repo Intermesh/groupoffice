@@ -1,5 +1,6 @@
 6.6.37
 - Billing: fix error in Document generator order when contact not entered
+- Core: Added new CLI commands to reset the JMAP sync state: https://groupoffice.readthedocs.io/en/latest/system-settings/tools.html
 
 28-01-2022 6.6.36
 - Tasks: drag and drop tasks to other lists
