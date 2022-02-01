@@ -245,7 +245,14 @@ class RememberMe extends Entity {
 
 		if(!password_verify($cookieParts[1], $rememberMe->token)) {
 			// clear logins
-			Token::delete(['userId' => $rememberMe->userId]);
+			Token::delete(
+				(new Query())
+					->where('userId', '=', $rememberMe->userId)
+						//below is for the api keys module. It sets tokens that never expire.
+						// A remember me token is never used for such a key so they can be
+						// safely ignored.
+					->andWhere('expiresAt', 'IS NOT', null)
+			);
 			RememberMe::delete(['userId' => $rememberMe->userId]);
 			self::unsetCookie();
 			throw new RememberMeTheft();
