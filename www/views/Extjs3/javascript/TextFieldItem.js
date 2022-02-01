@@ -4,6 +4,8 @@ Ext.menu.SearchFieldItem = Ext.extend(Ext.menu.BaseItem, {
 
     itemCls: "x-menu-textfield",
 
+    isFormField: true,
+
     constructor: function (config) {
         Ext.menu.SearchFieldItem.superclass.constructor.call(this, config);
 
@@ -24,6 +26,7 @@ Ext.menu.SearchFieldItem = Ext.extend(Ext.menu.BaseItem, {
                     cls: this.itemCls,
                     hideLabels: true,
                     enableKeyEvents: true,
+                    hasFocus: true,
                     placeholder: me.placeholder || t("Search") + "...",
                     triggerClass: 'x-form-clear-trigger',
                     onTriggerClick: function () {
@@ -48,5 +51,9 @@ Ext.menu.SearchFieldItem = Ext.extend(Ext.menu.BaseItem, {
         this.textField.on('keypress', function (field, e) {
             this.fireEvent('keypress', field, e);
         }, this);
-    }
+    },
+
+    focus: function(selectText, delay) {
+        this.textField.focus(selectText, delay);
+    },
 });
