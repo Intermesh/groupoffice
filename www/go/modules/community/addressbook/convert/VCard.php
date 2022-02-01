@@ -499,10 +499,16 @@ class VCard extends AbstractConverter {
 	private static function convertType(string $vCardType): ?string {
 		$types = explode(',', strtolower($vCardType));
 		foreach($types as $type) {
-			
-			//skip internet type.
-			if($type != 'internet') {
-				return $type;
+
+			switch($type) {
+				case 'cell':
+					return 'mobile';
+
+				case 'internet':
+					return null;
+
+				default:
+					return $type;
 			}
 		}
 
