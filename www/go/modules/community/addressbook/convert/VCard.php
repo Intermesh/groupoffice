@@ -18,7 +18,6 @@ use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
 use go\core\model\Link;
 use Sabre\VObject\Component\VCard as VCardComponent;
-use Sabre\VObject\Document;
 use Sabre\VObject\Document as SabreDocument;
 use Sabre\VObject\ParseException;
 use Sabre\VObject\Property;

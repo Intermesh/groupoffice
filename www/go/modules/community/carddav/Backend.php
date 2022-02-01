@@ -5,7 +5,6 @@
 namespace go\modules\community\carddav;
 
 use Exception;
-use go\core\db\Statement;
 use go\core\fs\Blob;
 use go\core\http\Request;
 use go\core\model\Acl;
