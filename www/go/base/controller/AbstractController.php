@@ -48,11 +48,8 @@ use GO\Base\Exception\SecurityTokenMismatch;
 use GO\Base\Model\Acl;
 use GO\Base\Model\Module;
 use GO\Base\Observable;
-use GO\Base\Util\Http;
 use GO\Base\Util\Number;
 use GO\Base\View\AbstractView;
-use GO\Base\View\FileView;
-use GO\Base\View\JsonView;
 use ReflectionMethod;
 
 

@@ -233,11 +233,12 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 			else
 				$query.= ' FLAGGED';
 		}
+		/* @var $account Account */
 
 		$account = Account::model()->findByPk($params['account_id']);
-		if(!$account)
+		if(!$account) {
 			throw new \GO\Base\Exception\NotFound();
-		/* @var $account Account */
+		}
 		$account->maybeRefreshToken();
 
 		$this->_filterMessages($params["mailbox"], $account);

@@ -367,18 +367,18 @@ class Account extends \GO\Base\Db\ActiveRecord
 	/**
 	 * Check if access token needs to be refreshed
 	 *
-	 * @todo move to proper class, somewhere in oauthClient
-	 * @todo maybe make part of an event?
 	 * @return bool|null
+	 * @throws \Exception
 	 */
 	public function maybeRefreshToken()
 	{
-		if (empty($this->client_id) ) {
+		if (! go()->getModule('community', 'oauth2client') ) {
 			return null;
 		}
 		$rec = go()->getDbConnection()->select()
-			->from(Oauth2Client::getMapping()->getPrimaryTable()->getName())
-			->where(['accountId'=> $this->id])
+			->from('oauth2client_account', 'oa')
+			->join('oauth2client_oauth2client', 'oc', 'oa.oauth2ClientId=oc.id')
+			->where(['oa.accountId'=> $this->id])
 			->single();
 		if(!$rec) {
 			return null;
@@ -394,6 +394,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 			return null;
 		}
 		$url = rtrim(go()->getSettings()->URL, '/');
+		// At some point, we should get a provider from generic adapter class based on defaultClientId. 
 		$provider = new Google([
 			'clientId' => $rec['clientId'],
 			'clientSecret' => $rec['clientSecret'],
@@ -404,7 +405,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 
 		$grant = new RefreshToken();
 		$token = $provider->getAccessToken($grant, ['refresh_token' => $refreshToken]);
-		$stmt = go()->getDbConnection()->update('oauth2client_oauth2client',
+		$stmt = go()->getDbConnection()->update('oauth2client_account',
 			['token' => $token->getToken(), 'expires' => $token->getExpires()],
 			['accountId' => $this->id]
 		);
