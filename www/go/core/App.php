@@ -3,6 +3,7 @@
 namespace go\core {
 
 use Exception;
+use Faker\Generator;
 use GO\Base\Observable;
 use GO;
 use go\core\auth\State as AuthState;
@@ -11,19 +12,18 @@ use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-	use go\core\db\Utils;
-	use go\core\event\EventEmitterTrait;
+use go\core\event\EventEmitterTrait;
 use go\core\event\Listeners;
 use go\core\fs\Blob;
 use go\core\fs\Folder;
 use go\core\jmap\Request;
 use go\core\mail\Mailer;
-	use go\core\model\Group;
-	use go\core\model\Module as ModuleModel;
+use go\core\model\Group;
+use go\core\model\Module as ModuleModel;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
-	use go\core\Settings as CoreSettings;
-	use go\core\util\ArrayObject;
+use go\core\Settings as CoreSettings;
+use go\core\util\ArrayObject;
 use go\core\webclient\Extjs3;
 use go\core\model\User;
 use go\core\model\Settings;
@@ -518,7 +518,7 @@ use Faker;
 		 *
 		 * return the module if it's installed and available.
 		 *
-		 * @param string $package Set to null for legacy modules
+		 * @param ?string $package Set to null for legacy modules
 		 * @param string $name
 		 * @return ModuleModel | false
 		 * @throws Exception
@@ -562,6 +562,7 @@ use Faker;
 		 * Destroys all cache and re-initializes event listeners and sync state.
 		 *
 		 * @param boolean $onDestruct
+		 * @noinspection PhpDocMissingThrowsInspection
 		 */
 		public function rebuildCache(bool $onDestruct = false) {
 			
@@ -574,7 +575,7 @@ use Faker;
 			
 			GO::clearCache(); //legacy
 
-			go()->getCache()->flush(true, false);
+			go()->getCache()->flush(true);
 			Table::destroyInstances();
 			Property::clearCache();
 
@@ -588,6 +589,7 @@ use Faker;
 			$this->resetSyncState();
 
 			go()->getSettings()->cacheClearedAt = time();
+			/** @noinspection PhpUnhandledExceptionInspection */
 			go()->getSettings()->save();
 			
 		}
@@ -863,9 +865,8 @@ use Faker;
 
 		/**
 		 * @throws Exception
-		 * @noinspection PhpUndefinedFieldInspection
 		 */
-		public function demo(Faker\Generator $faker) {
+		public function demo(Generator $faker) {
 
 			go()->getSettings()->passwordMinLength = 4;
 
