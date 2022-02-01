@@ -20,14 +20,31 @@ go.Modules.register("community", "tasks", {
 			},
 
 			linkDetailCards: function () {
-				return [new go.modules.community.tasks.TaskLinkDetail({
+
+				const incomplete = new go.modules.community.tasks.TaskLinkDetail({
+					title:  t("Incomplete tasks"),
 					link: {
-						title: t("Tasks"),
-						iconCls: 'icon ic-check',
 						entity: "Task",
 						filter: null
 					}
-				})]
+				});
+
+				incomplete.store.setFilter('completed',{complete:  false});
+
+				const completed = 	new go.modules.community.tasks.TaskLinkDetail({
+
+					title:  t("Completed tasks"),
+					link: {
+						entity: "Task",
+						filter: null
+					}
+				});
+				completed.store.setFilter('completed',{complete:  true});
+
+				return [
+					incomplete,
+
+					completed]
 			}
 		}],
 		relations: {
