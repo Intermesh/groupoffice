@@ -201,37 +201,43 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 		return $response;
 	}
 
-	protected function actionStore($params){
+	protected function actionStore(array $params)
+	{
 
 		$this->checkRequiredParameters(array('account_id'), $params);
 
 		GO::session()->closeWriting();
 
-		if(!isset($params['start']))
-			$params['start']=0;
+		if(!isset($params['start'])) {
+			$params['start'] = 0;
+		}
 
-		if(!isset($params['limit']))
-			$params['limit']=GO::user()->max_rows_list;
+		if(!isset($params['limit'])) {
+			$params['limit'] = GO::user()->max_rows_list;
+		}
 
-		if(!isset($params['dir']))
-			$params['dir']="ASC";
+		if(!isset($params['dir'])) {
+			$params['dir'] = "ASC";
+		}
 
 		$query=isset($params['query']) ? $params['query'] : "";
 
 		//passed when only unread should be shown
 		if(!empty($params['unread'])) {
 			$query = str_replace(array('UNSEEN', 'SEEN'), array('', ''), $query);
-			if ($query == '')
+			if ($query == '') {
 				$query .= 'UNSEEN';
-			else
-				$query.= ' UNSEEN';
+			} else {
+				$query .= ' UNSEEN';
+			}
 		}
 		if(!empty($params['flagged'])) {
 			$query = str_replace(array('UNFLAGGED', 'FLAGGED'), array('', ''), $query);
-			if ($query == '')
+			if ($query == '') {
 				$query .= 'FLAGGED';
-			else
-				$query.= ' FLAGGED';
+			} else {
+				$query .= ' FLAGGED';
+			}
 		}
 		/* @var $account Account */
 
