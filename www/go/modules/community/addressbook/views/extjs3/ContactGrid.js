@@ -54,7 +54,18 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"color"
 			],
 			sortInfo :{field: go.User.addressBookSettings.sortBy, direction: "ASC"},
-			entityStore: "Contact"
+			entityStore: "Contact",
+			listeners: {'beforeload': (store, options) => {
+				const oldState = this.getStateId();
+				if(store.filters && store.filters.org && store.filters.org.isOrganization) {
+					this.stateId = 'company-grid'
+				} else {
+					this.stateId = 'contact-grid'
+				}
+				if(oldState !== this.stateId) {
+					this.initState();
+				}
+			}}
 		});
 		
 		var grid = this;
@@ -342,7 +353,6 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 	},
 
 	applyState: function(state) {
-
 		this.supr().applyState.call(this, state);
 
 		var sort = this.store.getSortState();
@@ -354,7 +364,6 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 		if((sort.field == 'name' || sort.field == 'lastName') && go.User.addressBookSettings.sortBy != sort.field) {
 			this.store.setDefaultSort(go.User.addressBookSettings.sortBy, sort.direction);
 		}
-
 	},
 	
 

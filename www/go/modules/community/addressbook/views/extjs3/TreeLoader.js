@@ -14,7 +14,7 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 		
 		go.modules.community.addressbook.TreeLoader.superclass.constructor.call(this, config);
 		
-		this.baseAttrs.iconCls = 'ic-import-contacts';
+		this.baseAttrs.iconCls = 'ic-import-contacts brown';
 		
 		this.groupLoader = new go.tree.EntityLoader({
 			entityStore: "AddressBookGroup",
@@ -44,16 +44,14 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 		if(this.position == 0 && !this.getFilter("tbsearch")) {
 			r.responseData.unshift({
 				leaf: true,
-				iconCls: "ic-star",
-				text: t("Starred", "addressbook", "community"),
-				id: "starred"
-			});
-
-			r.responseData.unshift({
-				leaf: true,
-				iconCls: "ic-select-all",
+				iconCls: "ic-select-all blue",
 				text: t("All contacts", "addressbook", "community"),
 				id: "all"
+			},{
+				leaf: true,
+				iconCls: "ic-star orange",
+				text: t("Starred", "addressbook", "community"),
+				id: "starred"
 			});
 		}
 		go.modules.community.addressbook.TreeLoader.superclass.handleResponse.call(this, r);	
@@ -67,6 +65,9 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 		if(entity.groups.length === 0) {
 			attr.children = [];
 			attr.expanded = true;
+		}
+		if(entity.id === go.User.addressBookSettings.defaultAddressBookId) {
+			attr.iconCls = 'ic-import-contacts bluegrey';
 		}
 		return attr;
 	}

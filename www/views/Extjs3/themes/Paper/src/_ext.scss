@@ -1718,9 +1718,9 @@ td.grid-hd-group-cell {
 	&-ec-icon, &-node-icon {
 		position:relative;
 		//display:inline-block;
+		color: color($fg, 'icon');
 		&::before {
 			@extend %icon;
-			color: color($fg, 'icon');
 		}
 	}
 	&-nolines {}
