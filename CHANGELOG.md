@@ -1,5 +1,6 @@
 - Notes: drag and drop notes
 - Tasks: Fixed category permissions
+- Core: JMAP via CLI https://groupoffice.readthedocs.io/en/latest/developer/server/cli.html
 
 03-02-2022 6.6.36
 - Carddav: return "all" address book with all address book merged for macos because it only supports one address book.
