@@ -1,4 +1,5 @@
 - Notes: drag and drop notes
+- Tasks: Fixed category permissions
 
 03-02-2022 6.6.36
 - Carddav: return "all" address book with all address book merged for macos because it only supports one address book.
