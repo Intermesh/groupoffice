@@ -1,3 +1,5 @@
+- Notes: drag and drop notes
+
 03-02-2022 6.6.36
 - Carddav: return "all" address book with all address book merged for macos because it only supports one address book.
 - Billing: fix error in Document generator order when contact not entered

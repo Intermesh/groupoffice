@@ -38,6 +38,11 @@ class Category extends Entity {
 
 	public function getPermissionLevel(): int
 	{
+		//global category mayb only be created by admins
+		if(empty($this->tasklistId)) {
+			return go()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : 0;
+		}
+
 		return (
 			$this->ownerId === go()->getUserId()
 			||
@@ -45,6 +50,7 @@ class Category extends Entity {
 				->getUserRights()
 				->mayChangeCategories ? Acl::LEVEL_MANAGE : 0);
 	}
+
 
 	public function internalValidate()
 	{
