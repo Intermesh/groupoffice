@@ -67,7 +67,7 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 			attr.expanded = true;
 		}
 		if(entity.id === go.User.addressBookSettings.defaultAddressBookId) {
-			attr.iconCls = 'ic-import-contacts bluegrey';
+			attr.iconCls = 'ic-home bluegrey';
 		}
 		return attr;
 	}

@@ -63,6 +63,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					this.stateId = 'contact-grid'
 				}
 				if(oldState !== this.stateId) {
+					this.colModel.totalWidth = null; // this will make the "hiddenchange" event recalculate the width
 					this.initState();
 				}
 			}}
