@@ -10,6 +10,7 @@ go.modules.community.tasks.Portlet = Ext.extend(go.grid.GridPanel, {
 	// enableColumnMove : false,
 	loadMask: true,
 	autoHeight: true,
+	maxHeight: dp(600),
 	//saveListenerAdded: false,
 
 	initComponent: function() {
@@ -153,7 +154,8 @@ go.modules.community.tasks.Portlet = Ext.extend(go.grid.GridPanel, {
 
 	afterRender: function () {
 		this.supr().afterRender.call(this);
-		this.store.setFilter('tasklistIds', {tasklistId: go.User.taskPortletTaskLists});
+		const lists = go.User.taskPortletTaskLists.length ? go.User.taskPortletTaskLists : [go.User.tasksSettings.defaultTasklistId];
+		this.store.setFilter('tasklistIds', {tasklistId: lists});
 		this.store.load();
 	}
 });
