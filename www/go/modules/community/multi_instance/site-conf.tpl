@@ -29,8 +29,11 @@
   #For WebDAV support
   Alias /webdav ${DOC_ROOT_{version}}/modules/dav/files.php
 
-  #For SyncML support
+  #For O365 and LibreOffice online support
   Alias /wopi ${DOC_ROOT_{version}}/go/modules/business/wopi/wopi.php
+
+  #For OnlyOffice
+  Alias /onlyoffice ${DOC_ROOT_{version}}/go/modules/business/onlyoffice/connector.php
 
   #DAV Service discovery. At least required for iOS7 support
   Redirect 301 /.well-known/carddav /carddav
