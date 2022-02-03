@@ -31,7 +31,7 @@ abstract class ImapBase {
 	 */
 	var $default_charset='';
 	
-	public $lastCommand;
+	public $lastCommand = "";
 	
 	var $command_count=0;
 
@@ -376,8 +376,8 @@ abstract class ImapBase {
 				// Strip command count
 				$line = preg_replace("/^A".$this->command_count." NO( \[.*?\])? /i", "", $line);
 				$line = preg_replace("/ \(.*\)?/i", "", $line);
-				$this->errors[] = $line;
-//				$this->errors[]=$line."\n\nLast command: ".$this->lastCommand;
+//				$this->errors[] = $line;
+				$this->errors[]=$line."\n\nLast command: ".$this->lastCommand;
 			}
 		}	
 		
