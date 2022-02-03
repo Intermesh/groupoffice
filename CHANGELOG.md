@@ -1,3 +1,4 @@
+03-02-2022 6.6.37
 - Notes: drag and drop notes
 - Tasks: Fixed category permissions
 - Core: JMAP via CLI https://groupoffice.readthedocs.io/en/latest/developer/server/cli.html
