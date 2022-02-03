@@ -360,7 +360,7 @@ abstract class ImapBase {
 				if(!$result && $trackErrors){
 					foreach($data as $vals){
 						if (strtoupper($vals[1]) != 'OK') {
-							$this->errors[]=implode(' ', $vals)."\n\nLast command: ".$this->lastCommand;
+							$this->errors[]=implode(' ', $vals).", Last command: ".trim($this->lastCommand);
 						}
 					}
 				}
@@ -377,7 +377,7 @@ abstract class ImapBase {
 				$line = preg_replace("/^A".$this->command_count." NO( \[.*?\])? /i", "", $line);
 				$line = preg_replace("/ \(.*\)?/i", "", $line);
 //				$this->errors[] = $line;
-				$this->errors[]=$line."\n\nLast command: ".$this->lastCommand;
+				$this->errors[]=$line.", Last command: ". trim($this->lastCommand);
 			}
 		}	
 		
