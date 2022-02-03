@@ -3,7 +3,6 @@ namespace go\core\cli\controller;
 
 use Exception;
 use GO\Base\Observable;
-use go\core\cache\None;
 use go\core\Controller;
 use go\core\db\Table;
 use go\core\db\Utils;
@@ -12,6 +11,8 @@ use go\core\exception\Forbidden;
 use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\jmap\Entity;
+use go\core\jmap\Response;
+use go\core\jmap\Router;
 use go\core\model\Alert;
 use go\core\http\Client;
 use go\core\model\CronJobSchedule;
@@ -21,7 +22,9 @@ use Faker;
 
 
 use go\core\orm\EntityType;
+use go\core\util\JSON;
 use go\modules\community\history\Module as HistoryModule;
+use JsonException;
 use function GO;
 
 class System extends Controller {
@@ -29,6 +32,22 @@ class System extends Controller {
 	use EventEmitterTrait;
 
 	const EVENT_CLEANUP = 'cleanup';
+
+
+	/**
+	 * @throws Exception
+	 * @throws JsonException
+	 */
+	public function jmap() {
+		stream_set_blocking(STDIN, 0);
+		$data = stream_get_contents(STDIN);
+		$requests = JSON::decode($data, true);
+
+		Response::get()->jsonOptions = JSON_PRETTY_PRINT;
+
+		$router = new Router();
+		$router->run($requests);
+	}
 
 
 	/**

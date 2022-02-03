@@ -271,7 +271,7 @@ class Filters {
 	/**
 	 * Add text filter.
 	 * 
-	 * Values are wrapped with %..% and comparator will be LIKE or NOT LIKE
+	 * Comparator will be LIKE
 	 * 
 	 * @param string $name
 	 * @param Closure $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
