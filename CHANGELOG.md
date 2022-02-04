@@ -1,3 +1,5 @@
+- Time Registration: Display travel distance field after re-opening time registration
+
 - Core: Compatible with PHP 8.1 now
 
 03-02-2022 6.6.38
