@@ -1895,7 +1895,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		return $response;
 	}
 
-	//still used?
 	public function actionMessageAttachment($params){
 
 		$account = Account::model()->findByPk($params['account_id']);
