@@ -240,7 +240,7 @@ class File extends FileSystemObject {
 	 * @since 5.0
 	 * @throws Exception
 	 */
-	public function putContents($data, int $flags = null, $context = null) {
+	public function putContents($data, int $flags = 0, $context = null) {
 		
 		$this->create();
 		
