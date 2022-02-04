@@ -53,6 +53,40 @@ use Faker;
 
 		use EventEmitterTrait;
 
+
+		private $eventsEnabled = true;
+
+		/**
+		 * Disable events
+		 *
+		 * @return bool Old state
+		 */
+		public function disableEvents() : bool {
+			$old = $this->eventsEnabled;
+			$this->eventsEnabled = false;
+			return $old;
+		}
+
+		/**
+		 * Enable events
+		 *
+		 * @return bool Old state
+		 */
+		public function enableEvents(): bool {
+			$old = $this->eventsEnabled;
+			$this->eventsEnabled = true;
+			return $old;
+		}
+
+		/**
+		 * Check if events are enabled
+		 *
+		 * @return bool
+		 */
+		public function eventsEnabled() : bool {
+			return $this->eventsEnabled;
+		}
+
 		/**
 		 * Fires when the index page loads for the web client.
 		 */

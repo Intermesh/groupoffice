@@ -17,7 +17,7 @@ ini_set('implicit_flush', 1);
 
 // needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
 // system.
-EventEmitterTrait::$disableEvents = true;
+go()->disableEvents();
 require("gotest.php");
 
 if(!systemIsOk()) {

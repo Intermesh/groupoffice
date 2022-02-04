@@ -708,8 +708,8 @@ abstract class Entity  extends OrmEntity {
 		return $result;
 	}
 
-
-	public function jsonSerialize(): array
+	#[\ReturnTypeWillChange]
+	public function jsonSerialize()
 	{
 		$arr = $this->toArray();
 		$arr['id'] = $this->id();

@@ -376,6 +376,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 		$this->__unset($offset);
 	}
 
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize()
 	{
 		return $this->toArray();

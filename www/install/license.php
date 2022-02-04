@@ -11,7 +11,7 @@ go()->setCache(new \go\core\cache\None());
 
 // needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
 // system.
-EventEmitterTrait::$disableEvents = true;
+go()->disableEvents();
 
 if(go()->getDatabase()->hasTable("studio_studio")) {
 	$studioError = StudioModule::patch65to66();

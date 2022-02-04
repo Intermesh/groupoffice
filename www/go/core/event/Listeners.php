@@ -69,7 +69,7 @@ class Listeners extends Singleton {
 		$this->listeners = [];
 
 		//disable events to prevent recursion
-		EventEmitterTrait::$disableEvents = true;
+		go()->disableEvents();
 
 		foreach (Module::find(['id', 'name', 'package', 'version', 'enabled'])->where(['enabled' => true]) as $module) { /* @var $module Module */
 
@@ -94,7 +94,8 @@ class Listeners extends Singleton {
 		}
 
 		//disable events to prevent recursion
-		EventEmitterTrait::$disableEvents = false;
+		go()->enableEvents();
+
 		
 		App::get()->getCache()->set('listeners-2', $this->listeners);		
 	}

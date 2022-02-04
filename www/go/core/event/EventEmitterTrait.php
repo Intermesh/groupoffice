@@ -63,7 +63,7 @@ trait EventEmitterTrait {
 	public static function fireEvent(string $event, ...$args): bool
 	{
 		
-		if(EventEmitterTrait::$disableEvents) {
+		if(!go()->eventsEnabled()) {
 			return true;
 		}
 		

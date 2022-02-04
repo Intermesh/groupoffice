@@ -311,8 +311,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			throw new InvalidArgumentException("Can't get write only property ". $propName . " in " . static::class);
 		}
 	}
-	
-	public function jsonSerialize(): array
+
+	#[\ReturnTypeWillChange]
+	public function jsonSerialize()
 	{
 		return $this->toArray();
 	}
