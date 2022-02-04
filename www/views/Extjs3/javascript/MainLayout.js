@@ -427,7 +427,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			placeholder: t("Module name") + "...",
 			listeners: {
 				keyup: {
-					fn: function(field) {
+					fn: function(field, e) {
+						if (e.keyCode === e.ENTER) {
+							me.startMenu.openModule(me.startMenu.store.getAt(0).get('moduleName'));
+							return;
+						}
 						me.startMenu.store.filter('searchText', field.getValue().toLowerCase(), true);
 						me.startMenu.updateMenuItems();
 					},
@@ -465,11 +469,16 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				},
 				itemclick : function(item, e) {
 					if (!item.textField) {
-						this.openModule(item.moduleName);
-						this.startMenu.hide();
+						me.startMenu.openModule(item.moduleName);
 					}
 				},
 				scope: me
+			},
+			openModule: function(moduleName) {
+				me.openModule(moduleName);
+				me.startMenuSearchField.textField.reset();
+				me.startMenuSearchField.fireEvent('clear');
+				me.startMenu.hide();
 			},
 			updateMenuItems: function() {
 				var startMenu = me.startMenu;
