@@ -1575,11 +1575,11 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	public function getfull_url() {
-		return rtrim(go()->getSettings()->URL, '/') . '/';
+		return isset(go()->getSettings()->URL) ? rtrim(go()->getSettings()->URL, '/') . '/' : null;
 	}
 	
 	public function getorig_full_url() {
-		return rtrim(go()->getSettings()->URL, '/') . '/';
+		return $this->getfull_url();
 	}
 
 	public function getMajorVersion(){

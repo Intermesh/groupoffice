@@ -31,11 +31,13 @@ try {
 	$c->mergeRecursive($config);
 	go()->setConfig($c->getArray());
 
+	go()->getSettings()->URL = "http://localhost";
+
 	// Install new if db doesn't exist otherwise use existing
 //	$installDb = !go()->isInstalled() ? INSTALL_NEW : INSTALL_NONE;
 
 	// Always install
-	$installDb = INSTALL_NEW;
+	$installDb = INSTALL_NONE;
 
 //	For testing upgrades use:
 //	$installDb = INSTALL_UPGRADE;

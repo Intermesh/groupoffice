@@ -11,6 +11,7 @@ use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\ErrorHandler;
 use go\core\model\Field;
+use go\core\orm\CustomFieldsModel;
 use go\core\orm\Entity;
 use go\core\orm\Filters;
 use go\core\orm\Query;
@@ -200,12 +201,12 @@ abstract class Base extends Model {
 	 * This function is called when the API data is applied to the model with setValues();
 	 *
 	 * @param mixed $value The value for this field
-	 * @param \go\core\orm\CustomFieldsModel $values The values to be saved in the custom fields table
+	 * @param CustomFieldsModel $values The values to be saved in the custom fields table
 	 * @param Entity|ActiveRecord $entity
 	 * @return mixed
 	 * @see MultiSelect for an advaced example
 	 */
-	public function apiToDb($value, \go\core\orm\CustomFieldsModel $values, $entity)
+	public function apiToDb($value, CustomFieldsModel $values, $entity)
 	{
 		return $value;
 	}
@@ -216,12 +217,12 @@ abstract class Base extends Model {
 	 * This function is called when the data is serialized to JSON
 	 *
 	 * @param mixed $value The value for this field
-	 * @param \go\core\orm\CustomFieldsModel $values All the values of the custom fields to be returned to the API
+	 * @param CustomFieldsModel $values All the values of the custom fields to be returned to the API
 	 * @param Entity|ActiveRecord $entity
 	 * @return mixed
 	 * @see MultiSelect for an advaced example
 	 */
-	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity)
+	public function dbToApi($value, CustomFieldsModel $values, $entity)
 	{
 		return $value;
 	}
@@ -231,11 +232,11 @@ abstract class Base extends Model {
 	 * Used for templates or export
 	 *
 	 * @param mixed $value The value for this field
-	 * @param \go\core\orm\CustomFieldsModel $values The values inserted in the database
+	 * @param CustomFieldsModel $values The values inserted in the database
 	 * @param Entity|ActiveRecord $entity
 	 * @return string
 	 */
-	public function dbToText($value, \go\core\orm\CustomFieldsModel $values, $entity) {
+	public function dbToText($value, CustomFieldsModel $values, $entity) {
 		return $this->dbToApi($value, $values, $entity);
 	}
 
@@ -244,11 +245,11 @@ abstract class Base extends Model {
 	 * Used for templates or export
 	 *
 	 * @param mixed $value The value for this field
-	 * @param \go\core\orm\CustomFieldsModel $values The values inserted in the database
+	 * @param CustomFieldsModel $values The values inserted in the database
 	 * @param Entity|ActiveRecord $entity
 	 * @return string
 	 */
-	public function textToDb($value, \go\core\orm\CustomFieldsModel $values, $entity) {
+	public function textToDb($value, CustomFieldsModel $values, $entity) {
 		return $this->apiToDb($value, $values, $entity);
 	}
 
@@ -256,12 +257,12 @@ abstract class Base extends Model {
 	 * Called after the data is saved to API.
 	 *
 	 * @param mixed $value The value for this field
-	 * @param array $customFieldData The custom fields data
+	 * @param CustomFieldsModel $customFieldData The custom fields data
 	 * @param Entity $entity
 	 * @return boolean
 	 * @see MultiSelect for an advaced example
 	 */
-	public function afterSave($value, &$customFieldData, $entity)
+	public function afterSave($value, CustomFieldsModel &$customFieldModel, Entity $entity) : bool
 	{
 		
 		return true;
@@ -369,13 +370,13 @@ abstract class Base extends Model {
 	 * Called before the data is saved to API.
 	 *
 	 * @param mixed $value The value for this field
-	 * @param \go\core\orm\CustomFieldsModel $model
+	 * @param CustomFieldsModel $model
 	 * @param Entity $entity
-	 * @param \go\core\orm\CustomFieldsModel $record The values inserted in the database
+	 * @param array $record The values inserted in the database
 	 * @return boolean
 	 * @see MultiSelect for an advaced example
 	 */
-	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record)
+	public function beforeSave($value, CustomFieldsModel $model, $entity, &$record)
 	{
 		
 		return true;

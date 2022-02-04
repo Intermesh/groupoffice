@@ -4,6 +4,7 @@ namespace go\core\customfield;
 
 use GO;
 use go\core\db\Criteria;
+use go\core\orm\CustomFieldsModel;
 use go\core\orm\Entity;
 use go\core\orm\Filters;
 use go\core\orm\Query;
@@ -64,7 +65,7 @@ class MultiSelect extends Select {
 		return true;
 	}
 	
-	public function afterSave($value, &$customFieldData, $entity) {
+	public function afterSave($value,CustomFieldsModel &$customFieldModel, Entity $entity) : bool {
 		
 		if(!isset($this->optionsToSave)) {
 			return true;

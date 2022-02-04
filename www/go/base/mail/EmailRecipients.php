@@ -194,14 +194,14 @@ class EmailRecipients{
 	 * 
 	 * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com
 	 * 
-	 * @param StringHelper $emailRecipientList 
+	 * @param string $emailRecipientList
 	 */
 	public function addString($recipientListString)
 	{
 		//initiate addresses array
 		//$this->_addresses = array();
 
-		$recipientListString = trim($recipientListString,',; ');
+		$recipientListString = trim((string) $recipientListString,',; ');
 		
 		
 		

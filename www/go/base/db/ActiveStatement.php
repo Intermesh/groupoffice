@@ -135,6 +135,10 @@ class ActiveStatement implements \IteratorAggregate {
 	 * @return ActiveRecord[]
 	 */
 	public function fetchAll($fetch_style=null){
+		//for PHP 8 compat
+		if(!isset($fetch_style) && defined('PDO::FETCH_DEFAULT')) {
+			$fetch_style = PDO::FETCH_DEFAULT;
+		}
 		return $this->stmt->fetchAll($fetch_style);
 	}
 	

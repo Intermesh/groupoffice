@@ -398,10 +398,13 @@ class Settings extends core\Settings {
 	/**
 	 * Get's the transparent color based on the primary color.
 	 * 
-	 * @return string
+	 * @return ?string
 	 */
-	public function getPrimaryColorTransparent(): string
+	public function getPrimaryColorTransparent(): ?string
 	{
+		if(!isset($this->primaryColor)) {
+			return null;
+		}
 		list($r, $g, $b) = sscanf($this->primaryColor, "%02x%02x%02x");
 		
 		return "rgba($r, $g, $b, .16)";

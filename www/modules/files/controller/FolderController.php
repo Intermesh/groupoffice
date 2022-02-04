@@ -8,6 +8,7 @@ use GO;
 use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
 use go\core\orm\SearchableTrait;
+use go\core\util\StringUtil;
 use GO\Files\Model\Folder;
 
 class FolderController extends \GO\Base\Controller\AbstractModelController {
@@ -902,7 +903,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$i = 0;
 
-			$words = SearchableTrait::splitTextKeywords($queryStr);
+			$words = StringUtil::splitTextKeywords($queryStr);
 
 			foreach($words as $word) {
 

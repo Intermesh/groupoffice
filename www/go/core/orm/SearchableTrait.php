@@ -10,6 +10,7 @@ use go\core\ErrorHandler;
 use go\core\model\Link;
 use go\core\model\Search;
 use go\core\util\ClassFinder;
+use go\core\util\StringUtil;
 use function go;
 
 /**
@@ -50,35 +51,7 @@ trait SearchableTrait {
 		return null;
 	}
 
-	/**
-	 * Split text by non word characters to get useful search keywords.
-	 * @param ?string $text
-	 * @return string[]
-	 */
-	public static function splitTextKeywords(?string $text): array
-	{
 
-		if(empty($text)) {
-			return [];
-		}
-
-		//Split on non word chars followed by whitespace or end of string. This wat initials like J.K. or french dates
-		//01.01.2020 can be found too.
-//		$keywords = mb_split('[^\w\-_\+\\\\\/:](\s|$)*', mb_strtolower($text), -1);
-		$text = preg_replace('/[^\w\-_+\\\\\/\s:@]/u', '', mb_strtolower($text));
-		$text = preg_replace('/[-]+/u', '-', $text);
-		$text = preg_replace('/[_]+/u', '_', $text);
-		$keywords = mb_split("\s+", $text);
-
-		//filter small words
-		if(count($keywords) > 1) {
-			$keywords = array_filter($keywords, function ($word) {
-				return strlen($word) > 2;
-			});
-		}
-
-		return $keywords;
-	}
 
 	/**
 	 * Split numbers into multipe partials so we can match them using an index
@@ -132,7 +105,7 @@ trait SearchableTrait {
 	 */
 	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase) {
 		$i = 0;
-		$words = SearchableTrait::splitTextKeywords($searchPhrase);
+		$words = StringUtil::splitTextKeywords($searchPhrase);
 		$words = array_unique($words);
 
 		foreach($words as $word) {
@@ -188,7 +161,7 @@ trait SearchableTrait {
 		
 		$keywords = $this->getSearchKeywords();
 		if(!isset($keywords)) {
-			$keywords = array_merge(self::splitTextKeywords($search->name), self::splitTextKeywords($search->description));
+			$keywords = array_merge(StringUtil::splitTextKeywords($search->name), StringUtil::splitTextKeywords($search->description));
 		}
 
 		$links = (new Query())
@@ -212,7 +185,7 @@ trait SearchableTrait {
 
 		$arr = [];
 		foreach($keywords as $keyword) {
-			$arr = array_merge($arr, self::splitTextKeywords($keyword));
+			$arr = array_merge($arr, StringUtil::splitTextKeywords($keyword));
 		}
 
 		$keywords = array_unique($arr);
