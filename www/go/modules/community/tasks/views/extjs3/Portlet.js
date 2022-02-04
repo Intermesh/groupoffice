@@ -156,6 +156,7 @@ go.modules.community.tasks.Portlet = Ext.extend(go.grid.GridPanel, {
 		this.supr().afterRender.call(this);
 		const lists = go.User.taskPortletTaskLists.length ? go.User.taskPortletTaskLists : [go.User.tasksSettings.defaultTasklistId];
 		this.store.setFilter('tasklistIds', {tasklistId: lists});
+		this.store.setFilter('incomplete', {complete: false});
 		this.store.load();
 	}
 });
