@@ -1,3 +1,5 @@
+- Core: Compatible with PHP 8.1 now
+
 03-02-2022 6.6.38
 - Tasks: Fixed error: Argument 1 passed to go\core\jmap\Router::resolveResultReferences() must be of the type array, int given, called in /usr/share/groupoffice/go/core/jmap/Router.php on line 248
 
