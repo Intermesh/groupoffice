@@ -26,7 +26,7 @@ class DateTime extends \DateTime {
 
   /**
    * Overwrite constructor to used groupoffice default timezone and not systems default timezone
-   * @param StringHelper $time
+   * @param string $time
    * @param DateTimeZone $timezone
    */
   public function __construct($time="now", $timezone=null) {
@@ -67,9 +67,9 @@ class DateTime extends \DateTime {
 	 * @param StringHelper $format the format the date should be returned
 	 * @return StringHelper formatted date
 	 */
-	public function format($format=null)
+	public function format(string $format="") : string
 	{
-	  if($format===null) {
+	  if(empty($format)) {
 		//$format = \GO::user() ? \GO::user()->date_format . " " . \GO::user()->time_format : \GO::config()->default_date_format . " " . \GO::config()->default_time_format;
 		return \GO\Base\Util\Date::get_timestamp($this->getTimestamp());
 	  }
