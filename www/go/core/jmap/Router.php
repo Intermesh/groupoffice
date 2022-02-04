@@ -229,12 +229,17 @@ class Router {
 	}
 
 	/**
+	 * Resolves JMAP result references for parameters
+	 *
+	 * It also recurses into the "filter" parameters to resolve. This is not according to the JMAP spec but very handy :)
+	 *
 	 * @link http://jmap.io/spec-core.html#references-to-previous-method-results
 	 * @param array $params
+	 * @param bool $forFilter
 	 * @return array
 	 * @throws InvalidResultReference
 	 */
-	private function resolveResultReferences(array $params, $forFilter = false) : array {
+	private function resolveResultReferences(array $params, bool $forFilter = false) : array {
 
 		if($forFilter && isset($params['operator'])) {
 			foreach($params['conditions'] as &$filterCondition) {
@@ -249,8 +254,6 @@ class Router {
 			} elseif (substr($name, 0, 1) == '#') {
 				$params[substr($name, 1)] = $this->resolveResultReference($possibleResultReference);
 				unset($params[$name]);
-			} else if ($forFilter && is_array($possibleResultReference)) {
-				$params[$name] = $this->resolveResultReferences($possibleResultReference);
 			}
 		}
 
