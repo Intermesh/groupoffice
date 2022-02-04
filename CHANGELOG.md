@@ -2,6 +2,9 @@
 - Core: Compatible with PHP 8.1 now
 - Tasks: invalid database constraint for categories
 - Tasks: Moved tasklist up and preset with default task list
+- Timeregistration: Fixed week view export
+- Email: Fixed filer XSS attach when it's in an attachment
+- Core: Encrypted text field was visible in grid
 
 03-02-2022 6.6.38
 - Tasks: Fixed error: Argument 1 passed to go\core\jmap\Router::resolveResultReferences() must be of the type array, int given, called in /usr/share/groupoffice/go/core/jmap/Router.php on line 248
@@ -102,6 +105,10 @@
 
 
 6.5.98
+- Timeregistration: Fixed week view export
+- Email: Fixed filer XSS attach when it's in an attachment
+- Core: Encrypted text field was visible in grid
+
 01-02-2022 6.5.100
 - Leave days: minor rounding error in holiday calculator
 - Leave days: round leave day allowances to 1 decimal in year overview

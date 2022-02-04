@@ -335,6 +335,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);
 		$file = new \GO\Base\Fs\File(\GO::config()->file_storage_path . $tmpFolder->path.'/'.$params['filename']);
+		$file->parent()->create();
 
 		if(empty($params['tmp_file'])){
 			$account = Account::model()->findByPk($params['account_id']);
