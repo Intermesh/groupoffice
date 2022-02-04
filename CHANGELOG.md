@@ -1,3 +1,5 @@
+Timeregistration: Fixed week view export
+
 01-02-2022 6.5.100
 - Leave days: minor rounding error in holiday calculator
 - Leave days: round leave day allowances to 1 decimal in year overview
