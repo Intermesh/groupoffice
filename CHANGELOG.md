@@ -1,3 +1,4 @@
+07-02-2022 6.6.39
 - Studio: minor bugfix in `patch65to66` method
 - Projects2: if a project is not invoicable, external budgets and incomes are set to zero
 - Time Registration: Display travel distance field after re-opening time registration
