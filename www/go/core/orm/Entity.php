@@ -592,11 +592,10 @@ abstract class Entity extends Property {
    * Defaults to the module permissions it belongs to.
    *
    * @return int
-   * @throws SaveException
    */
-	public function findAclId(): int
+	public function findAclId(): ?int
 	{
-		return Acl::getReadOnlyAclId();
+		return null;
 	}
 
 
