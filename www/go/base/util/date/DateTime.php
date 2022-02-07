@@ -64,24 +64,24 @@ class DateTime extends \DateTime {
 	 * Format the datetime to the format given
 	 * If there is no format specified the default user specified format will be used
 	 * @todo fix timezone issue
-	 * @param StringHelper $format the format the date should be returned
-	 * @return StringHelper formatted date
+	 * @param string $format the format the date should be returned
+	 * @return string formatted date
 	 */
-	public function format(string $format="") : string
+	public function format($format = ""): string
 	{
-	  if(empty($format)) {
-		//$format = \GO::user() ? \GO::user()->date_format . " " . \GO::user()->time_format : \GO::config()->default_date_format . " " . \GO::config()->default_time_format;
-		return \GO\Base\Util\Date::get_timestamp($this->getTimestamp());
-	  }
-	  return parent::format($format);
+		if (empty($format)) {
+			//$format = \GO::user() ? \GO::user()->date_format . " " . \GO::user()->time_format : \GO::config()->default_date_format . " " . \GO::config()->default_time_format;
+			return \GO\Base\Util\Date::get_timestamp($this->getTimestamp());
+		}
+		return parent::format($format);
 	}
 	
 	/**
 	 * Format the DateTime object in a \GO::user respected time format
-	 * @param DateTimeZone $timezone
-	 * @return StringHelper The formatted time
+	 * @return string The formatted time
 	 */
-	public function formatTime() {
+	public function formatTime(): string
+	{
 	  $timeFormat = \GO::user() ? \GO::user()->time_format : \GO::config()->default_time_format;
 	  return parent::format($timeFormat);
 	}
