@@ -1729,9 +1729,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 				//filter out invites
 
-				$response['attachments'] = array_filter($response['attachments'], function($a) {
+				$response['attachments'] = array_values(array_filter($response['attachments'], function($a) {
 					return $a['isInvite'] == false;
-				});
+				}));
 
 //			}elseif($event){
 

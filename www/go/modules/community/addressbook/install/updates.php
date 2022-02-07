@@ -144,8 +144,14 @@ $updates['202106171331'][] = "create index addressbook_contact_isOrganization_in
 	on addressbook_contact (isOrganization);";
 
 
+$updates['202202070921'][] = "update `addressbook_phone_number` set type='mobile' where type='cell';";
 
-$updates['202106171331'][] = "ALTER TABLE `addressbook_user_settings` ADD `lastAddressBookId` INT(11) null;";
 
-$updates['202106171331'][] = "alter table addressbook_user_settings
+$updates['202202070921'][] = "ALTER TABLE `addressbook_user_settings` ADD `lastAddressBookId` INT(11) null;";
+
+$updates['202202070921'][] = "alter table addressbook_user_settings
 	add startIn enum('allcontacts', 'starred', 'default', 'remember') default 'allcontacts' not null;";
+
+
+$updates['202202070921'][] = "update `addressbook_phone_number` set type='mobile' where type='cell';";
+

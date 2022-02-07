@@ -1,4 +1,4 @@
-- Studio: minor bugfix in `patch65to66` method 
+- Studio: minor bugfix in `patch65to66` method
 - Projects2: if a project is not invoicable, external budgets and incomes are set to zero
 - Time Registration: Display travel distance field after re-opening time registration
 - Core: Compatible with PHP 8.1 now
@@ -109,11 +109,14 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
-
-6.5.98
+07-02-2022 6.5.101
 - Timeregistration: Fixed week view export
 - Email: Fixed filer XSS attach when it's in an attachment
 - Core: Encrypted text field was visible in grid
+- Email: Capability check wrong when IMAP proxy was used. Then GO didn't show the quotas.
+- Core: Fixed incorrect database type detection in MySQL 8
+- Leavedays: Fixed error in month report
+- Email: attachments were not visible if icalendar invite came first
 
 01-02-2022 6.5.100
 - Leave days: minor rounding error in holiday calculator
