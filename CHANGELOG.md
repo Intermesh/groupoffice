@@ -1,3 +1,5 @@
+- Studio: minor bugfix in `patch65to66` method 
+- Projects2: if a project is not invoicable, external budgets and incomes are set to zero
 - Time Registration: Display travel distance field after re-opening time registration
 - Core: Compatible with PHP 8.1 now
 - Tasks: invalid database constraint for categories
