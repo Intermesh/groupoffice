@@ -1,3 +1,7 @@
+<?php
+\Site::scripts()->registerGapiScript('jquery');
+\Site::scripts()->registerGapiScript('jquery-ui');
+?>
 <!doctype html>
 <html>
 	<head>
