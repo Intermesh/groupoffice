@@ -7,6 +7,7 @@
 - Core: Encrypted text field was visible in grid
 - Business: Fixed error call to undefined method getClassPermissionLevel() when editing agreements
 - Billing: Fixed invalid operant types error
+- Billing: Fixed report not working when projects module was not installed
 
 03-02-2022 6.6.38
 - Tasks: Fixed error: Argument 1 passed to go\core\jmap\Router::resolveResultReferences() must be of the type array, int given, called in /usr/share/groupoffice/go/core/jmap/Router.php on line 248
