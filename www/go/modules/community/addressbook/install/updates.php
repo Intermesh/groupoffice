@@ -140,3 +140,6 @@ $updates['202105171220'][] = "create index addressbook_contact_addressBookId_nam
 
 $updates['202106171331'][] = "create index addressbook_contact_isOrganization_index
 	on addressbook_contact (isOrganization);";
+
+
+$updates['202202070921'][] = "update `addressbook_phone_number` set type='mobile' where type='cell';";
