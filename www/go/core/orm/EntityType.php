@@ -468,8 +468,10 @@ class EntityType implements ArrayableInterface {
 	public static function resetAllSyncState() {
 		//reset all mod seqs
 		go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
-		go()->getDbConnection()->exec("TRUNCATE TABLE core_change");
-		go()->getDbConnection()->exec("TRUNCATE TABLE core_acl_group_changes");
+
+		// use delete and not truncate to keep transactions
+		go()->getDbConnection()->exec("DELETE FROM core_change");
+		go()->getDbConnection()->exec("DELETE FROM core_acl_group_changes");
 
 		// Disable keys otherwise this might take very long!
 		go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0;");
