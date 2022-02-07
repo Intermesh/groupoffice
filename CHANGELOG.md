@@ -1,6 +1,7 @@
 - Timeregistration: Fixed week view export
 - Email: Fixed filer XSS attach when it's in an attachment
 - Core: Encrypted text field was visible in grid
+- Email: Capability check wrong when IMAP proxy was used. Then GO didn't show the quotas.
 
 01-02-2022 6.5.100
 - Leave days: minor rounding error in holiday calculator
