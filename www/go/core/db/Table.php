@@ -117,19 +117,19 @@ class Table {
    */
 	private function init() {
 		
-		if (isset($this->columns)) {
-			return $this->columns;
-		}
-		
-		$cacheKey = $this->getCacheKey();
-
-		if (($cache = App::get()->getCache()->get($cacheKey))) {
-			$this->columns = $cache['columns'];
-			$this->pk = $cache['pk'];
-			$this->indexes = $cache['indexes'] ?? null;
-			$this->conn = null;
-			return;
-		}	
+//		if (isset($this->columns)) {
+//			return $this->columns;
+//		}
+//
+//		$cacheKey = $this->getCacheKey();
+//
+//		if (($cache = App::get()->getCache()->get($cacheKey))) {
+//			$this->columns = $cache['columns'];
+//			$this->pk = $cache['pk'];
+//			$this->indexes = $cache['indexes'] ?? null;
+//			$this->conn = null;
+//			return;
+//		}
 		
 		$this->columns = [];
 
@@ -145,7 +145,7 @@ class Table {
 		$this->conn = null;
 
 
-		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk, 'indexes' => $this->indexes]);
+//		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk, 'indexes' => $this->indexes]);
 
 
 		return;
@@ -186,6 +186,9 @@ class Table {
 		$c->autoIncrement = strpos($field['Extra'], 'auto_increment') !== false;
 		$c->trimInput = false;
 		$c->dataType = strtoupper($field['Type']);
+
+		//remove "unsigned" or any other extra info that might be there.
+		$field['Type'] = explode(" ", $field['Type'])[0];
 
 		preg_match('/(.*)\(([1-9].*)\)/', $field['Type'], $matches);
 		if ($matches) {
