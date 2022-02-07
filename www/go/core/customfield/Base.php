@@ -258,11 +258,11 @@ abstract class Base extends Model {
 	 *
 	 * @param mixed $value The value for this field
 	 * @param CustomFieldsModel $customFieldData The custom fields data
-	 * @param Entity $entity
+	 * @param Entity|ActiveRecord $entity
 	 * @return boolean
 	 * @see MultiSelect for an advaced example
 	 */
-	public function afterSave($value, CustomFieldsModel &$customFieldModel, Entity $entity) : bool
+	public function afterSave($value, CustomFieldsModel &$customFieldModel, $entity) : bool
 	{
 		
 		return true;
@@ -285,7 +285,13 @@ abstract class Base extends Model {
 		return true;
 	}
 
-	protected function validateRequiredCondition($value, Field $field,  Entity $model)
+	/**
+	 * @param mixed $value
+	 * @param Field $field
+	 * @param Entity|ActiveRecord $model
+	 * @return bool
+	 */
+	protected function validateRequiredCondition($value, Field $field, $model)
     {
         $value = trim($value);
 
@@ -371,7 +377,7 @@ abstract class Base extends Model {
 	 *
 	 * @param mixed $value The value for this field
 	 * @param CustomFieldsModel $model
-	 * @param Entity $entity
+	 * @param Entity|ActiveRecord $entity
 	 * @param array $record The values inserted in the database
 	 * @return boolean
 	 * @see MultiSelect for an advaced example
@@ -386,7 +392,7 @@ abstract class Base extends Model {
 	 *
 	 * Get the modelClass for this customfield, only needed if an id of a related record is stored
 	 *
-	 * @return bool | string
+	 * @return bool|string
 	 */
 	public function getModelClass() {
 		return false;
@@ -396,17 +402,20 @@ abstract class Base extends Model {
 	 * 
 	 * @return string
 	 */
-	public static function getName() {
+	public static function getName(): string
+	{
 		$cls = static::class;
 		return substr($cls, strrpos($cls, '\\') + 1);
 	}
-	
+
 	/**
 	 * Get all field types
-	 * 
+	 *
 	 * @return string[] eg ['functionField' => "go\core\customfield\FunctionField"];
+	 * @throws Exception
 	 */
-	public static function findAll() {
+	public static function findAll(): array
+	{
 		
 		$types = go()->getCache()->get("customfield-types");
 		
