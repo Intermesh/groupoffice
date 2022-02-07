@@ -65,7 +65,7 @@ class MultiSelect extends Select {
 		return true;
 	}
 	
-	public function afterSave($value,CustomFieldsModel &$customFieldModel, Entity $entity) : bool {
+	public function afterSave($value,CustomFieldsModel &$customFieldModel, $entity) : bool {
 		
 		if(!isset($this->optionsToSave)) {
 			return true;
