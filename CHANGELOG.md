@@ -3,6 +3,7 @@
 - Core: Encrypted text field was visible in grid
 - Email: Capability check wrong when IMAP proxy was used. Then GO didn't show the quotas.
 - Core: Fixed incorrect database type detection in MySQL 8
+- Leavedays: Fixed error in month report
 
 01-02-2022 6.5.100
 - Leave days: minor rounding error in holiday calculator
