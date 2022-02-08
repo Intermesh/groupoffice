@@ -899,9 +899,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 						this.openSystemSettings();
 				}, this);
-			}
-
-			if(!coreMod.settings.demoDataAsked) {
+			} else if(!coreMod.settings.demoDataAsked) {
 				Ext.MessageBox.confirm(t("Demo"), t("Do you want to generate some fake demonstration data?"), (btn) => {
 
 					go.Db.store("Module").save({
