@@ -157,3 +157,4 @@ $updates['202202041432'][] = "alter table tasks_category
         foreign key (tasklistId) references tasks_tasklist (id)
             on delete cascade;";
 
+$updates['202202081432'][] = "ALTER TABLE `tasks_task` CHANGE COLUMN `description` `description` TEXT NULL DEFAULT null;";

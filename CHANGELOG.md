@@ -1,5 +1,6 @@
-07-02-2022 6.6.40
-- Debian package dependencies change
+07-02-2022 6.6.42
+- Core: Debian package dependencies change. Makes it possible to install without mysql and apache.
+- Tasks: Fixed install on latest MySQL version that does not allow default value for TEXT columns
 
 07-02-2022 6.6.39
 - Studio: minor bugfix in `patch65to66` method
