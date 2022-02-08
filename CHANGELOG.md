@@ -1,3 +1,6 @@
+- Core: Auto linking in HTML editor only when scheme and tld are present
+- Files: Disabling assistant or other module with a file handler could lead to errors when opening a file.
+
 07-02-2022 6.6.42
 - Core: Debian package dependencies change. Makes it possible to install without mysql and apache.
 - Tasks: Fixed install on latest MySQL version that does not allow default value for TEXT columns
