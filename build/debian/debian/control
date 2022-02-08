@@ -27,8 +27,7 @@ Depends:
 	${perl:Depends},
 	dbconfig-common,
 	ucf (>= 0.28)
-Recommends: apache2
-Suggests: default-mysql-server | virtual-mysql-server
+Recommends: apache2, libapache2-mod-php, default-mysql-server
 Conflicts: groupoffice-com,
 	groupoffice-pro,
 	groupoffice-billing,
