@@ -897,7 +897,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						}
 					}, coreMod.id);
 
-						this.systemsettingsDialog.show();
+						this.openSystemSettings();
 				}, this);
 			}
 
