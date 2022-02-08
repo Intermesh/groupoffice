@@ -2,7 +2,8 @@
 - Studio: minor bugfix in `patch65to66` method
 - Projects2: if a project is not invoicable, external budgets and incomes are set to zero
 - Time Registration: Display travel distance field after re-opening time registration
-- Core: Compatible with PHP 8.1 now
+- Core: Changes to make GO compatible with PHP 8.1. Not done yet because oauth / openid dependencies
+    are either compatible with php 7 or php 8 but not both.
 - Tasks: invalid database constraint for categories
 - Tasks: Moved tasklist up and preset with default task list
 - Timeregistration: Fixed week view export
