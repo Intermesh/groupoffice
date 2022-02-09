@@ -1,3 +1,4 @@
+- Billing: check for new tasks module in book dialog
 - Projects2: Do not empty employee when opening existing time entry
 - Core: UK bank holidays for 2022 - Removed 2020
 - Core: Auto linking in HTML editor only when scheme and tld are present
