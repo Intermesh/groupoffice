@@ -277,8 +277,6 @@ abstract class EntityController extends Controller {
 			} else{
 				throw $e;
 			}
-		} finally {
-			go()->getDbConnection()->debug = $oldDebug;
 		}
 
 		static::fireEvent(self::EVENT_QUERY, $this, $p, $response);
