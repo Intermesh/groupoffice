@@ -176,6 +176,8 @@ abstract class Module extends Singleton {
 				return false;
 			}
 
+			go()->getDbConnection()->resumeTransactions();
+
 			if(!Installer::isInstalling()) {
 				go()->rebuildCache(true);
 			}
