@@ -176,6 +176,8 @@ abstract class Module extends Singleton {
 				return false;
 			}
 
+			go()->getDbConnection()->resumeTransactions();
+
 			go()->getDbConnection()->beginTransaction();
 
 			if(!$model->save()) {
