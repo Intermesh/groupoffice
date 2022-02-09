@@ -71,7 +71,6 @@ abstract class AclOwnerEntity extends AclEntity {
 
 	/**
 	 *
-	 * @return bool
 	 * @throws Exception
 	 */
 	protected function saveAcl()
@@ -456,7 +455,8 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return Query
 	 * @throws Exception
 	 */
-	protected static function getCheckAclUpdateQuery() {
+	protected static function getCheckAclUpdateQuery(): Query
+	{
 		$table = static::getMapping()->getPrimaryTable();
 		$updateQuery = 	(new Query())
 			->tableAlias('acl')
