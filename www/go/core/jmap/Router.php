@@ -52,16 +52,18 @@ class Router {
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function run() {	
+	public function run(?array $requests = null) {
 
-		$body = Request::get()->getBody();
+		if(!isset($requests)) {
+			$requests = Request::get()->getBody();
+		}
 		
 //		if(!is_array($body)) {
 //			return $this->error("urn:ietf:params:jmap:error:notRequest", 400, "The request parsed as JSON but did not match the type signature of the Request object.");
 //
 //		}
 
-		while($method = array_shift($body)) {
+		while($method = array_shift($requests)) {
 			$this->callMethod($method);
 		}
 
@@ -76,7 +78,7 @@ class Router {
 	 */
 	private function callMethod(array $body) {
 		if (count($body) != 3) {
-			throw new Exception(400, 'Bad request');
+			throw new Exception(400, 'Bad request. Supply 3 arguments, method, params and call id');
 		}
 
 		list($method, $params, $clientCallId) = $body;
@@ -199,13 +201,13 @@ class Router {
 	 *
 	 * community/notes/Note/get maps to go\modules\community\notes\controller\Note::get()
 	 *
-	 * @param $method
-	 * @param $params
+	 * @param string $method
+	 * @param ?array $params
 	 * @return JsonSerializable | array | ArrayObject
 	 * @throws Exception|InvalidResultReference
 	 * @params array $routerParams A merge of route and query params
 	 */
-	protected function callAction($method, $params) 
+	protected function callAction(string $method, ?array $params)
 	{
 		// Special testing method that echoes the params
 		if($method == "Core/echo") {
@@ -215,7 +217,7 @@ class Router {
 		$controllerMethod = $this->findControllerAction($method);
 		$controller = new $controllerMethod[0];
 
-		if(!isset($params)) {
+		if(empty($params)) {
 			$params = [];
 		} else if(!is_array($params)) {
 			throw new InvalidArgumentException("params argument should be an object with {key: value}");
@@ -227,23 +229,45 @@ class Router {
 	}
 
 	/**
+	 * Resolves JMAP result references for parameters
+	 *
+	 * It also recurses into the "filter" parameters to resolve. This is not according to the JMAP spec but very handy :)
+	 *
 	 * @link http://jmap.io/spec-core.html#references-to-previous-method-results
 	 * @param array $params
+	 * @param bool $forFilter
 	 * @return array
 	 * @throws InvalidResultReference
 	 */
-	private function resolveResultReferences(array $params) : array {
+	private function resolveResultReferences(array $params, bool $forFilter = false) : array {
 
-		foreach ($params as $name => $resultReference) {
-			if (substr($name, 0, 1) == '#') {
-				$result = $this->findResultOf($resultReference['resultOf']);
+		if($forFilter && isset($params['operator'])) {
+			foreach($params['conditions'] as &$filterCondition) {
+				$filterCondition = $this->resolveResultReferences($filterCondition, true);
+			}
+			return $params;
+		}
 
-				$params[substr($name, 1)] = $this->resolvePath(explode('/', trim($resultReference['path'], ' /')), $result[1]);
+		foreach ($params as $name => $possibleResultReference) {
+			if(!$forFilter && $name == 'filter') {
+				$params['filter'] = $this->resolveResultReferences($possibleResultReference, true);
+			} elseif (substr($name, 0, 1) == '#') {
+				$params[substr($name, 1)] = $this->resolveResultReference($possibleResultReference);
 				unset($params[$name]);
 			}
 		}
 
 		return $params;
+	}
+
+	/**
+	 * @throws InvalidResultReference
+	 */
+	private function resolveResultReference($resultReference) {
+		$result = $this->findResultOf($resultReference['resultOf']);
+
+		return $this->resolvePath(explode('/', trim($resultReference['path'], ' /')), $result[1]);
+
 	}
 
 	/**

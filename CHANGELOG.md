@@ -1,3 +1,48 @@
+- Core: Auto linking in HTML editor only when scheme and tld are present
+- Files: Disabling assistant or other module with a file handler could lead to errors when opening a file.
+
+07-02-2022 6.6.42
+- Core: Debian package dependencies change. Makes it possible to install without mysql and apache.
+- Tasks: Fixed install on latest MySQL version that does not allow default value for TEXT columns
+
+07-02-2022 6.6.39
+- Studio: minor bugfix in `patch65to66` method
+- Projects2: if a project is not invoicable, external budgets and incomes are set to zero
+- Time Registration: Display travel distance field after re-opening time registration
+- Core: Changes to make GO compatible with PHP 8.1. Not done yet because oauth / openid dependencies
+    are either compatible with php 7 or php 8 but not both.
+- Tasks: invalid database constraint for categories
+- Tasks: Moved tasklist up and preset with default task list
+- Timeregistration: Fixed week view export
+- Email: Fixed filer XSS attach when it's in an attachment
+- Core: Encrypted text field was visible in grid
+- Business: Fixed error call to undefined method getClassPermissionLevel() when editing agreements
+- Billing: Fixed invalid operant types error
+- Billing: Fixed report not working when projects module was not installed
+- Studio: fixed permissions problem. Users need to overwrite existing code to fix it!
+
+03-02-2022 6.6.38
+- Tasks: Fixed error: Argument 1 passed to go\core\jmap\Router::resolveResultReferences() must be of the type array, int given, called in /usr/share/groupoffice/go/core/jmap/Router.php on line 248
+
+03-02-2022 6.6.37
+- Notes: drag and drop notes
+- Tasks: Fixed category permissions
+- Core: JMAP via CLI https://groupoffice.readthedocs.io/en/latest/developer/server/cli.html
+
+03-02-2022 6.6.36
+- Carddav: return "all" address book with all address book merged for macos because it only supports one address book.
+- Billing: fix error in Document generator order when contact not entered
+- Core: Added new CLI commands to reset the JMAP sync state: https://groupoffice.readthedocs.io/en/latest/system-settings/tools.html
+- Email: case insensitive spoof check
+- Tasks: Split complete and incompleted tasks in links
+- Tasks: drag and drop tasks to other lists
+- Tasks: show green dates when active, show red when late. removed bold when status is needs action.
+- Tasks: remember filter states
+- Tasks: Auto update due and start date if the other date changes
+- Tasks: Added due in 7 days filter
+- Tasks: Show categories in detail and grid
+- Tasks: Portlet has max height and doesn't send many requests anymore
+
 27-01-2022 6.6.35
 - Tasks: Added widget for startpage
 - Tasks: When creating tasks from other Contacts, Projects or Orders the subject field will be auto filled.
@@ -73,9 +118,22 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+07-02-2022 6.5.101
+- Timeregistration: Fixed week view export
+- Email: Fixed filer XSS attach when it's in an attachment
+- Core: Encrypted text field was visible in grid
+- Email: Capability check wrong when IMAP proxy was used. Then GO didn't show the quotas.
+- Core: Fixed incorrect database type detection in MySQL 8
+- Leavedays: Fixed error in month report
+- Email: attachments were not visible if icalendar invite came first
 
-6.5.98
+01-02-2022 6.5.100
+- Leave days: minor rounding error in holiday calculator
+- Leave days: round leave day allowances to 1 decimal in year overview
+- Core: Italian translations updated (thank you Luca Pauluzzi)
+
 25-01-2022 6.5.99
+- Projects: fixed setRemoteComboText is not a function error when editing a project template task
 - Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
 
 24-01-2022 6.5.98

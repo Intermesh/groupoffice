@@ -346,7 +346,7 @@ abstract class AclItemEntity extends AclEntity {
 	 * @return int
 	 * @throws Exception
 	 */
-	public function findAclId(): int
+	public function findAclId(): ?int
 	{
 		return $this->getAclEntity()->findAclId();
 	}

@@ -12,6 +12,7 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
+use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\modules\community\addressbook\convert\Spreadsheet;
@@ -706,35 +707,25 @@ class Contact extends AclItemEntity {
 										
 	}
 
-	public static function sort(Query $query, array $sort): Query
+	public static function sort(Query $query, ArrayObject $sort): Query
 	{
 		if(isset($sort['firstName'])) {
-			$sort['name'] = $sort['firstName'];
-			unset($sort['firstName']);
+			$sort->renameKey('firstName', 'name');
 		}
-//		if(isset($sort['lastName'])) {
-//			$dir = $sort['lastName'] == 'ASC' ? 'ASC' : 'DESC';
-//			$sort[] = new Expression("IF(c.isOrganization, c.name, c.lastName) " . $dir);
-//			unset($sort['lastName'], $sort['lastName']);
-//			$sort['firstName'] = $dir;
-//		}
 
 		if(isset($sort['birthday'])) {
 			$query->join('addressbook_date', 'birthdaySort', 'birthdaySort.contactId = c.id and birthdaySort.type="birthday"', 'LEFT');
-			$sort['birthdaySort.date'] = $sort['birthday'];
-			unset($sort['birthday']);
+			$sort->renameKey('birthday', 'birthdaySort.date');
 		};
 
 		if(isset($sort['addressBook'])) {
-			$query->join('addressbook_addressbook', 'abSort', 'abSort.id = c.addressBookId');
-			$sort['abSort.name'] = $sort['addressBook'];
-			unset($sort['addressBook']);
+			$query->join('addressbook_addressbook', 'abSort', 'abSort.id = c.addressBookId', 'INNER');
+			$sort->renameKey('addressBook', 'abSort.name');
 		}
 
 		if(isset($sort['actionDate'])) {
 			$query->join('addressbook_date', 'actionDateSort', 'actionDateSort.contactId = c.id and actionDateSort.type="action"', 'LEFT');
-			$sort['actionDateSort.date'] = $sort['actionDate'];
-			unset($sort['actionDate']);
+			$sort->renameKey('actionDate', 'actionDateSort.date');
 		};
 		
 		return parent::sort($query, $sort);
@@ -781,9 +772,9 @@ class Contact extends AclItemEntity {
 	{
 		$url = trim(go()->getSettings()->URL, '/');
 		$uid = substr($url, strpos($url, '://') + 3);
-		$uid = str_replace('/', '-', $uid );
+		$uid = str_replace(['/', ':'], ['-', '-'], $uid );
 
-		return $this->id . '@' . $uid;
+		return $this->id . '-' . $uid;
 	}
 
 	public function setUid($uid) {

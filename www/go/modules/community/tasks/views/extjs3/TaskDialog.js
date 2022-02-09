@@ -5,12 +5,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	height: dp(600),
 	modal: false,
 
-	onLoad: function (values) {
-		if(go.util.empty(values.id)) {
-			this.tasklistCombo.setValue(go.User.tasksSettings.defaultTasklistId);
-		}
-	},
-
 	setLinkEntity : function(cfg) {
 
 		switch(cfg.entity) {
@@ -36,7 +30,11 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			fieldLabel : t("Start"),
 			listeners : {
 				setvalue : function(me,val) {
-					me.nextSibling().setMinValue(val);
+					const due = me.nextSibling();
+					//due.setMinValue(val);
+					if(!due.getValue() || due.getValue() < val) {
+						due.setValue(val);
+					}
 					if(!Ext.isEmpty(val)) {
 						this.recurrenceField.setStartDate(Ext.isDate(val) ? val : Date.parseDate(val, me.format));
 					}
@@ -52,8 +50,11 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			itemId: 'due',
 			fieldLabel : t("Due"),
 			listeners : {
-				change : function(me,val) {
-					me.previousSibling().setMaxValue(val);
+				setvalue : function(me,val) {
+					const start = me.previousSibling();
+					if(start.getValue() && start.getValue() > val) {
+						start.setValue(val);
+					}
 				},
 				scope : this
 			}
@@ -168,12 +169,37 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 							}
 						]
 					},
-					this.userCombo = new go.users.UserCombo({
-						fieldLabel: t('Responsible'),
-						hiddenName: 'responsibleUserId',
-						anchor:'100%',
-						allowBlank: true
-					}),
+					{
+						xtype: "container",
+						layout:"hbox",
+						items:[
+							{
+								style: "padding-right: 8px",
+								layout: "form",
+								xtype: "container",
+								flex: 1,
+								items: [
+									this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
+
+									})
+									]
+							},
+							{
+								layout: "form",
+								xtype: "container",
+								flex: 1,
+								items: [
+									this.userCombo = new go.users.UserCombo({
+										fieldLabel: t('Responsible'),
+										hiddenName: 'responsibleUserId',
+										anchor: '100%',
+										allowBlank: true
+									})
+								]
+							}
+						]
+					}
+					,
 					this.recurrenceField = new go.form.RecurrenceField({
 						name: 'recurrenceRule',
 						hidden: this.hideRecurrence,
@@ -205,7 +231,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						grow: true
 
 					},
-					this.tasklistCombo = new go.modules.community.tasks.TasklistCombo(),
 					new go.modules.community.tasks.AlertFields()
 				]
 			}]

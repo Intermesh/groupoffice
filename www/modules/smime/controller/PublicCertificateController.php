@@ -50,12 +50,7 @@ class PublicCertificateController extends \GO\Base\Controller\AbstractModelContr
 	}
 
 	public function actionVerify($params) {
-
-		$response['success'] = true;
-
 		$params['email']= strtolower($params['email']);
-
-		$oscpMsg = "Not checked";
 
 		//if file was already stored somewhere after decryption
 		if(!empty($params['cert_id'])){

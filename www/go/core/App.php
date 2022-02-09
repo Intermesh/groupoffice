@@ -3,6 +3,7 @@
 namespace go\core {
 
 use Exception;
+use Faker\Generator;
 use GO\Base\Observable;
 use GO;
 use go\core\auth\State as AuthState;
@@ -11,19 +12,19 @@ use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-	use go\core\db\Utils;
-	use go\core\event\EventEmitterTrait;
+use go\core\event\EventEmitterTrait;
 use go\core\event\Listeners;
 use go\core\fs\Blob;
 use go\core\fs\Folder;
 use go\core\jmap\Request;
 use go\core\mail\Mailer;
-	use go\core\model\Group;
-	use go\core\model\Module as ModuleModel;
-use go\core\orm\exception\SaveException;
+use go\core\model\Group;
+use go\core\model\Module as ModuleModel;
+	use go\core\orm\EntityType;
+	use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
-	use go\core\Settings as CoreSettings;
-	use go\core\util\ArrayObject;
+use go\core\Settings as CoreSettings;
+use go\core\util\ArrayObject;
 use go\core\webclient\Extjs3;
 use go\core\model\User;
 use go\core\model\Settings;
@@ -51,6 +52,40 @@ use Faker;
 		//use SingletonTrait;
 
 		use EventEmitterTrait;
+
+
+		private $eventsEnabled = true;
+
+		/**
+		 * Disable events
+		 *
+		 * @return bool Old state
+		 */
+		public function disableEvents() : bool {
+			$old = $this->eventsEnabled;
+			$this->eventsEnabled = false;
+			return $old;
+		}
+
+		/**
+		 * Enable events
+		 *
+		 * @return bool Old state
+		 */
+		public function enableEvents(): bool {
+			$old = $this->eventsEnabled;
+			$this->eventsEnabled = true;
+			return $old;
+		}
+
+		/**
+		 * Check if events are enabled
+		 *
+		 * @return bool
+		 */
+		public function eventsEnabled() : bool {
+			return $this->eventsEnabled;
+		}
 
 		/**
 		 * Fires when the index page loads for the web client.
@@ -518,7 +553,7 @@ use Faker;
 		 *
 		 * return the module if it's installed and available.
 		 *
-		 * @param string $package Set to null for legacy modules
+		 * @param ?string $package Set to null for legacy modules
 		 * @param string $name
 		 * @return ModuleModel | false
 		 * @throws Exception
@@ -562,6 +597,7 @@ use Faker;
 		 * Destroys all cache and re-initializes event listeners and sync state.
 		 *
 		 * @param boolean $onDestruct
+		 * @noinspection PhpDocMissingThrowsInspection
 		 */
 		public function rebuildCache(bool $onDestruct = false) {
 			
@@ -574,7 +610,7 @@ use Faker;
 			
 			GO::clearCache(); //legacy
 
-			go()->getCache()->flush(true, false);
+			go()->getCache()->flush(true);
 			Table::destroyInstances();
 			Property::clearCache();
 
@@ -585,9 +621,10 @@ use Faker;
 
 			Listeners::get()->init();
 
-			$this->resetSyncState();
+			EntityType::resetAllSyncState();
 
 			go()->getSettings()->cacheClearedAt = time();
+			/** @noinspection PhpUnhandledExceptionInspection */
 			go()->getSettings()->save();
 			
 		}
@@ -791,20 +828,7 @@ use Faker;
 			return false;
 		}
 		
-		/**
-		 * Resets all entity state so all clients must resync data.
-		 */
-		private function resetSyncState() {
-			//reset all mod seqs
-			go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
-			go()->getDbConnection()->exec("TRUNCATE TABLE core_change");
-			go()->getDbConnection()->exec("TRUNCATE TABLE core_acl_group_changes");
 
-			// Disable keys otherwise this might take very long!
-			go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0;");
-			go()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
-			go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1;");
-		}
 
 		/**
 		 * Download method for module icons
@@ -858,9 +882,8 @@ use Faker;
 
 		/**
 		 * @throws Exception
-		 * @noinspection PhpUndefinedFieldInspection
 		 */
-		public function demo(Faker\Generator $faker) {
+		public function demo(Generator $faker) {
 
 			go()->getSettings()->passwordMinLength = 4;
 

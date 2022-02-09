@@ -94,8 +94,22 @@ go.Modules.register("community", "addressbook", {
 				name: 'addressBookId',
 				multiple: false,
 				type: "go.modules.community.addressbook.AddresBookCombo"
+			},{
+				title: t('Type'),
+				name:'isOrganization',
+				multiple:false,
+				type: 'select',
+				options: [
+					{
+						value: true,
+						title: t("Organization",'addressbook', 'community')
+					},
+					{
+						value: false,
+						title: t("Contact",'addressbook', 'community')
+					}
+				]
 			},
-
 			{
 				name: 'name',
 				title: t("Name"),

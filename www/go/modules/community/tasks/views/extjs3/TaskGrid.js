@@ -9,6 +9,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 		this.store = new go.data.GroupingStore({
 			groupField: 'tasklist',
 			remoteGroup:true,
+			remoteSort: true,
 			fields: [
 				'id',
 				'title',
@@ -22,6 +23,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'creator', type: "relation"},
 				{name: 'modifier', type: "relation"},
 				{name: 'tasklist', type: "relation"},
+				{name: 'categories', type: "relation"},
 				'percentComplete',
 				'progress',
 				{
@@ -72,9 +74,11 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 		}, this);
 
 		const startRenderer = function(v, meta, record) {
-
-			if(record.data.due && record.data.due.format("Ymd") < (new Date).format("Ymd")) {
+			const now = (new Date).format("Ymd");
+				if(record.data.due && record.data.due.format("Ymd") < now) {
 				meta.css = "danger";
+			} else if(record.data.start && record.data.start.format("Ymd") < now) {
+				meta.css = "success";
 			}
 
 			return go.util.Format.date(v);
@@ -103,9 +107,9 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 							m.style += 'color:#'+rec.json.color+';';
 						}
 
-						if(rec.data.progress == "needs-action" && rec.get("start") <= now) {
-							m.style += 'font-weight: bold;';
-						}
+						// if(rec.data.progress == "needs-action" && rec.get("start") <= now) {
+						// 	m.style += 'font-weight: bold;';
+						// }
 
 						return v;
 					}
@@ -152,8 +156,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'due',
-					renderer: startRenderer,
-					hidden: true
+					renderer: startRenderer
 				},{
 					header: t('Responsible'),
 					width: dp(240),
@@ -224,6 +227,18 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'modifier',
 					renderer: function(v) {
 						return v ? v.displayName : "-";
+					},
+					hidden: true
+				},
+				{
+					xtype:"datecolumn",
+					id: 'categories',
+					header: t('Categories'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'categories',
+					renderer: function(v) {
+						return v.map(v=>'<span class="tasks-category">'+Ext.util.Format.htmlEncode(v.name)+'</span>').join("");
 					},
 					hidden: true
 				}

@@ -144,16 +144,25 @@ $updates['202106171331'][] = "create index addressbook_contact_isOrganization_in
 	on addressbook_contact (isOrganization);";
 
 
+$updates['202202070921'][] = "update `addressbook_phone_number` set type='mobile' where type='cell';";
 
-$updates['202106171331'][] = "ALTER TABLE `addressbook_user_settings` ADD `lastAddressBookId` INT(11) null;";
 
-$updates['202106171331'][] = "alter table addressbook_user_settings
+$updates['202202070921'][] = "ALTER TABLE `addressbook_user_settings` ADD `lastAddressBookId` INT(11) null;";
+
+$updates['202202070921'][] = "alter table addressbook_user_settings
 	add startIn enum('allcontacts', 'starred', 'default', 'remember') default 'allcontacts' not null;";
 
-$updates['202112101348'][] = "alter table addressbook_address
+
+$updates['202202070921'][] = "update `addressbook_phone_number` set type='mobile' where type='cell';";
+
+
+
+// 6.7
+
+$updates['202202070921'][] = "alter table addressbook_address
     add address text null;";
 
-$updates['202112101348'][] = function() {
+$updates['202202070921 '][] = function() {
 
 	go()->getDbConnection()->exec("alter table addressbook_address ADD id INT AUTO_INCREMENT PRIMARY KEY;");
 	\go\core\db\Table::destroyInstances();

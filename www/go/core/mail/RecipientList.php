@@ -23,7 +23,7 @@ class RecipientList implements ArrayAccess, Countable {
 	 * Pass a e-mail string like:
 	 * 
 	 * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com>
-	 * 
+	 *
 	 * @param string $emailRecipientList 
 	 */
 	public function __construct($emailRecipientList = '', $strict = false) {
@@ -251,18 +251,20 @@ class RecipientList implements ArrayAccess, Countable {
 //		return $this;
 //	}
 
-	public function offsetExists($offset) {
+	public function offsetExists($offset): bool
+	{
 		return array_key_exists($offset, $this->recipients);
 	}
 
+	#[\ReturnTypeWillChange]
 	public function offsetGet($offset) {
 		return $this->recipients[$offset];
 	}
 
-	public function offsetSet($offset, $value) {
+	public function offsetSet($offset, $value) : void{
 
 		if (!is_string($value)) {
-			return false;
+			return;
 		}
 
 		$recipients = new RecipientList($value);
@@ -270,11 +272,11 @@ class RecipientList implements ArrayAccess, Countable {
 		$this->recipients[$offset] = $recipients[0];
 	}
 
-	public function offsetUnset($offset) {
+	public function offsetUnset($offset) : void {
 		unset($this->recipients[$offset]);
 	}
 
-	public function count ( )
+	public function count() : int
 	{
 		return count($this->recipients);
 	}

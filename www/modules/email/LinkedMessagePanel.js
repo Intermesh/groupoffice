@@ -108,6 +108,9 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 		if(!this.remoteMessage)
 			this.remoteMessage={};
 
+		//for filterxss in message panel parent
+		this.params = this.remoteMessage;
+
 		this.messageId=this.currentId=id;		
 		this.remoteMessage.id=this.messageId;
 

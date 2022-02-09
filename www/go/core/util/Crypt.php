@@ -98,12 +98,12 @@ class Crypt {
 	 * Old deprecated mcrypt base decrypt.
 	 * 
 	 * @param string $msg
-	 * @param string $k
+	 * @param ?string $k
 	 * @param bool $base64
 	 * @return string|bool
 	 * @throws Exception
 	 */
-	private static function decrypt1(string $msg, string $k, bool $base64 = true)
+	private static function decrypt1(string $msg, ?string $k = null, bool $base64 = true)
 	{
 
 		//mbstring.func_overload will mess up substring with this function

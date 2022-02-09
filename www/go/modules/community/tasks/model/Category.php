@@ -9,6 +9,7 @@ namespace go\modules\community\tasks\model;
 use go\core\db\Criteria;
 use go\core\jmap\Entity;
 use go\core\model\Acl;
+use go\core\model\Module;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 
@@ -37,15 +38,26 @@ class Category extends Entity {
 
 	protected function internalGetPermissionLevel(): int
 	{
-		return ($this->ownerId === go()->getUserId() || \go\core\model\Module::findByName('community', 'tasks')->hasPermissionLevel(50)) ?  Acl::LEVEL_MANAGE : 0; // validate will make sure global categories aren't changed if no permission
+		//global category mayb only be created by admins
+		if(empty($this->tasklistId)) {
+			return go()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : 0;
+		}
+
+		return (
+			$this->ownerId === go()->getUserId()
+			||
+			Module::findByName('community', 'tasks')
+				->getUserRights()
+				->mayChangeCategories ? Acl::LEVEL_MANAGE : 0);
 	}
+
 
 	public function internalValidate()
 	{
 		if($this->isNew() && !$this->isModified('ownerId')) {
 			$this->ownerId = go()->getUserId();
 		}
-		if ($this->ownerId !== go()->getUserId() && !\go\core\model\Module::findByName('community', 'tasks')->hasPermissionLevel(50))
+		if ($this->ownerId !== go()->getUserId() && !Module::findByName('community', 'tasks')->hasPermissionLevel(50))
 			$this->setValidationError('ownerId', go()->t("You need manage permission to create global categories"));
 		return parent::internalValidate();
 	}

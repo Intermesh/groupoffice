@@ -27,6 +27,7 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	 */
 	const FORMAT_API_DATE_ONLY = "Y-m-d";
 
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return $this->format($this->hasTime ? self::FORMAT_API : self::FORMAT_API_DATE_ONLY);
 	}

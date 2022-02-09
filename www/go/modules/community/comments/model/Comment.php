@@ -12,6 +12,7 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
+use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use go\core\orm\EntityType;
 use GO\Base\Db\ActiveRecord;
@@ -120,7 +121,7 @@ class Comment extends AclItemEntity {
 			}, null);
 	}
 	
-	public static function sort(Query $query, array $sort): Query
+	public static function sort(Query $query, ArrayObject $sort): Query
 	{
 		if(empty($sort)) {
 			$sort = ['c.date' => 'ASC'];

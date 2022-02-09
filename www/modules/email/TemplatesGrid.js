@@ -80,7 +80,12 @@ GO.email.TemplatesGrid = function(config)
 		defaults:{
 			sortable:true
 		},
-		columns:[
+		columns:[{
+			header: '#',
+			width:30,
+			hidden:true,
+			dataIndex: 'id'
+		},
 		{
 			header: t("Name"),
 			dataIndex: 'name'

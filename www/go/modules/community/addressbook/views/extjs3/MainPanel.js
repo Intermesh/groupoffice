@@ -139,6 +139,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		});
 
 		this.addressBookTree.getLoader().on('load', (loader, node, response) => {
+			this.addressBookTree.getBottomToolbar().setVisible(response.queryResponse.hasMore);
 			this.loadMoreButton.setVisible(response.queryResponse.hasMore);
 		});
 		
@@ -562,10 +563,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 	createFilterPanel: function () {
 		var orgFilter = new go.NavMenu({			
 			store: new Ext.data.ArrayStore({
-				fields: ['name', 'icon', 'inputValue'], //icon and iconCls are supported.
+				fields: ['name', 'iconCls', 'inputValue'], //icon and iconCls are supported.
 				data: [					
-					[t("Organization"), 'business', true],
-					[t("Contact"), 'person', false]
+					[t("Organization"), 'ic-business green', true],
+					[t("Contact"), 'ic-person blue', false]
 				]
 			}),
 			simpleSelect: true,

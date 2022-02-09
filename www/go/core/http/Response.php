@@ -77,6 +77,15 @@ class Response extends Singleton{
 	 */
 	public $enableCache = true;
 
+
+	/**
+	 * Bitmask for JSON encoding options
+	 *
+	 * @var int
+	 * @see https://www.php.net/manual/en/function.json-encode.php
+	 */
+	public $jsonOptions = 0;
+
 	public function setContentType($contentType) {
 		$this->setHeader('Content-Type', $contentType);
 	}
@@ -336,11 +345,11 @@ class Response extends Singleton{
 				}
 
 				try {
-					$data = JSON::encode($data);
+					$data = JSON::encode($data, $this->jsonOptions);
 
 				} catch(CoreException $e) {
 					$error = new ProblemDetails(SetError::ERROR_SERVER_FAIL, 500, $e->getMessage());
-					$data = JSON::encode($error);
+					$data = JSON::encode($error, $this->jsonOptions);
 				}
 			} 
 			$this->sendHeaders();

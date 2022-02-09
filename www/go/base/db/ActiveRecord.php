@@ -52,6 +52,7 @@ use go\core\model\Link;
 use go\core\model\User;
 use go\core\model\UserDisplay;
 use go\core\orm\SearchableTrait;
+use go\core\util\StringUtil;
 
 abstract class ActiveRecord extends \GO\Base\Model{
 	const EVENT_URL = "url";
@@ -1508,7 +1509,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$joins .= "\nINNER JOIN core_search search ON search.entityId = t.id and search.entityTypeId = " . static::entityType()->getId();
 
 				$i = 0;
-				$words = SearchableTrait::splitTextKeywords($params['searchQuery']);
+				$words = StringUtil::splitTextKeywords($params['searchQuery']);
 				$words = array_unique($words);
 
 				foreach($words as $word) {
@@ -2450,6 +2451,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				break;
 
 			default:
+				if(empty($value)) {
+					return $value;
+				}
 				if(substr($this->columns[$attributeName]['dbtype'],-3)=='int')
 					return $value;
 				else
@@ -2557,6 +2561,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		if(!isset(self::$_magicAttributeNames))
 			self::$_magicAttributeNames=GO::cache ()->get('magicattributes');
+
+		if(!self::$_magicAttributeNames) {
+			self::$_magicAttributeNames = [];
+		}
 
 		if(!isset(self::$_magicAttributeNames[$this->className()])){
 			self::$_magicAttributeNames[$this->className()]=array();
@@ -3886,9 +3894,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-		$arr = SearchableTrait::splitTextKeywords($prepend);
+		$arr = StringUtil::splitTextKeywords($prepend);
 		foreach($keywords as $keyword) {
-			$arr = array_merge($arr, SearchableTrait::splitTextKeywords($keyword));
+			$arr = array_merge($arr, StringUtil::splitTextKeywords($keyword));
 		}
 		if($this->hasAttribute('id')) {
 			$keywords[] = $this->id;
@@ -3953,7 +3961,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 				$attr = $this->columns[$field];
 
-				$stmt->bindParam(':ins'.$i, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
+				$stmt->bindParam(':ins'.$i, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? 0 : $attr['length']);
 			}
 			$ret =  $stmt->execute();
 		}catch(\Exception $e){
@@ -4033,7 +4041,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			foreach($bindParams as $tag => $field){
 				$attr = $this->getColumn($field);
-				$stmt->bindParam($tag, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
+				$stmt->bindParam($tag, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? 0 : $attr['length']);
 			}
 
 			if($this->_debugSql)

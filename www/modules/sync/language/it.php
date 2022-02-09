@@ -6,4 +6,5 @@ return array (
   'Synchronization' => 'Sincronizzazione',
   'Maximum days old' => 'Maximum days old',
   'Address books' => 'Rubriche',
+  'Notebooks' => 'Blocchi note',
 );

@@ -6,6 +6,7 @@ use go\core\db\Criteria;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\ArrayObject;
 
 /**
  * EntityFilter model
@@ -74,7 +75,7 @@ class EntityFilter extends AclOwnerEntity {
 			});
 	}
 
-	public static function sort(\go\core\orm\Query $query, array $sort): Query
+	public static function sort(\go\core\orm\Query $query, ArrayObject $sort): Query
 	{
 		if(empty($sort)) {
 			$sort['name'] = 'ASC';

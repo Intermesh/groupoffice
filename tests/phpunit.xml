@@ -7,7 +7,7 @@
 	backupStaticAttributes="false"
 	convertErrorsToExceptions="true"
 	verbose="true"
-	debug="true">
+	>
 
 	<testsuites>
 		<testsuite name="core">

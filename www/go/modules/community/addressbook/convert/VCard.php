@@ -18,7 +18,6 @@ use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
 use go\core\model\Link;
 use Sabre\VObject\Component\VCard as VCardComponent;
-use Sabre\VObject\Document;
 use Sabre\VObject\Document as SabreDocument;
 use Sabre\VObject\ParseException;
 use Sabre\VObject\Property;
@@ -492,10 +491,16 @@ class VCard extends AbstractConverter {
 	private static function convertType(string $vCardType): ?string {
 		$types = explode(',', strtolower($vCardType));
 		foreach($types as $type) {
-			
-			//skip internet type.
-			if($type != 'internet') {
-				return $type;
+
+			switch($type) {
+				case 'cell':
+					return 'mobile';
+
+				case 'internet':
+					return null;
+
+				default:
+					return $type;
 			}
 		}
 

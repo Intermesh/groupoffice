@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `progress` TINYINT(2) NOT NULL DEFAULT 1,
   `progressUpdated` DATETIME NULL DEFAULT NULL,
   `title` VARCHAR(255) NOT NULL,
-  `description` TEXT NULL DEFAULT '',
+  `description` TEXT NULL DEFAULT NULL,
   `color` CHAR(6) NULL,
   `recurrenceRule` VARCHAR(400) NULL DEFAULT NULL,
   `priority` INT(11) NOT NULL DEFAULT 1,
@@ -145,14 +145,14 @@ CREATE TABLE IF NOT EXISTS `tasks_category` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   `ownerId` INT(11) NULL,
-  `tasklistId` INT(11) NULL,
+  `tasklistId` INT(11) UNSIGNED NULL,
   PRIMARY KEY (`id`),
   INDEX `user_id` (`ownerId` ASC),
   constraint tasks_category_ibfk_1
       foreign key (ownerId) references core_user (id)
           on delete cascade,
   constraint tasks_category_tasklist_ibfk_9
-      foreign key (tasklistId) references tasks_tasklist (createdBy)
+      foreign key (tasklistId) references tasks_tasklist (id)
           on delete cascade)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4

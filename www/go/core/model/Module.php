@@ -27,6 +27,10 @@ class Module extends Entity {
 	public $admin_menu;
 	public $version;
 	public $enabled;
+
+	/**
+	 * @var Permission[]
+	 */
 	public $permissions = [];
 
 	// for backwards compatibility
@@ -142,6 +146,8 @@ class Module extends Entity {
 		return (object) $rights;
 	}
 
+	private static $userRightsCache = [];
+
 	/**
 	 * Get's the rights of a user
 	 *
@@ -151,24 +157,33 @@ class Module extends Entity {
 	 */
 	public function getUserRights(int $userId = null) : stdClass
 	{
-
 		if(!isset($userId)) {
 			$userId = go()->getAuthState()->getUserId();
 			$isAdmin = go()->getAuthState()->isAdmin();
 		} else{
 			$isAdmin = User::isAdminById($userId);
+		}
 
+		if(!isset(self::$userRightsCache[$this->id])) {
+			self::$userRightsCache[$this->id] = [];
+		}
+
+		if(isset(self::$userRightsCache[$this->id][$userId])) {
+			return self::$userRightsCache[$this->id][$userId];
 		}
 
 		if(!$this->isAvailable()) {
-			return (object) ['mayRead' => $isAdmin];
+			self::$userRightsCache[$this->id][$userId] = (object) ['mayRead' => $isAdmin];
+			return self::$userRightsCache[$this->id][$userId];
 		}
 
 		if($isAdmin) {
-			return $this->adminRights();
+			self::$userRightsCache[$this->id][$userId] = $this->adminRights();
+			return self::$userRightsCache[$this->id][$userId];
 		}
 
-		return $this->userRights($userId);
+		self::$userRightsCache[$this->id][$userId] = $this->userRights($userId);
+		return self::$userRightsCache[$this->id][$userId];
 	}
 
 	private function userRights($userId): object

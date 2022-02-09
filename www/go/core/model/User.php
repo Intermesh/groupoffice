@@ -1067,12 +1067,17 @@ class User extends Entity {
 		if(!Module::isInstalled('community', 'addressbook')) {
 			throw new Exception("Can't set profile without address book module.");
 		}
-		
-		$this->contact = $this->getProfile();		
-		$this->contact->setValues($values);		
-	
-		if(!empty($this->contact->name)) {
-			$this->displayName = $this->contact->name;
+		if(isset($values['id'])) {
+			$contact = \go\modules\community\addressbook\model\Contact::findById($values['id']);
+			if(!empty($contact)){
+				$this->contact = $contact;
+			}
+		} else {
+			$this->contact = $this->getProfile();
+			$this->contact->setValues($values);
+			if (!empty($this->contact->name)) {
+				$this->displayName = $this->contact->name;
+			}
 		}
 	}
 

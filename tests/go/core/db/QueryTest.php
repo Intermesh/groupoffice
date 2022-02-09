@@ -84,7 +84,7 @@ class QueryTest extends TestCase {
 		$record = $query->single();
 
 		//Query should return typed data because of PDO::ATTR_EMULATE_PREPARES
-		$this->assertInternalType("int", $record['id']);
+		$this->assertIsInt($record['id']);
 		$this->assertEquals(1, $record['id']);
 
 

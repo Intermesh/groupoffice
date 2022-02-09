@@ -16,6 +16,7 @@ use go\core\db\Table;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
+use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\modules\community\comments\model\Comment;
@@ -478,16 +479,14 @@ class Link extends AclItemEntity
 	}
 
 
-	public static function sort(\go\core\orm\Query $query, array $sort): Query
+	public static function sort(Query $query, ArrayObject $sort): Query
 	{
 		if(isset($sort['modifiedAt'])) {
-			$sort['search.modifiedAt'] = $sort['modifiedAt'];
-			unset($sort['modifiedAt']);
+			$sort->renameKey('modifiedAt','search.modifiedAt' );
 		}
 
 		if(isset($sort['toEntity'])) {
-			$sort['eTo.name'] = $sort['toEntity'];
-			unset($sort['toEntity']);
+			$sort->renameKey('toEntity','eTo.name' );
 		}
 		return parent::sort($query, $sort);
 	}

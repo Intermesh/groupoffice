@@ -41,6 +41,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				fields: ['name', 'icon', 'iconCls', 'inputValue'],
 				data: [
 					[t("Today"), 'content_paste', 'green', 'today'],
+					[t("Due in seven days"), 'filter_7', 'purple', '7days'],
 					[t("All"), 'assignment', 'red', 'all'],
 					// [t("Completed"), 'assignment_turned_in', 'grey', 'completed'],
 					[t("Unscheduled"), 'event_busy', 'blue','unscheduled'],
@@ -49,6 +50,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				]
 			})
 		});
+
+		const showCompleted = Ext.state.Manager.get("tasks-show-completed");
 
 		this.sidePanel = new Ext.Panel({
 			width: dp(300),
@@ -82,11 +85,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							hideLabel: true,
 							xtype: "checkbox",
 							boxLabel: t("Show completed"),
-							value: false,
+							checked: showCompleted,
 							listeners: {
 								scope: this,
 								check: function(cb, checked) {
 									this.showCompleted(checked);
+									Ext.state.Manager.set("tasks-show-completed", checked);
 									this.taskGrid.store.load();
 								}
 							}
@@ -138,14 +142,26 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	},
 	
 	runModule : function() {
-		this.categoriesGrid.store.load();
+
+
+
+		let statusFilter = Ext.state.Manager.get("tasks-status-filter");
+		if(!statusFilter) {
+			statusFilter = 'today';
+		}
 
 		this.filterPanel.on("afterrender", () => {
-			this.filterPanel.selectRange(0,0);
+
+			let index = this.filterPanel.store.find('inputValue', statusFilter);
+			if(index == -1) {
+				index = 0;
+			}
+
+			this.filterPanel.selectRange(index,index);
 
 		});
-		this.setStatusFilter("today");
-		this.showCompleted(false);
+		this.setStatusFilter(statusFilter);
+		this.showCompleted(Ext.state.Manager.get("tasks-show-completed"));
 		this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
 
 		this.setDefaultSelection();
@@ -164,6 +180,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			selectedListIds.push(go.User.tasksSettings.defaultTasklistId);
 		}
 
+		this.filterCategories(selectedListIds);
+
 		this.tasklistsGrid.setDefaultSelection(selectedListIds)
 		this.checkCreateTaskList();
 	},
@@ -177,47 +195,23 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 
 	setStatusFilter : function(inputValue) {
+
 		switch(inputValue) {
 
 			case "today": // tasks today
-				const now = new Date(),
-					nowYmd = now.format("Y-m-d");
 
 				this.taskGrid.store.setFilter("status", {
-					start: "<=" + nowYmd
+					start: "<=now"
 				});
 
 				break;
 
-			// case 2: // tasks too late
-			// 	var now = new Date(),
-			// 	nowYmd = now.format("Y-m-d");
-			// 	this.taskGrid.store.setFilter('status',{
-			// 		late: nowYmd,
-			// 		percentComplete: "<100"
-			// 	});
-			// 	break;
+			case '7days':
+				this.taskGrid.store.setFilter("status", {
+					due: "<=7days"
+				});
+				break;
 
-			// case 3: // non completed tasks
-			// 	this.taskGrid.store.setFilter("status", {
-			// 		percentComplete: "<100"
-			// 	});
-			// 	break;
-
-			// case "completed": // completed tasks
-			// 	this.taskGrid.store.setFilter("status", {
-			// 		complete: true
-			// 	});
-			// 	break;
-
-			// case 5: // future tasks
-			// 	var now = new Date(),
-			// 	nowYmd = now.format("Y-m-d");
-			// 	this.taskGrid.store.setFilter('status',{
-			// 		future: nowYmd,
-			// 		percentComplete: "<100"
-			// 	});
-			// 	break;
 			case "unscheduled":
 				this.taskGrid.store.setFilter('status',{
 					scheduled: false
@@ -230,11 +224,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				});
 				break;
 
-
 			case "all": // all
 				this.taskGrid.store.setFilter("status", null);
 				break;
 		}
+
+		Ext.state.Manager.set("tasks-status-filter", inputValue);
 	},
 
 	createFilterPanel: function () {
@@ -286,9 +281,14 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						var dlg = new go.modules.community.tasks.CategoryDialog();
+						const dlg = new go.modules.community.tasks.CategoryDialog();
+						const firstSelected = this.tasklistsGrid.getSelectionModel().getSelected();
+						if(firstSelected) {
+							dlg.setValues({tasklistId: firstSelected.id});
+						}
 						dlg.show();
-					}
+					},
+					scope: this
 				}],
 			listeners: {
 				rowclick: function(grid, row, e) {
@@ -305,7 +305,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	createTasklistGrid : function() {
 		this.tasklistsGrid = new go.modules.community.tasks.TasklistsGrid({
-
 			filteredStore: this.taskGrid.store,
 			filterName: 'tasklistId',
 
@@ -325,6 +324,20 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					}
 				}],
 			listeners: {
+				afterrender: function(grid) {
+					new Ext.dd.DropTarget(grid.getView().mainBody, {
+						ddGroup : 'TasklistsDD',
+						notifyDrop :  (source, e, data) => {
+							const selections = source.dragData.selections,
+								dropRowIndex = grid.getView().findRowIndex(e.target),
+								tasklistId = grid.getView().grid.store.data.items[dropRowIndex].id;
+
+							selections.forEach((r) => {
+								go.Db.store("Task").save({tasklistId: tasklistId}, r.id);
+							})
+						}
+					});
+				},
 				rowclick: function(grid, row, e) {
 					if(e.target.className != 'x-grid3-row-checker') {
 						//if row was clicked and not the checkbox then switch to grid in narrow mode
@@ -349,6 +362,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createTaskGrid : function() {
 
 		this.taskGrid = new go.modules.community.tasks.TaskGrid({
+			enableDrag: true,
+			ddGroup: 'TasklistsDD',
 			split: true,
 			region: 'center',
 			tbar: [

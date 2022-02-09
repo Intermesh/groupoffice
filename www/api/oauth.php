@@ -17,13 +17,11 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Stream as StreamAlias;
 
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
-use Lcobucci\JWT\Token as TokenAlias;
-use Lcobucci\JWT\ValidationData;
+use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Exception\OAuthServerException;
 
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
+use League\OAuth2\Server\ResourceServer;
 use OpenIDConnectServer\ClaimExtractor;
 use Psr\Http\Message\ResponseInterface as ResponseInterfaceAlias;
 
@@ -208,85 +206,35 @@ class OAuthController {
 		return $file;
 	}
 
+
 	/**
-	 * @param $jwt
-	 * @return TokenAlias
-	 * @throws OAuthServerException
+	 * @return Response
 	 * @throws Exception
 	 */
-	private function validateAccessToken($jwt): TokenAlias
+	public function userinfo(): Response
 	{
-		try {
-			// Attempt to parse and validate the JWT
-			$token = (new Parser())->parse($jwt);
-			$publicKeyPath = 'file://' . $this->getPublicKeyFile()->getPath();
-//			$publicKey = new CryptKey($publicKeyPath);
-			try {
-				if ($token->verify(new Sha256(), $publicKeyPath) === false) {
-					throw OAuthServerException::accessDenied('Access token could not be verified');
-				}
-			} catch (BadMethodCallException $exception) {
-				throw OAuthServerException::accessDenied('Access token is not signed', null, $exception);
-			}
-
-			// Ensure access token hasn't expired
-			$data = new ValidationData();
-			$data->setCurrentTime(time());
-
-			if ($token->validate($data) === false) {
-				throw OAuthServerException::accessDenied('Access token is invalid');
-			}
-		} catch (InvalidArgumentException $exception) {
-			// JWT couldn't be parsed so return the request as is
-			throw OAuthServerException::accessDenied($exception->getMessage(), null, $exception);
-		} catch (RuntimeException $exception) {
-			// JWT couldn't be parsed so return the request as is
-			throw OAuthServerException::accessDenied('Error while decoding to JSON', null, $exception);
-		}
-
-		$accessTokenRepository = new repositories\AccessTokenRepository();
-		// Check if token has been revoked
-		if ($accessTokenRepository->isAccessTokenRevoked($token->getClaim('jti'))) {
-			throw OAuthServerException::accessDenied('Access token has been revoked');
-		}
-
-		return $token;
-	}
-
-	private function validateRequest($request) {
-
-		$accessToken = null;
-		$authorizationHeaders = $request->getHeader('Authorization');
-
-		if (count($authorizationHeaders)) {
-			$authorizationHeader = trim($authorizationHeaders[0]);
-
-			if (preg_match('/Bearer\s(\S+)/', $authorizationHeader, $matches)) {
-				$accessToken = $matches[1];
-			}
-		}
-
-		if (null === $accessToken) {
-			$accessToken = $_REQUEST['access_token'] ?? null;
-		}
-
-		if (null === $accessToken) {
-			throw OAuthServerException::accessDenied('Access token is invalid');
-		}
-
-		return $this->validateAccessToken($accessToken);
-	}
-	/**
-	 * @return MessageTraitAlias
-	 * @throws OAuthServerException
-	 */
-	public function userinfo()
-	{
-		$token = $this->validateRequest(ServerRequest::fromGlobals());
-
+		$request = ServerRequest::fromGlobals();
 		$response = new Response();
 
-		$userId = $token->getClaim('sub');
+		$accessTokenRepository = new repositories\AccessTokenRepository();
+
+		$publicKey = new CryptKey($this->getPublicKeyFile()->getPath());
+
+		$server = new ResourceServer(
+			$accessTokenRepository,
+			$publicKey
+		);
+
+		try {
+			$request = $server->validateAuthenticatedRequest($request);
+		} catch (OAuthServerException $exception) {
+			return $exception->generateHttpResponse($response);
+		} catch (Exception $exception) {
+			return (new OAuthServerException($exception->getMessage(), 0, 'unknown_error', 500))
+				->generateHttpResponse($response);
+		}
+
+		$userId = $request->getAttribute("oauth_user_id");
 
 		$userRepository = new repositories\UserRepository();
 		$userEntity = $userRepository->getUserEntityByIdentifier($userId);
@@ -328,9 +276,10 @@ class OAuthController {
 	}
 
 	/**
-	 * @return MessageTraitAlias
+	 * @return Response
+	 * @noinspection PhpUnused
 	 */
-	public function openIdConfiguration()
+	public function openIdConfiguration(): Response
 	{
 		$goUrl = rtrim(go()->getSettings()->URL, '/') . '/';
 		$endpointBase = $goUrl . 'api/oauth.php';
@@ -422,11 +371,11 @@ class OAuthController {
 	}
 }
 
+/** @noinspection PhpUnhandledExceptionInspection */
 (new Router())
 	->addRoute('/authorize/', 'GET', OAuthController::class, 'authorize')
 	->addRoute('/userinfo/', 'GET', OAuthController::class, 'userinfo')
 	->addRoute('/token/', 'POST', OAuthController::class, 'token')
 	->addRoute('/\.well-known\/openid-configuration/', 'GET', OAuthController::class, 'openIdConfiguration')
 	->addRoute('/certs/', 'GET', OAuthController::class, 'certs')
-	->addRoute('/jmap/', 'POST', OAuthController::class, 'jmap')
 	->run();

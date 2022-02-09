@@ -18,7 +18,7 @@ try {
 
 	// needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
 	// system.
-	EventEmitterTrait::$disableEvents = true;
+	go()->disableEvents();
 
 	require("gotest.php");
 	if(!systemIsOk()) {
@@ -102,7 +102,7 @@ try {
 			echo '<p class="error">'.$studioError.'</p>';
 		}
 
-		EventEmitterTrait::$disableEvents = false;
+		go()->enableEvents();
 		go()->getInstaller()->upgrade();	
 
 		echo "</pre>";

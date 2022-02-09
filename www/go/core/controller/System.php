@@ -6,6 +6,8 @@ use Exception;
 use GO;
 use go\core\cli\controller\System as CliSystemCtrl;
 use go\core\Controller;
+use go\core\exception\Forbidden;
+use go\core\fs\Blob;
 use go\core\jmap\Response;
 use go\core\model;
 
@@ -20,5 +22,25 @@ class System extends Controller {
 		ob_end_clean();
 
 		return ['success' => true];
+	}
+
+	/**
+	 * Blob method for CLI programs
+	 *
+	 * It aborts the regular JMAP output and outputs the file instead!
+	 *
+	 * @param $params
+	 * @return void
+	 * @throws Forbidden
+	 */
+	public function blob($params) {
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
+		$blob = Blob::findById($params['id']);
+
+		$blob->getFile()->output();
+		exit();
 	}
 }

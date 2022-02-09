@@ -144,6 +144,19 @@ $updates['202201261056'][] = "ALTER TABLE `tasks_portlet_tasklist` ADD CONSTRAIN
 
 $updates['202201271056'][] = "delete from tasks_task_category where categoryId not in (select id from tasks_category)";
 
+$updates['202202041432'][] = "alter table tasks_category
+    drop foreign key tasks_category_tasklist_ibfk_9;";
+
+$updates['202202041432'][] = "alter table tasks_category
+    modify tasklistId int(11) unsigned null;";
+
+$updates['202202041432'][] = "alter table tasks_category
+    add constraint tasks_category_tasklist_ibfk_9
+        foreign key (tasklistId) references tasks_tasklist (id)
+            on delete cascade;";
+
+$updates['202202081432'][] = "ALTER TABLE `tasks_task` CHANGE COLUMN `description` `description` TEXT NULL DEFAULT null;";
+
 
 
 //6.7
