@@ -4,6 +4,9 @@
 - Core: Auto linking in HTML editor only when scheme and tld are present
 - Files: Disabling assistant or other module with a file handler could lead to errors when opening a file.
 - Tasks: Add description to link and search listing
+- ActiveSync: sorting on column status works
+- Billing: Fixed expense moving to another book on edit
+- Files: Fixed problem where only 100 files were uploaded when dropping a folder to upload
 
 07-02-2022 6.6.42
 - Core: Debian package dependencies change. Makes it possible to install without mysql and apache.
