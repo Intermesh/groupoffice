@@ -16,7 +16,9 @@ if(!empty($argv[1])) {
 	define('GO_CONFIG_FILE', $argv[1]);
 }
 
-require('GO.php');
+require_once('./vendor/autoload.php');
+
+
 
 //The server manager calls cron via HTTP because it doesn't know the document root when running
 //multiple versions of GO.v It passes ?exec=1 to make it run on the command line.
@@ -31,7 +33,6 @@ if(!empty($_GET['exec'])) {
 }
 
 App::get()->setAuthState(new State());
-GO::session()->runAsRoot();
 
 //for debugging
 //go()->getDebugger()->output = true;
@@ -51,7 +52,12 @@ if(!$lock->lock()) {
 //new framework
 CronJobSchedule::runNext();
 
+$date = new DateTime();
+
 //old framework
+require('GO.php');
+GO::session()->runAsRoot();
+
 /**
  * @return mixed
  * @throws Exception
