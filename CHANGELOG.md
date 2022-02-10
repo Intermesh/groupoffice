@@ -3,6 +3,7 @@
 - Core: UK bank holidays for 2022 - Removed 2020
 - Core: Auto linking in HTML editor only when scheme and tld are present
 - Files: Disabling assistant or other module with a file handler could lead to errors when opening a file.
+- Tasks: Add description to link and search listing
 
 07-02-2022 6.6.42
 - Core: Debian package dependencies change. Makes it possible to install without mysql and apache.
