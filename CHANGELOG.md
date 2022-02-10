@@ -1,3 +1,5 @@
+- ActiveSync: sorting on column status works
+
 07-02-2022 6.5.101
 - Timeregistration: Fixed week view export
 - Email: Fixed filer XSS attach when it's in an attachment

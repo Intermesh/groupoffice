@@ -35,10 +35,15 @@ class DeviceController extends \GO\Base\Controller\AbstractModelController {
 	protected function beforeStoreStatement(array &$response, array &$params, \GO\Base\Data\AbstractStore &$store, \GO\Base\Db\FindParams $storeParams) {
 		
 		$storeParams->select('*');
-		
+
 		return parent::beforeStoreStatement($response, $params, $store, $storeParams);
 	}
-	
+	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel)
+	{
+		$columnModel->getColumn('can_connect')->setSortAlias(['new', 'can_connect']);
+		return parent::formatColumns($columnModel);
+	}
+
 	protected function afterDisplay(&$response, &$model, &$params) {
 		
 		$response['data']['deviceWiperequestOn'] = \GO\Base\Util\Date\DateTime::fromUnixtime($model->deviceWiperequestOn)->format();
