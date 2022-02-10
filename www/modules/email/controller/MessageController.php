@@ -2301,7 +2301,20 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			return $response;
 	}
 
-	protected function actionZipAllAttachments($params){
+	protected function actionDeleteAllAttachments(array $params): array
+	{
+		$account = Account::model()->findByPk($params['account_id']);
+		//$imap  = $account->openImapConnection($params['mailbox']);
+
+		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
+
+		// TODO: Remove all attachments, replace with inline HTML code <strong>Attachment filename was removed by recipient</strong>
+		$response['success'] = true;
+
+		return $response;
+	}
+
+	protected function actionZipAllAttachments(array $params){
 
 		$account = Account::model()->findByPk($params['account_id']);
 		//$imap  = $account->openImapConnection($params['mailbox']);

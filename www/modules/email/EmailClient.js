@@ -1431,6 +1431,43 @@ GO.email.saveAllAttachments = function(panel){
 	this.selectFolderDialog.show();
 };
 
+GO.email.deleteAllAttachments = function(panel) {
+	Ext.MessageBox.confirm(
+		t('Delete all attachments', 'email', 'legacy'),
+		t('Are you sure that you wish to remove all attachments from this email message?', 'email', 'legacy'),
+		function(btn) {
+			if(btn === 'yes') {
+				GO.request({
+					url: 'email/message/deleteAllAttachments',
+					params:{
+						//task:'save_attachment',
+						uid: panel.uid,
+						mailbox: panel.mailbox,
+						// number: attachment.number,
+						// encoding: attachment.encoding,
+						// type: attachment.type,
+						// subtype: attachment.subtype,
+						account_id: panel.account_id
+						// uuencoded_partnumber: attachment.uuencoded_partnumber,
+						// folder_id: folder_id,
+						// filename: filename,
+						// tmp_file: attachment.tmp_file ? attachment.tmp_file : 0,
+						// charset:attachment.charset,
+						// sender:panel.data.sender,
+						// filepath:panel.data.path//smime message are cached on disk
+					},
+
+					success: function (options, response, result) {
+						debugger;
+
+						// TODO What now?
+					},
+					scope: this
+				});
+			}
+		}, this);
+};
+
 GO.email.saveAttachment = function(attachment,panel)
 	{
 		if(!GO.files.saveAsDialog)

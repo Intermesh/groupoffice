@@ -1081,7 +1081,8 @@ class GO{
 	 * @param boolean $appendSecurityToken add a SecurityToken to the url.
 	 * @return string
 	 */
-	public static function url($path='', $params=array(), $relative=true, $htmlspecialchars=false, $appendSecurityToken=true){
+	public static function url($path='', $params=array(), $relative=true, $htmlspecialchars=false, $appendSecurityToken=true): string
+	{
 		$url = $relative ? "" : \GO::config()->full_url;
 
 		if(empty($path) && empty($params)){

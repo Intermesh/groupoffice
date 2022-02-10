@@ -24,7 +24,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		GO.email.MessagePanel.superclass.initComponent.call(this);
 
-
 		this.attachmentContextMenu = new GO.email.AttachmentContextMenu();
 		this.allAttachmentContextMenu = new GO.email.AllAttachmentContextMenu();
 		
@@ -52,7 +51,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<td style="width:70px"><b>'+t("From", "email")+'</b></td>'+
 
 			'<td>: {from} &lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;">{sender}</a>&gt;</td>'+
-//			'<td rowspan="99"><span id="'+this.linkMessageId+'" class="em-contact-link"></span></td>'+
 
 			'</tr>'+
 			'<tr><td><b>'+t("Subject", "email")+'</b></td><td>: {subject}</td></tr>'+
@@ -91,15 +89,9 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> '+
 				'</tpl>'+
 			'</tpl>'+
-//			ORIGINAL
-//			'<tpl if="attachments.length&gt;1 && zip_of_attachments_url!=\'\'">'+
-//			'<a class="filetype-link filetype-zip" href="{zip_of_attachments_url}" target="_blank">'+t("Download all as zipfile", "email")+'</a>'+
-//			'</tpl>'+
-			
-			'<tpl if="attachments.length&gt;1">'+
-//				'<a class="filetype-link btn-menu" id="downloadAllMenu" ></a>'+
+
+			'<tpl if="attachments.length&gt;0">'+
 				'<i class="icon ic-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'"></i>'+
-//				'<a class="filetype-link btn-expand-more" id="downloadAllMenu" ></a>'+
 			'</tpl>'+
 							
 							
@@ -219,21 +211,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			linkIconCls : function(link) {				
 				
 				return go.Entities.getLinkIcon(link.entity, link.filter);
-				
-//				var linkConfig = go.Entities.getLinkConfigs().find(function(cfg) {
-//					
-//					if(link.entity != cfg.entity) {
-//						return false;
-//					}
-//					
-//					if(link.filter != cfg.filter) {
-//						return false;
-//					}
-//					
-//					return true;
-//				});
-//				
-//				return linkConfig ? linkConfig.iconCls : "";
+
 			},
 			addSlashes : function(str)
 			{
@@ -247,20 +225,17 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		this.template.compile();
 	},
 
-
 	data: null,
-
 
 	popup : function(){
 
 		if(this.loading){
 			this.on('load', function(){this.popup()}, this, {single:true});
-		}else{
-
-				this.messageDialog = new GO.email.MessageDialog({
-					 closeAction:"close"
-				});
-				this.messageDialog.messagePanel.on('attachmentClicked', GO.email.openAttachment, this);
+		} else{
+			this.messageDialog = new GO.email.MessageDialog({
+				 closeAction:"close"
+			});
+			this.messageDialog.messagePanel.on('attachmentClicked', GO.email.openAttachment, this);
 
 			this.messageDialog.showData(this.data);
 			this.messageDialog.messagePanel.uid=this.uid;
@@ -273,8 +248,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 	loadMessage : function(uid, mailbox, account_id, password, no_max_body_size)
 	{
-		if(uid)
-		{
+		if(uid) {
 			this.uid=uid;
 			this.account_id=account_id;
 			this.mailbox=mailbox;
@@ -284,8 +258,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				mailbox: mailbox,
 				account_id: account_id
 			};
-			if(password)
-			{
+			if(password) {
 				this.params.password=password;
 			}
 		}
@@ -331,29 +304,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 
 		this.data=data;
-
-
-
-//				if(this.updated)
-//				{
-//					data.iCalendar.feedback = t("Event has been updated.", "email");
-//					this.updated = false;
-//				}else
-//				if(this.created)
-//				{
-//					data.iCalendar.feedback = t("Event has been created.", "email");
-//					this.created = false;
-//				}else
-//				if(this.deleted)
-//				{
-//					data.iCalendar.feedback = t("Event has been deleted.", "email");
-//					this.deleted = false;
-//				}else
-//				if(this.declined)
-//				{
-//					data.iCalendar.feedback = t("Invitation has been declined.", "email");
-//					this.declined = false;
-//				}
 
 		if(data.iCalendar && this.icalendarFeedback){
 			data.iCalendar.feedback = this.icalendarFeedback;
@@ -481,22 +431,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				this.processInvitation();
 			}, this);
 		}
-//		var declineInvitationEl = Ext.get('em-icalendar-decline-invitation');
-//		if(declineInvitationEl)
-//		{
-//			declineInvitationEl.on('click', function()
-//			{
-//				this.processInvitation("DECLINED");
-//			}, this);
-//		}
-//		var tentativeInvitationEl = Ext.get('em-icalendar-tentative-invitation');
-//		if(tentativeInvitationEl)
-//		{
-//			tentativeInvitationEl.on('click', function()
-//			{
-//				this.processInvitation("TENTATIVE");
-//			}, this);
-//		}
+
 		var icalDeleteEventEl = Ext.get('em-icalendar-delete-event-'+this.bodyId);
 		if(icalDeleteEventEl)
 		{
@@ -541,10 +476,17 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				this.attachmentsEl.on('contextmenu', this.onAttachmentContextMenu, this);
 			}
 		}
-		
-		if(data.attachments.length > 1 && this.allAttachmentContextMenu)	{
+
+		// Add 'Delete all attachmennts' option to allAttachment Context menu
+		if(data.attachments.length && this.allAttachmentContextMenu) {
 			this.allAttachmentsMenuEl = Ext.get('downloadAllMenu-'+this.downloadAllMenuId);
-			
+			const single = data.attachments.length === 1;
+			this.allAttachmentContextMenu.downloadButton.setVisible(!single);
+			if(go.Modules.isAvailable("legacy", "files")) {
+				this.allAttachmentContextMenu.saveButton.setVisible(!single);
+				this.allAttachmentContextMenu.saveToItemButton.setVisible(!single);
+			}
+
 			this.allAttachmentsMenuEl.on('click', this.onAllAttachmentContextMenu, this);
 			this.allAttachmentContextMenu.messagePanel = this;
 			this.allAttachmentsMenuEl.on('contextmenu', this.onAllAttachmentContextMenu, this);
@@ -555,10 +497,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			this.allAttachmentsMenuEl = Ext.get(this.bodyId);
 			this.allAttachmentsMenuEl.on('contextmenu', this.onImageContextMenu, this);
 		}
-
-
-		// this.contactImageEl = Ext.get(this.contactImageId);
-		// this.contactImageEl.on('click', this.lookupContact, this);
 
 		this.body.scrollTo('top',0);
 

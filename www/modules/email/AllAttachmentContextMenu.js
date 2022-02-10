@@ -13,12 +13,13 @@
 
 GO.email.AllAttachmentContextMenu = Ext.extend(Ext.menu.Menu, {
 	
-	messagePanel:false,
-	allZipFileUrl:false,
-	
-	initComponent : function(){
+	messagePanel: false,
+	allZipFileUrl: false,
+	deleteAllAttachmentsUrl: false,
+
+	initComponent : function() {
 		
-		var mnuItems = [];
+		let mnuItems = [];
 		
 		this.downloadButton = new Ext.menu.Item({
 			iconCls: 'btn-download',
@@ -29,9 +30,19 @@ GO.email.AllAttachmentContextMenu = Ext.extend(Ext.menu.Menu, {
 			},
 			scope: this
 		});
-				
+
 		mnuItems.push(this.downloadButton);
-		
+
+		this.deleteAllButton = new Ext.menu.Item({
+			iconCls: 'btn-delete',
+			text: t("Delete all attachments", 'email', 'community'),
+			cls: 'x-btn-text-icon',
+			handler: function() {
+				GO.email.deleteAllAttachments(this.messagePanel);
+			},
+			scope: this
+		});
+		mnuItems.push(this.deleteAllButton);
 		if(go.Modules.isAvailable("legacy", "files")){
 			this.saveButton = new Ext.menu.Item({
 				iconCls: 'btn-save',
@@ -52,8 +63,7 @@ GO.email.AllAttachmentContextMenu = Ext.extend(Ext.menu.Menu, {
 				text: t("Save all to item", "email"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
-
-					var dlg = new GO.email.LinkAttachmentDialog();
+					const dlg = new GO.email.LinkAttachmentDialog();
 					dlg.show(null,this.messagePanel);
 				},
 				scope: this
@@ -79,7 +89,11 @@ GO.email.AllAttachmentContextMenu = Ext.extend(Ext.menu.Menu, {
 		if(this.messagePanel){
 			// Check if there is a "zip_of_attachments_url" given, if so then enable the downloadButton and set the url
 			this.allZipFileUrl = this.messagePanel.data.zip_of_attachments_url;
-			this.downloadButton.setVisible(!GO.util.empty(this.allZipFileUrl));
+			this.downloadButton.setVisible((!GO.util.empty(this.allZipFileUrl) && this.messagePanel.data.attachments.length > 1));
+
+			//Same for "delete_all_attachments_url" given, if so then enable the deletAll button and set the url
+			this.deleteAllAttachmentsUrl = this.messagePanel.data.delete_all_attachments_url;
+			this.deleteAllButton.setVisible(!GO.util.empty(this.deleteAllAttachmentsUrl));
 		}
 		
 		GO.email.AllAttachmentContextMenu.superclass.showAt.call(this,xy);

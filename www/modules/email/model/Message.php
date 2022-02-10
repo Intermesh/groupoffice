@@ -35,8 +35,6 @@
 
 namespace GO\Email\Model;
 
-use GO;
-
 
 abstract class Message extends \GO\Base\Model {
 
@@ -288,7 +286,13 @@ abstract class Message extends \GO\Base\Model {
 		return $new;
 	}
 
-	public function getZipOfAttachmentsUrl(){
+	public function getDeleteAllAttachmentsUrl(): string
+	{
+		return '';
+	}
+
+	public function getZipOfAttachmentsUrl(): string
+	{
 		return '';
 	}
 
@@ -356,7 +360,8 @@ abstract class Message extends \GO\Base\Model {
 		}
 
 		$response['attachments'] = array();
-		$response['zip_of_attachments_url']=$this->getZipOfAttachmentsUrl();
+		$response['zip_of_attachments_url'] = $this->getZipOfAttachmentsUrl();
+		$response['delete_all_attachments_url'] = $this->getDeleteAllAttachmentsUrl();
 
 		$response['inlineAttachments'] = array();
 
