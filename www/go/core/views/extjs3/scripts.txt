@@ -62,6 +62,7 @@ form/KeyValueEditorGrid.js
 form/DateRangeField.js
 form/RecurrenceField.js
 form/SelectField.js
+form/IntervalField.js
 
 modules/ModulePanel.js
 
