@@ -122,6 +122,10 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+- ActiveSync: sorting on column status works
+- Billing: Fixed expense moving to another book on edit
+- Files: Fixed problem where only 100 files were uploaded when dropping a folder to upload
+
 07-02-2022 6.5.101
 - Timeregistration: Fixed week view export
 - Email: Fixed filer XSS attach when it's in an attachment

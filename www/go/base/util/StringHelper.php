@@ -896,7 +896,7 @@ class StringHelper {
 		"'</body>'usi",
 		"'<meta[^>]*>'usi",
 		"'<link[^>]*>'usi",
-		"'<title>.*?</title>'usi",
+		"'<title[^>]*>.*?</title>'usi",
 //		"'<head[^>]*>.*?</head>'usi", //Amazon had body inside the head !?
 		"'<head[^>]*>'usi",
 			"'</head[^>]*>'usi",

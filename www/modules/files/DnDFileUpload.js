@@ -1,16 +1,28 @@
 GO.files.DnDFileUpload = function(doneCallback, element) {
 
+	function readEntriesAsync(reader) {
+		return new Promise((resolve, reject) => {
+			reader.readEntries(entries => {
+				resolve(entries);
+			}, error => reject(error));
+		})
+	}
 
-
-	function upload(nodes, subfolder, folder_id) {
+	function upload(nodes, subfolder, folder_id, isSub) {
 		var uploadCount = nodes.length,
 			blobs = [];
 
-		Array.prototype.forEach.call(nodes, function(node) {
+
+
+		Array.prototype.forEach.call(nodes, async function(node) {
 			if(node && node.isDirectory) {
-				node.createReader().readEntries(function(subnodes) {
-					upload(subnodes, node.fullPath.replace(/^\//,"").split('/'), folder_id);
-				});
+				let reader = node.createReader();
+
+				let subnodes = await readEntriesAsync(reader);
+				while(subnodes.length> 0) {
+					upload(subnodes, node.fullPath.replace(/^\//, "").split('/'), folder_id);
+					subnodes = await readEntriesAsync(reader);
+				}
 				uploadCount--; // dont upload folders
 				return;
 			}
