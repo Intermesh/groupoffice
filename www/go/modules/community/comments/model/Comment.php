@@ -152,7 +152,7 @@ class Comment extends AclItemEntity {
 		return $this->relatedEntity;
 	}
 
-	protected function getAclEntity()
+	public function findAclEntity(): Entity
 	{
 		return $this->findEntity();
 	}

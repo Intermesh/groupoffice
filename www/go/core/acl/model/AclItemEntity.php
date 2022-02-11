@@ -260,10 +260,10 @@ abstract class AclItemEntity extends AclEntity {
 	/**
 	 * Get the entity that holds the acl id.
 	 *
-	 * @return Entity|ActiveRecord
+	 * @return Entity
 	 * @throws Exception
 	 */
-	protected function getAclEntity()
+	public function findAclEntity(): Entity
 	{
 		$cls = static::aclEntityClass();
 
@@ -315,7 +315,7 @@ abstract class AclItemEntity extends AclEntity {
 	{
 
 		if(!isset($this->permissionLevel)) {
-			$aclEntity = $this->getAclEntity();
+			$aclEntity = $this->findAclEntity();
 
 			$this->permissionLevel = $aclEntity->getPermissionLevel();
 		}
@@ -348,7 +348,7 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	public function findAclId(): ?int
 	{
-		return $this->getAclEntity()->findAclId();
+		return $this->findAclEntity()->findAclId();
 	}
 
 }

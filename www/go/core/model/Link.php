@@ -496,7 +496,7 @@ class Link extends AclItemEntity
 		return Search::class;
 	}
 
-	protected function getAclEntity()
+	public function findAclEntity(): Entity
 	{
 		return $this->findFromEntity();
 	}
