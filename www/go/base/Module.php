@@ -3,6 +3,7 @@ namespace GO\Base;
 
 use Faker\Generator;
 use go\core\Installer;
+use go\core\orm\EntityType;
 
 /**
  * Group-Office
@@ -417,6 +418,7 @@ class Module extends Observable {
 	 * @return boolean
 	 */
 	public function enable() {
+		go()->getCache()->delete('entity-types');
 		$this->registerEntities();
 		return true;
 	}

@@ -66,7 +66,7 @@ class Mailer extends \Swift_Mailer{
 			$message->setTo(\GO::config()->debug_email);
 			$message->setBcc(array());
 			$message->setCc(array());
-			\GO::debug("E-mail debugging is enabled in the Group-Office config.php file. All emails are send to: ".\GO::config()->debug_email);
+			\GO::debug("E-mail debugging is enabled in the Group-Office config.php file. All emails are sent to: ".\GO::config()->debug_email);
 		}
 		
 //		if(\GO::modules()->isInstalled("log")){
@@ -96,9 +96,7 @@ class Mailer extends \Swift_Mailer{
 //			\GO\Log\Model\Log::create ("email", $str);
 //		}
 		
-//		debug_print_backtrace();
-//		exit("NO MAIL");
-		
+
 		//workaround https://github.com/swiftmailer/swiftmailer/issues/335
 		$messageId = $message->getId();
 		

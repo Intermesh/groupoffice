@@ -287,6 +287,10 @@ class Task extends AclInheritEntity {
 			$desc .= ' - ' . go()->t("Unassigned", "community", "tasks");
 		}
 
+		if(!empty($this->description)) {
+			$desc .= ": " . $this->description;
+		}
+
 		return $desc;
 	}
 
