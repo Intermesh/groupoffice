@@ -5,17 +5,13 @@ namespace GO\Email\Controller;
 
 use GO;
 use GO\Base\Exception\AccessDenied;
-
+use GO\Base\Mail\Imap;
+use GO\Base\Model\Acl;
 use go\core\ErrorHandler;
+use go\core\model\Acl as GoAcl;
 use go\core\model\User;
 use GO\Email\Model\Account;
-use GO\Email\Model\Alias;
 use GO\Email\Model\Label;
-
-use GO\Base\Model\Acl;
-
-use GO\Base\Mail\Imap;
-use go\core\model\Acl as GoAcl;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Settings;
 
@@ -2304,11 +2300,33 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	protected function actionDeleteAllAttachments(array $params): array
 	{
 		$account = Account::model()->findByPk($params['account_id']);
-		//$imap  = $account->openImapConnection($params['mailbox']);
 
 		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
 
-		// TODO: Remove all attachments, replace with inline HTML code <strong>Attachment filename was removed by recipient</strong>
+		// Copy current message, get new UID
+		$command = "UID COPY ".$params['uid']." \"".$message->getImapConnection()->utf7_encode($params['mailbox'])."\"\r\n";
+		$message->getImapConnection()->send_command($command);
+		$res = $message->getImapConnection()->get_response();
+		$copiedUid = $message->getImapConnection()->get_uidnext();
+
+		$copiedMessage = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $copiedUid);
+
+		if($copiedMessage->deleteAttachments()) {
+			// Delete original message
+			$message->delete();
+			// Do the expunge thingy
+			$message->getImapConnection()->expunge();
+		}
+		// remove attachments (how?)
+
+
+
+		// Move copied message to inbox
+//		$copiedMessage->getImapConnection()->move([$copiedUid], $params['mailbox'], true);
+
+
+		// We done.
+
 		$response['success'] = true;
 
 		return $response;

@@ -1064,10 +1064,11 @@ class GO{
 	 *
 	 * This is handled by the main index.php
 	 *
-	 * @param StringHelper $url
+	 * @param string $url
 	 */
-	public static function setAfterLoginUrl($url){
-		\GO::session()->values['after_login_url']=$url;
+	public static function setAfterLoginUrl(string $url)
+	{
+		\GO::session()->values['after_login_url'] = $url;
 	}
 
 	/**

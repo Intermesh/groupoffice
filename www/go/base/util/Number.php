@@ -31,13 +31,14 @@ class Number {
 	 * @param	int $number The number
 	 * @param	int $decimals Number of decimals to display
 	 * @access public
-	 * @return StringHelper
+	 * @return string
 	 */
 
-	public static function localize($number, $decimals=2)
+	public static function localize($number, $decimals=2): string
 	{		
-		if($number===null)
+		if($number===null) {
 			return "";
+		}
 		
 		$ts = \GO::user() ? \GO::user()->thousands_separator : \GO::config()->default_thousands_separator;
 		$ds = \GO::user() ? \GO::user()->decimal_separator : \GO::config()->default_decimal_separator;
@@ -55,19 +56,20 @@ class Number {
 
 	public static function unlocalize($number)
 	{	
-		if($number=="")
+		if($number=="") {
 			return null;
+		}
 		
 		$ts = \GO::user() ? \GO::user()->thousands_separator : \GO::config()->default_thousands_separator;
 		$ds = \GO::user() ? \GO::user()->decimal_separator : \GO::config()->default_decimal_separator;
 		$number = str_replace($ts,'', $number);
 		$number = str_replace($ds,'.',$number);
 		
-		if(!empty($number) && !is_numeric($number))
+		if(!empty($number) && !is_numeric($number)) {
 			return false;
+		}
 		
 		return floatval($number);
-		//return str_replace($ds,'.',$number);
 	}
 
 	/**
@@ -77,13 +79,15 @@ class Number {
 	 * @param	int $size The size in bytes
 	 * @param	int $decimals Number of decimals to display
 	 * @access public
-	 * @return StringHelper
+	 * @return string
 	 */
 
-	public static function formatSize($size, $decimals = 1) {
+	public static function formatSize($size, $decimals = 1): string
+	{
 		
-		if($size==0)
+		if($size==0) {
 			return "0 bytes";
+		}
 		
 		switch ($size) {
 			case ($size >= 1073741824) :

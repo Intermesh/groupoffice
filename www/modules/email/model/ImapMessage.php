@@ -690,6 +690,42 @@ class ImapMessage extends ComposerMessage {
 		return $this->getImapConnection()->delete(array($this->uid));
 						
 	}
+
+
+	/**
+	 * Remove all attachments from current message
+	 *
+	 * @return bool
+	 */
+	public function deleteAttachments(): bool
+	{
+		$atts = $this->getAttachments();
+		// No attachments, just return false and the original message will be left as is
+		if(count($atts) === 0) {
+			return false;
+		}
+		$str = '';
+		while ($att = array_shift($atts)) {
+			if ($att->disposition == 'attachment' || empty($att->content_id)) {
+				$str .= '<hr/>'.
+					'Deleted: ' . $att->name .'<br/>'.
+					'<hr/>' .
+					'You deleted an attachment from this message. The original MIME headers for the attachment were:<br/>'.
+					'Content-Type: ' . $att->mime . '; name="'.$att->name . '"<br/>' .
+					'Content-Disposition: '. $att->disposition . '; filename="'.$att->name . '"<br/>' .
+					'Content-Transfer-Encoding: ' . $att->encoding . '<br/>' .
+					'Content-ID: ' . $att->content_id . '<br/>' .
+					'X-Attachment-Id:' . $att->content_id ;
+			}
+			$this->addPart($str);
+			unset($att); // AS if...
+		}
+		// Add $str (see above) to body
+
+		$this->setAttributes(['has_attachments' => 0]);
+
+		return true;
+	}
 	
 	/**
 	 * Returns an array with linked item objects.

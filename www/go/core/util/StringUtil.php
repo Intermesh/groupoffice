@@ -16,7 +16,6 @@ use Transliterator;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  *
- * @deprecated Just use string or use the go/util namespace functions
  */
 class StringUtil {
 
