@@ -34,7 +34,7 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 
 	protected function createAcl()
 	{
-		$this->{static::$aclColumnName} = $this->getAclEntity()->findAclId();
+		$this->{static::$aclColumnName} = $this->findAclEntity()->findAclId();
 
 		//parent::createAcl();
 	}
@@ -63,7 +63,7 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 	 * @return Entity
 	 * @throws Exception
 	 */
-	protected function getAclEntity(): Entity
+	public function findAclEntity(): Entity
 	{
 
 		$cls = static::aclEntityClass();
@@ -144,7 +144,7 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 	 */
 	protected function hasOwnAcl(): bool
 	{
-		return $this->{static::$aclColumnName} != $this->getAclEntity()->findAclId();
+		return $this->{static::$aclColumnName} != $this->findAclEntity()->findAclId();
 	}
 
 	/**
