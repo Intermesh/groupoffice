@@ -1,3 +1,4 @@
+14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog
 - Projects2: Do not empty employee when opening existing time entry
 - Core: UK bank holidays for 2022 - Removed 2020
