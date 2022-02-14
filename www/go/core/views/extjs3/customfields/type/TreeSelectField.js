@@ -188,11 +188,15 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		this.items.each(function(i) {			
 			i.markInvalid(msg);
 		});
+
+		this.fireEvent('invalid', this, msg);
 	},
 	clearInvalid: function () {
 		this.items.each(function(i) {
 			i.clearInvalid();
 		});
+
+		this.fireEvent('valid', this);
 	},
 
 	isValid : function(preventMark){
@@ -217,6 +221,8 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 			}
 		};
 		this.items.each(fn, this);
+
+		valid ? this.fireEvent('valid', this) : this.fireEvent('invalid', this, null);
 
 		return valid;
 	},
