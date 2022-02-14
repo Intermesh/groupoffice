@@ -9,6 +9,7 @@
 - Files: Fixed problem where only 100 files were uploaded when dropping a folder to upload
 - Newsletters: Attachment could dissapear from template when also using inline images
 - Core: refactored blob garbage collection. Blobs are not marked stale on entity save / delete but are all checked on collection run
+- Tasks: Only show started tasks on start page
 
 07-02-2022 6.6.42
 - Core: Debian package dependencies change. Makes it possible to install without mysql and apache.
