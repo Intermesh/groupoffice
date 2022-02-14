@@ -338,8 +338,10 @@ class Blob extends orm\Entity {
 		$paths = [];
 
 		foreach(Blob::find()->mergeWith($query) as $blob) {
-			$new[] = $blob->id;
-			$paths[] = $blob->path();
+			if($blob->id != go()->getSettings()->logoId) {
+				$new[] = $blob->id;
+				$paths[] = $blob->path();
+			}
 		}
 
 		if(empty($new)) {
