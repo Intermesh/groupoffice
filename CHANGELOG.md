@@ -7,6 +7,7 @@
 - ActiveSync: sorting on column status works
 - Billing: Fixed expense moving to another book on edit
 - Files: Fixed problem where only 100 files were uploaded when dropping a folder to upload
+- Newsletters: Attachment could dissapear from template when also using inline images
 
 07-02-2022 6.6.42
 - Core: Debian package dependencies change. Makes it possible to install without mysql and apache.

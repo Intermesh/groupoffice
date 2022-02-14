@@ -163,22 +163,7 @@ class Blob extends orm\Entity {
 		return false;
 	}
 
-	/**
-	 * Set the blob stale if it's not used in any of the referencing tables.
-	 *
-	 * @return bool true if blob is stale
-	 * @throws SaveException
-	 * @throws Exception
-	 */
-	public function setStaleIfUnused(): bool
-	{
-		$this->staleAt = $this->isUsed() ? null : new DateTime();
-		
-		if(!$this->save()) {
-			throw new SaveException($this);
-		}
-		return isset($this->staleAt);
-	}
+
 
 	/**
 	 * Create from file.
