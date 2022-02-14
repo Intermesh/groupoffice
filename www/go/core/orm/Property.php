@@ -1775,6 +1775,13 @@ abstract class Property extends Model {
 	}
 
 	/**
+	 * Statement for last delete() call.
+	 *
+	 * @var Statement
+	 */
+	public static $lastDeleteStmt;
+
+	/**
 	 * Delete this model
 	 *
 	 * When finding the models to delete in an override use mergeWith():
@@ -1786,11 +1793,13 @@ abstract class Property extends Model {
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 
-		$stmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
-		if(!$stmt->execute()) {			
+		self::$lastDeleteStmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
+		if(!self::$lastDeleteStmt->execute()) {
 			return false;
 		}
-		go()->debug("Deleted " . $stmt->rowCount() ." models of type " .static::class);
+		if(go()->getDebugger()->enabled) {
+			go()->debug("Deleted " . self::$lastDeleteStmt->rowCount() . " models of type " . static::class);
+		}
 		return true;
 	}
 

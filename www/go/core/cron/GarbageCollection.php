@@ -69,9 +69,7 @@ class GarbageCollection extends CronJob {
 
 	private function blobs() {
 		go()->debug("Cleaning up BLOB's");
-		
-		Blob::delete((new GoQuery)->where('staleAt', '<=', new DateTime()));
-	
+		Blob::delete(Blob::findStale());
 		go()->debug("Deleted stale blobs");
 	}
 

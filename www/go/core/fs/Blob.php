@@ -93,6 +93,16 @@ class Blob extends orm\Entity {
 	private $strContent;
 
 
+	protected function init()
+	{
+		parent::init();
+
+		if($this->isNew()) {
+			$this->staleAt = new DateTime("+1 hour");
+		}
+	}
+
+
 	/**
 	 * Get all table columns referencing the core_blob.id column.
 	 *
@@ -163,6 +173,33 @@ class Blob extends orm\Entity {
 		return false;
 	}
 
+	/**
+	 * Finds blobs that have no references anymore and are older than one hour
+	 *
+	 * @return self[]|Query
+	 */
+	public static function findStale() {
+		$refs = Blob::getReferences();
+
+		foreach($refs as $ref) {
+			$q = 	(new Query())
+				->select($ref['column'].' as blobId')
+				->from($ref['table'])
+				->where($ref['column'], '!=', null);
+
+			if(!isset($refsQuery)) {
+				$refsQuery = $q;
+			} else {
+				$refsQuery->union($q);
+			}
+		}
+
+		return static::find()
+			->join($refsQuery, 'refs', 'b.id = refs.blobId', 'left')
+			->where('refs.blobId is null')
+			->andWhere('staleAt < now()');
+	}
+
 
 
 	/**
@@ -183,7 +220,7 @@ class Blob extends orm\Entity {
 			$blob = new self();
 			$blob->id = $hash;
 			$blob->size = $file->getSize();
-			$blob->staleAt = new DateTime("+1 hour");
+
 		}
 		$blob->name = $file->getName();
 		$blob->tmpFile = $file->getPath();
@@ -217,6 +254,14 @@ class Blob extends orm\Entity {
 	/**
 	 * Create from string
 	 *
+	 * @example
+	 * ```
+	 * $blob = Blob::fromString(json_encode($jsonArray, JSON_PRETTY_PRINT));
+	 * $blob->name = $params['entity'] . '.json';
+	 * $blob->type = 'json';
+	 * $success = $blob->save();
+	 * ```
+	 *
 	 * @param string $string
 	 * @return self
 	 */
@@ -229,7 +274,6 @@ class Blob extends orm\Entity {
 			$blob->id = $hash;
 			$blob->size = mb_strlen($string, '8bit');
 			$blob->strContent = $string;
-			//$blob->staleAt = new DateTime("+1 hour");
 		}
 		return $blob;
 	}
@@ -294,22 +338,18 @@ class Blob extends orm\Entity {
 		$paths = [];
 
 		foreach(Blob::find()->mergeWith($query) as $blob) {
-			if(!$blob->isUsed()) {
-				$new[] = $blob->id;
-				$paths[] = $blob->path();
-			} else if(isset($blob->staleAt)) {
-				$blob->staleAt = null;
-				$blob->save();
-			}
+			$new[] = $blob->id;
+			$paths[] = $blob->path();
 		}
 
 		if(empty($new)) {
 			return true;
 		}
 
-		$query->clearWhere()->andWhere(['id' => $new]);
+		//for performance use Id's gathered above
+		$justIds = (new Query)->where(['id' => $new]);
 		
-		if(parent::internalDelete($query)) {
+		if(parent::internalDelete($justIds)) {
 
 			foreach($paths as $path) {
 				if(is_file($path)) {
