@@ -135,6 +135,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 
 		this.trialButton.setVisible(!store.reader.jsonData.has_license);
 
+		const scrollTop = this.body.dom.scrollTop;
+
 		this.removeAll();
 
 		let lastPackage = null;
@@ -253,6 +255,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 		}
 		this.doLayout();
 
+		this.body.dom.scrollTop = scrollTop;
+
 	},
 
 	showRights: function( id, rights) {
@@ -361,7 +365,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 
 				if(success){
 					if(record.data.enabled && record.isModified("enabled")) {
-						this.store.load();
+
 						this.showRights(record.data.id, record.data.rights);
 
 					}
