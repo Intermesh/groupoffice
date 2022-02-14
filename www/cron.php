@@ -16,7 +16,7 @@ if(!empty($argv[1])) {
 	define('GO_CONFIG_FILE', $argv[1]);
 }
 
-require_once(__DIR__ . './vendor/autoload.php');
+require_once(__DIR__ . '/vendor/autoload.php');
 
 
 
