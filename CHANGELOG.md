@@ -1,3 +1,4 @@
+14-02-2022 6.5.102
 - Core: UK bank holidays 2022 overrides
 - ActiveSync: sorting on column status works
 - Billing: Fixed expense moving to another book on edit
