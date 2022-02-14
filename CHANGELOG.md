@@ -1,3 +1,4 @@
+- Core: UK bank holidays 2022 overrides
 - ActiveSync: sorting on column status works
 - Billing: Fixed expense moving to another book on edit
 - Files: Fixed problem where only 100 files were uploaded when dropping a folder to upload
