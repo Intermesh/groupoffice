@@ -14,6 +14,7 @@
 - Tasks: global categories are editable if you have mayChangeCategories for the module
 - Newsletters: Listing of users gave error "unsupportedFilter"
 - Custom fields: Field condition didn't work for type "Select"
+- Tickets: Added template variable {ticket:rateHours} The total amount in hours spent on the ticket
 
 07-02-2022 6.6.42
 - Core: Debian package dependencies change. Makes it possible to install without mysql and apache.
