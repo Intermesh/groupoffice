@@ -5,11 +5,6 @@ use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\model\Search;
 
-/**
- * Entities can use this trait to make it show up in the global search function
- * 
- * @property array $customFields 
- */
 trait SearchableTrait {
 
 	public static $updateSearch = true;

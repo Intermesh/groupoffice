@@ -20,12 +20,17 @@ use go\core\util\JSON;
  * Entities can use this trait to enable a customFields property that can be 
  * extended by the user.
  * 
- * @property array $customFields 
+ * @property CustomFieldsModel $customFields
  */
 trait CustomFieldsTrait {
 
 	private static $customFieldsTableName;
 
+	/**
+	 * The model containing the cusotmfield  data
+	 *
+	 * @var CustomFieldsModel
+	 */
 	private $customFieldsModel;
 
 	/**
