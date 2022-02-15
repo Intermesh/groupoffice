@@ -168,6 +168,7 @@ class TemplateParser {
 		$this->addFilter('implode', [$this, "filterImplode"]);
 		$this->addFilter('entity', [$this, "filterEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
+		$this->addFilter('prop', [$this, "filterProp"]);
 		$this->addFilter('nl2br', "nl2br");
 		$this->addFilter('t', [$this, "filterTranslate"]);
 
@@ -298,6 +299,27 @@ class TemplateParser {
 		throw new Exception("Unsupported type for filter 'first'");
 
 
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function filterProp($entity, $propName) {
+		if(is_object($entity)) {
+			if(!isset($entity->$propName)) {
+				return null;
+			}
+
+			return $entity->$propName;
+		} else if(is_array($entity)) {
+			if(!isset($entity[$propName])) {
+				return null;
+			}
+
+			return $entity[$propName];
+		} else {
+			return null;
+		}
 	}
 	
 	/**

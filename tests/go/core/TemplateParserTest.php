@@ -71,5 +71,21 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 
 		$this->assertEquals($a->zipCode.$a->zipCode, $str);
 
+
+		$tpl = '{{contact.addresses |  filter:type:"postal" | first | prop:"zipCode"}}';
+		$zipCode = $tplParser->parse($tpl);
+		$this->assertEquals($a->zipCode, $zipCode);
+
+		$tpl = '{{contact.addresses |  filter:type:"notexisting" | first | prop:"zipCode"}}';
+		$notexistingType = $tplParser->parse($tpl);
+		$this->assertEquals(null, $notexistingType);
+
+		$tpl = '{{contact.addresses |  filter:type:"postal" | first | prop:"notexisting"}}';
+		$notexistingProp = $tplParser->parse($tpl);
+		$this->assertEquals(null, $notexistingProp);
+
 	}
+
+
+
 }
