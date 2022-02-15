@@ -2302,34 +2302,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$account = Account::model()->findByPk($params['account_id']);
 
 		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
-
-		// Copy current message, get new UID
-		$command = "UID COPY ".$params['uid']." \"".$message->getImapConnection()->utf7_encode($params['mailbox'])."\"\r\n";
-		$message->getImapConnection()->send_command($command);
-		$res = $message->getImapConnection()->get_response();
-		$copiedUid = $message->getImapConnection()->get_uidnext();
-
-		$copiedMessage = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $copiedUid);
-
-		if($copiedMessage->deleteAttachments()) {
-			// Delete original message
+		if($message->deleteAttachments()) {
+			// Delete original message, expunge
 			$message->delete();
-			// Do the expunge thingy
 			$message->getImapConnection()->expunge();
 		}
-		// remove attachments (how?)
-
-
-
-		// Move copied message to inbox
-//		$copiedMessage->getImapConnection()->move([$copiedUid], $params['mailbox'], true);
-
-
-		// We done.
-
-		$response['success'] = true;
-
-		return $response;
+		return ['success' =>  true];
 	}
 
 	protected function actionZipAllAttachments(array $params){

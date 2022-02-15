@@ -2,6 +2,7 @@
 
 namespace GO\Email\Model;
 
+use go\core\util\DateTime;
 use go\core\util\StringUtil;
 
 /**
@@ -713,16 +714,33 @@ class ImapMessage extends ComposerMessage {
 					'You deleted an attachment from this message. The original MIME headers for the attachment were:<br/>'.
 					'Content-Type: ' . $att->mime . '; name="'.$att->name . '"<br/>' .
 					'Content-Disposition: '. $att->disposition . '; filename="'.$att->name . '"<br/>' .
-					'Content-Transfer-Encoding: ' . $att->encoding . '<br/>' .
-					'Content-ID: ' . $att->content_id . '<br/>' .
-					'X-Attachment-Id:' . $att->content_id ;
-			}
-			$this->addPart($str);
-			unset($att); // AS if...
-		}
-		// Add $str (see above) to body
+					'Content-Transfer-Encoding: ' . $att->encoding . '<br/>';
+				if(isset($this->content_id)) {
+					$str .= 'Content-ID: ' . $att->content_id . '<br/>' .
+						'X-Attachment-Id:' . $att->content_id ;
+				}
 
-		$this->setAttributes(['has_attachments' => 0]);
+			}
+		}
+
+		$swiftMsg = new \Swift_Message();
+		$swiftMsg->setTo($this->to->getAddresses());
+		$swiftMsg->setFrom($this->from->getAddresses());
+		$swiftMsg->setCc($this->cc->getAddresses());
+		$swiftMsg->setBcc($this->bcc->getAddresses());
+		$swiftMsg->setSubject($this->subject);
+		$swiftMsg->setDate(new DateTime($this->date));
+		$swiftMsg->setContentType($this->content_type);
+//		$swiftMsg->setEncoder($this->content_transfer_encoding);
+		if($this->getHtmlBody()) {
+			$swiftMsg->setBody($this->getHtmlBody(), 'text/html');
+			$swiftMsg->addPart($str, 'text/html');
+		} else {
+			$swiftMsg->setBody($this->getPlainBody(), 'text/plain');
+			$swiftMsg->addPart($str, 'text/plain');
+		}
+
+		$this->getImapConnection()->append_message($this->mailbox, $swiftMsg, '\Seen');
 
 		return true;
 	}
