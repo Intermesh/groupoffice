@@ -1,3 +1,4 @@
+- Core: archive disabled user; remove archived user from project templates
 - Multi instance: Error reporting when (de)activate or login as admin fails
 
 14-02-2022 6.6.43
