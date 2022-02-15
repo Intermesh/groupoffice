@@ -1,3 +1,5 @@
+- Multi instance: Error reporting when (de)activate or login as admin fails
+
 14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog
 - Projects2: Do not empty employee when opening existing time entry
