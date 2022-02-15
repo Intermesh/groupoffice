@@ -100,7 +100,7 @@ go.Modules.register("community", "tasks", {
 			},
 			{
 				title: t("Tasklist"),
-				name: 'addressBookId',
+				name: 'taskListId',
 				multiple: false,
 				type: "go.modules.community.tasks.TasklistCombo"
 			},
@@ -169,5 +169,7 @@ go.modules.community.tasks.progress = {
 go.modules.community.tasks.listTypes = {
 	List : 1,
 	Board : 2,
-	Project : 3
+	Project : 3,
+	Support : 4
+
 }

@@ -553,7 +553,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.filterCategories(ids);
 
-		this.taskGrid.store.setFilter("role", ids.length == 0 ? {role:  go.modules.community.tasks.listTypes.List} : null);
+		//		this.taskGrid.store.setFilter("role", ids.length == 0 ? {role:  go.modules.community.tasks.listTypes.List} : null);
+		this.taskGrid.store.setFilter("role", ids.length == 0 ? {operator: "OR", conditions: [{role:  go.modules.community.tasks.listTypes.List}, {role:  go.modules.community.tasks.listTypes.Support}] }: null);
 
 		if(go.User.tasksSettings.rememberLastItems && go.User.tasksSettings.lastTasklistIds.join(",") != ids.join(",")) {
 

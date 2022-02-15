@@ -22,15 +22,16 @@ use GO\Projects2\Model\ProjectEntity;
  */
 class Tasklist extends AclOwnerEntity
 {
-
 	const List = 1;
 	const Board = 2;
 	const Project = 3;
+	const Support = 4;
 
 	const Roles = [
 		self::List => 'list',
 		self::Board => 'board',
-		self::Project => 'project'
+		self::Project => 'project',
+		self::Support => 'support'
 	];
 
 	/** @var int */

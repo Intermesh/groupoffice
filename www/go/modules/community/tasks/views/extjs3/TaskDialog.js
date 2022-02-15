@@ -180,7 +180,8 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								flex: 1,
 								items: [
 									this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
-
+										value: go.User.tasksSettings.defaultTasklistId,
+										allowBlank: false
 									})
 									]
 							},
