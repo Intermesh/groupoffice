@@ -3,6 +3,7 @@
 go.grid.DateColumn = Ext.extend(Ext.grid.Column, {
 	align: "right",
 	dateOnly: false,
+	shortDate: null,
 	constructor: function(cfg){
 
 
@@ -13,17 +14,20 @@ go.grid.DateColumn = Ext.extend(Ext.grid.Column, {
 					return go.util.Format.date(v);
 				}
 
-				return go.util.Format.shortDateTimeHTML(v);
+				return me.shortDate ? go.util.Format.shortDateTimeHTML(v) : go.util.Format.dateTime(v);
 			};
 		}
 
 		Ext.grid.DateColumn.superclass.constructor.call(this, cfg);
-		
-		this.resizable = !go.User.shortDateInList;
+
+		if(this.shortDate === null) {
+			this.shortDate = go.User.shortDateInList;
+		}
+
 		if(this.dateOnly) {
 			this.width = dp(128);
 		} else {
-			this.width = go.User.shortDateInList ? dp(128) : dp(168);
+			this.width = this.shortDate ? dp(128) : dp(168);
 		}
 	}
 });		
