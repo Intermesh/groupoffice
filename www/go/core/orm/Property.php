@@ -3,6 +3,7 @@
 namespace go\core\orm;
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use go\core\App;
@@ -448,7 +449,7 @@ abstract class Property extends Model {
 	private function trackModifications() {
 		foreach ($this->watchProperties() as $propName) {
 			$v = $this->$propName;
-			$this->oldProps[$propName] = $v;
+			$this->oldProps[$propName] = $v instanceof DateTimeInterface ? $v->format("U") : $v;
 		}
 	}
 
@@ -917,21 +918,21 @@ abstract class Property extends Model {
   /**
    * Compare two dates
    *
-   * @param DateTime|null $a
-   * @param DateTime|null $b
+   * @param string|null $old
+   * @param DateTimeInterface|null $new
    * @return bool
    */
-	private function datesAreDifferent(?CoreDateTime $a, ?CoreDateTime $b): bool
+	private function datesAreDifferent(?string $old, ?DateTimeInterface $new): bool
 	{
-		if(!isset($a) && isset($b)) {
+		if(!isset($old) && isset($new)) {
 			return true;
 		}
 
-		if(!isset($b) && isset($a)) {
+		if(!isset($new) && isset($old)) {
 			return true;
 		}
 
-		return $a->format('U') != $b->format('U');
+		return $old != $new->format('U');
 	}
 
 	/**
@@ -966,7 +967,7 @@ abstract class Property extends Model {
 				}
 			} else 
 			{			
-				if($newValue instanceof CoreDateTime) {
+				if($newValue instanceof DateTimeInterface) {
 					if($this->datesAreDifferent($oldValue, $newValue)) {
 						if($forIsModified) {
 							return true;
