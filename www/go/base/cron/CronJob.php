@@ -339,7 +339,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 				$failed=true;
 				\go\core\ErrorHandler::logException($e);
 				
-				\GO\Base\Mail\AdminNotifier::sendMail("CronJob ".$this->name." failed", "EXCEPTION: ". $e->getMessage());
+				\GO\Base\Mail\AdminNotifier::sendMail("CronJob ".$this->name." failed at " . go()->getSettings()->URL, "EXCEPTION: ". $e->getMessage());
 
 				$this->error = date('c') . ": " .(string)$e;
 

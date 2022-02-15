@@ -15,6 +15,7 @@ use go\core\db\Criteria;
 use go\core\db\Expression;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\User;
+use go\core\model\Module;
 use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\exception\SaveException;
@@ -215,6 +216,16 @@ class Task extends AclInheritEntity {
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
+
+		if(Module::isInstalled("legacy", "projects2")) {
+			$mapping->setQuery((new \go\core\db\Query())
+				->join('pr2_hours', 'prh', 'prh.task_id = task.id', 'left')
+				->select('COALESCE(SUM(prh.duration) * 60, 0) AS timeBooked')
+				->groupBy(['task.id'])
+			);
+		}
+
+		return $mapping;
 	}
 
 	public static function converters(): array

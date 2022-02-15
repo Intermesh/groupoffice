@@ -180,6 +180,14 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								flex: 1,
 								items: [
 									this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
+										listeners: {
+											change: (combo, val) => {
+												const categories = this.formPanel.form.findField('categories');
+												categories.comboStore.setFilter("tasklistId", {tasklistId: val});
+												//reloads combo when trigger is clicked
+												delete categories.comboBox.lastQuery;
+											}
+										}
 										value: go.User.tasksSettings.defaultTasklistId,
 										allowBlank: false
 									})
@@ -211,7 +219,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						xtype: "chips",
 						entityStore: "TaskCategory",
 						comboStoreConfig: {
-							filters: {ownerId: {ownerId:go.User.id}}
+							filters: {tasklistId: {tasklistId:this.tasklistCombo.getValue()}}
 						},
 						displayField: "name",
 						valueField: 'id',

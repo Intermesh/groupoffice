@@ -1040,7 +1040,7 @@ class User extends Entity {
 	 */
 	public function getProfile(): ?Contact
 	{
-		if(!Module::isInstalled('community', 'addressbook')) {
+		if(!Module::isInstalled('community', 'addressbook', true)) {
 			return null;
 		}
 

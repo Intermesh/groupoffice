@@ -74,7 +74,7 @@ GO.calendar.CalendarDialog = function(config)
 			name:'show_completed_tasks',
 			boxLabel:t("Show completed tasks", "calendar"),
 			hideLabel:true,
-			hidden: !GO.tasks
+			hidden: !go.Modules.isAvailable("community", "tasks")
 		},{
 			xtype:'textarea',
 			fieldLabel:t("Comment"),
@@ -458,7 +458,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 				this.exportButton.setDisabled(false);
 				this.importTab.setDisabled(false);
 
-				if(GO.tasks && action.result.remoteComboTexts.tasklist_id)
+				if(go.Modules.isAvailable("community", "tasks") && action.result.remoteComboTexts.tasklist_id)
 					this.selectTasklist.setRemoteText(action.result.remoteComboTexts.tasklist_id);
 
 				this.showGroups(action.result.data.group_id > 1);

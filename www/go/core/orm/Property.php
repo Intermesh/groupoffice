@@ -13,7 +13,6 @@ use go\core\db\Criteria;
 use go\core\db\Statement;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
-use go\core\fs\Blob;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use DateTime as CoreDateTime;
@@ -1067,8 +1066,6 @@ abstract class Property extends Model {
 			return false;
 		}
 
-		$this->checkBlobs();
-
 		return true;
 	}
 
@@ -1107,88 +1104,6 @@ abstract class Property extends Model {
 		}
 
 		return true;
-	}
-
-  /**
-   * Get all columns containing blob id's
-   *
-   * @return string[]
-   */
-	private static function getBlobColumns(): array
-	{
-
-		$cacheKey = 'property-getBlobColumns-' . static::class;
-
-		$cols = go()->getCache()->get($cacheKey);
-
-		if($cols !== null) {
-			return $cols;
-		}
-		
-		$refs = Blob::getReferences();
-		$cols = [];
-		foreach(static::getMapping()->getTables() as $table) {
-			foreach($table->getMappedColumns() as $col) {
-				foreach($refs as $r) {
-					if($r['table'] == $table->getName() && $r['column'] == $col->name) {
-						$cols[] = $col->name;
-					}
-				}
-			}
-		}
-
-		//check scalar blobs
-		foreach(static::getMapping()->getRelations() as $rel) {
-			if($rel->type != Relation::TYPE_SCALAR) {
-				continue;
-			}
-
-			foreach($refs as $r) {
-				if ($r['table'] == $rel->tableName && $r['column'] == $rel->getScalarColumn()) {
-					$cols[] = $rel->name;
-				}
-			}
-		}
-
-		go()->getCache()->set($cacheKey, $cols);
-		
-		return $cols;
-	}
-
-  /**
-   * @throws Exception
-   */
-	private function checkBlobs() {
-		$blobIds = [];
-		foreach(static::getBlobColumns() as $col) {
-			if($this->isModified([$col])) {
-				$mod = array_values($this->getModified([$col]))[0];
-				
-				if(isset($mod[0])) {
-					$v = $mod[0];
-
-					if (is_array($v)) {
-						$blobIds = array_merge($blobIds, $v);
-					} else {
-						$blobIds[] = $v;
-					}
-				}
-				
-				if(isset($mod[1])) {
-					$v = $mod[1];
-
-					if(is_array($v)) {
-						$blobIds = array_merge($blobIds, $v);
-					} else {
-						$blobIds[] = $v;
-					}
-				}
-			}
-		}
-		
-		foreach($blobIds as $id) {
-			Blob::findById($id)->setStaleIfUnused();
-		}
 	}
 
 	/**
@@ -1842,71 +1757,32 @@ abstract class Property extends Model {
 	}
 
 	/**
+	 * Statement for last delete() call.
+	 *
+	 * @var Statement
+	 */
+	public static $lastDeleteStmt;
+
+	/**
 	 * Delete this model
 	 *
 	 * When finding the models to delete in an override use mergeWith():
 	 *
 	 * self::find()->mergeWith($query);
 	 *
-	 * @throws SaveException
 	 */
 	protected static function internalDelete(Query $query): bool
 	{
-
 		$primaryTable = static::getMapping()->getPrimaryTable();
 
-		$blobIds = static::getBlobsToCheckAfterDelete($query);
-		
-		$stmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
-		if(!$stmt->execute()) {			
+		self::$lastDeleteStmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
+		if(!self::$lastDeleteStmt->execute()) {
 			return false;
 		}
-
-		go()->debug("Deleted " . $stmt->rowCount() ." models of type " .static::class);
-
-		if(count($blobIds)) {
-			$blobs = Blob::find()->where('id', '=', $blobIds);
-			foreach($blobs as $blob) {
-				$blob->setStaleIfUnused();
-			}
+		if(go()->getDebugger()->enabled) {
+			go()->debug("Deleted " . self::$lastDeleteStmt->rowCount() . " models of type " . static::class);
 		}
 		return true;
-	}
-
-  /**
-   * @param Query $query
-   * @return array
-   */
-	private static function getBlobsToCheckAfterDelete(Query $query): array
-	{
-		
-		$blobCols = static::getBlobColumns();
-		if(!count($blobCols)) {
-			return [];
-		}
-		$clnQry = clone($query);
-		$clnQry->select([],false); // reset $query in order to prevent ambiguous ID
-
-		$entities = static::internalFind($blobCols)->mergeWith($clnQry);
-
-		$blobIds = [];
-		foreach($entities as $entity) {
-			foreach($blobCols as $c) {
-				if(isset($entity->$c) && !in_array($entity->$c, $blobIds)) {
-
-					$v = $entity->$c;
-
-					if(is_array($v)) {
-						$blobIds = array_merge($blobIds, $v);
-					} else {
-						$blobIds[] = $entity->$c;
-					}
-
-				}
-			}
-		}
-
-		return $blobIds;		
 	}
 
 	private function validateTable(MappedTable $table) {		

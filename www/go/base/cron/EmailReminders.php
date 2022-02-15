@@ -156,7 +156,7 @@ class EmailReminders extends AbstractCron {
 				}
 			}
 
-			go()->getLanguage()->setLanguage(go()->getAuthState()->getUser(['language'])->language);
+			go()->getLanguage()->setLanguage(\GO::user()->language);
 		}
 	}
 	

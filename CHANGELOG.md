@@ -1,3 +1,6 @@
+- Multi instance: Error reporting when (de)activate or login as admin fails
+
+14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog
 - Projects2: Do not empty employee when opening existing time entry
 - Core: UK bank holidays for 2022 - Removed 2020
@@ -7,6 +10,15 @@
 - ActiveSync: sorting on column status works
 - Billing: Fixed expense moving to another book on edit
 - Files: Fixed problem where only 100 files were uploaded when dropping a folder to upload
+- Newsletters: Attachment could dissapear from template when also using inline images
+- Core: refactored blob garbage collection. Blobs are not marked stale on entity save / delete but are all checked on collection run
+- Tasks: Only show started tasks on start page
+- Tasks: Tasklist categories are editable by users with manage permissions for the lists.
+- Tasks: global categories are editable if you have mayChangeCategories for the module
+- Newsletters: Listing of users gave error "unsupportedFilter"
+- Custom fields: Field condition didn't work for type "Select"
+- Tickets: Added template variable {ticket:rateHours} The total amount in hours spent on the ticket
+- Core: Keep scroll position when changing modules
 
 07-02-2022 6.6.42
 - Core: Debian package dependencies change. Makes it possible to install without mysql and apache.
@@ -125,6 +137,8 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+14-02-2022 6.5.102
+- Core: UK bank holidays 2022 overrides
 - ActiveSync: sorting on column status works
 - Billing: Fixed expense moving to another book on edit
 - Files: Fixed problem where only 100 files were uploaded when dropping a folder to upload

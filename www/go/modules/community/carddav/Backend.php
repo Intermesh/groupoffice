@@ -222,7 +222,6 @@ class Backend extends AbstractBackend {
 		
 		if(!$blob || $blob->modifiedAt < $contact->modifiedAt) {
 			//blob won't be deleted if still used
-			$blob->setStaleIfUnused();
 			$c = new VCard();
 			$cardData = $c->export($contact);			
 			$blob = $this->createBlob($contact, $cardData);
@@ -261,7 +260,6 @@ class Backend extends AbstractBackend {
 			$blob = $this->createBlob($contact, $cardData);
 			
 			if(!$contact->save()) {
-				$blob->setStaleIfUnused();
 				throw new Exception("Could not save contact");
 			}
 		}
@@ -336,9 +334,7 @@ class Backend extends AbstractBackend {
 			$c->import($vcardComponent, $contact);
 			
 		} catch(Exception $e) {
-			ErrorHandler::logException($e);		
-			
-			$blob->setStaleIfUnused();			
+			ErrorHandler::logException($e);
 			
 			return null;
 		}
