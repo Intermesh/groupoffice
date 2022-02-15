@@ -19,6 +19,7 @@ use go\core\orm\EntityType;
 use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use go\modules\business\contracts\model\Contract;
 use go\modules\community\comments\model\Comment;
 
 /**
@@ -273,10 +274,17 @@ class Link extends AclItemEntity
 	/**
 	 * Find all links for a given entity
 	 *
+	 * @example Find first linked contract
+	 *
+	 * ```
+	 * $contract = core\model\Link::findLinks($document)->andWhere('toEntityTypeId', '=', Contract::entityType()->getId())-single();
+	 * ```
+	 *
 	 * @param Entity|ActiveRecord $a
-	 * @return Link[]
+	 * @return Query|Link[]
+	 * @throws Exception
 	 */
-	public static function findLinks($a) {
+	public static function findLinks($a) : Query {
 		return Link::find()->where([
 			'fromEntityTypeId' => $a->entityType()->getId(),
 			'fromId' => $a->id
