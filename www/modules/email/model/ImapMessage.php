@@ -705,24 +705,8 @@ class ImapMessage extends ComposerMessage {
 		if(count($atts) === 0) {
 			return false;
 		}
-		$str = '';
-		while ($att = array_shift($atts)) {
-			if ($att->disposition == 'attachment' || empty($att->content_id)) {
-				$str .= '<hr/>'.
-					'Deleted: ' . $att->name .'<br/>'.
-					'<hr/>' .
-					'You deleted an attachment from this message. The original MIME headers for the attachment were:<br/>'.
-					'Content-Type: ' . $att->mime . '; name="'.$att->name . '"<br/>' .
-					'Content-Disposition: '. $att->disposition . '; filename="'.$att->name . '"<br/>' .
-					'Content-Transfer-Encoding: ' . $att->encoding . '<br/>';
-				if(isset($this->content_id)) {
-					$str .= 'Content-ID: ' . $att->content_id . '<br/>' .
-						'X-Attachment-Id:' . $att->content_id ;
-				}
 
-			}
-		}
-
+		$bIsPlain = !$this->_htmlParts['text_found'];
 		$swiftMsg = new \Swift_Message();
 		$swiftMsg->setTo($this->to->getAddresses());
 		$swiftMsg->setFrom($this->from->getAddresses());
@@ -731,20 +715,60 @@ class ImapMessage extends ComposerMessage {
 		$swiftMsg->setSubject($this->subject);
 		$swiftMsg->setDate(new DateTime($this->date));
 		$swiftMsg->setContentType($this->content_type);
-//		$swiftMsg->setEncoder($this->content_transfer_encoding);
-		if($this->getHtmlBody()) {
+		if(!$bIsPlain) {
 			$swiftMsg->setBody($this->getHtmlBody(), 'text/html');
-			$swiftMsg->addPart($str, 'text/html');
 		} else {
 			$swiftMsg->setBody($this->getPlainBody(), 'text/plain');
-			$swiftMsg->addPart($str, 'text/plain');
+		}
+		while ($att = array_shift($atts)) {
+			if ($att->disposition == 'attachment' || empty($att->content_id)) {
+				$str = $this->addPartString($att, $bIsPlain);
+				$swiftMsg->addPart($str, ($bIsPlain ? 'text/plain' : 'text/html'));
+			}
 		}
 
 		$this->getImapConnection()->append_message($this->mailbox, $swiftMsg, '\Seen');
 
 		return true;
 	}
-	
+
+
+	/**
+	 * @param ImapMessageAttachment $att
+	 * @param bool $bIsPlain
+	 * @return string
+	 */
+	private function addPartString(ImapMessageAttachment $att, bool $bIsPlain): string
+	{
+		$str = '';
+		if($bIsPlain) {
+			$str .= "--\r\n" .
+				"Deleted: " . $att->name . "\r\n" .
+				"--\r\n" .
+				"You deleted an attachment from this message. The original MIME headers for the attachment were:\r\n" .
+				"Content-Type: " . $att->mime . "; name=\"" . $att->name . "\"\r\n" .
+				"Content-Disposition: " . $att->disposition . "; filename=\"" . $att->name . "\"\r\n" .
+				"Content-Transfer-Encoding: " . $att->encoding;
+
+		} else {
+			$str .= '<hr/>' .
+				'Deleted: ' . $att->name . '<br>' .
+				'<hr/>' .
+				'You deleted an attachment from this message. The original MIME headers for the attachment were:<br>' .
+				'Content-Type: ' . $att->mime . '; name="' . $att->name . '"<br>' .
+				'Content-Disposition: ' . $att->disposition . '; filename="' . $att->name . '"<br>' .
+				'Content-Transfer-Encoding: ' . $att->encoding;
+		}
+		if (isset($this->content_id)) {
+			$str .= '<br>Content-ID: ' . $att->content_id . '<br>' .
+				'X-Attachment-Id:' . $att->content_id;
+			$str .= "\r\nContent-ID: " . $att->content_id . "\r\n" .
+				"X-Attachment-Id: " . $att->content_id;
+		}
+		return $str;
+	}
+
+
 	/**
 	 * Returns an array with linked item objects.
 	 */

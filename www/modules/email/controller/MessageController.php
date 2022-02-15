@@ -2297,23 +2297,30 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			return $response;
 	}
 
+	/**
+	 * Delete all attachments from current email message
+	 *
+	 * @param array $params
+	 * @return bool[]
+	 * @throws AccessDenied
+	 */
 	protected function actionDeleteAllAttachments(array $params): array
 	{
 		$account = Account::model()->findByPk($params['account_id']);
-
+		$response = ['success' => true];
 		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
-		if($message->deleteAttachments()) {
-			// Delete original message, expunge
+		if ($message->deleteAttachments()) {
 			$message->delete();
 			$message->getImapConnection()->expunge();
+			$response['uid'] = $message->getImapConnection()->get_uidnext();
 		}
-		return ['success' =>  true];
+
+		return $response;
 	}
 
 	protected function actionZipAllAttachments(array $params){
 
 		$account = Account::model()->findByPk($params['account_id']);
-		//$imap  = $account->openImapConnection($params['mailbox']);
 
 		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
 
