@@ -110,17 +110,19 @@ abstract class EntityController extends Controller {
 		
 		$cls::sort($query, $sort);
 
-		if(!empty($query->getGroupBy())) {
-			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
-			$keys = $cls::getPrimaryKey();
-			$pkSort = [];
-			foreach($keys as $key) {
-				if(!isset($sort[$key])) {
-					$pkSort[$key] = 'ASC';
-				}
-			}
-			$query->orderBy($pkSort, true);
-		}
+		// MS: this messes up sort for invoices by date. Can't remember
+		// why this was needed before. I expect somthing to break with this removed!
+//		if(!empty($query->getGroupBy())) {
+//			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
+//			$keys = $cls::getPrimaryKey();
+//			$pkSort = [];
+//			foreach($keys as $key) {
+//				if(!isset($sort[$key])) {
+//					$pkSort[$key] = 'ASC';
+//				}
+//			}
+//			$query->orderBy($pkSort, true);
+//		}
 
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
 
