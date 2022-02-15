@@ -162,6 +162,8 @@ class TemplateParser {
 		$this->addFilter('date', [$this, "filterDate"]);		
 		$this->addFilter('number', [$this, "filterNumber"]);
 		$this->addFilter('filter', [$this, "filterFilter"]);
+		$this->addFilter('sort', [$this, "filterSort"]);
+		$this->addFilter('rsort', [$this, "filterRsort"]);
 		$this->addFilter('count', [$this, "filterCount"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
 		$this->addFilter('column', [$this, "filterColumn"]);
@@ -241,6 +243,42 @@ class TemplateParser {
 		return array_filter($array, function($i) use($propValue, $propName){
 			return $i->$propName == $propValue;
 		});
+	}
+
+	private function filterSort(?array $array, string $propName, $propValue = null): ?array
+	{
+		if(!isset($array)) {
+			return null;
+		}
+
+		return $this->internalFilterSort($array, $propName, $propValue, false);
+
+	}
+
+
+	private function internalFilterSort(array $array, string $propName, $propValue, bool $reverse) : array {
+
+		usort($array, function($a, $b) use ($propValue, $propName, $reverse) {
+
+			$first = $reverse ? $b : $a;
+			$second = $reverse ? $a : $b;
+
+			if(isset($propValue)) {
+				return ($first->$propName == $propValue) <=> ($second->$propName == $propValue);
+			}
+			return ($first->$propName <=> $second->$propName);
+		});
+
+		return $array;
+	}
+
+	private function filterRsort(?array $array, string $propName, $propValue = null): ?array
+	{
+		if(!isset($array)) {
+			return null;
+		}
+
+		return $this->internalFilterSort($array, $propName, $propValue, true);
 	}
 
 	private function filterColumn($array, $propName): ?array
