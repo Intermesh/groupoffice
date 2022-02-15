@@ -187,7 +187,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 												//reloads combo when trigger is clicked
 												delete categories.comboBox.lastQuery;
 											}
-										}
+										},
 										value: go.User.tasksSettings.defaultTasklistId,
 										allowBlank: false
 									})
