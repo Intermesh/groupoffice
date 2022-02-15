@@ -658,7 +658,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 *
 	 * @param entity
 	 * @param {string} id
-	 * @returns {Promise}
+	 * @returns {Promise<Entity>}
 	 */
 	save : function(entity, id) {
 		let p = {}, op;
