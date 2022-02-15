@@ -277,7 +277,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					xtype: 'tbtitle',
 					text: t('Categories')
 				}, '->', {
-					hidden: !go.Modules.get("community", 'tasks').userRights.mayChangeCategories,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {

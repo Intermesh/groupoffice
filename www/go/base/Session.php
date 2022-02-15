@@ -236,7 +236,10 @@ class Session extends Observable{
 		if(empty($this->values['user_id'])){
 			// Check Bearer token before returning null
 			$state = go()->getAuthState();
-			if($state && !empty($state->getUserId())) {
+			if(!$state) {
+				$state = new \go\core\jmap\State();
+			}
+			if(!empty($state->getUserId())) {
 				$this->values['user_id'] = $state->getUserId();
 				return Model\User::model()->findByPk($state->getUserId(), array(), true);
 			}

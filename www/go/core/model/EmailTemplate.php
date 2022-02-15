@@ -158,9 +158,9 @@ class EmailTemplate extends AclOwnerEntity
 		$array =  parent::toArray($properties);
 
 		if(isset($array['attachments'])) {
-			$array['attachments'] = array_filter($array['attachments'], function($a) {
+			$array['attachments'] = array_values(array_filter($array['attachments'], function($a) {
 				return $a['attachment'] == true;
-			});
+			}));
 		}
 
 		return $array;

@@ -36,7 +36,7 @@ GO.zpushadmin.DevicesGrid = Ext.extend(GO.grid.GridPanel,{
 				columns:[
 				{
 					header: t("Status", "zpushadmin"),
-					dataIndex: 'new',
+					dataIndex: 'can_connect',
 					sortable: true,
 					renderer: this.statusRenderer,
 					width:100

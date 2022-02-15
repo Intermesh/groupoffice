@@ -1,17 +1,9 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 namespace go\core\orm;
 
 use Exception;
-use GO\Base\Db\ActiveRecord;
-use go\core\App;
 use go\core\customfield\Html;
-use go\core\customfield\TextArea;
-use go\core\db\Query;
-use go\core\db\Table;
-use go\core\db\Utils;
-use go\core\Installer;
-use go\core\util\DateTime;
-use go\core\validate\ErrorCode;
 use go\core\model\Field;
 use PDOException;
 use go\core\util\JSON;
@@ -38,11 +30,12 @@ trait CustomFieldsTrait {
   /**
    * Get all custom fields data for an entity
    *
-   * @param bool $asText Returns all values printable as text. Useful for templates and exports.
-   * @return array
+   * @param bool|null $asText Returns all values printable as text. Useful for templates and exports.
+   * @return CustomFieldsModel
    * @throws Exception
    */
-	public function getCustomFields($asText = null) {
+	public function getCustomFields(bool $asText = null): CustomFieldsModel
+	{
 
 		if(!isset($asText)) {
 			$asText = $this->returnAsText;
@@ -60,10 +53,11 @@ trait CustomFieldsTrait {
   /**
    * Setter for legacy modules
    *
-   * @param $json
+   * @param string $json
    * @throws Exception
+   * @noinspection PhpUnused
    */
-	public function setCustomFieldsJSON($json) {
+	public function setCustomFieldsJSON(string $json) : void {
 		$data = JSON::decode($json, true);
 		$this->setCustomFields($data);
 	}
@@ -71,9 +65,9 @@ trait CustomFieldsTrait {
 	/**
 	 * Get the old custom fields data. Returns null if they were never modified.
 	 *
-	 * @return null|[]
+	 * @return null|array
 	 */
-	public function oldCustomFields() {
+	public function oldCustomFields() : ?array {
 		return $this->oldCustomFieldsData;
 	}
 
@@ -83,7 +77,8 @@ trait CustomFieldsTrait {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getModifiedCustomFields() {
+	public function getModifiedCustomFields(): array
+	{
 		if(!$this->isCustomFieldsModified()) {
 			return [];
 		}
@@ -115,8 +110,9 @@ trait CustomFieldsTrait {
 	 * @param bool $asText
 	 * @return $this
 	 * @throws Exception
+	 * @noinspection PhpMissingReturnTypeInspection
 	 */
-	public function setCustomFields($data, $asText = false)
+	public function setCustomFields($data, bool $asText = false)
 	{
 		$this->getCustomFields($asText)->setValues($data);
 
@@ -131,19 +127,23 @@ trait CustomFieldsTrait {
    * @param bool $asText
    * @return $this
    * @throws Exception
+   * @noinspection PhpMissingReturnTypeInspection
    */
-	public function setCustomField($name, $value, $asText = false) {
+	public function setCustomField(string $name, $value, bool $asText = false)
+	{
 		return $this->setCustomFields([$name => $value], $asText);
 	}
 	
 	private static $customFieldModels;
-	
+
 	/**
 	 * Check if custom fields are modified
-	 * 
+	 *
 	 * @return bool
+	 * @throws Exception
 	 */
-	public function isCustomFieldsModified() {
+	public function isCustomFieldsModified(): bool
+	{
 		return isset($this->customFieldsModel) && $this->getCustomFields()->isModified();
 	}
 
@@ -153,7 +153,8 @@ trait CustomFieldsTrait {
    * @return Field[]
    * @throws Exception
    */
-	public static function getCustomFieldModels() {
+	public static function getCustomFieldModels(): array
+	{
 		$cacheKey = 'custom-field-models-' . static::customFieldsEntityType()->getId();
 	 	$m = go()->getCache()->get($cacheKey);
 		if($m === null) {
@@ -177,7 +178,8 @@ trait CustomFieldsTrait {
    * @throws PDOException
    * @throws Exception
    */
-	public function saveCustomFields() {
+	public function saveCustomFields(): bool
+	{
 		if(!isset($this->customFieldsModel) ) {
 			return true;
 		}
@@ -190,7 +192,8 @@ trait CustomFieldsTrait {
    * @return string
    * @throws Exception
    */
-	public static function customFieldsTableName() {
+	public static function customFieldsTableName(): string
+	{
 
 		if(isset(self::$customFieldsTableName)) {
 			return self::$customFieldsTableName;
@@ -228,7 +231,8 @@ trait CustomFieldsTrait {
 	 * 
 	 * @return EntityType
 	 */
-	public static function customFieldsEntityType() {
+	public static function customFieldsEntityType(): EntityType
+	{
 		return static::entityType();
 	}
 
@@ -250,7 +254,10 @@ trait CustomFieldsTrait {
 	}
 
 
-	protected function getCustomFieldsSearchKeywords()
+	/**
+	 * @throws Exception
+	 */
+	protected function getCustomFieldsSearchKeywords(): array
 	{
 		$keywords = [];
 
@@ -266,20 +273,12 @@ trait CustomFieldsTrait {
 
 			if (is_array($v)) {
 				foreach ($v as $i) {
-					if (!empty($v) && is_string($v)) {
-						$keywords[] = $v;
+					if (!empty($i) && is_string($i)) {
+						$keywords[] = $i;
 					}
 				}
 			} else if (!empty($v) && is_string($v)) {
-
-//				$split = $field->getDataType() instanceof TextArea;
-//
-//				if ($split) {
-//					$keywords = array_merge($keywords, SearchableTrait::splitTextKeywords($v));
-//				} else {
-					$keywords[] = $v;
-//				}
-
+				$keywords[] = $v;
 			}
 		}
 

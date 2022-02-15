@@ -1,12 +1,11 @@
 <?php
 namespace go\core\orm;
 
+use DateInterval;
 use Exception;
-use Closure;
 use go\core\db\Criteria;
 use go\core\jmap\exception\UnsupportedFilter;
 use go\core\util\DateTime;
-use go\modules\community\test\model\C;
 
 /**
  * Filters
@@ -33,7 +32,8 @@ class Filters {
 	 * 
 	 * @return $this
 	 */
-	public function add($name, $fn, $default = self::NO_DEFAULT) {
+	public function add(string $name, callable $fn, $default = self::NO_DEFAULT): Filters
+	{
 		$this->filters[strtolower($name)] = ['type' => 'generic', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
@@ -50,10 +50,11 @@ class Filters {
 	 *  $c->andWhere('businessId', $value);
 	 * });
 	 * ```
-	 * @param $name
+	 * @param string $name
 	 * @return $this
 	 */
-	public function addColumn($name) {
+	public function addColumn(string $name): Filters
+	{
 		return $this->add($name, function(Criteria  $c, $value) use ($name) {
 			$c->andWhere($name, '=', $value);
 		});
@@ -66,6 +67,9 @@ class Filters {
 	// 	}
 	// }
 
+	/**
+	 * @throws Exception
+	 */
 	private function applyDefaults(Query $query, Criteria $criteria) {
 
 		$f = [];
@@ -92,9 +96,11 @@ class Filters {
 	/**
 	 * Check if filter was used by last apply() call
 	 *
+	 * @param string $name
 	 * @return boolean
 	 */
-	public function isUsed($name) {
+	public function isUsed(string $name): bool
+	{
 		return in_array(strtolower($name), $this->usedFilters);
 	}
 
@@ -103,11 +109,11 @@ class Filters {
 	 *
 	 * @param Query $query
 	 * @param array $filter
-	 * @param Criteria|null $criteria
 	 * @return Filters
 	 * @throws Exception
 	 */
-	public function apply(Query $query, array $filter)  {
+	public function apply(Query $query, array $filter): Filters
+	{
 		//keep track of used filters because they can be nested in sub conditions
 		$this->usedFilters = [];
 		$criteria = new Criteria();
@@ -123,7 +129,11 @@ class Filters {
 		return $this;
 	}
 
-	private function internalApply(Query $query, array $filter, Criteria $criteria) {
+	/**
+	 * @throws Exception
+	 */
+	private function internalApply(Query $query, array $filter, Criteria $criteria): void
+	{
 		if(isset($filter['conditions']) && isset($filter['operator'])) { // is FilterOperator
 
 			foreach($filter['conditions'] as $condition) {
@@ -160,7 +170,6 @@ class Filters {
 			}
 		}
 
-		return $this;
 	}
 
   /**
@@ -232,12 +241,13 @@ class Filters {
 	 * Supports ranges 1..4 between 1 and 4 and >=, <> != = operators
 	 * 
 	 * @param string $name
-	 * @param Closure $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
+	 * @param Callable $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
 	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
 	 * 
 	 * @return $this
 	 */
-	public function addNumber($name, $fn, $default = self::NO_DEFAULT) {
+	public function addNumber(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
+	{
 		$this->filters[strtolower($name)] = ['type' => 'number', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
@@ -250,19 +260,20 @@ class Filters {
 	 * 
 	 * Values are converted to DateTime objects. Supports all strtotime formats as input.
 	 *
-	 * @example
+	 * @param string $name
+	 * @param Callable $fn Called with: Criteria $criteria, $comparator, DateTime $value, Query $query, array $filters
+	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
+	 *
+	 * @return $this
+	 *@example
 	 *
 	 * ->addDate('date',function(Criteria $criteria, $comparator, $value){
 	 * 	$criteria->where('date', $comparator, $value);
 	 * })
-	 * 
-	 * @param string $name
-	 * @param Closure $fn Called with: Criteria $criteria, $comparator, DateTime $value, Query $query, array $filters
-	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
-	 * 
-	 * @return $this
+	 *
 	 */
-	public function addDate($name, $fn, $default = self::NO_DEFAULT) {
+	public function addDate(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
+	{
 		$this->filters[strtolower($name)] = ['type' => 'date', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
@@ -274,12 +285,13 @@ class Filters {
 	 * Comparator will be LIKE
 	 * 
 	 * @param string $name
-	 * @param Closure $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
+	 * @param Callable $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
 	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
 	 * 
 	 * @return $this
 	 */
-	public function addText($name, $fn, $default = self::NO_DEFAULT) {
+	public function addText(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
+	{
 		$this->filters[strtolower($name)] = ['type' => 'text', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
@@ -288,14 +300,16 @@ class Filters {
 	/**
 	 * Check if a filter is already defined.
 	 *
-	 * @param $name
+	 * @param string $name
 	 * @return bool
 	 */
-	public function hasFilter($name) {
+	public function hasFilter(string $name): bool
+	{
 		return isset($this->filters[strtolower($name)]);
 	}
 	
-	public static function parseNumericValue($value) {
+	public static function parseNumericValue($value): array
+	{
 		$regex = '/\s*(>=|<=|>|<|!=|<>|=)\s*(.*)/';
 		if(preg_match($regex, $value, $matches)) {
 			list(,$comparator, $v) = $matches;
@@ -326,14 +340,17 @@ class Filters {
 	// 			['comparator' => $comparator == '=' ? 'LIKE' : 'NOT LIKE', 'query' => $v]
 	// 	];
 	// }
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function checkRange($value) {
 		//Operators >, <, =, !=,
 		//Range ..
 		
 		$parts = array_map('trim', explode('..', $value));
 		if(count($parts) > 2) {
-			throw new \Exception("Invalid range. Only one .. allowed");
+			throw new Exception("Invalid range. Only one .. allowed");
 		}
 		
 		if(count($parts) == 1) {
@@ -344,13 +361,16 @@ class Filters {
 		return $parts;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function checkDateRange($value) {
 		//Operators >, <, =, !=,
 		//Range ..
 
 		$parts = array_map('trim', explode('..', $value));
 		if(count($parts) > 2) {
-			throw new \Exception("Invalid range. Only one .. allowed");
+			throw new Exception("Invalid range. Only one .. allowed");
 		}
 
 		if(count($parts) == 1) {
@@ -364,7 +384,7 @@ class Filters {
 		$parts[1] = new DateTime($parts[1]);
 		$parts['endHasTime'] = $endHasTime;
 		if(!$endHasTime) {
-			$parts[1]->add(new \DateInterval("P1D"));
+			$parts[1]->add(new DateInterval("P1D"));
 		}
 
 		return $parts;

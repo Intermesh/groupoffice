@@ -27,9 +27,10 @@ go.login.DomainCombo = Ext.extend(GO.form.ComboBoxReset, {
 			}));
 
 			this.setVisible(u.session.auth.domains.length > 0);
-
 			//needed for trigger rendering issue
-			this.onResize();
+			if(this.rendered) {
+				this.onResize();
+			}
 		});
 	}
 		
