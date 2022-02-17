@@ -40,7 +40,6 @@
     "lcobucci/jwt": "^3.4.0",
     "firebase/php-jwt": "^5.2",
     "donatj/phpuseragentparser": "^1.4",
-    "fzaninotto/faker": "^1.9",
     "league/oauth2-google": "^4.0",
     "fakerphp/faker": "^1.19",
     "ext-fileinfo": "*"
