@@ -3,6 +3,8 @@
 namespace go\core\model;
 
 use go\core\acl\model\AclOwnerEntity;
+use go\core\orm\Entity;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
@@ -139,11 +141,10 @@ class FieldSet extends AclOwnerEntity {
 	 * @param string $name
 	 * @return Query
 	 */
-	public static function findByEntity($name) {
+	public static function findByEntity(string $name) : Query {
 		$e = \go\core\orm\EntityType::findByName($name);
 		$entityTypeId = $e->getId();
 		return static::find()->where(['entityId' => $entityTypeId]);
 	}
-
 
 }

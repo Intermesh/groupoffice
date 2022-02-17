@@ -18,6 +18,7 @@ use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\exception\ConfigurationException;
+use go\core\exception\NotFound;
 use go\core\Installer;
 use go\core\mail\Message;
 use go\core\mail\Util;
@@ -1268,5 +1269,34 @@ class User extends Entity {
 		}
 
 		return Token::delete($query) && RememberMe::delete($query);
+	}
+
+
+	public static function findOrCreateByUsername(string $username, string $email, string $displayName, array $values = [], array $properties = []) : User {
+
+		$user = User::find($properties)
+			->where(['username' => $username])
+			->orWhere(['email' => $email])
+			->single();
+		if (!$user) {
+
+			if(!go()->getSettings()->allowRegistration) {
+				throw new NotFound("User not found");
+			}
+
+			$user = new User();
+			$user->setValues($values);
+			$user->username = $username;
+			$user->email = $email;
+			$user->displayName = $displayName;
+			if(!isset($user->recoveryEmail)) {
+				$user->recoveryEmail = $email;
+			}
+			if (!$user->save()) {
+				throw new SaveException($user);
+			}
+		}
+
+		return $user;
 	}
 }

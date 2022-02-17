@@ -2272,15 +2272,26 @@ abstract class Property extends Model {
 	}
 
   /**
-   * Copy the property.
+   * Copy the property or entity.
    *
    * The property will not be saved to the database.
    * The primary key values will not be copied.
    *
-   * @return $this
-   * @throws Exception
-   */
-	protected function internalCopy(): Property
+   * @example
+   * $sourceAcl = \go\core\model\Acl::findById($type->acl_id);
+   * $newAcl = $sourceAcl->copy();
+   *
+   * @example Copy relation array
+   * $sourceAcl = \go\core\model\Acl::findById($type->acl_id);
+   * $targetAcl = $tasklist->findAcl();
+   * $targetAcl->groups = array_map(function($g) {
+   * 	return $g->copy;
+   * }, $sourceAcl->groups);
+	 *
+	 * @return static
+	 * @throws Exception
+	 */
+	public function copy(): Property
 	{
 
 		if($this instanceof Entity) {
@@ -2304,10 +2315,10 @@ abstract class Property extends Model {
 				if($rel) {
 					if(is_array($this->$name)) {
 						foreach($this->$name as $key => $value) {
-							$copy->$name[$key] = $value instanceof self ? $value->internalCopy() : $value;
+							$copy->$name[$key] = $value instanceof self ? $value->copy() : $value;
 						}
 					} else{
-						$copy->$name = $this->$name instanceof self ? $this->$name->internalCopy() : $this->$name;
+						$copy->$name = $this->$name instanceof self ? $this->$name->copy() : $this->$name;
 					}
 				}
 			}

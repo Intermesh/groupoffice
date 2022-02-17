@@ -4819,10 +4819,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Copy links from this model to the target model.
 	 *
-	 * @param ActiveRecord $targetModel
+	 * @param ActiveRecord|Entity $targetModel
 	 */
-	public function copyLinks(ActiveRecord $targetModel){
-		if(!$this->hasLinks() || !$targetModel->hasLinks())
+	public function copyLinks($targetModel){
+		if(!$this->hasLinks() || ($targetModel instanceof ActiveRecord && !$targetModel->hasLinks()))
 			return false;
 
 		$links = Link::findLinks($this);

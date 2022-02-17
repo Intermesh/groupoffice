@@ -409,7 +409,8 @@ class Field extends AclItemEntity {
    * @return static
    * @throws Exception
    */
-	public static function create($entity, $fieldSetName, $databaseName, $name, $type = 'Text', $values = []) {
+	public static function create(string $entity, string $fieldSetName, string $databaseName, string $name, string $type = 'Text', array $values = []): Field
+	{
 		$field = Field::findByEntity($entity)->where(['databaseName' => $databaseName])->single();
 
 		if($field) {
