@@ -644,7 +644,7 @@ abstract class EntityController extends Controller {
 		$result['newState'] = $this->getState();
 
 
-		static::fireEvent(self::EVENT_SET, $this, $p);
+		static::fireEvent(self::EVENT_SET, $this, $p, $result);
 
 		return $result;
 	}
