@@ -47,6 +47,8 @@ GO.files.FilesContextMenu = function(config)
 		text: t("Save as PDF"),
 		handler: function () {
 
+			this.getEl().mask(t("Loading..."));
+
 			GO.request({
 				maskEl: Ext.getBody(),
 				url: 'files/file/convert',
@@ -55,11 +57,16 @@ GO.files.FilesContextMenu = function(config)
 					format: 'pdf',
 				},
 				success: function (action, response, result) {
+					this.getEl().unmask();
 					var filesModule = GO.mainLayout.getModulePanel('files');
 					if (filesModule && filesModule.gridStore){
 						filesModule.gridStore.reload();
 					}
-				}
+				},
+				fail: function() {
+					this.getEl().unmask();
+				},
+				scope: this
 			});
 		},
 		scope: this
