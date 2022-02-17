@@ -1,6 +1,7 @@
 - Core: archive disabled user; remove archived user from project templates
 - Multi instance: Error reporting when (de)activate or login as admin fails
 - Fileconvertor: Added convertio.co api
+- Email: Added option to remove all attachments
 
 14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog
