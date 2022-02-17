@@ -1160,6 +1160,10 @@ class User extends Entity {
 			}
 		}
 
+		if (Module::isInstalled("legacy", "projects2")) {
+			go()->getDbConnection()->delete('pr2_default_resources', ['user_id' => $this->id] )->execute();
+		}
+
 		$grpId = $this->getPersonalGroup()->id();
 		foreach (Acl::findByIds($aclIds) as $rec) {
 			foreach ($rec->groups as $aclGrp) {

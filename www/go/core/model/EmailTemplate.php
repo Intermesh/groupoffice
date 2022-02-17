@@ -10,7 +10,6 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\TemplateParser;
 use go\core\validate\ErrorCode;
-use go\modules\community\addressbook\model\EmailAddress;
 use Swift_Attachment;
 use Swift_EmbeddedFile;
 

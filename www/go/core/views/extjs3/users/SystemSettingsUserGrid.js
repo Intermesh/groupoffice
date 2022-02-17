@@ -342,7 +342,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 
 					var archiveItm  = menu.find('itemId','archive'), loginItm = menu.find('itemId', 'loginAs');
 					if(archiveItm.length > 0) {
-						archiveItm[0].setDisabled(!record.data.enabled || !go.Modules.get("core", "core").userRights.mayChangeUsers);
+						archiveItm[0].setDisabled( !go.Modules.get("core", "core").userRights.mayChangeUsers );
 					}
 					if(loginItm.length > 0 ) {
 						loginItm[0].setDisabled(!record.data.enabled || !go.User.isAdmin);

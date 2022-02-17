@@ -264,18 +264,6 @@ class Message extends \Swift_Message{
 		if(GO::config()->swift_email_body_force_to_base64) {
 			$part->setEncoder(new \Swift_Mime_ContentEncoder_Base64ContentEncoder());
 		}
-			
-//	Was testing this but didn't seem to work		
-//			$plainTextPart = $this->findPlainTextBody();
-//		if(!$plainTextPart) {
-//			$part= $this->addPart($htmlToText->get_text(), 'text/plain','UTF-8');
-//			//Override qupted-prinatble encdoding with base64 because it uses much less memory on larger bodies. See also:
-//			//https://github.com/swiftmailer/swiftmailer/issues/356
-//			$part->setEncoder(new \Swift_Mime_ContentEncoder_Base64ContentEncoder());
-//		}else
-//		{
-//			$plainTextPart->setBody($htmlToText->get_text());
-//		}
 		
 		return $this;
 	}

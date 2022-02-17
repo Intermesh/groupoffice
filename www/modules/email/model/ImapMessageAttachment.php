@@ -19,123 +19,122 @@
 
 namespace GO\Email\Model;
 
+use GO\Base\Fs\Folder;
+use GO\Base\Fs\File;
 
-class ImapMessageAttachment extends MessageAttachment{
+class ImapMessageAttachment extends MessageAttachment
+{
 
 	/**
 	 *
-	 * @var Account 
+	 * @var Account
 	 */
 	public $account;
 	public $mailbox;
 	public $uid;
-	
+
 	public $charset;
-	
+
 	private $_tmpDir;
-	
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * Every child of this class must override it.
-	 * 
-	 * @return ImapMessageAttachment the static model class
+	 *
+	 * @return MessageAttachment the static model class
 	 */
-	public static function model($className=__CLASS__)
-	{		
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
-	
-	public function setImapParams(Account $account, $mailbox, $uid){
-		$this->account=$account;
-		$this->mailbox=$mailbox;
-		$this->uid=$uid;
+
+	public function setImapParams(Account $account, $mailbox, $uid)
+	{
+		$this->account = $account;
+		$this->mailbox = $mailbox;
+		$this->uid = $uid;
 	}
-	
-	public function getTempDir(){
-		$this->_tmpDir=\GO::config()->tmpdir.'imap_messages/'.$this->account->id.'-'.$this->mailbox.'-'.$this->uid.'/';
-		if(!is_dir($this->_tmpDir))
+
+	public function getTempDir(): string
+	{
+		$this->_tmpDir = \GO::config()->tmpdir . 'imap_messages/' . $this->account->id . '-' . $this->mailbox . '-' . $this->uid . '/';
+		if (!is_dir($this->_tmpDir)) {
 			mkdir($this->_tmpDir, 0700, true);
+		}
 		return $this->_tmpDir;
 	}
-	
+
 	/**
-	 * 
-	 * @param \GO\Base\Fs\Folder $targetFolder
+	 *
+	 * @param Folder $targetFolder
 	 * @param string $filename Optional
-	 * @return type
+	 * @return
 	 */
-	public function saveToFile(\GO\Base\Fs\Folder $targetFolder, $filename=null){
-		
-		if(!isset($filename)) {
+	public function saveToFile(Folder $targetFolder, $filename = null): File
+	{
+		if (!isset($filename)) {
 			$filename = $this->name;
-		} 
-		
-		$path =$targetFolder->createChild($filename)->path();
-		
+		}
+
+		$path = $targetFolder->createChild($filename)->path();
+
 		$imap = $this->account->openImapConnection($this->mailbox);
-		return $imap->save_to_file($this->uid, $path,  $this->number, $this->encoding, true);
+		return $imap->save_to_file($this->uid, $path, $this->number, $this->encoding, true);
 	}
-	
-	public function createTempFile() {
-		
-		if(!$this->hasTempFile()){
-			
-			$tmpFile = new \GO\Base\Fs\File($this->getTempDir().\GO\Base\Fs\File::stripInvalidChars($this->name));	
-//			This fix for duplicate filenames in forwards caused screwed up attachment names!
-//			A possible new fix should be made in ImapMessage->getAttachments()
-//			
-//			$file = new \GO\Base\Fs\File($this->name);
-//			$tmpFile = new \GO\Base\Fs\File($this->getTempDir().uniqid(time()).'.'.$file->extension());
-			if(!$tmpFile->exists()){
+
+	public function createTempFile()
+	{
+		if (!$this->hasTempFile()) {
+			$tmpFile = new File($this->getTempDir() . File::stripInvalidChars($this->name));
+			if (!$tmpFile->exists()) {
 				$imap = $this->account->openImapConnection($this->mailbox);
-				$imap->save_to_file($this->uid, $tmpFile->path(),  $this->number, $this->encoding, true);
+				$imap->save_to_file($this->uid, $tmpFile->path(), $this->number, $this->encoding, true);
 			}
 			$this->setTempFile($tmpFile);
 			$this->size = $tmpFile->size();
 		}
-		
+
 		return $this->getTempFile();
 	}
-	
-	public function getEstimatedSize() {
-		if($this->hasTempFile()) {
+
+	public function getEstimatedSize(): float
+	{
+		if ($this->hasTempFile()) {
 			return $this->size;
 		}
-		
+
 		return parent::getEstimatedSize();
 	}
-	
-	public function getData() {		
+
+	public function getData()
+	{
 		$imap = $this->account->openImapConnection($this->mailbox);
-		return $imap->get_message_part_decoded($this->uid, $this->number,$this->encoding, $this->charset,true,false);
+		return $imap->get_message_part_decoded($this->uid, $this->number, $this->encoding, $this->charset, true, false);
 	}
-	
-	public function getUrl(){
-		
-		if($this->hasTempFile()){
+
+	/**
+	 * @return string
+	 */
+	public function getUrl(): string
+	{
+		if ($this->hasTempFile()) {
 			return parent::getUrl();
-		}else
-		{
+		} else {
 			$params = array(
-					"account_id"=>$this->account->id,
-					"mailbox"=>$this->mailbox,
-					"uid"=>$this->uid,
-					"number"=>$this->number,				
-					"encoding"=>$this->encoding,
-					"filename"=>$this->name
+				"account_id" => $this->account->id,
+				"mailbox" => $this->mailbox,
+				"uid" => $this->uid,
+				"number" => $this->number,
+				"encoding" => $this->encoding,
+				"filename" => $this->name
 			);
 		}
-		
-		$nameArr = explode('.',$this->name);
-		
-//		if (\GO::modules()->isInstalled('addressbook') && $nameArr[count($nameArr)-1]=='vcf')
-//			return \GO::url('addressbook/contact/handleAttachedVCard', $params);
-		
 		return \GO::url('email/message/attachment', $params);
 	}
-	
 
-	public function __wakeup() {	
+
+	public function __wakeup()
+	{
 		//refresh the account model because the password may have been changed
 		$this->account = Account::model()->findByPk($this->account->id);
 	}
