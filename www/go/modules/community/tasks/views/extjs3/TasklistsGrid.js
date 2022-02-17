@@ -2,6 +2,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 	autoHeight: true,
 	scrollLoader: false,
 	showMoreLoader: true,
+	loadMorePageSize: 10,
 	initComponent: function () {
 
 		Ext.apply(this, {

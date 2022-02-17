@@ -10,6 +10,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
+	support: false,
 	title: t("Tasks"),
 	layout: 'responsive',
 	layoutConfig: {
@@ -17,8 +18,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	},
 
 	initComponent: function () {
+		this.statePrefix = this.support ? 'support-' : 'tasks-';
 		this.createTaskGrid();
-		this.createTasklistGrid();	
+		this.createTasklistGrid();
 		this.createCategoriesGrid();
 
 		this.taskDetail = new go.modules.community.tasks.TaskDetail({
@@ -51,7 +53,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			})
 		});
 
-		const showCompleted = Ext.state.Manager.get("tasks-show-completed");
+		const showCompleted = Ext.state.Manager.get(this.statePrefix + "show-completed");
 
 		this.sidePanel = new Ext.Panel({
 			width: dp(300),
@@ -90,7 +92,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								scope: this,
 								check: function(cb, checked) {
 									this.showCompleted(checked);
-									Ext.state.Manager.set("tasks-show-completed", checked);
+									Ext.state.Manager.set(this.statePrefix + "show-completed", checked);
 									this.taskGrid.store.load();
 								}
 							}
@@ -106,7 +108,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.centerPanel = new Ext.Panel({
 			layout:'responsive',
-			stateId: "go-tasks-west",
+			stateId: this.statePrefix + "west",
 			region: "center",
 			listeners: {
 				afterlayout: (panel, layout) => {
@@ -145,7 +147,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 
 
-		let statusFilter = Ext.state.Manager.get("tasks-status-filter");
+		let statusFilter = Ext.state.Manager.get(this.statePrefix + "status-filter");
 		if(!statusFilter) {
 			statusFilter = 'today';
 		}
@@ -161,7 +163,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		});
 		this.setStatusFilter(statusFilter);
-		this.showCompleted(Ext.state.Manager.get("tasks-show-completed"));
+		this.showCompleted(Ext.state.Manager.get(this.statePrefix + "show-completed"));
 		this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
 
 		this.setDefaultSelection();
@@ -171,13 +173,17 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	},
 
+	getSettings : function() {
+		return this.support ? go.User.supportSettings : go.User.tasksSettings;
+	},
+
 	setDefaultSelection : function() {
-		let selectedListIds = [];
-		if(go.User.tasksSettings.rememberLastItems && go.User.tasksSettings.lastTasklistIds) {
-			selectedListIds = go.User.tasksSettings.lastTasklistIds;
+		let selectedListIds = [], settings = this.getSettings();
+		if(settings.rememberLastItems && settings.lastTasklistIds) {
+			selectedListIds = settings.lastTasklistIds;
 		}
-		if(!selectedListIds.length && go.User.tasksSettings.defaultTasklistId) {
-			selectedListIds.push(go.User.tasksSettings.defaultTasklistId);
+		if(!selectedListIds.length && settings.defaultTasklistId) {
+			selectedListIds.push(settings.defaultTasklistId);
 		}
 
 		this.filterCategories(selectedListIds);
@@ -229,7 +235,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				break;
 		}
 
-		Ext.state.Manager.set("tasks-status-filter", inputValue);
+		Ext.state.Manager.set(this.statePrefix + "status-filter", inputValue);
 	},
 
 	createFilterPanel: function () {
@@ -310,7 +316,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: t('Tasklist')
+					text: this.support ? t('Support', "support", "business") : t('Tasklist')
 				}, '->', {
 					xtype: "tbsearch"
 				},{
@@ -319,6 +325,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
 						var dlg = new go.modules.community.tasks.TasklistDialog();
+						dlg.setValues({role: this.support ? "support" : "list"})
 						dlg.show();
 					}
 				}],
@@ -346,6 +353,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				scope: this
 			}
 		});
+
+		if(this.support) {
+			this.tasklistsGrid.getStore().setFilter("role", {role: "support"});
+		}
 
 		this.tasklistsGrid.on('selectionchange', this.onTasklistSelectionChange, this); //add buffer because it clears selection first
 	},
@@ -520,7 +531,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		});
 		//this.quickAddTaskListCombo.store.load();
 		this.taskGrid.on('navigate', function (grid, rowIndex, record) {
-			go.Router.goto("task/" + record.id);
+			go.Router.goto((this.support ? "support/" : "task/") + record.id);
 		}, this);
 		
 	
@@ -555,10 +566,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		//		this.taskGrid.store.setFilter("role", ids.length == 0 ? {role:  go.modules.community.tasks.listTypes.List} : null);
 		this.taskGrid.store.setFilter("role", ids.length == 0 ? {operator: "OR", conditions: [{role:  go.modules.community.tasks.listTypes.List}, {role:  go.modules.community.tasks.listTypes.Support}] }: null);
 
-		if(go.User.tasksSettings.rememberLastItems && go.User.tasksSettings.lastTasklistIds.join(",") != ids.join(",")) {
+		const settings = this.getSettings();
+		if(settings.rememberLastItems && settings.lastTasklistIds.join(",") != ids.join(",")) {
 
 			go.Db.store("User").save({
-				tasksSettings: {
+				[this.support ? "supportSettings" : "tasksSettings"]: {
 					lastTasklistIds: ids
 				}
 			}, go.User.id);
