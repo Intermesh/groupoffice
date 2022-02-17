@@ -727,6 +727,10 @@ class Task extends AclInheritEntity {
 	 */
 	public function onCommentAdded(Comment $comment) {
 
+		if(!CoreAlert::$enabled ) {
+			return;
+		}
+
 		if($comment->createdBy != $this->responsibleUserId && $this->progress != Progress::NeedsAction) {
 			$this->progress = Progress::NeedsAction;
 			$this->save();
@@ -734,11 +738,6 @@ class Task extends AclInheritEntity {
 			$this->progress = Progress::InProcess;
 			$this->save();
 		}
-
-		if(!CoreAlert::$enabled ) {
-			return;
-		}
-
 
 		$excerpt = StringUtil::cutString(strip_tags($comment->text), 50);
 
