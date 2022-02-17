@@ -18,12 +18,13 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 					},
 					this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
 						editable: false,
-						allowBlank: true
+						allowBlank: false
 					})
 					]
 			}
 		];
-		if(GO.settings.has_admin_permission)
+
+		if(go.Modules.get("community", "tasks").userRights.mayChangeCategories)
 		{
 			this.ownerIdField = new Ext.form.Hidden({name:'ownerId',value:go.User.id, listeners:{
 				'setvalue': (me, val) => {  this.checkbox.setValue(!val) }
@@ -44,5 +45,14 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 			items[0].items.push(this.checkbox,this.ownerIdField);
 		}
 		return items;
+	},
+
+	onLoad: function() {
+		this.supr().onLoad.call(this);
+
+		if (go.Modules.get("community", "tasks").userRights.mayChangeCategories) {
+			this.checkbox.setValue(!this.tasklistCombo.getValue());
+		}
+
 	}
 });

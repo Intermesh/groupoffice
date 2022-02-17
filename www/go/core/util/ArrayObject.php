@@ -1,11 +1,11 @@
 <?php
 namespace go\core\util;
 
-use go\core\db\Expression;
+use ArrayObject as CoreArrayObject;
 use JsonSerializable;
 use stdClass;
 
-class ArrayObject extends \ArrayObject implements JsonSerializable {
+class ArrayObject extends CoreArrayObject implements JsonSerializable {
 
 	public $serializeJsonAsObject = false;
 	
@@ -113,6 +113,7 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 		}
 	}
 
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize()
 	{
 		if($this->serializeJsonAsObject && empty($this)) 

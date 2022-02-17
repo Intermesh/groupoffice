@@ -78,3 +78,4 @@ lang.csv
 .gitmodules
 /www/branding
 /.project
+.phpunit.result.cache

@@ -142,7 +142,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	},
 	
 	runModule : function() {
-		this.categoriesGrid.store.load();
+
+
 
 		let statusFilter = Ext.state.Manager.get("tasks-status-filter");
 		if(!statusFilter) {
@@ -178,6 +179,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		if(!selectedListIds.length && go.User.tasksSettings.defaultTasklistId) {
 			selectedListIds.push(go.User.tasksSettings.defaultTasklistId);
 		}
+
+		this.filterCategories(selectedListIds);
 
 		this.tasklistsGrid.setDefaultSelection(selectedListIds)
 		this.checkCreateTaskList();
@@ -274,13 +277,17 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					xtype: 'tbtitle',
 					text: t('Categories')
 				}, '->', {
-					hidden: !go.Modules.get("community", 'tasks').userRights.mayChangeCategories,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						var dlg = new go.modules.community.tasks.CategoryDialog();
+						const dlg = new go.modules.community.tasks.CategoryDialog();
+						const firstSelected = this.tasklistsGrid.getSelectionModel().getSelected();
+						if(firstSelected) {
+							dlg.setValues({tasklistId: firstSelected.id});
+						}
 						dlg.show();
-					}
+					},
+					scope: this
 				}],
 			listeners: {
 				rowclick: function(grid, row, e) {
@@ -297,10 +304,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	createTasklistGrid : function() {
 		this.tasklistsGrid = new go.modules.community.tasks.TasklistsGrid({
-
-			enableDragDrop: true,
-			ddGroup: 'TasklistsDD',
-
 			filteredStore: this.taskGrid.store,
 			filterName: 'tasklistId',
 
@@ -358,7 +361,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createTaskGrid : function() {
 
 		this.taskGrid = new go.modules.community.tasks.TaskGrid({
-			enableDragDrop: true,
+			enableDrag: true,
 			ddGroup: 'TasklistsDD',
 			split: true,
 			region: 'center',

@@ -121,7 +121,7 @@ class Store implements IteratorAggregate, ArrayableInterface, Countable  {
 	 * 
 	 * @return Traversable
 	 */
-	public function getIterator() {
+	public function getIterator() : Traversable {
 		return $this->traversable;
 	}
 

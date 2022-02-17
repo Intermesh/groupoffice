@@ -830,13 +830,16 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		$ex = strtolower($this->extension);
 
 		if(!isset(self::$defaultHandlers[$ex])){
+
+			$classes = \GO\Files\FilesModule::getAllFileHandlers();
+
 			$fh = FileHandler::model()->findByPk(
 						array('extension'=>$ex, 'user_id'=>\GO::user()->id));
 
-			if($fh && class_exists($fh->cls)){
+			if($fh && in_array($fh->cls, $classes)){
 				self::$defaultHandlers[$ex]=new $fh->cls;
 			}else{
-				$classes = \GO\Files\FilesModule::getAllFileHandlers();
+
 				foreach($classes as $class){
 
 //					$fileHandler = new $class->name;

@@ -8,6 +8,7 @@ use GO;
 use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
 use go\core\orm\SearchableTrait;
+use go\core\util\StringUtil;
 use GO\Files\Model\Folder;
 
 class FolderController extends \GO\Base\Controller\AbstractModelController {
@@ -59,8 +60,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$folders = array($params['path']);
 		}else
 		{
-			$folders = array('users','projects2','addressbook','notes','tickets');
+//			$folders = array('users','projects2','addressbook','notes','tickets', 'calendar', 'tasks', 'projects', 'log');
 
+			$folders = go()->getDbConnection()->selectSingleValue('name')
+				->from('fs_folders')
+				->where('(parent_id=0 OR parent_id is null) and name != "billing"')
+				->all();
 
 			$billingFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'billing');
 			if($billingFolder->exists()){
@@ -898,7 +903,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$i = 0;
 
-			$words = SearchableTrait::splitTextKeywords($queryStr);
+			$words = StringUtil::splitTextKeywords($queryStr);
 
 			foreach($words as $word) {
 

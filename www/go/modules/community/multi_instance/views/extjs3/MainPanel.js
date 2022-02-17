@@ -247,37 +247,45 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 					itemId: "login",
 					iconCls: 'ic-lock-open',
 					text: t("Login as administrator"),
-					handler: function (item) {
+					handler: async function (item) {
 						var record = this.store.getAt(item.parentMenu.rowIndex);
 
-						var win = window.open("about:blank", "groupoffice_instance");
-						go.Jmap.request({
-							method: "community/multi_instance/Instance/login",
-							params: {
-								id: record.get('id')
-							},
-							callback: function (options, success, result) {
 
-								//POST access token to popup for enhanced security
-								var f = document.createElement("form");
-								f.setAttribute('method', "post");
-								f.setAttribute('target', "groupoffice_instance");
-								f.setAttribute('action', document.location.protocol + "//" + record.get('hostname') + ':' + document.location.port);
+						try {
 
-								var i = document.createElement("input"); //input element, text
-								i.setAttribute('type', "hidden");
-								i.setAttribute('name', "accessToken");
-								i.setAttribute('value', result.accessToken);
-								f.appendChild(i);
+							this.getEl().mask(t("Loading..."));
+							const result = await go.Jmap.request({
+								method: "community/multi_instance/Instance/login",
+								params: {
+									id: record.get('id')
+								}
+							});
 
-								var body = document.getElementsByTagName('body')[0];
-								body.appendChild(f);
-								f.submit();
-								body.removeChild(f);
+							const win = window.open("about:blank", "groupoffice_instance");
 
-							},
-							scope: this
-						});
+							//POST access token to popup for enhanced security
+							const f = document.createElement("form");
+							f.setAttribute('method', "post");
+							f.setAttribute('target', "groupoffice_instance");
+							f.setAttribute('action', document.location.protocol + "//" + record.get('hostname') + ':' + document.location.port);
+
+							const i = document.createElement("input"); //input element, text
+							i.setAttribute('type', "hidden");
+							i.setAttribute('name', "accessToken");
+							i.setAttribute('value', result.accessToken);
+							f.appendChild(i);
+
+							var body = document.getElementsByTagName('body')[0];
+							body.appendChild(f);
+							f.submit();
+							body.removeChild(f);
+
+						}catch(e) {
+							console.error(e);
+							GO.errorDialog.show(e.message);
+						}finally {
+							this.getEl().unmask();
+						}
 					},
 					scope: this
 				}, '-',
@@ -285,15 +293,18 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 					itemId: "deactivate",
 					iconCls: 'ic-block',
 					text: t("Deactivate"),
-					handler: function (item) {
-						var record = this.store.getAt(item.parentMenu.rowIndex);
+					handler: async function (item) {
+						const record = this.store.getAt(item.parentMenu.rowIndex);
 
-						var update = {};
-						update[record.id] = {enabled: !record.data.enabled};
-
-						go.Db.store("Instance").set({
-							update: update
-						});
+						this.getEl().mask(t("Loading..."));
+						try {
+							const instance = await go.Db.store("Instance").save({enabled: !record.data.enabled}, record.id);
+						} catch(e) {
+							console.error(e);
+							GO.errorDialog.show(e.message);
+						} finally {
+							this.getEl().unmask();
+						}
 
 					},
 					scope: this

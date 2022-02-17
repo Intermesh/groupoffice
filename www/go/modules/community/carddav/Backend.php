@@ -6,9 +6,11 @@ namespace go\modules\community\carddav;
 
 use Exception;
 use go\core\fs\Blob;
+use go\core\http\Request;
 use go\core\model\Acl;
 use go\core\ErrorHandler;
 use go\core\orm\exception\SaveException;
+use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\addressbook\model\AddressBook;
@@ -30,19 +32,46 @@ class Backend extends AbstractBackend {
 	}
 
 	/**
+	 * Get default address book
+	 *
+	 * @return AddressBook
+	 * @throws Exception
+	 */
+	public function getDefaultAddressBook(): AddressBook
+	{
+
+		$addressbook = AddressBook::find()
+			->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
+			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
+			->where('su.userId', '=', go()->getAuthState()->getUserId())
+			->orderBy(['su.isDefault' => 'DESC'])
+			->single();
+
+		if (!$addressbook)
+			throw new Exception("FATAL: No default addressbook configured");
+
+		return $addressbook;
+	}
+
+	/**
 	 * @throws Forbidden
 	 * @throws NotFound
 	 * @throws Exception
 	 */
 	public function createCard($addressBookId, $cardUri, $cardData): string
 	{
-		$addressbook = AddressBook::findById($addressBookId);
-		if(!$addressbook) {
-			throw new NotFound();
-		}
-		
-		if(!$addressbook->getPermissionLevel()) {
-			throw new Forbidden();
+		if($addressBookId == "all") {
+			$addressbook = $this->getDefaultAddressBook();
+			$addressBookId = $addressbook->id;
+		} else {
+			$addressbook = AddressBook::findById($addressBookId);
+			if (!$addressbook) {
+				throw new NotFound();
+			}
+
+			if (!$addressbook->getPermissionLevel()) {
+				throw new Forbidden();
+			}
 		}
 		
 		$vcardComp = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
@@ -120,22 +149,51 @@ class Backend extends AbstractBackend {
 		);
 	}
 
+	private function isMacOs() {
+		//// [user-agent] => macOS/12.1 (21C52) AddressBookCore/2498.2.1
+		$ua =  Request::get()->getHeader('user-agent');
+		return stripos($ua, 'macos') !== false && stripos($ua, "AddressBookCore") !== false;
+	}
+
 	/**
 	 * @throws Exception
 	 */
 	public function getAddressBooksForUser($principalUri): array {
-		
+
+		if($this->isMacOs()) {
+			return [
+				[
+					'id' => "all",
+					'uri' => "all",
+					'principaluri' => $principalUri,
+					'{DAV:}displayname' => "All together",
+					'{http://calendarserver.org/ns/}getctag' => Contact::getState(),
+					'{' . Plugin::NS_CARDDAV . '}supported-address-data' => new SupportedAddressData(['contentType' => 'text/vcard', 'version' => '3.0']),
+					'{' . Plugin::NS_CARDDAV . '}addressbook-description' => 'User addressbook'
+				]
+			];
+		}
+
 		$r = [];
-		$addressBooks = AddressBook::find()
-						->join("sync_addressbook_user", "u", "u.addressBookId = a.id")						
-						->filter(['permissionLevel' => Acl::LEVEL_READ])
-						->andWhere('u.userId', '=', go()->getAuthState()->getUserId());
+
+		$addressBooks = $this->findAddressBooks();
 						
 		foreach($addressBooks as $a) {
 			$r[] = $this->addressBookToDAV($a, $principalUri);
 		}
 		
 		return $r;						
+	}
+
+
+	/**
+	 * @throws Exception
+	 */
+	private function findAddressBooks(): Query {
+		return AddressBook::find()
+			->join("sync_addressbook_user", "u", "u.addressBookId = a.id")
+			->filter(['permissionLevel' => Acl::LEVEL_READ])
+			->andWhere('u.userId', '=', go()->getAuthState()->getUserId());
 	}
 
 	/**
@@ -145,26 +203,25 @@ class Backend extends AbstractBackend {
 	 * @throws Exception
 	 */
 	public function getCard($addressBookId, $cardUri): array {
-		
-		$addressbook = AddressBook::findById($addressBookId);
-		if(!$addressbook) {
-			throw new NotFound();
+
+		if($addressBookId == "all") {
+			$addressBookId = $this->findAddressBooks()->selectSingleValue('addressBookId');
 		}
-		
-		if(!$addressbook->getPermissionLevel()) {
-			throw new Forbidden();
-		}
-		
-		$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uri' => $cardUri])->single();
+
+		$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uri' => rawurldecode($cardUri)])->single();
+		/** @var Contact $contact */
 		if(!$contact) {
 			throw new NotFound();
+		}
+
+		if(!$contact->getPermissionLevel()) {
+			throw new Forbidden();
 		}
 		
 		$blob = isset($contact->vcardBlobId) ? Blob::findById($contact->vcardBlobId) : false;
 		
 		if(!$blob || $blob->modifiedAt < $contact->modifiedAt) {
 			//blob won't be deleted if still used
-			$blob->setStaleIfUnused();
 			$c = new VCard();
 			$cardData = $c->export($contact);			
 			$blob = $this->createBlob($contact, $cardData);
@@ -184,10 +241,10 @@ class Backend extends AbstractBackend {
 	 * @throws SaveException
 	 * @throws Exception
 	 */
-	private function generateCards($addressbookId) {
+	private function generateCards($addressBookId) {
 		$contacts = Contact::find()
 						->join('core_blob', 'b', 'b.id = c.vcardBlobId', 'LEFT')
-						->where(['addressBookId' => $addressbookId])
+						->where(['addressBookId' => $addressBookId])
 						->andWhere('(c.vcardBlobId IS NULL OR b.modifiedAt < c.modifiedAt)')
 						->execute();
 		
@@ -203,7 +260,6 @@ class Backend extends AbstractBackend {
 			$blob = $this->createBlob($contact, $cardData);
 			
 			if(!$contact->save()) {
-				$blob->setStaleIfUnused();
 				throw new Exception("Could not save contact");
 			}
 		}
@@ -214,25 +270,29 @@ class Backend extends AbstractBackend {
 	 * @throws Forbidden
 	 * @throws NotFound
 	 */
-	public function getCards($addressbookId): array
+	public function getCards($addressBookId): array
 	{
-		$addressbook = AddressBook::findById($addressbookId);
-		if(!$addressbook) {
-			throw new NotFound();
+		if ($addressBookId == "all") {
+			$addressBookId = $this->findAddressBooks()->selectSingleValue('addressBookId');
+			$op = 'IN';
+		}else {
+			$op = '=';
+			$addressbook = AddressBook::findById($addressBookId);
+			if (!$addressbook) {
+				throw new NotFound();
+			}
+
+			if (!$addressbook->getPermissionLevel()) {
+				throw new Forbidden();
+			}
 		}
+		$this->generateCards($addressBookId);		
 		
-		if(!$addressbook->getPermissionLevel()) {
-			throw new Forbidden();
-		}
-		
-		$this->generateCards($addressbookId);		
-		
-		$contacts = go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, CONCAT(\'"\', vcardBlobId, \'"\') AS etag, b.size')
+		return go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, CONCAT(\'"\', vcardBlobId, \'"\') AS etag, b.size')
 						->from('addressbook_contact', 'c')
 						->join('core_blob', 'b', 'c.vcardBlobId = b.id')
-						->where('c.addressBookId', '=', $addressbookId);
-
-		return $contacts->all();
+						->where('c.addressBookId', $op, $addressBookId)
+						->all();
 	}
 	
 
@@ -252,7 +312,11 @@ class Backend extends AbstractBackend {
 	 */
 	public function updateCard($addressBookId, $cardUri, $cardData): ?string
 	{
-		$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uri' => $cardUri])->single();
+		if ($addressBookId == "all") {
+			$addressBookId = $this->findAddressBooks()->selectSingleValue('addressBookId');
+		}
+
+		$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uri' => rawurldecode($cardUri)])->single();
 		if(!$contact) {
 			throw new NotFound();
 		}
@@ -270,9 +334,7 @@ class Backend extends AbstractBackend {
 			$c->import($vcardComponent, $contact);
 			
 		} catch(Exception $e) {
-			ErrorHandler::logException($e);		
-			
-			$blob->setStaleIfUnused();			
+			ErrorHandler::logException($e);
 			
 			return null;
 		}

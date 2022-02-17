@@ -436,6 +436,51 @@ class EntityType implements ArrayableInterface {
 		go()->getDbConnection()->insert('core_change', $record)->execute();
 	}
 
+
+	/**
+	 * Resets the sync state causing all clients to resync this entity
+	 *
+	 * @return void
+	 */
+	public function resetSyncState() : void {
+		$this->highestModSeq = 0;
+		App::get()->getDbConnection()
+			->update(
+				"core_entity",
+				['highestModSeq' => 0],
+				Query::normalize(["id" => $this->id])
+					->tableAlias('entity')
+			)->execute(); //mod seq is a global integer that is incremented on any entity update
+
+		go()->getDbConnection()
+			->delete(
+				"core_change",
+				['entityTypeId' => $this->id]
+			)
+			->execute();
+
+		go()->getCache()->delete('entity-types');
+	}
+
+	/**
+	 * Resets all entity state so all clients must resync data.
+	 */
+	public static function resetAllSyncState() {
+		//reset all mod seqs
+		go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
+
+		// use delete and not truncate to keep transactions
+		go()->getDbConnection()->exec("DELETE FROM core_change");
+		go()->getDbConnection()->exec("DELETE FROM core_acl_group_changes");
+
+		// Disable keys otherwise this might take very long!
+		go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0;");
+		go()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
+		go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1;");
+
+		go()->getCache()->delete('entity-types');
+	}
+
 	/**
 	 * Checks if a saved entity needs changes for the JMAP API with change() and userChange()
 	 *
@@ -518,7 +563,7 @@ class EntityType implements ArrayableInterface {
 						->update(
 										"core_entity", 
 										['highestModSeq' => $modSeq],
-										\go\core\orm\Query::normalize(["id" => $this->id])->tableAlias('entity')
+										Query::normalize(["id" => $this->id])->tableAlias('entity')
 						)->execute(); //mod seq is a global integer that is incremented on any entity update
 	
 

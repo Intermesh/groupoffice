@@ -179,6 +179,9 @@ class Table {
 		$c->trimInput = false;
 		$c->dataType = strtoupper($field['Type']);
 
+		//remove "unsigned" or any other extra info that might be there.
+		$field['Type'] = explode(" ", $field['Type'])[0];
+
 		preg_match('/(.*)\(([1-9].*)\)/', $field['Type'], $matches);
 		if ($matches) {
 			$c->length  = intval($matches[2]);

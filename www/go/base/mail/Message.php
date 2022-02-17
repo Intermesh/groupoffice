@@ -70,7 +70,7 @@ class Message extends \Swift_Message{
 	
 	private function switchEncoder($body) {
 		
-		if(GO::config()->swift_email_body_force_to_base64) {
+		if(GO::config()->swift_email_body_force_to_base64 || empty($body)) {
 			return;
 		}
 		

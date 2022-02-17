@@ -1379,8 +1379,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @return void
 	 */
 	function __construct() {
-		$config = array();
-
 		$this->root_path = str_replace('\\','/',dirname(dirname(dirname(__FILE__)))).'/';
 
 		$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
@@ -1403,9 +1401,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 		
 		$this->file_storage_path = rtrim($this->file_storage_path, '/').'/';
 		$this->tmpdir = rtrim($this->tmpdir, '/').'/';
-
-//		if($this->info_log=="")
-//			$this->info_log =$this->file_storage_path.'log/info.log';
 
 		//this can be used in some cases where you don't want the dynamically
 		//determined full URL. This is done in set_full_url below.
@@ -1443,57 +1438,15 @@ var $billing_clear_payment_method_on_duplicate = true;
 			if(empty($config['tmpdir']) && function_exists('sys_get_temp_dir')) {
 				$this->tmpdir = rtrim(str_replace('\\','/', sys_get_temp_dir()),'/').'/groupoffice/';
 			}
-			
 		}
 
-//		// path to classes
-//		$this->class_path = $this->root_path.$this->class_path.'/';
-//
-//		// path to themes
-//		$this->theme_path = $this->root_path.$this->theme_path.'/';
-//
-//		// URL to themes
-//		$this->theme_url = $this->host.$this->theme_url.'/';
-//
-//		// path to controls
-//		$this->control_path = $this->root_path.$this->control_path.'/';
-//
-//		// url to controls
-//		$this->control_url = $this->host.$this->control_url.'/';
-//
-//		// path to modules
-//		$this->module_path = $this->root_path.$this->module_path.'/';
-//
-//		// url to user configuration apps
-//		$this->configuration_url = $this->host.$this->configuration_url.'/';
-
-
-		if($this->debug)
-			$this->debug_log=true;
-
-//		if($this->debug_log){// || $this->log_slow_requests) {
-//
-//			list ($usec, $sec) = explode(" ", microtime());
-//			$this->loadstart = ((float) $usec + (float) $sec);
-//
-////			$dat = getrusage();
-////			define('PHP_TUSAGE', microtime(true));
-////			define('PHP_RUSAGE', $dat["ru_utime.tv_sec"]*1e6+$dat["ru_utime.tv_usec"]);
-//		}
-
-//		if(is_string($this->file_create_mode)) {
-//			$this->file_create_mode=octdec($this->file_create_mode);
-//		}
-//
-//		if(is_string($this->folder_create_mode)) {
-//			$this->folder_create_mode=octdec($this->folder_create_mode);
-//		}
+		if($this->debug) {
+			$this->debug_log = true;
+		}
 
 		if($this->debug_log) {
 			$this->log=true;
 		}
-
-		//$this->set_full_url();
 
 		if(!$this->support_link && $this->isProVersion()){
 			$this->support_link = "https://www.group-office.com/support";
@@ -1575,11 +1528,11 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	public function getfull_url() {
-		return rtrim(go()->getSettings()->URL, '/') . '/';
+		return isset(go()->getSettings()->URL) ? rtrim(go()->getSettings()->URL, '/') . '/' : null;
 	}
 	
 	public function getorig_full_url() {
-		return rtrim(go()->getSettings()->URL, '/') . '/';
+		return $this->getfull_url();
 	}
 
 	public function getMajorVersion(){

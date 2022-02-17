@@ -201,8 +201,6 @@ abstract class EntityController extends Controller {
 
 		$state = $this->getState();
 
-		//enable SQL debugging here
-		go()->getDbConnection()->debug = go()->getDebugger()->enabled;
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
@@ -230,6 +228,10 @@ abstract class EntityController extends Controller {
 				'notfound' => [],
 				'canCalculateUpdates' => false
 			];
+
+			if(go()->getDebugger()->enabled) {
+				$response['query'] = (string) $idsQuery;
+			}
 
 			if(isset($hasMore)) {
 				$response['hasMore'] = $hasMore;

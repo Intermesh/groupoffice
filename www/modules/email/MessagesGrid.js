@@ -484,7 +484,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 			return false;
 		}
 
-		return Ext.form.VTypes.email(record.data.from) && record.data.from != record.data.sender;
+		return Ext.form.VTypes.email(record.data.from) && record.data.from.toLowerCase() != record.data.sender.toLowerCase();
 	},
 
 	renderMessage : function(value, metaData, record){

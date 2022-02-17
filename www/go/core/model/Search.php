@@ -68,7 +68,7 @@ class Search extends AclOwnerEntity {
 		return [];
 	}
 
-	public function findAclId() : int {
+	public function findAclId() : ?int {
 		return $this->aclId;
 	}
 	

@@ -1,8 +1,10 @@
 <?php
 namespace go\modules\community\addressbook\model;
 
+use go\core\db\Criteria;
 use go\core\fs\File;
 use go\core\model\Module as CoreModule;
+use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
@@ -100,6 +102,14 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	protected static function textFilterColumns(): array
 	{
 		return ['name'];
+	}
+
+	protected static function defineFilters(): Filters
+	{
+		return parent::defineFilters()
+			->add("name", function(Criteria $criteria, $value) {
+				$criteria->andWhere('name', 'LIKE', $value);
+			});
 	}
 
 	// /**

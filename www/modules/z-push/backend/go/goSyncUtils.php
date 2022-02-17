@@ -164,12 +164,12 @@ class GoSyncUtils {
 	 */
 
 	/**
-	 * @param SyncRecurrence $recur
+	 * @param SyncRecurrence|SyncTaskRecurrence $recur
 	 * @param int $eventStartTime
 	 * @return false|string
 	 * @throws Exception
 	 */
-	public static function importRecurrence(SyncRecurrence $recur, int $eventStartTime) {
+	public static function importRecurrence($recur, int $eventStartTime) {
 		$freq = "";
 		switch ($recur->type) {
 			case 0:
@@ -458,9 +458,9 @@ class GoSyncUtils {
 	 * Parse a RRULE
 	 * @param string $rrulestr
 	 * @param string $type "task" or "event"
-	 * @return SyncRecurrence
+	 * @return SyncRecurrence|SyncTaskRecurrence
 	 */
-	public static function ParseRecurrence(string $rrulestr, string $type): SyncRecurrence {
+	public static function ParseRecurrence(string $rrulestr, string $type) {
 		$recurrence = new SyncRecurrence();
 		if ($type == "task") {
 			$recurrence = new SyncTaskRecurrence();
@@ -549,11 +549,11 @@ class GoSyncUtils {
 	}
 
 	/**
-	 * @param SyncRecurrence $rec ActiveSync format rrule
+	 * @param SyncRecurrence|SyncTaskRecurrence $rec ActiveSync format rrule
 	 * @param bool $allday
 	 * @return array JMAP format array of rrule
 	 */
-	public static function GenerateRecurrence(SyncRecurrence $rec, bool $allday = true): array
+	public static function GenerateRecurrence($rec, bool $allday = true): array
 	{
 		$rrule = [];
 		if (isset($rec->type)) {

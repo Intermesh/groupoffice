@@ -5,12 +5,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	height: dp(600),
 	modal: false,
 
-	onLoad: function (values) {
-		if(go.util.empty(values.id)) {
-			this.tasklistCombo.setValue(go.User.tasksSettings.defaultTasklistId);
-		}
-	},
-
 	setLinkEntity : function(cfg) {
 
 		switch(cfg.entity) {
@@ -175,12 +169,44 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 							}
 						]
 					},
-					this.userCombo = new go.users.UserCombo({
-						fieldLabel: t('Responsible'),
-						hiddenName: 'responsibleUserId',
-						anchor:'100%',
-						allowBlank: true
-					}),
+					{
+						xtype: "container",
+						layout:"hbox",
+						items:[
+							{
+								style: "padding-right: 8px",
+								layout: "form",
+								xtype: "container",
+								flex: 1,
+								items: [
+									this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
+										listeners: {
+											change: (combo, val) => {
+												const categories = this.formPanel.form.findField('categories');
+												categories.comboStore.setFilter("tasklistId", {tasklistId: val});
+												//reloads combo when trigger is clicked
+												delete categories.comboBox.lastQuery;
+											}
+										}
+									})
+									]
+							},
+							{
+								layout: "form",
+								xtype: "container",
+								flex: 1,
+								items: [
+									this.userCombo = new go.users.UserCombo({
+										fieldLabel: t('Responsible'),
+										hiddenName: 'responsibleUserId',
+										anchor: '100%',
+										allowBlank: true
+									})
+								]
+							}
+						]
+					}
+					,
 					this.recurrenceField = new go.form.RecurrenceField({
 						name: 'recurrenceRule',
 						hidden: this.hideRecurrence,
@@ -191,7 +217,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						xtype: "chips",
 						entityStore: "TaskCategory",
 						comboStoreConfig: {
-							filters: {ownerId: {ownerId:go.User.id}}
+							filters: {tasklistId: {tasklistId:this.tasklistCombo.getValue()}}
 						},
 						displayField: "name",
 						valueField: 'id',
@@ -212,7 +238,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						grow: true
 
 					},
-					this.tasklistCombo = new go.modules.community.tasks.TasklistCombo(),
 					new go.modules.community.tasks.AlertFields()
 				]
 			}]

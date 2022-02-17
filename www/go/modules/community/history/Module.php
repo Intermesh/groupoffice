@@ -156,7 +156,7 @@ class Module extends core\Module
 		}
 
 		$l = LogEntry::getMapping()->getColumn('changes')->length;
-		if(mb_strlen($log->changes) > $l) {
+		if(isset($log->changes) && mb_strlen($log->changes) > $l) {
 			foreach($changes as $key => $v) {
 				$changes[$key] = '... changes were too big to log ...';
 			}

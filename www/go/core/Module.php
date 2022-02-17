@@ -163,11 +163,19 @@ abstract class Module extends Singleton {
 
 			go()->getDbConnection()->pauseTransactions();
 
-			self::installDependencies($this);
+			try {
+				self::installDependencies($this);
 
-			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+				go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 
-			$this->installDatabase();
+				$this->installDatabase();
+			} catch(Exception $e) {
+				ErrorHandler::logException($e);
+				go()->getDbConnection()->resumeTransactions();
+				$this->rollBack();
+				return false;
+			}
+
 			go()->getDbConnection()->resumeTransactions();
 
 			if(!Installer::isInstalling()) {

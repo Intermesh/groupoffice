@@ -1,19 +1,22 @@
 <?php
 namespace go\core\orm;
 
+use ArrayAccess;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\data\ArrayableInterface;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
-use go\core\http\Exception;
+use Exception;
 use go\core\Installer;
 use go\core\model\Field;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use JsonSerializable;
+use PDOException;
 
-class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerializable {
+class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializable {
 
 	private static $loopIds = [];
 
@@ -41,7 +44,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	 * @return CustomFieldsModel
 	 * @see getCustomFields()
 	 */
-	public function returnAsText(bool $value = true)
+	public function returnAsText(bool $value = true): CustomFieldsModel
 	{
 		$this->returnAsText = $value;
 
@@ -54,11 +57,13 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	}
 
 	/**
-	 * Set custom field values with key value arrat=y
-	 * @param mixed $data
+	 * Set custom field values with key value array
+	 * @param array|CustomFieldsModel $data
 	 * @return $this
+	 * @throws Exception
 	 */
-	public function setValues($data) {
+	public function setValues($data): CustomFieldsModel
+	{
 		$old = $this->internalGetCustomFields();
 		$this->data = array_merge($old, $this->normalizeCustomFieldsInput($data, $this->returnAsText));
 
@@ -71,8 +76,10 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	 * @param string $name
 	 * @param mixed $value
 	 * @return $this
+	 * @throws Exception
 	 */
-	public function setValue($name, $value) {
+	public function setValue(string $name, $value): CustomFieldsModel
+	{
 		return $this->setValues([$name => $value]);
 	}
 
@@ -81,9 +88,9 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	 *
 	 * @param string $name
 	 * @return mixed
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	public function getValue($name) {
+	public function getValue(string $name) {
 
 		$fn = $this->returnAsText ? 'dbToText' : 'dbToApi';
 		$record = $this->internalGetCustomFields();
@@ -91,7 +98,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 		$fields = self::getCustomFieldModels();
 
 		if(!isset($fields[$name])) {
-			throw new \Exception("Property '$name' doesn't exist");
+			throw new Exception("Property '$name' doesn't exist");
 		}
 
 		$field = $fields[$name];
@@ -103,7 +110,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 
 		self::$loopIds[] = $field->id;
 
-		$value =  $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $this, $this->entity);
+		$value =  $field->getDataType()->$fn($record[$field->databaseName] ?? null, $this, $this->entity);
 
 		//remove from loop check
 		self::$loopIds = array_filter(self::$loopIds, function($id) use ($field) {
@@ -113,11 +120,17 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 		return $value;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function __get($name)
 	{
 		return $this->getValue($name);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function __set($name, $value)
 	{
 		return $this->setValue($name, $value);
@@ -127,23 +140,32 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	{
 		try {
 			$val = $this->getValue($name);
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			return false;
 		}
 		return isset($val);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function __unset($name)
 	{
 		$this->setValue($name, null);
 	}
 
-	public function isModified() {
+	public function isModified(): bool
+	{
 		return $this->oldData != $this->data;
 	}
 
-	public function customFieldsTableName() {
+	/**
+	 * @throws Exception
+	 */
+	public function customFieldsTableName(): string
+	{
 		$cls = get_class($this->entity);
+		/** @var CustomFieldsTrait $cls */
 
 		return $cls::customFieldsTableName();
 	}
@@ -152,7 +174,8 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	 * @return array
 	 * @throws Exception
 	 */
-	private function internalGetCustomFields() {
+	private function internalGetCustomFields(): array
+	{
 		if(!isset($this->data)) {
 
 			if(!isset(self::$preparedCustomFieldStmt[$this->customFieldsTableName()])) {
@@ -165,7 +188,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 			}
 
 			$stmt = self::$preparedCustomFieldStmt[$this->customFieldsTableName()];
-			$stmt->bindValue(':id', $this->entity->id);
+			$stmt->bindValue(':id', $this->entity->id());
 
 			$stmt->execute();
 
@@ -175,19 +198,15 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 
 			$this->customFieldsIsNew = !$record;
 
+			$columns = Table::getInstance(static::customFieldsTableName())->getColumns();
 			if($record) {
-
-				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();
 				foreach($columns as $name => $column) {
 					$record[$name] = $column->castFromDb($record[$name]);
 				}
 
-				$this->data = $record;
-
 			} else
 			{
 				$record = [];
-				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();
 				foreach($columns as $name => $column) {
 					if($name == "id") {
 						continue;
@@ -195,8 +214,8 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 					$record[$name] = $column->default;
 				}
 
-				$this->data = $record;
 			}
+			$this->data = $record;
 		}
 
 		return $this->data;//array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
@@ -205,12 +224,12 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	/**
 	 * Converts user input to database formats.
 	 *
-	 * @param $data
+	 * @param array|CustomFieldsModel $data
 	 * @param bool $asText
-	 * @return mixed
+	 * @return array
 	 * @throws Exception
 	 */
-	private function normalizeCustomFieldsInput($data, $asText = false) {
+	private function normalizeCustomFieldsInput($data, bool $asText = false) : array {
 
 		if($data instanceof CustomFieldsModel)
 		{
@@ -242,37 +261,47 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 
 	/**
 	 * @return Field[]
+	 * @throws Exception
 	 */
-	public function getCustomFieldModels() {
+	public function getCustomFieldModels(): array
+	{
 		$cls = get_class($this->entity);
+		/** @var CustomFieldsTrait $cls */
 
-		$models = $cls::getCustomFieldModels();
-		return $models;
+		return $cls::getCustomFieldModels();
 	}
 
 	/**
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function validate() {
+	public function validate(): bool
+	{
 		if(!$this->isModified()) {
 			return true;
 		}
 		foreach($this->getCustomFieldModels() as $field) {
-			if(!$field->getDataType()->validate(isset($this->data[$field->databaseName]) ? $this->data[$field->databaseName] : null, $field, $this->entity)) {
+			if(!$field->getDataType()->validate($this->data[$field->databaseName] ?? null, $field, $this->entity)) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public function getAsText() {
+	/**
+	 * @throws Exception
+	 */
+	public function getAsText(): CustomFieldsModel
+	{
 		$this->internalGetCustomFields();
 		$text = clone $this;
 		$text->returnAsText(true);
 		return $text;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function toArray(array $properties = null): array
 	{
 		$fn = $this->returnAsText ? 'dbToText' : 'dbToApi';
@@ -281,13 +310,17 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 			if(empty($field->databaseName)) {
 				continue; //For type Notes which doesn't store any data
 			}
-			$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $this, $this->entity);
+			$record[$field->databaseName] = $field->getDataType()->$fn($record[$field->databaseName] ?? null, $this, $this->entity);
 		}
 		unset($record['id']);
 		return $record;
 	}
 
-	public function save() {
+	/**
+	 * @throws Exception
+	 */
+	public function save(): bool
+	{
 		try {
 
 			if(Installer::isInstalling()) {
@@ -297,7 +330,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 			$record = $this->data;
 
 			foreach($this->getCustomFieldModels() as $field) {
-				if(!$field->getDataType()->beforeSave(isset($this->data[$field->databaseName]) ? $this->data[$field->databaseName] : null, $this, $this->entity,$record)) {
+				if(!$field->getDataType()->beforeSave($this->data[$field->databaseName] ?? null, $this, $this->entity,$record)) {
 					return false;
 				}
 			}
@@ -316,7 +349,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 			if($this->customFieldsIsNew) {
 
 				//if(!empty($record)) { //always create record for select fields with foreign keys!
-				$record['id'] = $this->entity->id;
+				$record['id'] = $this->entity->id();
 				if(!App::get()
 					->getDbConnection()
 					->insert($this->customFieldsTableName(), $record)->execute()){
@@ -327,7 +360,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 			} else {
 				if(!empty($record) && !App::get()
 						->getDbConnection()
-						->update($this->customFieldsTableName(), $record, ['id' => $this->entity->id])->execute()) {
+						->update($this->customFieldsTableName(), $record, ['id' => $this->entity->id()])->execute()) {
 					return false;
 				}
 			}
@@ -338,44 +371,48 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 			//$this->data['id'] = $this->entity->id;
 
 			foreach($this->getCustomFieldModels() as $field) {
-				if(!$field->getDataType()->afterSave(isset($this->data[$field->databaseName]) ? $this->data[$field->databaseName] : null, $this, $this->entity)) {
+				if(!$field->getDataType()->afterSave($this->data[$field->databaseName] ?? null, $this, $this->entity)) {
 					return false;
 				}
 			}
 
 			return true;
-		} catch(\PDOException $e) {
+		} catch(PDOException $e) {
 			$uniqueKey = Utils::isUniqueKeyException($e);
 			if ($uniqueKey) {
 				$this->entity->setValidationError('customFields.' . $uniqueKey, ErrorCode::UNIQUE);
 				return false;
 			} else {
 //				throw $e;
-				throw new \Exception($e->getMessage());
+				throw new Exception($e->getMessage());
 			}
 		}
 	}
 
-	public function offsetExists($offset)
+	public function offsetExists($offset): bool
 	{
 		return $this->__isset($offset);
 	}
-
+	#[\ReturnTypeWillChange]
 	public function offsetGet($offset)
 	{
 		return $this->__get($offset);
 	}
 
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value) : void
 	{
-		return $this->__set($offset, $value);
+		$this->__set($offset, $value);
 	}
 
-	public function offsetUnset($offset)
+	public function offsetUnset($offset) : void
 	{
 		$this->__unset($offset);
 	}
 
+	/**
+	 * @throws Exception
+	 */
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize()
 	{
 		return $this->toArray();

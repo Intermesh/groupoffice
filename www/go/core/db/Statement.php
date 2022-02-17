@@ -17,7 +17,8 @@ use PDOStatement;
 class Statement extends PDOStatement implements JsonSerializable, ArrayableInterface{
 	
 	private $query;
-	
+
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return $this->fetchAll();
 	}

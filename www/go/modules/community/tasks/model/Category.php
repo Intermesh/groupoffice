@@ -12,6 +12,7 @@ use go\core\model\Acl;
 use go\core\model\Module;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\validate\ErrorCode;
 
 /**
  * Category model
@@ -36,25 +37,29 @@ class Category extends Entity {
 			->addTable("tasks_category", "category");
 	}
 
-	public function getPermissionLevel(): int
+	protected function init()
 	{
-		return (
-			$this->ownerId === go()->getUserId()
-			||
-			Module::findByName('community', 'tasks')
-				->getUserRights()
-				->mayChangeCategories ? Acl::LEVEL_MANAGE : 0);
-	}
+		parent::init();
 
-	public function internalValidate()
-	{
-		if($this->isNew() && !$this->isModified('ownerId')) {
+		if($this->isNew())  {
 			$this->ownerId = go()->getUserId();
 		}
-		if ($this->ownerId !== go()->getUserId() && !Module::findByName('community', 'tasks')->hasPermissionLevel(50))
-			$this->setValidationError('ownerId', go()->t("You need manage permission to create global categories"));
-		return parent::internalValidate();
 	}
+
+	public function getPermissionLevel(): int
+	{
+		//global category mayb only be created by admins
+		if(empty($this->tasklistId)) {
+			return Module::findByName('community', 'tasks')
+				->getUserRights()
+				->mayChangeCategories ? Acl::LEVEL_MANAGE : 0;
+		}
+
+		$tasklist = Tasklist::findById($this->tasklistId);
+
+		return $tasklist->getPermissionLevel() >= Acl::LEVEL_MANAGE ? Acl::LEVEL_DELETE : Acl::LEVEL_READ;
+	}
+
 
 	public static function getClientName(): string
 	{

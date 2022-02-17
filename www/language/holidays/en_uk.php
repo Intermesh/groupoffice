@@ -1,9 +1,14 @@
 <?php
+// For an up to date overview, see https://www.gov.uk/bank-holidays
+
 // holidays with fixed date
 $input_holidays['fix']['01-01'] = 'New Year\'s Day';
 $input_holidays['fix']['12-25'] = 'Christmas Day';
 $input_holidays['fix']['12-26'] = 'Boxing Day';
-
+// This one appears to be extra for 2022. Go Liz!
+if($year === '2022') {
+	$input_holidays['fix']['06-03'] = 'Platinum Jubilee bank holiday';
+}
 
 // holidays with variable date (christian holidays computation is based on the date of easter day)
 $input_holidays['var']['-2'] = 'Good Friday';
@@ -28,13 +33,13 @@ if (!class_exists('GOHolidaysUK')) {
 		 * @throws Exception
 		 */
 		public static function springBank($year){
+			if($year == 2022) {
+				return (new DateTime('first thu of June ' . $year))->format('Y-m-d');
+			}
 			return (new DateTime('last mon of May '.$year))->format('Y-m-d');
 		}
 
 		public static function earlyMayBank($year){
-			if($year == 2020) {
-				return "2020-05-08";
-			}
 			return (new DateTime('first mon of May '.$year))->format('Y-m-d');
 		}
 

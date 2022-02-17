@@ -8,9 +8,9 @@ Homepage: http://www.group-office.com
 
 Package: groupoffice
 Architecture: all
-Depends: libapache2-mod-php (>=7),	
-	apache2,
-	mariadb-server | mysql-server,
+Depends:
+    php-common,
+    php-json,
 	php-mysql,
 	php-gd,
 	php-cli,
@@ -27,6 +27,8 @@ Depends: libapache2-mod-php (>=7),
 	${perl:Depends},
 	dbconfig-common,
 	ucf (>= 0.28)
+Recommends: apache2, libapache2-mod-php, default-mysql-server
+Suggests: php-apcu
 Conflicts: groupoffice-com,
 	groupoffice-pro,
 	groupoffice-billing,

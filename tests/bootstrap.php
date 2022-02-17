@@ -92,6 +92,9 @@ try {
 
 		GO::$ignoreAclPermissions = false;
 
+		// fake URL
+		go()->getSettings()->URL = "http://localhost";
+
 //		echo "Installing demo data\n";
 //
 //		$ctrl = new System();

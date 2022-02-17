@@ -137,28 +137,26 @@ class Imap extends ImapBodyStruct
 		stream_set_timeout($this->handle, 10);
 //		$this->metadata = stream_get_meta_data($this->handle); // for debugging purposes
 		$greeting = trim(fgets($this->handle, 8192));
-		$this->handleGreeting($greeting);
+//		$this->handleGreeting($greeting);
 		if (self::$debug && $greeting) {
 			go()->debug('S: ' . $greeting);
 		}
 		return $this->authenticate($username, $password);
 	}
 
-
-	private function handleGreeting(string $greeting)
-	{
-		//some imap servers like dovecot respond with the capability after login.
-		//Set this in the session so we don't need to do an extra capability command.
-		if(($startpos = strpos($greeting, 'CAPABILITY'))!==false){
-			\GO::debug("Use capability from login");
-			$endpos=  strpos($greeting, ']', $startpos);
-			if($endpos){
-				$capability = substr($greeting, $startpos, $endpos-$startpos);
-				\GO::session()->values['GO_IMAP'][$this->server]['imap_capability']=$capability;
-			}
-
-		}
-	}
+//	private function handleGreeting($greeting) {
+//		//some imap servers like dovecot respond with the capability after login.
+//		//Set this in the session so we don't need to do an extra capability command.
+//		if(($startpos = strpos($greeting, 'CAPABILITY'))!==false){
+//			\GO::debug("Use capability from login");
+//			$endpos=  strpos($greeting, ']', $startpos);
+//			if($endpos){
+//				$capability = substr($greeting, $startpos, $endpos-$startpos);
+//				\GO::session()->values['GO_IMAP'][$this->server]['imap_capability']=$capability;
+//			}
+//
+//		}
+//	}
 
 	/**
 	 * Disconnect from the IMAP server
@@ -273,10 +271,12 @@ class Imap extends ImapBodyStruct
 			if (stristr($response, 'A' . $this->command_count . ' OK')) {
 				$authed = true;
 				$this->state = 'authed';
-				$this->handleGreeting($response);
+
+//				$this->handleGreeting($response);
+			}else
+			{
+				throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
 			}
-		} else {
-			throw new ImapAuthenticationFailedException('Authentication failed for user ' . $username . ' on IMAP server ' . $this->server);
 		}
 		return $authed;
 	}

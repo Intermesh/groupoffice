@@ -132,4 +132,5 @@ Le seguenti modifiche sono state effettuate da %s:
   'Browse {total} files' => 'Sfoglia {total} files',
   'Browse files' => 'Sfoglia files ',
   'Create folder' => 'Crea cartella',
+  'Open in browser' => 'Apri nel browser',
 );

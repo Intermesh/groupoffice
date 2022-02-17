@@ -75,27 +75,25 @@ class JsonResponse implements \ArrayAccess {
 			header('Content-type: application/json; charset=UTF-8'); //tell the browser we are returning json
 		}
 	}
-/**
- * 
- * @todo We need to support php 5.3.3 so we can't get by reference here.
- */
+
+	#[\ReturnTypeWillChange]
 	public function offsetGet($offset) {
 		return $this->data[$offset];
 	}
 
-	public function offsetSet($offset, $value) {
+	public function offsetSet($offset, $value) : void {
 		if (is_null($offset)) {
-            $this->data[] = $value;
-        } else {
-            $this->data[$offset] = $value;
-        }
+        $this->data[] = $value;
+    } else {
+        $this->data[$offset] = $value;
+    }
 	}
 
-	public function offsetExists($offset) {
+	public function offsetExists($offset) : bool {
 		return isset($this->data[$offset]);
 	}
 
-	public function offsetUnset($offset) {
+	public function offsetUnset($offset) : void {
 		unset($this->data[$offset]);
 	}
 	

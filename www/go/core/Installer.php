@@ -172,7 +172,7 @@ class Installer {
 		App::get()->getSettings()->save();
 
 		App::get()->setCache(new $cacheCls);
-		Listeners::get()->init();
+		go()->rebuildCache();
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;

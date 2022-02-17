@@ -27,6 +27,10 @@ class Module extends Entity {
 	public $admin_menu;
 	public $version;
 	public $enabled;
+
+	/**
+	 * @var Permission[]
+	 */
 	public $permissions = [];
 
 	// for backwards compatibility

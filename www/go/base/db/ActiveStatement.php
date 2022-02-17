@@ -121,6 +121,11 @@ class ActiveStatement implements \IteratorAggregate {
 	 * @return ActiveRecord
 	 */
 	public function fetch($fetch_style=null){
+
+		//for PHP 8 compat
+		if(!isset($fetch_style) && defined('PDO::FETCH_DEFAULT')) {
+			$fetch_style = PDO::FETCH_DEFAULT;
+		}
 		return $this->stmt->fetch($fetch_style);
 	}
 	
@@ -130,6 +135,10 @@ class ActiveStatement implements \IteratorAggregate {
 	 * @return ActiveRecord[]
 	 */
 	public function fetchAll($fetch_style=null){
+		//for PHP 8 compat
+		if(!isset($fetch_style) && defined('PDO::FETCH_DEFAULT')) {
+			$fetch_style = PDO::FETCH_DEFAULT;
+		}
 		return $this->stmt->fetchAll($fetch_style);
 	}
 	
@@ -179,8 +188,8 @@ class ActiveStatement implements \IteratorAggregate {
 	 * You need to specify which column needs to be used as key column and which 
 	 * culumn needs to be used as value column
 	 * 
-	 * @param StringHelper $keyColumn
-	 * @param StringHelper $valueColumn
+	 * @param string $keyColumn
+	 * @param string $valueColumn
 	 * @return array 
 	 */
 	public function fetchKeyValueArray($keyColumn, $valueColumn){
@@ -195,9 +204,9 @@ class ActiveStatement implements \IteratorAggregate {
 	
 	/**
 	 * Making the activefinder iterable
-	 * @return \IteratorIterator 
+	 * @return \Traversable
 	 */
-	public function getIterator()
+	public function getIterator(): \Traversable
 	{
 		return $this->stmt;
 	}

@@ -161,6 +161,20 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					scope: this
 				}],
 			listeners: {
+				afterrender: function(grid) {
+					new Ext.dd.DropTarget(grid.getView().mainBody, {
+						ddGroup : 'NotebooksDD',
+						notifyDrop :  (source, e, data) => {
+							const selections = source.dragData.selections,
+								dropRowIndex = grid.getView().findRowIndex(e.target),
+								noteBookId = grid.getView().grid.store.data.items[dropRowIndex].id;
+
+							selections.forEach((r) => {
+								go.Db.store("Note").save({noteBookId: noteBookId}, r.id);
+							})
+						}
+					});
+				},
 				rowclick: function(grid, row, e) {
 					if(e.target.className != 'x-grid3-row-checker') {
 						//if row was clicked and not the checkbox then switch to grid in narrow mode
@@ -180,6 +194,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createNoteGrid : function() {
 		this.noteGrid = new go.modules.community.notes.NoteGrid({
 			region: 'center',
+			ddGroup: "NotebooksDD",
+			enableDrag: true,
 			multiSelectToolbarItems: [
 				{
 					hidden: go.customfields.CustomFields.getFieldSets('Note').length == 0,

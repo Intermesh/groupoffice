@@ -2,16 +2,21 @@
 
 namespace go\core\oauth\server\responsetypes;
 
+use DateTimeImmutable;
 use go\core\oauth\server\requesttypes\AuthorizationRequest;
+//use Lcobucci\JWT\Encoding\ChainedFormatter;
+//use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Key;
+use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Signer\Key\LocalFileReference;
+//use Lcobucci\JWT\Token\Builder;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\Entities\UserEntityInterface;
 use OpenIDConnectServer\Entities\ClaimSetInterface;
 use OpenIDConnectServer\IdTokenResponse as BaseIdTokenResponse;
-use GuzzleHttp\Psr7\ServerRequest;
+use RuntimeException;
 
 class IdTokenResponse extends BaseIdTokenResponse
 {
@@ -27,15 +32,27 @@ class IdTokenResponse extends BaseIdTokenResponse
      */
     protected function getBuilder(AccessTokenEntityInterface $accessToken, UserEntityInterface $userEntity)
     {
-        // Add required id_token claims
-        $builder = (new Builder())
-            ->setAudience($accessToken->getClient()->getIdentifier())
-            ->setIssuer(rtrim(\go()->getSettings()->URL, '/') . '/api/oauth.php')
-            ->setIssuedAt(time())
-            ->setExpiration($accessToken->getExpiryDateTime()->getTimestamp())
-            ->setSubject($userEntity->getIdentifier());
+				// for future version of open id connect server with php 8
+//		    $claimsFormatter = ChainedFormatter::withUnixTimestampDates();
+//		    $builder = new Builder(new JoseEncoder(), $claimsFormatter);
 
-        return $builder;
+	    $builder = new Builder();
+
+	    // Since version 8.0 league/oauth2-server returns \DateTimeImmutable
+	    $expiresAt = $accessToken->getExpiryDateTime();
+	    if ($expiresAt instanceof \DateTime) {
+		    $expiresAt = DateTimeImmutable::createFromMutable($expiresAt);
+	    }
+
+	    // Add required id_token claims
+	    return $builder
+		    ->permittedFor($accessToken->getClient()->getIdentifier())
+		    ->issuedBy(rtrim(\go()->getSettings()->URL, '/') . '/api/oauth.php')
+		    ->issuedAt(new DateTimeImmutable())
+		    ->expiresAt($expiresAt)
+		    ->relatedTo($userEntity->getIdentifier());
+
+
     }
 
     protected $nonce;
@@ -68,11 +85,11 @@ class IdTokenResponse extends BaseIdTokenResponse
         $userEntity = $this->identityProvider->getUserEntityByIdentifier($accessToken->getUserIdentifier());
 
         if (false === is_a($userEntity, UserEntityInterface::class)) {
-            throw new \RuntimeException('UserEntity must implement UserEntityInterface');
+            throw new RuntimeException('UserEntity must implement UserEntityInterface');
         }
 
         if (false === is_a($userEntity, ClaimSetInterface::class)) {
-            throw new \RuntimeException('UserEntity must implement ClaimSetInterface');
+            throw new RuntimeException('UserEntity must implement ClaimSetInterface');
         }
 
         // Add required id_token claims
@@ -81,26 +98,26 @@ class IdTokenResponse extends BaseIdTokenResponse
         // Need a claim factory here to reduce the number of claims by provided scope.
         $claims = $this->claimExtractor->extract($accessToken->getScopes(), $userEntity->getClaims());
 
-        // if a nonce is given, we have to return it as claim
-        if ($authorizationRequest && ($nonce = $authorizationRequest->getNonce())) {
-            $claims['nonce'] = $nonce;
-        } elseif (!empty($this->nonce)) {
-            $claims['nonce'] = $this->nonce;
-        }
+		    foreach ($claims as $claimName => $claimValue) {
+			    $builder = $builder->withClaim($claimName, $claimValue);
+		    }
 
-        foreach ($claims as $claimName => $claimValue) {
-            $builder->set($claimName, $claimValue);
-        }
+		    if (
+			    method_exists($this->privateKey, 'getKeyContents')
+			    && !empty($this->privateKey->getKeyContents())
+		    ) {
+			    $key = InMemory::plainText($this->privateKey->getKeyContents(), (string)$this->privateKey->getPassPhrase());
+		    } else {
+			    $key = LocalFileReference::file($this->privateKey->getKeyPath(), (string)$this->privateKey->getPassPhrase());
+		    }
 
-        \go::debug($request = ServerRequest::fromGlobals());
+		    $token = $builder->getToken(new Sha256(), $key);
 
-        $token = $builder
-            ->sign(new Sha256(), new Key($this->privateKey->getKeyPath(), $this->privateKey->getPassPhrase()))
-            ->getToken();
+		    return [
+			    'id_token' => $token->toString()
+		    ];
 
-        return [
-            'id_token' => (string)$token
-        ];
+
     }
 
     /**

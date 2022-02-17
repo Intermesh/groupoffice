@@ -1040,7 +1040,7 @@ class User extends Entity {
 	 */
 	public function getProfile(): ?Contact
 	{
-		if(!Module::isInstalled('community', 'addressbook')) {
+		if(!Module::isInstalled('community', 'addressbook', true)) {
 			return null;
 		}
 		
@@ -1060,12 +1060,17 @@ class User extends Entity {
 		if(!Module::isInstalled('community', 'addressbook')) {
 			throw new Exception("Can't set profile without address book module.");
 		}
-		
-		$this->contact = $this->getProfile();		
-		$this->contact->setValues($values);		
-	
-		if(!empty($this->contact->name)) {
-			$this->displayName = $this->contact->name;
+		if(isset($values['id'])) {
+			$contact = \go\modules\community\addressbook\model\Contact::findById($values['id']);
+			if(!empty($contact)){
+				$this->contact = $contact;
+			}
+		} else {
+			$this->contact = $this->getProfile();
+			$this->contact->setValues($values);
+			if (!empty($this->contact->name)) {
+				$this->displayName = $this->contact->name;
+			}
 		}
 	}
 
@@ -1146,6 +1151,10 @@ class User extends Entity {
 			if ($calendarId = $this->calendarSettings->calendar_id) {
 				$aclIds[] = Calendar::model()->findByPk($calendarId)->findAclId();
 			}
+		}
+
+		if (Module::isInstalled("legacy", "projects2")) {
+			go()->getDbConnection()->delete('pr2_default_resources', ['user_id' => $this->id] )->execute();
 		}
 
 		$grpId = $this->getPersonalGroup()->id();

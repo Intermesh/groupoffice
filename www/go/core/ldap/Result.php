@@ -2,6 +2,9 @@
 
 namespace go\core\ldap;
 
+use Countable;
+use Iterator;
+
 /**
  * LDAP search result
  * 
@@ -19,7 +22,7 @@ namespace go\core\ldap;
  * @copyright Copyright Intermesh BV
  * @author Merijn Schering <mschering@intermesh.nl> 
  */
-class Result implements \Iterator, \Countable {
+class Result implements Iterator, Countable {
 
 	/**
 	 * The LDAP connection
@@ -45,20 +48,23 @@ class Result implements \Iterator, \Countable {
 		$this->connection = $ldapConn;
 	}
 
+	#[\ReturnTypeWillChange]
 	public function current() {		
 		return $this->current;
 	}
 
-	public function key(): \scalar {
+	#[\ReturnTypeWillChange]
+	public function key() {
 		return $this->index;
 	}
 
+	#[\ReturnTypeWillChange]
 	public function next() {	
 		$this->index++;
 		$this->setEntry(ldap_next_entry($this->connection->getLink(), $this->entryId));
 	}
 
-	public function rewind() {
+	public function rewind(): void {
 		$this->index = 0;
 		$this->setEntry(ldap_first_entry($this->connection->getLink(), $this->searchId));		
 	}

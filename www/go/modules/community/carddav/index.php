@@ -1,8 +1,20 @@
 <?php
+/**
+ * Copyright Intermesh
+ *
+ * This file is part of Group-Office. You should have received a copy of the
+ * Group-Office license along with Group-Office. See the file /LICENSE.TXT
+ *
+ * If you have questions write an e-mail to info@intermesh.nl
+ *
+ * @copyright Copyright Intermesh
+ * @author Merijn Schering <mschering@intermesh.nl>
+ */
 
 use go\core\App;
 use go\core\dav\auth\BasicBackend;
 use go\core\dav\davacl\PrincipalBackend;
+use go\core\http\Request;
 use go\modules\community\carddav\Backend;
 use Sabre\CardDAV\AddressBookRoot;
 use Sabre\CardDAV\Plugin as CardDAVPlugin;
@@ -19,17 +31,6 @@ App::get();
 
 // allow 2 minutes for vcard generation
 go()->getEnvironment()->setMaxExecutionTime(120);
-/**
- * Copyright Intermesh
- *
- * This file is part of Group-Office. You should have received a copy of the
- * Group-Office license along with Group-Office. See the file /LICENSE.TXT
- *
- * If you have questions write an e-mail to info@intermesh.nl
- *
- * @copyright Copyright Intermesh
- * @author Merijn Schering <mschering@intermesh.nl>
- */
 
 $authBackend = new BasicBackend();
 $authBackend->checkModulePermission('community', 'carddav');
@@ -48,6 +49,7 @@ $nodes = array(
 $server = new Server($nodes);
 $server->debugExceptions = go()->getDebugger()->enabled;
 $server->on('exception', function($e){
+//	go()->debug(Request::get()->getHeaders());
 	go()->debug((string) $e);
 });
 

@@ -3,11 +3,10 @@ go.modules.community.tasks.CategoriesGrid = Ext.extend(go.NavGrid, {
 	initComponent: function () {
 
 		Ext.apply(this, {
-			hideMenuButton: !go.Modules.get("community", 'tasks').userRights.mayChangeCategories,
+			//hideMenuButton: !go.Modules.get("community", 'tasks').userRights.mayChangeCategories,
 			store: new go.data.Store({
 				fields: ['id', 'name'],
-				entityStore: "TaskCategory",
-				filters: {ownerId:{ownerId: go.User.id}}
+				entityStore: "TaskCategory"
 			}),
 			menuItems: [
 				{
@@ -41,8 +40,8 @@ go.modules.community.tasks.CategoriesGrid = Ext.extend(go.NavGrid, {
 		go.modules.community.tasks.CategoriesGrid.superclass.initComponent.call(this);
 
 		this.on('beforeshowmenu', (menu, record) => {
-			menu.getComponent("edit").setDisabled(record.json.permissionLevel < go.permissionLevels.manage);
-			menu.getComponent("delete").setDisabled(record.json.permissionLevel < go.permissionLevels.manage);
+			menu.getComponent("edit").setDisabled(record.json.permissionLevel < go.permissionLevels.write);
+			menu.getComponent("delete").setDisabled(record.json.permissionLevel < go.permissionLevels.writeAndDelete);
 		});
 
 	}

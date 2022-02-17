@@ -739,7 +739,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * @return array
    * @throws Exception
    */
-	public function jsonSerialize(): array
+	#[\ReturnTypeWillChange]
+	public function jsonSerialize()
 	{
 		return $this->toArray();
 	}
