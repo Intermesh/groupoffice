@@ -204,21 +204,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			}
 			avatar.listeners = {
 				afterrender : (cmp) => {
-					cmp.getEl().on("click" , async () => {
-						//lookup in address book
-						const ids = await go.Db.store("Contact").query({
-							filter: {
-								isUser: creator.id
-							}
-						}).then(r=>r.ids);
-
-						if(!ids.length) {
-							Ext.MessageBox.alert(t("Not found"), t("Could not find this user in the address book for you."));
-						} else
-						{
-							go.Entities.get("Contact").goto(ids[0]);
-						}
-					})
+					cmp.getEl().on("click" , () => {
+						go.modules.community.addressbook.lookUpUserContact(creator.id);
+					});
 				}
 			}
 
