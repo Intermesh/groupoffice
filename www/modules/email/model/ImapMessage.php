@@ -742,29 +742,33 @@ class ImapMessage extends ComposerMessage {
 	{
 		$str = '';
 		if($bIsPlain) {
-			$str .= "--\r\n" .
-				"Deleted: " . $att->name . "\r\n" .
-				"--\r\n" .
-				"You deleted an attachment from this message. The original MIME headers for the attachment were:\r\n" .
-				"Content-Type: " . $att->mime . "; name=\"" . $att->name . "\"\r\n" .
-				"Content-Disposition: " . $att->disposition . "; filename=\"" . $att->name . "\"\r\n" .
-				"Content-Transfer-Encoding: " . $att->encoding;
 
+			$str .= "--\r\nThe attachment '" . $att->name . "' was manually removed.";
+			// Leaving this commented out for a while. Perhaps in the future, the wish is to show somewhat more helpful info...
+//			$str .= "--\r\n" .
+//				"Deleted: " . $att->name . "\r\n" .
+//				"--\r\n" .
+//				"You deleted an attachment from this message. The original MIME headers for the attachment were:\r\n" .
+//				"Content-Type: " . $att->mime . "; name=\"" . $att->name . "\"\r\n" .
+//				"Content-Disposition: " . $att->disposition . "; filename=\"" . $att->name . "\"\r\n" .
+//				"Content-Transfer-Encoding: " . $att->encoding;
 		} else {
-			$str .= '<hr/>' .
-				'Deleted: ' . $att->name . '<br>' .
-				'<hr/>' .
-				'You deleted an attachment from this message. The original MIME headers for the attachment were:<br>' .
-				'Content-Type: ' . $att->mime . '; name="' . $att->name . '"<br>' .
-				'Content-Disposition: ' . $att->disposition . '; filename="' . $att->name . '"<br>' .
-				'Content-Transfer-Encoding: ' . $att->encoding;
+			$str .= "<hr/>The attachment <strong>" . $att->name . "</strong> was manually removed.";
+
+//			$str .= '<hr/>' .
+//				'Deleted: ' . $att->name . '<br>' .
+//				'<hr/>' .
+//				'You deleted an attachment from this message. The original MIME headers for the attachment were:<br>' .
+//				'Content-Type: ' . $att->mime . '; name="' . $att->name . '"<br>' .
+//				'Content-Disposition: ' . $att->disposition . '; filename="' . $att->name . '"<br>' .
+//				'Content-Transfer-Encoding: ' . $att->encoding;
 		}
-		if (isset($this->content_id)) {
-			$str .= '<br>Content-ID: ' . $att->content_id . '<br>' .
-				'X-Attachment-Id:' . $att->content_id;
-			$str .= "\r\nContent-ID: " . $att->content_id . "\r\n" .
-				"X-Attachment-Id: " . $att->content_id;
-		}
+//		if (isset($this->content_id)) {
+//			$str .= '<br>Content-ID: ' . $att->content_id . '<br>' .
+//				'X-Attachment-Id:' . $att->content_id;
+//			$str .= "\r\nContent-ID: " . $att->content_id . "\r\n" .
+//				"X-Attachment-Id: " . $att->content_id;
+//		}
 		return $str;
 	}
 
