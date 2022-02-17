@@ -47,8 +47,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this.permissionLevel = this.messagesGrid.store.reader.jsonData.permission_level;
 			
 			this.messagesGrid.deleteButton.setDisabled(this.readOnly);
-//			this.propertiesButton.setDisabled(!this.isManager);
-		}, this);		
+		}, this);
 		
 		
 
@@ -81,44 +80,20 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	});
 	this.addGridHandlers(this.leftMessagesGrid);
 
-//	this.topMessagesGrid = new GO.email.MessagesGrid({
-//		id:'em-pnl-north',
-//		emailClient:this,
-//		store:this.messagesStore,
-//		height: 250,
-//		region:'north',
-//		hidden:!messagesAtTop,
-//		deleteConfig : deleteConfig,
-//		floatable:false,
-//		collapsible:true,
-//		collapseMode:'mini',
-//		split:true
-//	});
-//	this.addGridHandlers(this.topMessagesGrid);
-
-//	if(!this.topMessagesGrid.hidden)
-//	{
-//		this.messagesGrid=this.topMessagesGrid;
-//	}else
-//	{
-		this.messagesGrid=this.leftMessagesGrid;
-//	}
+	this.messagesGrid=this.leftMessagesGrid;
 
 	//for global access by composers
 	GO.email.messagesGrid = this.messagesGrid;
 
 	this.messagesGrid.store.on('load',function(){
 
-//		var cm = this.topMessagesGrid.getColumnModel();
 		var header = this.messagesGrid.store.reader.jsonData.sent || this.messagesGrid.store.reader.jsonData.drafts ? t("To", "email") : t("From", "email");
 		var header2 = this.messagesGrid.store.reader.jsonData.sent || this.messagesGrid.store.reader.jsonData.drafts ? t("From", "email") : t("To", "email");
-//		cm.setColumnHeader(cm.getIndexById('from'), header);
-//		cm.setColumnHeader(cm.getIndexById('to'), header2);
 
 		var unseen = this.messagesGrid.store.reader.jsonData.unseen;
-		for(var mailbox in unseen)
-			this.updateFolderStatus(mailbox,unseen[mailbox]);
-
+		for(var mailbox in unseen) {
+			this.updateFolderStatus(mailbox, unseen[mailbox]);
+		}
 		//don't confirm delete to trashfolder
 		this.messagesGrid.deleteConfig.noConfirmation=!this.messagesGrid.store.reader.jsonData.deleteConfirm;
 	}, this);
@@ -242,9 +217,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		handler: function(){
 
 			var record = this.messagesGrid.selModel.getSelected();
-			if(record)
-			{
-				//var win = window.open(GO.url("email/message/source",{account_id:this.account_id,mailbox:this.mailbox,uid:record.data.uid}));
+			if(record) {
 				var win = window.open(GO.url("email/message/source",{account_id:this.account_id,mailbox:record.data.mailbox,uid:record.data.uid}));
 				win.focus();
 			}
@@ -270,7 +243,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			if(records) {
 
 				var addEmailAsAttachmentList = [];
-
 
 				Ext.each(records, function(record) {
 					addEmailAsAttachmentList.push({
@@ -450,8 +422,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		})
 	);
 	
-	
-
 	this.gridContextMenu = new GO.menu.RecordsContextMenu({
 		shadow: "frame",
 		minWidth: 180,
@@ -487,9 +457,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		  handler: function(){
 
 			  var record = this.messagesGrid.selModel.getSelected();
-			  if(record)
-			  {
-				  //var win = window.open(GO.url("email/message/source",{account_id:this.account_id,mailbox:this.mailbox,uid:record.data.uid}));
+			  if(record) {
 				  var win = window.open(GO.url("email/message/source",{account_id:this.account_id,mailbox:record.data.mailbox,uid:record.data.uid}));
 				  win.focus();
 			  }
@@ -596,8 +564,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			node.attributes.mailbox,
 			usage
 		);
-		
-		
 	}, this);
 
 	this.treePanel.on('click',function(node){
@@ -727,16 +693,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 					this.messagesGrid.deleteSelected();
 					this.westPanel.show();
 				}}
-//			this.closeMessageButton = new Ext.Button({
-//				hidden:true,
-//				iconCls: 'ic-close',
-//				text: t("Close"),
-//				handler: function(){
-//					this.messagesGrid.expand();
-//
-//				},
-//				scope: this
-//			})
 		]}),
 		region:'center',
 		autoScroll:true,
@@ -771,11 +727,9 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		}else
 		{
 			this.messagePanel.do_not_mark_as_read = 0;
-			if(!GO.util.empty(data.do_not_mark_as_read))
+			if(!GO.util.empty(data.do_not_mark_as_read)) {
 				this.messagePanel.do_not_mark_as_read = data.do_not_mark_as_read;
-			//this.messagePanel.uid=record.data['uid'];	
-			
-			
+			}
 			this.replyAllButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.replyButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.forwardButton.setDisabled(this.readOnly && !this._permissionDelegated);
@@ -783,10 +737,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 			var record = this.messagesGrid.store.getById(this.messagePanel.uid);
 
-			if(record && !record.data.seen && data.notification)
-			{
-				if(GO.email.alwaysRespondToNotifications || confirm(t("The sender of this messages likes a read notification by you at: %s. Do you want to send a read notification now?", "email").replace('%s', data.notification)))
-				{
+			if(record && !record.data.seen && data.notification) {
+				if(GO.email.alwaysRespondToNotifications || confirm(t("The sender of this messages likes a read notification by you at: %s. Do you want to send a read notification now?", "email").replace('%s', data.notification))) {
 					GO.request({
 						url: "email/message/notification",
 						params: {
@@ -809,27 +761,13 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.printButton.setDisabled(true);
 	}, this);
 
-
-//	this.messagePanel.on('linkClicked', function(href){
-//		var win = window.open(href);
-//		win.focus();
-//	}, this);
-
 	this.messagePanel.on('attachmentClicked', GO.email.openAttachment, this);
-	//this.messagePanel.on('zipOfAttachmentsClicked', this.openZipOfAttachments, this);
-
-
-	/*this.messagePanel.on('emailClicked', function(email){
-	this.showComposer({to: email});
-  }, this);*/
 
 	/*
-   * for email seaching on sender from message panel
+     * for email seaching on sender from message panel
    */
-	GO.email.searchSender=function(sender)
-	{
-		if(this.rendered)
-		{
+	GO.email.searchSender=function(sender) {
+		if(this.rendered) {
 			GO.email.search_type = 'from';
 			this.messagesGrid.showUnreadButton.toggle(false, true);
 			this.messagesGrid.store.baseParams['search'] = sender;
@@ -844,10 +782,10 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				}
 			});
 
-			if(GO.mainLayout.tabPanel)
+			if(GO.mainLayout.tabPanel) {
 				GO.mainLayout.tabPanel.setActiveTab(this.id);
-		}else
-		{
+			}
+		} else {
 			alert(t("To use this function you must load your e-mail first by pressing the e-mail tab", "email"));
 		}
 	}
@@ -859,24 +797,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	},
 
 	_permissionDelegated : false,
-
-//	moveGrid : function(){
-//		if(this.topMessagesGrid.isVisible())
-//		{
-//			this.messagesGrid=this.leftMessagesGrid;
-//			this.topMessagesGrid.hide();
-//
-//		}else
-//		{
-//			this.messagesGrid=this.topMessagesGrid;
-//			this.leftMessagesGrid.hide();
-//		}
-//		//this.messagesGridContainer.add(this.messagesGrid);
-//		this.messagesGrid.show();
-//		this.messagesGrid.ownerCt.doLayout();
-//
-//		Ext.state.Manager.set('em-msgs-top', Ext.encode(this.topMessagesGrid.isVisible()));
-//	},
 
 	addGridHandlers : function(grid)
 	{
@@ -922,20 +842,16 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			}else
 			{
 				this.messagePanel.popup();
-				//this.messagesGrid.collapse();
 			}
 		}, this);
 
 		grid.on('navigate', function (sm, rowIndex, r) {
 			if(r.data['uid']!=this.messagePanel.uid)
 			{
-				//this.messagePanel.uid=r.data['uid'];
-				//this.messagePanel.loadMessage(r.data.uid, this.mailbox, this.account_id);
 				this.messagePanel.loadMessage(r.data.uid, r.data['mailbox'], this.account_id);
 				this.messagePanel.show();
 				if(!r.data.seen && this.messagesGrid.store.reader.jsonData.permission_level > GO.permissionLevels.read){
 					//set read with 2 sec delay.
-					//this.markAsRead.defer(2000, this, [r.data.uid, this.mailbox, this.account_id]);
 					this.markAsRead.defer(2000, this, [r.data.uid, r.data['mailbox'], this.account_id]);
 				}
 			}
@@ -987,32 +903,15 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 	afterRender : function(){
 		GO.email.EmailClient.superclass.afterRender.call(this);
-
-//		GO.email.notificationEl.setDisplayed(false);
-
 		this.body.mask(t("Loading..."));
 	},
 
-	onShow : function(){
-
-//		GO.email.notificationEl.setDisplayed(false);
-
+	onShow : function() {
 		GO.email.EmailClient.superclass.onShow.call(this);
 	},
 
-//	updateNotificationEl : function(){
-//		var node = this.treePanel.getRootNode();
-//
-//		GO.email.totalUnseen=0;
-//		for(var i=0;i<node.childNodes.length;i++)
-//		{
-//			GO.email.totalUnseen += node.childNodes[i].attributes.inbox_new;
-//		}
-//
-//	},
 
-	showComposer : function(values)
-	{
+	showComposer : function(values) {
 		GO.email.showComposer(
 		{
 			account_id: this.account_id,
@@ -1035,7 +934,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.account_id = account_id;
 		this.mailbox = mailbox;
 
-		//messagesPanel.setTitle(mailbox);
 		this.messagesGrid.account_id = account_id;
 		this.messagesGrid.store.baseParams['task']='messages';
 		this.messagesGrid.store.baseParams['account_id']=account_id;
@@ -1064,41 +962,32 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	 */
 	updateFolderStatus : function(mailbox, unseen, account_id)
 	{
-		if(!account_id)
-			account_id=this.messagesGrid.store.baseParams.account_id;
+		if(!account_id) {
+			account_id = this.messagesGrid.store.baseParams.account_id;
+		}
 		var nodeId = this.getFolderNodeId(account_id, mailbox);
 		var statusElId = "status_"+nodeId;
 		var statusEl = Ext.get(statusElId);
 
 
-
-//		var node = this.treePanel.getNodeById('folder_'+mailbox);
-//		if(node && node.attributes.mailbox=='INBOX')
-//		{
-//			node.parentNode.attributes.inbox_new=unseen;
-//		}
-
-		if(statusEl && statusEl.dom)
-		{
+		if(statusEl && statusEl.dom) {
 			var node = this.treePanel.getNodeById(nodeId);
 
 			if(node) {
-				if (unseen)
+				if (unseen) {
 					node.getUI().addClass('ml-folder-unseen');
-				else
+				} else {
 					node.getUI().removeClass('ml-folder-unseen');
+				}
 			}
 
 			var statusText = statusEl.dom.innerHTML;
 			var current = statusText=='' ? 0 : parseInt(statusText);
 
-			if(current != unseen)
-			{
-				if(unseen>0)
-				{
+			if(current != unseen) {
+				if(unseen>0) {
 					statusEl.dom.innerHTML = unseen;
-				}else
-				{
+				}else {
 					statusEl.dom.innerHTML = "";
 				}
 				return true;
@@ -1121,17 +1010,13 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		}
 		status+=increment;
 
-//		GO.email.totalUnseen+=increment;
-
 		this.updateFolderStatus(mailbox, status);
-//		this.updateNotificationEl();
 	},
 
 
 
 
-	refresh : function(refresh)
-	{
+	refresh : function(refresh) {
 
 		//restore scroll position after refresh in the root node load handler above
 		this.treeScrollTop = this.treePanel.body.dom.scrollTop;
@@ -1146,10 +1031,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			delete this.treePanel.loader.baseParams.refresh;
 	},
 
-	showAccountsDialog : function()
-	{
-		if(!this.accountsDialog)
-		{
+	showAccountsDialog : function() {
+		if(!this.accountsDialog) {
 			this.accountsDialog = new GO.email.AccountsDialog();
 			this.accountsDialog.accountsGrid.accountDialog.on('save', function(dialog, result){
 				if(result.refreshNeeded){
@@ -1180,9 +1063,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	flagMessages : function (flag, clear){
 		var selectedRows = this.messagesGrid.selModel.selections.keys;
 
-		if(selectedRows.length)
-		{
-
+		if(selectedRows.length) {
 			GO.request({
 				url: "email/message/setFlag",
 				maskEl:this.getEl(),
@@ -1193,8 +1074,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 					clear: clear ? 1 : 0,
 					messages: Ext.encode(selectedRows)
 				},
-				success: function(options, response,result)
-				{
+				success: function(options, response,result) {
 					var field;
 					var value;
 
@@ -1205,12 +1085,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 						case 'Seen':
 							field='seen';
 							value=!clear;
-
-//							for(var i=0;i<records.length;i++){
-//								if(records[i].get('seen')!=clear)
-//									GO.email.totalUnseen-=clear;
-//							}
-
 							break;
 						case 'Flagged':
 							field='flagged';
@@ -1226,9 +1100,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 					}
 
 					this.updateFolderStatus(this.mailbox, result.unseen);
-//					this.updateNotificationEl();
-
-
 				},
 				scope:this
 			});
@@ -1240,37 +1111,30 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		var records = this.messagesGrid.getSelectionModel().getSelections();
 
 		var emails=[];
-		for(var i=0;i<records.length;i++)
-		{
+		for(var i=0;i<records.length;i++) {
 			emails.push('"'+records[i].get('from')+'" <'+records[i].get('sender')+'>');
 		}
 
 		var activeComposer=false;
-		if(GO.email.composers)
-		{
-			for(var i=GO.email.composers.length-1;i>=0;i--)
-			{
-				if(GO.email.composers[i].isVisible())
-				{
+		if(GO.email.composers) {
+			for(var i=GO.email.composers.length-1;i>=0;i--) {
+				if(GO.email.composers[i].isVisible()) {
 					activeComposer=GO.email.composers[i];
 					break;
 				}
 			}
 		}
 
-		if(activeComposer)
-		{
+		if(activeComposer) {
 			var f = activeComposer.formPanel.form.findField(menuItem.field);
 			var v = f.getValue();
-			if(v!='')
-			{
+			if(v!='') {
 				v+=', ';
 			}
 			v+=emails.join(', ');
 			f.setValue(v);
 			activeComposer.focus();
-		}else
-		{
+		}else {
 			var config={
 				values:{}
 			}
@@ -1284,13 +1148,10 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 		var emails=[];
 		var from =[];
-		for(var i=0;i<records.length;i++)
-		{
-			//emails.push('"'+records[i].get('from')+'" <'+records[i].get('sender')+'>');
+		for(var i=0;i<records.length;i++) {
 			from.push(records[i].get('from'));
 			emails.push(records[i].get('sender'));
 		}
-		//var fromName = from[0];
 		var dialog = new GO.email.AddressListDialog({
 			email:emails[0],
 			from: from[0],
@@ -1304,11 +1165,9 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		var records = this.messagesGrid.getSelectionModel().getSelections();
 
 		var emails=[];
-		for(var i=0;i<records.length;i++)
-		{
+		for(var i=0;i<records.length;i++) {
 			emails.push(records[i].get('sender'));
 		}
-
 
 		go.Db.store("Contact").query({
 			filter: {
@@ -1336,7 +1195,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 GO.mainLayout.onReady(function(){
 
 	let countEmailShown;
-	//GO.email.Composer = new GO.email.EmailComposer();
 
 	//contextmenu when an e-mail address is clicked
 	GO.email.addressContextMenu=new GO.email.AddressContextMenu();
@@ -1431,6 +1289,37 @@ GO.email.saveAllAttachments = function(panel){
 	this.selectFolderDialog.show();
 };
 
+GO.email.deleteAllAttachments = function(panel) {
+	Ext.MessageBox.confirm(
+		t('Delete all attachments', 'email', 'legacy'),
+		t('Are you sure that you wish to remove all attachments from this email message?', 'email', 'legacy'),
+		function(btn) {
+			if(btn === 'yes') {
+				GO.request({
+					url: 'email/message/deleteAllAttachments',
+					params:{
+						uid: panel.uid,
+						mailbox: panel.mailbox,
+						account_id: panel.account_id
+					},
+
+					success: function (options, response, result) {
+						if(result.uid) {
+							panel.loadMessage(result.uid, panel.mainbox, panel.account_id);
+							GO.email.emailClient.leftMessagesGrid.store.load();
+						}
+					},
+					failure: function(response,options,result) {
+						console.log(response);
+						console.log(options);
+						console.log(result);
+					},
+					scope: this
+				});
+			}
+		}, this);
+};
+
 GO.email.saveAttachment = function(attachment,panel)
 	{
 		if(!GO.files.saveAsDialog)
@@ -1492,8 +1381,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 			return;
 		}
 
-		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml'))
-		{
+		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml')) {
 			GO.email.showMessageAttachment(0, {
 				action:'attachment',
 				account_id: panel.account_id,
@@ -1509,12 +1397,8 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 				sender:panel.data.sender, //for gnupg and smime,
 				filepath:panel.data.path ? panel.data.path : '' //In some cases encrypted messages are temporary stored on disk so the handlers must use that to fetch the data.
 			});
-		}else
-		{
-
-
-			switch(attachment.extension)
-			{
+		}else {
+			switch(attachment.extension) {
 				case 'ics':
 					GO.calendar.showEventDialog({
 						url: GO.url('calendar/event/loadICS'),
@@ -1561,10 +1445,8 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 				case 'jpg':
 				case 'jpeg':
 
-					if(GO.files && !forceDownload)
-					{
-						if(!this.imageViewer)
-						{
+					if(GO.files && !forceDownload) {
+						if(!this.imageViewer) {
 							this.imageViewer = new GO.files.ImageViewer({
 								closeAction:'hide'
 							});
@@ -1572,23 +1454,19 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 
 						var index = 0;
 						var images = Array();
-						if(panel)
-						{
-							for (var i = 0; i < panel.data.attachments.length;  i++)
-							{
+						if(panel) {
+							for (var i = 0; i < panel.data.attachments.length;  i++) {
 								var r = panel.data.attachments[i];
 								var ext = GO.util.getFileExtension(r.name);
 
-								if(ext=='jpg' || ext=='png' || ext=='gif' || ext=='bmp' || ext=='jpeg')
-								{
+								if(ext=='jpg' || ext=='png' || ext=='gif' || ext=='bmp' || ext=='jpeg') {
 									images.push({
 										name: r.name,
 										src: r.url+'&inline=1',
 										download_path: r.url+'&inline=0'
 									});
 								}
-								if(r.name==attachment.name)
-								{
+								if(r.name==attachment.name) {
 									index=images.length-1;
 								}
 							}
@@ -1614,9 +1492,6 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 		}
 	};
 
-
-
-
 /**
  * Function that will open an email composer. If a composer is already open it will create a new one. Otherwise it will reuse an already created one.
  * 
@@ -1632,50 +1507,41 @@ GO.email.showComposer = function(config){
 
 	var availableComposer;
 
-	for(var i=0;i<GO.email.composers.length;i++)
-	{
-		if(!GO.email.composers[i].isVisible())
-		{
+	for(var i=0;i<GO.email.composers.length;i++) {
+		if(!GO.email.composers[i].isVisible()) {
 			availableComposer=GO.email.composers[i];
 			break;
 		}
 	}
 
 
-	if(!availableComposer)
-	{
+	if(!availableComposer) {
 		config.move=30*GO.email.composers.length;
 
 		availableComposer = new GO.email.EmailComposer();
 		availableComposer.on('send', function(composer){
-			if(composer.sendParams.reply_uid && composer.sendParams.reply_uid>0)
-			{
+			if(composer.sendParams.reply_uid && composer.sendParams.reply_uid>0) {
 				var record = GO.email.messagesGrid.store.getById(composer.sendParams.reply_uid);
-				if(record)
-				{
+				if(record) {
 					record.set('answered',true);
 				}
 			}
 
-			if(composer.sendParams.forward_uid && composer.sendParams.forward_uid>0)
-			{
+			if(composer.sendParams.forward_uid && composer.sendParams.forward_uid>0) {
 				var record = GO.email.messagesGrid.store.getById(composer.sendParams.forward_uid);
-				if(record)
-				{
+				if(record) {
 					record.set('forwarded',true);
 				}
 			}
 
-			if(GO.email.messagesGrid && GO.email.messagesGrid.store.loaded && (GO.email.messagesGrid.store.reader.jsonData.sent || (GO.email.messagesGrid.store.reader.jsonData.drafts && composer.sendParams.draft_uid && composer.sendParams.draft_uid>0)))
-			{
+			if(GO.email.messagesGrid && GO.email.messagesGrid.store.loaded && (GO.email.messagesGrid.store.reader.jsonData.sent || (GO.email.messagesGrid.store.reader.jsonData.drafts && composer.sendParams.draft_uid && composer.sendParams.draft_uid>0))) {
 				GO.email.messagesGrid.store.reload();
 			}
 		});
 
 		availableComposer.on('save', function(composer){
 
-			if(GO.email.messagesGrid && GO.email.messagesGrid.store.loaded && GO.email.messagesGrid.store.reader.jsonData.drafts)
-			{
+			if(GO.email.messagesGrid && GO.email.messagesGrid.store.loaded && GO.email.messagesGrid.store.reader.jsonData.drafts) {
 				GO.email.messagesGrid.store.reload();
 			}
 		});
@@ -1695,26 +1561,8 @@ go.Modules.register("legacy", 'email', {
 	mainPanel: GO.email.EmailClient,
 	title: t("E-mail"),
 	userSettingsPanels: ["GO.email.SettingsPanel"]
-//	systemSettingsPanels: ["GO.email.SystemSettingsPanel"]
 });
 
-//GO.quickAddPanel.addButton(new Ext.Button({
-//		iconCls:'img-email-add',
-//		cls: 'x-btn-icon',
-//		tooltip:t("Email", "email"),
-//		handler: function(){
-//			GO.email.showComposer();
-//		},
-//		scope: this
-//	}),0);
-
-
-// GO.email.showAddressMenu = function(e, email, name)
-// {
-// 	var e = Ext.EventObject.setEvent(e);
-// 	e.preventDefault();
-// 	GO.email.addressContextMenu.showAt(e.getXY(), email, name);
-// }
 
 (function() {
 
@@ -1722,12 +1570,10 @@ go.Modules.register("legacy", 'email', {
 		var queryString = '';
 		var email = '';
 		var indexOf = href.indexOf('?');
-		if(indexOf>-1)
-		{
+		if(indexOf>-1) {
 			email = href.substr(7, indexOf-7);
 			queryString = href.substr(indexOf+1);
-		}else
-		{
+		}else {
 			email = href.substr(7);
 		}
 
@@ -1739,19 +1585,11 @@ go.Modules.register("legacy", 'email', {
 	}
 
 	function checkForMailto(e, target) {
-		// if(target.tagName!='A')
-		// {
-		// 	target = Ext.get(target).findParent('A', 10);
-		// 	if(!target)
-		// 		return false;
-		// }
 
-		if(target.tagName=='A' && target.attributes.href)
-		{
+		if(target.tagName=='A' && target.attributes.href) {
 			var href=target.attributes.href.value;
 
-			if(href.substr(0,6)=='mailto')
-			{
+			if(href.substr(0,6)=='mailto') {
 				launchAddressContextMenu(e, href);
 			}
 		}
@@ -1760,22 +1598,7 @@ go.Modules.register("legacy", 'email', {
 	Ext.getBody().on('click', checkForMailto);
 })();
 
-GO.newMenuItems.push(
-//				{
-//	itemId : 'email',
-//	text: t("Email", "email"),
-//	iconCls: 'go-model-icon-GO_Email_Model_ImapMessage',
-//	handler:function(item, e){
-//		var taskShowConfig = GO.email.getTaskShowConfig(item);
-//
-////		if(GO.settings.modules.savemailas.read_permission)
-////			taskShowConfig.values.subject='[id:'+item.parentMenu.link_config.modelNameAndId+'] ';
-//
-//		GO.email.showComposer(taskShowConfig);
-//	}
-//},
-
-{
+GO.newMenuItems.push({
 	itemId : 'email-files',
 	text: t("Email files", "email"),
 	iconCls: 'ic-email',
@@ -1812,39 +1635,6 @@ GO.newMenuItems.push(
 	}
 });
 
-// GO.email.getTaskShowConfig = function(item) {
-//
-// 	var taskShowConfig = {};
-//
-// 	if (Ext.isDefined(item)) {
-//
-// 		if(item.itemId && item.parentMenu.showConfigs && item.parentMenu.showConfigs[item.itemId]){
-// 			taskShowConfig = item.parentMenu.showConfigs[item.itemId];
-// 		}else{
-// 			taskShowConfig = item.parentMenu.taskShowConfig || {};
-// 		}
-// 		taskShowConfig.link_config=item.parentMenu.link_config
-// 	}
-//
-// 	taskShowConfig.values={};
-//
-// 	if (Ext.isDefined(item)) {
-//
-// 		taskShowConfig.values={};
-// 		if(typeof(item.parentMenu.panel)!='undefined' && typeof(item.parentMenu.panel.data.email)!='undefined'){
-// 			var to='';
-// 			if(item.parentMenu.panel.data.full_name){
-// 				to='"'+item.parentMenu.panel.data.full_name+'" <'+item.parentMenu.panel.data.email+'>';
-// 			}else if(item.parentMenu.panel.data.name){
-// 				to='"'+item.parentMenu.panel.data.name+'" <'+item.parentMenu.panel.data.email+'>';
-// 			}
-//
-// 			taskShowConfig.values.to=to;
-// 		}
-// 	}
-//
-// 	return taskShowConfig;
-// }
 //files is array of relative paths
 // files is array of objects with {name, path, size, type, extension}
 GO.email.emailFiles = function(files, detailView) {
@@ -2017,7 +1807,6 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 						mail_uid: JSON.stringify(mailUid)
 					},
 					success: function() {
-//						GO.email.emailClient.topMessagesGrid.store.load();
 						var records = me.messagesGrid.selModel.getSelections();
 						var lastItem = records.pop();
 						var index = me.messagesGrid.store.indexOfId(lastItem.id);
@@ -2051,7 +1840,6 @@ GO.email.moveToInbox = function(mailUid,fromAccountId) {
 						mail_uid: mailUid
 					},
 					success: function() {
-//						GO.email.emailClient.topMessagesGrid.store.load();
 						GO.email.emailClient.leftMessagesGrid.store.load();
 					},
 					failure: function(response,options,result) {
@@ -2069,11 +1857,11 @@ GO.email.moveToInbox = function(mailUid,fromAccountId) {
 
 
 /**
-		 * Launch email composer
-		 * 
-		 * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
-		 * @return {undefined}
-		 */
+ * Launch email composer
+ *
+ * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
+ * @return {undefined}
+ */
 go.util.mailto = function (config, event) {
 
 	event.preventDefault();

@@ -5,17 +5,13 @@ namespace GO\Email\Controller;
 
 use GO;
 use GO\Base\Exception\AccessDenied;
-
+use GO\Base\Mail\Imap;
+use GO\Base\Model\Acl;
 use go\core\ErrorHandler;
+use go\core\model\Acl as GoAcl;
 use go\core\model\User;
 use GO\Email\Model\Account;
-use GO\Email\Model\Alias;
 use GO\Email\Model\Label;
-
-use GO\Base\Model\Acl;
-
-use GO\Base\Mail\Imap;
-use go\core\model\Acl as GoAcl;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Settings;
 
@@ -2301,10 +2297,30 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			return $response;
 	}
 
-	protected function actionZipAllAttachments($params){
+	/**
+	 * Delete all attachments from current email message
+	 *
+	 * @param array $params
+	 * @return bool[]
+	 * @throws AccessDenied
+	 */
+	protected function actionDeleteAllAttachments(array $params): array
+	{
+		$account = Account::model()->findByPk($params['account_id']);
+		$response = ['success' => true];
+		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
+		if ($message->deleteAttachments()) {
+			$message->delete();
+			$message->getImapConnection()->expunge();
+			$response['uid'] = $message->getImapConnection()->get_uidnext();
+		}
+
+		return $response;
+	}
+
+	protected function actionZipAllAttachments(array $params){
 
 		$account = Account::model()->findByPk($params['account_id']);
-		//$imap  = $account->openImapConnection($params['mailbox']);
 
 		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
 

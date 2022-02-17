@@ -145,8 +145,13 @@ class SavedMessage extends ComposerMessage {
 	public function getSource(){
 		return '';
 	}
-	
-	public function getZipOfAttachmentsUrl(){
+
+	public function getDeleteAllAttachmentsUrl(): string
+	{
+		return '';
+	}
+	public function getZipOfAttachmentsUrl(): string
+	{
 		return \GO::url("savemailas/linkedEmail/zipOfAttachments", array("tmpdir"=>str_replace(\GO::config()->tmpdir, '', $this->_getTempDir())));
 	}
 	

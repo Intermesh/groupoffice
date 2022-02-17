@@ -1,7 +1,6 @@
 <?php
 namespace go\core\model;
 
-use GO\Base\Mail\SmimeMessage;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
@@ -9,7 +8,6 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\TemplateParser;
 use go\core\validate\ErrorCode;
-use go\modules\community\addressbook\model\EmailAddress;
 use Swift_Attachment;
 use Swift_EmbeddedFile;
 

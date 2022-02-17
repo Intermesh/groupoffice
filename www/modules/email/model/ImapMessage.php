@@ -2,6 +2,7 @@
 
 namespace GO\Email\Model;
 
+use go\core\util\DateTime;
 use go\core\util\StringUtil;
 
 /**
@@ -14,20 +15,20 @@ use go\core\util\StringUtil;
  * @property \GO\Base\Mail\EmailRecipients $bcc
  * @property \GO\Base\Mail\EmailRecipients $from
  * @property \GO\Base\Mail\EmailRecipients $reply_to
- * @property StringHelper $subject
+ * @property string $subject
  * @property int $uid
  * @property int $size
- * @property StringHelper $internal_date Date received
- * @property StringHelper $date Date sent
+ * @property string $internal_date Date received
+ * @property string $date Date sent
  * @property int $udate Unix time stamp sent
  * @property int $internal_udate Unix time stamp received
- * @property StringHelper $x_priority 
- * @property StringHelper $message_id
- * @property StringHelper $content_type
+ * @property string $x_priority
+ * @property string $message_id
+ * @property string $content_type
  * @property array $content_type_attributes
- * @property StringHelper $disposition_notification_to
- * @property StringHelper $content_transfer_encoding
- * @property StringHelper $charset
+ * @property string $disposition_notification_to
+ * @property string $content_transfer_encoding
+ * @property string $charset
  * @property bool $seen
  * @property bool $flagged
  * @property bool $answered
@@ -57,30 +58,7 @@ class ImapMessage extends ComposerMessage {
 	 * @var int 
 	 */
 	public $maxBodySize=256000;
-	
-	
-//	/**
-//	 * Set this to true to get temporary files when using toOutputArray() or
-//	 * getAttachments. This is necessary when the output is prepared for sending 
-//	 * with the composer.
-//	 * 
-//	 * @var boolean 
-//	 */
-//	public $createTempFilesForInlineAttachments=false;
-	
-//	/**
-//	 * Set this to true to get temporary files when using toOutputArray() or
-//	 * getAttachments. This is necessary when the output is prepared for sending 
-//	 * with the composer.
-//	 * 
-//	 * @var boolean 
-//	 */
-//	public $createTempFilesForAttachments=false;
-	
-	
-//	public $cacheOnDestruct=false;
-	
-	
+
 	private $_cache;
 	
 	
@@ -185,17 +163,12 @@ class ImapMessage extends ComposerMessage {
 		$cacheKey='email:'.$account->id.':'.$mailbox.':'.$uid;
 		
 		$cachedMessage = isset($this->_cache[$cacheKey]) ? $this->_cache[$cacheKey] : false;//\GO::cache()->get($cacheKey);
-//		
-		if($cachedMessage)
-		{
-//			\GO::debug("Returning message $cacheKey from cache");
-//			$cachedMessage->cacheOnDestruct=$cacheKey;
-			
+
+		if ($cachedMessage) {
+
 			$imap = $cachedMessage->account->openImapConnection($mailbox);
 			return $cachedMessage;
-		}else
-		{
-		
+		} else {
 			$imapMessage = new ImapMessage();
 			$imapMessage->account=$account;
 			
@@ -211,8 +184,6 @@ class ImapMessage extends ComposerMessage {
 
 			$imapMessage->setAttributes($attributes);
 
-//			$imapMessage->cacheOnDestruct=$cacheKey;
-			
 			$this->_cache[$cacheKey]=$imapMessage;
 			
 			return $imapMessage;
@@ -222,15 +193,7 @@ class ImapMessage extends ComposerMessage {
 	public function clearMessagesCache(){
 		$this->_cache=array();
 	}
-	
-//	public function __destruct() {
-//		if($this->cacheOnDestruct){
-//			$cacheKey=$this->cacheOnDestruct;
-//			$this->cacheOnDestruct=false;
-//			\GO::cache()->set($cacheKey, $this, 3600*24*2);
-//		}
-//	}
-	
+
 	
 	public function createFromHeaders($account, $mailbox, $headers){
 		$imapMessage = new ImapMessage();
@@ -258,21 +221,11 @@ class ImapMessage extends ComposerMessage {
 		$attributes['bcc']=(string) $this->bcc;
 		$attributes['reply_to']=(string) $this->reply_to;
 
-		
-//		$dayStart = mktime(0,0,0);
-		//$dayEnd = mktime(0,0,0,date('m'),date('d')+1);
-		
-//		if($this->udate<$dayStart)
-			$attributes["date"]=\GO\Base\Util\Date::get_timestamp($this->udate, false);
-//		else
-			$attributes["date_time"]=date(\GO::user()->time_format, $this->udate);
-		
-		
-		
-//		if($this->internal_udate<$dayStart)
-			$attributes["arrival"]=\GO\Base\Util\Date::get_timestamp($this->internal_udate, false);
-//		else
-			$attributes["arrival_time"]=date(\GO::user()->time_format, $this->internal_udate);		
+		$attributes["date"]=\GO\Base\Util\Date::get_timestamp($this->udate, false);
+		$attributes["date_time"]=date(\GO::user()->time_format, $this->udate);
+
+		$attributes["arrival"]=\GO\Base\Util\Date::get_timestamp($this->internal_udate, false);
+		$attributes["arrival_time"]=date(\GO::user()->time_format, $this->internal_udate);
 		
 		return $attributes;
 	}
@@ -299,15 +252,16 @@ class ImapMessage extends ComposerMessage {
 	
 	private $_struct;
 	
-	private function _getStruct(){
-		if(!isset($this->_struct)){
+	private function _getStruct()
+	{
+		if (!isset($this->_struct)) {
 			
 			$this->_struct = $this->getImapConnection()->get_message_structure($this->uid);
 			
 			if(count($this->_struct)==1) {
-					$headerCt = explode('/', $this->content_type);
+				$headerCt = explode('/', $this->content_type);
 
-				if(count($headerCt)==2){
+				if(count($headerCt)==2) {
 					//if there's only one part the IMAP server always seems to return the type as text/plain even though the headers say text/html
 					//so use the header's content type.
 
@@ -353,8 +307,6 @@ class ImapMessage extends ComposerMessage {
 			$imap = $this->getImapConnection();
 			$struct = $this->_getStruct();
 			
-			//\GO::debug($struct);
-
 			$hasAlternative = $imap->has_alternative_body($struct);
 
 			$this->_plainParts = $imap->find_body_parts($struct,'text', 'plain');
@@ -370,18 +322,20 @@ class ImapMessage extends ComposerMessage {
 			}
 
 			for($i=0,$max=count($this->_plainParts['parts']);$i<$max;$i++){				
-				if(empty($this->_plainParts['parts'][$i]['charset']))
-					$this->_plainParts['parts'][$i]['charset']=$this->defaultCharset;
-
-				if($this->_plainParts['parts'][$i]['type']=='text')
-					$this->_bodyPartNumbers[]=$this->_plainParts['parts'][$i]['number'];
+				if(empty($this->_plainParts['parts'][$i]['charset'])) {
+					$this->_plainParts['parts'][$i]['charset'] = $this->defaultCharset;
+				}
+				if($this->_plainParts['parts'][$i]['type']=='text') {
+					$this->_bodyPartNumbers[] = $this->_plainParts['parts'][$i]['number'];
+				}
 			}
 			for($i=0,$max=count($this->_htmlParts['parts']);$i<$max;$i++){
-				if(empty($this->_htmlParts['parts'][$i]['charset']))
-					$this->_htmlParts['parts'][$i]['charset']=$this->defaultCharset;
-
-				if($this->_htmlParts['parts'][$i]['type']=='text')
-					$this->_bodyPartNumbers[]=$this->_htmlParts['parts'][$i]['number'];
+				if(empty($this->_htmlParts['parts'][$i]['charset'])) {
+					$this->_htmlParts['parts'][$i]['charset'] = $this->defaultCharset;
+				}
+				if($this->_htmlParts['parts'][$i]['type']=='text') {
+					$this->_bodyPartNumbers[] = $this->_htmlParts['parts'][$i]['number'];
+				}
 			}
 		}
 	}
@@ -402,15 +356,14 @@ class ImapMessage extends ComposerMessage {
 	protected function getSeen(){
 		if(isset($this->attributes['seen'])){
 			return $this->attributes['seen'];
-		} else	{			
-			//when a message is retrieved from cache, we don't know if the seen flag has been changed.
-			//so when this is requested we fetch it from the IMAP server.
-			$imap = $this->getImapConnection();		
-			$attributes = $imap->get_message_header($this->uid, true);
-			$this->setAttributes($attributes);
-			
-			return $this->attributes['seen'];
 		}
+		//when a message is retrieved from cache, we don't know if the seen flag has been changed.
+		//so when this is requested we fetch it from the IMAP server.
+		$imap = $this->getImapConnection();
+		$attributes = $imap->get_message_header($this->uid, true);
+		$this->setAttributes($attributes);
+
+		return $this->attributes['seen'];
 	}
 
 	public function getHtmlBody($asText=false,$noMaxBodySize=false){				
@@ -420,12 +373,12 @@ class ImapMessage extends ComposerMessage {
 			
 			$this->_htmlBody='';
 			if($this->_htmlParts['text_found']){ //check if we found a html body
-//				\GO::debug($this->_htmlParts);
 				foreach($this->_htmlParts['parts'] as $htmlPart){
 					if($htmlPart['type']=='text'){
 
-						if(!empty($this->_htmlBody))
-							$this->_htmlBody.= '<br />';
+						if(!empty($this->_htmlBody)) {
+							$this->_htmlBody .= '<br />';
+						}
 						
 						$maxBodySize = $noMaxBodySize ? false : $this->maxBodySize;
 						
@@ -436,7 +389,7 @@ class ImapMessage extends ComposerMessage {
 						$this->_bodyTruncated = $imap->max_read;
 						
 						$this->_htmlBody .= $htmlPartStr;
-					} else	{
+					} else{
 						$attachment = $this->getAttachment($htmlPart['number']);
 						
 						if(!$attachment){
@@ -476,7 +429,6 @@ class ImapMessage extends ComposerMessage {
 			$html .= '<img alt="'.htmlspecialchars($partInfo['name']).'" src="cid:'.$attachment->content_id.'" style="display:block;margin:10px 0;" />';
 		} else {
 			$html .= '<a alt="'.htmlspecialchars($partInfo['name']).'" href="cid:'.$attachment->content_id.'" style="display:block;margin:10px 0;">'.htmlspecialchars($partInfo['name']).'</a>';
-//			$html .= '<img alt="'.$htmlPart['name'].'" src="cid:'.$attachment->content_id.'" style="display:block;margin:10px 0;" />';
 		}
 	
 		return $html;
@@ -575,7 +527,8 @@ class ImapMessage extends ComposerMessage {
 	 *
 	 * @return ImapMessageAttachment [] 
 	 */
-	public function &getAttachments() {
+	public function &getAttachments(): array
+	{
 		if(!$this->_imapAttachmentsLoaded){			
 			
 			$this->_imapAttachmentsLoaded=true;
@@ -659,18 +612,36 @@ class ImapMessage extends ComposerMessage {
 		return $this->attachments;
 	}
 
-	public function getZipOfAttachmentsUrl(){
-//		return \GO::config()->host.'modules/email/'.
-//		'zip_attachments.php?account_id='.$this->account->id.
-//		'&mailbox='.urlencode($this->mailbox).
-//		'&uid='.$this->uid.'&filename='.urlencode($this->subject);
-//		
+	/**
+	 * Generate a URL for removing all attachments from this message
+	 *
+	 * @return string
+	 */
+	public function getDeleteAllAttachmentsUrl(): string
+	{
 		$params = array(
-					"account_id"=>$this->account->id,
-					"mailbox"=>$this->mailbox,
-					"uid"=>$this->uid					
-			);
-		
+			"account_id" => $this->account->id,
+			"mailbox" => $this->mailbox,
+			"uid" => $this->uid
+		);
+
+		return \GO::url('email/message/deleteAllAttachments', $params);
+
+	}
+
+	/**
+	 * Generate a URL for zipping all attachments
+	 *
+	 * @return string
+	 */
+	public function getZipOfAttachmentsUrl(): string
+	{
+		$params = array(
+			"account_id" => $this->account->id,
+			"mailbox" => $this->mailbox,
+			"uid" => $this->uid
+		);
+
 		return \GO::url('email/message/zipAllAttachments', $params);
 	}
 	
@@ -720,7 +691,88 @@ class ImapMessage extends ComposerMessage {
 		return $this->getImapConnection()->delete(array($this->uid));
 						
 	}
-	
+
+
+	/**
+	 * Remove all attachments from current message
+	 *
+	 * @return bool
+	 */
+	public function deleteAttachments(): bool
+	{
+		$atts = $this->getAttachments();
+		// No attachments, just return false and the original message will be left as is
+		if(count($atts) === 0) {
+			return false;
+		}
+
+		$bIsPlain = !$this->_htmlParts['text_found'];
+		$swiftMsg = new \Swift_Message();
+		$swiftMsg->setTo($this->to->getAddresses());
+		$swiftMsg->setFrom($this->from->getAddresses());
+		$swiftMsg->setCc($this->cc->getAddresses());
+		$swiftMsg->setBcc($this->bcc->getAddresses());
+		$swiftMsg->setSubject($this->subject);
+		$swiftMsg->setDate(new DateTime($this->date));
+		$swiftMsg->setContentType($this->content_type);
+		if(!$bIsPlain) {
+			$swiftMsg->setBody($this->getHtmlBody(), 'text/html');
+		} else {
+			$swiftMsg->setBody($this->getPlainBody(), 'text/plain');
+		}
+		while ($att = array_shift($atts)) {
+			if ($att->disposition == 'attachment' || empty($att->content_id)) {
+				$str = $this->addPartString($att, $bIsPlain);
+				$swiftMsg->addPart($str, ($bIsPlain ? 'text/plain' : 'text/html'));
+			}
+		}
+
+		$this->getImapConnection()->append_message($this->mailbox, $swiftMsg, '\Seen');
+
+		return true;
+	}
+
+
+	/**
+	 * @param ImapMessageAttachment $att
+	 * @param bool $bIsPlain
+	 * @return string
+	 */
+	private function addPartString(ImapMessageAttachment $att, bool $bIsPlain): string
+	{
+		$str = '';
+		if($bIsPlain) {
+
+			$str .= "--\r\nThe attachment '" . $att->name . "' was manually removed.";
+			// Leaving this commented out for a while. Perhaps in the future, the wish is to show somewhat more helpful info...
+//			$str .= "--\r\n" .
+//				"Deleted: " . $att->name . "\r\n" .
+//				"--\r\n" .
+//				"You deleted an attachment from this message. The original MIME headers for the attachment were:\r\n" .
+//				"Content-Type: " . $att->mime . "; name=\"" . $att->name . "\"\r\n" .
+//				"Content-Disposition: " . $att->disposition . "; filename=\"" . $att->name . "\"\r\n" .
+//				"Content-Transfer-Encoding: " . $att->encoding;
+		} else {
+			$str .= "<hr/>The attachment <strong>" . $att->name . "</strong> was manually removed.";
+
+//			$str .= '<hr/>' .
+//				'Deleted: ' . $att->name . '<br>' .
+//				'<hr/>' .
+//				'You deleted an attachment from this message. The original MIME headers for the attachment were:<br>' .
+//				'Content-Type: ' . $att->mime . '; name="' . $att->name . '"<br>' .
+//				'Content-Disposition: ' . $att->disposition . '; filename="' . $att->name . '"<br>' .
+//				'Content-Transfer-Encoding: ' . $att->encoding;
+		}
+//		if (isset($this->content_id)) {
+//			$str .= '<br>Content-ID: ' . $att->content_id . '<br>' .
+//				'X-Attachment-Id:' . $att->content_id;
+//			$str .= "\r\nContent-ID: " . $att->content_id . "\r\n" .
+//				"X-Attachment-Id: " . $att->content_id;
+//		}
+		return $str;
+	}
+
+
 	/**
 	 * Returns an array with linked item objects.
 	 */
