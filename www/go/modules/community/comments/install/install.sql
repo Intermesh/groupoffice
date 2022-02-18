@@ -87,7 +87,8 @@ create table comments_comment_attachment
     name      varchar(190) not null,
     constraint comments_comment_attachment_comments_comment_id_fk
         foreign key (commentId) references comments_comment (id)
-            on update cascade,
+            on delete cascade,
     constraint comments_comment_attachment_core_blob_id_fk
-        foreign key (blobId) references core_blob (id)
+        foreign key (blobId) references core_blob (id) ]
+            on delete cascade
 );
