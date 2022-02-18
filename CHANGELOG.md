@@ -1,3 +1,4 @@
+- pr2analyzer: fix CSV report
 - Core: archive disabled user; remove archived user from project templates
 - Multi instance: Error reporting when (de)activate or login as admin fails
 - Fileconvertor: Added convertio.co api
