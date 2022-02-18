@@ -2,6 +2,7 @@
 - Multi instance: Error reporting when (de)activate or login as admin fails
 - Fileconvertor: Added convertio.co api
 - Email: Added option to remove all attachments
+- Comments: corrected foreign keys
 
 14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog
