@@ -127,13 +127,19 @@ GO.email.AccountDialog = function(config) {
 
 	this.incomingTab = new Ext.Container({
 		title : t("Incoming mail", "email"),
-		layout : 'form',
+		layout: {
+			type: 'form',
+		},
+
 		defaults : {
 			anchor : '100%'
 		},
 		defaultType : 'textfield',
 		autoHeight : true,
-		cls : 'go-form-panel',
+		cls: ' x-fieldset go-form-panel x-fieldset-noborder x-form-label-left',
+		// style: {
+		// 	padding: 'dp(8) dp(16) !important'
+		// },
 		waitMsgTarget : true,
 		labelWidth : 120,
 		items : [
@@ -257,14 +263,17 @@ GO.email.AccountDialog = function(config) {
 	
 	this.outgoingTab = new Ext.Container({
 		title : t("Outgoing mail", "email"),
-		layout : 'form',
+		layout: {
+			type: 'form',
+			padding: dp(10)
+		},
+		cls: ' x-fieldset go-form-panel x-fieldset-noborder x-form-label-left',
 		xtype:'fieldset',
 		defaults : {
 			anchor : '100%'
 		},
 		defaultType : 'textfield',
 		autoHeight : true,
-		cls : 'go-form-panel',
 		labelWidth : 120,
 		items : [this.SmtpHostField = new Ext.form.TextField({
 			fieldLabel : t("Host", "email"),
