@@ -120,6 +120,10 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 			$defaultTemplateModel->save();
 		}
 
+		// $model->isNew() does not work!
+		if(isset($params['oauth2_client_id']) && !empty($params['oauth2_client_id']) && empty($params['id'])) {
+			$response['needs_refresh_token'] = true;
+		}
 		return parent::afterSubmit($response, $model, $params, $modifiedAttributes);
 	}
 

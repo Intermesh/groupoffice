@@ -40,7 +40,6 @@ GO.email.AccountDialog = function(config) {
 		);
 	}
 
-	// TODO: Put this properly in an override function in OAuth2Client. The structure of this dialog does not appear to allow that
 	if (go.Modules.isAvailable("community", "oauth2client")) {
 		this.oauth2ClientCombo = new go.modules.community.oauth2client.ClientCombo({
 			fieldLabel: t('OAuth2 connection', 'oauth2client', 'community'),
@@ -50,7 +49,9 @@ GO.email.AccountDialog = function(config) {
 				'select': function (combo, record, index) {
 					this.incomingTab.hide();
 					this.outgoingTab.hide();
-					this.btnGetRefreshToken.show();
+					if(this.account_id) {
+						this.btnGetRefreshToken.show();
+					}
 
 					this.ImapUserNameField.setValue(this.EmailAddressField.getValue());
 					this.ImapPasswordField.allowBlank = true;
@@ -264,8 +265,7 @@ GO.email.AccountDialog = function(config) {
 	this.outgoingTab = new Ext.Container({
 		title : t("Outgoing mail", "email"),
 		layout: {
-			type: 'form',
-			padding: dp(10)
+			type: 'form'
 		},
 		cls: ' x-fieldset go-form-panel x-fieldset-noborder x-form-label-left',
 		xtype:'fieldset',
