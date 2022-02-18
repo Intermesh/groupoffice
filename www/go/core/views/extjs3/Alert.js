@@ -36,7 +36,7 @@
 		},
 
 		show : function(alert) {
-			const now = new Date(), id = 'core-alert-' + (alert.tag || alert.id);
+			const now = new Date(), id = 'core-alert-' + (alert.tag ||  "none") + "-" + alert.id;
 
 			// if(new Date(alert.triggerAt) > now) {
 			// 	go.Notifier.removeById(id);
@@ -102,7 +102,10 @@
 					return;
 				}
 
+
+
 				alertConfig.panelPromise.then((panelCfg) => {
+
 					go.Notifier.msg(panelCfg);
 				});
 
