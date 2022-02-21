@@ -6,6 +6,8 @@
 - Comments: corrected foreign keys
 - fileconvertor: xlsx extension was missing in libreoffice service
 - Email: Reply from linked emails didn't always load link in composer
+- Smime: fixed unique check for upload certificate
+- Smime: Uploading twice gave js error
 
 14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog
