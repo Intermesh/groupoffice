@@ -8,6 +8,7 @@
 - Email: Reply from linked emails didn't always load link in composer
 - Smime: fixed unique check for upload certificate
 - Smime: Uploading twice gave js error
+- Tasks: Added tasks per owner
 
 14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog
