@@ -3,6 +3,7 @@
 - Fileconvertor: Added convertio.co api
 - Email: Added option to remove all attachments
 - Comments: corrected foreign keys
+- fileconvertor: xlsx extension was missing in libreoffice service
 
 14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog
