@@ -46,6 +46,13 @@ class Certificate extends \GO\Base\Db\ActiveRecord {
 		return 'smi_pkcs12';
 	}
 
+	protected function init()
+	{
+		parent::init();
+
+		$this->columns['serial']['unique'] = ['provided_by'];
+	}
+
 	public function read($passphrase = null) {
 		if($passphrase === null) {
 			$passphrase = \GO::session()->values['smime']['passwords'][$this->account_id];
