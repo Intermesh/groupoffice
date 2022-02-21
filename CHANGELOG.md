@@ -9,6 +9,8 @@
 - Smime: fixed unique check for upload certificate
 - Smime: Uploading twice gave js error
 - Tasks: Added tasks per owner
+- Tasks: Added CLI command: ./cli.php community/tasks/Tasklist/export --tasklistId=4 --format=csv
+- Notes: Added CLI  command: ./cli.php community/notes/NoteBook/export --noteBookId=65 --format=csv
 
 14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog
