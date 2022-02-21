@@ -13,11 +13,6 @@ use go\core\util\ClassFinder;
 use go\core\util\StringUtil;
 use function go;
 
-/**
- * Entities can use this trait to make it show up in the global search function
- * 
- * @property array $customFields 
- */
 trait SearchableTrait {
 
 	public static $updateSearch = true;

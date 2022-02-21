@@ -201,8 +201,8 @@
 		 * See FieldSet::getFilter() in the PHP documentation
 		 * 
 		 */
-		filterFieldSets : function(formPanel) {
-			var values = formPanel instanceof go.form.EntityPanel ? formPanel.getValues() : formPanel.getForm().getFieldValues();
+		filterFieldSets : function(formPanel, values) {
+			values = values || (formPanel instanceof go.form.EntityPanel ? formPanel.getValues() : formPanel.getForm().getFieldValues());
 			formPanel.findByType("customformfieldset").forEach(function(fs){
 				fs.filter(values);
 			}, this);
