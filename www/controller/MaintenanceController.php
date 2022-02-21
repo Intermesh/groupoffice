@@ -219,7 +219,7 @@ class MaintenanceController extends AbstractController {
 		
 		$checkModels = array(
 				"GO\Calendar\Model\Event"=>array('name', 'start_time', 'end_time', 'calendar_id', 'rrule'),
-				"GO\Tasks\Model\Task"=>array('name', 'start_time', 'due_time', 'tasklist_id', 'rrule', 'user_id'),
+//				"GO\Tasks\Model\Task"=>array('name', 'start_time', 'due_time', 'tasklist_id', 'rrule', 'user_id'),
 				"GO\Files\Model\Folder"=>array('name', 'parent_id'),
 //				"GO\Calendar\Model\Participant"=>array('event_id', 'email'),
 				//"GO\Billing\Model\Order"=>array('order_id','book_id','btime')
