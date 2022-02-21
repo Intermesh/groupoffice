@@ -205,7 +205,7 @@ class Task extends AclItemEntity {
 
 	protected static function defineMapping(): Mapping
 	{
-		return parent::defineMapping()
+		$mapping = parent::defineMapping()
 			->addTable("tasks_task", "task")
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
@@ -213,7 +213,7 @@ class Task extends AclItemEntity {
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 
 		if(Module::isInstalled("legacy", "projects2")) {
-			$mapping->setQuery((new \go\core\db\Query())
+			$mapping->addQuery((new Query())
 				->join('pr2_hours', 'prh', 'prh.task_id = task.id', 'left')
 				->select('COALESCE(SUM(prh.duration) * 60, 0) AS timeBooked')
 				->groupBy(['task.id'])
