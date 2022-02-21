@@ -212,14 +212,6 @@ class Task extends AclItemEntity {
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 
-		if(Module::isInstalled("legacy", "projects2")) {
-			$mapping->addQuery((new Query())
-				->join('pr2_hours', 'prh', 'prh.task_id = task.id', 'left')
-				->select('COALESCE(SUM(prh.duration) * 60, 0) AS timeBooked')
-				->groupBy(['task.id'])
-			);
-		}
-
 		return $mapping;
 	}
 
