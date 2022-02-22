@@ -547,7 +547,6 @@ class Task extends AclItemEntity {
 			$query->join('tasks_tasklist_group', 'listGroup', 'listGroup.id = task.groupId', 'LEFT');
 			$sort->renameKey('groupOrder', 'listGroup.sortOrder');
 			$sort['id'] = "ASC";
-			unset($sort['groupOrder']);
 		}
 
 		if(isset($sort['tasklist'])) {
