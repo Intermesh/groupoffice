@@ -1,6 +1,7 @@
 - Email: Don't set a default template per account by default. Only a default for the user.
 - Email: Fix download all attachments as zip
 - Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
+- Core: Optimized memory management in database check for core models
 
 21-02-2022 6.6.44
 - pr2analyzer: fix CSV report
