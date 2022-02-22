@@ -596,11 +596,34 @@ class MaintenanceController extends AbstractController {
 				$m = \GO::getModel($model->getName());
 
 				if($m->checkDatabaseSupported()){		
+//					$stmt = $m->find(array(
+//							'ignoreAcl'=>true
+//					));
+//
+//					$stmt->callOnEach('checkDatabase');
+
+
+					//to avoid memory errors
+					$start = 0;
+
+					//per thousands to keep memory low
 					$stmt = $m->find(array(
-							'ignoreAcl'=>true
+						'ignoreAcl'=>true,
+						'start' => $start,
+						'limit' => 1000
 					));
-					
-					$stmt->callOnEach('checkDatabase');
+
+					while($stmt->rowCount()) {
+						$stmt->callOnEach('checkDatabase', true);
+
+						$stmt = $m->find(array(
+							'ignoreAcl'=>true,
+							'start' => $start+=1000,
+							'limit' => 1000
+						));
+					}
+
+					unset($stmt);
 					
 				}
 			}
