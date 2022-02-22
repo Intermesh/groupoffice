@@ -1,3 +1,5 @@
+- Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
+
 14-02-2022 6.5.102
 - Core: UK bank holidays 2022 overrides
 - ActiveSync: sorting on column status works
