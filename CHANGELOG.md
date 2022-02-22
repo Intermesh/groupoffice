@@ -1,3 +1,5 @@
+- Email: Don't set a default template per account by default. Only a default for the user.
+
 21-02-2022 6.6.44
 - pr2analyzer: fix CSV report
 - Core: archive disabled user; remove archived user from project templates
