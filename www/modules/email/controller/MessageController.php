@@ -24,7 +24,8 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 	/*
 	 * Example URL: http://localhost/groupoffice-4.0/www/?r=email/message/mailto&mailto=mailto:info@intermesh.nl&bcc=test@intermesh.nl&body=jaja&cc=cc@intermesh.nl&subject=subject
 	 */
-	protected function actionMailto($params){
+	protected function actionMailto($params)
+	{
 		$qs=strtolower(str_replace('mailto:','', urldecode($_SERVER['QUERY_STRING'])));
 		$qs=str_replace('?subject','&subject', $qs);
 
@@ -37,22 +38,22 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 		if(!isset($vars['subject']))
 			$vars['subject']='';
 
-		if(!isset($vars['body']))
-			$vars['body']='';
-		//
-//		var_dump($vars);
-//		exit();
+		if(!isset($vars['body'])) {
+			$vars['body'] = '';
+		}
 
 		header('Location: '.GO::createExternalUrl('email', 'showComposer', array('values'=>$vars)));
 		exit();
 	}
 
-	protected function actionNotification($params){
+	protected function actionNotification(array $params): array
+	{
 		$account = Account::model()->findByPk($params['account_id']);
 		
 		$alias = $this->_findAliasFromRecipients($account, new \GO\Base\Mail\EmailRecipients($params['message_to']));	
-		if(!$alias)
+		if(!$alias) {
 			$alias = $account->getDefaultAlias();
+		}
 
 		$body = sprintf(GO::t("Your message with subject \"%s\" was displayed at %s", "email"), $params['subject'], \GO\Base\Util\Date::get_timestamp(time()));
 
@@ -2318,8 +2319,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		return $response;
 	}
 
-	protected function actionZipAllAttachments(array $params){
-
+	protected function actionZipAllAttachments(array $params)
+	{
 		$account = Account::model()->findByPk($params['account_id']);
 
 		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
