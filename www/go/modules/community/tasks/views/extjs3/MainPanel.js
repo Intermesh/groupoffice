@@ -350,13 +350,13 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.tasklistsGrid.on('selectionchange', this.onTasklistSelectionChange, this); //add buffer because it clears selection first
 	},
 
-	checkValues: function() {
-		if(this.taskDateField.getValue() != null && this.taskNameTextField.getValue() != "") {
-			this.addTaskButton.setDisabled(false);
-		} else {
-			this.addTaskButton.setDisabled(true);
-		}
-	},
+	// checkValues: function() {
+	// 	if(this.taskDateField.getValue() != null && this.taskNameTextField.getValue() != "") {
+	// 		this.addTaskButton.setDisabled(false);
+	// 	} else {
+	// 		this.addTaskButton.setDisabled(true);
+	// 	}
+	// },
 	
 	createTaskGrid : function() {
 
@@ -463,55 +463,55 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					}
 
 				],
-			bbar: new Ext.Toolbar({
-				layout:'hbox',
-				layoutConfig: {
-					align: 'middle',
-					defaultMargins: {left: dp(4), right: dp(4),bottom:0,top:0}
-				},
-				items:[this.taskNameTextField = new Ext.form.TextField({
-					enableKeyEvents: true,
-					emptyText: t("Add a task..."),
-					flex:1,
-					listeners: {
-						specialkey: (field, e) => {
-							// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
-							// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
-							if (e.getKey() == e.ENTER) {
-								this.createTask();
-							}
-						}
-					}
-				}),
-					this.taskDateField = new go.form.DateField({
-						fieldLabel:t("Due date"),
-						enableKeyEvents: true,
-						listeners: {
-							scope: this,
-							keyup: function(field, e) {
-								this.checkValues();
-							},
-							select: function(field,date) {
-								this.checkValues();
-							},
-							specialkey: (field, e) => {
-								// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
-								// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
-								if (e.getKey() == e.ENTER) {
-									this.addTaskButton.handler.call(this);
-								}
-							}
-						}
-					}),
-					this.addTaskButton = new Ext.Button({
-						disabled: true,
-						iconCls: 'ic-add',
-						cls:'primary',
-						handler: this.createTask,
-						scope: this
-					})
-				]
-			}),
+			// bbar: new Ext.Toolbar({
+			// 	layout:'hbox',
+			// 	layoutConfig: {
+			// 		align: 'middle',
+			// 		defaultMargins: {left: dp(4), right: dp(4),bottom:0,top:0}
+			// 	},
+			// 	items:[this.taskNameTextField = new Ext.form.TextField({
+			// 		enableKeyEvents: true,
+			// 		emptyText: t("Add a task..."),
+			// 		flex:1,
+			// 		listeners: {
+			// 			specialkey: (field, e) => {
+			// 				// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
+			// 				// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
+			// 				if (e.getKey() == e.ENTER) {
+			// 					this.createTask();
+			// 				}
+			// 			}
+			// 		}
+			// 	}),
+			// 		this.taskDateField = new go.form.DateField({
+			// 			fieldLabel:t("Due date"),
+			// 			enableKeyEvents: true,
+			// 			listeners: {
+			// 				scope: this,
+			// 				keyup: function(field, e) {
+			// 					this.checkValues();
+			// 				},
+			// 				select: function(field,date) {
+			// 					this.checkValues();
+			// 				},
+			// 				specialkey: (field, e) => {
+			// 					// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
+			// 					// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
+			// 					if (e.getKey() == e.ENTER) {
+			// 						this.addTaskButton.handler.call(this);
+			// 					}
+			// 				}
+			// 			}
+			// 		}),
+			// 		this.addTaskButton = new Ext.Button({
+			// 			disabled: true,
+			// 			iconCls: 'ic-add',
+			// 			cls:'primary',
+			// 			handler: this.createTask,
+			// 			scope: this
+			// 		})
+			// 	]
+			// }),
 			listeners: {				
 				rowdblclick: this.onTaskGridDblClick,
 				scope: this,				
@@ -593,7 +593,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			});
 
 			this.addButton.setDisabled(!this.addTasklistId);
-			this.addTaskButton.setDisabled(!this.addTasklistId)
 		});
 	},
 

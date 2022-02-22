@@ -1,5 +1,7 @@
 6.6.46
 - Leavedays: Bugfix add holidays for another user
+- Tasks: Removed quick add bar as it doesn't add much
+- Tasks: Show totals in grid
 
 22-02-2022 6.6.45
 - Email: Don't set a default template per account by default. Only a default for the user.
