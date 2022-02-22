@@ -1269,7 +1269,7 @@ abstract class Property extends Model {
 
 			//reset models to new state because current ones think they're existing
 			$models = array_map(function($model) {
-				return $model->internalCopy();
+				return $model->copy();
 			}, $models);
 		}
 
