@@ -25,19 +25,4 @@ class DefaultTemplateForAccount extends \GO\Base\Db\ActiveRecord {
 			'emailAccount' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Email\Model\Account', 'field'=>'account_id')
 		);
 	}
-
-	
-	protected function defaultAttributes() {
-		$attr = parent::defaultAttributes();
-		
-		$findParams = \GO\Base\Db\FindParams::newInstance()->limit(1);
-		$stmt = Template::model()->find($findParams);
-		
-		if($template=$stmt->fetch())
-		{
-			$attr['template_id']=$template->id;
-		}
-		
-		return $attr;
-	}
 }
