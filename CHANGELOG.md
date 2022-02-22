@@ -4,6 +4,10 @@
 - Core: Optimized memory management in database check for core models
 - Notes: Fixed adding new note books
 - Savemailas: Menu was available even if you didn't have permissions for the module
+- Core: Custom field 'notes' prevented save with error:
+    TypeError in /usr/local/share/src/www/go/core/orm/CustomFieldsModel.php at line 93: Argument 1 passed to
+    go\core\orm\CustomFieldsModel::getValue() must be of the type string, null given, called in
+    /usr/local/share/src/www/go/core/orm/CustomFieldsModel.php on line 128
 
 21-02-2022 6.6.44
 - pr2analyzer: fix CSV report

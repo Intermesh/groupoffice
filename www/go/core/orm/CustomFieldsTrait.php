@@ -252,8 +252,10 @@ trait CustomFieldsTrait {
 		$fields = static::getCustomFieldModels();		
 		
 		foreach($fields as $field) {
-			if(!$filters->hasFilter($field->databaseName)) {
-				$field->getDataType()->defineFilter($filters);
+			if(!empty($field->databaseName)) {
+				if (!$filters->hasFilter($field->databaseName)) {
+					$field->getDataType()->defineFilter($filters);
+				}
 			}
 		}		
 	}
@@ -270,7 +272,7 @@ trait CustomFieldsTrait {
 
 		foreach (static::getCustomFieldModels() as $field) {
 
-			if ($field->getDataType() instanceof Html) {
+			if (empty($field->databaseName) || $field->getDataType() instanceof Html) {
 				continue;
 			}
 
