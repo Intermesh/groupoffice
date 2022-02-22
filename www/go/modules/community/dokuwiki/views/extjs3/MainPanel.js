@@ -35,7 +35,7 @@ go.modules.community.dokuwiki.MainPanel = Ext.extend(go.modules.ModulePanel, {
         var me = this,
             settings = go.Modules.get('community', 'dokuwiki').settings || {};
 
-        me.title = settings.title || t("title", 'dokuwiki');
+        me.title = settings.title || t("title", 'dokuwiki', 'community');
 
         me.iFrameComponent = new Ext.ux.IFrameComponent ({
             url: (settings.externalUrl || '')

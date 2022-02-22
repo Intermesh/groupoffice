@@ -146,3 +146,21 @@ $updates['202111041557'][] = "create table comments_comment_attachment
     constraint comments_comment_attachment_core_blob_id_fk
         foreign key (blobId) references core_blob (id)
 );";
+
+
+$updates['202202181433'][] = "alter table comments_comment_attachment
+    drop foreign key comments_comment_attachment_comments_comment_id_fk;";
+
+$updates['202202181433'][] = "alter table comments_comment_attachment
+    add constraint comments_comment_attachment_comments_comment_id_fk
+        foreign key (commentId) references comments_comment (id)
+            on delete cascade;";
+
+$updates['202202181433'][] = "alter table comments_comment_attachment
+    drop foreign key comments_comment_attachment_core_blob_id_fk;";
+
+$updates['202202181433'][] = "alter table comments_comment_attachment
+    add constraint comments_comment_attachment_core_blob_id_fk
+        foreign key (blobId) references core_blob (id)
+            on delete cascade;";
+

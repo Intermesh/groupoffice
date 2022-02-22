@@ -3,6 +3,7 @@ namespace go\modules\community\notes\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\model\Acl;
+use go\core\model\Module;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 
@@ -21,7 +22,8 @@ class NoteBook extends AclOwnerEntity {
 
 	protected function canCreate(): bool
 	{
-		return \go\core\model\Module::findByName('community', 'notes')->hasPermissionLevel(Acl::LEVEL_MANAGE);
+		return Module::findByName('community', 'notes')
+			->getUserRights()->mayChangeNoteBooks;
 	}
 
 	protected static function internalDelete(Query $query): bool

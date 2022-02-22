@@ -1,7 +1,32 @@
+22-02-2022 6.6.45
+- Email: Don't set a default template per account by default. Only a default for the user.
+- Email: Fix download all attachments as zip
+- Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
+- Core: Optimized memory management in database check for core models
+- Notes: Fixed adding new note books
+- Savemailas: Menu was available even if you didn't have permissions for the module
+- Core: Custom field 'notes' prevented save with error:
+    TypeError in /usr/local/share/src/www/go/core/orm/CustomFieldsModel.php at line 93: Argument 1 passed to
+    go\core\orm\CustomFieldsModel::getValue() must be of the type string, null given, called in
+    /usr/local/share/src/www/go/core/orm/CustomFieldsModel.php on line 128
+- History user search
+  #202223667
+
+21-02-2022 6.6.44
+- pr2analyzer: fix CSV report
 - Core: archive disabled user; remove archived user from project templates
 - Multi instance: Error reporting when (de)activate or login as admin fails
 - Fileconvertor: Added convertio.co api
 - Email: Added option to remove all attachments
+- Comments: corrected foreign keys
+- fileconvertor: xlsx extension was missing in libreoffice service
+- Email: Reply from linked emails didn't always load link in composer
+- Smime: fixed unique check for upload certificate
+- Smime: Uploading twice gave js error
+- Tasks: Added tasks per owner
+- Tasks: Added CLI command: ./cli.php community/tasks/Tasklist/export --tasklistId=4 --format=csv
+- Notes: Added CLI  command: ./cli.php community/notes/NoteBook/export --noteBookId=65 --format=csv
+- Address book: Wrong translation for LOB
 
 14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog

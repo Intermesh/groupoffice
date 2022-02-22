@@ -23,9 +23,12 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 							}
 						});
 
-						this.data.links.forEach(function(link) {
-							comp.createLinkButton.addLink(link.entity, link.entityId);
-						});
+						comp.on('dialog_ready', () => {
+
+							this.data.links.forEach(function(link) {
+								comp.createLinkButton.addLink(link.entity, link.entityId);
+							});
+						}, this, {single: true});
 					},
 					scope: this
 				},
@@ -42,9 +45,12 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 							}
 						});
 
+						comp.on('dialog_ready', () => {
+
 						this.data.links.forEach(function(link) {
 							comp.createLinkButton.addLink(link.entity, link.entityId);
 						});
+						}, this, {single: true});
 					},
 					scope: this
 				},

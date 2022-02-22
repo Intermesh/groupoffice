@@ -275,7 +275,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								}
 							},
 							change: function(cmp, id) {
-								go.customfields.CustomFields.filterFieldSets(this.formPanel);
+								go.customfields.CustomFields.filterFieldSets(this.formPanel, this.getValues() + cmp.getTextValue());
 								this.organizationsField.allowNew.addressBookId = id;
 							}
 						}
@@ -367,11 +367,11 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		if (isOrganization) {
 			this.tabPanel.unhideTabStripItem(this.businessPanel);
-			this.jobTitle.setFieldLabel(t("LOB"));
+			this.jobTitle.setFieldLabel(t("LOB", "addressbook", "community"));
 		} else
 		{
 			this.tabPanel.hideTabStripItem(this.businessPanel);
-			this.jobTitle.setFieldLabel(t("Job title"));
+			this.jobTitle.setFieldLabel(t("Job title", "addressbook", "community"));
 		}
 
 		this.nameField.nameMenuEnabled = !isOrganization;

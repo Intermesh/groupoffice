@@ -219,7 +219,7 @@ class MaintenanceController extends AbstractController {
 		
 		$checkModels = array(
 				"GO\Calendar\Model\Event"=>array('name', 'start_time', 'end_time', 'calendar_id', 'rrule'),
-				"GO\Tasks\Model\Task"=>array('name', 'start_time', 'due_time', 'tasklist_id', 'rrule', 'user_id'),
+//				"GO\Tasks\Model\Task"=>array('name', 'start_time', 'due_time', 'tasklist_id', 'rrule', 'user_id'),
 				"GO\Files\Model\Folder"=>array('name', 'parent_id'),
 //				"GO\Calendar\Model\Participant"=>array('event_id', 'email'),
 				//"GO\Billing\Model\Order"=>array('order_id','book_id','btime')
@@ -596,11 +596,34 @@ class MaintenanceController extends AbstractController {
 				$m = \GO::getModel($model->getName());
 
 				if($m->checkDatabaseSupported()){		
+//					$stmt = $m->find(array(
+//							'ignoreAcl'=>true
+//					));
+//
+//					$stmt->callOnEach('checkDatabase');
+
+
+					//to avoid memory errors
+					$start = 0;
+
+					//per thousands to keep memory low
 					$stmt = $m->find(array(
-							'ignoreAcl'=>true
+						'ignoreAcl'=>true,
+						'start' => $start,
+						'limit' => 1000
 					));
-					
-					$stmt->callOnEach('checkDatabase');
+
+					while($stmt->rowCount()) {
+						$stmt->callOnEach('checkDatabase', true);
+
+						$stmt = $m->find(array(
+							'ignoreAcl'=>true,
+							'start' => $start+=1000,
+							'limit' => 1000
+						));
+					}
+
+					unset($stmt);
 					
 				}
 			}

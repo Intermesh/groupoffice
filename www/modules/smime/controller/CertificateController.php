@@ -89,7 +89,7 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 //			$cert->save();
 //		}
 
-		return ['success' => $success];
+		return ['success' => $success, 'feedback' => $success ? "" : go()->t("This certificate already exists","legacy","smime") ];
 	}
 
 	public function actionDelete($params)

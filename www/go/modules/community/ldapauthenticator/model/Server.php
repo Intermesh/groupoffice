@@ -217,6 +217,8 @@ class Server extends Entity {
 		$this->connection->setOption(LDAP_OPT_REFERRALS, $this->followReferrals);
 		$this->connection->setOption(LDAP_OPT_PROTOCOL_VERSION, $this->protocolVersion);
 
+		// timeout in 10s
+//		$this->connection->setOption(LDAP_OPT_NETWORK_TIMEOUT, 10);
 
 		if(!$this->ldapVerifyCertificate) {
 			$this->connection->setOption(LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_NEVER);

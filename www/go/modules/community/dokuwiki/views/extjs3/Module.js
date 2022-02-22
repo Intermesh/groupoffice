@@ -12,7 +12,7 @@ go.Modules.register("community", 'dokuwiki', {
         }
 
         if (go.util.empty(title)) {
-            title = t("title", 'dokuwiki');
+            title = t("title", 'dokuwiki', 'community');
         }
 
         this.title = title;

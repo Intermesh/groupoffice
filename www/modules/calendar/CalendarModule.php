@@ -151,7 +151,7 @@ class CalendarModule extends \GO\Base\Module{
 
 			$calendar->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::READ_PERMISSION);
 
-			for($i = 0; $i < 20; $i++) {
+			for($i = 0; $i < 10; $i++) {
 
 				$time = Date::date_add(Date::get_last_sunday(time()), $faker->numberBetween(1, 21));
 

@@ -49,15 +49,19 @@ class Category extends Entity {
 	protected function internalGetPermissionLevel(): int
 	{
 		//global category mayb only be created by admins
-		if(empty($this->tasklistId)) {
+		if(empty($this->tasklistId) && empty($this->ownerId)) {
 			return Module::findByName('community', 'tasks')
 				->getUserRights()
-				->mayChangeCategories ? Acl::LEVEL_MANAGE : 0;
+				->mayChangeCategories ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 		}
 
-		$tasklist = Tasklist::findById($this->tasklistId);
+		if(isset($this->tasklistId)) {
+			$tasklist = Tasklist::findById($this->tasklistId);
 
-		return $tasklist->getPermissionLevel() >= Acl::LEVEL_MANAGE ? Acl::LEVEL_DELETE : Acl::LEVEL_READ;
+			return $tasklist->getPermissionLevel() >= Acl::LEVEL_MANAGE ? Acl::LEVEL_DELETE : Acl::LEVEL_READ;
+		} else {
+			return $this->ownerId == go()->getUserId() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
+		}
 	}
 
 
@@ -75,14 +79,17 @@ class Category extends Entity {
 	{
 		return parent::defineFilters()
 			->add('ownerId', function(Criteria $criteria, $value) {
-				$criteria->where('ownerId', '=', $value)->orWhere('ownerId', 'IS', null);
+				$criteria->where('ownerId', '=', $value)
+					->andWhere('tasklistId' , '=', null);
 			})
 			->add('tasklistId', function(Criteria $criteria, $value) {
-				if($value !== null) {
-					$criteria->where('tasklistId', '=', $value);
-				}
-				$criteria->orWhere('tasklistId', '=', null);
-			}, null);
+				$criteria->where('tasklistId', '=', $value);
+			})
+			->add('global', function(Criteria $criteria, $value) {
+				$op = $value ? '=' : '!=';
+				$criteria->where('tasklistId', $op, null)
+					->andWhere('ownerId', $op, null);
+			});
 	}
 
 }

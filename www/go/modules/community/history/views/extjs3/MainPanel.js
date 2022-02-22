@@ -81,6 +81,28 @@ Ext.define('go.modules.community.history.MainPanel', {
 			this.search();
 		}, this, {buffer: 1});
 
+		this.selectUser = new go.users.UserComboReset({
+			hideLabel: true,
+			emptyText: t('All users'),
+			allowBlank: true,
+			listeners: {
+				select: function (me, v) {
+					this.grid.store.setFilter('creator', {user: v.id}).load();
+				},
+				change: function (me, v) {
+					if (v === null) {
+						this.grid.store.setFilter('creator', null).load();
+					}
+				},
+				scope: this
+			}
+		});
+
+		//Requested by jonny History user search #202223667
+		this.selectUser.store.setFilter("default", {
+			showDisabled: true
+		});
+
 		return new Ext.Container({
 			region: "center",
 			//padding: dp(16),
@@ -102,22 +124,9 @@ Ext.define('go.modules.community.history.MainPanel', {
 								},
 								scope: this
 							}
-						}), new go.users.UserComboReset({
-							hideLabel: true,
-							emptyText: t('All users'),
-							allowBlank: true,
-							listeners: {
-								select: function (me, v) {
-									this.grid.store.setFilter('creator', {user: v.id}).load();
-								},
-								change: function (me, v) {
-									if (v === null) {
-										this.grid.store.setFilter('creator', null).load();
-									}
-								},
-								scope: this
-							}
-						}),],
+						}),
+						this.selectUser
+					],
 					padding: dp(16)
 				}, {
 					title: t('Actions'),

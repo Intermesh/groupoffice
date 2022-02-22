@@ -23,7 +23,7 @@ class Module extends core\Module {
 	protected function rights(): array
 	{
 		return [
-			'mayChangeNotebooks', // allows Nootbook/set (hide ui elements that use this)
+			'mayChangeNoteBooks', // allows Nootbook/set (hide ui elements that use this)
 		];
 	}
 
