@@ -8,6 +8,8 @@
     TypeError in /usr/local/share/src/www/go/core/orm/CustomFieldsModel.php at line 93: Argument 1 passed to
     go\core\orm\CustomFieldsModel::getValue() must be of the type string, null given, called in
     /usr/local/share/src/www/go/core/orm/CustomFieldsModel.php on line 128
+- History user search
+  #202223667
 
 21-02-2022 6.6.44
 - pr2analyzer: fix CSV report
