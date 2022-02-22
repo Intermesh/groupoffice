@@ -3,7 +3,7 @@ return array (
 	'name' => 'Notities',
 	'description' => 'Een module om notities te maken in verschillende notitieblokken.',
 
-	'mayChangeNotebooks' => 'Notitieblok wijzigen',
+	'mayChangeNoteBooks' => 'Notitieblok wijzigen',
 
 	'General' => 'Algemeen',
 	'Notebook' => 'Notitieblok',

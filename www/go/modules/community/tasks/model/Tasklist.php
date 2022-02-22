@@ -11,6 +11,7 @@ use Exception;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\model\Acl;
+use go\core\model\Module;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
@@ -150,5 +151,11 @@ class Tasklist extends AclOwnerEntity
 		$tasklist->save();
 		return $tasklist;
 
+	}
+
+	protected function canCreate(): bool
+	{
+		return Module::findByName('community', 'tasks')
+			->getUserRights()->mayChangeTasklists;
 	}
 }
