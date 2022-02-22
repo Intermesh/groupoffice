@@ -275,6 +275,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 
 		if(!this.view) {
 			this.view = new go.grid.GroupingView({
+				totalDisplay: true,
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
 				hideGroupedColumn: true
 			});
