@@ -22,7 +22,7 @@ abstract class SettingsEntity extends Entity {
 	private static $instance;
 
 	public static function get() {
-		return static::$instance ?? (static::$instance = static::getMapping()->getPrimaryTable() ? static::find()->single() : new static());
+		return static::$instance ?? (static::$instance = static::getMapping()->getPrimaryTable() ? (static::find()->single() ?? new static)  : new static());
 	}
 
 	protected $readOnlyKeys;
