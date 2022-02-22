@@ -2,6 +2,8 @@
 - Email: Fix download all attachments as zip
 - Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
 - Core: Optimized memory management in database check for core models
+- Notes: Fixed adding new note books
+- Savemailas: Menu was available even if you didn't have permissions for the module
 
 21-02-2022 6.6.44
 - pr2analyzer: fix CSV report
