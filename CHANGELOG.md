@@ -1,3 +1,4 @@
+22-02-2022 6.6.45
 - Email: Don't set a default template per account by default. Only a default for the user.
 - Email: Fix download all attachments as zip
 - Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
