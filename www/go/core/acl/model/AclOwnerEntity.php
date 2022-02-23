@@ -171,12 +171,11 @@ abstract class AclOwnerEntity extends AclEntity {
 		// When ACL has been provided by the client don't copy the default.
 		if(isset($this->setAcl) || go()->getInstaller()->isInProgress()) {
 			$this->acl = new Acl();
-		} else
-		{
+		} else {
 			$defaultAclId = static::entityType()->getDefaultAclId();
-			if($defaultAclId && ($defaultAcl = Acl::findById($defaultAclId)) {
+			if($defaultAclId && ($defaultAcl = Acl::findById($defaultAclId))) {
 				$this->acl = $defaultAcl->copy();
-			} else{
+			} else {
 				$this->acl = new Acl();
 			}
 		}
