@@ -65,6 +65,14 @@ class Comment extends AclItemEntity {
 	 */
 	public $attachments = [];
 
+
+	/**
+	 * The MIME message ID from the outgoing or incoming email (used in support module)
+	 *
+	 * @var string
+	 */
+	public $mimeMessageId;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()

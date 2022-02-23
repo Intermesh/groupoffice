@@ -164,3 +164,8 @@ $updates['202202181433'][] = "alter table comments_comment_attachment
         foreign key (blobId) references core_blob (id)
             on delete cascade;";
 
+//alter table comments_comment
+//    modify text mediumtext collate utf8mb4_general_ci null;
+//
+//alter table comments_comment
+//    add mimeMessageId varchar(255) collate ascii_bin null;

@@ -24,6 +24,8 @@ use go\core\util\StringUtil;
  * @property int $internal_udate Unix time stamp received
  * @property string $x_priority
  * @property string $message_id
+ * @property string[] $references
+ * @property string $in_reply_to
  * @property string $content_type
  * @property array $content_type_attributes
  * @property string $disposition_notification_to

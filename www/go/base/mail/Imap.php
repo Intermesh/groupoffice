@@ -1548,7 +1548,7 @@ class Imap extends ImapBodyStruct {
 						"DATE CONTENT-TYPE X-PRIORITY TO CC";
 
 		if($full_data)
-			$command .= " BCC REPLY-TO DISPOSITION-NOTIFICATION-TO CONTENT-TRANSFER-ENCODING MESSAGE-ID";
+			$command .= " BCC REPLY-TO DISPOSITION-NOTIFICATION-TO CONTENT-TRANSFER-ENCODING MESSAGE-ID REFERENCES IN-REPLY-TO";
 
 		$command .= ")])\r\n";
 
@@ -1557,7 +1557,7 @@ class Imap extends ImapBodyStruct {
 
 		$status = $this->check_response($res, true);
 		$tags = array('UID' => 'uid', 'FLAGS' => 'flags', 'X-GM-LABELS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-		$junk = array('SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', 'CC','BCC', '(', ')', ']', 'X-PRIORITY', 'DATE','REPLY-TO','DISPOSITION-NOTIFICATION-TO','CONTENT-TRANSFER-ENCODING', 'MESSAGE-ID');
+		$junk = array('SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', 'CC','BCC', '(', ')', ']', 'X-PRIORITY', 'DATE','REPLY-TO','DISPOSITION-NOTIFICATION-TO','CONTENT-TRANSFER-ENCODING', 'MESSAGE-ID', 'REFERENCES', 'IN-REPLY-TO');
 		//$flds = array('uid','flags','size','internal_date','answered','seen','','reply-to', 'content-type','x-priority','disposition-notification-to');
 		$headers = array();
 		foreach ($res as $n => $vals) {
@@ -1577,6 +1577,8 @@ class Imap extends ImapBodyStruct {
 					'x_priority'=>3,
 					'reply_to'=>'',
 					'message_id'=>'',
+					'references'=>'',
+					'in_reply_to'=>'',
 					'content_type'=>'',
 					'content_type_attributes'=>array(),
 					'disposition_notification_to'=>'',
