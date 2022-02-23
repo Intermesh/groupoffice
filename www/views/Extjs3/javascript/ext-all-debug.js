@@ -50435,12 +50435,9 @@ Ext.grid.ActionColumn = Ext.extend(Ext.grid.Column, {
         var me = this,
             items = cfg.items || (me.items = [me]),
             l = items.length,
-            i,
-            item;
+            i,item,disabled,tooltip;
 
         Ext.grid.ActionColumn.superclass.constructor.call(me, cfg);
-
-
 
         me.renderer = function(v, meta) {
 
@@ -50449,10 +50446,13 @@ Ext.grid.ActionColumn = Ext.extend(Ext.grid.Column, {
             meta.css += ' x-action-col-cell';
             for (i = 0; i < l; i++) {
                 item = items[i];
-                v += '<span alt="' + (item.altText || me.altText) + '" src="' + (item.icon || Ext.BLANK_IMAGE_URL) +
-                    '" class="x-action-col-icon x-action-col-' + String(i) + ' ' + (item.iconCls || '') +
+					disabled = item.disabled || (item.isDisabled ? item.isDisabled.apply(item.scope||this.scope||this, arguments) : false);
+					tooltip = disabled ? null : item.tooltip;
+
+                v += '<button '+(disabled ? 'disabled ':'')+'class="x-btn x-action-col-icon x-action-col-' + String(i) + ' ' +
+						 (item.iconCls || '') +
                     ' ' + (Ext.isFunction(item.getClass) ? item.getClass.apply(item.scope||this.scope||this, arguments) : '') + '"' +
-                    ((item.tooltip) ? ' ext:qtip="' + item.tooltip + '"' : '') + '></span>';
+                    ((tooltip) ? ' ext:qtip="' + tooltip + '"' : '') + '>'+item.text||''+'</button>';
             }
             return v;
         };
@@ -50467,13 +50467,20 @@ Ext.grid.ActionColumn = Ext.extend(Ext.grid.Column, {
     
     processEvent : function(name, e, grid, rowIndex, colIndex){
         var m = e.getTarget().className.match(this.actionIdRe),
+			  key = (name === 'keydown' && e.getKey()),
             item, fn;
-        if (m && (item = this.items[parseInt(m[1], 10)])) {
-            if (name == 'click') {
-                (fn = item.handler || this.handler) && fn.call(item.scope||this.scope||this, grid, rowIndex, colIndex, item, e);
-            } else if ((name == 'mousedown') && (item.stopSelection !== false)) {
-                return false;
-            }
+		 if (name === 'mousedown') {
+			 return false;
+		 }
+		 if (m && (item = this.items[parseInt(m[1], 10)])) {
+			  if(item) {
+				  if (name == 'click' || (key == e.ENTER || key == e.SPACE)) {
+					  (fn = item.handler || this.handler) && fn.call(item.scope || this.scope || this, grid, rowIndex, colIndex, item, e);
+					  if(item.stopSelection !== false) {
+						  return false;
+					  }
+				  }
+			  }
         }
         return Ext.grid.ActionColumn.superclass.processEvent.apply(this, arguments);
     }
