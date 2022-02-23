@@ -173,8 +173,8 @@ abstract class AclOwnerEntity extends AclEntity {
 			$this->acl = new Acl();
 		} else
 		{
-			$defaultAcl = Acl::findById(static::entityType()->getDefaultAclId());		
-			if($defaultAcl) {
+			$defaultAclId = static::entityType()->getDefaultAclId();
+			if($defaultAclId && ($defaultAcl = Acl::findById($defaultAclId)) {
 				$this->acl = $defaultAcl->copy();
 			} else{
 				$this->acl = new Acl();
