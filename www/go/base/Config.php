@@ -503,8 +503,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Force an HTTPS connection in the main /index.php
 	 *
 	 * @var boolean
+	 * @deprecated
 	 */
-	var $force_ssl=false;
+//	var $force_ssl=false;
 
 	/**
 	 * The path to the root of Group-Office with trailing slash.
