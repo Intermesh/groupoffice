@@ -2062,12 +2062,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 * @param string $mailbox		The affected mailbox in where to search the message uid
 	 * @param int $uid					The uid of the message to search in the mailbox
 	 * 
-	 * @return string						Json string if the request was successfully done
+	 * @return array				['success' => bool, 'message' => ?string]
 	 * 
 	 * @throws \GO\Base\Exception\NotFound
 	 * @throws AccessDenied
 	 */
-	protected function actionSaveAllAttachments($folder_id,$account_id,$mailbox,$uid, $filepath = null){
+	protected function actionSaveAllAttachments($folder_id,$account_id,$mailbox,$uid, $filepath = null): array
+	{
 		$response = array('success'=>true);
 		
 		$folder = \GO\Files\Model\Folder::model()->findByPk($folder_id);
