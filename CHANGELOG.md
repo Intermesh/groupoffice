@@ -2,6 +2,7 @@
 - Leavedays: Bugfix add holidays for another user
 - Tasks: Removed quick add bar as it doesn't add much
 - Tasks: Show totals in grid
+- Core: Argument 1 passed to go\core\orm\Entity::findById() must be of the type string, null given, called in /usr/share/groupoffice/go/core/acl/model/AclOwnerEntity.php on line 176
 - Converter: Fix missing use statement
 - Leavedays: Fix update script constructor budget property
 
