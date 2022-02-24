@@ -1,3 +1,4 @@
+24-02-2022 6.5.103
 - Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
 - Holidays: Fix calculation in case of interim agreement change
 
