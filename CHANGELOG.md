@@ -9,6 +9,7 @@
 - Addressbook: Exporting contacts could be blocked due to some old code that should have been removed
 - Addressbook: Changing address book in dialog was broken
 - LDAPauthenticator: Even though an email address was mapped the 'mail' attribute was still required for it to work.
+- smime: Reset upload dialog on opening
 
 22-02-2022 6.6.45
 - Email: Don't set a default template per account by default. Only a default for the user.
