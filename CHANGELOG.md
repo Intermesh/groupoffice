@@ -5,6 +5,8 @@
 - Core: Argument 1 passed to go\core\orm\Entity::findById() must be of the type string, null given, called in /usr/share/groupoffice/go/core/acl/model/AclOwnerEntity.php on line 176
 - Converter: Fix missing use statement
 - Leavedays: Fix update script constructor budget property
+- Addressbook: Exporting contacts could be blocked due to some old code that should have been removed
+- Addressbook: Changing address book in dialog was broken
 
 22-02-2022 6.6.45
 - Email: Don't set a default template per account by default. Only a default for the user.
