@@ -147,7 +147,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'start',
-					renderer: startRenderer
+					renderer: startRenderer,
+					hidden: this.forProject
 				},{
 					xtype:"datecolumn",
 					id: 'due',
@@ -159,7 +160,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: startRenderer
 				},{
 					header: t('Responsible'),
-					width: dp(240),
+					width: dp(180),
 					sortable: true,
 					dataIndex: 'responsible',
 					renderer: function(v) {
@@ -172,7 +173,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'percentComplete',
 					renderer:function (value, meta, rec, row, col, store){
 						return '<div class="go-progressbar"><div style="width:'+Math.ceil(value)+'%"></div></div>';
-					}
+					},
+					hidden: this.forProject
 				},{
 					hidden: true,
 					id:"progress",
@@ -246,31 +248,34 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 
 		if(this.forProject) {
 			this.columns.push({
-					header: t("Estimated duration", ),
-					dataIndex: 'estimatedDuration',
-					width: dp(64),
-					renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
-						if(parseInt(value) > 0) {
-							return go.util.Format.duration(value, false , false);
+				id: "timeBooked",
+				header: t("Hours booked", "tasks", 'community'),
+				dataIndex: 'timeBooked',
+				width: dp(100),
+				align: "right",
+				renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
+					if (parseInt(value) > 0) {
+						var v = parseInt(value);
+						if (parseInt(record.data.estimatedDuration) > 0 && v > parseInt(record.data.estimatedDuration)) {
+							metaData.css = 'projects-late';
 						}
-						return '';
+						return go.util.Format.duration(v);
 					}
-				},
-				{
-					header: t("Hours booked", "tasks", 'community'),
-					dataIndex: 'timeBooked',
-					width: dp(72),
-					renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
-						if(parseInt(value) > 0) {
-							var v = parseInt(value);
-							if(parseInt(record.data.estimatedDuration) > 0 && v > parseInt(record.data.estimatedDuration) ) {
-								metaData.css = 'projects-late';
-							}
-							return go.util.Format.duration(v);
-						}
-						return '';
+					return '';
+				}
+			},{
+				id:"estimatedDuration",
+				header: t("Estimated duration", "tasks", 'community' ),
+				dataIndex: 'estimatedDuration',
+				align: "right",
+				width: dp(100),
+				renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
+					if(parseInt(value) > 0) {
+						return go.util.Format.duration(value, false , false);
 					}
-				});
+					return '';
+				}
+			});
 		}
 
 		if(!this.view) {
