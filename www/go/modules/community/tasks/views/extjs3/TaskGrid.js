@@ -261,7 +261,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'timeBooked',
 					width: dp(72),
 					renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
-						console.warn(record);
 						if(parseInt(value) > 0) {
 							var v = parseInt(value);
 							if(parseInt(record.data.estimatedDuration) > 0 && v > parseInt(record.data.estimatedDuration) ) {
