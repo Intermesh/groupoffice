@@ -11,6 +11,7 @@
 - LDAPauthenticator: Even though an email address was mapped the 'mail' attribute was still required for it to work.
 - smime: Reset upload dialog on opening
 - Projects: Template tasks can also be created in the users' default list again
+- Tasks: Option to set due and start to today when creating new tasks
 
 22-02-2022 6.6.45
 - Email: Don't set a default template per account by default. Only a default for the user.

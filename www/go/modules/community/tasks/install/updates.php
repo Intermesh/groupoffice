@@ -158,3 +158,6 @@ $updates['202202041432'][] = "alter table tasks_category
             on delete cascade;";
 
 $updates['202202081432'][] = "ALTER TABLE `tasks_task` CHANGE COLUMN `description` `description` TEXT NULL DEFAULT null;";
+
+$updates['202202241617'][] = "alter table tasks_user_settings
+    add defaultDate bool default false null;";
