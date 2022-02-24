@@ -92,11 +92,13 @@ class Authenticator extends PrimaryAuthenticator {
 			return false;
 		}
 
-		if(!isset($record->mail) || !isset($record->mail[0])) {
-			throw new Exception("User '$username' has no 'mail' attribute set. Can't create a user");
+		$mappedValues = Module::mappedValues($record);
+
+		if(empty($mappedValues['email'])) {
+			throw new Exception("User '$username' has no 'e-mail' attribute set. Can't create a user");
 		}
 		
-		$user = User::find()->where(['username' => $username])->orWhere('email', '=', $record->mail[0])->single();
+		$user = User::find()->where(['username' => $username])->orWhere('email', '=', $mappedValues['email'])->single();
 		if(!$user) {
 			$user = new User();
 		}else if($user->hasPassword()){
@@ -116,7 +118,7 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		if($server->hasEmailAccount()) {
 			try {
-				$this->setEmailAccount($ldapUsername, $password, $record->mail[0], $server, $user);
+				$this->setEmailAccount($ldapUsername, $password, $mappedValues['email'], $server, $user);
 			} catch(ImapAuthenticationFailedException $e) {
 
 				//ignore imap failure.

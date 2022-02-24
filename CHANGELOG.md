@@ -2,9 +2,13 @@
 - Leavedays: Bugfix add holidays for another user
 - Tasks: Removed quick add bar as it doesn't add much
 - Tasks: Show totals in grid
+- Core: Argument 1 passed to go\core\orm\Entity::findById() must be of the type string, null given, called in /usr/share/groupoffice/go/core/acl/model/AclOwnerEntity.php on line 176
 - Converter: Fix missing use statement
 - Leavedays: Fix update script constructor budget property
 - Update Norsk translations. Thanks Egil!
+- Addressbook: Exporting contacts could be blocked due to some old code that should have been removed
+- Addressbook: Changing address book in dialog was broken
+- LDAPauthenticator: Even though an email address was mapped the 'mail' attribute was still required for it to work.
 
 22-02-2022 6.6.45
 - Email: Don't set a default template per account by default. Only a default for the user.
@@ -171,6 +175,9 @@
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+- Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
+- Holidays: Fix calculation in case of interim agreement change
 
 14-02-2022 6.5.102
 - Core: UK bank holidays 2022 overrides

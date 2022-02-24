@@ -12,11 +12,11 @@ class Settings extends core\Settings {
 	 */
 	public $autoLinkEmail = false;
 
+	/**
+	 * Create a personal address book for each new user
+	 *
+	 * @var bool
+	 */
 	public $createPersonalAddressBooks = true;
 
-	public $restrictExportToAdmins = false;
-
-	public function getUsersAddressBookId() {
-
-	}
 }
