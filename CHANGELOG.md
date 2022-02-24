@@ -4,6 +4,7 @@
 - Tasks: Show totals in grid
 - Converter: Fix missing use statement
 - Leavedays: Fix update script constructor budget property
+- Update Norsk translations. Thanks Egil!
 
 22-02-2022 6.6.45
 - Email: Don't set a default template per account by default. Only a default for the user.

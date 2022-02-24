@@ -32,7 +32,8 @@ class ErrorHandler {
 	/**
 	 * Called when PHP exits.
 	 */
-	public function shutdown() {
+	public function shutdown()
+	{
 		$error = error_get_last();
 		if ($error) {
 			//Log only fatal errors because other errors should have been logged by the normal error handler
@@ -40,8 +41,6 @@ class ErrorHandler {
 				$this->exceptionHandler(new ErrorException($error['message'],0,$error['type'],$error['file'], $error['line']));
 			}
 		}
-
-//		$this->debug("shutdown");
 	}
 
 	/**

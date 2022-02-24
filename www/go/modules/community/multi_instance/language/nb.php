@@ -3,7 +3,7 @@ return array (
   'Modules' => 'Moduler',
   'Allowed' => 'Tillatt',
   'Show trials' => 'Vis forsøk',
-  'E-mail selected' => 'Valg e-post',
+  'E-mail selected' => 'E-post er valgt',
   'Download site config' => 'Last ned sitekonfigurasjon',
   'Trial' => 'Prøveversjon',
   'User count' => 'Antall brukere',
