@@ -280,7 +280,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								}
 							},
 							change: function(cmp, id) {
-								go.customfields.CustomFields.filterFieldSets(this.formPanel, this.getValues() + cmp.getTextValue());
+								go.customfields.CustomFields.filterFieldSets(this.formPanel, this.getValues());
 								this.organizationsField.allowNew.addressBookId = id;
 							}
 						}
