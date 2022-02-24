@@ -5,5 +5,6 @@ return array (
   'externalUrl' => 'DokuWiki URL',
   'title' => 'Tittel',
   'Used as dokuwiki URL' => 'DokuWiki URL',
-  'Used as dokuwiki page title' => 'DokuWiki sidetittel',
+  'Used as dokuwiki page title' => 'DokuWiki tittel',
+  'Dokuwiki' => 'Dokuwiki',
 );

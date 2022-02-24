@@ -5,6 +5,7 @@
 - Core: Argument 1 passed to go\core\orm\Entity::findById() must be of the type string, null given, called in /usr/share/groupoffice/go/core/acl/model/AclOwnerEntity.php on line 176
 - Converter: Fix missing use statement
 - Leavedays: Fix update script constructor budget property
+- Update Norsk translations. Thanks Egil!
 - Addressbook: Exporting contacts could be blocked due to some old code that should have been removed
 - Addressbook: Changing address book in dialog was broken
 - LDAPauthenticator: Even though an email address was mapped the 'mail' attribute was still required for it to work.
