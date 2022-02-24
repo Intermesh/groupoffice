@@ -123,7 +123,7 @@ go.modules.community.tasks.Portlet = Ext.extend(go.grid.GridPanel, {
 				}
 			},{
 				xtype:"datecolumn",
-				header: t("Due date", "tasks"),
+				header: t("Due date", "tasks", "community"),
 				dataIndex: 'due',
 				width: 100,
 				sortable: false
