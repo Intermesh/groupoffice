@@ -172,6 +172,9 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+- Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
+- Holidays: Fix calculation in case of interim agreement change
+
 14-02-2022 6.5.102
 - Core: UK bank holidays 2022 overrides
 - ActiveSync: sorting on column status works
