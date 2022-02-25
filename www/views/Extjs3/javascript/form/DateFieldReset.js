@@ -15,8 +15,8 @@ GO.form.DateFieldReset = Ext.extend(Ext.form.DateField, {
 	initComponent: function() {
 		this.triggerConfig = {
 				tag:'span', cls:'x-form-twin-triggers', cn:[
-				{tag: "img", src: Ext.BLANK_IMAGE_URL, cls: "x-form-trigger x-form-clear-trigger"},
-				{tag: "img", src: Ext.BLANK_IMAGE_URL, cls: "x-form-trigger x-form-date-trigger"}
+				{tag: "button", cls: "x-form-trigger x-form-clear-trigger"},
+				{tag: "button", cls: "x-form-trigger x-form-date-trigger"}
 		]};
 		GO.form.DateFieldReset.superclass.initComponent.call(this);
 	},
