@@ -1,3 +1,5 @@
+- Core: Updated Dutch translation
+
 24-02-2022 6.6.46
 - Leavedays: Bugfix add holidays for another user
 - Tasks: Removed quick add bar as it doesn't add much
