@@ -4,24 +4,32 @@
 namespace GO\Base\Mail;
 
 
-class SystemMessage extends SmimeMessage {
+class SystemMessage extends SmimeMessage
+{
 
 	private $_account;
 	private $_alias;
-		
-	public function __construct($subject = null, $body = null, $contentType = null, $charset = null) {
+
+	/**
+	 * @param string|null $subject
+	 * @param string|null $body
+	 * @param string|null $contentType
+	 * @param string|null $charset
+	 * @throws \GO\Base\Exception\NotFound
+	 */
+	public function __construct(?string $subject = null, ?string $body = null, ?string $contentType = null, ?string $charset = null)
+	{
 		parent::__construct($subject, $body, $contentType, $charset);
-		
-		// Check if the account needs to be set
-		if(!empty(\GO::config()->smtp_account_id)){
-			
-			$this->_setAccount(); 
+
+		if (!empty(\GO::config()->smtp_account_id)){
+			// Check if the account needs to be set
+			$this->_setAccountFromObsoleteConfig();
 		
 			// Check if the message needs to be signed with smime
-			if(!empty(\GO::config()->smtp_account_smime_sign))
+			if(!empty(\GO::config()->smtp_account_smime_sign)) {
 				$this->_setSmime();
-		}else
-		{
+			}
+		} else {
 			$this->setFrom(\GO::config()->webmaster_email, \GO::config()->title);
 		}
 	}
@@ -32,14 +40,24 @@ class SystemMessage extends SmimeMessage {
 	 * 
 	 * @throws \GO\Base\Exception\NotFound
 	 */
-	private function _setAccount(){
-		
-		$findParams = \GO\Base\Db\FindParams::newInstance()->ignoreAcl();
-		$this->_account = \GO\Email\Model\Account::model()->findByPk(\GO::config()->smtp_account_id,$findParams,true);
-			
-		if(!$this->_account)
-			throw new \GO\Base\Exception\NotFound('The mailaccount given in the Group-Office config file cannot be found');
+	private function _setAccountFromObsoleteConfig()
+	{
+		$this->setAccount(\GO::config()->smtp_account_id);
+	}
 
+	/**
+	 * Override a default account from the constructor
+	 *
+	 * @param int $accountId
+	 * @throws \GO\Base\Exception\NotFound
+	 */
+	public function setAccount(int $accountId)
+	{
+//		$findParams = \GO\Base\Db\FindParams::newInstance()->ignoreAcl();
+		$this->_account = \GO\Email\Model\Account::model()->findByPk($accountId,false,true);
+		if(!$this->_account) {
+			throw new \GO\Base\Exception\NotFound('This mail account cannot be found');
+		}
 		$this->_alias = $this->_account->defaultAlias;
 
 		$this->setFrom($this->_alias->email,$this->_alias->name);
@@ -55,17 +73,18 @@ class SystemMessage extends SmimeMessage {
 	private function _setSmime(){
 		
 		// Check if the smime module is installed
-		if(!\GO::modules()->isInstalled("smime"))
-			Throw new \Exception('Smime module not installed');
-
-		if(empty(\GO::config()->smtp_account_smime_password))
-			Throw new \Exception('No password for smime set in the Group-Office config file');
-		
+		if(!\GO::modules()->isInstalled("smime")) {
+			throw new \Exception('Smime module not installed');
+		}
+		if(empty(\GO::config()->smtp_account_smime_password)) {
+			throw new \Exception('No password for smime set in the Group-Office config file');
+		}
 		// Check for a certificate for the give email account
 		$cert = \GO\Smime\Model\Certificate::model()->findByPk($this->_account->id);
 		
-		if(!$cert || empty($cert->cert))
-			Throw new \Exception('No certificate enabled for the given account');
+		if(!$cert || empty($cert->cert)) {
+			throw new \Exception('No certificate enabled for the given account');
+		}
 
 		// If the certificate is found, then get the password and attach the certificate to the message
 		$this->setSignParams($cert->cert, \GO::config()->smtp_account_smime_password);
@@ -77,10 +96,11 @@ class SystemMessage extends SmimeMessage {
 	 * 
 	 * @return mixed boolean/\GO\email\Model\Alias
 	 */
-	public function getAccountAlias(){
-		
-		if(!$this->hasAccount())
+	public function getAccountAlias()
+	{
+		if(!$this->hasAccount()) {
 			return false;
+		}
 		
 		return $this->_alias;
 	}
@@ -88,9 +108,10 @@ class SystemMessage extends SmimeMessage {
 	/**
 	 * Check if the account is set for this message
 	 * 
-	 * @return boolean
+	 * @return bool
 	 */
-	public function hasAccount(){
+	public function hasAccount(): bool
+	{
 		return !empty($this->_account);
 	}
 
@@ -99,10 +120,11 @@ class SystemMessage extends SmimeMessage {
 	 * 
 	 * @return mixed Transport/\GO\Email\Transport
 	 */
-	public function getTransport(){
-		if(!$this->hasAccount()){
+	public function getTransport()
+	{
+		if (!$this->hasAccount()) {
 			return Transport::newGoInstance ();
-		}else {
+		} else {
 			return \GO\Email\Transport::newGoInstance($this->_account);
 		}
 	}
@@ -111,9 +133,10 @@ class SystemMessage extends SmimeMessage {
 	 * Send the message with the GO mailer
 	 * Use this send function to be sure that the mailer is using the Transporter of the 
 	 * 
-	 * @return boolean
+	 * @return bool
 	 */
-	public function send(){
+	public function send(): bool
+	{
 		return Mailer::newGoInstance($this->getTransport())->send($this);
 	}
 	

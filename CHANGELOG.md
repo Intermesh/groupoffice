@@ -1,3 +1,5 @@
+- Tickets: enable override sending from custom account by ticket type
+- Core: enable setting account in system message 
 - Core: Updated Dutch translation
 - Core: Workaround case where saving history log fails with exception
 

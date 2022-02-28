@@ -3272,8 +3272,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 
 
-			if($this->dbUpdateRequired() && !$this->_dbUpdate())
+			if($this->dbUpdateRequired() && !$this->_dbUpdate()) {
 				return false;
+			}
 		}
 
 		//TODO modified custom fields attr?
