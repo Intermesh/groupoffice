@@ -811,7 +811,8 @@ ALTER TABLE `core_entity_filter`
   `encryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT 'tls',
   `verifyCertificate` tinyint(1) NOT NULL DEFAULT 1,
   `fromName` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fromEmail` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
+  `fromEmail` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `maxMessagesPerMinute` SMALLINT UNSIGNED NOT NULL DEFAULT(0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
