@@ -1,3 +1,4 @@
+28-02-2022 6.6.47
 - Newsletters: support maximum messages per minute to account per newsletter
 - Core: add maximum messages per minute to smtp_account
 - Tickets: enable override sending from custom account by ticket type
