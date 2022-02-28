@@ -11225,6 +11225,14 @@ Ext.ComponentMgr = function(){
 
         
         create : function(config, defaultType){
+						if(config.mobile && config.mobile.xtype && GO.util.isMobileOrTablet()) {
+								config.xtype = config.mobile.xtype;
+						}
+
+						if(config.desktop && config.desktop.xtype && !GO.util.isMobileOrTablet()) {
+							config.xtype = config.desktop.xtype;
+						}
+
             return config.render ? config : new types[config.xtype || defaultType](config);
         },
 
@@ -11269,11 +11277,16 @@ Ext.Component = function(config){
     Ext.apply(this, config);
 
 
-    if(config.mobile && GO.util.isMobileOrTablet()) {
-        Ext.apply(this, config.mobile);
+    if(this.mobile && GO.util.isMobileOrTablet()) {
+        Ext.apply(this, this.mobile);
     }
 
-    this.addEvents(
+		if(this.desktop && !GO.util.isMobileOrTablet()) {
+			Ext.apply(this, this.desktop);
+		}
+
+
+	this.addEvents(
         
         'added',
         

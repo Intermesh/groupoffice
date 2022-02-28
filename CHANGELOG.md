@@ -5,6 +5,7 @@
 - Core: Improved ActiveSync error handling and fixed errors in Task sync
 - Tasks: Fixed error in detail view when recurrence is set
 - Tasks: Fixed to many categories visible when no tasklist is selected
+- Newsletters: Module works on mobile now
 
 24-02-2022 6.6.46
 - Leavedays: Bugfix add holidays for another user
