@@ -92,16 +92,21 @@ class Router {
 		$args = $this->parseArgs();
 
 		if (!isset($args[0])) {
-			throw new Exception("Invalid arguments. Usage: cli.php package/modulename/controller/method --arg1=foo");
+			throw new InvalidArguments("Invalid arguments. Usage: cli.php package/modulename/controller/method --arg1=foo");
 		}
 		
 		$path = array_shift($args);
 		$parts = explode('/', $path);
 
+		if(!isset($parts[2]) || $parts[0] != 'core' && !isset($parts[3])) {
+			throw new InvalidArguments("the path parameter must have 3 components if starts with core/ or 4 components.");
+		}
+
 		if($parts[0] == 'core') {
 			$controllerCls = 'go\\core\\cli\\controller\\' . $parts[1];
 			$method = $parts[2];
 		} else{
+
 			$controllerCls = 'go\\modules\\' . $parts[0] . '\\' . $parts[1] . '\\cli\\controller\\' . $parts[2];
 			$method = $parts[3];
 		}

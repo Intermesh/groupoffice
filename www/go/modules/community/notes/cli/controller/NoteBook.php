@@ -55,4 +55,29 @@ JSON;
 	}
 
 
+	/**
+	 * ./cli.php community/notes/NoteBook/delete --noteBookId=1
+	 */
+	public function delete($noteBookId, $format = 'csv') {
+		$json = <<<JSON
+[
+  [
+    "NoteBook/set", {
+      "destroy": [$noteBookId]
+    },
+    "call-1"
+  ]
+]
+JSON;
+
+		$requests = JSON::decode($json, true);
+
+		Response::get()->jsonOptions = JSON_PRETTY_PRINT;
+
+		$router = new Router();
+		$router->run($requests);
+
+	}
+
+
 }
