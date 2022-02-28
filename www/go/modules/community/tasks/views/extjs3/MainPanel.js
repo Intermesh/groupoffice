@@ -545,21 +545,24 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	filterCategories : function(ids) {
 
+		const conditions = [
+			{
+				ownerId: go.User.id,
+			},
+			{
+				global: true
+			}
+		];
+
+		if(ids.length) {
+			conditions.push({
+				tasklistId: ids
+			});
+		}
+
 		this.categoriesGrid.store.setFilter('tasklist',{
 			operator: "or",
-			conditions: [
-				{
-					ownerId: go.User.id,
-				},
-				{
-					tasklistId: !ids.length ? null : ids
-				},
-				{
-					global: true
-				}
-			]
-
-
+			conditions: conditions
 		}).load();
 	},
 
