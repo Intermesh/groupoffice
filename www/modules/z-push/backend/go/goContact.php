@@ -2,7 +2,9 @@
 
 use GO\Base\Util\StringHelper;
 use go\core\model\Acl;
+use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
+use Exception;
 
 class goContact extends GoBaseBackendDiff {
 	
@@ -35,7 +37,7 @@ class goContact extends GoBaseBackendDiff {
 	 * 
 	 * @param StringHelper $folderid
 	 * @param int $id
-	 * @param array $contentParameters
+	 * @param SyncParameters $contentParameters
 	 * @return SyncContact
 	 */
 	public function GetMessage($folderid, $id, $contentParameters) {
@@ -52,7 +54,13 @@ class goContact extends GoBaseBackendDiff {
 			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
-		$message = $this->convertor->GO2AS($contact, $contentParameters);
+		try {
+			$message = $this->convertor->GO2AS($contact, $contentParameters);
+		} catch(Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'Contacts::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+			return false;
+		}
 		
 //		ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
 		return $message;		
@@ -67,7 +75,7 @@ class goContact extends GoBaseBackendDiff {
 	 * @param StringHelper $folderid
 	 * @param int $id
 	 * @param SyncContact $message
-	 * @param $contentParameters
+	 * @param SyncParameters $contentParameters
 	 * @return array
 	 * @throws StatusException
 	 */
@@ -93,7 +101,13 @@ class goContact extends GoBaseBackendDiff {
 			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
-		$this->convertor->AS2GO($message, $contact);
+		try {
+			$this->convertor->AS2GO($message, $contact);
+		} catch(Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'Contacts::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+			return false;
+		}
 	
 		return $this->StatMessage($folderid, $contact->id);		
 
@@ -159,7 +173,7 @@ class goContact extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
-		$addressBook = \go\modules\community\addressbook\model\AddressBook::findById($id);
+		$addressBook = AddressBook::findById($id);
 		if(!$addressBook) {
 			ZLog::Write(LOGLEVEL_WARN, "Contact folder '$id' not found");
 			return false;
@@ -183,7 +197,7 @@ class goContact extends GoBaseBackendDiff {
 	public function GetFolderList() {
 		$folders = array();
 
-		$addressBooks = \go\modules\community\addressbook\model\AddressBook::find()
+		$addressBooks = AddressBook::find()
 			->selectSingleValue('a.id')
 			->join("sync_addressbook_user", "u", "u.addressBookId = a.id")
 			->andWhere('u.userId', '=', go()->getAuthState()->getUserId())

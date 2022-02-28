@@ -4,6 +4,7 @@ namespace go\core\db;
 
 use Exception;
 use go\core\App;
+use LogicException;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -254,12 +255,11 @@ class Connection {
    * Rollback the DB transaction
    *
    * @return boolean
-   * @throws Exception
    */
 	public function rollBack(): bool
 	{
 		if($this->transactionSavePointLevel == 0) {
-			throw new Exception("Not in transaction!");
+			throw new LogicException("Not in transaction!");
 		}
 		
 		$this->transactionSavePointLevel--;	

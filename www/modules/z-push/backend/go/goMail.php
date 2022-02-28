@@ -30,45 +30,49 @@ class goMail extends GoBaseBackendDiff {
 	public function ChangeFolder($folderid, $oldid, $displayname, $type) {
 		ZLog::Write(LOGLEVEL_INFO, sprintf("goMail->ChangeFolder('%s','%s','%s','%s')", $folderid, $oldid, $displayname, $type));
 
-		// go to parent mailbox
-		//$this->imap_reopenFolder($folderid);
+		try {
+			// go to parent mailbox
+			//$this->imap_reopenFolder($folderid);
 
-		$imap = $this->_imapLogon();
-		
-		//remove m/ from the combined stuff
-		if(!empty($folderid)){
-			$folderid = substr($folderid, 2);
+			$imap = $this->_imapLogon();
 
-			// build name for new mailboxBackendMaildir        
-			$newname = $folderid . $imap->get_mailbox_delimiter() . $displayname;
-		}else
-		{
-			$newname = $displayname;
-		}
+			//remove m/ from the combined stuff
+			if (!empty($folderid)) {
+				$folderid = substr($folderid, 2);
 
-		$csts = false;
-		// if $id is set => rename mailbox, otherwise create
-		if ($oldid) {
-			// rename doesn't work properly with IMAP
-			// the activesync client doesn't support a 'changing ID'
-			// TODO this would be solved by implementing hex ids (Mantis #459)
-			
+				// build name for new mailboxBackendMaildir
+				$newname = $folderid . $imap->get_mailbox_delimiter() . $displayname;
+			} else {
+				$newname = $displayname;
+			}
+
+			$csts = false;
+			// if $id is set => rename mailbox, otherwise create
+			if ($oldid) {
+				// rename doesn't work properly with IMAP
+				// the activesync client doesn't support a 'changing ID'
+				// TODO this would be solved by implementing hex ids (Mantis #459)
+
 //			$oldid = substr($oldid,2);
 //			$csts = $imap->rename_folder($oldid, $newname);
-			
-		} else {
-			ZLog::Write(LOGLEVEL_INFO, "Create: ".$newname);
-			$csts = $imap->create_folder($newname);
-		}
-		if ($csts) {
 
-			//refresh cached folder list
-			$this->GetFolderList();
+			} else {
+				ZLog::Write(LOGLEVEL_INFO, "Create: " . $newname);
+				$csts = $imap->create_folder($newname);
+			}
+			if ($csts) {
 
-			return $this->StatFolder($newname);
-		}
-		else
+				//refresh cached folder list
+				$this->GetFolderList();
+
+				return $this->StatFolder($newname);
+			} else
+				return false;
+		} catch (\Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
+		}
 	}
 
 	/**
@@ -79,122 +83,123 @@ class goMail extends GoBaseBackendDiff {
 	 * 
 	 * @param StringHelper $folderid
 	 * @param int $id
-	 * @param array $contentparameters
+	 * @param SyncParameters $contentparameters
 	 * @return \SyncMail
 	 */
 	public function GetMessage($folderid, $id, $contentparameters) {
-		//TODO: implement truncation
-		$truncsize = Utils::GetTruncSize($contentparameters->GetTruncation());
-		
-		ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetMessage::truncsize = '.$truncsize);
-		
-		//TODO: implement MIME mails
-		//$mimesupport = $contentparameters->GetMimeSupport();
 
-		if (!$this->_imapLogon($folderid))
-			return false;
+		try {
+			$truncsize = Utils::GetTruncSize($contentparameters->GetTruncation());
 
-		$mailbox = $this->_replaceDotWithServerDelimiter($folderid);
-		$imapAccount = $this->getImapAccount();
-		if(!$imapAccount)
-			return false;
-		
-		// Hack to make Inbox also work
-		if ($folderid == 'Inbox')
-			$mailbox = 'INBOX';
+			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetMessage::truncsize = ' . $truncsize);
 
-		$message = new SyncMail(); // Create new syncmail object
-		
-		//attachements that are too big to send over.
-		$this->_tooBigAttachments=array();
-						
-		
-		$imapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($imapAccount, $mailbox, $id);
-		if ($imapMessage) {
+			//TODO: implement MIME mails
+			//$mimesupport = $contentparameters->GetMimeSupport();
 
-			$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentparameters->GetBodyPreference(), array(SYNC_BODYPREFERENCE_MIME, SYNC_BODYPREFERENCE_PLAIN, SYNC_BODYPREFERENCE_HTML));		
-			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetMessage::bpReturnType = '.$bpReturnType);
+			if (!$this->_imapLogon($folderid))
+				return false;
 
-			 if (Request::GetProtocolVersion() >= 12.0) {
+			$mailbox = $this->_replaceDotWithServerDelimiter($folderid);
+			$imapAccount = $this->getImapAccount();
+			if (!$imapAccount)
+				return false;
 
-				$message->asbody = new SyncBaseBody();
-				$asBodyData = null;
-				switch ($bpReturnType) {
-					case SYNC_BODYPREFERENCE_PLAIN:
-						$asBodyData = $imapMessage->getPlainBody();
-						$asBodyData .= $this->_getTooBigAttachmentsString();
-	
-						break;
-					case SYNC_BODYPREFERENCE_HTML:
-						$asBodyData = \GO\Base\Util\StringHelper::normalizeCrlf($imapMessage->getHtmlBody()).nl2br($this->_getTooBigAttachmentsString());
-						break;
-					case SYNC_BODYPREFERENCE_MIME:
-						//we load the mime message and create a new mime string since we can't trust the IMAP source. It often contains wrong encodings that will crash the 
-						//sync. eg. incredimail.
-						$source = $imapMessage->getSource();
-						
-						if(!strpos($source, "pkcs7-mime")){
-							ZLog::Write(LOGLEVEL_DEBUG, 'Recreating MIME source');
-							
-							try{
-								$sendMessage = \GO\Base\Mail\Message::newInstance()->loadMimeMessage($source, true);
-								$asBodyData = $sendMessage->toString();
-							} catch (Exception $e){
-								ZLog::Write(LOGLEVEL_ERROR, "Failed to recreate mime source. Falling back to original mime. Subject: ".$imapMessage->subject." Exception: ".$e->getMessage());
+			// Hack to make Inbox also work
+			if ($folderid == 'Inbox')
+				$mailbox = 'INBOX';
+
+			$message = new SyncMail(); // Create new syncmail object
+
+			//attachements that are too big to send over.
+			$this->_tooBigAttachments = array();
+
+
+			$imapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($imapAccount, $mailbox, $id);
+			if ($imapMessage) {
+
+				$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentparameters->GetBodyPreference(), array(SYNC_BODYPREFERENCE_MIME, SYNC_BODYPREFERENCE_PLAIN, SYNC_BODYPREFERENCE_HTML));
+				ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetMessage::bpReturnType = ' . $bpReturnType);
+
+				if (Request::GetProtocolVersion() >= 12.0) {
+
+					$message->asbody = new SyncBaseBody();
+					$asBodyData = null;
+					switch ($bpReturnType) {
+						case SYNC_BODYPREFERENCE_PLAIN:
+							$asBodyData = $imapMessage->getPlainBody();
+							$asBodyData .= $this->_getTooBigAttachmentsString();
+
+							break;
+						case SYNC_BODYPREFERENCE_HTML:
+							$asBodyData = \GO\Base\Util\StringHelper::normalizeCrlf($imapMessage->getHtmlBody()) . nl2br($this->_getTooBigAttachmentsString());
+							break;
+						case SYNC_BODYPREFERENCE_MIME:
+							//we load the mime message and create a new mime string since we can't trust the IMAP source. It often contains wrong encodings that will crash the
+							//sync. eg. incredimail.
+							$source = $imapMessage->getSource();
+
+							if (!strpos($source, "pkcs7-mime")) {
+								ZLog::Write(LOGLEVEL_DEBUG, 'Recreating MIME source');
+
+								try {
+									$sendMessage = \GO\Base\Mail\Message::newInstance()->loadMimeMessage($source, true);
+									$asBodyData = $sendMessage->toString();
+								} catch (Exception $e) {
+									ZLog::Write(LOGLEVEL_ERROR, "Failed to recreate mime source. Falling back to original mime. Subject: " . $imapMessage->subject . " Exception: " . $e->getMessage());
+									$asBodyData = $source;
+								}
+
+							} else {
+
+								ZLog::Write(LOGLEVEL_DEBUG, 'Passing through orignal IMAP MIME source for SMIME');
 								$asBodyData = $source;
 							}
-							
-						}  else {
-							
-							ZLog::Write(LOGLEVEL_DEBUG, 'Passing through orignal IMAP MIME source for SMIME');
-							$asBodyData = $source;
-						}						
-						break;
-					case SYNC_BODYPREFERENCE_RTF:
-						ZLog::Write(LOGLEVEL_DEBUG, "BackendIMAP->GetMessage RTF Format NOT CHECKED");
-						$asBodyData = base64_encode(\GO\Base\Util\StringHelper::normalizeCrlf($imapMessage->getPlainBody()).$this->_getTooBigAttachmentsString());
-						break;
-				}
+							break;
+						case SYNC_BODYPREFERENCE_RTF:
+							ZLog::Write(LOGLEVEL_DEBUG, "BackendIMAP->GetMessage RTF Format NOT CHECKED");
+							$asBodyData = base64_encode(\GO\Base\Util\StringHelper::normalizeCrlf($imapMessage->getPlainBody()) . $this->_getTooBigAttachmentsString());
+							break;
+					}
 
 
-				 //attachments are not necessary when using mime
-				 //
-				 //Attachments probably need to be sent even with MIME type:
-				 //http://talk.sonymobile.com/t5/Xperia-Z1-Compact/Z1-Compact-Problem-With-EAS/m-p/866755#11220
-				 //zpush_always_send_attachments config setting is for testing this carefully.
+					//attachments are not necessary when using mime
+					//
+					//Attachments probably need to be sent even with MIME type:
+					//http://talk.sonymobile.com/t5/Xperia-Z1-Compact/Z1-Compact-Problem-With-EAS/m-p/866755#11220
+					//zpush_always_send_attachments config setting is for testing this carefully.
 //				 if($bpReturnType!=SYNC_BODYPREFERENCE_MIME || !empty(\GO::config()->zpush_always_send_attachments)){
-					 $message->asattachments = $this->_getASAttachments($imapMessage,$id,$mailbox, $bpReturnType != SYNC_BODYPREFERENCE_PLAIN ? $asBodyData : null);
+					$message->asattachments = $this->_getASAttachments($imapMessage, $id, $mailbox, $bpReturnType != SYNC_BODYPREFERENCE_PLAIN ? $asBodyData : null);
 //				 }
 
-				// truncate body, if requested
-				//MS: Not sure if !empty($truncsize) is needed here. Testing for Robert S.
-				if(!empty($truncsize) && $bpReturnType != SYNC_BODYPREFERENCE_MIME && strlen($asBodyData) > $truncsize) {
-					$asBodyData = Utils::Utf8_truncate($asBodyData, $truncsize);
-					$message->asbody->truncated = 1;
-				}else {
-					$message->asbody->truncated = 0;
-				}
-				$message->asbody->data = version_compare(ZPUSH_VERSION, '2.3', '<') ? $asBodyData : StringStreamWrapper::Open($asBodyData);
-				$message->asbody->type = $bpReturnType;
+					// truncate body, if requested
+					//MS: Not sure if !empty($truncsize) is needed here. Testing for Robert S.
+					if (!empty($truncsize) && $bpReturnType != SYNC_BODYPREFERENCE_MIME && strlen($asBodyData) > $truncsize) {
+						$asBodyData = Utils::Utf8_truncate($asBodyData, $truncsize);
+						$message->asbody->truncated = 1;
+					} else {
+						$message->asbody->truncated = 0;
+					}
+					$message->asbody->data = version_compare(ZPUSH_VERSION, '2.3', '<') ? $asBodyData : StringStreamWrapper::Open($asBodyData);
+					$message->asbody->type = $bpReturnType;
 //				$message->nativebodytype = $bpReturnType; //This casued outlook 2013 to fail!!
-				$message->asbody->estimatedDataSize = strlen($asBodyData);
+					$message->asbody->estimatedDataSize = strlen($asBodyData);
 
-				$bpo = $contentparameters->BodyPreference($message->asbody->type);
-				if (Request::GetProtocolVersion() >= 14.0 && $bpo->GetPreview()) {
-					if(!isset($plainBody))
-						$plainBody = $imapMessage->getPlainBody();
-					
-					$textPreview = isset($plainBody) ? $plainBody : Utils::ConvertHtmlToText($message->asbody->data);
-					
-					$message->asbody->preview = Utils::Utf8_truncate($textPreview, $bpo->GetPreview());
-				} 
-			}else {
-				
-				
-				$message->bodytruncated = 0;
-				/* BEGIN fmbiete's contribution r1528, ZP-320 */
-				if ($bpReturnType == SYNC_BODYPREFERENCE_MIME) {
-					$mail = $imapMessage->getSource();
+					$bpo = $contentparameters->BodyPreference($message->asbody->type);
+					if (Request::GetProtocolVersion() >= 14.0 && $bpo->GetPreview()) {
+						if (!isset($plainBody))
+							$plainBody = $imapMessage->getPlainBody();
+
+						$textPreview = isset($plainBody) ? $plainBody : Utils::ConvertHtmlToText($message->asbody->data);
+
+						$message->asbody->preview = Utils::Utf8_truncate($textPreview, $bpo->GetPreview());
+					}
+				} else {
+
+
+					$message->bodytruncated = 0;
+					/* BEGIN fmbiete's contribution r1528, ZP-320 */
+					if ($bpReturnType == SYNC_BODYPREFERENCE_MIME) {
+						$mail = $imapMessage->getSource();
 //					if (strlen($mail) > $truncsize) {
 //						$message->mimedata = Utils::Utf8_truncate($mail, $truncsize);
 //						$message->mimetruncated = 1;
@@ -202,73 +207,77 @@ class goMail extends GoBaseBackendDiff {
 						$message->mimetruncated = 0;
 						$message->mimedata = $mail;
 //					}
-					$message->mimesize = strlen($message->mimedata);
-				} else {
-					//attachments are not needed for MIME
-					$message->attachments = $this->_getNormalAttachments($imapMessage,$id,$mailbox);
-									
-					$plainBody = $imapMessage->getPlainBody();
-					
-					$plainBody .= $this->_getTooBigAttachmentsString();
-					
-					// truncate body, if requested
-					if (strlen($plainBody) > $truncsize) {
-						$message->body = Utils::Utf8_truncate($plainBody, $truncsize);
-						$message->bodytruncated = 1;
+						$message->mimesize = strlen($message->mimedata);
 					} else {
-						$message->body = $plainBody;
-						$message->bodytruncated = 0;
+						//attachments are not needed for MIME
+						$message->attachments = $this->_getNormalAttachments($imapMessage, $id, $mailbox);
+
+						$plainBody = $imapMessage->getPlainBody();
+
+						$plainBody .= $this->_getTooBigAttachmentsString();
+
+						// truncate body, if requested
+						if (strlen($plainBody) > $truncsize) {
+							$message->body = Utils::Utf8_truncate($plainBody, $truncsize);
+							$message->bodytruncated = 1;
+						} else {
+							$message->body = $plainBody;
+							$message->bodytruncated = 0;
+						}
+						$message->bodysize = strlen($message->body);
 					}
-					$message->bodysize = strlen($message->body);
 				}
-			}
 
-			$message->datereceived = $imapMessage->udate;
-			$message->messageclass = "IPM.Note";
-			$message->subject = $imapMessage->subject;
-			$message->read = $imapMessage->seen ? 1 : 0;
-			$message->from = (string) $imapMessage->from;
+				$message->datereceived = $imapMessage->udate;
+				$message->messageclass = "IPM.Note";
+				$message->subject = $imapMessage->subject;
+				$message->read = $imapMessage->seen ? 1 : 0;
+				$message->from = (string)$imapMessage->from;
 
-			// Addressing block
-			$message->to = $imapMessage->to->getArray();
-			$message->cc = $imapMessage->cc->getArray();
-			$message->bcc = $imapMessage->bcc->getArray();
-			$message->reply_to =  $imapMessage->reply_to->getArray();
-			
-			$firstTo = $imapMessage->to->getAddress();
-			
-			if($firstTo)
-				$message->displayto=$firstTo['personal'];
-			
-			// End of addressing block
+				// Addressing block
+				$message->to = $imapMessage->to->getArray();
+				$message->cc = $imapMessage->cc->getArray();
+				$message->bcc = $imapMessage->bcc->getArray();
+				$message->reply_to = $imapMessage->reply_to->getArray();
 
-			if (isset($imapMessage->x_priority)) {
-				$mimeImportance =  $imapMessage->x_priority;
-				if ($mimeImportance > 3)
+				$firstTo = $imapMessage->to->getAddress();
+
+				if ($firstTo)
+					$message->displayto = $firstTo['personal'];
+
+				// End of addressing block
+
+				if (isset($imapMessage->x_priority)) {
+					$mimeImportance = $imapMessage->x_priority;
+					if ($mimeImportance > 3)
 						$message->importance = 0;
-				if ($mimeImportance == 3)
+					if ($mimeImportance == 3)
 						$message->importance = 1;
-				if ($mimeImportance < 3)
+					if ($mimeImportance < 3)
 						$message->importance = 2;
-			}else
-			{
-				$message->importance = 1;
-			}
-			
-			$message->internetcpid = INTERNET_CPID_UTF8;
-			if (Request::GetProtocolVersion() >= 12.0) {
+				} else {
+					$message->importance = 1;
+				}
+
+				$message->internetcpid = INTERNET_CPID_UTF8;
+				if (Request::GetProtocolVersion() >= 12.0) {
 					$message->contentclass = "urn:content-classes:message";
+				}
+
+				//don't flag as read right IS ALREADY DEFAULT
+//			$imapMessage->peek = true;
+				unset($imapMessage);
 			}
 
-			//don't flag as read right IS ALREADY DEFAULT
-//			$imapMessage->peek = true;
-			unset($imapMessage);
+			//Uses lots of mem:
+			//ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetMessage::MESSAGE = '.var_export($message,true));
+
+			return $message;
+		} catch (\Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+			return false;
 		}
-		
-		//Uses lots of mem:
-		//ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetMessage::MESSAGE = '.var_export($message,true));
-		
-		return $message;
 	}
 	
 	/**
@@ -594,9 +603,9 @@ class goMail extends GoBaseBackendDiff {
 			   }
 		   }
 
-		}
-		catch(Exception $e){
-			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ '.(string)$e);
+		} catch (\Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 		}
 
 		return $this->StatMessage($folderid, $id);
@@ -740,53 +749,56 @@ class goMail extends GoBaseBackendDiff {
 //		\GO\Base\Mail\ImapBase::$debug = true;
 //		GO()->getDebugger()->enable();
 
-		ZLog::Write(LOGLEVEL_DEBUG, "GetMessageList($folderid, $cutoffdate)");
-		$messages = array();
+		try {
+			ZLog::Write(LOGLEVEL_DEBUG, "GetMessageList($folderid, $cutoffdate)");
+			$messages = array();
 
-		if (GO::modules()->email) {
-			if ($imap = $this->_imapLogon($folderid)) {
-				//Don't fetch all messages with an empty cutoffdate because
-				//this may kill the server. Default to two weeks.
-				if (empty($cutoffdate))
-				{
-					ZLog::Write(LOGLEVEL_DEBUG, "empty cutoff");
-					$headers = $imap->get_flags();
-				} else
-				{
-					ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . date("j-M-Y", $cutoffdate));
-					$uids = $imap->search('SINCE ' . date("j-M-Y", $cutoffdate));
-					if(empty($uids)) {
+			if (GO::modules()->email) {
+				if ($imap = $this->_imapLogon($folderid)) {
+					//Don't fetch all messages with an empty cutoffdate because
+					//this may kill the server. Default to two weeks.
+					if (empty($cutoffdate)) {
+						ZLog::Write(LOGLEVEL_DEBUG, "empty cutoff");
+						$headers = $imap->get_flags();
+					} else {
+						ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . date("j-M-Y", $cutoffdate));
+						$uids = $imap->search('SINCE ' . date("j-M-Y", $cutoffdate));
+						if (empty($uids)) {
+							return [];
+						}
+						$headers = $imap->get_flags(min($uids) . ':*');
+					}
+
+					if (!$headers) {
+						ZLog::Write(LOGLEVEL_ERROR, "IMAP returned error reponse" . $imap->last_error());
 						return [];
 					}
-					$headers = $imap->get_flags(min($uids).':*');
-				}
 
-				if(!$headers) {
-					ZLog::Write(LOGLEVEL_ERROR, "IMAP returned error reponse" . $imap->last_error());
-					return [];
-				}
-				
-				
-				ZLog::Write(LOGLEVEL_DEBUG, "message count:".count($headers));
-					
-				
-				
-				/* Create messages array */
-				foreach ($headers as $header) {
-					
-					$message = array();
-					$message["mod"] = $header['date'];
-					$message["id"] = $header['uid'];
-					// 'flagged' aka 'FollowUp' aka 'starred'
-					$message["star"] = in_array("\Flagged", $header['flags']);
-					// 'seen' aka 'read' is the only flag we want to know about
-					$message["flags"] = in_array("\Seen", $header['flags']);
 
-					$messages[] = $message;
+					ZLog::Write(LOGLEVEL_DEBUG, "message count:" . count($headers));
+
+
+					/* Create messages array */
+					foreach ($headers as $header) {
+
+						$message = array();
+						$message["mod"] = $header['date'];
+						$message["id"] = $header['uid'];
+						// 'flagged' aka 'FollowUp' aka 'starred'
+						$message["star"] = in_array("\Flagged", $header['flags']);
+						// 'seen' aka 'read' is the only flag we want to know about
+						$message["flags"] = in_array("\Seen", $header['flags']);
+
+						$messages[] = $message;
+					}
 				}
 			}
+			return $messages;
+		} catch (\Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+			return [];
 		}
-		return $messages;
 	}
 
 	/**
