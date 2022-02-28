@@ -1,3 +1,5 @@
+- Newsletters: support maximum messages per minute to account per newsletter
+- Core: add maximum messages per minute to smtp_account
 - Tickets: enable override sending from custom account by ticket type
 - Core: enable setting account in system message 
 - Core: Updated Dutch translation
