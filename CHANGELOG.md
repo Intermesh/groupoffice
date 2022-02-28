@@ -1,4 +1,5 @@
 - Core: Updated Dutch translation
+- Core: Workaround case where saving history log fails with exception
 
 24-02-2022 6.6.46
 - Leavedays: Bugfix add holidays for another user
