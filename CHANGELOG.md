@@ -1,6 +1,7 @@
 - Core: Optimize 'optimizer_search_depth' for global search queries.
 - Tasks: fixed default list not selected by default in task dialog
 - Email: Folders could be deleted when truncating folder with a disabled trash folder
+- Projects: Search in selected project. Use arrow up to search all.
 
 28-02-2022 6.6.47
 - Newsletters: support maximum messages per minute to account per newsletter
