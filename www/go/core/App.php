@@ -940,8 +940,27 @@ use Faker;
 
 			parent::checkDatabase();
 		}
-	}
 
+
+		private $optimizerSearchDepthSet = false;
+
+		/**
+		 * Used for global search queries to optimize execution plan
+		 * Queries could hang in 'Statistics' state when inputing a large string resulting in many joins.
+		 *
+		 * Also see: https://mariadb.com/resources/blog/setting-optimizer-search-depth-in-mysql/
+		 */
+		public function setOptimizerSearchDepth() {
+			try {
+				go()->getDbConnection()->exec("SET SESSION optimizer_search_depth=4;");
+
+			} catch(Exception $e) {
+				ErrorHandler::log("Could not set 'optimizer_search_depth' on mysql. Please configure manually. " . $e->getMessage());
+			}
+
+			$this->optimizerSearchDepthSet = true;
+		}
+	}
 }
 
 namespace {
