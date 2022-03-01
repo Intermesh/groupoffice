@@ -1,3 +1,5 @@
+- Core: Optimize 'optimizer_search_depth' for global search queries.
+
 28-02-2022 6.6.47
 - Newsletters: support maximum messages per minute to account per newsletter
 - Core: add maximum messages per minute to smtp_account
@@ -9,7 +11,6 @@
 - Tasks: Fixed error in detail view when recurrence is set
 - Tasks: Fixed to many categories visible when no tasklist is selected
 - Newsletters: Module works on mobile now
-- Core: Optimize 'optimizer_search_depth' for global search queries.
 
 24-02-2022 6.6.46
 - Leavedays: Bugfix add holidays for another user

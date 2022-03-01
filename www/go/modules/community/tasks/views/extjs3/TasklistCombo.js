@@ -25,7 +25,7 @@
 		}
 	};
 
-	go.modules.community.tasks.TasklistCombo = Ext.extend(go.form.ComboBox, cfg,
+	go.modules.community.tasks.TasklistCombo = Ext.extend(go.form.ComboBox, Ext.apply(cfg,
 		{
 		initComponent: function() {
 			this.supr().initComponent.call(this);
@@ -38,9 +38,9 @@
 			}
 
 		}
-	});
+	}));
 
-	go.modules.community.tasks.TasklistComboBoxReset = Ext.extend(go.form.ComboBoxReset, cfg, {
+	go.modules.community.tasks.TasklistComboBoxReset = Ext.extend(go.form.ComboBoxReset, Ext.apply(cfg, {
 		initComponent: function() {
 			this.supr().initComponent.call(this);
 
@@ -52,7 +52,7 @@
 			}
 
 		}
-	});
+	}));
 
 	Ext.reg('tasklistcombo', go.modules.community.tasks.TasklistCombo );
 	Ext.reg('tasklistcomboreset', go.modules.community.tasks.TasklistComboBoxReset );
