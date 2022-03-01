@@ -1,3 +1,5 @@
+- Core: Optimize 'optimizer_search_depth' for global search queries.
+
 22-03-2022 6.5.105
 - Core: updated PT-BR translations. Thank you George!
 - Core: updated CN translations. Thank you Cheng Yupeng!
