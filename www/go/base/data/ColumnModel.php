@@ -255,10 +255,11 @@ class ColumnModel {
 	 * @param StringHelper $dataindex
 	 * @return Column 
 	 */
-	public function getColumn($dataindex){
-		
-		if(empty($this->_columns[$dataindex]))
+	public function getColumn($dataindex)
+	{
+		if(empty($this->_columns[$dataindex])) {
 			return false;
+		}
 		return $this->_columns[$dataindex];
 	}
 	
@@ -267,9 +268,8 @@ class ColumnModel {
 	 * 
 	 * @param array $columnNames Eg. array('id','name','age');
 	 */
-	public function sort($columnNames){
-		
-		
+	public function sort($columnNames)
+	{
 		for($i=0;$i<count($columnNames);$i++){
 			$column = $this->getColumn($columnNames[$i]);
 			if($column){
@@ -280,7 +280,6 @@ class ColumnModel {
 		
 		unset($this->_columnsSorted);
 		$this->_sortColumns();
-		
 	}
 	
 	
