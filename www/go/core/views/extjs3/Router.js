@@ -141,6 +141,20 @@ go.Router = (function () {
 				window.location.hash = path || "";
 			}
 			return this;
+		},
+
+		login: function() {
+
+			console.warn('redirect to login');
+			//prevent double calls because that made the page load twict
+			//this caused problems with the remember login cookie being regenerated twice
+			// the user received an invalid cookie theft notice
+			if(!this.redirectingToLogin) {
+				alert( t("Your session is no longer valid. Press OK to authenticate."));
+				this.redirectingToLogin = true;
+				document.location.href = BaseHref;
+
+			}
 		}
 	});
 
