@@ -1,3 +1,4 @@
+03-03-2022 6.6.48
 - Core: Optimize 'optimizer_search_depth' for global search queries.
 - Tasks: fixed default list not selected by default in task dialog
 - Email: Folders could be deleted when truncating folder with a disabled trash folder
