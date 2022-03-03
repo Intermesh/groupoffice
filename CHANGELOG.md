@@ -8,7 +8,7 @@
 - Newsletters: support maximum messages per minute to account per newsletter
 - Core: add maximum messages per minute to smtp_account
 - Tickets: enable override sending from custom account by ticket type
-- Core: enable setting account in system message 
+- Core: enable setting account in system message
 - Core: Updated Dutch translation
 - Core: Workaround case where saving history log fails with exception
 - Core: Improved ActiveSync error handling and fixed errors in Task sync
@@ -196,6 +196,10 @@
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+03-03-2022 6.5.104
+- Leavedays: add several missing columns to report CSV, fix sort order, fix calculation
+- Email: Folders could be deleted when truncating folder with a disabled trash folder
 
 24-02-2022 6.5.103
 - Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
