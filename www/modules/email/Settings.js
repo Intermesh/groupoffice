@@ -83,6 +83,8 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 				region: "center"
 			})
 		];
+
+		this.templateCombo.store.baseParams.permissionLevel = go.permissionLevels.read;
 		
 		GO.email.SettingsPanel.superclass.initComponent.call(this);
 	},

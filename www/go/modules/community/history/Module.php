@@ -74,9 +74,7 @@ class Module extends core\Module
 			$log->changes = json_encode($changes);
 		}
 
-		if(!$log->save()) {
-			ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
-		}
+		self::saveLog($log);
 	}
 
 	/**
@@ -163,8 +161,29 @@ class Module extends core\Module
 			$log->changes = json_encode($changes);
 		}
 
-		if(!$log->save()) {
-			ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
+		self::saveLog($log);
+	}
+
+
+	private static function saveLog(LogEntry $log) {
+		try {
+			if (!$log->save()) {
+				ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId . "): " . var_export($log->getValidationErrors(), true));
+			}
+		}catch(Exception $e) {
+
+			ErrorHandler::logException($e);
+			//try again with just ID in description. I had a case where there were malformed characters
+			$log->description = $log->entityId . ': error in description';
+
+			try {
+				if(!$log->save()) {
+					ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
+				}
+			} catch(Exception $e) {
+				ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId . "): " . var_export($log->getValidationErrors(), true));
+				ErrorHandler::logException($e);
+			}
 		}
 	}
 

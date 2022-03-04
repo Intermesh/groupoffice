@@ -205,20 +205,12 @@ class Task extends AclItemEntity {
 
 	protected static function defineMapping(): Mapping
 	{
-		return parent::defineMapping()
+		$mapping = parent::defineMapping()
 			->addTable("tasks_task", "task")
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
-
-		if(Module::isInstalled("legacy", "projects2")) {
-			$mapping->setQuery((new \go\core\db\Query())
-				->join('pr2_hours', 'prh', 'prh.task_id = task.id', 'left')
-				->select('COALESCE(SUM(prh.duration) * 60, 0) AS timeBooked')
-				->groupBy(['task.id'])
-			);
-		}
 
 		return $mapping;
 	}
@@ -555,7 +547,6 @@ class Task extends AclItemEntity {
 			$query->join('tasks_tasklist_group', 'listGroup', 'listGroup.id = task.groupId', 'LEFT');
 			$sort->renameKey('groupOrder', 'listGroup.sortOrder');
 			$sort['id'] = "ASC";
-			unset($sort['groupOrder']);
 		}
 
 		if(isset($sort['tasklist'])) {

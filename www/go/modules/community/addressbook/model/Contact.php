@@ -1081,13 +1081,6 @@ class Contact extends AclItemEntity {
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getAddressBook() {
-		return AddressBook::findById($this->addressBookId)->name;
-	}
-
-	/**
 	 * @return DateTime|string
 	 */
 	public function getBirthday()

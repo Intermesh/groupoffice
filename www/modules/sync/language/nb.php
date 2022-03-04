@@ -24,4 +24,6 @@ return array (
   '<h1>Group-Office SyncML Server</h1><p>This is the Group-Office SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with Group-Office.</p>' => '<h1>{product_name} SyncML Server</h1><p>Dette er en {product_name} SyncML server. Bruk en SyncML kompatibel enhet.</p>',
   'Synchronization' => 'Synkronisering',
   'Delete older events and tasks at the client (they will be kept in Group-Office)' => 'Slett eldre hendelser og oppgaver fra klienten (de blir bevart i {product_name})',
+  'Notebooks' => 'Notatbøker',
+  'Address books' => 'Adressebøker',
 );

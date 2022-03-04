@@ -1,11 +1,9 @@
 <?php
 return array (
-	"name" => "Adresboek",
-	"description" => "Bewaar contacten en organisaties",
-
-	'mayChangeAddressbooks' => 'Adresboeken wijzigen',
-	'mayExportContacts' => 'Contacten exporteren',
-
+  'name' => 'Adresboek',
+  'description' => 'Bewaar contacten en organisaties',
+  'mayChangeAddressbooks' => 'Adresboeken wijzigen',
+  'mayExportContacts' => 'Contacten exporteren',
   'salutationTemplate' => 'Geachte [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]heer/mevrouw[else][if {{contact.gender}}=="M"]heer[else]mevrouw[/if][/if][/if][if {{contact.middleName}}] {{contact.middleName}}[/if] {{contact.lastName}}',
   'Contact' => 'Contactpersoon',
   'Job title' => 'Titel',
@@ -147,4 +145,9 @@ return array (
   'Importing...' => 'Bezig met importeren…',
   'Restrict export to administrators' => 'Beperk export tot beheerders',
   'Allow new' => 'Sta nieuwe toe',
+  'Bank details' => 'Bankgegevens',
+  'Show more...' => 'Toon meer…',
+  'Display options for address books' => 'Weergave instrellingen voor adresboeken',
+  'Start in' => 'Start in',
+  'Last selected address book' => 'Laatst geselecteerde adresboek',
 );

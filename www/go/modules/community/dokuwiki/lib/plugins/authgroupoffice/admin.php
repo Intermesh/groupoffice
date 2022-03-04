@@ -73,5 +73,3 @@ class admin_plugin_authgroupoffice extends admin_plugin_acl {
 	}
 	
 }
-?>
-

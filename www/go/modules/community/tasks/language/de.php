@@ -56,4 +56,6 @@ return array (
 	'Open' => 'Offen',
 	'Group name' => 'Gruppenname',
 	'Ok' => 'OK',
+	'Set today for start and due date when creating new tasks' => 'Legen Sie den heutige Tag als Start- und Fälligkeitsdatum fest, wenn Sie neue Aufgaben erstellen.',
+	'' => ''
 );

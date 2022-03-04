@@ -107,14 +107,18 @@ GO.moduleManager.onModuleReady('email',function(){
 					})
 
 				],
-				buttons: ['->',{text:'Upload', handler: () => {this.certUploadForm.form.submit({
+				listeners: {
+					'show' : (win) => {
+						this.certUploadForm.form.reset();
+						this.uploadFile.clearQueue();
+						this.uploadFile.createUploadInput();
+					}
+				},
+				buttons: ['->',{text: t('Upload'), handler: () => {this.certUploadForm.form.submit({
 						success: () => {
 							this.certStore.reload();
-							this.passwordField.setValue('');
-							this.goPasswordField.setValue('');
-							this.uploadFile.clearQueue();
-							this.uploadFile.createUploadInput();
-							this.mimeUploadWindow.close();
+
+							this.mimeUploadWindow.hide();
 						},
 						failure: (form,action) => {
 							Ext.Msg.alert(t('Error'),action.result.feedback);

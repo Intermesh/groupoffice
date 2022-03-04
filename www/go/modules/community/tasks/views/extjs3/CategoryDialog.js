@@ -16,9 +16,9 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 						anchor: '100%',
 						allowBlank: false
 					},
-					this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
-						editable: false,
-						allowBlank: false
+					this.tasklistCombo = new go.modules.community.tasks.TasklistComboBoxReset({
+						allowBlank: true,
+						emptyText: t("All")
 					})
 					]
 			}
@@ -26,9 +26,7 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 
 		if(go.Modules.get("community", "tasks").userRights.mayChangeCategories)
 		{
-			this.ownerIdField = new Ext.form.Hidden({name:'ownerId',value:go.User.id, listeners:{
-				'setvalue': (me, val) => {  this.checkbox.setValue(!val) }
-			}});
+			this.ownerIdField = new Ext.form.Hidden({name:'ownerId',value:go.User.id});
 
 			this.checkbox = new Ext.form.Checkbox({
 				xtype:'xcheckbox',
@@ -51,7 +49,7 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 		this.supr().onLoad.call(this);
 
 		if (go.Modules.get("community", "tasks").userRights.mayChangeCategories) {
-			this.checkbox.setValue(!this.tasklistCombo.getValue());
+			this.checkbox.setValue(!this.tasklistCombo.getValue() && !this.ownerIdField.getValue());
 		}
 
 	}

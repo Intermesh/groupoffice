@@ -1505,6 +1505,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$where .= ') ';
 			} else
 			{
+
+				go()->setOptimizerSearchDepth();
+
 				$joins .= "\nINNER JOIN core_search search ON search.entityId = t.id and search.entityTypeId = " . static::entityType()->getId();
 
 				$i = 0;
@@ -3272,8 +3275,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 
 
-			if($this->dbUpdateRequired() && !$this->_dbUpdate())
+			if($this->dbUpdateRequired() && !$this->_dbUpdate()) {
 				return false;
+			}
 		}
 
 		//TODO modified custom fields attr?

@@ -15,7 +15,7 @@ go.modules.community.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 				{
 					xtype: "tasklistcombo",
 					hiddenName: "tasksSettings.defaultTasklistId",
-					fieldLabel: t("Defaultdd tasklist"),
+					fieldLabel: t("Default tasklist"),
 					role: 'list',
 					allowBlank: true
 				},
@@ -35,7 +35,14 @@ go.modules.community.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 							inputValue: true
 						}
 					]
-				})
+				}),
+				{
+					xtype: "checkbox",
+					hideLabel: true,
+					boxLabel: t("Set today for start and due date when creating new tasks"),
+					name: "tasksSettings.defaultDate"
+
+				}
 			]
 		}
 		];

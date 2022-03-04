@@ -5,17 +5,13 @@ namespace GO\Email\Controller;
 
 use GO;
 use GO\Base\Exception\AccessDenied;
-
+use GO\Base\Mail\Imap;
+use GO\Base\Model\Acl;
 use go\core\ErrorHandler;
+use go\core\model\Acl as GoAcl;
 use go\core\model\User;
 use GO\Email\Model\Account;
-use GO\Email\Model\Alias;
 use GO\Email\Model\Label;
-
-use GO\Base\Model\Acl;
-
-use GO\Base\Mail\Imap;
-use go\core\model\Acl as GoAcl;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Settings;
 
@@ -28,7 +24,8 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 	/*
 	 * Example URL: http://localhost/groupoffice-4.0/www/?r=email/message/mailto&mailto=mailto:info@intermesh.nl&bcc=test@intermesh.nl&body=jaja&cc=cc@intermesh.nl&subject=subject
 	 */
-	protected function actionMailto($params){
+	protected function actionMailto($params)
+	{
 		$qs=strtolower(str_replace('mailto:','', urldecode($_SERVER['QUERY_STRING'])));
 		$qs=str_replace('?subject','&subject', $qs);
 
@@ -41,22 +38,22 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 		if(!isset($vars['subject']))
 			$vars['subject']='';
 
-		if(!isset($vars['body']))
-			$vars['body']='';
-		//
-//		var_dump($vars);
-//		exit();
+		if(!isset($vars['body'])) {
+			$vars['body'] = '';
+		}
 
 		header('Location: '.GO::createExternalUrl('email', 'showComposer', array('values'=>$vars)));
 		exit();
 	}
 
-	protected function actionNotification($params){
+	protected function actionNotification(array $params): array
+	{
 		$account = Account::model()->findByPk($params['account_id']);
 		
 		$alias = $this->_findAliasFromRecipients($account, new \GO\Base\Mail\EmailRecipients($params['message_to']));	
-		if(!$alias)
+		if(!$alias) {
 			$alias = $account->getDefaultAlias();
+		}
 
 		$body = sprintf(GO::t("Your message with subject \"%s\" was displayed at %s", "email"), $params['subject'], \GO\Base\Util\Date::get_timestamp(time()));
 
@@ -2072,12 +2069,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 * @param string $mailbox		The affected mailbox in where to search the message uid
 	 * @param int $uid					The uid of the message to search in the mailbox
 	 * 
-	 * @return string						Json string if the request was successfully done
+	 * @return array				['success' => bool, 'message' => ?string]
 	 * 
 	 * @throws \GO\Base\Exception\NotFound
 	 * @throws AccessDenied
 	 */
-	protected function actionSaveAllAttachments($folder_id,$account_id,$mailbox,$uid, $filepath = null){
+	protected function actionSaveAllAttachments($folder_id,$account_id,$mailbox,$uid, $filepath = null): array
+	{
 		$response = array('success'=>true);
 		
 		$folder = \GO\Files\Model\Folder::model()->findByPk($folder_id);
@@ -2308,10 +2306,30 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			return $response;
 	}
 
-	protected function actionZipAllAttachments($params){
-
+	/**
+	 * Delete all attachments from current email message
+	 *
+	 * @param array $params
+	 * @return bool[]
+	 * @throws AccessDenied
+	 */
+	protected function actionDeleteAllAttachments(array $params): array
+	{
 		$account = Account::model()->findByPk($params['account_id']);
-		//$imap  = $account->openImapConnection($params['mailbox']);
+		$response = ['success' => true];
+		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
+		if ($message->deleteAttachments()) {
+			$message->delete();
+			$message->getImapConnection()->expunge();
+			$response['uid'] = $message->getImapConnection()->get_uidnext();
+		}
+
+		return $response;
+	}
+
+	protected function actionZipAllAttachments(array $params)
+	{
+		$account = Account::model()->findByPk($params['account_id']);
 
 		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
 

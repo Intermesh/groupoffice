@@ -5,27 +5,33 @@ class goCalendar extends GoBaseBackendDiff {
 	
 	public function DeleteMessage($folderid, $id, $contentparameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goCalendar->DeleteMessage('.$folderid.','.$id.')');
-		
-		$event = \GO\Calendar\Model\Event::model()->findByPk($id);
-		
-//		if(!$event->is_organizer) {
-//			
-//			//iphone uses delete to decline!
-//			if($this->MeetingResponse($id, "a/GroupOfficeCalendar", 4)) {
-//				return true;
-//			}
-//		}
-					
-		// Only delete from GO when you have the right permissions for it.
-		if ($event && $event->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
-			//HTC deletes old appointments. We don't like that so we refuse to delete appointments older then 7 days.
-			if($event->start_time<\GO\Base\Util\Date::date_add(time(), -7)){
+
+		try {
+			$event = \GO\Calendar\Model\Event::model()->findByPk($id);
+
+	//		if(!$event->is_organizer) {
+	//
+	//			//iphone uses delete to decline!
+	//			if($this->MeetingResponse($id, "a/GroupOfficeCalendar", 4)) {
+	//				return true;
+	//			}
+	//		}
+
+			// Only delete from GO when you have the right permissions for it.
+			if ($event && $event->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+				//HTC deletes old appointments. We don't like that so we refuse to delete appointments older then 7 days.
+				if($event->start_time<\GO\Base\Util\Date::date_add(time(), -7)){
+					return true;
+				}  else {
+					return $event->delete();
+				}
+			} else {
 				return true;
-			}  else {
-				return $event->delete();
-			}						
-		} else {
-			return true;
+			}
+		} catch (\Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+			return false;
 		}
 	}
 	
@@ -37,15 +43,21 @@ class goCalendar extends GoBaseBackendDiff {
 	 * 
 	 * @param StringHelper $folderid
 	 * @param int $id
-	 * @param array $contentparameters
+	 * @param SyncParameters $contentparameters
 	 * @return \SyncAppointment
 	 */
 	public function GetMessage($folderid, $id, $contentparameters) {
-		$event = \GO\Calendar\Model\Event::model()->findByPk($id);
-		if($event)
-			return $this->_handleEvent($event,$contentparameters);
-		else
+		try {
+			$event = \GO\Calendar\Model\Event::model()->findByPk($id);
+			if ($event)
+				return $this->_handleEvent($event, $contentparameters);
+			else
+				return false;
+		}  catch (\Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
+		}
 	}
 	
 	/**
@@ -547,7 +559,8 @@ class goCalendar extends GoBaseBackendDiff {
 			
 			$id = $event->id;
 		} catch (\Exception $e) {
-			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' . (string) $e);
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 		}
 
 		return $this->StatMessage($folderid, $id);
@@ -564,27 +577,32 @@ class goCalendar extends GoBaseBackendDiff {
 	public function MoveMessage($folderid, $id, $newfolderid, $contentparameters) {
 
 		ZLog::Write(LOGLEVEL_DEBUG, "goCalendar::MoveMessage($folderid, $id, $newfolderid)");
+		try {
+			$event = \GO\Calendar\Model\Event::model()->findByPk($id);
+			if(!$event) {
+				ZLog::Write(LOGLEVEL_WARN, "Event not found with id = " . $id ." in folder ". $folderid);
+				return false;
+			}
 
-		$event = \GO\Calendar\Model\Event::model()->findByPk($id);
-		if(!$event) {
-			ZLog::Write(LOGLEVEL_WARN, "Event not found with id = " . $id ." in folder ". $folderid);
+			if ($event->permissionLevel < \GO\Base\Model\Acl::WRITE_PERMISSION) {
+				ZLog::Write(LOGLEVEL_DEBUG, "Skipping update of read-only event " . $event->name);
+				return false;
+			}
+
+			$event->calendar_id = $newfolderid;
+			if(!$event->save(true)) {
+				ZLog::Write(LOGLEVEL_WARN, "Failed to save event id = " . $event->id);
+
+				return false;
+			}
+
+			// required for not duplicating events on iphone!
+			return $event->id . "";
+		} catch (\Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
 		}
-
-		if ($event->permissionLevel < \GO\Base\Model\Acl::WRITE_PERMISSION) {
-			ZLog::Write(LOGLEVEL_DEBUG, "Skipping update of read-only event " . $event->name);
-			return false;
-		}
-
-		$event->calendar_id = $newfolderid;
-		if(!$event->save(true)) {
-			ZLog::Write(LOGLEVEL_WARN, "Failed to save event id = " . $event->id);
-
-			return false;
-		}
-
-		// required for not duplicating events on iphone!
-		return $event->id . "";
 
 
 //		$duplicate = $event->duplicate([

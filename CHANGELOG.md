@@ -1,5 +1,65 @@
+03-03-2022 6.6.48
+- Core: Optimize 'optimizer_search_depth' for global search queries.
+- Tasks: fixed default list not selected by default in task dialog
+- Email: Folders could be deleted when truncating folder with a disabled trash folder
+- Projects: Search in selected project. Use arrow up to search all.
+- Core: Fixed token theft error
+
+28-02-2022 6.6.47
+- Newsletters: support maximum messages per minute to account per newsletter
+- Core: add maximum messages per minute to smtp_account
+- Tickets: enable override sending from custom account by ticket type
+- Core: enable setting account in system message
+- Core: Updated Dutch translation
+- Core: Workaround case where saving history log fails with exception
+- Core: Improved ActiveSync error handling and fixed errors in Task sync
+- Tasks: Fixed error in detail view when recurrence is set
+- Tasks: Fixed to many categories visible when no tasklist is selected
+- Newsletters: Module works on mobile now
+
+24-02-2022 6.6.46
+- Leavedays: Bugfix add holidays for another user
+- Tasks: Removed quick add bar as it doesn't add much
+- Tasks: Show totals in grid
+- Core: Argument 1 passed to go\core\orm\Entity::findById() must be of the type string, null given, called in /usr/share/groupoffice/go/core/acl/model/AclOwnerEntity.php on line 176
+- Converter: Fix missing use statement
+- Leavedays: Fix update script constructor budget property
+- Update Norsk translations. Thanks Egil!
+- Addressbook: Exporting contacts could be blocked due to some old code that should have been removed
+- Addressbook: Changing address book in dialog was broken
+- LDAPauthenticator: Even though an email address was mapped the 'mail' attribute was still required for it to work.
+- smime: Reset upload dialog on opening
+- Projects: Template tasks can also be created in the users' default list again
+- Tasks: Option to set due and start to today when creating new tasks
+
+22-02-2022 6.6.45
+- Email: Don't set a default template per account by default. Only a default for the user.
+- Email: Fix download all attachments as zip
+- Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
+- Core: Optimized memory management in database check for core models
+- Notes: Fixed adding new note books
+- Savemailas: Menu was available even if you didn't have permissions for the module
+- Core: Custom field 'notes' prevented save with error:
+    TypeError in /usr/local/share/src/www/go/core/orm/CustomFieldsModel.php at line 93: Argument 1 passed to
+    go\core\orm\CustomFieldsModel::getValue() must be of the type string, null given, called in
+    /usr/local/share/src/www/go/core/orm/CustomFieldsModel.php on line 128
+- History user search
+
+21-02-2022 6.6.44
+- pr2analyzer: fix CSV report
 - Core: archive disabled user; remove archived user from project templates
 - Multi instance: Error reporting when (de)activate or login as admin fails
+- Fileconvertor: Added convertio.co api
+- Email: Added option to remove all attachments
+- Comments: corrected foreign keys
+- fileconvertor: xlsx extension was missing in libreoffice service
+- Email: Reply from linked emails didn't always load link in composer
+- Smime: fixed unique check for upload certificate
+- Smime: Uploading twice gave js error
+- Tasks: Added tasks per owner
+- Tasks: Added CLI command: ./cli.php community/tasks/Tasklist/export --tasklistId=4 --format=csv
+- Notes: Added CLI  command: ./cli.php community/notes/NoteBook/export --noteBookId=65 --format=csv
+- Address book: Wrong translation for LOB
 
 14-02-2022 6.6.43
 - Billing: check for new tasks module in book dialog
@@ -137,6 +197,14 @@
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+03-03-2022 6.5.104
+- Leavedays: add several missing columns to report CSV, fix sort order, fix calculation
+- Email: Folders could be deleted when truncating folder with a disabled trash folder
+
+24-02-2022 6.5.103
+- Billing: change in the way VAT is calculated per line to solve a small one cent rounding problem
+- Holidays: Fix calculation in case of interim agreement change
 
 14-02-2022 6.5.102
 - Core: UK bank holidays 2022 overrides

@@ -415,7 +415,6 @@ abstract class Entity extends Property {
 	 *
 	 * @param mixed $query
 	 * @return Query
-	 * @throws Exception
 	 */
 	protected static function normalizeDeleteQuery($query): Query
 	{
@@ -433,7 +432,6 @@ abstract class Entity extends Property {
 
 		return $query;
 	}
-
 
 
 	/**
@@ -490,7 +488,7 @@ abstract class Entity extends Property {
 			}
 
 			return go()->getDbConnection()->commit();
-		} catch(Exception $e) {			
+		} catch(Exception $e) {
 			go()->getDbConnection()->rollBack();
 			throw $e;
 		}

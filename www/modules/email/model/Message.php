@@ -35,8 +35,6 @@
 
 namespace GO\Email\Model;
 
-use GO;
-
 
 abstract class Message extends \GO\Base\Model {
 
@@ -222,52 +220,33 @@ abstract class Message extends \GO\Base\Model {
 			return false;
 		else
 			return $att[$number];
-//			false}else{
-//			//throw new \Exception("Attachment number $number not found");
-//			return ;
-//		}
 	}
 
 
 	protected function extractUuencodedAttachments(&$body)
- {
-//		$body = str_replace("\r", '', $body);
+	{
 
 		if (($pos = strpos($body, "\nbegin ")) === false)
 			return;
 
-//		$regex = "/(begin ([0-7]{3}) (.+))\n/";
 		$regex = "/(begin ([0-7]{1,3}) (.+))\n/";
-//		$regex = "/(begin ([0-7]+) (.+))\n/";
-
-
 
 		if (preg_match_all($regex, $body, $matches, PREG_OFFSET_CAPTURE)) {
 
-//		throw new E$attxception(var_export($matches, true));
-//			$body = substr($body, 0, $pos);
-
 			for ($i = 0, $count = count($matches[3]); $i < $count; $i++) {
-//			$boundary	= $matches[1][$i];
-//			$fileperm	= $matches[2][$i];
 				$filename = trim($matches[3][$i][0]);
 				$offset = $matches[3][$i][1] + strlen($matches[3][$i][0]) + 1;
 
 				$endpos = strpos($body, 'end', $offset) - $offset - 1;
 
-
 				if($endpos){
-
 					if(!isset($startPosAtts))
 						$startPosAtts= $matches[0][$i][1];
 
 					$att = str_replace(array("\r"), "", substr($body, $offset, $endpos));
 
-					//$size = strlen($matches[4][$i]);
-
 					$file = \GO\Base\Fs\File::tempFile($filename);
 					$file->putContents(convert_uudecode($att));
-	//			$file->putContents($att);
 
 					$a = MessageAttachment::model()->createFromTempFile($file);
 					$a->number = "UU" . $i;
@@ -288,7 +267,13 @@ abstract class Message extends \GO\Base\Model {
 		return $new;
 	}
 
-	public function getZipOfAttachmentsUrl(){
+	public function getDeleteAllAttachmentsUrl(): string
+	{
+		return '';
+	}
+
+	public function getZipOfAttachmentsUrl(): string
+	{
 		return '';
 	}
 
@@ -356,7 +341,8 @@ abstract class Message extends \GO\Base\Model {
 		}
 
 		$response['attachments'] = array();
-		$response['zip_of_attachments_url']=$this->getZipOfAttachmentsUrl();
+		$response['zip_of_attachments_url'] = $this->getZipOfAttachmentsUrl();
+		$response['delete_all_attachments_url'] = $this->getDeleteAllAttachmentsUrl();
 
 		$response['inlineAttachments'] = array();
 

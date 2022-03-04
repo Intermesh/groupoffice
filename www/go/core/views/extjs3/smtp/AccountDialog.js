@@ -89,7 +89,17 @@ go.smtp.AccountDialog = Ext.extend(go.form.Dialog, {
 				boxLabel: t('Verify certificate'),
 				name: 'verifyCertificate',
 				checked: true
-			}],
+			}, {
+				xtype: 'numberfield',
+				name: 'maxMessagesPerMinute',
+				fieldLabel: t('Max messages per minute'),
+				hint: t("Set a maximum number of messages per minute. Entering a zero value will disable this value."),
+				decimals: 0,
+				value: 0,
+				minValue: 0,
+				allowBlank: false
+			}
+			],
 			bbar: [
 				{
 					text: t("Send test message"),

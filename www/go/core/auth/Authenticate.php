@@ -132,10 +132,15 @@ class Authenticate {
 	 */
 	public function passwordLogin(string $username, string $password) {
 
+		$isLocalUser = $this->isLocalUser($username);
+
+		go()->debug("Auth ". $username . " is " . ($isLocalUser ? "local" : "not local"));
 		// When the user is local don't use
-		if(!$this->isLocalUser($username) && !strstr($username, '@') && go()->getSettings()->defaultAuthenticationDomain) {
+		if(!$isLocalUser && !strstr($username, '@') && go()->getSettings()->defaultAuthenticationDomain) {
 			$username .= '@' . go()->getSettings()->defaultAuthenticationDomain;
 		}
+
+		go()->debug("Authenticating " . $username);
 
 		$cacheKey = 'login-' . md5($username. '|' . $password);
 

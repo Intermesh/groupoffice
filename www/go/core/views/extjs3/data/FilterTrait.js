@@ -58,8 +58,11 @@ go.data.FilterTrait = {
 	initFilters: function () {
 		//JMAP remote filters. Used by setFilter()
 		if (this.filters) {
-			for (var name in this.filters) {
-				this.setFilter(name, this.filters[name]);
+			//loose reference passed by config
+			const f = this.filters;
+			this.filters = {};
+			for (var name in f) {
+				this.setFilter(name, f[name]);
 			}
 		} else {
 			this.filters = {};

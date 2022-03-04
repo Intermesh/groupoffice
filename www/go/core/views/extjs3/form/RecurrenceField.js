@@ -49,7 +49,10 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
         if(!obj || !obj.frequency) {
             return t('Not recurring');
         }
-        var record = this.frequencyStore.getById(obj.frequency);
+        var record = this.frequencyStore.getById(obj.frequency.toLowerCase());
+        if(!record) {
+            return "Unsupported frequency: " + obj.frequency;
+        }
         var str = record.data.freq;
         if(obj.interval) {
             str = t('Every') + ' '+ obj.interval + ' '+ (obj.interval > 1 ? record.data.plural: record.data.text);

@@ -46,8 +46,6 @@ class NoteBook extends EntityController {
 	 * @param array $params
 	 */
 	public function set($params) {
-		if(!$this->rights->mayChangeNotebooks)
-			throw new Forbidden();
 		return $this->defaultSet($params);
 	}
 	

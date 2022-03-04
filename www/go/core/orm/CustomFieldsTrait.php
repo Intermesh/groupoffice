@@ -12,12 +12,17 @@ use go\core\util\JSON;
  * Entities can use this trait to enable a customFields property that can be 
  * extended by the user.
  * 
- * @property array $customFields 
+ * @property CustomFieldsModel $customFields
  */
 trait CustomFieldsTrait {
 
 	private static $customFieldsTableName;
 
+	/**
+	 * The model containing the cusotmfield  data
+	 *
+	 * @var CustomFieldsModel
+	 */
 	private $customFieldsModel;
 
 	/**
@@ -247,8 +252,10 @@ trait CustomFieldsTrait {
 		$fields = static::getCustomFieldModels();		
 		
 		foreach($fields as $field) {
-			if(!$filters->hasFilter($field->databaseName)) {
-				$field->getDataType()->defineFilter($filters);
+			if(!empty($field->databaseName)) {
+				if (!$filters->hasFilter($field->databaseName)) {
+					$field->getDataType()->defineFilter($filters);
+				}
 			}
 		}		
 	}
@@ -265,7 +272,7 @@ trait CustomFieldsTrait {
 
 		foreach (static::getCustomFieldModels() as $field) {
 
-			if ($field->getDataType() instanceof Html) {
+			if (empty($field->databaseName) || $field->getDataType() instanceof Html) {
 				continue;
 			}
 

@@ -339,47 +339,58 @@
 		 * @return Promise<Notification>
 		 */
 		notify: function(msg){
-			if (!("Notification" in window)) {
-				return Promise.reject("Notifications not supported");
-			}
 
+			return new Promise((resolve, reject) => {
 
-			if(!window.isSecureContext) {
-				return Promise.reject("Notifications only work in secure context");
-			}
-
-			var title = msg.title || t("Reminders");
-
-			msg.icon = msg.icon || GO.settings.config.full_url + 'views/Extjs3/themes/Paper/img/notify/reminder.png';
-			msg.body = msg.description || msg.body;
-			//delete msg.title;
-
-			try {
-				switch(Notification.permission) {
-					case 'denied':
-						return Promise.reject("Notifications are denied");
-						break;
-
-					case 'default':
-						return this.requestNotifyPermission().then((permission) => {
-							if(permission == "granted") {
-								return this.notify(msg);
-							}
-						});
-						break;
-					case 'granted':
-						var notification = new Notification(title,msg);
+				if (!("Notification" in window)) {
+					// settimeout needed for chrome devtools bug https://bugs.chromium.org/p/chromium/issues/detail?id=465666
+					setTimeout(() => {
+						reject("Notifications not supported");
+					});
+					return;
 				}
-			} catch (e) {
-				/* ignore failure on mobiles */
-				//this.flyout(msg);
-			}
 
-			if(notification && msg.onclose) {
-				notification.onclose = msg.onclose;
-			}
+				if(!window.isSecureContext) {
+					setTimeout(() => {
+						reject("Notifications only work in secure context");
+					});
+					return;
+				}
 
-			return Promise.resolve(notification);
+				var title = msg.title || t("Reminders");
+
+				msg.icon = msg.icon || GO.settings.config.full_url + 'views/Extjs3/themes/Paper/img/notify/reminder.png';
+				msg.body = msg.description || msg.body;
+				//delete msg.title;
+
+				try {
+					switch(Notification.permission) {
+						case 'denied':
+							return reject("Notifications are denied");
+							break;
+
+						case 'default':
+							return this.requestNotifyPermission().then((permission) => {
+								if(permission == "granted") {
+									return this.notify(msg);
+								}
+							});
+							break;
+						case 'granted':
+							var notification = new Notification(title,msg);
+					}
+				} catch (e) {
+					/* ignore failure on mobiles */
+					//this.flyout(msg);
+					console.warn("ignoring", e);
+				}
+
+				if(notification && msg.onclose) {
+					notification.onclose = msg.onclose;
+				}
+
+				resolve(notification);
+			});
 
 		},
 

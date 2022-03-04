@@ -13,11 +13,6 @@ use go\core\util\ClassFinder;
 use go\core\util\StringUtil;
 use function go;
 
-/**
- * Entities can use this trait to make it show up in the global search function
- * 
- * @property array $customFields 
- */
 trait SearchableTrait {
 
 	public static $updateSearch = true;
@@ -104,6 +99,9 @@ trait SearchableTrait {
 	 * @throws Exception
 	 */
 	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase) {
+
+		go()->setOptimizerSearchDepth();
+
 		$i = 0;
 		$words = StringUtil::splitTextKeywords($searchPhrase);
 		$words = array_unique($words);

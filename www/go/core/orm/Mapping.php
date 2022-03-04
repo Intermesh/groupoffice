@@ -228,7 +228,6 @@ class Mapping {
 	 * @param bool $autoCreate If not found then automatically create an empty object
 	 *
 	 * @return $this;
-	 * @throws Exception
 	 */
 	public function addHasOne(string $name, string $propertyName, array $keys, bool $autoCreate = false): Mapping
 	{

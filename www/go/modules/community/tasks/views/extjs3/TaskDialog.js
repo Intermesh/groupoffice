@@ -28,6 +28,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			name : 'start',
 			itemId: 'start',
 			fieldLabel : t("Start"),
+			value: go.User.tasksSettings.defaultDate ? new Date() : "",
 			listeners : {
 				setvalue : function(me,val) {
 					const due = me.nextSibling();
@@ -49,6 +50,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			name : 'due',
 			itemId: 'due',
 			fieldLabel : t("Due"),
+			value: go.User.tasksSettings.defaultDate ? new Date() : "",
 			listeners : {
 				setvalue : function(me,val) {
 					const start = me.previousSibling();

@@ -1106,3 +1106,5 @@ $updates['202112131205'][] = "insert ignore into core_setting values((select id 
 $updates['202201101250'][] = 'update `core_entity` set clientName = name WHERE clientName is null';
 
 $updates['202202141231'][] = "update core_blob set staleAt = now() where staleAt is null;";
+
+$updates['202203281145'][] = "ALTER TABLE `core_smtp_account` ADD `maxMessagesPerMinute` SMALLINT UNSIGNED NOT NULL DEFAULT(0);";
