@@ -403,6 +403,11 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			for (var i = 0, l = clipboardData.items.length; i < l; i++) {
 				var item = clipboardData.items[i];
 
+				// item.getAsString((s) => {
+				// 	console.warn(item.type);
+				// 	console.warn(s);
+				// })
+
 				//Some times clipboard data holds multiple versions. When copy pasting from excel you get html, plain text and an image.
 				//We prefer to use the html in that case so we exit if found.
 				if (item.type == 'text/html') {
