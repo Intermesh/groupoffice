@@ -467,13 +467,6 @@ class Installer {
 
 		//don't be strict in upgrade
 		go()->getDbConnection()->exec("SET sql_mode=''");
-
-		//try
-		try {
-			go()->getDbConnection()->exec("SET innodb_strict_mode=0");
-		} catch(Exception $e) {
-			echo "Failed to disable 'innodb_strict_mode': " . $e->getMessage() ."\n";
-		}
 		
 		jmap\Entity::$trackChanges = false;
 
