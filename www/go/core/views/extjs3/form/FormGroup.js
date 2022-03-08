@@ -370,7 +370,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 		if(this.mapKey) {
 			for(var r in records) {
-				set(records[r]);
+				set(records[r], records[r][this.mapKey]);
 			}
 		} else {
 			records.forEach(set);
