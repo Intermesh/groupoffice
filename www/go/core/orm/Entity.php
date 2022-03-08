@@ -1054,6 +1054,10 @@ abstract class Entity extends Property {
    */
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
+		if(empty($sort)) {
+			$sort->exchangeArray(static::defaultSort());
+		}
+
 		if(isset($sort['modifier'])) {
 			$query->join('core_user', 'modifier', 'modifier.id = '.$query->getTableAlias() . '.modifiedBy');
 			$query->orderBy(['modifier.displayName' => $sort['modifier']], true);
@@ -1079,6 +1083,16 @@ abstract class Entity extends Property {
 		$query->orderBy($sort->getArrayCopy(), true);
 
 		return $query;
+	}
+
+
+	/**
+	 * Return default sort array
+	 *
+	 * @return array eg. ['field' => 'ASC']
+	 */
+	protected static function defaultSort() : array {
+		return [];
 	}
 
 	/**
