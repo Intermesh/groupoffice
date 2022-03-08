@@ -350,4 +350,153 @@ class EntityTest extends TestCase {
 		$user = User::find(['id','groups'])->single();
 		$this->assertEquals($count, count($user->groups));
 	}
+
+
+
+	public function testMerge() {
+		$entity1 = new B();
+		$entity1->propA = "string 1";
+		$entity1->propB = "string 2";
+		$entity1->createdAt = new DateTime();
+
+		//Directly access by offset
+		$entity1->hasMany[0] = new AHasMany($entity1);
+		$entity1->hasMany[0]->propOfHasManyA = "string 5";
+
+
+		$aHasMany = new AHasMany($entity1);
+		$aHasMany->propOfHasManyA = "string 3";
+		//No offset
+		$entity1->hasMany[] = $aHasMany;
+
+
+		$entity1->hasOne = new AHasOne($entity1);
+		$entity1->hasOne->propA = "string 4";
+
+		$success = $entity1->save();
+		$this->assertEquals(true, $success);
+
+
+		$entity2 = new B();
+		$entity2->propA = "string 6";
+		$entity2->propB = "string 7";
+		$entity2->createdAt = new DateTime();
+
+		//Directly access by offset
+		$entity2->hasMany[0] = new AHasMany($entity2);
+		$entity2->hasMany[0]->propOfHasManyA = "string 8";
+
+
+		$aHasMany = new AHasMany($entity2);
+		$aHasMany->propOfHasManyA = "string 9";
+		//No offset
+		$entity2->hasMany[] = $aHasMany;
+
+
+		$entity2->hasOne = new AHasOne($entity2);
+		$entity2->hasOne->propA = "string 10";
+
+		$success = $entity2->save();
+		$this->assertEquals(true, $success);
+
+		$success = $entity1->merge($entity2);
+		$this->assertEquals(true, $success);
+
+
+		$this->assertEquals("string 6", $entity1->propA);
+		$this->assertEquals("string 7", $entity1->propB);
+		$this->assertEquals(4, count($entity1->hasMany));
+		$this->assertEquals("string 10", $entity1->hasOne->propA);
+
+
+
+
+		// again but with empty stuff on the target
+
+
+		$entity1 = new B();
+		$entity1->propA = "string 1";
+		$entity1->propB = "string 2";
+
+		$success = $entity1->save();
+		$this->assertEquals(true, $success);
+
+
+		$entity2 = new B();
+		$entity2->propA = "string 6";
+		$entity2->propB = "string 7";
+
+		//Directly access by offset
+		$entity2->hasMany[0] = new AHasMany($entity2);
+		$entity2->hasMany[0]->propOfHasManyA = "string 8";
+
+
+		$aHasMany = new AHasMany($entity2);
+		$aHasMany->propOfHasManyA = "string 9";
+		//No offset
+		$entity2->hasMany[] = $aHasMany;
+
+
+		$entity2->hasOne = new AHasOne($entity2);
+		$entity2->hasOne->propA = "string 10";
+
+		$success = $entity2->save();
+		$this->assertEquals(true, $success);
+
+		$success = $entity1->merge($entity2);
+		$this->assertEquals(true, $success);
+
+
+		$this->assertEquals("string 6", $entity1->propA);
+		$this->assertEquals("string 7", $entity1->propB);
+		$this->assertEquals(2, count($entity1->hasMany));
+		$this->assertEquals("string 10", $entity1->hasOne->propA);
+
+
+
+		// again with empty stuff on the source
+
+		$entity1 = new B();
+		$entity1->propA = "string 1";
+		$entity1->propB = "string 2";
+		$entity1->createdAt = new DateTime();
+
+		//Directly access by offset
+		$entity1->hasMany[0] = new AHasMany($entity1);
+		$entity1->hasMany[0]->propOfHasManyA = "string 5";
+
+
+		$aHasMany = new AHasMany($entity1);
+		$aHasMany->propOfHasManyA = "string 3";
+		//No offset
+		$entity1->hasMany[] = $aHasMany;
+
+
+		$entity1->hasOne = new AHasOne($entity1);
+		$entity1->hasOne->propA = "string 4";
+
+		$success = $entity1->save();
+		$this->assertEquals(true, $success);
+
+
+		$entity2 = new B();
+		$entity2->propA = "string 6";
+		$entity2->propB = "string 7";
+
+
+		$success = $entity2->save();
+		$this->assertEquals(true, $success);
+
+		$success = $entity1->merge($entity2);
+		$this->assertEquals(true, $success);
+
+
+		$this->assertEquals("string 6", $entity1->propA);
+		$this->assertEquals("string 7", $entity1->propB);
+		$this->assertEquals(2, count($entity1->hasMany));
+		$this->assertEquals("string 4", $entity1->hasOne->propA);
+
+
+
+	}
 }

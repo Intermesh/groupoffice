@@ -2028,7 +2028,13 @@ abstract class Property extends Model {
 		$this->$propName = [];
 		if(isset($value)) {
 			foreach ($value as $patch) {
-				//check if we can find an existing model to patch.
+				//if it's already a Propery model then use it and continue
+				if($patch instanceof  $relation->propertyName) {
+					$this->{$propName}[] = $patch;
+					continue;
+				}
+
+				//check if we can find an existing property model to patch.
 				$temp = new $relation->propertyName($this);
 				$temp->setValues($patch);
 				$id = $temp->id();

@@ -9,10 +9,10 @@ GO.postfixadmin.DomainExportDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 		var buttons = [];
 		
 		this.buttonDownload = new Ext.Button({
-			text: GO.lang['download'],
+			text: t("Export"),
 			handler: function(){
 				if(this.resetPasswordsCbx.getValue()){
-					if(confirm(GO.postfixadmin.lang.resetPasswordsConfirm)){
+					if(confirm(t("Are you sure you wan to reset all the passwords?"))){
 						this.submitForm(true);
 					}
 				} else {
@@ -28,7 +28,7 @@ GO.postfixadmin.DomainExportDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			formPanelConfig : {
 				standardSubmit:true
 			},
-			title: GO.postfixadmin.lang.exportDomain,
+			title: t("Export domain"),
 			formControllerUrl: 'postfixadmin/domain',
 			width:500,
 			height:220,
@@ -58,12 +58,7 @@ GO.postfixadmin.DomainExportDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	},
 	
 	buildForm : function () {
-		
-		this.resetPasswordsCbx = new Ext.ux.form.XCheckbox({
-			hideLabel:true,
-			boxLabel: GO.postfixadmin.lang.resetPasswords,
-			name: 'resetPasswords'
-		});
+
 		
 		this.domainField = new Ext.form.Hidden({
 			name: 'domain'
@@ -75,25 +70,31 @@ GO.postfixadmin.DomainExportDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 		
 		this.resetPasswordsCbx = new Ext.ux.form.XCheckbox({
 			hideLabel:true,
-			boxLabel: GO.postfixadmin.lang.resetPasswords,
+			boxLabel: t("Reset passwords"),
 			name: 'resetPasswords'
 		});
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],
+			title:t("Properties"),
 			waitMsgTarget:true,
 			layout:'form',
 			autoScroll:true,
-			items:[{
+			items:[
+				{
+					xtype: "fieldset",
+					items:[
+				{
 					border:false,
-					html:	GO.postfixadmin.lang.exportDomainText
+					html:	t("If you enable reset passwords then a new password will be generated and exported for each account. Warning! Existing client configuration will need to be updated after this action.")
 				},
 				{
 					html:'<hr>'
 				},
 				this.resetPasswordsCbx,
 				this.domainField,
-				this.remoteModelIdField
+				this.remoteModelIdField]
+				}
+
 			]
 		});
 		

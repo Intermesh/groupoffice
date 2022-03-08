@@ -79,7 +79,7 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 		var buttons = [];
 	
 		buttons.push(this.buttonExport = new Ext.Button({
-			text: GO.lang['cmdExport'],
+			text: t("Export"),
 			handler: function(){
 				var domainExportDialog = new GO.postfixadmin.DomainExportDialog();
 
@@ -118,9 +118,10 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			
 		
 		
-		Ext.applyIf(this, {
+		Ext.apply(this, {
 			buttons: buttons
 		});
+
 
 		Ext.apply(this, {
 			buttonAlign:'left',

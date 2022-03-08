@@ -759,18 +759,24 @@ class goCalendar extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
-		$calendar = \GO\Calendar\Model\Calendar::model()->findByPk($id);
-		if(!$calendar) {
+		try {
+			$calendar = \GO\Calendar\Model\Calendar::model()->findByPk($id);
+			if (!$calendar) {
+				return false;
+			}
+
+			$folder = new SyncFolder();
+			$folder->serverid = $id;
+			$folder->parentid = "0";
+			$folder->displayname = $calendar->name;
+			$folder->type = SYNC_FOLDER_TYPE_APPOINTMENT;
+
+			return $folder;
+		} catch(\Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
 		}
-
-		$folder = new SyncFolder();
-		$folder->serverid = $id;
-		$folder->parentid = "0";
-		$folder->displayname = $calendar->name;
-		$folder->type = SYNC_FOLDER_TYPE_APPOINTMENT;
-
-		return $folder;
 	}
 
 	/**
