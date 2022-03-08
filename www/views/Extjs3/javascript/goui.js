@@ -19,17 +19,23 @@
 	};
 
 
+	/**
+	 *
+	 * Load a goui component module into a HTMLElement
+	 *
+	 * Compiled goui must be present in views/Extjs3/goui
+	 *
+	 * @param {string} module Must export a single Component
+	 * @param {HTMLElement} el
+	 * @return {Promise<void>}
+	 */
 	window.goui = async function(module, el) {
 		injectGouiStyle();
 
 		el.classList.add("goui");
-
 		const mods = await import("../../."+module);
-
 		const modName = Object.keys(mods)[0];
-
 		mods[modName].create().render(el);
-
 
 	}
 })();
