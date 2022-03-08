@@ -1,28 +1,35 @@
-import {client} from "./goui/lib/api/Client.js";
+(function() {
 
-client.uri = document.location.origin + "/api/";
+	let styleInjected = false;
+	const injectGouiStyle = function() {
+		if(styleInjected) {
+			return;
+		}
+		var head = document.getElementsByTagName('head')[0];
 
+		var style = document.createElement('link');
+		style.href = "./views/Extjs3/goui/goui.css";
 
+		style.type = 'text/css';
+		style.rel = 'stylesheet';
+		head.append(style);
 
-//testing
+		styleInjected = true;
 
-import (BaseHref + "views/Extjs3/javascript/goui/lib/api/Client.js").then((mods) => {
-	this.client = mods.client;
-
-	this.client.session = go.User.session;
-	this.client.session.accessToken = go.User.accessToken;
-	this.client.uri = document.location.origin + "/api/";
-
-	import (BaseHref + "views/Extjs3/javascript/goui/lib/component/Component.js").then((mods) => {
-		// mods.Image.replaceImages(readMore.getComponent("content").getEl().dom);
-
-
-		const cmp = mods.Component.create({
-			html: "Hello"
-		})
-
-		cmp.render(this.getEl().dom);
+	};
 
 
-	});
-});
+	window.goui = async function(module, el) {
+		injectGouiStyle();
+
+		el.classList.add("goui");
+
+		const mods = await import("../../."+module);
+
+		const modName = Object.keys(mods)[0];
+
+		mods[modName].create().render(el);
+
+
+	}
+})();
