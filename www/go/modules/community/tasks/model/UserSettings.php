@@ -64,7 +64,14 @@ class UserSettings extends Property {
 
 		if($tasklist) {
 			$this->defaultTasklistId = $tasklist->id;
-			go()->getDbConnection()->update("tasks_user_settings", ['defaultTasklistId' => $this->defaultTasklistId], ['userId' => $this->userId])->execute();
+
+			//when coming here the models might be read only so we use this query
+			$stmt = go()->getDbConnection()->update("tasks_user_settings", ['defaultTasklistId' => $this->defaultTasklistId], ['userId' => $this->userId]);
+			$stmt->execute();
+			if(!$stmt->rowCount()) {
+				$stmt = go()->getDbConnection()->insert("tasks_user_settings", ['defaultTasklistId' => $this->defaultTasklistId, 'userId' => $this->userId]);
+				$stmt->execute();
+			}
 		}
 
 		return $this->defaultTasklistId;
