@@ -1,3 +1,4 @@
+08-03-2022 6.6.49
 - Core: updated German Translation. Thanks Peter!
 - Core: fixed merge reusing id's and created unittest for it
 - ActiveSync: catch access denied exception in getFolder()
