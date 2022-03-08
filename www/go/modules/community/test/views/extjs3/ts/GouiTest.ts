@@ -1,11 +1,14 @@
-import {Button} from "../../../../../../views/Extjs3/goui/component/Button.js";
-import {Alert} from "../../../../../../views/Extjs3/goui/Alert.js";
-import {Container} from "../../../../../../views/Extjs3/goui/component/Container.js";
-import {Toolbar} from "../../../../../../views/Extjs3/goui/component/Toolbar.js";
-import {Store} from "../../../../../../views/Extjs3/goui/data/Store.js";
-import {DateColumn, Table} from "../../../../../../views/Extjs3/goui/component/Table.js";
-import {DateTime} from "../../../../../../views/Extjs3/goui/util/DateTime.js";
+import {Button} from "../../../../../../../views/Extjs3/goui/component/Button.js";
+import {Alert} from "../../../../../../../views/Extjs3/goui/Alert.js";
+import {Container} from "../../../../../../../views/Extjs3/goui/component/Container.js";
+import {Toolbar} from "../../../../../../../views/Extjs3/goui/component/Toolbar.js";
+import {Store} from "../../../../../../../views/Extjs3/goui/data/Store.js";
+import {DateColumn, Table} from "../../../../../../../views/Extjs3/goui/component/Table.js";
+import {DateTime} from "../../../../../../../views/Extjs3/goui/util/DateTime.js";
 
+declare global {
+	var GO: any;
+};
 
 export class GouiTest extends Container {
 	cls = "vbox fit";
@@ -67,7 +70,8 @@ export class GouiTest extends Container {
 					Button.create({
 						text: "Open files",
 						handler: function () {
-							window.GO.mainLayout.openModule("files");
+							// window.GO.mainLayout.openModule("files");
+							window.GO.files.openFolder();
 						}
 					}),
 				]
