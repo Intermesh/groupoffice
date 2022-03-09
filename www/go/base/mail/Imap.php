@@ -2322,11 +2322,11 @@ class Imap extends ImapBodyStruct
 	 * Get the full body of a message part. Obtain the partnumbers with get_message_structure.
 	 *
 	 * @param $uid
-	 * @param int|null $message_part omit if you want the full message
+	 * @param $message_part omit if you want the full message
 	 * @param bool|null $peek
 	 * @return string
 	 */
-	public function get_message_part($uid, ?int $message_part=0, ?bool $peek=false) :string
+	public function get_message_part($uid, $message_part=0, ?bool $peek=false) :string
 	{
 		$str = '';
 		$this->get_message_part_start($uid,$message_part, $peek);
@@ -2353,11 +2353,11 @@ class Imap extends ImapBodyStruct
 
 	 *
 	 * @param <type> $uid
-	 * @param int|null $message_part
+	 * @param $message_part
  	 * @param bool|null $peek
 	 * @return <type>
 	 */
-	public function get_message_part_start($uid, ?int $message_part=0, ?bool $peek=false)
+	public function get_message_part_start($uid, $message_part=0, ?bool $peek=false)
 	{
 		$this->readFullLiteral = false;
 		$this->clean($uid, 'uid');

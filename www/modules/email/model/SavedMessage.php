@@ -5,7 +5,8 @@ namespace GO\Email\Model;
 
 use GO\Base\Fs\File;
 
-class SavedMessage extends ComposerMessage {
+class SavedMessage extends ComposerMessage
+{
 	
 	private $_loadedBody;
 	
@@ -27,7 +28,8 @@ class SavedMessage extends ComposerMessage {
 	 * @param StringHelper $mimeData MIME data string
 	 * @return SavedMessage 
 	 */
-	public function createFromMimeData($mimeData, $preserveHtmlStyle = true) {
+	public function createFromMimeData($mimeData, $preserveHtmlStyle = true)
+	{
 		$m = new SavedMessage();		
 		$m->setMimeData($mimeData, $preserveHtmlStyle);
 		return $m;
@@ -40,8 +42,8 @@ class SavedMessage extends ComposerMessage {
 	 * @param bookean $isTempFile Indicates if path it relative from tmpdir or file_storage_path
 	 * @return SavedMessage
 	 */
-	public function createFromMimeFile($path, $isTempFile=false, $preserveHtmlStyle = true) {
-		
+	public function createFromMimeFile($path, $isTempFile=false, $preserveHtmlStyle = true)
+	{
 		$fullPath = $isTempFile ? \GO::config()->tmpdir.$path : \GO::config()->file_storage_path.$path;
 		
 		$file = new \GO\Base\Fs\File($fullPath);
@@ -60,11 +62,8 @@ class SavedMessage extends ComposerMessage {
 	 * @param StringHelper $mimeData The MIME data string.
 	 * @return SavedMessage 
 	 */
-	public function setMimeData($mimeData, $preserveHtmlStyle = true) {
-	
-//		if (!empty($path))
-//			$attributes['path'] = $path;
-		
+	public function setMimeData($mimeData, $preserveHtmlStyle = true)
+	{
 		$decoder = new \GO\Base\Mail\MimeDecode($mimeData);
 		$structure = $decoder->decode(array(
 				'include_bodies' => true,
@@ -81,26 +80,16 @@ class SavedMessage extends ComposerMessage {
 			$attributes['subject'] = $structure->headers['subject'];
 		}
 
-		if (isset($structure->headers['disposition-notification-to'])) {
-			//$mail->ConfirmReadingTo = $structure->headers['disposition-notification-to'];
-		}
-
 		$attributes['to']=isset($structure->headers['to']) && strpos($structure->headers['to'], 'undisclosed') === false ? $structure->headers['to'] : '';
 		$attributes['cc'] = isset($structure->headers['cc']) && strpos($structure->headers['cc'], 'undisclosed') === false ? $structure->headers['cc'] : '';
 		$attributes['bcc'] = isset($structure->headers['bcc']) && strpos($structure->headers['bcc'], 'undisclosed') === false ? $structure->headers['bcc'] : '';		
 		$attributes['from'] = isset($structure->headers['from']) ? $structure->headers['from'] : '';
-		
-
-		$attributes['date']=isset($structure->headers['date']) ? $structure->headers['date'] : null;		
+		$attributes['date']=isset($structure->headers['date']) ? $structure->headers['date'] : null;
 		$attributes['udate']=isset($structure->headers['date']) ? strtotime($attributes['date']) : null;
 		$attributes['size']=strlen($mimeData);
 		
 		$attributes['message_id']=isset($structure->headers['message-id']) ? $structure->headers['message-id'] : "";
-		
-		
-//		
-//		\GO::debug($structure->headers);
-//		
+
 		if(isset($structure->headers['content-type']) && preg_match("/([^\/]*\/[^;]*)(.*)/", $structure->headers['content-type'], $matches)){
 			$attributes['content_type_attributes']=array();
 			$attributes['content_type']=$matches[1];
@@ -118,11 +107,10 @@ class SavedMessage extends ComposerMessage {
 		$this->setAttributes($attributes);
 		
 		$this->_getParts($structure, "", $preserveHtmlStyle);
-
 	}
 	
-	private function _getTempDir(){
-		
+	private function _getTempDir()
+	{
 		if(!isset($this->_tmpDir)) {
 			$this->_tmpDir=\GO::config()->tmpdir.'saved_messages/'.md5(serialize($this->attributes)).'/';
 
@@ -134,15 +122,18 @@ class SavedMessage extends ComposerMessage {
 		return $this->_tmpDir;
 	}
 	
-	public function getHtmlBody(){
+	public function getHtmlBody()
+	{
 		return $this->_loadedBody;
 	}
 	
-	public function getPlainBody() {
+	public function getPlainBody()
+	{
 		return \GO\Base\Util\StringHelper::html_to_text($this->_loadedBody);
 	}
 	
-	public function getSource(){
+	public function getSource()
+	{
 		return '';
 	}
 
@@ -150,26 +141,16 @@ class SavedMessage extends ComposerMessage {
 	{
 		return '';
 	}
+
+
 	public function getZipOfAttachmentsUrl(): string
 	{
 		return \GO::url("savemailas/linkedEmail/zipOfAttachments", array("tmpdir"=>str_replace(\GO::config()->tmpdir, '', $this->_getTempDir())));
 	}
-	
-	
-//	protected function getAttachmentUrl($attachment) {
-//		
-//		$file = new \GO\Base\Fs\File($attachment['name']);
-//		
-//		if($file->extension()=='dat'){			
-//			return \GO::url('email/message/tnefAttachmentFromTempFile', array('tmp_file'=>$attachment['tmp_file']));
-//		}else
-//		{		
-//			return \GO::url('core/downloadTempFile', array('path'=>$attachment['tmp_file']));
-//		}
-//	}
 
-	private function _getParts($structure, $part_number_prefix='', $preserveHtmlStyle = true) {
-				$this->_loadedBody = "";
+	private function _getParts($structure, $part_number_prefix='', $preserveHtmlStyle = true)
+	{
+		$this->_loadedBody = "";
 		if (isset($structure->parts)) {
 			$structure->ctype_primary = strtolower($structure->ctype_primary);
 			$structure->ctype_secondary = strtolower($structure->ctype_secondary);
@@ -234,8 +215,7 @@ class SavedMessage extends ComposerMessage {
 					$a->number=$part_number_prefix.$part_number;
 					$a->content_id=$content_id;
 					$a->mime=$mime_type;
-					
-					//$tmp_file = new \GO\Base\Fs\File($this->_getTempDir().$filename);
+
 					if(!empty($part->body)){
 						$tmp_file = new \GO\Base\Fs\File($this->_getTempDir(). \GO\Base\Fs\File::stripInvalidChars($filename));
 						$tmp_file->appendNumberToNameIfExists();						
@@ -274,59 +254,17 @@ class SavedMessage extends ComposerMessage {
 		}
 	}
 
-	private function _hasHtmlPart($structure) {
+	private function _hasHtmlPart($structure)
+	{
 		if (isset($structure->parts)) {
 			foreach ($structure->parts as $part) {
-				if ($part->ctype_primary == 'text' && $part->ctype_secondary == 'html')
+				if ($part->ctype_primary == 'text' && $part->ctype_secondary == 'html') {
 					return true;
-				else if ($this->_hasHtmlPart($part)) {
+				} else if ($this->_hasHtmlPart($part)) {
 					return true;
 				}
 			}
 		}
 		return false;
-	}	
-
-//	protected function _getAttachedImages($mimeNode) {
-//		$imageInfos = array();
-//
-//		if (!empty($mimeNode->ctype_primary) && $mimeNode->ctype_primary=='image') {
-//			$imageInfos[] = array(
-//					'filename' => $mimeNode->d_parameters['filename'],
-//					'image' => $mimeNode->body
-//			);
-//		}
-//		if (!empty($mimeNode->parts) && is_array($mimeNode->parts)) {
-//			foreach ($mimeNode->parts as $part) {
-//				$imageInfos = array_merge($imageInfos,$this->_getAttachedImages($part));
-//			}
-//		}
-//		
-//		return $imageInfos;
-//	}
-//	
-//	/**
-//	 * Returns information of the images, if any.
-//	 * @return Array Array of elements of type array("url"=>img src tag,
-//	 * "path"=>image location on server)
-//	 */
-//	public function getEmbeddedImages() {
-//		$imagePaths = array();
-////		preg_match_all('!<[\s]*img[\s][.]*src[\s]*="([^"]*)"!',$this->getHtmlBody(),$matches);
-////		foreach ($matches[1] as $src) {
-////			$pathArr = explode('&amp;path=',$src);
-////			$imagePaths[] = urldecode($pathArr[1]);
-////		}
-//		
-//		return $imagePaths;
-//	}
-//
-//	/**
-//	 * 
-//	 */
-//	public function toOutputArray($html=true) {
-//		$response = parent::toOutputArray();
-//		$response['inlineImages'] = $this->inlineImages;
-//		return $response;
-//	}
+	}
 }

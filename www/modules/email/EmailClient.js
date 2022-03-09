@@ -1298,7 +1298,7 @@ GO.email.deleteAllAttachments = function(panel) {
 
 					success: function (options, response, result) {
 						if(result.uid) {
-							panel.loadMessage(result.uid, panel.mainbox, panel.account_id);
+							panel.loadMessage(result.uid, panel.mailbox, panel.account_id);
 							GO.email.emailClient.leftMessagesGrid.store.load();
 						}
 					},
