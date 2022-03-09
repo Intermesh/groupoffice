@@ -1026,7 +1026,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 		if(refresh) {
 			delete this.treePanel.loader.baseParams.refresh;
-		}},
+		}
+	},
 
 	showAccountsDialog : function() {
 		if(!this.accountsDialog) {
