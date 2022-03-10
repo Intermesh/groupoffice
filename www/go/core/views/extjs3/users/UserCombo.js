@@ -35,7 +35,10 @@
 			</tpl>',
 
 		initComponent: function() {
-			this.value = go.User.id;
+
+			if(!( "value" in this.initialConfig)) {
+				this.value = go.User.id;
+			}
 			this.supr().initComponent.call(this);
 		}
 	};

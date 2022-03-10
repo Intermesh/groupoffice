@@ -1,3 +1,6 @@
+- Tasks: reorganized fields and fixed category select bug
+- Core: Upgrade from 6.5 to 6.6 didn't work on CLI
+
 08-03-2022 6.6.49
 - Core: updated German Translation. Thanks Peter!
 - Core: fixed merge reusing id's and created unittest for it
