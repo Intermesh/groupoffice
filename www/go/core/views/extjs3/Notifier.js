@@ -452,28 +452,32 @@
 				return;
 			}
 
-			var path = 'views/Extjs3/themes/Paper/sounds/'+(filename || 'dialog-question');
+			const path = 'views/Extjs3/themes/Paper/sounds/'+(filename || 'dialog-question');
 
-			var audio = new Audio(path + ".mp3");
-
-
+			if(!this.audio) {
+				this.audio = new Audio(path + ".mp3");
+				this.audio.controls = false;
+			}else{
+				this.audio.src = path + ".mp3";
+			}
 
 			if(this._userInteracted) {
-				audio.play()
+				this.audio.play()
 					.catch((e) => {
 						console.warn("Could not play notifier sound: " + e.message);
-					});
+					})
 			}else
 			{
-				this.userInteracted = this.userInteracted.createSequence(function() {
+				this.userInteracted = this.userInteracted.createSequence(() => {
 
-					audio.play()
+					this.audio.play()
 						.catch((e) => {
 							console.warn("Could not play notifier sound: " + e.message);
-						});
-
+						})
 				});
 			}
+
+
 
 		}
 	});
