@@ -2,6 +2,7 @@
 - Core: Upgrade from 6.5 to 6.6 didn't work on CLI
 - Core: Fixed: Login via AccessToken or ApiKey throws SSE error #816
 - Imap authenticator: Add STARTTLS support to IMAP Authenticator module #815
+- Core: changed new message sound
 
 08-03-2022 6.6.49
 - Core: updated German Translation. Thanks Peter!
