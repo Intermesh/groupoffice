@@ -44,10 +44,14 @@ class Authenticator extends PrimaryAuthenticator {
 		go()->debug("Attempting IMAP authentication on ".$server->imapHostname);
 		
 		$connection = new Connection();
-		if(!$connection->connect($server->imapHostname, $server->imapPort, $server->imapEncryption == 'ssl')) {
+		if(!$response = $connection->connect($server->imapHostname, $server->imapPort, $server->imapEncryption == 'ssl')) {
 			throw new Exception("Could not connect to IMAP server");
 		}
 		
+                if(strpos($response, 'STARTTLS') && $connection->startTLS()) {
+                        $server->imapEncryption = 'tls';
+                }
+
 		$imapUsername = $server->removeDomainFromUsername ? explode('@', $username)[0] : $username;
 		
 		if(!$connection->authenticate($imapUsername, $password)) {
