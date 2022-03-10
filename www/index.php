@@ -61,7 +61,7 @@ try {
 
 
 	//check if GO is installed
-	if(empty($_REQUEST['r']) && PHP_SAPI!='cli' && $_SERVER['REQUEST_METHOD'] == "GET"){
+	if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 
         if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 
@@ -94,7 +94,7 @@ try {
 		}
 
         // Process remember me persistent cookie
-        if(!go()->getAuthState()->isAuthenticated() && ($rememberMe = \go\core\model\RememberMe::verify())) {
+        if($_SERVER['REQUEST_METHOD'] == "GET" && !go()->getAuthState()->isAuthenticated() && ($rememberMe = \go\core\model\RememberMe::verify())) {
             $rememberMe->setCookie();
 
             $token = new Token();

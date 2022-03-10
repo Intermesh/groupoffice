@@ -194,7 +194,7 @@ go.AuthenticationManager = (function () {
 
 		onAuthenticated: function (result, username, password) {
 			
-			go.User.setAccessToken(result.accessToken, go.AuthenticationManager.rememberLogin);
+			go.User.setAccessToken(result.accessToken);
 
 			if(this.loginPanel) {
 				this.loginPanel.destroy();

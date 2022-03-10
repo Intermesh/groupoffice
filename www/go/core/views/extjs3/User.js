@@ -16,7 +16,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		go.util.Cookies.unset('accessToken');
 	},
 	
-	setAccessToken : function(accessToken, remember) {
+	setAccessToken : function(accessToken) {
 		this.accessToken = accessToken;
 		
 		if(!Ext.Ajax.defaultHeaders) {
