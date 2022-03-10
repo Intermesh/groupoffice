@@ -1,18 +1,119 @@
 import { Button } from "../../../../../../../views/Extjs3/goui/component/Button.js";
 import { Alert } from "../../../../../../../views/Extjs3/goui/Alert.js";
-import { Container } from "../../../../../../../views/Extjs3/goui/component/Container.js";
 import { Toolbar } from "../../../../../../../views/Extjs3/goui/component/Toolbar.js";
 import { Store } from "../../../../../../../views/Extjs3/goui/data/Store.js";
-import { DateColumn, Table } from "../../../../../../../views/Extjs3/goui/component/Table.js";
+import { CheckboxColumn, DateColumn, Table } from "../../../../../../../views/Extjs3/goui/component/Table.js";
 import { DateTime } from "../../../../../../../views/Extjs3/goui/util/DateTime.js";
+import { Component } from "../../../../../../../views/Extjs3/goui/component/Component.js";
+import { Splitter } from "../../../../../../../views/Extjs3/goui/component/Splitter.js";
+import { TestWindow } from "./TestWindow.js";
+import { DescriptionList } from "../../../../../../../views/Extjs3/goui/component/DescriptionList.js";
+import { Format } from "../../../../../../../views/Extjs3/goui/util/Format.js";
 ;
-export class GouiTest extends Container {
+export class GouiTest extends Component {
     constructor() {
         super(...arguments);
-        this.cls = "vbox fit";
+        // class hbox devides screen in horizontal columns
+        this.cls = "hbox fit";
     }
     init() {
         super.init();
+        const center = this.createCenter(), west = this.createWest(), east = this.createEast();
+        this.items = [
+            west,
+            Splitter.create({
+                stateId: "gouidemo-splitter-west",
+                resizeComponent: west,
+                resizeWidth: true
+            }),
+            center,
+            Splitter.create({
+                stateId: "gouidemo-splitter-east",
+                resizeComponent: east,
+                resizeWidth: true
+            }),
+            east
+        ];
+    }
+    createEast() {
+        this.descriptionList = DescriptionList.create({
+            cls: "pad",
+            width: 300
+        });
+        return Component.create({
+            cls: "fit vbox",
+            items: [
+                Toolbar.create({
+                    items: [
+                        Component.create({
+                            flex: 1,
+                            tagName: "h3",
+                            text: "Detail"
+                        }),
+                        Button.create({
+                            icon: "edit"
+                        })
+                    ]
+                }),
+                this.descriptionList
+            ]
+        });
+    }
+    createWest() {
+        const records = [];
+        for (let i = 1; i <= 20; i++) {
+            records.push({
+                id: i,
+                name: "Test " + i,
+                selected: i == 1
+            });
+        }
+        return Component.create({
+            cls: "vbox",
+            width: 300,
+            items: [
+                Toolbar.create({
+                    cls: "border-bottom",
+                    items: [
+                        Component.create({
+                            tagName: "h3",
+                            text: "Notebooks",
+                            flex: 1
+                        }),
+                        Button.create({
+                            icon: "add",
+                            handler: function () {
+                                const win = TestWindow.create();
+                                win.show();
+                            }
+                        })
+                    ]
+                }),
+                Table.create({
+                    flex: 1,
+                    title: "Table",
+                    store: Store.create({
+                        records: records,
+                        sort: [{ property: "number", isAscending: true }]
+                    }),
+                    cls: "fit no-row-lines",
+                    columns: [
+                        CheckboxColumn.create({
+                            property: "selected"
+                        }),
+                        {
+                            header: "Name",
+                            property: "name",
+                            sortable: true,
+                            resizable: false,
+                            width: 200
+                        }
+                    ]
+                })
+            ]
+        });
+    }
+    createCenter() {
         const records = [];
         for (let i = 1; i <= 20; i++) {
             records.push({
@@ -49,34 +150,53 @@ export class GouiTest extends Container {
                     property: "createdAt",
                     sortable: true
                 })
+            ],
+            rowSelection: {
+                multiSelect: true,
+                listeners: {
+                    selectionchange: (tableRowSelect) => {
+                        if (tableRowSelect.getSelected().length == 1) {
+                            const table = tableRowSelect.getTable();
+                            const record = table.getStore().getRecordAt(tableRowSelect.getSelected()[0]);
+                            this.showRecord(record);
+                        }
+                    }
+                }
+            },
+        });
+        return Component.create({
+            cls: "vbox",
+            flex: 1,
+            items: [
+                Toolbar.create({
+                    cls: "border-bottom",
+                    items: [
+                        Button.create({
+                            text: "Test GOUI!",
+                            handler: function () {
+                                Alert.success("Hurray! GOUI has made it's way into Extjs 3.4 :)");
+                            }
+                        }),
+                        Button.create({
+                            text: "Open files",
+                            handler: function () {
+                                // window.GO.mainLayout.openModule("files");
+                                window.GO.files.openFolder();
+                            }
+                        }),
+                    ]
+                }),
+                table
             ]
         });
-        this.items = [
-            Toolbar.create({
-                cls: "border-bottom",
-                items: [
-                    Button.create({
-                        text: "Test GOUI!",
-                        handler: function () {
-                            Alert.success("Hurray! GOUI has made it's way into Extjs 3.4 :)");
-                        }
-                    }),
-                    Button.create({
-                        text: "Open files",
-                        handler: function () {
-                            // window.GO.mainLayout.openModule("files");
-                            window.GO.files.openFolder();
-                        }
-                    }),
-                ]
-            }),
-            table,
-            Container.create({
-                cls: "border-top",
-                text: "Bottom",
-                height: 100
-            })
+    }
+    showRecord(record) {
+        const records = [
+            ['Number', record.number],
+            ['Description', record.description],
+            ['Created At', Format.date(record.createdAt)]
         ];
+        this.descriptionList.setRecords(records);
     }
 }
 //# sourceMappingURL=GouiTest.js.map
