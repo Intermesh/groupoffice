@@ -1,0 +1,3 @@
+[submodule "www/views/Extjs3/goui"]
+	path = www/views/Extjs3/goui-src
+	url = git@github.com:Intermesh/goui.git
