@@ -121,8 +121,7 @@ export class GouiTest extends Component {
 							header: "Name",
 							property: "name",
 							sortable: true,
-							resizable: false,
-							width: 200
+							resizable: false
 						}
 					]
 				})
