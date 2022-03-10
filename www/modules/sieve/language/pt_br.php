@@ -130,4 +130,6 @@ return array (
   'Body doesn\'t contain' => 'Corpo não contém',
   'Body contains' => 'Corpo contém',
   'nDaysText' => 'nTextoDias',
+  'Activate' => 'Ativar',
+  'Fill in the aliasses on which this message also needs to apply to. If you have multiple aliasses' => ' then separate each alias with a comma (',
 );

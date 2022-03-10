@@ -21,4 +21,5 @@ return array (
   'For multiple recipients use a comma separated list eg. alias1@domain.com;alias2@domain.com' => 'Favor múltiplos destinatários, use uma listagem  com campos separados por ponto e vírgula (;). Ex: alias1@dominio.com;alias2@dominio.com',
   'Used quota' => 'Cota usada',
   'Postfix admin' => 'Postfix admin',
+  'For multiple recipients use a comma separated list eg. alias1@domain.com' => 'alias2@domain.com',
 );

@@ -1,3 +1,5 @@
+- Core: updated PT-BR translations. Thank you George!
+
 03-03-2022 6.5.104
 - Leavedays: add several missing columns to report CSV, fix sort order, fix calculation
 - Email: Folders could be deleted when truncating folder with a disabled trash folder

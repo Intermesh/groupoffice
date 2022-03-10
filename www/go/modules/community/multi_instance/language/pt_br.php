@@ -18,4 +18,5 @@ return array (
   'Deactivate instance' => 'Desativar instância',
   'Activate instance' => 'Ativar instância',
   'Version' => 'Versão',
+  'Modules' => 'Módulos',
 );
