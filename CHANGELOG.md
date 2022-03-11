@@ -1,3 +1,7 @@
+11-03-2022 6.6.51
+- Projects: Added state to all collapsible panels
+- Projects: Added fees to time per activity
+
 10-03-2022 6.6.50
 - Tasks: reorganized fields and fixed category select bug
 - Core: Upgrade from 6.5 to 6.6 didn't work on CLI
