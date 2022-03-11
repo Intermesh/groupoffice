@@ -1,3 +1,4 @@
+10-03-2022 6.6.50
 - Tasks: reorganized fields and fixed category select bug
 - Core: Upgrade from 6.5 to 6.6 didn't work on CLI
 - Core: Fixed: Login via AccessToken or ApiKey throws SSE error #816

@@ -114,7 +114,7 @@ class Installer {
 		
 
 		//don't cache on install
-		App::get()->getCache()->flush(true, false);
+		App::get()->getCache()->flush( false);
 		$cacheCls = get_class(App::get()->getCache());
 		App::get()->setCache(new None());
 
