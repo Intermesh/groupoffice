@@ -4,6 +4,7 @@
 go.links.DetailPanel = Ext.extend(Ext.Panel, {
 	cls: 'go-links-detail',
 	limit: 5,
+
 	initComponent: function () {
 		var store = this.store = new go.data.Store({
 			baseParams: {
@@ -51,14 +52,19 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 			listeners: {
 				added: function(me, dv, index) {
 					this.stateId = 'go-links-' + (dv.entity ? dv.entity : dv.entityStore.entity.name);
+					this.initState();
+				},
+				expand: function() {
+					this.doLayout();
 				},
 				scope: this
 			},
 //			header: false,
 			collapsible: true,
 			titleCollapse: true,
+			hideMode: "offsets",
 			title: this.link.title,
-			items: this.dataView = new Ext.DataView({
+			items: [this.dataView = new Ext.DataView({
 				store: this.store,
 				tpl: tpl,
 				autoHeight: true,
@@ -67,7 +73,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 				listeners: {
 					scope: this,
 					containerclick: function(dv, e) {
-		
+
 						if(e.target.classList.contains("show-more")) {
 							this.store.baseParams.position += this.limit;
 							this.store.load({
@@ -80,10 +86,10 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 						}
 					},
 					click: function (dv, index, node, e) {
-						
-						
+
+
 						var record = this.store.getAt(index);
-						
+
 						if(e.target.tagName === "I" && e.target.innerHTML == 'more_vert'){
 							this.showLinkMoreMenu(node,e, record);
 						} else {
@@ -91,7 +97,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 							var win = new go.links.LinkDetailWindow({
 								entity: record.data.toEntity
 							});
-							
+
 							win.load(record.data.toId);
 
 //								var lb = new go.links.LinkBrowser({
@@ -104,7 +110,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 						}
 					}
 				}
-			})
+			})]
 
 		});
 		
