@@ -24,6 +24,8 @@ go.grid.GridTrait = {
 
 	enableDelete: true,
 
+
+
 	initGridTrait : function() {
 		if (!this.keys)
 		{

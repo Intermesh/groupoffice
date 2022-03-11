@@ -15,6 +15,14 @@ go.grid.EditorGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
 	loadMask: true,
 	
 	autoExpandMin: dp(200),
+
+	stateEvents : ['columnmove', 'columnresize', 'sortchange', 'groupchange', 'collapse', 'expand'],
+
+	getState : function(){
+		var o = Ext.grid.GridPanel.prototype.getState.apply(this);
+		o.collapsed = this.collapsed;
+		return o;
+	},
 	
 	initComponent: function () {
 		go.grid.EditorGridPanel.superclass.initComponent.call(this);
