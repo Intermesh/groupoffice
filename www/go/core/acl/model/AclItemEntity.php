@@ -260,10 +260,11 @@ abstract class AclItemEntity extends AclEntity {
 	/**
 	 * Get the entity that holds the acl id.
 	 *
-	 * @return Entity
+	 * Link and Search return ActivRecord.
+	 * @return Entity|ActiveRecord
 	 * @throws Exception
 	 */
-	public function findAclEntity(): Entity
+	public function findAclEntity()
 	{
 		$cls = static::aclEntityClass();
 

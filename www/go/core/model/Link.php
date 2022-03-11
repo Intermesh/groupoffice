@@ -504,7 +504,7 @@ class Link extends AclItemEntity
 		return Search::class;
 	}
 
-	public function findAclEntity(): Entity
+	public function findAclEntity()
 	{
 		return $this->findFromEntity();
 	}
