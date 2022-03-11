@@ -26,21 +26,19 @@ export class GouiTest extends Component {
 
 		const center = this.createCenter(), west = this.createWest(), east = this.createEast();
 
-		this.items = [
+		this.setItems([
 			west,
 			Splitter.create({
 				stateId: "gouidemo-splitter-west",
-				resizeComponent: west,
-				resizeWidth: true
+				resizeComponent: west
 			}),
 			center,
 			Splitter.create({
 				stateId: "gouidemo-splitter-east",
-				resizeComponent: east,
-				resizeWidth: true
+				resizeComponent: east
 			}),
 			east
-		];
+		]);
 	}
 
 	private createEast() {
