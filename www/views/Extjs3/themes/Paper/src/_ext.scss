@@ -1203,6 +1203,11 @@
 }
 
 .x-grid3{
+
+	&-summary-row {
+		border-top: 1px solid color($fg, 'line');
+	}
+
 	background-color: color($bg, "box");
 	&-scroller {
 		-webkit-overflow-scrolling: touch;
