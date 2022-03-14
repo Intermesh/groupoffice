@@ -61,6 +61,15 @@ class Module extends core\Module
 		$log->setEntity($record);
 		$log->setAction($action);
 		$changes = $record->getLogJSON($action);
+
+		if($action != 'delete') {
+			$cfChanges = self::getCustomFieldChanges($record);
+
+			if (!empty($cfChanges)) {
+				$changes['customFields'] = $cfChanges;
+			}
+		}
+
 		if($action == 'update' && empty($changes)) {
 			return;
 		}
@@ -75,6 +84,18 @@ class Module extends core\Module
 		}
 
 		self::saveLog($log);
+	}
+
+	/**
+	 * @param Entity|ActiveRecord $entity
+	 * @return array
+	 */
+	private static function getCustomFieldChanges($entity): array {
+		if(method_exists($entity, 'getCustomFields')) {
+			return $entity->getCustomFields(true)->getModified();
+		} else{
+			return [];
+		}
 	}
 
 	/**
@@ -133,6 +154,11 @@ class Module extends core\Module
 			unset($changes['modifiedBy']);
 			unset($changes['permissionLevel']);
 			unset($changes['filesFolderId']);
+
+			$cfChanges = self::getCustomFieldChanges($entity);
+			if(!empty($cfChanges)) {
+				$changes['customFields'] = $cfChanges;
+			}
 
 			if(empty($changes)) {
 				return;

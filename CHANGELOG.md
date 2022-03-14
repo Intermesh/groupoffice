@@ -1,3 +1,5 @@
+- History: Custom fields are logged now too.
+
 11-03-2022 6.6.51
 - Projects: Added state to all collapsible panels
 - Projects: Added fees to time per activity
