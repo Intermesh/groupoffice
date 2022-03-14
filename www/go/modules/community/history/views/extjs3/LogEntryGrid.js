@@ -54,9 +54,9 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				html.push.apply(html, this.renderJsonValue(data[i]));
 			}
 		} else if(typeof data === 'object') {
-			//html.push.apply(html, this.renderJson(data));
+		//	html.push.apply(html, this.renderJsonValue(data));
 			for(var key in data) {
-				html.push('<b>' + key + '</b> ' + data[key]);
+				html.push('<b>' + key + '</b> ' + this.renderJsonValue(data[key]));
 			}
 		} else {
 			html.push(data);
@@ -68,12 +68,32 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		if(!json) {
 			return [];
 		}
-		html = ['<table class="display-panel" style="table-layout: fixed;word-wrap:break-word;"><tr class="line"><th>'+t('Name')+'</th><th>'+t('New')+'</th><th>'+t('Old')+'</th></tr>'];
-		for(var key in json) {
-			html.push('<tr><td>'+key+':</td><td>'+this.renderJsonValue(json[key][1]).join('<br>')+
-				'</td><td>'+this.renderJsonValue(json[key][0]).join('<br>')+'</td></tr>');
-		}
+		var html = ['<table class="display-panel" style="table-layout: fixed;word-wrap:break-word;">' +
+		'<tr class="line"><th>'+t('Name')+'</th><th>'+t('Old')+'</th><th>'+t('New')+'</th></tr>'];
+		html.push(this.renderRows(json));
 		html.push('</tr></table>');
+		return html;
+	},
+
+	renderRows : function(json, prefix) {
+
+		prefix = prefix || "";
+
+		html = "";
+
+		for(var key in json) {
+
+
+			if(!Ext.isArray(json[key]) && typeof json[key] == "object") {
+				html += this.renderRows(json[key], key+ "." );
+			} else {
+
+				html += '<tr><td>' + prefix + key + ':</td>';
+				html += '<td>' + this.renderJsonValue(json[key][1]).join('<br>') +
+					'</td><td>' + this.renderJsonValue(json[key][0]).join('<br>') + '</td></tr>';
+			}
+		}
+
 		return html;
 	},
 
@@ -115,8 +135,9 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 			title: rec.data.description,
 			html: html,
 			autoScroll: true,
-			width: dp(500),
-			height: dp(500)
+			width: dp(800),
+			height: dp(600),
+			stateId: 'history-changes'
 
 		});
 		win.show();

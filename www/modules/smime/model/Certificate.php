@@ -50,7 +50,7 @@ class Certificate extends \GO\Base\Db\ActiveRecord {
 	{
 		parent::init();
 
-		$this->columns['serial']['unique'] = ['provided_by'];
+		$this->columns['serial']['unique'] = ['provided_by', 'account_id'];
 	}
 
 	public function read($passphrase = null) {

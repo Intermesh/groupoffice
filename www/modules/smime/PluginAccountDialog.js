@@ -110,8 +110,7 @@ GO.moduleManager.onModuleReady('email',function(){
 				listeners: {
 					'show' : (win) => {
 						this.certUploadForm.form.reset();
-						this.uploadFile.clearQueue();
-						this.uploadFile.createUploadInput();
+						this.uploadFile.reset();
 					}
 				},
 				buttons: ['->',{text: t('Upload'), handler: () => {this.certUploadForm.form.submit({
