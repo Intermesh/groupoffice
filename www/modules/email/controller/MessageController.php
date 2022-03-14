@@ -361,6 +361,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			{
 				$to[]=empty($personal) ? $email : $personal;
 			}
+			$record['from'] =  htmlspecialchars($record['from'], ENT_COMPAT, 'UTF-8');
 			$record['to']=  htmlspecialchars(implode(',', $to), ENT_COMPAT, 'UTF-8');
 			
 			if($response['sent'] || $response['drafts']){
