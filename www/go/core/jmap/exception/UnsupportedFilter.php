@@ -2,7 +2,7 @@
 namespace go\core\jmap\exception;
 
 class UnsupportedFilter extends \Exception {
-	public function __construct($message = "unsupportedFilter") {
-		parent::__construct($message);
+	public function __construct($name) {
+		parent::__construct("Unsupported filter: '" . $name . "'");
 	}
 }

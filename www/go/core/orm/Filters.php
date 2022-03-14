@@ -173,7 +173,7 @@ class Filters {
 			$name = strtolower($name);
 
 			if(!isset($this->filters[$name])) {
-				throw new UnsupportedFilter();
+				throw new UnsupportedFilter($name);
 			}
 
 			$query->usedFilters[] = $name;
