@@ -1,3 +1,6 @@
+6.6.52
+- Addressbook: Added 'load more' butten to SelectDialogPanel
+
 11-03-2022 6.6.51
 - Projects: Added state to all collapsible panels
 - Projects: Added fees to time per activity
