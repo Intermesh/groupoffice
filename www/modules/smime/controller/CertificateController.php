@@ -6,6 +6,7 @@ namespace GO\Smime\Controller;
 
 use GO\Base\Fs\File;
 use GO\Base\Util\HttpClient;
+use go\core\http\Exception;
 use GO\Smime\Model\Smime;
 use GO\Smime\Model\Certificate;
 use http\Client;
@@ -42,42 +43,51 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 
 	public function actionUpload($params) {
 
-		if (isset($_FILES['cert']['tmp_name'][0]) && is_uploaded_file($_FILES['cert']['tmp_name'][0])) {
-			//check Group-Office password
-			if (!\GO::user()->checkPassword($params['go_password']))
-				throw new \Exception(\GO::t("The Group-Office password was incorrect.", "smime"));
-
-			$certData = file_get_contents($_FILES['cert']['tmp_name'][0]);
-			//Smime::import($certData, $params['smime_password']);
-
-			//smime password may not match the Group-Office password
-			if($params['go_password'] === $params['smime_password'])
-				throw new \Exception(\GO::t("Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!", "smime"));
-
-			//password may not be empty.
-			if (empty($params['smime_password']))
-				throw new \Exception(\GO::t("Your SMIME key has no password. This is prohibited for security reasons!", "smime"));
+		if (!isset($_FILES['cert']['tmp_name'][0]) || !is_uploaded_file($_FILES['cert']['tmp_name'][0])) {
+			throw new \Exception("No file was received");
 		}
+
+		//check Group-Office password
+		if (!\GO::user()->checkPassword($params['go_password']))
+			throw new \Exception(\GO::t("The Group-Office password was incorrect.", "smime"));
+
+		$certData = file_get_contents($_FILES['cert']['tmp_name'][0]);
+		if(!$certData) {
+			throw new Exception("No certificate data was found");
+		}
+		//Smime::import($certData, $params['smime_password']);
+
+		//smime password may not match the Group-Office password
+		if($params['go_password'] === $params['smime_password'])
+			throw new \Exception(\GO::t("Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!", "smime"));
+
+		//password may not be empty.
+		if (empty($params['smime_password']))
+			throw new \Exception(\GO::t("Your SMIME key has no password. This is prohibited for security reasons!", "smime"));
+
 
 		//$cert = Model\Certificate::model()->findByPk($params['account_id']);
 		$success = false;
-		if (isset($certData)){
-			$cert = new Certificate();
-			$cert->cert = $certData;
-			$cert->account_id = $params['account_id'];
-			openssl_pkcs12_read($certData, $certs, $params['smime_password']);
-			if(!$certs) {
-				throw new \Exception(\GO::t("The SMIME password was incorrect.", "smime"));
-			}
-			$data = openssl_x509_parse($certs['cert']);
-			if($data) {
-				$cert->serial = $data['serialNumber'];
-				$cert->valid_since = date('Y-m-d H:i:s',$data['validFrom_time_t']);
-				$cert->valid_until = date('Y-m-d H:i:s',$data['validTo_time_t']);
-				$cert->provided_by = $data['issuer']['CN'];
-				$success = $cert->save();
+		$cert = new Certificate();
+		$cert->cert = $certData;
+		$cert->account_id = $params['account_id'];
+		openssl_pkcs12_read($certData, $certs, $params['smime_password']);
+		if(!$certs) {
+			throw new \Exception(\GO::t("The SMIME password was incorrect.", "smime"));
+		}
+		$data = openssl_x509_parse($certs['cert']);
+		if($data) {
+			$cert->serial = $data['serialNumber'];
+			$cert->valid_since = date('Y-m-d H:i:s',$data['validFrom_time_t']);
+			$cert->valid_until = date('Y-m-d H:i:s',$data['validTo_time_t']);
+			$cert->provided_by = $data['issuer']['CN'];
+			$success = $cert->save();
+
+			if(!$success) {
+				go()->error($cert->getValidationErrors());
 			}
 		}
+
 
 //		if (isset($certData))
 //			$cert->cert = $certData;
