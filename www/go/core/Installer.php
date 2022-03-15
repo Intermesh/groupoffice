@@ -338,8 +338,28 @@ class Installer {
 		}
 	}
 
+	private function removeObsoleteModules() {
+		$stmt = go()->getDbConnection()->delete('core_module',
+			['name' =>
+				[
+					'cron',
+					'tools',
+					'log',
+					'calexceptiongrid',
+					'calignoreuuid',
+					'displaypermissions'
+				],
+				'package' => null
+			]);
+
+		$stmt->execute();
+
+	}
+
 	public function getUnavailableModules(): array
 	{
+		$this->removeObsoleteModules();
+
 		$modules = (new Query)
 						->select('name, package')
 						->from('core_module')
