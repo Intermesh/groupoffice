@@ -1,3 +1,5 @@
+- Core: enter key on grid did not open edit dialog
+
 15-03-2022 6.6.54
 - Core: when using SMIME signing in the config.php it failed on a certificate failure
 - Tasks: Portlet uses standard tasks grid and sorts on start date by default
