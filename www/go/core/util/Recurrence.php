@@ -4,7 +4,6 @@ namespace go\core\util;
 use DateTimeInterface;
 use Sabre\VObject\DateTimeParser;
 use Sabre\VObject\InvalidDataException;
-use Sabre\VObject\InvalidDataException;
 use Sabre\VObject\Recur\RRuleIterator;
 
 class Recurrence extends RRuleIterator {
