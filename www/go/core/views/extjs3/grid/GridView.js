@@ -38,7 +38,7 @@ Ext.define('go.grid.GridView', {
 						'</div>',
 						'<div class="x-grid3-scroller">',
 								'<div class="x-grid3-body" style="{bstyle}">{body}</div>',
-								'<a href="#" class="x-grid3-focus" tabIndex="-1"></a>',
+								'<a class="x-grid3-focus" tabIndex="-1"></a>',
 						'</div>',
 						'<div class="go-grid-total" title="' + Ext.util.Format.htmlEncode(t("Click to hide")) + '"></div>',
 				'</div>',
