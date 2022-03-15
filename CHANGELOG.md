@@ -1,3 +1,7 @@
+- Core: Don't delete module when other modules depend on it.
+- Core: When uninstall model failed the screen updated as if it succeeded
+- History: fixed property 'id' doesn't exist error
+
 14-03-2022 6.6.52
 - Addressbook: Added 'load more' butten to SelectDialogPanel
 - History: Custom fields are logged now too.

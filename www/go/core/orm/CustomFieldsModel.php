@@ -187,6 +187,9 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 
 		$mod = [];
 		foreach($newCf as $key => $value) {
+			if($key == 'id') {
+				continue;
+			}
 			if(!array_key_exists($key, $oldCf)) {
 				$mod[$key] = [$this->convertValue($key, $value), null];
 			} elseif($value !== $oldCf[$key]) {
