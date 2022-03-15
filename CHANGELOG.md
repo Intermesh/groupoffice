@@ -3,6 +3,7 @@
 - Tasks: Portlet uses standard tasks grid and sorts on start date by default
 - Core: Fixed: Error: Call to a member function getUser() on null in /usr/share/groupoffice/go/core/Language.php:121
 - Newsletters: Fixed default sort on 'name' not working anymore
+- Core: removed obsolete modules 'log', 'tools' and 'cron'
 
 15-03-2022 6.6.53
 - Core: Don't delete module when other modules depend on it.
