@@ -3,6 +3,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	// config options for stateful behavior
 	stateful: true,
 	stateId: 'tasks-grid',
+	loadMask: true,
 
 	initComponent: function () {
 
