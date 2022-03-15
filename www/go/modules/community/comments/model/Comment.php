@@ -123,7 +123,7 @@ class Comment extends AclItemEntity {
 	
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
-		if(empty($sort)) {
+		if(!count($sort)) {
 			$sort = ['c.date' => 'ASC'];
 		}
 
