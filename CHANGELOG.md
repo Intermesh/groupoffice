@@ -1,3 +1,4 @@
+15-03-2022 6.6.53
 - Core: Don't delete module when other modules depend on it.
 - Core: When uninstall model failed the screen updated as if it succeeded
 - History: fixed property 'id' doesn't exist error
