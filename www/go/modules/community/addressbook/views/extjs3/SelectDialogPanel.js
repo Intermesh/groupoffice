@@ -36,7 +36,7 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 			value: this.query
 		});
 
-		var search = new Ext.Panel({
+		const search = new Ext.Panel({
 			layout: "form",
 			region: "north",
 			autoHeight: true,
@@ -52,9 +52,10 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 		
 		go.modules.community.addressbook.SelectDialogPanel.superclass.initComponent.call(this);
 
-
-	
-
+		this.addressBookTree.getLoader().on('load', (loader, node, response) => {
+			this.addressBookTree.getBottomToolbar().setVisible(response.queryResponse.hasMore);
+			this.loadMoreButton.setVisible(response.queryResponse.hasMore);
+		});
 
 		this.on("show", function() {
 			this.searchField.focus();			
@@ -78,10 +79,10 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 					if(e.ctrlKey || e.shiftKey) {
 						return;
 					}
-					var record = grid.getStore().getAt(rowIndex);					
+					const record = grid.getStore().getAt(rowIndex);
 					if(this.mode === 'email') {
-							this.selectEmail(record, e);
-					}					
+						this.selectEmail(record, e);
+					}
 				},
 				scope: this
 			}
@@ -94,15 +95,6 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				hasEmailAddresses: true
 			});
 		}
-
-		// this.grid.getSelectionModel().on("selectionchange", function(sm) {
-		// 	this.addSelectionButton.setDisabled(sm.getSelections().length == 0);
-		// }, this);
-
-		// this.grid.on('rowdblclick', function(grid, rowIndex, e){
-    //   var r = grid.store.getAt(rowIndex);
-    //   this.fireEvent('selectsingle', this, r.data.displayName, r.data.email, r.data.id);
-    // }, this);
 		
 		return this.grid;
 	},
@@ -128,7 +120,29 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				},
 				scope: this
 
-			}]
+			}],
+			bbar: new Ext.Toolbar({
+				cls: 'go-bbar-load-more',
+				items:[
+					'',
+					this.loadMoreButton = new Ext.Button({
+						hidden: true,
+						text: t("Show more..."),
+						handler: () => {
+
+
+							const loader = this.addressBookTree.getLoader();
+
+							loader.clearOnLoad = false;
+							loader.position += loader.pageSize;
+
+							loader.load(this.addressBookTree.getRootNode(), (node) => {
+								loader.clearOnLoad = true;
+							});
+						}
+					})
+				]
+			})
 		});	
 		
 		//because the root node is not visible it will auto expand on render.
@@ -164,7 +178,7 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	},
 	
 	createFilterPanel: function () {
-		var orgFilter = new go.NavMenu({			
+		const orgFilter = new go.NavMenu({
 			store: new Ext.data.ArrayStore({
 				fields: ['name', 'icon', 'inputValue'], //icon and iconCls are supported.
 				data: [					
@@ -178,9 +192,8 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				selectionchange: function (view, nodes) {
 					if(!nodes.length || nodes.length == 2) {
 						this.grid.store.setFilter("org", null);
-					} else
-					{
-						var record = view.store.getAt(nodes[0].viewIndex);
+					} else {
+						const record = view.store.getAt(nodes[0].viewIndex);
 						this.grid.store.setFilter("org", {isOrganization: record.data.inputValue});
 					}					
 					this.grid.store.load();
@@ -240,10 +253,10 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	},	
 
 	addAll : function() {
-		var me = this;
-		var promise = new Promise(function(resolve, reject) {
+		const me = this;
+		const promise = new Promise(function(resolve, reject) {
 		
-			var s = go.Db.store("Contact");
+			const s = go.Db.store("Contact");
 			me.getEl().mask(t("Loading..."));
 			s.query({
 				filter: me.grid.store.baseParams.filter
@@ -263,15 +276,15 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	},
 
 	addSelection : function() {
-		var records = this.grid.getSelectionModel().getSelections();				
+		const records = this.grid.getSelectionModel().getSelections();
 		return Promise.resolve(records.column('id'));
 	},
 	
 	
 	selectEmail : function(record, e) {
-		var emails = record.get("emailAddresses");
+		const emails = record.get("emailAddresses");
 				
-		var me = this,  items = emails.map(function(a) {
+		const me = this,  items = emails.map(function(a) {
 			return {
 				data: {
 					name: record.get("name"),
@@ -285,7 +298,7 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 			};
 		}, this);
 
-		var m = new Ext.menu.Menu({
+		const m = new Ext.menu.Menu({
 			cls: "x-menu-no-icons",
 			items: items
 		});

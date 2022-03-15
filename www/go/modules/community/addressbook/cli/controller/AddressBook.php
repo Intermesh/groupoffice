@@ -54,5 +54,30 @@ JSON;
 
 	}
 
+	/**
+	 * /cli.php community/addressbook/AddressBook/delete --addressBook=1
+	 */
+	public function delete($addressBook, $format = 'csv') {
+		$json = <<<JSON
+[
+  [
+    "AddressBook/set", {
+      "destroy": [$addressBook]
+    },
+    "call-1"
+  ]
+]
+JSON;
+
+		$requests = JSON::decode($json, true);
+
+		Response::get()->jsonOptions = JSON_PRETTY_PRINT;
+
+		$router = new Router();
+		$router->run($requests);
+
+	}
+
+
 
 }

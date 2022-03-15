@@ -20,4 +20,5 @@ return array (
   'Deactivate' => 'Deactiveren',
   'Deactivate instance' => 'Deactiveer omgeving',
   'Activate instance' => 'Activeeer omgeving',
+  'Allowed' => 'Toegestaan',
 );

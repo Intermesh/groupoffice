@@ -61,6 +61,15 @@ class Module extends core\Module
 		$log->setEntity($record);
 		$log->setAction($action);
 		$changes = $record->getLogJSON($action);
+
+		if($action != 'delete') {
+			$cfChanges = self::getCustomFieldChanges($record);
+
+			if (!empty($cfChanges)) {
+				$changes['customFields'] = $cfChanges;
+			}
+		}
+
 		if($action == 'update' && empty($changes)) {
 			return;
 		}
@@ -74,8 +83,18 @@ class Module extends core\Module
 			$log->changes = json_encode($changes);
 		}
 
-		if(!$log->save()) {
-			ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
+		self::saveLog($log);
+	}
+
+	/**
+	 * @param Entity|ActiveRecord $entity
+	 * @return array
+	 */
+	private static function getCustomFieldChanges($entity): array {
+		if(method_exists($entity, 'getCustomFields')) {
+			return $entity->getCustomFields(true)->getModified();
+		} else{
+			return [];
 		}
 	}
 
@@ -136,18 +155,17 @@ class Module extends core\Module
 			unset($changes['permissionLevel']);
 			unset($changes['filesFolderId']);
 
+			$cfChanges = self::getCustomFieldChanges($entity);
+			if(!empty($cfChanges)) {
+				$changes['customFields'] = $cfChanges;
+			}
+
 			if(empty($changes)) {
 				return;
 			}
 
 			if($action == 'create') {
-				$changes = array_map(function($c) {
-					return $c[0];
-				}, $changes);
-
-				$changes = array_filter($changes, function($c){
-					return $c !== "";
-				});
+				$changes = self::mapForCreate($changes);
 			}
 			$log->changes = json_encode($changes);
 
@@ -163,8 +181,45 @@ class Module extends core\Module
 			$log->changes = json_encode($changes);
 		}
 
-		if(!$log->save()) {
-			ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
+		self::saveLog($log);
+	}
+
+	private static function mapForCreate(array $changes): array {
+		$changes = array_map(function($c) {
+			if(array_key_exists(0, $c)) {
+				return $c[0];
+			} else{
+				return self::mapForCreate($c);
+			}
+		}, $changes);
+
+		$changes = array_filter($changes, function($c){
+			return !empty($c);
+		});
+
+		return $changes;
+	}
+
+
+	private static function saveLog(LogEntry $log) {
+		try {
+			if (!$log->save()) {
+				ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId . "): " . var_export($log->getValidationErrors(), true));
+			}
+		}catch(Exception $e) {
+
+			ErrorHandler::logException($e);
+			//try again with just ID in description. I had a case where there were malformed characters
+			$log->description = $log->entityId . ': error in description';
+
+			try {
+				if(!$log->save()) {
+					ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
+				}
+			} catch(Exception $e) {
+				ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId . "): " . var_export($log->getValidationErrors(), true));
+				ErrorHandler::logException($e);
+			}
 		}
 	}
 

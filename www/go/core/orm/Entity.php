@@ -444,7 +444,6 @@ abstract class Entity extends Property {
 	 *
 	 * @param mixed $query
 	 * @return Query
-	 * @throws Exception
 	 */
 	protected static function normalizeDeleteQuery($query): Query
 	{
@@ -462,7 +461,6 @@ abstract class Entity extends Property {
 
 		return $query;
 	}
-
 
 
 	/**
@@ -519,7 +517,7 @@ abstract class Entity extends Property {
 			}
 
 			return go()->getDbConnection()->commit();
-		} catch(Exception $e) {			
+		} catch(Exception $e) {
 			go()->getDbConnection()->rollBack();
 			throw $e;
 		}
@@ -1150,33 +1148,77 @@ abstract class Entity extends Property {
 		if(empty($entity->$name)) {
 			return;
 		}
-		if(!empty($this->$name) && is_array($this->$name)) {
-			$relation = static::getMapping()->getRelation($name);
 
-			$type = $relation ? $relation->type : null;
-			switch($type) {
-				case Relation::TYPE_MAP:
-				case Relation::TYPE_HAS_ONE:
-					$this->$name = array_replace($this->$name, $entity->$name);
-					break;
+		$relation = static::getMapping()->getRelation($name);
 
-				case Relation::TYPE_SCALAR:
-					$this->$name = array_unique(array_merge($this->$name, $entity->$name));
-					break;
-
-				default:
-					$this->$name = array_merge($this->$name, $entity->$name);
-
-					break;
+		if(!$relation) {
+			if(!is_array($this->$name)) {
+				$this->$name = $entity->$name;
+			} else{
+				$this->$name = array_merge($this->$name, $entity->$name);
 			}
-
-		} else{
-			$this->$name = $entity->$name;
+			return;
 		}
+
+
+		switch($relation->type) {
+			case Relation::TYPE_MAP:
+			case Relation::TYPE_HAS_ONE:
+
+				$copy = $entity->$name->toArray();
+
+				//unset the foreign key. The new model will apply the right key on save
+				foreach($relation->keys as $from => $to) {
+					unset($copy[$to]);
+				}
+
+				// has one or map might be null
+				if(!isset($this->$name)) {
+					$this->$name = new $relation->propertyName($this);
+				}
+
+				$this->$name = $this->$name->setValues($copy);
+				break;
+
+			case Relation::TYPE_SCALAR:
+				$this->$name = array_unique(array_merge($this->$name, $entity->$name));
+				break;
+
+			case Relation::TYPE_ARRAY:
+
+				$copies = [];
+				//unset the foreign key. The new model will apply the right key on save
+				for($i = 0, $l = count($entity->$name); $i < $l; $i ++) {
+					$copy = $entity->$name[$i]->toArray();
+					foreach ($relation->keys as $from => $to) {
+						unset($copy[$to]);
+					}
+					$copies[] = $copy;
+				}
+
+				//set values will normalize array value into a model
+				$this->setValue($name, array_merge($this->$name, $copies));
+
+				break;
+
+
+		}
+
+
 	}
 
   /**
-   * Merge this entity with another
+   * Merge this entity with another.
+   *
+   * This will happen:
+   *
+   * 1. Scalar properties of the given entity will overwrite the properties of this
+   *    entity.
+   * 2. Array properties will be merged.
+   * 3. Comments, files and links will be merged
+   * 4. foreign key fields will be updated
+   * 5. The given entity will be deletedf
+   *
    *
    * @param Entity $entity
    * @return bool
@@ -1266,7 +1308,7 @@ abstract class Entity extends Property {
    * @throws Exception
    */
 	private function mergeFiles(self $entity) {
-		if(!Module::isInstalled('legacy', 'files') && $entity->getMapping()->getColumn('filesFolderId')) {
+		if(!Module::isInstalled('legacy', 'files') || !$entity->getMapping()->getColumn('filesFolderId')) {
 			return;
 		}
 		$sourceFolder = Folder::model()->findByPk($entity->filesFolderId);
@@ -1279,6 +1321,8 @@ abstract class Entity extends Property {
 	}
 
   /**
+   * updates foreign key fields in other tables
+   *
    * @param Entity $entity
    * @throws Exception
    */

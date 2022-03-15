@@ -222,13 +222,14 @@ class Mapping {
 	/**
 	 * Add has one relation
 	 *
+	 * An empty value is null and not an empty object
+	 *
 	 * @param string $name
 	 * @param string $propertyName
 	 * @param array $keys
 	 * @param bool $autoCreate If not found then automatically create an empty object
 	 *
 	 * @return $this;
-	 * @throws Exception
 	 */
 	public function addHasOne(string $name, string $propertyName, array $keys, bool $autoCreate = false): Mapping
 	{
@@ -247,6 +248,8 @@ class Mapping {
 	 *
 	 * If the property does have a primary key. The client can sent it along to retain it. In this case the sort order must
 	 * be stored in an int column. The framework does this automatically when you specify this. See the $options parameter.
+	 *
+	 * The propery can't be null. An empty value is an empty array.
 	 *
 	 * @param string $name Name of the property
 	 * @param string $propertyName The name of the Property model
@@ -272,6 +275,8 @@ class Mapping {
 	 *
 	 * Map objects are unsorted!
 	 *
+	 * If the map is empty the value is null and not an empty object
+	 *
 	 * @param string $name
 	 * @param string $propertyName
 	 * @param array $keys
@@ -288,8 +293,11 @@ class Mapping {
 
 	/**
 	 * Add a scalar relation. For example an array of ID's.
-	 * 
-	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same scalar relation for tracking changes.
+	 *
+	 * A scalar is alwasys an array. It can't be null.
+	 *
+	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same
+	 * scalar relation for tracking changes.
 	 * 
 	 * eg. When a group's users[] change. It will mark all users as changed too because they have a scalar groups[] property.
 	 * 

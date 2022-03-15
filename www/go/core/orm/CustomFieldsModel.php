@@ -14,6 +14,7 @@ use go\core\model\Field;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use JsonSerializable;
+use LogicException;
 use PDOException;
 
 class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializable {
@@ -97,10 +98,6 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 
 		$fields = self::getCustomFieldModels();
 
-		if(!isset($fields[$name])) {
-			throw new Exception("Property '$name' doesn't exist");
-		}
-
 		$field = $fields[$name];
 
 		//prevent infinite loop for function and template fields
@@ -119,6 +116,8 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 
 		return $value;
 	}
+
+
 
 	/**
 	 * @throws Exception
@@ -157,6 +156,49 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	public function isModified(): bool
 	{
 		return $this->oldData != $this->data;
+	}
+
+
+
+	private function convertValue($name, $value) {
+		$fn = $this->returnAsText ? 'dbToText' : 'dbToApi';
+		$fields = self::getCustomFieldModels();
+		if(!isset($fields[$name])) {
+			throw new LogicException("Property '$name' doesn't exist");
+		}
+		$field = $fields[$name];
+		return $field->getDataType()->$fn($value, $this, $this->entity);
+	}
+
+
+	/**
+	 * Get modified custom fields with new and old value
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getModified(): array
+	{
+		if(!$this->isModified()) {
+			return [];
+		}
+		$oldCf = $this->oldData;
+		$newCf = $this->internalGetCustomFields();
+
+		$mod = [];
+		foreach($newCf as $key => $value) {
+			if($key == 'id') {
+				continue;
+			}
+			if(!array_key_exists($key, $oldCf)) {
+				$mod[$key] = [$this->convertValue($key, $value), null];
+			} elseif($value !== $oldCf[$key]) {
+				$mod[$key] = [$this->convertValue($key, $value), $this->convertValue($key, $oldCf[$key])];
+			}
+		}
+
+		return $mod;
+
 	}
 
 	/**
@@ -215,7 +257,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 				}
 
 			}
-			$this->data = $record;
+			$this->data = $this->oldData = $record;
 		}
 
 		return $this->data;//array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);

@@ -7,6 +7,7 @@
 
 namespace go\modules\community\tasks\model;
 
+use DateTimeInterface;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\orm\UserProperty;
@@ -148,7 +149,7 @@ class Alert extends UserProperty
 	 * @param DateTime $when
 	 * @return $this
 	 */
-	public function when(\DateTimeInterface $when) {
+	public function when(DateTimeInterface $when) {
 		$this->offset = null;
 		$this->relativeTo = null;
 		$this->when = $when;

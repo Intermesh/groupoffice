@@ -335,8 +335,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 		}
 
 		var url = GO.url('modules/module/updateModuleModel');
-
-		this.getEl().mask(t("Saving..."));
+		this.getEl().mask(t("Loading..."));
 		Ext.Ajax.request({
 			method:'POST',
 			url: url,
@@ -346,10 +345,13 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 			jsonData: {module:this.createJSON(record.data)},
 			scope : this,
 			callback : function (options, success,response) {
+
+				this.getEl().unmask();
 				var responseParams = Ext.decode(response.responseText);
 
 				if (!responseParams.success) {
 					GO.errorDialog.show(responseParams.feedback);
+					this.store.load();
 				}else{
 					if(responseParams.id){
 						record.set('id', responseParams.id);
@@ -367,8 +369,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 
 		var params = {};
 
-		this.getEl().mask(t("Saving..."));
-
+		this.getEl().mask(t("Loading..."));
 
 		if(record.data.id) {
 			params.update = {};
@@ -391,9 +392,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 					this.store.load();
 				}
 
-			}, this).finally(() => {
 				this.getEl().unmask();
-			});
+
+			}, this);
 		} else
 		{
 
@@ -415,6 +416,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 						Ext.MessageBox.alert(t("Error"), response.message);
 						this.store.load();
 					}
+
 					this.getEl().unmask();
 				},
 				scope: this
@@ -465,31 +467,32 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 				return;
 			}
 
-			this.getEl().mask(t("Saving..."));
-			if (record.data.isRefactored) {
 
+
+			if (record.data.isRefactored) {
+				this.getEl().mask(t("Loading..."));
 				go.Jmap.request({
 					method: "Module/uninstall",
 					params: {
 						name: record.data.name,
 						package: record.data.package
 					},
-					callback: function () {
-						record.set('enabled', false);
-						record.set('id', null);
-						record.commit();
-
-						this.getEl().unmask();
-					},
 					scope: this
-				});
+				}).then(() => {
+					record.set('enabled', false);
+					record.set('id', null);
+					record.commit();
+				}).finally(() => {
+					this.getEl().unmask();
+				})
 			} else {
 				GO.request({
+					maskEl: this.getEl(),
 					url: "modules/module/delete",
 					params: {
 						id: record.data.id
 					},
-					callback: function () {
+					success: function (response, options) {
 						record.set('enabled', false);
 						record.set('id', null);
 						record.commit();

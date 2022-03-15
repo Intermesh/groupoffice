@@ -9,13 +9,19 @@ use go\modules\community\notes\model\Note;
 class goNote extends GoBaseBackendDiff {
 
 	public function DeleteMessage($folderid, $id, $contentparameters) {
-		ZLog::Write(LOGLEVEL_DEBUG, 'goNote->DeleteMessage('.$folderid.','.$id.')');
-		$note = Note::findById($id);
-		
-		if($note && $note->hasPermissionLevel(Acl::LEVEL_DELETE)) {
-			return $note->delete($note->primaryKeyValues());
-		} else {
-			return true;
+		try {
+			ZLog::Write(LOGLEVEL_DEBUG, 'goNote->DeleteMessage(' . $folderid . ',' . $id . ')');
+			$note = Note::findById($id);
+
+			if ($note && $note->hasPermissionLevel(Acl::LEVEL_DELETE)) {
+				return $note->delete($note->primaryKeyValues());
+			} else {
+				return true;
+			}
+		} catch(Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'Note::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+			return false;
 		}
 	}
 	
@@ -31,54 +37,61 @@ class goNote extends GoBaseBackendDiff {
 	 * @return \SyncNote
 	 */
 	public function GetMessage($folderid, $id, $contentparameters) {
-		ZLog::Write(LOGLEVEL_DEBUG, 'goNote->GetMessage('.$folderid.','.$id.')');
-		$note = Note::findById($id);
-		
-		if(!$note) {
-			return false;
-		}
-		
-		if(!$note->hasPermissionLevel(Acl::LEVEL_READ)) {
-			return false;
-		}
 
-		$message = new SyncNote();
-	
-		$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentparameters->GetBodyPreference());
+		try {
+			ZLog::Write(LOGLEVEL_DEBUG, 'goNote->GetMessage(' . $folderid . ',' . $id . ')');
+			$note = Note::findById($id);
 
-		if (Request::GetProtocolVersion() >= 12.0) {
-			$sbBody = new SyncBaseBody();
-
-			$asBodyData = StringUtil::normalizeCrlf($note->content);
-
-			if ($bpReturnType == SYNC_BODYPREFERENCE_HTML) {
-				$sbBody->type = SYNC_BODYPREFERENCE_HTML;
-				$asBodyData = $note->content;
-			} else {
-
-				$sbBody->type = SYNC_BODYPREFERENCE_PLAIN;
-				$asBodyData = StringUtil::htmlToText($note->content);
+			if (!$note) {
+				return false;
 			}
-			ZLog::Write(LOGLEVEL_DEBUG, $asBodyData);
 
-			$sbBody->estimatedDataSize = strlen($asBodyData);
-			$sbBody->data = StringStreamWrapper::Open($asBodyData);
-			$sbBody->truncated = 0;
-			
-			$message->asbody = $sbBody;
+			if (!$note->hasPermissionLevel(Acl::LEVEL_READ)) {
+				return false;
+			}
 
-		} else {
-			$message->body = StringUtil::normalizeCrlf($note->content);
-			$message->bodysize = strlen($message->body);
-			$message->bodytruncated = 0;
+			$message = new SyncNote();
 
+			$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentparameters->GetBodyPreference());
+
+			if (Request::GetProtocolVersion() >= 12.0) {
+				$sbBody = new SyncBaseBody();
+
+				$asBodyData = StringUtil::normalizeCrlf($note->content);
+
+				if ($bpReturnType == SYNC_BODYPREFERENCE_HTML) {
+					$sbBody->type = SYNC_BODYPREFERENCE_HTML;
+					$asBodyData = $note->content;
+				} else {
+
+					$sbBody->type = SYNC_BODYPREFERENCE_PLAIN;
+					$asBodyData = StringUtil::htmlToText($note->content);
+				}
+				ZLog::Write(LOGLEVEL_DEBUG, $asBodyData);
+
+				$sbBody->estimatedDataSize = strlen($asBodyData);
+				$sbBody->data = StringStreamWrapper::Open($asBodyData);
+				$sbBody->truncated = 0;
+
+				$message->asbody = $sbBody;
+
+			} else {
+				$message->body = StringUtil::normalizeCrlf($note->content);
+				$message->bodysize = strlen($message->body);
+				$message->bodytruncated = 0;
+
+			}
+
+			$message->lastmodified = $note->modifiedAt->format('U');
+			$message->subject = $note->name;
+
+
+			return $message;
+		} catch(Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'Note::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+			return false;
 		}
-
-		$message->lastmodified		=		$note->modifiedAt->format('U');
-		$message->subject					=		$note->name;
-	
-
-		return $message;
 	}
 
 	/**
@@ -93,47 +106,52 @@ class goNote extends GoBaseBackendDiff {
 	 */
 	public function ChangeMessage($folderid, $id, $message, $contentParameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goNote->ChangeMessage('.$folderid.','.$id.')');
-		
-		ZLog::Write(LOGLEVEL_DEBUG, var_export($message, TRUE));
-	
-		$note = Note::findById($id);
 
-		if(!$note) {
-			$note = new Note ();
-			$note->noteBookId = $folderid;//(new \go\core\db\Query)->selectSingleValue('noteBookId')->from('sync_user_note_book')->where(['userId' => go()->getUserId()])->orderBy(['isDefault' => 'DESC'])->single();
-		}
+		try {
 
-		if(!$note->hasPermissionLevel(Acl::LEVEL_WRITE)) {
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
-		}
+			$note = Note::findById($id);
 
-		$note->content = GoSyncUtils::getBodyFromMessage($message);
-
-		if(isset($message->asbody) && isset($message->asbody->type)){
-			switch($message->asbody->type){
-				case SYNC_BODYPREFERENCE_PLAIN:
-					$note->content = StringUtil::textToHtml($note->content);
+			if(!$note) {
+				$note = new Note ();
+				$note->noteBookId = $folderid;//(new \go\core\db\Query)->selectSingleValue('noteBookId')->from('sync_user_note_book')->where(['userId' => go()->getUserId()])->orderBy(['isDefault' => 'DESC'])->single();
 			}
+
+			if(!$note->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+				throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			}
+
+			$note->content = GoSyncUtils::getBodyFromMessage($message);
+
+			if(isset($message->asbody) && isset($message->asbody->type)){
+				switch($message->asbody->type){
+					case SYNC_BODYPREFERENCE_PLAIN:
+						$note->content = StringUtil::textToHtml($note->content);
+				}
+			}
+
+			if(!empty($message->subject))
+			{
+				$note->name	=  $message->subject;
+			} else if($note->isNew()) {
+				$note->name = StringUtil::cutString(strip_tags($note->content), 20);
+			}
+
+			$note->cutPropertiesToColumnLength();
+
+			if(!$note->save()){
+				ZLog::Write(LOGLEVEL_WARN, 'ZPUSH2NOTE::Could not save ' . $note->id);
+				ZLog::Write(LOGLEVEL_WARN, var_export($note->getValidationErrors(), true));
+				throw new StatusException(SYNC_STATUS_SERVERERROR);
+			}
+		} catch(Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'Note::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+			return false;
 		}
 
-		if(!empty($message->subject))
-		{
-			$note->name	=  $message->subject;
-		} else if($note->isNew()) {
-			$note->name = StringUtil::cutString(strip_tags($note->content), 20);
-		}
 
-		$note->cutPropertiesToColumnLength();
+		return $this->StatMessage($folderid, $id);
 
-		if(!$note->save()){
-			ZLog::Write(LOGLEVEL_WARN, 'ZPUSH2NOTE::Could not save ' . $note->id);				
-			ZLog::Write(LOGLEVEL_WARN, var_export($note->getValidationErrors(), true));
-			throw new StatusException(SYNC_STATUS_SERVERERROR);
-		}			
-
-		
-		
-		return $this->StatMessage($folderid, $note->id);
 	}
 			
 	/**

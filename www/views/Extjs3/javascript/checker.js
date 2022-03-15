@@ -254,8 +254,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 	
 	handleLoginstatusResponse : function(data){
 		// If the login is not valid anymore, then the user is logged out and the browser will be redirected to the login screen
-		if(!data.loginValid){     
-			document.location.href=BaseHref;
+		if(!data.loginValid) {
+			go.Router.login();
 		}
 	}
 });

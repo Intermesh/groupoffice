@@ -68,44 +68,6 @@ trait CustomFieldsTrait {
 	}
 
 	/**
-	 * Get the old custom fields data. Returns null if they were never modified.
-	 *
-	 * @return null|array
-	 */
-	public function oldCustomFields() : ?array {
-		return $this->oldCustomFieldsData;
-	}
-
-	/**
-	 * Get modified custom fields with new and old value
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getModifiedCustomFields(): array
-	{
-		if(!$this->isCustomFieldsModified()) {
-			return [];
-		}
-		$oldCf = $this->oldCustomFields();
-		$newCf = $this->getCustomFields();
-
-		$mod = [];
-		foreach($newCf as $key => $value) {
-			if(!array_key_exists($key, $oldCf)) {
-				$mod[$key] = [$value, null];
-			} elseif($value !== $oldCf[$key]) {
-				$mod[$key] = [$value, $oldCf[$key]];
-			}
-		}
-
-		return $mod;
-
-	}
-
-	private $oldCustomFieldsData;
-
-	/**
 	 * Set custom field data
 	 *
 	 * The data array may hold partial data. It will be merged into the existing

@@ -4,6 +4,7 @@ namespace go\core\util;
 use DateTimeInterface;
 use Sabre\VObject\DateTimeParser;
 use Sabre\VObject\InvalidDataException;
+use Sabre\VObject\InvalidDataException;
 use Sabre\VObject\Recur\RRuleIterator;
 
 class Recurrence extends RRuleIterator {
@@ -40,6 +41,7 @@ class Recurrence extends RRuleIterator {
 	 * @param string $rrule RRULE FORMAT AS IN
 	 * @param DateTimeInterface $start
 	 * @throws InvalidDataException
+	 * @noinspection PhpMissingParentConstructorInspection
 	 */
 	public function __construct(DateTimeInterface $start) {
 		$this->startDate = $start;
@@ -80,27 +82,27 @@ class Recurrence extends RRuleIterator {
 		if ($this->byDay) {
 			$data['byDay'] = [];
 			foreach ($this->byDay as $day) {
+				$dayArr = ['day' => substr($day, -2)];
 				$nthOfPeriod = substr($day, 0, -2);
-				$day = ['day' => substr($day, -2)];
 				if(!empty($nthOfPeriod)) {
-					$day['nthOfPeriod'] = $nthOfPeriod;
+					$dayArr['nthOfPeriod'] = $nthOfPeriod;
 				}
-				$data['byDay'][] = $day;
+				$data['byDay'][] = $dayArr;
 			}
 		}
 		return $data;
 	}
 
 	/**
-	 * Create rrule iterator from JSON rule format
-	 *
+	 * Create rrule itterator from JSON rule format
 	 * @param array $rule json data
-	 * @param $start DateTimeInterface start of task
+	 * @param DateTimeInterface $start start of task
 	 * @return Recurrence
+	 * @throws InvalidDataException
 	 */
 	static function fromArray(array $rule, DateTimeInterface $start): Recurrence
 	{
-		$me = new self($start);
+		$me = new self(null, $start);
 		foreach(['frequency', 'interval', 'count',
 					  'byMonth', 'byYearDay', 'byWeekNo', 'byMonthDay'] as $key) {
 			if(!empty($rule[$key])) {

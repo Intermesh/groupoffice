@@ -36,8 +36,8 @@
 namespace GO\Email\Model;
 
 
-abstract class Message extends \GO\Base\Model {
-
+abstract class Message extends \GO\Base\Model
+{
 	protected $attributes = array(
 			'to' => '',
 			'cc' => '',
@@ -74,9 +74,10 @@ abstract class Message extends \GO\Base\Model {
 	 * also how \GO\Base\Mail\Imap::max_read is used.
 	 * @var boolean
 	 */
-	protected $_bodyTruncated;
+	protected $_bodyTruncated = false;
 
-	public function __construct() {
+	public function __construct()
+	{
 		$this->attributes['to'] = new \GO\Base\Mail\EmailRecipients($this->attributes['to']);
 		$this->attributes['cc'] = new \GO\Base\Mail\EmailRecipients($this->attributes['cc']);
 		$this->attributes['bcc'] = new \GO\Base\Mail\EmailRecipients($this->attributes['bcc']);
@@ -91,30 +92,34 @@ abstract class Message extends \GO\Base\Model {
 	 * @return mixed property value
 	 * @see getAttribute
 	 */
-	public function __get($name) {
-
+	public function __get($name)
+	{
 		$getter = 'get'.$name;
-		if(method_exists($this, $getter))
+		if(method_exists($this, $getter)) {
 			return $this->$getter();
-		else	if (isset($this->attributes[$name])) {
+		} elseif (isset($this->attributes[$name])) {
 			return $this->attributes[$name];
 		}
 	}
 
-	public function __set($name, $value){
+	public function __set($name, $value)
+	{
 		$setter = 'set'.$name;
-		if(method_exists($this, $setter))
+		if(method_exists($this, $setter)) {
 			return $this->$setter($name, $value);
-		else
-			$this->attributes[$name]=$value;
+		} else {
+			$this->attributes[$name] = $value;
+		}
 	}
 
-	public function __isset($name) {
+	public function __isset($name)
+	{
 		$value = $this->__get($name);
 		return isset($value);
 	}
 
-	public function __unset($name) {
+	public function __unset($name)
+	{
 		unset($this->attributes[$name]);
 	}
 
@@ -124,11 +129,13 @@ abstract class Message extends \GO\Base\Model {
 	 * @param String $className
 	 * @return ImapMessage
 	 */
-	public static function model($className=__CLASS__) {
+	public static function model($className=__CLASS__)
+	{
 		return parent::model($className);
 	}
 
-	public function setAttributes($attributes) {
+	public function setAttributes(array $attributes)
+	{
 
 		$this->attributes = array_merge($this->attributes, $attributes);
 		
@@ -139,7 +146,7 @@ abstract class Message extends \GO\Base\Model {
 
 		//workaround for invalid from
 		if(!$this->attributes['from']->getAddress()) {
-			$this->attributes['from'] = 	new \GO\Base\Mail\EmailRecipients("unknown@unknown.domain");
+			$this->attributes['from'] = new \GO\Base\Mail\EmailRecipients("unknown@unknown.domain");
 		}
 		$this->attributes['reply_to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['reply_to']));
 
@@ -228,15 +235,18 @@ abstract class Message extends \GO\Base\Model {
 	 *
 	 */
 
-	public function &getAttachments() {
+	public function &getAttachments()
+	{
 		return $this->attachments;
 	}
 
-	public function addAttachment(MessageAttachment $a){
+	public function addAttachment(MessageAttachment $a)
+	{
 		$this->attachments[$a->number]=$a;
 	}
 
-	public function isAttachment($number){
+	public function isAttachment(int $number)
+	{
 		$att = $this->getAttachments();
 		return isset($att[$number]);
 	}
@@ -248,34 +258,34 @@ abstract class Message extends \GO\Base\Model {
 	 * @param StringHelper $number
 	 * @return array See getAttachments
 	 */
-	public function getAttachment($number){
+	public function getAttachment(int $number)
+	{
 		$att = $this->getAttachments();
-		if(!isset($att[$number]))
+		if(!isset($att[$number])) {
 			return false;
-		else
+		} else {
 			return $att[$number];
+		}
 	}
 
 
 	protected function extractUuencodedAttachments(&$body)
 	{
-
-		if (($pos = strpos($body, "\nbegin ")) === false)
+		if (($pos = strpos($body, "\nbegin ")) === false) {
 			return;
+		}
 
 		$regex = "/(begin ([0-7]{1,3}) (.+))\n/";
 
 		if (preg_match_all($regex, $body, $matches, PREG_OFFSET_CAPTURE)) {
-
 			for ($i = 0, $count = count($matches[3]); $i < $count; $i++) {
 				$filename = trim($matches[3][$i][0]);
 				$offset = $matches[3][$i][1] + strlen($matches[3][$i][0]) + 1;
-
 				$endpos = strpos($body, 'end', $offset) - $offset - 1;
-
 				if($endpos){
-					if(!isset($startPosAtts))
-						$startPosAtts= $matches[0][$i][1];
+					if(!isset($startPosAtts)) {
+						$startPosAtts = $matches[0][$i][1];
+					}
 
 					$att = str_replace(array("\r"), "", substr($body, $offset, $endpos));
 
@@ -290,13 +300,14 @@ abstract class Message extends \GO\Base\Model {
 
 			$body = substr($body, 0, $startPosAtts);
 		}
-		\GO::debug($matches);
 	}
 
-	private function _convertRecipientArray($r){
+	private function _convertRecipientArray(array $r)
+	{
 		$new = array();
-		foreach($r as $email=>$personal)
-			$new[]=array('email'=>$email, 'personal'=>(string) $personal);
+		foreach($r as $email=>$personal) {
+			$new[] = array('email' => $email, 'personal' => (string)$personal);
+		}
 
 		return $new;
 	}
@@ -315,15 +326,15 @@ abstract class Message extends \GO\Base\Model {
 	 * Returns MIME fields contained in this class's instance as an associative
 	 * array.
 	 *
-	 * @param boolean $html Whether or not to return the HTML body. The alternative is
-	 * plain text. Defaults to true.
+	 * @param bool|null $html Whether or not to return the HTML body. The alternative is plain text. Defaults to true.
+	 * @param bool|null $recipientsAsString
+	 * @param bool|null $noMaxBodySize
+	 * @param bool|null $useHtmlSpecialChars
 	 *
-	 * @return Array
+	 * @return array
 	 */
-	public function toOutputArray($html=true, $recipientsAsString=false, $noMaxBodySize=false,$useHtmlSpecialChars=true) {
-
-		$from = $this->from->getAddresses();
-
+	public function toOutputArray(?bool $html=true, ?bool $recipientsAsString=false, ?bool $noMaxBodySize=false, ?bool $useHtmlSpecialChars=true): array
+	{
 		$response['notification'] = $this->disposition_notification_to;
 
 		//seen is expensive because it can't be recovered from cache.
@@ -348,9 +359,9 @@ abstract class Message extends \GO\Base\Model {
 
 		$response['to_string'] = (string) $this->to;
 
-		if (!$recipientsAsString && empty($response['to']))
+		if (!$recipientsAsString && empty($response['to'])) {
 			$response['to'][] = array('email' => '', 'personal' => \GO::t("Undisclosed recipients", "email"));
-
+		}
 		$response['full_from'] = (string) $this->from;
 		$response['priority'] = intval($this->x_priority);
 		$response['udate'] = $this->udate;
@@ -400,7 +411,6 @@ abstract class Message extends \GO\Base\Model {
 		$attachments = $this->getAttachments();
 
 		foreach($attachments as $att){
-			
 			if($html && $att->disposition != 'attachment') {				
 				if($att->mime == 'text/html') {
 					$htmlPartStr = $att->getData();
@@ -409,17 +419,14 @@ abstract class Message extends \GO\Base\Model {
 
 					$response['htmlbody'] .= '<hr />'.$htmlPartStr;
 					continue;
-
-				}else if($att->mime == 'text/plain') {
+				} else if($att->mime == 'text/plain') {
 					$htmlPartStr = $att->getData();
 					$htmlPartStr = \GO\Base\Util\StringHelper::text_to_html($htmlPartStr);
 
 					$response['htmlbody'] .= '<hr />'.$htmlPartStr;
 				}
 			}
-				
-			
-			
+
 			$replaceCount = 0;
 
 			$a = $att->getAttributes();
@@ -433,32 +440,28 @@ abstract class Message extends \GO\Base\Model {
 			}
 			$a['url'] .= '&amp;token='.$a['token'];
 			
-			if ($html && !empty($a['content_id']))
+			if ($html && !empty($a['content_id'])) {
 				$response['htmlbody'] = str_replace('cid:' . $a['content_id'], $a['url'], $response['htmlbody'], $replaceCount);
+			}
 
 			if ($a['name'] == 'smime.p7s') {
 				$response['smime_signed'] = true;
 				continue;
 			}
 
-			if(!$replaceCount || $a['disposition'] == 'attachment')
+			if(!$replaceCount || $a['disposition'] == 'attachment') {
 				$response['attachments'][] = $a;
-			else
-				$response['inlineAttachments'][]=$a;
-
+			} else {
+				$response['inlineAttachments'][] = $a;
+			}
 		}
 
-		
-		$response['contact_name']="";			
-		$response['contact_thumb_url']=null; //GO::config()->host.'modules/addressbook/themes/Default/images/unknown-person.png';
-		
+		$response['contact_name']="";
+		$response['contact_thumb_url'] = null;
 		$response['blocked_images']=0;
 		$response['xssDetected']=false;
-		
-		
 		$response['links'] = [];
-		
-		
+
 		$this->fireEvent('tooutputarray', array(&$response, $this, $html));
 
 		return $response;
@@ -466,10 +469,11 @@ abstract class Message extends \GO\Base\Model {
 
 	/**
 	 * Returns true iff message body has exceeded maximum size.
-	 * @return boolean
+	 * @return bool
 	 */
-	public function bodyIsTruncated() {
+	public function bodyIsTruncated(): bool
+	{
 		return $this->_bodyTruncated;
 	}
-
 }
+

@@ -28,9 +28,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	focus: function () {
-		if(this.formPanel.currentId) {
-			return;
-		}
+
 		if (this.nameField.getValue() != "") {
 			this.jobTitle.focus();
 		} else
@@ -275,7 +273,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								}
 							},
 							change: function(cmp, id) {
-								go.customfields.CustomFields.filterFieldSets(this.formPanel, this.getValues() + cmp.getTextValue());
+								go.customfields.CustomFields.filterFieldSets(this.formPanel);
 								this.organizationsField.allowNew.addressBookId = id;
 							}
 						}

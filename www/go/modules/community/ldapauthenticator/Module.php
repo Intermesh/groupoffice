@@ -123,13 +123,7 @@ class Module extends core\Module implements DomainProvider {
 	 */
 	public static function ldapRecordToUser($username, Record $record, User $user): User
 	{
-
 		go()->debug("cn: " . $record->cn[0] ?? "NULL");
-		go()->debug("mail: " .$record->mail[0] ?? "NULL");
-
-		if(!isset($record->mail) || !isset($record->mail[0])) {
-			throw new Exception("User '$username' has no 'mail' attribute set. Can't create a user");
-		}
 
 		$user->username = $username;
 
@@ -144,8 +138,6 @@ class Module extends core\Module implements DomainProvider {
 		}
 
 		$user->displayName = $record->cn[0];		
-		$user->email = $record->mail[0];
-		$user->recoveryEmail = $record->mail[1] ?? $record->mail[0];
 
 		$values = self::mappedValues($record);
 
@@ -155,6 +147,10 @@ class Module extends core\Module implements DomainProvider {
 		if(isset($values['email'])) $user->email = $values['email'];
 		if(isset($values['displayName'])) $user->displayName = $values['name'] = $values['displayName'];
 		if(isset($values['homeDir'])) $user->homeDir = $values['homeDir'];
+
+		if(!isset($user->recoveryEmail)) {
+			$user->recoveryEmail = $user->email;
+		}
 
 		if(CoreModelModule::isInstalled('community', 'addressbook')) {
 

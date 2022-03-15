@@ -10,14 +10,11 @@ class BlobTest extends TestCase
 {
 	public function testGarbageCollection() {
 
-
-		$blobCount = Blob::find()->selectSingleValue('count(*)')->single();
-
-
 		$blobsQuery = Blob::findStale();
 		$blobsStmt = $blobsQuery->execute();
 
-		$this->assertEquals(0, $blobsStmt->rowCount());
+		//count may vary depending on fresh install or upgrade in bootstrap.php
+		$staleCountAtStart = $blobsStmt->rowCount();
 
 		//create unused blob
 		$blob = Blob::fromString("test blob text");
@@ -31,7 +28,7 @@ class BlobTest extends TestCase
 
 		$blobsStmt = $blobsQuery->execute();
 
-		$this->assertEquals(1, $blobsStmt->rowCount());
+		$this->assertEquals($staleCountAtStart + 1, $blobsStmt->rowCount());
 
 //		echo $blobs ."\n\n";
 
@@ -40,11 +37,13 @@ class BlobTest extends TestCase
 		//expect file to be cleaned up
 		$this->assertEquals(false, $blob->getFile()->exists());
 
-		$this->assertEquals(1, Blob::$lastDeleteStmt->rowCount());
+		$this->assertEquals($staleCountAtStart + 1, Blob::$lastDeleteStmt->rowCount());
 
 		$blobsStmt = $blobsQuery->execute();
 
 		$this->assertEquals(0, $blobsStmt->rowCount());
+
+		$blobCount = Blob::find()->selectSingleValue('count(*)')->single();
 
 
 		$blackPixel = "R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";

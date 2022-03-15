@@ -229,6 +229,14 @@ abstract class Module extends Singleton {
 		}catch(Exception $e) {}
 	}
 
+	private function checkDependenciesForUninstall() {
+		$dependentModuleNames = \go\core\Module::getModulesThatDependOn($this);
+
+		if (count($dependentModuleNames)>0)
+			throw new Exception(sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."),implode(', ',$dependentModuleNames)));
+
+	}
+
 	/**
 	 * Uninstall the module
 	 *
@@ -238,6 +246,8 @@ abstract class Module extends Singleton {
 	 */
 	public function uninstall(): bool
 	{
+		$this->checkDependenciesForUninstall();
+
 		if(!$this->beforeUninstall()) {
 			return false;
 		}

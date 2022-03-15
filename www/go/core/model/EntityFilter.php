@@ -77,7 +77,7 @@ class EntityFilter extends AclOwnerEntity {
 
 	public static function sort(\go\core\orm\Query $query, ArrayObject $sort): Query
 	{
-		if(empty($sort)) {
+		if(!count($sort)) {
 			$sort['name'] = 'ASC';
 		}
 

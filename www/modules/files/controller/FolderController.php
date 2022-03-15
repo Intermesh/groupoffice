@@ -1360,7 +1360,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		if(count($removeBlobs)) {
-			Blob::delete(['id' => $removeBlobs]);
+			//Blob::delete(['id' => $removeBlobs]);
 		}
 	}
 

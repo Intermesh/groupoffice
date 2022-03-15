@@ -34,6 +34,13 @@ class UserSettings extends Property {
 	protected $lastTasklistIds;
 
 	/**
+	 * Set due and start to the current time for new tasks
+	 *
+	 * @var bool
+	 */
+	public $defaultDate = false;
+
+	/**
 	 * @return Mapping
 	 * @throws \ReflectionException
 	 */

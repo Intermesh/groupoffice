@@ -286,7 +286,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						const dlg = new go.modules.community.tasks.CategoryDialog();
+						const dlg = new go.modules.community.tasks.CategoryDialog()
+						dlg.tasklistCombo.store.setFilter("role", {role: "list"});
+
 						const firstSelected = this.tasklistsGrid.getSelectionModel().getSelected();
 						if(firstSelected) {
 							dlg.setValues({tasklistId: firstSelected.id});
@@ -554,21 +556,24 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	filterCategories : function(ids) {
 
+		const conditions = [
+			{
+				ownerId: go.User.id,
+			},
+			{
+				global: true
+			}
+		];
+
+		if(ids.length) {
+			conditions.push({
+				tasklistId: ids
+			});
+		}
+
 		this.categoriesGrid.store.setFilter('tasklist',{
 			operator: "or",
-			conditions: [
-				{
-					ownerId: go.User.id,
-				},
-				{
-					tasklistId: !ids.length ? null : ids
-				},
-				{
-					global: true
-				}
-			]
-
-
+			conditions: conditions
 		}).load();
 	},
 

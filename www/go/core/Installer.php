@@ -114,7 +114,7 @@ class Installer {
 		
 
 		//don't cache on install
-		App::get()->getCache()->flush(true, false);
+		App::get()->getCache()->flush( false);
 		$cacheCls = get_class(App::get()->getCache());
 		App::get()->setCache(new None());
 
@@ -338,8 +338,28 @@ class Installer {
 		}
 	}
 
+	private function removeObsoleteModules() {
+		$stmt = go()->getDbConnection()->delete('core_module',
+			['name' =>
+				[
+					'cron',
+					'tools',
+					'log',
+					'calexceptiongrid',
+					'calignoreuuid',
+					'displaypermissions'
+				],
+				'package' => null
+			]);
+
+		$stmt->execute();
+
+	}
+
 	public function getUnavailableModules(): array
 	{
+		$this->removeObsoleteModules();
+
 		$modules = (new Query)
 						->select('name, package')
 						->from('core_module')
@@ -467,13 +487,6 @@ class Installer {
 
 		//don't be strict in upgrade
 		go()->getDbConnection()->exec("SET sql_mode=''");
-
-		//try
-		try {
-			go()->getDbConnection()->exec("SET innodb_strict_mode=0");
-		} catch(Exception $e) {
-			echo "Failed to disable 'innodb_strict_mode': " . $e->getMessage() ."\n";
-		}
 		
 		jmap\Entity::$trackChanges = false;
 

@@ -1,2 +1,2 @@
-drop table bookmarks_bookmark;
-drop table bookmarks_category;
+drop table if exists bookmarks_bookmark;
+drop table if exists bookmarks_category;

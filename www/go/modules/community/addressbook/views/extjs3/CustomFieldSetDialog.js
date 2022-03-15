@@ -16,13 +16,6 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.customfiel
 					{boxLabel: t("Contacts"), inputValue: 'contacts'},
 					{boxLabel: t("Organizations"), inputValue: 'organizations'}
 				]
-
-			},{
-				xtype: 'textfield',
-				fieldLabel: t("Address book name filter"),
-				name: "filter.addressBookName",
-				value: '',
-				hint: t('Only show this field set in address books with this name (use % for wildcard)')
 			}, {
 				xtype: "checkbox",
 				name: "enableAddressBookFilter",

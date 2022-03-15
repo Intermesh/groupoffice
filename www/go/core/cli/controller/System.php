@@ -33,6 +33,11 @@ class System extends Controller {
 
 	const EVENT_CLEANUP = 'cleanup';
 
+	protected function authenticate()
+	{
+		// no auth because on upgrade it might fail and it's not needed on CLI anyway
+	}
+
 
 	/**
 	 * @throws Exception
@@ -98,9 +103,9 @@ class System extends Controller {
 	 * @throws Exception
 	 */
 	public function upgrade() {
-
-		Observable::cacheListeners();
-		Listeners::get()->init();
+//WHy was this needed? It made 6.5 upgrad fail.
+//		Observable::cacheListeners();
+//		Listeners::get()->init();
 
 		go()->getInstaller()->isValidDb();
 		Table::destroyInstances();

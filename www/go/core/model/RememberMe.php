@@ -22,6 +22,8 @@ use ReflectionException;
  *
  * https://stackoverflow.com/a/244907
  *
+ * https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence#title.2
+ *
  * @package go\core\model
  */
 class RememberMe extends Entity {

@@ -5,6 +5,7 @@ go.modules.GroupRights = Ext.extend(go.Window, {
 	width: 800,
 	height: 600,
 	layout:'fit',
+	stateId: 'core-module-rights',
 
 	filterUnused: function(store) {
 		store.filterBy(function(record, id) {
@@ -60,6 +61,7 @@ go.modules.GroupRights = Ext.extend(go.Window, {
 			}],
 			layout: 'fit',
 			items: [this.gridfield = new go.form.GridField({
+				stateId: 'module-permissions',
 				autoExpandColumn: "groupName",
 				hideHeaders: false,
 				autoHeight: false,
@@ -140,6 +142,7 @@ go.modules.GroupRights = Ext.extend(go.Window, {
 			fields: fields
 		}), new Ext.grid.ColumnModel({
 			defaults: {
+				width: dp(200),
 				xtype:'checkcolumn',
 				sortable: false,
 				hideable: false,

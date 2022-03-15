@@ -54,5 +54,29 @@ JSON;
 
 	}
 
+	/**
+	 * /cli.php community/tasks/Tasklist/delete --tasklistId=1.
+	 */
+	public function delete($tasklistId, $format = 'csv') {
+		$json = <<<JSON
+[
+  [
+    "Tasklist/set", {
+      "destroy": [$tasklistId]
+    },
+    "call-1"
+  ]
+]
+JSON;
+
+		$requests = JSON::decode($json, true);
+
+		Response::get()->jsonOptions = JSON_PRETTY_PRINT;
+
+		$router = new Router();
+		$router->run($requests);
+
+	}
+
 
 }

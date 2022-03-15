@@ -288,6 +288,7 @@ create table tasks_user_settings
     defaultTasklistId int(11) unsigned null,
     rememberLastItems boolean not null default false,
     lastTasklistIds varchar(255) null,
+    defaultDate bool default false null,
     constraint tasks_user_settings_pk
         primary key (userId),
     constraint tasks_user_settings_core_user_id_fk

@@ -99,6 +99,9 @@ trait SearchableTrait {
 	 * @throws Exception
 	 */
 	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase) {
+
+		go()->setOptimizerSearchDepth();
+
 		$i = 0;
 		$words = StringUtil::splitTextKeywords($searchPhrase);
 		$words = array_unique($words);

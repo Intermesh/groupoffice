@@ -243,7 +243,7 @@ if(isset($_POST['accessToken'])) { //defined in index.php
 	}
 	
 	?>	
-	go.User.setAccessToken('<?= $_POST['accessToken']; ?>', false);
+	go.User.setAccessToken('<?= $_POST['accessToken']; ?>');
 	<?php
 
 }

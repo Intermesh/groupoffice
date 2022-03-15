@@ -1107,20 +1107,22 @@ $updates['202201101250'][] = 'update `core_entity` set clientName = name WHERE c
 
 $updates['202202141231'][] = "update core_blob set staleAt = now() where staleAt is null;";
 
+$updates['202203281145'][] = "ALTER TABLE `core_smtp_account` ADD `maxMessagesPerMinute` SMALLINT UNSIGNED NOT NULL DEFAULT(0);";
+
 
 
 
 // Start 6.7
-$updates['202201101250'][] = "alter table core_pdf_block modify x int null;";
+$updates['202203281145'][] = "alter table core_pdf_block modify x int null;";
 
-$updates['202201101250'][] = "alter table core_pdf_block modify y int null;";
+$updates['202203281145'][] = "alter table core_pdf_block modify y int null;";
 
-$updates['202201101250'][] = "alter table core_pdf_block modify width int null;";
+$updates['202203281145'][] = "alter table core_pdf_block modify width int null;";
 
-$updates['202201101250'][] = "alter table core_pdf_block modify height int null;";
+$updates['202203281145'][] = "alter table core_pdf_block modify height int null;";
 
-$updates['202201101250'][] = "alter table core_pdf_template
+$updates['202203281145'][] = "alter table core_pdf_template
 	add `key` varchar(20) default null null after moduleId;";
 
 
-$updates['202201101250'][] = "drop index name on core_email_template;";
+$updates['202203281145'][] = "drop index name on core_email_template;";

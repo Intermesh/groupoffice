@@ -63,6 +63,16 @@ try {
 	//check if GO is installed
 	if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 
+        if(go()->getSettings()->databaseVersion != go()->getVersion()) {
+
+            if(go()->getDebugger()->enabled) {
+                echo "DEBUGGER: Version mismatch. Database version = ". go()->getSettings()->databaseVersion .", Application version: " . go()->getVersion() .".<br /><br />";
+                echo '<a href="install/upgrade.php">Click here to launch the upgrade</a>';
+                exit();
+            }
+            header('Location: '.GO::config()->host.'install/upgrade.php');
+            exit();
+        }
 
 		//Server manager uses this when directly signing in
 		if(!empty($_POST['accessToken'])) {
@@ -83,33 +93,22 @@ try {
 			date_default_timezone_set($old);
 		}
 
-		// Process remember me persistent cookie
-		if(!go()->getAuthState()->isAuthenticated() && ($rememberMe = \go\core\model\RememberMe::verify())) {
-			$rememberMe->setCookie();
+        // Process remember me persistent cookie
+        if($_SERVER['REQUEST_METHOD'] == "GET" && !go()->getAuthState()->isAuthenticated() && ($rememberMe = \go\core\model\RememberMe::verify())) {
+            $rememberMe->setCookie();
 
-			$token = new Token();
-			$token->userId = $rememberMe->userId;
-			$token->setAuthenticated();
-			$token->setCookie();
+            $token = new Token();
+            $token->userId = $rememberMe->userId;
+            $token->setAuthenticated();
+            $token->setCookie();
 
-			//for default_scripts.php to pass accessToken to script
-			$_POST['accessToken'] = $token->accessToken;
-		}
+            //for default_scripts.php to pass accessToken to script
+            $_POST['accessToken'] = $token->accessToken;
+        }
 
 		go()->fireEvent(\go\core\App::EVENT_INDEX);
 
 		Response::get()->sendHeaders();
-
-		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
-
-			if(go()->getDebugger()->enabled) {
-				echo "DEBUGGER: Version mismatch. Database version = ". go()->getSettings()->databaseVersion .", Application version: " . go()->getVersion() .".<br /><br />";
-				echo '<a href="install/upgrade.php">Click here to launch the upgrade</a>';
-				exit();
-			}
-			header('Location: '.GO::config()->host.'install/upgrade.php');
-			exit();
-		}
 	}
 
 	GO::router()->runController();

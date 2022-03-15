@@ -196,8 +196,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					this.setFilterVisible(false);
 					return;
 				}
-			} else
-			{
+			} else {
 				if (v != entity[name]) {
 					this.setFilterVisible(false);
 					return;

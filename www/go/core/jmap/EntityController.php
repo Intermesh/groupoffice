@@ -1066,6 +1066,8 @@ abstract class EntityController extends Controller {
 
 		$cls = $this->entityClass();
 
+		/** @var Entity $cls */
+
 		$entity = $cls::findById($primaryId);
 
 		if(!$this->canUpdate($entity)) {

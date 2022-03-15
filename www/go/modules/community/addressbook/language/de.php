@@ -132,8 +132,9 @@ return array (
   'Restrict export to administrators' => 'Export auf Administratoren beschränken',
   'Date of birth' => 'Geburtstag',
   'Show more...' => 'Mehr…',
-  'Importing...' => 'Importiere…',
+  'Importing...' => 'Importiere?',
   'Allow new' => 'Neu erlauben',
   'Are you sure that you would like to import this VCard?' => 'Sind Sie sicher, dass Sie diese VCard importieren möchten?',
-  'Importing...' => 'Importiere?',
+  'Display options for address books' => 'Anzeigeoptionen für Adressbücher',
+  'Last selected address book' => 'Zuletzt ausgewähltes Adressbuch',
 );

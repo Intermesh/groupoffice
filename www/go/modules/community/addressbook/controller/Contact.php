@@ -51,7 +51,7 @@ class Contact extends EntityController {
 	
 	/**
 	 * Handles the Foo entity's Foo/query command
-	 * 
+	 *
 	 * @param array $params
 	 * @see https://jmap.io/spec-core.html#/query
 	 */
@@ -91,10 +91,6 @@ class Contact extends EntityController {
 	}
 	
 	public function export($params) {
-		$addressbookMod = Module::get();
-		if($addressbookMod->getSettings()->restrictExportToAdmins && !$addressbookMod->getModel()->hasPermissionLevel(Acl::LEVEL_MANAGE)) {
-			throw new Forbidden("Export has been restricted to administrators");
-		}
 		return $this->defaultExport($params);
 	}
 	
@@ -121,12 +117,6 @@ class Contact extends EntityController {
 	}
 
 	public function labels($params) {
-
-		$addressbookMod = Module::get();
-		if($addressbookMod->getSettings()->restrictExportToAdmins && !go()->getAuthState()->isAdmin()) {
-			throw new Forbidden("Export has been restricted to administrators");
-		}
-
 		$tpl = <<<EOT
 {{contact.name}}
 [assign address = contact.addresses | filter:type:"postal" | first]
