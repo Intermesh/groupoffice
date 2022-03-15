@@ -64,7 +64,15 @@ abstract class AbstractConverter {
 	protected $index;
 
 	/**
-	 * Extra parameters sent by the client for importing
+	 * Extra parameters sent by the client for importing.
+	 *
+	 * Typically, a 'values' property is sent which you can apply to each entity in {@see importEntity()}:
+	 *
+	 * ```
+	 * if(isset($this->clientParams['values'])) {
+	 *  $entity->setValues($this->clientParams['values']);
+	 * }
+	 * ```
 	 *
 	 * @var array
 	 */
@@ -141,6 +149,20 @@ abstract class AbstractConverter {
   /**
    * Read file and import them into Group-Office
    *
+   * The flow:
+   *
+   * {@see initImport()}
+   *
+   * For each record:
+   *
+   * {@see nextImportRecord()}
+   * {@see importEntity()}
+   * {@see afterSave()}
+   *
+   * And finally
+   *
+   * {@see finishImport()}
+   *
    * @param File $file the source file
    * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
    * @return array ['count', 'errors', 'success']
@@ -208,26 +230,48 @@ abstract class AbstractConverter {
 	/**
 	 * Reads next record from file. Returns true on success or false when done.
 	 *
+	 * This method must store the record inside this convertor so that {@see importEntity()} can use
+	 * ot for importing.
+	 *
 	 * @return bool
 	 */
 	abstract protected function nextImportRecord(): bool;
 
-	protected function finishImport(): void
-	{
-
-	}
-
-
 	/**
-	 * Handle's the import. 
+	 * Import's a single entity
 	 * 
-	 * It must read from the $fp file pointer and return the entity object. The entity is not saved yet.
+	 * It uses the data stored in {@see nextImportRecord()} to create an entity and stores it.
 	 * 
 	 * When false is returned the result will be ignored. For example when you want to skip a CSV line because it's empty.
 	 *
 	 * @return Entity|false
 	 */
 	abstract protected function importEntity();
+
+
+	/**
+	 * Called after the entity has been imported.
+	 *
+	 * When you return false the import of the single entity will be rolled back.
+	 *
+	 * @param Entity $entity
+	 * @return bool
+	 */
+	protected function afterSave(Entity $entity): bool
+	{
+		return true;
+	}
+
+
+	/**
+	 * This method is called after all entities have been imported. Useful to clean things up.
+	 *
+	 * @return void
+	 */
+	protected function finishImport(): void
+	{
+
+	}
 
 
 	/** start of export */
@@ -242,7 +286,6 @@ abstract class AbstractConverter {
 	 */
 	public final function exportToBlob(Query $entities, array $params = []): Blob
 	{
-
 		$this->clientParams = $params;
 		$this->entitiesQuery = $entities;
 		$this->initExport();
@@ -280,10 +323,7 @@ abstract class AbstractConverter {
 	 */
 	abstract protected function initExport(): void;
 
-	protected function afterSave(Entity $entity): bool
-	{
-		return true;
-	}
+
 
 	/**
 	 * Export the given entity
