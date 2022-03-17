@@ -30,4 +30,5 @@ return array (
   'Files' => '文件',
   'Microsoft Word document' => 'Microsoft Word document',
   'Changes to Group-Office folder' => 'Changes to {product_name} folder',
+  'Ok' => '确定',
 );
