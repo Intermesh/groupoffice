@@ -176,6 +176,9 @@ try {
 					output(["error" => $msg], 400, $msg);
 				}
 
+				//trim username as mysql doesn't care about trialing or leading spaces but other systems might like IMAP or LDAP.
+				$data['username'] = trim($data['username']);
+
 				$user = $auth->passwordLogin($data['username'], $data['password']);
 				if (!$user) {
 					output([

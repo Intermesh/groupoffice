@@ -1058,14 +1058,12 @@ abstract class Entity extends Property {
 
 		if(isset($sort['modifier'])) {
 			$query->join('core_user', 'modifier', 'modifier.id = '.$query->getTableAlias() . '.modifiedBy');
-			$query->orderBy(['modifier.displayName' => $sort['modifier']], true);
-			unset($sort['modifier']);
+			$sort->renameKey('modifier', 'modifier.displayName');
 		}
 
 		if(isset($sort['creator'])) {
 			$query->join('core_user', 'creator', 'creator.id = '.$query->getTableAlias() . '.createdBy');
-			$query->orderBy(['creator.displayName' => $sort['creator']], true);
-			unset($sort['creator']);
+			$sort->renameKey('creator', 'creator.displayName');
 		}
 		
 		//Enable sorting on customfields with ['customFields.fieldName' => 'DESC']

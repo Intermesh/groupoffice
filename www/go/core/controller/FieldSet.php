@@ -105,7 +105,7 @@ class FieldSet extends EntityController {
 		$fieldSets = model\FieldSet::findByIds($params['fieldSetIds']);
 		$fieldSetArray = [];
 		foreach ($fieldSets as $fieldSet) {
-			$fields = model\Field::find()->where('fieldSetId', '=', $fieldSet->id);
+			$fields = model\Field::find()->where('fieldSetId', '=', $fieldSet->id)->orderBy(['sortOrder' => 'asc']);
 			$fieldArray = [];
 			foreach ($fields as $field) {
 				$fieldArray[] = [

@@ -275,7 +275,6 @@ class EntityType implements ArrayableInterface {
    *
    * @param int $id
    * @return static|bool
-   * @throws Exception
    */
 	public static function findById(int $id) {
 
@@ -416,7 +415,6 @@ class EntityType implements ArrayableInterface {
 	 *
 	 * @param Entity $entity
 	 * @param bool $isDeleted
-	 * @throws SaveException
 	 */
 	public function change(Entity $entity, bool $isDeleted = false) {
 		if(!jmap\Entity::$trackChanges) {

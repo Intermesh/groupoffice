@@ -1,11 +1,11 @@
 <?php
 namespace go\modules\community\comments\model;
 
+use Exception;
+use GO\Base\Exception\AccessDenied;
 use go\core\acl\model\AclItemEntity;
 use go\core\fs\Blob;
 use go\core\model\Acl;
-use go\core\model\Alert as CoreAlert;
-use go\core\model\UserDisplay;
 use go\core\orm\exception\SaveException;
 use go\core\model\Search;
 use go\core\orm\Filters;
@@ -91,11 +91,12 @@ class Comment extends AclItemEntity {
 	 * Set the entity type
 	 *
 	 * @param mixed $entity "note", Entity $note or Entitytype instance
-	 * @throws \Exception
+	 * @throws Exception
 	 *
 	 * @return self
 	 */
-	public function setEntity($entity) {
+	public function setEntity($entity): Comment
+	{
 
 		if($entity instanceof Entity || $entity instanceof ActiveRecord) {
 			$this->entityTypeId = $entity->entityType()->getId();
@@ -132,18 +133,19 @@ class Comment extends AclItemEntity {
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
 		if(!count($sort)) {
-			$sort = ['c.date' => 'ASC'];
+			$sort['c.date'] = 'ASC';
 		}
 
 		return parent::sort($query, $sort);		
 	}
 
 	private $relatedEntity;
-	
+
 	/**
 	 * Find the entity this comment belongs to.
-	 * 
+	 *
 	 * @return Entity|ActiveRecord
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
 	public function findEntity() {
 
@@ -151,7 +153,7 @@ class Comment extends AclItemEntity {
 			$e = EntityType::findById($this->entityTypeId);
 			$cls = $e->getClassName();
 			if (is_a($cls, ActiveRecord::class, true)) {
-				$this->relatedEntity = $cls::model()->findByPk($this->entityId);
+				$this->relatedEntity = $cls::model()->findByPk($this->entityId, false, true);
 			} else {
 				$this->relatedEntity = $cls::findById($this->entityId);
 			}
@@ -166,12 +168,12 @@ class Comment extends AclItemEntity {
 	}
 
 	/**
-	 * @param $entity
+	 * @param Entity|ActiveRecord $entity
 	 * @param array $properties
 	 * @return Query|Comment[]
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	public static function findFor($entity, $properties = []) {
+	public static function findFor($entity, array $properties = []) {
 		$entityTypeId = $entity->entityType()->getId();
 		$entityId = $entity->id;
 
@@ -201,18 +203,18 @@ class Comment extends AclItemEntity {
 		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_WRITE : false;
 
 	}
-	
+
 	/**
 	 * Applies conditions to the query so that only entities with the given permission level are fetched.
-	 * 
+	 *
 	 * @param Query $query
 	 * @param int $level
 	 * @param int|null $userId Leave to null for the current user
+	 * @param array|null $groups
 	 * @return Query $query;
 	 */
 	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
 	{
-		
 		return $query;
 	}
 	
@@ -226,7 +228,7 @@ class Comment extends AclItemEntity {
 		if(!isset($this->date)) {
 			$this->date = new DateTime();
 		}
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
 
 	protected function internalSave(): bool
@@ -316,15 +318,17 @@ class Comment extends AclItemEntity {
 	 * @return bool
 	 * @throws SaveException
 	 */
-	public static function copyTo($from, $to) {
+	public static function copyTo($from, $to): bool
+	{
 		go()->getDbConnection()->beginTransaction();
 		try {
 			foreach (Comment::findFor($from) as $comment) {
-				if (!$comment->copy()->setEntity($to)->save()) {
-					throw new SaveException();
+				$copy = $comment->copy();
+				if (!$copy->setEntity($to)->save()) {
+					throw new SaveException($copy);
 				}
 			}
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			go()->getDbConnection()->rollBack();
 			throw $e;
 		}
