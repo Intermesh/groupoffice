@@ -83,16 +83,18 @@ class Connection {
 	 * @param int $timeout The connection timeout
 	 * @return boolean
 	 */
-	public function connect($server, $port = 143, $ssl = false, $timeout = 10) {
+	public function connect(string $server, int $port = 143, bool $ssl = false, int $timeout = 10, bool $ignoreInvalidCertificates = false): bool
+	{
 
-//		if (!isset($this->handle)) {
-//		throw new \Exception('hier');
-			
-			
-		$streamContext = stream_context_create(['ssl' => [
-				"verify_peer"=>false,
-				"verify_peer_name"=>false
-		]]);
+		$contextOptions = [];
+		if($ignoreInvalidCertificates) {
+			$contextOptions['ssl'] = [
+				"allow_self_signed" => true,
+				"verify_peer" => false,
+				"verify_peer_name" => false
+			];
+		}
+		$streamContext = stream_context_create($contextOptions);
 
 		$remote = $ssl ? 'ssl://' : '';			
 		$remote .=  $server.":".$port;
@@ -117,13 +119,15 @@ class Connection {
 	
 		return $response;
 	}
-	
+
 	/**
 	 * Enable TLS encryption
-	 * 
+	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
-	public function startTLS() {
+	public function startTLS(): bool
+	{
 		$this->sendCommand("STARTTLS");
 		$response = $this->getResponse();
 
@@ -142,13 +146,15 @@ class Connection {
 		
 		return true;
 	}
-	
+
 	/**
 	 * Disconnect from the IMAP server
-	 * 
+	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
-	public function disconnect() {
+	public function disconnect(): bool
+	{
 		if (is_resource($this->handle)) {
 			$command = "LOGOUT";
 			$this->sendCommand($command);

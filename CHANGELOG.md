@@ -2,6 +2,7 @@
 - Tasks: Sorting by 'responsible' and 'categories' works
 - Core: SMIME sign via config.php failed with error
 - Core: Yes no field renders empty in grid if not set.
+- IMAP Authenticator: Allow wildcard and only enable TLS if set in config
 
 15-03-2022 6.6.54
 - Core: when using SMIME signing in the config.php it failed on a certificate failure
