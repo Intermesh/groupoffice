@@ -27,7 +27,7 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 				},
 				items: [{
 
-						hint: t("Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used."),
+						hint: t("Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.") + " " + t("Use a '*' to match all domains."),
 						xtype: "gridfield",
 						name: "domains",
 						store: new Ext.data.JsonStore({
