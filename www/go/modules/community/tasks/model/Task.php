@@ -580,6 +580,12 @@ class Task extends AclItemEntity {
 			$sort->renameKey('responsible', 'responsible.displayName');
 		}
 
+		if(isset($sort['categories'])) {
+			$query->join('tasks_task_category', 'tc', 'tc.taskId = '.$query->getTableAlias() . '.id', 'LEFT');
+			$query->join('tasks_category', 'categories', 'tc.categoryId = categories.id', 'LEFT');
+			$sort->renameKey('categories', 'categories.name');
+		}
+
 		return parent::sort($query, $sort);
 	}
 
