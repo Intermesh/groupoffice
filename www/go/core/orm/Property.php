@@ -1837,7 +1837,7 @@ abstract class Property extends Model {
 				$enumValues = str_getcsv(strtolower($matches[1]), ',' , "'");
 
 				if(!in_array(strtolower($value), $enumValues)) {
-					$this->setValidationError($column->name, ErrorCode::MALFORMED, "Invalid value for " . $column->dataType);
+					$this->setValidationError($column->name, ErrorCode::MALFORMED, "Invalid value (".$value.") for " . $column->dataType);
 					return;
 				}
 				break;
