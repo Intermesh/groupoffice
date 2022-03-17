@@ -575,7 +575,16 @@ class Task extends AclItemEntity {
 			$sort->insert($i, new Expression($query->getTableAlias() . '.`start` ' . $null));
 		}
 
+		if(isset($sort['responsible'])) {
+			$query->join('core_user', 'responsible', 'responsible.id = '.$query->getTableAlias() . '.createdBy');
+			$sort->renameKey('responsible', 'responsible.displayName');
+		}
 
+		if(isset($sort['categories'])) {
+			$query->join('tasks_task_category', 'tc', 'tc.taskId = '.$query->getTableAlias() . '.id', 'LEFT');
+			$query->join('tasks_category', 'categories', 'tc.categoryId = categories.id', 'LEFT');
+			$sort->renameKey('categories', 'categories.name');
+		}
 
 		return parent::sort($query, $sort);
 	}

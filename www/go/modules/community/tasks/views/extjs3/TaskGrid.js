@@ -234,7 +234,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: true
 				},
 				{
-					xtype:"datecolumn",
 					id: 'categories',
 					header: t('Categories'),
 					width: dp(160),
