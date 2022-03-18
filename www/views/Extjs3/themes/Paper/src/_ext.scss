@@ -1284,11 +1284,17 @@
 	&-row {
 		border:0;
 		border-bottom:1px solid color($fg, 'divider');
+
 		&:hover {
 			background-color:$cHover;
 		}
+
 		&-selected {
+			&:hover {
+				background-color: $cSelected;
+			}
 			background-color: $cSelected;
+
 			border-bottom-color: transparent;
 			background-image: none;
 		}
