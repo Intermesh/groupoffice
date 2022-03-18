@@ -477,6 +477,18 @@ use Faker;
 		}
 
 		/**
+		 * Creates new DB
+		 * @return Connection
+		 */
+		private function createDbConnection() : Connection{
+			$config = $this->getConfig();
+			$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port']  . ';dbname=' . $config['db_name'];
+			return new Connection(
+				$dsn, $config['db_user'], $config['db_pass']
+			);
+		}
+
+		/**
 		 * Get the database connection
 		 *
 		 * @return Connection
@@ -484,11 +496,7 @@ use Faker;
 		public function getDbConnection(): Connection
 		{
 			if (!isset($this->dbConnection)) {
-				$config = $this->getConfig();
-				$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port']  . ';dbname=' . $config['db_name'];
-				$this->dbConnection = new Connection(
-					$dsn, $config['db_user'], $config['db_pass']
-				);
+				$this->dbConnection = $this->createDbConnection();
 			}
 			return $this->dbConnection;
 		}
@@ -613,6 +621,7 @@ use Faker;
 			go()->getCache()->flush(true);
 			Table::destroyInstances();
 			Property::clearCache();
+			Property::clearCachedRelationStmts();
 
 			$webclient = Extjs3::get();
 			$webclient->flushCache();

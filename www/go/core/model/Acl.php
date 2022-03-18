@@ -338,20 +338,30 @@ class Acl extends Entity {
 	 */
 	public static function getUserPermissionLevel($aclId, $userId) {
 
-		if(\go\core\model\User::isAdminById($userId)) {
+		if(User::isAdminById($userId)) {
 			return self::LEVEL_MANAGE;
 		}
 		
 		$cacheKey = $aclId . "-" . $userId;
 		if(!isset(self::$permissionLevelCache[$cacheKey])) {
-			$query = (new Query())
-							->selectSingleValue('MAX(level)')
-							->from('core_acl_group', 'g')
-							->join('core_user_group', 'u', 'g.groupId = u.groupId')
-							->where(['g.aclId' => $aclId, 'u.userId' => $userId])
-							->groupBy(['g.aclId']);
+			$stmt = go()->getDbConnection()->getCachedStatment('acl-getUserPermissionLevel');
+			if(!$stmt) {
 
-			self::$permissionLevelCache[$cacheKey] = (int) $query->execute()->fetch();
+				$query = (new Query())
+					->selectSingleValue('MAX(level)')
+					->from('core_acl_group', 'g')
+					->join('core_user_group', 'u', 'g.groupId = u.groupId')
+					->where('g.aclId = :aclId AND u.userId = :userId')
+					->groupBy(['g.aclId']);
+
+				$stmt = $query->createStatement();
+				go()->getDbConnection()->cacheStatement('acl-getUserPermissionLevel', $stmt);
+			}
+
+			$stmt->bindValue(':aclId',$aclId);
+			$stmt->bindValue(':userId',$userId);
+
+			self::$permissionLevelCache[$cacheKey] = (int) $stmt->execute()->fetch();
 		}	
 		
 		return self::$permissionLevelCache[$cacheKey];

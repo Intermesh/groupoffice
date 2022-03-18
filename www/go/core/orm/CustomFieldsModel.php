@@ -21,7 +21,6 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 
 	private static $loopIds = [];
 
-	private static $preparedCustomFieldStmt = [];
 
 	/**
 	 * @var Entity|ActiveRecord
@@ -220,16 +219,17 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	{
 		if(!isset($this->data)) {
 
-			if(!isset(self::$preparedCustomFieldStmt[$this->customFieldsTableName()])) {
+			$stmt = go()->getDbConnection()->getCachedStatment('cf-' . $this->customFieldsTableName());
+			if(!$stmt) {
 				$query = (new Query())
 					->select('*')
 					->from($this->customFieldsTableName(), 'cf')
 					->where('cf.id = :id');
 
-				self::$preparedCustomFieldStmt[$this->customFieldsTableName()] = $query->createStatement();
+				$stmt = $query->createStatement();
+				go()->getDbConnection()->cacheStatement('cf-' . $this->customFieldsTableName(), $stmt);
 			}
 
-			$stmt = self::$preparedCustomFieldStmt[$this->customFieldsTableName()];
 			$stmt->bindValue(':id', $this->entity->id());
 
 			$stmt->execute();

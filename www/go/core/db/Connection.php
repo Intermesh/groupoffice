@@ -4,10 +4,14 @@ namespace go\core\db;
 
 use Exception;
 use go\core\App;
+use go\core\model\Acl;
+use go\core\orm\CustomFieldsModel;
+use go\core\orm\Property;
 use LogicException;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Sabre\DAV\Xml\Element\Prop;
 
 /**
  * The database connection object. It uses PDO to connect to the database.
@@ -124,6 +128,20 @@ class Connection {
 	 */
 	public function disconnect() {
 		$this->pdo = null;
+
+		Property::clearCachedRelationStmts();
+		Property::$lastDeleteStmt = null;
+		self::$cachedStatements = [];
+	}
+
+	private static $cachedStatements = [];
+
+	public function cacheStatement(string $name, Statement $statement) {
+		self::$cachedStatements[$name] = $statement;
+	}
+
+	public function getCachedStatment(string $name) : ?Statement {
+		return self::$cachedStatements[$name] ?? null;
 	}
 
 	/**
@@ -136,6 +154,16 @@ class Connection {
 		// if (strpos($this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION), 'mysqlnd') !== false) {
 		// 	echo 'PDO MySQLnd enabled!';
 		// }
+	}
+
+
+	/**
+	 * Get MySQL connection ID
+	 *
+	 * @return int
+	 */
+	public function getId() : int {
+		return (int) $this->query("select connection_id()")->fetch(PDO::FETCH_COLUMN, 0);
 	}
 
 	/**

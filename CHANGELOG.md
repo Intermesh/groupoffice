@@ -5,6 +5,7 @@
 - IMAP Authenticator: Allow wildcard and only enable TLS if set in config
 - Core: trim username on login
 - Email: fixed error when css contained @keyframes.
+- Core: DB connection disconnect was broken due to caching of statements
 
 15-03-2022 6.6.54
 - Core: when using SMIME signing in the config.php it failed on a certificate failure

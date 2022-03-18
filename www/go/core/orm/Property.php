@@ -310,17 +310,17 @@ abstract class Property extends Model {
 	private static function queryScalar($where, Relation $relation) {
 		$cacheKey = static::class.':'.$relation->name;
 
-		if(!isset(self::$cachedRelations[$cacheKey])) {
+		if(!isset(self::$cachedRelationStmts[$cacheKey])) {
 			$key = $relation->getScalarColumn();
 			$query = (new Query)->selectSingleValue($key)->from($relation->tableName);
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
 			}
 			$stmt = $query->createStatement();
-			self::$cachedRelations[$cacheKey] = $stmt;
+			self::$cachedRelationStmts[$cacheKey] = $stmt;
 		} else
 		{
-			$stmt = self::$cachedRelations[$cacheKey] ;			
+			$stmt = self::$cachedRelationStmts[$cacheKey] ;
 		}
 
 		foreach($where as $field => $value) {
@@ -334,28 +334,44 @@ abstract class Property extends Model {
 	/**
 	 * For reusing prepared statements
 	 */
-	private static $cachedRelations = [];
+	private static $cachedRelationStmts = [];
+
+
+	/**
+	 * Needed to close the database connection
+	 *
+	 * @return void
+	 */
+	public static function clearCachedRelationStmts() {
+		self::$cachedRelationStmts = [];
+	}
 
 
 	private static function queryRelation($cls, array $where, Relation $relation, $readOnly, $owner): Statement
 	{
+		$cacheKey = static::class.':'.$relation->name;
 
-		/** @var Entity $cls */
-		$query = $cls::internalFind([], $readOnly, $owner);
+		if(!isset(self::$cachedRelationStmts[$cacheKey])) {
+			/** @var Entity $cls */
+			$query = $cls::internalFind([], $readOnly, $owner);
 
-		foreach($where as $field => $value) {
-			$query->andWhere($field . '= :'.$field);
+			foreach ($where as $field => $value) {
+				$query->andWhere($field . '= :' . $field);
+			}
+
+			if (is_a($relation->propertyName, UserProperty::class, true)) {
+				$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
+			}
+
+			if (!empty($relation->orderBy)) {
+				$query->orderBy([$relation->orderBy => 'ASC']);
+			}
+
+			$stmt = self::$cachedRelationStmts[$cacheKey] = $query->createStatement();
+		}else
+		{
+			$stmt = self::$cachedRelationStmts[$cacheKey] ;
 		}
-
-		if(is_a($relation->propertyName, UserProperty::class, true)){
-			$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
-		}
-
-		if(!empty($relation->orderBy)) {
-			$query->orderBy([$relation->orderBy => 'ASC']);
-		}
-
-		$stmt = $query->createStatement();
 
 		foreach($where as $field => $value) {
 			$stmt->bindValue(':'.$field, $value);
@@ -484,8 +500,6 @@ abstract class Property extends Model {
 	}
 
 	private static $mapping;
-
-
 
 	public static function clearCache() {
 		self::$mapping = [];
