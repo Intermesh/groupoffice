@@ -777,18 +777,32 @@ class StringHelper {
 
 	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
 		# Wipe all block comments
-//		$css = preg_replace('!/\*.*?\*/!s', '', $css);
+		$css = preg_replace('!/\*.*?\*/!s', '', $css);
 
 		$parts = explode('}', $css);
+		$keyframeStarted = false;
 		$mediaQueryStarted = false;
 
 		foreach($parts as &$part)
 		{
 			$part = trim($part); # Wht not trim immediately .. ?
-			if(empty($part)) continue;
+			if(empty($part)) {
+				$keyframeStarted = false;
+				continue;
+			}
 			else # This else is also required
 			{
 				$partDetails = explode('{', $part);
+
+				if (strpos($part, 'keyframes') !== false) {
+					$keyframeStarted = true;
+					continue;
+				}
+
+				if($keyframeStarted) {
+					continue;
+				}
+
 				if(substr_count($part, "{")==2)
 				{
 					$mediaQuery = $partDetails[0]."{";
