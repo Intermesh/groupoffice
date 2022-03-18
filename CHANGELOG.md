@@ -36,6 +36,8 @@
 - Imap authenticator: Add STARTTLS support to IMAP Authenticator module #815
 - Core: changed new message sound
 - Core: Selected row color has priority over hover color
+- Core: Fixed searching for : token enclosed in "". For example "%foo:bar%"
+- Tasks: Fixed invalid filter tasklistid and added title
 
 08-03-2022 6.6.49
 - Core: updated German Translation. Thanks Peter!

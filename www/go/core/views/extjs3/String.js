@@ -14,9 +14,15 @@ String.prototype.lcFirst = function() {
  * @returns {Array}
  * 
  */
-String.prototype.splitCSV = function() {
-	var arr = this.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-	return arr || [];
+String.prototype.splitCSV = function(separator) {
+	separator = separator || ",";
+
+	//const regex = new RegExp('(".*?"|[^"' + separator + ']+)(?=\\s*[' + separator + ']|\\s*$)', 'g');
+	// var arr = this.match(regex);
+	// return arr || [];
+const regex = new RegExp(separator + "(?=(?:(?:[^\"]*\"){2})*[^\"]*$)")
+	return this.split(regex);
+
 }
 
 String.prototype.escapeRegExp = function() {

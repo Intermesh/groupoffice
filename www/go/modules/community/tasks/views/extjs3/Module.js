@@ -100,7 +100,7 @@ go.Modules.register("community", "tasks", {
 			},
 			{
 				title: t("Tasklist"),
-				name: 'addressBookId',
+				name: 'tasklistid',
 				multiple: false,
 				type: "go.modules.community.tasks.TasklistCombo"
 			},
