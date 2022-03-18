@@ -360,8 +360,8 @@ class Acl extends Entity {
 
 			$stmt->bindValue(':aclId',$aclId);
 			$stmt->bindValue(':userId',$userId);
-
-			self::$permissionLevelCache[$cacheKey] = (int) $stmt->execute()->fetch();
+			$stmt->execute();
+			self::$permissionLevelCache[$cacheKey] = (int) $stmt->fetch();
 		}	
 		
 		return self::$permissionLevelCache[$cacheKey];
