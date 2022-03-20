@@ -30,6 +30,9 @@ try {
 	$c = new core\util\ArrayObject(go()->getConfig());
 	$c->mergeRecursive($config);
 	go()->setConfig($c->getArray());
+	GO::clearCache(); //legacy
+
+	go()->getCache()->flush(false);
 
 	// Install new if db doesn't exist otherwise use existing
 	$installDb = !go()->isInstalled() ? INSTALL_NEW : INSTALL_NONE;

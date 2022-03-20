@@ -507,8 +507,8 @@ use Faker;
 				return parent::isInstalled();
 			} catch(PDOException $e) {
 
-				if(strpos($e->getMessage(), '[1049]') !== false) {
-					// database does not exists
+				if(strpos($e->getMessage(), '1049') !== false || strpos($e->getMessage(), '1146') !== false) {
+					// database does not exists or table does not exist
 					return false;
 				}
 				throw $e;
@@ -618,7 +618,7 @@ use Faker;
 			
 			GO::clearCache(); //legacy
 
-			go()->getCache()->flush(true);
+			go()->getCache()->flush(false);
 			Table::destroyInstances();
 			Property::clearCache();
 			Property::clearCachedRelationStmts();
