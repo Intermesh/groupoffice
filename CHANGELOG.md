@@ -1,3 +1,6 @@
+20-03-2022 6.6.56
+- Core: GO::$db was accessed directly causing various errors
+
 20-03-2022 6.6.55
 - Core: enter key on grid did not open edit dialog
 - Tasks: Sorting by 'responsible' and 'categories' works
