@@ -4,6 +4,7 @@
 - Smime: Don't check permissions on sending a system message with smime
 - Notes: added "name" and "content" filter to client
 - Email: Fixed error message when hitting refresh lots of times in the email module
+- Projects: fix template event 'Task' in case of due date
 
 20-03-2022 6.6.56
 - Core: GO::$db was accessed directly causing various errors
