@@ -9,6 +9,7 @@
 - Core: fixed relative url's in module stylesheets
 - Addressbook: Added tiktok and instagram url types
 - Core: When an update is installed. The system shows a system unavailable message instead of lauching the upgrade page
+- Core: link browser remembers entity selection
 
 20-03-2022 6.6.56
 - Core: GO::$db was accessed directly causing various errors
