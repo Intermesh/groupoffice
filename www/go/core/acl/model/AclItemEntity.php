@@ -267,11 +267,10 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	protected function getAclEntity()
 	{
+		$cls = static::aclEntityClass();
 
 		$stmt = go()->getDbConnection()->getCachedStatment('AclItemEntity.getAclEntity');
 		if(!$stmt) {
-			$cls = static::aclEntityClass();
-
 			/* @var $cls Entity */
 			$query =  $cls::find($cls::getMapping()->getColumnNames(), $this->readOnly);
 
@@ -304,7 +303,7 @@ abstract class AclItemEntity extends AclEntity {
 		$aclEntity = $stmt->fetch();
 
 		if(!$aclEntity) {
-			throw new Exception("Can't find related ACL entity. The keys for class '$cls' must be invalid: " . var_export($keys, true));
+			throw new Exception("Can't find related ACL entity. The keys for class '$cls' must be invalid: " . var_export(static::aclEntityKeys(), true));
 		}
 
 		self::$aclEntityCache[$cacheKey] = $aclEntity;
