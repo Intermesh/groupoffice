@@ -6,6 +6,8 @@
 - Email: Fixed error message when hitting refresh lots of times in the email module
 - Projects: fix template event 'Task' in case of due date
 - Projects: disable 'time registration' button for completed projects
+- Core: fixed relative url's in module stylesheets
+- Addressbook: Added tiktok and instagram url types
 
 20-03-2022 6.6.56
 - Core: GO::$db was accessed directly causing various errors
