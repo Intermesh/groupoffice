@@ -37,7 +37,7 @@ class Smime {
 
 	public function __construct($accountId) {
 		//fetch account for permission check.
-		$account = \GO\Email\Model\Account::model()->findByPk($accountId);
+		$account = \GO\Email\Model\Account::model()->findByPk($accountId, false, true);
 		$this->accountId = $account->id;
 //		$this->key = Certificate::model()->findByPk($account->id); // could me multiple
 	}
