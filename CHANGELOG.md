@@ -1,5 +1,6 @@
 6.6.57
 - Tasks: linked tasks show description in title column if applicable
+- Core: Performance optimizations
 
 20-03-2022 6.6.56
 - Core: GO::$db was accessed directly causing various errors
