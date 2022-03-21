@@ -977,6 +977,10 @@ abstract class Property extends Model {
 	 */
 	private function internalGetModified($properties = [], bool $forIsModified = false) {
 
+		if($this->readOnly) {
+			return $forIsModified ? false : [];
+		}
+
 		if(!is_array($properties)) {
 			$properties = [$properties];
 		}
