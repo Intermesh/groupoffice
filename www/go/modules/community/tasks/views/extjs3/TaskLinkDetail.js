@@ -18,6 +18,18 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 
 		this.supr().initComponent.call(this);
 
+		this.colModel.getColumnById('title').renderer = function(v,m,rec) {
+			if(rec.json.color) {
+				m.style += 'color:#'+rec.json.color+';';
+			}
+			let str = '<span>' + v + '</span>';
+
+			if(rec.data.description.length > 0) {
+				str += '<label>' + rec.data.description + "</label>";
+			}
+
+			return str;
+		};
 
 		this.on('rowdblclick', (grid, rowIndex) => {
 
