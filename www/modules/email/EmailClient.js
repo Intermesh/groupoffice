@@ -486,8 +486,12 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		mainPanel:this
 	});
 
+	this.treePanel.getRootNode().on('beforeload', () => {
+		this.messagesGrid.btnRefresh.setDisabled(true);
+	}, this);
 	//select the first inbox to be displayed in the messages grid
 	this.treePanel.getRootNode().on('load', function(rootNode) {
+
 		this.body.unmask();
 		//restore already selected account
 		let accountNode;
@@ -508,6 +512,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 		if(!accountNode) {
 			this.messagesStore.removeAll();
+			this.messagesGrid.btnRefresh.setDisabled(false);
 			return; //no accounts
 		}
 
@@ -542,6 +547,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			} else {
 				this.messagesStore.removeAll();
 			}
+
+			this.messagesGrid.btnRefresh.setDisabled(false);
 
 		}, this, {single: true});
 

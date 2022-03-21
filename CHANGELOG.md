@@ -2,6 +2,8 @@
 - Tasks: linked tasks show description in title column if applicable
 - Core: Performance optimizations
 - Smime: Don't check permissions on sending a system message with smime
+- Notes: added "name" and "content" filter to client
+- Email: Fixed error message when hitting refresh lots of times in the email module
 
 20-03-2022 6.6.56
 - Core: GO::$db was accessed directly causing various errors
