@@ -179,6 +179,8 @@ class Token extends Entity {
 	private function setClient() {
 		if(isset($_SERVER['REMOTE_ADDR'])) {
 			$this->remoteIpAddress = $_SERVER['REMOTE_ADDR'];
+		} else if(Environment::get()->isCli()) {
+			$this->remoteIpAddress = 'CLI';
 		}
 
 		if(isset($_SERVER['HTTP_USER_AGENT'])) {

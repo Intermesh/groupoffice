@@ -9,6 +9,7 @@ use go\core\App;
 use go\core\cli\controller\System;
 use go\core\cli\State;
 use GO\Base\Model\Module;
+use go\core\model\User;
 use GO\Demodata\Controller\DemodataController;
 
 const INSTALL_NEW = 0;
@@ -75,6 +76,9 @@ try {
 
 		$installer = go()->getInstaller();
 		$installer->install($admin);
+
+
+
 
 		\go\modules\community\test\Module::get()->install();
 
