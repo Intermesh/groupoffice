@@ -193,6 +193,10 @@ class Extjs3 {
 			$path = dirname($path);
 		}
 
+		if($firstParent == 'Extjs3') {
+			$path = dirname($path, 2);
+		}
+
 		return rtrim($path, '/') . '/';
 	}
 
