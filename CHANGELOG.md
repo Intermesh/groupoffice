@@ -6,6 +6,7 @@
 - Email: Fixed error message when hitting refresh lots of times in the email module
 - Projects: fix template event 'Task' in case of due date
 - Projects: disable 'time registration' button for completed projects
+- Projects: do not check for budgeting permissions if no budgets set
 - Core: fixed relative url's in module stylesheets
 - Addressbook: Added tiktok and instagram url types
 - Core: When an update is installed. The system shows a system unavailable message instead of lauching the upgrade page
