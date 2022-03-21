@@ -251,11 +251,11 @@ class Token extends Entity {
 	 */
 	public function getUser(array $properties = []) {
 		if(!empty($properties)) {
-			return $this->user ?? \go\core\model\User::findById($this->userId, $properties);
+			return $this->user ?? \go\core\model\User::findById($this->userId, $properties, true);
 		}
 
 		if(!$this->user) {
-			$this->user = \go\core\model\User::findById($this->userId);
+			$this->user = \go\core\model\User::findById($this->userId, true);
 		}
 		return $this->user;
 	}

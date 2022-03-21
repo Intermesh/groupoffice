@@ -144,7 +144,7 @@ class EntityType implements ArrayableInterface {
 
 		if(go()->getDebugger()->enabled) {
 			//do extra check if entity type belongs to the module
-			$module = Module::findByClass($className, ['id']);
+			$module = Module::findByClass($className, ['id'], true);
 			if($c['models'][$c['name'][$clientName]]->moduleId != $module->id) {
 				throw new Exception("Entity $className conflicts with : " .$c['models'][$c['name'][$clientName]]->getClassName() .". Please return unique client name with getClientName()");
 			}

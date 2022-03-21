@@ -257,6 +257,8 @@ abstract class AclItemEntity extends AclEntity {
 		}
 	}
 
+	private static $aclEntityCache = [];
+
 	/**
 	 * Get the entity that holds the acl id.
 	 *
@@ -265,24 +267,47 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	protected function getAclEntity()
 	{
-		$cls = static::aclEntityClass();
 
-		/* @var $cls Entity */
+		$stmt = go()->getDbConnection()->getCachedStatment('AclItemEntity.getAclEntity');
+		if(!$stmt) {
+			$cls = static::aclEntityClass();
 
+			/* @var $cls Entity */
+			$query =  $cls::find($cls::getMapping()->getColumnNames(), $this->readOnly);
 
-		$keys = [];
-		foreach (static::aclEntityKeys() as $from => $to) {
-			if(!isset($this->{$from})) {
-				throw new Exception("Required property '".static::class."::$from' not fetched");
+			foreach (static::aclEntityKeys() as $from => $to) {
+				$query->where($query->getTableAlias() . "." .$to . " = :" . $to);
 			}
-			$keys[$to] = $this->{$from};
+
+			$stmt = $query->createStatement();
+
+			go()->getDbConnection()->cacheStatement('AclItemEntity.getAclEntity', $stmt);
 		}
 
-		$aclEntity = $cls::find($cls::getMapping()->getColumnNames())->where($keys)->single();
+		$cacheKey = '';
+		foreach (static::aclEntityKeys() as $from => $to) {
+			if (!isset($this->{$from})) {
+				throw new Exception("Required property '" . static::class . "::$from' not fetched");
+			}
+
+			$stmt->bindValue(':' . $to, $this->{$from});
+
+			$cacheKey .= '-' . $to . '-' . $this->{$from};
+		}
+
+		if(isset(self::$aclEntityCache[$cacheKey])) {
+			return self::$aclEntityCache[$cacheKey];
+		}
+
+		$stmt->execute();
+
+		$aclEntity = $stmt->fetch();
 
 		if(!$aclEntity) {
 			throw new Exception("Can't find related ACL entity. The keys for class '$cls' must be invalid: " . var_export($keys, true));
 		}
+
+		self::$aclEntityCache[$cacheKey] = $aclEntity;
 	
 		return $aclEntity;
 	}

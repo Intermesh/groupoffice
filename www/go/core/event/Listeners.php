@@ -71,7 +71,7 @@ class Listeners extends Singleton {
 		//disable events to prevent recursion
 		go()->disableEvents();
 
-		foreach (Module::find(['id', 'name', 'package', 'version', 'enabled'])->where(['enabled' => true]) as $module) { /* @var $module Module */
+		foreach (Module::find(['id', 'name', 'package', 'version', 'enabled'], true)->where(['enabled' => true]) as $module) { /* @var $module Module */
 
 			if(!$module->isAvailable()) {
 				continue;

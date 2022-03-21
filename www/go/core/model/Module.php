@@ -333,12 +333,12 @@ class Module extends Entity {
 	 * @return self
 	 * @throws Exception
 	 */
-	public static function findByClass(string $className, array $properties = []): Module
+	public static function findByClass(string $className, array $properties = [], bool $readOnly = false): Module
 	{
 		switch($className) {	
 			
 			case strpos($className, "go\\core") === 0 || strpos($className, "GO\\Base") === 0:
-				$module = self::findByName('core', 'core', null, $properties);
+				$module = self::findByName('core', 'core', null, $properties, $readOnly);
 				break;
 			
 			default:				
@@ -355,7 +355,7 @@ class Module extends Entity {
 					$name = $classNameParts[3];
 				}
 				
-				$module = self::findByName($package, $name, null, $properties);
+				$module = self::findByName($package, $name, null, $properties, $readOnly);
 				// Needed for modules which are partly refactored.
 				// For example: The email account entity is required in the n ew framework
 				// and the email module itself is not refactored yet.
@@ -473,7 +473,7 @@ class Module extends Entity {
 	 * @param array $props
 	 * @return ?self
 	 */
-	public static function findByName(?string $package, string $name, ?bool $enabled = true, array $props = []) : ?self {
+	public static function findByName(?string $package, string $name, ?bool $enabled = true, array $props = [], bool $readOnly = false) : ?self {
 		$cache = $package."/". $name;
 
 		if($package == "legacy") {
@@ -483,7 +483,7 @@ class Module extends Entity {
 		$mod = go()->getCache()->get('module-' . $cache);
 		if(empty($mod)) {
 
-			$mod = static::find($props)->where(['package' => $package, 'name' => $name])->single();
+			$mod = static::find($props, $readOnly)->where(['package' => $package, 'name' => $name])->single();
 
 			if(empty($props) && !empty($mod)) {
 				go()->getCache()->set('module-' . $cache, $mod);

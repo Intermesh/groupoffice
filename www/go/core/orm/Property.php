@@ -242,7 +242,7 @@ abstract class Property extends Model {
 					}
 
 					if(!$prop && $relation->autoCreate) {
-						$prop = new $cls($this);
+						$prop = new $cls($this, true, [], $this->readOnly);
 						$this->applyRelationKeys($relation, $prop);
 					}
 					$this->{$relation->name} = $prop;
@@ -676,7 +676,7 @@ abstract class Property extends Model {
 	 	 */
 	protected static function atypicalApiProperties(): array
 	{
-		return ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString'];
+		return ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString', 'searchDescription'];
 	}
 
 	/**
