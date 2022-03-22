@@ -144,4 +144,13 @@ As seguintes mudanças foram feitas por %s:
   'Please open the upload program and upload your files. Click \'Yes\' when the upload is done.' => 'Por favor, abra o programa de upload e envie seus arquivos. Clique em "Sim" quando o upload estiver concluído.',
   'File info' => 'Informações do arquivo',
   'Expired files' => 'Arquivos expirados',
+  'Ok' => 'Ok',
+  'No items found' => 'Nenhum item encontrado',
+  'You are going to delete this link' => ' are you sure?',
+  '{filename} already exists' => ' do you want to overwrite the file?',
+  'Save as PDF' => 'Salvar como PDF',
+  'Download as PDF' => 'Baixar como PDF',
+  'Creator' => 'Criador',
+  'Modifier' => 'Modificador',
+  'Sorry' => ' something went wrong',
 );

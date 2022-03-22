@@ -117,4 +117,6 @@ return array (
   'Add from Group-Office' => '从 {product_name} 添加',
   'To' => 'To',
   'From' => 'From',
+  'Ok' => '确定',
+  'Search through Group-Office' => 'Search through {product_name}',
 );

@@ -3,7 +3,7 @@ return array (
   'Google authenticator' => 'Autenticador do Google',
   'Enable google authenticator' => 'Habilitar Google authenticator',
   'Disable google authenticator' => 'Desatilivar Google authenticator',
-  'When disabling Google autenticator this step will be removed from the login process.' => 'Ao desabilitar o Google authenticator, esta etapa será removida do processo de login.',
+  'When disabling Google autenticator this step will be removed from the login process.' => 'Ao desabilitar o Google authenticator',
   'Provide your current password to disable Google authenticator.' => 'Forneça sua senha atual para desabilitar o Google authenticator.',
   'Disable Google authenticator' => 'Desabilitar Google authenticator',
   'Provide your current password before you can enable Google authenticator.' => 'Forneça sua senha atual para que possa desabilitar o Google authenticator.',
@@ -18,4 +18,6 @@ return array (
   'Not found' => 'Não encontrado',
   'Invalid code' => 'Código inválido',
   'Scan the QR code below with the Google authenticator app on your mobile device, after that fill in the field below with the code generated in the app.' => 'Faça a leitura do código QR abaixo com o aplicativo autenticador Google em seu dispositivo móvel, em seguida preencha o campo abaixo com o código gerado no aplicativo.',
+  'Scan the QR code below with the Google authenticator app on your mobile device' => ' after that fill in the field below with the code generated in the app.',
+  'Block Group-Office usage until setup is done' => 'Block {product_name} usage until setup is done',
 );

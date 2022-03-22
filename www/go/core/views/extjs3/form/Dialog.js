@@ -24,6 +24,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	 * When the entity is modified by another user / process ask to load these changes
 	 */
 	loadExternalChanges: true,
+	deferredRender: true, // for contained tab panel. set to false to eager render
 
 	/**
 	 * If set then the title bar will be appended with ": "+ value of the field.
@@ -230,7 +231,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			},
 			activeTab: 0,
 			enableTabScroll:true,
-			//deferredRender: false,//required for custom fields tabs filtering
+			deferredRender: this.deferredRender,//required for custom fields tabs filtering
 			items: this.panels
 		});
 		

@@ -29,7 +29,7 @@ return array (
   'Is a user' => 'É um usuário',
   'Create personal address book for each user' => 'Criar catálogo de endereços pessoal para cada usuário',
   'Automatically link e-mail to contacts' => 'Vincular e-mail automaticamente a contatos',
-  'Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too.' => 'Aviso: isso copiará os e-mails para o armazenamento do GroupOffice e, portanto, aumentará o uso do espaço em disco. O e-mail estará visível para todas as pessoas que também podem ver o contato.',
+  'Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too.' => 'Aviso: isso copiará os e-mails para o armazenamento do {product_name} e',
   'Advanced' => 'Avançado',
   'Salutation template' => 'Modelo de saudação',
   'salutationTemplate' => 'Prezado (a) [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]Ms./Mr.[else][if {{contact.gender}}=="M"]Mr.[else]Ms.[/if][/if][/if] {{contact.lastName}}',
@@ -120,4 +120,5 @@ return array (
   'state' => 'Estado',
   'Country code' => 'Código do País',
   'Failed to add contacts to the group' => 'Falha ao adicionar contatos ao grupo',
+  'Importing...' => 'Importando...',
 );

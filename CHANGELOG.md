@@ -272,6 +272,9 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+- Core: updated PT-BR translations. Thank you George!
+- Core: updated CN translations. Thank you Cheng Yupeng!
+
 03-03-2022 6.5.104
 - Leavedays: add several missing columns to report CSV, fix sort order, fix calculation
 - Email: Folders could be deleted when truncating folder with a disabled trash folder
