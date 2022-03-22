@@ -244,7 +244,7 @@ class SavedMessage extends ComposerMessage
 			//convert text to html
 			if (stripos($structure->ctype_secondary, 'plain') !== false) {
 				$this->extractUuencodedAttachments($text_part);
-				$text_part = nl2br($text_part);
+				$text_part = $preserveHtmlStyle ? '<div class="msg">' . nl2br($text_part) . '</div>' : nl2br($text_part);
 			}else{
 				$text_part = \GO\Base\Util\StringHelper::convertLinks($text_part);
 				$text_part = \GO\Base\Util\StringHelper::sanitizeHtml($text_part, $preserveHtmlStyle);
