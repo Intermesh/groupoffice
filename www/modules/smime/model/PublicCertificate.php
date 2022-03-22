@@ -89,14 +89,19 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 
 		$pubCertFile = \GO\Base\Fs\File::tempFile();
 		$valid = openssl_pkcs7_verify($inputFile->path(), null, $pubCertFile->path(), Smime::rootCertificates());
-		$inputFile->delete();
+
 
 		if (!$valid) {
+			openssl_pkcs7_verify($inputFile->path(), PKCS7_NOVERIFY, $pubCertFile->path(), Smime::rootCertificates());
 			$err = '';
 			while ($msg = openssl_error_string())
 				$err .= $msg . "\n";
-			throw new \Exception($err);
+
+			go()->debug($err);
+
+//			throw new \Exception($err);
 		}
+		$inputFile->delete();
 		if (!$pubCertFile->exists()) {
 			throw new \Exception('Certificate appears to be valid but could not get certificate from signature. SSL Error: ' . openssl_error_string());
 		}
@@ -112,9 +117,10 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 			throw new \Exception(go()->t("The certificate must be in PEM format", "legacy", "smime"));
 		}
 
+
 		$emails = Smime::readEmails($arr);
 		$success = true;
-		foreach($emails as $email) {
+		foreach ($emails as $email) {
 			// save in DB
 			$cert = self::model()->find(FindParams::newInstance()->criteria(FindCriteria::newInstance()
 				->addCondition('email', $email)
@@ -126,8 +132,9 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 				$cert->user_id = \GO::user()->id;
 			}
 			$cert->cert = $certData;
-			$success = $cert->save() && $success;
+			$success = $valid && $cert->save() && $success;
 		}
+
 
 		try {
 			$cert->ocsp = $cert->checkOCSP($pubCertFile, $arr);
