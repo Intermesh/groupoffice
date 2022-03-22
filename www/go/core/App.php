@@ -444,10 +444,7 @@ use Faker;
 			$config->mergeRecursive($this->getGlobalConfig());
 			$config->mergeRecursive($this->getInstanceConfig());
 
-			if(!isset($config['debug_log'])) {
-				$config['debug_log'] = !empty($config['debug']);
-			}
-			
+
 			if(!isset($config['cache'])) {
 				if(cache\Apcu::isSupported()) {
 					$config['cache'] = cache\Apcu::class;
@@ -459,6 +456,10 @@ use Faker;
 
 			if(Request::get()->getHeader('X-Debug') == "1") {
 				$config['debug'] = true;
+			}
+
+			if(!isset($config['debug_log'])) {
+				$config['debug_log'] = true;
 			}
 
 			$this->config = $config->getArray();

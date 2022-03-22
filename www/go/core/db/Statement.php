@@ -113,7 +113,7 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 			
 			parent::execute($params);
 
-			if(go()->getDebugger()->enabled && go()->getDbConnection()->debug && isset($this->build)) {
+			if(go()->getDbConnection()->debug && isset($this->build) && go()->getDebugger()->enabled) {
 				$duration  = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
 
 				$sql = QueryBuilder::debugBuild($this->build);

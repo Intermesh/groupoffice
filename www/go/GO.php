@@ -595,15 +595,7 @@ class GO{
 		
 		//Start session here. Important that it's called before \GO::config().
 		\GO::session();
-		
-		if (!empty(\GO::config()->debug_usernames)) {
-			$usernames = explode(',',\GO::config()->debug_usernames);
-			$currentUserModel = \GO::user();
-			if (!empty($currentUserModel) && in_array($currentUserModel->username,$usernames))
-				\GO::config()->debug=true;
-		}
 
-		
 		if(!self::isInstalled()){
 			return;
 		}
