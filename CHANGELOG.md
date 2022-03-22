@@ -13,6 +13,7 @@
 - Core: link browser remembers entity selection
 - Addressbook: (re-?)add search to addressbook SelectDialogPanel
 - SMIME: Show invalid certificate details instead of openssl error
+- SMIME: Fixed unkwown sender problem
 
 20-03-2022 6.6.56
 - Core: GO::$db was accessed directly causing various errors

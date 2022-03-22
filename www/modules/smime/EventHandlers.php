@@ -70,7 +70,9 @@ class EventHandlers {
 			unset($mime);
 
 			$newResponse = $message->toOutputArray(true);
-			
+
+			unset($newResponse['sender']);
+			unset($newResponse['from']);
 			unset($newResponse['to']);					
 			unset($newResponse['cc']);
 					
