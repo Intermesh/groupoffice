@@ -272,8 +272,11 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+22-03-2022 6.5.105
 - Core: updated PT-BR translations. Thank you George!
 - Core: updated CN translations. Thank you Cheng Yupeng!
+- Core: ActiveSync timeout set to 3600 seconds
+- Email: if starttls failed an infite loop could occur
 
 03-03-2022 6.5.104
 - Leavedays: add several missing columns to report CSV, fix sort order, fix calculation
