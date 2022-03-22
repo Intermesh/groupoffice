@@ -15,6 +15,7 @@
 - SMIME: Show invalid certificate details instead of openssl error
 - SMIME: Fixed unkwown sender problem
 - Email: Fixed infinite loop when starttls failed
+- ActiveSync: Z-push script timeout set to 3600 instead of unlimited
 
 20-03-2022 6.6.56
 - Core: GO::$db was accessed directly causing various errors
