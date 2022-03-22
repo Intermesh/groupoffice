@@ -71,7 +71,7 @@ GO.smime.PublicCertsGrid = function(config){
 			var record = grid.getStore().getAt(rowIndex);
 
 			GO.request({
-				maskEl:this.certPanel.getEl(),
+				maskEl:this.getEl(),
 				url: "smime/publicCertificate/verify",
 				params:{
 					cert_id:record.id,
@@ -82,7 +82,8 @@ GO.smime.PublicCertsGrid = function(config){
 				{
 					let dlg = new GO.smime.CertificateDetailWindow();
 					dlg.show();
-					dlg.load(record.data.email, result);
+
+					dlg.load(result.data);
 				}							
 			});
 		}
