@@ -100,8 +100,6 @@ trait CustomFieldsTrait {
 	{
 		return $this->setCustomFields([$name => $value], $asText);
 	}
-	
-	private static $customFieldModels;
 
 	/**
 	 * Check if custom fields are modified
@@ -122,13 +120,15 @@ trait CustomFieldsTrait {
    */
 	public static function getCustomFieldModels(): array
 	{
-		$cacheKey = 'custom-field-models-' . static::customFieldsEntityType()->getId();
+		$id = static::customFieldsEntityType()->getId();
+
+		$cacheKey = 'custom-field-models-' . $id;
 	 	$m = go()->getCache()->get($cacheKey);
 		if($m === null) {
 			$m = array();
 			foreach(Field::find(['id', 'databaseName', 'fieldSetId', 'type', 'options', 'required'], true)
 						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
-						->where(['fs.entityId' => static::customFieldsEntityType()->getId()]) as $field) {
+						->where(['fs.entityId' => $id]) as $field) {
 				$m[$field->databaseName] = $field;
 			}
 

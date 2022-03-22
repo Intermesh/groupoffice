@@ -242,6 +242,8 @@ class EntityType implements ArrayableInterface {
 		return $i;
 	}
 
+	private static $cache;
+
   /**
    * @return array
    */

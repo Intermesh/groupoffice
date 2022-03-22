@@ -104,7 +104,8 @@ class Acl extends Entity {
 	/**
 	 * @throws Exception
 	 */
-	private function logChanges() {
+	private function logChanges(): bool
+	{
 		
 		if(!JmapEntity::$trackChanges) {
 			return true;
@@ -175,7 +176,7 @@ class Acl extends Entity {
 	 * $acl->addGroup(Group::ID_INTERNAL)->save();
 	 * ```
 	 */
-	public function addGroup($groupId, $level = self::LEVEL_READ): Acl
+	public function addGroup(int $groupId, int $level = self::LEVEL_READ): Acl
 	{
 
 		if(empty($level)) {
@@ -203,7 +204,8 @@ class Acl extends Entity {
 	 * @param int $groupId
 	 * @return $this
 	 */
-	public function removeGroup($groupId) {
+	public function removeGroup(int $groupId): Acl
+	{
 		$this->groups = array_filter($this->groups, function($group) use ($groupId) {
 			return $group->groupId != $groupId;
 		});
@@ -217,7 +219,7 @@ class Acl extends Entity {
 	 * @param int $groupId
 	 * @return bool|int Level
 	 */
-	public function hasGroup($groupId) {
+	public function hasGroup(int $groupId) {
 		$group = $this->findGroup($groupId);
 		
 		return $group ? $group->level : false;
@@ -229,7 +231,7 @@ class Acl extends Entity {
 	 * @param int $groupId
 	 * @return bool|AclGroup
 	 */
-	public function findGroup($groupId) {
+	public function findGroup(int $groupId) {
 		foreach($this->groups as $group) {
 			if($group->groupId == $groupId) {
 				return $group;
@@ -238,17 +240,18 @@ class Acl extends Entity {
 		
 		return false;
 	}
-	
+
 	/**
 	 * Adds a where exists condition so only items that are readable to the current user are returned.
-	 * 
+	 *
 	 * @param Query $query
 	 * @param string $column eg. t.aclId
 	 * @param int $level The required permission level
-	 * @param int $userId If null then the current user is used.
-	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
+	 * @param int|null $userId If null then the current user is used.
+	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
+	 * @throws Forbidden
 	 */
-	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null, $groups = null) {
+	public static function applyToQuery(Query $query, string $column, int $level = self::LEVEL_READ, int $userId = null, array $groups = null) {
 
 		if(!isset($userId)) {
 
@@ -336,7 +339,8 @@ class Acl extends Entity {
 	 * @param int $userId
 	 * @return int See the self::LEVEL_* constants
 	 */
-	public static function getUserPermissionLevel($aclId, $userId) {
+	public static function getUserPermissionLevel(int $aclId, int $userId): int
+	{
 
 		if(User::isAdminById($userId)) {
 			return self::LEVEL_MANAGE;
@@ -362,6 +366,8 @@ class Acl extends Entity {
 			$stmt->bindValue(':userId',$userId);
 			$stmt->execute();
 			self::$permissionLevelCache[$cacheKey] = (int) $stmt->fetch();
+
+			$stmt->closeCursor();
 		}	
 		
 		return self::$permissionLevelCache[$cacheKey];
@@ -374,7 +380,8 @@ class Acl extends Entity {
 	 * @param int $sinceState	 
 	 * @return Query
 	 */
-	public static function findGrantedSince($userId, $sinceState, Query $acls = null) {
+	public static function findGrantedSince(int $userId, $sinceState, Query $acls = null): Query
+	{
 		
 		//select ag.aclId from core_acl_group ag 
 		//inner join core_user_group ug on ag.groupId = ug.groupId
@@ -443,7 +450,7 @@ class Acl extends Entity {
 	 * Get all the Acl IDs that include read permissions for the given user at a given state in the past.
 	 * 
 	 * @param int $userId
-	 * @param stirng $sinceState The state
+	 * @param string $sinceState The state
 	 * @param Query $acls Only check the given ACL's. This query should select a single column returning ACL ids.
 	 * @return Query
 	 */

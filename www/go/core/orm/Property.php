@@ -548,6 +548,8 @@ abstract class Property extends Model {
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
 
+	private static $apiProperties = [];
+
   /**
    * Get all API properties
    *
@@ -555,7 +557,14 @@ abstract class Property extends Model {
    */
 	public static function getApiProperties(): array
 	{
-		$cacheKey = 'property-getApiProperties-' . static::class;
+		$cls = static::class;
+
+		//this function is called many times. This seems to have a slight performance benefit
+		if(isset(self::$apiProperties[$cls])) {
+			return self::$apiProperties[$cls];
+		}
+
+		$cacheKey = 'property-getApiProperties-' . $cls;
 
 		$props = go()->getCache()->get($cacheKey);
 		
@@ -577,6 +586,8 @@ abstract class Property extends Model {
 			
 			go()->getCache()->set($cacheKey, $props);
 		}
+
+		self::$apiProperties[$cls] = $props;
 		return $props;
 	}
 
@@ -691,8 +702,9 @@ abstract class Property extends Model {
 	 */
 	protected static function getDefaultFetchProperties(): array
 	{
-		
-		$cacheKey = 'property-getDefaultFetchProperties-' . static::class;
+		$cls = static::class;
+
+		$cacheKey = 'property-getDefaultFetchProperties-' . $cls;
 		
 		$props = go()->getCache()->get($cacheKey);
 		
@@ -701,6 +713,7 @@ abstract class Property extends Model {
 
 			go()->getCache()->set($cacheKey, $props);
 		}
+
 		return $props;
 	}	
 
@@ -779,6 +792,7 @@ abstract class Property extends Model {
 		return array_combine($keys, $ids);
 	}
 
+	private static $requiredProps = [];
   /**
    * Get properties that are minimally required to load for the object to function properly.
    *
@@ -788,32 +802,37 @@ abstract class Property extends Model {
 	{
 
 		$cls = static::class;
+		if(isset(self::$requiredProps[$cls])) {
+			return self::$requiredProps[$cls];
+		}
 
 		$cacheKey = $cls . '-required-props';
 
 		$required = go()->getCache()->get($cacheKey);
 
-		if($required !== null) {
-			return $required;
-		}
+		if($required === null) {
 
-		$props = static::getApiProperties();
 
-		$required = array_merge(static::getPrimaryKey(), static::internalRequiredProperties());
+			$props = static::getApiProperties();
 
-		//include these for title() in log entries
-		$titleProps = ['title', 'name', 'subject', 'description', 'displayName'];
+			$required = array_merge(static::getPrimaryKey(), static::internalRequiredProperties());
 
-		foreach($props as $name => $meta) {
-			if(in_array($name, $titleProps) || ($meta['access'] === self::PROP_PROTECTED && !empty($meta['db']))) {
-				$required[] = $name;
+			//include these for title() in log entries
+			$titleProps = ['title', 'name', 'subject', 'description', 'displayName'];
+
+			foreach ($props as $name => $meta) {
+				if (in_array($name, $titleProps) || ($meta['access'] === self::PROP_PROTECTED && !empty($meta['db']))) {
+					$required[] = $name;
+				}
 			}
+
+			$required = array_unique($required);
+
+			go()->getCache()->set($cacheKey, $required);
 		}
 
-		$required = array_unique($required);
+		self::$requiredProps[$cls] = $required;
 
-		go()->getCache()->set($cacheKey, $required);
-		
 		return $required;
 	}
 
