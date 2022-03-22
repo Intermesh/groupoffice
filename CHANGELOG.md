@@ -1,3 +1,4 @@
+22-03-2022 6.5.106
 - Core: Optimize 'optimizer_search_depth' for global search queries.
 
 22-03-2022 6.5.105
