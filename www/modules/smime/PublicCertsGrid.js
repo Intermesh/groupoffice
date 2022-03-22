@@ -78,10 +78,10 @@ GO.smime.PublicCertsGrid = function(config){
 					email:record.data.email
 				},
 				scope: this,
-				success: function(options, response, result)
-				{
+				success: function (options, response, result) {
 					let dlg = new GO.smime.CertificateDetailWindow();
 					dlg.show();
+
 
 					dlg.load(result.data);
 				}							
