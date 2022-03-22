@@ -14,6 +14,7 @@
 - Addressbook: (re-?)add search to addressbook SelectDialogPanel
 - SMIME: Show invalid certificate details instead of openssl error
 - SMIME: Fixed unkwown sender problem
+- Email: Fixed infinite loop when starttls failed
 
 20-03-2022 6.6.56
 - Core: GO::$db was accessed directly causing various errors
