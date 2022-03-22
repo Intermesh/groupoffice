@@ -961,6 +961,11 @@ use Faker;
 		 * Also see: https://mariadb.com/resources/blog/setting-optimizer-search-depth-in-mysql/
 		 */
 		public function setOptimizerSearchDepth() {
+
+			if($this->optimizerSearchDepthSet) {
+				return;
+			}
+
 			try {
 				go()->getDbConnection()->exec("SET SESSION optimizer_search_depth=4;");
 
