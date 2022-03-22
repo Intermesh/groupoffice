@@ -18,6 +18,7 @@
 - Newsletters: address lists sortable
 - ActiveSync: Z-push script timeout set to 3600 instead of unlimited
 - SMIME: Fixed error viewing public certificates
+- Core: implemented $config['debug_username'] = ['demo'];
 
 20-03-2022 6.6.56
 - Core: GO::$db was accessed directly causing various errors
