@@ -23,7 +23,10 @@ class Client {
       $this->setOption(CURLOPT_FOLLOWLOCATION, true);
       $this->setOption(CURLOPT_ENCODING, "UTF-8");
       $this->setOption(CURLOPT_USERAGENT, "Group-Office HttpClient " . go()->getVersion() . " (curl)");
-	
+
+
+	    $this->setOption(CURLOPT_CONNECTTIMEOUT, 5);
+	    $this->setOption(CURLOPT_TIMEOUT, 60);
     }
     return $this->curl;
   }

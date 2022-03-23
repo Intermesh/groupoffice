@@ -241,7 +241,7 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 
 		//Do OCSP
 
-		$cmd = "openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($publicCertFile->path())." -url ". escapeshellarg($ocspURI) ." -CAfile ". escapeshellarg($issuerPemFile->path());
+		$cmd = "timeout 5 openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($publicCertFile->path())." -url ". escapeshellarg($ocspURI) ." -CAfile ". escapeshellarg($issuerPemFile->path());
 		go()->debug("Running: $cmd");
 		exec ($cmd, $output,$ret);
 
