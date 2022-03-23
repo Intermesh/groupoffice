@@ -1,3 +1,6 @@
+6.6.58
+- Projects: bugfix do not set default task list in tasklist combo
+
 22-03-2022 6.6.57
 - Tasks: linked tasks show description in title column if applicable
 - Core: Performance optimizations
