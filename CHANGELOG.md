@@ -1,6 +1,7 @@
-6.6.58
+23-03-2022 6.6.58
 - Projects: bugfix do not set default task list in tasklist combo
 - Core: Fixed can't find related ACL entity error
+- SMIME: Added 5s timeout to openssl OCSP command
 
 22-03-2022 6.6.57
 - Tasks: linked tasks show description in title column if applicable
