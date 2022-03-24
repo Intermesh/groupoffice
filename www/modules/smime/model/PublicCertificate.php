@@ -90,7 +90,6 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 		$pubCertFile = \GO\Base\Fs\File::tempFile();
 		$valid = openssl_pkcs7_verify($inputFile->path(), null, $pubCertFile->path(), Smime::rootCertificates());
 
-
 		if (!$valid) {
 			openssl_pkcs7_verify($inputFile->path(), PKCS7_NOVERIFY, $pubCertFile->path(), Smime::rootCertificates());
 			$err = '';
@@ -99,16 +98,15 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 
 			go()->debug($err);
 
-//			throw new \Exception($err);
 		}
 		$inputFile->delete();
 		if (!$pubCertFile->exists()) {
-			throw new \Exception('Certificate appears to be valid but could not get certificate from signature. SSL Error: ' . openssl_error_string());
+			throw new \Exception('Could not get certificate from signature.');
 		}
 		$certData = $pubCertFile->getContents();
 
 		if (empty($certData)){
-			throw new \Exception('Certificate appears to be valid but could not get certificate from signature.');
+			throw new \Exception('Could not get certificate from signature.');
 		}
 
 		$arr = openssl_x509_parse($certData);

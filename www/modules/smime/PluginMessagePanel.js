@@ -91,7 +91,7 @@ GO.moduleManager.onModuleReady('email',function(){
 			if(!this.data.path)
 				this.data.path="";
 			
-			if(!this.smimeChecked){
+			//if(!this.smimeChecked){
 				GO.request({
 					maskEl:this.getEl(),
 					url: "smime/publicCertificate/verify",
@@ -122,9 +122,17 @@ GO.moduleManager.onModuleReady('email',function(){
 
 						if(callback && scope)
 							callback.call(scope, this);
-					}							
+					},
+					fail: function(options, response, result) {
+						this.smimeChecked = true;
+
+						this.smimeLink.update('<i class="icon ic-close"></i>'+ t("The certificate is invalid!", "smime"));
+						this.smimeLink.addClass("smi-invalid");
+
+						GO.errorDialog.show(result.feedback);
+					}
 				});
-			}
+			//}
 		}	
 	});
 });
