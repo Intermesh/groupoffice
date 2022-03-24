@@ -339,8 +339,11 @@ class Acl extends Entity {
 	 * @param int $userId
 	 * @return int See the self::LEVEL_* constants
 	 */
-	public static function getUserPermissionLevel(int $aclId, int $userId): int
+	public static function getUserPermissionLevel(int $aclId, ?int $userId): int
 	{
+		if(!isset($userId)) {
+			return 0;
+		}
 
 		if(User::isAdminById($userId)) {
 			return self::LEVEL_MANAGE;
