@@ -523,7 +523,7 @@ class Installer {
 	
 		// Make sure core module is accessible for everyone
 		$module  = GoCoreModule::findByName("core", "core");
-		if(!isset($module->permisions[Group::ID_EVERYONE])) {
+		if(!isset($module->permissions[Group::ID_EVERYONE])) {
 			$everyone = new model\Permission($module);
 			$module->permissions[Group::ID_EVERYONE] = $everyone;
 			$module->save();
