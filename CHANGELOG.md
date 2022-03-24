@@ -1,3 +1,5 @@
+- ldapauth: fixed delete output in dry run
+
 23-03-2022 6.6.58
 - Projects: bugfix do not set default task list in tasklist combo
 - Core: Fixed can't find related ACL entity error
