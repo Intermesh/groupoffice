@@ -213,11 +213,7 @@ class GO{
 	private static $_router;
 	private static $_request;
 	private static $_environment;
-	/**
-	 *
-	 * @var PDO
-	 */
-	public static $db;
+
 
 	private static $_modelCache;
 
@@ -227,10 +223,7 @@ class GO{
 	 * @return PDO Database connection object
 	 */
 	public static function getDbConnection(){
-		if(!isset(self::$db)){
-			self::setDbConnection();
-		}
-		return self::$db;
+		return go()->getDbConnection()->getPDO();
 	}
 	
 	/**
@@ -258,30 +251,7 @@ class GO{
 			sleep(10);
 	 */
 	public static function unsetDbConnection(){
-		self::$db=null;
-	}
-
-	public static function setDbConnection($dbname=false, $dbuser=false, $dbpass=false, $dbhost=false, $dbport=false, $options=array()){
-				
-		self::$db=null;
-
-		if($dbname===false)
-			$dbname=\GO::config()->db_name;
-
-		if($dbuser===false)
-			$dbuser=\GO::config()->db_user;
-
-		if($dbpass===false)
-			$dbpass=\GO::config()->db_pass;
-
-		if($dbhost===false)
-			$dbhost=\GO::config()->db_host;
-		
-		if($dbport===false)
-			$dbport=\GO::config()->db_port;
-		
-		
-		self::$db = go()->getDbConnection()->getPDO();//new \GO\Base\Db\PDO("mysql:host=$dbhost;dbname=$dbname;port=$dbport", $dbuser, $dbpass, $options);
+		go()->getDbConnection()->disconnect();
 	}
 
 	/**
@@ -625,15 +595,7 @@ class GO{
 		
 		//Start session here. Important that it's called before \GO::config().
 		\GO::session();
-		
-		if (!empty(\GO::config()->debug_usernames)) {
-			$usernames = explode(',',\GO::config()->debug_usernames);
-			$currentUserModel = \GO::user();
-			if (!empty($currentUserModel) && in_array($currentUserModel->username,$usernames))
-				\GO::config()->debug=true;
-		}
 
-		
 		if(!self::isInstalled()){
 			return;
 		}

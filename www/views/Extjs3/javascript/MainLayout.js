@@ -455,7 +455,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					name: 'searchText',
 					convert: function (v, data) {
 						let searchString = data.moduleName.replace('-', '').toLowerCase();
-						return searchString + ' ' + data.text.toLowerCase();
+						return searchString + ' ' + (data.text ? data.text.toLowerCase() : '?');
 					}
 				}],
 				sortInfo: {

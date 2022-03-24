@@ -1112,6 +1112,16 @@ $updates['202203281145'][] = "ALTER TABLE `core_smtp_account` ADD `maxMessagesPe
 
 
 
+$updates['202203181327'][] = "create index core_change_modSeq_entityTypeId_entityId_index
+    on core_change (modSeq, entityTypeId, entityId);";
+
+$updates['202203181327'][] = "create index core_change_user_modSeq_userId_entityTypeId_entityId_index
+    on core_change_user (modSeq, userId, entityTypeId, entityId);
+";
+
+
+
+
 // Start 6.7
 $updates['202203281145'][] = "alter table core_pdf_block modify x int null;";
 

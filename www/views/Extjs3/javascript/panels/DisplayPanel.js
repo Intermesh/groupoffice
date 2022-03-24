@@ -65,51 +65,12 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 
 	showComments: true,
 	
-	createTopToolbar : function(){
-//		
-//		this.newMenuButton = new GO.NewMenuButton({
-//			panel:this
-//		});
-//		
-//		
-		
+	createTopToolbar : function() {
+
 		var tbar=['->'];
 		
 		
 		
-//		
-//		if (!this.noLinkBrowser) {
-//			tbar.push(this.linkBrowseButton = new Ext.Button({
-//				iconCls: 'btn-link', 
-//				cls: 'x-btn-text-icon', 
-//				text: t("Links"),
-//				handler: function(){
-//					if(!GO.linkBrowser){
-//						GO.linkBrowser = new GO.LinkBrowser();
-//					}
-//					GO.linkBrowser.show({model_id: this.data.id,model_name: this.model_name,folder_id: "0"});
-//					GO.linkBrowser.on('hide', this.reload, this,{single:true});
-//				},
-//				scope: this
-//			}));
-//		}
-		
-//		if(GO.files && !this.noFileBrowser)
-//		{
-//			tbar.push(this.fileBrowseButton = new GO.files.FileBrowserButton({
-//				model_name:this.model_name
-//			}));
-//		}
-		
-//		tbar.push('-');
-//		tbar.push({            
-//	      iconCls: "btn-refresh",
-//	      text:t("Refresh"),      
-//				tooltip:t("Refresh"),      
-//	      handler: this.reload,
-//	      scope:this
-//	  });
-
 		tbar.push(this.editButton = new Ext.Button({
 				iconCls: 'btn-edit', 
 				tooltip: t("Edit"), 
@@ -171,14 +132,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		this.autoScroll=true;
 		this.split=true;
 		var tbar = this.createTopToolbar();
-	
-//		if(Ext.isArray(tbar)){
-//			tbar = new Ext.Toolbar({				
-//				enableOverflow:true,
-//				items:tbar
-//			});
-//		}
-		
+
 		if(tbar)
 			this.tbar = tbar;
 
@@ -295,12 +249,6 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	
 	onSave : function(panel, saved_id)
 	{
-		/*if(saved_id > 0 && this.data.id == saved_id)
-		{
-			this.reload();
-		}*/
-		//if(saved_id > 0 && (this.model_id == saved_id || this.model_id==0)){
-		
 		if(saved_id > 0 &&  this.model_id==0){
 			this.load(saved_id, true);
 		}
@@ -362,10 +310,8 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		}
 	},
 	
-	setData : function(data)
-	{
-		//this.body.removeAllListeners();
-		
+	setData : function(data) {
+
 		data.model_name=this.model_name.replace(/\\/g,"\\\\");
 		data.model_name_underscores = this.model_name.replace(/\\/g,"_")
 		data.panelId=this.getId();
@@ -389,9 +335,6 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			}
 		}
 
-		//
-		
-		//this.body.on('click', this.onBodyClick, this);
 	},
 
 	toggleSection : function(toggleId, collapse){
@@ -412,10 +355,10 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		if(collapse){
 			//data not loaded yet			
 
-			if(this.hiddenSections.indexOf(this.collapsibleSections[toggleId])==-1)
+			if(this.hiddenSections.indexOf(this.collapsibleSections[toggleId])==-1) {
 				this.hiddenSections.push(this.collapsibleSections[toggleId]);
-		}else
-		{
+			}
+		}else {
 			var index = this.hiddenSections.indexOf(this.collapsibleSections[toggleId]);
 			if(index>-1)
 				this.hiddenSections.splice(index,1);
@@ -423,31 +366,22 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 
 		if(!el && !collapse){
 			this.reload();
-		}else
-		{
-			if(el)
+		}else {
+			if(el) {
 				el.setDisplayed(!collapse);
+			}
 
-			if(collapse){
+			if(collapse) {
 				toggleBtn.addClass('go-tool-toggle-collapsed');
-			}else
-			{
+			} else{
 				toggleBtn.removeClass('go-tool-toggle-collapsed');
 			}
-			//dom.innerHTML = collapse ? '+' : '-';
 		}
-		if(saveState)
+		if(saveState) {
 			this.saveState();
+		}
 	},
 
-	/*collapsibleSectionHeader : function(title, id, dataKey){
-
-		this.collapsibleSections[id]=dataKey;
-
-		return '<div class="collapsible-display-panel-header">'+title+'<div class="x-tool x-tool-toggle" style="float:right;cursor:pointer" id="toggle-'+id+'" title="'+title+'">&nbsp;</div></div>';
-	},*/
-
-	
 	onBodyClick :  function(e, target){
 		
 		this.fireEvent('bodyclick', this, target, e);
@@ -459,25 +393,22 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			this.toggleSection(toggleId);
 		}
 
-		if(target.tagName!='A')
-		{
+		if(target.tagName!='A') {
 			target = Ext.get(target).findParent('A', 10);
-			if(!target)
+			if(!target) {
 				return false;
+			}
 		}	
 		
-		if(target.tagName=='A' && target.attributes['href'])
-		{			
+		if(target.tagName=='A' && target.attributes['href']) {
 			var href=target.attributes['href'].value;
-			if(href.substr(0,3)=='go:')
-			{
+			if(href.substr(0,3)=='go:') {
 				var fn = href.substr(3);
 
 				eval("this." + fn);
 
 				e.preventDefault();				
-			}else 
-			{
+			} else {
 				this.fireEvent('afterbodyclick', this, target, e, href);
 			}
 		}		
@@ -492,24 +423,20 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	},
 	
 	afterLoad : function(loadResponseData) {
-	
-		
 		this.fireEvent('afterload',this.model_id);
-		
 	},
 	
-	load : function(id, reload)
-	{
+	load : function(id, reload) {
 		this.fireEvent('beforeload',this, id);
 		
-		if(this.loading && id==this.model_id)
+		if(this.loading && id==this.model_id) {
 			return false;
+		}
 		
 		if(this.expandListenObject.collapsed || !this.rendered){
 			//model_id is needed for editHandlers
 			this.collapsedLinkId=this.model_id=id;
-		}else//else if(this.model_id!=id || reload)
-		{
+		} else {
 			this.loading=true;
 
 			this.loadParams[this.idParam]=this.model_id=this.link_id=id;
@@ -529,8 +456,9 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 
 					this.setData(result.data);
 					this.onLoad();
-					if(!reload)
+					if(!reload) {
 						this.body.scrollTo('top', 0);
+					}
 					
 					this.stopLoading.defer(300, this);
 					

@@ -443,7 +443,7 @@ abstract class Module extends Singleton {
 	 * When this is not overriden there are no extra permissions. Groups van still be added
 	 * @return array name => label
 	 */
-	public function getRights(): array
+	public final function getRights(): array
 	{
 		$types = $this->rights();
 		$result = [];
@@ -453,7 +453,14 @@ abstract class Module extends Singleton {
 		return $result;
 	}
 
-	// default backwards compatible
+	/**
+	 * Returns the flags that can be set for module rights
+	 *
+	 * For existing modules always add new types to the end for migration purposes Otherwise
+	 * permissions will mix
+	 *
+	 * @return string[]
+	 */
 	protected function rights(): array
 	{
 		return ['mayManage'];

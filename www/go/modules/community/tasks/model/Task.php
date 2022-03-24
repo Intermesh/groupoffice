@@ -301,6 +301,9 @@ class Task extends AclInheritEntity {
 	{
 
 		return parent::defineFilters()
+			->addText("title", function(Criteria $criteria, $comparator, $value, Query $query, array $filters){
+				$criteria->where('title', $comparator, $value);
+			})
 			->add('tasklistId', function(Criteria $criteria, $value) {
 				if(!empty($value)) {
 					$criteria->where(['tasklistId' => $value]);

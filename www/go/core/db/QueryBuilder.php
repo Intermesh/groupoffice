@@ -167,8 +167,14 @@ class QueryBuilder {
 					if(is_int($colName)) {
 						$colName = $columns[$colName];
 					}
-					
-					if($value instanceof Expression) {
+					if($value instanceof Query) {
+						$build = $value->build();
+
+						$tags[] = '(' . $build['sql'] .')';
+
+						$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
+
+					} else if($value instanceof Expression) {
 						$tags[] = (string) $value;
 					} else
 					{				

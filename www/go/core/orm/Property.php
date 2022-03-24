@@ -245,7 +245,7 @@ abstract class Property extends Model {
 					}
 
 					if(!$prop && $relation->autoCreate) {
-						$prop = new $cls($this);
+						$prop = new $cls($this, true, [], $this->readOnly);
 						$this->applyRelationKeys($relation, $prop);
 					}
 					$this->{$relation->name} = $prop;
@@ -313,17 +313,17 @@ abstract class Property extends Model {
 	private static function queryScalar($where, Relation $relation) {
 		$cacheKey = static::class.':'.$relation->name;
 
-		if(!isset(self::$cachedRelations[$cacheKey])) {
+		if(!isset(self::$cachedRelationStmts[$cacheKey])) {
 			$key = $relation->getScalarColumn();
 			$query = (new Query)->selectSingleValue($key)->from($relation->tableName);
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
 			}
 			$stmt = $query->createStatement();
-			self::$cachedRelations[$cacheKey] = $stmt;
+			self::$cachedRelationStmts[$cacheKey] = $stmt;
 		} else
 		{
-			$stmt = self::$cachedRelations[$cacheKey] ;			
+			$stmt = self::$cachedRelationStmts[$cacheKey] ;
 		}
 
 		foreach($where as $field => $value) {
@@ -337,28 +337,44 @@ abstract class Property extends Model {
 	/**
 	 * For reusing prepared statements
 	 */
-	private static $cachedRelations = [];
+	private static $cachedRelationStmts = [];
+
+
+	/**
+	 * Needed to close the database connection
+	 *
+	 * @return void
+	 */
+	public static function clearCachedRelationStmts() {
+		self::$cachedRelationStmts = [];
+	}
 
 
 	private static function queryRelation($cls, array $where, Relation $relation, $readOnly, $owner): Statement
 	{
+		$cacheKey = static::class.':'.$relation->name;
 
-		/** @var Entity $cls */
-		$query = $cls::internalFind([], $readOnly, $owner);
+		if(!isset(self::$cachedRelationStmts[$cacheKey])) {
+			/** @var Entity $cls */
+			$query = $cls::internalFind([], $readOnly, $owner);
 
-		foreach($where as $field => $value) {
-			$query->andWhere($field . '= :'.$field);
+			foreach ($where as $field => $value) {
+				$query->andWhere($field . '= :' . $field);
+			}
+
+			if (is_a($relation->propertyName, UserProperty::class, true)) {
+				$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
+			}
+
+			if (!empty($relation->orderBy)) {
+				$query->orderBy([$relation->orderBy => 'ASC']);
+			}
+
+			$stmt = self::$cachedRelationStmts[$cacheKey] = $query->createStatement();
+		}else
+		{
+			$stmt = self::$cachedRelationStmts[$cacheKey] ;
 		}
-
-		if(is_a($relation->propertyName, UserProperty::class, true)){
-			$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
-		}
-
-		if(!empty($relation->orderBy)) {
-			$query->orderBy([$relation->orderBy => 'ASC']);
-		}
-
-		$stmt = $query->createStatement();
 
 		foreach($where as $field => $value) {
 			$stmt->bindValue(':'.$field, $value);
@@ -489,8 +505,6 @@ abstract class Property extends Model {
 
 	private static $mapping;
 
-
-
 	public static function clearCache() {
 		self::$mapping = [];
 	}
@@ -538,12 +552,21 @@ abstract class Property extends Model {
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
 
+	private static $apiProperties = [];
+
   /**
    * @inheritDoc
    */
 	public static function getApiProperties(): array
 	{
-		$cacheKey = 'property-getApiProperties-' . static::class;
+		$cls = static::class;
+
+		//this function is called many times. This seems to have a slight performance benefit
+		if(isset(self::$apiProperties[$cls])) {
+			return self::$apiProperties[$cls];
+		}
+
+		$cacheKey = 'property-getApiProperties-' . $cls;
 
 		$props = go()->getCache()->get($cacheKey);
 		
@@ -565,6 +588,8 @@ abstract class Property extends Model {
 			
 			go()->getCache()->set($cacheKey, $props);
 		}
+
+		self::$apiProperties[$cls] = $props;
 		return $props;
 	}
 
@@ -664,7 +689,7 @@ abstract class Property extends Model {
 	 	 */
 	public static function atypicalApiProperties(): array
 	{
-		return ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString'];
+		return ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString', 'searchDescription', 'returnAsText'];
 	}
 
 	/**
@@ -679,8 +704,9 @@ abstract class Property extends Model {
 	 */
 	protected static function getDefaultFetchProperties(): array
 	{
-		
-		$cacheKey = 'property-getDefaultFetchProperties-' . static::class;
+		$cls = static::class;
+
+		$cacheKey = 'property-getDefaultFetchProperties-' . $cls;
 		
 		$props = go()->getCache()->get($cacheKey);
 		
@@ -689,6 +715,7 @@ abstract class Property extends Model {
 
 			go()->getCache()->set($cacheKey, $props);
 		}
+
 		return $props;
 	}	
 
@@ -741,6 +768,7 @@ abstract class Property extends Model {
 		return array_combine($keys, $ids);
 	}
 
+	private static $requiredProps = [];
   /**
    * Get properties that are minimally required to load for the object to function properly.
    *
@@ -750,32 +778,37 @@ abstract class Property extends Model {
 	{
 
 		$cls = static::class;
+		if(isset(self::$requiredProps[$cls])) {
+			return self::$requiredProps[$cls];
+		}
 
 		$cacheKey = $cls . '-required-props';
 
 		$required = go()->getCache()->get($cacheKey);
 
-		if($required !== null) {
-			return $required;
-		}
+		if($required === null) {
 
-		$props = static::getApiProperties();
 
-		$required = array_merge(static::getPrimaryKey(), static::internalRequiredProperties());
+			$props = static::getApiProperties();
 
-		//include these for title() in log entries
-		$titleProps = ['title', 'name', 'subject', 'description', 'displayName'];
+			$required = array_merge(static::getPrimaryKey(), static::internalRequiredProperties());
 
-		foreach($props as $name => $meta) {
-			if(in_array($name, $titleProps) || ($meta['access'] === self::PROP_PROTECTED && !empty($meta['db']))) {
-				$required[] = $name;
+			//include these for title() in log entries
+			$titleProps = ['title', 'name', 'subject', 'description', 'displayName'];
+
+			foreach ($props as $name => $meta) {
+				if (in_array($name, $titleProps) || ($meta['access'] === self::PROP_PROTECTED && !empty($meta['db']))) {
+					$required[] = $name;
+				}
 			}
+
+			$required = array_unique($required);
+
+			go()->getCache()->set($cacheKey, $required);
 		}
 
-		$required = array_unique($required);
+		self::$requiredProps[$cls] = $required;
 
-		go()->getCache()->set($cacheKey, $required);
-		
 		return $required;
 	}
 
@@ -940,6 +973,10 @@ abstract class Property extends Model {
 	 * @return array|bool eg. ["propName" => [newval, oldval]]
 	 */
 	private function internalGetModified($properties = [], bool $forIsModified = false) {
+
+		if($this->readOnly) {
+			return $forIsModified ? false : [];
+		}
 
 		if(!is_array($properties)) {
 			$properties = [$properties];

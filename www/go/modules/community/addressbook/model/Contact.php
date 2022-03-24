@@ -816,7 +816,7 @@ class Contact extends AclItemEntity {
 		if(!parent::internalSave()) {
 			return false;
 		}
-		
+
 		if(empty($this->uid) || empty($this->uri)) {
 			//We need the auto increment ID for the UID so we need to save again if this is a new contact
 			$this->getUid();
@@ -826,9 +826,9 @@ class Contact extends AclItemEntity {
 		if($this->isOrganization && $this->isModified(['name']) && !$this->updateEmployees()) {
 			return false;
 		}
-		
+
 		return $this->saveOriganizationIds();
-		
+
 	}
 
 	private function updateEmployees(): bool
@@ -890,18 +890,20 @@ class Contact extends AclItemEntity {
 
 	private static $organizationIdsStmt;
 
-	private static function prepareFindOrganizations(): \go\core\db\Statement
-	{
-		if(!isset(self::$organizationIdsStmt)) {
-			self::$organizationIdsStmt = self::find()
+	private static function prepareFindOrganizations() {
+		$stmt = go()->getDbConnection()->getCachedStatment('contact-organizations');
+		if(!$stmt) {
+			$stmt = self::find()
 				->selectSingleValue('c.id')
 				->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = ' . self::entityType()->getId())
 				->where('fromId = :contactId')
 				->andWhere('fromEntityTypeId = ' . self::entityType()->getId())
 				->andWhere('c.isOrganization = true')
 				->createStatement();
+
+			go()->getDbConnection()->cacheStatement('contact-organizations', $stmt);
 		}
-		return self::$organizationIdsStmt;
+		return $stmt;
 	}
 	
 	private $organizationIds;
@@ -968,7 +970,7 @@ class Contact extends AclItemEntity {
 
 	public function getSearchDescription(): string
 	{
-		$addressBook = AddressBook::findById($this->addressBookId, ['name']);
+		$addressBook = AddressBook::findById($this->addressBookId, ['name'], true);
 
 		$orgStr = "";	
 		

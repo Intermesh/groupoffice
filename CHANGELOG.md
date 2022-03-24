@@ -1,9 +1,58 @@
+6.6.59
+- Core: bugfix saving ACL groups
+- ldapauth: fixed delete output in dry run
+- Core: Fixed error in getting permission level when not logged in
+- SMIME: Fixed printing on smime error
+- SMIME: Do OCSP check on stored public certificates too
+- Email: Auto grow html editor in email composer on mobile mode
+- Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
+  For example foo/bar can be found with "foo/bar", "foo" and "bar"._
+  Note: A rebuild is required to make it work on existing entries
+- core: update chinese translation. Thanks bin wu!
+- Files: New permission to show main screen or not. This was it's possible to use files only for other items like
+  project, contacts etc.
+
+23-03-2022 6.6.58
+- Projects: bugfix do not set default task list in tasklist combo
+- Core: Fixed can't find related ACL entity error
+- SMIME: Added 5s timeout to openssl OCSP command
+- EMail: Accounts can be searched on username and smtp_host too
+
+22-03-2022 6.6.57
+- Tasks: linked tasks show description in title column if applicable
+- Core: Performance optimizations
+- Smime: Don't check permissions on sending a system message with smime
+- Notes: added "name" and "content" filter to client
+- Email: Fixed error message when hitting refresh lots of times in the email module
+- Projects: fix template event 'Task' in case of due date
+- Projects: disable 'time registration' button for completed projects
+- Projects: do not check for budgeting permissions if no budgets set
+- Core: fixed relative url's in module stylesheets
+- Addressbook: Added tiktok and instagram url types
+- Core: When an update is installed. The system shows a system unavailable message instead of lauching the upgrade page
+- Core: link browser remembers entity selection
+- Addressbook: (re-?)add search to addressbook SelectDialogPanel
+- SMIME: Show invalid certificate details instead of openssl error
+- SMIME: Fixed unkwown sender problem
+- Email: Fixed infinite loop when starttls failed
+- Newsletters: address lists sortable
+- ActiveSync: Z-push script timeout set to 3600 instead of unlimited
+- SMIME: Fixed error viewing public certificates
+- Core: implemented $config['debug_usernames'] = ['demo'];
+- Projects: Refresh task list panel upon deleting tasklist
+
+20-03-2022 6.6.56
+- Core: GO::$db was accessed directly causing various errors
+
+20-03-2022 6.6.55
 - Core: enter key on grid did not open edit dialog
 - Tasks: Sorting by 'responsible' and 'categories' works
 - Core: SMIME sign via config.php failed with error
 - Core: Yes no field renders empty in grid if not set.
 - IMAP Authenticator: Allow wildcard and only enable TLS if set in config
 - Core: trim username on login
+- Email: fixed error when css contained @keyframes.
+- Core: DB connection disconnect was broken due to caching of statements
 
 15-03-2022 6.6.54
 - Core: when using SMIME signing in the config.php it failed on a certificate failure
@@ -34,6 +83,9 @@
 - Core: Fixed: Login via AccessToken or ApiKey throws SSE error #816
 - Imap authenticator: Add STARTTLS support to IMAP Authenticator module #815
 - Core: changed new message sound
+- Core: Selected row color has priority over hover color
+- Core: Fixed searching for : token enclosed in "". For example "%foo:bar%"
+- Tasks: Fixed invalid filter tasklistid and added title
 
 08-03-2022 6.6.49
 - Core: updated German Translation. Thanks Peter!
@@ -239,6 +291,15 @@
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+22-03-2022 6.5.106
+- Core: Optimize 'optimizer_search_depth' for global search queries.
+
+22-03-2022 6.5.105
+- Core: updated PT-BR translations. Thank you George!
+- Core: updated CN translations. Thank you Cheng Yupeng!
+- Core: ActiveSync timeout set to 3600 seconds
+- Email: if starttls failed an infite loop could occur
 
 03-03-2022 6.5.104
 - Leavedays: add several missing columns to report CSV, fix sort order, fix calculation

@@ -50,7 +50,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 						->select("t.id,t.host,t.user_id,t.username,t.smtp_host,a.email, a.name")
-						->searchFields(array('a.email','a.name','t.host'))
+						->searchFields(array('a.email','a.name','t.host','t.username', 't.smtp_host'))
 						->joinModel(array(
 				'tableAlias' => 'a',
 				'model' => 'GO\Email\Model\Alias',

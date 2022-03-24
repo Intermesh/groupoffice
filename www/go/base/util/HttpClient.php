@@ -69,6 +69,9 @@ class HttpClient{
 		//set ajax header for Group-Office
 		$this->setCurlOption(CURLOPT_HTTPHEADER, array("X-Requested-With: XMLHttpRequest"));
 
+		$this->setCurlOption(CURLOPT_CONNECTTIMEOUT, 5);
+		$this->setCurlOption(CURLOPT_TIMEOUT, 60);
+
 	}
 	
 	/**

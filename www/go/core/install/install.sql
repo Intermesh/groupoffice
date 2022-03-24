@@ -1153,3 +1153,9 @@ CREATE TABLE `core_permission` (
           REFERENCES `core_group` (`id`)
           ON DELETE CASCADE
           ON UPDATE NO ACTION);
+
+create index core_change_modSeq_entityTypeId_entityId_index
+    on core_change (modSeq, entityTypeId, entityId);
+
+create index core_change_user_modSeq_userId_entityTypeId_entityId_index
+    on core_change_user (modSeq, userId, entityTypeId, entityId);

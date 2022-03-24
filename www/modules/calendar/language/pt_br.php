@@ -189,7 +189,7 @@ return array (
   'I haven\'t decided yet' => 'Ainda não decidi se participarei',
   'The following event has been updated by the organizer' => 'O seguinte evento foi atualizado pelo organizador',
   'Would you like to send a cancellation notice to the participants?' => 'Deseja informar aviso sobre o cancelamento para os participantes?',
-  'Would you like to notify the organizer that you will not attend by e-mail?' => 'Deseja informar ao organizador; por e-mail; que você não irá participar?',
+  'Would you like to notify the organizer that you will not attend by e-mail?' => 'Deseja informar ao organizador, por e-mail, que você não irá participar?',
   'Notify participants?' => 'Notificar participantes?',
   'Send notification?' => 'Enviar notificação?',
   'Would you like to notify the participants by e-mail?' => 'Deseja informar os participantes por e-mail?',
@@ -269,4 +269,6 @@ legacy;calendar;Publish iCalendar file of last month and future events. Caution!
   'Past events' => 'Eventos passados',
   'Visible tasklists' => 'Listas de tarefas visíveis',
   'Tasklist' => 'Lista de tarefas',
+  'Note that if the event is marked as private' => ' the files of this event are still accessible by users who have permissions to this event\'s calendar.',
+  'Ok' => 'Ok',
 );

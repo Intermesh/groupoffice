@@ -76,8 +76,16 @@ class Debugger {
 	 * @throws Exception
 	 */
 	public function __construct() {
-		if(!empty(go()->getConfig()['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')) {
+		if((isset($_REQUEST['r']) && $_REQUEST['r'] ==  'core/debug')) {
+			return;
+		}
+
+		if(!empty(go()->getConfig()['debug'])) {
 			$this->enable(go()->getConfig()['debug_log']);
+		} else if(!empty(go()->getConfig()['debug_usernames']) && is_array(go()->getConfig()['debug_usernames'])) {
+			if(go()->getAuthState() && ($user = go()->getAuthState()->getUser(['username'])) && in_array($user->username, go()->getConfig()['debug_usernames'])) {
+				$this->enable(go()->getConfig()['debug_log']);
+			}
 		}
 	}
 

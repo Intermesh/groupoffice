@@ -316,14 +316,14 @@ GO.email.MessagesGrid = function(config){
 				GO.email.showComposer({account_id: this.account_id});
 			},
 			scope: this
-		}),{
+		}),this.btnRefresh = new Ext.Button({
 			iconCls: 'ic-autorenew',
 			tooltip: t("Refresh"),
 			handler: function(){
 				this.emailClient.refresh(true);
 			},
 			scope: this
-		},this.deleteButton = new Ext.Button({
+		}),this.deleteButton = new Ext.Button({
 			iconCls: 'ic-delete',
 			tooltip: t("Delete"),
 			handler: function(){

@@ -496,18 +496,33 @@ END;
 		//Split on non word chars followed by whitespace or end of string. This wat initials like J.K. or french dates
 		//01.01.2020 can be found too.
 //		$keywords = mb_split('[^\w\-_\+\\\\\/:](\s|$)*', mb_strtolower($text), -1);
+
+		//remove all characters we don't care
+
 		$text = preg_replace('/[^\w\-_+\\\\\/\s:@]/u', '', mb_strtolower($text));
-		$text = preg_replace('/[-]+/u', '-', $text);
-		$text = preg_replace('/[_]+/u', '_', $text);
-		$keywords = mb_split("\s+", $text);
+
+		//split on white space and some common joining chars
+		$keywords = mb_split("[\s_\-\\\\\/]+", $text);
 
 		//filter small words
-		if(count($keywords) > 1) {
-			$keywords = array_filter($keywords, function ($word) {
-				return strlen($word) > 2;
-			});
-		}
+//		if(count($keywords) > 1) {
+//			$keywords = array_filter($keywords, function ($word) {
+//				return strlen($word) > 2;
+//			});
+//		}
 
 		return $keywords;
+
+		// Add words separated too when they are joined with -, /, \ or _. eg. Jansen-Pietersen or test/foo
+		// so they can be found with Jansen-Pietersen but also with Pietersen
+//		$secondPassKeywords = [];
+//		foreach ($keywords as $keyword) {
+//			$split = mb_split('[_\-\\\\\/]', $keyword);
+//			if(count($split) > 1) {
+//				$secondPassKeywords = array_merge($secondPassKeywords, $split);
+//			}
+//		}
+
+//		return array_merge($keywords, $secondPassKeywords);
 	}
 }

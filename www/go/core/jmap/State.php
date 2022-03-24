@@ -271,9 +271,6 @@ class State extends AbstractState {
 	 * @param array $properties the properties to fetch
 	 * @return User|null
 	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
 	 */
 	public function getUser(array $properties = []): ?User
 	{

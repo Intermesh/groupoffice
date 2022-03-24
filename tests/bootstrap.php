@@ -9,6 +9,7 @@ use go\core\App;
 use go\core\cli\controller\System;
 use go\core\cli\State;
 use GO\Base\Model\Module;
+use go\core\model\User;
 use GO\Demodata\Controller\DemodataController;
 
 const INSTALL_NEW = 0;
@@ -30,12 +31,15 @@ try {
 	$c = new core\util\ArrayObject(go()->getConfig());
 	$c->mergeRecursive($config);
 	go()->setConfig($c->getArray());
+	GO::clearCache(); //legacy
+
+	go()->getCache()->flush(false);
 
 	// Install new if db doesn't exist otherwise use existing
 	$installDb = !go()->isInstalled() ? INSTALL_NEW : INSTALL_NONE;
 
 	// Always install
-	//$installDb = INSTALL_NEW;
+//	$installDb = INSTALL_NEW;
 
 //	For testing upgrades use:
 //	$installDb = INSTALL_UPGRADE;
@@ -72,6 +76,9 @@ try {
 
 		$installer = go()->getInstaller();
 		$installer->install($admin);
+
+
+
 
 		\go\modules\community\test\Module::get()->install();
 

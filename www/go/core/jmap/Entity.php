@@ -552,9 +552,10 @@ abstract class Entity  extends OrmEntity {
 			}
 		}
 
+
 		//unofficial response but we use it to process no more than 100000 changes. A resync is
 		//more efficient in the webclient in that case.
-		$result['totalChanges'] = $changesQuery->foundRows();
+		$result['totalChanges'] = 0;//$changesQuery->foundRows();
 		
 		if($changes->rowCount() > $maxChanges && $count) {
 			$states[1]['offset'] += $maxChanges;
@@ -635,8 +636,8 @@ abstract class Entity  extends OrmEntity {
 	{
     return (new Query)
             ->select('entityId,max(destroyed) AS destroyed')
-	          ->calcFoundRows()
             ->from('core_change', 'change')
+	          ->useIndex("USE INDEX (core_change_modSeq_entityTypeId_entityId_index)")
             ->fetchMode(PDO::FETCH_ASSOC)
             ->groupBy(['entityId'])
             ->where(["entityTypeId" => static::entityType()->getId()])

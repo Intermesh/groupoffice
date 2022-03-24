@@ -108,7 +108,9 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 			tbar: [{
 				xtype: "tbtitle",
 				text: t("Address books")
-			}, '->', 
+			}, '->', {
+				xtype: "tbsearch"
+			},
 			//add back button for smaller screens
 			{
 				//this class will hide it on larger screens

@@ -551,7 +551,7 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 	 */
 	public function actionTruncateHolidays($params){
 		
-		$pdo_statement = \GO::$db->query('TRUNCATE TABLE '.\GO\Base\Model\Holiday::model()->tableName(). ';');
+		$pdo_statement = \GO::getDbConnection()->query('TRUNCATE TABLE '.\GO\Base\Model\Holiday::model()->tableName(). ';');
 		
 		if($pdo_statement->execute()){
 			echo 'Table '.\GO\Base\Model\Holiday::model()->tableName().' is truncated.';
