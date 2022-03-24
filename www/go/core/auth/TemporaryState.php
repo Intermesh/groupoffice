@@ -26,7 +26,7 @@ class TemporaryState extends AbstractState {
 	public function getUser(array $properties = []): ?User
 	{
 		if(!empty($properties)) {
-			return $this->user ?? $this->userId ? User::findById($this->userId, $properties) : null;
+			return $this->user ?? ($this->userId ? User::findById($this->userId, $properties) : null);
 		}
 
 		if(!$this->user) {
@@ -48,6 +48,14 @@ class TemporaryState extends AbstractState {
 	public function setUserId(?int $userId): TemporaryState
 	{
 		$this->userId = $userId;
+
+		if(!empty(go()->getConfig()['debug_usernames'])) {
+			$user = $this->getUser(['username']);
+			if(in_array($user->username, go()->getConfig()['debug_usernames'])) {
+				go()->getDebugger()->enable(true);
+			}
+		}
+
 		return $this;
 	}
 

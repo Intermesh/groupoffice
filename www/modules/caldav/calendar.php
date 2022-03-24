@@ -62,7 +62,7 @@ $tree = array(
 
 $server = new Sabre\DAV\Server($tree);
 
-$server->debugExceptions = \GO::config()->debug;
+$server->debugExceptions = go()->getDebugger()->enabled;
 
 $server->on('exception', function($e){
 	\GO::debug((string) $e);
