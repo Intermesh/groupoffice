@@ -96,4 +96,5 @@ return array (
   'All contacts' => '所有联系人',
   'Add online url' => '添加在线网址',
   'Not found or no access' => '未找到或无法访问',
+  'Contact' => '联系人',
 );
