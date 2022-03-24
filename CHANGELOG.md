@@ -5,6 +5,8 @@
 - SMIME: Fixed printing on smime error
 - SMIME: Do OCSP check on stored public certificates too
 - Email: Auto grow html editor in email composer on mobile mode
+- Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
+  For example foo/bar can be found with "foo/bar", "foo" and "bar"._
 
 23-03-2022 6.6.58
 - Projects: bugfix do not set default task list in tasklist combo
