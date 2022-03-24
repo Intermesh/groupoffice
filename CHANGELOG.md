@@ -292,6 +292,9 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+22-03-2022 6.5.106
+- Core: Optimize 'optimizer_search_depth' for global search queries.
+
 22-03-2022 6.5.105
 - Core: updated PT-BR translations. Thank you George!
 - Core: updated CN translations. Thank you Cheng Yupeng!
