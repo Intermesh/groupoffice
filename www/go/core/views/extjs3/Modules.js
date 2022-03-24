@@ -18,7 +18,7 @@ go.Modules = (function () {
 		 * Register a module.
 		 *
 		 * @see www/go/modules/community/addressbook/views/extjs3/Module.js for an extended example.
-		 *
+		 * @see FileBrowser.js for an example on how to add panels conditionally to the main tab panel
 		 *
 		 * @param {string} package
 		 * @param {string} name

@@ -297,3 +297,6 @@ $updates['202112231349'][] = "ALTER TABLE `fs_files` ROW_FORMAT=DYNAMIC;";
 $updates['202112231349'][] = "alter table fs_files
     modify name varchar(260) collate utf8mb4_bin not null;";
 
+
+
+$updates['202203241627'][] = "update core_permission set rights = rights + 2 where moduleId = (select id from core_module where name='files' and package is null);";
