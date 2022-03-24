@@ -1,3 +1,6 @@
+6.6.59
+- Core: bugfix saving ACL groups
+
 23-03-2022 6.6.58
 - Projects: bugfix do not set default task list in tasklist combo
 - Core: Fixed can't find related ACL entity error

@@ -168,7 +168,7 @@ class Acl extends Entity {
 	 * Add a group to the ACL
 	 *
 	 * @param int $groupId
-	 * @param int $level
+	 * @param int|null $level
 	 * @return $this
 	 *
 	 * @example
@@ -176,7 +176,7 @@ class Acl extends Entity {
 	 * $acl->addGroup(Group::ID_INTERNAL)->save();
 	 * ```
 	 */
-	public function addGroup(int $groupId, int $level = self::LEVEL_READ): Acl
+	public function addGroup(int $groupId, ?int $level = self::LEVEL_READ): Acl
 	{
 
 		if(empty($level)) {
