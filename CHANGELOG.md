@@ -4,6 +4,7 @@
 - Core: Fixed error in getting permission level when not logged in
 - SMIME: Fixed printing on smime error
 - SMIME: Do OCSP check on stored public certificates too
+- Email: Auto grow html editor in email composer on mobile mode
 
 23-03-2022 6.6.58
 - Projects: bugfix do not set default task list in tasklist combo

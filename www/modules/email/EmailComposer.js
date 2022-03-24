@@ -324,8 +324,13 @@ GO.email.EmailComposer = function(config) {
 	this.formPanel = new Ext.form.FormPanel({
 		border : false,		
 		waitMsgTarget : true,
-		cls : 'go-form-panel',		
-		layout:"border",
+		cls : 'go-form-panel',
+		desktop: {
+			layout: "border",
+		},
+		mobile: {
+			autoScroll: true
+		},
 		items : [{
 			region:"north",
 			layout:'form',
