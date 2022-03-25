@@ -1,4 +1,4 @@
-6.6.59
+25-03-2022 6.6.59
 - Core: bugfix saving ACL groups
 - ldapauth: fixed delete output in dry run
 - Core: Fixed error in getting permission level when not logged in
