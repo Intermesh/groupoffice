@@ -13,6 +13,7 @@ use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use GO\Savemailas\Model\LinkedEmail;
 
 /**
  * Link model
@@ -64,6 +65,17 @@ class Link extends AclItemEntity
 	public $toSearchId;
 	
 	protected $aclId;
+
+	public function getData() {
+		if($this->toEntity == 'LinkedEmail') {
+			// NOTE!: This will only work because has_attachments is readonly modseq of this Link model will not be updated
+			// Use the client side EntityStore for newer modules
+			// Remove when Email module is ported to JMAP
+			$to = $this->findToEntity();
+			return ['has_attachments' => $to ? $to->has_attachments : 0];
+		}
+		return null;
+	}
 
 	protected $permissionLevel;
 	

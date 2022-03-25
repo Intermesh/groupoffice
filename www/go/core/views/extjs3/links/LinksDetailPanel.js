@@ -22,7 +22,8 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 				'toId', 
 				'toSearchId',
 				{name: 'createdAt', type: 'date'}, 
-				'toEntity'
+				'toEntity',
+				'data'
 			],
 			entityStore: "Link",
 			listeners: {
@@ -50,7 +51,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 					<i class="label ' + this.link.iconCls + '" ext:qtip="{toEntity}"></i>\
 				</tpl>\
 				<tpl for="to">\
-					<a>{name}</a>\
+					<a>{name} <tpl if="parent.data && parent.data.has_attachments "><i class="icon">attachment</i></tpl></a>\
 					<small class="go-top-right" title="{[go.util.Format.dateTime(values.modifiedAt)]}" style="cursor:pointer">{[go.util.Format.userDateTime(values.modifiedAt)]}</small>\
 					<label>{description}</label>\
 				</tpl>\
