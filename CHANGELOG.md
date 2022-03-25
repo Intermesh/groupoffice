@@ -11,6 +11,7 @@
 - core: update chinese translation. Thanks bin wu!
 - Files: New permission to show main screen or not. This was it's possible to use files only for other items like
   project, contacts etc.
+- Core: Database check fixes AclOwnerEntity without ACL set
 
 23-03-2022 6.6.58
 - Projects: bugfix do not set default task list in tasklist combo

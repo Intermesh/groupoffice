@@ -4,6 +4,7 @@ namespace go\core\acl\model;
 use Exception;
 use go\core\model\Acl;
 use go\core\App;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\core\db\Expression;
 
@@ -394,10 +395,24 @@ abstract class AclOwnerEntity extends AclEntity {
 		parent::check();
 	}
 
+
+	private static function checkEmptyAcls() {
+		foreach(self::find(['id', static::$aclColumnName])->where(static::$aclColumnName, '=', null) as $model) {
+			$model->createAcl();
+			if(!$model->save()) {
+				throw new SaveException($model);
+			}
+		}
+
+	}
+
 	/**
 	 * @throws Exception
 	 */
 	public static function checkAcls() {
+
+		self::checkEmptyAcls();
+
 		$table = static::getMapping()->getPrimaryTable();
 
 		//set owner and entity properties of acl
