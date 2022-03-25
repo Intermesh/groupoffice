@@ -127,7 +127,7 @@ class Authenticate {
 	 *
 	 * @param string $username
 	 * @param string $password
-	 * @return false|User
+	 * @return false|User For performance reasons the user is fetched read only and partially with properties: ['id', 'username', 'password', 'enabled']
 	 * @throws Exception
 	 */
 	public function passwordLogin(string $username, string $password) {

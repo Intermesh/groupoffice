@@ -31,8 +31,13 @@ use go\core\Module;
 use go\core\model\Module as GoModule;
 use GO\Files\Model\Folder;
 
-class FilesModule extends \GO\Base\Module{	
-	
+class FilesModule extends \GO\Base\Module{
+
+
+	public function getRights()
+	{
+		return ['mayManage' => 1, 'mayAccessMainPanel' => 2];
+	}
 	
 	public static function initListeners() {
 
@@ -184,6 +189,17 @@ class FilesModule extends \GO\Base\Module{
 		$acl = $shared->setNewAcl(1);
 		$acl->addGroup(Group::ID_INTERNAL, \GO\Base\Model\Acl::DELETE_PERMISSION);
 		$shared->save();
+
+
+		// Set access to main screen default
+		$stmt = go()->getDbConnection()->replace('core_permission',
+			[
+				'moduleId' => go()->getDbConnection()->selectSingleValue('id')->from('core_module')->where(['name' => 'files', 'package' => null]),
+				'groupId' => \go\core\model\Group::ID_INTERNAL,
+				'rights' => 2
+			]);
+		$stmt->execute();
+
 
 	}
 	

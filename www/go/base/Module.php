@@ -72,6 +72,13 @@ class Module extends Observable {
 		return $this->name();
 	}
 
+	/**
+	 * Returns the flags for different permissions a module can have.
+	 * There's always mayRead by default. This default implmentation add mayManage.
+	 * When adding new permissions make sure to add them to the end with a new integer for migration purposes.
+	 *
+	 * @return int[]
+	 */
 	public function getRights() {
 		return ['mayManage' => 1];
 	}

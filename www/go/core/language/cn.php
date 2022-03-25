@@ -966,7 +966,6 @@ return array (
   'Desktop notifications active' => '桌面通知处于活动状态',
   'Show a popup window when an e-mail arrives' => '电子邮件到达时显示弹出窗口',
   'Mail reminders' => '邮件提醒',
-  'Look & feel' => '外观',
   'Reset windows and grids' => '重置窗口和网格',
   'Are you sure you want to reset all grid columns, windows, panel sizes etc. to the factory defaults?' => '您确定要将所有网格列、窗口、面板尺寸等重置为出厂默认设置吗？',
   'Provide your current password to save your user settings.' => '提供您当前的密码以保存您的用户设置。',

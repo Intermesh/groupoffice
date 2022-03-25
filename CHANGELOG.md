@@ -1,11 +1,22 @@
 6.6.59
 - Core: bugfix saving ACL groups
 - ldapauth: fixed delete output in dry run
-|
+- Core: Fixed error in getting permission level when not logged in
+- SMIME: Fixed printing on smime error
+- SMIME: Do OCSP check on stored public certificates too
+- Email: Auto grow html editor in email composer on mobile mode
+- Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
+  For example foo/bar can be found with "foo/bar", "foo" and "bar"._
+  Note: A rebuild is required to make it work on existing entries
+- core: update chinese translation. Thanks bin wu!
+- Files: New permission to show main screen or not. This was it's possible to use files only for other items like
+  project, contacts etc.
+
 23-03-2022 6.6.58
 - Projects: bugfix do not set default task list in tasklist combo
 - Core: Fixed can't find related ACL entity error
 - SMIME: Added 5s timeout to openssl OCSP command
+- EMail: Accounts can be searched on username and smtp_host too
 
 22-03-2022 6.6.57
 - Tasks: linked tasks show description in title column if applicable
@@ -280,6 +291,9 @@
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+22-03-2022 6.5.106
+- Core: Optimize 'optimizer_search_depth' for global search queries.
 
 22-03-2022 6.5.105
 - Core: updated PT-BR translations. Thank you George!

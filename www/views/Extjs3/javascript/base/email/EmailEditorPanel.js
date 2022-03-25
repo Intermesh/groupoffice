@@ -175,14 +175,22 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		config.items.push(this.hiddenAttachmentsField);
 		config.items.push(this.hiddenInlineImagesField);
 		
-		var anchorHeight = config.enableSubjectField ? "-" + dp(32) : "100%";
+		var anchorHeight = config.enableSubjectField ?	 "-" + dp(32) : "100%";
 
 
 		this.htmlEditor = new GO.form.HtmlEditor({
+			mobile: {
+				grow: true,
+				growMinHeight: 300,
+				anchor: "100%"
+			},
+			desktop: {
+				anchor: '100% '+anchorHeight,
+			},
 			name:'htmlbody',
 			hideLabel: true,
 			headingsMenu: false,
-			anchor: '100% '+anchorHeight,
+
 			plugins:this.initHtmlEditorPlugins(),
 			//this font is applied here because it must match the one in htmleditor.scss. Ext will copy this style to the body tag.
 			style: "font: " + dp(16) + "px  Helvetica, Arial, sans-serif",

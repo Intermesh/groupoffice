@@ -364,7 +364,7 @@ class Sync extends Controller {
   }
 
   private function deleteGroups($groupsInLDAP, $maxDeletePercentage, $dryRun) {
-    $groups = Group::find()
+    $groups = Group::find(['id','name'])
       ->join('ldapauth_server_group_sync', 's', 's.groupId = g.id')
       ->where('serverId', '=', $this->serverId)->execute();
 

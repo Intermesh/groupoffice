@@ -12,4 +12,5 @@ return array (
   'Label' => '标签',
   'Menu item' => '菜单项',
   'Global properties' => '全局属性',
+  'Website Manager' => '网站管理员',
 );
