@@ -734,7 +734,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$imap = $account->openImapConnection($account->sent);
 			if(!$imap->append_message($account->sent, $message, "\Seen")){
 				$response['success']=false;
-				$response['feedback'].='Failed to save send item to '.$account->sent;
+				$response['feedback'].='Failed to save sent item to '.$account->sent;
 			}
 		}		
 
