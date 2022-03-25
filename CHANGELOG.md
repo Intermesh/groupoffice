@@ -1,4 +1,4 @@
-6.6.59
+25-03-2022 6.6.59
 - Core: bugfix saving ACL groups
 - ldapauth: fixed delete output in dry run
 - Core: Fixed error in getting permission level when not logged in
@@ -7,10 +7,13 @@
 - Email: Auto grow html editor in email composer on mobile mode
 - Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
   For example foo/bar can be found with "foo/bar", "foo" and "bar"._
-  Note: A rebuild is required to make it work on existing entries
+  Note: A rebuild is required to make it work on existing entries. The upgrade schedules this at midnight.
 - core: update chinese translation. Thanks bin wu!
 - Files: New permission to show main screen or not. This was it's possible to use files only for other items like
   project, contacts etc.
+- Core: Database check fixes AclOwnerEntity without ACL set
+- Tickets: Refresh button in display panel
+- Core: Permissions to change groups and or users only allow to edit existing groups. You can't creaye new ones.
 
 23-03-2022 6.6.58
 - Projects: bugfix do not set default task list in tasklist combo
@@ -291,6 +294,10 @@
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+- Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
+  For example foo/bar can be found with "foo/bar", "foo" and "bar"._
+  Note: A rebuild is required to make it work on existing entries.
 
 22-03-2022 6.5.106
 - Core: Optimize 'optimizer_search_depth' for global search queries.

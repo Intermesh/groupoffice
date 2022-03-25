@@ -171,6 +171,7 @@ CREATE TABLE IF NOT EXISTS `em_links` (
   `subject` varchar(255) DEFAULT NULL,
   `time` int(11) NOT NULL DEFAULT '0',
   `path` varchar(255) DEFAULT NULL,
+  `has_attachments` tinyint(1) DEFAULT 0,
   `ctime` int(11) NOT NULL,
   `mtime` int(11) NOT NULL DEFAULT '0',
 	`muser_id` int(11) NOT NULL DEFAULT '0',

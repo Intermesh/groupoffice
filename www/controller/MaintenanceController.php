@@ -507,7 +507,7 @@ class MaintenanceController extends AbstractController {
 		
 				
 		if(!empty($params['module'])){
-			if($params['module']=='base'){
+			if($params['module']=='base' || $params['module']=='core'){
 				$this->_checkCoreModels();
 			}else {
 				if (empty($params['package']) || $params['package'] == 'legacy') {

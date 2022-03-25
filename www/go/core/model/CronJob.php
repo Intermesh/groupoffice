@@ -27,6 +27,7 @@ abstract class CronJob {
 		$cron->moduleId = $module->id;
 		$cron->name = $cron->description = $name;
 		$cron->expression = $expression;
+		$cron->enabled = true;
 
 		if(!$cron->save()) {
 			throw new Exception("Couldn't save cronjob " . $cron->getValidationErrorsAsString());

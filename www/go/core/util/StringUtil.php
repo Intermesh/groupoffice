@@ -483,46 +483,59 @@ END;
 
 	/**
 	 * Split text by non word characters to get useful search keywords.
+	 *
 	 * @param ?string $text
+	 * @param bool $forSave Split differently on save then when searching
+	 *
+	 * Case "Jansen-Pietersen"
+	 *
+	 * For save store:
+	 * - Jansen-Pietersen
+	 * - Jansen
+	 * - Pietersen
+	 *
+	 * On search do:
+	 * - Jansen-Pietersen"%
+	 *
 	 * @return string[]
 	 */
-	public static function splitTextKeywords(?string $text): array
+	public static function splitTextKeywords(?string $text, bool $forSave = true): array
 	{
 
 		if(empty($text)) {
 			return [];
 		}
 
-		//Split on non word chars followed by whitespace or end of string. This wat initials like J.K. or french dates
-		//01.01.2020 can be found too.
-//		$keywords = mb_split('[^\w\-_\+\\\\\/:](\s|$)*', mb_strtolower($text), -1);
-
-		//remove all characters we don't care
-
+		//remove all characters we don't care about
 		$text = preg_replace('/[^\w\-_+\\\\\/\s:@]/u', '', mb_strtolower($text));
 
-		//split on white space and some common joining chars
-		$keywords = mb_split("[\s_\-\\\\\/]+", $text);
+		if($forSave) {
+			//split on white space
+			$keywords = mb_split("[\s]+", $text);
 
-		//filter small words
-//		if(count($keywords) > 1) {
-//			$keywords = array_filter($keywords, function ($word) {
-//				return strlen($word) > 2;
-//			});
-//		}
+			// Add words separated too when they are joined with -, /, \ or _. eg. Jansen-Pietersen or test/foo
+			// so they can be found with Jansen-Pietersen but also with Pietersen
+			$secondPassKeywords = [];
+			foreach ($keywords as $keyword) {
+				$split = mb_split('[_\-\\\\\/]', $keyword);
+				if(count($split) > 1) {
+					$secondPassKeywords = array_merge($secondPassKeywords, $split);
+				}
+			}
 
-		return $keywords;
+			$keywords = array_merge($keywords, $secondPassKeywords);
+		} else{
+			// for search just split on white space
+			// for search just split on white space
+			$keywords = mb_split("[\s]+", $text);;
+		}
 
-		// Add words separated too when they are joined with -, /, \ or _. eg. Jansen-Pietersen or test/foo
-		// so they can be found with Jansen-Pietersen but also with Pietersen
-//		$secondPassKeywords = [];
-//		foreach ($keywords as $keyword) {
-//			$split = mb_split('[_\-\\\\\/]', $keyword);
-//			if(count($split) > 1) {
-//				$secondPassKeywords = array_merge($secondPassKeywords, $split);
-//			}
-//		}
+		//remove empty stuff.
+		return array_filter($keywords, function($keyword) {
+			$word = preg_replace("/[^\w]/", "", $keyword);
+			return !empty($word);
+		});
 
-//		return array_merge($keywords, $secondPassKeywords);
+
 	}
 }

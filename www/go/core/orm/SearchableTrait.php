@@ -22,7 +22,7 @@ trait SearchableTrait {
 	 * 
 	 * @return string
 	 */
-	abstract public function getSearchDescription(): string;
+	abstract protected function getSearchDescription(): string;
 	
 	/**
 	 * All the keywords that can be searched on.
@@ -103,7 +103,7 @@ trait SearchableTrait {
 		go()->setOptimizerSearchDepth();
 
 		$i = 0;
-		$words = StringUtil::splitTextKeywords($searchPhrase);
+		$words = StringUtil::splitTextKeywords($searchPhrase, false);
 		$words = array_unique($words);
 
 		foreach($words as $word) {
