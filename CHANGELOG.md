@@ -7,7 +7,7 @@
 - Email: Auto grow html editor in email composer on mobile mode
 - Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
   For example foo/bar can be found with "foo/bar", "foo" and "bar"._
-  Note: A rebuild is required to make it work on existing entries
+  Note: A rebuild is required to make it work on existing entries. The upgrade schedules this at midnight.
 - core: update chinese translation. Thanks bin wu!
 - Files: New permission to show main screen or not. This was it's possible to use files only for other items like
   project, contacts etc.
