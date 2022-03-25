@@ -23,9 +23,9 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 		this.title = t("Groups");
 		this.store = new go.data.Store({
 			filters: {
-				hideUsers: {
-					//excludeEveryone: true,
-					hideUsers: true
+				default: {
+					hideUsers: true,
+					permissionLevel: go.permissionLevels.write
 				}
 			},
 			fields: [
@@ -36,7 +36,11 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'users', type: "relation", limit: 5}
 				
 			],
-			entityStore: "Group"
+			entityStore: "Group",
+			sortInfo: {
+				field: "name",
+				direction: "asc"
+			}
 		});
 
 		Ext.apply(this, {
@@ -47,7 +51,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 						'text'					
 					]
 				}, {
-					disabled: !go.Modules.get("core", "core").userRights.mayChangeGroups,
+					disabled: !go.User.isAdmin,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
@@ -55,6 +59,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 						dlg.show();
 					}
 				}, {
+					disabled: !go.User.isAdmin,
 					iconCls: 'ic-settings',
 					tooltip: t("Group defaults"),
 					handler: function() {
@@ -120,7 +125,6 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 		this.moreMenu = new Ext.menu.Menu({
 			items: [
 				{
-					disabled: !go.Modules.get("core", "core").userRights.mayChangeGroups,
 					itemId: "view",
 					iconCls: 'ic-edit',
 					text: t("Edit"),
@@ -132,7 +136,6 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				},
 				"-",
 				{
-					disabled: !go.Modules.get("core", "core").userRights.mayChangeGroups,
 					itemId: "delete",
 					iconCls: 'ic-delete',
 					text: t("Delete"),
@@ -143,7 +146,15 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					},
 					scope: this
 				},
-			]
+			],
+			listeners: {
+				scope: this,
+				show: function(menu) {
+					var record = this.store.getAt(menu.rowIndex);
+
+					menu.items.item("delete").setDisabled(record.json.permissionLevel < go.permissionLevels.writeAndDelete);
+				}
+			}
 		});
 
 

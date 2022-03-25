@@ -13,6 +13,7 @@
   project, contacts etc.
 - Core: Database check fixes AclOwnerEntity without ACL set
 - Tickets: Refresh button in display panel
+- Core: Permissions to change groups and or users only allow to edit existing groups. You can't creaye new ones.
 
 23-03-2022 6.6.58
 - Projects: bugfix do not set default task list in tasklist combo

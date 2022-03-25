@@ -4,11 +4,12 @@ go.usersettings.VisibleToPanel = Ext.extend(Ext.Panel, {
 	layout: "fit",
 	initComponent: function() {
 
-		this.items = [this.sharePanel = new go.permissions.SharePanel({
+		this.items = [
+			this.sharePanel = new go.permissions.SharePanel({
 			header: false,
 			name: "personalGroup.acl",
 			showLevels: false,
-			disabled: !go.User.isAdmin
+			disabled: !go.Modules.get("core", "core").userRights.mayChangeUsers,
 		})];
 
 		this.supr().initComponent.call(this);

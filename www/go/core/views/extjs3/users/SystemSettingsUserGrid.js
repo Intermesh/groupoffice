@@ -117,7 +117,11 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 
 		this.store = new go.data.Store({
 			fields: cols.fields,
-			entityStore: "User"
+			entityStore: "User",
+			sortInfo: {
+				field: "displayName",
+				direction: "asc"
+			}
 		});
 
 		Ext.apply(this, {
@@ -139,12 +143,13 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			},{
 				iconCls: 'ic-add',
 				tooltip: t('Add'),
-				disabled: !go.Modules.get("core", "core").userRights.mayChangeUsers,
+				disabled: !go.User.isAdmin,
 				handler: function (e, toolEl) {
 					var dlg = new go.users.CreateUserWizard();
 					dlg.show();
 				}
 			},{
+				disabled: !go.User.isAdmin,
 				iconCls: 'ic-more-vert',
 				menu: [
 					{
@@ -339,6 +344,8 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				show: function(menu) {
 
 					var record = this.store.getAt(menu.rowIndex);
+
+					menu.items.item("delete").setDisabled(!go.User.isAdmin);
 
 					var archiveItm  = menu.find('itemId','archive'), loginItm = menu.find('itemId', 'loginAs');
 					if(archiveItm.length > 0) {
