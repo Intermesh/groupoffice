@@ -38,22 +38,60 @@ trait SearchableTrait {
 
 	/**
 	 * Split text by non word characters to get useful search keywords.
-	 * @param $text
+	 *
+	 * @param ?string $text
+	 * @param bool $forSave Split differently on save then when searching
+	 *
+	 * Case "Jansen-Pietersen"
+	 *
+	 * For save store:
+	 * - Jansen-Pietersen
+	 * - Jansen
+	 * - Pietersen
+	 *
+	 * On search do:
+	 * - Jansen-Pietersen"%
+	 *
 	 * @return string[]
 	 */
-	public static function splitTextKeywords($text) {
+	public static function splitTextKeywords(?string $text, bool $forSave = true): array
+	{
 
 		if(empty($text)) {
 			return [];
 		}
 
+		//remove all characters we don't care about
 		$text = preg_replace('/[^\w\-_+\\\\\/\s:@]/u', '', mb_strtolower($text));
 
-		//split on white space and some common joining chars
-		$keywords = mb_split("[\s_\-\\\\\/]+", $text);
+		if($forSave) {
+			//split on white space
+			$keywords = mb_split("[\s]+", $text);
+
+			// Add words separated too when they are joined with -, /, \ or _. eg. Jansen-Pietersen or test/foo
+			// so they can be found with Jansen-Pietersen but also with Pietersen
+			$secondPassKeywords = [];
+			foreach ($keywords as $keyword) {
+				$split = mb_split('[_\-\\\\\/]', $keyword);
+				if(count($split) > 1) {
+					$secondPassKeywords = array_merge($secondPassKeywords, $split);
+				}
+			}
+
+			$keywords = array_merge($keywords, $secondPassKeywords);
+		} else{
+			// for search just split on white space
+			// for search just split on white space
+			$keywords = mb_split("[\s]+", $text);;
+		}
+
+		//remove empty stuff.
+		return array_filter($keywords, function($keyword) {
+			$word = preg_replace("/[^\w]/", "", $keyword);
+			return !empty($word);
+		});
 
 
-		return $keywords;
 	}
 
 	/**
@@ -110,7 +148,7 @@ trait SearchableTrait {
 		go()->setOptimizerSearchDepth();
 
 		$i = 0;
-		$words = SearchableTrait::splitTextKeywords($searchPhrase);
+		$words = SearchableTrait::splitTextKeywords($searchPhrase, false);
 		$words = array_unique($words);
 
 
