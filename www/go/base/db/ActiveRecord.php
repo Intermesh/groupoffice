@@ -4563,10 +4563,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Pass another model to this function and they will be linked with the
 	 * Group-Office link system.
-
 	 * @param \go\core\orm\Entity|self|GO\Base\Model\SearchCacheRecord $model
 	 */
-
 	public function link($model, $description='', $this_folder_id=0, $model_folder_id=0){
 
 		$isSearchCacheModel = ($this instanceof \GO\Base\Model\SearchCacheRecord);
@@ -4586,78 +4584,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		Link::create($this, $model);
 
-//		if($this->linkExists($model))
-//			return true;
-//
-//
-//
-//		if($model instanceof \GO\Base\Model\SearchCacheRecord){
-//			$to_model_id = $model->entityId;
-//			$to_model_type_id = $model->entityTypeId;
-//		}else
-//		{
-//			$to_model_id = $model->id;
-//			$to_model_type_id = $model->entityType()->getId();
-//		}
-//
-//
-//
-//		$from_model_type_id = $isSearchCacheModel ? $this->entityTypeId : $this->modelTypeId();
-//
-//		$from_model_id = $isSearchCacheModel ? $this->model_id : $this->id;
-//
-//		if($to_model_id == $from_model_id && $to_model_type_id == $from_model_type_id) {
-//			//don't link to self
-//			return true;
-//		}
-//
-//		//Link::create()
-//
-//		if(!\go\core\App::get()->getDbConnection()->insert('core_link', [
-//				"toId" => $to_model_id,
-//				"toEntityTypeId" => $to_model_type_id,
-//				"fromId" => $from_model_id,
-//				"fromEntityTypeId" => $from_model_type_id,
-//				"description" => $description,
-//				"createdAt" => new \DateTime('now',new \DateTimeZone('UTC'))
-//
-//		])->execute()){
-//			return false;
-//		}
-//
-//		$reverse = [];
-//		$reverse['fromEntityTypeId'] = $to_model_type_id;
-//		$reverse['toEntityTypeId'] = $from_model_type_id;
-//		$reverse['toId'] = $from_model_id;
-//		$reverse['fromId'] = $to_model_id;
-//		$reverse['description'] = $description;
-//		$reverse['createdAt'] = new \DateTime('now',new \DateTimeZone('UTC'));
-//
-//
-//		if(!\go\core\App::get()->getDbConnection()->insert('core_link', $reverse)->execute()) {
-//			return false;
-//		}
-
 		$this->fireEvent('link', array($this, $model, $description, $this_folder_id, $model_folder_id));
 		return true;
 	}
-
-//	/**
-//	 * Can be overriden to do something after linking. It's a public method because sometimes
-//	 * searchCacheRecord models are used for linking. In that case we can call the afterLink method of the real model instead of the searchCacheRecord model.
-//	 *
-//	 * @param ActiveRecord $model
-//	 * @param boolean $isSearchCacheModel True if the given model is a search cache model.
-//	 *	In that case you can use the following code to get the real model:  $realModel = $isSearchCacheModel ? GO::getModel($this->model_name)->findByPk($this->model_id) : $this;
-//	 * @param string $description
-//	 * @param int $this_folder_id
-//	 * @param int $model_folder_id
-//	 * @param boolean $linkBack
-//	 * @return boolean
-//	 */
-//	public function afterLink(ActiveRecord $model, $isSearchCacheModel, $description='', $this_folder_id=0, $model_folder_id=0, $linkBack=true){
-//		return true;
-//	}
 
 	/**
 	 * 

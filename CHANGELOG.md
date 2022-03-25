@@ -295,6 +295,10 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+- Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
+  For example foo/bar can be found with "foo/bar", "foo" and "bar"._
+  Note: A rebuild is required to make it work on existing entries.
+
 22-03-2022 6.5.106
 - Core: Optimize 'optimizer_search_depth' for global search queries.
 
