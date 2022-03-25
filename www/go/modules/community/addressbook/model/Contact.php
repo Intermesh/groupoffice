@@ -962,7 +962,7 @@ class Contact extends AclItemEntity {
 		return true;
 	}
 
-	public function getSearchDescription(): string
+	protected function getSearchDescription(): string
 	{
 		$addressBook = AddressBook::findById($this->addressBookId, ['name'], true);
 

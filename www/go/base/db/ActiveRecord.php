@@ -1511,7 +1511,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$joins .= "\nINNER JOIN core_search search ON search.entityId = t.id and search.entityTypeId = " . static::entityType()->getId();
 
 				$i = 0;
-				$words = StringUtil::splitTextKeywords($params['searchQuery']);
+				$words = StringUtil::splitTextKeywords($params['searchQuery'], false);
 				$words = array_unique($words);
 
 				foreach($words as $word) {
