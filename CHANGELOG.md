@@ -5,6 +5,7 @@
 - Core: Block concurrent Foo/Set requests to make sure clients don't miss state
 - Core: If Foo/set throws statematch the client retries automatically.
 - Core: Locking with semaphore functions if available
+- Projects: when saving a task from a project template set current TZ
 
 25-03-2022 6.6.59
 - Core: bugfix saving ACL groups
