@@ -106,8 +106,8 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 				$me->{$key} = $rule[$key];
 			}
 		}
-		if(isset($rule->until)) {
-			$me->until = DateTimeParser::parse($rule['until'], $me->startDate->getTimezone());
+		if(isset($rule['until'])) {
+			$me->until = DateTimeParser::parse(str_replace('-','', $rule['until']) , $me->startDate->getTimezone());
 			if ($me->until < $me->startDate) {
 				$me->until = $me->startDate;
 			}

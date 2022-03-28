@@ -99,6 +99,7 @@
 - Core: updated German Translation. Thanks Peter!
 - Core: fixed merge reusing id's and created unittest for it
 - ActiveSync: catch access denied exception in getFolder()
+- Tasks: bugfix 'until' for repeating tasks
 
 03-03-2022 6.6.48
 - Core: Optimize 'optimizer_search_depth' for global search queries.
