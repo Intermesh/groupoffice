@@ -106,6 +106,7 @@ class CronJobSchedule extends Entity {
 		}
 		
 		$now = new CoreDateTime();
+		$now->setTimezone(new \DateTimeZone(go()->getSettings()->defaultTimezone));
 		$cronExpression = CronExpression::factory($this->expression);
 		return $cronExpression->getNextRunDate($now);
 	}

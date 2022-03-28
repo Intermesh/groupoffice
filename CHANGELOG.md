@@ -1,3 +1,7 @@
+6.6.60
+
+- Core: let cron jobs run in default time zone
+
 25-03-2022 6.6.59
 - Core: bugfix saving ACL groups
 - ldapauth: fixed delete output in dry run
