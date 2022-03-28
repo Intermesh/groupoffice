@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
+
 namespace go\core\util;
 
 use Exception;
@@ -10,7 +11,9 @@ use function GO;
  */
 class Lock {
 
-
+	/**
+	 * @var resource
+	 */
 	private $sem;
 	/**
 	 * @var bool
@@ -58,6 +61,9 @@ class Lock {
 		return sem_acquire($this->sem, !$this->blocking );
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function lockWithFlock() : bool {
 		$lockFolder = GO()
 			->getDataFolder()
