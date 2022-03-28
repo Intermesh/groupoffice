@@ -2,6 +2,9 @@
 - Core: let cron jobs run in default time zone
 - Core: only show yes no field in detail panel when value is set
 - Core: Fixed deadlock problem with JMAP sync modseq values
+- Core: Block concurrent Foo/Set requests to make sure clients don't miss state
+- Core: If Foo/set throws statematch the client retries automatically.
+- Core: Locking with semaphore functions if available
 
 25-03-2022 6.6.59
 - Core: bugfix saving ACL groups

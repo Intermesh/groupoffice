@@ -835,6 +835,14 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 				return response;
 			}).catch((error) => {
+
+
+				if(error.type && error.type == 'stateMismatch') {
+					return this.getUpdates().then(() => {
+						return this.set(params);
+					})
+				}
+
 				this.fireEvent("error", options, error);
 				if(cb) {
 					cb.call(scope || this, options, false, error);
