@@ -4,7 +4,8 @@
 require ('../www/GO.php');
 go()->getDebugger()->output = true;
 
-for($i = 0; $i < 1; $i++) {
+//go()->getDbConnection()->beginTransaction();
+for($i = 0; $i < 100; $i++) {
 
 	echo $i ."\n";
  try {
@@ -16,3 +17,5 @@ for($i = 0; $i < 1; $i++) {
 	 echo getmypid() . " ". $e->getMessage() ."\n";
  }
 }
+
+//go()->getDbConnection()->commit();

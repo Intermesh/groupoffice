@@ -160,13 +160,10 @@ abstract class AbstractConverter {
 
 			try {
 
-				go()->getDbConnection()->beginTransaction();
-
 				$entity = $this->importEntity();
 				
 				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
 				if($entity === false) {
-					go()->getDbConnection()->rollBack();
 					$this->index++;
 					continue;
 				}			
@@ -174,18 +171,14 @@ abstract class AbstractConverter {
 				$entity->save();
 
 				if($entity->hasValidationErrors()) {
-					go()->getDbConnection()->rollBack();
 					$response['errors'][] = "Item ". $this->index . ": ". var_export($entity->getValidationErrors(), true);
 				} elseif($this->afterSave($entity)) {
-					go()->getDbConnection()->commit();
 					$response['count']++;
 				} else{
-					go()->getDbConnection()->rollBack();
 					$response['errors'][] = "Item ". $this->index . ": Import afterSave returned false";
 				}				
 			}
 			catch(Exception $e) {
-				go()->getDbConnection()->rollBack();
 				ErrorHandler::logException($e);
 				$response['errors'][] = "Item ". $this->index . ": ".$e->getMessage();
 			}

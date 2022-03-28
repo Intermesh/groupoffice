@@ -16,6 +16,7 @@ use go\core\model\Acl;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
 use InvalidArgumentException;
+use PDO;
 use PDOException;
 
 /**
@@ -48,6 +49,12 @@ class EntityType implements ArrayableInterface {
 	protected $highestModSeq;
 	
 	private $highestUserModSeq;
+
+	private $modSeqIncremented = false;
+	/**
+	 * @var bool
+	 */
+	private $userModSeqIncremented = false;
 
 
 	/**
@@ -185,6 +192,8 @@ class EntityType implements ArrayableInterface {
 	{
 		$this->highestModSeq = null;
 		$this->highestUserModSeq = null;
+		$this->modSeqIncremented = false;
+		$this->userModSeqIncremented = false;
 
 		return $this;
 	}
@@ -206,7 +215,7 @@ class EntityType implements ArrayableInterface {
 	}
 	public function __wakeup()
 	{
-		$this->highestModSeq = null;
+		$this->clearCache();
 	}
 
   /**
@@ -242,12 +251,11 @@ class EntityType implements ArrayableInterface {
 		return $i;
 	}
 
-	private static $cache;
-
   /**
    * @return array
    */
 	private static function getCache() :array {
+
 		$cache = go()->getCache()->get('entity-types');
 
 		if($cache === null) {
@@ -369,10 +377,10 @@ class EntityType implements ArrayableInterface {
 			return true;
 		}
 
-		$this->highestModSeq = $this->nextModSeq();		
+		$this->highestModSeq = $this->nextModSeq();
 		
 		if(!is_array($changedEntities)) {
-			$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);		
+			$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);
 		} else {
 
 			if(empty($changedEntities)) {
@@ -443,11 +451,12 @@ class EntityType implements ArrayableInterface {
 	 * @return void
 	 */
 	public function resetSyncState() : void {
-		$this->highestModSeq = 0;
+		$this->clearCache();
+
 		App::get()->getDbConnection()
 			->update(
 				"core_entity",
-				['highestModSeq' => 0],
+				['highestModSeq' => null],
 				Query::normalize(["id" => $this->id])
 					->tableAlias('entity')
 			)->execute(); //mod seq is a global integer that is incremented on any entity update
@@ -544,10 +553,9 @@ class EntityType implements ArrayableInterface {
    */
 	public function nextModSeq() : int {
 
-//		if($this->modSeqIncremented) {
-//			return $this->highestModSeq;
-//		}
-		go()->getDbConnection()->lock(["core_entity" => [true, 'entity']]);
+		if($this->modSeqIncremented) {
+			return $this->highestModSeq;
+		}
 
 		App::get()->getDbConnection()
 						->update(
@@ -556,13 +564,13 @@ class EntityType implements ArrayableInterface {
 										Query::normalize(["id" => $this->id])->tableAlias('entity')
 						)->execute(); //mod seq is a global integer that is incremented on any entity update
 
-		$modSeq = go()->getDbConnection()->query("SELECT LAST_INSERT_ID()")->fetch(\PDO::FETCH_COLUMN, 0);
-		go()->debug($this->getName() ." " .$modSeq );
+		$modSeq = go()->getDbConnection()
+			->query("SELECT LAST_INSERT_ID()")
+			->fetch(PDO::FETCH_COLUMN, 0);
 
-		go()->getDbConnection()->unlockTables();
-
+		$this->modSeqIncremented = true;
 		$this->highestModSeq = $modSeq;
-		
+
 		return $modSeq;
 	}
 
@@ -573,26 +581,27 @@ class EntityType implements ArrayableInterface {
 	 * @throws PDOException
 	 */
 	public function nextUserModSeq() : int {
-		
-		$modSeq = (new Query())
-			->selectSingleValue("highestModSeq")
-			->from("core_change_user_modseq")
-			->where(["entityTypeId" => $this->id, "userId" => go()->getUserId()])
-			->forUpdate()
-			->single();
 
-		$modSeq++;
+		if($this->userModSeqIncremented) {
+			return $this->userModSeqIncremented;
+		}
+
 
 		App::get()->getDbConnection()
-						->replace(
-										"core_change_user_modseq", 
-										[
-												'highestModSeq' => $modSeq,
-												"entityTypeId" => $this->id,
-												"userId" => go()->getUserId()
-										]
-						)->execute(); //mod seq is a global integer that is incremented on any entity update
+			->update(
+				"core_change_user_modseq",
+				'highestModSeq = LAST_INSERT_ID(highestModSeq  +  1)',
+				Query::normalize([
+					"entityTypeId" => $this->id,
+					"userId" => go()->getUserId()
+				])->tableAlias('entity')
+			)->execute(); //mod seq is a global integer that is incremented on any entity update
 
+		$modSeq = go()->getDbConnection()
+			->query("SELECT LAST_INSERT_ID()")
+			->fetch(PDO::FETCH_COLUMN, 0);
+
+		$this->userModSeqIncremented = true;
 		$this->highestUserModSeq = $modSeq;
 		
 		return $modSeq;
