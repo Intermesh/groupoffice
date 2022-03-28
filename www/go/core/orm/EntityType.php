@@ -543,29 +543,23 @@ class EntityType implements ArrayableInterface {
    * @throws PDOException
    */
 	public function nextModSeq() : int {
-		
 
-		/*
-		 * START TRANSACTION
-		 * SELECT counter_field FROM child_codes FOR UPDATE;
-		  UPDATE child_codes SET counter_field = counter_field + 1;
-		 * COMMIT
-		 */
-		$modSeq = (new Query())
-						->selectSingleValue("highestModSeq")
-						->from("core_entity", 'entity')
-						->where(["id" => $this->id])
-						->forUpdate()
-						->single();
-		$modSeq++;
+//		if($this->modSeqIncremented) {
+//			return $this->highestModSeq;
+//		}
+		go()->getDbConnection()->lock(["core_entity" => [true, 'entity']]);
 
 		App::get()->getDbConnection()
 						->update(
-										"core_entity", 
-										['highestModSeq' => $modSeq],
+										"core_entity",
+										'highestModSeq = LAST_INSERT_ID(highestModSeq  +  1)',
 										Query::normalize(["id" => $this->id])->tableAlias('entity')
 						)->execute(); //mod seq is a global integer that is incremented on any entity update
-	
+
+		$modSeq = go()->getDbConnection()->query("SELECT LAST_INSERT_ID()")->fetch(\PDO::FETCH_COLUMN, 0);
+		go()->debug($this->getName() ." " .$modSeq );
+
+		go()->getDbConnection()->unlockTables();
 
 		$this->highestModSeq = $modSeq;
 		

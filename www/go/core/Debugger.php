@@ -257,7 +257,7 @@ class Debugger {
 		}
 
 		 if($this->output) {
-		 	echo $line;
+		 	echo getmypid() . " " .$line;
 		 }
 
 		if(is_resource($this->logFp)) {
