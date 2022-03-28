@@ -602,10 +602,9 @@ abstract class EntityController extends Controller {
 
 		// make sure there are no concurrent set request to avoid clients missing states
 		$lock = new Lock("jmap-set-lock");
-		while(!$lock->lock()) {
-			usleep(10000);
+		if (!$lock->lock()) {
+			throw new Exception("Could not obtain lock");
 		}
-
 
 		$oldState = $this->getState();
 

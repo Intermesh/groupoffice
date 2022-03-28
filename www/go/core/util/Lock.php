@@ -12,9 +12,14 @@ class Lock {
 
 
 	private $sem;
+	/**
+	 * @var bool
+	 */
+	private $blocking;
 
-	public function __construct($name) {
+	public function __construct(string $name, bool $blocking = true) {
 		$this->name = $name;
+		$this->blocking = $blocking;
 	}
 	
 	private $name;
@@ -50,7 +55,7 @@ class Lock {
 	private function lockWithSem() : bool {
 		go()->debug("lockWithSem");
 		$this->sem = sem_get( hexdec(substr(md5($this->name), 24)));
-		return sem_acquire($this->sem );
+		return sem_acquire($this->sem, !$this->blocking );
 	}
 
 	private function lockWithFlock() : bool {
@@ -69,7 +74,7 @@ class Lock {
 			throw new Exception("Could not create or open the file for writing.\rPlease check if the folder permissions are correct so the webserver can create and open files in it.\rPath: '" . $lockFile->getPath() . "'");
 		}
 
-		if (!flock($this->lockFp, LOCK_EX|LOCK_NB, $wouldblock)) {
+		if (!flock($this->lockFp, $this->blocking ? LOCK_EX : LOCK_EX|LOCK_NB, $wouldblock)) {
 
 			//unset it because otherwise __destruct will destroy the lock
 			if(is_resource($this->lockFp)) {
