@@ -4,14 +4,11 @@ namespace go\core\db;
 
 use Exception;
 use go\core\App;
-use go\core\model\Acl;
-use go\core\orm\CustomFieldsModel;
 use go\core\orm\Property;
 use LogicException;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Sabre\DAV\Xml\Element\Prop;
 
 /**
  * The database connection object. It uses PDO to connect to the database.

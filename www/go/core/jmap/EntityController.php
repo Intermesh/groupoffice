@@ -15,6 +15,7 @@ use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use go\core\util\Lock;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -595,25 +596,31 @@ abstract class EntityController extends Controller {
    */
 	protected function defaultSet(array $params): array
 	{
-
 		$this->trackSaves();
 
 		$p = $this->paramsSet($params);
 
+		// make sure there are no concurrent set request to avoid clients missing states
+		$lock = new Lock("jmap-set-lock");
+		while(!$lock->lock()) {
+			usleep(10000);
+		}
+
+
 		$oldState = $this->getState();
 
 		if (isset($p['ifInState']) && $p['ifInState'] != $oldState) {
-			throw new StateMismatch();
+			throw new StateMismatch("State mismatch. The server state " . $oldState . ' does not match your state ' .$p['ifInState']);
 		}
 
 		$result = [
-				'accountId' => $p['accountId'],
-				'created' => null,
-				'updated' => null,
-				'destroyed' => null,
-				'notCreated' => null,
-				'notUpdated' => null,
-				'notDestroyed' => null,
+			'accountId' => $p['accountId'],
+			'created' => null,
+			'updated' => null,
+			'destroyed' => null,
+			'notCreated' => null,
+			'notUpdated' => null,
+			'notDestroyed' => null,
 		];
 
 		$this->createEntitites($p['create'], $result);
@@ -624,6 +631,8 @@ abstract class EntityController extends Controller {
 
 		$result['oldState'] = $oldState;
 		$result['newState'] = $this->getState();
+
+		$lock->unlock();
 
 		return $result;
 	}

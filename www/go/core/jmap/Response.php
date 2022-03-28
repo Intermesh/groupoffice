@@ -51,6 +51,9 @@ class Response extends HttpResponse
 	 */
 	public function addError(array $responseData = null) {
 		$this->data[] = ["error",  $responseData, $this->clientCallId];
+
+		go()->getDebugger()->debug("response:",0, false);
+		go()->getDebugger()->error($responseData,0, false);
 	}
 	
 	/**
