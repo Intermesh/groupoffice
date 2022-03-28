@@ -2,6 +2,7 @@
 - Core: let cron jobs run in default time zone
 - Core: only show yes no field in detail panel when value is set
 - Core: Fixed deadlock problem with JMAP sync modseq values
+- Projects: when saving a task from a project template set current TZ
 
 25-03-2022 6.6.59
 - Core: bugfix saving ACL groups
