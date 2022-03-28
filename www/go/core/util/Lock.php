@@ -48,6 +48,7 @@ class Lock {
 	public function lock() : bool {
 
 		if(function_exists('sem_get')) {
+			//performs better but is not always available
 			return $this->lockWithSem();
 		} else
 		{
@@ -55,6 +56,11 @@ class Lock {
 		}
 	}
 
+	/**
+	 * Lock with Semaphore extension
+	 *
+	 * @return bool
+	 */
 	private function lockWithSem() : bool {
 		go()->debug("lockWithSem");
 		$this->sem = sem_get( hexdec(substr(md5($this->name), 24)));
@@ -62,6 +68,8 @@ class Lock {
 	}
 
 	/**
+	 * Lock with flock() function
+	 *
 	 * @throws Exception
 	 */
 	private function lockWithFlock() : bool {
