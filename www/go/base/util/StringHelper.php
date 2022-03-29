@@ -880,7 +880,8 @@ class StringHelper {
 	 *
 	 * This also removes everything outside the body and replaces mailto links
 	 *
-	 * @param	StringHelper $text Plain text string
+	 * @todo do this all client side in the next email module. Using DomParser api?
+	 * @param	string $text Plain text string
 	 * @access public
 	 * @return StringHelper HTML formatted string
 	 */
@@ -893,14 +894,17 @@ class StringHelper {
 		//remove strange white spaces in tags first
 		//sometimes things like this happen <style> </ style >
 		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
-		//remove comments because they might interfere
-		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
-		$html = preg_replace('!/\*.*?\*/!s', '', $html);
 
+		// extract style before removing comments because sometimes style is wrapped in a comment
+		// <style><!-- body{} --></style>
 		if($preserveHtmlStyle) {
 			$prefix = 'groupoffice-msg-' . uniqid();
 			$styles = self::extractStyles($html, $prefix);
 		}
+
+		//remove comments because they might interfere
+		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
+		$html = preg_replace('!/\*.*?\*/!s', '', $html);
 
 		$to_removed_array = array (
 		"'<!DOCTYPE[^>]*>'usi",
