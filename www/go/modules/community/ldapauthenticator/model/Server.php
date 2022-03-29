@@ -48,8 +48,10 @@ class Server extends Entity {
 	public $smtpEncryption;
 
 	public $syncUsers = false;
+	public $syncUsersDelete = false;
 	public $syncUsersQuery;
 	public $syncGroups = false;
+	public $syncGroupsDelete = false;
 	public $syncGroupsQuery;
 
 	public $imapUseEmailForUsername = false;

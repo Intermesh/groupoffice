@@ -1,3 +1,5 @@
+- LDAPAuthenticator: New options to delete users and or groups on sync
+
 29-03-2022 6.6.61
 - Projects: Refactored task editing from projects tasks tab
 - Core: fixed type error where float should be int

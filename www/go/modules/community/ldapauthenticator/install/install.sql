@@ -33,8 +33,10 @@ CREATE TABLE `ldapauth_server` (
   `smtpValidateCertificate` tinyint(1) NOT NULL DEFAULT '1',
   `syncUsers` BOOLEAN NOT NULL DEFAULT FALSE,
   `syncUsersQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `syncUsersDelete` bool default false not null,
   `syncGroups` BOOLEAN NOT NULL DEFAULT FALSE,
-  `syncGroupsQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL
+  `syncGroupsQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `syncGroupsDelete` bool default false not null
 ) ENGINE=InnoDB;
 --
 

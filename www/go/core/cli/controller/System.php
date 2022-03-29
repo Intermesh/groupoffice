@@ -119,16 +119,19 @@ JSON;
 	}
 
 	/**
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticator --package=community --name=Sync
 	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
 	 */
 	public function runCron($name, $module = "core", $package = "core") {
 
-		$module = Module::findByName($package, $module);
+		$mod = Module::findByName($package, $module);
+		if(!$mod) {
+			throw new NotFound("Module '$package/$module' not found");
+		}
 
 		$schedule = new CronJobSchedule();
-		$schedule->moduleId =$module->id;
+		$schedule->moduleId =$mod->id;
 		$schedule->name = $name;
 		$schedule->expression = "* * * * *";
 		$schedule->description = "Temporary CLI job " . uniqid();
