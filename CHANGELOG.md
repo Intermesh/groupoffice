@@ -1,3 +1,4 @@
+29-03-2022 6.6.62
 - LDAPAuthenticator: New options to delete users and or groups on sync
 - Files: fixed migration error when folders had to be moved to new location
 - Email: Added move email to option in context menu
