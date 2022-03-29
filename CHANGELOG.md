@@ -1,3 +1,5 @@
+- Projects: Refactored task editing from projects tasks tab
+
 29-03-2022 6.6.60
 - Core: let cron jobs run in default time zone
 - Core: only show yes no field in detail panel when value is set

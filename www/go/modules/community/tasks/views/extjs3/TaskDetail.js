@@ -155,16 +155,16 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				}
 			}),
 			'->',
-			{
+			this.editTaskBtn = new Ext.Button({
 				itemId: "edit",
 				iconCls: 'ic-edit',
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
-					var taskEdit = new go.modules.community.tasks.TaskDialog();
+					const taskEdit = new go.modules.community.tasks.TaskDialog();
 					taskEdit.load(this.data.id).show();
 				},
 				scope: this
-			},
+			}),
 
 			new go.detail.addButton({
 				detailView: this

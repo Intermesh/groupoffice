@@ -27,25 +27,25 @@
 
 	go.modules.community.tasks.TasklistCombo = Ext.extend(go.form.ComboBox, Ext.apply(cfg,
 		{
-		initComponent: function() {
-			this.supr().initComponent.call(this);
+			initComponent: function () {
+				this.supr().initComponent.call(this);
 
-			if(this.initialConfig.role) {
-				this.store.setFilter('role', {role: this.initialConfig.role});
+				if (this.initialConfig.role) {
+					this.store.setFilter('role', {role: this.initialConfig.role});
+				}
+				if (go.User.tasksSettings) {
+					this.value = go.User.tasksSettings.defaultTasklistId;
+				}
 			}
-			if(go.User.tasksSettings) {
-				this.value = go.User.tasksSettings.defaultTasklistId;
-			}
-
-		}
 	}));
 
 	go.modules.community.tasks.TasklistComboBoxReset = Ext.extend(go.form.ComboBoxReset, Ext.apply(cfg, {
 		initComponent: function() {
 			this.supr().initComponent.call(this);
 
-			if(this.initialConfig.role)
+			if(this.initialConfig.role) {
 				this.store.setFilter('role', {role: this.initialConfig.role});
+			}
 
 			if(go.User.tasksSettings) {
 				this.value = go.User.tasksSettings.defaultTasklistId;
