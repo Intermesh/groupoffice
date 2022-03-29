@@ -54,3 +54,9 @@ $updates['202203291610'][] = 'alter table ldapauth_server
 
 $updates['202203291610'][] = 'alter table ldapauth_server
     add syncGroupsDelete bool default false not null;';
+
+$updates['202203291610'][] = 'alter table ldapauth_server
+    add syncUsersMaxDeletePercentage int default 5 not null after syncUsersDelete;';
+
+$updates['202203291610'][] = 'alter table ldapauth_server
+    add syncGroupsMaxDeletePercentage int default 5 not null;';

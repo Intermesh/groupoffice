@@ -34,9 +34,11 @@ CREATE TABLE `ldapauth_server` (
   `syncUsers` BOOLEAN NOT NULL DEFAULT FALSE,
   `syncUsersQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `syncUsersDelete` bool default false not null,
+  `syncUsersMaxDeletePercentage` int default 5 not null,
   `syncGroups` BOOLEAN NOT NULL DEFAULT FALSE,
   `syncGroupsQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `syncGroupsDelete` bool default false not null
+  `syncGroupsDelete` bool default false not null,
+  `syncGroupsMaxDeletePercentage` int default 5 not null
 ) ENGINE=InnoDB;
 --
 

@@ -53,6 +53,8 @@ class Server extends Entity {
 	public $syncGroups = false;
 	public $syncGroupsDelete = false;
 	public $syncGroupsQuery;
+	public $syncGroupsMaxDeletePercentage = 5;
+	public $syncUsersMaxDeletePercentage = 5;
 
 	public $imapUseEmailForUsername = false;
 

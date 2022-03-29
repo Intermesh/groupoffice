@@ -329,18 +329,32 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					listeners: {
 						scope: this,
 						check: function (cb, checked) {
-							this.formPanel.form.findField('syncUsersDelete').setDisabled(!checked)
+							const cb2 = this.formPanel.form.findField('syncUsersDelete');
+							cb2.setValue(false);
+							cb2.setVisible(checked);
 						}
 					}
 				}, {
-					disabled: true,
+					hidden: true,
 					xtype: 'checkbox',
 					checked: false,
 					hideLabel: true,
 					boxLabel: t('Delete users'),
 					name: 'syncUsersDelete',
-
+					listeners: {
+						scope: this,
+						check: function (cb, checked) {
+							this.formPanel.form.findField('syncUsersMaxDeletePercentage').setVisible(checked)
+						}
+					}
 				}, {
+					hidden: true,
+					xtype: "gonumberfield",
+					name: 'syncUsersMaxDeletePercentage',
+					fieldLabel: t("Max delete percentage"),
+					value: 5,
+					decimals: 0
+				},{
 
 					xtype: 'checkbox',
 					checked: false,
@@ -350,16 +364,31 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					listeners: {
 						scope: this,
 						check: function (cb, checked) {
-							this.formPanel.form.findField('syncGroupsDelete').setDisabled(!checked)
+							const cb2 = this.formPanel.form.findField('syncGroupsDelete');
+							cb2.setValue(false);
+							cb2.setVisible(checked);
 						}
 					}
 				}, {
-					disabled: true,
+					hidden: true,
 					xtype: 'checkbox',
 					checked: false,
 					hideLabel: true,
 					boxLabel: t('Delete groups'),
-					name: 'syncGroupsDelete'
+					name: 'syncGroupsDelete',
+					listeners: {
+						scope: this,
+						check: function (cb, checked) {
+							this.formPanel.form.findField('syncGroupsMaxDeletePercentage').setVisible(checked)
+						}
+					}
+				},{
+					hidden: true,
+					xtype: "gonumberfield",
+					name: 'syncGroupsMaxDeletePercentage',
+					fieldLabel: t("Max delete percentage"),
+					value: 5,
+					decimals: 0
 				}, {
 					xtype: 'textarea',
 					grow: true,
