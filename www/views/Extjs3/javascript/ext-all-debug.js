@@ -27616,7 +27616,7 @@ Ext.Window = Ext.extend(Ext.Panel, {
 
         
         this.focusEl = this.el.createChild({
-                    tag: 'a', href:'#', cls:'x-dlg-focus',
+                    tag: 'a', cls:'x-dlg-focus',
                     tabIndex:'-1', html: '&#160;'});
         this.focusEl.swallowEvent('click', true);
 
@@ -39240,7 +39240,7 @@ Ext.menu.Item = Ext.extend(Ext.menu.BaseItem, {
         return {
             id: this.id,
             cls: this.itemCls + (this.menu ?  ' x-menu-item-arrow' : '') + (this.cls ?  ' ' + this.cls : ''),
-            href: this.href || '#',
+            href: this.href || '',
             hrefTarget: this.hrefTarget,
             icon: this.icon || Ext.BLANK_IMAGE_URL,
             iconCls: this.iconCls || '',
