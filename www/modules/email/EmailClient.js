@@ -235,6 +235,17 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		scope: this,
 		multiple:true
 	}),
+
+		this.contextMenuMoveTo = new Ext.menu.Item ({
+			iconCls: 'ic-move-to-inbox',
+			text: t("Move email to...", "email"),
+			handler: function(a,b,c){
+				var selectedEmails = this.messagesGrid.getSelectionModel().getSelections();
+				this.showCopyMailToDialog(selectedEmails, true);
+			},
+			scope: this,
+			multiple:true
+		}),
 	 this.addEmailButton = new Ext.menu.Item({
 		iconCls: 'ic-mail',
 		text: t("Forward as attachment ", "email"),
@@ -1056,9 +1067,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.accountsDialog.show();
 	},
 
-	showCopyMailToDialog : function(selectedEmailMessages) {
+	showCopyMailToDialog : function(selectedEmailMessages, move) {
 		if (!this._copyMailToDialog) {
-			this._copyMailToDialog = new GO.email.CopyMailToDialog();
+			this._copyMailToDialog = new GO.email.CopyMailToDialog({
+				move: move
+			});
 			this._copyMailToDialog.on('copy_email',function(){
 				this.messagesGrid.store.reload();
 			},this);

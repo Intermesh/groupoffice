@@ -9,6 +9,8 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 	height: 400,
 	
 	layout: 'fit',
+
+	move: false,
 		
 	initComponent : function(){	
 		
@@ -144,6 +146,7 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 				GO.request({
 					url : "email/account/copyMailTo",
 					params : {
+						move: this.move ? 1 : 0,
 						'srcMessages' : Ext.encode(srcMessages),
 						'targetAccountId' : targetAccountId,
 						'targetMailboxPath' : targetMailboxPath

@@ -597,6 +597,8 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 		$srcMessages = json_decode($params['srcMessages']);
 
+		$move = !empty($params['move']);
+
 		foreach ($srcMessages as $srcMessageInfo) {
 			$srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
 			$srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
@@ -606,14 +608,25 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 			if(!$targetAccountModel->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION))
 			  throw new \GO\Base\Exception\AccessDenied();
 
-			$targetImapConnection = $targetAccountModel->openImapConnection($params["targetMailboxPath"]);
-			
-			$flags = '';
-			
-			if($srcMessageInfo->seen)
-				$flags = '\SEEN';
+			if($move && $targetAccountModel->id == $srcAccountModel->id) {
+				$conn = $srcAccountModel->openImapConnection( $srcMessageInfo->mailboxPath);
 
-			$targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
+				$conn->move([$srcImapMessage->uid],$params["targetMailboxPath"]);
+
+			} else {
+				$targetImapConnection = $targetAccountModel->openImapConnection($params["targetMailboxPath"]);
+
+				$flags = '';
+
+				if ($srcMessageInfo->seen)
+					$flags = '\SEEN';
+
+				$targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
+
+				if ($move) {
+					$srcImapMessage->delete();
+				}
+			}
 		}
 
 		return array('success'=>true);
