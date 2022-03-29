@@ -966,13 +966,7 @@ button.filetype-pdf, button.filetype-doc {
 		}
 	}
 }
-tr.go-grid-row {
-	td {
-		border-bottom: 1px solid rgba(0,0,0,0.04);
-		vertical-align:top;
-		&.r {text-align:right}
-	}
-}
+
 .go-grid-icon { // icon in field
 	background-repeat: no-repeat;
 	background-position: 0 center;
@@ -1418,7 +1412,7 @@ table.display-panel {
 }
 tr.go-grid-row {
 	td {
-		border-bottom: 1px solid rgba(0,0,0,0.04);
+		border-bottom: 1px solid color($fg, "divider");
 		vertical-align:top;
 		//&.r {text-align:right}
 	}
