@@ -62,7 +62,7 @@ class Lock {
 	 * @return bool
 	 */
 	private function lockWithSem() : bool {
-		$this->sem = sem_get( hexdec(substr(md5($this->name), 24)));
+		$this->sem = sem_get( (int) hexdec(substr(md5($this->name), 24)));
 		return sem_acquire($this->sem, !$this->blocking );
 	}
 
