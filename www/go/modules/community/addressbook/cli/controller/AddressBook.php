@@ -57,7 +57,7 @@ JSON;
 	/**
 	 * /cli.php community/addressbook/AddressBook/delete --addressBook=1
 	 */
-	public function delete($addressBook, $format = 'csv') {
+	public function delete($addressBook) {
 		$json = <<<JSON
 [
   [

@@ -8,6 +8,7 @@
 - Projects: when saving a task from a project template set current TZ
 - Core: Remember UI state on mobile
 - Newsletters: validate template before sending newsletter
+- Core: Added CLI commands to remove groups and users
 
 25-03-2022 6.6.59
 - Core: bugfix saving ACL groups
