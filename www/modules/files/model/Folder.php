@@ -1382,7 +1382,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			\GO::debug("MOVE ".$file->name);
 			$file->folder_id=$this->id;
 			$file->appendNumberToNameIfExists();
-			if(!$file->save()){
+			if(!$file->save(true)){
 				throw new Exception("Could not save file ".$file->name." ".implode("\n", $file->getValidationErrors()));
 			}
 		}
