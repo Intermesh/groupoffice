@@ -1,4 +1,7 @@
+29-03-2022 6.6.61
 - Projects: Refactored task editing from projects tasks tab
+- Core: fixed type error where float should be int
+- Projects: Lines between  time entries per activity type
 
 29-03-2022 6.6.60
 - Core: let cron jobs run in default time zone
