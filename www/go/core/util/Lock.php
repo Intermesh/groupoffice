@@ -62,7 +62,8 @@ class Lock {
 	 * @return bool
 	 */
 	private function lockWithSem() : bool {
-		$this->sem = sem_get( (int) hexdec(substr(md5($this->name), 24)));
+		// prepend db name for multi instance
+		$this->sem = sem_get( (int) hexdec(substr(md5(go()->getConfig()['db_name'] . $this->name), 24)));
 		return sem_acquire($this->sem, !$this->blocking );
 	}
 
