@@ -2,7 +2,7 @@
 - Projects: disable add / edit buttons in time entry grid if project is complete
 - Core: save and display new style cronjobs correctly as per default timezone
 - Core: Updated Deutsch translations. Danke, Daniel!
-- 
+- Core: Updated Bulgarian translations. Благодарим ви Nikolay!
 
 29-03-2022 6.6.62
 - LDAPAuthenticator: New options to delete users and or groups on sync

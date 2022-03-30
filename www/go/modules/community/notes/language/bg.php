@@ -15,4 +15,8 @@ return array (
   'Note book' => 'Бележник',
   'Enter password to decrypt' => 'Въведете парола за дешифриране',
   'Default note book' => 'Бележник по подазбиране',
+  'Content' => 'Съдържание',
+  'Display options for notebooks' => 'Покажи настройки за бележниците',
+  'Start in' => 'Старт в',
+  'Remember last selected note book' => 'Запомни последно избрания бележник',
 );

@@ -238,4 +238,5 @@ return array (
   'Body contains' => 'Съобщението съдържа',
   'autoReplyMessage' => 'съобщение за автоматичен отговор',
   'Sieve' => 'Сито',
+  'Activate' => 'Активирай',
 );

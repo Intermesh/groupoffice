@@ -137,4 +137,9 @@ The following changes were made by %s:
   'Download selected' => 'Изтегли избраното',
   'Apply these custom field settings to current folder and it\'s sub folders recursively' => 'Приложете тези персонализирани настройки на полета към текущата папка и нейните подпапки рекурсивно',
   'Expired files' => 'Изтекли файлове',
+  'Sorry, something went wrong' => 'Съжалявам, нещо се обърка',
+  'Creator' => 'Създател',
+  'Modifier' => 'Редактор',
+  'Save as PDF' => 'Запазване като PDF',
+  'Download as PDF' => 'Изтегляне като PDF',
 );
