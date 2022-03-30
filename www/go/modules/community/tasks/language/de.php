@@ -59,4 +59,5 @@ return array (
   'Visible tasklists' => 'Sichtbare Aufgabenlisten',
   'Completed tasks' => 'Erledigte Aufgaben',
   'Assign me' => 'Mich zuweisen',
+  'Alerts' => 'Erinnerungen',
 );

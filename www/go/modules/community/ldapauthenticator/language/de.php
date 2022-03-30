@@ -29,4 +29,7 @@ return array (
   'For Microsoft ActiveDirectory use \'(objectCategory=InetOrgPerson)\'' => 'Für Microsoft ActiveDirectory verwenden Sie \'(objectCategory=InetOrgPerson)\'.',
   'For Microsoft ActiveDirectory use \'(objectCategory=group)\'' => 'Für Microsoft ActiveDirectory verwenden Sie \'(objectCategory=group)\'.',
   'LDAP Authenticator' => 'LDAP Authentifizierung',
+  'Delete users' => 'Benutzer löschen',
+  'Max delete percentage' => 'Maximal % löschen',
+  'Delete groups' => 'Gruppen löschen',
 );
