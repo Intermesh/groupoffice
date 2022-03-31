@@ -2181,7 +2181,7 @@ GO.files.openEmailAttachment = function(attachment, panel, choosehandler)
 		filename: attachment.name,
 		charset: attachment.charset,
 		sender: panel.data.sender, //for gnupg and smime,
-		filepath: panel.data.path ? panel.data.path : ''
+		tmp_file: attachment.tmp_file || ''
 	}
 	GO.request({
 		url: "files/file/saveAttachmentToTmp",
