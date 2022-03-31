@@ -1141,3 +1141,24 @@ $updates['202203310856'][] = function() {
 
 	echo "\n\n======\nNOTE: Search cache will be rebuilt at midnight. This may take a lot of time.\n======\n\n";
 };
+
+$updates['202203310856'][] = function() {
+	echo "Correcting invalid date field values (0000-00-00 => null)\n";
+	foreach(Field::find() as $field) {
+		try {
+			if ($field->getDataType() instanceof \go\core\customfield\Date) {
+				$table = $field->tableName();
+				$stmt = go()->getDbConnection()->update($table, $field->databaseName .' = null', $field->databaseName ." = '0000-00-00'");
+				echo $stmt . "\n";
+				$stmt->execute();
+			} else if ($field->getDataType() instanceof \go\core\customfield\DateTime) {
+				$table = $field->tableName();
+				$stmt = go()->getDbConnection()->update($table, $field->databaseName .' = null', $field->databaseName ." = '0000-00-00 00:00:00'");
+				echo $stmt . "\n";
+				$stmt->execute();
+			}
+		}catch(PDOException $e) {
+			echo "PDOException: " . $e->getMessage() . "\n";
+		}
+	}
+};
