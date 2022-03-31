@@ -541,20 +541,21 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			}
 
 			if(mailboxNode) {
-				mailboxNode.on('load', function(){
-
-					//don't know why but it doesn't work without a 10ms delay.
+				// mailboxNode.on('load', function(){
+				setTimeout(() => {
+					//don't know why but it doesn't work without a setTimeout
 					this.treePanel.getSelectionModel().select(mailboxNode);
 
 					if(this.treeScrollTop) {
-						//restore scroll position after refresh
+						//restore scroll position after refresh, dirty hack with 100ms delay to allow sub nodes to expand
 						setTimeout(() => {
 							this.treePanel.body.dom.scrollTop = this.treeScrollTop;
 							delete this.treeScrollTop;
-						}, 10);
+						}, 100);
 					}
+				}, 0)
 
-				},this, {single: true, defer: 10});
+				// },this, {single: true, defer: 10});
 			} else {
 				this.messagesStore.removeAll();
 			}
