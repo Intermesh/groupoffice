@@ -1,4 +1,4 @@
-6.6.63
+31-03-2022 6.6.63
 - Projects: disable add / edit buttons in time entry grid if project is complete
 - Core: save and display new style cronjobs correctly as per default timezone
 - Core: Updated Deutsch translations. Danke, Daniel!
@@ -6,6 +6,7 @@
 - Core: Complete rebuild of search cache on update at midnight
 - Core: Correct invalid date field values (0000-00-00 => null)
 - Email: Fixed mail rendering issue with defaults on p,div and span for line-height
+- Smime: fixed opening attachments on signed / encrypted mails
 
 29-03-2022 6.6.62
 - LDAPAuthenticator: New options to delete users and or groups on sync
