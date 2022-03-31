@@ -127,6 +127,7 @@ detail/CreateModifyPanel.js
 
 permissions/SharePanel.js
 permissions/ShareWindow.js
+permissions/AclOverviewGrid.js
 
 defaultpermissions/DefaultPermissionsPanel.js
 defaultpermissions/SystemSettingsPanel.js

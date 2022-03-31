@@ -257,7 +257,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			];
 
 			for($i = 0, $c = count($cache['models']); $i < $c; $i++) {
-			  /** @var self $t */
+			  	/** @var self $t */
 				$t = $cache['models'][$i];
 				$cache['id'][$t->getId()] = $i;
 				$cache['name'][$t->getName()] = $i;

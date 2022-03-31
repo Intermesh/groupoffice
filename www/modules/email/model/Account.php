@@ -106,6 +106,10 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		return 'acl_id';
 	}
 
+	public function title() {
+		return $this->username . ' - '.$this->host;
+	}
+
 	/**
 	 * Returns the table name
 	 */
