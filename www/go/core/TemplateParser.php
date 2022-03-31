@@ -99,6 +99,12 @@ use function GO;
  * {{address.formatted}}
  * `````````````````````````````````````````````````````````````````````
  *
+ * The same with sort:
+ * ```
+ * [assign formattedAddress = contact.addresses | sort:type:"postal" | first | prop:formatted]
+ * {{formattedAddress}}
+ * ```
+ *
  * @example Using [assign] to lookup a Contact entity with id = 1
  *
  * ```
