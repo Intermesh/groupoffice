@@ -13,7 +13,6 @@ use go\core\cache\None;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
-use go\core\event\Listeners;
 use go\core\fs\File;
 use go\core\jmap;
 use go\core\model;
@@ -27,7 +26,6 @@ use PDOException;
 use go\core\model\Module as GoCoreModule;
 use GO\Base\Db\ActiveRecord;
 use go\core\model\Acl;
-use PHPUnit\Framework\ExpectationFailedException;
 
 class Installer {
 	
@@ -474,7 +472,7 @@ class Installer {
 
 		$this->disableUnavailableModules();
 
-		$lock = new Lock("upgrade");
+		$lock = new Lock("upgrade", false);
 		if (!$lock->lock()) {
 			throw new Exception("Upgrade is already in progress");
 		}

@@ -365,7 +365,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	all : function(cb, scope) {
 
-		return this.initState().then(()  => {
+		return this.getState().then(()  => {
 			if(this.isComplete) {
 				return this.query().then((response) => {
 					return this.get(response.ids).then( (result) => {
@@ -557,7 +557,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		go.Jmap.pause();
 
 		this.pauseGet();
-		return this.initState().then(() => {
+		return this.getState().then(() => {
 			return this.stateStore.getItem(id + "").then((entity) => {
 				if(!entity) {
 					return null;
@@ -786,7 +786,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			throw "'destroy' must be an array.";
 		}
 
-		return this.initState().then(() => {
+		return this.getState().then((state) => {
+
+			params.ifInState = state;
+
 			const options = {
 				method: this.entity.name + "/set",
 				params: params
@@ -832,6 +835,14 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 				return response;
 			}).catch((error) => {
+
+
+				if(error.type && error.type == 'stateMismatch') {
+					return this.getUpdates().then(() => {
+						return this.set(params);
+					})
+				}
+
 				this.fireEvent("error", options, error);
 				if(cb) {
 					cb.call(scope || this, options, false, error);

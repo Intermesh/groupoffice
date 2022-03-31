@@ -2,26 +2,35 @@
 namespace go\modules\community\multi_instance\cron;
 
 use go\core\ErrorHandler;
+use go\core\http\Client;
 use go\core\model\CronJob;
+use go\core\model\CronJobSchedule;
+use go\modules\community\multi_instance\model\Instance;
+use Throwable;
 
 class InstanceCron extends CronJob {
 	
-	public function run(\go\core\model\CronJobSchedule $schedule) {
+	public function run(CronJobSchedule $schedule) {
 		//The server manager calls cron via HTTP because it doesn't know the document root when running
 		//multiple versions of GO.v It passes ?exec=1 to make it run on the command line.
-		$c = new \go\core\http\Client();
-		foreach(\go\modules\community\multi_instance\model\Instance::find() as $instance) {
-			if(!$instance->isInstalled()) {
-				go()->debug("NOT INSTALLED: ". $instance->hostname);
-				continue;
-			}
-			go()->debug("Running cron for ". $instance->getConfigFile()->getPath());
+		$c = new Client();
+		foreach(Instance::find() as $instance) {
+			try {
+				if (!$instance->isInstalled()) {
+					go()->debug("NOT INSTALLED: " . $instance->hostname);
+					continue;
+				}
 
-			$result = $c->get("http://" . $instance->hostname . '/cron.php?exec=1');
-			if($result['status'] != 200) {
-				ErrorHandler::log("Failed to run cron on instance " . $instance->hostname . ". HTTP Status: ". $result['status']);
+				go()->debug("Running cron for " . $instance->getConfigFile()->getPath());
+
+				$result = $c->get("http://" . $instance->hostname . '/cron.php?exec=1');
+				if ($result['status'] != 200) {
+					ErrorHandler::log("Failed to run cron on instance " . $instance->hostname . ". HTTP Status: " . $result['status']);
+				}
+
+			} catch(Throwable $e)  {
+				ErrorHandler::log("Failed to run cron on instance " . $instance->hostname . ". Error: " . $e->getMessage() );
 			}
-			//exec("php " . \go\core\Environment::get()->getInstallFolder()->getFile('cron.php')->getPath() . ' ' . $instance->getConfigFile()->getPath());
 		}
 	}
 }

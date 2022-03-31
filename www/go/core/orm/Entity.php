@@ -523,17 +523,28 @@ abstract class Entity extends Property {
 		}
 	}
 
+
+	protected function commitToDatabase() : bool {
+		return App::get()->getDbConnection()->commit();
+	}
+
   /**
    * @inheritDoc
    */
 	protected function commit(): bool
 	{
-		parent::commit();
+		if(!$this->commitToDatabase()) {
+			return false;
+		}
+
+		if(!parent::commit()) {
+			return false;
+		}
 
 		//$this->isDeleting = false;
 		$this->isSaving = false;
 
-		return App::get()->getDbConnection()->commit();
+		return true;
 	}
 
   /**

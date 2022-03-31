@@ -967,13 +967,7 @@ button.filetype-pdf, button.filetype-doc {
 		}
 	}
 }
-tr.go-grid-row {
-	td {
-		border-bottom: 1px solid rgba(0,0,0,0.04);
-		vertical-align:top;
-		&.r {text-align:right}
-	}
-}
+
 .go-grid-icon { // icon in field
 	background-repeat: no-repeat;
 	background-position: 0 center;
@@ -1419,7 +1413,7 @@ table.display-panel {
 }
 tr.go-grid-row {
 	td {
-		border-bottom: 1px solid rgba(0,0,0,0.04);
+		border-bottom: 1px solid color($fg, "divider");
 		vertical-align:top;
 		//&.r {text-align:right}
 	}
@@ -1912,6 +1906,14 @@ table[id^="comments-ext"] b {
 
 	p {
 		margin: dp(8) 0px;
+	}
+
+	p, span, div {
+		font-size: sp(16);
+		color: color($fg, 'text');
+		font-weight: $font-weight-r;
+		line-height: dp(24);
+		background-color: white;
 	}
 
 	a:link, a:visited, a:active {

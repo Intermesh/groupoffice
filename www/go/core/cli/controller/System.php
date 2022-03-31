@@ -54,6 +54,52 @@ class System extends Controller {
 		$router->run($requests);
 	}
 
+	/**
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteGroup --id=29
+	 */
+	public function deleteGroup($id) {
+		$json = <<<JSON
+[
+  [
+    "Group/set", {
+      "destroy": [$id]
+    },
+    "call-1"
+  ]
+]
+JSON;
+
+		$requests = JSON::decode($json, true);
+
+		Response::get()->jsonOptions = JSON_PRETTY_PRINT;
+
+		$router = new Router();
+		$router->run($requests);
+
+	}
+
+	/**
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteUser --id=1
+	 */
+	public function deleteUser($id) {
+		$json = <<<JSON
+[
+  [
+    "User/set", {
+      "destroy": [$id]
+    },
+    "call-1"
+  ]
+]
+JSON;
+
+		$requests = JSON::decode($json, true);
+
+		Response::get()->jsonOptions = JSON_PRETTY_PRINT;
+
+		$router = new Router();
+		$router->run($requests);
+	}
 
 	/**
 	 * @throws NotFound
@@ -73,16 +119,19 @@ class System extends Controller {
 	}
 
 	/**
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticator --package=community --name=Sync
 	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
 	 */
 	public function runCron($name, $module = "core", $package = "core") {
 
-		$module = Module::findByName($package, $module);
+		$mod = Module::findByName($package, $module);
+		if(!$mod) {
+			throw new NotFound("Module '$package/$module' not found");
+		}
 
 		$schedule = new CronJobSchedule();
-		$schedule->moduleId =$module->id;
+		$schedule->moduleId =$mod->id;
 		$schedule->name = $name;
 		$schedule->expression = "* * * * *";
 		$schedule->description = "Temporary CLI job " . uniqid();

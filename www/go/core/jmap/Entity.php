@@ -91,15 +91,24 @@ abstract class Entity  extends OrmEntity {
 			return false;
 		}
 
-		if(self::$trackChanges) {
-			$this->change();
-		}
-
 		if(static::supportsFiles()) {
 			$this->checkFilesFolder();
 		}
 
 		$this->saveTmpFiles();
+
+		return true;
+	}
+
+	protected function commitToDatabase(): bool
+	{
+		if(!parent::commitToDatabase()) {
+			return false;
+		}
+
+		if(self::$trackChanges) {
+			$this->change();
+		}
 
 		return true;
 	}

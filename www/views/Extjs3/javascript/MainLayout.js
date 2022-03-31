@@ -342,6 +342,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		//load state
 		if(!GO.util.isMobileOrTablet()) {
 			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
+		} else
+		{
+			Ext.state.Manager.setProvider(new Ext.state.CookieProvider({
+				expires: new Date(new Date().getTime()+(1000*60*60*24*30)), //30 days
+			}));
 		}
 		
 

@@ -40,7 +40,7 @@ class BuildSearchCache extends CronJob {
 
 		ob_start();
 		$c = new \GO\Core\Controller\MaintenanceController();
-		$c->run("buildSearchCache");
+		$c->run("buildSearchCache", ['reset' => true]);
 		$output = ob_get_clean();
 
 		go()->getMailer()->compose()

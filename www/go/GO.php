@@ -1169,22 +1169,14 @@ class GO{
 		}
 		return self::$_scripts;
 	}
-	
-
-	
-	/**
-	 * Get the license file object
-	 * 
-	 * @return \GO\Base\Fs\File
-	 */
-//	pnew \GO\Base\Fs\File(GO::config()->root_path.'groupoffice-license.txt');
 
 	/**
 	 * Checks if the main cron job is running for the task scheduler
 	 * 
-	 * @return boolean
+	 * @return bool
 	 */
-	public static function cronIsRunning(){
+	public static function cronIsRunning() :bool
+	{
 
 		$utc = gmdate("U");
 		return \GO::config()->get_setting('cron_last_run') > $utc-300;

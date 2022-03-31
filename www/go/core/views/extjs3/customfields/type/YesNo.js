@@ -10,7 +10,7 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 
 	/**
 	 * Return dialog to edit this type of field
-	 * 
+	 * \
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog: function () {
@@ -27,7 +27,7 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 	 */
 	renderDetailView: function (value, data, customfield) {
 		if (value === null) {
-			return t("Unknown");
+			return null;
 		}
 
 		return value === 1 ? t("Yes") : t("No");

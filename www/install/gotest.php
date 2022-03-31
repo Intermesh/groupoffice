@@ -418,7 +418,7 @@ function test_system() :array
 	$test['name']='Shared Memory Functions';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']= function_exists('sem_get') && function_exists('shm_attach') && function_exists('sem_acquire') && function_exists('shm_get_var');
-	$test['feedback']= "InterProcessData::InitSharedMem(): PHP libraries for the use shared memory are not available. Z-push will work unreliably!";
+	$test['feedback']= "InterProcessData::InitSharedMem(): PHP libraries for the use shared memory are not available. Locking performance will increase with them and Z-push will work unreliably!";
 	$test['fatal']=false;
 
 	$tests[]=$test;

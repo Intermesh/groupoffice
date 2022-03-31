@@ -11,6 +11,7 @@ use go\core\util\ArrayObject;
 use InvalidArgumentException;
 use JsonException;
 use JsonSerializable;
+use ReflectionClass;
 use Throwable;
 
 /**
@@ -99,18 +100,13 @@ class Router {
 				Response::get()->addResponse($response);
 			}
 			
-		} catch(InvalidResultReference $e) {
-			$error = ["message" => $e->getMessage()];
-
-			if(go()->getDebugger()->enabled) {
-				//only in debug mode, may contain sensitive information
-				$error["debugMessage"] = ErrorHandler::logException($e);
-				$error["trace"] = explode("\n", $e->getTraceAsString());
-			}
-		
-			Response::get()->addError($error);
 		} catch (Throwable $e) {
-			$error = ["message" => $e->getMessage()];
+			// convert jmap classes to set error response
+			// https://jmap.io/spec-core.html#errors
+			$error = [
+				"description" => $e->getMessage(),
+				"type" => lcfirst((new ReflectionClass($e))->getShortName())
+			];
 			
 			if(go()->getDebugger()->enabled) {
 				//only in debug mode, may contain sensitive information

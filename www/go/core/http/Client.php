@@ -1,9 +1,17 @@
 <?php
 namespace go\core\http;
 
+use Exception as CoreException;
 use go\core\fs\File;
 use go\core\util\JSON;
 
+/**
+ * Simple HTTP client
+ *
+ * @copyright (c) 2014, Intermesh BV http://www.intermesh.nl
+ * @author Merijn Schering <mschering@intermesh.nl>
+ * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
+ */
 class Client {
 
   private $curl;
@@ -12,26 +20,32 @@ class Client {
 
   private $lastHeaders = [];
 
+	/**
+	 * @return false|resource
+	 * @noinspection PhpMissingReturnTypeInspection
+	 */
   private function getCurl() {
     if(!isset($this->curl)) {
-
-      if(!extension_loaded('curl')) {
-        throw new \Exception("The cUrl extension for PHP isn't installed. This is required for Group-Office.");
-      }
-
       $this->curl = curl_init();
       $this->setOption(CURLOPT_FOLLOWLOCATION, true);
       $this->setOption(CURLOPT_ENCODING, "UTF-8");
       $this->setOption(CURLOPT_USERAGENT, "Group-Office HttpClient " . go()->getVersion() . " (curl)");
 
-
 	    $this->setOption(CURLOPT_CONNECTTIMEOUT, 5);
-	    $this->setOption(CURLOPT_TIMEOUT, 60);
+	    $this->setOption(CURLOPT_TIMEOUT, 360);
     }
     return $this->curl;
   }
 
-  public function setOption($option, $value) {
+	/**
+	 * Set cUrl option
+	 *
+	 * @param int $option
+	 * @param mixed $value
+	 * @return bool
+	 */
+  public function setOption(int $option, $value): bool
+  {
     return curl_setopt($this->getCurl(), $option, $value);
   }
 
@@ -49,19 +63,21 @@ class Client {
 
   }
 
-  /**
-   * Perform GET request
-   * 
-   * @return array ['status' => 200, 'body' => string, 'headers' => []]
-   */
-  public function get($url) { 
+	/**
+	 * Perform GET request
+	 *
+	 * @return array ['status' => 200, 'body' => string, 'headers' => []]
+	 * @throws CoreException
+	 */
+  public function get(string $url): array
+  {
     $this->initRequest($url);
 		
     $body = curl_exec($this->getCurl());
 		
 		$error = curl_error($this->getCurl());
 		if(!empty($error)) {
-      throw new \Exception($error);
+      throw new CoreException($error);
     }
 
     return [
@@ -77,9 +93,10 @@ class Client {
 	 * @param string $url
 	 * @param array $data
 	 * @return array
-	 * @throws \Exception
+	 * @throws CoreException
 	 */
-  public function postJson($url, $data) {
+  public function postJson(string $url, array $data): array
+  {
   	$str = JSON::encode($data);
 
   	$this->setOption(CURLOPT_HTTPHEADER, array(
@@ -95,12 +112,15 @@ class Client {
   }
 
 	/**
-	 * @param $url
+	 * Make a POST request
+	 *
+	 * @param string $url
 	 * @param array|string $data Array of HTTP post fields or string for RAW body.
 	 * @return array
-	 * @throws \Exception
+	 * @throws CoreException
 	 */
-  public function post($url, $data) {
+  public function post(string $url, $data): array
+  {
   	if(is_array($data)) {
 		  $data = array_merge($this->baseParams, $data);
 		  $this->setOption(CURLOPT_CUSTOMREQUEST, "POST");
@@ -115,7 +135,7 @@ class Client {
 		
 		$error = curl_error($this->getCurl());
 		if(!empty($error)) {
-      throw new \Exception($error);
+      throw new CoreException($error);
     }
 
     return [
@@ -125,8 +145,16 @@ class Client {
     ];
   }
 
-
-  public function download($url, File $file) {
+	/**
+	 * Download an URL to a file
+	 *
+	 * @param string $url
+	 * @param File $file
+	 * @return array
+	 * @throws CoreException
+	 */
+  public function download(string $url, File $file): array
+  {
     $fp = $file->open('w');
 
     $this->initRequest($url);
@@ -137,10 +165,8 @@ class Client {
 
     $error = curl_error($this->getCurl());
 		if(!empty($error)) {
-      throw new \Exception($error);
+      throw new CoreException($error);
     }
-
-    // var_dump($this->lastHeaders);
 
     if(isset($this->lastHeaders['content-disposition'])) {
       preg_match('/filename="(.*)"/', $this->lastHeaders['content-disposition'], $matches);
@@ -154,6 +180,11 @@ class Client {
 
   }
 
+	/**
+	 * Close the connection
+	 *
+	 * @return void
+	 */
   public function close() 
   {
      curl_close($this->curl);

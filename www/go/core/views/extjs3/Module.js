@@ -174,7 +174,7 @@ GO.mainLayout.on('render', function () {
 	window.addEventListener('unhandledrejection', function (event) {
 
 		if(Ext.isObject(event.reason)) {
-			var txt = event.reason.message || event.reason.detail || t("An error occurred. More details can be found in the console.");
+			var txt = event.reason.message || event.reason.detail || event.reason.description || t("An error occurred. More details can be found in the console.");
 		} else if(Ext.isString(event.reason)) {
 			var txt = event.reason;
 		} else

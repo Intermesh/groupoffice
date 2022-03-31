@@ -175,45 +175,25 @@ abstract class AbstractJsonController extends AbstractController {
 
 	/**
 	 * Renders DbStore object to a valid JSON response
-	 * @param \GO\Base\Date\JsonStore $store I JsonStore object to get JSON from
-	 * @deprecated boolean $return still here for buttonParams (should button params be set in DbStore
+	 * @param \GO\Base\Data\AbstractStore $store I JsonStore object to get JSON from
+	 * @param boolean $return still here for buttonParams (should button params be set in DbStore
 	 * @param mixed $buttonParams ???
 	 * @return \GO\Base\Data\JsonResponse Response object
 	 */
-	public function renderStore(\GO\Base\Data\AbstractStore $store, $return = false, $buttonParams=false) {
-
-//		$response = array(
-//				"success" => true,
-//				"results" => $store->getRecords(),
-//				'total' => $store->getTotal()
-//		);
-//		if($summary = $store->getSummary())
-//			$response['summary'] = $summary;
+	public function renderStore(\GO\Base\Data\AbstractStore $store, $return = false, $buttonParams=false)
+	{
 		
 		$this->fireEvent('renderStore', [$store]);
 		
 		$response=$store->getData();
-		if($summary = $store->getSummary())
+		if($summary = $store->getSummary()) {
 			$response['summary'] = $summary;
+		}
 
 		$title = $store->getTitle();
-		if (!empty($title))
+		if (!empty($title)) {
 			$response['title'] = $title;
-
-//		if ($store instanceof \GO\Base\Data\DbStore) {
-//			if ($store->getDeleteSuccess() !== null) {
-//				$response['deleteSuccess'] = $store->getDeleteSuccess();
-//				if(!$response['deleteSuccess'])
-//					$response['deleteFeedback'] = $store->getFeedBack();
-//			}
-//			if($buttonParams){
-//				$buttonParams = $store->getButtonParams();
-//				if (!empty($buttonParams))
-//					$response['buttonParams'] = $buttonParams;
-//			}
-//		}
-		
-		
+		}
 
 		return new \GO\Base\Data\JsonResponse($response);
 	}

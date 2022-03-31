@@ -1,3 +1,37 @@
+31-03-2022 6.6.63
+- Projects: disable add / edit buttons in time entry grid if project is complete
+- Core: save and display new style cronjobs correctly as per default timezone
+- Core: Updated Deutsch translations. Danke, Daniel!
+- Core: Updated Bulgarian translations. Благодарим ви Nikolay!
+- Core: Complete rebuild of search cache on update at midnight
+- Core: Correct invalid date field values (0000-00-00 => null)
+- Email: Fixed mail rendering issue with defaults on p,div and span for line-height
+- Smime: fixed opening attachments on signed / encrypted mails
+- Email: fixed message grid not loading if inbox is collapsed
+
+29-03-2022 6.6.62
+- LDAPAuthenticator: New options to delete users and or groups on sync
+- Files: fixed migration error when folders had to be moved to new location
+- Email: Added move email to option in context menu
+
+29-03-2022 6.6.61
+- Projects: Refactored task editing from projects tasks tab
+- Core: fixed type error where float should be int
+- Projects: Lines between  time entries per activity type
+
+29-03-2022 6.6.60
+- Core: let cron jobs run in default time zone
+- Core: only show yes no field in detail panel when value is set
+- Core: Fixed deadlock problem with JMAP sync modseq values
+- Core: Block concurrent Foo/Set requests to make sure clients don't miss state
+- Core: If Foo/set throws statematch the client retries automatically.
+- Core: Locking with semaphore functions if available
+- Projects: when saving a task from a project template set current TZ
+- Core: Remember UI state on mobile
+- Newsletters: validate template before sending newsletter
+- Core: Added CLI commands to remove groups and users
+- Core / Email: When pasting HTML inline the styles from the head. FIxes paste from excel styling.
+
 25-03-2022 6.6.59
 - Core: bugfix saving ACL groups
 - ldapauth: fixed delete output in dry run
@@ -94,6 +128,7 @@
 - Core: updated German Translation. Thanks Peter!
 - Core: fixed merge reusing id's and created unittest for it
 - ActiveSync: catch access denied exception in getFolder()
+- Tasks: bugfix 'until' for repeating tasks
 
 03-03-2022 6.6.48
 - Core: Optimize 'optimizer_search_depth' for global search queries.
