@@ -1,3 +1,6 @@
+31-03-2022 6.6.64
+- Core: Custom field date correction caused error on disabled modules.
+
 31-03-2022 6.6.63
 - Projects: disable add / edit buttons in time entry grid if project is complete
 - Core: save and display new style cronjobs correctly as per default timezone
