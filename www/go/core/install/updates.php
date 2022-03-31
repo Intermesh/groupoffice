@@ -1132,3 +1132,12 @@ $updates['202203251058'][] = "create index if not exists core_change_modSeq_enti
 $updates['202203251058'][] = "create index if not exists core_change_user_modSeq_userId_entityTypeId_entityId_index
     on core_change_user (modSeq, userId, entityTypeId, entityId);
 ";
+
+
+$updates['202203310856'][] = function() {
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
+
+	echo "\n\n======\nNOTE: Search cache will be rebuilt at midnight. This may take a lot of time.\n======\n\n";
+};
