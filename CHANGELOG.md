@@ -5,6 +5,7 @@
 - Core: Updated Bulgarian translations. Благодарим ви Nikolay!
 - Core: Complete rebuild of search cache on update at midnight
 - Core: Correct invalid date field values (0000-00-00 => null)
+- Email: Fixed mail rendering issue with defaults on p,div and span for line-height
 
 29-03-2022 6.6.62
 - LDAPAuthenticator: New options to delete users and or groups on sync
