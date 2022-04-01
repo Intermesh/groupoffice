@@ -844,6 +844,10 @@ abstract class Module extends Singleton {
 	public function checkAcls() {
 		$entities = $this->getClassFinder()->findByParent(AclOwnerEntity::class);
 		foreach($entities as $entity) {
+			if($entity == model\Search::class) {
+				continue;
+			}
+
 			echo "Checking " . $entity . "\n";
 			$entity::checkAcls();
 			echo "Done\n";

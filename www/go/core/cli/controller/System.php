@@ -218,7 +218,7 @@ JSON;
 	private function cleanupAcls() {
 
 		// for memory problems
-		go()->getDebugger()->disabled = false;
+		go()->getDebugger()->enabled = false;
 
 		echo "Cleaning up unused ACL's\n";
 
@@ -249,9 +249,9 @@ JSON;
 			", entityId = f.id where usedIn is null"
 		);
 
-		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
-
-		echo "Delete " . $deleteCount ." unused ACL's\n";
+//		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+//
+//		echo "Delete " . $deleteCount ." unused ACL's\n";
 
 	}
 
