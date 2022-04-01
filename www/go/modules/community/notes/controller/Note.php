@@ -7,6 +7,7 @@ use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
 use go\core\jmap\Response as ResponseAlias;
+use go\core\util\ArrayObject;
 use go\core\util\Crypt;
 use go\modules\community\notes\model;
 
@@ -49,7 +50,7 @@ class Note extends EntityController {
 	 * @throws InvalidArguments
 	 * @see https://jmap.io/spec-core.html#/query
 	 */
-	public function query(array $params): array
+	public function query(array $params): ArrayObject
 	{
 		return $this->defaultQuery($params);
 	}
@@ -62,7 +63,7 @@ class Note extends EntityController {
 	 * @throws Exception
 	 * @see https://jmap.io/spec-core.html#/get
 	 */
-	public function get(array $params): array
+	public function get(array $params): ArrayObject
 	{
 		return $this->defaultGet($params);
 	}
@@ -76,7 +77,7 @@ class Note extends EntityController {
 	 * @throws InvalidArguments
 	 * @throws StateMismatch
 	 */
-	public function set(array $params): array
+	public function set(array $params): ArrayObject
 	{
 		return $this->defaultSet($params);
 	}
@@ -90,7 +91,7 @@ class Note extends EntityController {
 	 * @throws InvalidArguments
 	 * @see https://jmap.io/spec-core.html#/changes
 	 */
-	public function changes(array $params): array
+	public function changes(array $params): ArrayObject
 	{
 		return $this->defaultChanges($params);
 	}
@@ -103,7 +104,7 @@ class Note extends EntityController {
 	 * @return array
 	 * @throws InvalidArguments
 	 */
-	public function export(array $params): array
+	public function export(array $params): ArrayObject
 	{
 		return $this->defaultExport($params);
 	}
@@ -116,7 +117,7 @@ class Note extends EntityController {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function import(array $params): array
+	public function import(array $params): ArrayObject
 	{
 		return $this->defaultImport($params);
 	}
@@ -129,7 +130,7 @@ class Note extends EntityController {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function importCSVMapping(array $params): array
+	public function importCSVMapping(array $params): ArrayObject
 	{
 		return $this->defaultImportCSVMapping($params);
 	}
@@ -140,7 +141,7 @@ class Note extends EntityController {
 	 * @param array $params
 	 * @return array
 	 */
-	public function exportColumns(array $params): array
+	public function exportColumns(array $params): ArrayObject
 	{
 		return $this->defaultExportColumns($params);
 	}
