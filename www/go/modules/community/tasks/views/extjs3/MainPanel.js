@@ -322,7 +322,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}, '->', {
 					xtype: "tbsearch"
 				},{
-					hidden: !go.Modules.get("community", 'tasks').userRights.mayChangeTasklists,
+				hidden: !go.Modules.get("community", 'tasks') || !go.Modules.get("community", 'tasks').userRights.mayChangeTasklists,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {

@@ -19,7 +19,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function allowGuests() {
 		if($this->isCli())
-			return array('syncfilesystem');
+			return array('syncfilesystem', 'removeempty');
 		else
 			return parent::allowGuests();
 	}
@@ -27,6 +27,55 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
   protected function allowWithoutModuleAccess() {
     return ['images'];
   }
+
+
+	public function actionRemoveEmpty() {
+
+		\GO\Base\Fs\File::setAllowDeletes(false);
+		GO::session()->runAsRoot();
+
+		$count = $total = $this->removeEmpty();
+		while($count != 0) {
+			$count = $this->removeEmpty();
+			$total += $count;
+		}
+
+		echo "Removed " . $count ." empty folders\n";
+
+	}
+
+	private function removeEmpty() {
+		$ids = go()->getDbConnection()->query("select id FROM fs_folders f
+    where not exists(
+            select * from fs_folders sub where sub.parent_id=f.id
+        ) and
+        not exists(
+                select * from fs_files fi where fi.folder_id=f.id
+            )")->fetchAll(\PDO::FETCH_COLUMN);
+
+		if(empty($ids)) {
+			echo "Nothing empty\n";
+			return;
+		}
+
+		$count = 0;
+		$folders = Folder::model()->findByAttribute('id', $ids);
+		foreach($folders as $folder) {
+
+			if($folder->hasFolderChildren() || $folder->hasFileChildren()) {
+				//should never happen
+				var_dump($folder->getAttributes());
+				throw new \Exception("FOlder has children!");
+			}
+			echo ".";
+			$folder->delete(true);
+			$count++;
+		}
+
+		echo "\n";
+
+		return $count;
+	}
 
 	protected function actionGetURL($path){
 		

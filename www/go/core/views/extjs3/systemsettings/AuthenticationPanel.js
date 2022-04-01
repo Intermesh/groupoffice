@@ -78,7 +78,8 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							name: "corsAllowOrigin",
 							itemCfg: {
 								xtype: "textfield",
-								hideLabel: true
+								hideLabel: true,
+								placeholder: 'eg. https://example.com'
 							},
 							anchor: "100%"
 						}, {

@@ -509,10 +509,10 @@ END;
 		//remove all characters we don't care about
 		$text = preg_replace('/[^\w\-_+\\\\\/\s:@]/u', '', mb_strtolower($text));
 
-		if($forSave) {
-			//split on white space
-			$keywords = mb_split("[\s]+", $text);
+		//split on white space
+		$keywords = mb_split("[\s]+", $text);
 
+		if($forSave) {
 			// Add words separated too when they are joined with -, /, \ or _. eg. Jansen-Pietersen or test/foo
 			// so they can be found with Jansen-Pietersen but also with Pietersen
 			$secondPassKeywords = [];
@@ -524,10 +524,6 @@ END;
 			}
 
 			$keywords = array_merge($keywords, $secondPassKeywords);
-		} else{
-			// for search just split on white space
-			// for search just split on white space
-			$keywords = mb_split("[\s]+", $text);;
 		}
 
 		//remove empty stuff.

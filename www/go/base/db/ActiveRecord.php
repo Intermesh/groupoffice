@@ -294,7 +294,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * This is defined as a function because it's a only property that can be set
 	 * by child classes.
 	 *
-	 * @return StringHelper The database table name
+	 * @return string The database table name
 	 */
 	public function tableName(){
 		return false;
@@ -4888,6 +4888,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			echo "Processing ".static::class ."\n";
 			
 			$entityTypeId = static::entityType()->getId();
+
+			echo "Deleting old values\n";
+
+			$stmt = go()->getDbConnection()->delete('core_search', (new \go\core\orm\Query)
+				->where('entityTypeId', '=',$entityTypeId)
+				->andWhere('entityId', 'NOT IN', go()->getDbConnection()->select('id')->from($this->tableName()))
+			);
+			$stmt->execute();
+
+			echo "Deleted ". $stmt->rowCount() . " entries\n";
 		
 			$start = 0;
 			$limit = 1000;

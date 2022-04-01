@@ -197,12 +197,22 @@ JSON;
 		echo "Cleaning up....\n";
 		Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
 
+		if(Module::isInstalled("legacy", "files")) {
+			$this->cleanupEmptyFolders();
+		}
+
 		$this->cleanupAcls();
 
 		$this->fireEvent(self::EVENT_CLEANUP);
 
 		$this->reportUnknownTables();
 
+	}
+
+	private function cleanupEmptyFolders() {
+		echo "Removing empty folders\n";
+		$fc = new \GO\Files\Controller\FolderController();
+		$fc->actionRemoveEmpty();
 	}
 
 	private function cleanupAcls() {
@@ -227,7 +237,7 @@ JSON;
 			if(!$module->isAvailable()) {
 				continue;
 			}
-			echo "Checking module ". ($modules->package ?? "legacy") . "/" .$module->name ."\n";
+			echo "Checking module ". ($module->package ?? "legacy") . "/" .$module->name ."\n";
 			$module->module()->checkAcls();
 		}
 
@@ -239,9 +249,9 @@ JSON;
 			", entityId = f.id where usedIn is null"
 		);
 
-	//	$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
 
-		//echo "Delete " . $deleteCount ." unused ACL's\n";
+		echo "Delete " . $deleteCount ." unused ACL's\n";
 
 	}
 
