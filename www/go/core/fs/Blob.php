@@ -419,14 +419,15 @@ class Blob extends orm\Entity {
 	{
 		return go()->getSettings()->URL . 'api/download.php?blob=' . $blobId;
 	}
-	
+
 	/**
 	 * Parse blob id's inserted as images in HTML content.
-	 * 
+	 *
 	 * @param ?string $html
+	 * @param bool $checkIfExists Verify if the blob exists in the database
 	 * @return string[] Array of blob ID's
 	 */
-	public static function parseFromHtml(?string $html): array
+	public static function parseFromHtml(?string $html, bool $checkIfExists = false): array
 	{
 //		if(!preg_match_all('/<img [^>]*src="[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
 //			return [];
@@ -446,7 +447,14 @@ class Blob extends orm\Entity {
 			$matches = array_merge($matches, $dataBlobIdMatches[1]);
 		}
 
-		return array_unique($matches);
+		$matches =  array_unique($matches);
+
+		if($checkIfExists) {
+			$matches = array_filter($matches, function($blobId) {
+				return Blob::exists($blobId);
+			});
+		}
+		return $matches;
 	}
 
 	/**

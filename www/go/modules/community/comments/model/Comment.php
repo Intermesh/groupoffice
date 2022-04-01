@@ -233,7 +233,7 @@ class Comment extends AclItemEntity {
 
 	protected function internalSave(): bool
 	{
-		$this->images = Blob::parseFromHtml($this->text);
+		$this->images = Blob::parseFromHtml($this->text, true);
 
 		if(!parent::internalSave()) {
 			return false;

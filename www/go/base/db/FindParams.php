@@ -221,7 +221,7 @@ class FindParams{
 			
 	 * ```
 	 * 
-	 * @param StringHelper $tableName
+	 * @param string $tableName
 	 * @param FindCriteria $criteria
 	 * @param String $tableAlias
 	 * @param String $type INNER or LEFT etc.
