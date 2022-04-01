@@ -7,6 +7,8 @@ use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
+use go\core\jmap\Entity;
+use go\core\model\Alert as CoreAlert;
 use go\core\orm\SearchableTrait;
 use go\core\util\StringUtil;
 use GO\Files\Model\Folder;
@@ -33,6 +35,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		\GO\Base\Fs\File::setAllowDeletes(false);
 		GO::session()->runAsRoot();
+
+		// Speed things up.
+		Entity::$trackChanges = false;
+		\go\modules\community\history\Module::$enabled = false;
 
 		$count = $total = $this->removeEmpty();
 		while($count != 0) {
@@ -67,6 +73,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				var_dump($folder->getAttributes());
 				throw new \Exception("FOlder has children!");
 			}
+			$folder->readonly= true;//prevent acl delete
 			echo ".";
 			$folder->delete(true);
 			$count++;

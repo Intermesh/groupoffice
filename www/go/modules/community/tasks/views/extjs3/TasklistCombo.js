@@ -33,7 +33,7 @@
 				if (this.initialConfig.role) {
 					this.store.setFilter('role', {role: this.initialConfig.role});
 				}
-				if (go.User.tasksSettings) {
+				if (go.User.tasksSettings && !("value" in this.initialConfig)) {
 					this.value = go.User.tasksSettings.defaultTasklistId;
 				}
 			}

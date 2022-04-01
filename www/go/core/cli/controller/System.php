@@ -15,6 +15,7 @@ use go\core\jmap\Response;
 use go\core\jmap\Router;
 use go\core\model\Alert;
 use go\core\http\Client;
+use go\core\model\Alert as CoreAlert;
 use go\core\model\CronJobSchedule;
 use go\core\event\Listeners;
 use go\core\model\Module;
@@ -219,6 +220,11 @@ JSON;
 
 		// for memory problems
 		go()->getDebugger()->enabled = false;
+		CoreAlert::$enabled = false;
+
+		// Speed things up.
+		Entity::$trackChanges = false;
+		\go\modules\community\history\Module::$enabled = false;
 
 		echo "Cleaning up unused ACL's\n";
 
@@ -249,9 +255,9 @@ JSON;
 			", entityId = f.id where usedIn is null"
 		);
 
-//		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
-//
-//		echo "Delete " . $deleteCount ." unused ACL's\n";
+		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+
+		echo "Delete " . $deleteCount ." unused ACL's\n";
 
 	}
 
