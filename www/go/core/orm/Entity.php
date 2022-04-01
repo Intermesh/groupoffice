@@ -337,6 +337,7 @@ abstract class Entity extends Property {
 
 			return $this->commit() && !$this->hasValidationErrors();
 		} catch(Exception $e) {
+			\go\core\ErrorHandler::logException($e);
 			$this->rollback();
 			throw $e;
 		}
@@ -527,7 +528,7 @@ abstract class Entity extends Property {
 		parent::rollBack();
 		// $this->isDeleting = false;
 		$this->isSaving = false;
-		return App::get()->getDbConnection()->rollBack();
+		return !go()->getDbConnection()->inTransaction() || App::get()->getDbConnection()->rollBack();
 	}
 
 	/**
