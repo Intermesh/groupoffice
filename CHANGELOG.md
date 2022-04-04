@@ -1,5 +1,6 @@
 6.6.66 the stuttering of the beast
 - Projects: Fix html entities in Template events names and descriptions  
+- OldCore: Permissions tab will not show disabled users
 
 04-04-2022 6.6.65
 - Files: Fix file search paging

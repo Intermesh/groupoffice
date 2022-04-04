@@ -67,15 +67,22 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 	 * @param Array $params Client input parameters
 	 * @return $response for the client. 
 	 */
-	protected function actionSelectedStore($params) {
+	protected function actionSelectedStore(array $params)
+	{
 		$currentPermissionLevel = \GO\Base\Model\Acl::getUserPermissionLevel($params['model_id'],\GO::user()->id);
 		$response['manage_permission'] = $params['currentUserHasManagePermission'] = \GO\Base\Model\Acl::hasPermission($currentPermissionLevel,\GO\Base\Model\Acl::MANAGE_PERMISSION);
 		$response = array_merge($response,parent::actionSelectedStore($params));
 		return $response;
 	}
-	
-		protected function actionSelectNewStore($params){
-		
+
+
+	/**
+	 * @param array $params
+	 * @return array|\GO\Base\Controller\type
+	 * @throws \go\core\http\Exception
+	 */
+	protected function actionSelectNewStore(array $params)
+	{
 		$model = \GO::getModel($this->modelName());
 		$linkModel = \GO::getModel($this->linkModelName());
 		
@@ -83,7 +90,8 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 		
 		$joinCriteria = \GO\Base\Db\FindCriteria::newInstance()
 			->addCondition($this->getRemoteKey(), $params['model_id'],'=','lt')
-			->addCondition($model->primaryKey(), 'lt.'.$this->linkModelField(), '=', 't', true, true);			
+			->addCondition($model->primaryKey(), 'lt.'.$this->linkModelField(), '=', 't', true, true);
+
 		
 		$this->formatColumns($store->getColumnModel());
 		
@@ -93,7 +101,8 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 			$findParams->join($linkModel->tableName(), $joinCriteria, 'lt', 'LEFT');
 
 			$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
-							->addCondition($this->linkModelField(), null,'IS','lt');
+				->addCondition($this->linkModelField(), null,'IS','lt')
+				->addRawCondition('(user.enabled = true OR t.isUserGroupFor IS NULL)', null,'=',true);
 			$findParams->criteria($findCriteria);
 		}
 		
@@ -116,8 +125,9 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 		$addKeys = !empty($params['add']) ? json_decode($params['add']) : array();
 		if (!empty($addKeys)) {
 			// Only admins may edit the set of linked groups.
-			if(!$params['currentUserHasManagePermission'])
+			if(!$params['currentUserHasManagePermission']) {
 				throw new \GO\Base\Exception\AccessDenied();
+			}
 		} else {
 			return false;
 		}
@@ -128,8 +138,9 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 		$delKeys = !empty($params['delete_keys']) ? json_decode($params['delete_keys']) : array();
 		if (!empty($delKeys)) {
 			// Only admins may edit the set of linked groups.
-			if(!$params['currentUserHasManagePermission'])
-					throw new \GO\Base\Exception\AccessDenied();
+			if(!$params['currentUserHasManagePermission']) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
 		} else {
 			return false;
 		}
