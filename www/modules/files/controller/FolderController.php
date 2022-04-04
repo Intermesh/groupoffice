@@ -882,19 +882,24 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$limit = !empty($params['limit']) ? $params['limit'] : 30;
 			$start = !empty($params['start']) ? $params['start'] : 0;
 
-			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 's.aclId', '=', false);
-
-			$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
-					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
 					->select('t.*')
-					->ignoreAcl()
-					->joinCustomFields()
-					->join("core_search", "s.entityId = t.id AND s.entityTypeId = " . \GO\Files\Model\File::entityType()->getId(), "s")
 
+					->joinCustomFields()
+					->join("core_search", "s.entityId = t.id AND s.entityTypeId = " . \GO\Files\Model\File::entityType()->getId(), "s");
+
+			if(!go()->getAuthState()->isAdmin()) {
+				$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 's.aclId', '=', false);
+
+				$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
+					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
+
+
+				$findParams->ignoreAcl()
 					->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER')->debugSql()
 					->criteria($aclWhereCriteria);
+			}
 
 			$i = 0;
 
