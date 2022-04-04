@@ -884,6 +884,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
+					->calcFoundRows()
 					->select('t.*')
 
 					->joinCustomFields()
@@ -921,16 +922,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					$findParams->order("t.".$params['sort'], $params['dir']);
 				}
 			}
-			
-			$filesStmt = \GO\Files\Model\File::model()->find($findParams);
-
-			$response['total'] = $filesStmt->rowCount();
 
 			$filesStmt = \GO\Files\Model\File::model()->find(
 				$findParams
 					->start($start)
 					->limit($limit)
 			);
+
+		$response['total'] = $filesStmt->foundRows;
 
 			$response['results'] = array();
 			$response['cm_state'] = '';
