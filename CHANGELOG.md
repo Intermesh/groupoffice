@@ -1,3 +1,4 @@
+04-04-2022 6.6.65
 - Files: Fix file search paging
 - Projects: Fixed projects overview reports
 - Tickets: fix close and open menu available without permission
