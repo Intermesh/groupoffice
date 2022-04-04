@@ -1273,12 +1273,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$this->_debugSql=!empty(GO::session()->values['debugSql']);
 		}
 //		$this->_debugSql=true;
-		if(GO::$ignoreAclPermissions)
-			$params['ignoreAcl']=true;
+
 
 		if(empty($params['userId'])){
 			$params['userId']=!empty(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
 		}
+
+		if(GO::$ignoreAclPermissions || User::isAdminById($params['userId']))
+			$params['ignoreAcl']=true;
 
 		if($this->aclField() && (empty($params['ignoreAcl']) || !empty($params['joinAclFieldTable']))){
 			$aclJoinProps = $this->_getAclJoinProps();
@@ -1775,7 +1777,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	private function _appendAclJoin($findParams, $aclJoinProps){
 
-		if(empty($findParams['ignoreAdminGroup']) && User::isAdminById($findParams['userId'])) {
+		if(empty($findParams['ignoreAdminGroup'])) {
 			return "";
 		}
 
