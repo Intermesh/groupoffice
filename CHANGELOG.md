@@ -1,5 +1,6 @@
 - Files: Fix file search paging
 - Projects: Fixed projects overview reports
+- Tickets: fix close and open menu available without permission
 
 31-03-2022 6.6.64
 - Core: Custom field date correction caused error on disabled modules.
