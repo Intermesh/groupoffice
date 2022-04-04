@@ -1,4 +1,4 @@
-- Files: Fix file search for admins
+- Files: Fix file search paging
 
 31-03-2022 6.6.64
 - Core: Custom field date correction caused error on disabled modules.
