@@ -1285,7 +1285,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$params['userId']=!empty(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
 		}
 
-		if(GO::$ignoreAclPermissions || User::isAdminById($params['userId']))
+		if(empty($params['ignoreAcl']) && empty($findParams['ignoreAdminGroup']) && (GO::$ignoreAclPermissions || User::isAdminById($params['userId'])))
 			$params['ignoreAcl']=true;
 
 		if($this->aclField() && (empty($params['ignoreAcl']) || !empty($params['joinAclFieldTable']))){
@@ -1783,10 +1783,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	private function _appendAclJoin($findParams, $aclJoinProps){
-
-		if(empty($findParams['ignoreAdminGroup'])) {
-			return "";
-		}
 
 		$sql = "\nINNER JOIN core_acl_group ON (`".$aclJoinProps['table']."`.`".$aclJoinProps['attribute']."` = core_acl_group.aclId";
 		if(isset($findParams['permissionLevel']) && $findParams['permissionLevel']>\GO\Base\Model\Acl::READ_PERMISSION){
