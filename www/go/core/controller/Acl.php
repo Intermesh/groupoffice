@@ -5,7 +5,7 @@ namespace go\core\controller;
 use GO\Base\Db\ActiveRecord;
 use go\core\exception\NotFound;
 use go\core\model;
-use function GO;
+use go\core\orm\EntityType;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\Controller;
 
@@ -101,5 +101,70 @@ class Acl extends Controller {
 		
 		// return [];		
 	}
-	
+
+	public function overview($params) {
+
+		//$level = "CASE ag.level WHEN 10 THEN 'Read' WHEN 20 THEN 'Read/Add' WHEN 30 THEN 'Write' WHEN 40 THEN 'Write/Delete' WHEN 50 THEN 'Manage' ELSE 'Other' END as level";
+		$statement = \go()->getDbConnection()
+			->select('ag.level, a.entityTypeId as typeId, e.name as type, a.entityId, m.name as module, IFNULL(g.isUserGroupFor, 0) as userGroup, g.name as username')
+			->from('core_acl_group', 'ag')
+			->join('core_acl', 'a', 'ag.aclId = a.id')
+			->join('core_group', 'g', 'g.id = ag.groupId')
+			->join('core_user', 'u', 'g.isUserGroupFor = u.id', 'LEFT')
+			->join('core_entity', 'e', 'a.entityTypeId = e.id')
+			->join('core_module', 'm', 'e.moduleId = m.id')
+			->where('(u.enabled = 1 OR u.enabled IS NULL)') // NULL for group
+			->andWhere('a.entityTypeId IS NOT NULL') // default ACLS for type do not have ids
+			->andWhere('a.entityId IS NOT NULL')->limit(2000)
+			->fetchMode(\PDO::FETCH_OBJ);
+		if(isset($params['filter'])) {
+			$filters = isset($params['filter']['conditions']) ? $params['filter']['conditions'] : [$params['filter']];
+			foreach($filters as $filter) {
+				if(isset($filter['groupId'])) {
+					$statement->andWhere('ag.groupId', '=', $filter['groupId']);
+				}
+				if(isset($filter['moduleId'])) {
+					$statement->andWhere('e.moduleId', '=', $filter['moduleId']);
+				}
+				if(isset($filter['type']) && $filter['type'] !== 'both') {
+					$statement->andWhere('g.isUserGroupFor', $filter['type']=='users'? 'IS NOT' :'IS', null );
+				}
+			}
+		}
+
+		$acgs = $statement->all();
+
+		if(count($acgs) < 2000) {
+			// only find name of entity if not to many data is loaded.
+			$types = [];
+			foreach($acgs as $record) {
+				if(!isset($types[$record->typeId])) {
+					$types[$record->typeId] = [];
+				}
+				$types[$record->typeId][] = $record->entityId;
+			}
+			$names = [];
+			foreach($types as $typeId => $ids) {
+				$et = EntityType::findById($typeId);
+				if(!$et) {
+					throw new \Exception($typeId);
+				}
+				$cls = $et->getClassName();
+				if(is_a($cls, ActiveRecord::class, true)) {
+					$items = $cls::model()->findByAttribute('id', $ids);
+				} else {
+					$items = $cls::find()->where('id', 'IN', $ids);
+				}
+				foreach($items as $item) {
+					$names[$item->id] = $item->title();
+				}
+			}
+			foreach($acgs as $record) {
+				$record->name = isset($names[$record->entityId]) ? $names[$record->entityId] : '';
+			}
+		}
+
+		return ['list'=>$acgs];
+	}
+
 }

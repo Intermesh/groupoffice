@@ -889,10 +889,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
+					->calcFoundRows()
 					->select('t.*')
 
 					->joinCustomFields()
-					->join("core_search", "s.entityId = t.id AND s.entityTypeId = " . \GO\Files\Model\File::entityType()->getId(), "s");
+					->join("core_search", "s.entityId = t.id AND s.entityTypeId = " . \GO\Files\Model\File::entityType()->getId(), "s")
+				->start($start)
+				->limit($limit)
+				->group(['t.id']);
 
 			if(!go()->getAuthState()->isAdmin()) {
 				$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 's.aclId', '=', false);
@@ -926,16 +930,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					$findParams->order("t.".$params['sort'], $params['dir']);
 				}
 			}
-			
-			$filesStmt = \GO\Files\Model\File::model()->find($findParams);
-
-			$response['total'] = $filesStmt->rowCount();
 
 			$filesStmt = \GO\Files\Model\File::model()->find(
 				$findParams
-					->start($start)
-					->limit($limit)
+
 			);
+
+		$response['total'] = $filesStmt->foundRows;
 
 			$response['results'] = array();
 			$response['cm_state'] = '';
