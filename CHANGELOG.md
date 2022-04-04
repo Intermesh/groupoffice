@@ -2,6 +2,7 @@
   For example foo/bar can be found with "foo/bar", "foo" and "bar"._
   Note: A rebuild is required to make it work on existing entries.
 - Files: Fixed file search paging
+- Tickets: fix close and open menu available without permission
 
 22-03-2022 6.5.106
 - Core: Optimize 'optimizer_search_depth' for global search queries.
