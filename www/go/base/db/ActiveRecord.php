@@ -1285,7 +1285,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$params['userId']=!empty(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
 		}
 
-		if(empty($params['ignoreAcl']) && empty($findParams['ignoreAdminGroup']) && (GO::$ignoreAclPermissions || User::isAdminById($params['userId'])))
+		if(empty($params['ignoreAcl']) && empty($params['ignoreAdminGroup']) && (GO::$ignoreAclPermissions || User::isAdminById($params['userId'])))
 			$params['ignoreAcl']=true;
 
 		if($this->aclField() && (empty($params['ignoreAcl']) || !empty($params['joinAclFieldTable']))){

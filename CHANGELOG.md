@@ -1,5 +1,5 @@
 6.6.66 the stuttering of the beast
-- Projects: Fix html entities in Template events names and descriptions  
+- Projects: Fix html entities in Template events names and descriptions
 - OldCore: Permissions tab will not show disabled users
 
 04-04-2022 6.6.65
@@ -342,6 +342,10 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+05-04-2022 6.5.108
+- Email: All accounts were shown to admins
+
+04-04-2022 6.5.107
 - Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
   For example foo/bar can be found with "foo/bar", "foo" and "bar"._
   Note: A rebuild is required to make it work on existing entries.
