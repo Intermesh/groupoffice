@@ -1,3 +1,16 @@
+05-04-2022 6.6.66
+- Email: All accounts were shown to admins
+- Projects: Fix html entities in Template events names and descriptions
+- OldCore: Permissions tab will not show disabled users
+
+04-04-2022 6.6.65
+- Files: Fix file search paging
+- Projects: Fixed projects overview reports
+- Tickets: fix close and open menu available without permission
+
+31-03-2022 6.6.64
+- Core: Custom field date correction caused error on disabled modules.
+
 31-03-2022 6.6.63
 - Projects: disable add / edit buttons in time entry grid if project is complete
 - Core: save and display new style cronjobs correctly as per default timezone
@@ -330,9 +343,15 @@
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
 
+05-04-2022 6.5.108
+- Email: All accounts were shown to admins
+
+04-04-2022 6.5.107
 - Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
   For example foo/bar can be found with "foo/bar", "foo" and "bar"._
   Note: A rebuild is required to make it work on existing entries.
+- Files: Fixed file search paging
+- Tickets: fix close and open menu available without permission
 
 22-03-2022 6.5.106
 - Core: Optimize 'optimizer_search_depth' for global search queries.

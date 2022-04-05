@@ -135,6 +135,20 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					this.store.load();
 				},
 				scope:this
+			},{
+				text:t('Permissions'),
+				iconCls: 'ic-list',
+				handler: function() {
+					(new go.Window({
+						title: t('Permission overview'),
+						width:1000,
+						height: 600,
+						layout:'fit',
+						maximizable: true,
+						resizable:true,
+						items:[new go.permissions.AclOverviewGrid()]
+					})).show();
+				}
 			}, '->', {
 				xtype: 'tbsearch',
 				filters: [

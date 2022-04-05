@@ -129,6 +129,7 @@ detail/CreateModifyPanel.js
 
 permissions/SharePanel.js
 permissions/ShareWindow.js
+permissions/AclOverviewGrid.js
 
 
 usersettings/VisibleToPanel.js
