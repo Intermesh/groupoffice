@@ -154,7 +154,7 @@ trait SearchableTrait {
 		$search->description = $this->getSearchDescription();
 		$search->filter = $this->getSearchFilter();
 		$search->modifiedAt = property_exists($this, 'modifiedAt') ? $this->modifiedAt : new DateTime();
-		
+		$search->rebuild = false;
 //		$search->createdAt = $this->createdAt;
 		
 		$keywords = $this->getSearchKeywords();
@@ -263,13 +263,12 @@ trait SearchableTrait {
 		/** @var Entity $cls */
 		$query = $cls::find();
 		/* @var $query OrmQuery */
-		$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT");
-		$query->andWhere('search.id IS NULL')
-
-//			$query->where('id', 'not in', Search::find()->selectSingleValue('entityId')->where('entityTypeId', '=', $cls::entityType()->getId()))
-							->limit($limit)
-							->offset($offset);
-
+		$query
+			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT")
+			->andWhere('search.id IS NULL')
+			->orWhere('search.rebuild = true')
+			->limit($limit)
+			->offset($offset);
 
 		return $query->execute();
 	}
@@ -306,7 +305,7 @@ trait SearchableTrait {
 				try {
 					flush();
 
-					$m->saveSearch(false);
+					$m->saveSearch();
 					echo ".";
 
 				} catch (Exception $e) {

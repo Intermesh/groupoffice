@@ -1165,3 +1165,7 @@ $updates['202203310856'][] = function() {
 		}
 	}
 };
+
+
+$updates['202204051245'][] = "alter table core_search
+    add `rebuild` bool default false not null;";

@@ -112,6 +112,13 @@ class Search extends AclOwnerEntity {
 	 */
 	public $modifiedAt;
 
+	/**
+	 * Rebuild this entry when running build search cache.
+	 *
+	 * @var bool
+	 */
+	public $rebuild = false;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()

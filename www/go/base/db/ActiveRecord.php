@@ -3733,6 +3733,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
+		$search->rebuild = false;
 		if(!$search->save()) {
 			throw new \Exception("Could not save search cache!");
 		}
@@ -3853,8 +3854,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Get keywords this model should be found on.
 	 * Returns all String properties in a concatenated string.
 	 *
-	 * @param String $prepend
-	 * @return String
+	 * @param string $prepend
+	 * @return string[]
 	 */
 	public function getSearchCacheKeywords($prepend=''){
 		$keywords=array();
@@ -4897,7 +4898,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 							->start($start)
 							->join('core_search', FindCriteria::newInstance()->addRawCondition('search.entityId', 't.id')->addRawCondition("search.entityTypeId", $entityTypeId), 'search', 'LEFT');
 			
-			$findParams->getCriteria()->addCondition('entityId',null, 'IS', 'search');							
+			$findParams->getCriteria()
+				->addCondition('entityId',null, 'IS', 'search')
+				->addCondition('rebuild',true, '=', 'search', false);
 			
 			//In small batches to keep memory low
 			$stmt = $this->find($findParams);
