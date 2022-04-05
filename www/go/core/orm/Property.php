@@ -333,6 +333,8 @@ abstract class Property extends Model {
 
 	/**
 	 * For reusing prepared statements
+	 *
+	 * @var Statement[]
 	 */
 	private static $cachedRelationStmts = [];
 
@@ -371,6 +373,7 @@ abstract class Property extends Model {
 		}else
 		{
 			$stmt = self::$cachedRelationStmts[$cacheKey] ;
+			$stmt->setOwner($owner);
 		}
 
 		foreach($where as $field => $value) {
