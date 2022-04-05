@@ -3742,6 +3742,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
 		}
 
+		$keywords = StringUtil::filterRedundantSearchWords($keywords);
+
 		$keywords = array_map(function ($word) use ($search){
 			return ['searchId' => $search->id, 'word'=> $word];
 		}, $keywords);
@@ -3901,10 +3903,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$arr = array_merge($arr, StringUtil::splitTextKeywords($keyword));
 		}
 		if($this->hasAttribute('id')) {
-			$keywords[] = $this->id;
+			$arr[] = $this->id;
 		}
-		$keywords = array_unique($arr);
-		return $keywords;
+		return $arr;
 	}
 
 	protected function beforeSave(){
@@ -4920,8 +4921,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 						}
 						
 					} catch (\Exception $e) {
-						\go\core\ErrorHandler::logException($e);
-						echo "\nError: " . $e->getMessage() ."\n";
+
+						echo "\n\nError: " . $e->getMessage() ."\n";
+
+						echo "Record: " . $m->id ."\n\n";
+
+						echo $e->getTraceAsString();
+
+
+						echo \go\core\ErrorHandler::logException($e);
+
 						$start++;
 					}
 				}

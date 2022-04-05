@@ -186,7 +186,7 @@ trait SearchableTrait {
 			$arr = array_merge($arr, StringUtil::splitTextKeywords($keyword));
 		}
 
-		$keywords = array_unique($arr);
+		$keywords = StringUtil::filterRedundantSearchWords($arr);
 
 		if(!empty($this->id) && !in_array($this->id, $keywords)) {
 			$keywords[] = $this->id;

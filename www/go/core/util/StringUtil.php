@@ -507,27 +507,31 @@ END;
 		}
 
 		//remove all characters we don't care about
-		$text = preg_replace('/[^\w\-_+\\\\\/\s:@]/u', '', mb_strtolower($text));
+		$text = preg_replace('/[^\w\-_+\\\\\/\s:@,;]/u', '', mb_strtolower($text));
+
+		//split on white space
+		$keywords = mb_split("[\s,;]+", $text);
 
 		if($forSave) {
-			//split on white space
-			$keywords = mb_split("[\s]+", $text);
-
 			// Add words separated too when they are joined with -, /, \ or _. eg. Jansen-Pietersen or test/foo
 			// so they can be found with Jansen-Pietersen but also with Pietersen
 			$secondPassKeywords = [];
 			foreach ($keywords as $keyword) {
-				$split = mb_split('[_\-\\\\\/]', $keyword);
-				if(count($split) > 1) {
+				// handle email differently. We want info@group-office.com split in
+				// info and group-office.com. With names like Jansen-Pietersen we want
+				// Jansen and Pietersen.
+				$split = explode('@', $keyword);
+				if(count($split) != 2) {
+					$split = mb_split('[_\-\\\\\/]', $keyword);
+				}
+
+				if (count($split) > 1) {
 					$secondPassKeywords = array_merge($secondPassKeywords, $split);
 				}
+
 			}
 
 			$keywords = array_merge($keywords, $secondPassKeywords);
-		} else{
-			// for search just split on white space
-			// for search just split on white space
-			$keywords = mb_split("[\s]+", $text);;
 		}
 
 		//remove empty stuff.
@@ -537,5 +541,37 @@ END;
 		});
 
 
+	}
+
+
+	/**
+	 * Filter out words that are already in the beginning of other words.
+	 *
+	 * We search for:
+	 *
+	 * where word like 'foo%'
+	 *
+	 * So if we store a word 'foobar' we don't need to store 'foo' as 'foobar'
+	 * will already cover that.
+	 *
+	 * @param array $keywords
+	 * @return void
+	 */
+	public static function filterRedundantSearchWords(array $keywords) : array {
+		$keywords = array_unique($keywords);
+
+		return array_values(array_filter($keywords, function($word) use ($keywords) {
+			foreach($keywords as $keyword) {
+				//don't check the same
+				if($keyword === $word) {
+					continue;
+				}
+
+				if(mb_strpos($keyword, $word) === 0) {
+					return false;
+				}
+			}
+			return true;
+		}));
 	}
 }
