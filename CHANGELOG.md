@@ -1,4 +1,5 @@
-6.6.66 the stuttering of the beast
+05-04-2022 6.6.66
+- Email: All accounts were shown to admins
 - Projects: Fix html entities in Template events names and descriptions
 - OldCore: Permissions tab will not show disabled users
 
