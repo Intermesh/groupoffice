@@ -1,6 +1,8 @@
 - Core: Reset search cache doesn't delete existing records but updates them one by one so the links and search results
   won't disappear for the users.
 - Core: Search handles e-mail addresses differenty. Domain names can be searched.
+- Core: module Permissions incorrectly returned from server
+- OnlyOffice: New permission 'mayEdit' to replace required manage permission
 
 05-04-2022 6.6.66
 - Email: All accounts were shown to admins
