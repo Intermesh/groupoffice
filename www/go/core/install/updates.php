@@ -1122,8 +1122,6 @@ $updates['202203251058'][] = function() {
 
 	//run build search cache on cron immediately. This job will deactivate itself.
 	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
-
-	echo "\n\n======\nNOTE: Search cache will be rebuilt at midnight. This may take a lot of time.\n======\n\n";
 };
 
 $updates['202203251058'][] = "create index if not exists core_change_modSeq_entityTypeId_entityId_index
@@ -1135,11 +1133,8 @@ $updates['202203251058'][] = "create index if not exists core_change_user_modSeq
 
 
 $updates['202203310856'][] = function() {
-
 	//run build search cache on cron immediately. This job will deactivate itself.
 	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
-
-	echo "\n\n======\nNOTE: Search cache will be rebuilt at midnight. This may take a lot of time.\n======\n\n";
 };
 
 $updates['202203310856'][] = function() {
@@ -1169,3 +1164,12 @@ $updates['202203310856'][] = function() {
 
 $updates['202204051245'][] = "alter table core_search
     add `rebuild` bool default false not null;";
+
+
+$updates['202204051245'][] = function() {
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
+
+	echo "\n\n======\nNOTE: Search cache will be rebuilt at midnight. This may take a lot of time.\n======\n\n";
+};
