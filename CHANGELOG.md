@@ -1,3 +1,4 @@
+05-04-2022 6.6.67
 - Core: Reset search cache doesn't delete existing records but updates them one by one so the links and search results
   won't disappear for the users.
 - Core: Search handles e-mail addresses differenty. Domain names can be searched.
