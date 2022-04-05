@@ -1,3 +1,6 @@
+- Core: Reset search cache doesn't delete existing records but updates them one by one so the links and search results
+  won't disappear for the users.
+
 05-04-2022 6.6.66
 - Email: All accounts were shown to admins
 - Projects: Fix html entities in Template events names and descriptions
