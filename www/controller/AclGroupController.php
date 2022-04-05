@@ -67,7 +67,7 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 	 * @param Array $params Client input parameters
 	 * @return $response for the client. 
 	 */
-	protected function actionSelectedStore(array $params)
+	protected function actionSelectedStore($params)
 	{
 		$currentPermissionLevel = \GO\Base\Model\Acl::getUserPermissionLevel($params['model_id'],\GO::user()->id);
 		$response['manage_permission'] = $params['currentUserHasManagePermission'] = \GO\Base\Model\Acl::hasPermission($currentPermissionLevel,\GO\Base\Model\Acl::MANAGE_PERMISSION);
@@ -81,7 +81,7 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 	 * @return array|\GO\Base\Controller\type
 	 * @throws \go\core\http\Exception
 	 */
-	protected function actionSelectNewStore(array $params)
+	protected function actionSelectNewStore($params)
 	{
 		$model = \GO::getModel($this->modelName());
 		$linkModel = \GO::getModel($this->linkModelName());
