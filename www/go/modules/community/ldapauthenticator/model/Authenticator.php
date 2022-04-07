@@ -102,6 +102,7 @@ class Authenticator extends PrimaryAuthenticator {
 		if(!$user) {
 			$user = new User();
 		}else if($user->hasPassword()){
+			//password in database is not needed and clearing it improves security
 			$user->clearPassword();
 		}
 
