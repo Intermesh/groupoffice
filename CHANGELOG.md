@@ -2,7 +2,8 @@
 - Addressbook: Default address book wasn't set when creating from an item
 - Core: Fixed: After upgrade from 6.6.66 to 6.6.67 got a ErrorException #825 and
    GO 6.6.67 install throws php-error on php 8 #824
-
+- Core: Callback not called if statemismatch occurred causing settings dialog not to save.
+- Googleauthenticator: Fixed message asking to load changes because enity has been modified by someone else
 
 05-04-2022 6.6.67
 - Core: Reset search cache doesn't delete existing records but updates them one by one so the links and search results
