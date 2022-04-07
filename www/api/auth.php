@@ -12,6 +12,7 @@ use go\core\model\Token;
 use go\core\jmap\Request;
 use go\core\http\Response;
 use go\core\model\User;
+use go\core\orm\exception\SaveException;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\util\JSON;
@@ -197,7 +198,7 @@ try {
 					$rememberMe = new RememberMe();
 					$rememberMe->userId = $token->userId;
 					if(!$rememberMe->save()) {
-						throw new \go\core\orm\exception\SaveException($rememberMe);
+						throw new SaveException($rememberMe);
 					}
 					$rememberMe->setCookie();
 
