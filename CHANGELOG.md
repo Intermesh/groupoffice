@@ -4,6 +4,7 @@
    GO 6.6.67 install throws php-error on php 8 #824
 - Core: Callback not called if statemismatch occurred causing settings dialog not to save.
 - Googleauthenticator: Fixed message asking to load changes because enity has been modified by someone else
+- Email: Fixed grey text on white background in e-mail in Dark theme
 
 05-04-2022 6.6.67
 - Core: Reset search cache doesn't delete existing records but updates them one by one so the links and search results
