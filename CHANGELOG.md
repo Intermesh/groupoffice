@@ -1,5 +1,8 @@
 - Core: Fixed modified at dates setting to current time when resetting search cache.
 - Addressbook: Default address book wasn't set when creating from an item
+- Core: Fixed: After upgrade from 6.6.66 to 6.6.67 got a ErrorException #825 and
+   GO 6.6.67 install throws php-error on php 8 #824
+
 
 05-04-2022 6.6.67
 - Core: Reset search cache doesn't delete existing records but updates them one by one so the links and search results
