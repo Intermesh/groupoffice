@@ -373,7 +373,9 @@ abstract class Property extends Model {
 		}else
 		{
 			$stmt = self::$cachedRelationStmts[$cacheKey] ;
-			$stmt->setOwner($owner);
+			$query = $stmt->getQuery();
+			/** @var Query $query */
+			$stmt->setFetchMode(PDO::FETCH_CLASS, $cls, [$owner, false, [], $query->getReadOnly()]);
 		}
 
 		foreach($where as $field => $value) {

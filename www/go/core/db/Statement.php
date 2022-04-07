@@ -30,34 +30,6 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 	}
 
 	/**
-	 * @var array
-	 */
-	private $fetchMode;
-
-	/**
-	 * @inheritDoc
-	 */
-	public function setFetchMode($mode, $className = null, array $params = [])
-	{
-		$this->fetchMode = func_get_args();
-
-		call_user_func_array(['parent', 'setFetchMode'], $this->fetchMode);
-	}
-
-
-	/**
-	 * Change owner constructor parameter for results in cached Statement create in Property::internalFind()
-	 *
-	 * @param Property $owner
-	 * @return void
-	 */
-	public function setOwner(Property $owner) {
-		$this->fetchMode[2][0] = $owner;
-
-		call_user_func_array(['parent', 'setFetchMode'], $this->fetchMode);
-	}
-
-	/**
 	 * Set's the select query object
 	 * 
 	 * @param Query $query
