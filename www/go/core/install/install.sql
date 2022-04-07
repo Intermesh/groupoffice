@@ -199,7 +199,8 @@ CREATE TABLE `core_search` (
   `entityTypeId` int(11) NOT NULL,
   `filter` VARCHAR(50) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
-  `aclId` int(11) NOT NULL
+  `aclId` int(11) NOT NULL,
+  `rebuild` bool default false not null
 ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `core_setting` (

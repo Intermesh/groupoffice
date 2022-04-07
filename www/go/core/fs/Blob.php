@@ -345,6 +345,7 @@ class Blob extends orm\Entity {
 		}
 
 		if(empty($new)) {
+			go()->debug("No blobs to delete");
 			return true;
 		}
 

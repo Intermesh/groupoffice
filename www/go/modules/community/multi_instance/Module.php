@@ -55,7 +55,8 @@ class Module extends \go\core\Module {
 	public static function checkUrl() {
 
 		//Skip localhost for development
-		if(Request::get()->getHost() === 'localhost') {
+		$host = Request::get()->getHost();
+		if($host === 'localhost' || $host === 'host.docker.internal') {
 			return;
 		}
 

@@ -27,7 +27,7 @@ class PushDispatcher
 
 	public function __construct($types)
 	{
-		$this->interval = go()->getDebugger()->enabled ? 5 : 30;
+		$this->interval = 30;
 
 		//Hard code debug to false to prevent spamming of log.
 		go()->getDebugger()->enabled = false;

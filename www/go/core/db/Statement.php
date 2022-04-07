@@ -4,6 +4,7 @@ namespace go\core\db;
 use go\core\data\ArrayableInterface;
 use go\core\ErrorHandler;
 use Exception;
+use go\core\orm\Property;
 use JsonSerializable;
 use PDOException;
 use PDOStatement;
@@ -27,7 +28,7 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 	{
 		return $this->fetchAll();
 	}
-	
+
 	/**
 	 * Set's the select query object
 	 * 

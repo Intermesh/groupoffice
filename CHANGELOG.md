@@ -1,3 +1,24 @@
+- Core: Performance optimization. When array type relations are overwritten with identical values it's no longer
+   detected as a modification. This caused every login from LDAP via activesync to log two redundant changes for user and
+   it's associated contact.
+
+07-04-2022 6.6.68
+- Core: Fixed modified at dates setting to current time when resetting search cache.
+- Addressbook: Default address book wasn't set when creating from an item
+- Core: Fixed: After upgrade from 6.6.66 to 6.6.67 got a ErrorException #825 and
+   GO 6.6.67 install throws php-error on php 8 #824
+- Core: Callback not called if statemismatch occurred causing settings dialog not to save.
+- Googleauthenticator: Fixed message asking to load changes because enity has been modified by someone else
+- Email: Fixed grey text on white background in e-mail in Dark theme
+- Core: Just show time if it's today when using short dates
+
+05-04-2022 6.6.67
+- Core: Reset search cache doesn't delete existing records but updates them one by one so the links and search results
+  won't disappear for the users.
+- Core: Search handles e-mail addresses differenty. Domain names can be searched.
+- Core: module Permissions incorrectly returned from server
+- OnlyOffice: New permission 'mayEdit' to replace required manage permission
+
 05-04-2022 6.6.66
 - Email: All accounts were shown to admins
 - Projects: Fix html entities in Template events names and descriptions

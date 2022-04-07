@@ -25,6 +25,15 @@ body{
   border: 1px solid #ccc;
   color: black;
   background-color: white;
+
+  &.go-html-formatted
+  {
+    p, span, div {
+      background-color: white;
+      color: black;
+    }
+  }
+
 }
 
 .em-composer {
@@ -44,6 +53,12 @@ body{
   }
 }
 
-.go-html-formatted a:visited {
-  color: #B39DDB;
+.go-html-formatted {
+  a:visited {
+    color: #B39DDB;
+  }
+
+  p, span, div {
+    background-color: black;
+  }
 }

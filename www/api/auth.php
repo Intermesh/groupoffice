@@ -229,7 +229,7 @@ try {
 					$rememberMe = new RememberMe();
 					$rememberMe->userId = $token->userId;
 					if(!$rememberMe->save()) {
-						throw new \go\core\orm\exception\SaveException($rememberMe);
+						throw new SaveException($rememberMe);
 					}
 					$rememberMe->setCookie();
 

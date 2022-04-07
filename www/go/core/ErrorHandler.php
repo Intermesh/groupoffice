@@ -63,6 +63,10 @@ class ErrorHandler {
 		if(!Environment::get()->isCli()) {
 			error_log($errorString, 0);
 		}
+
+		if(!go()->getDebugger()->enabled) {
+			return $errorString;
+		}
 		
 		App::get()->getDebugger()->error($errorString);
 

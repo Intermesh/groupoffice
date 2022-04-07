@@ -27,6 +27,8 @@ class Search extends AclOwnerEntity {
 	protected $entity;
 	protected $moduleId;
 
+	public $dontChangeModifiedAt = true;
+
 	public static function loggable(): bool
 	{
 		return false;
@@ -116,6 +118,13 @@ class Search extends AclOwnerEntity {
 	 * @var DateTime
 	 */
 	public $modifiedAt;
+
+	/**
+	 * Rebuild this entry when running build search cache.
+	 *
+	 * @var bool
+	 */
+	public $rebuild = false;
 
 	protected static function defineMapping(): Mapping
 	{

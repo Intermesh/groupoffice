@@ -133,6 +133,11 @@ class Sync extends Controller {
 			$this->output("User '" . $username . "' exists");
 		}
 
+		if($user->hasPassword()) {
+			//password in database is not needed and clearing it improves security
+			$user->clearPassword();
+		}
+
 		Module::ldapRecordToUser($username, $record, $user);
 
 		$this->fireEvent(self::EVENT_SYNC_USER, $user, $record);
