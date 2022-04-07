@@ -4,7 +4,6 @@ use GO\Base\Util\StringHelper;
 use go\core\model\Acl;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
-use Exception;
 
 class goContact extends GoBaseBackendDiff {
 	
