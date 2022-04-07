@@ -243,7 +243,8 @@ abstract class Property extends Model {
 
 					if(!$prop && $relation->autoCreate) {
 						$prop = new $cls($this, true, [], $this->readOnly);
-						$this->applyRelationKeys($relation, $prop);
+						// setting the relation keys make it instantly modified while it may not be necessary to save
+//						$this->applyRelationKeys($relation, $prop);
 					}
 					$this->{$relation->name} = $prop;
 				break;
@@ -447,12 +448,22 @@ abstract class Property extends Model {
 		$reflectionObject = new ReflectionClass(static::class);
 		$props = $reflectionObject->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
 		foreach ($props as $prop) {
-			if (!$prop->isStatic()) {
+			if (!in_array($prop->getName(), $p) && !$prop->isStatic()) {
 				$p[] = $prop->getName();
 			}
 		}
 
-		$exclude = ['isNew', 'oldProps', 'fetchProperties', 'selectedProperties', 'owner'];
+		$exclude = [
+			'isNew',
+			'oldProps',
+			'fetchProperties',
+			'selectedProperties',
+			'owner',
+			'dontChangeModifiedAt',
+			'returnAsText',
+			'permissionLevel',
+			'readOnly'
+		];
 		$p = array_diff($p, $exclude);
 
 		App::get()->getCache()->set($cacheKey, $p);
@@ -1332,7 +1343,7 @@ abstract class Property extends Model {
 		$models = $this->{$relation->name} ?? [];
 		$this->relatedValidationErrorIndex = 0;
 
-		$hasPk = !empty($relation->propertyName::getPrimaryKey());
+		$hasPk = static::hasPrimaryKey();
 		if($hasPk) {
 			$this->removeRelated($relation, $models, $modified[$relation->name][1]);
 		} else{
@@ -2065,19 +2076,31 @@ abstract class Property extends Model {
 	 */
 	protected function patchArray(Relation $relation, string $propName, ?array $value) {
 		$old = $this->$propName;
+		/** @var self[] $old */
+
+		$hasPK = $relation->propertyName::hasPrimaryKey();
 
 		//build map for lookup
-		$mapped = [];
-		foreach($old as $prop) {
-			$id = $prop->id();
-			if($id) {
-				$mapped[$id] = $prop;
+		if($hasPK) {
+			$mapped = [];
+			foreach ($old as $prop) {
+				$id = $prop->id();
+				if ($id) {
+					$mapped[$id] = $prop;
+				}
 			}
+		} else{
+			// use index to update existing
+			// this will avoid delete and inserts if you overwrite contacts emailAddresses with identical values.
+			// in example when syncing the same LDAP profile values
+			$mapped = $old;
 		}
 
 		$this->$propName = [];
 		if(isset($value)) {
-			foreach ($value as $patch) {
+			for ($i = 0, $c = count($value); $i < $c; $i++) {
+
+				$patch = $value[$i];
 				//if it's already a Propery model then use it and continue
 				if($patch instanceof  $relation->propertyName) {
 					$this->{$propName}[] = $patch;
@@ -2085,16 +2108,21 @@ abstract class Property extends Model {
 				}
 
 				//check if we can find an existing property model to patch.
-				$temp = new $relation->propertyName($this);
-				$temp->setValues($patch);
-				$id = $temp->id();
+				if($hasPK) {
+					$temp = new $relation->propertyName($this);
+					$temp->setValues($patch);
+					$id = $temp->id();
+				} else{
+					// without PK update by index
+					$id = $i;
+				}
 
 				if (isset($mapped[$id])) {
 					$mapped[$id]->setValues($patch);
 					$this->{$propName}[] = $mapped[$id];
 				} else {
 					//create new model
-					$this->{$propName}[] = $temp;
+					$this->{$propName}[] = $hasPK ? $temp : (new $relation->propertyName($this))->setValues($patch);
 				}
 			}
 		}
@@ -2232,7 +2260,7 @@ abstract class Property extends Model {
    */
 	public function primaryKeyValues(): array
 	{
-		$keys = $this->getPrimaryKey();
+		$keys = static::getPrimaryKey();
 		$v = [];
 		foreach($keys as $key) {
 			$v[$key] = $this->$key;
@@ -2277,6 +2305,11 @@ abstract class Property extends Model {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
 		return $primaryTable->getPrimaryKey();
+	}
+
+
+	public static final function hasPrimaryKey() : bool {
+		return !empty(static::getPrimaryKey());
 	}
 
   /**
