@@ -315,11 +315,15 @@ go.Modules.register("community", "addressbook", {
 			 * @returns {go.form.Dialog}
 			 */
 			linkWindow: function (entity, entityId, data) {
-				var dlg = new go.modules.community.addressbook.ContactDialog();
-				dlg.setValues({
-					addressBookId: data.addressBookId,
+				const dlg = new go.modules.community.addressbook.ContactDialog();
+				const v = {
 					isOrganization: false
-				});
+				};
+
+				if(data.addressBookId) {
+					v.addressBookId = data.addressBookId;
+				}
+				dlg.setValues(v);
 				return dlg;
 			},
 
@@ -354,11 +358,15 @@ go.Modules.register("community", "addressbook", {
 			 * @returns {go.form.Dialog}
 			 */
 			linkWindow: function (entity, entityId, data) {
-				var dlg = new go.modules.community.addressbook.ContactDialog();
-				dlg.setValues({
-					addressBookId: data.addressBookId,
+				const dlg = new go.modules.community.addressbook.ContactDialog();
+				const v = {
 					isOrganization: true
-				});
+				};
+
+				if(data.addressBookId) {
+					v.addressBookId = data.addressBookId;
+				}
+				dlg.setValues(v);
 				return dlg;
 			},
 
