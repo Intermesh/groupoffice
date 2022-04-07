@@ -29,6 +29,7 @@ body{
   &.go-html-formatted
   {
     p, span, div {
+      background-color: white;
       color: black;
     }
   }
@@ -57,4 +58,7 @@ body{
     color: #B39DDB;
   }
 
+  p, span, div {
+    background-color: black;
+  }
 }
