@@ -274,11 +274,11 @@ trait SearchableTrait {
 	}
 
 	/**
+	 * @param class-string<Entity> $cls
 	 * @throws Exception
 	 */
-	private static function rebuildSearchForEntity($cls) {
+	public static function rebuildSearchForEntity(string $cls) {
 		echo $cls."\n";
-		
 
 		echo "Deleting old values\n";
 

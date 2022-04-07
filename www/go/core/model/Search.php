@@ -27,6 +27,8 @@ class Search extends AclOwnerEntity {
 	protected $entity;
 	protected $moduleId;
 
+	public $dontChangeModifiedAt = true;
+
 	public static function loggable(): bool
 	{
 		return false;
