@@ -1,3 +1,5 @@
+- Core: Fixed modified at dates setting to current time when resetting search cache.
+
 05-04-2022 6.6.67
 - Core: Reset search cache doesn't delete existing records but updates them one by one so the links and search results
   won't disappear for the users.
