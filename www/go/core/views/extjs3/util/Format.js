@@ -311,7 +311,7 @@
 			
 			switch(diff) {
 				case 0:
-					return !showTime ? t('Today') : t('Today') + " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
+					return !showTime ?  Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H")) : t('Today') + " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
 				case -1:
 					return !showTime ? t('Yesterday') : t('Yesterday') + " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
 				case 1:
