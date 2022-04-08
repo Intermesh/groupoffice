@@ -94,7 +94,7 @@ class UserSettings extends Property
 
 			if ($this->isModified()) {
 				if(!$this->internalSave()) {
-					throw new \Exception("Could not update user with sync settings.");
+					throw new \Exception("Could not update user with sync settings:  " . $this->getValidationErrorsAsString());
 				}
 			}
 		}
