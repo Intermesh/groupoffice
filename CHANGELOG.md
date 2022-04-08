@@ -1,3 +1,6 @@
+08-04-2022 6.6.71
+- Core: Fixed double save problem in sync settings
+
 08-04-2022 6.6.70
 - Addressbook: fix for contactId doesn't have a default value
 - History: Changes of arrays not logged with old value
