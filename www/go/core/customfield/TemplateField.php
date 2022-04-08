@@ -54,7 +54,8 @@ class TemplateField extends TextArea {
 			$parsed = $e->getMessage();
 		}
 
-		$record[$this->field->databaseName] = $parsed;
+		$record[$this->field->databaseName] = empty($parsed) ? null : $parsed;
+
 
 		return true;
 	}
