@@ -1343,7 +1343,7 @@ abstract class Property extends Model {
 		$models = $this->{$relation->name} ?? [];
 		$this->relatedValidationErrorIndex = 0;
 
-		$hasPk = static::hasPrimaryKey();
+		$hasPk = $relation->propertyName::hasPrimaryKey();
 		if($hasPk) {
 			$this->removeRelated($relation, $models, $modified[$relation->name][1]);
 		} else{
