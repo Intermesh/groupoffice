@@ -23,6 +23,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals(true, $success);
 
 
+
 		$user = new User();
 		$user->username = 'test2';
 		$user->setPassword('test1test1');
@@ -43,6 +44,13 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$success = $user->save();
 
 		$this->assertEquals(false, $success);
+	}
+
+	public function testAdminToArray() {
+		$admin = User::findById(1);
+		$array = $admin->toArray();
+
+		$this->assertEquals(true, is_array($array));
 	}
 
 	public function testIsAdmin() {

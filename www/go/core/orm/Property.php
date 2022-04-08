@@ -243,8 +243,8 @@ abstract class Property extends Model {
 
 					if(!$prop && $relation->autoCreate) {
 						$prop = new $cls($this, true, [], $this->readOnly);
-						// setting the relation keys make it instantly modified while it may not be necessary to save
-//						$this->applyRelationKeys($relation, $prop);
+
+						$this->applyRelationKeys($relation, $prop);
 					}
 					$this->{$relation->name} = $prop;
 				break;
