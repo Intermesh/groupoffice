@@ -66,7 +66,7 @@ GO.email.MessagesGrid = function(config){
 				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
 			},
 			groupRenderer : function(value){
-				return go.util.Format.shortDateTime(value,false,true);
+				return go.util.Format.shortDateTime(value,false,true, true);
 			}
 		},{
 			id:'date',
@@ -79,7 +79,7 @@ GO.email.MessagesGrid = function(config){
 				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
 			},
 			groupRenderer : function(value){
-				return go.util.Format.shortDateTime(value,false,true);
+				return go.util.Format.shortDateTime(value,false,true, true);
 			}
 		},{
 			id:'size',
