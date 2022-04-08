@@ -434,8 +434,6 @@ abstract class Property extends Model {
 	 */
 	private function watchProperties(): array
 	{
-
-
 		$cacheKey = 'watch-props-' . static::class;
 
 		$ret = App::get()->getCache()->get($cacheKey);
@@ -464,11 +462,11 @@ abstract class Property extends Model {
 			'permissionLevel',
 			'readOnly'
 		];
-		$p = array_diff($p, $exclude);
+		$p = array_unique(array_diff($p, $exclude));
 
 		App::get()->getCache()->set($cacheKey, $p);
 
-		return array_unique($p);
+		return $p;
 	}
 
   /**
@@ -477,7 +475,14 @@ abstract class Property extends Model {
 	private function trackModifications() {
 		foreach ($this->watchProperties() as $propName) {
 			$v = $this->$propName;
-			$this->oldProps[$propName] = $v;
+
+			if(is_object($v)) {
+				$this->oldProps[$propName] = clone $v;
+			} else if(is_array($v) && isset($v[0]) && $v[0] instanceof self) {
+				$this->oldProps[$propName] = array_map(function($i) {return clone $i;}, $v);
+			} else {
+				$this->oldProps[$propName] = $v;
+			}
 		}
 	}
 
@@ -1029,44 +1034,14 @@ abstract class Property extends Model {
 		foreach($properties as $key) {
 
 			$oldValue = $this->oldProps[$key] ?? null;
-
 			$newValue = $this->{$key};
 
-			if($newValue instanceof self) {
-				if($newValue->isModified()) {
-					if($forIsModified) {
+			$propModified = $this->internalIsModified($newValue, $oldValue);
+			if ($propModified) {
+				if ($forIsModified) {
 						return true;
-					}
-					$modified[$key] = [$newValue, null];
 				}
-			} else
-			{
-				if($newValue instanceof CoreDateTime) {
-					if($this->datesAreDifferent($oldValue, $newValue)) {
-						if($forIsModified) {
-							return true;
-						}
-
-						$modified[$key] = [$newValue, $oldValue];
-					}
-				}	else if ($newValue !== $oldValue) {
-					if($forIsModified) {
-						return true;
-					}
-					$modified[$key] = [$newValue, $oldValue];
-				} else if(is_array($newValue) && (($v = array_values($newValue)) && isset($v[0]) && $v[0] instanceof self)) {
-					// Array comparison above might return false because the array contains identical objects but the objects itself might have changed.
-					foreach($newValue as $v) {
-						if($v->isModified()) {
-							if($forIsModified) {
-								return true;
-							}
-
-							$modified[$key] = [$newValue, $oldValue];
-							break;
-						}
-					}
-				}
+				$modified[$key] = [$newValue, $oldValue];
 			}
 		}
 
@@ -1075,6 +1050,36 @@ abstract class Property extends Model {
 		}
 
 		return $modified;
+	}
+
+	private function internalIsModified($newValue, $oldValue) {
+		if($newValue instanceof self) {
+			if($newValue->isModified()) {
+				return true;
+			}
+		} else
+		{
+			if($newValue instanceof CoreDateTime) {
+				if($this->datesAreDifferent($oldValue, $newValue)) {
+					return true;
+				}
+			}	else if(is_array($newValue) && (($v = array_values($newValue)) && isset($v[0]) && $v[0] instanceof self)) {
+				// Array comparison above might return false because the array contains identical objects but the objects itself might have changed.
+				if(!is_array($oldValue) || count($oldValue) != count($newValue)) {
+
+					return true;
+
+				} else {
+					foreach ($newValue as $v) {
+						if ($v->isModified()) {
+							return true;
+						}
+					}
+				}
+			} else if ($newValue !== $oldValue) {
+				return true;
+			}
+		}
 	}
 
 	/**
