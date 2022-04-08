@@ -153,7 +153,7 @@ class Module extends core\Module
 			unset($changes['createdAt']);
 			unset($changes['modifiedBy']);
 			unset($changes['permissionLevel']);
-			unset($changes['filesFolderId']);
+//			unset($changes['filesFolderId']);
 
 			$cfChanges = self::getCustomFieldChanges($entity);
 			if(!empty($cfChanges)) {
