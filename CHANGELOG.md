@@ -1,3 +1,4 @@
+08-04-2022 6.6.69
 - Core: Performance optimization. When array type relations are overwritten with identical values it's no longer
    detected as a modification. This caused every login from LDAP via activesync to log two redundant changes for user and
    it's associated contact.
