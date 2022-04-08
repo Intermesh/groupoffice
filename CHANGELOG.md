@@ -3,6 +3,7 @@
    it's associated contact.
 - Email: Fixed grouping in email for today broken
 - Filesearch: Fixed empty result for admins
+- Newsletters: Attachment could disappear after reopening composer
 
 07-04-2022 6.6.68
 - Core: Fixed modified at dates setting to current time when resetting search cache.
