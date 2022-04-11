@@ -1,4 +1,5 @@
 - Files: Search was incomplete
+- Core: CLI and web cache could be different because apcu is not used on CLI
 
 08-04-2022 6.6.71
 - Core: Fixed double save problem in sync settings
