@@ -11,14 +11,13 @@ use GO\Base\Util\Date\DateTime as DateTimeAlias;
 use go\core\App;
 use go\core\cli\State;
 use go\core\model\CronJobSchedule;
+use go\core\util\Lock;
 
 if(!empty($argv[1])) {
 	define('GO_CONFIG_FILE', $argv[1]);
 }
 
 require_once(__DIR__ . '/vendor/autoload.php');
-
-
 
 //The server manager calls cron via HTTP because it doesn't know the document root when running
 //multiple versions of GO.v It passes ?exec=1 to make it run on the command line.
@@ -42,7 +41,7 @@ if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 	exit();
 }
 
-$lock = new \go\core\util\Lock("cron", false);
+$lock = new Lock("cron", false);
 if(!$lock->lock()) {
     go()->debug("cron.php is locked (already running)");
     exit();
