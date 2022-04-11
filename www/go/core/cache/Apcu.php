@@ -119,12 +119,10 @@ class Apcu implements CacheInterface {
 	public function flush(bool $onDestruct = true) {
 
 		if ($onDestruct) {
-			
-			$this->getDiskCache()->flush(true);
-
 			$this->flushOnDestruct = true;
 			return;
 		}
+
 		$this->cache = [];
 		apcu_clear_cache();
 
