@@ -20,9 +20,12 @@ class Apcu implements CacheInterface {
 	private $cache;
 
 	private $disk;
+
+	private $apcuEnabled = false;
 	
 	public function __construct() {
 		$this->prefix = go()->getConfig()['db_name'];
+		$this->apcuEnabled = apcu_enabled();
 	}
 
 
@@ -50,10 +53,7 @@ class Apcu implements CacheInterface {
 	 */
 	public function set(string $key, $value, bool $persist = true, int $ttl = 0) {
 
-		if(PHP_SAPI === 'cli') {
-			$this->getDiskCache()->set($key, $value, $persist, $ttl);
-		}
-
+		$this->getDiskCache()->set($key, $value, $persist, $ttl);
 		if($persist) {
 			apcu_store($this->prefix . '-' .$key, $value, $ttl);
 		}
@@ -71,7 +71,7 @@ class Apcu implements CacheInterface {
 	 */
 	public function get(string $key) {
 
-		if(PHP_SAPI === 'cli') {
+		if(!$this->apcuEnabled) {
 			return $this->getDiskCache()->get($key);
 		}
 
@@ -96,13 +96,9 @@ class Apcu implements CacheInterface {
 	 * @param string $key 
 	 */
 	public function delete(string $key) {
-		
-		if(PHP_SAPI === 'cli') {
-			$this->getDiskCache()->delete($key);
-		}
-
 		unset($this->cache[$key]);
 		apcu_delete($this->prefix . '-' . $key);
+		$this->getDiskCache()->delete($key);
 	}
 
 	private $flushOnDestruct = false;
@@ -122,7 +118,6 @@ class Apcu implements CacheInterface {
 			$this->flushOnDestruct = true;
 			return;
 		}
-
 		$this->cache = [];
 		apcu_clear_cache();
 
