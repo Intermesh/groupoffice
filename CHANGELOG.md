@@ -1,3 +1,5 @@
+- Files: Search was incomplete
+
 08-04-2022 6.6.71
 - Core: Fixed double save problem in sync settings
 
