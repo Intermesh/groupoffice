@@ -14,6 +14,9 @@ class InstanceCron extends CronJob {
 		//The server manager calls cron via HTTP because it doesn't know the document root when running
 		//multiple versions of GO.v It passes ?exec=1 to make it run on the command line.
 		$c = new Client();
+		$c->setOption(CURLOPT_CONNECTTIMEOUT, 360);
+		$c->setOption(CURLOPT_TIMEOUT, 360);
+
 		foreach(Instance::find() as $instance) {
 			try {
 				if (!$instance->isInstalled()) {
