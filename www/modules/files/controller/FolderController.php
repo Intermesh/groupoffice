@@ -912,7 +912,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$i = 0;
 
-			$words = StringUtil::splitTextKeywords($queryStr);
+			$words = StringUtil::splitTextKeywords($queryStr, false);
 
 			foreach($words as $word) {
 
