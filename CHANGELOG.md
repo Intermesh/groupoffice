@@ -1,3 +1,15 @@
+11-04-2022 6.6.72
+- Files: Search was incomplete
+- Core: CLI and web cache could be different because apcu is not used on CLI
+- Tickets: inconsistency in permission check for reopening tickets
+
+08-04-2022 6.6.71
+- Core: Fixed double save problem in sync settings
+
+08-04-2022 6.6.70
+- Addressbook: fix for contactId doesn't have a default value
+- History: Changes of arrays not logged with old value
+
 08-04-2022 6.6.69
 - Core: Performance optimization. When array type relations are overwritten with identical values it's no longer
    detected as a modification. This caused every login from LDAP via activesync to log two redundant changes for user and

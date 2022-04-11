@@ -267,7 +267,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				//legacy scripts loaded from scripts.inc.php
 			var script = document.createElement('script');
 			script.type = 'text/javascript';
-			script.setAttribute('src', BaseHref + "views/Extjs3/modulescripts.php?mtime=" + go.User.modifiedAt);
+			script.setAttribute('src', BaseHref + "views/Extjs3/modulescripts.php?mtime=" + go.User.modifiedAt + "-" + go.User.apiVersion);
 			script.charset = 'utf-8';
 			script.id = 'testing';
 			script.defer = true;
@@ -905,7 +905,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						this.openSystemSettings();
 				}, this);
 			} else if(!coreMod.settings.demoDataAsked) {
-				Ext.MessageBox.confirm(t("Demo"), t("Do you want to generate some fake demonstration data?"), (btn) => {
+				Ext.MessageBox.confirm(t("Demo"), t("Do you want to generate some fake demonstration data? This will take about one or two minutes to generate."), (btn) => {
 
 					go.Db.store("Module").save({
 						settings: {
