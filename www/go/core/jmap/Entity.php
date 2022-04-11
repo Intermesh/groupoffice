@@ -5,12 +5,14 @@ namespace go\core\jmap;
 use DateTimeInterface;
 use Exception;
 use GO\Base\Exception\AccessDenied;
+use go\core\ErrorHandler;
 use go\core\model\Alert;
 use go\core\model\Module;
 use go\core\model\User;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
+use LogicException;
 use PDO;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\acl\model\AclItemEntity;
@@ -100,7 +102,13 @@ abstract class Entity  extends OrmEntity {
 		}
 
 		if(self::$trackChanges) {
-			$this->change();
+			try {
+				$this->change();
+			} catch(Exception $e) {
+				//if committing succeeded we must return true otherwise the parent class will rollback an already committed transaction
+				//messing up the flow
+				ErrorHandler::logException($e);
+			}
 		}
 
 		return true;
@@ -115,6 +123,11 @@ abstract class Entity  extends OrmEntity {
 	 * @throws Exception
 	 */
 	public function change(bool $force = false) {
+
+		if(go()->getDebugger()->enabled && go()->getDbConnection()->inTransaction()) {
+			throw new LogicException("Don't log changes in transactions. Deadlocks will come :(");
+		}
+
 		$this->entityType()->checkChange($this, $force);
 		$this->checkChangeForScalarRelations();
 	}

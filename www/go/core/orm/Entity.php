@@ -9,6 +9,7 @@ use GO\Base\Db\ActiveRecord;
 use go\core\data\convert\AbstractConverter;
 use go\core\data\convert\Json;
 use go\core\db\Column;
+use go\core\ErrorHandler;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
@@ -337,7 +338,7 @@ abstract class Entity extends Property {
 
 			return $this->commit() && !$this->hasValidationErrors();
 		} catch(Exception $e) {
-			\go\core\ErrorHandler::logException($e);
+			ErrorHandler::logException($e);
 			$this->rollback();
 			throw $e;
 		}
@@ -497,6 +498,7 @@ abstract class Entity extends Property {
 
 
 	protected function commitToDatabase() : bool {
+		go()->debug("commit " . static::class);
 		return App::get()->getDbConnection()->commit();
 	}
 
