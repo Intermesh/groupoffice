@@ -968,24 +968,24 @@ abstract class Property extends Model {
 		return $this->internalGetModified($properties);
 	}
 
-  /**
-   * Compare two dates
-   *
-   * @param string|null $old
-   * @param DateTimeInterface|null $new
-   * @return bool
-   */
-	private function datesAreDifferent(?string $old, ?DateTimeInterface $new): bool
+	/**
+	 * Compare two dates
+	 *
+	 * @param DateTimeInterface|null $a
+	 * @param DateTimeInterface|null $b
+	 * @return bool
+	 */
+	private function datesAreDifferent(?DateTimeInterface $a, ?DateTimeInterface $b): bool
 	{
-		if(!isset($old) && isset($new)) {
+		if(!isset($a) && isset($b)) {
 			return true;
 		}
 
-		if(!isset($new) && isset($old)) {
+		if(!isset($b) && isset($a)) {
 			return true;
 		}
 
-		return $old != $new->format('U');
+		return $a->format('U') != $b->format('U');
 	}
 
 	/**
