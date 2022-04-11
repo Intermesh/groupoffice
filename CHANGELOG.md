@@ -1,5 +1,6 @@
 - Files: Search was incomplete
 - Core: CLI and web cache could be different because apcu is not used on CLI
+- Tickets: inconsistency in permission check for reopening tickets
 
 08-04-2022 6.6.71
 - Core: Fixed double save problem in sync settings
