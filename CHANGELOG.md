@@ -1,4 +1,7 @@
+11-04-2022 6.6.73
 - SMIME: Fixed incorrect attachment size for some smime messages
+- Core: Fixed replacing hasOne properties
+- Core: Changes are pushed at the end to avoid dead locks. This fixes random deadlock problem with LDAP sync.
 
 11-04-2022 6.6.72
 - Files: Search was incomplete
