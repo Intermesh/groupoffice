@@ -9,7 +9,9 @@ use go\core\App;
 use go\core\cli\controller\System;
 use go\core\cli\State;
 use GO\Base\Model\Module;
+use go\core\db\Table;
 use go\core\model\User;
+use go\core\orm\Property;
 use GO\Demodata\Controller\DemodataController;
 
 const INSTALL_NEW = 0;
@@ -31,9 +33,6 @@ try {
 	$c = new core\util\ArrayObject(go()->getConfig());
 	$c->mergeRecursive($config);
 	go()->setConfig($c->getArray());
-	GO::clearCache(); //legacy
-
-	go()->getCache()->flush(false);
 
 	// Install new if db doesn't exist otherwise use existing
 	$installDb = !go()->isInstalled() ? INSTALL_NEW : INSTALL_NONE;
@@ -57,6 +56,14 @@ try {
 		}catch(\Exception $e) {
 
 		}
+
+		GO::clearCache(); //legacy
+
+		go()->getCache()->flush(false);
+		Table::destroyInstances();
+		Property::clearCache();
+		Property::clearCachedRelationStmts();
+
 
 		echo "Creating database 'groupoffice-phpunit'\n";
 		$pdo->query("CREATE DATABASE groupoffice_phpunit");

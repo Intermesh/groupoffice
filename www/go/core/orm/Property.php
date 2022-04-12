@@ -1282,11 +1282,10 @@ abstract class Property extends Model {
    */
 	private function saveRelatedHasOne(Relation $relation): bool
 	{
-
-		//remove old model if it's replaced
 		if(!$this->isNew()) {
+			//remove old model if it's replaced
 			$modified = $this->getModified([$relation->name]);
-			if (isset($modified[$relation->name][1])) {
+			if (isset($modified[$relation->name][1]) && (!isset($modified[$relation->name][0]) || $modified[$relation->name][0]->isNew())) {
 				if (!$modified[$relation->name][1]->internalDelete((new Query)->where($modified[$relation->name][1]->primaryKeyValues()))) {
 					$this->relatedValidationErrors = $modified[$relation->name][1]->getValidationErrors();
 					return false;
