@@ -9,6 +9,7 @@ use go\core\ErrorHandler;
 use go\core\model\Alert;
 use go\core\model\Module;
 use go\core\model\User;
+use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
@@ -123,10 +124,6 @@ abstract class Entity  extends OrmEntity {
 	 * @throws Exception
 	 */
 	public function change(bool $force = false) {
-
-		if(go()->getDebugger()->enabled && go()->getDbConnection()->inTransaction()) {
-			throw new LogicException("Don't log changes in transactions. Deadlocks will come :(");
-		}
 
 		$this->entityType()->checkChange($this, $force);
 		$this->checkChangeForScalarRelations();

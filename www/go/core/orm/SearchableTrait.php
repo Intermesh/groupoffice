@@ -129,7 +129,7 @@ trait SearchableTrait {
 	public function saveSearch(bool $checkExisting = true): bool
 	{
 
-		if(!static::$updateSearch) {
+		if(!static::$updateSearch || !$this->isModified()) {
 			return true;
 		}
 

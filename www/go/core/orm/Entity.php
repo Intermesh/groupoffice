@@ -616,7 +616,6 @@ abstract class Entity extends Property {
 	 * routing short routes like "Note/get"
 	 *
 	 * @return EntityType
-	 * @throws Exception
 	 */
 	public static function entityType(): EntityType
 	{

@@ -1,3 +1,5 @@
+- SMIME: Fixed incorrect attachment size for some smime messages
+
 11-04-2022 6.6.72
 - Files: Search was incomplete
 - Core: CLI and web cache could be different because apcu is not used on CLI

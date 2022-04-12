@@ -41,7 +41,7 @@ class Connection {
 	 * 
 	 * @var bool 
 	 */
-	public $debug = false;
+	public $debug = true;
 	
 	public function __construct($dsn, $username, $password) {
 		$this->dsn = $dsn;
@@ -398,14 +398,14 @@ class Connection {
    * Create an insert statement
    *
    * @param string $tableName
-   * @param array|Query $data Key value array or select query
+   * @param array|Query $data Key value array, a numeric array with key value arrays or select query
    * @param string[] $columns If $data is a query object then you can supply the
    *  selected columns with this parameter. If not given all columns must be
    *  selected in the correct order.
    *
    * @return Statement
    * @throws PDOException
-   * @example
+   * @example Single record
    * ```
    * $data = [
    *    "propA" => "string 1",
@@ -422,6 +422,25 @@ class Connection {
    * Get the ID if it has an auto increment column:
    * ```
    * $id = App::get()->getDbConnection()->getPDO()->lastInsertId();
+   * ```
+   *
+   *
+   * @example Multiple records
+   * ```
+   * $data = [[
+   *    "propA" => "string 1",
+   *    "createdAt" => new \DateTime(),
+   *    "modifiedAt" => new \DateTime()
+   * ],[
+   *    "propA" => "string 2",
+   *    "createdAt" => new \DateTime(),
+   *    "modifiedAt" => new \DateTime()
+   * ]];
+   *
+   * $result = App::get()
+   *        ->getDbConnection()
+   *        ->insert("test_a", $data)
+   *        ->execute();
    * ```
    *
    * Or with an expression:

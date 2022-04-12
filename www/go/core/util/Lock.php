@@ -4,6 +4,7 @@ namespace go\core\util;
 
 use Exception;
 use go\core\fs\File;
+use LogicException;
 use function GO;
 
 /**
@@ -33,8 +34,8 @@ class Lock {
 	 * @var resource 
 	 */
 	private $lockFp;
-	
-	private $unlock = false;
+
+	private $lockedByMe = false;
 	
 	/**
 	 * Lock an action
@@ -47,13 +48,23 @@ class Lock {
 	 */
 	public function lock() : bool {
 
+		if($this->lockedByMe) {
+			throw new LogicException("Lock '" . $this->name . "' already locked by you!");
+		}
+
 		if(function_exists('sem_get')) {
 			//performs better but is not always available
-			return $this->lockWithSem();
+			$locked = $this->lockWithSem();
 		} else
 		{
-			return $this->lockWithFlock();
+			$locked = $this->lockWithFlock();
 		}
+
+		if($locked) {
+			$this->lockedByMe = true;
+		}
+
+		return $locked;
 	}
 
 	/**
@@ -62,6 +73,7 @@ class Lock {
 	 * @return bool
 	 */
 	private function lockWithSem() : bool {
+
 		// prepend db name for multi instance
 		$this->sem = sem_get( (int) hexdec(substr(md5(go()->getConfig()['db_name'] . $this->name), 24)));
 		return sem_acquire($this->sem, !$this->blocking );
@@ -73,6 +85,7 @@ class Lock {
 	 * @throws Exception
 	 */
 	private function lockWithFlock() : bool {
+
 		$lockFolder = GO()
 			->getDataFolder()
 			->getFolder('locks');
@@ -105,8 +118,6 @@ class Lock {
 			}
 		}
 
-		$this->unlock = true;
-
 		return true;
 	}
 	
@@ -116,19 +127,24 @@ class Lock {
 	public function unlock() {
 		//cleanup lock file if lock() was used
 
+		if(!$this->lockedByMe) {
+			return;
+		}
+
 		if(isset($this->sem)) {
 			sem_release($this->sem);
 			sem_remove($this->sem);
+			$this->sem = null;
 		} else 	if(is_resource($this->lockFp)) {
 			flock($this->lockFp, LOCK_UN);
 			fclose($this->lockFp);
 			$this->lockFp = null;			
 		}
+
+		$this->lockedByMe = false;
 	}
 	
 	public function __destruct() {
-		if($this->unlock) {
-			$this->unlock();		
-		}
+		$this->unlock();
 	}
 }
