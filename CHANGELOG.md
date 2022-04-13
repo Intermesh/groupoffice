@@ -1,5 +1,6 @@
 13-04-2022 6.6.75
 - Mail: Could not create folder error on accessing subfolders
+- History: login not logged
 
 13-04-2022 6.6.74
 - Core: inifinite loop problem in rebuilding search cache

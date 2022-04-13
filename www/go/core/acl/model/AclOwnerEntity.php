@@ -309,7 +309,10 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 
 		if(!isset($this->permissionLevel)) {
-			$this->permissionLevel = Acl::getUserPermissionLevel($this->{static::$aclColumnName}, go()->getAuthState()->getUserId());
+			$this->permissionLevel =
+				(go()->getAuthState() && go()->getAuthState()->isAdmin()) ?
+					Acl::LEVEL_MANAGE :
+					Acl::getUserPermissionLevel($this->{static::$aclColumnName}, go()->getAuthState()->getUserId());
 		}
 
 		return $this->permissionLevel;

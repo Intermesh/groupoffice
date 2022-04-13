@@ -1261,4 +1261,9 @@ class User extends Entity {
 		return Token::delete($query) && RememberMe::delete($query);
 	}
 
+	public function findAclId(): ?int
+	{
+		return $this->getPersonalGroup()->findAclId();
+	}
+
 }

@@ -2,6 +2,7 @@
 
 namespace go\modules\community\history\model;
 
+use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\db\Criteria;
 use go\core\http\Request;
@@ -94,6 +95,11 @@ class LogEntry extends AclOwnerEntity {
 		if($this->isNew()) {
 			$this->remoteIp = Request::get()->getRemoteIpAddress();
 		}
+	}
+
+	protected function createAcl()
+	{
+	 //never create acl for log entry
 	}
 
 	public static function checkAcls()
@@ -206,7 +212,7 @@ class LogEntry extends AclOwnerEntity {
 	 * Set the entity type
 	 *
 	 * @param Entity | ActiveRecord $entity "note", Entity $note or Entitytype instance
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function setEntity($entity) {
 		$this->entityTypeId = $entity->entityType()->getId();
