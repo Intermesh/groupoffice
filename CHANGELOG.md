@@ -7,6 +7,7 @@
 - Comments: fixed missing background color
 - Tasks/addressbook/notes: Fixed add button was disabled if you had create permission but no write permissions
 - Task: Assigned to field lists only users that have write permissions to the task
+- googleauthenticator: force could be circumvented by reloading browser and then close password dialog
 
 11-04-2022 6.6.72
 - Files: Search was incomplete
