@@ -19,6 +19,21 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 	},
 
+
+	onTaskListChange : function(combo, val) {
+		const categories = this.formPanel.form.findField('categories');
+		categories.comboStore.setFilter("tasklistId", {
+			operator: "OR",
+			conditions: [
+				{tasklistId: val},
+				{global: true},
+				{ownerId: go.User.id}
+			]
+		});
+		//reloads combo when trigger is clicked
+		delete categories.comboBox.lastQuery;
+	},
+
 	initFormItems: function () {
 
 		// this.taskCombo = new go.modules.community.tasks.TaskCombo({});
@@ -108,6 +123,8 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			increment: 10,
 			value: 0
 		});
+
+
 
 		const propertiesPanel = new Ext.Panel({
 			hideMode : 'offsets',
@@ -201,19 +218,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 									items: [
 										this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
 											listeners: {
-												change: (combo, val) => {
-													const categories = this.formPanel.form.findField('categories');
-													categories.comboStore.setFilter("tasklistId", {
-														operator: "OR",
-														conditions: [
-															{tasklistId: val},
-															{global: true},
-															{ownerId: go.User.id}
-														]
-													});
-													//reloads combo when trigger is clicked
-													delete categories.comboBox.lastQuery;
-												}
+												change: this.onTaskListChange,
+												setvalue: this.onTaskListChange,
+												scope: this
 											}
 										})
 									]
