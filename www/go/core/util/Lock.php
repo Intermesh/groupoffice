@@ -153,5 +153,6 @@ class Lock {
 	
 	public function __destruct() {
 		$this->unlock();
+		unset(self::$locks[$this->name]);
 	}
 }
