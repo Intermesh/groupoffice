@@ -103,11 +103,11 @@ class ImapMessageAttachment extends MessageAttachment
 
 	public function getEstimatedSize(): float
 	{
-		if ($this->hasTempFile()) {
+		if ($this->hasTempFile() || $this->encoding !== 'base64') {
 			return $this->size;
+		} else {
+			return ceil($this->size * 0.75);
 		}
-
-		return parent::getEstimatedSize();
 	}
 
 	public function getData()

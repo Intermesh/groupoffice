@@ -85,30 +85,25 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 		Ext.apply(this, {		
 			plugins: [checkColumn],
-			tbar: [{
-				xtype: "button",
-				enableToggle: true,
-				pressed: false,
-				iconCls: 'ic-account-box',
-				tooltip: t("Show users"),
-				toggleHandler: function(btn, pressed) {
-					this.store.setFilter("hideUsers", {hideUsers: !pressed});
-					this.store.load();
+			tbar: [
+				{
+					xtype:'buttongroup',
+					defaults:{
+						toggleHandler: (btn, state) => {
+							if(state) {
+								const filter = btn.itemId === 'users' ? {hideGroups: true} : (btn.itemId === 'groups' ? {hideUsers: true} : null);
+								this.store.setFilter('hideUsers', filter).load();
+							}
+						},
+						toggleGroup: 'groupType'
+					},
+					items: [
+						{text:t('All'), itemId: 'both'},
+						{text:t('Users'), itemId: 'users'},
+						{text:t('Groups'), itemId: 'groups', pressed:true},
+					]
 				},
-				scope: this
-			},{
-				xtype: "button",
-				enableToggle: true,
-				pressed: true,
-				iconCls: 'ic-group-work',
-				tooltip: t("Show groups"),
-				toggleHandler: function(btn, pressed) {
-					this.store.setFilter("hideGroups", {hideGroups: !pressed});
-					this.store.load();
-				},
-				scope: this
-			},
-			'->', 
+				'->',
 				{
 					xtype: 'tbsearch',
 					filters: [

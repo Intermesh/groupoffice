@@ -1,3 +1,26 @@
+13-04-2022 6.6.75
+- Mail: Could not create folder error on accessing subfolders
+- History: login not logged
+
+13-04-2022 6.6.74
+- Core: inifinite loop problem in rebuilding search cache
+
+13-04-2022 6.6.73
+- SMIME: Fixed incorrect attachment size for some smime messages
+- Core: Fixed replacing hasOne properties
+- Core: Changes are pushed at the end to avoid dead locks. This fixes random deadlock problem with LDAP sync.
+- Tasks: Sort and filtering on task categories caused sql error
+- Tasks: fixed categories not loading for selected tasklist on dialog open
+- Comments: fixed missing background color
+- Tasks/addressbook/notes: Fixed add button was disabled if you had create permission but no write permissions
+- Task: Assigned to field lists only users that have write permissions to the task
+- googleauthenticator: force could be circumvented by reloading browser and then close password dialog
+- googleauthenticator: include username in title
+- Core: Dark mode text in email autocomplete not visible
+- Core: non admins with permissions to edit groups no longer see the modules tab
+- Core: rebuild search script could store incorrect ACL's
+- Projects: Ability to make templates writable
+
 11-04-2022 6.6.72
 - Files: Search was incomplete
 - Core: CLI and web cache could be different because apcu is not used on CLI

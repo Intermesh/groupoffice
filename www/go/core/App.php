@@ -640,6 +640,9 @@ use Faker;
 		}
 		
 		public function __destruct() {
+
+			EntityType::push();
+
 			if($this->rebuildCacheOnDestruct) {
 
 				$this->rebuildCache();

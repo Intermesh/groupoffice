@@ -1171,5 +1171,14 @@ $updates['202204051245'][] = function() {
 	//run build search cache on cron immediately. This job will deactivate itself.
 	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
 
-	echo "\n\n======\nNOTE: Search cache will be rebuilt at midnight. This may take a lot of time.\n======\n\n";
 };
+
+
+$updates['202204131216'][] = function() {
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("* * * * *", true);
+
+	echo "\n\n======\nNOTE: Search cache will be rebuilt.\n======\n\n";
+};
+

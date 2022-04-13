@@ -592,7 +592,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		go.Db.store("Tasklist").get(this.tasklistsGrid.getSelectedIds()).then((result) => {
 
 			result.entities.forEach((tasklist) => {
-				if (!this.addTasklistId && tasklist.permissionLevel >= go.permissionLevels.write) {
+				if (!this.addTasklistId && tasklist.permissionLevel >= go.permissionLevels.create) {
 					this.addTasklistId = tasklist.id;
 				}
 			});
@@ -605,6 +605,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	onTaskGridDblClick : function (grid, rowIndex, e) {
 
 		var record = grid.getStore().getAt(rowIndex);
+		console.warn(record.get('permissionLevel'));
 		if (record.get('permissionLevel') < go.permissionLevels.write) {
 			return;
 		}

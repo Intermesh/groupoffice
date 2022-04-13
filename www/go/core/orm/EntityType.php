@@ -15,6 +15,7 @@ use go\core\jmap;
 use go\core\model\Acl;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
+use go\core\util\Lock;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -372,7 +373,6 @@ class EntityType implements ArrayableInterface {
    */
 	public function changes($changedEntities): bool
 	{
-
 		if(!jmap\Entity::$trackChanges) {
 			return true;
 		}
@@ -380,7 +380,8 @@ class EntityType implements ArrayableInterface {
 		$this->highestModSeq = $this->nextModSeq();
 		
 		if(!is_array($changedEntities)) {
-			$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);
+
+			$this->queueChangeQuery($changedEntities);
 		} else {
 
 			if(empty($changedEntities)) {
@@ -388,29 +389,22 @@ class EntityType implements ArrayableInterface {
 			}
 
 			if(!is_array($changedEntities[0])) {
-				$changedEntities = array_map(function($entityId) {
-					return [$entityId, null, 0, $this->getId(), $this->highestModSeq, new DateTime()];
-				}, $changedEntities);
+				// array of id's. What about acl here?
+				foreach($changedEntities as $entityId) {
+					$this->queueChange($entityId);
+				}
 			} else{
 				if(count($changedEntities[0]) != 3) {
 					throw new InvalidArgumentException("Invalid array given");
 				}
-				$changedEntities = array_map(function($r) {
-					return array_merge(array_values($r), [$this->getId(), $this->highestModSeq, new DateTime()]);
-				}, $changedEntities);
+
+				foreach($changedEntities as $r) {
+					$this->queueChange($r[0], $r[1], $r[2]);
+				}
 			}
 		}
 
-		//It's possible that this won't write any change. This leads to a modSeq with no changes at all?
-		$stmt = go()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
-		$stmt->execute();
-
-		if(!$stmt->rowCount()) {
-			go()->warn("Empty changes!");
-		}
-
 		return true;
-
 	}
 
 	/**
@@ -430,20 +424,132 @@ class EntityType implements ArrayableInterface {
 		if(!jmap\Entity::$trackChanges) {
 			return;
 		}
-		$this->highestModSeq = $this->nextModSeq();
 
-		$record = [
-				'modSeq' => $this->highestModSeq,
-				'entityTypeId' => $this->id,
-				'entityId' => $entity->id(),
-				'aclId' => $entity->findAclId(),
-				'destroyed' => $isDeleted,
-				'createdAt' => new DateTime()
-						];
-
-		go()->getDbConnection()->insert('core_change', $record)->execute();
+		$this->queueChange($entity->id(), $entity->findAclId(), $isDeleted);
 	}
 
+	/**
+	 *
+	 * @param int|Query $entityId
+	 * @param int|null $aclId
+	 * @param bool $destroyed
+	 * @return void
+	 */
+	private function queueChange(int $entityId, ?int $aclId = null, bool $destroyed = false) {
+		if(!isset(self::$changes[$this->getId()])) {
+			self::$changes[$this->getId()] = [];
+		}
+		self::$changes[$this->getId()][] = [
+			'entityId' => $entityId,
+			'aclId' => $aclId,
+			'destroyed' => $destroyed
+		];;
+	}
+
+	/**
+	 * @todo 	It's possible that this won't write any change. This leads to a modSeq with no changes at all?
+	 *
+	 * @param Query $query
+	 * @return void
+	 */
+	private function queueChangeQuery(Query $query) {
+		if(!isset(self::$changeQueries[$this->getId()])) {
+			self::$changeQueries[$this->getId()] = [];
+		}
+		self::$changeQueries[$this->getId()][] = $query;
+	}
+
+	private static $changes = [];
+
+	/**
+	 * @var Query[]
+	 */
+	private static $changeQueries = [];
+
+
+	private static function pushQueries() {
+		if(empty(self::$changeQueries)) {
+			return;
+		}
+
+		$main = null;
+
+		foreach(self::$changeQueries as $entityTypeId => $queries) {
+			$type = self::findById($entityTypeId);
+			$modSeq = $type->nextModSeq();
+
+			foreach($queries as $query) {
+				$query->select('"' . $entityTypeId . '", "' . $modSeq . '", NOW()', true);
+				if(!isset($main)) {
+					$main = $query;
+				}
+				$main->union($query);
+			}
+		}
+
+		go()->getDbConnection()->insert("core_change", $main, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt'])->execute();
+	}
+
+	/**
+	 * Push changes to the database
+	 *
+	 * When changes are made to entities they are queued. Calling push() will write
+	 * them all to the database. When {@see App} is destructed it will also call this method.
+	 * {@see EntityController} calls it in defaultSet() so it can return the new state.
+	 * We do it like this so these entries are written outside of transactions. Otherwise
+	 * this will lead to concurrency problems with deadlocks in mysql.
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function push(bool $lock = true) {
+
+		if(empty(self::$changes) && empty(self::$changeQueries)) {
+			return;
+		}
+
+		if($lock) {
+			$l = new Lock("jmap-set-lock");
+			if (!$l->lock()) {
+				throw new Exception("Could not obtain lock");
+			}
+		}
+
+
+		self::pushQueries();
+
+		self::pushRecords();
+
+		if($lock) {
+			$l->unlock();
+		}
+	}
+
+	private static function pushRecords() {
+
+		if(empty(self::$changes)) {
+			return;
+		}
+		$now = new DateTime();
+		$allChanges = [];
+		foreach(self::$changes as $entityTypeId => $changes) {
+			$type = self::findById($entityTypeId);
+			$modSeq = $type->nextModSeq();
+
+			$allChanges = array_merge($allChanges, array_map(function($change) use($modSeq, $now, $entityTypeId) {
+
+				$change['createdAt'] = $now;
+				$change['modSeq'] = $modSeq;
+				$change['entityTypeId'] = $entityTypeId;
+
+				return $change;
+			}, $changes));
+		}
+
+		go()->getDbConnection()->insert('core_change', $allChanges)->execute();
+
+		self::$changes = [];
+	}
 
 	/**
 	 * Resets the sync state causing all clients to resync this entity

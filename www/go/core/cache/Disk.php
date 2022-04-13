@@ -41,7 +41,7 @@ class Disk implements CacheInterface {
 	 */
 	public function set(string $key, $value, bool $persist = true, int $ttl = 0) {
 
-		$key = str_replace('\\', '-', $key);
+		$key = File::stripInvalidChars($key, '-');
 
 		if($persist) {
 			$file = $this->folder->getFile($key);
@@ -67,8 +67,8 @@ class Disk implements CacheInterface {
 	 * @return mixed null if it doesn't exist
 	 */
 	public function get(string $key) {
-		
-		$key = str_replace('\\', '-', $key);
+
+		$key = File::stripInvalidChars($key, '-');
 
 		if(isset($this->cache[$key])) {
 			return $this->cache[$key];

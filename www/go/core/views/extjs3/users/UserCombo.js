@@ -16,6 +16,9 @@
 			xtype: 'gostore',
 			fields: ['id', 'displayName', 'username', 'avatarId'],
 			entityStore: "UserDisplay",
+			sortInfo: {
+				field: "displayName"
+			},
 			filter: {
 				default: {
 					showDisabled: false

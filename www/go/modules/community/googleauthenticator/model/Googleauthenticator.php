@@ -205,7 +205,7 @@ class Googleauthenticator extends Property {
 			return null;
 		}
 		
-		$name = empty($name) ? File::stripInvalidChars(go()->getSettings()->title) : $name;
+		$name = empty($name) ? $this->owner->username . '@' . File::stripInvalidChars(go()->getSettings()->title) : $name;
 		$secret = empty($secret)?$this->secret:$secret;
 
 		$level = QR_ECLEVEL_M;
