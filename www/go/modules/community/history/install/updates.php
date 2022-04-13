@@ -8,5 +8,13 @@ $updates['202104261531'][] = "alter table history_log_entry
 $updates['202109101136'][] = "create index history_log_entry_createdAt_index
 	on history_log_entry (createdAt);";
 
-//older bug caused accidental deletion of acls
 $updates['202111050931'][] = "update history_log_entry set removeAcl = 0;";
+
+// user login and logout created unneeded acl's
+$updates['202204131553'][] = "delete from core_acl where id in (
+	select aclId
+    from history_log_entry l
+             inner join core_acl a on a.id=l.aclId
+             inner join core_entity e on e.id=l.entityTypeId
+    where a.usedIn='history_log_entry.aclId' and l.removeAcl = false and clientName='User'
+    )";
