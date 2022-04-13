@@ -11,6 +11,7 @@ use function GO;
  * Create a lock to prevent the same action to run twice by multiple users
  */
 class Lock {
+	private static $locks = [];
 
 	/**
 	 * @var resource
@@ -24,6 +25,12 @@ class Lock {
 	public function __construct(string $name, bool $blocking = true) {
 		$this->name = $name;
 		$this->blocking = $blocking;
+
+		if(isset(self::$locks[$name])) {
+			throw new LogicException("Lock '" . $name . "' already exists!");
+		}
+
+		self::$locks[$name] = true;
 	}
 	
 	private $name;
