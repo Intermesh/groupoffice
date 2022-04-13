@@ -21,6 +21,10 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 
 	onTaskListChange : function(combo, val) {
+
+		if(!Ext.isNumber(val)) {
+			return; //some bug calling this with string
+		}
 		const categories = this.formPanel.form.findField('categories');
 		categories.comboStore.setFilter("tasklistId", {
 			operator: "OR",
@@ -32,6 +36,18 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		});
 		//reloads combo when trigger is clicked
 		delete categories.comboBox.lastQuery;
+
+
+		go.Db.store("Tasklist").single(val).then((tasklist) => {
+			this.userCombo.store.setFilter("acl", {
+				aclId: tasklist.aclId,
+				aclPermissionLevel: go.permissionLevels.write
+			});
+
+			delete this.userCombo.lastQuery;
+		}).catch((e) => {
+			console.error(e);
+		})
 	},
 
 	initFormItems: function () {

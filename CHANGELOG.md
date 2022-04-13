@@ -1,4 +1,4 @@
-11-04-2022 6.6.73
+13-04-2022 6.6.73
 - SMIME: Fixed incorrect attachment size for some smime messages
 - Core: Fixed replacing hasOne properties
 - Core: Changes are pushed at the end to avoid dead locks. This fixes random deadlock problem with LDAP sync.
@@ -6,6 +6,7 @@
 - Tasks: fixed categories not loading for selected tasklist on dialog open
 - Comments: fixed missing background color
 - Tasks/addressbook/notes: Fixed add button was disabled if you had create permission but no write permissions
+- Task: Assigned to field lists only users that have write permissions to the task
 
 11-04-2022 6.6.72
 - Files: Search was incomplete
