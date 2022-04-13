@@ -828,7 +828,7 @@
 			transform: translateX(-50%);
 		}
 	}
-   &.x-btn-pressed {
+   &.x-btn-pressed > tbody {
 		background-color: color($bg, 'pressed');
    }
    &-click {
