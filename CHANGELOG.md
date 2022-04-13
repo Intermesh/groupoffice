@@ -1,3 +1,6 @@
+13-04-2022 6.6.76
+- History: cleanup unnecessary ACL entries created by bug
+
 13-04-2022 6.6.75
 - Mail: Could not create folder error on accessing subfolders
 - History: login not logged
