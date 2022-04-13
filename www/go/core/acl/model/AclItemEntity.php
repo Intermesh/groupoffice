@@ -283,7 +283,7 @@ abstract class AclItemEntity extends AclEntity {
 			go()->getDbConnection()->cacheStatement($cls . '.getAclEntity', $stmt);
 		}
 
-		$cacheKey = '';
+		$cacheKey = $cls;
 		$keys = [];
 		foreach (static::aclEntityKeys() as $from => $to) {
 			if (!isset($this->{$from})) {
