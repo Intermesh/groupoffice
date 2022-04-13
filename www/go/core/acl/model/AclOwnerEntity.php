@@ -84,8 +84,6 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		$a = $this->findAcl();
 
-		$this->checkManagePermission();
-
 		foreach($this->setAcl as $groupId => $level) {
 			$a->addGroup($groupId, $level);
 		}
@@ -153,14 +151,12 @@ abstract class AclOwnerEntity extends AclEntity {
 	}
 
 	/**
-	 * Permissions are set via AclOwnerEntity models through setAcl(). When this property is used it will configure the Acl models.
-	 * This permission is not checked in the controller as usual but checked on save here.
-
+	 * Check if the ACL was modified
+	 *
 	 * @return bool
 	 */
-	protected function checkManagePermission(): bool
-	{
-		return $this->hasPermissionLevel(Acl::LEVEL_MANAGE);
+	public function isAclModified() : bool{
+		return isset($this->setAcl);
 	}
 
 	/**

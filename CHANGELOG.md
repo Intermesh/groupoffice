@@ -10,6 +10,7 @@
 - googleauthenticator: force could be circumvented by reloading browser and then close password dialog
 - googleauthenticator: include username in title
 - Core: Dark mode text in email autocomplete not visible
+- Core: non admins with permissions to edit groups no longer see the modules tab
 
 11-04-2022 6.6.72
 - Files: Search was incomplete
