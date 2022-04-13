@@ -1,3 +1,6 @@
+13-04-2022 6.6.74
+- Core: inifinite loop problem in rebuilding search cache
+
 13-04-2022 6.6.73
 - SMIME: Fixed incorrect attachment size for some smime messages
 - Core: Fixed replacing hasOne properties

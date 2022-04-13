@@ -391,7 +391,7 @@ abstract class Entity extends Property {
 		}
 		
 		//See \go\core\orm\SearchableTrait;
-		if(method_exists($this, 'saveSearch')) {
+		if(method_exists($this, 'saveSearch') && $this->isModified()) {
 			if(!$this->saveSearch()) {				
 				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not save core_search entry");				
 				return false;

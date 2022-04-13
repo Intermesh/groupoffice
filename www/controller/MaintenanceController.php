@@ -404,7 +404,7 @@ class MaintenanceController extends AbstractController {
 
 		\go\core\jmap\Entity::$trackChanges = false;
 		Module::$enabled = false;
-		go()->getDebugger()->enabled = false;
+//		go()->getDebugger()->enabled = false;
 		
 		if(!$this->lockAction()) {
 			exit("Already running!");
