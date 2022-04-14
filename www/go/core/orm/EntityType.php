@@ -399,6 +399,8 @@ class EntityType implements ArrayableInterface {
 				}
 
 				foreach($changedEntities as $r) {
+					//query results may pass associative arrays but they must be in the correct order
+					$r = array_values($r);
 					$this->queueChange($r[0], $r[1], $r[2]);
 				}
 			}
