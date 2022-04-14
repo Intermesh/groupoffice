@@ -340,8 +340,6 @@ class Sync extends Controller {
         }
       }
 
-			go()->debug($group->users);
-
       $this->fireEvent(self::EVENT_SYNC_GROUP, $group, $record);
 
       if (!$dryRun) {
