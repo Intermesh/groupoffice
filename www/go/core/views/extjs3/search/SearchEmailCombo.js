@@ -21,7 +21,7 @@ go.search.SearchEmailCombo = Ext.extend(go.form.ComboBox, {
 						<tpl if="!photoBlobId"><div class="avatar"></div></tpl>\\n\
 						<tpl if="photoBlobId"><div class="avatar" style="background-image:url({[go.Jmap.thumbUrl(values.photoBlobId, {w: 40, h: 40, zc: 1}) ]})"></div></tpl>\
 						<div class="wrap">\
-							<div>{email}</div><small style="color:#333;">{name}</small>\
+							<div>{email}</div><small>{name}</small>\
 						</div>\
 					</div></div>',
 				 '</tpl>'
