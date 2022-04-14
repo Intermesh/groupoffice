@@ -250,17 +250,7 @@ class Sync extends Controller {
       }
     }
 
-		$deleteCount = count($deleteIds);
-
-	  $this->output("Delete count: " . $deleteCount );
-
-	  $percentageToDelete = $totalInLDAP > 0 ? round(($deleteCount / $totalInLDAP) * 100, 2) : 0;
-
-	  $this->output("Delete percentage: " . $percentageToDelete . "%, Max: " . $maxDeletePercentage .'%');
-
-	  if ($percentageToDelete > $maxDeletePercentage) {
-		  throw new Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
-	  }
+		$this->logDeletes($deleteIds, $totalInLDAP, $maxDeletePercentage, $totalInGO);
 
 		if(!empty($deleteIds) && !$dryRun) {
 	    User::delete(['id' => $deleteIds]);
@@ -378,10 +368,6 @@ class Sync extends Controller {
 		}
 
     $this->output("Done");
-    
-    // go()->getDebugger()->printEntries();
-
-		//var_dump($attr);
   }
 
 	/**
@@ -407,16 +393,9 @@ class Sync extends Controller {
       }
     }
 
-    $deleteCount = count($deleteIds);
-    $this->output("Delete count: " . $deleteCount );
-    $percentageToDelete = $totalInLDAP > 0 ? round(($deleteCount / $totalInLDAP) * 100, 2) : 0;
-    $this->output("Delete percentage: " . $percentageToDelete . "%, Max: " . $maxDeletePercentage .'%');
+		$this->logDeletes($deleteIds, $totalInLDAP, $maxDeletePercentage, $totalInGO);
 
-	  if ($percentageToDelete > $maxDeletePercentage) {
-		  throw new Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
-	  }
-
-	  if(!$dryRun) {
+		if(!$dryRun) {
       if(!empty($deleteIds)) {
 	      Group::delete(['id' => $deleteIds]);
       }
@@ -469,5 +448,28 @@ class Sync extends Controller {
     $record = $accountResult->fetch();
     //Sometimes mail record doesn't exist. It can't find users by mail address in that case
 		return ['username' => $this->getGOUserName($record, $server), 'email' => $record->mail[0] ?? null];
+	}
+
+	/**
+	 * @param array $deleteIds
+	 * @param int $totalInLDAP
+	 * @param $maxDeletePercentage
+	 * @param int $totalInGO
+	 * @return void
+	 * @throws Exception
+	 */
+	private function logDeletes(array $deleteIds, int $totalInLDAP, $maxDeletePercentage, int $totalInGO): void
+	{
+		$deleteCount = count($deleteIds);
+
+		$this->output("Delete count: " . $deleteCount);
+
+		$percentageToDelete = $totalInLDAP > 0 ? round(($deleteCount / $totalInLDAP) * 100, 2) : 0;
+
+		$this->output("Delete percentage: " . $percentageToDelete . "%, Max: " . $maxDeletePercentage . '%');
+
+		if ($percentageToDelete > $maxDeletePercentage) {
+			throw new Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
+		}
 	}
 }
