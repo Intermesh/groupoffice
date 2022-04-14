@@ -294,11 +294,14 @@ class Mapping {
 	/**
 	 * Add a scalar relation. For example an array of ID's.
 	 *
-	 * A scalar is alwasys an array. It can't be null.
+	 * A scalar is always an array. It can't be null.
 	 *
+	 * Sort order of scalars are not guaranteed! MySQL may return it in a different order then it was written.
+	 * 
 	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same
 	 * scalar relation for tracking changes.
-	 * 
+	 * @todo maybe this is unneeded and scalars should only be defined in one entity?
+	 *
 	 * eg. When a group's users[] change. It will mark all users as changed too because they have a scalar groups[] property.
 	 * 
 	 * @param string $name

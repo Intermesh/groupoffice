@@ -228,9 +228,6 @@ class Connection {
 	public function beginTransaction(): bool
 	{
 		if($this->transactionSavePointLevel == 0) {
-			if($this->debug) {
-				go()->debug("START DB TRANSACTION", 1);
-			}
 			$ret = $this->getPdo()->beginTransaction();
 
 		}else
@@ -238,7 +235,12 @@ class Connection {
 			$ret = true;		
 		}		
 		
-		$this->transactionSavePointLevel++;		
+		$this->transactionSavePointLevel++;
+
+		if($this->debug) {
+			go()->debug("START DB TRANSACTION " . $this->transactionSavePointLevel, 1);
+		}
+
 		return $ret;
 	}
 
@@ -286,18 +288,18 @@ class Connection {
 		if($this->transactionSavePointLevel == 0) {
 			throw new LogicException("Not in transaction!");
 		}
-		
-		$this->transactionSavePointLevel--;	
+
+		$this->transactionSavePointLevel--;
+
+		if($this->debug) {
+			go()->warn("ROLLBACK DB TRANSACTION " . $this->transactionSavePointLevel, 1);
+		}
+
 		if($this->transactionSavePointLevel == 0) {			
-			go()->warn("ROLLBACK DB TRANSACTION", 1);
 			return $this->getPdo()->rollBack();
 		}else
 		{
 			return true;
-
-			// $sql = "ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			// go()->warn($sql, 1);
-			// return $this->exec($sql) !== false;						
 		}
 	}
 
@@ -309,29 +311,21 @@ class Connection {
    */
 	public function commit(): bool
 	{
-
-//		\go\core\App::get()->debug("Commit DB transation");
-//		\go\core\App::get()->getDebugger()->debugCalledFrom();
-		
 		if($this->transactionSavePointLevel == 0) {
 			throw new PDOException("Not in transaction!");
 		}
 
 		$this->transactionSavePointLevel--;
 
+		if($this->debug) {
+			go()->debug("COMMIT DB TRANSACTION " . $this->transactionSavePointLevel, 1);
+		}
+
+
 		if($this->transactionSavePointLevel == 0) {
-			if($this->debug) {
-				go()->debug("COMMIT DB TRANSACTION", 1);				
-			}
 			return $this->getPdo()->commit();
 		}else
 		{
-
-			// $sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			// if($this->debug) {
-			// 	go()->debug($sql, 1);				
-			// }
-			// return $this->exec($sql) !== false;			
 			return true;
 		}
 	}
@@ -404,14 +398,14 @@ class Connection {
    * Create an insert statement
    *
    * @param string $tableName
-   * @param array|Query $data Key value array or select query
+   * @param array|Query $data Key value array, a numeric array with key value arrays or select query
    * @param string[] $columns If $data is a query object then you can supply the
    *  selected columns with this parameter. If not given all columns must be
    *  selected in the correct order.
    *
    * @return Statement
    * @throws PDOException
-   * @example
+   * @example Single record
    * ```
    * $data = [
    *    "propA" => "string 1",
@@ -428,6 +422,25 @@ class Connection {
    * Get the ID if it has an auto increment column:
    * ```
    * $id = App::get()->getDbConnection()->getPDO()->lastInsertId();
+   * ```
+   *
+   *
+   * @example Multiple records
+   * ```
+   * $data = [[
+   *    "propA" => "string 1",
+   *    "createdAt" => new \DateTime(),
+   *    "modifiedAt" => new \DateTime()
+   * ],[
+   *    "propA" => "string 2",
+   *    "createdAt" => new \DateTime(),
+   *    "modifiedAt" => new \DateTime()
+   * ]];
+   *
+   * $result = App::get()
+   *        ->getDbConnection()
+   *        ->insert("test_a", $data)
+   *        ->execute();
    * ```
    *
    * Or with an expression:

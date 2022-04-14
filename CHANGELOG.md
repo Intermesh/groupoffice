@@ -1,3 +1,36 @@
+- Tickets: Added close button next to new message button and made new message button larger
+
+14-04-2022 6.6.77
+- Core: rewrote procedure to reset or add groups to all acl's of a type to make it a lot faster and use less resources.
+- History: cleanup unnecessary ACL entries created by bug query adjusted so it works in mysql 5.7 too.
+- Core: removed inline style that was incorrect in the Dark theme
+
+13-04-2022 6.6.76
+- History: cleanup unnecessary ACL entries created by bug
+
+13-04-2022 6.6.75
+- Mail: Could not create folder error on accessing subfolders
+- History: login not logged
+
+13-04-2022 6.6.74
+- Core: inifinite loop problem in rebuilding search cache
+
+13-04-2022 6.6.73
+- SMIME: Fixed incorrect attachment size for some smime messages
+- Core: Fixed replacing hasOne properties
+- Core: Changes are pushed at the end to avoid dead locks. This fixes random deadlock problem with LDAP sync.
+- Tasks: Sort and filtering on task categories caused sql error
+- Tasks: fixed categories not loading for selected tasklist on dialog open
+- Comments: fixed missing background color
+- Tasks/addressbook/notes: Fixed add button was disabled if you had create permission but no write permissions
+- Task: Assigned to field lists only users that have write permissions to the task
+- googleauthenticator: force could be circumvented by reloading browser and then close password dialog
+- googleauthenticator: include username in title
+- Core: Dark mode text in email autocomplete not visible
+- Core: non admins with permissions to edit groups no longer see the modules tab
+- Core: rebuild search script could store incorrect ACL's
+- Projects: Ability to make templates writable
+
 11-04-2022 6.6.72
 - Files: Search was incomplete
 - Core: CLI and web cache could be different because apcu is not used on CLI

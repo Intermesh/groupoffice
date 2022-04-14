@@ -9,6 +9,7 @@ use GO\Base\Db\ActiveRecord;
 use go\core\data\convert\AbstractConverter;
 use go\core\data\convert\Json;
 use go\core\db\Column;
+use go\core\ErrorHandler;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
@@ -366,7 +367,7 @@ abstract class Entity extends Property {
 
 			return $this->commit() && !$this->hasValidationErrors();
 		} catch(Exception $e) {
-			\go\core\ErrorHandler::logException($e);
+			ErrorHandler::logException($e);
 			$this->rollback();
 			throw $e;
 		}
@@ -419,7 +420,7 @@ abstract class Entity extends Property {
 		}
 		
 		//See \go\core\orm\SearchableTrait;
-		if(method_exists($this, 'saveSearch')) {
+		if(method_exists($this, 'saveSearch') && $this->isModified()) {
 			if(!$this->saveSearch()) {				
 				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not save core_search entry");				
 				return false;
@@ -526,6 +527,7 @@ abstract class Entity extends Property {
 
 
 	protected function commitToDatabase() : bool {
+		go()->debug("commit " . static::class);
 		return App::get()->getDbConnection()->commit();
 	}
 
@@ -656,7 +658,6 @@ abstract class Entity extends Property {
 	 * routing short routes like "Note/get"
 	 *
 	 * @return EntityType
-	 * @throws Exception
 	 */
 	public static function entityType(): EntityType
 	{

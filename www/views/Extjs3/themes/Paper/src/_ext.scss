@@ -828,7 +828,7 @@
 			transform: translateX(-50%);
 		}
 	}
-   &.x-btn-pressed {
+   &.x-btn-pressed > tbody {
 		background-color: color($bg, 'pressed');
    }
    &-click {
@@ -1797,11 +1797,11 @@ td.grid-hd-group-cell {
 
 .x-tree-node-loading a{
 	font-style: italic;
-	color:#444444;
+	color:color($fg, 'disabled');
 }
 
 .x-tree-node .x-tree-node-disabled a{
-	color:gray !important;
+	color: color($fg, 'secondary-text') !important;
 }
 
 .x-tree-node div.x-tree-drag-insert-below{

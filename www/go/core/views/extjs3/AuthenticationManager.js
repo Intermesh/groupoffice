@@ -222,10 +222,15 @@ go.AuthenticationManager = (function () {
 		 * @param message
 		 * @return {Promise}
 		 */
-		passwordPrompt : function(title, message) {
+		passwordPrompt : function(title, message, closable) {
+
+			if (closable == undefined) {
+				closable = true;
+			}
 			return new Promise((resolve, reject) =>
 			{
 				const passwordPrompt = new go.PasswordPrompt({
+					closable: closable,
 					width: dp(450),
 					text: message,
 					title: title,

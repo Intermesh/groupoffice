@@ -701,10 +701,10 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * 
 	 * @return array eg ['sql' => 'select...', 'params' => []]
 	 */
-	public function build(): array
+	public function build($prefix = ""): array
 	{
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
-		return $queryBuilder->buildSelect($this);
+		return $queryBuilder->buildSelect($this, $prefix);
 	}
 
 	/**

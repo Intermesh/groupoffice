@@ -34,7 +34,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					}
 				},
 				'estimatedDuration',
-				'timeBooked'
+				'timeBooked',
+				'permissionLevel'
 			],
 			entityStore: "Task",
 			sortInfo: {

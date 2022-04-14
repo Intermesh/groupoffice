@@ -756,8 +756,9 @@ class User extends Entity {
 		
 		if(!parent::internalSave()) {
 			return false;
-		}	
-		
+		}
+
+		/// TODO change log problem with deadlocks
 		$this->saveContact();
 
 		if(isset($this->personalGroup) && $this->personalGroup->isModified()) {
@@ -1269,6 +1270,11 @@ class User extends Entity {
 		}
 
 		return Token::delete($query) && RememberMe::delete($query);
+	}
+
+	public function findAclId(): ?int
+	{
+		return $this->getPersonalGroup()->findAclId();
 	}
 
 

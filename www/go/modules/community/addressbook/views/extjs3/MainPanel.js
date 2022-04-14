@@ -648,7 +648,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		this.grid.store.load().then(function (result) {
 			if (addressBookId) {
 				go.Db.store('AddressBook').single(addressBookId).then(function (ab) {
-					if (ab.permissionLevel < go.permissionLevels.write) {
+					if (ab.permissionLevel < go.permissionLevels.create) {
 						me.addButton.setDisabled(true);
 						me.importButton.setDisabled(true);
 						me.exportButton.setDisabled(true);

@@ -164,20 +164,20 @@ class QueryBuilder {
 			foreach($data as $record) {
 				$tags = [];
 				foreach ($record as $colName => $value) {
-					if(is_int($colName)) {
+					if (is_int($colName)) {
 						$colName = $columns[$colName];
 					}
-					if($value instanceof Query) {
-						$build = $value->build();
+					if ($value instanceof Query) {
+						$build = $value->build("\t");
 
-						$tags[] = '(' . $build['sql'] .')';
+						$tags[] = '(' . $build['sql'] . ')';
 
 						$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 
-					} else if($value instanceof Expression) {
+					} else if ($value instanceof Expression) {
 						$tags[] = (string) $value;
 					} else
-					{				
+					{
 						$paramTag = $this->getParamTag();
 						$tags[] = $paramTag;
 						$this->addBuildBindParameter($paramTag, $value, $this->tableName, $colName);

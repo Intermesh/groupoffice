@@ -5,6 +5,7 @@ namespace go\core\jmap;
 use Exception;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
+use go\core\acl\model\AclOwnerEntity;
 use go\core\fs\File;
 use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
@@ -15,6 +16,7 @@ use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
+use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
 use go\core\util\Lock;
@@ -437,7 +439,7 @@ abstract class EntityController extends Controller {
 
 		$unsorted = [];
 		$foundIds = [];
-		$result['list'] = [];
+
 		foreach($query as $e) {
 			if($e->hasPermissionLevel(Acl::LEVEL_READ)) {
 				$arr = $e->toArray();
@@ -647,6 +649,9 @@ abstract class EntityController extends Controller {
 		$this->mergeOtherSaves($result);
 
 		$result['oldState'] = $oldState;
+
+		EntityType::push(false);
+
 		$result['newState'] = $this->getState();
 
 
@@ -699,6 +704,7 @@ abstract class EntityController extends Controller {
 
   /**
    * Override this if you want to implement permissions for creating entities
+   * New properties have already been set so you can validate per property too if needed.
    *
    * @param Entity $entity
    * @return boolean
@@ -707,6 +713,7 @@ abstract class EntityController extends Controller {
 	{
 		return $entity->hasPermissionLevel(Acl::LEVEL_CREATE);
 	}
+
 
   /**
    * Creates a single entity
@@ -729,16 +736,28 @@ abstract class EntityController extends Controller {
 
 	/**
 	 * Override this if you want to change the default permissions for updating an entity.
-	 * 
+	 * New properties have already been set so you can validate per property too if needed.
+	 *
 	 * @param Entity $entity
 	 * @return bool
 	 */
 	protected function canUpdate(Entity $entity): bool
 	{
-		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE);
+		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE) && $this->checkAclChange($entity);
 	}
 
-  /**
+
+	protected function checkAclChange(Entity $entity): bool
+	{
+		if(!($entity instanceof AclOwnerEntity)) {
+			return true;
+		}
+
+		return $entity->getPermissionLevel() == Acl::LEVEL_MANAGE || !$entity->isAclModified();
+	}
+
+
+	/**
    * Updates the entities
    *
    * @param array $update

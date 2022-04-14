@@ -225,7 +225,6 @@ class SavedMessage extends ComposerMessage
 					}					
 
 					$a->index=count($this->attachments);
-					$a->size=isset($part->body) ? strlen($part->body) : 0;
 					$a->encoding = isset($part->headers['content-transfer-encoding']) ? $part->headers['content-transfer-encoding'] : '';
 					$a->disposition = isset($part->disposition) ? $part->disposition : '';
 		

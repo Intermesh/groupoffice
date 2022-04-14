@@ -106,6 +106,7 @@ class MessageAttachment extends \GO\Base\Model
 			throw new \Exception("File $file->name is not a temporary file");
 		}
 		$this->_tmp_file = $file->stripTempPath();
+		$this->size = $file->size();
 	}
 	
 	/**
@@ -183,9 +184,7 @@ class MessageAttachment extends \GO\Base\Model
 	 */
 	public function getEstimatedSize(): float
 	{
-		if ($this->encoding === 'base64') {
-			return ceil($this->size * 0.75);
-		}
+
 		return $this->size;
 	}
 

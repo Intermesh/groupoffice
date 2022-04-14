@@ -7,6 +7,7 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
 use go\core\orm\Entity;
+use go\core\orm\EntityType;
 use go\core\orm\Query;
 
 /**
@@ -191,6 +192,9 @@ abstract class AbstractConverter {
 				}			
 
 				$entity->save();
+
+				//push changes after each user
+				EntityType::push();
 
 				if($entity->hasValidationErrors()) {
 					$response['errors'][] = "Item ". $this->index . ": ". var_export($entity->getValidationErrors(), true);

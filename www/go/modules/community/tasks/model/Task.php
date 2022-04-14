@@ -325,8 +325,10 @@ class Task extends AclInheritEntity {
 			})
 			->add('categories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
-					$query->join("tasks_task_category","categories","task.id = categories.taskId")
-					->where(['categories.categoryId' => $value]);
+					if(!$query->isJoined("tasks_task_category","categories")) {
+						$query->join("tasks_task_category", "categories", "task.id = categories.taskId");
+					}
+					$criteria->where(['categories.categoryId' => $value]);
 				}
 			})->addDate("start", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('start',$comparator,$value);
@@ -590,8 +592,8 @@ class Task extends AclInheritEntity {
 
 		if(isset($sort['categories'])) {
 			$query->join('tasks_task_category', 'tc', 'tc.taskId = '.$query->getTableAlias() . '.id', 'LEFT');
-			$query->join('tasks_category', 'categories', 'tc.categoryId = categories.id', 'LEFT');
-			$sort->renameKey('categories', 'categories.name');
+			$query->join('tasks_category', 'categorySort', 'tc.categoryId = categorySort.id', 'LEFT');
+			$sort->renameKey('categories', 'categorySort.name');
 		}
 
 		return parent::sort($query, $sort);

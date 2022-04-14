@@ -152,14 +152,12 @@ abstract class AclOwnerEntity extends AclEntity {
 	}
 
 	/**
-	 * Permissions are set via AclOwnerEntity models through setAcl(). When this property is used it will configure the Acl models.
-	 * This permission is not checked in the controller as usual but checked on save here.
-
+	 * Check if the ACL was modified
+	 *
 	 * @return bool
 	 */
-	protected function checkManagePermission(): bool
-	{
-		return $this->hasPermissionLevel(Acl::LEVEL_MANAGE);
+	public function isAclModified() : bool{
+		return isset($this->setAcl);
 	}
 
 	/**
@@ -317,7 +315,10 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 
 		if(!isset($this->permissionLevel)) {
-			$this->permissionLevel = Acl::getUserPermissionLevel($this->{static::$aclColumnName}, go()->getAuthState()->getUserId());
+			$this->permissionLevel =
+				(go()->getAuthState() && go()->getAuthState()->isAdmin()) ?
+					Acl::LEVEL_MANAGE :
+					Acl::getUserPermissionLevel($this->{static::$aclColumnName}, go()->getAuthState()->getUserId());
 		}
 
 		return $this->permissionLevel;

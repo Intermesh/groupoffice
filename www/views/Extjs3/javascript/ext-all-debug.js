@@ -41853,8 +41853,20 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         if(this.hiddenField){
             this.hiddenField.value = Ext.value(v, '');
         }
-        Ext.form.ComboBox.superclass.setValue.call(this, text);
-        this.value = v;
+
+				const susp = this.eventsSuspended;
+				if(!susp)
+					this.suspendEvents(false);
+
+				Ext.form.ComboBox.superclass.setValue.call(this, text);
+
+				if(!susp)
+					this.resumeEvents();
+
+				this.value = v;
+
+				this.fireEvent('setvalue', this, v);
+
         return this;
     },
 

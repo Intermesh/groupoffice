@@ -1,15 +1,17 @@
-<?php
+<?php /** @noinspection PhpUndefinedFieldInspection */
+
+/** @noinspection PhpComposerExtensionStubsInspection */
+
 namespace go\modules\community\ldapauthenticator\cli\controller;
 
 use Exception;
 use go\core\Controller;
-use go\core\orm\Query;
+use go\core\orm\EntityType;
 use go\modules\community\ldapauthenticator\model\Server;
 use go\core\exception\NotFound;
 use go\core\ldap\Record;
 use go\core\model\Group;
 use go\core\ldap\Connection;
-use go\core\model\UserGroup;
 use go\core\model\User;
 use go\modules\community\ldapauthenticator\Module;
 use go\core\event\EventEmitterTrait;
@@ -34,6 +36,7 @@ class Sync extends Controller {
 	 * @param $id
 	 * @param $username
 	 * @throws NotFound
+	 * @throws Exception
 	 */
   public function test($id, $username) {
 	  //objectClass	inetOrgPerson)
@@ -62,9 +65,11 @@ class Sync extends Controller {
 	  }
   }
 
-  /**
-   * docker-compose exec --user www-data groupoffice-64 php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
-   */
+	/**
+	 * docker-compose exec --user www-data groupoffice php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
+	 * @throws NotFound
+	 * @throws Exception
+	 */
   public function users($id, $dryRun = false, $delete = false, $maxDeletePercentage = 5) {
     //objectClass	inetOrgPerson)
     $server = Server::findById($id);
@@ -98,6 +103,9 @@ class Sync extends Controller {
 			if($user) {
 				$usersInLDAP[] = $user->id;
 			}
+
+			//push changes after each user
+			EntityType::push();
 		}
 
 		if ($delete) {
@@ -107,6 +115,9 @@ class Sync extends Controller {
     $this->output("Done\n\n");
   }
 
+	/**
+	 * @throws Exception
+	 */
 	private function ldapRecordToUser(Record $record, Server $server, $dryRun) {
 
 		$username = $this->getGOUserName($record,$server);
@@ -218,7 +229,10 @@ class Sync extends Controller {
   }
 
 
-  private function deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun) {
+	/**
+	 * @throws Exception
+	 */
+	private function deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun) {
     $users = User::find(['id', 'username'])
       ->join('ldapauth_server_user_sync', 's', 's.userId = u.id')
       ->where('serverId', '=', $this->serverId)->execute();
@@ -236,17 +250,7 @@ class Sync extends Controller {
       }
     }
 
-		$deleteCount = count($deleteIds);
-
-	  $this->output("Delete count: " . $deleteCount );
-
-	  $percentageToDelete = $totalInLDAP > 0 ? round(($deleteCount / $totalInLDAP) * 100, 2) : 0;
-
-	  $this->output("Delete percentage: " . $percentageToDelete . "%, Max: " . $maxDeletePercentage .'%');
-
-	  if ($percentageToDelete > $maxDeletePercentage) {
-		  throw new Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
-	  }
+		$this->logDeletes($deleteIds, $totalInLDAP, $maxDeletePercentage, $totalInGO);
 
 		if(!empty($deleteIds) && !$dryRun) {
 	    User::delete(['id' => $deleteIds]);
@@ -263,9 +267,10 @@ class Sync extends Controller {
     }
   }
 
-  /**
-   * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
-   */
+	/**
+	 * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
+	 * @throws Exception
+	 */
   public function groups($id, $dryRun = false, $delete = false, $maxDeletePercentage = 5) {
 
     $server = Server::findById($id);
@@ -289,7 +294,6 @@ class Sync extends Controller {
 		}
 
     $groupsInLDAP = [];
-
 
 		$records = Record::find($connection, $server->groupsDN, $server->syncGroupsQuery);
     
@@ -325,13 +329,13 @@ class Sync extends Controller {
       $members = $this->getGroupMembers($record, $connection, $server);    
       
       foreach ($members as $u) {
-        $user = \go\core\model\User::find(['id'])->where(['username' => $u['username']])->orWhere(['email' => $u['email']])->single();
+        $user = User::find(['id'])->where(['username' => $u['username']])->orWhere(['email' => $u['email']])->single();
         if (!$user) {
           $this->output("Error: user '" . $u['username'] . "' does not exist in Group-Office");
         } else {
           $this->output("Adding user '" . $u['username'] . "'");
           if(!in_array($user->id, $group->users)) {
-	          $group->users[] = $user->id; //(new UserGroup())->setValue('userId', $user->id);
+	          $group->users[] = $user->id;
           }
         }
       }
@@ -348,27 +352,26 @@ class Sync extends Controller {
 
       }
 
-			$this->output("Synced " . $name);		
+			$this->output("Synced " . $name);
+
+	    //push changes after each user
+	    EntityType::push();
 
 			$groupsInLDAP[] = $group->id;
 		}
 
-    if(!$dryRun) {
-
-    }
 
 	  if ($delete) {
 			$this->deleteGroups($groupsInLDAP, $maxDeletePercentage, $dryRun);
 		}
 
     $this->output("Done");
-    
-    // go()->getDebugger()->printEntries();
-
-		//var_dump($attr);
   }
 
-  private function deleteGroups($groupsInLDAP, $maxDeletePercentage, $dryRun) {
+	/**
+	 * @throws Exception
+	 */
+	private function deleteGroups($groupsInLDAP, $maxDeletePercentage, $dryRun) {
     $groups = Group::find(['id','name'])
       ->join('ldapauth_server_group_sync', 's', 's.groupId = g.id')
       ->where('serverId', '=', $this->serverId)->execute();
@@ -388,16 +391,9 @@ class Sync extends Controller {
       }
     }
 
-    $deleteCount = count($deleteIds);
-    $this->output("Delete count: " . $deleteCount );
-    $percentageToDelete = $totalInLDAP > 0 ? round(($deleteCount / $totalInLDAP) * 100, 2) : 0;
-    $this->output("Delete percentage: " . $percentageToDelete . "%, Max: " . $maxDeletePercentage .'%');
+		$this->logDeletes($deleteIds, $totalInLDAP, $maxDeletePercentage, $totalInGO);
 
-	  if ($percentageToDelete > $maxDeletePercentage) {
-		  throw new Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
-	  }
-
-	  if(!$dryRun) {
+		if(!$dryRun) {
       if(!empty($deleteIds)) {
 	      Group::delete(['id' => $deleteIds]);
       }
@@ -406,7 +402,8 @@ class Sync extends Controller {
 
 
   
-  private function getGroupMembers(Record $record, Connection $ldapConn, Server $server) {
+  private function getGroupMembers(Record $record, Connection $ldapConn, Server $server): array
+  {
     $members = [];
     if (isset($record->memberuid)) {
       //for openldap      
@@ -436,7 +433,8 @@ class Sync extends Controller {
     return $members;
   }
 
-	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember, Server $server) {
+	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember, Server $server): array
+	{
 		$parts = preg_split('~(?<!\\\),~', $groupMember);
 		$query = str_replace('\\,', ',', array_shift($parts));
 		$query = str_replace('(', '\\(', $query);
@@ -448,5 +446,28 @@ class Sync extends Controller {
     $record = $accountResult->fetch();
     //Sometimes mail record doesn't exist. It can't find users by mail address in that case
 		return ['username' => $this->getGOUserName($record, $server), 'email' => $record->mail[0] ?? null];
+	}
+
+	/**
+	 * @param array $deleteIds
+	 * @param int $totalInLDAP
+	 * @param $maxDeletePercentage
+	 * @param int $totalInGO
+	 * @return void
+	 * @throws Exception
+	 */
+	private function logDeletes(array $deleteIds, int $totalInLDAP, $maxDeletePercentage, int $totalInGO): void
+	{
+		$deleteCount = count($deleteIds);
+
+		$this->output("Delete count: " . $deleteCount);
+
+		$percentageToDelete = $totalInLDAP > 0 ? round(($deleteCount / $totalInLDAP) * 100, 2) : 0;
+
+		$this->output("Delete percentage: " . $percentageToDelete . "%, Max: " . $maxDeletePercentage . '%');
+
+		if ($percentageToDelete > $maxDeletePercentage) {
+			throw new Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
+		}
 	}
 }
