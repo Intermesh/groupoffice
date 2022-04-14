@@ -1,5 +1,6 @@
 - Core: rewrote procedure to reset or add groups to all acl's of a type to make it a lot faster and use less resources.
 - History: cleanup unnecessary ACL entries created by bug query adjusted so it works in mysql 5.7 too.
+- Core: removed inline style that was incorrect in the Dark theme
 
 13-04-2022 6.6.76
 - History: cleanup unnecessary ACL entries created by bug
