@@ -115,7 +115,7 @@ class Listeners extends Singleton {
 
 		if (isset($this->listeners[$calledClass][$event])) {
 			foreach ($this->listeners[$calledClass][$event] as $listener) {	
-				App::get()->log("Event '$calledClass::$event' calls listener $listener[0]::$listener[1]");
+//				App::get()->log("Event '$calledClass::$event' calls listener $listener[0]::$listener[1]");
 				$return = call_user_func_array($listener, $args);
 				if ($return === false) {
 					App::get()->warn("Listener returned false for event " . $event . " " . var_export($listener, true));

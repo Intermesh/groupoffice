@@ -306,9 +306,10 @@ abstract class Property extends Model {
   /**
    * @param $where
    * @param Relation $relation
-   * @return Statement|mixed
+   * @return Statement
    */
-	private static function queryScalar($where, Relation $relation) {
+	private static function queryScalar($where, Relation $relation): Statement
+	{
 		$cacheKey = static::class.':'.$relation->name;
 
 		if(!isset(self::$cachedRelationStmts[$cacheKey])) {
@@ -388,6 +389,12 @@ abstract class Property extends Model {
 
 	}
 
+	/**
+	 * Builds where SQL conditions based on the relation keys
+	 *
+	 * @param Relation $relation
+	 * @return array
+	 */
 	private function buildRelationWhere(Relation $relation): array
 	{
 		$where = [];
@@ -1036,7 +1043,7 @@ abstract class Property extends Model {
 			$oldValue = $this->oldProps[$key] ?? null;
 			$newValue = $this->{$key};
 
-			$propModified = $this->internalIsModified($newValue, $oldValue);
+			$propModified = $this->internalIsModified($newValue, $oldValue, static::isScalarRelation($key));
 			if ($propModified) {
 				if ($forIsModified) {
 						return true;
@@ -1052,7 +1059,31 @@ abstract class Property extends Model {
 		return $modified;
 	}
 
-	private function internalIsModified($newValue, $oldValue) {
+	private static function isScalarRelation(string $propName) : bool{
+		$relation = static::getMapping()->getRelation($propName);
+		if(!$relation) {
+			return false;
+		}
+
+		return $relation->type == Relation::TYPE_SCALAR;
+	}
+
+	private function internalIsModified($newValue, $oldValue, bool $isScalarRelation): bool
+	{
+		if($isScalarRelation) {
+			//scalars must be checked without taking sort into regard
+			$newValue = $newValue ?? [];
+			$oldValue = $oldValue ?? [];
+
+			if(count($newValue) != count($oldValue)) {
+				return true;
+			}
+			sort($newValue);
+			sort($oldValue);
+
+			return $newValue != $oldValue;
+		}
+
 		if($newValue instanceof self) {
 			if($newValue->isModified()) {
 				return true;
@@ -1080,6 +1111,8 @@ abstract class Property extends Model {
 				return true;
 			}
 		}
+
+		return false;
 	}
 
 	/**
@@ -2312,6 +2345,11 @@ abstract class Property extends Model {
 	}
 
 
+	/**
+	 * Check if property has a primary key
+	 *
+	 * @return bool
+	 */
 	public static final function hasPrimaryKey() : bool {
 		return !empty(static::getPrimaryKey());
 	}

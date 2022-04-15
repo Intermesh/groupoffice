@@ -3,6 +3,8 @@
 namespace go\core\controller;
 
 use GO\Base\Db\ActiveRecord;
+use go\core\acl\model\AclOwnerEntity;
+use go\core\db\Query;
 use go\core\exception\NotFound;
 use go\core\model;
 use go\core\orm\EntityType;
@@ -30,76 +32,66 @@ class Acl extends Controller {
 		$cls = $entityType->getClassName();
 
 		if(is_a($cls, ActiveRecord::class, true) ) {
-			$entities = $cls::model()->find();
 
-			foreach($entities as $entity) {
-				
-				/** @var ActiveRecord $entity */
-				$acl = $entity->getAcl();
-				if(!$params['add']) {
-					$acl->clear();
-				}
+			$table= $cls::model()->tableName();
+			$col = 'acl_id';
 
-				foreach($defaultAcl as $groupId => $level) {
-					$acl->addGroup($groupId, $level);
-				}
+		} else {
+			/** @var AclOwnerEntity $cls */
+
+			$table = $cls::getMapping()->getPrimaryTable()->getName();
+			$col = $cls::$aclColumnName;
+		}
+
+		if(!$params['add']) {
+			$stmt = go()->getDbConnection()->delete('core_acl_group',(new Query())
+			->where('aclId', 'IN', go()->getDbConnection()->selectSingleValue($col)->from($table)));
+
+			$stmt->execute();
+
+			$stmt = go()->getDbConnection()->insert('core_acl_group',
+				go()->getDbConnection()
+					->select('t.'.$col.', g.id, "' . model\Acl::LEVEL_MANAGE .'"')
+					->from($table, 't')
+					->join('core_acl', 'a', 'a.id=t.'.$col)
+					->join('core_group', 'g', 'g.isUserGroupFor=a.ownedBy')
+					->where('a.ownedBy != '.model\User::ID_SUPER_ADMIN)
+			);
+
+			$stmt->execute();
+		}
+
+		foreach ($defaultAcl as $groupId => $level) {
+
+			$stmt = go()->getDbConnection()
+				->insertIgnore(
+					'core_acl_group',
+					go()->getDbConnection()->select($col.', "'.$groupId.'", "' . $level .'"')->from($table),
+					['aclId', 'groupId', 'level']
+			);
+
+			$stmt->execute();
+
+
+			if($cls::entityType()->getName() == "Group") {
+				$stmt = go()->getDbConnection()
+					->insertIgnore(
+						'core_acl_group',
+						go()->getDbConnection()->select($col.', id, "' . model\Acl::LEVEL_READ .'"')->from($table),
+						['aclId', 'groupId', 'level']
+					);
+
+				$stmt->execute();
 			}
-		} else {			
-			$entities = $cls::find();
 
-			foreach($entities as $entity) {
-				if(!$params['add']) {
-					$entity->findAcl()->groups = [];
+			EntityType::resetAllSyncState();
+			go()->getSettings()->cacheClearedAt = time();
+			/** @noinspection PhpUnhandledExceptionInspection */
+			go()->getSettings()->save();
 
-					if($entityType->getName() == "Group") {
-						// Groups have a special situtation. They must be shared with the group itself so they can see it.
-						$entity->findAcl()->addGroup($entity->id, model\Acl::LEVEL_READ);					
-					}			
-				}
-				
-				$entity->setAcl($defaultAcl);
-				if(!$entity->save()) {
-					throw new \Exception("Could not save default ACL for entity");
-				}
-			}
 		}
 
 		return [];
-
-
-		// $table = array_values($cls::getMapping()->getTables())[0];
-		// $defaultAcl = model\Acl::findById($entityType->getDefaultAclId());
-		
-		// $aclIds = go()->getDbConnection()->select('aclId')->from($table->getName());
-		// $acls = model\Acl::find()->where('id', 'IN', $aclIds);
-		
-		// foreach($acls as $acl) {
-		// 	if(!$params['add']) {
-		// 		$acl->groups = [];
-				
-		// 		if($entityType->getName() == "Group") {
-		// 			// Groups have a special situtation. They must be shared with the group itself so they can see it.
-		// 			$group = \go\core\model\Group::find()->where(['aclId' => $acl->id])->single();
-		// 			$acl->addGroup($group->id, model\Acl::LEVEL_READ);					
-		// 		}
-		// 	}
-			
-		// 	foreach($defaultAcl->groups as $group) {
-		// 		$aclGroup = $params['add'] || $entityType->getName() == "Group" ? $acl->findGroup($group->groupId) : false;
-		// 		if($aclGroup) {
-		// 			$aclGroup->level = $group->level;					
-		// 		} else
-		// 		{
-		// 			$acl->addGroup($group->groupId, $group->level);
-		// 		}
-		// 	}
-			
-		// 	if(!$acl->save()) {
-		// 		throw new \Exception("Could not save ACL");
-		// 	}
-		// }
-		
-		// return [];		
 	}
 
 	public function overview($params) {

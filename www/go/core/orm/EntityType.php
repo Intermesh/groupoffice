@@ -399,6 +399,8 @@ class EntityType implements ArrayableInterface {
 				}
 
 				foreach($changedEntities as $r) {
+					//query results may pass associative arrays but they must be in the correct order
+					$r = array_values($r);
 					$this->queueChange($r[0], $r[1], $r[2]);
 				}
 			}
@@ -488,6 +490,8 @@ class EntityType implements ArrayableInterface {
 		}
 
 		go()->getDbConnection()->insert("core_change", $main, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt'])->execute();
+
+		self::$changeQueries = [];
 	}
 
 	/**
@@ -503,6 +507,8 @@ class EntityType implements ArrayableInterface {
 	 * @throws Exception
 	 */
 	public static function push(bool $lock = true) {
+
+		go()->debug("Pusing JMAP sync changes");
 
 		if(empty(self::$changes) && empty(self::$changeQueries)) {
 			return;

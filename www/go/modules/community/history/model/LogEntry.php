@@ -238,6 +238,9 @@ class LogEntry extends AclOwnerEntity {
 		if($this->action != self::$actionMap['delete']) {
 			$this->removeAcl = false;
 		}
+
+		go()->debug("Changes for ". $this->entity.": " . $this->changes);
+
 		return parent::internalSave();
 	}
 }
