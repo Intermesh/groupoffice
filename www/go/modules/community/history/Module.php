@@ -232,6 +232,7 @@ class Module extends core\Module
 		$log->description = $user->username . ' [' . Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('login');
 		$log->changes = null;
+		$log->createdBy = $user->id;
 		if(!$log->save()){
 			throw new Exception("Could not save log");
 		}
@@ -264,6 +265,7 @@ class Module extends core\Module
 		$log->description = $user->username . ' [' . Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('logout');
 		$log->changes = null;
+		$log->createdBy = $user->id;
 		if(!$log->save()){
 			throw new Exception("Could not save log");
 		}
