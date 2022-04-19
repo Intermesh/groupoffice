@@ -13,5 +13,11 @@ go.usersettings.VisibleToPanel = Ext.extend(Ext.Panel, {
 		})];
 
 		this.supr().initComponent.call(this);
+	},
+
+	onLoad : function(user) {
+
+		this.sharePanel.store.setFilter("inAcl", {inAcl: {entity: "Group", id: user.personalGroup.id}});
+
 	}
 });
