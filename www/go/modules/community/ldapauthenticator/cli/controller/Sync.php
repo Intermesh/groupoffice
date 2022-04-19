@@ -268,7 +268,7 @@ class Sync extends Controller {
   }
 
 	/**
-	 * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
+	 * docker-compose exec --user www-data groupoffice php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
 	 * @throws Exception
 	 */
   public function groups($id, $dryRun = false, $delete = false, $maxDeletePercentage = 5) {
