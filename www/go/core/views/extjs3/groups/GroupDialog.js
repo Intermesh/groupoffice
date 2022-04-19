@@ -10,7 +10,14 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 
 		if(go.User.isAdmin) {
 			this.on('show', function () {
+
 				this.groupModuleGrid.groupId = this.currentId;
+				//sorts selected groups on top
+				this.groupModuleGrid.store.setFilter("groupIsAllowed", {groupIsAllowed: this.currentId});
+
+				//this sorts the selected members on top
+				this.groupUserGrid.store.setFilter('sort', {'groupMember' : this.currentId});
+
 				if (!this.currentId) {
 					//needed to load the grid.
 					this.groupUserGrid.setValue([]);

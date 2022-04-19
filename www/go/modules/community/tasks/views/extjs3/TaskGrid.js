@@ -2,7 +2,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	autoExpandColumn: 'title',
 	// config options for stateful behavior
 	stateful: true,
-	stateId: 'tasks-grid',
+	stateId: 'tasks-grid-main',
 	loadMask: true,
 
 	initComponent: function () {
@@ -290,4 +290,3 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 		go.modules.community.tasks.TaskGrid.superclass.initComponent.call(this);
 	}
 });
-
