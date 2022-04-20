@@ -508,7 +508,7 @@ class EntityType implements ArrayableInterface {
 	 */
 	public static function push(bool $lock = true) {
 
-		go()->debug("Pusing JMAP sync changes");
+		go()->debug("Pushing JMAP sync changes");
 
 		if(empty(self::$changes) && empty(self::$changeQueries)) {
 			return;
