@@ -105,8 +105,10 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					notificationBody:  body,
 
 					listeners: {
-						close: (panel) => {
-							this.doTask("dismiss_reminders", 0, [record.data.id], panel);
+						destroy: (panel) => {
+							if(!panel.skipTask) {
+								this.doTask("dismiss_reminders", 0, [record.data.id], panel);
+							}
 						}
 					},
 					handler: () => {
@@ -130,8 +132,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 						handler: (btn, e) => {
 							//needed to prevent notification area closing
 							e.stopEvent();
-							this.doTask("dismiss_reminders", 0, [record.data.id], pnl);
-							btn.findParentByType("panel").destroy();
+							pnl.destroy();
 						},
 						scope: this
 					}]
@@ -143,6 +144,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					i.setHandler(function(item){
 						this.doTask("snooze_reminders", item.value, [record.data.id], pnl);
 
+						//to prevent dismiss in destroy event handler above
+						pnl.skipTask = true;
 						pnl.destroy();
 						}, this);
 				}, this);
