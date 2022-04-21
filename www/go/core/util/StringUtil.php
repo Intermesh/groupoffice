@@ -536,7 +536,7 @@ END;
 
 		//remove empty stuff.
 		return array_filter($keywords, function($keyword) {
-			$word = preg_replace("/[^\w]/", "", $keyword);
+			$word = preg_replace("/[^\w]/u", "", $keyword);
 			return !empty($word);
 		});
 
