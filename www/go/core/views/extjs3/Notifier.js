@@ -209,7 +209,7 @@
 							//unfortunately this doesn't work on Firefox on Windows as it doesn't keep notifications. They auto close
 							// in a few seconds :(
 
-							if(!Ext.isWindows || !Ext.isFirefox) {
+							if(!Ext.isWindows || !Ext.isGecko) {
 								// close group-office notification too.
 								msgPanel.destroy();
 							}
