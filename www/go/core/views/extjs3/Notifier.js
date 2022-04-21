@@ -205,6 +205,9 @@
 						title: msgPanel.title,
 						tag: msgPanel.itemId,
 						onclose: function (e) {
+
+							console.warn(e);
+
 							// close group-office notification too.
 							msgPanel.destroy();
 						}
