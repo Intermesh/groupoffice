@@ -9,6 +9,7 @@
 - Core: JMAP missing change entries on deletes
 - Core: Don't dismiss notifications when desktop notifications are closed because firefox doesn't keep them. They are
    auto closed in a few seconds :(
+- Core: Fixed grids jump to top when changes were detected
 
 14-04-2022 6.6.77
 - Core: rewrote procedure to reset or add groups to all acl's of a type to make it a lot faster and use less resources.
