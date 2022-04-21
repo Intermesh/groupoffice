@@ -1,3 +1,4 @@
+21-04-2022 6.6.78
 - Tickets: Added close button next to new message button and made new message button larger
 - History: Assign login entry to the user that logs in instead of admin
 - Tickets: Added {ticket:type} template variable
