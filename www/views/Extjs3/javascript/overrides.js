@@ -1209,7 +1209,6 @@ Ext.override(Ext.KeyNav, {
 Ext.override(Ext.grid.GridView, {
 	scrollToTopOnLoad: true,
 	onLoad : function(store, records, o){
-
 			if (this.scrollToTopOnLoad && !o.keepScrollPosition){
 				if (Ext.isGecko) {
 						if (!this.scrollToTopTask) {

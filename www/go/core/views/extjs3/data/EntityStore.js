@@ -289,6 +289,11 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				}
 			}).then((changes) => {
 
+				// when polling with sseEnabled = false we might be getting an empty result.
+				if(go.util.empty(changes.removed) && go.util.empty(changes.changed)) {
+					return true;
+				}
+
 				if(changes.removed) {
 					changes.removed.forEach((id) => {
 						delete this.data[id];
