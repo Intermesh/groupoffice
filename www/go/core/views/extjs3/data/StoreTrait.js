@@ -184,7 +184,9 @@ go.data.StoreTrait = {
 			return;
 		}		
 
-		if(added.length || changed.length) {
+		// if they are all empty then something is wrong
+		// an exception occurred and we will also reload
+		if(added.length || changed.length || !destroyed.length) {
 			//we must reload because we don't know how to sort partial data.
 			const o = go.util.clone(this.lastOptions);
 			o.params = o.params || {};
