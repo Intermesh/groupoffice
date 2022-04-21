@@ -616,16 +616,8 @@ use Faker;
 			}
 
 			$this->rebuildCacheOnDestruct = false;
-			
-			GO::clearCache(); //legacy
 
-			go()->getCache()->flush(false);
-			Table::destroyInstances();
-			Property::clearCache();
-			Property::clearCachedRelationStmts();
-
-			$webclient = Extjs3::get();
-			$webclient->flushCache();
+			$this->clearCache();
 
 			Observable::cacheListeners();
 
@@ -637,6 +629,23 @@ use Faker;
 			/** @noinspection PhpUnhandledExceptionInspection */
 			go()->getSettings()->save();
 			
+		}
+
+		/**
+		 * Clears all caches
+		 *
+		 * @return void
+		 */
+		public function clearCache() {
+			App::get()->getCache()->flush( false);
+			Table::destroyInstances();
+			Property::clearCache();
+			Property::clearCachedRelationStmts();
+			GO::clearCache();
+			Listeners::get()->clear();
+			Observable::$listeners = [];
+			$webclient = Extjs3::get();
+			$webclient->flushCache();
 		}
 		
 		public function __destruct() {

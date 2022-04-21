@@ -27,6 +27,15 @@ class Listeners extends Singleton {
 
 
 	/**
+	 * Clears all listeners
+	 *
+	 * @return void
+	 */
+	public function clear() {
+		$this->listeners = null;
+	}
+
+	/**
 	 * Add an event listener
 	 *
 	 * @param string $firingClass

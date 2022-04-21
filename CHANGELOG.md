@@ -3,6 +3,7 @@
 - Tickets: Added {ticket:type} template variable
 - Core: fixed inefficient way of loading group members and sharing panels
 - Core: fixed lock problem: sem_release(): failed to release key 0x6bd7e64: Invalid argument
+- Fixed: GO version 6.6.x: Search in cyrillic does not work #834
 
 14-04-2022 6.6.77
 - Core: rewrote procedure to reset or add groups to all acl's of a type to make it a lot faster and use less resources.
