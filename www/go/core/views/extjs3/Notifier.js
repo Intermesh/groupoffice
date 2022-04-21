@@ -170,6 +170,7 @@
 					tooltip: t("Close"),
 					visible: !msg.persistent,
 					handler: function (e, toolEl, panel, tc) {
+						panel.fireEvent("close", panel);
 						panel.destroy();
 					}
 				});
