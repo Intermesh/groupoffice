@@ -120,7 +120,7 @@ class Token extends Entity {
 		
 		if($this->isNew()) {	
 			$this->setExpiryDate();
-			$this->lastActiveAt = new \DateTime();
+			$this->lastActiveAt = new DateTime();
 			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
@@ -137,8 +137,8 @@ class Token extends Entity {
 	 */
 	public function activity(): bool
 	{
-		if($this->lastActiveAt < new \DateTime("-1 mins")) {
-			$this->lastActiveAt = new \DateTime();
+		if($this->lastActiveAt < new DateTime("-1 mins")) {
+			$this->lastActiveAt = new DateTime();
 
 			//also refresh token
 			if(isset($this->expiresAt)) {
