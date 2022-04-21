@@ -206,10 +206,13 @@
 						tag: msgPanel.itemId,
 						onclose: function (e) {
 
-							console.warn(e);
+							//unfortunately this doesn't work on Firefox on Windows as it doesn't keep notifications. They auto close
+							// in a few seconds :(
 
-							// close group-office notification too.
-							msgPanel.destroy();
+							if(!Ext.isWindows || !Ext.isFirefox) {
+								// close group-office notification too.
+								msgPanel.destroy();
+							}
 						}
 					}
 				).then((notification) => {
