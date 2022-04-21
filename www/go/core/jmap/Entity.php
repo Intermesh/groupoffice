@@ -424,8 +424,11 @@ abstract class Entity  extends OrmEntity {
    */
 	protected static function logDeleteChanges(Query $query): bool
 	{
-		$ids = clone $query;
-		$ids->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed');
+		$idsQuery = clone $query;
+		$ids = $idsQuery
+			->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed')
+			->fetchMode(PDO::FETCH_ASSOC)
+			->all(); //we have to select now because later these id's are gone from the db
 		return static::entityType()->changes($ids);
 	}
 
@@ -523,12 +526,13 @@ abstract class Entity  extends OrmEntity {
 		//find the old state changelog entry
 		if($states[0]['modSeq']) { //If state == 0 then we don't need to check this
 			
-			$change = (new Query())
+			$stmt = (new Query())
 							->select("modSeq")
 							->from("core_change")
 							->where(["entityTypeId" => $entityType->getId()])
-							->andWhere('modSeq', '=', $states[0]['modSeq'])
-							->single();
+							->andWhere('modSeq', '=', $states[0]['modSeq']);
+
+			$change = $stmt->single();
 
 			if(!$change) {			
 				throw new CannotCalculateChanges("Can't calculate changes for '" . $entityType->getName() . "' with state: ". $sinceState .' ('.$states[0]['modSeq'].')');
@@ -746,7 +750,7 @@ abstract class Entity  extends OrmEntity {
 	 * @return Alert
 	 */
 	public function createAlert(DateTimeInterface $triggerAt,
-	                            string            $tag,
+	                            string            $tag = null,
 	                            int               $userId = null): Alert
 	{
 		$alert = new Alert();
