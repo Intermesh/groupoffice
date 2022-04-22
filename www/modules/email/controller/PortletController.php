@@ -41,12 +41,17 @@ class PortletController extends \GO\Base\Controller\AbstractModelController {
 				
 		$cm = $portletFoldersStore->getColumnModel();
 		$cm->formatColumn('email','$model->account->getDefaultAlias()->email');
-		
+		$cm->formatColumn('name', '$model->getName()');
 		$portletFoldersStore->setStatement($portletFoldersStatement);
 		
 		return $portletFoldersStore->getData();
 	}
-	
+
+protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel)
+{
+	$columnModel->formatColumn('name', '$model->getName()');
+}
+
 	/**
 	 * Enable a folder to be displayed in the portlet
 	 * 

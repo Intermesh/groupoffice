@@ -35,7 +35,7 @@ namespace GO\email\Model;
 
 class PortletFolder extends \GO\Base\Db\ActiveRecord{	
 	
-	public $name = 'UNDEFINED';
+	private $name;
 	
 	private $_imapMailbox;
 	
@@ -50,22 +50,25 @@ class PortletFolder extends \GO\Base\Db\ActiveRecord{
 		return parent::model($className);
 	}
 	
-	protected function init() {
-		$this->_load();
-		return parent::init();
-	}
+
 	
 	public function primaryKey() {
 		return array('account_id','folder_name','user_id');
 	}
 		
-	private function _load(){
-		
+	public function getName(){
+		if(isset($this->name)) {
+			return $this->name;
+		}
+		$this->name = 'undefined';
+
 		if(!empty($this->account))
 			$this->_imapMailbox = new \GO\Email\Model\ImapMailbox($this->account,array('name'=>$this->folder_name));
 		
 		if(!empty($this->_imapMailbox))
 			$this->name =  $this->_imapMailbox->getDisplayName();
+
+		return $this->name;
 	}
 	
 	/**
