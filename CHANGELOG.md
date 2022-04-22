@@ -1,5 +1,7 @@
+22-04-2022 6.6.79
 - LDAP: Only connect to IMAP for new accounts when syncing users
 - Core: modules unsorted
+- Core: Fixed cron grid not updating after save
 
 21-04-2022 6.6.78
 - Tickets: Added close button next to new message button and made new message button larger

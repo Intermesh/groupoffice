@@ -1302,13 +1302,13 @@
 		&-alt{ // for strips
 			background-color:$cHover;
 		}		
-		.ux-row-action {
-			opacity: 0;
-			transition : opacity 90ms $curve-standard;
-		}
-		&:hover .ux-row-action {
-			opacity: 1
-		}
+		//.ux-row-action {
+		//	opacity: 0;
+		//	transition : opacity 90ms $curve-standard;
+		//}
+		//&:hover .ux-row-action {
+		//	opacity: 1
+		//}
 	}
 	&-col {
 		padding: dp(4) 0;
