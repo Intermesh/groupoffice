@@ -183,8 +183,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		foreach($accounts as $account) {
-			$account->checkImapConnectionOnSave = true;
-			
+
 			$account->password = $password;			
 			
 			if($server->smtpUseUserCredentials) {				
@@ -193,6 +192,7 @@ class Authenticator extends PrimaryAuthenticator {
 			}
 			
 			$wasNew = $account->getIsNew();
+			$account->checkImapConnectionOnSave = $wasNew;
 			
 			if(!$account->save(true)){
 				throw new Exception("Could not save e-mail account: ".implode("\n", $account->getValidationErrors()));
