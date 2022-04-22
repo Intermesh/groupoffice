@@ -146,7 +146,7 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 				'years' =>  $expression->getExpression(CronExpression::YEAR),
 				'job' => $job->getCronClass(),
 				'nextrun' => $job->nextRunAt ? $this->adjustToUtc($job->nextRunAt) : "-",
-				'lastrun' => $job->runningSince ? $this->adjustToUtc($job->runningSince) : "-",
+				'lastrun' => $job->runningSince ? $this->adjustToUtc($job->runningSince) : ($job->lastRunAt ? $this->adjustToUtc($job->lastRunAt) : "-"),
 				'completedat' => $job->lastRunAt ? $this->adjustToUtc($job->lastRunAt) : "-",
 				'error' => $job->lastError
 
