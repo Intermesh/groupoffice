@@ -1,4 +1,6 @@
+22-04-2022 6.6.80
 - Core: cli commands check for unsupported parameters
+- Email: Portlet folders always connected to imap on load even on deleting users
 
 22-04-2022 6.6.79
 - LDAP: Only connect to IMAP for new accounts when syncing users
