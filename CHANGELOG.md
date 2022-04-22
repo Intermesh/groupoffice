@@ -1,3 +1,5 @@
+- Core: cli commands check for unsupported parameters
+
 22-04-2022 6.6.79
 - LDAP: Only connect to IMAP for new accounts when syncing users
 - Core: modules unsorted

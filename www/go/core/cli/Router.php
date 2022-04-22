@@ -169,7 +169,7 @@ class Router {
 			$methodArgs[] = $requestParams[$paramName] ?? $paramMeta['default'];
 			unset($requestParams[$paramName]);
 
-			$paramNames[] = $paramName . ($paramMeta['isOptional'] ? "" : "*" );
+			$paramNames[] = $paramName . ($paramMeta['isOptional'] ? ' = ' . var_export($paramMeta['default'], true) : "*" );
 		}
 
 		unset($requestParams['c']);
