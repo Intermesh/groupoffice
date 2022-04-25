@@ -181,14 +181,17 @@ go.Jmap = {
 	 */
 	poll : function() {
 		console.log("Start check for updates every 60s.");
-		setInterval(function() {
+		const checkFn = function() {
 			go.Db.stores().forEach(function(store) {
 				store.getState().then(function(state) {
 					if (state)
 						store.getUpdates();
 				});
 			})
-		}, 5000);
+
+		};
+		checkFn();
+		setInterval(checkFn, 60000);
 	},
 	
 	/**

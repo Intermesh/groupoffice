@@ -396,6 +396,24 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					{
 						iconCls: 'ic-more-vert',
 						menu: [
+							// {
+							// 	text: "refresh",
+							// 	handler: function () {
+							// 		const store = this.taskGrid.store, o = go.util.clone(store.lastOptions);
+							// 		o.params = o.params || {};
+							// 		o.params.position = 0;
+							// 		o.add = false;
+							// 		o.keepScrollPosition = true;
+							//
+							// 		if (store.lastOptions.params && store.lastOptions.params.position) {
+							// 			o.params.limit = store.lastOptions.params.position + (store.lastOptions.limit || store.baseParams.limit || 20);
+							// 		}
+							//
+							// 		store.load(o);
+							// 	},
+							// 	scope: this
+							// }
+							// ,
 							{
 								iconCls: 'ic-cloud-upload',
 								text: t("Import"),
@@ -448,16 +466,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								text: t("Delete"),
 								handler: function () {
 									this.taskGrid.deleteSelected();
-								},
-								scope: this
-							},
-							{
-								iconCls: 'ic-refresh',
-								tooltip: t("Refresh"),
-								text: t("Refresh"),
-								handler: function(){
-									this.taskGrid.store.load();
-									this.categoriesGrid.store.load();
 								},
 								scope: this
 							}

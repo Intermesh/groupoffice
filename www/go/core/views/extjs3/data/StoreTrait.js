@@ -192,6 +192,7 @@ go.data.StoreTrait = {
 			o.params = o.params || {};
 			o.params.position = 0;
 			o.add = false;
+			o.keepScrollPosition = true;
 
 			if(this.lastOptions.params && this.lastOptions.params.position) {				
 				o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);

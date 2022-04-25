@@ -1,3 +1,13 @@
+22-04-2022 6.6.80
+- Core: cli commands check for unsupported parameters
+- Email: Portlet folders always connected to imap on load even on deleting users
+
+22-04-2022 6.6.79
+- LDAP: Only connect to IMAP for new accounts when syncing users
+- Core: modules unsorted
+- Core: Fixed cron grid not updating after save
+
+21-04-2022 6.6.78
 - Tickets: Added close button next to new message button and made new message button larger
 - History: Assign login entry to the user that logs in instead of admin
 - Tickets: Added {ticket:type} template variable
@@ -7,6 +17,9 @@
 - Calendar: Fixed reminder not removed when snoozing
 - Core: reload on Foo/changes exception (cannotcalculatechanges)
 - Core: JMAP missing change entries on deletes
+- Core: Don't dismiss notifications when desktop notifications are closed because firefox doesn't keep them. They are
+   auto closed in a few seconds :(
+- Core: Fixed grids jump to top when changes were detected
 
 14-04-2022 6.6.77
 - Core: rewrote procedure to reset or add groups to all acl's of a type to make it a lot faster and use less resources.
