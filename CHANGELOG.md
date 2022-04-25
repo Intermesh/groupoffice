@@ -1,3 +1,6 @@
+6.6.81
+- Addressbook: fix install script, add support bank related fields to contact
+- 
 22-04-2022 6.6.80
 - Core: cli commands check for unsupported parameters
 - Email: Portlet folders always connected to imap on load even on deleting users
