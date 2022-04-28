@@ -1,5 +1,6 @@
 6.6.81
 - Addressbook: fix install script, add support bank related fields to contact
+- Billing: bugfix in product sales order export
 - 
 22-04-2022 6.6.80
 - Core: cli commands check for unsupported parameters
