@@ -173,6 +173,7 @@ class Router {
 		}
 
 		unset($requestParams['c']);
+		unset($requestParams['debug']);
 
 		if(!empty($requestParams)) {
 			throw new InvalidArguments("Bad request. The following parameters are not supported: " . implode(",", array_keys($requestParams))."\n\nSupported are: \n- " . implode("\n- ",  $paramNames));

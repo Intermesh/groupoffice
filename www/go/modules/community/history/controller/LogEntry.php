@@ -35,9 +35,4 @@ class LogEntry extends jmap\EntityController
 		return $this->defaultChanges($params);
 	}
 
-	protected static function defineMapping() {
-		return parent::defineMapping()
-			->addTable("history_log_entry");
-	}
-
 }
