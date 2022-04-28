@@ -150,12 +150,9 @@ class LogEntry extends AclOwnerEntity {
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
-			->addDate('date', function(Criteria $q, $value){
-				$q->andWhere('data', $value);
-			})
 			->add('actions', function(Criteria $q, $value) {
 				if(!empty($value)) {
-					$actionsr = [];
+					$actions = [];
 					foreach ($value as $v) {
 						$actions[] = self::$actionMap[$v];
 					}
