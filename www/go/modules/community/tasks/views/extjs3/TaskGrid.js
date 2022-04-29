@@ -184,7 +184,14 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Progress', "tasks", "community"),
 					dataIndex: 'progress',
 					renderer:function (value, meta, rec, row, col, store){
-						return `<div class="status tasks-task-status-${value}">${go.modules.community.tasks.progress[value]}</div>`;
+						let p = {
+							'needs-action': 'yellow',
+							'in-progress': 'blue',
+							'completed': 'green',
+							'failed': 'red',
+							'cancelled': 'bluegrey'
+						};
+						return `<div class="status ${p[value]}-fill">${go.modules.community.tasks.progress[value]}</div>`;
 					}
 				},{
 					xtype:"datecolumn",
