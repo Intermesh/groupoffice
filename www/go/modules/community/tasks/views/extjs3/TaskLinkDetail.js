@@ -24,7 +24,7 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 			}
 			let str = '<span>' + v + '</span>';
 
-			if(rec.data.description.length > 0) {
+			if(rec.data.description) {
 				str += '<label>' + rec.data.description + "</label>";
 			}
 
