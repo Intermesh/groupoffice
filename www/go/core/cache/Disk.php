@@ -139,7 +139,10 @@ class Disk implements CacheInterface {
 		
 		$this->cache = [];
 	
-		$this->folder->delete();
+		$f = clone $this->folder;
+		$f->rename('cache2tmp');
+		$f->delete();
+
 		$this->folder->create();
 		$this->folder->chmod(0777);
 		
