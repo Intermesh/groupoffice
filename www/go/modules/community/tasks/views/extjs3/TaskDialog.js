@@ -311,7 +311,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						xtype: "fieldset",
 						// collapsible: true,
 						title: t("Alerts"),
-						layout: "hbox",
 						items: [new go.modules.community.tasks.AlertFields()]
 					}
 				]
