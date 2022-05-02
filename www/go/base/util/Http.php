@@ -225,7 +225,9 @@ class Http {
 				header('Pragma: public');
 			}
 		} else {
-			header('Content-Type: ' .$file->mimeType());
+			// for workaround Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1759916
+			// we set application/octet-stream
+			header('Content-Type: ' .( $inline ? $file->mimeType() : 'application/octet-stream'));
 			header('Content-Disposition: '.$disposition.'; filename="' . $file->name() . '"');
 
 			if (!$cache) {
