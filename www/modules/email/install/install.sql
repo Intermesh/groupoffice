@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS `em_accounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT '0',
   `acl_id` int(11) NOT NULL DEFAULT '0',
-  `type` varchar(4) DEFAULT NULL,
   `host` varchar(100) DEFAULT NULL,
   `port` int(11) NOT NULL DEFAULT '0',
   `deprecated_use_ssl` tinyint(1) NOT NULL DEFAULT '0',

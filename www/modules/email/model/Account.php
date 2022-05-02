@@ -42,7 +42,6 @@ use GO\Base\Mail\Imap;
  * @property boolean $do_not_mark_as_read
  * @property int $port
  * @property StringHelper $host
- * @property StringHelper $type
  * @property int $acl_id
  * @property int $user_id
  * @property int $id
