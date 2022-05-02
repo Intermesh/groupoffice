@@ -1,7 +1,12 @@
-6.6.81
+02-05-2022 6.6.81
 - Addressbook: fix install script, add support bank related fields to contact
 - Billing: bugfix in product sales order export
-- 
+- Time tracking: Search in activity type field
+- Core: Saving an item could cause infinite loop leading to a freeze and high server load. This happened when changes
+  were made to an ACL
+- Files: Download PDF via Right click on file replaced Group-Office tab in firefox. Due to Firefox bug:
+  https://bugzilla.mozilla.org/show_bug.cgi?id=1759916
+
 22-04-2022 6.6.80
 - Core: cli commands check for unsupported parameters
 - Email: Portlet folders always connected to imap on load even on deleting users
