@@ -8,25 +8,26 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 	initComponent: function() {
 		this.supr().initComponent.call(this);
 
-		if(go.User.isAdmin) {
-			this.on('show', function () {
 
+		this.on('show', function () {
+
+			if(go.User.isAdmin) {
 				this.groupModuleGrid.groupId = this.currentId;
 				//sorts selected groups on top
 				this.groupModuleGrid.store.setFilter("groupIsAllowed", {groupIsAllowed: this.currentId});
+			}
+			//this sorts the selected members on top
+			this.groupUserGrid.store.setFilter('sort', {'groupMember' : this.currentId});
 
-				//this sorts the selected members on top
-				this.groupUserGrid.store.setFilter('sort', {'groupMember' : this.currentId});
+			if (!this.currentId) {
+				//needed to load the grid.
+				this.groupUserGrid.setValue([]);
+			} else if (this.currentId == 2) { //group everyone
+				this.groupUserGrid.setDisabled(true);
+				this.groupUserGrid.hide();
+			}
+		}, this);
 
-				if (!this.currentId) {
-					//needed to load the grid.
-					this.groupUserGrid.setValue([]);
-				} else if (this.currentId == 2) { //group everyone
-					this.groupUserGrid.setDisabled(true);
-					this.groupUserGrid.hide();
-				}
-			}, this);
-		}
 	},
 
 	onSubmit: function(success, groupId) {
