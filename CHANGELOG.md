@@ -1,3 +1,10 @@
+- Core: fixed concurrency problem in clearing disk cache
+- Calendar: In Compact theme the first calendar selection would lead to an event 15 mins too early.
+- Tasks: Fixed render issue in alerts
+- Tasks: Fixed issue where alert wouldn't display during sessiojn
+- Core: selected users not on top for non admins in group dialog
+- Leavedays: uninstall left two tables
+
 02-05-2022 6.6.81
 - Addressbook: fix install script, add support bank related fields to contact
 - Billing: bugfix in product sales order export
