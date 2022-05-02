@@ -483,10 +483,34 @@ use Faker;
 		 */
 		private function createDbConnection() : Connection{
 			$config = $this->getConfig();
-			$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port']  . ';dbname=' . $config['db_name'];
+			$dsn = $this->createDsn($config['db_name']);
 			return new Connection(
 				$dsn, $config['db_user'], $config['db_pass']
 			);
+		}
+
+		/**
+		 * Create PDO database DSN string
+		 *
+		 * @param string|null $dbName
+		 * @return string
+		 */
+		public function createDsn(string $dbName = null): string {
+			$config = $this->getConfig();
+
+			$dsn = 'mysql:';
+
+			if(!empty($config['db_socket'])) {
+				$dsn .= 'unix_socket=' . $config['db_socket'];
+			} else{
+				$dsn .= 'host=' . $config['db_host'] . ';port=' . $config['db_port'];
+			}
+
+			if(isset($dbName)) {
+				$dsn .= ';dbname=' . $config['db_name'];
+			}
+
+			return $dsn;
 		}
 
 		/**
