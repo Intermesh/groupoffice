@@ -2,6 +2,7 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 	autoHeight: true,
 	maxHeight: dp(300),
 	title: t("Tasks"),
+	stateId: "link-task-list",
 	collapsible: true,
 	initComponent: function() {
 
@@ -17,6 +18,11 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 		});
 
 		this.supr().initComponent.call(this);
+
+		this.on('added', (me, dv) => {
+			this.stateId = 'go-task-links-' + (dv.entity ? dv.entity : dv.entityStore.entity.name);
+			this.initState();
+		})
 
 		this.colModel.getColumnById('title').renderer = function(v,m,rec) {
 			if(rec.json.color) {
