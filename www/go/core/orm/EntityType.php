@@ -378,7 +378,7 @@ class EntityType implements ArrayableInterface {
 		}
 
 		if(!is_array($changedEntities)) {
-			$changedEntities = $changedEntities->all();
+			$changedEntities = $changedEntities->fetchMode(PDO::FETCH_ASSOC)->all();
 		}
 
 		if(empty($changedEntities)) {
@@ -448,51 +448,51 @@ class EntityType implements ArrayableInterface {
 		];;
 	}
 
-	/**
-	 * @todo 	It's possible that this won't write any change. This leads to a modSeq with no changes at all?
-	 *
-	 * @param Query $query
-	 * @return void
-	 */
-	private function queueChangeQuery(Query $query) {
-		if(!isset(self::$changeQueries[$this->getId()])) {
-			self::$changeQueries[$this->getId()] = [];
-		}
-		self::$changeQueries[$this->getId()][] = $query;
-	}
-
+//	/**
+//	 * @todo 	It's possible that this won't write any change. This leads to a modSeq with no changes at all?
+//	 *
+//	 * @param Query $query
+//	 * @return void
+//	 */
+//	private function queueChangeQuery(Query $query) {
+//		if(!isset(self::$changeQueries[$this->getId()])) {
+//			self::$changeQueries[$this->getId()] = [];
+//		}
+//		self::$changeQueries[$this->getId()][] = $query;
+//	}
+//
 	private static $changes = [];
 
 	/**
 	 * @var Query[]
 	 */
-	private static $changeQueries = [];
+//	private static $changeQueries = [];
 
 
-	private static function pushQueries() {
-		if(empty(self::$changeQueries)) {
-			return;
-		}
-
-		$main = null;
-
-		foreach(self::$changeQueries as $entityTypeId => $queries) {
-			$type = self::findById($entityTypeId);
-			$modSeq = $type->nextModSeq();
-
-			foreach($queries as $query) {
-				$query->select('"' . $entityTypeId . '", "' . $modSeq . '", NOW()', true);
-				if(!isset($main)) {
-					$main = $query;
-				}
-				$main->union($query);
-			}
-		}
-
-		go()->getDbConnection()->insert("core_change", $main, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt'])->execute();
-
-		self::$changeQueries = [];
-	}
+//	private static function pushQueries() {
+//		if(empty(self::$changeQueries)) {
+//			return;
+//		}
+//
+//		$main = null;
+//
+//		foreach(self::$changeQueries as $entityTypeId => $queries) {
+//			$type = self::findById($entityTypeId);
+//			$modSeq = $type->nextModSeq();
+//
+//			foreach($queries as $query) {
+//				$query->select('"' . $entityTypeId . '", "' . $modSeq . '", NOW()', true);
+//				if(!isset($main)) {
+//					$main = $query;
+//				}
+//				$main->union($query);
+//			}
+//		}
+//
+//		go()->getDbConnection()->insert("core_change", $main, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt'])->execute();
+//
+//		self::$changeQueries = [];
+//	}
 
 	/**
 	 * Push changes to the database
@@ -522,7 +522,7 @@ class EntityType implements ArrayableInterface {
 		}
 
 
-		self::pushQueries();
+//		self::pushQueries();
 
 		self::pushRecords();
 
