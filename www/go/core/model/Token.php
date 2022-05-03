@@ -6,6 +6,7 @@ use Exception;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
+use go\core\Debugger;
 use go\core\Environment;
 use go\core\ErrorHandler;
 use go\core\orm\Mapping;
@@ -478,6 +479,20 @@ class Token extends Entity {
 	protected static function internalDelete(Query $query): bool
 	{
 		foreach(self::find()->mergeWith($query)->selectSingleValue('accessToken') as $accessToken) {
+
+			// todo remove this part when logout issue is solved
+			$debugEnabled = go()->getDebugger()->enabled;
+			if(!$debugEnabled) {
+				go()->getDebugger()->enable(true);
+			}
+
+			go()->debug("Deleting token: " . $accessToken);
+			go()->getDebugger()->debugCalledFrom();
+
+			if(!$debugEnabled) {
+				go()->getDebugger()->enabled = false;
+			}
+
 			go()->getCache()->delete('token-' . $accessToken);
 		}
 
