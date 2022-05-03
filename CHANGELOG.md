@@ -6,6 +6,7 @@
 - Leavedays: uninstall left two tables
 - Core: remove slashes from tel: links. tel://12435 -> tel:12345
 - Core: Fixed JMAP sync errors
+- History: Show and search for entity ID
 
 02-05-2022 6.6.81
 - Addressbook: fix install script, add support bank related fields to contact
