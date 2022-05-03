@@ -214,7 +214,7 @@ go.util =  (function () {
 
 		callto: function (config, event) {
 			event.preventDefault();
-			document.location = "tel://" + config.number;
+			document.location = "tel:" + config.number;
 		},
 
 		streetAddress: function (config) {
