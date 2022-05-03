@@ -632,7 +632,7 @@ abstract class EntityController extends Controller {
 
 		$result['oldState'] = $oldState;
 
-		EntityType::push(false);
+		EntityType::push();
 
 		$result['newState'] = $this->getState();
 

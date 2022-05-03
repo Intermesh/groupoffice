@@ -489,9 +489,17 @@ abstract class Entity extends Property {
 				return false;			
 			}
 
-			return go()->getDbConnection()->commit();
+			if(!go()->getDbConnection()->commit()) {
+				return false;
+			}
+
+			EntityType::push();
+
+			return true;
 		} catch(Exception $e) {
-			go()->getDbConnection()->rollBack();
+			if(go()->getDbConnection()->inTransaction()) {
+				go()->getDbConnection()->rollBack();
+			}
 			throw $e;
 		}
 	}

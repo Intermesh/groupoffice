@@ -32,6 +32,16 @@ class Lock {
 
 		self::$locks[$name] = true;
 	}
+
+	/**
+	 * Check if lock exists
+	 *
+	 * @param string $name
+	 * @return bool
+	 */
+	public static function exists(string $name) : bool {
+		return isset(self::$locks[$name]);
+	}
 	
 	private $name;
 	

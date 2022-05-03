@@ -506,7 +506,7 @@ class EntityType implements ArrayableInterface {
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function push(bool $lock = true) {
+	public static function push() {
 
 		go()->debug("Pushing JMAP sync changes");
 
@@ -514,7 +514,7 @@ class EntityType implements ArrayableInterface {
 			return;
 		}
 
-		if($lock) {
+		if(!Lock::exists("jmap-set-lock")) {
 			$l = new Lock("jmap-set-lock");
 			if (!$l->lock()) {
 				throw new Exception("Could not obtain lock");
@@ -526,7 +526,7 @@ class EntityType implements ArrayableInterface {
 
 		self::pushRecords();
 
-		if($lock) {
+		if(isset($l)) {
 			$l->unlock();
 		}
 	}
