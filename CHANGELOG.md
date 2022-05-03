@@ -4,6 +4,8 @@
 - Tasks: Fixed issue where alert wouldn't display during sessiojn
 - Core: selected users not on top for non admins in group dialog
 - Leavedays: uninstall left two tables
+- Core: remove slashes from tel: links. tel://12435 -> tel:12345
+- Core: Fixed JMAP sync errors
 
 02-05-2022 6.6.81
 - Addressbook: fix install script, add support bank related fields to contact
