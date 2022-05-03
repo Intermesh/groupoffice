@@ -250,6 +250,7 @@ class Authenticate {
 
 		$token->oldLogout();
 		Token::delete($token->primaryKeyValues());
+		Token::unsetCookie();
 
 		return true;
 	}
