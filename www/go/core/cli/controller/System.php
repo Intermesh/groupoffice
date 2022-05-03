@@ -293,7 +293,7 @@ JSON;
 	 * @throws Forbidden
 	 * @example
 	 * ```
-	 * docker-compose exec --user www-data groupoffice-tasks ./www/cli.php core/System/demo
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo
 	 * ```
 	 */
 	public function demo() {
