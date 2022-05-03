@@ -462,12 +462,12 @@ class Sync extends Controller {
 
 		$this->output("Delete count: " . $deleteCount);
 
-		$percentageToDelete = $totalInLDAP > 0 ? round(($deleteCount / $totalInLDAP) * 100, 2) : 0;
+		$percentageToDelete = $totalInLDAP > 0 ? round(($deleteCount / $totalInGO) * 100, 2) : 0;
 
 		$this->output("Delete percentage: " . $percentageToDelete . "%, Max: " . $maxDeletePercentage . '%');
 
 		if ($percentageToDelete > $maxDeletePercentage) {
-			throw new Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
+			throw new Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
 		}
 	}
 }
