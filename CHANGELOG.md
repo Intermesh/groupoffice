@@ -9,6 +9,8 @@
 - Core: Fixed JMAP sync errors
 - History: Show and search for entity ID
 - Tasks: Fixed disappearing panel
+- LDAP: Convert email and username to lower case
+- Core: fixed moving modules when they got database updates
 
 02-05-2022 6.6.81
 - Addressbook: fix install script, add support bank related fields to contact
