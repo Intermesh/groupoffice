@@ -377,34 +377,34 @@ class EntityType implements ArrayableInterface {
 			return true;
 		}
 
-		$this->highestModSeq = $this->nextModSeq();
-		
 		if(!is_array($changedEntities)) {
+			$changedEntities = $changedEntities->all();
+		}
 
-			$this->queueChangeQuery($changedEntities);
-		} else {
+		if(empty($changedEntities)) {
+			return true;
+		}
 
-			if(empty($changedEntities)) {
-				return true;
+		$this->highestModSeq = $this->nextModSeq();
+
+
+		if(!is_array($changedEntities[0])) {
+			// array of id's. What about acl here?
+			foreach($changedEntities as $entityId) {
+				$this->queueChange($entityId);
+			}
+		} else{
+			if(count($changedEntities[0]) != 3) {
+				throw new InvalidArgumentException("Invalid array given");
 			}
 
-			if(!is_array($changedEntities[0])) {
-				// array of id's. What about acl here?
-				foreach($changedEntities as $entityId) {
-					$this->queueChange($entityId);
-				}
-			} else{
-				if(count($changedEntities[0]) != 3) {
-					throw new InvalidArgumentException("Invalid array given");
-				}
-
-				foreach($changedEntities as $r) {
-					//query results may pass associative arrays but they must be in the correct order
-					$r = array_values($r);
-					$this->queueChange($r[0], $r[1], $r[2]);
-				}
+			foreach($changedEntities as $r) {
+				//query results may pass associative arrays but they must be in the correct order
+				$r = array_values($r);
+				$this->queueChange($r[0], $r[1], $r[2]);
 			}
 		}
+
 
 		return true;
 	}

@@ -282,7 +282,7 @@ class Link extends AclItemEntity
 	 * Find all links for a given entity
 	 *
 	 * @param Entity|ActiveRecord $a
-	 * @return Link[]
+	 * @return Link[]|Query
 	 */
 	public static function findLinks($a) {
 		return Link::find()->where([
@@ -293,41 +293,40 @@ class Link extends AclItemEntity
 
 	/**
 	 * Delete a link between two entities
-	 * 
-	 * Warning: This will not fire the Link::EVENT_DELETE
-	 * 
+	 *
+	 *
 	 * @param Entity|ActiveRecord $a
-	 * @param Entity|ActiveRecord  $b
+	 * @param Entity|ActiveRecord $b
 	 * @return boolean
+	 * @throws Exception
 	 */
-	public static function deleteLink($a, $b) {
+	public static function deleteLink($a, $b): bool
+	{
 		return self::deleteLinkWithIds($a->id, $a->entityType()->getId(), $b->id, $b->entityType()->getId());
 	}
-	
+
 	/**
 	 * Delete link with id and entity type id's
-	 * 
-	 * Warning: This will not fire the Link::EVENT_DELETE
-	 * 
+	 *
 	 * @param int $aId
 	 * @param int $aTypeId
 	 * @param int $bId
 	 * @param int $bTypeId
 	 * @return boolean
+	 * @throws Exception
 	 */
-	public static function deleteLinkWithIds($aId, $aTypeId, $bId, $bTypeId) {
-			if(!go()->getDbConnection()
-						->delete('core_link',[
+	public static function deleteLinkWithIds(int $aId, int $aTypeId, int $bId, int $bTypeId): bool
+	{
+			if(!Link::delete([
 				'fromEntityTypeId' => $aTypeId,
 				'fromId' => $aId,
 				'toEntityTypeId' => $bTypeId,
 				'toId' => $bId,
-		])->execute()) {
+		])) {
 			return false;
 		}
 		
-		if(!go()->getDbConnection()
-						->delete('core_link',[
+		if(!Link::delete([
 				'fromEntityTypeId' => $bTypeId,
 				'fromId' => $bId,
 				'toEntityTypeId' => $aTypeId,
