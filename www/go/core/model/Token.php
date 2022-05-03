@@ -7,7 +7,9 @@ use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
 use go\core\Environment;
+use go\core\ErrorHandler;
 use go\core\orm\Mapping;
+use go\modules\community\history\model\LogEntry;
 use stdClass;
 use go\core\http\Request;
 use go\core\http\Response;
@@ -515,6 +517,8 @@ class Token extends Entity {
 		$q = (new Query)
 			->where('expiresAt', '!=', null)
 			->where('userId', 'NOT IN ', $admins);
+
+		ErrorHandler::log("Logout everyone but admins is used!");
 
 		return self::delete($q) && RememberMe::delete($q);
 	}
