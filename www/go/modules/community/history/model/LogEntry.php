@@ -5,6 +5,7 @@ namespace go\modules\community\history\model;
 use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\db\Criteria;
+use go\core\db\Query as DbQuery;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\db\Expression;
@@ -144,7 +145,16 @@ class LogEntry extends AclOwnerEntity {
 
 	protected static function textFilterColumns(): array
 	{
-		return ['description'];
+		return ['description', 'entityId'];
+	}
+
+	protected static function search(Criteria $criteria, string $expression, DbQuery $query): Criteria
+	{
+		if(is_numeric($expression)) {
+			return $criteria->andWhere('entityId', '=', $expression);
+		} else{
+			return parent::search($criteria, $expression, $query);
+		}
 	}
 
 	protected static function defineFilters(): Filters

@@ -151,7 +151,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		var cols = [{
 			header: t('ID'),
 			width: dp(80),
-			dataIndex: 'id',
+			dataIndex: 'entityId',
 			hidden:true,
 			align: "right"
 		},{
@@ -210,6 +210,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				fields: [
 					{name:'createdAt',type:'date'},
 					'id',
+					'entityId',
 					'entity',
 					'action',
 					'changes',
