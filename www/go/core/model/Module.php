@@ -67,7 +67,12 @@ class Module extends Entity {
 	}
 
 	public $checkDepencencies = true;
-	
+
+	protected static function internalRequiredProperties(): array
+	{
+		return array_merge(parent::internalRequiredProperties(), ['sort_order']);
+	}
+
 	protected function internalSave(): bool
 	{
 
