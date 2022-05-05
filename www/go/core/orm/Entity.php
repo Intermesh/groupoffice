@@ -1043,17 +1043,6 @@ abstract class Entity extends Property {
 	{
 		return null;
 	}
-
-	/**
-	 * Copy the entity. The copy is not saved to the database.
-	 *
-	 * @return static
-	 * @throws Exception
-	 */
-	public function copy(): Entity
-	{
-		return $this->internalCopy();
-	}
 	
 	
 	/**
