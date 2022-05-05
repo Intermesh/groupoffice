@@ -119,7 +119,7 @@ class Debugger {
 		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
 		$this->groupStartTime = $this->getTimeStamp();
 
-		$this->internalLog("Start JMAP method $name");
+		$this->internalLog("Method $name");
 	}
 
 	public function groupEnd(){
