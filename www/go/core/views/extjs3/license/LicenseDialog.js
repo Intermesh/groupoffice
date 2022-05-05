@@ -95,10 +95,10 @@ go.license.LicenseDialog = Ext.extend(go.Window, {
 						}
 					}, coreModule.id).then(() => {
 
-						return go.Jmap.request({method: "Module/installLicensed"}).then(() => {
+						// return go.Jmap.request({method: "Module/installLicensed"}).then(() => {
 							this.close();
 							go.reload();
-						})
+						// })
 
 					}).finally(() => {
 						this.getEl().unmask();
