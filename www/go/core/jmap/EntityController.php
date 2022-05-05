@@ -881,6 +881,8 @@ abstract class EntityController extends Controller {
 
 		$result['accountId'] = $p['accountId'];
 
+		go()->debug($result);
+
 		return $result;
 	}
 

@@ -5,6 +5,8 @@ use Closure;
 use Exception;
 use go\core\data\ArrayableInterface;
 use go\core\data\Model;
+use go\core\http\Request;
+use go\core\jmap\Router;
 
 /**
  * Debugger class. All entries are stored and the view can render them eventually.
@@ -116,6 +118,8 @@ class Debugger {
 		$this->entries[] = ['groupCollapsed', $name];
 		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
 		$this->groupStartTime = $this->getTimeStamp();
+
+		$this->internalLog("Start JMAP method $name");
 	}
 
 	public function groupEnd(){
@@ -227,6 +231,16 @@ class Debugger {
 		
 	}
 
+	public $requestId;
+
+	protected function getRequestId() : string {
+		if(!isset($this->requestId)) {
+			$this->requestId = basename($_SERVER["SCRIPT_FILENAME"]);
+		}
+
+		return $this->requestId;
+	}
+
 	protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
 
 		if(is_array($mixed) || $mixed instanceof ArrayableInterface) {
@@ -238,7 +252,8 @@ class Debugger {
 		}	else {
 			$print = $mixed;
 		}
-		$line = '[' . $level . ']';
+
+		$line = '[' . date('Y-m-d H:i:s') . '][' . $this->getRequestId() . '][' . go()->getUserId(). '][' . $level . ']';
 		
 		if(isset($cls)) {
 			$line .= '[' . $cls .':'. $lineNo.']';
