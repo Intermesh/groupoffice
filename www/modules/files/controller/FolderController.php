@@ -1725,7 +1725,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		$model->delete();
 
-		echo $this->render('delete', array('model' => $model));
+		echo $this->render('delete', array('success'=> true, 'model' => $model));
 	}
 
 	/**
