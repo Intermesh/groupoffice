@@ -2,6 +2,7 @@
 - Core: Improved debug.log
 - Files: Fixed empty error on delete folder from context menu
 - Newsletters: Add delete button for individual newsletters
+- Leavedays: Fixed manage permissions check in 6.6
 
 03-05-2022 6.6.82
 - Core: fixed concurrency problem in clearing disk cache
