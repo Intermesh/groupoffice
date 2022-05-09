@@ -1,3 +1,4 @@
+09-05-2022 6.6.83
 - Core: fixed clearing default ACL's when used
 - Core: Improved debug.log
 - Files: Fixed empty error on delete folder from context menu
