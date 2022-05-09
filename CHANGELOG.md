@@ -1,6 +1,7 @@
 - Core: fixed clearing default ACL's when used
 - Core: Improved debug.log
 - Files: Fixed empty error on delete folder from context menu
+- Newsletters: Add delete button for individual newsletters
 
 03-05-2022 6.6.82
 - Core: fixed concurrency problem in clearing disk cache
