@@ -30,27 +30,29 @@ class Migrator
 	        if($record['project_id'] > 0) {
 		        $projectId = $record['project_id'];
 		        $project = ProjectEntity::findById($projectId);
-		        // If for some reason there are more task lists, just select the first task list
-		        $prt = go()->getDbConnection()
-			        ->select('id')
-			        ->from('tasks_tasklist')
-			        ->where('projectId = ' . $projectId)
-			        ->single();
-		        if($prt) {
-		        	$tasklistId = $prt['id'];
-		        } else {
-		        	$arFlds = [
-		        		'role' => Tasklist::Project,
-				        'name' => $project->name,
-				        'createdBy'=> $project->user_id,
-				        'aclId' => $project->findAclId(),
-				        'projectId' => $projectId,
-				        'version'=> 1,
-				        'ownerId' => $project->user_id
-			        ];
-		        	go()->getDbConnection()->insert('tasks_tasklist', $arFlds)->execute();
-		        	$tasklistId = go()->getDbConnection()->getPDO()->lastInsertId();
-		        }
+						if($project) {
+							// If for some reason there are more task lists, just select the first task list
+							$prt = go()->getDbConnection()
+								->select('id')
+								->from('tasks_tasklist')
+								->where('projectId = ' . $projectId)
+								->single();
+							if ($prt) {
+								$tasklistId = $prt['id'];
+							} else {
+								$arFlds = [
+									'role' => Tasklist::Project,
+									'name' => $project->name,
+									'createdBy' => $project->user_id,
+									'aclId' => $project->findAclId(),
+									'projectId' => $projectId,
+									'version' => 1,
+									'ownerId' => $project->user_id
+								];
+								go()->getDbConnection()->insert('tasks_tasklist', $arFlds)->execute();
+								$tasklistId = go()->getDbConnection()->getPDO()->lastInsertId();
+							}
+						}
 	        } else {
 	        	$counter++;
 	        	echo 'S';
