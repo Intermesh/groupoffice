@@ -106,6 +106,7 @@ class Acl extends Controller {
 			->join('core_entity', 'e', 'a.entityTypeId = e.id')
 			->join('core_module', 'm', 'e.moduleId = m.id')
 			->where('(u.enabled = 1 OR u.enabled IS NULL)') // NULL for group
+			//->andWhere('e.name', '!=', "LogEntry") // Should not be needed because the ACL is copied from other item. a.entityTypeId is not the LogEntry
 			->andWhere('a.entityTypeId IS NOT NULL') // default ACLS for type do not have ids
 			->andWhere('a.entityId IS NOT NULL')->limit(2000)
 			->fetchMode(\PDO::FETCH_OBJ);

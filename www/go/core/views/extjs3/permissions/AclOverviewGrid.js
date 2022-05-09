@@ -9,7 +9,8 @@ go.permissions.AclOverviewGrid = Ext.extend(go.grid.GridPanel, {
 					'change': (_,v) => {this.store.setFilter('group', {groupId:v}).load() }
 				}},
 				{xtype:'component',html:' &nbsp; '+ t('Module')}, this.typeFilter({listeners: {
-					'select': (_,r) => {this.store.setFilter('module', {moduleId:r.data.id}).load() }
+					'select': (_,r) => {this.store.setFilter('module', {moduleId:r.data.id}).load() },
+					'change': (_,v) => {this.store.setFilter('module', {moduleId:v}).load() },
 				}}),
 				{
 					xtype:'buttongroup',
@@ -67,15 +68,13 @@ go.permissions.AclOverviewGrid = Ext.extend(go.grid.GridPanel, {
 				header: t('Level'),
 				dataIndex: "level",
 				width: dp(120),
-				renderer: (v) => {
-					return {
+				renderer: v => ({
 						10: t("Read only"),
 						20: t("Read and Create only"),
 						30: t("Write"),
 						40: t("Write and delete"),
 						50: t("Manage")
-					}[v] || v;
-				}
+					}[v] || v)
 			// },{
 			// 	xtype: 'actioncolumn',
 			// 	width: 90,
