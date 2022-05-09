@@ -319,7 +319,7 @@ abstract class FileSystemObject {
 	}
 
 	/**
-	 * Check if the given folder is a subfolder of this folder.
+	 * Check if the given folder is a parent of this folder.
 	 *
 	 * @param Folder $parent
 	 * @return boolean

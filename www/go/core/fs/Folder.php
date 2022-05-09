@@ -212,9 +212,14 @@ class Folder extends FileSystemObject {
 	 * Delete the folder
 	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
 	public function delete(): bool
 	{
+		if(!empty(go()->getConfig()['blockDeletes']) && !$this->isDescendantOf(go()->getTmpFolder())) {
+			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete folder '.$this->path);
+		}
+
 		if (!$this->exists()){
 			return true;
 		}

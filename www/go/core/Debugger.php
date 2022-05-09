@@ -233,7 +233,7 @@ class Debugger {
 
 	public $requestId;
 
-	protected function getRequestId() : string {
+	public function getRequestId() : string {
 		if(!isset($this->requestId)) {
 			$this->requestId = basename($_SERVER["SCRIPT_FILENAME"]);
 		}

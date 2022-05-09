@@ -105,9 +105,14 @@ class File extends FileSystemObject {
 	 * Delete the file
 	 *
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function delete(): bool
 	{
+		if(!empty(go()->getConfig()['blockDeletes']) && !$this->isDescendantOf(go()->getTmpFolder())) {
+			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete folder '.$this->path);
+		}
+
 		if (!file_exists($this->path)) {
 			return true;
 		}else{		

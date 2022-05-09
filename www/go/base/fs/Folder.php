@@ -88,6 +88,10 @@ class Folder extends Base {
 	 * @return boolean 
 	 */
 	public function delete(){
+
+		if(!empty(go()->getConfig()['blockDeletes']) && !$this->isSubFolderOf(new Folder(go()->getTmpFolder()->getPath()))) {
+			throw new \Exception(go()->getDebugger()->getRequestId().' tried to delete folder '.$this->path);
+		}
 		
 		\GO::debug("DELETE: ".$this->path());
 		
@@ -342,9 +346,9 @@ class Folder extends Base {
 	}
 	
 	/**
-	 * Check if the given folder is a subfolder of this folder.
+	 * Check if the given folder is a parent of this folder.
 	 * 
-	 * @param Folder $subFolder
+	 * @param Folder $parent
 	 * @return boolean 
 	 */
 	public function isSubFolderOf($parent){

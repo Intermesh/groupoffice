@@ -116,8 +116,12 @@ class File extends Base{
 		
 		if(!file_exists($this->path))
 			return true;
+
+		if(!empty(go()->getConfig()['blockDeletes']) && !$this->parent()->isSubFolderOf(new Folder(go()->getTmpFolder()->getPath()))) {
+			throw new \Exception(go()->getDebugger()->getRequestId().' tried to delete folder '.$this->path);
+		}
 		
-		if(self::$_allowDeletes)		
+		if(self::$_allowDeletes)
 			return unlink($this->path);
 		else{
 			$errorMsg = "The program tried to delete a file (".$this->stripFileStoragePath().") while File::\$allowDeletes is set to false.";
