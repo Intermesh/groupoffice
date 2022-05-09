@@ -14,35 +14,36 @@ use stdClass;
 
 class State extends AbstractState {
 	
-	private static function getFromHeader() {
+	private static function getFromHeader() : ?string {
 		
 		$auth = Request::get()->getHeader('Authorization');
 		if(!$auth) {
-			return false;
+			return null;
 		}
 		preg_match('/Bearer (.*)/', $auth, $matches);
 		if(!isset($matches[1])){
-			return false;
+			return null;
 		}
 		
 		return $matches[1];
 	}
 	
-	private static function getFromCookie() {
+	private static function getFromCookie() : ?string {
 //		if(Request::get()->getMethod() != "GET") {
 //			return false;
 //		}
 		
 		if(!isset($_COOKIE['accessToken'])) {
-			return false;
+			return null;
 		}
 		return $_COOKIE['accessToken'];
 	}
 
 	/**
-	 * Gets' the access token from the Authorizaion header or Cookie
+	 * Gets the access token from the Authorizaion header or Cookie
 	 */
-	public static function getClientAccessToken() {
+	public static function getClientAccessToken(): ?string
+	{
 		$tokenStr = static::getFromHeader();
 		if(!$tokenStr) {
 			$tokenStr = static::getFromCookie();
@@ -66,10 +67,7 @@ class State extends AbstractState {
 		
 		if(!isset($this->token)) {
 						
-			$tokenStr = $this->getFromHeader();
-			if(!$tokenStr) {
-				$tokenStr = $this->getFromCookie();
-			}
+			$tokenStr = self::getClientAccessToken();
 
 			if(!$tokenStr) {
 				return false;
