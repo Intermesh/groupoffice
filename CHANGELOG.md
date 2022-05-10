@@ -1,3 +1,4 @@
+10-05-2022 6.6.84
 - Caldav: filter tasklists by role 'list'
 - Core: Fixed error 'File exists in move!' in assistant
 - Core: fixed pps.svg missing error
