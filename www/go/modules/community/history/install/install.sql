@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `history_log_entry` (
   `entityTypeId` INT NOT NULL,
   `entityId` INT DEFAULT NULL,
   `remoteIp` varchar(50) null,
+  `requestId` varchar(190) default null,
   PRIMARY KEY (`id`),
   INDEX `fk_log_entry_core_user_idx` (`createdBy` ASC),
   INDEX `fk_log_entry_core_acl1_idx` (`aclId` ASC),

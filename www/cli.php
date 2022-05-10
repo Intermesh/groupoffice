@@ -24,8 +24,8 @@ if(!Environment::get()->isCli()) {
 	throw new Exception("You can only run this script on the Command Line Interface");
 }
 
+go()->getDebugger()->setRequestId('cli');
 if(!empty($args['debug'])) {
-    go()->getDebugger()->requestId = 'cli';
     go()->getDebugger()->output = true;
 	go()->getDebugger()->enable(false);
 }

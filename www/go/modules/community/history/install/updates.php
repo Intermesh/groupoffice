@@ -22,3 +22,8 @@ $updates['202204131553'][] = "delete from core_acl where id in (
 ) as a
 
 );";
+
+
+$updates['202205101146'][] = "alter table history_log_entry
+    add requestId varchar(190) default null;";
+

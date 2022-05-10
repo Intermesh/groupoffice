@@ -91,10 +91,13 @@ class LogEntry extends AclOwnerEntity {
 
 	public $remoteIp;
 
+	public $requestId;
+
 	protected function init()
 	{
 		if($this->isNew()) {
 			$this->remoteIp = Request::get()->getRemoteIpAddress();
+			$this->requestId = go()->getDebugger()->getRequestId();
 		}
 	}
 

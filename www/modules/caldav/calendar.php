@@ -44,6 +44,8 @@ if (!\GO::modules()->isInstalled('caldav')){
 	exit($msg);
 }
 
+go()->getDebugger()->setRequestId("CalDAV " . ($_SERVER['REQUEST_METHOD'] ?? ""));
+
 /* Backends */
 //if(empty(\GO::config()->webdav_auth_basic)) {
 //	$authBackend = new \GO\Dav\Auth\Backend();
@@ -65,7 +67,7 @@ $server = new Sabre\DAV\Server($tree);
 $server->debugExceptions = go()->getDebugger()->enabled;
 
 $server->on('exception', function($e){
-	\GO::debug((string) $e);
+	\go\core\ErrorHandler::logException($e);
 });
 
 //baseUri can also be /caldav/ with:

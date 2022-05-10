@@ -115,7 +115,8 @@ class Router{
 		$r = !empty($params['r']) ?  explode('/', $params['r']): array();
 		$this->_r= $params['r'] ?? "";
 
-		go()->getDebugger()->requestId = 'index.php?r=' . $this->_r;
+		go()->getDebugger()->setRequestId('index.php?r=' . $this->_r);
+
 	
 		$first = isset($r[0]) ? ucfirst($r[0]) : 'Auth';
 

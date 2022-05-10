@@ -192,6 +192,13 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				dataIndex: "remoteIp"
 			});
 
+			cols.push({
+				id: 'requestId',
+				header: t("Request ID"),
+				dataIndex: "requestId",
+				width: dp(200)
+			});
+
 			cols.splice(1,0, {
 				header: t('Name'),
 				dataIndex: 'description',
@@ -217,7 +224,8 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 					'createdBy',
 					'description',
 					{name: 'creator', type: "relation"},
-					'remoteIp'
+					'remoteIp',
+					'requestId'
 				],
 				baseParams: {sort: [{property: "id", isAscending:false}]},
 				entityStore: "LogEntry"

@@ -231,11 +231,15 @@ class Debugger {
 		
 	}
 
-	public $requestId;
+	public function setRequestId($id) {
+		$this->requestId = $id;
+	}
+
+	private $requestId;
 
 	public function getRequestId() : string {
 		if(!isset($this->requestId)) {
-			$this->requestId = basename($_SERVER["SCRIPT_FILENAME"]);
+			$this->setRequestId(basename($_SERVER["SCRIPT_FILENAME"]));
 		}
 
 		return $this->requestId;

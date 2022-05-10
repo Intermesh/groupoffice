@@ -96,6 +96,9 @@ class Router {
 		}
 		
 		$path = array_shift($args);
+
+		go()->getDebugger()->setRequestId('cli: ' . $path);
+
 		$parts = explode('/', $path);
 
 		if(!isset($parts[2]) || $parts[0] != 'core' && !isset($parts[3])) {
