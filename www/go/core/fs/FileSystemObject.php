@@ -65,10 +65,10 @@ abstract class FileSystemObject {
 				&& strpos($fso->getPath(), go()->getDataFolder()->getFolder('clientscripts')->getPath()) !== 0)
 		) {
 
-			ErrorHandler::log(go()->getDebugger()->getRequestId().' tried to delete folder ' . $fso->getPath());
+			ErrorHandler::log(go()->getDebugger()->getRequestId().' tried to delete ' . $fso->getPath());
 			ErrorHandler::logBacktrace();
 
-			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete folder ' . $fso->getPath());
+			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete ' . $fso->getPath());
 		}
 	}
 
