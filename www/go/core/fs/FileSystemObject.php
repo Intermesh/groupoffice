@@ -4,6 +4,7 @@ namespace go\core\fs;
 
 use Exception;
 use go\core\App;
+use go\core\ErrorHandler;
 use go\core\util\DateTime;
 use InvalidArgumentException;
 
@@ -60,6 +61,10 @@ abstract class FileSystemObject {
 				&& strpos($fso->getPath(), go()->getDataFolder()->getFolder('cache')->getPath()) !== 0
 				&& strpos($fso->getPath(), go()->getDataFolder()->getFolder('clientscripts')->getPath()) !== 0)
 		) {
+
+			ErrorHandler::logException(go()->getDebugger()->getRequestId().' tried to delete folder ' . $fso->getPath());
+			ErrorHandler::log((new \Exception())->getTraceAsString());
+
 			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete folder ' . $fso->getPath());
 		}
 	}
