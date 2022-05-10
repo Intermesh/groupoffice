@@ -59,6 +59,8 @@ abstract class FileSystemObject {
 		if(!empty(go()->getConfig()['blockDeletes'])
 			&& (
 				!$fso->isTemporary()
+				&& !$fso->isDescendantOf(go()->getDataFolder()->getFolder('tmp')) // tmp for files module used by email attachments
+				&& !$fso->isDescendantOf(go()->getDataFolder()->getFolder('versioning'))
 				&& strpos($fso->getPath(), go()->getDataFolder()->getFolder('cache')->getPath()) !== 0
 				&& strpos($fso->getPath(), go()->getDataFolder()->getFolder('clientscripts')->getPath()) !== 0)
 		) {

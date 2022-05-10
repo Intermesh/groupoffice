@@ -91,14 +91,16 @@ class Folder extends Base {
 	 */
 	public function delete(){
 
-		FileSystemObject::checkDeleteAllowed(new \go\core\fs\Folder($this->path()));
-		
+
 		\GO::debug("DELETE: ".$this->path());
 		
 		if(!$this->exists()) {
 			return true;
 		}
-		
+
+		FileSystemObject::checkDeleteAllowed(new \go\core\fs\Folder($this->path()));
+
+
 		//just delete symlink and not contents of linked folder!
 		if(is_link($this->path))
 			return unlink($this->path);
