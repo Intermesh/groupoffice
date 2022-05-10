@@ -47,6 +47,25 @@ abstract class FileSystemObject {
 
 
 	/**
+	 * Check if delete is allowed on give file or folder
+	 *
+	 * @param FileSystemObject $fso
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function checkDeleteAllowed(self $fso) {
+		if(!empty(go()->getConfig()['blockDeletes'])
+			&& (
+				!$fso->isTemporary()
+				&& strpos($fso->getPath(), go()->getDataFolder()->getFolder('cache')->getPath()) !== 0
+				&& strpos($fso->getPath(), go()->getDataFolder()->getFolder('clientscripts')->getPath()) !== 0)
+		) {
+			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete folder ' . $fso->getPath());
+		}
+	}
+
+
+	/**
 	 * Return absolute filesystem path
 	 *
 	 * @return string

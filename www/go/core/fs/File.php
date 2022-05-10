@@ -109,9 +109,7 @@ class File extends FileSystemObject {
 	 */
 	public function delete(): bool
 	{
-		if(!empty(go()->getConfig()['blockDeletes']) && !$this->isDescendantOf(go()->getTmpFolder())) {
-			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete folder '.$this->path);
-		}
+		self::checkDeleteAllowed($this);
 
 		if (!file_exists($this->path)) {
 			return true;

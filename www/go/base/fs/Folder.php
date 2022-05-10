@@ -21,6 +21,8 @@
 namespace GO\Base\Fs;
 
 
+use go\core\fs\FileSystemObject;
+
 class Folder extends Base {
 	
 	
@@ -89,9 +91,7 @@ class Folder extends Base {
 	 */
 	public function delete(){
 
-		if(!empty(go()->getConfig()['blockDeletes']) && !$this->isSubFolderOf(new Folder(go()->getTmpFolder()->getPath()))) {
-			throw new \Exception(go()->getDebugger()->getRequestId().' tried to delete folder '.$this->path);
-		}
+		FileSystemObject::checkDeleteAllowed(new \go\core\fs\Folder($this->path()));
 		
 		\GO::debug("DELETE: ".$this->path());
 		

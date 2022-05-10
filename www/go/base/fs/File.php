@@ -22,6 +22,8 @@
 namespace GO\Base\Fs;
 
 
+use go\core\fs\FileSystemObject;
+
 class File extends Base{
 	
 	
@@ -113,12 +115,11 @@ class File extends Base{
 	 * @return boolean 
 	 */
 	public function delete(){
-		
-		if(!file_exists($this->path))
-			return true;
 
-		if(!empty(go()->getConfig()['blockDeletes']) && !$this->parent()->isSubFolderOf(new Folder(go()->getTmpFolder()->getPath()))) {
-			throw new \Exception(go()->getDebugger()->getRequestId().' tried to delete folder '.$this->path);
+		FileSystemObject::checkDeleteAllowed(new \go\core\fs\File($this->path()));
+
+		if(!file_exists($this->path)) {
+			return true;
 		}
 		
 		if(self::$_allowDeletes)
