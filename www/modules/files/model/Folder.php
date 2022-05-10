@@ -17,6 +17,7 @@ namespace GO\Files\Model;
 
 use Exception;
 use GO;
+use go\core\fs\FileSystemObject;
 use go\core\fs\Folder as GoFolder;
 use go\core\model\Acl;
 
@@ -387,6 +388,13 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$this->name = $name;
 			$this->_path = null;
 		}
+	}
+
+	protected function beforeDelete()
+	{
+		FileSystemObject::checkDeleteAllowed(new \go\core\fs\Folder($this->fsFolder->path()));
+
+		return parent::beforeDelete();
 	}
 
 	protected function beforeSave() {

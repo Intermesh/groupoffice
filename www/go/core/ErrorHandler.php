@@ -3,6 +3,7 @@
 namespace go\core;
 
 use ErrorException;
+use Exception;
 use go\core\util\DateTime;
 use Throwable;
 
@@ -98,7 +99,7 @@ class ErrorHandler {
 	 * @return void
 	 */
 	public static function logBacktrace() {
-		$str = (new \Exception())->getTraceAsString();
+		$str = (new Exception())->getTraceAsString();
 
 		$lines = explode("\n", $str);
 

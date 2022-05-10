@@ -1,5 +1,6 @@
 <?php
 
+
 ini_set('error_reporting', E_ALL); 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -44,8 +45,11 @@ try {
 //	$installDb = INSTALL_UPGRADE;
 
 	if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
+		core\fs\FileSystemObject::allowRootFolderDelete();
 		$dataFolder->delete();
+		core\fs\FileSystemObject::allowRootFolderDelete(false);
 		$dataFolder->create();
+
 
 		//connect to server without database
 		$pdo = new PDO('mysql:host='. $config['db_host'], $config['db_user'], $config['db_pass']);

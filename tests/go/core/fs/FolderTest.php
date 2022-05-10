@@ -1,6 +1,7 @@
 <?php
 namespace go\core\fs;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use go\core\util\DateTime;
 
@@ -47,6 +48,18 @@ class FolderTest extends TestCase
 		$this->assertEquals(2, count($all));
 
 
+	}
+
+
+	/**
+	 * @return void
+	 * @throws Exception
+	 */
+	public function testRootFolderProtection() {
+		$this->expectException(Exception::class);
+
+		$rootFolder = go()->getDataFolder()->getFolder('tmp');
+		$rootFolder->delete();
 	}
 
 }

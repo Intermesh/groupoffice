@@ -18,6 +18,10 @@ use InvalidArgumentException;
  */
 abstract class FileSystemObject {
 
+	/**
+	 * @var bool
+	 */
+	private static $allowRootFolderDelete = false;
 	protected $path;
 
 
@@ -49,6 +53,17 @@ abstract class FileSystemObject {
 
 
 	/**
+	 * Allow deletes in the root folder of the data folder
+	 *
+	 * @param bool $allow
+	 * @return void
+	 */
+	public static function allowRootFolderDelete(bool $allow = true) {
+		self::$allowRootFolderDelete = $allow;
+	}
+
+
+	/**
 	 * Check if delete is allowed on give file or folder
 	 *
 	 * @param FileSystemObject $fso
@@ -56,20 +71,28 @@ abstract class FileSystemObject {
 	 * @throws Exception
 	 */
 	public static function checkDeleteAllowed(self $fso) {
-		if(!empty(go()->getConfig()['blockDeletes'])
-			&& (
-				!$fso->isTemporary()
-				&& !$fso->isDescendantOf(go()->getDataFolder()->getFolder('tmp')) // tmp for files module used by email attachments
-				&& !$fso->isDescendantOf(go()->getDataFolder()->getFolder('versioning'))
-				&& strpos($fso->getPath(), go()->getDataFolder()->getFolder('cache')->getPath()) !== 0
-				&& strpos($fso->getPath(), go()->getDataFolder()->getFolder('clientscripts')->getPath()) !== 0)
-		) {
 
-			ErrorHandler::log(go()->getDebugger()->getRequestId().' tried to delete ' . $fso->getPath());
-			ErrorHandler::logBacktrace();
-
-			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete ' . $fso->getPath());
+		if(!self::$allowRootFolderDelete && $fso->getParent() == go()->getDataFolder()) {
+			if(go()->getDebugger()->getRequestId() !== 'phpunit') {
+				ErrorHandler::log(go()->getDebugger()->getRequestId() . ' tried to delete in root: ' . $fso->getPath());
+				ErrorHandler::logBacktrace();
+			}
+			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete in root: ' . $fso->getPath());
 		}
+	}
+	/**
+	 * Get the parent folder object
+	 *
+	 * @return Folder|null Parent folder object
+	 */
+	public function getParent() : ?Folder {
+
+		$parentPath = dirname($this->path);
+		if ($parentPath == $this->path) {
+			return null;
+		}
+
+		return new Folder($parentPath);
 	}
 
 

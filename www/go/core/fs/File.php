@@ -40,12 +40,11 @@ class File extends FileSystemObject {
   /**
    * Get the parent folder object
    *
-   * @return Folder Parent folder object
+   * @return ?Folder Parent folder object
    */
-	public function getFolder(): Folder
+	public function getFolder(): ?Folder
 	{
-		$parentPath = dirname($this->path);		
-		return new Folder($parentPath);
+		return $this->getParent();
 	}
 
 

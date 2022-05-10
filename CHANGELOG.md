@@ -2,6 +2,7 @@
 - Core: Fixed error 'File exists in move!' in assistant
 - Core: fixed pps.svg missing error
 - History: Added request ID to history log
+- Core: Protect root folders from deletion
 
 09-05-2022 6.6.83
 - Core: fixed clearing default ACL's when used

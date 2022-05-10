@@ -6,6 +6,7 @@ use DateTimeInterface;
 use Exception;
 use GO\Base\Exception\AccessDenied;
 use go\core\ErrorHandler;
+use go\core\fs\FileSystemObject;
 use go\core\model\Alert;
 use go\core\model\Module;
 use go\core\model\User;
@@ -399,7 +400,15 @@ abstract class Entity  extends OrmEntity {
 	{
 		$ids = clone $query;
 		/** @noinspection PhpRedundantOptionalArgumentInspection */
-		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)->all();
+		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')
+			->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)
+			->all();
+
+		// make sure ID=0 is not there. Shouldn't be but this caused a disaster with a root folder with id=0 wiping
+		// the data
+		$ids = array_filter($ids, function($id) {
+			return !empty($id);
+		});
 
 		if(empty($ids)) {
 			return true;

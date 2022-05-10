@@ -27,7 +27,7 @@ class Disk implements CacheInterface {
 	 * @throws Exception
 	 */
 	public function __construct() {
-		$this->folder = App::get()->getDataFolder()->getFolder('cache2');
+		$this->folder = go()->getDataFolder()->getFolder('cache/disk');
 		$this->folder->create();
 	}
 
@@ -141,13 +141,13 @@ class Disk implements CacheInterface {
 		$this->cache = [];
 
 		//in case previous attempt failed
-		$checkExisting = go()->getDataFolder()->getFolder('cache2tmp');
+		$checkExisting = go()->getDataFolder()->getFolder('cache/disktrash');
 		if($checkExisting->exists()) {
 			$checkExisting->delete();
 		}
 	
 		$f = clone $this->folder;
-		if($f->rename('cache2tmp')) {
+		if($f->rename('disktrash')) {
 			$f->delete();
 		}
 

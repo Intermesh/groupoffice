@@ -69,7 +69,7 @@ if(go()->getDebugger()->enabled) {
   $cacheFile->delete();
 } else
 {
-  $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all.js');
+  $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('cache/clientscripts')->create()->getFile('all.js');
 }
 
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';

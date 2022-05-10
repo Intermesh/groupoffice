@@ -1182,3 +1182,14 @@ $updates['202204131216'][] = function() {
 	echo "\n\n======\nNOTE: Search cache will be rebuilt.\n======\n\n";
 };
 
+$updates['202205101416'][] = function() {
+
+	\go\core\fs\FileSystemObject::allowRootFolderDelete();
+
+	go()->getDataFolder()->getFolder('cache2')->delete();
+	go()->getDataFolder()->getFolder('clientscripts')->delete();
+	go()->getDataFolder()->getFolder('cache')->delete();
+
+	\go\core\fs\FileSystemObject::allowRootFolderDelete(false);
+};
+
