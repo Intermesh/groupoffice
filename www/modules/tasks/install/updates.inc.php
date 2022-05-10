@@ -114,6 +114,3 @@ $updates['201903291350'][] = function() {
 	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->migrateEntity("Task");
 };
-
-
-$updates['202205101237'][] = "update tasks_task set filesFolderId = null where filesFolderId=0;";

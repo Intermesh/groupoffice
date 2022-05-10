@@ -143,5 +143,3 @@ $updates['202106171331'][] = "create index addressbook_contact_isOrganization_in
 
 
 $updates['202202070921'][] = "update `addressbook_phone_number` set type='mobile' where type='cell';";
-
-$updates['202205101237'][] = "update addressbook_contact set filesFolderId = null where filesFolderId=0;";
