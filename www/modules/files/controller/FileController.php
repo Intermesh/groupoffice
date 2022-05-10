@@ -329,9 +329,9 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$tmpFolder = \GO\Files\Model\Folder::model()->tmpFolder();
 		foreach($tmpFolder->files as $file) {
 			//clean up older temp files
-//			if($file->mtime < strtotime("-4 hours")) {
+			if($file->mtime < strtotime("-4 hours")) {
 				$file->delete(true);
-//			}
+			}
 		}
 
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);

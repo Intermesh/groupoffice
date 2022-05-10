@@ -22,6 +22,7 @@
 namespace GO\Base\Fs;
 
 
+use go\core\ErrorHandler;
 use go\core\fs\FileSystemObject;
 
 class File extends Base{
@@ -393,7 +394,8 @@ class File extends Base{
 			$newPath = $file->path();
 		} else{
 			if (file_exists($newPath)) {
-				throw new \Exception("File exists in move!");
+				ErrorHandler::log("File $newPath exists in move");
+				throw new \Exception("File ".$newFileName."exists in move!");
 			}
 		}
 		

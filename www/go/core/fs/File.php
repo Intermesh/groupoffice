@@ -422,7 +422,8 @@ class File extends FileSystemObject {
 	{
 
 		if ($destination->exists()) {
-			throw new Exception("File exists in move!");
+			ErrorHandler::log("File " . $destination->getPath() . " exists in move");
+			throw new Exception("File " . $destination->getName() . " exists in move!");
 		}
 
 		if($destination->getPath() == $this->getPath()) {
