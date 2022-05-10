@@ -144,14 +144,16 @@ class Client {
 		$this->setOption(CURLOPT_POSTFIELDS, $data);
 		
     $body = curl_exec($this->getCurl());
+
+		$status = curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE);
 		
 		$error = curl_error($this->getCurl());
 		if(!empty($error)) {
-      throw new CoreException($error);
+      throw new CoreException($error .', HTTP Status: ' . $status);
     }
 
     return [
-      'status' => curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE),
+      'status' => $status,
       'headers' => $this->lastHeaders,
       'body' => $body
     ];
