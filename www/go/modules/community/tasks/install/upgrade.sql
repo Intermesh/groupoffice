@@ -308,7 +308,7 @@ INSERT INTO tasks_task (id,uid,tasklistId,createdBy,responsibleUserId, createdAt
            IF(completion_time, 3, 1) as progress,
            IF(completion_time, from_unixtime(completion_time), null),
            t.`name`, description,
-           t.files_folder_id,
+           IF(t.files_folder_id = 0, null, t.files_folder_id),
            IF(priority = 0, 9, IF(priority = 2, 1, 0)),
            percentage_complete FROM ta_tasks t JOIN ta_tasklists l ON tasklist_id = l.id;
 

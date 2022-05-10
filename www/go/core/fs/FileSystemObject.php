@@ -72,7 +72,7 @@ abstract class FileSystemObject {
 	 */
 	public static function checkDeleteAllowed(self $fso) {
 
-		if(!self::$allowRootFolderDelete && $fso->getParent() == go()->getDataFolder()) {
+		if(!self::$allowRootFolderDelete && ($fso->getParent()->getPath() == go()->getDataFolder()->getPath() || $fso->getPath() == go()->getDataFolder()->getPath()) ){
 			if(go()->getDebugger()->getRequestId() !== 'phpunit') {
 				ErrorHandler::log(go()->getDebugger()->getRequestId() . ' tried to delete in root: ' . $fso->getPath());
 				ErrorHandler::logBacktrace();

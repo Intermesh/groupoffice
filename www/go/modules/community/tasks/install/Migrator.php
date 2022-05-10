@@ -12,7 +12,7 @@ use go\core\util\DateTime;
 class Migrator
 {
 
-	private function getProject($record) {
+	private function getProject(array $record) {
 		if($record['project_id'] > 0) {
 			$projectId = $record['project_id'];
 			return ProjectEntity::findById($projectId);
@@ -35,7 +35,7 @@ class Migrator
       $jobId = $record['id'];
 
       $tasklistId = null;
-	    $project = $this->getProject($record['project_id']);
+	    $project = $this->getProject($record);
       if($project) {
         $projectId = $project->id;
 

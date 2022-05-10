@@ -62,4 +62,22 @@ class FolderTest extends TestCase
 		$rootFolder->delete();
 	}
 
+	/**
+	 * @return void
+	 * @throws Exception
+	 */
+	public function testCreateAndDelete() {
+
+		$folder = go()->getDataFolder()->getFolder('tmp/test');
+
+		//throws exception on failure
+		$folder->create();
+
+		$deleted = $folder->delete();
+		$this->assertEquals(true, $deleted);
+
+		$exists = $folder->exists();
+		$this->assertEquals(false, $exists);
+	}
+
 }
