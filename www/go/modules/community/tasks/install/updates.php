@@ -161,3 +161,7 @@ $updates['202202081432'][] = "ALTER TABLE `tasks_task` CHANGE COLUMN `descriptio
 
 $updates['202202241617'][] = "alter table tasks_user_settings
     add defaultDate bool default false null;";
+
+
+
+$updates['202205101237'][] = "update tasks_task set filesFolderId = null where filesFolderId=0;";
