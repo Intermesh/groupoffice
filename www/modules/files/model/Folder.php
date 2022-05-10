@@ -1425,6 +1425,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		\GO::debug("getTopLevelShare($folderName)");
 
+		// hidden file request by macos .DS_Store and ._template-icons
+		if(substr($folderName, 0, 1) == ".") {
+			return false;
+		}
+
 		if(!isset($this->_folderCache['Shared/'.$folderName])){
 			$findParams = \GO\Base\Db\FindParams::newInstance();
 
@@ -1440,7 +1445,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$folder=$this->find($findParams);
 			
 			if(!$folder) {
-				error_log("Could not find TopLEvelShare ".$folderName);
+				error_log("Could not find TopLevelShare ".$folderName);
 				$folder = false;
 			} elseif(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 				$folder = false;
