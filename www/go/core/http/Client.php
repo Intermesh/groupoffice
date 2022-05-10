@@ -118,7 +118,7 @@ class Client {
 	  $this->setHeader('Content-Length', strlen($str));
 
   	$response =  $this->post($url, $str);
-  	$response['body'] = JSON::decode($response['body']);
+  	$response['body'] = JSON::decode($response['body'], true);
 
   	return $response;
   }
