@@ -47,7 +47,16 @@ class Client {
   public function setOption(int $option, $value): bool
   {
     return curl_setopt($this->getCurl(), $option, $value);
-  }
+	}
+
+	private $headers = [];
+
+	public function setHeader(string $name, string $value): Client
+	{
+		$this->headers[$name] = $value;
+
+		return $this;
+	}
 
   private function initRequest($url) {
     $this->lastHeaders = [];
@@ -60,6 +69,12 @@ class Client {
 		
 		  return strlen($header);
     });
+
+
+	  $headers = $this->getHeadersForCurl();
+	  if(!empty($headers)) {
+		  $this->setOption(CURLOPT_HTTPHEADER, $headers);
+	  }
 
   }
 
@@ -99,11 +114,8 @@ class Client {
   {
   	$str = JSON::encode($data);
 
-  	$this->setOption(CURLOPT_HTTPHEADER, array(
-			  'Content-Type: application/json; charset=utf-8',
-			  'Content-Length: ' . strlen($str)
-		  )
-	  );
+		$this->setHeader('Content-Type', 'application/json; charset=utf-8');
+	  $this->setHeader('Content-Length', strlen($str));
 
   	$response =  $this->post($url, $str);
   	$response['body'] = JSON::decode($response['body']);
@@ -189,4 +201,14 @@ class Client {
   {
      curl_close($this->curl);
   }
+
+	private function getHeadersForCurl(): array
+	{
+		$s = [];
+		foreach($this->headers as $key => $value) {
+			$s[] = $key.': ' . $value;
+		}
+
+		return $s;
+	}
 }
