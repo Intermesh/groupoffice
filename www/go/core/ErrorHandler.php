@@ -93,6 +93,21 @@ class ErrorHandler {
 	}
 
 	/**
+	 * Log backtrace to main error log for debugging purposes.
+	 *
+	 * @return void
+	 */
+	public static function logBacktrace() {
+		$str = (new \Exception())->getTraceAsString();
+
+		$lines = explode("\n", $str);
+
+		foreach($lines as $line) {
+			error_log($line, 0);
+		}
+	}
+
+	/**
 	 * Handles uncaught exceptions
 	 *
 	 * @param Throwable $e

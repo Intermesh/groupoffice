@@ -3,6 +3,7 @@
 namespace go\core\fs;
 
 use Exception;
+use GO\Base\Html\Error;
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\util\DateTime;
@@ -63,7 +64,7 @@ abstract class FileSystemObject {
 		) {
 
 			ErrorHandler::log(go()->getDebugger()->getRequestId().' tried to delete folder ' . $fso->getPath());
-			ErrorHandler::log((new \Exception())->getTraceAsString());
+			ErrorHandler::logBacktrace();
 
 			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete folder ' . $fso->getPath());
 		}
