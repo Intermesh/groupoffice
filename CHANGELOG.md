@@ -1,4 +1,5 @@
 - Caldav: filter tasklists by role 'list'
+- Core: Fixed error 'File exists in move!' in assistant
 
 09-05-2022 6.6.83
 - Core: fixed clearing default ACL's when used
