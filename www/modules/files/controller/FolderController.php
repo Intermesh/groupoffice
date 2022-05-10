@@ -7,7 +7,7 @@ use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
-use go\core\orm\SearchableTrait;
+use go\core\orm\EntityType;
 use go\core\util\StringUtil;
 use GO\Files\Model\Folder;
 
@@ -52,6 +52,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$oldAllowDeletes = \GO\Base\Fs\File::setAllowDeletes(false);
 
 		\GO::$disableModelCache=true; //for less memory usage
+		//disable history logging
 		ini_set('max_execution_time', '0');
 
 		\GO::session()->runAsRoot();
@@ -90,7 +91,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				
 				$folder->syncFilesystem(true);
 				
-				
+				EntityType::push();
 			}
 			catch(\Exception $e){
 				if (PHP_SAPI != 'cli')
@@ -116,6 +117,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					$folder = Folder::model()->findByPath($name);
 					if($folder)
 							$folder->delete();
+
+					EntityType::push();
 				}
 				catch(\Exception $e){
 					if (PHP_SAPI != 'cli')
@@ -124,13 +127,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						echo $e->getMessage()."\n";
 				}
 			}
-		}	
-			
-		
-
-	
-		
-		
+		}
 	}
 	
 	public function actionDeleteInvalid(){
