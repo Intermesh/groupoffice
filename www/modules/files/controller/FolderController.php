@@ -64,7 +64,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$folders = go()->getDbConnection()->selectSingleValue('name')
 				->from('fs_folders')
-				->where('(parent_id=0 OR parent_id is null) and name != "billing"')
+				->where('(parent_id=0 OR parent_id is null) and name != "billing" and name != "email"')
 				->all();
 
 			$billingFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'billing');
