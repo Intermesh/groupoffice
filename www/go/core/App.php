@@ -507,7 +507,7 @@ use Faker;
 			}
 
 			if(isset($dbName)) {
-				$dsn .= ';dbname=' . $config['db_name'];
+				$dsn .= ';dbname=' . $dbName;
 			}
 
 			return $dsn;
