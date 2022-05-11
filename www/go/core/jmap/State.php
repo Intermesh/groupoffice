@@ -7,7 +7,6 @@ use go\core\ErrorHandler;
 use go\core\model\Module;
 use go\core\model\Token;
 use go\core\auth\State as AbstractState;
-use go\core\http\Response;
 use go\core\model\User;
 use PDO;
 use stdClass;

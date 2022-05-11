@@ -114,7 +114,7 @@ class Client {
   {
   	$str = JSON::encode($data);
 
-		$this->setHeader('Content-Type', 'application/json; charset=utf-8');
+		$this->setHeader('Content-Type', 'application/json;charset=utf-8');
 	  $this->setHeader('Content-Length', strlen($str));
 
   	$response =  $this->post($url, $str);
