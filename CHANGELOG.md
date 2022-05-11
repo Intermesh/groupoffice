@@ -1,5 +1,6 @@
 6.6.85
 - Core: Bugfix when saving new Custom Field to existing entity
+- Core: Don't check IP for authentication on CLI
 
 10-05-2022 6.6.84
 - Caldav: filter tasklists by role 'list'
