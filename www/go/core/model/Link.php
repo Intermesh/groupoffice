@@ -320,14 +320,14 @@ class Link extends AclItemEntity
 	/**
 	 * Delete link with id and entity type id's
 	 *
-	 * @param int $aId
+	 * @param int|int[] $aId
 	 * @param int $aTypeId
-	 * @param int $bId
+	 * @param int|int[] $bId
 	 * @param int $bTypeId
 	 * @return boolean
 	 * @throws Exception
 	 */
-	public static function deleteLinkWithIds(int $aId, int $aTypeId, int $bId, int $bTypeId): bool
+	public static function deleteLinkWithIds($aId, int $aTypeId, $bId, int $bTypeId): bool
 	{
 			if(!Link::delete([
 				'fromEntityTypeId' => $aTypeId,

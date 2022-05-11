@@ -937,7 +937,10 @@ class Contact extends AclItemEntity {
 	public function setOrganizationIds($ids) {		
 		$this->setOrganizationIds = $ids;				
 	}
-	
+
+	/**
+	 * @throws \go\core\orm\exception\SaveException
+	 */
 	private function saveOriganizationIds(){
 		if(!isset($this->setOrganizationIds)) {
 			return true;
