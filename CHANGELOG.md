@@ -1,3 +1,6 @@
+6.6.85
+- Core: Bugfix when saving new Custom Field to existing entity
+
 10-05-2022 6.6.84
 - Caldav: filter tasklists by role 'list'
 - Core: Fixed error 'File exists in move!' in assistant
