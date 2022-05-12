@@ -494,11 +494,13 @@ class Token extends Entity {
 			go()->getCache()->delete('token-' . $accessToken);
 		}
 
+		$success =  parent::internalDelete($query);
+
 		if(!$debugEnabled) {
 			go()->getDebugger()->enabled = false;
 		}
 
-		return parent::internalDelete($query);
+		return $success;
 	}
 
 	/**
