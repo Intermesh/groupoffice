@@ -728,7 +728,7 @@ class MaintenanceController extends AbstractController {
 
 			$entries = explode("\$l", $data);
 
-			//to find duplicate keys we'll reverse the lines becuase the last definition is used.
+			//to find duplicate keys we'll reverse the lines because the last definition is used.
 			$entries = array_reverse($entries);
 
 			$processedKeys = array();

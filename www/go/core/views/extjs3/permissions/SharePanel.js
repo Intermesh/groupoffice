@@ -325,7 +325,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 		go.permissions.SharePanel.superclass.afterRender.call(this);
 
-		//Check form currentId becuase when form is loading then it will load the store on setValue later.
+		//Check form currentId because when form is loading then it will load the store on setValue later.
 		//Set timeout is used to make sure the check will follow after a load call.
 
 		setTimeout(() => {

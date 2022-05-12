@@ -946,7 +946,7 @@ class StringHelper {
 //		 $html = "<div onclick=\"yo\" online='1' test='onclick' onclick=\"yo\"></div>\n\n\n" . $html;
 
 		$html = preg_replace($to_removed_array, '', $html);
-		//Remove any attribute starting with "on" or xmlns. Had to do this always becuase many mails contain weird tags like online="1".
+		//Remove any attribute starting with "on" or xmlns. Had to do this always because many mails contain weird tags like online="1".
 		//These were detected as xss attacks by detectXSS().
 
 //		$regex = '#(<[^>\s]*)\s(?:on|xmlns)[^>\s]+#iu';

@@ -166,7 +166,7 @@ Ext.override(Ext.form.TextArea,{
 
 Ext.override(Ext.form.TextField,{
 	
-	//Added check for ENTER key. Becuase this code prevented form submission
+	//Added check for ENTER key. because this code prevented form submission
 	filterKeys : function(e){
 
 		if(e.ctrlKey){

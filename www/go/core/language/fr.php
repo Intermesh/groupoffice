@@ -911,7 +911,7 @@ return array (
   'An error occured on the server. The console shows details.' => 'Une erreur est survenue sur le serveur. Plus de détails dans la console.',
   'Invalid search query' => 'Requête de recherche invalide',
   'Search...' => 'Recherche…',
-  'Some fields on this page can\'t be edited becuase they have been locked in the server configuration file.' => 'Certains champs de la page ne peuvent être édités car ils sont verouillés dans le fichier de configuration du serveur.',
+  'Some fields on this page can\'t be edited because they have been locked in the server configuration file.' => 'Certains champs de la page ne peuvent être édités car ils sont verouillés dans le fichier de configuration du serveur.',
   'User settings' => 'Paramètres utilisateur',
   'Time Format' => 'Format de l\' heure',
   'First weekday' => 'Premier jour de la semaine',

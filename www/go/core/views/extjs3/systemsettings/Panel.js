@@ -39,7 +39,7 @@ go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
 				xtype: 'box',
 				autoEl: 'p',
 				cls: 'info',
-				html: "<i class='icon'>info</i> " + t("Some fields on this page can't be edited becuase they have been locked in the server configuration file.")
+				html: "<i class='icon'>info</i> " + t("Some fields on this page can't be edited because they have been locked in the server configuration file.")
 			});
 		}
 

@@ -904,7 +904,7 @@ return array (
   'Outgoing E-mail (SMTP)' => '发送电子邮件（SMTP）',
   'System e-mail' => '系统邮箱',
   'Verify SSL certificate' => '验证SSL证书',
-  'Some fields on this page can\'t be edited becuase they have been locked in the server configuration file.' => '无法编辑此页面上的某些字段，因为它们已被锁定在服务器配置文件中。',
+  'Some fields on this page can\'t be edited because they have been locked in the server configuration file.' => '无法编辑此页面上的某些字段，因为它们已被锁定在服务器配置文件中。',
   'Change search condition' => '更改搜索条件',
   'Tools' => '工具',
   'Script output' => '脚本输出',

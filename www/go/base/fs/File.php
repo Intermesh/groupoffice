@@ -296,7 +296,7 @@ class File extends Base{
 			}
 		}
 
-		//if($this->exists()){ Don't use exists function becuase MemoryFile returns true but it does not exist on disk
+		//if($this->exists()){ Don't use exists function because MemoryFile returns true but it does not exist on disk
 		if(file_exists($this->path())){
 			if(function_exists('finfo_open')){
 					$finfo    = finfo_open(FILEINFO_MIME);
