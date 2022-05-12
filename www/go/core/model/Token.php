@@ -2,15 +2,14 @@
 namespace go\core\model;
 
 use DateInterval;
+use DateTimeZone;
 use Exception;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
-use go\core\Debugger;
 use go\core\Environment;
 use go\core\ErrorHandler;
 use go\core\orm\Mapping;
-use go\modules\community\history\model\LogEntry;
 use stdClass;
 use go\core\http\Request;
 use go\core\http\Response;
@@ -123,7 +122,7 @@ class Token extends Entity {
 		
 		if($this->isNew()) {	
 			$this->setExpiryDate();
-			$this->lastActiveAt = new DateTime();
+			$this->lastActiveAt = new DateTime("now", new DateTimeZone("UTC"));
 			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
@@ -140,8 +139,8 @@ class Token extends Entity {
 	 */
 	public function activity(): bool
 	{
-		if($this->lastActiveAt < new DateTime("-1 mins")) {
-			$this->lastActiveAt = new DateTime();
+		if($this->lastActiveAt < new DateTime("-1 mins", new DateTimeZone("UTC"))) {
+			$this->lastActiveAt = new DateTime("now", new DateTimeZone("UTC"));
 
 			//also refresh token
 			if(isset($this->expiresAt)) {
@@ -210,8 +209,9 @@ class Token extends Entity {
 
 	/**
 	 * Check if the token is expired.
-	 * 
+	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
 	public function isExpired(): bool
 	{
@@ -220,7 +220,7 @@ class Token extends Entity {
 			return false;
 		}
 		
-		return $this->expiresAt < new DateTime();
+		return $this->expiresAt < new DateTime("now", new DateTimeZone("UTC"));
 	}
 
 	/**
@@ -256,15 +256,21 @@ class Token extends Entity {
 		
 		return $this->save();
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function setExpiryDate() {
-		$expireDate = new DateTime();
+		$expireDate = new DateTime("now", new DateTimeZone("UTC"));
 		$expireDate->add(new DateInterval(Token::LIFETIME));
 		$this->expiresAt = $expireDate;		
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function setLoginExpiryDate() {
-		$expireDate = new DateTime();
+		$expireDate = new DateTime("now", new DateTimeZone("UTC"));
 		$expireDate->add(new DateInterval(Token::LOGIN_LIFETIME));
 		$this->expiresAt = $expireDate;		
 	}
@@ -299,7 +305,7 @@ class Token extends Entity {
 	{
 		
 		$user = $this->getUser();
-		$user->lastLogin = new DateTime();
+		$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
 		$user->loginCount++;
 		$user->language = go()->getLanguage()->getIsoCode();
 		if(!$user->save()) {
@@ -318,11 +324,12 @@ class Token extends Entity {
 		// Create accessToken and set expire time
 		return true;						
 	}
-	
+
 	/**
 	 * Check if this token is authenticated
-	 * 
+	 *
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function isAuthenticated(): bool
 	{
@@ -473,9 +480,12 @@ class Token extends Entity {
 		return static::delete(
 			(new Query)
 				->where('expiresAt', '!=', null)
-				->andWhere('expiresAt', '<', new DateTime()));
+				->andWhere('expiresAt', '<', new DateTime("now", new DateTimeZone("UTC"))));
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected static function internalDelete(Query $query): bool
 	{
 
