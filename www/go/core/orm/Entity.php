@@ -493,7 +493,10 @@ abstract class Entity extends Property {
 				return false;
 			}
 
-			EntityType::push();
+			if(!go()->getDbConnection()->inTransaction()) {
+				// only do this outside of transaction to avoid deadlocks
+				EntityType::push();
+			}
 
 			return true;
 		} catch(Exception $e) {

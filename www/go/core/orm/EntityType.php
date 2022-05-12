@@ -385,9 +385,6 @@ class EntityType implements ArrayableInterface {
 			return true;
 		}
 
-		$this->highestModSeq = $this->nextModSeq();
-
-
 		if(!is_array($changedEntities[0])) {
 			// array of id's. What about acl here?
 			foreach($changedEntities as $entityId) {
@@ -441,11 +438,16 @@ class EntityType implements ArrayableInterface {
 		if(!isset(self::$changes[$this->getId()])) {
 			self::$changes[$this->getId()] = [];
 		}
-		self::$changes[$this->getId()][] = [
+		if(!isset(self::$changes[$this->getId()][$entityId])) {
+			self::$changeCount++;
+		}
+		self::$changes[$this->getId()][$entityId] = [
 			'entityId' => $entityId,
 			'aclId' => $aclId,
 			'destroyed' => $destroyed
-		];;
+		];
+
+
 	}
 
 //	/**
@@ -462,6 +464,8 @@ class EntityType implements ArrayableInterface {
 //	}
 //
 	private static $changes = [];
+
+	private static $changeCount = 0;
 
 	/**
 	 * @var Query[]
@@ -503,18 +507,23 @@ class EntityType implements ArrayableInterface {
 	 * We do it like this so these entries are written outside of transactions. Otherwise
 	 * this will lead to concurrency problems with deadlocks in mysql.
 	 *
+	 * @param int $minChanges Minimum of changes to push. Set to 0 if you want to be sure changes are pusged
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function push() {
+	public static function push(int $minChanges = 10) {
 
-		if(empty(self::$changes)) {// && empty(self::$changeQueries)) {
+		if(self::$changeCount < $minChanges) {// && empty(self::$changeQueries)) {
 			return;
 		}
 
 		go()->debug("Pushing JMAP sync changes");
 
+		if(go()->getDbConnection()->inTransaction()) {
+			throw new Exception("huh");
+		}
 
+		//db transaction caused deadlocks
 		if(!Lock::exists("jmap-set-lock")) {
 			$l = new Lock("jmap-set-lock");
 			if (!$l->lock()) {
@@ -522,10 +531,9 @@ class EntityType implements ArrayableInterface {
 			}
 		}
 
-
-//		self::pushQueries();
-
+		go()->getDbConnection()->beginTransaction();
 		self::pushRecords();
+		go()->getDbConnection()->commit();
 
 		if(isset($l)) {
 			$l->unlock();
@@ -541,7 +549,9 @@ class EntityType implements ArrayableInterface {
 		$allChanges = [];
 		foreach(self::$changes as $entityTypeId => $changes) {
 			$type = self::findById($entityTypeId);
-			$modSeq = $type->nextModSeq();
+
+				$modSeq = $type->nextModSeq();
+
 
 			$allChanges = array_merge($allChanges, array_map(function($change) use($modSeq, $now, $entityTypeId) {
 
@@ -556,6 +566,7 @@ class EntityType implements ArrayableInterface {
 		go()->getDbConnection()->insert('core_change', $allChanges)->execute();
 
 		self::$changes = [];
+		self::$changeCount = 0;
 	}
 
 	/**
@@ -666,16 +677,24 @@ class EntityType implements ArrayableInterface {
    */
 	public function nextModSeq() : int {
 
-		if($this->modSeqIncremented) {
-			return $this->highestModSeq;
-		}
+		$stmt = go()->getDbConnection()
+			->update(
+				"core_entity",
+				'highestModSeq = LAST_INSERT_ID(highestModSeq  +  1)',
+				Query::normalize(["id" => $this->id])->tableAlias('entity')
+			);
 
-		App::get()->getDbConnection()
-						->update(
-										"core_entity",
-										'highestModSeq = LAST_INSERT_ID(highestModSeq  +  1)',
-										Query::normalize(["id" => $this->id])->tableAlias('entity')
-						)->execute(); //mod seq is a global integer that is incremented on any entity update
+		// on deadlocks retry 10 times
+		for($i = 10; $i > -1; $i--) {
+			try {
+				$stmt->execute(); //mod seq is a global integer that is incremented on any entity update
+			} catch (PDOException $e) {
+
+				if($i == 0) {
+					throw $e;
+				}
+			}
+		}
 
 		$modSeq = go()->getDbConnection()
 			->query("SELECT LAST_INSERT_ID()")
@@ -695,12 +714,7 @@ class EntityType implements ArrayableInterface {
 	 */
 	public function nextUserModSeq() : int {
 
-		if($this->userModSeqIncremented) {
-			return $this->userModSeqIncremented;
-		}
-
-
-		App::get()->getDbConnection()
+		$stmt = go()->getDbConnection()
 			->update(
 				"core_change_user_modseq",
 				'highestModSeq = LAST_INSERT_ID(highestModSeq  +  1)',
@@ -708,7 +722,20 @@ class EntityType implements ArrayableInterface {
 					"entityTypeId" => $this->id,
 					"userId" => go()->getUserId()
 				])->tableAlias('entity')
-			)->execute(); //mod seq is a global integer that is incremented on any entity update
+			);
+
+		// on deadlocks retry 10 times
+		for($i = 10; $i > -1; $i--) {
+			try {
+				$stmt->execute(); //mod seq is a global integer that is incremented on any entity update
+			} catch (PDOException $e) {
+
+				if($i == 0) {
+					throw $e;
+				}
+			}
+		}
+
 
 		$modSeq = go()->getDbConnection()
 			->query("SELECT LAST_INSERT_ID()")
@@ -716,7 +743,7 @@ class EntityType implements ArrayableInterface {
 
 		$this->userModSeqIncremented = true;
 		$this->highestUserModSeq = $modSeq;
-		
+
 		return $modSeq;
 	}
 

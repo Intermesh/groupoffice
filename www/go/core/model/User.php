@@ -313,7 +313,7 @@ class User extends Entity {
    *
    * @return Group
    */
-	public function getPersonalGroup(): Group
+	public function getPersonalGroup(): ?Group
 	{
 		if(empty($this->personalGroup)){
 			$this->personalGroup = Group::find()->where(['isUserGroupFor' => $this->id])->single();

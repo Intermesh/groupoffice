@@ -1193,3 +1193,6 @@ $updates['202205101416'][] = function() {
 	\go\core\fs\FileSystemObject::allowRootFolderDelete(false);
 };
 
+
+//create index core_entity_highestModSeq_index
+//    on core_entity (highestModSeq);
