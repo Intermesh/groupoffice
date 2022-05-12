@@ -3,6 +3,7 @@
 - Core: Don't check IP for authentication on CLI
 - Projects: Search in all folders by default. Added 'All projects' node.
 - Projects: Load default status from template
+- Core: Handle deadlocks and write changes more efficiently
 
 10-05-2022 6.6.84
 - Caldav: filter tasklists by role 'list'
