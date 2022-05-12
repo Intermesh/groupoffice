@@ -4,6 +4,7 @@ namespace go\core\jmap;
 use Exception;
 use GO\Base\Model\State as OldState;
 use go\core\ErrorHandler;
+use go\core\http\Response as HttpResponse;
 use go\core\model\Module;
 use go\core\model\Token;
 use go\core\auth\State as AbstractState;
@@ -143,18 +144,19 @@ class State extends AbstractState {
 	public function outputSession() {		
 		
 		if (!$this->isAuthenticated()) {
-			Response::get()->setStatus(401);
-			Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-			Response::get()->setHeader('Pragma', 'no-cache');
+			//use http/Response here because we don't want JMAP request output here
+			HttpResponse::get()->setStatus(401);
+			HttpResponse::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+			HttpResponse::get()->setHeader('Pragma', 'no-cache');
 
-			Response::get()->output([
+			HttpResponse::get()->output([
 					"auth" => [
 							"domains" => User::getAuthenticationDomains()
 					]
 			]);
 		} else
 		{
-			Response::get()->output($this->getSession());
+			HttpResponse::get()->output($this->getSession());
 		}
 	}
 
