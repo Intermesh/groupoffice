@@ -726,7 +726,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 //				{
 
 			var previousAccountRecord = cb.store.getById(cb.getValue());
-			if (this.templatesBtn.disabled == true || this.showConfig.template_id) {
+			if (this.templatesBtn.disabled == true || this.showConfig.emailFromTemplate) {
 				//console.log('disable template changing');
 				// do not switch template when switching From addres
 			} else if (newAccountRecord.get('template_id')!=previousAccountRecord.get('template_id')){
