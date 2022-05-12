@@ -1,4 +1,4 @@
-6.6.85
+12-05-2022 6.6.85
 - Core: Bugfix when saving new Custom Field to existing entity
 - Core: Don't check IP for authentication on CLI
 - Projects: Search in all folders by default. Added 'All projects' node.
