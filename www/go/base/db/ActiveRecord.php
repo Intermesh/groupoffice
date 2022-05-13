@@ -4208,10 +4208,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if($this->_debugSql)
 			GO::debug($sql);
 
-		$success = $this->getDbConnection()->query($sql);
-		if(!$success)
-			throw new \Exception("Could not delete from database");
+		try {
+			$success = $this->getDbConnection()->query($sql);
+			if (!$success)
+				throw new \Exception("Could not delete from database");
 
+		}
+		catch(\Exception $e) {
+			GO::debug("FAILED SQL: " . $sql);
+			throw $e;
+		}
 		$this->_isDeleted = true;
 		
 
