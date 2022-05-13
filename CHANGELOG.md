@@ -1,3 +1,5 @@
+- Core: Token dates could be saved in user timezone instead of UTC by old framework.
+- Core: Used unnamed parameters in queries for better performance with mysql native driver and large inserts
 12-05-2022 6.6.85
 - Core: Bugfix when saving new Custom Field to existing entity
 - Core: Don't check IP for authentication on CLI

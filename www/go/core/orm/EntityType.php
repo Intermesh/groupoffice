@@ -130,13 +130,13 @@ class EntityType implements ArrayableInterface {
 			$record['name'] = self::classNameToShortName($className);
 			$record['clientName'] = $clientName;
 			try {
-				App::get()->getDbConnection()->insert('core_entity', $record)->execute();
+				go()->getDbConnection()->insert('core_entity', $record)->execute();
 			} catch(PDOException $e) {
 				ErrorHandler::log("Failed to register new entity type for class '$className'.");
 				go()->debug($c);
 				throw $e;
 			}
-			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
+			$record['id'] = go()->getDbConnection()->getPDO()->lastInsertId();
 
 			go()->getCache()->delete('entity-types');
 
@@ -435,68 +435,32 @@ class EntityType implements ArrayableInterface {
 	 * @return void
 	 */
 	private function queueChange(int $entityId, ?int $aclId = null, bool $destroyed = false) {
-		if(!isset(self::$changes[$this->getId()])) {
-			self::$changes[$this->getId()] = [];
-		}
-		if(!isset(self::$changes[$this->getId()][$entityId])) {
-			self::$changeCount++;
-		}
-		self::$changes[$this->getId()][$entityId] = [
-			'entityId' => $entityId,
-			'aclId' => $aclId,
-			'destroyed' => $destroyed
-		];
 
+		$id = $this->getId();
 
+		if(!isset(self::$changes[$id])) {
+			self::$changes[$id] = [];
+		}
+
+		if(!isset(self::$changes[$id][$entityId])) {
+			self::$changes[$id][$entityId] = [
+				'entityId' => $entityId,
+				'aclId' => $aclId,
+				'destroyed' => $destroyed
+			];
+		} else{
+			if($destroyed) {
+				self::$changes[$id][$entityId]['destroyed'] = true;
+			}
+
+			if($aclId) {
+				self::$changes[$id][$entityId]['aclId'] = $aclId;
+			}
+		}
 	}
 
-//	/**
-//	 * @todo 	It's possible that this won't write any change. This leads to a modSeq with no changes at all?
-//	 *
-//	 * @param Query $query
-//	 * @return void
-//	 */
-//	private function queueChangeQuery(Query $query) {
-//		if(!isset(self::$changeQueries[$this->getId()])) {
-//			self::$changeQueries[$this->getId()] = [];
-//		}
-//		self::$changeQueries[$this->getId()][] = $query;
-//	}
-//
 	private static $changes = [];
 
-	private static $changeCount = 0;
-
-	/**
-	 * @var Query[]
-	 */
-//	private static $changeQueries = [];
-
-
-//	private static function pushQueries() {
-//		if(empty(self::$changeQueries)) {
-//			return;
-//		}
-//
-//		$main = null;
-//
-//		foreach(self::$changeQueries as $entityTypeId => $queries) {
-//			$type = self::findById($entityTypeId);
-//			$modSeq = $type->nextModSeq();
-//
-//			foreach($queries as $query) {
-//				$query->select('"' . $entityTypeId . '", "' . $modSeq . '", NOW()', true);
-//				if(!isset($main)) {
-//					$main = $query;
-//				}
-//				$main->union($query);
-//			}
-//		}
-//
-//		go()->getDbConnection()->insert("core_change", $main, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt'])->execute();
-//
-//		self::$changeQueries = [];
-//	}
 
 	/**
 	 * Push changes to the database
@@ -507,13 +471,12 @@ class EntityType implements ArrayableInterface {
 	 * We do it like this so these entries are written outside of transactions. Otherwise
 	 * this will lead to concurrency problems with deadlocks in mysql.
 	 *
-	 * @param int $minChanges Minimum of changes to push. Set to 0 if you want to be sure changes are pusged
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function push(int $minChanges = 10) {
+	public static function push() {
 
-		if(self::$changeCount < $minChanges) {// && empty(self::$changeQueries)) {
+		if(empty(self::$changes)) {// && empty(self::$changeQueries)) {
 			return;
 		}
 
@@ -550,23 +513,36 @@ class EntityType implements ArrayableInterface {
 		foreach(self::$changes as $entityTypeId => $changes) {
 			$type = self::findById($entityTypeId);
 
-				$modSeq = $type->nextModSeq();
-
+			$modSeq = $type->nextModSeq();
 
 			$allChanges = array_merge($allChanges, array_map(function($change) use($modSeq, $now, $entityTypeId) {
-
 				$change['createdAt'] = $now;
 				$change['modSeq'] = $modSeq;
 				$change['entityTypeId'] = $entityTypeId;
-
 				return $change;
 			}, $changes));
 		}
 
-		go()->getDbConnection()->insert('core_change', $allChanges)->execute();
+		foreach(self::splitRecords($allChanges) as $chunk) {
+			$stmt = go()->getDbConnection()->insert('core_change', $chunk);
+			$stmt->execute();
+		}
 
 		self::$changes = [];
-		self::$changeCount = 0;
+	}
+
+	private static function splitRecords(array $allChanges) : array {
+		// mysql limit
+		$maxPlaceHolders = 1000;
+
+		if(empty($allChanges)) {
+			return [];
+		}
+
+		$colCount = count($allChanges[0]);
+		$maxRecords = floor($maxPlaceHolders / $colCount);
+
+		return array_chunk($allChanges, $maxRecords);
 	}
 
 	/**
@@ -577,7 +553,7 @@ class EntityType implements ArrayableInterface {
 	public function resetSyncState() : void {
 		$this->clearCache();
 
-		App::get()->getDbConnection()
+		go()->getDbConnection()
 			->update(
 				"core_entity",
 				['highestModSeq' => null],

@@ -510,6 +510,8 @@ use Faker;
 				$dsn .= ';dbname=' . $dbName;
 			}
 
+			$dsn .= ';charset=utf8mb4';
+
 			return $dsn;
 		}
 

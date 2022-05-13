@@ -49,7 +49,7 @@ class Connection {
 		$this->password = $password;
 		$this->options = [
 				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'",
+				PDO::MYSQL_ATTR_INIT_COMMAND => "SET sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'",
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 				PDO::ATTR_PERSISTENT => false, //doesn't work with ATTR_STATEMENT_CLASS but should not have many benefits anyway
 				PDO::ATTR_STATEMENT_CLASS => [Statement::class],
@@ -58,13 +58,6 @@ class Connection {
 		];
 	}
 
-	// public function __destruct()
-	// {
-	// 	if($this->inTransaction()) {
-	// 		throw new \Exception("DB Transaction not closed properly");
-	// 	}
-	// }
-	
 	public function getDsn() {
 		return $this->dsn;
 	}
@@ -627,13 +620,14 @@ class Connection {
 			/**
 			 * @var Statement $stmt;
 			 */
-			$stmt->setBuild($build);						
+			$stmt->setBuild($build);
 
-			foreach ($build['params'] as $p) {
+			for ($i =0, $l = count($build['params']); $i < $l; $i++) {
 				// if (go()->getDebugger()->enabled && isset($p['value']) && !is_scalar($p['value'])) {
 				// 	throw new Exception("Invalid value " . var_export($p['value'], true));
 				// }
-				$stmt->bindValue($p['paramTag'], $p['value'], $p['pdoType']);
+
+				$stmt->bindValue($i + 1, $build['params'][$i]['value'], $build['params'][$i]['pdoType']);
 			}
 			/**
 			 * @var Statement $stmt;
