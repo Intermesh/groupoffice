@@ -12,7 +12,7 @@ ini_set("memory_limit", "4G");
 
 $ids = [];
 $pid = getmypid();
-for($i = 0; $i<100; $i++) {
+for($i = 0; $i<1; $i++) {
 	echo $pid.':'. \go\core\model\User::entityType()->getHighestModSeq() .':'.$i ."\n";
 	$user = new \go\core\model\User();
 	$user->username = $user->displayName = uniqid();
@@ -28,9 +28,9 @@ for($i = 0; $i<100; $i++) {
 }
 
 
-echo "Deleting the users now\n";
-
-\go\core\model\User::delete(['id' => $ids]);
+//echo "Deleting the users now\n";
+//
+//\go\core\model\User::delete(['id' => $ids]);
 
 
 

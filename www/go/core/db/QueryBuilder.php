@@ -16,9 +16,6 @@ use InvalidArgumentException;
  */
 class QueryBuilder {
 
-	// better for performance without PDO::ATTR_EMULATE_PREPARES enabled with large inserts
-
-	public $paramsUseUnnamed = true;
 
 	/**
 	 *
@@ -49,18 +46,18 @@ class QueryBuilder {
 	 */
 	private $buildBindParameters = [];
 
-	/**
-	 * To generate unique param tags for binding
-	 * 
-	 * @var int
-	 */
-	private static $paramCount = 0;
-
-	/**
-	 * Prefix of the bind parameter tag
-	 * @var string
-	 */
-	private static $paramPrefix = ':go';
+//	/**
+//	 * To generate unique param tags for binding
+//	 *
+//	 * @var int
+//	 */
+//	private static $paramCount = 0;
+//
+//	/**
+//	 * Prefix of the bind parameter tag
+//	 * @var string
+//	 */
+//	private static $paramPrefix = ':go';
 
 	/**
 	 * Key value array with [tableAlias => Table()]
@@ -895,11 +892,11 @@ class QueryBuilder {
 	 */
 	private function getParamTag(): string
 	{
-		if($this->paramsUseUnnamed)
+
 			return "?";
 
-		self::$paramCount++;
-		return self::$paramPrefix . self::$paramCount;
+//		self::$paramCount++;
+//		return self::$paramPrefix . self::$paramCount;
 	}
 
 	private function join($config, $prefix): string

@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class QueryTest extends TestCase {
 
 	public function testDelete() {
-		$success = App::get()
+		$success = go()
 						->getDbConnection()
 						->delete("test_a", ['id' => 1])
 						->execute();
@@ -33,20 +33,32 @@ class QueryTest extends TestCase {
 
 	public function testInsert() {
 
+		$now = new \DateTime();
+
 		$data = [
 				"id" => 1,
 				"propA" => "string 1",
-				"createdAt" => new \DateTime(),
-				"modifiedAt" => new \DateTime()
+				"createdAt" => $now,
+				"modifiedAt" => $now
 		];
 
-		$result = App::get()
+		$result = go()
 						->getDbConnection()
 						->insert("test_a", $data)
 						->execute();
 
 		$this->assertEquals(true, $result);
 
+		$record = go()->getDbConnection()
+			->select()
+			->from("test_a")
+			->where('id', '=', 1)
+			->single();
+
+		$this->assertEquals($data['id'], $record['id']);
+		$this->assertEquals($data['propA'], $record['propA']);
+		$this->assertEquals($data['createdAt']->format('Y-m-d H:i:s'), $record['createdAt']);
+		$this->assertEquals($data['modifiedAt']->format('Y-m-d H:i:s'), $record['modifiedAt']);
 
 		$data = [
 				"id" => 1,
@@ -54,7 +66,7 @@ class QueryTest extends TestCase {
 				"userId" => 1
 		];
 
-		$result = App::get()->getDbConnection()->replace("test_b", $data)->execute();
+		$result = go()->getDbConnection()->replace("test_b", $data)->execute();
 
 		$this->assertEquals(true, $result);
 	}
@@ -64,7 +76,10 @@ class QueryTest extends TestCase {
 				"propA" => "string 3"
 		];
 		
-		$stmt = App::get()->getDbConnection()->update("test_a", $data, ['id' => 1]);
+		$stmt = go()->getDbConnection()->update("test_a", $data, ['id' => 1]);
+
+
+
 		$stmt->execute();
 
 		$this->assertEquals(1, $stmt->rowCount());
@@ -128,7 +143,9 @@ class QueryTest extends TestCase {
 									(new Query)
 										->select('id')
 										->from("test_b", 'sub_b')
-						);
+										->where('id = :id')
+										->bind(':id', 1)
+						)->andWhere('id', '=', 1);
 
 		$record = $query->single();
 
@@ -142,7 +159,11 @@ class QueryTest extends TestCase {
 						->join(
 										(new Query)
 										->select('id')
-										->from("test_b", 'sub_b'), "subjoin", "subjoin.id = a.id"
+										->from("test_b", 'sub_b')
+										->where('id = :id')
+										->bind(':id', 1)
+
+										, "subjoin", "subjoin.id = a.id"
 						)
 						->where('id', '=', 1);
 
