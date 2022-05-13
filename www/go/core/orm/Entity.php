@@ -455,7 +455,7 @@ abstract class Entity extends Property {
 
 		$query = self::normalizeDeleteQuery($query);
 
-		App::get()->getDbConnection()->beginTransaction();
+		go()->getDbConnection()->beginTransaction();
 
 		try {
 
@@ -504,8 +504,7 @@ abstract class Entity extends Property {
 
 
 	protected function commitToDatabase() : bool {
-		go()->debug("commit " . static::class);
-		return App::get()->getDbConnection()->commit();
+		return go()->getDbConnection()->commit();
 	}
 
   /**

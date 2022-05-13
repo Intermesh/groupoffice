@@ -276,7 +276,8 @@ abstract class AclItemEntity extends AclEntity {
 			$query =  $cls::find($cls::getMapping()->getColumnNames(), $this->readOnly);
 
 			foreach (static::aclEntityKeys() as $from => $to) {
-				$query->where($query->getTableAlias() . "." .$to . " = :" . $to);
+				$query->where($query->getTableAlias() . "." .$to . " = :" . $to)
+					->bind(':' . $to, $this->{$from});
 			}
 
 			$stmt = $query->createStatement();

@@ -249,6 +249,17 @@ CREATE TABLE IF NOT EXISTS `em_contacts_last_mail_times` (
   PRIMARY KEY (`contact_id`,`user_id`)
 ) ENGINE=InnoDB;
 
+alter table em_contacts_last_mail_times
+    add constraint em_contacts_last_mail_times_addressbook_addressbook_id_fk
+        foreign key (contact_id) references addressbook_addressbook (id)
+            on delete cascade;
+
+alter table em_contacts_last_mail_times
+    add constraint em_contacts_last_mail_times_core_user_id_fk
+        foreign key (user_id) references core_user (id)
+            on delete cascade;
+
+
 -- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `em_labels`;

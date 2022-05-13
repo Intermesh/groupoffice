@@ -224,13 +224,14 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 				$query = (new Query())
 					->select('*')
 					->from($this->customFieldsTableName(), 'cf')
-					->where('cf.id = :id');
+					->where('cf.id = :id')
+					->bind(':id', $this->entity->id());
 
 				$stmt = $query->createStatement();
 				go()->getDbConnection()->cacheStatement('cf-' . $this->customFieldsTableName(), $stmt);
+			} else {
+				$stmt->bindValue(':id', $this->entity->id());
 			}
-
-			$stmt->bindValue(':id', $this->entity->id());
 
 			$stmt->execute();
 

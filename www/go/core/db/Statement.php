@@ -5,7 +5,9 @@ use go\core\data\ArrayableInterface;
 use go\core\ErrorHandler;
 use Exception;
 use go\core\orm\Property;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
 use JsonSerializable;
+use PDO;
 use PDOException;
 use PDOStatement;
 
@@ -86,6 +88,13 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 		}
 
 		return $this;
+	}
+
+	public function bindValue($param, $value, $type = PDO::PARAM_STR) : bool
+	{
+		$param = $this->build['paramMap'][$param] ?? $param;
+
+		return parent::bindValue($param, $value, $type);
 	}
 
 	/**

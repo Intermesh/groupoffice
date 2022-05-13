@@ -360,7 +360,8 @@ abstract class Property extends Model {
 			$query = $cls::internalFind([], $readOnly, $owner);
 
 			foreach ($where as $field => $value) {
-				$query->andWhere($field . '= :' . $field);
+				$query->andWhere($field . '= :' . $field)
+					->bind(':' . $field, $value);
 			}
 
 			if (is_a($relation->propertyName, UserProperty::class, true)) {
@@ -378,11 +379,13 @@ abstract class Property extends Model {
 			$query = $stmt->getQuery();
 			/** @var Query $query */
 			$stmt->setFetchMode(PDO::FETCH_CLASS, $cls, [$owner, false, [], $query->getReadOnly()]);
+
+			foreach($where as $field => $value) {
+				$stmt->bindValue(':'.$field, $value);
+			}
 		}
 
-		foreach($where as $field => $value) {
-			$stmt->bindValue(':'.$field, $value);
-		}
+
 		$stmt->execute();
 
 		return $stmt;

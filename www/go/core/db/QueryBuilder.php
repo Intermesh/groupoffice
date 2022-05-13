@@ -198,7 +198,7 @@ class QueryBuilder {
 
 		$sql = $this->insertNamedParams($sql);
 		
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'paramMap' => $this->namedParamMap];
 	}
 
 	public function buildUpdate($tableName, $data, Query $query, $command = "UPDATE"): array
@@ -256,7 +256,7 @@ class QueryBuilder {
 
 		$sql = $this->insertNamedParams($sql);
 
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'paramMap' => $this->namedParamMap];
 	}
 
 	public function buildDelete($tableName, Query $query): array
@@ -284,7 +284,7 @@ class QueryBuilder {
 
 		$sql = $this->insertNamedParams($sql);
 
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'paramMap' => $this->namedParamMap];
 	}
 
 	private function reset() {
@@ -314,6 +314,7 @@ class QueryBuilder {
 			$u = $this->internalBuildSelect($q, $prefix . "\t");
 			$r['sql'] .=  $prefix . "\n) UNION (\n" . $u['sql'];
 			$r['params'] = array_merge($r['params'], $u['params']);
+			$r['paramMap'] = array_merge($r['paramMap'], $u['paramMap']);
 		}
 		
 		$r['sql'] .= "\n)";
@@ -404,13 +405,17 @@ class QueryBuilder {
 
 		$sql = $this->insertNamedParams($sql);
 
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'paramMap' => $this->namedParamMap];
 	}
+
+	private $namedParamMap = [];
 
 	private function insertNamedParams($sql) {
 		foreach($this->namedParameters as $p) {
 			$pos = strpos($sql, $p['paramTag']);
 			$index = substr_count($sql, '?', 0, $pos);
+
+			$this->namedParamMap[$p['paramTag']] = $index + 1;
 			//$p['paramTag'] = '?';
 			array_splice($this->buildBindParameters, $index, 0, [$p]);
 
