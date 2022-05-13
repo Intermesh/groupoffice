@@ -266,7 +266,7 @@ class GO{
 		$old = \GO\Base\Fs\File::setAllowDeletes(true);
 
 		\GO::config()->getCacheFolder(false)->clearContents();
-		\GO::cache()->flush();
+
 		\GO\Base\Model::clearCache();
 
 		\GO\Base\Fs\File::setAllowDeletes($old);
