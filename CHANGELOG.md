@@ -1,4 +1,4 @@
-6.6.87
+16-05-2022 6.6.87
 - Newsletters: any user with manage permissions can pause a newsletter
 - Leavedays: In holiday request summary render dates correctly when date == today
 - Tickets: IMAP import display ticket type upon error
