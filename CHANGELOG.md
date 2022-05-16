@@ -1,5 +1,6 @@
 6.6.87
 - Newsletters: any user with manage permissions can pause a newsletter
+- Leavedays: In holiday request summary render dates correctly when date == today
 
 13-05-2022 6.6.86
 - Core: Token dates could be saved in user timezone instead of UTC by old framework.
