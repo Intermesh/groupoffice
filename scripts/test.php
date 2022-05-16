@@ -7,7 +7,7 @@ require ('../www/GO.php');
 
 go()->setAuthState(new \go\core\auth\TemporaryState(1));
 
-ini_set("memory_limit", "4G");
+ini_set("memory_limit", "256M");
 //ini_set("max_execution_time", 20);
 
 $ids = [];

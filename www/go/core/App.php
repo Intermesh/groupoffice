@@ -676,7 +676,7 @@ use Faker;
 		
 		public function __destruct() {
 
-			EntityType::push(0);
+			EntityType::push();
 
 			if($this->rebuildCacheOnDestruct) {
 
