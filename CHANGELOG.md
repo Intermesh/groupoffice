@@ -3,6 +3,7 @@
 - Leavedays: In holiday request summary render dates correctly when date == today
 - Tickets: IMAP import display ticket type upon error
 - Core: Polish translations
+- Calendar: raised timeout settings for server and client to 5 minutes for sending invitation e-mails.
 
 13-05-2022 6.6.86
 - Core: Token dates could be saved in user timezone instead of UTC by old framework.
