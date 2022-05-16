@@ -951,9 +951,9 @@ $updates['202110211653'][] = "UPDATE core_user u JOIN addressbook_contact c ON c
 // to 'Paper'
 $updates['202111151100'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
 
-// recalculate becuase of substitute days
+// recalculate because of substitute days
 $updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
-// recalculate becuase of substitute days (again)
+// recalculate because of substitute days (again)
 $updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
 
 $updates['202112131205'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
@@ -1107,4 +1107,92 @@ $updates['202201101250'][] = 'update `core_entity` set clientName = name WHERE c
 
 $updates['202202141231'][] = "update core_blob set staleAt = now() where staleAt is null;";
 
-$updates['202203281145'][] = "ALTER TABLE `core_smtp_account` ADD `maxMessagesPerMinute` SMALLINT UNSIGNED NOT NULL DEFAULT(0);";
+$updates['202202141231'][] = "ALTER TABLE `core_smtp_account` ADD `maxMessagesPerMinute` SMALLINT UNSIGNED NOT NULL DEFAULT(0);";
+
+
+$updates['202203181327'][] = "create index if not exists core_change_modSeq_entityTypeId_entityId_index
+    on core_change (modSeq, entityTypeId, entityId);";
+
+$updates['202203181327'][] = "create index if not exists core_change_user_modSeq_userId_entityTypeId_entityId_index
+    on core_change_user (modSeq, userId, entityTypeId, entityId);
+";
+
+
+$updates['202203251058'][] = function() {
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
+};
+
+$updates['202203251058'][] = "create index if not exists core_change_modSeq_entityTypeId_entityId_index
+    on core_change (modSeq, entityTypeId, entityId);";
+
+$updates['202203251058'][] = "create index if not exists core_change_user_modSeq_userId_entityTypeId_entityId_index
+    on core_change_user (modSeq, userId, entityTypeId, entityId);
+";
+
+
+$updates['202203310856'][] = function() {
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
+};
+
+$updates['202203310856'][] = function() {
+	echo "Correcting invalid date field values (0000-00-00 => null)\n";
+	$allEntities = EntityType::findAll();
+	foreach($allEntities as $e) {
+		foreach (Field::findByEntity($e->getId()) as $field) {
+			try {
+				if ($field->getDataType() instanceof \go\core\customfield\Date) {
+					$table = $field->tableName();
+					$stmt = go()->getDbConnection()->update($table, $field->databaseName . ' = null', $field->databaseName . " = '0000-00-00'");
+					echo $stmt . "\n";
+					$stmt->execute();
+				} else if ($field->getDataType() instanceof \go\core\customfield\DateTime) {
+					$table = $field->tableName();
+					$stmt = go()->getDbConnection()->update($table, $field->databaseName . ' = null', $field->databaseName . " = '0000-00-00 00:00:00'");
+					echo $stmt . "\n";
+					$stmt->execute();
+				}
+			} catch (PDOException $e) {
+				echo "PDOException: " . $e->getMessage() . "\n";
+			}
+		}
+	}
+};
+
+
+$updates['202204051245'][] = "alter table core_search
+    add `rebuild` bool default false not null;";
+
+
+$updates['202204051245'][] = function() {
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
+
+};
+
+
+$updates['202204131216'][] = function() {
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("* * * * *", true);
+
+	echo "\n\n======\nNOTE: Search cache will be rebuilt.\n======\n\n";
+};
+
+$updates['202205101416'][] = function() {
+
+	\go\core\fs\FileSystemObject::allowRootFolderDelete();
+
+	go()->getDataFolder()->getFolder('cache2')->delete();
+	go()->getDataFolder()->getFolder('clientscripts')->delete();
+	go()->getDataFolder()->getFolder('cache')->delete();
+
+	\go\core\fs\FileSystemObject::allowRootFolderDelete(false);
+};
+
+
+//create index core_entity_highestModSeq_index
+//    on core_entity (highestModSeq);

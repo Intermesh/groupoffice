@@ -1227,7 +1227,7 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
   'Appearance' => 'Apariencia',
   'Logo' => 'Logo',
   'Primary color' => 'Color primario',
-  'Some fields on this page can\'t be edited becuase they have been locked in the server configuration file.' => 'Algunos campos de esta página no se pueden editar porque están bloqueados en el archivo de configuración del servidor.',
+  'Some fields on this page can\'t be edited because they have been locked in the server configuration file.' => 'Algunos campos de esta página no se pueden editar porque están bloqueados en el archivo de configuración del servidor.',
   'Notifications' => 'Notificaciones',
   'Outgoing E-mail (SMTP)' => 'Correo saliente (SMTP)',
   'System e-mail' => 'Correo electrónico del sistema',

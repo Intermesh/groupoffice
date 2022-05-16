@@ -6,7 +6,9 @@
 	backupGlobals="false"
 	backupStaticAttributes="false"
 	convertErrorsToExceptions="true"
-	verbose="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	verbose="false"
 	>
 
 	<testsuites>

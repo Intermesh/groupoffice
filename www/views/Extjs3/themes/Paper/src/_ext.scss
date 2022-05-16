@@ -828,7 +828,7 @@
 			transform: translateX(-50%);
 		}
 	}
-   &.x-btn-pressed {
+   &.x-btn-pressed > tbody {
 		background-color: color($bg, 'pressed');
    }
    &-click {
@@ -1284,11 +1284,17 @@
 	&-row {
 		border:0;
 		border-bottom:1px solid color($fg, 'divider');
+
 		&:hover {
 			background-color:$cHover;
 		}
+
 		&-selected {
+			&:hover {
+				background-color: $cSelected;
+			}
 			background-color: $cSelected;
+
 			border-bottom-color: transparent;
 			background-image: none;
 		}
@@ -1786,11 +1792,11 @@ td.grid-hd-group-cell {
 
 .x-tree-node-loading a{
 	font-style: italic;
-	color:#444444;
+	color:color($fg, 'disabled');
 }
 
 .x-tree-node .x-tree-node-disabled a{
-	color:gray !important;
+	color: color($fg, 'secondary-text') !important;
 }
 
 .x-tree-node div.x-tree-drag-insert-below{
@@ -1809,10 +1815,10 @@ td.grid-hd-group-cell {
 	border-top-color:#36c;
 }
 
-.x-tree-node .x-tree-drag-append a {
-	background-color:#ddd;
-	border-color:gray;
-}
+//.x-tree-node .x-tree-drag-append a {
+//	background-color:#ddd;
+//	border-color:gray;
+//}
 
 .x-dd-drop-icon::before {
 	@extend %icon;

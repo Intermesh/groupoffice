@@ -20,11 +20,16 @@
 namespace GO\Core\Controller;
 
 
+use DateTimeZone;
 use Cron\CronExpression;
 use GO\Base\Util\Date;
 use go\core\model\CronJobSchedule;
+use go\core\util\DateTime;
+use function mysql_xdevapi\getSession;
 
 class CronController extends \GO\Base\Controller\AbstractJsonController{
+
+	private $tz;
 
 	protected function allowGuests() {
 		return array('run', 'runbyid');
@@ -83,10 +88,8 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 	 * 
 	 * @param array $params
 	 */
-	public function actionStore($params){
-		
-		
-		
+	public function actionStore(array $params)
+	{
 		$colModel = new \GO\Base\Data\ColumnModel(\GO\Base\Cron\CronJob::model());
 					
 		$colModel->formatColumn('active', function($model){
@@ -115,12 +118,17 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 		echo $response;
 	}
 
-	private function getNewCronJobs() {
+	/**
+	 * Get cron jobs from within the new framework
+	 *
+	 * @return array
+	 */
+	private function getNewCronJobs(): array
+	{
 		//['id','name','active','minutes', 'hours','error', 'monthdays', 'months',
 		// 'weekdays','years','job','nextrun','lastrun','completedat'],
 
 		$jobs = [];
-
 		foreach(CronJobSchedule::find() as $job) {
 
 			$expression = CronExpression::factory($job->expression);
@@ -137,9 +145,9 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 				'weekdays' => $expression->getExpression(CronExpression::WEEKDAY),
 				'years' =>  $expression->getExpression(CronExpression::YEAR),
 				'job' => $job->getCronClass(),
-				'nextrun' => $job->nextRunAt ? Date::get_timestamp($job->nextRunAt->format("U")) : "-",
-				'lastrun' => $job->runningSince ? Date::get_timestamp($job->runningSince->format("U")) : "-",
-				'completedat' => $job->lastRunAt ?  Date::get_timestamp($job->lastRunAt->format("U")) : "-",
+				'nextrun' => $job->nextRunAt ? $this->adjustToUtc($job->nextRunAt) : "-",
+				'lastrun' => $job->runningSince ? $this->adjustToUtc($job->runningSince) : ($job->lastRunAt ? $this->adjustToUtc($job->lastRunAt) : "-"),
+				'completedat' => $job->lastRunAt ? $this->adjustToUtc($job->lastRunAt) : "-",
 				'error' => $job->lastError
 
 			];
@@ -160,19 +168,22 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 	 * 
 	 * @param array $params
 	 */
-	public function actionRunBetween($params){
-		
+	public function actionRunBetween(array $params)
+	{
 		$from = false;
 		$till = false;
 		
-		if(isset($params['from']))
+		if(isset($params['from'])) {
 			$from = new \GO\Base\Util\Date\DateTime($params['from']);
+		}
 		
-		if(isset($params['till']))
+		if(isset($params['till'])) {
 			$till = new \GO\Base\Util\Date\DateTime($params['till']);
+		}
 		
-		if(!$from)
+		if(!$from) {
 			$from = new \GO\Base\Util\Date\DateTime();
+		}
 		
 		if(!$till){
 			$till = new \GO\Base\Util\Date\DateTime();
@@ -211,31 +222,7 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 		
 		return \GO\Base\Cron\CronJob::model()->find($findParams);
 	}
-//	/**
-//	 * This is the function that is called from the server's cron deamon.
-//	 * The cron deamon is supposed to call this function every minute.
-//	 * 
-//	 * TODO: Check if 1 minute doesn't set the server under heavy load.
-//	 */
-//	protected function actionRun($params){
-//		
-////		$this->requireCli();
-//		$jobAvailable = false;
-//		\GO::debug('CRONJOB START (PID:'.getmypid().')');
-//		while($cronToHandle = $this->_findNextCron()){
-//			$jobAvailable = true;
-//			\GO::debug('CRONJOB FOUND');
-//			$cronToHandle->run();
-//		}
-//		
-//		if(!$jobAvailable)
-//			\GO::debug('NO CRONJOB FOUND');
-//		
-//		\GO::debug('CRONJOB STOP (PID:'.getmypid().')');
-//		
-//		\GO::config()->save_setting('cron_last_run', time());
-//	}
-//	
+
 	
 	protected function actionRunById($params) {
 		$job = \GO\Base\Cron\CronJob::model()->findByPk($params['id']);
@@ -299,7 +286,26 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 				'data'=>$settings->getArray()
 		);
 	}
-	
+
+	/**
+	 * Hackish function to 'convert' new FW cronjobs to UTC
+	 *
+	 * Timestamps are correctly stored and retrieved, but somewhere along the line, the default  timezone is not being
+	 * taken into account. For old FW cron jobs this is being done correctly. After some time debugging, still not sure
+	 * why old FW timestamps are correctly being displayed.
+	 *
+	 * @param DateTime $dt
+	 * @return int
+	 */
+	private function adjustToUtc(DateTime $dt): int
+	{
+		if(!isset($this->tz)) {
+			$this->tz = new DateTimeZone(go()->getSettings()->defaultTimezone);
+		}
+		$t = $dt->getTimestamp();
+		$t -= intval($dt->setTimeZone($this->tz)->format('Z'));
+		return $t;
+	}
 	
 	
 }

@@ -325,6 +325,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			foreach($addresses as $email=>$personal) {
 				$to[]=empty($personal) ? $email : $personal;
 			}
+			$record['from'] =  htmlspecialchars($record['from'], ENT_COMPAT, 'UTF-8');
 			$record['to']=  htmlspecialchars(implode(',', $to), ENT_COMPAT, 'UTF-8');
 			
 			if ($response['sent'] || $response['drafts']) {
@@ -654,10 +655,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$message->handleEmailFormInput($params);
-
 		$recipientCount = $message->countRecipients();
 		if(!$recipientCount) {
-			throw new Exception(GO::t("You didn't enter a recipient", "email"));
+			throw new \Exception(GO::t("You didn't enter a recipient", "email"));
 		}
 		$message->setFrom($alias->email, $alias->name);
 		
@@ -739,7 +739,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$imap = $account->openImapConnection($account->sent);
 			if(!$imap->append_message($account->sent, $message, "\Seen")){
 				$response['success']=false;
-				$response['feedback'].='Failed to save send item to '.$account->sent;
+				$response['feedback'].='Failed to save sent item to '.$account->sent;
 			}
 		}		
 
@@ -1042,7 +1042,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$params['template_id'] = $templateModel->template_id;
 			}
 		}
-
 		$from =$replyTo->getAddress();
 		$fromArr = $message->from->getAddress();
 		
@@ -1066,7 +1065,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			if(!empty($oldMessage['smime_encrypted'])) {
 				$response['sendParams']['encrypt_smime'] = true;
 			}
-
 			$AccountModel =  Account::model()->findByPk($params['account_id']);
 			if($AccountModel->full_reply_headers) {
 				$headerLines = $this->_getFollowUpHeaders($message);
@@ -1684,7 +1682,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		//seen flag is expensive because it can't be recovered from cache
 		$linkedModels = new \go\core\util\ArrayObject();
-
 		if(GO::modules()->savemailas){
 			$tags = $this->_findAutoLinkTags($response['htmlbody'], $imapMessage->account->id);
 

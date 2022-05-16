@@ -21,7 +21,10 @@ use go\core\model\Module;
 use Faker;
 
 
+use go\core\model\User;
 use go\core\orm\EntityType;
+use go\core\orm\exception\SaveException;
+use go\core\util\DateTime;
 use go\core\util\JSON;
 use go\modules\community\history\Module as HistoryModule;
 use JsonException;
@@ -32,6 +35,11 @@ class System extends Controller {
 	use EventEmitterTrait;
 
 	const EVENT_CLEANUP = 'cleanup';
+
+	protected function authenticate()
+	{
+		// no auth because on upgrade it might fail and it's not needed on CLI anyway
+	}
 
 
 	/**
@@ -49,6 +57,52 @@ class System extends Controller {
 		$router->run($requests);
 	}
 
+	/**
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteGroup --id=29
+	 */
+	public function deleteGroup($id) {
+		$json = <<<JSON
+[
+  [
+    "Group/set", {
+      "destroy": [$id]
+    },
+    "call-1"
+  ]
+]
+JSON;
+
+		$requests = JSON::decode($json, true);
+
+		Response::get()->jsonOptions = JSON_PRETTY_PRINT;
+
+		$router = new Router();
+		$router->run($requests);
+
+	}
+
+	/**
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteUser --id=1
+	 */
+	public function deleteUser($id) {
+		$json = <<<JSON
+[
+  [
+    "User/set", {
+      "destroy": [$id]
+    },
+    "call-1"
+  ]
+]
+JSON;
+
+		$requests = JSON::decode($json, true);
+
+		Response::get()->jsonOptions = JSON_PRETTY_PRINT;
+
+		$router = new Router();
+		$router->run($requests);
+	}
 
 	/**
 	 * @throws NotFound
@@ -68,16 +122,19 @@ class System extends Controller {
 	}
 
 	/**
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticator --package=community --name=Sync
 	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
 	 */
 	public function runCron($name, $module = "core", $package = "core") {
 
-		$module = Module::findByName($package, $module);
+		$mod = Module::findByName($package, $module);
+		if(!$mod) {
+			throw new NotFound("Module '$package/$module' not found");
+		}
 
 		$schedule = new CronJobSchedule();
-		$schedule->moduleId =$module->id;
+		$schedule->moduleId =$mod->id;
 		$schedule->name = $name;
 		$schedule->expression = "* * * * *";
 		$schedule->description = "Temporary CLI job " . uniqid();
@@ -98,9 +155,9 @@ class System extends Controller {
 	 * @throws Exception
 	 */
 	public function upgrade() {
-
-		Observable::cacheListeners();
-		Listeners::get()->init();
+//WHy was this needed? It made 6.5 upgrad fail.
+//		Observable::cacheListeners();
+//		Listeners::get()->init();
 
 		go()->getInstaller()->isValidDb();
 		Table::destroyInstances();
@@ -236,7 +293,7 @@ class System extends Controller {
 	 * @throws Forbidden
 	 * @example
 	 * ```
-	 * docker-compose exec --user www-data groupoffice-tasks ./www/cli.php core/System/demo
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo
 	 * ```
 	 */
 	public function demo() {
@@ -271,6 +328,19 @@ class System extends Controller {
 		Alert::$enabled = true;
 
 		echo "\n\nAll done!\n\n";
+	}
+
+
+	public function alert($username) {
+		$user = User::find()->where('username', '=', $username)->single();
+
+		/* @var \go\core\model\User $user */
+
+		$alert = $user->createAlert(new DateTime());
+
+		if(!$alert->save()) {
+			throw new SaveException($alert);
+		}
 	}
 
 

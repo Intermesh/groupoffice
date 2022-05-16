@@ -3,7 +3,9 @@
 namespace go\core\fs;
 
 use Exception;
+use GO\Base\Html\Error;
 use go\core\App;
+use go\core\ErrorHandler;
 use go\core\util\DateTime;
 use InvalidArgumentException;
 
@@ -16,6 +18,10 @@ use InvalidArgumentException;
  */
 abstract class FileSystemObject {
 
+	/**
+	 * @var bool
+	 */
+	private static $allowRootFolderDelete = false;
 	protected $path;
 
 
@@ -43,6 +49,50 @@ abstract class FileSystemObject {
 		}
 
 		$this->path = $path;
+	}
+
+
+	/**
+	 * Allow deletes in the root folder of the data folder
+	 *
+	 * @param bool $allow
+	 * @return void
+	 */
+	public static function allowRootFolderDelete(bool $allow = true) {
+		self::$allowRootFolderDelete = $allow;
+	}
+
+
+	/**
+	 * Check if delete is allowed on give file or folder
+	 *
+	 * @param FileSystemObject $fso
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function checkDeleteAllowed(self $fso) {
+
+		if(!self::$allowRootFolderDelete && ($fso->getParent()->getPath() == go()->getDataFolder()->getPath() || $fso->getPath() == go()->getDataFolder()->getPath()) ){
+			if(go()->getDebugger()->getRequestId() !== 'phpunit') {
+				ErrorHandler::log(go()->getDebugger()->getRequestId() . ' tried to delete in root: ' . $fso->getPath());
+				ErrorHandler::logBacktrace();
+			}
+			throw new Exception(go()->getDebugger()->getRequestId().' tried to delete in root: ' . $fso->getPath());
+		}
+	}
+	/**
+	 * Get the parent folder object
+	 *
+	 * @return Folder|null Parent folder object
+	 */
+	public function getParent() : ?Folder {
+
+		$parentPath = dirname($this->path);
+		if ($parentPath == $this->path) {
+			return null;
+		}
+
+		return new Folder($parentPath);
 	}
 
 
@@ -319,7 +369,7 @@ abstract class FileSystemObject {
 	}
 
 	/**
-	 * Check if the given folder is a subfolder of this folder.
+	 * Check if the given folder is a parent of this folder.
 	 *
 	 * @param Folder $parent
 	 * @return boolean

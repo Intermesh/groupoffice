@@ -105,7 +105,7 @@ class Version extends \GO\Base\Db\ActiveRecord {
 		}
 		\GO::config()->save_setting("file_storage_usage", (int) \GO::config()->get_setting('file_storage_usage', 0, 0) + $this->size_bytes);
 		
-		$this->file->fsFile->move($folder, $file->name());
+		$this->file->fsFile->move($folder, $file->name(), false, true);
 		
 		$this->_deleteOld(); 
 		

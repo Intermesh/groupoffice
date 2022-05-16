@@ -1,5 +1,6 @@
 <?php
 
+
 ini_set('error_reporting', E_ALL); 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -9,6 +10,9 @@ use go\core\App;
 use go\core\cli\controller\System;
 use go\core\cli\State;
 use GO\Base\Model\Module;
+use go\core\db\Table;
+use go\core\model\User;
+use go\core\orm\Property;
 use GO\Demodata\Controller\DemodataController;
 
 const INSTALL_NEW = 0;
@@ -38,11 +42,14 @@ try {
 //	$installDb = INSTALL_NEW;
 
 //	For testing upgrades use:
-	$installDb = INSTALL_UPGRADE;
+//	$installDb = INSTALL_UPGRADE;
 
 	if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
+		core\fs\FileSystemObject::allowRootFolderDelete();
 		$dataFolder->delete();
+		core\fs\FileSystemObject::allowRootFolderDelete(false);
 		$dataFolder->create();
+
 
 		//connect to server without database
 		$pdo = new PDO('mysql:host='. $config['db_host'], $config['db_user'], $config['db_pass']);
@@ -53,6 +60,14 @@ try {
 		}catch(\Exception $e) {
 
 		}
+
+		GO::clearCache(); //legacy
+
+		go()->getCache()->flush(false);
+		Table::destroyInstances();
+		Property::clearCache();
+		Property::clearCachedRelationStmts();
+
 
 		echo "Creating database 'groupoffice-phpunit'\n";
 		$pdo->query("CREATE DATABASE groupoffice_phpunit");
@@ -72,6 +87,9 @@ try {
 
 		$installer = go()->getInstaller();
 		$installer->install($admin);
+
+
+
 
 		\go\modules\community\test\Module::get()->install();
 

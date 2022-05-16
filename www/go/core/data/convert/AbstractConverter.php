@@ -7,6 +7,7 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
 use go\core\orm\Entity;
+use go\core\orm\EntityType;
 use go\core\orm\Query;
 
 /**
@@ -160,32 +161,28 @@ abstract class AbstractConverter {
 
 			try {
 
-				go()->getDbConnection()->beginTransaction();
-
 				$entity = $this->importEntity();
 				
 				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
 				if($entity === false) {
-					go()->getDbConnection()->rollBack();
 					$this->index++;
 					continue;
 				}			
 
 				$entity->save();
 
+				//push changes after each user
+				EntityType::push();
+
 				if($entity->hasValidationErrors()) {
-					go()->getDbConnection()->rollBack();
 					$response['errors'][] = "Item ". $this->index . ": ". var_export($entity->getValidationErrors(), true);
 				} elseif($this->afterSave($entity)) {
-					go()->getDbConnection()->commit();
 					$response['count']++;
 				} else{
-					go()->getDbConnection()->rollBack();
 					$response['errors'][] = "Item ". $this->index . ": Import afterSave returned false";
 				}				
 			}
 			catch(Exception $e) {
-				go()->getDbConnection()->rollBack();
 				ErrorHandler::logException($e);
 				$response['errors'][] = "Item ". $this->index . ": ".$e->getMessage();
 			}

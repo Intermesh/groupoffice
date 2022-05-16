@@ -215,7 +215,6 @@ class SavedMessage extends ComposerMessage
 					$a->number=$part_number_prefix.$part_number;
 					$a->content_id=$content_id;
 					$a->mime=$mime_type;
-
 					if(!empty($part->body)){
 						$tmp_file = new \GO\Base\Fs\File($this->_getTempDir(). \GO\Base\Fs\File::stripInvalidChars($filename));
 						$tmp_file->appendNumberToNameIfExists();						
@@ -225,7 +224,6 @@ class SavedMessage extends ComposerMessage
 					}					
 
 					$a->index=count($this->attachments);
-					$a->size=isset($part->body) ? strlen($part->body) : 0;
 					$a->encoding = isset($part->headers['content-transfer-encoding']) ? $part->headers['content-transfer-encoding'] : '';
 					$a->disposition = isset($part->disposition) ? $part->disposition : '';
 		
@@ -244,7 +242,7 @@ class SavedMessage extends ComposerMessage
 			//convert text to html
 			if (stripos($structure->ctype_secondary, 'plain') !== false) {
 				$this->extractUuencodedAttachments($text_part);
-				$text_part = nl2br($text_part);
+				$text_part = $preserveHtmlStyle ? '<div class="msg">' . nl2br($text_part) . '</div>' : nl2br($text_part);
 			}else{
 				$text_part = \GO\Base\Util\StringHelper::convertLinks($text_part);
 				$text_part = \GO\Base\Util\StringHelper::sanitizeHtml($text_part, $preserveHtmlStyle);

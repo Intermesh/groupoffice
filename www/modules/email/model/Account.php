@@ -48,7 +48,6 @@ use League\OAuth2\Client\Provider\Google;
  * @property boolean $do_not_mark_as_read
  * @property int $port
  * @property StringHelper $host
- * @property StringHelper $type
  * @property int $acl_id
  * @property int $user_id
  * @property int $id
@@ -57,6 +56,7 @@ use League\OAuth2\Client\Provider\Google;
  * @property int $sieve_port
  * @property boolean $sieve_tls
  * @property boolean $sieve_usetls
+ * @property boolean $force_smtp_login
  */
 class Account extends \GO\Base\Db\ActiveRecord
 {
@@ -112,6 +112,10 @@ class Account extends \GO\Base\Db\ActiveRecord
 	 */
 	public function aclField() {
 		return 'acl_id';
+	}
+
+	public function title() {
+		return $this->username . ' - '.$this->host;
 	}
 
 	/**
@@ -345,7 +349,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 		
 		return $decrypted ? $decrypted : $this->smtp_password;
 	}
-	
+
 	/**
 	 * Open a connection to the imap server.
 	 *

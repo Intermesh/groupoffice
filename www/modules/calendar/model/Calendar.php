@@ -73,7 +73,7 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 	}
 	
 	static public function versionUp($id) {
-		return \GO::$db->exec('UPDATE cal_calendars SET version = version + 1 WHERE id = '.(int)$id);
+		return \GO::getDbConnection()->exec('UPDATE cal_calendars SET version = version + 1 WHERE id = '.(int)$id);
 	}
 
 	public function relations() {

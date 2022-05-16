@@ -45,7 +45,7 @@ class VersionController extends \GO\Base\Controller\AbstractModelController {
 		while($version = $stmt->fetch()) {
 			$path = \GO::config()->file_storage_path.$version->path;
 			if(file_exists($path)) {
-				$pdo_statement = \GO::$db->query('UPDATE '.Version::model()->tableName(). ' SET `size_bytes` = '.filesize($path).';');
+				$pdo_statement = \GO::getDbConnection()->query('UPDATE '.Version::model()->tableName(). ' SET `size_bytes` = '.filesize($path).';');
 				if($pdo_statement->execute()) {
 					$success++;
 				} else

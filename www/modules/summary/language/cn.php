@@ -14,7 +14,10 @@ return array (
   'name' => '概要',
   'description' => '在这里输入说明',
   'Start page' => '摘要',
-  'Loading Feed...' => 'Loading Feed...',
-  'Go to Post' => 'Go to Post',
+  'Loading Feed...' => '加载推荐',
+  'Go to Post' => '去发贴',
   'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+  'Rss Feeds' => 'RSS订阅',
+  'webfeeds' => '网络推荐',
+  'Summary' => '汇总',
 );

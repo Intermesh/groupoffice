@@ -66,7 +66,7 @@ GO.email.MessagesGrid = function(config){
 				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
 			},
 			groupRenderer : function(value){
-				return go.util.Format.shortDateTime(value,false,true);
+				return go.util.Format.shortDateTime(value,false,true, true);
 			}
 		},{
 			id:'date',
@@ -79,7 +79,7 @@ GO.email.MessagesGrid = function(config){
 				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
 			},
 			groupRenderer : function(value){
-				return go.util.Format.shortDateTime(value,false,true);
+				return go.util.Format.shortDateTime(value,false,true, true);
 			}
 		},{
 			id:'size',
@@ -316,14 +316,14 @@ GO.email.MessagesGrid = function(config){
 				GO.email.showComposer({account_id: this.account_id});
 			},
 			scope: this
-		}),{
+		}),this.btnRefresh = new Ext.Button({
 			iconCls: 'ic-autorenew',
 			tooltip: t("Refresh"),
 			handler: function(){
 				this.emailClient.refresh(true);
 			},
 			scope: this
-		},this.deleteButton = new Ext.Button({
+		}),this.deleteButton = new Ext.Button({
 			iconCls: 'ic-delete',
 			tooltip: t("Delete"),
 			handler: function(){
@@ -495,12 +495,12 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 			metaData.css = 'danger';
 			value += " &lt;" + record.data.sender + "&gt;";
 		}
-		
+
 		if(record.data['seen']=='0'){
-			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-unseen-from '+deletedCls+'">{0}</div><div class="ml-unseen-subject '+deletedCls+'">{1}</div>', value, record.data['subject']);
+			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-unseen-from '+deletedCls+'">{0}</div><div class="ml-unseen-subject '+deletedCls+'">{1}</div>', record.data['from'], record.data['subject']);
 		}else
 		{
-			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-from '+deletedCls+'">{0}</div><div class="ml-seen-subject '+deletedCls+'">{1}</div>', value, record.data['subject']);
+			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-from '+deletedCls+'">{0}</div><div class="ml-seen-subject '+deletedCls+'">{1}</div>', record.data['from'], record.data['subject']);
 		}
 	},
 

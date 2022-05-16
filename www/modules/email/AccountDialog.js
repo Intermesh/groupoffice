@@ -91,7 +91,7 @@ GO.email.AccountDialog = function(config) {
 			scope : this
 		});
 	}
-				
+
 	this.templatesCombo = new GO.form.ComboBox({
 		fieldLabel : t("Default e-mail template", "email"),
 		hiddenName : 'default_account_template_id',
@@ -124,7 +124,6 @@ GO.email.AccountDialog = function(config) {
 		hideLabel:false,
 		fieldLabel:''
 	});
-		
 
 	this.incomingTab = new Ext.Container({
 		title : t("Incoming mail", "email"),
@@ -305,8 +304,26 @@ GO.email.AccountDialog = function(config) {
 			forceSelection : true
 		}),
 		this.smtpAllowSelfSignedCheck,
-		{
-			xtype:'xcheckbox',
+		this.imapCredentialsCbx = new Ext.ux.form.XCheckbox({
+			hideLabel: true,
+			boxLabel: t("Use IMAP credentials", "email","communtiy"),
+			name: 'force_smtp_login',
+			handler: function(cb, checked) {
+				if(checked) {
+					this.smtpUsername.hide();
+					this.smtpPassword.hide();
+					this.useSmtpAuthentication.hide();
+				} else {
+					this.smtpUsername.show();
+					this.smtpPassword.show();
+					this.useSmtpAuthentication.show();
+				}
+
+			},
+			scope: this
+		}),
+
+		this.useSmtpAuthentication = new Ext.ux.form.XCheckbox({
 			checked: false,
 			name: 'smtp_auth',
 			hideLabel:true,
@@ -318,7 +335,7 @@ GO.email.AccountDialog = function(config) {
 				},
 				scope:this
 			}
-		},this.smtpUsername= new Ext.form.TextField({
+		}),this.smtpUsername= new Ext.form.TextField({
 			fieldLabel : t("Username"),
 			name : 'smtp_username',
 			disabled:true
@@ -485,7 +502,6 @@ GO.email.AccountDialog = function(config) {
 						collapsed : true,
 						autoHeight : true,
 						autoWidth : true,
-						// defaults: {anchor: '100%'},
 						defaultType : 'textfield',
 						labelWidth : 75,
 						labelAlign : 'left',

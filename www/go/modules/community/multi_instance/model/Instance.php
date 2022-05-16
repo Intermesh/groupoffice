@@ -117,9 +117,13 @@ class Instance extends Entity {
 			//update model from instance db once a day
 			if(!isset($this->modifiedAt) || $this->modifiedAt <= new \DateTime("-10 minute")) {
 				$this->getInstanceDbData();
-				
-				if($this->isModified() && !$this->save()) {
-					throw new Exception("Could not save instance data! ". var_export($this->getValidationErrors(), true));
+
+				try {
+					if ($this->isModified() && !$this->save()) {
+						throw new Exception("Could not save instance data! " . var_export($this->getValidationErrors(), true));
+					}
+				} catch(Exception $e) {
+					ErrorHandler::logException($e);
 				}
 			}
 		}
@@ -134,36 +138,23 @@ class Instance extends Entity {
 				$this->setValidationError('hostname', ErrorCode::REQUIRED, 'The hostname field is required');
 			}
 
-			if(!preg_match('/^[a-z0-9-_.]*$/', $this->hostname)) {
+			if(Utils::userExists($this->getDbUser())) {
+				$this->setValidationError('hostname', ErrorCode::UNIQUE, 'This hostname is not available (User exists).');
+			} elseif(!preg_match('/^[a-z0-9-_.]*$/', $this->hostname)) {
 				$this->setValidationError('hostname', ErrorCode::MALFORMED, 'The hostname was malformed');
-			}
-
-			if($this->getDbName() == go()->getDatabase()->getName()) {
+			}elseif($this->getDbName() == go()->getDatabase()->getName()) {
 				$this->setValidationError('hostname', ErrorCode::UNIQUE, 'This hostname is not available (Database exists).');
-			}
-
-			if(Utils::databaseExists($this->getDbName())) {
+			} elseif(Utils::databaseExists($this->getDbName())) {
 				$this->setValidationError('hostname', ErrorCode::UNIQUE, 'This hostname is not available (Database exists).');
-			}
-
-			//do get folder for compatibility with old config.php files
-			if($this->isNew() && $this->getConfigFile()->getFolder()->exists()) {
+			} elseif($this->isNew() && $this->getConfigFile()->getFolder()->exists()) {
 				$this->setValidationError('hostname', ErrorCode::UNIQUE, 'This hostname is not available (config file exists).');
-			}
-
-			if($this->isNew() && $this->getDataFolder()->exists()) {
+			} elseif($this->isNew() && $this->getDataFolder()->exists()) {
 				$this->setValidationError('hostname', ErrorCode::UNIQUE, 'This hostname is not available (data folder exists).');
-			}
-
-			if(!$this->getConfigFile()->isWritable()) {
+			} elseif(!$this->getConfigFile()->isWritable()) {
 				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The configuration file is not writable');
-			}
-
-			if(!$this->getDataFolder()->isWritable()) {
+			} elseif(!$this->getDataFolder()->isWritable()) {
 				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The data folder is not writable');
-			}
-
-			if(!$this->getTempFolder()->isWritable()) {
+			} elseif(!$this->getTempFolder()->isWritable()) {
 				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The temporary files folder is not writable');
 			}
 		} else {
@@ -172,6 +163,8 @@ class Instance extends Entity {
 				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, "You can't modify the hostname.");
 			}
 		}
+
+
 		
 		parent::internalValidate();
 	}
@@ -437,7 +430,7 @@ class Instance extends Entity {
 			parent::internalDelete((new Query())->from(self::getMapping()->getPrimaryTable()->getName())->where(['id' => $this->id]));
 
 			// User permissions incorrect
-			if($e instanceof \PDOException && strpos($e->getMessage(), 1044) !== false) {
+			if($e instanceof \PDOException && strpos($e->getMessage(), "1044") !== false) {
 				ErrorHandler::logException($e);
 				throw new Exception("Please setup the correct permissions for the database user. See https://groupoffice.readthedocs.io/en/latest/install/extras/multi_instance.html");
 			}
@@ -578,7 +571,17 @@ class Instance extends Entity {
 				throw new Exception("Config not found");
 			}
 
-			$dsn = 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
+			$dsn = 'mysql:';
+
+			if(!empty($config['db_socket'])) {
+				$dsn .= 'unix_socket=' . $config['db_socket'];
+			} else {
+				$dsn .= 'host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306);
+			}
+
+			$dsn .= ';dbname=' . $config['db_name'];
+			$dsn .= ';charset=utf8mb4';
+
 			$this->instanceDbConn = new Connection($dsn, $config['db_user'], $config['db_pass']);
 		}
 		

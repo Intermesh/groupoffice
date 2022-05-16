@@ -166,7 +166,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(300),
 					hidden: this.enabledColumns.indexOf('organizations') == -1,
 					renderer: function (organizations, meta, record) {
-						return organizations.column("name").join(", ");
+						return organizations ? organizations.column("name").join(", ") : "";
 					}
 				},
 				{

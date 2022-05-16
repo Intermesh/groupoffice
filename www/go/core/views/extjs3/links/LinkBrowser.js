@@ -22,7 +22,8 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			},
 			region: "west",
 			split: true,
-			stateId: "go-link-browser-entity-grid"
+			stateId: "go-link-browser-entity-grid",
+			savedSelection: "go-link-browser-" + this.entity
 		});
 
 		this.entityGrid.getTopToolbar().add('->');
@@ -36,15 +37,26 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			scope: this
 		});
 
-		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
+
+		applyEntityFilter = () => {
 			this.store.setFilter('entities', {
-				entities: sm.getSelections().map(function(r){
+				entities: this.entityGrid.getSelectionModel().getSelections().map(function(r){
 					return {name: r.data.entity, filter: r.data.filter};
 				})
 			});
-			
+
 			this.store.load();
+		}
+
+		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
+			applyEntityFilter();
+			
+
 		}, this, {buffer: 1});
+
+		this.entityGrid.on("viewready", () => {
+			applyEntityFilter();
+		})
 
 
 		this.store = new go.data.GroupingStore({
@@ -64,7 +76,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 				],
 			entityStore: "Link",
 			sortInfo: {field: 'modifiedAt', direction: 'DESC'},
-			autoLoad: true,
+			autoLoad: false,
 			remoteSort: true,
 			groupField: 'toEntity'
 		});

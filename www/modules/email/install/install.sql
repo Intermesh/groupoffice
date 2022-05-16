@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS `em_accounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT '0',
   `acl_id` int(11) NOT NULL DEFAULT '0',
-  `type` varchar(4) DEFAULT NULL,
   `host` varchar(100) DEFAULT NULL,
   `port` int(11) NOT NULL DEFAULT '0',
   `deprecated_use_ssl` tinyint(1) NOT NULL DEFAULT '0',
@@ -51,6 +50,7 @@ CREATE TABLE IF NOT EXISTS `em_accounts` (
 	`signature_below_reply` tinyint(1) NOT NULL DEFAULT '0',
 	`full_reply_headers` tinyint(1) NOT NULL DEFAULT '0',
 	`client_id` INT(11) UNSIGNED DEFAULT NULL,
+	`force_smtp_login` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB ;
@@ -172,6 +172,7 @@ CREATE TABLE IF NOT EXISTS `em_links` (
   `subject` varchar(255) DEFAULT NULL,
   `time` int(11) NOT NULL DEFAULT '0',
   `path` varchar(255) DEFAULT NULL,
+  `has_attachments` tinyint(1) DEFAULT 0,
   `ctime` int(11) NOT NULL,
   `mtime` int(11) NOT NULL DEFAULT '0',
 	`muser_id` int(11) NOT NULL DEFAULT '0',
@@ -249,6 +250,17 @@ CREATE TABLE IF NOT EXISTS `em_contacts_last_mail_times` (
   `last_mail_time` int(11) NOT NULL,
   PRIMARY KEY (`contact_id`,`user_id`)
 ) ENGINE=InnoDB;
+
+alter table em_contacts_last_mail_times
+    add constraint em_contacts_last_mail_times_addressbook_addressbook_id_fk
+        foreign key (contact_id) references addressbook_addressbook (id)
+            on delete cascade;
+
+alter table em_contacts_last_mail_times
+    add constraint em_contacts_last_mail_times_core_user_id_fk
+        foreign key (user_id) references core_user (id)
+            on delete cascade;
+
 
 -- --------------------------------------------------------
 

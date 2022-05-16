@@ -17,7 +17,7 @@ class Password extends PrimaryAuthenticator {
 	 * @return boolean 
 	 */
 	public function authenticate($username, $password) {		
-		$user = User::find(['id', 'username', 'password', 'enabled'])->where(['username' => $username])->single();
+		$user = User::find(['id', 'username', 'password', 'enabled'], true)->where(['username' => $username])->single();
 		if(!$user) {
 			return false;
 		}

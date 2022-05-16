@@ -444,10 +444,7 @@ use Faker;
 			$config->mergeRecursive($this->getGlobalConfig());
 			$config->mergeRecursive($this->getInstanceConfig());
 
-			if(!isset($config['debug_log'])) {
-				$config['debug_log'] = !empty($config['debug']);
-			}
-			
+
 			if(!isset($config['cache'])) {
 				if(cache\Apcu::isSupported()) {
 					$config['cache'] = cache\Apcu::class;
@@ -459,6 +456,10 @@ use Faker;
 
 			if(Request::get()->getHeader('X-Debug') == "1") {
 				$config['debug'] = true;
+			}
+
+			if(!isset($config['debug_log'])) {
+				$config['debug_log'] = true;
 			}
 
 			$this->config = $config->getArray();
@@ -477,6 +478,44 @@ use Faker;
 		}
 
 		/**
+		 * Creates new DB
+		 * @return Connection
+		 */
+		private function createDbConnection() : Connection{
+			$config = $this->getConfig();
+			$dsn = $this->createDsn($config['db_name']);
+			return new Connection(
+				$dsn, $config['db_user'], $config['db_pass']
+			);
+		}
+
+		/**
+		 * Create PDO database DSN string
+		 *
+		 * @param string|null $dbName
+		 * @return string
+		 */
+		public function createDsn(string $dbName = null): string {
+			$config = $this->getConfig();
+
+			$dsn = 'mysql:';
+
+			if(!empty($config['db_socket'])) {
+				$dsn .= 'unix_socket=' . $config['db_socket'];
+			} else{
+				$dsn .= 'host=' . $config['db_host'] . ';port=' . $config['db_port'];
+			}
+
+			if(isset($dbName)) {
+				$dsn .= ';dbname=' . $dbName;
+			}
+
+			$dsn .= ';charset=utf8mb4';
+
+			return $dsn;
+		}
+
+		/**
 		 * Get the database connection
 		 *
 		 * @return Connection
@@ -484,11 +523,7 @@ use Faker;
 		public function getDbConnection(): Connection
 		{
 			if (!isset($this->dbConnection)) {
-				$config = $this->getConfig();
-				$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port']  . ';dbname=' . $config['db_name'];
-				$this->dbConnection = new Connection(
-					$dsn, $config['db_user'], $config['db_pass']
-				);
+				$this->dbConnection = $this->createDbConnection();
 			}
 			return $this->dbConnection;
 		}
@@ -499,8 +534,8 @@ use Faker;
 				return parent::isInstalled();
 			} catch(PDOException $e) {
 
-				if(strpos($e->getMessage(), '[1049]') !== false) {
-					// database does not exists
+				if(strpos($e->getMessage(), '1049') !== false || strpos($e->getMessage(), '1146') !== false) {
+					// database does not exists or table does not exist
 					return false;
 				}
 				throw $e;
@@ -607,15 +642,8 @@ use Faker;
 			}
 
 			$this->rebuildCacheOnDestruct = false;
-			
-			GO::clearCache(); //legacy
 
-			go()->getCache()->flush(true);
-			Table::destroyInstances();
-			Property::clearCache();
-
-			$webclient = Extjs3::get();
-			$webclient->flushCache();
+			$this->clearCache();
 
 			Observable::cacheListeners();
 
@@ -628,8 +656,28 @@ use Faker;
 			go()->getSettings()->save();
 			
 		}
+
+		/**
+		 * Clears all caches
+		 *
+		 * @return void
+		 */
+		public function clearCache() {
+			App::get()->getCache()->flush( false);
+			Table::destroyInstances();
+			Property::clearCache();
+			Property::clearCachedRelationStmts();
+			GO::clearCache();
+			Listeners::get()->clear();
+			Observable::$listeners = [];
+			$webclient = Extjs3::get();
+			$webclient->flushCache();
+		}
 		
 		public function __destruct() {
+
+			EntityType::push();
+
 			if($this->rebuildCacheOnDestruct) {
 
 				$this->rebuildCache();
@@ -951,6 +999,11 @@ use Faker;
 		 * Also see: https://mariadb.com/resources/blog/setting-optimizer-search-depth-in-mysql/
 		 */
 		public function setOptimizerSearchDepth() {
+
+			if($this->optimizerSearchDepthSet) {
+				return;
+			}
+
 			try {
 				go()->getDbConnection()->exec("SET SESSION optimizer_search_depth=4;");
 

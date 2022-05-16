@@ -191,13 +191,18 @@ class Response extends Singleton{
 	 * @param int $httpCode
 	 * @param string|null $text Status text. May not contain new lines in headers.
 	 */
-	public function setStatus(int $httpCode, string $text = null) {
-
+	public function setStatus(int $httpCode, string $text = null)
+	{
 		if (!isset($text)) {
 			$text = http\Exception::$codes[$httpCode];
 		}
 
-		$status = "HTTP/" . $this->httpVersion . " " . $httpCode . " " . $text;
+		if (substr(PHP_SAPI, 0, 3) == 'cgi') {
+			$status = "Status: " . $httpCode . " " . $text;
+		} else
+		{
+			$status = "HTTP/" . $this->httpVersion . " " . $httpCode . " " . $text;
+		}
 		header($status);
 	}
 

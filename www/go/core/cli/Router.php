@@ -96,6 +96,9 @@ class Router {
 		}
 		
 		$path = array_shift($args);
+
+		go()->getDebugger()->setRequestId('cli: ' . $path);
+
 		$parts = explode('/', $path);
 
 		if(!isset($parts[2]) || $parts[0] != 'core' && !isset($parts[3])) {
@@ -158,12 +161,25 @@ class Router {
 
 		//call method with all parameters from the $_REQUEST object.
 		$methodArgs = [];
+
+		$paramNames = [];
+
 		foreach ($this->getMethodParams($controller, $methodName) as $paramName => $paramMeta) {
 			if (!isset($requestParams[$paramName]) && !$paramMeta['isOptional']) {
 				throw new InvalidArguments("Bad request. Missing argument '" . $paramName . "' for action method '" . get_class($controller) . "->" . $methodName . "'");
 			}
 
 			$methodArgs[] = $requestParams[$paramName] ?? $paramMeta['default'];
+			unset($requestParams[$paramName]);
+
+			$paramNames[] = $paramName . ($paramMeta['isOptional'] ? ' = ' . var_export($paramMeta['default'], true) : "*" );
+		}
+
+		unset($requestParams['c']);
+		unset($requestParams['debug']);
+
+		if(!empty($requestParams)) {
+			throw new InvalidArguments("Bad request. The following parameters are not supported: " . implode(",", array_keys($requestParams))."\n\nSupported are: \n- " . implode("\n- ",  $paramNames));
 		}
 
 		call_user_func_array([$controller, $methodName], $methodArgs);

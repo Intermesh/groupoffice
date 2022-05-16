@@ -10,22 +10,7 @@ use go\core\jmap\EntityController;
 
 
 class Group extends EntityController {
-	
-	protected function canUpdate(Entity $entity): bool
-	{
-		
-		return $this->rights->mayChangeGroups;
-	}
 
-	protected function canDestroy(Entity $entity): bool
-	{
-		return $this->rights->mayChangeGroups;
-	}
-
-	protected function canCreate(Entity $entity): bool
-	{
-		return $this->rights->mayChangeGroups;
-	}
 
 	/**
 	 * The class name of the entity this controller is for.

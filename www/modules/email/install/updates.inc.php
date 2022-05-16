@@ -209,4 +209,20 @@ $updates['202002280914'][] = "ALTER TABLE `em_contacts_last_mail_times` ADD INDE
 
 $updates['202112031315'][] = "ALTER TABLE `em_accounts` ADD KEY (`id`), ADD KEY(`user_id`);";
 
-//$updates['202201081000'][] = "ALTER TABLE `em_accounts` ADD COLUMN `client_id` INT(11) UNSIGNED DEFAULT NULL;";
+$updates['202205021223'][] = "alter table em_accounts drop column if exists type;";
+
+$updates['202205021223'][] = "alter table em_accounts drop column if exists type;";
+
+
+$updates['202205131420'][] = "alter table em_contacts_last_mail_times
+    add constraint em_contacts_last_mail_times_addressbook_addressbook_id_fk
+        foreign key (contact_id) references addressbook_addressbook (id)
+            on delete cascade;";
+
+$updates['202205131420'][] = "alter table em_contacts_last_mail_times
+    add constraint em_contacts_last_mail_times_core_user_id_fk
+        foreign key (user_id) references core_user (id)
+            on delete cascade;";
+
+
+$updates['202205131420'][] = "ALTER TABLE `em_accounts` ADD COLUMN IF NOT EXISTS `force_smtp_login` BOOLEAN NOT NULL DEFAULT FALSE;";

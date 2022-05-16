@@ -44,8 +44,10 @@ $root = new \GO\Dav\Fs\RootDirectory();
 $server = new Sabre\DAV\Server($root);
 $server->debugExceptions=\GO::config()->debug;
 
+go()->getDebugger()->setRequestId("WebDAV " . ($_SERVER['REQUEST_METHOD'] ?? ""));
+
 $server->on('exception', function($e){
-	\GO::debug((string) $e);
+	\go\core\ErrorHandler::logException($e);
 });
 
 //baseUri can also be /webdav/ with:

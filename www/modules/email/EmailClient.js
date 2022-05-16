@@ -235,6 +235,17 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		scope: this,
 		multiple:true
 	}),
+
+		this.contextMenuMoveTo = new Ext.menu.Item ({
+			iconCls: 'ic-move-to-inbox',
+			text: t("Move email to...", "email"),
+			handler: function(a,b,c){
+				var selectedEmails = this.messagesGrid.getSelectionModel().getSelections();
+				this.showCopyMailToDialog(selectedEmails, true);
+			},
+			scope: this,
+			multiple:true
+		}),
 	 this.addEmailButton = new Ext.menu.Item({
 		iconCls: 'ic-mail',
 		text: t("Forward as attachment ", "email"),
@@ -486,8 +497,12 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		mainPanel:this
 	});
 
+	this.treePanel.getRootNode().on('beforeload', () => {
+		this.messagesGrid.btnRefresh.setDisabled(true);
+	}, this);
 	//select the first inbox to be displayed in the messages grid
 	this.treePanel.getRootNode().on('load', function(rootNode) {
+
 		this.body.unmask();
 		//restore already selected account
 		let accountNode;
@@ -508,6 +523,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 		if(!accountNode) {
 			this.messagesStore.removeAll();
+			this.messagesGrid.btnRefresh.setDisabled(false);
 			return; //no accounts
 		}
 
@@ -525,23 +541,26 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			}
 
 			if(mailboxNode) {
-				mailboxNode.on('load', function(){
-
-					//don't know why but it doesn't work without a 10ms delay.
+				// mailboxNode.on('load', function(){
+				setTimeout(() => {
+					//don't know why but it doesn't work without a setTimeout
 					this.treePanel.getSelectionModel().select(mailboxNode);
 
 					if(this.treeScrollTop) {
-						//restore scroll position after refresh
+						//restore scroll position after refresh, dirty hack with 100ms delay to allow sub nodes to expand
 						setTimeout(() => {
 							this.treePanel.body.dom.scrollTop = this.treeScrollTop;
 							delete this.treeScrollTop;
-						}, 10);
+						}, 100);
 					}
+				}, 0)
 
-				},this, {single: true, defer: 10});
+				// },this, {single: true, defer: 10});
 			} else {
 				this.messagesStore.removeAll();
 			}
+
+			this.messagesGrid.btnRefresh.setDisabled(false);
 
 		}, this, {single: true});
 
@@ -1047,9 +1066,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.accountsDialog.show();
 	},
 
-	showCopyMailToDialog : function(selectedEmailMessages) {
+	showCopyMailToDialog : function(selectedEmailMessages, move) {
 		if (!this._copyMailToDialog) {
-			this._copyMailToDialog = new GO.email.CopyMailToDialog();
+			this._copyMailToDialog = new GO.email.CopyMailToDialog({
+				move: move
+			});
 			this._copyMailToDialog.on('copy_email',function(){
 				this.messagesGrid.store.reload();
 			},this);

@@ -89,21 +89,24 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 
 		$pubCertFile = \GO\Base\Fs\File::tempFile();
 		$valid = openssl_pkcs7_verify($inputFile->path(), null, $pubCertFile->path(), Smime::rootCertificates());
-		$inputFile->delete();
 
 		if (!$valid) {
+			openssl_pkcs7_verify($inputFile->path(), PKCS7_NOVERIFY, $pubCertFile->path(), Smime::rootCertificates());
 			$err = '';
 			while ($msg = openssl_error_string())
 				$err .= $msg . "\n";
-			throw new \Exception($err);
+
+			go()->debug($err);
+
 		}
+		$inputFile->delete();
 		if (!$pubCertFile->exists()) {
-			throw new \Exception('Certificate appears to be valid but could not get certificate from signature. SSL Error: ' . openssl_error_string());
+			throw new \Exception('Could not get certificate from signature.');
 		}
 		$certData = $pubCertFile->getContents();
 
 		if (empty($certData)){
-			throw new \Exception('Certificate appears to be valid but could not get certificate from signature.');
+			throw new \Exception('Could not get certificate from signature.');
 		}
 
 		$arr = openssl_x509_parse($certData);
@@ -112,9 +115,10 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 			throw new \Exception(go()->t("The certificate must be in PEM format", "legacy", "smime"));
 		}
 
+
 		$emails = Smime::readEmails($arr);
 		$success = true;
-		foreach($emails as $email) {
+		foreach ($emails as $email) {
 			// save in DB
 			$cert = self::model()->find(FindParams::newInstance()->criteria(FindCriteria::newInstance()
 				->addCondition('email', $email)
@@ -126,21 +130,28 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 				$cert->user_id = \GO::user()->id;
 			}
 			$cert->cert = $certData;
-			$success = $cert->save() && $success;
+			$success = $valid && $cert->save() && $success;
 		}
 
-		try {
-			$cert->ocsp = $cert->checkOCSP($pubCertFile, $arr);
-			$cert->ocspMsg = $cert->ocsp ? "OK" : \GO::t("The certificate has been revoked!", "smime");
-		}catch(\Exception $e) {
-			$cert->ocspMsg = $e->getMessage();
-		}
+
+		self::oscp($cert, $pubCertFile, $arr);
+
 		$pubCertFile->delete();
 
 		// return latest
 		$cert->valid = $valid;
 		return $cert;
 
+	}
+
+	private static function oscp(self $cert, File $pubCertFile, array $arr) {
+		try {
+			$cert->ocsp = $cert->checkOCSP($pubCertFile, $arr);
+			$cert->ocspMsg = $cert->ocsp ? "OK" : \GO::t("The certificate has been revoked!", "smime");
+		}catch(\Exception $e) {
+			$cert->ocspMsg = $e->getMessage();
+			$cert->ocsp = false;
+		}
 	}
 
 	/**
@@ -174,9 +185,13 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 		if(isset($this->valid)) {
 			$result['valid'] = $this->valid;
 		}
-		if($this->ocsp) {
-			$result['ocsp'] = $this->ocsp;
+		if(!isset($this->ocsp)) {
+			$pubCertFile = \GO\Base\Fs\File::tempFile();
+			$pubCertFile->putContents($this->cert);
+			self::oscp($this, $pubCertFile, $arr);
+			$pubCertFile->delete();
 		}
+		$result['ocsp'] = $this->ocsp;
 		if($this->ocspMsg) {
 			$result['ocspMsg'] = $this->ocspMsg;
 		}
@@ -234,7 +249,7 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 
 		//Do OCSP
 
-		$cmd = "openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($publicCertFile->path())." -url ". escapeshellarg($ocspURI) ." -CAfile ". escapeshellarg($issuerPemFile->path());
+		$cmd = "timeout 5 openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($publicCertFile->path())." -url ". escapeshellarg($ocspURI) ." -CAfile ". escapeshellarg($issuerPemFile->path());
 		go()->debug("Running: $cmd");
 		exec ($cmd, $output,$ret);
 

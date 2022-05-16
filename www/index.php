@@ -61,17 +61,18 @@ try {
 
 
 	//check if GO is installed
-	if(empty($_REQUEST['r']) && PHP_SAPI!='cli' && $_SERVER['REQUEST_METHOD'] == "GET"){
+	if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 
         if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 
-            if(go()->getDebugger()->enabled) {
-                echo "DEBUGGER: Version mismatch. Database version = ". go()->getSettings()->databaseVersion .", Application version: " . go()->getVersion() .".<br /><br />";
-                echo '<a href="install/upgrade.php">Click here to launch the upgrade</a>';
-                exit();
-            }
-            header('Location: '.GO::config()->host.'install/upgrade.php');
+            require('views/Extjs3/externalHeader.php');
+
+            echo "<h1>". go()->t("Service unavailable") . "</h1>";
+            echo "<p>". go()->t("The system is not available because an update is currently being installed. Please try again later.") . "</p>";
+
+            require('views/Extjs3/externalFooter.php');
             exit();
+
         }
 
 		//Server manager uses this when directly signing in
@@ -94,7 +95,7 @@ try {
 		}
 
         // Process remember me persistent cookie
-        if(!go()->getAuthState()->isAuthenticated() && ($rememberMe = \go\core\model\RememberMe::verify())) {
+        if($_SERVER['REQUEST_METHOD'] == "GET" && !go()->getAuthState()->isAuthenticated() && ($rememberMe = \go\core\model\RememberMe::verify())) {
             $rememberMe->setCookie();
 
             $token = new Token();

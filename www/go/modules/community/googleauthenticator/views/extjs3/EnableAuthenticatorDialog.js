@@ -17,6 +17,8 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 		this.formPanel.on('beforesubmit', (pnl,values) => {
 			values.googleauthenticator.secret = this.secretField.getValue();
 		});
+
+		this.formPanel.loadExternalChanges = false;
 	},
 	focus: function () {		
 		this.verifyField.focus();

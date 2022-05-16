@@ -31,10 +31,9 @@ class Query extends DbQuery {
 	public function setModel(string $cls, array $fetchProperties = [], bool $readOnly = false, Property $owner = null): Query
 	{
 		$this->model = $cls;
-		$fetchProperties1 = $fetchProperties;
 		$this->readOnly = $readOnly;
 
-		$args = [false, $fetchProperties1, $this->readOnly];
+		$args = [false, $fetchProperties, $this->readOnly];
 
 		if(isset($owner)) {
 			array_unshift($args, $owner);

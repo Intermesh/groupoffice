@@ -36,7 +36,7 @@ $settings['config']['allow_password_change'] = GO::config()->allow_password_chan
 $settings['config']['allow_themes'] = GO::config()->allow_themes;
 $settings['config']['allow_profile_edit'] = GO::config()->allow_profile_edit;
 $settings['config']['max_users'] = GO::config()->max_users;
-$settings['config']['debug'] = GO::config()->debug;
+$settings['config']['debug'] = go()->getDebugger()->enabled;
 $settings['config']['max_attachment_size'] = GO::config()->max_attachment_size;
 $settings['config']['max_file_size'] = GO::config()->max_file_size;
 $settings['config']['help_link'] = GO::config()->help_link;
@@ -58,18 +58,18 @@ $settings['language'] = go()->getLanguage()->getIsoCode();
 $settings['show_contact_cf_tabs'] = array();
 
 
-$root_uri = GO::config()->debug ? GO::config()->host : GO::config()->root_path;
+$root_uri = go()->getDebugger()->enabled ? GO::config()->host : GO::config()->root_path;
 $view_root_uri = $root_uri . 'views/Extjs3/';
 $view_root_path = GO::config()->root_path . 'views/Extjs3/';
 
 
 
-if(GO::config()->debug) {
+if(go()->getDebugger()->enabled) {
   $cacheFile = \go\core\App::get()->getTmpFolder()->getFile('debug.js');
   $cacheFile->delete();
 } else
 {
-  $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all.js');
+  $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('cache/clientscripts')->create()->getFile('all.js');
 }
 
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
@@ -186,7 +186,7 @@ if ($cacheFile->exists()) {
 	//$scripts = array_map('trim', $scripts);
 	//	$scripts = array_unique($scripts);
 
-  if(!GO::config()->debug) {
+  if(!go()->getDebugger()->enabled) {
     $minify = new \MatthiasMullie\Minify\JS();
   } else
   {
@@ -198,7 +198,7 @@ if ($cacheFile->exists()) {
 	$strip = strlen($rootFolder->getPath()) + 1;
 	foreach ($scripts as $script) {
 
-		if (GO::config()->debug) {
+		if (go()->getDebugger()->enabled) {
 			if (is_string($script)) {
 				echo '<script type="text/javascript">' . $script . '</script>' . "\n";
 			} else if ($script instanceof File) {
@@ -216,7 +216,7 @@ if ($cacheFile->exists()) {
 		}
 	}
 	
-	if (!GO::config()->debug) {
+	if (!go()->getDebugger()->enabled) {
 		$minify->gzip($cacheFile->getPath());		
 		echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. $cacheFile->getModifiedAt()->format("U") . '"></script>';
 	} else
@@ -243,7 +243,7 @@ if(isset($_POST['accessToken'])) { //defined in index.php
 	}
 	
 	?>	
-	go.User.setAccessToken('<?= $_POST['accessToken']; ?>', false);
+	go.User.setAccessToken('<?= $_POST['accessToken']; ?>');
 	<?php
 
 }

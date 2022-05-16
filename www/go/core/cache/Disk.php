@@ -6,6 +6,7 @@ use Exception;
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\fs\File;
+use go\core\fs\Folder;
 
 /**
  * Cache implementation that uses serialized objects in files on disk.
@@ -26,7 +27,7 @@ class Disk implements CacheInterface {
 	 * @throws Exception
 	 */
 	public function __construct() {
-		$this->folder = App::get()->getDataFolder()->getFolder('cache2');
+		$this->folder = go()->getDataFolder()->getFolder('cache/disk');
 		$this->folder->create();
 	}
 
@@ -41,7 +42,7 @@ class Disk implements CacheInterface {
 	 */
 	public function set(string $key, $value, bool $persist = true, int $ttl = 0) {
 
-		$key = str_replace('\\', '-', $key);
+		$key = File::stripInvalidChars($key, '-');
 
 		if($persist) {
 			$file = $this->folder->getFile($key);
@@ -67,8 +68,8 @@ class Disk implements CacheInterface {
 	 * @return mixed null if it doesn't exist
 	 */
 	public function get(string $key) {
-		
-		$key = str_replace('\\', '-', $key);
+
+		$key = File::stripInvalidChars($key, '-');
 
 		if(isset($this->cache[$key])) {
 			return $this->cache[$key];
@@ -138,8 +139,18 @@ class Disk implements CacheInterface {
 		go()->debug("Flushing cache");
 		
 		$this->cache = [];
+
+		//in case previous attempt failed
+		$checkExisting = go()->getDataFolder()->getFolder('cache/disktrash');
+		if($checkExisting->exists()) {
+			$checkExisting->delete();
+		}
 	
-		$this->folder->delete();
+		$f = clone $this->folder;
+		if($f->rename('disktrash')) {
+			$f->delete();
+		}
+
 		$this->folder->create();
 		$this->folder->chmod(0777);
 		

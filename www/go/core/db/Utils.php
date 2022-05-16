@@ -91,10 +91,10 @@ class Utils {
 	/**
 	 * Check if a database exists
 	 *
-	 * @param $databaseName
+	 * @param string $databaseName
 	 * @return boolean
 	 */
-	public static function databaseExists($databaseName): bool
+	public static function databaseExists(string $databaseName): bool
 	{
 		$stmt = App::get()->getDbConnection()->query('SHOW DATABASES');
 		while ($r = $stmt->fetch()) {
@@ -106,6 +106,28 @@ class Utils {
 
 		return false;
 	}
+
+	/**
+	 * Check if a user exists
+	 *
+	 * @param string $username
+	 * @return boolean
+	 */
+	public static function userExists(string $username): bool
+	{
+		$config = go()->getConfig();
+		$dsn = go()->createDsn('mysql');
+		$conn = new Connection(
+			$dsn, $config['db_user'], $config['db_pass']
+		);
+
+		return !!$conn
+			->selectSingleValue('User')
+			->from('user')
+			->where('User', '=', $username)
+			->single();
+	}
+
 
 	/**
 	 * Check if a table exists in the Group-Office database.

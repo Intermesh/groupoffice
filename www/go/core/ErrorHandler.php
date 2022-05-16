@@ -3,6 +3,7 @@
 namespace go\core;
 
 use ErrorException;
+use Exception;
 use go\core\util\DateTime;
 use Throwable;
 
@@ -63,6 +64,10 @@ class ErrorHandler {
 		if(!Environment::get()->isCli()) {
 			error_log($errorString, 0);
 		}
+
+		if(!go()->getDebugger()->enabled) {
+			return $errorString;
+		}
 		
 		App::get()->getDebugger()->error($errorString);
 
@@ -86,6 +91,21 @@ class ErrorHandler {
 	{
 		go()->error($str);
 		return error_log($str, 0);
+	}
+
+	/**
+	 * Log backtrace to main error log for debugging purposes.
+	 *
+	 * @return void
+	 */
+	public static function logBacktrace() {
+		$str = (new Exception())->getTraceAsString();
+
+		$lines = explode("\n", $str);
+
+		foreach($lines as $line) {
+			error_log($line, 0);
+		}
 	}
 
 	/**

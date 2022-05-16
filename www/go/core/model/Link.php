@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+
+/** @noinspection PhpUnused */
 
 namespace go\core\model;
 
@@ -9,17 +11,14 @@ use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\exception\SaveException;
-use go\core\db\Query as DbQuery;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
-use go\core\db\Table;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
-use go\modules\community\comments\model\Comment;
 
 /**
  * Link model
@@ -72,6 +71,21 @@ class Link extends AclItemEntity
 	
 	protected $aclId;
 
+	/**
+	 * @throws Exception
+	 */
+	public function getData(): ?array
+	{
+		if($this->toEntity == 'LinkedEmail') {
+			// NOTE!: This will only work because has_attachments is readonly modseq of this Link model will not be updated
+			// Use the client side EntityStore for newer modules
+			// Remove when Email module is ported to JMAP
+			$to = $this->findToEntity();
+			return ['has_attachments' => $to ? $to->has_attachments : 0];
+		}
+		return null;
+	}
+
 	protected $permissionLevel;
 	
 
@@ -89,11 +103,12 @@ class Link extends AclItemEntity
 	 * 
 	 * @return string eg. "Contact"
 	 */
-	public function getFromEntity() {
+	public function getFromEntity(): string
+	{
 		return $this->fromEntity;
 	}
 	
-	public function setFromEntity($entityName) {
+	public function setFromEntity(string $entityName) {
 		$e = EntityType::findByName($entityName);
 		$this->fromEntity = $e->getName();
 		$this->fromEntityTypeId = $e->getId();
@@ -113,7 +128,8 @@ class Link extends AclItemEntity
 	 * 
 	 * @return string eg. "Contact"
 	 */
-	public function getToEntity() {
+	public function getToEntity(): string
+	{
 		return $this->toEntity;
 	}
 
@@ -165,7 +181,8 @@ class Link extends AclItemEntity
 	 * @param string $entityType2
 	 * @return bool
 	 */
-	public function isBetween($entityType1, $entityType2) {
+	public function isBetween(string $entityType1, string $entityType2): bool
+	{
 		return (
 			($this->getToEntity() == $entityType1 && 	$this->getFromEntity() == $entityType2) ||
 			($this->getToEntity() == $entityType2 && $this->getFromEntity() == $entityType1)
@@ -216,11 +233,13 @@ class Link extends AclItemEntity
 	 *
 	 * @param Entity|ActiveRecord $a
 	 * @param Entity|ActiveRecord $b
-	 * @param string $description
+	 * @param string|null $description
+	 * @param bool $checkExisting
 	 * @return Link
+	 * @throws SaveException
 	 * @throws Exception
 	 */
-	public static function create($a, $b, $description = null, $checkExisting = true) {
+	public static function create($a, $b, string $description = null, bool $checkExisting = true) {
 		
 		$existingLink = $checkExisting ? static::findLink($a, $b) : false;
 		if($existingLink) {
@@ -251,7 +270,8 @@ class Link extends AclItemEntity
 	 * @param Entity|ActiveRecord  $b
 	 * @return boolean
 	 */
-	public static function linkExists($a, $b) {
+	public static function linkExists($a, $b): bool
+	{
 		return static::findLink($a, $b) !== false;
 	}
 	/**
@@ -274,7 +294,7 @@ class Link extends AclItemEntity
 	 * Find all links for a given entity
 	 *
 	 * @param Entity|ActiveRecord $a
-	 * @return Link[]
+	 * @return Link[]|Query
 	 */
 	public static function findLinks($a) {
 		return Link::find()->where([
@@ -285,46 +305,45 @@ class Link extends AclItemEntity
 
 	/**
 	 * Delete a link between two entities
-	 * 
-	 * Warning: This will not fire the Link::EVENT_DELETE
-	 * 
+	 *
+	 *
 	 * @param Entity|ActiveRecord $a
-	 * @param Entity|ActiveRecord  $b
+	 * @param Entity|ActiveRecord $b
 	 * @return boolean
+	 * @throws Exception
 	 */
-	public static function deleteLink($a, $b) {
+	public static function deleteLink($a, $b): bool
+	{
 		return self::deleteLinkWithIds($a->id, $a->entityType()->getId(), $b->id, $b->entityType()->getId());
 	}
-	
+
 	/**
 	 * Delete link with id and entity type id's
-	 * 
-	 * Warning: This will not fire the Link::EVENT_DELETE
-	 * 
-	 * @param int $aId
+	 *
+	 * @param int|int[] $aId
 	 * @param int $aTypeId
-	 * @param int $bId
+	 * @param int|int[] $bId
 	 * @param int $bTypeId
 	 * @return boolean
+	 * @throws Exception
 	 */
-	public static function deleteLinkWithIds($aId, $aTypeId, $bId, $bTypeId) {
-			if(!go()->getDbConnection()
-						->delete('core_link',[
+	public static function deleteLinkWithIds($aId, int $aTypeId, $bId, int $bTypeId): bool
+	{
+			if(!Link::delete([
 				'fromEntityTypeId' => $aTypeId,
 				'fromId' => $aId,
 				'toEntityTypeId' => $bTypeId,
 				'toId' => $bId,
-		])->execute()) {
+		])) {
 			return false;
 		}
 		
-		if(!go()->getDbConnection()
-						->delete('core_link',[
+		if(!Link::delete([
 				'fromEntityTypeId' => $bTypeId,
 				'fromId' => $bId,
 				'toEntityTypeId' => $aTypeId,
 				'toId' => $aId,
-		])->execute()) {
+		])) {
 			return false;
 		}
 		
@@ -404,10 +423,12 @@ class Link extends AclItemEntity
 		Acl::applyToQuery($query, 'search.aclId', $level, $userId, $groups);
 		return $query;
 	}
+
 	/**
 	 * Get the permission level of the current user
-	 * 
+	 *
 	 * @return int
+	 * @throws Exception
 	 */
 	public function getPermissionLevel(): int
 	{
@@ -514,7 +535,8 @@ class Link extends AclItemEntity
 	 * @return bool
 	 * @throws SaveException
 	 */
-	public static function copyTo($from, $to) {
+	public static function copyTo($from, $to): bool
+	{
 		go()->getDbConnection()->beginTransaction();
 		try {
 			foreach (Link::findLinks($from) as $link) {
@@ -523,7 +545,7 @@ class Link extends AclItemEntity
 				$copy->fromId = $to->id;
 
 				if (!$copy->save()) {
-					throw new SaveException();
+					throw new SaveException($copy);
 				}
 			}
 		} catch(Exception $e) {
@@ -548,9 +570,9 @@ class Link extends AclItemEntity
 		$offset = $faker->numberBetween(0, $searchCount);
 		$limit = min($searchCount - $offset, 2);
 
-		$search = Search::find()->limit($limit)->offset($offset);
+		$searches = Search::find()->limit($limit)->offset($offset);
 
-		foreach($search as $search) {
+		foreach($searches as $search) {
 			$entity = $search->findEntity();
 			if($entity && !$entity->equals($model)) {
 				Link::create($entity, $model);

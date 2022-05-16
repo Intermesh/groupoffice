@@ -34,7 +34,7 @@ class Authenticator extends PrimaryAuthenticator {
 		return Server::find()
 						->join('imapauth_server_domain', 'd', 's.id = d.serverId')
 						->where(['d.name' => $domain])
-						//->orWhere(['d.name' => '*'])
+						->orWhere(['d.name' => '*'])
 						->single();
 	}
 	
@@ -44,10 +44,16 @@ class Authenticator extends PrimaryAuthenticator {
 		go()->debug("Attempting IMAP authentication on ".$server->imapHostname);
 		
 		$connection = new Connection();
-		if(!$connection->connect($server->imapHostname, $server->imapPort, $server->imapEncryption == 'ssl')) {
+		if(!$connection->connect($server->imapHostname, $server->imapPort, $server->imapEncryption == 'ssl', 10, !$server->imapValidateCertificate)) {
 			throw new Exception("Could not connect to IMAP server");
 		}
-		
+
+		if($server->imapEncryption == 'tls') {
+			if(!$connection->startTLS()) {
+				throw new Exception("Could not enable TLS on " . $server->imapHostname .' at port ' .$server->imapPort);
+			}
+		}
+
 		$imapUsername = $server->removeDomainFromUsername ? explode('@', $username)[0] : $username;
 		
 		if(!$connection->authenticate($imapUsername, $password)) {

@@ -5,6 +5,8 @@ use Closure;
 use Exception;
 use go\core\data\ArrayableInterface;
 use go\core\data\Model;
+use go\core\http\Request;
+use go\core\jmap\Router;
 
 /**
  * Debugger class. All entries are stored and the view can render them eventually.
@@ -76,8 +78,16 @@ class Debugger {
 	 * @throws Exception
 	 */
 	public function __construct() {
-		if(!empty(go()->getConfig()['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')) {
+		if((isset($_REQUEST['r']) && $_REQUEST['r'] ==  'core/debug')) {
+			return;
+		}
+
+		if(!empty(go()->getConfig()['debug'])) {
 			$this->enable(go()->getConfig()['debug_log']);
+		} else if(!empty(go()->getConfig()['debug_usernames']) && is_array(go()->getConfig()['debug_usernames'])) {
+			if(go()->getAuthState() && ($user = go()->getAuthState()->getUser(['username'])) && in_array($user->username, go()->getConfig()['debug_usernames'])) {
+				$this->enable(go()->getConfig()['debug_log']);
+			}
 		}
 	}
 
@@ -108,6 +118,8 @@ class Debugger {
 		$this->entries[] = ['groupCollapsed', $name];
 		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
 		$this->groupStartTime = $this->getTimeStamp();
+
+		$this->internalLog("Method $name");
 	}
 
 	public function groupEnd(){
@@ -219,6 +231,20 @@ class Debugger {
 		
 	}
 
+	public function setRequestId($id) {
+		$this->requestId = $id;
+	}
+
+	private $requestId;
+
+	public function getRequestId() : string {
+		if(!isset($this->requestId)) {
+			$this->setRequestId(basename($_SERVER["SCRIPT_FILENAME"]));
+		}
+
+		return $this->requestId;
+	}
+
 	protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
 
 		if(is_array($mixed) || $mixed instanceof ArrayableInterface) {
@@ -230,7 +256,8 @@ class Debugger {
 		}	else {
 			$print = $mixed;
 		}
-		$line = '[' . $level . ']';
+
+		$line = '[' . date('Y-m-d H:i:s') . '][' . $this->getRequestId() . '][' . go()->getUserId(). '][' . $level . ']';
 		
 		if(isset($cls)) {
 			$line .= '[' . $cls .':'. $lineNo.']';
@@ -249,7 +276,7 @@ class Debugger {
 		}
 
 		 if($this->output) {
-		 	echo $line;
+		 	echo getmypid() . " " .$line;
 		 }
 
 		if(is_resource($this->logFp)) {

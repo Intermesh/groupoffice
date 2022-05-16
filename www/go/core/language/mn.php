@@ -722,7 +722,7 @@ return array (
   'Outgoing E-mail (SMTP)' => 'Гарах И-мэйл (SMTP)',
   'System e-mail' => 'Системийн и-мэйл',
   'Verify SSL certificate' => 'SSL гэрчилгээ баталгаажуулах',
-  'Some fields on this page can\'t be edited becuase they have been locked in the server configuration file.' => 'Энэ хуудасны зарим талбарууд серверийн тохиргооны файлд түгжигдсэн тул засах боломжгүй.',
+  'Some fields on this page can\'t be edited because they have been locked in the server configuration file.' => 'Энэ хуудасны зарим талбарууд серверийн тохиргооны файлд түгжигдсэн тул засах боломжгүй.',
   'No recurrence' => 'Давтамжгүй',
   'Weeks' => 'Долоо хоног',
   'Months by date' => 'Сар бүрийн тухайн огноогоор',

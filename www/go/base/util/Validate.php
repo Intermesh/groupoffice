@@ -172,7 +172,7 @@ class Validate {
 
 		$vies = new \SoapClient($wsdl);
 		
-		//lower the timeout becuase it can hang too long
+		//lower the timeout because it can hang too long
 		ini_set("default_socket_timeout", 5);
 
 		/**

@@ -22,6 +22,9 @@
 namespace GO\Base\Fs;
 
 
+use go\core\ErrorHandler;
+use go\core\fs\FileSystemObject;
+
 class File extends Base{
 	
 	
@@ -113,11 +116,14 @@ class File extends Base{
 	 * @return boolean 
 	 */
 	public function delete(){
-		
-		if(!file_exists($this->path))
+
+		FileSystemObject::checkDeleteAllowed(new \go\core\fs\File($this->path()));
+
+		if(!file_exists($this->path)) {
 			return true;
+		}
 		
-		if(self::$_allowDeletes)		
+		if(self::$_allowDeletes)
 			return unlink($this->path);
 		else{
 			$errorMsg = "The program tried to delete a file (".$this->stripFileStoragePath().") while File::\$allowDeletes is set to false.";
@@ -290,7 +296,7 @@ class File extends Base{
 			}
 		}
 
-		//if($this->exists()){ Don't use exists function becuase MemoryFile returns true but it does not exist on disk
+		//if($this->exists()){ Don't use exists function because MemoryFile returns true but it does not exist on disk
 		if(file_exists($this->path())){
 			if(function_exists('finfo_open')){
 					$finfo    = finfo_open(FILEINFO_MIME);
@@ -388,7 +394,8 @@ class File extends Base{
 			$newPath = $file->path();
 		} else{
 			if (file_exists($newPath)) {
-				throw new \Exception("File exists in move!");
+				ErrorHandler::log("File $newPath exists in move");
+				throw new \Exception("File ".$newFileName."exists in move!");
 			}
 		}
 		

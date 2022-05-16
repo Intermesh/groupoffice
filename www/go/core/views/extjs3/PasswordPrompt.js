@@ -65,7 +65,9 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 		go.PasswordPrompt.superclass.initComponent.call(this);
 	},
 	focus: function() {
+		setTimeout(() => {
 		this.passwordField.focus();
+		})
 	},
 	
 	okPressed: function () {

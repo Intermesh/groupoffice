@@ -4,7 +4,9 @@ namespace go\core\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
+use go\core\db\Expression;
 use go\core\exception\Forbidden;
+use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
@@ -94,7 +96,28 @@ class Group extends AclOwnerEntity {
 							if($value) {
 								$criteria->andWhere(['ug.userId' => $value]);	
 							}
-						});
+						})
+						->add('groupMember',function (Criteria $criteria, $value, Query $query){
+							//this filter doesn't actually filter but sorts the selected members on top
+							$query->join('core_user_group', 'ug_sort', 'ug_sort.groupId = g.id AND ug_sort.userId = ' . (int) $value, 'LEFT');
+							$query->orderBy(array_merge([new Expression('ISNULL(ug_sort.groupId) ASC')], $query->getOrderBy()));
+						})
+					->add('inAcl',function (Criteria $criteria, $value, Query $query) {
+
+						$type = EntityType::findByName($value['entity']);
+
+						if(!empty($value['default'])) {
+							$aclId = $type->getDefaultAclId();
+						} else{
+							$cls = $type->getClassName();
+							$aclId = $cls::find()->selectSingleValue($cls::$aclColumnName)->where('id', '=', $value['id'])->single();
+						}
+
+						//this filter doesn't actually filter but sorts the selected members on top
+						$query->join('core_acl_group', 'ag_sort', 'ag_sort.groupId = g.id AND ag_sort.aclId = ' . (int) $aclId, 'LEFT');
+						$query->orderBy(array_merge([new Expression('ISNULL(ag_sort.groupId) ASC')], $query->getOrderBy()));
+						$query->groupBy(['g.id']);
+					});
 						
 	}
 	

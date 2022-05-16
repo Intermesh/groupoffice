@@ -2,8 +2,10 @@
 
 namespace go\modules\community\history\model;
 
+use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\db\Criteria;
+use go\core\db\Query as DbQuery;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\db\Expression;
@@ -89,11 +91,19 @@ class LogEntry extends AclOwnerEntity {
 
 	public $remoteIp;
 
+	public $requestId;
+
 	protected function init()
 	{
 		if($this->isNew()) {
 			$this->remoteIp = Request::get()->getRemoteIpAddress();
+			$this->requestId = go()->getDebugger()->getRequestId();
 		}
+	}
+
+	protected function createAcl()
+	{
+	 //never create acl for log entry
 	}
 
 	public static function checkAcls()
@@ -138,18 +148,24 @@ class LogEntry extends AclOwnerEntity {
 
 	protected static function textFilterColumns(): array
 	{
-		return ['description'];
+		return ['description', 'entityId'];
+	}
+
+	protected static function search(Criteria $criteria, string $expression, DbQuery $query): Criteria
+	{
+		if(is_numeric($expression)) {
+			return $criteria->andWhere('entityId', '=', $expression);
+		} else{
+			return parent::search($criteria, $expression, $query);
+		}
 	}
 
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
-			->addDate('date', function(Criteria $q, $value){
-				$q->andWhere('data', $value);
-			})
 			->add('actions', function(Criteria $q, $value) {
 				if(!empty($value)) {
-					$actionsr = [];
+					$actions = [];
 					foreach ($value as $v) {
 						$actions[] = self::$actionMap[$v];
 					}
@@ -206,7 +222,7 @@ class LogEntry extends AclOwnerEntity {
 	 * Set the entity type
 	 *
 	 * @param Entity | ActiveRecord $entity "note", Entity $note or Entitytype instance
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function setEntity($entity) {
 		$this->entityTypeId = $entity->entityType()->getId();
@@ -232,6 +248,9 @@ class LogEntry extends AclOwnerEntity {
 		if($this->action != self::$actionMap['delete']) {
 			$this->removeAcl = false;
 		}
+
+		go()->debug("Changes for ". $this->entity.": " . $this->changes);
+
 		return parent::internalSave();
 	}
 }

@@ -622,7 +622,9 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		$build = $queryBuilder->buildSelect($this);
-		$build['start'] = go()->getDebugger()->getTimeStamp();
+		if($this->dbConn->debug) {
+			$build['start'] = go()->getDebugger()->getTimeStamp();
+		}
 
 		$stmt = $this->getDbConnection()->createStatement($build);
 		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
@@ -699,10 +701,10 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * 
 	 * @return array eg ['sql' => 'select...', 'params' => []]
 	 */
-	public function build(): array
+	public function build($prefix = ""): array
 	{
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
-		return $queryBuilder->buildSelect($this);
+		return $queryBuilder->buildSelect($this, $prefix);
 	}
 
 	/**

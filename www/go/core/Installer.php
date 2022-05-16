@@ -20,6 +20,7 @@ use go\core\model;
 use go\core\model\Group;
 use go\core\model\User;
 use go\core\orm\Entity;
+use go\core\orm\Property;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
 use PDO;
@@ -27,7 +28,6 @@ use PDOException;
 use go\core\model\Module as GoCoreModule;
 use GO\Base\Db\ActiveRecord;
 use go\core\model\Acl;
-use PHPUnit\Framework\ExpectationFailedException;
 
 class Installer {
 	
@@ -114,9 +114,9 @@ class Installer {
 		
 
 		//don't cache on install
-		App::get()->getCache()->flush(true, false);
-		$cacheCls = get_class(App::get()->getCache());
-		App::get()->setCache(new None());
+		go()->clearCache();
+		$cacheCls = get_class(go()->getCache());
+		go()->setCache(new None());
 
 
 		self::$isInstalling = true;
@@ -125,7 +125,7 @@ class Installer {
 		
 		jmap\Entity::$trackChanges = false;
 
-		$database = App::get()->getDatabase();
+		$database = go()->getDatabase();
 
 		if (count($database->getTables())) {
 			throw new Exception("Database is not empty");
@@ -134,7 +134,7 @@ class Installer {
 		$database->setUtf8();
 
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
-		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 		
 		$this->installGroups();
 
@@ -166,17 +166,17 @@ class Installer {
 			}
 		}
 
-		App::get()->getSettings()->systemEmail = $admin->email;
-		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
-		App::get()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
-		App::get()->getSettings()->save();
+		go()->getSettings()->systemEmail = $admin->email;
+		go()->getSettings()->databaseVersion = go()->getVersion();
+		go()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
+		go()->getSettings()->save();
 
-		App::get()->setCache(new $cacheCls);
+		go()->setCache(new $cacheCls);
 		go()->rebuildCache();
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
-		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 		self::$isInstalling = false;
 	}
 
@@ -232,7 +232,7 @@ class Installer {
 		$module = new model\Module();
 		$module->name = 'core';
 		$module->package = 'core';
-		$module->version = App::get()->getUpdateCount();
+		$module->version = go()->getUpdateCount();
 
 		//Share core with everyone
 		$module->permissions[Group::ID_EVERYONE] = (new model\Permission($module))
@@ -338,8 +338,28 @@ class Installer {
 		}
 	}
 
+	private function removeObsoleteModules() {
+		$stmt = go()->getDbConnection()->delete('core_module',
+			['name' =>
+				[
+					'cron',
+					'tools',
+					'log',
+					'calexceptiongrid',
+					'calignoreuuid',
+					'displaypermissions'
+				],
+				'package' => null
+			]);
+
+		$stmt->execute();
+
+	}
+
 	public function getUnavailableModules(): array
 	{
+		$this->removeObsoleteModules();
+
 		$modules = (new Query)
 						->select('name, package')
 						->from('core_module')
@@ -454,7 +474,7 @@ class Installer {
 
 		$this->disableUnavailableModules();
 
-		$lock = new Lock("upgrade");
+		$lock = new Lock("upgrade", false);
 		if (!$lock->lock()) {
 			throw new Exception("Upgrade is already in progress");
 		}
@@ -488,8 +508,8 @@ class Installer {
 		go()->setCache(new $cls);
 
 
-		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
-		App::get()->getSettings()->save();
+		go()->getSettings()->databaseVersion = go()->getVersion();
+		go()->getSettings()->save();
 
 		go()->rebuildCache();
 
@@ -503,7 +523,7 @@ class Installer {
 	
 		// Make sure core module is accessible for everyone
 		$module  = GoCoreModule::findByName("core", "core");
-		if(!isset($module->permisions[Group::ID_EVERYONE])) {
+		if(!isset($module->permissions[Group::ID_EVERYONE])) {
 			$everyone = new model\Permission($module);
 			$module->permissions[Group::ID_EVERYONE] = $everyone;
 			$module->save();

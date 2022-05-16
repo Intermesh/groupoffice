@@ -324,8 +324,13 @@ GO.email.EmailComposer = function(config) {
 	this.formPanel = new Ext.form.FormPanel({
 		border : false,		
 		waitMsgTarget : true,
-		cls : 'go-form-panel',		
-		layout:"border",
+		cls : 'go-form-panel',
+		desktop: {
+			layout: "border",
+		},
+		mobile: {
+			autoScroll: true
+		},
 		items : [{
 			region:"north",
 			layout:'form',
@@ -721,7 +726,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 //				{
 
 			var previousAccountRecord = cb.store.getById(cb.getValue());
-			if (this.templatesBtn.disabled == true) {
+			if (this.templatesBtn.disabled == true || this.showConfig.emailFromTemplate) {
 				//console.log('disable template changing');
 				// do not switch template when switching From addres
 			} else if (newAccountRecord.get('template_id')!=previousAccountRecord.get('template_id')){

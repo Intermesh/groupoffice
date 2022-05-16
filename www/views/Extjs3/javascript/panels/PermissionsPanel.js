@@ -174,7 +174,7 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 			}
 		],
 			fields:['id','name','displayName','level','isUserGroupFor'],
-			model_id: this.acl_id//GO.settings.user_id
+			model_id: this.acl_id
 		});
 
 		this.aclGroupsGrid.store.on("load", function(){

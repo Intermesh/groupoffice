@@ -47,7 +47,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		Ext.apply(this, {
 			items: [{
 				tpl: new Ext.XTemplate('<h3 class="title s8" style="{[values.color ? \'color:#\'+values.color : \'\']}">{title}</h3>\
-					<h4 class="status tasks-task-status-{progress}">{[go.modules.community.tasks.progress[values.progress]]}</h4>\
+					<h4 class="status {[this.progressColor(values.progress)]}-fill">{[go.modules.community.tasks.progress[values.progress]]}</h4>\
 				<p class="s6 pad">\
 					<label>'+t("Start at")+'</label><span>{[go.util.Format.date(values.start) || "-"]}</span><br><br>\
 					<label>'+t("Tasklist")+'</label><span><tpl for="tasklist">{name}</tpl></span><br><br>\
@@ -82,6 +82,15 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 					rruleToText: function(rrule) {
 						var fieldDummy = new go.form.RecurrenceField();
 						return fieldDummy.parseRule(rrule);
+					},
+					progressColor: function(p) {
+						return {
+							'needs-action': 'yellow',
+							'in-progress': 'blue',
+							'completed': 'green',
+							'failed': 'red',
+							'cancelled': 'bluegrey'
+						}[p] || 'cyan';
 					}
 				}),
 				listeners : {
@@ -155,16 +164,16 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				}
 			}),
 			'->',
-			{
+			this.editTaskBtn = new Ext.Button({
 				itemId: "edit",
 				iconCls: 'ic-edit',
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
-					var taskEdit = new go.modules.community.tasks.TaskDialog();
+					const taskEdit = new go.modules.community.tasks.TaskDialog();
 					taskEdit.load(this.data.id).show();
 				},
 				scope: this
-			},
+			}),
 
 			new go.detail.addButton({
 				detailView: this

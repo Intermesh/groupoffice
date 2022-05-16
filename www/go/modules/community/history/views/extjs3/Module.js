@@ -5,7 +5,21 @@ go.Modules.register("community", "history", {
 		name:'LogEntry',
 		relations: {
 			creator: {store: 'User', fk:'createdBy'}
-		}
+		},
+		filters: [
+			{
+				wildcards: false,
+				name: 'text',
+				type: "string",
+				multiple: false,
+				title: "Query"
+			},
+			{
+				title: t("Entity ID"),
+				name: 'entityId',
+				multiple: true,
+				type: 'number'
+			}]
 	}],
 	actionTypes: [
 		"create",

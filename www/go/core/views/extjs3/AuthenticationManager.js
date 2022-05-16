@@ -194,7 +194,7 @@ go.AuthenticationManager = (function () {
 
 		onAuthenticated: function (result, username, password) {
 			
-			go.User.setAccessToken(result.accessToken, go.AuthenticationManager.rememberLogin);
+			go.User.setAccessToken(result.accessToken);
 
 			if(this.loginPanel) {
 				this.loginPanel.destroy();
@@ -222,10 +222,15 @@ go.AuthenticationManager = (function () {
 		 * @param message
 		 * @return {Promise}
 		 */
-		passwordPrompt : function(title, message) {
+		passwordPrompt : function(title, message, closable) {
+
+			if (closable == undefined) {
+				closable = true;
+			}
 			return new Promise((resolve, reject) =>
 			{
 				const passwordPrompt = new go.PasswordPrompt({
+					closable: closable,
 					width: dp(450),
 					text: message,
 					title: title,

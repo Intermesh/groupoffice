@@ -18,7 +18,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 						->select("t.id,t.host,t.user_id,t.username,t.smtp_host,a.email, a.name")
-						->searchFields(array('a.email','a.name','t.host'))
+						->searchFields(array('a.email','a.name','t.host','t.username', 't.smtp_host'))
 						->joinModel(array(
 				'tableAlias' => 'a',
 				'model' => 'GO\Email\Model\Alias',
@@ -52,9 +52,9 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 		$response['data']['password']='';
 		$response['data']['smtp_password']='';
 
+
 		$alias = $model->getDefaultAlias();
 
-//		$response['data']['mbroot'] = trim($response['data']['mbroot'], './');
 
 		$response['data']['email'] = $alias->email;
 		$response['data']['name'] = $alias->name;
@@ -517,6 +517,8 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 	{
 		$srcMessages = json_decode($params['srcMessages']);
 
+		$move = !empty($params['move']);
+
 		foreach ($srcMessages as $srcMessageInfo) {
 			$srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
 			$srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
@@ -527,15 +529,25 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 				throw new \GO\Base\Exception\AccessDenied();
 			}
 
-			$targetImapConnection = $targetAccountModel->openImapConnection($params["targetMailboxPath"]);
-			
-			$flags = '';
-			
-			if($srcMessageInfo->seen) {
-				$flags = '\SEEN';
-			}
+			if($move && $targetAccountModel->id == $srcAccountModel->id) {
+				$conn = $srcAccountModel->openImapConnection( $srcMessageInfo->mailboxPath);
 
-			$targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
+				$conn->move([$srcImapMessage->uid],$params["targetMailboxPath"]);
+
+			} else {
+				$targetImapConnection = $targetAccountModel->openImapConnection($params["targetMailboxPath"]);
+
+				$flags = '';
+
+				if ($srcMessageInfo->seen)
+					$flags = '\SEEN';
+
+				$targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
+
+				if ($move) {
+					$srcImapMessage->delete();
+				}
+			}
 		}
 
 		return array('success'=>true);

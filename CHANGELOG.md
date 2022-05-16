@@ -1,7 +1,297 @@
+6.6.87
+- Newsletters: any user with manage permissions can pause a newsletter
+- Leavedays: In holiday request summary render dates correctly when date == today
+- Tickets: IMAP import display ticket type upon error
+- Core: Polish translations
+- Calendar: raised timeout settings for server and client to 5 minutes for sending invitation e-mails.
+
+13-05-2022 6.6.86
+- Core: Token dates could be saved in user timezone instead of UTC by old framework.
+- Core: Used unnamed parameters in queries for better performance with mysql native driver
+  (without PDO::ATTR_EMULATE_PREPARES) and large inserts
+
+12-05-2022 6.6.85
+- Core: Bugfix when saving new Custom Field to existing entity
+- Core: Don't check IP for authentication on CLI
+- Projects: Search in all folders by default. Added 'All projects' node.
+- Projects: Load default status from template
+- Core: Handle deadlocks and write changes more efficiently
+
+10-05-2022 6.6.84
+- Caldav: filter tasklists by role 'list'
+- Core: Fixed error 'File exists in move!' in assistant
+- Core: fixed pps.svg missing error
+- History: Added request ID to history log
+- Core: Protect root folders from deletion
+
+09-05-2022 6.6.83
+- Core: fixed clearing default ACL's when used
+- Core: Improved debug.log
+- Files: Fixed empty error on delete folder from context menu
+- Newsletters: Add delete button for individual newsletters
+- Leavedays: Fixed manage permissions check in 6.6
+- Assistant: Open file without re-authenticate in Group-Office Assistant 1.20.
+
+03-05-2022 6.6.82
+- Core: fixed concurrency problem in clearing disk cache
+- Calendar: In Compact theme the first calendar selection would lead to an event 15 mins too early.
+- Tasks: Fixed render issue in alerts
+- Tasks: Fixed issue where alert wouldn't display during sessiojn
+- Core: selected users not on top for non admins in group dialog
+- Leavedays: uninstall left two tables
+- Core: remove slashes from tel: links. tel://12435 -> tel:12345
+- Core: Fixed JMAP sync errors
+- History: Show and search for entity ID
+- Tasks: Fixed disappearing panel
+- LDAP: Convert email and username to lower case
+- Core: fixed moving modules when they got database updates
+
+02-05-2022 6.6.81
+- Addressbook: fix install script, add support bank related fields to contact
+- Billing: bugfix in product sales order export
+- Time tracking: Search in activity type field
+- Core: Saving an item could cause infinite loop leading to a freeze and high server load. This happened when changes
+  were made to an ACL
+- Files: Download PDF via Right click on file replaced Group-Office tab in firefox. Due to Firefox bug:
+  https://bugzilla.mozilla.org/show_bug.cgi?id=1759916
+
+22-04-2022 6.6.80
+- Core: cli commands check for unsupported parameters
+- Email: Portlet folders always connected to imap on load even on deleting users
+
+22-04-2022 6.6.79
+- LDAP: Only connect to IMAP for new accounts when syncing users
+- Core: modules unsorted
+- Core: Fixed cron grid not updating after save
+
+21-04-2022 6.6.78
+- Tickets: Added close button next to new message button and made new message button larger
+- History: Assign login entry to the user that logs in instead of admin
+- Tickets: Added {ticket:type} template variable
+- Core: fixed inefficient way of loading group members and sharing panels
+- Core: fixed lock problem: sem_release(): failed to release key 0x6bd7e64: Invalid argument
+- Fixed: GO version 6.6.x: Search in cyrillic does not work #834
+- Calendar: Fixed reminder not removed when snoozing
+- Core: reload on Foo/changes exception (cannotcalculatechanges)
+- Core: JMAP missing change entries on deletes
+- Core: Don't dismiss notifications when desktop notifications are closed because firefox doesn't keep them. They are
+   auto closed in a few seconds :(
+- Core: Fixed grids jump to top when changes were detected
+
+14-04-2022 6.6.77
+- Core: rewrote procedure to reset or add groups to all acl's of a type to make it a lot faster and use less resources.
+- History: cleanup unnecessary ACL entries created by bug query adjusted so it works in mysql 5.7 too.
+- Core: removed inline style that was incorrect in the Dark theme
+
+13-04-2022 6.6.76
+- History: cleanup unnecessary ACL entries created by bug
+
+13-04-2022 6.6.75
+- Mail: Could not create folder error on accessing subfolders
+- History: login not logged
+
+13-04-2022 6.6.74
+- Core: inifinite loop problem in rebuilding search cache
+
+13-04-2022 6.6.73
+- SMIME: Fixed incorrect attachment size for some smime messages
+- Core: Fixed replacing hasOne properties
+- Core: Changes are pushed at the end to avoid dead locks. This fixes random deadlock problem with LDAP sync.
+- Tasks: Sort and filtering on task categories caused sql error
+- Tasks: fixed categories not loading for selected tasklist on dialog open
+- Comments: fixed missing background color
+- Tasks/addressbook/notes: Fixed add button was disabled if you had create permission but no write permissions
+- Task: Assigned to field lists only users that have write permissions to the task
+- googleauthenticator: force could be circumvented by reloading browser and then close password dialog
+- googleauthenticator: include username in title
+- Core: Dark mode text in email autocomplete not visible
+- Core: non admins with permissions to edit groups no longer see the modules tab
+- Core: rebuild search script could store incorrect ACL's
+- Projects: Ability to make templates writable
+
+11-04-2022 6.6.72
+- Files: Search was incomplete
+- Core: CLI and web cache could be different because apcu is not used on CLI
+- Tickets: inconsistency in permission check for reopening tickets
+- Newsletters: export distribution report for sent newsletters
+- Newsletters: minor tweaks
+
+08-04-2022 6.6.71
+- Core: Fixed double save problem in sync settings
+
+08-04-2022 6.6.70
+- Addressbook: fix for contactId doesn't have a default value
+- History: Changes of arrays not logged with old value
+
+08-04-2022 6.6.69
+- Core: Performance optimization. When array type relations are overwritten with identical values it's no longer
+   detected as a modification. This caused every login from LDAP via activesync to log two redundant changes for user and
+   it's associated contact.
+- Email: Fixed grouping in email for today broken
+- Filesearch: Fixed empty result for admins
+- Newsletters: Attachment could disappear after reopening composer
+
+07-04-2022 6.6.68
+- Core: Fixed modified at dates setting to current time when resetting search cache.
+- Addressbook: Default address book wasn't set when creating from an item
+- Core: Fixed: After upgrade from 6.6.66 to 6.6.67 got a ErrorException #825 and
+   GO 6.6.67 install throws php-error on php 8 #824
+- Core: Callback not called if statemismatch occurred causing settings dialog not to save.
+- Googleauthenticator: Fixed message asking to load changes because enity has been modified by someone else
+- Email: Fixed grey text on white background in e-mail in Dark theme
+- Core: Just show time if it's today when using short dates
+
+05-04-2022 6.6.67
+- Core: Reset search cache doesn't delete existing records but updates them one by one so the links and search results
+  won't disappear for the users.
+- Core: Search handles e-mail addresses differenty. Domain names can be searched.
+- Core: module Permissions incorrectly returned from server
+- OnlyOffice: New permission 'mayEdit' to replace required manage permission
+
+05-04-2022 6.6.66
+- Email: All accounts were shown to admins
+- Projects: Fix html entities in Template events names and descriptions
+- OldCore: Permissions tab will not show disabled users
+
+04-04-2022 6.6.65
+- Files: Fix file search paging
+- Projects: Fixed projects overview reports
+- Tickets: fix close and open menu available without permission
+
+31-03-2022 6.6.64
+- Core: Custom field date correction caused error on disabled modules.
+
+31-03-2022 6.6.63
+- Projects: disable add / edit buttons in time entry grid if project is complete
+- Core: save and display new style cronjobs correctly as per default timezone
+- Core: Updated Deutsch translations. Danke, Daniel!
+- Core: Updated Bulgarian translations. Благодарим ви Nikolay!
+- Core: Complete rebuild of search cache on update at midnight
+- Core: Correct invalid date field values (0000-00-00 => null)
+- Email: Fixed mail rendering issue with defaults on p,div and span for line-height
+- Smime: fixed opening attachments on signed / encrypted mails
+- Email: fixed message grid not loading if inbox is collapsed
+
+29-03-2022 6.6.62
+- LDAPAuthenticator: New options to delete users and or groups on sync
+- Files: fixed migration error when folders had to be moved to new location
+- Email: Added move email to option in context menu
+
+29-03-2022 6.6.61
+- Projects: Refactored task editing from projects tasks tab
+- Core: fixed type error where float should be int
+- Projects: Lines between  time entries per activity type
+
+29-03-2022 6.6.60
+- Core: let cron jobs run in default time zone
+- Core: only show yes no field in detail panel when value is set
+- Core: Fixed deadlock problem with JMAP sync modseq values
+- Core: Block concurrent Foo/Set requests to make sure clients don't miss state
+- Core: If Foo/set throws statematch the client retries automatically.
+- Core: Locking with semaphore functions if available
+- Projects: when saving a task from a project template set current TZ
+- Core: Remember UI state on mobile
+- Newsletters: validate template before sending newsletter
+- Core: Added CLI commands to remove groups and users
+- Core / Email: When pasting HTML inline the styles from the head. FIxes paste from excel styling.
+
+25-03-2022 6.6.59
+- Core: bugfix saving ACL groups
+- ldapauth: fixed delete output in dry run
+- Core: Fixed error in getting permission level when not logged in
+- SMIME: Fixed printing on smime error
+- SMIME: Do OCSP check on stored public certificates too
+- Email: Auto grow html editor in email composer on mobile mode
+- Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
+  For example foo/bar can be found with "foo/bar", "foo" and "bar"._
+  Note: A rebuild is required to make it work on existing entries. The upgrade schedules this at midnight.
+- core: update chinese translation. Thanks bin wu!
+- Files: New permission to show main screen or not. This was it's possible to use files only for other items like
+  project, contacts etc.
+- Core: Database check fixes AclOwnerEntity without ACL set
+- Tickets: Refresh button in display panel
+- Core: Permissions to change groups and or users only allow to edit existing groups. You can't creaye new ones.
+
+23-03-2022 6.6.58
+- Projects: bugfix do not set default task list in tasklist combo
+- Core: Fixed can't find related ACL entity error
+- SMIME: Added 5s timeout to openssl OCSP command
+- EMail: Accounts can be searched on username and smtp_host too
+
+22-03-2022 6.6.57
+- Tasks: linked tasks show description in title column if applicable
+- Core: Performance optimizations
+- Smime: Don't check permissions on sending a system message with smime
+- Notes: added "name" and "content" filter to client
+- Email: Fixed error message when hitting refresh lots of times in the email module
+- Projects: fix template event 'Task' in case of due date
+- Projects: disable 'time registration' button for completed projects
+- Projects: do not check for budgeting permissions if no budgets set
+- Core: fixed relative url's in module stylesheets
+- Addressbook: Added tiktok and instagram url types
+- Core: When an update is installed. The system shows a system unavailable message instead of lauching the upgrade page
+- Core: link browser remembers entity selection
+- Addressbook: (re-?)add search to addressbook SelectDialogPanel
+- SMIME: Show invalid certificate details instead of openssl error
+- SMIME: Fixed unkwown sender problem
+- Email: Fixed infinite loop when starttls failed
+- Newsletters: address lists sortable
+- ActiveSync: Z-push script timeout set to 3600 instead of unlimited
+- SMIME: Fixed error viewing public certificates
+- Core: implemented $config['debug_usernames'] = ['demo'];
+- Projects: Refresh task list panel upon deleting tasklist
+
+20-03-2022 6.6.56
+- Core: GO::$db was accessed directly causing various errors
+
+20-03-2022 6.6.55
+- Core: enter key on grid did not open edit dialog
+- Tasks: Sorting by 'responsible' and 'categories' works
+- Core: SMIME sign via config.php failed with error
+- Core: Yes no field renders empty in grid if not set.
+- IMAP Authenticator: Allow wildcard and only enable TLS if set in config
+- Core: trim username on login
+- Email: fixed error when css contained @keyframes.
+- Core: DB connection disconnect was broken due to caching of statements
+
+15-03-2022 6.6.54
+- Core: when using SMIME signing in the config.php it failed on a certificate failure
+- Tasks: Portlet uses standard tasks grid and sorts on start date by default
+- Core: Fixed: Error: Call to a member function getUser() on null in /usr/share/groupoffice/go/core/Language.php:121
+- Newsletters: Fixed default sort on 'name' not working anymore
+- Core: removed obsolete modules 'log', 'tools' and 'cron'
+
+15-03-2022 6.6.53
+- Core: Don't delete module when other modules depend on it.
+- Core: When uninstall model failed the screen updated as if it succeeded
+- History: fixed property 'id' doesn't exist error
+- Core: open "lostPasswordURL" in new window.
+
+14-03-2022 6.6.52
+- Addressbook: Added 'load more' butten to SelectDialogPanel
+- History: Custom fields are logged now too.
+- Smime: fixed upload certificate with error 'Certificate already exists'
+- Email: fixed &amp; in sent items folder list
+
+11-03-2022 6.6.51
+- Projects: Added state to all collapsible panels
+- Projects: Added fees to time per activity
+
+10-03-2022 6.6.50
+- Tasks: reorganized fields and fixed category select bug
+- Core: Upgrade from 6.5 to 6.6 didn't work on CLI
+- Core: Fixed: Login via AccessToken or ApiKey throws SSE error #816
+- Imap authenticator: Add STARTTLS support to IMAP Authenticator module #815
+- Core: changed new message sound
+- Core: Selected row color has priority over hover color
+- Core: Fixed searching for : token enclosed in "". For example "%foo:bar%"
+- Tasks: Fixed invalid filter tasklistid and added title
+
 08-03-2022 6.6.49
 - Core: updated German Translation. Thanks Peter!
 - Core: fixed merge reusing id's and created unittest for it
 - ActiveSync: catch access denied exception in getFolder()
+- Tasks: bugfix 'until' for repeating tasks
 
 03-03-2022 6.6.48
 - Core: Optimize 'optimizer_search_depth' for global search queries.
@@ -202,6 +492,25 @@
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+05-04-2022 6.5.108
+- Email: All accounts were shown to admins
+
+04-04-2022 6.5.107
+- Core: extended search index with words separated by -,_,\ or /. They will be cached joined and separated.mode
+  For example foo/bar can be found with "foo/bar", "foo" and "bar"._
+  Note: A rebuild is required to make it work on existing entries.
+- Files: Fixed file search paging
+- Tickets: fix close and open menu available without permission
+
+22-03-2022 6.5.106
+- Core: Optimize 'optimizer_search_depth' for global search queries.
+
+22-03-2022 6.5.105
+- Core: updated PT-BR translations. Thank you George!
+- Core: updated CN translations. Thank you Cheng Yupeng!
+- Core: ActiveSync timeout set to 3600 seconds
+- Email: if starttls failed an infite loop could occur
 
 03-03-2022 6.5.104
 - Leavedays: add several missing columns to report CSV, fix sort order, fix calculation

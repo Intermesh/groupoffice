@@ -19,6 +19,37 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 	},
 
+
+	onTaskListChange : function(combo, val) {
+
+		if(!Ext.isNumber(val)) {
+			return; //some bug calling this with string
+		}
+		const categories = this.formPanel.form.findField('categories');
+		categories.comboStore.setFilter("tasklistId", {
+			operator: "OR",
+			conditions: [
+				{tasklistId: val},
+				{global: true},
+				{ownerId: go.User.id}
+			]
+		});
+		//reloads combo when trigger is clicked
+		delete categories.comboBox.lastQuery;
+
+
+		go.Db.store("Tasklist").single(val).then((tasklist) => {
+			this.userCombo.store.setFilter("acl", {
+				aclId: tasklist.aclId,
+				aclPermissionLevel: go.permissionLevels.write
+			});
+
+			delete this.userCombo.lastQuery;
+		}).catch((e) => {
+			console.error(e);
+		})
+	},
+
 	initFormItems: function () {
 
 		// this.taskCombo = new go.modules.community.tasks.TaskCombo({});
@@ -109,6 +140,8 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			value: 0
 		});
 
+
+
 		const propertiesPanel = new Ext.Panel({
 			hideMode : 'offsets',
 			//title : t("Properties"),
@@ -116,14 +149,15 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			layout : 'form',
 			autoScroll : true,
 			items : [{
-				xtype: "fieldset",
+				xtype: "container",
+				layout: "form",
 				defaults : {
 					anchor : '100%'
 				},
 				labelWidth:90,
 				items:[
 					{
-						xtype: 'container',
+						xtype: 'fieldset',
 						layout: 'column',
 						items: [
 							{
@@ -137,110 +171,148 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 							{xtype: 'colorfield', emptyText:'color', name: 'color', columnWidth:.1}
 						]
 					},{
-						xtype:'container',
-						layout:'column',
-						defaults: {
-							layout: 'form',
-							xtype:'container',
-							labelAlign:'top'
-						},
-						mobile : {
-							items:[
+						xtype:'fieldset',
+						// collapsible: true,
+						// title: t("Schedule"),
+
+
+						items: [
+							{
+								layout:'column',
+								defaults: {
+									layout: 'form',
+									xtype:'container',
+									labelAlign:'top'
+								},
+								mobile : {
+									items:[
+										{
+											columnWidth: .5,
+											items: [start,due, priority]
+										},
+										{
+											columnWidth: .5,
+											items: [progress, estimatedDuration, percentComplete]
+										}
+									]
+								},
+								items:[
+									{
+										columnWidth: .35,
+										items: [start,due]
+									},
+									{
+										columnWidth: .35,
+										items: [progress, estimatedDuration]
+									},
+									{
+										columnWidth: .3,
+										items: [priority, percentComplete]
+									}
+								],
+							},
+							this.recurrenceField = new go.form.RecurrenceField({
+								anchor: "100%",
+								name: 'recurrenceRule',
+								hidden: this.hideRecurrence,
+								disabled: true,
+							})
+						]
+					},
+					{
+						xtype: "fieldset",
+						// collapsible: true,
+						// title: t("Assignment"),
+						items: [{
+							layout: "hbox",
+							items: [
 								{
-									columnWidth: .5,
-									items: [start,due, priority]
+									style: "padding-right: 8px",
+									layout: "form",
+									xtype: "container",
+									flex: 1,
+									items: [
+										this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
+											listeners: {
+												change: this.onTaskListChange,
+												setvalue: this.onTaskListChange,
+												scope: this
+											}
+										})
+									]
 								},
 								{
-									columnWidth: .5,
-									items: [progress, estimatedDuration, percentComplete]
-								}
-							]
-						},
-						items:[
-							{
-								columnWidth: .35,
-								items: [start,due]
-							},
-							{
-								columnWidth: .35,
-								items: [progress, estimatedDuration]
-							},
-							{
-								columnWidth: .3,
-								items: [priority, percentComplete]
-							}
-						]
-					},
-					{
-						xtype: "container",
-						layout:"hbox",
-						items:[
-							{
-								style: "padding-right: 8px",
-								layout: "form",
-								xtype: "container",
-								flex: 1,
-								items: [
-									this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
-										listeners: {
-											change: (combo, val) => {
-												const categories = this.formPanel.form.findField('categories');
-												categories.comboStore.setFilter("tasklistId", {tasklistId: val});
-												//reloads combo when trigger is clicked
-												delete categories.comboBox.lastQuery;
-											}
-										}
-									})
+									layout: "form",
+									xtype: "container",
+									flex: 1,
+									items: [
+										this.userCombo = new go.users.UserCombo({
+											fieldLabel: t('Responsible'),
+											hiddenName: 'responsibleUserId',
+											anchor: '100%',
+											allowBlank: true,
+											value: null
+										})
 									]
+								}]
+						},
+						{
+							xtype: "chips",
+							entityStore: "TaskCategory",
+							comboStoreConfig: {
+								filters: {
+									tasklistId: {
+										operator: "OR",
+										conditions: [
+											{tasklistId: this.tasklistCombo.getValue()},
+											{global: true},
+											{ownerId: go.User.id}
+										]
+									}}
 							},
-							{
-								layout: "form",
-								xtype: "container",
-								flex: 1,
-								items: [
-									this.userCombo = new go.users.UserCombo({
-										fieldLabel: t('Responsible'),
-										hiddenName: 'responsibleUserId',
-										anchor: '100%',
-										allowBlank: true
-									})
-								]
-							}
-						]
+							displayField: "name",
+							valueField: 'id',
+							name: "categories",
+							fieldLabel:t("Category", "tasks")
+						}]
 					}
 					,
-					this.recurrenceField = new go.form.RecurrenceField({
-						name: 'recurrenceRule',
-						hidden: this.hideRecurrence,
-						disabled: true,
-					}),
+
 					{xtype:'hidden', name: 'groupId'},
+
 					{
-						xtype: "chips",
-						entityStore: "TaskCategory",
-						comboStoreConfig: {
-							filters: {tasklistId: {tasklistId:this.tasklistCombo.getValue()}}
+						xtype: "fieldset",
+						// collapsible: true,
+						// title: t("Other"),
+						defaults : {
+							anchor : '100%'
 						},
-						displayField: "name",
-						valueField: 'id',
-						name: "categories",
-						fieldLabel:t("Category", "tasks")
-					},{
-						xtype:'textarea',
-						name : 'description',
-						//allowBlank : false,
-						fieldLabel : t("Description"),
-						grow: true
+						items: [
 
-					},{
-						xtype:'textarea',
-						name : 'location',
-						allowBlank : true,
-						fieldLabel : t("Location"),
-						grow: true
+							{
+								xtype: 'textarea',
+								name: 'description',
+								//allowBlank : false,
+								fieldLabel: t("Description"),
+								grow: true
 
+							}, {
+								xtype: 'textarea',
+								name: 'location',
+								allowBlank: true,
+								fieldLabel: t("Location"),
+								grow: true
+
+							}
+							]
 					},
-					new go.modules.community.tasks.AlertFields()
+
+					{
+						xtype: "fieldset",
+						// collapsible: true,
+						title: t("Alerts"),
+						items: [new go.modules.community.tasks.AlertFields()]
+					}
 				]
 			}]
 		});

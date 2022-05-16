@@ -11,7 +11,5 @@ class UserTest extends TestCase {
 		$props = $user->toArray();
 		
 		$this->assertArrayHasKey('username', $props);
-		
-		
 	}
 }

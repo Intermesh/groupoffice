@@ -16,7 +16,7 @@ class Extjs3 {
 
 	
 	public function flushCache() {
-		return App::get()->getDataFolder()->getFolder('clientscripts')->delete();
+		return App::get()->getDataFolder()->getFolder('cache/clientscripts')->delete();
 	}
 
 	private $cssFile;
@@ -32,7 +32,7 @@ class Extjs3 {
 			return $this->cssFile;
 		}
 
-		$cacheFile = go()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
+		$cacheFile = go()->getDataFolder()->getFile('cache/clientscripts/' . $theme . '/style.css');
 		$debug = go()->getDebugger()->enabled && $cacheFile->exists();
 		if ($debug || !$cacheFile->exists()) {
 			$modules = Module::getInstalled(['id', 'name', 'package']);
@@ -120,7 +120,7 @@ class Extjs3 {
 		$iso = \go()->getLanguage()->getIsoCode();
 	
 		
-		$cacheFile = go()->getDataFolder()->getFile('clientscripts/lang_'.$iso.'.js');
+		$cacheFile = go()->getDataFolder()->getFile('cache/clientscripts/lang_'.$iso.'.js');
 
 		if (!$cacheFile->exists()) {
 //		if (!$cacheFile->exists()) {
@@ -188,6 +188,10 @@ class Extjs3 {
 		$firstParent = basename($path);
 		if($firstParent == 'install' || $firstParent == 'api') {
 			$path = dirname($path);
+		}
+
+		if($firstParent == 'Extjs3') {
+			$path = dirname($path, 2);
 		}
 
 		return rtrim($path, '/') . '/';

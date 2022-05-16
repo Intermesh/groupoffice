@@ -17,18 +17,26 @@ class PushDispatcher
 {
 	use EventEmitterTrait;
 
-	const MAX_LIFE_TIME = 120;
+	/**
+	 * Event fired at every time the pushdispatcher checks the state for changes
+	 */
 	const EVENT_INTERVAL = 'interval';
+	/**
+	 * Life time of the SSE request in seconds
+	 */
+	const MAX_LIFE_TIME = 120;
 
-	private $interval;
+
+	/**
+	 * Interval in seconds between every check for changes to push
+	 */
+	const CHECK_INTERVAL = 30;
 
 	private $map = [];
 	private $entityTypes = [];
 
 	public function __construct($types)
 	{
-		$this->interval = go()->getDebugger()->enabled ? 5 : 30;
-
 		//Hard code debug to false to prevent spamming of log.
 		go()->getDebugger()->enabled = false;
 
@@ -38,6 +46,7 @@ class PushDispatcher
 			$entityNames = explode(",", $_GET['types']);
 			$query->where('e.clientName', 'IN', $entityNames);
 		}
+
 		$entities = EntityType::findAll($query);
 		foreach($entities as $e) {
 			$this->map[$e->getName()] = $e->getClassName();
@@ -49,10 +58,10 @@ class PushDispatcher
 
 	/**
 	 * Only use this method in the event listeners that are attached to this dispatcher
-	 * @param $type string type of SSE event
-	 * @param $data mixed a jsonSerializable object
+	 * @param string $type string type of SSE event
+	 * @param mixed $data mixed a jsonSerializable object
 	 */
-	public function sendMessage($type, $data) {
+	public function sendMessage(string $type, $data) {
 		echo "event: $type\n";
 		echo 'data: ' . json_encode($data). "\n\n";
 
@@ -63,7 +72,8 @@ class PushDispatcher
 		flush();
 	}
 
-	private function checkChanges() {
+	private function checkChanges(): array
+	{
 		$state = [];
 		foreach ($this->map as $name => $cls) {
 			$cls::entityType()->clearCache();
@@ -74,7 +84,8 @@ class PushDispatcher
 	}
 
 
-	private function diff($old, $new) {
+	private function diff($old, $new): array
+	{
 
 		$diff = [];
 
@@ -87,12 +98,12 @@ class PushDispatcher
 		return $diff;
 	}
 
-	public function start($ping = 10) {
+	public function start(int $ping = 10) {
 		$sleeping = 0;
 		$changes = $this->checkChanges();
 
 		$start = time();
-		for($i = 0; $i < self::MAX_LIFE_TIME; $i += $this->interval) {
+		for($i = 0; $i < self::MAX_LIFE_TIME; $i += self::CHECK_INTERVAL) {
 			// break the loop if the client aborted the connection (closed the page)
 			if(connection_aborted()) {
 				break;
@@ -116,8 +127,9 @@ class PushDispatcher
 
 			go()->getDbConnection()->disconnect();
 
-			$sleeping += $this->interval;
-			time_sleep_until($start+$i+$this->interval);
+			$sleeping += self::CHECK_INTERVAL;
+
+			time_sleep_until($start + $i + self::CHECK_INTERVAL);
 		}
 	}
 }

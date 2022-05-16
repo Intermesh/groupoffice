@@ -250,7 +250,11 @@ abstract class ImapBase {
 				if (!is_resource($this->handle)) {
 					break;
 				}
-				$result[$n] .= fgets($this->handle, $line_length);
+				$chunk = fgets($this->handle, $line_length);
+				if($chunk === false) {
+					break 2;
+				}
+				$result[$n] .= $chunk;
 				$current_size += strlen($result[$n]);
 				if ($max && $current_size > $max) {
 					$this->max_read = true;		

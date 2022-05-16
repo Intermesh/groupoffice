@@ -464,13 +464,11 @@ class Session extends Observable{
         throw new \Exception("Could not set token");
       }
     }
-		
-		
-		if (!empty(\GO::config()->debug_usernames)) {
-			$usernames = explode(',',\GO::config()->debug_usernames);
-			if (in_array(\GO::user()->username,$usernames))
-				\GO::config()->debug=true;
 
+		if (!empty(\GO::config()->debug_usernames)) {
+			if (in_array(\GO::user()->username, \GO::config()->debug_usernames)){
+				go()->getDebugger()->enable(true);
+			}
 		}
 	}
 	

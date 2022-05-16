@@ -72,7 +72,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 				fakeLinkConfigs.push({id: m.name, entity: m.name, title: m.title});
 		});
 		this.entityGrid = new go.modules.community.history.TypeGrid({
-			savedSelection: "history",
+			// savedSelection: "history",
 			autoHeight: true,
 			entities: fakeLinkConfigs
 		});

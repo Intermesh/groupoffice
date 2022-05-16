@@ -4,45 +4,46 @@ namespace go\core\jmap;
 use Exception;
 use GO\Base\Model\State as OldState;
 use go\core\ErrorHandler;
+use go\core\http\Response as HttpResponse;
 use go\core\model\Module;
 use go\core\model\Token;
 use go\core\auth\State as AbstractState;
-use go\core\http\Response;
 use go\core\model\User;
 use PDO;
 use stdClass;
 
 class State extends AbstractState {
 	
-	private static function getFromHeader() {
+	private static function getFromHeader() : ?string {
 		
 		$auth = Request::get()->getHeader('Authorization');
 		if(!$auth) {
-			return false;
+			return null;
 		}
 		preg_match('/Bearer (.*)/', $auth, $matches);
 		if(!isset($matches[1])){
-			return false;
+			return null;
 		}
 		
 		return $matches[1];
 	}
 	
-	private static function getFromCookie() {
+	private static function getFromCookie() : ?string {
 //		if(Request::get()->getMethod() != "GET") {
 //			return false;
 //		}
 		
 		if(!isset($_COOKIE['accessToken'])) {
-			return false;
+			return null;
 		}
 		return $_COOKIE['accessToken'];
 	}
 
 	/**
-	 * Gets' the access token from the Authorizaion header or Cookie
+	 * Gets the access token from the Authorizaion header or Cookie
 	 */
-	public static function getClientAccessToken() {
+	public static function getClientAccessToken(): ?string
+	{
 		$tokenStr = static::getFromHeader();
 		if(!$tokenStr) {
 			$tokenStr = static::getFromCookie();
@@ -66,10 +67,7 @@ class State extends AbstractState {
 		
 		if(!isset($this->token)) {
 						
-			$tokenStr = $this->getFromHeader();
-			if(!$tokenStr) {
-				$tokenStr = $this->getFromCookie();
-			}
+			$tokenStr = self::getClientAccessToken();
 
 			if(!$tokenStr) {
 				return false;
@@ -146,18 +144,19 @@ class State extends AbstractState {
 	public function outputSession() {		
 		
 		if (!$this->isAuthenticated()) {
-			Response::get()->setStatus(401);
-			Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-			Response::get()->setHeader('Pragma', 'no-cache');
+			//use http/Response here because we don't want JMAP request output here
+			HttpResponse::get()->setStatus(401);
+			HttpResponse::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+			HttpResponse::get()->setHeader('Pragma', 'no-cache');
 
-			Response::get()->output([
+			HttpResponse::get()->output([
 					"auth" => [
 							"domains" => User::getAuthenticationDomains()
 					]
 			]);
 		} else
 		{
-			Response::get()->output($this->getSession());
+			HttpResponse::get()->output($this->getSession());
 		}
 	}
 
@@ -290,9 +289,6 @@ class State extends AbstractState {
 	 *
 	 * @param array $properties the properties to fetch
 	 * @return User|null
-	 * @throws Exception
-	 * @throws Exception
-	 * @throws Exception
 	 * @throws Exception
 	 */
 	public function getUser(array $properties = []): ?User

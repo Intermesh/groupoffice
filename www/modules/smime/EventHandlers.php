@@ -70,7 +70,9 @@ class EventHandlers {
 			unset($mime);
 
 			$newResponse = $message->toOutputArray(true);
-			
+
+			unset($newResponse['sender']);
+			unset($newResponse['from']);
 			unset($newResponse['to']);					
 			unset($newResponse['cc']);
 					
@@ -181,16 +183,19 @@ class EventHandlers {
 
 	public static function beforeSend(\GO\Email\Controller\MessageController $controller, array &$response, \GO\Base\Mail\SmimeMessage $message, \GO\Base\Mail\Mailer $mailer, \GO\Email\Model\Account $account, \GO\Email\Model\Alias $alias, $params) {
 
-		if(!empty($params['sign_smime']) || !empty($params['encrypt_smime'])) {
+		$signSmime = $params['sign_smime'] ?? false;
+		$encryptSmime = $params['encrypt_smime'] ?? false;
+
+		if ($signSmime || $encryptSmime) {
 			$password = GO::session()->values['smime']['passwords'][$account->id];
 			$cert = (new GO\Smime\Model\Smime($account->id))->latestCert();
 		}
 
-		if (!empty($params['sign_smime'])) {
+		if ($signSmime) {
 			$message->setSignParams($cert->cert, $password);
 		}
 
-		if (!empty($params['encrypt_smime'])) {
+		if ($encryptSmime) {
 			openssl_pkcs12_read($cert->cert, $certs, $password);
 
 			if (!isset($certs['cert']))

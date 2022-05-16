@@ -8,21 +8,31 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 	initComponent: function() {
 		this.supr().initComponent.call(this);
 
-		this.on('show', function() {
-			this.groupModuleGrid.groupId = this.currentId;
-			if(!this.currentId) {
+
+		this.on('show', function () {
+
+			if(go.User.isAdmin) {
+				this.groupModuleGrid.groupId = this.currentId;
+				//sorts selected groups on top
+				this.groupModuleGrid.store.setFilter("groupIsAllowed", {groupIsAllowed: this.currentId});
+			}
+			//this sorts the selected members on top
+			this.groupUserGrid.store.setFilter('sort', {'groupMember' : this.currentId});
+
+			if (!this.currentId) {
 				//needed to load the grid.
 				this.groupUserGrid.setValue([]);
-			} else if(this.currentId == 2) { //group everyone
+			} else if (this.currentId == 2) { //group everyone
 				this.groupUserGrid.setDisabled(true);
 				this.groupUserGrid.hide();
 			}
 		}, this);
+
 	},
 
 	onSubmit: function(success, groupId) {
 		//for(var id in changedModules) {
-		if(success) {
+		if(success && go.User.isAdmin) {
 			this.groupModuleGrid.groupId = groupId;
 			let changedModules = this.groupModuleGrid.getValue();
 			go.Db.store('Module').get(Object.keys(changedModules), (modules) => {
@@ -35,7 +45,11 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 					}
 				}
 				//console.warn(changedModules);
-				go.Db.store('Module').set({update: changedModules});
+				go.Db.store('Module').set({update: changedModules}).then((response) => {
+					if(response.notUpdated) {
+						GO.errorDialog.show(t("Failed to save"));
+					}
+				})
 			});
 
 
@@ -46,7 +60,10 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 	initFormItems: function () {
 
 		this.addPanel(new go.permissions.SharePanel());
-		this.addPanel(this.groupModuleGrid = new go.groups.GroupModuleGrid());
+
+		if(go.User.isAdmin) {
+			this.addPanel(this.groupModuleGrid = new go.groups.GroupModuleGrid());
+		}
 		
 		return [{
 				region: "north",

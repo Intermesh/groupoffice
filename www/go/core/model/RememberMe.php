@@ -281,7 +281,8 @@ class RememberMe extends Entity {
 	 * @return bool
 	 * @throws Exception
 	 */
-	public static function collectGarbage() {
+	public static function collectGarbage(): bool
+	{
 		return static::delete(
 			(new Query)
 				->andWhere('expiresAt', '<', new DateTime()));

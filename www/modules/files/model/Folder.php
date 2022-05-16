@@ -17,6 +17,7 @@ namespace GO\Files\Model;
 
 use Exception;
 use GO;
+use go\core\fs\FileSystemObject;
 use go\core\fs\Folder as GoFolder;
 use go\core\model\Acl;
 
@@ -387,6 +388,13 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$this->name = $name;
 			$this->_path = null;
 		}
+	}
+
+	protected function beforeDelete()
+	{
+		FileSystemObject::checkDeleteAllowed(new \go\core\fs\Folder($this->fsFolder->path()));
+
+		return parent::beforeDelete();
 	}
 
 	protected function beforeSave() {
@@ -1382,7 +1390,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			\GO::debug("MOVE ".$file->name);
 			$file->folder_id=$this->id;
 			$file->appendNumberToNameIfExists();
-			if(!$file->save()){
+			if(!$file->save(true)){
 				throw new Exception("Could not save file ".$file->name." ".implode("\n", $file->getValidationErrors()));
 			}
 		}
@@ -1425,6 +1433,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		\GO::debug("getTopLevelShare($folderName)");
 
+		// hidden file request by macos .DS_Store and ._template-icons
+		if(substr($folderName, 0, 1) == ".") {
+			return false;
+		}
+
 		if(!isset($this->_folderCache['Shared/'.$folderName])){
 			$findParams = \GO\Base\Db\FindParams::newInstance();
 
@@ -1440,7 +1453,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$folder=$this->find($findParams);
 			
 			if(!$folder) {
-				error_log("Could not find TopLEvelShare ".$folderName);
+				error_log("Could not find TopLevelShare ".$folderName);
 				$folder = false;
 			} elseif(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 				$folder = false;

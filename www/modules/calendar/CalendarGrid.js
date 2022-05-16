@@ -689,10 +689,14 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 					this.overlay.setSize(Ext.lib.Dom.getViewWidth(true), Ext.lib.Dom.getViewHeight(true));
 					this.overlay.show();
 
-					this.selector.setXY(position);
-					//substract double border
 					this.selector.setSize(this.snapCol['x'], this.snapCol['y']);
 					this.selector.setVisible(true,false);
+					this.selector.setXY(position);
+
+					// this second setXY() call fixed crazy firefox problem where the first selection would lead
+					// to one pixel less in height causing the time to be 15mins too early.
+					// only in the Compact theme.
+					this.selector.setXY(position);
 				}
 			}
 		}
@@ -1864,6 +1868,8 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		if(!allDay)
 		{
 			var size = el.getSize();
+
+			console.warn(position, size);
 
 			var startRow = this.getRowNumberByY(position[1]);
 			if(startRow<0)

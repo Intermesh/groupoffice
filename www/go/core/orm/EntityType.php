@@ -15,7 +15,9 @@ use go\core\jmap;
 use go\core\model\Acl;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
+use go\core\util\Lock;
 use InvalidArgumentException;
+use PDO;
 use PDOException;
 
 /**
@@ -48,6 +50,12 @@ class EntityType implements ArrayableInterface {
 	protected $highestModSeq;
 	
 	private $highestUserModSeq;
+
+	private $modSeqIncremented = false;
+	/**
+	 * @var bool
+	 */
+	private $userModSeqIncremented = false;
 
 
 	/**
@@ -122,13 +130,13 @@ class EntityType implements ArrayableInterface {
 			$record['name'] = self::classNameToShortName($className);
 			$record['clientName'] = $clientName;
 			try {
-				App::get()->getDbConnection()->insert('core_entity', $record)->execute();
+				go()->getDbConnection()->insert('core_entity', $record)->execute();
 			} catch(PDOException $e) {
 				ErrorHandler::log("Failed to register new entity type for class '$className'.");
 				go()->debug($c);
 				throw $e;
 			}
-			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
+			$record['id'] = go()->getDbConnection()->getPDO()->lastInsertId();
 
 			go()->getCache()->delete('entity-types');
 
@@ -144,7 +152,7 @@ class EntityType implements ArrayableInterface {
 
 		if(go()->getDebugger()->enabled) {
 			//do extra check if entity type belongs to the module
-			$module = Module::findByClass($className, ['id']);
+			$module = Module::findByClass($className, ['id'], true);
 			if($c['models'][$c['name'][$clientName]]->moduleId != $module->id) {
 				throw new Exception("Entity $className conflicts with : " .$c['models'][$c['name'][$clientName]]->getClassName() .". Please return unique client name with getClientName()");
 			}
@@ -185,6 +193,8 @@ class EntityType implements ArrayableInterface {
 	{
 		$this->highestModSeq = null;
 		$this->highestUserModSeq = null;
+		$this->modSeqIncremented = false;
+		$this->userModSeqIncremented = false;
 
 		return $this;
 	}
@@ -206,7 +216,7 @@ class EntityType implements ArrayableInterface {
 	}
 	public function __wakeup()
 	{
-		$this->highestModSeq = null;
+		$this->clearCache();
 	}
 
   /**
@@ -233,7 +243,7 @@ class EntityType implements ArrayableInterface {
 			$type = static::fromRecord($record);
 			$cls = $type->getClassName();
 			if(!class_exists($cls) || (!is_a($cls, Entity::class, true) && !is_a($cls, ActiveRecord::class, true))) {
-				go()->warn($cls .' not found!');
+				go()->warn('Entity class "' . $cls .'" in database but it is not found on disk!');
 				continue;
 			}
 			$i[] = $type;
@@ -246,6 +256,7 @@ class EntityType implements ArrayableInterface {
    * @return array
    */
 	private static function getCache() :array {
+
 		$cache = go()->getCache()->get('entity-types');
 
 		if($cache === null) {
@@ -256,7 +267,7 @@ class EntityType implements ArrayableInterface {
 			];
 
 			for($i = 0, $c = count($cache['models']); $i < $c; $i++) {
-			  /** @var self $t */
+			  	/** @var self $t */
 				$t = $cache['models'][$i];
 				$cache['id'][$t->getId()] = $i;
 				$cache['name'][$t->getName()] = $i;
@@ -275,7 +286,6 @@ class EntityType implements ArrayableInterface {
    *
    * @param int $id
    * @return static|bool
-   * @throws Exception
    */
 	public static function findById(int $id) {
 
@@ -363,45 +373,37 @@ class EntityType implements ArrayableInterface {
    */
 	public function changes($changedEntities): bool
 	{
-
 		if(!jmap\Entity::$trackChanges) {
 			return true;
 		}
 
-		$this->highestModSeq = $this->nextModSeq();		
-		
 		if(!is_array($changedEntities)) {
-			$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);		
-		} else {
+			$changedEntities = $changedEntities->fetchMode(PDO::FETCH_ASSOC)->all();
+		}
 
-			if(empty($changedEntities)) {
-				return true;
+		if(empty($changedEntities)) {
+			return true;
+		}
+
+		if(!is_array($changedEntities[0])) {
+			// array of id's. What about acl here?
+			foreach($changedEntities as $entityId) {
+				$this->queueChange($entityId);
+			}
+		} else{
+			if(count($changedEntities[0]) != 3) {
+				throw new InvalidArgumentException("Invalid array given");
 			}
 
-			if(!is_array($changedEntities[0])) {
-				$changedEntities = array_map(function($entityId) {
-					return [$entityId, null, 0, $this->getId(), $this->highestModSeq, new DateTime()];
-				}, $changedEntities);
-			} else{
-				if(count($changedEntities[0]) != 3) {
-					throw new InvalidArgumentException("Invalid array given");
-				}
-				$changedEntities = array_map(function($r) {
-					return array_merge(array_values($r), [$this->getId(), $this->highestModSeq, new DateTime()]);
-				}, $changedEntities);
+			foreach($changedEntities as $r) {
+				//query results may pass associative arrays but they must be in the correct order
+				$r = array_values($r);
+				$this->queueChange($r[0], $r[1], $r[2]);
 			}
 		}
 
-		//It's possible that this won't write any change. This leads to a modSeq with no changes at all?
-		$stmt = go()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
-		$stmt->execute();
-
-		if(!$stmt->rowCount()) {
-			go()->warn("Empty changes!");
-		}
 
 		return true;
-
 	}
 
 	/**
@@ -416,26 +418,132 @@ class EntityType implements ArrayableInterface {
 	 *
 	 * @param Entity $entity
 	 * @param bool $isDeleted
-	 * @throws SaveException
 	 */
 	public function change(Entity $entity, bool $isDeleted = false) {
 		if(!jmap\Entity::$trackChanges) {
 			return;
 		}
-		$this->highestModSeq = $this->nextModSeq();
 
-		$record = [
-				'modSeq' => $this->highestModSeq,
-				'entityTypeId' => $this->id,
-				'entityId' => $entity->id(),
-				'aclId' => $entity->findAclId(),
-				'destroyed' => $isDeleted,
-				'createdAt' => new DateTime()
-						];
-
-		go()->getDbConnection()->insert('core_change', $record)->execute();
+		$this->queueChange($entity->id(), $entity->findAclId(), $isDeleted);
 	}
 
+	/**
+	 *
+	 * @param int|Query $entityId
+	 * @param int|null $aclId
+	 * @param bool $destroyed
+	 * @return void
+	 */
+	private function queueChange(int $entityId, ?int $aclId = null, bool $destroyed = false) {
+
+		$id = $this->getId();
+
+		if(!isset(self::$changes[$id])) {
+			self::$changes[$id] = [];
+		}
+
+		if(!isset(self::$changes[$id][$entityId])) {
+			self::$changes[$id][$entityId] = [
+				'entityId' => $entityId,
+				'aclId' => $aclId,
+				'destroyed' => $destroyed
+			];
+		} else{
+			if($destroyed) {
+				self::$changes[$id][$entityId]['destroyed'] = true;
+			}
+
+			if($aclId) {
+				self::$changes[$id][$entityId]['aclId'] = $aclId;
+			}
+		}
+	}
+
+	private static $changes = [];
+
+
+	/**
+	 * Push changes to the database
+	 *
+	 * When changes are made to entities they are queued. Calling push() will write
+	 * them all to the database. When {@see App} is destructed it will also call this method.
+	 * {@see EntityController} calls it in defaultSet() so it can return the new state.
+	 * We do it like this so these entries are written outside of transactions. Otherwise
+	 * this will lead to concurrency problems with deadlocks in mysql.
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function push() {
+
+		if(empty(self::$changes)) {// && empty(self::$changeQueries)) {
+			return;
+		}
+
+		go()->debug("Pushing JMAP sync changes");
+
+		if(go()->getDbConnection()->inTransaction()) {
+			throw new Exception("huh");
+		}
+
+		//db transaction caused deadlocks
+		if(!Lock::exists("jmap-set-lock")) {
+			$l = new Lock("jmap-set-lock");
+			if (!$l->lock()) {
+				throw new Exception("Could not obtain lock");
+			}
+		}
+
+		go()->getDbConnection()->beginTransaction();
+		self::pushRecords();
+		go()->getDbConnection()->commit();
+
+		if(isset($l)) {
+			$l->unlock();
+		}
+	}
+
+	private static function pushRecords() {
+
+		if(empty(self::$changes)) {
+			return;
+		}
+		$now = new DateTime();
+		$allChanges = [];
+		foreach(self::$changes as $entityTypeId => $changes) {
+			$type = self::findById($entityTypeId);
+
+			$modSeq = $type->nextModSeq();
+
+			$allChanges = array_merge($allChanges, array_map(function($change) use($modSeq, $now, $entityTypeId) {
+				$change['createdAt'] = $now;
+				$change['modSeq'] = $modSeq;
+				$change['entityTypeId'] = $entityTypeId;
+				return $change;
+			}, $changes));
+		}
+
+		foreach(self::splitRecords($allChanges) as $chunk) {
+			$stmt = go()->getDbConnection()->insert('core_change', $chunk);
+			$stmt->execute();
+		}
+
+		self::$changes = [];
+	}
+
+	private static function splitRecords(array $allChanges) : array {
+		// mysql limit
+		$maxPlaceHolders = 1000;
+
+		if(empty($allChanges)) {
+			return [];
+		}
+
+		$colCount = count($allChanges[0]);
+		$maxRecords = floor($maxPlaceHolders / $colCount);
+
+		return array_chunk($allChanges, $maxRecords);
+	}
 
 	/**
 	 * Resets the sync state causing all clients to resync this entity
@@ -443,11 +551,12 @@ class EntityType implements ArrayableInterface {
 	 * @return void
 	 */
 	public function resetSyncState() : void {
-		$this->highestModSeq = 0;
-		App::get()->getDbConnection()
+		$this->clearCache();
+
+		go()->getDbConnection()
 			->update(
 				"core_entity",
-				['highestModSeq' => 0],
+				['highestModSeq' => null],
 				Query::normalize(["id" => $this->id])
 					->tableAlias('entity')
 			)->execute(); //mod seq is a global integer that is incremented on any entity update
@@ -543,32 +652,33 @@ class EntityType implements ArrayableInterface {
    * @throws PDOException
    */
 	public function nextModSeq() : int {
-		
 
-		/*
-		 * START TRANSACTION
-		 * SELECT counter_field FROM child_codes FOR UPDATE;
-		  UPDATE child_codes SET counter_field = counter_field + 1;
-		 * COMMIT
-		 */
-		$modSeq = (new Query())
-						->selectSingleValue("highestModSeq")
-						->from("core_entity", 'entity')
-						->where(["id" => $this->id])
-						->forUpdate()
-						->single();
-		$modSeq++;
+		$stmt = go()->getDbConnection()
+			->update(
+				"core_entity",
+				'highestModSeq = LAST_INSERT_ID(highestModSeq  +  1)',
+				Query::normalize(["id" => $this->id])->tableAlias('entity')
+			);
 
-		App::get()->getDbConnection()
-						->update(
-										"core_entity", 
-										['highestModSeq' => $modSeq],
-										Query::normalize(["id" => $this->id])->tableAlias('entity')
-						)->execute(); //mod seq is a global integer that is incremented on any entity update
-	
+		// on deadlocks retry 10 times
+		for($i = 10; $i > -1; $i--) {
+			try {
+				$stmt->execute(); //mod seq is a global integer that is incremented on any entity update
+			} catch (PDOException $e) {
 
+				if($i == 0) {
+					throw $e;
+				}
+			}
+		}
+
+		$modSeq = go()->getDbConnection()
+			->query("SELECT LAST_INSERT_ID()")
+			->fetch(PDO::FETCH_COLUMN, 0);
+
+		$this->modSeqIncremented = true;
 		$this->highestModSeq = $modSeq;
-		
+
 		return $modSeq;
 	}
 
@@ -579,28 +689,37 @@ class EntityType implements ArrayableInterface {
 	 * @throws PDOException
 	 */
 	public function nextUserModSeq() : int {
-		
-		$modSeq = (new Query())
-			->selectSingleValue("highestModSeq")
-			->from("core_change_user_modseq")
-			->where(["entityTypeId" => $this->id, "userId" => go()->getUserId()])
-			->forUpdate()
-			->single();
 
-		$modSeq++;
+		$stmt = go()->getDbConnection()
+			->update(
+				"core_change_user_modseq",
+				'highestModSeq = LAST_INSERT_ID(highestModSeq  +  1)',
+				Query::normalize([
+					"entityTypeId" => $this->id,
+					"userId" => go()->getUserId()
+				])->tableAlias('entity')
+			);
 
-		App::get()->getDbConnection()
-						->replace(
-										"core_change_user_modseq", 
-										[
-												'highestModSeq' => $modSeq,
-												"entityTypeId" => $this->id,
-												"userId" => go()->getUserId()
-										]
-						)->execute(); //mod seq is a global integer that is incremented on any entity update
+		// on deadlocks retry 10 times
+		for($i = 10; $i > -1; $i--) {
+			try {
+				$stmt->execute(); //mod seq is a global integer that is incremented on any entity update
+			} catch (PDOException $e) {
 
+				if($i == 0) {
+					throw $e;
+				}
+			}
+		}
+
+
+		$modSeq = go()->getDbConnection()
+			->query("SELECT LAST_INSERT_ID()")
+			->fetch(PDO::FETCH_COLUMN, 0);
+
+		$this->userModSeqIncremented = true;
 		$this->highestUserModSeq = $modSeq;
-		
+
 		return $modSeq;
 	}
 

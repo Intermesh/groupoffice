@@ -4,6 +4,7 @@ namespace go\core\db;
 
 use Exception;
 use go\core\App;
+use go\core\orm\Property;
 use LogicException;
 use PDO;
 use PDOException;
@@ -48,7 +49,7 @@ class Connection {
 		$this->password = $password;
 		$this->options = [
 				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'",
+				PDO::MYSQL_ATTR_INIT_COMMAND => "SET sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'",
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 				PDO::ATTR_PERSISTENT => false, //doesn't work with ATTR_STATEMENT_CLASS but should not have many benefits anyway
 				PDO::ATTR_STATEMENT_CLASS => [Statement::class],
@@ -57,13 +58,6 @@ class Connection {
 		];
 	}
 
-	// public function __destruct()
-	// {
-	// 	if($this->inTransaction()) {
-	// 		throw new \Exception("DB Transaction not closed properly");
-	// 	}
-	// }
-	
 	public function getDsn() {
 		return $this->dsn;
 	}
@@ -124,6 +118,20 @@ class Connection {
 	 */
 	public function disconnect() {
 		$this->pdo = null;
+
+		Property::clearCachedRelationStmts();
+		Property::$lastDeleteStmt = null;
+		self::$cachedStatements = [];
+	}
+
+	private static $cachedStatements = [];
+
+	public function cacheStatement(string $name, Statement $statement) {
+		self::$cachedStatements[$name] = $statement;
+	}
+
+	public function getCachedStatment(string $name) : ?Statement {
+		return self::$cachedStatements[$name] ?? null;
 	}
 
 	/**
@@ -136,6 +144,16 @@ class Connection {
 		// if (strpos($this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION), 'mysqlnd') !== false) {
 		// 	echo 'PDO MySQLnd enabled!';
 		// }
+	}
+
+
+	/**
+	 * Get MySQL connection ID
+	 *
+	 * @return int
+	 */
+	public function getId() : int {
+		return (int) $this->query("select connection_id()")->fetch(PDO::FETCH_COLUMN, 0);
 	}
 
 	/**
@@ -203,9 +221,6 @@ class Connection {
 	public function beginTransaction(): bool
 	{
 		if($this->transactionSavePointLevel == 0) {
-			if($this->debug) {
-				go()->debug("START DB TRANSACTION", 1);
-			}
 			$ret = $this->getPdo()->beginTransaction();
 
 		}else
@@ -213,7 +228,12 @@ class Connection {
 			$ret = true;		
 		}		
 		
-		$this->transactionSavePointLevel++;		
+		$this->transactionSavePointLevel++;
+
+		if($this->debug) {
+			go()->debug("START DB TRANSACTION " . $this->transactionSavePointLevel, 1);
+		}
+
 		return $ret;
 	}
 
@@ -261,18 +281,18 @@ class Connection {
 		if($this->transactionSavePointLevel == 0) {
 			throw new LogicException("Not in transaction!");
 		}
-		
-		$this->transactionSavePointLevel--;	
+
+		$this->transactionSavePointLevel--;
+
+		if($this->debug) {
+			go()->warn("ROLLBACK DB TRANSACTION " . $this->transactionSavePointLevel, 1);
+		}
+
 		if($this->transactionSavePointLevel == 0) {			
-			go()->warn("ROLLBACK DB TRANSACTION", 1);
 			return $this->getPdo()->rollBack();
 		}else
 		{
 			return true;
-
-			// $sql = "ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			// go()->warn($sql, 1);
-			// return $this->exec($sql) !== false;						
 		}
 	}
 
@@ -284,29 +304,21 @@ class Connection {
    */
 	public function commit(): bool
 	{
-
-//		\go\core\App::get()->debug("Commit DB transation");
-//		\go\core\App::get()->getDebugger()->debugCalledFrom();
-		
 		if($this->transactionSavePointLevel == 0) {
 			throw new PDOException("Not in transaction!");
 		}
 
 		$this->transactionSavePointLevel--;
 
+		if($this->debug) {
+			go()->debug("COMMIT DB TRANSACTION " . $this->transactionSavePointLevel, 1);
+		}
+
+
 		if($this->transactionSavePointLevel == 0) {
-			if($this->debug) {
-				go()->debug("COMMIT DB TRANSACTION", 1);				
-			}
 			return $this->getPdo()->commit();
 		}else
 		{
-
-			// $sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			// if($this->debug) {
-			// 	go()->debug($sql, 1);				
-			// }
-			// return $this->exec($sql) !== false;			
 			return true;
 		}
 	}
@@ -379,14 +391,14 @@ class Connection {
    * Create an insert statement
    *
    * @param string $tableName
-   * @param array|Query $data Key value array or select query
+   * @param array|Query $data Key value array, a numeric array with key value arrays or select query
    * @param string[] $columns If $data is a query object then you can supply the
    *  selected columns with this parameter. If not given all columns must be
    *  selected in the correct order.
    *
    * @return Statement
    * @throws PDOException
-   * @example
+   * @example Single record
    * ```
    * $data = [
    *    "propA" => "string 1",
@@ -403,6 +415,25 @@ class Connection {
    * Get the ID if it has an auto increment column:
    * ```
    * $id = App::get()->getDbConnection()->getPDO()->lastInsertId();
+   * ```
+   *
+   *
+   * @example Multiple records
+   * ```
+   * $data = [[
+   *    "propA" => "string 1",
+   *    "createdAt" => new \DateTime(),
+   *    "modifiedAt" => new \DateTime()
+   * ],[
+   *    "propA" => "string 2",
+   *    "createdAt" => new \DateTime(),
+   *    "modifiedAt" => new \DateTime()
+   * ]];
+   *
+   * $result = App::get()
+   *        ->getDbConnection()
+   *        ->insert("test_a", $data)
+   *        ->execute();
    * ```
    *
    * Or with an expression:
@@ -589,13 +620,14 @@ class Connection {
 			/**
 			 * @var Statement $stmt;
 			 */
-			$stmt->setBuild($build);						
+			$stmt->setBuild($build);
 
-			foreach ($build['params'] as $p) {
+			for ($i =0, $l = count($build['params']); $i < $l; $i++) {
 				// if (go()->getDebugger()->enabled && isset($p['value']) && !is_scalar($p['value'])) {
 				// 	throw new Exception("Invalid value " . var_export($p['value'], true));
 				// }
-				$stmt->bindValue($p['paramTag'], $p['value'], $p['pdoType']);
+
+				$stmt->bindValue($i + 1, $build['params'][$i]['value'], $build['params'][$i]['pdoType']);
 			}
 			/**
 			 * @var Statement $stmt;

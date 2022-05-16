@@ -4,6 +4,8 @@
 namespace GO\Base\Mail;
 
 
+use GO\Smime\Model\Smime;
+
 class SystemMessage extends SmimeMessage
 {
 
@@ -80,7 +82,7 @@ class SystemMessage extends SmimeMessage
 			throw new \Exception('No password for smime set in the Group-Office config file');
 		}
 		// Check for a certificate for the give email account
-		$cert = \GO\Smime\Model\Certificate::model()->findByPk($this->_account->id);
+		$cert = (new Smime($this->_account->id))->latestCert();
 		
 		if(!$cert || empty($cert->cert)) {
 			throw new \Exception('No certificate enabled for the given account');

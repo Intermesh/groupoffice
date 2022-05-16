@@ -6,6 +6,7 @@ namespace GO\Files\Controller;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
 use go\core\http\Client;
+use go\core\http\Response;
 use go\core\util\StringUtil;
 use GO\Email\Model\Account;
 use GO\Files\Model\File;
@@ -434,54 +435,70 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		\GO::session()->closeWriting();
 		
 		\GO::setMaxExecutionTime(0);
-		
-		if(isset($params['path'])){
-			$folder = \GO\Files\Model\Folder::model()->findByPath(dirname($params['path']));
-			if(!$folder) {
-			  throw new NotFound($params['path']);
-      }
-			$file = $folder->hasFile(\GO\Base\Fs\File::utf8Basename($params['path']));
-		}else
-		{
-			$file = \GO\Files\Model\File::model()->findByPk($params['id'], false, true);
-		}
-		
-		if(!$file)
-			throw new \GO\Base\Exception\NotFound();
-		
-		if(!empty($params['random_code'])){
-			if($file->random_code!=$params['random_code'])
-				throw new \GO\Base\Exception\NotFound();
-			
-			if(time()>$file->expire_time)
-				throw new \Exception(\GO::t("Sorry, the download link for this file has expired", "files"));				
-		} else {
-			$public = substr($file->path,0,6)=='public';
 
-			if (!$public) {
-				if (!\GO::user() || !$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
-					throw new \GO\Base\Exception\AccessDenied();
+		try {
+			if (isset($params['path'])) {
+				$folder = \GO\Files\Model\Folder::model()->findByPath(dirname($params['path']));
+				if (!$folder) {
+					throw new NotFound($params['path']);
+				}
+				$file = $folder->hasFile(\GO\Base\Fs\File::utf8Basename($params['path']));
+			} else {
+				$file = \GO\Files\Model\File::model()->findByPk($params['id'], false, true);
+			}
+
+			if (!$file)
+				throw new \GO\Base\Exception\NotFound();
+
+			if (!empty($params['random_code'])) {
+				if ($file->random_code != $params['random_code'])
+					throw new \GO\Base\Exception\NotFound();
+
+				if (time() > $file->expire_time)
+					throw new \Exception(\GO::t("Sorry, the download link for this file has expired", "files"));
+			} else {
+				$public = substr($file->path, 0, 6) == 'public';
+
+				if (!$public) {
+					if (!\GO::user() || !$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+						throw new \GO\Base\Exception\AccessDenied();
+					}
 				}
 			}
-		}
 
-		
-		// Show the file inside the browser or give it as a download
-		$inline = true; // Defaults to show inside the browser
-		if(isset($params['inline']) && ((bool) $params['inline'] === false || $params['inline'] == 'false')) {
-			$inline = false;
-		}
 
-		\GO\Base\Util\Http::outputDownloadHeaders($file->fsFile, $inline, !empty($params['cache']));
-		$file->open();
-		
-		$this->fireEvent('beforedownload', array(
+			// Show the file inside the browser or give it as a download
+			$inline = true; // Defaults to show inside the browser
+			if (isset($params['inline']) && ((bool)$params['inline'] === false || $params['inline'] == 'false')) {
+				$inline = false;
+			}
+
+			\GO\Base\Util\Http::outputDownloadHeaders($file->fsFile, $inline, !empty($params['cache']));
+			$file->open();
+
+			$this->fireEvent('beforedownload', array(
 				&$this,
 				&$params,
 				&$file
-		));
-		
-		$file->fsFile->output();
+			));
+
+			$file->fsFile->output();
+
+		}catch(NotFound $e) {
+			Response::get()->setStatus(404);
+
+			echo $e->getMessage();
+
+		}catch (AccessDenied $e) {
+			Response::get()->setStatus(403);
+
+			echo $e->getMessage();
+
+		}catch(\Throwable $e) {
+			Response::get()->setStatus(500);
+
+			echo $e->getMessage();
+		}
 	}
 
 	/**

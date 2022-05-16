@@ -56,4 +56,5 @@ return array (
   'Site File' => 'Site Datei',
   'Site Multifile' => 'Site Multidatei',
   'Base path' => 'Basispfad',
+  'Medium' => 'Mittel',
 );

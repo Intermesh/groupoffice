@@ -13,13 +13,14 @@ abstract class State {
 	 * @return int|null
 	 */
 	abstract function getUserId(): ?int;
-	
+
 	/**
 	 * Get the logged in user
-	 * 
+	 *
+	 * @param array $properties the properties to fetch
 	 * @return User|null
 	 */
-	abstract function getUser(): ?User;
+	abstract function getUser(array $properties = []): ?User;
 	
 	
 	/**

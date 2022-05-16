@@ -1279,12 +1279,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$this->_debugSql=!empty(GO::session()->values['debugSql']);
 		}
 //		$this->_debugSql=true;
-		if(GO::$ignoreAclPermissions)
-			$params['ignoreAcl']=true;
+
 
 		if(empty($params['userId'])){
 			$params['userId']=!empty(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
 		}
+
+		if(empty($params['ignoreAcl']) && empty($params['ignoreAdminGroup']) && (GO::$ignoreAclPermissions || User::isAdminById($params['userId'])))
+			$params['ignoreAcl']=true;
 
 		if($this->aclField() && (empty($params['ignoreAcl']) || !empty($params['joinAclFieldTable']))){
 			$aclJoinProps = $this->_getAclJoinProps();
@@ -1511,7 +1513,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$joins .= "\nINNER JOIN core_search search ON search.entityId = t.id and search.entityTypeId = " . static::entityType()->getId();
 
 				$i = 0;
-				$words = StringUtil::splitTextKeywords($params['searchQuery']);
+				$words = StringUtil::splitTextKeywords($params['searchQuery'], false);
 				$words = array_unique($words);
 
 				foreach($words as $word) {
@@ -1781,10 +1783,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	private function _appendAclJoin($findParams, $aclJoinProps){
-
-		if(empty($findParams['ignoreAdminGroup']) && User::isAdminById($findParams['userId'])) {
-			return "";
-		}
 
 		$sql = "\nINNER JOIN core_acl_group ON (`".$aclJoinProps['table']."`.`".$aclJoinProps['attribute']."` = core_acl_group.aclId";
 		if(isset($findParams['permissionLevel']) && $findParams['permissionLevel']>\GO\Base\Model\Acl::READ_PERMISSION){
@@ -3735,6 +3733,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
+		$search->rebuild = false;
 		if(!$search->save()) {
 			throw new \Exception("Could not save search cache!");
 		}
@@ -3742,6 +3741,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(!$isNew) {
 			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
 		}
+
+		$keywords = StringUtil::filterRedundantSearchWords($keywords);
 
 		$keywords = array_map(function ($word) use ($search){
 			return ['searchId' => $search->id, 'word'=> $word];
@@ -3855,8 +3856,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Get keywords this model should be found on.
 	 * Returns all String properties in a concatenated string.
 	 *
-	 * @param String $prepend
-	 * @return String
+	 * @param string $prepend
+	 * @return string[]
 	 */
 	public function getSearchCacheKeywords($prepend=''){
 		$keywords=array();
@@ -3902,10 +3903,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$arr = array_merge($arr, StringUtil::splitTextKeywords($keyword));
 		}
 		if($this->hasAttribute('id')) {
-			$keywords[] = $this->id;
+			$arr[] = $this->id;
 		}
-		$keywords = array_unique($arr);
-		return $keywords;
+		return $arr;
 	}
 
 	protected function beforeSave(){
@@ -4208,10 +4208,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if($this->_debugSql)
 			GO::debug($sql);
 
-		$success = $this->getDbConnection()->query($sql);
-		if(!$success)
-			throw new \Exception("Could not delete from database");
+		try {
+			$success = $this->getDbConnection()->query($sql);
+			if (!$success)
+				throw new \Exception("Could not delete from database");
 
+		}
+		catch(\Exception $e) {
+			GO::debug("FAILED SQL: " . $sql);
+			throw $e;
+		}
 		$this->_isDeleted = true;
 		
 
@@ -4563,10 +4569,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Pass another model to this function and they will be linked with the
 	 * Group-Office link system.
-
 	 * @param \go\core\orm\Entity|self|GO\Base\Model\SearchCacheRecord $model
 	 */
-
 	public function link($model, $description='', $this_folder_id=0, $model_folder_id=0){
 
 		$isSearchCacheModel = ($this instanceof \GO\Base\Model\SearchCacheRecord);
@@ -4586,78 +4590,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		Link::create($this, $model);
 
-//		if($this->linkExists($model))
-//			return true;
-//
-//
-//
-//		if($model instanceof \GO\Base\Model\SearchCacheRecord){
-//			$to_model_id = $model->entityId;
-//			$to_model_type_id = $model->entityTypeId;
-//		}else
-//		{
-//			$to_model_id = $model->id;
-//			$to_model_type_id = $model->entityType()->getId();
-//		}
-//
-//
-//
-//		$from_model_type_id = $isSearchCacheModel ? $this->entityTypeId : $this->modelTypeId();
-//
-//		$from_model_id = $isSearchCacheModel ? $this->model_id : $this->id;
-//
-//		if($to_model_id == $from_model_id && $to_model_type_id == $from_model_type_id) {
-//			//don't link to self
-//			return true;
-//		}
-//
-//		//Link::create()
-//
-//		if(!\go\core\App::get()->getDbConnection()->insert('core_link', [
-//				"toId" => $to_model_id,
-//				"toEntityTypeId" => $to_model_type_id,
-//				"fromId" => $from_model_id,
-//				"fromEntityTypeId" => $from_model_type_id,
-//				"description" => $description,
-//				"createdAt" => new \DateTime('now',new \DateTimeZone('UTC'))
-//
-//		])->execute()){
-//			return false;
-//		}
-//
-//		$reverse = [];
-//		$reverse['fromEntityTypeId'] = $to_model_type_id;
-//		$reverse['toEntityTypeId'] = $from_model_type_id;
-//		$reverse['toId'] = $from_model_id;
-//		$reverse['fromId'] = $to_model_id;
-//		$reverse['description'] = $description;
-//		$reverse['createdAt'] = new \DateTime('now',new \DateTimeZone('UTC'));
-//
-//
-//		if(!\go\core\App::get()->getDbConnection()->insert('core_link', $reverse)->execute()) {
-//			return false;
-//		}
-
 		$this->fireEvent('link', array($this, $model, $description, $this_folder_id, $model_folder_id));
 		return true;
 	}
-
-//	/**
-//	 * Can be overriden to do something after linking. It's a public method because sometimes
-//	 * searchCacheRecord models are used for linking. In that case we can call the afterLink method of the real model instead of the searchCacheRecord model.
-//	 *
-//	 * @param ActiveRecord $model
-//	 * @param boolean $isSearchCacheModel True if the given model is a search cache model.
-//	 *	In that case you can use the following code to get the real model:  $realModel = $isSearchCacheModel ? GO::getModel($this->model_name)->findByPk($this->model_id) : $this;
-//	 * @param string $description
-//	 * @param int $this_folder_id
-//	 * @param int $model_folder_id
-//	 * @param boolean $linkBack
-//	 * @return boolean
-//	 */
-//	public function afterLink(ActiveRecord $model, $isSearchCacheModel, $description='', $this_folder_id=0, $model_folder_id=0, $linkBack=true){
-//		return true;
-//	}
 
 	/**
 	 * 
@@ -4970,7 +4905,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 							->start($start)
 							->join('core_search', FindCriteria::newInstance()->addRawCondition('search.entityId', 't.id')->addRawCondition("search.entityTypeId", $entityTypeId), 'search', 'LEFT');
 			
-			$findParams->getCriteria()->addCondition('entityId',null, 'IS', 'search');							
+			$findParams->getCriteria()
+				->addCondition('entityId',null, 'IS', 'search')
+				->addCondition('rebuild',true, '=', 'search', false);
 			
 			//In small batches to keep memory low
 			$stmt = $this->find($findParams);
@@ -4990,8 +4927,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 						}
 						
 					} catch (\Exception $e) {
-						\go\core\ErrorHandler::logException($e);
-						echo "\nError: " . $e->getMessage() ."\n";
+
+						echo "\n\nError: " . $e->getMessage() ."\n";
+
+						echo "Record: " . $m->id ."\n\n";
+
+						echo $e->getTraceAsString();
+
+
+						echo \go\core\ErrorHandler::logException($e);
+
 						$start++;
 					}
 				}

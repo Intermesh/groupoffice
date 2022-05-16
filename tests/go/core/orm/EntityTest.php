@@ -197,6 +197,33 @@ class EntityTest extends TestCase {
 		$this->assertEquals(null, $entity->hasOne);
 		
 	}
+
+
+	public function testReplaceHasOne() {
+		$entity = new B();
+		$entity->propA = "string 1";
+		$entity->propB = "string 2";
+
+		$entity->hasOne = new AHasOne($entity);
+		$entity->hasOne->propA = "string 4";
+
+		$success = $entity->save();
+
+		$this->assertEquals(true, $success);
+
+
+		$entity->hasOne = new AHasOne($entity);
+		$entity->hasOne->propA = "string 5";
+
+		$success = $entity->save();
+
+		$this->assertEquals(true, $success);
+
+		$reloaded = B::findById($entity->id);
+
+		$this->assertEquals("string 5", $reloaded->hasOne->propA);
+
+	}
 	
 	
 	public function testSetEntityRelation() {

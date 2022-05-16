@@ -9,6 +9,7 @@ use GO\Base\Db\ActiveRecord;
 use go\core\data\convert\AbstractConverter;
 use go\core\data\convert\Json;
 use go\core\db\Column;
+use go\core\ErrorHandler;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
@@ -337,6 +338,7 @@ abstract class Entity extends Property {
 
 			return $this->commit() && !$this->hasValidationErrors();
 		} catch(Exception $e) {
+			ErrorHandler::logException($e);
 			$this->rollback();
 			throw $e;
 		}
@@ -389,7 +391,7 @@ abstract class Entity extends Property {
 		}
 		
 		//See \go\core\orm\SearchableTrait;
-		if(method_exists($this, 'saveSearch')) {
+		if(method_exists($this, 'saveSearch') && $this->isModified()) {
 			if(!$this->saveSearch()) {				
 				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not save core_search entry");				
 				return false;
@@ -453,7 +455,7 @@ abstract class Entity extends Property {
 
 		$query = self::normalizeDeleteQuery($query);
 
-		App::get()->getDbConnection()->beginTransaction();
+		go()->getDbConnection()->beginTransaction();
 
 		try {
 
@@ -487,11 +489,22 @@ abstract class Entity extends Property {
 				return false;			
 			}
 
-			return go()->getDbConnection()->commit();
+			if(!go()->getDbConnection()->commit()) {
+				return false;
+			}
+
+			return true;
 		} catch(Exception $e) {
-			go()->getDbConnection()->rollBack();
+			if(go()->getDbConnection()->inTransaction()) {
+				go()->getDbConnection()->rollBack();
+			}
 			throw $e;
 		}
+	}
+
+
+	protected function commitToDatabase() : bool {
+		return go()->getDbConnection()->commit();
 	}
 
   /**
@@ -499,12 +512,18 @@ abstract class Entity extends Property {
    */
 	protected function commit(): bool
 	{
-		parent::commit();
+		if(!$this->commitToDatabase()) {
+			return false;
+		}
+
+		if(!parent::commit()) {
+			return false;
+		}
 
 		//$this->isDeleting = false;
 		$this->isSaving = false;
 
-		return App::get()->getDbConnection()->commit();
+		return true;
 	}
 
   /**
@@ -516,7 +535,7 @@ abstract class Entity extends Property {
 		parent::rollBack();
 		// $this->isDeleting = false;
 		$this->isSaving = false;
-		return App::get()->getDbConnection()->rollBack();
+		return !go()->getDbConnection()->inTransaction() || App::get()->getDbConnection()->rollBack();
 	}
 
 	/**
@@ -602,7 +621,6 @@ abstract class Entity extends Property {
 	 * routing short routes like "Note/get"
 	 *
 	 * @return EntityType
-	 * @throws Exception
 	 */
 	public static function entityType(): EntityType
 	{
@@ -990,14 +1008,12 @@ abstract class Entity extends Property {
 	{
 		if(isset($sort['modifier'])) {
 			$query->join('core_user', 'modifier', 'modifier.id = '.$query->getTableAlias() . '.modifiedBy');
-			$query->orderBy(['modifier.displayName' => $sort['modifier']], true);
-			unset($sort['modifier']);
+			$sort->renameKey('modifier', 'modifier.displayName');
 		}
 
 		if(isset($sort['creator'])) {
 			$query->join('core_user', 'creator', 'creator.id = '.$query->getTableAlias() . '.createdBy');
-			$query->orderBy(['creator.displayName' => $sort['creator']], true);
-			unset($sort['creator']);
+			$sort->renameKey('creator', 'creator.displayName');
 		}
 		
 		//Enable sorting on customfields with ['customFields.fieldName' => 'DESC']
@@ -1023,17 +1039,6 @@ abstract class Entity extends Property {
 	public static function getState (): ?string
 	{
 		return null;
-	}
-
-	/**
-	 * Copy the entity. The copy is not saved to the database.
-	 *
-	 * @return static
-	 * @throws Exception
-	 */
-	public function copy(): Entity
-	{
-		return $this->internalCopy();
 	}
 	
 	

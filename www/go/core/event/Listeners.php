@@ -27,6 +27,15 @@ class Listeners extends Singleton {
 
 
 	/**
+	 * Clears all listeners
+	 *
+	 * @return void
+	 */
+	public function clear() {
+		$this->listeners = null;
+	}
+
+	/**
 	 * Add an event listener
 	 *
 	 * @param string $firingClass
@@ -71,7 +80,7 @@ class Listeners extends Singleton {
 		//disable events to prevent recursion
 		go()->disableEvents();
 
-		foreach (Module::find(['id', 'name', 'package', 'version', 'enabled'])->where(['enabled' => true]) as $module) { /* @var $module Module */
+		foreach (Module::find(['id', 'name', 'package', 'version', 'enabled'], true)->where(['enabled' => true]) as $module) { /* @var $module Module */
 
 			if(!$module->isAvailable()) {
 				continue;
@@ -115,7 +124,7 @@ class Listeners extends Singleton {
 
 		if (isset($this->listeners[$calledClass][$event])) {
 			foreach ($this->listeners[$calledClass][$event] as $listener) {	
-				App::get()->log("Event '$calledClass::$event' calls listener $listener[0]::$listener[1]");
+//				App::get()->log("Event '$calledClass::$event' calls listener $listener[0]::$listener[1]");
 				$return = call_user_func_array($listener, $args);
 				if ($return === false) {
 					App::get()->warn("Listener returned false for event " . $event . " " . var_export($listener, true));
