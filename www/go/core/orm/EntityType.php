@@ -480,12 +480,6 @@ class EntityType implements ArrayableInterface {
 			return;
 		}
 
-		go()->debug("Pushing JMAP sync changes");
-
-		if(go()->getDbConnection()->inTransaction()) {
-			throw new Exception("huh");
-		}
-
 		//db transaction caused deadlocks
 		if(!Lock::exists("jmap-set-lock")) {
 			$l = new Lock("jmap-set-lock");
@@ -522,6 +516,8 @@ class EntityType implements ArrayableInterface {
 				return $change;
 			}, $changes));
 		}
+
+		go()->debug("Pushing " . count($allChanges). " JMAP sync changes");
 
 		foreach(self::splitRecords($allChanges) as $chunk) {
 			$stmt = go()->getDbConnection()->insert('core_change', $chunk);

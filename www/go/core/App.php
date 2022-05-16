@@ -683,6 +683,8 @@ use Faker;
 				$this->rebuildCache();
 
 			}
+
+			go()->debug("Request done");
 		}
 
 		/**
