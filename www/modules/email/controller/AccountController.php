@@ -78,7 +78,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		if(isset($params['force_smtp_login'])) {
 			$params['smtp_auth'] = true;
 			$params['smtp_username'] = $params['username'];
-			$params['smtp_password'] = $params['password'];
+			$params['smtp_password'] = $params['password'] ?? $model->decryptPassword();
 		} elseif(isset($params['smtp_auth'])) {
 			if (!empty($params['smtp_auth'])){
 				if(empty($params['smtp_password']))
