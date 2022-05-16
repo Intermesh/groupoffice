@@ -26,7 +26,6 @@ return array (
   'Password' => 'Hasło',
   'Company' => 'Firma',
   'Permissions' => 'Uprawnienia',
-  'Look & feel' => 'Wygląd',
   'Settings' => 'Ustawienia',
   'Email for new enabled users' => 'Email dla nowo aktywowanych użytkowników',
   'Email for new disabled users' => 'Email dla deaktywowanych użytkowników',
@@ -451,6 +450,21 @@ Wszystkie prawa zastrzeżone.<br />
   'All fields' => 'Wszystkie pola',
   'results' => 'wyników',
   'months' => 'miesiące/miesięcy',
+	'short_months' =>
+		array (
+			1 => 'Sty',
+			2 => 'Lut',
+			3 => 'Mar',
+			4 => 'Kwi',
+			5 => 'Maj',
+			6 => 'Cze',
+			7 => 'Lip',
+			8 => 'Sie',
+			9 => 'Wrz',
+			10 => 'Paź',
+			11 => 'Lis',
+			12 => 'Gru',
+		),
   'short_days' => 
   array (
     0 => 'Nd',
