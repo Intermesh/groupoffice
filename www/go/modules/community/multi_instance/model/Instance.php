@@ -117,9 +117,13 @@ class Instance extends Entity {
 			//update model from instance db once a day
 			if(!isset($this->modifiedAt) || $this->modifiedAt <= new \DateTime("-10 minute")) {
 				$this->getInstanceDbData();
-				
-				if($this->isModified() && !$this->save()) {
-					throw new Exception("Could not save instance data! ". var_export($this->getValidationErrors(), true));
+
+				try {
+					if ($this->isModified() && !$this->save()) {
+						throw new Exception("Could not save instance data! " . var_export($this->getValidationErrors(), true));
+					}
+				} catch(Exception $e) {
+					ErrorHandler::logException($e);
 				}
 			}
 		}
