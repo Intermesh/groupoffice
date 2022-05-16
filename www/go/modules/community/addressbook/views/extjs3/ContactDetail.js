@@ -112,7 +112,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					},
 					tpl: '<div class="icons">\
 						<tpl for="emailAddresses">\
-							<a><tpl if="xindex == 1"><i class="icon label">email</i></tpl>\
+							<a href="mailto:{email}"><tpl if="xindex == 1"><i class="icon label">email</i></tpl>\
 							<span>{email}</span>\
 							<label>{[t("emailTypes")[values.type] || values.type]}</label>\
 							</a>\
@@ -155,7 +155,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					},
 					tpl: '<div class="icons">\
 						<tpl for="phoneNumbers">\
-							<a><tpl if="xindex == 1"><i class="icon label">phone</i></tpl>\
+							<a href="tel:{[values.number.replace(/[^0-9+]/g, \'\')]}"><tpl if="xindex == 1"><i class="icon label">phone</i></tpl>\
 							<span>{number}</span>\
 							<label>{[t("phoneTypes")[values.type] || values.type]}</label>\
 							</a>\
