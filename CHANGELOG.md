@@ -4,6 +4,8 @@
 - Tickets: IMAP import display ticket type upon error
 - Core: Polish translations
 - Calendar: raised timeout settings for server and client to 5 minutes for sending invitation e-mails.
+- History: Dropped foreing key contraint to user table because it caused lock on the core_user table while deleting users
+  blocking logins
 
 13-05-2022 6.6.86
 - Core: Token dates could be saved in user timezone instead of UTC by old framework.

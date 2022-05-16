@@ -1,3 +1,7 @@
+-- Warning:
+-- A foreign key contraint on createdBy to user caused a long lock while deleting users
+-- So we should not do that again!
+
 CREATE TABLE IF NOT EXISTS `history_log_entry` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `action` INT NULL,
@@ -15,11 +19,6 @@ CREATE TABLE IF NOT EXISTS `history_log_entry` (
   INDEX `fk_log_entry_core_user_idx` (`createdBy` ASC),
   INDEX `fk_log_entry_core_acl1_idx` (`aclId` ASC),
   INDEX `fk_log_entry_core_entity1_idx` (`entityTypeId` ASC),
-  CONSTRAINT `fk_log_entry_core_user`
-    FOREIGN KEY (`createdBy`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE SET NULL
-    ON UPDATE NO ACTION,
   CONSTRAINT `fk_log_entry_core_acl1`
     FOREIGN KEY (`aclId`)
     REFERENCES `core_acl` (`id`)

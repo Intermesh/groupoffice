@@ -27,3 +27,7 @@ $updates['202204131553'][] = "delete from core_acl where id in (
 $updates['202205101146'][] = "alter table history_log_entry
     add requestId varchar(190) default null;";
 
+
+$updates['202205161600'][] = "alter table history_log_entry
+    drop foreign key fk_log_entry_core_user;";
+
