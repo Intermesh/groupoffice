@@ -356,6 +356,9 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes) {
 
+		//allow more time for sending invites
+		go()->getEnvironment()->setMaxExecutionTime(360);
+
 		$isNewEvent = empty($params['id']);
 
 		if (!$model->isResource()) {

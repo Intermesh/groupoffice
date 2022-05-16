@@ -88,6 +88,9 @@ GO.calendar.EventDialog = function(calendar) {
 		items : this.tabPanel
 	});
 
+	//Set a long timeout for sending invites
+	this.formPanel.form.timeout= 360;
+
 	this.initWindow();
 
 	this.addEvents({
