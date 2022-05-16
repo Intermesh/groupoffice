@@ -580,6 +580,7 @@ class Instance extends Entity {
 			}
 
 			$dsn .= ';dbname=' . $config['db_name'];
+			$dsn .= ';charset=utf8mb4';
 
 			$this->instanceDbConn = new Connection($dsn, $config['db_user'], $config['db_pass']);
 		}
