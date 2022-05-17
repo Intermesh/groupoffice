@@ -242,18 +242,23 @@ class Sync extends Controller {
 		$this->output("Users in Group-Office: " . $totalInGO);
     $this->output("Users in LDAP: " . $totalInLDAP);
 
-    $deleteIds = [];
+    $deleteUsers= [];
     foreach($users as $user) {
       if (!in_array($user->id, $usersInLDAP)) {
-        $this->output("Will delete: " . $user->username . "\n");
-        $deleteIds[] = $user->id;
+	      $deleteUsers[] = [$user->id, $user->username];
       }
     }
 
-		$this->logDeletes($deleteIds, $totalInLDAP, $maxDeletePercentage, $totalInGO);
+		$this->logDeletes($deleteUsers, $totalInLDAP, $maxDeletePercentage, $totalInGO);
 
-		if(!empty($deleteIds) && !$dryRun) {
-	    User::delete(['id' => $deleteIds]);
+		if(!empty($deleteUsers)) {
+			// delete one by one to prevent a big locking transaction
+			foreach($deleteUsers as $u) {
+				$this->output("Deleting: " . $u[1]);
+				if(!$dryRun) {
+					User::delete(['id' => $u[0]]);
+				}
+			}
     }
   }
   
@@ -382,20 +387,23 @@ class Sync extends Controller {
 		$this->output("Groups in Group-Office: " . $totalInGO);
     $this->output("Groups in LDAP: " . $totalInLDAP);
 
-    $deleteIds = [];
+    $deleteGroups = [];
     foreach($groups as $group) {
       if (!in_array($group->id, $groupsInLDAP)) {
-        $this->output("Will delete " . $group->name);
-
-        $deleteIds[] = $group->id;
+        $deleteGroups[] = [$group->id, $group->name];
       }
     }
 
-		$this->logDeletes($deleteIds, $totalInLDAP, $maxDeletePercentage, $totalInGO);
+		$this->logDeletes($deleteGroups, $totalInLDAP, $maxDeletePercentage, $totalInGO);
 
-		if(!$dryRun) {
-      if(!empty($deleteIds)) {
-	      Group::delete(['id' => $deleteIds]);
+    if(!empty($deleteGroups)) {
+			foreach($deleteGroups as $g) {
+
+				$this->output("Deleting: " . $g[1]);
+
+				if(!$dryRun) {
+					Group::delete(['id' => $g['id']]);
+				}
       }
     }
   }
