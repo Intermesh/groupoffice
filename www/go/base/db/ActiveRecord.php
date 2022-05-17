@@ -478,7 +478,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function __construct($newRecord=true, $isStaticModel=false){
 
-		if(!empty(GO::session()->values['debugSql']))
+		if(!empty(GO::session()->values['debugSql']) || go()->getDbConnection()->debug)
 			$this->_debugSql=true;
 
 		$this->_isStaticModel = $isStaticModel;
