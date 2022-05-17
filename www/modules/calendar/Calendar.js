@@ -1849,8 +1849,10 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			break;
 			
 			case "GO\\Calendar\\Model\\Event":
-				if(event.permission_level<GO.permissionLevels.write)
-					return;
+				if(event.permission_level<GO.permissionLevels.write) {
+					GO.calendar.showInfo(event.event_id);
+					return''
+				}
 		
 				if(!event.is_organizer){
 					// You are not authorised to edit this event because you are not the organizer.
