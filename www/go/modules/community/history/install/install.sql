@@ -1,5 +1,6 @@
 -- Warning:
--- A foreign key contraint on createdBy to user caused a long lock while deleting users
+-- A foreign key contraint on createdBy to user and entityTypeId to core_entity
+-- caused a long lock while deleting users
 -- So we should not do that again!
 
 CREATE TABLE IF NOT EXISTS `history_log_entry` (
@@ -23,11 +24,6 @@ CREATE TABLE IF NOT EXISTS `history_log_entry` (
     FOREIGN KEY (`aclId`)
     REFERENCES `core_acl` (`id`)
     ON DELETE SET NULL
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_log_entry_core_entity1`
-    FOREIGN KEY (`entityTypeId`)
-    REFERENCES `core_entity` (`id`)
-    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
