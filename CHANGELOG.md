@@ -1,4 +1,7 @@
 - Email: Fixed invalid constraint in em_contacts_last_mail_times
+- History: new and old reversed for log entries in old framework
+- History: Dropped another foreign key contraint to user table because it caused lock on the core_user table while deleting users
+  blocking logins
 
 16-05-2022 6.6.87
 - Newsletters: any user with manage permissions can pause a newsletter
