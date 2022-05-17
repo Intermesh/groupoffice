@@ -150,15 +150,20 @@ class EntityType implements ArrayableInterface {
 			return $e;
 		}
 
-		if(go()->getDebugger()->enabled) {
+		if(go()->getDebugger()->enabled && !in_array($className, self::$checkedClasses)) {
 			//do extra check if entity type belongs to the module
 			$module = Module::findByClass($className, ['id'], true);
 			if($c['models'][$c['name'][$clientName]]->moduleId != $module->id) {
 				throw new Exception("Entity $className conflicts with : " .$c['models'][$c['name'][$clientName]]->getClassName() .". Please return unique client name with getClientName()");
 			}
+
+			self::$checkedClasses[] = $className;
 		}
 		return $c['models'][$c['name'][$clientName]] ?? null;
 	}
+
+
+	private $checkedClasses = [];
 
   /**
    * The highest mod sequence used for JMAP data sync
