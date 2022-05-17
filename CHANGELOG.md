@@ -1,3 +1,5 @@
+- Email: Fixed invalid constraint in em_contacts_last_mail_times
+
 16-05-2022 6.6.87
 - Newsletters: any user with manage permissions can pause a newsletter
 - Leavedays: In holiday request summary render dates correctly when date == today

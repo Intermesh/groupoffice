@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS `em_contacts_last_mail_times` (
 
 alter table em_contacts_last_mail_times
     add constraint em_contacts_last_mail_times_addressbook_addressbook_id_fk
-        foreign key (contact_id) references addressbook_addressbook (id)
+        foreign key (contact_id) references addressbook_contact (id)
             on delete cascade;
 
 alter table em_contacts_last_mail_times

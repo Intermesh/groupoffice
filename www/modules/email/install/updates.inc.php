@@ -226,3 +226,20 @@ $updates['202205131420'][] = "alter table em_contacts_last_mail_times
 
 
 $updates['202205131420'][] = "ALTER TABLE `em_accounts` ADD COLUMN IF NOT EXISTS `force_smtp_login` BOOLEAN NOT NULL DEFAULT FALSE;";
+
+
+$updates['202205170840'][] = "alter table em_contacts_last_mail_times
+    drop foreign key if exists em_contacts_last_mail_times_addressbook_addressbook_id_fk";
+
+$updates['202205170840'][] = "delete from em_contacts_last_mail_times where contact_id not in (select id from addressbook_contact)";
+$updates['202205170840'][] = "delete from em_contacts_last_mail_times where user_id not in (select id from core_user)";
+
+$updates['202205170840'][] = "alter table em_contacts_last_mail_times
+    add constraint em_contacts_last_mail_times_addressbook_contact_id_fk
+        foreign key if not exists (contact_id) references addressbook_contact (id)
+            on delete cascade";
+
+$updates['202205170840'][] = "alter table em_contacts_last_mail_times
+    add constraint em_contacts_last_mail_times_core_user_id_fk
+        foreign key if not exists (user_id) references core_user (id)
+            on delete cascade;";

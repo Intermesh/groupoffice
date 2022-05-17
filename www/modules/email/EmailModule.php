@@ -54,6 +54,11 @@ class EmailModule extends \GO\Base\Module{
 
 	}
 
+	public function depends()
+	{
+		return ['community/addressbook'];
+	}
+
 	public static function onMap(Mapping $mapping) {
 		$mapping->addHasOne('emailSettings', \GO\Email\Model\UserSettings::class, ['id' => 'id'], true);
 	}
