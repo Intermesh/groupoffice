@@ -1,3 +1,5 @@
+- Calendar: open info window when double clicking read only event
+
 05-04-2022 6.5.108
 - Email: All accounts were shown to admins
 
