@@ -60,27 +60,28 @@ class Module extends core\Module
 		$log = new LogEntry();
 		$log->setEntity($record);
 		$log->setAction($action);
-		$changes = $record->getLogJSON($action);
 
 		if($action != 'delete') {
+			$changes = $record->getLogJSON($action);
 			$cfChanges = self::getCustomFieldChanges($record);
 
 			if (!empty($cfChanges)) {
 				$changes['customFields'] = $cfChanges;
 			}
-		}
 
-		if($action == 'update' && empty($changes)) {
-			return;
-		}
-		$log->changes = json_encode($changes);
 
-		$l = LogEntry::getMapping()->getColumn('changes')->length;
-		if(mb_strlen($log->changes) > $l) {
-			foreach($changes as $key => $v) {
-				$changes[$key] = '... changes were too big to log ...';
+			if ($action == 'update' && empty($changes)) {
+				return;
 			}
 			$log->changes = json_encode($changes);
+
+			$l = LogEntry::getMapping()->getColumn('changes')->length;
+			if (mb_strlen($log->changes) > $l) {
+				foreach ($changes as $key => $v) {
+					$changes[$key] = '... changes were too big to log ...';
+				}
+				$log->changes = json_encode($changes);
+			}
 		}
 
 		self::saveLog($log);
