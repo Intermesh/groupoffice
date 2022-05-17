@@ -214,15 +214,9 @@ $updates['202205021223'][] = "alter table em_accounts
     drop column type;";
 
 
-$updates['202205131420'][] = "alter table em_contacts_last_mail_times
-    add constraint em_contacts_last_mail_times_addressbook_addressbook_id_fk
-        foreign key (contact_id) references addressbook_addressbook (id)
-            on delete cascade;";
+$updates['202205131420'][] = "";
 
-$updates['202205131420'][] = "alter table em_contacts_last_mail_times
-    add constraint em_contacts_last_mail_times_core_user_id_fk
-        foreign key (user_id) references core_user (id)
-            on delete cascade;";
+$updates['202205131420'][] = "";
 
 
 $updates['202205131420'][] = "ALTER TABLE `em_accounts` ADD COLUMN IF NOT EXISTS `force_smtp_login` BOOLEAN NOT NULL DEFAULT FALSE;";
