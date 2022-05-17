@@ -1,3 +1,5 @@
+- Workflow: fixed opening from start page and some minor styling issues
+
 17-05-2022 6.6.88
 - Email: Fixed invalid constraint in em_contacts_last_mail_times
 - History: new and old reversed for log entries in old framework
