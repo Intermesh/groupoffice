@@ -163,7 +163,7 @@ class EntityType implements ArrayableInterface {
 	}
 
 
-	private $checkedClasses = [];
+	private static $checkedClasses = [];
 
   /**
    * The highest mod sequence used for JMAP data sync
