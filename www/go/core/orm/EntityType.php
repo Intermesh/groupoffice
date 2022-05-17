@@ -665,6 +665,7 @@ class EntityType implements ArrayableInterface {
 		for($i = 10; $i > -1; $i--) {
 			try {
 				$stmt->execute(); //mod seq is a global integer that is incremented on any entity update
+				break;
 			} catch (PDOException $e) {
 
 				if($i == 0) {
@@ -705,6 +706,7 @@ class EntityType implements ArrayableInterface {
 		for($i = 10; $i > -1; $i--) {
 			try {
 				$stmt->execute(); //mod seq is a global integer that is incremented on any entity update
+				break;
 			} catch (PDOException $e) {
 
 				if($i == 0) {
