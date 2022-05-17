@@ -209,12 +209,12 @@ go.util =  (function () {
 				email = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.email + '>';
 			}
 
-			document.location = "mailto:" + email;
+			window.open("mailto:" + email, "_self");
 		},
 
 		callto: function (config, event) {
 			event.preventDefault();
-			document.location = "tel:" + config.number;
+			window.open("tel:" + config.number, "_self");
 		},
 
 		streetAddress: function (config) {
