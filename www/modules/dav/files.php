@@ -47,7 +47,7 @@ $server->debugExceptions=\GO::config()->debug;
 go()->getDebugger()->setRequestId("WebDAV " . ($_SERVER['REQUEST_METHOD'] ?? ""));
 
 $server->on('exception', function($e){
-	\go\core\ErrorHandler::logException($e);
+	go()->warn($e);
 });
 
 //baseUri can also be /webdav/ with:

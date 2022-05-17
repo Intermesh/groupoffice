@@ -67,7 +67,7 @@ $server = new Sabre\DAV\Server($tree);
 $server->debugExceptions = go()->getDebugger()->enabled;
 
 $server->on('exception', function($e){
-	\go\core\ErrorHandler::logException($e);
+	go()->warn($e);
 });
 
 //baseUri can also be /caldav/ with:

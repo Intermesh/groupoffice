@@ -51,7 +51,7 @@ go()->getDebugger()->setRequestId("CardDAV " . ($_SERVER['REQUEST_METHOD'] ?? ""
 $server = new Server($nodes);
 $server->debugExceptions = go()->getDebugger()->enabled;
 $server->on('exception', function($e){
-	\go\core\ErrorHandler::logException($e);
+	go()->warn($e);
 });
 
 
