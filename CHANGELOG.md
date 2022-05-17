@@ -1,4 +1,5 @@
 - Workflow: fixed opening from start page and some minor styling issues
+- Calendar: open info window when double clicking read only event
 
 17-05-2022 6.6.88
 - Email: Fixed invalid constraint in em_contacts_last_mail_times
