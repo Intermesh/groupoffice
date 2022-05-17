@@ -3388,7 +3388,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 						$oldVal = substr($oldVal,0,$cutoffLength).$cutoffString;
 					}
 					
-					$modifications[$key]=array($oldVal,$newVal);	
+					$modifications[$key]=array($newVal, $oldVal);
 				}
 				
 				// Also track customfieldsrecord changes
