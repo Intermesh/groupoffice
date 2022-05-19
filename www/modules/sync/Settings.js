@@ -32,7 +32,19 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 	
 	initComponent: function() {
 		
-		this.items = [];
+		this.items = [{
+			title: t("General"),
+			xtype: "fieldset",
+			items: [
+				{
+					hideLabel: true,
+					xtype: "checkbox",
+					boxLabel: t("Allow delete via synchronization"),
+					name: "allowDelete",
+					hint: t("By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.")
+				}]
+			}
+		];
 
 		if(go.Modules.isAvailable("legacy", "email")) {
 			this.items.push(new Ext.form.FieldSet({

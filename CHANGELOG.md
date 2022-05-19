@@ -1,4 +1,9 @@
 - Email: Authenticate to Gmail via Oauth 2.
+- Sync: Disallow deletes via sync by default.Due to a very nasty bug in Android 12
+  some phones started to delete contacts via Microsoft ActiveSync. Therefore we've
+  implemented a new setting in Group-Office that disallows deletes via sync by
+  default now. More info on the bug can be found here:
+  https://eu.community.samsung.com/t5/galaxy-z-fold-z-flip/outlook-contacts-gone-after-android-12-update/td-p/4567744/page/2
 
 17-05-2022 6.6.89
 - Workflow: fixed opening from start page and some minor styling issues

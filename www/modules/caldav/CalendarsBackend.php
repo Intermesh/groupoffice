@@ -27,6 +27,7 @@ use GO\Caldav\Model\DavEvent;
 use GO\Caldav\Model\DavTask;
 use GO\Base\Db\FindParams;
 use GO\Base\Db\FindCriteria;
+use Sabre\DAV\Exception\Forbidden;
 use Sabre\VObject\Reader;
 use Sabre\DAV\Exception;
 
@@ -784,6 +785,11 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 */
 	public function deleteCalendarObject($calendarId, $objectUri) {
 		\GO::debug("deleteCalendarObject($calendarId,$objectUri)");
+
+		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
+			go()->debug("Deleting is disabled by user sync settings");
+			throw new Forbidden("Deleting is disabled by user sync settings");
+		}
 
 		try{
 			$event = $this->getEventByUri($objectUri, $calendarId);

@@ -9,6 +9,12 @@ use go\modules\community\notes\model\Note;
 class goNote extends GoBaseBackendDiff {
 
 	public function DeleteMessage($folderid, $id, $contentparameters) {
+
+		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
+			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
+			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+		}
+
 		try {
 			ZLog::Write(LOGLEVEL_DEBUG, 'goNote->DeleteMessage(' . $folderid . ',' . $id . ')');
 			$note = Note::findById($id);
