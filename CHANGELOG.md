@@ -1,3 +1,4 @@
+19-05-2022 6.6.90
 - Email: Authenticate to Gmail via Oauth 2.
 - Sync: Disallow deletes via sync by default.Due to a very nasty bug in Android 12
   some phones started to delete contacts via Microsoft ActiveSync. Therefore we've

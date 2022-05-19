@@ -648,11 +648,6 @@ class goMail extends GoBaseBackendDiff {
 	 * @return boolean
 	 */
 	public function DeleteMessage($folderid, $id, $contentparameters) {
-
-		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
-			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
-		}
 		
 		ZLog::Write(LOGLEVEL_DEBUG, "goMail::DeleteMessage($folderid, $id)");
 	
