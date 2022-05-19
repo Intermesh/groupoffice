@@ -72,7 +72,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			stateId:'ab-tree',
 			split: true,
 			enableDrop: true,
-			readOnly: !go.Modules.get("community", 'addressbook').userRights.mayChangeAddressbooks,
+			readOnly: false, //!go.Modules.get("community", 'addressbook').userRights.mayChangeAddressbooks,
 			ddGroup: "addressbook",
 			ddAppendOnly: true,
 			tbar: [{
