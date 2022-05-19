@@ -104,7 +104,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	protected function actionDelete($params){
 		$msg = '';
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
-				
+
 		$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$params["mailbox"]));
 		if($mailbox->isSpecial()) {
 			throw new \Exception(\GO::t("You can't delete the trash, sent items or drafts folder", "email"));
@@ -126,7 +126,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 			$success = $mailbox->delete();
 		}
 		if(!$success) {
-			$msg = t("Failed to delete folder");
+			$msg = go()->t("Failed to delete folder") . ": " . $account->getImapConnection()->last_error();
 		}
 		return ['success' => $success, 'feedback' => $msg];
 	}
