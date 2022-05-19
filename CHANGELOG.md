@@ -1,3 +1,5 @@
+- Email: Authenticate to Gmail via Oauth 2.
+
 17-05-2022 6.6.89
 - Workflow: fixed opening from start page and some minor styling issues
 - Calendar: open info window when double clicking read only event
