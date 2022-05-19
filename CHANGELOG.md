@@ -5,6 +5,7 @@
   implemented a new setting in Group-Office that disallows deletes via sync by
   default now. More info on the bug can be found here:
   https://eu.community.samsung.com/t5/galaxy-z-fold-z-flip/outlook-contacts-gone-after-android-12-update/td-p/4567744/page/2
+- Workflow: Don't check permissions on attaching workflow history and more detailed error
 
 17-05-2022 6.6.89
 - Workflow: fixed opening from start page and some minor styling issues
