@@ -6,6 +6,9 @@
   default now. More info on the bug can be found here:
   https://eu.community.samsung.com/t5/galaxy-z-fold-z-flip/outlook-contacts-gone-after-android-12-update/td-p/4567744/page/2
 - Workflow: Don't check permissions on attaching workflow history and more detailed error
+- Addressbook: Edit own address book possible when not having rights to change address books
+- Tasks: Edit own task list possible when not having rights to change task lists
+- Notes: Edit own notebook possible when not having rights to change notebooks
 
 17-05-2022 6.6.89
 - Workflow: fixed opening from start page and some minor styling issues

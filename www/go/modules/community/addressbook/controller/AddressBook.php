@@ -59,10 +59,10 @@ class AddressBook extends EntityController {
 
 	protected function canDestroy(Entity $entity): bool
 	{
-		$mod = CoreModule::findByName("community", "addressbook");
-		if(!$mod->getUserRights()->mayChangeAddressbooks) {
-		 return false;
+		if(!$this->rights->mayChangeAddressbooks) {
+			return false;
 		}
+
 		return parent::canDestroy($entity);
 	}
 
