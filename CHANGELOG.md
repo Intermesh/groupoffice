@@ -11,6 +11,7 @@
 - Notes: Edit own notebook possible when not having rights to change notebooks
 - Tickets: Show type description on hover in combo for selecting types
 - History: Set delete period in days instead of years
+- Tickets: Send agent e-mail to cc address when customer writes a message
 
 17-05-2022 6.6.89
 - Workflow: fixed opening from start page and some minor styling issues
