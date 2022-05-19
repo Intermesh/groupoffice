@@ -13,6 +13,7 @@
 - History: Set delete period in days instead of years
 - Tickets: Send agent e-mail to cc address when customer writes a message
 - Email: Put context menu items in message panel so it's avialable on mobiles
+- Projects: Option to invoice per employee
 
 17-05-2022 6.6.89
 - Workflow: fixed opening from start page and some minor styling issues
