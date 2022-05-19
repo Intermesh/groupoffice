@@ -22,25 +22,26 @@
 namespace GO\Base\Mail;
 
 
-class Mailer extends \Swift_Mailer{
-	
+class Mailer extends \Swift_Mailer
+{
+
 	/**
-   * Create a new Mailer instance.
-   * 
-	 * @var \Swift_SmtpTransport $transport. 
-	 * Optionally supply a transport class. If omitted a Transport 
+	 * Create a new Mailer instance.
+	 *
+	 * @return Mailer
+	 * @var \Swift_SmtpTransport $transport .
+	 * Optionally supply a transport class. If omitted a Transport
 	 * object will be created that uses the smtp settings from config.php
-	 * 
-   * @return Mailer
-   */
-  public static function newGoInstance($transport=false)
-  {
-		if(!$transport)
-			$transport=Transport::newGoInstance();
-		
-    $mailer = new self($transport);		
+	 *
+	 */
+	public static function newGoInstance($transport = false)
+	{
+		if (!$transport) {
+			$transport = Transport::newGoInstance();
+		}
+		$mailer = new self($transport);
 		return $mailer;
-  }
+	}
 	
 	public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null) {
 		
@@ -69,34 +70,6 @@ class Mailer extends \Swift_Mailer{
 			\GO::debug("E-mail debugging is enabled in the Group-Office config.php file. All emails are sent to: ".\GO::config()->debug_email);
 		}
 		
-//		if(\GO::modules()->isInstalled("log")){
-//
-//			$str = "";
-//
-//			$from = $message->getFrom ();
-//			if(!empty($from))
-//				$str .= implode(",",array_keys($from));
-//			else
-//				$str .= "unknown";
-//
-//			$str .= " -> ";
-//
-//			$to = $message->getTo ();
-//			if(!empty($to))
-//				$str .= implode(",",array_keys($to));
-//
-//			$to = $message->getCc ();
-//			if(!empty($to))
-//				$str .= implode(",",array_keys($to));
-//
-//			$to = $message->getBcc ();
-//			if(!empty($to))
-//				$str .= implode(",",array_keys($to));
-//
-//			\GO\Log\Model\Log::create ("email", $str);
-//		}
-		
-
 		//workaround https://github.com/swiftmailer/swiftmailer/issues/335
 		$messageId = $message->getId();
 		
@@ -117,10 +90,11 @@ class Mailer extends \Swift_Mailer{
 		if(!empty($tmpDir)){
 			$folder = new \GO\Base\Fs\Folder($tmpDir);
 			// Check if folder is deleted successfully
-			if($folder->delete())
-				\GO::debug('Clear attachments tmp directory: '.$tmpDir);
-			else
-				\GO::debug('Failed to clear attachments tmp directory: '.$tmpDir);
+			if ($folder->delete()) {
+				\GO::debug('Clear attachments tmp directory: ' . $tmpDir);
+			} else {
+				\GO::debug('Failed to clear attachments tmp directory: ' . $tmpDir);
+			}
 		}
 		
 		return $count;

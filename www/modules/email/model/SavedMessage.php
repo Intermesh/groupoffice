@@ -89,7 +89,7 @@ class SavedMessage extends ComposerMessage
 		$attributes['size']=strlen($mimeData);
 		
 		$attributes['message_id']=isset($structure->headers['message-id']) ? $structure->headers['message-id'] : "";
-		
+
 		if(isset($structure->headers['content-type']) && preg_match("/([^\/]*\/[^;]*)(.*)/", $structure->headers['content-type'], $matches)){
 			$attributes['content_type_attributes']=array();
 			$attributes['content_type']=$matches[1];
@@ -215,7 +215,6 @@ class SavedMessage extends ComposerMessage
 					$a->number=$part_number_prefix.$part_number;
 					$a->content_id=$content_id;
 					$a->mime=$mime_type;
-					
 					if(!empty($part->body)){
 						$tmp_file = new \GO\Base\Fs\File($this->_getTempDir(). \GO\Base\Fs\File::stripInvalidChars($filename));
 						$tmp_file->appendNumberToNameIfExists();						
@@ -257,9 +256,9 @@ class SavedMessage extends ComposerMessage
 	{
 		if (isset($structure->parts)) {
 			foreach ($structure->parts as $part) {
-				if ($part->ctype_primary == 'text' && $part->ctype_secondary == 'html')
+				if ($part->ctype_primary == 'text' && $part->ctype_secondary == 'html') {
 					return true;
-				else if ($this->_hasHtmlPart($part)) {
+				} else if ($this->_hasHtmlPart($part)) {
 					return true;
 				}
 			}

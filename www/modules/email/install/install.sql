@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `em_accounts` (
   `do_not_mark_as_read` tinyint(1) NOT NULL DEFAULT '0',
 	`signature_below_reply` tinyint(1) NOT NULL DEFAULT '0',
 	`full_reply_headers` tinyint(1) NOT NULL DEFAULT '0',
+	`client_id` INT(11) UNSIGNED DEFAULT NULL,
 	`force_smtp_login` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)

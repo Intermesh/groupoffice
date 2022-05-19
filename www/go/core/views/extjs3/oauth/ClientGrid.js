@@ -90,7 +90,7 @@ go.oauth.ClientGrid = Ext.extend(go.grid.GridPanel, {
 		}, this);
 	}, 
 	
-		initRowActions: function () {
+	initRowActions: function () {
 
 		var actions = new Ext.ux.grid.RowActions({
 			menuDisabled: true,

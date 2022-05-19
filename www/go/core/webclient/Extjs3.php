@@ -2,13 +2,10 @@
 
 namespace go\core\webclient;
 
-use GO;
 use go\core\App;
 use go\core\Environment;
 use go\core\fs\File;
 use go\core\jmap\Request;
-use go\core\Language;
-use go\core\model\Settings;
 use go\core\model\Module;
 use go\core\SingletonTrait;
 
@@ -246,7 +243,11 @@ class Extjs3 {
 	}
 
 	public function getThemeUrl() {
-		return $this->getRelativeUrl() . 'views/Extjs3/themes/' . $this->getTheme() . '/';
+		$relativeUrl = $this->getRelativeUrl();
+		if(strpos($relativeUrl, "/modules/") > -1) {
+			return '/views/Extjs3/themes/' . $this->getTheme() . '/';
+		}
+		return $relativeUrl . 'views/Extjs3/themes/' . $this->getTheme() . '/';
 	}
 
 	public function renderPage($html, $title = null) {

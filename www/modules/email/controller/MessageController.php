@@ -3,16 +3,21 @@
 
 namespace GO\Email\Controller;
 
+use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
 use GO\Base\Mail\Imap;
+use GO\Base\Mail\Mailer;
+use GO\Base\Mail\SmimeMessage;
 use GO\Base\Model\Acl;
 use go\core\ErrorHandler;
 use go\core\model\Acl as GoAcl;
 use go\core\model\User;
+use GO\Email\Model\Alias;
 use GO\Email\Model\Account;
 use GO\Email\Model\Label;
+use GO\Email\Transport;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Settings;
 
@@ -70,7 +75,7 @@ class MessageController extends \GO\Base\Controller\AbstractController
 		$address=$toList->getAddress();
 		$message->setTo($address['email'], $address['personal']);
 
-		$mailer = \GO\Base\Mail\Mailer::newGoInstance(\GO\Email\Transport::newGoInstance($account));
+		$mailer = Mailer::newGoInstance(\GO\Email\Transport::newGoInstance($account));
 		$response['success'] = $mailer->send($message);
 
 		return $response;
@@ -624,7 +629,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 *
 	 * @todo Save to sent items should be implemented as a Swift outputstream for better memory management
 	 * @param array $params
-	 * @return boolean
+	 * @return array
+	 * @throws Exception
 	 */
 	protected function actionSend(array $params)
 	{
@@ -633,10 +639,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$response['success'] = true;
 		$response['feedback']='';
 
-		$alias = \GO\Email\Model\Alias::model()->findByPk($params['alias_id']);
+		$alias = Alias::model()->findByPk($params['alias_id']);
 		$account = Account::model()->findByPk($alias->account_id);
 
-		$message = new \GO\Base\Mail\SmimeMessage();
+		$message = new SmimeMessage();
 
 		$tag = $this->_createAutoLinkTagFromParams($params, $account);
 
@@ -649,14 +655,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$message->handleEmailFormInput($params);
-
 		$recipientCount = $message->countRecipients();
 		if(!$recipientCount) {
 			throw new \Exception(GO::t("You didn't enter a recipient", "email"));
 		}
 		$message->setFrom($alias->email, $alias->name);
 		
-		$mailer = \GO\Base\Mail\Mailer::newGoInstance(\GO\Email\Transport::newGoInstance($account));
+		$mailer = Mailer::newGoInstance(Transport::newGoInstance($account));
 
 		$logger = new \Swift_Plugins_Loggers_ArrayLogger();
 		$mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
@@ -755,7 +760,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$logStr = trim(substr($matches[0], 2, -2));
 			}
 
-			throw new \Exception($msg.nl2br($logStr));
+			throw new Exception($msg.nl2br($logStr));
 		}
 		
 		//if there's an autolink tag in the message we want to link outgoing messages too.
@@ -857,7 +862,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceUserTags($response['data']['htmlbody'],true);
 				}
 				
-				if(!empty($params['alias_id']) && ($alias = GO\Email\Model\Alias::model()->findByPk($params['alias_id']))) {				
+				if(!empty($params['alias_id']) && ($alias = GO\Email\Model\Alias::model()->findByPk($params['alias_id']))) {
 					$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceModelTags($response['data']['htmlbody'], $alias, 'alias:', true);
 				}
 				//cleanup empty tags
@@ -1037,7 +1042,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$params['template_id'] = $templateModel->template_id;
 			}
 		}
-		
 		$from =$replyTo->getAddress();
 		$fromArr = $message->from->getAddress();
 		
@@ -1061,7 +1065,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			if(!empty($oldMessage['smime_encrypted'])) {
 				$response['sendParams']['encrypt_smime'] = true;
 			}
-			
 			$AccountModel =  Account::model()->findByPk($params['account_id']);
 			if($AccountModel->full_reply_headers) {
 				$headerLines = $this->_getFollowUpHeaders($message);
@@ -1679,7 +1682,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		//seen flag is expensive because it can't be recovered from cache
 		$linkedModels = new \go\core\util\ArrayObject();
-		
 		if(GO::modules()->savemailas){
 			$tags = $this->_findAutoLinkTags($response['htmlbody'], $imapMessage->account->id);
 

@@ -432,7 +432,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			multiple:true
 		})
 	);
-	
+
 	this.gridContextMenu = new GO.menu.RecordsContextMenu({
 		shadow: "frame",
 		minWidth: 180,
@@ -571,16 +571,19 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		if(!node){
 			return;
 		}
-		var usage = '';
+		let usage = '';
 
-		var inboxNode = this.treePanel.findInboxNode(node);
+		let inboxNode = this.treePanel.findInboxNode(node);
 		if(inboxNode) {
 			usage=inboxNode.attributes.usage;
 		}
-
+		let mbname = node.attributes.mailbox;
+		if(Ext.isEmpty(mbname)) {
+			mbname = 'INBOX';
+		}
 		this.setAccount(
 			node.attributes.account_id,
-			node.attributes.mailbox,
+			mbname,
 			usage
 		);
 	}, this);
@@ -782,9 +785,9 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 	this.messagePanel.on('attachmentClicked', GO.email.openAttachment, this);
 
-	/*
-     * for email seaching on sender from message panel
-   */
+	/**
+     * for email seapching on sender from message panel
+    */
 	GO.email.searchSender=function(sender) {
 		if(this.rendered) {
 			GO.email.search_type = 'from';
@@ -849,8 +852,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		}, this);
 
 		grid.on("rowdblclick", function(){
-			if(this.messagesGrid.store.reader.jsonData.drafts || this.messagesGrid.store.reader.jsonData.sent)
-			{
+			if(this.messagesGrid.store.reader.jsonData.drafts || this.messagesGrid.store.reader.jsonData.sent) {
 				GO.email.showComposer({
 					uid: this.messagePanel.uid,
 					task: 'opendraft',
@@ -858,8 +860,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 					mailbox: this.mailbox,
 					account_id: this.account_id
 				});
-			}else
-			{
+			} else {
 				this.messagePanel.popup();
 			}
 		}, this);
@@ -1006,7 +1007,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			if(current != unseen) {
 				if(unseen>0) {
 					statusEl.dom.innerHTML = unseen;
-				}else {
+				} else {
 					statusEl.dom.innerHTML = "";
 				}
 				return true;
@@ -1023,8 +1024,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		var statusText = statusEl.dom.innerHTML;
 
 		var status = 0;
-		if(statusText!='')
-		{
+		if(statusText!='') {
 			status = parseInt(statusText.substring(1, statusText.length-1));
 		}
 		status+=increment;
@@ -1032,22 +1032,20 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.updateFolderStatus(mailbox, status);
 	},
 
-
-
-
 	refresh : function(refresh) {
 
 		//restore scroll position after refresh in the root node load handler above
 		this.treeScrollTop = this.treePanel.body.dom.scrollTop;
 
-		if(refresh)
-			this.treePanel.loader.baseParams.refresh=true;
-
+		if(refresh) {
+			this.treePanel.loader.baseParams.refresh = true;
+		}
 		this.treePanel.root.reload();
 		// this.messagesStore.removeAll();
 
-		if(refresh)
+		if(refresh) {
 			delete this.treePanel.loader.baseParams.refresh;
+		}
 	},
 
 	showAccountsDialog : function() {
@@ -1098,11 +1096,9 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				success: function(options, response,result) {
 					var field;
 					var value;
-
 					var records = this.messagesGrid.selModel.getSelections();
 
-					switch(flag)
-					{
+					switch(flag) {
 						case 'Seen':
 							field='seen';
 							value=!clear;
@@ -1114,8 +1110,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 					}
 
 
-					for(var i=0;i<records.length;i++)
-					{
+					for(var i=0;i<records.length;i++) {
 						records[i].set(field, value);
 						records[i].commit();
 					}
@@ -1234,13 +1229,11 @@ GO.mainLayout.onReady(function(){
 
 		var ep = GO.mainLayout.getModulePanel('email');
 
-		if(ep){
-			for(var i=0;i<data.email_status.unseen.length;i++)
-			{
+		if(ep) {
+			for(var i=0;i<data.email_status.unseen.length;i++) {
 				var s = data.email_status.unseen[i];
 				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
-				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
-				{
+				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id) {
 					ep.messagesGrid.store.reload({
 						keepScrollPosition: true
 					});
@@ -1359,7 +1352,6 @@ GO.email.saveAttachment = function(attachment,panel)
 					maskEl:dialog.el,
 					url: 'email/message/saveAttachment',
 					params:{
-						//task:'save_attachment',
 						uid: panel.uid,
 						mailbox: panel.mailbox,
 						number: attachment.number,
@@ -1418,7 +1410,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 				sender:panel.data.sender, //for gnupg and smime,
 				filepath:panel.data.path ? panel.data.path : '' //In some cases encrypted messages are temporary stored on disk so the handlers must use that to fetch the data.
 			});
-		}else {
+		} else {
 			switch(attachment.extension) {
 				case 'ics':
 					GO.calendar.showEventDialog({
@@ -1584,7 +1576,6 @@ go.Modules.register("legacy", 'email', {
 	userSettingsPanels: ["GO.email.SettingsPanel"]
 });
 
-
 (function() {
 
 	function launchAddressContextMenu(e, href){
@@ -1594,7 +1585,7 @@ go.Modules.register("legacy", 'email', {
 		if(indexOf>-1) {
 			email = href.substr(7, indexOf-7);
 			queryString = href.substr(indexOf+1);
-		}else {
+		} else {
 			email = href.substr(7);
 		}
 
@@ -1656,7 +1647,6 @@ GO.newMenuItems.push({
 	}
 });
 
-//files is array of relative paths
 // files is array of objects with {name, path, size, type, extension}
 GO.email.emailFiles = function(files, detailView) {
 	if (!Ext.isArray(files)) {
