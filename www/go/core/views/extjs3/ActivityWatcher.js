@@ -10,7 +10,7 @@ go.ActivityWatcher = (function() {
 		activity : function() {
 			//reset the secondsSinceLastActivity variable
 			//back to 0
-			localStorage.lastActivity = Math.floor(Date.now() / 1000);
+			localStorage.setItem('lastActivity', Math.floor(Date.now() / 1000));
 		},
 
 		init : function(maxInactivity) {
@@ -40,13 +40,13 @@ go.ActivityWatcher = (function() {
 
 
 		checkActivity : function() {
-			if(!localStorage.lastActivity) {
+			if(!localStorage.getItem('lastActivity')) {
 				return;
 			}
 
 			var now = Math.floor(Date.now() / 1000);
 
-			var secondsSinceLastActivity = now - localStorage.lastActivity;
+			var secondsSinceLastActivity = now - localStorage.getItem('lastActivity');
 			//console.log(secondsSinceLastActivity + ' seconds since the user was last active');
 			//if the user has been inactive or idle for longer
 			//then the seconds specified in maxInactivity
