@@ -1,5 +1,10 @@
 # README
 
+1. Setup an oauth app in google:
+
+https://developers.google.com/identity/protocols/oauth2
+
+
 ## Development environment (docker)
 
 When using the official [Group Office development environment](https://github.com/Intermesh/docker-groupoffice-development),
