@@ -108,7 +108,7 @@ class Module extends Entity {
 			return false;
 		}
 
-		if($this->isModified(['enabled'])) {
+		if($this->isModified(['enabled']) || $this->isNew()) {
 			go()->rebuildCache();
 		}
 

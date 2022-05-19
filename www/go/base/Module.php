@@ -373,9 +373,7 @@ class Module extends Observable {
 		}catch(\Exception $e){
 			throw new \Exception("SQL query failed: ".$query."\n\n".$e->getMessage());
 		}
-		
-		\GO::clearCache();
-		Observable::cacheListeners();
+		go()->rebuildCache(true);
 		//call saveUser for each user
 //		$stmt = Model\User::model()->find(array('ignoreAcl'=>true));		
 //		while($user = $stmt->fetch()){
