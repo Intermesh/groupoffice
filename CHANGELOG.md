@@ -23,6 +23,7 @@
 - Core: Token dates could be saved in user timezone instead of UTC by old framework.
 - Core: Used unnamed parameters in queries for better performance with mysql native driver
   (without PDO::ATTR_EMULATE_PREPARES) and large inserts
+- Core: fixed problem cuasing apache segmentation faults crashing the server!
 
 12-05-2022 6.6.85
 - Core: Bugfix when saving new Custom Field to existing entity
