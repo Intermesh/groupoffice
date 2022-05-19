@@ -138,327 +138,12 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		GO.email.saveAsItems[i].scope=this;
 	}
 
-	var addSendersItems = [{
-		text:t("To", "email"),
-		field:'to',
-		handler:this.addSendersTo,
-		scope:this
-	},{
-		text:'CC',
-		field:'cc',
-		handler:this.addSendersTo,
-		scope:this
-	},{
-		text:'BCC',
-		field:'bcc',
-		handler:this.addSendersTo,
-		scope:this
-	}];
 
-	if(go.Modules.isAvailable("business", "newsletters")) {
-		addSendersItems.push({
-			text: t("Address list", "newsletters", "business"),
-			handler: this.addSendersToAddresslist,
-			scope: this
-		});
-	}
-
-	var deleteSendersItems = [];
-
-	if(go.Modules.isAvailable("business", "newsletters")) {
-		deleteSendersItems.push({
-			text: t("Address list",  "newsletters", "business"),
-			handler: this.deleteSendersFromAddresslist,
-			scope: this
-		});
-	}
-	
-	var contextItems = [
-	this.contextMenuMarkAsRead = new Ext.menu.Item({
-		iconCls: 'ic-markunread',
-		text: t("Mark as read", "email"),
-		handler: function(){
-			this.flagMessages('Seen', false);
-		},
-		scope:this,
-		multiple:true
-	}),
-	this.contextMenuMarkAsUnread = new Ext.menu.Item({
-		iconCls: 'ic-markunread',
-		text: t("Mark as unread", "email"),
-		handler: function(){
-			this.flagMessages('Seen', true);
-		},
-		scope: this,
-		multiple:true
-	}),
-	this.contextMenuFlag = new Ext.menu.Item({
-		iconCls: 'ic-flag',
-		text: t("Add flag", "email"),
-		handler: function(){
-			this.flagMessages('Flagged', false);
-		},
-		scope: this,
-		multiple:true
-	}),
-	this.contextMenuUnflag = new Ext.menu.Item({
-		iconCls: 'ic-flag',
-		text: t("Remove flag", "email"),
-		handler: function(){
-			this.flagMessages('Flagged', true);
-		},
-		scope: this,
-		multiple:true
-	}),
-	'-',
-	this.contextMenuSource = new Ext.menu.Item ({
-		text: t("View source", "email"),
-		iconCls: 'ic-code',
-		handler: function(){
-
-			var record = this.messagesGrid.selModel.getSelected();
-			if(record) {
-				var win = window.open(GO.url("email/message/source",{account_id:this.account_id,mailbox:record.data.mailbox,uid:record.data.uid}));
-				win.focus();
-			}
-
-		},
-		scope: this
-	}),'-',
-	this.contextMenuCopyTo = new Ext.menu.Item ({
-		iconCls: 'ic-content-copy',
-		text: t("Copy email to...", "email"),
-		handler: function(a,b,c){
-			var selectedEmails = this.messagesGrid.getSelectionModel().getSelections();
-			this.showCopyMailToDialog(selectedEmails);
-		},
-		scope: this,
-		multiple:true
-	}),
-
-		this.contextMenuMoveTo = new Ext.menu.Item ({
-			iconCls: 'ic-move-to-inbox',
-			text: t("Move email to...", "email"),
-			handler: function(a,b,c){
-				var selectedEmails = this.messagesGrid.getSelectionModel().getSelections();
-				this.showCopyMailToDialog(selectedEmails, true);
-			},
-			scope: this,
-			multiple:true
-		}),
-	 this.addEmailButton = new Ext.menu.Item({
-		iconCls: 'ic-mail',
-		text: t("Forward as attachment ", "email"),
-		handler: function(){
-			var records = this.messagesGrid.selModel.getSelections();
-			if(records) {
-
-				var addEmailAsAttachmentList = [];
-
-				Ext.each(records, function(record) {
-					addEmailAsAttachmentList.push({
-						uid: record.get('uid'), 
-						mailbox: record.get('mailbox')
-					})
-				});
-
-				GO.email.showComposer({
-					values: addEmailAsAttachmentList.length == 1 ? {subject: "Fwd: " + records[0].data.subject} : undefined,
-					account_id: this.account_id,
-					addEmailAsAttachmentList: addEmailAsAttachmentList
-				});
-			}
-		},
-		scope:this,
-		multiple:true
-	}),
-	'-',
-	this.contextMenuDelete = new Ext.menu.Item({
-		iconCls: 'ic-delete',
-		text: t("Delete"),
-		handler: function(){
-			this.messagesGrid.deleteSelected();
-		},
-		scope: this,
-		multiple:true
-	}),
-	 this.contextMoveToSpamFolder = new Ext.menu.Item({
-		iconCls: 'ic-report',
-		text: t("Move to spam folder", "email"),
-		handler: function(){
-			 var records = this.messagesGrid.selModel.getSelections();
-			 if(!records) {
-				 return;
-			 }
-			 const uids = [];
-			 const mailbox = records[0].get("mailbox");
-
-			 Ext.each(records, function(record) {
-				 uids.push(record.get('uid'));
-			 }, this);
-
-				GO.email.moveToSpam(uids, mailbox, this.account_id);
-
-		},
-		scope: this,
-		multiple:true
-	})
-	,'-',{
-		iconCls: 'ic-add',
-		text: t("Add senders to...", "email"),
-		menu: {
-			items: addSendersItems
-		},
-		multiple:true
-	},{
-		iconCls: 'ic-delete',
-		text: t("Delete senders from...", "email"),
-		menu: {
-			items: deleteSendersItems
-		},
-		multiple:true,
-		hidden: (deleteSendersItems.length === 0)
-	}];
-
-	if(GO.email.saveAsItems && GO.email.saveAsItems.length) {
-		this.saveAsMenu = new Ext.menu.Menu({
-			items:GO.email.saveAsItems
-		});
-
-		this.saveAsMenu.on('show', function(menu){
-			var sm = this.messagesGrid.getSelectionModel();
-			var multiple = sm.getSelections().length>1;
-			var none = sm.getSelections().length==0;
-
-			for(var i=0;i<menu.items.getCount();i++)
-			{
-				var item = menu.items.get(i);
-				item.setDisabled(none || (!item.multiple && multiple));
-			}
-		}, this);
-
-		contextItems.push({
-			iconCls: 'ic-save',
-			text:t("Save as"),
-			menu:this.saveAsMenu,
-			multiple:true
-		});
-	}
-
-	this.setCheckStateOnLabelsMenu = function(onload) {
-		if (this.labelsContextMenu.store.loaded || onload) {
-
-			var flags = [];
-
-			this.labelsContextMenu.items.each(function(item) {
-				flags[item.flag] = item;
-				item.textEl.setStyle('color', '#' + item.color);
-				item.setChecked(false);
-			});
-
-			var selectedRows = this.messagesGrid.selModel.selections.keys, record;
-
-			Ext.each(selectedRows, function(id) {
-				record = this.messagesGrid.store.getById(id);
-
-				Ext.each(record.get('labels'), function(label) {
-					if (Ext.isDefined(flags[label.flag])) {
-						flags[label.flag].setChecked(true);
-					}
-				});
-			}, this);
-		}
-	};
-
-	contextItems.push(
-		this.contextMenuLabels = new Ext.menu.Item ({
-			iconCls: 'ic-label',
-			text: t("Labels", "email"),
-			menu: this.labelsContextMenu = new GO.menu.JsonMenu({
-				id: 'email-messages-labels-menu',
-				store: new GO.data.JsonStore({
-					url: GO.url("email/label/store"),
-					baseParams: {
-						account_id: 0,
-						forContextMenu: true
-					},
-					fields: ['flag', 'text', 'color'],
-					remoteSort: true			
-				}),
-				listeners:{
-					scope:this,
-					load: function() {
-						this.setCheckStateOnLabelsMenu();
-					},
-
-					beforeshow: function() {
-						var isDefined = Ext.isDefined(this.labelsContextMenu.store.baseParams.account_id) && this.labelsContextMenu.store.baseParams.account_id !== null;
-						if (!isDefined || (isDefined && this.labelsContextMenu.store.baseParams.account_id != this.messagesStore.baseParams.account_id)) {
-							this.labelsContextMenu.store.loaded = true; //hack - ignore initial store load
-							this.labelsContextMenu.store.baseParams.account_id = this.messagesStore.baseParams.account_id;
-							this.labelsContextMenu.store.load();
-						}
-					},
-
-					show: function() {
-						this.setCheckStateOnLabelsMenu();
-					},
-
-					itemclick : function(item, e) {
-						this.flagMessages(item.flag, item.checked);
-						if (this.messagePanel.uid) {
-							this.messagePanel.loadMessage();
-						}
-						var recs = this.messagesGrid.getSelectionModel().getSelections();
-						
-						Ext.each(recs, function (rec) {
-							var isRemovet = false;
-							for(var i=0; i<rec.data.labels.length; i++) {
-								 var label = rec.data.labels[i];
-
-								 if(label.flag == item.flag) {
-									 rec.data.labels.splice(i);
-									 isRemovet = true;
-								 }
-							}
-
-							if(!isRemovet) {
-								rec.data.labels.push(item);
-							}
-						})
-					}
-				}
-			}),
-			multiple:true
-		})
-	);
-
-	this.gridContextMenu = new GO.menu.RecordsContextMenu({
-		shadow: "frame",
-		minWidth: 180,
-		items: contextItems
+	this.gridContextMenu = new GO.email.MessageContextMenu({
+		main: this,
+		grid: this.messagesGrid
 	});
 
-	
-	this.gridContextMenu.on("show", function(){
-		
-		var record = this.messagesGrid.selModel.getSelected();
-		
-		this.contextMenuMarkAsUnread.setVisible(record.data.seen);
-		this.contextMenuMarkAsRead.setVisible(!record.data.seen);
-		
-		this.contextMenuMarkAsUnread.setDisabled(this.permissionLevel<GO.permissionLevels.create);
-		this.contextMenuMarkAsRead.setDisabled(this.permissionLevel<GO.email.permissionLevels.delegated);
-
-		this.contextMenuFlag.setVisible(!record.data.flagged);
-		this.contextMenuUnflag.setVisible(record.data.flagged);
-		
-		this.contextMenuFlag.setDisabled(this.permissionLevel<GO.email.permissionLevels.delegated);
-		this.contextMenuUnflag.setDisabled(this.permissionLevel<GO.email.permissionLevels.delegated);
-
-		this.contextMenuDelete.setDisabled(this.readOnly);
-	}, this);
-	
 	this.gridReadOnlyContextMenu = new GO.menu.RecordsContextMenu({
 		shadow: "frame",
 		minWidth: 180,
@@ -608,22 +293,20 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			triggerWidth: 1000
 		};
 
-	this.messagePanel = new GO.email.MessagePanel({
-		id:'email-message-panel',
-		tbar:new Ext.Toolbar({
-			enableOverflow: true,
-			items:[{
-				cls: 'go-narrow',
-				iconCls: "ic-arrow-back",
-				handler: function () {
-					this.westPanel.show();
-				},
-				scope: this
+	var messageTbar = new Ext.Toolbar({
+		enableOverflow: true,
+		items:[{
+			cls: 'go-narrow',
+			iconCls: "ic-arrow-back",
+			handler: function () {
+				this.westPanel.show();
 			},
+			scope: this
+		},
 			this.replyButton=new Ext.Button({
 				disabled:true,
 				iconCls: 'ic-reply',
-				text: t("Reply", "email"),
+				text: GO.util.isMobileOrTablet() ? "" : t("Reply", "email"),
 				handler: function(){
 					var comp = null;
 					if (!this._permissionDelegated) {
@@ -632,7 +315,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 							task: 'reply',
 							mailbox: this.messagePanel.mailbox,
 							account_id: this.account_id
-						});						
+						});
 					} else {
 						comp = GO.email.showComposer({
 							uid: this.messagePanel.uid,
@@ -642,7 +325,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 							delegated_cc_enabled: true
 						});
 					}
-					
+
 					this.messagePanel.data.links.forEach(function(link) {
 						comp.createLinkButton.addLink(link.entity, link.entityId);
 					});
@@ -651,7 +334,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			}),this.replyAllButton=new Ext.Button({
 				disabled:true,
 				iconCls: 'ic-reply-all',
-				text: t("Reply all", "email"),
+				text: GO.util.isMobileOrTablet() ? "" : t("Reply all", "email"),
 				handler: function(){
 					var comp = GO.email.showComposer({
 						uid: this.messagePanel.uid,
@@ -659,16 +342,18 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 						mailbox: this.messagePanel.mailbox,
 						account_id: this.account_id
 					});
-					
+
 					this.messagePanel.data.links.forEach(function(link) {
 						comp.createLinkButton.addLink(link.entity, link.entityId);
 					});
 				},
 				scope: this
-			}),this.forwardButton=new Ext.Button({
+			}),
+
+			this.forwardButton=new Ext.Button({
 				disabled:'true',
 				iconCls: 'ic-forward',
-				text: t("Forward", "email"),
+				text: GO.util.isMobileOrTablet() ? "" : t("Forward", "email"),
 				handler: function(){
 					var comp;
 					if (!this._permissionDelegated) {
@@ -693,12 +378,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				},
 				scope: this
 			}),'->',
-			{
-				hidden: !GO.email.saveAsItems || !GO.email.saveAsItems.length,
-				iconCls: 'ic-save',
-				text:t("Save as"),
-				menu:this.saveAsMenu
-			},this.printButton = new Ext.Button({
+			this.printButton = new Ext.Button({
 				disabled: true,
 				iconCls: 'ic-print',
 				tooltip: t("Print"),
@@ -708,14 +388,38 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				},
 				scope: this
 			}),
-				{xtype:'button',
-				iconCls:'ic-delete',
-				overflowText:t('Delete'),
-				handler: (btn) => {
-					this.messagesGrid.deleteSelected();
-					this.westPanel.show();
-				}}
-		]}),
+			{
+				iconCls: 'ic-more-vert',
+				menu: this.gridContextMenu
+			}
+		]});
+
+	if(!GO.util.isMobileOrTablet()) {
+
+
+		messageTbar.insert(-2,{
+			hidden: !GO.email.saveAsItems || !GO.email.saveAsItems.length,
+			iconCls: 'ic-save',
+			text:t("Save as"),
+			menu:this.saveAsMenu
+		});
+
+		messageTbar.insert(-1, {
+			xtype:'button',
+			iconCls:'ic-delete',
+			overflowText:t('Delete'),
+			handler: (btn) => {
+				this.messagesGrid.deleteSelected();
+				this.westPanel.show();
+			}
+		});
+
+
+	}
+
+	this.messagePanel = new GO.email.MessagePanel({
+		id:'email-message-panel',
+		tbar: messageTbar,
 		region:'center',
 		autoScroll:true,
 		titlebar: false,
@@ -835,12 +539,12 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 			var selectedMailboxFolder = this.treePanel.getSelectionModel().getSelectedNode();
 			// show the labels context menu when
-			this.contextMenuLabels.setVisible(selectedMailboxFolder.attributes.permittedFlags || selectedMailboxFolder.attributes.isAccount);
+			this.gridContextMenu.contextMenuLabels.setVisible(selectedMailboxFolder.attributes.permittedFlags || selectedMailboxFolder.attributes.isAccount);
 
 			if(this.messagesGrid.store.reader.jsonData.permission_level <= GO.permissionLevels.read || this.messagesGrid.store.reader.jsonData.multipleFolders)
 			  this.gridReadOnlyContextMenu.showAt([coords[0], coords[1]], grid.getSelectionModel().getSelections());
 			else
-			  this.gridContextMenu.showAt([coords[0], coords[1]], grid.getSelectionModel().getSelections());
+			  this.gridContextMenu.showAt([coords[0], coords[1]]);
 		},this);
 
 		grid.on('collapse', function(){
@@ -1071,10 +775,13 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this._copyMailToDialog = new GO.email.CopyMailToDialog({
 				move: move
 			});
+
 			this._copyMailToDialog.on('copy_email',function(){
 				this.messagesGrid.store.reload();
 			},this);
 		}
+
+		this._copyMailToDialog.move = move;
 
 		this._copyMailToDialog.show(selectedEmailMessages);
 	},
