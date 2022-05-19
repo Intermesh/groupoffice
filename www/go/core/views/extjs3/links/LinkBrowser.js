@@ -173,19 +173,6 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 					this.load(record.data.toEntity, record.data.toId);		
 									
 				},
-				
-//				dblclick: function () {
-//					var record = this.grid.getSelectionModel().getSelected();
-//					var entity = go.Entities.get(record.data.toEntity);
-//
-//					if (!entity) {
-//						throw record.data.toEntity + " is not a registered entity";
-//					}
-//					
-//					entity.goto(record.data.toId);
-//					
-//					this.close();
-//				},
 				scope: this
 			},
 			autoExpandColumn: 'name'			
