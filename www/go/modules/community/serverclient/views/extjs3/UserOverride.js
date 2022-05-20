@@ -68,7 +68,7 @@ Ext.onReady(function(){
 					callback: function(o,success,response) {
 						console.error(response);
 						if(!success) {
-							Ext.MessageBox.alert(t("Error"), t("The mailbox couldn't be created") + ': ' + response.message);
+							Ext.MessageBox.alert(t("Error"), t("The mailbox couldn't be created") + ': ' + response.description);
 						}
 					}
 				});

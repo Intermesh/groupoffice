@@ -441,7 +441,7 @@ go.grid.GridTrait = {
 
 		})
 		.catch(function(reason) {
-			GO.errorDialog.show(t( 'Sorry, an unexpected error occurred: ' + reason.message));
+			GO.errorDialog.show(t( 'Sorry, an unexpected error occurred: ' + reason.description));
 		})
 		.finally(function() {
 			me.getEl().unmask();			
