@@ -452,6 +452,11 @@ class Sync extends Controller {
 
 		$accountResult = Record::find($ldapConn, $searchDn, $query);
     $record = $accountResult->fetch();
+		if(!$record) {
+			$this->output("Skipping '$groupMember'. Could not find GO it in LDAP with query: " . $query);
+			return false;
+		}
+
     //Sometimes mail record doesn't exist. It can't find users by mail address in that case
 		return ['username' => $this->getGOUserName($record, $server), 'email' => $record->mail[0] ?? null];
 	}

@@ -1,3 +1,6 @@
+- Newsletters: Loading composer always showed first account
+- LDAP: Improved error handling when a group member can't be found in LDAP
+
 19-05-2022 6.6.90
 - Email: Authenticate to Gmail via Oauth 2.
 - Sync: Disallow deletes via sync by default.Due to a very nasty bug in Android 12
