@@ -1,6 +1,8 @@
+20-05-2022 6.6.91
 - Newsletters: Loading composer always showed first account
 - LDAP: Improved error handling when a group member can't be found in LDAP
 - Savemailas: Fixed broken save mail as menu
+- Core: redirect to index if not installed and user tries to access upgrade or license page
 
 19-05-2022 6.6.90
 - Email: Authenticate to Gmail via Oauth 2.
