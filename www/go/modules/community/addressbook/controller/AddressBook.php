@@ -2,7 +2,10 @@
 namespace go\modules\community\addressbook\controller;
 
 use go\core\exception\Forbidden;
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
+use go\core\model\Module as CoreModule;
 use go\modules\community\addressbook\model;
 
 /**
@@ -51,13 +54,18 @@ class AddressBook extends EntityController {
 	 * @param array $params
 	 */
 	public function set($params) {
-		if(!$this->rights->mayChangeAddressbooks) {
-			throw new Forbidden();
-		}
 		return $this->defaultSet($params);
 	}
-	
-	
+
+	protected function canDestroy(Entity $entity): bool
+	{
+		if(!$this->rights->mayChangeAddressbooks) {
+			return false;
+		}
+
+		return parent::canDestroy($entity);
+	}
+
 	/**
 	 * Handles the Foo entity's Foo/changes command
 	 * 

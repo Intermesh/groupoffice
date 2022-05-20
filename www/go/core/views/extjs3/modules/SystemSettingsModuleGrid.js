@@ -376,7 +376,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 					record.commit();
 				} else
 				{
-					Ext.MessageBox.alert(t("Error"), response.message);
+					Ext.MessageBox.alert(t("Error"), response.description);
 					this.store.load();
 				}
 
@@ -401,7 +401,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 							record.commit();
 					} else
 					{
-						Ext.MessageBox.alert(t("Error"), response.message);
+						Ext.MessageBox.alert(t("Error"), response.description);
 						this.store.load();
 					}
 

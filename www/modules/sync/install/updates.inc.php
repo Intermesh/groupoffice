@@ -115,3 +115,7 @@ $updates['202106101432'][] = "alter table sync_tasklist_user
 	add constraint sync_tasklist_user_tasks_tasklist_id_fk
 		foreign key (tasklistId) references tasks_tasklist (id)
 			on delete cascade;";
+
+
+$updates['202205191157'][] = "alter table sync_settings
+    add allowDeletes boolean default false null;";

@@ -668,7 +668,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 					$folder->setAttributes($autoCreateAttributes);
 					$folder->name = $folderName;
 					$folder->parent_id = $parent_id;
-					if(!$folder->save()){
+					if(!$folder->save(true)){
 						throw new Exception('Could not create folder: '.var_export($folder->getValidationErrors(), true));
 					}
 				}elseif(!empty($autoCreateAttributes))

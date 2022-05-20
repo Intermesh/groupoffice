@@ -276,10 +276,10 @@ class Module extends core\Module
 	 * @throws Exception
 	 */
 	public static function onGarbageCollection() {
-		$years = (int) Module::get()->getSettings()->deleteAfterYears;
+		$days = (int) Module::get()->getSettings()->deleteAfterDays;
 
-		if(!empty($years)) {
-			LogEntry::delete(LogEntry::find()->where('createdAt', '<', (new core\util\DateTime("-" . $years . " years"))));
+		if(!empty($days)) {
+			LogEntry::delete(LogEntry::find()->where('createdAt', '<', (new core\util\DateTime("-" . $days . " days"))));
 		}
 	}
 

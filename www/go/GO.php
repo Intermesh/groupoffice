@@ -265,7 +265,7 @@ class GO{
 	public static function clearCache(){
 		$old = \GO\Base\Fs\File::setAllowDeletes(true);
 
-		\GO::config()->getCacheFolder(false)->clearContents();
+	//	\GO::config()->getCacheFolder(false)->clearContents();
 
 		\GO\Base\Model::clearCache();
 

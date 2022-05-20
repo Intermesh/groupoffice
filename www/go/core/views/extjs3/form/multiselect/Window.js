@@ -8,10 +8,16 @@ go.form.multiselect.Window = Ext.extend(go.Window, {
 		
 		
 		this.grid = new go.grid.GridPanel({
+			tbar: [ '->', {
+				xtype: "tbsearch"
+			}],
 			viewConfig: {
 				emptyText: t("No items to display")
 			},
 			store: new go.data.Store({
+				sortInfo: {
+					field: this.field.displayField
+				},
 				fields: ['id', this.field.displayField],
 				entityStore: this.field.entityStore,
 				baseParams: this.field.storeBaseParams,

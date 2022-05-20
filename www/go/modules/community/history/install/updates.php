@@ -35,3 +35,7 @@ $updates['202205161600'][] = "alter table history_log_entry
 $updates['202205161600'][] = "alter table history_log_entry
     drop foreign key fk_log_entry_core_entity1;";
 
+
+$updates['202205161600'][] = "update core_setting set name='deleteAfterDays', value = value * 365 where name='deleteAfterYears';";
+
+

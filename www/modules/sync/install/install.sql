@@ -63,7 +63,8 @@ CREATE TABLE IF NOT EXISTS `sync_settings` (
   `server_is_master` tinyint(1) NOT NULL DEFAULT '1',
   `max_days_old` tinyint(4) NOT NULL DEFAULT '0',
   `delete_old_events` tinyint(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`user_id`)
+  `allowDeletes` boolean default false null,
+    PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB;
 
 -- --------------------------------------------------------

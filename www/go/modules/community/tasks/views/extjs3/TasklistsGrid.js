@@ -5,7 +5,6 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 	initComponent: function () {
 
 		Ext.apply(this, {
-			hideMenuButton: !go.Modules.get("community", 'tasks').userRights.mayChangeTasklists,
 			store: new go.data.Store({
 				fields: ['id', 'name'],
 				entityStore: "Tasklist",
@@ -50,7 +49,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 
 		this.on('beforeshowmenu', (menu, record) => {
 			menu.getComponent("edit").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
-			menu.getComponent("delete").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
+			menu.getComponent("delete").setDisabled(!go.Modules.get("community", 'tasks').userRights.mayChangeTasklists || record.get("permissionLevel") < go.permissionLevels.manage);
 		});
 	},
 

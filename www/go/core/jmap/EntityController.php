@@ -201,23 +201,13 @@ abstract class EntityController extends Controller {
    */
 	protected function defaultQuery(array $params): array
 	{
-
 		$state = $this->getState();
-
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
 		$idsQuery->fetchMode(PDO::FETCH_COLUMN, 0);
 
-
 		try {
-//			foreach ($idsQuery as $record) {
-//				if (!isset($count)) {
-//					$count = count($record);
-//				}
-//				$ids[] = $count ? $record[0] : implode('-', $record);
-//			}
-
 			$ids = $idsQuery->all();
 
 			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
@@ -746,7 +736,7 @@ abstract class EntityController extends Controller {
 			if(empty($properties)) {
 				$properties = [];
 			}
-			$entity = $this->getEntity($id);			
+			$entity = $this->getEntity($id);
 			if (!$entity) {
 				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Item not found"));
 				continue;

@@ -1,4 +1,19 @@
+19-05-2022 6.6.90
 - Email: Authenticate to Gmail via Oauth 2.
+- Sync: Disallow deletes via sync by default.Due to a very nasty bug in Android 12
+  some phones started to delete contacts via Microsoft ActiveSync. Therefore we've
+  implemented a new setting in Group-Office that disallows deletes via sync by
+  default now. More info on the bug can be found here:
+  https://eu.community.samsung.com/t5/galaxy-z-fold-z-flip/outlook-contacts-gone-after-android-12-update/td-p/4567744/page/2
+- Workflow: Don't check permissions on attaching workflow history and more detailed error
+- Addressbook: Edit own address book possible when not having rights to change address books
+- Tasks: Edit own task list possible when not having rights to change task lists
+- Notes: Edit own notebook possible when not having rights to change notebooks
+- Tickets: Show type description on hover in combo for selecting types
+- History: Set delete period in days instead of years
+- Tickets: Send agent e-mail to cc address when customer writes a message
+- Email: Put context menu items in message panel so it's avialable on mobiles
+- Projects: Option to invoice per employee
 
 17-05-2022 6.6.89
 - Workflow: fixed opening from start page and some minor styling issues
@@ -20,12 +35,14 @@
 - Calendar: raised timeout settings for server and client to 5 minutes for sending invitation e-mails.
 - History: Dropped foreing key contraint to user table because it caused lock on the core_user table while deleting users
   blocking logins
+- Calendar: Admin received unwanted reminders in public shared calendars
 
 13-05-2022 6.6.86
 - Core: Token dates could be saved in user timezone instead of UTC by old framework.
 - Core: Used unnamed parameters in queries for better performance with mysql native driver
   (without PDO::ATTR_EMULATE_PREPARES) and large inserts
 - Core: fixed problem cuasing apache segmentation faults crashing the server!
+- Projects: Add custom fields above sub projects
 
 12-05-2022 6.6.85
 - Core: Bugfix when saving new Custom Field to existing entity

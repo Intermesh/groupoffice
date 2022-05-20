@@ -200,7 +200,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		}
 		this.addressBookMoreMenu.data = node.attributes.data;
 		this.addressBookMoreMenu.getComponent("edit").setDisabled(this.addressBookMoreMenu.data.permissionLevel < go.permissionLevels.manage);
-		this.addressBookMoreMenu.getComponent("delete").setDisabled(this.addressBookMoreMenu.data.permissionLevel  < go.permissionLevels.manage);
+		this.addressBookMoreMenu.getComponent("delete").setDisabled(!go.Modules.get("community", 'addressbook').userRights.mayChangeAddressbooks || this.addressBookMoreMenu.data.permissionLevel  < go.permissionLevels.manage);
 		this.addressBookMoreMenu.showAt(e.getXY());
 	},
 

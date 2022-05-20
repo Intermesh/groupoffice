@@ -1,5 +1,5 @@
 GO.mainLayout.onReady(function(){
-	GO.debug = false;
+	GO.debug = GO.settings.config.debug;
 	var map = new Ext.KeyMap(document, {
 		stopEvent:true,
 		key:Ext.EventObject.F7,
