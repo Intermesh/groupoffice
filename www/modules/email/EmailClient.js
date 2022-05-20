@@ -401,7 +401,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			hidden: !GO.email.saveAsItems || !GO.email.saveAsItems.length,
 			iconCls: 'ic-save',
 			text:t("Save as"),
-			menu:this.saveAsMenu
+			menu:this.gridContextMenu.saveAsMenu
 		});
 
 		messageTbar.insert(-1, {
