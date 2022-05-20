@@ -1,13 +1,20 @@
 <?php
 require('../vendor/autoload.php');
 
-use go\core\event\EventEmitterTrait;
-use go\core\model\Module;
+use go\core\cache\None;
+use go\modules\business\license\model\License;
 use go\modules\business\studio\Module as StudioModule;
 use go\core\App;
 
 App::get();
-go()->setCache(new \go\core\cache\None());
+
+go()->setCache(new None());
+
+
+if(!go()->isInstalled()) {
+	header("Location: index.php");
+	exit();
+}
 
 // needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
 // system.
@@ -19,9 +26,6 @@ if(go()->getDatabase()->hasTable("studio_studio")) {
 
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
-
-
-
 
 
 $passwordMatch = true;
@@ -41,8 +45,8 @@ if (!empty($_POST)) {
     }
 
 } else{
-    if(!empty(go()->getSettings()->license) && !\go\modules\business\license\model\License::isValid()) {
-	    $error = \go\modules\business\license\model\License::$validationError;
+    if(!empty(go()->getSettings()->license) && !License::isValid()) {
+	    $error = License::$validationError;
     }
 }
 

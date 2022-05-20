@@ -257,7 +257,7 @@ class Debugger {
 			$print = $mixed;
 		}
 
-		$line = '[' . date('Y-m-d H:i:s') . '][' . $this->getRequestId() . '][' . go()->getUserId(). '][' . $level . ']';
+		$line = '[' . date('Y-m-d H:i:s') . '][' . $this->getRequestId() . '][' . $level . ']';
 		
 		if(isset($cls)) {
 			$line .= '[' . $cls .':'. $lineNo.']';

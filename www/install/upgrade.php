@@ -26,6 +26,11 @@ try {
 		exit();
 	}
 
+	if(!go()->isInstalled()) {
+		header("Location: index.php");
+		exit();
+	}
+
 	if(go()->getEnvironment()->hasIoncube() && !go()->getSettings()->licenseDenied && (empty(go()->getSettings()->license) || !\go\modules\business\license\model\License::isValid())) {
 		header("Location: license.php");
 		exit();
