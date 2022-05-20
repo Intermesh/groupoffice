@@ -201,7 +201,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				if(success) {
 					resolve(records);
 				} else{
-					if(options.error.message == "unsupportedSort") {
+					if(options.error.type == "unsupportedSort") {
 						return; //ignore.
 					}
 					//hack to pass error message from EntityStoreProxy to load callback
