@@ -1,5 +1,6 @@
 - Newsletters: Loading composer always showed first account
 - LDAP: Improved error handling when a group member can't be found in LDAP
+- Savemailas: Fixed broken save mail as menu
 
 19-05-2022 6.6.90
 - Email: Authenticate to Gmail via Oauth 2.
