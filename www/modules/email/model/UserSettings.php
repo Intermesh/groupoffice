@@ -13,6 +13,7 @@ use function GO;
  */
 class UserSettings extends Property {
 	public $id;
+	public $use_desktop_composer;
 	public $use_html_markup;
 	public $show_from;
 	public $show_cc;
@@ -44,6 +45,7 @@ class UserSettings extends Property {
 			}
 		}
 
+		$this->use_desktop_composer = !\GO::config()->get_setting("use_desktop_composer", $this->id);
 		$this->use_html_markup = !\GO::config()->get_setting("email_use_plain_text_markup", $this->id);
 		$this->show_from = !!\GO::config()->get_setting("email_show_from", $this->id, 1);
 		$this->show_cc = !!\GO::config()->get_setting("email_show_cc", $this->id, 1);

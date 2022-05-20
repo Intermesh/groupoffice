@@ -52,7 +52,8 @@ GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			}
 			
 			if(this.emailDownloadLink){
-				GO.email.showComposer({
+
+				go.showComposer({
 					loadUrl:GO.url('files/file/emailDownloadLink'),
 					loadParams:{
 						ids: Ext.encode(this.downloadLinkIds),
@@ -60,6 +61,7 @@ GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 						delete_when_expired: deleteWhenExpired
 					}
 				});
+
 			} else {
 				GO.request({
 					maskEl: this.getEl(),

@@ -201,15 +201,25 @@ go.util =  (function () {
 		 * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
 		 * @return {undefined}
 		 */
-		mailto: function (config, event) {
-			event.preventDefault();
-			var email = config.email;
+		mailto: function (config) {
+			var link = config.to;
 
 			if (config.name) {
-				email = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.email + '>';
+				link = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.to + '>';
 			}
+			const qp = [];
+			if(config.body) {
+				qp.push('body='+encodeURIComponent(config.body));
+			}
+			if(config.subject) {
+				qp.push('subject='+encodeURIComponent(config.subject));
+			}
+			if(qp.length) {
+				link += '?'+qp.join('&');
+			}
+			debugger;
 
-			window.open("mailto:" + email, "_self");
+			window.open("mailto:" + link, "_self");
 		},
 
 		callto: function (config, event) {
