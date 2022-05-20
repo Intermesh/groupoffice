@@ -20,11 +20,15 @@ GO.moduleManager.onModuleReady('email',function() {
 						this.tabPanel.unhideTabStripItem(this.labelsTab);
 					}
 					this.permissionsTab.setAcl(action.result.data.acl_id);
-					if (this.oauth2ClientCombo.getValue()) {
-						this.btnGetRefreshToken.show();
-						this.incomingTab.hide();
-						this.outgoingTab.hide();
+
+					const usesOauth2 = !go.util.empty(action.result.data.oauth2_client_id);
+					this.btnGetRefreshToken.setVisible(usesOauth2);
+					this.incomingTab.setVisible(!usesOauth2);
+					this.outgoingTab.setVisible(!usesOauth2);
+					if(!usesOauth2) {
+						this.oauth2ClientCombo.clearValue();
 					}
+					
 					this.refreshNeeded = false;
 				},
 				scope : this
