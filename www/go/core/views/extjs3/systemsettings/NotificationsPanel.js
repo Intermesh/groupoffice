@@ -107,7 +107,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 			);
 		}).catch(function(response) {
 			var error = "";
-			error = "<br /><br />" + response.message;
+			error = "<br /><br />" + response.description;
 
 			Ext.MessageBox.alert(
 				t("Failed"),

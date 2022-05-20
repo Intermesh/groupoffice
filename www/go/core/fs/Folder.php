@@ -176,20 +176,7 @@ class Folder extends FileSystemObject {
 		return new Folder($childPath);
 	}	
 	
-	/**
-	 * Get the parent folder object
-	 *
-	 * @return Folder|null Parent folder object
-	 */
-	public function getParent() : ?Folder {
 
-		$parentPath = dirname($this->path);
-		if ($parentPath == $this->path) {
-			return null;
-		}
-
-		return new Folder($parentPath);
-	}
 	
 	
 	/**
@@ -212,9 +199,12 @@ class Folder extends FileSystemObject {
 	 * Delete the folder
 	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
 	public function delete(): bool
 	{
+		self::checkDeleteAllowed($this);
+
 		if (!$this->exists()){
 			return true;
 		}

@@ -7,6 +7,7 @@ use Exception;
 use GO\Base\Exception\AccessDenied;
 use go\core\App;
 use go\core\ErrorHandler;
+use go\core\fs\FileSystemObject;
 use go\core\model\Alert;
 use go\core\model\Module;
 use go\core\model\User;
@@ -406,7 +407,15 @@ abstract class Entity  extends OrmEntity {
 	{
 		$ids = clone $query;
 		/** @noinspection PhpRedundantOptionalArgumentInspection */
-		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)->all();
+		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')
+			->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)
+			->all();
+
+		// make sure ID=0 is not there. Shouldn't be but this caused a disaster with a root folder with id=0 wiping
+		// the data
+		$ids = array_filter($ids, function($id) {
+			return !empty($id);
+		});
 
 		if(empty($ids)) {
 			return true;
@@ -431,9 +440,12 @@ abstract class Entity  extends OrmEntity {
    */
 	protected static function logDeleteChanges(Query $query): bool
 	{
-		$ids = clone $query;
-		$ids->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed');
-		return static::entityType()->changes($ids);
+		$idsQuery = clone $query;
+		$records = $idsQuery
+			->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed')
+			->fetchMode(PDO::FETCH_ASSOC)
+			->all(); //we have to select now because later these id's are gone from the db
+		return static::entityType()->changes($records);
 	}
 
   /**
@@ -530,12 +542,13 @@ abstract class Entity  extends OrmEntity {
 		//find the old state changelog entry
 		if($states[0]['modSeq']) { //If state == 0 then we don't need to check this
 			
-			$change = (new Query())
+			$stmt = (new Query())
 							->select("modSeq")
 							->from("core_change")
 							->where(["entityTypeId" => $entityType->getId()])
-							->andWhere('modSeq', '=', $states[0]['modSeq'])
-							->single();
+							->andWhere('modSeq', '=', $states[0]['modSeq']);
+
+			$change = $stmt->single();
 
 			if(!$change) {			
 				throw new CannotCalculateChanges("Can't calculate changes for '" . $entityType->getName() . "' with state: ". $sinceState .' ('.$states[0]['modSeq'].')');

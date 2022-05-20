@@ -22,3 +22,20 @@ $updates['202204131553'][] = "delete from core_acl where id in (
 ) as a
 
 );";
+
+
+$updates['202205101146'][] = "alter table history_log_entry
+    add requestId varchar(190) default null;";
+
+
+$updates['202205161600'][] = "alter table history_log_entry
+    drop foreign key fk_log_entry_core_user;";
+
+
+$updates['202205161600'][] = "alter table history_log_entry
+    drop foreign key fk_log_entry_core_entity1;";
+
+
+$updates['202205161600'][] = "update core_setting set name='deleteAfterDays', value = value * 365 where name='deleteAfterYears';";
+
+

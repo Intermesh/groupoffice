@@ -483,10 +483,36 @@ use Faker;
 		 */
 		private function createDbConnection() : Connection{
 			$config = $this->getConfig();
-			$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port']  . ';dbname=' . $config['db_name'];
+			$dsn = $this->createDsn($config['db_name']);
 			return new Connection(
 				$dsn, $config['db_user'], $config['db_pass']
 			);
+		}
+
+		/**
+		 * Create PDO database DSN string
+		 *
+		 * @param string|null $dbName
+		 * @return string
+		 */
+		public function createDsn(string $dbName = null): string {
+			$config = $this->getConfig();
+
+			$dsn = 'mysql:';
+
+			if(!empty($config['db_socket'])) {
+				$dsn .= 'unix_socket=' . $config['db_socket'];
+			} else{
+				$dsn .= 'host=' . $config['db_host'] . ';port=' . $config['db_port'];
+			}
+
+			if(isset($dbName)) {
+				$dsn .= ';dbname=' . $dbName;
+			}
+
+			$dsn .= ';charset=utf8mb4';
+
+			return $dsn;
 		}
 
 		/**
@@ -616,16 +642,8 @@ use Faker;
 			}
 
 			$this->rebuildCacheOnDestruct = false;
-			
-			GO::clearCache(); //legacy
 
-			go()->getCache()->flush(false);
-			Table::destroyInstances();
-			Property::clearCache();
-			Property::clearCachedRelationStmts();
-
-			$webclient = Extjs3::get();
-			$webclient->flushCache();
+			$this->clearCache();
 
 			Observable::cacheListeners();
 
@@ -638,6 +656,23 @@ use Faker;
 			go()->getSettings()->save();
 			
 		}
+
+		/**
+		 * Clears all caches
+		 *
+		 * @return void
+		 */
+		public function clearCache() {
+			App::get()->getCache()->flush( false);
+			Table::destroyInstances();
+			Property::clearCache();
+			Property::clearCachedRelationStmts();
+			GO::clearCache();
+			Listeners::get()->clear();
+			Observable::$listeners = [];
+			$webclient = Extjs3::get();
+			$webclient->flushCache();
+		}
 		
 		public function __destruct() {
 
@@ -648,6 +683,8 @@ use Faker;
 				$this->rebuildCache();
 
 			}
+
+			go()->debug("Request done");
 		}
 
 		/**

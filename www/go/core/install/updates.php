@@ -951,9 +951,9 @@ $updates['202110211653'][] = "UPDATE core_user u JOIN addressbook_contact c ON c
 // to 'Paper'
 $updates['202111151100'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
 
-// recalculate becuase of substitute days
+// recalculate because of substitute days
 $updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
-// recalculate becuase of substitute days (again)
+// recalculate because of substitute days (again)
 $updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
 
 $updates['202112131205'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
@@ -1182,6 +1182,20 @@ $updates['202204131216'][] = function() {
 	echo "\n\n======\nNOTE: Search cache will be rebuilt.\n======\n\n";
 };
 
+$updates['202205101416'][] = function() {
+
+	\go\core\fs\FileSystemObject::allowRootFolderDelete();
+
+	go()->getDataFolder()->getFolder('cache2')->delete();
+	go()->getDataFolder()->getFolder('clientscripts')->delete();
+	go()->getDataFolder()->getFolder('cache')->delete();
+
+	\go\core\fs\FileSystemObject::allowRootFolderDelete(false);
+};
+
+
+//create index core_entity_highestModSeq_index
+//    on core_entity (highestModSeq);
 
 
 

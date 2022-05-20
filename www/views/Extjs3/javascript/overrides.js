@@ -166,7 +166,7 @@ Ext.override(Ext.form.TextArea,{
 
 Ext.override(Ext.form.TextField,{
 	
-	//Added check for ENTER key. Becuase this code prevented form submission
+	//Added check for ENTER key. because this code prevented form submission
 	filterKeys : function(e){
 
 		if(e.ctrlKey){
@@ -1209,7 +1209,6 @@ Ext.override(Ext.KeyNav, {
 Ext.override(Ext.grid.GridView, {
 	scrollToTopOnLoad: true,
 	onLoad : function(store, records, o){
-
 			if (this.scrollToTopOnLoad && !o.keepScrollPosition){
 				if (Ext.isGecko) {
 						if (!this.scrollToTopTask) {

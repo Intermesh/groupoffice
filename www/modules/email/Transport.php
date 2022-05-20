@@ -22,22 +22,38 @@
 namespace GO\Email;
 
 
-class Transport extends \Swift_SmtpTransport{
-	
-	public static function newGoInstance(Model\Account $account){
+class Transport extends \Swift_SmtpTransport
+{
+
+	/**
+	 * @param Model\Account $account
+	 * @return Transport
+	 */
+	public static function newGoInstance(Model\Account $account)
+	{
 		$encryption = empty($account->smtp_encryption) ? null : $account->smtp_encryption;
 		$o = new self($account->smtp_host, $account->smtp_port, $encryption);
-		
-		if(!empty($account->smtp_username)){
+		$cltAcct = null;
+		if (go()->getModule('community', 'oauth2client')) {
+			$cltAcct = go()->getDbConnection()->select('token')
+				->from('oauth2client_account')
+				->where(['accountId' => $account->id])
+				->single();
+		}
+		if ($cltAcct) {
+			$o->setAuthMode('XOAUTH2')
+				->setUsername($account->username)
+				->setPassword($cltAcct['token']);
+		} else if (!empty($account->smtp_username)){
 			$o->setUsername($account->smtp_username)
 				->setPassword($account->decryptSmtpPassword());
 		}
-		
+
 		// Allow SSL/TLS and STARTTLS connection with self signed certificates. Enabling this will not check the identity of the server
-		if($account->smtp_allow_self_signed){
+		if ($account->smtp_allow_self_signed) {
 			$o->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name'  => false)));
 		}
-		
+
 		return $o;
 	}	
 }

@@ -304,4 +304,5 @@ Instellingen -> Accounts -> Dubbelklik account -> Mappen.',
   'Allow the use of a self signed certificate when using SSL or TLS' => 'Sta het gebruik van self signed certificates toe bij een SSL of TLS verbinding',
   'Delete all attachments' => 'Verwijder alle bijlagen',
   'Are you sure that you wish to remove all attachments from this email message?' => 'Weet u zeker dat u alle bijlagen uit dit bericht wenst te verwijderen?',
+	'Use IMAP credentials' => 'Gebruik IMAP inloggegevens'
 );

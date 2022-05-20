@@ -22,7 +22,10 @@ use go\core\model\Module;
 use Faker;
 
 
+use go\core\model\User;
 use go\core\orm\EntityType;
+use go\core\orm\exception\SaveException;
+use go\core\util\DateTime;
 use go\core\util\JSON;
 use go\modules\community\history\Module as HistoryModule;
 use JsonException;
@@ -306,7 +309,7 @@ JSON;
 	 * @throws Forbidden
 	 * @example
 	 * ```
-	 * docker-compose exec --user www-data groupoffice-tasks ./www/cli.php core/System/demo
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo
 	 * ```
 	 */
 	public function demo() {
@@ -341,6 +344,19 @@ JSON;
 		Alert::$enabled = true;
 
 		echo "\n\nAll done!\n\n";
+	}
+
+
+	public function alert($username) {
+		$user = User::find()->where('username', '=', $username)->single();
+
+		/* @var \go\core\model\User $user */
+
+		$alert = $user->createAlert(new DateTime());
+
+		if(!$alert->save()) {
+			throw new SaveException($alert);
+		}
 	}
 
 

@@ -27,6 +27,7 @@ use GO\Caldav\Model\DavEvent;
 use GO\Caldav\Model\DavTask;
 use GO\Base\Db\FindParams;
 use GO\Base\Db\FindCriteria;
+use Sabre\DAV\Exception\Forbidden;
 use Sabre\VObject\Reader;
 use Sabre\DAV\Exception;
 
@@ -312,10 +313,8 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			$stmt = \GO\Calendar\Model\Event::model()->find($fp);
 
 			$sequence=0;
-			while($e=$stmt->fetch()){
-
-//				if((string) $e->rrule==""){
-				if($e->private && $e->calendar->user_id != \GO::user()->id){
+			while ($e=$stmt->fetch()) {
+				if ($e->private && $e->calendar->user_id != \GO::user()->id) {
 					$e->name=\GO::t("Private", "calendar");
 					$e->location='';
 					$e->description='';
@@ -323,17 +322,12 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				$e->sequence=$sequence;
 				$sequence++;
 				$events[]=$e;
-
-//				}
-
-
 			}
 		}
 
 		$c = new \GO\Base\VObject\VCalendar();
 		$c->add(new \GO\Base\VObject\VTimezone());
 		foreach($events as $event){
-//			\GO::debug(date('c',$event->start_time).' '.$event->rrule);
 			$c->add($event->toVObject('REQUEST', false));
 		}
 
@@ -348,7 +342,8 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 * @param StringHelper $calendarId
 	 * @return array
 	 */
-	public function getCalendarObjects($calendarId) {
+	public function getCalendarObjects($calendarId)
+	{
 		\GO::debug("c:getCalendarObjects($calendarId)");
 		$log = '';
 		//weird bug?
@@ -358,8 +353,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 		//Get the calendar object and check if the user has delete permission.
 		$calendar = Calendar::model()->findByPk($calendarId, false, true);
-//		if(!$calendar->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION))
-//			throw new Sabre\DAV\Exception\Forbidden();
 
 		\GO::config()->caldav_max_months_old=isset(\GO::config()->caldav_max_months_old) ? \GO::config()->caldav_max_months_old : 6;
 		\GO::config()->caldav_max_months_old=\GO::config()->caldav_max_months_old*-1;
@@ -424,10 +417,8 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		}
 
 
-		if($calendar->tasklist_id>0)
-		{
+		if ($calendar->tasklist_id > 0) {
 			$tasklist = Tasklist::findById($calendar->tasklist_id); // ignore acl?
-			//$tasklist = \GO\Tasks\Model\Tasklist::model()->findByPk($calendar->tasklist_id, false, true);
 
 			if($tasklist) {
 
@@ -478,8 +469,9 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 		$user = $core_user->get_user_by_email($email);
 
-		if(!$user)
+		if(!$user) {
 			return false;
+		}
 
 		if(!empty($GLOBALS['GO_CONFIG']->require_calendar_access_for_freebusy)){
 			//Only show availability if user has access to the default calendar
@@ -494,8 +486,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		$fb=array();
 
 		while ($event = array_shift($events)) {
-			//\GO::debug($event['name'].' - '.$event['uuid']);
-			//if($event['uuid']!=$ignore_uuid)
 			$fb[]=array('start'=>$event['start_time'],'end'=>$event['end_time'], 'busyType'=>'BUSY');
 		}
 		return $fb;
@@ -537,12 +527,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			->select("t.*, d.uri, d.mtime AS client_mtime, d.data")
 			->criteria($whereCriteria)
 			->join(DavEvent::model()->tableName(), $joinCriteria,'d', 'LEFT');
-
-//		$sql = "SELECT d.uri,e.*, d.mtime AS client_mtime, d.data FROM cal_events e INNER JOIN dav_events d ON d.id=e.id WHERE d.uri=? AND e.calendar_id=?";
-//		$this->cal->query($sql, 'si', array($objectUri,$calendarId));
-//		$event = $this->cal->next_record();
-
-		//\GO::debug($event);
 
 		$event = \GO\Calendar\Model\Event::model()->find($findParams)->fetch();
 
@@ -613,13 +597,9 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 				$vcalendar = \GO\Base\VObject\Reader::read($calendarData);
 				$event=false;
-				foreach($vcalendar->vevent as $vevent){
-
-					//$recurrenceId = isset($vevent->recurren)
-
+				foreach($vcalendar->vevent as $vevent) {
 					$recurrenceDate=false;
 					$recurrence = $vevent->select('recurrence-id');
-					//var_dump($recurrence);exit();
 					if(count($recurrence)){
 						$firstMatch = array_shift($recurrence);
 						$recurrenceDate=intval($firstMatch->getDateTime()->format('U'));
@@ -661,7 +641,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				}
 			}
 		}catch(\GO\Base\Exception\AccessDenied $e){
-//			\GO::debug($e);
 			throw new Sabre\DAV\Exception\Forbidden;
 		}catch (\Exception $e) {
 			\go\core\ErrorHandler::logException($e);
@@ -697,10 +676,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				$vcalendar = \GO\Base\VObject\Reader::read($calendarData);
 
 				$event = $this->getEventByUri($objectUri, $calendarId);
-
-
-				//			\GO::debug($event->getAttributes());
-
 				if(!$event){
 					\GO::debug("Event $objectUri not found in calendar $calendarId!");
 					return false;
@@ -709,8 +684,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				$exceptionVEvents=array();
 				$VEvent=false;
 
-				if($vcalendar->vevent->count()>1)
-				{
+				if($vcalendar->vevent->count()>1) {
 					\GO::debug("Object has multiple VEVENT objects");
 					//recurrence
 					foreach($vcalendar->vevent as $e){
@@ -722,8 +696,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 						}
 					}
 
-				}else
-				{
+				}else {
 					\GO::debug("Object is a sinlge VEVENT object");
 					$VEvent=$vcalendar->vevent[0];
 				}
@@ -749,8 +722,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 
 
-				if(count($exceptionVEvents))
-				{
+				if(count($exceptionVEvents)) {
 
 					foreach($exceptionVEvents as $exceptionVEvent){
 
@@ -778,8 +750,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 				return $event->getETag();
 
-			}else
-			{
+			} else {
 				$calendar = Calendar::model()->findByPk($calendarId);
 				\GO::debug('item is a task');
 
@@ -795,7 +766,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			}
 
 		}catch(\GO\Base\Exception\AccessDenied $e){
-//			\GO::debug($e);
 			throw new Exception\Forbidden;
 		} catch(\GO\Base\Exception\Validation $e){
 			GO::debug($e->getMessage());
@@ -815,6 +785,11 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 */
 	public function deleteCalendarObject($calendarId, $objectUri) {
 		\GO::debug("deleteCalendarObject($calendarId,$objectUri)");
+
+		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
+			go()->debug("Deleting is disabled by user sync settings");
+			throw new Forbidden("Deleting is disabled by user sync settings");
+		}
 
 		try{
 			$event = $this->getEventByUri($objectUri, $calendarId);

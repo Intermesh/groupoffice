@@ -117,9 +117,13 @@ class Instance extends Entity {
 			//update model from instance db once a day
 			if(!isset($this->modifiedAt) || $this->modifiedAt <= new \DateTime("-10 minute")) {
 				$this->getInstanceDbData();
-				
-				if($this->isModified() && !$this->save()) {
-					throw new Exception("Could not save instance data! ". var_export($this->getValidationErrors(), true));
+
+				try {
+					if ($this->isModified() && !$this->save()) {
+						throw new Exception("Could not save instance data! " . var_export($this->getValidationErrors(), true));
+					}
+				} catch(Exception $e) {
+					ErrorHandler::logException($e);
 				}
 			}
 		}
@@ -567,7 +571,17 @@ class Instance extends Entity {
 				throw new Exception("Config not found");
 			}
 
-			$dsn = 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
+			$dsn = 'mysql:';
+
+			if(!empty($config['db_socket'])) {
+				$dsn .= 'unix_socket=' . $config['db_socket'];
+			} else {
+				$dsn .= 'host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306);
+			}
+
+			$dsn .= ';dbname=' . $config['db_name'];
+			$dsn .= ';charset=utf8mb4';
+
 			$this->instanceDbConn = new Connection($dsn, $config['db_user'], $config['db_pass']);
 		}
 		

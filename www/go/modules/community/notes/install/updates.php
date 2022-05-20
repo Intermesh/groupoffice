@@ -150,3 +150,6 @@ $updates['202012041036'][] = "";
 $updates['202012041036'][] = "";
 
 $updates['202104021322'][] = "ALTER TABLE `notes_user_settings` ADD (`rememberLastItems` TINYINT(1) DEFAULT 0, `lastNoteBookIds` VARCHAR(255) DEFAULT '');";
+
+
+$updates['202205101237'][] = "update notes_note set filesFolderId = null where filesFolderId=0;";

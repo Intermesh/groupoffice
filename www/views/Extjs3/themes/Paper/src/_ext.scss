@@ -1820,10 +1820,10 @@ td.grid-hd-group-cell {
 	border-top-color:#36c;
 }
 
-.x-tree-node .x-tree-drag-append a {
-	background-color:#ddd;
-	border-color:gray;
-}
+//.x-tree-node .x-tree-drag-append a {
+//	background-color:#ddd;
+//	border-color:gray;
+//}
 
 .x-dd-drop-icon::before {
 	@extend %icon;

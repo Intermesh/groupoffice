@@ -357,7 +357,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 				case 'pps':
 				case 'pptx':
 				case 'ppt':
-					$src = $dir . 'pps.svg';
+					$src = $dir . 'ppt.svg';
 					break;
 				case 'eml':
 				case 'msg':

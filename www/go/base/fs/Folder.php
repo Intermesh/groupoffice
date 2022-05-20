@@ -21,6 +21,8 @@
 namespace GO\Base\Fs;
 
 
+use go\core\fs\FileSystemObject;
+
 class Folder extends Base {
 	
 	
@@ -88,13 +90,17 @@ class Folder extends Base {
 	 * @return boolean 
 	 */
 	public function delete(){
-		
+
+
 		\GO::debug("DELETE: ".$this->path());
 		
 		if(!$this->exists()) {
 			return true;
 		}
-		
+
+		FileSystemObject::checkDeleteAllowed(new \go\core\fs\Folder($this->path()));
+
+
 		//just delete symlink and not contents of linked folder!
 		if(is_link($this->path))
 			return unlink($this->path);
@@ -342,9 +348,9 @@ class Folder extends Base {
 	}
 	
 	/**
-	 * Check if the given folder is a subfolder of this folder.
+	 * Check if the given folder is a parent of this folder.
 	 * 
-	 * @param Folder $subFolder
+	 * @param Folder $parent
 	 * @return boolean 
 	 */
 	public function isSubFolderOf($parent){

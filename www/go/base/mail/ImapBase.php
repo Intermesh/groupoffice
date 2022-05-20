@@ -38,24 +38,24 @@ abstract class ImapBase {
 	public static $debug = false;
 	
 	
-	public function last_error($clear=true){
+	public function last_error($clear=true)
+	{
 		$count=count($this->errors);
-		//\GO::debug($this->errors);
-		if($count){
-			
+		if($count) {
 			return $clear ? array_pop($this->errors) : $this->errors[$count-1];
-		}else
+		} else {
 			return false;
+		}
 	}
 
-	public function clear_errors(){
+	public function clear_errors()
+	{
 		$this->errors=array();
 	}
 
 
-	function input_validate($val, $type) {
-		//global $imap_search_charsets;
-		//global $imap_keywords;
+	function input_validate($val, $type)
+	{
 		$valid = false;
 		switch ($type) {
 			case 'search_str':
@@ -78,8 +78,7 @@ abstract class ImapBase {
 					$valid = true;
 				}
 				break;
-			case 'uid_list';				
-				//if (preg_match("/^(\d+\s*,*\s*|(\d+|\*):(\d+|\*))+$/", $val)) {
+			case 'uid_list';
 				if (preg_match("/^(?:\d+:\d+|\*:\d+|\d+:\*|\d+)(?:,(?:\d+:\d+|\*:\d+|\d+:\*|\d+))*$/", $val)) {
 					$valid = true;
 				}
@@ -97,7 +96,8 @@ abstract class ImapBase {
 		}
 		return $valid;
 	}
-	function clean($val, $type) {
+	function clean($val, $type)
+	{
 		if (!$this->input_validate($val, $type)) {
 			throw new \Exception("INVALID IMAP INPUT DETECTED: ".$type.': '.$val);
 		}
@@ -107,7 +107,8 @@ abstract class ImapBase {
 	/* break up a "line" response from imap. If we find
        a literal we read ahead on the stream and include it.
 	*/
-	function parse_line($line, $current_size, $max, $line_length) {
+	function parse_line($line, $current_size, $max, $line_length)
+	{
 		$line = str_replace(')(', ') (', $line);
 		$parts = array();
 		$line_cont = false;
@@ -167,8 +168,7 @@ abstract class ImapBase {
 						}
 						$chunk = substr($line, 0, $marker);
 						$line = substr($line, strlen($chunk));
-					}
-					else {
+					} else {
 						$chunk = trim($line);
 						$line = false;
 						$marker = strlen($chunk);
@@ -197,7 +197,8 @@ abstract class ImapBase {
 	}
 	/* Read literal found during parse_line().
 	*/
-	function read_literal($size, $max, $current, $line_length) {
+	function read_literal($size, $max, $current, $line_length)
+	{
 		$left_over = false;
 		$literal_data = fgets($this->handle, $line_length);
 		$current += strlen($literal_data);
@@ -217,7 +218,8 @@ abstract class ImapBase {
 		return array($literal_data, $left_over);
 	}
 
-	function get_response($max=false, $chunked=false, $line_length=8192, $sort=false) {
+	function get_response($max=false, $chunked=false, $line_length=8192, $sort=false)
+	{
 		$result = array();
 		$current_size = 0;
 		$chunked_result = array();
@@ -227,13 +229,17 @@ abstract class ImapBase {
 		$n = -1;
 		do {
 			$n++;
-			if (!is_resource($this->handle)) {
+			if (!is_resource($this->handle) || feof($this->handle)) {
 				break;
 			}
 			$result[$n] = fgets($this->handle, $line_length);
 
-			if(!$result[$n])
+			if( !$result[$n] ) {
+				if( $error = error_get_last()) {
+					$this->errors[] = $error;
+				}
 				break;
+			}
 
 			$current_size += strlen($result[$n]);
 			if ($max && $current_size > $max) {
@@ -265,8 +271,7 @@ abstract class ImapBase {
 			if ($sort) {
 				$line_cont = false;
 				$chunks = explode(' ', trim($result[$n]));
-			}
-			else {
+			} else {
 				list($line_cont, $chunks) = $this->parse_line($result[$n], $current_size, $max, $line_length);
 			}
 			if ($chunks && !$last_line_cont) {
@@ -282,75 +287,88 @@ abstract class ImapBase {
 					$chunked_result[$pchunk] = $line_bits;
 				}
 				$last_line_cont = false;
-			}
-			else {
+			} else {
 				$result[$n] = join(' ', $chunks);
 				if ($chunked) {
 					$chunked_result[$c] = $chunks;
 				}
 			}
-			
-    } while (substr($result[$n], 0, strlen('A'.$this->command_count.' ')) != 'A'.$this->command_count.' ');
-//		https://sourceforge.net/p/group-office/bugs/1711/
-//		} while (substr($result[$n], 0, strlen('A'.$this->command_count)) != 'A'.$this->command_count);
-		
+        } while (!feof($this->handle) && substr($result[$n], 0, strlen('A'.$this->command_count.' ')) != 'A'.$this->command_count.' ');
+
 		$this->responses[] = $result;
 		if ($chunked) {
 			if(!empty(\GO::session()->values['debugSql']) || self::$debug){
-				foreach($chunked_result as $chunks)
-					\GO::debug("R: ".implode(" ", $chunks));
+				foreach($chunked_result as $chunks) {
+					\GO::debug("R: " . implode(" ", $chunks));
+				}
 			}
 			$result = $chunked_result;
-		}else
-		{
+		} else {
 			if(!empty(\GO::session()->values['debugSql']) || self::$debug){
-				foreach($result as $line)
-					\GO::debug("R: ".$line);
+				foreach($result as $line) {
+					\GO::debug("R: " . $line);
+				}
 			}
 		}
 
-		//\GO::debug($result);
+		// \GO::debug($result); // TODO: Recomment this out!
 		return $result;
 	}
 	/* increment the imap command prefix such that it counts
        up on each command sent. ('A1', 'A2', ...) */
-	function command_number() {
+	function command_number() :int
+	{
 		$this->command_count += 1;
 		return $this->command_count;
 	}
-	/* put a prefix on a command and send it to the server */
-	function send_command($command, $piped=false) {
+	/**
+	 * put a prefix on a command and send it to the server
+	 *
+	 * @param string $command
+	 * @param bool|null $piped
+	 * @throws \Exception
+	 */
+	function send_command(string $command, ?bool $piped=false)
+	{
+		stream_set_timeout($this->handle, 10);
 		if ($piped) {
 			$final_command = '';
 			foreach ($command as $v) {
 				$final_command .= 'A'.$this->command_number().' '.$v;
 			}
 			$command = $final_command;
-		}
-		else {
+		} else {
 			$command = 'A'.$this->command_number().' '.$command;
 		}
 		if (!is_resource($this->handle)){
-				throw new \Exception("Lost connection to ".$this->server);
+			throw new \Exception("Lost connection to ".$this->server);
 		}
 		
 		$this->lastCommand=$command;
 
 		if(!fputs($this->handle, $command)){
 			throw new \Exception("Lost connection to ".$this->server);
-//				eturn false;
 		}
 		
 
-		if(!empty(\GO::session()->values['debugSql']) || self::$debug)
-			\GO::debug("S: ".$command);
+		if(!empty(\GO::session()->values['debugSql']) || self::$debug) {
+			\GO::debug("S: " . $command);
+		}
 		
 		$this->commands[trim($command)] = \GO\Base\Util\Date::getmicrotime();
 	}
-	/* determine if an imap response returned an "OK", returns
-       true or false */
-	function check_response($data, $chunked=false, $trackErrors=true) {
 
+
+	/**
+	 * determine if an imap response returned an "OK", returns true or false
+	 *
+	 * @param $data
+	 * @param false $chunked
+	 * @param bool $trackErrors
+	 * @return bool
+	 */
+	function check_response($data, $chunked=false, $trackErrors=true) :bool
+	{
 		$result = false;
 		if ($chunked) {
 			if (!empty($data)) {
@@ -369,14 +387,12 @@ abstract class ImapBase {
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			$line = array_pop($data);
 			if (preg_match("/^A".$this->command_count." OK/i", $line)) {
 				$result = true;
 			}
-			if(!$result && $trackErrors){
-				
+			if(!$result && $trackErrors) {
 				// Strip command count
 				$line = preg_replace("/^A".$this->command_count." NO( \[.*?\])? /i", "", $line);
 				$line = preg_replace("/ \(.*\)?/i", "", $line);
@@ -388,19 +404,7 @@ abstract class ImapBase {
 		return $result;
 	}
 
-	/*function utf7_decode($string) {
-		$string = iconv("UTF-7-IMAP", "UTF-8", $string);
-		//$string = mb_convert_encoding($string, "UTF-8", "UTF7-IMAP" );
-		return $string;
-	}
-	function utf7_encode($string) {
-
-		$string = iconv("UTF-8", "UTF-7-IMAP", $string);
-		//$string = mb_convert_encoding($string, "UTF7-IMAP", "UTF-8" );
-		return $string;
-	}*/
-
-	function utf7_decode($str) {
+	function utf7_decode(string $str) {
 		$Index_64 = array(
 						-1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1,
 						-1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1,
@@ -433,8 +437,9 @@ abstract class ImapBase {
 				for (; $u7len > 0; $i++, $u7len--) {
 					$u7 = $str[$i];
 
-					if ((ord($u7) & 0x80) || ($b = $Index_64[ord($u7)]) == -1)
+					if ((ord($u7) & 0x80) || ($b = $Index_64[ord($u7)]) == -1) {
 						break;
+					}
 
 					if ($k > 0) {
 						$ch |= $b << $k;
@@ -444,8 +449,9 @@ abstract class ImapBase {
 						$ch |= $b >> (-$k);
 						if ($ch < 0x80) {
 							/* Printable US-ASCII */
-							if (0x20 <= $ch && $ch < 0x7f)
+							if (0x20 <= $ch && $ch < 0x7f) {
 								return $err;
+							}
 							$p .= chr($ch);
 						}
 						else if ($ch < 0x800) {
@@ -464,22 +470,25 @@ abstract class ImapBase {
 				}
 
 				/* Non-zero or too many extra bits */
-				if ($ch || $k < 6)
+				if ($ch || $k < 6) {
 					return $err;
+				}
 
 				/* BASE64 not properly terminated */
-				if (!$u7len || $u7 != '-')
+				if (!$u7len || $u7 != '-') {
 					return $err;
+				}
 
 				/* Adjacent BASE64 sections */
-				if ($u7len > 2 && $str[$i+1] == '&' && $str[$i+2] != '-')
+				if ($u7len > 2 && $str[$i+1] == '&' && $str[$i+2] != '-') {
 					return $err;
-			}
-			/* Not printable US-ASCII */
-			else if (ord($u7) < 0x20 || ord($u7) >= 0x7f)
+				}
+			} else if (ord($u7) < 0x20 || ord($u7) >= 0x7f) {
+				/* Not printable US-ASCII */
 				return $err;
-			else
+			} else {
 				$p .= $u7;
+			}
 		}
 
 		return str_replace(array('\\\\','\"'), array('\\','"'), $p);
@@ -491,7 +500,7 @@ abstract class ImapBase {
 	 * Unicode characters above U+FFFF are replaced by U+FFFE.
 	 * If input data is invalid, return an empty string.
 	 */
-	function utf7_encode($str) {
+	function utf7_encode(string $str) {
 		$B64Chars = array(
 						'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
 						'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
@@ -598,7 +607,8 @@ abstract class ImapBase {
 	}
 
 
-	function mime_header_decode($string) {
+	function mime_header_decode(string $string)
+	{
 		return Utils::mimeHeaderDecode($string, $this->default_charset);
 	}
 }

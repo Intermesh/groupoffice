@@ -52,7 +52,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			callback: function(options, success, response) {
 				
 				if(!success) {
-					Ext.MessageBox.alert(t("Error"), response.message);
+					Ext.MessageBox.alert(t("Error"), response.description);
 					return;
 				}
 				this.csvStore = this.createCsvHeaderStore(response.csvHeaders);
@@ -324,7 +324,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					if(response.errors) {
 						Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
 					} else {
-						Ext.MessageBox.alert(t("Error"), response.message);
+						Ext.MessageBox.alert(t("Error"), response.description);
 					}
 				} else {
 					var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";

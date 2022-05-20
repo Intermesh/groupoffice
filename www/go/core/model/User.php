@@ -308,7 +308,7 @@ class User extends Entity {
    *
    * @return Group
    */
-	public function getPersonalGroup(): Group
+	public function getPersonalGroup(): ?Group
 	{
 		if(empty($this->personalGroup)){
 			$this->personalGroup = Group::find()->where(['isUserGroupFor' => $this->id])->single();
@@ -968,8 +968,6 @@ class User extends Entity {
 	{
 
 		$query->andWhere('id != 1');
-				
-		go()->getDbConnection()->beginTransaction();
 
 		go()->getDbConnection()->delete('go_settings', (new Query)->where('user_id', 'in', $query))->execute();
 		//go()->getDbConnection()->delete('go_reminders', (new Query)->where('user_id', 'in', $query))->execute();
@@ -982,7 +980,7 @@ class User extends Entity {
 			return false;
 		}
 
-		return go()->getDbConnection()->commit();
+		return true;
 	}
 
 

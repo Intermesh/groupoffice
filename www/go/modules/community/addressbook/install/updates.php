@@ -156,13 +156,15 @@ $updates['202202070921'][] = "alter table addressbook_user_settings
 $updates['202202070921'][] = "update `addressbook_phone_number` set type='mobile' where type='cell';";
 
 
+$updates['202205101237'][] = "update addressbook_contact set filesFolderId = null where filesFolderId=0;";
+
 
 // 6.7
 
-$updates['202202070921'][] = "alter table addressbook_address
+$updates['202205101237'][] = "alter table addressbook_address
     add address text null;";
 
-$updates['202202070921'][] = function() {
+$updates['202205101237'][] = function() {
 
 	go()->getDbConnection()->exec("alter table addressbook_address ADD id INT AUTO_INCREMENT PRIMARY KEY;");
 	\go\core\db\Table::destroyInstances();

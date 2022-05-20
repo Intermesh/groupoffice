@@ -638,39 +638,11 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public static function getGroupIds($userId) {
 
-		return go()->getDbConnection()->selectSingleValue('groupId')->from('core_user_group')->where(['userId' => $userId])->all();
-		// $user = GO::user();
-		// if ($user && $userId == $user->id) {
-		// 	if (!isset(GO::session()->values['user_groups'])) {
-		// 		GO::session()->values['user_groups'] = array();
+		if(!isset(self::$groupIds[$userId])) {
+			self::$groupIds[$userId] = go()->getDbConnection()->selectSingleValue('groupId')->from('core_user_group')->where(['userId' => $userId])->all();
+		}
 
-		// 		$stmt= UserGroup::model()->find(
-		// 						\GO\Base\Db\FindParams::newInstance()
-		// 						->select('t.groupId')
-		// 						->criteria(\GO\Base\Db\FindCriteria::newInstance()
-		// 										->addCondition("userId", $userId))
-		// 						);
-		// 		while ($r = $stmt->fetch()) {
-		// 			GO::session()->values['user_groups'][] = $r->groupId;
-		// 		}
-		// 	}
-		
-		// 	return GO::session()->values['user_groups'];
-		// } else {
-		// 	$ids = array();
-		// 	$stmt= UserGroup::model()->find(
-		// 						\GO\Base\Db\FindParams::newInstance()
-		// 						->select('t.groupId')
-		// 						->debugSql()
-		// 						->criteria(\GO\Base\Db\FindCriteria::newInstance()
-		// 										->addCondition("userId", $userId))
-		// 						);
-
-		// 	while ($r = $stmt->fetch()) {
-		// 		$ids[] = $r->groupId;
-		// 	}
-		// 	return $ids;
-		// }
+		return self::$groupIds[$userId];
 	}
 	
 	/**

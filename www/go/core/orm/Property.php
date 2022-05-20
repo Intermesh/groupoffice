@@ -363,7 +363,8 @@ abstract class Property extends Model {
 			$query = $cls::internalFind([], $readOnly, $owner);
 
 			foreach ($where as $field => $value) {
-				$query->andWhere($field . '= :' . $field);
+				$query->andWhere($field . '= :' . $field)
+					->bind(':' . $field, $value);
 			}
 
 			if (is_a($relation->propertyName, UserProperty::class, true)) {
@@ -381,11 +382,13 @@ abstract class Property extends Model {
 			$query = $stmt->getQuery();
 			/** @var Query $query */
 			$stmt->setFetchMode(PDO::FETCH_CLASS, $cls, [$owner, false, [], $query->getReadOnly()]);
+
+			foreach($where as $field => $value) {
+				$stmt->bindValue(':'.$field, $value);
+			}
 		}
 
-		foreach($where as $field => $value) {
-			$stmt->bindValue(':'.$field, $value);
-		}
+
 		$stmt->execute();
 
 		return $stmt;
@@ -2402,22 +2405,22 @@ abstract class Property extends Model {
 		}
 	}
 
-  /**
-   * Copy the property or entity.
-   *
-   * The property will not be saved to the database.
-   * The primary key values will not be copied.
-   *
-   * @example
-   * $sourceAcl = \go\core\model\Acl::findById($type->acl_id);
-   * $newAcl = $sourceAcl->copy();
-   *
-   * @example Copy relation array
-   * $sourceAcl = \go\core\model\Acl::findById($type->acl_id);
-   * $targetAcl = $tasklist->findAcl();
-   * $targetAcl->groups = array_map(function($g) {
-   * 	return $g->copy;
-   * }, $sourceAcl->groups);
+	/**
+	 * Copy the property or entity.
+	 *
+	 * The property will not be saved to the database.
+	 * The primary key values will not be copied.
+	 *
+	 * @example
+	 * $sourceAcl = \go\core\model\Acl::findById($type->acl_id);
+	 * $newAcl = $sourceAcl->copy();
+	 *
+	 * @example Copy relation array
+	 * $sourceAcl = \go\core\model\Acl::findById($type->acl_id);
+	 * $targetAcl = $tasklist->findAcl();
+	 * $targetAcl->groups = array_map(function($g) {
+	 * 	return $g->copy;
+	 * }, $sourceAcl->groups);
 	 *
 	 * @return static
 	 * @throws Exception

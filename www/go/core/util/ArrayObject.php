@@ -124,13 +124,24 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 		return $this->getArray();
 	}
 
-
+	/**
+	 * Prepend a value
+	 *
+	 * @param mixed $value
+	 * @return void
+	 */
 	public function unshift($value) {
 		$copy = $this->getArrayCopy();
 		array_unshift($copy, $value);
 		$this->exchangeArray($copy);
 	}
 
+	/**
+	 * Append a value
+	 *
+	 * @param mixed $value
+	 * @return void
+	 */
 	public function push($value) {
 		$this->offsetSet($this->count(), $value);
 	}
@@ -153,18 +164,14 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 				$insert,
 				array_slice($copy, $index)
 			);
-			$this->exchangeArray($new);
 		} else {
 			$new = array_merge(
 				array_slice($copy, 0, $index),
 				[$value],
 				array_slice($copy, $index)
 			);
-			$this->exchangeArray($new);
-//			$this->exchangeArray($copy);
 		}
-
-
+		$this->exchangeArray($new);
 	}
 
 	/**
@@ -195,8 +202,23 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 
 	}
 
+	/**
+	 * Get the keys of the array
+	 *
+	 * @return array
+	 */
 	public function keys() : array {
 		return array_keys($this->getArrayCopy());
+	}
+
+
+	/**
+	 * Check if a key exists
+	 * @param string $name
+	 * @return bool
+	 */
+	public function hasKey(string $name) : bool{
+		return array_key_exists($name, $this->getArrayCopy());
 	}
 
 	

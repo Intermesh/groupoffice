@@ -359,14 +359,16 @@ class Acl extends Entity {
 					->from('core_acl_group', 'g')
 					->join('core_user_group', 'u', 'g.groupId = u.groupId')
 					->where('g.aclId = :aclId AND u.userId = :userId')
-					->groupBy(['g.aclId']);
+					->groupBy(['g.aclId'])
+					->bind(':aclId', $aclId)
+					->bind(':userId', $userId);
 
 				$stmt = $query->createStatement();
 				go()->getDbConnection()->cacheStatement('acl-getUserPermissionLevel', $stmt);
+			} else {
+				$stmt->bindValue(':aclId', $aclId);
+				$stmt->bindValue(':userId', $userId);
 			}
-
-			$stmt->bindValue(':aclId',$aclId);
-			$stmt->bindValue(':userId',$userId);
 			$stmt->execute();
 			self::$permissionLevelCache[$cacheKey] = (int) $stmt->fetch();
 

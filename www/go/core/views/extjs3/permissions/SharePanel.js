@@ -180,9 +180,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 //			stateful: true,
 //			stateId: 'users-grid'
 		});
-		
-		this.store.on("beforeload", this.onBeforeStoreLoad, this);
-		
+
 		go.permissions.SharePanel.superclass.initComponent.call(this);
 
 		this.on("cellclick", function(grid, rowIndex, columnIndex, e) {
@@ -197,13 +195,33 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 
 		this.on("added", () => {
+
 			setTimeout(() => {
 
 				const form = this.findParentByType("entityform");
 				if (form) {
-					form.on("load", function (f, v) {
-						this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
-					}, this);
+					const onLoad = () => {
+						//orders selected values on top
+
+						const nameParts = this.name.split('.');
+						let entity;
+						if(nameParts.length ==3 && nameParts[2] == 'defaultAcl') {
+							//for default permisssions
+							entity = {default:true, entity: nameParts[1]};
+						} else
+						{
+							entity = {id: form.currentId, entity: form.entityStore.entity.name};
+							this.setDisabled(form.entity.permissionLevel < go.permissionLevels.manage);
+						}
+
+						this.store.setFilter("inAcl", {inAcl: entity});
+
+					};
+					if(!form.entity) {
+						form.on("load", onLoad);
+					} else {
+						onLoad();
+					}
 					if(this.value === null) {
 						this.value = form.entityStore.entity.defaultAcl;
 					}
@@ -307,15 +325,11 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 		go.permissions.SharePanel.superclass.afterRender.call(this);
 
-
-
-		//Check form currentId becuase when form is loading then it will load the store on setValue later.
+		//Check form currentId because when form is loading then it will load the store on setValue later.
 		//Set timeout is used to make sure the check will follow after a load call.
 
 		setTimeout(() => {
-			//if(!go.util.empty(me.value) && !form.currentId) {
-				this.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
-			//}
+				this.store.load();
 		});
 	},
 	
@@ -340,8 +354,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		this._isDirty = false;
 		this.value = groups;
 		if(this.rendered) {
-			this.store.load().catch(function () {
-			}); //ignore failed load becuase onBeforeStoreLoad can return false
+			this.store.load();
 		}
 	},
 	
@@ -355,42 +368,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		}
 		return groupIds;
 	},
-	
-	onBeforeStoreLoad : function(store, options) {
 
-		//don't add selected on search
-		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
-			this.store.setFilter('exclude', null);
-			return true;
-		} else
-		{
-			var selectedGroupIds = this.getSelectedGroupIds();
-			this.store.removeAll();
-		}
-
-		this.getEl().mask(t("Loading.."));
-		
-		go.Db.store("Group").get(selectedGroupIds, function(entities) {
-			this.store.loadData({records: entities}, true);
-			this.store.sortData();
-			this.store.setFilter('exclude', {
-				exclude: selectedGroupIds
-			});
-			var me = this;
-			this.store.load({
-				add: true,
-				selectedLoaded: true
-			}).then(function() {
-				//when reload is called by SSE we need this removed.
-				delete me.store.lastOptions.selectedLoaded;
-			}).finally(function() {
-				me.getEl().unmask();
-			})
-		}, this);
-		
-		return false;
-	},	
-	
 	getValue: function () {				
 		return this.value;
 	},

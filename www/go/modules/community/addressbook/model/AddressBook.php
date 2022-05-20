@@ -3,6 +3,7 @@ namespace go\modules\community\addressbook\model;
 
 use go\core\db\Criteria;
 use go\core\fs\File;
+use go\core\model\Acl;
 use go\core\model\Module as CoreModule;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;

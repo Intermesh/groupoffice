@@ -2,13 +2,12 @@
 
 
 namespace GO\Email\Controller;
-use GO;
-	
-	
-	
-	
-class AccountController extends \GO\Base\Controller\AbstractModelController {
 
+use GO;
+
+
+class AccountController extends \GO\Base\Controller\AbstractModelController
+{
 	protected $model = "GO\Email\Model\Account";
 	
 	protected function allowGuests() {
@@ -73,7 +72,8 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		return parent::formatColumns($columnModel);
 	}
 
-	protected function afterLoad(&$response, &$model, &$params) {
+	protected function afterLoad(&$response, &$model, &$params)
+	{
 
 		$response['data']['email_enable_labels'] = !empty(GO::config()->email_enable_labels); 
 
@@ -83,40 +83,40 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		$response['data']['password']='';
 		$response['data']['smtp_password']='';
 
-//		$response['data']['password'] = $model->decryptPassword();
-//		$response['data']['smtp_password'] = $model->decryptSmtpPassword();
-
 
 		$alias = $model->getDefaultAlias();
 
-//		$response['data']['mbroot'] = trim($response['data']['mbroot'], './');
 
 		$response['data']['email'] = $alias->email;
 		$response['data']['name'] = $alias->name;
 		$response['data']['signature'] = $alias->signature;
 
-//		if (\GO::modules()->isInstalled('addressbook')) {
-			$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-			if ($defaultTemplateModel) {
-				$response['data']['default_account_template_id'] = $defaultTemplateModel->template_id;
-			} else {
-				$response['data']['default_account_template_id'] = '';
-			}
-//		}
+		$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+		if ($defaultTemplateModel) {
+			$response['data']['default_account_template_id'] = $defaultTemplateModel->template_id;
+		} else {
+			$response['data']['default_account_template_id'] = '';
+		}
 
 		return parent::afterLoad($response, $model, $params);
 	}
 
 	protected function beforeSubmit(&$response, &$model, &$params) {
-		if(empty($params['password']))
-			unset($params['password']);
+		if(empty($params['password'])) {
+			if(isset($params['oauth2_client_id']) && !empty($params['oauth2_client_id'])) {
+				$params['password'] = uniqid(); // We only need it to save the account record
+				$model->checkImapConnectionOnSave = false;
+			} else {
+				unset($params['password']);
+			}
+		}
 
 		if(isset($params['smtp_auth'])) {
 			if (!empty($params['smtp_auth'])){
-				if(empty($params['smtp_password']))
+				if(empty($params['smtp_password'])) {
 					unset($params['smtp_password']);
-			}else
-			{
+				}
+			} else {
 				$params['smtp_password']="";
 				$params['smtp_username']="";
 			}
@@ -125,37 +125,36 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		return parent::beforeSubmit($response, $model, $params);
 	}
 
-	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes) {
-
+	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes)
+	{
 		if (empty($params['id'])) {
 			$model->addAlias($params['email'], $params['name']);
 		} else {
 			$alias = $model->getDefaultAlias();
 			$alias->name = $params['name'];
 
-			if(isset($params['email']))
+			if(isset($params['email'])) {
 				$alias->email = $params['email'];
+			}
 
 			$alias->signature = $params['signature'];
 			$alias->save();
 		}
 
 		if ( isset($params['default_account_template_id'])) {
-//			if ($params['default_account_template_id']==-1 || empty($params['default_account_template_id'])) {
-//				$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-//				if ($defaultTemplateModel)
-//					$defaultTemplateModel->delete();
-//			} elseif ($params['default_account_template_id']>0) {
-				$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-				if (!$defaultTemplateModel) {
-					$defaultTemplateModel = new \GO\Email\Model\DefaultTemplateForAccount();
-					$defaultTemplateModel->account_id = $model->id;
-				}
-				$defaultTemplateModel->template_id = (int) $params['default_account_template_id'];
-				$defaultTemplateModel->save();
-//			}
+			$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+			if (!$defaultTemplateModel) {
+				$defaultTemplateModel = new \GO\Email\Model\DefaultTemplateForAccount();
+				$defaultTemplateModel->account_id = $model->id;
+			}
+			$defaultTemplateModel->template_id = (int) $params['default_account_template_id'];
+			$defaultTemplateModel->save();
 		}
 
+		// $model->isNew() does not work!
+		if(isset($params['oauth2_client_id']) && !empty($params['oauth2_client_id']) && empty($params['id'])) {
+			$response['needs_refresh_token'] = true;
+		}
 		return parent::afterSubmit($response, $model, $params, $modifiedAttributes);
 	}
 
@@ -185,8 +184,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 				if($account->getDefaultAlias()){
 
 					$checkMailboxArray = $account->getAutoCheckMailboxes();
-
-					//$imap = $account->openImapConnection();
 
 					$existingCheckMailboxArray = array();
 
@@ -224,19 +221,18 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 		\GO::debug("Total unseen: ".$response['email_status']['total_unseen']);
 
-//$response['email_status']['has_new']=true;
 		return $response;
 	}
 
-	public function actionSubscribtionsTree($params){
+	public function actionSubscribtionsTree(array $params)
+	{
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 
 		$rootMailboxes = $account->getRootMailboxes(false, false);
 
-		//\GO::debug($rootMailboxes);
-		if ($params['node'] == 'root')
+		if ($params['node'] == 'root') {
 			return $this->_getMailboxTreeNodes($rootMailboxes, true);
-		else{
+		} else{
 			$parts = explode('_', base64_decode($params['node']));
 			$type = array_shift($parts);
 			$accountId = array_shift($parts);
@@ -249,7 +245,8 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		}
 	}
 
-	private function _getUsage(\GO\Email\Model\Account $account){
+	private function _getUsage(\GO\Email\Model\Account $account)
+	{
 		$usage="";
 
 		$quota = $account->openImapConnection()->get_quota();
@@ -267,11 +264,11 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 				$usage = sprintf(\GO::t("%s used", "email"), \GO\Base\Util\Number::formatSize($quota['usage']*1024));
 			}
 		}
-		//var_dump($usage);
 		return $usage;
 	}
 
-	public function actionTree($params) {
+	public function actionTree(array $params): array
+	{
 		\GO::session()->closeWriting();
 
 		$response = array();
@@ -301,54 +298,32 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 			$stmt =  \GO\Email\Model\Account::model()->find($findParams);
 
 			while ($account = $stmt->fetch()) {
-
+				$account->maybeRefreshToken();
 				$alias = $account->getDefaultAlias();
 				if($alias){
 					$nodeId=base64_encode('account_' . $account->id);
 
 					$node = array(
-							'text' => $alias->email,
-							'name' => $alias->email,
-							'id' => $nodeId,
-							'isAccount'=>true,
-							'permission_level'=>$account->getPermissionLevel(),
-							'hasError'=>false,
-							'iconCls' => 'ic-account-box',
-							'expanded' => $this->_isExpanded($nodeId),
-							'noselect' => false,
-							'account_id' => $account->id,
-							'mailbox' => rtrim($account->mbroot,"./"),
-							'noinferiors' => false,
-							//'inbox_new' => 0,
-							//'usage' => "",
-							//"acl_supported"=>false
+						'text' => $alias->email,
+						'name' => $alias->email,
+						'id' => $nodeId,
+						'isAccount'=>true,
+						'permission_level'=>$account->getPermissionLevel(),
+						'hasError'=>false,
+						'iconCls' => 'ic-account-box',
+						'expanded' => $this->_isExpanded($nodeId),
+						'noselect' => false,
+						'account_id' => $account->id,
+						'mailbox' => rtrim($account->mbroot,"./"),
+						'noinferiors' => false
 					);
-					if($node['permission_level']<= \GO\Base\Model\Acl::READ_PERMISSION)
-					  $node['cls'] = 'em-readonly';
-
-//					try{
-//						if($node['expanded']){
-//							$account->openImapConnection();
-//							$rootMailboxes = $account->getRootMailboxes(true);
-//							$node['children']=$this->_getMailboxTreeNodes($rootMailboxes);
-//						}
-//
-//					}catch(\GO\Base\Mail\ImapAuthenticationFailedException $e){
-//						//$this->_checkImapConnectException($e,$node);
-//						$node['isAccount'] = false;
-//						$node['hasError'] = true;
-//						$node['text'] .= ' ('.\GO::t("Error").')';
-//						$node['children']=array();
-//						$node['expanded']=true;
-//						$node['qtipCfg'] = array('title'=>\GO::t("Error"), 'text' =>htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));	
-//					}
-
+					if($node['permission_level']<= \GO\Base\Model\Acl::READ_PERMISSION) {
+						$node['cls'] = 'em-readonly';
+					}
 					$response[] = $node;
 				}
 			}
 		} else {
-//			$this->_setExpanded($params['node']);
-
 			$params['node']=base64_decode($params['node']);
 
 			$parts = explode('_', $params['node']);
@@ -369,18 +344,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		return $response;
 	}
 
-//	private function _checkImapConnectException(\Exception $e, &$node) {
-//		if (strpos($e->getMessage(),'Authentication failed')==0) {
-//			$node['isAccount'] = false;
-//			$node['hasError'] = true;
-//			$node['text'] .= ' ('.\GO::t("Error").')';
-//			$node['children']=array();
-//			$node['expanded']=true;
-//			$node['qtipCfg'] = array('title'=>\GO::t("Error"), 'text' =>htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));	
-//		} else {
-//			throw $e;
-//		}
-//	}
 
 	/**
 	 *
@@ -396,10 +359,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 			if(!$fetchAllWithSubscribedFlag && !$mailbox->isVisible())// && !$mailbox->haschildren)
 				continue;
 
-			/* @var $mailbox \GO\Email\Model\ImapMailbox */
-//			if (!$mailbox->subscribed)
-//				continue;
-
 			$nodeId = base64_encode('f_' . $mailbox->getAccount()->id . '_' . $mailbox->name);
 
 			
@@ -413,10 +372,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 				}
 			}
 			$text .= '<div class="ellipsis">'.$mailbox->getDisplayName().'</div>';
-
-//			\GO::debug($mailbox);
-
-//			$children = $this->_getMailboxTreeNodes($mailbox->getChildren());
 
 			$cls = $mailbox->noselect==1 ? 'em-tree-node-noselect' : "";
 			
@@ -461,8 +416,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 			if($fetchAllWithSubscribedFlag){
 				$node['checked']=$mailbox->subscribed;
 			}
-
-			//if($mailbox->hasnochildren)
 
 			$sortIndex = 5;
 
@@ -531,13 +484,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		return in_array($nodeId, $this->_treeState);
 	}
 
-//	private function _setExpanded($nodeId){
-//
-//		if(!$this->_isExpanded($nodeId)){
-//			$this->_treeState[]=$nodeId;
-//			\GO::config()->save_setting("email_accounts_tree", json_encode($this->_treeState), \GO::user()->id);
-//		}
-//	}
 
 	protected function actionSaveTreeState($params) {
 		$response['success'] = \GO::config()->save_setting("email_accounts_tree", $params['expandedNodes'], \GO::user()->id);
@@ -563,13 +509,8 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 
-	protected function actionUsernames($params){
-
-//		$store = \GO\Base\Data\Store::newInstance(\GO\Email\Model\Account::model());
-//		$findParams= $store->getDefaultParams($params)->group('username');
-
-
-
+	protected function actionUsernames(array $params)
+	{
 		$store = \GO\Base\Data\Store::newInstance(\GO\Base\Model\User::model());
 		$findParams= $store->getDefaultParams($params);
 		$findParams->joinModel(array(
@@ -588,14 +529,13 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 		$stmt = \GO\Base\Model\User::model()->find($findParams);
 
-		//$stmt = \GO\Email\Model\Account::model()->find($findParams);
 		$store->setStatement($stmt);
 
 		return $store->getData();
 	}
 
-	protected function actionSavePassword($params) {
-
+	protected function actionSavePassword(array $params)
+	{
 		$accountModel = \GO\Email\Model\Account::model()->findByPk($params['id']);
 		$accountModel->password = $params['password'];
 		$accountModel->save();
@@ -604,8 +544,8 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 	}
 
-	protected function actionCopyMailTo($params) {
-
+	protected function actionCopyMailTo(array $params)  :array
+	{
 		$srcMessages = json_decode($params['srcMessages']);
 
 		$move = !empty($params['move']);
@@ -616,8 +556,9 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 			$targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
 
-			if(!$targetAccountModel->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION))
-			  throw new \GO\Base\Exception\AccessDenied();
+			if(!$targetAccountModel->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
 
 			if($move && $targetAccountModel->id == $srcAccountModel->id) {
 				$conn = $srcAccountModel->openImapConnection( $srcMessageInfo->mailboxPath);
@@ -643,8 +584,8 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		return array('success'=>true);
 	}
 
-	protected function actionLoadAddress($params) {
-
+	protected function actionLoadAddress(array $params)
+	{
 		$accountModel = GO\Email\Model\Account::model()->find(
 			GO\Base\Db\FindParams::newInstance()
 				->single()

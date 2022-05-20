@@ -484,7 +484,7 @@ abstract class Entity extends Property {
 
 		$query = self::normalizeDeleteQuery($query);
 
-		App::get()->getDbConnection()->beginTransaction();
+		go()->getDbConnection()->beginTransaction();
 
 		try {
 
@@ -518,17 +518,22 @@ abstract class Entity extends Property {
 				return false;			
 			}
 
-			return go()->getDbConnection()->commit();
+			if(!go()->getDbConnection()->commit()) {
+				return false;
+			}
+
+			return true;
 		} catch(Exception $e) {
-			go()->getDbConnection()->rollBack();
+			if(go()->getDbConnection()->inTransaction()) {
+				go()->getDbConnection()->rollBack();
+			}
 			throw $e;
 		}
 	}
 
 
 	protected function commitToDatabase() : bool {
-		go()->debug("commit " . static::class);
-		return App::get()->getDbConnection()->commit();
+		return go()->getDbConnection()->commit();
 	}
 
   /**
@@ -1113,7 +1118,6 @@ abstract class Entity extends Property {
 	{
 		return null;
 	}
-
 
 	
 	/**

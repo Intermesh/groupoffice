@@ -48,7 +48,7 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				field: 'name',
 				direction: 'ASC'
 			},
-			remoteSort: false,
+			remoteSort: true,
 			baseParams: {
 				limit: 0
 			},
@@ -67,14 +67,6 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				},
 				'permissions',
 				'package',
-				// {
-				// 	name: 'level',
-				// 	type: {
-				// 		convert: function (v, data) {
-				// 			return me.value[data.id];
-				// 		}
-				// 	}
-				// },
 				{
 					name: 'selected',
 					type: {
@@ -91,7 +83,6 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			entityStore: "Module"
 		});
 
-		//var levelCombo = this.createLevelCombo();
 		this.moduleRightsEditor = new go.groups.ModulePermissionCombo({
 			store: new Ext.data.SimpleStore({
 				id: 0,
@@ -99,13 +90,6 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				data: []
 			})
 		});
-		// var rightsCombo = new go.groups.ModulePermissionCombo({
-		// 	store: new Ext.data.SimpleStore({
-		// 		id:0,
-		// 		fields : ['value', 'text'],
-		// 		data : (this.rights || []).map(v => [t(v), v] )
-		// 	}),
-		// });
 
 		Ext.apply(this, {
 			plugins: [checkColumn],
@@ -185,7 +169,6 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 //			stateId: 'users-grid'
 		});
 
-		this.store.on("beforeload", this.onBeforeStoreLoad, this);
 
 		go.groups.GroupModuleGrid.superclass.initComponent.call(this);
 
@@ -298,7 +281,7 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
 		}, this);
 
-		//Check form currentId becuase when form is loading then it will load the store on setValue later.
+		//Check form currentId because when form is loading then it will load the store on setValue later.
 		//Set timeout is used to make sure the check will follow after a load call.
 		var me = this;
 		setTimeout(function () {
@@ -326,46 +309,12 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 	},
 
 	setValue: function (groups) {
-		console.log(groups);
 		this._isDirty = false;
-		//this.value = groups || {};
-		this.store.load().catch(function () {
-		}); //ignore failed load becuase onBeforeStoreLoad can return false
+		this.store.load();
 	},
 
 	getSelectedModuleIds: function () {
 		return Object.keys(this.value).map(parseInt);
-	},
-
-	onBeforeStoreLoad: function (store, options) {
-
-		//don't add selected on search
-		if (this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
-			this.store.setFilter('exclude', null);
-			return true;
-		}
-		go.Db.store("Module").get(this.getSelectedModuleIds(), function (entities) {
-			this.store.loadData({records: entities}, true);
-			// this.store.sortData();
-			this.store.setFilter('exclude', {
-				exclude: this.getSelectedModuleIds()
-			});
-			var me = this;
-			this.store.load({
-				add: true,
-				selectedLoaded: true
-			}).then(function () {
-				me.store.multiSort([{
-					field: 'selected',
-					direction: 'DESC'
-				}, {
-					field: 'label',
-					direction: 'ASC'
-				}]);
-			});
-		}, this);
-
-		return false;
 	},
 
 	getValue: function () {

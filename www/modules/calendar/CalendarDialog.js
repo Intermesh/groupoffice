@@ -13,11 +13,8 @@
 
 GO.calendar.CalendarDialog = function(config)
 {
-	if(!config)
-	{
-		config = {};
-	}
-	
+	config = config || {};
+
 	this.propertiesTab = new Ext.Panel({	
 		title:t("Properties"),
 		layout:'form',
@@ -92,8 +89,7 @@ GO.calendar.CalendarDialog = function(config)
 		]
 	});
 
-	if(go.Modules.isAvailable("community", "tasks"))
-	{
+	if(go.Modules.isAvailable("community", "tasks")) {
 		this.tasklistsTab = new GO.base.model.multiselect.panel({
 		  title:t("Visible tasklists", "tasks"),
 		  url:'calendar/calendarTasklist',
@@ -351,13 +347,14 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 
 	resource: 0,
     
-	initComponent : function(){
-		
+	initComponent : function() {
 		this.addEvents({
 			'save' : true
 		});
-		
-		GO.calendar.CalendarDialog.superclass.initComponent.call(this);	
+		if(go.Modules.isAvailable("community", "tasks")) {
+			this.selectTasklist.store.setFilter('role', {role: 'list'});
+		}
+		GO.calendar.CalendarDialog.superclass.initComponent.call(this);
 		
 	},				
 	show : function (calendar_id, resource){		

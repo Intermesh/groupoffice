@@ -25,6 +25,8 @@
 namespace GO\Base\Data;
 
 
+use go\core\ErrorHandler;
+
 class Store extends AbstractStore {
 	
   /**
@@ -154,6 +156,9 @@ class Store extends AbstractStore {
 					$this->response['deleteSuccess'] = true;
 				}
       } catch (\Exception $e) {
+
+				ErrorHandler::logException($e);
+
         $this->response['deleteSuccess'] = false;
         $this->response['deleteFeedback'] = $e->getMessage();
 				if(\GO::config()->debug)

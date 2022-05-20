@@ -214,9 +214,7 @@ abstract class EntityController extends Controller {
    */
 	protected function defaultQuery(array $params): ArrayObject
 	{
-
 		$state = $this->getState();
-
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
@@ -650,7 +648,7 @@ abstract class EntityController extends Controller {
 
 		$result['oldState'] = $oldState;
 
-		EntityType::push(false);
+		EntityType::push();
 
 		$result['newState'] = $this->getState();
 
@@ -769,7 +767,7 @@ abstract class EntityController extends Controller {
 			if(empty($properties)) {
 				$properties = [];
 			}
-			$entity = $this->getEntity($id);			
+			$entity = $this->getEntity($id);
 			if (!$entity) {
 				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Item not found"));
 				continue;
@@ -802,7 +800,14 @@ abstract class EntityController extends Controller {
 			//The server must return all properties that were changed during a create or update operation for the JMAP spec
 			$entityProps = new ArrayObject($entity->toArray());			
 			$diff = $entityProps->diff($clientProps);
-			
+
+			// In some rare cases like password values may be set but not retrieved. We must add "null" here for the client.
+			foreach($properties as $key => $value) {
+				if(!$entityProps->hasKey($key)) {
+					$diff[$key] = null;
+				}
+			}
+
 			$result['updated'][$id] = empty($diff) ? null : $diff;
 		}
 	}

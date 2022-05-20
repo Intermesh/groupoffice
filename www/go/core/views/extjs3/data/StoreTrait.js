@@ -49,11 +49,27 @@ go.data.StoreTrait = {
 					console.error(response);
 
 					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
-				}else
+				}else if(response.type =="unsupportedSort") {
+
+					// Handle invalid sort state which may happen when a (custom) column has been removed.
+
+					console.warn("Clearing invalid sort state:", store.sortInfo);
+					store.sortInfo = {};
+					//caused infinite loop while developing
+					if(!GO.debug) {
+						store.reload();
+					} else {
+						GO.errorDialog.show(response.description);
+					}
+
+					//cancel further exception handling
+					// return false;
+
+				} else
 				{
 					console.error(response);
 
-					GO.errorDialog.show(t("Failed to send the request to the server. Please check your internet connection."));
+					GO.errorDialog.show(response.description || t("Failed to send the request to the server. Please check your internet connection."));
 				}
 			}
 			,this);
@@ -184,12 +200,15 @@ go.data.StoreTrait = {
 			return;
 		}		
 
-		if(added.length || changed.length) {
+		// if they are all empty then something is wrong
+		// an exception occurred and we will also reload
+		if(added.length || changed.length || !destroyed.length) {
 			//we must reload because we don't know how to sort partial data.
 			const o = go.util.clone(this.lastOptions);
 			o.params = o.params || {};
 			o.params.position = 0;
 			o.add = false;
+			o.keepScrollPosition = true;
 
 			if(this.lastOptions.params && this.lastOptions.params.position) {				
 				o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);

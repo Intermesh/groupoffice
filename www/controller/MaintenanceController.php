@@ -46,130 +46,7 @@ class MaintenanceController extends AbstractController {
 		$cg = new \go\core\fs\GarbageCollector;
 		$cg->execute();
 	}
-	
-	protected function actionDownloadFromShop($params){
-		$this->requireCli();
-		
-		$proPackageName = 'groupoffice-pro';
-		
-		$this->checkRequiredParameters(array('shopuser','shoppass'), $params);
-		
-		$shopUrl = 'https://intermesh.group-office.com/';
-		
-		$packages = isset($params['packages']) ? explode(",", $params['packages']) : array('documents-4.0', 'billing-4.0', 'groupoffice-pro-4.0');
-		
-		$downloads=array();
-		foreach($packages as $package_name){
-			
-			echo "\nGetting latest ".$package_name."\n";
-		
-			$packageUrl = $shopUrl.'?r=licenses/package/downloadPackageFile&package_name='.$package_name;
-			
 
-			$c = new \GO\Base\Util\HttpClient();
-			if(!$c->groupofficeLogin($shopUrl, $params['shopuser'],$params['shoppass']))
-				exit("Bad user name or password for shop");
-			else
-				echo "Shop login successful\n";
-
-			$tmpDir = new \GO\Base\Fs\Folder(getcwd());
-			if(!$tmpDir->isWritable())
-				exit("Error: ".$tmpDir->path ()." is not writable!\n");
-
-			$file = $tmpDir->createChild($package_name.'.tar.gz');
-			echo "Downloading file from shop...\n";
-			if(!$c->downloadFile($packageUrl, $file))		
-				exit("Error: Failed to download file");
-			
-			$file->rename($c->getLastDownloadedFilename());
-			
-			
-			$downloads[]=$file;
-			
-			
-			if(!empty($params['replacefolder']))
-				$params['unpack']=1;
-			
-			//echo "Filename: ".$c->getLastDownloadedFilename()."\n";
-
-			echo "File saved in ".$file->path()."\n";
-
-			if(!empty($params['unpack'])){
-				echo "Unpacking ".$file->name()."\n";
-				system('tar zxf '.$file->name());
-			}
-
-		}
-		
-		
-		
-		if(!empty($params['unpack'])){
-			foreach($downloads as $download){
-				if(strpos($download->name(), $proPackageName)!==false){
-					$proDownload=$download;
-					break;
-				}
-			}
-			
-			if(empty($proDownload)){
-				exit("Error: Can't unpack. Group-Office Professional was not part of the downloads\n");
-			}
-			
-			echo "Moving modules into pro package\n";
-			
-			$downloadFolder = str_replace('.tar.gz','', $proDownload->name());
-			
-			$newFolder = new \GO\Base\Fs\Folder(getcwd().'/'.$downloadFolder);
-			if(!$newFolder->exists())
-				exit("Download folder ".$newFolder->path()." does not exist.\n");
-			
-			foreach($downloads as $download){
-				if(strpos($download->name(), $proPackageName)===false){
-					
-					$modPackageName = str_replace('.tar.gz','', $download->name());
-					
-					system('rm -Rf '.$modPackageName.'/professional');
-					system('mv '.$modPackageName.'/* '.$downloadFolder.'/modules/');
-					system('rm -Rf '.$modPackageName.'*');
-					$proDownload->delete();
-				}
-			}			
-		
-			if(!empty($params['replacefolder'])){			
-
-				$params['replacefolder']=realpath($params['replacefolder']);
-
-				echo "Replacing: ".$params['replacefolder']."\n";
-
-				$replaceFolder = new \GO\Base\Fs\Folder($params['replacefolder']);
-
-				$origFolderName = $replaceFolder->name();
-
-				$backupName = $origFolderName.'_bak_'.date('YmdGis');
-
-				echo "Creating backup in ".$backupName."\n";
-
-
-				if(!$replaceFolder->exists()){
-					exit("Error: Folder ".$params['replacefolder']." does not exist!\n");
-				}
-				if(!$replaceFolder->rename($backupName))
-					die("Failed to rename ".$replaceFolder->path()."\n");
-
-//				$newFolder = new \GO\Base\Fs\Folder(getcwd().'/'.$downloadFolder);
-				if(!$newFolder->rename($origFolderName))
-					die("Failed to rename ".$newFolder->path()."\n");
-
-				//there might be a config file or license file in the directory
-				echo "Copying possible config and license files\n";
-				system('cp '.$replaceFolder->path().'/config.php '.$replaceFolder->path().'/*license.txt '.$newFolder->path().'/');
-
-			}
-		}
-		echo "All done\n";
-		
-	}
-	
 //	protected function ignoreAclPermissions() {
 //		return array('*');
 //	}
@@ -851,7 +728,7 @@ class MaintenanceController extends AbstractController {
 
 			$entries = explode("\$l", $data);
 
-			//to find duplicate keys we'll reverse the lines becuase the last definition is used.
+			//to find duplicate keys we'll reverse the lines because the last definition is used.
 			$entries = array_reverse($entries);
 
 			$processedKeys = array();

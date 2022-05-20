@@ -6,10 +6,10 @@ use go\core;
 class Settings extends core\Settings {
 		
 	/**
-	 * Delete history after this number of years
+	 * Delete history after this number of days
 	 * 
 	 * @var bool
 	 */
-	public $deleteAfterYears = 1;
+	public $deleteAfterDays = 365;
 
 }

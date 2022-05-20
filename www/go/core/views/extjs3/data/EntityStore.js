@@ -289,6 +289,11 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				}
 			}).then((changes) => {
 
+				// when polling with sseEnabled = false we might be getting an empty result.
+				if(go.util.empty(changes.removed) && go.util.empty(changes.changed)) {
+					return this.setState(changes.newState);
+				}
+
 				if(changes.removed) {
 					changes.removed.forEach((id) => {
 						delete this.data[id];
@@ -319,7 +324,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 						//more efficient in the webclient in that case.
 						if(changes.totalChanges > 10000) {
 							const errorMsg = "Too many changes for '" + this.entity.name + "' in state '" + this.state + "' " + changes.totalChanges + " > 10000";
-							return Promise.reject({type: "cannotcalculatechanges", detail: errorMsg, message: errorMsg});
+							return Promise.reject({type: "cannotcalculatechanges", detail: errorMsg, description: errorMsg});
 						}
 						return this.getUpdates(cb, scope);
 					} else
@@ -685,7 +690,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 						msg = response.notCreated[id].description;
 					}
 
-					return Promise.reject({message: msg, response: response, error: response.notCreated[id] || null});
+					return Promise.reject({description: msg, response: response, error: response.notCreated[id] || null});
 				}
 			} else
 			{
@@ -697,7 +702,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					if(response.notUpdated && id in response.notUpdated) {
 						msg = response.notUpdated[id].description;
 					}
-					return Promise.reject({message: msg, response: response, error: response.notUpdated[id] || null});
+					return Promise.reject({description: msg, response: response, error: response.notUpdated[id] || null});
 				}
 			}
 		});
@@ -726,7 +731,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	destroy : function(id) {
 		return this.set( {destroy: [id]}).then((response) => {
 			if(response.destroyed.indexOf(id) == -1) {
-				return Promise.reject({message: t("Failed to delete"), response: response, error: response.notDestroyed[id] || null});
+				return Promise.reject({description: t("Failed to delete"), response: response, error: response.notDestroyed[id] || null});
 			} else {
 				return true;
 			}

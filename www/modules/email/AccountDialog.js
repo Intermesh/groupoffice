@@ -14,8 +14,6 @@
 GO.email.AccountDialog = function(config) {
 	Ext.apply(this, config);
 
-//	var sslCb;
-
 	var advancedItems = [ new Ext.form.TextField({
 		fieldLabel : t("Root mailbox", "email"),
 		name : 'mbroot'
@@ -37,40 +35,88 @@ GO.email.AccountDialog = function(config) {
 				boxLabel: t("Use secure connection for (Sieve) email filters", "sieve"),
 				checked:GO.sieve.sieveTls,
 				name: 'sieve_usetls',
-//				allowBlank: true,
 				hideLabel:true
 			})
 		);
 	}
 
-				
-		this.templatesCombo = new GO.form.ComboBox({
-			fieldLabel : t("Default e-mail template", "email"),
-			hiddenName : 'default_account_template_id',
+	if (go.Modules.isAvailable("community", "oauth2client")) {
+		this.oauth2ClientCombo = new go.modules.community.oauth2client.ClientCombo({
+			fieldLabel: t('OAuth2 connection', 'oauth2client', 'community'),
+			hiddenName: 'oauth2_client_id',
 			width: 300,
-			store : new GO.data.JsonStore({
-				url : GO.url("email/template/accountTemplatesStore"),
-				baseParams : {
-					'type':"0"
+			listeners: {
+				'select': function (combo, record, index) {
+					this.incomingTab.hide();
+					this.outgoingTab.hide();
+					if(this.account_id) {
+						this.btnGetRefreshToken.show();
+					}
+
+					this.ImapUserNameField.setValue(this.EmailAddressField.getValue());
+					this.ImapPasswordField.allowBlank = true;
+
+					go.Db.store('DefaultClient').single(record.data.defaultClientId).then((entity) => {
+						this.ImapPortField.setValue(entity.imapPort);
+						this.ImapHostField.setValue(entity.imapHost);
+						this.ImapEncryptionField.setValue(entity.imapEncryption);
+
+						this.SmtpPortField.setValue(entity.smtpPort);
+						this.SmtpHostField.setValue(entity.smtpHost);
+						this.SmtpEncryptionField.setValue(entity.smtpEncryption);
+					}).finally(() => {
+						this.refreshNeeded = true;
+					});
 				},
-				root : 'results',
-				totalProperty : 'total',
-				id : 'id',
-				fields : ['id', 'name', 'group', 'text','template_id','checked'],
-				remoteSort : true
-			}),
-			value : '',
-			valueField : 'id',
-			displayField : 'name',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			editable : false,
-			selectOnFocus : true,
-			forceSelection : true
+				'clear': function(combo, oldValue, newValue) {
+					this.incomingTab.show();
+					this.outgoingTab.show();
+					this.ImapPasswordField.allowBlank = false;
+					this.btnGetRefreshToken.hide();
+					this.refreshNeeded = true;
+				},
+				scope: this
+			}
 		});
-		
-	
+		this.btnGetRefreshToken = new Ext.Button({
+			iconCls: 'ic-refresh',
+			text: 'Refresh token',
+			hidden: go.util.empty(this.oauth2ClientCombo.getValue()),
+			anchor: '20%',
+			tooltip: t('Request or update a refresh token in a separate window.','oauth2client','community'),
+			handler : function() {
+				window.open('/go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id, 'do_da_auth_thingy');
+				this.refreshNeeded = true;
+			},
+			scope : this
+		});
+	}
+
+	this.templatesCombo = new GO.form.ComboBox({
+		fieldLabel : t("Default e-mail template", "email"),
+		hiddenName : 'default_account_template_id',
+		width: 300,
+		store : new GO.data.JsonStore({
+			url : GO.url("email/template/accountTemplatesStore"),
+			baseParams : {
+				'type':"0"
+			},
+			root : 'results',
+			totalProperty : 'total',
+			id : 'id',
+			fields : ['id', 'name', 'group', 'text','template_id','checked'],
+			remoteSort : true
+		}),
+		value : '',
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		editable : false,
+		selectOnFocus : true,
+		forceSelection : true
+	});
 
 	this.imapAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
 		boxLabel: t("Allow self signed certificate when using SSL or TLS", "email"),
@@ -78,20 +124,26 @@ GO.email.AccountDialog = function(config) {
 		hideLabel:false,
 		fieldLabel:''
 	});
-		
 
-	var incomingTab = {
+	this.incomingTab = new Ext.Container({
 		title : t("Incoming mail", "email"),
-		layout : 'form',
+		layout: {
+			type: 'form',
+		},
+
 		defaults : {
 			anchor : '100%'
 		},
 		defaultType : 'textfield',
 		autoHeight : true,
-		cls : 'go-form-panel',
+		cls: ' x-fieldset go-form-panel x-fieldset-noborder x-form-label-left',
+		// style: {
+		// 	padding: 'dp(8) dp(16) !important'
+		// },
 		waitMsgTarget : true,
 		labelWidth : 120,
-		items : [new Ext.form.TextField({
+		items : [
+		this.ImapHostField = new Ext.form.TextField({
 			fieldLabel : 'IMAP '+t("Host", "email"),
 			name : 'host',
 			allowBlank : false,
@@ -102,12 +154,13 @@ GO.email.AccountDialog = function(config) {
 				scope : this
 			}
 		}),
-		new Ext.form.TextField({
+		this.ImapPortField = new Ext.form.TextField({
 			fieldLabel : t("Port", "email"),
 			name : 'port',
 			value : '143',
 			allowBlank : false
-		}), new Ext.form.TextField({
+		}),
+		this.ImapUserNameField = new Ext.form.TextField({
 			fieldLabel : t("Username"),
 			name : 'username',
 			allowBlank : false,
@@ -122,15 +175,13 @@ GO.email.AccountDialog = function(config) {
 			boxLabel: t("Permanently store password", "email"),
 			checked: true,
 			name: 'store_password',
-//			allowBlank: true,
 			hideLabel:true,
 			hidden: true //this function only works with imap auth at the moment.
 		}),
-		new Ext.form.TextField({
+		this.ImapPasswordField = new Ext.form.TextField({
 			fieldLabel : t("Password"),
 			name : 'password',
 			inputType : 'password',
-//			allowBlank : false,
 			listeners : {
 				change : function() {
 					this.refreshNeeded = true;
@@ -158,11 +209,11 @@ GO.email.AccountDialog = function(config) {
 			forceSelection : true
 		}),
 		this.imapAllowSelfSignedCheck]
-	};
+	});
 
-	// end incomming tab
+	// end incoming tab
 
-	var properties_items = [
+	this.properties_items = [
 	this.selectUser = new GO.form.SelectUser({
 		fieldLabel : t("User"),
 		disabled : !GO.settings.has_admin_permission,
@@ -173,7 +224,8 @@ GO.email.AccountDialog = function(config) {
 		name : 'name',
 		allowBlank : false,
 		anchor : '100%'
-	}, {
+	},
+	this.EmailAddressField = new Ext.form.TextField({
 		fieldLabel : t("E-mail"),
 		name : 'email',
 		vtype: 'emailAddress',
@@ -186,7 +238,7 @@ GO.email.AccountDialog = function(config) {
 			scope : this
 		},
 		anchor : '100%'
-	}, {
+	}), {
 		xtype : 'textarea',
 		name : 'signature',
 		fieldLabel : t("Signature", "email"),
@@ -195,7 +247,12 @@ GO.email.AccountDialog = function(config) {
 	}
 	];
 
-	properties_items.push(this.templatesCombo);
+	this.properties_items.push(this.templatesCombo);
+
+	if(go.Modules.isAvailable("community", "oauth2client")) {
+		this.properties_items.push(this.oauth2ClientCombo);
+		this.properties_items.push(this.btnGetRefreshToken);
+	}
 
 	this.smtpAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
 		boxLabel: t("Allow self signed certificate when using SSL or TLS", "email"),
@@ -204,28 +261,30 @@ GO.email.AccountDialog = function(config) {
 		fieldLabel:''
 	});
 	
-	var outgoingTab = {
+	this.outgoingTab = new Ext.Container({
 		title : t("Outgoing mail", "email"),
-		layout : 'form',
+		layout: {
+			type: 'form'
+		},
+		cls: ' x-fieldset go-form-panel x-fieldset-noborder x-form-label-left',
 		xtype:'fieldset',
 		defaults : {
 			anchor : '100%'
 		},
 		defaultType : 'textfield',
 		autoHeight : true,
-		cls : 'go-form-panel',
 		labelWidth : 120,
-		items : [new Ext.form.TextField({
+		items : [this.SmtpHostField = new Ext.form.TextField({
 			fieldLabel : t("Host", "email"),
 			name : 'smtp_host',
 			allowBlank : false,
 			value : GO.email.defaultSmtpHost
-		}),new Ext.form.TextField({
+		}),this.SmtpPortField = new Ext.form.TextField({
 			fieldLabel : t("Port", "email"),
 			name : 'smtp_port',
 			value : '25',
 			allowBlank : false
-		}), this.encryptionField = new Ext.form.ComboBox({
+		}), this.SmtpEncryptionField = new Ext.form.ComboBox({
 			fieldLabel : t("Encryption", "email"),
 			hiddenName : 'smtp_encryption',
 			store : new Ext.data.SimpleStore({
@@ -245,8 +304,26 @@ GO.email.AccountDialog = function(config) {
 			forceSelection : true
 		}),
 		this.smtpAllowSelfSignedCheck,
-		{
-			xtype:'xcheckbox',
+		this.imapCredentialsCbx = new Ext.ux.form.XCheckbox({
+			hideLabel: true,
+			boxLabel: t("Use IMAP credentials", "email","communtiy"),
+			name: 'force_smtp_login',
+			handler: function(cb, checked) {
+				if(checked) {
+					this.smtpUsername.hide();
+					this.smtpPassword.hide();
+					this.useSmtpAuthentication.hide();
+				} else {
+					this.smtpUsername.show();
+					this.smtpPassword.show();
+					this.useSmtpAuthentication.show();
+				}
+
+			},
+			scope: this
+		}),
+
+		this.useSmtpAuthentication = new Ext.ux.form.XCheckbox({
 			checked: false,
 			name: 'smtp_auth',
 			hideLabel:true,
@@ -258,7 +335,7 @@ GO.email.AccountDialog = function(config) {
 				},
 				scope:this
 			}
-		},this.smtpUsername= new Ext.form.TextField({
+		}),this.smtpUsername= new Ext.form.TextField({
 			fieldLabel : t("Username"),
 			name : 'smtp_username',
 			disabled:true
@@ -266,7 +343,6 @@ GO.email.AccountDialog = function(config) {
 		this.smtpPasswordStore = new Ext.ux.form.XCheckbox({
 			checked: true,
 			name: 'store_smtp_password',
-//			allowBlank: true,
 			hideLabel:true,
 			hidden: true
 		}),
@@ -276,9 +352,7 @@ GO.email.AccountDialog = function(config) {
 			inputType : 'password',
 			disabled:true
 		})]
-	};
-	
-	
+	});
 
 	GO.email.subscribedFoldersStore = new GO.data.JsonStore({
 		url : GO.url("email/folder/store"),
@@ -345,7 +419,7 @@ GO.email.AccountDialog = function(config) {
 		})]
 	});
 	
-	var propertiesTab = {
+	this.propertiesTab = {
 		title : t("Properties"),
 		autoScroll: true,
 		layout:'table',
@@ -359,7 +433,7 @@ GO.email.AccountDialog = function(config) {
 				autoHeight : true,
 				cls : 'go-form-panel',
 				labelWidth : 100,
-				items :properties_items
+				items :this.properties_items
 			},{ 
 				rowspan: 2,
 				defaults: {xtype:'fieldset'},
@@ -409,8 +483,7 @@ GO.email.AccountDialog = function(config) {
 	  levelLabels:levelLabels
 	});
 
-	//this.permissionsTab.disabled = false;
-	var serverTab = {
+	this.serverTab = {
 		title: t('Server', 'email'),
 		autoScroll: true,
 		disabled: (!GO.settings.modules.email.write_permission),
@@ -420,7 +493,7 @@ GO.email.AccountDialog = function(config) {
 				rowspan: 2,
 				defaults: {xtype:'fieldset'},
 				items: [
-					incomingTab,
+					this.incomingTab,
 					{
 						xtype : 'fieldset',
 						title : t("Advanced", "email"),
@@ -429,7 +502,6 @@ GO.email.AccountDialog = function(config) {
 						collapsed : true,
 						autoHeight : true,
 						autoWidth : true,
-						// defaults: {anchor: '100%'},
 						defaultType : 'textfield',
 						labelWidth : 75,
 						labelAlign : 'left',
@@ -438,16 +510,16 @@ GO.email.AccountDialog = function(config) {
 					}
 				]
 		},
-		outgoingTab
+		this.outgoingTab
 		]
 	};
-	console.log(serverTab);
+
 	this.filterGrid = new GO.email.FilterGrid();
 	this.labelsTab = new GO.email.LabelsGrid();
 
 	var items = [
-		propertiesTab,
-		serverTab,
+		this.propertiesTab,
+		this.serverTab,
 		this.filterGrid,
 		this.labelsTab,
 		this.permissionsTab
@@ -478,14 +550,7 @@ GO.email.AccountDialog = function(config) {
 
 	});
 
-	/*typeField.on('select', function(combo, record, index) {
-
-		var value = index == 1 ? '110' : '143';
-
-		this.propertiesPanel.form.findField('port').setValue(value);
-	}, this);*/
-
-	this.encryptionField.on('select', function(combo, record, index) {
+	this.SmtpEncryptionField.on('select', function(combo, record, index) {
 		var value = record.data.value == 'ssl' ? '465' : '587';
 		
 		this.propertiesPanel.form.findField('smtp_port')
@@ -497,18 +562,7 @@ GO.email.AccountDialog = function(config) {
 		this.propertiesPanel.form.findField('port')
 		.setValue(value);
 	}, this);
-	
-	
 
-//	sslCb.on('check', function(checkbox, checked) {
-//		//if (typeField.getValue() == 'imap') {
-//			var port = checked ? 993 : 143;
-//			this.propertiesPanel.form.findField('port').setValue(port);
-//		/*} else {
-//			var port = checked ? 995 : 110;
-//			this.propertiesPanel.form.findField('port').setValue(port);
-//		}*/
-//	}, this);
 
 	this.selectUser.on('select', function(combo, record, index) {
 		if(GO.util.empty(this.account_id)){
@@ -563,7 +617,6 @@ GO.email.AccountDialog = function(config) {
 			},
 			scope : this
 		},{
-
 			text : t("Ok"),
 			handler : function() {
 				this.save(true);
@@ -590,11 +643,8 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			waitMsg : t("Saving..."),
 			success : function(form, action) {
 
-				action.result.refreshNeeded = this.refreshNeeded
-				|| this.account_id == 0;
+				action.result.refreshNeeded = this.refreshNeeded || this.account_id === 0;
 				if (action.result.id) {
-					//this.account_id = action.result.account_id;
-					// this.foldersTab.setDisabled(false);
 					this.loadAccount(action.result.id);
 				}
 				
@@ -649,25 +699,13 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			GO.email.subscribedFoldersStore.baseParams.account_id = account_id;
 			GO.email.subscribedFoldersStore.load();
 		} else {
-
 			this.propertiesPanel.form.reset();
 			this.setAccountId(0);
 			this.foldersTab.setDisabled(true);
 			this.permissionsTab.setAcl(0);
-
-			// default values
-
-			// this.selectUser.setValue(GO.settings['user_id']);
-			// this.selectUser.setRawValue(GO.settings['name']);
-			// this.selectUser.lastSelectionText=GO.settings['name'];
-
-			this.propertiesPanel.form.findField('name')
-			.setValue(GO.settings['name']);
-			this.propertiesPanel.form.findField('email')
-			.setValue(GO.settings['email']);
-			this.propertiesPanel.form.findField('username')
-			.setValue(GO.settings['username']);
-
+			this.propertiesPanel.form.findField('name').setValue(GO.settings['name']);
+			this.propertiesPanel.form.findField('email').setValue(GO.settings['email']);
+			this.propertiesPanel.form.findField('username').setValue(GO.settings['username']);
 		}
 	},
 
@@ -681,27 +719,16 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			waitMsg : t("Loading..."),
 			success : function(form, action) {
 				this.refreshNeeded = false;
-
 				this.setAccountId(account_id);
-
 				this.selectUser.setRemoteText(action.result.remoteComboTexts.user_id);
-
 				this.aliasesButton.setDisabled(false);
-
 				this.foldersTab.setDisabled(false);
-
 				if(!action.result.data.email_enable_labels) {
 					this.tabPanel.hideTabStripItem(this.labelsTab);
 				} else {
 					this.tabPanel.unhideTabStripItem(this.labelsTab);
 				}
-
 				this.permissionsTab.setAcl(action.result.data.acl_id);
-				
-//				if (this.templatesCombo) {
-//					this.templatesCombo.store.load();
-//					this.templatesCombo.setRemoteText(action.result.remoteComboTexts['default_template_id']);
-//				}
 			},
 			scope : this
 		});

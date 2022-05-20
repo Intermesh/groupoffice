@@ -25,14 +25,23 @@
 			});
 
 			this.store.on("load", () => {
-				this.store.getRange().forEach((rec) => {
-					this.show(rec.data);
-				});
+				this.onStoreLoad();
 			});
-
 
 			this.store.load();
 
+			// re-evaluate alerts every 60s
+			setInterval(() => {
+				this.onStoreLoad();
+			}, 60000)
+
+		},
+
+
+		onStoreLoad : function() {
+			this.store.getRange().forEach((rec) => {
+				this.show(rec.data);
+			});
 		},
 
 		show : function(alert) {

@@ -223,23 +223,18 @@ trait SearchableTrait {
 	 */
 	public static function deleteSearchAndLinks(Query $query): bool
 	{
-		$delSearchStmt = go()->getDbConnection()
-			->delete('core_search',
-				(new Query)
-					->where(['entityTypeId' => static::entityType()->getId()])
-					->andWhere('entityId', 'IN', $query)
-			);
-//		$s = (string) $delSearchStmt;
-
-		if(!$delSearchStmt->execute()) {
-			return false;
-		}
-
-		go()->debug("Deleted " . $delSearchStmt->rowCount() ." search results");
-
+	  //delete link before search because they depend on eachother.
 		if(!Link::delete((new Query)
 			->where(['fromEntityTypeId' => static::entityType()->getId()])
 			->andWhere('fromId', 'IN', $query)
+		)) {
+			return false;
+		}
+
+		if(!Search::delete(
+			(new Query)
+				->where(['entityTypeId' => static::entityType()->getId()])
+				->andWhere('entityId', 'IN', $query)
 		)) {
 			return false;
 		}

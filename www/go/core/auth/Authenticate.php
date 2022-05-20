@@ -175,9 +175,11 @@ class Authenticate {
 			throw new Forbidden(go()->t("You're account has been disabled."));
 		}
 
-		$ip = Request::get()->getRemoteIpAddress();
-		if(!AuthAllowGroup::isAllowed($user, $ip)) {
-			throw new Forbidden(str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.") ));
+		if(!go()->getEnvironment()->isCli()) {
+			$ip = Request::get()->getRemoteIpAddress();
+			if (!AuthAllowGroup::isAllowed($user, $ip)) {
+				throw new Forbidden(str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.")));
+			}
 		}
 
 		if(go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
@@ -250,6 +252,7 @@ class Authenticate {
 
 		$token->oldLogout();
 		Token::delete($token->primaryKeyValues());
+		Token::unsetCookie();
 
 		return true;
 	}

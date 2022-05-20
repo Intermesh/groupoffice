@@ -223,7 +223,10 @@ class TemplateParser {
 			return null;
 		}
 		$cls = $et->getClassName();
-
+		// TODO: remove when projects2 is ported
+		if($cls === "GO\Projects2\Model\Project") {
+			$cls .= "Entity";
+		}
 		return $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
 	}
 

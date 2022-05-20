@@ -39,6 +39,11 @@ class UserSettings extends Property
 	public $noteBooks = [];
 
 	public $addressBooks = [];
+
+
+	public $allowDeletes = false;
+
+
 	private $doSetup = false;
 
 	protected function init()

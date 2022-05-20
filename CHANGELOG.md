@@ -1,4 +1,122 @@
+20-05-2022 6.6.91
+- Newsletters: Loading composer always showed first account
+- LDAP: Improved error handling when a group member can't be found in LDAP
+- Savemailas: Fixed broken save mail as menu
+- Core: redirect to index if not installed and user tries to access upgrade or license page
+
+19-05-2022 6.6.90
+- Email: Authenticate to Gmail via Oauth 2.
+- Sync: Disallow deletes via sync by default.Due to a very nasty bug in Android 12
+  some phones started to delete contacts via Microsoft ActiveSync. Therefore we've
+  implemented a new setting in Group-Office that disallows deletes via sync by
+  default now. More info on the bug can be found here:
+  https://eu.community.samsung.com/t5/galaxy-z-fold-z-flip/outlook-contacts-gone-after-android-12-update/td-p/4567744/page/2
+- Workflow: Don't check permissions on attaching workflow history and more detailed error
+- Addressbook: Edit own address book possible when not having rights to change address books
+- Tasks: Edit own task list possible when not having rights to change task lists
+- Notes: Edit own notebook possible when not having rights to change notebooks
+- Tickets: Show type description on hover in combo for selecting types
+- History: Set delete period in days instead of years
+- Tickets: Send agent e-mail to cc address when customer writes a message
+- Email: Put context menu items in message panel so it's avialable on mobiles
+- Projects: Option to invoice per employee
+
+17-05-2022 6.6.89
+- Workflow: fixed opening from start page and some minor styling issues
+- Calendar: open info window when double clicking read only event
+- Email: Fixed issue forwarding as attachment #676
+
+17-05-2022 6.6.88
+- Email: Fixed invalid constraint in em_contacts_last_mail_times
+- History: new and old reversed for log entries in old framework
+- History: Dropped another foreign key contraint to user table because it caused lock on the core_user table while deleting users
+  blocking logins
+- LDAP auth: Delete users and groups one by one instead of in one transaction causing long running locks on the database.
+
+16-05-2022 6.6.87
+- Newsletters: any user with manage permissions can pause a newsletter
+- Leavedays: In holiday request summary render dates correctly when date == today
+- Tickets: IMAP import display ticket type upon error
+- Core: Polish translations
+- Calendar: raised timeout settings for server and client to 5 minutes for sending invitation e-mails.
+- History: Dropped foreing key contraint to user table because it caused lock on the core_user table while deleting users
+  blocking logins
+- Calendar: Admin received unwanted reminders in public shared calendars
+
+13-05-2022 6.6.86
+- Core: Token dates could be saved in user timezone instead of UTC by old framework.
+- Core: Used unnamed parameters in queries for better performance with mysql native driver
+  (without PDO::ATTR_EMULATE_PREPARES) and large inserts
+- Core: fixed problem cuasing apache segmentation faults crashing the server!
+- Projects: Add custom fields above sub projects
+
+12-05-2022 6.6.85
+- Core: Bugfix when saving new Custom Field to existing entity
+- Core: Don't check IP for authentication on CLI
+- Projects: Search in all folders by default. Added 'All projects' node.
+- Projects: Load default status from template
+- Core: Handle deadlocks and write changes more efficiently
+
+10-05-2022 6.6.84
+- Caldav: filter tasklists by role 'list'
+- Core: Fixed error 'File exists in move!' in assistant
+- Core: fixed pps.svg missing error
+- History: Added request ID to history log
+- Core: Protect root folders from deletion
+
+09-05-2022 6.6.83
+- Core: fixed clearing default ACL's when used
+- Core: Improved debug.log
+- Files: Fixed empty error on delete folder from context menu
+- Newsletters: Add delete button for individual newsletters
+- Leavedays: Fixed manage permissions check in 6.6
+- Assistant: Open file without re-authenticate in Group-Office Assistant 1.20.
+
+03-05-2022 6.6.82
+- Core: fixed concurrency problem in clearing disk cache
+- Calendar: In Compact theme the first calendar selection would lead to an event 15 mins too early.
+- Tasks: Fixed render issue in alerts
+- Tasks: Fixed issue where alert wouldn't display during sessiojn
+- Core: selected users not on top for non admins in group dialog
+- Leavedays: uninstall left two tables
+- Core: remove slashes from tel: links. tel://12435 -> tel:12345
+- Core: Fixed JMAP sync errors
+- History: Show and search for entity ID
+- Tasks: Fixed disappearing panel
+- LDAP: Convert email and username to lower case
+- Core: fixed moving modules when they got database updates
+
+02-05-2022 6.6.81
+- Addressbook: fix install script, add support bank related fields to contact
+- Billing: bugfix in product sales order export
+- Time tracking: Search in activity type field
+- Core: Saving an item could cause infinite loop leading to a freeze and high server load. This happened when changes
+  were made to an ACL
+- Files: Download PDF via Right click on file replaced Group-Office tab in firefox. Due to Firefox bug:
+  https://bugzilla.mozilla.org/show_bug.cgi?id=1759916
+
+22-04-2022 6.6.80
+- Core: cli commands check for unsupported parameters
+- Email: Portlet folders always connected to imap on load even on deleting users
+
+22-04-2022 6.6.79
+- LDAP: Only connect to IMAP for new accounts when syncing users
+- Core: modules unsorted
+- Core: Fixed cron grid not updating after save
+
+21-04-2022 6.6.78
 - Tickets: Added close button next to new message button and made new message button larger
+- History: Assign login entry to the user that logs in instead of admin
+- Tickets: Added {ticket:type} template variable
+- Core: fixed inefficient way of loading group members and sharing panels
+- Core: fixed lock problem: sem_release(): failed to release key 0x6bd7e64: Invalid argument
+- Fixed: GO version 6.6.x: Search in cyrillic does not work #834
+- Calendar: Fixed reminder not removed when snoozing
+- Core: reload on Foo/changes exception (cannotcalculatechanges)
+- Core: JMAP missing change entries on deletes
+- Core: Don't dismiss notifications when desktop notifications are closed because firefox doesn't keep them. They are
+   auto closed in a few seconds :(
+- Core: Fixed grids jump to top when changes were detected
 
 14-04-2022 6.6.77
 - Core: rewrote procedure to reset or add groups to all acl's of a type to make it a lot faster and use less resources.
@@ -35,6 +153,8 @@
 - Files: Search was incomplete
 - Core: CLI and web cache could be different because apcu is not used on CLI
 - Tickets: inconsistency in permission check for reopening tickets
+- Newsletters: export distribution report for sent newsletters
+- Newsletters: minor tweaks
 
 08-04-2022 6.6.71
 - Core: Fixed double save problem in sync settings

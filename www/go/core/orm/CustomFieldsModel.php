@@ -189,7 +189,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 			if($key == 'id') {
 				continue;
 			}
-			if(!array_key_exists($key, $oldCf)) {
+			if (!is_array($oldCf) || !array_key_exists($key, $oldCf)) {
 				$mod[$key] = [$this->convertValue($key, $value), null];
 			} elseif($value !== $oldCf[$key]) {
 				$mod[$key] = [$this->convertValue($key, $value), $this->convertValue($key, $oldCf[$key])];
@@ -224,13 +224,14 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 				$query = (new Query())
 					->select('*')
 					->from($this->customFieldsTableName(), 'cf')
-					->where('cf.id = :id');
+					->where('cf.id = :id')
+					->bind(':id', $this->entity->id());
 
 				$stmt = $query->createStatement();
 				go()->getDbConnection()->cacheStatement('cf-' . $this->customFieldsTableName(), $stmt);
+			} else {
+				$stmt->bindValue(':id', $this->entity->id());
 			}
-
-			$stmt->bindValue(':id', $this->entity->id());
 
 			$stmt->execute();
 

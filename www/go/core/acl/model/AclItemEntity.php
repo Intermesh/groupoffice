@@ -175,9 +175,10 @@ abstract class AclItemEntity extends AclEntity {
 
 		$alias = static::joinAclEntity($changes);
 
-		$changes->select($alias . ', "1" as destroyed', true);
+		$records = $changes->select($alias . ', "1" as destroyed', true)
+			->all(); //we have to select now because later these id's are gone from the db
 	
-		return static::entityType()->changes($changes);
+		return static::entityType()->changes($records);
 	}
 
 	/**
@@ -276,7 +277,8 @@ abstract class AclItemEntity extends AclEntity {
 			$query =  $cls::find($cls::getMapping()->getColumnNames(), $this->readOnly);
 
 			foreach (static::aclEntityKeys() as $from => $to) {
-				$query->where($query->getTableAlias() . "." .$to . " = :" . $to);
+				$query->where($query->getTableAlias() . "." .$to . " = :" . $to)
+					->bind(':' . $to, $this->{$from});
 			}
 
 			$stmt = $query->createStatement();

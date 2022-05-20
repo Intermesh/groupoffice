@@ -1351,7 +1351,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Conditionally required field' => 'Bedingt erforderliches Feld',
   'Conditionally hidden field' => 'Bedingt verstecktes Feld',
   'Multi Select' => 'Mehrfachauswahl',
-  'Some fields on this page can\'t be edited becuase they have been locked in the server configuration file.' => 'Einige Felder auf dieser Seite können nicht bearbeitet werden, weil sie in der Server-Konfigurationsdatei gesperrt wurden.',
+  'Some fields on this page can\'t be edited because they have been locked in the server configuration file.' => 'Einige Felder auf dieser Seite können nicht bearbeitet werden, weil sie in der Server-Konfigurationsdatei gesperrt wurden.',
   'Sync file system' => 'Dateisystem synchronisieren',
   'Don\'t update' => 'Nicht updaten',
   'Update existing items by' => 'Existierende Einträge updaten durch ',

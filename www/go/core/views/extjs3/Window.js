@@ -40,7 +40,7 @@ go.Window = Ext.extend(Ext.Window, {
 	},
 	
 	// private, we don't want to store the window position remote because
-	//screens may differ later.
+	// screens may differ later.
 	getState : function(){
 		var s = go.Window.superclass.getState.call(this);
 
@@ -55,22 +55,12 @@ go.Window = Ext.extend(Ext.Window, {
 		return s;
 
 	},
-//	// fix for ext close animation
-//	close : function(){
-//		if(this.fireEvent('beforeclose', this) !== false){
-//			 if(this.hidden){
-//				  this.doClose();
-//			 }else{
-//				  this.hide(undefined, this.doClose, this);
-//			 }
-//		}
-//  },
-	
+
 	hide : function(animateTarget, cb, scope) {				
 		//Fix for ticket #201817154. Unclosable window remained when window was 
 		//hidden after submit while being dragged.
 		if (this.activeGhost) {
-		 this.unghost();
+			this.unghost();
 		}
 		
 		go.Window.superclass.hide.call(this, animateTarget, cb, scope);

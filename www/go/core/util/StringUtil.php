@@ -1,4 +1,7 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php /** @noinspection RegExpSimplifiable */
+/** @noinspection PhpUnused */
+
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace go\core\util;
 
@@ -22,7 +25,7 @@ class StringUtil {
   /**
    * Normalize the line end style of text.
    *
-   * @param string $text
+   * @param string|null $text
    * @param string $crlf
    * @return string
    */
@@ -128,7 +131,7 @@ END;
 			$str = preg_replace($regex, '$1', $str);
 		}
 
-		$normalized = \Normalizer::normalize($str, \Normalizer::FORM_C);
+		$normalized = Normalizer::normalize($str, Normalizer::FORM_C);
 		if($normalized === false) {
 			return $str;
 		} else{
@@ -509,6 +512,12 @@ END;
 		//remove all characters we don't care about
 		$text = preg_replace('/[^\w\-_+\\\\\/\s:@,;]/u', '', mb_strtolower($text));
 
+
+		// TODO transliterate to ascii so utf8 chars can be found with their ascii
+		// counterparts too ???
+		//
+//		$text = StringUtil::toAscii($text);
+
 		//split on white space
 		$keywords = mb_split("[\s,;]+", $text);
 
@@ -536,7 +545,7 @@ END;
 
 		//remove empty stuff.
 		return array_filter($keywords, function($keyword) {
-			$word = preg_replace("/[^\w]/", "", $keyword);
+			$word = preg_replace("/[^\w]/u", "", $keyword);
 			return !empty($word);
 		});
 

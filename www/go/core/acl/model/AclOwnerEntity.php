@@ -233,9 +233,10 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		$tableAlias = $query->getTableAlias();
 
-		$changes->select($tableAlias.'.id as entityId, '.$tableAlias.'.aclId, "1" as destroyed');
-		
-		return static::entityType()->changes($changes);
+		$records = $changes->select($tableAlias.'.id as entityId, '.$tableAlias.'.aclId, "1" as destroyed')
+			->all(); //we have to select now because later these id's are gone from the db
+
+		return static::entityType()->changes($records);
 	}
 	
 	protected static function internalDelete(Query $query): bool

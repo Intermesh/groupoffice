@@ -373,8 +373,14 @@ class Filters {
 
 		$endHasTime = strpos($parts[1], ':') !== false;
 
-		$parts[0] = new DateTime($parts[0]);
-		$parts[1] = new DateTime($parts[1]);
+		$tz = go()->getAuthState()->getUser()->timezone;
+
+		$parts[0] = new DateTime($parts[0],new \DateTimeZone($tz));
+		$parts[0]->setTimezone(new \DateTimeZone('UTC'));
+
+		$parts[1] = new DateTime($parts[1], new \DateTimeZone($tz));
+		$parts[1]->setTimezone(new \DateTimeZone('UTC'));
+
 		$parts['endHasTime'] = $endHasTime;
 		if(!$endHasTime) {
 			$parts[1]->add(new DateInterval("P1D"));

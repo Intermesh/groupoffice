@@ -10,6 +10,7 @@ use go\core\fs\Blob;
 use go\core\jmap\Entity;
 use go\core\model\Alert as CoreAlert;
 use go\core\orm\SearchableTrait;
+use go\core\orm\EntityType;
 use go\core\util\StringUtil;
 use GO\Files\Model\Folder;
 
@@ -108,6 +109,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$oldAllowDeletes = \GO\Base\Fs\File::setAllowDeletes(false);
 
 		\GO::$disableModelCache=true; //for less memory usage
+		//disable history logging
 		ini_set('max_execution_time', '0');
 
 		\GO::session()->runAsRoot();
@@ -120,7 +122,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$folders = go()->getDbConnection()->selectSingleValue('name')
 				->from('fs_folders')
-				->where('(parent_id=0 OR parent_id is null) and name != "billing"')
+				->where('(parent_id=0 OR parent_id is null) and name != "billing" and name != "email"')
 				->all();
 
 			$billingFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'billing');
@@ -146,7 +148,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				
 				$folder->syncFilesystem(true);
 				
-				
+				EntityType::push();
 			}
 			catch(\Exception $e){
 				if (PHP_SAPI != 'cli')
@@ -172,6 +174,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					$folder = Folder::model()->findByPath($name);
 					if($folder)
 							$folder->delete();
+
+					EntityType::push();
 				}
 				catch(\Exception $e){
 					if (PHP_SAPI != 'cli')
@@ -180,13 +184,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						echo $e->getMessage()."\n";
 				}
 			}
-		}	
-			
-		
-
-	
-		
-		
+		}
 	}
 	
 	public function actionDeleteInvalid(){
@@ -1781,7 +1779,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		$model->delete();
 
-		echo $this->render('delete', array('model' => $model));
+		echo $this->render('delete', array('success'=> true, 'model' => $model));
 	}
 
 	/**

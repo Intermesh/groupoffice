@@ -18,10 +18,10 @@ go.modules.community.history.SystemSettingsPanel = Ext.extend(go.systemsettings.
 						xtype: "numberfield",
 						decimals: 0,
 						fieldLabel: t("Delete entries after"),
-						name: "deleteAfterYears"
+						name: "deleteAfterDays"
 					}, {
 						xtype: "label",
-						html: t("years")
+						html: t("days")
 					}]
 				}]
 		}];

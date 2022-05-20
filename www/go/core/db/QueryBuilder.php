@@ -16,7 +16,6 @@ use InvalidArgumentException;
  */
 class QueryBuilder {
 
-	
 
 	/**
 	 *
@@ -47,18 +46,18 @@ class QueryBuilder {
 	 */
 	private $buildBindParameters = [];
 
-	/**
-	 * To generate unique param tags for binding
-	 * 
-	 * @var int
-	 */
-	private static $paramCount = 0;
-
-	/**
-	 * Prefix of the bind parameter tag
-	 * @var string
-	 */
-	private static $paramPrefix = ':go';
+//	/**
+//	 * To generate unique param tags for binding
+//	 *
+//	 * @var int
+//	 */
+//	private static $paramCount = 0;
+//
+//	/**
+//	 * Prefix of the bind parameter tag
+//	 * @var string
+//	 */
+//	private static $paramPrefix = ':go';
 
 	/**
 	 * Key value array with [tableAlias => Table()]
@@ -73,6 +72,10 @@ class QueryBuilder {
 	 * @var Connection
 	 */
 	private $conn;
+	/**
+	 * @var array
+	 */
+	private $namedParameters = [];
 
 	public function __construct(Connection $conn) {
 		$this->conn = $conn;
@@ -189,8 +192,10 @@ class QueryBuilder {
 
 			$sql = substr($sql, 0, -2); //strip off last ', '
 		}
+
+		$sql = $this->insertNamedParams($sql);
 		
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'paramMap' => $this->namedParamMap];
 	}
 
 	public function buildUpdate($tableName, $data, Query $query, $command = "UPDATE"): array
@@ -201,7 +206,8 @@ class QueryBuilder {
 		$this->setTableName($tableName);
 
 		$this->query = $query;
-		$this->buildBindParameters = $query->getBindParameters();
+		$this->buildBindParameters = [];
+		$this->namedParameters = $query->getBindParameters();
 		$this->tableAlias = $this->query->getTableAlias();
 		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
 
@@ -245,7 +251,9 @@ class QueryBuilder {
 			$sql .= "\nWHERE " . $where;
 		}
 
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		$sql = $this->insertNamedParams($sql);
+
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'paramMap' => $this->namedParamMap];
 	}
 
 	public function buildDelete($tableName, Query $query): array
@@ -254,7 +262,8 @@ class QueryBuilder {
 		$this->setTableName($tableName);
 		$this->reset();
 		$this->query = $query;
-		$this->buildBindParameters = $query->getBindParameters();
+		$this->buildBindParameters = [];
+		$this->namedParameters = $query->getBindParameters();
 		$this->tableAlias = $this->query->getTableAlias();
 		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
 
@@ -270,7 +279,9 @@ class QueryBuilder {
 			$sql .= "\nWHERE " . $where;
 		}
 
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		$sql = $this->insertNamedParams($sql);
+
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'paramMap' => $this->namedParamMap];
 	}
 
 	private function reset() {
@@ -300,6 +311,7 @@ class QueryBuilder {
 			$u = $this->internalBuildSelect($q, $prefix . "\t");
 			$r['sql'] .=  $prefix . "\n) UNION (\n" . $u['sql'];
 			$r['params'] = array_merge($r['params'], $u['params']);
+			$r['paramMap'] = array_merge($r['paramMap'], $u['paramMap']);
 		}
 		
 		$r['sql'] .= "\n)";
@@ -327,7 +339,8 @@ class QueryBuilder {
 		$this->reset();
 
 		$this->query = $query;
-		$this->buildBindParameters = $query->getBindParameters();
+		$this->buildBindParameters = [];
+		$this->namedParameters = $query->getBindParameters();
 		$this->tableAlias = $query->getTableAlias();
 
 		$from = $query->getFrom();
@@ -387,7 +400,28 @@ class QueryBuilder {
 			$sql .= "\n" . $prefix . "FOR UPDATE";
 		}
 
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		$sql = $this->insertNamedParams($sql);
+
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'paramMap' => $this->namedParamMap];
+	}
+
+	private $namedParamMap = [];
+
+	private function insertNamedParams($sql) {
+		foreach($this->namedParameters as $p) {
+			$pos = strpos($sql, $p['paramTag']);
+			$index = substr_count($sql, '?', 0, $pos);
+
+			$this->namedParamMap[$p['paramTag']] = $index + 1;
+			//$p['paramTag'] = '?';
+			array_splice($this->buildBindParameters, $index, 0, [$p]);
+
+			$sql = str_replace($p['paramTag'], '?', $sql);
+		}
+
+		$this->namedParameters = [];
+
+		return $sql;
 	}
 
 	/**
@@ -398,23 +432,15 @@ class QueryBuilder {
 	 */
 	public static function debugBuild(array $build) {
 		$sql = $build['sql'];
-		$binds = [];
 		if(isset($build['params'])) {
 			foreach ($build['params'] as $p) {
-				if (is_string($p['value']) && !mb_check_encoding($p['value'], 'utf8')) {
-					$queryValue = "[NON UTF8 VALUE]";
-				} else {
+				try {
 					$queryValue = var_export($p['value'], true);
+				} catch(Exception $e) {
+					$queryValue = "[FAILED_TO_STRING]";
 				}
-				$binds[$p['paramTag']] = $queryValue;
+				$sql = preg_replace('/\?/', $queryValue, $sql, 1);
 			}
-		}
-
-		//sort so $binds :param1 does not replace :param11 first.
-		krsort($binds);
-
-		foreach ($binds as $tag => $value) {
-			$sql = str_replace($tag, $value, $sql);
 		}
 
 		return $sql;
@@ -580,6 +606,7 @@ class QueryBuilder {
 			}
 			
 			if($token instanceof Criteria) {
+				$this->namedParameters = array_merge($this->namedParameters, $token->getBindParameters());
 				$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
 				$where = $this->buildWhere($token->getWhere(), $prefix . "\t");
 				
@@ -844,15 +871,18 @@ class QueryBuilder {
 		return "HAVING" . $this->buildWhere($h);
 	}
 
-	private function addBuildBindParameter($paramTag, $value, $tableAlias, $columnName) {
+	private function addBuildBindParameter(string $paramTag, $value, string $tableAlias, string $columnName) {
 
 		$columnObj = $this->findColumn($tableAlias, $columnName);
 
-		$this->buildBindParameters[] = [
-				'paramTag' => $paramTag,
-				'value' => $columnObj->castToDb($value),
-				'pdoType' => $columnObj->pdoType
-		];		
+		$val = [
+			'paramTag' => $paramTag == "?" ? count($this->buildBindParameters) + 1 : $paramTag,
+			'value' => $columnObj->castToDb($value),
+			'pdoType' => $columnObj->pdoType
+		];
+
+		$this->buildBindParameters[] = $val;
+
 	}
 
 	/**
@@ -862,8 +892,11 @@ class QueryBuilder {
 	 */
 	private function getParamTag(): string
 	{
-		self::$paramCount++;
-		return self::$paramPrefix . self::$paramCount;
+
+			return "?";
+
+//		self::$paramCount++;
+//		return self::$paramPrefix . self::$paramCount;
 	}
 
 	private function join($config, $prefix): string
@@ -877,7 +910,7 @@ class QueryBuilder {
 			$build = $builder->buildSelect($config['src'], $prefix . "\t");
 			$joinTableName = "(\n" . $prefix . "\t" . $build['sql'] . "\n" . $prefix . ')';
 
-			$this->buildBindParameters = array_merge($build['params']);
+			$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 		} else {
 			$this->aliasMap[$config['joinTableAlias']] = Table::getInstance($config['src'], $this->query->getDbConnection());
 			$joinTableName = '`' . $config['src'] . '`';
@@ -894,7 +927,7 @@ class QueryBuilder {
 		}
 
 		//import new params
-		$this->buildBindParameters = array_merge($this->buildBindParameters, $config['on']->getBindParameters());
+		$this->namedParameters = array_merge($this->namedParameters, $config['on']->getBindParameters());
 		$join .= 'ON ' . $this->buildWhere($config['on']->getWhere(), $prefix);
 
 		return $join;

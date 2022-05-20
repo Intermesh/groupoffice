@@ -21,12 +21,15 @@
 namespace GO\Calendar\Controller;
 
 use DateTime;
+use GO\Base\Data\JsonResponse;
 use GO\Base\Exception\AccessDenied;
+use GO\Base\Exception\SecurityTokenMismatch;
 use \GO\Base\Util\Date as GODate;
 use GO\Base\Db\ActiveRecord;
 use GO\Base\Db\FindCriteria;
 use GO\Base\Db\FindParams;
 use GO\Base\Fs\File;
+use GO\Calendar\Exception\AskPermission;
 use GO\Calendar\Model\Event;
 use go\core\db\Criteria;
 use go\core\orm\EntityType;
@@ -116,6 +119,22 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		}
 		
 		$model->setAttributes($params);
+	}
+
+	protected function actionSubmit($params)
+	{
+		try {
+			return parent::actionSubmit($params);
+		} catch(AskPermission $e) {
+			$response = new JsonResponse();
+
+			$response['success'] = false;
+			$response['feedback'] = $e->getMessage();
+
+			$response['exceptionCode'] = $e->getCode();
+
+			$this->view->render('Exception', array('response'=>$response));
+		}
 	}
 
 	protected function beforeSubmit(&$response, &$model, &$params) {
@@ -219,7 +238,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 			$exception_for_event_id=empty($params['exception_for_event_id']) ? 0 : $params['exception_for_event_id'];
 			if(count($event->getConflictingEvents($exception_for_event_id)))
-				throw new \Exception('Ask permission');
+				throw new AskPermission();
 		}
 //		
 //		/* Check for conflicts with other events in the calendar */		
@@ -336,6 +355,9 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes) {
+
+		//allow more time for sending invites
+		go()->getEnvironment()->setMaxExecutionTime(360);
 
 		$isNewEvent = empty($params['id']);
 

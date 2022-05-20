@@ -60,6 +60,8 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		parent::__construct();
 		$this->config = BackendGoConfig::GetBackendGoConfig();
 
+		go()->getDebugger()->setRequestId("ActiveSync");
+
 		foreach ($this->config['backends'] as $i => $b) {
 			// load and instatiate backend
 //			$this->_includeBackend($b['name']);

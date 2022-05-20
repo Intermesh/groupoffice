@@ -61,15 +61,16 @@ class Module extends EntityController {
 
 	protected function getQueryQuery(ArrayObject $params): Query
 	{
-		return $this->filterPermissions(parent::getQueryQuery($params))->orderBy(['sort_order' => 'ASC']);
+		return $this->filterPermissions(parent::getQueryQuery($params));
 	}
 
 	protected function getGetQuery(ArrayObject $params): \go\core\orm\Query
 	{
-		return $this->filterPermissions(parent::getGetQuery($params))->orderBy(['sort_order' => 'ASC']);
+		return $this->filterPermissions(parent::getGetQuery($params));
 	}
 
-	public function installLicensed(){
+	public function installLicensed(): array
+	{
 		$modules = \GO::modules()->getAvailableModules();
 
 		foreach ($modules as $moduleClass) {

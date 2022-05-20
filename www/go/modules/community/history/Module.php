@@ -60,27 +60,28 @@ class Module extends core\Module
 		$log = new LogEntry();
 		$log->setEntity($record);
 		$log->setAction($action);
-		$changes = $record->getLogJSON($action);
 
 		if($action != 'delete') {
+			$changes = $record->getLogJSON($action);
 			$cfChanges = self::getCustomFieldChanges($record);
 
 			if (!empty($cfChanges)) {
 				$changes['customFields'] = $cfChanges;
 			}
-		}
 
-		if($action == 'update' && empty($changes)) {
-			return;
-		}
-		$log->changes = json_encode($changes);
 
-		$l = LogEntry::getMapping()->getColumn('changes')->length;
-		if(mb_strlen($log->changes) > $l) {
-			foreach($changes as $key => $v) {
-				$changes[$key] = '... changes were too big to log ...';
+			if ($action == 'update' && empty($changes)) {
+				return;
 			}
 			$log->changes = json_encode($changes);
+
+			$l = LogEntry::getMapping()->getColumn('changes')->length;
+			if (mb_strlen($log->changes) > $l) {
+				foreach ($changes as $key => $v) {
+					$changes[$key] = '... changes were too big to log ...';
+				}
+				$log->changes = json_encode($changes);
+			}
 		}
 
 		self::saveLog($log);
@@ -237,6 +238,7 @@ class Module extends core\Module
 		$log->description = $user->username . ' [' . Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('login');
 		$log->changes = null;
+		$log->createdBy = $user->id;
 		if(!$log->save()){
 			throw new Exception("Could not save log");
 		}
@@ -269,6 +271,7 @@ class Module extends core\Module
 		$log->description = $user->username . ' [' . Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('logout');
 		$log->changes = null;
+		$log->createdBy = $user->id;
 		if(!$log->save()){
 			throw new Exception("Could not save log");
 		}
@@ -278,10 +281,10 @@ class Module extends core\Module
 	 * @throws Exception
 	 */
 	public static function onGarbageCollection() {
-		$years = (int) Module::get()->getSettings()->deleteAfterYears;
+		$days = (int) Module::get()->getSettings()->deleteAfterDays;
 
-		if(!empty($years)) {
-			LogEntry::delete(LogEntry::find()->where('createdAt', '<', (new core\util\DateTime("-" . $years . " years"))));
+		if(!empty($days)) {
+			LogEntry::delete(LogEntry::find()->where('createdAt', '<', (new core\util\DateTime("-" . $days . " days"))));
 		}
 	}
 

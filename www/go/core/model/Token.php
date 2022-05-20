@@ -2,11 +2,13 @@
 namespace go\core\model;
 
 use DateInterval;
+use DateTimeZone;
 use Exception;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
 use go\core\Environment;
+use go\core\ErrorHandler;
 use go\core\orm\Mapping;
 use stdClass;
 use go\core\http\Request;
@@ -120,7 +122,7 @@ class Token extends Entity {
 		
 		if($this->isNew()) {	
 			$this->setExpiryDate();
-			$this->lastActiveAt = new \DateTime();
+			$this->lastActiveAt = new DateTime("now", new DateTimeZone("UTC"));
 			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
@@ -137,8 +139,8 @@ class Token extends Entity {
 	 */
 	public function activity(): bool
 	{
-		if($this->lastActiveAt < new \DateTime("-1 mins")) {
-			$this->lastActiveAt = new \DateTime();
+		if($this->lastActiveAt < new DateTime("-1 mins", new DateTimeZone("UTC"))) {
+			$this->lastActiveAt = new DateTime("now", new DateTimeZone("UTC"));
 
 			//also refresh token
 			if(isset($this->expiresAt)) {
@@ -207,8 +209,9 @@ class Token extends Entity {
 
 	/**
 	 * Check if the token is expired.
-	 * 
+	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
 	public function isExpired(): bool
 	{
@@ -217,7 +220,7 @@ class Token extends Entity {
 			return false;
 		}
 		
-		return $this->expiresAt < new DateTime();
+		return $this->expiresAt < new DateTime("now", new DateTimeZone("UTC"));
 	}
 
 	/**
@@ -253,15 +256,21 @@ class Token extends Entity {
 		
 		return $this->save();
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function setExpiryDate() {
-		$expireDate = new DateTime();
+		$expireDate = new DateTime("now", new DateTimeZone("UTC"));
 		$expireDate->add(new DateInterval(Token::LIFETIME));
 		$this->expiresAt = $expireDate;		
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function setLoginExpiryDate() {
-		$expireDate = new DateTime();
+		$expireDate = new DateTime("now", new DateTimeZone("UTC"));
 		$expireDate->add(new DateInterval(Token::LOGIN_LIFETIME));
 		$this->expiresAt = $expireDate;		
 	}
@@ -296,7 +305,7 @@ class Token extends Entity {
 	{
 		
 		$user = $this->getUser();
-		$user->lastLogin = new DateTime();
+		$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
 		$user->loginCount++;
 		$user->language = go()->getLanguage()->getIsoCode();
 		if(!$user->save()) {
@@ -315,11 +324,12 @@ class Token extends Entity {
 		// Create accessToken and set expire time
 		return true;						
 	}
-	
+
 	/**
 	 * Check if this token is authenticated
-	 * 
+	 *
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function isAuthenticated(): bool
 	{
@@ -470,24 +480,37 @@ class Token extends Entity {
 		return static::delete(
 			(new Query)
 				->where('expiresAt', '!=', null)
-				->andWhere('expiresAt', '<', new DateTime()));
+				->andWhere('expiresAt', '<', new DateTime("now", new DateTimeZone("UTC"))));
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected static function internalDelete(Query $query): bool
 	{
-		foreach(self::find()->mergeWith($query)->selectSingleValue('accessToken') as $accessToken) {
-			go()->getCache()->delete('token-' . $accessToken);
 
-			Response::get()->setCookie('accessToken', "", [
-				'expires' => time() - 3600,
-				"path" => "/",
-				"samesite" => "Lax",
-				"domain" => Request::get()->getHost()
-			]);
-
+		// todo remove this part when logout issue is solved
+		$debugEnabled = go()->getDebugger()->enabled;
+		if(!$debugEnabled) {
+			go()->getDebugger()->enable(true);
 		}
 
-		return parent::internalDelete($query);
+		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
+		go()->debug("Deleting token query: " . $deleteQuery);
+		go()->getDebugger()->debugCalledFrom();
+		foreach($deleteQuery as $accessToken) {
+
+			go()->debug("Deleting token: " . $accessToken);
+			go()->getCache()->delete('token-' . $accessToken);
+		}
+
+		$success =  parent::internalDelete($query);
+
+		if(!$debugEnabled) {
+			go()->getDebugger()->enabled = false;
+		}
+
+		return $success;
 	}
 
 	/**
@@ -524,12 +547,23 @@ class Token extends Entity {
 			->where('expiresAt', '!=', null)
 			->where('userId', 'NOT IN ', $admins);
 
+		ErrorHandler::log("Logout everyone but admins is used!");
+
 		return self::delete($q) && RememberMe::delete($q);
 	}
 
 	public function setCookie() {
 		Response::get()->setCookie('accessToken', $this->accessToken, [
 			'expires' => 0,
+			"path" => "/",
+			"samesite" => "Lax",
+			"domain" => Request::get()->getHost()
+		]);
+	}
+
+	public static function unsetCookie() {
+		Response::get()->setCookie('accessToken', "", [
+			'expires' => time() - 3600,
 			"path" => "/",
 			"samesite" => "Lax",
 			"domain" => Request::get()->getHost()

@@ -479,7 +479,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function __construct($newRecord=true, $isStaticModel=false){
 
-		if(!empty(GO::session()->values['debugSql']))
+		if(!empty(GO::session()->values['debugSql']) || go()->getDbConnection()->debug)
 			$this->_debugSql=true;
 
 		$this->_isStaticModel = $isStaticModel;
@@ -3389,7 +3389,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 						$oldVal = substr($oldVal,0,$cutoffLength).$cutoffString;
 					}
 					
-					$modifications[$key]=array($oldVal,$newVal);	
+					$modifications[$key]=array($newVal, $oldVal);
 				}
 				
 				// Also track customfieldsrecord changes
@@ -4209,10 +4209,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if($this->_debugSql)
 			GO::debug($sql);
 
-		$success = $this->getDbConnection()->query($sql);
-		if(!$success)
-			throw new \Exception("Could not delete from database");
+		try {
+			$success = $this->getDbConnection()->query($sql);
+			if (!$success)
+				throw new \Exception("Could not delete from database");
 
+		}
+		catch(\Exception $e) {
+			GO::debug("FAILED SQL: " . $sql);
+			throw $e;
+		}
 		$this->_isDeleted = true;
 		
 

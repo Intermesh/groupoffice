@@ -32,6 +32,16 @@ class Lock {
 
 		self::$locks[$name] = true;
 	}
+
+	/**
+	 * Check if lock exists
+	 *
+	 * @param string $name
+	 * @return bool
+	 */
+	public static function exists(string $name) : bool {
+		return isset(self::$locks[$name]);
+	}
 	
 	private $name;
 	
@@ -82,8 +92,25 @@ class Lock {
 	private function lockWithSem() : bool {
 
 		// prepend db name for multi instance
-		$this->sem = sem_get( (int) hexdec(substr(md5(go()->getConfig()['db_name'] . $this->name), 24)));
-		return sem_acquire($this->sem, !$this->blocking );
+		try {
+			$this->sem = sem_get((int)hexdec(substr(md5(go()->getConfig()['db_name'] . $this->name), 24)));
+			$acquired = sem_acquire($this->sem, !$this->blocking);
+		} catch(Exception $e) {
+			//identifier might be removed by other process
+			$acquired = false;
+			//echo $e->getMessage() ."\n";
+		}
+
+		if(!$this->blocking) {
+			return $acquired;
+		} else {
+			if(!$acquired) {
+				sleep(1);
+				return $this->lockWithSem();
+			} else {
+				return true;
+			}
+		}
 	}
 
 	/**
@@ -139,7 +166,6 @@ class Lock {
 		}
 
 		if(isset($this->sem)) {
-			sem_release($this->sem);
 			sem_remove($this->sem);
 			$this->sem = null;
 		} else 	if(is_resource($this->lockFp)) {

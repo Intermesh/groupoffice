@@ -17,6 +17,7 @@ namespace GO\Files\Model;
 
 use Exception;
 use GO;
+use go\core\fs\FileSystemObject;
 use go\core\fs\Folder as GoFolder;
 use go\core\model\Acl;
 
@@ -389,6 +390,13 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		}
 	}
 
+	protected function beforeDelete()
+	{
+		FileSystemObject::checkDeleteAllowed(new \go\core\fs\Folder($this->fsFolder->path()));
+
+		return parent::beforeDelete();
+	}
+
 	protected function beforeSave() {
 		
 		//Normalize UTF-8. ONly form D works on MacOS webdav!
@@ -660,7 +668,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 					$folder->setAttributes($autoCreateAttributes);
 					$folder->name = $folderName;
 					$folder->parent_id = $parent_id;
-					if(!$folder->save()){
+					if(!$folder->save(true)){
 						throw new Exception('Could not create folder: '.var_export($folder->getValidationErrors(), true));
 					}
 				}elseif(!empty($autoCreateAttributes))
@@ -1425,6 +1433,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		\GO::debug("getTopLevelShare($folderName)");
 
+		// hidden file request by macos .DS_Store and ._template-icons
+		if(substr($folderName, 0, 1) == ".") {
+			return false;
+		}
+
 		if(!isset($this->_folderCache['Shared/'.$folderName])){
 			$findParams = \GO\Base\Db\FindParams::newInstance();
 
@@ -1440,7 +1453,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$folder=$this->find($findParams);
 			
 			if(!$folder) {
-				error_log("Could not find TopLEvelShare ".$folderName);
+				error_log("Could not find TopLevelShare ".$folderName);
 				$folder = false;
 			} elseif(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 				$folder = false;

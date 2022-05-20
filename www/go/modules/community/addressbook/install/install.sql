@@ -52,7 +52,9 @@ CREATE TABLE `addressbook_contact` (
   `uid` varchar(512) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
   `vcardBlobId` binary(40) DEFAULT NULL,
   `uri` varchar(512) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
-  `color` CHAR(6) NULL DEFAULT NULL
+  `color` CHAR(6) NULL DEFAULT NULL,
+  `nameBank` varchar(50) DEFAULT NULL,
+  `BIC` varchar(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact_custom_fields` (

@@ -135,6 +135,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 				ownerCt.insert(index + 1, {
 					xtype:'box',
 					html: this.hint,
+					style: "margin-top: 0",
 					cls: 'x-form-helptext'
 				});
 			}, this);

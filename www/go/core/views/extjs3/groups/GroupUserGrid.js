@@ -105,8 +105,7 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 				totalDisplay: true
 			}
 		});		
-	
-		this.store.on("beforeload", this.onBeforeStoreLoad, this);
+
 
 		go.groups.GroupUserGrid.superclass.initComponent.call(this);
 
@@ -140,41 +139,10 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		this._isDirty = false;
 		this.selectedUsers = users;
 		if(!this.disabled) {
-			this.store.load().catch(function () {});
+			this.store.load();
 		}
 	},
-	
-	onBeforeStoreLoad : function(store, options) {
-		//don't add selected on search, or when they are already loaded or when gridpanel is trying to fill the page.
-		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
-			return true;
-		}
 
-		go.Db.store("User").get(this.selectedUsers, function(entities) {
-			entities.columnSort('displayName', true);
-
-			this.store.loadData({records: entities}, true);
-			// this.store.sortData();
-
-			this.store.setFilter('exclude', {
-				exclude: this.selectedUsers
-			});
-
-			var me = this;
-
-			this.store.load({
-				add: true,
-				selectedLoaded: true
-			}).then(function() {
-				//when reload is called by SSE we need this removed.
-				delete me.store.lastOptions.selectedLoaded;
-			});
-
-		}, this);
-
-		return false;
-	},
-	
 	getValue: function () {
 		return this.selectedUsers;
 	},

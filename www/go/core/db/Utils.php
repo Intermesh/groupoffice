@@ -115,9 +115,8 @@ class Utils {
 	 */
 	public static function userExists(string $username): bool
 	{
-
 		$config = go()->getConfig();
-		$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port']  . ';dbname=mysql';
+		$dsn = go()->createDsn('mysql');
 		$conn = new Connection(
 			$dsn, $config['db_user'], $config['db_pass']
 		);

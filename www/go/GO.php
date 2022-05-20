@@ -265,8 +265,8 @@ class GO{
 	public static function clearCache(){
 		$old = \GO\Base\Fs\File::setAllowDeletes(true);
 
-		\GO::config()->getCacheFolder(false)->clearContents();
-		\GO::cache()->flush();
+	//	\GO::config()->getCacheFolder(false)->clearContents();
+
 		\GO\Base\Model::clearCache();
 
 		\GO\Base\Fs\File::setAllowDeletes($old);
@@ -418,8 +418,6 @@ class GO{
 								foreach($cachePref as $cacheDriver){
 									$cache = new $cacheDriver;
 									if($cache->supported()){
-
-										GO::debug("Using $cacheDriver cache");
 										GO::session()->values['cacheDriver'] = $cacheDriver;
 										self::$_cache=$cache;
 										break;
@@ -428,7 +426,7 @@ class GO{
 							}else
 							{
 								$cacheDriver = GO::session()->values['cacheDriver'];
-								GO::debug("Using $cacheDriver cache");
+
 								self::$_cache = new $cacheDriver;
 							}
 						}
@@ -616,15 +614,7 @@ class GO{
 
 		if(!empty(\GO::session()->values['debug']))
 			\GO::config()->debug=true;
-		
-		if(\GO::config()->debug || \GO::config()->debug_log){
-			$log = '['.date('Y-m-d H:i').'] INIT';
-			
-			if(isset($_SERVER['REQUEST_METHOD'])) {
-				$log .= ' '.$_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'];
-			}
-			\GO::debug($log);
-		}
+
 
 		if(!defined('GO_LOADED')){ //check if old Group-Office.php was loaded
 

@@ -85,6 +85,8 @@ class Router {
 		list($method, $params, $clientCallId) = $body;
 
 		Response::get()->setClientCall($method, $clientCallId);
+
+		go()->getDebugger()->setRequestId("JMAP " . $method);
 		
 		if($method != "community/dev/Debugger/get") {
 			//App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);

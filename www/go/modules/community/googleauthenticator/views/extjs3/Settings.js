@@ -70,8 +70,8 @@ Ext.onReady(function () {
 				go.Db.store("User").save(data, user.id).then(function() {
 					callback.call(this,user.id);
 				}).catch(function(error) {
-					if(error.message && !error.response) {
-						GO.errorDialog.show(error.message);
+					if(error.description && !error.response) {
+						GO.errorDialog.show(error.description);
 					}
 
 					// When the password is not correct, call itself again to try again
