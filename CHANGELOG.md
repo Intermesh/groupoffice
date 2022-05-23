@@ -2,6 +2,8 @@
 - Core: upgrade sabredav to 4.3.1
 - Tasks: New task got new UID even if set by client causing sync problems
 - Tasks: Include time in completed date when syncing with caldav
+- Caldav: Deleting tasks didn't work
+- Tickets: Pagination was missing
 
 20-05-2022 6.6.91
 - Newsletters: Loading composer always showed first account
