@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b9f5e09b310ecab477af95d4a2410ca4",
+    "content-hash": "68ff9901ebe8b6c861e98127e84267c9",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -2560,16 +2560,16 @@
         },
         {
             "name": "sabre/dav",
-            "version": "4.1.5",
+            "version": "4.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabre-io/dav.git",
-                "reference": "c1afdc77a95efea6ee40c03c45f57c3c0c80ec22"
+                "reference": "130abb7017f56e0d99b04eb94b041e000a8e9b39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabre-io/dav/zipball/c1afdc77a95efea6ee40c03c45f57c3c0c80ec22",
-                "reference": "c1afdc77a95efea6ee40c03c45f57c3c0c80ec22",
+                "url": "https://api.github.com/repos/sabre-io/dav/zipball/130abb7017f56e0d99b04eb94b041e000a8e9b39",
+                "reference": "130abb7017f56e0d99b04eb94b041e000a8e9b39",
                 "shasum": ""
             },
             "require": {
@@ -2584,7 +2584,7 @@
                 "ext-spl": "*",
                 "lib-libxml": ">=2.7.0",
                 "php": "^7.1.0 || ^8.0",
-                "psr/log": "^1.0",
+                "psr/log": "^1.0 || ^2.0 || ^3.0",
                 "sabre/event": "^5.0",
                 "sabre/http": "^5.0.5",
                 "sabre/uri": "^2.0",
@@ -2642,7 +2642,7 @@
                 "issues": "https://github.com/sabre-io/dav/issues",
                 "source": "https://github.com/fruux/sabre-dav"
             },
-            "time": "2021-02-12T07:54:23+00:00"
+            "time": "2022-01-20T13:59:29+00:00"
         },
         {
             "name": "sabre/event",
