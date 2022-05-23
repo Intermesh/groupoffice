@@ -1432,7 +1432,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 	
 						this.fireEvent('send', this);
 					
-						this.hide();
+						this.closeAction == "hide" ? this.hide() : this.close();
 					}else
 					{	
 						this.fireEvent('save', this);
