@@ -1,3 +1,5 @@
+- Core: updated German translation. Thanks Daniel!
+
 20-05-2022 6.6.91
 - Newsletters: Loading composer always showed first account
 - LDAP: Improved error handling when a group member can't be found in LDAP
