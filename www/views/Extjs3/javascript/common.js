@@ -228,7 +228,7 @@ GO.url = function(relativeUrl, params){
  */
 GO.request = function(config){
 
-	var url = GO.url(config.url);
+	var url = config.url.startsWith(BaseHref) ? config.url : GO.url(config.url);
 	delete config.url;
 	
 	if(!config.scope)
