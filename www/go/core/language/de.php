@@ -1528,4 +1528,5 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'At' => 'Um',
   'Are you sure you want to dismiss all notifications?' => 'Sind Sie sicher, dass Sie alle Benachrichtigungen verwerfen möchten?',
   'Your session is no longer valid. Press OK to authenticate.' => 'Ihre Sitzung ist abgelaufen. Bitte klicken Sie auf OK, um sich neu anzumelden.',
+  'Permission overview' => 'Berechtigungsübersicht',
 );
