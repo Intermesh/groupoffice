@@ -4,6 +4,7 @@
 - Tasks: Include time in completed date when syncing with caldav
 - Caldav: Deleting tasks didn't work
 - Tickets: Pagination was missing
+- Email: detail panels update when new email is sent from another item
 
 20-05-2022 6.6.91
 - Newsletters: Loading composer always showed first account
