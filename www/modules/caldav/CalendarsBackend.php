@@ -810,8 +810,9 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				$event->delete(); // will delete the DavEvent with an event
 			}else{
 				$task = $this->getTaskByUri($objectUri, $calendarId);
-				if($task)
-					$task->delete();  // will delete the DavTask with an event
+				if($task) {
+					Task::delete($task->primaryKeyValues());
+				}
 			}
 		}catch(\GO\Base\Exception\AccessDenied $e){
 //			\GO::debug($e);
