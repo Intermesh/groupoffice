@@ -39,7 +39,7 @@ try {
 	$installDb = !go()->isInstalled() ? INSTALL_NEW : INSTALL_NONE;
 
 	// Always install
-	$installDb = INSTALL_NEW;
+	$installDb = INSTALL_UPGRADE;
 
 //	For testing upgrades use:
 //	$installDb = INSTALL_UPGRADE;
