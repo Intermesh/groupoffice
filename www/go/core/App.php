@@ -529,7 +529,7 @@ namespace go\core {
 		public function isInstalled(): bool
 		{
 			try {
-				return parent::isInstalled();
+				return go()->getDatabase()->hasTable('core_module');
 			} catch(PDOException $e) {
 
 				go()->debug("Check isInstalled failed with : " . $e->getMessage());
