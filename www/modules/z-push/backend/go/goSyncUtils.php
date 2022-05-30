@@ -142,8 +142,23 @@ class GoSyncUtils {
 	 */
 	public static function getBodyFromMessage(SyncObject $message): string
 	{
+
 		if (Request::GetProtocolVersion() >= 12.0) {
-			return isset($message->asbody) && isset($message->asbody->data) ? stream_get_contents($message->asbody->data) : "";
+
+			if (!isset($message->asbody->data)) {
+				return "";
+			}
+
+			if (isset($message->nativebodytype) && $message->nativebodytype == SYNC_BODYPREFERENCE_RTF) {
+				$rtfparser = new z_RTF();
+				$rtfparser->loadrtf(base64_decode(stream_get_contents($message->asbody->data)));
+				$rtfparser->output("ascii");
+				$rtfparser->parse();
+				return $rtfparser->out;
+			} else {
+				return stream_get_contents($message->asbody->data);
+			}
+
 		} else {
 			if (!empty($message->body))
 				return $message->body;
