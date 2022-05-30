@@ -149,13 +149,13 @@ class GoSyncUtils {
 				return "";
 			}
 
-			if (isset($message->nativebodytype) && $message->nativebodytype == SYNC_BODYPREFERENCE_RTF) {
+			if (isset($message->asbody->type) && $message->asbody->type == SYNC_BODYPREFERENCE_RTF) {
 				$rtfparser = new z_RTF();
 				$rtfparser->loadrtf(base64_decode(stream_get_contents($message->asbody->data)));
 				$rtfparser->output("ascii");
 				$rtfparser->parse();
 				return $rtfparser->out;
-			} else if (isset($message->nativebodytype) && $message->nativebodytype == SYNC_BODYPREFERENCE_HTML) {
+			} else if (isset($message->asbody->type) && $message->asbody->type == SYNC_BODYPREFERENCE_HTML) {
 				$html = (string) stream_get_contents($message->asbody->data);
 				return StringUtil::htmlToText($html);
 			} else {
