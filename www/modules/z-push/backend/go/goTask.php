@@ -173,6 +173,9 @@ class goTask extends GoBaseBackendDiff {
 				ZLog::Write(LOGLEVEL_DEBUG, "Found task");
 			}
 
+			if (isset($message->uid))
+				$task->setUid($message->uid);
+
 			if (isset($message->startdate))
 				$task->start = new DateTime("@" . $message->startdate);
 
