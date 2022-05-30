@@ -1,3 +1,4 @@
+- Email: Fix error when double clicking account
 - ActiveSync: fixed problem with duplicate tasks when recurrence was enabled
 - ActiveSync: Convert RTF to text
 
