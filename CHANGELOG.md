@@ -1,6 +1,7 @@
 - Email: Fix error when double clicking account
 - ActiveSync: fixed problem with duplicate tasks when recurrence was enabled
 - ActiveSync: Convert RTF to text
+- Core: fixed removing permissions in group dialog
 
 23-05-2022 6.6.92
 - Core: updated German translation. Thanks Daniel!
