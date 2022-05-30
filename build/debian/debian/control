@@ -26,6 +26,7 @@ Depends:
 	${misc:Depends},
 	${perl:Depends},
 	dbconfig-common,
+	dbconfig-mysql,
 	ucf (>= 0.28)
 Recommends: apache2, libapache2-mod-php, default-mysql-server
 Suggests: php-apcu
