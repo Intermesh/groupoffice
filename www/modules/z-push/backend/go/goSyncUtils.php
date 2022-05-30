@@ -155,6 +155,9 @@ class GoSyncUtils {
 				$rtfparser->output("ascii");
 				$rtfparser->parse();
 				return $rtfparser->out;
+			} else if (isset($message->nativebodytype) && $message->nativebodytype == SYNC_BODYPREFERENCE_HTML) {
+				$html = (string) stream_get_contents($message->asbody->data);
+				return StringUtil::htmlToText($html);
 			} else {
 				return stream_get_contents($message->asbody->data);
 			}
