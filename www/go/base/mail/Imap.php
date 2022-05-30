@@ -839,6 +839,9 @@ class Imap extends ImapBodyStruct
 	 */
 	public function select_mailbox(string $mailbox_name='INBOX')
 	{
+		if(strlen($mailbox_name) === 0) {
+			return true;
+		}
 		if($this->selected_mailbox && $this->selected_mailbox['name']==$mailbox_name) {
 			return true;
 		}
