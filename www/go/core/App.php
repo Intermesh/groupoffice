@@ -532,8 +532,11 @@ namespace go\core {
 				return parent::isInstalled();
 			} catch(PDOException $e) {
 
+				go()->debug("Check isInstalled failed with : " . $e->getMessage());
+
 				if(strpos($e->getMessage(), '1049') !== false || strpos($e->getMessage(), '1146') !== false) {
 					// database does not exists or table does not exist
+
 					return false;
 				}
 				throw $e;
