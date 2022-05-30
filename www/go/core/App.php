@@ -529,11 +529,14 @@ namespace go\core {
 		public function isInstalled(): bool
 		{
 			try {
-				return parent::isInstalled();
+				return go()->getDatabase()->hasTable('core_module');
 			} catch(PDOException $e) {
+
+				go()->debug("Check isInstalled failed with : " . $e->getMessage());
 
 				if(strpos($e->getMessage(), '1049') !== false || strpos($e->getMessage(), '1146') !== false) {
 					// database does not exists or table does not exist
+
 					return false;
 				}
 				throw $e;
