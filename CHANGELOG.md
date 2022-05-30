@@ -2,6 +2,7 @@
 - ActiveSync: fixed problem with duplicate tasks when recurrence was enabled
 - ActiveSync: Convert RTF to text
 - Core: fixed removing permissions in group dialog
+- Core: Fixed bug in conditionally hidden fields 
 
 23-05-2022 6.6.92
 - Core: updated German translation. Thanks Daniel!
