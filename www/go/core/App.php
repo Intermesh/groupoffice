@@ -491,10 +491,14 @@ namespace go\core {
 		 * Create PDO database DSN string
 		 *
 		 * @param string|null $dbName
+		 * @param array|null $config
 		 * @return string
 		 */
-		public function createDsn(string $dbName = null): string {
-			$config = $this->getConfig();
+		public function createDsn(string $dbName = null, array $config = null): string {
+
+			if(!isset($config)) {
+				$config = $this->getConfig();
+			}
 
 			$dsn = 'mysql:';
 
