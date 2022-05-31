@@ -17,8 +17,9 @@ function dbConnect($config){
 	if(isset($pdo)) {
 		return $pdo;
 	}
+
+	$dsn = go()->createDsn($config['db_name'], $config);
 	try {
-        $dsn = go()->createDsn($config['db_name'], $config);
 		$pdo = new PDO($dsn, $config['db_user'], $config['db_pass']);
 	}
 	catch(Exception $e){
