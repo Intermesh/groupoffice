@@ -1,4 +1,5 @@
 - Core / Email: Ignore no state yet when getting updates
+- Core: include comments in search keywords
 
 30-05-2022 6.6.93
 - Email: Fix error when double clicking account
