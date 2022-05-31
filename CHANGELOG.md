@@ -1,3 +1,5 @@
+- Core / Email: Ignore no state yet when getting updates
+
 30-05-2022 6.6.93
 - Email: Fix error when double clicking account
 - ActiveSync: fixed problem with duplicate tasks when recurrence was enabled
