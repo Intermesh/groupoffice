@@ -85,7 +85,12 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
     FOREIGN KEY (`vcalendarBlobId`)
     REFERENCES `core_blob` (`id`)
     ON DELETE RESTRICT
-    ON UPDATE SET NULL)
+    ON UPDATE SET NULL,
+  constraint tasks_task_core_user_id_fk
+    foreign key (responsibleUserId)
+    references core_user (id)
+    on DELETE set null
+    )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;

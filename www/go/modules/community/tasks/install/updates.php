@@ -165,3 +165,12 @@ $updates['202202241617'][] = "alter table tasks_user_settings
 
 
 $updates['202205101237'][] = "update tasks_task set filesFolderId = null where filesFolderId=0;";
+
+
+$updates['202205311153'][] = "update tasks_task set responsibleUserId = null where responsibleUserId not in (select id from core_user);";
+
+$updates['202205311153'][] = "alter table tasks_task
+    add constraint tasks_task_core_user_id_fk
+        foreign key (responsibleUserId) references core_user (id)
+            on delete set null;";
+
