@@ -1,3 +1,22 @@
+- Core / Email: Ignore no state yet when getting updates
+- Core: include comments in search keywords
+
+30-05-2022 6.6.93
+- Email: Fix error when double clicking account
+- ActiveSync: fixed problem with duplicate tasks when recurrence was enabled
+- ActiveSync: Convert RTF to text
+- Core: fixed removing permissions in group dialog
+- Core: Fixed bug in conditionally hidden fields 
+
+23-05-2022 6.6.92
+- Core: updated German translation. Thanks Daniel!
+- Core: upgrade sabredav to 4.3.1
+- Tasks: New task got new UID even if set by client causing sync problems
+- Tasks: Include time in completed date when syncing with caldav
+- Caldav: Deleting tasks didn't work
+- Tickets: Pagination was missing
+- Email: detail panels update when new email is sent from another item
+
 20-05-2022 6.6.91
 - Newsletters: Loading composer always showed first account
 - LDAP: Improved error handling when a group member can't be found in LDAP

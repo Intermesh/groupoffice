@@ -229,7 +229,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			return this.requiredConditionMatches;
 		}
 
-		if (this.requiredConditionMatches) {
+		if (! this.requiredConditionMatches) {
 			this.show();
 		} else {
 			this.hide();

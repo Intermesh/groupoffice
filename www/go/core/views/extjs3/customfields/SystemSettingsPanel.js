@@ -26,14 +26,8 @@ go.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 				direction: 'ASC'
 			},
 			remoteSort: false
-//			groupField: 'moduleTitle'
 		});
-			
-			
-//		this.view = new Ext.grid.GroupingView({
-//			hideGroupedColumn: true
-//		});
-		
+
 		this.autoExpandColumn = "name";
 			
 		this.columns = [

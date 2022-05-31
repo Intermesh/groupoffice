@@ -714,13 +714,15 @@ class Installer {
 
 							if (
 								$e->getCode() == '23000' ||
-								$e->getCode() == '42000' ||
 								$e->getCode() == '42S21' || //duplicate col
 								$e->getCode() == '42S01' || //table exists
 								$e->getCode() == '42S22' || //col not found
 								strstr($e->getMessage(), 'errno: 121 ') || // (errno: 121 "Duplicate key on write or update")
 								strstr($e->getMessage(), ' 1826 ') || //HY000: SQLSTATE[HY000]: General error: 1826 Duplicate foreign key constraint
-								strstr($e->getMessage(), ' 1022 ') //Integrity constraint violation: 1022 Can't write; duplicate key in table '#sql-509_19b'/
+								strstr($e->getMessage(), ' 1091 ')  || //42000: SQLSTATE[42000]: Syntax error or access violation: 1091 Can't DROP 'type'; check that column/key exists
+								strstr($e->getMessage(), ' 1022 ')  || //Integrity constraint violation: 1022 Can't write; duplicate key in table '#sql-509_19b'/
+								strstr($e->getMessage(), ' 1061 ') //  SQLSTATE[42000]: Syntax error or access violation: 1061 Duplicate key name
+
 								) {
 
 								//duplicate and drop errors. Ignore those on updates.

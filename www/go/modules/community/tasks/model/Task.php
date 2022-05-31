@@ -376,7 +376,7 @@ class Task extends AclInheritEntity {
 
 	protected function internalSave(): bool
 	{
-		if ($this->isNew()) {
+		if ($this->isNew() && empty($this->uid)) {
 			$this->uid = UUID::v4();
 		}
 

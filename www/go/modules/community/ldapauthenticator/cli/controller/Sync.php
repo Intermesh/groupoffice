@@ -441,7 +441,7 @@ class Sync extends Controller {
     return $members;
   }
 
-	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember, Server $server): array
+	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember, Server $server): ?array
 	{
 		$parts = preg_split('~(?<!\\\),~', $groupMember);
 		$query = str_replace('\\,', ',', array_shift($parts));
@@ -454,7 +454,7 @@ class Sync extends Controller {
     $record = $accountResult->fetch();
 		if(!$record) {
 			$this->output("Skipping '$groupMember'. Could not find GO it in LDAP with query: " . $query);
-			return false;
+			return null;
 		}
 
     //Sometimes mail record doesn't exist. It can't find users by mail address in that case

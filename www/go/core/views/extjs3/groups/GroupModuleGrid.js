@@ -321,6 +321,9 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		let v = {};
 		this.store.getModifiedRecords().forEach((r) => {
 			v[r.id] = {permissions: this.replaceNewGroupId(r.data.permissions)};
+			if(!r.data.selected) {
+				v[r.id].permissions[this.groupId] = null;
+			}
 		});
 
 		return v;

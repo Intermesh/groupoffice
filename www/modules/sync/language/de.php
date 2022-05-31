@@ -27,4 +27,6 @@ return array (
   'Notebooks' => 'Notizbücher',
   'Address books' => 'Adressbücher',
   'Tasklists' => 'Aufgabenlisten',
+  'Allow delete via synchronization' => 'Löschen über Synchronisation erlauben',
+  'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'Standardmäßig sind Endgeräte nicht berechtigt, Elemente zu löschen. Dies wurde aufgrund eines Bugs in Android 12 hinzugefügt, durch den Kontakte nach einem Update gelöscht wurden.',
 );

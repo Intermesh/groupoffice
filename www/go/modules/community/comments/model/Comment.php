@@ -248,6 +248,13 @@ class Comment extends AclItemEntity {
 			if(method_exists($entity, 'onCommentAdded')) {
 				$entity->onCommentAdded($this);
 			}
+		} else {
+			$entity = $this->findEntity();
+		}
+
+		if($entity->modifiedAt < $this->modifiedAt && method_exists($entity, 'saveSearch')) {
+			//if entity wasn't saved in 'onCommentAdded' then save the search so it can be found
+			$entity->saveSearch();
 		}
 
 		return true;

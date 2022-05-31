@@ -17,12 +17,13 @@ function dbConnect($config){
 	if(isset($pdo)) {
 		return $pdo;
 	}
-	try{		
-		$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
+
+	$dsn = go()->createDsn($config['db_name'], $config);
+	try {
 		$pdo = new PDO($dsn, $config['db_user'], $config['db_pass']);
 	}
 	catch(Exception $e){
-		$dbConnectError = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
+		$dbConnectError = "Could not connect to the database with DSN = '" . $dsn . "' with username '" . $config['db_user'] . " and " . (empty($config['db_pass']) ? "NOT using password" : "USING a password") . ". The database returned this error:<br />".$e->getMessage();
 	}
 
 	if($pdo) {

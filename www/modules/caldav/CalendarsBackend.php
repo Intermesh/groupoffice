@@ -15,6 +15,8 @@
 
 namespace GO\Caldav;
 use go\core\fs\Blob;
+use go\core\model\Acl;
+use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use go\modules\community\tasks\convert\VCalendar;
 use go\modules\community\tasks\model\Task;
@@ -50,8 +52,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			$parser = new VCalendar();
 			$data = $parser->export($task);
 
-			go()->debug("CalendarsBackend::fromBlob() : " .$data);
-
 			$blob = Blob::fromString($data);
 			$blob->type = 'text/vcalendar';
 			$blob->name = $task->getUri();
@@ -61,7 +61,9 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			}
 
 			$task->vcalendarBlobId = $blob->id;
-			$task->save();
+			if(!$task->save()) {
+				throw new SaveException($task);
+			}
 		} else {
 			$data = $blob->getFile()->getContents();
 		}
@@ -148,19 +150,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 	private function _modelToDAVCalendar(Calendar $calendar, $principalUri){
 
-		$findParams = FindParams::newInstance()
-			->select('version')
-			->single()
-			->criteria(FindCriteria::newInstance()
-				//->addModel(\GO\Calendar\Model\Event::model())
-				->addCondition('id', $calendar->id));
-
-		$r = Calendar::model()->find($findParams);
-
 		$supportedComponents = array('VEVENT');
 		$version = $calendar->version;
-		if($calendar->tasklist_id>0) {
-			$supportedComponents[]='VTODO';
+		if($calendar->tasklist_id > 0) {
+			$supportedComponents[] = 'VTODO';
 
 			$version .= "-" . Task::getState();
 		}
@@ -180,6 +173,9 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			'{DAV:}displayname' => $calendar->name,
 			'{urn:ietf:params:xml:ns:caldav}calendar-description' => 'User calendar',
 			'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
+
+			// 1 = owner, 2 = readonly, 3 = readwrite
+			'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : ($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE ? 3 : 2)
 //			'read-only' => false,
 //			'access'=> \Sabre\DAV\Sharing\Plugin::ACCESS_READWRITE
 //			'{http://apple.com/ns/ical/}calendar-order' => $calendar->id,
@@ -404,13 +400,12 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				}
 				$log .= " $event->id, $davEvent->uri \n";
 				$objects[] = array(
-					'id' => $event->id,
 					'uri' => $davEvent->uri,
 					'calendardata' => $davEvent->data,
-					'calendarid' => $calendarId,
 					'lastmodified' => $event->mtime,
 					'etag'=>'"' . date('Ymd H:i:s', $event->mtime). '-'.$event->id.'"',
-					'size' => strlen($davEvent->data)
+					'size' => strlen($davEvent->data),
+					'component' => 'vevent'
 				);
 
 			}
@@ -435,19 +430,18 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 					$data = $this->fromBlob($task);
 					$log .= " $task->id, ".$task->getUri()." \n";
 					$objects[] = array(
-						'id' => $task->id,
 						'uri' => $task->getUri(),
 						'calendardata' => $data,
-						'calendarid' => $calendarId,
 						'lastmodified' => $task->modifiedAt->getTimestamp(),
 						'etag' => $task->etag(),
-						'size' => strlen($data)
+						'size' => strlen($data),
+						'component' => 'vtodo'
 					);
 				}
 			}
 		}
 
-		\GO::debug($log);
+		\GO::debug($objects);
 
 		return $objects;
 	}
@@ -535,15 +529,15 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			\GO::debug('Found event '.$objectUri);
 			$data = ($event->mtime==$event->client_mtime && !empty($event->data)) ? $event->data : $this->exportCalendarEvent($event);
 			//\GO::debug($event->mtime==$event->client_mtime ? "Returning client data (mtime)" : "Returning server data (mtime)");
-			//\GO::debug($data);
+//			\GO::debug($data);
 
 			$object = array(
-				'id' => $event->id,
 				'uri' => $event->uri,
 				'calendardata' => $data,
-				'calendarid' => $calendarId,
 				'lastmodified' => $event->mtime,
-				'etag'=>'"' . date('Ymd H:i:s', $event->mtime). '-'.$event->id.'"'
+				'etag'=>'"' . date('Ymd H:i:s', $event->mtime). '-'.$event->id.'"',
+				'size' => strlen($data),
+				'component' => 'vevent'
 			);
 			//\GO::debug($object);
 			return $object;
@@ -557,15 +551,17 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			if ($task) {
 				\GO::debug('Found task '.$objectUri);
 				$data = $this->fromBlob($task);
-				//go()->debug($data);
+
 				$object = array(
-					'id' => $task->id,
 					'uri' => $task->getUri(),
 					'calendardata' => $data,
-					'calendarid' => $calendarId,
 					'lastmodified' => $task->modifiedAt->getTimestamp(),
-					'etag' => $task->etag()
+					'etag' => $task->etag(),
+					'size' => strlen($data),
+					'component' => 'vtodo'
 				);
+
+//				go()->debug($object);
 
 				return $object;
 			}
@@ -654,7 +650,24 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 * Updates an existing calendarobject, based on it's uri.
 	 *
 	 *
-	 *
+	 * BEGIN:VCALENDAR
+	CALSCALE:GREGORIAN
+	PRODID:-//Apple Inc.//iOS 12.3.1//EN
+	VERSION:2.0
+	BEGIN:VTODO
+	COMPLETED:20220523T083538Z
+	CREATED:20220523T082243Z
+	DESCRIPTION:
+	DTSTAMP:20220523T083539Z
+	LAST-MODIFIED:20220523T083538Z
+	LOCATION:
+	PERCENT-COMPLETE:100
+	STATUS:COMPLETED
+	SUMMARY:test GO
+	UID:7614441d-b30f-4ce9-b18c-b84ccc52bbfc
+	END:VTODO
+	END:VCALENDAR
+
 
 	 *
 	 * @param StringHelper $calendarId
@@ -797,8 +810,9 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				$event->delete(); // will delete the DavEvent with an event
 			}else{
 				$task = $this->getTaskByUri($objectUri, $calendarId);
-				if($task)
-					$task->delete();  // will delete the DavTask with an event
+				if($task) {
+					Task::delete($task->primaryKeyValues());
+				}
 			}
 		}catch(\GO\Base\Exception\AccessDenied $e){
 //			\GO::debug($e);

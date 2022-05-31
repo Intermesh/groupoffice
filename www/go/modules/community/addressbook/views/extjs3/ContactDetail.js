@@ -99,13 +99,14 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 								}
 
 								var	i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
-							
-								go.util.mailto({
-									email: this.data.emailAddresses[i].email,
+
+								e.preventDefault();
+								go.showComposer({
+									to: this.data.emailAddresses[i].email,
 									name: this.data.name,
 									entity: "Contact",
 									entityId: this.data.id
-								}, e);
+								});
 
 							}, this);
 						}

@@ -1107,13 +1107,13 @@ $updates['202201101250'][] = 'update `core_entity` set clientName = name WHERE c
 
 $updates['202202141231'][] = "update core_blob set staleAt = now() where staleAt is null;";
 
-$updates['202202141231'][] = "ALTER TABLE `core_smtp_account` ADD `maxMessagesPerMinute` SMALLINT UNSIGNED NOT NULL DEFAULT(0);";
+$updates['202202141231'][] = "ALTER TABLE `core_smtp_account` ADD `maxMessagesPerMinute` SMALLINT UNSIGNED NOT NULL DEFAULT 0;";
 
 
-$updates['202203181327'][] = "create index if not exists core_change_modSeq_entityTypeId_entityId_index
+$updates['202203181327'][] = "create index core_change_modSeq_entityTypeId_entityId_index
     on core_change (modSeq, entityTypeId, entityId);";
 
-$updates['202203181327'][] = "create index if not exists core_change_user_modSeq_userId_entityTypeId_entityId_index
+$updates['202203181327'][] = "create index core_change_user_modSeq_userId_entityTypeId_entityId_index
     on core_change_user (modSeq, userId, entityTypeId, entityId);
 ";
 
@@ -1124,10 +1124,10 @@ $updates['202203251058'][] = function() {
 	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
 };
 
-$updates['202203251058'][] = "create index if not exists core_change_modSeq_entityTypeId_entityId_index
+$updates['202203251058'][] = "create index core_change_modSeq_entityTypeId_entityId_index
     on core_change (modSeq, entityTypeId, entityId);";
 
-$updates['202203251058'][] = "create index if not exists core_change_user_modSeq_userId_entityTypeId_entityId_index
+$updates['202203251058'][] = "create index core_change_user_modSeq_userId_entityTypeId_entityId_index
     on core_change_user (modSeq, userId, entityTypeId, entityId);
 ";
 

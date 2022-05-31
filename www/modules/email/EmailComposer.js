@@ -1386,8 +1386,9 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 //			if(this.link) {
 //				this.sendParams.link = this.link.entity + ":" + this.link.entityId;
 //			}
-			
-			this.sendParams.links = Ext.encode(this.createLinkButton.getNewLinks());
+
+			const newLinks = this.createLinkButton.getNewLinks();
+			this.sendParams.links = Ext.encode(newLinks);
 
 			this.formPanel.form.submit({
 				url : sendUrl,
@@ -1431,8 +1432,13 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 
 	
 						this.fireEvent('send', this);
+
+						if(Object.keys(newLinks).length) {
+							// this will update link detail panels
+							go.Db.store("Link").getUpdates();
+						}
 					
-						this.hide();
+						this.closeAction == "hide" ? this.hide() : this.close();
 					}else
 					{	
 						this.fireEvent('save', this);

@@ -2,34 +2,32 @@
 
 namespace go\core {
 
-use Exception;
-use Faker\Generator;
-use GO\Base\Observable;
-use GO;
-use go\core\auth\State as AuthState;
-use go\core\cache\CacheInterface;
-use go\core\db\Connection;
-use go\core\db\Database;
-use go\core\db\Query;
-use go\core\db\Table;
-use go\core\event\EventEmitterTrait;
-use go\core\event\Listeners;
-use go\core\fs\Blob;
-use go\core\fs\Folder;
-use go\core\jmap\Request;
-use go\core\mail\Mailer;
-use go\core\model\Group;
-use go\core\model\Module as ModuleModel;
+	use Exception;
+	use Faker\Generator;
+	use GO\Base\Observable;
+	use GO;
+	use go\core\auth\State as AuthState;
+	use go\core\cache\CacheInterface;
+	use go\core\db\Connection;
+	use go\core\db\Database;
+	use go\core\db\Table;
+	use go\core\event\EventEmitterTrait;
+	use go\core\event\Listeners;
+	use go\core\fs\Blob;
+	use go\core\fs\Folder;
+	use go\core\jmap\Request;
+	use go\core\mail\Mailer;
+	use go\core\model\Group;
+	use go\core\model\Module as ModuleModel;
 	use go\core\orm\EntityType;
 	use go\core\orm\exception\SaveException;
-use go\core\orm\Property;
-use go\core\Settings as CoreSettings;
-use go\core\util\ArrayObject;
-use go\core\webclient\Extjs3;
-use go\core\model\User;
-use go\core\model\Settings;
-
-use Faker;
+	use go\core\orm\Property;
+	use go\core\Settings as CoreSettings;
+	use go\core\util\ArrayObject;
+	use go\core\webclient\Extjs3;
+	use go\core\model\User;
+	use go\core\model\Settings;
+	use Faker;
 
 	use InvalidArgumentException;
 	use PDOException;
@@ -493,10 +491,14 @@ use Faker;
 		 * Create PDO database DSN string
 		 *
 		 * @param string|null $dbName
+		 * @param array|null $config
 		 * @return string
 		 */
-		public function createDsn(string $dbName = null): string {
-			$config = $this->getConfig();
+		public function createDsn(string $dbName = null, array $config = null): string {
+
+			if(!isset($config)) {
+				$config = $this->getConfig();
+			}
 
 			$dsn = 'mysql:';
 
@@ -531,11 +533,14 @@ use Faker;
 		public function isInstalled(): bool
 		{
 			try {
-				return parent::isInstalled();
+				return go()->getDatabase()->hasTable('core_module');
 			} catch(PDOException $e) {
+
+				go()->debug("Check isInstalled failed with : " . $e->getMessage());
 
 				if(strpos($e->getMessage(), '1049') !== false || strpos($e->getMessage(), '1146') !== false) {
 					// database does not exists or table does not exist
+
 					return false;
 				}
 				throw $e;

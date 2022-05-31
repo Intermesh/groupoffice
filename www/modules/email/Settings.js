@@ -16,7 +16,11 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 //				hideLabel:true,				
 //				name:'emailSettings.sort_email_addresses_by_time'
 //			}),
-
+			this.useHtml = new Ext.form.Checkbox({
+				boxLabel:t("Use desktop email client to compose", "email"),
+				hideLabel:true,
+				name:'emailSettings.use_desktop_composer'
+			}),
 			this.templateCombo = new GO.email.TemplateCombo({
 				hiddenName: "emailSettings.defaultTemplateId",
 				fieldLabel: t("Default template")

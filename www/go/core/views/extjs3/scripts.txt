@@ -70,6 +70,7 @@ SearchField.js
 NavMenu.js
 NavGrid.js
 Notifier.js
+Mail.js
 
 toolbar/SearchButton.js
 toolbar/TitleItem.js

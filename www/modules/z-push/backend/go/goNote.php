@@ -126,12 +126,23 @@ class goNote extends GoBaseBackendDiff {
 				throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 			}
 
-			$note->content = GoSyncUtils::getBodyFromMessage($message);
+			$note->content = "";
 
 			if(isset($message->asbody) && isset($message->asbody->type)){
 				switch($message->asbody->type){
 					case SYNC_BODYPREFERENCE_PLAIN:
-						$note->content = StringUtil::textToHtml($note->content);
+						$note->content = StringUtil::textToHtml(stream_get_contents($message->asbody->data));
+						break;
+					case SYNC_BODYPREFERENCE_HTML:
+						$note->content = stream_get_contents($message->asbody->data);
+						break;
+					case SYNC_BODYPREFERENCE_RTF:
+						$rtfparser = new z_RTF();
+						$rtfparser->loadrtf(base64_decode(stream_get_contents($message->asbody->data)));
+						$rtfparser->output("html");
+						$rtfparser->parse();
+						$note->content = $rtfparser->out;
+						break;
 				}
 			}
 
@@ -156,7 +167,7 @@ class goNote extends GoBaseBackendDiff {
 		}
 
 
-		return $this->StatMessage($folderid, $id);
+		return $this->StatMessage($folderid, $note->id);
 
 	}
 			

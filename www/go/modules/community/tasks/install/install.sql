@@ -87,6 +87,10 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
     REFERENCES `core_blob` (`id`)
     ON DELETE RESTRICT
     ON UPDATE SET NULL,
+  constraint tasks_task_core_user_id_fk
+    foreign key (responsibleUserId)
+    references core_user (id)
+    on DELETE set null,
   constraint tasks_task_core_acl_id_fk
       foreign key (aclId) references core_acl (id) ON DELETE RESTRICT
     )

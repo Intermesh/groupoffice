@@ -46,15 +46,12 @@ class ConnectionTest extends TestCase {
 		$a->zipCode = "5222 AE";
 		$a->countryCode = "NL";
 
-		$success = $contact1->save();
-//		$this->assertEquals(true, $success);
+	  $contact1->save();
 
-//		User::getApiProperties();
-//		$user = User::find()->single();
-//
 		$props = $user1->toArray();
 
-//		var_dump($props);
+		// allow one second for mysql 5.7 to close the connection
+		sleep(1);
 
 		$exists = $this->connExists($id);
 

@@ -98,6 +98,8 @@ class goTask extends GoBaseBackendDiff {
 		$task = Task::findById($id);
 		$message = new SyncTask();
 		if ($task) {
+			$message->uid = $task->getUid();
+
 			if($task->start) {
 				$message->startdate = $task->start->format("U");
 				$message->utcstartdate = $this->makeUTCDate($task->start);
@@ -174,6 +176,9 @@ class goTask extends GoBaseBackendDiff {
 				ZLog::Write(LOGLEVEL_DEBUG, "Found task");
 			}
 
+			if (isset($message->uid))
+				$task->setUid($message->uid);
+
 			if (isset($message->startdate))
 				$task->start = new DateTime("@" . $message->startdate);
 
@@ -244,7 +249,7 @@ class goTask extends GoBaseBackendDiff {
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 		}
 
-		return $this->StatMessage($folderid, $id);
+		return $this->StatMessage($folderid, $task->id);
 	}
 
 	/**
