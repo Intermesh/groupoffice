@@ -8,9 +8,11 @@ use go\core\db\Query as OrmQuery;
 use go\core\db\Statement;
 use go\core\ErrorHandler;
 use go\core\model\Link;
+use go\core\model\Module;
 use go\core\model\Search;
 use go\core\util\ClassFinder;
 use go\core\util\StringUtil;
+use go\modules\community\comments\model\Comment;
 use function go;
 
 trait SearchableTrait {
@@ -158,9 +160,12 @@ trait SearchableTrait {
 //		$search->createdAt = $this->createdAt;
 		
 		$keywords = $this->getSearchKeywords();
+
 		if(!isset($keywords)) {
 			$keywords = array_merge(StringUtil::splitTextKeywords($search->name), StringUtil::splitTextKeywords($search->description));
 		}
+
+		$keywords = $this->getCommentKeywords($keywords);
 
 		$links = (new Query())
 			->select('description')
@@ -215,6 +220,18 @@ trait SearchableTrait {
 			'core_search_word',$keywords
 		)->execute();
 
+	}
+
+	private function getCommentKeywords(array $keywords) : array {
+		if(Module::isInstalled("community", "comments")) {
+			$comments = Comment::findFor($this, ['text']);
+			foreach($comments as $comment) {
+				$plain = strip_tags($comment->text);
+				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
+			}
+		}
+
+		return $keywords;
 	}
 
 
