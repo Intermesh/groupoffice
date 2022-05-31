@@ -279,7 +279,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				if(cb) {
 					cb.call(scope || this, this, false);
 				}
-				return Promise.reject("No state yet");
+				return Promise.resolve(true);
 			}
 
 			return go.Jmap.request({
