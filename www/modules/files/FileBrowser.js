@@ -178,6 +178,7 @@ GO.files.FileBrowser = function(config){
 			id:'name',
 			header:t("Name"),
 			dataIndex: 'name',
+			width: 300,
 			renderer:function(v, meta, r){
 				var cls = r.get('acl_id')>0 && r.get('readonly')==0 ? 'filetype filetype-folder-shared' : 'filetype filetype-'+r.get('extension');
 				if(r.get('locked_user_id')>0)
