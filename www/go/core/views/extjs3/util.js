@@ -217,7 +217,6 @@ go.util =  (function () {
 			if(qp.length) {
 				link += '?'+qp.join('&');
 			}
-			debugger;
 
 			window.open("mailto:" + link, "_self");
 		},
