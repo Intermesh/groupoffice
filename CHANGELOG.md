@@ -1,3 +1,4 @@
+- Projects: Added feature to receive project status update emails to settings dialog
 - Core / Email: Ignore no state yet when getting updates
 - Core: include comments in search keywords
 
