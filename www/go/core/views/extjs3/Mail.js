@@ -1,11 +1,8 @@
 go.showComposer = function(cfg) {
 
 	if(GO.email && GO.email.showComposer && !go.User.emailSettings.use_desktop_composer) {
-		GO.email.showComposer(cfg);
+		GO.email.showComposer({values:cfg});
 		return;
-	}
-	function mailto(cleanCfg) {
-		go.util.mailto(cleanCfg);
 	}
 
 	// when the email module is not installed of we want to use the desktop composer.
@@ -30,11 +27,12 @@ go.showComposer = function(cfg) {
 				});
 			}
 		})
-	} else if(cfg.values.to) {
+	} else if(cfg.to) {
 		go.util.mailto({
-			to: cfg.values.to,
-			body: cfg.values.body,
-			subject: cfg.values.subject
+			to: cfg.to || '',
+			name:cfg.name,
+			body: cfg.body || '',
+			subject: cfg.subject|| ''
 		});
 	} else {
 		alert('incorrect showComposer config');

@@ -295,27 +295,7 @@ Ext.override(Ext.form.BasicForm,{
 
 		this.items.each(fn);
 
-		var keys, converted = {}, currentJSONlevel;
-
-		for (var key in o) {
-
-			keys = key.split('.');
-
-			currentJSONlevel = converted;
-
-			for (var i = 0; i < keys.length; i++) {
-				if (i === (keys.length - 1)) {
-					currentJSONlevel[keys[i]] = o[key];
-				} else
-				{
-					currentJSONlevel[keys[i]] = currentJSONlevel[keys[i]] || {};
-					currentJSONlevel = currentJSONlevel[keys[i]];
-				}
-			}
-
-		}
-				
-		return converted;
+		return go.util.splitToJson(o);
 	},
 	
 	setValues: function (values) {		
