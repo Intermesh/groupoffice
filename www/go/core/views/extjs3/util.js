@@ -665,6 +665,31 @@ go.util =  (function () {
 		});
 	},
 
+	// turns {'customFields.col_x': 'Foo'} into	{customFields:{col_x:'Foo}}
+	splitToJson : function(v) {
+		var keys, converted = {}, currentJSONlevel;
+
+		for (var key in v) {
+
+			keys = key.split('.');
+
+			currentJSONlevel = converted;
+
+			for (var i = 0; i < keys.length; i++) {
+				if (i === (keys.length - 1)) {
+					currentJSONlevel[keys[i]] = v[key];
+				} else
+				{
+					currentJSONlevel[keys[i]] = currentJSONlevel[keys[i]] || {};
+					currentJSONlevel = currentJSONlevel[keys[i]];
+				}
+			}
+
+		}
+
+		return converted;
+	},
+
 	parseEmail : function(emails) {
 
 		if(Ext.form.VTypes.emailAddress(emails)) {
