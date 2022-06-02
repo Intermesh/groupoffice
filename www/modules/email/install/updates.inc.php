@@ -240,3 +240,16 @@ $updates['202205170840'][] = "alter table em_contacts_last_mail_times
 
 
 $updates['202205170840'][] = "ALTER TABLE `em_accounts` ADD COLUMN `force_smtp_login` BOOLEAN NOT NULL DEFAULT FALSE;";
+
+$updates['202206020910'][] = function() {
+	// Check whether the deprecated field client_id exists in the em_accounts table. Since MySQL does not support
+	// 'DROP COLUMN IF EXISTS' queries, we use the old school PDO way.
+	$conn = \GO::getDbConnection();
+	$conn->beginTransaction();
+	if($r = $conn->query("SHOW COLUMNS FROM `em_accounts` WHERE `Field`='client_id';")) {
+		if($rec = $r->fetch(PDO::FETCH_ASSOC)) {
+			$conn->query("ALTER TABLE `em_accounts` DROP COLUMN `client_id`;");
+		}
+	}
+	$conn->commit();
+};
