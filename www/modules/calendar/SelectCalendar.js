@@ -98,6 +98,20 @@ Ext.extend(GO.calendar.SelectCalendar, GO.form.ComboBoxReset, {
 					this.store.add(currentRecord);
 					GO.calendar.SelectCalendar.superclass.setValue.call(this, id);
 				},
+				fail: function(scope,response,options) {
+					var comboRecord = Ext.data.Record.create([
+						{name: this.valueField},
+						{name: this.displayField}
+					]);
+					const data = {
+						[this.valueField]: id,
+						[this.displayField]: t("Not found or no access!")
+					};
+					this.store.add(new comboRecord(data));
+					GO.calendar.SelectCalendar.superclass.setValue.call(this, id);
+					//this.disable();
+					//GO.calendar.SelectCalendar.superclass.setValue.call(this, id);
+				},
 				scope: this
 			});
 		} else
