@@ -1,5 +1,7 @@
+- Projects: Added feature to receive project status update emails to settings dialog
 - Core / Email: Ignore no state yet when getting updates
 - Core: include comments in search keywords
+- Core: Avoid "the main cron job is not running" messae when processing a large job.
 
 30-05-2022 6.6.93
 - Email: Fix error when double clicking account

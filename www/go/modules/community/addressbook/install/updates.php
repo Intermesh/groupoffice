@@ -158,13 +158,17 @@ $updates['202202070921'][] = "update `addressbook_phone_number` set type='mobile
 
 $updates['202205101237'][] = "update addressbook_contact set filesFolderId = null where filesFolderId=0;";
 
+// Were missing for Softaculous. Add them again. Will be ignored if already there.
+$updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD nameBank varchar(50);';
+$updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD BIC varchar(11);';
+
 
 // 6.7
 
-$updates['202205101237'][] = "alter table addressbook_address
+$updates['202206020948'][] = "alter table addressbook_address
     add address text null;";
 
-$updates['202205101237'][] = function() {
+$updates['202206020948'][] = function() {
 
 	go()->getDbConnection()->exec("alter table addressbook_address ADD id INT AUTO_INCREMENT PRIMARY KEY;");
 	\go\core\db\Table::destroyInstances();
