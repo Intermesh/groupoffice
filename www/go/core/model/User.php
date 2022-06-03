@@ -502,7 +502,7 @@ class User extends Entity {
 			$this->homeDir = "users/" . $this->username;
 		}
 
-		if(empty($this->recoveryEmail)) {
+		if(empty($this->recoveryEmail) && in_array("recoveryEmail", $this->selectedProperties)) {
 			$this->recoveryEmail = $this->email;
 		}
 

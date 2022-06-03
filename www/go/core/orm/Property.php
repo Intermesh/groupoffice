@@ -1895,8 +1895,8 @@ abstract class Property extends Model {
 		}
 
 		foreach ($table->getMappedColumns() as $colName => $column) {
-			//Assume constants are correct, and this makes it unessecary to declare the property
-			if(array_key_exists($colName, $table->getConstantValues())) {
+			//Assume constants are correct, and this makes it unnecessary to declare the property
+			if(array_key_exists($colName, $table->getConstantValues()) || !in_array($colName, $this->selectedProperties)) {
 				continue;
 			}
 
