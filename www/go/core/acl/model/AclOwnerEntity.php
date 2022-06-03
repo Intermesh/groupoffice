@@ -79,8 +79,6 @@ abstract class AclOwnerEntity extends AclEntity {
 			return;
 		}
 
-		$this->checkManagePermission();
-
 		$a = $this->findAcl();
 
 		foreach($this->setAcl as $groupId => $level) {
