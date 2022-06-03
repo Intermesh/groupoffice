@@ -164,3 +164,11 @@ $updates['202202181433'][] = "alter table comments_comment_attachment
         foreign key (blobId) references core_blob (id)
             on delete cascade;";
 
+
+$updates['202206031337'][] = "delete from comments_comment where entityTypeId not in (select id from core_entity);";
+
+
+$updates['202206031337'][] = "alter table comments_comment
+    add constraint comments_comment_core_entity_id_fk
+        foreign key (entityTypeId) references core_entity (id)
+            on delete cascade;";

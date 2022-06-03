@@ -96,8 +96,13 @@ go.modules.community.addressbook.SettingsProfilePanel = Ext.extend(Ext.Panel, {
 			}
 		];
 
+		this.addCustomFields(this.items[0].items);
+
 		go.modules.community.addressbook.SettingsProfilePanel.superclass.initComponent.call(this);
-	}
+	},
+	addPanel: function(pnl) {this.items[0].items.push(pnl)},
+	entityStore: 'Contact',
+	addCustomFields: go.modules.community.addressbook.ContactDialog.prototype.addCustomFields
 
 });
 

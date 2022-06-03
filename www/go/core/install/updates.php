@@ -1196,3 +1196,8 @@ $updates['202205101416'][] = function() {
 
 //create index core_entity_highestModSeq_index
 //    on core_entity (highestModSeq);
+
+
+$updates['202206031343'][] = "drop index clientName_2 on core_entity;";
+
+$updates['202206031343'][] = "drop index moduleId_2 on core_entity;";
