@@ -2457,13 +2457,16 @@ abstract class Property extends Model {
 
 		//copy public and protected columns except for auto increments.
 		$props = $this->getApiProperties();
+
 		foreach($props as $name => $p) {
 			if(!isset($p['access'])) {
 				continue;
 			}
 			$col = static::getMapping()->getColumn($name);
-			if($col && $col->autoIncrement == false) {
-				$copy->$name = $this->$name;
+			if($col) {
+				if(!$col->autoIncrement) {
+					$copy->$name = $this->$name;
+				}
 			} else {
 				$rel = static::getMapping()->getRelation($name);
 				if($rel) {
@@ -2474,6 +2477,9 @@ abstract class Property extends Model {
 					} else{
 						$copy->$name = $this->$name instanceof self ? $this->$name->copy() : $this->$name;
 					}
+				} else {
+					// protected prop that's neither a column or relation
+					$copy->$name = $this->$name;
 				}
 			}
 		}
