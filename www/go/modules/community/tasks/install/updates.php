@@ -174,3 +174,5 @@ $updates['202205311153'][] = "alter table tasks_task
         foreign key (responsibleUserId) references core_user (id)
             on delete set null;";
 
+$updates['202206031355'][] = 'ALTER TABLE `tasks_task` ADD COLUMN `latitude` decimal(10,8) DEFAULT NULL, ' .
+	'ADD COLUMN `longitude` decimal(11,8) DEFAULT NULL;';
