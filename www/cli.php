@@ -29,5 +29,9 @@ if(!empty($args['debug'])) {
 	go()->getDebugger()->enable(false);
 }
 
+if(array_key_exists('debug', $args)) {
+    go()->getDebugger()->enabled = !empty($args['debug']);
+}
+
 $router = new Router();
 $router->run();
