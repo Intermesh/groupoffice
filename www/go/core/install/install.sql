@@ -879,6 +879,8 @@ ALTER TABLE `core_email_template_attachment`
   ADD CONSTRAINT `core_email_template_attachment_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `core_email_template_attachment_ibfk_2` FOREIGN KEY (`emailTemplateId`) REFERENCES `core_email_template` (`id`) ON DELETE CASCADE;
 
+create unique index core_email_template_moduleId_key_uindex
+    on core_email_template (moduleId, `key`);
 
 ALTER TABLE `core_change` ADD INDEX(`entityId`);
 

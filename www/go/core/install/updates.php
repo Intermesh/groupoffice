@@ -1202,16 +1202,20 @@ $updates['202205101416'][] = function() {
 
 
 // Start 6.7
-$updates['202203281145'][] = "alter table core_pdf_block modify x int null;";
+$updates['202205101416'][] = "alter table core_pdf_block modify x int null;";
 
-$updates['202203281145'][] = "alter table core_pdf_block modify y int null;";
+$updates['202205101416'][] = "alter table core_pdf_block modify y int null;";
 
-$updates['202203281145'][] = "alter table core_pdf_block modify width int null;";
+$updates['202205101416'][] = "alter table core_pdf_block modify width int null;";
 
-$updates['202203281145'][] = "alter table core_pdf_block modify height int null;";
+$updates['202205101416'][] = "alter table core_pdf_block modify height int null;";
 
-$updates['202203281145'][] = "alter table core_pdf_template
+$updates['202205101416'][] = "alter table core_pdf_template
 	add `key` varchar(20) default null null after moduleId;";
 
 
-$updates['202203281145'][] = "drop index name on core_email_template;";
+$updates['202205101416'][] = "drop index name on core_email_template;";
+
+
+$updates['202205101416'][] = "create unique index core_email_template_moduleId_key_uindex
+    on core_email_template (moduleId, `key`);";
