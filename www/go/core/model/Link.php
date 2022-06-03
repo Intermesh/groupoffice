@@ -550,7 +550,6 @@ class Link extends AclItemEntity
 				$copy = $link->copy();
 				$copy->fromEntityTypeId = $to::entityType()->getId();
 				$copy->fromId = $to->id;
-
 				if (!$copy->save()) {
 					throw new SaveException($copy);
 				}
