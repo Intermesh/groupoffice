@@ -250,8 +250,6 @@ class LogEntry extends AclOwnerEntity {
 			$this->removeAcl = false;
 		}
 
-		go()->debug("Changes for ". $this->entity.": " . $this->changes);
-
 		return parent::internalSave();
 	}
 }
