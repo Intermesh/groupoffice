@@ -505,7 +505,11 @@ namespace go\core {
 			if(!empty($config['db_socket'])) {
 				$dsn .= 'unix_socket=' . $config['db_socket'];
 			} else{
-				$dsn .= 'host=' . $config['db_host'] . ';port=' . $config['db_port'];
+				$dsn .= 'host=' . $config['db_host'];
+
+				if(isset($config['db_port'])) {
+					$dsn .= ';port=' . $config['db_port'];
+				}
 			}
 
 			if(isset($dbName)) {
