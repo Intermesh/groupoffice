@@ -16,6 +16,12 @@ if(!go()->isInstalled()) {
 	exit();
 }
 
+if(!empty(go()->getSettings()->license) && License::isValid()) {
+    \go\core\http\Response::get()->setStatus(403);
+    echo "<h1>Forbidden</h1>";
+    exit();
+}
+
 // needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
 // system.
 go()->disableEvents();

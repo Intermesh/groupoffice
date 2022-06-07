@@ -5,6 +5,7 @@ use go\core\ErrorHandler;
 use go\core\db\Table;
 use go\core\event\EventEmitterTrait;
 use go\core\model\Module;
+use go\modules\business\license\model\License;
 use go\modules\business\studio\Module as StudioModule;
 
 ini_set('zlib.output_compression', 0);
@@ -31,7 +32,7 @@ try {
 		exit();
 	}
 
-	if(go()->getEnvironment()->hasIoncube() && !go()->getSettings()->licenseDenied && (empty(go()->getSettings()->license) || !\go\modules\business\license\model\License::isValid())) {
+	if(go()->getEnvironment()->hasIoncube() && !go()->getSettings()->licenseDenied && (empty(go()->getSettings()->license) || !License::isValid())) {
 		header("Location: license.php");
 		exit();
 	}
@@ -76,7 +77,7 @@ try {
 
 		
 		echo '</p>';
-		if(empty(go()->getSettings()->license) || !\go\modules\business\license\model\License::isValid()) {
+		if(empty(go()->getSettings()->license) || !License::isValid()) {
 			echo '<a class="button accent" href="license.php">Install license</a>';
 		}
 		echo '<a class="right button primary" href="?confirmed=1" onclick="document.getElementsByClassName(\'card\')[0].classList.add(\'mask\')">Upgrade database</a></div>';
@@ -95,7 +96,9 @@ try {
 		. "<p>Please install the license file(s) and refresh this page or disable these modules.\n"
 		. "If you continue the incompatible modules will be disabled.</p>";
 
-		echo '<a class="button secondary" href="license.php">Install license</a>';
+		if(empty(go()->getSettings()->license) || !License::isValid()) {
+			echo '<a class="button secondary" href="license.php">Install license</a>';
+		}
 		echo '<a class="right button primary" href="?ignore=modules&confirmed=1" onclick="document.getElementsByClassName(\'card\')[0].classList.add(\'mask\')">Disable &amp; Continue</a>';
 
 		echo "</div>";
