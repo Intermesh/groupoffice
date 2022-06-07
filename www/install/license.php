@@ -19,6 +19,7 @@ if(!go()->isInstalled()) {
 if(!empty(go()->getSettings()->license) && License::isValid()) {
     \go\core\http\Response::get()->setStatus(403);
     echo "<h1>Forbidden</h1>";
+    echo "<p>You don't have access to this resource</p>";
     exit();
 }
 
