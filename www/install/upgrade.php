@@ -76,7 +76,9 @@ try {
 
 		
 		echo '</p>';
-		echo '<a class="button accent" href="license.php">Install license</a>';
+		if(empty(go()->getSettings()->license) || !\go\modules\business\license\model\License::isValid()) {
+			echo '<a class="button accent" href="license.php">Install license</a>';
+		}
 		echo '<a class="right button primary" href="?confirmed=1" onclick="document.getElementsByClassName(\'card\')[0].classList.add(\'mask\')">Upgrade database</a></div>';
 	
 	} elseif (!isset($_GET['ignore']) && count($unavailable)) {
