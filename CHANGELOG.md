@@ -1,7 +1,9 @@
 - Projects: Added feature to receive project status update emails to settings dialog
 - Core / Email: Ignore no state yet when getting updates
 - Core: include comments in search keywords
-- Core: Avoid "the main cron job is not running" messae when processing a large job.
+- Tasks: add latitude / longitude fields
+- Core: Avoid "the main cron job is not running" message when processing a large job.
+- Tickets: Fix HTML encoding issue in grid
 
 30-05-2022 6.6.93
 - Email: Fix error when double clicking account
