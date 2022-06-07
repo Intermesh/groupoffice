@@ -45,7 +45,7 @@ class UserSettings extends Property {
 			}
 		}
 
-		$this->use_desktop_composer = !\GO::config()->get_setting("use_desktop_composer", $this->id);
+		$this->use_desktop_composer = !!\GO::config()->get_setting("use_desktop_composer", $this->id);
 		$this->use_html_markup = !\GO::config()->get_setting("email_use_plain_text_markup", $this->id);
 		$this->show_from = !!\GO::config()->get_setting("email_show_from", $this->id, 1);
 		$this->show_cc = !!\GO::config()->get_setting("email_show_cc", $this->id, 1);
@@ -82,6 +82,7 @@ class UserSettings extends Property {
 			}
 		}
 
+		\GO::config()->save_setting('use_desktop_composer', !empty($this->use_desktop_composer) ? '0' : '1', $this->id);
 		\GO::config()->save_setting('email_use_plain_text_markup', !empty($this->use_html_markup) ? '0' : '1', $this->id);
 		\GO::config()->save_setting('email_show_from', !empty($this->show_from) ? 1 : 0, $this->id);
 		\GO::config()->save_setting('email_show_cc', !empty($this->show_cc) ? 1 : 0, $this->id);
