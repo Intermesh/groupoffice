@@ -244,10 +244,19 @@ class Comment extends AclItemEntity {
 			$entity = $this->findEntity();
 		}
 
-		if($entity->modifiedAt < $this->modifiedAt && method_exists($entity, 'saveSearch')) {
-			//if entity wasn't saved in 'onCommentAdded' then save the search so it can be found
-			$entity->saveSearch();
+		if(property_exists($entity, 'modifiedAt')) {
+			if($entity->modifiedAt < $this->modifiedAt && method_exists($entity, 'saveSearch')) {
+				//if entity wasn't saved in 'onCommentAdded' then save the search so it can be found
+				$entity->saveSearch();
+			}
+		} else if(property_exists($entity, 'mtime')) {
+			if($entity->mtime < $this->modifiedAt->format("U") && method_exists($entity, 'saveSearch')) {
+				//if entity wasn't saved in 'onCommentAdded' then save the search so it can be found
+				$entity->saveSearch();
+			}
 		}
+
+
 
 		return true;
 	}
