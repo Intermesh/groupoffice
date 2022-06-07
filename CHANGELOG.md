@@ -1,3 +1,6 @@
+07-06-2022 6.6.95
+- Email: Option to open desktop composer instead of Group-Office composer
+
 07-06-2022 6.6.94
 - Projects: Added feature to receive project status update emails to settings dialog
 - Core / Email: Ignore no state yet when getting updates
