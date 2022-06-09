@@ -293,7 +293,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			triggerWidth: 1000
 		};
 
-	var messageTbar = new Ext.Toolbar({
+	this.messageTbar = new Ext.Toolbar({
 		enableOverflow: true,
 		items:[{
 			cls: 'go-narrow',
@@ -397,14 +397,14 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	if(!GO.util.isMobileOrTablet()) {
 
 
-		messageTbar.insert(-2,{
+		this.messageTbar.insert(-2,{
 			hidden: !GO.email.saveAsItems || !GO.email.saveAsItems.length,
 			iconCls: 'ic-save',
 			text:t("Save as"),
 			menu:this.gridContextMenu.saveAsMenu
 		});
 
-		messageTbar.insert(-1, {
+		this.messageTbar.insert(-1, {
 			xtype:'button',
 			iconCls:'ic-delete',
 			overflowText:t('Delete'),
@@ -419,7 +419,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 	this.messagePanel = new GO.email.MessagePanel({
 		id:'email-message-panel',
-		tbar: messageTbar,
+		tbar: this.messageTbar,
 		region:'center',
 		autoScroll:true,
 		titlebar: false,
@@ -452,6 +452,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this.messagePanel.uid=0;
 		}else
 		{
+			this.messageTbar.setDisabled(false);
+
 			this.messagePanel.do_not_mark_as_read = 0;
 			if(!GO.util.empty(data.do_not_mark_as_read)) {
 				this.messagePanel.do_not_mark_as_read = data.do_not_mark_as_read;
@@ -481,10 +483,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	}, this);
 
 	this.messagePanel.on('reset', function(){
-		this.replyAllButton.setDisabled(true);
-		this.replyButton.setDisabled(true);
-		this.forwardButton.setDisabled(true);
-		this.printButton.setDisabled(true);
+		this.messageTbar.setDisabled(true);
 	}, this);
 
 	this.messagePanel.on('attachmentClicked', GO.email.openAttachment, this);
