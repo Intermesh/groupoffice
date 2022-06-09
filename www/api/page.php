@@ -12,9 +12,11 @@
 use go\core\fs\Blob;
 use go\core\App;
 use go\core\http\Response;
+use go\core\http\Request;
 
 require("../vendor/autoload.php");
 App::get();
+
 if(Request::get()->getMethod() == 'OPTIONS') {
 	Response::get()->output();
 	exit();
