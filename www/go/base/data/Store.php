@@ -300,7 +300,7 @@ class Store extends AbstractStore {
 			$findParams->start ($requestParams['start']);
 		
 		if(isset($requestParams['permissionLevel']))
-			$findParams->permissionLevel ($requestParams['permissionLevel']);
+			$findParams->permissionLevel ($requestParams['permissionLevel'], $requestParams['permissionLevelUserId'] ?? false);
 		
 		if($extraFindParams)
 			$findParams->mergeWith($extraFindParams);

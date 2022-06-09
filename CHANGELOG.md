@@ -1,4 +1,5 @@
 - Core: Open popup from notifications instead of routing to item
+- Email: fixed unable to create file error
 
 07-06-2022 6.6.95
 - Email: Option to open desktop composer instead of Group-Office composer

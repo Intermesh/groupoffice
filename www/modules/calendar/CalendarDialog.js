@@ -91,7 +91,7 @@ GO.calendar.CalendarDialog = function(config)
 
 	if(go.Modules.isAvailable("community", "tasks")) {
 		this.tasklistsTab = new GO.base.model.multiselect.panel({
-		  title:t("Visible tasklists", "tasks"),
+		  title:t("Visible tasklists", "tasks", "community"),
 		  url:'calendar/calendarTasklist',
 		  columns:[{header: t("Title"), dataIndex: 'name'}],
 		  fields:['id','name'],
@@ -99,12 +99,19 @@ GO.calendar.CalendarDialog = function(config)
 		});
 		
 		this.selectTasklist = new go.form.ComboBoxReset({
+			anchor: "100%",
 			fieldLabel:'CalDAV '+t("Tasklist",'tasks', 'community'),
 			store: {
 				xtype: 'gostore',
 				fields: ['id','name','user_name'],
 				entityStore: 'Tasklist',
-				baseParams: {'permissionLevel': GO.permissionLevels.write}
+				filters: {
+					default: {
+						permissionLevel: go.permissionLevels.write,
+						role: 'list'
+					}
+				}
+
 			},
 			// store:new GO.data.JsonStore({
 			// 	url: GO.url('tasks/tasklist/store'),
@@ -351,9 +358,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 		this.addEvents({
 			'save' : true
 		});
-		if(go.Modules.isAvailable("community", "tasks")) {
-			this.selectTasklist.store.setFilter('role', {role: 'list'});
-		}
+
 		GO.calendar.CalendarDialog.superclass.initComponent.call(this);
 		
 	},				
