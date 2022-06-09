@@ -1,6 +1,8 @@
 - Core: Open popup from notifications instead of routing to item
 - Email: fixed unable to create file error
 - Sync: only show folders available to user when editing as admin
+- Email: Disable all message toolbar items when nothing is selected
+- Email: Both date fields sorted on date sent. Now it also sorts on date arrived.
 
 07-06-2022 6.6.95
 - Email: Option to open desktop composer instead of Group-Office composer
