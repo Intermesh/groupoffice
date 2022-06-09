@@ -769,14 +769,12 @@ class goMail extends GoBaseBackendDiff {
 						$headers = $imap->get_flags(min($uids) . ':*');
 					}
 
-					if (!$headers) {
+					if ($headers === false) {
 						ZLog::Write(LOGLEVEL_ERROR, "IMAP returned error reponse" . $imap->last_error());
 						return [];
 					}
 
-
 					ZLog::Write(LOGLEVEL_DEBUG, "message count:" . count($headers));
-
 
 					/* Create messages array */
 					foreach ($headers as $header) {
