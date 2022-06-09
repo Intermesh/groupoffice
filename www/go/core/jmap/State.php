@@ -296,7 +296,6 @@ class State extends AbstractState {
 		return $this->getToken() ? $this->getToken()->getUser($properties) : null;
 	}
 
-
 	/**
 	 * Check if logged in user is admin
 	 *

@@ -133,6 +133,17 @@ abstract class AclEntity extends Entity {
 							//dummy used in permissionLevel filter.
 						})
 						->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
+
+							// security check. Only admins may query on behalf of others permissions
+							if(!empty($filter['permissionLevelUserId']) && $filter['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
+								throw new Forbidden("Only admins can pass 'permissionLevelUserId'");
+							}
+
+							// security check. Perhaps extend this later to check if the given groups are accessible by the user
+							if(!empty($filter['permissionLevelGroups']) && !go()->getAuthState()->isAdmin()) {
+								throw new Forbidden("Only admins can pass 'permissionLevelGroups'");
+							}
+
 							//Permission level is always added to the main query so that it's always applied with AND
 							static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
 						});
