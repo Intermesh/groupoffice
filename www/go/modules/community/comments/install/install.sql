@@ -94,4 +94,7 @@ create index fk_comments_label_has_comments_comment_comments_label1_idx
 
 
 
-
+alter table comments_comment
+    add constraint comments_comment_core_entity_id_fk
+        foreign key (entityTypeId) references core_entity (id)
+            on delete cascade;
