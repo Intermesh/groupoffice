@@ -34,13 +34,13 @@ class MessageController extends \GO\Base\Controller\AbstractController
 	 */
 	protected function actionMailto($params)
 	{
-		$qs=strtolower(str_replace('mailto:','', urldecode($_SERVER['QUERY_STRING'])));
+		$qs=str_replace('mailto:','', urldecode($_SERVER['QUERY_STRING']));
 		$qs=str_replace('?subject','&subject', $qs);
+		$qs=str_replace('?body','&body', $qs);
 
 		parse_str($qs, $vars);
 
-
-		$vars['to']=isset($vars['mailto']) ? $vars['mailto'] : '';
+		$vars['to']=isset($vars['mailto']) ? strtolower($vars['mailto']) : '';
 		unset($vars['mailto'], $vars['r']);
 
 		if(!isset($vars['subject'])) {
@@ -49,6 +49,8 @@ class MessageController extends \GO\Base\Controller\AbstractController
 
 		if(!isset($vars['body'])) {
 			$vars['body'] = '';
+		} else{
+			$vars['body'] = nl2br($vars['body']);
 		}
 
 		header('Location: '.GO::createExternalUrl('email', 'showComposer', array('values'=>$vars)));
