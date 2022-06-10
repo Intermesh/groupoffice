@@ -58,6 +58,14 @@
 				hiddenName: "countryCode",
 				name: "country",
 				anchor: "100%"
+			}, {
+				xtype: "hidden",
+				name: "latitude",
+				allowBlank: true
+			}, {
+				xtype: "hidden",
+				name: "longitude",
+				allowBlank: true
 			}]
 		}
 	}

@@ -863,13 +863,8 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 					// admin (shared) calendars behave differently. They add the creator as default organizer
 					// and not the calendar owner.
+					$this->addReminder($this->name, $remindTime, $this->user_id, $remindTime + $this->reminder);
 
-					foreach ($this->participants as $participant) {
-						if ($participant->user_id == $this->calendar->user_id) {
-							$this->addReminder($this->name, $remindTime, $this->calendar->user_id, $remindTime + $this->reminder);
-							break;
-						}
-					}
 				} else{
 					$this->addReminder($this->name, $remindTime, $this->calendar->user_id, $remindTime + $this->reminder);
 				}

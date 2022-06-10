@@ -92,3 +92,6 @@ create index fk_comments_label_has_comments_comment_comments_comment1_idx
 create index fk_comments_label_has_comments_comment_comments_label1_idx
     on comments_comment_label (labelId);
 
+
+
+

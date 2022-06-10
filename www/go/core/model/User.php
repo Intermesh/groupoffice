@@ -647,6 +647,7 @@ class User extends Entity {
       });
 	}
 
+	private $isAdmin;
 
   /**
    * Check if use is an admin
@@ -655,10 +656,15 @@ class User extends Entity {
    */
 	public function isAdmin(): bool
 	{
-		return !!(new Query)
-			->select()
-			->from('core_user_group')
-			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single();
+		if(!isset($this->isAdmin)) {
+			$this->isAdmin = !!(new Query)
+				->select()
+				->from('core_user_group')
+				->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])
+				->single();
+		}
+
+		return $this->isAdmin;
 	}
 
 	public static function isAdminById($userId): bool

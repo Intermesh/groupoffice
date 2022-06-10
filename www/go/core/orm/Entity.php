@@ -1353,7 +1353,7 @@ abstract class Entity extends Property {
 			}
 
 			go()->getDbConnection()
-				->update(
+				->updateIgnore(
 					$r['table'], 
 					[$r['column'] => $this->id], 
 					[$r['column'] => $entity->id])

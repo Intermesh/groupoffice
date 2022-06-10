@@ -5,6 +5,27 @@ go.form.multiselect.Window = Ext.extend(go.Window, {
 	layout: "fit",
 	field: null,
 	initComponent: function () {
+
+
+		const storeConfig = this.field.storeConfig || {};
+
+		Ext.apply(storeConfig, {
+			sortInfo: {
+				field: this.field.displayField
+			},
+			fields: ['id', this.field.displayField],
+			entityStore: this.field.entityStore,
+			baseParams: this.field.storeBaseParams,
+			listeners: {
+				load: function() {
+					var ids = this.field.getIds();
+					this.grid.store.filterBy(function(r) {
+						return ids.indexOf(r.id) === -1;
+					});
+				},
+				scope: this
+			}
+		});
 		
 		
 		this.grid = new go.grid.GridPanel({
@@ -14,23 +35,7 @@ go.form.multiselect.Window = Ext.extend(go.Window, {
 			viewConfig: {
 				emptyText: t("No items to display")
 			},
-			store: new go.data.Store({
-				sortInfo: {
-					field: this.field.displayField
-				},
-				fields: ['id', this.field.displayField],
-				entityStore: this.field.entityStore,
-				baseParams: this.field.storeBaseParams,
-				listeners: {
-					load: function() {
-						var ids = this.field.getIds();
-						this.grid.store.filterBy(function(r) {
-							return ids.indexOf(r.id) === -1;
-						});
-					},
-					scope: this
-				}
-			}),
+			store: new go.data.Store(storeConfig),
 			columns: [
 				{
 					id: 'name',

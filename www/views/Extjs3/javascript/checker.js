@@ -117,7 +117,15 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 							return;
 						}
 						const parts = record.data.model_name.split("\\");
-						go.Router.goto(parts[3].toLowerCase()+"/"+record.data.model_id);
+
+						//go.Router.goto(parts[3].toLowerCase()+"/"+record.data.model_id);
+
+						var win = new go.links.LinkDetailWindow({
+							entity: parts[3].toLowerCase()
+						});
+
+						win.load(record.data.model_id);
+
 						go.Notifier.hideNotifications();
 					},
 					buttonAlign: 'right',

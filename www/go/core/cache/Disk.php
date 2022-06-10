@@ -6,7 +6,6 @@ use Exception;
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\fs\File;
-use go\core\fs\Folder;
 
 /**
  * Cache implementation that uses serialized objects in files on disk.

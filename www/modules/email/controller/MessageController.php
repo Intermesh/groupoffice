@@ -234,13 +234,11 @@ class MessageController extends \GO\Base\Controller\AbstractController
 			case 'from':
 				$sortField=$response['sent'] ? Imap::SORT_TO : Imap::SORT_FROM;
 				break;
+			case 'internal_udate':
 			case 'arrival':
 				$sortField=Imap::SORT_ARRIVAL; //arrival is faster on older mail servers
 				break;
 
-			case 'date':
-				$sortField=Imap::SORT_DATE; //arrival is faster on older mail servers
-				break;
 
 			case 'subject':
 				$sortField=Imap::SORT_SUBJECT;

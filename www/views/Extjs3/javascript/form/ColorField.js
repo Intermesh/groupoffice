@@ -285,7 +285,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 				this.menu.palette.colors=this.colors;
 			}
 		}
-
+		this.menu.palette.select(this.value, true);
 		this.menu.show(this.el, "tl-bl");
 	}
 });

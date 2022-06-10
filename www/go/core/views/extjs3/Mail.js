@@ -1,7 +1,23 @@
+/**
+ * Send email using internal or dssktop email client
+ * @param cfg
+ * - loadUrl
+ * - loadParams
+ * - to
+ * - name
+ * - body
+ * - subject
+ */
 go.showComposer = function(cfg) {
 
 	if(GO.email && GO.email.showComposer && !go.User.emailSettings.use_desktop_composer) {
-		GO.email.showComposer({values:cfg});
+		cfg.values = cfg.values || {
+			name: cfg.name || '',
+			to:cfg.to || '',
+			body: cfg.body || '',
+			subject: cfg.subject|| ''
+		}
+		GO.email.showComposer(cfg);
 		return;
 	}
 

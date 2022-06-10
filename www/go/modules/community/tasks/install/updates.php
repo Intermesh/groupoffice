@@ -172,17 +172,19 @@ $updates['202205311153'][] = "alter table tasks_task
         foreign key (responsibleUserId) references core_user (id)
             on delete set null;";
 
+$updates['202206031355'][] = 'ALTER TABLE `tasks_task` ADD COLUMN `latitude` decimal(10,8) DEFAULT NULL, ' .
+	'ADD COLUMN `longitude` decimal(11,8) DEFAULT NULL;';
 
 
 
 //6.7
 
-$updates['202205311153'][] = "alter table tasks_task
+$updates['202206031355'][] = "alter table tasks_task
 	add aclId int null;";
 
-$updates['202205311153'][] = "update tasks_task t set t.aclId = (select aclId from tasks_tasklist where id = t.tasklistId);";
+$updates['202206031355'][] = "update tasks_task t set t.aclId = (select aclId from tasks_tasklist where id = t.tasklistId);";
 
-$updates['202205311153'][] = "alter table tasks_task
+$updates['202206031355'][] = "alter table tasks_task
 	add constraint tasks_task_core_acl_id_fk
 		foreign key (aclId) references core_acl (id)  ON DELETE RESTRICT;";
 

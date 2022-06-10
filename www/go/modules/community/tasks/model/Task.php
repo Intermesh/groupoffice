@@ -118,6 +118,15 @@ class Task extends AclInheritEntity {
 	 */
 	public $startTime;
 
+	/**
+	 * @var float
+	 */
+	public $latitude;
+
+	/**
+	 * @var float
+	 */
+	public $longitude;
 
 	/**
 	 * @var string

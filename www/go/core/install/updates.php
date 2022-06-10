@@ -1198,24 +1198,29 @@ $updates['202205101416'][] = function() {
 //    on core_entity (highestModSeq);
 
 
+$updates['202206031343'][] = "drop index clientName_2 on core_entity;";
+
+$updates['202206031343'][] = "drop index moduleId_2 on core_entity;";
+
+
 
 
 
 // Start 6.7
-$updates['202205101416'][] = "alter table core_pdf_block modify x int null;";
+$updates['202206031343'][] = "alter table core_pdf_block modify x int null;";
 
-$updates['202205101416'][] = "alter table core_pdf_block modify y int null;";
+$updates['202206031343'][] = "alter table core_pdf_block modify y int null;";
 
-$updates['202205101416'][] = "alter table core_pdf_block modify width int null;";
+$updates['202206031343'][] = "alter table core_pdf_block modify width int null;";
 
-$updates['202205101416'][] = "alter table core_pdf_block modify height int null;";
+$updates['202206031343'][] = "alter table core_pdf_block modify height int null;";
 
-$updates['202205101416'][] = "alter table core_pdf_template
+$updates['202206031343'][] = "alter table core_pdf_template
 	add `key` varchar(20) default null null after moduleId;";
 
 
-$updates['202205101416'][] = "drop index name on core_email_template;";
+$updates['202206031343'][] = "drop index name on core_email_template;";
 
 
-$updates['202205101416'][] = "create unique index core_email_template_moduleId_key_uindex
+$updates['202206031343'][] = "create unique index core_email_template_moduleId_key_uindex
     on core_email_template (moduleId, `key`);";

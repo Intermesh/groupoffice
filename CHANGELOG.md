@@ -1,7 +1,21 @@
+09-06-2022 6.6.96
+- Core: Open popup from notifications instead of routing to item
+- Email: fixed unable to create file error
+- Sync: only show folders available to user when editing as admin
+- Email: Disable all message toolbar items when nothing is selected
+- Email: Both date fields sorted on date sent. Now it also sorts on date arrived.
+
+07-06-2022 6.6.95
+- Email: Option to open desktop composer instead of Group-Office composer
+
+07-06-2022 6.6.94
 - Projects: Added feature to receive project status update emails to settings dialog
 - Core / Email: Ignore no state yet when getting updates
 - Core: include comments in search keywords
-- Core: Avoid "the main cron job is not running" messae when processing a large job.
+- Tasks: add latitude / longitude fields
+- Core: Avoid "the main cron job is not running" message when processing a large job.
+- Tickets: Fix HTML encoding issue in grid
+- Email: Option to open desktop composer instead of Group-Office composer
 
 30-05-2022 6.6.93
 - Email: Fix error when double clicking account
