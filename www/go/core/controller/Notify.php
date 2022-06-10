@@ -18,7 +18,7 @@ class Notify extends Controller {
 						->setFrom($settings->systemEmail, $settings->title)
 						->setTo($params['to'] ?? $settings->systemEmail)
 						->setSubject($params['subject'] ?? "")
-						->setBody($params['body'] ?? "");
+						->setBody($params['body'] ?? "", $params['contentType'] ?? null);
 
 		$success = $message->send();
 		
