@@ -1,4 +1,6 @@
+13-06-2022 6.5.109
 - Calendar: open info window when double clicking read only event
+- Core: PHP 7.3 support
 
 05-04-2022 6.5.108
 - Email: All accounts were shown to admins
