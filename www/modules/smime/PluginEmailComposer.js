@@ -130,19 +130,15 @@ GO.moduleManager.onModuleReady('email',function(){
 
 			this.signCheck.setDisabled(!record.json.has_smime_cert);
 			this.encryptCheck.setDisabled(!record.json.has_smime_cert);
-			
+
 			if(record.json.has_smime_cert && record.json.always_sign=="1"){
 				// Record has an smime cert and always sign is set to true
 				this.signCheck.setChecked(true);
 				this.sendParams['sign_smime'] ="1";	
-			} else if(!record.json.has_smime_cert){
+			} else {
 				// Record does not have an smime cert
 				this.signCheck.setChecked(false);
 				this.sendParams['sign_smime'] ="0";
-			} else {
-				// // Record has an smime cert and always sign is set to false
-				// this.signCheck.setChecked(false);
-				// this.sendParams['sign_smime'] ="0";
 			}
 		}
 	}
