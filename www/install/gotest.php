@@ -932,7 +932,13 @@ function save_config($config_obj)
 function whereis(string $cmd)
 {
 	if(strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
-		exec('whereis '.$cmd, $return);
+		$return = null;
+		try {
+			exec('whereis ' . $cmd, $return);
+		}
+		catch(Throwable $e) {
+			return false;
+		}
 
 		if(isset($return[0])) {
 			$locations = explode(' ', $return[0]);

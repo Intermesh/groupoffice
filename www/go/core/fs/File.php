@@ -56,11 +56,16 @@ class File extends FileSystemObject {
    */
 	public function isWritable(): bool
 	{
-		if($this->exists()) {
-			return is_writable($this->path);
-		}else
-		{
-			return $this->getFolder()->isWritable();
+		try {
+			if($this->exists()) {
+				return is_writable($this->path);
+			}else
+			{
+				return $this->getFolder()->isWritable();
+			}
+		} catch(Throwable $e) {
+			// open basedir restriction may lead here
+			return false;
 		}
 	}
 	

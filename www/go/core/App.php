@@ -31,6 +31,7 @@ namespace go\core {
 
 	use InvalidArgumentException;
 	use PDOException;
+	use Throwable;
 	use const GO_CONFIG_FILE;
 
 	/**
@@ -505,7 +506,7 @@ namespace go\core {
 			if(!empty($config['db_socket'])) {
 				$dsn .= 'unix_socket=' . $config['db_socket'];
 			} else{
-				$dsn .= 'host=' . $config['db_host'];
+				$dsn .= 'host=' . ($config['db_host'] ?? "localhost");
 
 				if(isset($config['db_port'])) {
 					$dsn .= ';port=' . $config['db_port'];
