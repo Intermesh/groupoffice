@@ -114,12 +114,12 @@ GO.files.FolderPropertiesDialog = function(config){
 		labelWidth: 70,
 		title: t("Comments", "files"),
 		border:false,
-		items: new Ext.form.TextArea({
+		items: [this.commentField = new Ext.form.TextArea({
 			name: 'comment',
 			fieldLabel: '',
 			hideLabel: true,
 			anchor:'100% 100%'
-		})
+		})]
 		
 	});
 	
@@ -299,8 +299,9 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 							GO.files.FolderPropertiesDialog.superclass.show.call(this);
 							this.readPermissionsTab.setDisabled(true);
 							this.commentsPanel.setDisabled(true);
+							this.commentField.setDisabled(true);
 
-	
+
 							if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Files\\Model\\Folder"]){
 								this.tabPanel.items.each(function(item, i) {
 									if(item.customfields) {
@@ -366,7 +367,8 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 		})
 
 		this.commentsPanel.setDisabled(readonly || permission_level<GO.permissionLevels.write);
-		
+		this.commentField.setDisabled(readonly || permission_level<GO.permissionLevels.write);
+
 	},
 	
 	save : function(hide)

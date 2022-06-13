@@ -1,5 +1,4 @@
 - Core: Fix color picker in case of null value
-
 - Core: Better error message for unsupported filter
 
 09-06-2022 6.6.96
@@ -26,7 +25,7 @@
 - ActiveSync: fixed problem with duplicate tasks when recurrence was enabled
 - ActiveSync: Convert RTF to text
 - Core: fixed removing permissions in group dialog
-- Core: Fixed bug in conditionally hidden fields 
+- Core: Fixed bug in conditionally hidden fields
 
 23-05-2022 6.6.92
 - Core: updated German translation. Thanks Daniel!
@@ -571,6 +570,14 @@
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+
+
+
+
+13-06-2022 6.5.109
+- Calendar: open info window when double clicking read only event
+- Core: PHP 7.3 support
 
 05-04-2022 6.5.108
 - Email: All accounts were shown to admins

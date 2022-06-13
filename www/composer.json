@@ -59,5 +59,11 @@
       "go\\core\\": "go/core/",
       "go\\modules\\": "go/modules/"
     }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "7.3.0"
+    }
   }
 }
