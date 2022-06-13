@@ -4,6 +4,7 @@
 - Core: Made template parser case insensitive
 - Core: show which cronjob created output
 - Projects: show time registrations for non-resource users
+- SMIME: Default sign checkbox not updated when switching from account
 
 09-06-2022 6.6.96
 - Core: Open popup from notifications instead of routing to item
