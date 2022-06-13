@@ -1,5 +1,7 @@
 - Core: Fix color picker in case of null value
 
+- Core: Better error message for unsupported filter
+
 09-06-2022 6.6.96
 - Core: Open popup from notifications instead of routing to item
 - Email: fixed unable to create file error
