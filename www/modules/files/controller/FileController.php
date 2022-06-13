@@ -149,7 +149,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		}
 		$time_end = microtime(true);
 		$execution_time = ($time_end - $time_start);
-		echo '<b>'.$count.' Folders updated in:</b> '.$execution_time.' Seconds';
+		//echo '<b>'.$count.' Folders updated in:</b> '.$execution_time.' Seconds';
 	}
 	
 	protected function actionDisplay($params) {
