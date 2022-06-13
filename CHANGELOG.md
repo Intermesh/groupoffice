@@ -2,6 +2,7 @@
 - Core: Better error message for unsupported filter
 - Core: Fixes for installing with open_basedir restriction enabled (leading to error: Constant K_PATH_CACHE already defined)
 - Core: Made template parser case insensitive
+- Core: show which cronjob created output
 
 09-06-2022 6.6.96
 - Core: Open popup from notifications instead of routing to item
