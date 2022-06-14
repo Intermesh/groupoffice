@@ -10,6 +10,7 @@ use go\core\data\convert\AbstractConverter;
 use go\core\data\convert\Json;
 use go\core\db\Column;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
@@ -741,6 +742,16 @@ abstract class Entity extends Property {
 				//dummy used in permissionLevel filter.
 			})
 			->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filterCondition, $filters) {
+
+				// security check. Only admins may query on behalf of others permissions
+				if(!empty($filter['permissionLevelUserId']) && $filter['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
+					throw new Forbidden("Only admins can pass 'permissionLevelUserId'");
+				}
+
+				// security check. Perhaps extend this later to check if the given groups are accessible by the user
+				if(!empty($filter['permissionLevelGroups']) && !go()->getAuthState()->isAdmin()) {
+					throw new Forbidden("Only admins can pass 'permissionLevelGroups'");
+				}
 
 				if(self::fireEvent(self::EVENT_FILTER_PERMISSION_LEVEL, $criteria, $value, $query, $filterCondition, $filters) === false) {
 					// event may override this by returning false
