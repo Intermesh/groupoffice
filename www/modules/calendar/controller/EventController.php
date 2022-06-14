@@ -32,6 +32,7 @@ use GO\Base\Fs\File;
 use GO\Calendar\Exception\AskPermission;
 use GO\Calendar\Model\Event;
 use go\core\db\Criteria;
+use go\core\model\Module;
 use go\core\orm\EntityType;
 use GO\Email\Model\Account;
 use GO\Leavedays\Model\Leaveday;
@@ -1087,7 +1088,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				}
 				
 				if(empty($params['events_only'])){
-					if(!$bdaysAdded && $calendar->show_bdays && \GO::modules()->addressbook){
+					if(!$bdaysAdded && $calendar->show_bdays && Module::isInstalled("community", "addressbook")){
 						$bdaysAdded=true;
 						$response = $this->_getBirthdayResponseForPeriod($response,$calendar,$startTime,$endTime);
 					}
@@ -1418,7 +1419,12 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$start = date('Y-m-d',strtotime($startTime));
 		$end = date('Y-m-d',strtotime($endTime));
 		
-		$addressbookIds = \go\modules\community\addressbook\model\AddressBook::find()->selectSingleValue('id')->filter(["permissionLevel" => \go\core\model\Acl::LEVEL_READ,'permissionLevelUserId' => $calendar->user_id])->all();
+		$addressbookIds = \go\modules\community\addressbook\model\AddressBook::find()
+			->selectSingleValue('id')
+			->filter([
+				"permissionLevel" => \go\core\model\Acl::LEVEL_READ
+				])
+			->all();
 		
 		if(empty($addressbookIds)){
 			$response['count_birthdays_only'] = 0;
