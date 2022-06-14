@@ -257,8 +257,8 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 		$expression .= $this->months;
 		$expression .= ' ';
 		$expression .= $this->weekdays;
-		$expression .= ' ';
-		$expression .= $this->years;
+//		$expression .= ' ';
+//		$expression .= $this->years;
 	
 		return $expression;
 	}
