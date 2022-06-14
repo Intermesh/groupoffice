@@ -7,6 +7,7 @@
 - SMIME: Default sign checkbox not updated when switching from account
 - Calendar: Fixed error "Only admins can pass 'permissionLevelUserId'"
 - Core: Fixed excessive white space in PDF generator
+- Core: fixed import when only filling has many relations. For example only e-mail addresses of a contact
 
 09-06-2022 6.6.96
 - Core: Open popup from notifications instead of routing to item
