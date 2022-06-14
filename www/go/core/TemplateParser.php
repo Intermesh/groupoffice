@@ -498,6 +498,9 @@ class TemplateParser {
 	 * @throws Exception
 	 */
 	private function parseBlocks($str) {
+
+		$str = $this->hideMicrosoftIfs($str);
+
 		$tags = $this->findBlocks($str);		
 			
 		for($i = 0;$i < count($tags); $i++) {
@@ -534,6 +537,8 @@ class TemplateParser {
 		}
 		
 		$replaced .= substr($str, $offset);
+
+		$replaced = $this->returnMicrosoftIfs($replaced);
 
 		return preg_replace("/(.*)\r?\n?$/", "$1", $replaced);
 	}
@@ -828,7 +833,7 @@ class TemplateParser {
 
 		foreach ($pathParts as $pathPart) {
 			//check for array access eg. contact.emailAddresses[0];
-			if(preg_match('/(.*)\[([0-9]+)\]/', $pathPart, $matches)) {
+			if(preg_match('/(.*)\[(\d+)]/', $pathPart, $matches)) {
 
 				// var_dump($matches);
 				
@@ -901,5 +906,28 @@ class TemplateParser {
 
 	public function &__get($name) {
 		return $this->models[$name];
+	}
+
+	/**
+	 * Temporarily remove conflicting if statements from microsoft
+	 *
+	 * eg.
+	 * ```
+	 * <!--[if (gte mso 9)|(IE)]>
+	 *  <div> you fool!</div>
+	 * <![endif]-->
+	 * ```
+	 *
+	 * @param string $str
+	 * @return string
+	 */
+	private function hideMicrosoftIfs(string $str): string
+	{
+		return preg_replace('/<!--\s*\[if/i', '<!--[MSIF', $str);
+	}
+
+	private function returnMicrosoftIfs(string $str): string
+	{
+		return str_replace( '<!--[MSIF', '<!--[if', $str);
 	}
 }
