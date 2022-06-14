@@ -1,3 +1,4 @@
+14-06-2022 6.6.97
 - Core: Fix color picker in case of null value
 - Core: Better error message for unsupported filter
 - Core: Fixes for installing with open_basedir restriction enabled (leading to error: Constant K_PATH_CACHE already defined)
@@ -8,6 +9,7 @@
 - Calendar: Fixed error "Only admins can pass 'permissionLevelUserId'"
 - Core: Fixed excessive white space in PDF generator
 - Core: fixed import when only filling has many relations. For example only e-mail addresses of a contact
+- Core: template parser failed when microsoft tags were used like <!--[if (gte mso 9)|(IE)]>-->
 
 09-06-2022 6.6.96
 - Core: Open popup from notifications instead of routing to item
