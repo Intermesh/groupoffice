@@ -173,7 +173,7 @@ class Filters {
 			$name = strtolower($name);
 
 			if(!isset($this->filters[$name])) {
-				throw new UnsupportedFilter($name);
+				throw new UnsupportedFilter($query->getModel()::entityType()->getName(), $name);
 			}
 
 			$query->usedFilters[] = $name;
