@@ -257,8 +257,8 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 		$expression .= $this->months;
 		$expression .= ' ';
 		$expression .= $this->weekdays;
-		$expression .= ' ';
-		$expression .= $this->years;
+//		$expression .= ' ';
+//		$expression .= $this->years;
 	
 		return $expression;
 	}
@@ -281,7 +281,9 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 	public function run(){
 		GO::session()->runAsRoot();
 		GO::debug('CRONJOB ('.$this->name.') START : '.date('d-m-Y H:i:s'));
-		
+
+		ob_start();
+
 		if($this->_prepareRun()){
 
 			$failed = false;
@@ -343,6 +345,13 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 
 				$this->error = date('c') . ": " .(string)$e;
 
+			}
+
+			$output = ob_get_contents();
+			ob_end_clean();
+
+			if(!empty($output)) {
+				echo get_class($this) . " output: \n\n" . $output . "\n---\n\n";
 			}
 			
 			$this->_finishRun($failed);

@@ -1,3 +1,16 @@
+14-06-2022 6.6.97
+- Core: Fix color picker in case of null value
+- Core: Better error message for unsupported filter
+- Core: Fixes for installing with open_basedir restriction enabled (leading to error: Constant K_PATH_CACHE already defined)
+- Core: Made template parser case insensitive
+- Core: show which cronjob created output
+- Projects: show time registrations for non-resource users
+- SMIME: Default sign checkbox not updated when switching from account
+- Calendar: Fixed error "Only admins can pass 'permissionLevelUserId'"
+- Core: Fixed excessive white space in PDF generator
+- Core: fixed import when only filling has many relations. For example only e-mail addresses of a contact
+- Core: template parser failed when microsoft tags were used like <!--[if (gte mso 9)|(IE)]>-->
+
 09-06-2022 6.6.96
 - Core: Open popup from notifications instead of routing to item
 - Email: fixed unable to create file error
@@ -22,7 +35,7 @@
 - ActiveSync: fixed problem with duplicate tasks when recurrence was enabled
 - ActiveSync: Convert RTF to text
 - Core: fixed removing permissions in group dialog
-- Core: Fixed bug in conditionally hidden fields 
+- Core: Fixed bug in conditionally hidden fields
 
 23-05-2022 6.6.92
 - Core: updated German translation. Thanks Daniel!
@@ -567,6 +580,14 @@
 - Core: System Settings -> Modules redesigned and searchable.
 - Core: modules can have specific permission types. We use it in the core to allow normal users to edit users, groups and
       custom fields.
+
+
+
+
+
+13-06-2022 6.5.109
+- Calendar: open info window when double clicking read only event
+- Core: PHP 7.3 support
 
 05-04-2022 6.5.108
 - Email: All accounts were shown to admins

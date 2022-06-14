@@ -1,8 +1,10 @@
 <?php
 namespace go\core\jmap\exception;
 
-class UnsupportedFilter extends \Exception {
-	public function __construct($name) {
-		parent::__construct("Unsupported filter: '" . $name . "'");
+use Exception;
+
+class UnsupportedFilter extends Exception {
+	public function __construct(string $entity, string $name) {
+		parent::__construct("The filter '$name' is not supported for entity '$entity' by the server.");
 	}
 }

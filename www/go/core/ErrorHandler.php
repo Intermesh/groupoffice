@@ -149,7 +149,9 @@ class ErrorHandler {
    * @throws ErrorException
    */
 	public static function errorHandler(int $errno, string $errstr, string $errfile, int $errline) {
-		go()->debug("ErrorHandler:errorHandler called $errno");
+
+		// do not use debug here because it will lead to a loop when error is thrown inside App::getConfig()
+		//go()->debug("ErrorHandler:errorHandler called $errno");
 
 		// check if error should be reported according to PHP settings
 		if (!(error_reporting() & $errno)) {

@@ -3,6 +3,7 @@ namespace go\core\fs;
 
 use Exception;
 use go\core\App;
+use Throwable;
 
 /**
  * A folder object
@@ -186,12 +187,16 @@ class Folder extends FileSystemObject {
 	 */
 	public function isWritable(): bool
 	{
-		
-		if($this->exists()) {
-			return is_writable($this->path);
-		}else
-		{
-			return $this->getParent()->isWritable();
+		try {
+			if ($this->exists()) {
+				return is_writable($this->path);
+			} else {
+				return $this->getParent()->isWritable();
+			}
+		} catch(Throwable $e) {
+
+			// open basedir restriction may lead here
+			return false;
 		}
 	}
 

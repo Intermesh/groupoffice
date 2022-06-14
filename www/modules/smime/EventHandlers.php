@@ -29,10 +29,10 @@ class EventHandlers {
 
 		foreach ($response['results'] as &$alias) {
 
-			$accountModel = \GO\Email\Model\Account::model()->findByPk($alias['account_id']);
+			$cert = (new Model\Smime($alias['account_id']))->latestCert();
 			$settings = Model\AccountSettings::model()->findByPk($alias['account_id']);
 
-			if ($settings && !empty($accountModel)) {
+			if ($settings && $cert) {
 				$alias['has_smime_cert'] = true;
 				$alias['always_sign'] = $settings->always_sign;
 			}

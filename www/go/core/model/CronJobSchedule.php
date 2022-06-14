@@ -167,7 +167,7 @@ class CronJobSchedule extends Entity
 		$cls = $this->getCronClass();
 
 		go()->debug("Running CRON method: " . $cls);
-		
+		ob_start();
 		try {
 			$cron = new $cls;			
 			$cron->run($this);
@@ -176,6 +176,13 @@ class CronJobSchedule extends Entity
 			$errorString = ErrorHandler::logException($ex);
 			echo $errorString . "\n";
 			$this->lastError = $errorString;
+		}
+
+		$output = ob_get_contents();
+		ob_end_clean();
+
+		if(!empty($output)) {
+			echo $cls . " output: \n\n" . $output . "\n---\n\n";
 		}
 
 		$this->lastRunAt = $this->getLocalDateTime();

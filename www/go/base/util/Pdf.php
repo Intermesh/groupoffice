@@ -10,7 +10,7 @@ class Pdf extends Fpdi  {
 		$this->init();
 	}
 	
-	public $font = 'freesans';
+	public $font = 'dejavusans';
 	public $font_size=10;
 	
 	public $title="";
@@ -22,7 +22,6 @@ td.head{
 	font-weight:bold;
 	border-bottom:2px solid #000;
 	font-size:110%;
-	line-height:200%;
 }
 td.total{
 
@@ -41,7 +40,6 @@ td.normal{
 td.group{
 	border-bottom:1px solid #ccc;
 	font-size:14px;
-	line-height:200%;
 }
 			
 h2{
@@ -117,6 +115,22 @@ color:#000;
 		
 				// set font
 		$this->SetFont($this->font, '', $this->font_size);
+
+//		$this->setHtmlVSpace(
+//			array(
+//				'div' => array(0 => array('h' => '', 'n' => 1), 1 => array('h' => '', 'n' => 0))
+//			)
+//		);
+
+		$tagvs = array(
+			'p' => array(0 => array('h' => 0, 'n' => 0.1), 1 => array('h' => 0, 'n' => 0.1)),
+			'div' => array(0 => array('h' => 0, 'n' => 0.1), 1 => array('h' => 0, 'n' => 0.1)),
+			'ol' => array(0 => array('h' => 0, 'n' => 0.1), 1 => array('h' => 0, 'n' => 0.1)),
+			'ul' => array(0 => array('h' => 0, 'n' => 0.1), 1 => array('h' => 0, 'n' => 0.1)),
+		);
+		$this->setHtmlVSpace($tagvs);
+		$this->setCellHeightRatio(1.25);
+		$this->SetCellPadding(0);
 	}
 	
 	

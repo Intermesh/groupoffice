@@ -146,7 +146,7 @@ class Spreadsheet extends convert\Spreadsheet {
 		}
 
 		//A contact will be an organization if there's a name but no firstName or lastName
-		$contact->isOrganization = empty($values['firstName']) && empty($values['lastName']);
+		$contact->isOrganization = empty($values['firstName']) && empty($values['lastName']) && !empty($values['name']);
 		
 		if($contact->isOrganization && empty($values['name']) && isset($values['organizations'][0])) {
 			$contact->name = $values['organizations'][0];

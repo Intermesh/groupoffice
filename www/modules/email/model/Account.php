@@ -421,7 +421,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 	{
 		$token = null;
 		$auth = 'plain';
-		if(go()->getModule('community', 'oauth2client')) {
+		if(!$this->isNew() && go()->getModule('community', 'oauth2client')) {
 			$acct = \go\modules\community\email\model\Account::findById($this->id);
 			$clt = $acct->oauth2_account;
 			if($clt) {

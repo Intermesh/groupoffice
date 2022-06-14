@@ -153,6 +153,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	public static function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company, $tagPrefix = 'company:'){
+		$attributes[$tagPrefix . 'name'] = $company->name;
 		$attributes[$tagPrefix . 'salutation'] = $company->getSalutation();
 		
 		$attributes[$tagPrefix . 'comment'] = $company->notes;
