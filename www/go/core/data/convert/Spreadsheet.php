@@ -730,6 +730,7 @@ class Spreadsheet extends AbstractConverter {
 						$item = $this->convertRecordToProperties($record, $sub, $c['properties'] ?? []);
 						if($item) {
 							$v[$propName][] = $item;
+							$hasCsvData = true;
 						}
 					}
 				} else{

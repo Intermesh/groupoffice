@@ -650,6 +650,8 @@ go.util =  (function () {
 									}
 
 									Ext.MessageBox.alert(t("Success"), msg);
+
+									go.Db.store(entity).getUpdates();
 								}
 
 								// if (callback) {

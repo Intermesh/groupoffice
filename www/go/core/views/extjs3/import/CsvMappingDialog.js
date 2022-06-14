@@ -333,6 +333,8 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					}
 						
 					Ext.MessageBox.alert(t("Success"), msg);
+
+					go.Db.store(this.entity).getUpdates();
 				}
 
 				this.close();
