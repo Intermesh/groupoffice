@@ -10,7 +10,7 @@
 		var head = document.getElementsByTagName('head')[0];
 
 		var style = document.createElement('link');
-		style.href = "./views/Extjs3/goui/goui.css";
+		style.href = "./views/Extjs3/goui/style/goui.css";
 
 		style.type = 'text/css';
 		style.rel = 'stylesheet';
@@ -20,13 +20,13 @@
 
 
 		//create root div for holding goui windows, menu's, alerts etc.
-		const div = document.createElement("div");
-		div.id="goui-root";
-		div.classList.add("goui");
-		document.body.appendChild(div);
-
-		const mods = await import("../goui/component/Root.js");
-		mods.root.setEl(div);
+		// const div = document.createElement("div");
+		// div.id="goui-root";
+		// div.classList.add("goui");
+		// document.body.appendChild(div);
+		//
+		// const mods = await import("../goui/component/Root.js");
+		// mods.root.setEl(div);
 	};
 
 
@@ -42,16 +42,16 @@
 	 */
 	window.goui = async function(module, el) {
 		injectGouiStyle();
-
 		//add class to apply goui style to chidren
-		el.dom.id = "goui";
+		el.id = "goui";
+		const rootMods = await import("../goui/script/component/Root.js");
 
 		//load component module
 		const mods = await import("../../."+module);
 		const modName = Object.keys(mods)[0];
 
 		//render first export to given el
-		mods[modName].create().render(el);
+		rootMods.root.getItems().add(mods[modName].create());
 
 	}
 })();
