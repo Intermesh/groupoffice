@@ -39,6 +39,11 @@ class UserSettings extends Property
 	public $noteBooks = [];
 
 	public $addressBooks = [];
+
+
+	public $allowDeletes = false;
+
+
 	private $doSetup = false;
 
 	protected function init()
@@ -46,6 +51,13 @@ class UserSettings extends Property
 		if($this->isNew()) {
 			$this->doSetup = true;
 		}
+	}
+
+	public function __clone()
+	{
+		// when modifications are tracked this object is cloned. We don't want it to
+		// run setup twice. When this object is json serialized by the history module
+		$this->doSetup = false;
 	}
 
 	public $tasklists = [];
@@ -94,9 +106,11 @@ class UserSettings extends Property
 
 			if ($this->isModified()) {
 				if(!$this->internalSave()) {
-					throw new \Exception("Could not update user with sync settings.");
+					throw new \Exception("Could not update user with sync settings:  " . $this->getValidationErrorsAsString());
 				}
 			}
+
+			$this->doSetup = false;
 		}
 	}
 

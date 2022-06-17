@@ -24,11 +24,7 @@ namespace GO\Base\Cache;
 
 class Apcu implements CacheInterface{
 	
-	private $_prefix;
-	
-	public function __construct() {
-		$this->_prefix=\GO::config()->db_name.'-';
-	}
+
 
 	/**
 	 * Store any value in the cache
@@ -37,7 +33,7 @@ class Apcu implements CacheInterface{
 	 * @param int $ttl Seconds to live
 	 */
 	public function set($key, $value, $ttl=0){
-		return apcu_store ($this->_prefix.$key , $value, $ttl );
+		return go()->getCache()->set($key, $value, true, $ttl);
 	}
 	
 	/**
@@ -48,7 +44,7 @@ class Apcu implements CacheInterface{
 	 */
 	public function get($key){
 		
-		return apcu_fetch($this->_prefix.$key);
+		return go()->getCache()->get($key);
 	}
 	
 	/**
@@ -57,17 +53,17 @@ class Apcu implements CacheInterface{
 	 * @param StringHelper $key 
 	 */
 	public function delete($key){
-		apcu_delete($this->_prefix.$key);
+		return go()->getCache()->delete($key);
 	}
 	/**
 	 * Flush all values 
 	 */
 	public function flush(){
-		apcu_clear_cache();
+		return go()->getCache()->flush();
 	}
 	
 	public function supported(){
-		return function_exists("apcu_store");
+		return true;
 	}
 	
 

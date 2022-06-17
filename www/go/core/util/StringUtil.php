@@ -1,4 +1,7 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php /** @noinspection RegExpSimplifiable */
+/** @noinspection PhpUnused */
+
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace go\core\util;
 
@@ -22,7 +25,7 @@ class StringUtil {
   /**
    * Normalize the line end style of text.
    *
-   * @param string $text
+   * @param string|null $text
    * @param string $crlf
    * @return string
    */
@@ -128,7 +131,7 @@ END;
 			$str = preg_replace($regex, '$1', $str);
 		}
 
-		$normalized = \Normalizer::normalize($str, \Normalizer::FORM_C);
+		$normalized = Normalizer::normalize($str, Normalizer::FORM_C);
 		if($normalized === false) {
 			return $str;
 		} else{
@@ -483,31 +486,101 @@ END;
 
 	/**
 	 * Split text by non word characters to get useful search keywords.
+	 *
 	 * @param ?string $text
+	 * @param bool $forSave Split differently on save then when searching
+	 *
+	 * Case "Jansen-Pietersen"
+	 *
+	 * For save store:
+	 * - Jansen-Pietersen
+	 * - Jansen
+	 * - Pietersen
+	 *
+	 * On search do:
+	 * - Jansen-Pietersen"%
+	 *
 	 * @return string[]
 	 */
-	public static function splitTextKeywords(?string $text): array
+	public static function splitTextKeywords(?string $text, bool $forSave = true): array
 	{
 
 		if(empty($text)) {
 			return [];
 		}
 
-		//Split on non word chars followed by whitespace or end of string. This wat initials like J.K. or french dates
-		//01.01.2020 can be found too.
-//		$keywords = mb_split('[^\w\-_\+\\\\\/:](\s|$)*', mb_strtolower($text), -1);
-		$text = preg_replace('/[^\w\-_+\\\\\/\s:@]/u', '', mb_strtolower($text));
-		$text = preg_replace('/[-]+/u', '-', $text);
-		$text = preg_replace('/[_]+/u', '_', $text);
-		$keywords = mb_split("\s+", $text);
+		//remove all characters we don't care about
+		$text = preg_replace('/[^\w\-_+\\\\\/\s:@,;]/u', '', mb_strtolower($text));
 
-		//filter small words
-		if(count($keywords) > 1) {
-			$keywords = array_filter($keywords, function ($word) {
-				return strlen($word) > 2;
-			});
+
+		// TODO transliterate to ascii so utf8 chars can be found with their ascii
+		// counterparts too ???
+		//
+//		$text = StringUtil::toAscii($text);
+
+		//split on white space
+		$keywords = mb_split("[\s,;]+", $text);
+
+		if($forSave) {
+			// Add words separated too when they are joined with -, /, \ or _. eg. Jansen-Pietersen or test/foo
+			// so they can be found with Jansen-Pietersen but also with Pietersen
+			$secondPassKeywords = [];
+			foreach ($keywords as $keyword) {
+				// handle email differently. We want info@group-office.com split in
+				// info and group-office.com. With names like Jansen-Pietersen we want
+				// Jansen and Pietersen.
+				$split = explode('@', $keyword);
+				if(count($split) != 2) {
+					$split = mb_split('[_\-\\\\\/]', $keyword);
+				}
+
+				if (count($split) > 1) {
+					$secondPassKeywords = array_merge($secondPassKeywords, $split);
+				}
+
+			}
+
+			$keywords = array_merge($keywords, $secondPassKeywords);
 		}
 
-		return $keywords;
+		//remove empty stuff.
+		return array_filter($keywords, function($keyword) {
+			$word = preg_replace("/[^\w]/u", "", $keyword);
+			return !empty($word);
+		});
+
+
+	}
+
+
+	/**
+	 * Filter out words that are already in the beginning of other words.
+	 *
+	 * We search for:
+	 *
+	 * where word like 'foo%'
+	 *
+	 * So if we store a word 'foobar' we don't need to store 'foo' as 'foobar'
+	 * will already cover that.
+	 *
+	 * @param array $keywords
+	 * @return void
+	 */
+	public static function filterRedundantSearchWords(array $keywords) : array {
+		$keywords = array_unique($keywords);
+
+		return array_values(array_filter($keywords, function($word) use ($keywords) {
+			foreach($keywords as $keyword) {
+				//don't check the same
+				if($keyword === $word) {
+					continue;
+				}
+
+				if(mb_strpos($keyword, $word) === 0) {
+					return false;
+				}
+			}
+			return true;
+		}));
 	}
 }

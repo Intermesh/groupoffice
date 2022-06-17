@@ -282,7 +282,7 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 
 						}catch(e) {
 							console.error(e);
-							GO.errorDialog.show(e.message);
+							GO.errorDialog.show(e.description);
 						}finally {
 							this.getEl().unmask();
 						}
@@ -301,7 +301,7 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 							const instance = await go.Db.store("Instance").save({enabled: !record.data.enabled}, record.id);
 						} catch(e) {
 							console.error(e);
-							GO.errorDialog.show(e.message);
+							GO.errorDialog.show(e.description);
 						} finally {
 							this.getEl().unmask();
 						}

@@ -11,25 +11,23 @@ go.form.ComboBoxReset = Ext.extend(go.form.ComboBox, {
 				{tag: "img", src: Ext.BLANK_IMAGE_URL, alt: "", cls: "x-form-trigger " + this.trigger2Class}
 			]};
 
-
-	 Ext.form.TwinTriggerField.prototype.initComponent.call(this);
+		Ext.form.TwinTriggerField.prototype.initComponent.call(this);
 		go.form.ComboBox.superclass.initComponent.call(this);
 
 		this.postInitComp();
-
 	},
 	getTrigger : Ext.form.TwinTriggerField.prototype.getTrigger,
 	getTriggerWidth : function() {return 0; },
 	initTrigger : Ext.form.TwinTriggerField.prototype.initTrigger,
 	trigger1Class : 'x-form-clear-trigger',
 	trigger2Class : 'x-form-arrow-trigger',
-	//hideTrigger1 : true,
 	onTrigger2Click : function() {
 		this.onTriggerClick();
 	},
 	onTrigger1Click : function() {
-		if(this.disabled)
+		if(this.disabled) {
 			return;
+		}
 
 		var oldValue = this.getValue();
 		this.clearValue();	

@@ -153,6 +153,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	public static function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company, $tagPrefix = 'company:'){
+		$attributes[$tagPrefix . 'name'] = $company->name;
 		$attributes[$tagPrefix . 'salutation'] = $company->getSalutation();
 		
 		$attributes[$tagPrefix . 'comment'] = $company->notes;
@@ -273,8 +274,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		$attributes[$tagPrefix . 'homepage'] = $contact->findUrlByType(\go\modules\community\addressbook\model\Url::TYPE_HOMEPAGE, false)->url ?? "";
 
 		$orgs = $contact->getOrganizationIds();
-		if(count($orgs) && ($company = \go\modules\community\addressbook\model\Contact::findById($orgs[0])))
-		{
+		if(count($orgs) && ($company = \go\modules\community\addressbook\model\Contact::findById($orgs[0]))) {
 			$attributes = array_merge($attributes, static::_getModelAttributes($company, $companyTagPrefix));
 		}
 
@@ -298,8 +298,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			case \go\modules\community\addressbook\model\Contact::class:
 				if($model->isOrganization) {
 					$attributes = array_merge($attributes, static::getCompanyAttributes($model, $tagPrefix));
-				} else
-				{
+				} else {
 					$attributes = array_merge($attributes, static::getContactAttributes($model, $tagPrefix));
 				}
 				
@@ -434,13 +433,15 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		$attributes = array_merge($this->_defaultTags, $attributes);
 		
 		if($this->htmlSpecialChars){
-			foreach($attributes as $key=>$value)
-				$attributes[$key]=htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
+			foreach($attributes as $key=>$value) {
+				$attributes[$key] = htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
+			}
 		}
 		
 		if(isset($this->_lineBreak)){
-			foreach($attributes as $key=>$value)
-				$attributes[$key]=str_replace("\n", $this->_lineBreak, $attributes[$key]);
+			foreach($attributes as $key=>$value) {
+				$attributes[$key] = str_replace("\n", $this->_lineBreak, $attributes[$key]);
+			}
 		}
 		
 		$templateParser = new \GO\Base\Util\TemplateParser();

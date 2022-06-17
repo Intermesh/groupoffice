@@ -14,6 +14,8 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 
 	hidden: true,
 
+	showMoreLoader: true,
+
 	initComponent: function () {
 
 		var actions = this.initRowActions();

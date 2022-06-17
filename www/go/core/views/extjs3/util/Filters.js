@@ -30,11 +30,14 @@ go.util.Filters = {
 		filters = this.normalize(filters);
 
 		defaultFilter = Object.keys(filters)[0];
-	
+
+		// eg. "name: Merijn,Jan name:Beton -name: Piet"
+		var tokens = (string).splitCSV(':'), data = [], currentFilterName = defaultFilter;
+
 		//Simple text check
-		if(string.indexOf(':') === -1) {
-			string = defaultFilter + ": " + string;
-		}	
+		if(tokens.length === 1) {
+			tokens.unshift(defaultFilter);
+		}
 
 		var stripBackSlash = function (val) {
 			// Strip backslashes respecting escapes
@@ -52,8 +55,6 @@ go.util.Filters = {
 			});
 		};
 		
-		// eg. "name: Merijn,Jan name:Beton -name: Piet"
-		var tokens = (string).split(':'), data = [], currentFilterName = defaultFilter;
 
 		for (var i = 0, l = tokens.length; i < l; i++) {
 			var words = tokens[i].split(' ');
@@ -76,10 +77,10 @@ go.util.Filters = {
 				if (filters[currentFilterName].multiple) {
 					//Values will be split into array values
 					f[currentFilterName] = str.splitCSV().map(function (v) {
+						v = v.trim();
 						//strip backslash and remove quotes
 						orig = v;
-						v = stripBackSlash(v.trim().replace(/^\"|\"$|^\'|\'$/g, ''));
-						
+						v = stripBackSlash(v.replace(/^\"|\"$|^\'|\'$/g, ''));
 						if(filters[currentFilterName].wildcards && v == orig) {
 							v = "%" + v + "%";
 						}
@@ -90,7 +91,7 @@ go.util.Filters = {
 				{
 					//strip backslash and remove quotes
 					orig = str;
-					f[currentFilterName] = stripBackSlash(str.trim().replace(/^\"|\"$|^\'|\'$/g, ''));
+					f[currentFilterName] = stripBackSlash(str.replace(/^\"|\"$|^\'|\'$/g, ''));
 					
 					if(filters[currentFilterName].wildcards && f[currentFilterName] == orig) {
 						f[currentFilterName] = "%" + f[currentFilterName] + "%";
@@ -112,7 +113,7 @@ go.util.Filters = {
 				arr = and;
 			}
 		}
-		;
+
 
 		if (not.length) {
 			and.push({
@@ -120,6 +121,8 @@ go.util.Filters = {
 				conditions: not
 			});
 		}
+
+		console.warn(and);
 
 		return {
 			operator: "AND",

@@ -59,6 +59,11 @@ ALTER TABLE `comments_comment_label`
 ALTER TABLE `comments_comment` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 ALTER TABLE `comments_comment` ADD INDEX(`section`);
 
+alter table comments_comment
+    add constraint comments_comment_core_entity_id_fk
+        foreign key (entityTypeId) references core_entity (id)
+            on delete cascade;
+
 
 
 CREATE TABLE `comments_comment_image` (
@@ -92,3 +97,6 @@ create table comments_comment_attachment
         foreign key (blobId) references core_blob (id)
             on delete cascade
 );
+
+
+

@@ -201,20 +201,29 @@ go.util =  (function () {
 		 * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
 		 * @return {undefined}
 		 */
-		mailto: function (config, event) {
-			event.preventDefault();
-			var email = config.email;
+		mailto: function (config) {
+			var link = config.to;
 
 			if (config.name) {
-				email = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.email + '>';
+				link = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.to + '>';
+			}
+			const qp = [];
+			if(config.body) {
+				qp.push('body='+encodeURIComponent(config.body));
+			}
+			if(config.subject) {
+				qp.push('subject='+encodeURIComponent(config.subject));
+			}
+			if(qp.length) {
+				link += '?'+qp.join('&');
 			}
 
-			document.location = "mailto:" + email;
+			window.open("mailto:" + link, "_self");
 		},
 
 		callto: function (config, event) {
 			event.preventDefault();
-			document.location = "tel://" + config.number;
+			window.open("tel:" + config.number, "_self");
 		},
 
 		streetAddress: function (config) {
@@ -423,6 +432,95 @@ go.util =  (function () {
 		addSlashes : function( str ) {
 			return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 		},
+
+
+		convertStyleToInline: function(html) {
+
+			const doc = new DOMParser().parseFromString(html, "text/html");
+			mystyle = [...doc.getElementsByTagName("style")].map(e => e.textContent).join("");
+
+			return "<style>" + mystyle + "</style>" + doc.body.innerHTML;
+
+			// sheet=cssToStyleSheet(mystyle);
+			// return convertToInline(doc,sheet);
+			//
+			// function convertToInline(origHtml, sheet) {
+			//
+			// 	let styleRules = sheet.cssRules;
+			// 	let selectorRules = [];
+			// 	let cssRules = [];
+			// 	for (let rule of styleRules) selectorRules.push(rule.selectorText);
+			// 	for (let rule of styleRules) cssRules.push(rule.cssText);
+			// 	let jsonCssRules = [];
+			// 	selectorRules.forEach((s, i) => {
+			// 		if (s) {
+			// 			let rule = cssRules[i].substr(s.length,cssRules[i].length).replace('{', '').replace('}', '').replace(/\s/g, '');
+			// 			if (rule) {
+			// 				let obj = {};
+			// 				obj[s] = rule;
+			// 				jsonCssRules.push(obj);
+			// 			}
+			// 		}
+			// 	});
+			// 	jsonCssRules.forEach((r, i) => {
+			// 		for (const [k, v] of Object.entries(r)) {
+			// 			let splitCss = v.split(';');
+			// 			let splitRules = [];
+			// 			let splitValues = [];
+			// 			Array.from(splitCss).forEach((rule) => {
+			// 				if (rule) {
+			// 					let nonCamelCaseRule = rule.substr(0, rule.indexOf(':'));
+			// 					let camelCaseRule = nonCamelCaseRule.replace(/(?:^\w|[A-Z]|\b\w)/g, function(part, idx) {
+			// 						return idx === 0 ? part.toLowerCase() : part.toUpperCase();
+			// 					}).replace('-', '').replace(/\s/g, '');
+			// 					let ruleValue = rule.substr(rule.indexOf(':') + 1, rule.length);
+			// 					splitRules.push(camelCaseRule);
+			// 					splitValues.push(ruleValue);
+			// 				}
+			// 			});
+			// 			if (k[0] === '.') {
+			// 				let elements = origHtml.getElementsByClassName(k.replace('.', ''));
+			// 				Array.from(elements).forEach((element) => {
+			// 					Array.from(splitRules).forEach((rule, i) => {
+			// 						element.style[rule] = splitValues[i];
+			// 					});
+			// 				});
+			// 			} else if (k[0] === '#') {
+			// 				let elements = origHtml.getElementById(k);
+			// 				Array.from(elements).forEach((element) => {
+			// 					Array.from(splitRules).forEach((rule, i) => {
+			// 						element.style[rule] = splitValues[i];
+			// 					});
+			// 				});
+			// 			} else {
+			// 				let elements = origHtml.getElementsByTagName(k);
+			// 				Array.from(elements).forEach((element) => {
+			// 					Array.from(splitRules).forEach((rule, i) => {
+			// 						element.style[rule] = splitValues[i];
+			// 					});
+			// 				});
+			// 			}
+			// 		}
+			// 	})
+			//
+			// 	Array.from(origHtml.getElementsByTagName('style')).forEach((element) => {
+			// 		element.remove();
+			// 	});
+			// 	Array.from(origHtml.getElementsByTagName('script')).forEach((element) => {
+			// 		element.remove();
+			// 	});
+			// 	let outputHtml = origHtml.documentElement.outerHTML;
+			// 	return outputHtml;
+			// }
+			//
+			// function cssToStyleSheet(cssText){
+			// 	const se = document.body.appendChild(document.createElement("style"));
+			// 	se.appendChild(document.createTextNode(cssText));
+			// 	const { sheet } = se;
+			// 	document.body.removeChild(se);
+			// 	return sheet;
+			// }
+		},
 		
 		
 		/*
@@ -475,7 +573,7 @@ go.util =  (function () {
 			}).then(function (response) {
 				go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
 			}).catch(function(response) {
-				Ext.MessageBox.alert(t("Error"), response.message);
+				Ext.MessageBox.alert(t("Error"), response.description);
 			}).finally(function() {
 				Ext.getBody().unmask();
 			})
@@ -543,7 +641,7 @@ go.util =  (function () {
 								Ext.getBody().unmask();
 
 								if (!success) {
-									Ext.MessageBox.alert(t("Error"), response.message);
+									Ext.MessageBox.alert(t("Error"), response.description);
 								} else {
 									var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
 
@@ -552,6 +650,8 @@ go.util =  (function () {
 									}
 
 									Ext.MessageBox.alert(t("Success"), msg);
+
+									go.Db.store(entity).getUpdates();
 								}
 
 								// if (callback) {
@@ -565,6 +665,31 @@ go.util =  (function () {
 				scope: this
 			}
 		});
+	},
+
+	// turns {'customFields.col_x': 'Foo'} into	{customFields:{col_x:'Foo}}
+	splitToJson : function(v) {
+		var keys, converted = {}, currentJSONlevel;
+
+		for (var key in v) {
+
+			keys = key.split('.');
+
+			currentJSONlevel = converted;
+
+			for (var i = 0; i < keys.length; i++) {
+				if (i === (keys.length - 1)) {
+					currentJSONlevel[keys[i]] = v[key];
+				} else
+				{
+					currentJSONlevel[keys[i]] = currentJSONlevel[keys[i]] || {};
+					currentJSONlevel = currentJSONlevel[keys[i]];
+				}
+			}
+
+		}
+
+		return converted;
 	},
 
 	parseEmail : function(emails) {

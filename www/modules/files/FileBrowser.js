@@ -178,6 +178,7 @@ GO.files.FileBrowser = function(config){
 			id:'name',
 			header:t("Name"),
 			dataIndex: 'name',
+			width: 300,
 			renderer:function(v, meta, r){
 				var cls = r.get('acl_id')>0 && r.get('readonly')==0 ? 'filetype filetype-folder-shared' : 'filetype filetype-'+r.get('extension');
 				if(r.get('locked_user_id')>0)
@@ -1261,7 +1262,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 					}
 				}
 
-				if(GO.settings.modules.files.write_permission)
+				if(go.Modules.get("legacy", "files").userRights.mayManage)
 				{
 					this.newMenu.add('-');
 
@@ -2181,7 +2182,7 @@ GO.files.openEmailAttachment = function(attachment, panel, choosehandler)
 		filename: attachment.name,
 		charset: attachment.charset,
 		sender: panel.data.sender, //for gnupg and smime,
-		filepath: panel.data.path ? panel.data.path : ''
+		tmp_file: attachment.tmp_file || ''
 	}
 	GO.request({
 		url: "files/file/saveAttachmentToTmp",
@@ -2322,10 +2323,21 @@ GO.files.isContentExpired = function(contentExpireDateString){
 	}
 };
 
-
+GO.files.MainPanel = Ext.extend(GO.files.FileBrowser, {
+	id: "files",
+	title: t("Files")
+})
 
 go.Modules.register("legacy", 'files', {
-	mainPanel: GO.files.FileBrowser,
+	// mainPanel: GO.files.FileBrowser,
+
+	initModule: function() {
+		if (go.Modules.get("legacy", "files").userRights.mayAccessMainPanel)
+		{
+			this.addPanel(GO.files.MainPanel);
+		}
+	},
+
 	title: t("Files", "files"),
 	iconCls: 'go-tab-icon-files',
 	customFieldTypes: [

@@ -62,6 +62,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			remoteGroup: true
 		});
 
+
 		this.reminderStore.on('load',function(store, records) {
 			//this.reminders.removeAll();
 
@@ -105,7 +106,9 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 					listeners: {
 						destroy: (panel) => {
-							this.doTask("dismiss_reminders", 0, [record.data.id], panel);
+							if(!panel.skipTask) {
+								this.doTask("dismiss_reminders", 0, [record.data.id], panel);
+							}
 						}
 					},
 					handler: () => {
@@ -114,7 +117,15 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 							return;
 						}
 						const parts = record.data.model_name.split("\\");
-						go.Router.goto(parts[3].toLowerCase()+"/"+record.data.model_id);
+
+						//go.Router.goto(parts[3].toLowerCase()+"/"+record.data.model_id);
+
+						var win = new go.links.LinkDetailWindow({
+							entity: parts[3].toLowerCase()
+						});
+
+						win.load(record.data.model_id);
+
 						go.Notifier.hideNotifications();
 					},
 					buttonAlign: 'right',
@@ -129,16 +140,22 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 						handler: (btn, e) => {
 							//needed to prevent notification area closing
 							e.stopEvent();
-							btn.findParentByType("panel").destroy();
+							pnl.destroy();
 						},
 						scope: this
 					}]
 				};
 
-				go.Notifier.msg(reminderPanel);
+				const pnl = go.Notifier.msg(reminderPanel);
 
 				snoozeMenu.items.each(function(i) {
-					i.setHandler(function(item){ this.doTask("snooze_reminders", item.value, [record.data.id], reminderPanel); }, this);
+					i.setHandler(function(item){
+						this.doTask("snooze_reminders", item.value, [record.data.id], pnl);
+
+						//to prevent dismiss in destroy event handler above
+						pnl.skipTask = true;
+						pnl.destroy();
+						}, this);
 				}, this);
 
 			}, this);

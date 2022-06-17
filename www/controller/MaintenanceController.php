@@ -14,6 +14,7 @@ use GO\Base\Db\PDO;
 use go\core\auth\TemporaryState;
 use go\core\db\Table;
 use go\core\db\Utils;
+use go\core\orm\SearchableTrait;
 use go\modules\community\history\Module;
 use PDOException;
 use ReflectionClass;
@@ -30,8 +31,8 @@ class MaintenanceController extends AbstractController {
 	protected function checkSecurityToken(){}
 	
 	protected function init() {
-		\GO::$disableModelCache=true; //for less memory usage
-		\GO::setMaxExecutionTime(0); //allow long runs		
+		GO::$disableModelCache=true; //for less memory usage
+		GO::setMaxExecutionTime(0); //allow long runs
 		GO::setMemoryLimit(256);
 		ini_set('display_errors','on');		
 	}
@@ -45,130 +46,7 @@ class MaintenanceController extends AbstractController {
 		$cg = new \go\core\fs\GarbageCollector;
 		$cg->execute();
 	}
-	
-	protected function actionDownloadFromShop($params){
-		$this->requireCli();
-		
-		$proPackageName = 'groupoffice-pro';
-		
-		$this->checkRequiredParameters(array('shopuser','shoppass'), $params);
-		
-		$shopUrl = 'https://intermesh.group-office.com/';
-		
-		$packages = isset($params['packages']) ? explode(",", $params['packages']) : array('documents-4.0', 'billing-4.0', 'groupoffice-pro-4.0');
-		
-		$downloads=array();
-		foreach($packages as $package_name){
-			
-			echo "\nGetting latest ".$package_name."\n";
-		
-			$packageUrl = $shopUrl.'?r=licenses/package/downloadPackageFile&package_name='.$package_name;
-			
 
-			$c = new \GO\Base\Util\HttpClient();
-			if(!$c->groupofficeLogin($shopUrl, $params['shopuser'],$params['shoppass']))
-				exit("Bad user name or password for shop");
-			else
-				echo "Shop login successful\n";
-
-			$tmpDir = new \GO\Base\Fs\Folder(getcwd());
-			if(!$tmpDir->isWritable())
-				exit("Error: ".$tmpDir->path ()." is not writable!\n");
-
-			$file = $tmpDir->createChild($package_name.'.tar.gz');
-			echo "Downloading file from shop...\n";
-			if(!$c->downloadFile($packageUrl, $file))		
-				exit("Error: Failed to download file");
-			
-			$file->rename($c->getLastDownloadedFilename());
-			
-			
-			$downloads[]=$file;
-			
-			
-			if(!empty($params['replacefolder']))
-				$params['unpack']=1;
-			
-			//echo "Filename: ".$c->getLastDownloadedFilename()."\n";
-
-			echo "File saved in ".$file->path()."\n";
-
-			if(!empty($params['unpack'])){
-				echo "Unpacking ".$file->name()."\n";
-				system('tar zxf '.$file->name());
-			}
-
-		}
-		
-		
-		
-		if(!empty($params['unpack'])){
-			foreach($downloads as $download){
-				if(strpos($download->name(), $proPackageName)!==false){
-					$proDownload=$download;
-					break;
-				}
-			}
-			
-			if(empty($proDownload)){
-				exit("Error: Can't unpack. Group-Office Professional was not part of the downloads\n");
-			}
-			
-			echo "Moving modules into pro package\n";
-			
-			$downloadFolder = str_replace('.tar.gz','', $proDownload->name());
-			
-			$newFolder = new \GO\Base\Fs\Folder(getcwd().'/'.$downloadFolder);
-			if(!$newFolder->exists())
-				exit("Download folder ".$newFolder->path()." does not exist.\n");
-			
-			foreach($downloads as $download){
-				if(strpos($download->name(), $proPackageName)===false){
-					
-					$modPackageName = str_replace('.tar.gz','', $download->name());
-					
-					system('rm -Rf '.$modPackageName.'/professional');
-					system('mv '.$modPackageName.'/* '.$downloadFolder.'/modules/');
-					system('rm -Rf '.$modPackageName.'*');
-					$proDownload->delete();
-				}
-			}			
-		
-			if(!empty($params['replacefolder'])){			
-
-				$params['replacefolder']=realpath($params['replacefolder']);
-
-				echo "Replacing: ".$params['replacefolder']."\n";
-
-				$replaceFolder = new \GO\Base\Fs\Folder($params['replacefolder']);
-
-				$origFolderName = $replaceFolder->name();
-
-				$backupName = $origFolderName.'_bak_'.date('YmdGis');
-
-				echo "Creating backup in ".$backupName."\n";
-
-
-				if(!$replaceFolder->exists()){
-					exit("Error: Folder ".$params['replacefolder']." does not exist!\n");
-				}
-				if(!$replaceFolder->rename($backupName))
-					die("Failed to rename ".$replaceFolder->path()."\n");
-
-//				$newFolder = new \GO\Base\Fs\Folder(getcwd().'/'.$downloadFolder);
-				if(!$newFolder->rename($origFolderName))
-					die("Failed to rename ".$newFolder->path()."\n");
-
-				//there might be a config file or license file in the directory
-				echo "Copying possible config and license files\n";
-				system('cp '.$replaceFolder->path().'/config.php '.$replaceFolder->path().'/*license.txt '.$newFolder->path().'/');
-
-			}
-		}
-		echo "All done\n";
-		
-	}
-	
 //	protected function ignoreAclPermissions() {
 //		return array('*');
 //	}
@@ -181,7 +59,7 @@ class MaintenanceController extends AbstractController {
       $params['description'] = $sourceAcl->usedIn;
     }
 		$acl = new \GO\Base\Model\Acl();
-		$acl->ownedBy=isset($params['user_id']) ? $params['user_id'] : \GO::user()->id;
+		$acl->ownedBy=isset($params['user_id']) ? $params['user_id'] : GO::user()->id;
 		$acl->usedIn=$params['description'];
 		$acl->save();
 
@@ -202,10 +80,10 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionRemoveDuplicates($params){
 				
-		if(!\GO::user()->isAdmin())
+		if(!GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
 		
-		\GO::session()->runAsRoot();
+		GO::session()->runAsRoot();
 
 		
 		\GO\Base\Fs\File::setAllowDeletes(false);
@@ -215,7 +93,7 @@ class MaintenanceController extends AbstractController {
 		
 		$this->lockAction();
 		
-		\GO::session()->closeWriting(); //close writing otherwise concurrent requests are blocked.
+		GO::session()->closeWriting(); //close writing otherwise concurrent requests are blocked.
 		
 		$checkModels = array(
 				"GO\Calendar\Model\Event"=>array('name', 'start_time', 'end_time', 'calendar_id', 'rrule'),
@@ -240,7 +118,7 @@ class MaintenanceController extends AbstractController {
 								->group($checkFields)
 								->having('n>1');
 
-				$stmt1 = \GO::getModel($modelName)->find($findParams);
+				$stmt1 = GO::getModel($modelName)->find($findParams);
 
 				echo '<table border="1">';
 				echo '<tr><td>ID</th><th>'.implode('</th><th>',$checkFields).'</th></tr>';
@@ -251,7 +129,7 @@ class MaintenanceController extends AbstractController {
 					
 					$select = 't.id';
 					
-					if(\GO::getModel($modelName)->hasFiles()){
+					if(GO::getModel($modelName)->hasFiles()){
 						$select .= ', t.files_folder_id';
 					}
 
@@ -266,7 +144,7 @@ class MaintenanceController extends AbstractController {
 						$criteria->addCondition($field, $dupModel->getAttribute($field));
 					}							
 
-					$stmt = \GO::getModel($modelName)->find($findParams);
+					$stmt = GO::getModel($modelName)->find($findParams);
 
 					$first = true;
 
@@ -308,17 +186,17 @@ class MaintenanceController extends AbstractController {
 				echo '</table>';
 
 				echo '<p>Found '.$count.' duplicates</p>';
-				echo '<br /><br /><a href="'.\GO::url('maintenance/removeDuplicates', array('delete'=>true, 'model'=>$modelName)).'">Click here to delete the newest duplicates marked in red for model '.$modelName.'.</a>';
+				echo '<br /><br /><a href="'. GO::url('maintenance/removeDuplicates', array('delete'=>true, 'model'=>$modelName)).'">Click here to delete the newest duplicates marked in red for model '.$modelName.'.</a>';
 				
 			}
 		}
 		
 		if(empty($params['model'])) {
-			echo '<br /><br /><a href="'.\GO::url('maintenance/removeDuplicates', array('delete'=>true)).'">Click here to delete the newest duplicates marked in red.</a>';
+			echo '<br /><br /><a href="'. GO::url('maintenance/removeDuplicates', array('delete'=>true)).'">Click here to delete the newest duplicates marked in red.</a>';
 
-			echo '<br /><br /><a href="'.\GO::url('maintenance/removeDuplicates', array('delete'=>true, 'ignore_links' => true)).'">Click here to delete the newest duplicates marked in red also when they have links.</a>';
+			echo '<br /><br /><a href="'. GO::url('maintenance/removeDuplicates', array('delete'=>true, 'ignore_links' => true)).'">Click here to delete the newest duplicates marked in red also when they have links.</a>';
 		} else {
-			echo '<br /><br /><a href="'.\GO::url('maintenance/removeDuplicates').'">Show all models.</a>';
+			echo '<br /><br /><a href="'. GO::url('maintenance/removeDuplicates').'">Show all models.</a>';
 		}
 	}
 
@@ -393,7 +271,7 @@ class MaintenanceController extends AbstractController {
 	 */
 	protected function actionBuildSearchCache($params) {
 		
-		if(!$this->isCli() && !GO::user()->isAdmin() && \GO::router()->getControllerAction()!='upgrade')
+		if(!$this->isCli() && !GO::user()->isAdmin() && GO::router()->getControllerAction()!='upgrade')
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		GO::setIgnoreAclPermissions(true);
@@ -403,7 +281,7 @@ class MaintenanceController extends AbstractController {
 
 		\go\core\jmap\Entity::$trackChanges = false;
 		Module::$enabled = false;
-		go()->getDebugger()->enabled = false;
+//		go()->getDebugger()->enabled = false;
 		
 		if(!$this->lockAction()) {
 			exit("Already running!");
@@ -422,15 +300,23 @@ class MaintenanceController extends AbstractController {
 		
 		if(!empty($params['reset'])) {
 			echo "Resetting cache!\n";
-			go()->getDbConnection()->exec("truncate core_search_word");
-			go()->getDbConnection()->exec("truncate core_search");
+//			go()->getDbConnection()->exec("truncate core_search_word");
+//			go()->getDbConnection()->exec("truncate core_search");
+
+			//change mtime's so they will be updated
+			if(!empty($params['modelName'])){
+				$entityTypeId = $params['modelName']::entityType()->getId();
+				go()->getDbConnection()->exec("update core_search set `rebuild` = true WHERE entityTypeId=" . $entityTypeId);
+			} else {
+				go()->getDbConnection()->exec("update core_search set `rebuild` = true");
+			}
 		}
 		
 		echo "Checking search cache\n\n";
 		echo ".: Record cached, E: Error while occurred, S: Record skipped (probably normal)\n"
 		.    "==============================================================================\n\n";
 		
-		\GO::session()->closeWriting(); //close writing otherwise concurrent requests are blocked.
+		GO::session()->closeWriting(); //close writing otherwise concurrent requests are blocked.
 
 		
 		$response = array();
@@ -439,33 +325,27 @@ class MaintenanceController extends AbstractController {
 			$modelName = $params['modelName'];
 			$models = array(new ReflectionClass($modelName));
 		} else {
-			$models=\GO::findClasses('model');
+			$models= GO::findClasses('model');
 		}
 		
 		foreach($models as $model){
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord") && !$model->isAbstract()){
-				$stmt = \GO::getModel($model->getName())->rebuildSearchCache();			
+				GO::getModel($model->getName())->rebuildSearchCache();
 			}
 		}
 		
 		if(empty($params['modelName'])){
-			\GO::modules()->callModuleMethod('buildSearchCache', array(&$response));
+			GO::modules()->callModuleMethod('buildSearchCache', array(&$response));
+			SearchableTrait::rebuildSearch();
+		} else if(is_a($params['modelName'], Entity::class, true)){
+			SearchableTrait::rebuildSearchForEntity($params['modelName']);
 		}
-		
-		
-		\go\core\orm\SearchableTrait::rebuildSearch();
-
-//		$this->addSearchCacheKeys();
-
 
 		go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1; SET autocommit=1");
 
 		echo "Resettings JMAP sync state\n";
 		go()->rebuildCache();
-		
-//		echo "Adding full text search index\n";
-//		\GO::getDbConnection()->query("ALTER TABLE `go_search_cache` ADD FULLTEXT ft_keywords(`name` ,`keywords`);");
-		
+
 		echo "\n\nAll done!\n\n";
 		
 		if(!$this->isCli()){
@@ -480,7 +360,7 @@ class MaintenanceController extends AbstractController {
 	protected function actionCheckDatabase($params) {
 		
 
-		if(!$this->isCli() && !\GO::user()->isAdmin())
+		if(!$this->isCli() && !GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();		 
 		
 		GO::setIgnoreAclPermissions(true);
@@ -507,7 +387,7 @@ class MaintenanceController extends AbstractController {
 		
 				
 		if(!empty($params['module'])){
-			if($params['module']=='base'){
+			if($params['module']=='base' || $params['module']=='core'){
 				$this->_checkCoreModels();
 			}else {
 				if (empty($params['package']) || $params['package'] == 'legacy') {
@@ -524,7 +404,7 @@ class MaintenanceController extends AbstractController {
 		}else
 		{
 			$this->_checkCoreModels();
-			\GO::modules()->callModuleMethod('checkDatabase', array(&$response));
+			GO::modules()->callModuleMethod('checkDatabase', array(&$response));
 		}
 
 
@@ -554,13 +434,13 @@ class MaintenanceController extends AbstractController {
 	private function _checkCoreModels(){
 		
 		$sql = "delete from core_acl where id = 0;";
-		\GO::getDbConnection()->query($sql);	
+		GO::getDbConnection()->query($sql);
 		
-		$classes=\GO::findClasses('model');
+		$classes= GO::findClasses('model');
 		foreach($classes as $model){
 			if($model->isSubclassOf('GO\Base\Db\ActiveRecord') && !$model->isAbstract()){
 
-				$m = \GO::getModel($model->getName());
+				$m = GO::getModel($model->getName());
 
 				if($m->hasColumn('user_id')) {
 					//correct missing user_id values
@@ -593,7 +473,7 @@ class MaintenanceController extends AbstractController {
 				echo "Processing ".$model->getName()."\n";
 				flush();
 
-				$m = \GO::getModel($model->getName());
+				$m = GO::getModel($model->getName());
 
 				if($m->checkDatabaseSupported()){		
 //					$stmt = $m->find(array(
@@ -665,13 +545,13 @@ class MaintenanceController extends AbstractController {
 		$lang1code = empty($params['lang1']) ? 'en' : $params['lang1'];
 		$lang2code = empty($params['lang2']) ? 'nl' : $params['lang2'];
 		
-		$commonLangFolder = new \GO\Base\Fs\Folder(\GO::config()->root_path.'language/');
+		$commonLangFolder = new \GO\Base\Fs\Folder(GO::config()->root_path.'language/');
 		$commonLangFolderContentArr = $commonLangFolder->ls();
-		$moduleModelArr = \GO::modules()->getAllModules();
+		$moduleModelArr = GO::modules()->getAllModules();
 		
 		echo "<h1>Translate tool</h1>";
 				
-		echo '<p><a href="'.\GO::url("maintenance/zipLanguage",array("lang"=>$lang2code)).'">Download zip file for '.$lang2code.'</a></p>';
+		echo '<p><a href="'. GO::url("maintenance/zipLanguage",array("lang"=>$lang2code)).'">Download zip file for '.$lang2code.'</a></p>';
 		
 		foreach ($commonLangFolderContentArr as $commonContentEl) {
 			if (get_class($commonContentEl)=='GO\Base\Fs\Folder') {
@@ -761,10 +641,10 @@ class MaintenanceController extends AbstractController {
 						}
 					}
 				} else {
-					$outputString .= '<i><font color="red">Could not compare '.str_replace(\GO::config()->root_path, '', $langFile->path()).', because it has no translation contents!</font></i><br />';
+					$outputString .= '<i><font color="red">Could not compare '.str_replace(GO::config()->root_path, '', $langFile->path()).', because it has no translation contents!</font></i><br />';
 				}
 			} else {
-				$outputString .= '<i><font color="red">Could not compare with '.str_replace(\GO::config()->root_path, '', $langFile->path()).', because it cannot be made UTF-8!</font></i><br />';
+				$outputString .= '<i><font color="red">Could not compare with '.str_replace(GO::config()->root_path, '', $langFile->path()).', because it cannot be made UTF-8!</font></i><br />';
 			}
 			
 			//for displaying errors
@@ -808,12 +688,12 @@ class MaintenanceController extends AbstractController {
 		
 		$files=array();
 		
-		$languages = array_keys(\GO::language()->getLanguages());
+		$languages = array_keys(GO::language()->getLanguages());
 		
-		$commonLangFolder = new \GO\Base\Fs\Folder(\GO::config()->root_path.'language/');
+		$commonLangFolder = new \GO\Base\Fs\Folder(GO::config()->root_path.'language/');
 		$folders = $commonLangFolder->ls();
 		
-		$modules = \GO::modules()->getAllModules();
+		$modules = GO::modules()->getAllModules();
 		foreach($modules as $module){
 			$folder = new \GO\Base\Fs\Folder($module->path.'language');
 			if($folder->exists())
@@ -848,7 +728,7 @@ class MaintenanceController extends AbstractController {
 
 			$entries = explode("\$l", $data);
 
-			//to find duplicate keys we'll reverse the lines becuase the last definition is used.
+			//to find duplicate keys we'll reverse the lines because the last definition is used.
 			$entries = array_reverse($entries);
 
 			$processedKeys = array();
@@ -902,17 +782,17 @@ class MaintenanceController extends AbstractController {
 		$fileNames = array();
 		
 		//gather file list in array
-		$commonLangFolder = new \GO\Base\Fs\Folder(\GO::config()->root_path.'language/');
+		$commonLangFolder = new \GO\Base\Fs\Folder(GO::config()->root_path.'language/');
 		if($commonLangFolder->exists()){
 			$commonLangFolderContentArr = $commonLangFolder->ls();
-			$moduleModelArr = \GO::modules()->getAllModules();
+			$moduleModelArr = GO::modules()->getAllModules();
 
 			foreach ($commonLangFolderContentArr as $commonLangFolder) {
 				if (get_class($commonLangFolder)=='GO\Base\Fs\Folder') {
 					$commonLangFileArr = $commonLangFolder->ls();
 					foreach ($commonLangFileArr as $commonLangFile)
 						if (get_class($commonLangFile)=='GO\Base\Fs\File' && $commonLangFile->name()==$langCode.'.php') {
-							$fileNames[] = str_replace(\GO::config()->root_path,'',$commonLangFile->path());
+							$fileNames[] = str_replace(GO::config()->root_path,'',$commonLangFile->path());
 						}
 				}
 			}
@@ -924,15 +804,15 @@ class MaintenanceController extends AbstractController {
 				$modLangFiles = $modLangFolder->ls();
 				foreach ($modLangFiles as $modLangFile) {
 					if ($modLangFile->name()==$langCode.'.php')
-						$fileNames[] = str_replace(\GO::config()->root_path,'',$modLangFile->path());
+						$fileNames[] = str_replace(GO::config()->root_path,'',$modLangFile->path());
 				}
 			}
 		}
 		
-		$tmpFile = \GO\Base\Fs\File::tempFile($langCode.'-'.str_replace('.','-', \GO::config()->version), 'zip');
+		$tmpFile = \GO\Base\Fs\File::tempFile($langCode.'-'.str_replace('.','-', GO::config()->version), 'zip');
 		
 		//exec zip
-		$cmdString = \GO::config()->cmd_zip.' '.$tmpFile->path().' '.implode(" ", $fileNames);
+		$cmdString = GO::config()->cmd_zip.' '.$tmpFile->path().' '.implode(" ", $fileNames);
 		exec($cmdString,$outputArr, $retVal);
 		
 		if($retVal>0)
@@ -967,7 +847,7 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionResetState($params){
 		
-		\GO::getDbConnection()->query("DELETE FROM go_state WHERE name!='summary-active-portlets' AND user_id=".intval($params['user_id']));
+		GO::getDbConnection()->query("DELETE FROM go_state WHERE name!='summary-active-portlets' AND user_id=".intval($params['user_id']));
 
 		return array('success'=>true);
 	}
@@ -987,7 +867,7 @@ class MaintenanceController extends AbstractController {
 		
 	
 		
-		if(\GO::modules()->isInstalled("calendar")){
+		if(GO::modules()->isInstalled("calendar")){
 			echo "\n\nProcessing calendar\n";
 			flush();
 			
@@ -1008,9 +888,9 @@ class MaintenanceController extends AbstractController {
 	
 	
 	protected function actionConvertToInnoDB(){
-		\GO::getDbConnection()->query("SET sql_mode = '';");
+		GO::getDbConnection()->query("SET sql_mode = '';");
 		
-		$stmt = \GO::getDbConnection()->query("SHOW TABLES");
+		$stmt = GO::getDbConnection()->query("SHOW TABLES");
 		$stmt->setFetchMode(PDO::FETCH_NUM);
 		
 		echo '<pre>';

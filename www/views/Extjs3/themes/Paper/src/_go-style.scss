@@ -86,17 +86,10 @@ p {
 	margin: dp(16) 0;
 }
 
-.blue {color: #039BE5 !important;}
-.red {color: $cDanger !important;}
-.pink {color: #D81B60 !important;}
-.purple {color: #8E24AA !important;}
-.cyan {color: #00ACC1 !important;}
-.green {color: $cSuccess !important;}
-.orange {color: #FB8C00 !important;}
-.brown {color: #6D4C41 !important;}
-.yellow {color: #FDD835 !important;}
-.bluegrey {color: #607D8B !important;}
-
+@each $name, $color in $hue {
+	.#{$name} { color: #{$color} !important;}
+	.#{$name}-fill { background-color: #{$color} !important; fill: #{$color} }
+}
 .info {
 	background-color: $cPrimaryTp;
 	color: $cPrimary;
@@ -966,13 +959,7 @@ button.filetype-pdf, button.filetype-doc {
 		}
 	}
 }
-tr.go-grid-row {
-	td {
-		border-bottom: 1px solid rgba(0,0,0,0.04);
-		vertical-align:top;
-		&.r {text-align:right}
-	}
-}
+
 .go-grid-icon { // icon in field
 	background-repeat: no-repeat;
 	background-position: 0 center;
@@ -1418,7 +1405,7 @@ table.display-panel {
 }
 tr.go-grid-row {
 	td {
-		border-bottom: 1px solid rgba(0,0,0,0.04);
+		border-bottom: 1px solid color($fg, "divider");
 		vertical-align:top;
 		//&.r {text-align:right}
 	}
@@ -1911,6 +1898,14 @@ table[id^="comments-ext"] b {
 
 	p {
 		margin: dp(8) 0px;
+	}
+
+	p, span, div {
+		font-size: sp(16);
+		color: color($fg, 'text');
+		font-weight: $font-weight-r;
+		line-height: dp(24);
+//		background-color: white;
 	}
 
 	a:link, a:visited, a:active {

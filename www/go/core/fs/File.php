@@ -40,12 +40,11 @@ class File extends FileSystemObject {
   /**
    * Get the parent folder object
    *
-   * @return Folder Parent folder object
+   * @return ?Folder Parent folder object
    */
-	public function getFolder(): Folder
+	public function getFolder(): ?Folder
 	{
-		$parentPath = dirname($this->path);		
-		return new Folder($parentPath);
+		return $this->getParent();
 	}
 
 
@@ -57,11 +56,16 @@ class File extends FileSystemObject {
    */
 	public function isWritable(): bool
 	{
-		if($this->exists()) {
-			return is_writable($this->path);
-		}else
-		{
-			return $this->getFolder()->isWritable();
+		try {
+			if($this->exists()) {
+				return is_writable($this->path);
+			}else
+			{
+				return $this->getFolder()->isWritable();
+			}
+		} catch(Throwable $e) {
+			// open basedir restriction may lead here
+			return false;
 		}
 	}
 	
@@ -105,9 +109,12 @@ class File extends FileSystemObject {
 	 * Delete the file
 	 *
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function delete(): bool
 	{
+		self::checkDeleteAllowed($this);
+
 		if (!file_exists($this->path)) {
 			return true;
 		}else{		
@@ -419,7 +426,8 @@ class File extends FileSystemObject {
 	{
 
 		if ($destination->exists()) {
-			throw new Exception("File exists in move!");
+			ErrorHandler::log("File " . $destination->getPath() . " exists in move");
+			throw new Exception("File " . $destination->getName() . " exists in move!");
 		}
 
 		if($destination->getPath() == $this->getPath()) {

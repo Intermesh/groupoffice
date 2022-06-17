@@ -45,5 +45,6 @@ modules/email/views/Extjs3/TemplateSelectionDialog.js
 modules/email/TemplatesGrid.js
 modules/email/EmailTemplateDialog.js
 modules/email/TemplateCombo.js
+modules/email/MessageContextMenu.js
 
 

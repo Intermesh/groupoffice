@@ -6,6 +6,11 @@ class goCalendar extends GoBaseBackendDiff {
 	public function DeleteMessage($folderid, $id, $contentparameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goCalendar->DeleteMessage('.$folderid.','.$id.')');
 
+		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
+			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
+			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+		}
+
 		try {
 			$event = \GO\Calendar\Model\Event::model()->findByPk($id);
 

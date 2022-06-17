@@ -2,8 +2,6 @@
 
 namespace go\core\cache;
 
-use go\core\cache\CacheInterface;
-
 /**
  * Cache implementation that uses serialized objects in files on disk.
  * The cache is persistent accross requests.
@@ -15,10 +13,6 @@ use go\core\cache\CacheInterface;
 class None implements CacheInterface {
 
 	private $cache = [];
-	
-	public function __construct() {
-		go()->warn("Not using cache. This will be slow!");
-	}
 
 	/**
 	 * Store any value in the cache
@@ -30,7 +24,6 @@ class None implements CacheInterface {
 	 */
 	public function set(string $key, $value, bool $persist = true, int $ttl = 0) {
 		$this->cache[$key] = $value;
-		return true;
 	}
 
 	/**
@@ -53,18 +46,15 @@ class None implements CacheInterface {
 	 */
 	public function delete(string $key) {
 		unset($this->cache[$key]);
-		return true;
 	}
 
 	/**
 	 * Flush all values 
 	 *
 	 * @param bool $onDestruct
-	 * @return boolean
 	 */
 	public function flush(bool $onDestruct = true) {
 		$this->cache = [];
-		return true;
 	}
 
 	public static function isSupported(): bool

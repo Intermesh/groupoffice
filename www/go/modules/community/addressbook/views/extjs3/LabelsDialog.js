@@ -220,7 +220,7 @@ go.modules.community.addressbook.LabelsDialog = Ext.extend(go.Window, {
 					}
 				})
 		}).catch(function (response) {
-			Ext.MessageBox.alert(t("Error"), response.message);
+			Ext.MessageBox.alert(t("Error"), response.description);
 		})
 			.then(function (response) {
 				go.util.viewFile(go.Jmap.downloadUrl(response.blobId, true));

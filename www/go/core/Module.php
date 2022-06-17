@@ -229,6 +229,14 @@ abstract class Module extends Singleton {
 		}catch(Exception $e) {}
 	}
 
+	private function checkDependenciesForUninstall() {
+		$dependentModuleNames = \go\core\Module::getModulesThatDependOn($this);
+
+		if (count($dependentModuleNames)>0)
+			throw new Exception(sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."),implode(', ',$dependentModuleNames)));
+
+	}
+
 	/**
 	 * Uninstall the module
 	 *
@@ -238,6 +246,8 @@ abstract class Module extends Singleton {
 	 */
 	public function uninstall(): bool
 	{
+		$this->checkDependenciesForUninstall();
+
 		if(!$this->beforeUninstall()) {
 			return false;
 		}
@@ -433,7 +443,7 @@ abstract class Module extends Singleton {
 	 * When this is not overriden there are no extra permissions. Groups van still be added
 	 * @return array name => label
 	 */
-	public function getRights(): array
+	public final function getRights(): array
 	{
 		$types = $this->rights();
 		$result = [];
@@ -443,7 +453,14 @@ abstract class Module extends Singleton {
 		return $result;
 	}
 
-	// default backwards compatible
+	/**
+	 * Returns the flags that can be set for module rights
+	 *
+	 * For existing modules always add new types to the end for migration purposes Otherwise
+	 * permissions will mix
+	 *
+	 * @return string[]
+	 */
 	protected function rights(): array
 	{
 		return ['mayManage'];

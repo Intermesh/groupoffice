@@ -55,14 +55,14 @@ JSON;
 	}
 
 	/**
-	 * /cli.php community/addressbook/AddressBook/delete --addressBook=1
+	 * /cli.php community/addressbook/AddressBook/delete --addressBookId=1
 	 */
-	public function delete($addressBook, $format = 'csv') {
+	public function delete($addressBookId) {
 		$json = <<<JSON
 [
   [
     "AddressBook/set", {
-      "destroy": [$addressBook]
+      "destroy": [$addressBookId]
     },
     "call-1"
   ]

@@ -37,12 +37,12 @@ class User extends EntityController {
 
 	protected function canDestroy(Entity $entity): bool
 	{
-		return $this->rights->mayChangeUsers;
+		return go()->getAuthState()->isAdmin();
 	}
 
 	protected function canCreate(Entity $entity): bool
 	{
-		return $this->rights->mayChangeUsers;
+		return go()->getAuthState()->isAdmin();
 	}
 	
 	/**

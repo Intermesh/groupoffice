@@ -2,7 +2,6 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.NavGrid, {
 
 	initComponent: function () {
 		Ext.apply(this, {
-			hideMenuButton: !go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks,
 			menuItems: [
 				{
 					itemId: "edit",
@@ -41,7 +40,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.NavGrid, {
 
 		this.on('beforeshowmenu', (menu, record) => {
 			menu.getComponent("edit").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
-			menu.getComponent("delete").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
+			menu.getComponent("delete").setDisabled(!go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks || record.get("permissionLevel") < go.permissionLevels.manage);
 		});
 	}
 });

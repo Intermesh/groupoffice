@@ -387,6 +387,8 @@ class Criteria {
 
 	/**
 	 * Add a parameter to bind to the SQL query
+	 *
+	 * You can only used named parameters and no ? .
 	 * 
 	 * ```````````````````````````````````````````````````````````````````````````
 	 * $query->where("userId = :userId")

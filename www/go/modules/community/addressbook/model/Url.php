@@ -18,6 +18,8 @@ class Url extends Property {
 	const TYPE_TWITTER = "twitter";
 	const TYPE_FACEBOOK = "facebook";
 	const TYPE_LINKEDIN = "linkedin";
+	const TYPE_INSTAGRAM = "instagram";
+	const TYPE_TIKTOK = "tiktok";
 
 
 	/**

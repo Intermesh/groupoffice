@@ -4,7 +4,6 @@ use GO\Base\Util\StringHelper;
 use go\core\model\Acl;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
-use Exception;
 
 class goContact extends GoBaseBackendDiff {
 	
@@ -17,8 +16,13 @@ class goContact extends GoBaseBackendDiff {
 
 	public function DeleteMessage($folderid, $id, $contentParameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goContact->DeleteMessage('.$folderid.','.$id.')');
-		
-		$contact = Contact::findById($id);		
+
+		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
+			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
+			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+		}
+
+		$contact = Contact::findById($id);
 		
 		if (!$contact) {
 			return true;

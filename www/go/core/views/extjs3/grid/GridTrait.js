@@ -24,6 +24,8 @@ go.grid.GridTrait = {
 
 	enableDelete: true,
 
+
+
 	initGridTrait : function() {
 		if (!this.keys)
 		{
@@ -47,21 +49,6 @@ go.grid.GridTrait = {
 		}
 		
 		this.initTotalDisplay();
-
-		// Handle invalid sort state which may happen when a (custom) column has been removed.
-		this.store.on("exception", function(store, type, action, options, response, arg ) {
-			if(response.message == "unsupportedSort") {
-				console.warn("Clearing invalid sort state:", store.sortInfo);
-				store.sortInfo = {};
-				//caused infinite loop while developing
-				if(!GO.debug) {
-					store.reload();
-				}
-
-				//cancel further exception handling
-				return false;
-			}
-		}, this);
 
 		if(this.multiSelectToolbarEnabled && this.getTopToolbar() && !this.getSelectionModel().singleSelect) {
 			this.initMultiSelectToolbar();
@@ -454,7 +441,7 @@ go.grid.GridTrait = {
 
 		})
 		.catch(function(reason) {
-			GO.errorDialog.show(t( 'Sorry, an unexpected error occurred: ' + reason.message));
+			GO.errorDialog.show(t( 'Sorry, an unexpected error occurred: ' + reason.description));
 		})
 		.finally(function() {
 			me.getEl().unmask();			

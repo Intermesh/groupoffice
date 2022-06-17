@@ -77,7 +77,7 @@ $updates['202104301506'][] = function() {
 
 $updates['202105211543'][] = "ALTER TABLE `tasks_task`  ADD `progressChange` TINYINT(2) NULL";
 
-$updates['202106011409'][] = "ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS `startTime` TIME NULL DEFAULT NULL";
+$updates['202106011409'][] = "ALTER TABLE `tasks_task` ADD COLUMN `startTime` TIME NULL DEFAULT NULL";
 
 
 
@@ -120,7 +120,7 @@ $updates['202107251024'][] = "ALTER TABLE `tasks_category` DROP FOREIGN KEY `tas
 $updates['202107251024'][] = "ALTER TABLE `tasks_category` CHANGE COLUMN `createdBy` `ownerId` INT(11) NULL ;";
 $updates['202107251024'][] = "ALTER TABLE `tasks_category` ADD CONSTRAINT `tasks_category_ibfk_1` FOREIGN KEY (`ownerId`) REFERENCES `core_user` (`id`);";
 
-$updates['202108101005'][] = "ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS `location` TEXT NULL;";
+$updates['202108101005'][] = "ALTER TABLE `tasks_task` ADD COLUMN `location` TEXT NULL;";
 
 $updates['202109301005'][] = "ALTER TABLE `tasks_category`
 ADD COLUMN `tasklistId` INT(11) NULL DEFAULT NULL AFTER `ownerId`,
@@ -161,3 +161,18 @@ $updates['202202081432'][] = "ALTER TABLE `tasks_task` CHANGE COLUMN `descriptio
 
 $updates['202202241617'][] = "alter table tasks_user_settings
     add defaultDate bool default false null;";
+
+
+
+$updates['202205101237'][] = "update tasks_task set filesFolderId = null where filesFolderId=0;";
+
+
+$updates['202205311153'][] = "update tasks_task set responsibleUserId = null where responsibleUserId not in (select id from core_user);";
+
+$updates['202205311153'][] = "alter table tasks_task
+    add constraint tasks_task_core_user_id_fk
+        foreign key (responsibleUserId) references core_user (id)
+            on delete set null;";
+
+$updates['202206031355'][] = 'ALTER TABLE `tasks_task` ADD COLUMN `latitude` decimal(10,8) DEFAULT NULL, ' .
+	'ADD COLUMN `longitude` decimal(11,8) DEFAULT NULL;';

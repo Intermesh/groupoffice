@@ -25,6 +25,9 @@
 namespace GO\Base\Data;
 
 
+use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
+
 class Store extends AbstractStore {
 	
   /**
@@ -154,6 +157,9 @@ class Store extends AbstractStore {
 					$this->response['deleteSuccess'] = true;
 				}
       } catch (\Exception $e) {
+
+				ErrorHandler::logException($e);
+
         $this->response['deleteSuccess'] = false;
         $this->response['deleteFeedback'] = $e->getMessage();
 				if(\GO::config()->debug)
@@ -293,9 +299,14 @@ class Store extends AbstractStore {
 		
 		if(!empty($requestParams['start']))
 			$findParams->start ($requestParams['start']);
+
+		// Security check. Only admins can query on behalf of others
+		if(!empty($requestParams['permissionLevelUserId']) && $requestParams['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
+			throw new Forbidden("Only admins can pass 'permissionLevelUserId'");
+		}
 		
 		if(isset($requestParams['permissionLevel']))
-			$findParams->permissionLevel ($requestParams['permissionLevel']);
+			$findParams->permissionLevel ($requestParams['permissionLevel'], $requestParams['permissionLevelUserId'] ?? false);
 		
 		if($extraFindParams)
 			$findParams->mergeWith($extraFindParams);

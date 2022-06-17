@@ -53,6 +53,7 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 				hide: function () {
 					this.buildFullName();
 //					this.jobTitle.focus();
+					this.focusNextEl();
 				},
 				afterrender: function (menu) {
 
@@ -61,7 +62,7 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 						enter: function (e) {
 							e.preventDefault();
 							this.nameMenu.hide();
-							this.focusNextEl();
+
 						},
 						scope: this
 					});
@@ -70,9 +71,9 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 						// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
 						// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
 						if (e.getKey() == e.TAB) {
-							this.nameMenu.hide();		
 							e.preventDefault();
-							this.focusNextEl();
+							this.nameMenu.hide();		
+
 						}
 
 					}, this);

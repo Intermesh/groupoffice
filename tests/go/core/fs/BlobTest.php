@@ -17,7 +17,7 @@ class BlobTest extends TestCase
 		$staleCountAtStart = $blobsStmt->rowCount();
 
 		//create unused blob
-		$blob = Blob::fromString("test blob text");
+		$blob = Blob::fromString("test blob text " . uniqid());
 		$blob->type = 'text/plain';
 		$blob->name = 'test.txt';
 		$blob->staleAt = new DateTime("-1 min");
@@ -27,10 +27,10 @@ class BlobTest extends TestCase
 		$this->assertEquals(true, $blob->getFile()->exists());
 
 		$blobsStmt = $blobsQuery->execute();
-
+//		echo $blobsQuery;
+//		var_dump($blobsStmt->fetchAll());
 		$this->assertEquals($staleCountAtStart + 1, $blobsStmt->rowCount());
 
-//		echo $blobs ."\n\n";
 
 		Blob::delete($blobsQuery);
 

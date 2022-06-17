@@ -47,3 +47,16 @@ $updates['202007271145'][] = 'alter table ldapauth_server alter column syncUsers
 $updates['202105101117'][] = 'alter table ldapauth_server modify syncUsersQuery text null;';
 
 $updates['202105101117'][] = 'alter table ldapauth_server modify syncGroupsQuery text null;';
+
+
+$updates['202203291610'][] = 'alter table ldapauth_server
+    add syncUsersDelete bool default false not null after syncUsersQuery;';
+
+$updates['202203291610'][] = 'alter table ldapauth_server
+    add syncGroupsDelete bool default false not null;';
+
+$updates['202203291610'][] = 'alter table ldapauth_server
+    add syncUsersMaxDeletePercentage int default 5 not null after syncUsersDelete;';
+
+$updates['202203291610'][] = 'alter table ldapauth_server
+    add syncGroupsMaxDeletePercentage int default 5 not null;';

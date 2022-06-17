@@ -324,8 +324,13 @@ GO.email.EmailComposer = function(config) {
 	this.formPanel = new Ext.form.FormPanel({
 		border : false,		
 		waitMsgTarget : true,
-		cls : 'go-form-panel',		
-		layout:"border",
+		cls : 'go-form-panel',
+		desktop: {
+			layout: "border",
+		},
+		mobile: {
+			autoScroll: true
+		},
 		items : [{
 			region:"north",
 			layout:'form',
@@ -721,7 +726,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 //				{
 
 			var previousAccountRecord = cb.store.getById(cb.getValue());
-			if (this.templatesBtn.disabled == true) {
+			if (this.templatesBtn.disabled == true || this.showConfig.emailFromTemplate) {
 				//console.log('disable template changing');
 				// do not switch template when switching From addres
 			} else if (newAccountRecord.get('template_id')!=previousAccountRecord.get('template_id')){
@@ -1381,8 +1386,9 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 //			if(this.link) {
 //				this.sendParams.link = this.link.entity + ":" + this.link.entityId;
 //			}
-			
-			this.sendParams.links = Ext.encode(this.createLinkButton.getNewLinks());
+
+			const newLinks = this.createLinkButton.getNewLinks();
+			this.sendParams.links = Ext.encode(newLinks);
 
 			this.formPanel.form.submit({
 				url : sendUrl,
@@ -1426,8 +1432,13 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 
 	
 						this.fireEvent('send', this);
+
+						if(Object.keys(newLinks).length) {
+							// this will update link detail panels
+							go.Db.store("Link").getUpdates();
+						}
 					
-						this.hide();
+						this.closeAction == "hide" ? this.hide() : this.close();
 					}else
 					{	
 						this.fireEvent('save', this);

@@ -12,6 +12,7 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 	cls: 'go-grid3-form-field',
 	hideHeaders: true,
 	clicksToEdit: 'auto',
+	autoHeight: true,
 	initComponent: function () {
 
 

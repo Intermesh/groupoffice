@@ -3,6 +3,7 @@
 namespace go\modules\community\notes\controller;
 
 use Exception;
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
@@ -79,6 +80,14 @@ class Note extends EntityController {
 	public function set(array $params): array
 	{
 		return $this->defaultSet($params);
+	}
+
+	protected function canDestroy(Entity $entity): bool
+	{
+		if(!$this->rights->mayChangeNoteBooks) {
+			return false;
+		}
+		return parent::canDestroy($entity);
 	}
 
 

@@ -125,7 +125,7 @@ class Module extends core\Module implements DomainProvider {
 	{
 		go()->debug("cn: " . $record->cn[0] ?? "NULL");
 
-		$user->username = $username;
+		$user->username = mb_strtolower($username);
 
 		if(!empty($record->jpegPhoto[0])) {
 			$blob = Blob::fromString($record->jpegPhoto[0]);
@@ -142,9 +142,9 @@ class Module extends core\Module implements DomainProvider {
 		$values = self::mappedValues($record);
 
 		if(isset($values['diskQuota'])) $user->disk_quota = $values['diskQuota'];
-		if(isset($values['recoveryEmail'])) $user->recoveryEmail = $values['recoveryEmail'];
+		if(isset($values['recoveryEmail'])) $user->recoveryEmail = mb_strtolower($values['recoveryEmail']);
 		if(isset($values['enabled'])) $user->enabled = $values['enabled'];
-		if(isset($values['email'])) $user->email = $values['email'];
+		if(isset($values['email'])) $user->email = mb_strtolower($values['email']);
 		if(isset($values['displayName'])) $user->displayName = $values['name'] = $values['displayName'];
 		if(isset($values['homeDir'])) $user->homeDir = $values['homeDir'];
 

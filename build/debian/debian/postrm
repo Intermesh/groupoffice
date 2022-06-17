@@ -6,9 +6,9 @@ dbc_go groupoffice $@
 
 
 if [ "$1" = "purge" ]; then
-    rm -f /etc/groupoffice/conf.php
+    rm -f /etc/groupoffice/config.php
     if which ucf >/dev/null 2>&1; then
-    	ucf --purge /etc/groupoffice/conf.php
+    	ucf --purge /etc/groupoffice/config.php
     fi
     db_purge
 fi

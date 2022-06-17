@@ -166,7 +166,7 @@ Ext.override(Ext.form.TextArea,{
 
 Ext.override(Ext.form.TextField,{
 	
-	//Added check for ENTER key. Becuase this code prevented form submission
+	//Added check for ENTER key. because this code prevented form submission
 	filterKeys : function(e){
 
 		if(e.ctrlKey){
@@ -295,27 +295,7 @@ Ext.override(Ext.form.BasicForm,{
 
 		this.items.each(fn);
 
-		var keys, converted = {}, currentJSONlevel;
-
-		for (var key in o) {
-
-			keys = key.split('.');
-
-			currentJSONlevel = converted;
-
-			for (var i = 0; i < keys.length; i++) {
-				if (i === (keys.length - 1)) {
-					currentJSONlevel[keys[i]] = o[key];
-				} else
-				{
-					currentJSONlevel[keys[i]] = currentJSONlevel[keys[i]] || {};
-					currentJSONlevel = currentJSONlevel[keys[i]];
-				}
-			}
-
-		}
-				
-		return converted;
+		return go.util.splitToJson(o);
 	},
 	
 	setValues: function (values) {		
@@ -1209,7 +1189,6 @@ Ext.override(Ext.KeyNav, {
 Ext.override(Ext.grid.GridView, {
 	scrollToTopOnLoad: true,
 	onLoad : function(store, records, o){
-
 			if (this.scrollToTopOnLoad && !o.keepScrollPosition){
 				if (Ext.isGecko) {
 						if (!this.scrollToTopTask) {

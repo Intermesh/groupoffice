@@ -1,3 +1,8 @@
+-- Warning:
+-- A foreign key contraint on createdBy to user and entityTypeId to core_entity
+-- caused a long lock while deleting users
+-- So we should not do that again!
+
 CREATE TABLE IF NOT EXISTS `history_log_entry` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `action` INT NULL,
@@ -10,24 +15,15 @@ CREATE TABLE IF NOT EXISTS `history_log_entry` (
   `entityTypeId` INT NOT NULL,
   `entityId` INT DEFAULT NULL,
   `remoteIp` varchar(50) null,
+  `requestId` varchar(190) default null,
   PRIMARY KEY (`id`),
   INDEX `fk_log_entry_core_user_idx` (`createdBy` ASC),
   INDEX `fk_log_entry_core_acl1_idx` (`aclId` ASC),
   INDEX `fk_log_entry_core_entity1_idx` (`entityTypeId` ASC),
-  CONSTRAINT `fk_log_entry_core_user`
-    FOREIGN KEY (`createdBy`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE SET NULL
-    ON UPDATE NO ACTION,
   CONSTRAINT `fk_log_entry_core_acl1`
     FOREIGN KEY (`aclId`)
     REFERENCES `core_acl` (`id`)
     ON DELETE SET NULL
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_log_entry_core_entity1`
-    FOREIGN KEY (`entityTypeId`)
-    REFERENCES `core_entity` (`id`)
-    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 

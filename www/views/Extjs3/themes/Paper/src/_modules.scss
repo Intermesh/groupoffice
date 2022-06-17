@@ -6,6 +6,7 @@
 	opacity: 1;
 	transition: opacity 300ms $curve-sharp;
 	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
 	background-color: rgba(0, 0, 0, 0.68);
 	&.x-hide-offsets {
 		opacity: 0;

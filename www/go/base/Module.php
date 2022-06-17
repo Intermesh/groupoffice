@@ -72,6 +72,13 @@ class Module extends Observable {
 		return $this->name();
 	}
 
+	/**
+	 * Returns the flags for different permissions a module can have.
+	 * There's always mayRead by default. This default implmentation add mayManage.
+	 * When adding new permissions make sure to add them to the end with a new integer for migration purposes.
+	 *
+	 * @return int[]
+	 */
 	public function getRights() {
 		return ['mayManage' => 1];
 	}
@@ -366,9 +373,7 @@ class Module extends Observable {
 		}catch(\Exception $e){
 			throw new \Exception("SQL query failed: ".$query."\n\n".$e->getMessage());
 		}
-		
-		\GO::clearCache();
-		Observable::cacheListeners();
+		go()->rebuildCache(true);
 		//call saveUser for each user
 //		$stmt = Model\User::model()->find(array('ignoreAcl'=>true));		
 //		while($user = $stmt->fetch()){

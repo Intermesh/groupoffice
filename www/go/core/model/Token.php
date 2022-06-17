@@ -2,10 +2,13 @@
 namespace go\core\model;
 
 use DateInterval;
+use DateTimeZone;
+use Exception;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
 use go\core\Environment;
+use go\core\ErrorHandler;
 use go\core\orm\Mapping;
 use stdClass;
 use go\core\http\Request;
@@ -110,13 +113,16 @@ class Token extends Entity {
 		return parent::defineMapping()
 		->addTable('core_auth_token', 'token');
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	protected function init() {
 		parent::init();
 		
 		if($this->isNew()) {	
 			$this->setExpiryDate();
-			$this->lastActiveAt = new \DateTime();
+			$this->lastActiveAt = new DateTime("now", new DateTimeZone("UTC"));
 			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
@@ -128,9 +134,13 @@ class Token extends Entity {
 		}
 	}
 
-	public function activity() {
-		if($this->lastActiveAt < new \DateTime("-1 mins")) {
-			$this->lastActiveAt = new \DateTime();
+	/**
+	 * @throws Exception
+	 */
+	public function activity(): bool
+	{
+		if($this->lastActiveAt < new DateTime("-1 mins", new DateTimeZone("UTC"))) {
+			$this->lastActiveAt = new DateTime("now", new DateTimeZone("UTC"));
 
 			//also refresh token
 			if(isset($this->expiresAt)) {
@@ -145,30 +155,34 @@ class Token extends Entity {
 
 		return false;
 	}
-	
-	/**
-	 * Set an authentication method to completed and add it to the 
-	 * "completedAuth" property
-	 * 
-	 * @param int $authId
-	 * @param boolean $lastAuth
-	 * @return boolean save success
-	 */
-	public function authCompleted($authId, $lastAuth=false){
-		$auths = explode(',',$this->completedAuth);
-		$auths[] = $authId;
-		$this->completedAuth = implode(',',$auths);
-		
-		if($lastAuth){
-			return $this->refresh();
-		}
-	
-		return $this->save();
-	}
-	
+
+//	/**
+//	 * Set an authentication method to completed and add it to the
+//	 * "completedAuth" property
+//	 *
+//	 * @param int $authId
+//	 * @param boolean $lastAuth
+//	 * @return boolean save success
+//	 * @throws Exception
+//	 */
+//	public function authCompleted($authId, $lastAuth=false): bool
+//	{
+//		$auths = explode(',',$this->completedAuth);
+//		$auths[] = $authId;
+//		$this->completedAuth = implode(',',$auths);
+//
+//		if($lastAuth){
+//			return $this->refresh();
+//		}
+//
+//		return $this->save();
+//	}
+//
 	private function setClient() {
 		if(isset($_SERVER['REMOTE_ADDR'])) {
 			$this->remoteIpAddress = $_SERVER['REMOTE_ADDR'];
+		} else if(Environment::get()->isCli()) {
+			$this->remoteIpAddress = 'CLI';
 		}
 
 		if(isset($_SERVER['HTTP_USER_AGENT'])) {
@@ -184,25 +198,34 @@ class Token extends Entity {
 		}
 
 	}
-	
-	private static function generateToken(){
+
+	/**
+	 * @throws Exception
+	 */
+	private static function generateToken(): string
+	{
 		return uniqid().bin2hex(random_bytes(16));
 	}
 
 	/**
 	 * Check if the token is expired.
-	 * 
+	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
-	public function isExpired(){
+	public function isExpired(): bool
+	{
 
 		if(!isset($this->expiresAt)) {
 			return false;
 		}
 		
-		return $this->expiresAt < new DateTime();
+		return $this->expiresAt < new DateTime("now", new DateTimeZone("UTC"));
 	}
-		
+
+	/**
+	 * @throws Exception
+	 */
 	private function internalRefresh() {
 		if(!isset($this->accessToken)) {
 			$this->accessToken = $this->generateToken();
@@ -211,32 +234,43 @@ class Token extends Entity {
 			$this->setExpiryDate();
 		}
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	public function setLoginToken() {
 		$this->loginToken = $this->generateToken();
 		$this->setLoginExpiryDate();
 	}
-	
+
 	/**
 	 * Set new tokens and expiry date
-	 * 
+	 *
 	 * @return Boolean
+	 * @throws Exception
 	 */
-	public function refresh() {
+	public function refresh(): bool
+	{
 		
 		$this->internalRefresh();
 		
 		return $this->save();
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function setExpiryDate() {
-		$expireDate = new DateTime();
+		$expireDate = new DateTime("now", new DateTimeZone("UTC"));
 		$expireDate->add(new DateInterval(Token::LIFETIME));
 		$this->expiresAt = $expireDate;		
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function setLoginExpiryDate() {
-		$expireDate = new DateTime();
+		$expireDate = new DateTime("now", new DateTimeZone("UTC"));
 		$expireDate->add(new DateInterval(Token::LOGIN_LIFETIME));
 		$this->expiresAt = $expireDate;		
 	}
@@ -249,13 +283,14 @@ class Token extends Entity {
 	 * @param array $properties the properties to fetch
 	 * @return User
 	 */
-	public function getUser(array $properties = []) {
+	public function getUser(array $properties = []): User
+	{
 		if(!empty($properties)) {
-			return $this->user ?? \go\core\model\User::findById($this->userId, $properties);
+			return $this->user ?? User::findById($this->userId, $properties, true);
 		}
 
 		if(!$this->user) {
-			$this->user = \go\core\model\User::findById($this->userId);
+			$this->user = User::findById($this->userId, []);
 		}
 		return $this->user;
 	}
@@ -264,12 +299,13 @@ class Token extends Entity {
 	 * Authenticate this token
 	 *
 	 * @return bool success
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	public function setAuthenticated(){
+	public function setAuthenticated(): bool
+	{
 		
 		$user = $this->getUser();
-		$user->lastLogin = new DateTime();
+		$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
 		$user->loginCount++;
 		$user->language = go()->getLanguage()->getIsoCode();
 		if(!$user->save()) {
@@ -288,13 +324,15 @@ class Token extends Entity {
 		// Create accessToken and set expire time
 		return true;						
 	}
-	
+
 	/**
 	 * Check if this token is authenticated
-	 * 
+	 *
 	 * @return bool
+	 * @throws Exception
 	 */
-	public function isAuthenticated() {
+	public function isAuthenticated(): bool
+	{
 		return isset($this->accessToken) && !$this->isExpired();
 	}
 	
@@ -320,7 +358,7 @@ class Token extends Entity {
       //Avoid session id in url's to prevent session hijacking.
       ini_set('session.use_only_cookies',1);
 
-      ini_set('session.cookie_secure',\go\core\http\Request::get()->isHttps());
+      ini_set('session.cookie_secure', Request::get()->isHttps());
    
 			session_name('groupoffice');
       session_start();
@@ -345,7 +383,8 @@ class Token extends Entity {
 	 * @param BaseAuthenticator $authenticator
 	 * @return boolean
 	 */
-	public function addPassedAuthenticator(BaseAuthenticator $authenticator){
+	public function addPassedAuthenticator(BaseAuthenticator $authenticator): bool
+	{
 		$id = $authenticator::id();
 		$methods = $this->getPassedAuthenticators();
 		
@@ -356,14 +395,16 @@ class Token extends Entity {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Set the given authenticator ID's as passed
-	 * 
+	 *
 	 * @param string[] $authenticators
 	 * @return boolean
+	 * @throws Exception
 	 */
-	public function setPassedAuthenticator($authenticators){
+	public function setPassedAuthenticator(array $authenticators): bool
+	{
 		$this->passedAuthenticators = trim(implode('|',$authenticators),'|');
 		return $this->save();
 	}
@@ -373,7 +414,8 @@ class Token extends Entity {
 	 * 
 	 * @return string[]
 	 */
-	public function getPassedAuthenticators(){
+	public function getPassedAuthenticators(): array
+	{
 		return empty($this->passedAuthenticators) ? [] : explode('|', $this->passedAuthenticators);
 	}
 	
@@ -382,7 +424,8 @@ class Token extends Entity {
 	 *
 	 * @return BaseAuthenticator[]
 	 */
-	public function getPendingAuthenticators(){
+	public function getPendingAuthenticators(): array
+	{
 		
 		$pending = [];
 		
@@ -406,7 +449,8 @@ class Token extends Entity {
 	 * @param array $data
 	 * @return SecondaryAuthenticator[]
 	 */
-	public function validateSecondaryAuthenticators(array $data) {
+	public function validateSecondaryAuthenticators(array $data): array
+	{
 		
 		$response = [];
 		$authenticators = $this->getPendingAuthenticators();
@@ -429,39 +473,55 @@ class Token extends Entity {
 	 *
 	 * @see GarbageCollection
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	public static function collectGarbage() {
+	public static function collectGarbage(): bool
+	{
 		return static::delete(
 			(new Query)
 				->where('expiresAt', '!=', null)
-				->andWhere('expiresAt', '<', new DateTime()));
+				->andWhere('expiresAt', '<', new DateTime("now", new DateTimeZone("UTC"))));
 	}
 
-	protected static function internalDelete(\go\core\orm\Query $query): bool
+	/**
+	 * @throws Exception
+	 */
+	protected static function internalDelete(Query $query): bool
 	{
-		foreach(self::find()->mergeWith($query)->selectSingleValue('accessToken') as $accessToken) {
-			go()->getCache()->delete('token-' . $accessToken);
 
-			Response::get()->setCookie('accessToken', "", [
-				'expires' => time() - 3600,
-				"path" => "/",
-				"samesite" => "Lax",
-				"domain" => Request::get()->getHost()
-			]);
-
+		// todo remove this part when logout issue is solved
+		$debugEnabled = go()->getDebugger()->enabled;
+		if(!$debugEnabled) {
+			go()->getDebugger()->enable(true);
 		}
 
-		return parent::internalDelete($query);
+		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
+		go()->debug("Deleting token query: " . $deleteQuery);
+		go()->getDebugger()->debugCalledFrom();
+		foreach($deleteQuery as $accessToken) {
+
+			go()->debug("Deleting token: " . $accessToken);
+			go()->getCache()->delete('token-' . $accessToken);
+		}
+
+		$success =  parent::internalDelete($query);
+
+		if(!$debugEnabled) {
+			go()->getDebugger()->enabled = false;
+		}
+
+		return $success;
 	}
 
 	/**
 	 * Get the permission level of the module this controller belongs to.
 	 *
-	 * @todo: improve performance by cache rights per user?
+	 * @param class-string<Entity> $cls
 	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
+	 * @throws Exception
+	 * @todo: improve performance by cache rights per user?
 	 */
-	public function getClassRights($cls)
+	public function getClassRights(string $cls): stdClass
 	{
 		//if(!isset($this->classRights[$cls])) {
 			$mod = Module::findByClass($cls, ['id', 'name', 'package']);
@@ -478,13 +538,16 @@ class Token extends Entity {
 	 * Destroys all tokens except
 	 *
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	public static function logoutEveryoneButAdmins() {
+	public static function logoutEveryoneButAdmins(): bool
+	{
 		$admins = (new Query)->select('userId')->from('core_user_group')->where('groupId', '=', Group::ID_ADMINS);
 		$q = (new Query)
 			->where('expiresAt', '!=', null)
 			->where('userId', 'NOT IN ', $admins);
+
+		ErrorHandler::log("Logout everyone but admins is used!");
 
 		return self::delete($q) && RememberMe::delete($q);
 	}
@@ -492,6 +555,15 @@ class Token extends Entity {
 	public function setCookie() {
 		Response::get()->setCookie('accessToken', $this->accessToken, [
 			'expires' => 0,
+			"path" => "/",
+			"samesite" => "Lax",
+			"domain" => Request::get()->getHost()
+		]);
+	}
+
+	public static function unsetCookie() {
+		Response::get()->setCookie('accessToken', "", [
+			'expires' => time() - 3600,
 			"path" => "/",
 			"samesite" => "Lax",
 			"domain" => Request::get()->getHost()

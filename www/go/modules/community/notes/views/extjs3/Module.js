@@ -20,6 +20,18 @@ go.Modules.register("community", 'notes', {
 				title: "Query"
 			},
 			{
+				name: 'name',
+				type: "string",
+				multiple: true,
+				title: t("Name")
+			},
+			{
+				name: 'content',
+				type: "string",
+				multiple: true,
+				title: t("Content")
+			},
+			{
 				title: t("Has links to..."),
 				name: 'link',
 				multiple: false,

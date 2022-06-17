@@ -144,6 +144,8 @@ if (!empty($_POST)) {
 	}
 	catch(Exception $e) {
         $error = $e->getMessage();
+
+        echo $e->getTraceAsString();
 	}
 
 }

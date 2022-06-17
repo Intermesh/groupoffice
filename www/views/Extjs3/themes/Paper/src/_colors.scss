@@ -54,7 +54,7 @@ $fg: (
 	line: rgba(black, 0.12),
 	disabled: rgba(black, 0.38),
 	disabled-button: rgba(black, 0.26),
-	track: rgba(black, 0.26),
+	track: rgba(#444444, 0.26),
 	disabled-text: rgba(black, 0.38),
 	hint-text: rgba(black, 0.38),
 	textbox-line: rgba(black, 0.42),
@@ -103,4 +103,17 @@ $cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
 $cHover: 		color($bg, 'hover') !default;
 $cActive: 		color($grey, 200) !default; // focussed
 $cAnchor: 		$cPrimary !default;
+
+$hue: (
+	"blue": #039BE5,
+	"red":#E57373,
+	"pink": #EC407A,
+	"purple": #8E24AA,
+	"cyan": #00ACC1,
+	"green":#43A047,
+	"orange": #FB8C00,
+	"brown": #6D4C41,
+	"yellow": #FDD170,
+	"bluegrey": #607D8B
+) !default;
 

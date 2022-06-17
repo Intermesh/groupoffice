@@ -777,18 +777,32 @@ class StringHelper {
 
 	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
 		# Wipe all block comments
-//		$css = preg_replace('!/\*.*?\*/!s', '', $css);
+		$css = preg_replace('!/\*.*?\*/!s', '', $css);
 
 		$parts = explode('}', $css);
+		$keyframeStarted = false;
 		$mediaQueryStarted = false;
 
 		foreach($parts as &$part)
 		{
 			$part = trim($part); # Wht not trim immediately .. ?
-			if(empty($part)) continue;
+			if(empty($part)) {
+				$keyframeStarted = false;
+				continue;
+			}
 			else # This else is also required
 			{
 				$partDetails = explode('{', $part);
+
+				if (strpos($part, 'keyframes') !== false) {
+					$keyframeStarted = true;
+					continue;
+				}
+
+				if($keyframeStarted) {
+					continue;
+				}
+
 				if(substr_count($part, "{")==2)
 				{
 					$mediaQuery = $partDetails[0]."{";
@@ -866,7 +880,8 @@ class StringHelper {
 	 *
 	 * This also removes everything outside the body and replaces mailto links
 	 *
-	 * @param	StringHelper $text Plain text string
+	 * @todo do this all client side in the next email module. Using DomParser api?
+	 * @param	string $text Plain text string
 	 * @access public
 	 * @return StringHelper HTML formatted string
 	 */
@@ -879,14 +894,17 @@ class StringHelper {
 		//remove strange white spaces in tags first
 		//sometimes things like this happen <style> </ style >
 		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
-		//remove comments because they might interfere
-		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
-		$html = preg_replace('!/\*.*?\*/!s', '', $html);
 
+		// extract style before removing comments because sometimes style is wrapped in a comment
+		// <style><!-- body{} --></style>
 		if($preserveHtmlStyle) {
 			$prefix = 'groupoffice-msg-' . uniqid();
 			$styles = self::extractStyles($html, $prefix);
 		}
+
+		//remove comments because they might interfere
+		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
+		$html = preg_replace('!/\*.*?\*/!s', '', $html);
 
 		$to_removed_array = array (
 		"'<!DOCTYPE[^>]*>'usi",
@@ -928,7 +946,7 @@ class StringHelper {
 //		 $html = "<div onclick=\"yo\" online='1' test='onclick' onclick=\"yo\"></div>\n\n\n" . $html;
 
 		$html = preg_replace($to_removed_array, '', $html);
-		//Remove any attribute starting with "on" or xmlns. Had to do this always becuase many mails contain weird tags like online="1".
+		//Remove any attribute starting with "on" or xmlns. Had to do this always because many mails contain weird tags like online="1".
 		//These were detected as xss attacks by detectXSS().
 
 //		$regex = '#(<[^>\s]*)\s(?:on|xmlns)[^>\s]+#iu';

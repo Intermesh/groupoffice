@@ -411,6 +411,12 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				//Some times clipboard data holds multiple versions. When copy pasting from excel you get html, plain text and an image.
 				//We prefer to use the html in that case so we exit if found.
 				if (item.type == 'text/html') {
+					e.preventDefault();
+					item.getAsString((s) => {
+						//convert style in the head to an inline style tag
+						const inlined = go.util.convertStyleToInline(s);
+						this.insertAtCursor(inlined);
+					});
 					return;
 				}
 

@@ -181,14 +181,17 @@ go.Jmap = {
 	 */
 	poll : function() {
 		console.log("Start check for updates every 60s.");
-		setInterval(function() {
+		const checkFn = function() {
 			go.Db.stores().forEach(function(store) {
 				store.getState().then(function(state) {
 					if (state)
 						store.getUpdates();
 				});
 			})
-		}, 5000);
+
+		};
+		checkFn();
+		setInterval(checkFn, 60000);
 	},
 	
 	/**
@@ -452,7 +455,7 @@ go.Jmap = {
 
 				for(var i = 0, l = opts.jsonData.length; i < l; i++) {
 					var clientCallId = opts.jsonData[i][2];
-					this.requestOptions[clientCallId].reject({message: response.responseText});
+					this.requestOptions[clientCallId].reject({description: response.responseText});
 					delete this.requestOptions[clientCallId];
 				}
 				

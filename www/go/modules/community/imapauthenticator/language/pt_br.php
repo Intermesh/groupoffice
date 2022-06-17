@@ -2,7 +2,7 @@
 return array (
   'IMAP Authenticator' => 'Autenticador IMAP',
   'Server profile' => 'Perfil do servidor',
-  'Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.' => 'Digite os domínios que este servidor imap deve usar para autenticar. Os usuários devem fazer login com seu endereço de e-mail e, se o domínio corresponder a este perfil, ele será usado.',
+  'Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.' => 'Digite os domínios que este servidor imap deve usar para autenticar. Os usuários devem fazer login com seu endereço de e-mail e',
   'Domains' => 'Domínios',
   'Validate certificate' => 'Validar certificado',
   'Remove domain from username' => 'Remover domínio do username',

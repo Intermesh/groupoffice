@@ -313,7 +313,7 @@ class User extends Entity {
    *
    * @return Group
    */
-	public function getPersonalGroup(): Group
+	public function getPersonalGroup(): ?Group
 	{
 		if(empty($this->personalGroup)){
 			$this->personalGroup = Group::find()->where(['isUserGroupFor' => $this->id])->single();
@@ -649,6 +649,7 @@ class User extends Entity {
       });
 	}
 
+	private $isAdmin;
 
   /**
    * Check if use is an admin
@@ -657,10 +658,15 @@ class User extends Entity {
    */
 	public function isAdmin(): bool
 	{
-		return !!(new Query)
-			->select()
-			->from('core_user_group')
-			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single();
+		if(!isset($this->isAdmin)) {
+			$this->isAdmin = !!(new Query)
+				->select()
+				->from('core_user_group')
+				->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])
+				->single();
+		}
+
+		return $this->isAdmin;
 	}
 
 	public static function isAdminById($userId): bool
@@ -758,8 +764,9 @@ class User extends Entity {
 		
 		if(!parent::internalSave()) {
 			return false;
-		}	
-		
+		}
+
+		/// TODO change log problem with deadlocks
 		$this->saveContact();
 
 		if(isset($this->personalGroup) && $this->personalGroup->isModified()) {
@@ -966,8 +973,6 @@ class User extends Entity {
 	{
 
 		$query->andWhere('id != 1');
-				
-		go()->getDbConnection()->beginTransaction();
 
 		go()->getDbConnection()->delete('go_settings', (new Query)->where('user_id', 'in', $query))->execute();
 		//go()->getDbConnection()->delete('go_reminders', (new Query)->where('user_id', 'in', $query))->execute();
@@ -980,7 +985,7 @@ class User extends Entity {
 			return false;
 		}
 
-		return go()->getDbConnection()->commit();
+		return true;
 	}
 
 
@@ -1258,6 +1263,11 @@ class User extends Entity {
 		}
 
 		return Token::delete($query) && RememberMe::delete($query);
+	}
+
+	public function findAclId(): ?int
+	{
+		return $this->getPersonalGroup()->findAclId();
 	}
 
 }

@@ -51,8 +51,8 @@ go.modules.community.googleauthenticator.enable = (user, password, countDown, bl
 			})
 			.catch((error) => {
 
-				if(error.message && !error.response) {
-					GO.errorDialog.show(error.message);
+				if(error.description && !error.response) {
+					GO.errorDialog.show(error.description);
 				}
 
 				// When the password is not correct, call itself again to try again
@@ -72,17 +72,28 @@ go.modules.community.googleauthenticator.enable = (user, password, countDown, bl
 			msg = "<p class='info'><i class='icon'>info</i> " + t("Your system administrator requires you to setup two factor authentication") + '</p>' + msg;
 		}
 
-		return go.AuthenticationManager.passwordPrompt(
-			t('Enable Google authenticator'),
-			msg)
+		const passwordPrompt = () => {
+			return go.AuthenticationManager.passwordPrompt(
+				t('Enable Google authenticator'),
+				msg,
+				!countDown && !block
+				)
 
-			.then((password) => {
-				return requestSecret(user, password);
+				.then((password) => {
+					return requestSecret(user, password);
 
-			}).catch(() => {
-				//user cancelled
-				this.close();
+				}).catch(() => {
+					//user cancelled
+					if(countDown || block) {
+						// cancel not allowed
+						return passwordPrompt();
+					} else {
+						this.close();
+					}
 			});
+		}
+
+		return passwordPrompt();
 	} else
 	{
 		return requestSecret(user, password);

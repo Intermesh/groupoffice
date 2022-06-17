@@ -13,6 +13,11 @@ class goTask extends GoBaseBackendDiff {
 	public function DeleteMessage($folderid, $id, $contentparameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goTask->DeleteMessage(' . $folderid . ',' . $id . ')');
 
+		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
+			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
+			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+		}
+
 		$task = Task::findById($id);
 
 		if (!$task) {
@@ -92,6 +97,8 @@ class goTask extends GoBaseBackendDiff {
 		$task = Task::findById($id);
 		$message = new SyncTask();
 		if ($task) {
+			$message->uid = $task->getUid();
+
 			if($task->start) {
 				$message->startdate = $task->start->format("U");
 				$message->utcstartdate = $this->makeUTCDate($task->start);
@@ -168,6 +175,9 @@ class goTask extends GoBaseBackendDiff {
 				ZLog::Write(LOGLEVEL_DEBUG, "Found task");
 			}
 
+			if (isset($message->uid))
+				$task->setUid($message->uid);
+
 			if (isset($message->startdate))
 				$task->start = new DateTime("@" . $message->startdate);
 
@@ -238,7 +248,7 @@ class goTask extends GoBaseBackendDiff {
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 		}
 
-		return $this->StatMessage($folderid, $id);
+		return $this->StatMessage($folderid, $task->id);
 	}
 
 	/**

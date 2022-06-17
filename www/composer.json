@@ -17,20 +17,19 @@
     "ext-calendar": "*",
     "ext-xml": "*",
     "ext-intl": "*",
-    "sabre/dav": "4.1.*",
+    "sabre/dav": "4.3.*",
     "ext-json": "*",
     "ext-openssl": "*",
     "swiftmailer/swiftmailer": "^6.3.0",
     "michelf/php-markdown": "^1.7",
     "phpoffice/phpexcel": "^1.8",
-    "tecnickcom/tcpdf": "6.3.*",
-    "mtdowling/cron-expression": "^1.2",
-    "setasign/fpdi": "^2.2",
-    "setasign/fpdi-tcpdf": "^2.2",
-    "matthiasmullie/minify": "^1.3",
+    "tecnickcom/tcpdf": "@stable",
+    "dragonmantank/cron-expression": "@stable",
+    "setasign/fpdi": "@stable",
+    "matthiasmullie/minify": "1.3.66",
     "defuse/php-encryption": "^2.1",
     "html2text/html2text": "^4.1",
-    "sabre/vobject": "^4.2",
+    "sabre/vobject": "^4.4",
     "phpseclib/mcrypt_compat": "^1.0",
     "league/oauth2-server": "^8.3.3",
     "guzzlehttp/psr7": "^1.6",
@@ -40,6 +39,7 @@
     "lcobucci/jwt": "^3.4.0",
     "firebase/php-jwt": "^5.2",
     "donatj/phpuseragentparser": "^1.4",
+    "league/oauth2-google": "^4.0",
     "fakerphp/faker": "^1.19",
     "ext-fileinfo": "*"
   },
@@ -57,6 +57,12 @@
     "psr-4": {
       "go\\core\\": "go/core/",
       "go\\modules\\": "go/modules/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "7.3.0"
     }
   }
 }

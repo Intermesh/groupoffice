@@ -3,6 +3,7 @@
 namespace go\core\jmap;
 
 use Exception;
+use go\core\acl\model\AclOwnerEntity;
 use go\core\fs\File;
 use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
@@ -13,8 +14,10 @@ use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
+use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use go\core\util\Lock;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -198,23 +201,13 @@ abstract class EntityController extends Controller {
    */
 	protected function defaultQuery(array $params): array
 	{
-
 		$state = $this->getState();
-
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
 		$idsQuery->fetchMode(PDO::FETCH_COLUMN, 0);
 
-
 		try {
-//			foreach ($idsQuery as $record) {
-//				if (!isset($count)) {
-//					$count = count($record);
-//				}
-//				$ids[] = $count ? $record[0] : implode('-', $record);
-//			}
-
 			$ids = $idsQuery->all();
 
 			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
@@ -425,7 +418,7 @@ abstract class EntityController extends Controller {
 
 		$unsorted = [];
 		$foundIds = [];
-		$result['list'] = [];
+
 		foreach($query as $e) {
 			$arr = $e->toArray();
 			$arr['id'] = $e->id();
@@ -595,25 +588,30 @@ abstract class EntityController extends Controller {
    */
 	protected function defaultSet(array $params): array
 	{
-
 		$this->trackSaves();
 
 		$p = $this->paramsSet($params);
 
+		// make sure there are no concurrent set request to avoid clients missing states
+		$lock = new Lock("jmap-set-lock");
+		if (!$lock->lock()) {
+			throw new Exception("Could not obtain lock");
+		}
+
 		$oldState = $this->getState();
 
 		if (isset($p['ifInState']) && $p['ifInState'] != $oldState) {
-			throw new StateMismatch();
+			throw new StateMismatch("State mismatch. The server state " . $oldState . ' does not match your state ' .$p['ifInState']);
 		}
 
 		$result = [
-				'accountId' => $p['accountId'],
-				'created' => null,
-				'updated' => null,
-				'destroyed' => null,
-				'notCreated' => null,
-				'notUpdated' => null,
-				'notDestroyed' => null,
+			'accountId' => $p['accountId'],
+			'created' => null,
+			'updated' => null,
+			'destroyed' => null,
+			'notCreated' => null,
+			'notUpdated' => null,
+			'notDestroyed' => null,
 		];
 
 		$this->createEntitites($p['create'], $result);
@@ -623,7 +621,12 @@ abstract class EntityController extends Controller {
 		$this->mergeOtherSaves($result);
 
 		$result['oldState'] = $oldState;
+
+		EntityType::push();
+
 		$result['newState'] = $this->getState();
+
+		$lock->unlock();
 
 		return $result;
 	}
@@ -668,6 +671,7 @@ abstract class EntityController extends Controller {
 
   /**
    * Override this if you want to implement permissions for creating entities
+   * New properties have already been set so you can validate per property too if needed.
    *
    * @param Entity $entity
    * @return boolean
@@ -676,6 +680,7 @@ abstract class EntityController extends Controller {
 	{		
 		return $entity->hasPermissionLevel(Acl::LEVEL_CREATE);
 	}
+
 
   /**
    * Creates a single entity
@@ -698,16 +703,28 @@ abstract class EntityController extends Controller {
 
 	/**
 	 * Override this if you want to change the default permissions for updating an entity.
+	 * New properties have already been set so you can validate per property too if needed.
 	 * 
 	 * @param Entity $entity
 	 * @return bool
 	 */
 	protected function canUpdate(Entity $entity): bool
 	{
-		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE);
+		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE) && $this->checkAclChange($entity);
 	}
 
-  /**
+
+	protected function checkAclChange(Entity $entity): bool
+	{
+		if(!($entity instanceof AclOwnerEntity)) {
+			return true;
+		}
+
+		return $entity->getPermissionLevel() == Acl::LEVEL_MANAGE || !$entity->isAclModified();
+	}
+
+
+	/**
    * Updates the entities
    *
    * @param array $update
@@ -719,7 +736,7 @@ abstract class EntityController extends Controller {
 			if(empty($properties)) {
 				$properties = [];
 			}
-			$entity = $this->getEntity($id);			
+			$entity = $this->getEntity($id);
 			if (!$entity) {
 				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Item not found"));
 				continue;
@@ -752,6 +769,13 @@ abstract class EntityController extends Controller {
 			//The server must return all properties that were changed during a create or update operation for the JMAP spec
 			$entityProps = new ArrayObject($entity->toArray());			
 			$diff = $entityProps->diff($clientProps);
+
+			// In some rare cases like password values may be set but not retrieved. We must add "null" here for the client.
+			foreach($properties as $key => $value) {
+				if(!$entityProps->hasKey($key)) {
+					$diff[$key] = null;
+				}
+			}
 			
 			$result['updated'][$id] = empty($diff) ? null : $diff;
 		}
@@ -853,6 +877,8 @@ abstract class EntityController extends Controller {
 		$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);
 
 		$result['accountId'] = $p['accountId'];
+
+		go()->debug($result);
 
 		return $result;
 	}

@@ -1,6 +1,7 @@
 <?php
 require('../vendor/autoload.php');
 use go\core\App;
+use go\core\fs\Folder;
 use go\core\util\IniFile;
 
 
@@ -17,12 +18,13 @@ function dbConnect($config){
 	if(isset($pdo)) {
 		return $pdo;
 	}
-	try{		
-		$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
+
+	$dsn = go()->createDsn($config['db_name'] ?? "groupoffice", $config);
+	try {
 		$pdo = new PDO($dsn, $config['db_user'], $config['db_pass']);
 	}
 	catch(Exception $e){
-		$dbConnectError = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
+		$dbConnectError = "Could not connect to the database with DSN = '" . $dsn . "' with username '" . ($config['db_user'] ?? "groupoffice") . " and " . (empty($config['db_pass']) ? "NOT using password" : "USING a password") . ". The database returned this error:<br />".$e->getMessage();
 	}
 
 	if($pdo) {
@@ -40,14 +42,13 @@ function dbConnect($config){
 
 $configFile = App::findConfigFile();
 if(!$configFile) {
-  $configFile = '/etc/groupoffice/config.php';
+    $configFile = '/etc/groupoffice/config.php';
 } else
 {
 	require($configFile);
 }
 
-
-
+$mustSave = false;
 
 if($_SERVER['REQUEST_METHOD'] != 'POST')
 {
@@ -56,10 +57,14 @@ if($_SERVER['REQUEST_METHOD'] != 'POST')
 	$config['tmpdir'] = $config['tmpdir'] ?? "/tmp/groupoffice";
 	
 	//check if config.ini is already prefilled with usable data (Docker)
-	$tmpFolder = new \go\core\fs\Folder($config['tmpdir']);
-	$dataFolder = new \go\core\fs\Folder($config['file_storage_path']);
+	$tmpFolder = new Folder($config['tmpdir']);
+	$dataFolder = new Folder($config['file_storage_path']);
+    if(!$dataFolder->isWritable() && isset($_SERVER['DOCUMENT_ROOT'])) {
+       $dataFolder = new Folder(dirname($_SERVER['DOCUMENT_ROOT']) . '/groupoffice');
+       $mustSave = true;
+    }
 	
-	if(dbConnect($config) && $dataFolder->isWritable() && $tmpFolder->isWritable()) {
+	if(dbConnect($config) && $dataFolder->isWritable() && $tmpFolder->isWritable() && !$mustSave) {
 		header("Location: install.php");
 		exit();
 	}
@@ -86,8 +91,8 @@ if($_SERVER['REQUEST_METHOD'] != 'POST')
 	$config['db_pass'] =$_POST['dbPassword'];
 	$config['db_port'] =$_POST['dbPort'];
 	
-	$tmpFolder = new \go\core\fs\Folder($config['tmpdir']);
-	$dataFolder = new \go\core\fs\Folder($config['file_storage_path']);
+	$tmpFolder = new Folder($config['tmpdir']);
+	$dataFolder = new Folder($config['file_storage_path']);
 	
 
 	if($dataFolder->isWritable() && $tmpFolder->isWritable() && dbConnect($config)) {
@@ -113,7 +118,16 @@ if($_SERVER['REQUEST_METHOD'] != 'POST')
 require('header.php');
 ?>
 
-		<?php if(!is_writable($configFile)): ?>
+		<?php
+        try {
+	        $isWritable = is_writable($configFile);
+        } catch(Throwable $e) {
+            //open basedir restriction
+            $isWritable = false;
+        }
+        if(!$isWritable):
+
+          ?>
 		
 		<section>
 			<fieldset>
@@ -143,7 +157,7 @@ require('header.php');
 				?>
 				
 				<p>
-					<input type="text" name="dataPath" value="<?=$config['file_storage_path']?>" placeholder="" required />
+					<input type="text" name="dataPath" value="<?=$dataFolder->getPath()?>" placeholder="" required />
 					<label>Data folder</label>
 				</p>
 				

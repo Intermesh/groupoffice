@@ -155,3 +155,9 @@ $updates['202202070921'][] = "alter table addressbook_user_settings
 
 $updates['202202070921'][] = "update `addressbook_phone_number` set type='mobile' where type='cell';";
 
+
+$updates['202205101237'][] = "update addressbook_contact set filesFolderId = null where filesFolderId=0;";
+
+// Were missing for Softaculous. Add them again. Will be ignored if already there.
+$updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD nameBank varchar(50);';
+$updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD BIC varchar(11);';

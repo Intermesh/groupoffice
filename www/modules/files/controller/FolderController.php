@@ -7,7 +7,7 @@ use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
-use go\core\orm\SearchableTrait;
+use go\core\orm\EntityType;
 use go\core\util\StringUtil;
 use GO\Files\Model\Folder;
 
@@ -52,6 +52,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$oldAllowDeletes = \GO\Base\Fs\File::setAllowDeletes(false);
 
 		\GO::$disableModelCache=true; //for less memory usage
+		//disable history logging
 		ini_set('max_execution_time', '0');
 
 		\GO::session()->runAsRoot();
@@ -64,7 +65,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$folders = go()->getDbConnection()->selectSingleValue('name')
 				->from('fs_folders')
-				->where('(parent_id=0 OR parent_id is null) and name != "billing"')
+				->where('(parent_id=0 OR parent_id is null) and name != "billing" and name != "email"')
 				->all();
 
 			$billingFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'billing');
@@ -90,7 +91,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				
 				$folder->syncFilesystem(true);
 				
-				
+				EntityType::push();
 			}
 			catch(\Exception $e){
 				if (PHP_SAPI != 'cli')
@@ -116,6 +117,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					$folder = Folder::model()->findByPath($name);
 					if($folder)
 							$folder->delete();
+
+					EntityType::push();
 				}
 				catch(\Exception $e){
 					if (PHP_SAPI != 'cli')
@@ -124,13 +127,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						echo $e->getMessage()."\n";
 				}
 			}
-		}	
-			
-		
-
-	
-		
-		
+		}
 	}
 	
 	public function actionDeleteInvalid(){
@@ -887,23 +884,32 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$limit = !empty($params['limit']) ? $params['limit'] : 30;
 			$start = !empty($params['start']) ? $params['start'] : 0;
 
-			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 's.aclId', '=', false);
-
-			$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
-					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
+					->calcFoundRows()
 					->select('t.*')
-					->ignoreAcl()
+
 					->joinCustomFields()
 					->join("core_search", "s.entityId = t.id AND s.entityTypeId = " . \GO\Files\Model\File::entityType()->getId(), "s")
+				->start($start)
+				->limit($limit)
+				->group(['t.id']);
 
+			if(!go()->getAuthState()->isAdmin()) {
+				$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 's.aclId', '=', false);
+
+				$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
+					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
+
+
+				$findParams->ignoreAcl()
 					->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER')->debugSql()
 					->criteria($aclWhereCriteria);
+			}
 
 			$i = 0;
 
-			$words = StringUtil::splitTextKeywords($queryStr);
+			$words = StringUtil::splitTextKeywords($queryStr, false);
 
 			foreach($words as $word) {
 
@@ -921,16 +927,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					$findParams->order("t.".$params['sort'], $params['dir']);
 				}
 			}
-			
-			$filesStmt = \GO\Files\Model\File::model()->find($findParams);
-
-			$response['total'] = $filesStmt->rowCount();
 
 			$filesStmt = \GO\Files\Model\File::model()->find(
 				$findParams
-					->start($start)
-					->limit($limit)
+
 			);
+
+		$response['total'] = $filesStmt->foundRows;
 
 			$response['results'] = array();
 			$response['cm_state'] = '';
@@ -1719,7 +1722,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		$model->delete();
 
-		echo $this->render('delete', array('model' => $model));
+		echo $this->render('delete', array('success'=> true, 'model' => $model));
 	}
 
 	/**

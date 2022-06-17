@@ -52,13 +52,11 @@ class EmailModule extends \GO\Base\Module{
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 
-		if(\go\core\model\Module::isInstalled('community', 'addressbook')) {
-			Contact::on(Contact::EVENT_BEFORE_DELETE, static::class, 'onContactDelete');
-		}
 	}
 
-	public static function onContactDelete(Query $query) {
-		go()->getDbConnection()->delete('em_contacts_last_mail_times', (new Query)->where('contact_id', 'IN', $query))->execute();
+	public function depends()
+	{
+		return ['community/addressbook'];
 	}
 
 	public static function onMap(Mapping $mapping) {

@@ -15,6 +15,7 @@
 namespace GO\Smime\Controller;
 
 
+use go\core\ErrorHandler;
 use GO\Smime\Model\PublicCertificate;
 
 class PublicCertificateController extends \GO\Base\Controller\AbstractModelController{

@@ -86,4 +86,6 @@ return array (
   'Calendar' => '日程表',
   'months by date' => 'months by date',
   'months by day' => 'months by day',
+  'Ok' => '确定',
+  'Start' => '开始',
 );

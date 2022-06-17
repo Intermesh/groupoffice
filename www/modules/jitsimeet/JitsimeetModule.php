@@ -42,7 +42,7 @@ class JitsimeetModule extends \GO\Base\Module{
 //		}
 //	}
 
-	public static function checkIfHasLink(&$self, &$response,&$model,&$params){
+	public static function checkIfHasLink($self, &$response,$model,&$params){
 		//find link in description
 		$response['data']['jitsiMeet'] = self::hasLink($model);
 	}

@@ -72,7 +72,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			stateId:'ab-tree',
 			split: true,
 			enableDrop: true,
-			readOnly: !go.Modules.get("community", 'addressbook').userRights.mayChangeAddressbooks,
+			readOnly: false, //!go.Modules.get("community", 'addressbook').userRights.mayChangeAddressbooks,
 			ddGroup: "addressbook",
 			ddAppendOnly: true,
 			tbar: [{
@@ -651,7 +651,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		this.grid.store.load().then(function (result) {
 			if (addressBookId) {
 				go.Db.store('AddressBook').single(addressBookId).then(function (ab) {
-					if (ab.permissionLevel < go.permissionLevels.write) {
+					if (ab.permissionLevel < go.permissionLevels.create) {
 						me.addButton.setDisabled(true);
 						me.importButton.setDisabled(true);
 						me.exportButton.setDisabled(true);

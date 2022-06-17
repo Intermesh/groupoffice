@@ -113,17 +113,10 @@ class Router{
 		}
 						
 		$r = !empty($params['r']) ?  explode('/', $params['r']): array();
-		$this->_r=isset($params['r']) ? $params['r'] : "";
-					
-		if(\GO::config()->debug || \GO::config()->debug_log){
-			$log = 'Controller route r=';
-			if(isset($params['r']))
-				$log .= $params['r'];
-			else 
-				$log = 'No r parameter given';				
+		$this->_r= $params['r'] ?? "";
 
-			\GO::debug($log);
-		}
+		go()->getDebugger()->setRequestId('index.php?r=' . $this->_r);
+
 	
 		$first = isset($r[0]) ? ucfirst($r[0]) : 'Auth';
 

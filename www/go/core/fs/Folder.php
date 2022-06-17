@@ -3,6 +3,7 @@ namespace go\core\fs;
 
 use Exception;
 use go\core\App;
+use Throwable;
 
 /**
  * A folder object
@@ -176,20 +177,7 @@ class Folder extends FileSystemObject {
 		return new Folder($childPath);
 	}	
 	
-	/**
-	 * Get the parent folder object
-	 *
-	 * @return Folder|null Parent folder object
-	 */
-	public function getParent() : ?Folder {
 
-		$parentPath = dirname($this->path);
-		if ($parentPath == $this->path) {
-			return null;
-		}
-
-		return new Folder($parentPath);
-	}
 	
 	
 	/**
@@ -199,12 +187,16 @@ class Folder extends FileSystemObject {
 	 */
 	public function isWritable(): bool
 	{
-		
-		if($this->exists()) {
-			return is_writable($this->path);
-		}else
-		{
-			return $this->getParent()->isWritable();
+		try {
+			if ($this->exists()) {
+				return is_writable($this->path);
+			} else {
+				return $this->getParent()->isWritable();
+			}
+		} catch(Throwable $e) {
+
+			// open basedir restriction may lead here
+			return false;
 		}
 	}
 
@@ -212,9 +204,12 @@ class Folder extends FileSystemObject {
 	 * Delete the folder
 	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
 	public function delete(): bool
 	{
+		self::checkDeleteAllowed($this);
+
 		if (!$this->exists()){
 			return true;
 		}

@@ -35,7 +35,9 @@ return [
 				"homepage" => "Homepage",
 				"facebook" => "Facebook",
 				"twitter" => "Twitter",
-				"linkedin" => "LinkedIn"
+				"linkedin" => "LinkedIn",
+				"instagram" => "Instagram",
+				"tiktok" => "TikTok"
 		],
 
 		"salutationTemplate" => 'Dear [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]Ms./Mr.[else][if {{contact.gender}}=="M"]Mr.[else]Ms.[/if][/if][/if][if {{contact.middleName}}] {{contact.middleName}}[/if] {{contact.lastName}}'

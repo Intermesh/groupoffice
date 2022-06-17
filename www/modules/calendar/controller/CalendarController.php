@@ -34,10 +34,7 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 	protected function allowGuests() {
 		return array('exportics');
 	}
-	
-//	protected function ignoreAclPermissions() {
-//		return array('exportics');
-//	}
+
 
 	protected function getStoreParams($params) {
 		
@@ -144,23 +141,8 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		
 		return $record;
 	}	
-	
-//	public function afterSubmit(&$response, &$model, &$params, $modifiedAttributes) {
-			
-//		if(!empty($params['tasklists'])){
-//			$visible_tasklists = json_decode($params['tasklists']);
-//		
-//			foreach($visible_tasklists as $vtsklst) {
-//				if($vtsklst->visible)
-//					$model->addManyMany('visible_tasklists', $vtsklst->id);
-//				else
-//					$model->removeManyMany ('visible_tasklists', $vtsklst->id);
-//			}
-//		}
-		
-//		return parent::afterSubmit($response, $model, $params, $modifiedAttributes);
-//	}
-	
+
+
 	public function actionImportIcs($params) {
 		\GO::setMaxExecutionTime(0);
 		
@@ -276,11 +258,8 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 	);
 	private $_colorIndex = 0;
 	
-	public function getCalendarColor($formattedrecord,$model,$controller){
-
-//		if(empty($formattedrecord->color))
-//			$color = false;
-		//$color = $model->getColor(\GO::user()->id);
+	public function getCalendarColor($formattedrecord,$model,$controller)
+	{
 		if(empty($formattedrecord['color'])){
 			if($this->_colorIndex >= count($this->_colors))
 				$this->_colorIndex = 0;
@@ -551,7 +530,7 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 	 */
 	public function actionTruncateHolidays($params){
 		
-		$pdo_statement = \GO::$db->query('TRUNCATE TABLE '.\GO\Base\Model\Holiday::model()->tableName(). ';');
+		$pdo_statement = \GO::getDbConnection()->query('TRUNCATE TABLE '.\GO\Base\Model\Holiday::model()->tableName(). ';');
 		
 		if($pdo_statement->execute()){
 			echo 'Table '.\GO\Base\Model\Holiday::model()->tableName().' is truncated.';

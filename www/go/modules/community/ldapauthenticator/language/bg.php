@@ -24,4 +24,7 @@ return array (
   'Synchronize groups' => 'Синхронизирай групите',
   'Group query' => 'Групова заявка',
   'For Microsoft ActiveDirectory use \'(objectCategory=group)\'' => 'За използване на Microsoft ActiveDirectory \'(objectCategory = group)\'',
+  'Delete users' => 'Изтриване на потребители',
+  'Max delete percentage' => 'Максимален процент на изтриване',
+  'Delete groups' => 'Изтриване на групи',
 );

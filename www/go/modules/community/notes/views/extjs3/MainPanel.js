@@ -328,7 +328,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		go.Db.store("NoteBook").get(this.noteBookGrid.getSelectedIds()).then((result) => {
 
 			result.entities.forEach((notebook) => {
-				if (!this.addNoteBookId && notebook.permissionLevel >= go.permissionLevels.write) {
+				if (!this.addNoteBookId && notebook.permissionLevel >= go.permissionLevels.create) {
 					this.addNoteBookId = notebook.id;
 				}
 			});

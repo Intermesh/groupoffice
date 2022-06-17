@@ -39,16 +39,14 @@ GO.email.AccountsTree = function(config){
 		var result = Ext.decode(response.responseText);
 		
 		if(result.success===false){
-//			GO.errorDialog.show(result.feedback);
 			node.setText(node.text+' ('+t("Error")+')');
 			node.setTooltip(result.feedback, t("Error"));
 			
-			if(result.exceptionClass && result.exceptionClass=='GO\\Base\\Mail\\ImapAuthenticationFailedException'){
+			if(result.exceptionClass && result.exceptionClass=='GO\\Base\\Mail\\Exception\\ImapAuthenticationFailedException'){
 				this._errorNodes.push(node.attributes);
 			}
 		}
 	  
-//		this._setErrorNodes(Ext.decode(response.responseText));
 		this._nodeId = 0;
 		this._handleFailedIMAPConnections();
 	},this);

@@ -101,8 +101,11 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		this.setValue({});
 	},
 
-	setValue: function (v) {
+	// from overrides.js 306-324 will add 'customFields.col_x' to the values if customFields:{col_x:''} exists
+	joinValues: Ext.form.BasicForm.prototype.joinValues,
 
+	setValue: function (v) {
+		v = this.joinValues(v);
 		for (var name in v) {
 			var field = this.findField(name);
 			if (field) {
@@ -147,7 +150,7 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 
 		this.getAllFormFields().forEach(fn, this);
 
-		return v;
+		return go.util.splitToJson(v)
 	},
 
 	markInvalid: function (msg) {

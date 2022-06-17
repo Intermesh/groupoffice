@@ -206,3 +206,50 @@ $updates['201905111651'][] = "DROP TABLE `email_template`;";
 $updates['201906271420'][] = "DELETE FROM go_state WHERE name='em-pnl-west'";
 
 $updates['202002280914'][] = "ALTER TABLE `em_contacts_last_mail_times` ADD INDEX(`last_mail_time`);";
+
+$updates['202112031315'][] = "ALTER TABLE `em_accounts` ADD KEY (`id`), ADD KEY(`user_id`);";
+
+$updates['202205021223'][] = "alter table em_accounts drop column type;";
+
+$updates['202205021223'][] = "alter table em_accounts drop column type;";
+
+
+$updates['202205131420'][] = "";
+
+$updates['202205131420'][] = "";
+
+
+$updates['202205131420'][] = "ALTER TABLE `em_accounts` ADD COLUMN `force_smtp_login` BOOLEAN NOT NULL DEFAULT FALSE;";
+
+
+$updates['202205170840'][] = "alter table em_contacts_last_mail_times
+    drop foreign key em_contacts_last_mail_times_addressbook_addressbook_id_fk";
+
+$updates['202205170840'][] = "delete from em_contacts_last_mail_times where contact_id not in (select id from addressbook_contact)";
+$updates['202205170840'][] = "delete from em_contacts_last_mail_times where user_id not in (select id from core_user)";
+
+$updates['202205170840'][] = "alter table em_contacts_last_mail_times
+    add constraint em_contacts_last_mail_times_addressbook_contact_id_fk
+        foreign key (contact_id) references addressbook_contact (id)
+            on delete cascade";
+
+$updates['202205170840'][] = "alter table em_contacts_last_mail_times
+    add constraint em_contacts_last_mail_times_core_user_id_fk
+        foreign key (user_id) references core_user (id)
+            on delete cascade;";
+
+
+$updates['202205170840'][] = "ALTER TABLE `em_accounts` ADD COLUMN `force_smtp_login` BOOLEAN NOT NULL DEFAULT FALSE;";
+
+$updates['202206020910'][] = function() {
+	// Check whether the deprecated field client_id exists in the em_accounts table. Since MySQL does not support
+	// 'DROP COLUMN IF EXISTS' queries, we use the old school PDO way.
+	$conn = \GO::getDbConnection();
+	$conn->beginTransaction();
+	if($r = $conn->query("SHOW COLUMNS FROM `em_accounts` WHERE `Field`='client_id';")) {
+		if($rec = $r->fetch(PDO::FETCH_ASSOC)) {
+			$conn->query("ALTER TABLE `em_accounts` DROP COLUMN `client_id`;");
+		}
+	}
+	$conn->commit();
+};

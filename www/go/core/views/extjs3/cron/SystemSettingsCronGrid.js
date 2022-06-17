@@ -20,8 +20,7 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 	stateId: 'system-settings-cron-grid',
 	itemId: "cron", //makes it routable
 	initComponent : function(){
-		
-		this.title = t("Manage system tasks", "cron");	
+		this.title = t("Manage system tasks", "cron");
 		
 		Ext.apply(this,{
 			standardTbar:false,
@@ -162,6 +161,10 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 		if(parts[0] == "new") {
 			var dlg = new go.cron.NewCronDialog();
 			dlg.load(parts[1]).show();
+
+			dlg.on('submit', () => {
+				this.store.reload();
+			})
 		} else {
 
 			go.cron.SystemSettingsCronGrid.superclass.showEditDialog.call(this, id, config, record);

@@ -60,8 +60,16 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 	editDialogConfig:null,
 	
 	loadMask:true,
+
+	stateEvents : ['columnmove', 'columnresize', 'sortchange', 'groupchange', 'collapse', 'expand'],
+
+	getState : function() {
+		var o = Ext.grid.GridPanel.prototype.getState.apply(this);
+		o.collapsed = this.collapsed;
+		return o;
+	},
 	
-	initComponent : function(){
+	initComponent : function() {
 		
 		
 		if(!this.view && !this.viewConfig){
@@ -90,12 +98,10 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 		}
 		
 		if(this.store.model && GO.customfields && GO.customfields.columns[this.store.model]){
-			for(var i=0;i<GO.customfields.columns[this.store.model].length;i++)
-			{
+			for(var i=0;i<GO.customfields.columns[this.store.model].length;i++) {
 				if(GO.customfields.nonGridTypes.indexOf(GO.customfields.columns[this.store.model][i].datatype)==-1){
-					if(GO.customfields.columns[this.store.model][i].exclude_from_grid != 'true')
-					{
-            if(!this.columns){
+					if(GO.customfields.columns[this.store.model][i].exclude_from_grid != 'true') {
+                        if(!this.columns){
 							this.columns = this.cm.columns;
 						}              
 						this.columns.push(GO.customfields.columns[this.store.model][i]);
@@ -125,8 +131,7 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 			});
 		}
     
-		if(this.paging)
-		{
+		if(this.paging) {
 			if(typeof(this.paging)=='boolean')
 				this.paging=parseInt(GO.settings['max_rows_list']);
 
@@ -150,25 +155,20 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 		}
 		
 		this.store.on('load', function(){
-//			this.changed=false;
-			
 			if(this.store.reader && this.store.reader.jsonData){
-				if(this.store.reader.jsonData.title)
+				if(this.store.reader.jsonData.title) {
 					this.setTitle(this.store.reader.jsonData.title);
-				
-//				if(this.store.reader.jsonData.emptyText){
-//					this.getView().emptyText=this.store.reader.jsonData.emptyText;
-//				}
-			} 
-			
-			
+				}
+			}
+
 		}, this);
 
 	
-		if(!this.sm && !this.disableSelection)
-			this.sm=this.selModel=new Ext.grid.RowSelectionModel();
+		if(!this.sm && !this.disableSelection) {
+			this.sm = this.selModel = new Ext.grid.RowSelectionModel();
+		}
 	
-		if(this.standardTbar){
+		if(this.standardTbar) {
 
 			this.tbar = this.tbar ? this.tbar : [];
 			if(!this.hideSearchField){
@@ -189,14 +189,14 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 				text: t("Add"),
 				cls: 'x-btn-text-icon',
 				handler: this.btnAdd,
-				disabled:this.standardTbarDisabled,
+				disabled: this.standardTbarDisabled,
 				scope: this
 			},{
 				itemId:'delete',
 				iconCls: 'btn-delete',
 				text: t("Delete"),
 				cls: 'x-btn-text-icon',
-				disabled:this.standardTbarDisabled,
+				disabled: this.standardTbarDisabled,
 				handler: function(){
 					this.deleteSelected();
 				},

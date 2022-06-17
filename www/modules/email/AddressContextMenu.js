@@ -26,22 +26,29 @@ GO.email.AddressContextMenu = function(config)
 		iconCls: 'btn-compose',
 		text: t("Compose", "email"),
 		cls: 'x-btn-text-icon',
-		handler: function(){
-
+		handler: function() {
 			var values = {
 				to: this.address
-				};
-			this.queryString = decodeURI(this.queryString);
+			};
+
 			var pairs = this.queryString.split('&');
 			var pair;
 			for(var i=0;i<pairs.length;i++){
 				pair = pairs[i].split('=');
 							
 				if(pair.length==2){
-					values[pair[0]]=pair[1];
+					values[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
 				}
 			}
-			
+
+			if(go.User.emailSettings.use_desktop_composer) {
+				return go.util.mailto(values);
+			}
+
+			if(values.body) {
+				values.body = Ext.util.Format.nl2br(values.body);
+			}
+
 			var composerConfig = {
 				values : values
 			};
@@ -49,7 +56,7 @@ GO.email.AddressContextMenu = function(config)
 			//if we're on the e-mail panel use the currently active account.			
 			var ep = GO.mainLayout.getModulePanel("email");			
 			if(ep && ep.isVisible())
-				composerConfig.account_id=ep.account_id;			
+				composerConfig.account_id=ep.account_id;
 
 			GO.email.showComposer(composerConfig);
 		},

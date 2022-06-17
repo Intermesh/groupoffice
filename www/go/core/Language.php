@@ -118,7 +118,7 @@ class Language {
 
 	private static function isDefaultCountry($countryCode) {
 		if(!isset(self::$defaultCountryIso)) {
-			$user = go()->getAuthState()->getUser(['timezone']);
+			$user = go()->getAuthState() ? go()->getAuthState()->getUser(['timezone']) : null;
 			if(!$user) {
 				$user = User::findById(1, ['timezone']);
 			}

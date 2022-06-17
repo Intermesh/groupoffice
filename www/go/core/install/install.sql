@@ -199,7 +199,8 @@ CREATE TABLE `core_search` (
   `entityTypeId` int(11) NOT NULL,
   `filter` VARCHAR(50) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
-  `aclId` int(11) NOT NULL
+  `aclId` int(11) NOT NULL,
+  `rebuild` bool default false not null
 ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `core_setting` (
@@ -812,7 +813,7 @@ ALTER TABLE `core_entity_filter`
   `verifyCertificate` tinyint(1) NOT NULL DEFAULT 1,
   `fromName` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `fromEmail` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `maxMessagesPerMinute` SMALLINT UNSIGNED NOT NULL DEFAULT(0)
+  `maxMessagesPerMinute` SMALLINT UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -1153,3 +1154,9 @@ CREATE TABLE `core_permission` (
           REFERENCES `core_group` (`id`)
           ON DELETE CASCADE
           ON UPDATE NO ACTION);
+
+create index core_change_modSeq_entityTypeId_entityId_index
+    on core_change (modSeq, entityTypeId, entityId);
+
+create index core_change_user_modSeq_userId_entityTypeId_entityId_index
+    on core_change_user (modSeq, userId, entityTypeId, entityId);

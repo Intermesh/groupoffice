@@ -149,18 +149,16 @@ GO.form.ColorField =  Ext.extend(function(config){
 	//text to use if blank and allowBlank is false
 	blankText: "Must have a hexidecimal value in the format ABCDEF.",
 
-	/**
-	 * @cfg {String} color
-	 * A string hex value to be used as the default color.  Defaults
-	 * to 'FFFFFF' (white).
-	 */
-	//defaultColor: 'FFFFFF',
-
 	maskRe: /[a-f0-9]/i,
 	// These regexes limit input and validation to hex values
 	regex: /[a-f0-9]/i,
 
-	//private
+	/**
+	 * @cfg {String} color
+	 * @private
+	 * A string hex value to be used as the default color.  Defaults
+	 * to 'FFFFFF' (white).
+	 */
 	curColor: 'FFFFFF',
 
 	// private
@@ -191,7 +189,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 		return !this.menu || !this.menu.isVisible();
 	},
 
-	getValue : function(){
+	getValue : function() {
 		return this.curColor;
     },
 	/**
@@ -200,7 +198,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 	 *
    * @param {String} hex The color value
    */
-	setValue : function(hex){	
+	setValue : function(hex){
 		GO.form.ColorField.superclass.setValue.call(this, hex);
 		this.setColor(hex);
 	},
@@ -277,15 +275,16 @@ GO.form.ColorField =  Ext.extend(function(config){
 			});
 			
 			this.menu.palette.on('select', this.handleSelect, this );
-			this.menu.palette.value=this.curColor;
-//			this.menu.on(Ext.apply({}, this.menuListeners, {scope:this} ));
+			this.menu.palette.value = this.curColor;
 
-			if(this.colors)
-			{
+			if(this.colors) {
 				this.menu.palette.colors=this.colors;
 			}
 		}
-
+		let color = this.getValue();
+		if(!go.util.empty(color)) {
+			this.menu.palette.select(color, true);
+		}
 		this.menu.show(this.el, "tl-bl");
 	}
 });

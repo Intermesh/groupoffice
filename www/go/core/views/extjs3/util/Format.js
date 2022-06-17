@@ -292,7 +292,7 @@
 			return '<span style="cursor:pointer" title="' + go.util.Format.dateTime(v) + '">' + go.util.Format.userDateTime(v) + '</span>';
 		},
 
-		shortDateTime: function (v, showTime, longNotation) {
+		shortDateTime: function (v, showTime, longNotation, noTimeForToday) {
 			
 			showTime?showTime:null;
 			longNotation?longNotation:null;
@@ -311,7 +311,7 @@
 			
 			switch(diff) {
 				case 0:
-					return !showTime ? t('Today') : t('Today') + " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
+					return !showTime ?  (noTimeForToday ? t("Today") : Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"))) : t('Today') + " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
 				case -1:
 					return !showTime ? t('Yesterday') : t('Yesterday') + " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
 				case 1:

@@ -2,7 +2,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	autoExpandColumn: 'title',
 	// config options for stateful behavior
 	stateful: true,
-	stateId: 'tasks-grid',
+	stateId: 'tasks-grid-main',
+	loadMask: true,
 
 	initComponent: function () {
 
@@ -33,7 +34,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					}
 				},
 				'estimatedDuration',
-				'timeBooked'
+				'timeBooked',
+				'permissionLevel'
 			],
 			entityStore: "Task",
 			sortInfo: {
@@ -182,7 +184,14 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Progress', "tasks", "community"),
 					dataIndex: 'progress',
 					renderer:function (value, meta, rec, row, col, store){
-						return `<div class="status tasks-task-status-${value}">${go.modules.community.tasks.progress[value]}</div>`;
+						let p = {
+							'needs-action': 'yellow',
+							'in-progress': 'blue',
+							'completed': 'green',
+							'failed': 'red',
+							'cancelled': 'bluegrey'
+						};
+						return `<div class="status ${p[value]}-fill">${go.modules.community.tasks.progress[value]}</div>`;
 					}
 				},{
 					xtype:"datecolumn",
@@ -233,7 +242,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: true
 				},
 				{
-					xtype:"datecolumn",
 					id: 'categories',
 					header: t('Categories'),
 					width: dp(160),
@@ -289,4 +297,3 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 		go.modules.community.tasks.TaskGrid.superclass.initComponent.call(this);
 	}
 });
-

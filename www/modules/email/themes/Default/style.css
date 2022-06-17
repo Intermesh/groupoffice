@@ -264,8 +264,7 @@ div.em-message-labels-container span {
 	border-radius: 5px;
 	padding: 3px 8px;
 	line-height: 15px;
-	margin-right: 5px;
-	margin-bottom: 5px;
+	margin: 5px;
 }
 
 div.em-messages-grid-labels-container > div {

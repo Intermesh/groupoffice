@@ -19,9 +19,9 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 			return html;
 		}
 
-		if(Ext.isDate(json)) {
+		if(Ext.isString(json) && json.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/)) {
 			// skip for now
-			html.push('datum');
+			html.push(go.util.Format.dateTime(json));
 		} else if(Ext.isArray(json)) {
 			html.push('<b>' + name + '</b> ');
 			for(var i = 0 ; i < json.length; i++) {
@@ -30,10 +30,8 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		} else if (json === null) {
 			html.push('<b>' + name + '</b> null');
 		} else if(typeof json === 'object') {
-			//html.push('<b>' + key + '</b> ');
 			for(var key in json) {
-				html.push.apply(html, this.renderJson(json[key], key));
-				//html.push(' - <b>' + key + '</b> ' + json[key]);
+				html.push.apply(html, this.renderJson(json[key], name && name != "customFields" ? name + "." + key : key));
 			}
 		} else { // string number bool
 			html.push('<b>' + name + '</b> ' + json);
@@ -46,6 +44,8 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		var html = [];
 		if(data === null) {
 			html.push('<i>null</i>');
+		} else if(Ext.isString(data) && data.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/)) {
+			html.push(go.util.Format.dateTime(data));
 		} else if(Ext.isArray(data)) {
 			for(var i = 0 ; i < data.length; i++) {
 				if(i !== 0) {
@@ -54,9 +54,9 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				html.push.apply(html, this.renderJsonValue(data[i]));
 			}
 		} else if(typeof data === 'object') {
-			//html.push.apply(html, this.renderJson(data));
+		//	html.push.apply(html, this.renderJsonValue(data));
 			for(var key in data) {
-				html.push('<b>' + key + '</b> ' + data[key]);
+				html.push('<b>' + key + '</b> ' + this.renderJsonValue(data[key]));
 			}
 		} else {
 			html.push(data);
@@ -68,12 +68,32 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		if(!json) {
 			return [];
 		}
-		html = ['<table class="display-panel" style="table-layout: fixed;word-wrap:break-word;"><tr class="line"><th>'+t('Name')+'</th><th>'+t('New')+'</th><th>'+t('Old')+'</th></tr>'];
-		for(var key in json) {
-			html.push('<tr><td>'+key+':</td><td>'+this.renderJsonValue(json[key][1]).join('<br>')+
-				'</td><td>'+this.renderJsonValue(json[key][0]).join('<br>')+'</td></tr>');
-		}
+		var html = ['<table class="display-panel" style="table-layout: fixed;word-wrap:break-word;">' +
+		'<tr class="line"><th>'+t('Name')+'</th><th>'+t('Old')+'</th><th>'+t('New')+'</th></tr>'];
+		html.push(this.renderRows(json));
 		html.push('</tr></table>');
+		return html;
+	},
+
+	renderRows : function(json, prefix) {
+
+		prefix = prefix || "";
+
+		html = "";
+
+		for(var key in json) {
+
+
+			if(!Ext.isArray(json[key]) && typeof json[key] == "object") {
+				html += this.renderRows(json[key], key != 'customFields' ? key+ "." : "");
+			} else {
+
+				html += '<tr><td>' + prefix + key + ':</td>';
+				html += '<td>' + this.renderJsonValue(json[key][1]).join('<br>') +
+					'</td><td>' + this.renderJsonValue(json[key][0]).join('<br>') + '</td></tr>';
+			}
+		}
+
 		return html;
 	},
 
@@ -111,25 +131,18 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		const win = new go.Window({
 			cls: "go-text-dialog",
 			closable: true,
-			minimizable: true,
+			collapsible: true,
 			title: rec.data.description,
 			html: html,
 			autoScroll: true,
-			width: dp(500),
-			height: dp(500)
+			width: dp(800),
+			height: dp(600),
+			stateId: 'history-changes'
 
 		});
 		win.show();
 
-		// var tt = new Ext.menu.Menu({
-		// 	//target: target,
-		// 	//title: rec.data.description,
-		// 	width:500,
-		// 	html: '<div style="padding:7px;max-height:400px;overflow-y:scroll;"><h5>'+rec.data.description+'</h5>'+html+'</div>' ,
-		// 	autoHide: false
-		// 	//closable: true
-		// });
-		// tt.show(target);
+
 	},
 
 	initComponent: function() {
@@ -138,7 +151,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		var cols = [{
 			header: t('ID'),
 			width: dp(80),
-			dataIndex: 'id',
+			dataIndex: 'entityId',
 			hidden:true,
 			align: "right"
 		},{
@@ -179,6 +192,13 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				dataIndex: "remoteIp"
 			});
 
+			cols.push({
+				id: 'requestId',
+				header: t("Request ID"),
+				dataIndex: "requestId",
+				width: dp(200)
+			});
+
 			cols.splice(1,0, {
 				header: t('Name'),
 				dataIndex: 'description',
@@ -197,13 +217,15 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				fields: [
 					{name:'createdAt',type:'date'},
 					'id',
+					'entityId',
 					'entity',
 					'action',
 					'changes',
 					'createdBy',
 					'description',
 					{name: 'creator', type: "relation"},
-					'remoteIp'
+					'remoteIp',
+					'requestId'
 				],
 				baseParams: {sort: [{property: "id", isAscending:false}]},
 				entityStore: "LogEntry"

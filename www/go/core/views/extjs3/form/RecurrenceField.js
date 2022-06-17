@@ -260,6 +260,7 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
             modal: true,
             layout: "fit",
             width: dp(376),
+            height: dp(294),
             items: [{
                 xtype:'form',
                 labelWidth: dp(72),

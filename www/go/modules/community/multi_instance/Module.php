@@ -55,7 +55,8 @@ class Module extends \go\core\Module {
 	public static function checkUrl() {
 
 		//Skip localhost for development
-		if(Request::get()->getHost() === 'localhost') {
+		$host = Request::get()->getHost();
+		if($host === 'localhost' || $host === 'host.docker.internal') {
 			return;
 		}
 
@@ -87,6 +88,12 @@ class Module extends \go\core\Module {
 				echo "Skipping not installed instance: " . $instance->hostname ."\n";
 				continue;
 			}
+
+			if(!$instance->enabled) {
+				echo "Skipping disabled instance: " . $instance->hostname ."\n";
+				continue;
+			}
+
 			echo "Upgrading instance: " . $instance->hostname . ": ";
 			flush();
 			$success = $instance->upgrade();

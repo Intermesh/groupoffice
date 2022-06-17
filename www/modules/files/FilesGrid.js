@@ -4,7 +4,8 @@ GO.files.FilesGrid = function(config) {
 	config.layout = 'fit';
 	config.split  = true;
 	config.paging  = true;
-	config.autoExpandColumn = 'name';
+	if(!go.util.isMobileOrTablet())
+		config.autoExpandColumn = 'name';
 	config.sm = new Ext.grid.RowSelectionModel();
 	config.loadMask = true;
 	config.enableDragDrop = true;

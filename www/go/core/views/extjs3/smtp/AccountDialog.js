@@ -125,7 +125,7 @@ go.smtp.AccountDialog = Ext.extend(go.form.Dialog, {
 			);
 		}).catch(function(response) {
 			var error = "";
-			error = "<br /><br />" + response.message;
+			error = "<br /><br />" + response.description;
 
 			Ext.MessageBox.alert(
 				t("Failed"),

@@ -60,21 +60,43 @@ class Module extends core\Module
 		$log = new LogEntry();
 		$log->setEntity($record);
 		$log->setAction($action);
-		$changes = $record->getLogJSON($action);
-		if($action == 'update' && empty($changes)) {
-			return;
-		}
-		$log->changes = json_encode($changes);
 
-		$l = LogEntry::getMapping()->getColumn('changes')->length;
-		if(mb_strlen($log->changes) > $l) {
-			foreach($changes as $key => $v) {
-				$changes[$key] = '... changes were too big to log ...';
+		if($action != 'delete') {
+			$changes = $record->getLogJSON($action);
+			$cfChanges = self::getCustomFieldChanges($record);
+
+			if (!empty($cfChanges)) {
+				$changes['customFields'] = $cfChanges;
+			}
+
+
+			if ($action == 'update' && empty($changes)) {
+				return;
 			}
 			$log->changes = json_encode($changes);
+
+			$l = LogEntry::getMapping()->getColumn('changes')->length;
+			if (mb_strlen($log->changes) > $l) {
+				foreach ($changes as $key => $v) {
+					$changes[$key] = '... changes were too big to log ...';
+				}
+				$log->changes = json_encode($changes);
+			}
 		}
 
 		self::saveLog($log);
+	}
+
+	/**
+	 * @param Entity|ActiveRecord $entity
+	 * @return array
+	 */
+	private static function getCustomFieldChanges($entity): array {
+		if(method_exists($entity, 'getCustomFields')) {
+			return $entity->getCustomFields(true)->getModified();
+		} else{
+			return [];
+		}
 	}
 
 	/**
@@ -132,20 +154,19 @@ class Module extends core\Module
 			unset($changes['createdAt']);
 			unset($changes['modifiedBy']);
 			unset($changes['permissionLevel']);
-			unset($changes['filesFolderId']);
+//			unset($changes['filesFolderId']);
+
+			$cfChanges = self::getCustomFieldChanges($entity);
+			if(!empty($cfChanges)) {
+				$changes['customFields'] = $cfChanges;
+			}
 
 			if(empty($changes)) {
 				return;
 			}
 
 			if($action == 'create') {
-				$changes = array_map(function($c) {
-					return $c[0];
-				}, $changes);
-
-				$changes = array_filter($changes, function($c){
-					return $c !== "";
-				});
+				$changes = self::mapForCreate($changes);
 			}
 			$log->changes = json_encode($changes);
 
@@ -162,6 +183,22 @@ class Module extends core\Module
 		}
 
 		self::saveLog($log);
+	}
+
+	private static function mapForCreate(array $changes): array {
+		$changes = array_map(function($c) {
+			if(array_key_exists(0, $c)) {
+				return $c[0];
+			} else{
+				return self::mapForCreate($c);
+			}
+		}, $changes);
+
+		$changes = array_filter($changes, function($c){
+			return !empty($c);
+		});
+
+		return $changes;
 	}
 
 
@@ -196,6 +233,7 @@ class Module extends core\Module
 		$log->description = $user->username . ' [' . Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('login');
 		$log->changes = null;
+		$log->createdBy = $user->id;
 		if(!$log->save()){
 			throw new Exception("Could not save log");
 		}
@@ -228,6 +266,7 @@ class Module extends core\Module
 		$log->description = $user->username . ' [' . Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('logout');
 		$log->changes = null;
+		$log->createdBy = $user->id;
 		if(!$log->save()){
 			throw new Exception("Could not save log");
 		}
@@ -237,10 +276,10 @@ class Module extends core\Module
 	 * @throws Exception
 	 */
 	public static function onGarbageCollection() {
-		$years = (int) Module::get()->getSettings()->deleteAfterYears;
+		$days = (int) Module::get()->getSettings()->deleteAfterDays;
 
-		if(!empty($years)) {
-			LogEntry::delete(LogEntry::find()->where('createdAt', '<', (new core\util\DateTime("-" . $years . " years"))));
+		if(!empty($days)) {
+			LogEntry::delete(LogEntry::find()->where('createdAt', '<', (new core\util\DateTime("-" . $days . " days"))));
 		}
 	}
 

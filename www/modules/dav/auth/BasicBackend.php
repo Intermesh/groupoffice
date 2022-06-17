@@ -35,17 +35,4 @@ class BasicBackend extends \go\core\dav\auth\BasicBackend {
 
 		return $result;
 	}
-
-	
-	/**
-	 * for old framework to work in GO::session()
-	 * 
-	 * @param \GO\Dav\Auth\User $user
-	 */
-	private function oldLogin($userId) {
-		if(!defined('GO_NO_SESSION')) {
-			define("GO_NO_SESSION", true);
-		}
-		$_SESSION['GO_SESSION'] = ['user_id' => $userId];
-	}
 }

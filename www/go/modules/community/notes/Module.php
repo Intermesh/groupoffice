@@ -123,7 +123,7 @@ class Module extends core\Module {
 		$noteBooks = NoteBook::find();
 
 		foreach($noteBooks as $noteBook) {
-			$count = $faker->numberBetween(3, 10);
+			$count = $faker->numberBetween(3, 6);
 			for($i = 0; $i < $count; $i++) {
 				echo ".";
 				$note = new Note();

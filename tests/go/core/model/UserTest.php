@@ -3,6 +3,8 @@
 namespace go\core;
 
 use GO\Base\Model\Module;
+use go\core\auth\Authenticate;
+use go\core\model\Token;
 use go\core\model\User;
 use go\core\util\ClassFinder;
 
@@ -19,6 +21,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$success = $user->save();
 
 		$this->assertEquals(true, $success);
+
 
 
 		$user = new User();
@@ -43,6 +46,13 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals(false, $success);
 	}
 
+	public function testAdminToArray() {
+		$admin = User::findById(1);
+		$array = $admin->toArray();
+
+		$this->assertEquals(true, is_array($array));
+	}
+
 	public function testIsAdmin() {
 		$admin = User::findById(1);
 
@@ -51,6 +61,32 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$user = User::find()->where(['username' => 'test1'])->single();
 
 		$this->assertEquals(false, $user->getIsAdmin());
+	}
+
+	public function testAuth() {
+		$auth = new Authenticate();
+		$user = $auth->passwordLogin("test1", "test1test1");
+
+		$this->assertEquals(false, !$user);
+
+		$token = new Token();
+		$token->userId = $user->id;
+		$token->addPassedAuthenticator($auth->getUsedPasswordAuthenticator());
+
+		$success = $token->save();
+
+		$this->assertEquals(true, $success);
+
+		$this->assertEmpty($token->getPendingAuthenticators());
+
+		$loginCount = $token->getUser()->loginCount;
+
+		$success = $token->setAuthenticated();
+		$this->assertEquals(true, $success);
+
+		$this->assertEquals($loginCount + 1, $token->getUser()->loginCount);
+
+
 	}
 
 

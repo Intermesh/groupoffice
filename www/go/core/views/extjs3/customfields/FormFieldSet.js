@@ -81,7 +81,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		this.formTabPanel = this.findParentByType('tabpanel');
 
 		if (!form) {
-			console.error("No go.form.EntityPanel found for filtering");
+			//console.error("No go.form.EntityPanel found for filtering");
 			return;
 		}
 

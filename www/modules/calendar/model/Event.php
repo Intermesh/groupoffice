@@ -858,7 +858,16 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		
 			if($remindTime){
 				$this->deleteReminders();
-				$this->addReminder($this->name, $remindTime, $this->calendar->user_id, $remindTime+$this->reminder);
+
+				if($this->calendar->user_id == 1) {
+
+					// admin (shared) calendars behave differently. They add the creator as default organizer
+					// and not the calendar owner.
+					$this->addReminder($this->name, $remindTime, $this->user_id, $remindTime + $this->reminder);
+
+				} else{
+					$this->addReminder($this->name, $remindTime, $this->calendar->user_id, $remindTime + $this->reminder);
+				}
 			}
 		} else {
 			$this->deleteReminders();

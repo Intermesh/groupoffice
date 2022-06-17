@@ -23,8 +23,30 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 
 
 	onLoadStart: function (userId) {
-		if(this.panelTasklist)
-			this.panelTasklist.setModelId(userId);
+		if(this.tasklistSelect) {
+			this.tasklistSelect.storeConfig.filters.permission = {
+				permissionLevel: go.permissionLevels.write,
+				permissionLevelUserId: userId
+			};
+		};
+
+		if(this.noteBookSelect) {
+			this.noteBookSelect.storeConfig.filters.permission = {
+				permissionLevel: go.permissionLevels.write,
+				permissionLevelUserId: userId
+			};
+		}
+
+		if(this.addressBookSelect) {
+			this.addressBookSelect.storeConfig.filters.permission = {
+				permissionLevel: go.permissionLevels.write,
+				permissionLevelUserId: userId
+			};
+		}
+
+		if(this.selectAccount) {
+			this.selectAccount.store.baseParams.permissionLevelUserId = userId;
+		}
 
 		if(this.panelCalendar)
 			this.panelCalendar.setModelId(userId);
@@ -32,7 +54,19 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 	
 	initComponent: function() {
 		
-		this.items = [];
+		this.items = [{
+			title: t("General"),
+			xtype: "fieldset",
+			items: [
+				{
+					hideLabel: true,
+					xtype: "checkbox",
+					boxLabel: t("Allow delete via synchronization"),
+					name: "syncSettings.allowDeletes",
+					hint: t("By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.")
+				}]
+			}
+		];
 
 		if(go.Modules.isAvailable("legacy", "email")) {
 			this.items.push(new Ext.form.FieldSet({
@@ -120,7 +154,12 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				hideLabel: true,
 				extraColumns: [defaultCol],
 				extraFields: [{name: "isDefault", type: "boolean"}],
-				plugins: [defaultCol]
+				plugins: [defaultCol],
+				storeConfig: {
+					filters: {
+						permission: {}
+					}
+				}
 			});
 			
 			this.items.push({
@@ -148,7 +187,12 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				hideLabel: true,
 				extraColumns: [defaultCol],
 				extraFields: [{name: "isDefault", type: "boolean"}],
-				plugins: [defaultCol]
+				plugins: [defaultCol],
+				storeConfig: {
+					filters: {
+						permission: {}
+					}
+				}
 			});
 			
 			this.items.push({
@@ -176,7 +220,15 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				hideLabel: true,
 				extraColumns: [defaultCol],
 				extraFields: [{name: "isDefault", type: "boolean"}],
-				plugins: [defaultCol]
+				plugins: [defaultCol],
+				storeConfig: {
+					filters: {
+						default: {
+							role: 'list'
+						},
+						permission: {}
+					}
+				}
 			});
 
 			this.items.push({

@@ -213,7 +213,7 @@ class MimeDecode
 
 				$structure = $this->_decode($this->_header, $this->_body);
 				if ($structure === false) {
-						$structure = $this->raiseError($this->_error);
+						throw new \Exception($this->_error);
 				}
 
 

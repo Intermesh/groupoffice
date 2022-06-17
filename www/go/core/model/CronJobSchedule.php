@@ -4,18 +4,17 @@ namespace go\core\model;
 
 use Cron\CronExpression;
 use DateTime as CoreDateTime;
-use GO;
 use go\core\ErrorHandler;
 use go\core\jmap\Entity;
 use go\core\model\Module as ModuleModel;
 use go\core\orm\Mapping;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
-use go\core\model\Module;
 use Exception;
 use go\core\db\Criteria;
 
-class CronJobSchedule extends Entity {
+class CronJobSchedule extends Entity
+{
 
 	/**
 	 * The Entity ID
@@ -24,10 +23,25 @@ class CronJobSchedule extends Entity {
 	 */
 	public $id;
 
+	/**
+	 * @var int
+	 */
 	public $moduleId;
+	/**
+	 * @var string
+	 */
 	public $description;
+	/**
+	 * @var string
+	 */
 	public $name;
+	/**
+	 * @var string
+	 */
 	public $expression;
+	/**
+	 * @var bool
+	 */
 	public $enabled = true;
 
 	/**
@@ -47,7 +61,10 @@ class CronJobSchedule extends Entity {
 	 * @var DateTime
 	 */
 	public $runningSince;
-	
+
+	/**
+	 * @var string
+	 */
 	public $lastError;
 	
 	protected static function defineMapping(): Mapping
@@ -61,7 +78,11 @@ class CronJobSchedule extends Entity {
 	}
 
 
-	protected function internalValidate() {
+	/**
+	 * @throws Exception
+	 */
+	protected function internalValidate()
+	{
 
 		if (isset($this->expression) && !CronExpression::isValidExpression($this->expression)) {
 			$this->setValidationError('expression', ErrorCode::MALFORMED);
@@ -89,15 +110,18 @@ class CronJobSchedule extends Entity {
 			$this->nextRunAt = $this->getNextRunDate();
 		}
 
-
-
 		if (!$this->enabled) {
 			$this->nextRunAt = null;
 		}
 
 		parent::internalValidate();
 	}
-	
+
+	/**
+	 * Try to determine when to run the current job next
+	 *
+	 * @return CoreDateTime|null
+	 */
 	private function getNextRunDate(): ?CoreDateTime
 	{
 
@@ -105,11 +129,14 @@ class CronJobSchedule extends Entity {
 			return null;
 		}
 		
-		$now = new CoreDateTime();
+		$now = $this->getLocalDateTime();
 		$cronExpression = CronExpression::factory($this->expression);
 		return $cronExpression->getNextRunDate($now);
 	}
-	
+
+	/**
+	 * @return string
+	 */
 	public function getCronClass(): string
 	{
 		$module = Module::findById($this->moduleId);
@@ -126,11 +153,12 @@ class CronJobSchedule extends Entity {
 	 * Run the job or schedule it if it has not been scheduled yet.
 	 * @throws Exception
 	 */
-	public function run() {
+	public function run()
+	{
 		//Set nextRun to null so it won't run more then once at a time
 		$this->nextRunAt = null;
 		//set runningSince to now
-		$this->runningSince = new CoreDateTime();
+		$this->runningSince = $this->getLocalDateTime();
 		$this->lastError = null;
 
 		if (!$this->save()) {
@@ -140,7 +168,7 @@ class CronJobSchedule extends Entity {
 		$cls = $this->getCronClass();
 
 		go()->debug("Running CRON method: " . $cls);
-		
+		ob_start();
 		try {
 			$cron = new $cls;			
 			$cron->run($this);
@@ -151,7 +179,14 @@ class CronJobSchedule extends Entity {
 			$this->lastError = $errorString;
 		}
 
-		$this->lastRunAt = new CoreDateTime();
+		$output = ob_get_contents();
+		ob_end_clean();
+
+		if(!empty($output)) {
+			echo $cls . " output: \n\n" . $output . "\n---\n\n";
+		}
+
+		$this->lastRunAt = $this->getLocalDateTime();
 		$this->runningSince = null;
 
 		$this->nextRunAt = $this->getNextRunDate();
@@ -172,9 +207,10 @@ class CronJobSchedule extends Entity {
 	 */
 	public static function runNext(): bool
 	{
+		$now = (new self)->getLocalDateTime();
 		$jobs = self::find()->where('enabled', '=', true)
 						->andWhere((new Criteria())
-							->andWhere('nextRunAt', '<=', new DateTime())
+							->andWhere('nextRunAt', '<=', $now)
 							->orWhere('nextRunAt', 'IS', null)
 						)
 						->orderBy(['nextRunAt' => 'ASC'])->all();
@@ -210,4 +246,20 @@ class CronJobSchedule extends Entity {
 			->single();
 	}
 
+	/**
+	 * Get current time in the default time zone.
+	 * 
+	 * By default, the timezone in newer code is set to UTC. This makes perfect sense, except for cron jobs, which should
+	 * adhere to local time. 
+	 *
+	 * @todo: if there are more use cases for localized DateTimes, move to go\core\util\Datetime ?
+	 * 
+	 * @return CoreDateTime
+	 */
+	private function getLocalDateTime(): CoreDateTime
+	{
+		$now = new CoreDateTime();
+		$now->setTimeZone(new \DateTimeZone(go()->getSettings()->defaultTimezone));
+		return $now;
+	}
 }

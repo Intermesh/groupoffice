@@ -39,4 +39,11 @@ return array (
   'SMIME certificate was added for' => 'Добавен бе SMIME сертификат за',
   'Could not add SMIME certificate for' => 'Не може да се добави SMIME сертификат за',
   'This message is encrypted.' => 'Това съобщение е кодирано.',
+  'Certificate' => 'Сертификат',
+  'Old SMIME certificates are needed to decrypt old e-mail' => 'Старите SMIME сертификати са необходими за декриптиране на стари имейли',
+  'Are you sure you want to delete this?' => 'Сигурни ли сте, че искате да изтриете това?',
+  'Upload certificate' => 'Качване на сертификат',
+  'PKCS12 certificates' => 'Сертификати PKCS12',
+  'valid' => 'валиден',
+  'since' => 'от',
 );

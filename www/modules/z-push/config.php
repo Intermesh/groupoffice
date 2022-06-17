@@ -37,8 +37,8 @@ if(!class_exists('GO'))
 //    define('BASE_PATH', dirname($_SERVER['SCRIPT_FILENAME']). '/');
 		define('BASE_PATH', \GO::config()->root_path. 'modules/z-push/vendor/z-push/');
 
-    // Try to set unlimited timeout
-    define('SCRIPT_TIMEOUT', 0);
+    // Try to set 3600 timeout. The max ping life time is set to 3540 below in  PING_HIGHER_BOUND_LIFETIME
+    define('SCRIPT_TIMEOUT', 3600);
 
     // Use a custom header to determinate the remote IP of a client.
     // By default, the server provided REMOTE_ADDR is used. If the header here set
@@ -263,7 +263,7 @@ if(!class_exists('GO'))
     // The maximum accepted time in second that a ping command should last.
     // If set to false, there will be no higher bound to the ping lifetime.
     // The minimum accepted value is 1 second. The maximum accepted value is 3540 seconds (59 minutes).
-    define('PING_HIGHER_BOUND_LIFETIME', false);
+    define('PING_HIGHER_BOUND_LIFETIME', 3540);
 
     // Maximum response time
     // Mobiles implement different timeouts to their TCP/IP connections. Android devices for example

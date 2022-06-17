@@ -8,9 +8,11 @@ use go\core\db\Query as OrmQuery;
 use go\core\db\Statement;
 use go\core\ErrorHandler;
 use go\core\model\Link;
+use go\core\model\Module;
 use go\core\model\Search;
 use go\core\util\ClassFinder;
 use go\core\util\StringUtil;
+use go\modules\community\comments\model\Comment;
 use function go;
 
 trait SearchableTrait {
@@ -22,7 +24,7 @@ trait SearchableTrait {
 	 * 
 	 * @return string
 	 */
-	abstract public function getSearchDescription(): string;
+	abstract protected function getSearchDescription(): string;
 	
 	/**
 	 * All the keywords that can be searched on.
@@ -103,7 +105,7 @@ trait SearchableTrait {
 		go()->setOptimizerSearchDepth();
 
 		$i = 0;
-		$words = StringUtil::splitTextKeywords($searchPhrase);
+		$words = StringUtil::splitTextKeywords($searchPhrase, false);
 		$words = array_unique($words);
 
 		foreach($words as $word) {
@@ -154,13 +156,16 @@ trait SearchableTrait {
 		$search->description = $this->getSearchDescription();
 		$search->filter = $this->getSearchFilter();
 		$search->modifiedAt = property_exists($this, 'modifiedAt') ? $this->modifiedAt : new DateTime();
-		
+		$search->rebuild = false;
 //		$search->createdAt = $this->createdAt;
 		
 		$keywords = $this->getSearchKeywords();
+
 		if(!isset($keywords)) {
 			$keywords = array_merge(StringUtil::splitTextKeywords($search->name), StringUtil::splitTextKeywords($search->description));
 		}
+
+		$keywords = $this->getCommentKeywords($keywords);
 
 		$links = (new Query())
 			->select('description')
@@ -186,7 +191,7 @@ trait SearchableTrait {
 			$arr = array_merge($arr, StringUtil::splitTextKeywords($keyword));
 		}
 
-		$keywords = array_unique($arr);
+		$keywords = StringUtil::filterRedundantSearchWords($arr);
 
 		if(!empty($this->id) && !in_array($this->id, $keywords)) {
 			$keywords[] = $this->id;
@@ -217,29 +222,36 @@ trait SearchableTrait {
 
 	}
 
+	private function getCommentKeywords(array $keywords) : array {
+		if(Module::isInstalled("community", "comments")) {
+			$comments = Comment::findFor($this, ['text']);
+			foreach($comments as $comment) {
+				$plain = strip_tags($comment->text);
+				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
+			}
+		}
+
+		return $keywords;
+	}
+
 
 	/**
 	 * @throws Exception
 	 */
 	public static function deleteSearchAndLinks(Query $query): bool
 	{
-		$delSearchStmt = go()->getDbConnection()
-			->delete('core_search',
-				(new Query)
-					->where(['entityTypeId' => static::entityType()->getId()])
-					->andWhere('entityId', 'IN', $query)
-			);
-//		$s = (string) $delSearchStmt;
-
-		if(!$delSearchStmt->execute()) {
-			return false;
-		}
-
-		go()->debug("Deleted " . $delSearchStmt->rowCount() ." search results");
-
+	  //delete link before search because they depend on eachother.
 		if(!Link::delete((new Query)
 			->where(['fromEntityTypeId' => static::entityType()->getId()])
 			->andWhere('fromId', 'IN', $query)
+		)) {
+			return false;
+		}
+
+		if(!Search::delete(
+			(new Query)
+				->where(['entityTypeId' => static::entityType()->getId()])
+				->andWhere('entityId', 'IN', $query)
 		)) {
 			return false;
 		}
@@ -263,23 +275,22 @@ trait SearchableTrait {
 		/** @var Entity $cls */
 		$query = $cls::find();
 		/* @var $query OrmQuery */
-		$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT");
-		$query->andWhere('search.id IS NULL')
-
-//			$query->where('id', 'not in', Search::find()->selectSingleValue('entityId')->where('entityTypeId', '=', $cls::entityType()->getId()))
-							->limit($limit)
-							->offset($offset);
-
+		$query
+			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT")
+			->andWhere('search.id IS NULL')
+			->orWhere('search.rebuild = true')
+			->limit($limit)
+			->offset($offset);
 
 		return $query->execute();
 	}
 
 	/**
+	 * @param class-string<Entity> $cls
 	 * @throws Exception
 	 */
-	private static function rebuildSearchForEntity($cls) {
+	public static function rebuildSearchForEntity(string $cls) {
 		echo $cls."\n";
-		
 
 		echo "Deleting old values\n";
 
@@ -306,7 +317,7 @@ trait SearchableTrait {
 				try {
 					flush();
 
-					$m->saveSearch(false);
+					$m->saveSearch();
 					echo ".";
 
 				} catch (Exception $e) {

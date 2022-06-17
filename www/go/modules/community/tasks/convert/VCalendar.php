@@ -65,6 +65,8 @@ class VCalendar extends AbstractConverter {
 			$calendar = new \Sabre\VObject\Component\VCalendar();
 			$vtodo = $calendar->createComponent('VTODO');
 			$calendar->add($vtodo);
+		} else{
+			$calendar->prodId = $this->getProdId();
 		}
 
 
@@ -109,7 +111,7 @@ class VCalendar extends AbstractConverter {
 		$vtodo->status = strtoupper($task->getProgress());
 		$vtodo->remove("COMPLETED");
 		if($vtodo->status == "COMPLETED") {
-			$vtodo->add('COMPLETED', $task->progressUpdated, ['VALUE' => 'DATE']);
+			$vtodo->add('COMPLETED', $task->progressUpdated);
 		}
 
 		if(!empty($task->percentComplete)) {
@@ -152,8 +154,12 @@ class VCalendar extends AbstractConverter {
 	{
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
-		fputs($this->fp, "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n");
+		fputs($this->fp, "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:" . $this->getProdId() . "\r\n");
 		fputs($this->fp, (new \GO\Base\VObject\VTimezone())->serialize());
+	}
+
+	private function getProdId() : string {
+		return "-//Intermesh//NONSGML Group-Office " . go()->getVersion()	. "//EN";
 	}
 
 	protected function finishExport(): Blob

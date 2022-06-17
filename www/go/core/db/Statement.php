@@ -4,7 +4,10 @@ namespace go\core\db;
 use go\core\data\ArrayableInterface;
 use go\core\ErrorHandler;
 use Exception;
+use go\core\orm\Property;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
 use JsonSerializable;
+use PDO;
 use PDOException;
 use PDOStatement;
 
@@ -27,7 +30,7 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 	{
 		return $this->fetchAll();
 	}
-	
+
 	/**
 	 * Set's the select query object
 	 * 
@@ -87,6 +90,13 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 		return $this;
 	}
 
+	public function bindValue($param, $value, $type = PDO::PARAM_STR) : bool
+	{
+		$param = $this->build['paramMap'][$param] ?? $param;
+
+		return parent::bindValue($param, $value, $type);
+	}
+
 	/**
 	 * Executes a prepared statement
 	 *
@@ -113,7 +123,7 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 			
 			parent::execute($params);
 
-			if(go()->getDebugger()->enabled && go()->getDbConnection()->debug && isset($this->build)) {
+			if(go()->getDbConnection()->debug && isset($this->build) && go()->getDebugger()->enabled) {
 				$duration  = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
 
 				$sql = QueryBuilder::debugBuild($this->build);

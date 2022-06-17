@@ -72,8 +72,9 @@ GO.base.model.multiselect.panel = function(config){
 			tooltip: t("Add"),
 			handler: function(){
 				if(!this.addDialog){
-					if(!config.selectColumns)
+					if(!config.selectColumns) {
 						config.selectColumns = config.columns;
+					}
 										
 					this.addDialog = new GO.base.model.multiselect.addDialog({
 						multiSelectPanel:this,

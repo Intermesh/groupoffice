@@ -166,10 +166,6 @@ go.Router.config({ mode: 'hash' });
 
 GO.mainLayout.on("boot", function () {
 
-	// go.Router.add(/^login$/, function () {
-	// 	GO.mainLayout.login();
-	// }, false);
-
 	go.Router.add(/^recover\/([a-f0-9]{40})-?(.*)/, function (hash, redirectUrl) {
 		var recoveryPanel = new go.login.RecoveryDialog();
 		recoveryPanel.show(hash, redirectUrl);
@@ -196,25 +192,4 @@ window.addEventListener('hashchange', function () {
 	go.Router.previousPath = go.Router.loadedPath;
 	go.Router.check();
 }, false);
-
-//
-//// returning the user to the initial state
-//Router.navigate();
-//
-//// adding routes
-//Router
-//				.add(/about/, function () {
-//					console.log('about');
-//				})
-//				.add(/products\/(.*)\/edit\/(.*)/, function () {
-//					console.log('products', arguments);
-//				})
-//				.add(function () {
-//					console.log('default');
-//				})
-//				.check('/products/12/edit/22').listen();
-//
-//// forwarding
-//Router.navigate('/about');
-
 

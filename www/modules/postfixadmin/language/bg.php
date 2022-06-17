@@ -51,4 +51,7 @@ return array (
   'Ok' => 'ОК',
   'Use \'*\' for a catch all alias (not recommended).' => 'Използвай \'*\' за намиране на всички псевдоними (не се препоръчва).',
   'Postfix admin' => 'Администратор на Postfix',
+  'Are you sure you wan to reset all the passwords?' => 'Сигурен ли си, че искаш да изтриеш всички пароли?',
+  'Export domain' => 'Експорт на домейн',
+  'Reset passwords' => 'Нулиране на пароли',
 );

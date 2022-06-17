@@ -126,6 +126,13 @@ class Backend extends AbstractBackend {
 	 * @throws Exception
 	 */
 	public function deleteCard($addressBookId, $cardUri): bool {
+
+		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
+			go()->debug("Deleting is disabled by user sync settings");
+			throw new Forbidden("Deleting is disabled by user sync settings");
+		}
+
+
 		$contact = Contact::find(['id', 'addressBookId'])->where(['addressBookId' => $addressBookId, 'uri' => $cardUri])->single();
 		if(!$contact) {
 			throw new NotFound();

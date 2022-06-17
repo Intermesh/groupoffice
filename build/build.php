@@ -332,13 +332,11 @@ class Builder
 		run("mkdir " . $debTarget);
 		run("cp -r " . __DIR__ . "/debian/* " . $debTarget);
 
-		run("mkdir " . $debTarget . "/etc/groupoffice");
-
 		file_put_contents($debTarget . '/debian/changelog', str_replace(
 			array('{package}', '{version}', '{date}'), array("groupoffice", $this->majorVersion . '.' . $this->minorVersion, $date), $tpl
 		));
 
-		run("cp -r " . $this->buildDir . "/" . $this->packageName . " " . $debTarget . "/usr/share/groupoffice");
+		run("cp -r " . $this->buildDir . "/" . $this->packageName . "/* " . $debTarget . "/usr/share/groupoffice");
 		cd($debTarget);
 		run("debuild --no-lintian -b");
 	}

@@ -4,6 +4,7 @@ namespace go\core\acl\model;
 use Exception;
 use go\core\model\Acl;
 use go\core\App;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\core\db\Expression;
 
@@ -83,8 +84,6 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		$a = $this->findAcl();
 
-		$this->checkManagePermission();
-
 		foreach($this->setAcl as $groupId => $level) {
 			$a->addGroup($groupId, $level);
 		}
@@ -152,14 +151,12 @@ abstract class AclOwnerEntity extends AclEntity {
 	}
 
 	/**
-	 * Permissions are set via AclOwnerEntity models through setAcl(). When this property is used it will configure the Acl models.
-	 * This permission is not checked in the controller as usual but checked on save here.
-
+	 * Check if the ACL was modified
+	 *
 	 * @return bool
 	 */
-	protected function checkManagePermission(): bool
-	{
-		return $this->hasPermissionLevel(Acl::LEVEL_MANAGE);
+	public function isAclModified() : bool{
+		return isset($this->setAcl);
 	}
 
 	/**
@@ -230,9 +227,10 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		$tableAlias = $query->getTableAlias();
 
-		$changes->select($tableAlias.'.id as entityId, '.$tableAlias.'.aclId, "1" as destroyed');
-		
-		return static::entityType()->changes($changes);
+		$records = $changes->select($tableAlias.'.id as entityId, '.$tableAlias.'.aclId, "1" as destroyed')
+			->all(); //we have to select now because later these id's are gone from the db
+
+		return static::entityType()->changes($records);
 	}
 	
 	protected static function internalDelete(Query $query): bool
@@ -312,7 +310,10 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 
 		if(!isset($this->permissionLevel)) {
-			$this->permissionLevel = Acl::getUserPermissionLevel($this->{static::$aclColumnName}, App::get()->getAuthState()->getUserId());
+			$this->permissionLevel =
+				(go()->getAuthState() && go()->getAuthState()->isAdmin()) ?
+					Acl::LEVEL_MANAGE :
+					Acl::getUserPermissionLevel($this->{static::$aclColumnName}, go()->getAuthState()->getUserId());
 		}
 
 		return $this->permissionLevel;
@@ -394,10 +395,24 @@ abstract class AclOwnerEntity extends AclEntity {
 		parent::check();
 	}
 
+
+	private static function checkEmptyAcls() {
+		foreach(self::find(['id', static::$aclColumnName])->where(static::$aclColumnName, '=', null) as $model) {
+			$model->createAcl();
+			if(!$model->save()) {
+				throw new SaveException($model);
+			}
+		}
+
+	}
+
 	/**
 	 * @throws Exception
 	 */
 	public static function checkAcls() {
+
+		self::checkEmptyAcls();
+
 		$table = static::getMapping()->getPrimaryTable();
 
 		//set owner and entity properties of acl

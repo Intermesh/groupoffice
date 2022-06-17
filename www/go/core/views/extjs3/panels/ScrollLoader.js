@@ -109,10 +109,11 @@ go.panels.ScrollLoader = {
 				o.params.position += (o.params.limit || this.pageSize);
 				o.params.limit = this.pageSize;
 				o.paging = true;
+				o.keepScrollPosition = true;
 
-				if(this.isGridPanel()) {
-					this.getView().scrollToTopOnLoad = false;
-				}
+				// if(this.isGridPanel()) {
+				// 	this.getView().scrollToTopOnLoad = false;
+				// }
 
 				store.load(o)
 			}

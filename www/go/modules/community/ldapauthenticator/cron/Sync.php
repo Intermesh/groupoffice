@@ -8,7 +8,7 @@ class Sync extends CronJob {
   
 	public function run(\go\core\model\CronJobSchedule $schedule) {
     $records = go()->getDbConnection()
-    ->select('id,syncGroups,syncUsers')
+    ->select('id,syncGroups,syncUsers,syncUsersDelete,syncGroupsDelete,syncUsersMaxDeletePercentage,syncGroupsMaxDeletePercentage')
     ->from('ldapauth_server')
     ->where('syncUsers = true OR syncGroups = true');
 
@@ -16,11 +16,11 @@ class Sync extends CronJob {
 
     foreach($records as $record) {
       if($record['syncUsers']) {
-        $c->users($record['id']);
+        $c->users($record['id'], false, !empty($record['syncUsersDelete']), $record['syncUsersMaxDeletePercentage']);
       }
 
       if($record['syncGroups']) {
-        $c->groups($record['id']);
+        $c->groups($record['id'],false, !empty($record['syncGroupsDelete']), $record['syncGroupsMaxDeletePercentage']);
       }
     }
 	}

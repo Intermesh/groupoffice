@@ -418,7 +418,7 @@ function test_system() :array
 	$test['name']='Shared Memory Functions';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']= function_exists('sem_get') && function_exists('shm_attach') && function_exists('sem_acquire') && function_exists('shm_get_var');
-	$test['feedback']= "InterProcessData::InitSharedMem(): PHP libraries for the use shared memory are not available. Z-push will work unreliably!";
+	$test['feedback']= "InterProcessData::InitSharedMem(): PHP libraries for the use shared memory are not available. Locking performance will increase with them and Z-push will work unreliably!";
 	$test['fatal']=false;
 
 	$tests[]=$test;
@@ -932,7 +932,13 @@ function save_config($config_obj)
 function whereis(string $cmd)
 {
 	if(strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
-		exec('whereis '.$cmd, $return);
+		$return = null;
+		try {
+			exec('whereis ' . $cmd, $return);
+		}
+		catch(Throwable $e) {
+			return false;
+		}
 
 		if(isset($return[0])) {
 			$locations = explode(' ', $return[0]);

@@ -45,12 +45,13 @@ $nodes = array(
 );
 
 
+go()->getDebugger()->setRequestId("CardDAV " . ($_SERVER['REQUEST_METHOD'] ?? ""));
+
 /* Initializing server */
 $server = new Server($nodes);
 $server->debugExceptions = go()->getDebugger()->enabled;
 $server->on('exception', function($e){
-//	go()->debug(Request::get()->getHeaders());
-	go()->debug((string) $e);
+	go()->warn($e);
 });
 
 
