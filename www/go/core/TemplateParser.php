@@ -223,6 +223,9 @@ class TemplateParser {
 	private function filterLinks(Entity $entity, $entityName, $properties = null) {
 
 		$entityType = EntityType::findByName($entityName);
+		if(!$entityType) {
+			throw new Exception("Entity '$entityName' doesn't exist");
+		}
 		$entityCls = $entityType->getClassName();
 		return $entityCls::findByLink($entity,!empty($properties) ? explode(",", $properties) : [], true);
 	}
