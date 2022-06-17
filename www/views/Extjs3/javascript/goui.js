@@ -44,7 +44,7 @@
 		injectGouiStyle();
 
 		//add class to apply goui style to chidren
-		el.classList.add("goui");
+		el.dom.id = "goui";
 
 		//load component module
 		const mods = await import("../../."+module);
