@@ -1,3 +1,5 @@
+- Core: Append number to users' personal group if it already exists as a normal group
+
 14-06-2022 6.6.97
 - Core: Fix color picker in case of null value
 - Core: Better error message for unsupported filter
