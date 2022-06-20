@@ -17,6 +17,7 @@ use go\core\model\User;
 use go\core\orm\Query;
 use go\modules\community\history\model\LogEntry;
 use go\modules\community\history\model\Settings;
+use GO\Projects2\Model\TimeEntry;
 
 class Module extends core\Module
 {
@@ -53,7 +54,7 @@ class Module extends core\Module
 		}
 
 		//hacky but works for old code
-		if(!$record->aclField()) {
+		if(!$record->aclField() && !($record instanceof TimeEntry)) {
 			return;
 		}
 
