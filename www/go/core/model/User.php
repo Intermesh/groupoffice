@@ -881,7 +881,7 @@ class User extends Entity {
 				$personalGroup->isUserGroupFor = $this->id;
 				$personalGroup->users[] = $this->id;
 
-				if (!$personalGroup->save()) {
+				if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
 					throw new SaveException($personalGroup);
 				}
 
@@ -890,7 +890,7 @@ class User extends Entity {
 				$personalGroup = $this->getPersonalGroup();
 				if ($this->isModified('username')) {
 					$personalGroup->name = $this->username;
-					if (!$personalGroup->save()) {
+					if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
 						throw new SaveException($personalGroup);
 					}
 				}
@@ -902,6 +902,20 @@ class User extends Entity {
 		}
 	}
 
+	private function appendNumberToGroupNameIfExists(Group $personalGroup): bool {
+		$i = 0;
+		$name = $personalGroup->name;
+
+		while (!$personalGroup->save()) {
+			$personalGroup->name = $name .' (' . ++$i .')';
+			if($i == 10) {
+				//give up
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	public function legacyOnSave() {
 		//for old framework. Remove when all is refactored!
