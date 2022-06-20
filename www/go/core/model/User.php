@@ -812,8 +812,8 @@ class User extends Entity {
 				$personalGroup->isUserGroupFor = $this->id;
 				$personalGroup->users[] = $this->id;
 
-				if (!$personalGroup->save()) {
-					throw new Exception("Could not create home group");
+				if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
+					throw new \Exception($personalGroup);
 				}
 
 				$this->personalGroup = $personalGroup;
@@ -821,7 +821,9 @@ class User extends Entity {
 				$personalGroup = $this->getPersonalGroup();
 				if ($this->isModified('username')) {
 					$personalGroup->name = $this->username;
-					$personalGroup->save();
+					if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
+						throw new \Exception($personalGroup);
+					}
 				}
 			}
 
@@ -830,7 +832,21 @@ class User extends Entity {
 			}
 		}
 	}
-	
+
+	private function appendNumberToGroupNameIfExists(Group $personalGroup): bool {
+		$i = 0;
+		$name = $personalGroup->name;
+
+		while (!$personalGroup->save()) {
+			$personalGroup->name = $name .' (' . ++$i .')';
+			if($i == 10) {
+				//give up
+				return false;
+			}
+		}
+
+		return true;
+	}
 	
 	public function legacyOnSave() {
 		//for old framework. Remove when all is refactored!
