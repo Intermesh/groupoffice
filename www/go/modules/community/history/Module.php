@@ -47,7 +47,7 @@ class Module extends core\Module
 	/**
 	 * @throws Exception
 	 */
-	static function logActiveRecord(ActiveRecord $record, $action) {
+	public static function logActiveRecord(ActiveRecord $record, $action) {
 
 		if(!self::$enabled || core\Installer::isInProgress()) {
 			return;
