@@ -9,7 +9,14 @@ import { splitter } from "../../../../../../../views/Extjs3/goui/script/componen
 import { TestWindow } from "./TestWindow.js";
 import { dl } from "../../../../../../../views/Extjs3/goui/script/component/DescriptionList.js";
 import { Format } from "../../../../../../../views/Extjs3/goui/script/util/Format.js";
+import { jmapstore } from "../../../../../../../views/Extjs3/goui/script/api/JmapStore.js";
 ;
+const noteBookStore = jmapstore({
+    entity: "NoteBook"
+});
+const noteStore = jmapstore({
+    entity: "Note"
+});
 export class GouiTest extends Component {
     constructor() {
         super(...arguments);
@@ -26,6 +33,9 @@ export class GouiTest extends Component {
             stateId: "gouidemo-splitter-east",
             resizeComponent: east
         }), east);
+        this.on("render", () => {
+            noteBookStore.load();
+        });
     }
     createEast() {
         this.descriptionList = dl({
@@ -69,10 +79,12 @@ export class GouiTest extends Component {
         })), table({
             flex: 1,
             title: "Table",
-            store: Store.create({
-                records: records,
-                sort: [{ property: "number", isAscending: true }]
-            }),
+            store: noteBookStore,
+            listeners: {
+                navigate: (table1, rowIndex, record) => {
+                    noteStore.load();
+                }
+            },
             cls: "fit no-row-lines",
             columns: [
                 checkboxcolumn({

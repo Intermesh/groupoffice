@@ -19,11 +19,20 @@ import {
 	DLRecord
 } from "../../../../../../../views/Extjs3/goui/script/component/DescriptionList.js";
 import {Format} from "../../../../../../../views/Extjs3/goui/script/util/Format.js";
+import {jmapstore} from "../../../../../../../views/Extjs3/goui/script/api/JmapStore.js";
 
 declare global {
 	var GO: any;
 }
 ;
+
+const noteBookStore = jmapstore({
+	entity: "NoteBook"
+});
+
+const noteStore = jmapstore({
+	entity: "Note"
+});
 
 export class GouiTest extends Component {
 
@@ -49,6 +58,10 @@ export class GouiTest extends Component {
 			}),
 			east
 		);
+
+		this.on("render", () => {
+			noteBookStore.load();
+		})
 	}
 
 	private createEast() {
@@ -112,10 +125,13 @@ export class GouiTest extends Component {
 			table({
 				flex: 1,
 				title: "Table",
-				store: Store.create({
-					records: records,
-					sort: [{property: "number", isAscending: true}]
-				}),
+				store: noteBookStore,
+				listeners: {
+					navigate: (table1, rowIndex, record) => {
+
+						noteStore.load();
+					}
+				},
 				cls: "fit no-row-lines",
 				columns: [
 					checkboxcolumn({

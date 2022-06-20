@@ -1,3 +1,4 @@
+
 (function() {
 
 	let styleInjected = false;
@@ -45,6 +46,11 @@
 		//add class to apply goui style to chidren
 		el.id = "goui";
 		const rootMods = await import("../goui/script/component/Root.js");
+
+		const clientMods = await import("../goui/script/api/Client.js");
+		clientMods.client.uri = BaseHref + "api/";
+
+		clientMods.client.session = Ext.apply(go.User.session, {accessToken: go.User.accessToken});
 
 		//load component module
 		const mods = await import("../../."+module);
