@@ -17,6 +17,8 @@ trait ValidationTrait {
 	 */
 	public final function validate(): bool {
 
+		$this->validationErrors = [];
+
 		$this->internalValidate();
 
 		return !$this->hasValidationErrors();
