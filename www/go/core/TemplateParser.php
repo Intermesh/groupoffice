@@ -300,6 +300,10 @@ class TemplateParser {
 			return $items->single();
 		}
 
+		if($items instanceof \GO\Base\Db\ActiveStatement) {
+			return $items->fetch();
+		}
+
 		throw new Exception("Unsupported type for filter 'first'");
 
 
