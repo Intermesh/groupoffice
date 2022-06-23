@@ -42,6 +42,7 @@ namespace GO\Base\Db;
 
 use GO\Base\Db\PDO;
 use GO;
+use go\core\customfield\Html;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
@@ -1878,10 +1879,17 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-//		if($withCustomFields && GO::modules()->customfields && $this->customfieldsRecord  && GO::modules()->customfields->permissionLevel)
-//		{
-//			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
-//		}
+		if($withCustomFields && method_exists(static::class, 'getCustomFields')) {
+			foreach (static::getCustomFieldModels() as $field) {
+
+				if (empty($field->databaseName) || $field->getDataType() instanceof Html) {
+					continue;
+				}
+
+				$fields[]='`cf`.`'.$field->databaseName.'`';
+			}
+		}
+
 		return $fields;
 	}
 
