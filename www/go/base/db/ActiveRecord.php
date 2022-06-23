@@ -5617,4 +5617,27 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		return ['title' => $title, 'body' => $body];
 	}
+
+
+	/**
+	 * For compatibility with template field to lookup a project for example
+	 * @param $entity
+	 * @param array $properties
+	 * @param bool $readOnly
+	 * @return false|ActiveRecord|ActiveStatement
+	 * @throws Exception
+	 */
+	public static function findByLink($entity, array $properties = [], bool $readOnly = false) {
+
+		$findParams = FindParams::newInstance()
+			->ignoreAcl()
+			->debugSql()
+			->join("core_link", 't.id = l.toId AND l.toEntityTypeId = '.static::entityType()->getId(), 'l');
+
+		$findParams->getCriteria()
+			->addCondition('fromEntityTypeId', $entity::entityType()->getId(), '=', 'l')
+			->addCondition('fromId', $entity->id, '=', 'l');
+
+		return self::model()->find($findParams);
+	}
 }
