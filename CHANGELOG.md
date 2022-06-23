@@ -1,3 +1,5 @@
+- Billing: Sort scheduled order normal when sorting on date
+
 13-06-2022 6.5.109
 - Calendar: open info window when double clicking read only event
 - Core: PHP 7.3 support
