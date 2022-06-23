@@ -311,7 +311,7 @@ class DbStore extends AbstractStore {
 		if (!is_array($this->direction))
 			$this->direction = count($this->sort) ? array($this->direction) : array();
 
-		if (isset($this->_requestParams['groupDir']))
+		if (!empty($this->_requestParams['groupBy']) && isset($this->_requestParams['groupDir']))
 			array_unshift($this->direction, $this->_requestParams['groupDir']);
 
 			$this->sort = $this->getColumnModel()->getSortColumns($this->sort);
