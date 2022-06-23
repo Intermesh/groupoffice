@@ -6,6 +6,8 @@
 - Tasks: Task should be green if they start and end today
 - Tasks: removed grouping by tasklist
 - Core: Custom field templates support old entities (ActiveRecord) now.
+- Core: save related items when linking so custom templates update.
+- Core: Search custom fields in old framework models
 
 14-06-2022 6.6.97
 - Core: Fix color picker in case of null value
