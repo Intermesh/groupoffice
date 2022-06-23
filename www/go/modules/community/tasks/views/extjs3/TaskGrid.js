@@ -79,7 +79,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			const now = (new Date).format("Ymd");
 				if(record.data.due && record.data.due.format("Ymd") < now) {
 				meta.css = "danger";
-			} else if(record.data.start && record.data.start.format("Ymd") < now) {
+			} else if(record.data.start && record.data.start.format("Ymd") <= now) {
 				meta.css = "success";
 			}
 
