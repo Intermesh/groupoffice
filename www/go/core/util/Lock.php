@@ -166,7 +166,7 @@ class Lock {
 		}
 
 		if(isset($this->sem)) {
-			sem_remove($this->sem);
+			sem_release($this->sem);
 			$this->sem = null;
 		} else 	if(is_resource($this->lockFp)) {
 			flock($this->lockFp, LOCK_UN);
