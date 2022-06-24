@@ -659,7 +659,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 					$folder->setAttributes($autoCreateAttributes);
 					$folder->name = $folderName;
 					$folder->parent_id = $parent_id;
-					if(!$folder->save()){
+					if(!$folder->save(true)){
 						throw new \Exception('Could not create folder: '.var_export($folder->getValidationErrors(), true));
 					}
 				}elseif(!empty($autoCreateAttributes))
@@ -1379,7 +1379,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			\GO::debug("MOVE ".$file->name);
 			$file->folder_id=$this->id;
 			$file->appendNumberToNameIfExists();
-			if(!$file->save()){
+			if(!$file->save(true)){
 				throw new \Exception("Could not save file ".$file->name." ".implode("\n", $file->getValidationErrors()));
 			}
 		}
