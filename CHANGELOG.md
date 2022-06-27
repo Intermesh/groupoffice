@@ -1,3 +1,4 @@
+- Leavedays: delete special budgets when no hours assigned
 - Calendar time tracking: fix error switching projects
 - Core: Append number to users' personal group if it already exists as a normal group
 - Sync: select readonly address books
