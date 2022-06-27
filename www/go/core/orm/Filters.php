@@ -185,8 +185,15 @@ class Filters {
 						call_user_func($filterConfig['fn'], $criteria, $range['endHasTime'] ? '<=' : '<', $range[1], $query, $filter);
 					} else
 					{
-						$v = self::parseNumericValue($value);
-						$v["query"] = new DateTime($v["query"]);
+						if($value == null) {
+							$v = [
+								'comparator' => '=',
+								'query' => null
+							];
+						} else {
+							$v = self::parseNumericValue($value);
+							$v["query"] = new DateTime($v["query"]);
+						}
 						call_user_func($filterConfig['fn'], $criteria, $v['comparator'], $v["query"], $query, $filter);
 					}
 					break;
@@ -237,7 +244,7 @@ class Filters {
 	 * })
 	 * 
 	 * @param string $name
-	 * @param Closure $fn Called with: Criteria $criteria, $comparator, DateTime $value, Query $query, array $filters
+	 * @param Closure $fn Called with: Criteria $criteria, $comparator, ?DateTime $value, Query $query, array $filters
 	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
 	 * 
 	 * @return $this
