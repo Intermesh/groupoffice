@@ -760,7 +760,9 @@ class StringHelper {
 
 			//don't add the style added by group-office inline because it will double up.
 			if(!strstr($matches[0][$i], 'groupoffice-email-style')) {
-				$css .= $matches[1][$i] . "\n\n";
+				$tmpCss = $matches[1][$i];
+				$tmpCss = preg_replace(["'<!--'", "'-->'"], "", $tmpCss);
+				$css .= $tmpCss. "\n\n"; // $matches[1][$i]
 			}
 		}
 
@@ -886,7 +888,6 @@ class StringHelper {
 	 * @return StringHelper HTML formatted string
 	 */
 	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
-	
 		//needed for very large strings when data is embedded in the html with an img tag
 		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
 
@@ -902,7 +903,9 @@ class StringHelper {
 			$styles = self::extractStyles($html, $prefix);
 		}
 
-		//remove comments because they might interfere
+		// remove comments because they might interfere. Some commands  in style tags may be improperly formatted
+		// because the user appears to paste from Word
+		$html = preg_replace(["'<style>[\s]*<!--'u", "'-->[\s*]</style>'u"], ['<style>','</style>'], $html);
 		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
 		$html = preg_replace('!/\*.*?\*/!s', '', $html);
 
