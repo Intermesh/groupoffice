@@ -2,7 +2,7 @@
   "name": "intermesh/groupoffice",
   "description": "Group-Office",
   "require": {
-    "php": ">=7.2.0",
+    "php": ">=7.3.0",
     "ext-pcre": "*",
     "ext-mbstring": "*",
     "ext-ctype": "*",

@@ -223,6 +223,10 @@ abstract class EntityController extends Controller {
 				'canCalculateUpdates' => false
 			];
 
+			if(go()->getDebugger()->enabled) {
+				$response['query'] =  (string)$idsQuery;
+			}
+
 			if(isset($hasMore)) {
 				$response['hasMore'] = $hasMore;
 			}
