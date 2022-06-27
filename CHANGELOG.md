@@ -1,3 +1,4 @@
+- Kanban: Fix board creation
 - Core: fix email HTML formatting for improperly commented inline styles
 - Leavedays: delete special budgets when no hours assigned
 - Calendar time tracking: fix error switching projects
