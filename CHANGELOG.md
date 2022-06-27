@@ -12,6 +12,7 @@
 - Core: save related items when linking so custom templates update.
 - Core: Search custom fields in old framework models
 - Billing: Sort scheduled order normal when sorting on date
+- Core: fixed undo after paste in HTML editor
 
 14-06-2022 6.6.97
 - Core: Fix color picker in case of null value
