@@ -1,3 +1,4 @@
+28-06-2022 6.6.98
 - Kanban: Fix board creation
 - Core: fix email HTML formatting for improperly commented inline styles
 - Leavedays: delete special budgets when no hours assigned
@@ -13,6 +14,7 @@
 - Core: Search custom fields in old framework models
 - Billing: Sort scheduled order normal when sorting on date
 - Core: fixed undo after paste in HTML editor
+- Caldav: Fixed recurring event not displayed on caldav clients
 
 14-06-2022 6.6.97
 - Core: Fix color picker in case of null value
