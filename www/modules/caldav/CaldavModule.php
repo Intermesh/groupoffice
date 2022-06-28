@@ -117,7 +117,7 @@ class CaldavModule extends \GO\Base\Module {
 		$isRecurring = count($events) > 1;
 
 		foreach($events as $event){
-			if($isRecurring) {
+			if($isRecurring && empty($event->rrule)) {
 				$recurrenceTime = $event->start_time;
 			} else{
 				$recurrenceTime = false;
