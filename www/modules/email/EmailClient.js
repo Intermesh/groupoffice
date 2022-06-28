@@ -557,8 +557,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			}
 
 			if(mailboxNode) {
-				mailboxNode.on('load', function(){
-
+				// mailboxNode.on('load', function(){
+				setTimeout(() => {
 					//don't know why but it doesn't work without a 10ms delay.
 					this.treePanel.getSelectionModel().select(mailboxNode);
 
@@ -567,10 +567,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 						setTimeout(() => {
 							this.treePanel.body.dom.scrollTop = this.treeScrollTop;
 							delete this.treeScrollTop;
-						}, 10);
+						}, 100);
 					}
+					}, 0)
 
-				},this, {single: true, defer: 10});
+				// },this, {single: true, defer: 10});
 			} else {
 				this.messagesStore.removeAll();
 			}
@@ -591,9 +592,14 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			usage=inboxNode.attributes.usage;
 		}
 
+		let mbname = node.attributes.mailbox;
+		if(Ext.isEmpty(mbname)) {
+			mbname = 'INBOX';
+		}
+
 		this.setAccount(
 			node.attributes.account_id,
-			node.attributes.mailbox,
+			mbname,
 			usage
 		);
 		
