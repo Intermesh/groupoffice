@@ -5,6 +5,7 @@ namespace go\modules\community\history;
 
 use GO\Base\Db\ActiveRecord;
 use go\core;
+use go\core\ErrorHandler;
 use go\core\jmap\Entity;
 use go\core\model\User;
 use go\modules\community\history\model\LogEntry;
@@ -62,9 +63,7 @@ class Module extends core\Module
 			$log->changes = json_encode($changes);
 		}
 
-		if(!$log->save()) {
-			\go\core\ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
-		}
+		static::saveLog($log);
 	}
 
 	public static function onEntitySave(Entity $entity) {
@@ -142,8 +141,29 @@ class Module extends core\Module
 			$log->changes = json_encode($changes);
 		}
 
-		if(!$log->save()) {
-			\go\core\ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
+		static::saveLog($log);
+
+	}
+
+	private static function saveLog(LogEntry $log) {
+		try {
+			if (!$log->save()) {
+				ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId . "): " . var_export($log->getValidationErrors(), true));
+			}
+		}catch(Exception $e) {
+
+			ErrorHandler::logException($e);
+			//try again with just ID in description. I had a case where there were malformed characters
+			$log->description = $log->entityId . ': error in description';
+
+			try {
+				if(!$log->save()) {
+					ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
+				}
+			} catch(Exception $e) {
+				ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId . "): " . var_export($log->getValidationErrors(), true));
+				ErrorHandler::logException($e);
+			}
 		}
 	}
 
