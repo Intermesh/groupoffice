@@ -1,4 +1,5 @@
 - Tasks: Fixed error when dismissing alert: SQLSTATE[22007]: Invalid datetime format: 1292 Truncated incorrect INTEGER value: 'assigned'
+- Core: Fixed search in old framework when having a multi select field
 
 28-06-2022 6.6.98
 - Kanban: Fix board creation
