@@ -3,6 +3,7 @@
 
 namespace go\modules\community\history;
 
+use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core;
 use go\core\ErrorHandler;
@@ -174,7 +175,7 @@ class Module extends core\Module
 		$log->setAction('login');
 		$log->changes = null;
 		if(!$log->save()){
-			throw new \Exception("Could not save log");
+			throw new Exception("Could not save log");
 		}
 	}
 
@@ -189,7 +190,7 @@ class Module extends core\Module
 		$log->setAction('badlogin');
 		$log->changes = null;
 		if(!$log->save()){
-			throw new \Exception("Could not save log");
+			throw new Exception("Could not save log");
 		}
 	}
 
@@ -200,7 +201,7 @@ class Module extends core\Module
 		$log->setAction('logout');
 		$log->changes = null;
 		if(!$log->save()){
-			throw new \Exception("Could not save log");
+			throw new Exception("Could not save log");
 		}
 	}
 
