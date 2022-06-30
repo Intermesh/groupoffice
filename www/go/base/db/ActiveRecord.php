@@ -1882,7 +1882,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if($withCustomFields && method_exists(static::class, 'getCustomFields')) {
 			foreach (static::getCustomFieldModels() as $field) {
 
-				if (empty($field->databaseName) || $field->getDataType() instanceof Html) {
+				if (!$field->getDataType()->hasColumn() || $field->getDataType() instanceof Html) {
 					continue;
 				}
 
