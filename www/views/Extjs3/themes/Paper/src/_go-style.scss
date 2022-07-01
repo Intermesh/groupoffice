@@ -2120,6 +2120,7 @@ table[id^="comments-ext"] b {
 		border-right: 1px solid color($fg,'line');
 		min-height:dp(40);
     	padding: 0 dp(4) 0 dp(16);
+		margin-right: 0;
 	}
 }
 
