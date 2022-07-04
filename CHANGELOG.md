@@ -1,6 +1,7 @@
 - Tasks: Fixed error when dismissing alert: SQLSTATE[22007]: Invalid datetime format: 1292 Truncated incorrect INTEGER value: 'assigned'
 - Business: fix employee combo to use correct entityType
 - Core: Fixed search in old framework when having a multi select field
+- Projects: Fixed error in post calculation when time entry had no comment
 
 28-06-2022 6.6.98
 - Kanban: Fix board creation
