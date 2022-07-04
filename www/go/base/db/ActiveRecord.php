@@ -50,10 +50,12 @@ use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\model\Alert;
 use go\core\model\Link;
+use go\core\model\Module;
 use go\core\model\User;
 use go\core\model\UserDisplay;
 use go\core\orm\SearchableTrait;
 use go\core\util\StringUtil;
+use go\modules\community\comments\model\Comment;
 
 abstract class ActiveRecord extends \GO\Base\Model{
 
@@ -3735,6 +3737,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return strlen($word) > 2;
 		});
 
+		$keywords = $this->getCommentKeywords($keywords);
+
 		if($this->hasAttribute('id') && !in_array($this->id, $keywords)) {
 			$keywords[] = $this->id;
 		}
@@ -3821,6 +3825,18 @@ abstract class ActiveRecord extends \GO\Base\Model{
 //		return false;
 		
 		return true;
+	}
+
+	private function getCommentKeywords(array $keywords) : array {
+		if(Module::isInstalled("community", "comments")) {
+			$comments = Comment::findFor($this, ['text']);
+			foreach($comments as $comment) {
+				$plain = strip_tags($comment->text);
+				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
+			}
+		}
+
+		return $keywords;
 	}
 	
 	
