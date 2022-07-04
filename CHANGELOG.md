@@ -3,6 +3,7 @@
 - Core: Fixed search in old framework when having a multi select field
 - Projects: Fixed error in post calculation when time entry had no comment
 - Core: Archive user doesn't archive default address book, task list, note book and calendar but the items this user created.
+- Core: Search on comment content didn't work for old framework (eg. Projects)
 
 28-06-2022 6.6.98
 - Kanban: Fix board creation
