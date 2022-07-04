@@ -202,14 +202,18 @@ END;
 	/**
 	 * Cut's off a string if it exceeds a given length
 	 *
-	 * @param string $str The string to chop
+	 * @param ?string $str The string to chop
 	 * @param int $maxLength The maximum number of characters in the string
 	 * @param bool $cutWholeWords
 	 * @param string $append
 	 * @return string
 	 */
-	public static function cutString(string $str, int $maxLength, bool $cutWholeWords = true, string $append = '...'): string
+	public static function cutString(?string $str, int $maxLength, bool $cutWholeWords = true, string $append = '...'): string
 	{
+		if(!isset($str)) {
+			return "";
+		}
+
 		if (strlen($str) <= $maxLength) {
 			return $str;
 		}
