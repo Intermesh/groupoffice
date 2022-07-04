@@ -69,13 +69,13 @@ class Lock {
 			throw new LogicException("Lock '" . $this->name . "' already locked by you!");
 		}
 
-		if(function_exists('sem_get')) {
-			//performs better but is not always available
-			$locked = $this->lockWithSem();
-		} else
-		{
+//		if(function_exists('sem_get')) {
+//			//performs better but is not always available
+//			$locked = $this->lockWithSem();
+//		} else
+//		{
 			$locked = $this->lockWithFlock();
-		}
+//		}
 
 		if($locked) {
 			$this->lockedByMe = true;
