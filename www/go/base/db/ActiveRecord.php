@@ -3094,6 +3094,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 	}
 
+	private $isSaving = false;
 
 	/**
 	 * Saves the model to the database
@@ -3196,6 +3197,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$this->_trimSpacesFromAttributes();
 
+		$this->isSaving = true;
+
 		if($this->isNew){
 
 			//automatically set sort order column
@@ -3215,6 +3218,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			
 			if(!$this->beforeSave()){
+				$this->isSaving = false;
 				GO::debug("WARNING: ".$this->className()."::beforeSave returned false or no value");
 				return false;
 			}
@@ -3242,6 +3246,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				}
 				
 				if(empty($this->{$this->primaryKey()})){
+					$this->isSaving = false;
 					return false;
 				}
 			}			
@@ -3279,11 +3284,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			if(!$this->beforeSave()){
 				GO::debug("WARNING: ".$this->className()."::beforeSave returned false or no value");
+				$this->isSaving = false;
 				return false;
 			}
 
 
 			if($this->dbUpdateRequired() && !$this->_dbUpdate()) {
+				$this->isSaving = false;
 				return false;
 			}
 		}
@@ -3293,11 +3300,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$this->log($wasNew ? "create" : "update",true, false);
 
 		if($this->hasCustomFields() && !$this->saveCustomFields()) {
+			$this->isSaving = false;
 			return false;
 		}
 
 		if(!$this->afterSave($wasNew)){
 			GO::debug("WARNING: ".$this->className()."::afterSave returned false or no value");
+			$this->isSaving = false;
 			return false;
 		}
 
@@ -3315,7 +3324,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$this->_modifiedAttributes = array();
 
+		$this->isSaving = false;
+
 		return true;
+	}
+
+	public function isSaving() {
+		return $this->isSaving;
 	}
 	
 	protected function nextSortOrder() {

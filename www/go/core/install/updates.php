@@ -1201,3 +1201,13 @@ $updates['202205101416'][] = function() {
 $updates['202206031343'][] = "drop index clientName_2 on core_entity;";
 
 $updates['202206031343'][] = "drop index moduleId_2 on core_entity;";
+
+
+$updates['202207041200'][] = "alter table core_customfields_field_set
+    add parentFieldSetId int null;";
+
+$updates['202207041200'][] = "alter table core_customfields_field_set
+    add constraint core_customfields_field_set_core_customfields_field_set_id_fk
+        foreign key (parentFieldSetId) references core_customfields_field_set (id)
+            on delete set null;";
+
