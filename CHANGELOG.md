@@ -1,3 +1,5 @@
+- Email: Fix pathname open refresh token URL  
+
 04-07-2022 6.6.99
 - Tasks: Fixed error when dismissing alert: SQLSTATE[22007]: Invalid datetime format: 1292 Truncated incorrect INTEGER value: 'assigned'
 - Business: fix employee combo to use correct entityType
