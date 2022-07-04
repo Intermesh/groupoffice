@@ -6,6 +6,7 @@
 - Core: Search on comment content didn't work for old framework (eg. Projects)
 - Billing: 190 char field for customer contact name
 - Billing: Cut attribute lengths if they're too long when copying names from address book
+- Core: Lock with flock as sem was keeping a lock forever sometimes.
 
 28-06-2022 6.6.98
 - Kanban: Fix board creation
