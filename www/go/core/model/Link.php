@@ -406,18 +406,26 @@ class Link extends AclItemEntity
 			return false;
 		}
 		if($from instanceof ActiveRecord) {
-			$from->save(true);
+			if(!$from->isSaving()) {
+				$from->save(true);
+			}
 		} else{
-			$from->save();
+			if(!$from->isSaving()) {
+				$from->save();
+			}
 		}
 		$to = $this->findToEntity();
 		if(!$to) {
 			return false;
 		}
 		if($to instanceof ActiveRecord) {
-			$to->save(true);
+			if(!$to->isSaving()) {
+				$to->save(true);
+			}
 		} else{
-			$to->save();
+			if(!$to->isSaving()) {
+				$to->save();
+			}
 		}
 
 		return true;
