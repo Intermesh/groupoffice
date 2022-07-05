@@ -1,3 +1,4 @@
+05-07-2022 6.6.101
 - Leavedays: several fixes special leave budgets
 - Core: Add custom field sets to custom tabs
 - Core: Error when entity was updated when another was created
