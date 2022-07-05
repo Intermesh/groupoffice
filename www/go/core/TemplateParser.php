@@ -170,7 +170,12 @@ class TemplateParser {
 		$this->addFilter('nl2br', "nl2br");
 		$this->addFilter('t', [$this, "filterTranslate"]);
 
-		$this->addModel('now', new DateTime());	
+		$this->addModel('now', new DateTime());
+
+		$this->addModel('system', [
+			"title" => go()->getSettings()->title,
+			"url" => go()->getSettings()->URL
+		]);
 	}
 
 	private $_currentUser;
