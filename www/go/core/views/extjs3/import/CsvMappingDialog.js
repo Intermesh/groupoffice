@@ -17,7 +17,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			
 			items: [
 				this.fieldSet = new Ext.form.FieldSet({
-					labelWidth: dp(200),
+					labelWidth: dp(300),
 					items: [{
 							xtype: 'box',
 							autoEl: 'p',
@@ -215,8 +215,11 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			if(!go.util.empty(h.properties)) {
 				var formContainer = {
 					xtype: "formcontainer",
-					labelWidth: dp(200),
+					labelWidth: dp(300),
 					hideLabel: true,
+					defaults: {
+						anchor: "100%"
+					},
 					items: this.createMappingFields(h.properties, fields[h.name] ? fields[h.name].properties : {}, parent ? parent + "." + h.name : h.name)
 				};
 
@@ -249,6 +252,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					name: h.name,
 					fieldLabel: fields[h.name] ? fields[h.name].label : (h.label || h.name),
 					items: [this.createCombo({
+						anchor: "100%",
 						store: this.csvStore,
 						hiddenName: "csvIndex",
 						setValue: function(v) {
