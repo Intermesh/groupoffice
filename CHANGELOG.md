@@ -1,3 +1,5 @@
+- Leavedays: several fixes special leave budgets
+
 04-07-2022 6.6.100
 - Email: Fix pathname open refresh token URL
 - Billing: fixed infinite save loop problem
