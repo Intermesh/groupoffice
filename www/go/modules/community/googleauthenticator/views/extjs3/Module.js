@@ -51,8 +51,8 @@ go.modules.community.googleauthenticator.enable = (user, password, countDown, bl
 			})
 			.catch((error) => {
 
-				if(error.description && !error.response) {
-					GO.errorDialog.show(error.description);
+				if(error.message && !error.response) {
+					GO.errorDialog.show(error.message);
 				}
 
 				// When the password is not correct, call itself again to try again

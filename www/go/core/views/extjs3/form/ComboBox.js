@@ -198,8 +198,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			this.setValue(entity.id);
 			return this.setValuePromise;
 		}).catch((error) => {
-			GO.errorDialog.show(error.description);
-			return Promise.reject(error.description);
+			GO.errorDialog.show(error.message);
+			return Promise.reject(error.message);
 		});
 	},
 	
