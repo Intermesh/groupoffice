@@ -1,6 +1,7 @@
 - Leavedays: several fixes special leave budgets
 - Core: Add custom field sets to custom tabs
 - Core: Error when entity was updated when another was created
+- Newsletters: New API method to subscribe with double opt in via e-mail
 
 04-07-2022 6.6.100
 - Email: Fix pathname open refresh token URL
