@@ -1,14 +1,13 @@
 <?php
-//This example creates a contact on a Group-Office installation and sends
+//This example creates a contact on a Group-Office installation, subscribes it to a newsletter and sends
 //an email to notify the system admin.
-
-//NOTE: A custom field 'newsletter' of type checkbox is used in this example. So
-//create that for testing.
 
 //Adjust these variables for your installation
 $apiKey = "61bb0ed6515d2da17c95e073a0458bdb4421273784cc3";
 $apiUrl = 'http://localhost/api/jmap.php';
 
+// make sure this list exists in Group-Office
+$addressListId = 1;
 
 // For debugging display all errors
 ini_set('display_errors', 'on');
@@ -63,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			"clientCallId-1"
 		],
         ['business/newsletters/Subscription/invite', [
-          "addressListId" => 1,
+          "addressListId" => $addressListId,
           "#contactId" => [ // Use ID of just created contact
             "resultOf" => "clientCallId-1",
             "path" => "/created/contact1/id"
