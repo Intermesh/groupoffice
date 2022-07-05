@@ -70,7 +70,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			type: "submit",
 			handler: function() {
 				this.submit().catch((error) => {
-					GO.errorDialog.show(error.message || error.description);
+					GO.errorDialog.show(error);
 				});
 			},
 			scope: this
@@ -112,7 +112,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 					text: t("Save"),
 					handler: function() {
 						this.submit().catch(function(error) {
-							GO.errorDialog.show(error.message || error.description);
+							GO.errorDialog.show(error );
 						});
 					},
 					scope: this

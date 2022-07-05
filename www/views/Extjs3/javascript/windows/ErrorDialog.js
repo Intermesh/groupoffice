@@ -45,7 +45,10 @@ Ext.extend(GO.ErrorDialog, GO.Window, {
 
 	show : function(error, title) {
 
-		console.trace('errordialog');
+		console.error(error);
+		if(Ext.isString(error)) {
+			console.trace('errordialog');
+		}
 		
 		if(!title) {
 			title = t("Error");
@@ -61,6 +64,9 @@ Ext.extend(GO.ErrorDialog, GO.Window, {
 
 		if(!error)
 			error = "No error message given";
+		else if(error.message) {
+			error = error.message;
+		}
 		
 		this.setHeight(dp(120));
 		this.messagePanel.body.update(error);

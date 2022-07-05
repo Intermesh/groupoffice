@@ -818,7 +818,8 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 							continue;
 						}
 						//merge existing data, with updates from client and server
-						entity = Ext.apply(this.data[serverId], params.update[serverId]);
+
+						entity = params.update && params.update[serverId] ? Ext.apply(this.data[serverId], params.update[serverId]) : this.data[serverId];
 						entity = Ext.apply(entity, response.updated[serverId] || {});
 						this._add(entity, true);
 					}
@@ -840,7 +841,6 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 				return response;
 			}).catch((error) => {
-
 
 				if(error.type && error.type == 'stateMismatch') {
 					return this.getUpdates().then(() => {
