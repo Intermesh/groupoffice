@@ -1,4 +1,5 @@
 - Leavedays: several fixes special leave budgets
+- Core: Add custom field sets to custom tabs
 
 04-07-2022 6.6.100
 - Email: Fix pathname open refresh token URL
