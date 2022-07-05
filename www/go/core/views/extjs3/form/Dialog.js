@@ -174,7 +174,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		});
 	},
 	
-	addCustomFields : function(items) {
+	addCustomFields : function(items, parentFieldSetId) {
 		if(go.Entities.get(this.entityStore).customFields) {
 			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
 			fieldsets.forEach(function(fs) {
