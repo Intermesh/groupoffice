@@ -85,7 +85,7 @@ GO.email.AccountDialog = function(config) {
 			anchor: '20%',
 			tooltip: t('Request or update a refresh token in a separate window.','oauth2client','community'),
 			handler : function() {
-				window.open('/go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id, 'do_da_auth_thingy');
+				window.open(window.location.pathname + 'go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id, 'do_da_auth_thingy');
 				this.refreshNeeded = true;
 			},
 			scope : this

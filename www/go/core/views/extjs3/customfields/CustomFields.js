@@ -191,7 +191,11 @@
 			var fieldSets = this.getFieldSets(entity), formFieldSets = [];
 
 			for (var i = 0, l = fieldSets.length; i < l; i++) {
-				formFieldSets.push(new go.customfields.FormFieldSet({fieldSet: fieldSets[i]}));				
+				if(!fieldSets[i].parentFieldSetId) {
+					let fs = new go.customfields.FormFieldSet({fieldSet: fieldSets[i]});
+					formFieldSets.push(fs);
+				}
+
 			}
 			return formFieldSets;
 		},

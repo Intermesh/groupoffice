@@ -42,6 +42,7 @@ namespace GO\Base\Db;
 
 use GO\Base\Db\PDO;
 use GO;
+use go\core\customfield\Html;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
@@ -49,10 +50,12 @@ use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\model\Alert;
 use go\core\model\Link;
+use go\core\model\Module;
 use go\core\model\User;
 use go\core\model\UserDisplay;
 use go\core\orm\SearchableTrait;
 use go\core\util\StringUtil;
+use go\modules\community\comments\model\Comment;
 
 abstract class ActiveRecord extends \GO\Base\Model{
 	const EVENT_URL = "url";
@@ -1879,10 +1882,17 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-//		if($withCustomFields && GO::modules()->customfields && $this->customfieldsRecord  && GO::modules()->customfields->permissionLevel)
-//		{
-//			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
-//		}
+		if($withCustomFields && method_exists(static::class, 'getCustomFields')) {
+			foreach (static::getCustomFieldModels() as $field) {
+
+				if (!$field->getDataType()->hasColumn() || $field->getDataType() instanceof Html) {
+					continue;
+				}
+
+				$fields[]='`cf`.`'.$field->databaseName.'`';
+			}
+		}
+
 		return $fields;
 	}
 
@@ -3085,6 +3095,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 	}
 
+	private $isSaving = false;
 
 	/**
 	 * Saves the model to the database
@@ -3187,6 +3198,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$this->_trimSpacesFromAttributes();
 
+		$this->isSaving = true;
+
 		if($this->isNew){
 
 			//automatically set sort order column
@@ -3206,6 +3219,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			
 			if(!$this->beforeSave()){
+				$this->isSaving = false;
 				GO::debug("WARNING: ".$this->className()."::beforeSave returned false or no value");
 				return false;
 			}
@@ -3233,6 +3247,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				}
 				
 				if(empty($this->{$this->primaryKey()})){
+					$this->isSaving = false;
 					return false;
 				}
 			}			
@@ -3270,11 +3285,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			if(!$this->beforeSave()){
 				GO::debug("WARNING: ".$this->className()."::beforeSave returned false or no value");
+				$this->isSaving = false;
 				return false;
 			}
 
 
 			if($this->dbUpdateRequired() && !$this->_dbUpdate()) {
+				$this->isSaving = false;
 				return false;
 			}
 		}
@@ -3284,11 +3301,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$this->log($wasNew ? "create" : "update",true, false);
 
 		if($this->hasCustomFields() && !$this->saveCustomFields()) {
+			$this->isSaving = false;
 			return false;
 		}
 
 		if(!$this->afterSave($wasNew)){
 			GO::debug("WARNING: ".$this->className()."::afterSave returned false or no value");
+			$this->isSaving = false;
 			return false;
 		}
 
@@ -3306,9 +3325,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$this->_modifiedAttributes = array();
 
+		$this->isSaving = false;
+
 		return true;
 	}
-	
+
+	public function isSaving() {
+		return $this->isSaving;
+	}
+
 	protected function nextSortOrder() {
 		return $this->count();
 	}
@@ -3728,6 +3753,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return strlen($word) > 2;
 		});
 
+		$keywords = $this->getCommentKeywords($keywords);
+
 		if($this->hasAttribute('id') && !in_array($this->id, $keywords)) {
 			$keywords[] = $this->id;
 		}
@@ -3815,7 +3842,19 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		
 		return true;
 	}
-	
+
+	private function getCommentKeywords(array $keywords) : array {
+		if(Module::isInstalled("community", "comments")) {
+			$comments = Comment::findFor($this, ['text']);
+			foreach($comments as $comment) {
+				$plain = strip_tags($comment->text);
+				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
+			}
+		}
+
+		return $keywords;
+	}
+
 	
 	/**
 	 * Cut all attributes to their maximum lengths. Useful when importing stuff.
@@ -4904,7 +4943,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$stmt->execute();
 
 			echo "Deleted ". $stmt->rowCount() . " entries\n";
-		
+
 			$start = 0;
 			$limit = 1000;
 			
@@ -5627,6 +5666,29 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		return ['title' => $title, 'body' => $body];
+	}
+
+
+	/**
+	 * For compatibility with template field to lookup a project for example
+	 * @param $entity
+	 * @param array $properties
+	 * @param bool $readOnly
+	 * @return false|ActiveRecord|ActiveStatement
+	 * @throws Exception
+	 */
+	public static function findByLink($entity, array $properties = [], bool $readOnly = false) {
+
+		$findParams = FindParams::newInstance()
+			->ignoreAcl()
+			->debugSql()
+			->join("core_link", 't.id = l.toId AND l.toEntityTypeId = '.static::entityType()->getId(), 'l');
+
+		$findParams->getCriteria()
+			->addCondition('fromEntityTypeId', $entity::entityType()->getId(), '=', 'l')
+			->addCondition('fromId', $entity->id, '=', 'l');
+
+		return self::model()->find($findParams);
 	}
 
 	public function url() {

@@ -1588,7 +1588,9 @@ class Event extends \GO\Base\Db\ActiveRecord {
 			}
 		}
 		if($recurrenceTime){
-			$dt = \GO\Base\Util\Date\DateTime::fromUnixtime($recurrenceTime);			
+			$dt = \GO\Base\Util\Date\DateTime::fromUnixtime($recurrenceTime);
+			//recurrence ID may not change
+			$dt->setTime(0,0,0);
 			$rId = $e->add('recurrence-id', $dt);
 			if($this->_exceptionEvent->all_day_event){
 				$rId['VALUE']='DATE';
@@ -1908,7 +1910,7 @@ $sub = $offset>0;
 		$this->setAttributes($attributes, false);
 		
 		$recurrenceIds = $vobject->select('recurrence-id');
-		if(count($recurrenceIds)){
+		if(empty($this->rrule) && count($recurrenceIds)){
 			
 			//this is a single instance of a recurring series.
 			//attempt to find the exception of the recurring series event by uuid

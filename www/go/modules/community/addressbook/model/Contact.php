@@ -858,7 +858,7 @@ class Contact extends AclItemEntity {
 		}
 		
 		if($this->isNew() && !isset($this->addressBookId)) {
-			$this->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
+			$this->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
 		}
 		
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {

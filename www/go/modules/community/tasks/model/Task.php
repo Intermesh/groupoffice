@@ -489,8 +489,16 @@ class Task extends AclInheritEntity {
 
 		$alertIds = [];
 
+		//The ID of the core_alert is the tag of the task_alert.
+		//But in some cases it contains a string like 'assigned' for when a task is assinged.
 		foreach($alerts as $alert) {
-			$alertIds[] = $alert->tag;
+			if(is_numeric($alert->tag)) {
+				$alertIds[] = $alert->tag;
+			}
+		}
+
+		if(empty($alertIds)) {
+			return;
 		}
 
 		go()->getDbConnection()->update(

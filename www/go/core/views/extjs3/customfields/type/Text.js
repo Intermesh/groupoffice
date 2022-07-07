@@ -112,7 +112,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		var form = this.findParentByType('form').getForm();
 		var field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
 		if (!field) {
-			console.warn("Field" + fieldName + ' not found in string.'); // TODO: Alert?
+			console.warn("Field " + fieldName + ' not found in string.'); // TODO: Alert?
 			return ''; // As yet, return an empty string if a field is not found
 		}
 		var fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();

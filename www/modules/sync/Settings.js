@@ -25,21 +25,21 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 	onLoadStart: function (userId) {
 		if(this.tasklistSelect) {
 			this.tasklistSelect.storeConfig.filters.permission = {
-				permissionLevel: go.permissionLevels.write,
+				permissionLevel: go.permissionLevels.read,
 				permissionLevelUserId: userId
 			};
 		};
 
 		if(this.noteBookSelect) {
 			this.noteBookSelect.storeConfig.filters.permission = {
-				permissionLevel: go.permissionLevels.write,
+				permissionLevel: go.permissionLevels.read,
 				permissionLevelUserId: userId
 			};
 		}
 
 		if(this.addressBookSelect) {
 			this.addressBookSelect.storeConfig.filters.permission = {
-				permissionLevel: go.permissionLevels.write,
+				permissionLevel: go.permissionLevels.read,
 				permissionLevelUserId: userId
 			};
 		}

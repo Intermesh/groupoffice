@@ -693,8 +693,6 @@ namespace go\core {
 				$this->rebuildCache();
 
 			}
-
-			go()->debug("Request done");
 		}
 
 		/**

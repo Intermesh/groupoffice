@@ -8,6 +8,7 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\model\Acl;
 use go\core\model\Field;
+use go\core\model\FieldSet;
 use go\core\orm\Entity;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
@@ -379,7 +380,7 @@ class Spreadsheet extends AbstractConverter {
 	 * @return string[]
 	 * @throws Exception
 	 */
-	protected function internalGetHeaders($forMapping = false) {
+	protected function internalGetHeaders(bool $forMapping = false) {
 
 		$entityCls = $this->entityClass;
 
@@ -441,17 +442,18 @@ class Spreadsheet extends AbstractConverter {
 
 		if(method_exists($entityCls, 'getCustomFields')) {
 			$fields = Field::findByEntity($entityCls::entityType()->getId());
+			/** @var Field[] $fields */
 			$customFieldProps = [];
 			foreach($fields as $field) {
 
 				if($forMapping) {
-					$customFieldProps[$field->databaseName] = ['name' => $field->databaseName, 'label' => $field->name, 'many' => false];
+					$customFieldProps[$field->databaseName] = ['name' => $field->databaseName, 'label' => $field->name .' (' . FieldSet::findById($field->fieldSetId, ['name'])->name . ')', 'many' => false];
 				} else{
 					//client specified which columns to export
 					if(!empty($this->clientParams['columns']) && !in_array($field->databaseName, $this->clientParams['columns'])) {
 						continue;
 					}
-					$headers[] =  ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => false];
+					$headers[] =  ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name , 'many' => false];
 				}
 			}
 

@@ -1,3 +1,46 @@
+- Core: New look and feel in line with new website
+
+05-07-2022 6.6.101
+- Leavedays: several fixes special leave budgets
+- Core: Add custom field sets to custom tabs
+- Core: Error when entity was updated when another was created
+- Core: Add custom field set name to field names when importing so duplicate names in differnet field sets can be
+  distinguished
+- Newsletters: New API method to subscribe with double opt in via e-mail
+
+04-07-2022 6.6.100
+- Email: Fix pathname open refresh token URL
+- Billing: fixed infinite save loop problem
+
+04-07-2022 6.6.99
+- Tasks: Fixed error when dismissing alert: SQLSTATE[22007]: Invalid datetime format: 1292 Truncated incorrect INTEGER value: 'assigned'
+- Business: fix employee combo to use correct entityType
+- Core: Fixed search in old framework when having a multi select field
+- Projects: Fixed error in post calculation when time entry had no comment
+- Core: Archive user doesn't archive default address book, task list, note book and calendar but the items this user created.
+- Core: Search on comment content didn't work for old framework (eg. Projects)
+- Billing: 190 char field for customer contact name
+- Billing: Cut attribute lengths if they're too long when copying names from address book
+- Core: Lock with flock as sem was keeping a lock forever sometimes.
+
+28-06-2022 6.6.98
+- Kanban: Fix board creation
+- Core: fix email HTML formatting for improperly commented inline styles
+- Leavedays: delete special budgets when no hours assigned
+- Calendar time tracking: fix error switching projects
+- Core: Append number to users' personal group if it already exists as a normal group
+- Sync: select readonly address books
+- History: Added time entries to history log
+- History: Added download action
+- Tasks: Task should be green if they start and end today
+- Tasks: removed grouping by tasklist
+- Core: Custom field templates support old entities (ActiveRecord) now.
+- Core: save related items when linking so custom templates update.
+- Core: Search custom fields in old framework models
+- Billing: Sort scheduled order normal when sorting on date
+- Core: fixed undo after paste in HTML editor
+- Caldav: Fixed recurring event not displayed on caldav clients
+
 14-06-2022 6.6.97
 - Core: Fix color picker in case of null value
 - Core: Better error message for unsupported filter
@@ -584,6 +627,8 @@
 
 
 
+
+- Billing: Sort scheduled order normal when sorting on date
 
 13-06-2022 6.5.109
 - Calendar: open info window when double clicking read only event

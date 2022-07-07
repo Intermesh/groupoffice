@@ -576,7 +576,7 @@ go.util =  (function () {
 			}).then(function (response) {
 				go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
 			}).catch(function(response) {
-				Ext.MessageBox.alert(t("Error"), response.description);
+				Ext.MessageBox.alert(t("Error"), response.message);
 			}).finally(function() {
 				Ext.getBody().unmask();
 			})
@@ -644,7 +644,7 @@ go.util =  (function () {
 								Ext.getBody().unmask();
 
 								if (!success) {
-									Ext.MessageBox.alert(t("Error"), response.description);
+									Ext.MessageBox.alert(t("Error"), response.message);
 								} else {
 									var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
 

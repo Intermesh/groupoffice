@@ -3,6 +3,7 @@
 namespace go\core\model;
 
 use go\core\acl\model\AclOwnerEntity;
+use go\core\db\Criteria;
 use go\core\orm\Entity;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
@@ -47,7 +48,8 @@ class FieldSet extends AclOwnerEntity {
 	protected $entity;
 	
 	protected $filter;	
-	
+
+	public $parentFieldSetId;
 	/**
 	 * Show this fieldset as a tab in clients
 	 * 
@@ -110,9 +112,11 @@ class FieldSet extends AclOwnerEntity {
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
-						->add('entities', function(\go\core\db\Criteria $criteria, $value) {
-							//$ids = \go\core\orm\EntityType::namesToIds($value);			
+						->add('entities', function(Criteria $criteria, $value) {
 							$criteria->andWhere('e.name', 'IN', $value);
+						})
+						->add('isTab', function(Criteria $criteria, $value) {
+							$criteria->andWhere('isTab', '=', $value);
 						});
 	}
 	

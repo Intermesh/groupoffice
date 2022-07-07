@@ -5,6 +5,7 @@ body{
 .x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
   border: 1px solid color($fg,'line');
   background-color: color($grey, 50);
+  border-radius: dp(4);
   &:hover{
     @extend .z1;
     //background-color: $cHover;
@@ -18,7 +19,7 @@ body{
   }
   &.primary, &.raised {
     color: white;
-    background-color: $cPrimary;
+    background-color: $cSecondary;
     //&:hover{ background-color: #387002;}
   }
 }

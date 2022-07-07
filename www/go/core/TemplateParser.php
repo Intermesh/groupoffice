@@ -180,7 +180,12 @@ class TemplateParser {
 		$this->addFilter('nl2br', "nl2br");
 		$this->addFilter('t', [$this, "filterTranslate"]);
 
-		$this->addModel('now', new DateTime());	
+		$this->addModel('now', new DateTime());
+
+		$this->addModel('system', [
+			"title" => go()->getSettings()->title,
+			"url" => go()->getSettings()->URL
+		]);
 	}
 
 	private $_currentUser;
@@ -233,6 +238,9 @@ class TemplateParser {
 	private function filterLinks(Entity $entity, $entityName, $properties = null) {
 
 		$entityType = EntityType::findByName($entityName);
+		if(!$entityType) {
+			throw new Exception("Entity '$entityName' doesn't exist");
+		}
 		$entityCls = $entityType->getClassName();
 		return $entityCls::findByLink($entity,!empty($properties) ? explode(",", $properties) : [], true);
 	}
@@ -341,6 +349,10 @@ class TemplateParser {
 
 		if($items instanceof Query) {
 			return $items->single();
+		}
+
+		if($items instanceof \GO\Base\Db\ActiveStatement) {
+			return $items->fetch();
 		}
 
 		throw new Exception("Unsupported type for filter 'first'");
