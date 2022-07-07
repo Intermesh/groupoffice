@@ -1,3 +1,5 @@
+- Core: New look and feel in line with new website
+
 05-07-2022 6.6.101
 - Leavedays: several fixes special leave budgets
 - Core: Add custom field sets to custom tabs
