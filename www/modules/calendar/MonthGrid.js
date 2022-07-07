@@ -67,9 +67,9 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 
 	gridEvents : {},
 
-	weekNumberWidth : 16,
+	weekNumberWidth : 20,
 
-	dayNameHeight : 16,
+	dayNameHeight : 20,
 
 	nextId : 0,
 
@@ -165,7 +165,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 		{
 			tag: 'div',
 			style: 'width:'+(this.dayNameHeight-1)+'px',
-			cls: 'cal-monthgrid-week-no'
+			cls: 'cal-monthgrid-weekday-name'
 		}, true);
 
 		Ext.DomHelper.append(cell,{
@@ -181,7 +181,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 			var cell = Ext.DomHelper.append(this.cellWrap,
 			{
 				tag: 'div',
-				cls: 'cal-monthgrid-week-no'
+				cls: 'cal-monthgrid-weekday-name'
 			}, true);
 
 			Ext.DomHelper.append(cell,{

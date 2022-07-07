@@ -191,13 +191,15 @@
 		border-bottom: 1px solid color($fg, 'line');
 	}
 	>li.x-tab-strip-active {
-		@include var(border-color, c-primary);
+		@include var(border-color, c-accent);
 		span.x-tab-strip-text {
-			@include var(color, c-primary);
+			color: color($fg, 'text');
+			font-weight: bold;
 		}
 	}
 	&-text {
 		@extend %font-button;
+		font-weight: normal;
 	}
 	&-disabled .x-tabs-text {
 		color: color($fg, 'disabled');
@@ -205,7 +207,8 @@
 
 	span.x-tab-strip-text {
 		padding:0;
-		color: color($fg, 'text');
+		color: color($fg, 'secondary-text');
+		font-weight: normal;
 		&.primary {
 			color: rgba(white, 0.7);
 		}
@@ -700,7 +703,7 @@
 	letter-spacing: 0; // for button icons
 	height: dp(32); // 32 for dense
 	line-height: dp(32) - 2; // 32 for dense
-	border-radius: $borderRadius;
+	border-radius: dp(16);
 	vertical-align: middle;
 	white-space: nowrap;
 	overflow: hidden;
@@ -711,6 +714,11 @@
 	
 	button {
 		min-height: dp(32);
+		line-height: dp(20);
+	}
+
+	&-text {
+		padding: dp(6);
 	}
 	
 	.x-form-composite & {
@@ -858,9 +866,9 @@
 			.ic-more, .ic-more-vert, .ic-more-horiz, .x-toolbar-more-icon {
 				&::after { display:none;}
 			}
-			> button::after { 
-				margin-left: dp(20);
-			}
+			//> button::after {
+			//	margin-left: dp(20);
+			//}
 		}
 		button {
 			min-width:dp(32);
@@ -868,9 +876,9 @@
 			position:relative;
 			&::before {
 				@extend %icon;
-				position:absolute;
-				top:dp(4);
-				left:dp(4);
+				//position:absolute;
+				//top:dp(4);
+				//left:dp(4);
 			}
 		}
    }
@@ -1044,7 +1052,7 @@
 }
 
 .x-toolbar{
-	height: dp(48);
+	height: dp(64);
 	padding:0;
 
 	&.go-paging-tb, .go-paging-tb & {
@@ -1060,7 +1068,7 @@
 	}
 
 	.x-panel-bbar & {
-		height: dp(40);
+		height: dp(56);
 		border-top: 1px solid color($fg, 'line');
 	}
 
@@ -1089,10 +1097,10 @@
 		}
 	}
 	&-left {
-		padding-left: dp(8);
-		.x-window & {
-			padding-left: dp(16);
-		}
+		padding-left: dp(16);
+		//.x-window & {
+		//	padding-left: dp(16);
+		//}
 	}
 	div.xtb-text {
 		@extend %font-subheading-dense;
@@ -2527,7 +2535,7 @@ $menuScrollerSize : dp(4);
 		}
 	}
 	&-footer {
-		padding: dp(4);
+		padding: dp(8);
 		border-top: 1px solid color($fg, 'line');
 	}
 	&-footer-noborder {
@@ -2543,8 +2551,8 @@ $menuScrollerSize : dp(4);
 			overflow:hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
-			height: dp(48);
-			line-height: dp(48);
+			height: dp(56);
+			line-height: dp(56);
 		}
 	}
 	&-header-noborder {
@@ -2563,6 +2571,9 @@ $menuScrollerSize : dp(4);
 	}
 	&-maximized .x-window-tc {
 		background-color:#fff;
+	}
+	&-maximized {
+		border-radius: 0;
 	}
 }
 

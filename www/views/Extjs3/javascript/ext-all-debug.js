@@ -31185,7 +31185,7 @@ Ext.Button = Ext.extend(Ext.BoxComponent, {
     setText : function(text){
         this.text = text;
         if(this.el){
-            this.btnEl.update(text || '&#160;');
+            this.btnEl.update(text || '');
             this.setButtonClass();
         }
         this.doAutoWidth();
