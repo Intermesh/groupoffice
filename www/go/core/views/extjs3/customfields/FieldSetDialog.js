@@ -5,7 +5,23 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 	width: dp(1000),
 	height: dp(800),
 	autoScroll: true,
+
+	initComponent : function() {
+		go.customfields.FieldSetDialog.superclass.initComponent.call(this);
+
+		this.formPanel.on("setvalues", (form, v) => {
+			this.fieldSetCombo.store.setFilter("default", {
+				entities: [v.entity],
+				exclude: [this.currentId],
+				isTab: true
+			});
+
+			this.fieldSetCombo.setDisabled(v.isTab);
+		});
+	},
 	initFormItems: function () {
+
+
 		this.addPanel(new go.permissions.SharePanel());
 		return [{
 				xtype: 'fieldset',
@@ -23,8 +39,23 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 						xtype: "checkbox",
 						name: 'isTab',
 						hideLabel: true,
-						boxLabel: t("Show as tab")
-					}, {
+						boxLabel: t("Show as tab"),
+
+						listeners: {
+							check:function(cb, checked) {
+								this.fieldSetCombo.setDisabled(checked);
+							},
+							scope: this
+						}
+					},
+					this.fieldSetCombo = new go.customfields.FieldSetCombo({
+						disabled: true,
+						hiddenName: "parentFieldSetId",
+						fieldLabel: t("Show on tab"),
+						emptyText: t("Default")
+					}),
+
+					{
 						xtype: "textarea",
 						name: "description",
 						fieldLabel: t("Description"),

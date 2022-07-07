@@ -14,6 +14,7 @@ use go\core\fs\Blob;
 use go\core\fs\File as GoFile;
 use go\core\fs\Folder;
 use GO\Email\Controller\MessageController;
+use go\modules\community\history\Module;
 
 class FileController extends \GO\Base\Controller\AbstractModelController {
 
@@ -481,6 +482,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 				&$params,
 				&$file
 			));
+
+			if(\go\core\model\Module::isInstalled('community', 'history')) {
+				Module::logActiveRecord($file, 'download');
+			}
 
 			$file->fsFile->output();
 

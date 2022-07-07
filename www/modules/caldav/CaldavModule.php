@@ -2,6 +2,7 @@
 
 namespace GO\Caldav;
 
+use GO\Base\Db\PDO;
 use GO\Caldav\Model\DavEvent;
 use GO\Caldav\Model\DavTask;
 use go\core\http\Exception;
@@ -103,7 +104,7 @@ class CaldavModule extends \GO\Base\Module {
 					$e->location='';
 					$e->description='';
 				}
-				$e->sequence=$sequence;
+//				$e->sequence=$sequence;
 				$sequence++;
 				$events[]=$e;
 
@@ -112,8 +113,16 @@ class CaldavModule extends \GO\Base\Module {
 		
 		$c = new \GO\Base\VObject\VCalendar();		
 		$c->add(new \GO\Base\VObject\VTimezone());
+
+		$isRecurring = count($events) > 1;
+
 		foreach($events as $event){
-			$c->add($event->toVObject('REQUEST', false));		
+			if($isRecurring && empty($event->rrule)) {
+				$recurrenceTime = $event->start_time;
+			} else{
+				$recurrenceTime = false;
+			}
+			$c->add($event->toVObject('REQUEST', false, $recurrenceTime));
 		}
 		
 		return $c->serialize();

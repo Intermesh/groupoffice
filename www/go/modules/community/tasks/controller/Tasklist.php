@@ -33,8 +33,9 @@ class Tasklist extends EntityController
 
 	public function set($params)
 	{
-		if(!$this->rights->mayChangeTasklists)
+		if(!$this->rights->mayChangeTasklists) {
 			throw new Forbidden();
+		}
 		return $this->defaultSet($params);
 	}
 

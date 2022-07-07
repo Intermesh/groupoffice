@@ -4,7 +4,7 @@ use go\core\App;
 use go\core\webclient\Extjs3;
 
 if(!isset($primaryColor)) {
-	$primaryColor = (go()->getSettings()->primaryColor ?? 'rgb(2, 119, 189)');
+	$primaryColor = (go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)');
 }
 $webclient = Extjs3::get();
 $lang = GO::language()->getLanguage(); ?>

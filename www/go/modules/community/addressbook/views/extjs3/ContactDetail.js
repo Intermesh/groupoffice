@@ -386,7 +386,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 								callback: function (options, success, response) {
 									Ext.getBody().unmask();
 									if(!success) {
-										Ext.MessageBox.alert(t("Error"), response.description);
+										Ext.MessageBox.alert(t("Error"), response.message);
 									} else {
 										GO.email.showComposer({
 											blobs: [response.blob]

@@ -44,6 +44,7 @@ use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\UserSettings;
 use go\modules\community\notes\model\NoteBook;
 use go\modules\community\notes\model\UserSettings as NotesUserSettings;
+use go\modules\community\tasks\model\Task;
 use go\modules\community\tasks\model\Tasklist;
 use go\modules\community\tasks\model\UserSettings as TasksUserSettings;
 
@@ -1145,24 +1146,27 @@ class User extends Entity {
 		$aclIds = [];
 
 		if(Module::isInstalled("community", "addressbook")) {
-			if ($defAddressBookId = $this->addressBookSettings->getDefaultAddressBookId()) {
-				$addressBook = AddressBook::findById($defAddressBookId);
+
+			$addressBooks = AddressBook::find()->where('createdBy','=', $this->id);
+			foreach($addressBooks as $addressBook) {
 				$aclIds[] = $addressBook->findAclId();
 				AddressBook::entityType()->change($addressBook);
 			}
 		}
 
 		if(Module::isInstalled("community", "notes")) {
-			if ($defNoteBookId = $this->notesSettings->getDefaultNoteBookId()) {
-				$noteBook = NoteBook::findById($defNoteBookId);
+			$noteBooks = NoteBook::find()->where('createdBy','=', $this->id);
+			foreach($noteBooks as $noteBook) {
 				$aclIds[] = $noteBook->findAclId();
 				NoteBook::entityType()->change($noteBook);
 			}
 		}
 
 		if(Module::isInstalled("community", "tasks")) {
-			if ($defTaskListId = $this->tasksSettings->getDefaultTasklistId()) {
-				$aclIds[] = Tasklist::findById($defTaskListId)->aclId;
+			$taskLists  = Tasklist::find()->where('createdBy','=', $this->id)->andWhere('role','=', Tasklist::List);
+			foreach($taskLists as $taskList) {
+				$aclIds[] = $taskList->findAclId();
+				Tasklist::entityType()->change($taskList);
 			}
 		}
 
@@ -1179,7 +1183,7 @@ class User extends Entity {
 		$grpId = $this->getPersonalGroup()->id();
 		foreach (Acl::findByIds($aclIds) as $rec) {
 			foreach ($rec->groups as $aclGrp) {
-				if (!in_array($aclGrp->groupId, [Group::ID_ADMINS, $grpId])) {
+				if ($aclGrp->groupId != $grpId) {
 					$rec->removeGroup($aclGrp->groupId);
 				}
 			}

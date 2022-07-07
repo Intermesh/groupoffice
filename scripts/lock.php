@@ -6,13 +6,12 @@ require ('../www/GO.php');
 go()->getDebugger()->output = true;
 go()->getDebugger()->enable(true);
 
-
+echo "Start";
 $lock = new \go\core\util\Lock("Test");
-$lock->lock();
+go()->getDebugger()->debugTiming("start");
 
-for($i = 0; $i < 2; $i++) {
-	echo $i ."\n";
-	sleep(1);
+for($i = 0; $i < 1000; $i++) {
+	$lock->lock();
+	$lock->unlock();
 }
-
-$lock->unlock();
+go()->getDebugger()->debugTiming("end");

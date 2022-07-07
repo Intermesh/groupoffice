@@ -59,7 +59,7 @@ class Filters {
 			$c->andWhere($name, '=', $value);
 		});
 	}
-	
+
 	// private function validate(Query $query, array $filter) {
 	// 	$invalidFilters = array_diff(array_map('strtolower',array_keys($filter)), array_keys($this->filters));
 	// 	if(!empty($invalidFilters)) {
@@ -214,8 +214,15 @@ class Filters {
 						call_user_func($filterConfig['fn'], $criteria, $range['endHasTime'] ? '<=' : '<', $range[1], $query, $filter);
 					} else
 					{
-						$v = self::parseNumericValue($value);
-						$v["query"] = new DateTime($v["query"]);
+						if($value == null) {
+							$v = [
+								'comparator' => '=',
+								'query' => null
+							];
+						} else {
+							$v = self::parseNumericValue($value);
+							$v["query"] = new DateTime($v["query"]);
+						}
 						call_user_func($filterConfig['fn'], $criteria, $v['comparator'], $v["query"], $query, $filter);
 					}
 					break;
@@ -271,6 +278,7 @@ class Filters {
 	 * 	$criteria->where('date', $comparator, $value);
 	 * })
 	 *
+	 * @return $this
 	 */
 	public function addDate(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
 	{

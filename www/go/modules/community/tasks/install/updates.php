@@ -176,3 +176,6 @@ $updates['202205311153'][] = "alter table tasks_task
 
 $updates['202206031355'][] = 'ALTER TABLE `tasks_task` ADD COLUMN `latitude` decimal(10,8) DEFAULT NULL, ' .
 	'ADD COLUMN `longitude` decimal(11,8) DEFAULT NULL;';
+
+$updates['202206201417'][] = 'alter table tasks_tasklist_group
+    add progressChange tinyint(2) null;';

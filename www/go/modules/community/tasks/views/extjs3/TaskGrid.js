@@ -7,9 +7,9 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 
 	initComponent: function () {
 
-		this.store = new go.data.GroupingStore({
-			groupField: 'tasklist',
-			remoteGroup:true,
+		this.store = new go.data.Store({
+			// groupField: 'tasklist',
+			// remoteGroup:true,
 			remoteSort: true,
 			fields: [
 				'id',
@@ -79,7 +79,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			const now = (new Date).format("Ymd");
 				if(record.data.due && record.data.due.format("Ymd") < now) {
 				meta.css = "danger";
-			} else if(record.data.start && record.data.start.format("Ymd") < now) {
+			} else if(record.data.start && record.data.start.format("Ymd") <= now) {
 				meta.css = "success";
 			}
 
@@ -287,10 +287,10 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 		}
 
 		if(!this.view) {
-			this.view = new go.grid.GroupingView({
+			this.view = new go.grid.GridView({
 				totalDisplay: true,
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
-				hideGroupedColumn: true
+				// hideGroupedColumn: true
 			});
 		}
 

@@ -541,7 +541,7 @@ a {
 		float: left;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(18) dp(8) 0 0;
+		padding: dp(16) dp(8) 0 0;
 		color: white;
 		&:hover,&:active { color: white; }
 	}
@@ -833,7 +833,7 @@ button {
 	//@extend .avatar;
 	position:absolute;	
 	right: dp(16);
-	top: dp(14);
+	top: dp(8);
 	z-index:15;
 	.avatar {
 		border: 1px solid white;
@@ -884,8 +884,8 @@ hr {
 	color: rgba(white, 0.87);
 	background-color: $cDanger !important; // override element style
 	position:absolute;
-	right:dp(-4);
-	top:dp(4);	
+	right:dp(-8);
+	top:dp(8);
 }
 
 .go-create-link-btn {
@@ -2268,8 +2268,9 @@ table[id^="comments-ext"] b {
 	display: inline-block;
 	@extend .x-btn;
 	min-height: dp(32);
-	line-height: dp(28);
-	padding: dp(2) dp(8);
+	line-height: dp(16);
+	height: auto;
+	padding: dp(8) dp(16);
 	margin: 0;
 
 	&:hover, &:focus {
@@ -2473,12 +2474,22 @@ body.go-compact {
 
 	.go-main-tab-panel.x-tab-panel > .x-tab-panel-header {
 		position: absolute;
-		top: dp(-56);
+		top: dp(-64);
 		left: dp(272);
 		right: dp(272);
 		width: auto !important;
-		height: 0;
+		height:0 ;
 		overflow: visible;
+		.x-tab-strip-top {
+			height: dp(64);
+		}
+		.x-tab-strip > li {
+			height: dp(64);
+			line-height: dp(64);
+			.x-tab-strip-text {
+				font-weight: bold;
+			}
+		}
 	}
 
 	.go-main-tab-panel {

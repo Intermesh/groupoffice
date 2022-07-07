@@ -736,7 +736,7 @@ abstract class EntityController extends Controller {
 			if(empty($properties)) {
 				$properties = [];
 			}
-			$entity = $this->getEntity($id);
+			$entity = $this->getEntity($id);			
 			if (!$entity) {
 				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Item not found"));
 				continue;

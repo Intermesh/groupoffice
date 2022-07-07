@@ -341,6 +341,9 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	public function getPermissionLevel(): int
 	{
+		if((go()->getAuthState() && go()->getAuthState()->isAdmin())) {
+			return Acl::LEVEL_MANAGE;
+		}
 
 		if(!isset($this->permissionLevel)) {
 			$aclEntity = $this->getAclEntity();

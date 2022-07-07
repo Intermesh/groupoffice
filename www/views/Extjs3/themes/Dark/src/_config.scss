@@ -50,4 +50,8 @@ $hue: (
         "brown": #6D4C41,
         "yellow": #F57F17,
         "bluegrey": #546E7A
-)
+);
+
+$umbra: rgba(#6a6a6a, .2)!default;
+$penumbra: rgba(#6a6a6a, .14)!default;
+$ambient: rgba(#6a6a6a, .12)!default;

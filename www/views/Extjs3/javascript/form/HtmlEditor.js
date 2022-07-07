@@ -415,7 +415,8 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					item.getAsString((s) => {
 						//convert style in the head to an inline style tag
 						const inlined = go.util.convertStyleToInline(s);
-						this.insertAtCursor(inlined);
+						this.execCmd("insertHTML", inlined);
+						// this.insertAtCursor(inlined);
 					});
 					return;
 				}

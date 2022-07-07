@@ -378,13 +378,57 @@ class Link extends AclItemEntity
 		
 		if($this->isNew()) {			
 //			$this->updateDataFromSearch();
-			return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
+			if(!App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute()) {
+				return false;
+			}
+
+			return $this->updateEntities();
 		}
 
-		return App::get()->getDbConnection()->updateIgnore('core_link',
+		if(!App::get()->getDbConnection()->updateIgnore('core_link',
 			['description' => $this->description],
 			['toId' => $this->fromId, 'toEntityTypeId' => $this->fromEntityTypeId, 'fromId' => $this->toId, 'fromEntityTypeId' => $this->toEntityTypeId]
-		)->execute();
+		)->execute()) {
+			return false;
+		}
+
+
+		return $this->updateEntities();
+	}
+
+	/**
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	private function updateEntities(): bool
+	{
+		$from = $this->findFromEntity();
+		if(!$from) {
+			return false;
+		}
+		if($from instanceof ActiveRecord) {
+			if(!$from->isSaving()) {
+				$from->save(true);
+			}
+		} else{
+			if(!$from->isSaving()) {
+				$from->save();
+			}
+		}
+		$to = $this->findToEntity();
+		if(!$to) {
+			return false;
+		}
+		if($to instanceof ActiveRecord) {
+			if(!$to->isSaving()) {
+				$to->save(true);
+			}
+		} else{
+			if(!$to->isSaving()) {
+				$to->save();
+			}
+		}
+
+		return true;
 	}
 
 //	private function updateDataFromSearch() {

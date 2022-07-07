@@ -408,7 +408,7 @@ border-collapse:collapse;
 }
 .cal-monthgrid-week-no{
 	border-bottom:1px solid rgba(0,0,0, 0.12);
-	border-right:1px solid transparent;
+	border-right:1px solid rgba(0,0,0, 0.12);
 	vertical-align:top;
 	/*background-color:#d9e3e6;*/
 	float:left;
@@ -420,9 +420,30 @@ border-collapse:collapse;
 	position:absolute;
 	padding:1px 2px;
 }
+
+.cal-monthgrid-week-no .x-monthGrid-cell-day-text {
+	min-width: 20px;
+	display: inline-block;
+	text-align: center;
+}
+
+.cal-monthgrid-weekday-name {
+	border-bottom:1px solid rgba(0,0,0, 0.12);
+	text-align: right;
+	display:inline-block;
+	padding-right: 4px;
+	font-size: 10px;
+}
 .cal-monthGrid-cell .x-monthGrid-cell-day-text {
-	padding:4px;
-	margin-left: 4px;
+	padding:0px;
+	margin: 4px;
+	border-radius: 50%;
+	min-width: 20px;
+	display: inline-block;
+	text-align: center;
+	float: right;
+	line-height: 20px;
+
 }
 
 .x-monthGrid-cell-current, .x-monthGrid-cell-today{
@@ -435,7 +456,7 @@ border-collapse:collapse;
 .x-monthGrid-cell-today .x-monthGrid-cell-day-text{
 	background-color: #177ea3;
 	color: white  !important;
-	border-radius: 10px;
+
 }
 
 a.x-monthGrid-cell-day-text:link, a.x-monthGrid-cell-day-text:visited,a.x-monthGrid-cell-day-text:active{
@@ -458,6 +479,7 @@ a.x-monthGrid-cell-day-text:hover{
 	border-radius: 2px;
 	-moz-outline:none;
 	outline:none;
+	clear: both;
 }
 
 .x-calGrid-month-event-proxy {

@@ -131,7 +131,8 @@ CREATE TABLE `core_customfields_field_set` (
   `sortOrder` tinyint(4) NOT NULL DEFAULT 0,
   `filter` text DEFAULT NULL,
   `isTab` BOOLEAN NOT NULL DEFAULT FALSE,
-  `columns` TINYINT NOT NULL DEFAULT '2'
+  `columns` TINYINT NOT NULL DEFAULT '2',
+  parentFieldSetId int null
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_customfields_select_option` (
@@ -1160,3 +1161,9 @@ create index core_change_modSeq_entityTypeId_entityId_index
 
 create index core_change_user_modSeq_userId_entityTypeId_entityId_index
     on core_change_user (modSeq, userId, entityTypeId, entityId);
+
+
+alter table core_customfields_field_set
+    add constraint core_customfields_field_set_core_customfields_field_set_id_fk
+        foreign key (parentFieldSetId) references core_customfields_field_set (id)
+            on delete set null;

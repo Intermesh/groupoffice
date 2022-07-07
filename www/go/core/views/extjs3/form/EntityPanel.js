@@ -166,15 +166,15 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 				switch (notSaved[id].type) {
 					case "forbidden":
-						response.description = t("Sorry, you don't have permissions to update this item");
+						response.message = t("Sorry, you don't have permissions to update this item");
 						break;
 
 					default:
 
 						var firstErrorMsg = me.markServerValidationErrors(notSaved[id].validationErrors);
 
-						if(!response.description) {
-							response.description = firstErrorMsg || notSaved[id].description;
+						if(!response.message) {
+							response.message = firstErrorMsg;
 						}
 						break;
 				}
