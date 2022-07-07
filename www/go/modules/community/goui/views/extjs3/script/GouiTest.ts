@@ -34,6 +34,11 @@ const noteStore = jmapstore({
 	entity: "Note"
 });
 
+
+export const GouiTest = comp({
+	cls: "hbox fit"
+})
+
 export class GouiTest extends Component {
 
 	// class hbox devides screen in horizontal columns

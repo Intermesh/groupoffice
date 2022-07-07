@@ -56,8 +56,10 @@
 		const mods = await import("../../."+module);
 		const modName = Object.keys(mods)[0];
 
+		mods[modName].render(el);
+
 		//render first export to given el
-		rootMods.root.getItems().add(mods[modName].create());
+		//rootMods.root.getItems().add(mods[modName]);
 
 	}
 })();
