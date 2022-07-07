@@ -69,6 +69,8 @@
 		font-size: dp(18);
 		@extend .z12;
 		text-align: center;
+		border-radius: $borderRadius;
+		border: 1px solid color($fg, 'line');
 
 	}
 }
