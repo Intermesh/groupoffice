@@ -703,7 +703,7 @@
 	letter-spacing: 0; // for button icons
 	height: dp(32); // 32 for dense
 	line-height: dp(32) - 2; // 32 for dense
-	border-radius: dp(16);
+	border-radius: $borderRadius;
 	vertical-align: middle;
 	white-space: nowrap;
 	overflow: hidden;
@@ -2416,7 +2416,7 @@ $menuScrollerSize : dp(4);
 	}
 }
 .x-tool{
-	margin: dp(8) 0;
+	margin: dp(12) 0;
 	position:relative;
 	width:dp(32);
 	height:dp(32);
@@ -2547,7 +2547,7 @@ $menuScrollerSize : dp(4);
 		@extend %font-title;
 		background-color:color($bg,'app-bar');
 		border-radius: $borderRadius;
-		padding: 0 dp(8) 0 dp(16);
+		padding: 0 dp(16);
 		&-text {
 			display:block;
 			overflow:hidden;
