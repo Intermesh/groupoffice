@@ -25,7 +25,7 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
             var ids = this.grid.getSelectionModel().getSelections().map(function(r) {return r.id;});
 
             go.Db.store("Contact").merge(ids).catch(function(result) {
-              Ext.MessageBox.alert(t("Error"), result.description);
+              Ext.MessageBox.alert(t("Error"), result.message);
             });
           }, this);
 

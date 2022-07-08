@@ -455,7 +455,7 @@ go.Jmap = {
 
 				for(var i = 0, l = opts.jsonData.length; i < l; i++) {
 					var clientCallId = opts.jsonData[i][2];
-					this.requestOptions[clientCallId].reject({description: response.responseText});
+					this.requestOptions[clientCallId].reject({message: response.responseText});
 					delete this.requestOptions[clientCallId];
 				}
 				
