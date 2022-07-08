@@ -7,10 +7,14 @@ import {client} from "../../../../../../../views/Extjs3/goui/script/api/Client.j
 import {Entity} from "../../../../../../../views/Extjs3/goui/script/api/EntityStore.js";
 import {Image} from "../../../../../../../views/Extjs3/goui/script/api/Image.js";
 
+declare global {
+	var GO: any;
+	var go: any;
+}
+
 export class NoteDetail extends Component {
 	private titleCmp!: Component;
 	private editBtn!: Button;
-	private currentId?: number;
 	private entity?: Entity;
 	private content: Component;
 
@@ -26,6 +30,28 @@ export class NoteDetail extends Component {
 				cls: "normalize card pad"
 			})
 		);
+
+
+		this.on("render", () => {
+
+			const detailView = new go.detail.Panel({
+				width: undefined,
+				entityStore: go.Db.store("Note"),
+				header: false
+			});
+
+
+			detailView.addCustomFields();
+			detailView.addLinks();
+			detailView.addComments();
+			detailView.addFiles();
+			detailView.addHistory();
+
+			this.items.add(detailView);
+		});
+
+
+
 	}
 
 	private createToolbar() {
@@ -58,6 +84,8 @@ export class NoteDetail extends Component {
 			this.content.items.clear();
 			this.content.items.add(Image.replace(this.entity.content));
 
+			this.legacyOnLoad();
+
 		} catch (e) {
 			Window.alert(t("Error"), e + "");
 		} finally {
@@ -65,5 +93,15 @@ export class NoteDetail extends Component {
 		}
 
 		return this;
+	}
+
+	private legacyOnLoad() {
+
+		this.items.forEach((item:any) =>  {
+			if(item.internalLoad) {
+				item.internalLoad(this.entity);
+			}
+		});
+
 	}
 }

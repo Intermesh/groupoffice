@@ -1,9 +1,9 @@
 import {AutocompleteField} from "../../../../../../../views/Extjs3/goui/script/component/form/AutocompleteField.js";
 import {NoteBookGrid} from "./NoteBookGrid.js";
-import {Config} from "../../../../../../../views/Extjs3/goui/script/component/Observable.js";
 import {t} from "../../../../../../../views/Extjs3/goui/script/Translate.js";
 import {EntityStore} from "../../../../../../../views/Extjs3/goui/script/api/EntityStore.js";
 import {client} from "../../../../../../../views/Extjs3/goui/script/api/Client.js";
+import {Config} from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
 
 export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
 	constructor() {
