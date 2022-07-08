@@ -3,6 +3,7 @@ import {NoteBookGrid} from "./NoteBookGrid.js";
 import {Config} from "../../../../../../../views/Extjs3/goui/script/component/Observable.js";
 import {t} from "../../../../../../../views/Extjs3/goui/script/Translate.js";
 import {EntityStore} from "../../../../../../../views/Extjs3/goui/script/api/EntityStore.js";
+import {client} from "../../../../../../../views/Extjs3/goui/script/api/Client.js";
 
 export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
 	constructor() {
@@ -22,7 +23,7 @@ export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
 
 			if(this.input?.value == this.value) {
 				// record not available in store. Load it.
-				const entityStore = new EntityStore("NoteBook");
+				const entityStore = client.store("NoteBook");
 				const nb = await entityStore.single(this.value);
 
 				this.setInputValue(nb.name);

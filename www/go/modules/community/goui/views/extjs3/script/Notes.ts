@@ -1,33 +1,21 @@
-import {btn, Button} from "../../../../../../../views/Extjs3/goui/script/component/Button.js";
+import {btn} from "../../../../../../../views/Extjs3/goui/script/component/Button.js";
 import {Notifier} from "../../../../../../../views/Extjs3/goui/script/Notifier.js";
 import {tbar} from "../../../../../../../views/Extjs3/goui/script/component/Toolbar.js";
-import {store, Store, StoreRecord} from "../../../../../../../views/Extjs3/goui/script/data/Store.js";
-import {
-	checkboxcolumn,
-	column,
-	datecolumn,
-	table,
-	Table
-} from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
-import {DateTime} from "../../../../../../../views/Extjs3/goui/script/util/DateTime.js";
+import {StoreRecord} from "../../../../../../../views/Extjs3/goui/script/data/Store.js";
+import {column} from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
 import {comp, Component} from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
 import {splitter} from "../../../../../../../views/Extjs3/goui/script/component/Splitter.js";
 
-import {
-	DescriptionList,
-	dl,
-	DLRecord
-} from "../../../../../../../views/Extjs3/goui/script/component/DescriptionList.js";
+import {DescriptionList, DLRecord} from "../../../../../../../views/Extjs3/goui/script/component/DescriptionList.js";
 import {Format} from "../../../../../../../views/Extjs3/goui/script/util/Format.js";
-import {jmapstore} from "../../../../../../../views/Extjs3/goui/script/api/JmapStore.js";
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
-import {rowselect} from "../../../../../../../views/Extjs3/goui/script/component/TableRowSelect.js";
+import {NoteDetail} from "./NoteDetail.js";
 
 declare global {
 	var GO: any;
 }
-;
+
 
 class Notes extends Component {
 
@@ -35,6 +23,7 @@ class Notes extends Component {
 	private descriptionList!: DescriptionList;
 	private noteBookGrid!: NoteBookGrid;
 	private noteGrid!: NoteGrid;
+	private noteDetail!: NoteDetail;
 
 	public constructor() {
 		super();
@@ -63,28 +52,7 @@ class Notes extends Component {
 	}
 
 	private createEast() {
-		this.descriptionList = dl({
-			cls: "pad"
-		});
-
-		return comp({
-				cls: "fit vbox",
-				width: 300
-			},
-			tbar({},
-
-				comp({
-					flex: 1,
-					tagName: "h3",
-					text: "Detail"
-				}),
-
-				btn({
-					icon: "edit"
-				})
-			),
-			this.descriptionList
-		)
+		return this.noteDetail = new NoteDetail();
 	}
 
 	private createWest() {
@@ -114,7 +82,7 @@ class Notes extends Component {
 
 				btn({
 					icon: "add",
-					handler:  () => {
+					handler: () => {
 
 					}
 				})
@@ -189,7 +157,7 @@ class Notes extends Component {
 				}),
 				btn({
 						text: "Open files",
-						handler:  () => {
+						handler: () => {
 							// window.GO.mainLayout.openModule("files");
 							window.GO.files.openFolder();
 						}
@@ -201,13 +169,15 @@ class Notes extends Component {
 	}
 
 	private showRecord(record: StoreRecord) {
-		const records: DLRecord = [
-			['Number', record.number],
-			['Description', record.description],
-			['Created At', Format.date(record.createdAt)]
-		];
+		// const records: DLRecord = [
+		// 	['Number', record.number],
+		// 	['Description', record.description],
+		// 	['Created At', Format.date(record.createdAt)]
+		// ];
+		//
+		// this.descriptionList.records = records;
 
-		this.descriptionList.records = records;
+		this.noteDetail.load(record.id);
 	}
 }
 

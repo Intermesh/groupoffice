@@ -4,11 +4,9 @@ import { tbar } from "../../../../../../../views/Extjs3/goui/script/component/To
 import { column } from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
 import { comp, Component } from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
 import { splitter } from "../../../../../../../views/Extjs3/goui/script/component/Splitter.js";
-import { dl } from "../../../../../../../views/Extjs3/goui/script/component/DescriptionList.js";
-import { Format } from "../../../../../../../views/Extjs3/goui/script/util/Format.js";
 import { NoteGrid } from "./NoteGrid.js";
 import { notebookgrid } from "./NoteBookGrid.js";
-;
+import { NoteDetail } from "./NoteDetail.js";
 class Notes extends Component {
     constructor() {
         super();
@@ -26,19 +24,7 @@ class Notes extends Component {
         });
     }
     createEast() {
-        this.descriptionList = dl({
-            cls: "pad"
-        });
-        return comp({
-            cls: "fit vbox",
-            width: 300
-        }, tbar({}, comp({
-            flex: 1,
-            tagName: "h3",
-            text: "Detail"
-        }), btn({
-            icon: "edit"
-        })), this.descriptionList);
+        return this.noteDetail = new NoteDetail();
     }
     createWest() {
         const records = [];
@@ -126,13 +112,15 @@ class Notes extends Component {
         })), this.noteGrid);
     }
     showRecord(record) {
-        const records = [
-            ['Number', record.number],
-            ['Description', record.description],
-            ['Created At', Format.date(record.createdAt)]
-        ];
-        this.descriptionList.records = records;
+        // const records: DLRecord = [
+        // 	['Number', record.number],
+        // 	['Description', record.description],
+        // 	['Created At', Format.date(record.createdAt)]
+        // ];
+        //
+        // this.descriptionList.records = records;
+        this.noteDetail.load(record.id);
     }
 }
 export const gouiTest = new Notes();
-//# sourceMappingURL=GouiTest.js.map
+//# sourceMappingURL=Notes.js.map

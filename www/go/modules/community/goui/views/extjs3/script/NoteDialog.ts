@@ -9,6 +9,8 @@ import {tbar} from "../../../../../../../views/Extjs3/goui/script/component/Tool
 import {btn} from "../../../../../../../views/Extjs3/goui/script/component/Button.js";
 import {fieldset} from "../../../../../../../views/Extjs3/goui/script/component/form/Fieldset.js";
 import {notebookcombo} from "./NoteBookCombo.js";
+import {Notifier} from "../../../../../../../views/Extjs3/goui/script/Notifier.js";
+import {root} from "../../../../../../../views/Extjs3/goui/script/component/Root.js";
 
 export class NoteDialog extends Window {
 	private form: Form;
@@ -24,6 +26,8 @@ export class NoteDialog extends Window {
 		this.title = t("Note");
 		this.width = 600;
 		this.height = 400;
+		this.stateId = "note-dialog";
+		this.maximizable = true;
 
 		this.items.add(
 			this.form = form(
@@ -32,8 +36,7 @@ export class NoteDialog extends Window {
 					flex: 1,
 					handler: async (form) => {
 						try {
-							const entity = await this.entityStore.save(form.value, this.currentId);
-							// this.form.value = entity;
+							await this.entityStore.save(form.value, this.currentId);
 							this.close();
 						} catch (e) {
 							Window.alert(t("Error"), e + "");
@@ -47,9 +50,33 @@ export class NoteDialog extends Window {
 
 					notebookcombo(),
 
-					textfield({name: "name", label: t("Name"), required: true}),
+					textfield({
+						name: "name",
+						label: t("Name"),
+						required: true
+					}),
 
-					htmlfield({name: "content"})
+					htmlfield({
+						name: "content",
+						listeners: {
+							insertimage: (htmlfield, file, img) => {
+								root.mask();
+
+								client.upload(file).then(r => {
+									if (img) {
+										img.dataset.blobId = r.blobId;
+										img.removeAttribute("id");
+									}
+									Notifier.success("Uploaded " + file.name + " successfully");
+								}).catch((err) => {
+									console.error(err);
+									Notifier.error("Failed to upload " + file.name);
+								}).finally(() => {
+									root.unmask();
+								});
+							}
+						}
+					})
 
 				),
 
@@ -69,8 +96,7 @@ export class NoteDialog extends Window {
 		this.mask();
 
 		try {
-			const entity = await this.entityStore.single(id);
-			this.form.value = entity;
+			this.form.value = await this.entityStore.single(id);
 			this.currentId = id;
 		} catch (e) {
 			Window.alert(t("Error"), e + "");
