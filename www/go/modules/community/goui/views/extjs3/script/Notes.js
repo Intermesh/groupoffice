@@ -9,7 +9,7 @@ import { Format } from "../../../../../../../views/Extjs3/goui/script/util/Forma
 import { NoteGrid } from "./NoteGrid.js";
 import { notebookgrid } from "./NoteBookGrid.js";
 ;
-class GouiTest extends Component {
+class Notes extends Component {
     constructor() {
         super();
         this.cls = "hbox fit";
@@ -65,7 +65,7 @@ class GouiTest extends Component {
         })), this.noteBookGrid = notebookgrid({
             flex: 1,
             cls: "fit no-row-lines",
-            rowSelection: {
+            rowSelectionConfig: {
                 multiSelect: true,
                 listeners: {
                     selectionchange: (tableRowSelect) => {
@@ -95,7 +95,7 @@ class GouiTest extends Component {
         this.noteGrid.flex = 1;
         this.noteGrid.title = "Notes";
         this.noteGrid.cls = "fit";
-        this.noteGrid.rowSelection = {
+        this.noteGrid.rowSelectionConfig = {
             multiSelect: true,
             listeners: {
                 selectionchange: (tableRowSelect) => {
@@ -134,5 +134,5 @@ class GouiTest extends Component {
         this.descriptionList.records = records;
     }
 }
-export const gouiTest = new GouiTest();
+export const gouiTest = new Notes();
 //# sourceMappingURL=GouiTest.js.map

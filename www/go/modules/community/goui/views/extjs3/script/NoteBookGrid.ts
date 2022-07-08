@@ -1,32 +1,29 @@
-import {column, datetimecolumn, Table} from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
-import {Store} from "../../../../../../../views/Extjs3/goui/script/data/Store.js";
+import {column, Table} from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
 import {t} from "../../../../../../../views/Extjs3/goui/script/Translate.js";
-import {NoteDialog} from "./NoteDialog.js";
 import {JmapStore, jmapstore} from "../../../../../../../views/Extjs3/goui/script/api/JmapStore.js";
 import {Config} from "../../../../../../../views/Extjs3/goui/script/component/Observable.js";
 
-export interface NoteBookGrid {
-	store : JmapStore
-}
-
-export class NoteBookGrid extends Table {
+export class NoteBookGrid extends Table<JmapStore> {
 
 	constructor() {
 
-		const columns = [
-			column({
-				header: t("Name"),
-				property: "name",
-				sortable: true
-			})
-		];
+		super(
 
-		super(jmapstore({
-			entity: "NoteBook",
-			sort: [{
-				property: "name"
-			}]
-		}), columns);
+			jmapstore({
+				entity: "NoteBook",
+				sort: [{
+					property: "name"
+				}]
+			}),
+
+			[
+				column({
+					header: t("Name"),
+					property: "name",
+					sortable: true
+				})
+			]
+		);
 	}
 
 }

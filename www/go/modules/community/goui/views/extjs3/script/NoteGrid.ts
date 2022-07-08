@@ -12,20 +12,6 @@ export class NoteGrid extends Table {
 
 	constructor() {
 
-		const columns = [
-			column({
-				header: t("Name"),
-				property: "name",
-				sortable: true
-			}),
-
-			datetimecolumn({
-				header: t("Created At"),
-				property: "createdAt",
-				sortable: true
-			})
-		];
-
 		super(
 			jmapstore({
 				entity: "Note",
@@ -33,13 +19,27 @@ export class NoteGrid extends Table {
 					property: "name"
 				}]
 			}),
-			columns
+
+			[
+				column({
+					header: t("Name"),
+					property: "name",
+					sortable: true
+				}),
+
+				datetimecolumn({
+					header: t("Created At"),
+					property: "createdAt",
+					sortable: true
+				})
+			]
 		);
 
-		this.on("rowdblclick", (table, rowIndex, ev) => {
+		this.on("rowdblclick", async (table, rowIndex, ev) => {
 			const dlg = new NoteDialog();
-			dlg.load(table.store.get(rowIndex).id);
 			dlg.show();
+			await dlg.load(table.store.get(rowIndex).id);
+
 		})
 	}
 

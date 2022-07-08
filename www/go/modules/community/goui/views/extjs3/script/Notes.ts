@@ -29,10 +29,7 @@ declare global {
 }
 ;
 
-
-
-
-class GouiTest extends Component {
+class Notes extends Component {
 
 	// class hbox devides screen in horizontal columns
 	private descriptionList!: DescriptionList;
@@ -125,7 +122,7 @@ class GouiTest extends Component {
 			this.noteBookGrid = notebookgrid({
 				flex: 1,
 				cls: "fit no-row-lines",
-				rowSelection: {
+				rowSelectionConfig: {
 
 					multiSelect: true,
 					listeners: {
@@ -163,7 +160,7 @@ class GouiTest extends Component {
 		this.noteGrid.flex = 1;
 		this.noteGrid.title = "Notes";
 		this.noteGrid.cls = "fit";
-		this.noteGrid.rowSelection = {
+		this.noteGrid.rowSelectionConfig = {
 			multiSelect: true,
 			listeners: {
 				selectionchange: (tableRowSelect) => {
@@ -214,4 +211,4 @@ class GouiTest extends Component {
 	}
 }
 
-export const gouiTest = new GouiTest();
+export const gouiTest = new Notes();
