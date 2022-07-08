@@ -44,7 +44,8 @@
 	window.goui = async function(module, el) {
 		injectGouiStyle();
 		//add class to apply goui style to chidren
-		el.id = "goui";
+		// el.id = "goui";
+		el.classList.add("goui");
 		const rootMods = await import("../goui/script/component/Root.js");
 
 		const clientMods = await import("../goui/script/api/Client.js");

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "strict" : true,
-    "target": "es2017",
+    "target": "ES2017",
     "sourceMap": true,
     "lib": ["es2018", "dom"],
     "moduleResolution": "node",

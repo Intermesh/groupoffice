@@ -1,40 +1,28 @@
-import { btn, Button } from "../../../../../../../views/Extjs3/goui/script/component/Button.js";
+import { btn } from "../../../../../../../views/Extjs3/goui/script/component/Button.js";
 import { Notifier } from "../../../../../../../views/Extjs3/goui/script/Notifier.js";
 import { tbar } from "../../../../../../../views/Extjs3/goui/script/component/Toolbar.js";
-import { Store } from "../../../../../../../views/Extjs3/goui/script/data/Store.js";
-import { checkboxcolumn, column, datecolumn, table } from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
-import { DateTime } from "../../../../../../../views/Extjs3/goui/script/util/DateTime.js";
+import { column } from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
 import { comp, Component } from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
 import { splitter } from "../../../../../../../views/Extjs3/goui/script/component/Splitter.js";
-import { TestWindow } from "./TestWindow.js";
 import { dl } from "../../../../../../../views/Extjs3/goui/script/component/DescriptionList.js";
 import { Format } from "../../../../../../../views/Extjs3/goui/script/util/Format.js";
-import { jmapstore } from "../../../../../../../views/Extjs3/goui/script/api/JmapStore.js";
+import { NoteGrid } from "./NoteGrid.js";
+import { notebookgrid } from "./NoteBookGrid.js";
 ;
-const noteBookStore = jmapstore({
-    entity: "NoteBook"
-});
-const noteStore = jmapstore({
-    entity: "Note"
-});
-export class GouiTest extends Component {
+class GouiTest extends Component {
     constructor() {
-        super(...arguments);
-        // class hbox devides screen in horizontal columns
+        super();
         this.cls = "hbox fit";
-    }
-    init() {
-        super.init();
         const center = this.createCenter(), west = this.createWest(), east = this.createEast();
-        this.getItems().add(west, splitter({
+        this.items.add(west, splitter({
             stateId: "gouidemo-splitter-west",
-            resizeComponent: west
+            resizeComponentPredicate: west
         }), center, splitter({
             stateId: "gouidemo-splitter-east",
-            resizeComponent: east
+            resizeComponentPredicate: east
         }), east);
         this.on("render", () => {
-            noteBookStore.load();
+            this.noteBookGrid.store.load();
         });
     }
     createEast() {
@@ -44,7 +32,7 @@ export class GouiTest extends Component {
         return comp({
             cls: "fit vbox",
             width: 300
-        }, tbar({}, Component.create({
+        }, tbar({}, comp({
             flex: 1,
             tagName: "h3",
             text: "Detail"
@@ -72,24 +60,27 @@ export class GouiTest extends Component {
             flex: 1
         }), btn({
             icon: "add",
-            handler: function () {
-                const win = TestWindow.create();
-                win.show();
+            handler: () => {
             }
-        })), table({
+        })), this.noteBookGrid = notebookgrid({
             flex: 1,
-            title: "Table",
-            store: noteBookStore,
-            listeners: {
-                navigate: (table1, rowIndex, record) => {
-                    noteStore.load();
+            cls: "fit no-row-lines",
+            rowSelection: {
+                multiSelect: true,
+                listeners: {
+                    selectionchange: (tableRowSelect) => {
+                        const noteBookIds = tableRowSelect.selected.map((index) => tableRowSelect.table.store.get(index).id);
+                        this.noteGrid.store.queryParams.filter = {
+                            noteBookId: noteBookIds
+                        };
+                        this.noteGrid.store.load();
+                    }
                 }
             },
-            cls: "fit no-row-lines",
             columns: [
-                checkboxcolumn({
-                    property: "selected"
-                }),
+                // checkboxcolumn({
+                // 	property: "selected"
+                // }),
                 column({
                     header: "Name",
                     property: "name",
@@ -100,73 +91,39 @@ export class GouiTest extends Component {
         }));
     }
     createCenter() {
-        const records = [];
-        for (let i = 1; i <= 20; i++) {
-            records.push({
-                number: i,
-                description: "Test " + i,
-                createdAt: (new DateTime()).addDays(Math.ceil(Math.random() * -365)).format("c")
-            });
-        }
-        const tbl = table({
-            flex: 1,
-            title: "Table",
-            store: Store.create({
-                records: records,
-                sort: [{ property: "number", isAscending: true }]
-            }),
-            cls: "fit",
-            columns: [
-                column({
-                    header: "Number",
-                    property: "number",
-                    sortable: true,
-                    resizable: true,
-                    width: 200
-                }),
-                column({
-                    header: "Description",
-                    property: "description",
-                    sortable: true,
-                    resizable: true,
-                    width: 300
-                }),
-                datecolumn({
-                    header: "Created At",
-                    property: "createdAt",
-                    sortable: true
-                })
-            ],
-            rowSelection: {
-                multiSelect: true,
-                listeners: {
-                    selectionchange: (tableRowSelect) => {
-                        if (tableRowSelect.getSelected().length == 1) {
-                            const table = tableRowSelect.getTable();
-                            const record = table.getStore().getRecordAt(tableRowSelect.getSelected()[0]);
-                            this.showRecord(record);
-                        }
+        this.noteGrid = new NoteGrid();
+        this.noteGrid.flex = 1;
+        this.noteGrid.title = "Notes";
+        this.noteGrid.cls = "fit";
+        this.noteGrid.rowSelection = {
+            multiSelect: true,
+            listeners: {
+                selectionchange: (tableRowSelect) => {
+                    if (tableRowSelect.selected.length == 1) {
+                        const table = tableRowSelect.table;
+                        const record = table.store.get(tableRowSelect.selected[0]);
+                        this.showRecord(record);
                     }
                 }
-            },
-        });
+            }
+        };
         return comp({
             cls: "vbox",
             flex: 1
         }, tbar({
             cls: "border-bottom"
-        }, Button.create({
+        }, btn({
             text: "Test GOUI!",
-            handler: function () {
+            handler: () => {
                 Notifier.success("Hurray! GOUI has made it's way into Extjs 3.4 :)");
             }
-        }), Button.create({
+        }), btn({
             text: "Open files",
-            handler: function () {
+            handler: () => {
                 // window.GO.mainLayout.openModule("files");
                 window.GO.files.openFolder();
             }
-        })), tbl);
+        })), this.noteGrid);
     }
     showRecord(record) {
         const records = [
@@ -174,7 +131,8 @@ export class GouiTest extends Component {
             ['Description', record.description],
             ['Created At', Format.date(record.createdAt)]
         ];
-        this.descriptionList.setRecords(records);
+        this.descriptionList.records = records;
     }
 }
+export const gouiTest = new GouiTest();
 //# sourceMappingURL=GouiTest.js.map
