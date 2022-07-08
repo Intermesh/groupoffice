@@ -1,4 +1,6 @@
 - Core: New look and feel in line with new website
+- Core: fix notice userDisplay model timezone
+- Leavedays: fix notice manager YearCredit model
 
 05-07-2022 6.6.101
 - Leavedays: several fixes special leave budgets
