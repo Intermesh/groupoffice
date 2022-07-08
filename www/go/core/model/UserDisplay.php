@@ -43,6 +43,13 @@ class UserDisplay extends Entity {
 	 */
 	public $email;
 
+	/**
+	 * The user timezone
+	 *
+	 * @var string eg. europe/amsterdam
+	 */
+	public $timezone;
+
 	protected static function textFilterColumns(): array
 	{
 		return ['username', 'displayName', 'email'];
