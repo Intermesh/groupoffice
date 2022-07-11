@@ -21,12 +21,23 @@ export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
 
 		this.on("setvalue", async (field, newValue, oldValue) => {
 
-			if(this.input?.value == this.value) {
+			const loadText = async () => {
 				// record not available in store. Load it.
-				const entityStore = client.store("NoteBook");
-				const nb = await entityStore.single(this.value);
+				if(this.input?.value == this.value) {
+					const entityStore = client.store("NoteBook");
+					const nb = await entityStore.single(this.value);
 
-				this.setInputValue(nb.name);
+					this.setInputValue(nb.name);
+				}
+			}
+
+			if(this.rendered) {
+				await loadText();
+			} else
+			{
+				this.on("render", () => {
+					loadText();
+				}, {once: true})
 			}
 		});
 	}

@@ -21,10 +21,10 @@
 
 
 		//create root div for holding goui windows, menu's, alerts etc.
-		// const div = document.createElement("div");
-		// div.id="goui-root";
-		// div.classList.add("goui");
-		// document.body.appendChild(div);
+		const div = document.createElement("div");
+		div.id="goui";
+		div.classList.add("goui");
+		document.body.appendChild(div);
 		//
 		// const mods = await import("../goui/component/Root.js");
 		// mods.root.setEl(div);

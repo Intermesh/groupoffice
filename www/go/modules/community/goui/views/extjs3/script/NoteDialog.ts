@@ -17,7 +17,7 @@ import {comp} from "../../../../../../../views/Extjs3/goui/script/component/Comp
 import {containerfield} from "../../../../../../../views/Extjs3/goui/script/component/form/ContainerField.js";
 
 export class NoteDialog extends Window {
-	private form: Form;
+	readonly form: Form;
 	private entityStore: EntityStore;
 	private currentId?: number;
 	private cards: CardContainer;
@@ -90,7 +90,7 @@ export class NoteDialog extends Window {
 				),
 
 
-				tbar({},
+				tbar({cls: "border-top"},
 					"->",
 					btn({
 						type: "submit",

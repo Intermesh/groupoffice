@@ -14,6 +14,10 @@ import {
 	checkboxselectcolumn,
 	column
 } from "../../../../../../../views/Extjs3/goui/script/component/table/TableColumns.js";
+import {NoteDialog} from "./NoteDialog.js";
+import {textfield} from "../../../../../../../views/Extjs3/goui/script/component/form/TextField.js";
+import {t} from "../../../../../../../views/Extjs3/goui/script/Translate.js";
+import {Field} from "../../../../../../../views/Extjs3/goui/script/component/form/Field.js";
 
 declare global {
 	var GO: any;
@@ -52,8 +56,9 @@ class Notes extends Component {
 			east
 		);
 
-		this.on("render", () => {
-			this.noteBookGrid.store.load();
+		this.on("render", async () => {
+			const records = await this.noteBookGrid.store.load();
+			this.noteBookGrid.rowSelection!.selected = [0];
 		})
 	}
 
@@ -62,15 +67,6 @@ class Notes extends Component {
 	}
 
 	private createWest() {
-
-		const records = [];
-		for (let i = 1; i <= 20; i++) {
-			records.push({
-				id: i,
-				name: "Test " + i,
-				selected: i == 1
-			});
-		}
 
 
 		return comp({
@@ -97,7 +93,6 @@ class Notes extends Component {
 				flex: 1,
 				cls: "fit no-row-lines",
 				rowSelectionConfig: {
-
 					multiSelect: true,
 					listeners: {
 						selectionchange: (tableRowSelect) => {
@@ -152,20 +147,27 @@ class Notes extends Component {
 			tbar({
 					cls: "border-bottom"
 				},
+				"->",
+				// textfield({
+				// 	label: t("Search"),
+				// 	buttons: [
+				// 		btn({icon: "clear", handler:(btn) => (btn.parent!.parent! as Field).value = ""})
+				// 	]
+				// }),
 				btn({
-					text: "Test GOUI!",
+					cls: "primary",
+					icon: "add",
 					handler: () => {
-						Notifier.success("Hurray! GOUI has made it's way into Extjs 3.4 :)");
+						const dlg = new NoteDialog();
+						const noteBookId =this.noteBookGrid.store.get(this.noteBookGrid.rowSelection!.selected[0]).id;
+
+						dlg.form.setValues({
+							noteBookId: noteBookId
+						});
+						dlg.show();
+
 					}
-				}),
-				btn({
-						text: "Open files",
-						handler: () => {
-							// window.GO.mainLayout.openModule("files");
-							window.GO.files.openFolder();
-						}
-					}
-				)
+				})
 			),
 			this.noteGrid
 		)
