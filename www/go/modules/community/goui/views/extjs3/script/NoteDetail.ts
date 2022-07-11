@@ -1,16 +1,13 @@
 import {comp, Component} from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
-import {tbar} from "../../../../../../../views/Extjs3/goui/script/component/Toolbar.js";
+import {tbar, Toolbar} from "../../../../../../../views/Extjs3/goui/script/component/Toolbar.js";
 import {btn, Button} from "../../../../../../../views/Extjs3/goui/script/component/Button.js";
 import {t} from "../../../../../../../views/Extjs3/goui/script/Translate.js";
 import {Window} from "../../../../../../../views/Extjs3/goui/script/component/Window.js";
 import {client} from "../../../../../../../views/Extjs3/goui/script/api/Client.js";
 import {Entity} from "../../../../../../../views/Extjs3/goui/script/api/EntityStore.js";
 import {Image} from "../../../../../../../views/Extjs3/goui/script/api/Image.js";
+import {NoteDialog} from "./NoteDialog.js";
 
-declare global {
-	var GO: any;
-	var go: any;
-}
 
 export class NoteDetail extends Component {
 	private titleCmp!: Component;
@@ -19,6 +16,7 @@ export class NoteDetail extends Component {
 	private content: Component;
 	private scroller: Component;
 	private detailView: any;
+	private toolbar!: Toolbar;
 
 	constructor() {
 		super();
@@ -51,14 +49,20 @@ export class NoteDetail extends Component {
 	}
 
 	private createToolbar() {
-		return tbar({
+		return this.toolbar = tbar({
+				disabled: true,
 				cls: "border-bottom"
 			},
 			this.titleCmp = comp({tagName: "h3"}),
 			'->',
 			this.editBtn = btn({
 				icon: "edit",
-				title: t("Edit")
+				title: t("Edit"),
+				handler: (button, ev) => {
+					const dlg = new NoteDialog();
+					dlg.load(this.entity!.id);
+					dlg.show();
+				}
 			})
 		);
 	}
@@ -81,6 +85,8 @@ export class NoteDetail extends Component {
 			this.content.items.add(Image.replace(this.entity.content));
 
 			this.legacyOnLoad();
+
+			this.toolbar.disabled = false;
 
 		} catch (e) {
 			Window.alert(t("Error"), e + "");

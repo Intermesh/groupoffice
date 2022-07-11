@@ -14,7 +14,10 @@ import {NoteDetail} from "./NoteDetail.js";
 
 declare global {
 	var GO: any;
+	var go: any;
+	var Ext: any;
 }
+
 
 
 class Notes extends Component {
