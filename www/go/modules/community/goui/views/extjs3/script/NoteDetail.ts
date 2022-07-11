@@ -17,6 +17,8 @@ export class NoteDetail extends Component {
 	private editBtn!: Button;
 	private entity?: Entity;
 	private content: Component;
+	private scroller: Component;
+	private detailView: any;
 
 	constructor() {
 		super();
@@ -26,32 +28,26 @@ export class NoteDetail extends Component {
 
 		this.items.add(
 			this.createToolbar(),
-			this.content = comp({
-				cls: "normalize card pad"
-			})
+			this.scroller = comp({flex: 1, cls: "scroll vbox"},
+				this.content = comp({
+					cls: "normalize card pad"
+				})
+			)
 		);
 
-
-		this.on("render", () => {
-
-			const detailView = new go.detail.Panel({
-				width: undefined,
-				entityStore: go.Db.store("Note"),
-				header: false
-			});
-
-
-			detailView.addCustomFields();
-			detailView.addLinks();
-			detailView.addComments();
-			detailView.addFiles();
-			detailView.addHistory();
-
-			this.items.add(detailView);
+		// Legacy stuff
+		this.detailView = new go.detail.Panel({
+			width: undefined,
+			entityStore: go.Db.store("Note"),
+			header: false
 		});
+		this.detailView.addCustomFields();
+		this.detailView.addLinks();
+		this.detailView.addComments();
+		this.detailView.addFiles();
+		this.detailView.addHistory();
 
-
-
+		this.scroller.items.add(this.detailView);
 	}
 
 	private createToolbar() {
@@ -96,12 +92,7 @@ export class NoteDetail extends Component {
 	}
 
 	private legacyOnLoad() {
-
-		this.items.forEach((item:any) =>  {
-			if(item.internalLoad) {
-				item.internalLoad(this.entity);
-			}
-		});
-
+		this.detailView.currentId = this.entity!.id;
+		this.detailView.internalLoad(this.entity);
 	}
 }

@@ -11,6 +11,7 @@ import {fieldset} from "../../../../../../../views/Extjs3/goui/script/component/
 import {notebookcombo} from "./NoteBookCombo.js";
 import {Notifier} from "../../../../../../../views/Extjs3/goui/script/Notifier.js";
 import {root} from "../../../../../../../views/Extjs3/goui/script/component/Root.js";
+import {Image} from "../../../../../../../views/Extjs3/goui/script/api/Image.js";
 
 export class NoteDialog extends Window {
 	private form: Form;
@@ -59,6 +60,7 @@ export class NoteDialog extends Window {
 					htmlfield({
 						name: "content",
 						listeners: {
+
 							insertimage: (htmlfield, file, img) => {
 								root.mask();
 
