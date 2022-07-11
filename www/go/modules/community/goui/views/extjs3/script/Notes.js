@@ -1,12 +1,12 @@
 import { btn } from "../../../../../../../views/Extjs3/goui/script/component/Button.js";
 import { Notifier } from "../../../../../../../views/Extjs3/goui/script/Notifier.js";
 import { tbar } from "../../../../../../../views/Extjs3/goui/script/component/Toolbar.js";
-import { column } from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
 import { comp, Component } from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
 import { splitter } from "../../../../../../../views/Extjs3/goui/script/component/Splitter.js";
 import { NoteGrid } from "./NoteGrid.js";
 import { notebookgrid } from "./NoteBookGrid.js";
 import { NoteDetail } from "./NoteDetail.js";
+import { checkboxselectcolumn, column } from "../../../../../../../views/Extjs3/goui/script/component/table/TableColumns.js";
 class Notes extends Component {
     constructor() {
         super();
@@ -64,9 +64,7 @@ class Notes extends Component {
                 }
             },
             columns: [
-                // checkboxcolumn({
-                // 	property: "selected"
-                // }),
+                checkboxselectcolumn(),
                 column({
                     header: "Name",
                     property: "name",

@@ -1,7 +1,11 @@
-import {column, Table} from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
+import {Table} from "../../../../../../../views/Extjs3/goui/script/component/table/Table.js";
 import {t} from "../../../../../../../views/Extjs3/goui/script/Translate.js";
 import {JmapStore, jmapstore} from "../../../../../../../views/Extjs3/goui/script/api/JmapStore.js";
 import {Config} from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
+import {
+	checkboxselectcolumn,
+	column
+} from "../../../../../../../views/Extjs3/goui/script/component/table/TableColumns.js";
 
 export class NoteBookGrid extends Table<JmapStore> {
 

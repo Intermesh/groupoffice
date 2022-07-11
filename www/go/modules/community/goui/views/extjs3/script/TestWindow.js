@@ -1,5 +1,5 @@
 import { Window } from "../../../../../../../views/Extjs3/goui/script/component/Window.js";
-import { column, datecolumn, table } from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
+import { table } from "../../../../../../../views/Extjs3/goui/script/component/table/Table.ts";
 import { store } from "../../../../../../../views/Extjs3/goui/script/data/Store.js";
 import { form } from "../../../../../../../views/Extjs3/goui/script/component/form/Form.js";
 import { fieldset } from "../../../../../../../views/Extjs3/goui/script/component/form/Fieldset.js";
@@ -12,6 +12,7 @@ import { btn, Button } from "../../../../../../../views/Extjs3/goui/script/compo
 import { datefield } from "../../../../../../../views/Extjs3/goui/script/component/form/DateField.js";
 import { Menu } from "../../../../../../../views/Extjs3/goui/script/component/menu/Menu.js";
 import { DateTime } from "../../../../../../../views/Extjs3/goui/script/util/DateTime.js";
+import {column, datecolumn} from "../../../../../../../views/Extjs3/goui/script/component/table/TableColumns.js";
 export class TestWindow extends Window {
     constructor() {
         super(...arguments);

@@ -2,7 +2,6 @@ import {btn} from "../../../../../../../views/Extjs3/goui/script/component/Butto
 import {Notifier} from "../../../../../../../views/Extjs3/goui/script/Notifier.js";
 import {tbar} from "../../../../../../../views/Extjs3/goui/script/component/Toolbar.js";
 import {StoreRecord} from "../../../../../../../views/Extjs3/goui/script/data/Store.js";
-import {column} from "../../../../../../../views/Extjs3/goui/script/component/Table.js";
 import {comp, Component} from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
 import {splitter} from "../../../../../../../views/Extjs3/goui/script/component/Splitter.js";
 
@@ -11,6 +10,10 @@ import {Format} from "../../../../../../../views/Extjs3/goui/script/util/Format.
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
+import {
+	checkboxselectcolumn,
+	column
+} from "../../../../../../../views/Extjs3/goui/script/component/table/TableColumns.js";
 
 declare global {
 	var GO: any;
@@ -110,10 +113,7 @@ class Notes extends Component {
 					}
 				},
 				columns: [
-					// checkboxcolumn({
-					// 	property: "selected"
-					// }),
-
+					checkboxselectcolumn(),
 					column({
 						header: "Name",
 						property: "name",
