@@ -6,18 +6,20 @@
  * /api/page.php/$PACKAGE/$MODULENAME/$CONTROLLER/$METHOD
  *
  * eg. /api/page.php/nuw/projectsdsgvo/answer/accept
- * 
- * 
+ *
+ *
  */
-use go\core\fs\Blob;
+
 use go\core\App;
-use go\core\http\Response;
+use go\core\ErrorHandler;
+use go\core\fs\Blob;
 use go\core\http\Request;
+use go\core\http\Response;
 
 require("../vendor/autoload.php");
 App::get();
 
-if(Request::get()->getMethod() == 'OPTIONS') {
+if (Request::get()->getMethod() == 'OPTIONS') {
 	Response::get()->output();
 	exit();
 }
@@ -64,7 +66,7 @@ try {
 
 	call_user_func_array([$c, $method], $parts);
 
-} catch(Exception $e) {
+} catch (Exception $e) {
 	ErrorHandler::logException($e);
 	Response::get()->setStatus(500);
 	Response::get()->output($e->getMessage());
