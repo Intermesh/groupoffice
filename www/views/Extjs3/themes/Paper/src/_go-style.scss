@@ -471,7 +471,8 @@ a {
 		.x-tab-strip {
 			
 			&-active {
-				@include var(border-bottom-color, c-accent);
+				//@include var(border-bottom-color, c-accent);
+				border-bottom-color: $cTertiary;
 				color:white;
 				.x-tab-strip-text{ color:white;}
 			}

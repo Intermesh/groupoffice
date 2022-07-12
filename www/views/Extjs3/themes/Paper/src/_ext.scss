@@ -759,7 +759,7 @@
 		}
 
 		&.accent {
-			@include var(background-color, c-accent);
+			@include var(background-color, c-secondary);
 		}
 	}
 	.x-toolbar & {

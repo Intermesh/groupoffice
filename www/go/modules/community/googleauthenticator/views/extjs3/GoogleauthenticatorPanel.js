@@ -7,7 +7,7 @@ go.modules.community.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(g
 			cls: 'login-text-comp'
 		});
 
-		this.secretField = new Ext.form.TextField({
+		this.secretField = new go.form.PasteButtonField({
 			itemId: 'googleauthenticator_code',
 			fieldLabel: t('Code'),
 			name: 'googleauthenticator_code',
@@ -42,25 +42,6 @@ go.modules.community.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(g
 				})
 			]
 		});
-
-		if(navigator.clipboard && navigator.clipboard.readText) {
-			panel.add({
-				cls:"right accent",
-				style: "margin-right: " + dp(16) + "px",
-					xtype: "button",
-					text: t("Paste"),
-					handler: function() {
-						navigator.clipboard.readText().then((clipText) => {
-							this.secretField.setValue(clipText);
-						}).catch((reason) => {
-							console.error(reason);
-							Ext.MessageBox.alert(t("Sorry"), t("Reading from your clipboard isn't allowed"));
-						});
-				},
-				scope: this
-
-			})
-		}
 
 		Ext.apply(this, {
 			layout: "fit",
