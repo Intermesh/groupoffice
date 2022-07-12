@@ -479,6 +479,9 @@ a {
 		}
 		.x-tab-scroller-right, .x-tab-scroller-left {
 			color: white;
+			&:after {
+				padding-top: dp(20);
+			}
 		}
 		.x-tab-scroller-right-over, .x-tab-scroller-left-over {
 			color: white;
