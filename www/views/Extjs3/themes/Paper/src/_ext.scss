@@ -193,7 +193,8 @@
 		border-bottom: 1px solid color($fg, 'line');
 	}
 	>li.x-tab-strip-active {
-		@include var(border-color, c-accent);
+		//@include var(border-color, c-accent);
+		border-color: $cTertiary;
 		span.x-tab-strip-text {
 			color: color($fg, 'text');
 			font-weight: bold;
@@ -209,7 +210,6 @@
 
 	span.x-tab-strip-text {
 		padding:0;
-		color: color($fg, 'secondary-text');
 		font-weight: normal;
 		&.primary {
 			color: rgba(white, 0.7);
@@ -760,7 +760,7 @@
 		}
 
 		&.accent {
-			@include var(background-color, c-accent);
+			@include var(background-color, c-secondary);
 		}
 	}
 	.x-toolbar & {

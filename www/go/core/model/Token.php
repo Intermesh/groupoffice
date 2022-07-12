@@ -99,7 +99,7 @@ class Token extends Entity {
 	 * 
 	 * @link http://php.net/manual/en/dateinterval.construct.php
 	 */
-	const LIFETIME = 'PT30M';
+	const LIFETIME = 'P1D';
 	
 	/**
 	 * A date interval for the login lifetime of a token

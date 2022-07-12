@@ -471,7 +471,8 @@ a {
 		.x-tab-strip {
 			
 			&-active {
-				@include var(border-bottom-color, c-accent);
+				//@include var(border-bottom-color, c-accent);
+				border-bottom-color: $cTertiary;
 				color:white;
 				.x-tab-strip-text{ color:white;}
 			}
@@ -479,6 +480,9 @@ a {
 		}
 		.x-tab-scroller-right, .x-tab-scroller-left {
 			color: white;
+			&:after {
+				padding-top: dp(20);
+			}
 		}
 		.x-tab-scroller-right-over, .x-tab-scroller-left-over {
 			color: white;

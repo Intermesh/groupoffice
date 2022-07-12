@@ -1,4 +1,8 @@
+12-07-2022 6.6.102
 - Core: New look and feel in line with new website
+- Core: fix notice userDisplay model timezone
+- Leavedays: fix notice manager YearCredit model
+- Core: Longer token lifetime to avoid re-authentication through a working day
 
 05-07-2022 6.6.101
 - Leavedays: several fixes special leave budgets
