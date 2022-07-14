@@ -4,6 +4,7 @@ namespace go\core\util;
 
 use Exception;
 use go\core\fs\File;
+use go\core\jmap\Request;
 use LogicException;
 use function GO;
 
@@ -148,9 +149,15 @@ class Lock {
 				// another process holds the lock
 				return false;
 			} else {
-				throw new Exception("Could not lock controller action '" . $this->name . "'");
+				//happens on apache restart: https://stackoverflow.com/questions/36084158/what-is-the-reason-for-flock-to-return-false
+				throw new Exception("Could not obtain excusive lock with name '" . $this->name . "'");
 			}
 		}
+
+		// for debugging lock problem. Store request infor user ID and PID number
+		$userId = (go()->getAuthState() ? go()->getAuthState()->getUserId() : '-');
+		$request = Request::get()->getRawBody();
+		fputs($this->lockFp, getmypid() . ' ' . $userId . ' ' .$request);
 
 		return true;
 	}
