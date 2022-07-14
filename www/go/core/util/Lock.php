@@ -157,7 +157,7 @@ class Lock {
 		// for debugging lock problem. Store request infor user ID and PID number
 		$userId = (go()->getAuthState() ? go()->getAuthState()->getUserId() : '-');
 		$request = Request::get()->getRawBody();
-		fputs($this->lockFp, getmypid() . ' ' . $userId . ' ' .$request);
+		fputs($this->lockFp, getmypid() . ' ' . $userId . ' ' . go()->getDebugger()->getRequestId() . ' ' .$request);
 
 		return true;
 	}

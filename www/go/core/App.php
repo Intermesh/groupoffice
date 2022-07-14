@@ -686,12 +686,14 @@ namespace go\core {
 		
 		public function __destruct() {
 
-			EntityType::push();
+			try {
+				EntityType::push();
 
-			if($this->rebuildCacheOnDestruct) {
-
-				$this->rebuildCache();
-
+				if ($this->rebuildCacheOnDestruct) {
+					$this->rebuildCache();
+				}
+			} catch(Exception $e) {
+				ErrorHandler::logException($e, "Error occurred in App destructor");
 			}
 		}
 
