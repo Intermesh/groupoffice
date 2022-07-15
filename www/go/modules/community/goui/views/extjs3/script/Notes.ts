@@ -25,12 +25,9 @@ declare global {
 	var Ext: any;
 }
 
-
-
 class Notes extends Component {
 
 	// class hbox devides screen in horizontal columns
-	private descriptionList!: DescriptionList;
 	private noteBookGrid!: NoteBookGrid;
 	private noteGrid!: NoteGrid;
 	private noteDetail!: NoteDetail;
