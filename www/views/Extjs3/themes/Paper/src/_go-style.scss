@@ -545,7 +545,7 @@ a {
 		float: left;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(16) dp(8) 0 0;
+		padding: dp(14) dp(8) 0 0;
 		color: white;
 		&:hover,&:active { color: white; }
 	}
@@ -835,9 +835,10 @@ button {
 
 .user-img {
 	//@extend .avatar;
+
 	position:absolute;	
 	right: dp(16);
-	top: dp(8);
+	top: dp(6);
 	z-index:15;
 	.avatar {
 		border: 1px solid white;
@@ -2272,28 +2273,13 @@ table[id^="comments-ext"] b {
 	display: inline-block;
 	@extend .x-btn;
 	min-height: dp(32);
-	line-height: dp(16);
+	line-height: dp(24);
 	height: auto;
 	padding: dp(8) dp(16);
 	margin: 0;
 
 	&:hover, &:focus {
-		transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary-tp);
-	}
-
-	&.primary {
-		&:hover, &:focus {
-			transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-			@include var(background-color, c-accent);
-		}
-	}
-
-	&.accent {
-		&:hover, &:focus {
-			transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-			@include var(background-color, c-primary);
-		}
+		filter: brightness(120%);
 	}
 }
 

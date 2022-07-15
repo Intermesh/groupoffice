@@ -24,17 +24,17 @@
 }
 @keyframes indeterminate1 {
 	0% {
-		left: 0%;
+		left: 10%;
 		width: 0%
 	}
 
 	50% {
 		left: 25%;
-		width: 75%
+		width: 70%
 	}
 
 	75% {
-		left: 100%;
+		left: 90%;
 		width: 0%
 	}
 }
@@ -60,7 +60,7 @@
 		text-indent: -9999px;
 	}
 	
-	div { 
+	div {
 		position: relative;
 		margin: 0 auto;
 		top: dp(5);			
@@ -716,7 +716,7 @@
 	
 	button {
 		min-height: dp(32);
-		line-height: dp(20);
+		line-height: dp(24);
 	}
 
 	&-text {
