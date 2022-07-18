@@ -8,6 +8,7 @@
 - Core: If only custom fields were modified, isModified returned false.
 - Email: Body search disabled by default because it performs bad by default. You can enable it with $config['email_allow_body_search'] = true.
 - Email: autocomplete = new-password to prevent autofill
+- Workflow: Only enabled for files and invoices
 
 12-07-2022 6.6.102
 - Core: New look and feel in line with new website
