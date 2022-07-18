@@ -1,3 +1,4 @@
+- Billing: Fix overwrite uploaded logo for PDF template
 - Core: Implemented lock timeout of 10s and throw error message with info about who is acquiring and who is holding the
   lock.
 - Tickets: attachments were no longer visible.
