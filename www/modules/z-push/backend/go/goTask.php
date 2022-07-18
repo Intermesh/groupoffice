@@ -383,7 +383,6 @@ class goTask extends GoBaseBackendDiff {
 	}
 
 	public function getNotification($folder = null) {
-		ZLog::Write(LOGLEVEL_DEBUG, 'goTask->getNotification()');
 		$record = Task::find()
 			->fetchMode(PDO::FETCH_ASSOC)
 			->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
@@ -393,6 +392,10 @@ class goTask extends GoBaseBackendDiff {
 			->single();
 
 		$newstate = $record ? 'M'.$record['modifiedAt'].':C'.$record['count'] : "M0:C0";
+
+		ZLog::Write(LOGLEVEL_DEBUG,'goTask->getNotification('.$folder.') State: '.$newstate);
+
+
 		return $newstate;
 	}
 
