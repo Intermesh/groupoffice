@@ -1,6 +1,7 @@
 - Core: Implemented lock timeout of 10s and throw error message with info about who is acquiring and who is holding the
   lock.
 - Tickets: attachments were no longer visible.
+- Search: Don't put users in result if they also have a match in the address book
 
 12-07-2022 6.6.102
 - Core: New look and feel in line with new website

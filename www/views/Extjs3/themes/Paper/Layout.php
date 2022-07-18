@@ -81,7 +81,15 @@ $lang = GO::language()->getLanguage(); ?>
                 :root {
                     --c-secondary: <?= '#'.go()->getSettings()->secondaryColor; ?> !important;
                 }
-            <?php
+                <?php
+            }
+
+            if(go()->getSettings()->tertiaryColor) {
+                ?>
+                :root {
+                    --c-tertiary: <?= '#'.go()->getSettings()->tertiaryColor; ?> !important;
+                }
+                <?php
             }
 
             if(go()->getSettings()->accentColor) {
@@ -89,7 +97,7 @@ $lang = GO::language()->getLanguage(); ?>
                 :root {
                     --c-accent: <?= '#'.go()->getSettings()->accentColor; ?> !important;
                 }
-            <?php
+                <?php
             }
         }
 		?>

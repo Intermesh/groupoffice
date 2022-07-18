@@ -3,6 +3,9 @@
 :root {
   --c-primary: #{map-get($vars, c-primary)};
   --c-primary-tp: #{map-get($vars, c-primary-tp)};
+	--c-secondary: #{map-get($vars, c-secondary)};
+	--c-tertiary: #{map-get($vars, c-tertiary)};
+	--c-accent: #{map-get($vars, c-accent)};
 }
 
 ::-webkit-scrollbar-thumb {
@@ -14,7 +17,7 @@ input[type="time"]::-webkit-clear-button {
 }
 
 html {
-   font-size: 100%;
+	font-size: 100%;
 	letter-spacing: normal;
 	-moz-osx-font-smoothing: grayscale;
    -webkit-font-smoothing: antialiased;
@@ -471,8 +474,7 @@ a {
 		.x-tab-strip {
 			
 			&-active {
-				//@include var(border-bottom-color, c-accent);
-				border-bottom-color: $cTertiary;
+				@include var(border-color, c-tertiary);
 				color:white;
 				.x-tab-strip-text{ color:white;}
 			}

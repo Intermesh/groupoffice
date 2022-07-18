@@ -67,21 +67,28 @@ $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Insta
 		<?php
 
 		if(go()->getSettings()->secondaryColor) {
-                ?>
-        :root {
-            --c-secondary: <?= '#'.go()->getSettings()->secondaryColor; ?> !important;
+            ?>
+            :root {
+                --c-secondary: <?= '#'.go()->getSettings()->secondaryColor; ?> !important;
+            }
+            <?php
         }
-        <?php
-				}
 
-				if(go()->getSettings()->accentColor) {
-						?>
-        :root {
-            --c-accent: <?= '#'.go()->getSettings()->accentColor; ?> !important;
+         if(go()->getSettings()->tertiaryColor) {
+             ?>
+            :root {
+                --c-tertiary: <?= '#'.go()->getSettings()->tertiaryColor; ?> !important;
+            }
+            <?php
+		}
+
+        if(go()->getSettings()->accentColor) {
+		?>
+            :root {
+                --c-accent: <?= '#'.go()->getSettings()->accentColor; ?> !important;
+            }
+            <?php
         }
-        <?php
-
-				}
 }
 if(go()->getSettings()->logoId) {
 		//blob id is not used by script but added only for caching.

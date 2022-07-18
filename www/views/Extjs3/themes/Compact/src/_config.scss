@@ -122,9 +122,10 @@ $vars: (
         c-primary-tp: $cPrimaryTp,
         c-header-bg: $cHeaderBg,
         c-secondary: $cSecondary,
+        c-tertiary: $cTertiary,
         c-accent: $cAccent,
         c-accent-tp: $cAccentTp
-);
+) !default;
 
 
 @mixin var($property, $varName) {

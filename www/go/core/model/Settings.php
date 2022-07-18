@@ -385,6 +385,13 @@ class Settings extends core\Settings {
 	 *
 	 * @var string
 	 */
+	public $tertiaryColor;
+
+	/**
+	 * Secondary color in html notation 000000;
+	 *
+	 * @var string
+	 */
 	public $accentColor;
 	
 	/**

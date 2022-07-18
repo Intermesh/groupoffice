@@ -60,7 +60,7 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 								scope: this,
 								change: function (field, color) {
 									if (!color) {
-										color = "0277BD"; //default color
+										color = "1652A1"; //default color
 									}
 									document.body.style.setProperty('--c-primary', '#' + color);
 								}
@@ -79,7 +79,7 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 								scope: this,
 								change: function (field, color) {
 									if (!color) {
-										color = "78A22F"; //default color
+										color = "00B0AD"; //default color
 									}
 									document.body.style.setProperty('--c-secondary', '#' + color);
 								}
@@ -92,12 +92,33 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 							dark: true
 
 						}),
+
+						this.tertiaryColorField = new GO.form.ColorField({
+							listeners: {
+								scope: this,
+								change: function (field, color) {
+									if (!color) {
+										color = "F3DB00";
+									}
+									document.body.style.setProperty('--c-tertiary', '#' + color);
+
+								}
+							},
+							fieldLabel: t("Tertiary color"),
+							showHexValue: true,
+							value: null,
+							width: 200,
+							name: 'tertiaryColor',
+							dark: true
+
+						}),
+
 						this.accentColorField = new GO.form.ColorField({
 							listeners: {
 								scope: this,
 								change: function (field, color) {
 									if (!color) {
-										color = "FF9100"; //default color
+										color = "FF7200"; //default color
 									}
 									document.body.style.setProperty('--c-accent', '#' + color);
 								}
