@@ -98,15 +98,39 @@ class Module extends core\Module implements DomainProvider {
 
 				'organization' => 'organizationname',
 
+//				// example for contact custom fields
+//				'contactCustomFields' => [
+//					'field' => 'employeeType'
+//				],
+//
+//				// example for user custom fields
+//				'userCustomFields' => [
+//					'field' => 'ou'
+//				]
+
 //				'homeDir' => function($record) {
 //					//relative path from group-office file_storage_path
 //					return "ldap_homes/" . $record->uid[0] . "/files";
 //				}
 				];
 		}
-		$mapping = $cfg['ldapMapping'];
+		$mapping = self::map($cfg['ldapMapping'], $record);
+
+//
+//		go()->debug("Record:");
+//		go()->debug($record->getAttributes());
+//
+//		go()->debug("Mapping: ");
+//		go()->debug($mapping);
+
+		return $mapping;
+	}
+
+	private static function map(array $mapping, Record $record) : array {
 		foreach($mapping as $local => $ldap) {
-			if($ldap instanceof Closure) {
+			if(is_array($ldap)) {
+				$mapping[$local] = self::map($ldap, $record);
+			} else if($ldap instanceof Closure) {
 				$mapping[$local] = $ldap($record);
 			} else if(isset($record->{$ldap})) {
 				$mapping[$local] = $record->{$ldap}[0];
@@ -208,6 +232,14 @@ class Module extends core\Module implements DomainProvider {
 				$values['organizationIds'] = [$org->id];
 			} else{
 				$values['organizationIds'] = [];
+			}
+
+			if(isset($values['userCustomFields'])) {
+				$user->getCustomFields()->setValues($values['userCustomFields']);
+			}
+
+			if(isset($values['contactCustomFields'])) {
+				$values['customFields'] = $values['contactCustomFields'];
 			}
 
 			//strip out unsupported properies.
