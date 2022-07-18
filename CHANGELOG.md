@@ -4,6 +4,8 @@
 - Tickets: attachments were no longer visible.
 - Search: Don't put users in result if they also have a match in the address book
 - Core: Third theme color used at tab strips is configurable
+- LDAP: Custom fields can be mapped too
+- Core: If only custom fields were modified, isModified returned false.
 
 12-07-2022 6.6.102
 - Core: New look and feel in line with new website
