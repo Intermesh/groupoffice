@@ -179,6 +179,7 @@ GO.email.AccountDialog = function(config) {
 			hidden: true //this function only works with imap auth at the moment.
 		}),
 		this.ImapPasswordField = new Ext.form.TextField({
+			autocomplete: 'new-password',
 			fieldLabel : t("Password"),
 			name : 'password',
 			inputType : 'password',
@@ -347,6 +348,7 @@ GO.email.AccountDialog = function(config) {
 			hidden: true
 		}),
 		this.smtpPassword = new Ext.form.TextField({
+			autocomplete: 'new-password',
 			fieldLabel : t("Password"),
 			name : 'smtp_password',
 			inputType : 'password',
