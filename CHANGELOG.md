@@ -6,6 +6,7 @@
 - Core: Third theme color used at tab strips is configurable
 - LDAP: Custom fields can be mapped too
 - Core: If only custom fields were modified, isModified returned false.
+- Email: Body search disabled by default because it performs bad by default. You can enable it with $config['email_allow_body_search'] = true.
 
 12-07-2022 6.6.102
 - Core: New look and feel in line with new website

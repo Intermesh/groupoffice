@@ -67,6 +67,8 @@ var $billing_clear_payment_method_on_duplicate = true;
  */
 	var $enabled = true;
 
+	var $email_allow_body_search = false;
+
 	/**
 	 * Enable sending system emails with an email account from the email module
 	 * Needs to be the id of the wanted mail account
