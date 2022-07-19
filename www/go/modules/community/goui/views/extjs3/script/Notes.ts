@@ -1,9 +1,14 @@
-import {btn, checkboxselectcolumn, client, column, comp, Component, splitter, StoreRecord, tbar} from "goui.js";
+import {comp, Component} from "@goui/component/Component.js";
+import {splitter} from "@goui/component/Splitter.js";
+import {tbar} from "@goui/component/Toolbar.js";
+import {btn} from "@goui/component/Button.js";
+import {checkboxselectcolumn, column} from "@goui/component/table/TableColumns.js";
+import {StoreRecord} from "@goui/data/Store.js";
+
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
-
 
 declare global {
 	var GO: any;

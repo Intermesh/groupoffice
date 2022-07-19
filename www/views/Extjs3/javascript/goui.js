@@ -48,7 +48,7 @@
 		el.classList.add("goui");
 		//const rootMods = await import("../build/goui.js");
 
-		const clientMods = await import("../goui/build/goui.js");
+		const clientMods = await import(BaseHref + "views/Extjs3/goui/dist/api/Client.js");
 
 		clientMods.client.uri = BaseHref + "api/";
 

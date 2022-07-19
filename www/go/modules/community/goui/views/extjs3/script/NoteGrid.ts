@@ -1,5 +1,9 @@
-import {column, datetimecolumn, JmapStore, jmapstore, t, Table} from "goui.js";
+
 import {NoteDialog} from "./NoteDialog.js";
+import {Table} from "@goui/component/table/Table.js";
+import {JmapStore, jmapstore} from "@goui/api/JmapStore.js";
+import {t} from "@goui/Translate.js";
+import {column, datetimecolumn} from "@goui/component/table/TableColumns.js";
 
 export interface NoteGrid {
 	store: JmapStore
@@ -36,8 +40,7 @@ export class NoteGrid extends Table {
 			const dlg = new NoteDialog();
 			dlg.show();
 			await dlg.load(table.store.get(rowIndex).id);
-
-		})
+		});
 	}
 
 }

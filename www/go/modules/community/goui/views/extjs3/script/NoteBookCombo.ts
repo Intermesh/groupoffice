@@ -1,5 +1,9 @@
-import {AutocompleteField, client, Config, t} from "goui.js"
+
 import {NoteBookGrid} from "./NoteBookGrid.js";
+import {AutocompleteField} from "@goui/component/form/AutocompleteField.js";
+import {t} from "@goui/Translate.js";
+import {Config} from "@goui/component/Component.js";
+import {client} from "@goui/api/Client.js";
 
 export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
 	constructor() {

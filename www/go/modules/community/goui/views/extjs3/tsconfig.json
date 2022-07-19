@@ -5,20 +5,19 @@
     "sourceMap": true,
     "lib": ["es2018", "dom"],
     "moduleResolution": "node",
-
-    //es6
     "module":"es2020",
+    "esModuleInterop": true,
+    "baseUrl": ".",
+
+    "outDir": "./dist",
 
     "paths": {
-      "*": ["../../../../../../views/Extjs3/goui/build/*"]
+      "@goui/*": ["../../../../../../views/Extjs3/goui/dist/*"]
     }
   },
 
   "include": [
-    "./**/*.ts"
-  ],
-  "exclude": [
-    "**/node_modules", "**/.*/"
+    "./script/**/*.ts"
   ]
 
 }

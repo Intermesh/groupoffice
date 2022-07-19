@@ -1,24 +1,20 @@
-import {
-	btn,
-	CardContainer,
-	cardmenu,
-	cards,
-	client,
-	containerfield,
-	EntityStore,
-	Fieldset,
-	fieldset,
-	Form,
-	form,
-	htmlfield,
-	Notifier,
-	root,
-	t,
-	tbar,
-	textfield,
-	Window
-} from "goui.js";
+
 import {notebookcombo} from "./NoteBookCombo.js";
+import {cardmenu} from "@goui/component/CardMenu.js";
+import {CardContainer, cards} from "@goui/component/CardContainer.js";
+import {containerfield} from "@goui/component/form/ContainerField.js";
+import {form, Form} from "@goui/component/form/Form.js";
+import {Fieldset, fieldset} from "@goui/component/form/Fieldset.js";
+import {textfield} from "@goui/component/form/TextField.js";
+import {tbar} from "@goui/component/Toolbar.js";
+import {t} from "@goui/Translate.js";
+import {root} from "@goui/component/Root.js";
+import {client} from "@goui/api/Client.js";
+import {htmlfield} from "@goui/component/form/HtmlField.js";
+import {EntityStore} from "@goui/api/EntityStore.js";
+import {btn} from "@goui/component/Button.js";
+import {Window} from "@goui/component/Window.js";
+import {Notifier} from "@goui/Notifier.js";
 
 export class NoteDialog extends Window {
 	readonly form: Form;
