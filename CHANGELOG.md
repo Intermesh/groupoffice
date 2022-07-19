@@ -1,3 +1,4 @@
+19-07-2022 6.6.104
 - Email: Added copy image to context menu. Fixes #859
 - Core: alter table to row format = dynamic if in another format in database check and make it default at installation
   and upgrade. Fixes #860
