@@ -133,6 +133,8 @@ class Installer {
 
 		$database->setUtf8();
 
+		$this->setDefaultRowFormat();
+
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
 		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 		
@@ -451,6 +453,15 @@ class Installer {
 		return $buffer;
 	}
 
+	private function setDefaultRowFormat() {
+		try {
+			go()->getDbConnection()->exec("set global innodb_default_row_format = DYNAMIC;");
+		}
+		catch (Exception $e) {
+			echo "Could not set default row format: " .$e->getMessage() ."\n";
+		}
+	}
+
 	/**
 	 * @throws Exception
 	 */
@@ -487,6 +498,8 @@ class Installer {
 
 		//don't be strict in upgrade
 		go()->getDbConnection()->exec("SET sql_mode=''");
+
+		$this->setDefaultRowFormat();
 		
 		jmap\Entity::$trackChanges = false;
 
@@ -795,10 +808,10 @@ class Installer {
 				continue;
 			}
 			
-			if($record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
-				echo "Converting ". $record["Name"] . " to InnoDB\n";
+			if($record['Row_format'] != 'Dynamic' || $record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
+				echo "Converting ". $record["Name"] . " to InnoDB and row format = Dynamic\n";
 				flush();
-				$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB;";
+				$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB, ROW_FORMAT=Dynamic;";
 				go()->getDbConnection()->query($sql);	
 			}
 			
