@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "esbuild": "^0.14.49",
+    "npm-run-all": "^4.1.5"
+  },
+
+  "scripts": {
+    "start": "npm-run-all --parallel watch:tsc --print-label ",
+    "watch:tsc": "esbuild script/Notes.ts --external:../../../../../../views/Extjs3/goui/build/goui.js --bundle --watch --sourcemap --format=esm --target=esnext --outdir=build"
+  }
+}

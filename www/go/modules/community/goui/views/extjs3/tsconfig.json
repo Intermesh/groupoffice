@@ -9,6 +9,9 @@
     //es6
     "module":"es2020",
 
+    "paths": {
+      "*": ["../../../../../../views/Extjs3/goui/build/*"]
+    }
   },
 
   "include": [

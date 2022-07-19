@@ -1,11 +1,4 @@
-import {comp, Component} from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
-import {tbar, Toolbar} from "../../../../../../../views/Extjs3/goui/script/component/Toolbar.js";
-import {btn, Button} from "../../../../../../../views/Extjs3/goui/script/component/Button.js";
-import {t} from "../../../../../../../views/Extjs3/goui/script/Translate.js";
-import {Window} from "../../../../../../../views/Extjs3/goui/script/component/Window.js";
-import {client} from "../../../../../../../views/Extjs3/goui/script/api/Client.js";
-import {Entity} from "../../../../../../../views/Extjs3/goui/script/api/EntityStore.js";
-import {Image} from "../../../../../../../views/Extjs3/goui/script/api/Image.js";
+import {btn, Button, client, comp, Component, Entity, Image, t, tbar, Toolbar, Window} from "goui.js";
 import {NoteDialog} from "./NoteDialog.js";
 
 

@@ -1,12 +1,8 @@
-import {Table} from "../../../../../../../views/Extjs3/goui/script/component/table/Table.js";
-import {Store} from "../../../../../../../views/Extjs3/goui/script/data/Store.js";
-import {t} from "../../../../../../../views/Extjs3/goui/script/Translate.js";
+import {column, datetimecolumn, JmapStore, jmapstore, t, Table} from "goui.js";
 import {NoteDialog} from "./NoteDialog.js";
-import {JmapStore, jmapstore} from "../../../../../../../views/Extjs3/goui/script/api/JmapStore.js";
-import {column, datetimecolumn} from "../../../../../../../views/Extjs3/goui/script/component/table/TableColumns.js";
 
 export interface NoteGrid {
-	store : JmapStore
+	store: JmapStore
 }
 
 export class NoteGrid extends Table {

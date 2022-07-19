@@ -1,29 +1,16 @@
-import {btn} from "../../../../../../../views/Extjs3/goui/script/component/Button.js";
-import {Notifier} from "../../../../../../../views/Extjs3/goui/script/Notifier.js";
-import {tbar} from "../../../../../../../views/Extjs3/goui/script/component/Toolbar.js";
-import {StoreRecord} from "../../../../../../../views/Extjs3/goui/script/data/Store.js";
-import {comp, Component} from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
-import {splitter} from "../../../../../../../views/Extjs3/goui/script/component/Splitter.js";
-
-import {DescriptionList, DLRecord} from "../../../../../../../views/Extjs3/goui/script/component/DescriptionList.js";
-import {Format} from "../../../../../../../views/Extjs3/goui/script/util/Format.js";
+import {btn, checkboxselectcolumn, client, column, comp, Component, splitter, StoreRecord, tbar} from "goui.js";
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
-import {
-	checkboxselectcolumn,
-	column
-} from "../../../../../../../views/Extjs3/goui/script/component/table/TableColumns.js";
 import {NoteDialog} from "./NoteDialog.js";
-import {textfield} from "../../../../../../../views/Extjs3/goui/script/component/form/TextField.js";
-import {t} from "../../../../../../../views/Extjs3/goui/script/Translate.js";
-import {Field} from "../../../../../../../views/Extjs3/goui/script/component/form/Field.js";
+
 
 declare global {
 	var GO: any;
 	var go: any;
 	var Ext: any;
 }
+
 
 class Notes extends Component {
 
@@ -156,7 +143,7 @@ class Notes extends Component {
 					icon: "add",
 					handler: () => {
 						const dlg = new NoteDialog();
-						const noteBookId =this.noteBookGrid.store.get(this.noteBookGrid.rowSelection!.selected[0]).id;
+						const noteBookId = this.noteBookGrid.store.get(this.noteBookGrid.rowSelection!.selected[0]).id;
 
 						dlg.form.setValues({
 							noteBookId: noteBookId

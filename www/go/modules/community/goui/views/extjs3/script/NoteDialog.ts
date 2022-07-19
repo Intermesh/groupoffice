@@ -1,20 +1,24 @@
-import {Form, form} from "../../../../../../../views/Extjs3/goui/script/component/form/Form.js";
-import {textfield} from "../../../../../../../views/Extjs3/goui/script/component/form/TextField.js";
-import {t} from "../../../../../../../views/Extjs3/goui/script/Translate.js";
-import {Window} from "../../../../../../../views/Extjs3/goui/script/component/Window.js";
-import {htmlfield} from "../../../../../../../views/Extjs3/goui/script/component/form/HtmlField.js";
-import {EntityStore} from "../../../../../../../views/Extjs3/goui/script/api/EntityStore.js";
-import {client} from "../../../../../../../views/Extjs3/goui/script/api/Client.js";
-import {tbar} from "../../../../../../../views/Extjs3/goui/script/component/Toolbar.js";
-import {btn} from "../../../../../../../views/Extjs3/goui/script/component/Button.js";
-import {Fieldset, fieldset} from "../../../../../../../views/Extjs3/goui/script/component/form/Fieldset.js";
+import {
+	btn,
+	CardContainer,
+	cardmenu,
+	cards,
+	client,
+	containerfield,
+	EntityStore,
+	Fieldset,
+	fieldset,
+	Form,
+	form,
+	htmlfield,
+	Notifier,
+	root,
+	t,
+	tbar,
+	textfield,
+	Window
+} from "goui.js";
 import {notebookcombo} from "./NoteBookCombo.js";
-import {Notifier} from "../../../../../../../views/Extjs3/goui/script/Notifier.js";
-import {root} from "../../../../../../../views/Extjs3/goui/script/component/Root.js";
-import {CardContainer, cards} from "../../../../../../../views/Extjs3/goui/script/component/CardContainer.js";
-import {cardmenu} from "../../../../../../../views/Extjs3/goui/script/component/CardMenu.js";
-import {comp} from "../../../../../../../views/Extjs3/goui/script/component/Component.js";
-import {containerfield} from "../../../../../../../views/Extjs3/goui/script/component/form/ContainerField.js";
 
 export class NoteDialog extends Window {
 	readonly form: Form;
@@ -124,11 +128,11 @@ export class NoteDialog extends Window {
 		const es = "Note"
 		if (go.Entities.get(es).customFields) {
 			var fieldsets = go.customfields.CustomFields.getFormFieldSets(es);
-			fieldsets.forEach((fs:any) => {
+			fieldsets.forEach((fs: any) => {
 
 				//replace customFields. because we will use a containerfield here.
-				fs.cascade((item:any) => {
-					if(item.getName) {
+				fs.cascade((item: any) => {
+					if (item.getName) {
 						let fieldName = item.getName().replace('customFields.', '');
 						item.name = fieldName;
 					}

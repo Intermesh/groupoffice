@@ -20,7 +20,7 @@ go.modules.community.goui.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		go.modules.community.goui.MainPanel.superclass.initComponent.call(this);
 
 		this.on("afterrender", () => {
-			goui("./go/modules/community/goui/views/extjs3/script/Notes.js", this.body.dom);
+			goui("./go/modules/community/goui/views/extjs3/build/Notes.js", this.body.dom);
 		}, this);
 	},
 
