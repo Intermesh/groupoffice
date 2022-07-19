@@ -1,4 +1,5 @@
 - Email: Added copy image to context menu. Fixes #859
+- Core: user profile form scrolls to first invalid form field
 
 18-07-2022 6.6.103
 - Billing: Fix overwrite uploaded logo for PDF template
