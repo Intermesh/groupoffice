@@ -89,8 +89,9 @@ $cPrimaryTp:	rgba(22, 82, 161, 0.16) !default;
 $cHeaderBg: 	$cPrimary !default;
 
 $cSecondary: rgb(0, 176, 173) !default;
-$cAccent:		rgb(243,219,0) !default;
-$cAccentTp:		rgba(243,219,0, 0.16) !default;
+$cTertiary: rgb(243,219,0) !default;
+$cAccent: rgb(255, 114, 0) !default;
+$cAccentTp:		rgba(255,114,0, 0.16) !default;
 
 // Colors that have meaning (eg. success/failure)
 $cSuccess:		#43A047 !default;

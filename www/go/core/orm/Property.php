@@ -1025,7 +1025,7 @@ abstract class Property extends Model {
 	 * @param bool $forIsModified
 	 * @return array|bool eg. ["propName" => [newval, oldval]]
 	 */
-	private function internalGetModified($properties = [], bool $forIsModified = false) {
+	protected function internalGetModified(&$properties = [], bool $forIsModified = false) {
 
 		if($this->readOnly) {
 			return $forIsModified ? false : [];
@@ -1037,6 +1037,13 @@ abstract class Property extends Model {
 
 		if(empty($properties)) {
 			$properties = array_keys($this->oldProps);
+
+			if(method_exists($this, 'getCustomFields') && $this->getCustomFields()->isModified()) {
+				if ($forIsModified) {
+					return true;
+				}
+				$modified['customFields'] = $this->getCustomFields()->getModified();
+			}
 		}
 
 		$modified = [];

@@ -3,7 +3,9 @@
 namespace go\core\util;
 
 use Exception;
+use go\core\ErrorHandler;
 use go\core\fs\File;
+use go\core\jmap\Request;
 use LogicException;
 use function GO;
 
@@ -21,6 +23,14 @@ class Lock {
 	 * @var bool
 	 */
 	private $blocking;
+
+	private $startTime;
+
+	/**
+	 * Timeout in seconds
+	 * @var int
+	 */
+	public $timeout = 10;
 
 	public function __construct(string $name, bool $blocking = true) {
 		$this->name = $name;
@@ -69,19 +79,43 @@ class Lock {
 			throw new LogicException("Lock '" . $this->name . "' already locked by you!");
 		}
 
-//		if(function_exists('sem_get')) {
-//			//performs better but is not always available
-//			$locked = $this->lockWithSem();
-//		} else
-//		{
+		if(!isset($this->startTime)) {
+			$this->startTime = microtime(true);
+		}
+
+		if(function_exists('sem_get')) {
+			//performs better but is not always available
+			$locked = $this->lockWithSem();
+		} else
+		{
 			$locked = $this->lockWithFlock();
-//		}
+		}
 
 		if($locked) {
 			$this->lockedByMe = true;
-		}
 
-		return $locked;
+			// for debugging lock problem. Store request infor user ID and PID number
+			$this->getLockFile()->putContents($this->getRequestInfo());
+
+			//reset start time to take off the waiting time. We want to use it for measuring the lock time now.
+			$this->startTime = microtime(true);
+			return true;
+		} else {
+			if($this->timeout > 0 && $this->timeTaken() > $this->timeout) {
+				$info = $this->getLockFile()->getContents();
+				throw new Exception("Waiting for lock (" . $this->getRequestInfo() .") for longer than " . $this->timeout."s. Lock is held by (" . $info . ")");
+			}
+			//sleep for 100 milliseconds
+			usleep(100000);
+			return $this->lock();
+		}
+	}
+
+
+	private function getRequestInfo(): string
+	{
+		$userId = go()->getAuthState() ? (go()->getAuthState()->getUserId() ? go()->getAuthState()->getUserId() : '-') : '-';
+		return getmypid() . ' ' . $userId . ' ' . go()->getDebugger()->getRequestId();
 	}
 
 	/**
@@ -94,23 +128,23 @@ class Lock {
 		// prepend db name for multi instance
 		try {
 			$this->sem = sem_get((int)hexdec(substr(md5(go()->getConfig()['db_name'] . $this->name), 24)));
-			$acquired = sem_acquire($this->sem, !$this->blocking);
+			$acquired = sem_acquire($this->sem, true);
 		} catch(Exception $e) {
 			//identifier might be removed by other process
 			$acquired = false;
-			//echo $e->getMessage() ."\n";
 		}
+		return $acquired;
+	}
 
-		if(!$this->blocking) {
-			return $acquired;
-		} else {
-			if(!$acquired) {
-				sleep(1);
-				return $this->lockWithSem();
-			} else {
-				return true;
-			}
-		}
+
+	private function getLockFile() {
+		$lockFolder = GO()
+			->getDataFolder()
+			->getFolder('locks');
+
+		$name = File::stripInvalidChars($this->name);
+
+		return $lockFolder->getFile($name . '.lock')->touch(true);
 	}
 
 	/**
@@ -120,22 +154,16 @@ class Lock {
 	 */
 	private function lockWithFlock() : bool {
 
-		$lockFolder = GO()
-			->getDataFolder()
-			->getFolder('locks');
-
-		$name = File::stripInvalidChars($this->name);
-
-		$lockFile = $lockFolder->getFile($name . '.lock')->touch(true);
+		$lockFile = $this->getLockFile();
 
 		//needs to be put in a private variable otherwise the lock is released outside the function scope
-		$this->lockFp = $lockFile->open('w+');
+		$this->lockFp = $lockFile->open('r');
 
 		if(!$this->lockFp){
 			throw new Exception("Could not create or open the file for writing.\rPlease check if the folder permissions are correct so the webserver can create and open files in it.\rPath: '" . $lockFile->getPath() . "'");
 		}
 
-		if (!flock($this->lockFp, $this->blocking ? LOCK_EX : LOCK_EX|LOCK_NB, $wouldblock)) {
+		if (!flock($this->lockFp, LOCK_EX|LOCK_NB, $wouldblock)) {
 
 			//unset it because otherwise __destruct will destroy the lock
 			if(is_resource($this->lockFp)) {
@@ -147,8 +175,10 @@ class Lock {
 			if ($wouldblock) {
 				// another process holds the lock
 				return false;
+
 			} else {
-				throw new Exception("Could not lock controller action '" . $this->name . "'");
+				//happens on apache restart: https://stackoverflow.com/questions/36084158/what-is-the-reason-for-flock-to-return-false
+				throw new Exception("Could not obtain excusive lock with name '" . $this->name . "'");
 			}
 		}
 
@@ -175,6 +205,19 @@ class Lock {
 		}
 
 		$this->lockedByMe = false;
+
+		//Warn about long lock times in error log
+		$lockTime = $this->timeTaken();
+		if($lockTime > 1) {
+			$userId = (go()->getAuthState() ? go()->getAuthState()->getUserId() : '-');
+			ErrorHandler::log("Lock " . $this->name . " by " .$userId ." in request ". go()->getDebugger()->getRequestId() . ' with pid '.getmypid().' took '.$lockTime.'s');
+		}
+
+		$this->startTime = null;
+	}
+
+	private function timeTaken() {
+		return microtime(true) - $this->startTime;
 	}
 	
 	public function __destruct() {

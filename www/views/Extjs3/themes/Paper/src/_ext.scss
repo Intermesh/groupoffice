@@ -24,17 +24,17 @@
 }
 @keyframes indeterminate1 {
 	0% {
-		left: 0%;
+		left: 10%;
 		width: 0%
 	}
 
 	50% {
 		left: 25%;
-		width: 75%
+		width: 70%
 	}
 
 	75% {
-		left: 100%;
+		left: 90%;
 		width: 0%
 	}
 }
@@ -60,7 +60,7 @@
 		text-indent: -9999px;
 	}
 	
-	div { 
+	div {
 		position: relative;
 		margin: 0 auto;
 		top: dp(5);			
@@ -193,7 +193,7 @@
 		border-bottom: 1px solid color($fg, 'line');
 	}
 	>li.x-tab-strip-active {
-		@include var(border-color, c-accent);
+		@include var(border-color, c-tertiary);
 		span.x-tab-strip-text {
 			color: color($fg, 'text');
 			font-weight: bold;
@@ -209,7 +209,6 @@
 
 	span.x-tab-strip-text {
 		padding:0;
-		color: color($fg, 'secondary-text');
 		font-weight: normal;
 		&.primary {
 			color: rgba(white, 0.7);
@@ -716,7 +715,7 @@
 	
 	button {
 		min-height: dp(32);
-		line-height: dp(20);
+		line-height: dp(24);
 	}
 
 	&-text {
@@ -760,7 +759,7 @@
 		}
 
 		&.accent {
-			@include var(background-color, c-accent);
+			@include var(background-color, c-secondary);
 		}
 	}
 	.x-toolbar & {
@@ -1152,7 +1151,7 @@
 .x-tbar-page-prev:before { @extend %icon; content: 'chevron_left'; }
 
 .x-tbar-page-number{
-	width: dp(48);
+	width: dp(56);
 }
 
 

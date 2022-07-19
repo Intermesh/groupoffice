@@ -164,7 +164,11 @@ GO.email.AccountDialog = function(config) {
 			fieldLabel : t("Username"),
 			name : 'username',
 			allowBlank : false,
+			autocomplete: "new-password",
 			listeners : {
+				render : function(f) {
+					f.getEl().dom.setAttribute("data-lpignore", "true");
+				},
 				change : function() {
 					this.refreshNeeded = true;
 				},
@@ -179,10 +183,15 @@ GO.email.AccountDialog = function(config) {
 			hidden: true //this function only works with imap auth at the moment.
 		}),
 		this.ImapPasswordField = new Ext.form.TextField({
+			autocomplete: 'new-password',
+
 			fieldLabel : t("Password"),
 			name : 'password',
 			inputType : 'password',
 			listeners : {
+				render : function(f) {
+					f.getEl().dom.setAttribute("data-lpignore", "true");
+				},
 				change : function() {
 					this.refreshNeeded = true;
 				},
@@ -336,9 +345,15 @@ GO.email.AccountDialog = function(config) {
 				scope:this
 			}
 		}),this.smtpUsername= new Ext.form.TextField({
-			fieldLabel : t("Username"),
-			name : 'smtp_username',
-			disabled:true
+				fieldLabel : t("Username"),
+				name : 'smtp_username',
+				disabled:true,
+				autocomplete: "new-password",
+				listeners: {
+					render : function(f) {
+						f.getEl().dom.setAttribute("data-lpignore", "true");
+					}
+				}
 		}),
 		this.smtpPasswordStore = new Ext.ux.form.XCheckbox({
 			checked: true,
@@ -347,10 +362,16 @@ GO.email.AccountDialog = function(config) {
 			hidden: true
 		}),
 		this.smtpPassword = new Ext.form.TextField({
+			autocomplete: 'new-password',
 			fieldLabel : t("Password"),
 			name : 'smtp_password',
 			inputType : 'password',
-			disabled:true
+			disabled:true,
+			listeners: {
+				render : function(f) {
+					f.getEl().dom.setAttribute("data-lpignore", "true");
+				}
+			}
 		})]
 	});
 

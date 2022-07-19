@@ -1,4 +1,31 @@
+19-07-2022 6.6.104
+- Email: Added copy image to context menu. Fixes #859
+- Core: alter table to row format = dynamic if in another format in database check and make it default at installation
+  and upgrade. Fixes #860
+- Core: user profile form scrolls to first invalid form field
+- Core: totals input wider to fit 4 digits. Fixes #843
+- Core: no timeout on upgrade and cron lock
+- Calendar: Wrong calendar list when copying an event after the first time
+- Email: Add data-lpignore=true to username and password fields to disable lastpass autofill
+
+18-07-2022 6.6.103
+- Billing: Fix overwrite uploaded logo for PDF template
+- Core: Implemented lock timeout of 10s and throw error message with info about who is acquiring and who is holding the
+  lock.
+- Tickets: attachments were no longer visible.
+- Search: Don't put users in result if they also have a match in the address book
+- Core: Third theme color used at tab strips is configurable
+- LDAP: Custom fields can be mapped too
+- Core: If only custom fields were modified, isModified returned false.
+- Email: Body search disabled by default because it performs bad by default. You can enable it with $config['email_allow_body_search'] = true.
+- Email: autocomplete = new-password to prevent autofill
+- Workflow: Only enabled for files and invoices
+
+12-07-2022 6.6.102
 - Core: New look and feel in line with new website
+- Core: fix notice userDisplay model timezone
+- Leavedays: fix notice manager YearCredit model
+- Core: Longer token lifetime to avoid re-authentication through a working day
 
 05-07-2022 6.6.101
 - Leavedays: several fixes special leave budgets

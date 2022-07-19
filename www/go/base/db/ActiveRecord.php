@@ -3010,6 +3010,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$destination = str_replace('{extension}', $newValue->extension(), $destination);
 
 				$destinationFile = new \GO\Base\Fs\File(GO::config()->file_storage_path.$destination);
+
+				if($destinationFile->exists()) {
+					$destinationFile->delete();
+				}
 				$destinationFolder = $destinationFile->parent();
 				$destinationFolder->create();
 

@@ -40,6 +40,7 @@ form/Dialog.js
 form/BatchEditDialog.js
 form/CheckboxGroup.js
 form/PasswordGeneratorField.js
+form/PasteButtonField.js
 form/DateField.js
 form/DateTimeField.js
 form/TimeField.js
