@@ -486,6 +486,7 @@ class Installer {
 		$this->disableUnavailableModules();
 
 		$lock = new Lock("upgrade", false);
+		$lock->timeout = 0;
 		if (!$lock->lock()) {
 			throw new Exception("Upgrade is already in progress");
 		}

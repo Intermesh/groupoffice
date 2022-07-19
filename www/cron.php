@@ -44,6 +44,8 @@ if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 GO::config()->save_setting('cron_last_run', time());
 
 $lock = new Lock("cron", false);
+$lock->timeout = 0;
+
 if(!$lock->lock()) {
     go()->debug("cron.php is locked (already running)");
     exit();
