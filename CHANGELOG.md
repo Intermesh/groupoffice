@@ -1,4 +1,6 @@
 - Email: Added copy image to context menu. Fixes #859
+- Core: alter table to row format = dynamic if in another format in database check and make it default at installation
+  and upgrade. Fixes #860
 
 18-07-2022 6.6.103
 - Billing: Fix overwrite uploaded logo for PDF template
