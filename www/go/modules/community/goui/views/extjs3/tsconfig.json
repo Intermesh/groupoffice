@@ -3,7 +3,7 @@
     "strict" : true,
     "target": "ES2017",
     "sourceMap": true,
-    "lib": ["es2018", "dom"],
+    "lib": ["es2020", "dom"],
     "moduleResolution": "node",
     "module":"es2020",
     "esModuleInterop": true,

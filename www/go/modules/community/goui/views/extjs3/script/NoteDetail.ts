@@ -1,6 +1,5 @@
 
 import {NoteDialog} from "./NoteDialog.js";
-import {comp, Component} from "@goui/component/Component.js";
 import {btn, Button} from "@goui/component/Button.js";
 import {Entity} from "@goui/api/EntityStore.js";
 import {tbar, Toolbar} from "@goui/component/Toolbar.js";
@@ -8,6 +7,7 @@ import {t} from "@goui/Translate.js";
 import {client} from "@goui/api/Client.js";
 import {Window} from "@goui/component/Window.js";
 import {Image} from "@goui/api/Image.js";
+import {comp, Component} from "@goui/component/Component.js";
 
 
 export class NoteDetail extends Component {

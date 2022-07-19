@@ -83,7 +83,7 @@ echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?l
 <script type="importmap">
 {
   "imports": {
-    "@goui": "<?= $root_uri; ?>views/Extjs3/goui/dist"
+    "@goui/": "<?= $root_uri; ?>views/Extjs3/goui/dist/"
   }
 }
 </script>
