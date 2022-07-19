@@ -4,6 +4,7 @@
 - Core: user profile form scrolls to first invalid form field
 - Core: totals input wider to fit 4 digits. Fixes #843
 - Core: no timeout on upgrade and cron lock
+- Calendar: Wrong calendar list when copying an event after the first time
 
 18-07-2022 6.6.103
 - Billing: Fix overwrite uploaded logo for PDF template
