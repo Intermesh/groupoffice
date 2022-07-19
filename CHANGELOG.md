@@ -1,3 +1,5 @@
+- Email: Added copy image to context menu. Fixes #859
+
 18-07-2022 6.6.103
 - Billing: Fix overwrite uploaded logo for PDF template
 - Core: Implemented lock timeout of 10s and throw error message with info about who is acquiring and who is holding the
