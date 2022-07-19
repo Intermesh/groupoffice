@@ -1,7 +1,7 @@
 import {Table} from "@goui/component/table/Table.js";
 import {JmapStore, jmapstore} from "@goui/api/JmapStore.js";
 import {t} from "@goui/Translate.js";
-import {Config} from "@goui/component/Component.js";
+import {Config, createComponent} from "@goui/component/Component.js";
 import {column} from "@goui/component/table/TableColumns.js";
 
 
@@ -29,4 +29,4 @@ export class NoteBookGrid extends Table<JmapStore> {
 
 }
 
-export const notebookgrid = (config: Config<NoteBookGrid>) => Object.assign(new NoteBookGrid(), config);
+export const notebookgrid = (config: Config<NoteBookGrid>) => createComponent(new NoteBookGrid(), config);
