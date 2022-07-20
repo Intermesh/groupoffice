@@ -41,13 +41,7 @@ GO.calendar.EventDialog = function(calendar) {
 	];
 
 	//This field is added for filtering the custom field panels. It needs the group_id to be in the form values to filter on this value.
-	this.propertiesPanel.add(new Ext.form.Hidden({name: "group_id"})); 
-	
-	
-	if(go.Modules.isAvailable("legacy", "comments")){
-		this.commentsGrid = new GO.comments.CommentsGrid({title:t("Comments", "comments")});
-		items.push(this.commentsGrid);
-	}
+	this.propertiesPanel.add(new Ext.form.Hidden({name: "group_id"}));
 	
 	this.tabPanel = new Ext.TabPanel({
 		activeTab : 0,
@@ -312,22 +306,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					} else {
 						this.recurrencePanel.setDisabled(false);
 					}
-					
-					if(go.Modules.isAvailable("legacy", "comments")){
-						if(action.result.data['id'] > 0){
-							if (!GO.util.empty(action.result.data['action_date'])) {
-								this.commentsGrid.actionDate = action.result.data['action_date'];
-							} else {
-								this.commentsGrid.actionDate = false;
-							}
-							this.commentsGrid.setLinkId(action.result.data['id'], 'GO\\Calendar\\Model\\Event');
-							this.commentsGrid.store.load();
-							this.commentsGrid.setDisabled(false);
-						} else {
-							this.commentsGrid.setDisabled(true);
-						}
-					}
-								
+
 					this.recurrencePanel.setStartDate(this.startDate.getValue());
 					this.recurrencePanel.changeRepeat(action.result.data.freq);
 					this.recurrencePanel.setDaysButtons(action.result.data);

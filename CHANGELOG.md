@@ -1,5 +1,6 @@
 6.6.105
 - Newsletters: bugfix retrieving entity types in addressbook dialog
+- Calendar: add ACL field to TasklistCompat model to prevent non-admin users seeing all task lists
 
 19-07-2022 6.6.104
 - Email: Added copy image to context menu. Fixes #859
