@@ -20,8 +20,9 @@ class UserSettings extends Property {
 		return parent::defineMapping()->addTable('fb_acl');
 	}	
 	
-	protected function internalSave(): bool
+	protected function init()
 	{
+		parent::init();
 		
 		if(!isset($this->acl_id)) {
 			$acl = new \GO\Base\Model\Acl();
@@ -30,8 +31,6 @@ class UserSettings extends Property {
 			$acl->save();
 			$this->acl_id = $acl->id;
 		}
-		
-		return parent::internalSave();
 	}
 
 }
