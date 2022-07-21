@@ -133,8 +133,6 @@ class Installer {
 
 		$database->setUtf8();
 
-		$this->setDefaultRowFormat();
-
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
 		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 		
@@ -453,15 +451,6 @@ class Installer {
 		return $buffer;
 	}
 
-	private function setDefaultRowFormat() {
-		try {
-			go()->getDbConnection()->exec("set global innodb_default_row_format = DYNAMIC;");
-		}
-		catch (Exception $e) {
-			echo "Could not set default row format: " .$e->getMessage() ."\n";
-		}
-	}
-
 	/**
 	 * @throws Exception
 	 */
@@ -500,8 +489,6 @@ class Installer {
 		//don't be strict in upgrade
 		go()->getDbConnection()->exec("SET sql_mode=''");
 
-		$this->setDefaultRowFormat();
-		
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
