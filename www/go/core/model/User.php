@@ -867,6 +867,7 @@ class User extends Entity {
 	}
 
 
+
 	/**
 	 * @throws SaveException
 	 * @throws Exception

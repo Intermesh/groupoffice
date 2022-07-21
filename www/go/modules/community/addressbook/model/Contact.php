@@ -6,6 +6,7 @@ use go\core\acl\model\AclItemEntity;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
+use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Entity;
 use go\core\orm\Filters;
@@ -827,8 +828,27 @@ class Contact extends AclItemEntity {
 			return false;
 		}
 
+		$this->updateUser();
+
 		return $this->saveOriganizationIds();
 
+	}
+
+	private function updateUser() {
+		if(isset($this->goUserId) && $this->isModified([
+				'name',
+				'emailAddresses',
+			])) {
+
+			$user = User::findById($this->goUserId,['email', 'displayName']);
+			$user->displayName = $this->name;
+			if(isset($this->emailAddresses[0])) {
+				$user->email = $this->emailAddresses[0]->email;
+			}
+			if($user->isModified()) {
+				$user->save();
+			}
+		}
 	}
 
 	private function updateEmployees(): bool
