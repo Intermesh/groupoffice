@@ -5,6 +5,7 @@
 - Calendar: UI bug where more... appeared over day number in month view
 - Core: Don't set default row format as it needs SUPER privileges
 - Core: Lock on cron sent email every time.
+- Freebusypermissions: ACL not always generated
 
 19-07-2022 6.6.104
 - Email: Added copy image to context menu. Fixes #859

@@ -2237,6 +2237,9 @@ table[id^="comments-ext"] b {
 	background-color: color($bg, 'box');
 	cursor: pointer;
 	z-index:2;
+	&:hover {
+		opacity: 0;
+	}
 }
 
 
