@@ -5,6 +5,7 @@ namespace go\core\model;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\db\Expression;
+use go\core\db\Query as DbQuery;
 use go\core\exception\Forbidden;
 use go\core\orm\EntityType;
 use go\core\orm\Filters;
@@ -123,7 +124,13 @@ class Group extends AclOwnerEntity {
 	
 	protected static function textFilterColumns(): array
 	{
-		return ['name'];
+		return ['name', 'u.displayName'];
+	}
+
+	protected static function search(Criteria $criteria, string $expression, DbQuery $query): Criteria
+	{
+		$query->join('core_user', 'u', 'u.id = g.isUserGroupFor', 'LEFT');
+		return parent::search($criteria, $expression, $query);
 	}
 
 	protected function internalValidate()
