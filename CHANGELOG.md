@@ -1,4 +1,4 @@
-6.6.105
+20-07-2022 6.6.105
 - Newsletters: bugfix retrieving entity types in addressbook dialog
 - Calendar: add ACL field to TasklistCompat model to prevent non-admin users seeing all task lists
 - Core: Search users by display name in permission search
