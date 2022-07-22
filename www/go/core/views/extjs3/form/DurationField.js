@@ -6,6 +6,8 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 	//maskRe: /[0-9]|:/,
 	cls: 'x-form-duration',
 
+	submit: true, //override for compositefield
+
 	width: 72,
 
 	initComponent() {
@@ -15,6 +17,7 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 				maxValue:23,
 				style:{textAlign:'right'},
 				allowNegative:false,
+				minValue: 0,
 				decimals: 0,
 				selectOnFocus:true,
 				emptyText:'--',
@@ -27,6 +30,7 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 				name:t('Minutes'),
 				maxValue:59,
 				allowNegative:false,
+				minValue: 0,
 				decimals: 0,
 				selectOnFocus:true,
 				emptyText:'--',
