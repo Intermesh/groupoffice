@@ -700,7 +700,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$folder->visible=1;
 		$folder->readonly=1;
 		//\GO::$ignoreAclPermissions=true;
-		$folder->save();
+		$folder->save(true);
 		//\GO::$ignoreAclPermissions=false;
 
 		return $folder;
