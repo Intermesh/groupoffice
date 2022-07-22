@@ -1228,6 +1228,7 @@ tr.go-grid-row {
 		padding-left: dp(16);
 		padding-bottom:dp(8)
 	}
+    * { overflow:hidden;}
 
 	label {
 		@extend %font-caption;
