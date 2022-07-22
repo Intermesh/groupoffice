@@ -408,14 +408,20 @@
 		}
 		
 	}
-	&-text, textarea.x-form-field, &-time {
-		@extend %font-data;
-		background-color:color($bg, 'box');
-		border: 1px solid color($fg, 'track');
-		display: inline-block;
-		padding: dp(6) dp(8);
-	}
-	&-time { max-height: dp(32);  }
+    &-duration, &-text, textarea.x-form-field, &-time {
+      @extend %font-data;
+      background-color:color($bg, 'box');
+      border: 1px solid color($fg, 'track');
+      display: inline-block;
+      padding: dp(6) dp(8);
+    }
+    &-duration > div > input {
+      border:0;
+      background:transparent;
+      padding:0;
+      @extend %font-data;
+    }
+	&-time { max-height: dp(36);  }
 	
 	textarea.x-form-field {
 		/*height: min-content;*/
@@ -493,7 +499,7 @@
 		color: $cDanger;
 	}
 	
-	&-focus, textarea.x-form-focus {
+	&-focus, textarea.x-form-focus, &:focus-within {
 		@extend .z2;
 		@include var(border-color, c-primary);
 	}	

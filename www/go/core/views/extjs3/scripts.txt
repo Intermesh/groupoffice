@@ -43,6 +43,7 @@ form/PasswordGeneratorField.js
 form/DateField.js
 form/DateTimeField.js
 form/TimeField.js
+form/DurationField.js
 form/FileField.js
 form/ImageField.js
 form/FileButtonField.js
