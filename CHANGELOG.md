@@ -1,3 +1,6 @@
+6.6.106
+- Email: do not search in mail body if  $config['email_allow_body_search'] is not set
+
 20-07-2022 6.6.105
 - Newsletters: bugfix retrieving entity types in addressbook dialog
 - Calendar: add ACL field to TasklistCompat model to prevent non-admin users seeing all task lists
