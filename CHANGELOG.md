@@ -1,6 +1,7 @@
 6.6.106
 - Email: do not search in mail body if  $config['email_allow_body_search'] is not set
 - Email: fix retrieving attachments by X.Y MIME part numbers
+- Tasks: set state for task dialog. Fixes #868.
 
 20-07-2022 6.6.105
 - Newsletters: bugfix retrieving entity types in addressbook dialog
