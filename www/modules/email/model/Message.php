@@ -211,7 +211,7 @@ abstract class Message extends \GO\Base\Model
 		$this->attachments[$a->number]=$a;
 	}
 
-	public function isAttachment(int $number)
+	public function isAttachment($number)
 	{
 		$att = $this->getAttachments();
 		return isset($att[$number]);
@@ -221,10 +221,10 @@ abstract class Message extends \GO\Base\Model
 	 * Get an attachment by MIME partnumber.
 	 * eg. 1.1 or 2
 	 *
-	 * @param StringHelper $number
+	 * @param mixed $number
 	 * @return array See getAttachments
 	 */
-	public function getAttachment(int $number)
+	public function getAttachment($number)
 	{
 		$att = $this->getAttachments();
 		if(!isset($att[$number])) {
