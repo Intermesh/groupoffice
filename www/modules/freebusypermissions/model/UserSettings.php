@@ -29,7 +29,16 @@ class UserSettings extends Property {
 			$acl->ownedBy = $this->user_id;
 			$acl->usedIn = FreeBusyAcl::model()->tableName();
 			$acl->save();
+
 			$this->acl_id = $acl->id;
+			$this->user_id = $this->owner->id;
+
+			go()->getDbConnection()
+				->insert('fb_acl', [
+					'user_id' => $this->owner->id,
+					'acl_id' => $acl->id
+				])->execute();
+
 		}
 	}
 

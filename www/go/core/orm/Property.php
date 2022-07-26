@@ -1145,7 +1145,7 @@ abstract class Property extends Model {
 	 */
 	public function getOldValue(string $propName) {
 		if(!array_key_exists($propName, $this->oldProps)){
-			throw new InvalidArgumentException("Property " . $propName . " does not exist");
+			throw new InvalidArgumentException("Property " . $propName . " does not exist on " . static::class);
 		}
 		return $this->oldProps[$propName];
 	}
