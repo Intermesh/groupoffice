@@ -969,6 +969,7 @@
 	background-color: color($bg, 'card');
 	margin-right: dp(8);
 	border-radius:$borderRadius;
+	overflow: hidden;
 	border: 1px solid color($fg, 'line');
 	&-header{
 		color: inherit;
