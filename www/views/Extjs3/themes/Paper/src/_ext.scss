@@ -874,8 +874,8 @@
 			//}
 		}
 		button {
-			min-width:dp(32);
-			min-height: dp(32);
+			min-width:dp(40);
+			min-height: dp(40);
 			position:relative;
 			&::before {
 				@extend %icon;
