@@ -1,11 +1,11 @@
 <?php
 return array (
   'Announcement' => 'Aviso',
-  'Show until' => 'Exibir até',
-  'Loading Feed...' => 'Carregando feed...',
+  'Show until' => 'Mostrar até',
+  'Loading Feed...' => 'A carregar p feed...',
   'Go to Post' => 'Ir para o post',
   'Today ' => 'Hoje',
-  'You don\'t have any items on your start page.' => 'Você não tem nenhum ítem na página inicial.',
+  'You don\'t have any items on your start page.' => 'Não tem nenhum ítem na página inicial.',
   'Start page' => 'Página Inicial',
   'Manage announcements' => 'Administrar avisos',
   'Announcements' => 'Avisos',

@@ -28,6 +28,7 @@ $languages['mn']='Монгол хэл';
 $languages['nl']='Nederlands';
 $languages['nb']='Norsk bokmål';
 $languages['pl']='Polski';
+$languages['pt_pt']='Português';
 $languages['pt_br']='Português - Brazil';
 $languages['ru']='Русский';
 $languages['ro']='Romanian';

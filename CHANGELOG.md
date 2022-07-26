@@ -1,4 +1,5 @@
 6.6.106
+- Tasks: different style for completed checkbox
 - Email: do not search in mail body if  $config['email_allow_body_search'] is not set
 - Email: fix retrieving attachments by X.Y MIME part numbers
 - Tasks: set state for task dialog. Fixes #868.
