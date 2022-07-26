@@ -43,6 +43,10 @@ class Calendar extends EntityController {
 	 * 
 	 * @see https://jmap.io/spec-core.html#/set
 	 * @param array $params
+	 * @param bool $onDestroyRemoveEvents If false, any attempt to destroy a Calendar that still has CalendarEvents in
+	 * 	it will be rejected with a calendarHasEvent SetError. If true, any CalendarEvents that were in the Calendar
+	 * 	will be removed from it, and if in no other Calendars they will be destroyed. This SHOULD NOT send scheduling
+	 * 	messages to participants or create CalendarEventNotification objects.
 	 */
 	public function set($params) {
 		return $this->defaultSet($params);
