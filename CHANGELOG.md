@@ -1,4 +1,4 @@
-6.6.106
+26-07-2022 6.6.106
 - Core: Added Portugese translation (pt_PT)
 - Tasks: different style for completed checkbox
 - Email: do not search in mail body if  $config['email_allow_body_search'] is not set
