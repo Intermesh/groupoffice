@@ -21,8 +21,8 @@ return array (
   'Used quota' => 'Quota usada',
   'Postfix admin' => 'Administrador de Postfix',
   'Ok' => 'Ok',
-  'Are you sure you wan to reset all the passwords?' => 'Tem a certeza que quer limpar todas as senhas?',
+  'Are you sure you wan to reset all the passwords?' => 'Tem a certeza que quer limpar todas as palavra-passe?',
   'Export domain' => 'Exportar domínio',
-  'Reset passwords' => 'Limpar senhas',
-  'If you enable reset passwords then a new password will be generated and exported for each account. Warning! Existing client configuration will need to be updated after this action.' => 'Se limpou as senhas, uma nova senha será gerada e exportada para cada conta. AVISO! As contas deverão ser atualizadas posteriormente.',
+  'Reset passwords' => 'Limpar palavra-passe',
+  'If you enable reset passwords then a new password will be generated and exported for each account. Warning! Existing client configuration will need to be updated after this action.' => 'Se limpou as palavra-passe, uma nova palavra-passe será gerada e exportada para cada conta. AVISO! As contas deverão ser atualizadas posteriormente.',
 );

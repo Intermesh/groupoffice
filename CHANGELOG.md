@@ -1,3 +1,7 @@
+6.6.107
+- Core: More Portugese translations (pt_PT) - Thank you Paulo
+- Core: Read Ext localization files for locales with upper class region code
+
 26-07-2022 6.6.106
 - Core: Added Portugese translation (pt_PT)
 - Tasks: different style for completed checkbox

@@ -77,7 +77,7 @@ return array (
   'Send notification?' => 'Enviar notificação?',
   'Would you like to send updated meeting information to participants?' => 'Deseja enviar uma atualização de convite para os participantes?',
   'You are not the organizer' => 'Não é o organizador',
-  'You are not authorised to edit this event because you are not the organizer.' => 'Não pode editar este evento porque não é o organizador.',
+  'You are not authorised to edit this event because you are not the organizer.' => 'Não pode alterar este evento porque não é o organizador.',
   'Global categories' => 'Categorias globais',
   'Forthcoming events' => 'Próximos eventos',
   'Past events' => 'Eventos passados',

@@ -4,7 +4,7 @@ return array (
   'Default note book' => 'Categoria de notas padrão',
   'Notebook' => 'Bloco de Notas',
   'Note book' => 'Bloco de Notas',
-  'Enter password to decrypt' => 'Introduza a senha para descriptografar',
+  'Enter password to decrypt' => 'Introduza a palavra-passe para descriptografar',
   'Notebooks' => 'Blocos de Notas',
   'Display options for notebooks' => 'Opções de visualização para Bloco de Notas.',
   'Start in' => 'Começar em',
