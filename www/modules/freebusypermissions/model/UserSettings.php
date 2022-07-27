@@ -31,11 +31,13 @@ class UserSettings extends Property {
 			$acl->save();
 
 			$this->acl_id = $acl->id;
-			$this->user_id = $this->owner->id;
+			if($this->owner){
+				$this->user_id = $this->owner->id;
+			}
 
 			go()->getDbConnection()
 				->insert('fb_acl', [
-					'user_id' => $this->owner->id,
+					'user_id' => $this->user_id,
 					'acl_id' => $acl->id
 				])->execute();
 
