@@ -165,11 +165,11 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 				listeners: {
 					render: function(c) {
 						var author = r.data.author ? '<br><br>'+t('Author')+': '+r.data.author : '';
-						// new Ext.ToolTip({
-						//     target: c.getEl(),
-						//     anchor: 'left',
-						//     html: r.data.description + author
-						// });
+						new Ext.ToolTip({
+						    target: c.getEl(),
+						    anchor: 'left',
+						    html: r.data.description + author
+						});
 					}
 				},
 				items:[
