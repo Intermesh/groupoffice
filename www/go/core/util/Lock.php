@@ -101,6 +101,11 @@ class Lock {
 			$this->startTime = microtime(true);
 			return true;
 		} else {
+
+			if(!$this->blocking) {
+				return false;
+			}
+
 			if($this->timeout > 0 && $this->timeTaken() > $this->timeout) {
 				$info = $this->getLockFile()->getContents();
 				throw new Exception("Waiting for lock (" . $this->getRequestInfo() .") for longer than " . $this->timeout."s. Lock is held by (" . $info . ")");
