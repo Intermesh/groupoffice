@@ -3,7 +3,7 @@ import {NoteBookGrid} from "./NoteBookGrid.js";
 import {AutocompleteField} from "@goui/component/form/AutocompleteField.js";
 import {t} from "@goui/Translate.js";
 import {Config, createComponent} from "@goui/component/Component.js";
-import {client} from "@goui/api/Client.js";
+import {client} from "@goui/jmap/Client.js";
 
 export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
 	constructor() {

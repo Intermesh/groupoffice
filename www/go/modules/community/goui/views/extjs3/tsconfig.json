@@ -12,7 +12,8 @@
     "outDir": "./dist",
 
     "paths": {
-      "@goui/*": ["../../../../../../views/Extjs3/goui/dist/*"]
+      "@goui/*": ["../../../../../../views/Extjs3/goui/dist/*"],
+      "@go-core/*": ["../../../../../../views/Extjs3/groupoffice-core/dist/*"]
     }
   },
 

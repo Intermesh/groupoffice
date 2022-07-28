@@ -11,7 +11,7 @@
 		var head = document.getElementsByTagName('head')[0];
 
 		var style = document.createElement('link');
-		style.href = "./views/Extjs3/goui/style/goui.css";
+		style.href = "./views/Extjs3/goui/dist/goui.css";
 
 		style.type = 'text/css';
 		style.rel = 'stylesheet';
@@ -48,7 +48,7 @@
 		el.classList.add("goui");
 		//const rootMods = await import("../build/goui.js");
 
-		const clientMods = await import("../goui/dist/api/Client.js");
+		const clientMods = await import("../goui/dist/jmap/Client.js");
 
 		clientMods.client.uri = BaseHref + "api/";
 

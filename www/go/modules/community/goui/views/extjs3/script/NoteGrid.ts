@@ -1,7 +1,7 @@
 
 import {NoteDialog} from "./NoteDialog.js";
 import {Table} from "@goui/component/table/Table.js";
-import {JmapStore, jmapstore} from "@goui/api/JmapStore.js";
+import {JmapStore, jmapstore} from "@goui/jmap/JmapStore.js";
 import {t} from "@goui/Translate.js";
 import {column, datetimecolumn} from "@goui/component/table/TableColumns.js";
 
