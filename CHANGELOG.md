@@ -1,10 +1,11 @@
-6.6.107
+28-07-2022 6.6.107
 - Core: More Portugese translations (pt_PT) - Thank you Paulo
 - Core: Read Ext localization files for locales with upper class region code
 - Freebusypermissions: Fixed missing freebusy acl and foreign key error
 - Core: Custom fields on user profile tab only show if they are enabled for the users address book
 - Caldav: bug in recurring series where exceptions might show twice
 - Calendar: Fixed error in overflow calendar nav
+- Core: cron job waited for previous to finish
 
 26-07-2022 6.6.106
 - Core: Added Portugese translation (pt_PT)
