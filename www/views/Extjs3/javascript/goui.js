@@ -11,7 +11,7 @@
 		var head = document.getElementsByTagName('head')[0];
 
 		var style = document.createElement('link');
-		style.href = "./views/Extjs3/goui/dist/goui.css";
+		style.href = "./views/Extjs3/goui/dist/groupoffice.css";
 
 		style.type = 'text/css';
 		style.rel = 'stylesheet';

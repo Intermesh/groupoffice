@@ -25,11 +25,13 @@ export class NoteDetail extends Component {
 		this.cls = "vbox";
 		this.width = 400;
 
+		this.style.position = "relative";
+
 		this.items.add(
 			this.createToolbar(),
 			this.scroller = comp({flex: 1, cls: "scroll vbox"},
 				this.content = comp({
-					cls: "normalize card pad"
+					cls: "normalize goui-card pad"
 				})
 			)
 		);

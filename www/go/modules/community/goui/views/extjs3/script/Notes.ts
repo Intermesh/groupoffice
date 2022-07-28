@@ -9,6 +9,7 @@ import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
+import {router} from "@goui/Router.js";
 
 declare global {
 	var GO: any;
@@ -22,14 +23,16 @@ class Notes extends Component {
 	// class hbox devides screen in horizontal columns
 	private noteBookGrid!: NoteBookGrid;
 	private noteGrid!: NoteGrid;
-	private noteDetail!: NoteDetail;
+	readonly noteDetail!: NoteDetail;
 
 	public constructor() {
 		super();
 
 		this.cls = "hbox fit";
 
-		const center = this.createCenter(), west = this.createWest(), east = this.createEast();
+		const west = this.createWest();
+
+		this.noteDetail = new NoteDetail();
 
 		this.items.add(
 			west,
@@ -37,12 +40,12 @@ class Notes extends Component {
 				stateId: "gouidemo-splitter-west",
 				resizeComponentPredicate: west
 			}),
-			center,
+			this.createCenter(),
 			splitter({
 				stateId: "gouidemo-splitter-east",
-				resizeComponentPredicate: east
+				resizeComponentPredicate: this.noteDetail
 			}),
-			east
+			this.noteDetail
 		);
 
 		this.on("render", async () => {
@@ -51,9 +54,7 @@ class Notes extends Component {
 		})
 	}
 
-	private createEast() {
-		return this.noteDetail = new NoteDetail();
-	}
+
 
 	private createWest() {
 
@@ -114,7 +115,7 @@ class Notes extends Component {
 		this.noteGrid = new NoteGrid();
 		this.noteGrid.flex = 1;
 		this.noteGrid.title = "Notes";
-		this.noteGrid.cls = "fit";
+		this.noteGrid.cls = "fit light-bg";
 		this.noteGrid.rowSelectionConfig = {
 			multiSelect: true,
 			listeners: {
@@ -171,8 +172,14 @@ class Notes extends Component {
 		//
 		// this.descriptionList.records = records;
 
-		this.noteDetail.load(record.id);
+		// this.noteDetail.load(record.id);
+		router.goto("goui/notes/note/" + record.id);
 	}
 }
+
+//todo somehow init this in GO
+router.add(/^goui\/notes\/note\/(\d+)$/, (noteId) => {
+	gouiTest.noteDetail.load(parseInt(noteId));
+});
 
 export const gouiTest = new Notes();
