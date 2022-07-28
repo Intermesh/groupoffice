@@ -2,6 +2,7 @@
 - Core: More Portugese translations (pt_PT) - Thank you Paulo
 - Core: Read Ext localization files for locales with upper class region code
 - Freebusypermissions: Fixed missing freebusy acl and foreign key error
+- Core: Custom fields on user profile tab only show if they are enabled for the users address book
 
 26-07-2022 6.6.106
 - Core: Added Portugese translation (pt_PT)
