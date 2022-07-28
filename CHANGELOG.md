@@ -4,6 +4,7 @@
 - Freebusypermissions: Fixed missing freebusy acl and foreign key error
 - Core: Custom fields on user profile tab only show if they are enabled for the users address book
 - Caldav: bug in recurring series where exceptions might show twice
+- Calendar: Fixed error in overflow calendar nav
 
 26-07-2022 6.6.106
 - Core: Added Portugese translation (pt_PT)
