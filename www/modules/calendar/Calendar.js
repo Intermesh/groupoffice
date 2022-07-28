@@ -763,7 +763,7 @@ GO.calendar.MainPanel = function(config){
 							iconCls: 'ic-keyboard-arrow-left',
 							handler: function(){
 								me.setDisplay({
-									date: this.getActivePanel().previousDate()
+									date: me.getActivePanel().previousDate()
 								});
 							},
 							scope: this
