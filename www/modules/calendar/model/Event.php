@@ -1589,8 +1589,6 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		}
 		if($recurrenceTime){
 			$dt = \GO\Base\Util\Date\DateTime::fromUnixtime($recurrenceTime);
-			//recurrence ID may not change
-			$dt->setTime(0,0,0);
 			$rId = $e->add('recurrence-id', $dt);
 			if($this->_exceptionEvent->all_day_event){
 				$rId['VALUE']='DATE';

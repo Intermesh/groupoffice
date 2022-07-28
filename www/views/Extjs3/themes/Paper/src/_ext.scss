@@ -874,8 +874,8 @@
 			//}
 		}
 		button {
-			min-width:dp(32);
-			min-height: dp(32);
+			min-width:dp(40);
+			min-height: dp(40);
 			position:relative;
 			&::before {
 				@extend %icon;
@@ -969,6 +969,7 @@
 	background-color: color($bg, 'card');
 	margin-right: dp(8);
 	border-radius:$borderRadius;
+	overflow: hidden;
 	border: 1px solid color($fg, 'line');
 	&-header{
 		color: inherit;

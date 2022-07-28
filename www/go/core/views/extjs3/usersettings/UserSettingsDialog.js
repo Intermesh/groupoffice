@@ -35,8 +35,18 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			region:'center',
 			hideMode: "offsets",
 			fileUpload: true,
-			baseParams : {}			
+			baseParams : {},
+
+
 		});
+		//for compatibility with custom field panel filtering
+		this.formPanel.getValues = () => {
+			const v = this.formPanel.form.getValues();
+			v.addressBookId = parseInt(go.Modules.get("core", "core").settings.userAddressBookId);
+			console.warn(v);
+
+			return v;
+		}
 		
 		//Add a hidden submit button so the form will submit on enter
 		this.formPanel.add(new Ext.Button({

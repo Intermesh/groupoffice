@@ -248,7 +248,10 @@ GO.email.SearchDialog = function(config){
 			var from = form.findField('from').getValue();
 			var to = form.findField('to').getValue();
 			var cc = form.findField('cc').getValue();
-			var body = form.findField('body').getValue();
+			var body = false;
+			if(form.findField('body')) {
+				body = form.findField('body').getValue();
+			}
 			
 			var before = form.findField('before').getValue();
 			var since = form.findField('since').getValue();

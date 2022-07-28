@@ -1,3 +1,30 @@
+28-07-2022 6.6.107
+- Core: More Portugese translations (pt_PT) - Thank you Paulo
+- Core: Read Ext localization files for locales with upper class region code
+- Freebusypermissions: Fixed missing freebusy acl and foreign key error
+- Core: Custom fields on user profile tab only show if they are enabled for the users address book
+- Caldav: bug in recurring series where exceptions might show twice
+- Calendar: Fixed error in overflow calendar nav
+- Core: cron job waited for previous to finish
+
+26-07-2022 6.6.106
+- Core: Added Portugese translation (pt_PT)
+- Tasks: different style for completed checkbox
+- Email: do not search in mail body if  $config['email_allow_body_search'] is not set
+- Email: fix retrieving attachments by X.Y MIME part numbers
+- Tasks: set state for task dialog. Fixes #868.
+- Freebusy: acl not saved for new users
+
+20-07-2022 6.6.105
+- Newsletters: bugfix retrieving entity types in addressbook dialog
+- Calendar: add ACL field to TasklistCompat model to prevent non-admin users seeing all task lists
+- Core: Search users by display name in permission search
+- Calendar: UI bug where more... appeared over day number in month view
+- Core: Don't set default row format as it needs SUPER privileges
+- Core: Lock on cron sent email every time.
+- Freebusypermissions: ACL not always generated
+- Core: Hide totals on hover: fixes #809
+
 19-07-2022 6.6.104
 - Email: Added copy image to context menu. Fixes #859
 - Core: alter table to row format = dynamic if in another format in database check and make it default at installation

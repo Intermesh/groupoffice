@@ -100,7 +100,12 @@ go.modules.community.addressbook.SettingsProfilePanel = Ext.extend(Ext.Panel, {
 
 		go.modules.community.addressbook.SettingsProfilePanel.superclass.initComponent.call(this);
 	},
-	addPanel: function(pnl) {this.items[0].items.push(pnl)},
+	addPanel: function(pnl) {
+		const fs = pnl.items.itemAt(0);
+		fs.title = pnl.title;
+		fs.collapsible = true;
+		this.items[0].items.push(fs)
+	},
 	entityStore: 'Contact',
 	addCustomFields: go.modules.community.addressbook.ContactDialog.prototype.addCustomFields
 

@@ -84,6 +84,8 @@ class CaldavModule extends \GO\Base\Module {
 			$events[]=$event;
 		}else{
 			//a recurring event must be sent with all it's exceptions in the same data
+
+			$masterId = $event->id;
 			
 			$fp = \GO\Base\Db\FindParams::newInstance()
 				->order('start_time','ASC')
@@ -104,7 +106,7 @@ class CaldavModule extends \GO\Base\Module {
 					$e->location='';
 					$e->description='';
 				}
-//				$e->sequence=$sequence;
+				$e->sequence=$sequence;
 				$sequence++;
 				$events[]=$e;
 
@@ -117,12 +119,11 @@ class CaldavModule extends \GO\Base\Module {
 		$isRecurring = count($events) > 1;
 
 		foreach($events as $event){
-			if($isRecurring && empty($event->rrule)) {
-				$recurrenceTime = $event->start_time;
-			} else{
-				$recurrenceTime = false;
+			if($isRecurring && empty($event->rrule) && $event->exception_for_event_id != $masterId) {
+				$event->exception_for_event_id = $masterId;
+				$event->save(true);
 			}
-			$c->add($event->toVObject('REQUEST', false, $recurrenceTime));
+			$c->add($event->toVObject('REQUEST', false));
 		}
 		
 		return $c->serialize();

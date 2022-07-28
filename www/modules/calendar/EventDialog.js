@@ -41,13 +41,7 @@ GO.calendar.EventDialog = function(calendar) {
 	];
 
 	//This field is added for filtering the custom field panels. It needs the group_id to be in the form values to filter on this value.
-	this.propertiesPanel.add(new Ext.form.Hidden({name: "group_id"})); 
-	
-	
-	if(go.Modules.isAvailable("legacy", "comments")){
-		this.commentsGrid = new GO.comments.CommentsGrid({title:t("Comments", "comments")});
-		items.push(this.commentsGrid);
-	}
+	this.propertiesPanel.add(new Ext.form.Hidden({name: "group_id"}));
 	
 	this.tabPanel = new Ext.TabPanel({
 		activeTab : 0,
@@ -64,7 +58,6 @@ GO.calendar.EventDialog = function(calendar) {
 	
 	
 	go.customfields.CustomFields.getFormFieldSets("Event").forEach(function(fs) {
-		//console.log(fs);
 		if(fs.fieldSet.isTab) {
 			fs.title = null;
 			fs.collapsible = false;
@@ -312,22 +305,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					} else {
 						this.recurrencePanel.setDisabled(false);
 					}
-					
-					if(go.Modules.isAvailable("legacy", "comments")){
-						if(action.result.data['id'] > 0){
-							if (!GO.util.empty(action.result.data['action_date'])) {
-								this.commentsGrid.actionDate = action.result.data['action_date'];
-							} else {
-								this.commentsGrid.actionDate = false;
-							}
-							this.commentsGrid.setLinkId(action.result.data['id'], 'GO\\Calendar\\Model\\Event');
-							this.commentsGrid.store.load();
-							this.commentsGrid.setDisabled(false);
-						} else {
-							this.commentsGrid.setDisabled(true);
-						}
-					}
-								
+
 					this.recurrencePanel.setStartDate(this.startDate.getValue());
 					this.recurrencePanel.changeRepeat(action.result.data.freq);
 					this.recurrencePanel.setDaysButtons(action.result.data);
@@ -436,10 +414,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			}
 		}
 	},
-//	setWritePermission : function(writePermission) {
-//		this.win.buttons[0].setDisabled(!writePermission);
-//		this.win.buttons[1].setDisabled(!writePermission);
-//	},
 
 	setValues : function(values) {
 		if (values) {
@@ -464,28 +438,13 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 		this.participantsPanel.setEventId(event_id);
 
-//		this.linkBrowseButton.setDisabled(event_id < 1);
 		if(this.fileBrowseButton)
 			this.fileBrowseButton.setId(event_id);
 
 		this.createLinkButton.setEntity("Event", event_id);
 	},
 
-	setCurrentDate : function() {
-		var formValues = {};
 
-		var date = new Date();
-
-		formValues['start_date'] = date.format(GO.settings['date_format']);
-		formValues['start_time'] = date.format(GO.settings.time_format);
-		
-		formValues['end_date'] = date.format(GO.settings['date_format']);
-		formValues['end_time'] = date.add(Date.HOUR, 1).format(GO.settings.time_format);
-		
-		this.formPanel.form.setValues(formValues);
-	},
-
-//	has_other_participants:0,
 	submitForm : function(hide, config) {
 
 		if(!config)
@@ -501,8 +460,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			'check_conflicts' : typeof(config.check_conflicts)!='undefined' ? config.check_conflicts : null
 		};
 
-//		if(this.participantsPanel.store.loaded)
-//		{
 		var gridData = this.participantsPanel.getGridData();
 		params.participants=Ext.encode(gridData);
 		
@@ -545,7 +502,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					model_name:"GO\\Calendar\\Model\\Event",
 					all_day_event:this.formPanel.form.findField('all_day_event').getValue() ? true : false,
 					exception_event_id : this.formPanel.form.baseParams['exception_event_id']
-//					has_other_participants: this.participantsPanel.invitationRequired()
 				};
 				
 				if(action.result.background){
@@ -649,18 +605,14 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 	getStartDate : function() {
 
 		var startDate = this.startDate.getValue();
-//		if (!this.formPanel.form.findField('all_day_event').getValue()) {
-			startDate = Date.parseDate(startDate.format('Y-m-d')+' '+this.formPanel.form.findField('start_time').getValue(),'Y-m-d '+GO.settings.time_format);
-//		}
+		startDate = Date.parseDate(startDate.format('Y-m-d')+' '+this.formPanel.form.findField('start_time').getValue(),'Y-m-d '+GO.settings.time_format);
 
 		return startDate;
 	},
 
 	getEndDate : function() {
 		var endDate = this.endDate.getValue();
-//		if (!this.formPanel.form.findField('all_day_event').getValue()) {
-			endDate = Date.parseDate(endDate.format('Y-m-d')+' '+this.formPanel.form.findField('end_time').getValue(),'Y-m-d '+GO.settings.time_format);
-//		}
+		endDate = Date.parseDate(endDate.format('Y-m-d')+' '+this.formPanel.form.findField('end_time').getValue(),'Y-m-d '+GO.settings.time_format);
 		return endDate;
 	},
 
@@ -710,7 +662,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			allowBlank : true,
 			fieldLabel : t("Location")
 		});
-		this.startDate = new Ext.form.DateField({
+		this.startDate = new go.form.DateField({
 			name : 'start_date',
 			width : 120,
 			format : GO.settings['date_format'],
@@ -753,7 +705,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			}
 		});	
 
-		this.endDate = new Ext.form.DateField({
+		this.endDate = new go.form.DateField({
 			name : 'end_date',
 			width : 120,
 			format : GO.settings['date_format'],
