@@ -1,6 +1,7 @@
 6.6.107
 - Core: More Portugese translations (pt_PT) - Thank you Paulo
 - Core: Read Ext localization files for locales with upper class region code
+- Freebusypermissions: Fixed missing freebusy acl and foreign key error
 
 26-07-2022 6.6.106
 - Core: Added Portugese translation (pt_PT)
