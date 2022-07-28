@@ -6,10 +6,6 @@ use go\core\orm\Property;
 use function GO;
 
 
-/**
- * Temporary workaround for saving old settings form a user property;
- * @todo replace with behaviours
- */
 class UserSettings extends Property {
 	
 	public $user_id;
@@ -18,30 +14,37 @@ class UserSettings extends Property {
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()->addTable('fb_acl');
-	}	
-	
+	}
+
 	protected function init()
 	{
-		parent::init();
-		
-		if(!isset($this->acl_id)) {
-			$acl = new \GO\Base\Model\Acl();
-			$acl->ownedBy = $this->user_id;
-			$acl->usedIn = FreeBusyAcl::model()->tableName();
-			$acl->save();
-
-			$this->acl_id = $acl->id;
-			if($this->owner){
-				$this->user_id = $this->owner->id;
-			}
+		if(!isset($this->acl_id) && isset($this->owner) && isset($this->owner->id)) {
+			$this->createAcl();
 
 			go()->getDbConnection()
 				->insert('fb_acl', [
-					'user_id' => $this->user_id,
-					'acl_id' => $acl->id
+					'user_id' => $this->owner->id,
+					'acl_id' => $this->acl_id
 				])->execute();
-
 		}
+	}
+
+	private function createAcl() {
+		$acl = new \GO\Base\Model\Acl();
+		$acl->ownedBy = $this->user_id;
+		$acl->usedIn = FreeBusyAcl::model()->tableName();
+		$acl->save();
+
+		$this->acl_id = $acl->id;
+	}
+
+	protected function internalSave() : bool
+	{
+		if(!isset($this->acl_id)) {
+			$this->createAcl();
+		}
+
+		return parent::internalSave();
 	}
 
 }
