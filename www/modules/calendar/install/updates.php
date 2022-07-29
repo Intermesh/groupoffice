@@ -334,3 +334,6 @@ $updates['201903291350'][] = function() {
 	$m->migrateEntity("Event");	
 	$m->migrateEntity("Calendar");	
 };
+
+
+$updates['202207291355'][] = "update cal_events set exception_for_event_id = 0 where exception_for_event_id != 0 AND exception_for_event_id not in (select id from cal_events);";
