@@ -227,7 +227,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			});
 		}
 
-		if(!(this.ownerCt instanceof Ext.TabPanel)) {
+		if(!(this.ownerCt.ownerCt instanceof Ext.TabPanel)) {
 			this.setVisible(v);
 			setDisabled(this, !v);
 		} else{
