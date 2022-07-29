@@ -213,7 +213,7 @@ class Lock {
 
 		//Warn about long lock times in error log
 		$lockTime = $this->timeTaken();
-		if($this->timeout > 0 && $lockTime > 1) {
+		if($this->timeout > 0 && $this->blocking && $lockTime > 1) {
 			$userId = (go()->getAuthState() ? go()->getAuthState()->getUserId() : '-');
 			ErrorHandler::log("Lock " . $this->name . " by " .$userId ." in request ". go()->getDebugger()->getRequestId() . ' with pid '.getmypid().' took '.$lockTime.'s');
 		}
