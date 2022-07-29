@@ -1,3 +1,5 @@
+- Core: Fix save failure when there are more then 100 changes on the server
+
 29-07-2022 6.6.108
 - Core: empty custom tab when fields were hidden
 - Core: Don't report lock time when non blocking
