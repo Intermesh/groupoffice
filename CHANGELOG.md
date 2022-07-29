@@ -1,3 +1,11 @@
+29-07-2022 6.6.109
+- Core: Fix save failure when there are more then 100 changes on the server
+- Calendar: fix for corrupted recurrence records
+
+29-07-2022 6.6.108
+- Core: empty custom tab when fields were hidden
+- Core: Don't report lock time when non blocking
+
 28-07-2022 6.6.107
 - Core: More Portugese translations (pt_PT) - Thank you Paulo
 - Core: Read Ext localization files for locales with upper class region code
