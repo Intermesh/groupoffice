@@ -1,4 +1,6 @@
+29-07-2022 6.6.108
 - Core: empty custom tab when fields were hidden
+- Core: Don't report lock time when non blocking
 
 28-07-2022 6.6.107
 - Core: More Portugese translations (pt_PT) - Thank you Paulo
