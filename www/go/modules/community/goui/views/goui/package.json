@@ -7,6 +7,6 @@
 
   "scripts": {
     "start": "npm-run-all --parallel watch:tsc --print-label ",
-    "watch:tsc": "esbuild script/Notes.ts --external:../../../../../../views/Extjs3/goui/dist/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist"
+    "watch:tsc": "esbuild script/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist"
   }
 }

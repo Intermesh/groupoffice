@@ -50,6 +50,8 @@ $lang = GO::language()->getLanguage(); ?>
 	<link rel="stylesheet" type="text/css" as="style"  href="<?= GO::view()->getUrl()?>css.php?theme=<?=\GO::view()->getTheme()->getName(); ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>"  />
 	<link rel="stylesheet" type="text/css" as="style"  href="<?= GO::view()->getUrl()?>css.php?theme=<?=\GO::view()->getTheme()->getName(); ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>"  />
 
+
+    <link rel="stylesheet" type="text/css" as="style"  href="<?= $webclient->getBaseUrl();?>views/goui/goui/dist/groupoffice.css" />
 	<?php
 
 	//$this is \GO\Core\Controller\Auth
@@ -111,6 +113,7 @@ $lang = GO::language()->getLanguage(); ?>
   ?>
 </head>
 <body class="go-compact">
+    <div id="goui"></div>
 	<div id="sound"></div>
     <div id="paper"></div>
 	<!--Putting scripts in div will speed up developer tools because they don't have to show all those nodes-->

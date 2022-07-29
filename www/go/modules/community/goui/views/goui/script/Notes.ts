@@ -11,14 +11,8 @@ import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
 import {router} from "@goui/Router.js";
 
-declare global {
-	var GO: any;
-	var go: any;
-	var Ext: any;
-}
 
-
-class Notes extends Component {
+export class Notes extends Component {
 
 	// class hbox devides screen in horizontal columns
 	private noteBookGrid!: NoteBookGrid;
@@ -164,22 +158,7 @@ class Notes extends Component {
 	}
 
 	private showRecord(record: StoreRecord) {
-		// const records: DLRecord = [
-		// 	['Number', record.number],
-		// 	['Description', record.description],
-		// 	['Created At', Format.date(record.createdAt)]
-		// ];
-		//
-		// this.descriptionList.records = records;
-
-		// this.noteDetail.load(record.id);
-		router.goto("goui/notes/note/" + record.id);
+		this.noteDetail.load(record.id);
+		// router.goto("goui/notes/note/" + record.id);
 	}
 }
-
-//todo somehow init this in GO
-router.add(/^goui\/notes\/note\/(\d+)$/, (noteId) => {
-	gouiTest.noteDetail.load(parseInt(noteId));
-});
-
-export const gouiTest = new Notes();

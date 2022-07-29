@@ -79,5 +79,5 @@ lang.csv
 /www/branding
 /.project
 .phpunit.result.cache
-/www/go/modules/community/goui/views/extjs3/node_modules/
-/www/go/modules/community/goui/views/extjs3/dist/
+node_modules
+dist

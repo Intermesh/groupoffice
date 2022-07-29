@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strict" : true,
+    "target": "ES2017",
+    "sourceMap": true,
+    "lib": ["es2020", "dom"],
+    "moduleResolution": "node",
+    "module":"es2020",
+    "esModuleInterop": true,
+    "outDir": "./dist", //set this in the extended
+    "paths": {
+      "@goui/*": ["../../../../../../views/goui/goui/dist/*"],
+      "@go-core/*": ["../../../../../../views/goui/groupoffice-core/dist/*"]
+    }
+  }
+
+}
