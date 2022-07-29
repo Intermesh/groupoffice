@@ -130,7 +130,7 @@ export class NoteDialog extends Window {
 				fs.cascade((item: any) => {
 					if (item.getName) {
 						let fieldName = item.getName().replace('customFields.', '');
-						item.name = fieldName;
+						item.name = item.hiddenName =  fieldName;
 					}
 				});
 

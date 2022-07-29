@@ -117,7 +117,8 @@ export class Notes extends Component {
 					if (tableRowSelect.selected.length == 1) {
 						const table = tableRowSelect.table;
 						const record = table.store.get(tableRowSelect.selected[0]);
-						this.showRecord(record);
+
+						router.goto("goui-notes/" + record.id);
 					}
 				}
 			}
@@ -157,8 +158,8 @@ export class Notes extends Component {
 		)
 	}
 
-	private showRecord(record: StoreRecord) {
-		this.noteDetail.load(record.id);
-		// router.goto("goui/notes/note/" + record.id);
+	public  showNote(noteId: number) {
+		this.noteDetail.load(noteId);
 	}
+
 }
