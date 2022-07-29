@@ -1,4 +1,5 @@
 - Core: Fix save failure when there are more then 100 changes on the server
+- Calendar: fix for corrupted recurrence records
 
 29-07-2022 6.6.108
 - Core: empty custom tab when fields were hidden
