@@ -336,4 +336,8 @@ $updates['201903291350'][] = function() {
 };
 
 
-$updates['202207291355'][] = "update cal_events set exception_for_event_id = 0 where exception_for_event_id != 0 AND exception_for_event_id not in (select id from cal_events);";
+$updates['202207291355'][] = "update cal_events e
+left join cal_events e2 on e.exception_for_event_id = e2.id
+set e.exception_for_event_id = 0 where e.exception_for_event_id != 0 AND e2.id is null;";
+
+

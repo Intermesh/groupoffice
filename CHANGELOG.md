@@ -1,3 +1,7 @@
+31-07-2022 6.6.110
+- Address book: Fix for greyed out fields
+- Core: Rewrote update query so it works for mysql 5.7
+
 29-07-2022 6.6.109
 - Core: Fix save failure when there are more then 100 changes on the server
 - Calendar: fix for corrupted recurrence records
