@@ -192,7 +192,7 @@
 
 			for (var i = 0, l = fieldSets.length; i < l; i++) {
 				if(!fieldSets[i].parentFieldSetId) {
-					let fs = new go.customfields.FormFieldSet({fieldSet: fieldSets[i]});
+					let fs = new go.customfields.FormFieldSet({fieldSet: fieldSets[i], isTab: fieldSets[i].isTab});
 					formFieldSets.push(fs);
 				}
 
