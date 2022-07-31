@@ -104,6 +104,7 @@ go.modules.community.addressbook.SettingsProfilePanel = Ext.extend(Ext.Panel, {
 		const fs = pnl.items.itemAt(0);
 		fs.title = pnl.title;
 		fs.collapsible = true;
+		fs.isTab = false;
 		this.items[0].items.push(fs)
 	},
 	entityStore: 'Contact',
