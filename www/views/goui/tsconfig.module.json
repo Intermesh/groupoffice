@@ -8,6 +8,7 @@
     "module":"es2020",
     "esModuleInterop": true,
     "outDir": "./dist", //set this in the extended
+    "baseUrl": ".", //set this in the extended too
     "paths": {
       "@goui/*": ["../../../../../../views/goui/goui/dist/*"],
       "@go-core/*": ["../../../../../../views/goui/groupoffice-core/dist/*"]
