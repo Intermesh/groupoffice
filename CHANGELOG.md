@@ -1,3 +1,6 @@
+6.6.111 - The Aardvark edition
+- Projects2: Income grid - remove buggy rowActions by OOTB actionColumn
+
 31-07-2022 6.6.110
 - Address book: Fix for greyed out fields
 - Core: Rewrote update query so it works for mysql 5.7
