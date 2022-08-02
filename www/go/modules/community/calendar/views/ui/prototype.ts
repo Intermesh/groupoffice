@@ -22,24 +22,20 @@ Object.assign(Element.prototype,{
         return this;
     },
     cls: function(name: string|string[], enable?: boolean) {
-        if(!name) return this;
-        if($.isArray(name)) {
-            (name as string[]).map((n) => { this.cls(n, enable)});
+        if(Array.isArray(name)) {
+            name.map((n) => { this.cls(n, enable)});
             return this;
         }
-        name = name as string;
-        if(enable !== undefined) {
-            name = (enable ? '+' : '-') + name;
-        }
-        switch (name.substring(0, 1)) {
-            case '+': this.classList.add(name.substring(1));
-                break;
-            case '-': this.classList.remove(name.substring(1));
-                break;
-            case '!': this.classList.toggle(name.substring(1));
-                break;
-            default: this.className = name;
-        }
+		if(enable !== undefined) {
+			name = (enable ? '+':'-') + name;
+		}
+        const fn = {'+': 'add',
+			'-': 'remove',
+			'!': 'toggle'}[name[0]];
+
+		fn ? this.classList[fn](name.slice(1)) :
+			 this.className = name;
+
         return this;
     },
     attr: function(name: string, value?: string) {
@@ -50,9 +46,8 @@ Object.assign(Element.prototype,{
         return this;
     },
     has: function(clsOrAttr: string) {
-        if (clsOrAttr.substring(0, 1) === '.') {
-            return this.classList.contains(clsOrAttr.substring(1));
-        }
+        if (clsOrAttr[0] === '.')
+            return this.classList.contains(clsOrAttr.slice(1));
         return this.hasAttribute(clsOrAttr);
     },
     isA: function(tagName: string) { /* Check element by tagname */

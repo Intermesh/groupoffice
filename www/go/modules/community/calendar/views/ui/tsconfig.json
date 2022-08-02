@@ -24,6 +24,7 @@
     "Component.ts",
     "Engine.ts",
     "prototype.ts",
-    "Tool.ts"
+    "Tool.ts",
+
   ]
 }
