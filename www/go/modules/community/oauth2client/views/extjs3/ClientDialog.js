@@ -15,7 +15,18 @@ go.modules.community.oauth2client.ClientDialog = Ext.extend(go.form.Dialog, {
 					allowBlank: false
 				},this.defaultClientCombo = new go.modules.community.oauth2client.DefaultClientCombo({
 					fieldLabel: t("Provider", "oauth2client", "community"),
-					anchor: '100%'
+					anchor: '100%',
+					listeners: {
+						'show': function(me) {
+							const value = me.getValue(),
+								label = (value === 2) ? 'Tenant ID' : t("Client Id");
+
+						},
+						'select': function( combo, record, index ) {
+							this.projectIdFld.setFieldLabel(( record.id === 2 )? 'Tenant Id' : t('Client Id'));
+						},
+						scope: this
+					}
 				}),
 				{
 					xtype: 'textfield',
@@ -31,13 +42,13 @@ go.modules.community.oauth2client.ClientDialog = Ext.extend(go.form.Dialog, {
 					anchor: '100%',
 					allowBlank: false
 				},
-				{
+				this.projectIdFld = new Ext.form.TextField({
 					xtype: 'textfield',
 					name: 'projectId',
 					fieldLabel: t("API Project Id"),
 					anchor: '100%',
 					allowBlank: false
-				}
+				})
 			]
 		}
 		];

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8908b8498d3f27bb7b2e39f4965ae673",
+    "content-hash": "9f8905075db4833d1a7870f72c3e3662",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -3759,6 +3759,63 @@
             "time": "2021-12-31T08:39:24+00:00"
         },
         {
+            "name": "thenetworg/oauth2-azure",
+            "version": "v2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TheNetworg/oauth2-azure.git",
+                "reference": "06fb2d620fb6e6c934f632c7ec7c5ea2e978a844"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TheNetworg/oauth2-azure/zipball/06fb2d620fb6e6c934f632c7ec7c5ea2e978a844",
+                "reference": "06fb2d620fb6e6c934f632c7ec7c5ea2e978a844",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-openssl": "*",
+                "firebase/php-jwt": "~3.0||~4.0||~5.0||~6.0",
+                "league/oauth2-client": "~2.0",
+                "php": "^7.1|^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "TheNetworg\\OAuth2\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Hajek",
+                    "email": "jan.hajek@thenetw.org",
+                    "homepage": "https://thenetw.org"
+                }
+            ],
+            "description": "Azure Active Directory OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
+            "keywords": [
+                "SSO",
+                "aad",
+                "authorization",
+                "azure",
+                "azure active directory",
+                "client",
+                "microsoft",
+                "oauth",
+                "oauth2",
+                "windows azure"
+            ],
+            "support": {
+                "issues": "https://github.com/TheNetworg/oauth2-azure/issues",
+                "source": "https://github.com/TheNetworg/oauth2-azure/tree/v2.1.1"
+            },
+            "time": "2022-06-23T10:35:36+00:00"
+        },
+        {
             "name": "webmozart/assert",
             "version": "1.11.0",
             "source": {
@@ -5782,7 +5839,8 @@
     "stability-flags": {
         "tecnickcom/tcpdf": 0,
         "dragonmantank/cron-expression": 0,
-        "setasign/fpdi": 0
+        "setasign/fpdi": 0,
+        "guzzlehttp/guzzle": 0
     },
     "prefer-stable": false,
     "prefer-lowest": false,

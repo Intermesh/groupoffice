@@ -42,15 +42,17 @@ go.modules.community.oauth2client.ClientGrid = Ext.extend(go.grid.GridPanel, {
 				header: t('projectId'),
 				dataIndex: 'projectId',
 				id: 'projectId'
-			},{
+			},/*,{
 				header: t('Provider'),
-				dataIndex: 'defaultClient.name',
+				dataIndex: 'defaultClientId',
 				id: 'providerName',
-				renderer: function() {
+				renderer: function(v) {
+					debugger;
+					go.Db.store('DefaultClient').load(v).then(()=>)
 					// TODO: provider name from defaultClient.name; for now only Google is supported
 					return 'Google';
 				}
-			},
+			},*/
 			actions
 			],
 			viewConfig: {
