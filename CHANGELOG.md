@@ -3,6 +3,7 @@
 - Core: Remember stateId for user profile dialog
 - Notes: bugfix - allow users to delete their own notes regardless of mayChangeNoteBooks permissions
 - Projects2: fix error automatically creating task in case of missing manager user id
+- Scanbox: Save / move to entities
 
 31-07-2022 6.6.110
 - Address book: Fix for greyed out fields
