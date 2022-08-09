@@ -15,6 +15,8 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 			this.hFld = new Ext.form.NumberField({
 				name:t('Hours'),
 				maxValue:23,
+				autoCreate: {tag: 'input', type: 'text', size: '2', autocomplete: 'off', maxlength: '2'},
+				maxLength:2,
 				style:{textAlign:'right'},
 				allowNegative:false,
 				minValue: 0,
@@ -29,6 +31,8 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 			this.mFld = new Ext.form.NumberField({
 				name:t('Minutes'),
 				maxValue:59,
+				autoCreate: {tag: 'input', type: 'text', size: '2', autocomplete: 'off', maxlength: '2'},
+				maxLength:2,
 				allowNegative:false,
 				minValue: 0,
 				decimals: 0,
