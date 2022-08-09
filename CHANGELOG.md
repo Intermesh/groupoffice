@@ -1,4 +1,4 @@
-6.6.111
+09-08-2022 6.6.111
 - Projects2: Income grid - remove buggy rowActions by OOTB actionColumn
 - Core: Remember stateId for user profile dialog
 - Notes: bugfix - allow users to delete their own notes regardless of mayChangeNoteBooks permissions
