@@ -67,6 +67,30 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 		this.mFld.setValue(parseInt(hm[1]));
 	},
 
+	// override if needed
+	getErrors: function(v) {
+		return [];
+	},
+
+	validate : function(){
+		if(this.disabled || this.validateValue(this.getValue())){
+			this.clearInvalid();
+			return true;
+		}
+		return false;
+	},
+
+	validateValue: function(value, preventMark) {
+		var error = this.getErrors(value)[0];
+
+		if (error == undefined) {
+			return true;
+		} else {
+			this.markInvalid(error);
+			return false;
+		}
+	},
+
 	setMinutes: function(minutes) {
 		this.setSeconds(minutes*60);
 	},
