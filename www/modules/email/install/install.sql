@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `em_accounts` (
   `spam` varchar(100) NOT NULL DEFAULT 'Spam',
   `smtp_host` varchar(100) DEFAULT NULL,
   `smtp_port` int(11) NOT NULL,
-  `smtp_encryption` char(3) NOT NULL,
+  `smtp_encryption` char(10) NOT NULL,
 	`smtp_allow_self_signed` tinyint(1) NOT NULL DEFAULT '0',
   `smtp_username` varchar(50) DEFAULT NULL,
   `smtp_password` varchar(512) NOT NULL DEFAULT '',

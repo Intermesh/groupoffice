@@ -253,3 +253,5 @@ $updates['202206020910'][] = function() {
 	}
 	$conn->commit();
 };
+
+$updates['202208101034'][] = "ALTER TABLE `em_accounts` CHANGE COLUMN `smtp_encryption` `smtp_encryption` CHAR(10) NOT NULL;";

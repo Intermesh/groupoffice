@@ -300,7 +300,7 @@ GO.email.AccountDialog = function(config) {
 				fields : ['value', 'text'],
 				data : [
 				['', t("No encryption", "email")],
-				['tls', 'TLS'], ['ssl', 'SSL']]
+				['tls', 'TLS'], ['ssl', 'SSL'],['starttls', 'STARTTLS']]
 			}),
 			value : '',
 			valueField : 'value',
