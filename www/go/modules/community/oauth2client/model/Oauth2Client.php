@@ -70,8 +70,8 @@ final class Oauth2Client extends Entity
 				break;
 			case 'Azure':
 				$prvVendorName = 'TheNetworg';
-				$params['tenantId'] = $this->projectId;
-				$params['scopes'] = ['openid', 'profile', 'email'];
+				$params['tenant'] = $this->projectId;
+				$params['scopes'] = ['openid', 'profile', 'email','https://outlook.office.com/mail.read'];
 				break;
 			default:
 				throw new NotFound('Default client ' . $defaultClient->name . ' not supported');

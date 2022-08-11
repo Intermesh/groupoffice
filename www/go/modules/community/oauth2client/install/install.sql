@@ -33,8 +33,8 @@ VALUES (1, 'GoogleOauth2', 'Google','imap.gmail.com',993, 'ssl','smtp.gmail.com'
 CREATE TABLE IF NOT EXISTS `oauth2client_account` (
      `accountId` INT(11) NOT NULL,
      `oauth2ClientId` INT(11) UNSIGNED NOT NULL,
-     `token` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-     `refreshToken` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+     `token` TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+     `refreshToken` TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL,
      `expires` INT(11) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

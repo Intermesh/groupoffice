@@ -77,7 +77,9 @@ final class Oauth2Client extends EntityController
 				if ($refreshToken = $token->getRefreshToken()) {
 					$acct->oauth2_account->refreshToken = $refreshToken;
 				}
-				$acct->save();
+				if(!$acct->save()) {
+					throw new \Exception("Unable to save token");
+				}
 				$ownerDetails = $provider->getResourceOwner($token);
 			} catch (\Exception $e) {
 				// Failed to get user details
