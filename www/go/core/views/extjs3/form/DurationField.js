@@ -17,6 +17,12 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 				maxValue:23,
 				autoCreate: {tag: 'input', type: 'text', size: '2', autocomplete: 'off', maxlength: '2'},
 				maxLength:2,
+				enableKeyEvents: true,
+				listeners: {
+					// When hour field is bigger then 2 or has string length 2 "01"
+					'keyup': (me,e) => { const v = e.target.value, key =  e.keyCode;
+						if(key >= 48 && key <= 57 && (v.length > 1 || parseInt(v) > 2)) {me.nextSibling().nextSibling().focus(); } }
+				},
 				style:{textAlign:'right'},
 				allowNegative:false,
 				minValue: 0,
