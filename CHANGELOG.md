@@ -1,5 +1,9 @@
-6.6.111 - The Aardvark edition
+09-08-2022 6.6.111
 - Projects2: Income grid - remove buggy rowActions by OOTB actionColumn
+- Core: Remember stateId for user profile dialog
+- Notes: bugfix - allow users to delete their own notes regardless of mayChangeNoteBooks permissions
+- Projects2: fix error automatically creating task in case of missing manager user id
+- Scanbox: Save / move to entities
 
 31-07-2022 6.6.110
 - Address book: Fix for greyed out fields

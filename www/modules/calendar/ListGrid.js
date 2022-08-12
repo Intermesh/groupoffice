@@ -89,11 +89,7 @@ GO.calendar.ListGrid = function(config)
 		renderer: function(v, metadata, record)
 		{
 			var html = '';
-			
-			//TODO: Set the correct background color for the following span block. The background-color depends on the status of the event.
-//			if(!GO.util.empty(record.data.status_color))
-//				html += '<span class="x-calListGrid-event-status" style="background-color:#'+record.data.status_color+';"></span>';
-			
+
 			html += '<div class="';
 			if(record.data.link_count>0)
 			{

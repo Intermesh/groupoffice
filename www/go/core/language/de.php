@@ -1446,7 +1446,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   '{count} selected' => '{count} ausgewählt',
   'E-mail files' => 'E-Mail-Dateien',
   'Failed to save' => 'Speichern fehlgeschlagen',
-  'Regional' => 'Speichern fehlgeschlagen',
+  'Regional' => 'Regional',
   'API keys can be used for other services to connect to the API. A website feeding contact information for example.' => 'API-Schlüssel können für andere Dienste verwendet werden, um sich mit der API zu verbinden. Eine Website, die zum Beispiel Kontaktinformationen liefert.',
   'Add client' => 'Client hinzufügen',
   'Select columns' => 'Spalten auswählen',

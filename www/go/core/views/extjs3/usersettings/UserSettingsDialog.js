@@ -18,6 +18,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	cls: 'go-user-settings-dlg',
 	title: t("My account"),
 	width: dp(1000),
+	stateId: 'userSettingsDialog',
 	currentUserId:null,
 	user: null,
 
@@ -43,7 +44,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.formPanel.getValues = () => {
 			const v = this.formPanel.form.getValues();
 			v.addressBookId = parseInt(go.Modules.get("core", "core").settings.userAddressBookId);
-			console.warn(v);
+			// console.warn(v);
 
 			return v;
 		}

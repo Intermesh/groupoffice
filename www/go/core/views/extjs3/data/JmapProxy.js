@@ -48,6 +48,8 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 					success: true
 				};
 
+				this.fireEvent('request',options, success, response);
+
 				if (action === Ext.data.Api.actions.read) {
 					this.onRead(action, o, data);
 				} else {
