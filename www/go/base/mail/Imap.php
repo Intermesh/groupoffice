@@ -103,6 +103,7 @@ class Imap extends ImapBodyStruct
 //		\GO::debug("imap::connect($server, $port, $username, ***, $ssl, $starttls, $auth, ***)");
 
 		$this->ssl = $ssl;
+//		$this->starttls = ($starttls && $auth !== 'azure');
 		$this->starttls = $starttls;
 		$this->auth = strtolower($auth);
 
@@ -232,6 +233,7 @@ class Imap extends ImapBodyStruct
 				fputs($this->handle, $challenge_response . "\r\n");
 				break;
 			case 'googleoauth2':
+			case 'azure':
 				$str = base64_encode("user=$this->username\1auth=Bearer $this->token\1\1");
 				$this->send_command("AUTHENTICATE XOAUTH2 " . $str . "\r\n");
 				break;

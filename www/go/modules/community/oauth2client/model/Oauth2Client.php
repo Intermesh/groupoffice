@@ -69,9 +69,11 @@ final class Oauth2Client extends Entity
 				$params['scopes'] =  ['https://mail.google.com/'];
 				break;
 			case 'Azure':
+				// https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
+				// https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
 				$prvVendorName = 'TheNetworg';
 				$params['tenant'] = $this->projectId;
-				$params['scopes'] = ['openid', 'profile', 'email','https://outlook.office.com/mail.read'];
+				$params['scopes'] = ['openid', 'profile', 'offline_access', 'email','https://outlook.office.com/IMAP.AccessAsUser.All', 'https://outlook.office.com/SMTP.Send'];
 				break;
 			default:
 				throw new NotFound('Default client ' . $defaultClient->name . ' not supported');
