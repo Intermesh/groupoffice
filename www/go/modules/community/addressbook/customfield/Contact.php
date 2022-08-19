@@ -115,10 +115,9 @@ class Contact extends Base {
 			->where(['name' => $value])
 			->single();
 
-		if(!$id) {
+		if(!$id && $this->field->getOption('allowNew')) {
 			$contact = new model\Contact();
 			$contact->isOrganization = $this->field->getOption('isOrganization');
-			$contact->allowNew = $this->field->getOption('allowNew');
 			$contact->name = $contact->lastName = $value;
 			$contact->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
 			if(!$contact->save()) {
