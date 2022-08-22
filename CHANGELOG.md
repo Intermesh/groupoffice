@@ -1,6 +1,8 @@
 - Core: Fixed permission disappearing when changing level
 - Email: Don't offer to drop messages on read only accounts
 - Email: Move/copy dialog didn't offer to move to accounts shared with "Use" permissions
+- Core: New grids can configure grouping now too.
+- Email: Grouping can be disabled
 
 09-08-2022 6.6.111
 - Projects2: Income grid - remove buggy rowActions by OOTB actionColumn
