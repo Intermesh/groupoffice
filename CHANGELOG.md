@@ -1,3 +1,5 @@
+- Core: Fixed permission disappearing when changing level
+
 09-08-2022 6.6.111
 - Projects2: Income grid - remove buggy rowActions by OOTB actionColumn
 - Core: Remember stateId for user profile dialog
