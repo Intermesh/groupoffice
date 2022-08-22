@@ -1,3 +1,21 @@
+22-08-2022 6.6.112
+- Core: Fixed permission disappearing when changing level
+- Email: Don't offer to drop messages on read only accounts
+- Email: Move/copy dialog didn't offer to move to accounts shared with "Use" permissions
+- Core: New grids can configure grouping now too.
+- Email: Grouping can be disabled
+
+09-08-2022 6.6.111
+- Projects2: Income grid - remove buggy rowActions by OOTB actionColumn
+- Core: Remember stateId for user profile dialog
+- Notes: bugfix - allow users to delete their own notes regardless of mayChangeNoteBooks permissions
+- Projects2: fix error automatically creating task in case of missing manager user id
+- Scanbox: Save / move to entities
+
+31-07-2022 6.6.110
+- Address book: Fix for greyed out fields
+- Core: Rewrote update query so it works for mysql 5.7
+
 29-07-2022 6.6.109
 - Core: Fix save failure when there are more then 100 changes on the server
 - Calendar: fix for corrupted recurrence records

@@ -24,7 +24,7 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 			loader : new GO.base.tree.TreeLoader({
 				dataUrl : GO.url("email/account/tree"),
 				baseParams: {
-					permissionLevel: GO.permissionLevels.write
+					permissionLevel: GO.permissionLevels.create
 				},
 				preloadChildren : true,
 				listeners : {

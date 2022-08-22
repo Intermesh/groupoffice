@@ -449,9 +449,15 @@ go.grid.GridTrait = {
 	},
 	
 	handleHdMenuItemClick: function(item) {
+
 		var cm = this.getColumnModel()
 		  , id = item.getItemId()
 		  , column = cm.getIndexById(id.substr(4));
+
+		if(id.substr(0, 10) == "col-group-") {
+			return this.onGroupByClick(item);
+		}
+
 		if (column !== -1) {
 			if (item.checked && cm.getColumnsBy(function(c) {return !c.hidden }, this).length <= 1) {
 				 return
@@ -468,7 +474,8 @@ go.grid.GridTrait = {
 			this.headerMenu.on("itemclick", this.handleHdMenuItemClick, this);
 		}
 		this.headerMenu.removeAll();
-		for (i = 0; i < cm.getColumnCount(); i++) {
+		const colCount = cm.getColumnCount();
+		for (i = 0; i < colCount; i++) {
 			column = cm.getColumnAt(i);
 			if (column.hideable !== false) {
 				item = new Ext.menu.CheckItem({
@@ -495,6 +502,62 @@ go.grid.GridTrait = {
 			}
 			return comparison;
 		});
+
+
+		if(this.store instanceof Ext.data.GroupingStore) {
+			this.headerMenu.add("-");
+			this.headerMenu.add('<div class="menu-title">'
+			+ t("Group", ) + '</div>');
+
+			item = new Ext.menu.CheckItem({
+				group: "groupBy",
+				text: t("None"),
+				itemId: "col-group-",
+				checked: this.store.groupField == false,
+				hideOnClick: false
+			});
+
+			this.headerMenu.add(item)
+
+			for (i = 0; i < colCount; i++) {
+				column = cm.getColumnAt(i);
+				if (column.groupable !== false) {
+					const dataIndex = cm.getDataIndex(i);
+
+					console.warn(dataIndex, this.store.groupField);
+					item = new Ext.menu.CheckItem({
+						group: "groupBy",
+						text: cm.getOrgColumnHeader(i) + "",
+						itemId: "col-group-" + dataIndex,
+						checked: this.store.groupField == dataIndex,
+						hideOnClick: false,
+						htmlEncode: column.headerHtmlEncode
+					});
+					this.headerMenu.add(item)
+				}
+			}
+		}
+
 		this.headerMenu.show(el, "tr-br?")
+	},
+
+	onGroupByClick : function(item) {
+
+		var id = item.getItemId();
+		const dataindex = id.substr(10);
+
+		if(!dataindex) {
+			this.store.clearGrouping();
+			this.saveState();
+			return;
+		}
+
+		this.enableGrouping = true;
+		this.store.groupBy(dataindex);
+		this.fireEvent('groupchange', this, this.store.getGroupState());
+		//this.beforeMenuShow(); // Make sure the checkboxes get properly set when changing groups
+		this.view.refresh();
+		this.saveState();
+
 	}
 }

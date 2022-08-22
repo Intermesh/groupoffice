@@ -1470,7 +1470,7 @@ abstract class Property extends Model {
 		$pk = $cls::getPrimaryKey();
 
 		foreach($oldModels as $model) {
-			if(in_array($model, $models)) {
+			if(self::arrayContains($models, $model)) {
 				//if object is still present then don't remove
 				continue;
 			}
@@ -1490,6 +1490,24 @@ abstract class Property extends Model {
 		$query->andWhere($removeKeys);
 
 		return $cls::internalDelete($query);
+	}
+
+	/**
+	 * Check if an array of models contains a given property
+	 * Also works for cloned objects because it checks class name and primary key
+	 *
+	 * @param Property[] $models
+	 * @param Property $model
+	 * @return void
+	 * @throws Exception
+	 */
+	private static function arrayContains(array $models, self $model) {
+		foreach($models as $m) {
+			if($m->equals($model)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
   /**
