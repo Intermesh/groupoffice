@@ -1,3 +1,5 @@
+- Core: Fixed reload link on changes not showing all links
+
 23-08-2022 6.6.113
 - Core / projects: fix for mysql general error 1366 incorrect integer value ''
 
