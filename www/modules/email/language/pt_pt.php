@@ -212,4 +212,9 @@ return array (
   'BCC' => 'BCC',
   'You didn\'t fill in a subject. Are you sure you want to save this message without a subject?' => 'Não introduziu um assunto. Tem certeza de que deseja guardar essa mensagem sem o assunto?',
   'Use desktop email client to compose' => 'Usar a sua aplicação de ambiente de trabalho, para envio de e-mails',
+	'Trash' => 'Itens Eliminados',
+	'Sent items' => 'Itens Enviados',
+	'Drafts' => 'Rascunhos',
+	'Inbox' => 'Caixa de Entrada',
+	'Spam' => 'Spam',
 );
