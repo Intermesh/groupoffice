@@ -8,6 +8,7 @@ import {client} from "@goui/jmap/Client.js";
 import {Window} from "@goui/component/Window.js";
 import {Image} from "@goui/jmap/Image.js";
 import {comp, Component} from "@goui/component/Component.js";
+import {FunctionUtil} from "@goui/util/FunctionUtil.js";
 
 
 export class NoteDetail extends Component {
@@ -37,6 +38,13 @@ export class NoteDetail extends Component {
 		);
 
 		// Legacy stuff
+
+		const ro = new ResizeObserver(FunctionUtil.buffer(100,() =>{
+			this.detailView.doLayout();
+		}));
+
+		ro.observe(this.el);
+
 		this.detailView = new go.detail.Panel({
 			width: undefined,
 			entityStore: go.Db.store("Note"),
