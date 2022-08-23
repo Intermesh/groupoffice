@@ -1,3 +1,5 @@
+- Core / projects: fix for mysql general error 1366 incorrect integer value ''
+
 22-08-2022 6.6.112
 - Core: Fixed permission disappearing when changing level
 - Email: Don't offer to drop messages on read only accounts
