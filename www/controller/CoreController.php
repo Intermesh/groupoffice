@@ -70,7 +70,10 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		
 		$info['username']=GO::user()->username;
 		$info['config']=GO::config()->get_config_file();
-		$info['database']=GO::config()->db_name;
+		$info['db_name']=GO::config()->db_name;
+		$info['db_host']=GO::config()->db_host;
+		$info['db_type'] = go()->getDatabase()->isMariaDB() ? "MariaDB" : "MySQL";
+		$info['db_version']=go()->getDatabase()->getVersion();
 		
 		$modules = GO::modules()->getAllModules();		
 		foreach($modules as $module){
