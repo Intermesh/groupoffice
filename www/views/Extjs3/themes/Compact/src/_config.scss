@@ -122,9 +122,10 @@ $vars: (
         c-primary-tp: $cPrimaryTp,
         c-header-bg: $cHeaderBg,
         c-secondary: $cSecondary,
+        c-tertiary: $cTertiary,
         c-accent: $cAccent,
         c-accent-tp: $cAccentTp
-);
+) !default;
 
 
 @mixin var($property, $varName) {
@@ -183,7 +184,6 @@ $vars: (
   color:inherit;
   width: auto;
   height: auto;
-  line-height: 1;
   text-transform: none;
   letter-spacing: normal;
   vertical-align:middle;

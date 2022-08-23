@@ -4,6 +4,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	stateful: true,
 	stateId: 'tasks-grid-main',
 	loadMask: true,
+	cls: "tasks-task-grid",
 
 	initComponent: function () {
 
@@ -48,22 +49,13 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			id:'complete',
 			dataIndex: 'complete',
 			hideInExport:true,
-			header: '<i class="icon ic-check"></i>',
-			width: dp(56),
+			header: '',
+			width: dp(48),
+			resizable: false,
 			hideable:false,
 			menuDisabled: true,
 			sortable:false,
-			groupable:false,
-			renderer: function (v, p, record) {
-				p.css += ' x-grid3-check-col-td';
-				var disabledCls = '';
-				if (this.isDisabled(record))
-					disabledCls = ' x-item-disabled';
-
-				return String.format('<div class="x-grid3-check-col{0}' + disabledCls + '" {1}></div>',
-					v ? '-on' : '',
-					record.json.color ? 'style="color:#'+record.json.color+'"' : '');
-			}
+			groupable:false
 		});
 
 		this.checkColumn.on('change', function(record){

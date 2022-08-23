@@ -107,7 +107,6 @@ class Extjs3 {
 		$css = str_replace("sourceMappingURL=", "sourceMappingURL=".$baseurl, $css);
 
 		return $css;
-		 //return preg_replace('/url[\s]*\(([^\)]*)\)/ieU', "GO\Base\View\Extjs3::_replaceUrlCallback('$1', \$baseurl)", $css);
 	}
 	
 	
@@ -123,13 +122,18 @@ class Extjs3 {
 		$cacheFile = go()->getDataFolder()->getFile('cache/clientscripts/lang_'.$iso.'.js');
 
 		if (!$cacheFile->exists()) {
-//		if (!$cacheFile->exists()) {
 
 			$str = "var GO = GO || {};\n";
 
 			$extjsLang = \go()->getLanguage()->t("extjs_lang");
-			if ($extjsLang == 'extjs_lang')
-				$extjsLang = $iso;
+			if ($extjsLang == 'extjs_lang') {
+				// We save ISO region codes lower case, Ext requires upper case.
+				$arIsoParts = explode('_', $iso);
+				if (isset($arIsoParts[1])) {
+					$arIsoParts[1] = strtoupper($arIsoParts[1]);
+				}
+				$extjsLang = implode('_', $arIsoParts);
+			}
 
 			$viewRoot = Environment::get()->getInstallFolder()->getFolder('views/Extjs3');
 

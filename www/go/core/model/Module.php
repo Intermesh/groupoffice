@@ -591,5 +591,6 @@ class Module extends Entity {
 	
 	public function setSettings($value) {
 		$this->getSettings()->setValues($value);
+		$this->change(true);
 	}
 }

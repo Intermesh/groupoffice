@@ -1506,7 +1506,9 @@ class go_sieve_script
         else {
             if ($test['type'] == 'regex') {
                 array_push($exts, 'regex');
-            }
+            } elseif($test['type'] === 'contains' && $test['test'] === 'body') {
+					$out .= ' :text';
+				}
 
             $out .= ' :' . $test['type'];
         }

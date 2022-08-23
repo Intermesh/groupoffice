@@ -52,9 +52,7 @@ Ext.define('go.grid.GridView', {
 		if(this.totalDisplay) {
 			this.totalDisplay = this.el.child('div.go-grid-total');
 			this.totalDisplay.setRight(this.scrollOffset);
-			this.totalDisplay.on("click", function() {
-				this.totalDisplay.hide();
-			}, this);
+
 
 			this.setTotalCount(this.totalCount);
 		} else{

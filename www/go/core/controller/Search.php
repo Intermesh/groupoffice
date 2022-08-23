@@ -28,36 +28,41 @@ class Search extends EntityController {
 		
 		$q = $params['filter']['text'] ?? null;
 
-		$query = new Query();
 
-		$selectQueryContact ='u.id as entityId, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId';
-		$isEmailModuleAvailable = Module::isAvailableFor("legacy","email");
 
+		$hasAddressbook = Module::isAvailableFor("community", "addressbook");
+		$isEmailModuleAvailable = Module::isAvailableFor("legacy", "email");
 		//TODO change when email module has been refactored.
 		$optionEnabled = \GO::config()->get_setting("email_sort_email_addresses_by_time", go()->getAuthState()->getUserId());
 
-		if($isEmailModuleAvailable && $optionEnabled == "1") {
-			$selectQueryContact .= ', NULL as priority';
+
+		if (!$hasAddressbook || !go()->getSettings()->userAddressBook()->getPermissionLevel()) {
+
+			$query = new Query();
+
+			$selectQueryContact = 'u.id as entityId, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId';
+
+
+			if ($isEmailModuleAvailable && $optionEnabled == "1") {
+				$selectQueryContact .= ', NULL as priority';
+			}
+			$query->from('core_user', 'u')
+				->join('core_group', 'g', 'u.id = g.isUserGroupFor');
+			Acl::applyToQuery($query, 'g.aclId');
+
+			$query->select($selectQueryContact);
+
+			if (!empty($q)) {
+				$query->where(
+					(new Criteria)
+						->where('email', 'LIKE', '%' . $q . '%')
+						->orWhere('displayName', 'LIKE', '%' . $q . '%')
+				);
+			}
+			$query->andWhere('enabled', '=', 1);
 		}
-		$query->from('core_user', 'u')
-						->join('core_group', 'g', 'u.id = g.isUserGroupFor');
-		Acl::applyToQuery($query, 'g.aclId');
 
-		$query->select($selectQueryContact);
-
-		if (!empty($q)) {
-			$query->where(
-				(new Criteria)
-							->where('email', 'LIKE', '%' . $q . '%')
-							->orWhere('displayName', 'LIKE', '%' . $q . '%')
-						);
-		}
-		$query->andWhere('enabled', '=', 1);
-
-
-
-
-		if (Module::isAvailableFor("community", "addressbook")) {
+		if ($hasAddressbook) {
 
 			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.photoBlobId';
 
@@ -85,9 +90,13 @@ class Search extends EntityController {
 				);
 			}
 
-			self::fireEvent(self::EVENT_SEARCH_EMAIL_CONTACTS, $contactsQuery, $query);
+			self::fireEvent(self::EVENT_SEARCH_EMAIL_CONTACTS, $contactsQuery, $query ?? $contactsQuery);
 
-			$query->union($contactsQuery);
+			if(isset($query)) {
+				$query->union($contactsQuery);
+			} else{
+				$query = $contactsQuery;
+			}
 		}
 
 		$query->offset($params['position'] ?? 0)

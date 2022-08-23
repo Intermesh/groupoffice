@@ -31,6 +31,13 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	data: {},
 	currentId: null,
 	basePanels: [],
+
+	layout: "anchor",
+
+	defaults: {
+		anchor: "100%"
+	},
+
 	/**
 	 * string[] relation names defined in entity store
 	 * When specified the Detailview will listen to these store and fetch the related entities

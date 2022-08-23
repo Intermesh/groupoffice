@@ -9,6 +9,8 @@ use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
 use go\core\jmap\Response as ResponseAlias;
 use go\core\util\ArrayObject;
+use go\core\model\Acl;
+use go\core\model\Permission;
 use go\core\util\Crypt;
 use go\modules\community\notes\model;
 
@@ -85,6 +87,9 @@ class Note extends EntityController {
 
 	protected function canDestroy(Entity $entity): bool
 	{
+		if($entity->createdBy === go()->getUserId()) {
+			return true; // Anyone should be able to remove their own notes, regardless of people allowed to change noteBOOKs
+		}
 		if(!$this->rights->mayChangeNoteBooks) {
 			return false;
 		}

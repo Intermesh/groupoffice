@@ -69,7 +69,17 @@ GO.email.AttachmentContextMenu = function(config)
 			scope: this
 		});
 		config.items.push(this.saveToItemButton);
-	}		
+	}
+
+
+	config.items.push(this.copyImageButton = new Ext.menu.Item({
+		iconCls: 'ic-content-copy',
+		text: t("Copy image"),
+		handler: function() {
+			this.copyToClipboard();
+		},
+		scope: this
+	}));
 	
 	GO.email.AttachmentContextMenu.superclass.constructor.call(this, config);	
 }
@@ -77,10 +87,41 @@ GO.email.AttachmentContextMenu = function(config)
 Ext.extend(GO.email.AttachmentContextMenu, Ext.menu.Menu,{
 	attachment : false,
 
-	showAt : function(xy, attachment)
+	copyToClipboard: async function() {
+		try {
+			let canvas = document.createElement('canvas');
+			canvas.width = this.img.clientWidth;
+			canvas.height = this.img.clientHeight;
+			let context = canvas.getContext('2d');
+			context.drawImage(this.img, 0, 0);
+
+			const blob = await canvas.toBlob((blob) => {
+				let data = [new ClipboardItem({[blob.type]: blob})];
+
+				if (navigator.clipboard) {
+					navigator.clipboard.write(data).then(function () {
+						console.log('done')
+					}, function (err) {
+						console.log('error')
+					});
+				} else {
+					console.log('Browser do not support Clipboard API')
+				}
+			});
+		} catch (e) {
+			console.error(e);
+		}
+
+	},
+
+	showAt : function(xy, attachment, img)
 	{ 	
 		this.attachment = attachment;
-		
+		this.img = img;
+
+		this.copyImageButton.setVisible(!!this.img);
+
+
 		GO.email.AttachmentContextMenu.superclass.showAt.call(this, xy);
 	}	
 });

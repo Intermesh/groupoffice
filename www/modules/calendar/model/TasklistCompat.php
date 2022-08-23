@@ -26,4 +26,9 @@ class TasklistCompat extends \GO\Base\Db\ActiveRecord {
 		return 'tasks_tasklist';
 	}
 
+	public function aclField()
+	{
+		return 'aclId';
+	}
+
 }

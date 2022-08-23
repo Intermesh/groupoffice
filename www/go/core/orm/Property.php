@@ -1003,7 +1003,7 @@ abstract class Property extends Model {
 	 * @param bool $forIsModified
 	 * @return array|bool eg. ["propName" => [newval, oldval]]
 	 */
-	private function internalGetModified($properties = [], bool $forIsModified = false) {
+	protected function internalGetModified(&$properties = [], bool $forIsModified = false) {
 
 		if($this->readOnly) {
 			return $forIsModified ? false : [];
@@ -1015,6 +1015,13 @@ abstract class Property extends Model {
 
 		if(empty($properties)) {
 			$properties = array_keys($this->oldProps);
+
+			if(method_exists($this, 'getCustomFields') && $this->getCustomFields()->isModified()) {
+				if ($forIsModified) {
+					return true;
+				}
+				$modified['customFields'] = $this->getCustomFields()->getModified();
+			}
 		}
 
 		$modified = [];
@@ -1116,7 +1123,7 @@ abstract class Property extends Model {
 	 */
 	public function getOldValue(string $propName) {
 		if(!array_key_exists($propName, $this->oldProps)){
-			throw new InvalidArgumentException("Property " . $propName . " does not exist");
+			throw new InvalidArgumentException("Property " . $propName . " does not exist on " . static::class);
 		}
 		return $this->oldProps[$propName];
 	}
@@ -1445,7 +1452,7 @@ abstract class Property extends Model {
 		$pk = $cls::getPrimaryKey();
 
 		foreach($oldModels as $model) {
-			if(in_array($model, $models)) {
+			if(self::arrayContains($models, $model)) {
 				//if object is still present then don't remove
 				continue;
 			}
@@ -1465,6 +1472,24 @@ abstract class Property extends Model {
 		$query->andWhere($removeKeys);
 
 		return $cls::internalDelete($query);
+	}
+
+	/**
+	 * Check if an array of models contains a given property
+	 * Also works for cloned objects because it checks class name and primary key
+	 *
+	 * @param Property[] $models
+	 * @param Property $model
+	 * @return void
+	 * @throws Exception
+	 */
+	private static function arrayContains(array $models, self $model) {
+		foreach($models as $m) {
+			if($m->equals($model)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
   /**

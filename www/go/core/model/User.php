@@ -797,6 +797,30 @@ class User extends Entity {
 		return true;
 	}
 
+
+	protected function internalGetModified(&$properties = [], bool $forIsModified = false)
+	{
+		// check if it's empty because the parent method will fill it with all props
+		$allProps = empty($properties);
+
+		$modified = parent::internalGetModified($properties, $forIsModified);
+
+		if($forIsModified && $modified) {
+			return true;
+		}
+
+		// Add contact profile
+		if (($allProps || in_array('profile', $properties)) && isset($this->contact) && $this->contact->isModified()) {
+			if($forIsModified) {
+				return true;
+			}
+
+			$modified['profile'] = $this->contact->getModified();
+		}
+
+		return $modified;
+	}
+
 	/**
 	 * @throws Exception
 	 */

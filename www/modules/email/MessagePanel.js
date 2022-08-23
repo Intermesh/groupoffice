@@ -603,7 +603,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 
 		e.preventDefault();
-		this.attachmentContextMenu.showAt(e.getXY(),attachment);
+		this.attachmentContextMenu.showAt(e.getXY(),attachment, target);
 
 
 	},

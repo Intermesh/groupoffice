@@ -326,6 +326,9 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 							const errorMsg = "Too many changes for '" + this.entity.name + "' in state '" + this.state + "' " + changes.totalChanges + " > 10000";
 							return Promise.reject({type: "cannotcalculatechanges", detail: errorMsg, message: errorMsg});
 						}
+						//clear the promise or it won't run again.
+
+						this.getUpdatesPromise = null;
 						return this.getUpdates(cb, scope);
 					} else
 					{

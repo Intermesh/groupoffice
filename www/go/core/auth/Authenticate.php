@@ -144,7 +144,7 @@ class Authenticate {
 
 		$cacheKey = 'login-' . md5($username. '|' . $password);
 
-		if($cache = go()->getCache()->get($cacheKey)) {
+		if(!go()->getSettings()->maintenanceMode && $cache = go()->getCache()->get($cacheKey)) {
 			$this->usedPasswordAuthenticator = $cache[1];
 			return $cache[0];
 		}

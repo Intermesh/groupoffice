@@ -4,6 +4,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	width: dp(800),
 	height: dp(600),
 	modal: false,
+	stateId: 'communityTasksTaskDialog',
 
 	setLinkEntity : function(cfg) {
 

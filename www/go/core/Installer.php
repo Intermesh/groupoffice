@@ -475,6 +475,7 @@ class Installer {
 		$this->disableUnavailableModules();
 
 		$lock = new Lock("upgrade", false);
+		$lock->timeout = 0;
 		if (!$lock->lock()) {
 			throw new Exception("Upgrade is already in progress");
 		}
@@ -487,7 +488,7 @@ class Installer {
 
 		//don't be strict in upgrade
 		go()->getDbConnection()->exec("SET sql_mode=''");
-		
+
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
@@ -795,10 +796,10 @@ class Installer {
 				continue;
 			}
 			
-			if($record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
-				echo "Converting ". $record["Name"] . " to InnoDB\n";
+			if($record['Row_format'] != 'Dynamic' || $record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
+				echo "Converting ". $record["Name"] . " to InnoDB and row format = Dynamic\n";
 				flush();
-				$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB;";
+				$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB, ROW_FORMAT=Dynamic;";
 				go()->getDbConnection()->query($sql);	
 			}
 			

@@ -85,6 +85,8 @@ class Columns{
 					$type = $field['Type'];
 					$length = 0;
 				}
+
+				$type = explode(" ", $type)[0];
 				
 				$required=false;
 				$gotype = 'textfield';

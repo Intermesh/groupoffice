@@ -20,23 +20,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 		go.detail.addButton.superclass.initComponent.call(this);
 		
 		
-		if(go.Modules.isAvailable("legacy", "workflow")) {
-			//todo, refactor comments so this is also a linkable entity
-			this.menu.add(	{
-				iconCls: 'go-module-icon-workflow',
-				text: t("Workflow"),
-				scope: this,
-				handler: function() {
-					var modelDialog = new GO.workflow.ModelDialog();
-					modelDialog.closeAction = "close";
 
-					modelDialog.addBaseParam('model_id', this.getEntityId());
-					modelDialog.addBaseParam('model_name',  this.getEntity());
-
-					modelDialog.show();
-				}
-			});
-		}
 		
 		//TODO refactor
 		
@@ -107,6 +91,27 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 	},
 	
 	onAfterRender : function() {
+
+		if(go.Modules.isAvailable("legacy", "workflow")) {
+
+			if(['File', 'Folder', 'Order'].indexOf(this.getEntity()) > -1) {
+				this.menu.add({
+					iconCls: 'go-module-icon-workflow',
+					text: t("Workflow"),
+					scope: this,
+					handler: function () {
+						var modelDialog = new GO.workflow.ModelDialog();
+						modelDialog.closeAction = "close";
+
+						modelDialog.addBaseParam('model_id', this.getEntityId());
+						modelDialog.addBaseParam('model_name', this.getEntity());
+
+						modelDialog.show();
+					}
+				});
+			}
+		}
+
 		this.detailView.on('load', function (dv) {
 			if(!dv.data) {
 				this.setDisabled(true);

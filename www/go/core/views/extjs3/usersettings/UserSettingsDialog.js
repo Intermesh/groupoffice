@@ -18,6 +18,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	cls: 'go-user-settings-dlg',
 	title: t("My account"),
 	width: dp(1000),
+	stateId: 'userSettingsDialog',
 	currentUserId:null,
 	user: null,
 
@@ -35,8 +36,18 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			region:'center',
 			hideMode: "offsets",
 			fileUpload: true,
-			baseParams : {}			
+			baseParams : {},
+
+
 		});
+		//for compatibility with custom field panel filtering
+		this.formPanel.getValues = () => {
+			const v = this.formPanel.form.getValues();
+			v.addressBookId = parseInt(go.Modules.get("core", "core").settings.userAddressBookId);
+			// console.warn(v);
+
+			return v;
+		}
 		
 		//Add a hidden submit button so the form will submit on enter
 		this.formPanel.add(new Ext.Button({
@@ -113,7 +124,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			this.addPanel(go.usersettings.VisibleToPanel);
 		}
 
-		// this.loadModulePanels();
 		
 		var customFieldSets = go.customfields.CustomFields.getFormFieldSets("User").filter(function(fs){return fs.fieldSet.isTab;})
 		customFieldSets.forEach(function(fs){
@@ -225,7 +235,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	submit : function(){
 		// loop through child panels and call onSubmitStart function if available
-		var valid = true;
+		let valid = true;
 		this.tabPanel.items.each(function(tab) {
 			if(tab.onValidate){
 				if(!tab.onValidate()) {
@@ -236,7 +246,27 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		},this);
 		
 		if (!valid || !this.formPanel.getForm().isValid()) {
-			console.debug("UserSettings form invalid");
+			let allFields = this.getFields(), l = allFields.length, fldName, p;
+			for(let i=0;i<l;i++) {
+				let f = allFields[i];
+				if(f instanceof Ext.form.CompositeField) {
+					continue;
+				}
+
+				if(!f.disabled && !f.isValid()) {
+					fldName = f.fieldLabel
+					let t = f.findParentBy(function(cb)  {
+						return (cb.itemCls === 'x-tab-item');
+					});
+					this.tabPanel.setActiveTab(t);
+					document.getElementById(f.id).scrollIntoView(); // Vanilla JS > ExtJS3
+					f.focus();
+					break;
+				}
+			}
+
+			Ext.MessageBox.alert(t("Warning"), t("You have errors in your form. The invalid fields are marked."));
+			console.debug("UserSettings form invalid, name of field is " + fldName);
 			return;
 		}
 		

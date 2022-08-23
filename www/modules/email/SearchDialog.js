@@ -34,10 +34,7 @@ GO.email.SearchDialog = function(config){
 						fieldLabel: t("Recipient (CC)", "email"),
 						name: 'cc'
 					},
-					{
-						fieldLabel: t("Body", "email"),
-						name: 'body'
-					},
+
 					new Ext.form.DateField({
 						fieldLabel: t("Received before", "email"),
 						name: 'before',
@@ -159,7 +156,15 @@ GO.email.SearchDialog = function(config){
 					}
 					]
 				});
-				
+
+
+				if(GO.settings.config.email_allow_body_search) {
+					this.formPanel.insert(4, {
+						xtype: "textfield",
+						fieldLabel: t("Body", "email"),
+						name: 'body'
+					});
+				}
 				
 				this.dialog = new go.Window({
 					layout: 'fit',
@@ -243,7 +248,10 @@ GO.email.SearchDialog = function(config){
 			var from = form.findField('from').getValue();
 			var to = form.findField('to').getValue();
 			var cc = form.findField('cc').getValue();
-			var body = form.findField('body').getValue();
+			var body = false;
+			if(form.findField('body')) {
+				body = form.findField('body').getValue();
+			}
 			
 			var before = form.findField('before').getValue();
 			var since = form.findField('since').getValue();

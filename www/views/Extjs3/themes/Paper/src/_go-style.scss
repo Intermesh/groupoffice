@@ -3,6 +3,9 @@
 :root {
   --c-primary: #{map-get($vars, c-primary)};
   --c-primary-tp: #{map-get($vars, c-primary-tp)};
+	--c-secondary: #{map-get($vars, c-secondary)};
+	--c-tertiary: #{map-get($vars, c-tertiary)};
+	--c-accent: #{map-get($vars, c-accent)};
 }
 
 ::-webkit-scrollbar-thumb {
@@ -14,7 +17,7 @@ input[type="time"]::-webkit-clear-button {
 }
 
 html {
-   font-size: 100%;
+	font-size: 100%;
 	letter-spacing: normal;
 	-moz-osx-font-smoothing: grayscale;
    -webkit-font-smoothing: antialiased;
@@ -284,7 +287,7 @@ a {
 	border-radius: $borderRadius;
 	background-color: color($bg, 'card');
 	margin: dp(56) auto 0;
-	padding: dp(8);
+	padding: dp(16);
 	max-width: 100%;
 	width: 600px;
 	max-height: 220px;
@@ -471,8 +474,7 @@ a {
 		.x-tab-strip {
 			
 			&-active {
-				//@include var(border-bottom-color, c-accent);
-				border-bottom-color: $cTertiary;
+				@include var(border-color, c-tertiary);
 				color:white;
 				.x-tab-strip-text{ color:white;}
 			}
@@ -545,7 +547,7 @@ a {
 		float: left;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(16) dp(8) 0 0;
+		padding: dp(14) dp(8) 0 0;
 		color: white;
 		&:hover,&:active { color: white; }
 	}
@@ -835,9 +837,10 @@ button {
 
 .user-img {
 	//@extend .avatar;
+
 	position:absolute;	
 	right: dp(16);
-	top: dp(8);
+	top: dp(6);
 	z-index:15;
 	.avatar {
 		border: 1px solid white;
@@ -2239,6 +2242,9 @@ table[id^="comments-ext"] b {
 	background-color: color($bg, 'box');
 	cursor: pointer;
 	z-index:2;
+	&:hover {
+		opacity: 0;
+	}
 }
 
 
@@ -2277,28 +2283,13 @@ table[id^="comments-ext"] b {
 	display: inline-block;
 	@extend .x-btn;
 	min-height: dp(32);
-	line-height: dp(16);
+	line-height: dp(24);
 	height: auto;
 	padding: dp(8) dp(16);
 	margin: 0;
 
 	&:hover, &:focus {
-		transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary-tp);
-	}
-
-	&.primary {
-		&:hover, &:focus {
-			transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-			@include var(background-color, c-accent);
-		}
-	}
-
-	&.accent {
-		&:hover, &:focus {
-			transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-			@include var(background-color, c-primary);
-		}
+		filter: brightness(120%);
 	}
 }
 
