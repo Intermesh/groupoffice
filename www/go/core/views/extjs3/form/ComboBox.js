@@ -231,6 +231,11 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				me.resolveEntity(value).then(function (entity) {
 					//this prevents the list to expand on loading the value
 					var origHasFocus = me.hasFocus;
+					if(me.value != value) {
+						// Abort another setValue() call was made in between. This can happen when fetching the default
+						// value takes longer then the setValue() call of loading a dialog value.
+						return;
+					}
 
 					me.store.on("load", function() {
 
