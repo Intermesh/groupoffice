@@ -3,7 +3,6 @@
 - Tasks: grouping can be configured in grid now
 - Tasks: First open of task dialog could falsely set the default tasklist if the network response was slow
 
-
 23-08-2022 6.6.113
 - Core / projects: fix for mysql general error 1366 incorrect integer value ''
 

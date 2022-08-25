@@ -205,6 +205,9 @@
 
 			if(neg) {
 				value *= -1;
+			} else {
+				// make sure value is numeric
+				value *= 1;
 			}
 			
 			var dec = go.User.decimalSeparator,
