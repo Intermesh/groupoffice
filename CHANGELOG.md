@@ -1,4 +1,5 @@
 - Core: Fixed reload link on changes not showing all links
+- Holidays: Fixed bug in holiday calculator when agreement changed in the middle of a year
 
 23-08-2022 6.6.113
 - Core / projects: fix for mysql general error 1366 incorrect integer value ''
