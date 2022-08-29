@@ -83,7 +83,7 @@ class Connection {
 	 * @param int $timeout The connection timeout
 	 * @return boolean
 	 */
-	public function connect(string $server, int $port = 143, bool $ssl = false, int $timeout = 10, bool $ignoreInvalidCertificates = false): bool
+	public function connect(string $server, int $port = 143, bool $ssl = false, int $timeout = 25, bool $ignoreInvalidCertificates = false): bool
 	{
 
 		$contextOptions = [];

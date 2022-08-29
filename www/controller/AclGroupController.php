@@ -136,7 +136,17 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 	
 	protected function beforeDelete(array $params) {
 		$delKeys = !empty($params['delete_keys']) ? json_decode($params['delete_keys']) : array();
+
 		if (!empty($delKeys)) {
+
+			$acl = \GO\Base\Model\Acl::model()->findByPk($params['model_id'], false, false);
+
+			$groupId = \go\core\model\Group::findPersonalGroupID($acl->ownedBy);
+
+			if(in_array($groupId, $delKeys)) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+
 			// Only admins may edit the set of linked groups.
 			if(!$params['currentUserHasManagePermission']) {
 				throw new \GO\Base\Exception\AccessDenied();

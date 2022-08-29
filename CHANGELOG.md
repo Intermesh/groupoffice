@@ -1,3 +1,10 @@
+25-08-2022 6.6.114
+- Core: Fixed reload link on changes not showing all links
+- Holidays: Fixed bug in holiday calculator when agreement changed in the middle of a year
+- Tasks: grouping can be configured in grid now
+- Tasks: First open of task dialog could falsely set the default tasklist if the network response was slow
+- Projects: Faster way of adding project resources in bulk via template
+
 23-08-2022 6.6.113
 - Core / projects: fix for mysql general error 1366 incorrect integer value ''
 

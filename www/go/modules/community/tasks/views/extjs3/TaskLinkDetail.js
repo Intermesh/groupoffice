@@ -6,15 +6,15 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 	collapsible: true,
 	initComponent: function() {
 
-		this.view = new go.grid.GridView({
+		this.view = new go.grid.GroupingView({
 			emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
 			totalDisplay: false,
 			actionConfig: {
 				scope: this,
 				menu: this.initMoreMenu()
-			}
-			// hideGroupedColumn: true,
-			// showGroupName: false
+			},
+			hideGroupedColumn: true,
+			showGroupName: false
 		});
 
 		this.supr().initComponent.call(this);

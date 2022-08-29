@@ -843,6 +843,9 @@ class go_sieve_script
                         array_push($exts, 'body');
 
                         $tests[$i] .= ($test['not'] ? 'not ' : '') . 'body';
+							  if(empty($test['part']) && $test['type'] === 'contains') {
+								  $test['part'] = 'text';
+							  }
 
                         if (!empty($test['part'])) {
                             $tests[$i] .= ' :' . $test['part'];
@@ -1506,9 +1509,7 @@ class go_sieve_script
         else {
             if ($test['type'] == 'regex') {
                 array_push($exts, 'regex');
-            } elseif($test['type'] === 'contains' && $test['test'] === 'body') {
-					$out .= ' :text';
-				}
+            }
 
             $out .= ' :' . $test['type'];
         }

@@ -82,4 +82,14 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 		return new static("@" . parent::createFromFormat($format, $datetime, $timezone)->format("U"));
 	}
 
+	/**
+	 * Get the number of days in a given year
+	 *
+	 * @param int $year
+	 * @return int
+	 */
+	public static function daysInYear(int $year) : int {
+		return date("L", mktime(0, 0, 0, 1, 1, $year)) ? 366 : 365;
+	}
+
 }

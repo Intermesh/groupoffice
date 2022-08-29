@@ -129,7 +129,7 @@ go.Modules.register("community", "tasks", {
 				title: t("Responsible"),
 				name: 'responsibleUserId',
 				multiple: false,
-				type: 'usercombo'
+				type: 'go.users.UserCombo'
 			}]
 
 	}],
