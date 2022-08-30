@@ -389,7 +389,8 @@ class Link extends AclItemEntity
 				return false;
 			}
 
-			return $this->updateEntities();
+			$this->updateEntities();
+			return true;
 		}
 
 		if(!App::get()->getDbConnection()->updateIgnore('core_link',
@@ -400,7 +401,8 @@ class Link extends AclItemEntity
 		}
 
 
-		return $this->updateEntities();
+		$this->updateEntities();
+		return true;
 	}
 
 	/**
