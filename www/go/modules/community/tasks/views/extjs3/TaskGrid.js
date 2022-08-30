@@ -6,6 +6,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	loadMask: true,
 	cls: "tasks-task-grid",
 
+	support: false,
+
 	initComponent: function () {
 
 		this.store = new go.data.GroupingStore({
@@ -145,7 +147,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'start',
 					renderer: startRenderer,
-					hidden: this.forProject,
+					hidden: this.forProject || this.support,
 					groupable: false
 				},{
 					xtype:"datecolumn",
@@ -156,7 +158,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'due',
 					renderer: startRenderer,
-					groupable: false
+					groupable: false,
+					hidden: this.support
 				},{
 					header: t('Responsible'),
 					width: dp(180),
@@ -177,7 +180,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer:function (value, meta, rec, row, col, store){
 						return '<div class="go-progressbar"><div style="width:'+Math.ceil(value)+'%"></div></div>';
 					},
-					hidden: this.forProject,
+					hidden: this.forProject || this.support,
 					groupable: false
 				},{
 					hidden: true,
@@ -203,7 +206,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'createdAt',
-					hidden: true,
+					hidden: !this.support,
 					groupable: false
 				},
 				{					
@@ -213,7 +216,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'modifiedAt',
-					hidden: true,
+					hidden: !this.support,
 					groupable: false
 				},
 				{	
@@ -224,7 +227,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v) {
 						return v ? v.displayName : "-";
 					},
-					hidden: true,
+					hidden: !this.support,
 					groupable: true
 				},
 				{
@@ -235,7 +238,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v) {
 						return v ? v.name : "-";
 					},
-					hidden: true,
+					hidden: !this.support,
 					groupable: true
 				},
 				{	

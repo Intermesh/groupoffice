@@ -26,6 +26,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.taskDetail = new go.modules.community.tasks.TaskDetail({
 			region: 'east',
 			split: true,
+			stateId: this.statePrefix  + '-task-detail',
 			tbar: [this.taskBackButton = new Ext.Button({
 				//cls: 'go-narrow',
 				hidden: true,
@@ -60,6 +61,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			cls: 'go-sidenav',
 			region: "west",
 			split: true,
+			stateId: this.support ? "support-west" : "tasks-west",
 			tbar: this.sidePanelTbar = new Ext.Toolbar({
 				//cls: 'go-narrow',
 				hidden: true,
@@ -374,6 +376,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createTaskGrid : function() {
 
 		this.taskGrid = new go.modules.community.tasks.TaskGrid({
+			support: this.support,
+			stateId: this.statePrefix  + '-tasks-grid-main',
 			enableDrag: true,
 			ddGroup: 'TasklistsDD',
 			split: true,
