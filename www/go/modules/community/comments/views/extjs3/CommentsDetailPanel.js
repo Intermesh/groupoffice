@@ -215,10 +215,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
 			}
 
-			let readMore = new go.detail.ReadMore({
+			let readMore = new Ext.Container({
 				cls: 'go-html-formatted ' + mineCls
 			});
-			readMore.setText(r.get('text'));
+
+			readMore.insert(1, {xtype:'box',html:r.get('text'), itemId:"content", cls: 'content ' +mineCls});
 			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
 
 			if(r.data.attachments && r.data.attachments.length) {
