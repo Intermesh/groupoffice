@@ -176,9 +176,12 @@
 				});
 			}
 
+			let openNotifications = true;
+
 			if(this._messages[msg.itemId]) {
 				this._messages[msg.itemId].replaced = true;
 				this._messages[msg.itemId].destroy();
+				openNotifications = false;
 			}
 			this._messages[msg.itemId] = msgPanel;
 
@@ -233,7 +236,9 @@
 			this.notifications.add(msgPanel);
 			this.notifications.doLayout();
 
-			this.showNotifications();
+			if(openNotifications) {
+				this.showNotifications();
+			}
 
 			this.updateStatusIcons();
 
