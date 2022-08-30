@@ -250,7 +250,7 @@ class Task extends AclInheritEntity {
 
 	public function getProgress(): string
 	{
-		return Progress::$db[$this->progress];
+		return isset(Progress::$db[$this->progress]) ? Progress::$db[$this->progress] : Progress::$db[1];
 	}
 
 	public function getTimeBooked(): ?int
