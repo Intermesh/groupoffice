@@ -27,6 +27,7 @@ use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use go\core\util\JSON;
+use go\core\util\PdfRenderer;
 use go\modules\community\history\Module as HistoryModule;
 use JsonException;
 use function GO;
@@ -40,6 +41,27 @@ class System extends Controller {
 	protected function authenticate()
 	{
 		// no auth because on upgrade it might fail and it's not needed on CLI anyway
+	}
+
+
+	/**
+	 *
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/addPDFFont --file=/root/Downloads/Lato/Lato-Regular.ttf
+	 * @param string $file
+	 * @return void
+	 */
+	public function addPDFFont(string $file) {
+
+		$f = new File($file);
+		if(!$f->exists()) {
+			throw new NotFound($f->getPath());
+		}
+
+		// convert TTF font to TCPDF format and store it on the fonts folder
+		$result = PdfRenderer::addTTFFont($file);
+
+
+		var_dump($result);
 	}
 
 

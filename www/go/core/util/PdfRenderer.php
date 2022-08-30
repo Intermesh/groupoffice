@@ -1,7 +1,10 @@
 <?php
 namespace go\core\util;
 
+use Exception;
+use go\core\fs\Folder;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use TCPDF_FONTS;
 
 /**
  * PDF renderer
@@ -43,6 +46,35 @@ class PdfRenderer extends Fpdi {
 		//Set normal font
 		$this->normal();
 	}
+
+	/**
+	 * Get all available fonts
+	 *
+	 * @return array eg. [['name' => 'Arial', 'family' => 'arial', 'core' =>
+	 * @throws Exception
+	 */
+	public static function getFonts() : array {
+		$folder = new Folder(K_PATH_FONTS);
+		$files = $folder->find([
+			'regex' => '/.*\.php/'
+		]);
+
+		$fonts = [];
+		foreach($files as $file) {
+			$name = null;
+			require($file);
+			$fonts[$file->getNameWithoutExtension()] = $name;
+		}
+
+		return $fonts;
+	}
+
+	public static function addTTFFont(string $ttfPath) {
+		// convert TTF font to TCPDF format and store it on the fonts folder
+		return TCPDF_FONTS::addTTFfont($ttfPath, 'TrueTypeUnicode', '', 32);
+
+	}
+
 	/**
 	 * Set font to bold
 	 *
