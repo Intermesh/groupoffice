@@ -19,10 +19,21 @@ use go\core\orm\Entity;
  */
 abstract class SettingsEntity extends Entity {
 
-	private static $instance;
+	private static $instance = [];
 
 	public static function get() {
-		return static::$instance ?? (static::$instance = static::getMapping()->getPrimaryTable() ? (static::find()->single() ?? new static)  : new static());
+
+		$cls = static::class;
+
+		if(!isset(self::$instance[$cls])) {
+			if(static::getMapping()->getPrimaryTable()) {
+				self::$instance[$cls] = static::find()->single() ?? new static;
+			} else {
+				self::$instance[$cls] = new static;
+			}
+
+		}
+		return static::$instance[$cls];
 	}
 
 	protected $readOnlyKeys;
