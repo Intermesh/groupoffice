@@ -35,6 +35,10 @@ class BackgroundProcess {
 		$this->outputFile = File::tempFile("txt");
 	}
 
+	public function getOutput() {
+		return $this->outputFile->getContents();
+	}
+
 	public function run(): int
 	{
 

@@ -24,9 +24,9 @@ if(!Environment::get()->isCli()) {
 }
 
 go()->getDebugger()->setRequestId('cli');
+go()->getDebugger()->output = true;
 if(!empty($args['debug'])) {
-    go()->getDebugger()->output = true;
-	go()->getDebugger()->enable(false);
+	go()->getDebugger()->enable(true);
 }
 
 if(array_key_exists('debug', $args)) {
