@@ -183,7 +183,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: this.forProject || this.support,
 					groupable: false
 				},{
-					hidden: true,
+					hidden: !this.support,
 					id:"progress",
 					width:dp(150),
 					header: t('Progress', "tasks", "community"),
@@ -206,7 +206,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'createdAt',
-					hidden: !this.support,
+					hidden: true,
 					groupable: false
 				},
 				{					
