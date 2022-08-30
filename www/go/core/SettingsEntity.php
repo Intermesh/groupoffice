@@ -33,7 +33,7 @@ abstract class SettingsEntity extends Entity {
 			}
 
 		}
-		return static::$instance[$cls];
+		return self::$instance[$cls];
 	}
 
 	protected $readOnlyKeys;
