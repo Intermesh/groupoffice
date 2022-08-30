@@ -6,7 +6,6 @@ use go\core\util\Recurrence;
 use go\modules\community\tasks\model\Alert;
 use go\modules\community\tasks\model\Progress;
 use go\modules\community\tasks\model\Task;
-use go\core\model\Acl;
 use go\modules\community\tasks\model\Tasklist;
 
 class goTask extends GoBaseBackendDiff {
