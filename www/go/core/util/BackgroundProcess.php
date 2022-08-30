@@ -1,6 +1,7 @@
 <?php
 namespace go\core\util;
 
+use go\core\App;
 use go\core\fs\File;
 
 class BackgroundProcess {
@@ -45,6 +46,8 @@ class BackgroundProcess {
 		}
 
 		$cmd .= " --userId=" . go()->getUserId();
+
+		$cmd .= " -c=" . escapeshellarg(App::findConfigFile());
 
 		go()->debug("BACKGROUND CMD: ". $cmd);
 
