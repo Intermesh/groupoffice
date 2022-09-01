@@ -40,7 +40,7 @@ class Criteria {
 			return new static;
 		}
 		
-		if($criteria instanceof self) {
+		if($criteria instanceof static) {
 			return $criteria;
 		}
 		

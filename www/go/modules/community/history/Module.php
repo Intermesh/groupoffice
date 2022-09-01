@@ -14,7 +14,7 @@ use go\core\jmap\Entity;
 use go\core\model\CronJobSchedule;
 use go\core\model\Search;
 use go\core\model\User;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\modules\community\history\model\LogEntry;
 use go\modules\community\history\model\Settings;
 use GO\Projects2\Model\TimeEntry;
