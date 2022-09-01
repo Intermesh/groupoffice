@@ -39,6 +39,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		});
 
 		const showCompleted = Ext.state.Manager.get(this.statePrefix + "show-completed");
+		const assignedToMe = Ext.state.Manager.get(this.statePrefix + "assigned-to-me");
 
 		if(this.support) {
 			this.filterPanel = new go.modules.community.tasks.ProgressGrid({
@@ -125,6 +126,35 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					}
 				]
 			}));
+		} else {
+			this.sidePanel.items.insert(1, Ext.create({
+				xtype: "panel",
+				layout: "form",
+				bodyStyle: "padding-left: 18px;", // TODO wtf 18px?
+				tbar: [
+					{
+						xtype:"tbtitle",
+						text: t("Assigned")
+					}
+				],
+				items: [
+					{
+						hideLabel: true,
+						xtype: "checkbox",
+						boxLabel: t("Mine"),
+						checked: assignedToMe,
+						listeners: {
+							scope: this,
+							check: function(cb, checked) {
+
+								this.assignedToMe(checked);
+								Ext.state.Manager.set(this.statePrefix + "assigned-to-me", checked);
+								this.taskGrid.store.load();
+							}
+						}
+					}
+				]
+			}));
 		}
 
 		this.centerPanel = new Ext.Panel({
@@ -162,12 +192,22 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	showCompleted : function(show) {
 		this.taskGrid.store.setFilter('completed', show ? null : {complete:  false});
 	},
+
+	assignedToMe : function(show) {
+		this.taskGrid.store.setFilter('assignedToMe', show ?
+			{
+				operator: "OR",
+				conditions: [
+					{responsibleUserId: go.User.id},
+					{responsibleUserId: null}
+				]
+			} : null);
+	},
 	
 	runModule : function() {
 
-
 		if(this.support) {
-			// this.filterPanel.on("selectionchange", this.onProgressSelectionChange, this);
+			this.assignedToMe(Ext.state.Manager.get(this.statePrefix + "assigned-to-me"));
 		} else {
 
 			this.filterPanel.on("afterrender", () => {
@@ -190,7 +230,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			}
 
 			this.setStatusFilter(statusFilter);
-
 		}
 
 
