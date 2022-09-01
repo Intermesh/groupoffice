@@ -76,7 +76,7 @@ class UserSettings extends Property {
 			$stmt = go()->getDbConnection()->update("tasks_user_settings", ['defaultTasklistId' => $this->defaultTasklistId], ['userId' => $this->userId]);
 			$stmt->execute();
 			if(!$stmt->rowCount()) {
-				$stmt = go()->getDbConnection()->insert("tasks_user_settings", ['defaultTasklistId' => $this->defaultTasklistId, 'userId' => $this->userId]);
+				$stmt = go()->getDbConnection()->insertIgnore("tasks_user_settings", ['defaultTasklistId' => $this->defaultTasklistId, 'userId' => $this->userId]);
 				$stmt->execute();
 			}
 		}
