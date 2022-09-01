@@ -181,10 +181,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	setDefaultSelection : function() {
 		let selectedListIds = [], settings = this.getSettings();
-		if(settings.rememberLastItems && settings.lastTasklistIds) {
+		if(settings.rememberLastItems) {
 			selectedListIds = settings.lastTasklistIds;
-		}
-		if(!selectedListIds.length && settings.defaultTasklistId) {
+		} else if(settings.defaultTasklistId) {
 			selectedListIds.push(settings.defaultTasklistId);
 		}
 
@@ -316,6 +315,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.tasklistsGrid = new go.modules.community.tasks.TasklistsGrid({
 			filteredStore: this.taskGrid.store,
 			filterName: 'tasklistId',
+			selectFirst: false,
 
 			split: true,
 			tbar: [{
@@ -596,7 +596,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.filterCategories(ids);
 
 		//		this.taskGrid.store.setFilter("role", ids.length == 0 ? {role:  go.modules.community.tasks.listTypes.List} : null);
-		this.taskGrid.store.setFilter("role", ids.length == 0 ? {operator: "OR", conditions: [{role:  go.modules.community.tasks.listTypes.List}, {role:  go.modules.community.tasks.listTypes.Support}] }: null);
+		this.taskGrid.store.setFilter("role", ids.length == 0 ? {role:  !this.support ? go.modules.community.tasks.listTypes.List : go.modules.community.tasks.listTypes.Support} : null);
 
 		const settings = this.getSettings();
 		if(settings.rememberLastItems && settings.lastTasklistIds.join(",") != ids.join(",")) {
@@ -612,7 +612,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	checkCreateTaskList: function() {
 
-		this.addTasklistId = false;
+		this.addTasklistId = this.getSettings().defaultTasklistId;
 
 		go.Db.store("Tasklist").get(this.tasklistsGrid.getSelectedIds()).then((result) => {
 

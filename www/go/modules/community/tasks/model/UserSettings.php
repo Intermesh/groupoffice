@@ -107,7 +107,7 @@ class UserSettings extends Property {
 	 */
 	public function setLastTasklistIds(?array $ids = null)
 	{
-		if (is_array($ids) && count($ids) > 0) {
+		if (is_array($ids)) {
 			$this->lastTasklistIds = JSON::encode($ids);
 		} else {
 			$this->lastTasklistIds = '';

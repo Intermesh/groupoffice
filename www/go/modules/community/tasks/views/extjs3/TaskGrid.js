@@ -81,8 +81,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			return go.util.Format.date(v);
 		};
 
-		const now = new Date();
-
 		this.columns = [
 				this.checkColumn,
 				{

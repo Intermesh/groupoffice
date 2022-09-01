@@ -15,6 +15,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	hideMenuButton: false,
 	filteredStore: null,
 	filterName: null,
+	selectFirst: true,
 	initComponent: function () {
 
 		const actions = this.initRowActions();
@@ -31,7 +32,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 					xtype: 'toolbar'
 				},
 				this.selectAllToolbar = new Ext.Toolbar({
-					items: [{xtype: "selectallcheckbox"}]
+					items: [{xtype: "selectallcheckbox", selectFirst: this.selectFirst}]
 				})
 			]
 		};
