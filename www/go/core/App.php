@@ -1021,7 +1021,20 @@ namespace go\core {
 
 			$this->optimizerSearchDepthSet = true;
 		}
+
+		public function checkAcls()
+		{
+			//one legacy model that needs checking
+			$stmt = GO\Base\Model\Template::find(['ignoreAcl'=>true]);
+			while($stmt->rowCount()) {
+				$stmt->callOnEach('checkAcl', true);
+			}
+
+			return parent::checkAcls();
+		}
 	}
+
+
 }
 
 namespace {

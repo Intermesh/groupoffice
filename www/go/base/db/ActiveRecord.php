@@ -4863,8 +4863,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if($this->aclField() && (!$this->isJoinedAclField || $this instanceof \GO\Files\Model\Folder)) {
 			if (!($this instanceof \GO\Files\Model\Folder) || (!$this->readonly && $this->acl_id > 0)) {
 				$acl = $this->acl;
+
 				if (!$acl) {
+
 					$this->setNewAcl();
+
+
+					echo "Setting new ACL " . $this->{$this->aclField()} ."\n";
 
 					if ($save) {
 						$this->save();
