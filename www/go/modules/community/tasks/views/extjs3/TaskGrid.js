@@ -55,9 +55,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			dataIndex: 'complete',
 			hideInExport:true,
 			header: '',
-			width: dp(48),
-			resizable: false,
-			fixed: true,
+
 			hideable:false,
 			menuDisabled: true,
 			sortable:false,
