@@ -1265,7 +1265,7 @@
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
 		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
-		padding: dp(6) dp(8) dp(6) dp(16); // 10 top = middle of row line-height 20dp
+		padding: dp(6) dp(8) dp(6) dp(24); // 10 top = middle of row line-height 20dp
 		.ux-row-action-cell & {
 			padding: 0;
 		}
