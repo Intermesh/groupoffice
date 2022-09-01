@@ -4926,8 +4926,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 
-		if($this->isModified())
+		if($this->isModified()) {
 			$this->save();
+			echo "Saved\n";
+		}
 	}
 
 
