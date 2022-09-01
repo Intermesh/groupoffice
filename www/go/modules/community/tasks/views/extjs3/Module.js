@@ -86,7 +86,8 @@ go.Modules.register("community", "tasks", {
 				title: t("Modified by"),
 				name: 'modifiedBy',
 				multiple: true,
-				type: 'string'
+				type: 'go.users.UserCombo',
+				typeConfig: {value: null}
 			}, {
 				title: t("Created at"),
 				name: 'createdat',
@@ -96,7 +97,8 @@ go.Modules.register("community", "tasks", {
 				title: t("Created by"),
 				name: 'createdby',
 				multiple: true,
-				type: 'string'
+				type: 'go.users.UserCombo',
+				typeConfig: {value: null}
 			},
 			{
 				title: t("Tasklist"),
@@ -129,7 +131,8 @@ go.Modules.register("community", "tasks", {
 				title: t("Responsible"),
 				name: 'responsibleUserId',
 				multiple: false,
-				type: 'go.users.UserCombo'
+				type: 'go.users.UserCombo',
+				typeConfig: {value: null}
 			}]
 
 	}],

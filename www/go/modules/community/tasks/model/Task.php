@@ -350,9 +350,9 @@ class Task extends AclInheritEntity {
 			})->add('scheduled', function(Criteria $criteria, $value) {
 				$criteria->where('start', $value ? 'IS NOT' : 'IS',null);
 			})->add('responsibleUserId', function(Criteria $criteria, $value){
-				if(!empty($value)) {
+				//if(!empty($value)) {
 					$criteria->where('responsibleUserId', '=',$value);
-				}
+				//}//
 			})
 			->add('progress', function(Criteria $criteria, $value){
 				if(!empty($value)) {

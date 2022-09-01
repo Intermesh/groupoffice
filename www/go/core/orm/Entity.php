@@ -788,11 +788,17 @@ abstract class Entity extends Property {
 
 		if (static::getMapping()->getColumn('modifiedBy')) {
 			$filters->addText("modifiedBy", function (Criteria $criteria, $comparator, $value, Query $query) {
-				if (!$query->isJoined('core_user', 'modifier')) {
-					$query->join('core_user', 'modifier', 'modifier.id = ' . $query->getTableAlias() . '.modifiedBy');
-				}
 
-				$criteria->where('modifier.displayName', $comparator, $value);
+				if(is_numeric($value)) {
+					$criteria->andWhere('modifiedBy', '=', $value);
+				} else {
+
+					if (!$query->isJoined('core_user', 'modifier')) {
+						$query->join('core_user', 'modifier', 'modifier.id = ' . $query->getTableAlias() . '.modifiedBy');
+					}
+
+					$criteria->where('modifier.displayName', $comparator, $value);
+				}
 			});
 		}
 
@@ -809,11 +815,16 @@ abstract class Entity extends Property {
 				$criteria->where('createdBy', '=', go()->getAuthState()->getUserId());
 			});
 			$filters->addText("createdBy", function (Criteria $criteria, $comparator, $value, Query $query) {
-				if (!$query->isJoined('core_user', 'creator')) {
-					$query->join('core_user', 'creator', 'creator.id = ' . $query->getTableAlias() . '.createdBy');
-				}
 
-				$criteria->where('creator.displayName', $comparator, $value);
+				if(is_int($value) || is_array($value) && is_int($value[0])) {
+					$criteria->andWhere('createdBy', '=', $value);
+				} else {
+					if (!$query->isJoined('core_user', 'creator')) {
+						$query->join('core_user', 'creator', 'creator.id = ' . $query->getTableAlias() . '.createdBy');
+					}
+
+					$criteria->where('creator.displayName', $comparator, $value);
+				}
 			});
 		}
 

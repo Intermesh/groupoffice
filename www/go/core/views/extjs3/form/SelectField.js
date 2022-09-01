@@ -26,7 +26,7 @@ go.form.SelectField = Ext.extend(go.form.ComboBox, {
         if(!this.store) {
             this.store = new Ext.data.ArrayStore({
                 fields: ['value', 'text'],
-                id: 'value',
+                id: 0,
                 data: this.options
             });
         }

@@ -38,23 +38,40 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			})]
 		});
 
-		this.filterPanel = new go.NavMenu({
-			region:'north',
-			store: new Ext.data.ArrayStore({
-				fields: ['name', 'icon', 'iconCls', 'inputValue'],
-				data: [
-					[t("Today"), 'content_paste', 'green', 'today'],
-					[t("Due in seven days"), 'filter_7', 'purple', '7days'],
-					[t("All"), 'assignment', 'red', 'all'],
-					// [t("Completed"), 'assignment_turned_in', 'grey', 'completed'],
-					[t("Unscheduled"), 'event_busy', 'blue','unscheduled'],
-					[t("Scheduled"), 'events', 'orange', 'scheduled'],
-
-				]
-			})
-		});
-
 		const showCompleted = Ext.state.Manager.get(this.statePrefix + "show-completed");
+
+		if(this.support) {
+			this.filterPanel = new go.modules.community.tasks.ProgressGrid({
+				tbar: [{
+					xtype: "tbtitle",
+					text: t("Status")
+				}],
+				filterName: "progress",
+				filteredStore: this.taskGrid.store
+
+			});
+
+		} else {
+
+			this.filterPanel = new go.NavMenu({
+				region: 'north',
+				store: new Ext.data.ArrayStore({
+					fields: ['name', 'icon', 'iconCls', 'inputValue'],
+					data: [
+						[t("Today"), 'content_paste', 'green', 'today'],
+						[t("Due in seven days"), 'filter_7', 'purple', '7days'],
+						[t("All"), 'assignment', 'red', 'all'],
+						// [t("Completed"), 'assignment_turned_in', 'grey', 'completed'],
+						[t("Unscheduled"), 'event_busy', 'blue', 'unscheduled'],
+						[t("Scheduled"), 'events', 'orange', 'scheduled'],
+
+					]
+				})
+			});
+
+
+		}
+
 
 		this.sidePanel = new Ext.Panel({
 			width: dp(300),
@@ -82,31 +99,33 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 			items:[
 				this.filterPanel,
-				{
-					xtype: "fieldset",
-					items: [
-						{
-							hideLabel: true,
-							xtype: "checkbox",
-							boxLabel: t("Show completed"),
-							checked: showCompleted,
-							listeners: {
-								scope: this,
-								check: function(cb, checked) {
-									this.showCompleted(checked);
-									Ext.state.Manager.set(this.statePrefix + "show-completed", checked);
-									this.taskGrid.store.load();
-								}
-							}
-						}
-					]
-				},
 				this.tasklistsGrid,
 				this.categoriesGrid,
 				this.createFilterPanel(),
 
 			]
 		});
+		if(!this.support) {
+			this.sidePanel.items.insert(1, Ext.create({
+				xtype: "fieldset",
+				items: [
+					{
+						hideLabel: true,
+						xtype: "checkbox",
+						boxLabel: t("Show completed"),
+						checked: showCompleted,
+						listeners: {
+							scope: this,
+							check: function(cb, checked) {
+								this.showCompleted(checked);
+								Ext.state.Manager.set(this.statePrefix + "show-completed", checked);
+								this.taskGrid.store.load();
+							}
+						}
+					}
+				]
+			}));
+		}
 
 		this.centerPanel = new Ext.Panel({
 			layout:'responsive',
@@ -114,7 +133,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			region: "center",
 			listeners: {
 				afterlayout: (panel, layout) => {
-
 					this.sidePanelTbar.setVisible(layout.isNarrow());
 					this.showNavButton.setVisible(layout.isNarrow())
 				}
@@ -148,25 +166,33 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	runModule : function() {
 
 
+		if(this.support) {
+			// this.filterPanel.on("selectionchange", this.onProgressSelectionChange, this);
+		} else {
 
-		let statusFilter = Ext.state.Manager.get(this.statePrefix + "status-filter");
-		if(!statusFilter) {
-			statusFilter = 'today';
-		}
+			this.filterPanel.on("afterrender", () => {
 
-		this.filterPanel.on("afterrender", () => {
+				let index = this.filterPanel.store.find('inputValue', statusFilter);
+				if (index == -1) {
+					index = 0;
+				}
 
-			let index = this.filterPanel.store.find('inputValue', statusFilter);
-			if(index == -1) {
-				index = 0;
+				this.filterPanel.selectRange(index, index);
+
+			});
+			this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
+
+			this.showCompleted(Ext.state.Manager.get(this.statePrefix + "show-completed"));
+
+			let statusFilter = Ext.state.Manager.get(this.statePrefix + "status-filter");
+			if (!statusFilter) {
+				statusFilter = 'today';
 			}
 
-			this.filterPanel.selectRange(index,index);
+			this.setStatusFilter(statusFilter);
 
-		});
-		this.setStatusFilter(statusFilter);
-		this.showCompleted(Ext.state.Manager.get(this.statePrefix + "show-completed"));
-		this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
+		}
+
 
 		this.setDefaultSelection();
 
@@ -199,6 +225,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.setStatusFilter(rec.data.inputValue);
 		this.taskGrid.store.load();
 	},
+
+
 
 
 	setStatusFilter : function(inputValue) {
@@ -320,7 +348,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: this.support ? t('Support', "support", "business") : t('Tasklist')
+					text: t('Lists')
 				}, '->', {
 					xtype: "tbsearch"
 				},{

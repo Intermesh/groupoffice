@@ -15,7 +15,8 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	hideMenuButton: false,
 	filteredStore: null,
 	filterName: null,
-	selectFirst: true,
+	selectFirst: false,
+	saveSelection: false,
 	initComponent: function () {
 
 		const actions = this.initRowActions();
@@ -24,20 +25,31 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 
 		this.selModel = new Ext.grid.CheckboxSelectionModel();
 
-		const tbar = {
-			xtype: "container",
-			items: [
-				{
-					items: this.tbar,
-					xtype: 'toolbar'
-				},
-				this.selectAllToolbar = new Ext.Toolbar({
-					items: [{xtype: "selectallcheckbox", selectFirst: this.selectFirst}]
-				})
-			]
-		};
+		this.selectAllToolbar = new Ext.Toolbar({
+			items: [{
+				xtype: "selectallcheckbox",
+				selectFirst: this.selectFirst
+			}]
+		})
 
-		this.tbar = tbar;
+		if(this.tbar) {
+			const tbar = {
+				xtype: "container",
+				items: [
+					{
+						items: this.tbar,
+						xtype: 'toolbar'
+					},
+
+					this.selectAllToolbar
+				]
+			};
+
+			this.tbar = tbar;
+		} else
+		{
+			this.tbar = this.selectAllToolbar;
+		}
 
 		if(!this.columns) {
 			this.columns = [
@@ -60,6 +72,23 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 		this.store.on("load", this.onStoreLoad, this);
 		this.store.on("datachanged", this.onStoreDataChanged, this);
 		this.getSelectionModel().on('selectionchange', this.onSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
+
+		if(this.saveSelection) {
+
+			const state = Ext.state.Manager.get(this.stateId)
+
+			if(state) {
+				const ids = JSON.parse(state);
+				this.setDefaultSelection(ids);
+			}
+
+			if(this.store.getCount()) {
+				this.on("viewready", () => {
+					this.onStoreLoad(this.store);
+				})
+			}
+		}
+
 	},
 
 	setDefaultSelection : function(selectedListIds) {
@@ -78,7 +107,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 		this.selectAllToolbar.setVisible(this.store.getCount() > 1);
 	},
 
-	onStoreLoad: function(store, records, opts) {
+	onStoreLoad: function(store) {
 
 		//mark selected records in the filter as seleted in the selection model
 		const selected = [], selectedIds = this.getSelectedIds();
@@ -116,9 +145,14 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 			ids.push(r.id);
 		}, this);
 
+
 		this.filteredStore.setFilter(this.getId(), {[this.filterName]: ids});
 
 		this.fireEvent('selectionchange', ids, sm);
+
+		if(this.saveSelection) {
+			Ext.state.Manager.set(this.stateId, JSON.stringify(ids));
+		}
 
 		this.filteredStore.load();
 	},
