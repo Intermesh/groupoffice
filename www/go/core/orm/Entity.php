@@ -446,9 +446,9 @@ abstract class Entity extends Property {
 	 * Normalize a query value passed to delete()
 	 *
 	 * @param mixed $query
-	 * @return Query
+	 * @return \go\core\db\Query
 	 */
-	protected static function normalizeDeleteQuery($query): Query
+	protected static function normalizeDeleteQuery($query): \go\core\db\Query
 	{
 
 		if($query instanceof Entity) {
