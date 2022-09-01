@@ -27,6 +27,16 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			// this.composer.textField.syncSize();
 		}, this);
 
+		this.on("added", (cont) => {
+
+			cont.ownerCt.on("beforeload", (dv, id) => {
+				if(this.composer.textField.isDirty() && this.composer.textField.getValue() != "" && this.composer.textField.getValue() != "<br>") {
+					console.warn(this.composer.textField.getValue());
+					return confirm(t("You have an unsaved comment. Are you sure you want to discard the comment?"));
+				}
+			});
+		})
+
 
 		if(go.User.isAdmin && this.title) {
 			this.tools = [{			
@@ -132,6 +142,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		this.entity = type;
 		if(this.composer) {
 			this.composer.initEntity(this.entityId, this.entity, this.section);
+
+			this.composer.reset();
 		}
 		this.store.setFilter('entity', {
 			entity: this.entity,

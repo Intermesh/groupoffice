@@ -215,6 +215,10 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			return Promise.resolve(this.data);
 		}
 
+		if(this.fireEvent("beforeload", this, id) === false) {
+			return Promise.resolve(this.data);
+		}
+
 		this.currentId = id;
 		this.loading = this.entityStore.single(id).then((entity) => {
 			try {
