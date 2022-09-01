@@ -41,10 +41,13 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				'permissionLevel'
 			],
 			entityStore: "Task",
-			sortInfo: {
-				field: "start",
-				direction: "ASC"
-			}
+			sortInfo: this.support ? {
+					field: "modifiedAt",
+					direction: "DESC"
+				} : {
+					field: "start",
+					direction: "ASC"
+				}
 		});
 
 		this.checkColumn = new GO.grid.CheckColumn({

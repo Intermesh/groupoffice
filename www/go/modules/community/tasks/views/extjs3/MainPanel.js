@@ -215,7 +215,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.filterCategories(selectedListIds);
 
-		this.tasklistsGrid.setDefaultSelection(selectedListIds)
+		this.tasklistsGrid.setDefaultSelection(selectedListIds);
+
+		this.taskGrid.store.setFilter("role", selectedListIds.length == 0 ? {role:  !this.support ? go.modules.community.tasks.listTypes.List : go.modules.community.tasks.listTypes.Support} : null);
+
+
 		this.checkCreateTaskList();
 	},
 
@@ -516,55 +520,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					}
 
 				],
-			// bbar: new Ext.Toolbar({
-			// 	layout:'hbox',
-			// 	layoutConfig: {
-			// 		align: 'middle',
-			// 		defaultMargins: {left: dp(4), right: dp(4),bottom:0,top:0}
-			// 	},
-			// 	items:[this.taskNameTextField = new Ext.form.TextField({
-			// 		enableKeyEvents: true,
-			// 		emptyText: t("Add a task..."),
-			// 		flex:1,
-			// 		listeners: {
-			// 			specialkey: (field, e) => {
-			// 				// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
-			// 				// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
-			// 				if (e.getKey() == e.ENTER) {
-			// 					this.createTask();
-			// 				}
-			// 			}
-			// 		}
-			// 	}),
-			// 		this.taskDateField = new go.form.DateField({
-			// 			fieldLabel:t("Due date"),
-			// 			enableKeyEvents: true,
-			// 			listeners: {
-			// 				scope: this,
-			// 				keyup: function(field, e) {
-			// 					this.checkValues();
-			// 				},
-			// 				select: function(field,date) {
-			// 					this.checkValues();
-			// 				},
-			// 				specialkey: (field, e) => {
-			// 					// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
-			// 					// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
-			// 					if (e.getKey() == e.ENTER) {
-			// 						this.addTaskButton.handler.call(this);
-			// 					}
-			// 				}
-			// 			}
-			// 		}),
-			// 		this.addTaskButton = new Ext.Button({
-			// 			disabled: true,
-			// 			iconCls: 'ic-add',
-			// 			cls:'primary',
-			// 			handler: this.createTask,
-			// 			scope: this
-			// 		})
-			// 	]
-			// }),
+
 			listeners: {				
 				rowdblclick: this.onTaskGridDblClick,
 				scope: this,				
