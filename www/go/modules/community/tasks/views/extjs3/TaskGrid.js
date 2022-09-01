@@ -11,7 +11,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
 
 		this.store = new go.data.GroupingStore({
-			groupField: 'tasklist',
+			groupField: this.support ? false : 'tasklist',
 			remoteGroup:true,
 			remoteSort: true,
 			fields: [
@@ -54,6 +54,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			header: '',
 			width: dp(48),
 			resizable: false,
+			fixed: true,
 			hideable:false,
 			menuDisabled: true,
 			sortable:false,

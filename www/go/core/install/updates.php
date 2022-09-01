@@ -1234,3 +1234,6 @@ $updates['202207041200'][] = "drop index name on core_email_template;";
 
 $updates['202207041200'][] = "create unique index core_email_template_moduleId_key_uindex
     on core_email_template (moduleId, `key`);";
+
+
+$updates["202209010941"][] = "TRUNCATE TABLE go_state"; //for fixed non resizable columns getting 100px width
