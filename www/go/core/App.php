@@ -1025,7 +1025,7 @@ namespace go\core {
 		public function checkAcls()
 		{
 			//one legacy model that needs checking
-			$stmt = GO\Base\Model\Template::find(['ignoreAcl'=>true]);
+			$stmt = GO\Base\Model\Template::model()->find(['ignoreAcl'=>true]);
 			while($stmt->rowCount()) {
 				$stmt->callOnEach('checkAcl', true);
 			}
