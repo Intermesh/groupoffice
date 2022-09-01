@@ -4915,15 +4915,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		//fill in empty required attributes that have defaults
-		$defaults = $this->getDefaultAttributes();
-		foreach ($this->columns as $field => $attr) {
-			if ($attr['required'] && empty($this->$field) && isset($defaults[$field])) {
-				$this->$field = $defaults[$field];
-
-				echo "Setting default value " . $this->className() . ":" . $this->id . " $field=" . $defaults[$field] . "\n";
-
-			}
-		}
+//		$defaults = $this->getDefaultAttributes();
+//		foreach ($this->columns as $field => $attr) {
+//			if ($attr['required'] && empty($this->$field) && isset($defaults[$field])) {
+//				$this->$field = $defaults[$field];
+//
+//				echo "Setting default value " . $this->className() . ":" . $this->id . " $field=" . $defaults[$field] . "\n";
+//
+//			}
+//		}
 
 
 		if($this->isModified()) {
