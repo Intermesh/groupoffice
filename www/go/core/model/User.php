@@ -313,6 +313,9 @@ class User extends Entity {
 	{
 		if(empty($this->personalGroup)){
 			$this->personalGroup = Group::find()->where(['isUserGroupFor' => $this->id])->single();
+			if(!$this->personalGroup) {
+				$this->createPersonalGroup();
+			}
 		}
 
 		return $this->personalGroup;
@@ -774,7 +777,7 @@ class User extends Entity {
 				return false;
 			}
 		}
-		$this->createPersonalGroup();
+		$this->checkPersonalGroup();
 
 		if($this->isNew()) {
 			$this->legacyOnSave();	
@@ -896,20 +899,11 @@ class User extends Entity {
 	 * @throws SaveException
 	 * @throws Exception
 	 */
-	private function createPersonalGroup()
+	private function checkPersonalGroup()
 	{
 		if ($this->isNew() || $this->isModified(['groups', 'username'])) {
 			if ($this->isNew()) {// !in_array($this->getPersonalGroup()->id, $groupIds)) {
-				$personalGroup = new Group();
-				$personalGroup->name = $this->username;
-				$personalGroup->isUserGroupFor = $this->id;
-				$personalGroup->users[] = $this->id;
-
-				if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
-					throw new SaveException($personalGroup);
-				}
-
-				$this->personalGroup = $personalGroup;
+				$this->createPersonalGroup();
 			} else {
 				$personalGroup = $this->getPersonalGroup();
 				if ($this->isModified('username')) {
@@ -924,6 +918,19 @@ class User extends Entity {
 				$this->groups[] = $personalGroup->id;
 			}
 		}
+	}
+
+	private function createPersonalGroup() {
+		$personalGroup = new Group();
+		$personalGroup->name = $this->username;
+		$personalGroup->isUserGroupFor = $this->id;
+		$personalGroup->users[] = $this->id;
+
+		if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
+			throw new SaveException($personalGroup);
+		}
+
+		$this->personalGroup = $personalGroup;
 	}
 
 	private function appendNumberToGroupNameIfExists(Group $personalGroup): bool {
