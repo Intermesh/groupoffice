@@ -527,7 +527,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				go.Jmap.upload(file, {
 					success: function(response) {
 						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));
-						imgEl.setAttribute('style', 'max-width: 100%');
+						imgEl.setAttribute('style', `max-width: 100%;height:auto;aspect-ratio: ${loader.width} / ${loader.height};`);
 						me.fireEvent('attach', me, response.blobId, file, imgEl);
 					}
 				});
