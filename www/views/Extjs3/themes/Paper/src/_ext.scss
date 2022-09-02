@@ -1262,10 +1262,17 @@
 		border-bottom: 1px solid color($fg, 'line');
 		background-color: color($bg, 'background');
 	}
+
+	&-cell-first {
+		.x-grid3-cell-inner {
+			padding-left: dp(24);
+		}
+	}
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
 		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
-		padding: dp(6) dp(8) dp(6) dp(24); // 10 top = middle of row line-height 20dp
+		padding: dp(6) dp(8) dp(6) dp(12); // 10 top = middle of row line-height 20dp
+
 		.ux-row-action-cell & {
 			padding: 0;
 		}
