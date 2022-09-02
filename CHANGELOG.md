@@ -1,3 +1,5 @@
+- Core: Acl owner could be removed
+
 25-08-2022 6.6.114
 - Core: Fixed reload link on changes not showing all links
 - Holidays: Fixed bug in holiday calculator when agreement changed in the middle of a year
