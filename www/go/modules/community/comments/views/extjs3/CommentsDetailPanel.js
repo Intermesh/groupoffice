@@ -21,6 +21,24 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			this.store.destroy();
 		}, this);
 
+
+		this.on("render", () => {
+
+			this.body.dom.addEventListener("click", (e) => {
+				if(e.target.tagName == "IMG") {
+
+					const v = new GO.files.ImageViewer();
+
+					v.show([{
+						name: e.target.attributes.alt ? e.target.attributes.alt.value : e.target.attributes.src.value,
+						src: e.target.attributes.src.value
+					}]);
+
+
+				}
+			})
+		});
+
 		this.on("expand", function() {
 			this.updateView();
 
@@ -237,7 +255,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			if(r.data.attachments && r.data.attachments.length) {
 				let atts = "";
 				r.data.attachments.forEach(a => {
-					atts += `<a class="attachment" target="_blank" title="${a.name}" href="${go.Jmap.downloadUrl(a.blobId)}"><span class="filetype filetype-${a.name.substring(a.name.lastIndexOf(".") + 1)}"></span>${a.name}</a>`;
+					atts += `<a class="attachment" target="_blank" title="${a.name}" href="${go.Jmap.downloadUrl(a.blobId, true)}"><span class="filetype filetype-${a.name.substring(a.name.lastIndexOf(".") + 1)}"></span>${a.name}</a>`;
 				})
 				readMore.insert(2, {xtype: 'box', html: atts, cls: "attachments"});
 			}

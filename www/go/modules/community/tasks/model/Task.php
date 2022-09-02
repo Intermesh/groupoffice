@@ -755,7 +755,7 @@ class Task extends AclInheritEntity {
 
 		if($comment->createdBy != $this->responsibleUserId && $this->progress != Progress::NeedsAction) {
 			$this->progress = Progress::NeedsAction;
-		} else if($this->progress = Progress::NeedsAction && $comment->createdBy == $this->responsibleUserId) {
+		} else if($this->progress == Progress::NeedsAction && $comment->createdBy == $this->responsibleUserId) {
 			$this->progress = Progress::InProcess;
 		}
 
