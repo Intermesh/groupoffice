@@ -59,8 +59,8 @@ class Message extends \Swift_Message {
 	 * @param Blob $blob
 	 * @return static
 	 */
-	public function addBlob(Blob $blob) {
-		$this->attach(Attachment::fromBlob($blob)->setFilename($blob->name));
+	public function addBlob(Blob $blob, $name = null) {
+		$this->attach(Attachment::fromBlob($blob)->setFilename($name ?? $blob->name));
 		return $this;
 	}
 
