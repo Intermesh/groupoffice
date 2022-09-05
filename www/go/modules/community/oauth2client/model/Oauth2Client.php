@@ -73,7 +73,8 @@ final class Oauth2Client extends Entity
 				// https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
 				$prvVendorName = 'TheNetworg';
 				$params['tenant'] = $this->projectId;
-				$params['scopes'] = ['openid', 'profile', 'offline_access', 'email','https://outlook.office.com/IMAP.AccessAsUser.All', 'https://outlook.office.com/SMTP.Send'];
+				$params['scopes'] = ['openid', 'profile', 'offline_access', 'email','https://ps.outlook.com/IMAP.AccessAsApp'];//, 'https://outlook.office.com/Mail.Send', ''];
+				$params['defaultEndPointVersion'] = '2,0';
 				break;
 			default:
 				throw new NotFound('Default client ' . $defaultClient->name . ' not supported');
