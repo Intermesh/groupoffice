@@ -637,13 +637,19 @@ class Contact extends AclItemEntity {
 											}
 
 											$date = $value->format(Column::DATE_FORMAT);
+											$now = new DateTime();
+											$year = $now->format("Y");
+											$nowStr = $now->format(Column::DATE_FORMAT);
 
-											$query->select("IF (STR_TO_DATE(CONCAT(YEAR('$date'), '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') >= '$date', "
-												."STR_TO_DATE(CONCAT(YEAR('$date'), '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') , "
-												."STR_TO_DATE(CONCAT(YEAR('$date') + 1,'/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e')) as upcomingBirthday", true);
+											$query->select("IF (STR_TO_DATE(CONCAT('$year', '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') >= '$nowStr', "
+												."STR_TO_DATE(CONCAT('$year', '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') , "
+												."STR_TO_DATE(CONCAT('$year' + 1,'/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e')) as upcomingBirthday", true);
 
 											$query->having('upcomingBirthday '. $comparator .' "' . $date . '"');
 											$query->orderBy(['upcomingBirthday' => 'ASC']);
+
+											// normal count query will fail with the above select overwritten with count(*)
+											$query->calcFoundRows();
 
 										})->add('userGroupId', function(Criteria $criteria, $value, Query $query) {
 											$query->join('core_user_group', 'ug', 'ug.userId = c.goUserId');

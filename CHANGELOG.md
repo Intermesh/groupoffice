@@ -1,3 +1,8 @@
+- Core: Acl owner could be removed
+- Address book: fixed upcoming birthday filter
+- Projects: Some tabs were falsely active when there was no project ID yet
+- Core / Comments: Loading and save masks in entity form panel
+
 25-08-2022 6.6.114
 - Core: Fixed reload link on changes not showing all links
 - Holidays: Fixed bug in holiday calculator when agreement changed in the middle of a year
