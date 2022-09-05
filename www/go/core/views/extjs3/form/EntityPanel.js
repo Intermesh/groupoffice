@@ -45,6 +45,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	load: function (id, callback, scope) {
 		this.currentId = id;
 
+		this.getEl().mask(t("Loading..."));
+
 		this.entityStore.single(id).then((entity) => {
 			this.entity = entity;
 
@@ -57,7 +59,9 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			if(callback) {
 				callback.call(scope || me, entity);
 			}
-		});
+		}).finally(() => {
+			this.getEl().unmask();
+		})
 	},
 	
 	getValues : function (dirtyOnly) {
@@ -136,7 +140,10 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		this.submitting = true;
 
 		this.fireEvent('beforesubmit', this, values);
-		
+
+		this.getEl().mask(t("Saving..."));
+
+
 		return me.entityStore.set(params).then(function(response) {
 
 			var saved = (params.create ? response.created : response.updated) || {};
@@ -201,6 +208,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			return Promise.reject(error);
 		}).finally(function() {
 			me.submitting = false;
+
+			me.getEl().unmask();
 		})
 
 	},
