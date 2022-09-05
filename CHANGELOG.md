@@ -1,5 +1,6 @@
 05-09-2022 6.6.115
 - Core: Acl owner could be removed
+- Core: Better handling of permissions when end user edits fieldsets
 - Address book: fixed upcoming birthday filter
 - Projects: Some tabs were falsely active when there was no project ID yet
 - Core / Comments: Loading and save masks in entity form panel

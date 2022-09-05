@@ -40,10 +40,11 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				'databaseName',
 				'type',
 				'fieldId',
-				'fieldSetId',				
+				'fieldSetId',
 				{name: 'isFieldSet', type: "boolean"},
 				{name: 'sortOrder', type: "int"},
-				"aclId"
+				"aclId",
+				'permissionLevel'
 			]
 		});
 
@@ -57,12 +58,12 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 		var types = go.customfields.CustomFields.getTypes();
 		Ext.apply(this, {
-			//plugins: [actions],
 			tbar: [
 				"->",
 				{
 					iconCls: 'ic-cloud-upload',
 					tooltip: t('Import fieldsets from JSON-file'),
+					disabled: !go.User.isAdmin,
 					handler: function() {
 						go.util.openFileDialog({
 							multiple: false,
@@ -98,6 +99,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				}, {
 					iconCls: 'ic-cloud-download',
 					tooltip: t('Export fieldsets to JSON-file'),
+					disabled: !go.User.isAdmin,
 					handler: function() {
 						var dlg = new go.customfields.ExportDialog();
 						dlg.setEntity(this.entity);
@@ -108,6 +110,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					iconCls: 'ic-add',
 					cls: "primary",
 					text: t('Add field set'),
+					disabled: !go.User.isAdmin,
 					handler: function (e, toolEl) {
 						var dlg = this.createFieldSetDialog();
 						dlg.setValues({entity: this.entity});
@@ -184,9 +187,6 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					}
 				}
 			}
-			// config options for stateful behavior
-//			stateful: true,
-//			stateId: 'apikeys-grid'
 		});
 
 		go.customfields.SystemSettingsPanel.superclass.initComponent.call(this);
@@ -358,14 +358,11 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			return false;
 		}
 
-//		if(isField && overRecord.data.isFieldSet) {
-//			return false;
-//		}
-
 		return true;
 	},
 
 	showMoreMenu: function (record, e) {
+		const permLvl = record.data.permissionLevel;
 		if (!this.moreMenu) {
 			this.moreMenu = new Ext.menu.Menu({
 				items: [
@@ -373,6 +370,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 						itemId: "edit",
 						iconCls: 'ic-edit',
 						text: t("Edit"),
+						disabled: permLvl < go.permissionLevels.write,
 						handler: function () {
 							this.edit(this.moreMenu.record);
 						},
@@ -381,6 +379,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 						itemId: "delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),
+						disabled: permLvl < go.permissionLevels.writeAndDelete,
 						handler: function () {
 							this.getSelectionModel().selectRecords([this.moreMenu.record]);
 							this.deleteSelected();
@@ -497,7 +496,6 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 			go.Db.store("FieldSet").get(response.ids, function (fieldSets) {
 				fieldSetsLoaded = true;
-
 				var storeData = [], lastSortOrder = -1;
 				fieldSets.forEach(function (fs) {
 					fs.sortOrder = lastSortOrder + 1;
@@ -510,7 +508,8 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 						fs.id,
 						true,
 						fs.sortOrder * 100000,
-						fs.aclId
+						fs.aclId,
+						fs.permissionLevel
 					]);
 
 					fsSortOrderMap[fs.id] = fs.sortOrder * 100000;
@@ -545,8 +544,6 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					this.store.loadData(storeData, true);
 
 					this.store.multiSort([
-//						//{field: 'fieldSetId', direction: 'ASC'},
-//						{field: 'isFieldSet', direction: 'DESC'},
 						{field: 'sortOrder', direction: 'ASC'}
 					]);
 					this.loading = false;
