@@ -1,3 +1,4 @@
+05-09-2022 6.6.115
 - Core: Acl owner could be removed
 - Address book: fixed upcoming birthday filter
 - Projects: Some tabs were falsely active when there was no project ID yet
