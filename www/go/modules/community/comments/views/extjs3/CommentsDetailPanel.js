@@ -14,8 +14,20 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	titleCollapse: true,
 	bodyCssClass: 'comments-container',
 	autoHeight: true,
+	large: false,
 	stateId: "comments-detail",
 	initComponent: function () {
+
+
+		this.buttons = [this.scrollToTopButton = new Ext.Button({
+			xtype: "button",
+			iconCls: "ic-arrow-circle-up",
+			text: t("Scroll to top"),
+			scope: this,
+			handler: function() {
+				this.ownerCt.body.scrollTo("top");
+			}
+		})]
 
 		this.on('destroy', function() {
 			this.store.destroy();
@@ -136,9 +148,14 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		this.items = [
 			this.commentsContainer = new cntrClass({
 				region:'center',
-				autoScroll:true
+				autoScroll:true,
+				scope: this,
+
 			})
 		];
+
+
+
 		if(this.showComposer) {
 			this.items.push(this.composer = new go.modules.comments.Composer({
 				margins: {left: dp(8), right: dp(8),bottom:dp(8),top:0},
@@ -168,6 +185,10 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			entityId: this.entityId,
 			section: this.section
 		});
+
+		if(this.large) {
+			this.commentsContainer.el.dom.style.maxHeight = (document.body.offsetHeight * 0.7) + "px";
+		}
 		
 		this.store.load();
 	},
@@ -320,7 +341,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		var dom = this.commentsContainer.getEl().dom;
 		dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
 
-		this.composer.getEl().scrollIntoView(this.ownerCt.body);
+		if(this.large) {
+			this.scrollToTopButton.getEl().scrollIntoView(this.ownerCt.body);
+		}
 
 		//console.log(scroll.dom.scrollTop, scroll.dom.scrollHeight, this.initScrollHeight, this.initScrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
 		//scroll.scroll("b", scroll.dom.scrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));

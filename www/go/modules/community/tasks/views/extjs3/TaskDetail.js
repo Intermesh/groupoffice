@@ -128,7 +128,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 		go.modules.community.tasks.TaskDetail.superclass.initComponent.call(this);
 		this.addCustomFields();
-		this.addComments();
+		this.addComments(this.support);
 		this.addLinks();
 		this.addFiles();
 		this.addHistory();
@@ -160,7 +160,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		var items = this.tbar || [];
 
 		items = items.concat([
-			new go.detail.ScrollToToButton(),
+			// new go.detail.ScrollToToButton(),
 
 			this.assignMeBtn = new Ext.Button({
 				text: t("Assign me"),

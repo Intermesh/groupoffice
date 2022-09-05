@@ -248,9 +248,11 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		return this.add(new go.links.getDetailPanels(sortFn));
 	},
 
-	addComments : function() {
+	addComments : function(large) {
 		if (go.Modules.isAvailable("community", "comments")) {
-			this.add(new go.modules.comments.CommentsDetailPanel());
+			this.add(new go.modules.comments.CommentsDetailPanel({
+				large: large
+			}));
 		}
 	},
 	addFiles : function() {

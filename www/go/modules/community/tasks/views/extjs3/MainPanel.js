@@ -33,7 +33,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				hidden: true,
 				iconCls: "ic-arrow-back",
 				handler: function () {
-					go.Router.goto("tasks");
+					go.Router.goto(this.support ? "support" : "tasks");
 				},
 				scope: this
 			})]
