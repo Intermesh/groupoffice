@@ -473,7 +473,9 @@ namespace go\core {
 		 * @noinspection PhpUnused
 		 */
 		private function initTCPDF() {
+
 			define("K_PATH_CACHE", $this->config['tmpdir'] . "/");
+
 //			define("K_PATH_FONTS",go()->getDataFolder()->getFolder("tcpdf/fonts")->getPath() . "/");
 		}
 

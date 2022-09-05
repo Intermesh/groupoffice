@@ -80,6 +80,29 @@ class PdfTemplateRenderer extends PdfRenderer {
 				$this->tplIdx[$i] = $this->importPage($i);
 			}
 		}
+
+		$this->allowLocalFiles = true;
+
+		$logo = $this->template->getLogo();
+		if($logo) {
+			$this->parser->addModel("logo", "file://" . $logo->getFile()->getPath());
+		}
+
+	}
+
+	/**
+	 * <tcpdf method="logo"></tcpdf>
+	 * @return void
+	 */
+	protected function logo() {
+		$blob = $this->template->getLogo();
+		if(!$blob) {
+			return;
+		}
+
+		$img = $this->Image($blob->getFile()->getPath());
+
+		$b = $this->getImageBuffer($img);
 	}
 
 	/**

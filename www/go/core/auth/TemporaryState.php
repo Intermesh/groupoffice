@@ -85,7 +85,7 @@ class TemporaryState extends AbstractState {
 
 	protected function getBaseUrl(): string
 	{
-		return go()->getSettings()->URL . 'api/';
+		return go()->getSettings()->URL . 'api';
 	}
 }
 

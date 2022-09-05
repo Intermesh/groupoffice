@@ -64,6 +64,12 @@ class PdfTemplate extends Entity {
 	protected $stationaryBlobId;
 
 	/**
+	 *
+	 * @var string
+	 */
+	protected $logoBlobId;
+
+	/**
 	 * 
 	 * @var double
 	 */							
@@ -169,6 +175,28 @@ class PdfTemplate extends Entity {
 		} else{
 			$blob = (array) $blob;
 			$this->stationaryBlobId = $blob['id'];
+		}
+	}
+
+	/**
+	 * Get stationary PDF blob
+	 *
+	 * @return Blob
+	 * @throws \Exception
+	 */
+	public function getLogo() {
+		if(!empty($this->logoBlobId)){
+			return Blob::findById($this->logoBlobId);
+		}
+		return null;
+	}
+
+	public function setLogo($blob) {
+		if(!$blob) {
+			$this->logoBlobId = NULL;
+		} else{
+			$blob = (array) $blob;
+			$this->logoBlobId = $blob['id'];
 		}
 	}
 }

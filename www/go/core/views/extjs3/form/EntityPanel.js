@@ -207,7 +207,10 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 			return Promise.reject(error);
 		}).finally(function() {
-			me.submitting = false;
+
+			setTimeout(() => {
+				me.submitting = false;
+			});
 
 			me.getEl().unmask();
 		})

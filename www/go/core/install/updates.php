@@ -1237,3 +1237,11 @@ $updates['202207041200'][] = "create unique index core_email_template_moduleId_k
 
 
 $updates["202209010941"][] = "TRUNCATE TABLE go_state"; //for fixed non resizable columns getting 100px width
+
+
+$updates["202209051226"][] = "alter table core_pdf_template
+    add logoBlobId binary(40) null after stationaryBlobId;";
+
+$updates["202209051226"][] = "alter table core_pdf_template
+    add constraint core_pdf_template_core_blob_id_fk
+        foreign key (logoBlobId) references core_blob (id);";

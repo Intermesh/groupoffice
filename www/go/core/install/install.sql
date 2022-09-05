@@ -1028,31 +1028,46 @@ CREATE TABLE `core_pdf_block` (
   `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `core_pdf_template` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `moduleId` int(11) NOT NULL,
-  `key` varchar(20) default null,
-  `language` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `stationaryBlobId` binary(40) DEFAULT NULL,
-  `landscape` tinyint(1) NOT NULL DEFAULT 0,
-  `pageSize` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'A4',
-  `measureUnit` enum('mm','pt','cm','in') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mm',
-  `marginTop` decimal(19,4) NOT NULL DEFAULT 10.0000,
-  `marginRight` decimal(19,4) NOT NULL DEFAULT 10.0000,
-  `marginBottom` decimal(19,4) NOT NULL DEFAULT 10.0000,
-  `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+create table core_pdf_template
+(
+    id               bigint unsigned auto_increment
+        primary key,
+    moduleId         int                                           not null,
+    `key`            varchar(20) collate ascii_bin                 null,
+    language         varchar(20)                   default 'en'    not null,
+    name             varchar(50)                                   not null,
+    stationaryBlobId binary(40)                                    null,
+    logoBlobId       binary(40)                                    null,
+    landscape        tinyint(1)                    default 0       not null,
+    pageSize         varchar(20)                   default 'A4'    not null,
+    measureUnit      enum ('mm', 'pt', 'cm', 'in') default 'mm'    not null,
+    marginTop        decimal(19, 4)                default 10.0000 not null,
+    marginRight      decimal(19, 4)                default 10.0000 not null,
+    marginBottom     decimal(19, 4)                default 10.0000 not null,
+    marginLeft       decimal(19, 4)                default 10.0000 not null,
+    constraint core_pdf_template_core_blob_id_fk
+        foreign key (logoBlobId) references core_blob (id),
+    constraint core_pdf_template_ibfk_1
+        foreign key (moduleId) references core_module (id)
+            on delete cascade,
+    constraint core_pdf_template_ibfk_2
+        foreign key (stationaryBlobId) references core_blob (id)
+);
+
+create index moduleId
+    on core_pdf_template (moduleId);
+
+create index stationaryBlobId
+    on core_pdf_template (stationaryBlobId);
+
+
 
 
 ALTER TABLE `core_pdf_block`
   ADD PRIMARY KEY `id` (`id`),
   ADD KEY `pdfTemplateId` (`pdfTemplateId`);
 
-ALTER TABLE `core_pdf_template`
-  ADD PRIMARY KEY `id` (`id`),
-  ADD KEY `moduleId` (`moduleId`),
-  ADD KEY `stationaryBlobId` (`stationaryBlobId`);
+
 
 
 ALTER TABLE `core_pdf_block`
@@ -1064,11 +1079,6 @@ ALTER TABLE `core_pdf_template`
 
 ALTER TABLE `core_pdf_block`
   ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `core_pdf_template`
-  ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);
-
 
 ALTER TABLE `core_search` ADD  FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 

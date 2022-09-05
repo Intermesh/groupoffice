@@ -6,6 +6,8 @@ use go\core\fs\Folder;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use TCPDF_FONTS;
 
+require_once(__DIR__ . '/tcpdf_config.php');
+
 /**
  * PDF renderer
  */

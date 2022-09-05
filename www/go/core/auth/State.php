@@ -64,7 +64,8 @@ abstract class State {
 
 	public function getDownloadUrl($blobId): string
 	{
-		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
+//		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
+		return "/api/download.php?blob=".$blobId;
 	}
 
 	/**
