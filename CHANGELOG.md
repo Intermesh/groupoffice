@@ -1,4 +1,5 @@
 - Core: Acl owner could be removed
+- Address book: fixed upcoming birthday filter
 
 25-08-2022 6.6.114
 - Core: Fixed reload link on changes not showing all links
