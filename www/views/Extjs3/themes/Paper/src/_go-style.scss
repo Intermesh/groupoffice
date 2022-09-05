@@ -2085,7 +2085,7 @@ table[id^="comments-ext"] b {
 .comments-container {
 	min-height: dp(150);
 	> div {
-		max-height: dp(744);
+		//max-height: dp(744);
 		min-height: dp(32);
 	}
 }

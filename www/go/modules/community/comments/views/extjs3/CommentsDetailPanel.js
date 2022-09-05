@@ -320,6 +320,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		var dom = this.commentsContainer.getEl().dom;
 		dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
 
+		this.composer.getEl().scrollIntoView(this.ownerCt.body);
+
 		//console.log(scroll.dom.scrollTop, scroll.dom.scrollHeight, this.initScrollHeight, this.initScrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
 		//scroll.scroll("b", scroll.dom.scrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
 	}

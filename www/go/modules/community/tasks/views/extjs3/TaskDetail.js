@@ -160,6 +160,8 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		var items = this.tbar || [];
 
 		items = items.concat([
+			new go.detail.ScrollToToButton(),
+
 			this.assignMeBtn = new Ext.Button({
 				text: t("Assign me"),
 				scope: this,
@@ -185,6 +187,8 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			new go.detail.addButton({
 				detailView: this
 			}),
+
+
 
 			this.moreMenu = {
 				iconCls: 'ic-more-vert',
@@ -216,7 +220,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 						scope: this
 					})
 				]
-			}]);
+			}
+
+
+		]);
 		
 		if(go.Modules.isAvailable("legacy", "files")) {
 			this.moreMenu.menu.splice(1,0,{

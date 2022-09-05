@@ -122,6 +122,7 @@ User.js
 String.js
 
 detail/Panel.js
+detail/ScrollToTopButton.js
 detail/ReadMore.js
 detail/AddButton.js
 detail/PropertyList.js
