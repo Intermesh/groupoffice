@@ -279,12 +279,19 @@ class Task extends AclInheritEntity {
 	{
 		$keywords = [$this->title, $this->description];
 		if($this->responsibleUserId) {
-			$rUser = User::findById($this->responsibleUserId);
+			$rUser = UserDisplay::findById($this->responsibleUserId);
 			$keywords[] = $rUser->displayName;
 		}
 		if($this->tasklistId) {
 			$tasklist = TaskList::findById($this->tasklistId);
 			$keywords[] = $tasklist->name;
+		}
+
+		if($this->createdBy) {
+			$creator = UserDisplay::findById($this->createdBy);
+			if($creator) {
+				$keywords[] = $rUser->displayName;
+			}
 		}
 		return $keywords;
 	}
