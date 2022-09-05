@@ -290,7 +290,7 @@ class Task extends AclInheritEntity {
 		if($this->createdBy) {
 			$creator = UserDisplay::findById($this->createdBy);
 			if($creator) {
-				$keywords[] = $rUser->displayName;
+				$keywords[] = $creator->displayName;
 			}
 		}
 		return $keywords;
