@@ -7,6 +7,8 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	relations: ["tasklist", "responsible", 'categories'],
 	cls: "go-detail-view tasks-task",
 
+	support: false,
+
 	initComponent: function () {
 
 
@@ -106,17 +108,22 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 						});
 					}
 				}
-			}],
+			}]
 
-			buttons: [{
+
+		});
+
+
+		if(!this.support) {
+			this.buttons = [{
 				iconCls: 'ic-forward',
 				text:t("Continue task", "tasks"),
 				handler:() => {
 					const continueTaskDialog = new go.modules.community.tasks.ContinueTaskDialog();
 					continueTaskDialog.load(this.currentId).show();
 				}
-			}]
-		});
+			}];
+		}
 		
 
 		go.modules.community.tasks.TaskDetail.superclass.initComponent.call(this);

@@ -24,6 +24,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.createCategoriesGrid();
 
 		this.taskDetail = new go.modules.community.tasks.TaskDetail({
+			support: this.support,
 			region: 'east',
 			split: true,
 			stateId: this.statePrefix  + '-task-detail',
