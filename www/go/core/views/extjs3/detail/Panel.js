@@ -205,6 +205,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 	load: function (id) {
 
+		id = parseInt(id);
+
 		if(this.loading) {
 			return this.loading.then(() => {
 				return this.load(id);
