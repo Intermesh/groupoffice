@@ -141,7 +141,6 @@ go.Modules.register("community", "tasks", {
 			const alert = alertConfig.alert;
 			if(alert.entity == "Task" && alert.tag == "assigned") {
 
-
 				//replace panel promise
 				alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
 					return go.Db.store("User").single(alert.data.assignedBy).then((assigner) =>{
@@ -149,7 +148,6 @@ go.Modules.register("community", "tasks", {
 						panelCfg.notificationBody = panelCfg.html;
 						return panelCfg;
 					});
-
 				});
 			}
 		});

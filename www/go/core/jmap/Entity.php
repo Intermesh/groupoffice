@@ -763,7 +763,8 @@ abstract class Entity  extends OrmEntity {
 	 * Typically, you set a tag and data. Previous alerts with the same tag and model will be replaced with this one.
 	 * If you don't use a tag it won't replace anything.
 	 *
-	 * It's up to the client to display the data in a human friendly way.
+	 * It's up to the client to display the data in a human friendly way. See
+	 * www/go/modules/community/tasks/views/extjs3/Module.js for an example in the initModule() function
 	 *
 	 * @example
 	 * ```
