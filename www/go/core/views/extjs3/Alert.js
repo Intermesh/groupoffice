@@ -47,15 +47,6 @@
 		show : function(alert) {
 			const now = new Date(), id = 'core-alert-' + (alert.tag ||  "none") + "-" + alert.id;
 
-			// if(new Date(alert.triggerAt) > now) {
-			// 	go.Notifier.removeById(id);
-			// 	return;
-			// }
-			//
-			// if(go.Notifier.removeById(id)) {
-			// 	return;
-			// }
-
 			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
 
 				const iconCls = go.Entities.getLinkIcon(alert.entity);
@@ -63,8 +54,6 @@
 				const c = {
 					statusIcon: 'reminder',
 					itemId: id,
-					title: alert.title,
-					items: [{html: alert.body}],
 					iconCls: iconCls,
 					buttonAlign: "right",
 					listeners: {
@@ -79,6 +68,7 @@
 					buttons: [{
 						text: t("Open"),
 						handler: (btn) => {
+							go.Notifier.hideNotifications();
 							btn.findParentByType("panel").handler();
 						}
 					}, {
@@ -98,12 +88,6 @@
 					}))
 				}
 
-
-				if(!c.notificationBody) {
-					c.notificationBody =  go.util.htmlToText(alert.body);
-				//	console.warn(c.notificationBody);
-				}
-
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
 
 				//Modules can use this to cancel or modify the alert
@@ -111,9 +95,30 @@
 					return;
 				}
 
-
-
 				alertConfig.panelPromise.then((panelCfg) => {
+
+					if(!panelCfg.title) {
+						//default title
+						panelCfg.title = entity.name || entity.title || entity.description || alert.entity;
+					}
+
+					if(!panelCfg.items && !panelCfg.html) {
+
+						//default alert body
+						let body = go.util.Format.dateTime(alert.triggerAt);
+						if(alert.data) {
+							body += "<br />" + JSON.stringify(alert.data, undefined, 1);
+						}
+						panelCfg.html = body;
+					}
+
+					if(!("notificationBody" in c)) {
+						c.notificationBody =  go.util.Format.dateTime(alert.triggerAt);
+
+						if(alert.data) {
+							c.notificationBody += ": " + JSON.stringify(alert.data, undefined, 1);
+						}
+					}
 
 					go.Notifier.msg(panelCfg);
 				});

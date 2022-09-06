@@ -137,22 +137,22 @@ go.Modules.register("community", "tasks", {
 
 	}],
 	initModule: function () {
-		// go.Alerts.on("beforeshow", function(alerts, alertConfig) {
-		// 	const alert = alertConfig.alert;
-		// 	if(alert.entity == "Task" && alert.data && alert.data.type == "assigned") {
-		//
-		//
-		// 		//replace panel promise
-		// 		alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
-		// 			return go.Db.store("User").single(alert.data.assignedBy).then((assigner) =>{
-		// 				panelCfg.html += ": " + t("You were assigned to this task by {assignedBy}").replace("{assignedBy}", assigner.displayName);
-		// 				panelCfg.notificationBody = panelCfg.html;
-		// 				return panelCfg;
-		// 			});
-		//
-		// 		});
-		// 	}
-		// });
+		go.Alerts.on("beforeshow", function(alerts, alertConfig) {
+			const alert = alertConfig.alert;
+			if(alert.entity == "Task" && alert.tag == "assigned") {
+
+
+				//replace panel promise
+				alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
+					return go.Db.store("User").single(alert.data.assignedBy).then((assigner) =>{
+						panelCfg.items = [{html: go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.displayName) }];
+						panelCfg.notificationBody = panelCfg.html;
+						return panelCfg;
+					});
+
+				});
+			}
+		});
 	},
 
 

@@ -54,8 +54,10 @@
 				if(me.notificationsVisible()) {
 					return; // it will hide on any click outside the panel
 				}
-				me.showNotifications();
-				e.stopPropagation();
+
+				setTimeout(() => {
+					me.showNotifications();
+				});
 
 			}, this);
 
@@ -237,7 +239,9 @@
 			this.notifications.doLayout();
 
 			if(openNotifications) {
-				this.showNotifications();
+				// this.showNotifications();
+				this.flyout(msg);
+
 			}
 
 			this.updateStatusIcons();
@@ -253,6 +257,12 @@
 			}
 
 			delete this._messages[msg.itemId];
+
+			if(msg.replaced) {
+				//just an update of an existing message
+				return;
+			}
+
 			this.updateStatusIcons();
 
 			if(!this.hasMessages()) {
@@ -442,19 +452,29 @@
 				this.messageCt = Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true);
 			}
 			msg.renderTo = this.messageCt;
-			msg.html = msg.description; // backward compat
-			var msgCtr = new Ext.Panel(msg);
+			if(!msg.html && !msg.items) {
+				msg.html = msg.description; // backward compat
+			}
+			var msgCtr = new Ext.create(msg, "panel");
 
 			var me = this;
 			if (msg.time) {
 				setTimeout(function () {
-					me.remove(msgCtr);
+					// prevent destroy event dismissing alert
+					msgCtr.replaced = true;
+					msgCtr.destroy();
 				}, msg.time);
 			}
 			if(!msg.persistent) {
-				msgCtr.el.on('click', function () {
-					me.remove(msgCtr);
-				});
+				// msgCtr.el.on('click', function () {
+				// 	me.remove(msgCtr);
+				// });
+
+				Ext.getBody().on("click", function() {
+					// prevent destroy event dismissing alert
+					msgCtr.replaced = true;
+					msgCtr.destroy();
+				}, this, {single: true});
 			}
 
 			return msgCtr;

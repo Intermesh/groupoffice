@@ -5656,29 +5656,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	}
 
-	public function alertProps(Alert $alert) {
-
-		$body = null;
-		$title = null;
-
-		if ($alert->tag == "comment") {
-			// hack for comments
-			$data = $alert->getData();
-			$creator = UserDisplay::findById($data->createdBy, ['displayName']);
-			$body = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ":<br /><br />\n\n<i>" . $alert->getData()->excerpt . "</i>";
-		}
-		if(!isset($body)) {
-			$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
-			$body = $alert->triggerAt->toUserFormat(true, $user);
-		}
-
-		if(!isset($title)) {
-			$title = $alert->findEntity()->title() ?? null;
-		}
-
-		return ['title' => $title, 'body' => $body];
-	}
-
 
 	/**
 	 * For compatibility with template field to lookup a project for example

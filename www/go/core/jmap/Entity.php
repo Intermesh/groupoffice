@@ -758,7 +758,27 @@ abstract class Entity  extends OrmEntity {
 	}
 
 	/**
-	 * Create an alert for this entity
+	 * Create an alert for this entity.
+	 *
+	 * Typically, you set a tag and data. Previous alerts with the same tag and model will be replaced with this one.
+	 * If you don't use a tag it won't replace anything.
+	 *
+	 * It's up to the client to display the data in a human friendly way.
+	 *
+	 * @example
+	 * ```
+	 * $alert = $task->createAlert(new \DateTime(), 'assigned', $this->responsibleUserId)
+	 *  ->setData([
+	 *    'assignedBy' => go()->getAuthState()->getUserId()
+	 *  ]);
+	 *
+	 * if (!$alert->save()) {
+	 *  throw new SaveException($alert);
+	 * }
+	 * ```
+	 *
+	 *
+	 *
 	 *
 	 * @param DateTimeInterface $triggerAt
 	 * @param ?string $tag A unique tag for this entity and user. It will replace existing ones.
@@ -806,39 +826,6 @@ abstract class Entity  extends OrmEntity {
 	 */
 	public static function dismissAlerts(array $alerts) {
 
-	}
-
-
-	public function alertTitle(Alert $alert) {
-
-	}
-
-	const EVENT_ALERT_PROPS = 'alertprops';
-
-	public function alertProps(Alert $alert): array
-	{
-
-		$body = null;
-		$title = null;
-
-		$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
-		go()->getLanguage()->setLanguage($user->language);
-
-		self::fireEvent(self::EVENT_ALERT_PROPS, $this, $alert, ['title' => &$title, 'body' => &$body]);
-
-		if(!isset($body)) {
-
-			$body = $alert->triggerAt->toUserFormat(true, $user);
-		}
-
-		if(!isset($title)) {
-			$title = $alert->findEntity()->title() ?? null;
-		}
-
-
-		go()->getLanguage()->setLanguage(go()->getAuthState()->getUser(['language'])->language);
-
-		return ['title' => $title, 'body' => $body];
 	}
 
 

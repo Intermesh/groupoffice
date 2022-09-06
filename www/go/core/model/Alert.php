@@ -20,6 +20,11 @@ use go\modules\community\comments\model\Comment;
 use JsonException;
 use stdClass;
 
+/**
+ * Alert model
+ *
+ * {@see Entity::createAlert()}
+ */
 class Alert extends SingleOwnerEntity
 {
 	public static $enabled = true;
@@ -205,40 +210,40 @@ class Alert extends SingleOwnerEntity
 		return parent::internalDelete($query);
 	}
 
-	private $props;
+//	private $props;
 
-	/**
-	 * @throws AccessDenied
-	 * @throws JsonException
-	 */
-	private function getProps(): array
-	{
-		if(!isset($this->props)) {
-
-			$data = $this->getData();
-
-			if(!empty($data->title) && !empty($data->body)) {
-				$this->props = ['title' => $data->title, 'body' => $data->body];
-			} else {
-
-				$e = $this->findEntity();
-				if (!$e) {
-					$this->props = ['title' => null, 'body' => null];
-				} else {
-					$this->props = $e->alertProps($this);
-				}
-			}
-		}
-
-		return $this->props;
-	}
-
-	public function getTitle() {
-		return $this->getProps()['title'];
-	}
-
-	public function getBody() {
-		return $this->getProps()['body'];
-	}
+//	/**
+//	 * @throws AccessDenied
+//	 * @throws JsonException
+//	 */
+//	private function getProps(): array
+//	{
+//		if(!isset($this->props)) {
+//
+//			$data = $this->getData();
+//
+//			if(!empty($data->title) && !empty($data->body)) {
+//				$this->props = ['title' => $data->title, 'body' => $data->body];
+//			} else {
+//
+//				$e = $this->findEntity();
+//				if (!$e) {
+//					$this->props = ['title' => null, 'body' => null];
+//				} else {
+//					$this->props = $e->alertProps($this);
+//				}
+//			}
+//		}
+//
+//		return $this->props;
+//	}
+//
+//	public function getTitle() {
+//		return $this->getProps()['title'];
+//	}
+//
+//	public function getBody() {
+//		return $this->getProps()['body'];
+//	}
 
 }

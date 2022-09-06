@@ -726,29 +726,6 @@ class Task extends AclInheritEntity {
 		return false;
 	}
 
-	/**
-	 * @throws Exception
-	 */
-	public function alertProps(CoreAlert $alert): array
-	{
-		if($alert->tag != 'assigned') {
-			return parent::alertProps($alert);
-		}
-		$data = $alert->getData();
-		$assigner = UserDisplay::findById($data->assignedBy, ['displayName']);
-
-		$body = str_replace('{assigner}', $assigner->displayName, go()->t("You were assigned to this task by {assigner}"));
-		$task = $alert->findEntity();
-		if($task) {
-
-			$title = $task->title();
-		} else{
-			$title = "Missing task?";
-		}
-
-		return ['title' => $title, 'body' => $body];
-	}
-
 
 	/**
 	 * @throws SaveException
