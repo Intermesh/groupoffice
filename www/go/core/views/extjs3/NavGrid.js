@@ -17,6 +17,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	filterName: null,
 	selectFirst: false,
 	saveSelection: false,
+	selectAllButton: false,
 	initComponent: function () {
 
 		const actions = this.initRowActions();
@@ -25,30 +26,33 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 
 		this.selModel = new Ext.grid.CheckboxSelectionModel();
 
-		this.selectAllToolbar = new Ext.Toolbar({
-			items: [{
-				xtype: "selectallcheckbox",
-				selectFirst: this.selectFirst
-			}]
-		})
+		if(this.selectAllButton) {
+			this.selectAllToolbar = new Ext.Toolbar({
+				items: [{
+					xtype: "selectallcheckbox",
+					selectFirst: this.selectFirst
+				}]
+			})
 
-		if(this.tbar) {
-			const tbar = {
-				xtype: "container",
-				items: [
-					{
-						items: this.tbar,
-						xtype: 'toolbar'
-					},
+			if (this.tbar) {
+				const tbar = {
+					xtype: "container",
+					items: [
+						{
+							items: this.tbar,
+							xtype: 'toolbar'
+						},
 
-					this.selectAllToolbar
-				]
-			};
+						this.selectAllToolbar
+					]
+				};
 
-			this.tbar = tbar;
-		} else
-		{
-			this.tbar = this.selectAllToolbar;
+				this.tbar = tbar;
+			} else {
+				this.tbar = this.selectAllToolbar;
+			}
+
+			this.store.on("datachanged", this.onStoreDataChanged, this);
 		}
 
 		if(!this.columns) {
@@ -70,7 +74,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 		go.NavGrid.superclass.initComponent.call(this);
 
 		this.store.on("load", this.onStoreLoad, this);
-		this.store.on("datachanged", this.onStoreDataChanged, this);
+
 		this.getSelectionModel().on('selectionchange', this.onSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
 
 		if(this.saveSelection) {
