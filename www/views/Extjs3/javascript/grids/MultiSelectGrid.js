@@ -8,7 +8,6 @@ GO.grid.MultiSelectGrid = function (config){
 	this.checkColumn = new GO.grid.CheckColumn({
 		header: '&nbsp;',
 		dataIndex: 'checked',
-		width: dp(40),
 		listeners:{
 			scope:this,
 			change:function(record){

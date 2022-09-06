@@ -1,3 +1,27 @@
+05-09-2022 6.6.115
+- Core: Acl owner could be removed
+- Core: Better handling of permissions when end user edits fieldsets
+- Address book: fixed upcoming birthday filter
+- Projects: Some tabs were falsely active when there was no project ID yet
+- Core / Comments: Loading and save masks in entity form panel
+
+25-08-2022 6.6.114
+- Core: Fixed reload link on changes not showing all links
+- Holidays: Fixed bug in holiday calculator when agreement changed in the middle of a year
+- Tasks: grouping can be configured in grid now
+- Tasks: First open of task dialog could falsely set the default tasklist if the network response was slow
+- Projects: Faster way of adding project resources in bulk via template
+
+23-08-2022 6.6.113
+- Core / projects: fix for mysql general error 1366 incorrect integer value ''
+
+22-08-2022 6.6.112
+- Core: Fixed permission disappearing when changing level
+- Email: Don't offer to drop messages on read only accounts
+- Email: Move/copy dialog didn't offer to move to accounts shared with "Use" permissions
+- Core: New grids can configure grouping now too.
+- Email: Grouping can be disabled
+
 09-08-2022 6.6.111
 - Projects2: Income grid - remove buggy rowActions by OOTB actionColumn
 - Core: Remember stateId for user profile dialog

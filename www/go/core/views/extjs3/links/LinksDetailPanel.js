@@ -76,8 +76,10 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 					containerclick: function(dv, e) {
 
 						if(e.target.classList.contains("show-more")) {
-							this.store.baseParams.position += this.limit;
 							this.store.load({
+								params: {
+									position: this.store.getCount(),
+								},
 								add: true,
 								callback: function() {
 									this.dataView.refresh();

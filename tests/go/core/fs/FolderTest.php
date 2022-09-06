@@ -29,6 +29,8 @@ class FolderTest extends TestCase
 			]
 		);
 
+		sort($garbage);
+
 		$this->assertEquals(2, count($garbage));
 
 		$this->assertEquals($emptyFolder->getPath(), $garbage[1]->getPath());

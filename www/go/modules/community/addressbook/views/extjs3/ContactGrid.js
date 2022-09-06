@@ -71,6 +71,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 		
 		var grid = this;
 
+		const deaccentChar = c => c.substr(0, 1).toUpperCase().normalize('NFD').replace(/\p{Diacritic}/gu, "");
 
 		function getIndexChar(record, rowIndex) {
 			var sortBy = record.data.isOrganization ? "name" : go.User.addressBookSettings.sortBy;
@@ -88,8 +89,8 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 			var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
 			var lastSortBy = !lastRecord || !lastRecord.data.isOrganization ? go.User.addressBookSettings.sortBy : "name" ;
 
-			var char = record.data[sortBy].substr(0, 1).toUpperCase();
-			if(!lastRecord || !lastRecord.data[lastSortBy] || lastRecord.data[lastSortBy].substr(0, 1).toUpperCase() !== char) {
+			var char = deaccentChar(record.data[sortBy]);
+			if(!lastRecord || !lastRecord.data[lastSortBy] || deaccentChar(lastRecord.data[lastSortBy]) !== char) {
 				return "<h3>" + char + "</h3>";
 			}
 

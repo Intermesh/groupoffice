@@ -149,8 +149,8 @@ abstract class AbstractExport {
 			
 			$format = '$model->resolveAttribute("'.$col.'","formatted");';
 
-			
-			$colModel->formatColumn($col, $format, array(), '', $this->getLabel($col));
+			if($col !== 'customFields.') // CF of type Notes must be skipped
+				$colModel->formatColumn($col, $format, array(), '', $this->getLabel($col));
 			
 		}
 
