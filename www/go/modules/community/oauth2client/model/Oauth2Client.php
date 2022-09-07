@@ -66,15 +66,22 @@ final class Oauth2Client extends Entity
 		switch ($defaultClient->name) {
 			case 'Google':
 				$params['accessType'] = 'offline';
-				$params['scopes'] =  ['https://mail.google.com/'];
+				$params['scopes'] = ['https://mail.google.com/'];
 				break;
 			case 'Azure':
 				// https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
 				// https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
 				$prvVendorName = 'TheNetworg';
 				$params['tenant'] = $this->projectId;
-				$params['scopes'] = ['openid', 'profile', 'offline_access', 'email','https://ps.outlook.com/IMAP.AccessAsApp'];//, 'https://outlook.office.com/Mail.Send', ''];
-				$params['defaultEndPointVersion'] = '2,0';
+				$params['scopes'] = [
+					'openid',
+					'profile',
+					'offline_access',
+					'email',
+					'https://outlook.office.com/IMAP.AccessAsUser.All',
+					'https://outlook.office.com/SMTP.Send'
+				];
+				$params['defaultEndPointVersion'] = '2.0';
 				break;
 			default:
 				throw new NotFound('Default client ' . $defaultClient->name . ' not supported');
