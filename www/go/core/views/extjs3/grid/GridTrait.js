@@ -13,6 +13,8 @@ go.grid.GridTrait = {
 	 */
 	scrollLoader: true,
 
+	loadMorePageSize: 20,
+
 	showMoreLoader: false,
 
 	multiSelectToolbarEnabled: true,
@@ -124,7 +126,7 @@ go.grid.GridTrait = {
 			this.loadMoreButton.setVisible(s.hasMore);
 		});
 	},
-	loadMorePageSize: 20,
+
 
 
 	initMultiSelectToolbar : function() {
