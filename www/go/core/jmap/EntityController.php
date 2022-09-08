@@ -792,10 +792,10 @@ abstract class EntityController extends Controller {
 				continue;
 			}
 
-			//refetch from server when mapping has a query object.
-			if($entity::getMapping()->getQuery() != null) {
+			//refetch from server when mapping has a query object or caches values in getters that need clearing
+			//if($entity::getMapping()->getQuery() != null) {
 				$entity = $this->getEntity($id);
-			}
+			//}
 			
 			//The server must return all properties that were changed during a create or update operation for the JMAP spec
 			$entityProps = new ArrayObject($entity->toArray());			
