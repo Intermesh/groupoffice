@@ -566,6 +566,9 @@ class TemplateParser {
 	 */
 	public function parse(string $str) {
 		if($this->enableBlocks) {
+			// this will break divs
+			$str = preg_replace('/<[^>]+>\[else\]<\/[^>]+>/', '[else]', $str);
+
 			$str = $this->parseBlocks($str);
 		}
 //		$str = preg_replace_callback('/\n?\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*)(?<!\\\\)\\]\n?/', [$this, 'replaceAssign'], $str);
@@ -579,6 +582,7 @@ class TemplateParser {
 	private function parseBlocks($str) {
 
 		$str = $this->hideMicrosoftIfs($str);
+
 
 		$tags = $this->findBlocks($str);		
 			
