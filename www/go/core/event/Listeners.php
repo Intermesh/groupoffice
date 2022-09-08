@@ -122,7 +122,7 @@ class Listeners extends Singleton {
 	{
 		$this->checkInit();
 
-		$return = null;
+		$returnVal = null;
 
 		if (isset($this->listeners[$calledClass][$event])) {
 			foreach ($this->listeners[$calledClass][$event] as $listener) {	
@@ -131,6 +131,10 @@ class Listeners extends Singleton {
 				if ($return === false) {
 					App::get()->warn("Listener returned false for event " . $event . " " . var_export($listener, true));
 					return false;
+				}
+
+				if($return != null) {
+					$returnVal = $return;
 				}
 			}
 		}
@@ -149,10 +153,10 @@ class Listeners extends Singleton {
 					return false;
 				}
 				if($parentReturn) {
-					$return = $parentReturn;
+					$returnVal = $parentReturn;
 				}
 			}
 		}
-		return $return;
+		return $returnVal;
 	}
 }

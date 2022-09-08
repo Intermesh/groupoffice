@@ -6,6 +6,7 @@ use go\core\cron\GarbageCollection;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
+use go\core\jmap\Entity;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\TemplateParser;
@@ -36,7 +37,7 @@ use Swift_EmbeddedFile;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 
-class EmailTemplate extends AclOwnerEntity
+class EmailTemplate extends Entity
 {
 
 	/**
@@ -50,7 +51,7 @@ class EmailTemplate extends AclOwnerEntity
 	 * 
 	 * @var int
 	 */
-	protected $moduleId;
+	public $moduleId;
 
 	public $key;
 
@@ -133,7 +134,11 @@ class EmailTemplate extends AclOwnerEntity
 		return parent::internalSave();
 	}
 
-	
+	protected function internalGetPermissionLevel(): int
+	{
+		return Module::findById($this->moduleId)->getPermissionLevel();
+	}
+
 	private function parseImages()
 	{
 		$cids = Blob::parseFromHtml($this->body);

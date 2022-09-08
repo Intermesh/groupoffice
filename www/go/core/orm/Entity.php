@@ -108,7 +108,6 @@ abstract class Entity extends Property {
 	 *
 	 *
 	 * @param Entity $entity;
-	 * @param array ['permissionLevel' => &$permissionLevel] You can set the permission level by reference to override
 	 */
 	const EVENT_PERMISSION_LEVEL = 'permissionlevel';
 
@@ -591,7 +590,7 @@ abstract class Entity extends Property {
 	 */
 	public function getPermissionLevel() {
 
-		$permissionLevel = static::fireEvent(self::EVENT_PERMISSION_LEVEL, $this, ["permissionLevel" => &$permissionLevel]);
+		$permissionLevel = static::fireEvent(self::EVENT_PERMISSION_LEVEL, $this);
 
 		if(is_int($permissionLevel)) {
 			return $permissionLevel;

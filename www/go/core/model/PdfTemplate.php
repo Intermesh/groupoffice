@@ -35,7 +35,7 @@ class PdfTemplate extends Entity {
 	 * 
 	 * @var int
 	 */							
-	protected $moduleId;
+	public $moduleId;
 
 	/**
 	 * Arbitrary string to identity where the template belongs to. For exampkle a bussinessId in the
@@ -138,6 +138,11 @@ class PdfTemplate extends Entity {
 				$criteria->where(['key' => $value]);
 			});
 
+	}
+
+	protected function internalGetPermissionLevel(): int
+	{
+		return Module::findById($this->moduleId)->getPermissionLevel();
 	}
 
 	/**
