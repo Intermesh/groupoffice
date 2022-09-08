@@ -119,8 +119,6 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 			return;
 		}
 
-		$this->checkManagePermission();
-
 		if($this->hasOwnAcl()) {
 			parent::saveAcl();
 		} else {
