@@ -21,6 +21,10 @@
 				fields: ['id', 'entity', 'entityId', 'data', 'tag', 'triggerAt', 'userId', 'title', 'body'],
 				filters: {
 					user: {userId: go.User.id}
+				},
+				sortInfo: {
+					field: "triggerAt",
+					direction: "DESC"
 				}
 			});
 
