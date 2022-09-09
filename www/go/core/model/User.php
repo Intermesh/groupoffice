@@ -903,7 +903,7 @@ class User extends Entity {
 	{
 		if ($this->isNew() || $this->isModified(['groups', 'username'])) {
 			if ($this->isNew()) {// !in_array($this->getPersonalGroup()->id, $groupIds)) {
-				$this->createPersonalGroup();
+				$personalGroup = $this->createPersonalGroup();
 			} else {
 				$personalGroup = $this->getPersonalGroup();
 				if ($this->isModified('username')) {
@@ -920,7 +920,8 @@ class User extends Entity {
 		}
 	}
 
-	private function createPersonalGroup() {
+	private function createPersonalGroup(): Group
+	{
 		$personalGroup = new Group();
 		$personalGroup->name = $this->username;
 		$personalGroup->isUserGroupFor = $this->id;
@@ -931,6 +932,8 @@ class User extends Entity {
 		}
 
 		$this->personalGroup = $personalGroup;
+
+		return $personalGroup;
 	}
 
 	private function appendNumberToGroupNameIfExists(Group $personalGroup): bool {
