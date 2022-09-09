@@ -1,5 +1,6 @@
 6.6.116
 - Core: Better handling of permissions when end user edits fields as well
+- Core: Updated trial license URL
 
 05-09-2022 6.6.115
 - Core: Acl owner could be removed
