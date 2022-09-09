@@ -75,15 +75,15 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 	
 	setValue : function(options) {
 		// set the root node
-        var root = new Ext.tree.AsyncTreeNode({
+		var root = new Ext.tree.AsyncTreeNode({
 			text: 'Root',
 			draggable:false,
 			id:'root',
 			children: this.apiToTree(options),
 			expanded: true,
 			checked: true
-        });
-        this.setRootNode(root);
+		});
+		this.setRootNode(root);
 	},
 	
 	apiToTree : function(options) {
@@ -108,7 +108,7 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 	},
 	_isDirty: true,
 	isDirty: function () {
-		return this._isDirty;
+		return this.rendered;
 	},
 	getValue: function () {
 		return this.treeToAPI(this.getRootNode());	
