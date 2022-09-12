@@ -13,8 +13,6 @@ go.emailtemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 
 	initFormItems: function () {
 
-		this.addPanel(new go.permissions.SharePanel());
-
 		return [
 			new go.emailtemplate.TemplateFieldset()
 		];
