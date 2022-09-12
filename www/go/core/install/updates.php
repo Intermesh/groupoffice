@@ -1261,4 +1261,4 @@ $updates["202209121148"][] = "alter table core_email_template
     drop key core_email_template_moduleId_key_uindex;";
 
 $updates["202209121148"][] = "create index core_email_template_moduleId_key_index
-    on intermesh.core_email_template (moduleId, `key`);";
+    on core_email_template (moduleId, `key`);";
