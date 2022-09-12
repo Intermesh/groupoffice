@@ -1,5 +1,6 @@
 - Newsletters: Fix integrity constraint when removing SMTP account for existing newsletters
 - Core: check module availability by retrieving permissions
+- Addressbook: Fixed merge
 
 09-09-2022 6.6.116
 - Core: Better handling of permissions when end user edits fields as well
