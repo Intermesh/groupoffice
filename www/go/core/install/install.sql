@@ -855,7 +855,6 @@ CREATE TABLE `core_email_template_attachment` (
 
 ALTER TABLE `core_email_template`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `aclId` (`aclId`),
   ADD KEY `moduleId` (`moduleId`);
 
 ALTER TABLE `core_email_template_attachment`
@@ -872,7 +871,6 @@ ALTER TABLE `core_email_template_attachment`
 
 
 ALTER TABLE `core_email_template`
-  ADD CONSTRAINT `core_email_template_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
   ADD CONSTRAINT `core_email_template_ibfk_2` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `core_email_template_attachment`
