@@ -420,10 +420,10 @@ class Blob extends orm\Entity {
 	{
 		return go()->getSettings()->URL . 'api/download.php?blob=' . $blobId;
 	}
-	
+
 	/**
 	 * Parse blob id's inserted as images in HTML content.
-	 * 
+	 *
 	 * @param string $html
 	 * @return string[] Array of blob ID's
 	 */
@@ -435,7 +435,7 @@ class Blob extends orm\Entity {
 
 		$matches = [];
 
-		if(preg_match_all('/"http[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $urlMatches)) {
+		if(preg_match_all('/blob=([^>&"]*)"[^>]*>/i', $html, $urlMatches)) {
 			$matches = $urlMatches[1];
 		}
 

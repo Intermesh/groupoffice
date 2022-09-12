@@ -44,7 +44,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				{name: 'isFieldSet', type: "boolean"},
 				{name: 'sortOrder', type: "int"},
 				"aclId",
-				'permissionLevel'
+				"permissionLevel"
 			]
 		});
 
@@ -408,7 +408,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 	showAddFieldMenu: function (record, e) {
 		if (!this.addFieldMenu) {
 
-			var items = [], types = go.customfields.CustomFields.getTypes();
+			let items = [], types = go.customfields.CustomFields.getTypes();
 
 			for (var name in types) {
 				items.push({
@@ -480,7 +480,8 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 		this.loading = true;
 		this.store.removeAll();
 
-		var fsSortOrderMap = {};
+		let fsSortOrderMap = {};
+		let fsPermLvlMap = [];
 
 		go.Db.store("FieldSet").query({
 			filter: {
@@ -513,9 +514,8 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					]);
 
 					fsSortOrderMap[fs.id] = fs.sortOrder * 100000;
-
+					fsPermLvlMap[fs.id] = fs.permissionLevel;
 				});
-
 				this.store.loadData(storeData, true);
 
 			}, this);
@@ -538,7 +538,8 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 							f.fieldSetId,
 							false,
 							f.sortOrder + fsSortOrderMap[f.fieldSetId],
-							null
+							null,
+							fsPermLvlMap[f.fieldSetId]
 						]);
 					});
 					this.store.loadData(storeData, true);
@@ -551,9 +552,6 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			}, this);
 
 		}, this);
-
-
-
 	}
 });
 

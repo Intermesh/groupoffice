@@ -1,3 +1,12 @@
+- Newsletters: Fix integrity constraint when removing SMTP account for existing newsletters
+- Core: check module availability by retrieving permissions
+- Addressbook: Fixed merge
+
+09-09-2022 6.6.116
+- Core: Better handling of permissions when end user edits fields as well
+- Core: Updated trial license URL
+- Core: Bug where select options could be removed by mistake when editing the field
+
 05-09-2022 6.6.115
 - Core: Acl owner could be removed
 - Core: Better handling of permissions when end user edits fieldsets
