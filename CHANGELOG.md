@@ -2,6 +2,7 @@
 - Core: check module availability by retrieving permissions
 - Addressbook: Fixed merge
 - OAuth2-client: add Azure ActiveDirectory support
+- Core: Fix render of HTML entities in entity trees
 
 09-09-2022 6.6.116
 - Core: Better handling of permissions when end user edits fields as well
