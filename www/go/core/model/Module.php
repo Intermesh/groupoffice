@@ -49,6 +49,10 @@ class Module extends Entity {
 
 		$rights = $this->getUserRights($userId);
 
+		if (!$rights->mayRead) {
+			return 0;
+		}
+
 		if($this->name == 'projects2' && $rights->mayFinance && !$rights->mayManage) { // a single exception for this compat method
 			return 45;
 		}
@@ -480,10 +484,11 @@ class Module extends Entity {
 			$package = null;
 		}
 
-		$query = static::find()->where(['package' => $package, 'name' => $name, 'enabled' => true]);
-		static::applyAclToQuery($query, $level, $userId);
-		
-		return !!$query->single();
+//		$query = static::find()->where(['package' => $package, 'name' => $name, 'enabled' => true]);
+//		static::applyAclToQuery($query, $level, $userId);
+//		return !!$query->single();
+		$mod = self::findByName($package, $name, true);
+		return !empty($mod) && $mod->getPermissionLevel($userId) >= $level;
 	}
 
 	/**
