@@ -1245,3 +1245,6 @@ $updates["202209051226"][] = "alter table core_pdf_template
 $updates["202209051226"][] = "alter table core_pdf_template
     add constraint core_pdf_template_core_blob_id_fk
         foreign key (logoBlobId) references core_blob (id);";
+
+$updates["202209121148"][] = "alter table core_email_template
+    drop column aclId;";
