@@ -1078,7 +1078,7 @@ abstract class Property extends Model {
 			}
 		} else
 		{
-			if($newValue instanceof CoreDateTime) {
+			if($newValue instanceof CoreDateTime && $oldValue instanceof CoreDateTime) {
 				if($this->datesAreDifferent($oldValue, $newValue)) {
 					return true;
 				}
