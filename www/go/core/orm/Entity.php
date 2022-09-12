@@ -1100,6 +1100,10 @@ abstract class Entity extends Property {
 
 		switch($relation->type) {
 			case Relation::TYPE_MAP:
+				if(isset($entity->$name)) {
+					$this->$name = is_array($this->$name) ? array_merge($this->$name, $entity->$name) : $this->$name = $entity->$name;
+				}
+				break;
 			case Relation::TYPE_HAS_ONE:
 
 				$copy = $entity->$name->toArray();
