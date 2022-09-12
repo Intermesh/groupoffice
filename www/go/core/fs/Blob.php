@@ -440,7 +440,7 @@ class Blob extends orm\Entity {
 
 		$matches = [];
 
-		if(preg_match_all('/"http[^>]*\?blob=([^>&"]*)"[^>]*>/i', $html, $urlMatches)) {
+		if(preg_match_all('/blob=([^>&"]*)"[^>]*>/i', $html, $urlMatches)) {
 			$matches = $urlMatches[1];
 		}
 
