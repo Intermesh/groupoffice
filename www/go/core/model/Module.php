@@ -483,10 +483,6 @@ class Module extends Entity {
 		if($package == "legacy") {
 			$package = null;
 		}
-
-//		$query = static::find()->where(['package' => $package, 'name' => $name, 'enabled' => true]);
-//		static::applyAclToQuery($query, $level, $userId);
-//		return !!$query->single();
 		$mod = self::findByName($package, $name, true);
 		return !empty($mod) && $mod->getPermissionLevel($userId) >= $level;
 	}
