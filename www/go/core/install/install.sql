@@ -1058,6 +1058,10 @@ create index stationaryBlobId
     on core_pdf_template (stationaryBlobId);
 
 
+create index core_pdf_template_key_index
+    on core_pdf_template (`key`);
+
+
 
 
 ALTER TABLE `core_pdf_block`

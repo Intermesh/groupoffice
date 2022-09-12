@@ -1252,3 +1252,13 @@ $updates["202209121148"][] = "alter table core_email_template
 
 $updates["202209121148"][] = "alter table core_email_template
     drop column aclId;";
+
+$updates["202209121148"][] = "create index core_pdf_template_key_index
+    on core_pdf_template (moduleId, `key`);";
+
+
+$updates["202209121148"][] = "alter table core_email_template
+    drop key core_email_template_moduleId_key_uindex;";
+
+$updates["202209121148"][] = "create index core_email_template_moduleId_key_index
+    on intermesh.core_email_template (moduleId, `key`);";
