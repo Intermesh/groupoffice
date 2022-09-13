@@ -4,6 +4,7 @@
 - Addressbook: Fixed merge
 - OAuth2-client: add Azure ActiveDirectory support
 - Core: Fix render of HTML entities in entity trees
+- Newsletters: better handling of height templates window
 
 09-09-2022 6.6.116
 - Core: Better handling of permissions when end user edits fields as well
