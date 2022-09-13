@@ -60,6 +60,7 @@ class PdfTemplateRenderer extends PdfRenderer {
 		$orientation = $this->template->landscape ? 'L' : 'P';
 
 		$this->parser = new TemplateParser();
+		$this->parser->addModel('template', $this->template);
 		foreach($templateModels as $name => $model) {
 			$this->parser->addModel($name, $model);
 		}
@@ -88,6 +89,11 @@ class PdfTemplateRenderer extends PdfRenderer {
 			$this->parser->addModel("logo", "file://" . $logo->getFile()->getPath());
 		}
 
+	}
+
+	public function getTemplate(): PdfTemplate
+	{
+		return $this->template;
 	}
 
 	/**
