@@ -129,6 +129,47 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		go.modules.community.tasks.TaskDetail.superclass.initComponent.call(this);
 		this.addCustomFields();
 		this.addComments(this.support);
+
+		if(this.support && go.Modules.isAvailable("business", "contracts")) {
+			this.contractGrid = new go.modules.business.contracts.ContractGrid({
+				title: t("Contracts", "contracts", "business"),
+				autoHeight: true,
+				maxHeight: dp(400),
+				listeners: {
+					scope: this,
+					rowdblclick: function (grid, rowIndex, e) {
+						var record = grid.getStore().getAt(rowIndex);
+						if (record.get('permissionLevel') < go.permissionLevels.write) {
+							return;
+						}
+
+						var dlg = new go.modules.business.contracts.ContractDialog();
+						dlg.load(record.id).show();
+					}
+				}
+			});
+
+			this.add(this.contractGrid);
+
+			this.insert(0, this.noContractWarning = new Ext.Panel({
+				hidden: true,
+				cls: "go-message-panel",
+				html: "<i class='icon danger'>warning</i> " + t("This customer doesn't have an active contract", "support", "business")
+			}));
+
+			this.on("load", async () => {
+				this.noContractWarning.hide();
+				this.contractGrid.store.setFilter("def", {createdBy: this.data.createdBy, active: true});
+
+				const records = await this.contractGrid.store.load();
+
+				if(!records.length) {
+					this.noContractWarning.show();
+				}
+			});
+		}
+
+
 		this.addLinks();
 		this.addFiles();
 		this.addHistory();

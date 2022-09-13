@@ -131,12 +131,18 @@ abstract class EntityController extends Controller {
 
 		$query->filter($params['filter']);
 
+
+		return $query;
+	}
+
+	protected function applyPermissionLevelToQueryQuery(Query $query) {
+		$cls = $this->entityClass();
 		// Only return readable ID's
 		if($cls::getFilters()->hasFilter('permissionLevel') &&  !$query->isFilterUsed('permissionLevel')) {
 			$query->filter(['permissionLevel' => Acl::LEVEL_READ]);
 		}
-		return $query;
 	}
+
 	
 	/**
 	 * Takes the request arguments, validates them and fills it with defaults.
@@ -346,7 +352,7 @@ abstract class EntityController extends Controller {
 			return false;
 		}
 		
-		if(!$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
+		if(!$this->canRead($entity)) {
 			App::get()->debug("Forbidden: " . $cls . ": ".$id);
 			return false; //not found
 		}
@@ -439,7 +445,7 @@ abstract class EntityController extends Controller {
 		$foundIds = [];
 
 		foreach($query as $e) {
-			if($e->hasPermissionLevel(Acl::LEVEL_READ)) {
+			if($this->canRead($e)) {
 				$arr = $e->toArray();
 				$arr['id'] = $e->id();
 				$unsorted[$arr['id']] = $arr;
@@ -698,6 +704,18 @@ abstract class EntityController extends Controller {
 				$result['notCreated'][$clientId]->validationErrors = $entity->getValidationErrors();
 			}
 		}
+	}
+
+	/**
+	 * Override this if you want to implement permissions for creating entities
+	 * New properties have already been set so you can validate per property too if needed.
+	 *
+	 * @param Entity $entity
+	 * @return boolean
+	 */
+	protected function canRead(Entity $entity): bool
+	{
+		return $entity->hasPermissionLevel(Acl::LEVEL_READ);
 	}
 
   /**

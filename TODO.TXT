@@ -31,8 +31,10 @@ Roadmap
     - Birthdays from address book as special calendar
 
 - Mailserver
+    - Quota warning: https://doc.dovecot.org/configuration_manual/quota/#quota-warning-scripts
     - limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
     - permissions per account?
+    - Auto clean spam and trash
     - DKIM generator and implementation
     - Cronb job that checks every hour:
         - SPF record is correct
