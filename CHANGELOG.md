@@ -6,6 +6,8 @@
 - Core: Fix render of HTML entities in entity trees
 - Newsletters: better handling of height templates window
 - Newsletters: fix exception when importing contacts with address lists
+- Calendar: today button better visibility
+- Calendar: fix period buttons render bug
 
 09-09-2022 6.6.116
 - Core: Better handling of permissions when end user edits fields as well
