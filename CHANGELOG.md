@@ -1,3 +1,4 @@
+15-09-2022 6.6.117
 - Leave days: support for non-expiring special leave types
 - Newsletters: Fix integrity constraint when removing SMTP account for existing newsletters
 - Core: check module availability by retrieving permissions
