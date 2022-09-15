@@ -130,7 +130,20 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		this.addCustomFields();
 		this.addComments(this.support);
 
-		if(this.support && go.Modules.isAvailable("business", "contracts")) {
+		if(this.support) {
+			this.addContracts();
+		}
+		this.addLinks();
+		this.addFiles();
+		this.addHistory();
+
+		this.on("destroy" , () => {
+			this.progressMenu.destroy();
+		})
+	},
+
+	addContracts: function() {
+		if(go.Modules.isInstalled("business", "contracts")) {
 			this.contractGrid = new go.modules.business.contracts.ContractGrid({
 				title: t("Contracts", "contracts", "business"),
 				autoHeight: true,
@@ -163,22 +176,12 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 				const records = await this.contractGrid.store.load();
 
-				if(!records.length) {
+				if (!records.length) {
 					this.noContractWarning.show();
 				}
 			});
 		}
-
-
-		this.addLinks();
-		this.addFiles();
-		this.addHistory();
-
-		this.on("destroy" , () => {
-			this.progressMenu.destroy();
-		})
 	},
-
 
 	changeProgress : function(progress) {
 		go.Db.store("Task").save({
