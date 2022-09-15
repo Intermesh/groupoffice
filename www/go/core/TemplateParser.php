@@ -767,7 +767,11 @@ class TemplateParser {
 		$expression = html_entity_decode($expression);
 
 		//split string into tokens. See http://stackoverflow.com/questions/5475312/explode-string-into-tokens-keeping-quoted-substr-intact		
-		foreach(self::$tokens as $token) {			
+		foreach(self::$tokens as $token) {
+			if($token == '-') {
+				//skip for negative numbers
+				continue;
+			}
 			$expression = str_replace($token, ' '.$token.' ', $expression);
 		}
 		$expression = str_replace(';', ' ; ', $expression);
