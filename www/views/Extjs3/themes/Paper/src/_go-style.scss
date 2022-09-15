@@ -1924,6 +1924,10 @@ table[id^="comments-ext"] b {
 	a:visited {
 		color: purple;
 	}
+
+	pre {
+		white-space: pre-wrap; // to prevent horizontal scrolling
+	}
 }
 
 .normal-link {
