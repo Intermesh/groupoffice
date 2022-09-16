@@ -176,7 +176,7 @@ abstract class Entity extends Property {
 	/**
 	 * Find or create an entity
 	 *
-	 * @param string $id
+	 * @param string $id $businessId . "-" . $contactId
 	 * @param array $values Values to apply if it needs to be created.
 	 * @return static
 	 * @throws Exception
