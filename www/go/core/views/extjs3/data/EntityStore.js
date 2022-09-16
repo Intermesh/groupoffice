@@ -422,6 +422,9 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	single: function(id) {
 
+		if(id == null) {
+			Promise.resolve(null);
+		}
 
 		return this._getSingleFromBrowserStorage(id).then((entity) => {
 			if(entity) {
@@ -528,7 +531,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					{
 						if(!this.data[id]) {
 							//return Promise.reject("Data not available ???");
-							this.scheduledPromises[id].reject("Data not available ???");
+							this.scheduledPromises[id].reject("Data not available for id=" +id + " in store " + this.entity.name);
 						}
 						this.scheduledPromises[id].resolve(go.util.clone(this.data[id]));
 					}
