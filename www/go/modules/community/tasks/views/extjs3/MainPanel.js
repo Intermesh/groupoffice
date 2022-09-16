@@ -474,7 +474,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						tooltip: t('Add'),
 						cls: 'primary',
 						handler: function (btn) {
-							var dlg = new go.modules.community.tasks.TaskDialog();
+							let dlg = new go.modules.community.tasks.TaskDialog({support: this.support});
 							dlg.setValues({
 								tasklistId: this.addTasklistId
 							}).show();
@@ -654,12 +654,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	
 	onTaskGridDblClick : function (grid, rowIndex, e) {
 
-		var record = grid.getStore().getAt(rowIndex);
+		const record = grid.getStore().getAt(rowIndex);
 		if (record.get('permissionLevel') < go.permissionLevels.write) {
 			return;
 		}
 
-		var dlg = new go.modules.community.tasks.TaskDialog();
+		let dlg = new go.modules.community.tasks.TaskDialog({support: this.support});
 		dlg.load(record.id).show();
 	},
 	
@@ -676,7 +676,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		var dlg = new go.modules.community.tasks.TaskDialog();
+		var dlg = new go.modules.community.tasks.TaskDialog({support: this.support});
 		dlg.load(record.id).show();
 	}	
 });
