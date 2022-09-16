@@ -434,12 +434,12 @@ class EntityType implements ArrayableInterface {
 
 	/**
 	 *
-	 * @param int|Query $entityId
+	 * @param int|string $entityId
 	 * @param int|null $aclId
 	 * @param bool $destroyed
 	 * @return void
 	 */
-	private function queueChange(int $entityId, ?int $aclId = null, bool $destroyed = false) {
+	private function queueChange($entityId, ?int $aclId = null, bool $destroyed = false) {
 
 		$id = $this->getId();
 
