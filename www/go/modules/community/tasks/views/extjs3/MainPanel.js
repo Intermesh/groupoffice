@@ -400,10 +400,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						var dlg = new go.modules.community.tasks.TasklistDialog();
+						let dlg = new go.modules.community.tasks.TasklistDialog();
 						dlg.setValues({role: this.support ? "support" : "list"})
 						dlg.show();
-					}
+					},
+					scope: this
 				}],
 			listeners: {
 				afterrender: function(grid) {
