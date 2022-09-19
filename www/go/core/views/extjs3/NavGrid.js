@@ -18,15 +18,21 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	selectFirst: false,
 	saveSelection: false,
 	selectAllButton: false,
+	singleSelect: false,
 	initComponent: function () {
 
 		const actions = this.initRowActions();
 
 		this.plugins = [actions];
+		if(this.singleSelect) {
+			this.selModel = new Ext.grid.RowSelectionModel({singleSelect: true});
+		} else
+		{
+			this.selModel = new Ext.grid.CheckboxSelectionModel();
+		}
 
-		this.selModel = new Ext.grid.CheckboxSelectionModel();
 
-		if(this.selectAllButton) {
+		if(this.selectAllButton && !this.singleSelect) {
 			this.selectAllToolbar = new Ext.Toolbar({
 				items: [{
 					xtype: "selectallcheckbox",
@@ -57,7 +63,6 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 
 		if(!this.columns) {
 			this.columns = [
-				this.selModel,
 				{
 					id: 'name',
 					header: t('Name'),
@@ -69,6 +74,10 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 				},
 				actions
 			];
+
+			if(!this.singleSelect) {
+				this.columns.unshift(this.selModel);
+			}
 		}
 
 		go.NavGrid.superclass.initComponent.call(this);
@@ -126,9 +135,9 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 
 		const select = () => {
 			// console.warn(selected);
-			this.getSelectionModel().suspendEvents(false)
+			// this.getSelectionModel().suspendEvents(false)
 			this.getSelectionModel().selectRecords(selected, true);
-			this.getSelectionModel().resumeEvents();
+			// this.getSelectionModel().resumeEvents();
 		}
 
 		if(this.rendered) {
