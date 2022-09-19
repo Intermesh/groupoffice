@@ -1,5 +1,6 @@
 6.6.119
 - Newsletters: fix bug max number of messages per minute
+- Newsletters: end user can edit their own newsletter
 
 19-09-2022 6.6.118
 - Newsletters: Fixed upgrade bug in newsletters
