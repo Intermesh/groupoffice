@@ -186,13 +186,13 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
   
 	// See modules/email/EmailClient.js and search for "GO.checker.registerRequest" for an usage example
 	registerRequest : function(url, params, callback, scope){
-		params.r=url;
-		var requestId = Ext.id();
+		params.r = url;
+		const requestId = Ext.id();
 
 		this.params.requests[requestId] = params;	
 		this.callbacks[requestId] = {
-			callback:callback,
-			scope:scope
+			callback: callback,
+			scope: scope
 		};
 	},
   
