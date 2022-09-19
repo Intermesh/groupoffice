@@ -1,3 +1,6 @@
+19-09-2022 6.6.118
+- Newsletters: Fixed upgrade bug in newsletters
+
 15-09-2022 6.6.117
 - Leave days: support for non-expiring special leave types
 - Newsletters: Fix integrity constraint when removing SMTP account for existing newsletters
