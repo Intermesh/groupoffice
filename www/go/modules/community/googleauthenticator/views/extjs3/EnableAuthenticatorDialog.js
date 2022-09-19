@@ -108,7 +108,7 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 	},
 	
 	onLoad : function() {
-		this.QRcomponent.setQrBlobId(this.formPanel.entity.googleauthenticator.qrBlobId);
+		this.QRcomponent.setQrBlobId("community/googleauthenticator/qr");
 		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.onLoad.call(this);
 
 		const user =  this.getValues()
