@@ -131,6 +131,7 @@ abstract class EntityController extends Controller {
 
 		$query->filter($params['filter']);
 
+		$this->applyPermissionLevelToQueryQuery($query);
 
 		return $query;
 	}
