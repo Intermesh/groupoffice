@@ -261,13 +261,13 @@ class Filters {
 	 * Values are converted to DateTime objects. Supports all strtotime formats as input.
 	 *
 	 * @param string $name
-	 * @param Callable $fn Called with: Criteria $criteria, $comparator, DateTime $value, Query $query, array $filters
+	 * @param Callable $fn Called with: Criteria $criteria, $comparator, ?DateTime $value, Query $query, array $filters
 	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
 	 *
 	 * @return $this
 	 *@example
 	 *
-	 * ->addDate('date',function(Criteria $criteria, $comparator, $value){
+	 * ->addDate('date',function(Criteria $criteria, $comparator, ?DateTime $value){
 	 * 	$criteria->where('date', $comparator, $value);
 	 * })
 	 *
