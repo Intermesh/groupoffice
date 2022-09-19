@@ -840,7 +840,6 @@ class Instance extends Entity {
 			if ($mod instanceof BaseModule) {
 				$key = $mod->package() . $mod->name();
 				// old Framework
-				// old Framework
 				$avMod = [
 					'id' => $id,
 					'package' => 'legacy',

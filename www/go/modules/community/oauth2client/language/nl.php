@@ -13,5 +13,8 @@ return array(
 	'OAuth2 Connections' => 'OAuth2 Koppelingen',
 	'Please press the button "Refresh token" to finish the OAuth2 connection' => 'Klikt u nu s.v.p. op de knop "Refresh token" om de OAuth2 verbinding te voltooien',
 	'Get a refresh token' => 'Haal een refresh token op',
+	'Client ID' => '',
+	'Client Secret' => '',
+	'Project ID' => '',
 	'' => ''
 );

@@ -1,4 +1,26 @@
+19-09-2022 6.6.118
+- Newsletters: Fixed upgrade bug in newsletters
+
+15-09-2022 6.6.117
+- Leave days: support for non-expiring special leave types
+- Newsletters: Fix integrity constraint when removing SMTP account for existing newsletters
+- Core: check module availability by retrieving permissions
+- Addressbook: Fixed merge
+- OAuth2-client: add Azure ActiveDirectory support
+- Core: Fix render of HTML entities in entity trees
+- Newsletters: better handling of height templates window
+- Newsletters: fix exception when importing contacts with address lists
+- Calendar: today button better visibility
+- Calendar: fix period buttons render bug
+
+09-09-2022 6.6.116
+- Core: Better handling of permissions when end user edits fields as well
+- Core: Updated trial license URL
+- Core: Bug where select options could be removed by mistake when editing the field
+
+05-09-2022 6.6.115
 - Core: Acl owner could be removed
+- Core: Better handling of permissions when end user edits fieldsets
 - Address book: fixed upcoming birthday filter
 - Projects: Some tabs were falsely active when there was no project ID yet
 - Core / Comments: Loading and save masks in entity form panel

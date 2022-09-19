@@ -41,7 +41,8 @@
     "donatj/phpuseragentparser": "^1.4",
     "league/oauth2-google": "^4.0",
     "fakerphp/faker": "^1.19",
-    "ext-fileinfo": "*"
+    "ext-fileinfo": "*",
+    "thenetworg/oauth2-azure": "^2.1"
   },
   "license": "AGPL",
   "authors": [

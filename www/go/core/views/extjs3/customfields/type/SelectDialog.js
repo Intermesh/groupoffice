@@ -6,6 +6,7 @@ go.customfields.type.SelectDialog = Ext.extend(go.customfields.FieldDialog, {
 	// initComponent: function() {
 	// 	this.supr().initComponent.call(this);
 	// },
+	deferredRender: false,
 	initFormItems: function () {
 		var items = go.customfields.type.SelectDialog.superclass.initFormItems.call(this);
 		// items[0].autoHeight = true;

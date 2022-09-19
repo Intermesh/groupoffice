@@ -566,6 +566,8 @@ GO.calendar.MainPanel = function(config){
 		scope: this
 	},{
 		iconCls:'ic-today',
+		// text: t("Today"),
+		cls: "accent",
 		tooltip : t("Today"),
 		handler : function(){
 			this.setDisplay({
@@ -575,6 +577,7 @@ GO.calendar.MainPanel = function(config){
 		scope : this
 	},{
 	xtype:'buttongroup',
+	layout: 'table',
 	items: [
 		this.dayButton = new Ext.Button({
 			iconCls: 'ic-view-day',
@@ -862,7 +865,7 @@ GO.calendar.MainPanel = function(config){
 		this.centerPanel = new Ext.Panel({
 			layout:'fit',
 			region:'center',
-			tbar: {enableOverflow: true,items: tbar},
+			tbar: {enableOverflow: GO.util.isMobileOrTablet(),items: tbar},
 			items: [this.displayPanel]
 		})
 	];		
@@ -1032,12 +1035,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 		},this);
 		
 
-//		if(GO.calendar.openState){
-//			this.state=GO.calendar.openState;
-//			if(!this.state.calendars && !this.state.view_id)
-//				this.state.calendars=[GO.calendar.defaultCalendar.id];
-//		}else
-//		{
 			this.state = Ext.state.Manager.get('calendar-state');
 			if(!this.state)
 			{
@@ -1051,9 +1048,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			{
 				this.state = Ext.decode(this.state);
 			}
-			
-			
-//			console.log(this.state);
 
 			if(this.state.displayType=='view')
 				this.state.displayType='days';
@@ -1061,28 +1055,12 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			if(go.util.empty(this.state.calendars)) {
 				this.state.calendars=[GO.calendar.defaultCalendar.id];
 			}
-			
-			//this.state.view_id=0;
-			//this.state.group_id=1;
-//		}
 
 		if(GO.calendar.openState)
 			this.state = Ext.apply(this.state, GO.calendar.openState);
 
-
-			console.warn(this.state);
-
-		/*this.state.applyFilter=true;
-		this.calendarsStore.on('load', function(){
-			this.state.applyFilter=false;
-		}, this, {single:true});*/
-				
-		this.init();	
+		this.init();
 		this.createDaysGrid();
-
-		/*this.on('show', function(){
-			this.refresh();
-		}, this);		*/
 	},
 	
 	init : function(){
@@ -1205,22 +1183,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 	},
 	
 	updatePeriodInfoPanel : function (){
-		
-		/*var html = '';
-		var displayDate = this.getActivePanel().configuredDate;
-		
-		if(this.displayType=='month')
-		{
-			html = displayDate.format('F, Y');
-		}else
-		{
-			if(this.days<8){
-				html = t("Week")+' '+displayDate.format('W');
-			}else
-			{
-				html = displayDate.format('W')+' - '+displayDate.add(Date.DAY,this.days).format('W');
-			}
-		}*/
 
 		if(this.periodInfoPanel.getEl()) {
 			this.periodInfoPanel.getEl().update(this.getActivePanel().periodDisplay);

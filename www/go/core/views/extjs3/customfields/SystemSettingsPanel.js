@@ -49,7 +49,6 @@ go.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 					menuDisabled: false,
 					sortable: false,
 					renderer: function(v, meta, record) {	
-						
 						return '<button title="' + Ext.util.Format.htmlEncode(t('Manage default permissions')) + '" class="icon">edit</button>';
 						
 					}

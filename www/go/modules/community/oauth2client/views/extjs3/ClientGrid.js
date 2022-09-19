@@ -31,24 +31,23 @@ go.modules.community.oauth2client.ClientGrid = Ext.extend(go.grid.GridPanel, {
 				dataIndex: 'name',
 				id: 'name'
 			},{
-				header: t('clientId'),
+				header: t('Client ID'),
 				dataIndex: 'clientId',
 				id: 'clientId'
 			},{
-				header: t('clientSecret'),
+				header: t('Client Secret'),
 				dataIndex: 'clientSecret',
 				id: 'clientSecret'
 			},{
-				header: t('projectId'),
+				header: t('Project ID'),
 				dataIndex: 'projectId',
 				id: 'projectId'
 			},{
 				header: t('Provider'),
-				dataIndex: 'defaultClient.name',
+				dataIndex: 'defaultClientId',
 				id: 'providerName',
-				renderer: function() {
-					// TODO: provider name from defaultClient.name; for now only Google is supported
-					return 'Google';
+				renderer: (v) => {
+					return this.defaultClients[v];
 				}
 			},
 			actions
@@ -65,10 +64,17 @@ go.modules.community.oauth2client.ClientGrid = Ext.extend(go.grid.GridPanel, {
 		});
 
 		go.modules.community.oauth2client.ClientGrid.superclass.initComponent.call(this);
+		this.defaultClients = [];
 
-		this.on('render', function() {
-			this.store.load();
-		}, this);
+		this.on('render', () => {
+			go.Db.store('DefaultClient').all((success, data) => {
+				for(let i=0,l=data.length;i<l;i++) {
+					this.defaultClients[data[i].id] = data[i].name;
+				}
+			}).finally(() => {
+				this.store.load();
+			});
+		});
 
 		this.on("rowdblclick", function(grid, rowIndex, e) {
 			let record = grid.getStore().getAt(rowIndex);
@@ -121,7 +127,7 @@ go.modules.community.oauth2client.ClientGrid = Ext.extend(go.grid.GridPanel, {
 						scope: this
 					},{
 						itemId:"delete",
-						iconCls: 'ic-share',
+						iconCls: 'ic-delete',
 						text: t("Delete"),
 						handler: function() {
 							this.getSelectionModel().selectRecords([this.moreMenu.record]);
