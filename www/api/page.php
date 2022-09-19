@@ -69,5 +69,11 @@ try {
 } catch (Exception $e) {
 	ErrorHandler::logException($e);
 	Response::get()->setStatus(500);
+	Response::get()->setContentType("text/plain");
 	Response::get()->output($e->getMessage());
+
+
+	if(go()->getDebugger()->enabled) {
+		go()->getDebugger()->printEntries();
+	}
 }
