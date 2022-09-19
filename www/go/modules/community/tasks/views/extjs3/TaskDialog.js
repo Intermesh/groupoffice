@@ -5,6 +5,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	height: dp(600),
 	modal: false,
 	stateId: 'communityTasksTaskDialog',
+	support: null,
 
 	setLinkEntity : function(cfg) {
 
@@ -234,6 +235,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 									flex: 1,
 									items: [
 										this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
+											role: this.support ? "support": null,
 											listeners: {
 												change: this.onTaskListChange,
 												setvalue: this.onTaskListChange,
