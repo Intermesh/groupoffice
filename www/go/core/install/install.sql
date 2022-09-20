@@ -58,7 +58,7 @@ CREATE TABLE `core_blob` (
 
 CREATE TABLE `core_change` (
   `id` int(11) NOT NULL,
-  `entityId` int(11) NOT NULL,
+  `entityId` varchar(100) collate ascii_bin not null,
   `entityTypeId` int(11) NOT NULL,
   `modSeq` int(11) NOT NULL,
   `aclId` int(11) DEFAULT NULL,

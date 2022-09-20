@@ -1262,3 +1262,7 @@ $updates["202209121148"][] = "alter table core_email_template
 
 $updates["202209121148"][] = "create index core_email_template_moduleId_key_index
     on core_email_template (moduleId, `key`);";
+
+
+$updates["202209121148"][] = "alter table core_change
+    modify entityId varchar(100) collate ascii_bin not null;";
