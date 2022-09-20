@@ -609,6 +609,17 @@ a {
 	}
 }
 
+.x-btn.go-list-btn {
+	border: 0;
+	.x-btn-mc {
+		text-align: left;
+		button {
+			font-weight: normal;
+			padding-left: dp(16);
+			font-size: sp(16);
+		}
+	}
+}
 
 
 .go-search-panel {
@@ -1812,14 +1823,36 @@ table[id^="comments-ext"] b {
 
 
 .go-form-group {
+	.go-form-group-edit-tb {
+		display: none;
+	}
+
+	.x-fieldset {
+		border: none;
+		padding: 0;
+		margin: 0;
+	}
+
+
+	&.multiple {
+		.go-form-group-edit-tb {
+			display: block;
+		}
+
+		.x-fieldset {
+			border: 1px solid color($fg, "line");
+			padding: dp(8) dp(16);
+			margin: dp(16);
+		}
+	}
 
 
 	.x-panel-bbar {
 		overflow: visible;
 		.x-toolbar {
 			border-top: 0;
+			height: dp(32);
 		}
-
 		.x-btn-text {
 			font-weight: normal;
 			@include var(color, c-primary);
@@ -1829,7 +1862,10 @@ table[id^="comments-ext"] b {
 	.x-toolbar {
 		margin-left: dp(-16);
 	}
-	margin-bottom: dp(16);
+
+	&:not(:last-child) {
+		margin-bottom: dp(16);
+	}
 }
 
 

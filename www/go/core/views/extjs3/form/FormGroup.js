@@ -103,10 +103,17 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 
 		this.on("add",function(e) {
+
+			this.updateCls();
+
 			//to prevent adding to Ext.form.BasicForm with add event.
 			//Cancels event bubbling
 			return false;
-		});
+		}, this);
+
+		this.on('remove', function() {
+			this.updateCls();
+		}, this);
 
 		go.form.FormGroup.superclass.initComponent.call(this);
 	},
@@ -118,6 +125,29 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 		if(this.startWithItem && this.items.getCount() == 0) {
 			this.addPanel(true);
+		}
+
+		this.updateCls();
+	},
+
+	updateCls : function() {
+		if(!this.rendered) {
+			return;
+		}
+
+		const hasMultiple = this.getEl().hasClass("multiple");
+		const shouldMultiple = this.items.getCount() > 1;
+
+		if(hasMultiple != shouldMultiple) {
+
+			if(shouldMultiple) {
+				this.getEl().addClass('multiple' )
+			} else {
+				this.getEl().removeClass('multiple' )
+			}
+
+			this.doLayout();
+
 		}
 	},
 
@@ -261,7 +291,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			this.addRow(true);
 		} else
 		{
-			c.items.get('del-btn').focus();
+			c.items.get('edit-tb').items.get('del-btn').focus();
 		}
 
 	},
@@ -285,12 +315,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			itemId: 'del-btn',
 			xtype: "button",
 			cls: "small",
+			flex: 1,
 			iconCls: 'ic-delete',
 			handler: function() {
-				if(this.ownerCt.formField.key) {
-					me.markDeleted.push(this.ownerCt.formField.key);
+				if(this.ownerCt.ownerCt.formField.key) {
+					me.markDeleted.push(this.ownerCt.ownerCt.formField.key);
 				}
-				this.ownerCt.destroy();
+				this.ownerCt.ownerCt.destroy();
 				me.dirty = true;
 			}
 		}),
@@ -309,11 +340,21 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 
 		if(this.editable) {
-			items.push(delBtn);
+
+			const editTB = new Ext.Container({
+				itemId: 'edit-tb',
+				cls: 'go-form-group-edit-tb',
+				width: dp(40),
+				layout: "hbox",
+				items: [delBtn]
+			});
+
+			items.push(editTB);
 
 			if(this.sortable) {
 				var dragHandle = this.createDragHandle(rowId);
-				items.push(dragHandle);
+				editTB.add(dragHandle);
+				editTB.setWidth(dp(80));
 			}
 		}
 
@@ -343,6 +384,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			tooltip: t("Drag to sort"),
 			rowId: rowId,
 			tabIndex: -1,
+			flex: 1,
 			listeners: {
 				scope: this,
 				destroy: function(cmp) {
@@ -427,9 +469,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			records.forEach(set);
 		}
 
-		if(this.startWithItem) {
-			this.addPanel(true);
-		}
+		// if(this.startWithItem) {
+		// 	this.addPanel(true);
+		// }
 
 		this.doLayout();
 	},
