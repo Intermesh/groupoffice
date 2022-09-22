@@ -127,13 +127,33 @@ abstract class EntityController extends Controller {
 //			$query->orderBy($pkSort, true);
 //		}
 
-		$query->select($cls::getPrimaryKey(true)); //only select primary key
+		$this->selectColumnsForQueryQuery($query);
 
 		$query->filter($params['filter']);
 
 		$this->applyPermissionLevelToQueryQuery($query);
 
 		return $query;
+	}
+
+	protected function selectColumnsForQueryQuery(Query $query) {
+		$cls = $this->entityClass();
+//		/**
+//		 * @var Entity $cls;
+//		 */
+//		$mapQuery = $cls::getMapping()->getQuery();
+//		if(isset($mapQuery)) {
+//			$select = $mapQuery->select($cls::getPrimaryKey(true), true)->getSelect();
+//			$query->select($select); //only select primary key
+//		} else{
+
+		$keys = $cls::getPrimaryKey(true);
+		if(count($keys) == 1) {
+			$query->select($keys);
+		} else{
+			$query->select("CONCAT(" . implode(", '-', ", $keys) . ")");
+		}
+//		}
 	}
 
 	protected function applyPermissionLevelToQueryQuery(Query $query) {

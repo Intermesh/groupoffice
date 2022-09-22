@@ -541,6 +541,12 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this;
 	}
 
+	public function removeJoins() {
+		$this->joins = [];
+
+		return $this;
+	}
+
 	/**
 	 * Skip this number of records
 	 *
