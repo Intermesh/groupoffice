@@ -1887,6 +1887,8 @@ table[id^="comments-ext"] b {
  */
 .go-html-formatted {
 
+	word-break: break-all;
+
 	@extend %font-body1;
 
 	blockquote {
