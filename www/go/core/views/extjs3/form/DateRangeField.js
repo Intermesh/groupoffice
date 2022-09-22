@@ -202,6 +202,16 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 					me.startDatePicker.focus();
 				}
 
+			}, "-",{
+				text: t("Clear"),
+				scope: this,
+				handler: function() {
+					this.setValue(null);
+					this.updateBtnText();
+
+					this.fireEvent("change", this, null, this.lastValue);
+				}
+
 			}]
 		});
 
