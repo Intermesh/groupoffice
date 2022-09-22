@@ -308,8 +308,12 @@ class Spreadsheet extends AbstractConverter {
 				$templateValues = $templateValues->$seg ?? "";
 			}
 		}
-		
-		return is_array($templateValues) ? implode(static::$multipleDelimiter, $templateValues) : $templateValues;
+
+		try {
+			return is_array($templateValues) ? implode(static::$multipleDelimiter, $templateValues) : $templateValues;
+		} catch(\Exception $e) {
+			return "error: ". $e->getMessage();
+		}
 	}
 
 	/**
