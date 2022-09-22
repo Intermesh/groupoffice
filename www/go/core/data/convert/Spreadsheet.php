@@ -413,7 +413,7 @@ class Spreadsheet extends AbstractConverter {
 			$headers = $this->addSubHeaders($headers, $name, $value, false, $forMapping);
 		}
 
-		$exclude = $entityCls::atypicalApiProperties();
+		$exclude = array_merge($entityCls::atypicalApiProperties(), static::$excludeHeaders);
 		$exclude[] = 'customFields';
 		$exclude[] = 'acl';
 		$exclude[] = 'permissionLevel';
