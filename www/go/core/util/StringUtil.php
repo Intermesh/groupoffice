@@ -514,8 +514,7 @@ END;
 		}
 
 		//remove all characters we don't care about
-		$text = preg_replace('/[^\w\-_+\\\\\/\s:@,;]/u', '', mb_strtolower($text));
-
+		$text = preg_replace('/[^\w\-_+\\\\\/\s:@,;.]/u', '', mb_strtolower($text));
 
 		// TODO transliterate to ascii so utf8 chars can be found with their ascii
 		// counterparts too ???
