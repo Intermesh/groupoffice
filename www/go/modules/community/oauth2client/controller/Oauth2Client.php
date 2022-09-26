@@ -51,7 +51,7 @@ final class Oauth2Client extends EntityController
 			throw new Exception('Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
 		}
 		if (!isset(\GO::session()->values['accountId'])) {
-			throw new Exception('Invalid parameter');
+			throw new Exception(500, 'Invalid parameter');
 		}
 		$accountId = \GO::session()->values['accountId'];
 		$provider = $this->getProvider($accountId);

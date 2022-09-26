@@ -6,6 +6,8 @@
 - Pr2Analyzer: Fix error when manually changing start date or end date in grid
 - Newsletters: Added labels to buttons in compose dialog;
 - Tickets: Fix HTML entitiy rendering of subject field in grid
+- Email: more helpful error when OAuth2 token is invalid
+- OAuth2Client: better error handling
 
 19-09-2022 6.6.118
 - Newsletters: Fixed upgrade bug in newsletters
