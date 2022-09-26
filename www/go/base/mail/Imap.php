@@ -3,6 +3,7 @@
 namespace GO\Base\Mail;
 
 use Exception;
+use GO\Base\Fs\File;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 
 class Imap extends ImapBodyStruct
@@ -2899,6 +2900,22 @@ class Imap extends ImapBodyStruct
 
 			fclose($fp);
 			$tmpfile->delete();
+		} else if ($data instanceof File) {
+
+			if(!$this->append_start($mailbox, $data->size(), $flags)) {
+				return false;
+			}
+
+			$fp = fopen($data->path(), 'r');
+
+			while($line = fgets($fp, 1024)){
+				if(!$this->append_feed($line)) {
+					return false;
+				}
+			}
+
+			fclose($fp);
+
 		} else {
 			if(!$this->append_start($mailbox, strlen($data), $flags)) {
 				return false;
