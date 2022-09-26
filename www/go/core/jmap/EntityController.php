@@ -1099,8 +1099,7 @@ abstract class EntityController extends Controller {
    */
 	protected function defaultExport(array $params): ArrayObject
 	{
-
-		ini_set('max_execution_time', 10 * 60);
+		go()->getEnvironment()->setMaxExecutionTime(10 * 60);
 		
 		$params = $this->paramsExport($params);
 		
