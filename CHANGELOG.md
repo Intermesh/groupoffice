@@ -4,6 +4,7 @@
 - Projects: Fix width of checkbox in InvoicablePanel
 - Pr2Analyzer: when explicitly exporting, set limit to zero
 - Pr2Analyzer: Fix error when manually changing start date or end date in grid
+- Newsletters: Added labels to buttons in compose dialog
 
 19-09-2022 6.6.118
 - Newsletters: Fixed upgrade bug in newsletters
