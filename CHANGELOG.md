@@ -1,4 +1,4 @@
-6.6.119
+27-09-2022 6.6.119
 - Newsletters: fix bug max number of messages per minute
 - Newsletters: end user can edit their own newsletter
 - Projects: Fix width of checkbox in InvoicablePanel
