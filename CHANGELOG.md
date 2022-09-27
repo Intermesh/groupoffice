@@ -9,6 +9,7 @@
 - Email: more helpful error when OAuth2 token is invalid
 - OAuth2Client: better error handling
 - Email: Fixed broken UI after delete email on mobile
+- AddressBook: Fixed error Only admins can pass 'permissionLevelUserId' on login
 
 19-09-2022 6.6.118
 - Newsletters: Fixed upgrade bug in newsletters
