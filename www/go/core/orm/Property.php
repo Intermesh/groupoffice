@@ -120,7 +120,7 @@ abstract class Property extends Model {
 	/**
 	 * Constructor
 	 *
-	 * @param Property $owner
+	 * @param ?Property $owner
 	 * @param boolean $isNew Indicates if this model is saved to the database.
 	 * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
 	 * @param bool $readOnly Entities can be fetched readonly to improve performance

@@ -2357,7 +2357,8 @@ table[id^="comments-ext"] b {
 
 
 	section {
-		width: dp(800);
+		width: 100%;
+		max-width: dp(800);
 		margin: 0 auto;
 		padding: dp(16);
 	}

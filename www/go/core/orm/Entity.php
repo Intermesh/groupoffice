@@ -158,7 +158,7 @@ abstract class Entity extends Property {
 	 *
 	 * For a single value do:
 	 *
-	 * @exanple
+	 * @example
 	 * ````
 	 * $note = Note::find()->where(['name' => 'Foo'])->single();
 	 *
