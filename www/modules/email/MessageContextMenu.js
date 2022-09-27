@@ -144,8 +144,9 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 			this.contextMenuDelete = new Ext.menu.Item({
 				iconCls: 'ic-delete',
 				text: t("Delete"),
-				handler: function(){
-					this.main.messagesGrid.deleteSelected();
+				handler: async function(){
+					await this.main.messagesGrid.deleteSelected();
+					this.main.westPanel.show();
 				},
 				scope: this,
 				multiple:true

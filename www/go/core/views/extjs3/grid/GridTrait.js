@@ -341,40 +341,51 @@ go.grid.GridTrait = {
 	deleteSelected: function () {
 
 		if(!this.enableDelete) {
-			return;
+			return Promise.resolve();
 		}
 
-		var selectedRecords = this.getSelectionModel().getSelections(), count = selectedRecords.length, strConfirm;
+		return new Promise((resolve, reject) => {
 
-		switch (count)
-		{
-			case 0:
-				return;
-			case 1:
-				strConfirm = t("Are you sure you want to delete the selected item?");
-				break;
+			var selectedRecords = this.getSelectionModel().getSelections(), count = selectedRecords.length, strConfirm;
 
-			default:
-				strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', count);
-				break;
-		}
+			switch (count)
+			{
+				case 0:
+					return;
+				case 1:
+					strConfirm = t("Are you sure you want to delete the selected item?");
+					break;
 
-		Ext.MessageBox.confirm(t("Confirm delete"), t(strConfirm), function (btn) {
-
-			if (btn != "yes") {
-				return;
+				default:
+					strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', count);
+					break;
 			}
-			
-			this.doDelete(selectedRecords);
-			
-		}, this);
+
+			Ext.MessageBox.confirm(t("Confirm delete"), t(strConfirm), async function (btn) {
+
+				if (btn != "yes") {
+					return;
+				}
+
+				try {
+					const result = await this.doDelete(selectedRecords);
+
+					resolve(result);
+				} catch(e) {
+					reject(e);
+				}
+
+			}, this);
+		});
 	},
 
 	selectNextAfterDelete : function() {
 
 		// Do not go to the next item, if mobile we want to stay in the grid view
-		if(GO.util.isMobileOrTablet())
+		if(GO.util.isMobileOrTablet()) {
+			this.show();
 			return;
+		}
 
 		var index = -1;
 
@@ -442,10 +453,12 @@ go.grid.GridTrait = {
 		})
 		.catch(function(reason) {
 			GO.errorDialog.show(t( 'Sorry, an unexpected error occurred: ' + reason.message));
+			return Promise.reject(reason);
 		})
 		.finally(function() {
 			me.getEl().unmask();			
 		});
+		return prom;
 	},
 	
 	handleHdMenuItemClick: function(item) {
