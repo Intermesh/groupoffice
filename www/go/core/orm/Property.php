@@ -172,11 +172,12 @@ abstract class Property extends Model {
 	 */
 	private $defaults = [];
 
-  /**
-   * Loads defaults from the database or casts the database value to the right type in PHP
-   *
-   * @param boolean $loadDefault
-   */
+	/**
+	 * Loads defaults from the database or casts the database value to the right type in PHP
+	 *
+	 * @param boolean $loadDefault
+	 * @throws Exception
+	 */
 	private function initDatabaseColumns(bool $loadDefault) {
 		$m = static::getMapping();
 		foreach($this->selectedProperties as $propName) {
@@ -441,9 +442,10 @@ abstract class Property extends Model {
 	/**
 	 * Get all properties to check when saving and using isModified()
 	 *
-	 * By default all non-static public and protected properties + dynamically mapped properties.
+	 * By default, all non-static public and protected properties + dynamically mapped properties.
 	 *
 	 * @return array
+	 * @throws Exception
 	 */
 	private function watchProperties(): array
 	{
@@ -540,11 +542,12 @@ abstract class Property extends Model {
 		self::$mapping = [];
 	}
 
-  /**
-   * Returns the mapping object that is defined in defineMapping()
-   *
-   * @return Mapping
-   */
+	/**
+	 * Returns the mapping object that is defined in defineMapping()
+	 *
+	 * @return Mapping
+	 * @throws Exception
+	 */
 	public final static function getMapping(): Mapping
 	{
 		$cls = static::class;
@@ -2148,7 +2151,7 @@ abstract class Property extends Model {
 			for ($i = 0, $c = count($value); $i < $c; $i++) {
 
 				$patch = $value[$i];
-				//if it's already a Propery model then use it and continue
+				//if it's already a Property model then use it and continue
 				if($patch instanceof  $relation->propertyName) {
 					$this->{$propName}[] = $patch;
 					continue;
@@ -2192,31 +2195,28 @@ abstract class Property extends Model {
 		$this->$propName = [];
 		if(isset($value)) {
 			foreach ($value as $id => $patch) {
-				if (!isset($patch) || $patch === false) {
-					if (!array_key_exists($id, $old)) {
-						go()->warn("Key $id does not exist in " . static::class . '->' . $propName);
-					}
-					continue;
-				}
 				if (is_array($old) && isset($old[$id])) {
 					$this->$propName[$id] = $old[$id];
 					if (is_array($patch)) { //may be given as bool
 						$this->$propName[$id]->setValues($patch);
+					} else if($patch === false || $patch === null) {
+						unset($this->$propName[$id]);
 					}
 				} else {
 
 					$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);
 
-					//Why?
-//					if (is_bool($patch)) {
-						// if($relation->type == Relation::TYPE_MAP) {
-						//Only change key to values when using booleans. Key can also be made up by the client.
+					//might be null when map keys are set to false or null
+					if($this->$propName[$id] != null) {
+
 						foreach ($this->mapKeyToValues($id, $relation) as $key => $value) {
-							if(empty($this->$propName[$id]->$key)) {
+							if (empty($this->$propName[$id]->$key)) {
 								$this->$propName[$id]->$key = $value;
 							}
 						}
-//					}
+					} else {
+						unset($this->$propName[$id]);
+					}
 				}
 			}
 		}
@@ -2274,6 +2274,7 @@ abstract class Property extends Model {
 		}
 
 		if(is_bool($value)) {
+			// for maps with {1: false}
 			$value = $value ? [] : null;
 		}
 

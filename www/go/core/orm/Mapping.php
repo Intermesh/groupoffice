@@ -222,7 +222,7 @@ class Mapping {
 	/**
 	 * Add has one relation
 	 *
-	 * An empty value is null and not an empty object
+	 * An empty value is null and not an empty object. Set to null to remove.
 	 *
 	 * @param string $name
 	 * @param string $propertyName
@@ -243,13 +243,12 @@ class Mapping {
 	/**
 	 * Add an array relation.
 	 *
-	 * Array's can be sorted. When the property does not have a primary key, the whole array will be deleted and rewritten
-	 * when saved. This will retain the sort order automatically.
-	 *
-	 * If the property does have a primary key. The client can sent it along to retain it. In this case the sort order must
-	 * be stored in an int column. The framework does this automatically when you specify this. See the $options parameter.
-	 *
-	 * The propery can't be null. An empty value is an empty array.
+	 * - Array's can be sorted. When the property does not have a primary key, the whole array will be deleted and rewritten
+	 *   when saved. This will retain the sort order automatically.
+	 * - If the property does have a primary key. The client can send it along to retain it. In this case the sort order must
+	 *   be stored in an int column. The framework does this automatically when you specify this. See the $options parameter.
+	 * - The property can't be null. An empty value is an empty array.
+	 * - When updating the array property, the client must send all items. Items not included will be removed.
 	 *
 	 * @param string $name Name of the property
 	 * @param string $propertyName The name of the Property model
@@ -271,11 +270,12 @@ class Mapping {
 	}
 
 	/**
-	 * Add a mapped relation. Index is the ID.
+	 * Add a mapped relation. Index is the ID of the {@see Property}.
 	 *
-	 * Map objects are unsorted!
-	 *
-	 * If the map is empty the value is null and not an empty object
+	 * - Map objects are unsorted!
+	 * - If the map is empty the value is null and not an empty object
+	 * - When updating a map the client must send the full property value. Everything that is not included will be removed.
+	 * - Setting a value to null or false will remove it from the map.
 	 *
 	 * @param string $name
 	 * @param string $propertyName
