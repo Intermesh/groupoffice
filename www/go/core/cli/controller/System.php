@@ -183,7 +183,7 @@ JSON;
 //		Listeners::get()->init();
 
 		go()->getInstaller()->isValidDb();
-		Table::destroyInstances();
+		go()->getDatabase()->clearCache();
 		\GO::session()->runAsRoot();	
 		date_default_timezone_set("UTC");
 		go()->getInstaller()->upgrade();

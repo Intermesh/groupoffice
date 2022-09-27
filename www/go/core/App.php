@@ -677,7 +677,7 @@ namespace go\core {
 		 */
 		public function clearCache() {
 			App::get()->getCache()->flush( false);
-			Table::destroyInstances();
+			go()->getDatabase()->clearCache();
 			Property::clearCache();
 			Property::clearCachedRelationStmts();
 			GO::clearCache();

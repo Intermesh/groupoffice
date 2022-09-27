@@ -75,6 +75,11 @@ class Database {
 		
 		return $this->tableNames;
 	}
+
+	public function clearCache() {
+		$this->tableNames = null;
+		Table::destroyInstances();
+	}
 	
 	/**
 	 * Get all tables

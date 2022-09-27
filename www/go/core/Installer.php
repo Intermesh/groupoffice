@@ -682,7 +682,7 @@ class Installer {
 					if (is_callable($query)) {
 						
 						//upgrades may have modified tables so rebuild model and table cache
-						Table::destroyInstances();
+						go()->getDatabase()->clearCache();
 						go()->getCache()->flush(true, false);
 										
 						echo $modStr . "Running callable function\n";
@@ -690,7 +690,7 @@ class Installer {
 					} else if (substr($query, 0, 7) == 'script:') {
 						
 						//upgrades may have modified tables so rebuild model and table cache
-						Table::destroyInstances();
+						go()->getDatabase()->clearCache();
 						go()->getCache()->flush(true, false);
 						
 						$root = go()->getEnvironment()->getInstallFolder();

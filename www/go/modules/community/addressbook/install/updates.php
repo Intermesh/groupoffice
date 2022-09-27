@@ -171,7 +171,7 @@ $updates['202206020948'][] = "alter table addressbook_address
 $updates['202206020948'][] = function() {
 
 	go()->getDbConnection()->exec("alter table addressbook_address ADD id INT AUTO_INCREMENT PRIMARY KEY;");
-	\go\core\db\Table::destroyInstances();
+	go()->getDatabase()->clearCache();
 	try {
 		$addresses = go()->getDbConnection()->select('id,street,street2,countryCode')
 			->from("addressbook_address");
