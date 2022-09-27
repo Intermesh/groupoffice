@@ -52,7 +52,7 @@ try {
 
 	go()->getInstaller()->isValidDb();
 
-	Table::destroyInstances();
+	go()->getDatabase()->clearCache();
 	
 	$unavailable = go()->getInstaller()->getUnavailableModules();
 
