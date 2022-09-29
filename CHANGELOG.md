@@ -5,7 +5,7 @@
 - Leavedays: several bug fixes in special leave budgets
 - Libreoffice / office online: Fixed opening two attachments with the same name
 - Tickets: Group management was unavailable
-
+- Tasks: don't show project task lists in normal mode
 
 27-09-2022 6.6.119
 - Newsletters: fix bug max number of messages per minute
