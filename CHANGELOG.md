@@ -3,6 +3,7 @@
 - OAuth2Client: better error handling
 - Core: Added Online / Offline events to show the user if the device is still connected to wifi.
 - Leavedays: several bug fixes in special leave budgets
+- Libreoffice / office online: Fixed opening two attachments with the same name
 
 27-09-2022 6.6.119
 - Newsletters: fix bug max number of messages per minute
