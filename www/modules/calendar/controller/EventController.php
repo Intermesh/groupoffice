@@ -2002,39 +2002,31 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	
 	protected function actionExportEventAsIcs($event_id) {
 		
-		$eventModel = \GO\Calendar\Model\Event::model()->findByPk($event_id);
+		$event = \GO\Calendar\Model\Event::model()->findByPk($event_id);
 		
-		if (!$eventModel)
+		if (!$event)
 			throw new Exception('Could not find event with ID #'.$event_id.'.');
 			
-		if ($eventModel->exception_for_event_id>0)
-			$eventModel = \GO\Calendar\Model\Event::model()->findByPk($eventModel->exception_for_event_id);
+		if ($event->exception_for_event_id>0)
+			$event = \GO\Calendar\Model\Event::model()->findByPk($event->exception_for_event_id);
 		
-		if (!$eventModel)
+		if (!$event)
 			throw new Exception('Could not find main recurring event of event #'.$event_id.'.');
 		
 		
-		if($eventModel->private && $eventModel->calendar->user_id != \GO::user()->id) {
+		if($event->private && $event->calendar->user_id != \GO::user()->id) {
 			throw new \GO\Base\Exception\AccessDenied();
 		}
 		
-		\GO\Base\Util\Http::outputDownloadHeaders(new \GO\Base\FS\File($eventModel->calendar->name.' - '.\GO\Base\Util\Date::get_timestamp($eventModel->start_time).' '.$eventModel->name.'.ics'));
-		
-		echo "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML ".\GO::config()->product_name." ".\GO::config()->version."//EN\r\n";
-		
-		$t = new \GO\Base\VObject\VTimezone();
-		echo $t->serialize();
-		$v = $eventModel->toVObject();
-		echo $v->serialize();
-		
-		$exceptionsStmt = \GO\Calendar\Model\Event::model()->findByAttributes(array('calendar_id'=>$eventModel->calendar_id,'exception_for_event_id'=>$eventModel->id));
-		foreach ($exceptionsStmt as $exceptionEventModel) {
-			$vexc = $exceptionEventModel->toVObject();
-			echo $vexc->serialize();
-		}
-		
-		echo "END:VCALENDAR\r\n";
-		
+
+//		echo "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML ".\GO::config()->product_name." ".\GO::config()->version."//EN\r\n";
+//
+//		$t = new \GO\Base\VObject\VTimezone();
+//		echo $t->serialize();
+
+		\GO\Base\Util\Http::outputDownloadHeaders(new \GO\Base\FS\File($event->calendar->name.' - '.\GO\Base\Util\Date::get_timestamp($event->start_time).' '.$event->name.'.ics'));
+		echo $event->exportFullRecurrenceICS()->serialize();
+
 	}
 
 
