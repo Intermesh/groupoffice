@@ -385,26 +385,6 @@ Ext.extend(GO.email.AccountsTree, Ext.tree.TreePanel, {
 	
 	findInboxNode : function(node){
 		return this.findMailboxByName(node, 'INBOX');
-		//
-		// if(node.attributes.isAccount){
-		// 	accountNode=node;
-		// }else
-		// {
-		// 	var p = node.parentNode;
-		// 	var accountNode=false;
-		// 	while(p){
-		// 			if(p.attributes.isAccount){
-		// 					accountNode=p;
-		// 					break;
-		// 			}
-		// 			p = p.parentNode;
-		// 	}
-		// }
-		//
-		// if(!accountNode)
-		// 	return false;
-		//
-		// return accountNode.findChild('mailbox','INBOX');
 	},
 
 	findMailboxByName: function (node, name) {

@@ -262,8 +262,8 @@ class FindParams{
 	 * Join a relation in the find query. Relation models are fetched together and
 	 * can be accessed without the need for an extra select query.
 	 * 
-	 * @param StringHelper $name
-	 * @param StringHelper $type
+	 * @param string $name
+	 * @param string $type
 	 */
 	public function joinRelation($name, $type='INNER'){
 		
@@ -449,7 +449,7 @@ class FindParams{
 	 * Adds a having clause. Warning. RAW SQL is passed to the query. Be careful
 	 * with user input.
 	 * 
-	 * @param StringHelper $rawSQL
+	 * @param string $rawSQL
 	 * @return FindParams 
 	 */
 	public function having($rawSQL){

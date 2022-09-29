@@ -48,10 +48,10 @@ final class Oauth2Client extends EntityController
 	public function callback()
 	{
 		if (!empty($_GET['error'])) {
-			throw new Exception('Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
+			throw new Exception(500, 'Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
 		}
 		if (!isset(\GO::session()->values['accountId'])) {
-			throw new Exception('Invalid parameter');
+			throw new Exception(500, 'Invalid parameter');
 		}
 		$accountId = \GO::session()->values['accountId'];
 		$provider = $this->getProvider($accountId);
@@ -62,7 +62,7 @@ final class Oauth2Client extends EntityController
 			unset(\GO::session()->values['oauth2state']);
 			unset(\GO::session()->values['accountId']);
 			\GO::session()->closeWriting();
-			throw new Exception('Invalid state');
+			throw new Exception(500, 'Invalid state');
 		} else {
 			// Try to get an access token (using the authorization code grant)
 			$token = $provider->getAccessToken('authorization_code', [
@@ -78,7 +78,7 @@ final class Oauth2Client extends EntityController
 					$acct->oauth2_account->refreshToken = $refreshToken;
 				}
 				if(!$acct->save()) {
-					throw new \Exception("Unable to save token");
+					throw new Exception(500, "Unable to save token");
 				}
 				$ownerDetails = $provider->getResourceOwner($token);
 			} catch (\Exception $e) {
@@ -110,11 +110,11 @@ final class Oauth2Client extends EntityController
 	{
 		\GO::session()->values['accountId'] = $accountId;
 		if (!$provider = $this->getProvider($accountId)) {
-			throw new Exception('No OAuth2 client settings found for current email account.');
+			throw new Exception(412, 'No OAuth2 client settings found for current email account.');
 		}
 
 		if (!empty($_GET['error'])) {
-			throw new Exception('Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
+			throw new Exception(500, 'Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
 		}
 
 		// If we don't have an authorization code then get one

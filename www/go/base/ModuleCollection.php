@@ -199,7 +199,7 @@ class ModuleCollection extends Model\ModelCollection{
 	 * Check if a module is installed.
    * Default check if module is enabled an treat a disabled module as not installed. When checking from within moduleController return the model if record is in core_module
 	 * 
-	 * @param StringHelper $name
+	 * @param string $name
    * @param boolean $checkEnabled
 	 * @return Model\Module 
 	 */

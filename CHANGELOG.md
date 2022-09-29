@@ -1,8 +1,24 @@
-6.6.119
+
+6.6.120
+- OAuth2Client: better error handling
+- Core: Added Online / Offline events to show the user if the device is still connected to wifi.
+- Leavedays: several bug fixes in special leave budgets
+- Libreoffice / office online: Fixed opening two attachments with the same name
+- Tickets: Group management was unavailable
+- Tasks: don't show project task lists in normal mode
+
+27-09-2022 6.6.119
 - Newsletters: fix bug max number of messages per minute
 - Newsletters: end user can edit their own newsletter
 - Projects: Fix width of checkbox in InvoicablePanel
 - Pr2Analyzer: when explicitly exporting, set limit to zero
+- Pr2Analyzer: Fix error when manually changing start date or end date in grid
+- Newsletters: Added labels to buttons in compose dialog;
+- Tickets: Fix HTML entitiy rendering of subject field in grid
+- Email: more helpful error when OAuth2 token is invalid
+- OAuth2Client: better error handling
+- Email: Fixed broken UI after delete email on mobile
+- AddressBook: Fixed error Only admins can pass 'permissionLevelUserId' on login
 
 19-09-2022 6.6.118
 - Newsletters: Fixed upgrade bug in newsletters

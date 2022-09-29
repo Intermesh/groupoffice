@@ -1936,7 +1936,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Loads the model attributes from the database. It also automatically checks
 	 * read permission for the current user.
 	 *
-	 * @param int $primaryKey
+	 * @param int|array $primaryKey
 	 * @return static
 	 */
 
@@ -4122,7 +4122,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	/**
 	 * Delete's the model from the database
-	 * @return PDOStatement
+	 * @return bool
 	 */
 	public function delete($ignoreAcl=false){
 
@@ -4293,8 +4293,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$this->_deleteLinks();	
 		
 		
-		if(!$this->afterDelete())
+		if(!$this->afterDelete()) {
 			return false;
+		}
 		
 		if($this->hasLinks() && !is_array($this->pk)) {
 			$this->deleteReminders();

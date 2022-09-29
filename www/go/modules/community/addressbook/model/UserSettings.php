@@ -65,7 +65,10 @@ class UserSettings extends Property {
 				}
 			}
 		} else {
-			$addressBook = AddressBook::find(['id'])->filter(['permissionLevel' => Acl::LEVEL_WRITE, 'permissionLevelUserId' => $this->userId])->single();			
+			$addressBook = AddressBook::applyAclToQuery(
+				AddressBook::find(['id'])
+				, Acl::LEVEL_WRITE, $this->userId)
+				->single();
 		}
 
 		if($addressBook) {

@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\addressbook\model;
 
+use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\fs\File;
 use go\core\model\Acl;
@@ -19,7 +20,7 @@ use go\modules\community\addressbook\Module;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 
-class AddressBook extends \go\core\acl\model\AclOwnerEntity {
+class AddressBook extends AclOwnerEntity {
 	
 	/**
 	 * 

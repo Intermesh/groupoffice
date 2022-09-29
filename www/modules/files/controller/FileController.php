@@ -15,6 +15,7 @@ use go\core\fs\File as GoFile;
 use go\core\fs\Folder;
 use GO\Email\Controller\MessageController;
 use go\modules\community\history\Module;
+use Exception;
 
 class FileController extends \GO\Base\Controller\AbstractModelController {
 
@@ -348,7 +349,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		}else
 		{
 			$tmpfile = new \GO\Base\Fs\File(\GO::config()->tmpdir.$params['tmp_file']);
-			$file = $tmpfile->copy($file->parent(), $params['filename']);
+			$file = $tmpfile->copy($file->parent(), $file->name());
 			if(!$file) {
 				throw new Exception("IO error");
 			}
@@ -359,6 +360,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$dbFile = $tmpFolder->hasFile($file->name());
 		if(!$dbFile) {
 			$dbFile = $tmpFolder->addFile($file->name(), true);
+		} else {
+			$dbFile->touch();
 		}
 		return ['success' => true, 'data' => $dbFile->getAttributes()];
 	}

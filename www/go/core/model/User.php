@@ -1214,8 +1214,8 @@ class User extends Entity {
 		}
 
 		if(Module::isInstalled("legacy", "calendar")) {
-			if ($calendarId = $this->calendarSettings->calendar_id) {
-				$aclIds[] = Calendar::model()->findByPk($calendarId)->findAclId();
+			if (($calendarId = $this->calendarSettings->calendar_id) && ($calendar = Calendar::model()->findByPk($calendarId))) {
+				$aclIds[] = $calendar->findAclId();
 			}
 		}
 

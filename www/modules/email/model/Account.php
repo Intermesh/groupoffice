@@ -426,7 +426,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 			$clt = $acct->oauth2_account;
 			if($clt) {
 				if(!$token = $clt->token) {
-					return null;
+					throw new ImapAuthenticationFailedException('OAuth2: Error retrieving token');
 				}
 				$defaultClientId = Oauth2Client::findById($clt->oauth2ClientId)->defaultClientId;
 				$auth = strtolower(DefaultClient::findById($defaultClientId)->authenticationMethod);

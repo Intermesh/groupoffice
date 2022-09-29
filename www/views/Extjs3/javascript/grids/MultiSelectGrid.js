@@ -11,7 +11,6 @@ GO.grid.MultiSelectGrid = function (config){
 		listeners:{
 			scope:this,
 			change:function(record){
-
 				record.commit();
 				this.lastRecordClicked = record;
 
@@ -70,14 +69,6 @@ GO.grid.MultiSelectGrid = function (config){
 		}
 
 		this.selectedAll = (num_selected == this.store.data.items.length) ? true : false;
-		
-		//this.fireEvent('change', this, this.getSelected(), this.getSelectedRecords());
-
-//		if(this.allowNoSelection)
-//		{
-//			var text = (this.selectedAll) ? t("Deselect all") : t("Select all");
-//			this.selectButton.setText(text);
-//		}
 	    
 	},this);
 	
@@ -150,11 +141,9 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 		if(this.relatedStore){
 			this.on('change', function(grid, categories, records)
 			{
-				//if(records.length){
 					this.relatedStore.baseParams[this.getRequestParam()] = Ext.encode(categories);
 					this.relatedStore.load();
 					delete this.relatedStore.baseParams[this.getRequestParam()];
-				//}
 			}, this);
 
 
@@ -314,17 +303,7 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 
 			this.getSelectionModel().clearSelections();
 		}
-//		if(this.lastSelectedIndex>-1)
-//		{
-//			this.getView().focusRow(this.lastSelectedIndex);
-//		}
 
 		this.selectedAll = (records.length == this.store.data.items.length) ? true : false;
-		if(this.allowNoSelection)
-		{						
-//			var text = (this.selectedAll) ? t("Deselect all") : t("Select all");			
-			//this.selectButton.setText(text);
-		}
-		
 	}
 });
