@@ -85,12 +85,12 @@
 					}]
 				};
 
-				if("progress" in alert.data) {
-					c.items.push(new Ext.ProgressBar({
-						text: t("Progress") + " " + alert.data.progress + "%",
-						value: alert.data.progress / 100
-					}))
-				}
+				// if("progress" in alert.data) {
+				// 	c.items.push(new Ext.ProgressBar({
+				// 		text: t("Progress") + " " + alert.data.progress + "%",
+				// 		value: alert.data.progress / 100
+				// 	}))
+				// }
 
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
 
