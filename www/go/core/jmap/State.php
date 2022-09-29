@@ -149,6 +149,10 @@ class State extends AbstractState {
 	private function getBaseUrl() {
 		$url = Request::get()->isHttps() ? 'https://' : 'http://';
 		$url .= Request::get()->getHost(false) . dirname($_SERVER['PHP_SELF']);
+		// HACK for old framework index.php
+		if(substr(dirname($_SERVER['PHP_SELF']), -4) !== '/api'){
+			$url .= '/api';
+		}
 		return $url;
 	}
 	
