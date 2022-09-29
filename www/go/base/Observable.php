@@ -56,9 +56,9 @@ class Observable{
 	/**
 	 * Add a listener function to this object
 	 * 
-	 * @param StringHelper $eventName
-	 * @param StringHelper $listenerClass Object class name where the static listener function is in.
-	 * @param StringHelper $staticListenerFunction Static listener function name.
+	 * @param string $eventName
+	 * @param string $listenerClass Object class name where the static listener function is in.
+	 * @param string $staticListenerFunction Static listener function name.
 	 */
 	public function addListener($eventName,$listenerClass, $staticListenerFunction){
 		$currentClass = get_class($this);

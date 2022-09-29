@@ -1935,7 +1935,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Loads the model attributes from the database. It also automatically checks
 	 * read permission for the current user.
 	 *
-	 * @param int $primaryKey
+	 * @param int|array $primaryKey
 	 * @return static
 	 */
 

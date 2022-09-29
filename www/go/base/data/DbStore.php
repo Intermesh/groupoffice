@@ -128,7 +128,7 @@ class DbStore extends AbstractStore {
 
 	/**
 	 * Create a new store
-	 * @param StringHelper $modelClass the classname of the model to execute the find() method on
+	 * @param string $modelClass the classname of the model to execute the find() method on
 	 * @param ColumnModel $columnModel the column model object for formatting this store's columns
 	 * @param array $storeParams the $_POST params to set to this store @see setStoreParams()
 	 * @param \GO\Base\Db\FindParams $findParams extra findParams to be added to the store
