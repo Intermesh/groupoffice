@@ -79,9 +79,9 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 		if(entityStore.entity.name === this.entityStore.entity.name) {
 
-			if(changed.indexOf(this.currentId) > -1) {
+			if(changed.indexOfLoose(this.currentId) > -1) {
 				this.reload();
-			} else if (destroyed.indexOf(this.currentId) > -1) {
+			} else if (destroyed.indexOfLoose(this.currentId) > -1) {
 				this.reset();
 			}
 			return;

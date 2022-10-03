@@ -65,6 +65,11 @@
 			this.notificationArea.insert(0,this.notifications);
 
 			this.notifiedAlerts = {};
+
+
+			//ugly but it needs to be rendered before first notifications appear
+			this.showNotifications();
+			this.hideNotifications();
 		},
 
 		_messages: {},
@@ -235,7 +240,11 @@
 				return false;
 			}
 
-
+			var me = this;
+			function moveToNotificationArea(msgPanel) {
+				me.notifications.add(msgPanel);
+				me.notifications.doLayout();
+			}
 
 			if(openNotifications) {
 				// this.showNotifications();
@@ -243,14 +252,26 @@
 
 				msgPanel.render(this.messageCt);
 
+				msgPanel.getEl().on("mouseenter", (e) => {
+					msgPanel.mouseEntered = true;
+				});
+
+				msgPanel.getEl().on("mouseout", (e) => {
+
+					if(!e.within(	msgPanel.getEl(), true)) {
+						moveToNotificationArea(msgPanel);
+					}
+				});
+
 				setTimeout(() => {
-					this.notifications.add(msgPanel);
-					this.notifications.doLayout();
+
+					if(!msgPanel.mouseEntered) {
+						moveToNotificationArea(msgPanel);
+					}
 				}, 2000);
 
 			} else {
-				this.notifications.add(msgPanel);
-				this.notifications.doLayout();
+				moveToNotificationArea(msgPanel);
 			}
 
 			this.updateStatusIcons();

@@ -402,6 +402,11 @@ class Task extends AclInheritEntity {
 		if ($this->isModified('percentComplete')) {
 			if ($this->percentComplete == 100) {
 				$this->progress = Progress::Completed;
+
+				// Remove alert for creator of this comment. Other users will get a replaced alert below.
+				CoreAlert::deleteByEntity($this);
+
+
 			} else if ($this->percentComplete > 0 && $this->progress == Progress::NeedsAction) {
 				$this->progress = Progress::InProcess;
 			}
@@ -754,7 +759,11 @@ class Task extends AclInheritEntity {
 			$commenters[] = $this->responsibleUserId;
 		}
 
+		//remove creator of this comment
 		$commenters = array_filter($commenters, function($c) use($comment) {return $c != $comment->createdBy;});
+
+		// Remove alert for creator of this comment. Other users will get a replaced alert below.
+		CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);
 
 		foreach($commenters as $userId) {
 			$alert = $this->createAlert(new DateTime(), 'comment', $userId)

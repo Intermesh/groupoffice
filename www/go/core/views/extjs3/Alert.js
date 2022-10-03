@@ -32,6 +32,19 @@
 				this.onStoreLoad();
 			});
 
+			this.store.on("remove", (store, record) => {
+				const id = 'core-alert-' + record.data.id
+
+				const alert = go.Notifier.getById(id);
+				if(alert) {
+					// replaced is a bad name here. It won't attempt to remove the alert on
+					// the server when set.
+					alert.replaced = true;
+					alert.destroy();
+					go.Notifier.updateStatusIcons();
+				}
+			});
+
 			this.store.load();
 
 			// re-evaluate alerts every 60s
@@ -49,7 +62,7 @@
 		},
 
 		show : function(alert) {
-			const now = new Date(), id = 'core-alert-' + (alert.tag ||  "none") + "-" + alert.id;
+			const now = new Date(), id = 'core-alert-' + alert.id;
 
 			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
 

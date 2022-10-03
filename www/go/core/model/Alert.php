@@ -70,7 +70,7 @@ class Alert extends SingleOwnerEntity
 	/**
 	 * Set the entity type
 	 *
-	 * @param mixed $entity "note", Entity $note or Entitytype instance
+	 * @param Entity|ActiveRecord|EntityType|string $entity "note", Entity $note or Entitytype instance
 	 * @throws Exception
 	 *
 	 * @return self
@@ -90,6 +90,40 @@ class Alert extends SingleOwnerEntity
 		$this->entityTypeId = $entity->getId();
 
 		return $this;
+	}
+
+
+	/**
+	 * Delete alerts by entity tag and user ID
+	 *
+	 * @param Entity|ActiveRecord $entity
+	 * @param string|null $tag
+	 * @param int|null $userId
+	 * @return bool
+	 * @throws Exception
+	 */
+	public static function deleteByEntity($entity, ?string $tag = null, ?int $userId = null) {
+		$entityTypeId = $entity->entityType()->getId();
+		$entityId = $entity->id;
+
+		//skip dismiss action below in internal delete
+		$query = Query::normalize([
+			'entityTypeId' => $entityTypeId,
+			'entityId' => $entityId
+		]);
+
+
+		if(isset($tag)) {
+			$query->andWhere('tag', '=', $tag);
+		}
+
+		if(isset($userId)) {
+			$query->andWhere('userId', '=', $userId);
+		}
+//			// Skip dismiss update in internalDelete below
+//			->setData(['preventDismiss' => true]);
+
+		return static::delete($query);
 	}
 
 	protected static function defineFilters(): Filters
