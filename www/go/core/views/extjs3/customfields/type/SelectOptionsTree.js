@@ -13,13 +13,12 @@ go.customfields.type.SelectOptionsTree = function(config){
 	config.bbar=[ '->',{
 		iconCls: 'ic-add',
 		handler:function(){
-			var node = this.selModel.getSelectedNode();
-			if(!node)
-			{
+			let node = this.selModel.getSelectedNode();
+			if(!node) {
 				node = this.getRootNode();
 			}
 
-			var newNode = new Ext.tree.AsyncTreeNode({
+			let newNode = new Ext.tree.AsyncTreeNode({
 				text: '',				
 				expanded:true,
 				children:[]
@@ -34,9 +33,8 @@ go.customfields.type.SelectOptionsTree = function(config){
 	{
 		iconCls: 'ic-delete',
 		handler:function(){
-			var node = this.selModel.getSelectedNode();
-			if(!node)
-			{				
+			let node = this.selModel.getSelectedNode();
+			if (!node) {
 				return false;
 			}
 			node.destroy();
@@ -47,27 +45,81 @@ go.customfields.type.SelectOptionsTree = function(config){
 
 	go.customfields.type.SelectOptionsTree.superclass.constructor.call(this, config);
 
+	this.store = new Ext.data.ArrayStore({
+		autoDestroy: true,
+		storeId: 'options_renderModes',
+		idIndex: 0,
+		fields: [
+			'value',
+			'label'
+		]
+	});
+	this.store.loadData([['row', t("Row")],['column', t("Column")]]);
+	// TODO: Replace this with a dialog
 	this.treeEditor = new Ext.tree.TreeEditor(
 		this,
-		new Ext.form.TextField({
+		new Ext.form.TriggerField({
+			triggerConfig: {
+				tag: "button",
+				type: "button",
+				//tabindex: -1,
+				cls: "x-form-trigger ic-settings",
+				'ext:qtip': t("Option value display settings")
+			},
+			// hideLabel: true,
+			items: [
+				{
+					xtype: 'textfield',
+					width: dp(180),
+					hideLabel: true,
+					name: 'text',
+					maskRe:/[^:]/
+				},
+				{
+					xtype: 'colorfield',
+					hideLabel: false,
+					fieldLabel: t('Text color'),
+					name: 'foregroundColor'
+				},
+				{
+					xtype: 'colorfield',
+					hideLabel: false,
+					fieldLabel: t('Background color'),
+					name: 'backgroundColor'
+				},
+				{
+					xtype: 'gocombo',
+					fieldLabel: t("Render mode"),
+					name: 'renderMode',
+					store: this.store,
+					valueField: 'value',
+					displayField: 'label',
+					triggerAction: 'all',
+				}
+			],
+			width: 450,
 			cancelOnEsc:true,
 			completeOnEnter:true,
-			maskRe:/[^:]/
+			xtype: 'compositefield'
 		}),
-		{
-			listeners:{
-				//complete  : this.afterEdit,
-				beforecomplete  : function( editor, value, startValue){
-					value=value.trim();
-					if(go.util.empty(value)){
-						editor.focus();
-						return false;
-					}
-				},
-				scope:this
-			}
-		});
-		
+	// 	new Ext.form.TextField({
+	// 		cancelOnEsc:true,
+	// 		completeOnEnter:true,
+	// 		maskRe:/[^:]/
+	// 	}),
+	{
+		listeners:{
+			beforecomplete  : function( editor, value, startValue){
+				debugger;
+				value=value.trim();
+				if(go.util.empty(value)){
+					editor.focus();
+					return false;
+				}
+			},
+			scope:this
+		}
+	});
 	this.setValue([]);
 }
 
@@ -75,20 +127,20 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 	
 	setValue : function(options) {
 		// set the root node
-		var root = new Ext.tree.AsyncTreeNode({
+		const root = new Ext.tree.AsyncTreeNode({
 			text: 'Root',
-			draggable:false,
-			id:'root',
+			draggable: false,
+			id: 'root',
 			children: this.apiToTree(options),
 			expanded: true,
-			checked: true
+			checked: true,
+			editable: false
 		});
 		this.setRootNode(root);
 	},
 	
 	apiToTree : function(options) {
-		// debugger;
-		var me = this;
+		const me = this;
 		options.forEach(function(o) {
 			o.expanded = true; //always expand or they won't be submitted and thus deleted on the server!
 			o.children = me.apiToTree(o.children);
@@ -96,7 +148,7 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 			o.checked = !!o.enabled;
 			delete o.id;
 		});
-		
+
 		return options;
 	},
 	
@@ -115,8 +167,8 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 	},
 	
 	treeToAPI : function(node) {
-		var v = [], me = this;
-		// debugger;
+		let v = [];
+		const me = this;
 		node.childNodes.forEach(function(child) {
 			v.push({
 				id: child.attributes.serverId || null,

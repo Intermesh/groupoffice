@@ -104,8 +104,52 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 			title: field.name,
 			customfield: field
 		};
-	}
-	
+	},
+	/**
+	 * Get grid column definition
+	 *
+	 * @param {type} field
+	 * @returns {TextAnonym$0.getColumn.TextAnonym$6}
+	 */
+	getColumn : function(field) {
+		const def = this.getFieldDefinition(field);
+		let c = {
+			dataIndex: def.name,
+			header: def.customField.name,
+			hidden: def.customField.hiddenInGrid,
+			id: "custom-field-" + encodeURIComponent(def.customField.databaseName),
+			sortable: true,
+			hideable: true,
+			draggable: true,
+			xtype: this.getColumnXType()
+		};
+
+		c.renderer = function(val, cb) {
+			if(!go.util.empty(val)) {
+				const selectedOption = field.dataType.options.find(elm => elm.text === val);
+				if(!selectedOption) {
+					return val;
+				}
+
+				if(selectedOption.renderMode === 'cell') {
+					let inlineStyle = cb.style || "";
+					if (selectedOption.foregroundColor) {
+						inlineStyle += "color: #" + selectedOption.foregroundColor + ";";
+					}
+					if(selectedOption.backgroundColor) {
+						inlineStyle += "background-color: #" + selectedOption.backgroundColor + ";";
+					}
+					cb.style = inlineStyle;
+				} else if(selectedOption.renderMode === 'row') {
+					// TODO: How to render the entire row?
+				}
+			}
+			return val;
+		}
+		return c;
+	},
+
 });
+
 
 // go.customfields.CustomFields.registerType(new go.customfields.type.Select());
