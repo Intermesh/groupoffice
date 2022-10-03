@@ -235,13 +235,22 @@
 				return false;
 			}
 
-			this.notifications.add(msgPanel);
-			this.notifications.doLayout();
+
 
 			if(openNotifications) {
 				// this.showNotifications();
-				this.flyout(msg);
+				//this.flyout(msg);
 
+				msgPanel.render(this.messageCt);
+
+				setTimeout(() => {
+					this.notifications.add(msgPanel);
+					this.notifications.doLayout();
+				}, 2000);
+
+			} else {
+				this.notifications.add(msgPanel);
+				this.notifications.doLayout();
 			}
 
 			this.updateStatusIcons();
@@ -448,9 +457,7 @@
 		 * @returns The created Ext.Panel
 		 */
 		flyout: function(msg) {
-			if(!this.messageCt) {
-				this.messageCt = Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true);
-			}
+
 			msg.renderTo = this.messageCt;
 			if(!msg.html && !msg.items) {
 				msg.html = msg.description; // backward compat
