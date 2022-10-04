@@ -6,6 +6,9 @@
 - Libreoffice / office online: Fixed opening two attachments with the same name
 - Tickets: Group management was unavailable
 - Tasks: don't show project task lists in normal mode
+- Core: Login dialog - fix rendering of 'Remember me' checkbox on mobile
+- Core: set minimum search indexing for Active Record items to two characters
+- Projects2: bugfix in calculation of remaining budget hours
 
 27-09-2022 6.6.119
 - Newsletters: fix bug max number of messages per minute
