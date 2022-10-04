@@ -362,9 +362,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		//make sure extension is not too long
 		$this->cutAttributeLength("extension");
 
-		$this->size = $this->fsFile->size();
-		//$this->ctime = $this->fsFile->ctime();
-		$this->mtime = $this->fsFile->mtime();
+		if($this->fsFile->exists()) {
+			$this->size = $this->fsFile->size();
+			//$this->ctime = $this->fsFile->ctime();
+			$this->mtime = $this->fsFile->mtime();
+		}
 
 		
 

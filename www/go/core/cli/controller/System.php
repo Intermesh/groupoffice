@@ -332,9 +332,11 @@ JSON;
 	 * @example
 	 * ```
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo
+	 *
+	 * docker-compose exec --user www-data groupoffice-finance ./www/cli.php core/System/demo --package=business --module=catalog
 	 * ```
 	 */
-	public function demo() {
+	public function demo(?string $package = null, ?string $module = null) {
 
 		$faker = Faker\Factory::create();
 
@@ -343,6 +345,15 @@ JSON;
 		Alert::$enabled = false;
 
 		$modules = Module::find();
+
+		if(isset($package)) {
+			$modules->andWhere('package', '=', $package);
+		}
+
+		if(isset($module)) {
+			$modules->andWhere('name', '=', $module);
+		}
+
 //		$modules = [Module::findByName("community", "tasks")];
 
 		foreach($modules as $module) {
