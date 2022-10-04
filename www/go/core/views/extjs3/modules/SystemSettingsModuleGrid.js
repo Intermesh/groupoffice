@@ -124,9 +124,6 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 				delegate: ".tile",
 				listeners : {
 					beforeshow: function updateTipBody(tip) {
-						//var rowIndex = view.findRowIndex(tip.triggerElement);
-
-						console.warn(tip.triggerElement);
 						tip.body.dom.innerHTML = tip.triggerElement.dataset.tooltip;
 					}
 				}
