@@ -1,5 +1,4 @@
-
-6.6.120
+05-10-2022 6.6.120
 - OAuth2Client: better error handling
 - Core: Added Online / Offline events to show the user if the device is still connected to wifi.
 - Leavedays: several bug fixes in special leave budgets
