@@ -2,6 +2,7 @@
 
 namespace go\core\auth;
 use Exception;
+use go\core\jmap\Request;
 use go\core\model\Module;
 use go\core\model\User;
 use stdClass;
@@ -60,7 +61,16 @@ abstract class State {
 	 *
 	 * @return string
 	 */
-	abstract protected function getBaseUrl(): string;
+	protected function getBaseUrl(): string
+	{
+		if(go()->getEnvironment()->isCli()) {
+			return go()->getSettings()->URL . 'api';
+		} else{
+			$url = Request::get()->isHttps() ? 'https://' : 'http://';
+			$url .= Request::get()->getHost(false) . dirname($_SERVER['SCRIPT_NAME']);
+			return $url;
+		}
+	}
 
 	public function getDownloadUrl($blobId): string
 	{

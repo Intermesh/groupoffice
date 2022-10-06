@@ -160,15 +160,6 @@ class State extends AbstractState {
 		}
 	}
 
-	/** @noinspection HttpUrlsUsage */
-	protected function getBaseUrl(): string
-	{
-		$url = Request::get()->isHttps() ? 'https://' : 'http://';
-		$url .= Request::get()->getHost(false) . dirname($_SERVER['PHP_SELF']);
-		return $url;
-	}
-
-
 	/**
 	 *
 	 */
