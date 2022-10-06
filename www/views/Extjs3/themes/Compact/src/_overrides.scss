@@ -5,7 +5,10 @@ body{
 .x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
   border: 1px solid color($fg,'line');
   background-color: color($grey, 50);
-  border-radius: dp(4);
+  border-radius: 4px;
+  .x-btn-group & {
+    border-radius: 0;
+  }
   &:hover{
     @extend .z1;
     //background-color: $cHover;
@@ -19,8 +22,11 @@ body{
   }
   &.primary, &.raised {
     color: white;
-    background-color: $cSecondary;
+    @include var('background-color', c-secondary);
     //&:hover{ background-color: #387002;}
+  }
+  &.accent {
+    @include var('background-color', c-accent);
   }
 }
 .x-toolbar .xtb-sep{
@@ -32,10 +38,10 @@ body{
 }
 
 .x-btn-group{
-  @extend .z1;
-  border:0;
+  //@extend .z1;
+  border:1px solid color($fg,'line');
   .x-btn {
-    border: 0px;
+    border: 0;
   }
 }
 
@@ -128,11 +134,32 @@ table.x-calGrid-headings-table {
   height: 0;
   overflow: visible;
 }
+
+  .go-main-tab-panel.x-tab-panel > .x-tab-panel-header {
+    top: dp(-58);
+    left: dp(272);
+    right: dp(272);
+    width: auto !important;
+    .x-tab-strip-top {
+      height: dp(48);
+    }
+    .x-tab-strip > li {
+      height: dp(48);
+      line-height: dp(48);
+      .x-tab-strip-text {
+        font-weight: bold;
+      }
+    }
+  }
+
+  .go-main-tab-panel {
+    bottom: 0;
+  }
+
 .go-main-tab-panel.x-tab-panel > .x-tab-panel-header .x-tab-strip-active {
   border: 1px solid rgba(0,0,0,.16);
   background-color: rgba(0,0,0,.12);
-  border-radius: 15px
-
+  border-radius: 15px;
 }
 .go-main-tab-panel {
   bottom:0;
@@ -148,3 +175,9 @@ table.x-calGrid-headings-table {
 // fix icon that is different in outline theme
 .ic-file-download:before {content: 'download' !important; }
 .ic-file-upload:before {content: 'upload' !important; }
+
+.go-detail-view > .x-panel-bwrap > .x-panel-body > .x-panel, .x-portlet {
+  box-shadow:none;
+  outline: 1px solid rgba(0,0,0,0.089);
+}
+.x-portlet { overflow:hidden;}
