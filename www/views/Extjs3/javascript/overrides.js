@@ -54,8 +54,14 @@ function dp(size) {
 
 	var componentInitComponent = Ext.Component.prototype.initComponent;
 
-	Ext.override(Ext.Component, {  
-			
+	Ext.override(Ext.Component, {
+
+		/**
+		 * For GOUI
+		 */
+		fire: function() {
+			Ext.Component.prototype.fireEvent.apply(this, arguments);
+		},
 
 		initComponent : function() {
 			componentInitComponent.call(this);			

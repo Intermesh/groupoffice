@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "esbuild": "^0.14.49"
+  },
+
+  "scripts": {
+    "start": "esbuild script/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist"
+  }
+}

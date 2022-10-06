@@ -1,0 +1,29 @@
+<html>
+<body>
+
+<script>
+
+	console.time();
+
+	for(let i = 0; i < 1000; i++) {
+
+
+		const a = document.createElement("div");
+
+		let parent = a;
+		for(let n = 9; n < 100; n++) {
+          let sub = document.createElement("div");
+          sub.innerText="TEST " + n;
+          a.appendChild(sub);
+        }
+			document.body.appendChild(a);
+
+
+    }
+
+	console.timeEnd();
+</script>
+
+
+</body>
+</html>

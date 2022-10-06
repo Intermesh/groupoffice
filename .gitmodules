@@ -1,0 +1,6 @@
+[submodule "www/views/Extjs3/goui"]
+	path = www/views/goui/goui
+	url = git@github.com:Intermesh/goui.git
+[submodule "www/views/Extjs3/groupoffice-core"]
+	path = www/views/goui/groupoffice-core
+	url = git@github.com:Intermesh/groupoffice-core.git

@@ -80,3 +80,6 @@ lang.csv
 /.project
 .phpunit.result.cache
 /www/views/Extjs3/goui
+
+node_modules
+dist
