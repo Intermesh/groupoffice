@@ -824,7 +824,9 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					}
 				}
 
-				me.setState(response.newState);
+				// Then is turned off because users will miss updates if they /set before the previous update
+				// Problem dues not exist anymore in 6.6
+				// me.setState(response.newState);
 
 				if(response.destroyed) {
 					for(var i =0, l = response.destroyed.length; i < l; i++) {
