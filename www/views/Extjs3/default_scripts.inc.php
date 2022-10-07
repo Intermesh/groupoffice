@@ -113,13 +113,13 @@ if (isset(GO::session()->values['security_token']))
 ?>
 </script>
 <?php
-  
+$gouiScripts = [];
 if ($cacheFile->exists()) {
 	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='.$cacheFile->getModifiedAt()->format("U"). '"></script>';
 } else {
 
 	$scripts = array();
-	$gouiScripts = [];
+
 	$load_modules = GO::modules()->getAllModules(true);
 
 	$scripts[] = "var BaseHref = '" . $baseUrl . "';";
