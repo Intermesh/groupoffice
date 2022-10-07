@@ -19,6 +19,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 
 
+		this.origTitle = this.title;
+
+
 		this.buttons = [this.scrollToTopButton = new Ext.Button({
 			xtype: "button",
 			iconCls: "ic-arrow-circle-up",
@@ -200,7 +203,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		o = o || {};
 
 		let badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
-		this.setTitle(t("Comments") + badge);
+		this.setTitle(this.origTitle + badge);
 		let prevStr = null;
 
 		let dom = this.commentsContainer.getEl().dom;

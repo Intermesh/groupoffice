@@ -86,12 +86,13 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				this.checkColumn,
 				{
 					id: 'id',
-					hidden: true,
+					hidden: !this.support,
 					header: 'ID',
-					width: dp(35),
+					width: dp(80),
 					sortable: true,
 					dataIndex: 'id',
-					groupable: false
+					groupable: false,
+					align: "right"
 				},
 				{
 					id: 'title',

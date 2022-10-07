@@ -46,9 +46,11 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			]
 		});
 
+		const title = this.support ? "#{id}: {title}" : "{title}";
+
 		Ext.apply(this, {
 			items: [{
-				tpl: new Ext.XTemplate('<h3 class="title s8" style="{[values.color ? \'color:#\'+values.color : \'\']}">{title}</h3>\
+				tpl: new Ext.XTemplate('<h3 class="title s8" style="{[values.color ? \'color:#\'+values.color : \'\']}">'+title+'</h3>\
 					<h4 class="status {[this.progressColor(values.progress)]}-fill">{[go.modules.community.tasks.progress[values.progress]]}</h4>\
 				<p class="s6 pad">\
 					<label>'+t("Start at")+'</label><span>{[go.util.Format.date(values.start) || "-"]}</span><br><br>\
@@ -131,6 +133,13 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		this.addComments(this.support);
 
 		if(this.support) {
+
+			this.add(new go.modules.comments.CommentsDetailPanel({
+				large: false,
+				title: t("Private notes"),
+				section: "private"
+			}));
+
 			this.addContracts();
 		}
 		this.addLinks();
