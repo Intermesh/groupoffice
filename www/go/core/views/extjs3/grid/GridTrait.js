@@ -341,40 +341,51 @@ go.grid.GridTrait = {
 	deleteSelected: function () {
 
 		if(!this.enableDelete) {
-			return;
+			return Promise.resolve();
 		}
 
-		var selectedRecords = this.getSelectionModel().getSelections(), count = selectedRecords.length, strConfirm;
+		return new Promise((resolve, reject) => {
 
-		switch (count)
-		{
-			case 0:
-				return;
-			case 1:
-				strConfirm = t("Are you sure you want to delete the selected item?");
-				break;
+			var selectedRecords = this.getSelectionModel().getSelections(), count = selectedRecords.length, strConfirm;
 
-			default:
-				strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', count);
-				break;
-		}
+			switch (count)
+			{
+				case 0:
+					return;
+				case 1:
+					strConfirm = t("Are you sure you want to delete the selected item?");
+					break;
 
-		Ext.MessageBox.confirm(t("Confirm delete"), t(strConfirm), function (btn) {
-
-			if (btn != "yes") {
-				return;
+				default:
+					strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', count);
+					break;
 			}
-			
-			this.doDelete(selectedRecords);
-			
-		}, this);
+
+			Ext.MessageBox.confirm(t("Confirm delete"), t(strConfirm), async function (btn) {
+
+				if (btn != "yes") {
+					return;
+				}
+
+				try {
+					const result = await this.doDelete(selectedRecords);
+
+					resolve(result);
+				} catch(e) {
+					reject(e);
+				}
+
+			}, this);
+		});
 	},
 
 	selectNextAfterDelete : function() {
 
 		// Do not go to the next item, if mobile we want to stay in the grid view
-		if(GO.util.isMobileOrTablet())
+		if(GO.util.isMobileOrTablet()) {
+			this.show();
 			return;
+		}
 
 		var index = -1;
 
@@ -442,16 +453,24 @@ go.grid.GridTrait = {
 		})
 		.catch(function(reason) {
 			GO.errorDialog.show(t( 'Sorry, an unexpected error occurred: ' + reason.message));
+			return Promise.reject(reason);
 		})
 		.finally(function() {
 			me.getEl().unmask();			
 		});
+		return prom;
 	},
 	
 	handleHdMenuItemClick: function(item) {
+
 		var cm = this.getColumnModel()
 		  , id = item.getItemId()
 		  , column = cm.getIndexById(id.substr(4));
+
+		if(id.substr(0, 10) == "col-group-") {
+			return this.onGroupByClick(item);
+		}
+
 		if (column !== -1) {
 			if (item.checked && cm.getColumnsBy(function(c) {return !c.hidden }, this).length <= 1) {
 				 return
@@ -468,7 +487,8 @@ go.grid.GridTrait = {
 			this.headerMenu.on("itemclick", this.handleHdMenuItemClick, this);
 		}
 		this.headerMenu.removeAll();
-		for (i = 0; i < cm.getColumnCount(); i++) {
+		const colCount = cm.getColumnCount();
+		for (i = 0; i < colCount; i++) {
 			column = cm.getColumnAt(i);
 			if (column.hideable !== false) {
 				item = new Ext.menu.CheckItem({
@@ -495,6 +515,62 @@ go.grid.GridTrait = {
 			}
 			return comparison;
 		});
+
+
+		if(this.store instanceof Ext.data.GroupingStore) {
+			this.headerMenu.add("-");
+			this.headerMenu.add('<div class="menu-title">'
+			+ t("Group", ) + '</div>');
+
+			item = new Ext.menu.CheckItem({
+				group: "groupBy",
+				text: t("None"),
+				itemId: "col-group-",
+				checked: this.store.groupField == false,
+				hideOnClick: false
+			});
+
+			this.headerMenu.add(item)
+
+			for (i = 0; i < colCount; i++) {
+				column = cm.getColumnAt(i);
+				if (column.groupable !== false) {
+					const dataIndex = cm.getDataIndex(i);
+
+					console.warn(dataIndex, this.store.groupField);
+					item = new Ext.menu.CheckItem({
+						group: "groupBy",
+						text: cm.getOrgColumnHeader(i) + "",
+						itemId: "col-group-" + dataIndex,
+						checked: this.store.groupField == dataIndex,
+						hideOnClick: false,
+						htmlEncode: column.headerHtmlEncode
+					});
+					this.headerMenu.add(item)
+				}
+			}
+		}
+
 		this.headerMenu.show(el, "tr-br?")
+	},
+
+	onGroupByClick : function(item) {
+
+		var id = item.getItemId();
+		const dataindex = id.substr(10);
+
+		if(!dataindex) {
+			this.store.clearGrouping();
+			this.saveState();
+			return;
+		}
+
+		this.enableGrouping = true;
+		this.store.groupBy(dataindex);
+		this.fireEvent('groupchange', this, this.store.getGroupState());
+		//this.beforeMenuShow(); // Make sure the checkboxes get properly set when changing groups
+		this.view.refresh();
+		this.saveState();
+
 	}
 }

@@ -88,7 +88,13 @@ Ext.extend(GO.email.AttachmentContextMenu, Ext.menu.Menu,{
 	attachment : false,
 
 	copyToClipboard: async function() {
+
+		if(!window.ClipboardItem) {
+			Ext.MessageBox.alert(t("Error"), t("Sory, this is not supported by Firefox"));
+			return;
+		}
 		try {
+
 			let canvas = document.createElement('canvas');
 			canvas.width = this.img.clientWidth;
 			canvas.height = this.img.clientHeight;

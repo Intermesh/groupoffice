@@ -204,6 +204,8 @@ class Authenticate {
 
 	public function sendRecoveryMail($email): bool
 	{
+		$email = trim($email);
+
 		$user = User::find()->where(['email' => $email])->orWhere(['recoveryEmail' => $email])->single();
 		if (empty($user)) {
 			go()->debug("User not found");

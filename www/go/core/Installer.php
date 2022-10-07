@@ -133,8 +133,6 @@ class Installer {
 
 		$database->setUtf8();
 
-		$this->setDefaultRowFormat();
-
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
 		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 		
@@ -453,15 +451,6 @@ class Installer {
 		return $buffer;
 	}
 
-	private function setDefaultRowFormat() {
-		try {
-			go()->getDbConnection()->exec("set global innodb_default_row_format = DYNAMIC;");
-		}
-		catch (Exception $e) {
-			echo "Could not set default row format: " .$e->getMessage() ."\n";
-		}
-	}
-
 	/**
 	 * @throws Exception
 	 */
@@ -486,6 +475,7 @@ class Installer {
 		$this->disableUnavailableModules();
 
 		$lock = new Lock("upgrade", false);
+		$lock->timeout = 0;
 		if (!$lock->lock()) {
 			throw new Exception("Upgrade is already in progress");
 		}
@@ -499,8 +489,6 @@ class Installer {
 		//don't be strict in upgrade
 		go()->getDbConnection()->exec("SET sql_mode=''");
 
-		$this->setDefaultRowFormat();
-		
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
@@ -694,7 +682,7 @@ class Installer {
 					if (is_callable($query)) {
 						
 						//upgrades may have modified tables so rebuild model and table cache
-						Table::destroyInstances();
+						go()->getDatabase()->clearCache();
 						go()->getCache()->flush(true, false);
 										
 						echo $modStr . "Running callable function\n";
@@ -702,7 +690,7 @@ class Installer {
 					} else if (substr($query, 0, 7) == 'script:') {
 						
 						//upgrades may have modified tables so rebuild model and table cache
-						Table::destroyInstances();
+						go()->getDatabase()->clearCache();
 						go()->getCache()->flush(true, false);
 						
 						$root = go()->getEnvironment()->getInstallFolder();

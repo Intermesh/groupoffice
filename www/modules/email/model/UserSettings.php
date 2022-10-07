@@ -10,6 +10,10 @@ use function GO;
 
 /**
  * Temporary workaround for saving old settings form a user property;
+ *
+ * Set value for everyone:
+ *
+ * replace into go_settings (user_id,name,value) select id,"email_sort_email_addresses_by_time", "1" from core_user;
  */
 class UserSettings extends Property {
 	public $id;

@@ -20,7 +20,7 @@ $font-weight-l: 100;
 %font-caption { //Used as labels and grid headers
 	font-size: sp(13);
 	font-weight: $font-weight-r;
-	color: $cSecondary;
+    @include var('color', c-accent)
 }
 
 %font-body1 {

@@ -153,7 +153,7 @@ class FilesModule extends \GO\Base\Module{
 						// Remove if the module is not enabled for this user
 						unset(self::$fileHandlers[$key]);
 					}
-				} else{
+				} else {
 					if(!GoModule::isAvailableFor($nsArr[2], $nsArr[3])) {
 						unset(self::$fileHandlers[$key]);
 					}

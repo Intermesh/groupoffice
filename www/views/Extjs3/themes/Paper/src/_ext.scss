@@ -702,8 +702,8 @@
 
 	@extend %font-button;
 	letter-spacing: 0; // for button icons
-	height: dp(32); // 32 for dense
-	line-height: dp(32) - 2; // 32 for dense
+	height: dp(36); // 32 for dense
+	line-height: dp(36); // 32 for dense
 	border-radius: $borderRadius;
 	vertical-align: middle;
 	white-space: nowrap;
@@ -714,12 +714,12 @@
 	transition: background-color 225ms linear, box-shadow 225ms $curve-standard;
 	
 	button {
-		min-height: dp(32);
+		min-height: dp(36);
 		line-height: dp(24);
 	}
 
 	&-text {
-		padding: dp(6);
+		padding: dp(6) ;
 	}
 	
 	.x-form-composite & {
@@ -874,8 +874,8 @@
 			//}
 		}
 		button {
-			min-width:dp(32);
-			min-height: dp(32);
+			min-width:dp(40);
+			min-height: dp(40);
 			position:relative;
 			&::before {
 				@extend %icon;
@@ -889,8 +889,8 @@
 		button::before{
 			@extend %icon;
 			padding-right: dp(8);
-			//MS Why was this here?
-			/*margin-top: dp(-4);*/
+			//MS Why was this here? // MH To align the text of a button with the icon
+            margin-top: dp(-2);
 		}
 		i.icon {
 			margin-right: dp(8);
@@ -969,6 +969,7 @@
 	background-color: color($bg, 'card');
 	margin-right: dp(8);
 	border-radius:$borderRadius;
+	overflow: hidden;
 	border: 1px solid color($fg, 'line');
 	&-header{
 		color: inherit;
@@ -1261,10 +1262,17 @@
 		border-bottom: 1px solid color($fg, 'line');
 		background-color: color($bg, 'background');
 	}
+
+	&-cell-first {
+		.x-grid3-cell-inner {
+			padding-left: dp(24);
+		}
+	}
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
 		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
-		padding: dp(6) dp(8) dp(6) dp(16); // 10 top = middle of row line-height 20dp
+		padding: dp(6) dp(8) dp(6) dp(12); // 10 top = middle of row line-height 20dp
+
 		.ux-row-action-cell & {
 			padding: 0;
 		}

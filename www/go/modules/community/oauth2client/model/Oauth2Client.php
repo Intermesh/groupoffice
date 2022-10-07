@@ -57,26 +57,39 @@ final class Oauth2Client extends Entity
 	{
 		$defaultClient = DefaultClient::findById($this->defaultClientId);
 		$url = rtrim(go()->getSettings()->URL, '/');
-
+		$prvVendorName = 'League';
+		$params = [
+			'clientId' => $this->clientId,
+			'clientSecret' => $this->clientSecret,
+			'redirectUri' => $url . '/go/modules/community/oauth2client/gauth.php/callback',
+		];
 		switch ($defaultClient->name) {
 			case 'Google':
-				$accessType = 'offline';
-				$scopes = ['https://mail.google.com/'];
-				$redirectUri = $url . '/go/modules/community/oauth2client/gauth.php/callback';
+				$params['accessType'] = 'offline';
+				$params['scopes'] = ['https://mail.google.com/'];
+				break;
+			case 'Azure':
+				// https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
+				// https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
+				$prvVendorName = 'TheNetworg';
+				$params['tenant'] = $this->projectId;
+				$params['scopes'] = [
+					'openid',
+					'profile',
+					'offline_access',
+					'email',
+					'https://outlook.office.com/IMAP.AccessAsUser.All',
+					'https://outlook.office.com/SMTP.Send'
+				];
+				$params['defaultEndPointVersion'] = '2.0';
 				break;
 			default:
 				throw new NotFound('Default client ' . $defaultClient->name . ' not supported');
 				break;
 		}
-		$prvClsName = "League\\OAuth2\\Client\\Provider\\" . ucfirst($defaultClient->name);
+		$prvClsName = $prvVendorName . "\\OAuth2\\Client\\Provider\\" . ucfirst($defaultClient->name);
 
-		return new $prvClsName([
-			'clientId' => $this->clientId,
-			'clientSecret' => $this->clientSecret,
-			'redirectUri' => $redirectUri,
-			'accessType' => $accessType,
-			'scopes' => $scopes
-		]);
+		return new $prvClsName($params);
 
 	}
 }

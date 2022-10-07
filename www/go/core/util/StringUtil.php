@@ -535,7 +535,8 @@ END;
 				// Jansen and Pietersen.
 				$split = explode('@', $keyword);
 				if(count($split) != 2) {
-					$split = mb_split('[_\-\\\\\/]', $keyword);
+					//also split domains on . and words on -,\,/ for searching
+					$split = mb_split('[_\-\\\\\/.]', $keyword);
 				}
 
 				if (count($split) > 1) {

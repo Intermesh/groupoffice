@@ -289,45 +289,8 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	}
 
 
-	private function exportCalendarEvent($event){
-
-		$events=array();
-		if(empty($event->rrule)){
-			$events[]=$event;
-		}else{
-			//a recurring event must be sent with all it's exceptions in the same data
-
-			$fp = FindParams::newInstance()
-				->order('start_time','ASC')
-				->select('t.*')
-				->debugSql()
-				->ignoreAcl();
-			$fp->getCriteria()
-				->addCondition('calendar_id', $event->calendar_id)
-				->addCondition('uuid', $event->uuid);
-
-			$stmt = \GO\Calendar\Model\Event::model()->find($fp);
-
-			$sequence=0;
-			while ($e=$stmt->fetch()) {
-				if ($e->private && $e->calendar->user_id != \GO::user()->id) {
-					$e->name=\GO::t("Private", "calendar");
-					$e->location='';
-					$e->description='';
-				}
-				$e->sequence=$sequence;
-				$sequence++;
-				$events[]=$e;
-			}
-		}
-
-		$c = new \GO\Base\VObject\VCalendar();
-		$c->add(new \GO\Base\VObject\VTimezone());
-		foreach($events as $event){
-			$c->add($event->toVObject('REQUEST', false));
-		}
-
-		return $c->serialize();
+	private function exportCalendarEvent($event) {
+		return $event->exportFullRecurrenceICS()->serialize();
 	}
 
 

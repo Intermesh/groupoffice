@@ -53,6 +53,7 @@ namespace GO\Calendar\Model;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use GO\Base\Db\FindParams;
 use GO\Calendar\Model\Exception;
 use GO;
 use GO\Base\Util\StringHelper;
@@ -1579,7 +1580,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 //			$e->{"X-FUNAMBOL-ALLDAY"}=1;
 //		}
 		
-		if($this->exception_for_event_id>0){
+		if(!$recurrenceTime && $this->exception_for_event_id>0){
 			//this is an exception
 			
 			$exception = $this->recurringEventException(); //get master event from relation
@@ -1589,8 +1590,6 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		}
 		if($recurrenceTime){
 			$dt = \GO\Base\Util\Date\DateTime::fromUnixtime($recurrenceTime);
-			//recurrence ID may not change
-			$dt->setTime(0,0,0);
 			$rId = $e->add('recurrence-id', $dt);
 			if($this->_exceptionEvent->all_day_event){
 				$rId['VALUE']='DATE';
@@ -1699,6 +1698,58 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		
 		
 		return $e;
+	}
+
+
+	public function exportFullRecurrenceICS(): \GO\Base\VObject\VCalendar
+	{
+		$events=array();
+		if(empty($this->rrule)){
+			$events[]=$this;
+		}else{
+			//a recurring event must be sent with all it's exceptions in the same data
+
+			$fp = FindParams::newInstance()
+				->order('start_time','ASC')
+				->select('t.*')
+				->debugSql()
+				->ignoreAcl();
+			$fp->getCriteria()
+				->addCondition('calendar_id', $this->calendar_id)
+				->addCondition('uuid', $this->uuid);
+
+			$stmt = \GO\Calendar\Model\Event::model()->find($fp);
+
+			$sequence=0;
+			while ($e=$stmt->fetch()) {
+				if ($e->private && $e->calendar->user_id != \GO::user()->id) {
+					$e->name=\GO::t("Private", "calendar");
+					$e->location='';
+					$e->description='';
+				}
+				$e->sequence=$sequence;
+				$sequence++;
+				$events[]=$e;
+			}
+		}
+
+		$isRecurring = count($events) > 1;
+
+		$c = new \GO\Base\VObject\VCalendar();
+		$c->add(new \GO\Base\VObject\VTimezone());
+		foreach($events as $event){
+			$recurrenceTime = empty($event->rrule) ? $event->start_time : false;
+
+			if($isRecurring && empty($event->rrule) && $event->exception_for_event_id != $this->id) {
+				$event->exception_for_event_id = $this->id;
+				$event->save(true);
+			}
+
+			$c->add($event->toVObject('REQUEST', false, $recurrenceTime));
+		}
+
+
+		return $c;
 	}
 	
 

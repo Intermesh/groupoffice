@@ -78,53 +78,6 @@ class CaldavModule extends \GO\Base\Module {
 	 * @return type
 	 */
 	static private function exportCalendarEvent($event){
-		
-		$events=array();
-		if(empty($event->rrule)){
-			$events[]=$event;
-		}else{
-			//a recurring event must be sent with all it's exceptions in the same data
-			
-			$fp = \GO\Base\Db\FindParams::newInstance()
-				->order('start_time','ASC')
-				->select('t.*')
-				->debugSql()
-				->ignoreAcl();
-			$fp->getCriteria()
-				->addCondition('calendar_id', $event->calendar_id)
-				->addCondition('uuid', $event->uuid);
-			
-			$stmt = \GO\Calendar\Model\Event::model()->find($fp);
-			
-			$sequence=0;
-			while($e=$stmt->fetch()){
-				
-				if($e->private && $e->calendar->user_id != \GO::user()->id){
-					$e->name=\GO::t("Private", "calendar");
-					$e->location='';
-					$e->description='';
-				}
-//				$e->sequence=$sequence;
-				$sequence++;
-				$events[]=$e;
-
-			}			
-		}
-		
-		$c = new \GO\Base\VObject\VCalendar();		
-		$c->add(new \GO\Base\VObject\VTimezone());
-
-		$isRecurring = count($events) > 1;
-
-		foreach($events as $event){
-			if($isRecurring && empty($event->rrule)) {
-				$recurrenceTime = $event->start_time;
-			} else{
-				$recurrenceTime = false;
-			}
-			$c->add($event->toVObject('REQUEST', false, $recurrenceTime));
-		}
-		
-		return $c->serialize();
+		return $event->exportFullRecurrenceICS()->serialize();
 	}
 }

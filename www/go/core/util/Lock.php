@@ -101,7 +101,12 @@ class Lock {
 			$this->startTime = microtime(true);
 			return true;
 		} else {
-			if($this->timeTaken() > $this->timeout) {
+
+			if(!$this->blocking) {
+				return false;
+			}
+
+			if($this->timeout > 0 && $this->timeTaken() > $this->timeout) {
 				$info = $this->getLockFile()->getContents();
 				throw new Exception("Waiting for lock (" . $this->getRequestInfo() .") for longer than " . $this->timeout."s. Lock is held by (" . $info . ")");
 			}
@@ -208,7 +213,7 @@ class Lock {
 
 		//Warn about long lock times in error log
 		$lockTime = $this->timeTaken();
-		if($lockTime > 1) {
+		if($this->timeout > 0 && $this->blocking && $lockTime > 1) {
 			$userId = (go()->getAuthState() ? go()->getAuthState()->getUserId() : '-');
 			ErrorHandler::log("Lock " . $this->name . " by " .$userId ." in request ". go()->getDebugger()->getRequestId() . ' with pid '.getmypid().' took '.$lockTime.'s');
 		}

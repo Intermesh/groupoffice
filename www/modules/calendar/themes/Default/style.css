@@ -405,6 +405,7 @@ border-collapse:collapse;
 	overflow:hidden;
 	font-size:11px;
 	float:left;
+	position: relative;
 }
 .cal-monthgrid-week-no{
 	border-bottom:1px solid rgba(0,0,0, 0.12);
@@ -416,9 +417,11 @@ border-collapse:collapse;
 	font-size: 11px;
 }
 .cal-overflow-indicator{
-	font-style:italic;
 	position:absolute;
-	padding:1px 2px;
+	left: 7px;
+	top: 4px;
+	cursor: pointer;
+	color: var(--c-secondary, rgb(0, 176, 173));
 }
 
 .cal-monthgrid-week-no .x-monthGrid-cell-day-text {

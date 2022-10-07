@@ -6,9 +6,9 @@
 	//src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
 	src: local("Material Icons"), 
 		local("MaterialIcons-Regular"), 
-		url(#{$resourcePath}fonts/MaterialIcons-Regular.woff2) format("woff2"), // Super Modern
+		url(#{$resourcePath}fonts/icons.woff2) format("woff2"), // Super Modern
 		//url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
-		url(#{$resourcePath}fonts/MaterialIcons-Regular.ttf) format("truetype"); // Android, Safari, iOS
+		url(#{$resourcePath}fonts/icons.ttf) format("truetype"); // Android, Safari, iOS
 }
 // #################
 // ##### ICONS #####

@@ -2,9 +2,11 @@
 
 namespace go\core\model;
 
+use Exception;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\db\Expression;
+use go\core\db\Query as DbQuery;
 use go\core\exception\Forbidden;
 use go\core\orm\EntityType;
 use go\core\orm\Filters;
@@ -123,7 +125,13 @@ class Group extends AclOwnerEntity {
 	
 	protected static function textFilterColumns(): array
 	{
-		return ['name'];
+		return ['name', 'u.displayName'];
+	}
+
+	protected static function search(Criteria $criteria, string $expression, DbQuery $query): Criteria
+	{
+		$query->join('core_user', 'u', 'u.id = g.isUserGroupFor', 'LEFT');
+		return parent::search($criteria, $expression, $query);
 	}
 
 	protected function internalValidate()
@@ -255,7 +263,14 @@ class Group extends AclOwnerEntity {
 //		}
 //	}
 
-	public static function findPersonalGroupID($userId) {
+	/**
+	 * Get the group ID that is used for granting permissions for the given user ID
+	 *
+	 * @param int $userId
+	 * @return int
+	 * @throws Exception
+	 */
+	public static function findPersonalGroupID(int $userId) : int {
 		$groupId = Group::find()
 							->where(['isUserGroupFor' => $userId])
 							->selectSingleValue('id')
@@ -265,7 +280,7 @@ class Group extends AclOwnerEntity {
 		}
 		$user = User::findById($userId, ['username']);
 		if(!$user) {
-			throw new \Exception("Invalid userId given");
+			throw new Exception("Invalid userId given");
 		}
 		$personalGroup = new Group();
 		$personalGroup->name = $user->username;
@@ -273,7 +288,7 @@ class Group extends AclOwnerEntity {
 		$personalGroup->users[] = $userId;
 		
 		if(!$personalGroup->save()) {
-			throw new \Exception("Could not create personal group");
+			throw new Exception("Could not create personal group");
 		}
 
 		return $personalGroup->id;

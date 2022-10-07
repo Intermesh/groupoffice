@@ -5,7 +5,7 @@ GO.ErrorDialog = function(config) {
 		width: dp(872),
 		closeAction : 'hide',
 		plain : true,
-		height: dp(424),
+		height: dp(460),
 		layout: 'fit',
 		border : false,
 		closable : true,

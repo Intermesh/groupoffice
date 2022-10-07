@@ -1,8 +1,126 @@
+05-10-2022 6.6.120
+- OAuth2Client: better error handling
+- Core: Added Online / Offline events to show the user if the device is still connected to wifi.
+- Leavedays: several bug fixes in special leave budgets
+- Libreoffice / office online: Fixed opening two attachments with the same name
+- Tickets: Group management was unavailable
+- Tasks: don't show project task lists in normal mode
+- Core: Login dialog - fix rendering of 'Remember me' checkbox on mobile
+- Core: set minimum search indexing for Active Record items to two characters
+- Projects2: bugfix in calculation of remaining budget hours
+
+27-09-2022 6.6.119
+- Newsletters: fix bug max number of messages per minute
+- Newsletters: end user can edit their own newsletter
+- Projects: Fix width of checkbox in InvoicablePanel
+- Pr2Analyzer: when explicitly exporting, set limit to zero
+- Pr2Analyzer: Fix error when manually changing start date or end date in grid
+- Newsletters: Added labels to buttons in compose dialog;
+- Tickets: Fix HTML entitiy rendering of subject field in grid
+- Email: more helpful error when OAuth2 token is invalid
+- OAuth2Client: better error handling
+- Email: Fixed broken UI after delete email on mobile
+- AddressBook: Fixed error Only admins can pass 'permissionLevelUserId' on login
+
+19-09-2022 6.6.118
+- Newsletters: Fixed upgrade bug in newsletters
+
+15-09-2022 6.6.117
+- Leave days: support for non-expiring special leave types
+- Newsletters: Fix integrity constraint when removing SMTP account for existing newsletters
+- Core: check module availability by retrieving permissions
+- Addressbook: Fixed merge
+- OAuth2-client: add Azure ActiveDirectory support
+- Core: Fix render of HTML entities in entity trees
+- Newsletters: better handling of height templates window
+- Newsletters: fix exception when importing contacts with address lists
+- Calendar: today button better visibility
+- Calendar: fix period buttons render bug
+
+09-09-2022 6.6.116
+- Core: Better handling of permissions when end user edits fields as well
+- Core: Updated trial license URL
+- Core: Bug where select options could be removed by mistake when editing the field
+
+05-09-2022 6.6.115
+- Core: Acl owner could be removed
+- Core: Better handling of permissions when end user edits fieldsets
+- Address book: fixed upcoming birthday filter
+- Projects: Some tabs were falsely active when there was no project ID yet
+- Core / Comments: Loading and save masks in entity form panel
+
+25-08-2022 6.6.114
+- Core: Fixed reload link on changes not showing all links
+- Holidays: Fixed bug in holiday calculator when agreement changed in the middle of a year
+- Tasks: grouping can be configured in grid now
+- Tasks: First open of task dialog could falsely set the default tasklist if the network response was slow
+- Projects: Faster way of adding project resources in bulk via template
+
+23-08-2022 6.6.113
+- Core / projects: fix for mysql general error 1366 incorrect integer value ''
+
+22-08-2022 6.6.112
+- Core: Fixed permission disappearing when changing level
+- Email: Don't offer to drop messages on read only accounts
+- Email: Move/copy dialog didn't offer to move to accounts shared with "Use" permissions
+- Core: New grids can configure grouping now too.
+- Email: Grouping can be disabled
+
+09-08-2022 6.6.111
+- Projects2: Income grid - remove buggy rowActions by OOTB actionColumn
+- Core: Remember stateId for user profile dialog
+- Notes: bugfix - allow users to delete their own notes regardless of mayChangeNoteBooks permissions
+- Projects2: fix error automatically creating task in case of missing manager user id
+- Scanbox: Save / move to entities
+
+31-07-2022 6.6.110
+- Address book: Fix for greyed out fields
+- Core: Rewrote update query so it works for mysql 5.7
+
+29-07-2022 6.6.109
+- Core: Fix save failure when there are more then 100 changes on the server
+- Calendar: fix for corrupted recurrence records
+
+29-07-2022 6.6.108
+- Core: empty custom tab when fields were hidden
+- Core: Don't report lock time when non blocking
+
+28-07-2022 6.6.107
+- Core: More Portugese translations (pt_PT) - Thank you Paulo
+- Core: Read Ext localization files for locales with upper class region code
+- Freebusypermissions: Fixed missing freebusy acl and foreign key error
+- Core: Custom fields on user profile tab only show if they are enabled for the users address book
+- Caldav: bug in recurring series where exceptions might show twice
+- Calendar: Fixed error in overflow calendar nav
+- Core: cron job waited for previous to finish
+
+26-07-2022 6.6.106
+- Core: Added Portugese translation (pt_PT)
+- Tasks: different style for completed checkbox
+- Email: do not search in mail body if  $config['email_allow_body_search'] is not set
+- Email: fix retrieving attachments by X.Y MIME part numbers
+- Tasks: set state for task dialog. Fixes #868.
+- Freebusy: acl not saved for new users
+
+20-07-2022 6.6.105
+- Newsletters: bugfix retrieving entity types in addressbook dialog
+- Calendar: add ACL field to TasklistCompat model to prevent non-admin users seeing all task lists
+- Core: Search users by display name in permission search
+- Calendar: UI bug where more... appeared over day number in month view
+- Core: Don't set default row format as it needs SUPER privileges
+- Core: Lock on cron sent email every time.
+- Freebusypermissions: ACL not always generated
+- Core: Hide totals on hover: fixes #809
+
+19-07-2022 6.6.104
 - Email: Added copy image to context menu. Fixes #859
 - Core: alter table to row format = dynamic if in another format in database check and make it default at installation
   and upgrade. Fixes #860
 - Core: user profile form scrolls to first invalid form field
 - Core: totals input wider to fit 4 digits. Fixes #843
+- Core: no timeout on upgrade and cron lock
+- Calendar: Wrong calendar list when copying an event after the first time
+- Email: Add data-lpignore=true to username and password fields to disable lastpass autofill
 
 18-07-2022 6.6.103
 - Billing: Fix overwrite uploaded logo for PDF template

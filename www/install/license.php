@@ -61,7 +61,7 @@ require('header.php');
 ?>
 <script>
 function getLicense() {
-    window.open('https://www.group-office.com/30-day-trial?hostname=' + document.domain + '&version=<?= go()->getMajorVersion() ?>' , '_blank');
+    window.open('https://www.group-office.com/account#trial/' + document.domain , '_blank');
 }
 
 function noThanks() {

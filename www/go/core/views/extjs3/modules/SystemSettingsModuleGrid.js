@@ -117,6 +117,19 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 		this.store.on('datachanged', this.draw,this);
 
 		this.on('afterrender', function() {
+
+			this.tip = new Ext.ToolTip({
+				renderTo: Ext.getBody(),
+				target: this.getEl(),
+				delegate: ".tile",
+				listeners : {
+					beforeshow: function updateTipBody(tip) {
+						tip.body.dom.innerHTML = tip.triggerElement.dataset.tooltip;
+					}
+				}
+			});
+
+
 			this.store.load();
 		},this);
 
@@ -165,11 +178,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 				listeners: {
 					render: function(c) {
 						var author = r.data.author ? '<br><br>'+t('Author')+': '+r.data.author : '';
-						// new Ext.ToolTip({
-						//     target: c.getEl(),
-						//     anchor: 'left',
-						//     html: r.data.description + author
-						// });
+						c.getEl().dom.dataset.tooltip = r.data.description + author;
 					}
 				},
 				items:[

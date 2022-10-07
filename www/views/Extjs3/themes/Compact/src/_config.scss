@@ -11,7 +11,7 @@
   font-family: 'Material Icons Outline';
   font-style: normal;
   font-weight: 400;
-  src:  url('./fonts/outline.woff2') format("woff2"); // Super Modern
+  src:  url('./fonts/icons.woff2') format("woff2"); // Super Modern
 }
 
 $black-87-opacity: rgba(black, 0.87) !default;
@@ -41,7 +41,7 @@ $grey: (
 );
 
 $fg: (
-        base: $cSecondary,
+        base: black,
         divider: rgba(black, 0.04),
         line: rgba(black, 0.12),
         disabled: rgba(black, 0.38),
@@ -64,7 +64,7 @@ $bg: (
         background: #edebe9,
         hover: rgba(black, .04),
         pressed: rgba(black, .08),
-        selected: $cAccentTp,
+        selected: $cPrimaryTp,
         readonly: rgba(black, .08),
         box: white,
         tbar: white,
@@ -105,7 +105,7 @@ $layout-sm:     960px !default;
 $layout-md:     1280px !default;
 $layout-lg:     1920px !default;
 
-$borderRadius: dp(2);
+$borderRadius: 8px;
 
 // Bezier easing curve
 $curve-standard: cubic-bezier(0.4, 0.0, 0.2, 1);

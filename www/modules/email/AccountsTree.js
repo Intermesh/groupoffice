@@ -99,6 +99,10 @@ GO.email.AccountsTree = function(config){
 
 	this.on('nodedragover', function(e)
 	{
+		if(e.target.attributes.permission_level < go.permissionLevels.create) {
+			return false;
+		}
+
 		var rowIdx = 0;
 		if(e.data) {
 			rowIdx = e.data.rowIndex;
@@ -244,6 +248,10 @@ GO.email.AccountsTree = function(config){
 							timeout:300000,
 							url:"email/message/move",
 							params:params,
+							fail: function(response, options, result) {
+								GO.errorDialog.show(result.feedback);
+								Ext.MessageBox.hide();
+							},
 							success:function(options, response, result){
 								if(result.messages && result.messages.length>0)
 								{
@@ -377,26 +385,6 @@ Ext.extend(GO.email.AccountsTree, Ext.tree.TreePanel, {
 	
 	findInboxNode : function(node){
 		return this.findMailboxByName(node, 'INBOX');
-		//
-		// if(node.attributes.isAccount){
-		// 	accountNode=node;
-		// }else
-		// {
-		// 	var p = node.parentNode;
-		// 	var accountNode=false;
-		// 	while(p){
-		// 			if(p.attributes.isAccount){
-		// 					accountNode=p;
-		// 					break;
-		// 			}
-		// 			p = p.parentNode;
-		// 	}
-		// }
-		//
-		// if(!accountNode)
-		// 	return false;
-		//
-		// return accountNode.findChild('mailbox','INBOX');
 	},
 
 	findMailboxByName: function (node, name) {

@@ -330,7 +330,7 @@ abstract class ImapBase {
 	 */
 	function send_command(string $command, ?bool $piped=false)
 	{
-		stream_set_timeout($this->handle, 10);
+		stream_set_timeout($this->handle, 30);
 		if ($piped) {
 			$final_command = '';
 			foreach ($command as $v) {

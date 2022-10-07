@@ -92,12 +92,16 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			region:"east",
 			tooltip: t('Send'),
 			iconCls: 'ic-send',
-			handler: function(){
+			handler: async function(){
 				if (Ext.isEmpty(this.textField.getValue())) {
 					this.textField.focus();
 					return false;
 				}
-				this.submit().then(function () {
+				this.sendBtn.setDisabled(true);
+
+				try {
+					await this.submit();
+
 					this.reset(); // otherwise it will update the second time
 					this.textField.setHeight(this.minComposerHeight);
 
@@ -105,7 +109,12 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 					this.textField.syncValue();
 					this.ownerCt.doLayout();
 					this.doLayout();
-				}.bind(this));
+				} catch(e) {
+					GO.errorDialog.show(e.message);
+				}
+
+				this.sendBtn.setDisabled(false);
+
 			},
 			scope: this
 		});

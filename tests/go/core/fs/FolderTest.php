@@ -29,10 +29,12 @@ class FolderTest extends TestCase
 			]
 		);
 
+		sort($garbage);
+
 		$this->assertEquals(2, count($garbage));
 
-		$this->assertEquals($emptyFolder->getPath(), $garbage[0]->getPath());
-		$this->assertEquals($oldFile->getPath(), $garbage[1]->getPath());
+		$this->assertEquals($emptyFolder->getPath(), $garbage[1]->getPath());
+		$this->assertEquals($oldFile->getPath(), $garbage[0]->getPath());
 
 		$all = $tmp->find();
 

@@ -867,6 +867,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.welcome();
 
+		this.handleBrowserOnlineOffline();
 		// Start in 5s to give the browser some time to boot other requests.
 		setTimeout(function() {
 			go.Jmap.sse();
@@ -874,7 +875,33 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		
 	},
 
+	handleBrowserOnlineOffline() {
+		// when wifi gets out of reach
+		const offlineDialog = new Ext.Window({
+			modal:true,
+			width:300,
+			height:150,
+			closable: false,
+			shadow:false,
+			closeAction: 'hide',
+			title: t('Browser is offline'),
+			items: [
+				{xtype:'box', cls:'ext-el-mask'},
+				{xtype:'box',cls:'ext-el-mask-msg', style:'text-align:center; width:100%;', html: '<br><br>'+t('Waiting for connection to return')+'...'}
+			]
+		});
 
+		window.addEventListener('online', () => {
+			// todo enable checker and SSE when online.
+			console.log('online');
+			offlineDialog.hide();
+		});
+		window.addEventListener('offline', () => {
+			// todo disable checker and SSE when offline.
+			offlineDialog.show();
+			console.log('offline');
+		});
+	},
 	
 	
 	openSystemSettings : function() {

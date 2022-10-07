@@ -147,10 +147,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			});
 		}
 
-
-
-
-		if (form.getXType() == "entityform") {
+		if (form.getXType() == "entityform" || form.ownerCt instanceof go.usersettings.UserSettingsDialog) {
 
 			form.getForm().items.each( (field) => {
 				field.on('change', (field) => {
@@ -197,7 +194,9 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	 * @returns {undefined}
 	 */
 	filter: function (entity) {
+
 		for (var name in this.fieldSet.filter) {
+
 			var v = this.fieldSet.filter[name];
 
 			if (Ext.isArray(v)) {
@@ -228,7 +227,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			});
 		}
 
-		if(!this.fieldSet.isTab) {
+		if(!this.isTab) {
 			this.setVisible(v);
 			setDisabled(this, !v);
 		} else{
@@ -240,6 +239,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			 	this.formTabPanel.hideTabStripItem(this.ownerCt);
 			}		
 		}
+
 	}
 });
 

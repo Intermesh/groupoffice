@@ -64,7 +64,7 @@ try {
 		GO::clearCache(); //legacy
 
 		go()->getCache()->flush(false);
-		Table::destroyInstances();
+		go()->getDatabase()->clearCache();
 		Property::clearCache();
 		Property::clearCachedRelationStmts();
 

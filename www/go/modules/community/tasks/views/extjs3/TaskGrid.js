@@ -1,15 +1,16 @@
 go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
-	autoExpandColumn: 'title',
+	//autoExpandColumn: 'title',
 	// config options for stateful behavior
 	stateful: true,
 	stateId: 'tasks-grid-main',
 	loadMask: true,
+	cls: "tasks-task-grid",
 
 	initComponent: function () {
 
-		this.store = new go.data.Store({
-			// groupField: 'tasklist',
-			// remoteGroup:true,
+		this.store = new go.data.GroupingStore({
+			groupField: 'tasklist',
+			remoteGroup:true,
 			remoteSort: true,
 			fields: [
 				'id',
@@ -48,22 +49,12 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			id:'complete',
 			dataIndex: 'complete',
 			hideInExport:true,
-			header: '<i class="icon ic-check"></i>',
-			width: dp(56),
+			header: '',
+
 			hideable:false,
 			menuDisabled: true,
 			sortable:false,
-			groupable:false,
-			renderer: function (v, p, record) {
-				p.css += ' x-grid3-check-col-td';
-				var disabledCls = '';
-				if (this.isDisabled(record))
-					disabledCls = ' x-item-disabled';
-
-				return String.format('<div class="x-grid3-check-col{0}' + disabledCls + '" {1}></div>',
-					v ? '-on' : '',
-					record.json.color ? 'style="color:#'+record.json.color+'"' : '');
-			}
+			groupable:false
 		});
 
 		this.checkColumn.on('change', function(record){
@@ -96,7 +87,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					header: 'ID',
 					width: dp(35),
 					sortable: true,
-					dataIndex: 'id'
+					dataIndex: 'id',
+					groupable: false
 				},
 				{
 					id: 'title',
@@ -114,7 +106,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						// }
 
 						return v;
-					}
+					},
+					groupable: false
 				},{
 					hideable: false,
 					id: 'icons',
@@ -140,7 +133,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						}
 
 						return v;
-					}
+					},
+					groupable: false
 				},{
 					xtype:"datecolumn",
 					id: 'start',
@@ -150,7 +144,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'start',
 					renderer: startRenderer,
-					hidden: this.forProject
+					hidden: this.forProject,
+					groupable: false
 				},{
 					xtype:"datecolumn",
 					id: 'due',
@@ -159,7 +154,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'due',
-					renderer: startRenderer
+					renderer: startRenderer,
+					groupable: false
 				},{
 					header: t('Responsible'),
 					width: dp(180),
@@ -167,7 +163,11 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'responsible',
 					renderer: function(v) {
 						return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
-					}
+					},
+					groupRenderer: function(v) {
+						return v ? v.displayName : "-";
+					},
+					groupable: true
 				},{
 					id:"percentComplete",
 					width:dp(150),
@@ -176,7 +176,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer:function (value, meta, rec, row, col, store){
 						return '<div class="go-progressbar"><div style="width:'+Math.ceil(value)+'%"></div></div>';
 					},
-					hidden: this.forProject
+					hidden: this.forProject,
+					groupable: false
 				},{
 					hidden: true,
 					id:"progress",
@@ -192,7 +193,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 							'cancelled': 'bluegrey'
 						};
 						return `<div class="status ${p[value]}-fill">${go.modules.community.tasks.progress[value]}</div>`;
-					}
+					},
+					groupable: false
 				},{
 					xtype:"datecolumn",
 					id: 'createdAt',
@@ -200,7 +202,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'createdAt',
-					hidden: true
+					hidden: true,
+					groupable: false
 				},
 				{					
 					xtype:"datecolumn",
@@ -209,7 +212,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'modifiedAt',
-					hidden: true
+					hidden: true,
+					groupable: false
 				},
 				{	
 					header: t('Created by'),
@@ -219,7 +223,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v) {
 						return v ? v.displayName : "-";
 					},
-					hidden: true
+					hidden: true,
+					groupable: true
 				},
 				{
 					header: t('Tasklist'),
@@ -229,7 +234,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v) {
 						return v ? v.name : "-";
 					},
-					hidden: true
+					hidden: true,
+					groupable: true
 				},
 				{	
 					header: t('Modified by'),
@@ -239,7 +245,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v) {
 						return v ? v.displayName : "-";
 					},
-					hidden: true
+					hidden: true,
+					groupable: false
 				},
 				{
 					id: 'categories',
@@ -250,7 +257,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v) {
 						return v.map(v=>'<span class="tasks-category">'+Ext.util.Format.htmlEncode(v.name)+'</span>').join("");
 					},
-					hidden: true
+					hidden: true,
+					groupable: false
 				}
 			];
 
@@ -270,7 +278,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						return go.util.Format.duration(v);
 					}
 					return '';
-				}
+				},
+				groupable: false
 			},{
 				id:"estimatedDuration",
 				header: t("Estimated duration", "tasks", 'community' ),
@@ -282,15 +291,16 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						return go.util.Format.duration(value, false , false);
 					}
 					return '';
-				}
+				},
+				groupable: false
 			});
 		}
 
 		if(!this.view) {
-			this.view = new go.grid.GridView({
+			this.view = new go.grid.GroupingView({
 				totalDisplay: true,
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
-				// hideGroupedColumn: true
+				hideGroupedColumn: true
 			});
 		}
 

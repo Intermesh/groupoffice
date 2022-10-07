@@ -28,6 +28,7 @@ class Transport extends \Swift_SmtpTransport
 	/**
 	 * @param Model\Account $account
 	 * @return Transport
+	 * @throws \Exception
 	 */
 	public static function newGoInstance(Model\Account $account)
 	{

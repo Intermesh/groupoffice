@@ -71,13 +71,13 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 	
 	convertEntityToNode : function(entityData) {
 
-		var encoded = go.util.Format.htmlEncode(entityData);
+		const encoded = go.util.Format.htmlEncode(entityData);
 		return {
 			id: this.entityStore.entity.name + "-" + entityData.id,			
 			data: entityData,						
 			entity:  this.entityStore.entity,
-			text: this.textTpl.apply(encoded),
-			secondaryText: this.secondaryTextTpl.apply(encoded),
+			text: Ext.util.Format.htmlDecode(this.textTpl.apply(encoded)),
+			secondaryText: Ext.util.Format.htmlDecode(this.secondaryTextTpl.apply(encoded)),
 			nodeType: 'groupoffice',
 			loader: this
 		};
