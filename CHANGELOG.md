@@ -1,4 +1,5 @@
 6.6.121
+- Billing: Align ID column in PDF to the left
 - Core: Archived user contacts moved into separate address book 'Archived users'
 - Email: Search button and account properties unreachable on some mobile resolutions
 
