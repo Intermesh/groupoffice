@@ -28,7 +28,6 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	renderDetailView: function (value, data, customfield) {		
 		var text = this.findRecursive(value, customfield.dataType.options);
 		return text ? text.substr(3) : null;
-		// return opt ? opt.text : null;
 	},
 
 	findRecursive: function (value, options, text) {

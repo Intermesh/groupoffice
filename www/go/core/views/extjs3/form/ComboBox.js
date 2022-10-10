@@ -309,6 +309,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	},
 
 	getParams: function (text) {
+		debugger;
+
 		//override to add 'text' filter for JMAP API
 		this.store.setFilter('combotext', {text: text});
 
