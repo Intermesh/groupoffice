@@ -17349,13 +17349,24 @@ Ext.layout.ToolbarLayout = Ext.extend(Ext.layout.ContainerLayout, {
             hideOnClick: hideOnClick
         });
 
+				if(!config.handler) {
+					config.handler = component.handler;
+					if(!config.scope) {
+						config.scope = component;
+					}
+				}
+
         if (group || component.enableToggle) {
+						delete config.iconCls;
             Ext.apply(config, {
                 group  : group,
-                checked: component.pressed,
+                checked: component.pressed || component.checked || false,
                 listeners: {
                     checkchange: function(item, checked){
+											if(component.toggle)
                         component.toggle(checked);
+											else
+												component.setChecked(!component.checked);
                     }
                 }
             });
