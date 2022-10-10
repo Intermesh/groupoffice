@@ -1,3 +1,7 @@
+6.6.121
+
+- Core: Archived user contacts moved into separate address book 'Archived users'
+
 05-10-2022 6.6.120
 - OAuth2Client: better error handling
 - Core: Added Online / Offline events to show the user if the device is still connected to wifi.
