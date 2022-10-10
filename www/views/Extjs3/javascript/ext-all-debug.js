@@ -17345,7 +17345,7 @@ Ext.layout.ToolbarLayout = Ext.extend(Ext.layout.ContainerLayout, {
         ]);
 
         Ext.apply(config, {
-            text       : component.overflowText || component.text,
+            text       : component.overflowText || component.text || component.tooltip,
             hideOnClick: hideOnClick
         });
 
@@ -17370,6 +17370,15 @@ Ext.layout.ToolbarLayout = Ext.extend(Ext.layout.ContainerLayout, {
 
     
     addComponentToMenu : function(menu, component) {
+
+			if (component.isXType('button') && component.menu && component.iconCls == 'ic-more-vert') {
+
+				menu.add('-');
+				component.menu.items.each(function (item) {
+					this.addComponentToMenu(menu, item);
+				}, this);
+				return;
+			}
 				if(component.addComponentToMenu) {
 					component.addComponentToMenu(menu, component);
 				} else if (component instanceof Ext.Toolbar.Separator) {
@@ -17379,7 +17388,7 @@ Ext.layout.ToolbarLayout = Ext.extend(Ext.layout.ContainerLayout, {
             if (component.isXType('splitbutton')) {
                 menu.add(this.createMenuConfig(component, true));
 
-            } else if (component.isXType('button')) {
+            } else if (component.isXType('button') || component.isXType('menubaseitem')) {
                 menu.add(this.createMenuConfig(component, !component.menu));
 
             } else if (component.isXType('buttongroup')) {

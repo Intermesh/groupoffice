@@ -303,7 +303,11 @@ GO.email.MessagesGrid = function(config){
 
 	var me = this;
 
-	if(!config.hideSearch)
+
+
+	if(!config.hideSearch) {
+		this.getTopToolbar().enableOverflow = true;
+
 		this.getTopToolbar().add({
 				cls: 'go-narrow',
 				iconCls: "ic-menu",
@@ -312,64 +316,66 @@ GO.email.MessagesGrid = function(config){
 				},
 				scope: this
 			},
-		this.composerButton = new Ext.Button({
-			iconCls: 'ic-drafts',
-			text: t("Compose", "email"),
-			cls: 'primary',
-			handler: function(){
-				GO.email.showComposer({account_id: this.account_id});
-			},
-			scope: this
-		}),this.btnRefresh = new Ext.Button({
-			iconCls: 'ic-autorenew',
-			tooltip: t("Refresh"),
-			handler: function(){
-				this.emailClient.refresh(true);
-			},
-			scope: this
-		}),this.deleteButton = new Ext.Button({
-			iconCls: 'ic-delete',
-			tooltip: t("Delete"),
-			handler: function(){
-				this.deleteSelected();
-				this.expand();
-			},
-			scope: this
-		}),
-		'->',
-		this.showUnreadButton,
-		this.searchField = new go.toolbar.SearchButton({
-			//store: config.store,
-			paramName:'search',
-			hidden: config.hideSearch,
-			tools: [
-				this.searchType,
-				this.searchTypeButton
-			],
-			listeners: {
-				search: function(me, v) {
-					config.store.baseParams['search']=v;
-					config.store.load();
+			this.composerButton = new Ext.Button({
+				iconCls: 'ic-drafts',
+				text: t("Compose", "email"),
+				cls: 'primary',
+				handler: function () {
+					GO.email.showComposer({account_id: this.account_id});
 				},
-				reset: function() {
-					this.searchDialog.hasSearch = false;
-					delete this.store.baseParams.query;
-					delete this.store.baseParams.search;
-					delete this.store.baseParams.searchIn;
-					this.resetSearch();
-					this.store.load({params:{start:0} });
+				scope: this
+			}), this.btnRefresh = new Ext.Button({
+				iconCls: 'ic-autorenew',
+				tooltip: t("Refresh"),
+				handler: function () {
+					this.emailClient.refresh(true);
 				},
-				scope:this
-			},
-			hasActiveSearch: function() {		
-				return  me.store.baseParams.search || me.store.baseParams.query;
+				scope: this
+			}), this.deleteButton = new Ext.Button({
+				iconCls: 'ic-delete',
+				tooltip: t("Delete"),
+				handler: function () {
+					this.deleteSelected();
+					this.expand();
+				},
+				scope: this
+			}),
+			'->',
+			this.showUnreadButton,
+			this.searchField = new go.toolbar.SearchButton({
+				//store: config.store,
+				paramName: 'search',
+				hidden: config.hideSearch,
+				tools: [
+					this.searchType,
+					this.searchTypeButton
+				],
+				listeners: {
+					search: function (me, v) {
+						config.store.baseParams['search'] = v;
+						config.store.load();
+					},
+					reset: function () {
+						this.searchDialog.hasSearch = false;
+						delete this.store.baseParams.query;
+						delete this.store.baseParams.search;
+						delete this.store.baseParams.searchIn;
+						this.resetSearch();
+						this.store.load({params: {start: 0}});
+					},
+					scope: this
+				},
+				hasActiveSearch: function () {
+					return me.store.baseParams.search || me.store.baseParams.query;
+				}
+			}), {
+				iconCls: 'ic-more-vert',
+				tooltip: t("Settings"),
+				menu: this.settingsMenu
 			}
-		}),{
-			iconCls: 'ic-more-vert',
-			tooltip:t("Settings"),
-			menu: this.settingsMenu
-		}
-	);
+		);
+	}
+
 
 	var origRefreshHandler = this.getBottomToolbar().refresh.handler;
 
