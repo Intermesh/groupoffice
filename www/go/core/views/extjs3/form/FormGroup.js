@@ -66,7 +66,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	// When mapKey is set we remember the keys of properties that are going to be deleted here
 	markDeleted: [],
 
-	startWithItem: true,
+	startWithItem: false,
+
+	required: false,
 
 	/**
 	 * Enable sorting by drag and drop
@@ -91,7 +93,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		this.itemCfg.isFormField = false;
 		this.markDeleted = [];
 		this.itemCfg.columnWidth = 1;
-		
+
+		if(this.required) {
+			this.startWithItem = true;
+		}
+
 		if(!this.itemCfg.xtype) {
 			this.itemCfg.xtype = "formcontainer";
 		}
@@ -138,12 +144,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		const hasMultiple = this.getEl().hasClass("multiple");
 		const shouldMultiple = this.items.getCount() > 1;
 
-		if(hasMultiple != shouldMultiple) {
+		this.required ? this.getEl().addClass('required') : this.getEl().removeClass('required');
 
+		if(hasMultiple != shouldMultiple) {
 			if(shouldMultiple) {
-				this.getEl().addClass('multiple' )
+				this.getEl().addClass('multiple')
 			} else {
-				this.getEl().removeClass('multiple' )
+				this.getEl().removeClass('multiple')
 			}
 
 			this.doLayout();

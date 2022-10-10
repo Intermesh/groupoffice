@@ -1823,8 +1823,10 @@ table[id^="comments-ext"] b {
 
 
 .go-form-group {
-	.go-form-group-edit-tb {
-		display: none;
+	&.required {
+		.go-form-group-edit-tb {
+			display: none;
+		}
 	}
 
 	.x-fieldset {
