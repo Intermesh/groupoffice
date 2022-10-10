@@ -702,8 +702,8 @@
 
 	@extend %font-button;
 	letter-spacing: 0; // for button icons
-	height: dp(32); // 32 for dense
-	line-height: dp(32) - 2; // 32 for dense
+	height: dp(36); // 32 for dense
+	line-height: dp(36); // 32 for dense
 	border-radius: $borderRadius;
 	vertical-align: middle;
 	white-space: nowrap;
@@ -714,12 +714,12 @@
 	transition: background-color 225ms linear, box-shadow 225ms $curve-standard;
 	
 	button {
-		min-height: dp(32);
+		min-height: dp(36);
 		line-height: dp(24);
 	}
 
 	&-text {
-		padding: dp(6);
+		padding: dp(6) ;
 	}
 	
 	.x-form-composite & {
@@ -889,8 +889,8 @@
 		button::before{
 			@extend %icon;
 			padding-right: dp(8);
-			//MS Why was this here?
-			/*margin-top: dp(-4);*/
+			//MS Why was this here? // MH To align the text of a button with the icon
+            margin-top: dp(-2);
 		}
 		i.icon {
 			margin-right: dp(8);
