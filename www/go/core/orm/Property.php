@@ -130,6 +130,10 @@ abstract class Property extends Model {
 	public function __construct($owner, bool $isNew = true, array $fetchProperties = [], bool $readOnly = false) {
 		$this->isNew = $isNew;
 
+
+		//test
+		$readOnly = false;
+
 		if (empty($fetchProperties)) {
 			$fetchProperties = static::getDefaultFetchProperties();
 		}

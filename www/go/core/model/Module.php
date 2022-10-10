@@ -242,17 +242,25 @@ class Module extends Entity {
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
-			->add("enabled", function(Criteria $criteria, $value) {
-				if($value === null) {
+			->add("enabled", function (Criteria $criteria, $value) {
+				if ($value === null) {
 					return;
 				}
-				$criteria->andWhere('enabled', '=', (bool) $value);
+				$criteria->andWhere('enabled', '=', (bool)$value);
 			})
-			->add('groupIsAllowed',function (Criteria $criteria, $value, Query $query) {
+			->add('groupIsAllowed', function (Criteria $criteria, $value, Query $query) {
 				//this filter doesn't actually filter but sorts the selected members on top
-				$query->join('core_permission', 'p_sort', 'p_sort.moduleId = m.id AND p_sort.groupId = ' . (int) $value, 'LEFT');
+				$query->join('core_permission', 'p_sort', 'p_sort.moduleId = m.id AND p_sort.groupId = ' . (int)$value, 'LEFT');
 				$query->orderBy(array_merge([new Expression('ISNULL(p_sort.groupId) ASC')], $query->getOrderBy()));
 				$query->groupBy(['m.id']);
+			})
+			->add("name", function (Criteria $criteria, $value) {
+
+				$criteria->andWhere('name', '=', $value);
+			})
+			->add("package", function (Criteria $criteria, $value) {
+
+				$criteria->andWhere('package', '=', $value);
 			});
 	}
 

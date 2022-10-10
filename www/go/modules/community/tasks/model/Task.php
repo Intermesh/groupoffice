@@ -337,7 +337,10 @@ class Task extends AclInheritEntity {
 				if(!$query->isJoined("tasks_tasklist", "tasklist") ){
 					$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
 				}
-				$criteria->where(['tasklist.role' => $value]);
+
+				$roleID = array_search($value, Tasklist::Roles, true);
+
+				$criteria->where(['tasklist.role' => $roleID]);
 			})
 			->add('categories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
