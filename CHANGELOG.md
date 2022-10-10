@@ -1,3 +1,5 @@
+- Email: Search button and account properties unreachable on some mobile resolutions
+
 05-10-2022 6.6.120
 - OAuth2Client: better error handling
 - Core: Added Online / Offline events to show the user if the device is still connected to wifi.
