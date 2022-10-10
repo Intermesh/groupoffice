@@ -17345,17 +17345,28 @@ Ext.layout.ToolbarLayout = Ext.extend(Ext.layout.ContainerLayout, {
         ]);
 
         Ext.apply(config, {
-            text       : component.overflowText || component.text,
+            text       : component.overflowText || component.text || component.tooltip,
             hideOnClick: hideOnClick
         });
 
+				if(!config.handler) {
+					config.handler = component.handler;
+					if(!config.scope) {
+						config.scope = component;
+					}
+				}
+
         if (group || component.enableToggle) {
+						delete config.iconCls;
             Ext.apply(config, {
                 group  : group,
-                checked: component.pressed,
+                checked: component.pressed || component.checked || false,
                 listeners: {
                     checkchange: function(item, checked){
+											if(component.toggle)
                         component.toggle(checked);
+											else
+												component.setChecked(!component.checked);
                     }
                 }
             });
@@ -17370,6 +17381,15 @@ Ext.layout.ToolbarLayout = Ext.extend(Ext.layout.ContainerLayout, {
 
     
     addComponentToMenu : function(menu, component) {
+
+			if (component.isXType('button') && component.menu && component.iconCls == 'ic-more-vert') {
+
+				menu.add('-');
+				component.menu.items.each(function (item) {
+					this.addComponentToMenu(menu, item);
+				}, this);
+				return;
+			}
 				if(component.addComponentToMenu) {
 					component.addComponentToMenu(menu, component);
 				} else if (component instanceof Ext.Toolbar.Separator) {
@@ -17379,7 +17399,7 @@ Ext.layout.ToolbarLayout = Ext.extend(Ext.layout.ContainerLayout, {
             if (component.isXType('splitbutton')) {
                 menu.add(this.createMenuConfig(component, true));
 
-            } else if (component.isXType('button')) {
+            } else if (component.isXType('button') || component.isXType('menubaseitem')) {
                 menu.add(this.createMenuConfig(component, !component.menu));
 
             } else if (component.isXType('buttongroup')) {

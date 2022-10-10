@@ -1,6 +1,6 @@
 6.6.121
-
 - Core: Archived user contacts moved into separate address book 'Archived users'
+- Email: Search button and account properties unreachable on some mobile resolutions
 
 05-10-2022 6.6.120
 - OAuth2Client: better error handling
