@@ -8,7 +8,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 		Ext.apply(this, {
 			store: new go.data.Store({
 				fields: ['id', 'name'],
-				entityStore: "Tasklist",
+				entityStore: "TaskList",
 				filters: {role: {role: 'list'}},
 				sortInfo: {
 					field: 'name',
@@ -35,7 +35,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 							if (btn != "yes") {
 								return;
 							}
-							go.Db.store("Tasklist").set({destroy: [this.moreMenu.record.id]});
+							go.Db.store("TaskList").set({destroy: [this.moreMenu.record.id]});
 						}, this);
 					},
 					scope: this

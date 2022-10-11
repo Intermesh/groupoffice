@@ -9,7 +9,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 	onReady: async function() {
 		if(this.currentId) {
-			const tl = await go.Db.store("Tasklist").single(this.tasklistCombo.getValue());
+			const tl = await go.Db.store("TaskList").single(this.tasklistCombo.getValue());
 			this.tasklistCombo.store.setFilter("role", {role: tl.role});
 		} else {
 			this.tasklistCombo.store.setFilter("role", {role: this.role});

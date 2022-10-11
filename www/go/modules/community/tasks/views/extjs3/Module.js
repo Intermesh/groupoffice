@@ -2,7 +2,7 @@ go.Modules.register("community", "tasks", {
 	mainPanel: "go.modules.community.tasks.MainPanel",
 	title: t("Tasks"),
 	entities: ["TaskCategory","PortletTasklist","Settings",{
-		name: "Tasklist",
+		name: "TaskList",
 		relations: {
 			creator: {store: "UserDisplay", fk: "createdBy"},
 			groups: {name: 'Groups'}
@@ -51,7 +51,7 @@ go.Modules.register("community", "tasks", {
 			creator: {store: "UserDisplay", fk: "createdBy"},
 			modifier: {store: "UserDisplay", fk: "modifiedBy"},
 			responsible: {store: 'UserDisplay', fk: 'responsibleUserId'},
-			tasklist: {store: 'Tasklist', fk: 'tasklistId'},
+			tasklist: {store: 'TaskList', fk: 'tasklistId'},
 			categories: {store: "TaskCategory", fk: "categories"},
 		},
 
@@ -101,7 +101,7 @@ go.Modules.register("community", "tasks", {
 				typeConfig: {value: null}
 			},
 			{
-				title: t("Tasklist"),
+				title: t("Task list"),
 				name: 'tasklistid',
 				multiple: false,
 				type: "go.modules.community.tasks.TasklistCombo"

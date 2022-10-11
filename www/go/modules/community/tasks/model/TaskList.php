@@ -52,7 +52,7 @@ class TaskList extends AclOwnerEntity
 	 *
 	 * @param string $value ['list'|'board'|'project']
 	 */
-	public function setRole($value) {
+	public function setRole(string $value) {
 		$key = array_search($value, self::Roles, true);
 		if($key === false) {
 			$this->setValidationError('role', 10, 'Incorrect role value for tasklist');

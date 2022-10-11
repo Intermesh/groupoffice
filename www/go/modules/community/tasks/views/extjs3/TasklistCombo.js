@@ -1,6 +1,6 @@
 (function() {
 	const cfg = {
-		fieldLabel: t("Tasklist"),
+		fieldLabel: t("Task list"),
 		hiddenName: 'tasklistId',
 		anchor: '100%',
 		emptyText: t("Please select..."),
@@ -16,7 +16,7 @@
 		store: {
 			xtype: "gostore",
 			fields: ['id', 'name'],
-			entityStore: "Tasklist",
+			entityStore: "TaskList",
 			filters: {
 				permissionLevel: {
 					permissionLevel: go.permissionLevels.write
