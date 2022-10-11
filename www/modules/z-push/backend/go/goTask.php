@@ -6,7 +6,7 @@ use go\core\util\Recurrence;
 use go\modules\community\tasks\model\Alert;
 use go\modules\community\tasks\model\Progress;
 use go\modules\community\tasks\model\Task;
-use go\modules\community\tasks\model\Tasklist;
+use go\modules\community\tasks\model\TaskList;
 
 class goTask extends GoBaseBackendDiff {
 
@@ -308,13 +308,13 @@ class goTask extends GoBaseBackendDiff {
 			//remove t/ from the folder ? Shouldn't this already have been done by the combined backend wrapper?
 			$oldid = substr($oldid, 2);
 
-			$tasklist = Tasklist::findById($oldid);
+			$tasklist = TaskList::findById($oldid);
 			if(!$tasklist) {
 				ZLog::Write(LOGLEVEL_DEBUG, "Tasklist with $oldid not found");
 				return false;
 			}
 		} else{
-			$tasklist = new Tasklist();
+			$tasklist = new TaskList();
 		}
 
 		$tasklist->name = $displayname;
@@ -342,7 +342,7 @@ class goTask extends GoBaseBackendDiff {
 	public function GetFolder($id) {
 		ZLog::Write(LOGLEVEL_DEBUG, "GetFolder($id)");
 
-		$tasklist = Tasklist::findById($id);
+		$tasklist = TaskList::findById($id);
 		if(!$tasklist || !$tasklist->hasPermissionLevel(Acl::LEVEL_READ)) {
 			ZLog::Write(LOGLEVEL_WARN, "GetFolder($id) not found or no permissions");
 			return false;
@@ -365,7 +365,7 @@ class goTask extends GoBaseBackendDiff {
 	public function GetFolderList() {
 		$folders = array();
 
-		$tasklists = Tasklist::find()
+		$tasklists = TaskList::find()
 			->selectSingleValue('tasklist.id')
 			->join("sync_tasklist_user", "u", "u.tasklistId = tasklist.id")
 			->andWhere('u.userId', '=', go()->getAuthState()->getUserId())

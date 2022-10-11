@@ -56,7 +56,7 @@ class Category extends Entity {
 		}
 
 		if(isset($this->tasklistId)) {
-			$tasklist = Tasklist::findById($this->tasklistId);
+			$tasklist = TaskList::findById($this->tasklistId);
 
 			return $tasklist->getPermissionLevel() >= Acl::LEVEL_MANAGE ? Acl::LEVEL_DELETE : Acl::LEVEL_READ;
 		} else {

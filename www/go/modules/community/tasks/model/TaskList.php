@@ -21,7 +21,7 @@ use GO\Projects2\Model\ProjectEntity;
 /**
  * Tasklist model
  */
-class Tasklist extends AclOwnerEntity
+class TaskList extends AclOwnerEntity
 {
 	const List = 1;
 	const Board = 2;
@@ -103,7 +103,7 @@ class Tasklist extends AclOwnerEntity
 		return parent::defineMapping()
 			->addTable("tasks_tasklist", "tasklist")
 			->addUserTable('tasks_tasklist_user', "ut", ['id' => 'tasklistId'])
-			->addArray('groups', TasklistGroup::class, ['id' => 'tasklistId'], ['orderBy'=>'sortOrder']);
+			->addArray('groups', TaskListGroup::class, ['id' => 'tasklistId'], ['orderBy'=>'sortOrder']);
 	}
 
 	protected function internalSave(): bool
@@ -134,10 +134,10 @@ class Tasklist extends AclOwnerEntity
 	 * Create a task list for a project and return its id
 	 *
 	 * @param int $projectId
-	 * @return Tasklist
+	 * @return TaskList
 	 * @throws Exception
 	 */
-	public static function createForProject(int $projectId) :Tasklist
+	public static function createForProject(int $projectId) :TaskList
 	{
 		$project = ProjectEntity::findById($projectId, ['id', 'name', 'acl_id']);
 

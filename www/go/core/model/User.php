@@ -40,7 +40,7 @@ use go\modules\community\addressbook\model\UserSettings;
 use go\modules\community\notes\model\NoteBook;
 use go\modules\community\notes\model\UserSettings as NotesUserSettings;
 use go\modules\community\tasks\model\Task;
-use go\modules\community\tasks\model\Tasklist;
+use go\modules\community\tasks\model\TaskList;
 use go\modules\community\tasks\model\UserSettings as TasksUserSettings;
 
 
@@ -1206,10 +1206,10 @@ class User extends Entity {
 		}
 
 		if(Module::isInstalled("community", "tasks")) {
-			$taskLists  = Tasklist::find()->where('createdBy','=', $this->id)->andWhere('role','=', Tasklist::List);
+			$taskLists  = TaskList::find()->where('createdBy','=', $this->id)->andWhere('role','=', TaskList::List);
 			foreach($taskLists as $taskList) {
 				$aclIds[] = $taskList->findAclId();
-				Tasklist::entityType()->change($taskList);
+				TaskList::entityType()->change($taskList);
 			}
 		}
 

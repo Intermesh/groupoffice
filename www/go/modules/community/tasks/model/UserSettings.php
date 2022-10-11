@@ -59,9 +59,9 @@ class UserSettings extends Property {
 			return null;
 		}
 
-		$tasklist = Tasklist::find()->where('createdBy', '=', $this->userId)->single();
+		$tasklist = TaskList::find()->where('createdBy', '=', $this->userId)->single();
 		if(!$tasklist) {
-			$tasklist = new Tasklist();
+			$tasklist = new TaskList();
 			$tasklist->createdBy = $this->userId;
 			$tasklist->name = User::findById($this->userId, ['displayName'])->displayName;
 			if(!$tasklist->save()) {

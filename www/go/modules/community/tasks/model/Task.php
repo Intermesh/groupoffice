@@ -197,14 +197,14 @@ class Task extends AclInheritEntity {
 	protected $timeBooked;
 
 	/**
-	 * @var TasklistGroup[]
+	 * @var TaskListGroup[]
 	 */
 	public $group = [];
 
 
 	protected static function aclEntityClass(): string
 	{
-		return Tasklist::class;
+		return TaskList::class;
 	}
 
 	protected static function aclEntityKeys(): array
@@ -223,7 +223,7 @@ class Task extends AclInheritEntity {
 			->addTable("tasks_task", "task")
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
-			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
+			->addMap('group', TaskListGroup::class, ['groupId' => 'id'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 
 		return $mapping;
@@ -298,7 +298,7 @@ class Task extends AclInheritEntity {
 
 	protected function getSearchDescription(): string
 	{
-		$tasklist = Tasklist::findById($this->tasklistId);
+		$tasklist = TaskList::findById($this->tasklistId);
 		$desc = $tasklist->name;
 		if(!empty($this->responsibleUserId) && ($user = User::findById($this->responsibleUserId, ['displayName']))) {
 			$desc .= ' - '.$user->displayName;
@@ -338,7 +338,7 @@ class Task extends AclInheritEntity {
 					$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
 				}
 
-				$roleID = array_search($value, Tasklist::Roles, true);
+				$roleID = array_search($value, TaskList::Roles, true);
 
 				$criteria->where(['tasklist.role' => $roleID]);
 			})
@@ -703,7 +703,7 @@ class Task extends AclInheritEntity {
 		$tasks = self::find(['id','start', 'estimatedDuration','startTime'])
 			->join('tasks_tasklist','tl','task.tasklistId = tl.id')
 			->andWhere($c)
-			->andWhere('tl.role = '. Tasklist::Project)
+			->andWhere('tl.role = '. TaskList::Project)
 			->all();
 
 		// All day tasks are to be considered conflicting by definition

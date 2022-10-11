@@ -38,7 +38,7 @@ use go\core\model\Acl;
 use go\core\model\User;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\notes\model\NoteBook;
-use go\modules\community\tasks\model\Tasklist;
+use go\modules\community\tasks\model\TaskList;
 
 class Settings extends \GO\Base\Db\ActiveRecord{
 	
@@ -85,7 +85,7 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 
 	public function getDefaultTasklist() {
 
-		$tasklist = Tasklist::find()
+		$tasklist = TaskList::find()
 			->join('sync_tasklist_user', 'su', 'su.tasklist_id = a.id')
 			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
 			->where('su.user_id', '=', go()->getAuthState()->getUserId())

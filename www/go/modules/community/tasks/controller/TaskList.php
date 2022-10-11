@@ -13,12 +13,12 @@ use go\core\jmap\EntityController;
 use go\core\model\Module as CoreModule;
 use go\modules\community\tasks\model;
 
-class Tasklist extends EntityController
+class TaskList extends EntityController
 {
 
 	protected function entityClass(): string
 	{
-		return model\Tasklist::class;
+		return model\TaskList::class;
 	}
 
 	public function query($params)
