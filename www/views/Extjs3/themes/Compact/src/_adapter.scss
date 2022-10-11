@@ -1,0 +1,60 @@
+%flex {
+  display: flex !important;
+  //flex-direction: row;
+  align-items:stretch;
+  > * {
+    &.flex {
+      flex-grow:1;
+      flex-shrink:1;
+    }
+    outline: 1px solid color($fg, 'line');
+    flex-shrink:0;
+    flex-grow:0;
+    position:relative;
+  }
+}
+.hbox {
+  @extend %flex;
+  > * {
+    overflow-x:visible;
+    will-change: width;
+    &.collapsed {
+      width:0 !important;
+    }
+  }
+  > hr { // sash splitter
+    background-color: transparent;
+    position:absolute;
+    z-index:5;
+    margin:0;
+    border:0;
+    cursor: ew-resize;
+    cursor: col-resize;
+    width: 5px;
+    top:0;
+    height:100%;
+    &:hover{
+      background-color: color($bg, 'hover');
+    }
+    &.moving {
+      background-color: color($fg, 'line');
+    }
+  }
+}
+.vbox {
+  @extend %flex;
+  flex-direction: column;
+  > hr {
+    cursor: ns-resize;
+    cursor: row-resize;
+    height: 5px;
+    width:auto;
+  }
+  > * {
+    overflow:hidden;
+  }
+  > .flex { overflow-y: auto;}
+  &.flex { overflow-y: auto; }
+}
+.group { overflow:hidden;}
+.group > * { float:left}

@@ -13,6 +13,7 @@ function $regApp(name: string, cfg: any) {
 			cfg.ui.iconCls = 'ic'; /// blehh
 			self.panelConfig = cfg.ui;
 			for(const path in cfg.routes) {
+				// @ts-ignore
 				go.Router.add(path, cfg.routes[path]);
 			}
 		}
@@ -25,6 +26,6 @@ function $regApp(name: string, cfg: any) {
 	}
 	if(entities.length)
 		old.entities = entities;
-
+	// @ts-ignore
 	go.Modules.register("community", name, old);
 }

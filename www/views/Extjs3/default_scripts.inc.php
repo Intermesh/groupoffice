@@ -166,8 +166,11 @@ if ($cacheFile->exists()) {
 					$scriptsFile = $modulePath . 'scripts.txt';
 					if (!file_exists($scriptsFile))
 						$scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
-
-					$prefix = "";
+                    $prefix = "";
+                    if (!file_exists($scriptsFile)) { // GOUI
+                      $scriptsFile = $module->moduleManager->path() . 'scripts.txt';
+                      $prefix = dirname(str_replace("\\", "/", get_class($module->moduleManager)))."/";
+                    }
 				}
 				
 				if (file_exists($scriptsFile)) {

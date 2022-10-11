@@ -8,7 +8,12 @@ class Module extends core\Module
 
 	public function getAuthor(): string
 	{
-		return "Intermesh BV <info@intermesh.nl>";
+		return "Intermesh BV <mdhart@intermesh.nl>";
+	}
+
+	public static function getTitle(): string
+	{
+		return 'Calendar GOUI';
 	}
 
 	protected function rights(): array

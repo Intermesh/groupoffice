@@ -38,7 +38,7 @@ class CalendarEvent extends AclItemEntity {
 	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
 		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
 
-	const EventProperties = ['uid','prodId', 'sequence','title','description','locale', 'showWithoutTime', 'start','timeZone','duration','priority','privacy','status', 'recurrenceRule'];
+	const EventProperties = ['id','uid','prodId', 'sequence','title','description','locale', 'showWithoutTime', 'start','timeZone','duration','priority','privacy','status', 'recurrenceRule'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'calendarId'];
 	const IgnoredPropertiesInException = ['uid', 'organizerEmail', 'allDay','recurrence', 'links'];
@@ -135,7 +135,7 @@ class CalendarEvent extends AclItemEntity {
 	protected static function defineMapping(): Mapping {
 		return (new Mapping(static::class))
 			->addTable('calendar_event', "eventdata", null, self::EventProperties)
-			->addUserTable('calendar_participant', 'eventuser', ['id' => 'userId'],self::UserProperties)
+			->addUserTable('calendar_event_user', 'eventuser', ['id' => 'userId'],self::UserProperties)
 			->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
 			->addMap('participants', Participant::class, ['id' => 'eventId'])
 			->addMap('alerts', Alert::class, ['id' => 'eventId']);

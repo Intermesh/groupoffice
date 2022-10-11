@@ -9,7 +9,7 @@ declare module Ext {
 		off: any;
 		add: (items: any[]) => void
 
-		private ownerCt: Component
+		protected ownerCt: Ext.Container
 
 		hasListener(name: string): boolean
 
@@ -22,6 +22,9 @@ declare module Ext {
 		constructor(config?);
 
 		initComponent(...args: any[])
+	}
+	class Window extends Container {
+		close()
 	}
 }
 
@@ -63,7 +66,12 @@ type IconCfg = {
 	title?: string
 }
 
-const Box = (cfg: ComponentCfg, ...items: ItemCfg[]) => create(Component,cfg)
+class Dialog extends Ext.Window {
+	setItems(...items) {
+		for(const cmp of items)
+			this.add(cmp);
+	}
+}
 
 class Component extends Ext.Container {
 
@@ -76,8 +84,9 @@ class Component extends Ext.Container {
 		return this.el.dom;
 	}
 
-	setItems(items) {
-		this.add(items);
+	setItems(...items) {
+		for(const cmp of items)
+			this.add(cmp);
 	}
 
 
@@ -91,8 +100,8 @@ class Component extends Ext.Container {
 	// get el() {return Ext.get(this.dom);}
 	// //get tabEl() {return this.dom;}
 	// tabEl
-	fireEvent(name, ...args) {
-		//this.fire(name, ...args);
-	} // pass the events anyway
+	// fireEvent(name, ...args) {
+	// 	//this.fire(name, ...args);
+	// } // pass the events anyway
 	// onRender(ct) {this.render(ct);}
 }

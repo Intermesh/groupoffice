@@ -29,10 +29,7 @@ class Event extends Entity {
 		return 'calendar_event';
 	}
 
-
-
 	// ATTRIBUTES
-
 
 	public function getStartAt() {
 		if(is_string($this->startAt)) {

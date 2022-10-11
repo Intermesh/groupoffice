@@ -7,9 +7,7 @@ class MonthView extends CalendarView {
 			let now = new Date();
 			day = new Date(now.getFullYear(), now.getMonth(), 1);
 		}
-		if(this.isRendered()) {
-			this.dom.cls('reverse',(day < this.day));
-		}
+		this.dom.cls('reverse',(day < this.day));
 		this.day = new Date(+day);
 		let end = new Date(+day);
 		day.setDate(1);
@@ -21,7 +19,7 @@ class MonthView extends CalendarView {
 		end.add(1,'d');
 		//this.renderView();
 		//this.dom.cls('+loading');
-		this.query.filter('date', {after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00')}).fetch(0,500);
+		this.store.filter('date', {after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00')}).fetch(0,500);
 	}
 
 	renderView() {
@@ -56,15 +54,18 @@ class MonthView extends CalendarView {
 
 		//this.dom.html('<div class="monthview">'+html+'</div>');
 
-		const anim = this.dom!.has('.anim'),
-			 el = this.dom!.html('<div class="cal month active">'+html+'</div>', anim ? -1 : undefined),
-			curr = el.prev();
-		if (anim && curr) { // Render new view and transist it into the old with css
-			//el.cls('+active');
-			curr.cls('-active');
-			// we cant use an 'animationend' event it wont fire when the animation is missing
-			setTimeout(function(){curr.remove(); },1375);  // could be anywere in the future after the animation
-		}
+		// const //anim = this.dom!.has('.anim'),
+		// 	 el = this.dom!.html('<div class="cal month active">'+html+'</div>', anim ? -1 : undefined),
+		// 	curr = el.prev();
+		this.dom.style.height = '100%';
+		this.dom.classList.add('cal','month','active');
+		this.dom!.innerHTML = html;
+		// if (anim && curr) { // Render new view and transist it into the old with css
+		// 	//el.cls('+active');
+		// 	curr.cls('-active');
+		// 	// we cant use an 'animationend' event it wont fire when the animation is missing
+		// 	setTimeout(function(){curr.remove(); },1375);  // could be anywere in the future after the animation
+		// }
 		
 		//this.fire('render', start);
 		//this.waiting = false;
@@ -83,35 +84,34 @@ class MonthView extends CalendarView {
 				r.next(); 
 			}
 		}
-		while (e = this.store.get(this.query.ids[i])) {
+		for (e of this.store.data.items) {
 			if(e.start.date().to('Yw') === start.to('Yw') && !e.recurrenceRule) {
 				html += this.drawEvent(e, new Date(e.start), start);
 			}
-			i++;
 		}
 		return html;
 	}
 
-	onRender(dom){
-		this.setDate(new Date());
-		dom.on('click',(ev) => {
-
-			const event = ev.target.up('.event');
-			if(event) {
-				const dlg = new EventDialog();
-				dlg.show(event).form.load(event.dataset.id);
-				
-			}
-			const day = ev.target.up('li[data-date]');
-			if(day) {
-				const dlg = new EventDialog();
-				//const date = Date.fromYmd(day.dataset.date);
-				dlg.show(event).form.create({start: day.dataset.date, end: day.dataset.date})
-				
-			}
-			ev.preventDefault();
-		});
-	}
+	// onRender(dom){
+	// 	this.setDate(new Date());
+	// 	dom.on('click',(ev) => {
+	//
+	// 		const event = ev.target.up('.event');
+	// 		if(event) {
+	// 			const dlg = new EventDialog();
+	// 			dlg.show(event).form.load(event.dataset.id);
+	//
+	// 		}
+	// 		const day = ev.target.up('li[data-date]');
+	// 		if(day) {
+	// 			const dlg = new EventDialog();
+	// 			//const date = Date.fromYmd(day.dataset.date);
+	// 			dlg.show(event).form.create({start: day.dataset.date, end: day.dataset.date})
+	//
+	// 		}
+	// 		ev.preventDefault();
+	// 	});
+	// }
 
 	private slots;
 	private ROWHEIGHT = 26;

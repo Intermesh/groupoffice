@@ -1,26 +1,6 @@
 $calEventColor : $cPrimary; 
 $calTodayColor : $cAccent;
 
-%flex {
-	box-shadow: 0 0 1px rgba(0,0,0,.11),0 1px 2px rgba(0,0,0,.22);
-    box-sizing: border-box;
-    height: 88px;
-    padding: 12px;
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 132px;
-    z-index: 0;
-    display: -webkit-flex;
-    display: flex;
-	cursor:pointer;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-    -webkit-justify-content: center;
-    justify-content: center;
-
-}
-
 go-yearview {
 	position:absolute;
 	width:100%;

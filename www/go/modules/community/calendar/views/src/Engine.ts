@@ -1,6 +1,4 @@
-app
-let $app: any,
-    $ = (function() {
+let $ = (function() {
         let e: {[event:string]: Function[]} = {},
             idCounter = 0,
             isTypOf = function<T>(otype: string) : (obj:any) => obj is T {

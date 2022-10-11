@@ -1,273 +1,249 @@
+function buildAdapter(cls, cfg, items) {
+    if (cfg.tagName) {
+        cfg.autoEl = cfg.tagName;
+        delete cfg.tagName;
+    }
+    if (cfg.icon) {
+        cfg.iconCls = 'ic-' + cfg.icon.replace('_', '-');
+        delete cfg.icon;
+    }
+    if (cfg.flex) {
+        cfg.cls += ' flex';
+    }
+    if (cfg.layout) {
+        cfg.cls += ' ' + cfg.layout;
+        delete cfg.layout;
+    }
+    if (items)
+        cfg.items = items;
+    return new cls(cfg);
+}
+function fieldAdapter(cls, cfg) {
+    if (cfg.required) {
+        cfg.allowBlank = false;
+    }
+    if (cfg.label) {
+        cfg.fieldLabel = cfg.label;
+    }
+    return buildAdapter(cls, cfg);
+}
+function columnAdapter(cfg) {
+    for (const col of cfg.columns) {
+        col.dataIndex = col.id;
+    }
+    return cfg;
+}
+const comp = (cfg, ...items) => buildAdapter(Ext.Container, cfg, items), tbar = (cfg, ...items) => buildAdapter(Ext.Toolbar, cfg, items), btn = cfg => buildAdapter(Ext.Button, cfg), menu = (cfg, ...items) => {
+    for (const i in items) {
+        if (typeof items[i] !== 'string')
+            items[i] = new Ext.menu.Item(items[i].initialConfig);
+    }
+    return buildAdapter(Ext.menu.Menu, cfg, items);
+}, cards = (cfg, ...items) => buildAdapter(Ext.TabPanel, cfg, items), datepicker = cfg => { return new Ext.DatePicker(cfg); }, list = cfg => buildAdapter(Ext.list.ListView, columnAdapter(cfg)), store = cfg => {
+    cfg.fields = cfg.properties;
+    cfg.entityStore = cfg.entity;
+    cfg.enableCustomFields = false;
+    return new go.data.Store(cfg);
+}, form = (cfg, ...items) => buildAdapter(Ext.form.FormPanel, cfg, items), select = (cfg) => fieldAdapter(go.form.SelectField, cfg), textfield = (cfg) => fieldAdapter(Ext.form.TextField, cfg), datefield = (cfg) => fieldAdapter(Ext.form.DateField, cfg), fieldset = (cfg, ...items) => buildAdapter(Ext.form.FieldSet, cfg, items), checkbox = (cfg) => fieldAdapter(Ext.form.Checkbox, cfg), htmlfield = cfg => fieldAdapter(go.form.HtmlEditor, cfg);
+class Dialog extends Ext.Window {
+    setItems(...items) {
+        for (const cmp of items)
+            this.add(cmp);
+    }
+}
 class Component extends Ext.Container {
     constructor() {
         super(...arguments);
         this.e = {};
-        this.active = false;
-        this.painting = false;
-    }
-    isRendered() {
-        return this.dom !== undefined;
     }
     get parent() {
-        return this.ownerCt.body;
+        return this.ownerCt;
     }
     get dom() {
-        this.el.dom;
+        return this.el.dom;
     }
-    setItems(items) {
-        this.add(items);
-    }
-    fire(name, ...args) {
-        let result = true;
-        if (!this.e[name])
-            return result;
-        for (let fn of this.e[name]) {
-            args.unshift(this);
-            result = result && fn.apply(this, args);
-        }
-        return result;
-    }
-    fireEvent(name, ...args) {
+    setItems(...items) {
+        for (const cmp of items)
+            this.add(cmp);
     }
 }
-const Cmp = (cfg) => new Component(cfg);
-const AUTH_GUEST = { username: 'Guest', displayName: 'Anonymouse', accessToken: '', accountId: '', accounts: {}, capabilities: { maxSizeUpload: 1000 } };
-let $app, $ = (function () {
-    let e = {}, idCounter = 0, isTypOf = function (otype) {
-        return function (obj) {
-            return Object.prototype.toString.call(obj) === '[object ' + otype + ']';
-        };
-    };
-    return {
-        id: document.getElementById.bind(document),
-        el: function (tagName, options) { return document.createElement(tagName, options); },
-        extend: Object.assign,
-        apply: function (source, destination) {
-            return $.extend(destination || {}, source);
-        },
-        on: function (name, callback) {
-            if (!e[name])
-                e[name] = [];
-            e[name].push(callback);
-            return $;
-        },
-        fire: function (name, ...args) {
-            if (!e[name])
-                return true;
-            let result = true;
-            for (let fn of e[name]) {
-                if (fn.apply($, args) === false)
-                    result = false;
-            }
-            return result;
-        },
-        isArray: Array.isArray,
-        isObject: function (obj) { return (typeof obj === "object") && (obj !== null); },
-        isEmpty: (val) => val == null || !(Object.keys(val) || val).length,
-        isString: isTypOf('String'),
-        isFunction: isTypOf('Function'),
-        isNumber: isTypOf('Number'),
-        isRegExp: isTypOf('RegExp'),
-        isNaN: function (val) { return isNaN(val) && val.toString().trim() !== ''; },
-        isDate: function (d) { return d instanceof Date && !isNaN(d.getTime()); },
-        auth: AUTH_GUEST,
-        server: window.location.origin + window.location.pathname,
-        throttle: function (callback) {
-            var active = false, evt, handler = function () {
-                active = false;
-                callback(evt);
-            };
-            return function handleEvent(e) {
-                evt = e;
-                if (!active) {
-                    active = true;
-                    requestAnimationFrame(handler);
-                }
-                ;
-            };
-        },
-        notify: function (msg) {
-            let notify = $.el('li').cls(msg.category), tid, text = '';
-            if (msg.category === 'system') {
-                notify.cls('+error');
-            }
-            if (msg.title) {
-                text = '<b>' + msg.title + '</b> ';
-            }
-            notify.html(text + msg.content);
-            let notifier = document.getElementById('notifier');
-            notifier.appendChild(notify);
-            if (msg.category === 'status') {
-                tid = setTimeout(function () { notify.remove(); }, 5000);
-            }
-            notify.on('click', function (e) { this.remove(); if (tid)
-                clearTimeout(tid); });
-        },
-        print: function (el) {
-            let printer = document.getElementById('printer');
-            printer.innerHTML = el.innerHTML;
-            window.print();
-        },
-        uri: { api: '', download: '', upload: '', sse: '' },
-        fileView: undefined,
-        app: {},
-        appId: '',
-        escapeHTML: function (unsafe) {
-            return unsafe.replace(/[\u0000-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u00FF]/g, (c) => '&#' + ('000' + c.charCodeAt(0)).substr(-4, 4) + ';');
-        },
-        download: function (blobId, fileName = '') {
-            if (blobId) {
-                return this.uri.download.replace('{blobId}', blobId).replace('{name}', fileName.replace(/[^a-zA-Z0-9._-]*/g, ''));
-            }
-        },
-        http: function () {
-            return this.jmap;
-        },
-        browser: function () {
-            var N = navigator.appName, ua = navigator.userAgent, tem;
-            var M = ua.match(/(opera|chrome|safari|firefox|msie)\/?\s*(\.?\d+(\.\d+)*)/i);
-            if (M && (tem = ua.match(/version\/([\.\d]+)/i)) != null)
-                M[2] = tem[1];
-            M = M ? [M[1], M[2]] : [N, navigator.appVersion, '-?'];
-            return M.join(';');
-        },
-        uuid: function () {
-            return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) => {
-                return (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16);
-            });
-        },
-        toArray: function (obj) { return Object.keys(obj).map((i) => obj[i]); },
-        luid: function (prefix = '#') { return prefix + (++idCounter); },
-        jsonPath: function (obj, path) {
-            let s, str = path.split('.');
-            while (s = str.shift()) {
-                const res = s.match(/\[(.+)\]/);
-                if (res) {
-                    s = s.slice(0, 0 - res[0].length);
-                }
-                if (!obj || !obj.hasOwnProperty(s))
-                    return undefined;
-                obj = obj[s];
-                if (res && res[1]) {
-                    if (obj.indexOf(res[1]) === -1)
-                        return undefined;
-                    obj = obj[res[1]];
-                }
-            }
-            return obj;
-        },
-        jsonMerge(data, path, value) {
-            let s, i = 0, str = path.split('.'), curr = data;
-            for (; i < str.length - 1; i++) {
-                const s = str[i];
-                if (!curr[s])
-                    curr[s] = {};
-                curr = curr[s];
-            }
-            curr[str[i]] = value;
+function pad(n) {
+    return (n < 10 ? '0' : '') + n;
+}
+Object.assign(Date, {
+    fromWeek(year, week) {
+        let w = new Date(year, 1, 1);
+        w.setWeek(week);
+        return w;
+    },
+    fromYmd(ymd) {
+        let val = ymd.split('-');
+        return new Date(+val[0], (+val[1]) - 1, +val[2]);
+    },
+    fromShortDate(shortDate) {
+        let tester = new Date('1971-02-03'), result = tester.toShort(), dayPos = result.indexOf('3'), monthPos = result.indexOf('2'), yearPos = result.indexOf('71'), sep = result.match(/[\D]/), parts = shortDate.split(sep[0]), order = [], yearFirst = false;
+        if (yearPos < monthPos) {
+            yearFirst = true;
+            order.push(parts[0]);
         }
-    };
-})();
-Object.assign(Element.prototype, {
-    on: function (event, listener, useCapture) {
-        this.addEventListener(event, listener, useCapture);
+        else {
+            order.push(parts[2]);
+        }
+        if (dayPos < monthPos) {
+            order.push(pad(parts[yearFirst ? 2 : 1]));
+            order.push(pad(parts[yearFirst ? 1 : 0]));
+        }
+        else {
+            order.push(pad(parts[yearFirst ? 1 : 0]));
+            order.push(pad(parts[yearFirst ? 2 : 1]));
+        }
+        return new Date(order.join('-'));
+    },
+    period: ['seconden', 'minuten', 'uren', 'dagen', 'weken', 'maanden', 'jaar'],
+    period1: ['seconde', 'minuut', 'uur', 'dag', 'week', 'maand', 'jaar'],
+    days: [],
+    months: [],
+    firstWeekday: 1,
+    dateFormat: 'd-m-Y'
+});
+const durationRegex = /(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?(?:T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?)?/;
+Object.assign(Date.prototype, {
+    to(format) {
+        return format
+            .replace(/Y/, this.getFullYear())
+            .replace(/y/, ("" + this.getFullYear()).substring(2, 4))
+            .replace(/e/, this.getDayOfYear())
+            .replace(/m/, pad(this.getMonth() + 1))
+            .replace(/d/, pad(this.getDate()))
+            .replace(/j/, this.getDate())
+            .replace(/w/, this.getWeek())
+            .replace(/H/, pad(this.getHours()))
+            .replace(/i/, pad(this.getMinutes()))
+            .replace(/s/, pad(this.getSeconds()))
+            .replace(/M/, "\t")
+            .replace(/D/, "\n")
+            .replace(/l/, "\r")
+            .replace(/N/, Date.months[this.getMonth()].substring(0, 3))
+            .split("\t").join(Date.months[this.getMonth()])
+            .split("\n").join(this.getDayName().substring(0, 2))
+            .split("\r").join(this.getDayName());
+    },
+    toShort() {
+        return (new Intl.DateTimeFormat()).format(this);
+    },
+    getDayName() {
+        return Date.days[this.getDay()];
+    },
+    getDayOfYear() {
+        return (Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()) - Date.UTC(this.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
+    },
+    getWeekDay() {
+        return (this.getDay() == 0 ? 6 : (this.getDay() - Date.firstWeekday));
+    },
+    getWeek() {
+        var awn = Math.floor(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate() + 3) / 864e5 / 7), wYr = new Date(awn * 6048e5).getUTCFullYear();
+        return awn - Math.floor(Date.UTC(wYr, 0, 7) / 6048e5) + 1;
+    },
+    setWeek(week) {
+        this.setMonth(0);
+        this.setDate(1);
+        this.add((week - 1) * 7, 'd');
+        this.setDay(Date.firstWeekday);
+    },
+    setDay(day) {
+        let days = (Date.firstWeekday === 1 && this.getDay() === 0) ? 8 : this.getDay() + 1;
+        let diff = this.getDate() - days + Date.firstWeekday;
+        this.setDate(diff + day);
         return this;
     },
-    off: function (event, listener, useCapture) {
-        this.removeEventListener(event, listener, useCapture);
+    changeTime(h = 0, m = 0, s = 0) {
+        this.setHours(h, m, s);
         return this;
     },
-    cls: function (name, enable) {
-        if (!name)
-            return this;
-        if ($.isArray(name)) {
-            name.map((n) => { this.cls(n, enable); });
-            return this;
-        }
-        name = name;
-        if (enable !== undefined) {
-            name = (enable ? '+' : '-') + name;
-        }
-        switch (name.substring(0, 1)) {
-            case '+':
-                this.classList.add(name.substring(1));
+    clone() {
+        return new Date(+this);
+    },
+    add(amount, unit) {
+        switch (unit) {
+            case 'w': amount *= 7;
+            case 'd':
+                this.setDate(this.getDate() + amount);
                 break;
-            case '-':
-                this.classList.remove(name.substring(1));
+            case 'm':
+                this.setMonth(this.getMonth() + amount);
                 break;
-            case '!':
-                this.classList.toggle(name.substring(1));
-                break;
-            default: this.className = name;
+            case 'y': this.setFullYear(this.getFullYear() + amount);
         }
         return this;
     },
-    attr: function (name, value) {
-        if (value === undefined) {
-            return this.getAttribute(name);
+    diff(end) {
+        let endc = end.clone();
+        endc.setDate(0);
+        let monthDays = endc.getDate(), sihdmy = [0, 0, 0, 0, 0, end.getFullYear() - this.getFullYear()], it = 0, map = { getSeconds: 60, getMinutes: 60, getHours: 24, getDate: monthDays, getMonth: 12 };
+        for (let i in map) {
+            let fn = i;
+            if (sihdmy[it] + end[fn]() < this[fn]()) {
+                sihdmy[it + 1]--;
+                sihdmy[it] += map[fn] - this[fn]() + end[fn]();
+            }
+            else if (sihdmy[it] + end[fn]() > this[fn]()) {
+                sihdmy[it] += end[fn]() - this[fn]();
+            }
+            it++;
         }
-        this.setAttribute(name, value);
+        const [s, i, h, d, m, y] = sihdmy;
+        return 'P' + (y > 0 ? y + 'Y' : '') +
+            (m > 0 ? m + 'M' : '') +
+            (d > 0 ? d + 'D' : '') +
+            ((h || i || s) ? 'T' +
+                (h > 0 ? h + 'H' : '') +
+                (i > 0 ? i + 'M' : '') +
+                (s > 0 ? s + 'S' : '') : '');
+    },
+    addDuration(iso8601) {
+        let p, matches = iso8601.match(durationRegex);
+        matches.shift();
+        const sign = matches.shift() || '';
+        for (let o of ['FullYear', 'Month', 'Week', 'Date', 'Hours', 'Minutes', 'Seconds']) {
+            if (p = matches.shift()) {
+                if (o === 'Week') {
+                    p *= 7;
+                    o = 'Date';
+                }
+                this['set' + o](this['get' + o]() + parseInt(sign + p));
+            }
+        }
         return this;
     },
-    has: function (clsOrAttr) {
-        if (clsOrAttr.substring(0, 1) === '.') {
-            return this.classList.contains(clsOrAttr.substring(1));
+    toUTCJmap() {
+        this.setUTCMilliseconds(0);
+        return this.toJSON().replace('.000', '');
+    },
+    toJmap: function () {
+        return this.to('Y-m-dTH:i:s');
+    },
+    toSmart() {
+        let now = new Date();
+        if (now.to('Ymd') === this.to('Ymd')) {
+            return this.to('H:i');
         }
-        return this.hasAttribute(clsOrAttr);
-    },
-    isA: function (tagName) {
-        return this.tagName.toLowerCase() === tagName.toLowerCase();
-    },
-    prev: function () { return this.previousElementSibling; },
-    next: function () { return this.nextElementSibling; },
-    up: function (expression, until) {
-        if (!expression)
-            return this.parentElement;
-        let dom = this;
-        do {
-            if (dom === until)
-                return null;
-            if (!dom.matches(expression))
-                continue;
-            return dom;
-        } while (dom = dom.parentElement);
-    },
-    child: function (index) {
-        switch (index) {
-            case 0: return this.firstElementChild;
-            case -1: return this.lastElementChild;
-            default: return this.children[index];
+        else if (now.getFullYear() === this.getFullYear()) {
+            return this.to('j N');
         }
-    },
-    putf: function (...elements) {
-        this.prepend(...elements);
-        return this;
-    },
-    put: function (...elements) {
-        this.append(...elements);
-        return this;
-    },
-    html: function (html, pos) {
-        switch (pos) {
-            case 0:
-                this.insertAdjacentHTML('afterbegin', html);
-                return this.child(0);
-            case -1:
-                this.insertAdjacentHTML('beforeend', html);
-                return this.child(-1);
-            default:
-                this.innerHTML = html;
-                return this;
+        else {
+            return this.to('d-m-Y');
         }
-    },
-    owns: function (el) {
-        do {
-            if (el === this)
-                return true;
-        } while (el = el.parentElement);
-        return false;
     }
 });
+let tmp = new Date('1970-01-01'), loc = navigator.language;
+for (let i = 0; i < 12; i++) {
+    tmp.setMonth(i);
+    Date.months.push(tmp.toLocaleString(loc, { month: 'long' }));
+}
+for (let i = 0; i < 7; i++) {
+    tmp.setDay(i);
+    Date.days.push(tmp.toLocaleString(loc, { weekday: 'long' }));
+}
 function $regApp(name, cfg) {
     var old = {
         mainPanel: {},
@@ -289,5 +265,188 @@ function $regApp(name, cfg) {
     if (entities.length)
         old.entities = entities;
     go.Modules.register("community", name, old);
+}
+class CalendarView extends Component {
+    constructor(cfg) {
+        super(cfg);
+        this.day = new Date();
+        this.update = (data) => {
+            this.recur = this.expandRecurrence();
+            this.renderView();
+        };
+        this.bind();
+        this.on('render', () => { this.store.load(); });
+    }
+    bind() {
+        this.store = store({
+            entity: 'CalendarEvent',
+            properties: ['name', 'start', 'id'],
+            listeners: { 'load': (me, records) => this.update() }
+        });
+    }
+    expandRecurrence() {
+        let recur = {};
+        return recur;
+    }
+    eventHtml(e, style) {
+        return `<div data-id="${e.id}" style="${style}" class="event">
+			${e.recurrenceRule ? '<i>refresh</i>' : ''}
+			${e.links ? '<i>attachment</i>' : ''}
+			${e.alerts ? '<i>notifications</i>' : ''}
+			${e.title || '(' + t('Nameless') + ')'}
+			${!e.isAllDay ? '<span>' + (e.start && e.start.date().to('H:i')) + ' - ' + e.start.date().addDuration(e.duration).to('H:i') + '</span>' : ''}
+		</div>`;
+    }
+    calculateOverlap(events) {
+        let overlap = {};
+        for (const event of events) {
+            let start = event.start.date(), startM = start.getHours() * 60 + start.getMinutes(), end = start.clone().addDuration(event.duration), endM = end.to('Ymd') > start.to('Ymd') ? 1450 : end.getHours() * 60 + end.getMinutes();
+            overlap[event.id] = { start: startM, end: endM, span: 1, max: 1 };
+        }
+        for (const me in overlap) {
+            const o = overlap[me];
+            for (const id in overlap) {
+                const ov = overlap[id];
+                if ((o.start < ov.end && o.start > ov.start) ||
+                    (o.end > ov.start && o.end < ov.end)) {
+                    o.max++;
+                }
+                else if (ov.start > o.end)
+                    break;
+            }
+        }
+        let position = 0, prevMax = 1, previousCols = {};
+        for (const event of events) {
+            const o = overlap[event.id];
+            let col = position % prevMax;
+            if (col + 1 == prevMax)
+                position = 0;
+            let pcol = col = position % prevMax, ppos = position;
+            while (pcol != col || ppos == position && ppos < 6) {
+                ppos++;
+                if (!previousCols[pcol]) {
+                    pcol = ppos % prevMax;
+                    continue;
+                }
+                const previous = overlap[previousCols[pcol].id];
+                if (previous.end > o.start && pcol == col) {
+                    position++;
+                    col = position % prevMax;
+                    previous.max = Math.max(o.max, previous.max);
+                }
+                else if (previous.end > o.start) {
+                    o.max = Math.max(o.max, previous.max);
+                }
+                pcol = ppos % prevMax;
+            }
+            o.col = col;
+            previousCols[position % o.max] = event;
+            prevMax = o.max;
+        }
+        return overlap;
+    }
+}
+class MonthView extends CalendarView {
+    constructor() {
+        super(...arguments);
+        this.stale = true;
+        this.ROWHEIGHT = 26;
+    }
+    setDate(day) {
+        if (!day) {
+            let now = new Date();
+            day = new Date(now.getFullYear(), now.getMonth(), 1);
+        }
+        this.dom.cls('reverse', (day < this.day));
+        this.day = new Date(+day);
+        let end = new Date(+day);
+        day.setDate(1);
+        day.setDay(Date.firstWeekday);
+        this.firstDay = new Date(day.toDateString());
+        end.setMonth(end.getMonth() + 1);
+        end.setDate(0);
+        end.setDay(6);
+        end.add(1, 'd');
+        this.store.filter('date', { after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00') }).fetch(0, 500);
+    }
+    renderView() {
+        let it = 0;
+        if (!this.stale)
+            return;
+        let now = new Date(), day = new Date(this.day.toDateString());
+        day.setDate(1);
+        let start = new Date(+day), e, html = `<ul>`;
+        for (var i = 0; i < 7; i++) {
+            let d = (i + Date.firstWeekday) % 7;
+            html += `<li class="${(day.to('Ym') == now.to('Ym') && now.getDay() == d) ? 'current' : ''}">${Date.days[d]}</li>`;
+        }
+        day.setDay(Date.firstWeekday);
+        html += `</ul>`;
+        while (day.to('Ym') <= start.to('Ym')) {
+            html += `<ol>
+				<li class="weeknb">${day.getWeek()}</li>
+				<li class="events">${this.drawWeek(day)}</li>`;
+            for (var i = 0; i < 7; i++) {
+                var cls = [];
+                if (day.to('Ymd') === now.to('Ymd'))
+                    cls.push('today');
+                if (day.to('Ymd') < now.to('Ymd'))
+                    cls.push('past');
+                if (day.to('Ym') !== start.to('Ym'))
+                    cls.push('other');
+                html += `<li class="${cls.join(' ')}" data-date="${day.to('Y-m-d')}"><em>${day.getDate()}</em></li>`;
+                day.add(1, 'd');
+            }
+            html += `</ol>`;
+        }
+        this.dom.style.height = '100%';
+        this.dom.classList.add('cal', 'month', 'active');
+        this.dom.innerHTML = html;
+    }
+    drawWeek(start) {
+        let end = new Date(+start), i = 0, e;
+        end.add(7, 'd');
+        let html = '';
+        this.slots = { 0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {} };
+        for (var storeIt in this.recur) {
+            const r = this.recur[storeIt];
+            while (r.current < end) {
+                html += this.drawEvent(this.store.get(storeIt), r.current, start);
+                r.next();
+            }
+        }
+        for (e of this.store.data.items) {
+            if (e.start.date().to('Yw') === start.to('Yw') && !e.recurrenceRule) {
+                html += this.drawEvent(e, new Date(e.start), start);
+            }
+        }
+        return html;
+    }
+    calcRow(start, days) {
+        let row = 1, end = Math.min(start + days, 7);
+        while (row < 8) {
+            for (let i = start; i < end; i++) {
+                if (this.slots[i][row]) {
+                    break;
+                }
+                if (i == end - 1) {
+                    for (let j = start; j < end; j++) {
+                        this.slots[j][row] = true;
+                    }
+                    return row;
+                }
+            }
+            row++;
+        }
+        return 10;
+    }
+    drawEvent(e, eStart, weekstart) {
+        let d = e.duration.match(/P.*(\d+)D/);
+        const cal = $.db.stores.Calendar.get(e.calendarId);
+        let color = cal ? cal.color : '356772', start = eStart.clone(), days = d ? +d[1] : 1;
+        let row = this.calcRow(start.getWeekDay(), days);
+        let width = Math.min(7, days) * (100 / 7) - .2, left = Math.floor((start - weekstart) / 864e5) * (100 / 7), top = row * this.ROWHEIGHT, style = `background-color:#${color}; width: ${width}%; left:${left}%; top:${top}px;`;
+        return super.eventHtml(e, style);
+    }
 }
 //# sourceMappingURL=ui.js.map

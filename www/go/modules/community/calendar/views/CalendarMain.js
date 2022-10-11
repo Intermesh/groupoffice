@@ -6,50 +6,59 @@ class CalendarMain extends Component {
 
 	constructor() {
 		super();
-		this.cls = 'hbox'
-		this.items.add(
-			comp({tagName: 'aside', width: 240},
+		this.setItems(
+			comp({tagName: 'aside', width: 200},
 				datepicker(),
 				tbar({},
-					comp({html:'Calendars'}),
-					btn({icon:'home'}),
-					btn({icon:'settings'}),
-					btn({icon:'all_done'})
+					comp({html: 'Calendars'}),
+					btn({icon: 'home'}),
+					btn({icon: 'settings'}),
+					btn({icon: 'done_all'})
 				),
-				table({store:'Calendar', column: [
-					column({id:'id'}),
-					column({id:'name'})
-				]})
+				list({
+					store: store({entity:'Calendar', properties: ['id', 'name', 'color'], sort: [{property:'name'}]}),
+					listeners: {
+						'render': me => {me.store.load();},
+						'selectionchange': me => {this.test.setText('CHANGED!')}
+					},
+					multiSelect: true,
+					columns: [
+						{id: 'id'},
+						{id: 'name'}
+					]
+				})
 			),
-			comp({layout:'vbox',flex:true},
+			comp({layout: 'vbox', flex: true},
 				tbar({},
-					btn({icon:'add', text: t('Add')}),
-					btn({icon:'delete'}),
-					btn({icon:'refresh'}),
-					btn({icon:'settings'}),
-					btn({cls:'primary', icon:'event'}),
-					comp({cls:'group'},
-						btn({icon:'view_day', text: t('Day')}),
-						btn({icon:'view_week', text: t('Week')}),
-						btn({icon:'view_month', text: t('Month')})
+					btn({icon: 'add', cls:'primary', text: t('Add'), handler: _ => (new EventDialog()).show() }),
+					btn({icon: 'delete'}),
+					btn({icon: 'refresh'}),
+					btn({icon: 'settings'}),
+					btn({cls: 'primary', icon: 'event'}),
+					comp({cls: 'group'},
+						btn({icon: 'view_day', text: t('Day')}),
+						btn({icon: 'view_week', text: t('Week')}),
+						btn({icon: 'view_module', text: t('Month')})
 					),
-					comp({flex:true}),
-					comp({icon:'info'}),
-					comp({icon:'print', menu: menu({},
-						btn({icon:'print', text: t('Print current view')}),
-						btn({icon:'print', text: t('Print count per category')}),
-						'-',
-						btn({icon:'view_day', text: t('Day')}),
-						btn({icon:'view_week', text: t('Week')}),
-						btn({icon:'view_month', text: t('Month')})
-					)})
+					'->',
+					btn({icon: 'info'}),
+					btn({
+						icon: 'print', menu: menu({},
+							btn({icon: 'print', text: t('Print current view')}),
+							btn({icon: 'print', text: t('Print count per category')}),
+							'-',
+							btn({icon: 'view_day', text: t('Day')}),
+							btn({icon: 'view_week', text: t('Week')}),
+							btn({icon: 'view_module', text: t('Month')})
+						)
+					})
 				),
-				cards({flex:true},
-					new DayView(),
-					new WeekView(),
+				comp({flex: true},
+					// new DayView(),
+					// new WeekView(),
 					new MonthView()
 				)
-			),
+			)
 		);
 	}
 }

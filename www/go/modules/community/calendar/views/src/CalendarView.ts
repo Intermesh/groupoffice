@@ -4,60 +4,62 @@ abstract class CalendarView extends Component {
 	protected firstDay?: Date
 	protected recur?: {[id:string]: Recurrence}
 
-	protected store!: Store
-	protected query!: ServerQuery
+	protected store!: any
 
 	constructor(cfg: ComponentCfg) {
 		super(cfg);
-		this.cls = 'anim horizontal';
-		this.bind('CalendarEvent');
+		this.bind();
+		this.on('render', () => { this.store.load() });
 	}
 
-	private bind(name: string) {
-		this.store = $.db.store(name); // move to query?
-		this.query = this.store.query('month').on('update', this.update) as ServerQuery;
+	private bind() {
+		this.store = store({
+			entity:'CalendarEvent',
+			properties: ['name', 'start', 'id'],
+			listeners: {'load': (me,records) => this.update()}
+		});
 	}
 
 	private expandRecurrence() {
 		// todo: move to store update (only for new events)
 		let recur: any = {};
-		for (var i=0,e; e = this.store.get(this.query.ids[i]); i++) {
-			if(e.recurrenceRule) {
-				recur[e.id] = new Recurrence({dtstart: new Date(e.start), rule: e.recurrenceRule, ff: this.firstDay});
-			}
-		}
+		// for (var i=0,e; e = this.store.get(this.query.ids[i]); i++) {
+		// 	if(e.recurrenceRule) {
+		// 		recur[e.id] = new Recurrence({dtstart: new Date(e.start), rule: e.recurrenceRule, ff: this.firstDay});
+		// 	}
+		// }
 		
 		return recur;
 	}
 
-	onRender(dom){
-		this.setDate(new Date());
-		dom.on('click',(ev) => {
-
-			const event = ev.target.up('.event');
-			if(event && !event.has('.moving')) {
-				const dlg = new EventDialog();
-				dlg.show(event).form.load(event.dataset.id);
-				
-			}
-			// const day = ev.target.up('li[data-date]');
-			// if(day) {
-			// 	const dlg = new EventDialog();
-			// 	//const date = Date.fromYmd(day.dataset.date);
-			// 	dlg.show(event).form.create({start: day.dataset.date, end: day.dataset.date})
-				
-			// }
-			ev.preventDefault();
-		});
-	}
+	// onRender(dom){
+	// 	this.setDate(new Date());
+	// 	dom.on('click',(ev) => {
+	//
+	// 		const event = ev.target.up('.event');
+	// 		if(event && !event.has('.moving')) {
+	// 			const dlg = new EventDialog();
+	// 			dlg.show().form.load(event.dataset.id);
+	//
+	// 		}
+	// 		// const day = ev.target.up('li[data-date]');
+	// 		// if(day) {
+	// 		// 	const dlg = new EventDialog();
+	// 		// 	//const date = Date.fromYmd(day.dataset.date);
+	// 		// 	dlg.show(event).form.create({start: day.dataset.date, end: day.dataset.date})
+	//
+	// 		// }
+	// 		ev.preventDefault();
+	// 	});
+	// }
 
 	update = (data?: any) => {
 		//this.fire('change', data);
 		//this.dom.cls('-loading');
-		if(this.isRendered()) {
+		//if(this.isRendered()) {
 			this.recur = this.expandRecurrence();
 			this.renderView();
-		}
+		//}
 	}
 
 	protected eventHtml(e, style) {

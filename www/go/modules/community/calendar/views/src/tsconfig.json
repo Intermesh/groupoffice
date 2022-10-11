@@ -21,10 +21,12 @@
     "outFile": "../ui.js"
   },
   "files": [
+    "Adapter.ts",
     "Component.ts",
-    "Engine.ts",
-    "prototype.ts",
+    //"Engine.ts",
+    "DateStuff.ts",
     "Tool.ts",
-
+    "CalendarView.ts",
+    "MonthView.ts"
   ]
 }
