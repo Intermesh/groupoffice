@@ -45,8 +45,8 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 						store : new Ext.data.SimpleStore({
 							fields : ['value', 'label'],
 							data : [
-								['row', t("Row")],
-								['cell', t("Cell")]
+								['cell', t("Cell")],
+								['row', t("Row")]
 							]
 						}),
 						mode: "local",

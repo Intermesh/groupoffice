@@ -28,6 +28,11 @@ go.customfields.type.SelectOptionsTree = function(config){
 			const dlg = new go.customfields.type.OptionDialog();
 			dlg.load(newNode);
 			dlg.show();
+			dlg.on('beforeclose', () => {
+				if(dlg.doSave) {
+					this.save(newNode, dlg.nodeAttributes);
+				}
+			});
 		},
 		scope:this
 	},
@@ -51,14 +56,8 @@ go.customfields.type.SelectOptionsTree = function(config){
 			dlg.load(node);
 			dlg.show();
 			dlg.on('beforeclose', () => {
-				// debugger;
 				if(dlg.doSave) {
-					node.text = dlg.nodeAttributes.text;
-					node.attributes.text = dlg.nodeAttributes.text;
-					node.attributes.backgroundColor = dlg.nodeAttributes.backgroundColor;
-					node.attributes.foregroundColor = dlg.nodeAttributes.foregroundColor;
-					node.attributes.renderMode = dlg.nodeAttributes.renderMode;
-					node.setText(dlg.nodeAttributes.text);
+					this.save(node, dlg.nodeAttributes);
 				}
 			});
 		}
@@ -119,7 +118,7 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 				id: child.attributes.serverId || null,
 				text: child.text,
 				sortOrder: child.attributes.sortOrder,
-				enabled: child.attributes.checked,
+				enabled: child.attributes.checked || false,
 				children: this.treeToAPI(child),
 				foregroundColor: child.attributes.foregroundColor || null,
 				backgroundColor: child.attributes.backgroundColor || null,
@@ -144,5 +143,15 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 	},
 	validate : function() {
 		return true;
+	},
+
+	save: function(node, attributes) {
+		node.text = attributes.text;
+		node.attributes.text = attributes.text;
+		node.attributes.backgroundColor = attributes.backgroundColor;
+		node.attributes.foregroundColor = attributes.foregroundColor;
+		node.attributes.renderMode = attributes.renderMode;
+		node.attributes.checked = true;
+		node.setText(attributes.text);
 	}
 });
