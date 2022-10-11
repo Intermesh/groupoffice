@@ -2,6 +2,7 @@
 - Billing: Align ID column in PDF to the left
 - Core: Archived user contacts moved into separate address book 'Archived users'
 - Email: Search button and account properties unreachable on some mobile resolutions
+- Leavedays: Allow decimals in special leave budget hours
 
 05-10-2022 6.6.120
 - OAuth2Client: better error handling
