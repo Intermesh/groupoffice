@@ -13,22 +13,11 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 	completeOnEnter: true,
 	buttonAlign: "left",
 	layout: "fit",
+	doSave: false,
 
 	nodeAttributes: {},
 
-	store: new Ext.data.ArrayStore({
-		// autoDestroy: true,
-		storeId: "options_renderModes",
-		idIndex: 0,
-		fields: [
-			"value",
-			"label"
-		]
-	}),
-
 	initComponent: function () {
-		this.store.loadData([["row", t("Row")], ["column", t("Column")]]);
-
 		this.items = [this.form = new Ext.form.FormPanel({
 			items: [{
 				xtype: "fieldset",
@@ -39,7 +28,8 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 						fieldLabel: t("Text"),
 						name: "text",
 						allowBlank: false,
-						maskRe: /[^:]/
+						maskRe: /[^:]/,
+						width: 200
 					},
 					this.fgColorField = new GO.form.ColorField({
 						fieldLabel: t("Text color"),
@@ -49,15 +39,23 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 						fieldLabel: t("Background color"),
 						name: "backgroundColor"
 					}),
-					this.renderModeCombo = new go.form.ComboBoxReset({
+					this.renderModeCombo = new Ext.form.ComboBox({
 						fieldLabel: t("Render mode"),
 						name: "renderMode",
-						store: this.store,
-						entityStore: null,
+						store : new Ext.data.SimpleStore({
+							fields : ['value', 'label'],
+							data : [
+								['row', t("Row")],
+								['cell', t("Cell")]
+							]
+						}),
+						mode: "local",
 						valueField: "value",
 						displayField: "label",
 						triggerAction: "all",
-						allowBlank: go.util.empty(this.fgColorField.curColor) && go.util.empty(this.bgColorField.curColor)
+						editable : false,
+						selectOnFocus : true,
+						width : 200
 					})
 				],
 			}
@@ -70,18 +68,31 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 			this.saveButton = new Ext.Button({
 				cls: "primary",
 				text: t("Save"),
-				handler: function() {
-					// debugger;
-					if(go.util.empty(this.fgColorField.getValue()) && go.util.empty(this.bgColorField.getValue())) {
-						this.renderModeCombo.clearValue();
+				handler: ()  => {
+					if (this.isBlankSelected(this.fgColorField) && this.isBlankSelected(this.bgColorField)) {
+						this.renderModeCombo.setValue(null);
+					} else if(go.util.empty(this.renderModeCombo.getValue())) {
+						this.renderModeCombo.markInvalid();
+						this.renderModeCombo.focus();
+						return false;
 					}
 					const form = this.form.getForm();
-					if(!form.validate()) {
-						return;
+					let valid = true, fn = function (i) {
+						if (!i.validate()) {
+							valid = false;
+							i.markInvalid();
+							i.focus();
+							return false;
+						}
+					};
+					form.items.each(fn, this);
+
+					if(!valid) {
+						return false;
 					}
+					this.doSave = true;
 					Ext.apply(this.nodeAttributes, form.getValues(), this.oldAttributes);
 					this.close();
-
 				},
 				scope: this
 			})
@@ -99,6 +110,12 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 		}
 		this.oldAttributes = this.nodeAttributes;
 		form.setValues(node.attributes);
+		this.renderModeCombo.allowBlank = this.isBlankSelected(this.fgColorField) && this.isBlankSelected(this.bgColorField);
 	},
+
+	isBlankSelected: function(fld) {
+		const value = fld.getValue();
+		return (go.util.empty(value) || value.toLowerCase() === 'ffffff');
+	}
 });
 

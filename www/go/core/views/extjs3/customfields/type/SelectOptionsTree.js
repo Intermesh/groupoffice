@@ -51,16 +51,18 @@ go.customfields.type.SelectOptionsTree = function(config){
 			dlg.load(node);
 			dlg.show();
 			dlg.on('beforeclose', () => {
-				debugger;
-				node.text = dlg.nodeAttributes.text;
-				node.attributes.text = dlg.nodeAttributes.text;
-				node.attributes.backgroundColor = dlg.nodeAttributes.backgroundColor;
-				node.attributes.foregroundColor = dlg.nodeAttributes.foregroundColor;
-				node.attributes.renderMode = dlg.nodeAttributes.renderMode;
-				node.setText(dlg.nodeAttributes.text);
+				// debugger;
+				if(dlg.doSave) {
+					node.text = dlg.nodeAttributes.text;
+					node.attributes.text = dlg.nodeAttributes.text;
+					node.attributes.backgroundColor = dlg.nodeAttributes.backgroundColor;
+					node.attributes.foregroundColor = dlg.nodeAttributes.foregroundColor;
+					node.attributes.renderMode = dlg.nodeAttributes.renderMode;
+					node.setText(dlg.nodeAttributes.text);
+				}
 			});
 		}
-	}, this);
+	});
 
 	this.setValue([]);
 }
