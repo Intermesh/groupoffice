@@ -25,16 +25,9 @@ go.customfields.type.SelectOptionsTree = function(config){
 			});
 
 			newNode = node.appendChild(newNode);
-			const dlg = new go.customfields.type.OptionDialog();
-			dlg.load(newNode);
-			dlg.show();
-			dlg.on('beforeclose', () => {
-				if(dlg.doSave) {
-					this.save(newNode, dlg.nodeAttributes);
-				}
-			});
+			this.optionDialog(newNode);
 		},
-		scope:this
+		scope: this
 	},
 	{
 		iconCls: 'ic-delete',
@@ -52,15 +45,12 @@ go.customfields.type.SelectOptionsTree = function(config){
 
 	this.on("click",  (node, e) => {
 		if (e.target.tagName === "BUTTON") {
-			const dlg = new go.customfields.type.OptionDialog();
-			dlg.load(node);
-			dlg.show();
-			dlg.on('beforeclose', () => {
-				if(dlg.doSave) {
-					this.save(node, dlg.nodeAttributes);
-				}
-			});
+			this.optionDialog(node);
 		}
+	});
+
+	this.on("dblclick", (node, e) => {
+		this.optionDialog(node);
 	});
 
 	this.setValue([]);
@@ -153,5 +143,16 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 		node.attributes.renderMode = attributes.renderMode;
 		node.attributes.checked = true;
 		node.setText(attributes.text);
-	}
+	},
+
+	optionDialog: function(node) {
+		const dlg = new go.customfields.type.OptionDialog();
+		dlg.load(node);
+		dlg.show();
+		dlg.on('beforeclose', () => {
+			if(dlg.doSave) {
+				this.save(node, dlg.nodeAttributes);
+			}
+		});
+	},
 });
