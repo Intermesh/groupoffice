@@ -41,16 +41,17 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 					}),
 					this.renderModeCombo = new Ext.form.ComboBox({
 						fieldLabel: t("Render mode"),
-						name: "renderMode",
-						store : new Ext.data.SimpleStore({
-							fields : ['value', 'label'],
+						// name: "renderMode",
+						hiddenName: "renderMode",
+						store : new Ext.data.ArrayStore({
+							fields : ['id', 'label'],
 							data : [
 								['cell', t("Cell")],
 								['row', t("Row")]
 							]
 						}),
 						mode: "local",
-						valueField: "value",
+						valueField: "id",
 						displayField: "label",
 						triggerAction: "all",
 						editable : false,
@@ -91,6 +92,9 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 						return false;
 					}
 					this.doSave = true;
+					let values = form.getValues();
+					console.clear();
+					console.log(values);
 					Ext.apply(this.nodeAttributes, form.getValues(), this.oldAttributes);
 					this.close();
 				},

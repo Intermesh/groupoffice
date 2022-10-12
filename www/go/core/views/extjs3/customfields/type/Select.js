@@ -63,7 +63,7 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var c = go.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
+		let c = go.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		c.xtype = "treeselectfield";
 		c.customfield = customfield;
@@ -84,7 +84,7 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	 */
 	getFieldDefinition : function(field) {
 		
-		var c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
+		let c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
 		
 		c.convert = function(v, record) {
 			return this.customFieldType.renderDetailView(v, record.data, this.customField);
@@ -123,24 +123,39 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 			xtype: this.getColumnXType()
 		};
 
-		c.renderer = function(val, cb) {
+		c.renderer = function(val, metadata, record, rowIndex) {
 			if(!go.util.empty(val)) {
 				const selectedOption = field.dataType.options.find(elm => elm.text === val);
 				if(!selectedOption) {
 					return val;
 				}
 
+				let inlineStyle =  "";
+				if (selectedOption.foregroundColor) {
+					inlineStyle += "color: #" + selectedOption.foregroundColor + ";";
+				}
+				if(selectedOption.backgroundColor) {
+					inlineStyle += "background-color: #" + selectedOption.backgroundColor + ";";
+				}
+
 				if(selectedOption.renderMode === 'cell') {
-					let inlineStyle = cb.style || "";
-					if (selectedOption.foregroundColor) {
-						inlineStyle += "color: #" + selectedOption.foregroundColor + ";";
+					let cellStyle = metadata.style || '';
+					if(!go.util.empty(inlineStyle)) {
+						cellStyle += inlineStyle;
 					}
-					if(selectedOption.backgroundColor) {
-						inlineStyle += "background-color: #" + selectedOption.backgroundColor + ";";
-					}
-					cb.style = inlineStyle;
+					metadata.style = cellStyle;
 				} else if(selectedOption.renderMode === 'row') {
 					// TODO: How to render the entire row?
+					// 1: get current grid / row
+					// 2: get viewConfig
+					// 3: add row class
+					// debugger;
+					// let row = c.getParentByType('grid');//.getView().getRow(rowIndex);
+					// let rowStyle = row.metadata.style || "";
+					// if(!go.util.empty(inlineStyle)) {
+					// 	rowStyle += inlineStyle;
+					// }
+					// row.metadata.style = rowStyle;
 				}
 			}
 			return val;

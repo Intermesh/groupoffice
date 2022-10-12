@@ -1308,4 +1308,10 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Logout all' => 'Allen uitloggen',
   'Permission denied' => 'Geen toegang',
   'Visible to' => 'Zichtbaar aan',
+	'Warning: removing select options also removes the data from the records. You can disable select options by unchecking them.' => 'Let op: wanneer u opties verwijdert, worden deze gegevens ook uit de recrods verwijderd. U kunt opties ook uitzetten door ze uit te vinken.',
+	'Row' => 'Rij',
+	'Cell' => 'Cel',
+	'Background color' => 'Achtergroundkleur',
+	'Text color' => 'Tekstkleur',
+	'Render mode' => 'Weergavemodus'
 );
