@@ -1579,23 +1579,23 @@ class Event extends \GO\Base\Db\ActiveRecord {
 //		if($this->all_day_event){
 //			$e->{"X-FUNAMBOL-ALLDAY"}=1;
 //		}
-		
-		if(!$recurrenceTime && $this->exception_for_event_id>0){
-			//this is an exception
-			
-			$exception = $this->recurringEventException(); //get master event from relation
-			if($exception){
-				$recurrenceTime=$exception->getStartTime();				
+		if($this->exception_for_event_id>0) {
+			if (!$recurrenceTime){
+				//this is an exception
+
+				$exception = $this->recurringEventException(); //get master event from relation
+				if ($exception) {
+					$recurrenceTime = $exception->getStartTime();
+				}
+			}
+			if ($recurrenceTime) {
+				$dt = \GO\Base\Util\Date\DateTime::fromUnixtime($recurrenceTime);
+				$rId = $e->add('recurrence-id', $dt);
+				if ($this->_exceptionEvent->all_day_event) {
+					$rId['VALUE'] = 'DATE';
+				}
 			}
 		}
-		if($recurrenceTime){
-			$dt = \GO\Base\Util\Date\DateTime::fromUnixtime($recurrenceTime);
-			$rId = $e->add('recurrence-id', $dt);
-			if($this->_exceptionEvent->all_day_event){
-				$rId['VALUE']='DATE';
-			}
-		}
-	
 		
 		$dtstart = $e->add('dtstart', \GO\Base\Util\Date\DateTime::fromUnixtime($this->start_time));
 		if($this->all_day_event){
