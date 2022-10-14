@@ -351,8 +351,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			const editTB = new Ext.Container({
 				itemId: 'edit-tb',
 				cls: 'go-form-group-edit-tb',
-				width: dp(40),
-				layout: "hbox",
+				layout: {
+					type: "hbox",
+					align: "middle"
+				},
 				items: [delBtn]
 			});
 

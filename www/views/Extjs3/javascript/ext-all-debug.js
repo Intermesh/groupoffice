@@ -11532,6 +11532,10 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
                 this.disable(true);
             }
 
+						if(this.flex) {
+							this.el.dom.style.flex = this.flex;
+						}
+
             if(this.stateful !== false){
                 this.initStateEvents();
             }
@@ -15326,10 +15330,10 @@ Ext.Container.LAYOUTS['border'] = Ext.layout.BorderLayout;
 Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
 
     
-    labelSeparator : ':',
+    labelSeparator : '',
 
     
-
+		labelAlign: "top",
     
     trackLabels: true,
 
@@ -15451,6 +15455,12 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
             c.label = c.getItemCt().child('label.x-form-item-label');
             if(!c.rendered){
                 c.render('x-form-el-' + c.id);
+
+								if(c.flex) {
+									c.itemCt.dom.style.flex = c.flex;
+									c.el.dom.style.width="100%";
+								}
+
                 /* start extra code */
                 var newEl,
                  fEl = Ext.fly('x-form-el-' + c.id),
@@ -39598,7 +39608,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
 
     fieldClass : 'x-form-field',
     
-    msgTarget : 'qtip',
+    msgTarget : 'under',
     
     msgFx : 'normal',
     
@@ -39683,9 +39693,42 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         }
 
         this.el.addClass([this.fieldClass, this.cls]);
+
+
+				this.on("invalid", () => {
+					const labelEl = this.findLabelEl();
+
+					if(labelEl) {
+						labelEl.classList.add(this.invalidClass + "-label");
+					}
+				});
+
+				this.on("valid", () => {
+					const labelEl = this.findLabelEl();
+
+					if(labelEl) {
+						labelEl.classList.remove(this.invalidClass + "-label");
+					}
+				});
     },
 
-    
+
+		findLabelEl : function() {
+			const xFormEl = this.el.dom.parentNode;
+			if(!xFormEl) {
+				return undefined;
+			}
+
+			const labelEl = xFormEl.previousSibling;
+
+			if(labelEl && labelEl.tagName == "LABEL") {
+				return labelEl;
+			}
+
+			return undefined;
+
+		},
+
     getItemCt : function(){
         return this.itemCt;
     },
@@ -39755,6 +39798,10 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         this.preFocus();
         if(this.focusClass){
             this.el.addClass(this.focusClass);
+						const labelEl = this.findLabelEl();
+						if(labelEl) {
+							labelEl.classList.add(this.focusClass + "-label");
+						}
         }
         if(!this.hasFocus){
             this.hasFocus = true;
@@ -39772,6 +39819,11 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         this.beforeBlur();
         if(this.focusClass){
             this.el.removeClass(this.focusClass);
+
+					const labelEl = this.findLabelEl();
+					if(labelEl) {
+						labelEl.classList.remove(this.focusClass + "-label");
+					}
         }
         this.hasFocus = false;
         if(this.validationEvent !== false && (this.validateOnBlur || this.validationEvent == 'blur')){
@@ -42126,11 +42178,18 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
                 this.assetHeight += this.footer.getHeight();
             }
         }
+			// debugger;
+      //   if(this.bufferSize){
+      //       this.doResize(this.bufferSize);
+      //       delete this.bufferSize;
+      //   }
 
-        if(this.bufferSize){
-            this.doResize(this.bufferSize);
-            delete this.bufferSize;
-        }
+			// Needed for go-hbox class with flex
+				if(!this.listWidth) {
+					var lw =  Math.max(this.wrap.getWidth(), this.minListWidth);
+					this.list.setWidth(lw);
+				}
+
         this.list.alignTo.apply(this.list, [this.el].concat(this.listAlign));
 
         
@@ -43592,7 +43651,7 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
     minButtonWidth : 75,
 
     
-    labelAlign : 'left',
+    labelAlign : 'top',
 
     
     monitorValid : false,
@@ -44994,8 +45053,6 @@ Ext.form.TimeField = Ext.extend(Ext.form.ComboBox, {
     
     typeAhead: false,
 
-    
-    
     
     initDate: '1/1/2008',
 

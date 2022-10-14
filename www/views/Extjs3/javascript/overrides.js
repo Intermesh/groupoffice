@@ -16,6 +16,10 @@ Ext.override(Ext.data.Connection, {
 	timeout: 180000
 });
 
+Ext.override(Ext.form.TimeField, {
+	width: dp(160)
+});
+
 /**
  * Density Independend pixel calculation
  * 
@@ -367,7 +371,8 @@ Ext.override(Ext.form.TriggerField,{
 		if(Ext.isNumber(w)){
 			this.el.setWidth(w - tw);
 		}
-		this.wrap.setWidth(w + tw);
+		// this messes up go-hbox class with flex
+		//this.wrap.setWidth(w + tw);
 	},
 	
 	 onRender : function(ct, position){
@@ -378,9 +383,11 @@ Ext.override(Ext.form.TriggerField,{
         this.trigger = this.wrap.createChild(this.triggerConfig ||
                 {tag: "button", type: "button", tabindex: "-1", cls: "x-form-trigger " + this.triggerClass});
         this.initTrigger();
-        if(!this.width){
-            this.wrap.setWidth(this.el.getWidth()+this.getTriggerWidth());
-        }
+
+				// this messes up go-hbox class with flex
+        // if(!this.width){
+            //this.wrap.setWidth(this.el.getWidth()+this.getTriggerWidth());
+        // }
         this.resizeEl = this.positionEl = this.wrap;
     },
 	 getTriggerWidth: function(){

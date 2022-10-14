@@ -1823,6 +1823,13 @@ table[id^="comments-ext"] b {
 
 
 .go-form-group {
+
+	.go-form-group-edit-tb
+	{
+		width: dp(50);
+		height: dp(58);
+		padding-top: dp(8);
+	}
 	&.required {
 		.go-form-group-edit-tb {
 			display: none;
@@ -2643,4 +2650,23 @@ body.go-compact {
 			font-style: italic;
 		}
 	}
+}
+
+
+.ux-datetime-date, .ux-datetime-time {
+	vertical-align: top;
+}
+
+
+.go-hbox {
+	display: flex;
+	gap: dp(16);
+	flex-direction: row;
+	align-items: center;
+}
+
+.go-vbox {
+	display: flex;
+	gap: dp(8);
+	flex-direction: column;
 }

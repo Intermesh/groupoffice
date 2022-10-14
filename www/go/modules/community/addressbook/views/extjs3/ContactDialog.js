@@ -216,6 +216,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					},
 
 					this.genderField = new go.form.RadioGroup({
+						anchor: '-20',
 						xtype: 'radiogroup',
 						fieldLabel: t("Gender"),
 						name: "gender",

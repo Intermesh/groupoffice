@@ -14,7 +14,7 @@ GO.mainLayout.on("authenticated", function() {
 });
 
 go.form.DateField = Ext.extend(Ext.form.DateField, {
-	width: dp(140),
+	width: dp(196),
 	
 	initComponent : function(){
 		this.altFormats =  "Y-m-d|c|" + go.User.dateFormat.replace("Y","y");

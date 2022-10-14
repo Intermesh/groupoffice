@@ -265,6 +265,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 				entityStore: this.entityStore
 			}));
 		}
+
 		
 		this.comboBox = new go.form.ComboBox({
 			listeners: {
@@ -278,7 +279,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 				}
 			},
 			submit: false,
-			hideLabel: true,
+			fieldLabel: this.fieldLabel,
 			anchor: '100%',
 			emptyText: this.emptyText || t("Please select..."),
 			pageSize: this.entityStore ? 50 : this.pageSize,
@@ -293,7 +294,9 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			value:"",
 			collapseOnSelect: true, //Maybe false for selecting more options? But it's annoying in contact dialog
 			allowNew: this.allowNew
-		});		
+		});
+
+		delete this.fieldLabel;
 		
 		this.comboBox.on('select', function(combo, record) {
 			this.dataView.store.add([record]);

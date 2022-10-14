@@ -378,7 +378,7 @@
 		div.x-box-item.text, label {
 			@extend %font-subheading-dense;
 			padding: dp(4) 0;
-			line-height:dp(24)
+			line-height:dp(22)
 		}
 	}
 	
@@ -390,11 +390,11 @@
 	&-field {
 		@extend %font-data;
 		color: color($fg, 'text');
-		min-height: dp(32);
+		min-height: dp(50);
 		line-height: dp(20);
 		//line-height: dp(18);
 		transition: border-color 100ms linear, box-shadow 225ms linear;
-		border-radius: dp(4);
+		border-radius: dp(10);
 		&.x-item-disabled {
 			background-color: color($bg, 'background');
 		}
@@ -417,7 +417,7 @@
 		background-color:color($bg, 'box');
 		border: 1px solid color($fg, 'track');
 		display: inline-block;
-		padding: dp(6) dp(8);
+		padding: dp(13) dp(16);
 	}
 	&-time { max-height: dp(32);  }
 	
@@ -439,18 +439,19 @@
 	&-cb-label {
 		display: inline-block;
 		height: dp(32);
+		line-height: dp(32);
 	}
-/*	
-	Merijn: this messed up long labels (login screen) and hint texts (IMAP auth in system settings)
-&-check-wrap {
-		height: dp(32);
-	}*/
+	&-check-wrap {
+		padding: dp(9) 0;
+	}
 	&-checkbox {
 		position:absolute;
 		opacity: 0;
+		line-height: normal;
+		min-height: auto;
 		+ .x-form-cb-label::before {
 			@extend %checkbox;
-			margin-right: dp(12);
+			//margin-right: dp(12);
 		}
 		&:checked + .x-form-cb-label::before {
 			content: 'check_box';
@@ -461,6 +462,8 @@
 	}
 	&-radio {
 		position:absolute;
+		line-height: normal;
+		min-height: auto;
 		opacity:0;
 		+ label {
 			margin-left: 0;
@@ -477,11 +480,16 @@
 		}
 	}
 	&-radio-group {
-		padding-left: 0; //dp(16);
+		padding: dp(4) dp(16);
+		overflow: visible;
+		border: 1px solid color($fg, 'track');;
+		background-color: color($bg, 'box');
 		overflow:visible;
 	}
 	&-item {
-		margin-bottom:dp(4);
+		position: relative;
+		padding-top: dp(8);
+		margin-bottom:dp(8);
 		//Following line made grid in forms appear in disabled like text
 		/*@extend %font-caption;*/
 
@@ -489,7 +497,39 @@
 		.x-form-element {
 			margin: 0;
 		}
+
+		label.x-form-item-label {
+			&:empty {
+				display: none;
+			}
+			display:flex;
+			align-items: center;
+			float:none;
+			position:absolute !important;
+
+			//top: dp(15);
+
+			left: dp(12);
+
+			padding: 0 dp(4);
+			overflow: visible;
+			background-color: color($bg, 'box');
+			height: 2px;
+
+			z-index:2;
+		}
+
+		label.x-form-focus-label {
+			@include var(color, c-primary);
+		}
+
+		label.x-form-invalid-label {
+			color: $cDanger;
+			background-color: $cDangerBg;
+		}
 	}
+
+
 
 	&-invalid-icon:before {
 		@extend %icon;
@@ -501,7 +541,8 @@
 	&-focus, textarea.x-form-focus {
 		@extend .z2;
 		@include var(border-color, c-primary);
-	}	
+	}
+
 	&-invalid, textarea.x-form-invalid {
 		border-color: rgba($cDanger,0.54);
 		background-color: $cDangerBg;
@@ -544,14 +585,14 @@
 		}
 	}
 	.x-form-trigger {
-		height: dp(32);
-		width: dp(32);
+		height: dp(50);
+		width: dp(50);
 		vertical-align: middle;
 		padding:0;
 		color: color($fg, 'icon');
 		&::before {
-			max-height: dp(32);
-			max-width: dp(32);
+			max-height: dp(50);
+			max-width: dp(50);
 			@extend %icon;
 			content: 'arrow_drop_down';
 		}
@@ -564,7 +605,7 @@
 		&.x-form-date-trigger::before {content: 'event';}
 		&.x-form-edit-trigger::before{content: 'edit';}
 		.x-small-editor & {
-			height: dp(32);
+			height: dp(50);
 		}
 	} 
 	.x-trigger-noedit {
@@ -620,8 +661,7 @@
 
 .x-form-invalid-msg {
 	color:#c0272b;
-	font:normal 11px tahoma, arial, helvetica, sans-serif;
-	background-image:url(../images/default/shared/warning.gif);
+	padding: dp(8) dp(16);
 }
 
 .x-form-empty-field {

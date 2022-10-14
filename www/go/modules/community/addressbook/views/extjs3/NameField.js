@@ -34,9 +34,9 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 			}
 			
 			var formPanel = this.findParentByType('form');
-			this.nameMenu.items.get(0).items.each(function (i) {
+			this.nameMenu.findBy((i) => i.isFormField).forEach(function (i) {
 				formPanel.form.add(i);
-			}, this);
+			});
 		})
 	},
 
@@ -131,37 +131,65 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 	createContactNameFieldSet: function () {
 		return new Ext.form.FieldSet(
 						{
+							width: dp(800),
 							items: [
+
 								{
-									xtype: 'textfield',
-									name: 'prefixes',
-									fieldLabel: t("Prefix")
-								}, {
-									xtype: 'textfield',
-									name: 'initials',
-									fieldLabel: t("Initials")
-								}, this.firstName = new Ext.form.TextField({
-									xtype: 'textfield',
-									name: 'firstName',
-									fieldLabel: t("First")
-								}), this.middleName = new Ext.form.TextField({
-									xtype: 'textfield',
-									name: 'middleName',
-									fieldLabel: t("Middle")
-								}), this.lastName = new Ext.form.TextField({
-									xtype: 'textfield',
-									name: 'lastName',
-									fieldLabel: t("Last")
-								}), this.suffixField = new Ext.form.TextField({
-									xtype: 'textfield',
-									name: 'suffixes',
-									fieldLabel: t("Suffix")
-								}), this.salutationField = new Ext.form.TextField({
+									xtype: "container",
+									layout: "form",
+									cls: "go-hbox",
+									items: [
+
+										this.firstName = new Ext.form.TextField({
+											xtype: 'textfield',
+											name: 'firstName',
+											fieldLabel: t("First"),
+
+											flex: 1
+										}), this.middleName = new Ext.form.TextField({
+											xtype: 'textfield',
+											name: 'middleName',
+											fieldLabel: t("Middle"),
+											width: dp(128)
+										}), this.lastName = new Ext.form.TextField({
+											xtype: 'textfield',
+											name: 'lastName',
+											fieldLabel: t("Last"),
+											flex: 1
+										}),
+										{
+											xtype: 'textfield',
+											name: 'initials',
+											fieldLabel: t("Initials"),
+											width: dp(100)
+										}
+									]
+								},
+								{
+									xtype: "container",
+									layout: "form",
+									cls: "go-hbox",
+									items: [
+										{
+											xtype: 'textfield',
+											name: 'prefixes',
+											fieldLabel: t("Prefix"),
+											flex: 1
+										}, this.suffixField = new Ext.form.TextField({
+											xtype: 'textfield',
+											name: 'suffixes',
+											fieldLabel: t("Suffix"),
+											flex: 1
+										})
+									]
+								},
+								this.salutationField = new Ext.form.TextField({
 									xtype: 'textfield',
 									name: 'salutation',
-									fieldLabel: t("Salutation")
+									fieldLabel: t("Salutation"),
+									anchor: "100%"
 								})
-							]
+								]
 						});
 	}
 });
