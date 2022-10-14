@@ -193,3 +193,6 @@ $updates['202206201417'][] = "alter table tasks_task
 		foreign key (aclId) references core_acl (id)  ON DELETE RESTRICT;";
 
 
+$updates['202210141620'][] = "update core_entity set name='TaskList', clientName='TaskList' where name='Tasklist'";
+
+
