@@ -20,7 +20,7 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 			this.formcontainer = this.findParentByType('formcontainer');
 			
 			if(this.formcontainer) {
-				this.nameMenu.items.first().items.each(function(i) {
+				this.nameMenu.findBy((i) => i.isFormField).forEach(function (i) {
 					this.formcontainer.addAdditionalField(i);
 				}, this)
 				

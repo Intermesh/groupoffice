@@ -142,7 +142,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			collapsible:true,
 			maximizable:true,
 			width : dp(672),
-			height : dp(672),
+			height : dp(800),
 			stateId:'calendar_event_dialog',
 			closeAction : 'hide',
 			title : t("Appointment", "calendar"),

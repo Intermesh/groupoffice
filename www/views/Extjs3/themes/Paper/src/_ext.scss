@@ -381,10 +381,13 @@
 			line-height:dp(22)
 		}
 	}
-	
-	&-display-field {
-		line-height: dp(32);
+
+	&-display-field, &-plainfield {
 		@extend %font-data;
+		line-height: dp(20);
+		padding: dp(15) dp(16);
+		border-radius: dp(10);
+		border: 1px solid color($fg, 'line');
 	}
 	
 	&-field {
@@ -650,7 +653,6 @@
 }
 
 
-.x-form-plainfield,
 .x-form-item-label,
 .x-form-label-left label.x-form-item-label{
 	@extend %font-label;
