@@ -64,8 +64,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 	initFormItems: function () {
 
-		// this.taskCombo = new go.modules.community.tasks.TaskCombo({});
-
 		const start = {
 			xtype: 'datefield',
 			name: 'start',

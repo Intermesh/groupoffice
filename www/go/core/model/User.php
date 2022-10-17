@@ -338,7 +338,8 @@ class User extends Entity {
 	/**
 	 * @throws Forbidden
 	 */
-	public function setArchive($v) {
+	public function setArchive($v)
+	{
 		if(!go()->getAuthState()->isAdmin()) {
 			throw new Forbidden("Only admins can archive");
 		}
@@ -1194,6 +1195,12 @@ class User extends Entity {
 			foreach($addressBooks as $addressBook) {
 				$aclIds[] = $addressBook->findAclId();
 				AddressBook::entityType()->change($addressBook);
+			}
+			$profile = Contact::find()->where('goUserId', '=', $this->id)->single();
+			if($profile) {
+				$archivedAb = go()->getSettings()->archivedUsersAddressBook();
+				$profile->addressBookId = $archivedAb->id;
+				$profile->save();
 			}
 		}
 

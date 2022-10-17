@@ -8,6 +8,7 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 			layout: 'form',
 			items: [
 				this.langCombo = new go.login.LanguageCombobox({
+					emptyText: t("My selected language"),
 					listeners: {
 						select: function (cmb) {
 							if (cmb.getValue() != '') {

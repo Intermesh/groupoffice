@@ -1160,6 +1160,7 @@ abstract class EntityController extends Controller {
 		go()->getDbConnection()->commit();
 
 		return new ArrayObject([
+			"id" => $primaryId,
 			"updated" => [$primaryId => $entity],
 			"destroyed" => $params['ids'],
 			'oldState' => $oldState,

@@ -204,7 +204,7 @@ go.AuthenticationManager = (function () {
 
 			return go.User.onLoad(result).then(() => {
 
-				if(go.User.theme != GO.settings.config.theme) {
+				if(go.User.theme != GO.settings.config.theme || go.User.language != GO.lang.iso) {
 					go.reload();
 					return;
 				}
