@@ -166,6 +166,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * permissions to do that while adding it.
 	 * 
 	 * @param callable $callback Code in this function will run as administrator
+	 * @depcreated
 	 */
 	public static function sudo($callback) {
 		
