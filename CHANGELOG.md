@@ -1,4 +1,5 @@
 - Core: Remember user selected language
+- Address book: Merge selected contacts
 
 17-10-2022: 6.6.122
 - Projects2: add approved boolean field to expense budget table
