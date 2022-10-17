@@ -43,6 +43,7 @@ views/Extjs3/javascript/data/GroupingStore.js
 views/Extjs3/javascript/grids/ColumnRenderers.js
 
 views/Extjs3/javascript/grids/GridPanel.js
+views/Extjs3/javascript/grids/GridView.js
 views/Extjs3/javascript/grids/NotifyDrop.js
 views/Extjs3/javascript/grids/MultiSelectGrid.js
 views/Extjs3/javascript/grids/GroupSummary.js

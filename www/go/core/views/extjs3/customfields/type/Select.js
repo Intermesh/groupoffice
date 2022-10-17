@@ -123,7 +123,7 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 			xtype: this.getColumnXType()
 		};
 
-		c.renderer = function(val, metadata, record, rowIndex) {
+		c.renderer = function(val, metadata, record, rowIndex, i, store) {
 			if(!go.util.empty(val)) {
 				const selectedOption = field.dataType.options.find(elm => elm.text === val);
 				if(!selectedOption) {
@@ -150,6 +150,10 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 					// 2: get viewConfig
 					// 3: add row class
 					// debugger;
+					// let el = c.getEl().parent('gridpanel');
+					// const grid = this.up('gridpanel');
+					// let row = this.grid.getGrid().getRow(rowIndex);
+					//
 					// let row = c.getParentByType('grid');//.getView().getRow(rowIndex);
 					// let rowStyle = row.metadata.style || "";
 					// if(!go.util.empty(inlineStyle)) {
@@ -159,10 +163,28 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 				}
 			}
 			return val;
-		}
+		};
+		c.rowRenderer = function(val) {
+			if (!go.util.empty(val)) {
+				const selectedOption = field.dataType.options.find(elm => elm.text === val);
+				if(!selectedOption || selectedOption.renderMode !== "row") {
+					return false;
+				}
+
+				let inlineStyle =  "";
+				if (selectedOption.foregroundColor) {
+					inlineStyle += "color: #" + selectedOption.foregroundColor + ";";
+				}
+				if(selectedOption.backgroundColor) {
+					inlineStyle += "background-color: #" + selectedOption.backgroundColor + ";";
+				}
+				return inlineStyle;
+			}
+			return false;
+		};
+
 		return c;
 	},
-
 });
 
 
