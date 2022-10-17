@@ -533,6 +533,15 @@ abstract class Entity  extends OrmEntity {
    */
 	public static function getChanges(string $sinceState, int $maxChanges): array
 	{
+		$result = [
+			'oldState' => $sinceState,
+			'changed' => [],
+			'removed' => []
+		];
+
+		if($sinceState == self::getState()) {
+			return $result;
+		}
 		
 		$entityType = static::entityType();
 		
@@ -555,11 +564,7 @@ abstract class Entity  extends OrmEntity {
 			}
 		}	
 		
-		$result = [				
-			'oldState' => $sinceState,
-			'changed' => [],
-			'removed' => []
-		];		
+
 			
 		$userChanges = static::getUserChangesQuery($states[1]['modSeq']);
 			

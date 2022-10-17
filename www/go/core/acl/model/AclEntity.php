@@ -48,6 +48,14 @@ abstract class AclEntity extends Entity {
 	public static function getChanges(string $sinceState, int $maxChanges): array
 	{
 
+		if($sinceState == self::getState()) {
+			return  [
+				'oldState' => $sinceState,
+				'changed' => [],
+				'removed' => []
+			];
+		}
+
 		$result = parent::getChanges($sinceState, $maxChanges);
 
 		//return is admin because ACL's don't apply to admins or when we're at the max of changes

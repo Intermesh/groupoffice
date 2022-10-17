@@ -14,7 +14,7 @@
 
 		},
 
-		init : function() {
+		init : async function() {
 
 			this.store = new go.data.Store({
 				entityStore: "Alert",
@@ -45,7 +45,8 @@
 				}
 			});
 
-			this.store.load();
+			await go.Db.store("Alert").getUpdates();
+			await this.store.load();
 
 			// re-evaluate alerts every 60s
 			setInterval(() => {

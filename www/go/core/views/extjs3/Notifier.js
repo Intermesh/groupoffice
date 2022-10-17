@@ -265,7 +265,7 @@
 
 				setTimeout(() => {
 
-					if(!msgPanel.mouseEntered) {
+					if(!msgPanel.mouseEntered && !msgPanel.isDestroyed) {
 						moveToNotificationArea(msgPanel);
 					}
 				}, 2000);
