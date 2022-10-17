@@ -40490,14 +40490,14 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
     defaultTriggerWidth: 17,
 
     
-    onResize : function(w, h){
-        Ext.form.TriggerField.superclass.onResize.call(this, w, h);
-        var tw = this.getTriggerWidth();
-        if(Ext.isNumber(w)){
-            this.el.setWidth(w - tw);
-        }
-        this.wrap.setWidth(this.el.getWidth() + tw);
-    },
+    // onResize : function(w, h){
+    //     Ext.form.TriggerField.superclass.onResize.call(this, w, h);
+    //     var tw = this.getTriggerWidth();
+    //     // if(Ext.isNumber(w)){
+    //     //     this.el.setWidth(w - tw);
+    //     // }
+    //     // this.wrap.setWidth(this.el.getWidth() + tw);
+    // },
 
     getTriggerWidth: function(){
         var tw = this.trigger.getWidth();
@@ -40514,20 +40514,22 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
         }
     },
 
-    
-    onRender : function(ct, position){
-        this.doc = Ext.isIE ? Ext.getBody() : Ext.getDoc();
-        Ext.form.TriggerField.superclass.onRender.call(this, ct, position);
 
-        this.wrap = this.el.wrap({cls: 'x-form-field-wrap x-form-field-trigger-wrap'});
-        this.trigger = this.wrap.createChild(this.triggerConfig ||
-                {tag: "img", src: Ext.BLANK_IMAGE_URL, alt: "", cls: "x-form-trigger " + this.triggerClass});
-        this.initTrigger();
-        if(!this.width){
-            this.wrap.setWidth(this.el.getWidth()+this.trigger.getWidth());
-        }
-        this.resizeEl = this.positionEl = this.wrap;
-    },
+		onRender : function(ct, position){
+			this.doc = Ext.isIE ? Ext.getBody() : Ext.getDoc();
+			Ext.form.TriggerField.superclass.onRender.call(this, ct, position);
+
+			this.wrap = this.el.wrap({cls: 'x-form-field-wrap x-form-field-trigger-wrap'});
+			this.trigger = this.wrap.createChild(this.triggerConfig ||
+				{tag: "button", type: "button", tabindex: "-1", cls: "x-form-trigger " + this.triggerClass});
+			this.initTrigger();
+
+			// this messes up go-hbox class with flex
+			// if(!this.width){
+			//this.wrap.setWidth(this.el.getWidth()+this.getTriggerWidth());
+			// }
+			this.resizeEl = this.positionEl = this.wrap;
+		},
 
     getWidth: function() {
         return(this.el.getWidth() + this.trigger.getWidth());

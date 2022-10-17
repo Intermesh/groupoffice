@@ -569,7 +569,8 @@
 
 .x-form-field-trigger-wrap {
 	> input {
-		padding-right: dp(32); // for trigger button: todo twintrigger
+		padding-right: dp(48); // for trigger button: todo twintrigger
+		width: 100%;
 	}
 }
 
