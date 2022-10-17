@@ -91,7 +91,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		}
 
 		changed.forEach((id) => {
-			if(this.watchRelations[entityStore.entity.name].indexOf(id) > -1) {
+			if(this.watchRelations[entityStore.entity.name].indexOfLoose(id) > -1) {
 				this.internalLoad(this.data);
 				return;
 			}

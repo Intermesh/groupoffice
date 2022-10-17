@@ -64,8 +64,13 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 			cont.ownerCt.on("beforeload", (dv, id) => {
 				if(this.composer.textField.isDirty() && this.composer.textField.getValue() != "" && this.composer.textField.getValue() != "<br>") {
-					console.warn(this.composer.textField.getValue());
-					return confirm(t("You have an unsaved comment. Are you sure you want to discard the comment?"));
+					if(confirm(t("You have an unsaved comment. Are you sure you want to discard the comment?"))) {
+						this.composer.reset();
+						return true;
+					} else
+					{
+						return false;
+					}
 				}
 			});
 		})
@@ -181,7 +186,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		if(this.composer) {
 			this.composer.initEntity(this.entityId, this.entity, this.section);
 
-			this.composer.reset();
+
 		}
 		this.store.setFilter('entity', {
 			entity: this.entity,
