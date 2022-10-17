@@ -495,6 +495,23 @@ class Module extends Entity {
 		return !empty($mod) && $mod->getPermissionLevel($userId) >= $level;
 	}
 
+	// for backwards compatibility
+	public function getPermissionLevel($userId = null): int
+	{
+
+		$rights = $this->getUserRights($userId);
+
+		if (!$rights->mayRead) {
+			return 0;
+		}
+
+		if($this->name == 'projects2' && $rights->mayFinance && !$rights->mayManage) { // a single exception for this compat method
+			return 45;
+		}
+
+		return !empty($rights->mayManage) ? 50 : 10;
+	}
+
 	/**
 	 * Find a module by package and name
 	 *
