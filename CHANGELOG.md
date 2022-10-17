@@ -1,3 +1,6 @@
+17-10-2022: 6.6.122
+- Projects2: add approved boolean field to expense budget table
+
 14-10-2022 6.6.121
 - Billing: Align ID column in PDF to the left
 - Core: Archived user contacts moved into separate address book 'Archived users'
