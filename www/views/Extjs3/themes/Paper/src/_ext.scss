@@ -572,6 +572,10 @@
 		padding-right: dp(48); // for trigger button: todo twintrigger
 		width: 100%;
 	}
+
+	> textarea {
+		width: 100%;
+	}
 }
 
 .x-form-field-wrap {
