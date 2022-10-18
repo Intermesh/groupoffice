@@ -1,7 +1,7 @@
 go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 	name: 'name',
 	fieldLabel: t("Name"),
-	anchor: '100%',
+	// anchor: '100%',
 	allowBlank: false,
 	nameMenuEnabled: true,
 	initComponent: function () {
