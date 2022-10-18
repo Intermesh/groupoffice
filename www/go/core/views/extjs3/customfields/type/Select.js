@@ -126,40 +126,20 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 		c.renderer = function(val, metadata, record, rowIndex, i, store) {
 			if(!go.util.empty(val)) {
 				const selectedOption = field.dataType.options.find(elm => elm.text === val);
-				if(!selectedOption) {
-					return val;
-				}
+				if(selectedOption && selectedOption.renderMode === "cell") {
+					let inlineStyle = "";
+					if (selectedOption.foregroundColor) {
+						inlineStyle += "color: #" + selectedOption.foregroundColor + ";";
+					}
+					if (selectedOption.backgroundColor) {
+						inlineStyle += "background-color: #" + selectedOption.backgroundColor + ";";
+					}
 
-				let inlineStyle =  "";
-				if (selectedOption.foregroundColor) {
-					inlineStyle += "color: #" + selectedOption.foregroundColor + ";";
-				}
-				if(selectedOption.backgroundColor) {
-					inlineStyle += "background-color: #" + selectedOption.backgroundColor + ";";
-				}
-
-				if(selectedOption.renderMode === 'cell') {
 					let cellStyle = metadata.style || '';
-					if(!go.util.empty(inlineStyle)) {
+					if (!go.util.empty(inlineStyle)) {
 						cellStyle += inlineStyle;
 					}
 					metadata.style = cellStyle;
-				} else if(selectedOption.renderMode === 'row') {
-					// TODO: How to render the entire row?
-					// 1: get current grid / row
-					// 2: get viewConfig
-					// 3: add row class
-					// debugger;
-					// let el = c.getEl().parent('gridpanel');
-					// const grid = this.up('gridpanel');
-					// let row = this.grid.getGrid().getRow(rowIndex);
-					//
-					// let row = c.getParentByType('grid');//.getView().getRow(rowIndex);
-					// let rowStyle = row.metadata.style || "";
-					// if(!go.util.empty(inlineStyle)) {
-					// 	rowStyle += inlineStyle;
-					// }
-					// row.metadata.style = rowStyle;
 				}
 			}
 			return val;
