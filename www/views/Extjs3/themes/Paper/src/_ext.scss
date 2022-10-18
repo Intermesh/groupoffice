@@ -522,7 +522,7 @@
 			left: dp(12);
 			font-size: sp(16);
 			top: dp(32);
-			transform: translateY(dp(-24) - 0.8) scale(.8);
+			transform: translateY(dp(-24)) scale(.8);
 			//below performs better but looks ugly on windows :(
 			will-change: transform;
 			transform-origin: top left;
