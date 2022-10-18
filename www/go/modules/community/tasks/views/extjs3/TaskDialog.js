@@ -5,6 +5,16 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	height: dp(600),
 	modal: false,
 	stateId: 'communityTasksTaskDialog',
+	role: "list",
+
+	onReady: async function() {
+		if(this.currentId) {
+			const tl = await go.Db.store("Tasklist").single(this.tasklistCombo.getValue());
+			this.tasklistCombo.store.setFilter("role", {role: tl.role});
+		} else {
+			this.tasklistCombo.store.setFilter("role", {role: this.role});
+		}
+	},
 
 	setLinkEntity : function(cfg) {
 
@@ -52,8 +62,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	initFormItems: function () {
-
-		// this.taskCombo = new go.modules.community.tasks.TaskCombo({});
 
 		const start = {
 			xtype:'datefield',

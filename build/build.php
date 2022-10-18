@@ -76,13 +76,13 @@ class Builder
 	        [
 		        "archiveSuffix" => "",
 			    "name" => "sixsix",
-			    "encoderOptions" => "-71 --allow-reflection-all"
+			    "encoderOptions" => "-72 --allow-reflection-all"
 		    ]
 	];
 
-	private $encoder = __DIR__ . "/deploy/ioncube_encoder5_10.2/ioncube_encoder.sh";
+	private $encoder = __DIR__ . "/deploy/ioncube_encoder5_12.0/ioncube_encoder.sh";
 
-	private $encoderOptions = "-56 --allow-reflection-all";
+	private $encoderOptions = null;
 	private $proRepos = "git@git.intermesh.nl:groupoffice/promodules.git";
 	private $sourceDir = __DIR__ . "/deploy/source";
 	private $encodedDir = __DIR__ . "/deploy/encoded";

@@ -17,7 +17,7 @@ go.login.LanguageCombobox = Ext.extend(Ext.form.ComboBox,{
 			triggerAction:'all',
 			forceSelection: false,
 			editable: false,
-			value: GO.lang.iso,
+			// value: GO.lang.iso,
 			maxHeight:999999,
 			width:dp(192)
  		});

@@ -307,7 +307,11 @@ class Token extends Entity {
 		$user = $this->getUser();
 		$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
 		$user->loginCount++;
-		$user->language = go()->getLanguage()->getIsoCode();
+
+		if(isset($_COOKIE['GO_LANGUAGE'])) {
+			$user->language = $_COOKIE['GO_LANGUAGE'];
+		}
+
 		if(!$user->save()) {
 			return false;
 		}

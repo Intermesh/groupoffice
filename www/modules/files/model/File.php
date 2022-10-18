@@ -744,7 +744,6 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	 */
 	public function appendNumberToNameIfExists()
 	{
-		$dir = $this->folder->path;
 		$origName = $this->fsFile->nameWithoutExtension();
 		$extension = $this->fsFile->extension();
 		$x=1;

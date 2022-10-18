@@ -4,6 +4,7 @@
 namespace GO\Smime;
 
 use GO;
+use GO\Smime\Model\Smime;
 
 
 class EventHandlers {
@@ -50,6 +51,10 @@ class EventHandlers {
 			
 			$outfile = \GO\Base\Fs\File::tempFile();
 			$imapMessage->getImapConnection()->save_to_file($imapMessage->uid, $outfile->path());
+
+			if(!$outfile->exists()) {
+				throw new Exception("Could not save message");
+			}
 			
 			$verifyOutfile = \GO\Base\Fs\File::tempFile();
 
@@ -59,7 +64,7 @@ class EventHandlers {
 			//PHP can't output the verified data without the signature without 
 			//suppling the extracerts option. We generated a dummy certificate for 
 			//this.
-			openssl_pkcs7_verify($outfile->path(), null, "/dev/null", array(), GO::config()->root_path."modules/smime/dummycert.pem", $verifyOutfile->path());
+			openssl_pkcs7_verify($outfile->path(), PKCS7_NOVERIFY, "/dev/null", array(), GO::config()->root_path."modules/smime/dummycert.pem", $verifyOutfile->path());
 
 			$mime = $verifyOutfile->getContents();
 			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($mime);
@@ -135,7 +140,7 @@ class EventHandlers {
 		$data = $outfile->getContents();
 		if (strpos($data, 'signed-data')) {
 			$verifyOutfile = \GO\Base\Fs\File::tempFile();
-			openssl_pkcs7_verify($outfile->path(), null, "/dev/null", array(), GO::config()->root_path . "modules/smime/dummycert.pem", $verifyOutfile->path());
+			openssl_pkcs7_verify($outfile->path(), PKCS7_NOVERIFY, "/dev/null", array(), GO::config()->root_path . "modules/smime/dummycert.pem", $verifyOutfile->path());
 
 			$outfile = $verifyOutfile;
 		}

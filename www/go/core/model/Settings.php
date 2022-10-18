@@ -499,6 +499,41 @@ class Settings extends core\Settings {
 		return $addressBook;		
 	}
 
+	/**
+	 * When archiving a user, move profile user
+	 *
+	 * @return AddressBook | null
+	 * @throws Exception
+	 */
+
+	public function archivedUsersAddressBook()
+	{
+		if(!Module::findByName('community', 'addressbook')) {
+			return null;
+		}
+
+		$ab = isset($this->archivedUsersAddressBook) ? AddressBook::findById($this->archivedUsersAddressBook) : null;
+
+		if (!$ab) {
+			go()->getDbConnection()->beginTransaction();
+			$ab = new AddressBook();
+			$ab->name = go()->t("Archived users");
+			if(!$ab->save()) {
+				throw new Exception("Could not save address book");
+			}
+			$this->archivedUsersAddressBook = $ab->id;
+
+			//Share users address book with admins only
+			$ab->findAcl()->addGroup(Group::ID_ADMINS)->save();
+			if(!$this->save()) {
+				throw new Exception("Could not save core settings");
+			}
+			go()->getDbConnection()->commit();
+		}
+
+		return $ab;
+	}
+
 	
 	
 	/**
