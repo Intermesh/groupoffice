@@ -519,8 +519,18 @@
 			position:absolute !important;
 
 			//top: dp(15);
-
 			left: dp(12);
+			font-size: sp(16);
+			top: dp(32);
+			transform: translateY(dp(-24) - 0.8) scale(.8);
+			//below performs better but looks ugly on windows :(
+			will-change: transform;
+			transform-origin: top left;
+			transition: transform linear 100ms;
+			&.x-form-empty-label:not(&.x-form-focus-label) {
+			 transform: none;
+			}
+
 
 			padding: 0 dp(4);
 			overflow: visible;

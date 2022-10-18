@@ -39695,37 +39695,64 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         this.el.addClass([this.fieldClass, this.cls]);
 
 
-				this.on("invalid", () => {
-					const labelEl = this.findLabelEl();
-
-					if(labelEl) {
-						labelEl.classList.add(this.invalidClass + "-label");
-					}
-				});
-
-				this.on("valid", () => {
-					const labelEl = this.findLabelEl();
-
-					if(labelEl) {
-						labelEl.classList.remove(this.invalidClass + "-label");
-					}
-				});
+				this.initLabelClasses();
     },
 
 
+		initLabelClasses : function() {
+			this.on("invalid", () => {
+				const labelEl = this.findLabelEl();
+
+				if(labelEl) {
+					labelEl.classList.add(this.invalidClass + "-label");
+				}
+			});
+
+			this.on("valid", () => {
+				const labelEl = this.findLabelEl();
+
+				if(labelEl) {
+					labelEl.classList.remove(this.invalidClass + "-label");
+				}
+			});
+
+			this.on("change", (field, v) => {
+				this.applyEmptyLabelCls(v)
+			});
+
+			this.applyEmptyLabelCls(this.getValue());
+		},
+
+		applyEmptyLabelCls: function(v) {
+			const labelEl = this.findLabelEl();
+
+			if(labelEl) {
+				labelEl.classList.toggle("x-form-empty-label", !v);
+			}
+		},
+
+		labelEl: undefined,
+
 		findLabelEl : function() {
-			const xFormEl = this.el.dom.parentNode;
-			if(!xFormEl) {
-				return undefined;
+
+
+			if(this.labelEl === undefined) {
+				const xFormEl = this.el.up(".x-form-element");
+				if (!xFormEl) {
+					return undefined;
+				}
+
+				const labelEl = xFormEl.dom.previousSibling;
+
+				if (labelEl && labelEl.tagName == "LABEL") {
+					this.labelEl = labelEl;
+				} else
+				{
+					this.labelEl = null;
+				}
 			}
 
-			const labelEl = xFormEl.previousSibling;
-
-			if(labelEl && labelEl.tagName == "LABEL") {
-				return labelEl;
-			}
-
-			return undefined;
+			return this.labelEl;
 
 		},
 
@@ -40311,10 +40338,10 @@ Ext.form.TextField = Ext.extend(Ext.form.Field,  {
     },
 
     applyEmptyText : function(){
-        if(this.rendered && this.emptyText && this.getRawValue().length < 1 && !this.hasFocus){
-            this.setRawValue(this.emptyText);
-            this.el.addClass(this.emptyClass);
-        }
+        // if(this.rendered && this.emptyText && this.getRawValue().length < 1 && !this.hasFocus){
+        //     this.setRawValue(this.emptyText);
+        //     this.el.addClass(this.emptyClass);
+        // }
     },
 
     
@@ -42387,7 +42414,7 @@ Ext.form.CheckboxGroup = Ext.extend(Ext.form.Field, {
     
     groupCls : 'x-form-check-group',
 
-    
+	applyEmptyLabelCls: function(v) {},
     initComponent: function(){
         this.addEvents(
             
@@ -43130,9 +43157,9 @@ Ext.form.RadioGroup = Ext.extend(Ext.form.CheckboxGroup, {
     
     
     groupCls : 'x-form-radio-group',
-    
-    
-    
+
+
+
     
     getValue : function(){
         var out = null;
