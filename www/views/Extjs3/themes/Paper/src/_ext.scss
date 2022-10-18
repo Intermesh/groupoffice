@@ -538,6 +538,10 @@
 			color: $cDanger;
 			background-color: $cDangerBg;
 		}
+
+		label.x-form-readonly-label {
+			background-color: color($bg, 'readonly');
+		}
 	}
 
 

@@ -39754,8 +39754,15 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
 
     
     setReadOnly : function(readOnly){
+
         if(this.rendered){
             this.el.dom.readOnly = readOnly;
+
+						const labelEl = this.findLabelEl();
+
+						if(labelEl) {
+							labelEl.classList.toggle("x-form-readonly-label", readOnly);
+						}
         }
         this.readOnly = readOnly;
     },
