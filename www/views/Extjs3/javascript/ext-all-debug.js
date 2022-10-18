@@ -39720,6 +39720,10 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
 				this.applyEmptyLabelCls(v)
 			});
 
+			this.on("setvalue", (field, v) => {
+				this.applyEmptyLabelCls(v)
+			});
+
 			this.applyEmptyLabelCls(this.getValue());
 		},
 
@@ -39727,7 +39731,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
 			const labelEl = this.findLabelEl();
 
 			if(labelEl) {
-				labelEl.classList.toggle("x-form-empty-label", !v);
+				labelEl.classList.toggle("x-form-empty-label", v + "" === "");
 			}
 		},
 
