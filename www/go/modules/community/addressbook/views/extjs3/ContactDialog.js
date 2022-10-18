@@ -27,17 +27,17 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		return true;
 	},
 
-	focus: function () {
-
-		if (this.nameField.getValue() != "") {
-			this.jobTitle.focus();
-		} else
-		{
-			setTimeout(() => {
-				this.nameField.focus();
-			});
-		}
-	},
+	// focus: function () {
+	//
+	// 	if (this.nameField.getValue() != "") {
+	// 		this.jobTitle.focus();
+	// 	} else
+	// 	{
+	// 		setTimeout(() => {
+	// 			this.nameField.focus();
+	// 		});
+	// 	}
+	// },
 
 	setLinkEntity: function(config) {
 		if(config.entity == "Contact") {

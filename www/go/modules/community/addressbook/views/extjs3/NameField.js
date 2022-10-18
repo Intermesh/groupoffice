@@ -132,12 +132,21 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 		return new Ext.form.FieldSet(
 						{
 							width: dp(800),
+							mobile: {
+								width: document.body.offsetWidth - dp(32)
+							},
 							items: [
 
 								{
 									xtype: "container",
 									layout: "form",
 									cls: "go-hbox",
+									mobile: {
+										cls: "",
+										defaults: {
+											anchor: "100%"
+										}
+									},
 									items: [
 
 										this.firstName = new Ext.form.TextField({
@@ -166,6 +175,12 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 									]
 								},
 								{
+									mobile: {
+										cls: "",
+										defaults: {
+											anchor: "100%"
+										}
+									},
 									xtype: "container",
 									layout: "form",
 									cls: "go-hbox",

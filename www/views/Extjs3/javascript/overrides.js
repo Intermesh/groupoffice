@@ -472,7 +472,7 @@ Ext.override(Ext.FormPanel,{
 		var focFn = function() {
 			if(!GO.util.isMobileOrTablet()) {
 				var firstField = this.getForm().items.find(function (item) {
-					if (!item.disabled && item.isVisible())
+					if (!item.disabled && item.isVisible() && go.util.empty(item.getValue()))
 						return true;
 				});
 

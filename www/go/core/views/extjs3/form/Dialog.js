@@ -370,9 +370,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 		return this.formPanel.isValid();
 	},
 
-	focus: function () {		
-		this.formPanel.focus();
-	},
 
 	/**
 	 * Override to do stuff before submitting to server
@@ -509,6 +506,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 				//onReady is called after load.
 				return;
 			}
+
+
+			// In overrides.js the form panel focuses on the first empty field or first field with an error
+			me.formPanel.focus();
 
 			me.onReady();
 		});
