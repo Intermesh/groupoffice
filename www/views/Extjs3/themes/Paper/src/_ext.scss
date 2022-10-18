@@ -340,6 +340,8 @@
 	padding: dp(6) dp(8);
 }
 
+
+
 .x-form{
 	background-color: color($bg, 'form');
 	> .x-tab-panel {
@@ -413,7 +415,13 @@
 		&.x-triggerfield-selectonly {
 			background-color:color($bg, 'box');
 		}
-		
+
+		.x-small-editor & {
+			min-height: dp(36);
+			padding: dp(4) dp(8);
+		}
+
+
 	}
 	&-text, textarea.x-form-field, &-time {
 		@extend %font-data;
@@ -613,7 +621,8 @@
 		&.x-form-date-trigger::before {content: 'event';}
 		&.x-form-edit-trigger::before{content: 'edit';}
 		.x-small-editor & {
-			height: dp(50);
+			height: dp(36);
+			width: dp(36);
 		}
 	} 
 	.x-trigger-noedit {
@@ -2662,7 +2671,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 
 // HTML
 .x-html-editor-wrap {
-	border-radius: dp(4);
+	border-radius: dp(10);
 	border:1px solid color($fg, 'track');
 }
 .x-html-editor-tb {
@@ -2678,9 +2687,16 @@ body.x-body-masked .x-window-plain .x-window-mc {
 			font-size: .8em;
 		}
 	}
-	//.x-toolbar-left {
-	//	padding-left: 0;
-	//}
+	.x-toolbar-left {
+		padding-left: dp(8);
+		.x-form-field-wrap:first-child {
+			margin-left: 0;
+		}
+	}
+
+	.x-toolbar-right {
+		padding-right: dp(8);
+	}
 
 	.x-btn-text {
 		background-image: none; //url(wysiwyg.gif);

@@ -79,7 +79,7 @@ Ext.onReady(function() {
 				{
 					xtype: 'checkbox',
 					name: 'encryptcheck',
-					fieldLabel: 'Encrypt content',
+					boxLabel: t('Encrypt content'),
 					submit:false,
 					listeners: {
 

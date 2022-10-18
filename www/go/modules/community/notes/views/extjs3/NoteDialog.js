@@ -15,7 +15,7 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 		
 		var items = [{
 				xtype: 'fieldset',
-				anchor: fieldSetAnchor,
+				// anchor: fieldSetAnchor,
 				items: [
 					{
 						xtype: 'textfield',
@@ -27,9 +27,13 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 					{
 						xtype: 'xhtmleditor',
 						name: 'content',
+						grow: true,
+						growMinHeight: dp(100),
+						growMaxHeight: 0,
+
 						fieldLabel: "",
 						hideLabel: true,
-						anchor: '0 -90',
+						// anchor: '0 -90',
 						allowBlank: false,
 						plugins: [new GO.plugins.HtmlEditorImageInsert(), go.form.HtmlEditor.emojiPlugin],
 						listeners: {

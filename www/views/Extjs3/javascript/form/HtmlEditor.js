@@ -652,7 +652,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 		h +=  this.tb.el.getHeight();
 
-		if(h > this.growMaxHeight) {
+		if(this.growMaxHeight && h > this.growMaxHeight) {
 			h = this.growMaxHeight;
 		}
 
