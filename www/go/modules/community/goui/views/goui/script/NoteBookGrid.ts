@@ -20,7 +20,7 @@ export class NoteBookGrid extends Table<JmapStore> {
 			[
 				column({
 					header: t("Name"),
-					property: "name",
+					id: "name",
 					sortable: true
 				})
 			]

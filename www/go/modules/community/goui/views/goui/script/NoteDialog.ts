@@ -15,6 +15,7 @@ import {EntityStore} from "@goui/jmap/EntityStore.js";
 import {btn} from "@goui/component/Button.js";
 import {Window} from "@goui/component/Window.js";
 import {Notifier} from "@goui/Notifier.js";
+import {comp} from "@goui/component/Component.js";
 
 export class NoteDialog extends Window {
 	readonly form: Form;
@@ -56,13 +57,20 @@ export class NoteDialog extends Window {
 				this.cards = cards({flex: 1},
 					this.general = fieldset({cls: "scroll fit", title: t("General")},
 
-						notebookcombo(),
 
-						textfield({
-							name: "name",
-							label: t("Name"),
-							required: true
-						}),
+
+						comp({cls: "hbox gap"},
+							textfield({
+								flex: 2,
+								name: "name",
+								label: t("Name"),
+								required: true
+							}),
+
+							notebookcombo({
+								flex: 1
+							}),
+						),
 
 						htmlfield({
 							name: "content",
@@ -85,7 +93,10 @@ export class NoteDialog extends Window {
 									});
 								}
 							}
-						})
+						}),
+
+
+
 					)
 				),
 
@@ -123,7 +134,7 @@ export class NoteDialog extends Window {
 	private addCustomFields() {
 		const es = "Note"
 		if (go.Entities.get(es).customFields) {
-			var fieldsets = go.customfields.CustomFields.getFormFieldSets(es);
+			const fieldsets = go.customfields.CustomFields.getFormFieldSets(es);
 			fieldsets.forEach((fs: any) => {
 
 				//replace customFields. because we will use a containerfield here.

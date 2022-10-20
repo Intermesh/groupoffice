@@ -24,13 +24,13 @@ export class NoteGrid extends Table {
 			[
 				column({
 					header: t("Name"),
-					property: "name",
+					id: "name",
 					sortable: true
 				}),
 
 				datetimecolumn({
 					header: t("Created At"),
-					property: "createdAt",
+					id: "createdAt",
 					sortable: true
 				})
 			]

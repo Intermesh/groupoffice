@@ -10,9 +10,10 @@ import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
 import {router} from "@goui/Router.js";
+import {t} from "@goui/Translate.js";
 
 
-export class Notes extends Component {
+export class Main extends Component {
 
 	// class hbox devides screen in horizontal columns
 	private noteBookGrid!: NoteBookGrid;
@@ -94,8 +95,8 @@ export class Notes extends Component {
 				columns: [
 					checkboxselectcolumn(),
 					column({
-						header: "Name",
-						property: "name",
+						header: t("Name"),
+						id: "name",
 						sortable: true,
 						resizable: false
 					})
