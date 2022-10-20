@@ -51563,7 +51563,7 @@ Ext.grid.GroupingView = Ext.extend(Ext.grid.GridView, {
 
         if(!this.startGroup){
             this.startGroup = new Ext.XTemplate(
-                '<div id="{groupId}" class="x-grid-group {cls}">',
+                '<div id="{groupId}" class="x-grid-group {cls} x-grid-group-val-{[Ext.util.Format.htmlEncode(values.gvalue || "empty")]}">',
                     '<div id="{groupId}-hd" class="x-grid-group-hd" style="{style}"><div class="x-grid-group-title">', this.groupTextTpl ,'</div></div>',
                     '<div id="{groupId}-bd" class="x-grid-group-body">'
             );

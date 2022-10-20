@@ -19,3 +19,4 @@ ProgressGrid.js
 SettingsPanel.js
 ContinueTaskDialog.js
 Portlet.js
+TaskListGroupingCombo.js

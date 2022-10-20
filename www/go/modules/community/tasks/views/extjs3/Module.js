@@ -1,9 +1,10 @@
 go.Modules.register("community", "tasks", {
 	mainPanel: "go.modules.community.tasks.MainPanel",
 	title: t("Tasks"),
-	entities: ["TaskCategory","PortletTasklist","Settings",{
+	entities: ["TaskListGrouping", "TaskCategory","PortletTasklist","Settings",{
 		name: "TaskList",
 		relations: {
+			group: {store: "TaskListGrouping", fk: "groupingId"},
 			creator: {store: "UserDisplay", fk: "createdBy"},
 			groups: {name: 'Groups'}
 		}

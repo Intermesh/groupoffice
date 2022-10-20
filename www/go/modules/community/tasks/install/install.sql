@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist` (
   `ownerId` INT(11) NOT NULL DEFAULT 1,
   `filesFolderId` INT(11) DEFAULT null,
   projectId int(11) null,
+  groupingId int unsigned null,
   PRIMARY KEY (`id`),
   INDEX `fkCreatedBy` (`createdBy` ASC),
   INDEX `fkAcl` (`aclId` ASC),
@@ -309,3 +310,25 @@ alter table tasks_user_settings
 
 create index tasks_task_progress_index
     on tasks_task (progress);
+
+
+
+
+create table tasks_tasklist_grouping
+(
+    id      int unsigned auto_increment,
+    name    varchar(190) not null,
+    `order` int unsigned null,
+    constraint tasks_tasklist_grouping_pk
+        primary key (id),
+    constraint tasks_tasklist_grouping_name
+        unique (name)
+);
+
+
+
+
+alter table tasks_tasklist
+    add constraint tasks_tasklist_tasks_tasklist_grouping_null_fk
+        foreign key (groupingId) references groupoffice_67.tasks_tasklist_grouping (id)
+            on delete set null;

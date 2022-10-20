@@ -196,3 +196,22 @@ $updates['202206201417'][] = "alter table tasks_task
 $updates['202210141620'][] = "update core_entity set name='TaskList', clientName='TaskList' where name='Tasklist'";
 
 
+$updates['202210201328'][] = "create table tasks_tasklist_grouping
+(
+	id      int unsigned auto_increment,
+    name    varchar(190) not null,
+    `order` int unsigned null,
+    constraint tasks_tasklist_grouping_pk
+        primary key (id),
+    constraint tasks_tasklist_grouping_name
+        unique (name)
+);";
+
+
+$updates['202210201328'][] = "alter table tasks_tasklist
+                    add groupingId int unsigned null;";
+
+$updates['202210201328'][] = "alter table tasks_tasklist
+                    add constraint tasks_tasklist_tasks_tasklist_grouping_null_fk
+                        foreign key (groupingId) references groupoffice_67.tasks_tasklist_grouping (id)
+                            on delete set null;";

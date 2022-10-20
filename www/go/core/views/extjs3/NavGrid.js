@@ -19,11 +19,12 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	saveSelection: false,
 	selectAllButton: false,
 	singleSelect: false,
-	initComponent: function () {
 
+
+	initColumns : function() {
 		const actions = this.initRowActions();
-
 		this.plugins = [actions];
+
 		if(this.singleSelect) {
 			this.selModel = new Ext.grid.RowSelectionModel({singleSelect: true});
 		} else
@@ -31,6 +32,29 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 			this.selModel = new Ext.grid.CheckboxSelectionModel();
 		}
 
+		if(!this.columns) {
+			this.columns = [
+				{
+					id: 'name',
+					header: t('Name'),
+					sortable: false,
+					dataIndex: 'name',
+					hideable: false,
+					draggable: false,
+					menuDisabled: true
+				},
+				actions
+			];
+
+			if(!this.singleSelect) {
+				this.columns.unshift(this.selModel);
+			}
+		}
+	},
+
+	initComponent: function () {
+
+		this.initColumns();
 
 		if(this.selectAllButton && !this.singleSelect) {
 			this.selectAllToolbar = new Ext.Toolbar({
@@ -61,24 +85,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 			this.store.on("datachanged", this.onStoreDataChanged, this);
 		}
 
-		if(!this.columns) {
-			this.columns = [
-				{
-					id: 'name',
-					header: t('Name'),
-					sortable: false,
-					dataIndex: 'name',
-					hideable: false,
-					draggable: false,
-					menuDisabled: true
-				},
-				actions
-			];
 
-			if(!this.singleSelect) {
-				this.columns.unshift(this.selModel);
-			}
-		}
 
 		go.NavGrid.superclass.initComponent.call(this);
 
