@@ -27,6 +27,7 @@ return array (
   'Create link' => 'Maak link',
   'Users' => 'Gebruikers',
   'Archive user' => 'Gebruiker archiveren',
+  'Archived users' => 'Gearchiveerde gebruikers',
   'Admin module. Managing system users.' => 'Beheren van de gebruikers',
   'You can\'t delete the primary administrator' => 'U kunt de primaire Administrator niet verwijderen',
   'You can\'t delete yourself' => 'U kunt zichzelf niet verwijderen',

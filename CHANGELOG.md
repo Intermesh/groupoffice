@@ -1,3 +1,20 @@
+- Core: Remember user selected language
+- Core: Remove old modules
+- Address book: Merge selected contacts
+- Smime: SMIME signed as attachment didn't show if signature was invalid
+- Core: validate / and \ in email address as it's allowed by RC822
+- Address book: increased max size for salutation column in contacts table
+
+17-10-2022: 6.6.122
+- Projects2: add approved boolean field to expense budget table
+
+14-10-2022 6.6.121
+- Billing: Align ID column in PDF to the left
+- Core: Archived user contacts moved into separate address book 'Archived users'
+- Email: Search button and account properties unreachable on some mobile resolutions
+- Leavedays: Allow decimals in special leave budget hours
+- Caldav: Some appointments broke caldav connection
+
 05-10-2022 6.6.120
 - OAuth2Client: better error handling
 - Core: Added Online / Offline events to show the user if the device is still connected to wifi.

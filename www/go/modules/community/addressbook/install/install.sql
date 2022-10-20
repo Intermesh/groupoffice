@@ -35,7 +35,7 @@ CREATE TABLE `addressbook_contact` (
   `middleName` varchar(55) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lastName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `suffixes` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Suffixes like ''Msc.''',
-  `salutation` VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `salutation` VARCHAR(382) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `gender` enum('M','F') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'M for Male, F for Female or null for unknown',
   `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `isOrganization` tinyint(1) NOT NULL DEFAULT 0,

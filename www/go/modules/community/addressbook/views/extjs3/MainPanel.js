@@ -209,6 +209,41 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			ddGroup: "addressbook",
 			multiSelectToolbarItems: [
 				{
+					iconCls: "ic-merge-type",
+					tooltip: t("Merge"),
+					handler: function() {
+						const ids = this.grid.getSelectionModel().getSelections().column('id');
+						if(ids.length < 2) {
+							Ext.MessageBox.alert(t("Error"), t("Please select at least two contacts"));
+						} else
+						{
+							Ext.MessageBox.confirm(t("Merge"), t("The selected contacts will be merged into one contact. Are you sure?"), async function(btn) {
+
+								if(btn != "yes") {
+									return;
+								}
+
+								try {
+									Ext.getBody().mask(t("Saving..."));
+									const result = await go.Db.store("Contact").merge(ids);
+									await go.Db.store("Contact").getUpdates();
+
+									setTimeout(() => {
+										const dlg = new go.modules.community.addressbook.ContactDialog();
+										dlg.load(result.id);
+										dlg.show();
+									})
+								} catch(e) {
+									Ext.MessageBox.alert(t("Error"), e.message);
+								} finally {
+									Ext.getBody().unmask();
+								}
+							}, this);
+						}
+					},
+					scope: this
+				},
+				{
 					hidden: go.customfields.CustomFields.getFieldSets('Contact').length == 0,
 					iconCls: 'ic-edit',
 					tooltip: t("Batch edit"),
@@ -503,7 +538,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 						"-",
 
 						{
-							iconCls: 'ic-content-copy',
+							iconCls: 'ic-merge-type',
 							text: t("Look for duplicates"),
 							handler: function() {
 								var win = new go.modules.community.addressbook.DuplicateDialog();
