@@ -123,44 +123,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	fireReady: function () {
 		this.fireEvent('ready', this);
 		this.ready = true;
-//		this.initLogoutTimer();
-//		GO.playAlarm('desktop-login');
 	},
-
-//	/**
-//	 * Set a timer that will automatically logout when no mouseclicks or keypresses
-//	 * @param start set the false to stop the logout timer
-//	 * @see fireReady
-//	 */
-//	initLogoutTimer: function (start) {
-//		//Does work in IE since 3-jan-2014
-//
-//		if (!GO.util.empty(GO.settings.config['session_inactivity_timeout'])) {
-//			var ms = GO.settings.config['session_inactivity_timeout'] * 1000;
-//			var delay = (function () {
-//				var timer = 0;
-//				return function (ms) {
-//					clearTimeout(timer);
-//					if (ms > 0)
-//						timer = setTimeout(function () {
-//							window.location = GO.url('core/auth/logout');
-//						}, ms);
-//				};
-//			})();
-//			var keyevent = (Ext.isIE || Ext.isWebKit || Ext.isOpera) ? 'keydown' : 'keypress';
-//			Ext.EventManager.on(document, keyevent, function () {
-//				delay(ms);
-//			});
-//			Ext.EventManager.on(document, 'click', function () {
-//				delay(ms);
-//			});
-//			this.timeout = delay;
-//			this.timeout(ms);
-//		} else {
-//			//dummy
-//			this.timeout = function (ms) {}
-//		}
-//	},
 
 	getOpenModules: function () {
 		var openModules = [];
@@ -184,7 +147,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			titlebar: false,
 			enableTabScroll: true,
 			border: false,
-//			activeTab:'go-module-panel-'+GO.settings.start_module,
 			tabPosition: 'top',
 			items: items,
 			deferedRender:true
@@ -239,7 +201,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						tp.activeTab = null;
 					}
 				}
-				//this.refreshMenu();
 				this.saveState();
 			}
 		}, this);
@@ -323,8 +284,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				pnl.routeDefault();
 			}
 		});
-		
-		//this.initModule(moduleName);
 	},
 
 	onAuthentication: function (password) {
@@ -754,15 +713,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 								}
 							},
 							scope: this
-				}
-//						,{
-//							iconCls: 'ic-connect',
-//							text:t("Connect your device"),
-//							handler: function() {
-//								var cyd;
-//							}
-//						}
-				,{
+				},{
 					iconCls: 'ic-info',
 					text: t("About {product_name}"),
 					handler: function () {
@@ -828,14 +779,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		// 	},
 		// 	scope: this
 		// }));
-
-
-
-
-
-
-
-
 		var c = go.User.capabilities['go:core:core'] || {};
 
 		this.systemSettingsWindow = new go.systemsettings.Dialog({
@@ -955,26 +898,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			// }
 		}
 	},
-//
-//	search: function (query) {
-//		if (!this.searchPanel) {
-//			this.searchPanel = new GO.grid.SearchPanel(
-//							{
-//								query: query,
-//								id: 'go-search-panel'
-//							}
-//			);
-//			this.tabPanel.add(this.searchPanel);
-//		} else
-//		{
-//			this.searchPanel.query = query;
-//			this.searchPanel.load();
-//		}
-//		this.tabPanel.unhideTabStripItem(this.searchPanel);
-//		this.searchPanel.show();
-//	},
 
-		initModule: function (moduleName) {
+	initModule: function (moduleName) {
 			if(!this.tabPanel) {
 				return false;
 			}

@@ -412,7 +412,13 @@ Ext.extend(Ext.grid.GridSummary, Ext.util.Observable, {
 });
 
 Ext.grid.GridSummary.Calculations = {
+
+  'SUM' : function(v, record, field){
+    return v + record.data[field]||0;
+  },
+
 	'sum' : function(v, record, field){
+
 		return GO.util.numberFormat(GO.util.unlocalizeNumber(v) + (GO.util.unlocalizeNumber(record.data[field])||0));
 	},
 

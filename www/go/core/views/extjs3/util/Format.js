@@ -209,6 +209,8 @@
 				// make sure value is numeric
 				value *= 1;
 			}
+
+			value = parseFloat(value);
 			
 			var dec = go.User.decimalSeparator,
 				tho = go.User.thousandsSeparator;

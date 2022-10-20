@@ -286,7 +286,7 @@ class Token extends Entity {
 	public function getUser(array $properties = []): User
 	{
 		if(!empty($properties)) {
-			return $this->user ?? User::findById($this->userId, $properties, true);
+			return $this->user ?? User::findById($this->userId, $properties, false);
 		}
 
 		if(!$this->user) {
@@ -304,7 +304,7 @@ class Token extends Entity {
 	public function setAuthenticated(): bool
 	{
 		
-		$user = $this->getUser();
+		$user = $this->getUser(['loginCount', 'lastLogin', 'language']);
 		$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
 		$user->loginCount++;
 

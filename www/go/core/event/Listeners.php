@@ -116,11 +116,13 @@ class Listeners extends Singleton {
 	 * @param string $traitUser
 	 * @param string $event
 	 * @param array $args
-	 * @return boolean
+	 * @return mixed Returns the last listener return value or false if one of the listeners explicitly returns false
 	 */
-	public function fireEvent(string $calledClass, string $traitUser, string $event, array $args): bool
+	public function fireEvent(string $calledClass, string $traitUser, string $event, array $args)
 	{
 		$this->checkInit();
+
+		$returnVal = null;
 
 		if (isset($this->listeners[$calledClass][$event])) {
 			foreach ($this->listeners[$calledClass][$event] as $listener) {	
@@ -129,6 +131,10 @@ class Listeners extends Singleton {
 				if ($return === false) {
 					App::get()->warn("Listener returned false for event " . $event . " " . var_export($listener, true));
 					return false;
+				}
+
+				if($return != null) {
+					$returnVal = $return;
 				}
 			}
 		}
@@ -142,9 +148,15 @@ class Listeners extends Singleton {
 		if($calledClass != $traitUser) { // && $event != Property::EVENT_MAPPING) {
 			$parent = get_parent_class($calledClass);
 			if($parent) {
-				return $this->fireEvent($parent, $traitUser, $event, $args);
+				$parentReturn = $this->fireEvent($parent, $traitUser, $event, $args);
+				if($parentReturn === false) {
+					return false;
+				}
+				if($parentReturn) {
+					$returnVal = $parentReturn;
+				}
 			}
 		}
-		return true;
+		return $returnVal;
 	}
 }

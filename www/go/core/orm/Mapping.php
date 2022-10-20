@@ -180,11 +180,11 @@ class Mapping {
   /**
    * Get the first table from the mapping
    *
-   * @return MappedTable
+   * @return MappedTable|null
    */
-	public function getPrimaryTable(): MappedTable
+	public function getPrimaryTable(): ?MappedTable
 	{
-		return array_values($this->tables)[0];
+		return array_values($this->tables)[0] ?? null;
 	}
 
   /**
@@ -222,7 +222,7 @@ class Mapping {
 	/**
 	 * Add has one relation
 	 *
-	 * An empty value is null and not an empty object
+	 * An empty value is null and not an empty object. Set to null to remove.
 	 *
 	 * @param string $name
 	 * @param string $propertyName
@@ -243,17 +243,16 @@ class Mapping {
 	/**
 	 * Add an array relation.
 	 *
-	 * Array's can be sorted. When the property does not have a primary key, the whole array will be deleted and rewritten
-	 * when saved. This will retain the sort order automatically.
+	 * - Array's can be sorted. When the property does not have a primary key, the whole array will be deleted and rewritten
+	 *   when saved. This will retain the sort order automatically.
+	 * - If the property does have a primary key. The client can send it along to retain it. In this case the sort order must
+	 *   be stored in an int column. The framework does this automatically when you specify this. See the $options parameter.
+	 * - The property can't be null. An empty value is an empty array.
+	 * - When updating the array property, the client must send all items. Items not included will be removed.
 	 *
-	 * If the property does have a primary key. The client can sent it along to retain it. In this case the sort order must
-	 * be stored in an int column. The framework does this automatically when you specify this. See the $options parameter.
-	 *
-	 * The propery can't be null. An empty value is an empty array.
-	 *
-	 * @param string $name
-	 * @param string $propertyName
-	 * @param array $keys
+	 * @param string $name Name of the property
+	 * @param string $propertyName The name of the Property model
+	 * @param array $keys The keys of the relation. eg. ['id' => 'articleId']
 	 * @param array $options pass ['orderBy' => 'sortOrder'] to save the sort order in this int column. This property can
 	 *   be a protected property because the client does not need to know of it's existence.
 	 *
@@ -271,11 +270,12 @@ class Mapping {
 	}
 
 	/**
-	 * Add a mapped relation. Index is the ID.
+	 * Add a mapped relation. Index is the ID of the {@see Property}.
 	 *
-	 * Map objects are unsorted!
-	 *
-	 * If the map is empty the value is null and not an empty object
+	 * - Map objects are unsorted!
+	 * - If the map is empty the value is null and not an empty object
+	 * - When updating a map the client must send the full property value. Everything that is not included will be removed.
+	 * - Setting a value to null or false will remove it from the map.
 	 *
 	 * @param string $name
 	 * @param string $propertyName
@@ -301,7 +301,7 @@ class Mapping {
 	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same
 	 * scalar relation for tracking changes.
 	 * @todo maybe this is unneeded and scalars should only be defined in one entity?
-	 * 
+	 *
 	 * eg. When a group's users[] change. It will mark all users as changed too because they have a scalar groups[] property.
 	 * 
 	 * @param string $name

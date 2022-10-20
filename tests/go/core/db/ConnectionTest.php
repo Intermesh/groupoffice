@@ -40,8 +40,7 @@ class ConnectionTest extends TestCase {
 		$contact1->addresses[0] = $a = new Address($contact1);
 
 		$a->type = Address::TYPE_POSTAL;
-		$a->street =	"Street";
-		$a->street2 = "1";
+		$a->address =	"Street 1";
 		$a->city = "Den Bosch";
 		$a->zipCode = "5222 AE";
 		$a->countryCode = "NL";

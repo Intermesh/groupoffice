@@ -11,7 +11,7 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 	minWidth : 40,
 	minHeight: 40,
 	width: dp(480),
-	height: GO.util.isMobileOrTablet() ? dp(308) : dp(260),
+	height: dp(360),
 	layout:'card',
 	title: t("Login required"),
 

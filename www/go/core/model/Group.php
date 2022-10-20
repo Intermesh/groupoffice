@@ -106,13 +106,17 @@ class Group extends AclOwnerEntity {
 						})
 					->add('inAcl',function (Criteria $criteria, $value, Query $query) {
 
-						$type = EntityType::findByName($value['entity']);
 
-						if(!empty($value['default'])) {
-							$aclId = $type->getDefaultAclId();
+						if(is_array($value)) {
+							$type = EntityType::findByName($value['entity']);
+							if (!empty($value['default'])) {
+								$aclId = $type->getDefaultAclId();
+							} else {
+								$cls = $type->getClassName();
+								$aclId = $cls::find()->selectSingleValue($cls::$aclColumnName)->where('id', '=', $value['id'])->single();
+							}
 						} else{
-							$cls = $type->getClassName();
-							$aclId = $cls::find()->selectSingleValue($cls::$aclColumnName)->where('id', '=', $value['id'])->single();
+							$aclId = $value;
 						}
 
 						//this filter doesn't actually filter but sorts the selected members on top

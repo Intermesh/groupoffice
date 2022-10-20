@@ -79,3 +79,7 @@ lang.csv
 /www/branding
 /.project
 .phpunit.result.cache
+/www/views/Extjs3/goui
+
+node_modules
+dist

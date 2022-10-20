@@ -17,6 +17,8 @@ use go\core\db\Expression;
  * @see Acl
  */
 abstract class AclOwnerEntity extends AclEntity {
+
+	use AclSetterTrait;
 	
 	/**
 	 * The ID of the {@see Acl}
@@ -24,26 +26,19 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @var int
 	 */
 	protected $aclId;
-	
-	/**
-	 * The acl entity
-	 * @var Acl 
-	 */
-	private $acl;
+
 
 	public static $aclColumnName = 'aclId';
 
 	protected function internalSave(): bool
 	{
 		
-		if($this->isNew() && !isset($this->{static::$aclColumnName})) {
+		if(!isset($this->{static::$aclColumnName})) {
 			$this->createAcl();
 		}
 
-		if(!$this->saveAcl()) {
-			return false;
-		}
-		
+		$this->saveAcl();
+
 		if(!parent::internalSave()) {
 			return false;
 		}
@@ -51,113 +46,14 @@ abstract class AclOwnerEntity extends AclEntity {
 		if($this->isNew() && isset($this->acl)) {
 			$this->acl->entityId = $this->id;
 			if(!$this->acl->save()) {
-				return false;
+				throw new SaveException($this->acl);
 			}
 		}
 
 		return true;
 	}
 
-	private $aclChanges;
 
-	/**
-	 * This is set with the new and old groupLevel values
-	 * 
-	 * @return array [groupId => [newLevel, oldLevel]]
-	 */
-	protected function getAclChanges(): array
-	{
-		return $this->aclChanges;
-	}
-
-
-	/**
-	 *
-	 * @return bool
-	 * @throws Exception
-	 */
-	private function saveAcl(): bool
-	{
-		if(!isset($this->setAcl)) {
-			return true;
-		}
-
-		$a = $this->findAcl();
-
-		foreach($this->setAcl as $groupId => $level) {
-			$a->addGroup($groupId, $level);
-		}
-		
-		$mod = $a->getModified(['groups']);
-		if(isset($mod['groups'])) {
-			$this->aclChanges = [];
-			foreach($mod['groups'][0] as $new) {
-				$this->aclChanges[$new->groupId] = [$new->level, null];
-			}
-			foreach($mod['groups'][1] as $old) {
-				if(!isset($this->aclChanges[$old->groupId])) {
-					$this->aclChanges[$old->groupId] = [null, $old->level];
-				} else {
-					$this->aclChanges[$old->groupId][1] = $old->level;
-				}
-			}
-		}
-
-		return $a->save();
-	}
-
-	/**
-	 * Returns an array with group ID as key and permission level as value.
-	 *
-	 * @return array eg. ["2" => 50, "3" => 10]
-	 * @throws Exception
-	 */
-	public function getAcl(): ?array
-	{
-		$a = $this->findAcl();
-
-		if(empty($a->groups)) {
-			//return null because an empty array is serialzed as [] instead of {}
-			return null;
-		}
-		
-		$acl = [];
-		if($a) {
-			foreach($a->groups as $group) {
-				$acl[$group->groupId] = $group->level;
-			}
-		}
-
-		return $acl;
-	}
-
-	protected $setAcl;
-
-	/**
-	 * Set the ACL
-	 * 
-	 * @param array $acl An array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
-	 * 
-	 * @example
-	 * ```
-	 * $addressBook->setAcl([
-	 * 	Group::ID_INTERNAL => Acl::LEVEL_DELETE
-	 * ]);
-	 * ```
-	 */
-	public function setAcl(array $acl)
-	{
-		$this->setAcl = $acl;		
-	}
-
-	/**
-	 * Check if the ACL was modified
-	 *
-	 * @return bool
-	 */
-	public function isAclModified() : bool{
-		return isset($this->setAcl);
-	}
 
 	/**
 	 * @throws Exception
@@ -184,6 +80,11 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 
 		$this->{static::$aclColumnName} = $this->acl->id;
+	}
+
+	protected function isAclChanged()
+	{
+		return $this->isModified([static::$aclColumnName]);
 	}
 
 
@@ -279,34 +180,18 @@ abstract class AclOwnerEntity extends AclEntity {
 
 	}
 
-	/**
-	 * Get the ACL entity
-	 *
-	 * @return Acl
-	 * @throws Exception
-	 */
-	public function findAcl(): ?Acl
-	{
-		if(empty($this->{static::$aclColumnName})) {
-			return null;
-		}
-		if(!isset($this->acl)) {
-			$this->acl = Acl::internalFind()->where(['id' => $this->{static::$aclColumnName}])->single();
-		}
-		
-		return $this->acl;
-	}
+
 	
 	/**
 	 * Get the permission level of the current user
 	 * 
 	 * @return int
 	 */
-	public function getPermissionLevel(): int
+	protected function internalGetPermissionLevel() : int
 	{
 
-		if($this->isNew()) {
-			return parent::getPermissionLevel();
+		if($this->isNew() && !$this->{static::$aclColumnName}) {
+			return parent::internalGetPermissionLevel();
 		}
 
 		if(!isset($this->permissionLevel)) {
@@ -367,7 +252,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	{
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
-		return (new Query)->selectSingleValue(static::$aclColumnName)->from($firstTable->getName());
+		return (new Query)->selectSingleValue(static::$aclColumnName)->distinct()->from($firstTable->getName());
 	}
 	
 	public function findAclId(): ?int {
@@ -385,7 +270,6 @@ abstract class AclOwnerEntity extends AclEntity {
 
 	/**
 	 * Check database integrity
-	 * @throws Exception
 	 * @throws Exception
 	 */
 	public static function check()
@@ -407,6 +291,13 @@ abstract class AclOwnerEntity extends AclEntity {
 	}
 
 	/**
+	 * Executed when a database check is performed
+	 *
+	 * It registers the table and for which entity the acl is used and updates the ownedBy from
+	 * createdBy if present.
+	 *
+	 * When ACL's are no longer used they may be cleaned up.
+	 *
 	 * @throws Exception
 	 */
 	public static function checkAcls() {
@@ -440,15 +331,31 @@ abstract class AclOwnerEntity extends AclEntity {
 			$updates['acl.ownedBy'] = new Expression('coalesce(entity.createdBy, 1)');
 		}
 
+		$updateQuery = static::getCheckAclUpdateQuery();
+
 		$stmt = go()->getDbConnection()->update(
 			'core_acl',
 			$updates,
-			(new Query())
-				->tableAlias('acl')
-				->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id'));
+			$updateQuery);
 
 		if(!$stmt->execute()) {
 			throw new Exception("Could not update ACL");
 		}
 	}
+
+	/**
+	 * Builds the query to update ACL's on the database check
+	 *
+	 * @return Query
+	 * @throws Exception
+	 */
+	protected static function getCheckAclUpdateQuery(): Query
+	{
+		$table = static::getMapping()->getPrimaryTable();
+		$updateQuery = 	(new Query())
+			->tableAlias('acl')
+			->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id');
+		return $updateQuery;
+	}
+
 }

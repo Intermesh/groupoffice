@@ -44,6 +44,11 @@ class Search extends AclOwnerEntity {
 		return parent::check();
 	}
 
+	protected function createAcl()
+	{
+		// don't for search
+	}
+
 	protected static function checkAcl()
 	{
 		//don't call parent as it's messes up core_acl references!

@@ -2,6 +2,7 @@
 namespace go\core\util;
 
 use Exception;
+use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\model\PdfTemplate;
 use go\core\TemplateParser;
@@ -59,6 +60,7 @@ class PdfTemplateRenderer extends PdfRenderer {
 		$orientation = $this->template->landscape ? 'L' : 'P';
 
 		$this->parser = new TemplateParser();
+		$this->parser->addModel('template', $this->template);
 		foreach($templateModels as $name => $model) {
 			$this->parser->addModel($name, $model);
 		}
@@ -79,6 +81,34 @@ class PdfTemplateRenderer extends PdfRenderer {
 				$this->tplIdx[$i] = $this->importPage($i);
 			}
 		}
+
+		$this->allowLocalFiles = true;
+
+		$logo = $this->template->getLogo();
+		if($logo) {
+			$this->parser->addModel("logo", "file://" . $logo->getFile()->getPath());
+		}
+
+	}
+
+	public function getTemplate(): PdfTemplate
+	{
+		return $this->template;
+	}
+
+	/**
+	 * <tcpdf method="logo"></tcpdf>
+	 * @return void
+	 */
+	protected function logo() {
+		$blob = $this->template->getLogo();
+		if(!$blob) {
+			return;
+		}
+
+		$img = $this->Image($blob->getFile()->getPath());
+
+		$b = $this->getImageBuffer($img);
 	}
 
 	/**
@@ -140,59 +170,65 @@ class PdfTemplateRenderer extends PdfRenderer {
 	 */
 	public function render() {
 
-		$this->AddPage();
+		try {
+			$this->AddPage();
 
-		$currentX = $this->getX();
-		$currentY = $this->getY();
+			$currentX = $this->getX();
+			$currentY = $this->getY();
 
 
-		foreach($this->template->blocks as $block) {
+			foreach ($this->template->blocks as $block) {
 
-			$this->normal();
+				$this->normal();
 
-			if(isset($block->x)) {
-				$this->setX($block->x);
-			}
+				if (isset($block->x)) {
+					$this->setX($block->x);
+				}
 
-			if(isset($block->y)) {
-				$this->setY($block->y);
-			}
+				if (isset($block->y)) {
+					$this->setY($block->y);
+				}
 
-			if(!isset($block->width)) {
-				$block->width = $this->w-$this->lMargin - $this->rMargin;
-			}
+				if (!isset($block->width)) {
+					$block->width = $this->w - $this->lMargin - $this->rMargin;
+				}
 
-			if($this->previewMode) {
-				$block->type = 'text';
-			}
-			$method = 'renderBlock'.$block->type;
-
-			if(!method_exists($this, $method)) {
-				if($this->previewMode) {
+				if ($this->previewMode) {
 					$block->type = 'text';
-					$method = 'renderBlock'.$block->type;
+				}
+				$method = 'renderBlock' . $block->type;
+
+				if (!method_exists($this, $method)) {
+					if ($this->previewMode) {
+						$block->type = 'text';
+						$method = 'renderBlock' . $block->type;
+					} else {
+						throw new Exception("Invalid block tag " . $block->type);
+					}
+				}
+
+				$this->setCellPaddings(0, 0, 0, 0);
+				$this->normal();
+
+				$this->$method($block);
+
+				if (isset($block->x)) {
+					$this->setX($currentX);
 				} else {
-					throw new Exception("Invalid block tag ".$block->type);
+					$currentX = $this->getX();
+				}
+
+				if (isset($block->y)) {
+					$this->setY($currentY);
+				} else {
+					$currentY = $this->getY();
 				}
 			}
-
-			$this->setCellPaddings(0,0,0,0);
-			$this->normal();
-
-			$this->$method($block);
-
-			if(isset($block->x)) {
-				$this->setX($currentX);
-			}else
-			{
-				$currentX = $this->getX();
-			}
-
-			if(isset($block->y)) {
-				$this->setY($currentY);
-			}else
-			{
-				$currentY = $this->getY();
+		}
+		catch(\Exception $e) {
+			$this->MultiCell($this->w - $this->lMargin - $this->rMargin,  14,  ErrorHandler::logException($e), 0, "L");
+			if(go()->getDebugger()->enabled) {
+				$this->MultiCell($this->w - $this->lMargin - $this->rMargin, 14, $e->getTraceAsString(), 0, "L");
 			}
 		}
 		return parent::render();

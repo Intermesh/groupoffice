@@ -27,21 +27,9 @@ class Module extends core\Module
 	public function defineListeners()
 	{
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'garbageCollection');
-		Entity::on(Entity::EVENT_ALERT_PROPS, static::class, 'onAlertProps');
 
 	}
 
-	public static function onAlertProps(Entity $entity, core\model\Alert $alert, $props)
-	{
-		if ($alert->tag != "comment") {
-			return;
-		}
-		$data = $alert->getData();
-
-		$creator = core\model\UserDisplay::findById($data->createdBy, ['displayName']);
-
-		$props['body'] = str_replace("{creator}", $creator ? $creator->displayName : go()->t("Unknown"), go()->t("A comment was made by {creator}", "community", "comments")) . ": <br /><br />\n\n<i>" . $alert->getData()->excerpt . "</i>";
-	}
 
 	protected function beforeInstall(\go\core\model\Module $model): bool
 	{

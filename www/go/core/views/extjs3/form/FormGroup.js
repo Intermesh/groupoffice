@@ -66,7 +66,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	// When mapKey is set we remember the keys of properties that are going to be deleted here
 	markDeleted: [],
 
-	startWithItem: true,
+	startWithItem: false,
+
+	required: false,
 
 	/**
 	 * Enable sorting by drag and drop
@@ -91,7 +93,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		this.itemCfg.isFormField = false;
 		this.markDeleted = [];
 		this.itemCfg.columnWidth = 1;
-		
+
+		if(this.required) {
+			this.startWithItem = true;
+		}
+
 		if(!this.itemCfg.xtype) {
 			this.itemCfg.xtype = "formcontainer";
 		}
@@ -103,10 +109,17 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 
 		this.on("add",function(e) {
+
+			this.updateCls();
+
 			//to prevent adding to Ext.form.BasicForm with add event.
 			//Cancels event bubbling
 			return false;
-		});
+		}, this);
+
+		this.on('remove', function() {
+			this.updateCls();
+		}, this);
 
 		go.form.FormGroup.superclass.initComponent.call(this);
 	},
@@ -119,12 +132,36 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		if(this.startWithItem && this.items.getCount() == 0) {
 			this.addPanel(true);
 		}
+
+		this.updateCls();
+	},
+
+	updateCls : function() {
+		if(!this.rendered) {
+			return;
+		}
+
+		const hasMultiple = this.getEl().hasClass("multiple");
+		const shouldMultiple = this.items.getCount() > 1;
+
+		this.required ? this.getEl().addClass('required') : this.getEl().removeClass('required');
+
+		if(hasMultiple != shouldMultiple) {
+			if(shouldMultiple) {
+				this.getEl().addClass('multiple')
+			} else {
+				this.getEl().removeClass('multiple')
+			}
+
+			this.doLayout();
+
+		}
 	},
 
 	initSortable : function() {
 		var me = this;
 		this.dropZone = new Ext.dd.DropZone(this.getEl(), {
-			ddGroup: "form-group-sortable",
+			ddGroup: "form-group-sortable-" + this.getId(),
 			getTargetFromEvent: function(e) {
 				return e.getTarget('.go-form-group-row');
 			},
@@ -204,12 +241,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				//iconCls: this.addButtonIconCls,
 				text: this.addButtonText || this.btnCfg.text || t("Add"),
 				handler: function() {
-					var wrap = this.addPanel();
-					this.doLayout();
-					
-					wrap.formField.focus();
-
-					this.fireEvent("newitem", this, wrap);
+					this.addRow();
 				
 				},
 				scope: this
@@ -233,6 +265,15 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		}
 //		return false;
 //	},
+
+	addRow : function(auto) {
+		var wrap = this.addPanel(auto);
+		this.doLayout();
+
+		wrap.formField.focus();
+
+		this.fireEvent("newitem", this, wrap);
+	},
 	
 	createNewItem : function(auto) {
 		var item = Ext.ComponentMgr.create(this.itemCfg);
@@ -242,10 +283,26 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 
 		item.auto = auto;
+
+
 		
 		return item;
 	},
-	
+
+	checkForNewRow : function(focusCatcher, e) {
+
+		const c = focusCatcher.findParentByType("formgroupitemcontainer");
+
+		if(c.rowIndex == this.items.length - 1 && c.formField.isDirty()) {
+
+			this.addRow(true);
+		} else
+		{
+			c.items.get('edit-tb').items.get('del-btn').focus();
+		}
+
+	},
+
 	each : function(fn, scope){
 		var items = [].concat(this.items.items); // each safe for removal
 		for(var i = 0, len = items.length; i < len; i++){
@@ -262,25 +319,51 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	addPanel : function(auto, index) {
 		var formField = this.createNewItem(auto), me = this, items = [formField], delBtn = new Ext.Button({
 			//disabled: formField.disabled,
+			itemId: 'del-btn',
 			xtype: "button",
 			cls: "small",
+			flex: 1,
 			iconCls: 'ic-delete',
 			handler: function() {
-				if(this.ownerCt.formField.key) {
-					me.markDeleted.push(this.ownerCt.formField.key);
+				if(this.ownerCt.ownerCt.formField.key) {
+					me.markDeleted.push(this.ownerCt.ownerCt.formField.key);
 				}
-				this.ownerCt.destroy();
+				this.ownerCt.ownerCt.destroy();
 				me.dirty = true;
 			}
 		}),
 			rowId  = Ext.id();
 
+		if(this.startWithItem) {
+			const focusCatch = new Ext.form.TextField({
+				submit: false,
+				width: 0,
+				height: 0,
+				style: "padding: 0; border:0"
+			})
+
+			focusCatch.on('focus', this.checkForNewRow, this);
+			items.push(focusCatch);
+		}
+
 		if(this.editable) {
-			items.push(delBtn);
+
+			const editTB = new Ext.Container({
+				itemId: 'edit-tb',
+				cls: 'go-form-group-edit-tb',
+				layout: {
+					type: "hbox",
+					align: "middle"
+				},
+				items: [delBtn]
+			});
+
+			items.push(editTB);
 
 			if(this.sortable) {
 				var dragHandle = this.createDragHandle(rowId);
-				items.push(dragHandle);
+				editTB.add(dragHandle);
+				editTB.setWidth(dp(80));
 			}
 		}
 
@@ -310,6 +393,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			tooltip: t("Drag to sort"),
 			rowId: rowId,
 			tabIndex: -1,
+			flex: 1,
 			listeners: {
 				scope: this,
 				destroy: function(cmp) {
@@ -357,7 +441,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		if(this.dirty) {
 			return true;
 		}
-		
+
 		var dirty = false;
 		this.items.each(function(wrap) {
 			if(wrap.formField.isDirty()) {
@@ -394,9 +478,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			records.forEach(set);
 		}
 
-		if(this.startWithItem) {
-			this.addPanel(true);
-		}
+		// if(this.startWithItem) {
+		// 	this.addPanel(true);
+		// }
 
 		this.doLayout();
 	},
@@ -443,9 +527,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 		var f = this.getAllFormFields();
 
-
 		for(var i = 0, l = f.length; i < l; i++) {
-			if(!(i == (l - 1) && f[i].auto && !f[i].isDirty()) && !f[i].isValid(preventMark)) {
+			if(i == (l - 1) && f[i].auto && !f[i].isDirty()) {
+				//skip auto new fields if not dirty
+				continue;
+			}
+
+			if(!f[i].isValid(preventMark)) {
 				return false;
 			}
 		}
@@ -470,7 +558,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		var f = this.getAllFormFields();
 
 		for(var i = 0, l = f.length; i < l; i++) {
-			if(!(i == (l - 1) && f[i].auto && !f[i].isDirty()) && !f[i].validate()) {
+
+			if(i == (l - 1) && f[i].auto && !f[i].isDirty()) {
+				//skip auto new fields if not dirty
+				continue;
+			}
+
+			if(!f[i].validate()) {
 					return false;
 			}
 		}

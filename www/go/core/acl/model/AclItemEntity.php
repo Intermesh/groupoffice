@@ -217,7 +217,7 @@ abstract class AclItemEntity extends AclEntity {
 //				"` was already joined with alias `" .  $column->table->getAlias() .
 //				"` in class " . static::class . ". If you joined this table via defineMapping() then override the method joinAclEntity() and return '" . $column->table->getAlias() . '.' . $cls::$aclColumnName ."'.") ;
 //		}
-		
+
 		//If this is another AclItemEntity then recurse
 		if(is_a($cls, AclItemEntity::class, true)) {
 			return $cls::joinAclEntity($query,  $column->table->getAlias());
@@ -263,10 +263,11 @@ abstract class AclItemEntity extends AclEntity {
 	/**
 	 * Get the entity that holds the acl id.
 	 *
+	 * Link and Search return ActivRecord.
 	 * @return Entity|ActiveRecord
 	 * @throws Exception
 	 */
-	protected function getAclEntity()
+	public function findAclEntity()
 	{
 		$cls = static::aclEntityClass();
 		$stmt = go()->getDbConnection()->getCachedStatment($cls.'.getAclEntity');
@@ -321,7 +322,13 @@ abstract class AclItemEntity extends AclEntity {
 		return $aclEntity;
 	}
 
-	private function isAclChanged()
+	protected static function internalRequiredProperties() : array
+	{
+		return array_keys(static::aclEntityKeys());
+	}
+
+
+	protected function isAclChanged()
 	{
 		return $this->isModified(array_keys(static::aclEntityKeys()));
 	}
@@ -339,14 +346,14 @@ abstract class AclItemEntity extends AclEntity {
 	 * @inheritDoc
 	 * @throws Exception
 	 */
-	public function getPermissionLevel(): int
+	protected function internalGetPermissionLevel(): int
 	{
 		if((go()->getAuthState() && go()->getAuthState()->isAdmin())) {
 			return Acl::LEVEL_MANAGE;
 		}
 
 		if(!isset($this->permissionLevel)) {
-			$aclEntity = $this->getAclEntity();
+			$aclEntity = $this->findAclEntity();
 
 			$this->permissionLevel = $aclEntity->getPermissionLevel();
 		}
@@ -379,7 +386,7 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	public function findAclId(): ?int
 	{
-		return $this->getAclEntity()->findAclId();
+		return $this->findAclEntity()->findAclId();
 	}
 
 }

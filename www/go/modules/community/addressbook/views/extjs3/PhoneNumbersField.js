@@ -16,9 +16,12 @@
 		addButtonIconCls: 'ic-phone',
 		itemCfg: {
 			items: [{
-				xtype: "compositefield",
-				hideLabel: true,
+				anchor: "100%",
+				layout: "form",
+				xtype: "container",
+				cls: "go-hbox",
 				items: [{
+					fieldLabel: t("Type"),
 					xtype: 'combo',
 					name: 'type',
 					mode: 'local',
@@ -33,6 +36,7 @@
 					},
 					value: "work"
 				}, {
+					fieldLabel: t("Number"),
 					flex: 1,
 					xtype: "textfield",
 					allowBlank: false,

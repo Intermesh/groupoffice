@@ -23,11 +23,13 @@ go.form.SelectField = Ext.extend(go.form.ComboBox, {
 
     initComponent : function(){
 
-        this.store = new Ext.data.ArrayStore({
-            fields: ['value', 'text'],
-            id: 'value',
-            data: this.options
-        });
+        if(!this.store) {
+            this.store = new Ext.data.ArrayStore({
+                fields: ['value', 'text'],
+                id: 0,
+                data: this.options
+            });
+        }
 
         go.form.SelectField.superclass.initComponent.call(this);
     }

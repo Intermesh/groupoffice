@@ -337,6 +337,9 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		
 		if(this.store &&this.store.entityStore) {
 			filters = go.util.Filters.parseQueryString(v, this.store.entityStore.entity.filters);	
+		} else
+		{
+			filters = {text: v};
 		}
 		
 		this.fireEvent('search', this, v, filters);

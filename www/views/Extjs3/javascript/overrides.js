@@ -16,6 +16,10 @@ Ext.override(Ext.data.Connection, {
 	timeout: 180000
 });
 
+Ext.override(Ext.form.TimeField, {
+	width: dp(160)
+});
+
 /**
  * Density Independend pixel calculation
  * 
@@ -54,8 +58,14 @@ function dp(size) {
 
 	var componentInitComponent = Ext.Component.prototype.initComponent;
 
-	Ext.override(Ext.Component, {  
-			
+	Ext.override(Ext.Component, {
+
+		/**
+		 * For GOUI
+		 */
+		fire: function() {
+			Ext.Component.prototype.fireEvent.apply(this, arguments);
+		},
 
 		initComponent : function() {
 			componentInitComponent.call(this);			
@@ -355,28 +365,8 @@ Ext.override(Ext.form.TriggerField,{
 		}
 	},
 
-	onResize: function(w, h){
-		Ext.form.TriggerField.superclass.onResize.call(this, w, h);
-		var tw = this.getTriggerWidth();
-		if(Ext.isNumber(w)){
-			this.el.setWidth(w - tw);
-		}
-		this.wrap.setWidth(w + tw);
-	},
 	
-	 onRender : function(ct, position){
-        this.doc = Ext.isIE ? Ext.getBody() : Ext.getDoc();
-        Ext.form.TriggerField.superclass.onRender.call(this, ct, position);
 
-        this.wrap = this.el.wrap({cls: 'x-form-field-wrap x-form-field-trigger-wrap'});
-        this.trigger = this.wrap.createChild(this.triggerConfig ||
-                {tag: "button", type: "button", tabindex: "-1", cls: "x-form-trigger " + this.triggerClass});
-        this.initTrigger();
-        if(!this.width){
-            this.wrap.setWidth(this.el.getWidth()+this.getTriggerWidth());
-        }
-        this.resizeEl = this.positionEl = this.wrap;
-    },
 	 getTriggerWidth: function(){
 		 return 0;
 	 }
@@ -482,7 +472,7 @@ Ext.override(Ext.FormPanel,{
 		var focFn = function() {
 			if(!GO.util.isMobileOrTablet()) {
 				var firstField = this.getForm().items.find(function (item) {
-					if (!item.disabled && item.isVisible())
+					if (!item.disabled && item.isVisible() && go.util.empty(item.getValue()))
 						return true;
 				});
 

@@ -1211,3 +1211,58 @@ $updates['202207041200'][] = "alter table core_customfields_field_set
         foreign key (parentFieldSetId) references core_customfields_field_set (id)
             on delete set null;";
 
+
+
+
+
+
+// Start 6.7
+$updates['202207041200'][] = "alter table core_pdf_block modify x int null;";
+
+$updates['202207041200'][] = "alter table core_pdf_block modify y int null;";
+
+$updates['202207041200'][] = "alter table core_pdf_block modify width int null;";
+
+$updates['202207041200'][] = "alter table core_pdf_block modify height int null;";
+
+$updates['202207041200'][] = "alter table core_pdf_template
+	add `key` varchar(20) default null null after moduleId;";
+
+
+$updates['202207041200'][] = "drop index name on core_email_template;";
+
+
+$updates['202207041200'][] = "create unique index core_email_template_moduleId_key_uindex
+    on core_email_template (moduleId, `key`);";
+
+
+$updates["202209010941"][] = "TRUNCATE TABLE go_state"; //for fixed non resizable columns getting 100px width
+
+
+$updates["202209051226"][] = "alter table core_pdf_template
+    add logoBlobId binary(40) null after stationaryBlobId;";
+
+$updates["202209051226"][] = "alter table core_pdf_template
+    add constraint core_pdf_template_core_blob_id_fk
+        foreign key (logoBlobId) references core_blob (id);";
+
+
+$updates["202209121148"][] = "alter table core_email_template
+    drop foreign key core_email_template_ibfk_1;";
+
+$updates["202209121148"][] = "alter table core_email_template
+    drop column aclId;";
+
+$updates["202209121148"][] = "create index core_pdf_template_key_index
+    on core_pdf_template (moduleId, `key`);";
+
+
+$updates["202209121148"][] = "alter table core_email_template
+    drop key core_email_template_moduleId_key_uindex;";
+
+$updates["202209121148"][] = "create index core_email_template_moduleId_key_index
+    on core_email_template (moduleId, `key`);";
+
+
+$updates["202209121148"][] = "alter table core_change
+    modify entityId varchar(100) collate ascii_bin not null;";

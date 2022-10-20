@@ -6,6 +6,7 @@ use ErrorException;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\model\CronJobSchedule;
 use go\core\model\OauthAccessToken;
 use go\core\model\RememberMe;
 use go\core\util\DateTime;
@@ -35,9 +36,15 @@ class GarbageCollection extends CronJob {
 
 	use EventEmitterTrait;
 
+	/**
+	 * Fires when the garbage collection job runs
+	 */
 	const EVENT_RUN = 'run';
-	
-	public function run(\go\core\model\CronJobSchedule $schedule) {
+
+	/**
+	 * @throws Exception
+	 */
+	public function run(CronJobSchedule $schedule) {
 		$this->blobs();
 		$this->change();
 		$this->links();

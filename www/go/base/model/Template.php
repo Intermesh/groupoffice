@@ -165,8 +165,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		
 			$a = $company->findAddressByType(\go\modules\community\addressbook\model\Address::TYPE_VISIT, true);
 			if($a) {				
-				$attributes[$tagPrefix . 'address'] = $a->street;
-				$attributes[$tagPrefix . 'address_no'] = $a->street2;
+				$attributes[$tagPrefix . 'address'] = $a->address;
+				$attributes[$tagPrefix . 'address_no'] = "";
 				$attributes[$tagPrefix . 'zip'] = $a->zipCode;
 				$attributes[$tagPrefix . 'country'] = $a->country;
 				$attributes[$tagPrefix . 'state'] = $a->state;
@@ -177,8 +177,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			
 			$a = $company->findAddressByType(\go\modules\community\addressbook\model\Address::TYPE_POSTAL, true);
 			if($a) {				
-				$attributes[$tagPrefix . 'post_address'] = $a->street;
-				$attributes[$tagPrefix . 'post_address_no'] = $a->street2;
+				$attributes[$tagPrefix . 'post_address'] = $a->address;
+				$attributes[$tagPrefix . 'post_address_no'] = "";
 				$attributes[$tagPrefix . 'post_zip'] = $a->zipCode;
 				$attributes[$tagPrefix . 'post_country'] = $a->country;
 				$attributes[$tagPrefix . 'post_state'] = $a->state;
@@ -224,8 +224,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			if(isset($contact->addresses[0])) {
 				$a = $contact->addresses[0];
 
-				$attributes[$tagPrefix . 'address'] = $a->street;
-				$attributes[$tagPrefix . 'address_no'] = $a->street2;
+				$attributes[$tagPrefix . 'address'] = $a->address;
+				//$attributes[$tagPrefix . 'address_no'] = "";//$a->street2;
 				$attributes[$tagPrefix . 'zip'] = $a->zipCode;
 				$attributes[$tagPrefix . 'country'] = $a->country;
 				$attributes[$tagPrefix . 'city'] = $a->city;

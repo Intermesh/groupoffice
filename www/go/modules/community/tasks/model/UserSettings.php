@@ -59,9 +59,9 @@ class UserSettings extends Property {
 			return null;
 		}
 
-		$tasklist = Tasklist::find()->where('createdBy', '=', $this->userId)->single();
+		$tasklist = TaskList::find()->where('createdBy', '=', $this->userId)->single();
 		if(!$tasklist) {
-			$tasklist = new Tasklist();
+			$tasklist = new TaskList();
 			$tasklist->createdBy = $this->userId;
 			$tasklist->name = User::findById($this->userId, ['displayName'])->displayName;
 			if(!$tasklist->save()) {
@@ -71,7 +71,14 @@ class UserSettings extends Property {
 
 		if($tasklist) {
 			$this->defaultTasklistId = $tasklist->id;
-			go()->getDbConnection()->update("tasks_user_settings", ['defaultTasklistId' => $this->defaultTasklistId], ['userId' => $this->userId])->execute();
+
+			//when coming here the models might be read only so we use this query
+			$stmt = go()->getDbConnection()->update("tasks_user_settings", ['defaultTasklistId' => $this->defaultTasklistId], ['userId' => $this->userId]);
+			$stmt->execute();
+			if(!$stmt->rowCount()) {
+				$stmt = go()->getDbConnection()->insertIgnore("tasks_user_settings", ['defaultTasklistId' => $this->defaultTasklistId, 'userId' => $this->userId]);
+				$stmt->execute();
+			}
 		}
 
 		return $this->defaultTasklistId;
@@ -100,7 +107,7 @@ class UserSettings extends Property {
 	 */
 	public function setLastTasklistIds(?array $ids = null)
 	{
-		if (is_array($ids) && count($ids) > 0) {
+		if (is_array($ids)) {
 			$this->lastTasklistIds = JSON::encode($ids);
 		} else {
 			$this->lastTasklistIds = '';

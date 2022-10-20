@@ -26,10 +26,7 @@ class Module extends \go\core\Module
         return 'info@michalcharvat.cz';
     }
 
-    /**
-     * @return \go\modules\community\dokuwiki\model\Settings|null
-     */
-    public function getSettings(): ?\go\core\Settings
+    public function getSettings()
     {
         return Settings::get();
     }

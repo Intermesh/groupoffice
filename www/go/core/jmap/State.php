@@ -160,35 +160,6 @@ class State extends AbstractState {
 		}
 	}
 
-	/** @noinspection HttpUrlsUsage */
-	protected function getBaseUrl(): string
-	{
-		$url = Request::get()->isHttps() ? 'https://' : 'http://';
-		$url .= Request::get()->getHost(false) . dirname($_SERVER['PHP_SELF']);
-		return $url;
-	}
-
-	public function getPageUrl(): string
-	{
-		return $this->getBaseUrl(). "/page.php";
-	}
-	
-	public function getApiUrl(): string
-	{
-		return $this->getBaseUrl() . '/jmap.php';
-	}
-	
-	public function getUploadUrl(): string
-	{
-		return $this->getBaseUrl(). '/upload.php';
-	}
-	
-	public function getEventSourceUrl(): ?string
-	{
-		return go()->getConfig()['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
-	}
-
-
 	/**
 	 *
 	 */

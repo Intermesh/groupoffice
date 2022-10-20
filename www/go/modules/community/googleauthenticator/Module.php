@@ -2,9 +2,12 @@
 namespace go\modules\community\googleauthenticator;
 
 use go\core;
+use go\core\fs\Blob;
+use go\core\fs\File;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\Settings;
+use go\core\util\QRcode;
 use go\modules\community\googleauthenticator\model;
 use go\core\model\Group;
 use go\core\model\Module as ModuleModel;
@@ -53,8 +56,31 @@ class Module extends core\Module {
 	}
 
 
-	public function getSettings(): ?Settings
+	public function getSettings()
 	{
 		return model\Settings::get();
 	}
+
+
+	/**
+	 * Get the blob id of the QR code image
+	 *
+	 * @param string $name
+	 * @param string $secret
+	 * @param string $title
+	 * @param array $params
+	 *
+	 * @return boolean/string
+	 */
+	public function downloadQr() {
+
+		$user = go()->getAuthState()->getUser();
+
+		header("Content-Type: image/png");
+
+		$user->googleauthenticator->outputQr();
+
+
+	}
+
 }

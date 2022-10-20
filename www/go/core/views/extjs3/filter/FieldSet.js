@@ -2,6 +2,12 @@ go.filter.FieldSet = Ext.extend(Ext.form.FieldSet, {
 	title: t("Conditions"),
 	entity: null,
 
+	setEntity: function (name) {
+		this.entity = name;
+		this.filterConditions.setEntity(name);
+		this.conditionsField.reset();
+	},
+
 	initComponent: function () {		
 
 		this.items = [
@@ -27,11 +33,11 @@ go.filter.FieldSet = Ext.extend(Ext.form.FieldSet, {
 								inputValue: "NOT",
 								boxLabel: t("Match NONE of the conditions")
 							}]
-					}, {
+					}, this.filterConditions = new go.filter.Conditions({
 						xtype: "filterconditions",
 						name: "conditions",
 						entity: this.entity
-					}
+					})
 				]
 			})
 		];

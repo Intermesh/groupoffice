@@ -26,7 +26,7 @@ GO.email.SelectAccount = function (config) {
 	Ext.apply(config, {
 		fieldLabel: t("E-mail Account", "email"),
 		anchor:'-20',
-		emptyText:t("Please select..."),
+
 		store: new GO.data.JsonStore({
 			url: GO.url("email/account/store"),
 			fields: ['id', 'username'],
@@ -47,6 +47,9 @@ GO.email.SelectAccount = function (config) {
 
 }
 Ext.extend(GO.email.SelectAccount, GO.form.ComboBox, {
+	emptyText:t("Please select..."),
+	fieldLabel: t("E-mail Account", "email"),
+	anchor:'-20',
 	setValue: function (id) {
 
 		if (!id) {
@@ -109,3 +112,4 @@ Ext.extend(GO.email.SelectAccount, GO.form.ComboBox, {
 
 
 
+Ext.reg(	'emailaccountcombo', GO.email.SelectAccount );

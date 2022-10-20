@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `history_log_entry` (
   `aclId` INT NULL,
   `removeAcl` TINYINT(1) NOT NULL DEFAULT 0,
   `entityTypeId` INT NOT NULL,
-  `entityId` INT DEFAULT NULL,
+    `entityId` varchar(100) collate ascii_bin default null,
   `remoteIp` varchar(50) null,
   `requestId` varchar(190) default null,
   PRIMARY KEY (`id`),

@@ -195,7 +195,6 @@ go.data.StoreTrait = {
 	onChanges : function(entityStore, added, changed, destroyed) {
 
 		// console.info(entityStore.entity.name, added, changed, destroyed);
-
 		if(!this.loaded || this.loading || !this.lastOptions) {
 			return;
 		}		
@@ -221,6 +220,7 @@ go.data.StoreTrait = {
 		}
 
 		destroyed.forEach((id) =>{
+
 			const record = this.getById(id);
 			if(record) {
 				this.remove(record);

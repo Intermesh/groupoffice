@@ -2,7 +2,11 @@
 
 namespace go\core\mail;
 
+use Exception;
+use GO;
+use GO\Base\Fs\File;
 use go\core\fs\Blob;
+use Swift_ByteStream_FileByteStream;
 
 /**
  * A mail message to send
@@ -59,8 +63,8 @@ class Message extends \Swift_Message {
 	 * @param Blob $blob
 	 * @return static
 	 */
-	public function addBlob(Blob $blob) {
-		$this->attach(Attachment::fromBlob($blob)->setFilename($blob->name));
+	public function addBlob(Blob $blob, $name = null) {
+		$this->attach(Attachment::fromBlob($blob)->setFilename($name ?? $blob->name));
 		return $this;
 	}
 
@@ -69,6 +73,26 @@ class Message extends \Swift_Message {
 	 */
 	public function getMailer() {
 		return $this->mailer;
+	}
+
+
+	public function toTmpFile($path = null): File
+	{
+		if(!isset($path)) {
+			$path = 'email/' . date('mY') . '/sent_' . go()->getAuthState()->getUserId() . '-' . uniqid(time()) . '.eml';
+		}
+
+		$file = new File(GO::config()->file_storage_path . $path);
+		$file->parent()->create();
+
+		$fbs = new Swift_ByteStream_FileByteStream($file->path(), true);
+		$this->toByteStream($fbs);
+
+		if (!$file->exists()) {
+			throw new Exception("Failed to save email to file!");
+		}
+
+		return $file;
 	}
 
 }

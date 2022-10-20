@@ -15,32 +15,54 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	hideMenuButton: false,
 	filteredStore: null,
 	filterName: null,
+	selectFirst: false,
+	saveSelection: false,
+	selectAllButton: false,
+	singleSelect: false,
 	initComponent: function () {
 
 		const actions = this.initRowActions();
 
 		this.plugins = [actions];
+		if(this.singleSelect) {
+			this.selModel = new Ext.grid.RowSelectionModel({singleSelect: true});
+		} else
+		{
+			this.selModel = new Ext.grid.CheckboxSelectionModel();
+		}
 
-		this.selModel = new Ext.grid.CheckboxSelectionModel();
 
-		const tbar = {
-			xtype: "container",
-			items: [
-				{
-					items: this.tbar,
-					xtype: 'toolbar'
-				},
-				this.selectAllToolbar = new Ext.Toolbar({
-					items: [{xtype: "selectallcheckbox"}]
-				})
-			]
-		};
+		if(this.selectAllButton && !this.singleSelect) {
+			this.selectAllToolbar = new Ext.Toolbar({
+				items: [{
+					xtype: "selectallcheckbox",
+					selectFirst: this.selectFirst
+				}]
+			})
 
-		this.tbar = tbar;
+			if (this.tbar) {
+				const tbar = {
+					xtype: "container",
+					items: [
+						{
+							items: this.tbar,
+							xtype: 'toolbar'
+						},
+
+						this.selectAllToolbar
+					]
+				};
+
+				this.tbar = tbar;
+			} else {
+				this.tbar = this.selectAllToolbar;
+			}
+
+			this.store.on("datachanged", this.onStoreDataChanged, this);
+		}
 
 		if(!this.columns) {
 			this.columns = [
-				this.selModel,
 				{
 					id: 'name',
 					header: t('Name'),
@@ -52,13 +74,34 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 				},
 				actions
 			];
+
+			if(!this.singleSelect) {
+				this.columns.unshift(this.selModel);
+			}
 		}
 
 		go.NavGrid.superclass.initComponent.call(this);
 
 		this.store.on("load", this.onStoreLoad, this);
-		this.store.on("datachanged", this.onStoreDataChanged, this);
+
 		this.getSelectionModel().on('selectionchange', this.onSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
+
+		if(this.saveSelection) {
+
+			const state = Ext.state.Manager.get(this.stateId)
+
+			if(state) {
+				const ids = JSON.parse(state);
+				this.setDefaultSelection(ids);
+			}
+
+			if(this.store.getCount()) {
+				this.on("viewready", () => {
+					this.onStoreLoad(this.store);
+				})
+			}
+		}
+
 	},
 
 	setDefaultSelection : function(selectedListIds) {
@@ -77,7 +120,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 		this.selectAllToolbar.setVisible(this.store.getCount() > 1);
 	},
 
-	onStoreLoad: function(store, records, opts) {
+	onStoreLoad: function(store) {
 
 		//mark selected records in the filter as seleted in the selection model
 		const selected = [], selectedIds = this.getSelectedIds();
@@ -92,9 +135,9 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 
 		const select = () => {
 			// console.warn(selected);
-			this.getSelectionModel().suspendEvents(false)
+			// this.getSelectionModel().suspendEvents(false)
 			this.getSelectionModel().selectRecords(selected, true);
-			this.getSelectionModel().resumeEvents();
+			// this.getSelectionModel().resumeEvents();
 		}
 
 		if(this.rendered) {
@@ -115,9 +158,14 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 			ids.push(r.id);
 		}, this);
 
+
 		this.filteredStore.setFilter(this.getId(), {[this.filterName]: ids});
 
 		this.fireEvent('selectionchange', ids, sm);
+
+		if(this.saveSelection) {
+			Ext.state.Manager.set(this.stateId, JSON.stringify(ids));
+		}
 
 		this.filteredStore.load();
 	},

@@ -111,6 +111,11 @@ class Module extends core\Module
 	 * @throws Exception
 	 */
 	public static function onEntityDelete(Query $query, $cls) {
+
+		if(!self::$enabled || core\Installer::isInProgress()) {
+			return;
+		}
+
 		if(is_a($cls, LogEntry::class, true) || is_a($cls, Search::class, true)) {
 			return;
 		}
@@ -284,10 +289,7 @@ class Module extends core\Module
 		}
 	}
 
-	/**
-	 * @return Settings|null
-	 */
-	public function getSettings(): ?core\Settings
+	public function getSettings()
 	{
 		return Settings::get();
 	}

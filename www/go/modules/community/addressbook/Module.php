@@ -160,7 +160,7 @@ class Module extends core\Module
 	/**
 	 * @return core\Settings|null
 	 */
-	public function getSettings(): ?core\Settings
+	public function getSettings()
 	{
 		return Settings::get();
 	}
@@ -260,6 +260,7 @@ class Module extends core\Module
 	 */
 	private function internalDemoContact(Generator $faker): Contact
 	{
+
 		$contact = new Contact();
 //			$blob = core\fs\Blob::fromTmp(new core\fs\File($faker->image(null, 640, 480, 'people')));
 //			$company->photoBlobId = $blob->id;
@@ -297,18 +298,33 @@ class Module extends core\Module
 	 */
 	public function demo(Generator $faker) {
 		if(!isset($this->demoCompanies)) {
-			$this->demoCompanies = [];
-			$this->demoContacts = [];
-			for ($n = 0; $n < 10; $n++) {
-				echo ".";
 
-				$company = $this->internalDemoCompany($faker);
-				$this->demoCompanies[] = $company;
-				$contact = $this->internalDemoContact($faker);
-				$this->demoContacts[] = $contact;
+			$companies = Contact::find()
+				->where('isOrganization', '=', true)
+				->orderBy(['id' => 'DESC'])
+				->limit(10)
+				->all();
 
-				Link::create($contact, $company, null, true);
+			if(count($companies) == 10) {
+				$this->demoCompanies = $companies;
+				$this->demoContacts = 	Contact::find()
+					->where('isOrganization', '=', false)
+					->orderBy(['id' => 'DESC'])
+					->limit(10)
+					->all();
+			} else{
+				for ($n = 0; $n < 10; $n++) {
+					echo ".";
+
+					$company = $this->internalDemoCompany($faker);
+					$this->demoCompanies[] = $company;
+					$contact = $this->internalDemoContact($faker);
+					$this->demoContacts[] = $contact;
+
+					Link::create($contact, $company, null, true);
+				}
 			}
+
 		}
 	}
 
@@ -330,8 +346,7 @@ class Module extends core\Module
 
 		$company->addresses[0] = $a = new Address($company);
 
-		$a->street = $faker->streetName;
-		$a->street2 = $faker->streetAddress;
+		$a->address = $faker->streetName .' '.$faker->streetAddress;
 		$a->city = $faker->city;
 		$a->zipCode = $faker->postcode;
 		$a->state = $faker->state;

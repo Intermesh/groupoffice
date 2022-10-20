@@ -113,6 +113,7 @@ $vars: (
   text-rendering: optimizeLegibility; // Support for Safari and Chrome.
   -moz-osx-font-smoothing: grayscale; // Support for Firefox.
   font-feature-settings: 'liga'; // Support for IE
+	line-height: normal;
 }
  
 @function str-replace($string, $search, $replace: '') {

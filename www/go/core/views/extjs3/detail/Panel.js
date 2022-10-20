@@ -79,9 +79,9 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 		if(entityStore.entity.name === this.entityStore.entity.name) {
 
-			if(changed.indexOf(this.currentId) > -1) {
+			if(changed.indexOfLoose(this.currentId) > -1) {
 				this.reload();
-			} else if (destroyed.indexOf(this.currentId) > -1) {
+			} else if (destroyed.indexOfLoose(this.currentId) > -1) {
 				this.reset();
 			}
 			return;
@@ -91,7 +91,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		}
 
 		changed.forEach((id) => {
-			if(this.watchRelations[entityStore.entity.name].indexOf(id) > -1) {
+			if(this.watchRelations[entityStore.entity.name].indexOfLoose(id) > -1) {
 				this.internalLoad(this.data);
 				return;
 			}
@@ -205,6 +205,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 	load: function (id) {
 
+		id = parseInt(id);
+
 		if(this.loading) {
 			return this.loading.then(() => {
 				return this.load(id);
@@ -212,6 +214,10 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		}
 
 		if(this.currentId == id) {
+			return Promise.resolve(this.data);
+		}
+
+		if(this.fireEvent("beforeload", this, id) === false) {
 			return Promise.resolve(this.data);
 		}
 
@@ -242,9 +248,11 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		return this.add(new go.links.getDetailPanels(sortFn));
 	},
 
-	addComments : function() {
+	addComments : function(large) {
 		if (go.Modules.isAvailable("community", "comments")) {
-			this.add(new go.modules.comments.CommentsDetailPanel());
+			this.add(new go.modules.comments.CommentsDetailPanel({
+				large: large
+			}));
 		}
 	},
 	addFiles : function() {

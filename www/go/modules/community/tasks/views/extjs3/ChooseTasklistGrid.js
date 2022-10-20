@@ -7,7 +7,7 @@ go.modules.community.tasks.ChooseTasklistGrid = Ext.extend(go.grid.GridPanel, {
                 'name',
                 {name: 'creator', type: "relation"}
 			],
-			entityStore: "Tasklist"
+			entityStore: "TaskList"
 		});
 
 		Ext.apply(this, {		

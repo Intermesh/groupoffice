@@ -5,7 +5,7 @@ namespace go\modules\community\tasks\install;
 
 use go\core\model\User;
 use go\modules\community\tasks\model\Progress;
-use go\modules\community\tasks\model\Tasklist;
+use go\modules\community\tasks\model\TaskList;
 use GO\Projects2\Model\ProjectEntity;
 use go\core\util\DateTime;
 
@@ -49,7 +49,7 @@ class Migrator
 					$tasklistId = $prt['id'];
 				} else {
 					$arFlds = [
-						'role' => Tasklist::Project,
+						'role' => TaskList::Project,
 						'name' => $project->name,
 						'createdBy' => $project->user_id,
 						'aclId' => $project->findAclId(),

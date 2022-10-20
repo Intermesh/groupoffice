@@ -125,6 +125,23 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 	},
 
+	selectFirst : async function() {
+		if(!this.store.loaded) {
+			await this.store.load();
+			return this.selectFirst();
+		}
+		if(!this.store.getCount()) {
+			return null;
+		}
+
+		const firstRecord = this.store.getAt(0);
+		const v = firstRecord.get(this.valueField)
+		this.setValue(v);
+
+		return v;
+
+	},
+
 	postInitComp : function() {
 		//Set value promise can be used to do stuff after setvalue completed fetching the entity and loaded the store.
 		this.setValuePromise = Promise.resolve(this);

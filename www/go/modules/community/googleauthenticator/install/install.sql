@@ -7,7 +7,8 @@
 CREATE TABLE `googleauth_secret` (
   `userId` int(11) NOT NULL,
   `secret` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `createdAt` datetime NOT NULL
+  `createdAt` datetime NOT NULL,
+  `verified` bool default false not null
 ) ENGINE=InnoDB;
 
 --

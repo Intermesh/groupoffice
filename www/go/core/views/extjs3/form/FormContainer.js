@@ -86,6 +86,9 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		return dirty;
 	},
 
+	/**
+	 * Required for  resetting after loading a form
+	 */
 	setNotDirty : function() {
 		var dirty = false, fn = function (i) {
 			i.originalValue = i.getValue();

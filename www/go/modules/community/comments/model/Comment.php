@@ -65,6 +65,14 @@ class Comment extends AclItemEntity {
 	 */
 	public $attachments = [];
 
+
+	/**
+	 * The MIME message ID from the outgoing or incoming email (used in support module)
+	 *
+	 * @var string
+	 */
+	public $mimeMessageId;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -154,7 +162,7 @@ class Comment extends AclItemEntity {
 		return $this->relatedEntity;
 	}
 
-	protected function getAclEntity()
+	public function findAclEntity()
 	{
 		return $this->findEntity();
 	}
@@ -177,7 +185,7 @@ class Comment extends AclItemEntity {
 	 *
 	 * @return int
 	 */
-	public function getPermissionLevel(): int
+	protected function internalGetPermissionLevel(): int
 	{
 
 		if(go()->getAuthState()->isAdmin()) {
@@ -225,7 +233,7 @@ class Comment extends AclItemEntity {
 
 	protected function internalSave(): bool
 	{
-		$this->images = Blob::parseFromHtml($this->text);
+		$this->images = Blob::parseFromHtml($this->text, true);
 
 		if(!parent::internalSave()) {
 			return false;

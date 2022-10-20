@@ -62,6 +62,17 @@ class Extjs3 {
 						if($debug && $file->getModifiedAt() > $modifiedAt) {
 							$modifiedAt = $file->getModifiedAt();
 						}
+						continue;
+					}
+
+					$file = $folder->getFile('views/goui/dist/style.css');
+					if ($file->exists()) {
+						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
+
+						if($debug && $file->getModifiedAt() > $modifiedAt) {
+							$modifiedAt = $file->getModifiedAt();
+						}
+						continue;
 					}
 
 

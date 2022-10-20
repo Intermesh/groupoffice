@@ -302,3 +302,15 @@ i.icon.em-low_priority {
 		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
 	}
 }
+
+
+
+.finance-document-item-group-title {
+	display: none;
+}
+
+.go-form-group.multiple {
+	.finance-document-item-group-title {
+		display: block;
+	}
+}

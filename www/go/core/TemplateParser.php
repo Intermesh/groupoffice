@@ -4,6 +4,7 @@ namespace go\core;
 
 use DateTimeZone;
 use Exception;
+use go\core\data\Model;
 use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\db\Query;
@@ -98,6 +99,12 @@ use function GO;
  * {{address.formatted}}
  * `````````````````````````````````````````````````````````````````````
  *
+ * The same with sort:
+ * ```
+ * [assign formattedAddress = contact.addresses | sort:type:"postal" | first | prop:formatted]
+ * {{formattedAddress}}
+ * ```
+ *
  * @example Using [assign] to lookup a Contact entity with id = 1
  *
  * ```
@@ -161,12 +168,15 @@ class TemplateParser {
 		$this->addFilter('date', [$this, "filterDate"]);		
 		$this->addFilter('number', [$this, "filterNumber"]);
 		$this->addFilter('filter', [$this, "filterFilter"]);
+		$this->addFilter('sort', [$this, "filterSort"]);
+		$this->addFilter('rsort', [$this, "filterRsort"]);
 		$this->addFilter('count', [$this, "filterCount"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
 		$this->addFilter('column', [$this, "filterColumn"]);
 		$this->addFilter('implode', [$this, "filterImplode"]);
 		$this->addFilter('entity', [$this, "filterEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
+		$this->addFilter('prop', [$this, "filterProp"]);
 		$this->addFilter('nl2br', "nl2br");
 		$this->addFilter('t', [$this, "filterTranslate"]);
 
@@ -252,6 +262,42 @@ class TemplateParser {
 		});
 	}
 
+	private function filterSort(?array $array, string $propName, $propValue = null): ?array
+	{
+		if(!isset($array)) {
+			return null;
+		}
+
+		return $this->internalFilterSort($array, $propName, $propValue, false);
+
+	}
+
+
+	private function internalFilterSort(array $array, string $propName, $propValue, bool $reverse) : array {
+
+		usort($array, function($a, $b) use ($propValue, $propName, $reverse) {
+
+			$first = $reverse ? $b : $a;
+			$second = $reverse ? $a : $b;
+
+			if(isset($propValue)) {
+				return ($first->$propName == $propValue) <=> ($second->$propName == $propValue);
+			}
+			return ($first->$propName <=> $second->$propName);
+		});
+
+		return $array;
+	}
+
+	private function filterRsort(?array $array, string $propName, $propValue = null): ?array
+	{
+		if(!isset($array)) {
+			return null;
+		}
+
+		return $this->internalFilterSort($array, $propName, $propValue, true);
+	}
+
 	private function filterColumn($array, $propName): ?array
 	{
 
@@ -313,6 +359,27 @@ class TemplateParser {
 
 
 	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function filterProp($entity, $propName) {
+		if(is_object($entity)) {
+			if(!isset($entity->$propName)) {
+				return null;
+			}
+
+			return $entity->$propName;
+		} else if(is_array($entity)) {
+			if(!isset($entity[$propName])) {
+				return null;
+			}
+
+			return $entity[$propName];
+		} else {
+			return null;
+		}
+	}
 	
 	/**
 	 * Add a filter function
@@ -321,7 +388,7 @@ class TemplateParser {
 	 * @param callable $function
 	 */
 	public function addFilter(string $name, callable $function) {
-		$this->filters[$name] = $function;
+		$this->filters[strtolower($name)] = $function;
 	}
 
 	/**
@@ -499,6 +566,9 @@ class TemplateParser {
 	 */
 	public function parse(string $str) {
 		if($this->enableBlocks) {
+			// this will break divs
+			$str = preg_replace('/<[^>]+>\[else\]<\/[^>]+>/', '[else]', $str);
+
 			$str = $this->parseBlocks($str);
 		}
 //		$str = preg_replace_callback('/\n?\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*)(?<!\\\\)\\]\n?/', [$this, 'replaceAssign'], $str);
@@ -512,6 +582,7 @@ class TemplateParser {
 	private function parseBlocks($str) {
 
 		$str = $this->hideMicrosoftIfs($str);
+
 
 		$tags = $this->findBlocks($str);		
 			
@@ -696,7 +767,11 @@ class TemplateParser {
 		$expression = html_entity_decode($expression);
 
 		//split string into tokens. See http://stackoverflow.com/questions/5475312/explode-string-into-tokens-keeping-quoted-substr-intact		
-		foreach(self::$tokens as $token) {			
+		foreach(self::$tokens as $token) {
+			if($token == '-') {
+				//skip for negative numbers
+				continue;
+			}
 			$expression = str_replace($token, ' '.$token.' ', $expression);
 		}
 		$expression = str_replace(';', ' ; ', $expression);
@@ -817,7 +892,7 @@ class TemplateParser {
 		foreach($filters as $filter) {
 			
 			$args = array_map('trim', str_getcsv($filter, ':', '"'));
-			$filterName = array_shift($args);
+			$filterName = strtolower(array_shift($args));
 			array_unshift($args, $value);
 
 			if(!isset($this->filters[$filterName])) {

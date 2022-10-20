@@ -6,10 +6,12 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	loadMask: true,
 	cls: "tasks-task-grid",
 
+	support: false,
+
 	initComponent: function () {
 
 		this.store = new go.data.GroupingStore({
-			groupField: 'tasklist',
+			groupField: this.support ? false : 'tasklist',
 			remoteGroup:true,
 			remoteSort: true,
 			fields: [
@@ -39,10 +41,13 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				'permissionLevel'
 			],
 			entityStore: "Task",
-			sortInfo: {
-				field: "start",
-				direction: "ASC"
-			}
+			sortInfo: this.support ? {
+					field: "modifiedAt",
+					direction: "DESC"
+				} : {
+					field: "start",
+					direction: "ASC"
+				}
 		});
 
 		this.checkColumn = new GO.grid.CheckColumn({
@@ -77,18 +82,17 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			return go.util.Format.date(v);
 		};
 
-		const now = new Date();
-
 		this.columns = [
 				this.checkColumn,
 				{
 					id: 'id',
-					hidden: true,
+					hidden: !this.support,
 					header: 'ID',
-					width: dp(35),
+					width: dp(80),
 					sortable: true,
 					dataIndex: 'id',
-					groupable: false
+					groupable: false,
+					align: "right"
 				},
 				{
 					id: 'title',
@@ -144,7 +148,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'start',
 					renderer: startRenderer,
-					hidden: this.forProject,
+					hidden: this.forProject || this.support,
 					groupable: false
 				},{
 					xtype:"datecolumn",
@@ -176,10 +180,10 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer:function (value, meta, rec, row, col, store){
 						return '<div class="go-progressbar"><div style="width:'+Math.ceil(value)+'%"></div></div>';
 					},
-					hidden: this.forProject,
+					hidden: this.forProject || this.support,
 					groupable: false
 				},{
-					hidden: true,
+					hidden: !this.support,
 					id:"progress",
 					width:dp(150),
 					header: t('Progress', "tasks", "community"),
@@ -212,7 +216,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'modifiedAt',
-					hidden: true,
+					hidden: !this.support,
 					groupable: false
 				},
 				{	
@@ -223,7 +227,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v) {
 						return v ? v.displayName : "-";
 					},
-					hidden: true,
+					hidden: !this.support,
 					groupable: true
 				},
 				{
@@ -234,7 +238,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v) {
 						return v ? v.name : "-";
 					},
-					hidden: true,
+					hidden: !this.support,
 					groupable: true
 				},
 				{	

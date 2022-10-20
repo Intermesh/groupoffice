@@ -473,7 +473,10 @@ namespace go\core {
 		 * @noinspection PhpUnused
 		 */
 		private function initTCPDF() {
+
 			define("K_PATH_CACHE", $this->config['tmpdir'] . "/");
+
+//			define("K_PATH_FONTS",go()->getDataFolder()->getFolder("tcpdf/fonts")->getPath() . "/");
 		}
 
 		/**
@@ -793,12 +796,7 @@ namespace go\core {
 			return null;
 		}
 
-		/**
-		 * Get the application settings
-		 * 
-		 * @return Settings|null
-		 */
-		public function getSettings(): ?CoreSettings
+		public function getSettings()
 		{
 			return Settings::get();
 		}
@@ -1025,7 +1023,20 @@ namespace go\core {
 
 			$this->optimizerSearchDepthSet = true;
 		}
+
+		public function checkAcls()
+		{
+			//one legacy model that needs checking
+			$stmt = GO\Base\Model\Template::model()->find(['ignoreAcl'=>true]);
+			while($stmt->rowCount()) {
+				$stmt->callOnEach('checkAcl', true);
+			}
+
+			return parent::checkAcls();
+		}
 	}
+
+
 }
 
 namespace {

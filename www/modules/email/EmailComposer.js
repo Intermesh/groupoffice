@@ -655,8 +655,8 @@ GO.email.EmailComposer = function(config) {
 
 	GO.email.EmailComposer.superclass.constructor.call(this, {
 		title : t("Compose an e-mail message", "email"),
-		width : 750,
-		height : 600,
+		width : dp(1000),
+		height : dp(800),
 		minWidth : 300,
 		minHeight : 200,
 		layout : 'fit',

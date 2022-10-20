@@ -119,7 +119,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	submit: function (cb, scope) {
 
 		if (!this.isValid()) {
-			return Promise.reject();
+			return Promise.reject({message: t("You have errors in your form. The invalid fields are marked.")});
 		}		
 		//get only modified values on existing items, otherwise get all values.
 		var id, params = {}, values = this.getValues(!!this.currentId), me = this;
@@ -207,7 +207,10 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 			return Promise.reject(error);
 		}).finally(function() {
-			me.submitting = false;
+
+			setTimeout(() => {
+				me.submitting = false;
+			});
 
 			me.getEl().unmask();
 		})

@@ -275,22 +275,30 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		//this is needed if the editor has not been activated yet.
 		this.updateToolbar();
 
-		Array.from(e.dataTransfer.files).forEach(function(file) {
+		Array.from(e.dataTransfer.files).forEach(function (file) {
 			go.Jmap.upload(file, {
 				scope: this,
-				success: function(response) {
-					console.warn(response);
+				success: function (response) {
 					var imgEl = null;
 					if (file.type.match(/^image\//)) {
-						var domId = Ext.id(), img = '<img style="max-width: 100%" id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
+						var domId = Ext.id(),
+							img = '<img style="max-width: 100%" id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
 						this.insertAtCursor(img);
 						imgEl = this.getDoc().getElementById(domId);
+
+						if(imgEl) {
+							imgEl.addEventListener("load", () => {
+								const width = imgEl.offsetWidth, height = imgEl.offsetHeight;
+								imgEl.setAttribute('style', `max-width: 100%;height:auto;aspect-ratio: ${width} / ${height};`);
+							});
+						}
 					}
 
 					this.fireEvent('attach', this, response, file, imgEl);
 				}
 			});
 		}, this);
+
 
 	},
 
@@ -527,7 +535,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				go.Jmap.upload(file, {
 					success: function(response) {
 						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));
-						imgEl.setAttribute('style', 'max-width: 100%');
+						imgEl.setAttribute('style', `max-width: 100%;height:auto;aspect-ratio: ${loader.width} / ${loader.height};`);
 						me.fireEvent('attach', me, response.blobId, file, imgEl);
 					}
 				});
@@ -644,7 +652,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 		h +=  this.tb.el.getHeight();
 
-		if(h > this.growMaxHeight) {
+		if(this.growMaxHeight && h > this.growMaxHeight) {
 			h = this.growMaxHeight;
 		}
 

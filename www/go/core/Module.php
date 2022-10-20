@@ -178,10 +178,6 @@ abstract class Module extends Singleton {
 
 			go()->getDbConnection()->resumeTransactions();
 
-			if(!Installer::isInstalling()) {
-				go()->rebuildCache(true);
-			}
-
 			go()->getDbConnection()->beginTransaction();
 
 			if(!$model->save()) {
@@ -192,6 +188,10 @@ abstract class Module extends Singleton {
 			if(!$this->registerEntities()) {
 				$this->rollBack();				
 				return false;
+			}
+
+			if(!Installer::isInstalling()) {
+				go()->rebuildCache();
 			}
 
 			if(!$this->afterInstall($model)) {
@@ -265,7 +265,7 @@ abstract class Module extends Singleton {
 		}
 
 		if(!Installer::isInstalling()) {
-			go()->rebuildCache(true);
+			go()->rebuildCache();
 		}
 
 
@@ -822,9 +822,9 @@ abstract class Module extends Singleton {
 	 * A module must override this function and implement a \go\core\Settings object
 	 * to store settings.
 	 * 
-	 * @return Settings|null
+	 * @return Settings|SettingsEntity|null
 	 */
-	public function getSettings(): ?Settings
+	public function getSettings()
 	{
 		return null;
 	}
@@ -844,6 +844,10 @@ abstract class Module extends Singleton {
 	public function checkAcls() {
 		$entities = $this->getClassFinder()->findByParent(AclOwnerEntity::class);
 		foreach($entities as $entity) {
+			if($entity == model\Search::class) {
+				continue;
+			}
+
 			echo "Checking " . $entity . "\n";
 			$entity::checkAcls();
 			echo "Done\n";

@@ -5,6 +5,7 @@ namespace go\core\jmap;
 use DateTimeInterface;
 use Exception;
 use GO\Base\Exception\AccessDenied;
+use go\core\App;
 use go\core\ErrorHandler;
 use go\core\fs\FileSystemObject;
 use go\core\model\Alert;
@@ -29,8 +30,13 @@ use GO\Files\Model\Folder;
  * multiple database tables. It can be extended with has one related tables and
  * it can also have properties in other tables.
  */
-abstract class Entity  extends OrmEntity {	
-	
+abstract class Entity  extends OrmEntity {
+
+	/**
+	 * Fires when an URL for the entity is generated
+	 */
+	const EVENT_URL = "url";
+
 	/**
 	 * Track changes in the core_change log for the JMAP protocol.
 	 * Disabled during install and upgrade.
@@ -85,6 +91,7 @@ abstract class Entity  extends OrmEntity {
 	{
 		
 		if(!parent::internalSave()) {
+			App::get()->debug(static::class."::internalSave() returned false");
 			return false;
 		}
 
@@ -526,6 +533,15 @@ abstract class Entity  extends OrmEntity {
    */
 	public static function getChanges(string $sinceState, int $maxChanges): array
 	{
+		$result = [
+			'oldState' => $sinceState,
+			'changed' => [],
+			'removed' => []
+		];
+
+		if($sinceState == self::getState()) {
+			return $result;
+		}
 		
 		$entityType = static::entityType();
 		
@@ -548,11 +564,7 @@ abstract class Entity  extends OrmEntity {
 			}
 		}	
 		
-		$result = [				
-			'oldState' => $sinceState,
-			'changed' => [],
-			'removed' => []
-		];		
+
 			
 		$userChanges = static::getUserChangesQuery($states[1]['modSeq']);
 			
@@ -751,15 +763,36 @@ abstract class Entity  extends OrmEntity {
 	}
 
 	/**
-	 * Create an alert for this entity
+	 * Create an alert for this entity.
+	 *
+	 * Typically, you set a tag and data. Previous alerts with the same tag and model will be replaced with this one.
+	 * If you don't use a tag it won't replace anything.
+	 *
+	 * It's up to the client to display the data in a human friendly way. See
+	 * www/go/modules/community/tasks/views/extjs3/Module.js for an example in the initModule() function
+	 *
+	 * @example
+	 * ```
+	 * $alert = $task->createAlert(new \DateTime(), 'assigned', $this->responsibleUserId)
+	 *  ->setData([
+	 *    'assignedBy' => go()->getAuthState()->getUserId()
+	 *  ]);
+	 *
+	 * if (!$alert->save()) {
+	 *  throw new SaveException($alert);
+	 * }
+	 * ```
+	 *
+	 *
+	 *
 	 *
 	 * @param DateTimeInterface $triggerAt
-	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param ?string $tag A unique tag for this entity and user. It will replace existing ones.
 	 * @param int|null $userId The user this alert is for. Defaults to current user.
 	 * @return Alert
 	 */
 	public function createAlert(DateTimeInterface $triggerAt,
-	                            string            $tag = null,
+	                            ?string            $tag = null,
 	                            int               $userId = null): Alert
 	{
 		$alert = new Alert();
@@ -802,36 +835,16 @@ abstract class Entity  extends OrmEntity {
 	}
 
 
-	public function alertTitle(Alert $alert) {
+	public function url() {
 
-	}
+		$url = static::fireEvent(self::EVENT_URL, $this);
 
-	const EVENT_ALERT_PROPS = 'alertprops';
-
-	public function alertProps(Alert $alert): array
-	{
-
-		$body = null;
-		$title = null;
-
-		$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
-		go()->getLanguage()->setLanguage($user->language);
-
-		self::fireEvent(self::EVENT_ALERT_PROPS, $this, $alert, ['title' => &$title, 'body' => &$body]);
-
-		if(!isset($body)) {
-
-			$body = $alert->triggerAt->toUserFormat(true, $user);
+		if(!empty($url)) {
+			return $url;
 		}
 
-		if(!isset($title)) {
-			$title = $alert->findEntity()->title() ?? null;
-		}
-
-
-		go()->getLanguage()->setLanguage(go()->getAuthState()->getUser(['language'])->language);
-
-		return ['title' => $title, 'body' => $body];
+		return go()->getSettings()->URL . '#' . strtolower(static::entityType()->getName()) . "/" . $this->id();
 	}
+
 
 }

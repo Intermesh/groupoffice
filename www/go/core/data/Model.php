@@ -31,25 +31,25 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	/**
 	 * Get all properties exposed to the API
 	 *
-	 * eg.
-	 *
+	 * @example
+	 * ```
 	 * [
 	 *  "propName" => [
 	 *    'setter' => true, //Set with setPropName
 	 *    'getter'=> true', //Get with getPropName
-	 *    'access' => self::PROP_PROTECTED // is a protected property
+	 *    'access' => self::PROP_PROTECTED | self::PROP_PUBLIC | null // is a public or protected property or null if there's just setters and getters
 	 * ]
-	 *
+	 * ```
 	 * So properties are:
 	 *
 	 * 1. Readable in the API if they have access public or getter = true
 	 * 2. Writable in the API if they have access public or setter = true
 	 *
 	 * @return array
-	 * @example GEt writable property names
-	 *
+	 * @example Get writable property names
+	 * ```
 	 * $writablePropNames = array_keys(array_filter($this->getApiProperties(), function($r) {return ($r['setter'] || $r['access'] = self::PROP_PUBLIC);}));
-	 *
+	 * ```
 	 */
 	public static function getApiProperties(): array
 	{
@@ -120,12 +120,57 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		return $arr;
 	}
 
+
+	/**
+	 * Load properties from the config.php file defined as:
+	 *
+	 * ```
+	 * [
+	 *  'modulePackage' => [
+	 *    'moduleName' => [
+	 *      'propName' => 'value'
+	 *    ]
+	 *   ]
+	 * ]
+	 * ```
+	 *
+	 * @return array
+	 */
+	protected static function loadPropertiesFromConfigFile() : array {
+		$config = go()->getConfig();
+
+		$pkgName = static::getModulePackageName();
+
+		if(!isset($config[$pkgName])) {
+			return [];
+		}
+
+		if($pkgName == "core") {
+			$c = $config[$pkgName];
+		} else
+		{
+			$modName = static::getModuleName();
+
+			if(!isset($config[$pkgName][$modName])) {
+				return [];
+			}
+			$c = $config[$pkgName][$modName];
+		}
+
+		$props = array_filter(static::getApiProperties(), function($p) {
+			// only defined props
+			return isset($p['access']);
+		});
+
+		return array_filter($c, function($key) use ($props) { return in_array($key, $props);}, ARRAY_FILTER_USE_KEY);
+	}
+
   /**
    * Get the readable property names as array
    *
    * @return string[]
    */
-	protected static function getReadableProperties(): array
+	public static function getReadableProperties(): array
 	{
 		return array_keys(array_filter(static::getApiProperties(), function($props){
 			return $props['getter'] || $props['access'] == self::PROP_PUBLIC;
@@ -137,7 +182,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
    *
    * @return string[]
    */
-	protected static function getWritableProperties(): array
+	public static function getWritableProperties(): array
 	{
 		return array_keys(array_filter(static::getApiProperties(), function($props){
 			return $props['setter'] || $props['access'] == self::PROP_PUBLIC;
@@ -208,7 +253,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			return $arr;
 		} else if($value instanceof DateTime) { //if (is_null($value) || is_scalar($value) || $value instanceof \StdClass) {
 			return (string) $value;
-		} else {
+		} else if($value instanceof \DateTimeInterface) { //if (is_null($value) || is_scalar($value) || $value instanceof \StdClass) {
+			return $value->format(DateTime::FORMAT_API);
+		}else{
 			return $value;
 		}
 	}
@@ -319,7 +366,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	}
 	
 	/**
-	 * Get's the class name without the namespace
+	 * Gets the class name without the namespace
 	 * 
 	 * eg. class go\modules\community\notes\model\Note becomes just "note"
 	 * 
@@ -329,5 +376,34 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	{
 		$cls = static::class;
 		return substr($cls, strrpos($cls, '\\') + 1);
+	}
+
+
+	/**
+	 * Get module name
+	 *
+	 * @return string
+	 */
+	public static function getModuleName(): string
+	{
+		if(strpos(static::class, "go\\core") === 0) {
+			return "core";
+		}
+
+		return explode("\\", static::class)[3];
+	}
+
+	/**
+	 * Get the module package name
+	 * Is nullable for backwards compatibility with old framework
+	 * @return string|null
+	 */
+	public static function getModulePackageName(): ?string
+	{
+		if(strpos(static::class, "go\\core") === 0) {
+			return "core";
+		}
+
+		return explode("\\", static::class)[2];
 	}
 }

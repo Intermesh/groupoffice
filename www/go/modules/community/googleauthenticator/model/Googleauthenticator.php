@@ -3,9 +3,11 @@
 namespace go\modules\community\googleauthenticator\model;
 
 use Exception;
+use go\core\fs\Blob;
 use go\core\orm\Mapping;
 use go\core\fs\File;
 use go\core\orm\Property;
+use go\core\util\QRcode;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR.'util'.DIRECTORY_SEPARATOR.'QRcode.php';
 
@@ -14,6 +16,8 @@ class Googleauthenticator extends Property {
 	public $userId;
 	protected $secret;
 	public $createdAt;
+
+	protected $verified = false;
 	
 	private $verify = false;
 	private $requestSecret = false;
@@ -30,7 +34,7 @@ class Googleauthenticator extends Property {
 	{
 		return parent::defineMapping()->addTable("googleauth_secret");
 	}
-	
+
 	public function getSecret() {
 		return $this->secret;
 	}
@@ -50,8 +54,13 @@ class Googleauthenticator extends Property {
 	protected function internalValidate() {
 		
 		// When saving the new secret, the code needs to be verified first
-		if(!empty($this->verify) && !$this->verifyCode($this->verify)){
-			$this->setValidationError('verify', \go\core\validate\ErrorCode::INVALID_INPUT, "The verify code is not correct.");
+		if(!empty($this->verify)){
+
+			if(!$this->verifyCode($this->verify)) {
+				$this->setValidationError('verify', \go\core\validate\ErrorCode::INVALID_INPUT, "The verify code is not correct.");
+			} else{
+				$this->verified = true;
+			}
 		}
 		
 		return parent::internalValidate();
@@ -59,14 +68,8 @@ class Googleauthenticator extends Property {
 	
 	protected function internalSave(): bool
 	{
-		
 		if(empty($this->secret)) {
 			$this->secret = $this->createSecret();
-		}
-		
-		// Don't actually save when only the secret is requested
-		if($this->requestSecret){
-			return true;
 		}
 				
 		return parent::internalSave();
@@ -110,7 +113,7 @@ class Googleauthenticator extends Property {
 	}
 	
 	public function getIsEnabled() {
-		return isset($this->secret)&& isset($this->createdAt);
+		return $this->verified;
 	}
 
 	/**
@@ -188,22 +191,17 @@ class Googleauthenticator extends Property {
 //
 //		return 'https://chart.googleapis.com/chart?chs=' . $width . 'x' . $height . '&chld=' . $level . '|0&cht=qr&chl=' . $urlencoded . '';
 //	}
-	
+
 	/**
 	 * Get the blob id of the QR code image
-	 * 
-	 * @param string $name
-	 * @param string $secret
-	 * @param string $title
+	 *
+	 * @param string|null $name
+	 * @param null $secret
+	 * @param null $title
 	 * @param array $params
-	 * 
-	 * @return boolean/string
 	 */
-	public function getQrBlobId($name=null, $secret=null, $title = null, $params = array()) {
-		
-		if(!$this->publish) {
-			return null;
-		}
+	public function outputQr(string $name=null, $secret=null, $title = null, $params = array()) : Blob {
+
 		
 		$name = empty($name) ? $this->owner->username . '@' . File::stripInvalidChars(go()->getSettings()->title) : $name;
 		$secret = empty($secret)?$this->secret:$secret;
@@ -221,10 +219,6 @@ class Googleauthenticator extends Property {
 				case 'H':
 					$level = QR_ECLEVEL_H;
 					break;
-				case 'M':
-				default:
-					$level = QR_ECLEVEL_M;
-					break;
 			}
 		}
 		
@@ -233,22 +227,8 @@ class Googleauthenticator extends Property {
 			$otpUrl .= '&issuer='.urlencode($title);
 		}
 		
-		$tmpFile = \go\core\fs\File::tempFile($name);
-		
-		\go\core\util\QRcode::png($otpUrl, $tmpFile->getPath(),$level,8);
-				
-		$qrBlob = \go\core\fs\Blob::fromTmp($tmpFile);
-		$qrBlob->setValues(array(
-				'name'=>$name,
-				'modified'=>time(),
-				'type'=>'image/png'
-		));
-		
-		if(!$qrBlob->save()){
-			return false;
-		}
-		
-		return $qrBlob->id;
+
+		QRcode::png($otpUrl, null ,$level,8);
 	}
 
 	/**

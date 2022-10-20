@@ -4,8 +4,6 @@ namespace go\core\db;
 use go\core\data\ArrayableInterface;
 use go\core\ErrorHandler;
 use Exception;
-use go\core\orm\Property;
-use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
 use JsonSerializable;
 use PDO;
 use PDOException;

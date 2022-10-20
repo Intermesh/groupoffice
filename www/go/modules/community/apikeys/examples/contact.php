@@ -45,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	$contact['addresses'] = [
 			[
 					'street' => $_POST['street'],
-					'street2' => $_POST['street2'],
 					'city' => $_POST['city'],
 					'zipCode' => $_POST['zipCode'],
 					'country' => $_POST['country']
@@ -215,10 +214,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           </div>
         </div>
 
-        <div class="mb-3">
-          <label for="street2">Address 2 <span class="text-muted">(Optional)</span></label>
-          <input type="text" class="form-control" id="street2" name="street2"  placeholder="Apartment or suite">
-        </div>
 				
 				<div class="mb-3">
           <label for="city">City</label>

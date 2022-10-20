@@ -14,7 +14,13 @@ go.form.Dialog = Ext.extend(go.Window, {
 	modal: true,
 	maximizable: !GO.util.isMobileOrTablet(),
 	entityStore: null,
+
+	/**
+	 * The current ID of the loaded entity
+	 * @var int
+	 */
 	currentId: null,
+
 	buttonAlign: 'left',
 	layout: "fit",
 	showCustomfields:true,
@@ -175,7 +181,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 	
 	addCustomFields : function(items, parentFieldSetId) {
-		if(go.Entities.get(this.entityStore).customFields) {
+		// if(go.Entities.get(this.entityStore).customFields) {
 			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
 			fieldsets.forEach(function(fs) {
 				if(fs.fieldSet.isTab) {
@@ -194,7 +200,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 					items.push(fs);
 				}
 			}, this);
-		}
+		// }
 	},
 
 	movePermissionsPanelToEnd : function() {
@@ -364,9 +370,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 		return this.formPanel.isValid();
 	},
 
-	focus: function () {		
-		this.formPanel.focus();
-	},
 
 	/**
 	 * Override to do stuff before submitting to server
@@ -503,6 +506,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 				//onReady is called after load.
 				return;
 			}
+
+
+			// In overrides.js the form panel focuses on the first empty field or first field with an error
+			me.formPanel.focus();
 
 			me.onReady();
 		});

@@ -13,10 +13,11 @@
 require("../vendor/autoload.php");
 
 use go\core\App;
+use go\core\ErrorHandler;
 use go\core\fs\Blob;
-use go\core\jmap\Response;
+use go\core\http\Response;
 use go\core\jmap\State;
-use go\core\jmap\Request;
+use go\core\http\Request;
 
 App::get();
 if(Request::get()->getMethod() == 'OPTIONS') {
@@ -36,47 +37,55 @@ if(!isset($_GET['blob'])) {
 	exit();
 }
 
+try {
 
-if(strpos($_GET['blob'], '/') === false) {
-	$blob = Blob::findById($_GET['blob']);
-	if (!$blob) {
+	if (strpos($_GET['blob'], '/') === false) {
+		$blob = Blob::findById($_GET['blob']);
+		if (!$blob) {
 
-		Response::get()->setStatus(404);
-		Response::get()->output("Not found");
+			Response::get()->setStatus(404);
+			Response::get()->output("Not found");
+			exit();
+		}
+
+		$blob->output(!empty($_GET['inline']));
 		exit();
 	}
-
-	$blob->output(!empty($_GET['inline']));	
-	exit();
-}
 
 //Blob used for routing to a download method in the module file if we get here.
 
-$parts = explode("/", $_GET['blob']);
+	$parts = explode("/", $_GET['blob']);
 
-$package = array_shift($parts);
-if($package == "core") {
-	$c = GO();
-	$method = "download" . array_shift($parts);
-} else {
-	$module = array_shift($parts);
-	$method = "download" . array_shift($parts);
-	//left over are params
+	$package = array_shift($parts);
+	if ($package == "core") {
+		$c = GO();
+		$method = "download" . array_shift($parts);
+	} else {
+		$module = array_shift($parts);
+		$method = "download" . array_shift($parts);
+		//left over are params
 
-	$ctrlCls = "go\\modules\\" . $package . "\\". $module . "\\Module";
-	if(!class_exists($ctrlCls)) {
-		Response::get()->setStatus(404);
-		Response::get()->output("Controller class '$ctrlCls' not found");
-		exit();
+		$ctrlCls = "go\\modules\\" . $package . "\\" . $module . "\\Module";
+		if (!class_exists($ctrlCls)) {
+			Response::get()->setStatus(404);
+			Response::get()->output("Class '$ctrlCls' not found");
+			exit();
+		}
+
+		$c = $ctrlCls::get();
 	}
-	
-	$c = $ctrlCls::get();
-}
 
-if(!method_exists($c, $method)) {
-	Response::get()->setStatus(404);
-	Response::get()->output("Controller method '$method' not found");
-	exit();
-}
+	if (!method_exists($c, $method)) {
+		Response::get()->setStatus(404);
+		Response::get()->output("Controller method '$method' not found in '$ctrlCls'");
+		exit();
+	} else {
+		Response::get()->sendHeaders();
+	}
 
-call_user_func_array([$c, $method], $parts);
+	call_user_func_array([$c, $method], $parts);
+} catch(Exception $e) {
+	ErrorHandler::logException($e);
+	Response::get()->setStatus(500);
+	Response::get()->output($e->getMessage());
+}

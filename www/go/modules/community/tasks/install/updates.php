@@ -1,7 +1,5 @@
 <?php
 
-use GO\Base\Util\Icalendar\Rrule;
-use go\core\orm\Query;
 use go\modules\community\tasks\install\Migrator;
 
 $updates['201911061630'][] = function() {
@@ -13,7 +11,7 @@ $updates['201911061630'][] = function(){
 
 	while($row = $stmt->fetch()) {
 		try {
-			$rrule = new \go\modules\community\tasks\model\Recurrence($row['rrule'], new DateTime("@" . $row["start_time"]));
+			$rrule = \go\core\util\Recurrence::fromString($row['rrule'], new DateTime("@" . $row["start_time"]));
 			$data = ['recurrenceRule' => json_encode($rrule->toArray())];
 			go()->getDbConnection()->updateIgnore('tasks_task', $data, ['id' => $row['id']])->execute();
 		} catch(Exception $e) {
@@ -179,3 +177,22 @@ $updates['202206031355'][] = 'ALTER TABLE `tasks_task` ADD COLUMN `latitude` dec
 
 $updates['202206201417'][] = 'alter table tasks_tasklist_group
     add progressChange tinyint(2) null;';
+
+
+
+
+//6.7
+
+$updates['202206201417'][] = "alter table tasks_task
+	add aclId int null;";
+
+$updates['202206201417'][] = "update tasks_task t set t.aclId = (select aclId from tasks_tasklist where id = t.tasklistId);";
+
+$updates['202206201417'][] = "alter table tasks_task
+	add constraint tasks_task_core_acl_id_fk
+		foreign key (aclId) references core_acl (id)  ON DELETE RESTRICT;";
+
+
+$updates['202210141620'][] = "update core_entity set name='TaskList', clientName='TaskList' where name='Tasklist'";
+
+

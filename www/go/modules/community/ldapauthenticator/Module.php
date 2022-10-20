@@ -202,7 +202,6 @@ class Module extends core\Module implements DomainProvider {
 
 			$addrAttrs = [];
 			if(!empty($values['street'])) $addrAttrs['street'] = $values['street'];
-			if(!empty($values['street2'])) $addrAttrs['street2'] = $values['street2'];
 			if(!empty($values['zipCode'])) $addrAttrs['zipCode'] = $values['zipCode'];
 			if(!empty($values['city'])) $addrAttrs['city'] = $values['city'];
 			if(!empty($values['state'])) $addrAttrs['state'] = $values['state'];

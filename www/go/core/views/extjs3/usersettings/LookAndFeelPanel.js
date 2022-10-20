@@ -248,8 +248,8 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		
 				
 		this.formattingFieldset = new Ext.form.FieldSet({
-			labelWidth:dp(160),
-			defaults: { width:dp(50) },
+			// labelWidth:dp(160),
+			defaults: { width:dp(180) },
 			title: t('Formatting','users','core'),
 			items:[
 				{

@@ -10,6 +10,7 @@ use go\core\data\convert\AbstractConverter;
 use go\core\data\convert\Json;
 use go\core\db\Column;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
@@ -89,6 +90,7 @@ abstract class Entity extends Property {
 	 * 
 	 * The event listener is called with the {@see Filters} object.
 	 * @see self::defineFilters()
+	 * @see \go\modules\business\newsletters\Module::onContactFilter()
 	 */
 	const EVENT_FILTER = "filter";
 
@@ -100,6 +102,28 @@ abstract class Entity extends Property {
 	 * #param array $sort
 	 */
 	const EVENT_SORT = "sort";
+
+	/**
+	 * Fires when permission level is requested
+	 *
+	 *
+	 * @param Entity $entity;
+	 */
+	const EVENT_PERMISSION_LEVEL = 'permissionlevel';
+
+
+	/**
+	 * Fires when filtering on permission level.
+	 *
+	 * Normal behaviour can be overriden by returning false in your listener.
+	 *
+	 * @param Criteria $criteria
+	 * @param int $value
+	 * @param Query $query
+	 * @param $filter
+	 *
+	 */
+	const EVENT_FILTER_PERMISSION_LEVEL = "filterpermissionlevel";
 
 	/**
 	 * Constructor
@@ -134,7 +158,7 @@ abstract class Entity extends Property {
 	 *
 	 * For a single value do:
 	 *
-	 * @exanple
+	 * @example
 	 * ````
 	 * $note = Note::find()->where(['name' => 'Foo'])->single();
 	 *
@@ -152,7 +176,7 @@ abstract class Entity extends Property {
 	/**
 	 * Find or create an entity
 	 *
-	 * @param string $id
+	 * @param string $id $businessId . "-" . $contactId
 	 * @param array $values Values to apply if it needs to be created.
 	 * @return static
 	 * @throws Exception
@@ -195,7 +219,11 @@ abstract class Entity extends Property {
 	 */
 	public static final function findById(string $id, array $properties = [], bool $readOnly = false): ?Entity
 	{
-		return static::internalFindById($id, $properties, $readOnly);
+		$query = static::internalFind($properties, $readOnly);
+		$keys = static::idToPrimaryKeys($id);
+		$query->where($keys);
+
+		return $query->single();
 	}
 
 	private static $existingIds = [];
@@ -204,7 +232,7 @@ abstract class Entity extends Property {
 	 * Check if an ID exists in the database in the most efficient way. It also caches the result
 	 * during the same request.
 	 *
-	 * @param $id
+	 * @param string|int|null $id
 	 * @return bool
 	 * @throws Exception
 	 */
@@ -266,7 +294,7 @@ abstract class Entity extends Property {
 		foreach($ids as $id) {
 			$idParts = explode('-', $id);
 			if(count($idParts) != $keyCount) {
-				throw new Exception("Given id is invalid (" . $id . ")");
+				throw new Exception("Given id is invalid (" . $id . "). Key must have " . $keyCount ." parts concatenated with a '-'.");
 			}
 			for($i = 0; $i < $keyCount; $i++) {			
 				$idArr[$i][] = $idParts[$i];
@@ -320,7 +348,8 @@ abstract class Entity extends Property {
 
 		try {
 			
-			if (!$this->fireEvent(self::EVENT_BEFORE_SAVE, $this)) {
+			if ($this->fireEvent(self::EVENT_BEFORE_SAVE, $this) === false) {
+
 				$this->rollback();
 				return false;
 			}
@@ -331,7 +360,7 @@ abstract class Entity extends Property {
 				return false;
 			}		
 			
-			if (!$this->fireEvent(self::EVENT_SAVE, $this)) {
+			if ($this->fireEvent(self::EVENT_SAVE, $this) === false) {
 				$this->rollback();
 				return false;
 			}
@@ -459,7 +488,7 @@ abstract class Entity extends Property {
 
 		try {
 
-			if(!static::fireEvent(static::EVENT_BEFORE_DELETE, $query, static::class)) {
+			if(static::fireEvent(static::EVENT_BEFORE_DELETE, $query, static::class) === false) {
 				go()->getDbConnection()->rollBack();
 				return false;
 			}
@@ -484,7 +513,7 @@ abstract class Entity extends Property {
 				return false;
 			}
 
-			if(!static::fireEvent(static::EVENT_DELETE, $query, static::class)) {
+			if(static::fireEvent(static::EVENT_DELETE, $query, static::class) === false) {
 				go()->getDbConnection()->rollBack();
 				return false;			
 			}
@@ -554,10 +583,23 @@ abstract class Entity extends Property {
 	 *
 	 * Note: when overriding this function you also need to override applyAclToQuery() so that queries return only
 	 * readable entities.
-	 * 
+	 *
+	 * @final
+	 * @todo make final but there's a backwards compatibility override in model/Module.php
 	 * @return int
 	 */
-	public function getPermissionLevel(): int
+	public function getPermissionLevel() {
+
+		$permissionLevel = static::fireEvent(self::EVENT_PERMISSION_LEVEL, $this);
+
+		if(is_int($permissionLevel)) {
+			return $permissionLevel;
+		}
+
+		return $this->internalGetPermissionLevel();
+	}
+
+	protected function internalGetPermissionLevel(): int
 	{
 		if($this->isNew()) {
 			return $this->canCreate() ? Acl::LEVEL_CREATE : 0;
@@ -691,7 +733,35 @@ abstract class Entity extends Property {
 
 		$filters = new Filters();
 
-		$filters->add('text', function (Criteria $criteria, $value, Query $query) {
+		$filters
+			->add("permissionLevelUserId", function() {
+				//dummy used in permissionLevel filter.
+			})
+			->add("permissionLevelGroups", function() {
+				//dummy used in permissionLevel filter.
+			})
+			->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filterCondition, $filters) {
+
+				// security check. Only admins may query on behalf of others permissions
+				if(!empty($filter['permissionLevelUserId']) && $filter['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
+					throw new Forbidden("Only admins can pass 'permissionLevelUserId'");
+				}
+
+				// security check. Perhaps extend this later to check if the given groups are accessible by the user
+				if(!empty($filter['permissionLevelGroups']) && !go()->getAuthState()->isAdmin()) {
+					throw new Forbidden("Only admins can pass 'permissionLevelGroups'");
+				}
+
+				if(self::fireEvent(self::EVENT_FILTER_PERMISSION_LEVEL, $criteria, $value, $query, $filterCondition, $filters) === false) {
+					// event may override this by returning false
+					return;
+				}
+
+				//Permission level is always added to the main query so that it's always applied with AND
+				static::applyAclToQuery($query, $value, $filterCondition['permissionLevelUserId'] ?? null, $filterCondition['permissionLevelGroups'] ?? null);
+			})
+
+			->add('text', function (Criteria $criteria, $value, Query $query) {
 			if (!is_array($value)) {
 				$value = [$value];
 			}
@@ -717,11 +787,17 @@ abstract class Entity extends Property {
 
 		if (static::getMapping()->getColumn('modifiedBy')) {
 			$filters->addText("modifiedBy", function (Criteria $criteria, $comparator, $value, Query $query) {
-				if (!$query->isJoined('core_user', 'modifier')) {
-					$query->join('core_user', 'modifier', 'modifier.id = ' . $query->getTableAlias() . '.modifiedBy');
-				}
 
-				$criteria->where('modifier.displayName', $comparator, $value);
+				if(is_numeric($value)) {
+					$criteria->andWhere('modifiedBy', '=', $value);
+				} else {
+
+					if (!$query->isJoined('core_user', 'modifier')) {
+						$query->join('core_user', 'modifier', 'modifier.id = ' . $query->getTableAlias() . '.modifiedBy');
+					}
+
+					$criteria->where('modifier.displayName', $comparator, $value);
+				}
 			});
 		}
 
@@ -733,12 +809,21 @@ abstract class Entity extends Property {
 
 
 		if (static::getMapping()->getColumn('createdBy')) {
+			$filters->add("createdByMe", function (Criteria $criteria, $value, Query $query) {
+				//operator must always be = as this filter is also used in conjunction with permission queries
+				$criteria->where('createdBy', '=', go()->getAuthState()->getUserId());
+			});
 			$filters->addText("createdBy", function (Criteria $criteria, $comparator, $value, Query $query) {
-				if (!$query->isJoined('core_user', 'creator')) {
-					$query->join('core_user', 'creator', 'creator.id = ' . $query->getTableAlias() . '.createdBy');
-				}
 
-				$criteria->where('creator.displayName', $comparator, $value);
+				if(is_int($value) || is_array($value) && is_int($value[0])) {
+					$criteria->andWhere('createdBy', '=', $value);
+				} else {
+					if (!$query->isJoined('core_user', 'creator')) {
+						$query->join('core_user', 'creator', 'creator.id = ' . $query->getTableAlias() . '.createdBy');
+					}
+
+					$criteria->where('creator.displayName', $comparator, $value);
+				}
 			});
 		}
 
@@ -1006,6 +1091,10 @@ abstract class Entity extends Property {
    */
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
+		if(empty($sort)) {
+			$sort->exchangeArray(static::defaultSort());
+		}
+
 		if(isset($sort['modifier'])) {
 			$query->join('core_user', 'modifier', 'modifier.id = '.$query->getTableAlias() . '.modifiedBy');
 			$sort->renameKey('modifier', 'modifier.displayName');
@@ -1031,6 +1120,16 @@ abstract class Entity extends Property {
 		return $query;
 	}
 
+
+	/**
+	 * Return default sort array
+	 *
+	 * @return array eg. ['field' => 'ASC']
+	 */
+	protected static function defaultSort() : array {
+		return [];
+	}
+
 	/**
 	 * Get the current state of this entity
 	 * 
@@ -1040,7 +1139,7 @@ abstract class Entity extends Property {
 	{
 		return null;
 	}
-	
+
 	
 	/**
 	 * Map of file types to a converter class for importing and exporting.

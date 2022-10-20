@@ -609,6 +609,17 @@ a {
 	}
 }
 
+.x-btn.go-list-btn {
+	border: 0;
+	.x-btn-mc {
+		text-align: left;
+		button {
+			font-weight: normal;
+			padding-left: dp(16);
+			font-size: sp(16);
+		}
+	}
+}
 
 
 .go-search-panel {
@@ -641,7 +652,7 @@ a {
 				transform: scale(.8);
 				margin-top: dp(12);
 			}
-			.x-tool {
+			.x-tool, .x-panel-inline-icon {
 				transform: scale(.8);
 				margin-top: dp(4);
 			};
@@ -931,6 +942,7 @@ hr {
 	color: color($fg, 'text');
 	text-shadow: 0px 0px 4px white;
 	border:1px solid color($fg, 'divider');
+	line-height: dp(24);
 
 	.x-panel-header-text & {
 		margin: dp(8);
@@ -1812,13 +1824,45 @@ table[id^="comments-ext"] b {
 
 .go-form-group {
 
+	.go-form-group-edit-tb
+	{
+		width: dp(50);
+		height: dp(58);
+		padding-top: dp(8);
+	}
+	&.required {
+		.go-form-group-edit-tb {
+			display: none;
+		}
+	}
+
+	.x-fieldset {
+		border: none;
+		padding: 0;
+		margin: 0;
+	}
+
+
+	&.multiple {
+		.go-form-group-edit-tb {
+			display: block;
+		}
+
+		.x-fieldset {
+			border: 1px solid color($fg, "line");
+			border-radius: dp(10);
+			padding: dp(8) dp(16);
+			margin: dp(16);
+		}
+	}
+
 
 	.x-panel-bbar {
 		overflow: visible;
 		.x-toolbar {
 			border-top: 0;
+			height: dp(32);
 		}
-
 		.x-btn-text {
 			font-weight: normal;
 			@include var(color, c-primary);
@@ -1828,7 +1872,10 @@ table[id^="comments-ext"] b {
 	.x-toolbar {
 		margin-left: dp(-16);
 	}
-	margin-bottom: dp(16);
+
+	&:not(:last-child) {
+		margin-bottom: dp(16);
+	}
 }
 
 
@@ -1849,6 +1896,8 @@ table[id^="comments-ext"] b {
  * Resets ExtJS style to normal HTML defaults for displaying the HTML editor values or e-mails
  */
 .go-html-formatted {
+
+	word-break: break-word;
 
 	@extend %font-body1;
 
@@ -1923,6 +1972,10 @@ table[id^="comments-ext"] b {
 	a:visited {
 		color: purple;
 	}
+
+	pre {
+		white-space: pre-wrap; // to prevent horizontal scrolling
+	}
 }
 
 .normal-link {
@@ -1941,6 +1994,11 @@ table[id^="comments-ext"] b {
 }
 
 .go-messages {
+
+	img {
+		max-width: 100%;
+		cursor: pointer;
+	}
 
 	.avatar {
 		margin: 0;
@@ -2309,7 +2367,8 @@ table[id^="comments-ext"] b {
 
 
 	section {
-		width: dp(800);
+		width: 100%;
+		max-width: dp(800);
 		margin: 0 auto;
 		padding: dp(16);
 	}
@@ -2389,6 +2448,7 @@ table[id^="comments-ext"] b {
 	*[disabled] {
 		opacity: 0.65;
 		cursor: not-allowed;
+		pointer-events: none;
 	}
 
 	.mask-message{
@@ -2591,4 +2651,22 @@ body.go-compact {
 			font-style: italic;
 		}
 	}
+}
+
+
+.ux-datetime-date, .ux-datetime-time {
+	vertical-align: top;
+}
+
+
+.go-hbox {
+	display: flex;
+	gap: dp(16);
+	flex-direction: row;
+}
+
+.go-vbox {
+	display: flex;
+	gap: dp(8);
+	flex-direction: column;
 }

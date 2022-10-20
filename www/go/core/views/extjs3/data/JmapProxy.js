@@ -34,6 +34,29 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 			//callback : this.createCallback(action, rs),
 			scope: this
 		};
+
+
+		if (params.dir && params.sort) {
+			params.sort = [{
+				property: params.sort,
+				isAscending: params.dir === "ASC"
+			}];
+			delete params.dir;
+		}
+
+		if(params.groupBy) {
+			if(!params.sort){
+				params.sort = [];
+			}
+
+			params.sort.unshift({
+				property: params.groupBy,
+				isAscending: params.groupDir == "ASC"
+			});
+
+			delete params.groupBy;
+			delete params.groupDir;
+		}
 		
 		
 		go.Jmap.request({

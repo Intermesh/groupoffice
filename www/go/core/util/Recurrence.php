@@ -1,11 +1,12 @@
 <?php
-namespace go\modules\community\tasks\model;
+namespace go\core\util;
 
 use DateTimeInterface;
 use Sabre\VObject\DateTimeParser;
 use Sabre\VObject\InvalidDataException;
+use Sabre\VObject\Recur\RRuleIterator;
 
-class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
+class Recurrence extends RRuleIterator {
 	public $interval = 1;
 
 	/**
@@ -30,15 +31,7 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 	 * @var int[]
 	 */
 	public $byWeekNo;
-//	public $byHour;
-//	public $byMinute;
-//	public $bySecond;
-	/**
-	 * @var int[]
-	 * The occurrences within the recurrence interval to include in the final results.
-	 * Negative values offset from the end of the list of occurrences.
-	 */
-	public $bySetPosition;
+
 	public $count;
 	public $until;
 
@@ -49,11 +42,20 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 	 * @throws InvalidDataException
 	 * @noinspection PhpMissingParentConstructorInspection
 	 */
-	public function __construct($rrule, DateTimeInterface $start) {
+	public function __construct(DateTimeInterface $start) {
 		$this->startDate = $start;
-		if($rrule)
-			$this->parseRRule($rrule);
 		$this->currentDate = clone $this->startDate;
+	}
+
+	/**
+	 * @throws InvalidDataException
+	 */
+	public static function fromString(string $rrule, DateTimeInterface $start) : Recurrence
+	{
+		$r = new Recurrence($start);
+		$r->parseRRule($rrule);
+
+		return $r;
 	}
 
 	/**

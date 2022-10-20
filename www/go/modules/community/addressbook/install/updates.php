@@ -162,4 +162,30 @@ $updates['202205101237'][] = "update addressbook_contact set filesFolderId = nul
 $updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD nameBank varchar(50);';
 $updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD BIC varchar(11);';
 
-$updates['202210171545'][] = 'ALTER TABLE `addressbook_contact` CHANGE `salutation` `salutation` VARCHAR(382) DEFAULT NULL;';
+
+// 6.7
+
+$updates['202206020948'][] = "alter table addressbook_address
+    add address text null;";
+
+$updates['202206020948'][] = function() {
+
+	go()->getDbConnection()->exec("alter table addressbook_address ADD id INT AUTO_INCREMENT PRIMARY KEY;");
+	go()->getDatabase()->clearCache();
+	try {
+		$addresses = go()->getDbConnection()->select('id,street,street2,countryCode')
+			->from("addressbook_address");
+		foreach ($addresses as $address) {
+
+			$a = go()->getLanguage()->formatAddress($address['countryCode'], ['street' => $address['street'], 'street2' => $address['street2']], false);
+
+			go()->getDbConnection()->update("addressbook_address", ['address' => $a], ['id' => $address['id']])->execute();
+		}
+	} finally
+	{
+		go()->getDbConnection()->exec("alter table addressbook_address drop id;");
+	}
+
+
+
+};

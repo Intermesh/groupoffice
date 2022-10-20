@@ -151,8 +151,8 @@ try {
 	throw $e;
 }
 
-
+// debugger
+//go()->getDebugger()->enabled = true;
+//go()->getDebugger()->output = true;
 
 echo "Done\n\n\n";
-
-

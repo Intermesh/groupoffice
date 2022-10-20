@@ -12,6 +12,16 @@ use go\core\model\Acl;
 
 abstract class AclEntity extends Entity {
 
+
+	/**
+	 * Fires when the ACL has changed.
+	 *
+	 * Not when changes were made to the acl but when the complete list has been replaced when for example
+	 * a contact has been moved to another address book.	 *
+	 */
+	const EVENT_ACL_CHANGED = 'aclchanged';
+
+
 	protected $permissionLevel;
 
 	/**
@@ -37,6 +47,14 @@ abstract class AclEntity extends Entity {
 
 	public static function getChanges(string $sinceState, int $maxChanges): array
 	{
+
+		if($sinceState == self::getState()) {
+			return  [
+				'oldState' => $sinceState,
+				'changed' => [],
+				'removed' => []
+			];
+		}
 
 		$result = parent::getChanges($sinceState, $maxChanges);
 
@@ -122,31 +140,23 @@ abstract class AclEntity extends Entity {
 		
 		return $result;
 	}
-	
-	protected static function defineFilters(): Filters
+
+
+
+	/**
+	 * Return true when the ACL of the entity changes so the EVENT_ACL_CHANGED event will fire
+	 *
+	 * @return boolean
+	 */
+	abstract protected function isAclChanged();
+
+	protected function internalSave() : bool
 	{
-		return parent::defineFilters()
-						->add("permissionLevelUserId", function() {
-							//dummy used in permissionLevel filter.
-						})
-						->add("permissionLevelGroups", function() {
-							//dummy used in permissionLevel filter.
-						})
-						->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
+		if (!$this->isNew() && $this->isAclChanged()) {
+			static::fireEvent(self::EVENT_ACL_CHANGED, $this);
+		}
 
-							// security check. Only admins may query on behalf of others permissions
-							if(!empty($filter['permissionLevelUserId']) && $filter['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
-								throw new Forbidden("Only admins can pass 'permissionLevelUserId'");
-							}
-
-							// security check. Perhaps extend this later to check if the given groups are accessible by the user
-							if(!empty($filter['permissionLevelGroups']) && !go()->getAuthState()->isAdmin()) {
-								throw new Forbidden("Only admins can pass 'permissionLevelGroups'");
-							}
-
-							//Permission level is always added to the main query so that it's always applied with AND
-							static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
-						});
+		return parent::internalSave();
 	}
 
 	/**

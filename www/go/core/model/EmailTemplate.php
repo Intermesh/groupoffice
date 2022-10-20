@@ -1,9 +1,12 @@
 <?php
 namespace go\core\model;
 
+use GO\Base\Mail\SmimeMessage;
+use go\core\cron\GarbageCollection;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
+use go\core\jmap\Entity;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\TemplateParser;
@@ -13,6 +16,11 @@ use Swift_EmbeddedFile;
 
 /**
  * E-mail template model
+ *
+ *
+ * Because these models are polymorphic relations they need to be cleaned up by the code.
+ * You could to this with the garbage collection event.
+ * @see GarbageCollection::EVENT_RUN
  *
  * @example
  * ```
@@ -29,7 +37,7 @@ use Swift_EmbeddedFile;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 
-class EmailTemplate extends AclOwnerEntity
+class EmailTemplate extends Entity
 {
 
 	/**
@@ -43,7 +51,7 @@ class EmailTemplate extends AclOwnerEntity
 	 * 
 	 * @var int
 	 */
-	protected $moduleId;
+	public $moduleId;
 
 	public $key;
 
@@ -104,9 +112,9 @@ class EmailTemplate extends AclOwnerEntity
 	}
 	
 	/**
-	 *  
+	 * @param $module array{package:string, module:string} | int
 	 */ 
-  public function setModule($module) {
+  public function setModule( $module) {
 
 		if(is_int($module)) {
 			$this->moduleId = $module;
@@ -126,7 +134,11 @@ class EmailTemplate extends AclOwnerEntity
 		return parent::internalSave();
 	}
 
-	
+	protected function internalGetPermissionLevel(): int
+	{
+		return Module::findById($this->moduleId)->getPermissionLevel();
+	}
+
 	private function parseImages()
 	{
 		$cids = Blob::parseFromHtml($this->body);

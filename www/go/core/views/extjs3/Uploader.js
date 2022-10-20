@@ -75,15 +75,16 @@
 							animate:false,
 							itemId:'totalProgress',
 							height: 4,
-							style: 'margin: ' + dp(8) + 'px 0'
+							style: 'margin: ' + dp(8) + 'px 0px;'
 						}
 					],
 					bbar: [
 						'->',
 						{
 							text: t('Abort'),
-							handler: function() {
-								uploadNotification.setPersistent(false);
+							handler: function(btn) {
+
+								btn.findParentByType("panel").setPersistent(false);
 								go.Uploader.abort = true;
 								for(var i = 0, l = go.Uploader.uploadQueue.items.length; i < l; i++) {
 									go.Uploader.uploadQueue.items[i].remainingBytes = 0;
@@ -101,12 +102,10 @@
 
 							},
 							scope:this
-						}]
+						}],
 					// listeners: {
-					// 	afterrender: function() {
-					// 		setTimeout(function(){
-					// 			uploadNotification.updateCount();
-					// 		})
+					// 	afterrender: function(n) {
+					// 		n.doLayout();
 					// 	}
 					// }
 
@@ -134,7 +133,7 @@
 				me.notificationsTimeout = setTimeout(function() {
 					me.notificationsTimeout = null;
 					if (me.uploadQueue.items.length > me.uploadQueue.finished) {
-						go.Notifier.showNotifications();
+						// go.Notifier.showNotifications();
 						notification = me.getNotification();
 						notification.updateCount();
 					}
@@ -181,6 +180,7 @@
 		finish : function() {
 			go.Notifier.toggleIcon('upload', false); //done
 			if(uploadNotification) {
+				// uploadNotification.items.get('totalProgress').updateProgress(1);
 				go.Notifier.remove(uploadNotification);
 			}
 			uploadNotification = null;

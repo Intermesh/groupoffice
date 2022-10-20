@@ -11,6 +11,7 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 	collapsible: true,
 	modal: false,
 
+	closeOnSubmit: false,
 	initFormItems: function () {
 
 		this.addPanel({
@@ -87,12 +88,19 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 				displayField: 'display'
 			},
 
-			this.fileUploadField = new go.form.FileButtonField({
+			 new go.form.FileButtonField({
 				fieldLabel: t("Stationary PDF"),
 				name: 'stationary',
 				anchor: '100%',
 				accept: '.pdf'
-			})]
+			}),
+
+				new go.form.FileButtonField({
+					fieldLabel: t("Logo"),
+					name: 'logo',
+					anchor: '100%',
+					accept: 'image/*'
+				})]
 		}, {
 			columnWidth: .5,
 			xtype: 'fieldset',

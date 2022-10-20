@@ -2,11 +2,14 @@ go.links.LinkDetailWindow = Ext.extend(go.Window, {
   entity: "",
   layout: "fit",
   initComponent: function() {
+
     var str = this.entity;
     this.entity = go.Entities.get(this.entity);
     if (!this.entity) {
       throw str + " is not a registered entity";
     }
+
+    this.stateId = "go-link-detail-" + this.entity.name;
 
     this.detailView = this.entity.links[0].linkDetail();
 
@@ -21,7 +24,7 @@ go.links.LinkDetailWindow = Ext.extend(go.Window, {
 
     this.title = this.entity.title;
 
-    this.width = this.detailView.width || dp("600");
+    this.width = this.detailView.width || dp("1000");
     this.height = this.detailView.height || dp("700");
 
     this.items = [

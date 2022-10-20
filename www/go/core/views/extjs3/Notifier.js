@@ -54,8 +54,10 @@
 				if(me.notificationsVisible()) {
 					return; // it will hide on any click outside the panel
 				}
-				me.showNotifications();
-				e.stopPropagation();
+
+				setTimeout(() => {
+					me.showNotifications();
+				});
 
 			}, this);
 
@@ -63,6 +65,11 @@
 			this.notificationArea.insert(0,this.notifications);
 
 			this.notifiedAlerts = {};
+
+
+			//ugly but it needs to be rendered before first notifications appear
+			this.showNotifications();
+			this.hideNotifications();
 		},
 
 		_messages: {},
@@ -176,8 +183,12 @@
 				});
 			}
 
+			let openNotifications = true;
+
 			if(this._messages[msg.itemId]) {
+				this._messages[msg.itemId].replaced = true;
 				this._messages[msg.itemId].destroy();
+				openNotifications = false;
 			}
 			this._messages[msg.itemId] = msgPanel;
 
@@ -229,10 +240,39 @@
 				return false;
 			}
 
-			this.notifications.add(msgPanel);
-			this.notifications.doLayout();
+			var me = this;
+			function moveToNotificationArea(msgPanel) {
+				me.notifications.add(msgPanel);
+				me.notifications.doLayout();
+			}
 
-			this.showNotifications();
+			if(openNotifications) {
+				// this.showNotifications();
+				//this.flyout(msg);
+
+				msgPanel.render(this.messageCt);
+
+				msgPanel.getEl().on("mouseenter", (e) => {
+					msgPanel.mouseEntered = true;
+				});
+
+				msgPanel.getEl().on("mouseout", (e) => {
+
+					if(!e.within(	msgPanel.getEl(), true)) {
+						moveToNotificationArea(msgPanel);
+					}
+				});
+
+				setTimeout(() => {
+
+					if(!msgPanel.mouseEntered && !msgPanel.isDestroyed) {
+						moveToNotificationArea(msgPanel);
+					}
+				}, 2000);
+
+			} else {
+				moveToNotificationArea(msgPanel);
+			}
 
 			this.updateStatusIcons();
 
@@ -247,6 +287,12 @@
 			}
 
 			delete this._messages[msg.itemId];
+
+			if(msg.replaced) {
+				//just an update of an existing message
+				return;
+			}
+
 			this.updateStatusIcons();
 
 			if(!this.hasMessages()) {
@@ -259,6 +305,8 @@
 		},
 
 		showNotifications : function() {
+
+			console.trace("notifications");
 
 			//added here to make sure it comes last
 			if(!this.notificationArea.tools['close']) {
@@ -430,23 +478,31 @@
 		 * @returns The created Ext.Panel
 		 */
 		flyout: function(msg) {
-			if(!this.messageCt) {
-				this.messageCt = Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true);
-			}
+
 			msg.renderTo = this.messageCt;
-			msg.html = msg.description; // backward compat
-			var msgCtr = new Ext.Panel(msg);
+			if(!msg.html && !msg.items) {
+				msg.html = msg.description; // backward compat
+			}
+			var msgCtr = new Ext.create(msg, "panel");
 
 			var me = this;
 			if (msg.time) {
 				setTimeout(function () {
-					me.remove(msgCtr);
+					// prevent destroy event dismissing alert
+					msgCtr.replaced = true;
+					msgCtr.destroy();
 				}, msg.time);
 			}
 			if(!msg.persistent) {
-				msgCtr.el.on('click', function () {
-					me.remove(msgCtr);
-				});
+				// msgCtr.el.on('click', function () {
+				// 	me.remove(msgCtr);
+				// });
+
+				Ext.getBody().on("click", function() {
+					// prevent destroy event dismissing alert
+					msgCtr.replaced = true;
+					msgCtr.destroy();
+				}, this, {single: true});
 			}
 
 			return msgCtr;

@@ -2,6 +2,7 @@
 go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 	module: null,
 	key: null,
+	autoHeight: true,
 	viewConfig: {
 		emptyText: 	'<p>' +t("No items to display") + '</p>'
 	},
@@ -72,7 +73,7 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 					module: {module: this.module, key: this.key}
 				}	
 			}),
-			autoHeight: true,
+
 			columns: [
 				{
 					id: 'name',

@@ -4,6 +4,7 @@ namespace go\modules\community\history\model;
 
 use Exception;
 use GO\Base\Db\ActiveRecord;
+use go\core\acl\model\AclEntity;
 use go\core\db\Criteria;
 use go\core\db\Query as DbQuery;
 use go\core\http\Request;
@@ -137,8 +138,8 @@ class LogEntry extends AclOwnerEntity {
 		return parent::defineMapping()->addTable('history_log_entry', 'l')
 			->addQuery(
 				(new Query())
-					->select("e.clientName AS entity")
-					->join('core_entity', 'e', 'e.id = l.entityTypeId')
+					->select("log_e.clientName AS entity")
+					->join('core_entity', 'log_e', 'log_e.id = l.entityTypeId')
 			);
 	}
 

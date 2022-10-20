@@ -227,7 +227,11 @@ class Debugger {
 		if($writeFile) {
 			$this->writeLog($level, $mixed, $caller['class'], $lastCaller['line']);
 		}
-		$this->entries[] = [$level, $mixed, $caller['class'], $lastCaller['line']];
+
+		if(!$this->output) {
+			//save memory on CLI
+			$this->entries[] = [$level, $mixed, $caller['class'], $lastCaller['line']];
+		}
 		
 	}
 

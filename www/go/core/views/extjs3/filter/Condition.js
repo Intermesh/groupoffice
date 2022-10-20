@@ -89,7 +89,11 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 			cls = go.filter.types[filter.type];
 		}else
 		{
-			cls = eval(filter.type);
+			try {
+				cls = eval(filter.type);
+			} catch(e) {
+				throw "Invalid filter type '" + filter.type + "' in definition '" +this.entity+ "' " + JSON.stringify(filter, null, 1);
+			}
 		}
 
 		if(!filter.typeConfig) {

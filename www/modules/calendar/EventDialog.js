@@ -142,7 +142,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			collapsible:true,
 			maximizable:true,
 			width : dp(672),
-			height : dp(672),
+			height : dp(800),
 			stateId:'calendar_event_dialog',
 			closeAction : 'hide',
 			title : t("Appointment", "calendar"),
@@ -488,6 +488,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					end_time : endDate.format('Y-m-d H:i'),
 					startDate : startDate,
 					endDate : endDate,
+
 					description : Ext.util.Format.htmlEncode(GO.util.nl2br(this.formPanel.form
 						.findField('description').getValue()).replace(/\n/g,'')),
 					background : this.formPanel.form.findField('background')
@@ -664,7 +665,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		});
 		this.startDate = new go.form.DateField({
 			name : 'start_date',
-			width : 120,
 			format : GO.settings['date_format'],
 			allowBlank : false,			
 			listeners : {
@@ -679,7 +679,8 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			increment: 15,
 			format:GO.settings.time_format,
 			name:'start_time',
-			width:dp(120),
+			fieldLabel:t("Start"),
+			width: dp(140),
 			hideLabel:true,
 			autoSelect :true,			
 			listeners : {
@@ -694,7 +695,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			increment: 15,
 			format:GO.settings.time_format,
 			name:'end_time',
-			width:dp(120),
+			width: dp(140),
 			hideLabel:true,
 			autoSelect :true,			
 			listeners : {
@@ -707,7 +708,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 		this.endDate = new go.form.DateField({
 			name : 'end_date',
-			width : 120,
+			fieldLabel:t("End"),
 			format : GO.settings['date_format'],
 			allowBlank : false,			
 			listeners : {
@@ -743,6 +744,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		}, this);
 
 		this.eventStatus = new Ext.form.ComboBox({
+			fieldLabel: t("Status"),
 			hiddenName : 'status',
 			triggerAction : 'all',
 			editable : false,
@@ -833,10 +835,12 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			cls:'go-form-panel',
 			layout : 'form',
 			autoScroll : true,
-			defaults: { anchor: '0'},
+			defaults: { anchor: '100%'},
 			items : [
 				{
-				xtype: 'compositefield',
+				xtype : 'container',
+				layout: "form",
+				cls: "go-hbox",
 				items: [this.selectCalendar = new GO.calendar.SelectCalendar({
 					dontQueryCalendar :  true,
 					valueField : 'id',
@@ -869,6 +873,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					}
 				}),
 				this.colorField = new GO.form.ColorField({
+					width: dp(100),
 					hideLabel : true,
 					name : 'background',
 					value : "EBF1E2"
@@ -877,18 +882,22 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			this.subjectField,
 			this.locationField,
 			{	
-				xtype : 'compositefield',
-				fieldLabel:t("Start"),
+				xtype : 'container',
+				layout: "form",
+				cls: "go-hbox",
+
 				items : [this.startDate,this.startTime,this.allDayCB
 				]
 			},{
-				fieldLabel:t("End"),
-				xtype : 'compositefield',				
+					xtype : 'container',
+					layout: "form",
+					cls: "go-hbox",
 				items : [this.endDate, this.endTime,this.checkAvailabilityButton
 				]
 			},{
-				xtype : 'compositefield',
-				fieldLabel : t("Status", "calendar"),
+					xtype : 'container',
+					layout: "form",
+					cls: "go-hbox",
 				items : [
 				this.eventStatus,
 				this.busy,

@@ -7,7 +7,7 @@ use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\validate\ErrorCode;
 
-class TasklistGroup extends Property
+class TaskListGroup extends Property
 {
 	/** @var int PK */
 	public $id;

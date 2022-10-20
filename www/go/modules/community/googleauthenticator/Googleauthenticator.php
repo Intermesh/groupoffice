@@ -37,7 +37,7 @@ class Googleauthenticator extends SecondaryAuthenticator {
 						->selectSingleValue('id')
 						->from("googleauth_secret", "s")
 						->join("core_user", "u", "u.id = s.userId")
-						->where(['username' => $username])->single();
+						->where(['username' => $username, 'verified' => true])->single();
 		
 		return !empty($id);
 	}

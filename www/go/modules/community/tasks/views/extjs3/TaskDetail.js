@@ -7,6 +7,8 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	relations: ["tasklist", "responsible", 'categories'],
 	cls: "go-detail-view tasks-task",
 
+	support: false,
+
 	initComponent: function () {
 
 
@@ -44,9 +46,11 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			]
 		});
 
+		const title = this.support ? "#{id}: {title}" : "{title}";
+
 		Ext.apply(this, {
 			items: [{
-				tpl: new Ext.XTemplate('<h3 class="title s8" style="{[values.color ? \'color:#\'+values.color : \'\']}">{title}</h3>\
+				tpl: new Ext.XTemplate('<h3 class="title s8" style="{[values.color ? \'color:#\'+values.color : \'\']}">'+title+'</h3>\
 					<h4 class="status {[this.progressColor(values.progress)]}-fill">{[go.modules.community.tasks.progress[values.progress]]}</h4>\
 				<p class="s6 pad">\
 					<label>'+t("Start at")+'</label><span>{[go.util.Format.date(values.start) || "-"]}</span><br><br>\
@@ -106,22 +110,38 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 						});
 					}
 				}
-			}],
+			}]
 
-			buttons: [{
+
+		});
+
+
+		if(!this.support) {
+			this.buttons = [{
 				iconCls: 'ic-forward',
 				text:t("Continue task", "tasks"),
 				handler:() => {
 					const continueTaskDialog = new go.modules.community.tasks.ContinueTaskDialog();
 					continueTaskDialog.load(this.currentId).show();
 				}
-			}]
-		});
+			}];
+		}
 		
 
 		go.modules.community.tasks.TaskDetail.superclass.initComponent.call(this);
 		this.addCustomFields();
-		this.addComments();
+		this.addComments(this.support);
+
+		if(this.support) {
+
+			this.add(new go.modules.comments.CommentsDetailPanel({
+				large: false,
+				title: t("Private notes"),
+				section: "private"
+			}));
+
+			this.addContracts();
+		}
 		this.addLinks();
 		this.addFiles();
 		this.addHistory();
@@ -131,6 +151,46 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		})
 	},
 
+	addContracts: function() {
+		if(go.Modules.isInstalled("business", "contracts")) {
+			this.contractGrid = new go.modules.business.contracts.ContractGrid({
+				title: t("Contracts", "contracts", "business"),
+				autoHeight: true,
+				maxHeight: dp(400),
+				listeners: {
+					scope: this,
+					rowdblclick: function (grid, rowIndex, e) {
+						var record = grid.getStore().getAt(rowIndex);
+						if (record.get('permissionLevel') < go.permissionLevels.write) {
+							return;
+						}
+
+						var dlg = new go.modules.business.contracts.ContractDialog();
+						dlg.load(record.id).show();
+					}
+				}
+			});
+
+			this.add(this.contractGrid);
+
+			this.insert(0, this.noContractWarning = new Ext.Panel({
+				hidden: true,
+				cls: "go-message-panel",
+				html: "<i class='icon danger'>warning</i> " + t("This customer doesn't have an active contract", "support", "business")
+			}));
+
+			this.on("load", async () => {
+				this.noContractWarning.hide();
+				this.contractGrid.store.setFilter("def", {createdBy: this.data.createdBy, active: true});
+
+				const records = await this.contractGrid.store.load();
+
+				if (!records.length) {
+					this.noContractWarning.show();
+				}
+			});
+		}
+	},
 
 	changeProgress : function(progress) {
 		go.Db.store("Task").save({
@@ -153,6 +213,8 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		var items = this.tbar || [];
 
 		items = items.concat([
+			// new go.detail.ScrollToToButton(),
+
 			this.assignMeBtn = new Ext.Button({
 				text: t("Assign me"),
 				scope: this,
@@ -178,6 +240,8 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			new go.detail.addButton({
 				detailView: this
 			}),
+
+
 
 			this.moreMenu = {
 				iconCls: 'ic-more-vert',
@@ -209,7 +273,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 						scope: this
 					})
 				]
-			}]);
+			}
+
+
+		]);
 		
 		if(go.Modules.isAvailable("legacy", "files")) {
 			this.moreMenu.menu.splice(1,0,{

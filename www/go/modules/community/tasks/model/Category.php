@@ -46,7 +46,7 @@ class Category extends Entity {
 		}
 	}
 
-	public function getPermissionLevel(): int
+	protected function internalGetPermissionLevel(): int
 	{
 		//global category mayb only be created by admins
 		if(empty($this->tasklistId) && empty($this->ownerId)) {
@@ -56,7 +56,7 @@ class Category extends Entity {
 		}
 
 		if(isset($this->tasklistId)) {
-			$tasklist = Tasklist::findById($this->tasklistId);
+			$tasklist = TaskList::findById($this->tasklistId);
 
 			return $tasklist->getPermissionLevel() >= Acl::LEVEL_MANAGE ? Acl::LEVEL_DELETE : Acl::LEVEL_READ;
 		} else {

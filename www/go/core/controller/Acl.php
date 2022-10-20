@@ -52,6 +52,7 @@ class Acl extends Controller {
 			$stmt = go()->getDbConnection()->insert('core_acl_group',
 				go()->getDbConnection()
 					->select('t.'.$col.', g.id, "' . model\Acl::LEVEL_MANAGE .'"')
+					->distinct()
 					->from($table, 't')
 					->join('core_acl', 'a', 'a.id=t.'.$col)
 					->join('core_group', 'g', 'g.isUserGroupFor=a.ownedBy')

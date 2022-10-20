@@ -52,6 +52,9 @@ body{
     background-color: color($bg, 'box');
   }
 }
+.x-form-item label.x-form-invalid-label {
+  background-color: color($bg, 'box');
+}
 
 .go-html-formatted {
   a:visited {

@@ -26,7 +26,7 @@ GO.files.openDetailViewFileBrowser = function () {
 
 			//hack to update entity store
 			var store = go.Db.store(fb.model_name);
-			if (store) {
+			if (store && store.data[fb.model_id]) {
 				store.data[fb.model_id].filesFolderId = result.files_folder_id;
 				//store.saveState();
 			}
