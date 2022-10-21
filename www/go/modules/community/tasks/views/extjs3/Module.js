@@ -169,9 +169,9 @@ go.modules.community.tasks.progress = {
 };
 
 go.modules.community.tasks.listTypes = {
-	List : 1,
-	Board : 2,
-	Project : 3,
-	Support : 4
+	List : "list",
+	Board : "board",
+	Project : "project",
+	Support : "support"
 
 }
