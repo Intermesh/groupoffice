@@ -586,11 +586,10 @@ a {
 		margin: 0;
 	}
 	.x-form-field-wrap {
-		margin: 0 auto;		
+		margin: 0 auto;
+		max-width: dp(800);
 	}
 	input {
-		width: 100%;
-		max-width: dp(800);
 		background: none;
 		height: dp(48);
 		border:0;
