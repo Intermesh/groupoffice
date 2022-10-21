@@ -99,12 +99,7 @@
 					}]
 				};
 
-				// if("progress" in alert.data) {
-				// 	c.items.push(new Ext.ProgressBar({
-				// 		text: t("Progress") + " " + alert.data.progress + "%",
-				// 		value: alert.data.progress / 100
-				// 	}))
-				// }
+
 
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
 
@@ -117,17 +112,39 @@
 
 					if(!panelCfg.title) {
 						//default title
-						panelCfg.title = entity.name || entity.title || entity.description || alert.entity;
+						panelCfg.title = alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity;
 					}
+
 
 					if(!panelCfg.items && !panelCfg.html) {
 
 						//default alert body
 						let body = go.util.Format.dateTime(alert.triggerAt);
-						if(alert.data) {
-							body += "<br />" + JSON.stringify(alert.data, undefined, 1);
+
+						if(alert.data.body) {
+							body = alert.data.body;
 						}
+
 						panelCfg.html = body;
+
+
+						if(alert.data && "progress" in alert.data) {
+
+							if(!panelCfg.items) {
+								panelCfg.items = [
+									{
+										xtype: "box",
+										html:panelCfg.html
+									}
+								];
+
+								delete panelCfg.html;
+							}
+							panelCfg.items.push(new Ext.ProgressBar({
+								text: t("Progress") + " " + alert.data.progress + "%",
+								value: alert.data.progress / 100
+							}))
+						}
 					}
 
 					if(!("notificationBody" in c)) {

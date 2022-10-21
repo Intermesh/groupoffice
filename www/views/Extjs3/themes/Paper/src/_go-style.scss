@@ -703,11 +703,9 @@ a {
 	float:left;
 	height: dp(32);
 	padding: dp(2) dp(8);
-	margin-top: dp(16);
+	margin-top: dp(18);
 	margin-right: dp(8);
 	border-radius: dp(16);
-	border: 1px solid color($fg,'line');
-	background-color: color($bg,'readonly');
 	> * {
 		@extend %icon;
 		animation: blink .3s 7 alternate;
