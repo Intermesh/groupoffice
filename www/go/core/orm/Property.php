@@ -1785,8 +1785,7 @@ abstract class Property extends Model {
 				}
 				throw $e;
 			}
-		} catch (Exception $e) {
-    }
+		}
 
     return true;
 	}
