@@ -1,3 +1,4 @@
+24-10-2022: 6.6.123
 - Core: Remember user selected language
 - Core: Remove old modules
 - Address book: Merge selected contacts
