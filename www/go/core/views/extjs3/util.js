@@ -736,12 +736,25 @@ go.util =  (function () {
 			this.blobCache[blobId] = fetch(go.Jmap.downloadUrl(blobId), fetchOptions)
 				.then( r => {
 
-					type = r.headers.get("Content-Type") || undefined
 
-					return r.arrayBuffer()
+					if(r.ok) {
+						type = r.headers.get("Content-Type") || undefined
+
+						return r.arrayBuffer().then( ab => URL.createObjectURL( new Blob( [ ab ], { type: type } ) ) );
+					} else
+					{
+						console.error(r);
+
+						return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
+					}
 
 				})
-				.then( ab => URL.createObjectURL( new Blob( [ ab ], { type: type } ) ) );
+				.catch((e) => {
+					console.error(e);
+
+					return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
+				});
+
 		}
 
 		return this.blobCache[blobId];
@@ -774,10 +787,12 @@ go.util =  (function () {
 					promises.push(this.getBlobURL(blobId).then(src => {
 
 						img.src = src;
-					}).then(() => {
+					})
+						.then(() => {
 						//wait till image is fully loaded
 						return new Promise(resolve => { img.onload = img.onerror = resolve; })
-					}));
+					}))
+
 				}
 			});
 
