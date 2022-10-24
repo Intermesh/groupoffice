@@ -492,29 +492,14 @@ class Token extends Entity {
 	 */
 	protected static function internalDelete(Query $query): bool
 	{
-
-		// todo remove this part when logout issue is solved
-		$debugEnabled = go()->getDebugger()->enabled;
-		if(!$debugEnabled) {
-			go()->getDebugger()->enable(true);
-		}
-
 		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
-		go()->debug("Deleting token query: " . $deleteQuery);
-		go()->getDebugger()->debugCalledFrom();
-		foreach($deleteQuery as $accessToken) {
 
+		foreach($deleteQuery as $accessToken) {
 			go()->debug("Deleting token: " . $accessToken);
 			go()->getCache()->delete('token-' . $accessToken);
 		}
 
-		$success =  parent::internalDelete($query);
-
-		if(!$debugEnabled) {
-			go()->getDebugger()->enabled = false;
-		}
-
-		return $success;
+		return parent::internalDelete($query);
 	}
 
 	/**

@@ -334,29 +334,45 @@ class Blob extends orm\Entity {
 	protected static function internalDelete(Query $query): bool
 	{
 
-		$new = [];
+		$ids = [];
 		$paths = [];
 
-		foreach(Blob::find()->mergeWith($query) as $blob) {
+		// debug disappearing blobs
+		go()->getDebugger()->enable(true);
+
+		go()->debug("BLOB GC");
+
+		$blobs = Blob::find()->mergeWith($query);
+
+		go()->debug($blobs);
+
+		foreach($blobs as $blob) {
 			if($blob->id != go()->getSettings()->logoId) {
-				$new[] = $blob->id;
+				$ids[] = $blob->id;
 				$paths[] = $blob->path();
 			}
 		}
 
-		if(empty($new)) {
+		if(empty($ids)) {
 			go()->debug("No blobs to delete");
 			return true;
 		}
 
+
+
+		go()->debug($query);
+		go()->debug($ids);
+
 		//for performance use Id's gathered above
-		$justIds = (new Query)->where(['id' => $new]);
+		$justIds = (new Query)->where(['id' => $ids]);
 		
 		if(parent::internalDelete($justIds)) {
 
 			foreach($paths as $path) {
 				if(is_file($path)) {
 					unlink($path);
+
+					go()->debug("GC unlink blob: " . $path);
 				}
 			}
 			return true;

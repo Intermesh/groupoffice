@@ -30,6 +30,10 @@ use Throwable;
  * - core_change sync changelog
  *
  * Modules can use EVENT_RUN to extend the process
+ *
+ * For testing:
+ *
+ * docker-compose exec -u www-data groupoffice-finance ./www/cli.php core/System/runCron --name='GarbageCollection'
  * 
  */
 class GarbageCollection extends CronJob {
@@ -76,7 +80,7 @@ class GarbageCollection extends CronJob {
 
 	private function blobs() {
 		go()->debug("Cleaning up BLOB's");
-		Blob::delete(Blob::findStale());
+		Blob::delete(Blob::find());
 		go()->debug("Deleted stale blobs");
 	}
 
