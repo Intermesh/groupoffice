@@ -43,9 +43,20 @@ class Acl extends Controller {
 			$col = $cls::$aclColumnName;
 		}
 
+
+		$fullAclCol = "$table.$col";
+
+		go()->getDbConnection()->debug = true;
+
+
 		if(!$params['add']) {
 			$stmt = go()->getDbConnection()->delete('core_acl_group',(new Query())
-			->where('aclId', 'IN', go()->getDbConnection()->selectSingleValue($col)->from($table)));
+			->where('aclId', 'IN',
+				go()->getDbConnection()
+					->selectSingleValue($col)->from($table, "t2")
+					->join("core_acl", "acl", "acl.id = t2.$col")
+					->where("acl.usedIn = '$fullAclCol'")
+			));
 
 			$stmt->execute();
 
@@ -56,6 +67,7 @@ class Acl extends Controller {
 					->join('core_acl', 'a', 'a.id=t.'.$col)
 					->join('core_group', 'g', 'g.isUserGroupFor=a.ownedBy')
 					->where('a.ownedBy != '.model\User::ID_SUPER_ADMIN)
+					->where("a.usedIn = '$fullAclCol'")
 			);
 
 			$stmt->execute();
@@ -66,7 +78,11 @@ class Acl extends Controller {
 			$stmt = go()->getDbConnection()
 				->insertIgnore(
 					'core_acl_group',
-					go()->getDbConnection()->select($col.', "'.$groupId.'", "' . $level .'"')->from($table),
+					go()->getDbConnection()
+						->select($col.', "'.$groupId.'", "' . $level .'"')
+						->from($table, 't')
+						->join("core_acl", "acl", "acl.id = t.$col")
+						->where("acl.usedIn = '$fullAclCol'"),
 					['aclId', 'groupId', 'level']
 			);
 
