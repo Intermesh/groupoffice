@@ -19,6 +19,7 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 					layout: "form",
 					items: [
 						this.templateCombo = new GO.email.TemplateCombo({
+							anchor: '90%',
 							hiddenName: "emailSettings.defaultTemplateId",
 							fieldLabel: t("Default template")
 						}),
@@ -74,9 +75,6 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 
 		]
 			},
-//			this.templateGrid = new GO.email.TemplateGrid({
-//				ownedBy: null
-//			}),
 			this.templatesGrid = new GO.email.TemplatesGrid({
 				region: "center"
 			})
