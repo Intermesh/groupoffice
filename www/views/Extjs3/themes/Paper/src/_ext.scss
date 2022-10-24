@@ -340,7 +340,9 @@
 	padding: dp(6) dp(8);
 }
 
-
+// hack to detect browser autofill https://github.com/matteobad/detect-autofill/
+@keyframes onautofillstart { from {} }
+@keyframes onautofillcancel { from {} }
 
 .x-form{
 	background-color: color($bg, 'form');
@@ -429,6 +431,15 @@
 		border: 1px solid color($fg, 'track');
 		display: inline-block;
 		padding: dp(13) dp(16);
+
+		&:-webkit-autofill {
+			background-color: transparent !important;
+			-webkit-box-shadow: 0 0 0 50px color($bg, 'box') inset;
+			animation-name: onautofillstart;
+		}
+		&:not(:-webkit-autofill) {
+			animation-name: onautofillcancel;
+		}
 	}
 	&-time { max-height: dp(32);  }
 	

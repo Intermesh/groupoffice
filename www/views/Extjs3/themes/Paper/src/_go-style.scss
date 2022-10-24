@@ -311,6 +311,7 @@ a {
 		text-align:right;
 		color:white;
 		padding-top: dp(4);
+		@include var(background-color, c-primary);
 	}
 	input {
 		background-color: inherit;

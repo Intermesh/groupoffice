@@ -39716,22 +39716,37 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
 				}
 			});
 
-			this.on("change", (field, v) => {
-				this.applyEmptyLabelCls(v)
-			});
+			const updateLabelClass = (field, v) => {
+				// console.warn(v,this.emptyText,this.placeholder);
+				this.applyEmptyLabelCls(!v &&  !this.emptyText && !this.placeholder)
+			};
 
-			this.on("setvalue", (field, v) => {
-				this.applyEmptyLabelCls(v)
-			});
+			this.on("change", updateLabelClass);
 
-			this.applyEmptyLabelCls(this.getValue());
+			this.on("setvalue", updateLabelClass);
+
+
+			//hack or detecting browser autofill
+			this.el.dom.addEventListener("animationstart", ({ target, animationName }) => {
+					switch (animationName) {
+						case 'onautofillstart':
+							this.applyEmptyLabelCls(false);
+							break;
+						case 'onautofillcancel':
+							this.applyEmptyLabelCls(!this.emptyText && !this.placeholder && !this.getValue());
+							break;
+					}
+			}, false);
+
+			this.applyEmptyLabelCls(!this.emptyText && !this.placeholder && !this.getValue());
+
 		},
 
-		applyEmptyLabelCls: function(v) {
+		applyEmptyLabelCls: function(isEmpty) {
 			const labelEl = this.findLabelEl();
 
 			if(labelEl) {
-				labelEl.classList.toggle("x-form-empty-label", v + "" === "");
+				labelEl.classList.toggle("x-form-empty-label", isEmpty);
 			}
 		},
 
@@ -40342,10 +40357,10 @@ Ext.form.TextField = Ext.extend(Ext.form.Field,  {
     },
 
     applyEmptyText : function(){
-        // if(this.rendered && this.emptyText && this.getRawValue().length < 1 && !this.hasFocus){
-        //     this.setRawValue(this.emptyText);
-        //     this.el.addClass(this.emptyClass);
-        // }
+        if(this.rendered && this.emptyText && this.getRawValue().length < 1 && !this.hasFocus){
+            this.setRawValue(this.emptyText);
+            this.el.addClass(this.emptyClass);
+        }
     },
 
     
