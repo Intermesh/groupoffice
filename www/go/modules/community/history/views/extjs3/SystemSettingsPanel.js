@@ -13,7 +13,9 @@ go.modules.community.history.SystemSettingsPanel = Ext.extend(go.systemsettings.
 			xtype: "fieldset",
 			items: [
 				{
-					xtype: "compositefield",
+					xtype: "container",
+					layout: "form",
+					cls: "go-hbox",
 					items: [{
 						xtype: "numberfield",
 						decimals: 0,
@@ -21,7 +23,8 @@ go.modules.community.history.SystemSettingsPanel = Ext.extend(go.systemsettings.
 						name: "deleteAfterDays"
 					}, {
 						xtype: "label",
-						html: t("days")
+						html: t("days"),
+						style: "align-self: center"
 					}]
 				}]
 		}];
