@@ -1895,7 +1895,7 @@ table[id^="comments-ext"] b {
  */
 .go-html-formatted {
 
-	word-break: break-word;
+	overflow-wrap: break-word;
 
 	@extend %font-body1;
 
