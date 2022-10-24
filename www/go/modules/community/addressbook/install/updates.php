@@ -162,6 +162,7 @@ $updates['202205101237'][] = "update addressbook_contact set filesFolderId = nul
 $updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD nameBank varchar(50);';
 $updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD BIC varchar(11);';
 
+$updates['202210171545'][] = 'ALTER TABLE `addressbook_contact` CHANGE `salutation` `salutation` VARCHAR(382) DEFAULT NULL;';
 
 // 6.7
 
