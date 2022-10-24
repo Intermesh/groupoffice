@@ -80,7 +80,7 @@ class GarbageCollection extends CronJob {
 
 	private function blobs() {
 		go()->debug("Cleaning up BLOB's");
-		Blob::delete(Blob::find());
+		Blob::delete(Blob::findStale());
 		go()->debug("Deleted stale blobs");
 	}
 
