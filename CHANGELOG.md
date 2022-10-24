@@ -4,6 +4,7 @@
 - Smime: SMIME signed as attachment didn't show if signature was invalid
 - Core: validate / and \ in email address as it's allowed by RC822
 - Address book: increased max size for salutation column in contacts table
+- Address book: Fixed merge with two contacts in the same address list
 
 17-10-2022: 6.6.122
 - Projects2: add approved boolean field to expense budget table
