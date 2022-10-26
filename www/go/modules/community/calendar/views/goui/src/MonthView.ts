@@ -1,55 +1,54 @@
-class MonthView extends CalendarView {
+import {CalendarView} from "./CalendarView.js";
+import {DateTime} from "@goui/util/DateTime.js";
+import {E} from "@goui/util/Element.js";
 
-	private stale = true
+export class MonthView extends CalendarView {
 
-	setDate(day:any) {
+	setDate(day: DateTime) {
 		if(!day) {
-			let now = new Date();
-			day = new Date(now.getFullYear(), now.getMonth(), 1);
+			day = (new DateTime()).setDate(1);
 		}
-		this.dom.cls('reverse',(day < this.day));
-		this.day = new Date(+day);
-		let end = new Date(+day);
-		day.setDate(1);
-		day.setDay(Date.firstWeekday); // start monday
-		this.firstDay = new Date(day.toDateString());
-		end.setMonth(end.getMonth()+1);
-		end.setDate(0);
-		end.setDay(6); //end sunday after last day
-		end.add(1,'d');
+		//this.el.cls('reverse',(day < this.day));
+		this.day = day.clone();
+		let end = day.clone();
+		day.setDate(1).setWeekDay(0);
+		this.firstDay = day.clone();
+		end.addMonths(1).setDate(0).setWeekDay(6).addDays(1); //end sunday after last day
 		//this.renderView();
 		//this.dom.cls('+loading');
-		this.store.filter('date', {after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00')}).fetch(0,500);
+		//this.store.filter('date', {after: day.format('Y-m-dT00:00:00'), before: end.format('Y-m-dT00:00:00')}).fetch(0,500);
 	}
 
 	renderView() {
 		let it = 0;
-		if (!this.stale) return;
-		let now = new Date(),
-			 day = new Date(this.day.toDateString()); // toDateString removes time
+		let now = new DateTime(),
+			 day = this.day.clone(); // toDateString removes time
 		day.setDate(1);
-		let start = new Date(+day), e,
-			html = `<ul>`;
-		for (var i = 0; i < 7; i++) { // header
-			let d = (i + Date.firstWeekday) % 7;
-			html += `<li class="${(day.to('Ym') == now.to('Ym') && now.getDay() == d)?'current':''}">${Date.days[d]}</li>`;
-		}
-		day.setDay(Date.firstWeekday); // start monday
-		html += `</ul>`;
-		while (day.to('Ym') <= start.to('Ym')) {
-			html += `<ol>
-				<li class="weeknb">${day.getWeek()}</li>
-				<li class="events">${this.drawWeek(day)}</li>`;
+		let start = day.clone(), e;
+
+		this.el.style.height = '100%';
+		this.el.cls(['+cal','+month','+active']);
+		this.el.append(E('ul',...DateTime.dayNames.map((name,i) =>
+			E('li',name).cls('current', day.format('Ym') == now.format('Ym') && now.getWeekDay() == i)
+		))); // headers
+
+		day.setWeekDay(0);
+		while (day.format('Ym') <= start.format('Ym')) {
+			const row = E('ol',
+					E('li',day.getWeekOfYear()).cls('weeknb'),
+					E('li',...this.drawWeek(day)).cls('events')
+				);
 			for (var i = 0; i < 7; i++) {
-				var cls:string[] =[];
-				if (day.to('Ymd') === now.to('Ymd')) cls.push('today');
-				if (day.to('Ymd') < now.to('Ymd')) cls.push('past');
-				if (day.to('Ym') !== start.to('Ym')) cls.push('other');
-				html += `<li class="${cls.join(' ')}" data-date="${day.to('Y-m-d')}"><em>${day.getDate()}</em></li>`; // day block
-				
-				day.add(1,'d');
+				row.append(E('li',
+					E('em',day.format(day.getDate() === 1 ? 'j M' : 'j'))
+				).attr('data-date', day.format('Y-m-d'))
+				 .cls('today', day.format('Ymd') === now.format('Ymd'))
+				 .cls('past', day.format('Ymd') < now.format('Ymd'))
+				 .cls('other', day.format('Ym') !== start.format('Ym')))
+
+				day.addDays(1);
 			}
-			html +=`</ol>`;
+			this.el.append(row);
 		}
 
 		//this.dom.html('<div class="monthview">'+html+'</div>');
@@ -57,9 +56,8 @@ class MonthView extends CalendarView {
 		// const //anim = this.dom!.has('.anim'),
 		// 	 el = this.dom!.html('<div class="cal month active">'+html+'</div>', anim ? -1 : undefined),
 		// 	curr = el.prev();
-		this.dom.style.height = '100%';
-		this.dom.classList.add('cal','month','active');
-		this.dom!.innerHTML = html;
+
+		//this.el.append(weeks);
 		// if (anim && curr) { // Render new view and transist it into the old with css
 		// 	//el.cls('+active');
 		// 	curr.cls('-active');
@@ -71,25 +69,26 @@ class MonthView extends CalendarView {
 		//this.waiting = false;
 	}
 
-	private drawWeek(start: Date) {
-		let end = new Date(+start), i=0, e;
-		end.add(7,'d');
-		let html = '';
+	private drawWeek(start: DateTime) {
+		let end = start.clone(),
+			i=0, e;
+		end.addDays(7);
+		let eventEls = [];
 		this.slots = {0:{},1:{},2:{},3:{},4:{},5:{},6:{}};
 		//debugger;
 		for(var storeIt in this.recur) { 
 			const r = this.recur[storeIt];
-			while(r.current < end){ 
-				html += this.drawEvent(this.store.get(storeIt), r.current, start);
+			while(r.current < end){
+				eventEls.push(this.drawEvent(this.store.get(storeIt), r.current, start));
 				r.next(); 
 			}
 		}
-		for (e of this.store.data.items) {
-			if(e.start.date().to('Yw') === start.to('Yw') && !e.recurrenceRule) {
-				html += this.drawEvent(e, new Date(e.start), start);
+		for (e of this.store.items) {
+			if(e.start.date().format('Yw') === start.format('Yw') && !e.recurrenceRule) {
+				eventEls.push(this.drawEvent(e, new DateTime(e.start), start));
 			}
 		}
-		return html;
+		return eventEls;
 	}
 
 	// onRender(dom){
@@ -113,11 +112,11 @@ class MonthView extends CalendarView {
 	// 	});
 	// }
 
-	private slots;
+	private slots: any;
 	private ROWHEIGHT = 26;
 
 
-	private calcRow(start, days) {
+	private calcRow(start: number, days: number) {
 		let row = 1, end = Math.min(start+days, 7);
 		while(row < 8) {
 			for(let i = start; i < end; i++) {
@@ -137,16 +136,16 @@ class MonthView extends CalendarView {
 		return 10;
 	}
 
-	drawEvent(e, eStart, weekstart) {
+	drawEvent(e: any, eStart: DateTime, weekstart: DateTime) {
 		let d = e.duration.match(/P.*(\d+)D/);
-		const cal = $.db.stores.Calendar.get(e.calendarId);
+		const cal = go.Db.stores('Calendar').get(e.calendarId);
 		let color = cal ? cal.color : '356772',
 			start = eStart.clone(),
 			days = d ? +d[1] : 1;
 		let row = this.calcRow(start.getWeekDay(),days);
 
 		let width = Math.min(7, days) * (100 / 7)- .2,
-			left = Math.floor((start - weekstart)/864e5) * (100 / 7),
+			left = Math.floor((start.getTime() - weekstart.getTime())/864e5) * (100 / 7),
 			top = row * this.ROWHEIGHT,
 			style = `background-color:#${color}; width: ${width}%; left:${left}%; top:${top}px;`;
 		//debugger;

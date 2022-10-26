@@ -1,24 +1,40 @@
-abstract class CalendarView extends Component { 
+import {Component} from "@goui/component/Component";
+import {jmapstore} from "@goui/jmap/JmapStore.js";
+import {Recurrence} from "./Recurrence.js";
+import {E} from "@goui/util/Element.js";
+import {DateTime} from "@goui/util/DateTime.js";
+import {t} from "@goui/Translate.js";
+
+export interface CalendarEvent {
+	recurrenceRule : any
+	links: any
+	alerts: any
+	isAllDay: boolean // showWithoutTime
+	duration: string
+	id: string
+	start: string
+	title: string
+	calendarId: string
+}
+
+export abstract class CalendarView extends Component {
 	
-	protected day: Date = new Date()
-	protected firstDay?: Date
+	protected day: DateTime = new DateTime()
+	protected firstDay?: DateTime
 	protected recur?: {[id:string]: Recurrence}
 
-	protected store!: any
+	protected store: any
 
-	constructor(cfg: ComponentCfg) {
-		super(cfg);
-		this.bind();
-		this.on('render', () => { this.store.load() });
-	}
-
-	private bind() {
-		this.store = store({
+	constructor() {
+		super();
+		this.store = jmapstore({
 			entity:'CalendarEvent',
 			properties: ['name', 'start', 'id'],
 			listeners: {'load': (me,records) => this.update()}
-		});
+		})
+		this.on('render', () => { this.store.load() });
 	}
+
 
 	private expandRecurrence() {
 		// todo: move to store update (only for new events)
@@ -32,8 +48,8 @@ abstract class CalendarView extends Component {
 		return recur;
 	}
 
-	// onRender(dom){
-	// 	this.setDate(new Date());
+	 internalRender(){
+	 	this.setDate(new DateTime());
 	// 	dom.on('click',(ev) => {
 	//
 	// 		const event = ev.target.up('.event');
@@ -51,7 +67,8 @@ abstract class CalendarView extends Component {
 	// 		// }
 	// 		ev.preventDefault();
 	// 	});
-	// }
+		 return this.el;
+	 }
 
 	update = (data?: any) => {
 		//this.fire('change', data);
@@ -62,14 +79,16 @@ abstract class CalendarView extends Component {
 		//}
 	}
 
-	protected eventHtml(e, style) {
-		return `<div data-id="${e.id}" style="${style}" class="event">
-			${e.recurrenceRule ? '<i>refresh</i>':''}
-			${e.links ? '<i>attachment</i>':''}
-			${e.alerts ? '<i>notifications</i>':''}
-			${e.title || '('+t('Nameless')+')'}
-			${!e.isAllDay ? '<span>'+(e.start && e.start.date().to('H:i'))+' - '+e.start.date().addDuration(e.duration).to('H:i')+'</span>':''}
-		</div>`;
+	protected eventHtml(e: CalendarEvent, style: string) {
+		const items = [],
+			 start = new DateTime(e.start);
+		if(e.recurrenceRule) items.push('refresh');
+		if(e.links) items.push('attachment');
+		if(e.alerts) items.push('notifications');
+		items.push(e.title || '('+t('Nameless')+')');
+		if(e.isAllDay)
+			items.push(E('span', start.format('H:i')+' - '+start.addDuration(e.duration).format('H:i')));
+		return E('div', ...items).cls('event').attr('data-id', e.id).attr('style',style);
 	}
 
 	protected calculateOverlap(events: any[]) {

@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "esbuild src/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist",
+    "start:sass": "npx sass --watch style:dist"
+  }
+}
