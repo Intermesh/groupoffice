@@ -2668,3 +2668,31 @@ body.go-compact {
 	gap: dp(8);
 	flex-direction: column;
 }
+
+
+.go-daterange-field {
+	height: dp(50);
+	background-color:color($bg, 'box');
+	border: 1px solid color($fg, 'track');
+
+	&:hover {
+		filter: none;
+	}
+
+	.x-btn-mc {
+		text-align: left;
+		padding: dp(8);
+	}
+
+	button {
+		@extend %font-data;
+		color: color($fg, 'text');
+
+	}
+
+	em.x-btn-arrow {
+		> button:after {
+			display: none;
+		}
+	}
+}
