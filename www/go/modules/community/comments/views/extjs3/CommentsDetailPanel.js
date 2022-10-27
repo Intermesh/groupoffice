@@ -278,7 +278,19 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				cls: 'go-html-formatted ' + mineCls
 			});
 
-			readMore.insert(1, {xtype:'box',html:r.get('text'), itemId:"content", cls: 'content ' +mineCls});
+			const qs = new go.util.QuoteStripper(r.get("text")),
+
+				quote = qs.getQuote(), quoteId = Ext.id();
+
+			let quoteLess = qs.getBodyWithoutQuote();
+
+			if(quote) {
+				quoteLess += '<a class="normal-link" id="' + quoteId + '">' + t("More") + "</a>";
+			}
+
+			const content = Ext.create({xtype:'box',html: quoteLess, itemId:"content", cls: 'content ' +mineCls});
+
+			readMore.insert(1, content);
 			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
 
 			if(r.data.attachments && r.data.attachments.length) {
@@ -311,6 +323,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 			readMore.on('afterrender',function(me){
 
+
+
 				me.getEl().on("contextmenu", function(e, target, obj){
 					e.stopEvent();
 
@@ -325,6 +339,15 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			readMore.getComponent("content").on("afterrender" , (content) => {
 
 				go.util.replaceBlobImages(content.getEl().dom);
+
+
+				if(quote) {
+
+					document.getElementById(quoteId).addEventListener("click", () => {
+						content.getContentTarget().update(r.get("text"));
+					});
+
+				}
 			})
 
 			prevStr = go.util.Format.date(r.get('date'));

@@ -117,6 +117,7 @@ util/Cookies.js
 util/SelectDialog.js
 util/Object.js
 util/Autolinker.js
+util/QuoteStripper.js
 
 User.js
 String.js
