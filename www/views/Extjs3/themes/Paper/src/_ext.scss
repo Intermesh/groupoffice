@@ -345,6 +345,11 @@
 @keyframes onautofillcancel { from {} }
 
 .x-form{
+
+	.x-panel, .x-fieldset {
+		border-radius: dp(10);
+		overflow: hidden;
+	}
 	background-color: color($bg, 'form');
 	> .x-tab-panel {
 		 > .x-tab-panel-bwrap> .x-tab-panel-body > div { // tabbed form dialog
@@ -730,7 +735,7 @@
 		
 		@extend %font-subheading; //changed this to be the same as panel headers as they are mixed in forms
 		//float:left;
-		padding:dp(8) 0 dp(16);
+		padding:dp(8) 0;
 		position: initial;
 		top: dp(32);
 		width: 100%;
@@ -740,7 +745,7 @@
 	
 		.x-tool {
 			float: right;
-			margin: dp(-12) 0;
+			margin: dp(-3.5);
 		}
 /*		.x-tool +.x-fieldset-header-text {
 			line-height: dp(40);

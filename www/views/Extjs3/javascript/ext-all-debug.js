@@ -39742,7 +39742,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent, {
 			return true;
 		}
 
-		const v = args.length == 1 ? args[0] : this.getValue();
+		const v = args.length == 1 ? args[0] : this.getRawValue();
 
 		return !!v;
 	},
@@ -41366,6 +41366,8 @@ Ext.form.DisplayField = Ext.extend(Ext.form.Field,  {
 
     setValue : function(v){
         this.setRawValue(v);
+
+				this.fireEvent("setvalue", this, v);
         return this;
     }
     
@@ -42317,6 +42319,12 @@ Ext.form.Checkbox = Ext.extend(Ext.form.Field,  {
 
 	
     initComponent : function(){
+
+			if(this.fieldLabel && !this.boxLabel) {
+				this.boxLabel = this.fieldLabel;
+				delete this.fieldLabel;
+			}
+
         Ext.form.Checkbox.superclass.initComponent.call(this);
         this.addEvents(
             
