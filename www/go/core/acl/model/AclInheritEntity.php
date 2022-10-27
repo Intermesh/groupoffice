@@ -200,9 +200,9 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 	}
 
 
-	protected static function getCheckAclUpdateQuery(): Query
+	protected static function checkAclJoinEntityTable(): Query
 	{
-		$updateQuery = parent::getCheckAclUpdateQuery();
+		$updateQuery = parent::checkAclJoinEntityTable();
 		$ownerAclAlias = static::joinAclEntity($updateQuery, 'entity');
 		$updateQuery->where('entity.' .static::$aclColumnName . " != " . $ownerAclAlias );
 
