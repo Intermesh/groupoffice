@@ -19,7 +19,7 @@ use go\core\db\Expression;
 abstract class AclOwnerEntity extends AclEntity {
 
 	use AclSetterTrait;
-	
+
 	/**
 	 * The ID of the {@see Acl}
 	 * 
@@ -309,6 +309,9 @@ abstract class AclOwnerEntity extends AclEntity {
 		//set owner and entity properties of acl
 		$aclColumn = static::getMapping()->getColumn(static::$aclColumnName);
 
+		$updateQuery = 	static::checkAclJoinEntityTable();
+		$updateQuery->tableAlias('acl');
+
 		$updates = [
 			'acl.entityTypeId' => static::entityType()->getId(),
 			'acl.entityId' => new Expression('entity.id'),
@@ -336,7 +339,8 @@ abstract class AclOwnerEntity extends AclEntity {
 		$stmt = go()->getDbConnection()->update(
 			'core_acl',
 			$updates,
-			$updateQuery);
+			$updateQuery
+		);
 
 		if(!$stmt->execute()) {
 			throw new Exception("Could not update ACL");
@@ -344,18 +348,14 @@ abstract class AclOwnerEntity extends AclEntity {
 	}
 
 	/**
-	 * Builds the query to update ACL's on the database check
+	 * This function joins the enity table so that the check function can set the usedIn property on the acl.
+	 * The table alias must be 'entity'.
 	 *
-	 * @return Query
-	 * @throws Exception
+	 * @return \go\core\db\Query|Query
 	 */
-	protected static function getCheckAclUpdateQuery(): Query
-	{
+	protected static function checkAclJoinEntityTable() {
 		$table = static::getMapping()->getPrimaryTable();
-		$updateQuery = 	(new Query())
-			->tableAlias('acl')
+		return (new Query())
 			->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id');
-		return $updateQuery;
 	}
-
 }

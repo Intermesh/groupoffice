@@ -163,6 +163,13 @@ class TaskList extends AclOwnerEntity
 			->getUserRights()->mayChangeTasklists;
 	}
 
+	protected static function checkAclJoinEntityTable()
+	{
+		return (new Query())
+			->join("tasks_tasklist", 'entity', 'entity.aclId = acl.id and entity.role != ' . self::Project);
+
+	}
+
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
 		if(isset($sort['group'])) {
