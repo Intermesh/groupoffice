@@ -39576,171 +39576,168 @@ Ext.reg('menucheckitem', Ext.menu.CheckItem);
 });
 Ext.reg('colormenu', Ext.menu.ColorMenu);
 
-Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
-    
-    
-    
-    
-    
-    
-
-    
-    invalidClass : 'x-form-invalid',
-    
-    invalidText : 'The value in this field is invalid',
-    
-    focusClass : 'x-form-focus',
-    
-    
-    validationEvent : 'keyup',
-    
-    validateOnBlur : true,
-    
-    validationDelay : 250,
-    
-    defaultAutoCreate : {tag: 'input', type: 'text', size: '20', autocomplete: 'off'},
-    
-    autocomplete: "off",
-
-    placeholder: "",
-
-    spellCheck: false,
-
-    fieldClass : 'x-form-field',
-    
-    msgTarget : 'under',
-    
-    msgFx : 'normal',
-    
-    readOnly : false,
-    
-    disabled : false,
-    
-    submitValue: true,
-
-    
-    isFormField : true,
-
-    
-    msgDisplay: '',
-
-    
-    hasFocus : false,
-
-    
-    initComponent : function(){
-        Ext.form.Field.superclass.initComponent.call(this);
-        this.addEvents(
-            
-            'focus',
-            
-            'blur',
-            
-            'specialkey',
-            
-            'change',
-            
-            'invalid',
-            
-            'valid'
-        );
-    },
-
-    
-    getName : function(){
-        return this.rendered && this.el.dom.name ? this.el.dom.name : this.name || this.id || '';
-    },
-
-    
-    onRender : function(ct, position){
-        if(!this.el){
-            var cfg = this.getAutoCreate();
-
-            if(!cfg.name){
-                cfg.name = this.name || this.id;
-            }
-            if(this.inputType){
-                cfg.type = this.inputType;
-            }
-
-            cfg.autocomplete = this.autocomplete;
-            cfg.placeholder = this.placeholder;
-
-            if(!this.spellCheck) {
-              cfg.autocorrect="off";
-              cfg.autocapitalize="off";
-              cfg.spellcheck="false";
-            }
-            
-            this.autoEl = cfg;
-        }
-        Ext.form.Field.superclass.onRender.call(this, ct, position);
-        if(this.submitValue === false){
-            this.el.dom.removeAttribute('name');
-        }
-        var type = this.el.dom.type;
-        if(type){
-            if(type == 'password'){
-                type = 'text';
-            }
-            this.el.addClass('x-form-'+type);
-        }
-        if(this.readOnly){
-            this.setReadOnly(true);
-        }
-        if(this.tabIndex !== undefined){
-            this.el.dom.setAttribute('tabIndex', this.tabIndex);
-        }
-
-        this.el.addClass([this.fieldClass, this.cls]);
+Ext.form.Field = Ext.extend(Ext.BoxComponent, {
 
 
-				this.initLabelClasses();
-    },
+	invalidClass: 'x-form-invalid',
+
+	invalidText: 'The value in this field is invalid',
+
+	focusClass: 'x-form-focus',
 
 
-		initLabelClasses : function() {
-			this.on("invalid", () => {
-				const labelEl = this.findLabelEl();
+	validationEvent: 'keyup',
 
-				if(labelEl) {
-					labelEl.classList.add(this.invalidClass + "-label");
-				}
-			});
+	validateOnBlur: true,
 
-			this.on("valid", () => {
-				const labelEl = this.findLabelEl();
+	validationDelay: 250,
 
-				if(labelEl) {
-					labelEl.classList.remove(this.invalidClass + "-label");
-				}
-			});
+	defaultAutoCreate: {tag: 'input', type: 'text', size: '20', autocomplete: 'off'},
 
-			const updateLabelClass = (field, v) => {
-				// console.warn(v,this.emptyText,this.placeholder);
-				this.applyEmptyLabelCls(!v &&  !this.emptyText && !this.placeholder)
-			};
+	autocomplete: "off",
 
-			this.on("change", updateLabelClass);
+	placeholder: "",
 
-			this.on("setvalue", updateLabelClass);
+	spellCheck: false,
+
+	fieldClass: 'x-form-field',
+
+	msgTarget: 'under',
+
+	msgFx: 'normal',
+
+	readOnly: false,
+
+	disabled: false,
+
+	submitValue: true,
 
 
-			//hack or detecting browser autofill
-			this.el.dom.addEventListener("animationstart", ({ target, animationName }) => {
-					switch (animationName) {
-						case 'onautofillstart':
-							this.applyEmptyLabelCls(false);
-							break;
-						case 'onautofillcancel':
-							this.applyEmptyLabelCls(!this.emptyText && !this.placeholder && !this.getValue());
-							break;
-					}
-			}, false);
+	isFormField: true,
 
-			this.applyEmptyLabelCls(!this.emptyText && !this.placeholder && !this.getValue());
 
-		},
+	msgDisplay: '',
+
+
+	hasFocus: false,
+
+
+	initComponent: function () {
+		Ext.form.Field.superclass.initComponent.call(this);
+		this.addEvents(
+			'focus',
+
+			'blur',
+
+			'specialkey',
+
+			'change',
+
+			'invalid',
+
+			'valid'
+		);
+	},
+
+
+	getName: function () {
+		return this.rendered && this.el.dom.name ? this.el.dom.name : this.name || this.id || '';
+	},
+
+
+	onRender: function (ct, position) {
+		if (!this.el) {
+			var cfg = this.getAutoCreate();
+
+			if (!cfg.name) {
+				cfg.name = this.name || this.id;
+			}
+			if (this.inputType) {
+				cfg.type = this.inputType;
+			}
+
+			cfg.autocomplete = this.autocomplete;
+			cfg.placeholder = this.placeholder;
+
+			if (!this.spellCheck) {
+				cfg.autocorrect = "off";
+				cfg.autocapitalize = "off";
+				cfg.spellcheck = "false";
+			}
+
+			this.autoEl = cfg;
+		}
+		Ext.form.Field.superclass.onRender.call(this, ct, position);
+		if (this.submitValue === false) {
+			this.el.dom.removeAttribute('name');
+		}
+		var type = this.el.dom.type;
+		if (type) {
+			if (type == 'password') {
+				type = 'text';
+			}
+			this.el.addClass('x-form-' + type);
+		}
+		if (this.readOnly) {
+			this.setReadOnly(true);
+		}
+		if (this.tabIndex !== undefined) {
+			this.el.dom.setAttribute('tabIndex', this.tabIndex);
+		}
+
+		this.el.addClass([this.fieldClass, this.cls]);
+
+
+		this.initLabelClasses();
+	},
+
+
+	initLabelClasses: function () {
+		this.on("invalid", () => {
+			const labelEl = this.findLabelEl();
+
+			if (labelEl) {
+				labelEl.classList.add(this.invalidClass + "-label");
+			}
+		});
+
+		this.on("valid", () => {
+			const labelEl = this.findLabelEl();
+
+			if (labelEl) {
+				labelEl.classList.remove(this.invalidClass + "-label");
+			}
+		});
+
+		const updateLabelClass = (field, v) => {
+			// console.warn(v,this.emptyText,this.placeholder);
+			this.applyEmptyLabelCls(!v && !this.hasEmptyTextOrPlaceHolder())
+		};
+
+		this.on("change", updateLabelClass);
+
+		this.on("setvalue", updateLabelClass);
+
+
+		//hack or detecting browser autofill
+		this.el.dom.addEventListener("animationstart", ({target, animationName}) => {
+			switch (animationName) {
+				case 'onautofillstart':
+					this.applyEmptyLabelCls(false);
+					break;
+				case 'onautofillcancel':
+					this.applyEmptyLabelCls(!this.hasEmptyTextOrPlaceHolder() && !this.getValue());
+					break;
+			}
+		}, false);
+
+		this.applyEmptyLabelCls(!this.hasEmptyTextOrPlaceHolder() && !this.getValue());
+
+	},
+
+	hasEmptyTextOrPlaceHolder: function () {
+		return  this.emptyText || this.placeholder;
+	},
 
 		applyEmptyLabelCls: function(isEmpty) {
 			const labelEl = this.findLabelEl();
@@ -42876,6 +42873,20 @@ Ext.form.CompositeField = Ext.extend(Ext.form.Field, {
         this.items.addAll(fields);
         
     },
+
+	hasEmptyTextOrPlaceHolder: function () {
+		if(this.emptyText || this.placeholder) {
+			return true;
+		}
+
+		const first = this.items.first();
+
+		if(!first) {
+			return false;
+		}
+
+		return first.emptyText || first.placeholder;
+	},
 
     
     onRender: function(ct, position) {
