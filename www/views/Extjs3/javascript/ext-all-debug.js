@@ -39711,7 +39711,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent, {
 
 		const updateLabelClass = (field, v) => {
 			// console.warn(v,this.emptyText,this.placeholder);
-			this.applyEmptyLabelCls(!v && !this.hasEmptyTextOrPlaceHolder())
+			this.applyEmptyLabelCls(!this.labelShouldFloat(v))
 		};
 
 		this.on("change", updateLabelClass);
@@ -39726,17 +39726,25 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent, {
 					this.applyEmptyLabelCls(false);
 					break;
 				case 'onautofillcancel':
-					this.applyEmptyLabelCls(!this.hasEmptyTextOrPlaceHolder() && !this.getValue());
+					this.applyEmptyLabelCls(!this.labelShouldFloat());
 					break;
 			}
 		}, false);
-
-		this.applyEmptyLabelCls(!this.hasEmptyTextOrPlaceHolder() && !this.getValue());
+		this.applyEmptyLabelCls(!this.labelShouldFloat());
 
 	},
 
-	hasEmptyTextOrPlaceHolder: function () {
-		return  this.emptyText || this.placeholder;
+
+
+	labelShouldFloat: function (...args) {
+
+		if(this.emptyText || this.placeholder) {
+			return true;
+		}
+
+		const v = args.length == 1 ? args[0] : this.getValue();
+
+		return !!v;
 	},
 
 		applyEmptyLabelCls: function(isEmpty) {
@@ -42874,7 +42882,7 @@ Ext.form.CompositeField = Ext.extend(Ext.form.Field, {
         
     },
 
-	hasEmptyTextOrPlaceHolder: function () {
+	labelShouldFloat: function (...args) {
 		if(this.emptyText || this.placeholder) {
 			return true;
 		}
@@ -42885,7 +42893,13 @@ Ext.form.CompositeField = Ext.extend(Ext.form.Field, {
 			return false;
 		}
 
-		return first.emptyText || first.placeholder;
+		if(first.emptyText || first.placeholder) {
+			return true;
+		}
+
+		const v = args.length ? args[0] : first.getValue();
+
+		return !!v;
 	},
 
     
