@@ -32,10 +32,10 @@ class QuoteStripper {
 		}
 	}
 	findByGreaterThan() {
-		const pattern = /\n&gt;/;
+		const pattern = /&gt;(\s|&nbsp;)/;
 		const match = pattern.exec(this.body);
 		if (match) {
-			return pattern.lastIndex;
+			return match.index;
 		}
 		return -1;
 	}
@@ -71,7 +71,8 @@ class QuoteStripper {
 		let pos = 0;
 		for (let i = 0, c = lines.length; i < c; i++) {
 			const plain = lines[i].replace(/(<([^>]+)>)/ig, ""); //strip html tags
-			const pattern = /[a-z]+:\s*[a-z0-9\._\-+\&]+@[a-z0-9\.\-_]+/i;
+			const pattern = /[a-z]+:.*[a-z0-9._\-+&]+@[a-z0-9.\-_]+/i;
+
 			//Match:
 			//ABC: email@domain.com
 			if (plain.match(pattern)) {
