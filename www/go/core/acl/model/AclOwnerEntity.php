@@ -418,6 +418,9 @@ abstract class AclOwnerEntity extends AclEntity {
 		//set owner and entity properties of acl
 		$aclColumn = static::getMapping()->getColumn(static::$aclColumnName);
 
+		$updateQuery = 	static::checkAclJoinEntityTable();
+		$updateQuery->tableAlias('acl');
+
 		$updates = [
 			'acl.entityTypeId' => static::entityType()->getId(),
 			'acl.entityId' => new Expression('entity.id'),
@@ -443,12 +446,23 @@ abstract class AclOwnerEntity extends AclEntity {
 		$stmt = go()->getDbConnection()->update(
 			'core_acl',
 			$updates,
-			(new Query())
-				->tableAlias('acl')
-				->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id'));
+			$updateQuery
+		);
 
 		if(!$stmt->execute()) {
 			throw new Exception("Could not update ACL");
 		}
+	}
+
+	/**
+	 * This function joins the enity table so that the check function can set the usedIn property on the acl.
+	 * The table alias must be 'entity'.
+	 *
+	 * @return \go\core\db\Query|Query
+	 */
+	protected static function checkAclJoinEntityTable() {
+		$table = static::getMapping()->getPrimaryTable();
+		return (new Query())
+			->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id');
 	}
 }
