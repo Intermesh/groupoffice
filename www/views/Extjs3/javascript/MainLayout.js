@@ -944,6 +944,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			var newTitle = number ? panel.origTitle + ' <div class="go-tab-notification" style="background-color:' + color + '">' + number + '</div>' : panel.origTitle;
 
+			panel.notification = number;
+
 			panel.setTitle(newTitle);
 		}
 

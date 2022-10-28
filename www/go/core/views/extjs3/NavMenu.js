@@ -44,10 +44,14 @@ go.NavMenu = Ext.extend(Ext.DataView,{
 			itemSelector:'div',
 			tpl:'<tpl for=".">\
 					<div class="{cls}"><i class="icon {iconCls}">{icon}</i>\
-					<span>{name}</span></div>\
+					<span>{name}</span>\
+					<tpl if="values.badge">\
+					<span class="badge right">{badge}</span>\
+					</tpl>\
+					</div>\
 					</tpl>\
 				</tpl>',
-			columns: [{dataIndex:'name'}]
+			// columns: [{dataIndex:'name'}]
 		});
 		
 		go.NavMenu.superclass.initComponent.call(this);
