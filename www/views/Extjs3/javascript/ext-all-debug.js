@@ -43288,6 +43288,9 @@ Ext.form.Hidden = Ext.extend(Ext.form.Field, {
     
     shouldLayout: false,
 
+
+    initLabelClasses: function() {},
+
     
     onRender : function(){
         Ext.form.Hidden.superclass.onRender.apply(this, arguments);

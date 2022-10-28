@@ -402,7 +402,7 @@
 	&-field {
 		@extend %font-data;
 		color: color($fg, 'text');
-		min-height: dp(50);
+		//min-height: dp(50);
 		line-height: dp(20);
 		//line-height: dp(18);
 		transition: border-color 100ms linear, box-shadow 225ms linear;
@@ -435,7 +435,7 @@
 		background-color:color($bg, 'box');
 		border: 1px solid color($fg, 'track');
 		display: inline-block;
-		padding: dp(13) dp(16);
+		padding: dp(11) dp(16);
 
 		&:-webkit-autofill {
 			background-color: transparent !important;
@@ -450,7 +450,7 @@
 	
 	textarea.x-form-field {
 		/*height: min-content;*/
-		height: dp(32);
+		min-height: dp(44); //line-height 20 + padding 11 + borders = 44
 	}
 	//&-empty-field + .x-form-twin-triggers > .x-form-clear-trigger {
 	//	visibility:hidden; // only show clear button when not
@@ -516,7 +516,7 @@
 	&-item {
 		position: relative;
 		padding-top: dp(8);
-		margin-bottom:dp(8);
+		margin-bottom:dp(6);
 		//Following line made grid in forms appear in disabled like text
 		/*@extend %font-caption;*/
 
@@ -538,8 +538,8 @@
 			//top: dp(15);
 			left: dp(12);
 			font-size: sp(16);
-			top: dp(32);
-			transform: translateY(dp(-24)) scale(.8);
+			top: dp(28);
+			transform: translateY(dp(-20)) scale(.8);
 			//below performs better but looks ugly on windows :(
 			will-change: transform;
 			transform-origin: top left;
