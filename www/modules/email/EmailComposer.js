@@ -187,26 +187,7 @@ GO.email.EmailComposer = function(config) {
 
 
 	var items = [
-	this.fromCombo = new Ext.form.ComboBox({
-		store : GO.email.aliasesStore,
-		editable:false,
-		fieldLabel : t("From", "email"),
-		name : 'alias_name',
-		anchor : '100%',
-		displayField : 'from',
-		valueField : 'id',
-		hiddenName : 'alias_id',
-		forceSelection : true,
-		triggerAction : 'all',
-		mode : 'local',
-		tpl: '<tpl for="."><div class="x-combo-list-item">{from:htmlEncode}</div></tpl>',
-		listeners:{
-			beforeselect: function(cb, newAccountRecord){
-				this._checkLoadTemplate(cb,newAccountRecord);
-			},
-			scope:this
-		}
-	}),
+
 	{
 		xtype:'compositefield',
 		anchor : '100%',
@@ -307,11 +288,44 @@ GO.email.EmailComposer = function(config) {
 						
 	
 	
-	items.push(this.subjectField = new Ext.form.TextField({
-		fieldLabel : t("Subject", "email"),
-		name : 'subject',
-		anchor : '100%'
-	}));
+	items.push(
+
+		{
+			xtype: "container",
+			cls: "go-hbox",
+			layout: "form",
+			items: [
+				this.subjectField = new Ext.form.TextField({
+					fieldLabel : t("Subject", "email"),
+					name : 'subject',
+					flex: 1
+				}),
+
+				this.fromCombo = new Ext.form.ComboBox({
+					store : GO.email.aliasesStore,
+					editable:false,
+					fieldLabel : t("From", "email"),
+					name : 'alias_name',
+					flex: 1,
+					displayField : 'from',
+					valueField : 'id',
+					hiddenName : 'alias_id',
+					forceSelection : true,
+					triggerAction : 'all',
+					mode : 'local',
+					tpl: '<tpl for="."><div class="x-combo-list-item">{from:htmlEncode}</div></tpl>',
+					listeners:{
+						beforeselect: function(cb, newAccountRecord){
+							this._checkLoadTemplate(cb,newAccountRecord);
+						},
+						scope:this
+					}
+				})
+			]
+		}
+
+
+	);
 	this.emailEditor = new GO.base.email.EmailEditorPanel({
 		maxAttachmentsSize:parseInt(GO.settings.config.max_attachment_size),
 		region:'center'
