@@ -16,13 +16,15 @@ class QuoteStripper {
 	}
 	split() {
 		let quoteIndex = this.findByBlockQuote();
-		if (quoteIndex === -1) {
+		if (quoteIndex < 1) {
 			quoteIndex = this.findByGreaterThan();
 		}
-		if (quoteIndex === -1) {
+
+		if (quoteIndex < 1) {
 			quoteIndex = this.findQuoteByHeaderBlock();
 		}
-		if (quoteIndex > -1) {
+
+		if (quoteIndex > 0) {
 			this.bodyWithoutQuote = this.body.substring(0, quoteIndex);
 			this.quote = this.body.substring(quoteIndex);
 		}
