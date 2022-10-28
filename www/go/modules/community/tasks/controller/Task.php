@@ -65,5 +65,30 @@ class Task extends EntityController {
 
 		return $entity;
 	}
+	
+	
+	
+	public function countMine() {
+		$query = model\Task::find(['id'])
+			->selectSingleValue("count(*)")
+			->filter([
+				"operator" => "OR",
+				"conditions" => [
+					["responsibleUserId" => go()->getUserId()],
+					["responsibleUserId" => null]
+				]
+			])
+			->filter([
+				"progress" => "needs-action",
+				"role" => "support"
+			]);
+
+		$query->removeJoin("tasks_task_user");
+		$query->removeJoin("pr2_hours");
+		$query->groupBy([]);
+
+
+		return $query->single();
+	}
 }
 
