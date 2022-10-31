@@ -4,7 +4,8 @@
 - Billing: add customer report export
 - Comments: Only the creator or admin may edit and delete comments
 - Core: Added "Is empty" filter to custom date filter
-- Calendar: When an appointment was openend from an email it was set as declined for the organizer immediately
+- Calendar: When an appointment was opened from an email it was set as declined for the organizer immediately
+- Email: Fix: open linked email in popup
 
 24-10-2022: 6.6.123
 - Core: Remember user selected language

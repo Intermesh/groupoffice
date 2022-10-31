@@ -102,14 +102,6 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 							});
 
 							win.load(record.data.toId);
-
-//								var lb = new go.links.LinkBrowser({
-//									entity: this.store.baseParams.filter.entity,
-//									entityId: this.store.baseParams.filter.entityId
-//								});
-//
-//								lb.show();
-//								lb.load(record.data.toEntity, record.data.toId);
 						}
 					}
 				}
