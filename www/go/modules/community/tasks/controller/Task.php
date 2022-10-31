@@ -65,9 +65,11 @@ class Task extends EntityController {
 
 		return $entity;
 	}
-	
-	
-	
+
+	public function merge($params) {
+		return $this->defaultMerge($params);
+	}
+
 	public function countMine() {
 		$query = model\Task::find(['id'])
 			->selectSingleValue("count(*)")

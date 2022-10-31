@@ -455,6 +455,44 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			ddGroup: 'TasklistsDD',
 			split: true,
 			region: 'center',
+			multiSelectToolbarItems: [
+				{
+					iconCls: "ic-merge-type",
+					tooltip: t("Merge"),
+					handler: function() {
+						const ids = this.taskGrid.getSelectionModel().getSelections().column('id');
+						console.warn(ids);
+						if(ids.length < 2) {
+							Ext.MessageBox.alert(t("Error"), t("Please select at least two items"));
+						} else
+						{
+							Ext.MessageBox.confirm(t("Merge"), t("The selected items will be merged into one. The item you selected first will be used primarily. Are you sure?"), async function(btn) {
+
+								if(btn != "yes") {
+									return;
+								}
+
+								try {
+									Ext.getBody().mask(t("Saving..."));
+									const result = await go.Db.store("Task").merge(ids);
+									await go.Db.store("Task").getUpdates();
+
+									setTimeout(() => {
+										const dlg = new go.modules.community.tasks.TaskDialog();
+										dlg.load(result.id);
+										dlg.show();
+									})
+								} catch(e) {
+									Ext.MessageBox.alert(t("Error"), e.message);
+								} finally {
+									Ext.getBody().unmask();
+								}
+							}, this);
+						}
+					},
+					scope: this
+				}
+				],
 			tbar: [
 					this.showNavButton = new Ext.Button({
 						hidden: true,

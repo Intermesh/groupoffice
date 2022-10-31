@@ -214,10 +214,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					handler: function() {
 						const ids = this.grid.getSelectionModel().getSelections().column('id');
 						if(ids.length < 2) {
-							Ext.MessageBox.alert(t("Error"), t("Please select at least two contacts"));
+							Ext.MessageBox.alert(t("Error"), t("Please select at least two items"));
 						} else
 						{
-							Ext.MessageBox.confirm(t("Merge"), t("The selected contacts will be merged into one contact. Are you sure?"), async function(btn) {
+							Ext.MessageBox.confirm(t("Merge"), t("The selected items will be merged into one. The item you selected first will be used primarily. Are you sure?"), async function(btn) {
 
 								if(btn != "yes") {
 									return;
