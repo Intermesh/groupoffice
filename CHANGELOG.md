@@ -1,4 +1,4 @@
-6.6.124
+31-10-2022 6.6.124
 - Core: Add extra CSS options to custom comboboxes
 - Billing: add profit and profit percentage fields, also add both fields to customer report
 - Billing: add customer report export
