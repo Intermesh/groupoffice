@@ -29,7 +29,7 @@ go.users.UserGrid = Ext.extend(go.grid.GridPanel, {
 
 						return '<div class="user"><div class="avatar" style="' + style + '"></div>' +
 							'<div class="wrap">' +
-							'<div class="displayName">' + value + '</div>' +
+							'<div class="displayName">' + Ext.util.Format.htmlEncode(value) + '</div>' +
 							'<small class="username">' + Ext.util.Format.htmlEncode(record.get('username')) + '</small>' +
 							'</div>' +
 							'</div>';
