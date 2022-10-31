@@ -71,6 +71,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 		this.contextMenu = new Ext.menu.Menu({
 			items:[{
+
+				itemId: "delete",
 				iconCls: 'ic-delete',
 				text: t("Delete"),
 				handler: function() {
@@ -85,6 +87,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				},
 				scope:this
 			},{
+				itemId: "edit",
 				iconCls: 'ic-edit',
 				text: t("Edit"),
 				handler: function() {
@@ -263,11 +266,13 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 			readMore.on('render',function(me){me.getEl().on("contextmenu", function(e, target, obj){
 				e.stopEvent();		
-				
-				if(r.data.permissionLevel > go.permissionLevels.read) {
-					this.contextMenu.record = r;
-					this.contextMenu.showAt(e.xy);
-				}
+
+				this.contextMenu.record = r;
+				this.contextMenu.showAt(e.xy);
+
+
+				this.contextMenu.items.get("delete").setDisabled(r.data.permissionLevel < go.permissionLevels.writeAndDelete);
+				this.contextMenu.items.get("edit").setDisabled(r.data.permissionLevel < go.permissionLevels.write);
 
 			}, this);},this);
 
