@@ -2,6 +2,7 @@
 - Core: Add extra CSS options to custom comboboxes
 - Billing: add profit and profit percentage fields, also add both fields to customer report
 - Billing: add customer report export
+- Comments: Only the creator or admin may edit and delete comments
 
 24-10-2022: 6.6.123
 - Core: Remember user selected language
