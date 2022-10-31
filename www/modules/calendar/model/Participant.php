@@ -440,6 +440,7 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 		
 		return parent::afterDelete();
 	}
+
 	
 //	private function _updateEvents(){
 //
