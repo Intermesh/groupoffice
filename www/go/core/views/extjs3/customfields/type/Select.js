@@ -28,7 +28,6 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	renderDetailView: function (value, data, customfield) {		
 		var text = this.findRecursive(value, customfield.dataType.options);
 		return text ? text.substr(3) : null;
-		// return opt ? opt.text : null;
 	},
 
 	findRecursive: function (value, options, text) {
@@ -64,7 +63,7 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var c = go.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
+		let c = go.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		c.xtype = "treeselectfield";
 		c.customfield = customfield;
@@ -85,7 +84,7 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	 */
 	getFieldDefinition : function(field) {
 		
-		var c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
+		let c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
 		
 		c.convert = function(v, record) {
 			return this.customFieldType.renderDetailView(v, record.data, this.customField);
@@ -104,8 +103,69 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 			title: field.name,
 			customfield: field
 		};
-	}
-	
+	},
+	/**
+	 * Get grid column definition
+	 *
+	 * @param {type} field
+	 * @returns {TextAnonym$0.getColumn.TextAnonym$6}
+	 */
+	getColumn : function(field) {
+		const def = this.getFieldDefinition(field);
+		let c = {
+			dataIndex: def.name,
+			header: def.customField.name,
+			hidden: def.customField.hiddenInGrid,
+			id: "custom-field-" + encodeURIComponent(def.customField.databaseName),
+			sortable: true,
+			hideable: true,
+			draggable: true,
+			xtype: this.getColumnXType()
+		};
+
+		c.renderer = function(val, metadata, record, rowIndex, i, store) {
+			if(!go.util.empty(val)) {
+				const selectedOption = field.dataType.options.find(elm => elm.text === val);
+				if(selectedOption && selectedOption.renderMode === "cell") {
+					let inlineStyle = "";
+					if (selectedOption.foregroundColor) {
+						inlineStyle += "color: #" + selectedOption.foregroundColor + ";";
+					}
+					if (selectedOption.backgroundColor) {
+						inlineStyle += "background-color: #" + selectedOption.backgroundColor + ";";
+					}
+
+					let cellStyle = metadata.style || '';
+					if (!go.util.empty(inlineStyle)) {
+						cellStyle += inlineStyle;
+					}
+					metadata.style = cellStyle;
+				}
+			}
+			return val;
+		};
+		c.rowRenderer = function(val) {
+			if (!go.util.empty(val)) {
+				const selectedOption = field.dataType.options.find(elm => elm.text === val);
+				if(!selectedOption || selectedOption.renderMode !== "row") {
+					return false;
+				}
+
+				let inlineStyle =  "";
+				if (selectedOption.foregroundColor) {
+					inlineStyle += "color: #" + selectedOption.foregroundColor + ";";
+				}
+				if(selectedOption.backgroundColor) {
+					inlineStyle += "background-color: #" + selectedOption.backgroundColor + ";";
+				}
+				return inlineStyle;
+			}
+			return false;
+		};
+
+		return c;
+	},
 });
+
 
 // go.customfields.CustomFields.registerType(new go.customfields.type.Select());

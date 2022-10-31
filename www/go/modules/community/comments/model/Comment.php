@@ -200,7 +200,7 @@ class Comment extends AclItemEntity {
 			return Acl::LEVEL_MANAGE;
 		}
 
-		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_WRITE : false;
+		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_CREATE : false;
 
 	}
 

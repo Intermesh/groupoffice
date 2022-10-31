@@ -139,8 +139,11 @@ CREATE TABLE `core_customfields_select_option` (
   `id` int(11) NOT NULL,
   `fieldId` int(11) NOT NULL,
   `parentId` int(11) DEFAULT NULL,
-  `text` varchar(255) DEFAULT NULL,
-  `sortOrder` int(11) UNSIGNED DEFAULT 0,
+  `text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `foregroundColor` varchar(6) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `backgroundColor` varchar(6) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `renderMode` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sortOrder` int(11) unsigned DEFAULT 0,
   `enabled` BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 

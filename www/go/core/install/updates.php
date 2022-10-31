@@ -1213,7 +1213,9 @@ $updates['202207041200'][] = "alter table core_customfields_field_set
 
 
 
-
+$updates['202209291100'][] = "ALTER TABLE `core_customfields_select_option` ADD COLUMN `foregroundColor` VARCHAR(6) DEFAULT NULL AFTER `text`, 
+    ADD COLUMN `backgroundColor` VARCHAR(6) DEFAULT NULL AFTER `foregroundColor`, 
+    ADD COLUMN `renderMode` VARCHAR(20) DEFAULT NULL AFTER `backgroundColor`;";
 
 
 // Start 6.7

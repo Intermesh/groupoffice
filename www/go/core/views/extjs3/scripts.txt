@@ -227,6 +227,7 @@ customfields/type/DateDialog.js
 customfields/type/Date.js
 customfields/type/DateTimeDialog.js
 customfields/type/DateTime.js
+customfields/type/OptionDialog.js
 customfields/type/SelectOptionsTree.js
 customfields/type/SelectDialog.js
 customfields/type/Select.js
