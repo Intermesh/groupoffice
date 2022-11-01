@@ -1,3 +1,5 @@
+- Core: Switch user will not update last login and login count.
+
 31-10-2022 6.6.124
 - Core: Add extra CSS options to custom comboboxes
 - Billing: add profit and profit percentage fields, also add both fields to customer report

@@ -2,6 +2,7 @@
 
 namespace go\core\controller;
 
+use Exception;
 use GO;
 use go\core\exception\Forbidden;
 use go\core\jmap\EntityController;
@@ -54,7 +55,11 @@ class User extends EntityController {
 	{
 		return model\User::class;
 	}
-	
+
+	/**
+	 * @throws InvalidArguments
+	 * @throws Forbidden
+	 */
 	public function loginAs($params) {
 		
 		if(!isset($params['userId'])) {
@@ -68,7 +73,7 @@ class User extends EntityController {
 		$user = model\User::findById($params['userId']);
 		
 		if(!$user->enabled) {
-			throw new \Exception("This user is disabled");
+			throw new Exception("This user is disabled");
 		}
 		
 		$success = go()->getAuthState()->changeUser($params['userId']);

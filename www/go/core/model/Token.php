@@ -298,22 +298,26 @@ class Token extends Entity {
 	/**
 	 * Authenticate this token
 	 *
+	 * @param bool $increaseLogins True if login must be counted and last login must be updated.
 	 * @return bool success
 	 * @throws Exception
 	 */
-	public function setAuthenticated(): bool
+	public function setAuthenticated(bool $increaseLogins = true): bool
 	{
 		
 		$user = $this->getUser();
-		$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
-		$user->loginCount++;
 
-		if(isset($_COOKIE['GO_LANGUAGE'])) {
-			$user->language = $_COOKIE['GO_LANGUAGE'];
-		}
+		if($increaseLogins) {
+			$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
+			$user->loginCount++;
 
-		if(!$user->save()) {
-			return false;
+			if (isset($_COOKIE['GO_LANGUAGE'])) {
+				$user->language = $_COOKIE['GO_LANGUAGE'];
+			}
+
+			if (!$user->save()) {
+				return false;
+			}
 		}
 
 		if(!$this->refresh()) {
