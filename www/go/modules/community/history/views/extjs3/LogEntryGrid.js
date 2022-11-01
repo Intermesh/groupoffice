@@ -168,7 +168,8 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		},{
 			xtype: "datecolumn",
 			header: t('Date'),
-			dataIndex: 'createdAt'
+			dataIndex: 'createdAt',
+			sortable: true
 		}];
 
 		if(!this.forDetailView) {
