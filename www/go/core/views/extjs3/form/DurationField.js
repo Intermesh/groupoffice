@@ -106,7 +106,7 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 	},
 
 	getMinutes: function() {
-		return (this.hFld.getValue()*60) + this.mFld.getValue();
+		return (+this.hFld.getValue() * 60) + +this.mFld.getValue();
 	},
 
 	getValue: function() {
