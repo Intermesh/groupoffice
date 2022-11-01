@@ -106,7 +106,13 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<h5 class="em-links-header">'+t("Links")+'</h5>'+
 				'<div class="em-links">'+
 				'<tpl for="links">'+
-					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> <a href="#{entity}/{model_id}">{name}</a> <label>{description}</label></p></div>'+
+					'<tpl if="entity==\'LinkedEmail\'">'+
+						'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> <a href="#" onclick="const win = new go.links.LinkDetailWindow({entity\:\'LinkedEmail\'});win.load({model_id});">{name}</a> <label>{description}</label></p></div>'+
+					'</tpl>' +
+					'<tpl if="entity!=\'LinkedEmail\'">' +
+						'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> <a href="#{entity}/{model_id}">{name}</a> <label>{description}</label>' +
+						'</p></div>'+
+					'</tpl>' +
 				'</tpl>'+
 			'</div></tpl>'+
 			
@@ -213,12 +219,30 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				return go.Entities.getLinkIcon(link.entity, link.filter);
 
 			},
+			addDeleteBtn: function(link) {
+				let btn = new Ext.Button({
+					itemId: "delete",
+					iconCls: "ic-delete",
+					text: t("Unlink"),
+					handler: function () {
+						Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to unlink this item?"), function (btn) {
+							if (btn == "yes") {
+								go.Db.store("Link").set({
+									destroy: [link.id]
+								});
+							}
+						}, this);
+					},
+					scope: this
+				});
+				return btn.render();
+			},
 			addSlashes : function(str)
 			{
 				str = GO.util.html_entity_decode(str, 'ENT_QUOTES');
 				str = GO.util.add_slashes(str);
 				return str;
-			}
+			},
 
 		});
 		

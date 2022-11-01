@@ -26,7 +26,8 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 						['after', t("is after, today plus")],
 						['beforedate', t("is before")],
 						['afterdate', t("is after")],
-							['equals', t("equals")]
+						['equals', t("equals")],
+						['empty', t("Is empty")]
 					]
 				}),
 				valueField: 'value',
@@ -55,6 +56,11 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 								this.valueField.setVisible(false);
 								this.periodCombo.setVisible(false);
 								this.dateField.setVisible(true);
+								this.doLayout();
+							case 'empty':
+								this.valueField.setVisible(false);
+								this.periodCombo.setVisible(false);
+								this.dateField.setVisible(false);
 								this.doLayout();
 						}
 					}
@@ -209,7 +215,10 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 
 			case'equals':
 				return v;
-			
+
+			case 'empty':
+				return null;
+
 		}
 	},
 	validate: function() {
