@@ -1,52 +1,86 @@
 import {CalendarView} from "./CalendarView.js";
 import {DateTime} from "@goui/util/DateTime.js";
+import {EventDialog} from "./EventDialog";
 import {E} from "@goui/util/Element.js";
 
 export class MonthView extends CalendarView {
 
-	setDate(day: DateTime) {
-		if(!day) {
-			day = (new DateTime()).setDate(1);
-		}
+	start!: DateTime
+
+	constructor() {
+		super();
+		this.el.on('click',(ev) => {
+
+			const event = ev.target.up('.event');
+			if(event) {
+				const dlg = new EventDialog();
+				dlg.show(event).form.load(event.dataset.id);
+
+			}
+			const day = ev.target.up('li[data-date]');
+
+			if(day) {
+				const dlg = new EventDialog();
+				//const date = Date.fromYmd(day.dataset.date);
+				dlg.show();
+				dlg.form.value = ({start: day.dataset.date, end: day.dataset.date});
+
+			}
+			ev.preventDefault();
+		});
+	}
+
+	goto(date: DateTime, days?: number) {
 		//this.el.cls('reverse',(day < this.day));
-		this.day = day.clone();
-		let end = day.clone();
-		day.setDate(1).setWeekDay(0);
-		this.firstDay = day.clone();
-		end.addMonths(1).setDate(0).setWeekDay(6).addDays(1); //end sunday after last day
-		//this.renderView();
+		this.day = date;
+		this.start = date.clone();
+
+		if(days) {
+			this.days = days + this.start.getWeekDay();
+		} else {
+			this.start.setDate(1)
+			this.days = this.day.getDaysInMonth()+this.start.getWeekDay();
+
+		}
+		this.start.setWeekDay(0);
+
+		// /let end = day.clone();
+		//this.firstDay = day.clone().setDate(1).setWeekDay(0);
+		//end.addMonths(1).setDate(0).setWeekDay(6).addDays(1); //end sunday after last day
+		this.renderView();
 		//this.dom.cls('+loading');
 		//this.store.filter('date', {after: day.format('Y-m-dT00:00:00'), before: end.format('Y-m-dT00:00:00')}).fetch(0,500);
 	}
 
 	renderView() {
+		this.el.innerHTML = ''; //clear
 		let it = 0;
 		let now = new DateTime(),
-			 day = this.day.clone(); // toDateString removes time
-		day.setDate(1);
-		let start = day.clone(), e;
+			 day = this.start.clone(); // toDateString removes time
+
+		let e;
 
 		this.el.style.height = '100%';
-		this.el.cls(['+cal','+month','+active']);
+		this.el.cls(['+cal','+month']);
 		this.el.append(E('ul',...DateTime.dayNames.map((name,i) =>
-			E('li',name).cls('current', day.format('Ym') == now.format('Ym') && now.getWeekDay() == i)
+			E('li',name).cls('current', this.day.format('Ym') == now.format('Ym') && now.getWeekDay() == i)
 		))); // headers
 
-		day.setWeekDay(0);
-		while (day.format('Ym') <= start.format('Ym')) {
+		while (it < this.days) {
 			const row = E('ol',
-					E('li',day.getWeekOfYear()).cls('weeknb'),
-					E('li',...this.drawWeek(day)).cls('events')
-				);
+				E('li',day.getWeekOfYear()).cls('weeknb'),
+				E('li',...this.drawWeek(day)).cls('events')
+			);
 			for (var i = 0; i < 7; i++) {
 				row.append(E('li',
 					E('em',day.format(day.getDate() === 1 ? 'j M' : 'j'))
 				).attr('data-date', day.format('Y-m-d'))
 				 .cls('today', day.format('Ymd') === now.format('Ymd'))
 				 .cls('past', day.format('Ymd') < now.format('Ymd'))
-				 .cls('other', day.format('Ym') !== start.format('Ym')))
+				 .cls('other', day.format('Ym') !== this.day.format('Ym')))
 
 				day.addDays(1);
+				it++;
 			}
 			this.el.append(row);
 		}
@@ -84,7 +118,7 @@ export class MonthView extends CalendarView {
 			}
 		}
 		for (e of this.store.items) {
-			if(e.start.date().format('Yw') === start.format('Yw') && !e.recurrenceRule) {
+			if((new DateTime(e.start)).format('Yw') === start.format('Yw') && !e.recurrenceRule) {
 				eventEls.push(this.drawEvent(e, new DateTime(e.start), start));
 			}
 		}

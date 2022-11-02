@@ -1,6 +1,13 @@
 import {modules} from "@go-core/Modules.js";
 import {CalendarMain} from "./CalendarMain";
 import {router} from "@go-core/Router.js";
+import {jmapstore} from "@goui/jmap/JmapStore.js";
+
+export const calendarStore = jmapstore({
+	entity:'Calendar',
+	properties: ['id', 'name', 'color'],
+	sort: [{property:'name'}]
+})
 
 modules.register(  {
 	package: "community",

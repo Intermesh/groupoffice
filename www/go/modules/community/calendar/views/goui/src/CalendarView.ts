@@ -9,7 +9,7 @@ export interface CalendarEvent {
 	recurrenceRule : any
 	links: any
 	alerts: any
-	isAllDay: boolean // showWithoutTime
+	showWithoutTime: boolean // isAllDay
 	duration: string
 	id: string
 	start: string
@@ -20,8 +20,10 @@ export interface CalendarEvent {
 export abstract class CalendarView extends Component {
 	
 	protected day: DateTime = new DateTime()
+	protected days: number = 1
 	protected firstDay?: DateTime
 	protected recur?: {[id:string]: Recurrence}
+
 
 	protected store: any
 
@@ -29,7 +31,7 @@ export abstract class CalendarView extends Component {
 		super();
 		this.store = jmapstore({
 			entity:'CalendarEvent',
-			properties: ['name', 'start', 'id'],
+			properties: ['title', 'start','duration','calendarId','showWithoutTime','alerts','recurrenceRule','id'],
 			listeners: {'load': (me,records) => this.update()}
 		})
 		this.on('render', () => { this.store.load() });
@@ -49,7 +51,7 @@ export abstract class CalendarView extends Component {
 	}
 
 	 internalRender(){
-	 	this.setDate(new DateTime());
+	 	// this.goto(new DateTime());
 	// 	dom.on('click',(ev) => {
 	//
 	// 		const event = ev.target.up('.event');
@@ -86,7 +88,7 @@ export abstract class CalendarView extends Component {
 		if(e.links) items.push('attachment');
 		if(e.alerts) items.push('notifications');
 		items.push(e.title || '('+t('Nameless')+')');
-		if(e.isAllDay)
+		if(e.showWithoutTime)
 			items.push(E('span', start.format('H:i')+' - '+start.addDuration(e.duration).format('H:i')));
 		return E('div', ...items).cls('event').attr('data-id', e.id).attr('style',style);
 	}
@@ -96,10 +98,10 @@ export abstract class CalendarView extends Component {
 
 		// read start, end, span, max
 		for (const event of events) {
-			let start = event.start.date(),
+			let start = new DateTime(event.start),
 				startM = start.getHours()*60+start.getMinutes(),
 				end = start.clone().addDuration(event.duration),
-				endM = end.to('Ymd') > start.to('Ymd') ? 1450 : end.getHours()*60+end.getMinutes();
+				endM = end.format('Ymd') > start.format('Ymd') ? 1450 : end.getHours()*60+end.getMinutes();
 
 			overlap[event.id] = {start: startM, end: endM,span: 1, max:1};
 		}
@@ -166,5 +168,5 @@ export abstract class CalendarView extends Component {
 
 	abstract renderView(): void;
 
-	abstract setDate(day:any): void
+	abstract goto(date:DateTime, days:number): void
 }

@@ -2,6 +2,7 @@ import {CalendarView, CalendarEvent} from "./CalendarView.js";
 import {EventDialog} from "./EventDialog";
 import {DateTime} from "@goui/util/DateTime.js";
 import {E} from "@goui/util/Element.js";
+import {calendarStore} from "./Index.js";
 
 export class WeekView extends CalendarView {
 
@@ -9,19 +10,20 @@ export class WeekView extends CalendarView {
 	private px30min = 0;
 	private top = 0;
 
-	setDate(day: DateTime) {
+	goto(day: DateTime, amount: number) {
 		if(!day) {
 			day = new DateTime();
 		}
-		this.el.cls('reverse',(day < this.day));
+		this.days = amount;
+		//this.el.cls('reverse',(day < this.day));
 
 		this.day = day.clone();
-		let end = day.clone();
+		//let end = day.clone();
 
-		day.setWeekDay(0); // start monday
-		this.firstDay = day.clone();
-		end.setWeekDay(7); //end sunday after last day
-		//this.renderView();
+		//day.setWeekDay(0); // start monday
+		//this.firstDay = day.clone();
+		//end.setWeekDay(7); //end sunday after last day
+		this.renderView();
 		//this.store.filter('date', {after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00')}).fetch(0,500);
 	}
 
@@ -153,16 +155,17 @@ export class WeekView extends CalendarView {
 	}
 
 	renderView() {
+		this.el.innerHTML = ''; // clear
 		let now = new DateTime(),
 			it = 1, hour, e,
 			day = this.day.clone();
-		day.setWeekDay(0);
+		//day.setWeekDay(0);
 
-		let heads = [], allday = [], days = [], hours = [];
+		let heads = [], allday = [], days = [], hours = [], showNowBar ,nowbar;
 		for (hour = 1; hour < 24; hour++) {
 			hours.push(E('em', hour+':00'));
 		}
-		for (var i = 0; i < 7; i++) {
+		for (var i = 0; i < this.days; i++) {
 			let events: HTMLElement[] = [],
 				evs: any[] = [], 
 				alldays: HTMLElement[] = [];
@@ -188,21 +191,24 @@ export class WeekView extends CalendarView {
 
 			heads.push(E('li',day.format('l'),E('em',day.getDate())).cls(cls));
 			allday.push(E('li', ...alldays));
-			days.push(E('li', ...events).attr('data-day', day.format('Y-m-d')));
-
+			days.push(E('li', ...events).cls('weekend',day.getWeekDay() > 4).attr('data-day', day.format('Y-m-d')));
+			if(now.format('Ymd') === day.format('Ymd')) {
+				showNowBar = true;
+			}
 			day.addDays(1); it=0;
 		}
-		const top = 24*7 / (60*24) * (now.getHours()*60 + now.getMinutes()), // 1296 = TOTAL HEIGHT of DAY
-			left = 100 / 7 * now.getWeekDay();
-		let nowbar = E('div', E('hr'), E('b').attr('style', `left: calc(${left}%);`),E('span', now.format('H:i'))).cls('now').attr('style', `top:${top}vh;`)
-
+		if(showNowBar) {
+			const top = 24 * 7 / (60 * 24) * (now.getHours() * 60 + now.getMinutes()), // 1296 = TOTAL HEIGHT of DAY
+				left = 100 / this.days * (now.getWeekDay() - this.day.getWeekDay());
+			nowbar = E('div', E('hr'), E('b').attr('style', `left: calc(${left}%);`), E('span', now.format('G:i'))).cls('now').attr('style', `top:${top}vh;`)
+		}
 		let ol;
-		this.el.cls('cal week active')
+		this.el.cls('cal week')
 		this.el.style.height = '100%';
 		this.el.append(
 			E('ul',E('li',this.day.getWeekOfYear()), ...heads),
 			E('ul',E('li'), ...allday),
-			ol = E('ol',E('li', nowbar, E('em'), ...hours), ...days)
+			ol = E('ol',E('li', nowbar || '', E('em'), ...hours), ...days)
 		);
 
 		//this.el.innerHTML = (`<div class="cal week active"><ul><li>${this.day.getWeekOfYear()}</li>${heads}</ul><ul><li></li>${allday}</ul><ol><li>${nowbar}<em></em>${hours}</li>${days}</ol></div>`);
@@ -211,7 +217,7 @@ export class WeekView extends CalendarView {
 	}
    // event, overlap
 	protected drawEvent(e: CalendarEvent, o?: any) { // o = calculated overlap
-		const cal = go.Db.store('Calendar').get(e.calendarId);
+		const cal = calendarStore.items.find(c => c.id == e.calendarId);
 		let color = cal ? cal.color : '356772', 
 			style = `background-color:#${color};`;
 		if(o) {

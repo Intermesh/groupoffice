@@ -41,7 +41,7 @@ class CalendarEvent extends AclItemEntity {
 	const EventProperties = ['id','uid','prodId', 'sequence','title','description','locale', 'showWithoutTime', 'start','timeZone','duration','priority','privacy','status', 'recurrenceRule'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'calendarId'];
-	const IgnoredPropertiesInException = ['uid', 'organizerEmail', 'allDay','recurrence', 'links'];
+	const IgnoredPropertiesInException = ['uid', 'organizerEmail', 'showWithoutTime','recurrence', 'links'];
 
 	public $calendarId;
 	public $groupId;
@@ -51,7 +51,13 @@ class CalendarEvent extends AclItemEntity {
 	public $role;
 	public $email;
 
-
+	public $id;
+	public $prodId;
+	public $timeZone;
+	public $locale;
+	public $priority;
+	public $color;
+	public $useDefaultAlerts;
 	/**
 	 * A unique identifier for the object.
 	 * @var string
@@ -69,32 +75,32 @@ class CalendarEvent extends AclItemEntity {
 	 * Time is ignored for this event when true
 	 * @var bool
 	 */
-	public $allDay = false;
+	public $showWithoutTime = false;
 
 	/**
 	 * The start time of the event
 	 * @var DateTime
 	 */
-	protected $startAt;
+	public $start;
 
 	/**
 	 * The duration of the event (or the occurence)
 	 * (optional, default: PT0S)
 	 * @var \DateInterval
 	 */
-	protected $duration;
+	public $duration;
 
 	/**
 	 * The title
 	 * @var string
 	 */
-	protected $title;
+	public $title;
 
 	/**
 	 * free text that would describe the event
 	 * @var string
 	 */
-	public $description;
+	public $description = '';
 
 	/**
 	 * The location where the event takes place
@@ -118,25 +124,28 @@ class CalendarEvent extends AclItemEntity {
 	 * Public, Private, Secret
 	 * @var int
 	 */
-	public $visibility = self::Public;
+	public $privacy = self::Public;
 
 	/**
 	 * Is event Transparent or Opaque
 	 * @var boolean
 	 */
-	public $busy = true;
+	public $freeBusyStatus = 'busy';
 
 	/**
 	 * The exception object that is applied to this instance
 	 * @var DateTime
 	 */
 	public $recurrenceId = null;
+	public $recurrenceRule;
+	public $participants;
+	public $alerts;
 
 	protected static function defineMapping(): Mapping {
-		return (new Mapping(static::class))
+		return parent::defineMapping()
 			->addTable('calendar_event', "eventdata", null, self::EventProperties)
-			->addUserTable('calendar_event_user', 'eventuser', ['id' => 'userId'],self::UserProperties)
-			->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
+			->addUserTable('calendar_event_user', 'eventuser', ['id' => 'eventId'],self::UserProperties)
+			//->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
 			->addMap('participants', Participant::class, ['id' => 'eventId'])
 			->addMap('alerts', Alert::class, ['id' => 'eventId']);
 			//->addMap('locations', Location::class, ['id' => 'eventId']);
@@ -199,24 +208,18 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 
+//
+//	public function getStartAt() {
+//		if(!empty($this->instance)) {
+//			return $this->instance->startAt;
+//		}
+//		return $this->startAt;
+//	}
 
-	public function getStartAt() {
-		if(!empty($this->instance)) {
-			return $this->instance->startAt;
-		}
-		return $this->startAt;
-	}
-
-	public function getEndAt() {
-		if(!empty($this->endAt)) {
-			if(is_string($this->endAt)) {
-				$this->endAt = new DateTime($this->endAt);
-			}
-			return $this->endAt;
-		}
-		$endAt = clone $this->getStartAt();
-		$endAt->add($this->duration);
-		return $endAt;
+	public function end() {
+		$end = new DateTime($this->start);
+		$end->add($this->duration);
+		return $end;
 	}
 
 	/**
@@ -227,9 +230,9 @@ class CalendarEvent extends AclItemEntity {
 		return $this->alarms->getRowCount() > 0;
 	}
 
-	public function getIsOrganizer() {
-		return $this->email === $this->organizerEmail;
-	}
+//	public function isOrganizer() {
+//		return $this->email === $this->organizerEmail;
+//	}
 
 	/**
 	 * This function can only be called on a recurring series. After that the object
@@ -360,20 +363,6 @@ class CalendarEvent extends AclItemEntity {
 		return !empty($this->recurrenceId);
 	}
 
-	/**
-	 * Returns true when more attendees then just yourself
-	 * @return boolean
-	 */
-	public function hasAttendees() {
-		$count = 0;
-		foreach($this->attendees as $attendee) {
-			$count++;
-			if($count > 1) // more then just yourself
-				return true;
-		}
-		return false;
-	}
-
 	public function isRecurring() {
 		return (!empty($this->recurrenceRule)); // && !empty($this->recurrenceRule->frequency));
 	}
@@ -394,6 +383,6 @@ class CalendarEvent extends AclItemEntity {
 	{
 		$calendar = Calendar::findById($this->calendarId, ['name'], true);
 
-		return $calendar->name .': '. $this->startAt . ' - '  . $this->endAt;
+		return $calendar->name .': '. $this->start;
 	}
 }

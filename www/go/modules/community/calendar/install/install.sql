@@ -280,3 +280,9 @@ CREATE TABLE IF NOT EXISTS `calendar_event_location` (
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
+    `id` INT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_event_calendar_event_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
