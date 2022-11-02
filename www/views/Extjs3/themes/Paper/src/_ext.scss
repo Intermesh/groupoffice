@@ -2908,10 +2908,10 @@ $resizerSize : dp(3);
 // ### SLIDER ### todo
 // ##############
 .x-slider-horz {
-	height: dp(32);
+	height: dp(44);
 	overflow:visible;
 	.x-slider-inner {
-		top: dp(16);
+		top: dp(24);
 		background-color: color($fg, 'track');
 		border-radius: $borderRadius;
 		height: dp(2);
