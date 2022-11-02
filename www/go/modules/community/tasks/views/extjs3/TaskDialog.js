@@ -111,7 +111,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 		const estimatedDuration = {
 			name: "estimatedDuration",
-			xtype: "nativetimefield",
+			xtype: "durationfield",
 			width: dp(150),
 			fieldLabel: t("Estimated duration"),
 			asInteger: true
