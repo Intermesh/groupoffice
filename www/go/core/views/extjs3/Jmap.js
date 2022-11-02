@@ -10,6 +10,8 @@ go.Jmap = {
 
 	paused: 0,
 
+	requestTimeout: 60000,
+
 	/**
 	 * Enable for XDEBUG profiling
 	 */
@@ -395,6 +397,7 @@ go.Jmap = {
 		}
 
 		Ext.Ajax.request({
+			timeout: this.requestTimeout,
 			url: this.getApiUrl(),
 			method: 'POST',
 			jsonData: this.requests,
