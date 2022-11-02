@@ -6,6 +6,8 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	modal: false,
 	stateId: 'communityTasksTaskDialog',
 	role: "list",
+	support: null,
+	redirectOnSave: false,
 
 	onReady: async function () {
 		if (this.currentId) {
@@ -15,7 +17,14 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			this.tasklistCombo.store.setFilter("role", {role: this.role});
 		}
 	},
-	support: null,
+
+	onSubmit : function() {
+		if(this.support) {
+			go.Router.goto("support/" + this.currentId);
+		} else {
+			this.entityStore.entity.goto(this.currentId);
+		}
+	},
 
 	setLinkEntity: function (cfg) {
 
@@ -51,12 +60,12 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 
 		go.Db.store("Tasklist").single(val).then((tasklist) => {
-			this.userCombo.store.setFilter("acl", {
+			this.responsibleCombo.store.setFilter("acl", {
 				aclId: tasklist.aclId,
 				aclPermissionLevel: go.permissionLevels.write
 			});
 
-			delete this.userCombo.lastQuery;
+			delete this.responsibleCombo.lastQuery;
 		}).catch((e) => {
 			console.error(e);
 		})
@@ -240,6 +249,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								],
 							},
 							this.recurrenceField = new go.form.RecurrenceField({
+								hidden: this.support,
 								anchor: "100%",
 								name: 'recurrenceRule',
 								hidden: this.hideRecurrence,
@@ -252,38 +262,43 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						// collapsible: true,
 						// title: t("Assignment"),
 						items: [{
-							layout: "hbox",
+							xtype: "container",
+							cls: "go-hbox",
+							layout: "form",
 							items: [
-								{
-									style: "padding-right: 8px",
-									layout: "form",
-									xtype: "container",
+								this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
 									flex: 1,
-									items: [
-										this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
-											role: this.support ? "support" : null,
-											listeners: {
-												change: this.onTaskListChange,
-												setvalue: this.onTaskListChange,
-												scope: this
-											}
-										})
-									]
-								},
-								{
-									layout: "form",
-									xtype: "container",
+									anchor: undefined,
+									role: this.support ? "support" : null,
+									listeners: {
+										change: this.onTaskListChange,
+										setvalue: this.onTaskListChange,
+										scope: this
+									}
+								}),
+								this.responsibleCombo = new go.users.UserCombo({
 									flex: 1,
-									items: [
-										this.userCombo = new go.users.UserCombo({
-											fieldLabel: t('Responsible'),
-											hiddenName: 'responsibleUserId',
-											anchor: '100%',
-											allowBlank: true,
-											value: null
-										})
-									]
-								}]
+									anchor: undefined,
+									fieldLabel: t('Responsible'),
+									hiddenName: 'responsibleUserId',
+									allowBlank: true,
+									value: null
+								}),
+
+								this.customerCombo = new go.users.UserCombo({
+									flex: 1,
+									disabled: !this.support,
+									hidden: !this.support,
+									anchor: undefined,
+									fieldLabel: t('Customer'),
+									hiddenName: 'createdBy',
+									allowBlank: false,
+									value: null
+								})
+								
+								
+
+								]
 						},
 							{
 								xtype: "chips",
