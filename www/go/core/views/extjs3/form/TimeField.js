@@ -6,6 +6,10 @@ go.form.TimeField = Ext.extend(Ext.form.TextField, {
 	// set true to get/set value in minutes instead of seconds
 	inMinutes: false,
 
+	labelShouldFloat: function() {
+		return true;
+	},
+
 	initComponent: function() {
 		if(!this.allowBlank) {
 			// https://bugzilla.mozilla.org/show_bug.cgi?id=1479708

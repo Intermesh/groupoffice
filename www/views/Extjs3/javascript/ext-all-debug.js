@@ -45255,6 +45255,10 @@ Ext.form.SliderField = Ext.extend(Ext.form.Field, {
     
     
     actionMode: 'wrap',
+
+	labelShouldFloat: function() {
+			return true;
+	},
     
     
     initComponent : function() {
