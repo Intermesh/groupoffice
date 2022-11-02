@@ -430,7 +430,7 @@
 
 
 	}
-	&-text, textarea.x-form-field, &-time {
+	&-duration, &-text, textarea.x-form-field, &-time {
 		@extend %font-data;
 		background-color:color($bg, 'box');
 		border: 1px solid color($fg, 'track');
@@ -446,6 +446,14 @@
 			animation-name: onautofillcancel;
 		}
 	}
+
+	&-duration > div > input {
+		border:0;
+		background:transparent;
+		padding:0;
+		@extend %font-data;
+	}
+
 	&-time { max-height: dp(32);  }
 	
 	textarea.x-form-field {
@@ -577,7 +585,7 @@
 		color: $cDanger;
 	}
 	
-	&-focus, textarea.x-form-focus {
+	&-focus, textarea.x-form-focus, &:focus-within {
 		@extend .z2;
 		@include var(border-color, c-primary);
 	}

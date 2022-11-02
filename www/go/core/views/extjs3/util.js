@@ -233,7 +233,7 @@ go.util =  (function () {
 
 			var adr = config.address;
 			if(config.zipCode) {
-				adr += ", " + config.zipCode.replace(/ /g, ''); 
+				adr += ", " + config.zipCode.replace(/ /g, '');
 			}
 			if(config.country) {
 				adr += ", " + config.country;
@@ -242,7 +242,7 @@ go.util =  (function () {
 			if(Ext.isSafari || Ext.isMac) {
 				document.location = "http://maps.apple.com/?address=" + encodeURIComponent(adr);
 			} else {
-				window.open("https://www.google.com/maps/place/" + encodeURIComponent(adr));	
+				window.open("https://maps.google.com/maps?q=" + encodeURIComponent(adr));
 			}
 
 			//window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));

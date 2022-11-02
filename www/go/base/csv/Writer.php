@@ -25,7 +25,7 @@ class Writer extends Reader{
 	/**
 	 * Writes an array of strings as the next line of the CSV file, after making
 	 * sure a file handle is set to write mode 'w'.
-	 * @param Array $fields The elements of this array will be written into a line
+	 * @param string[] $fields The elements of this array will be written into a line
 	 * of the current CSV file.
 	 * @return int The length of the written string, or false on failure.
 	 */

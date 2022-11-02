@@ -1,4 +1,5 @@
 - Core: Switch user will not update last login and login count.
+- Billing: fixed division by zero
 
 31-10-2022 6.6.124
 - Core: Add extra CSS options to custom comboboxes

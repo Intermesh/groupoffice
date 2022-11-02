@@ -1222,7 +1222,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 	}
 
-	private $useSqlCalcFoundRows=true;
+	protected $useSqlCalcFoundRows=true;
 
 	/**
 	 * Find models
