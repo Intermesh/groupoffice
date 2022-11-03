@@ -114,7 +114,10 @@ if (isset(GO::session()->values['security_token']))
 </script>
 <?php
 $gouiScripts = [];
+$rootFolder = new Folder(GO::config()->root_path);
+$strip = strlen($rootFolder->getPath()) + 1;
 if ($cacheFile->exists()) {
+    $gouiScripts = go()->getCache()->get("gouiScripts");
 	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='.$cacheFile->getModifiedAt()->format("U"). '"></script>';
 } else {
 
@@ -204,8 +207,7 @@ if ($cacheFile->exists()) {
     $js = "";
   }
 
-	$rootFolder = new Folder(GO::config()->root_path);
-	$strip = strlen($rootFolder->getPath()) + 1;
+
 	foreach ($scripts as $script) {
 
 		if (go()->getDebugger()->enabled) {
@@ -236,6 +238,9 @@ if ($cacheFile->exists()) {
 //    fclose($fp);
   }
 //  echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
+
+
+	go()->getCache()->set("gouiScripts", $gouiScripts);
 }
 
 foreach($gouiScripts as $gouiScript) {
