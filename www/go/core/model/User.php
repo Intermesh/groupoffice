@@ -498,7 +498,7 @@ class User extends Entity {
 			return false;
 		}						
 		
-		return App::get()->getAuthState()->isAdmin();
+		return go()->getModel()->getUserRights()->mayChangeUsers;
 	}
 	
 	protected function internalValidate() {
