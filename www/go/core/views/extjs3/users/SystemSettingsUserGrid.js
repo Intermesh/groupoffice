@@ -53,8 +53,8 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 					return '<div class="user">' + go.util.avatar(value, record.data.avatarId)  +
 						'<div class="wrap">'+
-						'<div class="displayName">' + value + '</div>' +
-						'<small class="username">' + Ext.util.Format.htmlDecode(record.get('username')) + '</small>' +
+						'<div class="displayName">' + Ext.util.Format.htmlEncode(value) + '</div>' +
+						'<small class="username">' + Ext.util.Format.htmlEncode(record.get('username')) + '</small>' +
 						'</div>'+
 						'</div>';
 				}
