@@ -10,8 +10,9 @@ CONFIG=$1
 
 SASS="sass --no-source-map"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
 cd $DIR/../;
+DIR="$(pwd)";
+
 
 # pull promodules
 echo "Pulling promodules"
@@ -40,9 +41,7 @@ echo "Pulling main repository"
 
 git pull
 
-echo `pwd`
-
-for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \));
+for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' );
 do
   replace1=${line/src\/style.scss/style.css};
   replace2=${replace1/src\/style-mobile.scss/style-mobile.css};
@@ -50,6 +49,21 @@ do
   echo $line - $replace3;
 	$SASS $line $replace3;
 done
+
+
+echo BUILDING node modules...
+cd $DIR;
+for line in $(find . -name package.json -not -path '*/node_modules/*');
+do
+  NODE_DIR="$(dirname "${line}")";
+  echo "BUILD:" $NODE_DIR;
+  cd $NODE_DIR;
+  npm run build;
+  cd $DIR;
+
+done
+
+echo "DONE";
 
 composer update -n --no-dev -o
 

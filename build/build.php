@@ -201,7 +201,7 @@ class Builder
 		cd($this->buildDir . "/" . $this->packageName);
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
 
-		$sassFiles = run('find . -regex ".*/[^_]*\.scss"');
+		$sassFiles = run("find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*'");
 
 		foreach ($sassFiles as $sassFile) {
 			run("sass --no-source-map $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
@@ -209,10 +209,27 @@ class Builder
 
 		$this->encode();
 
+        $this->buildNodeModules();
+
 		cd($this->buildDir);
 		run("tar czf " . $this->packageName . ".tar.gz " . $this->packageName);
 		echo "Created " . $this->buildDir . '/'. $this->packageName . ".tar.gz\n";
 	}
+
+
+    private function buildNodeModules() {
+
+	    cd($this->buildDir . "/" . $this->packageName);
+
+	    $packageFiles = run("find . -name package.json -not -path '*/node_modules/*')");
+
+        foreach($packageFiles as $packageFile)  {
+            $nodeDir = dirname($packageFile);
+            cd($nodeDir);
+            run("npm run build");
+	        cd($this->buildDir . "/" . $this->packageName);
+        }
+    }
 
 	private function encode()
 	{
