@@ -638,7 +638,13 @@ Ext.override(Ext.grid.GridView, {
 				meta.css   = i === 0 ? 'x-grid3-cell-first ' : (i == last ? 'x-grid3-cell-last ' : '');
 				meta.attr  = meta.cellAttr = '';
 				meta.style = column.style;
-				meta.value = column.renderer.call(column.scope, record.data[column.name], meta, record, rowIndex, i, store);
+
+				let v = this.encodeGridValue(store, column, record);
+				try {
+					meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
+				} catch(e) {
+					console.error(e);
+				}
 
 				if (Ext.isEmpty(meta.value)) {
 					meta.value = '&#160;';
