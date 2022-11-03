@@ -6961,9 +6961,9 @@ Ext.apply(Ext.EventManager, function(){
 
        //dont fire on mobiles
        fireWindowResize : function(){
-				 if(GO.util.isMobileOrTablet()) {
-					 return;
-				 }
+				 // if(GO.util.isMobileOrTablet()) {
+					//  return;
+				 // }
            if(resizeEvent){
                resizeTask.delay(100);
            }
