@@ -48,7 +48,6 @@ $lang = GO::language()->getLanguage(); ?>
 	<link rel="stylesheet" type="text/css" as="style"  href="<?= GO::view()->getTheme()->getUrl();?>style.css?v=<?=$cssMtime ?>" media="print, (min-device-width:1201px)" />
 	<link rel="stylesheet" type="text/css" as="style" media="screen and (max-device-width:1200px)" href="<?= GO::view()->getTheme()->getUrl(); ?>style-mobile.css?v=<?=$cssMtime;?>" />
 	<link rel="stylesheet" type="text/css" as="style"  href="<?= GO::view()->getUrl()?>css.php?theme=<?=\GO::view()->getTheme()->getName(); ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>"  />
-	<link rel="stylesheet" type="text/css" as="style"  href="<?= GO::view()->getUrl()?>css.php?theme=<?=\GO::view()->getTheme()->getName(); ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>"  />
     <link rel="preload" href="<?= GO::view()->getTheme()->getUrl();?>fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
 	<?php
 
