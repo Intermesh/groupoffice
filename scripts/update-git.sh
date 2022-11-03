@@ -39,7 +39,7 @@ cd ../../
 
 echo "Pulling main repository"
 
-git pull
+git pull --recurse-submodules
 
 for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' );
 do
