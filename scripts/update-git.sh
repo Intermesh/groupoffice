@@ -65,6 +65,8 @@ done
 
 echo "DONE";
 
+cd www
+
 composer update -n --no-dev -o
 
 if [ -z "$CONFIG" ]; then
