@@ -320,13 +320,16 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				me.loadLegacyModuleScripts()
 			]).then(function(){
 				go.Entities.init();
-				me.addDefaultRoutes();
 
 				me.fireEvent('authenticated', this, go.User, password);
 
 				me.renderUI();
 				Ext.getBody().unmask();
-				go.Router.check();
+				setTimeout(() => {
+					//give "authenticated" listeners above a change to add routes
+					me.addDefaultRoutes();
+					go.Router.check();
+				})
 			}).catch(GO.settings.config.debug ? undefined : function(error){
 				console.error(error);
 				Ext.getBody().unmask();
