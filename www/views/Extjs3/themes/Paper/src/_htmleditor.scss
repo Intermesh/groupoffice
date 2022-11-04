@@ -7,7 +7,7 @@ body, p, span, div {
 	background-color: white;
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-device-width: 1200px) {
 	body, p, span, div {
 		font-size: 16px; //smaller size will cause iphone to zoom when focussed on input fields!
 		line-height: 24px;
