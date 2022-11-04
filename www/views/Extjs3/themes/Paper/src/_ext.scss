@@ -638,14 +638,14 @@
 		}
 	}
 	.x-form-trigger {
-		height: 100%;
-		width: dp(42);
+		height: dp(44);
+		width: dp(44);
 		vertical-align: middle;
 		padding:0;
 		color: color($fg, 'icon');
 		&::before {
-			max-height: dp(50);
-			max-width: dp(50);
+			max-height: dp(44);
+			max-width: dp(44);
 			@extend %icon;
 			content: 'arrow_drop_down';
 		}
