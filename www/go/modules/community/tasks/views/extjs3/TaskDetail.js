@@ -231,7 +231,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				iconCls: 'ic-edit',
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
-					const taskEdit = new go.modules.community.tasks.TaskDialog();
+					const taskEdit = new go.modules.community.tasks.TaskDialog({support: this.support});
 					taskEdit.load(this.data.id).show();
 				},
 				scope: this
