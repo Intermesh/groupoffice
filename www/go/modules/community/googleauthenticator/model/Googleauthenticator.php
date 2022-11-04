@@ -162,37 +162,6 @@ class Googleauthenticator extends Property {
 	}
 
 	/**
-	 * Get QR-Code URL for image, from google charts.
-	 *
-	 * @param string $name
-	 * @param string $secret
-	 * @param string $title
-	 * @param array  $params
-	 *
-	 * @return string
-	 */
-//	public function getQrUrl($name=null, $secret=null, $title = null, $params = array()) {
-//		
-//		if(!$this->publish) {
-//			return null;
-//		}
-//		
-//		$name = empty($name)?App::get()->getSettings()->title:$name;
-//		$secret = empty($secret)?$this->secret:$secret;
-//		
-//		$width = !empty($params['width']) && (int) $params['width'] > 0 ? (int) $params['width'] : 200;
-//		$height = !empty($params['height']) && (int) $params['height'] > 0 ? (int) $params['height'] : 200;
-//		$level = !empty($params['level']) && array_search($params['level'], array('L', 'M', 'text', 'H')) !== false ? $params['level'] : 'M';
-//
-//		$urlencoded = urlencode('otpauth://totp/' . rawurlencode($name) . '?secret=' . $secret . '');
-//		if (isset($title)) {
-//			$urlencoded .= urlencode('&issuer=' . urlencode($title));
-//		}
-//
-//		return 'https://chart.googleapis.com/chart?chs=' . $width . 'x' . $height . '&chld=' . $level . '|0&cht=qr&chl=' . $urlencoded . '';
-//	}
-
-	/**
 	 * Get the blob id of the QR code image
 	 *
 	 * @param string|null $name
@@ -200,7 +169,7 @@ class Googleauthenticator extends Property {
 	 * @param null $title
 	 * @param array $params
 	 */
-	public function outputQr(string $name=null, $secret=null, $title = null, $params = array()) : Blob {
+	public function outputQr(string $name=null, $secret=null, $title = null, $params = array()) {
 
 		
 		$name = empty($name) ? $this->owner->username . '@' . File::stripInvalidChars(go()->getSettings()->title) : $name;
