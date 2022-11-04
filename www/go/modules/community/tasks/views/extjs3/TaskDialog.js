@@ -74,7 +74,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	initFormItems: function () {
 
 		const start = {
+			flex: 1,
 			xtype: 'datefield',
+			width: undefined,
 			name: 'start',
 			itemId: 'start',
 			fieldLabel: t("Start"),
@@ -96,6 +98,8 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		};
 
 		const due = {
+			flex: 1,
+			width: undefined,
 			xtype: 'datefield',
 			name: 'due',
 			itemId: 'due',
@@ -113,28 +117,26 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		};
 
 		const progress = new go.modules.community.tasks.ProgressCombo({
-			width: dp(150),
-
+			flex: 1,
 			value: 'needs-action'
 		});
 
 		const estimatedDuration = {
 			name: "estimatedDuration",
 			xtype: "durationfield",
-			width: dp(150),
+			flex: 1,
 			fieldLabel: t("Estimated duration"),
 			asInteger: true
 		};
 
 		const priority = {
-			anchor: "100%",
+			flex: 1,
 			xtype: 'combo',
 			name: 'priority_text',
 			hiddenName: 'priority',
 			triggerAction: 'all',
 			editable: false,
 			selectOnFocus: true,
-			width: dp(150),
 			forceSelection: true,
 			fieldLabel: t("Priority"),
 			mode: 'local',
@@ -158,8 +160,15 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			maxValue: 100,
 			increment: 10,
 			value: 0,
-			anchor: "100%"
+			flex: 1,
 		});
+
+		this.recurrenceField = new go.form.RecurrenceField({
+			anchor: "100%",
+			name: 'recurrenceRule',
+			hidden: this.hideRecurrence || this.support,
+			disabled: true
+		})
 
 
 		const propertiesPanel = new Ext.Panel({
@@ -176,85 +185,66 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					{
 
 						xtype: 'fieldset',
-						layout: 'column',
 						items: [
 							{
-								columnWidth: .8,
 								xtype: "container",
 								layout: "form",
+								cls: 'go-hbox',
 								items: [{
-									anchor: "100%",
+									flex: 1,
 									xtype: 'textfield',
 									name: 'title',
 									allowBlank: false,
 									fieldLabel: t("Subject")
-								}]
+								},
+									{xtype: 'colorfield', emptyText: 'color', name: 'color', hideLabel: true}
+								]
 							},
 
-							{html:' ', columnWidth:.03},
-
-							{
-								columnWidth: .17,
-								xtype: "container",
-								layout: "form",
-								items: [
-									{xtype: 'colorfield', emptyText: 'color', name: 'color', hideLabel: true, anchor: "100%"}
-								]
-							}
+							this.customerCombo = new go.users.UserCombo({
+								flex: 1,
+								disabled: !this.support,
+								hidden: !this.support,
+								anchor: undefined,
+								fieldLabel: t('Customer'),
+								hiddenName: 'createdBy',
+								allowBlank: false,
+								value: null
+							})
 						]
 
 
 					}, {
 						xtype: 'fieldset',
-						// collapsible: true,
-						// title: t("Schedule"),
-
-
-						items: [
-							{
-								layout: 'column',
-								defaults: {
-									layout: 'form',
-									xtype: 'container',
-									labelAlign: 'top',
-									defaults: {
-										anchor: "90%"
-									}
-								},
-								mobile: {
-									items: [
-										{
-											columnWidth: .5,
-											items: [start, due, priority]
-										},
-										{
-											columnWidth: .5,
-											items: [progress, estimatedDuration, percentComplete]
-										}
-									]
-								},
-								items: [
-									{
-										columnWidth: .35,
-										items: [start, due]
-									},
-									{
-										columnWidth: .35,
-										items: [progress, estimatedDuration]
-									},
-									{
-										columnWidth: .3,
-										items: [priority, percentComplete]
-									}
-								],
+						defaults: {
+							layout: 'form',
+							xtype: 'container',
+							cls: "go-hbox"
+						},
+						mobile: {
+							items: [{
+								items: [start, due]
+							},{
+								items: [estimatedDuration, progress]
+							}, {
+								items: [percentComplete, priority]
 							},
-							this.recurrenceField = new go.form.RecurrenceField({
-								anchor: "100%",
-								name: 'recurrenceRule',
-								hidden: this.hideRecurrence || this.support,
-								disabled: true
-							})
-						]
+								this.recurrenceField]
+						},
+						desktop: {
+							items: [
+								{
+									items: [start, due, estimatedDuration]
+								},{
+									items: [progress, percentComplete, priority]
+								},
+								this.recurrenceField
+							]
+						},
+
+
+
+
 					},
 					{
 						xtype: "fieldset",
@@ -282,20 +272,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 									hiddenName: 'responsibleUserId',
 									allowBlank: true,
 									value: null
-								}),
-
-								this.customerCombo = new go.users.UserCombo({
-									flex: 1,
-									disabled: !this.support,
-									hidden: !this.support,
-									anchor: undefined,
-									fieldLabel: t('Customer'),
-									hiddenName: 'createdBy',
-									allowBlank: false,
-									value: null
 								})
-								
-								
 
 								]
 						},

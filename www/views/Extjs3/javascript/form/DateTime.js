@@ -79,9 +79,9 @@ Ext.ux.form.DateTime = Ext.extend(Ext.form.Field, {
     /**
      * @cfg {Number} timeWidth Width of time field in pixels (defaults to 100)
      */
-    ,timeWidth:dp(160)
+    ,timeWidth:dp(140)
 		
-		,dateWidth: dp(140)
+		,dateWidth: dp(160)
     /**
      * @cfg {String} dateFormat Format of DateField. Can be localized. (defaults to 'm/y/d')
      */

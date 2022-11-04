@@ -39711,7 +39711,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent, {
 
 		const updateLabelClass = (field, v) => {
 			// console.warn(v,this.emptyText,this.placeholder);
-			this.applyEmptyLabelCls(!this.labelShouldFloat(v))
+			this.applyEmptyLabelCls(!this.labelShouldFloat())
 		};
 
 		this.on("change", updateLabelClass);
@@ -39736,14 +39736,13 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent, {
 
 
 
-	labelShouldFloat: function (...args) {
+	labelShouldFloat: function () {
 
 		if(this.emptyText || this.placeholder) {
 			return true;
 		}
 
-		const v = args.length == 1 ? args[0] : this.getRawValue();
-
+		const v = this.getRawValue();
 		return !!v;
 	},
 
@@ -42872,9 +42871,9 @@ Ext.form.CompositeField = Ext.extend(Ext.form.Field, {
         Ext.form.CompositeField.superclass.initComponent.apply(this, arguments);
         
         this.innerCt = new Ext.Container({
-            layout  : 'hbox',
+            layout  : 'auto',
             items   : this.items,
-            cls     : 'x-form-composite',
+            cls     : 'x-form-composite go-hbox',
             defaultMargins: '0 3 0 0',
             ownerCt: this
         });
@@ -42890,7 +42889,7 @@ Ext.form.CompositeField = Ext.extend(Ext.form.Field, {
         
     },
 
-	labelShouldFloat: function (...args) {
+	labelShouldFloat: function () {
 		if(this.emptyText || this.placeholder) {
 			return true;
 		}
@@ -42905,7 +42904,7 @@ Ext.form.CompositeField = Ext.extend(Ext.form.Field, {
 			return true;
 		}
 
-		const v = args.length ? args[0] : first.getValue();
+		const v = first.getRawValue();
 
 		return !!v;
 	},
