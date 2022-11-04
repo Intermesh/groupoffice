@@ -118,6 +118,18 @@ $rootFolder = new Folder(GO::config()->root_path);
 $strip = strlen($rootFolder->getPath()) + 1;
 if ($cacheFile->exists()) {
     $gouiScripts = go()->getCache()->get("gouiScripts");
+
+    if(!$gouiScripts) {
+	    $gouiScripts = [];
+	    $load_modules = GO::modules()->getAllModules(true);
+	    foreach ($load_modules as $module) {
+            $bundleFile = new File($module->moduleManager->path(). 'views/goui/dist/Index.js');
+            if($bundleFile->exists()) {
+                $gouiScripts[] = $bundleFile;
+            }
+        }
+    }
+
 	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='.$cacheFile->getModifiedAt()->format("U"). '"></script>';
 } else {
 
@@ -157,8 +169,6 @@ if ($cacheFile->exists()) {
 			} else {
 				$scriptsFile = false;
 				$modulePath = $module->moduleManager->path();
-				
-				
 			}
 			$pkg = $module->package ? $module->package : "legacy";
 			
