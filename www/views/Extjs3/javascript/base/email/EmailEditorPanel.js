@@ -182,6 +182,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			mobile: {
 				grow: true,
 				growMinHeight: 300,
+				growMaxHeight: 0,
 				anchor: "100%"
 			},
 			desktop: {

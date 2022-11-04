@@ -338,7 +338,7 @@ GO.email.EmailComposer = function(config) {
 	this.formPanel = new Ext.form.FormPanel({
 		border : false,		
 		waitMsgTarget : true,
-		cls : 'go-form-panel',
+		// cls : 'go-form-panel',
 		desktop: {
 			layout: "border",
 		},
@@ -355,7 +355,20 @@ GO.email.EmailComposer = function(config) {
 			autoHeight:true,
 			border:false,
 			items: items
-		},this.emailEditor],
+		},
+
+			{
+				xtype: "fieldset",
+				region:'center',
+				desktop: {
+					layout: "fit",
+				},
+				mobile: {
+					autoHeight: true
+				},
+				items: [this.emailEditor]
+			}
+			],
 		keys:[{
 			key: Ext.EventObject.ENTER,
 			ctrl:true,
