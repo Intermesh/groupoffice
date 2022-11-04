@@ -193,7 +193,9 @@ GO.email.EmailComposer = function(config) {
 		anchor : '100%',
 		items: [
 
-			this.toCombo = new GO.email.RecipientCombo(),
+			this.toCombo = new GO.email.RecipientCombo({
+				flex: 1
+			}),
 			new Ext.Button({				
 				iconCls : 'ic-add',
 				handler: function() {
@@ -223,7 +225,7 @@ GO.email.EmailComposer = function(config) {
 		items: [this.ccCombo = new GO.email.RecipientCombo({
 			fieldLabel : t("CC", "email"),
 			name : 'cc',
-			anchor : '100%'
+			flex: 1
 		}),
 		new Ext.Button({				
 				iconCls : 'ic-add',
@@ -256,7 +258,7 @@ GO.email.EmailComposer = function(config) {
 		items: [this.bccCombo = new GO.email.RecipientCombo({
 			fieldLabel : t("BCC", "email"),
 			name : 'bcc',
-			anchor : '100%'
+			flex: 1
 		}),
 			new Ext.Button({				
 				iconCls : 'ic-add',

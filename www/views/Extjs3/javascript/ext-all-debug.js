@@ -40577,6 +40577,9 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
 			Ext.form.TriggerField.superclass.onRender.call(this, ct, position);
 
 			this.wrap = this.el.wrap({cls: 'x-form-field-wrap x-form-field-trigger-wrap'});
+			if(this.flex) {
+				this.wrap.dom.style.flex = this.flex;
+			}
 			this.trigger = this.wrap.createChild(this.triggerConfig ||
 				{tag: "button", type: "button", tabindex: "-1", cls: "x-form-trigger " + this.triggerClass});
 			this.initTrigger();
