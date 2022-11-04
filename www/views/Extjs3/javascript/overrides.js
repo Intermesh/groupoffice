@@ -713,7 +713,7 @@ Ext.override(Ext.grid.CheckboxSelectionModel, {
 });
 
 Ext.override(Ext.layout.ToolbarLayout, {
-	triggerWidth: dp(40)
+	triggerWidth: dp(50)
 });
 
 /**

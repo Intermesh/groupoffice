@@ -678,7 +678,11 @@ GO.email.EmailComposer = function(config) {
 		animCollapse : false,
 		closeAction : 'hide',
 		buttonAlign : 'center',
-		tbar : tbar,
+
+		tbar: {
+			enableOverflow: true,
+			items: tbar
+		},
 		items : this.formPanel
 	});
 	
