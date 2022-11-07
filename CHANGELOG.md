@@ -3,6 +3,7 @@
 - Email: 16px on mobile in htmleditor so iphone won't zoom in
 - Core: fix search user and contact search in email address bar
 - Core / Address book: Always create address book entry for user
+- Core: Error dialog could display nothing when horizontal scrollbar was present
 
 31-10-2022 6.6.124
 - Core: Add extra CSS options to custom comboboxes
