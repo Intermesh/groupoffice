@@ -169,9 +169,14 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								dropRowIndex = grid.getView().findRowIndex(e.target),
 								noteBookId = grid.getView().grid.store.data.items[dropRowIndex].id;
 
+
+							const update = {};
 							selections.forEach((r) => {
-								go.Db.store("Note").save({noteBookId: noteBookId}, r.id);
+								update[r.id] = {noteBookId: noteBookId};
 							})
+
+							go.Db.store("Note").set({update: update});
+
 						}
 					});
 				},
