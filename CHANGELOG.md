@@ -4,6 +4,7 @@
 - Core: fix search user and contact search in email address bar
 - Core / Address book: Always create address book entry for user
 - Core: Error dialog could display nothing when horizontal scrollbar was present
+- Core: Accent color for combo group headers
 
 31-10-2022 6.6.124
 - Core: Add extra CSS options to custom comboboxes
