@@ -415,9 +415,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								dropRowIndex = grid.getView().findRowIndex(e.target),
 								tasklistId = grid.getView().grid.store.data.items[dropRowIndex].id;
 
+							const update = {};
 							selections.forEach((r) => {
-								go.Db.store("Task").save({tasklistId: tasklistId}, r.id);
+								update[r.id] = {tasklistId: tasklistId};
 							})
+
+							go.Db.store("Task").set({update: update});
 						}
 					});
 				},
