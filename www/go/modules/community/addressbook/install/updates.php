@@ -166,3 +166,5 @@ $updates['202210171545'][] = 'ALTER TABLE `addressbook_contact` CHANGE `salutati
 
 $updates['202211041158'][] = 'alter table addressbook_contact
     modify department varchar(200) null;';
+
+$updates['202211071330'][] = "ALTER TABLE `addressbook_email_address` ADD KEY `email` (`email`);";

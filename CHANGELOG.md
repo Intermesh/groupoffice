@@ -1,6 +1,7 @@
 - Core: Switch user will not update last login and login count.
 - Billing: fixed division by zero
 - Email: 16px on mobile in htmleditor so iphone won't zoom in
+- Core: fix search user and contact search in email address bar
 
 31-10-2022 6.6.124
 - Core: Add extra CSS options to custom comboboxes
