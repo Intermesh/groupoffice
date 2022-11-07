@@ -164,12 +164,17 @@ $updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD BIC varchar(11
 
 $updates['202210171545'][] = 'ALTER TABLE `addressbook_contact` CHANGE `salutation` `salutation` VARCHAR(382) DEFAULT NULL;';
 
+$updates['202211041158'][] = 'alter table addressbook_contact
+    modify department varchar(200) null;';
+
+$updates['202211071330'][] = "ALTER TABLE `addressbook_email_address` ADD KEY `email` (`email`);";
+
 // 6.7
 
-$updates['202206020948'][] = "alter table addressbook_address
+$updates['202211071330'][] = "alter table addressbook_address
     add address text null;";
 
-$updates['202206020948'][] = function() {
+$updates['202211071330'][] = function() {
 
 	go()->getDbConnection()->exec("alter table addressbook_address ADD id INT AUTO_INCREMENT PRIMARY KEY;");
 	go()->getDatabase()->clearCache();

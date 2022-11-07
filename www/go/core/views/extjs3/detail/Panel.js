@@ -90,12 +90,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			return;
 		}
 
-		changed.forEach((id) => {
+		for(const id of changed) {
 			if(this.watchRelations[entityStore.entity.name].indexOfLoose(id) > -1) {
 				this.internalLoad(this.data);
 				return;
 			}
-		});
+		}
 	},
 	
 	// listen to relational stores as well

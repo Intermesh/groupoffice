@@ -547,7 +547,8 @@ ALTER TABLE `core_setting`
 ALTER TABLE `core_user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`),
-  ADD KEY `fk_user_avatar_id_idx` (`avatarId`);
+  ADD KEY `fk_user_avatar_id_idx` (`avatarId`),
+  ADD KEY `email` (`email`);
 
 ALTER TABLE `core_user_custom_fields`
   ADD PRIMARY KEY (`id`);

@@ -99,11 +99,15 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		};
 	},
 
+	_isDirty: false,
+
 	onChange: function() {
+		this._isDirty = true;
 		this.fireEvent('change', this, this.getValue());
 	},
 	
 	reset:function() {
+		this._isDirty = false;
 		this.items.each(function(f){
 			f.reset();
 	  });
@@ -135,7 +139,7 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 	},
 	
 	isDirty: function () {
-		return true;
+		return this._isDirty;
 	},
 
 	

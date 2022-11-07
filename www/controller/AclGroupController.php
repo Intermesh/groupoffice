@@ -144,12 +144,12 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 			$groupId = \go\core\model\Group::findPersonalGroupID($acl->ownedBy);
 
 			if(in_array($groupId, $delKeys)) {
-				throw new \GO\Base\Exception\AccessDenied();
+				throw new \GO\Base\Exception\AccessDenied("You can't remove the owner");
 			}
 
 			// Only admins may edit the set of linked groups.
 			if(!$params['currentUserHasManagePermission']) {
-				throw new \GO\Base\Exception\AccessDenied();
+				throw new \GO\Base\Exception\AccessDenied("Only admins can do this");
 			}
 		} else {
 			return false;

@@ -769,7 +769,6 @@ class User extends Entity {
 			return false;
 		}
 
-		/// TODO change log problem with deadlocks
 		$this->saveContact();
 
 		if(isset($this->personalGroup) && $this->personalGroup->isModified()) {
@@ -875,23 +874,41 @@ class User extends Entity {
 	 */
 	private function saveContact(): bool
 	{
-		if (!isset($this->contact)) {
+		if(!$this->isModified(['displayName', 'email', 'avatarId'])) {
 			return true;
 		}
 
-		$this->contact->photoBlobId = $this->avatarId;
-		if (!isset($this->contact->emailAddresses[0])) {
-			$this->contact->emailAddresses = [(new EmailAddress($this->contact))->setValues(['email' => $this->email])];
-		}
-		if (empty($this->contact->name) || $this->isModified(['displayName'])) {
-			$this->contact->name = $this->displayName;
-			$parts = explode(' ', $this->displayName);
-			$this->contact->firstName = array_shift($parts);
-			$this->contact->lastName = implode(' ', $parts);
+		$contact = $this->getProfile();
+
+		$contact->photoBlobId = $this->avatarId;
+
+		$compare = $this->isModified('email') ? $this->getOldValue("email") : $this->email;
+		if($this->isModified("email")) {
+			$hasEmail = false;
+			foreach ($contact->emailAddresses as $emailAddress) {
+				if ($emailAddress->email == $compare) {
+					$hasEmail = $emailAddress;
+					break;
+				}
+			}
+
+			if (!$hasEmail) {
+				$contact->emailAddresses[] = (new EmailAddress($contact))->setValues(['email' => $this->email]);
+			} else if($hasEmail != $this->email) {
+				$hasEmail->email = $this->email;
+			}
 		}
 
-		$this->contact->goUserId = $this->id;
-		return $this->contact->save();
+		if (empty($contact->name) || $this->isModified(['displayName'])) {
+			$contact->name = $this->displayName;
+			$parts = explode(' ', $this->displayName);
+			$contact->firstName = array_shift($parts);
+			$contact->lastName = implode(' ', $parts);
+		}
+
+		$contact->goUserId = $this->id;
+
+		return $contact->save();
 	}
 
 
@@ -1100,21 +1117,20 @@ class User extends Entity {
 		if(!Module::isInstalled('community', 'addressbook', true)) {
 			return null;
 		}
-
-		$contact = !$this->isNew() ? Contact::findForUser($this->id) : null;
-		if(!$contact) {
-			$contact = new Contact();
-			$contact->goUserId = $this->id;
-			$contact->addressBookId = go()->getSettings()->userAddressBook()->id;
+		
+		$this->contact = !$this->isNew() ? Contact::findForUser($this->id) : null;
+		if(!$this->contact) {
+			$this->contact = new Contact();
+			$this->contact->addressBookId = go()->getSettings()->userAddressBook()->id;
 			if($this->email) {
-				$contact->emailAddresses[0] = (new EmailAddress($contact))->setValues(['email' => $this->email]);
+				$this->contact->emailAddresses[0] = (new EmailAddress($this->contact))->setValues(['email' => $this->email]);
 			}
 			$nameParts = explode(" ", $this->displayName);
-			$contact->firstName = array_shift($nameParts);
-			$contact->lastName = implode(" ", $nameParts);
+			$this->contact->firstName = array_shift($nameParts);
+			$this->contact->lastName = implode(" ", $nameParts);
 		}
 		
-		return $contact;
+		return $this->contact;
 	}
 
 	/**
@@ -1132,7 +1148,7 @@ class User extends Entity {
 		} else {
 			$this->contact = $this->getProfile();
 			$this->contact->setValues($values);
-			if (!empty($this->contact->name)) {
+			if ($this->contact->isModified("name")) {
 				$this->displayName = $this->contact->name;
 			}
 		}

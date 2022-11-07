@@ -74,12 +74,11 @@ Ext.extend(GO.ErrorDialog, GO.Window, {
 		GO.ErrorDialog.superclass.show.call(this);
 		
 		if(this.messagePanel.body.isScrollable()) {
-			var newHeight = this.messagePanel.body.dom.scrollHeight + dp(120);
+			var newHeight = this.messagePanel.body.dom.scrollHeight + dp(150); // add 30 for horizontal scrollbar
 							
-			if(newHeight > dp(120)){
-				this.setHeight(newHeight);
-				this.autoSize();	
-			}
+			this.setHeight(newHeight);
+			this.autoSize();
+
 		}
 		this.center();
 	}
