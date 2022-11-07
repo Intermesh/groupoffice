@@ -143,7 +143,8 @@ ALTER TABLE `addressbook_date`
   ADD KEY `contactId` (`contactId`);
 
 ALTER TABLE `addressbook_email_address`
-  ADD KEY `contactId` (`contactId`);
+  ADD KEY `contactId` (`contactId`),
+  ADD KEY `email` (`email`);
 
 ALTER TABLE `addressbook_group`
   ADD PRIMARY KEY (`id`),
