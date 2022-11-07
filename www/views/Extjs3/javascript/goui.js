@@ -53,6 +53,7 @@
 		clientMods.client.uri = BaseHref + "api/";
 
 		clientMods.client.session = Ext.apply(go.User.session, {accessToken: go.User.accessToken});
+		clientMods.client.accessToken = go.User.accessToken;
 
 		//load component module
 		const mods = await import("../../."+module);
