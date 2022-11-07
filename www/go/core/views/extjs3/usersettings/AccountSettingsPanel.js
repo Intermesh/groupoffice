@@ -42,7 +42,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					defaults: {
 						anchor: "100%"
 					},
-					items: [this.usernameField = new Ext.form.TextField({
+					items: [
+						this.usernameField = new Ext.form.TextField({
 						xtype: 'textfield',
 						name: 'username',
 						fieldLabel: t("Username"),
@@ -52,11 +53,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						regex: /^[A-Za-z0-9_\-\.\@]*$/,
 						regexText: t("You have invalid characters in the username") + " (a-z, 0-9, -, _, ., @)."
 					}),
-					this.displayNameField = new Ext.form.TextField({
-						fieldLabel: t('Display name','users','core'),
-						name: 'displayName',
-						allowBlank:false
-					}),
+
 					this.emailField = new Ext.form.TextField({
 						fieldLabel: t('E-mail','users','core'),
 						name: 'email',
@@ -76,6 +73,16 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				
 			}]
 		});
+
+		if(!go.Modules.isInstalled("community", "addressbook")) {
+			this.displayNameField = new Ext.form.TextField({
+				fieldLabel: t('Display name','users','core'),
+				name: 'displayName',
+				allowBlank:false
+			});
+
+			this.userFieldset.insert(1, this.displayNameField);
+		}
 
 		this.quotaFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),		
