@@ -219,12 +219,9 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 			},
 			addDeleteBtn: function(link) {
-				return ""; // TODO: get the actual link ID. This is not being returned from the API. Odd...
-				// return '<a class="simple-link" onclick="go.Db.store(\'Link\').set({destroy: ['+link.id+']});">'+t('Delete') + '</a>';
-				// let btn = new Ext.Button({
-				// 	itemId: "delete",
-				// 	iconCls: "ic-delete",
-				// 	text: t("Unlink"),
+				return "";
+				// return '<a class="simple-link" onclick="go.Db.store(\'Link\').set({destroy: ['+link.link_id+']}).then(() => {GO.mainLayout.openModule(\'email\');});">'+t('Delete') + '</a>';
+				// TODO: Handler:
 				// 	handler: function () {
 				// 		Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to unlink this item?"), function (btn) {
 				// 			if (btn == "yes") {
@@ -234,9 +231,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				// 			}
 				// 		}, this);
 				// 	},
-				// 	scope: this
-				// });
-				// return btn.render();
 			},
 			addSlashes : function(str)
 			{

@@ -82,7 +82,7 @@ class SearchCacheRecord extends \GO\Base\Db\ActiveRecord {
 
 
 		$params = \GO\Base\Db\FindParams::newInstance()
-						->select("t.*,l.description AS link_description")
+						->select("t.*,l.description AS link_description, l.id AS link_id")
 						->order('modifiedAt','DESC')
 						->join('core_link',  \GO\Base\Db\FindCriteria::newInstance()
 										->ignoreUnknownColumns() //we don't have models for go_links_* tables

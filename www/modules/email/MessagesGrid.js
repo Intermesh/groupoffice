@@ -449,6 +449,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		GO.email.messagesGrid.store.load();
 	},
 
+	/* @deprecated
 	renderNorthMessageRow : function(value, metaData, record){
 
 		if( this.isSpoofed(record)) {
@@ -462,7 +463,8 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		else
 			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-mail">{0}</div>', value);
 	},
-
+	*/
+	/* @deprecated
 	renderMessageSmallRes : function(value, metaData, record){
 
 		if( this.isSpoofed(record)) {
@@ -477,7 +479,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		{
 			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-from">{0}</div><div class="ml-seen-subject">{1}</div>', value, record.data['subject']);
 		}
-	},
+	},*/
 
 	createQtipTemplate: function(record){
 		var qtipTemplate = '';
@@ -546,6 +548,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		
 	},
 
+	/* @deprecated
 	renderFlagged : function(value, p, record){
 
 		var str = '';
@@ -563,4 +566,5 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		return str;
 
 	}
+	 */
 });
