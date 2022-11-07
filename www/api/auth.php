@@ -172,7 +172,7 @@ try {
 			} else {
 
 				if (empty($data['username']) || empty($data['password'])) {
-					$msg = "Missing arguments 'username' and 'password' for authenticatoin.";
+					$msg = "Missing arguments 'username' and 'password' for authentication.";
 					output(["error" => $msg], 400, $msg);
 				}
 
