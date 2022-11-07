@@ -2184,8 +2184,8 @@ a.x-menu-group-item .x-menu-item-text:before{
 }
 .menu-title {
 	@extend %font-caption;
-	@include var(color, c-primary);
-	padding: dp(8) dp(16) 0;
+	@include var(color, c-accent);
+	padding: dp(8) dp(8) 0;
 }
 
 .x-combo-list-group {
