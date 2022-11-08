@@ -675,7 +675,8 @@ class Settings extends core\Settings {
 					throw new Exception("License data was corrupted");
 				}
 
-				if (!License::validate($data)) {
+				// force validation because the license was just replaced
+				if (!License::validate($data, true)) {
 					throw new Exception(License::$validationError);
 				}
 			}
