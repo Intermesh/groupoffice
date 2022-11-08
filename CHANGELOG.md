@@ -1,3 +1,6 @@
+08-11-2022 6.6.126
+- Core: Fixed Creating default object from empty value on install
+
 07-11-2022 6.6.125
 - Core: Switch user will not update last login and login count.
 - Billing: fixed division by zero
