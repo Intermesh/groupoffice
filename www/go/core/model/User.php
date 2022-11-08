@@ -879,6 +879,10 @@ class User extends Entity {
 
 		$contact = $this->getProfile();
 
+		if(!$contact) {
+			return true;
+		}
+
 		$contact->photoBlobId = $this->avatarId;
 
 		$compare = $this->isModified('email') ? $this->getOldValue("email") : $this->email;
