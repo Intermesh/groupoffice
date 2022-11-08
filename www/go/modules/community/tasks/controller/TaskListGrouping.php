@@ -9,6 +9,7 @@ namespace go\modules\community\tasks\controller;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
+use go\modules\business\supportclient\Module;
 use go\modules\community\tasks\model;
 
 class TaskListGrouping extends EntityController {

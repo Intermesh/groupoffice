@@ -36,6 +36,24 @@ abstract class EntityController extends Controller {
 	const EVENT_BEFORE_GET = "beforeget";
 	const EVENT_GET = "get";
 
+
+	/**
+	 * Can be used to return true or false and override the default {@see self::checkModulePermissions()}
+	 */
+	const EVENT_CHECK_PERMISSION = "checkpermission";
+
+
+	protected function checkModulePermissions(): bool
+	{
+		$ret = static::fireEvent(self::EVENT_CHECK_PERMISSION, $this);
+
+		if(isset($ret)) {
+			return $ret;
+		}
+
+		return parent::checkModulePermissions();
+	}
+
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
