@@ -53,6 +53,12 @@ abstract class AclOwnerEntity extends AclEntity {
 		return true;
 	}
 
+	protected static function internalRequiredProperties(): array
+	{
+		$arr =  parent::internalRequiredProperties();
+		$arr[] = static::$aclColumnName;
+		return $arr;
+	}
 
 
 	/**
@@ -194,6 +200,10 @@ abstract class AclOwnerEntity extends AclEntity {
 			return parent::internalGetPermissionLevel();
 		}
 
+		if(!isset($this->{static::$aclColumnName})) {
+			throw new Exception(static::$aclColumnName .' not set for ' . static::class . '::' . $this->id());
+		}
+
 		if(!isset($this->permissionLevel)) {
 			$this->permissionLevel =
 				(go()->getAuthState() && go()->getAuthState()->isAdmin()) ?
@@ -229,9 +239,14 @@ abstract class AclOwnerEntity extends AclEntity {
 	 */
 	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
 	{
-		$tables = static::getMapping()->getTables();
-		$firstTable = array_shift($tables);
-		$tableAlias = $firstTable->getAlias();
+//		$tables = static::getMapping()->getTables();
+
+		$col = static::getMapping()->getColumn(static::$aclColumnName);
+		$tableAlias = $col->table->getAlias();
+//		$firstTable = array_shift($tables);
+//		$tableAlias = $firstTable->getAlias();
+
+
 		Acl::applyToQuery($query, $tableAlias . '.' . static::$aclColumnName, $level, $userId, $groups);
 		
 		return $query;
@@ -354,7 +369,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return \go\core\db\Query|Query
 	 */
 	protected static function checkAclJoinEntityTable() {
-		$table = static::getMapping()->getPrimaryTable();
+		$table = static::getMapping()->getColumn(static::$aclColumnName)->getTable();
 		return (new Query())
 			->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id');
 	}
