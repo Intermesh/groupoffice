@@ -40015,7 +40015,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent, {
 
     
     alignErrorEl : function(){
-        this.errorEl.setWidth(this.getErrorCt().getWidth(true) - 20);
+       // this.errorEl.setWidth(this.getErrorCt().getWidth(true) - 20);
     },
 
     
