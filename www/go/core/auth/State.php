@@ -70,7 +70,7 @@ abstract class State {
 			$url .= Request::get()->getHost(false) . dirname($_SERVER['SCRIPT_NAME']);
 
 			// HACK for old framework index.php
-			if(substr(dirname($_SERVER['PHP_SELF']), -4) !== '/api'){
+			if(substr($url, -4) !== '/api'){
 				$url .= '/api';
 			}
 
