@@ -1209,6 +1209,9 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 
 				if (typeof(config.values)!='undefined' && typeof(config.values.body)!='undefined')
 					params.body = config.values.body;
+
+				if (typeof(config.values)!='undefined' && typeof(config.values.subject)!='undefined')
+					params.subject = config.values.subject;
 				
 				this.lastLoadUrl = url;
 				this.lastLoadParams = params;

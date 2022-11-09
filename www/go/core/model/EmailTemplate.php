@@ -1,12 +1,15 @@
 <?php
 namespace go\core\model;
 
+use Exception;
 use GO\Base\Mail\SmimeMessage;
 use go\core\cron\GarbageCollection;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\jmap\Entity;
+use go\core\mail\Message;
+use go\core\model\Module as ModuleModel;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\TemplateParser;
@@ -110,6 +113,27 @@ class EmailTemplate extends Entity
 	{
 		return ['name'];
 	}
+
+
+	/**
+	 * Find templates by module key and language
+	 *
+	 * @param string $package
+	 * @param string $name
+	 * @param string|null $preferredLanguage
+	 * @param string|null $key
+	 * @return EmailTemplate|null
+	 */
+	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?EmailTemplate {
+		$moduleModel = ModuleModel::findByName($package, $name);
+
+		$template = isset($lang) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
+		if (!$template) {
+			$template = static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key])->single();
+		}
+
+		return $template;
+	}
 	
 	/**
 	 * @param $module array{package:string, module:string} | int
@@ -182,9 +206,11 @@ class EmailTemplate extends Entity
 	 * Create message from this template
 	 *
 	 * @param TemplateParser $templateParser
-	 * @return \go\core\mail\Message
+	 * @return Message
+	 * @throws Exception
 	 */
-	public function toMessage(TemplateParser $templateParser) {
+	public function toMessage(TemplateParser $templateParser): Message
+	{
   	$message = go()->getMailer()->compose();
 		$subject = $templateParser->parse($this->subject);
 		$body = $templateParser->parse($this->body);
@@ -213,5 +239,19 @@ class EmailTemplate extends Entity
 		}
 
 		return $message;
+	}
+
+	public function toMessageArray(TemplateParser $templateParser) : array {
+
+		$blobs = [];
+		foreach($this->attachments as $attachment) {
+			$blobs[] = Blob::findById($attachment->blobId);
+		}
+
+		return [
+			"subject" => $templateParser->parse($this->subject),
+			"body" => $templateParser->parse($this->body),
+			"blobs" => $blobs
+			];
 	}
 }

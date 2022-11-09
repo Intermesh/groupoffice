@@ -6,6 +6,7 @@ use go\core\cron\GarbageCollection;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
+use go\core\model\Module as ModuleModel;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\validate\ErrorCode;
@@ -138,6 +139,31 @@ class PdfTemplate extends Entity {
 				$criteria->where(['key' => $value]);
 			});
 
+	}
+
+	protected static function textFilterColumns(): array
+	{
+		return ['name'];
+	}
+
+	/**
+	 * Find templates by module key and language
+	 *
+	 * @param string $package
+	 * @param string $name
+	 * @param string|null $preferredLanguage
+	 * @param string|null $key
+	 * @return PdfTemplate|null
+	 */
+	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?PdfTemplate {
+		$moduleModel = ModuleModel::findByName($package, $name);
+
+		$template = isset($lang) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
+		if (!$template) {
+			$template = static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key])->single();
+		}
+
+		return $template;
 	}
 
 	protected function internalGetPermissionLevel(): int
