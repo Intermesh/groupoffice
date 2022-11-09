@@ -38,6 +38,10 @@ use function GO;
  */
 abstract class Module extends Singleton {
 
+	const STATUS_STABLE = "stable";
+	const STATUS_BETA = "beta";
+	const STATUS_DEPRECATED = "deprecated";
+
 	/**
 	 * Find module class file by name
 	 * 
@@ -55,6 +59,14 @@ abstract class Module extends Singleton {
 		}
 		
 		return null;
+	}
+
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_BETA;
 	}
 
 

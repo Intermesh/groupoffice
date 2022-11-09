@@ -21,6 +21,13 @@ use GO\Projects2\Model\TimeEntry;
 
 class Module extends core\Module
 {
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
 
 	public static $enabled = true;
 

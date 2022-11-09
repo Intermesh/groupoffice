@@ -2601,7 +2601,7 @@ body.go-compact {
 	> div.tile {
 		position:relative;
 		outline: 2px solid color($fg,'divider');
-		height: dp(232);
+		height: dp(264);
 		background-color: color($bg,'card');
 	}
 
@@ -2625,6 +2625,7 @@ body.go-compact {
 	}
 	.thumb {
 		margin: dp(16);
+		margin-top: dp(48);
 		height: dp(80);
 		background-position: center center;
 		background-repeat: no-repeat;
@@ -2639,6 +2640,27 @@ body.go-compact {
 		padding: 2px;
 		width: dp(50);
 		min-height: dp(24);
+	}
+
+	.status {
+		position: absolute;
+		right: dp(8);
+		top: dp(8);
+		color: orange;
+		background-color: cornsilk;
+		border-radius: dp(4);
+		border: 1px solid orange;
+		text-transform: uppercase;
+
+		&.deprecated {
+			color: whitesmoke;
+			background-color: lightslategray;
+			border-color: darkslategrey;
+		}
+
+		&.stable {
+			display:none;
+		}
 	}
 }
 

@@ -24,7 +24,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 
 		this.store = new GO.data.JsonStore({
 			url: GO.url("modules/module/store"),
-			fields:['name', 'package', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'rights', 'icon', 'enabled', 'warning','author', 'buyEnabled','not_installable', 'isRefactored','installed'],
+			fields:['name', 'package', 'status', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'rights', 'icon', 'enabled', 'warning','author', 'buyEnabled','not_installable', 'isRefactored','installed'],
 			remoteSort: false,
 			idProperty: 'name'
 
@@ -205,6 +205,11 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 				// 		scope:this
 				// 	}
 				// },
+					{
+						xtype:'box',
+						cls: 'status ' + r.data.status,
+						html: t(r.data.status)
+					},
 					{
 						xtype:'box',
 						cls: 'thumb',

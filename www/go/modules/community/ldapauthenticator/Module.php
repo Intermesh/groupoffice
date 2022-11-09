@@ -16,6 +16,13 @@ use go\core\model\User;
 use go\core\fs\Blob;
 
 class Module extends core\Module implements DomainProvider {
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
 
 	public function getAuthor(): string
 	{

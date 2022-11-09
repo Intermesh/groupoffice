@@ -14,6 +14,13 @@ use go\core\model\Module as ModuleModel;
 use go\core\model\User;
 
 class Module extends core\Module {
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
 
 	public function getAuthor(): string
 	{
