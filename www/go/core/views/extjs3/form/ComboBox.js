@@ -237,7 +237,10 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 			if(!value) {
 				resolve(me);
-				return go.form.ComboBox.superclass.setValue.call(me, value);
+				go.form.ComboBox.superclass.setValue.call(me, value);
+				me.clearInvalid();
+
+				return;
 			}
 
 			//create record from entity store if not exists
@@ -257,6 +260,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 					me.store.on("load", function() {
 
 						go.form.ComboBox.superclass.setValue.call(me, value);
+
+						me.clearInvalid();
 
 						me.hasFocus = origHasFocus;
 						resolve(me);
@@ -309,6 +314,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				}
 				Ext.form.ComboBox.superclass.setValue.call(me, text);
 				me.value = value;
+				me.clearInvalid();
 
 				resolve(me);
 				return me;
