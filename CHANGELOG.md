@@ -1,3 +1,9 @@
+09-11-2022 6.6.128
+- Core: rollback of fix for autocomplete. Probably fixed by always creating an address book entry
+
+08-11-2022 6.6.127
+- Billing: Fixed Call to undefined method go\core\orm\SearchableTrait::splitTextKeywords()
+
 08-11-2022 6.6.126
 - Core: Fixed Creating default object from empty value on install
 

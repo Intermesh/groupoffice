@@ -35,30 +35,34 @@ class Search extends EntityController {
 		//TODO change when email module has been refactored.
 		$optionEnabled = \GO::config()->get_setting("email_sort_email_addresses_by_time", go()->getAuthState()->getUserId());
 
-		$query = new Query();
 
-		$selectQueryContact = 'u.id as entityId, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId';
+		if (!$hasAddressbook || !go()->getSettings()->userAddressBook()->getPermissionLevel()) {
+
+			$query = new Query();
+
+			$selectQueryContact = 'u.id as entityId, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId';
 
 
-		if ($isEmailModuleAvailable && $optionEnabled == "1") {
-			$selectQueryContact .= ', NULL as priority';
+			if ($isEmailModuleAvailable && $optionEnabled == "1") {
+				$selectQueryContact .= ', NULL as priority';
+			}
+			$query->from('core_user', 'u')
+				->join('core_group', 'g', 'u.id = g.isUserGroupFor');
+			Acl::applyToQuery($query, 'g.aclId');
+
+			$query->select($selectQueryContact);
+
+			if (!empty($q)) {
+				$query->where(
+					(new Criteria)
+						->where('email', 'LIKE', '%' . $q . '%')
+						->orWhere('displayName', 'LIKE', '%' . $q . '%')
+				);
+			}
+			$query->andWhere('enabled', '=', 1);
 		}
-		$query->from('core_user', 'u')
-			->join('core_group', 'g', 'u.id = g.isUserGroupFor');
-		Acl::applyToQuery($query, 'g.aclId');
 
-		$query->select($selectQueryContact);
-
-		if (!empty($q)) {
-			$query->where(
-				(new Criteria)
-					->where('email', 'LIKE', '%' . $q . '%')
-					->orWhere('displayName', 'LIKE', '%' . $q . '%')
-			);
-		}
-		$query->andWhere('enabled', '=', 1);
-
-		if ($hasAddressbook && go()->getSettings()->userAddressBook()->getPermissionLevel()) {
+		if ($hasAddressbook) {
 
 			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.photoBlobId';
 
@@ -82,7 +86,6 @@ class Search extends EntityController {
 				$contactsQuery->where(
 						(new Criteria)
 								->where('e.email', 'LIKE', '%' . $q . '%')
-								->where('e.email NOT IN (SELECT email FROM core_user WHERE enabled=1)')
 								->orWhere('c.name', 'LIKE', '%' . $q . '%')
 				);
 			}
