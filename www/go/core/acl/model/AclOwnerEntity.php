@@ -349,8 +349,6 @@ abstract class AclOwnerEntity extends AclEntity {
 			$updates['acl.ownedBy'] = new Expression('coalesce(entity.createdBy, 1)');
 		}
 
-		$updateQuery = static::getCheckAclUpdateQuery();
-
 		$stmt = go()->getDbConnection()->update(
 			'core_acl',
 			$updates,
