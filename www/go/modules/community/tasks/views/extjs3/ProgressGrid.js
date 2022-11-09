@@ -2,6 +2,7 @@ go.modules.community.tasks.ProgressGrid = Ext.extend(go.NavGrid, {
 	autoHeight: true,
 	saveSelection: true,
 	stateId: "task-progress-grid",
+	hideMenuButton: true,
 	initComponent: function () {
 		Ext.apply(this, {
 			store: new Ext.data.ArrayStore({
