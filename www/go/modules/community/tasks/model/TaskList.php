@@ -162,13 +162,13 @@ class TaskList extends AclOwnerEntity
 		return Module::findByName('community', 'tasks')
 			->getUserRights()->mayChangeTasklists;
 	}
-// TODO
-//	protected static function checkAclJoinEntityTable()
-//	{
-//		return (new Query())
-//			->join("tasks_tasklist", 'entity', 'entity.aclId = acl.id and entity.role != ' . self::Project);
-//
-//	}
+
+	protected static function checkAclJoinEntityTable()
+	{
+		return (new Query())
+			->join("tasks_tasklist", 'entity', 'entity.aclId = acl.id and entity.role != ' . self::Project);
+
+	}
 
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
