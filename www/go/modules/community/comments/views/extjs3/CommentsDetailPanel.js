@@ -358,6 +358,13 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			prevStr = go.util.Format.date(r.get('date'));
 		}, this);
 
+		// this anchor will keep the panel scrolled down when images are loading and push the content down
+		this.commentsContainer.add({
+				xtype: "box",
+				cls: "anchor"
+			}
+		);
+
 		// Put a date on top
 		this.commentsContainer.insert(0,{
 			xtype:"container",
