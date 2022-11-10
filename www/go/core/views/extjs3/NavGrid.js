@@ -132,6 +132,10 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 		//mark selected records in the filter as seleted in the selection model
 		const selected = [], selectedIds = this.getSelectedIds();
 
+		if(this.selectFirst && selectedIds.length == 0 && store.getCount() > 0) {
+			selected.push(store.getAt(0));
+		}
+
 		selectedIds.forEach((id) =>{
 			const record = store.getById(id);
 
