@@ -192,8 +192,8 @@
 			return parseInt(parts[0])*60+parseInt(parts[1]);
 		},
 
-		valuta : function(amount) {
-			return go.User.currency + go.util.Format.number(amount, 2);
+		valuta : function(amount, decimals = 2) {
+			return go.User.currency + "&nbsp;" + go.util.Format.number(amount, decimals);
 		},
 
 
