@@ -104,47 +104,53 @@ class Module extends core\Module {
 	 * @throws SaveException
 	 * @throws Exception
 	 */
-	public function demoTasks(Generator $faker, TaskList $tasklist, bool $withLinks = true) {
+	public function demoTasks(Generator $faker, TaskList $tasklist, bool $withLinks = true, $titles = null, $count = 5) {
 
-		$titles = [
-			"Finish tasks module",
-			"Call Michael about Energy project",
-			"Order printer paper",
-			"Create functional design",
-			"Create technical design",
-			"Create database design",
-			"Order machine parts",
-			"Order lunch",
-			"Schedule meeting with client",
-			"Discuss design with John",
-			"Fix issue with automatic problem solver",
-			"Prepare Weekly board meeting",
-			"Test two factor authentication",
-			"Perform weekly penetration tests on Group-Office",
-			"Implement Oauth 2.0",
-			"Implement Open ID",
-			"Feature request on autofill email addresses",
-			"Feature request SMIME encryption",
-			"Discuss roadmap for next release",
-			"Buy bigger screens",
-			"Verify backups",
-			"Perform weekly penetration tests on servers",
-			"Prepare quote for solar panels module",
-			"Prepare quote for Wind mill project",
-			"Review graphical designs for Group-Office website",
-			"Design checkout process",
-			"Take out the trash",
-			"Order more coffee",
-		];
+		if(!isset($titles)) {
+			$titles = [
+				"Finish tasks module",
+				"Call Michael about Energy project",
+				"Order printer paper",
+				"Create functional design",
+				"Create technical design",
+				"Create database design",
+				"Order machine parts",
+				"Order lunch",
+				"Schedule meeting with client",
+				"Discuss design with John",
+				"Fix issue with automatic problem solver",
+				"Prepare Weekly board meeting",
+				"Test two factor authentication",
+				"Perform weekly penetration tests on Group-Office",
+				"Implement Oauth 2.0",
+				"Implement Open ID",
+				"Feature request on autofill email addresses",
+				"Feature request SMIME encryption",
+				"Discuss roadmap for next release",
+				"Buy bigger screens",
+				"Verify backups",
+				"Perform weekly penetration tests on servers",
+				"Prepare quote for solar panels module",
+				"Prepare quote for Wind mill project",
+				"Review graphical designs for Group-Office website",
+				"Design checkout process",
+				"Take out the trash",
+				"Order more coffee",
+			];
+		}
 
 		$titleCount = count($titles);
 
-		for($i = 0; $i < 5; $i ++ ) {
+		$userIds = User::find()->selectSingleValue('id')->all();
+		$maxUserIndex = count($userIds) - 1;
+
+
+		for($i = 0; $i < $count; $i ++ ) {
 			echo ".";
 			$task = new Task();
 			$task->title = $titles[$faker->numberBetween(0, $titleCount - 1)];
-			$task->createdBy = $tasklist->createdBy;
-			$task->responsibleUserId = $task->createdBy;
+			$task->createdBy = $userIds[$faker->numberBetween(0, $maxUserIndex)];
+			$task->responsibleUserId = $userIds[$faker->numberBetween(0, $maxUserIndex)];
 			$task->start = $faker->dateTimeBetween("-1 years", "now");
 			$task->due =  $faker->dateTimeBetween($task->start, "now");
 			$task->tasklistId = $tasklist->id;
