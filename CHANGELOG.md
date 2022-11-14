@@ -1,3 +1,5 @@
+- Email: Set large minWidth so messages grid can't be removed.
+
 09-11-2022 6.6.128
 - Core: rollback of fix for autocomplete. Probably fixed by always creating an address book entry
 
