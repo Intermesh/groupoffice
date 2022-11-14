@@ -221,7 +221,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				handler: function() {
 					go.Db.store("Task").save({
 						responsibleUserId: go.User.id,
-						progress: "in-progress"
+						// progress: "in-progress"
 					}, this.data.id);
 				}
 			}),
