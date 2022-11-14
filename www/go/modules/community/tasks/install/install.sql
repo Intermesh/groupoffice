@@ -330,5 +330,5 @@ create table tasks_tasklist_grouping
 
 alter table tasks_tasklist
     add constraint tasks_tasklist_tasks_tasklist_grouping_null_fk
-        foreign key (groupingId) references groupoffice_67.tasks_tasklist_grouping (id)
+        foreign key (groupingId) references tasks_tasklist_grouping (id)
             on delete set null;
