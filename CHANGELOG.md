@@ -1,6 +1,7 @@
 - Email: Set large minWidth so messages grid can't be removed.
 - Calendar: SQLSTATE[HY000]: General error: 1093 Table 'p1' is specified twice, both as a target for 'UPDATE' and as a separate source for data
 - Billing: fixed display of lists in the frontpage
+- Core: Prevent invalid cache without licensed modules if system is accessed via unlicensed host
 
 09-11-2022 6.6.128
 - Core: rollback of fix for autocomplete. Probably fixed by always creating an address book entry
