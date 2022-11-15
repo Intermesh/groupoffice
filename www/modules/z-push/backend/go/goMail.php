@@ -1003,8 +1003,10 @@ class goMail extends GoBaseBackendDiff {
 				
 				if($refImapMessage) {
 					$headers = $sendMessage->getHeaders();
-					$headers->addTextHeader('In-Reply-To', $refImapMessage->message_id);
-					$headers->addTextHeader('References', $refImapMessage->message_id);
+					$headers->removeAll("In-Reply-To");
+					$headers->removeAll("References");
+					$headers->addTextHeader('In-Reply-To', "<" . $refImapMessage->message_id . ">");
+					$headers->addTextHeader('References', "<" . $refImapMessage->message_id  . ">");
 				}
 			}
 			
