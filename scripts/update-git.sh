@@ -58,6 +58,7 @@ do
   NODE_DIR="$(dirname "${line}")";
   echo "BUILD:" $NODE_DIR;
   cd $NODE_DIR;
+  npm install;
   npm run build;
   cd $DIR;
 
