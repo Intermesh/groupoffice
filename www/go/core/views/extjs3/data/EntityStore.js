@@ -421,7 +421,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	single: function(id) {
 
-		if(id == null) {
+		if(!id) {
 			Promise.resolve(null);
 		}
 
