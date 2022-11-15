@@ -5,6 +5,7 @@
 - Billing: Add project name to search cache
 - Core: Updated Hungarian language
 - LDAP: Disable creation of IMAP accounts didn't work
+- Newsletter: Bug when an image was both attached as attachment and inline.
 
 09-11-2022 6.6.128
 - Core: rollback of fix for autocomplete. Probably fixed by always creating an address book entry
