@@ -194,4 +194,5 @@ return array (
   'Repeat every' => 'Ismétlés',
   'At days' => 'at nap',
   'times' => 'alkalommal',
+  'Start' => 'Kezdés',
 );

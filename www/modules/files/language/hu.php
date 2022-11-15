@@ -92,4 +92,9 @@ A következő változásokat végrehajtotta: %s:
   'Please open the upload program and upload your files. Click \'Yes\' when the upload is done.' => 'Kérjük, nyissa meg a feltöltési program feltölteni a fájlokat. Kattintson az „Igen”, ha a feltöltés befejeződött.',
   'Folder display locked by owner/admin' => 'Mappamegjelenítés zárva tulajdonos / admin által',
   'Can\'t do this when in search mode.' => 'Keresési módban ezt nem teheti.',
+  'Save as PDF' => 'Mentés PDF-ként',
+  'Download as PDF' => 'Letöltés PDF-ként',
+  'Open in browser' => 'Megnyitás a böngészőben',
+  'Sorry, something went wrong' => 'Sajnálom, valami elromlott',
+  'No items found' => 'Nem találtunk elemeket',
 );

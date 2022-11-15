@@ -10,4 +10,9 @@ return array (
   'Deactivate instance' => 'kikapcsolás',
   'Delete instance' => 'Törlés',
   'Activate instance' => 'aktiválás',
+  'Modules' => 'Modulok',
+  'Storage quota' => 'Tárolási kvóta',
+  'Storage usage' => 'Tárolóhasználat',
+  'Version' => 'Verzió',
+  'Size in GB' => 'Méret GB-ban',
 );

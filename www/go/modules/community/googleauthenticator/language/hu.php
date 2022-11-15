@@ -16,4 +16,5 @@ return array (
   'When disabling Google autenticator this step will be removed from the login process.' => 'Ha letiltja a Google autenticator ezt a lépést el lesz távolítva a bejelentkezési folyamatot.',
   'Provide your current password to disable Google authenticator.' => 'Adja meg jelenlegi jelszavát letiltani Google Hitelesítő.',
   'Disable Google authenticator' => 'Kikapcsolja a Google Hitelesítő',
+  'Block Group-Office usage until setup is done' => 'Block {product_name} usage until setup is done',
 );
