@@ -30,6 +30,7 @@ namespace GO\Base;
 use GO\Base\Model\Acl;
 use go\core\fs\File;
 use go\core\util\ClassFinder;
+use go\modules\business\license\model\License;
 
 class ModuleCollection extends Model\ModelCollection{
 
@@ -254,8 +255,9 @@ class ModuleCollection extends Model\ModelCollection{
 			if(static::isAllowed($module->name, $module->package) && $module->isAvailable())
 				$modules[] = $module;
 		}
-		
-		\GO::cache()->set($cacheKey, $modules);
+		if(empty(go()->getSettings()->license) || License::isValid()) {
+			\GO::cache()->set($cacheKey, $modules);
+		}
 		
 		return $modules;
 	}
