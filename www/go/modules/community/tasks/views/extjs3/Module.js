@@ -145,6 +145,10 @@ go.Modules.register("community", "tasks", {
 				//replace panel promise
 				alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
 					return go.Db.store("User").single(alert.data.assignedBy).then((assigner) =>{
+						if(!assigner) {
+							assigner = {displayName: t("Unknown")};
+						}
+
 						panelCfg.items = [{html: go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.displayName) }];
 						panelCfg.notificationBody = panelCfg.html;
 						return panelCfg;
