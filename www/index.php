@@ -5,6 +5,8 @@ use go\core\http\Request;
 use go\core\ErrorHandler;
 
 use go\core\http\Response;
+use go\modules\business\license\model\License;
+
 /**
  * Copyright Intermesh
  *
@@ -72,7 +74,14 @@ try {
 
             require('views/Extjs3/externalFooter.php');
             exit();
+        }
 
+        if(!empty(go()->getSettings()->license) && !License::isValid()) {
+	        require('views/Extjs3/externalHeader.php');
+            echo "<h1>Invalid license</h1>";
+            echo "<p>" . License::$validationError. "</p>";
+	        require('views/Extjs3/externalFooter.php');
+            exit();
         }
 
 		//Server manager uses this when directly signing in

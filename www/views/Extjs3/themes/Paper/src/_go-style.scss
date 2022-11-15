@@ -1914,6 +1914,11 @@ table[id^="comments-ext"] b {
 
 	@extend %font-body1;
 
+	* {
+		overflow: visible;
+		box-sizing: content-box;
+	}
+
 	blockquote {
 		display: block;
 		margin: 1em 40px;
