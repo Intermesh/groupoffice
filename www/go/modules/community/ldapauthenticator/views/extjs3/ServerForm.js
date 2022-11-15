@@ -10,8 +10,12 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 
 		this.formPanel.on("beforesubmit", function (form, values) {
 			if (!this.formPanel.getForm().findField('ldapUseAuthentication').getValue()) {
-				values.username = null;
-				values.password = null;
+				values.username = "";
+				values.password = "";
+			}
+
+			if(!this.createEmailCheckbox.getValue()) {
+				values.imapHostname = "";
 			}
 		}, this);
 	},
