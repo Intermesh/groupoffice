@@ -42,6 +42,7 @@
 - Address book: Fixed merge with two contacts in the same address list
 - Tasks: Don't reset project task lists permissions when using this option
 - Email: Fix attaching file to email from existing item
+- Core: profile not saving in users
 
 17-10-2022: 6.6.122
 - Projects2: add approved boolean field to expense budget table

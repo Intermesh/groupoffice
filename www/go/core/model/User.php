@@ -873,13 +873,13 @@ class User extends Entity {
 	 */
 	private function saveContact(): bool
 	{
-		if(!$this->isModified(['displayName', 'email', 'avatarId'])) {
-			return true;
-		}
-
 		$contact = $this->getProfile();
 
 		if(!$contact) {
+			return true;
+		}
+
+		if(!$this->isModified(['displayName', 'email', 'avatarId']) && !$contact->isModified()) {
 			return true;
 		}
 
@@ -1108,6 +1108,10 @@ class User extends Entity {
 	{
 		if(!Module::isInstalled('community', 'addressbook', true)) {
 			return null;
+		}
+
+		if(isset($this->contact)) {
+			return $this->contact;
 		}
 		
 		$this->contact = !$this->isNew() ? Contact::findForUser($this->id) : null;
