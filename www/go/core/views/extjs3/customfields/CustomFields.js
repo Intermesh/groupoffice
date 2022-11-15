@@ -99,6 +99,8 @@
 						return;
 					}
 					var def = type.getFilter(field);
+
+					def.title += " (" + fs.name + ")";
 					if(def) {
 						defs.push(def);
 					}
