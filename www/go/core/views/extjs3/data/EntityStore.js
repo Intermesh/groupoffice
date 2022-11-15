@@ -422,7 +422,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	single: function(id) {
 
 		if(!id) {
-			Promise.resolve(null);
+			return Promise.resolve(null);
 		}
 
 		return this._getSingleFromBrowserStorage(id).then((entity) => {
