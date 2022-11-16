@@ -1,0 +1,467 @@
+//@import "../../../../../../../views/Extjs3/themes/Paper/src/_base.scss";
+@import '../../../../../../../views/goui/goui/style/_util.scss';
+@import '../../../../../../../views/goui/goui/style/_config.scss';
+
+%font-caption {
+	text-transform: uppercase;
+	font-weight: 400;
+	font-size: .8em;
+}
+
+%event {
+	cursor: pointer;
+	word-wrap: break-word;
+	overflow: hidden;
+	box-sizing: border-box;
+	border-radius: $borderRadius;
+	//background-color: $colorPrimary;
+	border-color: currentcolor;
+	border-width: 1px;
+	border-style: solid;
+	border-left: 3px solid;
+
+	background-color: #f7f7f7;
+	padding: dp(4) dp(8);
+	//text-shadow: 0 0 5px rgba(0, 0, 0, 0.38);
+	text-align: left;
+	> em, > span {color: $colorText;}
+	&::first-letter {
+		text-transform: capitalize;
+	}
+	 &:hover {
+			filter: brightness(105%);
+	 }
+	&.new {
+		background-color: white !important;
+		border-width: 1px;
+		border-style: solid;
+	}
+	&.selected {
+		border-color: $colorSelectedRow;
+		background-color: $colorSelectedRow!important;
+		> * {color:white; font-weight: 600;}
+	}
+	&.declined {
+		text-decoration: line-through;
+	}
+
+	&.tentative {
+		opacity: .6;
+	}
+	&.allday {
+		background-color:currentcolor;
+		> em {color:rgba(255,255,255, .86);}
+	}
+
+	i {
+		font-size: inherit !important;
+		color: inherit;
+		min-height: dp(16);
+		height: dp(16);
+		width: dp(16);
+		min-width: dp(16);
+	}
+}
+
+%multiday {
+	&.start {
+		margin-right: 0;
+		overflow: hidden;
+		border-radius: 2px 0px 0px 2px;
+		border-right: none;
+	}
+
+	&.mid {
+		margin-left: -3px;
+		margin-right: -3px;
+		border-radius: 0;
+		text-indent: -9999px;
+		border-width: 1px 0 1px 0;
+	}
+
+	&.end {
+		margin-left: 0;
+		margin-right: 0;
+		border-radius: 0px 2px 2px 0px;
+		text-indent: -9999px;
+		border-left: none;
+	}
+
+	span.event-ghost {
+		background-color: transparent;
+		border-left: 0;
+	}
+}
+
+.yearview {
+	background-color: $colorBackground;
+	min-height: 560px;
+	height: 100%;
+	display:flex;
+	flex-wrap: wrap;
+	justify-items: center;
+	justify-content:space-evenly;
+	align-items: center;
+	> div {
+		min-width: 25%;
+	}
+
+	table {
+		color: $colorTextSecondary;
+		height: 100%;
+		width:100%;
+		margin: 0 auto;
+		max-width: 300px;
+		min-height: 210px;
+		min-width: 224px;
+		caption { // month name
+			cursor: pointer;
+			text-align: center;
+			//font-size: 1.2em;
+			padding-bottom: 0.8em;
+
+			&.current {
+				color: $colorPrimary;
+			}
+		}
+
+		th {
+			@extend %font-caption;
+			height: 20px;
+		}
+
+		td {
+			&.today {
+				font-weight: 500;
+				color: $colorPrimary;
+			}
+
+			&.past {
+				opacity: .7;
+			}
+		}
+
+		td, th {
+			cursor: default;
+			position: relative;
+			text-align: center;
+			vertical-align: top;
+			overflow: hidden;
+
+			> div {
+				position: absolute;
+				top: 15px;
+				width: 100%;
+				height: 6px;
+				line-height: 6px;
+				text-align: center;
+
+				> p {
+					display: inline-block;
+					border-radius: 50%;
+					width: 6px;
+					height: 6px;
+					padding: 0;
+					margin: 0;
+					background-color: $colorPrimary;
+				}
+			}
+		}
+
+		td.weeknb {
+			color: $colorTextSecondary;
+			font-size: .9em;
+		}
+	}
+}
+
+.cal {
+	li {
+		color: $colorText;
+
+		&.today {
+			color: $colorPrimary;
+			font-weight: 600;
+			> em {
+				border-color: $colorPrimary;
+				font-weight: 600;
+				color: $colorPrimary;
+			}
+		}
+
+		&.past, &.other {
+			color: $colorTextSecondary;
+		}
+
+		&.other {
+			background-color: $colorBackgroundDarker;
+		}
+
+		// another month
+	}
+
+	.now { // the nowbar
+		position: absolute;
+		pointer-events: none;
+		left: dp(64);
+		right: 0;
+		z-index: 10;
+
+		> hr {
+			//background-color: $colorPrimary;
+			border-bottom: 1px dashed $colorPrimary;
+			height: 1.5px;
+			margin: 0;
+		}
+
+		> b { // dot
+			width: dp(12);
+			height: dp(12);
+			border-radius: 50%;
+			box-shadow: 0 0 0 2px $colorBackground;
+			left: 14.4%;
+			position: absolute;
+			display: block;
+			transform: translate(-50%, -50%);
+			background-color: $colorPrimary;
+		}
+
+		> span { // time display
+			margin-left: dp(-64);
+			background-color: $colorPrimary;
+			color: white;
+			height: dp(22);
+			line-height: dp(22);
+			font-size: .9em;
+			white-space: nowrap;
+			display: inline-block;
+			text-align: right;
+			padding-right: dp(16);
+			width: dp(64);
+			transform: translateY(-50%);
+			clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%);
+		}
+	}
+}
+
+.cal.month {
+	display: flex;
+	flex-direction: column;
+
+	ul { // header
+		@extend %font-caption;
+		padding-left: dp(24); // for weeknbs
+		display: flex;
+		border-bottom: 1px solid $colorLine;
+		//background-color: color($bg, 'status-bar');
+		height: dp(32);
+
+		> li { //weekdays
+			color: $colorTextSecondary;
+			line-height: dp(32);
+			font-size: .9em;
+			text-align: center;
+			text-transform: uppercase;
+
+			&.current {
+				color: $colorPrimary;
+			}
+		}
+	}
+
+	ol { // week row
+		background-color: $colorBackground;
+		display: flex;
+		flex: 1 0 0;
+		position: relative;
+		align-items: stretch;
+		border-top: 1px solid $colorBorder;
+		user-select:none;
+		> li { // day
+			//&:not(.events):hover {
+			//	background-color: $colorHover;
+			//}
+
+			&.events {
+				position: absolute;
+				margin-left: dp(24); // week numbers
+				margin-top: dp(24); // day numbers
+				width: calc(100% - 18px);
+				overflow: hidden;
+				bottom: 0;
+				top: 0;
+				pointer-events:none;
+
+				> div {
+					@extend %event;
+					@extend %multiday;
+					position: absolute;
+					pointer-events: all;
+					&.continues {
+						border-bottom-left-radius: 0;
+						border-top-left-radius: 0;
+					}
+					> span { //time
+						float: right;
+						font-weight: 100;
+						font-size: .9em;
+					}
+				}
+			}
+
+			&.weeknb {
+				text-align: center;
+				color: $colorTextSecondary;
+				border-right: 1px solid $colorBorder;
+				font-size: .8em;
+				max-width: dp(24);
+				font-weight: 300;
+			}
+		}
+	}
+
+	li {
+		flex: 1 0 0;
+
+		&:focus {
+			outline: none;
+			box-shadow: none;
+		}
+
+		> em { // date number
+			font-style: normal;
+			display: block;
+			text-align: center;
+			border-top: 2px solid transparent;
+			//width: dp(24);
+			height: dp(24);
+			line-height: dp(24);
+		}
+	}
+}
+
+$hourHeight: 7vh;
+$halfHour: 3.5vh;
+
+.cal.week {
+
+	display: flex;
+	flex-direction: column;
+	> ul li:first-child {
+		font-size: .9em;
+		text-align: center;
+		line-height: dp(36);
+		min-height: dp(36);
+	}
+	.all-days { // container
+		position:relative;
+		margin-top:4px;
+	}
+	> ul { //header + all-day
+		display: flex;
+		padding-right: 14px; // for scrollbar
+		max-height: dp(212); // x all-day events fit
+		border-bottom: 2px solid $colorBorder;
+		&:first-child { // header
+			@extend %font-caption;
+			min-height: dp(36);
+			> li {
+				border-right: 1px solid $colorBorder;
+				//padding: dp(4);
+
+				> em { // date number
+					font-style: normal;
+					color: inherit;
+					margin-left: dp(8);
+					padding: dp(4) 0;
+					font-size: 1.2em;
+					//border: 1px solid currentColor;
+				}
+			}
+		}
+		.event {
+			position:absolute;
+		}
+	}
+
+	> dl { // has 7 li's for days
+		background-color: $colorBackground;
+		overflow-y: scroll;
+		position: relative;
+		display: flex;
+		flex-grow: 1000;
+
+		> dd {
+			position: relative;
+			overflow: hidden;
+			height: 24*$hourHeight;
+			background: linear-gradient(180deg, $colorLine 1px, transparent 1px);
+			background-size: 100% $hourHeight;
+			background-repeat: repeat-y;
+			border-right: 1px solid $colorBorder;
+			.event {
+				transition: all .1s ease-out;
+				position: absolute;
+				width: 99.8%;
+			}
+		}
+		> dt { // time display
+			position: initial;
+			background-size: 8px $hourHeight;
+			background-position: top right;
+			border-right: 0;
+
+			> em { //time
+				//&:first-child { height: dp(62);} // move all up 4 dp
+				font-style: normal;
+				display: block;
+				font-size: .8em;
+				height: $hourHeight;
+				color: $colorTextSecondary;
+				text-align: right;
+				padding: 0 dp(15) 0 0;
+				line-height: 0; // move text to top of box
+			}
+		}
+	}
+
+	li, dd, dt { // header / all-day
+		flex: 5 0 0;
+
+		&.weekend {
+			background-color: $colorButton;
+		}
+
+		&:first-child { // weeknr
+			max-width: dp(64);
+		}
+	}
+
+	.event {
+		@extend %event;
+		overflow: visible !important;
+
+		> span { //time
+			display: block;
+			font-weight: 200;
+		}
+
+		// handle bars
+		&:before, &:after {
+			content: '';
+			position: absolute;
+			left: 0;
+			right: 0;
+			height: 4px;
+			cursor: row-resize;
+		}
+
+		&:before {
+			top: -2px;
+		}
+
+		&:after {
+			bottom: -2px;
+		}
+	}
+}
