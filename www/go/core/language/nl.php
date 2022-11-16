@@ -911,12 +911,13 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
     'ZA' => 'Zuid Afrika',
     'ES' => 'Spanje',
     'SE' => 'Zweden',
-    'CH' => 'Zwitzerland',
+    'CH' => 'Zwitserland',
     'TN' => 'Tunisië',
     'TR' => 'Turkije',
     'GB' => 'Groot-Brittannië',
     'US' => 'Verenigde Staten',
     'UM' => 'Verenigde Staten (Minor Outlying Islands)',
+	  'XK' => 'Kosovo'
   ),
   'filetypes' => 
   array (

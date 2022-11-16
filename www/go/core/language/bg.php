@@ -964,6 +964,7 @@ If you did not request a new password please delete this mail.' => '%s,
     'RS' => 'Сърбия',
     'ME' => 'Черна Гора',
     'IC' => 'Канарски острови',
+	  'XK' => 'Kosovo'
   ),
   'filetypes' => 
   array (

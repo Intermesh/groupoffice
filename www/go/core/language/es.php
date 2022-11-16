@@ -948,6 +948,7 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
     'RS' => 'República de Serbia',
     'ME' => 'República de Montenegro',
     'IC' => 'Islas Canarias',
+	  'XK' => 'Kosovo',
   ),
   'filetypes' => 
   array (

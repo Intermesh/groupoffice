@@ -744,6 +744,7 @@ Si no heu sol·licitat una nova contrasenya, si us plau esborreu aquest e-mail.'
     'CD' => 'The Democratic Republic of the Congo',
     'KP' => 'Korea, Democratic people\'s republic of',
     'KR' => 'Korea, Republic of',
+	  'XK' => 'Kosovo'
   ),
   'filetypes' => 
   array (

@@ -968,6 +968,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
     'RS' => 'Serbien',
     'ME' => 'Montenegro',
     'IC' => 'Kanarische Inseln',
+	  'XK' => 'Kosovo',
   ),
   'filetypes' => 
   array (

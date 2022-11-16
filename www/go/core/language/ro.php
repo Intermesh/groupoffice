@@ -481,6 +481,7 @@ Password: %s',
     'VI' => 'Insulele Vergini (US)',
     'WF' => 'Insulele Wallis e Futuna',
     'EH' => 'Sahara Occidentale',
+	  'XK' => 'Kosovo'
   ),
   'filetypes' => 
   array (

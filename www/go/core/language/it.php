@@ -708,6 +708,7 @@ Se non hai richiesto una nuova password ti preghiamo di eliminare questo messagg
     'JP' => 'Giappone',
     'JO' => 'Giordania',
     'KZ' => 'Kazakistan',
+	'XK' => 'Kosovo',
     'KG' => 'Kyrghizistan',
     'LA' => 'Repubblica Popolare Democratica del Laos',
     'LV' => 'Lettonia',
