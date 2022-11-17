@@ -548,8 +548,8 @@ class Message extends \Swift_Message{
 		
 		if(isset($params['in_reply_to'])){
 			$headers = $this->getHeaders();
-			$headers->addTextHeader('In-Reply-To', $params['in_reply_to']);
-			$headers->addTextHeader('References', $params['in_reply_to']);
+			$headers->addTextHeader('In-Reply-To', "<" . $params['in_reply_to'] . ">");
+			$headers->addTextHeader('References', "<" .$params['in_reply_to'] . ">");
 		}	
 
 		if($params['content_type']=='html'){
