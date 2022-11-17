@@ -27,7 +27,7 @@ GO.zpushadmin.DevicesGrid = Ext.extend(GO.grid.GridPanel,{
 			paging:true,
 			view:new Ext.grid.GridView({
 				emptyText: t("No items to display"),
-				getRowClass: this.rowRenderer
+				getRowClass: this.getRowClass
 			}),
 			cm:new Ext.grid.ColumnModel({
 				defaults:{
@@ -152,7 +152,7 @@ GO.zpushadmin.DevicesGrid = Ext.extend(GO.grid.GridPanel,{
 		else
 			return t("Disabled", "zpushadmin");		
 	},
-	rowRenderer : function(record, index){
+	getRowClass : function(record, index){
 		if(record.data['new']==true)
 			return 'zpushadmin-new-device';
 		else if(record.data['can_connect']==true)
