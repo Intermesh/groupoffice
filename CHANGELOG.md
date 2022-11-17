@@ -1,5 +1,6 @@
 - Carddav/ caldav: Log exceptions in carddav and caldav
 - Caldav: Fixed Apple caldav sync
+- Calendar: fixed accept invitation on MySQL 5.7 servers.
 
 17-11-2022 6.6.129
 - Email: Set large minWidth so messages grid can't be removed.
