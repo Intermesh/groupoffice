@@ -650,6 +650,7 @@ All rights reserved.<br />
     'ZR' => 'Ζαΐρ',
     'ZM' => 'Ζάμπια',
     'ZW' => 'Ζιμπάμπουε',
+	  'XK'=> 'Kosovo',
   ),
   'filetypes' => 
   array (

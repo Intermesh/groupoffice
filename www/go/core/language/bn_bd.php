@@ -1046,6 +1046,7 @@ If you did not request a new password please delete this mail.' => '%s,
     'RS' => 'সার্বিয়া প্রজাতন্ত্র',
     'ME' => 'মন্টিনিগ্রো প্রজাতন্ত্র',
     'IC' => 'ক্যানারি দ্বীপপুঞ্জ',
+	  'XK' => 'Kosovo'
   ),
   'filetypes' => 
   array (

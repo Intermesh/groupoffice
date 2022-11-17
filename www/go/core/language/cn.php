@@ -580,6 +580,7 @@ return array (
     'ZR' => 'Zaire',
     'ZM' => 'Zambia',
     'ZW' => 'Zimbabwe',
+	  'XK' => 'Kosovo'
   ),
   'filetypes' => 
   array (

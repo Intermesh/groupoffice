@@ -344,6 +344,7 @@ If you did not request a new password please delete this mail.',
     'RS' => 'Republic of Serbia',
     'ME' => 'Republic of Montenegro',
     'IC' => 'Canary Islands',
+	  'XK' => 'Kosovo'
   ),
   'filetypes' => 
   array (
