@@ -7,6 +7,7 @@
 - LDAP: Disable creation of IMAP accounts didn't work
 - Newsletter: Bug when an image was both attached as attachment and inline.
 - ActiveSync: duplicate Reference and in-reply-to header
+- Email: unreadable text in background. White font on white background.
 
 09-11-2022 6.6.128
 - Core: rollback of fix for autocomplete. Probably fixed by always creating an address book entry
