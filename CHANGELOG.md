@@ -1,4 +1,5 @@
 - Carddav/ caldav: Log exceptions in carddav and caldav
+- Caldav: Fixed Apple caldav sync
 
 17-11-2022 6.6.129
 - Email: Set large minWidth so messages grid can't be removed.
