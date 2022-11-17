@@ -429,9 +429,10 @@ class File extends FileSystemObject {
 				// (?) Shoud this be issued here, or should the first
 				// range be used? Or should the header be ignored and
 				// we output the whole content?
-				header('HTTP/1.1 416 Requested Range Not Satisfiable');
+				Response::get()->setStatus(416);
 				Response::get()->setHeader("Content-Range", "bytes $start-$end/$size");
 				// (?) Echo some info to the client?
+				Response::get()->sendHeaders();
 				exit;
 			}
 			// If the range starts with an '-' we start from the beginning
@@ -456,20 +457,23 @@ class File extends FileSystemObject {
 			// Validate the requested range and return an error if it's not correct.
 			if ($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
 
-				header('HTTP/1.1 416 Requested Range Not Satisfiable');
+				Response::get()->setStatus(416);
 				Response::get()->setHeader("Content-Range,", "bytes $start-$end/$size");
-				// (?) Echo some info to the client?
+				Response::get()->sendHeaders();
 				exit;
 			}
 			$start  = $c_start;
 			$end    = $c_end;
 			$length = $end - $start + 1; // Calculate new content length
 			fseek($fp, $start);
-			header('HTTP/1.1 206 Partial Content');
+			Response::get()->setStatus(206);
+			Response::get()->sendHeaders();
 		}
 		// Notify the client the byte range we'll be outputting
 		Response::get()->setHeader("Content-Range", "bytes $start-$end/$size");
 		Response::get()->setHeader("Content-Length", "$length");
+
+		Response::get()->sendHeaders();
 
 		// Start buffered download
 		$buffer = 1024 * 8;

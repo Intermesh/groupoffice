@@ -477,7 +477,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 				$inline = false;
 			}
 
-			\GO\Base\Util\Http::outputDownloadHeaders($file->fsFile, $inline, !empty($params['cache']));
+//			\GO\Base\Util\Http::outputDownloadHeaders($file->fsFile, $inline, !empty($params['cache']));
 			$file->open();
 
 			$this->fireEvent('beforedownload', array(
@@ -490,7 +490,9 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 				Module::logActiveRecord($file, 'download');
 			}
 
-			$file->fsFile->output();
+			//Supports range download
+			$coreFsFile = new \go\core\fs\File($file->fsFile->path());
+			$coreFsFile->output(true, !empty($params['cache']), [], $inline);
 
 		}catch(NotFound $e) {
 			Response::get()->setStatus(404);
