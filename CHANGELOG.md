@@ -1,3 +1,5 @@
+- Carddav/ caldav: Log exceptions in carddav and caldav
+
 17-11-2022 6.6.129
 - Email: Set large minWidth so messages grid can't be removed.
 - Calendar: SQLSTATE[HY000]: General error: 1093 Table 'p1' is specified twice, both as a target for 'UPDATE' and as a separate source for data
