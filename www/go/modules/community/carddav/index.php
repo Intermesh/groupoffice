@@ -21,6 +21,7 @@ use Sabre\CardDAV\AddressBookRoot;
 use Sabre\CardDAV\Plugin as CardDAVPlugin;
 use Sabre\DAV\Auth\Plugin as AuthPlugin;
 use Sabre\DAV\Browser\Plugin;
+use Sabre\DAV\Exception\NotAuthenticated;
 use Sabre\DAV\Server;
 use Sabre\DAVACL\Plugin as AclPlugin;
 use Sabre\DAVACL\PrincipalCollection;
@@ -52,7 +53,9 @@ go()->getDebugger()->setRequestId("CardDAV " . ($_SERVER['REQUEST_METHOD'] ?? ""
 $server = new Server($nodes);
 $server->debugExceptions = go()->getDebugger()->enabled;
 $server->on('exception', function($e){
-	ErrorHandler::logException($e);
+	if(!($e instanceof NotAuthenticated)) {
+		ErrorHandler::logException($e);
+	}
 });
 
 

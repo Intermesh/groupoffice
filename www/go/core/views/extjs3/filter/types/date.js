@@ -47,7 +47,6 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 								this.valueField.setVisible(true);
 								this.periodCombo.setVisible(true);
 								this.dateField.setVisible(false);
-								this.doLayout();
 								break;
 
 							case 'beforedate':
@@ -56,13 +55,15 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 								this.valueField.setVisible(false);
 								this.periodCombo.setVisible(false);
 								this.dateField.setVisible(true);
-								this.doLayout();
+								break;
 							case 'empty':
+							default:
 								this.valueField.setVisible(false);
 								this.periodCombo.setVisible(false);
 								this.dateField.setVisible(false);
-								this.doLayout();
+								break;
 						}
+						this.doLayout();
 					}
 				}
 			});
@@ -126,7 +127,7 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 	},
 	
 	setValue: function (v) {
-
+debugger;
 		v = v + "";
 
 		var regex = /([>< ]+)?([0-9]{4}-[0-9]{2}-[0-9]{2})/;

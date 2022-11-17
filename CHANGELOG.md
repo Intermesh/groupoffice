@@ -1,3 +1,10 @@
+17-11-2022 6.6.130
+- Carddav/ caldav: Log exceptions in carddav and caldav
+- Caldav: Fixed Apple caldav sync
+- Calendar: fixed accept invitation on MySQL 5.7 servers.
+- ActiveSync management: didn't load in some cases
+
+17-11-2022 6.6.129
 - Email: Set large minWidth so messages grid can't be removed.
 - Calendar: SQLSTATE[HY000]: General error: 1093 Table 'p1' is specified twice, both as a target for 'UPDATE' and as a separate source for data
 - Billing: fixed display of lists in the frontpage
@@ -7,6 +14,8 @@
 - LDAP: Disable creation of IMAP accounts didn't work
 - Newsletter: Bug when an image was both attached as attachment and inline.
 - ActiveSync: duplicate Reference and in-reply-to header
+- Core: Added Kosovo to the countries list
+- Core: fix date custom filter to display date on before/after value
 - Email: unreadable text in background. White font on white background.
 
 09-11-2022 6.6.128

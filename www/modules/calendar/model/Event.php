@@ -125,7 +125,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function getETag() {
-		return '"' . date('Ymd H:i:s', $this->mtime). '-'.$this->id.'"';
+		return '"' . date('Ymd-H:i:s', $this->mtime). '-'.$this->id.'"';
 	}
 	
 	protected function init() {

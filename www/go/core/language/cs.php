@@ -1064,6 +1064,7 @@ Pokud jste nežádal o nové heslo, prosím smažte tento mail.',
     'RS' => 'Srbsko',
     'ME' => 'Černá Hora',
     'IC' => 'Kanárské ostrovy',
+	  'XK' => 'Kosovo',
   ),
   'filetypes' => 
   array (

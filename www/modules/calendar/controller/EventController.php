@@ -32,6 +32,7 @@ use GO\Base\Fs\File;
 use GO\Calendar\Exception\AskPermission;
 use GO\Calendar\Model\Event;
 use go\core\db\Criteria;
+use go\core\db\Query;
 use go\core\model\Module;
 use go\core\orm\EntityType;
 use GO\Email\Model\Account;
@@ -1750,9 +1751,28 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$organizerEvent = $event->getOrganizerEvent();
 		if($organizerEvent) {
 			//pass new status to organizer event
-			\GO::getDbConnection()->query("UPDATE cal_participants p1 SET p1.status= (select status from cal_participants p2 ".
-				"where p2.event_id= ".$event->id." AND p2.user_id =".\go()->getUserId() .") ".
-				"where p1.event_id = ".$organizerEvent->id." AND p1.user_id =".\go()->getUserId());			// update participant's version
+
+			$records = go()->getDbConnection()
+				->select("status,user_id")
+				->from("cal_participants")
+				->where('event_id', '=', $event->id)
+				->andWhere('user_id', '=', go()->getUserId())
+				->all();
+
+			foreach($records as $record) {
+				go()->getDbConnection()->update(
+					"cal_participants",
+					['status' => $record['status']],
+						(new Query())
+						->where('event_id', '=', $organizerEvent->id)
+						->andWhere('user_id', '=', go()->getUserId())
+				)->execute();
+			}
+
+			// this didn't work in older mysql / mariadb versions:
+//			\GO::getDbConnection()->query("UPDATE cal_participants p1 SET p1.status = (select p2.status from cal_participants p2 ".
+//				"where p2.event_id= ".$event->id." AND p2.user_id =".\go()->getUserId() .") ".
+//				"where p1.event_id = ".$organizerEvent->id." AND p1.user_id =".\go()->getUserId());			// update participant's version
 
 			\GO::getDbConnection()->query("DELETE FROM cal_participants WHERE event_id = ".$event->id." AND user_id !=".\go()->getUserId());
 			\GO::getDbConnection()->query("INSERT INTO cal_participants (event_id, name, email, user_id, contact_id, status, last_modified, is_organizer, role) SELECT '".$event->id."', name, email, user_id, contact_id, status, last_modified, is_organizer, role FROM cal_participants p2 WHERE p2.event_id = ".$organizerEvent->id." AND user_id !=".\go()->getUserId());

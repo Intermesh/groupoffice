@@ -16,6 +16,7 @@
 
 //session writing doesn't make any sense because
 use go\core\ErrorHandler;
+use Sabre\DAV\Exception\NotAuthenticated;
 
 define("GO_NO_SESSION", true);
 
@@ -69,7 +70,11 @@ $server = new Sabre\DAV\Server($tree);
 $server->debugExceptions = go()->getDebugger()->enabled;
 
 $server->on('exception', function($e){
-	ErrorHandler::logException($e);
+
+	if(!($e instanceof NotAuthenticated)) {
+		ErrorHandler::logException($e);
+	}
+
 });
 
 //baseUri can also be /caldav/ with:

@@ -37,13 +37,6 @@ class JsonResponse implements \ArrayAccess {
 	public function __toString() {
 		
 		$this->setHeaders();
-		
-		// make values that start with startjs: functions
-//		$this->_data = array_walk_recursive($this->_data, function($item, $key) {
-//			if(strpos($item,'startjs:')!==false)
-//				$item = stripslashes(str_replace(array('\t','\n', 'startjs:', ':endjs'),'',$item));
-//		});
-		
 		$string = JSON::encode($this->data);
 		
 		if(strpos($string,'startjs:')!==false){
