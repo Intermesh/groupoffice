@@ -380,7 +380,7 @@ class File extends FileSystemObject {
 		}
 
 		if (isset($_SERVER['HTTP_RANGE'])){
-			$this->rangeDownload($this->getPath());
+			$this->rangeDownload();
 			return;
 		}
 		
@@ -405,16 +405,17 @@ class File extends FileSystemObject {
 		}
 	}
 
-	private function rangeDownload($file) {
+	private function rangeDownload() {
 
-		$fp = fopen($file, 'rb');
+		$fp = $this->open('rb');
 
-		$size   = filesize($file); // File size
+		$size   = $this->getSize();
 		$length = $size;           // Content length
 		$start  = 0;               // Start byte
 		$end    = $size - 1;       // End byte
-		Response::get()->setHeader("Accept-Ranges", "0-$length");
-		// header('Accept-Ranges: bytes');
+//		Response::get()->setHeader("Accept-Ranges", "0-$length");
+		Response::get()->setHeader("Accept-Ranges", "bytes");
+
 		// multipart/byteranges
 		// http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
 		if (isset($_SERVER['HTTP_RANGE'])) {
@@ -426,7 +427,7 @@ class File extends FileSystemObject {
 			// Make sure the client hasn't sent us a multibyte range
 			if (strpos($range, ',') !== false) {
 
-				// (?) Shoud this be issued here, or should the first
+				// (?) Should this be issued here, or should the first
 				// range be used? Or should the header be ignored and
 				// we output the whole content?
 				Response::get()->setStatus(416);
@@ -437,7 +438,7 @@ class File extends FileSystemObject {
 			}
 			// If the range starts with an '-' we start from the beginning
 			// If not, we forward the file pointer
-			// And make sure to get the end byte if spesified
+			// And make sure to get the end byte if specified
 			if ($range[0] == '-') {
 
 				// The n-number of the last bytes is requested
