@@ -1,3 +1,6 @@
+17-11-2022 6.6.131
+- Wrong build
+
 17-11-2022 6.6.130
 - Carddav/ caldav: Log exceptions in carddav and caldav
 - Caldav: Fixed Apple caldav sync
