@@ -2284,7 +2284,7 @@ table[id^="comments-ext"] b {
 .go-button {
 	display: inline-block;
 	@extend .x-btn;
-	min-height: dp(32);
+	//min-height: dp(32);
 	line-height: dp(24);
 	height: auto;
 	padding: dp(8) dp(16);
