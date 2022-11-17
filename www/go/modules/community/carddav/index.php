@@ -14,6 +14,7 @@
 use go\core\App;
 use go\core\dav\auth\BasicBackend;
 use go\core\dav\davacl\PrincipalBackend;
+use go\core\ErrorHandler;
 use go\core\http\Request;
 use go\modules\community\carddav\Backend;
 use Sabre\CardDAV\AddressBookRoot;
@@ -51,7 +52,7 @@ go()->getDebugger()->setRequestId("CardDAV " . ($_SERVER['REQUEST_METHOD'] ?? ""
 $server = new Server($nodes);
 $server->debugExceptions = go()->getDebugger()->enabled;
 $server->on('exception', function($e){
-	go()->warn($e);
+	ErrorHandler::logException($e);
 });
 
 
