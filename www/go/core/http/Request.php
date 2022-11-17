@@ -83,6 +83,15 @@ class Request extends Singleton{
 		$accept = explode(',', strtolower($_SERVER['HTTP_ACCEPT']));		
 		return array_map('trim', $accept);				
 	}
+
+	/**
+	 * Get the path part
+	 *
+	 * @return string
+	 */
+	public function getPath() : string {
+		return isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : "";
+	}
 	
 	/**
 	 * Get the accepted languages sent by the request in lower case

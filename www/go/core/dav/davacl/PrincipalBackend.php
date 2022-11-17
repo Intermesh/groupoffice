@@ -193,33 +193,4 @@ class PrincipalBackend extends AbstractBackend {
 		return $principals;
 	}
 
-	public function findByUri($uri, $principalPrefix) {
-//		$value = null;
-//        $scheme = null;
-//        list($scheme, $value) = explode(":", $uri, 2);
-//        if (empty($value)) return null;
-//
-//        $uri = null;
-//        switch ($scheme){
-//            case "mailto":
-//                $query = 'SELECT uri FROM ' . $this->tableName . ' WHERE lower(email)=lower(?)';
-//                $stmt = $this->pdo->prepare($query);
-//                $stmt->execute([ $value ]);
-//            
-//                while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-//                    // Checking if the principal is in the prefix
-//                    list($rowPrefix) = URLUtil::splitPath($row['uri']);
-//                    if ($rowPrefix !== $principalPrefix) continue;
-//                    
-//                    $uri = $row['uri'];
-//                    break; //Stop on first match
-//                }
-//                break;
-//            default:
-//                //unsupported uri scheme
-//                return null;
-//        }
-//        return $uri;
-	}
-
 }

@@ -154,7 +154,7 @@ class Router {
 
   private function findRoute()
   {
-    $path = isset($_SERVER['PATH_INFO']) ? ltrim($_SERVER['PATH_INFO'], '/') : "";
+    $path = ltrim(Request::get()->getPath(), '/');
     
     $method = Request::get()->getHeader('X-WOPI-Override');
     if(!$method) {

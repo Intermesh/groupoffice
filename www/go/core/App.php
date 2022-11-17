@@ -721,23 +721,23 @@ namespace go\core {
 		 * @param string|callable|array|object $msg
 		 */
 		public function debug($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->log($msg, $traceBackSteps);
+			$this->getDebugger()->log($msg, $traceBackSteps + 1);
 		}
 		
 		public function log($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->log($msg, $traceBackSteps);
+			$this->getDebugger()->log($msg, $traceBackSteps + 1);
 		}
 		
 		public function warn($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->warn($msg, $traceBackSteps);
+			$this->getDebugger()->warn($msg, $traceBackSteps + 1);
 		}
 		
 		public function error($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->error($msg, $traceBackSteps);
+			$this->getDebugger()->error($msg, $traceBackSteps + 1);
 		}
 		
 		public function info($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->info($msg, $traceBackSteps);
+			$this->getDebugger()->info($msg, $traceBackSteps + 1);
 		}
 
 		private $authState;
