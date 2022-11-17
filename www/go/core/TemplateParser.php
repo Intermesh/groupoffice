@@ -827,7 +827,7 @@ class TemplateParser {
 		if($this->encloseVars) {		
 			$value = is_scalar($value) || 
 				!isset($value) || 
-				(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
+				(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', (string) $value) . '"' : !empty($value);
 		}
 
 		return $value;
