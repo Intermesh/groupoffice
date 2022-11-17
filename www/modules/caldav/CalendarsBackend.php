@@ -389,7 +389,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		}
 
 
-		if (false && $calendar->tasklist_id > 0) {
+		if ($calendar->tasklist_id > 0) {
 			$tasklist = Tasklist::findById($calendar->tasklist_id); // ignore acl?
 
 			if($tasklist) {
