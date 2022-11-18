@@ -48,7 +48,7 @@ class Builder
 
 	private $majorVersion = "6.7";
 
-	private $gitBranch = 'master';
+	private $gitBranch = 'finance';
 
 	/**
 	 *
@@ -124,12 +124,12 @@ class Builder
         $this->packageName = "groupoffice-" . $this->majorVersion . "." . $this->minorVersion ;
 
 
-        $this->buildDir = __DIR__ . "/deploy/build/" . $this->majorVersion . "/" . $options['name'];
+        $this->buildDir = __DIR__ . "/deploy/build/" . $this->majorVersion . "/" . $this->distro;
 
         run("rm -rf " . $this->buildDir);
         run("mkdir -p " . $this->buildDir);
 
-        $this->encodedDir = __DIR__ . "/deploy/encoded/" . $this->majorVersion . "/" . $options['name'];
+        $this->encodedDir = __DIR__ . "/deploy/encoded/" . $this->majorVersion . "/" . $this->distro;
 
         run("rm -rf " . $this->encodedDir);
         run("mkdir -p " . $this->encodedDir);
