@@ -55,7 +55,7 @@ class Builder
 
 	/**
 	 *
-	 * @var string 63-php-70
+	 * @var string sixsix, sixseven etc or unstable
 	 */
 	public $distro = "unstable";
 
@@ -120,7 +120,7 @@ class Builder
 		$this->minorVersion = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
 
 
-        $this->packageName = "groupoffice-" . $this->distro . "-" . $this->majorVersion . "." . $this->minorVersion;
+        $this->packageName = "groupoffice-" . $this->majorVersion . "." . $this->minorVersion;
 
 
         $this->buildDir = __DIR__ . "/deploy/build/" . $this->majorVersion . "/" . $this->distro;
@@ -317,7 +317,17 @@ class Builder
 		$r = $client->api('repo')->releases();
 
 		if (!isset($this->githubRelease)) {
-			$this->githubRelease = $r->create($this->github['USERNAME'], $this->github['REPOSITORY'], array('tag_name' => $tagName, 'name'=> $tagName, 'target_commitish' => $this->gitBranch, 'body' => 'Use the ' . $this->packageName . '.tar.gz file for installations. It contains all the code, libraries and compiled code. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'));
+			$this->githubRelease = $r->create(
+                    $this->github['USERNAME'],
+                    $this->github['REPOSITORY'],
+                    array(
+                      'tag_name' => $tagName,
+                      'name'=> $tagName,
+                      'prerelease' => $this->distro == "unstable",
+                      'target_commitish' => $this->gitBranch,
+                      'body' => 'Use the ' . $this->packageName . '.tar.gz file for installations. It contains all the code, libraries and compiled code. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'
+                    )
+            );
 		}
 
 		$asset = $r->assets()->create(
