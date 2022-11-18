@@ -170,7 +170,8 @@ class MultiSelectGrid {
 		if($selectedCount){			
 			if($selectedCount>1){				
 				$tableName = "ms_".$this->_requestParamName;
-				$findParams->getCriteria()->addInTemporaryTableCondition($tableName,$columnName, $this->selectedIds, $tableAlias, $useAnd, $useNot);
+//				$findParams->getCriteria()->addInTemporaryTableCondition($tableName,$columnName, $this->selectedIds, $tableAlias, $useAnd, $useNot);
+				$findParams->getCriteria()->addInCondition($columnName, $this->selectedIds, $tableAlias, $useAnd, $useNot);
 			}else
 			{
 //				$findParams->getCriteria()->addInCondition($columnName, $this->selectedIds, $tableAlias, $useAnd, $useNot);
