@@ -1520,6 +1520,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 					$i++;
 				}
+
+				if(empty($params['group'])) {
+					$params['group'] = [];
+				}
+
+				if(!in_array('id', $params['group']) && !in_array('t.id', $params['group'])) {
+					$params['group'][] = 't.id';
+				}
 			}
 		}
 
