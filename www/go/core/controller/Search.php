@@ -85,7 +85,7 @@ class Search extends EntityController {
 				);
 			}
 
-			self::fireEvent(self::EVENT_SEARCH_EMAIL_CONTACTS, $contactsQuery, $query);
+			self::fireEvent(self::EVENT_SEARCH_EMAIL_CONTACTS, $contactsQuery, $query, $q);
 
 			$query->union($contactsQuery);
 		}
@@ -97,8 +97,8 @@ class Search extends EntityController {
 			$query->orderBy(["priority" => "DESC", "name" => "ASC"]);
 		}
 
-		self::fireEvent(self::EVENT_SEARCH_EMAIL, $query);
-		
+		self::fireEvent(self::EVENT_SEARCH_EMAIL, $query, $q);
+
 		\go\core\jmap\Response::get()->addResponse([
 				'list' => $query->toArray()
 				]);
