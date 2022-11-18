@@ -56,11 +56,7 @@ class Builder
 	 */
 	public $distro = "sixseven";
 
-	/**
-	 *
-	 * @var string php-70
-	 */
-	public $variant;
+
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
 	/**
 	 *
@@ -121,7 +117,7 @@ class Builder
 		$this->minorVersion = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
 
 
-        $this->packageName = "groupoffice-" . $this->majorVersion . "." . $this->minorVersion ;
+        $this->packageName = "groupoffice-" . $this->majorVersion . "." . $this->minorVersion;
 
 
         $this->buildDir = __DIR__ . "/deploy/build/" . $this->majorVersion . "/" . $this->distro;
