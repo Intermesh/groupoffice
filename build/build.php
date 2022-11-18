@@ -212,7 +212,7 @@ class Builder
 
 	    cd($this->buildDir . "/" . $this->packageName);
 
-	    $packageFiles = run("find views -name package.json -not -path '*/node_modules/*'");
+	    $packageFiles = array_reverse(run("find views -name package.json -not -path '*/node_modules/*'"));
 
 	    $packageFiles = array_merge($packageFiles, run("find go/modules -name package.json -not -path '*/node_modules/*'"));
 
