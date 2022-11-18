@@ -242,6 +242,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				text: this.addButtonText || this.btnCfg.text || t("Add"),
 				handler: function() {
 					this.addRow();
+					this.fireEvent("change", this, this.getValue());
 				
 				},
 				scope: this
@@ -330,6 +331,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				}
 				this.ownerCt.ownerCt.destroy();
 				me.dirty = true;
+
+				this.fireEvent("change", me, me.getValue());
 			}
 		}),
 			rowId  = Ext.id();
@@ -381,6 +384,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		} else
 		{
 			this.insert(index, wrap);
+		}
+
+		if(formField.isFormField) {
+			formField.on('change', () => {
+				this.fireEvent('change', this, this.getValue());
+			})
 		}
 
 		return wrap;
@@ -481,6 +490,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		// if(this.startWithItem) {
 		// 	this.addPanel(true);
 		// }
+
+		this.fireEvent("setvalue", this, records);
 
 		this.doLayout();
 	},
