@@ -138,7 +138,11 @@ Ext.override(Ext.form.TextArea,{
 
 		if (this.grow) {
 			// debugger;
-				this.autoSize();
+			setTimeout(() => {
+				if(!this.isDestroyed) {
+					this.autoSize();
+				}
+			})
 		}
 	},
 
