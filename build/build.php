@@ -222,7 +222,7 @@ class Builder
     }
 
     private function runEncoder($sourcePath, $targetPath) {
-	    run($this->encoder . ' -72 --allow-reflection-all -B --replace-target --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
+	    run($this->encoder . ' -73 --allow-reflection-all -B --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
 		    '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
 
 	    run($this->encoder . ' -81 --add-to-bundle --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
