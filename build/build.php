@@ -185,6 +185,9 @@ class Builder
 
 		cd($this->buildDir . "/" . $this->packageName);
 
+
+        $this->buildNodeModules();
+
         $this->encode();
 
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
@@ -195,7 +198,6 @@ class Builder
 			run("sass --no-source-map $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
 		}
 
-        $this->buildNodeModules();
 
 		cd($this->buildDir);
 		run("tar czf " . $this->packageName . ".tar.gz " . $this->packageName);
