@@ -686,11 +686,11 @@ function ioncube_version_tester() :array
 		
 		$ioncube_loader_version = ioncube_loader_version_array();
 
-	  if ($ioncube_loader_version['major'] < 5 ) {// || ($ioncube_loader_version['major'] == 4 && $ioncube_loader_version['minor'] < 6) ) {
+	  if ($ioncube_loader_version['major'] < 10  || ($ioncube_loader_version['major'] == 10 && $ioncube_loader_version['minor'] < 2) ) {
 			$test = array(
 				'status'	=>'ERROR',
 				'problem'	=>'Installed: version '. $ioncube_loader_version['version'],
-				'solution'=>'Ioncube loader is installed but needs to be updated. Group-Office will only work reliably with ioncube loader version 5.0 or later. The most recent version of the loader can be found <a href="http://www.ioncube.com/loaders.php" target="_blank">here</a>.'
+				'solution'=>'Ioncube loader is installed but needs to be updated. Group-Office will only work reliably with ioncube loader version 10.2 or later. The most recent version of the loader can be found <a href="http://www.ioncube.com/loaders.php" target="_blank">here</a>.'
 			);
 	  } else {
 			$test = array(
