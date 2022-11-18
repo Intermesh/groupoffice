@@ -96,7 +96,10 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 		}
 	},
 	
-	getValue : function() {		
+	getValue : function() {
+		if(!this.rendered) {
+			return this.value;
+		}
 		var v = GO.form.NumberField.superclass.getValue.call(this);
 		if(this.serverFormats) {
 			return v;
