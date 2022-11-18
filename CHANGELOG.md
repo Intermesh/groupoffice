@@ -1,3 +1,6 @@
+- Caldav: set caldav tasklist automatically for new users
+- Core: background color when button is focussed
+
 17-11-2022 6.6.131
 - Wrong build
 

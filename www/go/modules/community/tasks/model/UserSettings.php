@@ -2,6 +2,7 @@
 
 namespace go\modules\community\tasks\model;
 
+use GO\Calendar\Model\Calendar;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
@@ -72,6 +73,15 @@ class UserSettings extends Property {
 		if($tasklist) {
 			$this->defaultTasklistId = $tasklist->id;
 			go()->getDbConnection()->update("tasks_user_settings", ['defaultTasklistId' => $this->defaultTasklistId], ['userId' => $this->userId])->execute();
+//
+//			//connect this tasklist to the default calendar for caldav sync.
+//			if(isset($this->owner->calendarSettings) && $this->owner->calendarSettings->calendar_id) {
+//				$calendar = Calendar::model()->findByPk($this->owner->calendarSettings->calendar_id);
+//				if($calendar) {
+//					$calendar->tasklist_id = $tasklist->id;
+//					$calendar->save();
+//				}
+//			}
 		}
 
 		return $this->defaultTasklistId;
