@@ -215,6 +215,7 @@ class Builder
         foreach($packageFiles as $packageFile)  {
             $nodeDir = dirname($packageFile);
             cd($nodeDir);
+	        run("npm install");
             run("npm run build");
 	        cd($this->buildDir . "/" . $this->packageName);
         }
