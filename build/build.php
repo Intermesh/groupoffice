@@ -37,8 +37,10 @@ function run($cmd)
 
 function cd($dir)
 {
+    $dir = realpath($dir);
+
     echo "\ncd $dir\n\n";
-	if (!chdir(realpath($dir))) {
+	if (!chdir($dir)) {
 		throw new Exception("Could not change dir to '" . $dir . "'");
 	}
 }
