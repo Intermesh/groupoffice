@@ -15,6 +15,7 @@ use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\ArrayObject;
 use go\core\util\DateTime;
+use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\modules\community\addressbook\convert\Spreadsheet;
 use go\modules\community\addressbook\convert\VCard;
@@ -1035,7 +1036,7 @@ class Contact extends AclItemEntity {
 		}
 		foreach($this->phoneNumbers as $e) {
 			$santiziedNumber = preg_replace("/[^0-9+]/", "", $e->number);
-			$keywords = array_merge($keywords, SearchableTrait::numberToKeywords($santiziedNumber));
+			$keywords = array_merge($keywords, StringUtil::numberToKeywords($santiziedNumber));
 		}
 		if(!$this->isOrganization) {
 			$keywords = array_merge($keywords, $this->findOrganizations()->selectSingleValue('name')->all());

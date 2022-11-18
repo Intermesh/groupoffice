@@ -49,49 +49,6 @@ trait SearchableTrait {
 	}
 
 
-
-	/**
-	 * Split numbers into multipe partials so we can match them using an index
-	 * eg.
-	 *
-	 * ticket no
-	 *
-	 * 2002-12341234
-	 *
-	 * Will be found on:
-	 *
-	 * 002-12341234
-	 * 02-12341234
-	 * 2-12341234
-	 * -12341234
-	 * 12341234
-	 * 2341234
-	 * 341234
-	 * 41234
-	 * 1234
-	 * 234
-	 *
-	 * this is faster then searchgin for
-	 *
-	 * %234 because it can't use an index
-	 *
-	 * @param string|int $number
-	 * @param int $minSearchLength
-	 * @return array
-	 */
-	public static function numberToKeywords($number, int $minSearchLength = 3): array
-	{
-		$keywords = [$number];
-
-		while(strlen($number) > $minSearchLength) {
-			$number = substr($number, 1);
-			$keywords[] = $number;
-		}
-
-		return $keywords;
-
-	}
-
 	/**
 	 * Prepares the query for a search
 	 *
