@@ -185,10 +185,12 @@ class Builder
 
 	private function buildFromSource()
 	{
-
 		run("cp -r " . dirname(__DIR__) . "/www/ " . $this->buildDir . "/" . $this->packageName);
 
 		cd($this->buildDir . "/" . $this->packageName);
+
+        $this->encode();
+
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
 
 		$sassFiles = run("find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*'");
@@ -196,8 +198,6 @@ class Builder
 		foreach ($sassFiles as $sassFile) {
 			run("sass --no-source-map $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
 		}
-
-		$this->encode();
 
         $this->buildNodeModules();
 
