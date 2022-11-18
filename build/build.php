@@ -44,9 +44,9 @@ function cd($dir)
 
 class Builder
 {
-    public $test = false;
+    public $test = true;
 
-	private $majorVersion = "6.6";
+	private $majorVersion = "6.7";
 
 	private $gitBranch = 'master';
 
@@ -54,7 +54,7 @@ class Builder
 	 *
 	 * @var string 63-php-70
 	 */
-	public $distro;
+	public $distro = "sixseven";
 
 	/**
 	 *
@@ -72,13 +72,7 @@ class Builder
 	 * @var string groupoffice-6.3.8-php-70
 	 */
 	private $packageName;
-	private $variants = [
-	        [
-		        "archiveSuffix" => "",
-			    "name" => "sixsix",
-			    "encoderOptions" => "-72 --allow-reflection-all"
-		    ]
-	];
+
 
 	private $encoder = __DIR__ . "/deploy/ioncube_encoder5_12.0/ioncube_encoder.sh";
 
@@ -127,36 +121,32 @@ class Builder
 		$this->minorVersion = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
 
 
-		foreach ($this->variants as $options) {
-			$this->distro = $options['name'];
-
-			$this->packageName = "groupoffice-" . $this->majorVersion . "." . $this->minorVersion . $options["archiveSuffix"];
-
-			$this->encoderOptions = $options['encoderOptions'];
-
-			$this->buildDir = __DIR__ . "/deploy/build/" . $this->majorVersion . "/" . $options['name'];
-
-			run("rm -rf " . $this->buildDir);
-			run("mkdir -p " . $this->buildDir);
-
-			$this->encodedDir = __DIR__ . "/deploy/encoded/" . $this->majorVersion . "/" . $options['name'];
-
-			run("rm -rf " . $this->encodedDir);
-			run("mkdir -p " . $this->encodedDir);
-
-			$this->buildFromSource();
+        $this->packageName = "groupoffice-" . $this->majorVersion . "." . $this->minorVersion ;
 
 
-            $this->buildDebianPackage();
+        $this->buildDir = __DIR__ . "/deploy/build/" . $this->majorVersion . "/" . $options['name'];
 
-            if(!$this->test) {
-	            $this->createGithubRelease();
-	            $this->addToDebianRepository();
-	            $this->sendTarToSF();
-            }
+        run("rm -rf " . $this->buildDir);
+        run("mkdir -p " . $this->buildDir);
+
+        $this->encodedDir = __DIR__ . "/deploy/encoded/" . $this->majorVersion . "/" . $options['name'];
+
+        run("rm -rf " . $this->encodedDir);
+        run("mkdir -p " . $this->encodedDir);
+
+        $this->buildFromSource();
 
 
-		}
+        $this->buildDebianPackage();
+
+        if(!$this->test) {
+            $this->createGithubRelease();
+            $this->addToDebianRepository();
+            $this->sendTarToSF();
+        }
+
+
+
 	}
 
 	private function pullSource()
@@ -231,19 +221,25 @@ class Builder
         }
     }
 
+    private function runEncoder($sourcePath, $targetPath) {
+	    run($this->encoder . ' -74 --allow-reflection-all -B --replace-target --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
+		    '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
+
+	    run($this->encoder . ' -81 --add-to-bundle --replace-target --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
+		    '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
+
+    }
+
 	private function encode()
 	{
 		foreach ($this->proModules as $module) {
-			run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" --exclude "Site*Controller.php" ' .
-				'--copy "vendor/" ' . $this->sourceDir . '/promodules/' . $module . ' ' .
-				'--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
+            $this->runEncoder('/promodules/' . $module, '/modules');
 		}
 
+        $this->runEncoder('/promodules/tickets/model', '/modules/tickets/');
+        $this->runEncoder('/promodules/tickets/customfields/model', '/modules/tickets/customfields/');
+			$this->runEncoder('/promodules/tickets/customfields/model', '/modules/tickets/customfields/');
 
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' . $this->sourceDir . '/promodules/tickets/model ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/');
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' . $this->sourceDir . '/promodules/tickets/customfields/model ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/customfields');
 		run($this->encoder . " " . $this->encoderOptions . ' --replace-target ' . $this->sourceDir . '/promodules/tickets/TicketsModule.php ' .
 			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/');
 
@@ -259,9 +255,7 @@ class Builder
 
 
 		//business package
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' .
-			$this->sourceDir . '/business ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/go/modules');
+        $this->runEncoder('/business', '/go/modules');
 
 		$businessDir = new DirectoryIterator($this->sourceDir . '/business');
 		foreach ($businessDir as $fileinfo) {
