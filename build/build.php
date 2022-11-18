@@ -211,7 +211,7 @@ class Builder
 
 	    cd($this->buildDir . "/" . $this->packageName);
 
-	    $packageFiles = run("find . -name package.json -not -path '*/node_modules/*')");
+	    $packageFiles = run("find . -name package.json -not -path '*/node_modules/*'");
 
         foreach($packageFiles as $packageFile)  {
             $nodeDir = dirname($packageFile);
