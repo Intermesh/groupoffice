@@ -225,7 +225,7 @@ class Builder
 	    run($this->encoder . ' -74 --allow-reflection-all -B --replace-target --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
 		    '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
 
-	    run($this->encoder . ' -81 --add-to-bundle --replace-target --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
+	    run($this->encoder . ' -81 --add-to-bundle --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
 		    '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
 
     }
