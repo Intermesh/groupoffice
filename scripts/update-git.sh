@@ -41,7 +41,7 @@ echo "Pulling main repository"
 
 git pull --recurse-submodules
 
-for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' );
+for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
 do
   replace1=${line/src\/style.scss/style.css};
   replace2=${replace1/src\/style-mobile.scss/style-mobile.css};
