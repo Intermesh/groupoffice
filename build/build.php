@@ -216,6 +216,7 @@ class Builder
             $nodeDir = dirname($packageFile);
             cd($nodeDir);
 	        run("npm install");
+            run("pwd");
             run("npm run build");
 	        cd($this->buildDir . "/" . $this->packageName);
         }
