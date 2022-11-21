@@ -351,7 +351,7 @@ class File extends FileSystemObject {
 			}
 
 			//Don't set content length for zip files because gzip of apache will corrupt the download. http://www.heath-whyte.info/david/computers/corrupted-zip-file-downloads-with-php
-			if($this->extension()!='zip') {
+			if($this->getExtension() != 'zip') {
 				$r->setHeader('Content-Length', $this->getSize());
 			}
 
