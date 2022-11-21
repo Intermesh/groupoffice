@@ -21,7 +21,6 @@ use go\modules\community\oauth2client\model\DefaultClient;
 use go\modules\community\oauth2client\model\Oauth2Client;
 use go\modules\community\oauth2client\model\Oauth2Account;
 use League\OAuth2\Client\Grant\RefreshToken;
-use League\OAuth2\Client\Provider\Google;
 
 /**
  * The Email model
@@ -371,43 +370,29 @@ class Account extends \GO\Base\Db\ActiveRecord
 	/**
 	 * Check if access token needs to be refreshed
 	 *
-	 * @return bool|null
 	 * @throws \Exception
 	 */
-	public function maybeRefreshToken()
+	public function maybeRenewAccessToken()
 	{
-		if (! go()->getModule('community', 'oauth2client') ) {
-			return null;
+		if (!go()->getModule('community', 'oauth2client')) {
+			return;
 		}
-		$rec = go()->getDbConnection()->select()
-			->from('oauth2client_account', 'oa')
-			->join('oauth2client_oauth2client', 'oc', 'oa.oauth2ClientId=oc.id')
-			->where(['oa.accountId'=> $this->id])
-			->single();
-		if(!$rec) {
-			return null;
-		}
-		$expires = $rec['expires'];
-		if($expires >= time()) {
-//			go()->debug("No token refresh needed");
-			return null;
-		}
-		$refreshToken = $rec['refreshToken'];
-		if(!$refreshToken) {
-			//go()->debug("No token refresh found. A new refresh token needs to be generated.");
-			return null;
-		}
+		$accountEntity = \go\modules\community\email\model\Account::findById($this->id);
+		if ($acctSettings = $accountEntity->oauth2_account) {
+			if (!$acctSettings->refreshToken || !$acctSettings->expires) {
+				go()->debug("The new refresh token needs to be generated.");
+				return;
+			}
 
-		$oauth2Client = Oauth2Client::findById($rec['oauth2ClientId']);
-		$provider = $oauth2Client->getProvider();
+			$client = Oauth2Client::findById($acctSettings->oauth2ClientId);
+			$tokenParams = [
+				'access_token' => $acctSettings->token,
+				'refresh_token' => $acctSettings->refreshToken,
+				'expires_in' => $acctSettings->expires - time()
+			];
 
-		$grant = new RefreshToken();
-		$token = $provider->getAccessToken($grant, ['refresh_token' => $refreshToken]);
-		$stmt = go()->getDbConnection()->update('oauth2client_account',
-			['token' => $token->getToken(), 'expires' => $token->getExpires()],
-			['accountId' => $this->id]
-		);
-		return $stmt->execute();
+			$client->maybeRefreshAccessToken($accountEntity, $tokenParams);
+		}
 	}
 
 
