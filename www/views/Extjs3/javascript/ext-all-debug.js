@@ -6952,9 +6952,6 @@ Ext.apply(Ext.EventManager, function(){
                resizeEvent = new Ext.util.Event();
                resizeTask = new Ext.util.DelayedTask(this.doResizeEvent);
                Ext.EventManager.on(window, "resize", this.fireWindowResize, this);
-							 Ext.EventManager.on(window, "orientationchange", function() {
-								this.doResizeEvent();
-							 }, this, {delay: 500});
            }
            resizeEvent.addListener(fn, scope, options);
        },
