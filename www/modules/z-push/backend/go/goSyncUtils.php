@@ -297,6 +297,137 @@ class GoSyncUtils {
 		return $ASyncDay;
 	}
 
+	private static $knownMSTZS = array(
+		"-780/-60/0/0/0/0/0/0/0/0"=>"Pacific/Enderbury"
+	,"-720/-60/4/1/0/3/9/5/0/2"=>"Pacific/Auckland"
+	,"-660/-60/0/0/0/0/0/0/0/0"=>"Antarctica/Casey"
+	,"-600/-60/4/1/0/3/10/1/0/2"=>"Australia/Melbourne"
+	,"-600/-60/0/0/0/0/0/0/0/0"=>"Australia/Brisbane"
+	,"-570/-60/4/1/0/3/10/1/0/2"=>"Australia/Adelaide"
+	,"-570/-60/0/0/0/0/0/0/0/0"=>"Australia/Darwin"
+	,"-540/-60/0/0/0/0/0/0/0/0"=>"Asia/Chita"
+	,"-480/-60/0/0/0/0/0/0/0/0"=>"Asia/Brunei"
+	,"-420/-60/0/0/0/0/0/0/0/0"=>"Antarctica/Davis"
+	,"-390/-60/0/0/0/0/0/0/0/0"=>"Asia/Yangon"
+	,"-360/-60/0/0/0/0/0/0/0/0"=>"Antarctica/Vostok"
+	,"-345/-60/0/0/0/0/0/0/0/0"=>"Asia/Kathmandu"
+	,"-330/-60/0/0/0/0/0/0/0/0"=>"Asia/Colombo"
+	,"-300/-60/0/0/0/0/0/0/0/0"=>"Antarctica/Mawson"
+	,"-270/-60/0/0/0/0/0/0/0/0"=>"Asia/Kabul"
+	,"-210/-60/9/3/4/22/3/3/3/22"=>"Asia/Tehran"
+	,"-180/-60/0/0/0/0/0/0/0/0"=>"Africa/Addis_Ababa"
+	,"-120/-60/10/5/0/4/3/5/0/3"=>"Europe/Helsinki"
+	,"-120/-60/0/0/0/0/0/0/0/0"=>"Africa/Blantyre"
+	,"-60/-60/10/5/0/3/3/5/0/2"=>"Europe/Berlin"
+	,"-60/-60/10/4/0/3/3/5/0/2"=>"Europe/Berlin"
+	,"-60/-60/0/0/0/0/0/0/0/0"=>"Africa/Algiers"
+	,"0/-60/10/5/0/2/3/5/0/1"=>"Europe/Dublin"
+	,"0/-60/10/4/0/2/3/5/0/1"=>"Europe/Dublin"
+	,"0/-60/0/0/0/0/0/0/0/0"=>"Africa/Abidjan"
+	,"60/-60/0/0/0/0/0/0/0/0"=>"Atlantic/Cape_Verde"
+	,"180/-60/2/4/6/23/10/3/6/23"=>"America/Sao_Paulo"
+	,"180/-60/10/5/6/23/3/4/6/22"=>"America/Godthab"
+	,"180/-60/0/0/0/0/0/0/0/0"=>"America/Araguaina"
+	,"240/-60/11/1/0/2/3/2/0/2"=>"America/Barbados"
+	,"240/-60/0/0/0/0/0/0/0/0"=>"America/Anguilla"
+	,"270/-60/0/0/0/0/0/0/0/0"=>"America/Caracas"
+	,"300/-60/11/1/0/2/3/2/0/2"=>"America/New_York"
+	,"300/-60/0/0/0/0/0/0/0/0"=>"America/Atikokan"
+	,"360/-60/11/1/0/2/3/2/0/2"=>"America/Chicago"
+	,"360/-60/0/0/0/0/0/0/0/0"=>"America/Belize"
+	,"420/-60/10/5/0/2/4/1/0/2"=>"America/Chihuahua"
+	,"420/-60/11/1/0/2/3/2/0/2"=>"America/Denver"
+	,"420/-60/0/0/0/0/0/0/0/0"=>"America/Creston"
+	,"480/-60/11/1/0/2/3/2/0/2"=>"America/Los_Angeles"
+	,"540/-60/11/1/0/2/3/2/0/2"=>"America/Anchorage"
+	,"600/-60/0/0/0/0/0/0/0/0"=>"Pacific/Honolulu"
+	);
+
+	/**
+	 * Given the MS timezone find a matching tzid, for the year the event starts in.
+	 * @param string $mstz
+	 * @param int $eventstart
+	 * @return string
+	 */
+	public static function tzidFromMSTZ(string $mstz, int $eventstart) : ?string {
+		// 1. Check known MS time zones
+		$mstz_parts = unpack("lbias/Z64tzname/vdstendyear/vdstendmonth/vdstendday/vdstendweek/vdstendhour/"
+			."vdstendminute/vdstendsecond/vdstendmillis/lstdbias/Z64tznamedst/vdststartyear/"
+			."vdststartmonth/vdststartday/vdststartweek/vdststarthour/vdststartminute/"
+			."vdststartsecond/vdststartmillis/ldstbias", base64_decode($mstz));
+		$mstz = $mstz_parts['bias']
+			."/".$mstz_parts['dstbias']
+			."/".$mstz_parts['dstendmonth']
+			."/".$mstz_parts['dstendweek']
+			."/".$mstz_parts['dstendday']
+			."/".$mstz_parts['dstendhour']
+			."/".$mstz_parts['dststartmonth']
+			."/".$mstz_parts['dststartweek']
+			."/".$mstz_parts['dststartday']
+			."/".$mstz_parts['dststarthour'];
+		if (isset(self::$knownMSTZS[$mstz])) {
+			$tzid = self::$knownMSTZS[$mstz];
+			ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendCalDAV->tzidFromMSTZ(): Found tzid in known list: '%s'.", $tzid));
+			return $tzid;
+		}
+
+		// 2. Loop all time zones to find a match on offset and transition date
+		$year = date("Y", $eventstart);
+		$offset_std = -($mstz_parts["bias"] * 60);
+		$offset_dst = -(($mstz_parts["bias"] + $mstz_parts["dstbias"]) * 60);
+		$dststart_timestamp = self::timestampFromMSTZ($mstz_parts, "dststart", $mstz_parts["bias"], $year);
+		$dstend_timestamp = self::timestampFromMSTZ($mstz_parts, "dstend", $mstz_parts["bias"] + $mstz_parts["dstbias"], $year);
+
+		$tzids = DateTimeZone::listIdentifiers();
+		foreach ($tzids as $tzid) {
+			$timezone = new DateTimeZone($tzid);
+			$transitions = $timezone->getTransitions(date("U", strtotime($year."0101T000000Z")), date("U", strtotime($year."1231T235959Z")));
+
+			$tno = count($transitions);
+			if ($tno == 1 && $dststart_timestamp == 0) {
+				if ($transitions[0]['offset'] == $offset_std) {
+					ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendCalDAV->tzidFromMSTZ(): Found tzid: '%s'.", $tzid));
+					ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendCalDAV->tzidFromMSTZ(): Add tzid to knownMSTZS array for better performance: '%s'.", ',"'.$mstz.'"=>"'.$tzid.'"'));
+					return $tzid;
+				}
+			}
+			else if (($tno == 3 || $tno == 5) && $dststart_timestamp != 0) {
+				if ($dststart_timestamp < $dstend_timestamp) {
+					if(
+						$transitions[1]['isdst'] == 1 &&
+						$transitions[1]['ts'] == $dststart_timestamp &&
+						$transitions[1]['offset'] == $offset_dst &&
+						$transitions[2]['isdst'] == 0 &&
+						$transitions[2]['ts'] == $dstend_timestamp &&
+						$transitions[2]['offset'] == $offset_std)
+					{
+						ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendCalDAV->tzidFromMSTZ(): Found tzid: '%s'.", $tzid));
+						ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendCalDAV->tzidFromMSTZ(): Add tzid to knownMSTZS array for better performance: '%s'.", ',"'.$mstz.'"=>"'.$tzid.'"'));
+						return $tzid;
+					}
+				}
+				else {
+					if (
+						$transitions[1]['isdst'] == 0 &&
+						$transitions[1]['ts'] == $dstend_timestamp &&
+						$transitions[1]['offset'] == $offset_std &&
+						$transitions[2]['isdst'] == 1 &&
+						$transitions[2]['ts'] == $dststart_timestamp &&
+						$transitions[2]['offset'] == $offset_dst)
+					{
+						ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendCalDAV->tzidFromMSTZ(): Found tzid: '%s'.", $tzid));
+						ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendCalDAV->tzidFromMSTZ(): Add tzid to knownMSTZS array for better performance: '%s'.", ',"'.$mstz.'"=>"'.$tzid.'"'));
+						return $tzid;
+					}
+				}
+			}
+		}
+
+		// 3. Give up, use Zulu
+		ZLog::Write(LOGLEVEL_WARN, sprintf("BackendCalDAV->tzidFromMSTZ(): Failed to find tzid, defaulting to UTC. MS time zone: '%s'.", join('/', $mstz_parts)));
+		return null;
+	}
+
 	public static function getTimeZoneForClient() {
 
 		if (!isset(GO::session()->values['activesync_timezone'])) {

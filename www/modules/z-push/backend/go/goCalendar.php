@@ -363,11 +363,27 @@ class goCalendar extends GoBaseBackendDiff {
 		return $this->timezone;
 	}
 
-	private function importAllDayTime($time) {
-		$dt = new \DateTime('@'.$time, new \DateTimeZone("UTC"));		
-		$dt->setTimezone(new \DateTimeZone($this->getDefaultTimeZone()));
-		$dt->setTime(0, 0);
-		$newTime = $dt->format("U");
+	private function importAllDayTime($time, $mstz) {
+		ZLog::Write(LOGLEVEL_DEBUG, 'goCalendar->importAllDayTime('.$time.', '.$mstz.') ' );
+
+		$tz = GoSyncUtils::tzidFromMSTZ($mstz, $time);
+
+		ZLog::Write(LOGLEVEL_DEBUG, $tz );
+
+		if(!$tz) {
+			$tz = $this->getDefaultTimeZone();
+			ZLog::Write(LOGLEVEL_DEBUG, "fall back to user timezone: " .$tz );
+		}
+
+		$dt = new \DateTime('@'.$time,new \DateTimeZone($tz));
+		$dt->setTimezone( new \DateTimeZone($this->getDefaultTimeZone()));
+		//$dt->setTime(0, 0);
+
+		$utc = new DateTime($dt->format('Y-m-d H:i:s'), new DateTimeZone("UTC"));
+		$newTime = $utc->format("U");
+
+
+		ZLog::Write(LOGLEVEL_DEBUG, date('c', $newTime) );
 
 		return $newTime;
 	}
@@ -409,13 +425,13 @@ class goCalendar extends GoBaseBackendDiff {
 		if (isset($message->starttime)) {
 			$event->start_time = $message->starttime;
 			if($message->alldayevent) {
-				$event->start_time = $this->importAllDayTime($event->start_time);
+				$event->start_time = $this->importAllDayTime($event->start_time, $message->timezone);
 			}
 		}
 		if (isset($message->endtime)){
 			$event->end_time = $message->endtime;
 			if($message->alldayevent) {
-				$event->end_time = $this->importAllDayTime($event->end_time);
+				$event->end_time = $this->importAllDayTime($event->end_time, $message->timezone);
 			}
 		}
 		if (isset($message->location))
@@ -535,7 +551,7 @@ class goCalendar extends GoBaseBackendDiff {
 	 * @param \SyncAppointment $message
 	 * @return array
 	 */
-	public function ChangeMessage($folderid, $id, $message,$contentParameters) {
+	public function  ChangeMessage($folderid, $id, $message,$contentParameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goCalendar->ChangeMessage('.$folderid.','.$id.',)');
 		try {
 

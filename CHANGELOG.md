@@ -2,6 +2,9 @@
 - Core: background color when button is focussed
 - WOPI: Two attachments with same name caused problems when opening via WOPI (Libreoffice or o365)
 - OAuth2Client / Email: Refactor renewing of access token, better check access token on sending email
+- ActiveSync: All day events could shift when made with phone in another timezone
+- Core: turning mobile didn't resize screen correctly
+- Core: don't focus on search in start menu as it causes it to close on android phones
 
 17-11-2022 6.6.131
 - Wrong build
