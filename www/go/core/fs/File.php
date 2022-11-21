@@ -350,6 +350,11 @@ class File extends FileSystemObject {
 				$r->setHeader('Content-Type', $this->getContentType());
 			}
 
+			//Don't set content length for zip files because gzip of apache will corrupt the download. http://www.heath-whyte.info/david/computers/corrupted-zip-file-downloads-with-php
+			if($this->extension()!='zip') {
+				$r->setHeader('Content-Length', $this->getSize());
+			}
+
 			if(!$r->hasHeader('Content-Disposition')) {
 				$disp = $inline ? 'inline' : 'attachment';
 				$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
