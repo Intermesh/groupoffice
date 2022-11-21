@@ -1,6 +1,7 @@
 - Caldav: set caldav tasklist automatically for new users
 - Core: background color when button is focussed
 - WOPI: Two attachments with same name caused problems when opening via WOPI (Libreoffice or o365)
+- OAuth2Client / Email: Refactor renewing of access token, better check access token on sending email
 
 17-11-2022 6.6.131
 - Wrong build
@@ -1742,7 +1743,6 @@
 - Core: Fixed date range with commentedAt filter
 - docuwiki: correct path in module description to INSTALL.TXT
 - ActiveSync: Was generating unnecessary temporary files
-- OAuth2Client / Email: Refactor renewing of access token, better check access token on sending email
 
 16-11-2020 6.4.192
 - Comments: Fixed bug when adding two comments without opening another item would overwrite the first.
