@@ -301,7 +301,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 			while ($account = $stmt->fetch()) {
 				try {
 					$account->maybeRenewAccessToken();
-				}catch(Exception $e) {
+				}catch(\Exception $e) {
 					ErrorHandler::logException($e);
 				}
 				$alias = $account->getDefaultAlias();
