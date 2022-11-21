@@ -117,23 +117,37 @@ final class Oauth2Client extends Entity
 	 *
 	 * @param Account $account
 	 * @param array $tokenParams ['refresh_token','access_token','expires_in']
-	 * @throws Exception
+	 * @throws \Exception
 	 * @throws NotFound
 	 */
 	public function maybeRefreshAccessToken(Account $account, array $tokenParams)
 	{
 		$provider = $this->getProvider();
 
-		$currentAccessToken = $this->getAccessTokenCls($tokenParams, $provider);
-		if ($currentAccessToken->hasExpired()) {
-			$newAccessToken = $provider->getAccessToken('refresh_token', [
-				'refresh_token' => $tokenParams['refresh_token']
-			]);
-			$account->oauth2_account->token = $newAccessToken->getToken();
-			$account->oauth2_account->expires = $newAccessToken->getExpires();
-			if (!$account->save()) {
-				throw new Exception(500, "Unable to refresh access token");
+		try {
+			$currentAccessToken = $this->getAccessTokenCls($tokenParams, $provider);
+			if ($currentAccessToken->hasExpired()) {
+				$newAccessToken = $provider->getAccessToken('refresh_token', [
+					'refresh_token' => $tokenParams['refresh_token']
+				]);
+				$account->oauth2_account->token = $newAccessToken->getToken();
+				$account->oauth2_account->expires = $newAccessToken->getExpires();
+				if (!$account->save()) {
+					throw new Exception(500, "Unable to refresh access token");
+				}
 			}
+		}
+
+		catch(\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+			// If the refresh token is invalid, invalidate access token as well
+			$account->oauth2_account->expires = 0;
+			$account->oauth2_account->token = null;
+			$account->oauth2_account->refreshToken = null;
+			$account->save();
+			go()->getDebugger()->error($e->getMessage());
+		}
+		catch(Exception $e) {
+			go()->getDebugger()->error($e->getMessage());
 		}
 	}
 }
