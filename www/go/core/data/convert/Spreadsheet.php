@@ -592,6 +592,15 @@ class Spreadsheet extends AbstractConverter {
 		if(isset($this->clientParams['updateBy'])) {
 			$this->updateBy = $this->clientParams['updateBy'];
 		}
+
+
+	}
+
+	private function saveMapping(array $headers) {
+		$checkSum = md5(implode(",", array_map("trim", $headers)));
+
+		go()->getCache()->set("mapping-" . $checkSum, $this->clientParams['mapping']);
+
 	}
 
 	protected $record;
@@ -601,6 +610,7 @@ class Spreadsheet extends AbstractConverter {
 		if($this->index == 0) {
 			//skip headers
 			$headers = $this->readRecord();
+			$this->saveMapping($headers);
 		}
 		$this->record = $this->readRecord();
 

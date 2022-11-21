@@ -1075,6 +1075,9 @@ abstract class EntityController extends Controller {
 		
 		$response['goHeaders'] = $converter->getEntityMapping();
 		$response['csvHeaders'] = $converter->getCsvHeaders($file);
+
+		$checkSum = md5(implode(',', array_map("trim", $response['csvHeaders'])));
+		$response['mapping'] = go()->getCache()->get("mapping-" . $checkSum);
 		
 		if(!$response) {
 			throw new Exception("Invalid response from import convertor");
