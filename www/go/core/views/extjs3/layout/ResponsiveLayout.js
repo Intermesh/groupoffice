@@ -1,7 +1,7 @@
 go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	type: 'responsive',
 
-	monitorResize: !GO.util.isMobileOrTablet(),
+	monitorResize: true,
 
 /**
  * Defaults to the first added item. Only used in narrow mode
