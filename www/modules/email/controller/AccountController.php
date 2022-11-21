@@ -4,6 +4,7 @@
 namespace GO\Email\Controller;
 
 use GO;
+use go\core\ErrorHandler;
 
 
 class AccountController extends \GO\Base\Controller\AbstractModelController
@@ -298,7 +299,11 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 			$stmt =  \GO\Email\Model\Account::model()->find($findParams);
 
 			while ($account = $stmt->fetch()) {
-				$account->maybeRefreshToken();
+				try {
+					$account->maybeRefreshToken();
+				}catch(Exception $e) {
+					ErrorHandler::logException($e);
+				}
 				$alias = $account->getDefaultAlias();
 				if($alias){
 					$nodeId=base64_encode('account_' . $account->id);
