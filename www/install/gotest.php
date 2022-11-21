@@ -136,8 +136,8 @@ function test_system() :array
 	
 	$test['name']='PHP version';
 	$test['showSuccessFeedback'] = false;
-	$test['pass']=function_exists('version_compare') && version_compare( phpversion(), "7.4", ">=");
-	$test['feedback']='Fatal error: Your PHP version ('.phpversion().') is not supported. PHP 7.4 or higher is required.';
+	$test['pass']=function_exists('version_compare') && version_compare( phpversion(), "7.3", ">=");
+	$test['feedback']='Fatal error: Your PHP version ('.phpversion().') is not supported. PHP 7.3 or higher is required.';
 	$test['fatal']=true;
 
 	$tests[]=$test;
