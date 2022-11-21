@@ -300,7 +300,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 
 			while ($account = $stmt->fetch()) {
 				try {
-					$account->maybeRefreshToken();
+					$account->maybeRenewAccessToken();
 				}catch(Exception $e) {
 					ErrorHandler::logException($e);
 				}

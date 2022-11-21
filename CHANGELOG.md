@@ -1,3 +1,11 @@
+- Caldav: set caldav tasklist automatically for new users
+- Core: background color when button is focussed
+- WOPI: Two attachments with same name caused problems when opening via WOPI (Libreoffice or o365)
+- OAuth2Client / Email: Refactor renewing of access token, better check access token on sending email
+
+17-11-2022 6.6.131
+- Wrong build
+
 17-11-2022 6.6.130
 - Carddav/ caldav: Log exceptions in carddav and caldav
 - Caldav: Fixed Apple caldav sync

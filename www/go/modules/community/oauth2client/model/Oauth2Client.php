@@ -3,8 +3,10 @@
 namespace go\modules\community\oauth2client\model;
 
 use go\core\exception\NotFound;
+use go\core\http\Exception;
 use go\core\jmap\Entity;
 use go\core\orm\Mapping;
+use go\modules\community\email\model\Account;
 
 final class Oauth2Client extends Entity
 {
@@ -91,5 +93,47 @@ final class Oauth2Client extends Entity
 
 		return new $prvClsName($params);
 
+	}
+
+	/**
+	 * @param array $tokenParams
+	 * @param mixed $provider
+	 * @return mixed
+	 * @throws NotFound
+	 */
+	private function getAccessTokenCls(array $tokenParams, $provider)
+	{
+		$defaultClient = DefaultClient::findById($this->defaultClientId);
+		$prvVendorName = ($defaultClient->name === 'Azure') ? 'TheNetworg' : 'League';
+		$clsName = $prvVendorName . "\\OAuth2\\Client\\Token\\AccessToken";
+		return new $clsName($tokenParams, $provider);
+	}
+
+	/**
+	 * Checks whether the access token is still valid. If not, renew it using refresh token
+	 *
+	 * The token parameter expires_in is preferred over the 'expires' parameter and is calculated as the
+	 * seconds (positive or negative) since the current time.
+	 *
+	 * @param Account $account
+	 * @param array $tokenParams ['refresh_token','access_token','expires_in']
+	 * @throws Exception
+	 * @throws NotFound
+	 */
+	public function maybeRefreshAccessToken(Account $account, array $tokenParams)
+	{
+		$provider = $this->getProvider();
+
+		$currentAccessToken = $this->getAccessTokenCls($tokenParams, $provider);
+		if ($currentAccessToken->hasExpired()) {
+			$newAccessToken = $provider->getAccessToken('refresh_token', [
+				'refresh_token' => $tokenParams['refresh_token']
+			]);
+			$account->oauth2_account->token = $newAccessToken->getToken();
+			$account->oauth2_account->expires = $newAccessToken->getExpires();
+			if (!$account->save()) {
+				throw new Exception(500, "Unable to refresh access token");
+			}
+		}
 	}
 }

@@ -914,8 +914,8 @@
 
 	&:focus, &-focus,  &:hover {
 		//transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		//@include var(background-color, c-primary-tp);
-		filter: brightness(120%);
+		@include var(background-color, c-primary-tp);
+		//filter: brightness(120%);
 	}
 
 	&-icon-small-top {
