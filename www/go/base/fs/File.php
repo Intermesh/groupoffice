@@ -215,12 +215,12 @@ class File extends Base{
 	/**
 	 * Put data in the file. (See php function file_put_contents())
 	 * 
-	 * @param StringHelper $data
-	 * @param type $flags
+	 * @param string $data
+	 * @param int $flags
 	 * @param type $context
 	 * @return boolean 
 	 */
-	public function putContents($data, $flags=null, $context=null){
+	public function putContents($data, $flags=0, $context=null){
 		if(file_put_contents($this->path, $data, $flags, $context)){
 			$this->setDefaultPermissions();
 			return true;
