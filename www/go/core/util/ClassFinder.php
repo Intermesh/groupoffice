@@ -190,8 +190,8 @@ class ClassFinder {
 	public static function fileIsEncoded(File $file): bool
 	{
 		//Check if file is encoded
-		$data = $file->getContents(0, 20);
-		return strpos($data, '<?php //004fb') !== false;
+		$data = $file->getContents(0, 100);
+		return strpos($data, 'ionCube') !== false;
 	}
 
 	private function folderToClassNames(Folder $folder, string $namespace): array

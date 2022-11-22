@@ -246,6 +246,7 @@ class Builder
             }
 		}
 
+        run('cp ' . $this->sourceDir . '/promodules/professional/Module.php ' . $this->buildDir . "/" . $this->packageName . '/modules/professional');
 		run('cp ' . $this->sourceDir . '/promodules/projects2/report/* ' . $this->buildDir . "/" . $this->packageName . '/modules/projects2/report/');
 		run('cp ' . $this->sourceDir . '/promodules/billing/Pdf.php ' . $this->buildDir . "/" . $this->packageName . '/modules/billing/Pdf.php');
 
