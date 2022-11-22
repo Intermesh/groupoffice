@@ -358,8 +358,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$file->shortenFileName($maxLength);
 
 		$dbFile = $tmpFolder->hasFile($file->name());
-		File::$deleteInDatabaseOnly = true;
-		$dbFile->delete();
+		if($dbFile) {
+			File::$deleteInDatabaseOnly = true;
+			$dbFile->delete();
+		}
 		$dbFile = $tmpFolder->addFile($file->name(), true);
 
 		return ['success' => true, 'data' => $dbFile->getAttributes()];
