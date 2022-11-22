@@ -1,3 +1,4 @@
+22-11-2022 6.6.132
 - Caldav: set caldav tasklist automatically for new users
 - Core: background color when button is focussed
 - WOPI: Two attachments with same name caused problems when opening via WOPI (Libreoffice or o365)
