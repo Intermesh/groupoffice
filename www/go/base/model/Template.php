@@ -434,7 +434,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		
 		if($this->htmlSpecialChars){
 			foreach($attributes as $key=>$value) {
-				$attributes[$key] = htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
+				$attributes[$key] = htmlspecialchars((string) $value, ENT_COMPAT, 'UTF-8');
 			}
 		}
 		
