@@ -1,3 +1,6 @@
+22-11-2022 6.6.133
+- Core: Fixed running and installing without Ionbcube
+
 22-11-2022 6.6.132
 - Caldav: set caldav tasklist automatically for new users
 - Core: background color when button is focussed
