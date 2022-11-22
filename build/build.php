@@ -279,7 +279,9 @@ class Builder
                 run('cp -r ' . $this->sourceDir . '/business/' . $moduleName . '/install/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/install/');
             }
 
-	        run ('cp ' . $moduleFile .' ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/');
+            if (file_exists($moduleFile) ) {
+                run ('cp ' . $moduleFile .' ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/');
+            }
         }
 
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');
