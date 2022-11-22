@@ -47,7 +47,7 @@ function cd($dir)
 
 class Builder
 {
-    public $test = true;
+    public $test = false;
 
 	private $majorVersion = "6.7";
 
