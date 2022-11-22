@@ -6,6 +6,7 @@
 - ActiveSync: All day events could shift when made with phone in another timezone
 - Core: turning mobile didn't resize screen correctly
 - Core: don't focus on search in start menu as it causes it to close on android phones
+- Sync: Allow deleting of items by default again
 
 17-11-2022 6.6.131
 - Wrong build
