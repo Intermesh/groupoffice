@@ -250,11 +250,21 @@ class Builder
 
 
 		foreach ($this->proModules as $module) {
+            // keep lang and module install stuff open source
 			if (is_dir($this->sourceDir . '/promodules/' . $module . '/language')) {
 				run('cp ' . $this->sourceDir . '/promodules/' . $module . '/language/* ' . $this->buildDir . "/" . $this->packageName . '/modules/' . $module . '/language/');
 			}
+
+            if (is_dir($this->sourceDir . '/promodules/' . $module . '/install')) {
+                run('cp -r ' . $this->sourceDir . '/promodules/' . $module . '/install/* ' . $this->buildDir . "/" . $this->packageName . '/modules/' . $module . '/install/');
+            }
+
+            if (file_exists($this->sourceDir . '/promodules/' . $module . '/' . ucfirst($module) . 'Module.php')) {
+                run('cp ' . $this->sourceDir . '/promodules/' . $module . '/' . ucfirst($module) . 'Module.php ' . $this->buildDir . "/" . $this->packageName . '/modules/' . $module . '/');
+            }
 		}
 
+        run('cp ' . $this->sourceDir . '/promodules/professional/Module.php ' . $this->buildDir . "/" . $this->packageName . '/modules/professional');
 		run('cp ' . $this->sourceDir . '/promodules/projects2/report/* ' . $this->buildDir . "/" . $this->packageName . '/modules/projects2/report/');
 		run('cp ' . $this->sourceDir . '/promodules/billing/Pdf.php ' . $this->buildDir . "/" . $this->packageName . '/modules/billing/Pdf.php');
 
@@ -286,7 +296,9 @@ class Builder
                 run('cp -r ' . $this->sourceDir . '/business/' . $moduleName . '/install/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/install/');
             }
 
-	        //run ('cp ' . $moduleFile .' ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/');
+            if (file_exists($moduleFile) ) {
+                run ('cp ' . $moduleFile .' ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/');
+            }
         }
 
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');

@@ -1,3 +1,7 @@
+22-11-2022 6.6.133
+- Core: Fixed running and installing without Ionbcube
+
+22-11-2022 6.6.132
 - Caldav: set caldav tasklist automatically for new users
 - Core: background color when button is focussed
 - WOPI: Two attachments with same name caused problems when opening via WOPI (Libreoffice or o365)
@@ -6,6 +10,8 @@
 - ActiveSync: All day events could shift when made with phone in another timezone
 - Core: turning mobile didn't resize screen correctly
 - Core: don't focus on search in start menu as it causes it to close on android phones
+- Sync: Allow deleting of items by default again
+- Core: install without ioncube
 
 17-11-2022 6.6.131
 - Wrong build
