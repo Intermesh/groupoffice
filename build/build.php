@@ -55,9 +55,9 @@ class Builder
 
 	/**
 	 *
-	 * @var string sixsix, sixseven etc or unstable
+	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $distro = "unstable";
+	public $distro = "testing";
 
 
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
@@ -335,7 +335,7 @@ class Builder
                     array(
                       'tag_name' => $tagName,
                       'name'=> $tagName,
-                      'prerelease' => $this->distro == "unstable",
+                      'prerelease' => $this->distro == "testing",
                       'target_commitish' => $this->gitBranch,
                       'body' => 'Use the ' . $this->packageName . '.tar.gz file for installations. It contains all the code, libraries and compiled code. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'
                     )
