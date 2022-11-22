@@ -1,10 +1,10 @@
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `googleauth_secret`
+-- Tabelstructuur voor tabel `otp_secret`
 --
 
-CREATE TABLE `googleauth_secret` (
+CREATE TABLE `otp_secret` (
   `userId` int(11) NOT NULL,
   `secret` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdAt` datetime NOT NULL,
@@ -16,9 +16,9 @@ CREATE TABLE `googleauth_secret` (
 --
 
 --
--- Indexen voor tabel `googleauth_secret`
+-- Indexen voor tabel `otp_secret`
 --
-ALTER TABLE `googleauth_secret`
+ALTER TABLE `otp_secret`
   ADD PRIMARY KEY (`userId`),
   ADD KEY `user` (`userId`);
 
@@ -27,7 +27,8 @@ ALTER TABLE `googleauth_secret`
 --
 
 --
--- Beperkingen voor tabel `googleauth_secret`
+-- Beperkingen voor tabel `otp_secret`
 --
-ALTER TABLE `googleauth_secret`
-    ADD CONSTRAINT `googleauth_secret_user` FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `otp_secret`
+    ADD CONSTRAINT `otp_secret_user` FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+

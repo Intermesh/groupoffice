@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\community\googleauthenticator\model;
+namespace go\modules\community\otp\model;
 use go\core;
 
 

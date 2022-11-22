@@ -1,10 +1,10 @@
-go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
-	title:t('Enable Google authenticator'),
+go.modules.community.otp.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
+	title:t('Enable OTP Authenticator'),
 	iconCls: 'ic-security',
 	modal:true,
 	entityStore:"User",
-	width: 400,
-	height: 540,
+	width: dp(580),
+	height: dp(680),
 	showCustomfields:false,
 	closable: false,
 	maximizable: false,
@@ -12,10 +12,10 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 	countDown: 0,
 	initComponent: function () {
 
-		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.initComponent.call(this);
+		go.modules.community.otp.EnableAuthenticatorDialog.superclass.initComponent.call(this);
 
 		this.formPanel.on('beforesubmit', (pnl,values) => {
-			values.googleauthenticator.secret = this.secretField.getValue();
+			values.otp.secret = this.secretField.getValue();
 		});
 
 		this.formPanel.loadExternalChanges = false;
@@ -25,7 +25,7 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 	},
 
 	initButtons : function() {
-		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.initButtons.call(this);
+		go.modules.community.otp.EnableAuthenticatorDialog.superclass.initButtons.call(this);
 
 		if(!this.block) {
 			this.buttons.splice(0,0, this.setupLaterButton = new Ext.Button({
@@ -58,7 +58,7 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 	},
 
 	actionComplete : function() {
-		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.actionComplete.call(this);
+		go.modules.community.otp.EnableAuthenticatorDialog.superclass.actionComplete.call(this);
 		// if(this.setupLaterButton) { //<- Will return an error while still saving authenticator code correctly
 		if(this.setupLaterButton && this.setupLaterButton.el.dom) {
 			this.setupLaterButton.setDisabled(this.countDown > 0);
@@ -68,15 +68,15 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 	initFormItems: function () {
 		
 		this.QRcomponent = new go.QRCodeComponent({
-			name:'googleauthenticator.qrBlobId',
-			cls: "googleauthenticator-qr",
+			name:'otp.qrBlobId',
+			cls: "otp-qr",
 			width: 200,
 			height: 200
 		});
 		
 		this.secretField = new Ext.form.TextField({
 			readOnly:true,
-			name:'googleauthenticator.secret',
+			name:'otp.secret',
 			fieldLabel: t('Secret'),
 			hint: t('Secret key for manual input'),
 			anchor: "100%"
@@ -84,8 +84,8 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 		});
 			
 		this.verifyField = new go.form.PasteButtonField({
-			fieldLabel: t('Verify','googleauthenticator'),
-			name: 'googleauthenticator.verify',
+			fieldLabel: t('Verify','otp'),
+			name: 'otp.verify',
 			allowBlank:false,
 			anchor: "100%"
 		});
@@ -96,7 +96,7 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 				labelWidth: dp(64),
 				items: [
 					new Ext.Container({
-						html: t('Scan the QR code below with the Google authenticator app on your mobile device, after that fill in the field below with the code generated in the app.')
+						html: t('Scan the QR code below with the OTP Authenticator app on your mobile device, after that fill in the field below with the code generated in the app.')
 					}),
 					this.QRcomponent,
 					this.secretField,
@@ -108,11 +108,11 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 	},
 	
 	onLoad : function() {
-		this.QRcomponent.setQrBlobId("community/googleauthenticator/qr");
-		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.onLoad.call(this);
+		this.QRcomponent.setQrBlobId("community/otp/qr");
+		go.modules.community.otp.EnableAuthenticatorDialog.superclass.onLoad.call(this);
 
 		const user =  this.getValues()
-		if(go.modules.community.googleauthenticator.isEnforced(user)) {
+		if(go.modules.community.otp.isEnforced(user)) {
 			this.formPanel.items.first().insert(0, {
 				xtype: 'box',
 				autoEl: 'p',

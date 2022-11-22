@@ -1,35 +1,35 @@
 Ext.onReady(function () {
 	Ext.override(go.usersettings.AccountSettingsPanel, {
 		initComponent: go.usersettings.AccountSettingsPanel.prototype.initComponent.createSequence(function () {
-			if(!go.Modules.isAvailable("community", "googleauthenticator")) {
+			if(!go.Modules.isAvailable("community", "otp")) {
 				return;
 			}
-			this.googleAuthenticatorFieldset = new go.modules.community.googleauthenticator.AuthenticatorSettingsFieldset();
-			this.insert(3, this.googleAuthenticatorFieldset);
+			this.otpFieldset = new go.modules.community.otp.AuthenticatorSettingsFieldset();
+			this.insert(3, this.otpFieldset);
 			})
 		});
 	});
 	
-	go.modules.community.googleauthenticator.AuthenticatorSettingsFieldset = Ext.extend(Ext.form.FieldSet, {
+	go.modules.community.otp.AuthenticatorSettingsFieldset = Ext.extend(Ext.form.FieldSet, {
 		entityStore:"User",
 		currentUser: null,
 		labelWidth: dp(152),
-		title: t('Google authenticator'),
+		title: t('Two Factor Authentication'),
 
 		initComponent: function() {
 			this.enableAuthenticatorBtn = new Ext.Button({
-				text:t('Enable google authenticator'),
+				text:t('Enable OTP Authenticator'),
 				hidden:false,
 				handler:function(){
 
-					go.modules.community.googleauthenticator.enable(this.currentUser);
+					go.modules.community.otp.enable(this.currentUser);
 
 				},
 				scope: this
 			});
 			
 			this.disableAuthenticatorBtn = new Ext.Button({
-				text:t('Disable google authenticator'),
+				text:t('Disable OTP Authenticator'),
 				hidden:true,
 				handler:function(){
 					var me = this;
@@ -41,16 +41,21 @@ Ext.onReady(function () {
 			});
 			
 			this.items = [
+				{
+					xtype: "box",
+					autoEl: "p",
+					html: t("Setup one-time password authentication using an OTP application which generates a unique PIN for each login.")
+				},
 				this.enableAuthenticatorBtn,
 				this.disableAuthenticatorBtn
 			];
 			
-			go.modules.community.googleauthenticator.AuthenticatorSettingsFieldset.superclass.initComponent.call(this);
+			go.modules.community.otp.AuthenticatorSettingsFieldset.superclass.initComponent.call(this);
 		},
 		
 		onLoad : function(user){
 			
-			var isActive = (user.googleauthenticator && user.googleauthenticator.isEnabled);
+			var isActive = (user.otp && user.otp.isEnabled);
 			
 			this.enableAuthenticatorBtn.setVisible(!isActive);
 			this.disableAuthenticatorBtn.setVisible(isActive);
@@ -62,7 +67,7 @@ Ext.onReady(function () {
 			
 			function execute(currentPassword){
 				var data = {
-						googleauthenticator: null
+						otp: null
 					};
 				if(currentPassword) {
 					data.currentPassword = currentPassword;
@@ -86,8 +91,8 @@ Ext.onReady(function () {
 			} else {
 
 				go.AuthenticationManager.passwordPrompt(
-					t('Disable Google authenticator'),
-					t("When disabling Google autenticator this step will be removed from the login process.") + "<br><br>" + t("Provide your current password to disable Google authenticator.")
+					t('Disable OTP Authenticator'),
+					t("When disabling OTP Authenticator this step will be removed from the login process.") + "<br><br>" + t("Provide your current password to disable OTP Authenticator.")
 				). then((password) => {
 					execute.call(this,password);
 				});

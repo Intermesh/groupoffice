@@ -1,6 +1,6 @@
 <?php
 
-namespace go\modules\community\googleauthenticator\model;
+namespace go\modules\community\otp\model;
 
 use Exception;
 use go\core\fs\Blob;
@@ -11,7 +11,7 @@ use go\core\util\QRcode;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR.'util'.DIRECTORY_SEPARATOR.'QRcode.php';
 
-class Googleauthenticator extends Property {
+class OtpAuthenticator extends Property {
 		
 	public $userId;
 	protected $secret;
@@ -32,7 +32,7 @@ class Googleauthenticator extends Property {
 	
 	protected static function defineMapping(): Mapping
 	{
-		return parent::defineMapping()->addTable("googleauth_secret");
+		return parent::defineMapping()->addTable("otp_secret");
 	}
 
 	public function getSecret() {
@@ -240,7 +240,7 @@ class Googleauthenticator extends Property {
 	 *
 	 * @param int $length
 	 *
-	 * @return GoogleAuthenticator
+	 * @return OtpAuthenticator
 	 */
 	public function setCodeLength($length) {
 		$this->codeLength = $length;

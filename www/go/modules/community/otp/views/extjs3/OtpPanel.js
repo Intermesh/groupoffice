@@ -1,16 +1,16 @@
-go.modules.community.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(go.login.BaseLoginPanel, {
+go.modules.community.otp.OtpPanel = Ext.extend(go.login.BaseLoginPanel, {
 
 	initComponent: function () {
 
 		this.secretText = new GO.form.HtmlComponent({
-			html: t("Get the code from the google authenticator app on your mobile device and fill it in below") + '.',
+			html: t("Get the code from the OTP Authenticator app on your mobile device and fill it in below") + '.',
 			cls: 'login-text-comp'
 		});
 
 		this.secretField = new go.form.PasteButtonField({
-			itemId: 'googleauthenticator_code',
+			itemId: 'otp_code',
 			fieldLabel: t('Code'),
-			name: 'googleauthenticator_code',
+			name: 'otp_code',
 			allowBlank: false,
 			anchor: '100%',
 			autocomplete: "one-time-code"
@@ -50,7 +50,7 @@ go.modules.community.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(g
 			]
 		});
 
-		go.modules.community.googleauthenticator.GoogleauthenticatorPanel.superclass.initComponent.call(this);
+		go.modules.community.otp.OtpPanel.superclass.initComponent.call(this);
 	},
 	setErrors: function (errors) {
 		for (var key in errors) {
@@ -70,4 +70,4 @@ go.modules.community.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(g
 	}
 });
 
-go.AuthenticationManager.register('googleauthenticator', new go.modules.community.googleauthenticator.GoogleauthenticatorPanel());
+go.AuthenticationManager.register('otpauthenticator', new go.modules.community.otp.OtpPanel());

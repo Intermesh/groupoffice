@@ -85,7 +85,12 @@ try {
 
 	call_user_func_array([$c, $method], $parts);
 } catch(Exception $e) {
+	Response::get()->setContentType('text/plain');
 	ErrorHandler::logException($e);
 	Response::get()->setStatus(500);
 	Response::get()->output($e->getMessage());
+
+	if(go()->getDebugger()->enabled) {
+		go()->getDebugger()->printEntries();
+	}
 }

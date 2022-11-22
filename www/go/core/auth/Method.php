@@ -74,9 +74,10 @@ class Method extends Entity {
 	/**
 	 * Get an instance of the authenticator
 	 * 
-	 * @return Authenticator
+	 * @return BaseAuthenticator
 	 */
-	public function getAuthenticator(){
+	public function getAuthenticator(): BaseAuthenticator
+	{
 		
 		if(!$this->authenticator) {			
 			$all = $this->findAllAuthenticators();

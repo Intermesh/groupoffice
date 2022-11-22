@@ -1,39 +1,39 @@
 
-go.Modules.register("community", "googleauthenticator");
+go.Modules.register("community", "otp");
 
 GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
 
-	if(!go.Modules.isAvailable("community", "googleauthenticator")) {
+	if(!go.Modules.isAvailable("community", "otp")) {
 		return;
 	}
 
-	if(user.googleauthenticator && user.googleauthenticator.isEnabled) {
+	if(user.otp && user.otp.isEnabled) {
 		return;
 	}
 
-	if(!go.modules.community.googleauthenticator.isEnforced(user)) {
+	if(!go.modules.community.otp.isEnforced(user)) {
 		return;
 	}
 
-	const s = go.Modules.get("community", "googleauthenticator").settings;
+	const s = go.Modules.get("community", "otp").settings;
 
-	go.modules.community.googleauthenticator.enable(user, password, s.countDown, s.block);
+	go.modules.community.otp.enable(user, password, s.countDown, s.block);
 
 });
 
 
-go.modules.community.googleauthenticator.isEnforced = (user) => {
-	const enforceForGroupId = parseInt(go.Modules.get("community", "googleauthenticator").settings.enforceForGroupId);
+go.modules.community.otp.isEnforced = (user) => {
+	const enforceForGroupId = parseInt(go.Modules.get("community", "otp").settings.enforceForGroupId);
 
 	return enforceForGroupId && user.groups.indexOf(enforceForGroupId) > -1;
 }
 
-go.modules.community.googleauthenticator.enable = (user, password, countDown, block) => {
+go.modules.community.otp.enable = (user, password, countDown, block) => {
 
 	function requestSecret (user, currentPassword){
 
 		const data = {
-			googleauthenticator: {
+			otp: {
 				requestSecret:true
 			}
 		};
@@ -43,7 +43,7 @@ go.modules.community.googleauthenticator.enable = (user, password, countDown, bl
 		Ext.getBody().mask(t("Loading..."));
 		return go.Db.store("User").save(data, user.id)
 			.then((user) => {
-				const enableDialog = new go.modules.community.googleauthenticator.EnableAuthenticatorDialog({
+				const enableDialog = new go.modules.community.otp.EnableAuthenticatorDialog({
 					block: block,
 					countDown: countDown
 				});
@@ -56,7 +56,7 @@ go.modules.community.googleauthenticator.enable = (user, password, countDown, bl
 				}
 
 				// When the password is not correct, call itself again to try again
-				return go.modules.community.googleauthenticator.enable(user, null, countDown, block);
+				return go.modules.community.otp.enable(user, null, countDown, block);
 			}).finally(() => {
 				Ext.getBody().unmask();
 			})
@@ -65,16 +65,16 @@ go.modules.community.googleauthenticator.enable = (user, password, countDown, bl
 
 	if(!go.User.isAdmin && !password) {
 
-		let msg = t("Provide your current password before you can enable Google authenticator.");
+		let msg = t("Provide your current password before you can enable OTP Authenticator.");
 
-		if(go.modules.community.googleauthenticator.isEnforced(user)) {
+		if(go.modules.community.otp.isEnforced(user)) {
 
 			msg = "<p class='info'><i class='icon'>info</i> " + t("Your system administrator requires you to setup two factor authentication") + '</p>' + msg;
 		}
 
 		const passwordPrompt = () => {
 			return go.AuthenticationManager.passwordPrompt(
-				t('Enable Google authenticator'),
+				t('Enable OTP Authenticator'),
 				msg,
 				!countDown && !block
 				)

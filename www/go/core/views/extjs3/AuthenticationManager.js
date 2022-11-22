@@ -231,7 +231,7 @@ go.AuthenticationManager = (function () {
 			{
 				const passwordPrompt = new go.PasswordPrompt({
 					closable: closable,
-					width: dp(450),
+					width: dp(540),
 					text: message,
 					title: title,
 					iconCls: 'ic-security',

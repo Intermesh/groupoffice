@@ -1,15 +1,15 @@
 Ext.onReady(function () {
 	Ext.override(go.systemsettings.AuthenticationPanel, {
 		initComponent: go.systemsettings.AuthenticationPanel.prototype.initComponent.createSequence(function () {
-			this.googleAuthenticatorFieldset = new go.modules.community.googleauthenticator.AuthenticatorSystemSettingsFieldset();
-			this.insert(1, this.googleAuthenticatorFieldset);
+			this.otpFieldset = new go.modules.community.otp.AuthenticatorSystemSettingsFieldset();
+			this.insert(1, this.otpFieldset);
 		})
 	});
 });
 
-go.modules.community.googleauthenticator.AuthenticatorSystemSettingsFieldset = Ext.extend(Ext.form.FieldSet, {
+go.modules.community.otp.AuthenticatorSystemSettingsFieldset = Ext.extend(Ext.form.FieldSet, {
 	labelWidth: dp(152),
-	title: t('Google authenticator'),
+	title: t('OTP Authenticator'),
 
 	initComponent: function() {
 
@@ -22,8 +22,8 @@ go.modules.community.googleauthenticator.AuthenticatorSystemSettingsFieldset = E
 			this.enforceForGroup = new go.groups.GroupComboReset({
 				submit: false,
 				xtype: "groupcomboreset",
-				name: "googleauthenticator.enforceForGroupId",
-				value: go.Modules.get("community", "googleauthenticator").settings.enforceForGroupId
+				name: "otp.enforceForGroupId",
+				value: go.Modules.get("community", "otp").settings.enforceForGroupId
 			}),
 
 			this.blockField = new Ext.form.Checkbox({
@@ -31,7 +31,7 @@ go.modules.community.googleauthenticator.AuthenticatorSystemSettingsFieldset = E
 				xtype: "checkbox",
 				boxLabel: t("Block Group-Office usage until setup is done"),
 				name: "block",
-				checked: go.Modules.get("community", "googleauthenticator").settings.block,
+				checked: go.Modules.get("community", "otp").settings.block,
 				listeners: {
 					check: (cb, checked) => {
 						this.countDown.setDisabled(checked);
@@ -40,17 +40,17 @@ go.modules.community.googleauthenticator.AuthenticatorSystemSettingsFieldset = E
 			}),
 			this.countDown = new go.form.NumberField({
 				submit: false,
-				disabled: go.Modules.get("community", "googleauthenticator").settings.block,
+				disabled: go.Modules.get("community", "otp").settings.block,
 				xtype: "numberfield",
 				decimals: 0,
 				name: "countDown",
-				value: go.Modules.get("community", "googleauthenticator").settings.countDown,
+				value: go.Modules.get("community", "otp").settings.countDown,
 				fieldLabel: t("Count down"),
 				hint: t("Count down this number of seconds until the user can cancel the setup")
 			})
 		];
 
-		go.modules.community.googleauthenticator.AuthenticatorSystemSettingsFieldset.superclass.initComponent.call(this);
+		go.modules.community.otp.AuthenticatorSystemSettingsFieldset.superclass.initComponent.call(this);
 
 		this.on("added", () => {
 			const panel = this.findParentByType("systemsettingspanel");
@@ -58,7 +58,7 @@ go.modules.community.googleauthenticator.AuthenticatorSystemSettingsFieldset = E
 
 			panel.onSubmit = (cb, scope) => {
 
-				const mod = go.Modules.get("community", "googleauthenticator");
+				const mod = go.Modules.get("community", "otp");
 
 				go.Db.store("Module").save({
 					settings: {
