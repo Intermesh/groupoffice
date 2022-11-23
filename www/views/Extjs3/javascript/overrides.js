@@ -909,7 +909,7 @@ Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 
 Ext.apply(Ext.form.VTypes, {
     emailAddress:  function(v) {
-		var email = /^[_a-z0-9\-+\&\'\/\\]+(\.[_a-z0-9\-+\&\']+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*(\.[a-z]{2,100})$/i;
+		const email = /^[_a-z0-9\-+\&\'\/\\]+(\.[_a-z0-9\-+\&\']+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*(\.[a-z]{2,100})$/i;
         return email.test(v);
     },
     emailAddressText: Ext.form.VTypes.emailText,

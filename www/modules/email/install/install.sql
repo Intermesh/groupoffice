@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS `em_aliases` (
   `account_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `reply_to` varchar(100) DEFAULT NULL,
   `signature` text,
   `default` BOOLEAN NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),

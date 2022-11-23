@@ -8,15 +8,15 @@ class AliasController extends \GO\Base\Controller\AbstractModelController {
 
 	protected $model = 'GO\Email\Model\Alias';
 
-	protected function beforeStore(&$response, &$params, &$store) {
-
+	protected function beforeStore(&$response, &$params, &$store)
+	{
 		$store->setDefaultSortOrder('name');
 
 		return parent::beforeStore($response, $params, $store);
 	}
 
-	protected function getStoreParams($params) {
-		
+	protected function getStoreParams($params)
+	{
 		if(empty($params['account_id'])){
 			$findParams = \GO\Base\Db\FindParams::newInstance()
 							->select('t.*')
@@ -31,8 +31,7 @@ class AliasController extends \GO\Base\Controller\AbstractModelController {
 							->ignoreAdminGroup()
 							->permissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)
 							->order(array('order','default'), array('DESC','DESC'));
-		}else
-		{
+		} else {
 			$findParams = \GO\Base\Db\FindParams::newInstance();
 			$findParams->getCriteria()->addCondition("account_id", $params['account_id'])->addCondition("default", 1,'!=');
 		}
@@ -40,7 +39,8 @@ class AliasController extends \GO\Base\Controller\AbstractModelController {
 		return $findParams;
 	}
 
-	public function formatStoreRecord($record, $model, $store) {
+	public function formatStoreRecord($record, $model, $store)
+	{
 		
 		$r = new \GO\Base\Mail\EmailRecipients();
 		$r->addRecipient($model->email, $model->name);

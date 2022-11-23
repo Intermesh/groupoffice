@@ -255,3 +255,5 @@ $updates['202206020910'][] = function() {
 };
 
 $updates['202208101034'][] = "ALTER TABLE `em_accounts` CHANGE COLUMN `smtp_encryption` `smtp_encryption` CHAR(10) NOT NULL;";
+
+$updates['202211230945'][] = "ALTER TABLE `em_aliases` ADD COLUMN `reply_to` VARCHAR(100) DEFAULT NULL;";

@@ -11,45 +11,45 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 GO.email.AliasesGrid = function(config){
-	if(!config)
-	{
-		config = {};
-	}
-	config.layout='fit';
-	config.autoScroll=true;
+	config = config || {};
+
+	config.layout = 'fit';
+	config.autoScroll = true;
 	config.store = new GO.data.JsonStore({
 	    url: GO.url("email/alias/store"),
-	    fields: ['id','account_id','name','email','signature'],
+	    fields: ['id','account_id','name','email','reply_to','signature'],
 	    remoteSort: true
 	});
 
-	var columnModel =  new Ext.grid.ColumnModel({
-		defaults:{
-			sortable:true
+	const columnModel = new Ext.grid.ColumnModel({
+		defaults: {
+			sortable: true
 		},
-		columns:[
-		{
-			header: t("Name"), 
-			dataIndex: 'name'
-		},{
-			header: t("Email", "email"), 
-			dataIndex: 'email'
-		}]
+		columns: [
+			{
+				header: t("Name"),
+				dataIndex: 'name'
+			}, {
+				header: t("Email", "email"),
+				dataIndex: 'email'
+			}, {
+				header: t("Reply-to", "email"),
+				dataIndex: 'reply_to'
+			}]
 	});
-	
-	config.cm=columnModel;
-	config.view=new Ext.grid.GridView({
+
+	config.cm = columnModel;
+	config.view = new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
 		emptyText: t("No items to display")		
 	});
-	config.sm=new Ext.grid.RowSelectionModel();
-	config.loadMask=true;
+	config.sm = new Ext.grid.RowSelectionModel();
+	config.loadMask = true;
 	this.aliasDialog = new GO.email.AliasDialog();
 		this.aliasDialog.on('save', function(){   
 			this.store.reload();	  
-			if(GO.email.aliasesStore.loaded)
-			{
+			if (GO.email.aliasesStore.loaded) {
 				GO.email.aliasesStore.reload();
 			}
 		}, this);
@@ -82,21 +82,17 @@ GO.email.AliasesGrid = function(config){
 		}];
 	GO.email.AliasesGrid.superclass.constructor.call(this, config);
 	this.on('rowdblclick', function(grid, rowIndex){
-		var record = grid.getStore().getAt(rowIndex);	
+		const record = grid.getStore().getAt(rowIndex);
 		this.aliasDialog.show(record.data.id);
-		}, this);
+	}, this);
 };
 Ext.extend(GO.email.AliasesGrid, GO.grid.GridPanel,{
-	setAccountId : function(account_id)
-	{
-		if(this.store.baseParams.account_id != account_id)
-		{
+	setAccountId : function(account_id) {
+		if(this.store.baseParams.account_id != account_id) {
 			this.store.baseParams.account_id=account_id;
-			if(account_id==0)
-			{
+			if(account_id==0) {
 				this.store.removeAll();
-			}else
-			{
+			} else {
 				this.store.load();
 			}
 		}

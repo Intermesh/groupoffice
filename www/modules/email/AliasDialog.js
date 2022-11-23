@@ -38,14 +38,22 @@ GO.email.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 				xtype : 'textfield',
 				name : 'name',
 				anchor : '100%',
-				allowBlank:false,
+				allowBlank: false,
 				fieldLabel : t("Name")
 			}, {
 				xtype : 'textfield',
 				name : 'email',
 				anchor : '100%',
+				vtype: 'emailAddress',
 				allowBlank:false,
 				fieldLabel : t("Email", "email")
+			}, {
+				xtype : 'textfield',
+				name : 'reply_to',
+				anchor : '100%',
+				vtype: 'emailAddress',
+				allowBlank: true,
+				fieldLabel : t("Reply to", "email")
 			}, {
 				xtype : 'textarea',
 				name : 'signature',

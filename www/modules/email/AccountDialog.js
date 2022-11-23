@@ -248,6 +248,20 @@ GO.email.AccountDialog = function(config) {
 		},
 		anchor : '100%'
 	}), {
+		name: 'reply_to',
+			fieldLabel: t("Reply to"),
+			allowBlank: true,
+			vtype: 'emailAddress',
+			disabled:!GO.settings.modules.email.write_permission && GO.email.disableAliases,
+			hidden: GO.email.disableAliases,
+			listeners : {
+				change : function() {
+					this.refreshNeeded = true;
+				},
+				scope : this
+			},
+			anchor : '100%'
+	}, {
 		xtype : 'textarea',
 		name : 'signature',
 		fieldLabel : t("Signature", "email"),

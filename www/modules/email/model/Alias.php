@@ -18,6 +18,7 @@
  * 
  * @property string $name
  * @property string $email
+ * @property string|null $reply_to
  * @property boolean $default
  * @property string $signature
  * @property int $account_id

@@ -515,13 +515,15 @@ class Account extends \GO\Base\Db\ActiveRecord
 	}
 
 
-	public function addAlias($email, $name, $signature='', $default=1){
+	public function addAlias(string $email, string $name, string $signature='', ?int $default=1, ?string $replyTo = null): Alias
+	{
 		$a = new Alias();
 		$a->account_id=$this->id;
 		$a->email=$email;
 		$a->name=$name;
 		$a->signature=$signature;
 		$a->default=$default;
+		$a->reply_to = $replyTo;
 		$a->save(true);
 
 		return $a;

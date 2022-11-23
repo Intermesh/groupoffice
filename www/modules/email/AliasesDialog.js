@@ -11,18 +11,15 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
  
-GO.email.AliasesDialog = function(config){	
-	if(!config)
-	{
-		config={};
-	}
-	
+GO.email.AliasesDialog = function(config) {
+	config = config || {};
+
 	this.aliasesGrid = new GO.email.AliasesGrid();
 		
 	config.layout='fit';
 	config.modal=false;
 	config.resizable=false;
-	config.width=500;
+	config.width=640;
 	config.height=400;
 	config.closeAction='hide';
 	config.title= t("Aliases", "email");					
