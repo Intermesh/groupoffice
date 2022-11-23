@@ -538,8 +538,19 @@ class Message extends \Swift_Message{
 			$alias = \GO\Email\Model\Alias::model()->findByPk($params['alias_id']);	
 			$this->setFrom($alias->email, $alias->name);
 			
-			if(!empty($params['notification']))
-				$this->setReadReceiptTo(array($alias->email=>$alias->name));
+			if(!empty($params['notification'])) {
+				$this->setReadReceiptTo(array($alias->email => $alias->name));
+			}
+
+			if (!empty($alias->reply_to)) {
+				$this->setReplyTo([$alias->reply_to => $alias->name]);
+			}
+
+			if(!$alias->default) {
+				$acct = GO\Email\Model\Account::load($alias->account_id);
+				$defaultAlias = $acct->getDefaultAlias();
+				$this->setReturnPath($defaultAlias->email);
+			}
 		}
 		
 		if(isset($params['priority']) && $params['priority'] != 3)
