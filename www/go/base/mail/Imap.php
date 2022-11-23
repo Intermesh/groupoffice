@@ -1633,6 +1633,19 @@ class Imap extends ImapBodyStruct
 		return $final_headers;
 	}
 
+	public function get_envelope(int $uid)
+	{
+		$this->get_message_part_start($uid, 'HEADER', true);
+		while ($line = trim($this->get_message_part_line())) {
+			if (!strpos($line, 'envelope-from')) {
+				continue;
+			}
+			if ($envelope = preg_replace('/\(envelope-from <(.*)>\)/', '$1', $line)) {
+				return $envelope;
+			}
+		}
+		return null;
+	}
 	/**
 	 * @param string $uidRange
 	 * @return array|false

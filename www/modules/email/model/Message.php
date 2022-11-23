@@ -321,7 +321,6 @@ abstract class Message extends \GO\Base\Model
 		$response['bcc'] = $recipientsAsString ? (string) $this->bcc :  $this->_convertRecipientArray($this->bcc->getAddresses());
 		$response['reply_to'] = (string) $this->reply_to;
 		$response['message_id'] = $this->message_id;
-		$response['date'] = $this->date;
 
 		$response['to_string'] = (string) $this->to;
 
@@ -329,6 +328,13 @@ abstract class Message extends \GO\Base\Model
 			$response['to'][] = array('email' => '', 'personal' => \GO::t("Undisclosed recipients", "email"));
 		}
 		$response['full_from'] = (string) $this->from;
+
+		if(isset($this->envelope) && $this->envelope !== $response['sender']) {
+			$response['has_envelope'] = true;
+			$response['envelope'] = $this->envelope;
+		} else {
+			$response['has_envelope'] = false;
+		}
 		$response['priority'] = intval($this->x_priority);
 		$response['udate'] = $this->udate;
 		$response['date'] = \GO\Base\Util\Date::get_timestamp($this->udate);

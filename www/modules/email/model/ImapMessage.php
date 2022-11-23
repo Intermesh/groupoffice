@@ -176,11 +176,17 @@ class ImapMessage extends ComposerMessage {
 
 			$attributes = $imap->get_message_header($uid, true);
 
-			if (!$attributes)
-				return false;
 
-			$attributes['uid']=$uid;
+			if (!$attributes) {
+				return false;
+			}
+
+			$attributes['uid'] = $uid;
 			$attributes['mailbox'] = $mailbox;
+
+			if($envelope = $imap->get_envelope($uid)) {
+				$attributes['envelope'] = $envelope;
+			}
 
 			$imapMessage->setAttributes($attributes);
 
@@ -207,8 +213,9 @@ class ImapMessage extends ComposerMessage {
 	}
 	
 	public function getAttributes($formatted=false){
-		if(!$formatted)
+		if(!$formatted) {
 			return $this->attributes;
+		}
 		
 		$attributes = $this->attributes;
 		

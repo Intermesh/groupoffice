@@ -49,8 +49,12 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<tr>'+
 
 			'<td style="width:70px"><b>'+t("From", "email")+'</b></td>'+
-
+			'<tpl if="has_envelope">'+
+			'<td>: {from} ' + t('on behalf of') + ' {envelope} &lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;">{sender}</a>&gt;</td>'+
+			'</tpl>'+
+			'<tpl if="!has_envelope">'+
 			'<td>: {from} &lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;">{sender}</a>&gt;</td>'+
+			'</tpl>' +
 
 			'</tr>'+
 			'<tr><td><b>'+t("Subject", "email")+'</b></td><td>: {subject}</td></tr>'+

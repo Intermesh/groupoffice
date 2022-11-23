@@ -1336,11 +1336,14 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		return $lines;
 	}
 
-	public function actionView($params)
+	/**
+	 * @param array $params
+	 * @return array|mixed
+	 * @throws AccessDenied
+	 * @throws NotFound
+	 */
+	public function actionView(array $params)
 	{
-//		Do not close session writing because SMIME stores the password in the session
-//		GO::session()->closeWriting();
-
 		$params['no_max_body_size'] = !empty($params['no_max_body_size']) && $params['no_max_body_size']!=='false' ? true : false;
 
 		$account = Account::model()->findByPk($params['account_id']);
@@ -1353,10 +1356,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$imapMessage) {
 			throw new NotFound();
 		}
-
-		//workaround for gmail. It doesn't flag messages as seen automatically.
-//		if (!$imapMessage->seen && stripos($account->host, 'gmail') !== false)
-//			$imapMessage->getImapConnection()->set_message_flag(array($imapMessage->uid), "\Seen");
 
 		if(!empty($params['create_temporary_attachments'])) {
 			$imapMessage->createTempFilesForAttachments();
