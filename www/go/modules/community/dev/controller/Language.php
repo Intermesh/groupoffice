@@ -1,6 +1,6 @@
 <?php
 
-namespace go\modules\community\dev	\controller;
+namespace go\modules\community\dev\controller;
 
 use go\core\cache\None;
 use go\core\Controller;
