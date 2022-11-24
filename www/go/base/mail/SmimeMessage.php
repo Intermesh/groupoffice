@@ -271,10 +271,10 @@ class SmimeMessage extends Message
 	public function __destruct(){
 		parent::__destruct();
 		
-		if(file_exists($this->tempout))
+		if(isset($this->tempout) && file_exists($this->tempout))
 			unlink($this->tempout);
 		
-		if(file_exists($this->tempin))
+		if(isset($this->tempin) && file_exists($this->tempin))
 			unlink($this->tempin);
 	} 
 }
