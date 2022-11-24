@@ -107,7 +107,7 @@ class Spreadsheet extends AbstractConverter {
 	 */
 	public static function supportedExtensions(): array
 	{
-		return ['csv', 'xlsx'];
+		return ['csv', 'xlsx', "html"];
 	}
 
 	protected function init()
@@ -130,12 +130,36 @@ class Spreadsheet extends AbstractConverter {
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
 
-		if($this->extension != 'csv') {
-			$this->spreadsheet = new PhpSpreadsheet();
-			$this->spreadSheetIndex = 1;
-		}else{
-			//add UTF-8 BOM char for excel to recognize UTF-8 in the CSV
-			fputs($this->fp, chr(239) . chr(187) . chr(191));
+		switch($this->extension) {
+			case'csv':
+				//add UTF-8 BOM char for excel to recognize UTF-8 in the CSV
+				fputs($this->fp, chr(239) . chr(187) . chr(191));
+			break;
+			case "html":
+				fputs($this->fp, "<html><body><style>
+body{
+	font: 14px Helvetica;
+}
+table{
+	border: 1px solid black;
+ 	border-collapse: collapse;
+ 	min-width: 100%; 	
+}
+td, th {
+  padding: 8px;
+}
+
+th {
+  text-align: left;
+  background-color: #f1f1f1;
+}
+</style><table border='1'>");
+				break;
+
+			default:
+				$this->spreadsheet = new PhpSpreadsheet();
+				$this->spreadSheetIndex = 1;
+				break;
 		}
 	}
 
@@ -153,10 +177,23 @@ class Spreadsheet extends AbstractConverter {
 		}
 	}
 
-	protected function writeRecord($array) {
-		if($this->extension == 'csv') {
-			fputcsv($this->fp, $array, $this->delimiter, $this->enclosure);
-		} else{
+	protected function writeRecord(array $array, bool $headers = false) {
+		switch($this->extension) {
+			case 'html':
+
+				if($headers) {
+					fputs($this->fp, "<tr><th>" . implode("</th><th>", array_map("htmlspecialchars", $array)) . "</th></tr>");
+				}else {
+					fputs($this->fp, "<tr><td>" . implode("</td><td>", array_map("htmlspecialchars", $array)) . "</td></tr>");
+				}
+
+				break;
+			case 'csv':
+				fputcsv($this->fp, $array, $this->delimiter, $this->enclosure);
+				break;
+			default:
+
+
 			$this->arrayToSpreadSheet($this->spreadSheetIndex++, $array);
 		}
 	}
@@ -165,7 +202,7 @@ class Spreadsheet extends AbstractConverter {
 	{
 
 		if ($this->index == 0) {
-			$this->writeRecord(array_column($this->getHeaders(), 'name'));
+			$this->writeRecord(array_column($this->getHeaders(), 'name'), true);
 		}
 
 		$headers = $this->getHeaders();
@@ -186,30 +223,38 @@ class Spreadsheet extends AbstractConverter {
 
 	protected function finishExport(): Blob
 	{
-		if($this->extension != 'csv') {
+		switch($this->extension) {
+			case 'html':
+				fputs($this->fp, "</table></body></html>");
+				break;
+			case 'csv':
 
-			$headerStyle = [
-				'font' => [
-					'bold' => true,
-					'color' => ['argb' => 'ffffff']
-				],
-				'fill' => [
-					// SOLID FILL
-					'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-					'color' => ['argb' => '0277bd']
-				]
-			];
-			foreach($this->spreadsheet->getActiveSheet()->getColumnIterator() as $col) {
-				$style = $this->spreadsheet->getActiveSheet()->getStyle($col->getColumnIndex() . "1");
-				$style->applyFromArray($headerStyle);
+				break;
+			default:
 
-				$colDim = $this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex());
-				$colDim->setAutoSize(true);
-			}
+				$headerStyle = [
+					'font' => [
+						'bold' => true,
+						'color' => ['argb' => 'ffffff']
+					],
+					'fill' => [
+						// SOLID FILL
+						'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+						'color' => ['argb' => '0277bd']
+					]
+				];
+				foreach($this->spreadsheet->getActiveSheet()->getColumnIterator() as $col) {
+					$style = $this->spreadsheet->getActiveSheet()->getStyle($col->getColumnIndex() . "1");
+					$style->applyFromArray($headerStyle);
 
-			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
-			$writer->setPreCalculateFormulas(false);
-			$writer->save($this->tempFile->getPath());
+					$colDim = $this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex());
+					$colDim->setAutoSize(true);
+				}
+
+				$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
+				$writer->setPreCalculateFormulas(false);
+				$writer->save($this->tempFile->getPath());
+				break;
 
 		}
 

@@ -460,6 +460,16 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 												'csv');
 										},
 										scope: this
+									},{
+										text: t("Web page") + ' (HTML)',
+										iconCls: 'filetype filetype-html',
+										handler: function() {
+											go.util.exportToFile(
+												'Task',
+												Object.assign(go.util.clone(this.taskGrid.store.baseParams), this.taskGrid.store.lastOptions.params, {limit: 0, position: 0}),
+												'html');
+										},
+										scope: this
 									}
 								]
 							},

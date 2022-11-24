@@ -582,7 +582,7 @@ go.util =  (function () {
 			})
 		}
 
-		if(extension == 'csv' || extension == 'xlsx') {
+		if(extension == 'csv' || extension == 'xlsx' || extension == 'html') {
 			const win = new go.import.ColumnSelectDialog({
 				entity: entity,
 				handler: doExport,
