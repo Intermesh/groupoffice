@@ -236,7 +236,7 @@ class Net_Sieve
             }
         }
 
-        if (strlen($user) && strlen($pass)) {
+        if (!empty($user) && !empty($pass)) {
             $this->_error = $this->_handleConnectAndLogin();
         }
     }
@@ -1269,7 +1269,7 @@ class Net_Sieve
     /**
      * Write debug text to the current debug output handler.
      *
-     * @param StringHelper $message Debug message text.
+     * @param string $message Debug message text.
      *
      * @return void
      */
