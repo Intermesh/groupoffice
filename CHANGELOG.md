@@ -1,3 +1,6 @@
+24-11-2022 6.6.135
+- Calendar: tasklist_id cannot be null error on user create.
+
 22-11-2022 6.6.134
 - Email: Error in /usr/local/share/src/www/modules/files/controller/FileController.php at line 362: Call to a member function delete() on bool
 
