@@ -96,6 +96,7 @@ CREATE TABLE IF NOT EXISTS `em_aliases` (
   `reply_to` varchar(100) DEFAULT NULL,
   `signature` text,
   `default` BOOLEAN NOT NULL DEFAULT '0',
+  `force_envelope_sender` BOOLEAN NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `account_id` (`account_id`)
 ) ENGINE=InnoDB ;

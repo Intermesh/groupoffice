@@ -97,7 +97,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes)
 	{
 		if (empty($params['id'])) {
-			$model->addAlias($params['email'], $params['name'], $params['signature'], 1, $params['reply_to']);
+			$model->addAlias($params['email'], $params['name'], $params['signature'], 1, $params['reply_to'], 0);
 		} else {
 			$alias = $model->getDefaultAlias();
 			$alias->name = $params['name'];
@@ -108,6 +108,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 
 			$alias->signature = $params['signature'];
 			$alias->reply_to = $params['reply_to'];
+			$alias->force_envelope_sender = isset($params['force_envelope_sender']) ? $params['force_envelope_sender']: 0;
 			$alias->save();
 		}
 

@@ -500,38 +500,42 @@ class Message extends \Swift_Message{
 	public function countRecipients(){
 		return count($this->getTo() ?? []) + count($this->getCc() ?? []) + count($this->getBcc() ?? []);
 	}
-	
+
 	/**
 	 * handleEmailFormInput
-	 * 
-
+	 *
 	 * This method can be used in Models and Controllers. It puts the email body
 	 * and inline (image) attachments from the client in the message, which can
 	 * then be used for storage in the database or sending emails.
-	 * 
+	 *
 	 * @param Array $params Must contain elements: body (string) and
-	 * 
+	 *
 	 * inlineAttachments (string).
+	 * @throws Exception
 	 */
-	public function handleEmailFormInput($params){
-		
-		if(!empty($params['subject']))
-			$this->setSubject($params['subject']);		
+	public function handleEmailFormInput(array $params)
+	{
+		if(!empty($params['subject'])) {
+			$this->setSubject($params['subject']);
+		}
 		
 		if(!empty($params['to'])){		
 			$to = new EmailRecipients($params['to']);
-			foreach($to->getAddresses() as $email=>$personal)
-				$this->addTo($email,$personal);
+			foreach($to->getAddresses() as $email=>$personal) {
+				$this->addTo($email, $personal);
+			}
 		}
 		if(!empty($params['cc'])){		
 			$cc = new EmailRecipients($params['cc']);
-			foreach($cc->getAddresses() as $email=>$personal)
-				$this->addCc($email,$personal);
+			foreach($cc->getAddresses() as $email=>$personal) {
+				$this->addCc($email, $personal);
+			}
 		}
 		if(!empty($params['bcc'])){		
 			$bcc = new EmailRecipients($params['bcc']);
-			foreach($bcc->getAddresses() as $email=>$personal)
-				$this->addBcc($email,$personal);
+			foreach($bcc->getAddresses() as $email=>$personal) {
+				$this->addBcc($email, $personal);
+			}
 		}
 		
 		if(isset($params['alias_id'])){
@@ -546,26 +550,24 @@ class Message extends \Swift_Message{
 				$this->setReplyTo([$alias->reply_to => $alias->name]);
 			}
 
-			if(!$alias->default) {
+			if ($alias->force_envelope_sender) {
 				$acct = GO\Email\Model\Account::load($alias->account_id);
 				$defaultAlias = $acct->getDefaultAlias();
 				$this->setReturnPath($defaultAlias->email);
 			}
 		}
 		
-		if(isset($params['priority']) && $params['priority'] != 3)
-			$this->setPriority ($params['priority']);
-		
-		
+		if(isset($params['priority']) && $params['priority'] != 3) {
+			$this->setPriority($params['priority']);
+		}
+
 		if(isset($params['in_reply_to'])){
 			$headers = $this->getHeaders();
 			$headers->addTextHeader('In-Reply-To', $params['in_reply_to']);
 			$headers->addTextHeader('References', $params['in_reply_to']);
 		}	
 
-		if($params['content_type']=='html'){
-			
-						
+		if($params['content_type']=='html') {
 			$params['htmlbody'] = $this->_embedPastedImages($params['htmlbody']);
 			
 			//inlineAttachments is an array(array('url'=>'',tmp_file=>'relative/path/');
@@ -575,7 +577,7 @@ class Message extends \Swift_Message{
 				/* inline attachments must of course exist as a file, and also be used in
 				 * the message body
 				 */
-				 if(count($inlineAttachments)){
+				 if(count($inlineAttachments)) {
 					foreach ($inlineAttachments as $ia) {
 
 						//$tmpFile = new \GO\Base\Fs\File(\GO::config()->tmpdir.$ia['tmp_file']);
@@ -653,8 +655,7 @@ class Message extends \Swift_Message{
 					$this->attach($file);
 					
 					//$tmpFile->delete();
-				}else
-				{
+				} else {
 					throw new \Exception("Error: attachment missing on server: ".$tmpFile->stripTempPath().".<br /><br />The temporary files folder is cleared on each login. Did you relogin?");
 				}
 			}

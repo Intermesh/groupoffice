@@ -515,7 +515,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 	}
 
 
-	public function addAlias(string $email, string $name, string $signature='', ?int $default=1, ?string $replyTo = null): Alias
+	public function addAlias(string $email, string $name, string $signature='', ?int $default=1, ?string $replyTo = null, ?int $forceEnvelopeSender=0): Alias
 	{
 		$a = new Alias();
 		$a->account_id=$this->id;
@@ -524,6 +524,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 		$a->signature=$signature;
 		$a->default=$default;
 		$a->reply_to = $replyTo;
+		$a->force_envelope_sender = $forceEnvelopeSender;
 		$a->save(true);
 
 		return $a;

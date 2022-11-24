@@ -55,10 +55,16 @@ GO.email.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 				allowBlank: true,
 				fieldLabel : t("Reply to", "email")
 			}, {
+				xtype : 'xcheckbox',
+				name : 'force_envelope_sender',
+				anchor : '100%',
+				allowBlank: true,
+				boxLabel : t("Force envelope sender", "email"),
+			}, {
 				xtype : 'textarea',
 				name : 'signature',
 				anchor : '100%',
-				height:150,
+				height: 150,
 				fieldLabel : t("Signature", "email")
 			}]
 		});
