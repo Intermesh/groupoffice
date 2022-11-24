@@ -19,8 +19,6 @@ return array (
   'Invalid code' => 'Ongeldige code',
   'Secret' => 'Geheim',
   'Verify' => 'Verifiëren',
-  'Enable OTP Authenticator' => 'OTP Authenticator inschakelen',
-  'Disable OTP Authenticator' => 'OTP Authenticator uitschakelen',
   'Provide your current password before you can enable OTP Authenticator.' => 'Voer uw huidige wachtwoord in om OTP Authenticator in te schakelen',
   'Scan the QR code below with the OTP Authenticator app on your mobile device, after that fill in the field below with the code generated in the app.' => 'Scan de QR code hieronder met de OTP of OTP Authenticator App op uw mobiele telefoon. Voer daarna de code in om te bevestigen.',
   'Setup later' => 'Stel later in',
