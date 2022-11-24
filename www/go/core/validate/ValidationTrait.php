@@ -14,7 +14,7 @@ trait ValidationTrait {
 	 * @return boolean
 	 */
 	public final function validate() {
-
+		$this->validationErrors = [];
 		$this->internalValidate();
 
 		return !$this->hasValidationErrors();

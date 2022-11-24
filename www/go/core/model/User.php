@@ -813,7 +813,7 @@ class User extends Entity {
 				$personalGroup->users[] = $this->id;
 
 				if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
-					throw new \Exception($personalGroup);
+					throw new \Exception('Could not create homegroup '.$personalGroup->name);
 				}
 
 				$this->personalGroup = $personalGroup;
@@ -822,7 +822,7 @@ class User extends Entity {
 				if ($this->isModified('username')) {
 					$personalGroup->name = $this->username;
 					if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
-						throw new \Exception($personalGroup);
+						throw new \Exception('Could not change homegroup '.$personalGroup->name);
 					}
 				}
 			}
