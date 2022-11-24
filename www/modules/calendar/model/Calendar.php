@@ -105,7 +105,7 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 		if(Module::get()->isInstalled()) {
 			$coreUser = User::findById($user->id, ['tasksSettings']);
 
-			$this->tasklist_id = $coreUser->tasksSettings->getDefaultTasklistId();
+			$this->tasklist_id = $coreUser->tasksSettings->getDefaultTasklistId() ?? 0;
 		}
 		return parent::setDefaultAttributes($user, $feedback);
 	}
