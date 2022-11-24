@@ -1,3 +1,6 @@
+24-11-2022 6.7.3
+- Core: small fixes and Dutch translation
+
 24-11-2022 6.6.135
 - Calendar: tasklist_id cannot be null error on user create.
 
