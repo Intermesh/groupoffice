@@ -1337,4 +1337,5 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Your session is no longer valid. Press OK to authenticate.' => 'Uw sessie is niet meer geldig. Druk op OK om opnieuw te authentificeren.',
   'File size exceeds the maximum of {max}.' => 'Het bestand is groter dan het maximum van {max}.',
   'Show on tab' => 'Toon op tab',
+	"This field is required" => "Dit veld is vereist"
 );
