@@ -12,6 +12,7 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 		this.on("focus", function () {
 			if (this.nameMenuEnabled) {
 				this.nameMenu.show(this.getEl());
+				this.buildFullName();
 			}
 		}, this);
 		
