@@ -1633,19 +1633,30 @@ class Imap extends ImapBodyStruct
 		return $final_headers;
 	}
 
+	/**
+	 * Try to distill the envelope-from address from the full headers
+	 *
+	 * @param int $uid
+	 * @return array|string|string[]|null
+	 */
 	public function get_envelope(int $uid)
 	{
-		$this->get_message_part_start($uid, 'HEADER', true);
-		while ($line = trim($this->get_message_part_line())) {
+		$headers = $this->get_message_part($uid, 'HEADER', true);
+		$lines = preg_split('/[\r\n\t]+/', $headers);
+		$envelope = null;
+		foreach($lines as $line) {
+			$line = trim($line);
 			if (!strpos($line, 'envelope-from')) {
 				continue;
 			}
-			if ($envelope = preg_replace('/\(envelope-from <(.*)>\)/', '$1', $line)) {
-				return $envelope;
-			}
+			$envelope = preg_replace('/\(envelope-from <(.*)>\)/', '$1', $line);
+			break;
 		}
-		return null;
+
+		return $envelope;
 	}
+
+
 	/**
 	 * @param string $uidRange
 	 * @return array|false
