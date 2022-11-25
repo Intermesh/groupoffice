@@ -22,7 +22,7 @@ GO.mainLayout.on('authenticated', function() {
 
 							const form = this.findParentByType("form").form,
 								descriptionField = form.findField('description'),
-								jitsiLink = meetUri+(Math.random() + 1).toString(36).substring(2);
+								jitsiLink = meetUri + btn._jitsiRoom;
 
 							const desc = descriptionField.getValue();
 							descriptionField.setValue((desc ? desc + "\n" : "") + t("Online meeting link", "jitsimeet") + ":\n\n" + jitsiLink + "\n\n");
@@ -38,8 +38,9 @@ GO.mainLayout.on('authenticated', function() {
 
 			}),
 			setData : GO.calendar.EventDialog.prototype.setData.createSequence(function(action){
-				//console.log(action.result.data.jitsiMeet);
 				this.jitsiButton.setDisabled(action.result.data.jitsiMeet);
+				//I am sure there is a better place to store this - but I dont know the framework well enough:
+				this.jitsiButton._jitsiRoom = action.result.data.jitsiRoom;
 			})
 
 		});
