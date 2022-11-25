@@ -9,6 +9,7 @@ use go\core\fs\File;
 use go\core\model\Acl;
 use go\core\model\Field;
 use go\core\model\FieldSet;
+use go\core\model\ImportMapping;
 use go\core\orm\Entity;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
@@ -643,8 +644,13 @@ th {
 
 	private function saveMapping(array $headers) {
 		$checkSum = md5(implode(",", array_map("trim", $headers)));
+		$entityClass = $this->entityClass;
 
-		go()->getCache()->set("mapping-" . $checkSum, $this->clientParams['mapping']);
+
+		$mapping = ImportMapping::findOrCreate($entityClass::entityType()->getId() . "-" . $checkSum);
+		$mapping->setMap($this->clientParams['mapping']);
+		$mapping->updateBy =$this->updateBy;
+		$mapping->save();
 
 	}
 

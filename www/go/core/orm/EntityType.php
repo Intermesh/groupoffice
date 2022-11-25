@@ -482,7 +482,7 @@ class EntityType implements ArrayableInterface {
 	 */
 	public static function push(int $minChanges = 1) {
 
-		if(count(self::$changes) < $minChanges) {// && empty(self::$changeQueries)) {
+		if(count(self::$changes) < $minChanges) {
 			return;
 		}
 

@@ -16,6 +16,7 @@ use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
+use go\core\model\ImportMapping;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
@@ -1077,7 +1078,11 @@ abstract class EntityController extends Controller {
 		$response['csvHeaders'] = $converter->getCsvHeaders($file);
 
 		$checkSum = md5(implode(',', array_map("trim", $response['csvHeaders'])));
-		$response['mapping'] = go()->getCache()->get("mapping-" . $checkSum);
+		$entityClass = $this->entityClass();
+		$mapping = ImportMapping::findById($entityClass::entityType()->getId() . "-" . $checkSum);
+
+		$response['mapping'] = $mapping ? $mapping->getMap() : null;
+		$response['updateBy'] = $mapping ? $mapping->updateBy : null;
 		
 		if(!$response) {
 			throw new Exception("Invalid response from import convertor");

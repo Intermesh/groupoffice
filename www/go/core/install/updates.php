@@ -1288,3 +1288,19 @@ $updates['202211251153'][] = "alter table core_auth_remember_me
     add constraint core_auth_remember_me_core_user_id_fk
         foreign key (userId) references core_user (id)
             on delete cascade;";
+
+
+$updates['202211251153'][] = "create table core_import_mapping
+(
+	entityTypeId int                        null,
+    checksum     char(32) collate ascii_bin null,
+    mapping      text                       null,
+    updateBy     varchar(100) default null  null,
+    constraint core_import_mapping_core_entity_null_fk
+        foreign key (entityTypeId) references core_entity (id)
+            on delete cascade
+)";
+
+$updates['202211251153'][] = "alter table core_import_mapping
+    add constraint core_import_mapping_pk
+        primary key (entityTypeId, checksum);";

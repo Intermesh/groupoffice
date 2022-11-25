@@ -71,6 +71,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 
 				if(response.mapping) {
 					this.formPanel.form.setValues(response.mapping);
+					this.formPanel.form.setValues({updateBy: response.updateBy});
 				} else {
 					var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
 					Ext.apply(v, this.findAliases());

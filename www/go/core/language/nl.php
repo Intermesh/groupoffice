@@ -1261,7 +1261,7 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Create new preset' => 'Sla deze set velden op',
   'Please enter a name' => 'Voer een naam in ',
   'Import Comma Separated values' => 'Importeer door komma gescheiden waarden (CSV)',
-  'Don\'t update' => 'Nieuw bijwerken',
+  'Don\'t update' => 'Niet bijwerken',
   'Update existing items by' => 'Bestaande items bijwerken op basis van',
   'Fixed value' => 'Vaste waarde',
   'Imported {count} items' => '{count} items geïmporteerd',
@@ -1337,5 +1337,6 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Your session is no longer valid. Press OK to authenticate.' => 'Uw sessie is niet meer geldig. Druk op OK om opnieuw te authentificeren.',
   'File size exceeds the maximum of {max}.' => 'Het bestand is groter dan het maximum van {max}.',
   'Show on tab' => 'Toon op tab',
-	"This field is required" => "Dit veld is vereist"
+	"This field is required" => "Dit veld is vereist",
+	"Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue." => "Koppel de CSV kolommen met de juiste Group-Office kolommen en druk om 'Importeren' om verder te gaan."
 );
