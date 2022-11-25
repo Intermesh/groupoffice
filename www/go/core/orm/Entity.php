@@ -1009,7 +1009,7 @@ abstract class Entity extends Property {
 		$columns = static::textFilterColumns();
 
 		if(static::useSearchableTraitForSearch($query)) {
-			SearchableTrait::addCriteria( $criteria, $query, $expression);
+			static::addCriteria( $criteria, $query, $expression);
 			return $criteria;
 		}
 

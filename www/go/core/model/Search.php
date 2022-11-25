@@ -189,7 +189,7 @@ class Search extends AclOwnerEntity {
 							
 						})
 						->add('text', function(Criteria $criteria, $value, Query $query) {
-							SearchableTrait::addCriteria( $criteria, $query, $value);
+							static::addCriteria( $criteria, $query, $value);
 						});					
 	}
 

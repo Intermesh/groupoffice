@@ -609,16 +609,19 @@ END;
 	 * 1234
 	 * 234
 	 *
-	 * this is faster then searchgin for
+	 * this is faster then searching for
 	 *
 	 * %234 because it can't use an index
 	 *
-	 * @param string|int $number
+	 * @param string|int|null $number
 	 * @param int $minSearchLength
 	 * @return array
 	 */
 	public static function numberToKeywords($number, int $minSearchLength = 3): array
 	{
+		if(!isset($number)) {
+			return [];
+		}
 		$keywords = [$number];
 
 		while (strlen($number) > $minSearchLength) {
