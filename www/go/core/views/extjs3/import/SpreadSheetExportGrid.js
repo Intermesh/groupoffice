@@ -9,6 +9,8 @@ go.import.SpreadSheetExportGrid = Ext.extend(go.grid.GridPanel, {
 
 	multiSelectToolbarEnabled: false,
 
+	scrollLoader: false,
+
 	entityStore: null,
 
 	extension: "csv",
