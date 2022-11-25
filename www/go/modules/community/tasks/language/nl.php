@@ -60,7 +60,6 @@ return array (
   'Completed tasks' => 'Volotooide taken',
   'You were assigned to this task by {assignedBy}' => 'Deze taak is aan u toegewezen door {assignedBy}',
   'Visible tasklists' => 'Zichtbare takenlijsten',
-  'In Progress' => 'Bezig',
   'Display options for tasklists' => 'Weergave instellingen voor takenlijsten',
   'Default tasklist' => 'Standaard takenlijst',
   'Remember last selected tasklist' => 'Onthoud mijn laatst geselecteerde takenlijsten',

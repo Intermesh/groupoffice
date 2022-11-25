@@ -4,7 +4,7 @@ go.modules.community.tasks.ProgressCombo = Ext.extend(go.form.SelectField,{
 	options : [
 			['completed', t("Completed")],
 			['failed', t("Failed")],
-			['in-progress', t("In Progress")],
+			['in-progress', t("In progress")],
 			['needs-action', t("Needs action")],
 			['cancelled', t("Cancelled")]
 		]
