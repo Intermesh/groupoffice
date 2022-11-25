@@ -763,8 +763,10 @@ th {
 	
 	protected function importCustomColumns(Entity $entity, $values){
 		foreach($this->customColumns as $c) {
-			call_user_func_array( $c['importFunction'], [$entity, $values[$c['name']] ?? null, &$values, $c['name']]);
-			unset($values[$c['name']]);
+			if(isset($values[$c['name']])) {
+				call_user_func_array($c['importFunction'], [$entity, $values[$c['name']], &$values, $c['name']]);
+				unset($values[$c['name']]);
+			}
 		}
 		return $values;
 	}
