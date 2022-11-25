@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS `dav_events`;
 CREATE TABLE IF NOT EXISTS `dav_events` (
   `id` int(11) NOT NULL,
   `mtime` int(11) NOT NULL,
-  `data` text NOT NULL,
+  `data` MEDIUMTEXT NOT NULL,
   `uri` varchar(512) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `uri` (`uri`)

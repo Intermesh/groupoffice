@@ -184,6 +184,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 		// if(go.Entities.get(this.entityStore).customFields) {
 			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
 			fieldsets.forEach(function(fs) {
+				if(fs.fieldSet.permissionLevel <= 10) {
+					return;
+				}
 				if(fs.fieldSet.isTab) {
 					fs.title = null;
 					fs.collapsible = false;

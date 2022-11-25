@@ -416,7 +416,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														//starred: {label: t("Starred")},
 
 														"emailAddresses": {
-															label: t("E-mail address"),
+															label: t("E-mail addresses"),
 															properties: {
 																"email": {label: "E-mail"},
 																"type": {label: t("Type")}
@@ -499,6 +499,16 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														'Contact',
 														Object.assign(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, position: 0}),
 														'csv');
+									},
+									scope: this
+								},{
+									text: t("Web page") + " (HTML)",
+									iconCls: 'filetype filetype-html',
+									handler: function() {
+										go.util.exportToFile(
+											'Contact',
+											Object.assign(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, position: 0}),
+											'html');
 									},
 									scope: this
 								},

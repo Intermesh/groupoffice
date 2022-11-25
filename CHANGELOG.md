@@ -1,3 +1,11 @@
+- Core: export to web page (html)
+- Fixed: dav_event sql data column too small #916
+- Fixed: core_auth_remember_me foreign key error #913
+- Fixed: Addressbook CSV import bug #902
+- Fixed: Semaphore buildup due to faulty unlock #901
+- Fixed: 6.6.128 - PHP8.1 complains about loosing precision #907
+
+
 24-11-2022 6.7.3
 - Core: small fixes and Dutch translation
 

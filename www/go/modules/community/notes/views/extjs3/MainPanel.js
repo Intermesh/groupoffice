@@ -293,6 +293,21 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							},
 							scope: this
 						},{
+							text: t("Web page") + " (HTML)",
+							iconCls: 'filetype filetype-html',
+							handler: function() {
+								go.util.exportToFile(
+									'Note',
+									Object.assign(go.util.clone(this.noteGrid.store.baseParams), this.noteGrid.store.lastOptions.params, {
+										limit: 0,
+										position: 0
+									}),
+									'html');
+							},
+							scope: this
+						},
+
+							{
 							iconCls: 'filetype filetype-json',
 							text: 'JSON',
 							handler: function() {

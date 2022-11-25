@@ -1155,7 +1155,9 @@ create index core_auth_remember_me_series_index
 
 alter table core_auth_remember_me
     add constraint core_auth_remember_me_core_user_id_fk
-        foreign key (userId) references core_user (id);
+        foreign key (userId) references core_user (id)
+            on delete cascade;
+
 CREATE TABLE `core_permission` (
   `moduleId` INT NOT NULL,
   `groupId` INT NOT NULL,

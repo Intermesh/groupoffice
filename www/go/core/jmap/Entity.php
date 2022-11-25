@@ -338,7 +338,7 @@ abstract class Entity  extends OrmEntity {
 			foreach($classes as $cls) {
 			  $query = $cls::find();
         $query->where('id', 'IN', $ids);
-        $this->changesQuery($query, $cls);
+        static::changesQuery($query, $cls);
 			}			
 		}
 	}
@@ -358,7 +358,7 @@ abstract class Entity  extends OrmEntity {
       $aclAlias = $cls::joinAclEntity($query);
       $query->select($aclAlias, true);
     } else if(is_a($cls, AclOwnerEntity::class, true)) {
-      $query->select($cls::$aclColumnName, true);
+      $query->select($query->getTableAlias() . "." . $cls::$aclColumnName, true);
     } else{
       $query->select('NULL AS aclId', true);
     }
