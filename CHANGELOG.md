@@ -1,6 +1,8 @@
 - Core: export to web page (html)
 - Fixed: dav_event sql data column too small #916
 - Fixed: core_auth_remember_me foreign key error #913
+- Fixed: Addressbook CSV import bug #902
+- Fixed: Semaphore buildup due to faulty unlock #901
 
 24-11-2022 6.6.135
 - Calendar: tasklist_id cannot be null error on user create.
