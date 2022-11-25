@@ -1,4 +1,5 @@
 - Core: export to web page (html)
+- Fixed: dav_event sql data column too small #916
 
 24-11-2022 6.6.135
 - Calendar: tasklist_id cannot be null error on user create.
