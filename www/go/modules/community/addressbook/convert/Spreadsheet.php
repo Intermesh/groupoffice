@@ -94,7 +94,7 @@ class Spreadsheet extends convert\Spreadsheet {
 	 * List headers to exclude
 	 * @var string[]
 	 */
-	public static $excludeHeaders = ['addressBookId', 'goUserId', 'vcardBlobId', 'uri'];
+	public static $excludeHeaders = ['addressBookId', 'goUserId', 'vcardBlobId', 'uri', 'organizationIds'];
 	
 	protected function init() {
 		parent::init();

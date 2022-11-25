@@ -476,12 +476,13 @@ class EntityType implements ArrayableInterface {
 	 * We do it like this so these entries are written outside of transactions. Otherwise
 	 * this will lead to concurrency problems with deadlocks in mysql.
 	 *
+	 * @param int $minChanges Only do it if there are more changes than this number
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function push() {
+	public static function push(int $minChanges = 1) {
 
-		if(empty(self::$changes)) {// && empty(self::$changeQueries)) {
+		if(count(self::$changes) < $minChanges) {// && empty(self::$changeQueries)) {
 			return;
 		}
 

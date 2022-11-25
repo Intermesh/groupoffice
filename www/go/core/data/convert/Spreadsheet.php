@@ -739,8 +739,6 @@ th {
 
 		$entityClass = $this->entityClass;
 
-
-
 		$entity = false;
 		//lookup entity by id if given
 		if($this->updateBy == 'id' && !empty($values['id'])) {
@@ -748,6 +746,8 @@ th {
 			if($entity && $entity->getPermissionLevel() < Acl::LEVEL_WRITE) {
 				$entity = false;
 			}
+		} elseif(!empty($this->updateBy) && !empty($values[$this->updateBy])) {
+			$entity = $entityClass::find()->where($this->updateBy,'=', $values[$this->updateBy])->single();
 		}
 		if(!$entity) {
 			$entity = new $entityClass;

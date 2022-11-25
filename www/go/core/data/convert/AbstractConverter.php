@@ -193,8 +193,8 @@ abstract class AbstractConverter {
 
 				$entity->save();
 
-				//push changes after each user
-				EntityType::push();
+				//push changes after each 100 imports
+				EntityType::push(100);
 
 				if($entity->hasValidationErrors()) {
 					$response['errors'][] = "Item ". $this->index . ": ". var_export($entity->getValidationErrors(), true);
