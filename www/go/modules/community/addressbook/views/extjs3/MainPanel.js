@@ -419,7 +419,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														//starred: {label: t("Starred")},
 
 														"emailAddresses": {
-															label: t("E-mail address"),
+															label: t("E-mail addresses"),
 															properties: {
 																"email": {label: "E-mail"},
 																"type": {label: t("Type")}
