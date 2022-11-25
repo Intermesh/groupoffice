@@ -1219,6 +1219,7 @@ class StringHelper {
 		// Generate array of allowable characters.
 		$characters_allow = explode(',', $characters_allow);
 
+		$array_allow = [];
 		for ($i = 0; $i < count($characters_allow); $i ++) {
 			if (substr_count($characters_allow[$i], '-') > 0) {
 				$character_range = explode('-', $characters_allow[$i]);
@@ -1233,7 +1234,7 @@ class StringHelper {
 
 		// Generate array of disallowed characters.
 		$characters_disallow = explode(',', $characters_disallow);
-
+		$array_disallow = [];
 		for ($i = 0; $i < count($characters_disallow); $i ++) {
 			if (substr_count($characters_disallow[$i], '-') > 0) {
 				$character_range = explode('-', $characters_disallow[$i]);
