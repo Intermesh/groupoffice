@@ -7,6 +7,8 @@
 - Jitsi: Add JWT capability to jitsimeet module #900
 - Files: Add event listeners
 - Core: retrieve maximum of 50 alerts
+- Email: Feature request: Save to drafts #851
+- Calendar: Description got lost on exceptions
 
 24-11-2022 6.6.135
 - Calendar: tasklist_id cannot be null error on user create.
