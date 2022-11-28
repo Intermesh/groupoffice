@@ -194,6 +194,7 @@ abstract class AbstractJsonController extends AbstractController {
 		if (!empty($title)) {
 			$response['title'] = $title;
 		}
+		$this->fireEvent('afterRenderStore', [&$response]);
 
 		return new \GO\Base\Data\JsonResponse($response);
 	}
@@ -252,13 +253,9 @@ abstract class AbstractJsonController extends AbstractController {
 	}
 
 	public function run($action = '', $params = array(), $render = true, $checkPermissions = true) {
-		if (empty($action))
+		if (empty($action)) {
 			$action = $this->defaultAction;
-
-//		$this->fireEvent($action, array(
-//			&$this,
-//			&$params
-//		));
+		}
 
 		$response = parent::run($action, $params, $render, $checkPermissions);
 
@@ -281,8 +278,9 @@ abstract class AbstractJsonController extends AbstractController {
 		$response['remoteComboTexts'] = array();
 
 		foreach ($combofields as $property => $map) {
-			if (is_numeric($property))
+			if (is_numeric($property)) {
 				throw new \Exception("remoteComboFields() must return a key=>value array.");
+			}
 
 			try {
 				eval('$value = ' . $map . ';');

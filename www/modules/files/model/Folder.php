@@ -135,69 +135,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function deriveCustomfieldSettings(Folder $from) {
 		return true;
-		
-//		if(!\GO::modules()->isInstalled('customfields')) {
-//			return true;
-//		}
-//		
-//		$success = true;
-//		//cleanup
-//		$enabledCategories = \GO\Customfields\Model\EnabledCategory::model()->findByAttributes(array(
-//			'model_name'=>'GO\Files\model\File',
-//			'model_id'=>$this->id
-//		));
-//		$enabledCategories->callOnEach('delete');
-//		//find
-//		$disableCategories = \GO\Customfields\Model\DisableCategories::model()->findByPk(array(
-//			'model_id'=>$this->id,
-//			'model_name'=>'GO\Files\model\File'
-//		));
-//		
-//		if(!\GO\Customfields\Model\DisableCategories::isEnabled('GO\Files\model\File', $from->id)) {
-//			
-//			if(!empty($disableCategories)) { //clean me when $from is not active
-//				
-//				$success = $disableCategories->delete();
-//			}
-//			return $success;
-//		} 
-//		
-//		if(empty($disableCategories)) {
-//			$disableCategories = new \GO\Customfields\Model\DisableCategories();
-//			$disableCategories->model_name='GO\Files\model\File';
-//			$disableCategories->model_id=$this->id;
-//			$success = $disableCategories->save() && $success;
-//		}
-//		$parentCategories = \GO\Customfields\Model\EnabledCategory::model()->findByAttributes(array(
-//			'model_name'=>'GO\Files\model\File',
-//			'model_id'=>$from->id
-//		));
-//		//create
-//		foreach($parentCategories as $category){
-//			$enabled = $category->duplicate(array('model_id'=>$this->id));
-//			$success = $enabled->save() && $success;
-//		}
-//		return $success;
+
 	}
 	
 	public function recursivlyApplyCustomfieldSettings() {
 		
 		return true;
-		
-//		if(!\GO::modules()->isInstalled('customfields')) {
-//			return true;
-//		}
-//		
-//		$ids = $this->getSubFolderIds();
-//		foreach($ids as $subfolder_id) {
-//			if($subfolder_id==$this->id) {
-//				continue; //skip
-//			}
-//			$subfolder = Folder::model()->findByPk($subfolder_id);
-//			$subfolder->deriveCustomfieldSettings($this);
-//			$subfolder->recursiveApplyCustomFieldCategories = true;
-//			$subfolder->save();
-//		}
 	}
 
 	/**
