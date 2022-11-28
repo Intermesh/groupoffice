@@ -9,6 +9,7 @@
 - Core: retrieve maximum of 50 alerts
 - Email: Feature request: Save to drafts #851
 - Calendar: Description got lost on exceptions
+- Email: remove linked item from message panel
 
 24-11-2022 6.6.135
 - Calendar: tasklist_id cannot be null error on user create.
