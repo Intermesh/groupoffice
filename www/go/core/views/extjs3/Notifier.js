@@ -3,7 +3,7 @@
 	function setInteracted(e) {
 
 		if(e instanceof KeyboardEvent) {
-			var keyCode = e.which ? e.which : e.keyCode;
+			const keyCode = e.which ? e.which : e.keyCode;
 
 			if(keyCode == 18 || keyCode == 91 || keyCode == 17|| keyCode == 16|| keyCode == 20) {
 				return;
@@ -20,7 +20,7 @@
 	window.addEventListener("click", setInteracted);
 	window.addEventListener("keydown", setInteracted);
 
-	var Notifier = Ext.extend(Ext.util.Observable, {
+	let Notifier = Ext.extend(Ext.util.Observable, {
 
 		constructor: function() {
 
@@ -38,7 +38,7 @@
 		notificationArea: null,
 		init: function(notificationArea) {
 
-			var me = this;
+			let me = this;
 
 			this.messageCt = Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true);
 
@@ -46,7 +46,7 @@
 
 			this.addStatusIcon('upload', 'ic-file-upload');
 			this.statusBar = new Ext.Container({applyTo: "status-bar", hidden:!this.showStatusBar});
-			for(var key in this._icons) {
+			for(const key in this._icons) {
 				this.statusBar.add(this._icons[key]);
 			}
 			this.statusBar.doLayout();
@@ -84,7 +84,7 @@
 				}
 				return;
 			}
-			for(var icon in this._icons) {
+			for(const icon in this._icons) {
 				if(!this._icons[icon].hidden) return;
 			}
 			this.statusBar.hide();
@@ -162,7 +162,7 @@
 			//msg.renderTo = this.messageCt;
 			msg.html = msg.description || msg.html || msg.body; // backward compat
 
-			var msgPanel = Ext.create(msg, "panel");
+			let msgPanel = Ext.create(msg, "panel");
 
 			if(!msgPanel.tools || !msgPanel.getTool('close')) {
 				msgPanel.addTool({
@@ -290,7 +290,7 @@
 		},
 
 		hasMessages: function() {
-			for(var id in this._messages) {
+			for(let id in this._messages) {
 				return true;
 			}
 			return false;
@@ -330,7 +330,7 @@
 		},
 
 		removeAll : function() {
-			for(var id in this._messages) {
+			for(const id in this._messages) {
 				if(!this._messages[id].persistent) {
 					this.remove(this._messages[id]);
 				}
@@ -364,7 +364,7 @@
 					return;
 				}
 
-				var title = msg.title || t("Reminders");
+				const title = msg.title || t("Reminders");
 
 				msg.icon = msg.icon || GO.settings.config.full_url + 'views/Extjs3/themes/Paper/img/notify/reminder.png';
 				msg.body = msg.description || msg.body;
@@ -384,7 +384,7 @@
 							});
 							break;
 						case 'granted':
-							var notification = new Notification(title,msg);
+							let notification = new Notification(title,msg);
 					}
 				} catch (e) {
 					/* ignore failure on mobiles */
@@ -435,9 +435,9 @@
 			}
 			msg.renderTo = this.messageCt;
 			msg.html = msg.description; // backward compat
-			var msgCtr = new Ext.Panel(msg);
+			let msgCtr = new Ext.Panel(msg);
 
-			var me = this;
+			let me = this;
 			if (msg.time) {
 				setTimeout(function () {
 					me.remove(msgCtr);

@@ -15,13 +15,13 @@
 		},
 
 		init : function() {
-
 			this.store = new go.data.Store({
 				entityStore: "Alert",
 				fields: ['id', 'entity', 'entityId', 'data', 'tag', 'triggerAt', 'userId', 'title', 'body'],
 				filters: {
 					user: {userId: go.User.id}
-				}
+				},
+				baseParams: {limit: 50}
 			});
 
 			this.store.on("load", () => {
