@@ -224,16 +224,16 @@ trait SearchableTrait {
 	 * @return Statement
 	 * @throws Exception
 	 */
-	private static function queryMissingSearchCache(string $cls, int $offset = 0): Statement
+	private static function queryMissingSearchCache(int $offset = 0): Statement
 	{
 		
 		$limit = 1000;
 
-		/** @var Entity $cls */
-		$query = $cls::find();
+
+		$query = static::find();
 		/* @var $query OrmQuery */
 		$query
-			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT")
+			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . static::entityType()->getId(), "LEFT")
 			->andWhere('search.id IS NULL')
 			->orWhere('search.rebuild = true')
 			->limit($limit)
@@ -246,7 +246,8 @@ trait SearchableTrait {
 	 * @param class-string<Entity> $cls
 	 * @throws Exception
 	 */
-	public static function rebuildSearchForEntity(string $cls) {
+	public static function rebuildSearchForEntity() {
+		$cls = static::class;
 		echo $cls."\n";
 
 		echo "Deleting old values\n";
@@ -262,7 +263,7 @@ trait SearchableTrait {
 		echo "Deleted ". $stmt->rowCount() . " entries\n";
 
 		//In small batches to keep memory low
-		$stmt = self::queryMissingSearchCache($cls);			
+		$stmt = static::queryMissingSearchCache();
 		
 		$offset = 0;
 		
@@ -287,7 +288,7 @@ trait SearchableTrait {
 			echo "\n";
 			go()->getDbConnection()->exec("commit");
 
-			$stmt = self::queryMissingSearchCache($cls, $offset);
+			$stmt = static::queryMissingSearchCache($offset);
 		}
 
 
@@ -296,16 +297,4 @@ trait SearchableTrait {
 
 	}
 
-	/**
-	 * @throws Exception
-	 */
-	public static function rebuildSearch() {
-		$classFinder = new ClassFinder();
-		$entities = $classFinder->findByTrait(SearchableTrait::class);
-		
-		foreach($entities as $cls) {
-			self::rebuildSearchForEntity($cls);			
-			echo "\nDone\n\n";
-		}
-	}
 }

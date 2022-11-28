@@ -27,7 +27,7 @@ function output(array $data = [], int $status = 200, string $statusMsg = null) {
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 	Response::get()->setHeader('Pragma', 'no-cache');
 
-	Response::get()->setStatus($status, str_replace("\n", " - " , $statusMsg));
+	Response::get()->setStatus($status, $statusMsg ? str_replace("\n", " - " , $statusMsg) : null);
 	Response::get()->sendHeaders();
 
 	go()->getDebugger()->groupEnd();

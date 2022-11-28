@@ -22,8 +22,10 @@ namespace go\core {
 	use go\core\orm\EntityType;
 	use go\core\orm\exception\SaveException;
 	use go\core\orm\Property;
+	use go\core\orm\SearchableTrait;
 	use go\core\Settings as CoreSettings;
 	use go\core\util\ArrayObject;
+	use go\core\util\ClassFinder;
 	use go\core\webclient\Extjs3;
 	use go\core\model\User;
 	use go\core\model\Settings;
@@ -54,6 +56,20 @@ namespace go\core {
 
 
 		private $eventsEnabled = true;
+
+		/**
+		 * @throws Exception
+		 */
+		public function rebuildSearch()
+		{
+			$classFinder = new ClassFinder();
+			$entities = $classFinder->findByTrait(SearchableTrait::class);
+
+			foreach ($entities as $cls) {
+				$cls::rebuildSearchForEntity();
+				echo "\nDone\n\n";
+			}
+		}
 
 		/**
 		 * Disable events
