@@ -1216,3 +1216,12 @@ $updates['202209291100'][] = "ALTER TABLE `core_customfields_select_option` ADD 
     ADD COLUMN `renderMode` VARCHAR(20) DEFAULT NULL AFTER `backgroundColor`;";
 
 $updates['202211071330'][] = "ALTER TABLE `core_user` ADD KEY `email` (`email`);";
+
+
+$updates['202211251153'][] = "alter table core_auth_remember_me
+    drop foreign key core_auth_remember_me_core_user_id_fk;";
+
+$updates['202211251153'][] = "alter table core_auth_remember_me
+    add constraint core_auth_remember_me_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade;";
