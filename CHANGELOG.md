@@ -5,7 +5,8 @@
 - Fixed: Semaphore buildup due to faulty unlock #901
 - Fixed: 6.6.128 - PHP8.1 complains about loosing precision #907
 - Jitsi: Add JWT capability to jitsimeet module #900
-
+- Email: Feature request: Save to drafts #851
+- Calendar: Description got lost on exceptions
 
 24-11-2022 6.6.135
 - Calendar: tasklist_id cannot be null error on user create.
