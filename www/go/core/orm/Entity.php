@@ -212,13 +212,17 @@ abstract class Entity extends Property {
 	 * $models = ModelWithDoublePK::findById("1-1");
 	 * ```
 	 *
-	 * @param string $id
+	 * @param string|null $id
 	 * @param string[] $properties
 	 * @param bool $readOnly
 	 * @return ?static
 	 */
-	public static final function findById(string $id, array $properties = [], bool $readOnly = false): ?Entity
+	public static final function findById(?string $id, array $properties = [], bool $readOnly = false): ?Entity
 	{
+		if($id == null) {
+			return null;
+		}
+
 		$query = static::internalFind($properties, $readOnly);
 		$keys = static::idToPrimaryKeys($id);
 		$query->where($keys);
@@ -234,11 +238,9 @@ abstract class Entity extends Property {
 	 *
 	 * @param string|int|null $id
 	 * @return bool
-	 * @throws Exception
 	 */
-	public static function exists($id): bool
+	public static function exists(?string $id): bool
 	{
-
 		if(empty($id)) {
 			return false;
 		}

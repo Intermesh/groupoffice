@@ -881,7 +881,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	 * @return Event
 	 */
 	public function getRelatedParticipantEvents($includeThisEvent=false){
-		$findParams = \GO\Base\Db\FindParams::newInstance()->ignoreAcl();
+		$findParams = \GO\Base\Db\FindParams::newInstance()->ignoreAcl()->select('t.*');
 		
 		$start_time = $this->isModified('start_time') ? $this->getOldAttributeValue('start_time') : $this->start_time;
 		
