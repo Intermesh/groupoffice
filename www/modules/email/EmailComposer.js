@@ -835,7 +835,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			run: this.autoSave,
 			scope:this,
 			interval:120000
-		//interval:5000
+		//	interval:5000
 		};
 		
 		this.on('hide', this.stopAutoSave, this);
@@ -1378,6 +1378,13 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		
 		this.saveButton.setDisabled(true);
 		this.sendButton.setDisabled(true);
+
+		if(autoSave) {
+			go.Notifier.flyout({
+				description: t("Autosaving e-mail message to drafts (every 2 mins)"),
+				time: 2000
+			});
+		}
 
 		var strNoSubjectMsg = draft ?
 			t("You didn't fill in a subject. Are you sure you want to save this message without a subject?", "email")
