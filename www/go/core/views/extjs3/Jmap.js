@@ -226,7 +226,11 @@ go.Jmap = {
 							entities.column("name").join(',');
 			
 			var source = new EventSource(url), me = this;
-			
+
+			source.addEventListener('msg', function(e) {
+				go.Notifier.flyout({title:"New message",description: event.data, time: 5000});
+			});
+
 			source.addEventListener('state', function(e) {
 
 				var data = JSON.parse(e.data);
@@ -461,8 +465,8 @@ go.Jmap = {
 					this.requestOptions[clientCallId].reject({message: response.responseText});
 					delete this.requestOptions[clientCallId];
 				}
-				
-				Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + response.responseText);
+				if(response.status !== 504) // gateway timeout
+					Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + response.responseText);
 				
 			}
 		});

@@ -14,7 +14,7 @@ go.tree.TreeNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
             '<span class="x-tree-node-indent">',this.indentMarkup,"</span>",
             '<span class="x-tree-ec-icon x-tree-elbow"></span>',
             '<span style="background-image:url(', a.icon || this.emptyIcon, ');" class="x-tree-node-icon',(a.icon ? " x-tree-node-inline-icon" : ""),(a.iconCls ? " "+a.iconCls : ""),'" unselectable="on"></span>',
-            cb ? ('<span class="x-tree-node-cb"><input type="checkbox" ' + (a.checked ? 'checked="checked" /></span>' : '/></span>')) : '',
+            cb ? ('<span class="x-tree-node-cb"><input class="x-tree-node-cb" type="checkbox" ' + (a.checked ? 'checked="checked" />' : '/>') + '</span>') : '',
             '<a hidefocus="on" class="x-tree-node-anchor" href="',href,'" tabIndex="1" ',
              a.hrefTarget ? ' target="'+a.hrefTarget+'"' : "", '><span unselectable="on"><div class="secondary ',n.secondaryIconCls,'">',n.secondaryText,'</div><div class="ellipsis">',n.text,'</div></span></a></div>',
             '<ul class="x-tree-node-ct" style="display:none;"></ul>',
@@ -34,7 +34,7 @@ go.tree.TreeNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
         this.iconNode = cs[2];
         var index = 3;
         if(cb){
-            this.checkbox = cs[3];
+            this.checkbox = cs[3].firstChild;
             // fix for IE6
             this.checkbox.defaultChecked = this.checkbox.checked;
             index++;
