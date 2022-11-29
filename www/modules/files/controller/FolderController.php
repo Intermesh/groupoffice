@@ -795,18 +795,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$response['cm_state']=isset($folder->cm_state) && !empty($folder->apply_state) ? $folder->cm_state : "";
 		$response['may_apply_state']=\GO\Base\Model\Acl::hasPermission($folder->getPermissionLevel(), \GO\Base\Model\Acl::MANAGE_PERMISSION);
 
-//      if($response["lock_state"]){
-//          $state = json_decode($response["cm_state"]);
-//
-//          if(isset($state->sort)){
-//              $params['sort']=$state->sort->field;
-//              $params['dir']=$state->sort->direction;
-//          }
-//      }
-
-
-
-
 		$store = \GO\Base\Data\Store::newInstance(Folder::model());
 
 		//set sort aliases
@@ -927,6 +915,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$params['delete_keys'] = json_encode($ids['files']);
 			$store->processDeleteActions($params, "GO\Files\Model\File");
+			$this->fireEvent('afterListDeleteActionFolder', [$params]);
 		}
 	}
 
@@ -1316,13 +1305,15 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		$response['success'] = true;
 
-		if (!isset($params['overwrite']))
+		if (!isset($params['overwrite'])) {
 			$params['overwrite'] = 'ask'; //can be ask, yes, no
+		}
 
 		$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
 
-		if (!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION))
+		if (!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
 			throw new \GO\Base\Exception\AccessDenied();
+		}
 
 		if(isset($params['blobs'])) {
 			$paths = json_decode($params['blobs']);
@@ -1333,7 +1324,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		$this->processPaths($paths, $destinationFolder, $params['overwrite'], $response);
-
+		$this->fireEvent('afterUpload', [$params, $destinationFolder]);
 		return $response;
 	}
 

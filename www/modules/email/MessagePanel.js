@@ -37,11 +37,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		this.bodyId = Ext.id();
 		this.attachmentsId = Ext.id();
 
-
 		this.linkMessageId = Ext.id();
 		this.downloadAllMenuId = Ext.id();
 
-		var templateStr =
+		let templateStr =
 						
 		'<div class="message-header">'+
 			
@@ -219,18 +218,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 			},
 			addDeleteBtn: function(link) {
-				return "";
-				// return '<a class="simple-link" onclick="go.Db.store(\'Link\').set({destroy: ['+link.link_id+']}).then(() => {GO.mainLayout.openModule(\'email\');});">'+t('Delete') + '</a>';
-				// TODO: Handler:
-				// 	handler: function () {
-				// 		Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to unlink this item?"), function (btn) {
-				// 			if (btn == "yes") {
-				// 				go.Db.store("Link").set({
-				// 					destroy: [link.id]
-				// 				});
-				// 			}
-				// 		}, this);
-				// 	},
+				return '<a class="simple-link" onclick="GO.email.unlink('+link.link_id+');">'+t('Delete') + '</a>';
 			},
 			addSlashes : function(str)
 			{
@@ -483,8 +471,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			}, this);
 		}
 
-		// this.messageBodyEl = Ext.get(this.bodyId);
-		
 		if(data.attachments.length)
 		{
 			this.attachmentsEl = Ext.get(this.attachmentsId);

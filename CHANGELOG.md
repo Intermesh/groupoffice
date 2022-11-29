@@ -5,8 +5,12 @@
 - Fixed: Semaphore buildup due to faulty unlock #901
 - Fixed: 6.6.128 - PHP8.1 complains about loosing precision #907
 - Jitsi: Add JWT capability to jitsimeet module #900
+- Files: Add event listeners
+- Core: retrieve maximum of 50 alerts
 - Email: Feature request: Save to drafts #851
 - Calendar: Description got lost on exceptions
+- Email: remove linked item from message panel
+- Tasks: Add possibility to import tasklistId from CSV
 
 24-11-2022 6.7.3
 - Core: small fixes and Dutch translation

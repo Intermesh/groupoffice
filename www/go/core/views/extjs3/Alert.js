@@ -25,7 +25,8 @@
 				sortInfo: {
 					field: "triggerAt",
 					direction: "DESC"
-				}
+				},
+				baseParams: {limit: 50}
 			});
 
 			this.store.on("load", () => {
