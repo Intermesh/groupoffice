@@ -1,3 +1,6 @@
+6.6.137
+- Tasks: Search task lists in upload dialog
+
 29-11-2022 6.6.136
 - Core: export to web page (html)
 - Fixed: dav_event sql data column too small #916
