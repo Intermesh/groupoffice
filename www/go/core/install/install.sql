@@ -837,15 +837,26 @@ ALTER TABLE `core_smtp_account`
   ADD CONSTRAINT `core_smtp_account_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
 
 
-CREATE TABLE `core_email_template` (
-  `id` int(11) NOT NULL,
-  `moduleId` int(11) NOT NULL,
-  `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL,
-  `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en',
-  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `subject` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `body` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+create table core_email_template
+(
+    id       int auto_increment
+        primary key,
+    moduleId int                                        not null,
+    `key`    varchar(20) collate ascii_bin              null,
+    language varchar(20) collate ascii_bin default 'en' not null,
+    name     varchar(190)                               not null,
+    subject  varchar(190)                               null,
+    body     mediumtext                                 not null,
+    constraint core_email_template_ibfk_2
+        foreign key (moduleId) references core_module (id)
+            on delete cascade
+);
+
+create index core_email_template_moduleId_key_index
+    on core_email_template (moduleId, `key`);
+
+create index moduleId
+    on core_email_template (moduleId);
 
 CREATE TABLE `core_email_template_attachment` (
   `id` int(11) NOT NULL,
@@ -856,33 +867,17 @@ CREATE TABLE `core_email_template_attachment` (
   `attachment` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
-
-ALTER TABLE `core_email_template`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `moduleId` (`moduleId`);
-
 ALTER TABLE `core_email_template_attachment`
   ADD PRIMARY KEY (`id`),
   ADD KEY `templateId` (`emailTemplateId`),
   ADD KEY `blobId` (`blobId`);
 
-
-ALTER TABLE `core_email_template`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
 ALTER TABLE `core_email_template_attachment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `core_email_template`
-  ADD CONSTRAINT `core_email_template_ibfk_2` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `core_email_template_attachment`
   ADD CONSTRAINT `core_email_template_attachment_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `core_email_template_attachment_ibfk_2` FOREIGN KEY (`emailTemplateId`) REFERENCES `core_email_template` (`id`) ON DELETE CASCADE;
-
-create unique index core_email_template_moduleId_key_uindex
-    on core_email_template (moduleId, `key`);
 
 ALTER TABLE `core_change` ADD INDEX(`entityId`);
 
@@ -1055,15 +1050,12 @@ create table core_pdf_template
         foreign key (stationaryBlobId) references core_blob (id)
 );
 
-create index moduleId
-    on core_pdf_template (moduleId);
+create index core_pdf_template_key_index
+    on core_pdf_template (moduleId, `key`);
 
 create index stationaryBlobId
     on core_pdf_template (stationaryBlobId);
 
-
-create index core_pdf_template_key_index
-    on core_pdf_template (`key`);
 
 
 

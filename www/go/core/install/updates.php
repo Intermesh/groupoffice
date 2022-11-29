@@ -1304,3 +1304,5 @@ $updates['202211251153'][] = "create table core_import_mapping
 $updates['202211251153'][] = "alter table core_import_mapping
     add constraint core_import_mapping_pk
         primary key (entityTypeId, checksum);";
+
+$updates['202211251153'][] = "drop index moduleId on core_pdf_template;";
