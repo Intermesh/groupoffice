@@ -127,7 +127,7 @@ class EmailTemplate extends Entity
 	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?EmailTemplate {
 		$moduleModel = ModuleModel::findByName($package, $name);
 
-		$template = isset($lang) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
+		$template = isset($preferredLanguage) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
 		if (!$template) {
 			$template = static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key])->single();
 		}
