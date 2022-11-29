@@ -11,6 +11,7 @@
 - Calendar: Description got lost on exceptions
 - Email: remove linked item from message panel
 - Tasks: Add possibility to import tasklistId from CSV
+- Core: Set global SMTP timeout value in System Settings -> Notifications
 
 24-11-2022 6.6.135
 - Calendar: tasklist_id cannot be null error on user create.
