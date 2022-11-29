@@ -1041,8 +1041,7 @@ GO.email.deleteAllAttachments = function(panel) {
 		}, this);
 };
 
-GO.email.saveAttachment = function(attachment,panel)
-	{
+GO.email.saveAttachment = function(attachment,panel) {
 		if(!GO.files.saveAsDialog)
 		{
 			GO.files.saveAsDialog = new GO.files.SaveAsDialog({
@@ -1085,10 +1084,7 @@ GO.email.saveAttachment = function(attachment,panel)
 		});
 	}
 
-
-
-GO.email.openAttachment = function(attachment, panel, forceDownload)
-{
+GO.email.openAttachment = function(attachment, panel, forceDownload) {
 		if(!panel)
 			return false;
 
@@ -1211,6 +1207,22 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 			}
 		}
 	};
+
+/**
+ * Unlink an email
+ * @param linkId
+ */
+GO.email.unlink = function(linkId) {
+	Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to unlink this item?"), function (btn) {
+		if (btn === "yes") {
+			go.Db.store("Link").set({
+				destroy: [linkId]
+			}).then(() => {
+				GO.mainLayout.getModulePanel('email').messagePanel.reload();
+			});
+		}
+	}, this);
+};
 
 /**
  * Function that will open an email composer. If a composer is already open it will create a new one. Otherwise it will reuse an already created one.
