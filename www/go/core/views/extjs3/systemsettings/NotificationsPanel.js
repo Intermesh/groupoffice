@@ -76,6 +76,11 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 							hideLabel: true,
 							disabled: false,
 							boxLabel: t("Verify SSL certificate")							
+						}, {
+							xtype: 'numberfield',
+							name: 'smtpTimeout',
+							fieldLabel: t('Timeout (s)'),
+							decimals: 0
 						}
 					]
 				}]
