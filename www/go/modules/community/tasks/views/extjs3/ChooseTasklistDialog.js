@@ -8,7 +8,10 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(go.Window, {
 
 	initComponent: function () {
         this.chooseTasklistGrid = new go.modules.community.tasks.ChooseTasklistGrid({
-            height: dp(700)
+            height: dp(640),
+            tbar: ['->', {
+                xtype: 'tbsearch'
+            }]
         });
 
         this.taskListFromCsvCB = new Ext.form.Checkbox({
@@ -16,8 +19,9 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(go.Window, {
             boxLabel: t('Import task list ID from CSV file'),
             handler: (cb,checked) => {
                 const el = this.chooseTasklistGrid.getEl();
+
                 if(checked) {
-                    el.mask()
+                    el.mask();
                 } else {
                     el.unmask();
                 }
@@ -25,8 +29,8 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(go.Window, {
         });
 
         this.openFileButton = new Ext.Button({
-            iconCls: 'ic-search',
-            text: t("Open file"),
+            iconCls: 'ic-file-upload',
+            text: t("Upload"),
             width: dp(40),
             height: dp(30),
             handler: function() {
@@ -46,7 +50,6 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(go.Window, {
                     go.util.importFile(
                         'Task', 
                         ".ics,.csv",
-                        // { tasklistId: this.chooseTasklistGrid.selectedId },
                         TLvalues,
                         {},
                         {
@@ -60,7 +63,6 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(go.Window, {
                                 priority: t("priority"),
                                 percentComplete: t("percentage completed"),
                                 categories: t("categories")
-
                             }
                         });
                 }
@@ -90,10 +92,21 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(go.Window, {
 
         this.buttons = [this.openFileButton];
 
-		    this.items = [
-            this.chooseTasklistGrid
+		this.items = [
+            propertiesPanel
         ];
 
         go.modules.community.tasks.ChooseTasklistDialog.superclass.initComponent.call(this);
-	}
+
+        this.on("render", function () {
+            this.search();
+        }, this);
+    },
+
+
+    search : function(v) {
+        this.chooseTasklistGrid.store.setFilter("search", {text: v});
+        this.chooseTasklistGrid.store.load();
+    },
+
 });

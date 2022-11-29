@@ -1338,5 +1338,10 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'File size exceeds the maximum of {max}.' => 'Het bestand is groter dan het maximum van {max}.',
   'Show on tab' => 'Toon op tab',
 	"This field is required" => "Dit veld is vereist",
-	"Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue." => "Koppel de CSV kolommen met de juiste Group-Office kolommen en druk om 'Importeren' om verder te gaan."
+	"Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue." => "Koppel de CSV kolommen met de juiste Group-Office kolommen en druk om 'Importeren' om verder te gaan.",
+	'Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog.' =>
+		'Voltooi de installatie door de systeeminstellingen te controleren. Klik op OK om door te gaan naar de systeeminstellingen.',
+	"Do you want to generate some fake demonstration data? This will take about one or two minutes to generate." =>
+		"Wilt u demonstratie data genereren? Dit duurt ongeveer 1 a 2 minuten om te genereren."
+
 );

@@ -1,3 +1,7 @@
+6.6.137
+- Tasks: Search task lists in upload dialog
+
+29-11-2022 6.6.136
 - Core: export to web page (html)
 - Fixed: dav_event sql data column too small #916
 - Fixed: core_auth_remember_me foreign key error #913
@@ -11,6 +15,7 @@
 - Calendar: Description got lost on exceptions
 - Email: remove linked item from message panel
 - Tasks: Add possibility to import tasklistId from CSV
+- Core: Set global SMTP timeout value in System Settings -> Notifications
 
 24-11-2022 6.7.3
 - Core: small fixes and Dutch translation

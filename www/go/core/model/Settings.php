@@ -146,6 +146,15 @@ class Settings extends core\Settings {
 	 */
 	protected $smtpPassword = null;
 
+	/**
+	 * Global SMTP timeout value in seconds
+	 *
+	 * Also used for the e-mail module.
+	 *
+	 * @var int
+	 */
+	public $smtpTimeout = 30;
+
 
 	/**
 	 * @throws Exception

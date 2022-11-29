@@ -211,6 +211,21 @@ require('header.php');
                 </select>
             </p>
 
+
+            <p>
+                <label>Language</label>
+                <select name="language" value="<?= go()->getLanguage()->getIsoCode(); ?>">
+                  <?php
+                  foreach(go()->getLanguage()->getLanguages() as $iso => $language) {
+                      ?>
+                    <option value="<?= $iso; ?>"><?= htmlspecialchars($language); ?></option>
+                          <?php
+                  }
+
+                  ?>
+                </select>
+            </p>
+
             <button class="right primary" name="submitButton" type="submit">Install</button>
 		</fieldset>
 
