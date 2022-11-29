@@ -67,4 +67,5 @@ return array (
   'Assign me' => 'Toewijzen aan mijzelf',
   'Are you sure you want to unlink this item?' => 'Weet u zeker dat u dit item wilt ontkoppelen?',
   'Group name' => 'Groepsnaam',
+	'Import task list ID from CSV file' => 'Importeer takenlijst-id uit CSV-bestand'
 );

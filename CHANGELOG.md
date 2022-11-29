@@ -10,6 +10,7 @@
 - Email: Feature request: Save to drafts #851
 - Calendar: Description got lost on exceptions
 - Email: remove linked item from message panel
+- Tasks: Add possibility to import tasklistId from CSV
 
 24-11-2022 6.6.135
 - Calendar: tasklist_id cannot be null error on user create.
