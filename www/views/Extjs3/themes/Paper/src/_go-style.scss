@@ -1324,10 +1324,12 @@ button.filetype-pdf, button.filetype-doc {
 		margin: 0;
 	}
 
-	.status {
+	.x-panel-header {
+		.status {
 
-		float:right;
-		margin: dp(12) dp(16);
+			float: right;
+			margin: dp(12) dp(16);
+		}
 	}
 }
 
