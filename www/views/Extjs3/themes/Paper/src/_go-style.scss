@@ -2444,7 +2444,7 @@ table[id^="comments-ext"] b {
 		color: #666;
 	}
 
-	textarea, input:not([type=checkbox]):not([type=radio]) {
+	textarea, input:not([type=checkbox]):not([type=radio]), select {
 
 		@extend %font-data;
 		color: color($fg, 'text');
@@ -2460,6 +2460,8 @@ table[id^="comments-ext"] b {
 		padding: dp(6) dp(8);
 
 	}
+
+
 
 	pre {
 		@extend code;

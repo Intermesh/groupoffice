@@ -77,7 +77,8 @@ if (!empty($_POST)) {
 				'displayName' => "System Administrator",
 				'username' => $_POST['username'],
 				'password' => $_POST['password'],
-				'email' => $_POST['email']
+				'email' => $_POST['email'],
+                'language' => $_POST['language']
 		];
 
 		App::get()->getInstaller()->install($admin);
@@ -193,6 +194,22 @@ require('header.php');
 				<label>Confirm</label>
 				<input type="password" name="passwordConfirm" autocomplete="new-password" pattern=".{6,}" title="Minimum length is 6 chars"  value="<?= $_POST['passwordConfirm'] ?? ""; ?>" required>
 			</p>
+
+            <p>
+                <label>Language</label>
+                <select name="language">
+
+                <?php
+                foreach(go()->getLanguage()->getLanguages() as $iso => $language) {
+                    ?>
+                    <option value="<?= $iso; ?>" <?= go()->getLanguage()->getIsoCode() == $iso ? "selected" : ""; ?>><?= htmlspecialchars($language); ?></option>
+                    <?php
+                }
+
+                ?>
+
+                </select>
+            </p>
 
             <button class="right primary" name="submitButton" type="submit">Install</button>
 		</fieldset>

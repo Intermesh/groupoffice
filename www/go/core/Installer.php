@@ -140,6 +140,9 @@ class Installer {
 
 		$admin = $this->installAdminUser($adminValues);
 
+		go()->getSettings()->language = $admin->language;
+		go()->getLanguage()->setLanguage($admin->language);
+
 		$this->installCoreModule();
 				
 		$this->registerCoreEntities();		
