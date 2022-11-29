@@ -90,7 +90,7 @@ class Module extends core\Module implements DomainProvider {
 //				'addressType' => function($record) {
 //					return \go\modules\community\addressbook\model\Address::TYPE_WORK;
 //				},
-				'street' => 'street',
+				'address' => 'street',
 				'zipCode' => 'postalCode',
 				'city' => 'l',
 				'state' => 's',
