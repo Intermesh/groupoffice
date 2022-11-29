@@ -14,6 +14,7 @@ use go\core\exception\Forbidden;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\model\Search;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
@@ -1011,7 +1012,7 @@ abstract class Entity extends Property {
 		$columns = static::textFilterColumns();
 
 		if(static::useSearchableTraitForSearch($query)) {
-			static::addCriteria( $criteria, $query, $expression);
+			Search::addCriteria( $criteria, $query, $expression);
 			return $criteria;
 		}
 
