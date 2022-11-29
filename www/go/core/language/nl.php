@@ -1315,5 +1315,9 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
 	'Cell' => 'Cel',
 	'Background color' => 'Achtergroundkleur',
 	'Text color' => 'Tekstkleur',
-	'Render mode' => 'Weergavemodus'
+	'Render mode' => 'Weergavemodus',
+	'Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog.' =>
+		'Voltooi de installatie door de systeeminstellingen te controleren. Klik op OK om door te gaan naar de systeeminstellingen.',
+	"Do you want to generate some fake demonstration data? This will take about one or two minutes to generate." =>
+	 "Wilt u demonstratie data genereren? Dit duurt ongeveer 1 a 2 minuten om te genereren."
 );
