@@ -48,7 +48,7 @@ abstract class Property extends Model {
 
 	use EventEmitterTrait;
 
-	private static $mapping;
+	private static $_mapping;
 
 	/**
 	 * For reusing prepared statements
@@ -548,7 +548,7 @@ abstract class Property extends Model {
 	}
 
 	public static function clearCache() {
-		self::$mapping = [];
+		self::$_mapping = [];
 		self::$requiredProps = [];
 		self::$cachedRelationStmts = [];
 		self::$apiProperties = [];
@@ -564,23 +564,23 @@ abstract class Property extends Model {
 	public final static function getMapping(): Mapping
 	{
 		$cls = static::class;
-		if(isset(self::$mapping[$cls])) {
-			return self::$mapping[$cls];
+		if(isset(self::$_mapping[$cls])) {
+			return self::$_mapping[$cls];
 		}
 		$cacheKey = 'mapping-' . $cls;
 
-		self::$mapping[$cls] = go()->getCache()->get($cacheKey);
-		if(self::$mapping[$cls] === null) {
-			self::$mapping[$cls] = static::defineMapping();
+		self::$_mapping[$cls] = go()->getCache()->get($cacheKey);
+		if(self::$_mapping[$cls] === null) {
+			self::$_mapping[$cls] = static::defineMapping();
 
-			self::$mapping[$cls]->dynamic = true;
+			self::$_mapping[$cls]->dynamic = true;
 
-			static::fireEvent(self::EVENT_MAPPING, self::$mapping[$cls]);
+			static::fireEvent(self::EVENT_MAPPING, self::$_mapping[$cls]);
 
-			go()->getCache()->set($cacheKey, self::$mapping[$cls]);
+			go()->getCache()->set($cacheKey, self::$_mapping[$cls]);
 		}
 
-		return self::$mapping[$cls];
+		return self::$_mapping[$cls];
 	}
 
 	/**
