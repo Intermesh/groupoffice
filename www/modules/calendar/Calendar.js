@@ -2228,7 +2228,7 @@ go.Modules.register("legacy", 'calendar', {
 				linkDetailCards: function() {
 					var forth = new go.links.DetailPanel({
 						link: {
-							title: t("Forthcoming events"),
+							title: t("Forthcoming appointments"),
 							iconCls: 'icon ic-event orange',
 							entity: "Event",
 							filter: null
@@ -2239,7 +2239,7 @@ go.Modules.register("legacy", 'calendar', {
 
 					var past = new go.links.DetailPanel({						
 						link: {
-							title: t("Past events"),
+							title: t("Past appointments"),
 							iconCls: 'icon ic-event orange',
 							entity: "Event",
 							filter: null

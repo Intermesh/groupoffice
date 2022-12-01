@@ -215,6 +215,11 @@ go.links.getDetailPanels = function(sortFn) {
 	
 	go.Entities.getLinkConfigs().forEach(function (e) {
 		if(e.linkDetailCards) {
+
+			const entity = go.Entities.get(e.entity);
+
+			go.Translate.setModule(entity.package, entity.module);
+
 			var clss = e.linkDetailCards();
 			if(!Ext.isArray(clss)) {
 				clss = [clss];
