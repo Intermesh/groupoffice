@@ -38,7 +38,7 @@ try {
 	}
 
 	if(go()->getDatabase()->hasTable("studio_studio")) {
-		$studioError = StudioModule::patch65to66();
+		$studioError = StudioModule::patch66to67();
 	}
 
 	require('header.php');

@@ -417,7 +417,7 @@
 				msg.icon = msg.icon || GO.settings.config.full_url + 'views/Extjs3/themes/Paper/img/notify/reminder.png';
 				msg.body = msg.description || msg.body;
 				//delete msg.title;
-
+				let notification;
 				try {
 					switch(Notification.permission) {
 						case 'denied':
@@ -432,7 +432,7 @@
 							});
 							break;
 						case 'granted':
-							let notification = new Notification(title,msg);
+							notification = new Notification(title,msg);
 					}
 				} catch (e) {
 					/* ignore failure on mobiles */
