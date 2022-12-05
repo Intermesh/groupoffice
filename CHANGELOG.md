@@ -1,6 +1,7 @@
 6.6.137
 - Tasks: Search task lists in upload dialog
 - Newsletters: Prevent sending messages to empty recipient lists
+- Postfixadmin: Restrict SMTP service via username login by default to prevent abuse.
 
 29-11-2022 6.6.136
 - Core: export to web page (html)
