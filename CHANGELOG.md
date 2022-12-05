@@ -1,4 +1,4 @@
-6.6.137
+05-12-2022 6.6.137
 - Tasks: Search task lists in upload dialog
 - Newsletters: Prevent sending messages to empty recipient lists
 - Postfixadmin: Restrict SMTP service via username login by default to prevent abuse.
