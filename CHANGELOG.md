@@ -3,6 +3,7 @@
 - Newsletters: Prevent sending messages to empty recipient lists
 - Postfixadmin: Restrict SMTP service via username login by default to prevent abuse.
 - Core / email: used map of charset aliases to fix conversion problem with Korean emails
+- Core / email: fixed Sanitize corrupted html #922
 
 29-11-2022 6.6.136
 - Core: export to web page (html)
