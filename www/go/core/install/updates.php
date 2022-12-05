@@ -1309,4 +1309,4 @@ $updates['202211291426'][] = "alter table core_import_mapping
 
 $updates['202211291426'][] = "drop index moduleId on core_pdf_template;";
 
-$update['202211291426'][] = "alter table `core_customfields_field` add column `filterable` BOOLEAN NOT NULL DEFAULT FALSE";
+$updates['202211291426'][] = "alter table `core_customfields_field` add column `filterable` BOOLEAN NOT NULL DEFAULT FALSE";
