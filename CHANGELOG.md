@@ -1,3 +1,6 @@
+05-12-2022 6.6.138
+- Core: typo in update script
+
 05-12-2022 6.6.137
 - Tasks: Search task lists in upload dialog
 - Newsletters: Prevent sending messages to empty recipient lists

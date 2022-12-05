@@ -1228,6 +1228,7 @@ $updates['202211251153'][] = "alter table core_auth_remember_me
         foreign key (userId) references core_user (id)
             on delete cascade;";
 
+$updates['202211291426'][] = "alter table `core_customfields_field` add column `filterable` BOOLEAN NOT NULL DEFAULT FALSE";
 $update['202211291426'][] = "alter table `core_customfields_field` add column `filterable` BOOLEAN NOT NULL DEFAULT FALSE";
 
 
