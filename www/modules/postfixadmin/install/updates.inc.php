@@ -70,3 +70,7 @@ $updates['202104301055'][] = "drop index domain on pa_domains";
 
 $updates['202104301055'][] = "create unique index domain
              	on pa_domains (domain)";
+
+
+$updates['202212051053'][] = "alter table pa_mailboxes
+    add smtpAllowed bool default false not null after password;";
