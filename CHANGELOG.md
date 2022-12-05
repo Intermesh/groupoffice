@@ -1,5 +1,6 @@
 6.6.137
 - Tasks: Search task lists in upload dialog
+- Newsletters: Prevent sending messages to empty recipient lists
 
 29-11-2022 6.6.136
 - Core: export to web page (html)
