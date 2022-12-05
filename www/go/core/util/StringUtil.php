@@ -454,7 +454,7 @@ END;
 		$fromCharset = strtolower($fromCharset);
 
 		if(isset(self::$charsetAliases[$fromCharset])) {
-			$fromCharset = self::$charsetAliases[$fromCharset];
+			$fromCharset = strtolower(self::$charsetAliases[$fromCharset]);
 		}
 
 		$toCharset = 'UTF-8';
@@ -468,7 +468,7 @@ END;
 				$str = mb_convert_encoding($str, 'UTF-8', $fromCharset);			
 			} else
 			{
-				$str = iconv($fromCharset, 'UTF-8//TRANSLIT', $str);					
+				$str = iconv($fromCharset, 'UTF-8//TRANSLIT//IGNORE', $str);
 			}
 		}catch (Throwable $e) {
 			App::get()->debug("Could not convert from ".$fromCharset." to UTF8 ".$e->getMessage());
