@@ -9,6 +9,7 @@ use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
 use GO\Calendar\Model\Calendar;
 use GO\Calendar\Model\UserSettings as CalendarUserSettings;
+use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\auth\Authenticate;
 use go\core\auth\BaseAuthenticator;
@@ -50,7 +51,7 @@ use go\modules\community\tasks\model\UserSettings as TasksUserSettings;
  * @property ?UserSettings $addressBookSettings
  * @property ?CalendarUserSettings $calendarSettings
  */
-class User extends Entity {
+class User extends AclItemEntity {
 	
 	use CustomFieldsTrait;
 
@@ -1054,7 +1055,7 @@ class User extends Entity {
 	protected static function internalDelete(Query $query): bool
 	{
 
-		$query->andWhere('id != 1');
+		$query->andWhere($query->getTableAlias() . '.id != 1');
 
 		go()->getDbConnection()->delete('go_settings', (new Query)->where('user_id', 'in', $query))->execute();
 		//go()->getDbConnection()->delete('go_reminders', (new Query)->where('user_id', 'in', $query))->execute();
@@ -1401,5 +1402,15 @@ class User extends Entity {
 		}
 
 		return $user;
+	}
+
+	protected static function aclEntityClass(): string
+	{
+		return Group::class;
+	}
+
+	protected static function aclEntityKeys(): array
+	{
+		return ['id' => 'isUserGroupFor'];
 	}
 }
