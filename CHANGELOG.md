@@ -1,5 +1,6 @@
 - Core / addressbook: Fixed disappearing custom fields after saving a new contact to an organization
 - Summary: Creating an announcement is allways shared with "everyone" group by default #930
+- Caldav: Fixed problem in fetching participants and sending mail via IMip
 
 05-12-2022 6.6.138
 - Core: typo in update script
