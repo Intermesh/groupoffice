@@ -98,9 +98,9 @@ class Extjs3 {
 	private function replaceCssUrl($css, File $file){
 		
 		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', $this->getRelativeUrl(), $file->getFolder()->getPath()).'/';
-		
-		$css = preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
-			function($matches) use($baseurl) { 
+
+        $css = preg_replace_callback('#url\s*\(\s*[\'"]?(?!(((?:https?:)?\/\/)|(?:data\:?:)))([^\'"\)]+)[\'"]?\s*\)#',
+			function($matches) use($baseurl) {
 				return 'url('.$baseurl.trim(stripslashes($matches[1]),'\'" ').')';
 			}, $css);
 
