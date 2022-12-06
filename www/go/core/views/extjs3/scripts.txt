@@ -77,7 +77,6 @@ toolbar/SearchButton.js
 toolbar/TitleItem.js
 
 layout/ResponsiveLayout.js
-layout/FitWidthLayout.js
 
 AuthenticationManager.js
 ActivityWatcher.js
@@ -270,6 +269,7 @@ filter/FilterGrid.js
 filter/FilterCombo.js
 filter/FilterDialog.js
 filter/FilterAddButton.js
+filter/FilterPanel.js
 filter/VariableFilterPanel.js
 filter/VariableFilterDialog.js
 filter/variabletypes/date.js

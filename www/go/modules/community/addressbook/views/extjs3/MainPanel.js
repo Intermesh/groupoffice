@@ -20,9 +20,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			cls: 'go-sidenav',
 			region: "west",
 			split: true,
-			// autoScroll: true,
-			layout: "fitwidth",
-			bodyStyle: 'overflow-y: auto',
+			autoScroll: true,
+			layout: "anchor",
+			defaultAnchor: '100%',
 			items: [
 				new go.NavMenu({
 					region:'north',
@@ -66,7 +66,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					})
 				}),
 				this.createAddressBookTree(),
-				this.createFilterPanel()
+				{xtype:'filterpanel', store: this.grid.store, entity: 'Contact'}
 			]
 		});
 
@@ -182,6 +182,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		this.addressBookTree.getLoader().on('load', (loader, node, response) => {
 			this.addressBookTree.getBottomToolbar().setVisible(response.queryResponse.hasMore);
 			this.loadMoreButton.setVisible(response.queryResponse.hasMore);
+			this.sidePanel.doLayout();
 		});
 		
 		
@@ -622,7 +623,16 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				rowdblclick: this.onGridDblClick,
 				
 				keypress: this.onGridKeyPress,
+				'rowcontextmenu': function (grid, rowIndex, e) {
+					e.stopEvent();
+					var sm = this.grid.getSelectionModel();
+					if (sm.isSelected(rowIndex) !== true) {
+						sm.clearSelections();
+						sm.selectRow(rowIndex);
+					}
 
+					this.showContextMenu(e);
+				},
 				scope: this
 			}
 		});
@@ -633,6 +643,14 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		}, this);
 		
 		return this.grid;
+	},
+
+	showContextMenu(e) {
+		const m = new go.modules.community.addressbook.ContactContextMenu();
+		let records = this.grid.getSelectionModel().getSelections();
+
+		m.setRecords(records);
+		m.showAt(e.getXY());
 	},
 	
 	onGridDblClick : function (grid, rowIndex, e) {
@@ -662,41 +680,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		var dlg = new go.modules.community.addressbook.ContactDialog();
 		dlg.load(record.id).show();
 
-	},
-	
-	createFilterPanel: function () {
-
-		return new Ext.Panel({
-			region: "center",
-			minHeight: dp(200),
-			autoScroll: true,
-			tbar: [
-				{
-					xtype: 'tbtitle',
-					text: t("Filters")
-				},
-				'->',
-				{
-					xtype: 'filteraddbutton',
-					entity: 'Contact'
-				}
-			],
-			items: [
-				{xtype: "box", autoEl: "hr"},
-				{
-					xtype: 'filtergrid',
-					filterStore: this.grid.store,
-					entity: "Contact"
-				},
-				{
-					xtype: 'variablefilterpanel',
-					filterStore: this.grid.store,
-					entity: "Contact"
-				}
-				]
-		});
-		
-		
 	},
 
 	rememberLastAddressboek(addressBookId) {

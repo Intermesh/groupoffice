@@ -25,15 +25,16 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.createNoteGrid();
 
 		this.sidePanel = new Ext.Panel({
-			layout: 'fitwidth',
-			bodyStyle: 'overflow-y: auto',
+			autoScroll: true,
+			layout: "anchor",
+			defaultAnchor: '100%',
 			width: dp(300),
 			cls: 'go-sidenav',
 			region: "west",
 			split: true,
 			items: [
 				this.createNoteBookGrid(),
-				this.createFilterPanel()
+				{xtype:'filterpanel', store: this.noteGrid.store, entity: 'Note'}
 			]
 		});
 
@@ -93,40 +94,6 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.noteBookGrid.setDefaultSelection(selectedListIds);
 		this.checkCreateNoteBook();
-	},
-
-	createFilterPanel: function () {
-
-		return new Ext.Panel({
-			region: "center",
-			minHeight: dp(200),
-			autoScroll: true,
-			tbar: [
-				{
-					xtype: 'tbtitle',
-					text: t("Filters")
-				},
-				'->',
-				{
-					xtype: 'filteraddbutton',
-					entity: 'Note'
-				}
-			],
-			items: [
-				{
-					xtype: 'filtergrid',
-					filterStore: this.noteGrid.store,
-					entity: "Note"
-				},
-				{
-					xtype: 'variablefilterpanel',
-					filterStore: this.noteGrid.store,
-					entity: "Note"
-				}
-			]
-		});
-		
-		
 	},
 	
 	createNoteBookGrid : function() {

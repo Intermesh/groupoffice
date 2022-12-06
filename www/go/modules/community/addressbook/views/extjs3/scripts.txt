@@ -27,3 +27,4 @@ DuplicateDialog.js
 LabelsDialog.js
 BirthdaysPortlet.js
 BirthdaysPortletSettingsDialog.js
+ContactContextMenu.js
