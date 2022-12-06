@@ -2,6 +2,7 @@
 namespace go\core\acl\model;
 
 use Exception;
+use go\core\ErrorHandler;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\orm\exception\SaveException;
@@ -201,10 +202,9 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 
 		if(!isset($this->{static::$aclColumnName})) {
-			throw new Exception(static::$aclColumnName .' not set for ' . static::class . '::' . $this->id());
-		}
-
-		if(!isset($this->permissionLevel)) {
+			ErrorHandler::log(static::$aclColumnName .' not set for ' . static::class . '::' . $this->id());
+			$this->permissionLevel = 	(go()->getAuthState() && go()->getAuthState()->isAdmin()) ? Acl::LEVEL_MANAGE : 0;
+		} else if(!isset($this->permissionLevel)) {
 			$this->permissionLevel =
 				(go()->getAuthState() && go()->getAuthState()->isAdmin()) ?
 					Acl::LEVEL_MANAGE :
