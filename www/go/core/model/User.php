@@ -648,7 +648,16 @@ class User extends Entity {
       }, false)
       ->add('groupId', function (Criteria $criteria, $value, Query $query){
         $query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $value]);
-      });
+      })
+			->addText("username", function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('username', $comparator, $value);
+			})
+			->addText("email", function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('email', $comparator, $value);
+			})
+			->addText("displayName", function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('displayName', $comparator, $value);
+			});
 	}
 
 	private $isAdmin;
