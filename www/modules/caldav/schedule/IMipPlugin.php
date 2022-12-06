@@ -4,6 +4,8 @@
 namespace GO\Caldav\Schedule;
 
 
+use go\core\ErrorHandler;
+
 class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 
 	public function __construct($senderEmail=null) {
@@ -27,22 +29,29 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
      * @return void
      */
 	protected function mail($to, $subject, $body, array $headers) {
+
+		go()->debug("CalDAV IMip mail: " . $to ." : " . $subject);
 		
 		if(empty($to)) {
 			return;
 		}
-		
-		$recipients = new \GO\Base\Mail\EmailRecipients($to);
-		$to = $recipients->getAddress();
-		
-		$message = \GO\Base\Mail\Message::newInstance($subject)
-						->setFrom(\GO::user()->email, \GO::user()->name)
-						->addReplyTo(\GO::user()->email)
-						->addTo($to['email'], $to['personal']);
 
-		$message->setBody($body, "text/calendar; method=" . (string) $this->itipMessage->method, "utf-8");
+		try {
+			$recipients = new \GO\Base\Mail\EmailRecipients($to);
+			$to = $recipients->getAddress();
 
-		\GO\Base\Mail\Mailer::newGoInstance()->send($message);
+			$message = \GO\Base\Mail\Message::newInstance($subject)
+				->setFrom(\GO::user()->email, \GO::user()->name)
+				->addReplyTo(\GO::user()->email)
+				->addTo($to['email'], $to['personal']);
+
+			$message->setBody($body, "text/calendar; method=" . (string)$this->itipMessage->method, "utf-8");
+
+			\GO\Base\Mail\Mailer::newGoInstance()->send($message);
+		} catch(\Throwable $e) {
+			ErrorHandler::log("Error sending CalDAV IMip mail to " . implode("," , $to));
+			ErrorHandler::logException($e);
+		}
 	}
 
 }

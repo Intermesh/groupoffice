@@ -23,8 +23,7 @@ require('../../GO.php');
 
 
 // Authentication backend
-$authBackend = new \GO\Dav\Auth\BasicBackend();
-
+$authBackend = new \go\core\dav\auth\BasicBackend();
 
 if (!\GO::modules()->isInstalled('dav')){
 	$msg = 'DAV module not installed. Install it at Start menu -> Apps.';
@@ -35,10 +34,6 @@ if (!\GO::modules()->isInstalled('dav')){
 }
 
 $root = new \GO\Dav\Fs\RootDirectory();
-
-//$root = new \GO\Dav\Fs\Directory("projects2");
-
-//$tree = new \GO\Dav\ObjectTree($root);
 
 // The rootnode needs in turn to be passed to the server class
 $server = new Sabre\DAV\Server($root);
