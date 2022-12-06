@@ -188,10 +188,9 @@ class Builder
 
 		cd($this->buildDir . "/" . $this->packageName);
 
+        $this->encode();
 
         $this->buildNodeModules();
-
-        $this->encode();
 
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
 
