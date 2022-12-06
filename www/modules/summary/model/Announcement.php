@@ -48,12 +48,4 @@ class Announcement extends \GO\Base\Db\ActiveRecord {
 		return parent::init();
 	}
 	
-	protected function afterSave($wasNew) {
-		// Only do this when it's a new model
-		if($wasNew){
-			$this->acl->addGroup(GO::config()->group_everyone);
-		}
-		return parent::afterSave($wasNew);
-	}
-	
 }
