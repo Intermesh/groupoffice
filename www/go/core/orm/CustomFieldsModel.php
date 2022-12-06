@@ -370,7 +370,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 				return true;
 			}
 
-			$record = $this->data;
+			$record = $this->internalGetCustomFields();
 
 			foreach($this->getCustomFieldModels() as $field) {
 				if(!$field->getDataType()->beforeSave($this->data[$field->databaseName] ?? null, $this, $this->entity,$record)) {

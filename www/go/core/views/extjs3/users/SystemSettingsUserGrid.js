@@ -74,7 +74,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				header: t('Modified at'),
 				width: dp(160),
 				sortable: true,
-				dataIndex: 'createdAt',
+				dataIndex: 'modifiedAt',
 				hidden: true
 			},
 			{

@@ -15,7 +15,67 @@ go.Modules.register("core", 'core', {
 			}
 		},
 
-		'User',
+		{
+			name: 'User',
+			filters: [
+				{
+					wildcards: false,
+					name: 'text',
+					type: "string",
+					multiple: false,
+					title: "Query"
+				},
+				{
+					title: t("Comment"),
+					name: 'comment',
+					multiple: true,
+					type: 'string'
+				},
+				{
+					title: t("Commented at"),
+					name: 'commentedat',
+					multiple: false,
+					type: 'date'
+				}, {
+					title: t("Modified at"),
+					name: 'modifiedat',
+					multiple: false,
+					type: 'date'
+				}, {
+					title: t("Modified by"),
+					name: 'modifiedBy',
+					multiple: true,
+					type: 'string'
+				}, {
+					title: t("Created at"),
+					name: 'createdat',
+					multiple: false,
+					type: 'date'
+				}, {
+					title: t("Created by"),
+					name: 'createdby',
+					multiple: true,
+					type: 'string'
+				},
+				{
+					title: t("Username"),
+					name: 'username',
+					multiple: true,
+					type: 'string'
+				},{
+					title: t("Display name"),
+					name: 'displayName',
+					multiple: true,
+					type: 'string'
+				},{
+					title: t("E-mail"),
+					name: 'email',
+					multiple: true,
+					type: 'string'
+				},
+			]
+
+		},
 		'UserDisplay',
 		'Field', 
 		{

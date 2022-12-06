@@ -1,3 +1,5 @@
+- Core / addressbook: Fixed disappearing custom fields after saving a new contact to an organization
+
 05-12-2022 6.6.138
 - Core: typo in update script
 
