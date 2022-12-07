@@ -444,6 +444,10 @@ abstract class EntityController extends Controller {
 		
 		if(!isset($params['ids'])) {
 			$query = $cls::find($params['properties'], static::$getReadOnly);
+
+			//filter permissions
+			$cls::applyAclToQuery($query, Acl::LEVEL_READ);
+
 		} else
 		{
 			$query = $cls::findByIds($params['ids'], $params['properties'], static::$getReadOnly);
