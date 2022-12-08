@@ -1226,7 +1226,7 @@ $updates['202211251153'][] = "alter table core_auth_remember_me
         foreign key (userId) references core_user (id)
             on delete cascade;";
 
-$update['202211291426'][] = "alter table `core_customfields_field` add column `filterable` BOOLEAN NOT NULL DEFAULT FALSE";
+$updates['202211291426'][] = "alter table `core_customfields_field` add column `filterable` BOOLEAN NOT NULL DEFAULT FALSE";
 
-$update['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId in (SELECT aclId FROM core_customfields_field_set);";
-$update['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId = (SELECT defaultAclId FROM core_entity WHERE name = 'FieldSet');";
+$updates['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId in (SELECT aclId FROM core_customfields_field_set);";
+$updates['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId = (SELECT defaultAclId FROM core_entity WHERE name = 'FieldSet');";
