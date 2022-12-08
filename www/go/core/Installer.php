@@ -222,7 +222,7 @@ class Installer {
 		//Allow people to read filters by default
 		model\EntityFilter::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 		//Allow people to read custom fieldsets by default
-		model\FieldSet::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		model\FieldSet::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_WRITE]);
 		//groups readble to everyone
 		Group::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}

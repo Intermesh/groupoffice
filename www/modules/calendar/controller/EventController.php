@@ -1729,7 +1729,6 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			}
 		}else
 		{
-//			throw new \Exception("ja");
 			$event = $this->findByStartTime($vevent, $settings->calendar_id);
 			if($event) {
 				$event->delete();
@@ -1777,30 +1776,12 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			\GO::getDbConnection()->query("DELETE FROM cal_participants WHERE event_id = ".$event->id." AND user_id !=".\go()->getUserId());
 			\GO::getDbConnection()->query("INSERT INTO cal_participants (event_id, name, email, user_id, contact_id, status, last_modified, is_organizer, role) SELECT '".$event->id."', name, email, user_id, contact_id, status, last_modified, is_organizer, role FROM cal_participants p2 WHERE p2.event_id = ".$organizerEvent->id." AND user_id !=".\go()->getUserId());
 		}
-
-//		if(!$participant)
-//		{
-//			//this is a bad situation. The import thould have detected a user for one of the participants.
-//			//It uses the E-mail account aliases to determine a user. See \GO\Calendar\Model\Event::importVObject
-//			$participant = new \GO\Calendar\Model\Participant();
-//			$participant->event_id=$event->id;
-//			$participant->user_id=$event->calendar->user_id;
-//			$participant->email=$event->calendar->user->email;	
-//			$participant->save();
-//		}		
-		
-//		if($status)
-//				$participant->status=$status;
-//			$participant->save();
-		
-//		$event->replyToOrganizer();
-		
 		
 		$langKey = $eventUpdated ? 'eventUpdatedIn' : 'eventScheduledIn';
 		
-		$response['attendance_event_id']=$event->id;
-		$response['feedback']=sprintf(\GO::t($langKey,'calendar'), $event->calendar->name, $participant->statusName);
-		$response['success']=true;
+		$response['attendance_event_id'] = $event->id;
+		$response['feedback'] = sprintf(\GO::t($langKey,'calendar'), $event->calendar->name, $participant->statusName ?? "");
+		$response['success'] = true;
 		
 		return $response;
 	}

@@ -2638,9 +2638,18 @@ The following is the error message:
 		}
 //		}
 
+		$mailer = $this->getUserMailer();
+
+		// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
+		if($mailer->getTransport() instanceof \GO\Email\Transport) {
+			$message->setSender($this->user->email);
+		} else {
+			$message->setSender(go()->getSettings()->systemEmail);
+		}
+
 		$message->setHtmlAlternateBody($body);
 
-		$this->getUserMailer()->send($message);
+		$mailer->send($message);
 
 	}
 	
@@ -2710,7 +2719,16 @@ The following is the error message:
 			if($language !== false)
 				\GO::language()->setLanguage($language);
 
-			$this->getUserMailer()->send($message);
+			$mailer = $this->getUserMailer();
+
+			// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
+			if($mailer->getTransport() instanceof \GO\Email\Transport) {
+				$message->setSender($this->user->email);
+			} else {
+				$message->setSender(go()->getSettings()->systemEmail);
+			}
+
+			$mailer->send($message);
 		}
 
 		return true;
@@ -2828,7 +2846,18 @@ The following is the error message:
 					if($language !== false)
 						\GO::language()->setLanguage($language);
 
-					if(!$this->getUserMailer()->send($message)) {
+
+
+					$mailer = $this->getUserMailer();
+
+					// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
+					if($mailer->getTransport() instanceof \GO\Email\Transport) {
+						$message->setSender($this->user->email);
+					} else {
+						$message->setSender(go()->getSettings()->systemEmail);
+					}
+
+					if(!$mailer->send($message)) {
 						throw new \Exception("Failed to send invite");
 					}
 					
