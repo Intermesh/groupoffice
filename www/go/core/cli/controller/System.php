@@ -9,6 +9,7 @@ use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\Forbidden;
 use go\core\exception\NotFound;
+use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\Entity;
 use go\core\jmap\Response;
@@ -125,6 +126,8 @@ JSON;
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticator --package=community --name=Sync
 	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
+	 *
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=core --package=core --name=GarbageCollection
 	 */
 	public function runCron($name, $module = "core", $package = "core") {
 
@@ -361,4 +364,16 @@ JSON;
 		
 	// 	echo "\n\nFound " . $staleCount ." stale blobs\n";
 	// }
+
+
+
+	/**
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/checkBlobs --delete
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function checkBlobs(bool $delete = false) {
+		Blob::removeMissingFromFilesystem($delete);
+	}
 }

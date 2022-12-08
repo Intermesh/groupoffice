@@ -496,4 +496,36 @@ class Blob extends orm\Entity {
 	{
 		return array_merge(parent::atypicalApiProperties(), ['file']);
 	}
+
+
+	/**
+	 * Iterates all blobs on disk and checks if they are in the database
+	 *
+	 * @param bool $delete
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function removeMissingFromFilesystem(bool $delete = false) {
+		$folder = go()->getDataFolder()->getFolder("data");
+
+		foreach($folder->getFolders() as $level1) {
+			foreach($level1->getFolders() as $level2) {
+				foreach($level2->getFiles() as $file) {
+					$blobId = $file->getName();
+
+					echo $blobId . ": ";
+
+					$blob = static::findById($blobId);
+
+					echo $blob ? "found" : "NOT FOUND";
+
+					if(!$blob && $delete) {
+						$file->delete();
+					}
+
+					echo "\n";
+				}
+			}
+		}
+	}
 }
