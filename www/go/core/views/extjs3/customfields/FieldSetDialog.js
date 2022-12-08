@@ -21,8 +21,11 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 	},
 	initFormItems: function () {
 
-
-		this.addPanel(new go.permissions.SharePanel());
+		this.addPanel(new go.permissions.SharePanel(
+			{
+				addLevel: go.permissionLevels.write
+			}
+		));
 		return [{
 				xtype: 'fieldset',
 				items: [{
