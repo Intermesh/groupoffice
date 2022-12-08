@@ -108,7 +108,7 @@ class Folder extends FileSystemObject {
 		}
 
 		$children = [];
-		while ($item = readdir($dir)) {
+		while (false !== ($item = readdir($dir))) {
 			
 			$folderPath = $this->path . '/' . $item;
 			
