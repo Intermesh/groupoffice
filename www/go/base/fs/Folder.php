@@ -54,7 +54,7 @@ class Folder extends Base {
 			return false;
 
 		$folders = array();
-		while ($item = readdir($dir)) {
+		while (false !== ($item = readdir($dir))) {
 			$folderPath = $this->path.'/'.$item;
 			if ($item != "." && $item != ".." &&
 							($getHidden || !(strpos($item, ".") === 0) )) {
