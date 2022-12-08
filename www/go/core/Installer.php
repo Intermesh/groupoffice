@@ -501,9 +501,11 @@ class Installer {
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
+		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 		while (!$this->upgradeModules()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";			
 		}
+		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 
 		echo "Rebuilding cache\n";
 
@@ -657,7 +659,7 @@ class Installer {
 
 		$counts = array();
 
-		$aModuleWasUpgradedToNewBackend = false;		
+		$aModuleWasUpgradedToNewBackend = false;
 		
 		foreach ($u as $updateQuerySet) {
 
