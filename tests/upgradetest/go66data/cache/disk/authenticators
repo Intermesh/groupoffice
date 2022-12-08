@@ -1,0 +1,1 @@
+a:5:{s:8:"password";s:21:"go\core\auth\Password";s:5:"dummy";s:49:"go\modules\community\dev\model\DummyAuthenticator";s:19:"googleauthenticator";s:60:"go\modules\community\googleauthenticator\Googleauthenticator";s:4:"imap";s:58:"go\modules\community\imapauthenticator\model\Authenticator";s:4:"ldap";s:58:"go\modules\community\ldapauthenticator\model\Authenticator";}

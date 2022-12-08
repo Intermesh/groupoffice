@@ -1,0 +1,1 @@
+a:4:{s:12:"readOnlyKeys";a:3:{s:6:"setter";b:0;s:6:"getter";b:1;s:6:"access";N;}s:6:"values";a:3:{s:6:"setter";b:1;s:6:"getter";b:0;s:6:"access";N;}s:5:"value";a:3:{s:6:"setter";b:1;s:6:"getter";b:0;s:6:"access";N;}s:15:"deleteAfterDays";a:3:{s:6:"setter";b:0;s:6:"getter";b:0;s:6:"access";i:2;}}
