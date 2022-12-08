@@ -42,7 +42,7 @@ try {
 	$installDb = INSTALL_NEW;
 
 //	For testing upgrades use:
-//	$installDb = INSTALL_UPGRADE;
+	$installDb = INSTALL_UPGRADE;
 
 	if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
 		core\fs\FileSystemObject::allowRootFolderDelete();
@@ -121,11 +121,11 @@ try {
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {
     echo "Running upgrade: ";
-	  $importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go65.sql';
+	  $importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go66.sql';
     echo "Running: " . $importCmd . "\n";
 	  system($importCmd);
 
-	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/go65data/* ' . $dataFolder->getPath();
+	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/go66data/* ' . $dataFolder->getPath();
 	  echo "Running: " . $copyCmd . "\n";
 	  system($copyCmd);
 
