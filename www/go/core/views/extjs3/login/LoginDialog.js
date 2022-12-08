@@ -80,16 +80,20 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 	},
 		
 	focus: function() {
-		// If it's the username panel then set the username field active
-		// var i = this.getLayout().activeItem;
-		// if(i.rendered) {
-		// 	i.focus();
-		// } else
-		// {
-		// 	i.on('render', function() {
-		// 		i.focus();
-		// 	}, this, {single: true});
-		// }
+		// timeout is needed for autofill in chrome. Otherwise the label does not move to the top of the field somehow
+		// I guess the onautofillstart animation does not run in that case.
+
+		setTimeout(() => {
+			// If it's the username panel then set the username field active
+			var i = this.getLayout().activeItem;
+			if (i.rendered) {
+				i.focus();
+			} else {
+				i.on('render', function () {
+					i.focus();
+				}, this, {single: true});
+			}
+		},500);
 		
 	}
 	
