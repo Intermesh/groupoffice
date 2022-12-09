@@ -86,6 +86,9 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 		setTimeout(() => {
 			// If it's the username panel then set the username field active
 			var i = this.getLayout().activeItem;
+			if(!i) {
+				return;
+			}
 			if (i.rendered) {
 				i.focus();
 			} else {
