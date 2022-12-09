@@ -12,6 +12,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	onReady: async function () {
 		if (this.currentId) {
 			const tl = await go.Db.store("TaskList").single(this.tasklistCombo.getValue());
+			this.role = tl.role;
 			this.tasklistCombo.store.setFilter("role", {role: tl.role});
 		} else {
 			this.tasklistCombo.store.setFilter("role", {role: this.role});
@@ -19,10 +20,19 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	onSubmit : function() {
-		if(this.support) {
-			go.Router.goto("support/" + this.currentId);
-		} else {
-			this.entityStore.entity.goto(this.currentId);
+
+		switch(this.role) {
+			case "support":
+				go.Router.goto("support/" + this.currentId);
+				break;
+
+			case "board":
+			case "project":
+				break;
+
+			default:
+				this.entityStore.entity.goto(this.currentId);
+				break;
 		}
 	},
 
@@ -166,7 +176,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		this.recurrenceField = new go.form.RecurrenceField({
 			anchor: "100%",
 			name: 'recurrenceRule',
-			hidden: this.hideRecurrence || this.support,
+			hidden: this.hideRecurrence || this.role == "support",
 			disabled: true
 		})
 
@@ -203,8 +213,8 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 							this.customerCombo = new go.users.UserCombo({
 								flex: 1,
-								disabled: !this.support,
-								hidden: !this.support,
+								disabled: this.role != "support",
+								hidden: this.role != "support",
 								anchor: undefined,
 								fieldLabel: t('Customer'),
 								hiddenName: 'createdBy',
@@ -258,7 +268,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
 									flex: 1,
 									anchor: undefined,
-									role: this.support ? "support" : null,
+									role: this.role,
 									listeners: {
 										change: this.onTaskListChange,
 										setvalue: this.onTaskListChange,

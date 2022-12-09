@@ -515,7 +515,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						tooltip: t('Add'),
 						cls: 'primary',
 						handler: function (btn) {
-							let dlg = new go.modules.community.tasks.TaskDialog({support: this.support});
+							let dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
 							dlg.setValues({
 								tasklistId: this.addTasklistId
 							}).show();
@@ -710,7 +710,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		let dlg = new go.modules.community.tasks.TaskDialog({support: this.support});
+		let dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
 		dlg.load(record.id).show();
 	},
 	
@@ -727,7 +727,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		var dlg = new go.modules.community.tasks.TaskDialog({support: this.support});
+		var dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
 		dlg.load(record.id).show();
 	}	
 });
