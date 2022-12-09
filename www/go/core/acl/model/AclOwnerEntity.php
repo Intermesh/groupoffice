@@ -407,6 +407,12 @@ abstract class AclOwnerEntity extends AclEntity {
 	}
 
 	/**
+	 * Fixes broken ACL's:
+	 *
+	 * 1. Adds new if missing
+	 * 2. Set't the correct values for entityTypeId, entityId and usedIn
+	 * 3. Copies ownedBy from createdBy if present
+	 * 4. @todo: when old framework ACl is deprecated then it should add's owner to ACL if missing
 	 * @throws Exception
 	 */
 	public static function checkAcls() {

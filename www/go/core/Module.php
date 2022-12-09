@@ -841,6 +841,12 @@ abstract class Module extends Singleton {
 		}
 	}
 
+
+	/**
+	 * Check and fixes all enitties ACL's
+	 * @see AclOwnerEntity::checkAcls()
+	 * @return void
+	 */
 	public function checkAcls() {
 		$entities = $this->getClassFinder()->findByParent(AclOwnerEntity::class);
 		foreach($entities as $entity) {
