@@ -47,6 +47,16 @@ class PdfRenderer extends Fpdi {
 
 		//Set normal font
 		$this->normal();
+
+		$this->setHtmlVSpace([
+			'p' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+			'div' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+			'ol' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+			'ul' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+		]);
+
+		$this->setCellHeightRatio(1.25);
+		$this->SetCellPadding(0);
 	}
 
 	/**

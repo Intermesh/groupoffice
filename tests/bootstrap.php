@@ -42,7 +42,7 @@ try {
 	$installDb = INSTALL_NEW;
 
 //	For testing upgrades use:
-	$installDb = INSTALL_UPGRADE;
+//	$installDb = INSTALL_UPGRADE;
 
 	if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
 		core\fs\FileSystemObject::allowRootFolderDelete();

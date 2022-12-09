@@ -776,7 +776,8 @@ class TemplateParser {
 		}
 		$expression = str_replace(';', ' ; ', $expression);
 		
-		$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);		
+		//$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$parts = empty($expression) ? [] : str_getcsv($expression,' ','"');
 		$parts = array_map('trim', $parts);
 		
 		$str = '';
@@ -799,7 +800,7 @@ class TemplateParser {
 				$str .= $part.' ';
 			}else
 			{
-				$str .= '"'. str_replace('"', '\"', $part) . '" ';
+				$str .= '"'. $part . '" ';
 			}			
 		}		
 		return empty($str) ? 'return false;' : 'return ('.$str.');';
