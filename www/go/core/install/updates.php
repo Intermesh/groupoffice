@@ -1233,6 +1233,18 @@ $updates['202211291426'][] = "alter table `core_customfields_field` add column `
 $updates['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId in (SELECT aclId FROM core_customfields_field_set);";
 $updates['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId = (SELECT defaultAclId FROM core_entity WHERE name = 'FieldSet');";
 
+$updates['202212081208'][] = function() {
+	// make sure groups are visible to themselves
+	$stmt = go()->getDbConnection()
+		->insertIgnore(
+			'core_acl_group',
+			go()->getDbConnection()->select('aclId, id, "10"')->from("core_group"),
+			['aclId', 'groupId', 'level']
+		);
+
+	$stmt->execute();
+};
+
 // Start 6.7
 $updates['202212081208'][] = "alter table core_pdf_block modify x int null;";
 
@@ -1316,3 +1328,14 @@ $updates['202212081208'][] = "alter table `core_customfields_field` add column `
 
 $updates['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId in (SELECT aclId FROM core_customfields_field_set);";
 $updates['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId = (SELECT defaultAclId FROM core_entity WHERE name = 'FieldSet');";
+$updates['202212081208'][] = function() {
+	// make sure groups are visible to themselves
+	$stmt = go()->getDbConnection()
+		->insertIgnore(
+			'core_acl_group',
+			go()->getDbConnection()->select('aclId, id, "10"')->from("core_group"),
+			['aclId', 'groupId', 'level']
+		);
+
+	$stmt->execute();
+};

@@ -60,6 +60,7 @@ class Acl extends Controller {
 
 			$stmt->execute();
 
+			// Add ACL owners
 			$stmt = go()->getDbConnection()->insert('core_acl_group',
 				go()->getDbConnection()
 					->select('t.'.$col.', g.id, "' . model\Acl::LEVEL_MANAGE .'"')
@@ -80,33 +81,32 @@ class Acl extends Controller {
 				->insertIgnore(
 					'core_acl_group',
 					go()->getDbConnection()
-						->select($col.', "'.$groupId.'", "' . $level .'"')
+						->select($col . ', "' . $groupId . '", "' . $level . '"')
 						->from($table, 't')
 						->join("core_acl", "acl", "acl.id = t.$col")
 						->where("acl.usedIn = '$fullAclCol'"),
 					['aclId', 'groupId', 'level']
-			);
+				);
 
 			$stmt->execute();
-
-
-			if($cls::entityType()->getName() == "Group") {
-				$stmt = go()->getDbConnection()
-					->insertIgnore(
-						'core_acl_group',
-						go()->getDbConnection()->select($col.', id, "' . model\Acl::LEVEL_READ .'"')->from($table),
-						['aclId', 'groupId', 'level']
-					);
-
-				$stmt->execute();
-			}
-
-			EntityType::resetAllSyncState();
-			go()->getSettings()->cacheClearedAt = time();
-			/** @noinspection PhpUnhandledExceptionInspection */
-			go()->getSettings()->save();
-
 		}
+
+		if($cls::entityType()->getName() == "Group") {
+			//share groups with themselves
+			$stmt = go()->getDbConnection()
+				->insertIgnore(
+					'core_acl_group',
+					go()->getDbConnection()->select($col.', id, "' . model\Acl::LEVEL_READ .'"')->from($table),
+					['aclId', 'groupId', 'level']
+				);
+
+			$stmt->execute();
+		}
+
+		EntityType::resetAllSyncState();
+		go()->getSettings()->cacheClearedAt = time();
+		/** @noinspection PhpUnhandledExceptionInspection */
+		go()->getSettings()->save();
 
 		return [];
 	}
