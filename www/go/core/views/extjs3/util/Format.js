@@ -297,6 +297,14 @@
 			return '<span style="cursor:pointer" title="' + go.util.Format.dateTime(v) + '">' + go.util.Format.userDateTime(v) + '</span>';
 		},
 
+		shortTime: function(v) {
+			let arV = v.split(":");
+			if(arV.length !== 3) {
+				return '';
+			}
+			return arV[0] + ":" + arV[1];
+		},
+
 		shortDateTime: function (v, showTime, longNotation, noTimeForToday) {
 			
 			showTime?showTime:null;
