@@ -2710,6 +2710,11 @@ body.x-body-masked .x-window-plain .x-window-mc {
 .x-html-editor-wrap {
 	border-radius: dp(10);
 	border:1px solid color($fg, 'track');
+	background-color:color($bg, 'box');
+
+	iframe {
+		border-radius: dp(10);
+	}
 }
 .x-html-editor-tb {
 	.x-toolbar {

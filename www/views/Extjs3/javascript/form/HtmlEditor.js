@@ -77,8 +77,12 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	initComponent: function() {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
 
+		if(this.grow && !this.height) {
+			this.height = this.growMinHeight;
+		}
+
 		this.on('afterrender', function() {
-			if(this.grow && this.growMinHeight < dp(36)) {
+			if(this.grow && this.growMinHeight <= dp(46)) {
 				this.tb.hide();
 			}
 		}, this);
@@ -609,7 +613,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	/**
 	 * Minimum height for field
 	 */
-	growMinHeight: dp(30),
+	growMinHeight: dp(46),
 
 	/**
 	 * Maximum height for field
@@ -632,14 +636,14 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		body.style.display = 'inline-block';
 
 		body.style.minHeight =  this.growMinHeight + "px";
-		body.style.padding = dp(6) + "px " + dp(8) + "px";
+		body.style.padding = window.getComputedStyle(this.el.dom).padding;
 		body.style.boxSizing = "border-box";
 		body.style.width = "100%";
 		body.style.lineHeight = dp(20) + "px";
 
 		var h =  Math.max(this.growMinHeight, body.offsetHeight); // 400  max height
 
-		if(h > 36) {
+		if(h > dp(48)) {
 			this.tb.show();
 			//workaround for combo
 			if(this.tb.items.itemAt(0).wrap) {

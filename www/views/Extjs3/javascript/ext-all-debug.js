@@ -44675,7 +44675,9 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             if(doc){
                 try{
                     Ext.EventManager.removeAll(doc);
-                }catch(e){}
+                }catch(e){
+									console.warn(e);
+								}
             }
 
             
@@ -44700,7 +44702,9 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             this.pushValue();
             this.setReadOnly(this.readOnly);
             this.fireEvent('initialize', this);
-        }catch(e){}
+        }catch(e){
+					console.warn(e);
+				}
     },
 
     
