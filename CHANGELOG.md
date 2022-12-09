@@ -1,7 +1,8 @@
 - Core: Default permissions for custom field categories are write now
 - Calendar: Set sender header on e-mails
 - Custom fields: upgrade custom field set permissions to write
-- Core: dissallow multiple references and in-reply-to headers when parsing messages
+- Core: disallow multiple references and in-reply-to headers when parsing messages
+- Leavedays: upon loading existing leave request with special leave budget, display currently selected budget.
 
 06-12-2022 6.6.139
 - Core / addressbook: Fixed disappearing custom fields after saving a new contact to an organization
