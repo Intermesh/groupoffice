@@ -171,6 +171,9 @@ class PdfTemplateRenderer extends PdfRenderer {
 	public function render() {
 
 		try {
+
+			$oldLang = go()->getLanguage()->setLanguage($this->template->language);
+
 			$this->AddPage();
 
 			$currentX = $this->getX();
@@ -231,7 +234,11 @@ class PdfTemplateRenderer extends PdfRenderer {
 				$this->MultiCell($this->w - $this->lMargin - $this->rMargin, 14, $e->getTraceAsString(), 0, "L");
 			}
 		}
-		return parent::render();
+		$ret =  parent::render();
+
+		go()->getLanguage()->setLanguage($oldLang);
+
+		return $ret;
 	}
 
 
