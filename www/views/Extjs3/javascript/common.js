@@ -250,9 +250,6 @@ GO.request = function(config){
 	var p = Ext.apply({
 		url:url,
 		callback:function(options, success, response){
-			
-//			console.log(response);
-//
 			if(config.maskEl)
 				config.maskEl.unmask();
 
