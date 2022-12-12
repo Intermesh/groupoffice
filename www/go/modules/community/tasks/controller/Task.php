@@ -8,6 +8,7 @@ namespace go\modules\community\tasks\controller;
 
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\modules\community\tasks\model;
 
 class Task extends EntityController {
@@ -81,6 +82,7 @@ class Task extends EntityController {
 				]
 			])
 			->filter([
+				"permissionLevel" => Acl::LEVEL_WRITE,
 				"progress" => "needs-action",
 				"role" => "support"
 			]);
