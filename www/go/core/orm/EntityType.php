@@ -523,6 +523,8 @@ class EntityType implements ArrayableInterface {
 			}, $changes));
 		}
 
+		$allChanges = array_values($allChanges);
+
 		go()->debug("Pushing " . count($allChanges). " JMAP sync changes");
 
 		foreach(self::splitRecords($allChanges) as $chunk) {
