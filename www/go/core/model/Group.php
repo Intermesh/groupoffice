@@ -170,7 +170,7 @@ class Group extends AclOwnerEntity {
 		$stmt = go()->getDbConnection()
 			->insertIgnore(
 				'core_acl_group',
-				go()->getDbConnection()->select('aclId, id, "' . model\Acl::LEVEL_READ .'"')->from("core_group"),
+				go()->getDbConnection()->select('aclId, id, "' . Acl::LEVEL_READ .'"')->from("core_group"),
 				['aclId', 'groupId', 'level']
 			);
 
