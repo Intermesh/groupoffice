@@ -384,7 +384,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				tooltip: t("Print"),
 				overflowText: t("Print"),
 				handler: function(){
-					this.messagePanel.body.print();
+					this.print();
 				},
 				scope: this
 			}),
@@ -523,6 +523,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	},
 
 	_permissionDelegated : false,
+
+
 
 	addGridHandlers : function(grid)
 	{

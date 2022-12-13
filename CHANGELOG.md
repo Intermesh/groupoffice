@@ -4,6 +4,7 @@
 - Custom fields: upgrade custom field set permissions to write
 - Core: disallow multiple references and in-reply-to headers when parsing messages
 - Leavedays: upon loading existing leave request with special leave budget, display currently selected budget.
+- Leavedays: Warn manager when leave request without budget is being aprroved.
 - Core: Make sure users have permissions to see themselves.
 
 06-12-2022 6.6.139
