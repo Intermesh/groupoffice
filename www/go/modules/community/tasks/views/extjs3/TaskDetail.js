@@ -254,7 +254,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 						iconCls: "ic-print",
 						text: t("Print"),
 						handler: function () {
-							this.body.print({title: this.data.name});
+							this.el.print({title: "#" + this.data.id + ": " + this.data.title});
 						},
 						scope: this
 					}, "-",

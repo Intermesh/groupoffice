@@ -3,7 +3,10 @@ go.print = function(tmpl, data) {
 	var paper = document.getElementById('paper');
 
 	paper.innerHTML = Ext.isEmpty(data) ? tmpl : tmpl.apply(data);
-	Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
+
+	Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+		Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
+	});
 
 };
 
@@ -787,6 +790,9 @@ go.util =  (function () {
 					promises.push(this.getBlobURL(blobId).then(src => {
 
 						img.src = src;
+						img.onload = () => {
+							URL.revokeObjectURL(img.src);
+						}
 					})
 						.then(() => {
 						//wait till image is fully loaded

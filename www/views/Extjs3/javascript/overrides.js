@@ -795,19 +795,9 @@ Ext.override(Ext.Element, {
 		Ext.apply(this, config);
         
 		var el = Ext.get(this.id).dom;
-		// var c = document.getElementById('printcontainer');
-		// var iFrame = document.getElementById('printframe');
-        
-		var strTemplate = '<HTML><HEAD>{0}<TITLE>{1}</TITLE></HEAD><BODY onload="{2}" style="background-color:white;"><div style="position:fixed; top:0; left:0; right:0; bottom:0; z-index:99;"></div>{3}</BODY></HTML>';
 		var strAttr = '';
 		var strFormat;
-		var strHTML;
-        
-		//Get rid of the old crap so we don't copy it
-		//to our iframe
-		// if (iFrame != null) c.removeChild(iFrame);
-		// if (c != null) el.removeChild(c);
-        
+
 		//Copy attributes from this element.
 		for (var i = 0; i < el.attributes.length; i++) {
 			if (Ext.isEmpty(el.attributes[i].value) || el.attributes[i].value.toLowerCase() != 'null') {
@@ -823,38 +813,17 @@ Ext.override(Ext.Element, {
 		}
 
 		this.printCSS+='<style>body{overflow:visible !important;}</style>';
-		var html = el.innerHTML;
+		var html = "<div " + strAttr+">" + el.innerHTML + "</div>";
 		if(config.title) {
-
-
+			// set document title for saving to PDF
 			const oldTitle = document.title;
-
 			document.title = config.title;
-
 			window.addEventListener("afterprint" , function(){
-
 				document.title = oldTitle;
 			}, {once: true});
-
-			html = '<h1 style="margin-left:5px;font-size:16px;margin:10px 5px;">' + config.title + '</h1>' + html;
 		}
-        
-		//Build our HTML document for the iframe
-		// strHTML = String.format(
-		// 	strTemplate
-		// 	, Ext.isEmpty(this.printCSS)? '#': this.printCSS
-		// 	, this.printTitle
-		// 	, Ext.isIE? 'document.execCommand(\'print\');': 'window.print();'
-		// 	, html
-		// 	);
 
-      go.print(html);
-
-		// var popup = window.open('about:blank');
-		// if (!popup.opener) popup.opener = self
-		// popup.document.write(strHTML);
-		// popup.document.close();
-		// popup.focus();
+		go.print(html);
 	}
 });
 

@@ -2151,6 +2151,20 @@ table[id^="comments-ext"] b {
 		font-size:22px;
 	}
 }
+
+@media print {
+	.comments-container {
+		>div {
+			max-height: none !important;
+			height: auto !important;
+			overflow: visible !important;
+		}
+
+		.new-message {
+			display: none;
+		}
+	}
+}
 .comments-container {
 	min-height: dp(150);
 	> div {
