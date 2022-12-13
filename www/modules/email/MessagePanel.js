@@ -234,6 +234,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 	data: null,
 
+	print : function() {
+		this.body.print({title: this.data.date + " - " + this.data.sender + " - " + this.data.subject});
+	},
+
 	popup : function(){
 
 		if(this.loading){
