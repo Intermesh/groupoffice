@@ -829,10 +829,21 @@ Ext.override(Ext.Element, {
 		}
 
 		this.printCSS+='<style>body{overflow:visible !important;}</style>';
-
 		var html = el.innerHTML;
-		if(config.title)
-			html = '<h1 style="margin-left:5px;font-size:16px;margin:10px 5px;">'+config.title+'</h1>'+html;
+		if(config.title) {
+
+
+			const oldTitle = document.title;
+
+			document.title = config.title;
+
+			window.addEventListener("afterprint" , function(){
+
+				document.title = oldTitle;
+			}, {once: true});
+
+			html = '<h1 style="margin-left:5px;font-size:16px;margin:10px 5px;">' + config.title + '</h1>' + html;
+		}
         
 		//Build our HTML document for the iframe
 		// strHTML = String.format(
@@ -844,6 +855,7 @@ Ext.override(Ext.Element, {
 		// 	);
 
       go.print(html);
+
 		// var popup = window.open('about:blank');
 		// if (!popup.opener) popup.opener = self
 		// popup.document.write(strHTML);
