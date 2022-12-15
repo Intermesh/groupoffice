@@ -1,4 +1,5 @@
 - Core: HTML encode errors in Error dialog to prevent XSS
+- Core: Better error message on partial installed database
 
 09-12-2022 6.6.140
 - Core: Default permissions for custom field categories are write now
