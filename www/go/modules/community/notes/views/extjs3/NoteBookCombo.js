@@ -19,6 +19,9 @@ go.modules.community.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
 			filter: {
 					permissionLevel: go.permissionLevels.write
 			}
+		},
+		sortInfo: {
+			field: "name"
 		}
 	}
 });
