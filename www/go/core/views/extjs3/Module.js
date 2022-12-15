@@ -227,7 +227,7 @@ GO.mainLayout.on('render', function () {
 
 	// if(!GO.settings.config.debug) {
 		window.onerror = function (message, source, lineno, colno, error) {
-			GO.errorDialog.show(t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
+			GO.errorDialog.show(t("An error occurred. More details can be found in the console.") + "\n\n" + message);
 		}
 	// }
 
