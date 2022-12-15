@@ -1,5 +1,6 @@
 - Core: HTML encode errors in Error dialog to prevent XSS
 - Core: Better error message on partial installed database
+- Notes: fixed Feature request: Show note categories in alphabetical order when choosing a note's category #940
 
 09-12-2022 6.6.140
 - Core: Default permissions for custom field categories are write now
