@@ -1,3 +1,10 @@
+15-12-2022 6.6.141
+- Core: HTML encode errors in Error dialog to prevent XSS
+- Core: Better error message on partial installed database
+- Notes: fixed Feature request: Show note categories in alphabetical order when choosing a note's category #940
+- Core: Add more than one item to multiselect field. Fixes Feature request: Automatically add new notes to Synchronization #927 partially.
+- Core: Some images missing due to incorrect URL's in css.
+
 09-12-2022 6.6.140
 - Core: Default permissions for custom field categories are write now
 - Calendar: Set sender header on e-mails

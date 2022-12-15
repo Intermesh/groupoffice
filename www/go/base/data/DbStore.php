@@ -138,7 +138,6 @@ class DbStore extends AbstractStore {
 		$this->_modelClass = $modelClass;
 		$this->_columnModel = $columnModel;
 		$this->_requestParams = isset($requestParams) ? $requestParams : $_REQUEST;
-		//$this->setStoreParams($requestParams);
 		if ($findParams instanceof \GO\Base\Db\FindParams){
 			$this->_extraFindParams = $findParams;
 		}elseif($findParams!=null){

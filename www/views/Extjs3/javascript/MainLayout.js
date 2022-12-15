@@ -307,15 +307,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				expires: new Date(new Date().getTime()+(1000*60*60*24*30)), //30 days
 			}));
 		}
-		
 
 		var me = this;
 
-		Ext.getBody().mask(t("Loading..."));
-
 		return go.Modules.init().then(function() {
 			go.User.loadLegacyModules();
-			Promise.all([
+			return Promise.all([
 				go.customfields.CustomFields.init(),				
 				me.loadLegacyModuleScripts()
 			]).then(function(){
@@ -330,11 +327,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					me.addDefaultRoutes();
 					go.Router.check();
 				})
-			}).catch(GO.settings.config.debug ? undefined : function(error){
-				console.error(error);
-				Ext.getBody().unmask();
-				Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
 			});
+		}).catch(function(error) {
+			// Ext.getBody().unmask();
+			GO.errorDialog.show(error);
 		});
 		
 		

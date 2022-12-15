@@ -183,7 +183,7 @@ abstract class AbstractJsonController extends AbstractController {
 	public function renderStore(\GO\Base\Data\AbstractStore $store, $return = false, $buttonParams=false)
 	{
 		
-		$this->fireEvent('renderStore', [$store]);
+		$this->fireEvent('renderStore', [&$store]);
 		
 		$response=$store->getData();
 		if($summary = $store->getSummary()) {

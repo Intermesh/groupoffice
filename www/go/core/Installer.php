@@ -330,6 +330,10 @@ class Installer {
 			throw new Exception("This is not a Group-Office 6.3+ database. Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
 		}
 
+		if(!go()->getSettings()->databaseVersion) {
+			throw new Exception("It looks like a previous installation attempt failed. Please try to reinstall with an empty database. If the problem persists please report the error.");
+		}
+
 		if (version_compare(go()->getSettings()->databaseVersion, self::MIN_UPGRADABLE_VERSION) === -1) {
 			throw new Exception("Your version is " . go()->getSettings()->databaseVersion . ". Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
 		}

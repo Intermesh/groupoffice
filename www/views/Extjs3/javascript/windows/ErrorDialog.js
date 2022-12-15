@@ -69,7 +69,7 @@ Ext.extend(GO.ErrorDialog, GO.Window, {
 		}
 		
 		this.setHeight(dp(120));
-		this.messagePanel.body.update(error);
+		this.messagePanel.body.update(Ext.util.Format.nl2br(Ext.util.Format.htmlEncode(error)));
 
 		GO.ErrorDialog.superclass.show.call(this);
 		
