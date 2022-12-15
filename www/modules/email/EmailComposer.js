@@ -1474,7 +1474,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 					{
 						var fb = action.result && action.result.feedback ? action.result.feedback : t("Could not connect to the server. Please check your internet connection.");
 						
-						GO.errorDialog.show(Ext.util.Format.nl2br(Ext.util.Format.htmlEncode(fb)));
+						GO.errorDialog.show(fb);
 					}
 					this.saveButton.setDisabled(false);
 					this.sendButton.setDisabled(false);
