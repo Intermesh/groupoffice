@@ -1,3 +1,8 @@
+19-12-2022 6.6.142
+- Core: No HTML in server errors
+- ActiveSync: Fixed error  Argument 1 passed to GoSyncUtils::getBodyPreferenceMatch() must be of the type array or null, bool given, called in modules/z-push/backend/go/goMail.php on line 120
+- Core: Permission overview sorted by group name and sometimes it showed +2000 results if name of the item could not be found.
+
 15-12-2022 6.6.141
 - Core: HTML encode errors in Error dialog to prevent XSS
 - Core: Better error message on partial installed database

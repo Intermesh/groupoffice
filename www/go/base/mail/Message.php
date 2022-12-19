@@ -644,7 +644,7 @@ class Message extends \Swift_Message{
 					//$tmpFile->delete();
 				}else
 				{
-					throw new \Exception("Error: attachment missing on server: ".$tmpFile->stripTempPath().".<br /><br />The temporary files folder is cleared on each login. Did you relogin?");
+					throw new \Exception("Error: attachment missing on server: ".$tmpFile->stripTempPath().".\n\nThe temporary files folder is cleared on each login. Did you relogin?");
 				}
 			}
 		}

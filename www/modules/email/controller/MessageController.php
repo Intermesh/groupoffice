@@ -512,7 +512,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$account = Account::model()->findByPk($alias->account_id);
 
 		if (empty($account->drafts)) {
-			throw new \Exception(GO::t("Message could not be saved because the 'Drafts' folder is disabled.<br /><br />Go to E-mail -> Administration -> Accounts -> Double click account -> Folders to configure it.", "email"));
+			throw new \Exception(GO::t("Message could not be saved because the 'Drafts' folder is disabled.\n\nGo to E-mail -> Administration -> Accounts -> Double click account -> Folders to configure it.", "email"));
 		}
 		$message = new \GO\Base\Mail\Message();
 
@@ -750,7 +750,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 		
 		if(count($failedRecipients)) {
-			$msg = GO::t("Failed to send to", "email").': '.implode(', ',$failedRecipients).'<br /><br />';
+			$msg = GO::t("Failed to send to", "email").': '.implode(', ',$failedRecipients)."\n\n";
 
 			$logStr = $logger->dump();
 
@@ -760,7 +760,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$logStr = trim(substr($matches[0], 2, -2));
 			}
 
-			throw new Exception($msg.nl2br($logStr));
+			throw new Exception($msg.$logStr);
 		}
 		
 		//if there's an autolink tag in the message we want to link outgoing messages too.
