@@ -66,11 +66,11 @@ class GoSyncUtils {
 	/**
 	 * Returns the best match of preferred body preference types.
 	 *
-	 * @param ?array $bpTypes
+	 * @param ?array|false $bpTypes
 	 * @param array $supported
 	 * @return int
 	 */
-	public static function getBodyPreferenceMatch(?array $bpTypes, array $supported = array(SYNC_BODYPREFERENCE_PLAIN, SYNC_BODYPREFERENCE_HTML)): int
+	public static function getBodyPreferenceMatch($bpTypes, array $supported = array(SYNC_BODYPREFERENCE_PLAIN, SYNC_BODYPREFERENCE_HTML)): int
 	{
 
 		ZLog::Write(LOGLEVEL_DEBUG, 'GoSyncUtils->getBodyPreferenceMatch() ~~ bpTypes = ' . var_export($bpTypes, true));
