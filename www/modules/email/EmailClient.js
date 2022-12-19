@@ -384,7 +384,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				tooltip: t("Print"),
 				overflowText: t("Print"),
 				handler: function(){
-					this.print();
+					this.messagePanel.print();
 				},
 				scope: this
 			}),

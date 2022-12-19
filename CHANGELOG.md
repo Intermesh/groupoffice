@@ -1,3 +1,5 @@
+- Email: fix print button
+
 19-12-2022 6.6.142
 - Core: No HTML in server errors
 - ActiveSync: Fixed error  Argument 1 passed to GoSyncUtils::getBodyPreferenceMatch() must be of the type array or null, bool given, called in modules/z-push/backend/go/goMail.php on line 120
