@@ -187,7 +187,8 @@ class Message extends \Swift_Message{
 		}
 
 		if(isset($structure->headers['message-id'])) {
-			$this->setId(trim($structure->headers['message-id'], ' <>'));
+			//Microsoft had ID Message-ID: <[132345@microsoft.com]>
+			$this->setId(trim($structure->headers['message-id'], ' <>[]'));
 		}
 
 		if(isset($structure->headers['in-reply-to'])) {
