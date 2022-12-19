@@ -288,6 +288,11 @@ go.Modules.register("community", "addressbook", {
 						title: t("No")
 					}
 				]
+			}, {
+				title: t("VAT number"),
+				name: 'vatNo',
+				type:"text",
+				multiple: true
 			}
 		],
 

@@ -652,7 +652,12 @@ class Contact extends AclItemEntity {
 											// normal count query will fail with the above select overwritten with count(*)
 											$query->calcFoundRows();
 
-										})->add('userGroupId', function(Criteria $criteria, $value, Query $query) {
+										})
+										->addText("vatNo", function(Criteria $criteria, $comparator, $value, Query $query) {
+											$criteria->where('c.vatNo', $comparator, $value);
+										})
+
+										->add('userGroupId', function(Criteria $criteria, $value, Query $query) {
 											$query->join('core_user_group', 'ug', 'ug.userId = c.goUserId');
 											$criteria->where(['ug.groupId' => $value]);
 										})->add('isUser', function(Criteria $criteria, $value, Query $query) {
