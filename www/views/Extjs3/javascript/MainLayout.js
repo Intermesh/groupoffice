@@ -277,6 +277,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		panelConfig =panelConfig || {}
 		panelConfig.package = panelClass.prototype.package;
 
+		console.warn(panelConfig);
+
 		GO.moduleManager._addModule(moduleName, panelClass, panelConfig);
 				
 		go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
@@ -430,13 +432,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			listeners: {
 				afterrender: function(menu, e) {
 					menu.getEl().dom.addEventListener("click", (e) => {
-						console.warn("mainmenuhide");
 						menu.hide();
 					});
 
 					me.startMenuSearchField.on("render", (sf) => {
 						sf.getEl().dom.addEventListener("click", (e) => {
-							console.warn(e);
 							e.stopPropagation();
 						});
 					});
