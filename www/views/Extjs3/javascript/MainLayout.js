@@ -465,6 +465,19 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				},
 			}),
 			listeners: {
+				afterrender: function(menu, e) {
+					menu.getEl().dom.addEventListener("click", (e) => {
+						console.warn("mainmenuhide");
+						menu.hide();
+					});
+
+					me.startMenuSearchField.on("render", (sf) => {
+						sf.getEl().dom.addEventListener("click", (e) => {
+							console.warn(e);
+							e.stopPropagation();
+						});
+					});
+				},
 				show: function() {
 					if(!GO.util.isMobileOrTablet()) {
 						this.startMenuSearchField.focus(false, 500);
@@ -481,6 +494,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				me.openModule(moduleName);
 				me.startMenuSearchField.textField.reset();
 				me.startMenuSearchField.fireEvent('clear');
+
 				me.startMenu.hide();
 			},
 			updateMenuItems: function() {
@@ -709,7 +723,18 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					text: '<i class="icon">apps</i>',
 					renderTo: 'start-menu-link',
 					clickEvent: 'mousedown',
+					tooltip: t("Main menu") + " (" + (Ext.isMac ? '⌘ + ⇧' : 'CTRL + SHIFT') + ' + M)',
 					template: new Ext.XTemplate('<span><button></button></span>')
+				});
+
+				new Ext.KeyMap(document, {
+					stopEvent:true,
+					key:Ext.EventObject.M,
+					ctrl:true,
+					shift: true,
+					fn: () => {
+						this.startMenuLink.showMenu();
+					}
 				});
 
 				var userBtn = Ext.get('user-menu');
