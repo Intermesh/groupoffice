@@ -1176,6 +1176,7 @@ Ext.override(Ext.form.Field, {
 			var fieldHelp = new Ext.ux.FieldHelp(this.hint);
 			this.plugins = this.plugins || [];
 			this.plugins.push(fieldHelp);
+			delete this.hint;
 		}
 		
 		
