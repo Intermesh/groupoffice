@@ -40,6 +40,7 @@
 	}));
 
 	go.modules.community.tasks.TasklistComboBoxReset = Ext.extend(go.form.ComboBoxReset, Ext.apply(cfg, {
+		allowBlank: true,
 		initComponent: function() {
 			this.supr().initComponent.call(this);
 
