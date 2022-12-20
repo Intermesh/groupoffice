@@ -45,7 +45,7 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							anchor: "100%"
 						}
 					]
-			},
+				},
 				{
 					xtype: "fieldset",
 					title: t("Allowed groups"),
@@ -60,7 +60,37 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							border: true
 						})
 					]
-				}
+				},
+				{
+					xtype: "fieldset",
+					title: t("API settings"),
+					items: [
+						{
+							xtype: "box",
+							autoEl: "p",
+							html: t("Allow Cross Origin Requests from these origins")
+						},
+						{
+							xtype: "formgroup",
+							hideLabel: false,
+							fieldLabel: t("CORS origins"),
+
+							name: "corsAllowOrigin",
+							itemCfg: {
+								xtype: "textfield",
+								hideLabel: true,
+								placeholder: 'eg. https://example.com'
+							},
+							anchor: "100%"
+						}, {
+							xtype: "checkbox",
+							hideLabel: true,
+							boxLabel: "Allow user registration requests by everyone. Be careful!",
+							name: "allowRegistration"
+						}
+					]
+
+				},
 
 			]
 		});

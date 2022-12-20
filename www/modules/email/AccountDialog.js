@@ -125,18 +125,14 @@ GO.email.AccountDialog = function(config) {
 		fieldLabel:''
 	});
 
-	this.incomingTab = new Ext.Container({
+	this.incomingTab = new Ext.form.FieldSet({
 		title : t("Incoming mail", "email"),
-		layout: {
-			type: 'form',
-		},
-
+		columnWidth: .5,
 		defaults : {
 			anchor : '100%'
 		},
 		defaultType : 'textfield',
 		autoHeight : true,
-		cls: ' x-fieldset go-form-panel x-fieldset-noborder x-form-label-left',
 		// style: {
 		// 	padding: 'dp(8) dp(16) !important'
 		// },
@@ -270,13 +266,9 @@ GO.email.AccountDialog = function(config) {
 		fieldLabel:''
 	});
 	
-	this.outgoingTab = new Ext.Container({
+	this.outgoingTab = new Ext.form.FieldSet({
+		columnWidth: .5,
 		title : t("Outgoing mail", "email"),
-		layout: {
-			type: 'form'
-		},
-		cls: ' x-fieldset go-form-panel x-fieldset-noborder x-form-label-left',
-		xtype:'fieldset',
 		defaults : {
 			anchor : '100%'
 		},
@@ -443,8 +435,8 @@ GO.email.AccountDialog = function(config) {
 	this.propertiesTab = {
 		title : t("Properties"),
 		autoScroll: true,
-		layout:'table',
-		layoutConfig: {columns: 2},
+		layout:'column',
+		// layoutConfig: {columns: 2},
 		items: [{
 				title : t("Properties"),
 				xtype:'fieldset',
@@ -465,7 +457,6 @@ GO.email.AccountDialog = function(config) {
 						title : t("Extra options", "email"),
 						forceLayout:true,
 						labelWidth : 75,
-						labelAlign : 'left',
 						defaults: {hideLabel : true, checked:false},
 						items : [
 							new Ext.ux.form.XCheckbox({
@@ -508,10 +499,11 @@ GO.email.AccountDialog = function(config) {
 		title: t('Server', 'email'),
 		autoScroll: true,
 		disabled: (!GO.settings.modules.email.write_permission),
-		layout:'table',
-		layoutConfig: {columns: 2},
-		items: [{ 
-				rowspan: 2,
+		layout:'column',
+		// layoutConfig: {columns: 2},
+		items: [{
+			columnWidth: .5,
+
 				defaults: {xtype:'fieldset'},
 				items: [
 					this.incomingTab,
@@ -525,7 +517,6 @@ GO.email.AccountDialog = function(config) {
 						autoWidth : true,
 						defaultType : 'textfield',
 						labelWidth : 75,
-						labelAlign : 'left',
 
 						items : advancedItems
 					}
@@ -599,7 +590,7 @@ GO.email.AccountDialog = function(config) {
 	GO.email.AccountDialog.superclass.constructor.call(this, {
 		layout : 'fit',
 		modal : false,
-		height: dp(616),
+		height: dp(800),
 		width : dp(1008),
 		stateId: 'email-account-dialog',
 		closeAction : 'hide',

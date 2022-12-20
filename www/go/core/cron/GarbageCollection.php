@@ -6,6 +6,7 @@ use ErrorException;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\model\CronJobSchedule;
 use go\core\model\OauthAccessToken;
 use go\core\model\RememberMe;
 use go\core\util\DateTime;
@@ -29,15 +30,25 @@ use Throwable;
  * - core_change sync changelog
  *
  * Modules can use EVENT_RUN to extend the process
+ *
+ * For testing:
+ *
+ * docker-compose exec -u www-data groupoffice-finance ./www/cli.php core/System/runCron --name='GarbageCollection'
  * 
  */
 class GarbageCollection extends CronJob {
 
 	use EventEmitterTrait;
 
+	/**
+	 * Fires when the garbage collection job runs
+	 */
 	const EVENT_RUN = 'run';
-	
-	public function run(\go\core\model\CronJobSchedule $schedule) {
+
+	/**
+	 * @throws Exception
+	 */
+	public function run(CronJobSchedule $schedule) {
 		$this->blobs();
 		$this->change();
 		$this->links();

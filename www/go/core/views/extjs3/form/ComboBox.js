@@ -125,6 +125,23 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 	},
 
+	selectFirst : async function() {
+		if(!this.store.loaded) {
+			await this.store.load();
+			return this.selectFirst();
+		}
+		if(!this.store.getCount()) {
+			return null;
+		}
+
+		const firstRecord = this.store.getAt(0);
+		const v = firstRecord.get(this.valueField)
+		this.setValue(v);
+
+		return v;
+
+	},
+
 	postInitComp : function() {
 		//Set value promise can be used to do stuff after setvalue completed fetching the entity and loaded the store.
 		this.setValuePromise = Promise.resolve(this);
@@ -220,7 +237,10 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 			if(!value) {
 				resolve(me);
-				return go.form.ComboBox.superclass.setValue.call(me, value);
+				go.form.ComboBox.superclass.setValue.call(me, value);
+				me.clearInvalid();
+
+				return;
 			}
 
 			//create record from entity store if not exists
@@ -240,6 +260,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 					me.store.on("load", function() {
 
 						go.form.ComboBox.superclass.setValue.call(me, value);
+
+						me.clearInvalid();
 
 						me.hasFocus = origHasFocus;
 						resolve(me);
@@ -292,6 +314,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				}
 				Ext.form.ComboBox.superclass.setValue.call(me, text);
 				me.value = value;
+				me.clearInvalid();
 
 				resolve(me);
 				return me;

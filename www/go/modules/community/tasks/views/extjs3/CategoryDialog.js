@@ -4,7 +4,8 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 	titleField: "name",
 	resizable: false,
 	width: dp(400),
-	autoHeight: true,
+	height: dp(400),
+	redirectOnSave: false,
 	initFormItems: function () {
 		var items = [{
 				xtype: 'fieldset',

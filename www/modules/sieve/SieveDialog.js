@@ -67,7 +67,7 @@ GO.sieve.SieveDialog = function(config) {
 	});
 
 	this.formPanel = new Ext.FormPanel({
-		style:'padding:5px;',
+		style:'padding:' + dp(16) + "px",
 		autoHeight:true,
 		border:false,
 		labelWidth:200,
@@ -77,7 +77,7 @@ GO.sieve.SieveDialog = function(config) {
 				name:'active',
 				checked:true,
 				xtype:'checkbox',
-				fieldLabel:t("Activate this filter", "sieve")
+				boxLabel:t("Activate this filter", "sieve")
 			},
 			this.rgMethod,
 			this.criteriaLabel = new Ext.form.Label({text: '...'+t("meeting these criteria", "sieve")+':',	width:'100%',	style: 'padding-bottom: 10px; font-weight:bold;'})

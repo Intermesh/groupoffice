@@ -9,7 +9,14 @@ use go\core\webclient\Extjs3;
 use go\modules\community\multi_instance\model\Instance;
 
 class Module extends \go\core\Module {
-	
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
+
 	public function getAuthor(): string
 	{
 		return "Intermesh BV";

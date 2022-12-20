@@ -19,11 +19,18 @@ use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\modules\community\comments\Module as CommentsModule;
 use go\modules\community\tasks\model\Task;
-use go\modules\community\tasks\model\Tasklist;
+use go\modules\community\tasks\model\TaskList;
 use go\modules\community\tasks\model\UserSettings;
 
 class Module extends core\Module {
-							
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
+
 	public function getAuthor(): string
 	{
 		return "Intermesh BV <info@intermesh.nl>";
@@ -69,14 +76,14 @@ class Module extends core\Module {
 	 * @throws Exception
 	 */
 	public static function onUserDelete(core\db\Query $query) {
-		Tasklist::delete(['createdBy' => $query]);
+		TaskList::delete(['createdBy' => $query]);
 	}
 
 	public static function onUserBeforeSave(User $user)
 	{
 		if (!$user->isNew() && $user->isModified('displayName')) {
 			$oldName = $user->getOldValue('displayName');
-			$tasklist = Tasklist::find()->where(['createdBy' => $user->id, 'name' => $oldName])->single();
+			$tasklist = TaskList::find()->where(['createdBy' => $user->id, 'name' => $oldName])->single();
 			if ($tasklist) {
 				$tasklist->name = $user->displayName;
 				$tasklist->save();
@@ -86,7 +93,7 @@ class Module extends core\Module {
 
 	public function demo(Generator $faker)
 	{
-		$tasklists = Tasklist::find()->where(['role' => Tasklist::List]);
+		$tasklists = TaskList::find()->where(['role' => TaskList::List]);
 
 		foreach($tasklists as $tasklist) {
 			$this->demoTasks($faker, $tasklist);
@@ -97,47 +104,53 @@ class Module extends core\Module {
 	 * @throws SaveException
 	 * @throws Exception
 	 */
-	public function demoTasks(Generator $faker, Tasklist $tasklist, bool $withLinks = true) {
+	public function demoTasks(Generator $faker, TaskList $tasklist, bool $withLinks = true, $titles = null, $count = 5) {
 
-		$titles = [
-			"Finish tasks module",
-			"Call Michael about Energy project",
-			"Order printer paper",
-			"Create functional design",
-			"Create technical design",
-			"Create database design",
-			"Order machine parts",
-			"Order lunch",
-			"Schedule meeting with client",
-			"Discuss design with John",
-			"Fix issue with automatic problem solver",
-			"Prepare Weekly board meeting",
-			"Test two factor authentication",
-			"Perform weekly penetration tests on Group-Office",
-			"Implement Oauth 2.0",
-			"Implement Open ID",
-			"Feature request on autofill email addresses",
-			"Feature request SMIME encryption",
-			"Discuss roadmap for next release",
-			"Buy bigger screens",
-			"Verify backups",
-			"Perform weekly penetration tests on servers",
-			"Prepare quote for solar panels module",
-			"Prepare quote for Wind mill project",
-			"Review graphical designs for Group-Office website",
-			"Design checkout process",
-			"Take out the trash",
-			"Order more coffee",
-		];
+		if(!isset($titles)) {
+			$titles = [
+				"Finish tasks module",
+				"Call Michael about Energy project",
+				"Order printer paper",
+				"Create functional design",
+				"Create technical design",
+				"Create database design",
+				"Order machine parts",
+				"Order lunch",
+				"Schedule meeting with client",
+				"Discuss design with John",
+				"Fix issue with automatic problem solver",
+				"Prepare Weekly board meeting",
+				"Test two factor authentication",
+				"Perform weekly penetration tests on Group-Office",
+				"Implement Oauth 2.0",
+				"Implement Open ID",
+				"Feature request on autofill email addresses",
+				"Feature request SMIME encryption",
+				"Discuss roadmap for next release",
+				"Buy bigger screens",
+				"Verify backups",
+				"Perform weekly penetration tests on servers",
+				"Prepare quote for solar panels module",
+				"Prepare quote for Wind mill project",
+				"Review graphical designs for Group-Office website",
+				"Design checkout process",
+				"Take out the trash",
+				"Order more coffee",
+			];
+		}
 
 		$titleCount = count($titles);
 
-		for($i = 0; $i < 5; $i ++ ) {
+		$userIds = User::find()->selectSingleValue('id')->all();
+		$maxUserIndex = count($userIds) - 1;
+
+
+		for($i = 0; $i < $count; $i ++ ) {
 			echo ".";
 			$task = new Task();
 			$task->title = $titles[$faker->numberBetween(0, $titleCount - 1)];
-			$task->createdBy = $tasklist->createdBy;
-			$task->responsibleUserId = $task->createdBy;
+			$task->createdBy = $userIds[$faker->numberBetween(0, $maxUserIndex)];
+			$task->responsibleUserId = $userIds[$faker->numberBetween(0, $maxUserIndex)];
 			$task->start = $faker->dateTimeBetween("-1 years", "now");
 			$task->due =  $faker->dateTimeBetween($task->start, "now");
 			$task->tasklistId = $tasklist->id;

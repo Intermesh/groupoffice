@@ -829,8 +829,7 @@ END;
 		}
 
 		//remove all characters we don't care about
-		$text = preg_replace('/[^\w\-_+\\\\\/\s:@,;]/u', '', mb_strtolower($text));
-
+		$text = preg_replace('/[^\w\-_+\\\\\/\s:@,;.]/u', '', mb_strtolower($text));
 
 		// TODO transliterate to ascii so utf8 chars can be found with their ascii
 		// counterparts too ???
@@ -902,5 +901,50 @@ END;
 			}
 			return true;
 		}));
+	}
+
+	/**
+	 * Split numbers into multipe partials so we can match them using an index
+	 * eg.
+	 *
+	 * ticket no
+	 *
+	 * 2002-12341234
+	 *
+	 * Will be found on:
+	 *
+	 * 002-12341234
+	 * 02-12341234
+	 * 2-12341234
+	 * -12341234
+	 * 12341234
+	 * 2341234
+	 * 341234
+	 * 41234
+	 * 1234
+	 * 234
+	 *
+	 * this is faster then searching for
+	 *
+	 * %234 because it can't use an index
+	 *
+	 * @param string|int|null $number
+	 * @param int $minSearchLength
+	 * @return array
+	 */
+	public static function numberToKeywords($number, int $minSearchLength = 3): array
+	{
+		if(!isset($number)) {
+			return [];
+		}
+		$keywords = [$number];
+
+		while (strlen($number) > $minSearchLength) {
+			$number = substr($number, 1);
+			$keywords[] = $number;
+		}
+
+		return $keywords;
+
 	}
 }

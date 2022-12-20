@@ -32,7 +32,7 @@ class ReminderController extends \GO\Base\Controller\AbstractController {
 	
 	protected function actionStore($params){
 		$params = \GO\Base\Db\FindParams::newInstance()
-						->order('vtime')
+						->order('vtime', 'DESC')
 						->select('t.*')
 						->join(\GO\Base\Model\ReminderUser::model()->tableName(),
 									\GO\Base\Db\FindCriteria::newInstance()

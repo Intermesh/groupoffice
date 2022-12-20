@@ -28,6 +28,7 @@ class Response extends HttpResponse
 	protected function sendSecurityHeaders()
 	{
 		//no headers needed for JMAP
+		$this->sendCorsHeaders();
 	}
 
 	/**

@@ -4,6 +4,7 @@
 namespace GO\Email\Controller;
 
 use GO;
+use go\core\ErrorHandler;
 
 
 class AccountController extends \GO\Base\Controller\AbstractModelController
@@ -14,6 +15,37 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 		return array('setsieve');
 	}
 
+
+	protected function actionDisplay($params) {
+		$modelName = $this->model;
+		$model = \GO::getModel($modelName)->findByPk($this->getPrimaryKeyFromParams($params));
+
+		if(!$model)
+			throw new \GO\Base\Exception\NotFound();
+
+		return ['success' => true, 'data' => ['username' => $model->username]];
+	}
+
+
+//	protected function actionTest($params){
+//
+//		\GO::$disableModelCache=true;
+//
+//		for($i=0;$i<1000;$i++){
+//
+//			echo $i."<br>";
+//			${"account".$i} = \GO\Email\Model\Account::model()->findSingle();
+//
+//			${"account".$i}->openImapConnection("INBOX");
+//		}
+//
+//
+//
+//	}
+
+//	protected function headers() {
+//		header('Content-Type: application/json; charset=UTF-8');
+//	}
 	protected function getStoreParams($params) {
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
@@ -267,7 +299,11 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 			$stmt =  \GO\Email\Model\Account::model()->find($findParams);
 
 			while ($account = $stmt->fetch()) {
-				$account->maybeRenewAccessToken();
+				try {
+					$account->maybeRenewAccessToken();
+				}catch(\Exception $e) {
+					ErrorHandler::logException($e);
+				}
 				$alias = $account->getDefaultAlias();
 				if($alias){
 					$nodeId=base64_encode('account_' . $account->id);

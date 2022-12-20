@@ -123,7 +123,7 @@ go.Entities = (function () {
 		},
 
 		/**
-		 * Get link configurations as degined in Module.js with go.Modules.register();
+		 * Get link configurations as defined in Module.js with go.Modules.register();
 		 * 
 		 * @returns {Array}
 		 */

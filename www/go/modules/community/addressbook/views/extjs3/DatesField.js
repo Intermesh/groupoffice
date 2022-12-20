@@ -16,8 +16,10 @@
 		addButtonIconCls: 'ic-event',
 		itemCfg: {
 			items: [{
-				xtype: "compositefield",
-				hideLabel: true,
+				anchor: "100%",
+				layout: "form",
+				xtype: "container",
+				cls: "go-hbox",
 				items: [{
 					xtype: 'combo',
 					name: 'type',
@@ -31,13 +33,15 @@
 					mobile: {
 						width: dp(100)
 					},
-					value: "birthday"
+					value: "birthday",
+					fieldLabel: t("Type")
 				}, {
 					flex: 1,
 					xtype: "datefield",
 					allowBlank: false,
 					name: "date",
-					setFocus: true
+					setFocus: true,
+					fieldLabel: t("Date"),
 				}]
 			}]
 		}

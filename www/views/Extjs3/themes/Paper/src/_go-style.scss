@@ -311,6 +311,7 @@ a {
 		text-align:right;
 		color:white;
 		padding-top: dp(4);
+		@include var(background-color, c-primary);
 	}
 	input {
 		background-color: inherit;
@@ -418,6 +419,15 @@ a {
 		min-height: dp(40);
 		padding: dp(8) 0;
 		padding-left: dp(16);
+		display:flex;
+		> span {
+			flex: 1;
+		}
+
+		.badge {
+			flex: none;
+			margin-right: dp(16);
+		}
 		// border:0;
 		// margin:0;
 		cursor:pointer;
@@ -586,11 +596,10 @@ a {
 		margin: 0;
 	}
 	.x-form-field-wrap {
-		margin: 0 auto;		
+		margin: 0 auto;
+		max-width: dp(800);
 	}
 	input {
-		width: 100%;
-		max-width: dp(800);
 		background: none;
 		height: dp(48);
 		border:0;
@@ -609,6 +618,21 @@ a {
 	}
 }
 
+.x-btn.go-list-btn {
+	border: 0;
+	width: 100% !important;
+	.x-btn-mc {
+		text-align: left;
+		button {
+			width: 100%;
+			font-weight: normal;
+			padding-left: dp(16);
+			font-size: sp(16);
+			text-align: left;
+
+		}
+	}
+}
 
 
 .go-search-panel {
@@ -641,7 +665,7 @@ a {
 				transform: scale(.8);
 				margin-top: dp(12);
 			}
-			.x-tool {
+			.x-tool, .x-panel-inline-icon {
 				transform: scale(.8);
 				margin-top: dp(4);
 			};
@@ -692,11 +716,9 @@ a {
 	float:left;
 	height: dp(32);
 	padding: dp(2) dp(8);
-	margin-top: dp(16);
+	margin-top: dp(18);
 	margin-right: dp(8);
 	border-radius: dp(16);
-	border: 1px solid color($fg,'line');
-	background-color: color($bg,'readonly');
 	> * {
 		@extend %icon;
 		animation: blink .3s 7 alternate;
@@ -931,6 +953,7 @@ hr {
 	color: color($fg, 'text');
 	text-shadow: 0px 0px 4px white;
 	border:1px solid color($fg, 'divider');
+	line-height: dp(24);
 
 	.x-panel-header-text & {
 		margin: dp(8);
@@ -1235,6 +1258,7 @@ button.filetype-pdf, button.filetype-doc {
 	.s12 {width:100%;}
 	.pad {
 		padding-left: dp(16);
+		padding-right: dp(16);
 	}
     * { overflow:hidden;}
 
@@ -1301,10 +1325,12 @@ button.filetype-pdf, button.filetype-doc {
 		margin: 0;
 	}
 
-	.status {
+	.x-panel-header {
+		.status {
 
-		float:right;
-		margin: dp(12) dp(16);
+			float: right;
+			margin: dp(12) dp(16);
+		}
 	}
 }
 
@@ -1810,13 +1836,45 @@ table[id^="comments-ext"] b {
 
 .go-form-group {
 
+	.go-form-group-edit-tb
+	{
+		width: dp(50);
+		height: dp(58);
+		padding-top: dp(8);
+	}
+	&.required {
+		.go-form-group-edit-tb {
+			display: none;
+		}
+	}
+
+	.x-fieldset {
+		border: none;
+		padding: 0;
+		margin: 0;
+	}
+
+
+	&.multiple {
+		.go-form-group-edit-tb {
+			display: block;
+		}
+
+		.x-fieldset {
+			border: 1px solid color($fg, "line");
+			border-radius: dp(10);
+			padding: dp(8) dp(16);
+			margin: dp(16);
+		}
+	}
+
 
 	.x-panel-bbar {
 		overflow: visible;
 		.x-toolbar {
 			border-top: 0;
+			height: dp(32);
 		}
-
 		.x-btn-text {
 			font-weight: normal;
 			@include var(color, c-primary);
@@ -1826,18 +1884,22 @@ table[id^="comments-ext"] b {
 	.x-toolbar {
 		margin-left: dp(-16);
 	}
-	margin-bottom: dp(16);
+
+	&:not(:last-child) {
+		margin-bottom: dp(16);
+	}
 }
 
 
 .go-chip {
-	display: inline-block; 
-	border-radius: dp(4); 
-	background-color: $cPrimaryTp; 
+	display: inline-block;
+	border-radius: dp(10);
+	padding: dp(8);
+	background-color: $cPrimaryTp;
 	margin-right: dp(8);
-	margin-top: dp(8);
-	padding-left: dp(8);
-	
+	margin-bottom: dp(4);
+	padding-left: dp(16);
+
 	button.icon {
 		color: color($fg, "secondary-text");
 	}
@@ -1847,6 +1909,8 @@ table[id^="comments-ext"] b {
  * Resets ExtJS style to normal HTML defaults for displaying the HTML editor values or e-mails
  */
 .go-html-formatted {
+
+	overflow-wrap: break-word;
 
 	@extend %font-body1;
 
@@ -1912,7 +1976,7 @@ table[id^="comments-ext"] b {
 
 	p, span, div {
 		font-size: sp(16);
-		color: color($fg, 'text');
+		//color: color($fg, 'text');
 		font-weight: $font-weight-r;
 		line-height: dp(24);
 //		background-color: white;
@@ -1926,6 +1990,10 @@ table[id^="comments-ext"] b {
 	a:visited {
 		color: purple;
 	}
+
+	pre {
+		white-space: pre-wrap; // to prevent horizontal scrolling
+	}
 }
 
 .normal-link {
@@ -1934,16 +2002,20 @@ table[id^="comments-ext"] b {
 	cursor: pointer;
 }
 
-.go-chip {
-	display: inline-block; 
-	border-radius: dp(4);
-	background-color:  $cPrimaryTp;
-	margin-right: dp(8);
-	margin-top: dp(8);
-	padding-left: dp(8);
-}
+
 
 .go-messages {
+
+
+	overflow-anchor: none;
+
+
+
+
+	img {
+		max-width: 100%;
+		cursor: pointer;
+	}
 
 	.avatar {
 		margin: 0;
@@ -2079,11 +2151,30 @@ table[id^="comments-ext"] b {
 		font-size:22px;
 	}
 }
+
+@media print {
+	.comments-container {
+		>div {
+			max-height: none !important;
+			height: auto !important;
+			overflow: visible !important;
+		}
+
+		.new-message {
+			display: none;
+		}
+	}
+}
 .comments-container {
 	min-height: dp(150);
 	> div {
 		max-height: dp(744);
 		min-height: dp(32);
+	}
+
+	.anchor {
+		height:1px;
+		overflow-anchor: auto;
 	}
 }
 .new-message {
@@ -2313,7 +2404,8 @@ table[id^="comments-ext"] b {
 
 
 	section {
-		width: dp(800);
+		width: 100%;
+		max-width: dp(800);
 		margin: 0 auto;
 		padding: dp(16);
 	}
@@ -2369,7 +2461,7 @@ table[id^="comments-ext"] b {
 		color: #666;
 	}
 
-	textarea, input:not([type=checkbox]):not([type=radio]) {
+	textarea, input:not([type=checkbox]):not([type=radio]), select {
 
 		@extend %font-data;
 		color: color($fg, 'text');
@@ -2386,6 +2478,8 @@ table[id^="comments-ext"] b {
 
 	}
 
+
+
 	pre {
 		@extend code;
 	}
@@ -2393,6 +2487,7 @@ table[id^="comments-ext"] b {
 	*[disabled] {
 		opacity: 0.65;
 		cursor: not-allowed;
+		pointer-events: none;
 	}
 
 	.mask-message{
@@ -2527,7 +2622,7 @@ body.go-compact {
 	> div.tile {
 		position:relative;
 		outline: 2px solid color($fg,'divider');
-		height: dp(232);
+		height: dp(264);
 		background-color: color($bg,'card');
 	}
 
@@ -2551,6 +2646,7 @@ body.go-compact {
 	}
 	.thumb {
 		margin: dp(16);
+		margin-top: dp(48);
 		height: dp(80);
 		background-position: center center;
 		background-repeat: no-repeat;
@@ -2565,6 +2661,27 @@ body.go-compact {
 		padding: 2px;
 		width: dp(50);
 		min-height: dp(24);
+	}
+
+	.status {
+		position: absolute;
+		right: dp(8);
+		top: dp(8);
+		color: orange;
+		background-color: cornsilk;
+		border-radius: dp(4);
+		border: 1px solid orange;
+		text-transform: uppercase;
+
+		&.deprecated {
+			color: whitesmoke;
+			background-color: lightslategray;
+			border-color: darkslategrey;
+		}
+
+		&.stable {
+			display:none;
+		}
 	}
 }
 
@@ -2593,6 +2710,52 @@ body.go-compact {
 		.x-btn-text {
 			@include var(color, c-primary);
 			font-style: italic;
+		}
+	}
+}
+
+
+.ux-datetime-date, .ux-datetime-time {
+	vertical-align: top;
+}
+
+
+.go-hbox {
+	display: flex;
+	gap: dp(8);
+	flex-direction: row;
+}
+
+.go-vbox {
+	display: flex;
+	gap: dp(8);
+	flex-direction: column;
+}
+
+
+.go-daterange-field {
+	height: dp(44);
+	background-color:color($bg, 'box');
+	border: 1px solid color($fg, 'track');
+
+	&:hover {
+		filter: none;
+	}
+
+	.x-btn-mc {
+		text-align: left;
+		padding: dp(8);
+	}
+
+	button {
+		@extend %font-data;
+		color: color($fg, 'text');
+
+	}
+
+	em.x-btn-arrow {
+		> button:after {
+			display: none;
 		}
 	}
 }

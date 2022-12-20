@@ -4,6 +4,7 @@ namespace go\core\model;
 use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\customfield\Base;
+use go\core\customfield\Text;
 use go\core\db\Criteria;
 use go\core\db\Table;
 use go\core\orm\EntityType;
@@ -399,6 +400,13 @@ class Field extends AclItemEntity {
   /**
    * Find or create custom field
    *
+   * @example
+   * ```
+   * Field::create("Contract", "Intermesh", "hostname", "Hostname", Text::getName(), [
+   *  "options" => ["maxLength" => 255]
+   * ]);
+   * ```
+   *
    * @param string $entity eg. "User"
    * @param string $fieldSetName eg. "Forum"
    * @param string $databaseName eg. "numberOfPosts"
@@ -409,7 +417,8 @@ class Field extends AclItemEntity {
    * @return static
    * @throws Exception
    */
-	public static function create($entity, $fieldSetName, $databaseName, $name, $type = 'Text', $values = []) {
+	public static function create(string $entity, string $fieldSetName, string $databaseName, string $name, string $type = 'Text', array $values = []): Field
+	{
 		$field = Field::findByEntity($entity)->where(['databaseName' => $databaseName])->single();
 
 		if($field) {

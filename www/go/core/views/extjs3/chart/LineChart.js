@@ -4,6 +4,8 @@ go.chart.LineChart = Ext.extend(go.chart.ChartComponent, {
 	 go.chart.LineChart.superclass.initComponent.call(this);
 	},
 
+	chartType: "Line",
+
 	/**
 	 * @var {Array}
 	 */
@@ -12,25 +14,8 @@ go.chart.LineChart = Ext.extend(go.chart.ChartComponent, {
 	/**
 	 * @var {Object}
 	 */
-	options:null,
+	options:null
 	
-	update: function(series){
 
-		var data = {
-			series: series
-		};
-
-		if( this.labels ) {
-			data.labels =  this.labels;
-		}
-		
-		if(!this.chart) {
-			this.chart = new Chartist.Line("#" + this.el.id, data, this.options || {});
-		} else
-		{
-			this.chart.update(data);
-		}
-		
-	}
 	
 });

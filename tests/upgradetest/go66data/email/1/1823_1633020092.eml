@@ -1,0 +1,298 @@
+Return-Path: <bounces+9647731-98dc-flavio=lucanet.com.br@em7825.mercadolivre.com.br>
+Delivered-To: lucanet.com.br-flavio@lucanet.com.br
+Received: (qmail 81456 invoked by uid 89); 30 Sep 2021 16:41:42 -0000
+Received: from unknown (HELO mx.emailarray.com) (MTkyLjE2OC4xLjk1) 
+  by mx11.emailarray.com with ESMTPS (ECDHE-RSA-AES256-GCM-SHA384 encrypted); 30 Sep 2021 16:41:42 -0000
+Authentication-Results: mx.emailarray.com; iprev=pass; spf=pass smtp.mailfrom=em7825.mercadolivre.com.br
+Received-SPF: Pass (mx.emailarray.com: domain of em7825.mercadolivre.com.br designates 149.72.129.251 as permitted sender) receiver=mx.emailarray.com; identity=mailfrom; client-ip=149.72.129.251; helo=o12.ptr7196.sg.mercadolibre.com; envelope-from=<bounces+9647731-98dc-flavio=lucanet.com.br@em7825.mercadolivre.com.br>
+Received-SPF: None (mx.emailarray.com: domain of o12.ptr7196.sg.mercadolibre.com does not designate 149.72.129.251 as permitted sender) receiver=mx.emailarray.com; identity=helo; client-ip=149.72.129.251; helo=o12.ptr7196.sg.mercadolibre.com; envelope-from=<bounces+9647731-98dc-flavio=lucanet.com.br@em7825.mercadolivre.com.br>
+Received: from o12.ptr7196.sg.mercadolibre.com (o12.ptr7196.sg.mercadolibre.com [149.72.129.251])
+	by mx.emailarray.com (Haraka/2.8.21) with ESMTPS id 3951C7E4-461A-4323-9E9F-426B8C2BEE03.1
+	envelope-from <bounces+9647731-98dc-flavio=lucanet.com.br@em7825.mercadolivre.com.br>
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 verify=FAIL);
+	Thu, 30 Sep 2021 12:41:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mercadolivre.com.br;
+	h=content-transfer-encoding:content-type:from:mime-version:subject:to;
+	s=s1; bh=kSsjvOHya9lMncjC1ASDcT3tKs97gretNP4dGjnNPNw=;
+	b=5g/WmXzd+EuQv45a4dhXkrh6VXYT81rdsVm0xvHa+QdsvcPnHlIsiS3NoA+as/zlXaO2
+	bmFqKo8U0djq2q9B1nZcHNkgIZyh1YK3l4VxApKrZGdQXq47oPQnxouiYxABGSHqu/0B6D
+	vTZfFGxldhGsRv9YihYqUIda0MzAiUBhgFeSqu0/7xNa2Oe9iYadZQTCBSZn6K1MMajcFd
+	liQoQjuYBeNgBxrCix84zer9qavT0/dYPFuEKvHwLdKX5E+zA3QcexYt6RVWsQRjyjvwlQ
+	5ZgwjGjS90VrxtTofBJ/GR06fYD1dt7S+GIbDIEx30quVyllDduqhusglWSVCP5A==
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=iso-8859-1
+Date: Thu, 30 Sep 2021 16:41:32 +0000 (UTC)
+From: Mercado Livre <nao-responder@mercadolivre.com.br>
+Mime-Version: 1.0
+Message-ID: <r4Y9JAbRT_6w0V-XrL-71A@ismtpd0162p1mdw1.sendgrid.net>
+Subject: Opine sobre o produto que comprou
+X-SG-EID: 
+ =?us-ascii?Q?gyMJed=2FLrSjENY4rB7J7lAFjDAyaHKQ5R6UaDn3RIoysWZxk1gnKgyZeA50PwA?=
+ =?us-ascii?Q?753rluTIS0rKH7u1eFX97BFJhERSWjkjxa4tSxf?=
+ =?us-ascii?Q?tyMtU+emmlGPILJ9zNeaOXi4A654C3t34NkFXFT?=
+ =?us-ascii?Q?8adLhLesbcuWvgyErTeIwf8J7Av6eVJhzMFBCbr?=
+ =?us-ascii?Q?kEF6VdXOlL1rJXXWUeVOVt6vU5j4VSt=2FkAMDpRI?=
+ =?us-ascii?Q?oB+Xt4VpCzXTDt11h9pDeiMNzwqKrM80kG07HNh?=
+ =?us-ascii?Q?7H7J9w2nV7bjs4HfH2lhQ=3D=3D?=
+X-SG-ID: 
+ =?us-ascii?Q?N2C25iY2uzGMFz6rgvQsb5e7d=2FkDL5ynMFuFlK5WXYZqv2OZdBnmlNjKORmAVe?=
+ =?us-ascii?Q?ivU=2Fz4SPTxP7E4PogZM8rEswqKlS0jd+0xYrR9d?=
+ =?us-ascii?Q?9f8mp+N0uXWIhHoCSsMaTcAHThgYSqufJ0MO27e?=
+ =?us-ascii?Q?gb8YfAsApNEczNuBXfXt2rhDUcMkA+Gxj=2F2ZrcP?=
+ =?us-ascii?Q?vVNvTQ05FZdkmAa7ZxcPtBQ5YlSvd=2FD63cri+i=2F?=
+ =?us-ascii?Q?zIV4utSbJdGEsn=2FHmVhNJXFKfw=2Fpl=2FLCR=2FEc=2F4Z?=
+ =?us-ascii?Q?wAYRmxpIqjcB9XRvkHDvk3ctXvCUNomI1TrzzAw?=
+ =?us-ascii?Q?waWz1NflFCj1b+SZ=2FozNEiOXxveanhL9cVFHfY5?=
+ =?us-ascii?Q?0HkHEMRGThccBdEKtZZGk55+OQ84rp+O3vNhEm7?=
+ =?us-ascii?Q?muhn=2FuANQ5j6pw6qM7jyA34ZOqKpevQCtH44qgZ?=
+ =?us-ascii?Q?Z2QnHbcKzRJ9WhUzBK+G4HjaUgiyZUfVWt0G4Sf?=
+ =?us-ascii?Q?UKwWTUKDbrYNT7zCJ=2FGzI40CYCmDRn0Fvsl3wMa?=
+ =?us-ascii?Q?9SZeueU1hwc2jUBVZjgozwiKAYqDqQpwiV6YXSw?=
+ =?us-ascii?Q?qR+Q=3D=3D?=
+To: flavio@lucanet.com.br
+X-Entity-ID: ZBN47b/6UaYOpi8LSj3/fQ==
+X-Rspamd-Bar: -----
+X-Rspamd-Report: MV_CASE(0.5) SENDGRID_SENDER(3) R_SPF_ALLOW(-0.2) SPFWL_SAFE(-5) MX_GOOD(-0.01) DMARC_POLICY_ALLOW(-0.5) FORGED_SENDER(0.3) SUBJ_MED(2.8) ONCE_RECEIVED(0.1) SENDER_DOM_NEQ_TLD(2) R_DKIM_ALLOW(-0.2) EXT_CSS(1) HTML_SHORT_LINK_IMG_1(2) MANY_INVISIBLE_PARTS(0.05) WHITELIST_DMARC(-7) BAYES_HAM(-1.967515) MIME_HTML_ONLY(0.2) WHITELIST_SPF_DKIM(-3)
+X-Rspamd-Score: -5.927515
+X-EmailArray-EnvFrom: bounces+9647731-98dc-flavio=lucanet.com.br@em7825.mercadolivre.com.br
+X-EmailArray-Remote-IP: 149.72.129.251
+X-EmailArray-UID: 3951C7E4-461A-4323-9E9F-426B8C2BEE03.1
+X-EmailArray-TO: flavio@lucanet.com.br
+X-PolarisMail-Flags: z
+X-PolarisMail-Spam: Whitelisted
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.=
+w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns=3D"http://www.w3.=
+org/1999/xhtml"><head><meta http-equiv=3D"Content-Type" content=3D"text/htm=
+l; charset=3Dutf-8"><meta http-equiv=3D"X-UA-Compatible" content=3D"IE=3Ded=
+ge"><meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=
+=3D1.0"><title></title><link rel=3D"stylesheet" href=3D"https://static.mlst=
+atic.com/org-img/ui/font/lato/300.400.700.css"><style type=3D"text/css" sty=
+le=3D"font-family: Lato, Arial, sans-serif;"> @media screen and (max-width:=
+ 401px) { .two-column .column { max-width: 100% !important; } .three-column=
+ .column { max-width: 150px !important; } .inner2 { padding: 20px 10px !imp=
+ortant; } .three-column img {} .header-content .hashtag { font-size: 11px !=
+important; } .banner-col-3 .three-column .column { max-width: 100% !importa=
+nt; } .banner-beneficios .three-column .column * { max-width: 100% !importa=
+nt; display: block; text-align: center; } .btn_detalles, .bt_explorar_cat {=
+ width: 100% !important; } .header-logo { content: url(https://www.mercadol=
+ibre.com/org-img/mkt/email-mkt-assets/davinci/2x/logo-meli-br_codo_a_codo.p=
+ng) !important; height: 36px !important; width: auto !important; } [class^=
+=3D"banner-vertical-text-"] { max-width: 280px !important; } } @media (max-=
+width: 401px) { .template-itemPrincipal { padding: 0 20px 20px 20px !import=
+ant;} }</style></head><body style=3D"-ms-text-size-adjust: 100%; -webkit-te=
+xt-size-adjust: 100%; background-color: #FFFFFF; font-family: Lato, Arial, =
+sans-serif; margin: 0; max-width: 600px; min-width: 100%; padding: 0;"><img=
+ src=3D"https://api.mercadolibre.com/reviews/emails/pixel.gif?reviewer=3D13=
+3767986&item_id=3DMLB1815783071&review_type=3DdefaultReview"/><img src=3D"h=
+ttp://data.mercadolibre.com/pixel.gif?q=3D[tracks:[[path:"/reviews/email", =
+user: [uid:null, user_id:133767986], type: "View", user_time_zone: "0", ser=
+ver_id: fb8b3c64-8513-4d85-b882-465046b55d61, id: fb8b3c64-8513-4d85-b882-4=
+65046b55d61, event_data: [cookies:[], headers:[], http_url: null, itemId: M=
+LB1815783071, reviewerId:133767986, requestedType: defaultReview], applicat=
+ion: [version: unknown, server_hostname: i-04003a7c2567e0933-10.50.26.207, =
+server_poolname: unknown, business=3D"mercadolibre", site_id: MLB] device:[=
+resolution_height: null, resolution_width: null, platform: "/email", user_a=
+gent:null],  experiments:[], created_hidden:false]]]"/><center class=3D"wra=
+pper" style=3D"-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; =
+font-family: Lato, Arial, sans-serif; table-layout: fixed; width: 100%;"><d=
+iv class=3D"webkit" style=3D"font-family: Lato, Arial, sans-serif; max-widt=
+h: 600px;"><!--[if (gte mso 9)|(IE)]><table width=3D"600" align=3D"center">=
+<tr><td><![endif]--><table class=3D"outer" align=3D"center" style=3D"-ms-te=
+xt-size-adjust: 100%; -webkit-text-size-adjust: 100%; Margin: 0 auto; borde=
+r-spacing: 0; font-family: Arial, Helvetica, sans-serif; max-width: 600px; =
+mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;"><tr><td class=
+=3D" preheader-content headerLink align-left  header_first_line" style=3D"-=
+ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; color: #FFFFFF; =
+font-family: Lato, Arial, sans-serif; font-size: 1px; margin: 0; mso-table-=
+lspace: 0pt; mso-table-rspace: 0pt; padding: 0; text-align: center;"><span =
+class=3D"align-left  " style=3D"font-family: Lato, Arial, sans-serif; text-=
+align: left;">Compartilhe a sua opini=E3o!</span></td></tr><tr style=3D"fon=
+t-family: Lato, Arial, sans-serif;"><td style=3D"-ms-text-size-adjust: 100%=
+; -webkit-text-size-adjust: 100%; font-family: Lato, Arial, sans-serif; mso=
+-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0;"><table class=3D"out=
+er" align=3D"center" style=3D"-ms-text-size-adjust: 100%; -webkit-text-size=
+-adjust: 100%; Margin: 0 auto; border-spacing: 0; font-family: Arial, Helve=
+tica, sans-serif; max-width: 600px; mso-table-lspace: 0pt; mso-table-rspace=
+: 0pt; width: 100%;"><tr style=3D"font-family: Lato, Arial, sans-serif;"><t=
+d style=3D"-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; font=
+-family: Lato, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: =
+0pt; padding: 0;"><!-- Begin Header --><table border=3D"0" cellpadding=3D"0=
+" cellspacing=3D"0" width=3D"100%" class=3D"template-mainHeader" style=3D"-=
+ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #FFE=
+600; border-spacing: 0; font-family: Lato, Arial, sans-serif; height: 55px;=
+ mso-table-lspace: 0pt; mso-table-rspace: 0pt;"><tr style=3D"font-family: L=
+ato, Arial, sans-serif;"><td valign=3D"top" class=3D"header-content" style=
+=3D"-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; float: left=
+; font-family: Lato, Arial, sans-serif; height: 36px; line-height: 100%; ms=
+o-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 9px 20px 8px 20px; ver=
+tical-align: middle;"><a class=3D"logo" href=3D"http://www.mercadolivre.com=
+.br/" target=3D"_blank" style=3D"-ms-text-size-adjust: 100%; -webkit-text-s=
+ize-adjust: 100%; color: #3483FA; font-family: Lato, Arial, sans-serif; fon=
+t-weight: normal; margin: 0; padding: 0; text-decoration: none; word-break:=
+ normal;"><img class=3D"header-logo" width=3D"139" height=3D"37" alt=3D"Ir =
+para Mercado Livre" src=3D"https://www.mercadolibre.com/org-img/mkt/email-m=
+kt-assets/davinci/2x/logo-meli-br_codo_a_codo.png" style=3D"-ms-interpolati=
+on-mode: bicubic; border: 0; font-family: Lato, Arial, sans-serif; height: =
+36px; margin: 0; padding: 1px 0 0 0; text-align: left; vertical-align: midd=
+le; width: 139px;"></a></td></tr></table><!-- End Header --><div style=3D"f=
+ont-family: Lato, Arial, sans-serif; padding-top: 40px;"></div><!--[if gte =
+mso 9]><table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" style=3D"tab=
+le-layout: fixed;" align=3D"center"><tr><td><![endif]--><!-- Start Headline=
+ --><table cellspacing=3D"0" cellpadding=3D"0" border=3D"0" class=3D"box he=
+adline-container" style=3D"-ms-text-size-adjust: 100%; -webkit-text-size-ad=
+just: 100%; border-spacing: 0; display: table; font-family: Lato, Arial, sa=
+ns-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0 10px; te=
+xt-align: center; width: 100%;"><tbody style=3D"font-family: Lato, Arial, s=
+ans-serif;"><tr style=3D"border: none; font-family: Lato, Arial, sans-serif=
+; margin: 0; padding: 0;"><td class=3D"headline-main-table-td" style=3D"-ms=
+-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; border: none; box-=
+sizing: border-box; font-family: Lato, Arial, sans-serif; margin: 0; mso-ta=
+ble-lspace: 0pt; mso-table-rspace: 0pt; padding: 0 10px;"><h1 class=3D"head=
+line-title" style=3D"border: none; color: #333333; display: block; font-fam=
+ily: Lato, Arial, sans-serif; font-size: 28px; font-weight: 400; letter-spa=
+cing: normal; line-height: normal; margin: 0; padding: 0; text-align: cente=
+r; word-break: normal; word-spacing: normal;">O que voc=EA achou do produto=
+?</h1></td></tr></tbody></table><!-- End Headline --><!--[if gte mso 9]></t=
+d></tr></table><![endif]--><div style=3D"font-family: Lato, Arial, sans-ser=
+if; padding-top: 35px;"></div><!-- BEGIN item Principal --><table border=3D=
+"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"template-itemPrincipal" st=
+yle=3D"-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; backgrou=
+nd-color: #FFFFFF; border-spacing: 0; font-family: Lato, Arial, sans-serif;=
+ mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding-bottom: 20px; width:=
+ 100%;"><tr style=3D"font-family: Lato, Arial, sans-serif;"><td style=3D"-m=
+s-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; font-family: Lato=
+, Arial, sans-serif; margin: 0 auto; mso-table-lspace: 0pt; mso-table-rspac=
+e: 0pt; padding: 0; text-align: center;"><a href=3D"https://reviews.mercado=
+livre.com.br/review/MLB1815783071"><img height=3D"280" width=3D"280"  src=
+=3D"http://http2.mlstatic.com/D_678309-MLB45109901361_032021-P.jpg" alt=3D"=
+Orquidea Negra Cymbidium Kiwi Midnight Muda Adulta Rara" style=3D"-ms-inter=
+polation-mode: bicubic; border: solid 1px #cccccc; font-family: Lato, Arial=
+, sans-serif;"></a></td></tr><tr style=3D"font-family: Lato, Arial, sans-se=
+rif;"><td style=3D"-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 10=
+0%; font-family: Lato, Arial, sans-serif; margin: 0 auto; mso-table-lspace:=
+ 0pt; mso-table-rspace: 0pt; padding: 0; text-align: center;"><h2 class=3D"=
+itemPrincipal-title" style=3D"color: #333333; font-family: Lato, Arial, san=
+s-serif; font-size: 24px; font-weight: normal; line-height: 20px; margin: 0=
+ auto; max-width: 280px; padding: 20px 0 0 0; text-align: left; text-indent=
+: 0; word-break: normal;"><a href=3D"https://reviews.mercadolivre.com.br/re=
+view/MLB1815783071" style=3D"-ms-text-size-adjust: 100%; -webkit-text-size-=
+adjust: 100%; color: #999999; font-family: Lato, Arial, sans-serif; font-si=
+ze: 16px; font-weight: 300; line-height: 1.4; margin-bottom: 5px; margin-to=
+p: 0; padding: 0; text-align: left; text-decoration: none; text-indent: 0; =
+word-break: normal;">Orquidea Negra Cymbidium Kiwi Midnight Muda Adulta Rar=
+a</a></h2></td></tr></table><!-- END item Principal --><!-- Button center -=
+-><table cellspacing=3D"0" cellpadding=3D"0" border=3D"0" class=3D"row row-=
+grey" style=3D"-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; =
+background-color: #FFFFFF; border-spacing: 0; font-family: Lato, Arial, san=
+s-serif; margin: 0 auto; max-width: 600px; mso-table-lspace: 0pt; mso-table=
+-rspace: 0pt; text-align: center; width: auto;"><tr style=3D"font-family: L=
+ato, Arial, sans-serif;"><td class=3D"" style=3D"-ms-text-size-adjust: 100%=
+; -webkit-text-size-adjust: 100%; font-family: Lato, Arial, sans-serif; mso=
+-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0;"><a href=3D"https://=
+reviews.mercadolivre.com.br/review/MLB1815783071" target=3D"_blank" class=
+=3D"button-container button-itemPpl" style=3D"-ms-text-size-adjust: 100%; -=
+webkit-text-size-adjust: 100%; color: #3483FA; display: block; font-family:=
+ Lato, Arial, sans-serif; font-weight: normal; margin: 0; padding: 0; paddi=
+ng-left: 0; position: relative; text-decoration: none; width: 100%; word-br=
+eak: normal;"><table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=
+=3D"btn_center" style=3D"-ms-text-size-adjust: 100%; -webkit-text-size-adju=
+st: 100%; border-spacing: 0; display: table !important; font-family: Lato, =
+Arial, sans-serif; height: 48px; margin: 0 auto; max-height: 48px; mso-tabl=
+e-lspace: 0pt; mso-table-rspace: 0pt; width: 280px;"><tr style=3D"font-fami=
+ly: Lato, Arial, sans-serif;"><td align=3D"center" class=3D"button-normal b=
+utton button-primary " style=3D"-moz-border-radius: 4px; -ms-text-size-adju=
+st: 100%; -webkit-border-radius: 4px; -webkit-text-size-adjust: 100%; backg=
+round-color: #3483FA; border: 0; border-radius: 4px; color: #FFFFFF; font-f=
+amily: Lato, Arial, sans-serif; font-size: 18px; font-weight: 400; height: =
+48px; margin: 5px 0; max-height: 48px; max-width: 280px; mso-table-lspace: =
+0pt; mso-table-rspace: 0pt; outline: 0; padding: 0 30px; text-align: center=
+; text-decoration: none; width: 100%;">Dar a minha opini=E3o</td></tr></tab=
+le></a></td></tr></table><!-- Ends Button center --><div style=3D"font-fami=
+ly: Lato, Arial, sans-serif; padding-top: 50px;"></div><!-- Begin footer --=
+><table width=3D"100%" cellspacing=3D"0" cellpadding=3D"0" border=3D"0" sty=
+le=3D"-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; backgroun=
+d: #eee; border-spacing: 0; font-family: Lato, Arial, sans-serif; mso-table=
+-lspace: 0pt; mso-table-rspace: 0pt; padding: 0;"><tr style=3D"font-family:=
+ Lato, Arial, sans-serif;"><td style=3D"-ms-text-size-adjust: 100%; -webkit=
+-text-size-adjust: 100%; font-family: Lato, Arial, sans-serif; mso-table-ls=
+pace: 0pt; mso-table-rspace: 0pt; padding: 0; text-align: center;"><div cla=
+ss=3D"footer-download-app" style=3D"display: inline-block; font-family: Lat=
+o, Arial, sans-serif; font-size: 17px; max-width: 230px; min-width: 90px; p=
+adding: 20px 40px; vertical-align: middle;"><span class=3D"footer-download-=
+app-text" style=3D"color: #666666; display: block; font-family: Lato, Arial=
+, sans-serif; font-size: 14px; font-weight: 300; text-align: center; width:=
+ auto; word-break: normal;">Baixe gr=E1tis o aplicativo!</span><table cells=
+pacing=3D"0" cellpadding=3D"0" border=3D"0" style=3D"-ms-text-size-adjust: =
+100%; -webkit-text-size-adjust: 100%; border-spacing: 0; font-family: Lato,=
+ Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding-t=
+op: 10px;" class=3D"ecxicon-app"><tbody style=3D"font-family: Lato, Arial, =
+sans-serif;"><tr style=3D"font-family: Lato, Arial, sans-serif;"><td class=
+=3D"ecxlogo-left" style=3D"-ms-text-size-adjust: 100%; -webkit-text-size-ad=
+just: 100%; font-family: Lato, Arial, sans-serif; mso-table-lspace: 0pt; ms=
+o-table-rspace: 0pt; padding: 0;"><a href=3D"https://itunes.apple.com/br/ap=
+p/mercadolibre/id463624852?mt=3D8" target=3D"_blank" title=3D"Baixe para iO=
+S" class=3D"ecxlogo-left-a" style=3D"-ms-text-size-adjust: 100%; -webkit-te=
+xt-size-adjust: 100%; color: #3483FA; font-family: Lato, Arial, sans-serif;=
+ font-weight: normal; padding: 0 !important; text-decoration: none; word-br=
+eak: normal;"><img src=3D"https://mercadolibre.com/org-img/mkt/email-mkt-as=
+sets/2x/appleStore.png" border=3D"0" width=3D"104" height=3D"32" alt=3D"Bai=
+xe para iOS" style=3D"-ms-interpolation-mode: bicubic; border: 0; font-fami=
+ly: Lato, Arial, sans-serif;"></a></td><td width=3D"20" style=3D"-ms-text-s=
+ize-adjust: 100%; -webkit-text-size-adjust: 100%; font-family: Lato, Arial,=
+ sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0;">&nb=
+sp;</td><td class=3D"ecxlogo-right" style=3D"-ms-text-size-adjust: 100%; -w=
+ebkit-text-size-adjust: 100%; font-family: Lato, Arial, sans-serif; mso-tab=
+le-lspace: 0pt; mso-table-rspace: 0pt; padding: 0; padding-left: 0px;"><a h=
+ref=3D"https://play.google.com/store/apps/details?id=3Dcom.mercadolibre&hl=
+=3Dpt_BR" target=3D"_blank" title=3D"Baixe para Android" class=3D"ecxlogo-r=
+ight-a" style=3D"-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%=
+; color: #3483FA; font-family: Lato, Arial, sans-serif; font-weight: normal=
+; padding: 0 !important; text-decoration: none; word-break: normal;"><img s=
+rc=3D"https://mercadolibre.com/org-img/mkt/email-mkt-assets/2x/googlePlay.p=
+ng" border=3D"0" width=3D"104" height=3D"32" alt=3D"Baixe para Android" sty=
+le=3D"-ms-interpolation-mode: bicubic; border: 0; font-family: Lato, Arial,=
+ sans-serif;"></a></td></tr></tbody></table></div></td></tr></table><!-- En=
+d Footer --></td></tr></table></td></tr></table><!--[if (gte mso 9)|(IE)]><=
+/td></tr></table><![endif]--></div></center><img src=3D"http://links.mercad=
+olivre.com.br/wf/open?upn=3DXWrA4W-2FcfjIvfrKT48znHdEI-2BnG4LF5Et6e7MgV8SDc=
+94M7MveaF-2Fg5vo3k39oJe90Dym5ay60uLlStpZ1eVLYn-2Bf-2BgzVrA4iXK7mO-2BrdQ8rDf=
+m6U20KlrqmzKwacygogqeneDklNHyl4YZSDd0UDgDE-2BKm-2FxLF90MQ-2BI-2B6zDBnwyEdDA=
+BqjyVFFiDQSc-2Buz35yblTiS-2B1rw-2Ffn5MEqrMEeLhZn3I1CSl6Smg7LPWbQeB1iV5XXkoc=
+F4rERcxVf-2BWzRcgjWWNtGzpo5Vv-2Ft7k4Te1LK05M70g-2F0gh-2B6V1MSgl91EGPmt2gw15=
+lVcSyB2cKJyROJ00TH6x4Ij4YhQVMzM08l22j-2FFr-2BbEvoApd2dXJye5hOjGb8r7dlsP4x8D=
+ySmhE-2BuWvK-2FmGzWLelCQEikwW-2BdIeFDQHYTEX-2BXpDkPJiXPTu-2FWBiHGymV0dHYxxm=
+PKM6X8LtdjuhTu08qFMmZL1LU-2BjSLJUB7a7eEZx2oLjGWn8VQlTJN-2B8AkDQuEKnoxFnlmHQ=
+yHA-2F6oo6TRtfafdDQ8O5dfCebLheAYtJ4KeFjy7Gh5u1keyBbrna2vSqXanh9Y5O-2FJ-2FRp=
+xFlX4jtSwJuyZtHMS89tjlDkHPwQa6MSfs4dRX1DxPuKizvhCXlp24-2B7IUMQKfX8eICyVioS-=
+2B48ZBG5mobMPbS5t9fJUvM0S-2FdXd8K26yU4v0SiT0QS1Lt7AQLAc-2FG9K9KowNSQHw-3D-3=
+D" alt=3D"" width=3D"1" height=3D"1" border=3D"0" style=3D"height:1px !impo=
+rtant;width:1px !important;border-width:0 !important;margin-top:0 !importan=
+t;margin-bottom:0 !important;margin-right:0 !important;margin-left:0 !impor=
+tant;padding-top:0 !important;padding-bottom:0 !important;padding-right:0 !=
+important;padding-left:0 !important;"/></body></html><table cellspacing=3D"=
+0" cellpadding=3D"0" width=3D"100%" align=3D"center" style=3D"background: r=
+gb(255, 255, 255);"> <tr> <td align=3D"center"> <!--[if mso]><table border=
+=3D"0" cellspacing=3D"0" cellpadding=3D"0" align=3D"center" width=3D"600"><=
+tr><td align=3D"center" valign=3D"top" width=3D"600"><![endif]--> <table ro=
+le=3D"presentation" cellspacing=3D"0" cellpadding=3D"0" width=3D"100%" alig=
+n=3D"center" style=3D"max-width: 600px; background: rgb(255, 255, 255);"> <=
+tr> <td align=3D"center" style=3D"font-weight: 400; font-family: 'Proxima N=
+ova', _apple_system, 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif=
+; font-size: 11px; line-height: 1.45; color: rgb(140, 140, 140); padding: 2=
+0px 25px; text-align: center;"> Te enviamos este e-mail para <a target=3D"_=
+blank" href=3D"mailto:flavio@lucanet.com.br" style=3D"color: rgb(52, 131, 2=
+50); text-decoration: none;">flavio@lucanet.com.br</a>.<br><a target=3D"_bl=
+ank" href=3D"https://myaccount.mercadolivre.com.br/preferences/emails" styl=
+e=3D"color: rgb(52, 131, 250); text-decoration: none;">Administrar prefer=
+=EAncias de e-mails</a>.<br>Veja <a target=3D"_blank" href=3D"https://www.m=
+ercadolivre.com.br/privacidade" style=3D"color: rgb(52, 131, 250); text-dec=
+oration: none;">como cuidamos da sua Privacidade</a> e confira os <a target=
+=3D"_blank" href=3D"https://www.mercadolivre.com.br/ajuda/991" style=3D"col=
+or: rgb(52, 131, 250); text-decoration: none;">Termos e condi=E7=F5es do Me=
+rcado Livre</a>. </td> </tr> </table> <!--[if mso]></td></tr></table><![end=
+if]--> </td> </tr></table>

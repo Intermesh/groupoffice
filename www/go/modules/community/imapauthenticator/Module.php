@@ -8,6 +8,13 @@ use go\modules\community\imapauthenticator\model\Authenticator;
 use go\core\model\Module as CoreModule;
 
 class Module extends core\Module implements DomainProvider {
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
 
 	public function getAuthor(): string
 	{

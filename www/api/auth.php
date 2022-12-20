@@ -27,7 +27,7 @@ function output(array $data = [], int $status = 200, string $statusMsg = null) {
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 	Response::get()->setHeader('Pragma', 'no-cache');
 
-	Response::get()->setStatus($status, $statusMsg);
+	Response::get()->setStatus($status, $statusMsg ? str_replace("\n", " - " , $statusMsg) : null);
 	Response::get()->sendHeaders();
 
 	go()->getDebugger()->groupEnd();
@@ -66,8 +66,15 @@ function finishLogin(Token $token, string $rememberMeToken = null) {
 
 
 try {
+
+
 //Create the app with the config.php file
 	App::get()->setAuthState(new State());
+
+	if (Request::get()->getMethod() == "OPTIONS") {
+		output();
+	}
+
 	go()->getDebugger()->group("auth");
 	$auth = new Authenticate();
 
@@ -87,6 +94,30 @@ try {
 	}
 
 	switch ($data['action']) {
+
+		case 'register':
+
+			if(!go()->getSettings()->allowRegistration) {
+				output([], 403, 'Registration is not allowed');
+				exit();
+			}
+
+			$user = new User();
+			$user->setValues($data['user']);
+			if(!$user->save()) {
+				throw new SaveException($user);
+			}
+
+
+
+			$token = new Token();
+			$token->userId = $user->id;
+			$token->setAuthenticated();
+			$token->setCookie();
+
+			finishLogin($token);
+
+			break;
 		case 'forgotten':
 			$auth->sendRecoveryMail($data['email']);
 			//Don't show if user was found or not for security
@@ -141,7 +172,7 @@ try {
 			} else {
 
 				if (empty($data['username']) || empty($data['password'])) {
-					$msg = "Missing arguments 'username' and 'password' for authenticatoin.";
+					$msg = "Missing arguments 'username' and 'password' for authentication.";
 					output(["error" => $msg], 400, $msg);
 				}
 

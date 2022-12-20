@@ -80,6 +80,14 @@ echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?l
 
 ?>
 
+<!--<script type="importmap">-->
+<!--{-->
+<!--  "imports": {-->
+<!--    "@goui/": "--><?//= $root_uri; ?><!--views/Extjs3/goui/dist/"-->
+<!--  }-->
+<!--}-->
+<!--</script>-->
+
 <script type="text/javascript">
 
 	Ext.namespace("GO");
@@ -105,12 +113,28 @@ if (isset(GO::session()->values['security_token']))
 ?>
 </script>
 <?php
-  
+$gouiScripts = [];
+$rootFolder = new Folder(GO::config()->root_path);
+$strip = strlen($rootFolder->getPath()) + 1;
 if ($cacheFile->exists()) {
+    $gouiScripts = go()->getCache()->get("gouiScripts");
+
+    if(!$gouiScripts) {
+	    $gouiScripts = [];
+	    $load_modules = GO::modules()->getAllModules(true);
+	    foreach ($load_modules as $module) {
+            $bundleFile = new File($module->moduleManager->path(). 'views/goui/dist/Index.js');
+            if($bundleFile->exists()) {
+                $gouiScripts[] = $bundleFile;
+            }
+        }
+    }
+
 	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='.$cacheFile->getModifiedAt()->format("U"). '"></script>';
 } else {
 
 	$scripts = array();
+
 	$load_modules = GO::modules()->getAllModules(true);
 
 	$scripts[] = "var BaseHref = '" . $baseUrl . "';";
@@ -145,8 +169,6 @@ if ($cacheFile->exists()) {
 			} else {
 				$scriptsFile = false;
 				$modulePath = $module->moduleManager->path();
-				
-				
 			}
 			$pkg = $module->package ? $module->package : "legacy";
 			
@@ -157,9 +179,9 @@ if ($cacheFile->exists()) {
 
 			$scripts[] = $js;
 
-			$bundleFile = new File($module->moduleManager->path(). 'views/extjs3/scripts.js');
+			$bundleFile = new File($module->moduleManager->path(). 'views/goui/dist/Index.js');
 			if($bundleFile->exists()) {
-				$scripts[] = $bundleFile;
+				$gouiScripts[] = $bundleFile;
 			} else {
 
 				if (!$scriptsFile || !file_exists($scriptsFile)) {
@@ -195,8 +217,7 @@ if ($cacheFile->exists()) {
     $js = "";
   }
 
-	$rootFolder = new Folder(GO::config()->root_path);
-	$strip = strlen($rootFolder->getPath()) + 1;
+
 	foreach ($scripts as $script) {
 
 		if (go()->getDebugger()->enabled) {
@@ -227,6 +248,18 @@ if ($cacheFile->exists()) {
 //    fclose($fp);
   }
 //  echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
+
+
+	go()->getCache()->set("gouiScripts", $gouiScripts);
+}
+
+foreach($gouiScripts as $gouiScript) {
+	$relPath = substr($gouiScript->getPath(), $strip);
+	$parts = explode('/', $relPath);
+
+	$relPath = $baseUrl . $relPath;
+
+	echo '<script type="module" src="'.$relPath. '?mtime='.$gouiScript->getModifiedAt()->format("U").'"></script>' . "\n";
 }
 
 if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {

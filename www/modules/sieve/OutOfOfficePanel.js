@@ -151,7 +151,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			name: 'ooo_days',
 			value: 3,
 			allowBlank:false,
-			width:70,
+			width:dp(300),
 			decimals:0,
 			fieldLabel:t("Reply every x days", "sieve")
 		});

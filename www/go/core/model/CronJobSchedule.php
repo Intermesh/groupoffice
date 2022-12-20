@@ -7,6 +7,7 @@ use DateTime as CoreDateTime;
 use go\core\ErrorHandler;
 use go\core\jmap\Entity;
 use go\core\model\Module as ModuleModel;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
@@ -155,14 +156,12 @@ class CronJobSchedule extends Entity
 	 */
 	public function run()
 	{
-		//Set nextRun to null so it won't run more then once at a time
-		$this->nextRunAt = null;
 		//set runningSince to now
 		$this->runningSince = $this->getLocalDateTime();
 		$this->lastError = null;
 
 		if (!$this->save()) {
-			throw new Exception("Could not save CRON job");
+			throw new SaveException($this);
 		}
 		
 		$cls = $this->getCronClass();
@@ -248,12 +247,12 @@ class CronJobSchedule extends Entity
 
 	/**
 	 * Get current time in the default time zone.
-	 * 
+	 *
 	 * By default, the timezone in newer code is set to UTC. This makes perfect sense, except for cron jobs, which should
-	 * adhere to local time. 
+	 * adhere to local time.
 	 *
 	 * @todo: if there are more use cases for localized DateTimes, move to go\core\util\Datetime ?
-	 * 
+	 *
 	 * @return CoreDateTime
 	 */
 	private function getLocalDateTime(): CoreDateTime

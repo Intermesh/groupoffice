@@ -191,9 +191,9 @@ class Table {
 			$c->length = null;
 		}
 		
-		if($c->default == 'CURRENT_TIMESTAMP') {
-			throw new InvalidArgumentException("Please don't use CURRENT_TIMESTAMP as default mysql value. It's only supported in MySQL 5.6+");
-		}
+//		if($c->default == 'CURRENT_TIMESTAMP') {
+//			throw new InvalidArgumentException("Please don't use CURRENT_TIMESTAMP as default mysql value. It's only supported in MySQL 5.6+");
+//		}
 		
 		switch ($c->dbType) {
 			case 'int':

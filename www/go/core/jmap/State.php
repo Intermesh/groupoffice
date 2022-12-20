@@ -160,39 +160,6 @@ class State extends AbstractState {
 		}
 	}
 
-	/** @noinspection HttpUrlsUsage */
-	protected function getBaseUrl(): string
-	{
-		$url = Request::get()->isHttps() ? 'https://' : 'http://';
-		$url .= Request::get()->getHost(false) . dirname($_SERVER['PHP_SELF']);
-		// HACK for old framework index.php
-		if(substr(dirname($_SERVER['PHP_SELF']), -4) !== '/api'){
-			$url .= '/api';
-		}
-		return $url;
-	}
-
-	public function getPageUrl(): string
-	{
-		return $this->getBaseUrl(). "/page.php";
-	}
-	
-	public function getApiUrl(): string
-	{
-		return $this->getBaseUrl() . '/jmap.php';
-	}
-	
-	public function getUploadUrl(): string
-	{
-		return $this->getBaseUrl(). '/upload.php';
-	}
-	
-	public function getEventSourceUrl(): ?string
-	{
-		return go()->getConfig()['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
-	}
-
-
 	/**
 	 *
 	 */
@@ -229,15 +196,10 @@ class State extends AbstractState {
 
 	private function addModuleCapabilities(array $response) {
 		$modules = Module::getInstalled();
-		$groupedRights = "SELECT moduleId, BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".go()->getAuthState()->getUserId().") GROUP BY moduleId;";
-		$rights = go()->getDbConnection()->query($groupedRights)->fetchAll(PDO::FETCH_KEY_PAIR);
 		foreach ($modules as $module) {
-			if(go()->getAuthState()->isAdmin()) {
-				$p = $module->may(PHP_INT_MAX);
-			} else if(isset($rights[$module->id])) {
-				$p = $module->may($rights[$module->id]);
-			}
-			if(!empty($p)) {
+			$p = $module->getUserRights();
+
+			if($p->mayRead) {
 				$response['capabilities']->{'go:' . ($module->package ?? 'legacy') . ':' . $module->name} = $p;
 			}
 		}

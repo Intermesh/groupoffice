@@ -1,5 +1,6 @@
 go.PasswordPrompt = Ext.extend(go.Window, {
-	width: dp(400),
+	width: dp(600),
+	height: dp(400),
 	text: t('Provide your password.'),
 	title: t('Password required'),
 	modal: true,
@@ -44,7 +45,6 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 		});
 
 		Ext.apply(this, {
-			autoHeight:true,
 			closeAction: 'cancelPressed',
 			items: [
 				this.formPanel

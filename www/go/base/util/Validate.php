@@ -107,7 +107,6 @@ class Validate {
 			'EE',
 			'FI',
 			'FR',
-			//'FX', ??
 			'DE',
 			'GR',
 			'HU',
@@ -124,8 +123,7 @@ class Validate {
 			'SK',
 			'SI',
 			'ES',
-			'SE',
-			'GB'
+			'SE'
 		);
 	}
 	

@@ -13,65 +13,12 @@ go.emailtemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 
 	initFormItems: function () {
 
-		this.addPanel(new go.permissions.SharePanel());
-
-		return [{
-			xtype: 'fieldset',
-			layout: "border",
-			items: [{
-				region: "center",
-				xtype: "panel",
-				layout: "form",
-				defaults: {
-					anchor: '100%'
-				},
-				items: [
-				{
-					xtype: 'textfield',
-					name: 'name',
-					fieldLabel: t("Name")
-				}, {
-					xtype: 'golanguagecombo'
-				},{
-					xtype: 'textfield',
-					name: 'subject',
-					fieldLabel: t("Subject")
-				}, {
-					anchor: "100% -" + dp(96),
-					xtype: 'xhtmleditor',
-					plugins: [new GO.plugins.HtmlEditorImageInsert()],
-					name: 'body',
-					hideLabel: true,
-					listeners: {
-						attach: this.onAttach,
-						scope: this
-					}
-				}
-				]
-			},
-
-			this.attachments = new go.form.AttachmentsField({
-				region: "south",
-				name: "attachments"
-			})
-			]
-		}
+		return [
+			new go.emailtemplate.TemplateFieldset()
 		];
-	},
-
-	onAttach: function (htmleditor, blob, file, imgEl) {
-
-		//Inline images are parsed form the body and should not be sent as attachment
-		if (imgEl) {
-			return;
-		}
-
-		this.attachments.addAttachment({
-			blobId: blob.blobId,
-			name: file.name,
-			attachment: true
-		});
 	}
+
+
 });
 
 

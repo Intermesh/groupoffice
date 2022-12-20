@@ -7,6 +7,7 @@ use go\core\jmap\EntityController;
 use go\core\model;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
+use go\core\util\ArrayObject;
 
 
 class Link extends EntityController {
@@ -21,7 +22,7 @@ class Link extends EntityController {
 		return model\Link::class;
 	}
 	
-	protected function paramsQuery(array $params): array
+	protected function paramsQuery(array $params): ArrayObject
 	{
 		$p =  parent::paramsQuery($params);
 		
@@ -34,7 +35,7 @@ class Link extends EntityController {
 		return $p;
 	}
 
-	protected function getQueryQuery(array $params): Query
+	protected function getQueryQuery(ArrayObject $params): Query
 	{
 		$q = parent::getQueryQuery($params)
 			->groupBy([])

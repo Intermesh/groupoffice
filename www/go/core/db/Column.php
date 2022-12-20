@@ -288,6 +288,11 @@ class Column {
 
 			case 'date':
 			case 'datetime':
+
+				if(strtolower(substr($value, 0, 3)) == "cur") {
+					return new DateTime();
+				}
+
 				//Work around date problem
 				if($value == "0000-00-00") {
 					return null;

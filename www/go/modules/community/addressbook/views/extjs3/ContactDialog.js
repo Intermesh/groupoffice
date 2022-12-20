@@ -27,18 +27,6 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		return true;
 	},
 
-	focus: function () {
-
-		if (this.nameField.getValue() != "") {
-			this.jobTitle.focus();
-		} else
-		{
-			setTimeout(() => {
-				this.nameField.focus();
-			});
-		}
-	},
-
 	setLinkEntity: function(config) {
 		if(config.entity == "Contact") {
 			var me = this;			
@@ -79,16 +67,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		this.setTitle(title);
 	},
-	setDialogValues: function(firstName, middleName, lastName,email) {
-		this.nameField.firstName.setValue(firstName);
-		this.nameField.middleName.setValue(middleName);
-		this.nameField.lastName.setValue(lastName);
-		var panel = this.emailAddressesField.items.get(0);
-		this.emailAddressesField.doLayout();
-		var emailField = panel.formField.items.items[0].items.items[1];
-		emailField.setValue(email);
-		//var example = panel.formField.find("name","email");//.setValue(firstName);
-	},
+
 	initFormItems: function () {
 
 		this.addPanel(this.businessPanel = new Ext.Panel({
@@ -152,37 +131,56 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 
 		}));
+
+		this.nameField = new go.modules.community.addressbook.NameField({
+			flex: 1
+		});
+
+		this.colorField = new GO.form.ColorField({
+			name: "color",
+			width: dp(120),
+			mobile: {
+				width: undefined
+			},
+			fieldLabel: t("Color")
+		});
+
 		var items = [this.infoFieldSet = new Ext.form.FieldSet({
 				xtype: 'fieldset',
 				items: [
 					{
-						layout: "hbox",
+						xtype: "container",
+						cls: "go-hbox",
 						items: [
 							{
 								flex: 1,
 								layout: "form",
+
+								mobile: {
+									items: [
+										this.nameField,
+										this.colorField
+									]
+								},
 								items: [
 									{
 										xtype: "container",
 										flex: 1,
-										layout: "hbox",
+										cls: "go-hbox",
 										items: [
 											{
 												flex: 1,
 												layout:"form",
-												items: [this.nameField = new go.modules.community.addressbook.NameField({
-													flex: 1
-												})]
+												items: [this.nameField]
 											},{
 												width: dp(8),
 												xtype: "box"
 											},
 											{
 												layout: "form",
-												items: [new GO.form.ColorField({
-													hideLabel: true,
-													name: "color"
-												})]
+												items: [
+													this.colorField
+												]
 											}
 										]
 									},
@@ -216,6 +214,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					},
 
 					this.genderField = new go.form.RadioGroup({
+						anchor: '100%',
 						xtype: 'radiogroup',
 						fieldLabel: t("Gender"),
 						name: "gender",
@@ -228,7 +227,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					}),
 
 					this.organizationsField = new go.form.Chips({
-						anchor: '-20',
+						anchor: '100%',
 						xtype: "chips",
 						entityStore: "Contact",
 						displayField: "name",
@@ -253,7 +252,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					}),
 
 					this.addressBook = new go.modules.community.addressbook.AddresBookCombo({
-						anchor: '-20',
+						anchor: '100%',
 						value: go.User.addressBookSettings ? go.User.addressBookSettings.defaultAddressBookId : null,
 						allowBlank: false,
 						listeners: {

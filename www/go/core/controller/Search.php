@@ -8,6 +8,7 @@ use go\core\event\EventEmitterTrait;
 use go\core\model\Acl;
 use go\core\orm\Query;
 use go\core\jmap\EntityController;
+use go\core\util\ArrayObject;
 use go\modules\community\addressbook\model\Contact;
 use go\core\model\Module;
 use go\core\model;
@@ -17,8 +18,6 @@ class Search extends EntityController {
 	const EVENT_SEARCH_EMAIL_CONTACTS = "searchemailcontacts";
 
 	const EVENT_SEARCH_EMAIL = "searchemail";
-
-	use EventEmitterTrait;
 
 	protected function entityClass(): string
 	{
@@ -124,7 +123,7 @@ class Search extends EntityController {
 		return $this->defaultQuery($params);
 	}
 
-	protected function getQueryQuery(array $params): Query
+	protected function getQueryQuery(ArrayObject $params): Query
 	{
 		$hasIndex = go()->getDatabase()->getTable('core_search')->hasIndex("core_search_entityTypeId_filter_modifiedAt_aclId_index");
 

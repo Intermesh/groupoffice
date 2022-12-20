@@ -18,4 +18,7 @@ return array (
   'Group query' => 'Groepen query',
   'Login query' => 'Inlog query',
   'Extra query for user authentication eg' => 'Extra query voor gebruikers authenticatie bijv',
+  'Delete users' => 'Verwijder gebruikers',
+  'Max delete percentage' => 'Maximaal percentage te verwijderen',
+  'Delete groups' => 'Verwijder groepen',
 );

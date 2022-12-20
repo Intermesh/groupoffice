@@ -434,12 +434,12 @@ class EntityType implements ArrayableInterface {
 
 	/**
 	 *
-	 * @param int|Query $entityId
+	 * @param int|string $entityId
 	 * @param int|null $aclId
 	 * @param bool $destroyed
 	 * @return void
 	 */
-	private function queueChange(int $entityId, ?int $aclId = null, bool $destroyed = false) {
+	private function queueChange($entityId, ?int $aclId = null, bool $destroyed = false) {
 
 		$id = $this->getId();
 
@@ -476,12 +476,13 @@ class EntityType implements ArrayableInterface {
 	 * We do it like this so these entries are written outside of transactions. Otherwise
 	 * this will lead to concurrency problems with deadlocks in mysql.
 	 *
+	 * @param int $minChanges Only do it if there are more changes than this number
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function push() {
+	public static function push(int $minChanges = 1) {
 
-		if(empty(self::$changes)) {// && empty(self::$changeQueries)) {
+		if(count(self::$changes) < $minChanges) {
 			return;
 		}
 
@@ -521,6 +522,8 @@ class EntityType implements ArrayableInterface {
 				return $change;
 			}, $changes));
 		}
+
+		$allChanges = array_values($allChanges);
 
 		go()->debug("Pushing " . count($allChanges). " JMAP sync changes");
 

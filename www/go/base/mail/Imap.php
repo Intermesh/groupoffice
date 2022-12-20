@@ -3,6 +3,7 @@
 namespace GO\Base\Mail;
 
 use Exception;
+use GO\Base\Fs\File;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 
 class Imap extends ImapBodyStruct
@@ -16,6 +17,9 @@ class Imap extends ImapBodyStruct
 	const SORT_SUBJECT='SUBJECT';
 	const SORT_SIZE='SIZE';
 
+	/**
+	 * @var resource|bool
+	 */
 	var $handle=false;
 
 	var $ssl=false;
@@ -1467,7 +1471,7 @@ class Imap extends ImapBodyStruct
 						"DATE CONTENT-TYPE X-PRIORITY TO CC";
 
 		if($full_data) {
-			$command .= " BCC REPLY-TO DISPOSITION-NOTIFICATION-TO CONTENT-TRANSFER-ENCODING MESSAGE-ID";
+			$command .= " BCC REPLY-TO DISPOSITION-NOTIFICATION-TO CONTENT-TRANSFER-ENCODING MESSAGE-ID REFERENCES IN-REPLY-TO";
 		}
 
 		$command .= ")])\r\n";
@@ -1476,7 +1480,7 @@ class Imap extends ImapBodyStruct
 		$res = $this->get_response(false, true);
 
 		$tags = array('UID' => 'uid', 'FLAGS' => 'flags', 'X-GM-LABELS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-		$junk = array('SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', 'CC','BCC', '(', ')', ']', 'X-PRIORITY', 'DATE','REPLY-TO','DISPOSITION-NOTIFICATION-TO','CONTENT-TRANSFER-ENCODING', 'MESSAGE-ID');
+		$junk = array('SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', 'CC','BCC', '(', ')', ']', 'X-PRIORITY', 'DATE','REPLY-TO','DISPOSITION-NOTIFICATION-TO','CONTENT-TRANSFER-ENCODING', 'MESSAGE-ID', 'REFERENCES', 'IN-REPLY-TO');
 
 		$headers = array();
 		foreach ($res as $n => $vals) {
@@ -1496,6 +1500,8 @@ class Imap extends ImapBodyStruct
 					'x_priority'=>3,
 					'reply_to'=>'',
 					'message_id'=>'',
+					'references'=>'',
+					'in_reply_to'=>'',
 					'content_type'=>'',
 					'content_type_attributes'=>array(),
 					'disposition_notification_to'=>'',
@@ -2864,9 +2870,9 @@ class Imap extends ImapBodyStruct
 	/**
 	 * Append a message to a mailbox
 	 *
-	 * @param StringHelper $mailbox
-	 * @param StringHelper|\Swift_Message $data
-	 * @param StringHelper $flags See set_message_flag
+	 * @param string $mailbox
+	 * @param string|\Swift_Message $data
+	 * @param string $flags See set_message_flag
 	 * @return boolean
 	 */
 	public function append_message($mailbox, $data, $flags="") :bool
@@ -2894,6 +2900,22 @@ class Imap extends ImapBodyStruct
 
 			fclose($fp);
 			$tmpfile->delete();
+		} else if ($data instanceof File) {
+
+			if(!$this->append_start($mailbox, $data->size(), $flags)) {
+				return false;
+			}
+
+			$fp = fopen($data->path(), 'r');
+
+			while($line = fgets($fp, 1024)){
+				if(!$this->append_feed($line)) {
+					return false;
+				}
+			}
+
+			fclose($fp);
+
 		} else {
 			if(!$this->append_start($mailbox, strlen($data), $flags)) {
 				return false;

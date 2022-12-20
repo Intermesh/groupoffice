@@ -2,7 +2,11 @@
 
 namespace go\core\model;
 
+use BadMethodCallException;
+use Exception;
+use GO\Base\Cron\EmailReminders;
 use GO\Base\Db\ActiveRecord;
+use GO\Base\Exception\AccessDenied;
 use go\core\acl\model\SingleOwnerEntity;
 
 use go\core\db\Criteria;
@@ -11,7 +15,16 @@ use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\JSON;
+use go\modules\community\comments\model\Comment;
+use JsonException;
+use stdClass;
 
+/**
+ * Alert model
+ *
+ * {@see Entity::createAlert()}
+ */
 class Alert extends SingleOwnerEntity
 {
 	public static $enabled = true;
@@ -30,6 +43,13 @@ class Alert extends SingleOwnerEntity
 
 	protected $data;
 
+	/**
+	 * Set to true if user has mail reminders enabled
+	 * The cron  job sends them
+	 *
+	 * @see EmailReminders
+	 * @var bool
+	 */
 	public $sendMail = false;
 
 	protected static function defineMapping(): Mapping
@@ -38,12 +58,72 @@ class Alert extends SingleOwnerEntity
 			->addTable("core_alert", "alert");
 	}
 
-	public function getEntity() {
+	/**
+	 * @throws Exception
+	 */
+	public function getEntity(): string
+	{
 		return EntityType::findById($this->entityTypeId)->getName();
 	}
 
-	public function setEntity($name) {
-		$this->entityTypeId = EntityType::findByName($name)->getId();
+
+	/**
+	 * Set the entity type
+	 *
+	 * @param Entity|ActiveRecord|EntityType|string $entity "note", Entity $note or Entitytype instance
+	 * @throws Exception
+	 *
+	 * @return self
+	 */
+	public function setEntity($entity) {
+
+		if($entity instanceof Entity || $entity instanceof ActiveRecord) {
+			$this->entityTypeId = $entity->entityType()->getId();
+			$this->entityId = $entity->id;
+			return $this;
+		}
+
+		if(!($entity instanceof EntityType)) {
+			$entity = EntityType::findByName($entity);
+		}
+		$this->entity = $entity->getName();
+		$this->entityTypeId = $entity->getId();
+
+		return $this;
+	}
+
+
+	/**
+	 * Delete alerts by entity tag and user ID
+	 *
+	 * @param Entity|ActiveRecord $entity
+	 * @param string|null $tag
+	 * @param int|null $userId
+	 * @return bool
+	 * @throws Exception
+	 */
+	public static function deleteByEntity($entity, ?string $tag = null, ?int $userId = null) {
+		$entityTypeId = $entity->entityType()->getId();
+		$entityId = $entity->id;
+
+		//skip dismiss action below in internal delete
+		$query = Query::normalize([
+			'entityTypeId' => $entityTypeId,
+			'entityId' => $entityId
+		]);
+
+
+		if(isset($tag)) {
+			$query->andWhere('tag', '=', $tag);
+		}
+
+		if(isset($userId)) {
+			$query->andWhere('userId', '=', $userId);
+		}
+//			// Skip dismiss update in internalDelete below
+//			->setData(['preventDismiss' => true]);
+
+		return static::delete($query);
 	}
 
 	protected static function defineFilters(): Filters
@@ -58,35 +138,51 @@ class Alert extends SingleOwnerEntity
 	 * Get arbitrary notification data
 	 *
 	 * @return StdClass
+	 * @throws JsonException
 	 */
 	public function getData() {
-		return empty($this->data) ? (Object) [] : json_decode($this->data, false);
+		return empty($this->data) ? (Object) [] : JSON::decode($this->data, false);
 	}
+
+
+	private $relatedEntity;
 
 	/**
 	 * Find the entity this alert belongs to.
 	 *
 	 * @return Entity|ActiveRecord
+	 * @throws AccessDenied
+	 * @throws Exception
 	 */
 	public function findEntity() {
-		$e = EntityType::findById($this->entityTypeId);
-		$cls = $e->getClassName();
-		if(is_a($cls, ActiveRecord::class, true)) {
-			return $cls::model()->findByPk($this->entityId);
-		} else {
-			return $cls::findById($this->entityId);
+
+		if(!isset($this->relatedEntity)) {
+			$e = EntityType::findById($this->entityTypeId);
+			$cls = $e->getClassName();
+			if (is_a($cls, ActiveRecord::class, true)) {
+				$this->relatedEntity = $cls::model()->findByPk($this->entityId);
+			} else {
+				$this->relatedEntity = $cls::findById($this->entityId);
+			}
 		}
+
+		return $this->relatedEntity;
 	}
 
 
 	/**
 	 * Set arbitrary notification data
 	 *
+	 * If this data contains a "title" and "description" property, then this will be
+	 * used as such.
+	 *
 	 * @param array $data
 	 * @return Alert
+	 * @throws JsonException
 	 */
-	public function setData(array $data) {
-		$this->data = json_encode(array_merge((array) $this->getData(), $data));
+	public function setData(array $data): Alert
+	{
+		$this->data = JSON::encode(array_merge((array) $this->getData(), $data));
 
 		return $this;
 	}
@@ -94,7 +190,7 @@ class Alert extends SingleOwnerEntity
 	protected function internalSave(): bool
 	{
 		if(!self::$enabled) {
-			throw new \BadMethodCallException("Alerts are disabled. Please check this before creating alerts");
+			throw new BadMethodCallException("Alerts are disabled. Please check this before creating alerts");
 		}
 
 		if($this->isNew()) {
@@ -117,7 +213,11 @@ class Alert extends SingleOwnerEntity
 				}
 			}
 		}
-		return parent::internalSave();
+		if(!parent::internalSave()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected static function internalDelete(Query $query): bool
@@ -144,26 +244,40 @@ class Alert extends SingleOwnerEntity
 		return parent::internalDelete($query);
 	}
 
-	private $props;
+//	private $props;
 
-	private function getProps() {
-		if(!isset($this->props)) {
-			$e = $this->findEntity();
-			if (!$e) {
-				$this->props = ['title' => null, 'body' => null];
-			} else{
-				$this->props = $e->alertProps($this);
-			}
-		}
-
-		return $this->props;
-	}
-
-	public function getTitle() {
-		return $this->getProps()['title'];
-	}
-	public function getBody() {
-		return $this->getProps()['body'];
-	}
+//	/**
+//	 * @throws AccessDenied
+//	 * @throws JsonException
+//	 */
+//	private function getProps(): array
+//	{
+//		if(!isset($this->props)) {
+//
+//			$data = $this->getData();
+//
+//			if(!empty($data->title) && !empty($data->body)) {
+//				$this->props = ['title' => $data->title, 'body' => $data->body];
+//			} else {
+//
+//				$e = $this->findEntity();
+//				if (!$e) {
+//					$this->props = ['title' => null, 'body' => null];
+//				} else {
+//					$this->props = $e->alertProps($this);
+//				}
+//			}
+//		}
+//
+//		return $this->props;
+//	}
+//
+//	public function getTitle() {
+//		return $this->getProps()['title'];
+//	}
+//
+//	public function getBody() {
+//		return $this->getProps()['body'];
+//	}
 
 }

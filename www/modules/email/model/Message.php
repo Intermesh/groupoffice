@@ -169,6 +169,43 @@ abstract class Message extends \GO\Base\Model
 				$this->attributes['x_priority']= intval($this->attributes['x_priority']);
 				break;
 		}
+
+		$this->attributes['references'] = $this->parseMessageIds($this->attributes['references'] ?? "");
+		$this->attributes['message_id'] = $this->parseMessageIds($this->attributes['message_id'] ?? "")[0] ?? null;
+		$this->attributes['in_reply_to'] = $this->parseMessageIds($this->attributes['in_reply_to'] ?? "")[0] ?? null;
+	}
+
+
+	/**
+	 * Parse message-id, references, in-reply-to headers into an array of id strings
+	 *
+	 * @param string|null $ids
+	 * @return array
+	 */
+	private function parseMessageIds(?string $ids) : array {
+		if(empty($ids)) {
+			return [];
+		}
+		//remove non ascii chars. Incredimail sends invalid chars.
+		$ids= preg_replace('/[[:^print:]]/', '', $ids);
+
+		//remove whitespaces
+		$arr = preg_split('/[\s,]+/', $ids);
+
+		/*
+		 * References: <DUB124-W490C3E1C3A57E495104C6FF34A0@phx.gbl>
+		 *  <,<714ec0acc17243a33f40b25f663b03f5@intermesh.group-office.com> <>>
+		 *  <DUB124-W4084488AD7C09D18C33FE8F3300@phx.gbl>,<A5CC2BCF-A755-4471-AB58-0BEBECF918D7@intermesh.nl>
+		 */
+
+		$arr = array_map(function($id) {
+			return trim($id, " <>");
+		}, $arr);
+
+		$arr = array_unique($arr);
+		return array_filter($arr, function($id) {
+			return !empty($id);
+		});
 	}
 
 	/**

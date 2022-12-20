@@ -22,6 +22,10 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 	submit: true,
 	
 	dirty:false,
+
+	labelShouldFloat: function() {
+		return true;
+	},
 	
 	initComponent: function () {
 		
@@ -129,6 +133,8 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 			this.hiddenField.setValue(null);
 			this.filenameField.setValue(null);
 		}
+
+		this.fireEvent("setvalue", this, this.getRawValue());
 	},
 	
 	getValue: function(){

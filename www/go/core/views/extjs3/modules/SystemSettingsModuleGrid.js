@@ -24,7 +24,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 
 		this.store = new GO.data.JsonStore({
 			url: GO.url("modules/module/store"),
-			fields:['name', 'package', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'rights', 'icon', 'enabled', 'warning','author', 'buyEnabled','not_installable', 'isRefactored','installed'],
+			fields:['name', 'package', 'status', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'rights', 'icon', 'enabled', 'warning','author', 'buyEnabled','not_installable', 'isRefactored','installed'],
 			remoteSort: false,
 			idProperty: 'name'
 
@@ -114,7 +114,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 		}];
 
 		this.store.on('update', this.draw,this);
-		this.store.on('datachanged', this.draw,this);
+		this.store.on('load', this.draw,this);
 
 		this.on('afterrender', function() {
 
@@ -144,7 +144,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 		}
 	},
 
-	draw: function(store) {
+	draw: function() {
+
+		const store = this.store;
 
 		this.trialButton.setVisible(!store.reader.jsonData.has_license);
 
@@ -203,6 +205,11 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 				// 		scope:this
 				// 	}
 				// },
+					{
+						xtype:'box',
+						cls: 'status ' + r.data.status,
+						html: t(r.data.status)
+					},
 					{
 						xtype:'box',
 						cls: 'thumb',
@@ -304,6 +311,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 			return this.submitJmap(record);
 		}
 
+		this.getEl().mask(t("Saving..."));
+
 		GO.request({
 			maskEl:this.getEl(),
 			url: 'modules/module/update',
@@ -324,6 +333,11 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 					}
 				}
 				record.commit();
+
+				this.draw();
+				this.getEl().unmask();
+
+
 			}
 		});
 	},
@@ -358,6 +372,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 					}
 					record.commit();
 				}
+
+				this.draw();
+				this.getEl().unmask();
 			}
 		});
 	},
@@ -493,6 +510,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 						record.set('enabled', false);
 						record.set('id', null);
 						record.commit();
+
+						this.getEl().unmask();
 					},
 					scope: this
 				});

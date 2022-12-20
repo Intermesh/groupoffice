@@ -25,6 +25,13 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 	disableSelection: true,
 
+	/**
+	 * Generally not needed.
+	 * If set, the ACL id of this property will be used for sorting the selected groups on top.
+	 * If not set it will use the standard AclOwnerEntity acl id for it.
+	 */
+	aclIdProp: null,
+
 	initComponent: function () {
 		
 		var checkColumn = new GO.grid.CheckColumn({
@@ -125,7 +132,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 										style = user && user.avatarId ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("user").avatarId, {w: 40, h: 40, zc: 1}) + ')"' : "background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));";
 										html = user ? "" : '<i class="icon">group</i>';
 
-							memberStr = record.get('users').column('displayName').join(", ");								
+							let memberStr = record.get('users').column('displayName').join(", ");
 							var more = record.json._meta.users.total - store.fields.item('users').limit;
 							if(more > 0) {
 								memberStr += t(" and {count} more").replace('{count}', more);
@@ -200,18 +207,22 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 				const form = this.findParentByType("entityform");
 				if (form) {
-					const onLoad = () => {
+					const onLoad = async () => {
 						//orders selected values on top
-
-						const nameParts = this.name.split('.');
 						let entity;
-						if(nameParts.length ==3 && nameParts[2] == 'defaultAcl') {
-							//for default permisssions
-							entity = {default:true, entity: nameParts[1]};
+						if(!this.aclIdProp) {
+							const nameParts = this.name.split('.');
+
+							if (nameParts.length == 3 && nameParts[2] == 'defaultAcl') {
+								//for default permisssions
+								entity = {default: true, entity: nameParts[1]};
+							} else {
+								entity = {id: form.currentId, entity: form.entityStore.entity.name};
+								this.setDisabled(form.entity.permissionLevel < go.permissionLevels.manage);
+							}
 						} else
 						{
-							entity = {id: form.currentId, entity: form.entityStore.entity.name};
-							this.setDisabled(form.entity.permissionLevel < go.permissionLevels.manage);
+							entity = go.util.Object.fetchPath(form.values, this.aclIdProp);
 						}
 
 						this.store.setFilter("inAcl", {inAcl: entity});

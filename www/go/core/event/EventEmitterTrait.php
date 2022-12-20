@@ -58,19 +58,15 @@ trait EventEmitterTrait {
 	 * 
 	 * @param string $event Defined in constants prefixed by EVENT_
 	 * @param mixed $args Multiple extra arguments to be passed to the listener functions.
-	 * @return boolean
+	 * @return mixed Returns the last listener return value or false if one of the listeners explicitly returns false
 	 */
-	public static function fireEvent(string $event, ...$args): bool
+	public static function fireEvent(string $event, ...$args)
 	{
 		
 		if(!go()->eventsEnabled()) {
 			return true;
 		}
 		
-		if(!Listeners::get()->fireEvent(static::class, self::class, $event, $args)) {
-			return false;
-		}		
-		
-		return true;
+		return Listeners::get()->fireEvent(static::class, self::class, $event, $args);
 	}
 }

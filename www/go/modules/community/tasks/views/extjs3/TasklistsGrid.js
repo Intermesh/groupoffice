@@ -2,12 +2,50 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 	autoHeight: true,
 	scrollLoader: false,
 	showMoreLoader: true,
+	loadMorePageSize: 20,
+	cls: "go-tasks-task-list",
+
+	initColumns: function() {
+
+		go.modules.community.tasks.TasklistsGrid.superclass.initColumns.call(this);
+
+
+		this.columns.push({
+			id: 'group',
+			header: t('Group'),
+			sortable: false,
+			dataIndex: 'group',
+			// groupRenderer: function(v, un, r, rowIndex, colIndex, ds) {
+			// 	if(!v) {
+			// 		return "";
+			// 	}
+			// }
+		})
+
+	},
+
 	initComponent: function () {
 
+		this.view = new go.grid.GroupingView({
+			showGroupName: false,
+			emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
+			totalDisplay: false,
+			hideGroupedColumn: true,
+			forceFit: true,
+			autoFill: true,
+			emptyGroupText: ""
+		});
+
 		Ext.apply(this, {
-			store: new go.data.Store({
-				fields: ['id', 'name'],
-				entityStore: "Tasklist",
+			store: new go.data.GroupingStore({
+				groupField: "group",
+				remoteGroup: true,
+				fields: [
+					'id',
+					'name',
+					{name: "group", type: "relation", mapping: "group.name"}
+				],
+				entityStore: "TaskList",
 				filters: {role: {role: 'list'}},
 				sortInfo: {
 					field: 'name',
@@ -34,7 +72,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 							if (btn != "yes") {
 								return;
 							}
-							go.Db.store("Tasklist").set({destroy: [this.moreMenu.record.id]});
+							go.Db.store("TaskList").set({destroy: [this.moreMenu.record.id]});
 						}, this);
 					},
 					scope: this
@@ -46,6 +84,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 		});
 
 		go.modules.community.tasks.TasklistsGrid.superclass.initComponent.call(this);
+
 
 		this.on('beforeshowmenu', (menu, record) => {
 			menu.getComponent("edit").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);

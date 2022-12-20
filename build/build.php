@@ -37,7 +37,10 @@ function run($cmd)
 
 function cd($dir)
 {
-	if (!chdir(realpath($dir))) {
+    $dir = realpath($dir);
+
+    echo "\ncd $dir\n\n";
+	if (!chdir($dir)) {
 		throw new Exception("Could not change dir to '" . $dir . "'");
 	}
 }
@@ -46,21 +49,17 @@ class Builder
 {
     public $test = false;
 
-	private $majorVersion = "6.6";
+	private $majorVersion = "6.7";
 
-	private $gitBranch = 'master';
-
-	/**
-	 *
-	 * @var string 63-php-70
-	 */
-	public $distro;
+	private $gitBranch = 'finance';
 
 	/**
 	 *
-	 * @var string php-70
+	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $variant;
+	public $distro = "testing";
+
+
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
 	/**
 	 *
@@ -72,13 +71,7 @@ class Builder
 	 * @var string groupoffice-6.3.8-php-70
 	 */
 	private $packageName;
-	private $variants = [
-	        [
-		        "archiveSuffix" => "",
-			    "name" => "sixsix",
-			    "encoderOptions" => "-72 --allow-reflection-all"
-		    ]
-	];
+
 
 	private $encoder = __DIR__ . "/deploy/ioncube_encoder5_12.0/ioncube_encoder.sh";
 
@@ -127,36 +120,32 @@ class Builder
 		$this->minorVersion = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
 
 
-		foreach ($this->variants as $options) {
-			$this->distro = $options['name'];
-
-			$this->packageName = "groupoffice-" . $this->majorVersion . "." . $this->minorVersion . $options["archiveSuffix"];
-
-			$this->encoderOptions = $options['encoderOptions'];
-
-			$this->buildDir = __DIR__ . "/deploy/build/" . $this->majorVersion . "/" . $options['name'];
-
-			run("rm -rf " . $this->buildDir);
-			run("mkdir -p " . $this->buildDir);
-
-			$this->encodedDir = __DIR__ . "/deploy/encoded/" . $this->majorVersion . "/" . $options['name'];
-
-			run("rm -rf " . $this->encodedDir);
-			run("mkdir -p " . $this->encodedDir);
-
-			$this->buildFromSource();
+        $this->packageName = "groupoffice-" . $this->majorVersion . "." . $this->minorVersion;
 
 
-            $this->buildDebianPackage();
+        $this->buildDir = __DIR__ . "/deploy/build/" . $this->majorVersion . "/" . $this->distro;
 
-            if(!$this->test) {
-	            $this->createGithubRelease();
-	            $this->addToDebianRepository();
-	            $this->sendTarToSF();
-            }
+        run("rm -rf " . $this->buildDir);
+        run("mkdir -p " . $this->buildDir);
+
+        $this->encodedDir = __DIR__ . "/deploy/encoded/" . $this->majorVersion . "/" . $this->distro;
+
+        run("rm -rf " . $this->encodedDir);
+        run("mkdir -p " . $this->encodedDir);
+
+        $this->buildFromSource();
 
 
-		}
+        $this->buildDebianPackage();
+
+        if(!$this->test) {
+            $this->createGithubRelease();
+            $this->addToDebianRepository();
+            $this->sendTarToSF();
+        }
+
+
+
 	}
 
 	private function pullSource()
@@ -195,38 +184,66 @@ class Builder
 
 	private function buildFromSource()
 	{
-
 		run("cp -r " . dirname(__DIR__) . "/www/ " . $this->buildDir . "/" . $this->packageName);
 
 		cd($this->buildDir . "/" . $this->packageName);
+
+        $this->encode();
+
+        $this->buildNodeModules();
+
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
 
-		$sassFiles = run('find . -regex ".*/[^_]*\.scss"');
+		$sassFiles = run("find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*'");
 
 		foreach ($sassFiles as $sassFile) {
 			run("sass --no-source-map $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
 		}
 
-		$this->encode();
 
 		cd($this->buildDir);
 		run("tar czf " . $this->packageName . ".tar.gz " . $this->packageName);
 		echo "Created " . $this->buildDir . '/'. $this->packageName . ".tar.gz\n";
 	}
 
+
+    private function buildNodeModules() {
+
+	    cd($this->buildDir . "/" . $this->packageName);
+
+	    $packageFiles = array_reverse(run("find views -name package.json -not -path '*/node_modules/*'"));
+
+	    $packageFiles = array_merge($packageFiles, run("find go/modules -name package.json -not -path '*/node_modules/*'"));
+
+        foreach($packageFiles as $packageFile)  {
+            $nodeDir = dirname($packageFile);
+            cd($nodeDir);
+	        run("npm install");
+            run("pwd");
+            run("npm run build");
+	        cd($this->buildDir . "/" . $this->packageName);
+        }
+    }
+
+    private function runEncoder($sourcePath, $targetPath) {
+	    run($this->encoder . ' -72 --allow-reflection-all -B --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
+		    '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
+
+	    run($this->encoder . ' -81 --add-to-bundle --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
+		    '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
+
+    }
+
 	private function encode()
 	{
 		foreach ($this->proModules as $module) {
-			run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" --exclude "Site*Controller.php" ' .
-				'--copy "vendor/" ' . $this->sourceDir . '/promodules/' . $module . ' ' .
-				'--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
+            $this->runEncoder('/promodules/' . $module, '/modules');
 		}
 
+        $this->runEncoder('/promodules/tickets/model', '/modules/tickets/');
+        $this->runEncoder('/promodules/tickets/customfields/model', '/modules/tickets/customfields/');
+			$this->runEncoder('/promodules/tickets/customfields/model', '/modules/tickets/customfields/');
 
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' . $this->sourceDir . '/promodules/tickets/model ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/');
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' . $this->sourceDir . '/promodules/tickets/customfields/model ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/customfields');
 		run($this->encoder . " " . $this->encoderOptions . ' --replace-target ' . $this->sourceDir . '/promodules/tickets/TicketsModule.php ' .
 			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/');
 
@@ -252,9 +269,7 @@ class Builder
 
 
 		//business package
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' .
-			$this->sourceDir . '/business ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/go/modules');
+        $this->runEncoder('/business', '/go/modules');
 
 		$businessDir = new DirectoryIterator($this->sourceDir . '/business');
 		foreach ($businessDir as $fileinfo) {
@@ -313,7 +328,17 @@ class Builder
 		$r = $client->api('repo')->releases();
 
 		if (!isset($this->githubRelease)) {
-			$this->githubRelease = $r->create($this->github['USERNAME'], $this->github['REPOSITORY'], array('tag_name' => $tagName, 'name'=> $tagName, 'target_commitish' => $this->gitBranch, 'body' => 'Use the ' . $this->packageName . '.tar.gz file for installations. It contains all the code, libraries and compiled code. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'));
+			$this->githubRelease = $r->create(
+                    $this->github['USERNAME'],
+                    $this->github['REPOSITORY'],
+                    array(
+                      'tag_name' => $tagName,
+                      'name'=> $tagName,
+                      'prerelease' => $this->distro == "testing",
+                      'target_commitish' => $this->gitBranch,
+                      'body' => 'Use the ' . $this->packageName . '.tar.gz file for installations. It contains all the code, libraries and compiled code. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'
+                    )
+            );
 		}
 
 		$asset = $r->assets()->create(

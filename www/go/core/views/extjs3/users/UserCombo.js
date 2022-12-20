@@ -3,7 +3,7 @@
 		fieldLabel: t("User"),
 		hiddenName: 'userId',
 		anchor: '100%',
-		emptyText: t("Please select..."),
+		// emptyText: t("Please select..."),
 		pageSize: 50,
 		valueField: 'id',
 		displayField: 'displayName',

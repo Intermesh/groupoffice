@@ -50,4 +50,28 @@
   th {
     font-weight: bold;
   }
+
+  .x-btn {
+    display: none;
+  }
+
+  .go-detail-view {
+    .x-panel-body {
+      overflow: visible !important;
+      height: auto !important;
+
+    }
+
+    .x-panel-tbar {
+      display: none;
+    }
+
+    .x-panel {
+      box-shadow: none !important;
+    }
+
+    .x-tool {
+      display: none;
+    }
+  }
 }

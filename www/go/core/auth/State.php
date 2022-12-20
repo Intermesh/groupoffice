@@ -2,6 +2,7 @@
 
 namespace go\core\auth;
 use Exception;
+use go\core\jmap\Request;
 use go\core\model\Module;
 use go\core\model\User;
 use stdClass;
@@ -60,11 +61,27 @@ abstract class State {
 	 *
 	 * @return string
 	 */
-	abstract protected function getBaseUrl(): string;
+	protected function getBaseUrl(): string
+	{
+		if(go()->getEnvironment()->isCli()) {
+			return go()->getSettings()->URL . 'api';
+		} else{
+			$url = Request::get()->isHttps() ? 'https://' : 'http://';
+			$url .= Request::get()->getHost(false) . dirname($_SERVER['SCRIPT_NAME']);
+
+			// HACK for old framework index.php
+			if(substr($url, -4) !== '/api'){
+				$url .= '/api';
+			}
+
+			return $url;
+		}
+	}
 
 	public function getDownloadUrl($blobId): string
 	{
-		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
+//		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
+		return "/api/download.php?blob=".$blobId;
 	}
 
 	/**
@@ -89,7 +106,7 @@ abstract class State {
 
 	public function getEventSourceUrl(): ?string
 	{
-		return go()->getConfig()['core']['general']['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
+		return go()->getConfig()['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
 	}
 
 }

@@ -64,6 +64,7 @@ form/KeyValueEditorGrid.js
 form/DateRangeField.js
 form/RecurrenceField.js
 form/SelectField.js
+form/IntervalField.js
 
 modules/ModulePanel.js
 
@@ -90,6 +91,7 @@ login/UsernamePanel.js
 login/LoginPanel.js
 login/RecoveryDialog.js
 
+links/EntityCombo.js
 links/LinkDetailWindow.js
 links/LinkBrowserMenuItem.js
 links/CreateLinkButton.js
@@ -116,11 +118,13 @@ util/Cookies.js
 util/SelectDialog.js
 util/Object.js
 util/Autolinker.js
+util/QuoteStripper.js
 
 User.js
 String.js
 
 detail/Panel.js
+detail/ScrollToTopButton.js
 detail/ReadMore.js
 detail/AddButton.js
 detail/PropertyList.js
@@ -289,6 +293,7 @@ form/AttachmentsField.js
 form/LanguageCombo.js
 
 emailtemplate/TemplateDialog.js
+emailtemplate/TemplateFieldset.js
 emailtemplate/GridPanel.js
 pdftemplate/TemplateDialog.js
 pdftemplate/GridPanel.js
@@ -297,7 +302,7 @@ pdftemplate/BlocksField.js
 chart/ChartComponent.js
 chart/LineChart.js
 chart/PieChart.js
-
+chart/BarChart.js
 
 license/LicenseDialog.js
 

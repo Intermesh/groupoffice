@@ -20,7 +20,7 @@ use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use go\modules\community\tasks\convert\VCalendar;
 use go\modules\community\tasks\model\Task;
-use go\modules\community\tasks\model\Tasklist;
+use go\modules\community\tasks\model\TaskList;
 use GO\Calendar\Model\Calendar;
 use Sabre;
 use GO;
@@ -390,7 +390,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 
 		if ($calendar->tasklist_id > 0) {
-			$tasklist = Tasklist::findById($calendar->tasklist_id); // ignore acl?
+			$tasklist = TaskList::findById($calendar->tasklist_id); // ignore acl?
 
 			if($tasklist) {
 
@@ -830,7 +830,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		$currentToken = $calendar->version;
 
 		if($calendar->tasklist_id) {
-			$tasklist = Tasklist::findById($calendar->tasklist_id);
+			$tasklist = TaskList::findById($calendar->tasklist_id);
 
 			if($tasklist) {
 				$currentToken += $tasklist->version;

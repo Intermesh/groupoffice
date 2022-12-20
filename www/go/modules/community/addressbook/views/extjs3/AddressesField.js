@@ -31,17 +31,13 @@
 				displayField: 'display',
 				value: "work"
 			}, {
-				xtype: "textfield",
-				fieldLabel: t("Street"),
-				name: "street",
+				xtype: "textarea",
+				grow: true,
+				fieldLabel: t("Address"),
+				name: "address",
 				anchor: "100%",
 				setFocus: true
-			}, {
-				xtype: "textfield",
-				fieldLabel: t("Street 2"),
-				name: "street2",
-				anchor: "100%"
-			}, {
+			},{
 				xtype: "textfield",
 				fieldLabel: t("ZIP code"),
 				name: "zipCode",

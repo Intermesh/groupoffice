@@ -3,6 +3,7 @@ go.filter.Conditions = Ext.extend(go.form.FormGroup, {
 	name: "conditions",
 	addButtonText: t("Add condition"),	
 	hideLabel: true,
+	startWithItem: false,
 	initComponent : function() {
 		
 		this.itemCfg = {
@@ -11,6 +12,11 @@ go.filter.Conditions = Ext.extend(go.form.FormGroup, {
 		};
 		
 		go.filter.Conditions.superclass.initComponent.call(this);
+	},
+
+	setEntity: function (name) {
+		this.entity = this.itemCfg.entity = name;
+		this.reset();
 	},
 
 	initBbar : function() {

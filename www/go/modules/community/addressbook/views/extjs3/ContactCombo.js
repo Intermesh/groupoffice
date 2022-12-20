@@ -8,7 +8,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	fieldLabel: t("Contact"),
 	hiddenName: 'contactId',
 	anchor: '100%',
-	emptyText: t("Please select..."),
+	// emptyText: t("Please select..."),
 	pageSize: 50,
 	valueField: 'id',
 	displayField: 'name',

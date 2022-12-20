@@ -46,26 +46,3 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 });
 
 Ext.reg("gogrid", go.grid.GridPanel);
-
-
-(function() {
-	var origGetState = Ext.grid.GridPanel.prototype.getState;
-	
-	Ext.override(Ext.grid.GridPanel, {
-			
-			getState : function() {
-
-				var o = origGetState.call(this);
-
-				for(var i = 0, c; (c = this.colModel.config[i]); i++){
-					if(c.resizable === false) {
-						delete o.columns[i].width;
-					}            
-				}
-
-				return o;
-			}
-	});
-
-})();
-

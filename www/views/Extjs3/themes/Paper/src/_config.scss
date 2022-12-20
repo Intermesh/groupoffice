@@ -66,6 +66,7 @@ $vars: (
 	color: rgba(white, 0.87);
 	//margin-top: dp(1.5);
 	min-width:dp(21);
+	width: content-box;
 	height:dp(21);
 	padding: 0 dp(4);
 	line-height:dp(21);
@@ -113,6 +114,7 @@ $vars: (
   text-rendering: optimizeLegibility; // Support for Safari and Chrome.
   -moz-osx-font-smoothing: grayscale; // Support for Firefox.
   font-feature-settings: 'liga'; // Support for IE
+	line-height: normal;
 }
  
 @function str-replace($string, $search, $replace: '') {

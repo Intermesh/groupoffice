@@ -16,8 +16,10 @@
 		addButtonIconCls: 'ic-home',
 		itemCfg: {
 			items: [{
-				xtype: "compositefield",
-				hideLabel: true,
+				anchor: "100%",
+				layout: "form",
+				xtype: "container",
+				cls: "go-hbox",
 				items: [{
 					xtype: 'combo',
 					name: 'type',
@@ -31,13 +33,15 @@
 					mobile: {
 						width: dp(100)
 					},
-					value: "homepage"
+					value: "homepage",
+					fieldLabel: t("Type"),
 				}, {
 					flex: 1,
 					xtype: "textfield",
 					allowBlank: false,
 					name: "url",
-					setFocus: true
+					setFocus: true,
+					fieldLabel: "URL",
 				}]
 			}]
 		}

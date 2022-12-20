@@ -340,7 +340,16 @@
 	padding: dp(6) dp(8);
 }
 
+// hack to detect browser autofill https://github.com/matteobad/detect-autofill/
+@keyframes onautofillstart { from {} }
+@keyframes onautofillcancel { from {} }
+
 .x-form{
+
+	.x-panel, .x-fieldset {
+		border-radius: dp(10);
+		overflow: hidden;
+	}
 	background-color: color($bg, 'form');
 	> .x-tab-panel {
 		 > .x-tab-panel-bwrap> .x-tab-panel-body > div { // tabbed form dialog
@@ -378,23 +387,26 @@
 		div.x-box-item.text, label {
 			@extend %font-subheading-dense;
 			padding: dp(4) 0;
-			line-height:dp(24)
+			line-height:dp(22)
 		}
 	}
-	
-	&-display-field {
-		line-height: dp(32);
+
+	&-display-field, &-plainfield {
 		@extend %font-data;
+		line-height: dp(20);
+		padding: dp(15) dp(16);
+		border-radius: dp(10);
+		border: 1px solid color($fg, 'line');
 	}
 	
 	&-field {
 		@extend %font-data;
 		color: color($fg, 'text');
-		min-height: dp(32);
+		min-height: dp(44); //line-height 20 + padding 11 + borders = 44
 		line-height: dp(20);
 		//line-height: dp(18);
 		transition: border-color 100ms linear, box-shadow 225ms linear;
-		border-radius: dp(4);
+		border-radius: dp(10);
 		&.x-item-disabled {
 			background-color: color($bg, 'background');
 		}
@@ -410,26 +422,43 @@
 		&.x-triggerfield-selectonly {
 			background-color:color($bg, 'box');
 		}
-		
+
+		.x-small-editor & {
+			min-height: dp(36);
+			padding: dp(4) dp(8);
+		}
+
+
 	}
-    &-duration, &-text, textarea.x-form-field, &-time {
-      @extend %font-data;
-      background-color:color($bg, 'box');
-      border: 1px solid color($fg, 'track');
-      display: inline-block;
-      padding: dp(6) dp(8);
-    }
-    &-duration > div > input {
-      border:0;
-      background:transparent;
-      padding:0;
-      @extend %font-data;
-    }
-	&-time { max-height: dp(36);  }
+	&-duration, &-text, textarea.x-form-field, &-time {
+		@extend %font-data;
+		background-color:color($bg, 'box');
+		border: 1px solid color($fg, 'track');
+		display: inline-block;
+		padding: dp(11) dp(16);
+
+		&:-webkit-autofill {
+			background-color: transparent !important;
+			-webkit-box-shadow: 0 0 0 50px color($bg, 'box') inset;
+			animation-name: onautofillstart;
+		}
+		&:not(:-webkit-autofill) {
+			animation-name: onautofillcancel;
+		}
+	}
+
+	&-duration > input {
+		border:0;
+		background:transparent;
+		padding:0;
+		@extend %font-data;
+	}
+
+	&-time { max-height: dp(32);  }
 	
 	textarea.x-form-field {
 		/*height: min-content;*/
-		height: dp(32);
+		min-height: dp(44); //line-height 20 + padding 11 + borders = 44
 	}
 	//&-empty-field + .x-form-twin-triggers > .x-form-clear-trigger {
 	//	visibility:hidden; // only show clear button when not
@@ -445,18 +474,19 @@
 	&-cb-label {
 		display: inline-block;
 		height: dp(32);
+		line-height: dp(32);
 	}
-/*	
-	Merijn: this messed up long labels (login screen) and hint texts (IMAP auth in system settings)
-&-check-wrap {
-		height: dp(32);
-	}*/
+	&-check-wrap {
+		padding: dp(9) 0;
+	}
 	&-checkbox {
 		position:absolute;
 		opacity: 0;
+		line-height: normal;
+		min-height: auto;
 		+ .x-form-cb-label::before {
 			@extend %checkbox;
-			margin-right: dp(12);
+			//margin-right: dp(12);
 		}
 		&:checked + .x-form-cb-label::before {
 			content: 'check_box';
@@ -467,6 +497,8 @@
 	}
 	&-radio {
 		position:absolute;
+		line-height: normal;
+		min-height: auto;
 		opacity:0;
 		+ label {
 			margin-left: 0;
@@ -483,11 +515,16 @@
 		}
 	}
 	&-radio-group {
-		padding-left: 0; //dp(16);
+		padding: dp(4) dp(16);
+		overflow: visible;
+		border: 1px solid color($fg, 'track');;
+		background-color: color($bg, 'box');
 		overflow:visible;
 	}
 	&-item {
-		margin-bottom:dp(4);
+		position: relative;
+		padding-top: dp(8);
+		margin-bottom:dp(6);
 		//Following line made grid in forms appear in disabled like text
 		/*@extend %font-caption;*/
 
@@ -495,7 +532,51 @@
 		.x-form-element {
 			margin: 0;
 		}
+
+		label.x-form-item-label {
+			&:empty {
+				display: none;
+			}
+			display:flex;
+			align-items: center;
+			float:none;
+			position:absolute !important;
+			pointer-events: none;
+
+			//top: dp(15);
+			left: dp(12);
+			font-size: sp(13);
+			top: dp(8);
+			will-change: top, font-size;
+			transition: all linear 100ms;
+			&.x-form-empty-label:not(&.x-form-focus-label) {
+				top: dp(28);
+				font-size: sp(16);
+			}
+
+			padding: 0 dp(4);
+			overflow: visible;
+			background-color: color($bg, 'box');
+			height: 2px;
+
+			z-index:2;
+		}
+
+		label.x-form-focus-label {
+			@include var(color, c-primary);
+		}
+
+		label.x-form-invalid-label {
+			color: $cDanger;
+			background-color: $cDangerBg;
+		}
+
+		label.x-form-readonly-label {
+			background-color: color($bg, 'readonly');
+		}
 	}
+
+
 
 	&-invalid-icon:before {
 		@extend %icon;
@@ -507,7 +588,8 @@
 	&-focus, textarea.x-form-focus, &:focus-within {
 		@extend .z2;
 		@include var(border-color, c-primary);
-	}	
+	}
+
 	&-invalid, textarea.x-form-invalid {
 		border-color: rgba($cDanger,0.54);
 		background-color: $cDangerBg;
@@ -519,7 +601,7 @@
 		line-height: 1.6em;
 		//overflow: hidden;
 		//text-overflow: ellipsis;
-		padding-bottom: dp(8);
+		padding: dp(8) dp(16);
 	}
 	
 }
@@ -531,7 +613,12 @@
 
 .x-form-field-trigger-wrap {
 	> input {
-		padding-right: dp(32); // for trigger button: todo twintrigger
+		padding-right: dp(48); // for trigger button: todo twintrigger
+		width: 100%;
+	}
+
+	> textarea {
+		width: 100%;
 	}
 }
 
@@ -545,19 +632,20 @@
 	}
 	.x-form-twin-triggers {
 		padding: 0 dp(4);
+		height: 100%;
 		.x-form-trigger {
-			width: dp(24);
+			width: dp(32);
 		}
 	}
 	.x-form-trigger {
-		height: dp(32);
-		width: dp(32);
+		height: dp(44);
+		width: dp(44);
 		vertical-align: middle;
 		padding:0;
 		color: color($fg, 'icon');
 		&::before {
-			max-height: dp(32);
-			max-width: dp(32);
+			max-height: dp(44);
+			max-width: dp(44);
 			@extend %icon;
 			content: 'arrow_drop_down';
 		}
@@ -570,7 +658,8 @@
 		&.x-form-date-trigger::before {content: 'event';}
 		&.x-form-edit-trigger::before{content: 'edit';}
 		.x-small-editor & {
-			height: dp(32);
+			height: dp(36);
+			width: dp(36);
 		}
 	} 
 	.x-trigger-noedit {
@@ -615,7 +704,6 @@
 }
 
 
-.x-form-plainfield,
 .x-form-item-label,
 .x-form-label-left label.x-form-item-label{
 	@extend %font-label;
@@ -626,8 +714,7 @@
 
 .x-form-invalid-msg {
 	color:#c0272b;
-	font:normal 11px tahoma, arial, helvetica, sans-serif;
-	background-image:url(../images/default/shared/warning.gif);
+	padding: dp(8) dp(16);
 }
 
 .x-form-empty-field {
@@ -654,7 +741,7 @@
 		
 		@extend %font-subheading; //changed this to be the same as panel headers as they are mixed in forms
 		//float:left;
-		padding:dp(8) 0 dp(16);
+		padding:dp(8) 0;
 		position: initial;
 		top: dp(32);
 		width: 100%;
@@ -664,7 +751,7 @@
 	
 		.x-tool {
 			float: right;
-			margin: dp(-12) 0;
+			margin: dp(-3.5);
 		}
 /*		.x-tool +.x-fieldset-header-text {
 			line-height: dp(40);
@@ -1221,6 +1308,11 @@
 }
 
 .x-grid3{
+
+	&-summary-row {
+		border-top: 1px solid color($fg, 'line');
+	}
+
 	background-color: color($bg, "box");
 	&-scroller {
 		-webkit-overflow-scrolling: touch;
@@ -2616,8 +2708,13 @@ body.x-body-masked .x-window-plain .x-window-mc {
 
 // HTML
 .x-html-editor-wrap {
-	border-radius: dp(4);
+	border-radius: dp(10);
 	border:1px solid color($fg, 'track');
+	background-color:color($bg, 'box');
+
+	iframe {
+		border-radius: dp(10);
+	}
 }
 .x-html-editor-tb {
 	.x-toolbar {
@@ -2632,9 +2729,16 @@ body.x-body-masked .x-window-plain .x-window-mc {
 			font-size: .8em;
 		}
 	}
-	//.x-toolbar-left {
-	//	padding-left: 0;
-	//}
+	.x-toolbar-left {
+		padding-left: dp(8);
+		.x-form-field-wrap:first-child {
+			margin-left: 0;
+		}
+	}
+
+	.x-toolbar-right {
+		padding-right: dp(8);
+	}
 
 	.x-btn-text {
 		background-image: none; //url(wysiwyg.gif);
@@ -2817,10 +2921,10 @@ $resizerSize : dp(3);
 // ### SLIDER ### todo
 // ##############
 .x-slider-horz {
-	height: dp(32);
+	height: dp(44);
 	overflow:visible;
 	.x-slider-inner {
-		top: dp(16);
+		top: dp(24);
 		background-color: color($fg, 'track');
 		border-radius: $borderRadius;
 		height: dp(2);

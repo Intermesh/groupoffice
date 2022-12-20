@@ -3,7 +3,10 @@ go.print = function(tmpl, data) {
 	var paper = document.getElementById('paper');
 
 	paper.innerHTML = Ext.isEmpty(data) ? tmpl : tmpl.apply(data);
-	Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
+
+	Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+		Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
+	});
 
 };
 
@@ -24,6 +27,9 @@ go.util =  (function () {
 	return {
 
 		clone: function(obj) {
+			if(obj === undefined) {
+				return undefined;
+			}
 			return JSON.parse(JSON.stringify(obj));
 		},
 
@@ -228,10 +234,7 @@ go.util =  (function () {
 
 		streetAddress: function (config) {
 
-			var adr = config.street;
-			if(config.street2) {
-				adr += (" " + config.street2);
-			}
+			var adr = config.address;
 			if(config.zipCode) {
 				adr += ", " + config.zipCode.replace(/ /g, '');
 			}
@@ -718,7 +721,89 @@ go.util =  (function () {
 		}
 
 		return a;
-	}
+	},
+
+		blobCache : {},
+
+		getBlobURL : function(blobId) {
+			let fetchOptions = {
+				method: 'GET',
+				headers: {
+					'Authorization': 'Bearer ' + go.User.accessToken
+				}
+			}
+
+
+		if(!this.blobCache[blobId]) {
+			let type;
+			this.blobCache[blobId] = fetch(go.Jmap.downloadUrl(blobId), fetchOptions)
+				.then( r => {
+
+
+					if(r.ok) {
+						type = r.headers.get("Content-Type") || undefined
+
+						return r.arrayBuffer().then( ab => URL.createObjectURL( new Blob( [ ab ], { type: type } ) ) );
+					} else
+					{
+						console.error(r);
+
+						return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
+					}
+
+				})
+				.catch((e) => {
+					console.error(e);
+
+					return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
+				});
+
+		}
+
+		return this.blobCache[blobId];
+	},
+
+		/**
+		 * Replaces all img tags with a blob ID source from group-office with an objectURL
+		 *
+		 * @param el
+		 * @return Promise that resolves when all images are fully loaded
+		 */
+		replaceBlobImages : function (el) {
+
+			const promises = [];
+			el.querySelectorAll("img").forEach((img) => {
+
+				let blobId = img.dataset.blobId;
+				if(!blobId) {
+					const regex = new RegExp('blob=([^">\'&\?].*)');
+					const matches = regex.exec(img.src);
+					if(matches && matches[1]) {
+						blobId = matches[1];
+					}
+				}
+
+				if(blobId) {
+
+					img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+
+					promises.push(this.getBlobURL(blobId).then(src => {
+
+						img.src = src;
+						img.onload = () => {
+							URL.revokeObjectURL(img.src);
+						}
+					})
+						.then(() => {
+						//wait till image is fully loaded
+						return new Promise(resolve => { img.onload = img.onerror = resolve; })
+					}))
+
+				}
+			});
+
+			return Promise.all(promises);
+		}
 	};
 })();
 

@@ -105,6 +105,7 @@ class ModuleController extends AbstractJsonController{
 					'description'=>$module->getDescription(),
 					'icon'=>$module->getIcon(),
 					'rights'=>array_keys($module->getRights()),
+					"status" => $module->getStatus(),
 					//'aclId'=>$model ? $model->getAclId() : 0,
 
 					'localizedPackage'=> $module->getLocalizedPackage(),
@@ -138,6 +139,7 @@ class ModuleController extends AbstractJsonController{
 					'author'=>$module->author(),
 					'description'=>$module->description(),
 					'icon'=>$module->icon(),
+					"status" => $module->getStatus(),
 					//'aclId'=>$model ? $model->getAcl_id() : 0,
 					'rights'=> array_keys($module->getRights()),
 //					'buyEnabled'=>!GO::scriptCanBeDecoded() || 

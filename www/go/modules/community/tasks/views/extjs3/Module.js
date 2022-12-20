@@ -1,9 +1,10 @@
 go.Modules.register("community", "tasks", {
 	mainPanel: "go.modules.community.tasks.MainPanel",
 	title: t("Tasks"),
-	entities: ["TaskCategory","PortletTasklist","Settings",{
-		name: "Tasklist",
+	entities: ["TaskListGrouping", "TaskCategory","PortletTasklist","Settings",{
+		name: "TaskList",
 		relations: {
+			group: {store: "TaskListGrouping", fk: "groupingId"},
 			creator: {store: "UserDisplay", fk: "createdBy"},
 			groups: {name: 'Groups'}
 		}
@@ -51,7 +52,7 @@ go.Modules.register("community", "tasks", {
 			creator: {store: "UserDisplay", fk: "createdBy"},
 			modifier: {store: "UserDisplay", fk: "modifiedBy"},
 			responsible: {store: 'UserDisplay', fk: 'responsibleUserId'},
-			tasklist: {store: 'Tasklist', fk: 'tasklistId'},
+			tasklist: {store: 'TaskList', fk: 'tasklistId'},
 			categories: {store: "TaskCategory", fk: "categories"},
 		},
 
@@ -86,7 +87,8 @@ go.Modules.register("community", "tasks", {
 				title: t("Modified by"),
 				name: 'modifiedBy',
 				multiple: true,
-				type: 'string'
+				type: 'go.users.UserCombo',
+				typeConfig: {value: null}
 			}, {
 				title: t("Created at"),
 				name: 'createdat',
@@ -96,10 +98,11 @@ go.Modules.register("community", "tasks", {
 				title: t("Created by"),
 				name: 'createdby',
 				multiple: true,
-				type: 'string'
+				type: 'go.users.UserCombo',
+				typeConfig: {value: null}
 			},
 			{
-				title: t("Tasklist"),
+				title: t("Task list"),
 				name: 'tasklistid',
 				multiple: false,
 				type: "go.modules.community.tasks.TasklistCombo"
@@ -129,27 +132,30 @@ go.Modules.register("community", "tasks", {
 				title: t("Responsible"),
 				name: 'responsibleUserId',
 				multiple: false,
-				type: 'go.users.UserCombo'
+				type: 'go.users.UserCombo',
+				typeConfig: {value: null}
 			}]
 
 	}],
 	initModule: function () {
-		// go.Alerts.on("beforeshow", function(alerts, alertConfig) {
-		// 	const alert = alertConfig.alert;
-		// 	if(alert.entity == "Task" && alert.data && alert.data.type == "assigned") {
-		//
-		//
-		// 		//replace panel promise
-		// 		alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
-		// 			return go.Db.store("User").single(alert.data.assignedBy).then((assigner) =>{
-		// 				panelCfg.html += ": " + t("You were assigned to this task by {assignedBy}").replace("{assignedBy}", assigner.displayName);
-		// 				panelCfg.notificationBody = panelCfg.html;
-		// 				return panelCfg;
-		// 			});
-		//
-		// 		});
-		// 	}
-		// });
+		go.Alerts.on("beforeshow", function(alerts, alertConfig) {
+			const alert = alertConfig.alert;
+			if(alert.entity == "Task" && alert.tag == "assigned") {
+
+				//replace panel promise
+				alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
+					return go.Db.store("User").single(alert.data.assignedBy).then((assigner) =>{
+						if(!assigner) {
+							assigner = {displayName: t("Unknown")};
+						}
+
+						panelCfg.items = [{html: go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.displayName) }];
+						panelCfg.notificationBody = panelCfg.html;
+						return panelCfg;
+					});
+				});
+			}
+		});
 	},
 
 
@@ -167,7 +173,9 @@ go.modules.community.tasks.progress = {
 };
 
 go.modules.community.tasks.listTypes = {
-	List : 1,
-	Board : 2,
-	Project : 3
+	List : "list",
+	Board : "board",
+	Project : "project",
+	Support : "support"
+
 }

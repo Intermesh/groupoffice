@@ -11,6 +11,7 @@ use Exception;
 use GO;
 use GO\Base\Controller\AbstractController;
 use GO\Base\Db\PDO;
+use go\core\App;
 use go\core\auth\TemporaryState;
 use go\core\db\Table;
 use go\core\db\Utils;
@@ -336,7 +337,7 @@ class MaintenanceController extends AbstractController {
 		
 		if(empty($params['modelName'])){
 			GO::modules()->callModuleMethod('buildSearchCache', array(&$response));
-			SearchableTrait::rebuildSearch();
+			go()->rebuildSearch();
 		} else if(is_a($params['modelName'], Entity::class, true)){
 			SearchableTrait::rebuildSearchForEntity($params['modelName']);
 		}

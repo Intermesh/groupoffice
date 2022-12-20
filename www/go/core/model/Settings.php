@@ -44,16 +44,6 @@ class Settings extends core\Settings {
 			}
 		}
 	}
-	
-	protected function getModuleName(): string
-	{
-		return "core";
-	}
-	
-	protected function getModulePackageName(): ?string
-	{
-		return "core";
-	}
 
 	private function hasLanguage(string $lang): bool
 	{
@@ -472,40 +462,48 @@ class Settings extends core\Settings {
 	 */
 	public $userAddressBookId = null;
 
+
+	private $userAddressBook;
+
 	/**
 	 * @return AddressBook
 	 * @throws Exception
 	 */
-	public function userAddressBook() {
+	public function userAddressBook(): ?AddressBook
+	{
 		if(!Module::findByName('community', 'addressbook')) {
 			return null;
 		}
+
+		if(isset($this->userAddressBook)) {
+			return $this->userAddressBook;
+		}
 		
 		if(isset($this->userAddressBookId)) {
-			$addressBook = AddressBook::findById($this->userAddressBookId);
+			$this->userAddressBook = AddressBook::findById($this->userAddressBookId);
 		} else{
-			$addressBook = false;
+			$this->userAddressBook = null;
 		}
 
-		if(!$addressBook) {
+		if(!$this->userAddressBook) {
 			go()->getDbConnection()->beginTransaction();
-			$addressBook = new AddressBook();	
-			$addressBook->name = go()->t("Users");		
+			$this->userAddressBook = new AddressBook();
+			$this->userAddressBook->name = go()->t("Users");
 
-			if(!$addressBook->save()) {
+			if(!$this->userAddressBook->save()) {
 				throw new Exception("Could not save address book");
 			}
-			$this->userAddressBookId = $addressBook->id;
+			$this->userAddressBookId = $this->userAddressBook->id;
 
 			//Share users address book with internal
-			$addressBook->findAcl()->addGroup(Group::ID_INTERNAL)->save();
+			$this->userAddressBook->findAcl()->addGroup(Group::ID_INTERNAL)->save();
 			if(!$this->save()) {
 				throw new Exception("Could not save core settings");
 			}
 			go()->getDbConnection()->commit();
 		}
 
-		return $addressBook;		
+		return $this->userAddressBook;
 	}
 
 	/**

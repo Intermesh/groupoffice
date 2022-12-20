@@ -49,78 +49,6 @@ trait SearchableTrait {
 	}
 
 
-
-	/**
-	 * Split numbers into multipe partials so we can match them using an index
-	 * eg.
-	 *
-	 * ticket no
-	 *
-	 * 2002-12341234
-	 *
-	 * Will be found on:
-	 *
-	 * 002-12341234
-	 * 02-12341234
-	 * 2-12341234
-	 * -12341234
-	 * 12341234
-	 * 2341234
-	 * 341234
-	 * 41234
-	 * 1234
-	 * 234
-	 *
-	 * this is faster then searchgin for
-	 *
-	 * %234 because it can't use an index
-	 *
-	 * @param string|int $number
-	 * @param int $minSearchLength
-	 * @return array
-	 */
-	public static function numberToKeywords($number, int $minSearchLength = 3): array
-	{
-		$keywords = [$number];
-
-		while(strlen($number) > $minSearchLength) {
-			$number = substr($number, 1);
-			$keywords[] = $number;
-		}
-
-		return $keywords;
-
-	}
-
-	/**
-	 * Prepares the query for a search
-	 *
-	 * @param Criteria $criteria
-	 * @param Query $query
-	 * @param string $searchPhrase
-	 * @throws Exception
-	 */
-	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase) {
-
-		go()->setOptimizerSearchDepth();
-
-		$i = 0;
-		$words = StringUtil::splitTextKeywords($searchPhrase, false);
-		$words = array_unique($words);
-
-		foreach($words as $word) {
-			$query->join(
-				"core_search_word",
-				'w'.$i, 'w'.$i.'.searchId = search.id',
-				'INNER'
-			);
-
-			$criteria->where('w'.$i.'.word', 'LIKE', $word . '%');
-
-			$i++;
-		}
-	}
-
 	/**
 	 * Save entity to search cache
 	 *
@@ -267,16 +195,16 @@ trait SearchableTrait {
 	 * @return Statement
 	 * @throws Exception
 	 */
-	private static function queryMissingSearchCache(string $cls, int $offset = 0): Statement
+	private static function queryMissingSearchCache(int $offset = 0): Statement
 	{
 		
 		$limit = 1000;
 
-		/** @var Entity $cls */
-		$query = $cls::find();
+
+		$query = static::find();
 		/* @var $query OrmQuery */
 		$query
-			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT")
+			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . static::entityType()->getId(), "LEFT")
 			->andWhere('search.id IS NULL')
 			->orWhere('search.rebuild = true')
 			->limit($limit)
@@ -289,7 +217,8 @@ trait SearchableTrait {
 	 * @param class-string<Entity> $cls
 	 * @throws Exception
 	 */
-	public static function rebuildSearchForEntity(string $cls) {
+	public static function rebuildSearchForEntity() {
+		$cls = static::class;
 		echo $cls."\n";
 
 		echo "Deleting old values\n";
@@ -305,7 +234,7 @@ trait SearchableTrait {
 		echo "Deleted ". $stmt->rowCount() . " entries\n";
 
 		//In small batches to keep memory low
-		$stmt = self::queryMissingSearchCache($cls);			
+		$stmt = static::queryMissingSearchCache();
 		
 		$offset = 0;
 		
@@ -330,7 +259,7 @@ trait SearchableTrait {
 			echo "\n";
 			go()->getDbConnection()->exec("commit");
 
-			$stmt = self::queryMissingSearchCache($cls, $offset);
+			$stmt = static::queryMissingSearchCache($offset);
 		}
 
 
@@ -339,16 +268,4 @@ trait SearchableTrait {
 
 	}
 
-	/**
-	 * @throws Exception
-	 */
-	public static function rebuildSearch() {
-		$classFinder = new ClassFinder();
-		$entities = $classFinder->findByTrait(SearchableTrait::class);
-		
-		foreach($entities as $cls) {
-			self::rebuildSearchForEntity($cls);			
-			echo "\nDone\n\n";
-		}
-	}
 }

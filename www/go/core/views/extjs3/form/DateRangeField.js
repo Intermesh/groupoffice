@@ -3,9 +3,11 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 	value: null,
 	lastValue: null,
 
-	text: t("No range selected"),
+	cls: "go-daterange-field",
 
-	iconCls: 'ic-schedule',
+	text: "",
+
+	// iconCls: 'ic-schedule',
 
 	isFormField: true,
 
@@ -202,10 +204,38 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 					me.startDatePicker.focus();
 				}
 
+			}, "-",{
+				text: t("Clear"),
+				scope: this,
+				handler: function() {
+					this.setValue(null);
+					this.updateBtnText();
+
+					this.fireEvent("change", this, null, this.lastValue);
+				}
+
 			}]
 		});
 
+
+
 		this.supr().initComponent.call(this);
+
+		this.on("render", () => {
+			Ext.form.Field.prototype.initLabelClasses.call(this);
+		})
+	},
+
+	labelShouldFloat : function(...args) {
+		return Ext.form.Field.prototype.labelShouldFloat.apply(this, args);
+	},
+
+	applyEmptyLabelCls : function(...args) {
+		return Ext.form.Field.prototype.applyEmptyLabelCls.apply(this, args);
+	},
+
+	findLabelEl : function(...args) {
+		return Ext.form.Field.prototype.findLabelEl.apply(this, args);
 	},
 
 	// setDateRange: function(btn) {
@@ -221,7 +251,7 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 	},
 
 	reset: function () {
-		this.value = null;
+		this.setValue(null);
 		this.updateBtnText();
 	},
 
@@ -229,6 +259,8 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 		this.lastValue = this.getValue();
 		this.value = v;
 		this.updateBtnText();
+
+		this.fireEvent("setvalue", this, v);
 	},
 
 	getValue: function () {
@@ -262,7 +294,7 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 
 	updateBtnText: function() {
 		if(this.value == null) {
-			this.setText(t("No range selected"));
+			this.setText("");
 			return;
 		}
 		var txt = go.util.Format.date(this.startDatePicker.getValue()) + ' - ' + go.util.Format.date(this.endDatePicker.getValue());

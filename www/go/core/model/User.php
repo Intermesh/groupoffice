@@ -4,7 +4,6 @@ namespace go\core\model;
 
 use DateTimeZone;
 use Exception;
-use GO\Base\Html\Error;
 use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
@@ -15,15 +14,12 @@ use go\core\App;
 use go\core\auth\Authenticate;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\DomainProvider;
-use go\core\auth\Method;
-use go\core\auth\Password;
-use go\core\auth\PrimaryAuthenticator;
 use go\core\convert\UserSpreadsheet;
-use go\core\customfield\Date;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
-use go\core\ErrorHandler;
+use go\core\exception\ConfigurationException;
+use go\core\exception\NotFound;
 use go\core\Installer;
 use go\core\mail\Message;
 use go\core\mail\Util;
@@ -36,7 +32,6 @@ use go\core\jmap\Entity;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\ClassFinder;
 use go\core\util\DateTime;
-use go\core\util\Geolocation;
 use go\core\validate\ErrorCode;
 use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\AddressBook;
@@ -46,7 +41,7 @@ use go\modules\community\addressbook\model\UserSettings;
 use go\modules\community\notes\model\NoteBook;
 use go\modules\community\notes\model\UserSettings as NotesUserSettings;
 use go\modules\community\tasks\model\Task;
-use go\modules\community\tasks\model\Tasklist;
+use go\modules\community\tasks\model\TaskList;
 use go\modules\community\tasks\model\UserSettings as TasksUserSettings;
 
 
@@ -319,11 +314,17 @@ class User extends AclItemEntity {
 	{
 		if(empty($this->personalGroup)){
 			$this->personalGroup = Group::find()->where(['isUserGroupFor' => $this->id])->single();
+			if(!$this->personalGroup) {
+				$this->createPersonalGroup();
+			}
 		}
 
 		return $this->personalGroup;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function setPersonalGroup($values) {
 		$this->getPersonalGroup()->setValues($values);
 	}
@@ -498,7 +499,7 @@ class User extends AclItemEntity {
 			return false;
 		}						
 		
-		return App::get()->getAuthState()->isAdmin();
+		return go()->getModel()->getUserRights()->mayChangeUsers;
 	}
 	
 	protected function internalValidate() {
@@ -507,7 +508,7 @@ class User extends AclItemEntity {
 			$this->homeDir = "users/" . $this->username;
 		}
 
-		if(empty($this->recoveryEmail)) {
+		if(empty($this->recoveryEmail) && in_array("recoveryEmail", $this->selectedProperties)) {
 			$this->recoveryEmail = $this->email;
 		}
 
@@ -616,13 +617,13 @@ class User extends AclItemEntity {
 	}
 
 
-	public function getPermissionLevel(): int
+	protected function internalGetPermissionLevel(): int
 	{
 		if($this->id == App::get()->getAuthState()->getUserId()) {
 			return Acl::LEVEL_WRITE;
 		}
 
-		return parent::getPermissionLevel();
+		return parent::internalGetPermissionLevel();
 	}
 	
 	protected static function textFilterColumns(): array
@@ -786,7 +787,7 @@ class User extends AclItemEntity {
 				return false;
 			}
 		}
-		$this->createPersonalGroup();
+		$this->checkPersonalGroup();
 
 		if($this->isNew()) {
 			$this->legacyOnSave();	
@@ -925,24 +926,16 @@ class User extends AclItemEntity {
 	}
 
 
+
 	/**
 	 * @throws SaveException
 	 * @throws Exception
 	 */
-	private function createPersonalGroup()
+	private function checkPersonalGroup()
 	{
 		if ($this->isNew() || $this->isModified(['groups', 'username'])) {
 			if ($this->isNew()) {// !in_array($this->getPersonalGroup()->id, $groupIds)) {
-				$personalGroup = new Group();
-				$personalGroup->name = $this->username;
-				$personalGroup->isUserGroupFor = $this->id;
-				$personalGroup->users[] = $this->id;
-
-				if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
-					throw new SaveException($personalGroup);
-				}
-
-				$this->personalGroup = $personalGroup;
+				$personalGroup = $this->createPersonalGroup();
 			} else {
 				$personalGroup = $this->getPersonalGroup();
 				if ($this->isModified('username')) {
@@ -957,6 +950,22 @@ class User extends AclItemEntity {
 				$this->groups[] = $personalGroup->id;
 			}
 		}
+	}
+
+	private function createPersonalGroup(): Group
+	{
+		$personalGroup = new Group();
+		$personalGroup->name = $this->username;
+		$personalGroup->isUserGroupFor = $this->id;
+		$personalGroup->users[] = $this->id;
+
+		if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
+			throw new SaveException($personalGroup);
+		}
+
+		$this->personalGroup = $personalGroup;
+
+		return $personalGroup;
 	}
 
 	private function appendNumberToGroupNameIfExists(Group $personalGroup): bool {
@@ -1021,6 +1030,9 @@ class User extends AclItemEntity {
 	/**
 	 * Get the user disk quota in bytes
 	 * @return int amount of bytes the user may use
+	 * @throws ConfigurationException
+	 * @throws ConfigurationException
+	 * @throws ConfigurationException
 	 */
 	public function getStorageQuota(){
 		if(!empty($this->disk_quota)) {
@@ -1128,6 +1140,12 @@ class User extends AclItemEntity {
 		if(!$this->contact) {
 			$this->contact = new Contact();
 			$this->contact->addressBookId = go()->getSettings()->userAddressBook()->id;
+			if($this->email) {
+				$this->contact->emailAddresses[0] = (new EmailAddress($this->contact))->setValues(['email' => $this->email]);
+			}
+			$nameParts = explode(" ", $this->displayName);
+			$this->contact->firstName = array_shift($nameParts);
+			$this->contact->lastName = implode(" ", $nameParts);
 		}
 		
 		return $this->contact;
@@ -1229,10 +1247,10 @@ class User extends AclItemEntity {
 		}
 
 		if(Module::isInstalled("community", "tasks")) {
-			$taskLists  = Tasklist::find()->where('createdBy','=', $this->id)->andWhere('role','=', Tasklist::List);
+			$taskLists  = TaskList::find()->where('createdBy','=', $this->id)->andWhere('role','=', TaskList::List);
 			foreach($taskLists as $taskList) {
 				$aclIds[] = $taskList->findAclId();
-				Tasklist::entityType()->change($taskList);
+				TaskList::entityType()->change($taskList);
 			}
 		}
 
@@ -1262,6 +1280,9 @@ class User extends AclItemEntity {
 		$this->theme = $v;
 	}
 
+	/**
+	 * @throws ConfigurationException
+	 */
 	public function getTheme() {
 		if(!go()->getConfig()['allow_themes']) {
 			return go()->getConfig()['theme'];
@@ -1354,6 +1375,34 @@ class User extends AclItemEntity {
 		return $this->getPersonalGroup()->findAclId();
 	}
 
+
+	public static function findOrCreateByUsername(string $username, string $email, string $displayName, array $values = [], array $properties = []) : User {
+
+		$user = User::find($properties)
+			->where(['username' => $username])
+			->orWhere(['email' => $email])
+			->single();
+		if (!$user) {
+
+			if(!go()->getSettings()->allowRegistration) {
+				throw new NotFound("User not found");
+			}
+
+			$user = new User();
+			$user->setValues($values);
+			$user->username = $username;
+			$user->email = $email;
+			$user->displayName = $displayName;
+			if(!isset($user->recoveryEmail)) {
+				$user->recoveryEmail = $email;
+			}
+			if (!$user->save()) {
+				throw new SaveException($user);
+			}
+		}
+
+		return $user;
+	}
 
 	protected static function aclEntityClass(): string
 	{

@@ -50,41 +50,46 @@ GO.email.UnknownRecipientsDialog = Ext.extend(go.Window, {
 	
 				if(action == 'btn-add')
 				{
-                    this.addContactToAddresslistAtSaveContactEvent = true;
-                    var dialog = new go.modules.community.addressbook.ContactDialog();
-                    var firstName = record.data.first_name;
-                    var middleName = record.data.middle_name;
-                    var lastName = record.data.last_name;
-                    var email = record.data.email;
-                    dialog.show();
-                    dialog.setDialogValues(firstName, middleName, lastName, email);
+					this.addContactToAddresslistAtSaveContactEvent = true;
+					const dialog = new go.modules.community.addressbook.ContactDialog();
+					dialog.show();
+
+					dialog.setValues({
+						firstName: record.data.first_name,
+						middleName: record.data.middle_name,
+						lastName: record.data.last_name,
+						emailAddresses: [{
+							type: "work",
+							email: record.data.email
+						}]
+					});
 				}else
 				{
-                    this.email = record.data.email;
+					this.email = record.data.email;
 
-                    var me = this;
-                    var select = new go.util.SelectDialog({
-                        entities: ['Contact'],
-                        query: me.personal,
-                        mode: 'id',				
-                        singleSelect: true,
-                        selectMultiple: function (ids) {
-                            var dlg = new go.modules.community.addressbook.ContactDialog();
-                            dlg.on("load", function() {
+					var me = this;
+					var select = new go.util.SelectDialog({
+							entities: ['Contact'],
+							query: me.personal,
+							mode: 'id',
+							singleSelect: true,
+							selectMultiple: function (ids) {
+									var dlg = new go.modules.community.addressbook.ContactDialog();
+									dlg.on("load", function() {
 
-                                var a = dlg.formPanel.entity.emailAddresses;
-                                a.push({
-                                    type: "work",
-                                    email: me.email
-                                });
-                                dlg.setValues({
-                                    emailAddresses: a
-                                });
-                            });
-                            dlg.load(ids[0]).show();
-                        }					
-                    });
-                    select.show();
+											var a = dlg.formPanel.entity.emailAddresses;
+											a.push({
+													type: "work",
+													email: me.email
+											});
+											dlg.setValues({
+													emailAddresses: a
+											});
+									});
+									dlg.load(ids[0]).show();
+							}
+					});
+					select.show();
 
 					// if(!GO.email.findContactDialog)
 					// {

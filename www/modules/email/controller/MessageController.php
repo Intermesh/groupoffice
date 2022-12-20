@@ -875,7 +875,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 		} else {
 			$message = new \GO\Email\Model\ComposerMessage();
-			
+
+			if(!empty($params['subject'])) {
+				$message->subject = $params['subject'];
+			}
+
 			$this->_setAddressFields($params, $message);
 			$this->_addEmailsAsAttachment($message,$params);
 			

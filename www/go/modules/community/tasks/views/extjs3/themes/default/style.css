@@ -48,3 +48,8 @@
 .tasks-task-grid .x-grid3-check-col-td > div > div.x-grid3-check-col-on::before {
     content: "check_circle";
 }
+
+
+.go-tasks-task-list .x-grid-group-val-empty .x-grid-group-hd {
+    display: none;
+}

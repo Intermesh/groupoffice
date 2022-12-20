@@ -1,9 +1,15 @@
 <?php
 namespace go\core\model;
 
+use Exception;
+use GO\Base\Mail\SmimeMessage;
+use go\core\cron\GarbageCollection;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
+use go\core\jmap\Entity;
+use go\core\mail\Message;
+use go\core\model\Module as ModuleModel;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\TemplateParser;
@@ -13,6 +19,11 @@ use Swift_EmbeddedFile;
 
 /**
  * E-mail template model
+ *
+ *
+ * Because these models are polymorphic relations they need to be cleaned up by the code.
+ * You could to this with the garbage collection event.
+ * @see GarbageCollection::EVENT_RUN
  *
  * @example
  * ```
@@ -29,7 +40,7 @@ use Swift_EmbeddedFile;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 
-class EmailTemplate extends AclOwnerEntity
+class EmailTemplate extends Entity
 {
 
 	/**
@@ -43,7 +54,7 @@ class EmailTemplate extends AclOwnerEntity
 	 * 
 	 * @var int
 	 */
-	protected $moduleId;
+	public $moduleId;
 
 	public $key;
 
@@ -102,11 +113,32 @@ class EmailTemplate extends AclOwnerEntity
 	{
 		return ['name'];
 	}
+
+
+	/**
+	 * Find templates by module key and language
+	 *
+	 * @param string $package
+	 * @param string $name
+	 * @param string|null $preferredLanguage
+	 * @param string|null $key
+	 * @return EmailTemplate|null
+	 */
+	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?EmailTemplate {
+		$moduleModel = ModuleModel::findByName($package, $name);
+
+		$template = isset($preferredLanguage) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
+		if (!$template) {
+			$template = static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key])->single();
+		}
+
+		return $template;
+	}
 	
 	/**
-	 *  
+	 * @param $module array{package:string, module:string} | int
 	 */ 
-  public function setModule($module) {
+  public function setModule( $module) {
 
 		if(is_int($module)) {
 			$this->moduleId = $module;
@@ -126,7 +158,11 @@ class EmailTemplate extends AclOwnerEntity
 		return parent::internalSave();
 	}
 
-	
+	protected function internalGetPermissionLevel(): int
+	{
+		return Module::findById($this->moduleId)->getPermissionLevel();
+	}
+
 	private function parseImages()
 	{
 		$cids = Blob::parseFromHtml($this->body);
@@ -170,9 +206,11 @@ class EmailTemplate extends AclOwnerEntity
 	 * Create message from this template
 	 *
 	 * @param TemplateParser $templateParser
-	 * @return \go\core\mail\Message
+	 * @return Message
+	 * @throws Exception
 	 */
-	public function toMessage(TemplateParser $templateParser) {
+	public function toMessage(TemplateParser $templateParser): Message
+	{
   	$message = go()->getMailer()->compose();
 		$subject = $templateParser->parse($this->subject);
 		$body = $templateParser->parse($this->body);
@@ -201,5 +239,19 @@ class EmailTemplate extends AclOwnerEntity
 		}
 
 		return $message;
+	}
+
+	public function toMessageArray(TemplateParser $templateParser) : array {
+
+		$blobs = [];
+		foreach($this->attachments as $attachment) {
+			$blobs[] = Blob::findById($attachment->blobId);
+		}
+
+		return [
+			"subject" => $templateParser->parse($this->subject),
+			"body" => $templateParser->parse($this->body),
+			"blobs" => $blobs
+			];
 	}
 }

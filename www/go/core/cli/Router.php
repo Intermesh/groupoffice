@@ -175,8 +175,10 @@ class Router {
 			$paramNames[] = $paramName . ($paramMeta['isOptional'] ? ' = ' . var_export($paramMeta['default'], true) : "*" );
 		}
 
+		// unset some params supported in cli.php that we don't want to check for a bad request.
 		unset($requestParams['c']);
 		unset($requestParams['debug']);
+		unset($requestParams['userId']);
 
 		if(!empty($requestParams)) {
 			throw new InvalidArguments("Bad request. The following parameters are not supported: " . implode(",", array_keys($requestParams))."\n\nSupported are: \n- " . implode("\n- ",  $paramNames));

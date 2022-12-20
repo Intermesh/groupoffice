@@ -8,6 +8,7 @@ use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\model;
 use go\core\orm\Query;
+use go\core\util\ArrayObject;
 
 class FieldSet extends EntityController {
 
@@ -40,11 +41,11 @@ class FieldSet extends EntityController {
 						->where(['m.enabled' => true]);
 	}
 
-	protected function getQueryQuery(array $params): Query
+	protected function getQueryQuery(ArrayObject $params): Query
 	{
 		return $this->checkEnabledModule(parent::getQueryQuery($params)->orderBy(['sortOrder' => 'ASC', 'id' => 'ASC']));
 	}
-	protected function getGetQuery(array $params): \go\core\orm\Query
+	protected function getGetQuery(ArrayObject $params): \go\core\orm\Query
 	{
 		return $this->checkEnabledModule(parent::getGetQuery($params)->orderBy(['sortOrder' => 'ASC', 'id' => 'ASC']));
 	}

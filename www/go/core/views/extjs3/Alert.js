@@ -14,12 +14,17 @@
 
 		},
 
-		init : function() {
+		init : async function() {
+
 			this.store = new go.data.Store({
 				entityStore: "Alert",
 				fields: ['id', 'entity', 'entityId', 'data', 'tag', 'triggerAt', 'userId', 'title', 'body'],
 				filters: {
 					user: {userId: go.User.id}
+				},
+				sortInfo: {
+					field: "triggerAt",
+					direction: "DESC"
 				},
 				baseParams: {limit: 50}
 			});
@@ -28,7 +33,21 @@
 				this.onStoreLoad();
 			});
 
-			this.store.load();
+			this.store.on("remove", (store, record) => {
+				const id = 'core-alert-' + record.data.id
+
+				const alert = go.Notifier.getById(id);
+				if(alert) {
+					// replaced is a bad name here. It won't attempt to remove the alert on
+					// the server when set.
+					alert.replaced = true;
+					alert.destroy();
+					go.Notifier.updateStatusIcons();
+				}
+			});
+
+			await go.Db.store("Alert").getUpdates();
+			await this.store.load();
 
 			// re-evaluate alerts every 60s
 			setInterval(() => {
@@ -47,15 +66,6 @@
 		show : function(alert) {
 			const now = new Date(), id = 'core-alert-' + alert.id;
 
-			if(new Date(alert.triggerAt) > now) {
-				go.Notifier.removeById(id);
-				return;
-			}
-
-			if(go.Notifier.getById(id)) {
-				return;
-			}
-
 			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
 
 				const iconCls = go.Entities.getLinkIcon(alert.entity);
@@ -63,13 +73,12 @@
 				const c = {
 					statusIcon: 'reminder',
 					itemId: id,
-					title: alert.title,
-					html: alert.body,
 					iconCls: iconCls,
 					buttonAlign: "right",
 					listeners: {
 						destroy: (panel) => {
-							go.Db.store("Alert").destroy(alert.id);
+							if(!panel.replaced)
+								go.Db.store("Alert").destroy(alert.id);
 						}
 					},
 					handler: () => {
@@ -78,6 +87,7 @@
 					buttons: [{
 						text: t("Open"),
 						handler: (btn) => {
+							go.Notifier.hideNotifications();
 							btn.findParentByType("panel").handler();
 						}
 					}, {
@@ -91,10 +101,6 @@
 				};
 
 
-				if(!c.notificationBody) {
-					c.notificationBody =  go.util.htmlToText(alert.body);
-				//	console.warn(c.notificationBody);
-				}
 
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
 
@@ -104,11 +110,57 @@
 				}
 
 				alertConfig.panelPromise.then((panelCfg) => {
+
+					if(!panelCfg.title) {
+						//default title
+						panelCfg.title = alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity;
+					}
+
+
+					if(!panelCfg.items && !panelCfg.html) {
+
+						//default alert body
+						let body = go.util.Format.dateTime(alert.triggerAt);
+
+						if(alert.data.body) {
+							body = alert.data.body;
+						}
+
+						panelCfg.html = body;
+
+
+						if(alert.data && "progress" in alert.data) {
+
+							if(!panelCfg.items) {
+								panelCfg.items = [
+									{
+										xtype: "box",
+										html:panelCfg.html
+									}
+								];
+
+								delete panelCfg.html;
+							}
+							panelCfg.items.push(new Ext.ProgressBar({
+								text: t("Progress") + " " + alert.data.progress + "%",
+								value: alert.data.progress / 100
+							}))
+						}
+					}
+
+					if(!("notificationBody" in c)) {
+						c.notificationBody =  go.util.Format.dateTime(alert.triggerAt);
+
+						if(alert.data) {
+							c.notificationBody += ": " + JSON.stringify(alert.data, undefined, 1);
+						}
+					}
+
 					go.Notifier.msg(panelCfg);
 				});
 
 			}).catch((reason) => {
-				console.warn("Alert for unknown entity", reason);
+				console.warn("Alert for unknown entity", reason, alert);
 			})
 		}
 	})

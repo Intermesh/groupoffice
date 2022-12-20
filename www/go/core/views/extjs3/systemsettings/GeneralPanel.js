@@ -20,7 +20,9 @@ go.systemsettings.GeneralPanel = Ext.extend(go.systemsettings.Panel, {
 							hint: t("Used as page title and sender name for notifications")
 						},
 						{
-							xtype: "compositefield",
+							xtype: "container",
+							layout: "form",
+							cls: "go-hbox",
 							items: [
 								this.languageCombo = new Ext.form.ComboBox({
 									flex: 1,

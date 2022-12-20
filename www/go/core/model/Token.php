@@ -286,7 +286,7 @@ class Token extends Entity {
 	public function getUser(array $properties = []): User
 	{
 		if(!empty($properties)) {
-			return $this->user ?? User::findById($this->userId, $properties, true);
+			return $this->user ?? User::findById($this->userId, $properties, false);
 		}
 
 		if(!$this->user) {
@@ -305,7 +305,7 @@ class Token extends Entity {
 	public function setAuthenticated(bool $increaseLogins = true): bool
 	{
 		
-		$user = $this->getUser();
+		$user = $this->getUser(['loginCount', 'lastLogin', 'language']);
 
 		if($increaseLogins) {
 			$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
@@ -496,29 +496,14 @@ class Token extends Entity {
 	 */
 	protected static function internalDelete(Query $query): bool
 	{
-
-		// todo remove this part when logout issue is solved
-		$debugEnabled = go()->getDebugger()->enabled;
-		if(!$debugEnabled) {
-			go()->getDebugger()->enable(true);
-		}
-
 		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
-		go()->debug("Deleting token query: " . $deleteQuery);
-		go()->getDebugger()->debugCalledFrom();
-		foreach($deleteQuery as $accessToken) {
 
+		foreach($deleteQuery as $accessToken) {
 			go()->debug("Deleting token: " . $accessToken);
 			go()->getCache()->delete('token-' . $accessToken);
 		}
 
-		$success =  parent::internalDelete($query);
-
-		if(!$debugEnabled) {
-			go()->getDebugger()->enabled = false;
-		}
-
-		return $success;
+		return parent::internalDelete($query);
 	}
 
 	/**

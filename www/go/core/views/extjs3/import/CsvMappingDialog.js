@@ -30,6 +30,15 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		this.items = [this.formPanel];
 		
 		this.buttons = [
+			// {
+			// 	text: t("Save mapping"),
+			// 	handler: function() {
+			// 		const mapping = this.formPanel.form.getFieldValues();
+			//
+			// 		console.warn(mapping);
+			// 	},
+			// 	scope: this
+			// },
 			'->',
 			this.importButton = new Ext.Button({
 				cls: 'raised',
@@ -60,9 +69,14 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 
 				this.fieldSet.add(this.createMappingFields(response.goHeaders, this.fields));
 
-				var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
-				Ext.apply(v, this.findAliases());
-				this.formPanel.form.setValues(v);
+				if(response.mapping) {
+					this.formPanel.form.setValues(response.mapping);
+					this.formPanel.form.setValues({updateBy: response.updateBy});
+				} else {
+					var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
+					Ext.apply(v, this.findAliases());
+					this.formPanel.form.setValues(v);
+				}
 				
 				this.doLayout();
 			},

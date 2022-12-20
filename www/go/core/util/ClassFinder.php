@@ -83,9 +83,6 @@ class ClassFinder {
 	 */
 	public function find(): array
 	{
-		
-		go()->debug("ClassFinder find() used.");
-		
 		$allClasses = [];
 		foreach ($this->namespaces as $namespace => $folder) {
 
@@ -107,8 +104,9 @@ class ClassFinder {
 	/**
 	 * Find class names that are sub classes of the given class or implement this as an interface
 	 *
-	 * @param string $name Parent class name or interface eg. go\core\orm\Record::class
-	 * @return array
+	 * @template T
+	 * @param class-string<T> $name Parent class name or interface eg. go\core\orm\Record::class
+	 * @return class-string<T>[]
 	 * @noinspection PhpDocMissingThrowsInspection
 	 */
 	public function findByParent(string $name): array
@@ -122,9 +120,10 @@ class ClassFinder {
 	
 	/**
 	 * Find classes that use a given trait
-	 * 
-	 * @param string $name Name of the trait eg. go\core\db\Searchable::class
-	 * @return string[] Full class name eg. ["go\core\App"]
+	 *
+	 * @template T
+	 * @param class-string<T> $name Name of the trait eg. go\core\db\Searchable::class
+	 * @return class-string<T>[] Full class name eg. ["go\core\App"]
 	 */
 	public function findByTrait(string $name): array
 	{
@@ -137,10 +136,10 @@ class ClassFinder {
 	 * Find class names by a closure function
 	 *
 	 * If you return true in the closure function it will be included in the results.
-	 * The closure funciton is called with the class name
+	 * The closure function is called with the class name
 	 *
 	 * @param Closure $fn
-	 * @return array
+	 * @return string[]
 	 */
 	public function findBy(Closure $fn): array
 	{

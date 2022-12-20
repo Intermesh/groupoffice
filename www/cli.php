@@ -5,6 +5,7 @@ use go\core\cache\None;
 use go\core\cli\Router;
 use go\core\cli\State;
 use go\core\Environment;
+use go\core\model\User;
 
 require(__DIR__ . "/vendor/autoload.php");
 
@@ -16,18 +17,16 @@ if(isset($args['c'])) {
 	define('GO_CONFIG_FILE', $args['c']);
 }
 
-App::get()->setAuthState(new State());
-//no cache 
-//go()->setCache(new None());
+App::get()->setAuthState(new State($args['userId'] ?? User::ID_SUPER_ADMIN));
 
 if(!Environment::get()->isCli()) {
 	throw new Exception("You can only run this script on the Command Line Interface");
 }
 
 go()->getDebugger()->setRequestId('cli');
+go()->getDebugger()->output = true;
 if(!empty($args['debug'])) {
-    go()->getDebugger()->output = true;
-	go()->getDebugger()->enable(false);
+	go()->getDebugger()->enable(true);
 }
 
 if(array_key_exists('debug', $args)) {

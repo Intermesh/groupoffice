@@ -48,7 +48,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			headingsMenu: false,
 			enableFontSize: false,
 			enableAlignments: false,
-			enableSourceEdit: false,
+			enableSourceEdit: true,
 			// toolbarHidden: true,
 			// emptyText: t('Add comment')+'...',
 			allowBlank: false,

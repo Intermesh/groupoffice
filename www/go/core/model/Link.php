@@ -293,10 +293,17 @@ class Link extends AclItemEntity
 	/**
 	 * Find all links for a given entity
 	 *
+	 * @example Find first linked contract
+	 *
+	 * ```
+	 * $contract = core\model\Link::findLinks($document)->andWhere('toEntityTypeId', '=', Contract::entityType()->getId())-single();
+	 * ```
+	 *
 	 * @param Entity|ActiveRecord $a
 	 * @return Link[]|Query
+	 * @throws Exception
 	 */
-	public static function findLinks($a) {
+	public static function findLinks($a) : Query {
 		return Link::find()->where([
 			'fromEntityTypeId' => $a->entityType()->getId(),
 			'fromId' => $a->id
@@ -382,7 +389,8 @@ class Link extends AclItemEntity
 				return false;
 			}
 
-			return $this->updateEntities();
+			$this->updateEntities();
+			return true;
 		}
 
 		if(!App::get()->getDbConnection()->updateIgnore('core_link',
@@ -393,7 +401,8 @@ class Link extends AclItemEntity
 		}
 
 
-		return $this->updateEntities();
+		$this->updateEntities();
+		return true;
 	}
 
 	/**
@@ -474,7 +483,7 @@ class Link extends AclItemEntity
 	 * @return int
 	 * @throws Exception
 	 */
-	public function getPermissionLevel(): int
+	protected function internalGetPermissionLevel(): int
 	{
 		if($this->isNew() && empty($this->aclId)) {
 			$e = $this->findToEntity();
@@ -561,7 +570,7 @@ class Link extends AclItemEntity
 		return Search::class;
 	}
 
-	protected function getAclEntity()
+	public function findAclEntity()
 	{
 		return $this->findFromEntity();
 	}
@@ -587,7 +596,6 @@ class Link extends AclItemEntity
 				$copy = $link->copy();
 				$copy->fromEntityTypeId = $to::entityType()->getId();
 				$copy->fromId = $to->id;
-
 				if (!$copy->save()) {
 					throw new SaveException($copy);
 				}

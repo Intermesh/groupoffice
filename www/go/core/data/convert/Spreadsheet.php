@@ -9,6 +9,7 @@ use go\core\fs\File;
 use go\core\model\Acl;
 use go\core\model\Field;
 use go\core\model\FieldSet;
+use go\core\model\ImportMapping;
 use go\core\orm\Entity;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
@@ -353,8 +354,12 @@ th {
 				$templateValues = $templateValues->$seg ?? "";
 			}
 		}
-		
-		return is_array($templateValues) ? implode(static::$multipleDelimiter, $templateValues) : $templateValues;
+
+		try {
+			return is_array($templateValues) ? implode(static::$multipleDelimiter, $templateValues) : $templateValues;
+		} catch(\Exception $e) {
+			return "error: ". $e->getMessage();
+		}
 	}
 
 	/**
@@ -457,6 +462,34 @@ th {
 
 			$headers = $this->addSubHeaders($headers, $name, $value, false, $forMapping);
 		}
+
+		$exclude = array_merge($entityCls::atypicalApiProperties(), static::$excludeHeaders);
+		$exclude[] = 'customFields';
+		$exclude[] = 'acl';
+		$exclude[] = 'permissionLevel';
+
+		$props = $entityCls::getApiProperties();
+		foreach($props as $name => $prop) {
+
+			if($prop['getter']) {
+
+				if(in_array($name, $exclude)) {
+					continue;
+				}
+
+				if($forMapping) {
+					$headers[$name] = ['name' => $name, 'label' => $name, 'many' => false];
+				} else{
+					//client specified which columns to export
+					if(!empty($this->clientParams['columns']) && !in_array($name, $this->clientParams['columns'])) {
+						continue;
+					}
+
+					$headers[] = ['name' => $name, 'label' => $name, 'many' => false];
+				}
+			}
+		}
+
 		if(method_exists($entityCls, 'getCustomFields')) {
 			$fields = Field::findByEntity($entityCls::entityType()->getId());
 			/** @var Field[] $fields */
@@ -605,6 +638,20 @@ th {
 		if(isset($this->clientParams['updateBy'])) {
 			$this->updateBy = $this->clientParams['updateBy'];
 		}
+
+
+	}
+
+	private function saveMapping(array $headers) {
+		$checkSum = md5(implode(",", array_map("trim", $headers)));
+		$entityClass = $this->entityClass;
+
+
+		$mapping = ImportMapping::findOrCreate($entityClass::entityType()->getId() . "-" . $checkSum);
+		$mapping->setMap($this->clientParams['mapping']);
+		$mapping->updateBy =$this->updateBy;
+		$mapping->save();
+
 	}
 
 	protected $record;
@@ -614,6 +661,7 @@ th {
 		if($this->index == 0) {
 			//skip headers
 			$headers = $this->readRecord();
+			$this->saveMapping($headers);
 		}
 		$this->record = $this->readRecord();
 
@@ -697,8 +745,6 @@ th {
 
 		$entityClass = $this->entityClass;
 
-
-
 		$entity = false;
 		//lookup entity by id if given
 		if($this->updateBy == 'id' && !empty($values['id'])) {
@@ -706,6 +752,8 @@ th {
 			if($entity && $entity->getPermissionLevel() < Acl::LEVEL_WRITE) {
 				$entity = false;
 			}
+		} elseif(!empty($this->updateBy) && !empty($values[$this->updateBy])) {
+			$entity = $entityClass::find()->where($this->updateBy,'=', $values[$this->updateBy])->single();
 		}
 		if(!$entity) {
 			$entity = new $entityClass;
@@ -715,8 +763,10 @@ th {
 	
 	protected function importCustomColumns(Entity $entity, $values){
 		foreach($this->customColumns as $c) {
-			call_user_func_array( $c['importFunction'], [$entity, $values[$c['name']] ?? null, &$values, $c['name']]);
-			unset($values[$c['name']]);
+			if(isset($values[$c['name']])) {
+				call_user_func_array($c['importFunction'], [$entity, $values[$c['name']], &$values, $c['name']]);
+				unset($values[$c['name']]);
+			}
 		}
 		return $values;
 	}

@@ -288,7 +288,6 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					sinceState: this.state
 				}
 			}).then((changes) => {
-
 				// when polling with sseEnabled = false we might be getting an empty result.
 				if(go.util.empty(changes.removed) && go.util.empty(changes.changed)) {
 					return this.setState(changes.newState);
@@ -422,6 +421,9 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	single: function(id) {
 
+		if(!id) {
+			return Promise.resolve(null);
+		}
 
 		return this._getSingleFromBrowserStorage(id).then((entity) => {
 			if(entity) {
@@ -528,7 +530,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					{
 						if(!this.data[id]) {
 							//return Promise.reject("Data not available ???");
-							this.scheduledPromises[id].reject("Data not available ???");
+							this.scheduledPromises[id].reject("Data not available for id=" +id + " in store " + this.entity.name);
 						}
 						this.scheduledPromises[id].resolve(go.util.clone(this.data[id]));
 					}

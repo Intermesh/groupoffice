@@ -130,6 +130,16 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 				scope:this
 			});
 		}
+
+		this.keys.push({
+			key: Ext.EventObject.A,
+			ctrl: true,
+			stopEvent: true,
+			fn: (e) => {
+				this.getSelectionModel().selectAll();
+			},
+			scope:this
+		});
     
 		if(this.paging) {
 			if(typeof(this.paging)=='boolean')

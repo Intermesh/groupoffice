@@ -1,10 +1,9 @@
-
 go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(go.Window, {
 	title: t("Choose a tasklist"),
     entityStore: "Task",
     layout: 'form',
-	width: dp(800),
-	height: dp(800),
+  width: dp(800),
+  height: dp(800),
     modal: true,
 
 	initComponent: function () {
@@ -37,8 +36,8 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(go.Window, {
             handler: function() {
                 if(!this.chooseTasklistGrid.selectedId && !this.taskListFromCsvCB.checked) {
                     Ext.Msg.show({
-                        title:t("Tasklist not selected"),
-                        msg: t("You have not selected any tasklist. Select a tasklist before proceeding."),
+                        title:t("Task list not selected"),
+                        msg: t("You have not selected any task list. Select a task list before proceeding."),
                         buttons: Ext.Msg.OK,
                         animEl: 'elId',
                         icon: Ext.MessageBox.WARNING

@@ -16,6 +16,10 @@ Ext.override(Ext.data.Connection, {
 	timeout: 180000
 });
 
+Ext.override(Ext.form.TimeField, {
+	width: dp(160)
+});
+
 /**
  * Density Independend pixel calculation
  * 
@@ -54,8 +58,14 @@ function dp(size) {
 
 	var componentInitComponent = Ext.Component.prototype.initComponent;
 
-	Ext.override(Ext.Component, {  
-			
+	Ext.override(Ext.Component, {
+
+		/**
+		 * For GOUI
+		 */
+		fire: function() {
+			Ext.Component.prototype.fireEvent.apply(this, arguments);
+		},
 
 		initComponent : function() {
 			componentInitComponent.call(this);			
@@ -128,7 +138,11 @@ Ext.override(Ext.form.TextArea,{
 
 		if (this.grow) {
 			// debugger;
-				this.autoSize();
+			setTimeout(() => {
+				if(!this.isDestroyed) {
+					this.autoSize();
+				}
+			})
 		}
 	},
 
@@ -355,28 +369,8 @@ Ext.override(Ext.form.TriggerField,{
 		}
 	},
 
-	onResize: function(w, h){
-		Ext.form.TriggerField.superclass.onResize.call(this, w, h);
-		var tw = this.getTriggerWidth();
-		if(Ext.isNumber(w)){
-			this.el.setWidth(w - tw);
-		}
-		this.wrap.setWidth(w + tw);
-	},
 	
-	 onRender : function(ct, position){
-        this.doc = Ext.isIE ? Ext.getBody() : Ext.getDoc();
-        Ext.form.TriggerField.superclass.onRender.call(this, ct, position);
 
-        this.wrap = this.el.wrap({cls: 'x-form-field-wrap x-form-field-trigger-wrap'});
-        this.trigger = this.wrap.createChild(this.triggerConfig ||
-                {tag: "button", type: "button", tabindex: "-1", cls: "x-form-trigger " + this.triggerClass});
-        this.initTrigger();
-        if(!this.width){
-            this.wrap.setWidth(this.el.getWidth()+this.getTriggerWidth());
-        }
-        this.resizeEl = this.positionEl = this.wrap;
-    },
 	 getTriggerWidth: function(){
 		 return 0;
 	 }
@@ -482,7 +476,7 @@ Ext.override(Ext.FormPanel,{
 		var focFn = function() {
 			if(!GO.util.isMobileOrTablet()) {
 				var firstField = this.getForm().items.find(function (item) {
-					if (!item.disabled && item.isVisible())
+					if (!item.disabled && item.isVisible() && go.util.empty(item.getValue()))
 						return true;
 				});
 
@@ -801,19 +795,9 @@ Ext.override(Ext.Element, {
 		Ext.apply(this, config);
         
 		var el = Ext.get(this.id).dom;
-		// var c = document.getElementById('printcontainer');
-		// var iFrame = document.getElementById('printframe');
-        
-		var strTemplate = '<HTML><HEAD>{0}<TITLE>{1}</TITLE></HEAD><BODY onload="{2}" style="background-color:white;"><div style="position:fixed; top:0; left:0; right:0; bottom:0; z-index:99;"></div>{3}</BODY></HTML>';
 		var strAttr = '';
 		var strFormat;
-		var strHTML;
-        
-		//Get rid of the old crap so we don't copy it
-		//to our iframe
-		// if (iFrame != null) c.removeChild(iFrame);
-		// if (c != null) el.removeChild(c);
-        
+
 		//Copy attributes from this element.
 		for (var i = 0; i < el.attributes.length; i++) {
 			if (Ext.isEmpty(el.attributes[i].value) || el.attributes[i].value.toLowerCase() != 'null') {
@@ -829,38 +813,17 @@ Ext.override(Ext.Element, {
 		}
 
 		this.printCSS+='<style>body{overflow:visible !important;}</style>';
-		var html = el.innerHTML;
+		var html = "<div " + strAttr+">" + el.innerHTML + "</div>";
 		if(config.title) {
-
-
+			// set document title for saving to PDF
 			const oldTitle = document.title;
-
 			document.title = config.title;
-
 			window.addEventListener("afterprint" , function(){
-
 				document.title = oldTitle;
 			}, {once: true});
-
-			html = '<h1 style="margin-left:5px;font-size:16px;margin:10px 5px;">' + config.title + '</h1>' + html;
 		}
-        
-		//Build our HTML document for the iframe
-		// strHTML = String.format(
-		// 	strTemplate
-		// 	, Ext.isEmpty(this.printCSS)? '#': this.printCSS
-		// 	, this.printTitle
-		// 	, Ext.isIE? 'document.execCommand(\'print\');': 'window.print();'
-		// 	, html
-		// 	);
 
-      go.print(html);
-
-		// var popup = window.open('about:blank');
-		// if (!popup.opener) popup.opener = self
-		// popup.document.write(strHTML);
-		// popup.document.close();
-		// popup.focus();
+		go.print(html);
 	}
 });
 
@@ -1213,6 +1176,7 @@ Ext.override(Ext.form.Field, {
 			var fieldHelp = new Ext.ux.FieldHelp(this.hint);
 			this.plugins = this.plugins || [];
 			this.plugins.push(fieldHelp);
+			delete this.hint;
 		}
 		
 		

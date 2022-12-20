@@ -16,7 +16,7 @@ go.panels.ScrollLoader = {
 	
 	initScrollLoader :function() {
 		//setup auto load more for go.data.Store's only
-		if((this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) && this.store.entityStore) {
+		if((this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore)) {
 			
 			this.on('afterrender', this.onRenderScrollLoader, this);
 
@@ -96,8 +96,7 @@ go.panels.ScrollLoader = {
 		const store = this.store;
 		if (this.allRecordsLoaded || this.store.loading){
 			return;
-		}	
-
+		}
 
 		if(this.scrollUp) {
 			

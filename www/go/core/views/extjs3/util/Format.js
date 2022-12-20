@@ -192,8 +192,8 @@
 			return parseInt(parts[0])*60+parseInt(parts[1]);
 		},
 
-		valuta : function(amount) {
-			return go.User.currency + go.util.Format.number(amount, 2);
+		valuta : function(amount, decimals = 2) {
+			return go.User.currency + "&nbsp;" + go.util.Format.number(amount, decimals);
 		},
 
 
@@ -209,6 +209,8 @@
 				// make sure value is numeric
 				value *= 1;
 			}
+
+			value = parseFloat(value);
 			
 			var dec = go.User.decimalSeparator,
 				tho = go.User.thousandsSeparator;
@@ -293,6 +295,14 @@
 
 		shortDateTimeHTML: function(v) {
 			return '<span style="cursor:pointer" title="' + go.util.Format.dateTime(v) + '">' + go.util.Format.userDateTime(v) + '</span>';
+		},
+
+		shortTime: function(v) {
+			let arV = v.split(":");
+			if(arV.length !== 3) {
+				return '';
+			}
+			return arV[0] + ":" + arV[1];
 		},
 
 		shortDateTime: function (v, showTime, longNotation, noTimeForToday) {

@@ -214,10 +214,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					handler: function() {
 						const ids = this.grid.getSelectionModel().getSelections().column('id');
 						if(ids.length < 2) {
-							Ext.MessageBox.alert(t("Error"), t("Please select at least two contacts"));
+							Ext.MessageBox.alert(t("Error"), t("Please select at least two items"));
 						} else
 						{
-							Ext.MessageBox.confirm(t("Merge"), t("The selected contacts will be merged into one contact. Are you sure?"), async function(btn) {
+							Ext.MessageBox.confirm(t("Merge"), t("The selected items will be merged into one. The item you selected first will be used primarily. Are you sure?"), async function(btn) {
 
 								if(btn != "yes") {
 									return;
@@ -357,7 +357,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 															field: "addresses[].street",
 															fixed: {type: "home"},
 															related: {
-																street2: "Home Street 2",
 																city: "Home City",
 																state: "Home State",
 																zipCode: "Home Postal Code",
@@ -368,7 +367,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 															field: "addresses[].street",
 															fixed: {type: "work"},
 								  							related: {
-																street2: "Business Street 2",
 																city: "Business City",
 																state: "Business State",
 																zipCode: "Business Postal Code",
@@ -380,7 +378,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 															field: "addresses[].street",
 															fixed: {type: "other"},
 															related: {
-																street2: "Other Street 2",
 																city: "Other City",
 																state: "Other State",
 																zipCode: "Other Postal Code",
@@ -521,7 +518,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 									handler: function() {
 										go.util.exportToFile(
 											'Contact',
-											Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+											Ext.apply(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, start: 0}),
 											'json');
 									},
 									scope: this

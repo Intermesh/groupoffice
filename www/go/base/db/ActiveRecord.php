@@ -58,6 +58,7 @@ use go\core\util\StringUtil;
 use go\modules\community\comments\model\Comment;
 
 abstract class ActiveRecord extends \GO\Base\Model{
+	const EVENT_URL = "url";
 
 	/**
 	 * The mode for this model on how to output the attribute data.
@@ -296,7 +297,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * This is defined as a function because it's a only property that can be set
 	 * by child classes.
 	 *
-	 * @return StringHelper The database table name
+	 * @return string The database table name
 	 */
 	public function tableName(){
 		return false;
@@ -3336,7 +3337,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function isSaving() {
 		return $this->isSaving;
 	}
-	
+
 	protected function nextSortOrder() {
 		return $this->count();
 	}
@@ -3855,7 +3856,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		return $keywords;
 	}
-	
+
 	
 	/**
 	 * Cut all attributes to their maximum lengths. Useful when importing stuff.
@@ -4799,10 +4800,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Copy links from this model to the target model.
 	 *
-	 * @param ActiveRecord $targetModel
+	 * @param ActiveRecord|Entity $targetModel
 	 */
-	public function copyLinks(ActiveRecord $targetModel){
-		if(!$this->hasLinks() || !$targetModel->hasLinks())
+	public function copyLinks($targetModel){
+		if(!$this->hasLinks() || ($targetModel instanceof ActiveRecord && !$targetModel->hasLinks()))
 			return false;
 
 		$links = Link::findLinks($this);
@@ -4861,8 +4862,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if($this->aclField() && (!$this->isJoinedAclField || $this instanceof \GO\Files\Model\Folder)) {
 			if (!($this instanceof \GO\Files\Model\Folder) || (!$this->readonly && $this->acl_id > 0)) {
 				$acl = $this->acl;
+
 				if (!$acl) {
+
 					$this->setNewAcl();
+
+
+					echo "Setting new ACL " . $this->{$this->aclField()} ."\n";
 
 					if ($save) {
 						$this->save();
@@ -4908,19 +4914,21 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		//fill in empty required attributes that have defaults
-		$defaults = $this->getDefaultAttributes();
-		foreach ($this->columns as $field => $attr) {
-			if ($attr['required'] && empty($this->$field) && isset($defaults[$field])) {
-				$this->$field = $defaults[$field];
+//		$defaults = $this->getDefaultAttributes();
+//		foreach ($this->columns as $field => $attr) {
+//			if ($attr['required'] && empty($this->$field) && isset($defaults[$field])) {
+//				$this->$field = $defaults[$field];
+//
+//				echo "Setting default value " . $this->className() . ":" . $this->id . " $field=" . $defaults[$field] . "\n";
+//
+//			}
+//		}
 
-				echo "Setting default value " . $this->className() . ":" . $this->id . " $field=" . $defaults[$field] . "\n";
 
-			}
-		}
-
-
-		if($this->isModified())
+		if($this->isModified()) {
 			$this->save();
+			echo "Saved\n";
+		}
 	}
 
 
@@ -4935,7 +4943,17 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			echo "Processing ".static::class ."\n";
 			
 			$entityTypeId = static::entityType()->getId();
-		
+
+			echo "Deleting old values\n";
+
+			$stmt = go()->getDbConnection()->delete('core_search', (new \go\core\orm\Query)
+				->where('entityTypeId', '=',$entityTypeId)
+				->andWhere('entityId', 'NOT IN', go()->getDbConnection()->select('id')->from($this->tableName()))
+			);
+			$stmt->execute();
+
+			echo "Deleted ". $stmt->rowCount() . " entries\n";
+
 			$start = 0;
 			$limit = 1000;
 			
@@ -5637,29 +5655,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	}
 
-	public function alertProps(Alert $alert) {
-
-		$body = null;
-		$title = null;
-
-		if ($alert->tag == "comment") {
-			// hack for comments
-			$data = $alert->getData();
-			$creator = UserDisplay::findById($data->createdBy, ['displayName']);
-			$body = str_replace("{creator}", $creator->displayName, go()->t("A comment was made by {creator}", "community", "comments")) . ":<br /><br />\n\n<i>" . $alert->getData()->excerpt . "</i>";
-		}
-		if(!isset($body)) {
-			$user = User::findById($alert->userId, ['id', 'timezone', 'dateFormat', 'timeFormat']);
-			$body = $alert->triggerAt->toUserFormat(true, $user);
-		}
-
-		if(!isset($title)) {
-			$title = $alert->findEntity()->title() ?? null;
-		}
-
-		return ['title' => $title, 'body' => $body];
-	}
-
 
 	/**
 	 * For compatibility with template field to lookup a project for example
@@ -5681,5 +5676,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			->addCondition('fromId', $entity->id, '=', 'l');
 
 		return self::model()->find($findParams);
+	}
+
+	public function url() {
+
+		$url = static::fireEvent(self::EVENT_URL, $this);
+
+		if(!empty($url)) {
+			return $url;
+		}
+
+		return go()->getSettings()->URL . '#' . strtolower(static::entityType()->getName()) . "/" . $this->id();
 	}
 }

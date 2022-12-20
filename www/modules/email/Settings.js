@@ -21,13 +21,10 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 						this.templateCombo = new GO.email.TemplateCombo({
 							anchor: '90%',
 							hiddenName: "emailSettings.defaultTemplateId",
-							fieldLabel: t("Default template")
+							fieldLabel: t("Default template"),
+							anchor: "-20"
 						}),
-						this.useHtml = new Ext.form.Checkbox({
-							boxLabel:t("Use desktop email client to compose", "email"),
-							hideLabel:true,
-							name:'emailSettings.use_desktop_composer'
-						}),
+
 						this.useHtml = new Ext.form.Checkbox({
 							boxLabel:t("Use HTML markup", "email"),
 							hideLabel:true,
@@ -53,6 +50,11 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 					xtype: "container",
 					columnWidth: .5,
 					items: [
+						new Ext.form.Checkbox({
+							boxLabel:t("Use desktop email client to compose", "email"),
+							hideLabel:true,
+							name:'emailSettings.use_desktop_composer'
+						}),
 						this.skipUnknownRecipients = new Ext.form.Checkbox({
 							boxLabel:t("Don't show unknown recipients dialog", "email"),
 							hideLabel:true,

@@ -121,7 +121,7 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 			return new stdClass;
 		} 
 
-		return $this;
+		return $this->getArray();
 	}
 
 	/**

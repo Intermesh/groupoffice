@@ -30,7 +30,7 @@ class PushDispatcher
 	/**
 	 * Interval in seconds between every check for changes to push
 	 */
-	const CHECK_INTERVAL = 30;
+	const CHECK_INTERVAL = 10;
 
 	private $map = [];
 	private $entityTypes = [];

@@ -13,6 +13,8 @@ go.grid.GridTrait = {
 	 */
 	scrollLoader: true,
 
+	loadMorePageSize: 20,
+
 	showMoreLoader: false,
 
 	multiSelectToolbarEnabled: true,
@@ -33,7 +35,7 @@ go.grid.GridTrait = {
 		}
 
 		if(this.enableDelete) {
-			this.initDeleteKey();
+			this.initKeys();
 		}
 		if(this.getSelectionModel().getSelected) {
 			this.initNav();
@@ -124,7 +126,7 @@ go.grid.GridTrait = {
 			this.loadMoreButton.setVisible(s.hasMore);
 		});
 	},
-	loadMorePageSize: 20,
+
 
 
 	initMultiSelectToolbar : function() {
@@ -310,13 +312,14 @@ go.grid.GridTrait = {
 				if(record) {
 					this.fireEvent('navigate', this, this.store.indexOf(record), record);				
 				}
-			}			
+			}
+
 		}, this, {
 			buffer: 300
 		});
 	},
 	
-	initDeleteKey : function() {
+	initKeys : function() {
 
 		function onDeleteKey(key, e){
 			//sometimes there's a search input in the grid, so dont delete when focus is on an input
@@ -334,6 +337,16 @@ go.grid.GridTrait = {
 			key: Ext.EventObject.BACKSPACE,
 			ctrl: true,
 			fn: onDeleteKey,
+			scope:this
+		});
+
+		this.keys.push({
+			key: Ext.EventObject.A,
+			ctrl: true,
+			stopEvent: true,
+			fn: (e) => {
+				this.getSelectionModel().selectAll();
+			},
 			scope:this
 		});
 	},

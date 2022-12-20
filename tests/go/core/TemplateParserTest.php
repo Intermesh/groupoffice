@@ -5,6 +5,7 @@ use go\core\model\Link;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\EmailAddress;
 
 class TemplateParserTest extends \PHPUnit\Framework\TestCase
 {
@@ -32,11 +33,20 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 		$contact1->addresses[0] = $a = new Address($contact1);
 
 		$a->type = Address::TYPE_POSTAL;
-		$a->street =	"Street";
-		$a->street2 = "1";
+		$a->address =	"Street 1";
 		$a->city = "Den Bosch";
 		$a->zipCode = "5222 AE";
 		$a->countryCode = "NL";
+
+
+		$contact1->emailAddresses[] = (new EmailAddress($contact1))
+			->setValues(["type" => EmailAddress::TYPE_WORK, 'email' => 'work@intermesh.localhost']);
+
+		$contact1->emailAddresses[] = (new EmailAddress($contact1))
+			->setValues(["type" => EmailAddress::TYPE_HOME, 'email' => 'home@intermesh.localhost']);
+
+		$contact1->emailAddresses[] = (new EmailAddress($contact1))
+			->setValues(["type" => EmailAddress::TYPE_HOME, 'email' => 'aaa@intermesh.localhost']);
 
 		$success = $contact1->save();
 		$this->assertEquals(true, $success);
@@ -72,5 +82,34 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 
 		$this->assertEquals($a->zipCode.$a->zipCode, $str);
 
+
+		$tpl = '{{contact.addresses |  filter:type:"postal" | first | prop:"zipCode"}}';
+		$zipCode = $tplParser->parse($tpl);
+		$this->assertEquals($a->zipCode, $zipCode);
+
+		$tpl = '{{contact.addresses |  filter:type:"notexisting" | first | prop:"zipCode"}}';
+		$notexistingType = $tplParser->parse($tpl);
+		$this->assertEquals(null, $notexistingType);
+
+		$tpl = '{{contact.addresses |  filter:type:"postal" | first | prop:"notexisting"}}';
+		$notexistingProp = $tplParser->parse($tpl);
+		$this->assertEquals(null, $notexistingProp);
+
+
+		$tpl =  '{{contact.id | Entity:Contact | prop:emailAddresses | first | prop:email}}';
+		$firstEmail = $tplParser->parse($tpl);
+		$this->assertEquals($contact1->emailAddresses[0]->email, $firstEmail);
+
+
+		$tpl =  '{{contact.id | Entity:Contact | prop:emailAddresses | sort:email | first | prop:email}}';
+		$firstSortedEmail = $tplParser->parse($tpl);
+		$this->assertEquals($contact1->emailAddresses[2]->email, $firstSortedEmail);
+
+		$tpl =  '{{contact.id | Entity:Contact | prop:emailAddresses | rsort:type:home | first | prop:type}}';
+		$home = $tplParser->parse($tpl);
+		$this->assertEquals(EmailAddress::TYPE_HOME, $home);
 	}
+
+
+
 }

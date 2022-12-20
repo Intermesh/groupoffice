@@ -39,3 +39,6 @@ $updates['202205161600'][] = "alter table history_log_entry
 $updates['202205161600'][] = "update core_setting set name='deleteAfterDays', value = value * 365 where name='deleteAfterYears';";
 
 
+$updates['202205161600'][] = "alter table history_log_entry
+    modify entityId varchar(100) collate ascii_bin null;";
+

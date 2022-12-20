@@ -66,8 +66,10 @@ GO.form.SelectCountry = function(config){
 }
  
 Ext.extend(GO.form.SelectCountry, Ext.form.ComboBox, {
+	fieldLabel: t("Country"),
 	selectOnFocus:true,
 	forceSelection: true,
+	value: null,
 	getValue: function() {
 		var v = GO.form.SelectCountry.superclass.getValue.call(this);
 		

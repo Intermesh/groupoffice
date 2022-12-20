@@ -82,7 +82,6 @@ Ext.define('go.modules.community.history.MainPanel', {
 		}, this, {buffer: 1});
 
 		this.selectUser = new go.users.UserComboReset({
-			hideLabel: true,
 			emptyText: t('All users'),
 			allowBlank: true,
 			listeners: {
@@ -115,7 +114,8 @@ Ext.define('go.modules.community.history.MainPanel', {
 					layout: 'form',
 					items: [
 						this.dateRangeField = new go.form.DateRangeField({
-							hideLabel: true,
+							fieldLabel: t("Date"),
+
 							xtype: 'godaterangefield',
 							anchor: '100%',
 							listeners: {

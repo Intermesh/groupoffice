@@ -19,10 +19,12 @@
 			anchor: "100%",
 			items: [{
 				anchor: "100%",
-				xtype: "compositefield",
-				hideLabel: true,
+				layout: "form",
+				xtype: "container",
+				cls: "go-hbox",
 				items: [
 					{
+						fieldLabel: t("Type"),
 						xtype: 'combo',
 						name: 'type',
 						mode: 'local',
@@ -38,6 +40,7 @@
 						value: "work"
 					},
 					{
+						fieldLabel: t("E-mail"),
 						flex: 1,
 						xtype: "textfield",
 						allowBlank: false,

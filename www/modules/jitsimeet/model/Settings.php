@@ -16,23 +16,23 @@ class Settings extends core\Settings
 	 * @var boolean
 	 */
 	public $jitsiJwtEnabled = false;
-	
+
 	/**
 	 * @var string
 	 */
 	public $jitsiJwtSecret = ''; //TODO: jitsiJwtSecret is leaked on the client side! I dont know how to prevent that...
-	
+
 	/**
 	 * @var string
 	 */
 	public $jitsiJwtAppId = '';
-	
-	protected function getModulePackageName(): ?string
+
+	public static function getModulePackageName(): ?string
 	{
 		return null; // backwards compat
 	}
 
-	protected function getModuleName(): string
+	public static function getModuleName(): string
 	{
 		return 'jitsimeet'; // backwards compat
 	}

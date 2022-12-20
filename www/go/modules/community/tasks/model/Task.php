@@ -10,20 +10,20 @@ namespace go\modules\community\tasks\model;
 
 use DateTimeInterface;
 use Exception;
-use go\core\acl\model\AclItemEntity;
+use go\core\acl\model\AclInheritEntity;
+use go\core\db\Criteria;
 use go\core\db\Expression;
 use go\core\model\Alert as CoreAlert;
+use go\core\model\User;
 use go\core\model\Module;
 use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
-use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
-use go\core\orm\SearchableTrait;
-use go\core\db\Criteria;
 use go\core\orm\Query;
-use go\core\util\{ArrayObject, DateTime, StringUtil, Time, UUID};
+use go\core\orm\SearchableTrait;
+use go\core\util\{ArrayObject, DateTime, Recurrence, StringUtil, Time, UUID};
 use go\core\validate\ErrorCode;
 use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\Spreadsheet;
@@ -35,7 +35,7 @@ use PDO;
 /**
  * Task model
  */
-class Task extends AclItemEntity {
+class Task extends AclInheritEntity {
 
 	const PRIORITY_LOW = 9;
 	const PRIORITY_HIGH = 1;
@@ -197,14 +197,14 @@ class Task extends AclItemEntity {
 	protected $timeBooked;
 
 	/**
-	 * @var TasklistGroup[]
+	 * @var TaskListGroup[]
 	 */
 	public $group = [];
 
 
 	protected static function aclEntityClass(): string
 	{
-		return Tasklist::class;
+		return TaskList::class;
 	}
 
 	protected static function aclEntityKeys(): array
@@ -212,13 +212,18 @@ class Task extends AclItemEntity {
 		return ['tasklistId' => 'id'];
 	}
 
-	protected static function defineMapping(): Mapping
+	protected static function internalRequiredProperties() : array
 	{
-		$mapping = parent::defineMapping()
+		//Needed for support module permissions
+		return array_merge(parent::internalRequiredProperties(), ['createdBy']);
+	}
+
+	protected static function defineMapping() :Mapping {
+		return parent::defineMapping()
 			->addTable("tasks_task", "task")
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
-			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
+			->addMap('group', TaskListGroup::class, ['groupId' => 'id'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 
 		return $mapping;
@@ -245,7 +250,7 @@ class Task extends AclItemEntity {
 
 	public function getProgress(): string
 	{
-		return Progress::$db[$this->progress];
+		return isset(Progress::$db[$this->progress]) ? Progress::$db[$this->progress] : Progress::$db[1];
 	}
 
 	public function getTimeBooked(): ?int
@@ -274,19 +279,26 @@ class Task extends AclItemEntity {
 	{
 		$keywords = [$this->title, $this->description];
 		if($this->responsibleUserId) {
-			$rUser = User::findById($this->responsibleUserId);
+			$rUser = UserDisplay::findById($this->responsibleUserId);
 			$keywords[] = $rUser->displayName;
 		}
 		if($this->tasklistId) {
 			$tasklist = TaskList::findById($this->tasklistId);
 			$keywords[] = $tasklist->name;
 		}
+
+		if($this->createdBy) {
+			$creator = UserDisplay::findById($this->createdBy);
+			if($creator) {
+				$keywords[] = $creator->displayName;
+			}
+		}
 		return $keywords;
 	}
 
 	protected function getSearchDescription(): string
 	{
-		$tasklist = Tasklist::findById($this->tasklistId);
+		$tasklist = TaskList::findById($this->tasklistId);
 		$desc = $tasklist->name;
 		if(!empty($this->responsibleUserId) && ($user = User::findById($this->responsibleUserId, ['displayName']))) {
 			$desc .= ' - '.$user->displayName;
@@ -325,7 +337,10 @@ class Task extends AclItemEntity {
 				if(!$query->isJoined("tasks_tasklist", "tasklist") ){
 					$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
 				}
-				$criteria->where(['tasklist.role' => $value]);
+
+				$roleID = array_search($value, TaskList::Roles, true);
+
+				$criteria->where(['tasklist.role' => $roleID]);
 			})
 			->add('categories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
@@ -345,9 +360,9 @@ class Task extends AclItemEntity {
 			})->add('scheduled', function(Criteria $criteria, $value) {
 				$criteria->where('start', $value ? 'IS NOT' : 'IS',null);
 			})->add('responsibleUserId', function(Criteria $criteria, $value){
-				if(!empty($value)) {
+				//if(!empty($value)) {
 					$criteria->where('responsibleUserId', '=',$value);
-				}
+				//}//
 			})
 			->add('progress', function(Criteria $criteria, $value){
 				if(!empty($value)) {
@@ -390,6 +405,11 @@ class Task extends AclItemEntity {
 		if ($this->isModified('percentComplete')) {
 			if ($this->percentComplete == 100) {
 				$this->progress = Progress::Completed;
+
+				// Remove alert for creator of this comment. Other users will get a replaced alert below.
+				CoreAlert::deleteByEntity($this);
+
+
 			} else if ($this->percentComplete > 0 && $this->progress == Progress::NeedsAction) {
 				$this->progress = Progress::InProcess;
 			}
@@ -683,7 +703,7 @@ class Task extends AclItemEntity {
 		$tasks = self::find(['id','start', 'estimatedDuration','startTime'])
 			->join('tasks_tasklist','tl','task.tasklistId = tl.id')
 			->andWhere($c)
-			->andWhere('tl.role = '. Tasklist::Project)
+			->andWhere('tl.role = '. TaskList::Project)
 			->all();
 
 		// All day tasks are to be considered conflicting by definition
@@ -714,20 +734,6 @@ class Task extends AclItemEntity {
 		return false;
 	}
 
-	public function alertProps(CoreAlert $alert): array
-	{
-		if($alert->tag != 'assigned') {
-			return parent::alertProps($alert);
-		}
-		$data = $alert->getData();
-		$assigner = UserDisplay::findById($data->assignedBy, ['displayName']);
-
-		$body = str_replace('{assigner}', $assigner->displayName, go()->t("You were assigned to this task by {assigner}"));
-		$title = $alert->findEntity()->title() ?? null;
-
-		return ['title' => $title, 'body' => $body];
-	}
-
 
 	/**
 	 * @throws SaveException
@@ -735,18 +741,19 @@ class Task extends AclItemEntity {
 	 */
 	public function onCommentAdded(Comment $comment) {
 
-		if($comment->createdBy != $this->responsibleUserId && $this->progress != Progress::NeedsAction) {
-			$this->progress = Progress::NeedsAction;
-			$this->save();
-		} else if($this->progress = Progress::NeedsAction && $comment->createdBy == $this->responsibleUserId) {
-			$this->progress = Progress::InProcess;
-			$this->save();
-		}
-
 		if(!CoreAlert::$enabled ) {
 			return;
 		}
 
+		if($comment->createdBy == $this->responsibleUserId) {
+			$this->progress = Progress::InProcess;
+		} else {
+			$this->progress = Progress::NeedsAction;
+		}
+
+		// make sure modified at is updated
+		$this->modifiedAt = new DateTime();
+		$this->save();
 
 		$excerpt = StringUtil::cutString(strip_tags($comment->text), 50);
 
@@ -755,7 +762,11 @@ class Task extends AclItemEntity {
 			$commenters[] = $this->responsibleUserId;
 		}
 
+		//remove creator of this comment
 		$commenters = array_filter($commenters, function($c) use($comment) {return $c != $comment->createdBy;});
+
+		// Remove alert for creator of this comment. Other users will get a replaced alert below.
+		CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);
 
 		foreach($commenters as $userId) {
 			$alert = $this->createAlert(new DateTime(), 'comment', $userId)

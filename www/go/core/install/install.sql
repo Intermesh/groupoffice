@@ -58,7 +58,7 @@ CREATE TABLE `core_blob` (
 
 CREATE TABLE `core_change` (
   `id` int(11) NOT NULL,
-  `entityId` int(11) NOT NULL,
+  `entityId` varchar(100) collate ascii_bin not null,
   `entityTypeId` int(11) NOT NULL,
   `modSeq` int(11) NOT NULL,
   `aclId` int(11) DEFAULT NULL,
@@ -837,16 +837,26 @@ ALTER TABLE `core_smtp_account`
   ADD CONSTRAINT `core_smtp_account_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
 
 
-CREATE TABLE `core_email_template` (
-  `id` int(11) NOT NULL,
-  `moduleId` int(11) NOT NULL,
-  `aclId` int(11) NOT NULL,
-  `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL,
-  `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en',
-  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `subject` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `body` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+create table core_email_template
+(
+    id       int auto_increment
+        primary key,
+    moduleId int                                        not null,
+    `key`    varchar(20) collate ascii_bin              null,
+    language varchar(20) collate ascii_bin default 'en' not null,
+    name     varchar(190)                               not null,
+    subject  varchar(190)                               null,
+    body     mediumtext                                 not null,
+    constraint core_email_template_ibfk_2
+        foreign key (moduleId) references core_module (id)
+            on delete cascade
+);
+
+create index core_email_template_moduleId_key_index
+    on core_email_template (moduleId, `key`);
+
+create index moduleId
+    on core_email_template (moduleId);
 
 CREATE TABLE `core_email_template_attachment` (
   `id` int(11) NOT NULL,
@@ -857,34 +867,17 @@ CREATE TABLE `core_email_template_attachment` (
   `attachment` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
-
-ALTER TABLE `core_email_template`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `aclId` (`aclId`),
-  ADD KEY `moduleId` (`moduleId`);
-
 ALTER TABLE `core_email_template_attachment`
   ADD PRIMARY KEY (`id`),
   ADD KEY `templateId` (`emailTemplateId`),
   ADD KEY `blobId` (`blobId`);
 
-
-ALTER TABLE `core_email_template`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
 ALTER TABLE `core_email_template_attachment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `core_email_template`
-  ADD CONSTRAINT `core_email_template_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
-  ADD CONSTRAINT `core_email_template_ibfk_2` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `core_email_template_attachment`
   ADD CONSTRAINT `core_email_template_attachment_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `core_email_template_attachment_ibfk_2` FOREIGN KEY (`emailTemplateId`) REFERENCES `core_email_template` (`id`) ON DELETE CASCADE;
-
 
 ALTER TABLE `core_change` ADD INDEX(`entityId`);
 
@@ -1022,39 +1015,56 @@ create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
 CREATE TABLE `core_pdf_block` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
-  `x` int(11) NOT NULL,
-  `y` int(11) NOT NULL,
-  `width` int(11) NOT NULL,
-  `height` int(11) NOT NULL,
+  `x` int(11)  NULL,
+  `y` int(11)  NULL,
+  `width` int(11)  NULL,
+  `height` int(11)  NULL,
   `align` enum('L','C','R','J') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
   `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `core_pdf_template` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `moduleId` int(11) NOT NULL,
-  `language` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `stationaryBlobId` binary(40) DEFAULT NULL,
-  `landscape` tinyint(1) NOT NULL DEFAULT 0,
-  `pageSize` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'A4',
-  `measureUnit` enum('mm','pt','cm','in') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mm',
-  `marginTop` decimal(19,4) NOT NULL DEFAULT 10.0000,
-  `marginRight` decimal(19,4) NOT NULL DEFAULT 10.0000,
-  `marginBottom` decimal(19,4) NOT NULL DEFAULT 10.0000,
-  `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+create table core_pdf_template
+(
+    id               bigint unsigned auto_increment
+        primary key,
+    moduleId         int                                           not null,
+    `key`            varchar(20) collate ascii_bin                 null,
+    language         varchar(20)                   default 'en'    not null,
+    name             varchar(50)                                   not null,
+    stationaryBlobId binary(40)                                    null,
+    logoBlobId       binary(40)                                    null,
+    landscape        tinyint(1)                    default 0       not null,
+    pageSize         varchar(20)                   default 'A4'    not null,
+    measureUnit      enum ('mm', 'pt', 'cm', 'in') default 'mm'    not null,
+    marginTop        decimal(19, 4)                default 10.0000 not null,
+    marginRight      decimal(19, 4)                default 10.0000 not null,
+    marginBottom     decimal(19, 4)                default 10.0000 not null,
+    marginLeft       decimal(19, 4)                default 10.0000 not null,
+    constraint core_pdf_template_core_blob_id_fk
+        foreign key (logoBlobId) references core_blob (id),
+    constraint core_pdf_template_ibfk_1
+        foreign key (moduleId) references core_module (id)
+            on delete cascade,
+    constraint core_pdf_template_ibfk_2
+        foreign key (stationaryBlobId) references core_blob (id)
+);
+
+create index core_pdf_template_key_index
+    on core_pdf_template (moduleId, `key`);
+
+create index stationaryBlobId
+    on core_pdf_template (stationaryBlobId);
+
+
+
 
 
 ALTER TABLE `core_pdf_block`
-  ADD UNIQUE KEY `id` (`id`),
+  ADD PRIMARY KEY `id` (`id`),
   ADD KEY `pdfTemplateId` (`pdfTemplateId`);
 
-ALTER TABLE `core_pdf_template`
-  ADD UNIQUE KEY `id` (`id`),
-  ADD KEY `moduleId` (`moduleId`),
-  ADD KEY `stationaryBlobId` (`stationaryBlobId`);
+
 
 
 ALTER TABLE `core_pdf_block`
@@ -1066,11 +1076,6 @@ ALTER TABLE `core_pdf_template`
 
 ALTER TABLE `core_pdf_block`
   ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `core_pdf_template`
-  ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);
-
 
 ALTER TABLE `core_search` ADD  FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
@@ -1173,3 +1178,20 @@ alter table core_customfields_field_set
     add constraint core_customfields_field_set_core_customfields_field_set_id_fk
         foreign key (parentFieldSetId) references core_customfields_field_set (id)
             on delete set null;
+
+
+
+create table core_import_mapping
+(
+    entityTypeId int                        null,
+    checksum     char(32) collate ascii_bin null,
+    mapping      text                       null,
+    updateBy     varchar(100) default null  null,
+    constraint core_import_mapping_core_entity_null_fk
+        foreign key (entityTypeId) references core_entity (id)
+            on delete cascade
+);
+
+alter table core_import_mapping
+    add constraint core_import_mapping_pk
+        primary key (entityTypeId, checksum);

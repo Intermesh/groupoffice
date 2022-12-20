@@ -58,6 +58,10 @@ class Client {
 		return $this;
 	}
 
+	public function unsetHeader(string $name) {
+		unset($this->headers[$name]);
+	}
+
   private function initRequest($url) {
     $this->lastHeaders = [];
     $this->setOption(CURLOPT_URL, $url);
@@ -66,7 +70,7 @@ class Client {
       if(preg_match('/([\w-]+): (.*)/i', $header, $matches)) {
         $this->lastHeaders[strtolower($matches[1])] = trim($matches[2]);
       }
-		
+
 		  return strlen($header);
     });
 
@@ -87,6 +91,8 @@ class Client {
   public function get(string $url): array
   {
     $this->initRequest($url);
+
+	  $this->setOption(CURLOPT_POST, false);
 		
     $body = curl_exec($this->getCurl());
 		
@@ -95,8 +101,11 @@ class Client {
       throw new CoreException($error);
     }
 
+		$info = curl_getinfo($this->getCurl());
     return [
-      'status' => curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE),
+	    "requestHeaders" => $this->headers,
+      'status' => $info['http_code'],
+	    'info' => $info,
       'headers' => $this->lastHeaders,
       'body' => $body
     ];
@@ -114,11 +123,16 @@ class Client {
   {
   	$str = JSON::encode($data);
 
-		$this->setHeader('Content-Type', 'application/json;charset=utf-8');
+		$this->setHeader('Content-Type', 'application/json');
 	  $this->setHeader('Content-Length', strlen($str));
+	  $this->setHeader('Accept', 'application/json');
 
   	$response =  $this->post($url, $str);
   	$response['body'] = JSON::decode($response['body'], true);
+
+		$this->unsetHeader("Content-Type");
+	  $this->unsetHeader("Content-Length");
+	  $this->unsetHeader("Accept");
 
   	return $response;
   }
@@ -152,15 +166,21 @@ class Client {
       throw new CoreException($error .', HTTP Status: ' . $status);
     }
 
-    return [
-      'status' => $status,
+	  $info = curl_getinfo($this->getCurl());
+
+	  $this->setOption(CURLOPT_POSTFIELDS, "");
+
+	  return [
+			"requestHeaders" => $this->headers,
+		  'status' => $info['http_code'],
+		  'info' => $info,
       'headers' => $this->lastHeaders,
       'body' => $body
     ];
   }
 
 	/**
-	 * Download an URL to a file
+	 * Download a URL to a file
 	 *
 	 * @param string $url
 	 * @param File $file

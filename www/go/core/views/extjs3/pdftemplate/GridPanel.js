@@ -2,9 +2,15 @@
 go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 	module: null,
 	key: null,
+	autoHeight: true,
 	viewConfig: {
 		emptyText: 	'<p>' +t("No items to display") + '</p>'
 	},
+
+	/**
+	 * Set defaults for new templates
+	 */
+	templateDefaults: undefined,
 
 	setKey: function(key) {
 		this.key = key,
@@ -61,6 +67,9 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 					handler: function() {
 						var dlg = new go.pdftemplate.TemplateDialog();
 						dlg.setValues({module: this.module, key: this.key}).show();
+						if(this.templateDefaults) {
+							dlg.setValues(this.templateDefaults);
+						}
 					},
 					scope: this
 			}],
@@ -72,7 +81,7 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 					module: {module: this.module, key: this.key}
 				}	
 			}),
-			autoHeight: true,
+
 			columns: [
 				{
 					id: 'name',

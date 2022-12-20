@@ -25,15 +25,6 @@ body{
   border: 1px solid #ccc;
   color: black;
   background-color: white;
-
-  &.go-html-formatted
-  {
-    p, span, div {
-      background-color: white;
-      color: black;
-    }
-  }
-
 }
 
 .em-composer {
@@ -51,6 +42,9 @@ body{
     border-color: rgba($cDanger,0.54);
     background-color: color($bg, 'box');
   }
+}
+.x-form-item label.x-form-invalid-label {
+  background-color: color($bg, 'box');
 }
 
 .go-html-formatted {

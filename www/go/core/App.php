@@ -22,8 +22,10 @@ namespace go\core {
 	use go\core\orm\EntityType;
 	use go\core\orm\exception\SaveException;
 	use go\core\orm\Property;
+	use go\core\orm\SearchableTrait;
 	use go\core\Settings as CoreSettings;
 	use go\core\util\ArrayObject;
+	use go\core\util\ClassFinder;
 	use go\core\webclient\Extjs3;
 	use go\core\model\User;
 	use go\core\model\Settings;
@@ -54,6 +56,20 @@ namespace go\core {
 
 
 		private $eventsEnabled = true;
+
+		/**
+		 * @throws Exception
+		 */
+		public function rebuildSearch()
+		{
+			$classFinder = new ClassFinder();
+			$entities = $classFinder->findByTrait(SearchableTrait::class);
+
+			foreach ($entities as $cls) {
+				$cls::rebuildSearchForEntity();
+				echo "\nDone\n\n";
+			}
+		}
 
 		/**
 		 * Disable events
@@ -473,7 +489,10 @@ namespace go\core {
 		 * @noinspection PhpUnused
 		 */
 		private function initTCPDF() {
+
 			define("K_PATH_CACHE", $this->config['tmpdir'] . "/");
+
+//			define("K_PATH_FONTS",go()->getDataFolder()->getFolder("tcpdf/fonts")->getPath() . "/");
 		}
 
 		/**
@@ -793,12 +812,7 @@ namespace go\core {
 			return null;
 		}
 
-		/**
-		 * Get the application settings
-		 * 
-		 * @return Settings|null
-		 */
-		public function getSettings(): ?CoreSettings
+		public function getSettings()
 		{
 			return Settings::get();
 		}
@@ -1025,7 +1039,20 @@ namespace go\core {
 
 			$this->optimizerSearchDepthSet = true;
 		}
+
+		public function checkAcls()
+		{
+			//one legacy model that needs checking
+			$stmt = GO\Base\Model\Template::model()->find(['ignoreAcl'=>true]);
+			while($stmt->rowCount()) {
+				$stmt->callOnEach('checkAcl', true);
+			}
+
+			return parent::checkAcls();
+		}
 	}
+
+
 }
 
 namespace {

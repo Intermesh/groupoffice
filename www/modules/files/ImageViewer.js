@@ -107,7 +107,11 @@ GO.files.ImageViewer = Ext.extend(go.Window, {
 		this.on('resize', function(){this.syncImgSize(this.fullSize);}, this);
 	},
 
-	
+	/**
+	 *
+	 * @param images [{name: "", src: "" }]
+	 * @param index
+	 */
 	show : function(images, index)
 	{
 		if(!index)

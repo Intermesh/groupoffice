@@ -21,6 +21,13 @@ use GO\Projects2\Model\TimeEntry;
 
 class Module extends core\Module
 {
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
 
 	public static $enabled = true;
 
@@ -111,6 +118,11 @@ class Module extends core\Module
 	 * @throws Exception
 	 */
 	public static function onEntityDelete(Query $query, $cls) {
+
+		if(!self::$enabled || core\Installer::isInProgress()) {
+			return;
+		}
+
 		if(is_a($cls, LogEntry::class, true) || is_a($cls, Search::class, true)) {
 			return;
 		}
@@ -284,10 +296,7 @@ class Module extends core\Module
 		}
 	}
 
-	/**
-	 * @return Settings|null
-	 */
-	public function getSettings(): ?core\Settings
+	public function getSettings()
 	{
 		return Settings::get();
 	}

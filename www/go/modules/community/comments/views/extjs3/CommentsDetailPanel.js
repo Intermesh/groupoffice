@@ -14,18 +14,66 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	titleCollapse: true,
 	bodyCssClass: 'comments-container',
 	autoHeight: true,
+	large: false,
 	stateId: "comments-detail",
 	initComponent: function () {
+
+
+		this.origTitle = this.title;
+
+
+		this.buttons = [this.scrollToTopButton = new Ext.Button({
+			xtype: "button",
+			iconCls: "ic-arrow-circle-up",
+			text: t("Scroll to top"),
+			scope: this,
+			handler: function() {
+				this.ownerCt.body.scrollTo("top");
+			}
+		})]
 
 		this.on('destroy', function() {
 			this.store.destroy();
 		}, this);
+
+
+		this.on("render", () => {
+
+			this.body.dom.addEventListener("click", (e) => {
+				if(e.target.tagName == "IMG") {
+
+					const v = new GO.files.ImageViewer();
+
+					v.show([{
+						name: e.target.attributes.alt ? e.target.attributes.alt.value : e.target.attributes.src.value,
+						src: e.target.attributes.src.value
+					}]);
+
+
+				}
+			})
+		});
 
 		this.on("expand", function() {
 			this.updateView();
 
 			// this.composer.textField.syncSize();
 		}, this);
+
+		this.on("added", (cont) => {
+
+			cont.ownerCt.on("beforeload", (dv, id) => {
+				if(this.composer.textField.isDirty() && this.composer.textField.getValue() != "" && this.composer.textField.getValue() != "<br>") {
+					if(confirm(t("You have an unsaved comment. Are you sure you want to discard the comment?"))) {
+						this.composer.reset();
+						return true;
+					} else
+					{
+						return false;
+					}
+				}
+			});
+		})
 
 
 		if(go.User.isAdmin && this.title) {
@@ -111,9 +159,14 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		this.items = [
 			this.commentsContainer = new cntrClass({
 				region:'center',
-				autoScroll:true
+				autoScroll:true,
+				scope: this,
+
 			})
 		];
+
+
+
 		if(this.showComposer) {
 			this.items.push(this.composer = new go.modules.comments.Composer({
 				margins: {left: dp(8), right: dp(8),bottom:dp(8),top:0},
@@ -135,13 +188,19 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		this.entity = type;
 		if(this.composer) {
 			this.composer.initEntity(this.entityId, this.entity, this.section);
+
+
 		}
 		this.store.setFilter('entity', {
 			entity: this.entity,
 			entityId: this.entityId,
 			section: this.section
 		});
-		
+
+		if(this.large) {
+			this.commentsContainer.el.dom.style.maxHeight = (document.body.offsetHeight * 0.7) + "px";
+		}
+
 		this.store.load();
 	},
 		
@@ -152,7 +211,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		o = o || {};
 
 		let badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
-		this.setTitle(t("Comments") + badge);
+		this.setTitle(this.origTitle + badge);
 		let prevStr = null;
 
 		let dom = this.commentsContainer.getEl().dom;
@@ -207,21 +266,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			}
 			avatar.listeners = {
 				afterrender : (cmp) => {
-					cmp.getEl().on("click" , async () => {
-						//lookup in address book
-						const ids = await go.Db.store("Contact").query({
-							filter: {
-								isUser: creator.id
-							}
-						}).then(r=>r.ids);
-
-						if(!ids.length) {
-							Ext.MessageBox.alert(t("Not found"), t("Could not find this user in the address book for you."));
-						} else
-						{
-							go.Entities.get("Contact").goto(ids[0]);
-						}
-					})
+					cmp.getEl().on("click" , () => {
+						go.modules.community.addressbook.lookUpUserContact(creator.id);
+					});
 				}
 			}
 
@@ -230,16 +277,29 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
 			}
 
-			let readMore = new go.detail.ReadMore({
+			let readMore = new Ext.Container({
 				cls: 'go-html-formatted ' + mineCls
 			});
-			readMore.setText(r.get('text'));
+
+			const qs = new go.util.QuoteStripper(r.get("text")),
+
+				quote = qs.getQuote(), quoteId = Ext.id();
+
+			let quoteLess = qs.getBodyWithoutQuote();
+
+			if(quote) {
+				quoteLess += '<a class="normal-link" id="' + quoteId + '">' + t("More") + "</a>";
+			}
+
+			const content = Ext.create({xtype:'box',html: quoteLess, itemId:"content", cls: 'content ' +mineCls});
+
+			readMore.insert(1, content);
 			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
 
 			if(r.data.attachments && r.data.attachments.length) {
 				let atts = "";
 				r.data.attachments.forEach(a => {
-					atts += `<a class="attachment" target="_blank" title="${a.name}" href="${go.Jmap.downloadUrl(a.blobId)}"><span class="filetype filetype-${a.name.substring(a.name.lastIndexOf(".") + 1)}"></span>${a.name}</a>`;
+					atts += `<a class="attachment" target="_blank" title="${a.name}" href="${go.Jmap.downloadUrl(a.blobId, true)}"><span class="filetype filetype-${a.name.substring(a.name.lastIndexOf(".") + 1)}"></span>${a.name}</a>`;
 				})
 				readMore.insert(2, {xtype: 'box', html: atts, cls: "attachments"});
 			}
@@ -264,20 +324,46 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				]
 			});
 
-			readMore.on('render',function(me){me.getEl().on("contextmenu", function(e, target, obj){
-				e.stopEvent();		
-
-				this.contextMenu.record = r;
-				this.contextMenu.showAt(e.xy);
+			readMore.on('afterrender',function(me){
 
 
-				this.contextMenu.items.get("delete").setDisabled(r.data.permissionLevel < go.permissionLevels.writeAndDelete);
-				this.contextMenu.items.get("edit").setDisabled(r.data.permissionLevel < go.permissionLevels.write);
 
-			}, this);},this);
+				me.getEl().on("contextmenu", function(e, target, obj){
+					e.stopEvent();
+
+					this.contextMenu.record = r;
+					this.contextMenu.showAt(e.xy);
+
+					this.contextMenu.items.get("delete").setDisabled(r.data.permissionLevel < go.permissionLevels.writeAndDelete);
+					this.contextMenu.items.get("edit").setDisabled(r.data.permissionLevel < go.permissionLevels.write);
+
+				}, this);
+
+			},this);
+
+			readMore.getComponent("content").on("afterrender" , (content) => {
+
+				go.util.replaceBlobImages(content.getEl().dom);
+
+
+				if(quote) {
+
+					document.getElementById(quoteId).addEventListener("click", () => {
+						content.getContentTarget().update(r.get("text"));
+					});
+
+				}
+			})
 
 			prevStr = go.util.Format.date(r.get('date'));
 		}, this);
+
+		// this anchor will keep the panel scrolled down when images are loading and push the content down
+		this.commentsContainer.add({
+				xtype: "box",
+				cls: "anchor"
+			}
+		);
 
 		// Put a date on top
 		this.commentsContainer.insert(0,{
@@ -297,6 +383,10 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	scrollDown : function() {
 		var dom = this.commentsContainer.getEl().dom;
 		dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
+
+		if(this.large) {
+			this.scrollToTopButton.getEl().scrollIntoView(this.ownerCt.body);
+		}
 
 		//console.log(scroll.dom.scrollTop, scroll.dom.scrollHeight, this.initScrollHeight, this.initScrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
 		//scroll.scroll("b", scroll.dom.scrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));

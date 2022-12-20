@@ -192,12 +192,16 @@ debugger;
 	},
 	getValue: function() {
 
-		let v;
-		if(this.dateField.isVisible()) {
-			v =  this.dateField.getValue().format('Y-m-d');
-		} else
+		let v = this.dateField.getValue();
+		if(v) {
+			if (this.dateField.isVisible()) {
+				v = v.format('Y-m-d');
+			} else {
+				v = v + ' ' + this.periodCombo.getValue();
+			}
+		}else
 		{
-			v =  this.valueField.getValue() + ' ' + this.periodCombo.getValue();
+			v = null;
 		}
 
 		switch(this.operatorCombo.getValue()) {				
@@ -215,7 +219,7 @@ debugger;
 
 			case 'empty':
 				return null;
-			
+
 		}
 	},
 	validate: function() {

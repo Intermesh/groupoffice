@@ -1,7 +1,12 @@
 <?php
 namespace go\core\util;
 
+use Exception;
+use go\core\fs\Folder;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use TCPDF_FONTS;
+
+require_once(__DIR__ . '/tcpdf_config.php');
 
 /**
  * PDF renderer
@@ -42,7 +47,46 @@ class PdfRenderer extends Fpdi {
 
 		//Set normal font
 		$this->normal();
+
+		$this->setHtmlVSpace([
+			'p' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+			'div' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+			'ol' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+			'ul' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+		]);
+
+		$this->setCellHeightRatio(1.25);
+		$this->SetCellPadding(0);
 	}
+
+	/**
+	 * Get all available fonts
+	 *
+	 * @return array eg. [['name' => 'Arial', 'family' => 'arial', 'core' =>
+	 * @throws Exception
+	 */
+	public static function getFonts() : array {
+		$folder = new Folder(K_PATH_FONTS);
+		$files = $folder->find([
+			'regex' => '/.*\.php/'
+		]);
+
+		$fonts = [];
+		foreach($files as $file) {
+			$name = null;
+			require($file);
+			$fonts[$file->getNameWithoutExtension()] = $name;
+		}
+
+		return $fonts;
+	}
+
+	public static function addTTFFont(string $ttfPath) {
+		// convert TTF font to TCPDF format and store it on the fonts folder
+		return TCPDF_FONTS::addTTFfont($ttfPath, 'TrueTypeUnicode', '', 32);
+
+	}
+
 	/**
 	 * Set font to bold
 	 *

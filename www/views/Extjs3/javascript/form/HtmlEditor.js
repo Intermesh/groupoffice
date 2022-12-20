@@ -77,8 +77,12 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	initComponent: function() {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
 
+		if(this.grow && !this.height) {
+			this.height = this.growMinHeight;
+		}
+
 		this.on('afterrender', function() {
-			if(this.grow && this.growMinHeight < dp(36)) {
+			if(this.grow && this.growMinHeight <= dp(46)) {
 				this.tb.hide();
 			}
 		}, this);
@@ -275,22 +279,30 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		//this is needed if the editor has not been activated yet.
 		this.updateToolbar();
 
-		Array.from(e.dataTransfer.files).forEach(function(file) {
+		Array.from(e.dataTransfer.files).forEach(function (file) {
 			go.Jmap.upload(file, {
 				scope: this,
-				success: function(response) {
-					console.warn(response);
+				success: function (response) {
 					var imgEl = null;
 					if (file.type.match(/^image\//)) {
-						var domId = Ext.id(), img = '<img style="max-width: 100%" id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
+						var domId = Ext.id(),
+							img = '<img style="max-width: 100%" id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
 						this.insertAtCursor(img);
 						imgEl = this.getDoc().getElementById(domId);
+
+						if(imgEl) {
+							imgEl.addEventListener("load", () => {
+								const width = imgEl.offsetWidth, height = imgEl.offsetHeight;
+								imgEl.setAttribute('style', `max-width: 100%;height:auto;aspect-ratio: ${width} / ${height};`);
+							});
+						}
 					}
 
 					this.fireEvent('attach', this, response, file, imgEl);
 				}
 			});
 		}, this);
+
 
 	},
 
@@ -527,7 +539,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				go.Jmap.upload(file, {
 					success: function(response) {
 						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));
-						imgEl.setAttribute('style', 'max-width: 100%');
+						imgEl.setAttribute('style', `max-width: 100%;height:auto;aspect-ratio: ${loader.width} / ${loader.height};`);
 						me.fireEvent('attach', me, response.blobId, file, imgEl);
 					}
 				});
@@ -601,7 +613,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	/**
 	 * Minimum height for field
 	 */
-	growMinHeight: dp(30),
+	growMinHeight: dp(46),
 
 	/**
 	 * Maximum height for field
@@ -624,14 +636,14 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		body.style.display = 'inline-block';
 
 		body.style.minHeight =  this.growMinHeight + "px";
-		body.style.padding = dp(6) + "px " + dp(8) + "px";
+		body.style.padding = window.getComputedStyle(this.el.dom).padding;
 		body.style.boxSizing = "border-box";
 		body.style.width = "100%";
 		body.style.lineHeight = dp(20) + "px";
 
 		var h =  Math.max(this.growMinHeight, body.offsetHeight); // 400  max height
 
-		if(h > 36) {
+		if(h > dp(48)) {
 			this.tb.show();
 			//workaround for combo
 			if(this.tb.items.itemAt(0).wrap) {

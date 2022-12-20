@@ -350,6 +350,11 @@ class File extends FileSystemObject {
 				$r->setHeader('Content-Type', $this->getContentType());
 			}
 
+			//Don't set content length for zip files because gzip of apache will corrupt the download. http://www.heath-whyte.info/david/computers/corrupted-zip-file-downloads-with-php
+			if($this->getExtension() != 'zip') {
+				$r->setHeader('Content-Length', $this->getSize());
+			}
+
 			if(!$r->hasHeader('Content-Disposition')) {
 				$disp = $inline ? 'inline' : 'attachment';
 				$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
@@ -377,7 +382,12 @@ class File extends FileSystemObject {
 				$r->setHeader('Pragma', 'no-cache');
 				$r->removeHeader('Last-Modified');
 			}
-		}		
+		}
+
+		if (isset($_SERVER['HTTP_RANGE'])){
+			$this->rangeDownload();
+			return;
+		}
 		
 		if(ob_get_contents() != '') {			
 			throw new Exception("Could not output file because output has already been sent. Turn off output buffering to find out where output has been started.");
@@ -399,7 +409,98 @@ class File extends FileSystemObject {
 			flush();
 		}
 	}
-	
+
+	private function rangeDownload() {
+
+		$fp = $this->open('rb');
+
+		$size   = $this->getSize();
+		$length = $size;           // Content length
+		$start  = 0;               // Start byte
+		$end    = $size - 1;       // End byte
+//		Response::get()->setHeader("Accept-Ranges", "0-$length");
+		Response::get()->setHeader("Accept-Ranges", "bytes");
+
+		// multipart/byteranges
+		// http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
+		if (isset($_SERVER['HTTP_RANGE'])) {
+
+			$c_start = $start;
+			$c_end   = $end;
+			// Extract the range string
+			list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
+			// Make sure the client hasn't sent us a multibyte range
+			if (strpos($range, ',') !== false) {
+
+				// (?) Should this be issued here, or should the first
+				// range be used? Or should the header be ignored and
+				// we output the whole content?
+				Response::get()->setStatus(416);
+				Response::get()->setHeader("Content-Range", "bytes $start-$end/$size");
+				// (?) Echo some info to the client?
+				Response::get()->sendHeaders();
+				exit;
+			}
+			// If the range starts with an '-' we start from the beginning
+			// If not, we forward the file pointer
+			// And make sure to get the end byte if specified
+			if ($range[0] == '-') {
+
+				// The n-number of the last bytes is requested
+				$c_start = $size - substr($range, 1);
+			}
+			else {
+
+				$range  = explode('-', $range);
+				$c_start = $range[0];
+				$c_end   = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;
+			}
+			/* Check the range and make sure it's treated according to the specs.
+			 * http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+			 */
+			// End bytes can not be larger than $end.
+			$c_end = ($c_end > $end) ? $end : $c_end;
+			// Validate the requested range and return an error if it's not correct.
+			if ($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
+
+				Response::get()->setStatus(416);
+				Response::get()->setHeader("Content-Range,", "bytes $start-$end/$size");
+				Response::get()->sendHeaders();
+				exit;
+			}
+			$start  = $c_start;
+			$end    = $c_end;
+			$length = $end - $start + 1; // Calculate new content length
+			fseek($fp, $start);
+			Response::get()->setStatus(206);
+			Response::get()->sendHeaders();
+		}
+		// Notify the client the byte range we'll be outputting
+		Response::get()->setHeader("Content-Range", "bytes $start-$end/$size");
+		Response::get()->setHeader("Content-Length", "$length");
+
+		Response::get()->sendHeaders();
+
+		// Start buffered download
+		$buffer = 1024 * 8;
+		while(!feof($fp) && ($p = ftell($fp)) <= $end) {
+
+			if ($p + $buffer > $end) {
+
+				// In case we're only outputtin a chunk, make sure we don't
+				// read past the length
+				$buffer = $end - $p + 1;
+			}
+			set_time_limit(0); // Reset time limit for big files
+			echo fread($fp, $buffer);
+			flush(); // Free up memory. Otherwise large files will trigger PHP's memory limit.
+		}
+
+		fclose($fp);
+
+	}
+
+
 	/**
 	 * Open file pointer
 	 * 

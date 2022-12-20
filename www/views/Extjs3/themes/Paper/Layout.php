@@ -45,10 +45,14 @@ $lang = GO::language()->getLanguage(); ?>
 	<?php
 	$cssMtime = filemtime(__DIR__ . "/style.css");
 	?>
-	<link rel="stylesheet" type="text/css" as="style"  href="<?= GO::view()->getTheme()->getUrl();?>style.css?v=<?=$cssMtime ?>" media="print, (min-device-width:1201px)" />
+	<link rel="stylesheet" type="text/css" as="style" media="print, (min-device-width:1201px)"  href="<?= GO::view()->getTheme()->getUrl();?>style.css?v=<?=$cssMtime ?>" />
 	<link rel="stylesheet" type="text/css" as="style" media="screen and (max-device-width:1200px)" href="<?= GO::view()->getTheme()->getUrl(); ?>style-mobile.css?v=<?=$cssMtime;?>" />
 	<link rel="stylesheet" type="text/css" as="style"  href="<?= GO::view()->getUrl()?>css.php?theme=<?=\GO::view()->getTheme()->getName(); ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>"  />
     <link rel="preload" href="<?= GO::view()->getTheme()->getUrl();?>fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
+
+
+    <link rel="stylesheet" type="text/css" as="style" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/goui/dist/groupoffice.css" />
+    <link rel="stylesheet" type="text/css" as="style" media="screen and (max-device-width:1200px)"  href="<?= $webclient->getBaseUrl();?>views/goui/goui/dist/groupoffice-mobile.css" />
 	<?php
 
 	//$this is \GO\Core\Controller\Auth
@@ -110,6 +114,7 @@ $lang = GO::language()->getLanguage(); ?>
   ?>
 </head>
 <body class="go-compact">
+    <div id="goui"></div>
 	<div id="sound"></div>
     <div id="paper"></div>
 	<!--Putting scripts in div will speed up developer tools because they don't have to show all those nodes-->

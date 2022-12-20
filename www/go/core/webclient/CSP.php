@@ -61,6 +61,7 @@ class CSP
 			->add('img-src', "'self'")
 			->add('img-src', "about:")
 			->add('img-src', "data:")
+			->add('img-src', "blob:")
 			->add('img-src', "http:")
 			->add('img-src', "https:")
 			->add('style-src', "'self'")

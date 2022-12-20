@@ -16,6 +16,7 @@ use go\core\jmap\Response;
 use go\core\jmap\Router;
 use go\core\model\Alert;
 use go\core\http\Client;
+use go\core\model\Alert as CoreAlert;
 use go\core\model\CronJobSchedule;
 use go\core\event\Listeners;
 use go\core\model\Module;
@@ -27,6 +28,7 @@ use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use go\core\util\JSON;
+use go\core\util\PdfRenderer;
 use go\modules\community\history\Module as HistoryModule;
 use JsonException;
 use function GO;
@@ -40,6 +42,27 @@ class System extends Controller {
 	protected function authenticate()
 	{
 		// no auth because on upgrade it might fail and it's not needed on CLI anyway
+	}
+
+
+	/**
+	 *
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/addPDFFont --file=/root/Downloads/Lato/Lato-Regular.ttf
+	 * @param string $file
+	 * @return void
+	 */
+	public function addPDFFont(string $file) {
+
+		$f = new File($file);
+		if(!$f->exists()) {
+			throw new NotFound($f->getPath());
+		}
+
+		// convert TTF font to TCPDF format and store it on the fonts folder
+		$result = PdfRenderer::addTTFFont($file);
+
+
+		var_dump($result);
 	}
 
 
@@ -203,6 +226,10 @@ JSON;
 		echo "Cleaning up....\n";
 		Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
 
+		if(Module::isInstalled("legacy", "files")) {
+			$this->cleanupEmptyFolders();
+		}
+
 		$this->cleanupAcls();
 
 		$this->fireEvent(self::EVENT_CLEANUP);
@@ -211,10 +238,21 @@ JSON;
 
 	}
 
+	private function cleanupEmptyFolders() {
+		echo "Removing empty folders\n";
+		$fc = new \GO\Files\Controller\FolderController();
+		$fc->actionRemoveEmpty();
+	}
+
 	private function cleanupAcls() {
 
 		// for memory problems
-		go()->getDebugger()->disabled = false;
+		go()->getDebugger()->enabled = false;
+		CoreAlert::$enabled = false;
+
+		// Speed things up.
+		Entity::$trackChanges = false;
+		\go\modules\community\history\Module::$enabled = false;
 
 		echo "Cleaning up unused ACL's\n";
 
@@ -233,7 +271,7 @@ JSON;
 			if(!$module->isAvailable()) {
 				continue;
 			}
-			echo "Checking module ". ($modules->package ?? "legacy") . "/" .$module->name ."\n";
+			echo "Checking module ". ($module->package ?? "legacy") . "/" .$module->name ."\n";
 			$module->module()->checkAcls();
 		}
 
@@ -245,9 +283,9 @@ JSON;
 			", entityId = f.id where usedIn is null"
 		);
 
-	//	$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
 
-		//echo "Delete " . $deleteCount ." unused ACL's\n";
+		echo "Delete " . $deleteCount ." unused ACL's\n";
 
 	}
 
@@ -297,9 +335,11 @@ JSON;
 	 * @example
 	 * ```
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo
+	 *
+	 * docker-compose exec --user www-data groupoffice-finance ./www/cli.php core/System/demo --package=business --module=catalog
 	 * ```
 	 */
-	public function demo() {
+	public function demo(?string $package = null, ?string $module = null) {
 
 		$faker = Faker\Factory::create();
 
@@ -308,6 +348,15 @@ JSON;
 		Alert::$enabled = false;
 
 		$modules = Module::find();
+
+		if(isset($package)) {
+			$modules->andWhere('package', '=', $package);
+		}
+
+		if(isset($module)) {
+			$modules->andWhere('name', '=', $module);
+		}
+
 //		$modules = [Module::findByName("community", "tasks")];
 
 		foreach($modules as $module) {

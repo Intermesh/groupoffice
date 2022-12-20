@@ -8,6 +8,7 @@ namespace go\modules\community\tasks\controller;
 
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\modules\community\tasks\model;
 
 class Task extends EntityController {
@@ -59,11 +60,39 @@ class Task extends EntityController {
 		$entity = new $cls;
 
 		if (isset($properties['projectId']) && empty($properties['tasklistId'])) {
-			$properties['tasklistId'] = model\Tasklist::createForProject($properties['projectId'])->id;
+			$properties['tasklistId'] = model\TaskList::createForProject($properties['projectId'])->id;
 		}
 		$entity->setValues($properties);
 
 		return $entity;
+	}
+
+	public function merge($params) {
+		return $this->defaultMerge($params);
+	}
+
+	public function countMine() {
+		$query = model\Task::find(['id'])
+			->selectSingleValue("count(*)")
+			->filter([
+				"operator" => "OR",
+				"conditions" => [
+					["responsibleUserId" => go()->getUserId()],
+					["responsibleUserId" => null]
+				]
+			])
+			->filter([
+				"permissionLevel" => Acl::LEVEL_WRITE,
+				"progress" => "needs-action",
+				"role" => "support"
+			]);
+
+		$query->removeJoin("tasks_task_user");
+		$query->removeJoin("pr2_hours");
+		$query->groupBy([]);
+
+
+		return $query->single();
 	}
 }
 

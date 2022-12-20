@@ -15,7 +15,14 @@ use go\modules\community\bookmarks\model\Category;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class Module extends core\Module {
-							
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
+
 	public function getAuthor(): string
 	{
 		return "Intermesh BV <info@intermesh.nl>";

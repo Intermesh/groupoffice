@@ -62,6 +62,7 @@ GO.calendar.SelectCalendar = function(config){
 }
 Ext.extend(GO.calendar.SelectCalendar, GO.form.ComboBoxReset, {
 	dontQueryCalendar : false,
+
 	setValue: function (id) {
 
 		if (!id || this.dontQueryCalendar) {

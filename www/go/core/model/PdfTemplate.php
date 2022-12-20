@@ -2,10 +2,11 @@
 namespace go\core\model;
 
 
+use go\core\cron\GarbageCollection;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
-use \go\core\model\PdfBlock;
+use go\core\model\Module as ModuleModel;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\validate\ErrorCode;
@@ -15,6 +16,9 @@ use go\core\validate\ErrorCode;
  *
  * For usage see {@see PdfRenderer}
  *
+ * Because these models are polymorphic relations they need to be cleaned up by the code.
+ * You could to this with the garbage collection event.
+ * @see GarbageCollection::EVENT_RUN
  *
  * @copyright (c) 2016, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
@@ -32,7 +36,7 @@ class PdfTemplate extends Entity {
 	 * 
 	 * @var int
 	 */							
-	protected $moduleId;
+	public $moduleId;
 
 	/**
 	 * Arbitrary string to identity where the template belongs to. For exampkle a bussinessId in the
@@ -59,6 +63,12 @@ class PdfTemplate extends Entity {
 	 * @var string
 	 */							
 	protected $stationaryBlobId;
+
+	/**
+	 *
+	 * @var string
+	 */
+	protected $logoBlobId;
 
 	/**
 	 * 
@@ -131,6 +141,36 @@ class PdfTemplate extends Entity {
 
 	}
 
+	protected static function textFilterColumns(): array
+	{
+		return ['name'];
+	}
+
+	/**
+	 * Find templates by module key and language
+	 *
+	 * @param string $package
+	 * @param string $name
+	 * @param string|null $preferredLanguage
+	 * @param string|null $key
+	 * @return PdfTemplate|null
+	 */
+	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?PdfTemplate {
+		$moduleModel = ModuleModel::findByName($package, $name);
+
+		$template = isset($preferredLanguage) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
+		if (!$template) {
+			$template = static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key])->single();
+		}
+
+		return $template;
+	}
+
+	protected function internalGetPermissionLevel(): int
+	{
+		return Module::findById($this->moduleId)->getPermissionLevel();
+	}
+
 	/**
 	 *
 	 */
@@ -166,6 +206,28 @@ class PdfTemplate extends Entity {
 		} else{
 			$blob = (array) $blob;
 			$this->stationaryBlobId = $blob['id'];
+		}
+	}
+
+	/**
+	 * Get stationary PDF blob
+	 *
+	 * @return Blob
+	 * @throws \Exception
+	 */
+	public function getLogo() {
+		if(!empty($this->logoBlobId)){
+			return Blob::findById($this->logoBlobId);
+		}
+		return null;
+	}
+
+	public function setLogo($blob) {
+		if(!$blob) {
+			$this->logoBlobId = NULL;
+		} else{
+			$blob = (array) $blob;
+			$this->logoBlobId = $blob['id'];
 		}
 	}
 }

@@ -172,3 +172,12 @@ $updates['202206031337'][] = "alter table comments_comment
     add constraint comments_comment_core_entity_id_fk
         foreign key (entityTypeId) references core_entity (id)
             on delete cascade;";
+
+
+//6.7
+
+$updates['202206031337'][] = "alter table comments_comment
+    modify text mediumtext collate utf8mb4_general_ci null;";
+
+$updates['202206031337'][] = "alter table comments_comment
+    add mimeMessageId varchar(255) collate ascii_bin null;";
