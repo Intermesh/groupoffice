@@ -493,6 +493,12 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 
 			//Supports range download
 			$coreFsFile = new \go\core\fs\File($file->fsFile->path());
+
+			// prevent html to render on same domain having access to all global JS stuff
+			if($coreFsFile->getContentType() == 'text/html') {
+				$inline = false;
+			}
+
 			$coreFsFile->output(true, !empty($params['cache']), [], $inline);
 
 		}catch(NotFound $e) {
