@@ -36,7 +36,9 @@ abstract class EntityController extends Controller {
 	const EVENT_SET = "set";
 	const EVENT_BEFORE_GET = "beforeget";
 	const EVENT_GET = "get";
-
+	const EVENT_BEFORE_CAN_CREATE = "beforecanupdate";
+	const EVENT_BEFORE_CAN_UPDATE = "beforecanupdate";
+	const EVENT_BEFORE_CAN_DESTROY = "beforecanupdate";
 
 	/**
 	 * Can be used to return true or false and override the default {@see self::checkModulePermissions()}
@@ -803,6 +805,9 @@ abstract class EntityController extends Controller {
 	 */
 	protected function canUpdate(Entity $entity): bool
 	{
+		if($ret = self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity)) {
+			return $ret;
+		}
 		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE) && $this->checkAclChange($entity);
 	}
 

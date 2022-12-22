@@ -30,4 +30,21 @@ class Time
 		$arTime = explode(":", $strTime);
 		return (intval($arTime[0]) * 3600) + (intval($arTime[1]) * 60) + intval($arTime[2]);
 	}
+
+
+	public static function fromSeconds(int $seconds, bool $includeSeconds = false, $zeroPad = true): string
+	{
+		$hours = floor($seconds / 3600);
+		$seconds -= ($hours * 3600);
+		$minutes = floor($seconds / 60);
+		if($includeSeconds) {
+			$seconds -= ($minutes * 60);
+		}
+
+		$ret = (($hours > 9 && $zeroPad) ? $hours : '0' . $hours) . ':' . ($minutes > 9 ? $minutes : '0' . $minutes);
+		if($includeSeconds) {
+			$ret .= ($seconds > 9 ? $seconds : '0'. $seconds);
+		}
+		return $ret;
+	}
 }
