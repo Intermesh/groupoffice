@@ -28,15 +28,13 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	focus: function () {
-
-		if (this.nameField.getValue() != "") {
-			this.jobTitle.focus();
-		} else
-		{
-			setTimeout(() => {
+		setTimeout(() => {
+			if (this.nameField.getValue() != "") {
+				this.jobTitle.focus();
+			} else {
 				this.nameField.focus();
-			});
-		}
+			}
+		},20);
 	},
 
 	setLinkEntity: function(config) {
