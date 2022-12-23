@@ -212,7 +212,7 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 		});
 		
 		Ext.apply(this, {
-			title : t("Recurrence"),
+			title : t("Repeat"),
 			cls:'go-form-panel',
 			layout : 'form',
 			hideMode : 'offsets',
@@ -221,13 +221,13 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 				border:false
 			},
 			items : [{
-				fieldLabel : t("Repeat every"),
+				fieldLabel : t("Every"),
 				xtype : 'compositefield',
 				items : [this.repeatEvery,this.repeatType,this.monthTime]
-			}, 
+			},
+				{html:t("At days")},
 			this.daysGroup = new Ext.ButtonGroup({
 				disabled:true,
-				fieldLabel : t("At days"),
 				items : [
 					this.cb[1],this.cb[2],this.cb[3],this.cb[4],this.cb[5],this.cb[6],this.cb[0],
 					this.dayButtons[1],this.dayButtons[2],this.dayButtons[3],this.dayButtons[4],this.dayButtons[5],this.dayButtons[6],this.dayButtons[0]

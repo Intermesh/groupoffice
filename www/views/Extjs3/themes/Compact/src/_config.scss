@@ -91,10 +91,10 @@ $cAnchor: 		#0000FF;
 
 $resourcePath: '../Paper/';
 $density: 110;
-$font-scale: 1.1;
+$font-scale: 1.15;
 
 @function dp($width) {
-  @return math.div(($width * $density) , 160) *1px;
+  @return math.round(math.div(($width * $density) , 160)) *1px;
 }
 @function sp($size) {
   @return ceil(dp($size) * $font-scale);
