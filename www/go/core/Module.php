@@ -113,28 +113,13 @@ abstract class Module extends Singleton {
 			return true;
 		}
 
-		if(!go()->getEnvironment()->hasIoncube() && static::sourceIsEncoded()) {
+		if(!go()->getEnvironment()->hasIoncube()) {
 			return false;
 		}
 
 		return License::has($license);
 		
 	}
-
-	private static function sourceIsEncoded() : bool {
-
-		$isEncoded = go()->getCache()->get('source-is-encoded');
-
-		if($isEncoded === null) {
-			$isEncoded = ClassFinder::fileIsEncoded(new File(dirname(__DIR__) . '/modules/business/license/model/License.php'));
-			go()->getCache()->set('source-is-encoded', $isEncoded);
-		}
-
-		return $isEncoded;
-
-
-	}
-
 
 	/**
 	 * Install the module
