@@ -1,3 +1,6 @@
+6.6.144
+- Leavedays: fix error when saving existing leave day registration
+
 19-12-2022 6.6.143
 - Email: fix print button
 
