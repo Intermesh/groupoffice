@@ -316,7 +316,7 @@ class Response extends Singleton{
 		if(!empty($origins) && isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $origins)) {
 			$this->setHeader('Access-Control-Allow-Origin', $_SERVER['HTTP_ORIGIN']);
 			$this->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
-			$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization, X-File-Name, X-File-LastModified');
+			$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization, X-File-Name, X-File-LastModified, X-CSRF-Token, Cookie');
 			$this->setHeader('Access-Control-Max-Age', "1728000");
 			$this->setHeader('Access-Control-Allow-Credentials', 'true');
 		}
