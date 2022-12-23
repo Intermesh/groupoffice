@@ -17,6 +17,10 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\util\JSON;
 
+
+// we don't want to use that here. Because otheriwse the CSRFToken is needed too.
+unset($_COOKIE['accessToken']);
+
 /**
  * @param array $data
  * @param int $status
@@ -53,7 +57,11 @@ function finishLogin(Token $token, string $rememberMeToken = null) {
 	go()->setAuthState($authState);
 	$response = $authState->getSession();
 
+	// Browsers should not store this for security. They must use the httpOnly flagged cookie that
+	// can't be stolen. The CSRFToken must be used to prevent CSRF attacks.
+	// @see Token::CSRFToken
 	$response['accessToken'] = $token->accessToken;
+	$response['CSRFToken'] = $token->CSRFToken;
 
 	if($rememberMeToken != null) {
 		$response['rememberMeToken'] = $rememberMeToken;

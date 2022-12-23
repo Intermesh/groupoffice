@@ -32,6 +32,17 @@ class Token extends Entity {
 	public $accessToken;
 
 	/**
+	 * Cross Site Request Forgery token
+	 *
+	 * It's checked on each request that is not a GET request and where the accessToken is sent as a cookie.
+	 *
+	 * It can be passed as a 'X-CSRF-Token' header or 'CSRFToken' parameter
+	 *
+	 * @var string
+	 */
+	public $CSRFToken;
+
+	/**
 	 * 
 	 * @var int
 	 */							
@@ -229,6 +240,9 @@ class Token extends Entity {
 	private function internalRefresh() {
 		if(!isset($this->accessToken)) {
 			$this->accessToken = $this->generateToken();
+		}
+		if(!isset($this->CSRFToken)) {
+			$this->CSRFToken = $this->generateToken();
 		}
 		if(isset($this->expiresAt)) {
 			$this->setExpiryDate();
@@ -550,7 +564,8 @@ class Token extends Entity {
 			'expires' => 0,
 			"path" => "/",
 			"samesite" => "Lax",
-			"domain" => Request::get()->getHost()
+			"domain" => Request::get()->getHost(),
+			"httpOnly" => true
 		]);
 	}
 
@@ -559,7 +574,8 @@ class Token extends Entity {
 			'expires' => time() - 3600,
 			"path" => "/",
 			"samesite" => "Lax",
-			"domain" => Request::get()->getHost()
+			"domain" => Request::get()->getHost(),
+			"httpOnly" => true
 		]);
 	}
 	

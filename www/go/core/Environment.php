@@ -2,7 +2,9 @@
 
 namespace go\core;
 
+use go\core\fs\File;
 use go\core\fs\Folder;
+use go\core\util\ClassFinder;
 
 /**
  * Server information class.
@@ -145,7 +147,20 @@ class Environment extends Singleton {
 	 */
 	public function hasIoncube(): bool
 	{
-		return extension_loaded('ionCube Loader');
+		return extension_loaded('ionCube Loader') || !self::sourceIsEncoded();
 	}
 
+	private static function sourceIsEncoded() : bool {
+
+		$isEncoded = go()->getCache()->get('source-is-encoded');
+
+		if($isEncoded === null) {
+			$isEncoded = ClassFinder::fileIsEncoded(new File(dirname(__DIR__) . '/modules/business/license/model/License.php'));
+			go()->getCache()->set('source-is-encoded', $isEncoded);
+		}
+
+		return $isEncoded;
+
+
+	}
 }
