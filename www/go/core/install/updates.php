@@ -1242,3 +1242,6 @@ $updates['202212090912'][] = function() {
 
 	$stmt->execute();
 };
+
+$updates['202212231031'][] = "alter table core_auth_token
+    add `CSRFToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL after accessToken;";

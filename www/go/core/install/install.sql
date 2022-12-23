@@ -35,6 +35,7 @@ CREATE TABLE `core_auth_password` (
 CREATE TABLE `core_auth_token` (
   `loginToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `accessToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `CSRFToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
   `userId` int(11) NOT NULL,
   `createdAt` datetime NOT NULL,
   `expiresAt` datetime DEFAULT NULL,
