@@ -1245,68 +1245,71 @@ $updates['202212081208'][] = function() {
 	$stmt->execute();
 };
 
+$updates['202212231031'][] = "alter table core_auth_token
+    add `CSRFToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL after accessToken;";
+
 // Start 6.7
-$updates['202212081208'][] = "alter table core_pdf_block modify x int null;";
+$updates['202212231031'][] = "alter table core_pdf_block modify x int null;";
 
-$updates['202212081208'][] = "alter table core_pdf_block modify y int null;";
+$updates['202212231031'][] = "alter table core_pdf_block modify y int null;";
 
-$updates['202212081208'][] = "alter table core_pdf_block modify width int null;";
+$updates['202212231031'][] = "alter table core_pdf_block modify width int null;";
 
-$updates['202212081208'][] = "alter table core_pdf_block modify height int null;";
+$updates['202212231031'][] = "alter table core_pdf_block modify height int null;";
 
-$updates['202212081208'][] = "alter table core_pdf_template
+$updates['202212231031'][] = "alter table core_pdf_template
 	add `key` varchar(20) default null null after moduleId;";
 
 
-$updates['202212081208'][] = "drop index name on core_email_template;";
+$updates['202212231031'][] = "drop index name on core_email_template;";
 
 
-$updates['202212081208'][] = "create unique index core_email_template_moduleId_key_uindex
+$updates['202212231031'][] = "create unique index core_email_template_moduleId_key_uindex
     on core_email_template (moduleId, `key`);";
 
 
-$updates["202212081208"][] = "TRUNCATE TABLE go_state"; //for fixed non resizable columns getting 100px width
+$updates["202212231031"][] = "TRUNCATE TABLE go_state"; //for fixed non resizable columns getting 100px width
 
 
-$updates["202212081208"][] = "alter table core_pdf_template
+$updates["202212231031"][] = "alter table core_pdf_template
     add logoBlobId binary(40) null after stationaryBlobId;";
 
-$updates["202212081208"][] = "alter table core_pdf_template
+$updates["202212231031"][] = "alter table core_pdf_template
     add constraint core_pdf_template_core_blob_id_fk
         foreign key (logoBlobId) references core_blob (id);";
 
 
-$updates["202212081208"][] = "alter table core_email_template
+$updates["202212231031"][] = "alter table core_email_template
     drop foreign key core_email_template_ibfk_1;";
 
-$updates["202212081208"][] = "alter table core_email_template
+$updates["202212231031"][] = "alter table core_email_template
     drop column aclId;";
 
-$updates["202212081208"][] = "create index core_pdf_template_key_index
+$updates["202212231031"][] = "create index core_pdf_template_key_index
     on core_pdf_template (moduleId, `key`);";
 
 
-$updates["202212081208"][] = "alter table core_email_template
+$updates["202212231031"][] = "alter table core_email_template
     drop key core_email_template_moduleId_key_uindex;";
 
-$updates["202212081208"][] = "create index core_email_template_moduleId_key_index
+$updates["202212231031"][] = "create index core_email_template_moduleId_key_index
     on core_email_template (moduleId, `key`);";
 
 
-$updates["202212081208"][] = "alter table core_change
+$updates["202212231031"][] = "alter table core_change
     modify entityId varchar(100) collate ascii_bin not null;";
 
 
-$updates['202212081208'][] = "alter table core_auth_remember_me
+$updates['202212231031'][] = "alter table core_auth_remember_me
     drop foreign key core_auth_remember_me_core_user_id_fk;";
 
-$updates['202212081208'][] = "alter table core_auth_remember_me
+$updates['202212231031'][] = "alter table core_auth_remember_me
     add constraint core_auth_remember_me_core_user_id_fk
         foreign key (userId) references core_user (id)
             on delete cascade;";
 
 
-$updates['202212081208'][] = "create table core_import_mapping
+$updates['202212231031'][] = "create table core_import_mapping
 (
 	entityTypeId int                        null,
     checksum     char(32) collate ascii_bin null,
@@ -1317,18 +1320,18 @@ $updates['202212081208'][] = "create table core_import_mapping
             on delete cascade
 )";
 
-$updates['202212081208'][] = "alter table core_import_mapping
+$updates['202212231031'][] = "alter table core_import_mapping
     add constraint core_import_mapping_pk
         primary key (entityTypeId, checksum);";
 
-$updates['202212081208'][] = "drop index moduleId on core_pdf_template;";
+$updates['202212231031'][] = "drop index moduleId on core_pdf_template;";
 
-$updates['202212081208'][] = "alter table `core_customfields_field` add column `filterable` BOOLEAN NOT NULL DEFAULT FALSE";
+$updates['202212231031'][] = "alter table `core_customfields_field` add column `filterable` BOOLEAN NOT NULL DEFAULT FALSE";
 
 
-$updates['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId in (SELECT aclId FROM core_customfields_field_set);";
-$updates['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId = (SELECT defaultAclId FROM core_entity WHERE name = 'FieldSet');";
-$updates['202212081208'][] = function() {
+$updates['202212231031'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId in (SELECT aclId FROM core_customfields_field_set);";
+$updates['202212231031'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId = (SELECT defaultAclId FROM core_entity WHERE name = 'FieldSet');";
+$updates['202212231031'][] = function() {
 	// make sure groups are visible to themselves
 	$stmt = go()->getDbConnection()
 		->insertIgnore(
