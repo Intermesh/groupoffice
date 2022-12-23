@@ -1843,11 +1843,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$inline = false;
 		}
 
-		//to work around office bug: http://support.microsoft.com/kb/2019105/en-us
-		//never use inline on IE with office documents because it will prompt for authentication.
-		$officeExtensions = array('doc','dot','docx','dotx','docm','dotm','xls','xlt','xla','xlsx','xltx','xlsm','xltm','xlam','xlsb','ppt','pot','pps','ppa','pptx','potx','ppsx','ppam','pptm','potm','ppsm');
-		if(\GO\Base\Util\Http::isInternetExplorer() && in_array($file->extension(), $officeExtensions)) {
-			$inline=false;
+		if($file->mimeType() == 'text/html') {
+			$inline = false;
 		}
 		
 		$imap = $account->openImapConnection($params['mailbox']);

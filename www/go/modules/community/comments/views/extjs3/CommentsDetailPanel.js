@@ -358,12 +358,6 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			prevStr = go.util.Format.date(r.get('date'));
 		}, this);
 
-		// this anchor will keep the panel scrolled down when images are loading and push the content down
-		this.commentsContainer.add({
-				xtype: "box",
-				cls: "anchor"
-			}
-		);
 
 		// Put a date on top
 		this.commentsContainer.insert(0,{
@@ -381,14 +375,15 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 	},
 	scrollDown : function() {
-		var dom = this.commentsContainer.getEl().dom;
-		dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
 
-		if(this.large) {
-			this.scrollToTopButton.getEl().scrollIntoView(this.ownerCt.body);
-		}
+		// make sure images are loaded
+		Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+			const dom = this.commentsContainer.getEl().dom;
+			dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
 
-		//console.log(scroll.dom.scrollTop, scroll.dom.scrollHeight, this.initScrollHeight, this.initScrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
-		//scroll.scroll("b", scroll.dom.scrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
+			if (this.large) {
+				this.scrollToTopButton.getEl().scrollIntoView(this.ownerCt.body);
+			}
+		});
 	}
 });

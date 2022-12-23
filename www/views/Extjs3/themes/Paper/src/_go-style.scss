@@ -2003,14 +2003,7 @@ table[id^="comments-ext"] b {
 }
 
 
-
 .go-messages {
-
-
-	overflow-anchor: none;
-
-
-
 
 	img {
 		max-width: 100%;
@@ -2170,11 +2163,6 @@ table[id^="comments-ext"] b {
 	> div {
 		max-height: dp(744);
 		min-height: dp(32);
-	}
-
-	.anchor {
-		height:1px;
-		overflow-anchor: auto;
 	}
 }
 .new-message {
