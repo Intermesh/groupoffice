@@ -12,12 +12,6 @@ go.AuthenticationManager = (function () {
 		loginToken: null,
 
 		/**
-		 * Contains the access token used for authenticating requests.
-		 */
-
-		accessToken: null,
-
-		/**
 		 * Contains the username of the user that is logging in
 		 */
 		username: null,
@@ -121,7 +115,6 @@ go.AuthenticationManager = (function () {
 		},
 		
 		logout: function (first) {
-
 			if (Ext.Ajax.isLoading())
 			{
 				if (first) {
@@ -135,7 +128,6 @@ go.AuthenticationManager = (function () {
 						url: go.AuthenticationManager.getAuthUrl(),
 						method: "DELETE",
 						callback: function() {
-							go.User.clearAccessToken();
 							go.reload();
 						}
 					});
@@ -147,7 +139,6 @@ go.AuthenticationManager = (function () {
 
 			var loginData = {
 				loginToken: this.loginToken, //while the user is authenticating only loginToken is set 
-				accessToken: this.accessToken, //after authentication the access token is retrieved. It can be stored for remembering the login when a user closes the browser.
 				rememberLogin: this.rememberLogin,
 				authenticators: authenticators
 			};
@@ -193,13 +184,11 @@ go.AuthenticationManager = (function () {
 		},
 
 		onAuthenticated: function (result, username, password) {
-			
-			go.User.setAccessToken(result.accessToken);
-
 			if(this.loginPanel) {
 				this.loginPanel.destroy();
 				this.loginPanel = null;
 			}
+
 
 
 			return go.User.onLoad(result).then(() => {

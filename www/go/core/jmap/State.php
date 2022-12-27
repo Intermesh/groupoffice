@@ -4,6 +4,7 @@ namespace go\core\jmap;
 use Exception;
 use GO\Base\Model\State as OldState;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\http\Response as HttpResponse;
 use go\core\model\Module;
 use go\core\model\Token;
@@ -44,12 +45,41 @@ class State extends AbstractState {
 	 */
 	public static function getClientAccessToken(): ?string
 	{
-		$tokenStr = static::getFromHeader();
+		$tokenStr = static::getFromCookie();
+
 		if(!$tokenStr) {
-			$tokenStr = static::getFromCookie();
+			$tokenStr = static::getFromHeader();
+		} else{
+			self::$cookieAccessTokenUsed = true;
 		}
 
 		return $tokenStr;
+	}
+
+	private static $cookieAccessTokenUsed = false;
+
+	/**
+	 * @throws Forbidden
+	 */
+	private static function checkCSRF(Token $token) : bool {
+
+		if(!self::$cookieAccessTokenUsed || $_SERVER['REQUEST_METHOD'] == 'GET') {
+			return true;
+		}
+
+		// if cookie is used then we must also check the CSRF token
+		$csrfToken = Request::get()->getHeader('X-CSRF-Token') ?: $_REQUEST['CSRFToken'] ?? null;
+		if(!$csrfToken) {
+			go()->debug("'X-CSRF-Token' header or 'CSRFToken' request parameter missing");
+			return false;
+		}
+
+		if($csrfToken != $token->CSRFToken) {
+			go()->debug("CSRFToken mismatch");
+			return false;
+		}
+
+		return true;
 	}
 	
 	/**	
@@ -62,6 +92,7 @@ class State extends AbstractState {
 	 * Get the authorization token by reading the request header "Authorization"
 	 *
 	 * @return boolean|Token
+	 * @throws Exception
 	 */
 	public function getToken() {
 		
@@ -75,6 +106,9 @@ class State extends AbstractState {
 
 			$this->token = go()->getCache()->get('token-' . $tokenStr);
 			if($this->token) {
+				if(!self::checkCSRF($this->token)) {
+					return false;
+				}
 				$this->token->activity();
 				return $this->token;
 			}
@@ -88,13 +122,17 @@ class State extends AbstractState {
 			if($this->token->isExpired()) {
 				try {
 					$this->token->delete($this->token->primaryKeyValues());
+					Token::unsetCookie();
 				} catch(Exception $e) {
 					ErrorHandler::logException($e);
 				}
 				$this->token = false;
 			} else{
+				if(!self::checkCSRF($this->token)) {
+					return false;
+				}
 				go()->getCache()->set('token-' . $tokenStr, $this->token);
-			}			
+			}
 		}
 		
 		return $this->token;
@@ -190,6 +228,8 @@ class State extends AbstractState {
 
 		//todo optimize
 		$response['state'] = OldState::model()->getFullClientState($this->getUserId());
+
+		$response['CSRFToken'] = $this->getToken()->CSRFToken;
 
 		return $response;
 	}

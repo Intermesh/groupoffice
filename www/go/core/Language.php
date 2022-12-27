@@ -5,6 +5,7 @@ namespace go\core;
 use Exception;
 use go\core\cache\None;
 use go\core\fs\File;
+use go\core\http\Response;
 use go\core\jmap\Request;
 use go\core\model\Module;
 use go\core\model\User;
@@ -45,8 +46,15 @@ class Language {
 	{
 
 		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
-			if(!headers_sent())
-				setcookie('GO_LANGUAGE', $_GET['SET_LANGUAGE'], time() + (10 * 365 * 24 * 60 * 60));
+			if(!headers_sent()) {
+				//setcookie('GO_LANGUAGE', $_GET['SET_LANGUAGE'], time() + (10 * 365 * 24 * 60 * 60));
+				Response::get()->setCookie('GO_LANGUAGE', $_GET['SET_LANGUAGE'], [
+					'expires' => time() + (10 * 365 * 24 * 60 * 60),
+					"path" => "/",
+					"samesite" => "Strict",
+					"domain" => Request::get()->getHost()
+				]);
+			}
 			return $_GET['SET_LANGUAGE'];
 		}
 
@@ -55,8 +63,14 @@ class Language {
 				$this->isoCode = $_COOKIE['GO_LANGUAGE'];
 			} else {
 				$this->isoCode = go()->getAuthState() && go()->getAuthState()->isAuthenticated() ? go()->getAuthState()->getUser(['language'])->language : $this->getBrowserLanguage();
-				if(!headers_sent())
-					setcookie('GO_LANGUAGE', $this->isoCode, time() + (10 * 365 * 24 * 60 * 60));
+				if(!headers_sent()) {
+					Response::get()->setCookie('GO_LANGUAGE', $this->isoCode, [
+						'expires' => time() + (10 * 365 * 24 * 60 * 60),
+						"path" => "/",
+						"samesite" => "Strict",
+						"domain" => Request::get()->getHost()
+					]);
+				}
 			}
 		}
 		return $this->isoCode;

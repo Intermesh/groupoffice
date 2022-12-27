@@ -1873,7 +1873,7 @@ table[id^="comments-ext"] b {
 		overflow: visible;
 		.x-toolbar {
 			border-top: 0;
-			height: dp(32);
+			//height: dp(32); this would cut the bottom of the buttons
 		}
 		.x-btn-text {
 			font-weight: normal;
