@@ -947,4 +947,52 @@ END;
 		return $keywords;
 
 	}
+
+	/**
+	 * Format a number by using the user preferences
+	 *
+	 * @param int $number The number
+	 * @param int $decimals Number of decimals to display
+	 * @access public
+	 * @return string
+	 */
+	public static function localize(?int $number = null, int $decimals = 2): string
+	{
+		if ($number === null) {
+			return "";
+		}
+		$user = go()->getAuthState()->getUser(['thousandsSeparator', 'decimalSeparator']);
+
+		$ts = $user ? $user->thousandsSeparator : go()->getConfig()['default_thousands_separator'];
+		$ds = $user ? $user->decimalSeparator : GO()->getConfig()['default_decimal_separator'];
+
+		return number_format(floatval($number), $decimals, $ds, $ts);
+	}
+
+	/**
+	 * Convert a number formatted by using the user preferences to a number understood by PHP
+	 *
+	 * @param string $number The number
+	 * @access public
+	 * @return float|null|bool
+	 */
+	public static function unlocalize(string $number = "")
+	{
+		if ($number == "") {
+			return null;
+		}
+		$user = go()->getAuthState()->getUser(['thousandsSeparator', 'decimalSeparator']);
+
+		$ts = $user ? $user->thousandsSeparator : go()->getConfig()['default_thousands_separator'];
+		$ds = $user ? $user->decimalSeparator : GO()->getConfig()['default_decimal_separator'];
+		$number = str_replace($ts, '', $number);
+		$number = str_replace($ds, '.', $number);
+
+		if (!empty($number) && !is_numeric($number)) {
+			return false;
+		}
+
+		return floatval($number);
+	}
+
 }

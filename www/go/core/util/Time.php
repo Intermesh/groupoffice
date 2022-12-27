@@ -32,7 +32,16 @@ class Time
 	}
 
 
-	public static function fromSeconds(int $seconds, bool $includeSeconds = false, $zeroPad = true): string
+	/**
+	 * Convert a number of seconds to a human-readable time format HH:MM[:SS]
+	 *
+	 * @param int $seconds number of seconds
+	 * @param bool $includeSeconds if true, render seconds
+	 * @param bool $zeroPad Render hours and minutes with a leading zero
+	 *
+	 * @return string
+	 */
+	public static function fromSeconds(int $seconds, bool $includeSeconds = false, bool $zeroPad = true): string
 	{
 		$hours = floor($seconds / 3600);
 		$seconds -= ($hours * 3600);
