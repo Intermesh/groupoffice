@@ -18,7 +18,7 @@ use go\core\validate\ErrorCode;
 use go\core\util\JSON;
 
 
-// we don't want to use that here. Because otheriwse the CSRFToken is needed too.
+// we don't want to use that here. Because otherwise the CSRFToken is needed too.
 unset($_COOKIE['accessToken']);
 
 /**

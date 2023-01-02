@@ -29,15 +29,19 @@ class State extends AbstractState {
 		return $matches[1];
 	}
 	
-	private static function getFromCookie() : ?string {
-//		if(Request::get()->getMethod() != "GET") {
-//			return false;
-//		}
-		
-		if(!isset($_COOKIE['accessToken'])) {
-			return null;
+	private static function getFromCookie() : ?string
+	{
+		if(isset($_COOKIE['accessToken'])) {
+			return $_COOKIE['accessToken'];
 		}
-		return $_COOKIE['accessToken'];
+		$httpCookies = $_SERVER['HTTP_COOKIE'] ?? 'foo;bar';
+		foreach(explode('; ', $httpCookies) as $item) {
+			$httpCookie = explode('=', $item);
+			if ($httpCookie[0] === 'accessToken') {
+				return $httpCookie[1];
+			}
+		}
+		return null;
 	}
 
 	/**
