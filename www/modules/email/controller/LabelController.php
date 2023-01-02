@@ -64,7 +64,7 @@ class LabelController extends AbstractModelController
             $findParams = FindParams::newInstance()->criteria($criteria);
             $stmt = Label::model()->find($findParams);
 
-            $deleteRecords = array();
+            $deleteRecords = [];
             while ($label = $stmt->fetch()) {
                 $deleteRecords[] = $label->getPk();
             }
@@ -78,8 +78,10 @@ class LabelController extends AbstractModelController
 
         $store->processDeleteActions($params, $this->model);
 
-        if (isset($params['delete_keys']) && !count($params['delete_keys'])) {
-            $store->response['deleteSuccess'] = true;
-        }
+		// The code below will trigger an error if both conditions are true, since response is protected
+	    // TODO: Remove entirely after a few months. The deleteSuccess is set anyway in the Store class
+//        if (isset($params['delete_keys']) && !count(json_decode($params['delete_keys']))) {
+//            $store->response['deleteSuccess'] = true;
+//        }
     }
 }
