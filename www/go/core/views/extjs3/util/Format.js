@@ -353,6 +353,18 @@
 				str += !showTime?"": " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
 				return str;
 			}
-		}
+		},
+
+		firstDayOfWeek: function (yearnb, weeknb) {
+			// Jan 1 of 'year'
+			let d = new Date(yearnb, 0, 1);
+			d = this.dateToUserTZ(d);
+			d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+			let week = (parseInt(weeknb) + (yearnb === d.getFullYear() ? -1 : 0 )),
+				days = parseInt(d.getDate()) + 7 * week;
+			d.setDate(days);
+			d.setDate(d.getDate() - 3);
+			return d;
+		},
 	};
 })();
