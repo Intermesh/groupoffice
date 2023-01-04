@@ -1,3 +1,5 @@
+- Core: minor bugfix in User archival
+
 09-09-2022 6.5.110
 - Billing: Sort scheduled order normal when sorting on date
 - Core: Bug where select options could be removed by mistake when editing the field

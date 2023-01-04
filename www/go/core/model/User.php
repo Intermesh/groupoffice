@@ -1074,14 +1074,16 @@ class User extends Entity {
 		if ($calendarId = $this->calendarSettings->calendar_id) {
 			$aclIds[] = \GO\Calendar\Model\Calendar::model()->findByPk($calendarId)->findAclId();
 		}
-		$grpId = $this->getPersonalGroup()->id();
-		foreach (Acl::findByIds($aclIds) as $rec) {
-			foreach ($rec->groups as $aclGrp) {
-				if (!in_array($aclGrp->groupId, [Group::ID_ADMINS, $grpId])) {
-					$rec->removeGroup($aclGrp->groupId);
+		if (count($aclIds)) {
+			$grpId = $this->getPersonalGroup()->id();
+			foreach (Acl::findByIds($aclIds) as $rec) {
+				foreach ($rec->groups as $aclGrp) {
+					if (!in_array($aclGrp->groupId, [Group::ID_ADMINS, $grpId])) {
+						$rec->removeGroup($aclGrp->groupId);
+					}
 				}
+				$rec->save();
 			}
-			$rec->save();
 		}
 	}
 
