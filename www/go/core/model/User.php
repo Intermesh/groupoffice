@@ -1264,14 +1264,16 @@ class User extends AclItemEntity {
 			go()->getDbConnection()->delete('pr2_default_resources', ['user_id' => $this->id] )->execute();
 		}
 
-		$grpId = $this->getPersonalGroup()->id();
-		foreach (Acl::findByIds($aclIds) as $rec) {
-			foreach ($rec->groups as $aclGrp) {
-				if ($aclGrp->groupId != $grpId) {
-					$rec->removeGroup($aclGrp->groupId);
+		if (count($aclIds)) {
+			$grpId = $this->getPersonalGroup()->id();
+			foreach (Acl::findByIds($aclIds) as $rec) {
+				foreach ($rec->groups as $aclGrp) {
+					if ($aclGrp->groupId != $grpId) {
+						$rec->removeGroup($aclGrp->groupId);
+					}
 				}
+				$rec->save();
 			}
-			$rec->save();
 		}
 	}
 
