@@ -2,6 +2,7 @@
 - Leavedays: fix error when saving existing leave day registration
 - Email: Fix error message upon deleting email label
 - Core: Don't render HTML in attachments to prevent XSS
+- Core: Bugfix in user archival
 
 19-12-2022 6.6.143
 - Email: fix print button
