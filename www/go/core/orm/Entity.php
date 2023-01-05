@@ -1094,7 +1094,7 @@ abstract class Entity extends Property {
    */
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
-		if(empty($sort)) {
+		if(empty($sort->getArray())) {
 			$sort->exchangeArray(static::defaultSort());
 		}
 
