@@ -34,13 +34,7 @@ class State extends AbstractState {
 		if(isset($_COOKIE['accessToken'])) {
 			return $_COOKIE['accessToken'];
 		}
-		$httpCookies = $_SERVER['HTTP_COOKIE'] ?? 'foo;bar';
-		foreach(explode('; ', $httpCookies) as $item) {
-			$httpCookie = explode('=', $item);
-			if ($httpCookie[0] === 'accessToken') {
-				return $httpCookie[1];
-			}
-		}
+
 		return null;
 	}
 
