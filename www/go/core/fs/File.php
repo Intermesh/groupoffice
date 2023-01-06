@@ -357,10 +357,10 @@ class File extends FileSystemObject {
 
 			if(!$r->hasHeader('Content-Disposition')) {
 				$disp = $inline ? 'inline' : 'attachment';
-				$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
+//				$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
 			}
 			if(!$r->hasHeader('Content-Transfer-Encoding')) {
-				$r->setHeader('Content-Transfer-Encoding', 'binary');
+//				$r->setHeader('Content-Transfer-Encoding', 'binary');
 			}
 
 			if ($useCache) {
@@ -384,11 +384,11 @@ class File extends FileSystemObject {
 			}
 		}
 
-		Response::get()->setHeader("Accept-Ranges", "bytes");
-
 		if (isset($_SERVER['HTTP_RANGE'])){
 			$this->rangeDownload();
 			return;
+		} else {
+			Response::get()->setHeader("Accept-Ranges", "bytes");
 		}
 		
 		if(ob_get_contents() != '') {			
@@ -414,21 +414,16 @@ class File extends FileSystemObject {
 
 	private function rangeDownload() {
 
-		$fp = $this->open('rb');
-
 		$size   = $this->getSize();
 		$length = $size;           // Content length
 		$start  = 0;               // Start byte
 		$end    = $size - 1;       // End byte
-//		Response::get()->setHeader("Accept-Ranges", "0-$length");
-
 
 		// multipart/byteranges
 		// http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
 		if (isset($_SERVER['HTTP_RANGE'])) {
 
-			$c_start = $start;
-			$c_end   = $end;
+
 			// Extract the range string
 			list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
 			// Make sure the client hasn't sent us a multibyte range
@@ -447,16 +442,15 @@ class File extends FileSystemObject {
 			// If not, we forward the file pointer
 			// And make sure to get the end byte if specified
 			if ($range[0] == '-') {
-
 				// The n-number of the last bytes is requested
 				$c_start = $size - substr($range, 1);
-			}
-			else {
-
+				$c_end   = $end;
+			}	else {
 				$range  = explode('-', $range);
 				$c_start = $range[0];
 				$c_end   = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;
 			}
+
 			/* Check the range and make sure it's treated according to the specs.
 			 * http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 			 */
@@ -470,10 +464,11 @@ class File extends FileSystemObject {
 				Response::get()->sendHeaders();
 				exit;
 			}
+
 			$start  = $c_start;
 			$end    = $c_end;
 			$length = $end - $start + 1; // Calculate new content length
-			fseek($fp, $start);
+
 			Response::get()->setStatus(206);
 			Response::get()->sendHeaders();
 		}
@@ -485,6 +480,11 @@ class File extends FileSystemObject {
 
 		// Start buffered download
 		$buffer = 1024 * 8;
+		$fp = $this->open('rb');
+		if($start > 0) {
+			fseek($fp, $start);
+		}
+
 		while(!feof($fp) && ($p = ftell($fp)) <= $end) {
 
 			if ($p + $buffer > $end) {
