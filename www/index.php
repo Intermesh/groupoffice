@@ -92,6 +92,8 @@ try {
 			//this token is used in default_scripts.inc.php too
 			$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
 			if($token) {
+
+                go()->getAuthState()->setToken($token);
 				$token->setAuthenticated();
 				$token->setCookie();
 
