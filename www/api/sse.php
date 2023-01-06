@@ -38,7 +38,6 @@ ini_set("max_execution_time", PushDispatcher::MAX_LIFE_TIME + 10);
 header('Cache-Control: no-cache');
 header('Pragma: no-cache');
 header("Content-Type: text/event-stream");
-header('Cache-Control: no-cache');
 header('Connection: keep-alive');
 header('X-Accel-Buffering: no');
 
