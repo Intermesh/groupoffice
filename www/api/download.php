@@ -55,6 +55,13 @@ try {
 			$inline = false;
 		}
 
+		$ua_info = \donatj\UserAgent\parse_user_agent();
+		if($ua_info['browser'] == 'Safari' && $blob->getFile()->getExtension() == 'webm' && !strstr(Request::get()->getUri(), 'webm')) {
+			//workaround webm bug in safari that needs a webm extension :(
+			header("Location: " . str_replace('download.php?', 'download.php/test.webm?', Request::get()->getFullUrl()));
+			exit();
+		}
+
 		$blob->output($inline);
 		exit();
 	}
