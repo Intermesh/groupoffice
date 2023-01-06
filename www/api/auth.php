@@ -55,6 +55,10 @@ function finishLogin(Token $token, string $rememberMeToken = null) {
 	$authState = new State();
 	$authState->setToken($token);
 	go()->setAuthState($authState);
+
+	$token->setAuthenticated();
+	$token->setCookie();
+
 	$response = $authState->getSession();
 
 	// Browsers should not store this for security. They must use the httpOnly flagged cookie that
@@ -168,8 +172,7 @@ try {
 
 					$token = new Token();
 					$token->userId = $rememberMe->userId;
-					$token->setAuthenticated();
-					$token->setCookie();
+
 
 					finishLogin($token, $rememberMe->getToken());
 				} else {
