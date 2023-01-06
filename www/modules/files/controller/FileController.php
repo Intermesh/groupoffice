@@ -6,6 +6,7 @@ namespace GO\Files\Controller;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
 use go\core\http\Client;
+use go\core\http\Request;
 use go\core\http\Response;
 use go\core\util\StringUtil;
 use GO\Email\Model\Account;
@@ -437,6 +438,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	
 
 	protected function actionDownload($params) {
+
 		\GO::session()->closeWriting();
 		
 		\GO::setMaxExecutionTime(0);
@@ -469,6 +471,13 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 						throw new \GO\Base\Exception\AccessDenied();
 					}
 				}
+			}
+
+			$ua_info = \donatj\UserAgent\parse_user_agent();
+			if($ua_info['browser'] == 'Safari' && $file->extension == 'webm' && !strstr(Request::get()->getUri(), 'webm')) {
+				//workaround webm bug in safari that needs a webm extension :(
+				header("Location: " . str_replace('index.php?', 'index.php/test.webm?', Request::get()->getFullUrl()));
+				exit();
 			}
 
 

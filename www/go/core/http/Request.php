@@ -333,7 +333,7 @@ class Request extends Singleton{
 	}
 
 	/**
-	 * Get full URL
+	 * Get full URL used for the request
 	 *
 	 * @return string
 	 */
@@ -342,6 +342,13 @@ class Request extends Singleton{
 		return $this->getProtocol(). '//' .$this->getHost(false) . $this->getUri();
 	}
 
+	/**
+	 * Get start of URL with protocol, host and port number.
+	 *
+	 * eg. http://localhost:8080
+	 *
+	 * @return string
+	 */
 	public function getBaseUrl(): string
 	{
 		return $this->getProtocol(). '//' .$this->getHost(false);
