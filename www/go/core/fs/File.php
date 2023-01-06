@@ -373,7 +373,7 @@ class File extends FileSystemObject {
 					$r->setModifiedAt($this->getModifiedAt());
 				}
 				if(!$r->hasHeader('Etag')) {
-					$r->setETag($this->getMd5Hash());
+					$r->setETag('"' . $this->getMd5Hash() . '"');
 				}
 				$r->abortIfCached();
 			} else{
