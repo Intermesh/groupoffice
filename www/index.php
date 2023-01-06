@@ -109,6 +109,7 @@ try {
 
             $token = new Token();
             $token->userId = $rememberMe->userId;
+            go()->getAuthState()->setToken($token);
             $token->setAuthenticated();
             $token->setCookie();
 
