@@ -56,7 +56,9 @@ function finishLogin(Token $token, string $rememberMeToken = null) {
 	$authState->setToken($token);
 	go()->setAuthState($authState);
 
-	$token->setAuthenticated();
+	if(!$token->isAuthenticated()) {
+		$token->setAuthenticated();
+	}
 	$token->setCookie();
 
 	$response = $authState->getSession();
@@ -120,12 +122,8 @@ try {
 				throw new SaveException($user);
 			}
 
-
-
 			$token = new Token();
 			$token->userId = $user->id;
-			$token->setAuthenticated();
-			$token->setCookie();
 
 			finishLogin($token);
 
@@ -223,17 +221,9 @@ try {
 				return $o::id();
 			}, $token->getPendingAuthenticators());
 
-			if (empty($authenticators) && !$token->isAuthenticated()) {
-				$token->setAuthenticated();
-			}
+			$authenticated = empty($authenticators);
 
-			if (!$token->save()) {
-				throw new Exception("Could not save token: " . var_export($token->getValidationErrors(), true));
-			}
-
-
-
-			if ($token->isAuthenticated()) {
+			if ($authenticated) {
 
 				$rememberMeToken = null;
 				if(!empty($data['rememberLogin'])) {
@@ -255,7 +245,6 @@ try {
 				'authenticators' => $authenticators
 			];
 
-
 			$validationErrors = [];
 			foreach ($testedAuthenticators as $authenticator) {
 				$errors = $authenticator->getValidationErrors();
@@ -266,7 +255,6 @@ try {
 					$validationErrors[$authenticator::id()] = [$authenticator::id() . ' ' . go()->t('failed')];
 				}
 			}
-
 
 			if (!empty($validationErrors)) {
 				$user = $token->getUser();
