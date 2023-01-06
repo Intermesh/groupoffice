@@ -476,7 +476,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			$ua_info = \donatj\UserAgent\parse_user_agent();
 			if($ua_info['browser'] == 'Safari' && $file->extension == 'webm' && !strstr(Request::get()->getUri(), 'webm')) {
 				//workaround webm bug in safari that needs a webm extension :(
-				header("Location: " . str_replace('index.php?', 'index.php/test.webm?', Request::get()->getFullUrl()));
+				header("Location: " . str_replace('index.php?', 'index.php/' . rawurlencode($file->name) . '?', Request::get()->getFullUrl()));
 				exit();
 			}
 
