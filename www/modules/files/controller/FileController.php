@@ -499,7 +499,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 				$inline = false;
 			}
 
-			$coreFsFile->output(true, !empty($params['cache']), [], $inline);
+			$coreFsFile->output(true, !array_key_exists('cache', $params) || !empty($params['cache']), [], $inline);
 
 		}catch(NotFound $e) {
 			Response::get()->setStatus(404);
