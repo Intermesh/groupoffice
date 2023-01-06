@@ -321,6 +321,10 @@ class Token extends Entity {
 		
 		$user = $this->getUser(['loginCount', 'lastLogin', 'language']);
 
+		if(!$this->refresh()) {
+			return false;
+		}
+
 		if($increaseLogins) {
 			$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
 			$user->loginCount++;
@@ -332,10 +336,6 @@ class Token extends Entity {
 			if (!$user->save()) {
 				return false;
 			}
-		}
-
-		if(!$this->refresh()) {
-			return false;
 		}
 		
 		// For backwards compatibility, set the server session for the old code
