@@ -118,7 +118,7 @@ try {
 
 		go()->fireEvent(\go\core\App::EVENT_INDEX);
 
-		Response::get()->sendHeaders();
+
 	}
 
 	GO::router()->runController();

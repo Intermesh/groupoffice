@@ -47,7 +47,7 @@ class Response extends Singleton{
 	{
 		parent::__construct();
 
-		$this->sendSecurityHeaders();
+		$this->sendCorsHeaders();
 	}
 
 	/**
@@ -312,10 +312,7 @@ class Response extends Singleton{
 		}
 	}
 
-	protected function sendSecurityHeaders() {
-
-		$this->sendCorsHeaders();
-
+	public function sendDocumentSecurityHeaders() {
 		$frameAncestors = go()->getConfig()['frameAncestors'];
 
 		if(empty($frameAncestors)) {

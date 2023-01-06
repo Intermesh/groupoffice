@@ -26,6 +26,8 @@ if (Request::get()->getMethod() == 'OPTIONS') {
 
 try {
 
+	Response::get()->sendDocumentSecurityHeaders();
+
 	if (strpos($_SERVER['PATH_INFO'], '/') === false) {
 
 		$blob = Blob::findById(App::get()->getSettings()->logoId);
