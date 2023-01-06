@@ -52,10 +52,7 @@ function finishLogin(Token $token, string $rememberMeToken = null) {
 	$authState->setToken($token);
 	go()->setAuthState($authState);
 
-	if(!$token->isAuthenticated()) {
-		$token->setAuthenticated();
-	}
-	$token->setCookie();
+	$token->setAuthenticated();
 
 	$response = $authState->getSession();
 
