@@ -384,6 +384,8 @@ class File extends FileSystemObject {
 			}
 		}
 
+		Response::get()->setHeader("Accept-Ranges", "bytes");
+
 		if (isset($_SERVER['HTTP_RANGE'])){
 			$this->rangeDownload();
 			return;
@@ -419,7 +421,7 @@ class File extends FileSystemObject {
 		$start  = 0;               // Start byte
 		$end    = $size - 1;       // End byte
 //		Response::get()->setHeader("Accept-Ranges", "0-$length");
-		Response::get()->setHeader("Accept-Ranges", "bytes");
+
 
 		// multipart/byteranges
 		// http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
