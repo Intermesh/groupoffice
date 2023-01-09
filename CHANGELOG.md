@@ -1,4 +1,4 @@
-6.6.144
+09-01-2023 6.6.144
 - Leavedays: fix error when saving existing leave day registration
 - Email: Fix error message upon deleting email label
 - Core: Don't render HTML in attachments to prevent XSS
