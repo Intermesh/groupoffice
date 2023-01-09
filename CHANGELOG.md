@@ -3,6 +3,8 @@
 - Email: Fix error message upon deleting email label
 - Core: Don't render HTML in attachments to prevent XSS
 - Core: Bugfix in user archival
+- apikeys: Fixed double collation in update query
+- multi instance: generate wopi apache config for Microsoft Office Online
 
 19-12-2022 6.6.143
 - Email: fix print button

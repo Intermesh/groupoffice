@@ -165,6 +165,7 @@ class Module extends \go\core\Module {
 
 		$tld = $this->getTLD();
 
+		// Each instance must have a dedicated WOPI subdomain for Microsoft: https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/online/build-test-ship/environments#wopi-discovery-urls
 		$wopialiases = array_map(function($hostname) {
 			$parts = explode(".", $hostname);
 			$first = array_shift($parts);
