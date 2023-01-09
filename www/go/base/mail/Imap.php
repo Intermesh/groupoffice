@@ -554,7 +554,8 @@ class Imap extends ImapBodyStruct
 					$has_no_kids = true;
 				}
 
-				$subscribed = $listSubscribed || $this->_isSubscribed($folder, $flags);
+				$decodedName = $this->utf7_decode($folder);
+				$subscribed = $listSubscribed || $this->_isSubscribed($decodedName, $flags);
 
 				$nonexistent = stristr($flags, 'NonExistent');
 
@@ -566,7 +567,7 @@ class Imap extends ImapBodyStruct
 					$folder = $this->_unescape($folder);
 					$folders[$folder] = array(
 									'delimiter' => $delim,
-									'name' => $this->utf7_decode($folder),
+									'name' => $decodedName,
 									'marked' => $marked,
 									'noselect' => $no_select,
 									'nonexistent' => $nonexistent,
