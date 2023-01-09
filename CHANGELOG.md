@@ -5,6 +5,7 @@
 - Core: Bugfix in user archival
 - apikeys: Fixed double collation in update query
 - multi instance: generate wopi apache config for Microsoft Office Online
+- Core: Archive user also removes them from groups
 
 19-12-2022 6.6.143
 - Email: fix print button
