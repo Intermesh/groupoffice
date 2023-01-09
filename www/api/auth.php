@@ -17,10 +17,6 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\util\JSON;
 
-
-// we don't want to use that here. Because otheriwse the CSRFToken is needed too.
-unset($_COOKIE['accessToken']);
-
 /**
  * @param array $data
  * @param int $status
@@ -80,14 +76,13 @@ try {
 
 
 //Create the app with the config.php file
-	App::get()->setAuthState(new State());
+	App::get();
 
 	if (Request::get()->getMethod() == "OPTIONS") {
 		output();
 	}
 
 	go()->getDebugger()->group("auth");
-	$auth = new Authenticate();
 
 	if (Request::get()->getMethod() == "DELETE") {
 		$data = ['action' => 'logout'];
@@ -102,7 +97,16 @@ try {
 			$data['action'] = 'login';
 		}
 		Response::get()->setContentType("application/json;charset=utf-8");
+
+		// we don't want to use that here. Because otherwise the CSRFToken is needed too.
+		unset($_COOKIE['accessToken']);
 	}
+
+	go()->setAuthState(new State());
+	go()->getDebugger()->group("auth");
+	$auth = new Authenticate();
+
+
 
 	switch ($data['action']) {
 

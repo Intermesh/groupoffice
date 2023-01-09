@@ -62,6 +62,13 @@ try {
 			exit();
 		}
 
+		$inline = !empty($_GET['inline']);
+
+		// prevent html to render on same domain having access to all global JS stuff
+		if($blob->type == 'text/html') {
+			$inline = false;
+		}
+
 		$blob->output($inline);
 		exit();
 	}

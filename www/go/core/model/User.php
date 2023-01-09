@@ -519,9 +519,8 @@ class User extends AclItemEntity {
 			}
 		}
 
-		if($this->isModified('groups')) {	
-			
-			
+		if($this->isModified('groups')) {
+
 			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
 				$this->groups[] = Group::ID_EVERYONE;
 				// $this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group everyone"));
@@ -762,6 +761,9 @@ class User extends AclItemEntity {
 	
 	protected function internalSave(): bool
 	{
+		if($this->archive) {
+			$this->groups = [Group::ID_EVERYONE, $this->getPersonalGroup()->id];
+		}
 		
 		if(isset($this->plainPassword)) {
 			$this->password = $this->passwordHash($this->plainPassword);

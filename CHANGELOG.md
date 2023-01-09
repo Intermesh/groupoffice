@@ -1,12 +1,18 @@
-6.6.144
+09-01-2023 6.6.144
 - Leavedays: fix error when saving existing leave day registration
-
+- Email: Fix error message upon deleting email label
 - Core: Don't render HTML in attachments to prevent XSS
+- Core: Bugfix in user archival
+- apikeys: Fixed double collation in update query
+- multi instance: generate wopi apache config for Microsoft Office Online
+- Core: Archive user also removes them from groups
+- Email: Folders with double quotes in the name didn't show up
+- Tasks: Portlet had a timezone bug where it queried tasks in UTC times.
 
 19-12-2022 6.6.143
 - Email: fix print button
 
-19-12-2022admin  6.6.142
+19-12-2022 6.6.142
 - Core: No HTML in server errors
 - ActiveSync: Fixed error  Argument 1 passed to GoSyncUtils::getBodyPreferenceMatch() must be of the type array or null, bool given, called in modules/z-push/backend/go/goMail.php on line 120
 - Core: Permission overview sorted by group name and sometimes it showed +2000 results if name of the item could not be found.

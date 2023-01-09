@@ -1345,3 +1345,6 @@ $updates['202212231031'][] = function() {
 
 $updates['202212231031'][] = "alter table core_auth_token
     add `CSRFToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL after accessToken;";
+
+
+$updates['202301091428'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
