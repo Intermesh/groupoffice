@@ -149,13 +149,37 @@ class Module extends \go\core\Module {
 		echo $this->parseTemplate($tpl, "DEFAULT", $i['DEFAULT']);
 	}
 
+	private function getTLD() : string {
+		$hostname = Request::get()->getHost();
+		$dotPos = strpos($hostname, '.');
+
+		if(!$dotPos) {
+			return "localdomain";
+		}
+
+		return substr($hostname, $dotPos + 1);
+	}
+
 	private function parseTemplate($tpl, $version, $hostnames) {
 
-		$tld = substr($_SERVER['HTTP_HOST'], strpos($_SERVER['HTTP_HOST'], '.') + 1);
+
+		$tld = $this->getTLD();
+
+		$wopialiases = array_map(function($hostname) {
+			$parts = explode(".", $hostname);
+			$first = array_shift($parts);
+			$alias = $first . '.wopi';
+
+			if(count($parts)) {
+				$alias .= '.' . implode("." , $parts);
+			}
+			return $alias;
+		}, $hostnames);
 
 		$replacements = [
 			'{docroot}' => $version == 'DEFAULT' ? go()->getEnvironment()->getInstallFolder()->getPath() : '/usr/local/share/groupoffice-' . $version . '/www',
 			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld .' ' .$this->implode($hostnames) : $this->implode($hostnames),
+			'{wopialiases}' => $version == 'DEFAULT' ? '*.wopi.' . $tld .' ' .$this->implode($wopialiases) : $this->implode($wopialiases),
 			'{tld}' => $tld,
 			'{servername}' => strtolower(str_replace('.', '', $version)) . '.' . $tld,
 			'{version}' => str_replace('.', '', $version)
