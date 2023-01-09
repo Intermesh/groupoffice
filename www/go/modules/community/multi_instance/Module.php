@@ -210,6 +210,6 @@ class Module extends \go\core\Module {
 			}
 		}
 
-		return trim($str);
+		return trim($str, " \n\\");
 	}
 }
