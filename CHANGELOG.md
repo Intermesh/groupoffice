@@ -1,4 +1,6 @@
+10-09-2023 6.5.111
 - Core: minor bugfix in User archival
+- Remove window.onerror and unhandled rejection error dialog as it's of no use for the end user.
 
 09-09-2022 6.5.110
 - Billing: Sort scheduled order normal when sorting on date
