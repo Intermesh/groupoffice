@@ -1,3 +1,6 @@
+6.6.145
+- Tickets: Fix rendering HTML characters
+
 09-01-2023 6.6.144
 - Leavedays: fix error when saving existing leave day registration
 - Email: Fix error message upon deleting email label
