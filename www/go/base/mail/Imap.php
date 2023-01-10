@@ -554,6 +554,7 @@ class Imap extends ImapBodyStruct
 					$has_no_kids = true;
 				}
 
+				$folder = $this->_unescape($folder);
 				$decodedName = $this->utf7_decode($folder);
 				$subscribed = $listSubscribed || $this->_isSubscribed($decodedName, $flags);
 
@@ -563,9 +564,9 @@ class Imap extends ImapBodyStruct
 					$no_select = true;
 				}
 
-				if (!isset($folders[$folder]) && $folder) {
-					$folder = $this->_unescape($folder);
-					$folders[$folder] = array(
+				if (!isset($folders[$decodedName]) && $decodedName) {
+
+					$folders[$decodedName] = array(
 									'delimiter' => $delim,
 									'name' => $decodedName,
 									'marked' => $marked,
@@ -588,9 +589,9 @@ class Imap extends ImapBodyStruct
 					}
 					else {
 						if($lastProp=='MESSAGES'){
-							$folders[$folder]['messages']=intval($v);
+							$folders[$decodedName]['messages']=intval($v);
 						}elseif($lastProp=='UNSEEN'){
-							$folders[$folder]['unseen']=intval($v);
+							$folders[$decodedName]['unseen']=intval($v);
 						}
 					}
 
@@ -638,8 +639,6 @@ class Imap extends ImapBodyStruct
 		}
 
 		\GO\Base\Util\ArrayUtil::caseInsensitiveSort($folders);
-
-		\GO::debug($folders);
 
 		return $folders;
 	}
@@ -852,7 +851,7 @@ class Imap extends ImapBodyStruct
 			$this->touched_folders[] = $mailbox_name;
 		}
 
-		$box = $this->utf7_encode($mailbox_name);
+		$box = $this->addslashes($this->utf7_encode($mailbox_name));
 		$this->clean($box, 'mailbox');
 
 		\GO::debug("Selecting IMAP mailbox $box");
@@ -2560,7 +2559,7 @@ class Imap extends ImapBodyStruct
 
 		$uid_string = implode(',',$uids);
 
-		$command = "UID COPY %s \"".$this->utf7_encode($mailbox)."\"\r\n";
+		$command = "UID COPY %s \"".$this->addslashes($this->utf7_encode($mailbox))."\"\r\n";
 		$status = $this->_runInChunks($command, $uids);
 		return $status;
 	}
