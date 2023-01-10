@@ -11,6 +11,7 @@
 - Core: Archive user also removes them from groups
 - Email: Folders with double quotes in the name didn't show up
 - Tasks: Portlet had a timezone bug where it queried tasks in UTC times.
+- Core: Remove window.onerror and unhandled rejection error dialog as it's of no use for the end user.
 
 19-12-2022 6.6.143
 - Email: fix print button
