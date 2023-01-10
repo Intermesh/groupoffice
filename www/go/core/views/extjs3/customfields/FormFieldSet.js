@@ -23,7 +23,12 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 		var fields = go.customfields.CustomFields.getFormFields(this.fieldSet.id);
 
-
+		// add field sets that should be added to this tab
+		go.customfields.CustomFields.getFieldSets(this.fieldSet.entity).forEach((fs) => {
+			if( fs.parentFieldSetId == this.fieldSet.id) {
+				fields.push(new go.customfields.FormFieldSet({fieldSet: fs, layout: "column"}));
+			}
+		});
 
 		var c = fields.length;
 		var fieldsPerColumn = Math.floor(c / this.fieldSet.columns);
@@ -41,7 +46,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			me = this,
 			max = fieldsInFirstColumn;
 
-
 		fields.forEach(function (field) {
 			currentCol.items.push(field);
 			colItemCount++;
@@ -54,13 +58,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		});
 
 		items.push(currentCol);
-
-
-		go.customfields.CustomFields.getFieldSets(this.fieldSet.entity).forEach((fs) => {
-			if( fs.parentFieldSetId == this.fieldSet.id) {
-				items.push(new go.customfields.FormFieldSet({fieldSet: fs}));
-			}
-		});
 		
 		Ext.apply(this, {
 			title: this.fieldSet.name,
