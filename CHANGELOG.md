@@ -1,7 +1,4 @@
-6.6.145
-- Tickets: Fix rendering HTML characters
-
-09-01-2023 6.6.144
+?-01-2023 6.6.144
 - Leavedays: fix error when saving existing leave day registration
 - Email: Fix error message upon deleting email label
 - Core: Don't render HTML in attachments to prevent XSS
@@ -12,6 +9,8 @@
 - Email: Folders with double quotes in the name didn't show up
 - Tasks: Portlet had a timezone bug where it queried tasks in UTC times.
 - Core: Remove window.onerror and unhandled rejection error dialog as it's of no use for the end user.
+- Core: Keep scroll position when adding new custom fields
+- Tickets: Fix rendering HTML characters
 
 19-12-2022 6.6.143
 - Email: fix print button
