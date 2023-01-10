@@ -12,7 +12,7 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 		this.formPanel.on("setvalues", (form, v) => {
 			this.fieldSetCombo.store.setFilter("default", {
 				entities: [v.entity],
-				exclude: [this.currentId],
+				exclude: this.currentId ? [this.currentId] : undefined,
 				isTab: true
 			});
 
@@ -28,16 +28,16 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 		));
 		return [{
 				xtype: 'fieldset',
-				items: [{
-						xtype: "hidden",
-						name: "entity"
-					},
+				items: [
 					{
 						xtype: 'textfield',
 						name: 'name',
 						fieldLabel: t("Name"),
 						anchor: '100%',
 						allowBlank: false
+					},{
+						xtype: "hidden",
+						name: "entity"
 					}, {
 						xtype: "checkbox",
 						name: 'isTab',

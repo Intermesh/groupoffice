@@ -12,6 +12,7 @@
 - Core: Keep scroll position when adding new custom fields
 - Tickets: Fix rendering HTML characters
 - Core: Fixed bug where custom field sets put on another tab didn't show in the right layout
+- Core: Fixed bug where "Show on tab" combo was empty when creating a new field set.groups
 
 19-12-2022 6.6.143
 - Email: fix print button
