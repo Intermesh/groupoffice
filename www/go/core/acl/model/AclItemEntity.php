@@ -168,16 +168,13 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	protected static function logDeleteChanges(Query $query): bool
 	{
-
 		$table = self::getMapping()->getPrimaryTable();
 		$changes = clone $query;
 		$changes->select($table->getAlias() . '.id as entityId');
 
 		$alias = static::joinAclEntity($changes);
 
-		$records = $changes->select($alias . ', "1" as destroyed', true)
-			->all(); //we have to select now because later these id's are gone from the db
-	
+		$records = $changes->select($alias . ', "1" as destroyed', true);
 		return static::entityType()->changes($records);
 	}
 

@@ -436,8 +436,7 @@ abstract class Entity  extends OrmEntity {
 		$idsQuery = clone $query;
 		$records = $idsQuery
 			->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed')
-			->fetchMode(PDO::FETCH_ASSOC)
-			->all(); //we have to select now because later these id's are gone from the db
+			->fetchMode(PDO::FETCH_ASSOC);
 		return static::entityType()->changes($records);
 	}
 
