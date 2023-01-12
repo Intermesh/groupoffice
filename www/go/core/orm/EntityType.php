@@ -382,12 +382,23 @@ class EntityType implements ArrayableInterface {
 			return true;
 		}
 
+		$maxChanges = 10000;
+
 		if(!is_array($changedEntities)) {
-			$changedEntities = $changedEntities->fetchMode(PDO::FETCH_ASSOC)->all();
+			//we have to select now because later these id's are gone from the db
+			$changedEntities = $changedEntities
+				->limit(++$maxChanges)
+				->fetchMode(PDO::FETCH_ASSOC)
+				->all();
 		}
 
 		if(empty($changedEntities)) {
 			return true;
+		}
+
+		if(count($changedEntities) == $maxChanges) {
+			// if there are more than the max resync the entity
+			return static::entityType()->resetSyncState();
 		}
 
 		if(!is_array($changedEntities[0])) {
