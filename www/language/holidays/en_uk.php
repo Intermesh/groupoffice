@@ -11,7 +11,7 @@ if($year === '2022') {
 }
 
 if($year === '2023') {
-	$input_holidays['fix']['08-05'] = 'Bank holiday for the coronation of King Charles III';
+	$input_holidays['fix']['05-08'] = 'Bank holiday for the coronation of King Charles III';
 }
 
 // holidays with variable date (christian holidays computation is based on the date of easter day)
