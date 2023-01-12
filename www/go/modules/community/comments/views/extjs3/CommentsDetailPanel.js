@@ -220,6 +220,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 		this.commentsContainer.removeAll();
 
+		const imagePromises = [];
+
 		this.store.each(function(r) {
 			let labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
 
@@ -343,7 +345,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 			readMore.getComponent("content").on("afterrender" , (content) => {
 
-				go.util.replaceBlobImages(content.getEl().dom);
+				imagePromises.push(go.util.replaceBlobImages(content.getEl().dom));
 
 
 				if(quote) {
@@ -371,19 +373,22 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			]
 		});
 		this.doLayout();
-		this.scrollDown();
+		this.scrollDown(imagePromises);
 
 	},
-	scrollDown : function() {
+	scrollDown : function(imagePromises) {
 
-		// make sure images are loaded
-		Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+
+		Promise.all(imagePromises).then(() => {
 			const dom = this.commentsContainer.getEl().dom;
 			dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
 
 			if (this.large) {
 				this.scrollToTopButton.getEl().scrollIntoView(this.ownerCt.body);
 			}
+
+			console.warn("scrollDown2");
 		});
+
 	}
 });

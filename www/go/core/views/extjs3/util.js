@@ -788,15 +788,11 @@ go.util =  (function () {
 					img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
 					promises.push(this.getBlobURL(blobId).then(src => {
-
 						img.src = src;
-						img.onload = () => {
-							URL.revokeObjectURL(img.src);
-						}
 					})
 						.then(() => {
 						//wait till image is fully loaded
-						return new Promise(resolve => { img.onload = img.onerror = resolve; })
+						return new Promise(resolve => { img.onload = img.onerror =() => { URL.revokeObjectURL(img.src); resolve(); } })
 					}))
 
 				}
