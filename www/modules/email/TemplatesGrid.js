@@ -146,7 +146,7 @@ Ext.extend(GO.email.TemplatesGrid, GO.grid.GridPanel,{
 		if(!this.emailTemplateDialog){
 			this.emailTemplateDialog = new GO.email.EmailTemplateDialog();
 			this.emailTemplateDialog.on('save', function(){
-				this.store.load();
+				this.store.reload();
 			}, this);
 		}
 		this.emailTemplateDialog.show(template_id);

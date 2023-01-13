@@ -30,6 +30,7 @@ namespace GO\Base;
 
 
 use go\core\ErrorHandler;
+use go\core\jmap\State;
 use go\core\model\Token;
 
 class Session extends Observable{
@@ -86,6 +87,8 @@ class Session extends Observable{
 		if(isset($_REQUEST['GOSID'])){
 			if(!isset($_REQUEST['security_token']) || $_SESSION['GO_SESSION']['security_token']!=$_REQUEST['security_token']){
 				throw new \Exception\SecurityTokenMismatch();
+			} else{
+				State::$CSRFcheck = false;
 			}
 		}		
 		

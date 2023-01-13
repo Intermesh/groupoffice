@@ -56,12 +56,19 @@ class State extends AbstractState {
 
 	private static $cookieAccessTokenUsed = false;
 
+
+	/**
+	 * Check CSRF token on each POST request.
+	 * @var bool
+	 */
+	public static $CSRFcheck = true;
+
 	/**
 	 * @throws Forbidden
 	 */
 	private static function checkCSRF(Token $token) : bool {
 
-		if(!self::$cookieAccessTokenUsed || $_SERVER['REQUEST_METHOD'] == 'GET') {
+		if(!self::$CSRFcheck || !self::$cookieAccessTokenUsed || $_SERVER['REQUEST_METHOD'] == 'GET') {
 			return true;
 		}
 

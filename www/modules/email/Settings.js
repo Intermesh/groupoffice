@@ -2,13 +2,11 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 	title : t("E-mail"),
 	iconCls: 'ic-email',
 	autoScroll: true,
-	layout: "border",
 	initComponent: function() {
 
 		this.items=[{
 			xtype:'fieldset',
 			title:t("Options"),
-			region: "north",
 			autoHeight: true,
 			layout: "column",
 			items:[
@@ -78,7 +76,8 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 		]
 			},
 			this.templatesGrid = new GO.email.TemplatesGrid({
-				region: "center"
+				region: "center",
+				autoHeight: true
 			})
 		];
 
