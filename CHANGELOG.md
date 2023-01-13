@@ -1,4 +1,8 @@
-- caldav: Task sync failed with reminder: Fixed: Too few arguments to function go\\core\\orm\\Property::__construct(), 0 passed in /usr/share/groupoffice/go/modules/community/tasks/convert/VCalendar.php on line 360
+- Caldav: Task sync failed with reminder: Fixed: Too few arguments to
+    function go\\core\\orm\\Property::__construct(), 0 passed in
+    /usr/share/groupoffice/go/modules/community/tasks/convert/VCalendar.php on line 360
+- Core: Don't log more than 10000 changes at once. Resync the whole entity in that case. This is to solve an issue where
+    the garbage collection tried to delete millions of log entries.
 
 10-01-2023 6.6.144
 - Leavedays: fix error when saving existing leave day registration
