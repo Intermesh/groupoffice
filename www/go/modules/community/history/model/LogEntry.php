@@ -5,6 +5,7 @@ namespace go\modules\community\history\model;
 use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclEntity;
+use go\core\acl\model\AclInheritEntity;
 use go\core\db\Criteria;
 use go\core\db\Query as DbQuery;
 use go\core\http\Request;
@@ -230,7 +231,13 @@ class LogEntry extends AclOwnerEntity {
 		$this->entityTypeId = $entity->entityType()->getId();
 		$this->entity = $entity->entityType()->getName();
 		$this->entityId = $entity->id();
-		$this->removeAcl = $entity instanceof AclOwnerEntity || ($entity instanceof ActiveRecord && $entity->aclField() && (!$entity->isJoinedAclField || $entity->isAclOverwritten() || ($entity instanceof  Folder && !empty($entity->acl_id) && !$entity->readonly)));
+
+		if($entity instanceof AclInheritEntity) {
+			$this->removeAcl = $entity->hasOwnAcl();
+		} else {
+			$this->removeAcl = $entity instanceof AclOwnerEntity || ($entity instanceof ActiveRecord && $entity->aclField() && (!$entity->isJoinedAclField || $entity->isAclOverwritten() || ($entity instanceof Folder && !empty($entity->acl_id) && !$entity->readonly)));
+		}
+
 		$this->description = $entity->title();
 		$this->cutPropertiesToColumnLength();
 		$this->setAclId($entity->findAclId());

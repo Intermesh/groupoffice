@@ -138,9 +138,10 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 	}
 
 	/**
+	 * Check if the ACL is different from than the ACL it inherits from.
 	 * @throws Exception
 	 */
-	protected function hasOwnAcl(): bool
+	public function hasOwnAcl(): bool
 	{
 		return $this->{static::$aclColumnName} != $this->findAclEntity()->findAclId();
 	}
