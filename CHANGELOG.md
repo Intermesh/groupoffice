@@ -1,3 +1,4 @@
+13-01-2023 6.6.145
 - Caldav: Task sync failed with reminder: Fixed: Too few arguments to
     function go\\core\\orm\\Property::__construct(), 0 passed in
     /usr/share/groupoffice/go/modules/community/tasks/convert/VCalendar.php on line 360
@@ -6,6 +7,7 @@
 - Tickets: Fixed SQLSTATE[42S22]: Column not found: 1054 Unknown column 's.starred' in 'field list'
 - Address book: Fixed import when VCF had empty phone number or emails in it.
 - Email: Fixed email templates not visible on mobile screen
+- Core: Clear cache on request with invalid license error to prevent invalid cache creation without licensed modules.
 
 10-01-2023 6.6.144
 - Leavedays: fix error when saving existing leave day registration
