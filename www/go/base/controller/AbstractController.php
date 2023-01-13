@@ -50,6 +50,7 @@ use GO\Base\Model\Module;
 use GO\Base\Observable;
 use GO\Base\Util\Number;
 use GO\Base\View\AbstractView;
+use go\core\jmap\State;
 use ReflectionMethod;
 
 
@@ -199,6 +200,8 @@ abstract class AbstractController extends Observable {
 			//\GO::session()->logout();			
 			throw new SecurityTokenMismatch();
 
+		} else{
+			State::$CSRFcheck = false;
 		}
 	}	
 	
