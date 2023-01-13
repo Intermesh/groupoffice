@@ -8,6 +8,7 @@ use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\orm\Entity;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Property as OrmProperty;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
@@ -228,21 +229,27 @@ class VCard extends AbstractConverter {
 	 * @return OrmProperty[]
 	 */
 	private function importHasMany(Contact $entity, array $prop, ?Property $vcardProp, string $cls, callable $fn): array {
-		$index = 0;
+		$importCount = 0;
 		if (!empty($vcardProp)) {
-			foreach ($vcardProp as $index => $value) {
-				if (!isset($prop[$index])) {
-					$prop[$index] = new $cls($entity);
+			foreach ($vcardProp as $value) {
+				$v = call_user_func($fn, $value);
+				if(!$v) {
+					continue;
+				}
+				if (!isset($prop[$importCount])) {
+					$prop[$importCount] = new $cls($entity);
 				}
 
 				/** @noinspection PhpPossiblePolymorphicInvocationInspection */
-				$prop[$index]->type = $this->convertType((string) $value['TYPE']);
-				$v = call_user_func($fn, $value);
-				$prop[$index]->setValues($v);
+				$prop[$importCount]->type = $this->convertType((string) $value['TYPE']);
+
+				$prop[$importCount]->setValues($v);
+				$importCount++;
 			}
-			$index++;
+
 		}
 
+		$index = $importCount + 1;
 		$c = count($prop);
 		if ($c > $index) {
 			array_splice($prop, $index, $c - $index);
@@ -335,7 +342,11 @@ class VCard extends AbstractConverter {
 
 		empty($vcardComponent->NOTE) ?: $entity->notes = (string) $vcardComponent->NOTE;
 		$entity->emailAddresses = $this->importHasMany($entity, $entity->emailAddresses, $vcardComponent->EMAIL, EmailAddress::class, function($value) {
-			return ['email' => (string) $value];
+			$email = (string) $value;
+			if(empty($email)) {
+				return false;
+			}
+			return ['email' => $email];
 		});
 
 		if(empty($entity->name)) {
@@ -356,7 +367,11 @@ class VCard extends AbstractConverter {
 		}
 
 		$entity->phoneNumbers = $this->importHasMany($entity, $entity->phoneNumbers, $vcardComponent->TEL, PhoneNumber::class, function($value) {
-			return ['number' => (string) $value];
+			$number = (string) $value;
+			if(empty($number)) {
+				return false;
+			}
+			return ['number' => (string) $number];
 		});
 
 		$entity->addresses = $this->importHasMany($entity, $entity->addresses, $vcardComponent->ADR, Address::class, function($value) {
@@ -384,7 +399,7 @@ class VCard extends AbstractConverter {
 		$this->importPhoto($entity, $vcardComponent);
 
 		if (!$entity->save()) {
-			throw new Exception("Could not save contact");
+			throw new SaveException($entity);
 		}
 
 		if(!$entity->isOrganization) {

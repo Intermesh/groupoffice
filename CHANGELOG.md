@@ -4,6 +4,7 @@
 - Core: Don't log more than 10000 changes at once. Resync the whole entity in that case. This is to solve an issue where
     the garbage collection tried to delete millions of log entries.
 - Tickets: Fixed SQLSTATE[42S22]: Column not found: 1054 Unknown column 's.starred' in 'field list'
+- Address book: Fixed import when VCF had empty phone number or emails in it.
 
 10-01-2023 6.6.144
 - Leavedays: fix error when saving existing leave day registration
