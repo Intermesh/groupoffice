@@ -1137,7 +1137,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload) {
 							}
 							Ext.getBody().mask(t("Importing..."));
 							go.Jmap.request({
-								method: "Contact/loadVCS",
+								method: "Contact/loadVCF",
 								params: {
 									account_id: panel.account_id,
 									mailbox: panel.mailbox,
