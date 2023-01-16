@@ -205,6 +205,13 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	},
 		
 	updateView : function(o) {
+
+		if(this.lastImages) {
+			this.lastImages.forEach(img => {
+				URL.revokeObjectURL(img.src);
+			});
+		}
+
 		if(this.collapsed || !this.commentsContainer.rendered) {
 			return;
 		}
@@ -375,11 +382,17 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		this.doLayout();
 		this.scrollDown(imagePromises);
 
+
 	},
 	scrollDown : function(imagePromises) {
 
+		this.lastImages = [];
 
-		Promise.all(imagePromises).then(() => {
+		Promise.all(imagePromises).then((imgs) => {
+
+			// we will clear the memory on the next load or reset.
+			this.lastImages = this.lastImages.concat(...imgs);
+
 			const dom = this.commentsContainer.getEl().dom;
 			dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
 

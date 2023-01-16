@@ -723,51 +723,47 @@ go.util =  (function () {
 		return a;
 	},
 
-		blobCache : {},
-
-		getBlobURL : function(blobId) {
-			let fetchOptions = {
-				method: 'GET',
-				headers: {
-					'Authorization': 'Bearer ' + go.User.accessToken
-				}
+	getBlobURL : function(blobId) {
+		let fetchOptions = {
+			method: 'GET',
+			headers: {
+				'Authorization': 'Bearer ' + go.User.accessToken
 			}
+		}
+
+		let type;
+		return fetch(go.Jmap.downloadUrl(blobId), fetchOptions)
+			.then( r => {
 
 
-		if(!this.blobCache[blobId]) {
-			let type;
-			this.blobCache[blobId] = fetch(go.Jmap.downloadUrl(blobId), fetchOptions)
-				.then( r => {
+				if(r.ok) {
+					type = r.headers.get("Content-Type") || undefined
 
-
-					if(r.ok) {
-						type = r.headers.get("Content-Type") || undefined
-
-						return r.arrayBuffer().then( ab => URL.createObjectURL( new Blob( [ ab ], { type: type } ) ) );
-					} else
-					{
-						console.error(r);
-
-						return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
-					}
-
-				})
-				.catch((e) => {
-					console.error(e);
+					return r.arrayBuffer().then( ab => URL.createObjectURL( new Blob( [ ab ], { type: type } ) ) );
+				} else
+				{
+					console.error(r);
 
 					return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
-				});
+				}
 
-		}
+			})
+			.catch((e) => {
+				console.error(e);
+
+				return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
+			});
 
 		return this.blobCache[blobId];
 	},
 
 		/**
-		 * Replaces all img tags with a blob ID source from group-office with an objectURL
+		 * Replaces all img tags with a blob ID source from group-office with an objectURL.
+		 *
+		 * Don't forget to free memory with URL.revokeObjectURL(img.src); when they are no longer needed.
 		 *
 		 * @param el
-		 * @return Promise that resolves when all images are fully loaded
+		 * @return Promise<HTMLImageElement[]> that resolves when all images are fully loaded
 		 */
 		replaceBlobImages : function (el) {
 
@@ -786,13 +782,12 @@ go.util =  (function () {
 				if(blobId) {
 
 					img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-
 					promises.push(this.getBlobURL(blobId).then(src => {
 						img.src = src;
 					})
 						.then(() => {
 						//wait till image is fully loaded
-						return new Promise(resolve => { img.onload = img.onerror =() => { URL.revokeObjectURL(img.src); resolve(); } })
+						return new Promise(resolve => { img.onload = img.onerror = resolve(img) })
 					}))
 
 				}
