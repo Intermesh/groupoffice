@@ -1,3 +1,5 @@
+- Email: fixed vcard import from email
+
 13-01-2023 6.6.145
 - Caldav: Task sync failed with reminder: Fixed: Too few arguments to
     function go\\core\\orm\\Property::__construct(), 0 passed in
