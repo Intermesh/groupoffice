@@ -831,11 +831,10 @@ Ext.override(Ext.Element, {
 		this.printCSS+='<style>body{overflow:visible !important;}</style>';
 		var html = el.innerHTML;
 		if(config.title) {
-
-
 			const oldTitle = document.title;
 
-			document.title = config.title;
+			// Replace characters not valid for file names
+			document.title = config.title.replace(':', '.').replace(/[/\\?%*|"<>]+/g, '-');
 
 			window.addEventListener("afterprint" , function(){
 
