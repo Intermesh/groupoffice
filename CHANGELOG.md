@@ -1,4 +1,5 @@
-- Email: fixed vcard import from email
+- Email: Fixed vcard import from email
+- Core: When printing, Replace characters not valid for file names
 
 13-01-2023 6.6.145
 - Caldav: Task sync failed with reminder: Fixed: Too few arguments to
