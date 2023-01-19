@@ -344,6 +344,12 @@
 @keyframes onautofillstart { from {} }
 @keyframes onautofillcancel { from {} }
 
+.x-fieldset {
+	.x-panel  {
+		border-radius: dp(10);
+		overflow:hidden;
+	}
+}
 .x-form{
 
 	.x-panel, .x-fieldset {

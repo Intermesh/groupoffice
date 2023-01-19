@@ -106,7 +106,16 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 			autoExpandColumn: "name"
 		});
 
-		go.smtp.GridPanel.superclass.initComponent.call(this);
+		if(this.title) {
+			this.tbar.unshift({
+				xtype:'tbtitle',
+				text: this.title
+			})
+
+			delete this.title;
+		}
+
+		go.pdftemplate.GridPanel.superclass.initComponent.call(this);
 		
 		this.on("rowdblclick", function(grid, rowIndex, e) {
 			var record = grid.getStore().getAt(rowIndex);

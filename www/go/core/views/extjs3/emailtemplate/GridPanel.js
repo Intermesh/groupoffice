@@ -104,7 +104,7 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 			autoExpandColumn: "name"
 		});
 
-		go.smtp.GridPanel.superclass.initComponent.call(this);
+		go.emailtemplate.GridPanel.superclass.initComponent.call(this);
 		
 		this.on("rowdblclick", function(grid, rowIndex, e) {
 			var record = grid.getStore().getAt(rowIndex);

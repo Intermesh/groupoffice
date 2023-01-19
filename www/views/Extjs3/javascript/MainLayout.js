@@ -265,8 +265,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		panelConfig =panelConfig || {}
 		panelConfig.package = panelClass.prototype.package;
 
-		console.warn(panelConfig);
-
 		GO.moduleManager._addModule(moduleName, panelClass, panelConfig);
 				
 		go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
