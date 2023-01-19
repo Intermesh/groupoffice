@@ -204,22 +204,4 @@ class Reminder extends \GO\Base\Db\ActiveRecord {
 										->addCondition('model_type_id', $model_type_id)
 										->addCondition('model_id', $id)));
 	}
-	
-	
-//	public function getUsers($findParams=false){
-//		$stmt = User::model()->find(\GO\Base\Db\FindParams::newInstance()
-//						->mergeWith($findParams)
-//						->order(array('first_name','last_name'),array('ASC','ASC'))
-//						->criteria(\GO\Base\Db\FindCriteria::model()->addModel(ReminderUser::model(),'r')->addCondition('reminder_id',$this->id,'=','r'))
-//						->join(ReminderUser::model()->tableName(), 
-//										\GO\Base\Db\FindCriteria::model()->addModel(ReminderUser::model())
-//														->addCondition('id','r.user_id','=','r',true,true)
-//														
-//											)
-//						
-//						);
-//		
-//		return $stmt;
-//	}
-  	
 }
