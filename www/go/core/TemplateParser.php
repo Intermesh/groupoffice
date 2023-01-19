@@ -159,6 +159,7 @@ class TemplateParser {
 	
 	public function __construct() {
 		$this->addFilter('date', [$this, "filterDate"]);		
+		$this->addFilter('timestamp', [$this, "filterUnixTimestamp"]);
 		$this->addFilter('number', [$this, "filterNumber"]);
 		$this->addFilter('filter', [$this, "filterFilter"]);
 		$this->addFilter('count', [$this, "filterCount"]);
@@ -207,6 +208,19 @@ class TemplateParser {
 		$date->setTimezone(new DateTimeZone($this->_currentUser()->timezone));
 
 		return $date->format($format);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function filterUnixTimestamp(int $ts, $format = null): string
+	{
+		if(!isset($ts)) {
+			return "";
+		}
+
+		$dt = DateTime::createFromFormat('U', $ts);
+		return $this->filterDate($dt, $format);
 	}
 
 	private function filterEntity($id, $entityName, $properties = null) {
