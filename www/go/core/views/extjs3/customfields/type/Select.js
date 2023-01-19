@@ -132,7 +132,8 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 						inlineStyle += "color: #" + selectedOption.foregroundColor + ";";
 					}
 					if (selectedOption.backgroundColor) {
-						inlineStyle += "background-color: #" + selectedOption.backgroundColor + ";";
+						//inlineStyle += "background-color: #" + selectedOption.backgroundColor + ";";
+						val = '<div class="status" style="background-color: #' + selectedOption.backgroundColor + '">' + val + '</div>';
 					}
 
 					let cellStyle = metadata.style || '';
