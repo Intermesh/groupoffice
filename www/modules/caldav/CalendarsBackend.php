@@ -195,7 +195,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 * @return mixed
 	 */
 	public function createCalendar($principalUri, $calendarUri, array $properties) {
-		throw new Sabre\DAV\Exception\Forbidden();
+		throw new Sabre\DAV\Exception\Forbidden("Create calendar is not supported");
 	}
 
 	/**

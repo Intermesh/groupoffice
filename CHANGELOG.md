@@ -1,3 +1,9 @@
+19-01-2023 6.6.146
+- Email: Fixed vcard import from email
+- Core: When printing, Replace characters not valid for file names
+- Core: Fall back on disk cache is apcu fails.
+- Core: Fixed install
+
 13-01-2023 6.6.145
 - Caldav: Task sync failed with reminder: Fixed: Too few arguments to
     function go\\core\\orm\\Property::__construct(), 0 passed in

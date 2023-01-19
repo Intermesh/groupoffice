@@ -2371,19 +2371,11 @@ GO.calendar.openCalendar = function(displayConfig){
 			GO.calendar.openState=displayConfig;
 			mp.show();
 		}
-//	}else
-//	{
-//		GO.calendar.openState=displayConfig;
-//		GO.mainLayout.on('render', function(){
-//			 GO.mainLayout.openModule('calendar');
-//		});
-//	}
-	
 }
 
 
 GO.calendar.handleMeetingRequest=function(responseResult){
-	
+
 	if (responseResult.askForMeetingRequestForNewParticipants) {
 		Ext.Msg.show({
 			title:t("Notify participants?", "calendar"),

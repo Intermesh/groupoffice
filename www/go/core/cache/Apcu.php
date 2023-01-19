@@ -86,7 +86,8 @@ class Apcu implements CacheInterface {
 		$value = apcu_fetch($this->prefix . '-' .$key, $success);
 		
 		if(!$success) {
-			return null;
+			// if acpu fails fallback on disk cache
+			return $this->getDiskCache()->get($key);
 		}
 		
 		$this->cache[$key] = $value;

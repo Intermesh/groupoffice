@@ -369,7 +369,7 @@ Ext.override(Ext.form.TriggerField,{
 		}
 	},
 
-	
+
 
 	 getTriggerWidth: function(){
 		 return 0;
@@ -817,7 +817,10 @@ Ext.override(Ext.Element, {
 		if(config.title) {
 			// set document title for saving to PDF
 			const oldTitle = document.title;
-			document.title = config.title;
+
+			// Replace characters not valid for file names
+			document.title = config.title.replace(':', '.').replace(/[/\\?%*|"<>]+/g, '-');
+
 			window.addEventListener("afterprint" , function(){
 				document.title = oldTitle;
 			}, {once: true});

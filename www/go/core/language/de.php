@@ -1057,7 +1057,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'The language is automatically detected from the browser. If the language is not available then this language will be used.' => 'Die Sprache wird automatisch vom Browser erkannt. Wenn die Sprache nicht verfügbar ist, wird diese Sprache verwendet.',
   'Login message' => 'Login Nachricht',
   'This message will show on the login screen' => 'Diese Nachricht wird auf dem Anmeldebildschirm angezeigt',
-  'Exporting...' => 'Exportiere?',
+  'Exporting...' => 'Exportiere...',
   'Appearance' => 'Aussehen',
   'Primary color' => 'Primäre Farbe',
   'Notifications' => 'Benachrichtigungen',
