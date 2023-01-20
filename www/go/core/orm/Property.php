@@ -779,6 +779,10 @@ abstract class Property extends Model {
 
 		$tables = self::getMapping()->getTables();
 
+		if(empty($tables)) {
+			throw new LogicException("No table defined for " . static::class);
+		}
+
 		$mainTableName = array_keys($tables)[0];
 
 		if (empty($fetchProperties)) {
