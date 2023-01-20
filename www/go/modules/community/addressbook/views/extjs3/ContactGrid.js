@@ -41,6 +41,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"emailAddresses",
 				"phoneNumbers",
 				"dates",
+				'starred',
 				"birthday", //dummy
 				"actionDate", //dummy
 				"gender",
