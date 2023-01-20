@@ -24,7 +24,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			layout: "anchor",
 			defaultAnchor: '100%',
 			items: [
-				new go.NavMenu({
+				this.navMenu = new go.NavMenu({
 					region:'north',
 					listeners: {
 						"afterrender": me => {
@@ -192,9 +192,11 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			var abSettings = go.User.addressBookSettings, abNode = null;
 			if (abSettings.startIn == "allcontacts") {
 				//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
-				this.addressBookTree.getSelectionModel().select(node.firstChild);
+				//abNode = node.firstChild;
+				// when we select nothong the grid will load without filter
 			} else if (abSettings.startIn == "starred") {
-				abNode = node.findChild('id', 'starred');
+				//abNode = node.findChild('id', 'starred');
+				this.navMenu.select(1); // = starred item
 			} else if (abSettings.startIn == "remember" && abSettings.lastAddressBookId > 0) {
 				abNode = node.findChild('id', 'AddressBook-' + abSettings.lastAddressBookId);
 			} else {
@@ -210,11 +212,16 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		this.selectedAbs = {};
 		this.addressBookTree.on('checkchange', function (node, checked) {
 			this.grid.store.setFilter('groups', null);
+			if (node) {
+				this.doNotSelected = true;
+				this.addressBookTree.getSelectionModel().select(node);
+			}
 			this.selectAddressbook(node.attributes.data.id, checked);
 		},this );
 
 		this.addressBookTree.getSelectionModel().on('selectionchange', function (sm, node) {
-			if (!node) {
+			if (!node || this.doNotSelected) {
+				this.doNotSelected = false;
 				return;
 			}
 			if (node.attributes.entity.name === "AddressBook") {
@@ -226,7 +233,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 				this.addButton.setDisabled(false);
 
-				//this.deselectNodes();
+				this.deselectNodes();
 				node.parentNode.ui.checkbox.checked = true;
 				this.selectAddressbook(node.parentNode.attributes.data.id, true);
 

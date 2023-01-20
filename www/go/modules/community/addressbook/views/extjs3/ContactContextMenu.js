@@ -8,17 +8,30 @@ go.modules.community.addressbook.ContactContextMenu = Ext.extend(Ext.menu.Menu,{
 			this.editButton = new Ext.menu.Item({
 				iconCls: 'ic-edit',
 				text: t("Edit"),
-				handler: () => (new go.modules.community.addressbook.ContactDialog()).load(this.record[0].id).show()
+				handler: () => (new go.modules.community.addressbook.ContactDialog()).load(this.records[0].id).show()
 			}),
 			this.starItem = new Ext.menu.Item({
 				iconCls: "ic-star",
 				text: t("Star"),
-				handler: () => {
+				handler: (m) => {
 					const update = {};
-					this.records.map(r => {update[r.id] = {starred: true} });
+					this.records.map(r => {update[r.id] = {starred: m.iconCls == 'ic-star'} });
 					go.Db.store("Contact").set({update});
 				}
 			}),
+			// this.destarItem = new Ext.menu.Item({
+			// 	iconCls: "ic-star",
+			// 	text: t("Star"),
+			// 	listeners:{'afterrender': (item) => {
+			// 		(new Ext.ButtonGroup({
+			// 			style:'float:right; margin-top:-5px; margin-left:12px;margin-right:-20px;',
+			// 			 items: [
+			// 				 new Ext.Button({text:t('On'), handler:m=>(m.value = true)}),
+			// 				 new Ext.Button({text:t('Off'), handler:m=>(m.value = false)})
+			// 			 ],
+			// 		 })).render(item.el);
+			// 	}}
+			// }),
 			'-',
 			{
 			// Which groups should we suggest? should we move the contact to a different address book if skip adding of they don't match the contacts AB?
@@ -116,7 +129,7 @@ go.modules.community.addressbook.ContactContextMenu = Ext.extend(Ext.menu.Menu,{
 			this.editButton.setDisabled(true);
 		} else if(records.length === 1) {
 			const record = records[0];
-			this.starItem.setIconClass(record.data.starred ? "ic-star" : "ic-star-border");
+			this.starItem.setIconClass(record.data.starred ? "ic-star-border" : "ic-star");
 			this.editButton.setDisabled(record.data.permissionLevel < GO.permissionLevels.write);
 			this.deleteButton.setDisabled(record.data.permissionLevel < GO.permissionLevels.writeAndDelete);
 		}
