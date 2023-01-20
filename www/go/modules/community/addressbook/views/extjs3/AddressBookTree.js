@@ -22,7 +22,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 			});
 		}
 
-		// this.selModel = new Ext.tree.MultiSelectionModel();
+		//this.selModel = new Ext.tree.MultiSelectionModel();
 		
 		this.root = {
 			nodeType: 'groupoffice',

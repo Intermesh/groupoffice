@@ -95,15 +95,15 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}]
 			}),
 
-			bodyStyle: 'overflow-y: auto',
-
-			layout:'fitwidth',
+			autoScroll: true,
+			layout: "anchor",
+			defaultAnchor: '100%',
 
 			items:[
 				this.filterPanel,
 				this.tasklistsGrid,
 				this.categoriesGrid,
-				this.createFilterPanel(),
+				{xtype:'filterpanel', store: this.taskGrid.store, entity: 'Task'}
 
 			]
 		});
@@ -310,41 +310,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		Ext.state.Manager.set(this.statePrefix + "status-filter", inputValue);
 	},
-
-	createFilterPanel: function () {
-
-
-		return new Ext.Panel({
-			minHeight: dp(200),
-			autoScroll: true,
-			tbar: [
-				{
-					xtype: 'tbtitle',
-					text: t("Filters")
-				},
-				'->',
-				{
-					xtype: 'filteraddbutton',
-					entity: 'Task'
-				}
-			],
-			items: [
-				{
-					xtype: 'filtergrid',
-					filterStore: this.taskGrid.store,
-					entity: "Task"
-				},
-				{
-					xtype: 'variablefilterpanel',
-					filterStore: this.taskGrid.store,
-					entity: "Task"
-				}
-			]
-		});
-
-
-	},
-
 
 	createCategoriesGrid: function() {
 		this.categoriesGrid = new go.modules.community.tasks.CategoriesGrid({

@@ -308,10 +308,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 	},
 
 	onLoad: function () {
-
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
-		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
-		this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
 		go.modules.community.addressbook.ContactDetail.superclass.onLoad.call(this);
 	},
 
@@ -340,81 +337,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 				xtype: "linkbrowserbutton"
 			},
 
-			this.moreMenu ={
+			this.moreMenu = {
 				iconCls: 'ic-more-vert',
-				menu: [
-					this.starItem = new Ext.menu.Item({
-						iconCls: "ic-star",
-						text: t("Star"),
-						handler: function () {
-							var update = {};
-							update[this.currentId] = {starred: this.data.starred ? null : true};
-
-							go.Db.store("Contact").set({
-								update: update
-							});
-						},
-						scope: this
-					}),
-					'-',
-					{
-						iconCls: "ic-print",
-						text: t("Print"),
-						handler: function () {
-							this.body.print({title: this.data.name});
-						},
-						scope: this
-					},{
-						iconCls: "ic-cloud-download",
-						text: t("Export") + " (vCard)",
-						handler: function () {
-							go.util.downloadFile(go.Jmap.downloadUrl("community/addressbook/vcard/" + this.data.id));
-						},
-						scope: this
-					},{
-						iconCls: "ic-attach-file",
-						text: t("Send") + " (vCard)",
-						handler: function () {
-							Ext.getBody().mask(t("Exporting..."));
-							go.Jmap.request({
-								method: "Contact/export",
-								params: {
-									extension: 'vcf',
-									ids: [this.data.id]
-								},
-								scope: this,
-								callback: function (options, success, response) {
-									Ext.getBody().unmask();
-									if(!success) {
-										Ext.MessageBox.alert(t("Error"), response.message);
-									} else {
-										GO.email.showComposer({
-											blobs: [response.blob]
-										});
-									}
-								}
-							});
-						},
-						scope: this
-					},
-					'-',
-					
-					this.deleteItem = new Ext.menu.Item({
-						itemId: "delete",
-						iconCls: 'ic-delete',
-						text: t("Delete"),
-						handler: function () {
-							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
-								if (btn !== "yes") {
-									return;
-								}
-								this.entityStore.set({destroy: [this.currentId]});
-							}, this);
-						},
-						scope: this
-					})
-
-				]
+				menu: new go.modules.community.addressbook.ContactContextMenu({listeners: {
+					'beforeshow': (me) => {
+						me.setRecords([{data:this.data,id:this.data.id}]).addPrintBody(this.body);
+					}
+				}})
 			}]);
 
 		if(go.Modules.isAvailable("legacy", "files")) {

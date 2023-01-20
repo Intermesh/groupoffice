@@ -5,6 +5,7 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 		totalDisplay: false
 	},
 	autoHeight: true,
+	autoScroll:true,
 	
 	filterStore: null,
 	
