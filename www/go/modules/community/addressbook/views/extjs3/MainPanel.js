@@ -210,11 +210,16 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		this.selectedAbs = {};
 		this.addressBookTree.on('checkchange', function (node, checked) {
 			this.grid.store.setFilter('groups', null);
+			if (node) {
+				this.doNotSelected = true;
+				this.addressBookTree.getSelectionModel().select(node);
+			}
 			this.selectAddressbook(node.attributes.data.id, checked);
 		},this );
 
 		this.addressBookTree.getSelectionModel().on('selectionchange', function (sm, node) {
-			if (!node) {
+			if (!node || this.doNotSelected) {
+				this.doNotSelected = false;
 				return;
 			}
 			if (node.attributes.entity.name === "AddressBook") {
@@ -226,7 +231,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 				this.addButton.setDisabled(false);
 
-				//this.deselectNodes();
+				this.deselectNodes();
 				node.parentNode.ui.checkbox.checked = true;
 				this.selectAddressbook(node.parentNode.attributes.data.id, true);
 

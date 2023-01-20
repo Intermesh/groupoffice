@@ -8,7 +8,7 @@ go.modules.community.addressbook.ContactContextMenu = Ext.extend(Ext.menu.Menu,{
 			this.editButton = new Ext.menu.Item({
 				iconCls: 'ic-edit',
 				text: t("Edit"),
-				handler: () => (new go.modules.community.addressbook.ContactDialog()).load(this.record[0].id).show()
+				handler: () => (new go.modules.community.addressbook.ContactDialog()).load(this.records[0].id).show()
 			}),
 			this.starItem = new Ext.menu.Item({
 				iconCls: "ic-star",
