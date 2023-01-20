@@ -172,6 +172,8 @@ class TemplateParser {
 		$this->addFilter('sort', [$this, "filterSort"]);
 		$this->addFilter('rsort', [$this, "filterRsort"]);
 		$this->addFilter('count', [$this, "filterCount"]);
+		$this->addFilter('multiply', [$this, "filterMultiply"]);
+		$this->addFilter('add', [$this, "filterAdd"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
 		$this->addFilter('column', [$this, "filterColumn"]);
 		$this->addFilter('implode', [$this, "filterImplode"]);
@@ -262,6 +264,16 @@ class TemplateParser {
 	private function filterNumber($number,$decimals=2, $decimalSeparator='.', $thousandsSeparator=','): string
 	{
 		return number_format($number,$decimals, $decimalSeparator, $thousandsSeparator);
+	}
+
+	private function filterMultiply($number,$factor): string
+	{
+		return $number * $factor;
+	}
+
+	private function filterAdd($number,$add): string
+	{
+		return $number + $add;
 	}
 	
 	private function filterFilter($array, $propName, $propValue): ?array
