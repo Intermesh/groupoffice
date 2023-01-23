@@ -272,6 +272,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 
 		$q = clone $query;
+		$q->distinct();
 		$q->select(static::$aclColumnName);
 		return $q->all();
 
