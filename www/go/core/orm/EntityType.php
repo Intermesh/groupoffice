@@ -398,7 +398,8 @@ class EntityType implements ArrayableInterface {
 
 		if(count($changedEntities) == $maxChanges) {
 			// if there are more than the max resync the entity
-			return static::entityType()->resetSyncState();
+			$this->resetSyncState();
+			return true;
 		}
 
 		if(!is_array($changedEntities[0])) {
@@ -571,7 +572,7 @@ class EntityType implements ArrayableInterface {
 		go()->getDbConnection()
 			->update(
 				"core_entity",
-				['highestModSeq' => null],
+				['highestModSeq' => 0],
 				Query::normalize(["id" => $this->id])
 					->tableAlias('entity')
 			)->execute(); //mod seq is a global integer that is incremented on any entity update

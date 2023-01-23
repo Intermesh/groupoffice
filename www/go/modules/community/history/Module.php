@@ -292,7 +292,11 @@ class Module extends core\Module
 		$days = (int) Module::get()->getSettings()->deleteAfterDays;
 
 		if(!empty($days)) {
-			LogEntry::delete(LogEntry::find()->where('createdAt', '<', (new core\util\DateTime("-" . $days . " days"))));
+			LogEntry::delete(
+				LogEntry::find()
+					->removeJoin('core_entity')
+					->where('createdAt', '<', (new core\util\DateTime("-" . $days . " days")))
+			);
 		}
 	}
 

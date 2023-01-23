@@ -1,3 +1,6 @@
+- Calendar: Fixed: ErrorException in /usr/share/groupoffice/go/base/util/icalendar/RRuleIterator.php at line 98: Illegal offset type
+
+
 19-01-2023 6.6.146
 - Email: Fixed vcard import from email
 - Core: When printing, Replace characters not valid for file names

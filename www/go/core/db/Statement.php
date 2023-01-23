@@ -118,14 +118,17 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 					$this->build[$key] = $v;
 				}
 			}
+
+			if(go()->getDbConnection()->debug && isset($this->build) && go()->getDebugger()->enabled) {
+				$sql = QueryBuilder::debugBuild($this->build);
+				go()->debug(str_replace(["\n","\t"], [" ", ""], $sql) , 5);
+			}
 			
 			parent::execute($params);
 
 			if(go()->getDbConnection()->debug && isset($this->build) && go()->getDebugger()->enabled) {
-				$duration  = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
-
-				$sql = QueryBuilder::debugBuild($this->build);
-				go()->debug(str_replace(["\n","\t"], [" ", ""], $sql) . "\n(" . $duration . 'ms)', 5);
+				$duration = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
+				go()->debug("Query took " . $duration . "ms");
 			}
 
 			return true;

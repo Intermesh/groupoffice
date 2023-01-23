@@ -91,9 +91,9 @@ class RRuleIterator implements Iterator {
 				} else {
 
 					$bySetPositions = \GO::t("month_times");
-					
-					$bySetPos = !empty($this->bySetPos) ? $this->bySetPos : 1;
 
+					// todo, multiple bysetpos not supported
+					$bySetPos = !empty($this->bySetPos) ? $this->bySetPos[0] : 1;
 					if (count($days) == 1) {						
 						$daysStr = $bySetPositions[$bySetPos] . ' ' . $days[0];
 					} else {

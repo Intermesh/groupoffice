@@ -180,6 +180,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 
 		$q = clone $query;
+
 		$q->select(static::$aclColumnName);
 		return $q->all();
 
