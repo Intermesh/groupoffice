@@ -1249,3 +1249,6 @@ $updates['202212231031'][] = "alter table core_auth_token
 
 $updates['202301091428'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
 $updates['202301121428'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+$updates['202301231301'][] = 'delete from go_settings where name = "file_storage_usage"';
+$updates['202301231301'][] = 'delete from go_settings where name = "database_usage"';
+$updates['202301231301'][] = 'delete from go_settings where name = "mailbox_usage"';

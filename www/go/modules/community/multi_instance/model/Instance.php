@@ -666,6 +666,7 @@ class Instance extends Entity {
 						->selectSingleValue('value')
 						->from('go_settings')
 						->where('name', '=', "file_storage_usage")
+						->andWhere('user_id', '=', 0)
 						->single();
 
 			$this->version = (new \go\core\db\Query())
