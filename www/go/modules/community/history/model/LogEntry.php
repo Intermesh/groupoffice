@@ -197,6 +197,7 @@ class LogEntry extends AclOwnerEntity {
 	{
 
 		$q = clone $query;
+		$q->distinct();
 		$q->andWhere('removeAcl', '=',1)
 		->andWhere('action', '=', self::$actionMap['delete']);
 
