@@ -120,8 +120,6 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 					$this->build[$key] = $v;
 				}
 			}
-			
-			parent::execute($params);
 
 			if(go()->getDbConnection()->debug && isset($this->build) && go()->getDebugger()->enabled) {
 				$duration  = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
@@ -129,6 +127,8 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 				$sql = QueryBuilder::debugBuild($this->build);
 				go()->debug(str_replace(["\n","\t"], [" ", ""], $sql) . "\n(" . $duration . 'ms)', 5);
 			}
+			
+			parent::execute($params);
 
 			return true;
 		}
