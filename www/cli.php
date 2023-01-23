@@ -34,5 +34,9 @@ if(array_key_exists('debug', $args)) {
     go()->getDebugger()->enabled = !empty($args['debug']);
 }
 
+if(array_key_exists('debugSql', $args)) {
+	go()->getDbConnection()->debug = !empty($args['debugSql']);
+}
+
 $router = new Router();
 $router->run();
