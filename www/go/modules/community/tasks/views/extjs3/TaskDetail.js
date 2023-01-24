@@ -23,7 +23,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 						this.changeProgress("needs-action");
 					}
 				},{
-					text: t("In Progress"),
+					text: t("In progress"),
 					handler: () => {
 						this.changeProgress("in-progress");
 					}

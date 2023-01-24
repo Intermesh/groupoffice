@@ -46,7 +46,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			this.filterPanel = new go.modules.community.tasks.ProgressGrid({
 				tbar: [{
 					xtype: "tbtitle",
-					text: t("Status")
+					text: t("Status", 'tasks','community')
 				}],
 				filterName: "progress",
 				filteredStore: this.taskGrid.store
@@ -135,14 +135,14 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				tbar: [
 					{
 						xtype:"tbtitle",
-						text: t("Assigned")
+						text: t("Assigned", 'tasks','community')
 					}
 				],
 				items: [
 					{
 						hideLabel: true,
 						xtype: "checkbox",
-						boxLabel: t("Mine"),
+						boxLabel: t("Mine", 'tasks','community'),
 						checked: assignedToMe,
 						listeners: {
 							scope: this,
@@ -319,7 +319,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: t('Categories')
+					text: t('Categories', 'tasks','community')
 				}, '->', {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
@@ -357,7 +357,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: t('Lists')
+					text: t('Lists', 'tasks','community')
 				}, '->', {
 					xtype: "tbsearch"
 				},{
