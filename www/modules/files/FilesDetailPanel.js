@@ -10,7 +10,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		this.store = new GO.data.JsonStore({
 			url: GO.url('files/folder/list'),
 			suppressError: true,
-			fields: ['id', 'name', 'mtime', 'extension', "handler"],
+			fields: ['id', 'name', 'mtime', 'extension', "handler", "musername"],
 			remoteSort: true
 		});
 		
@@ -30,7 +30,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for="."><a>\
 			<i class="icon label filetype filetype-{extension}"></i>\
 			<span>{name}</span>\
-			<label>{user_name} at {mtime}</label>\
+			<label>{musername} {[t("at")]} {mtime}</label>\
 		</a></tpl></div>');
 
 
