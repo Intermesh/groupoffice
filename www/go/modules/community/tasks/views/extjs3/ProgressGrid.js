@@ -11,7 +11,7 @@ go.modules.community.tasks.ProgressGrid = Ext.extend(go.NavGrid, {
 				data: [
 					['completed', t("Completed")],
 					['failed', t("Failed")],
-					['in-progress', t("In Progress")],
+					['in-progress', t("In progress")],
 					['needs-action', t("Needs action")],
 					['cancelled', t("Cancelled")]
 				]
