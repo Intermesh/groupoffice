@@ -229,6 +229,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			setDisabled(this, !v);
 		} else{
 			setDisabled(this.ownerCt, !v);
+			this.formTabPanel = this.formTabPanel || this.findParentByType('tabpanel');
 			if(v) {
 			 	this.formTabPanel.unhideTabStripItem(this.ownerCt);
 			} else
