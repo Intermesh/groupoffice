@@ -16,6 +16,10 @@ use function GO;
 
 /**
  * Template parser
+ *
+ * Replaces variables {{varname}} and parse structural blocks like [if] and [each]
+ *
+ * Structurabl blocks may be wrapped with <template>[if ...]</template> so they can be valid html inside wysywig editors
  * 
  * By default two variable are already present:
  * 
@@ -648,6 +652,9 @@ class TemplateParser {
 		$replaced .= substr($str, $offset);
 
 		$replaced = $this->returnMicrosoftIfs($replaced);
+
+		// remove empty <template></template>
+		$replaced = preg_replace("/<template>[\s]*<\/template>/i", "", $replaced);
 
 		return preg_replace("/(.*)\r?\n?$/", "$1", $replaced);
 	}
