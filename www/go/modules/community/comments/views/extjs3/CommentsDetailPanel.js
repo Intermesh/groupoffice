@@ -21,8 +21,28 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 		this.origTitle = this.title;
 
-
-		this.buttons = [this.scrollToTopButton = new Ext.Button({
+		this.buttonAlign = 'left';
+		this.buttons = [new Ext.Button({
+			text:t('Attach file'),
+			iconCls: 'ic-file-upload',
+			handler: () => {
+				go.util.openFileDialog({
+					multiple: true,
+					autoUpload: true,
+					listeners: {
+						upload: function(response) {
+							const att = this.composer.attachmentBox;
+							att.setValue(att.getValue().concat([{
+								blobId: response.blobId,
+								name: response.name
+							}]));
+							this.composer.onSync();
+						},
+						scope: this
+					}
+				})
+			}
+		}), '->',this.scrollToTopButton = new Ext.Button({
 			xtype: "button",
 			iconCls: "ic-arrow-circle-up",
 			text: t("Scroll to top"),
