@@ -15,21 +15,47 @@
 	box-sizing: border-box;
 	border-radius: $borderRadius;
 	//background-color: $colorPrimary;
-	border-color: currentcolor;
-	border-width: 1px;
-	border-style: solid;
-	border-left: 3px solid;
-
-	background-color: #f7f7f7;
-	padding: dp(4) dp(8);
+	background-color:currentColor;
+	//border-right-color:white;
+	//border-bottom-color:white;
+	//border-color: currentcolor;
+	//border-width: 1px;
+	//border-style: solid;
+	//border-left: 3px solid;
+	//background-color: #f7f7f7;
+	padding: dp(2) dp(6);
 	//text-shadow: 0 0 5px rgba(0, 0, 0, 0.38);
 	text-align: left;
-	> em, > span {color: $colorText;}
+	user-select: none;
+	transition: all .15s ease-out;
+	> em, > span {
+		color:white;
+	}
+	> em {
+		text-overflow:ellipsis;
+		overflow:hidden;
+	}
+	> span {
+		text-align:right;
+		flex: 1 0 auto;
+		white-space: nowrap;
+		font-weight: 100;
+		font-size: .9em;
+	}
 	&::first-letter {
 		text-transform: capitalize;
 	}
+	&:focus {
+		box-shadow:
+				0 dp(3) dp(1) dp(-2) rgba(#6a6a6a, .2),
+				0 dp(2) dp(2) 0 rgba(#6a6a6a, .14),
+				0 dp(1) dp(5) 0 rgba(#6a6a6a, .12);
+		border-color: rgba(0,0,0,.5);
+		filter: brightness(90%);
+		//transform: scale(1.01);
+	}
 	 &:hover {
-			filter: brightness(105%);
+			filter: brightness(110%);
 	 }
 	&.new {
 		background-color: white !important;
@@ -37,8 +63,7 @@
 		border-style: solid;
 	}
 	&.selected {
-		border-color: $colorSelectedRow;
-		background-color: $colorSelectedRow!important;
+		filter: brightness(80%);
 		> * {color:white; font-weight: 600;}
 	}
 	&.declined {
@@ -60,36 +85,6 @@
 		height: dp(16);
 		width: dp(16);
 		min-width: dp(16);
-	}
-}
-
-%multiday {
-	&.start {
-		margin-right: 0;
-		overflow: hidden;
-		border-radius: 2px 0px 0px 2px;
-		border-right: none;
-	}
-
-	&.mid {
-		margin-left: -3px;
-		margin-right: -3px;
-		border-radius: 0;
-		text-indent: -9999px;
-		border-width: 1px 0 1px 0;
-	}
-
-	&.end {
-		margin-left: 0;
-		margin-right: 0;
-		border-radius: 0px 2px 2px 0px;
-		text-indent: -9999px;
-		border-left: none;
-	}
-
-	span.event-ghost {
-		background-color: transparent;
-		border-left: 0;
 	}
 }
 
@@ -182,6 +177,7 @@
 		&.today {
 			color: $colorPrimary;
 			font-weight: 600;
+			border-top: 1px solid $colorPrimary;
 			> em {
 				border-color: $colorPrimary;
 				font-weight: 600;
@@ -294,17 +290,15 @@
 
 				> div {
 					@extend %event;
-					@extend %multiday;
+					display:flex;
 					position: absolute;
 					pointer-events: all;
 					&.continues {
 						border-bottom-left-radius: 0;
 						border-top-left-radius: 0;
 					}
-					> span { //time
-						float: right;
-						font-weight: 100;
-						font-size: .9em;
+					> em {
+						white-space: nowrap;
 					}
 				}
 			}
@@ -344,7 +338,7 @@ $hourHeight: 7vh;
 $halfHour: 3.5vh;
 
 .cal.week {
-
+	height:100%;
 	display: flex;
 	flex-direction: column;
 	> ul li:first-child {
@@ -366,9 +360,8 @@ $halfHour: 3.5vh;
 			@extend %font-caption;
 			min-height: dp(36);
 			> li {
-				border-right: 1px solid $colorBorder;
-				//padding: dp(4);
-
+				padding: dp(4);
+				line-height: dp(24);
 				> em { // date number
 					font-style: normal;
 					color: inherit;
@@ -378,32 +371,32 @@ $halfHour: 3.5vh;
 					//border: 1px solid currentColor;
 				}
 			}
+
+		}
+		> li {
+			border-right: 1px solid $colorBorder;
 		}
 		.event {
 			position:absolute;
 		}
 	}
 
-	> dl { // has 7 li's for days
+	> dl { // can have 7 dd for day columns
 		background-color: $colorBackground;
 		overflow-y: scroll;
 		position: relative;
 		display: flex;
 		flex-grow: 1000;
 
-		> dd {
+		> dd { // day column
 			position: relative;
 			overflow: hidden;
 			height: 24*$hourHeight;
+			//max-height: 1680px;
 			background: linear-gradient(180deg, $colorLine 1px, transparent 1px);
 			background-size: 100% $hourHeight;
 			background-repeat: repeat-y;
 			border-right: 1px solid $colorBorder;
-			.event {
-				transition: all .1s ease-out;
-				position: absolute;
-				width: 99.8%;
-			}
 		}
 		> dt { // time display
 			position: initial;
@@ -417,6 +410,7 @@ $halfHour: 3.5vh;
 				display: block;
 				font-size: .8em;
 				height: $hourHeight;
+				//max-height: 70px; // 1680 / 24
 				color: $colorTextSecondary;
 				text-align: right;
 				padding: 0 dp(15) 0 0;
@@ -436,16 +430,22 @@ $halfHour: 3.5vh;
 			max-width: dp(64);
 		}
 	}
-
 	.event {
 		@extend %event;
-		overflow: visible !important;
-
-		> span { //time
-			display: block;
-			font-weight: 200;
+	}
+	dl .event {
+		left:0;
+		top:0;
+		position: absolute;
+		border-left: 3px solid rgba(0,0,0,.25);
+		border-top: 1px solid rgba(0,0,0,.25);
+		> em, > span {
+			color: white;
 		}
-
+		> span { //time
+			display: inline-block;
+			float:right;
+		}
 		// handle bars
 		&:before, &:after {
 			content: '';
@@ -455,13 +455,15 @@ $halfHour: 3.5vh;
 			height: 4px;
 			cursor: row-resize;
 		}
-
-		&:before {
-			top: -2px;
-		}
-
-		&:after {
-			bottom: -2px;
-		}
+		&:before {top: 0;}
+		&:after {bottom: 0;}
 	}
+}
+
+.calendar-list ul > li {
+	//padding: 6px 0;
+	padding-left: 11px;
+	display: flex;
+	cursor: pointer;
+	align-items:center;
 }

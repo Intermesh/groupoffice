@@ -200,8 +200,15 @@ class Column {
 		if (!isset($value)) {
 			return null;
 		}
-		
+
+		// The dbType can be overriden in the 'comment' of the table column
+		// @see Table::createColumn() @dbType
 		switch ($this->dbType) {
+			case 'localdatetime':
+				$dt = new GoDateTime($value);
+				$dt->isLocal = true;
+				return $dt;
+
 			case 'datetime':
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					if(!($value instanceof GoDateTime)) {
@@ -247,6 +254,7 @@ class Column {
 		}
 		
 		switch ($this->dbType) {
+			case 'localdatetime':
 			case 'datetime':
 				return $value->format(self::DATETIME_FORMAT);
 
@@ -288,6 +296,7 @@ class Column {
 
 			case 'date':
 			case 'datetime':
+			case 'localdatetime':
 				//Work around date problem
 				if($value == "0000-00-00") {
 					return null;
@@ -301,7 +310,8 @@ class Column {
 					}
 				}
 
-				$value->hasTime = $this->dbType == 'datetime';
+				$value->isLocal = $this->dbType == 'localdatetime';
+				$value->hasTime = $this->dbType != 'date';
 
 				return $value;
 

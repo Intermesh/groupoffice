@@ -16,11 +16,19 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	 * @var bool
 	 */
 	public $hasTime = true;
+	/**
+	 * When true this is a date-time string with no time zone/offset information.
+	 * The timezone information is save in a different property
+	 * @var bool
+	 */
+	public $isLocal = false;
 	
 	/**
 	 * The date outputted to the clients. It's according to ISO 8601;	 
 	 */
 	const FORMAT_API = "c";
+
+	const FORMAT_API_LOCAL = "Y-m-d\TH:i:s";
 
 	/**
 	 * API format for a date without time
@@ -29,11 +37,11 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 
 	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
-		return $this->format($this->hasTime ? self::FORMAT_API : self::FORMAT_API_DATE_ONLY);
+		return $this->format($this->hasTime ? ($this->isLocal ? self::FORMAT_API_LOCAL : self::FORMAT_API) : self::FORMAT_API_DATE_ONLY);
 	}
 	
 	public function __toString() {
-		return $this->format($this->hasTime ? self::FORMAT_API : self::FORMAT_API_DATE_ONLY);
+		return $this->jsonSerialize();
 	}
 
 	private static $currentUser;

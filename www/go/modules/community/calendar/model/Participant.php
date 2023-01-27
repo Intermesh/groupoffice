@@ -77,7 +77,7 @@ class Participant extends Property
 	/** @var string is the client, server or none responsible for sending imip invites */
 	//public $scheduleAgent = 'server';
 
-	/** @var uint The sequence number of the last response from the participant.  */
+	/** @var int The sequence number of the last response from the participant.  */
 	public $scheduleSequence = 0;
 
 	/** @var string[] A list of status codes, returned from the precessing of the most recent scheduling messages */

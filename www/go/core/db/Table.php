@@ -190,6 +190,11 @@ class Table {
 			$c->dbType = strtolower(preg_replace("/\(.*\)$/", "", $field['Type']));
 			$c->length = null;
 		}
+
+		preg_match('/@dbType=(\w*)/i', $c->comment, $matches);
+		if($matches) {
+			$c->dbType = strtolower($matches[1]);
+		}
 		
 		if($c->default == 'CURRENT_TIMESTAMP') {
 			throw new InvalidArgumentException("Please don't use CURRENT_TIMESTAMP as default mysql value. It's only supported in MySQL 5.6+");

@@ -3,6 +3,7 @@ import {EventDialog} from "./EventDialog";
 import {DateTime} from "@goui/util/DateTime.js";
 import {datepicker} from "@goui/component/picker/DatePicker";
 import {E} from "@goui/util/Element.js";
+import {calendarStore} from "./Index.js";
 
 export class YearView extends CalendarView {
 	constructor() {
@@ -83,8 +84,8 @@ export class YearView extends CalendarView {
 							// }
 							for (const e of this.store.items) {
 								if(new DateTime(e.start).format('Ymd') != day.format('Ymd')) break;
-								const cal = go.Db.store('Calendar').get(e.calendarId);
-								html += `<p title="${e.title+' - '+e.start.date().format('H:i')}" style="background-color:#${cal ? cal.color : '356772'}"></p>`;
+								const cal = calendarStore.items.find(c => c.id == e.calendarId);
+								html += `<p title="${e.title+' - '+(new DateTime(e.start)).format('H:i')}" style="background-color:#${cal ? cal.color : '356772'}"></p>`;
 								it++;
 							}
 							html += `</div>

@@ -1,158 +1,197 @@
-import {CalendarView, CalendarEvent} from "./CalendarView.js";
+import {CalendarView, CalendarEvent, CalendarItem} from "./CalendarView.js";
 import {EventDialog} from "./EventDialog";
 import {DateTime} from "@goui/util/DateTime.js";
 import {E} from "@goui/util/Element.js";
 import {calendarStore} from "./Index.js";
+import {t} from "@goui/Translate.js";
+
+interface CalendarDayItem extends CalendarItem {
+	pos: number
+	lanes: number
+	startM:number
+	endM: number // not needed after calculation
+}
 
 export class WeekView extends CalendarView {
 
-	dragGhost: any
-	private px30min = 0;
-	private top = 0;
+	dayCols: {[dayStartYMD:string]: HTMLElement} = {}
+	dayItems : CalendarDayItem[] = []
+	alldayCtr!: HTMLElement
+
+	constructor() {
+		super();
+		this.makeDraggable();
+		this.el.tabIndex = 0;
+		this.el.cls('cal week');
+		this.el.on('keydown', (e: KeyboardEvent) => {
+			if(e.key == 'Delete') {
+				this.selected.forEach(item => {
+					const i = this.dayItems.indexOf(item as CalendarDayItem);
+					if(i > -1) {
+						Object.values(item.divs).forEach(d => d.remove());
+						this.dayItems.splice(i,1);
+					}
+				});
+				this.updateItems();
+			}
+		});
+	}
 
 	goto(day: DateTime, amount: number) {
 		if(!day) {
 			day = new DateTime();
 		}
+		if(day.format('Ymd') === this.day.format('Ymd') && this.days === amount)
+			return;
+
 		this.days = amount;
-		//this.el.cls('reverse',(day < this.day));
-
-		this.day = day.clone();
-		//let end = day.clone();
-
-		//day.setWeekDay(0); // start monday
-		//this.firstDay = day.clone();
-		//end.setWeekDay(7); //end sunday after last day
+		this.day = day.setHours(0,0,0,0);
 		this.renderView();
+		// TODO : load store instead.
+		this.populateViewModel();
 		//this.store.filter('date', {after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00')}).fetch(0,500);
+
+
 	}
 
-	// onRender(dom){
-	// 	super.onRender(dom);
-	//
-	// 	dom.on('mousedown', (ev: MouseEvent) => {
-	// 		if(ev.button!== 0) return;
-	// 		let el = ev.target as HTMLElement;
-	// 		//console.log(this.dom.lastElementChild.lastElementChild.lastElementChild);
-	// 		const li = this.el.lastElementChild!.lastElementChild!.lastElementChild as HTMLElement;
-	// 		this.px30min = li.offsetHeight / 48;
-	// 		this.top = li.getBoundingClientRect().top;
-	//
-	// 		if(el.isA('li')) { // CREATE
-	// 			const startM = Math.floor((ev.clientY - this.top) / this.px30min)*30,
-	// 				data = {
-	// 					start: (new Date(el.dataset.day!)).setHours(0,startM).toJmap(),
-	// 					duration: 'PT30M'
-	// 				} as CalendarEvent;
-	// 			let div;
-	// 			el.append(div = this.drawEvent(data));
-	//
-	// 			this.dragGhost = data;
-	// 			this.moveEvent(div,data,startM);
-	// 		} else {
-	// 			el = el.up('.event');
-	// 			if(el) { // MOVE
-	// 				const data = this.store.get(el.dataset.id!) || this.dragGhost;
-	// 				let anchor;
-	// 				if(ev.offsetY <= 2) {
-	// 					anchor = this.m(data.start.date().addDuration(data.duration)); // endM
-	// 				} else if(ev.offsetY >= el.offsetHeight - 2) {
-	// 					anchor = this.m(data.start.date()); //startM
-	// 					console.log(anchor);
-	// 				}
-	// 				// no acnhor = use mouse as offset
-	// 				this.moveEvent(el,data,anchor);
-	// 			}
-	// 		}
-	//
-	// 	});
-	// }
+	private makeDraggable() {
 
-	static dragStart(move: (e:Event) => any[] ,drop: (e:Event, ...data: any[]) => void) {
-		let data: any[] = [];
-		const moving = (e: MouseEvent) => {
+		const SNAP = 30; // minutes
+
+		let ev: CalendarDayItem,
+			offset: number,
+			last:number,
+			anchor: number,
+			from : number,
+			till: number,
+			currDayEl: HTMLElement,
+			pxPerSnap: number,
+			action: (m:number) => [number, number];
+
+		const move: typeof action = m => [m, m+(ev.end.getMinuteOfDay()-ev.start.getMinuteOfDay())],
+			resize: typeof action = m => (m > anchor) ? [anchor,m] : [m,anchor];
+
+		const mouseMove = (e: MouseEvent & {target: HTMLElement}) => {
 			e.preventDefault();
-			data = move(e);
-		}, up = (e: MouseEvent) => {
-			window.removeEventListener('mousemove', moving);
-			window.removeEventListener('mouseup', up);
-			drop(e, ...data);
-		}
-		window.addEventListener('mousemove',moving);
-		window.addEventListener('mouseup',up)
-	}
+			const minute = Math.round((e.clientY - offset) / pxPerSnap) * SNAP,
+				dragDayEl = e.target.up('dd[data-day]');
+			if(!dragDayEl) return;
+			if(dragDayEl !== currDayEl) { // move to different day
+				const a = Array.from(dragDayEl.parentElement!.children),
+					diff = a.indexOf(dragDayEl) - a.indexOf(currDayEl),
+					prevDay = ev.start.clone();
 
-	// private moveEvent(el:HTMLElement, data, anchor) {
-	// 	el.cls('+moving');
-	// 	let r: [DateTime, DateTime],
-	// 		last:number;
-	// 	WeekView.dragStart((e: MouseEvent) => {
-	// 		const time = Math.floor((e.clientY - this.top) / this.px30min)*30;
-	// 		if(time !== last) {
-	// 			last = time;
-	// 			r = this.onDrag(el, data, time, anchor);
-	// 		}
-	// 		return r;
-	// 	}, (e: MouseEvent, start:DateTime, end:DateTime) => {
-	// 		// update data
-	// 		setTimeout(()=>{ el.cls('-moving'); });
-	// 		if(!data.id) {
-	// 			data.start = start.format('c');
-	// 			data.duration = start.diff(end);
-	// 			const dlg = new EventDialog();
-	// 			dlg.show();
-	// 			dlg.form.setValues(data);
-	// 		}
-	// 		console.log(start, data.duration);
-	// 		//event.remove(); this.dragGhost = null;
-	// 	});
-	// }
-
-	private m(date: DateTime){ return date.getHours()*60+date.getMinutes(); }
-
-	private onDrag(event:HTMLElement, data:CalendarEvent, minute:number, anchor?:number) {
-		let start = new DateTime(data.start);
-		if(!anchor) { // move
-			start.setHours(0,minute);
-		}
-		let end = start.clone().addDuration(data.duration);
-		if(anchor) {
-			if(minute > anchor) { // drag below
-				start.setHours(0,anchor)
-				end.setHours(0,minute)
-			} else { // drag above anchor
-				start.setHours(0,minute);
-				end.setHours(0,anchor)
+				ev.start.addDays(diff);
+				ev.end.addDays(diff);
+				currDayEl = dragDayEl;
+				this.dayItems.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
+				Object.values(ev.divs).forEach(d => d.remove());
+				ev.divs = {};
+				this.updateItems(ev.start.clone());
+				this.updateItems(prevDay);
 			}
-		} 
+			if(minute !== last) { // move to along same day
+				last = minute;
+				[from, till] = action(minute);
+				if(from === till) return;
+				ev.start.setHours(0, from);
+				ev.end.setHours(0, till);
+				const firstDiv = Object.values(ev.divs)[0];
+				if(firstDiv)
+					firstDiv.lastElementChild!.textContent = ev.start.format('G:i') + ' - ' + ev.end.format('G:i');
+				this.updateItems(ev.start.clone());
+			}
 
-		const startM = this.m(start),
-			endM = Math.min(1450,this.m(end));
-		event.style.top = (100 / 1440 * startM)+'%';
-		event.style.height = (100 / 1440 * (endM - startM))+'%';
-		event.lastElementChild!.textContent = start.format('H:i')+' - '+end.format('H:i');
-		return [start,end];
+		},
+		mouseUp = (e:MouseEvent) => {
+			this.el.un('mousemove', mouseMove);
+			window.removeEventListener('mouseup', mouseUp);
+
+			this.save(ev, () => {
+				this.dayItems.shift()
+				this.updateItems();
+			});
+		};
+
+		this.el.on('mousedown', (e: MouseEvent) => {
+			if (e.button !== 0) return;
+
+			const li = this.el.lastElementChild!.lastElementChild as HTMLElement,
+				target = e.target as HTMLElement;
+			pxPerSnap = li.offsetHeight / (1440 / SNAP); // 96 quarter-hours in a day
+			offset = li.getBoundingClientRect().top;
+			currDayEl = target.up('[data-day]')!;
+
+			const event = target.up('div[data-key]');
+			if (event) { // MOVE
+				offset += e.offsetY;
+				ev = this.dayItems.find(m => m.key == event.dataset.key)!;
+				if(!ev) return;
+				action = resize;
+				// 4 pixels for the resize handle on top and bottom of event
+				if (e.offsetY <= 4) {
+					anchor = ev.end.getMinuteOfDay();
+				} else if (e.offsetY >= event.offsetHeight - 4) {
+					anchor = ev.start.getMinuteOfDay();
+					offset -= event.offsetHeight;
+				} else {
+					action = move;
+				}
+				this.el.on('mousemove', mouseMove);
+			}
+			if(target.isA('dd')) { // CREATE
+				anchor = Math.round(e.offsetY / pxPerSnap) * SNAP;
+				const data = {
+						start: (new DateTime(target.dataset.day!)).setHours(0, anchor).format('c'),
+						title: 'New event',
+						duration: 'PT1H',
+						calendarId: '2',
+						showWithoutTime: false
+					},
+					start = new DateTime(data.start),
+					end = start.clone().addHours(1);
+				ev = {start,end,data, divs: {}, color: '356772'} as CalendarDayItem; // todo overlap
+				this.dayItems.unshift(ev);
+				this.updateItems(start.clone().setHours(0,0,0,0));
+				action = resize;
+				this.el.on('mousemove', mouseMove);
+			}
+
+			window.addEventListener('mouseup', mouseUp);
+		});
 	}
 
-	private changeTime(event: HTMLElement, d: CalendarEvent, minutes: number, type: 'start'|'end'|'move') {
-		// toggle end/start when end < start
-		let start = new DateTime(d.start);
-		if(type == 'move') {
-			start.setHours(0,minutes);
-		}
-		let end = start.clone().addDuration(d.duration);
-		switch(type) {
-			case 'start': start.setHours(0,minutes); break; // increase duration
-			case 'end': end.setHours(0,minutes); break;
+	protected clear() {
+		this.dayItems.forEach(ev => {
+			Object.values(ev.divs).forEach(d => d.remove());
+		})
+		this.dayItems = [];
+		super.clear();
+	}
+
+	protected populateViewModel() {
+		this.clear();
+		const viewEnd = this.day.clone().addDays(this.days);
+		const allDay = [],
+			withTime = []
+		for (const e of this.store.items) {
+
+			const items = super.makeItems(e, this.day, viewEnd);
+			if(e.showWithoutTime) {
+				allDay.push(...items as CalendarItem[]);
+			} else {
+				withTime.push(...items as CalendarDayItem[]);
+			}
 		}
 
-		console.log(start, d.start,type,minutes);
-		let startM = start.getHours()*60+start.getMinutes(),
-			endM = end.format('Ymd') > start.format('Ymd') ? 1450 : end.getHours()*60+end.getMinutes();
-		event.style.top = (100 / 1440 * startM)+'%';
-		event.style.height = (100 / 1440 * (endM - startM))+'%';
-		event.lastElementChild!.textContent = start.format('H:i')+' - '+end.format('H:i');
+		this.viewModel = allDay.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
+		this.dayItems = withTime.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
+
+		this.updateFullDayItems();
+		this.updateItems();
 	}
+
+
 
 	renderView() {
 		this.el.innerHTML = ''; // clear
@@ -161,75 +200,132 @@ export class WeekView extends CalendarView {
 			day = this.day.clone();
 		//day.setWeekDay(0);
 
-		let heads = [], allday = [], days = [], hours = [], showNowBar ,nowbar;
+		let heads = [], days = [], hours = [], showNowBar ,nowbar;
 		for (hour = 1; hour < 24; hour++) {
 			hours.push(E('em', hour+':00'));
 		}
-		for (var i = 0; i < this.days; i++) {
-			let events: HTMLElement[] = [],
-				evs: any[] = [], 
-				alldays: HTMLElement[] = [];
-			for(var storeIt in this.recur) { 
-				const rec = this.recur[storeIt], ev = this.store.get(storeIt);
-				while(rec.current.format('Ymd') == day.format('Ymd')){
-					if(ev.isAllDay) { alldays.push(this.drawEvent(ev)); }
-					else { evs.push(ev); }
-					rec.next(); 
-				}
-			}
-			for (e of this.store.items) {
-				if(!e.recurrenceRule && (new DateTime(e.start)).format('Ymd') == day.format('Ymd')) {
-					if(e.isAllDay) { alldays.push(this.drawEvent(e)); }
-					else { evs.push(e); }
-				}
-			}
-			const ov = this.calculateOverlap(evs);
-			for(let ev of evs) {
-				events.push(this.drawEvent(ev, ov[ev.id]));
-			}
-			const cls = day.format('Ymd') < now.format('Ymd') ? 'past' : (day.format('Ymd') === now.format('Ymd') ? 'today' : '');
 
-			heads.push(E('li',day.format('l'),E('em',day.getDate())).cls(cls));
-			allday.push(E('li', ...alldays));
-			days.push(E('li', ...events).cls('weekend',day.getWeekDay() > 4).attr('data-day', day.format('Y-m-d')));
+		this.dayCols = {};
+		for (var i = 0; i < this.days; i++) {
+
+			heads.push(E('li',day.format('l'),E('em',day.getDate()))
+				.cls('past', day.format('Ymd') < now.format('Ymd'))
+				.cls('today', day.format('Ymd') === now.format('Ymd'))
+			);
+			const dayContainer = E('dd').cls('weekend',day.getDay()%6==0).attr('data-day', day.format('Y-m-d'));
+			this.dayCols[day.format('Ymd')] = dayContainer;
+			days.push(dayContainer);
 			if(now.format('Ymd') === day.format('Ymd')) {
 				showNowBar = true;
 			}
 			day.addDays(1); it=0;
 		}
 		if(showNowBar) {
-			const top = 24 * 7 / (60 * 24) * (now.getHours() * 60 + now.getMinutes()), // 1296 = TOTAL HEIGHT of DAY
+			const top = 24 * 7 / (60 * 24) * now.getMinuteOfDay(), // 1296 = TOTAL HEIGHT of DAY
 				left = 100 / this.days * (now.getWeekDay() - this.day.getWeekDay());
-			nowbar = E('div', E('hr'), E('b').attr('style', `left: calc(${left}%);`), E('span', now.format('G:i'))).cls('now').attr('style', `top:${top}vh;`)
+			nowbar = E('div', E('hr'), E('b').attr('style', `left: ${left}%;`), E('span', now.format('G:i'))).cls('now').attr('style', `top:${top}vh;`)
 		}
-		let ol;
-		this.el.cls('cal week')
-		this.el.style.height = '100%';
+		let ol: HTMLElement;
+
 		this.el.append(
 			E('ul',E('li',this.day.getWeekOfYear()), ...heads),
-			E('ul',E('li'), ...allday),
-			ol = E('ol',E('li', nowbar || '', E('em'), ...hours), ...days)
+			E('ul',E('li', t('All-day')), this.alldayCtr = E('li').cls('all-days')),
+			ol = E('dl',E('dt', nowbar || '', E('em'), ...hours), ...days)
 		);
-
-		//this.el.innerHTML = (`<div class="cal week active"><ul><li>${this.day.getWeekOfYear()}</li>${heads}</ul><ul><li></li>${allday}</ul><ol><li>${nowbar}<em></em>${hours}</li>${days}</ol></div>`);
-		//const ol = this.el.firstElementChild!.children[2];
-		ol.scrollTop = ol.scrollHeight / 100 * 25; // = scroll 6hours down (1/4 of day)
+		setTimeout(() => ol.scrollTop = ol.scrollHeight / 4); // = scroll 6hours down (1/4 of day)
 	}
-   // event, overlap
-	protected drawEvent(e: CalendarEvent, o?: any) { // o = calculated overlap
-		const cal = calendarStore.items.find(c => c.id == e.calendarId);
-		let color = cal ? cal.color : '356772', 
-			style = `background-color:#${color};`;
-		if(o) {
-			let minutes = o.end - o.start,
-			top = 100 / 1440 * o.start, // 1440 minutes in day
-			left = o.col * (100 / o.max),
-			width = (100 / o.max) * o.span - .2,
-			height = 100 / 1440 * minutes;
-			style += ` height: calc(${height}% - 1px); top: ${top}%; left: ${left}%; width: ${width}%;`;
-		}
 
-		return super.eventHtml(e,style);
+	private updateFullDayItems() {
+		this.slots = {0:{},1:{},2:{},3:{},4:{},5:{},6:{}};
+		this.alldayCtr.prepend(...this.viewModel.map(e =>
+			super.eventHtml(e).attr('style',this.makestyle(e, this.day))
+		));
+		var lengths = Object.values(this.slots).map((i: any) => Object.keys(i).length);
+		this.alldayCtr.style.height = (Math.max(...lengths) * this.ROWHEIGHT)+'px';
+	}
+
+	private updateItems(day?: DateTime) {
+
+		this.continues = [];
+		this.iter = 0;
+		if(day) {
+			this.drawDay(day.setHours(0,0,0,0), this.dayCols[day.format('Ymd')])
+		} else {
+			for (const ymd in this.dayCols) {
+				this.drawDay(DateTime.createFromFormat(ymd, 'Ymd')!, this.dayCols[ymd])
+			}
+		}
+		// call draw week but re-use divs only set style ignore the return value
+	}
+
+	iter!: number
+	continues: CalendarDayItem[] = []
+
+	private drawDay(dayStart: DateTime, dd: HTMLElement) {
+		let stillContinueing = [],
+			e: any,
+			eventEls = [],
+			end = dayStart.clone().addDays(1);
+		while((e = this.dayItems[this.iter]) && e.start.format('Ymd') < end.format('Ymd')) {
+			if(e.end.date > dayStart.date) {
+				this.continues.push(e);
+			}
+			this.iter++;
+		}
+		if(this.continues.length)
+			this.calculateOverlap(this.continues, dayStart);
+		while(e = this.continues.shift()) {
+			eventEls.push(this.drawEvent(e, dayStart, dd));
+			if(e.end.date > end.date) {
+				stillContinueing.push(e); // push it back for next week
+			}
+		}
+		this.continues = stillContinueing;
+		return eventEls;
+	}
+
+	protected calculateOverlap(events: CalendarDayItem[], dayStart: DateTime) {
+		//events.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
+		let highestEnd = 0,
+			blockStart = 0,
+			blockLanes = 1;
+		for(let i = 0; i < events.length; i++) {
+			const a = events[i]; // current item
+			a.startM =  a.start.format('Ymd') < dayStart.format('Ymd') ? 0 : a.start.getMinuteOfDay();
+			a.endM = a.end.format('Ymd') > dayStart.format('Ymd') ? 1440 : a.end.getMinuteOfDay();
+			a.pos = 0;
+			if(a.startM >= highestEnd) { // end collision block
+				blockStart = i
+				blockLanes = 1;
+			}
+			for(let j = blockStart; j < i; j++) {
+				const b = events[j]; // already positioned item
+				if(a.endM > b.startM && a.startM < b.endM && a.pos === b.pos) { // collides
+					a.pos++;
+					blockLanes = Math.max(blockLanes, a.pos+1);
+					j = blockStart-1; // restart from blockstart
+				}
+				b.lanes = blockLanes;
+			}
+			a.lanes = blockLanes;
+			highestEnd = Math.max(highestEnd,a.endM);
+		}
+	}
+
+	protected drawEvent(e: CalendarDayItem, dayStart: DateTime, dd: HTMLElement) {
+		const i = dayStart.format('Ymd')
+		if(!e.divs[i]) {
+			e.divs[i] = super.eventHtml(e);
+		}
+		if(!e.divs[i].isConnected)  dd.append(e.divs[i]);
+		Object.assign(e.divs[i].style,{
+			color: '#'+e.color,
+			top: (100 / 1440 * e.startM)+'%',
+			left: (e.pos * (100 / e.lanes))+'%',
+			width: (100 / e.lanes) +'%',
+			height: (100 / 1440 * (e.endM - e.startM))+'%'
+		});
+		return e.divs[i]
 	}
 
 }

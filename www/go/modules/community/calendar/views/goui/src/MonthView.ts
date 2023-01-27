@@ -1,38 +1,22 @@
-import {CalendarView} from "./CalendarView.js";
+import {CalendarView, CalendarEvent, CalendarItem} from "./CalendarView.js";
 import {DateTime} from "@goui/util/DateTime.js";
-import {EventDialog} from "./EventDialog";
 import {E} from "@goui/util/Element.js";
 
 export class MonthView extends CalendarView {
 
 	start!: DateTime
+	dragData?: CalendarEvent
+
+	weekRows: [DateTime, HTMLElement][] = []
 
 	constructor() {
 		super();
-		this.el.on('click',(ev) => {
-
-			const event = ev.target.up('.event');
-			if(event) {
-				const dlg = new EventDialog();
-				dlg.show(event).form.load(event.dataset.id);
-
-			}
-			const day = ev.target.up('li[data-date]');
-
-			if(day) {
-				const dlg = new EventDialog();
-				//const date = Date.fromYmd(day.dataset.date);
-				dlg.show();
-				dlg.form.value = ({start: day.dataset.date, end: day.dataset.date});
-
-			}
-			ev.preventDefault();
-		});
+		this.makeDraggable(this.el);
 	}
 
 	goto(date: DateTime, days?: number) {
 		//this.el.cls('reverse',(day < this.day));
-		this.day = date;
+		this.day = date.setHours(0,0,0, 0);
 		this.start = date.clone();
 
 		if(days) {
@@ -43,35 +27,124 @@ export class MonthView extends CalendarView {
 
 		}
 		this.start.setWeekDay(0);
+		this.viewModel = [];
 
-		// /let end = day.clone();
-		//this.firstDay = day.clone().setDate(1).setWeekDay(0);
-		//end.addMonths(1).setDate(0).setWeekDay(6).addDays(1); //end sunday after last day
 		this.renderView();
+		this.populateViewModel();
 		//this.dom.cls('+loading');
 		//this.store.filter('date', {after: day.format('Y-m-dT00:00:00'), before: end.format('Y-m-dT00:00:00')}).fetch(0,500);
 	}
 
+	private makeDraggable(el) {
+		let from : HTMLElement,
+			till: HTMLElement,
+			last: HTMLElement,
+			anchor: HTMLElement,
+			ev: CalendarItem,
+			action: (day:HTMLElement) => void;
+
+		const create = (day: HTMLElement) => {
+				[from, till] = (anchor.compareDocumentPosition(day) & 0x02) ? [day,anchor] : [anchor,day];
+				ev.start = new DateTime(from.dataset.date!);
+				ev.end = new DateTime(till.dataset.date!).addDays(1);
+		},
+		move = (day:HTMLElement) => {
+				let [y,m,d] = day.dataset.date!.split('-').map(Number);
+				ev.start.setYear(y).setMonth(m).setDate(d);
+				ev.end = ev.start.clone().addDuration(ev.data.duration);
+		},
+		mouseMove = ({target}: MouseEvent & {target: HTMLElement}) => {
+			const day = target.up('li[data-date]');
+			if(day && day != last) {
+				last = day;
+				action(day)
+				Object.values(ev.divs).forEach(d => d.remove());
+				ev.divs = {};
+				this.updateItems();
+			}
+		},
+		mouseUp = (e: MouseEvent) => {
+			el.un('mousemove', mouseMove);
+			window.removeEventListener('mouseup', mouseUp);
+
+			ev && this.save(ev, () => {
+				//clean
+				this.viewModel.shift();
+				this.updateItems();
+			});
+		};
+		el.on('mousedown', ({target}) => {
+			const day = target.up('li[data-date]');
+			if(day) {
+				const data = {
+						start: day.dataset.date!,
+						title: 'New event',
+						duration: 'P1D',
+						calendarId: '2',
+						showWithoutTime: true
+					},
+					start = new DateTime(data.start),
+					end = start.clone().addDays(1);
+				ev = {start,end,data, divs: {}, color: '356772'};
+				this.viewModel.unshift(ev);
+				this.updateItems();
+				//this.drawEvent(ev, weekStart);
+				//eventsContainer.prepend(ev.divs[0]);
+				anchor = from = till = day;
+				action = create;
+				el.on('mousemove', mouseMove);
+
+			}
+			const event = target.up('div[data-id]');
+			if(event) {
+				ev = this.viewModel.find(m => m.data.id == event.dataset.id)!;
+				action = move;
+				el.on('mousemove', mouseMove);
+
+			}
+			window.addEventListener('mouseup', mouseUp);
+		});
+	}
+
+	protected clear() {
+		this.viewModel.forEach(ev => {
+			Object.values(ev.divs).forEach(d => d.remove());
+		})
+		this.viewModel = [];
+	}
+
+	protected populateViewModel() {
+		this.clear()
+		const viewEnd = this.start.clone().addDays(this.days);
+		for (const e of this.store.items) {
+			this.viewModel.push(...super.makeItems(e, this.start, viewEnd));
+		}
+		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
+
+		this.updateItems()
+	}
+
 	renderView() {
 		this.el.innerHTML = ''; //clear
-		let it = 0;
+		let it = 0, i =0;
 		let now = new DateTime(),
 			 day = this.start.clone(); // toDateString removes time
 
-		let e;
-
 		this.el.style.height = '100%';
 		this.el.cls(['+cal','+month']);
-		this.el.append(E('ul',...DateTime.dayNames.map((name,i) =>
+		this.el.append(E('ul',...Object.values(DateTime.dayNames).map((name,i) =>
 			E('li',name).cls('current', this.day.format('Ym') == now.format('Ym') && now.getWeekDay() == i)
 		))); // headers
 
+		this.weekRows = [];
 		while (it < this.days) {
-			const row = E('ol',
-				E('li',day.getWeekOfYear()).cls('weeknb'),
-				E('li',...this.drawWeek(day)).cls('events')
-			);
-			for (var i = 0; i < 7; i++) {
+			const weekStart = day.clone(),
+				eventContainer = E('li',...this.drawWeek(weekStart)).cls('events'),
+				row = E('ol',
+					E('li',day.getWeekOfYear()).cls('weeknb').on('click',e => this.fire('selectweek', weekStart)),
+					eventContainer
+				);
+			for (i = 0; i < 7; i++) {
 				row.append(E('li',
 					E('em',day.format(day.getDate() === 1 ? 'j M' : 'j'))
 				).attr('data-date', day.format('Y-m-d'))
@@ -82,107 +155,53 @@ export class MonthView extends CalendarView {
 				day.addDays(1);
 				it++;
 			}
+			this.weekRows.push([weekStart, eventContainer]);
 			this.el.append(row);
 		}
-
-		//this.dom.html('<div class="monthview">'+html+'</div>');
-
-		// const //anim = this.dom!.has('.anim'),
-		// 	 el = this.dom!.html('<div class="cal month active">'+html+'</div>', anim ? -1 : undefined),
-		// 	curr = el.prev();
-
-		//this.el.append(weeks);
-		// if (anim && curr) { // Render new view and transist it into the old with css
-		// 	//el.cls('+active');
-		// 	curr.cls('-active');
-		// 	// we cant use an 'animationend' event it wont fire when the animation is missing
-		// 	setTimeout(function(){curr.remove(); },1375);  // could be anywere in the future after the animation
-		// }
-		
-		//this.fire('render', start);
-		//this.waiting = false;
 	}
 
-	private drawWeek(start: DateTime) {
-		let end = start.clone(),
-			i=0, e;
-		end.addDays(7);
+	private updateItems() {
+		this.continues = [];
+		this.iterator = 0;
+		for(const [ws, container] of this.weekRows) {
+			container.append(...this.drawWeek(ws));
+		}
+		// call draw week but re-use divs only set style ignore the return value
+	}
+
+	iterator!: number
+	continues: CalendarItem[] = []
+
+	private drawWeek(wstart: DateTime) {
+		let end = wstart.clone().addDays(7),
+			e: any;
 		let eventEls = [];
 		this.slots = {0:{},1:{},2:{},3:{},4:{},5:{},6:{}};
-		//debugger;
-		for(var storeIt in this.recur) { 
-			const r = this.recur[storeIt];
-			while(r.current < end){
-				eventEls.push(this.drawEvent(this.store.get(storeIt), r.current, start));
-				r.next(); 
+		let stillContinueing = [];
+		while(e = this.continues.shift()) {
+			eventEls.push(this.drawEvent(e, wstart));
+			if(e.end.date > end.date) {
+				stillContinueing.push(e); // push it back for next week
 			}
 		}
-		for (e of this.store.items) {
-			if((new DateTime(e.start)).format('Yw') === start.format('Yw') && !e.recurrenceRule) {
-				eventEls.push(this.drawEvent(e, new DateTime(e.start), start));
+		this.continues = stillContinueing;
+		while((e = this.viewModel[this.iterator]) && e.start.format('YW') < end.format('YW')) {
+			eventEls.push(this.drawEvent(e, wstart));
+			if(e.end.date > end.date) {
+				this.continues.push(e); // todo
 			}
+			this.iterator++;
 		}
+
 		return eventEls;
 	}
 
-	// onRender(dom){
-	// 	this.setDate(new Date());
-	// 	dom.on('click',(ev) => {
-	//
-	// 		const event = ev.target.up('.event');
-	// 		if(event) {
-	// 			const dlg = new EventDialog();
-	// 			dlg.show(event).form.load(event.dataset.id);
-	//
-	// 		}
-	// 		const day = ev.target.up('li[data-date]');
-	// 		if(day) {
-	// 			const dlg = new EventDialog();
-	// 			//const date = Date.fromYmd(day.dataset.date);
-	// 			dlg.show(event).form.create({start: day.dataset.date, end: day.dataset.date})
-	//
-	// 		}
-	// 		ev.preventDefault();
-	// 	});
-	// }
-
-	private slots: any;
-	private ROWHEIGHT = 26;
-
-
-	private calcRow(start: number, days: number) {
-		let row = 1, end = Math.min(start+days, 7);
-		while(row < 8) {
-			for(let i = start; i < end; i++) {
-				if(this.slots[i][row]){ // used
-					break; // next row
-				}
-				if(i == end-1) {
-					// mark used
-					for(let j = start; j < end; j++) {
-						this.slots[j][row] = true; 
-					}
-					return row;
-				}
-			}
-			row++;
+	drawEvent(e: CalendarItem, weekstart: DateTime) {
+		if(!e.divs[weekstart.format('YW')]) {
+			e.divs[weekstart.format('YW')] = super.eventHtml(e);
 		}
-		return 10;
-	}
-
-	drawEvent(e: any, eStart: DateTime, weekstart: DateTime) {
-		let d = e.duration.match(/P.*(\d+)D/);
-		const cal = go.Db.stores('Calendar').get(e.calendarId);
-		let color = cal ? cal.color : '356772',
-			start = eStart.clone(),
-			days = d ? +d[1] : 1;
-		let row = this.calcRow(start.getWeekDay(),days);
-
-		let width = Math.min(7, days) * (100 / 7)- .2,
-			left = Math.floor((start.getTime() - weekstart.getTime())/864e5) * (100 / 7),
-			top = row * this.ROWHEIGHT,
-			style = `background-color:#${color}; width: ${width}%; left:${left}%; top:${top}px;`;
-		//debugger;
-		return super.eventHtml(e,style);
+		return e.divs[weekstart.format('YW')]
+			.attr('style',this.makestyle(e, weekstart))
+			.cls('continues', weekstart.diffInDays(e.start) < 0)
 	}
 }

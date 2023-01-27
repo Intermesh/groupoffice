@@ -1,11 +1,11 @@
 import {modules} from "@go-core/Modules.js";
-import {CalendarMain} from "./CalendarMain";
+import {Main} from "./Main.js";
 import {router} from "@go-core/Router.js";
 import {jmapstore} from "@goui/jmap/JmapStore.js";
 
 export const calendarStore = jmapstore({
 	entity:'Calendar',
-	properties: ['id', 'name', 'color'],
+	properties: ['id', 'name', 'color', 'isVisible', 'isSubscribed'],
 	sort: [{property:'name'}]
 })
 
@@ -14,7 +14,7 @@ modules.register(  {
 	name: "calendar",
 	init () {
 
-		let ui: CalendarMain;
+		let ui: Main;
 
 		router.add(/^calendar\/year\/(\d+)$/, (year) => {
 			modules.openMainPanel("calendar");
@@ -31,7 +31,7 @@ modules.register(  {
 		});
 
 		modules.addMainPanel("calendar", "Calendar", () => {
-			ui = new CalendarMain();
+			ui = new Main();
 			return ui;
 		});
 	}

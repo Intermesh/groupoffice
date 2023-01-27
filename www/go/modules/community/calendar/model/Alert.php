@@ -23,7 +23,7 @@ class Alert extends Property {
 
 	/* actions */
 	const Email = 'email';
-	const Display = 'diplay';
+	const Display = 'display';
 
 	/** @var int auto increment primary key */
 	public $id;

@@ -41,7 +41,13 @@ class CalendarEvent extends AclItemEntity {
 	const EventProperties = ['id','uid','prodId', 'sequence','title','description','locale', 'showWithoutTime', 'start','timeZone','duration','priority','privacy','status', 'recurrenceRule'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'calendarId'];
-	const IgnoredPropertiesInException = ['uid', 'organizerEmail', 'showWithoutTime','recurrence', 'links'];
+
+	// If any of this properties is in the recurrenceOverrides the Object most be ignored
+	const IgnoredPropertiesInException = [
+		'uid', 'links', 'method', 'privacy', 'prodId',
+		'recurrenceId', 'recurrenceOverrides','recurrenceRule',
+		'relatedTo','replyTo','sentBy','timeZones'];
+
 
 	public $calendarId;
 	public $groupId;
@@ -65,8 +71,8 @@ class CalendarEvent extends AclItemEntity {
 	public $uid;
 
 	/**
-	 * This is an revision number that is increased by 1 every time the organizer
-	 * makes a significant change
+	 * This is a revision number that is increased by 1 every time the organizer
+	 * makes a change (except when only the "participants" property is changed)
 	 * @var int
 	 */
 	public $sequence = 0;
@@ -137,7 +143,7 @@ class CalendarEvent extends AclItemEntity {
 	 * @var DateTime
 	 */
 	public $recurrenceId = null;
-	public $recurrenceRule;
+	protected $recurrenceRule;
 	public $participants;
 	public $alerts;
 
@@ -182,6 +188,14 @@ class CalendarEvent extends AclItemEntity {
 
 	public function getTitle() {
 		return $this->title;
+	}
+
+	public function getRecurrenceRule() {
+		return !empty($this->recurrenceRule) ? json_decode($this->recurrenceRule): null;
+	}
+
+	public function setRecurrenceRule($rule) {
+		$this->recurrenceRule = json_encode($rule);
 	}
 
 	/**
