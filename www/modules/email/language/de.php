@@ -342,4 +342,12 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Delete all attachments' => 'Alle Anhänge löschen',
   'Move email to...' => 'E-Mail verschieben nach...',
   'Are you sure that you wish to remove all attachments from this email message?' => 'Sind Sie sicher, dass Sie alle Anhänge aus dieser E-Mail entfernen möchten?',
+  'Autosaving e-mail message to drafts (every 2 mins)' => 'Automatische Speicherung von E-Mail-Nachrichten in Entwürfen (alle 2 Minuten)',
+  'OAuth2 connection' => 'OAuth2-Verbindung',
+  'Request or update a refresh token in a separate window.' => 'Anforderung oder Aktualisierung eines Aktualisierungs-Tokens in einem separaten Fenster.',
+  'Use IMAP credentials' => 'IMAP-Anmeldeinformationen verwenden',
+  'Use desktop email client to compose' => 'Desktop-E-Mail-Client zum Verfassen verwenden',
+  'Are you sure you want to unlink this item?' => 'Sind Sie sicher, dass Sie diese Verknüpfung aufheben möchten?',
+  'Copy image' => 'Bild kopieren',
+  'Sory, this is not supported by Firefox' => 'Sorry, dies wird von Firefox nicht unterstützt',
 );

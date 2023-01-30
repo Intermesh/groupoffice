@@ -60,4 +60,9 @@ return array (
   'Completed tasks' => 'Erledigte Aufgaben',
   'Assign me' => 'Mich zuweisen',
   'Alerts' => 'Erinnerungen',
+  'Import task list ID from CSV file' => 'Aufgabenlisten-ID aus CSV-Datei importieren',
+  'Web page' => 'Webseite',
+  'Role' => 'Rolle',
+  'Schedule' => 'Zeitplan',
+  'Assignment' => 'Zuweisung',
 );
