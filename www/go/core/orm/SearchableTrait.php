@@ -205,6 +205,7 @@ trait SearchableTrait {
 
 		if(!$isNew) {
 			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
+			$search->change(true);
 		}
 
 		if(empty($keywords)) {
