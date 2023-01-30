@@ -29,7 +29,10 @@ trait SearchableTrait {
 	/**
 	 * All the keywords that can be searched on.
 	 *
-	 * Note: for larger text fields it might be useful to use {@see self::splitTextKeywords()} on it.
+	 * Note: All strings you return will  be optimized for searching using {@see StringUtil::splitTextKeywords()}.
+	 *
+	 * If you have numbers that should be searched on endings then use {@see StringUtil::numberToKeywords()}. For example
+	 * an invoice ID "I2022-001234" should be found by searching on "1234" or with phone numbers.
 	 * 
 	 * @return string[]|null
 	 */
@@ -90,7 +93,7 @@ trait SearchableTrait {
 		$keywords = $this->getSearchKeywords();
 
 		if(!isset($keywords)) {
-			$keywords = array_merge(StringUtil::splitTextKeywords($search->name), StringUtil::splitTextKeywords($search->description));
+			$keywords = [$search->name, $search->description];
 		}
 
 		$keywords = $this->getCommentKeywords($keywords);

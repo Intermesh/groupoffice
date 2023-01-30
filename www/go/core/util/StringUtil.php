@@ -930,7 +930,7 @@ END;
 	 *
 	 * @param string|int|null $number
 	 * @param int $minSearchLength
-	 * @return array
+	 * @return string[]
 	 */
 	public static function numberToKeywords($number, int $minSearchLength = 3): array
 	{
