@@ -179,3 +179,11 @@ $updates['202206031355'][] = 'ALTER TABLE `tasks_task` ADD COLUMN `latitude` dec
 
 $updates['202206201417'][] = 'alter table tasks_tasklist_group
     add progressChange tinyint(2) null;';
+
+$updates['202301301230'][] = function () {
+	if (\go\core\model\Module::isInstalled('legacy', 'projects2')) {
+		echo "Cleaning up orphaned project task lists..." . PHP_EOL;
+		$q = "DELETE FROM `tasks_tasklist` WHERE `role` = 3 AND `projectId` NOT IN(SELECT `id` FROM `pr2_projects`);";
+		go()->getDbConnection()->exec($q);
+	}
+};
