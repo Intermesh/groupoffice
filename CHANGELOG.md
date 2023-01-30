@@ -2,6 +2,7 @@
 - Timeregistration2: fix check on overwriting travel distance for existing time entry
 - Core: Updated German translation
 - Tasks: Clean up task lists when project is being deleted
+- smime: Fixed account losing 'always sign' setting
 
 19-01-2023 6.6.146
 - Email: Fixed vcard import from email
