@@ -1,10 +1,10 @@
 - Calendar: Fixed: ErrorException in /usr/share/groupoffice/go/base/util/icalendar/RRuleIterator.php at line 98: Illegal offset type
 - Timeregistration2: fix check on overwriting travel distance for existing time entry
 - Core: Updated German translation
+- Core: Fixed XSS vulnerability through GO_LANGUAGE cookie
 - Tasks: Clean up task lists when project is being deleted
 - smime: Fixed account losing 'always sign' setting
 - Core: force update search upon saving entity
-
 
 19-01-2023 6.6.146
 - Email: Fixed vcard import from email
