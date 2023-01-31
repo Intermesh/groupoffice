@@ -795,7 +795,6 @@ button {
 	}
 
 	.go-detail-view & {
-		margin-top:dp(8);
 		margin-right: dp(8);
 	}
 
@@ -807,6 +806,7 @@ button {
 
 	.x-grid3-cell-inner & {
 		margin-right: dp(8);
+		vertical-align: middle;
 	}
 
 	.x-btn {
