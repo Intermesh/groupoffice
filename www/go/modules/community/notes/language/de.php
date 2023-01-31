@@ -24,4 +24,5 @@ return array (
   'Display options for notebooks' => 'Optionen für Notizbücher anzeigen',
   'Remember last selected note book' => 'Das zuletzt ausgewählte Notizbuch merken',
   'Content' => 'Inhalt',
+  'Web page' => 'Webseite',
 );

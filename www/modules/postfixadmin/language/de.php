@@ -51,4 +51,8 @@ return array (
   'Mailbox' => 'Mailbox',
   'Ok' => 'OK',
   'Use \'*\' for a catch all alias (not recommended).' => 'Verwenden Sie \'*\' für einen CatchAll (nicht empfohlen).',
+  'Are you sure you wan to reset all the passwords?' => 'Sind Sie sicher, dass Sie alle Passwörter zurücksetzen wollen?',
+  'Export domain' => 'Domäne exportieren',
+  'Reset passwords' => 'Passwörter zurücksetzen',
+  'Allow external SMTP usage' => 'Externe SMTP-Nutzung zulassen',
 );

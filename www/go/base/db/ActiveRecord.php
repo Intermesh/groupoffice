@@ -763,33 +763,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 
-//	private function _joinAclTable(){
-//		$arr = explode('.',$this->aclField());
-//		if(count($arr)==2){
-//			//we need to join a table for the acl field
-//			$r= $this->getRelation($arr[0]);
-//			$model = GO::getModel($r['model']);
-//
-//			$ret['relation']=$arr[0];
-//			$ret['aclField']=$arr[1];
-//			$ret['join']="\nINNER JOIN `".$model->tableName().'` '.$ret['relation'].' ON ('.$ret['relation'].'.`'.$model->primaryKey().'`=t.`'.$r['field'].'`) ';
-//			$ret['fields']='';
-//
-//			$cols = $model->getColumns();
-//
-//			foreach($cols as $field=>$props){
-//				$ret['fields'].=', '.$ret['relation'].'.`'.$field.'` AS `'.$ret['relation'].'@'.$field.'`';
-//			}
-//			$ret['table']=$ret['relation'];
-//
-//		}else
-//		{
-//			return false;
-//		}
-//
-//		return $ret;
-//	}
-
 	/**
 	 * Makes an attribute unique in the table by adding a number behind the name.
 	 * eg. Name becomes Name (1) if it already exists.
@@ -4125,8 +4098,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function delete($ignoreAcl=false){
 
 		GO::setMaxExecutionTime(180); // Added this because the deletion of all relations sometimes takes a lot of time (3 minutes)
-
-		//GO::debug("Delete ".$this->className()." pk: ".$this->pk);
 
 		if($this->isNew)
 			return true;

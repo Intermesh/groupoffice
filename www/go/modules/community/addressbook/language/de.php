@@ -30,6 +30,7 @@ return array (
     'home' => 'Privat',
     'mobile' => 'Mobil',
     'workmobile' => 'Arbeit Mobil',
+    'fax' => 'Fax',
     'workfax' => 'Arbeit Fax',
   ),
   'addressTypes' => 
@@ -136,4 +137,6 @@ return array (
   'Are you sure that you would like to import this VCard?' => 'Sind Sie sicher, dass Sie diese VCard importieren möchten?',
   'Display options for address books' => 'Anzeigeoptionen für Adressbücher',
   'Last selected address book' => 'Zuletzt ausgewähltes Adressbuch',
+  'Please select at least two contacts' => 'Bitte wählen Sie mindestens zwei Kontakte aus',
+  'Web page' => 'Webseite',
 );

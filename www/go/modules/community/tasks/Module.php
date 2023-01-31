@@ -21,6 +21,7 @@ use go\modules\community\comments\Module as CommentsModule;
 use go\modules\community\tasks\model\Task;
 use go\modules\community\tasks\model\TaskList;
 use go\modules\community\tasks\model\UserSettings;
+use GO\Projects2\Model\Project;
 
 class Module extends core\Module {
 	/**
@@ -47,6 +48,16 @@ class Module extends core\Module {
 		User::on(User::EVENT_BEFORE_DELETE, static::class, 'onUserDelete');
 		User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
 	}
+
+
+	public function initListeners()
+	{
+		if(model\Module::isInstalled('legacy', 'projects2')) {
+			$prj = new Project();
+			$prj->addListener('beforedelete', self::class, 'onBeforeProjectDelete');
+		}
+	}
+
 
 
 	public static function onMap(Mapping $mapping) {
@@ -78,6 +89,18 @@ class Module extends core\Module {
 	public static function onUserDelete(core\db\Query $query) {
 		TaskList::delete(['createdBy' => $query]);
 	}
+
+
+	/**
+	 * @throws Exception
+	 */
+	public static function onBeforeProjectDelete(Project $project): bool
+	{
+		$query = (new core\orm\Query())->where(['role' => Tasklist::Project, 'projectId' => $project->id]);
+		$success = TaskList::delete($query);
+		return $success;
+	}
+
 
 	public static function onUserBeforeSave(User $user)
 	{

@@ -178,25 +178,33 @@ $updates['202206031355'][] = 'ALTER TABLE `tasks_task` ADD COLUMN `latitude` dec
 $updates['202206201417'][] = 'alter table tasks_tasklist_group
     add progressChange tinyint(2) null;';
 
+$updates['202301301230'][] = function () {
+	if (\go\core\model\Module::isInstalled('legacy', 'projects2')) {
+		echo "Cleaning up orphaned project task lists..." . PHP_EOL;
+		$q = "DELETE FROM `tasks_tasklist` WHERE `role` = 3 AND `projectId` NOT IN(SELECT `id` FROM `pr2_projects`);";
+		go()->getDbConnection()->exec($q);
+	}
+};
+
 
 
 
 //6.7
 
-$updates['202206201417'][] = "alter table tasks_task
+$updates['202301301230'][] = "alter table tasks_task
 	add aclId int null;";
 
-$updates['202206201417'][] = "update tasks_task t set t.aclId = (select aclId from tasks_tasklist where id = t.tasklistId);";
+$updates['202301301230'][] = "update tasks_task t set t.aclId = (select aclId from tasks_tasklist where id = t.tasklistId);";
 
-$updates['202206201417'][] = "alter table tasks_task
+$updates['202301301230'][] = "alter table tasks_task
 	add constraint tasks_task_core_acl_id_fk
 		foreign key (aclId) references core_acl (id)  ON DELETE RESTRICT;";
 
 
-$updates['202210141620'][] = "update core_entity set name='TaskList', clientName='TaskList' where name='Tasklist'";
+$updates['202301301230'][] = "update core_entity set name='TaskList', clientName='TaskList' where name='Tasklist'";
 
 
-$updates['202210201328'][] = "create table tasks_tasklist_grouping
+$updates['202301301230'][] = "create table tasks_tasklist_grouping
 (
 	id      int unsigned auto_increment,
     name    varchar(190) not null,
@@ -208,10 +216,10 @@ $updates['202210201328'][] = "create table tasks_tasklist_grouping
 );";
 
 
-$updates['202210201328'][] = "alter table tasks_tasklist
+$updates['202301301230'][] = "alter table tasks_tasklist
                     add groupingId int unsigned null;";
 
-$updates['202210201328'][] = "alter table tasks_tasklist
+$updates['202301301230'][] = "alter table tasks_tasklist
                     add constraint tasks_tasklist_tasks_tasklist_grouping_null_fk
                         foreign key (groupingId) references tasks_tasklist_grouping (id)
                             on delete set null;";

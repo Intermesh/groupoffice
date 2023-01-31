@@ -20,10 +20,12 @@ class EventHandlers {
 
 	public static function submitAccount(\GO\Email\Controller\AccountController $controller, &$response, \GO\Email\Model\Account $account, $params, $modifiedAttributes)
 	{
-		$settings = Model\AccountSettings::model()->createOrFindByParams(['account_id'=>$account->id]);
-		$settings->account_id = $account->id;
-		$settings->always_sign = !empty($params['always_sign']) ? 1 : 0;
-		$settings->save();
+		if(array_key_exists('always_sign', $params)) {
+			$settings = Model\AccountSettings::model()->createOrFindByParams(['account_id' => $account->id]);
+			$settings->account_id = $account->id;
+			$settings->always_sign = !empty($params['always_sign']) ? 1 : 0;
+			$settings->save();
+		}
 	}
 
 	public static function aliasesStore(\GO\Email\Controller\AliasController $controller, &$response, \GO\Base\Data\Store $store, $params) {

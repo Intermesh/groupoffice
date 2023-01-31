@@ -94,7 +94,8 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 				scope: this,
 				select: this.onSelect,
 				beforeselect: this.onBeforeSelect,
-				change: this.onChange
+				change: this.onChange,
+				setvalue: this.onChange // to hide conditional fields on select (also when in lazy render tab)
 			}
 		};
 	},
@@ -134,7 +135,6 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		} else {
 			this.fireEvent('select', this, record);
 		}
-		
 		this.doLayout();
 	},
 	
