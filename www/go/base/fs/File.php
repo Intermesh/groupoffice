@@ -428,6 +428,34 @@ class File extends Base{
 		
 		return false;						
 	}
+
+	/**
+	 * Create a hard link
+	 *
+	 * @link http://php.net/manual/en/function.link.php
+	 *
+	 * @param File $targetLink The link name.
+	 *
+	 * @return bool <b>File</b> on success or <b>FALSE</b> on failure.
+	 */
+	public function link(File $targetLink): bool
+	{
+		return link($this->path(), $targetLink->path());
+	}
+
+	public function linkOrCopy(File $targetLink) {
+
+		try {
+			if($this->link($targetLink)) {
+				go()->debug("Link success");
+				return true;
+			}
+		}catch(\Throwable $e) {
+
+		}
+
+		return $this->copy($targetLink->parent(), $targetLink->name());
+	}
 	
 	/**
 	 * Copy a file to another folder.

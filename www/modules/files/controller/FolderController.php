@@ -1306,9 +1306,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						}
 					}
 					$filename = $blob->name;
-					$removeBlob = $this->removeBlob($blob->id);
-				}else{
-					$removeBlob = false;
+
 				}
 
 				if ($file->exists()) {
@@ -1324,14 +1322,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								$params['overwrite'] = 'ask';
 							case 'yestoall':
 								//we dont want overwrite file in no case
-								if(!$removeBlob || $this->blobIsNeededAgain($removeBlob->id, $paths)) {
-									$newFile = GO\Base\Fs\File::tempFile();
-									$file = $file->copy($newFile->parent(), $newFile->name());
-								}
+								$newFile = GO\Base\Fs\File::tempFile();
+								$file = $file->linkOrCopy($newFile);
+
 								$existingFile->replace($file);
-								if($removeBlob) {
-									$removeBlobs[] = $removeBlob->id;
-								}
+
 								break;
 							case 'no':
 								$params['overwrite'] = 'ask';
@@ -1339,23 +1334,17 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								continue 2;
 						}
 					} else {
-						if(!$removeBlob || $this->blobIsNeededAgain($removeBlob->id, $paths)) {
-							$newFile = GO\Base\Fs\File::tempFile();
-							$file = $file->copy($newFile->parent(), $newFile->name());
-						}
+						$newFile = GO\Base\Fs\File::tempFile();
+						$file = $file->linkOrCopy($newFile);
+
 						$destinationFolder->addFileSystemFile($file, false, $filename);
-						if($removeBlob) {
-							$removeBlobs[] = $removeBlob->id;
-						}
+
 					}
 					$response['success'] = true;
 				}
 			}
 		}
 
-		if(count($removeBlobs)) {
-			//Blob::delete(['id' => $removeBlobs]);
-		}
 	}
 
 	/**
