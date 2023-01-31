@@ -1,3 +1,4 @@
+31-01-2023 6.6.147
 - Calendar: Fixed: ErrorException in /usr/share/groupoffice/go/base/util/icalendar/RRuleIterator.php at line 98: Illegal offset type
 - Timeregistration2: fix check on overwriting travel distance for existing time entry
 - Core: Updated German translation
