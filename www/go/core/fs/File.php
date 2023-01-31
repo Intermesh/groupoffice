@@ -565,7 +565,7 @@ class File extends FileSystemObject {
 	 * 
 	 * @return bool <b>File</b> on success or <b>FALSE</b> on failure.
 	 */
-	public function createLink(File $targetLink): bool
+	public function link(File $targetLink): bool
 	{
 		return link($this->getPath(), $targetLink->getPath());
 	}
