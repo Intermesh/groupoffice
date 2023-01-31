@@ -75,7 +75,7 @@ return array (
   'This customer doesn\'t have an active contract' => 'Dese klant heeft geen actief contract',
   'Assignment' => 'Toegewezen',
   'Alerts' => 'Meldingen',
-	'Import task list ID from CSV file' => 'Importeer takenlijst-id uit CSV-bestand',
-	'Role' => 'Rol',
-	'List' => 'Takenlijst'
+  'Import task list ID from CSV file' => 'Importeer takenlijst-id uit CSV-bestand',
+  'Role' => 'Rol',
+  'List' => 'Takenlijst',
 );
