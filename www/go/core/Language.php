@@ -52,7 +52,7 @@ class Language {
 		}
 
 		if(!isset($this->isoCode)) {
-			if(isset($_COOKIE['GO_LANGUAGE'])) {
+			if(isset($_COOKIE['GO_LANGUAGE']) && $this->hasLanguage($_COOKIE['GO_LANGUAGE'])) {
 				$this->isoCode = $_COOKIE['GO_LANGUAGE'];
 			} else {
 				$this->isoCode = go()->getAuthState() && go()->getAuthState()->isAuthenticated() ? go()->getAuthState()->getUser(['language'])->language : $this->getBrowserLanguage();
