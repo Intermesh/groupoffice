@@ -451,7 +451,7 @@ class File extends Base{
 				return true;
 			}
 		}catch(\Throwable $e) {
-
+			go()->debug($e);
 		}
 
 		return $this->copy($targetLink->parent(), $targetLink->name());
