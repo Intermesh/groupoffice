@@ -448,7 +448,7 @@ class File extends Base{
 		try {
 			if($this->link($targetLink)) {
 				go()->debug("Link success");
-				return true;
+				return $targetLink;
 			}
 		}catch(\Throwable $e) {
 			go()->debug($e);
