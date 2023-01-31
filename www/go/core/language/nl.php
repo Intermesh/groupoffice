@@ -1182,7 +1182,7 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'This action will select {count} items and might cause Group-Office to become slow. Are you sure you want continue?' => 'This action will select {count} items and might cause {product_name} to become slow. Are you sure you want continue?',
   'Please create a new password to continue working in Group-Office.' => 'Please create a new password to continue working in {product_name}.',
   'Please choose if you\'d like to allow desktop notifications by Group-Office after pressing \'Ok\'.' => 'Please choose if you\'d like to allow desktop notifications by {product_name} after pressing \'Ok\'.',
-  'Please match the CSV columns with the correct Group-Office columns and press \'Import\' to continue.' => 'Please match the CSV columns with the correct {product_name} columns and press \'Import\' to continue.',
+  'Please match the CSV columns with the correct Group-Office columns and press \'Import\' to continue.' => 'Koppel de CSV kolommen met de juiste {product_name} kolommen en druk om \'Importeren\' om verder te gaan.',
   'Users can login without this domain behind the username. Note that if the user exists in the Group-Office database it will take precedence.' => 'Users can login without this domain behind the username. Note that if the user exists in the {product_name} database it will take precedence.',
   'Please use an email address that you can access from outside Group-Office.' => 'Please use an email address that you can access from outside {product_name}.',
   'This instance is using' => 'Deze instantie gebruikt',
@@ -1337,11 +1337,7 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Your session is no longer valid. Press OK to authenticate.' => 'Uw sessie is niet meer geldig. Druk op OK om opnieuw te authentificeren.',
   'File size exceeds the maximum of {max}.' => 'Het bestand is groter dan het maximum van {max}.',
   'Show on tab' => 'Toon op tab',
-	"This field is required" => "Dit veld is vereist",
-	"Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue." => "Koppel de CSV kolommen met de juiste Group-Office kolommen en druk om 'Importeren' om verder te gaan.",
-	'Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog.' =>
-		'Voltooi de installatie door de systeeminstellingen te controleren. Klik op OK om door te gaan naar de systeeminstellingen.',
-	"Do you want to generate some fake demonstration data? This will take about one or two minutes to generate." =>
-		"Wilt u demonstratie data genereren? Dit duurt ongeveer 1 a 2 minuten om te genereren."
-
+  'This field is required' => 'Dit veld is vereist',
+  'Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog.' => 'Voltooi de installatie door de systeeminstellingen te controleren. Klik op OK om door te gaan naar de systeeminstellingen.',
+  'Do you want to generate some fake demonstration data? This will take about one or two minutes to generate.' => 'Wilt u demonstratie data genereren? Dit duurt ongeveer 1 a 2 minuten om te genereren.',
 );
