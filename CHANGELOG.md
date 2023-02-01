@@ -1,4 +1,5 @@
 - Core / Files: Uploading files in files module could corrupt blob system
+- Projects2: fix bug in resource dialog when budgeted hours greater than or equal to 1000
 
 31-01-2023 6.6.147
 - Calendar: Fixed: ErrorException in /usr/share/groupoffice/go/base/util/icalendar/RRuleIterator.php at line 98: Illegal offset type
