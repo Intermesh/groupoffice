@@ -39,16 +39,10 @@
 .tasks-category ~ .tasks-category::before {
     content: ', ';
 }
-
-.tasks-task-grid .x-grid3-check-col-td > div > div::before {
-    content: "radio_button_unchecked";
-    color: var(--c-primary, rgb(22, 82, 161));
+.tasks-task-grid .x-grid3-check-col-td > div > div {
+    position:relative;
+    top:2px;
 }
-
-.tasks-task-grid .x-grid3-check-col-td > div > div.x-grid3-check-col-on::before {
-    content: "check_circle";
-}
-
 
 .go-tasks-task-list .x-grid-group-val-empty .x-grid-group-hd {
     display: none;

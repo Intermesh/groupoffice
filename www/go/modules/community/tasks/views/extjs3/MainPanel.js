@@ -131,7 +131,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			this.sidePanel.items.insert(1, Ext.create({
 				xtype: "panel",
 				layout: "form",
-				bodyStyle: "padding-left: 18px;", // TODO wtf 18px?
 				tbar: [
 					{
 						xtype:"tbtitle",
@@ -139,7 +138,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					}
 				],
 				items: [
-					{
+					{xtype:'fieldset',items:[{
 						hideLabel: true,
 						xtype: "checkbox",
 						boxLabel: t("Mine", 'tasks','community'),
@@ -153,7 +152,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								this.taskGrid.store.load();
 							}
 						}
-					}
+					}]}
 				]
 			}));
 		}

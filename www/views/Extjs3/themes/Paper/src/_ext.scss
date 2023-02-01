@@ -299,19 +299,63 @@
 // ##################
 // ### FORM FIELD ###
 // ##################
-%checkbox {
-	@extend %icon;
-	content: 'check_box_outline_blank'; // 'check_box' when on
-	position: relative;
-	color: inherit;
-	display:inline-block;
-	height: dp(32);
-	width: dp(32);
-	left:dp(-4);
-	box-sizing: border-box;
-	background-color: transparent;
-	border-radius: 50%;
-	padding:dp(4);
+%checkbox2 {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	display: inline-block;
+	cursor: pointer;
+	min-width: dp(22);
+	min-height: dp(22);
+	width: dp(22);
+	height:dp(22);
+	background-color: color($bg, 'box');
+	border: 1px solid color($fg, 'textbox-line');
+	border-radius: dp(4);
+	&:before { // tick
+		content: '';
+		transform: scale(0);
+		display:inline-block;
+		vertical-align: baseline;
+		margin: -1px;
+		width: dp(22);
+		height: dp(22);
+		transition: 90ms transform ease-in-out;
+		@include var(background, c-primary);
+	}
+	&:checked:before { // tick-on
+		transform: scale(1);
+	}
+	&:focus {
+		@include var(border-color, c-primary);
+		box-shadow: 0 0 0 1px $cPrimary;
+	}
+	&[style]:checked:before {
+		color:inherit;
+		text-shadow: 0 0 1px black;
+	}
+	&[type="checkbox"],
+	.x-grid3-check-col-td &,
+	.x-menu-check-item:not(.x-menu-group-item) &.x-menu-item-icon,
+	&.x-grid3-row-checker,
+	.x-grid3-hd-checker &.x-grid3-hd-checker {
+		&:before {
+			clip-path: polygon(39.375% 74.375%, 16% 51%, 20.48% 46.52%, 39.33% 65.37%, 79.33% 25.37%, 83.81% 29.85%)
+		}
+	}
+	&[type="radio"],
+	.x-grid3-col-complete & {
+		border-radius: 50%;
+		&:checked:before {
+			content: '';
+			border-radius: 50%;
+			transform: scale(.4);
+		}
+	}
+}
+input[type="checkbox"],
+input[type="radio"] {
+	@extend %checkbox2;
 }
 
 .x-form-grow-sizer {
@@ -478,47 +522,25 @@
       color: color($fg, 'text');
 	}
 	&-cb-label {
-		display: inline-block;
-		height: dp(32);
-		line-height: dp(32);
+		//top:4px;
+		line-height: dp(24);
 	}
 	&-check-wrap {
 		padding: dp(9) 0;
 	}
-	&-checkbox {
-		position:absolute;
-		opacity: 0;
-		line-height: normal;
-		min-height: auto;
-		+ .x-form-cb-label::before {
-			@extend %checkbox;
-			//margin-right: dp(12);
-		}
-		&:checked + .x-form-cb-label::before {
-			content: 'check_box';
-		}
-		&:focus + .x-form-cb-label::before {
-			@include var(background-color, c-primary-tp);
-		}
+	&-checkbox.x-form-field { // the <input>
+		@extend %checkbox2;
+		margin-right: dp(12);
+		//+ .x-form-cb-label {
+		//	height: dp(24);
+		//}
 	}
-	&-radio {
-		position:absolute;
-		line-height: normal;
-		min-height: auto;
-		opacity:0;
-		+ label {
-			margin-left: 0;
-		}
-		+ label:before {
-			@extend %checkbox; // different icon    |
-			content: 'radio_button_unchecked'; // <--
-		}
-		&:checked + label:before {
-			content: 'radio_button_checked';
-		}
-		&:focus + label::before {
-			@include var(background-color, c-primary-tp);
-		}
+	&-radio.x-form-field {
+		@extend %checkbox2;
+		margin-right: dp(12);
+		//+ label {
+		//	height: dp(24);
+		//}
 	}
 	&-radio-group {
 		padding: dp(4) dp(16);
@@ -768,26 +790,9 @@
 			position:relative;
 		}
 
-		input{
-			opacity:0;
-			width:dp(24);
-			height:dp(24);
-			
-			+ .x-fieldset-header-text{
-				padding-left:dp(8);
-				&::before{
-					@extend %checkbox;
-					top:dp(-7);
-					left:dp(-36);
-					pointer-events:none;
-				}
-			}
-			&:checked + .x-fieldset-header-text::before{
-				content: 'check_box';
-			}
-			&:focus + .x-fieldset-header-text::before{
-				@include var(background-color, c-primary-tp);
-			}
+		input {
+			@extend %checkbox2;
+			margin-right: dp(8);
 		}
 	}
 }
@@ -1210,7 +1215,7 @@
 		padding: 0 dp(8) 0 0;
 	}
 	.xtb-title {
-		padding-left: dp(8);
+		//padding-left: dp(8);
 		@extend %font-title;
 	}
 
@@ -1368,8 +1373,9 @@
 	}
 
 	&-cell-first {
-		.x-grid3-cell-inner {
-			padding-left: dp(24);
+		.x-grid3-cell-inner { // -col-checker
+			padding-left: dp(16);
+			padding-right:0;
 		}
 	}
 	&-cell-inner, &-hd-inner {
@@ -1391,19 +1397,15 @@
 		}
 	}
 	&-row-checker, .x-grid3-hd-checker &-hd-checker {
-		height:dp(20); // same as line-height of text
-		&::before {
-			@extend %checkbox;
-			padding:0; // grid row has the padding
-			top: -1px; // grid col need 1px up
-		}
+		@extend %checkbox2;
+		top:2px;
+		position: relative;
+		//height:dp(20); // same as line-height of text
 		.x-grid3-row-selected &::before {
-			content: 'check_box';
+			transform: scale(1);
 		}
 	}
-	
-	
-	
+
 	&-row {
 		border:0;
 		border-bottom:1px solid color($fg, 'divider');
@@ -1439,17 +1441,14 @@
 	}
 	&-check-col-td > div {
 		text-overflow: initial;
-		 > div {
-			height:dp(20);
-			&::before{
-				@extend %checkbox;
-				padding:0;
-				top: -1px;
-			}
-			&.x-grid3-check-col-on::before {
-				content: 'check_box';
-			}
-		}
+		// > div { //
+	}
+	.x-grid3-check-col, .x-grid3-check-col-on {
+		@extend %checkbox2;
+		height:dp(20);
+	}
+	.x-grid3-check-col-on:before { // tick-on
+		transform: scale(1);
 	}
 	&-row td, &-summary-row td {
 		@extend %font-data;
@@ -1833,9 +1832,9 @@ td.grid-hd-group-cell {
 		
 		
 	}
-	&-node-cb {
-		padding: 0 dp(4);
-	}
+	//&-node-cb {
+	//	padding: 0 dp(4);
+	//}
 	&-node-anchor {
 		width:auto;
 		overflow:visible;
@@ -2238,30 +2237,35 @@ td.x-date-mp-sep {
 	}
 	&-item-icon {
 		display:inline-block;
-		width: dp(40) !important; // <- some modules mess this up
+		margin-right:dp(12);
+		//width: dp(40) !important; // <- some modules mess this up (michael:we have a launcher now)
 		height: dp(20); // 4 dp smaller
 		position:relative;
 		background-size: contain; // <- for svg backgrounds
+		background-position: center center !important; // why is the default left important?
 		li > & {
 			position:absolute;
 		}
 	}
-	&-check-item .x-menu-item-text:before {
-		position: absolute;
-		left: dp(16);
-		top: 0;
-		@extend %icon;
-		content: 'check_box_outline_blank';
+	&-check-item .x-menu-item-icon {
+		@extend %checkbox2;
+		position: relative;
+		top: 1px;
 	}
-	&-item-checked .x-menu-item-text:before {
-		position: absolute;
-		left: dp(16);
-		top: 0;
-		@extend %icon;
-		content: 'check_box';
+	&-item-checked .x-menu-item-icon:before {
+		transform: scale(1);
 	}
-	&-item-checked a.x-menu-group-item .x-menu-item-text:before {
-		content: 'radio_button_checked';
+	a.x-menu-group-item {
+		.x-menu-item-icon {
+			border-radius: 50%;
+		}
+	}
+	&-item-checked a.x-menu-group-item {
+		.x-menu-item-icon:before {
+			content: '';
+			border-radius: 50%;
+			transform: scale(.4);
+		}
 	}
 	&-group-item .x-menu-item-icon{ background-image:none;}
 	&-plain {
@@ -2276,9 +2280,6 @@ a.x-menu-item {
 	user-select: none;
 	padding: 0 dp(56) 0 dp(16);
 	border:0 !important;
-}
-a.x-menu-group-item .x-menu-item-text:before{
-	content: 'radio_button_unchecked';
 }
 .menu-title {
 	@extend %font-caption;
