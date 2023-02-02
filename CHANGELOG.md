@@ -8951,6 +8951,7 @@ Projects
 
 2009/08/24 3.2.28
 - Fixed bug in billing module where country was incorrectly saved
+- Savemailas/Projects: Fix linked e-mail acl's when overriding a project's default permissions.
 
 2009/08/21 3.2.26
 - New report for billing that shows the total turnover per customer
