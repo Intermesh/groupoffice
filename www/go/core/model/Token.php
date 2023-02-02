@@ -578,7 +578,7 @@ class Token extends Entity {
 		Response::get()->setCookie('accessToken', $this->accessToken, [
 			'expires' => 0,
 			"path" => "/",
-			"samesite" => "Strict",
+			"samesite" => "Lax", // strict not possible or oauth won't work as it will not send cookie on callback page
 			"secure" => Request::get()->isHttps(),
 			"domain" => Request::get()->getHost(),
 			"httpOnly" => true
@@ -589,7 +589,7 @@ class Token extends Entity {
 		Response::get()->setCookie('accessToken', "", [
 			'expires' => time() - 3600,
 			"path" => "/",
-			"samesite" => "Strict",
+			"samesite" => "Lax", // strict not possible or oauth won't work as it will not send cookie on callback page
 			"secure" => Request::get()->isHttps(),
 			"domain" => Request::get()->getHost(),
 			"httpOnly" => true
