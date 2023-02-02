@@ -3514,29 +3514,40 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * When you move a contact to another contact all the acl id's must change.
 	 */
 	private function _fixLinkedEmailAcls(){
-		if($this->hasLinks() && GO::modules()->isInstalled('savemailas')){
-			$arr = explode('.', $this->aclField());
-			if (count($arr) > 1) {
+		if(!$this->hasLinks() || !GO::modules()->isInstalled('savemailas')) {
+			return;
+		}
+		$arr = explode('.', $this->aclField());
+		if (count($arr) > 1) {
 
-				$relation = $this->getRelation($arr[0]);
+			$relation = $this->getRelation($arr[0]);
 
-				if($relation && $this->isModified($relation['field'])){
-					//acl relation changed. We must update linked emails
+			if($relation && $this->isModified($relation['field'])){
+				//acl relation changed. We must update linked emails
 
-					GO::debug("Fixing linked e-mail acl's because relation ".$arr[0]." changed.");
+				GO::debug("Fixing linked e-mail acl's because relation ".$arr[0]." changed.");
+				$this->_doFixLinkedEmailAcls();
+				return;
+			}
+		}
 
-					$stmt = \GO\Savemailas\Model\LinkedEmail::model()->findLinks($this);
-					if($stmt->rowCount()) {
-						$aclId = $this->findAclId();
-						while ($linkedEmail = $stmt->fetch()) {
+		$acl_overwrite_col = $this->aclOverwrite();
+		if($acl_overwrite_col && $this->isModified([$acl_overwrite_col])) {
+			$this->_doFixLinkedEmailAcls();
+		}
 
-							GO::debug("Updating " . $linkedEmail->subject);
+	}
 
-							$linkedEmail->acl_id = $aclId;
-							$linkedEmail->save();
-						}
-					}
-				}
+	private function _doFixLinkedEmailAcls() {
+		$stmt = \GO\Savemailas\Model\LinkedEmail::model()->findLinks($this);
+		if($stmt->rowCount()) {
+			$aclId = $this->findAclId();
+			while ($linkedEmail = $stmt->fetch()) {
+
+				GO::debug("Updating " . $linkedEmail->subject);
+
+				$linkedEmail->acl_id = $aclId;
+				$linkedEmail->save();
 			}
 		}
 	}
