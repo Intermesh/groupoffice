@@ -15,6 +15,9 @@ require($dir . 'GO.php');
  * Get user entity from current state or token param
  */
 $state = new State();
+//not possible with oauth flow.
+State::$CSRFcheck = false;
+
 $tokenStr = Request::get()->getQueryParam('token');
 if ($tokenStr) {
 	$tokenStrParts = explode(';', $tokenStr);
