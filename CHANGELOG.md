@@ -1,5 +1,6 @@
 - Core / Files: Uploading files in files module could corrupt blob system
 - Projects2: fix bug in resource dialog when budgeted hours greater than or equal to 1000
+- Savemailas/Projects: Fix linked e-mail acl's when overriding a project's default permissions.
 
 31-01-2023 6.6.147
 - Calendar: Fixed: ErrorException in /usr/share/groupoffice/go/base/util/icalendar/RRuleIterator.php at line 98: Illegal offset type
@@ -8951,7 +8952,6 @@ Projects
 
 2009/08/24 3.2.28
 - Fixed bug in billing module where country was incorrectly saved
-- Savemailas/Projects: Fix linked e-mail acl's when overriding a project's default permissions.
 
 2009/08/21 3.2.26
 - New report for billing that shows the total turnover per customer
