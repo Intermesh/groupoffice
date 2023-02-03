@@ -24,7 +24,7 @@ class Date extends Base {
    */
 	public function defineFilter(Filters $filters) {		
 		
-		$filters->addDateTime($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
+		$filters->addDate($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
 			$this->joinCustomFieldsTable($query);						
 			$criteria->where('customFields.' . $this->field->databaseName, $comparator, $value);
 		});
