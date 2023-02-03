@@ -39,11 +39,6 @@
 .tasks-category ~ .tasks-category::before {
     content: ', ';
 }
-.tasks-task-grid .x-grid3-check-col-td > div > div {
-    position:relative;
-    top:2px;
-}
-
 .go-tasks-task-list .x-grid-group-val-empty .x-grid-group-hd {
     display: none;
 }

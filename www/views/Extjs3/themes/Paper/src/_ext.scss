@@ -474,8 +474,8 @@ input[type="radio"] {
 		}
 
 		.x-small-editor & {
-			min-height: dp(36);
-			padding: dp(4) dp(8);
+			//min-height: dp(36); //messes up checkbox in billing
+			//padding: dp(4) dp(8);
 		}
 
 
@@ -1446,6 +1446,7 @@ input[type="radio"] {
 	.x-grid3-check-col, .x-grid3-check-col-on {
 		@extend %checkbox2;
 		height:dp(20);
+		vertical-align: middle;
 	}
 	.x-grid3-check-col-on:before { // tick-on
 		transform: scale(1);
