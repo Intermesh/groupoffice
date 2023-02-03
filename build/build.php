@@ -210,6 +210,10 @@ class Builder
 		$this->encode();
 
 		cd($this->buildDir);
+
+        // remove sensitive files OWASP WSTG - WSTG-INFO-05
+        run("rm composer.json composer.lock vendor/composer/installed.json");
+
 		run("tar czf " . $this->packageName . ".tar.gz " . $this->packageName);
 		echo "Created " . $this->buildDir . '/'. $this->packageName . ".tar.gz\n";
 	}

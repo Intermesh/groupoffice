@@ -46,7 +46,7 @@ class Language {
 	{
 		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
 			if(!headers_sent()) {
-				setcookie("GO_LANGUAGE", $_GET['SET_LANGUAGE'],time() + (10 * 365 * 24 * 60 * 60),"/",Request::get()->getHost());
+				setcookie("GO_LANGUAGE", $_GET['SET_LANGUAGE'],time() + (10 * 365 * 24 * 60 * 60),"/",Request::get()->getHost(), Request::get()->isHttps(), true);
 			}
 			return $_GET['SET_LANGUAGE'];
 		}
@@ -57,7 +57,7 @@ class Language {
 			} else {
 				$this->isoCode = go()->getAuthState() && go()->getAuthState()->isAuthenticated() ? go()->getAuthState()->getUser(['language'])->language : $this->getBrowserLanguage();
 				if(!headers_sent()) {
-					setcookie("GO_LANGUAGE", $this->isoCode,time() + (10 * 365 * 24 * 60 * 60),"/",Request::get()->getHost());
+					setcookie("GO_LANGUAGE", $this->isoCode,time() + (10 * 365 * 24 * 60 * 60),"/",Request::get()->getHost(), Request::get()->isHttps(), true);
 				}
 			}
 		}
