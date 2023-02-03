@@ -217,9 +217,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			section: this.section
 		});
 
-		if(this.large) {
-			this.commentsContainer.el.dom.style.maxHeight = (document.body.offsetHeight * 0.7) + "px";
-		}
+
 
 		this.store.load();
 	},
@@ -235,6 +233,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		if(this.collapsed || !this.commentsContainer.rendered) {
 			return;
 		}
+
+		if(this.large) {
+			this.commentsContainer.el.dom.style.maxHeight = (document.body.offsetHeight * 0.7) + "px";
+		}
+
 		o = o || {};
 
 		let badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
