@@ -3,6 +3,7 @@
 - Savemailas/Projects: Fix linked e-mail acl's when overriding a project's default permissions.
 - Core: Minor security enhancements
 - Onlyoffice: Fixed save a copy in onlyoffice
+- Core: Raise JMAP timeout to 180s
 
 31-01-2023 6.6.147
 - Calendar: Fixed: ErrorException in /usr/share/groupoffice/go/base/util/icalendar/RRuleIterator.php at line 98: Illegal offset type
