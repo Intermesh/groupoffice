@@ -15,6 +15,7 @@
 
   &:before {
       content: " ";
+	  position:absolute;
       background-image: url(#{$resourcePath}img/logo-white.svg);
       background-size: contain;
       background-repeat: no-repeat;
@@ -26,6 +27,7 @@
 
   ul {
       max-width: 95%;
+	  padding-top:dp(40);
       display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(10rem, 17%), 1fr));
       justify-content: space-between;
@@ -58,12 +60,17 @@
   li.x-menu-textfield-item {
     grid-column: 1 / -1;
     height: 50px;
-    min-width: 100%;
+	  //max-width: 500px;
+	  margin: 0 auto;
+	  width:400px;
+	  position:relative;
     > div {
       @extend .search-field-wrap;
       background-color: transparent !important;
     }
-    > div > div { margin: 0 auto; overflow:hidden;}
+    > div > div {
+		 overflow:hidden;
+	 }
 
   }
   .x-menu-item-text {

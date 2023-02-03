@@ -6,7 +6,7 @@ Ext.menu.SearchFieldItem = Ext.extend(Ext.menu.BaseItem, {
 
     isFormField: true,
 
-    layout: "fit",
+    //layout: "fit",
 
     constructor: function (config) {
         Ext.menu.SearchFieldItem.superclass.constructor.call(this, config);
@@ -20,7 +20,7 @@ Ext.menu.SearchFieldItem = Ext.extend(Ext.menu.BaseItem, {
 
         Ext.menu.SearchFieldItem.superclass.onRender.apply(me, arguments);
 
-        console.warn(Math.max(700, window.innerWidth * 0.8));
+        //console.warn(Math.max(700, window.innerWidth * 0.8));
 
         me.textFieldContainer = new Ext.Container({
             renderTo: me.id,
@@ -28,7 +28,7 @@ Ext.menu.SearchFieldItem = Ext.extend(Ext.menu.BaseItem, {
             cls: "go-menu-search-field-textfield-container",
             items: [
                 me.textField = new Ext.form.TriggerField({
-                    width: Math.min(700, window.innerWidth * 0.8),
+                    //width: Math.min(700, window.innerWidth * 0.8),
                     cls: this.itemCls,
                     hideLabel: true,
                     enableKeyEvents: true,
@@ -43,7 +43,7 @@ Ext.menu.SearchFieldItem = Ext.extend(Ext.menu.BaseItem, {
             ]
         });
 
-        this.textFieldContainer.setWidth(this.parentMenu.ul.getWidth());
+       // this.textFieldContainer.setWidth(this.parentMenu.ul.getWidth());
         this.container.addClass('x-menu-textfield-item');
 
         this.textField.on('keyup', function (field, e) {
