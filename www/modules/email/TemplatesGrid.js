@@ -157,15 +157,10 @@ Ext.extend(GO.email.TemplatesGrid, GO.grid.GridPanel,{
 	afterRender : function()
 	{
 		GO.email.TemplatesGrid.superclass.afterRender.call(this);
-		
-		if(this.isVisible())
+		if(!this.store.loaded)
 		{
-			if(!this.store.loaded)
-			{
-				this.store.load();
-			}
+			this.store.load();
 		}
-
 	},
 	
 	onShow : function(){

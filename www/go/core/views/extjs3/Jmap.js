@@ -10,7 +10,7 @@ go.Jmap = {
 
 	paused: 0,
 
-	requestTimeout: 60000,
+	requestTimeout: 180000,
 
 	/**
 	 * Enable for XDEBUG profiling

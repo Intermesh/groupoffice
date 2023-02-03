@@ -349,9 +349,9 @@ class Task extends AclInheritEntity {
 					}
 					$criteria->where(['categories.categoryId' => $value]);
 				}
-			})->addDate("start", function(Criteria $criteria, $comparator, $value) {
+			})->addDateTime("start", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('start',$comparator,$value);
-			})->addDate("due", function(Criteria $criteria, $comparator, $value) {
+			})->addDateTime("due", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('due', $comparator, $value);
 			})->addNumber('percentComplete', function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('percentComplete', $comparator, $value);

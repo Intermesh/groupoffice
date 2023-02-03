@@ -1,6 +1,10 @@
 - Core / Files: Uploading files in files module could corrupt blob system
 - Projects2: fix bug in resource dialog when budgeted hours greater than or equal to 1000
 - Savemailas/Projects: Fix linked e-mail acl's when overriding a project's default permissions.
+- Core: Minor security enhancements
+- Onlyoffice: Fixed save a copy in onlyoffice
+- Core: Raise JMAP timeout to 180s
+- Email: fixed templates not loading on mobile
 
 31-01-2023 6.6.147
 - Calendar: Fixed: ErrorException in /usr/share/groupoffice/go/base/util/icalendar/RRuleIterator.php at line 98: Illegal offset type

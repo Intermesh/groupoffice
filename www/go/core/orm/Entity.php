@@ -782,7 +782,7 @@ abstract class Entity extends Property {
 			});
 
 		if (static::getMapping()->getColumn('modifiedAt')) {
-			$filters->addDate("modifiedAt", function (Criteria $criteria, $comparator, $value) {
+			$filters->addDateTime("modifiedAt", function (Criteria $criteria, $comparator, $value) {
 				$criteria->where('modifiedAt', $comparator, $value);
 			});
 		}
@@ -805,7 +805,7 @@ abstract class Entity extends Property {
 		}
 
 		if (static::getMapping()->getColumn('createdAt')) {
-			$filters->addDate("createdAt", function (Criteria $criteria, $comparator, $value) {
+			$filters->addDateTime("createdAt", function (Criteria $criteria, $comparator, $value) {
 				$criteria->where('createdAt', $comparator, $value);
 			});
 		}
@@ -836,7 +836,7 @@ abstract class Entity extends Property {
 			static::defineCustomFieldFilters($filters);
 		}
 
-		$filters->addDate('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
+		$filters->addDateTime('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
 			if (!$query->isJoined('comments_comment', 'comment')) {
 				$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
 			}
@@ -895,13 +895,13 @@ abstract class Entity extends Property {
 	 */
 	private static function defineLegacyFilters(Filters $filters) {
 		if (static::getMapping()->getColumn('ctime')) {
-			$filters->addDate('createdAt', function (Criteria $criteria, $comparator, DateTime $value) {
+			$filters->addDateTime('createdAt', function (Criteria $criteria, $comparator, DateTime $value) {
 				$criteria->andWhere('ctime', $comparator, $value->format("U"));
 			});
 		}
 
 		if (static::getMapping()->getColumn('mtime')) {
-			$filters->addDate('modifiedAt', function (Criteria $criteria, $comparator, DateTime $value) {
+			$filters->addDateTime('modifiedAt', function (Criteria $criteria, $comparator, DateTime $value) {
 				$criteria->andWhere('mtime', $comparator, $value->format("U"));
 			});
 		}
