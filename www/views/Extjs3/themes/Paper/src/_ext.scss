@@ -444,7 +444,7 @@ input[type="radio"] {
 	&-display-field, &-plainfield {
 		@extend %font-data;
 		line-height: dp(20);
-		padding: dp(15) dp(16);
+		padding: dp(10) dp(16);
 		border-radius: dp(10);
 		border: 1px solid color($fg, 'line');
 	}
