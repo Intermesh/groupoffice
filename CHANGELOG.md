@@ -4,6 +4,7 @@
 - Core: Minor security enhancements
 - Onlyoffice: Fixed save a copy in onlyoffice
 - Core: Raise JMAP timeout to 180s
+- Email: fixed templates not loading on mobile
 
 31-01-2023 6.6.147
 - Calendar: Fixed: ErrorException in /usr/share/groupoffice/go/base/util/icalendar/RRuleIterator.php at line 98: Illegal offset type
