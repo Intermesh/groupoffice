@@ -615,21 +615,21 @@ class Contact extends AclItemEntity {
 										->add('gender', function(Criteria $criteria, $value) {
 											$criteria->andWhere(['gender' => $value, 'isOrganization'=> false]);
 										})
-										->addDate("dateofbirth", function(Criteria $criteria, $comparator, $value, Query $query) {
+										->addDateTime("dateofbirth", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'dob')) {
 												$query->join('addressbook_date', 'dob', 'dob.contactId = c.id', "INNER");
 											}
 											$criteria->where('dob.type', '=', Date::TYPE_BIRTHDAY)
 												->andWhere('dob.date',$comparator, $value);
 										})
-										->addDate("actionDate", function(Criteria $criteria, $comparator, $value, Query $query) {
+										->addDateTime("actionDate", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'actionDate')) {
 												$query->join('addressbook_date', 'actionDate', 'actionDate.contactId = c.id', "INNER");
 											}
 											$criteria->where('actionDate.type', '=', Date::TYPE_ACTION)
 												->andWhere('actionDate.date',$comparator, $value);
 										})
-										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
+										->addDateTime("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'bdate')) {
 												$query->join('addressbook_date', 'bdate', 'bdate.contactId = c.id AND bdate.type = "'.Date::TYPE_BIRTHDAY .'"', "INNER");
 											}

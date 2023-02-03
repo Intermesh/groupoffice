@@ -280,7 +280,7 @@ class Filters {
 	 *
 	 * @return $this
 	 */
-	public function addDate(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
+	public function addDateTime(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
 	{
 		$this->filters[strtolower($name)] = ['type' => 'date', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
