@@ -1,3 +1,5 @@
+- Studio: fix permissions for ACL entities
+
 06-02-2023 6.6.148
 - Core / Files: Uploading files in files module could corrupt blob system
 - Projects2: fix bug in resource dialog when budgeted hours greater than or equal to 1000
