@@ -1,5 +1,5 @@
 go.users.CreateUserAccountPanel = Ext.extend(Ext.form.FormPanel, {
-
+	autoScroll: true,
 	isValid: function () {
 
 		return  this.getForm().isValid();
