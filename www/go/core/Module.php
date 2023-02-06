@@ -253,7 +253,7 @@ abstract class Module extends Singleton {
 		
 		$model = model\Module::find()->where(['name' => static::getName(), 'package' => static::getPackage()])->single();
 		if(!$model) {
-			throw new NotFound("Module not found: ". static::getName() . "/" . static::getPackage());
+			throw new NotFound("Module not found: ".  static::getPackage() . "/" . static::getName());
 		}
 		$model->enabled = false;
 		
