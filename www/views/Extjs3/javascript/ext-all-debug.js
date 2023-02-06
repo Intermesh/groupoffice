@@ -15438,7 +15438,9 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
 
 								if(c.flex) {
 									c.itemCt.dom.style.flex = c.flex;
-									c.el.dom.style.width="100%";
+									if(c.xtype != "checkbox") {
+										c.el.dom.style.width = "100%";
+									}
 								}
 
                 /* start extra code */
