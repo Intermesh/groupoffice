@@ -247,8 +247,13 @@ class EntityType implements ArrayableInterface {
 		foreach($records as $record) {
 			$type = static::fromRecord($record);
 			$cls = $type->getClassName();
-			if(!class_exists($cls) || (!is_a($cls, Entity::class, true) && !is_a($cls, ActiveRecord::class, true))) {
-				go()->warn('Entity class "' . $cls .'" in database but it is not found on disk!');
+			try {
+				if (!class_exists($cls) || (!is_a($cls, Entity::class, true) && !is_a($cls, ActiveRecord::class, true))) {
+					go()->warn('Entity class "' . $cls . '" in database but it is not found on disk!');
+					continue;
+				}
+			} catch(Exception $e) {
+				go()->warn('Entity class "' . $cls . '" in database but there was an error loading it: ' . $e->getMessage());
 				continue;
 			}
 			$i[] = $type;
