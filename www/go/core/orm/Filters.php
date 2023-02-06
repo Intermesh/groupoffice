@@ -275,7 +275,7 @@ class Filters {
 	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
 	 *
 	 * @return $this
-	 *@example
+	 * @example
 	 *
 	 * ->addDateTime('date',function(Criteria $criteria, $comparator, $value){
 	 * 	$criteria->where('date', $comparator, $value);
