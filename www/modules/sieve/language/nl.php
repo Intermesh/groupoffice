@@ -37,7 +37,7 @@ return array (
   'size' => 'grootte',
   'contains' => 'bevat',
   'doesn\'t contain' => 'bevat niet',
-  'is' => 'op',
+  'is' => 'is',
   'doesn\'t equal' => 'is niet gelijk aan',
   'exists' => 'bestaat',
   'doesn\'t exist' => 'bestaat niet',

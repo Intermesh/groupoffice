@@ -155,6 +155,13 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 					this.cmbBodyOperator.setValue('contains');
 				}
 				break;
+
+			// case 'matches':
+			// 	if (not)
+			// 		this.cmbOperator.setValue('notmatches');
+			// 	else
+			// 		this.cmbOperator.setValue('matches');
+			// 	break;
 			case 'is':
 				if (not)
 					this.cmbOperator.setValue('notis');

@@ -34,6 +34,8 @@ GO.sieve.cmbOperatorStore = new Ext.data.ArrayStore({
 	[t("doesn't contain", "sieve"), 'notcontains'],
 	[t("is", "sieve"), 'is'],
 	[t("doesn't equal", "sieve"), 'notis'],
+		// [t("matches", "sieve"), 'matches'],
+		// [t("doesn't match", "sieve"), 'notmatches'],
 	[t("exists", "sieve"), 'exists'],
 	[t("doesn't exist", "sieve"), 'notexists']
 	]
