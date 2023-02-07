@@ -116,6 +116,10 @@ class Builder
 
 	public function build()
 	{
+
+		//dummy sign just to enter password at start
+		run("gpg --clear-sign -o- /dev/null");
+
 		$this->pullSource();
 		$this->minorVersion = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
 
