@@ -42291,7 +42291,7 @@ Ext.form.Checkbox = Ext.extend(Ext.form.Field,  {
     
     checked : false,
     
-    boxLabel: '&#160;',
+    boxLabel: '',
     
     defaultAutoCreate : { tag: 'input', type: 'checkbox', autocomplete: 'off'},
     

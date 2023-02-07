@@ -524,13 +524,14 @@ input[type="radio"] {
 	&-cb-label {
 		//top:4px;
 		line-height: dp(24);
+		margin-left: dp(12);
 	}
 	&-check-wrap {
 		padding: dp(9) 0;
 	}
 	&-checkbox.x-form-field { // the <input>
 		@extend %checkbox2;
-		margin-right: dp(12);
+		//margin-right: dp(12);
 		//+ .x-form-cb-label {
 		//	height: dp(24);
 		//}
@@ -1830,8 +1831,6 @@ td.grid-hd-group-cell {
 	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor, &-node-cb {
 		display:table-cell;
 		vertical-align: top; //required for Firefox
-		
-		
 	}
 	//&-node-cb {
 	//	padding: 0 dp(4);
@@ -1889,7 +1888,7 @@ td.grid-hd-group-cell {
 }
 .x-tree-node a > span, .x-dd-drag-ghost a > span {
 	@extend .ellipsis;
-	padding: 0 dp(6);
+	padding: 0 dp(6) 0 dp(12);
 	display:block;
 	top:0;
 	left:0;

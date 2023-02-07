@@ -17,7 +17,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	filterName: null,
 	selectFirst: false,
 	saveSelection: false,
-	selectAllButton: false,
+	selectAllButton: true,
 	singleSelect: false,
 
 
@@ -64,23 +64,29 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 				}]
 			})
 
-			if (this.tbar) {
-				const tbar = {
-					xtype: "container",
-					items: [
-						{
-							items: this.tbar,
-							xtype: 'toolbar'
-						},
-
-						this.selectAllToolbar
-					]
-				};
-
-				this.tbar = tbar;
-			} else {
-				this.tbar = this.selectAllToolbar;
+			if (!this.tbar) {
+				this.tbar = [];
 			}
+
+			this.tbar.splice(0, 0, 				{
+				xtype: 'checkbox',
+				style: 'margin-right: ' + dp(7) + "px",
+				listeners: {
+					check: function(cb, checked) {
+
+						if (checked) {
+							this.getSelectionModel().selectAll();
+						} else if(this.selectFirst)
+						{
+							this.getSelectionModel().selectRange(0, 0);
+						} else {
+							this.getSelectionModel().clearSelections();
+						}
+
+					},
+					scope: this
+				}
+			});
 
 			this.store.on("datachanged", this.onStoreDataChanged, this);
 		}

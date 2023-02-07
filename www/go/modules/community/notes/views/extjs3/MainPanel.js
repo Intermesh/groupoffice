@@ -103,7 +103,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			filteredStore: this.noteGrid.store,
 			showMoreLoader: true,
 
-			tbar: [{
+			tbar: [
+				{
 					xtype: 'tbtitle',
 					text: t('Notebooks')
 				}, '->', {
