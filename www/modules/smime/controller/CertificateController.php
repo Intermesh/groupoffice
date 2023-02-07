@@ -58,8 +58,8 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 		//Smime::import($certData, $params['smime_password']);
 
 		//smime password may not match the Group-Office password
-		if($params['go_password'] === $params['smime_password'])
-			throw new \Exception(\GO::t("Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!", "smime"));
+//		if($params['go_password'] === $params['smime_password'])
+//			throw new \Exception(\GO::t("Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!", "smime"));
 
 		//password may not be empty.
 		if (empty($params['smime_password']))
