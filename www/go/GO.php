@@ -410,25 +410,7 @@ class GO{
             if(!GO::isInstalled()){
               self::$_cache=new \GO\Base\Cache\None();
 						}else{
-							if(!isset(GO::session()->values['cacheDriver'])){
-								$cachePref = array(
-										"\\GO\\Base\\Cache\\Apcu",
-										"\\GO\\Base\\Cache\\Disk"
-								);
-								foreach($cachePref as $cacheDriver){
-									$cache = new $cacheDriver;
-									if($cache->supported()){
-										GO::session()->values['cacheDriver'] = $cacheDriver;
-										self::$_cache=$cache;
-										break;
-									}
-								}
-							}else
-							{
-								$cacheDriver = GO::session()->values['cacheDriver'];
-
-								self::$_cache = new $cacheDriver;
-							}
+							self::$_cache = new \GO\Base\Cache\Apcu();
 						}
         }
         return self::$_cache;

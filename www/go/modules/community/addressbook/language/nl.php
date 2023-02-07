@@ -146,7 +146,7 @@ return array (
   'Allow new' => 'Sta nieuwe toe',
   'Bank details' => 'Bankgegevens',
   'Show more...' => 'Toon meer…',
-  'Display options for address books' => 'Weergave instrellingen voor adresboeken',
+  'Display options for address books' => 'Weergave instellingen voor adresboeken',
   'Start in' => 'Start in',
   'Last selected address book' => 'Laatst geselecteerde adresboek',
 );
