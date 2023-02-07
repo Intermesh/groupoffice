@@ -104,14 +104,14 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 			autoExpandColumn: "name"
 		});
 
-		if(this.title) {
-			this.tbar.unshift({
-				xtype:'tbtitle',
-				text: this.title
-			})
-
-			delete this.title;
-		}
+		// if(this.title) {
+		// 	this.tbar.unshift({
+		// 		xtype:'tbtitle',
+		// 		text: this.title
+		// 	})
+		//
+		// 	delete this.title;
+		// }
 
 		go.emailtemplate.GridPanel.superclass.initComponent.call(this);
 		
