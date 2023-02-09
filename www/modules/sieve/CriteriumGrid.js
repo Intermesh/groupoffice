@@ -80,6 +80,13 @@ GO.sieve.CriteriumGrid = function(config){
 							} else {
 								txtToDisplay = t("Body contains", "sieve")+' '+record.data.arg;
 							}
+						} else {
+							if(record.data.not)
+							{
+								txtToDisplay = t("Body doesn't match", "sieve")+' '+record.data.arg;
+							} else {
+								txtToDisplay = t("Body matches", "sieve")+' '+record.data.arg;
+							}
 						}
 						break;
 					case 'header':
@@ -133,6 +140,31 @@ GO.sieve.CriteriumGrid = function(config){
 									txtToDisplay = t("To equals", "sieve")+' '+record.data.arg2;
 								else
 									txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg1+" "+t("is", "sieve") +" "+record.data.arg2;
+							}
+						}
+						else if(record.data.type == 'matches')
+						{
+							if(record.data.not)
+							{
+								if(record.data.arg1 == 'Subject')
+									txtToDisplay = t("Subject doesn't match", "sieve")+' '+record.data.arg2;
+								else if(record.data.arg1 == 'From')
+									txtToDisplay = t("From doesn't match", "sieve")+' '+record.data.arg2;
+								else if(record.data.arg1 == 'To')
+									txtToDisplay = t("To doesn't match", "sieve")+' '+record.data.arg2;
+								else
+									txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg1+" "+t("doesn't match", "sieve") +" "+record.data.arg2;
+							}
+							else
+							{
+								if(record.data.arg1 == 'Subject')
+									txtToDisplay = t("Subject matches", "sieve")+' '+record.data.arg2;
+								else if(record.data.arg1 == 'From')
+									txtToDisplay = t("From matches", "sieve")+' '+record.data.arg2;
+								else if(record.data.arg1 == 'To')
+									txtToDisplay = t("To matches", "sieve")+' '+record.data.arg2;
+								else
+									txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg1+" "+t("matches", "sieve") +" "+record.data.arg2;
 							}
 						}
 						break;
