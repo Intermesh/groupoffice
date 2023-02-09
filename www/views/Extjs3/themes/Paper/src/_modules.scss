@@ -191,6 +191,11 @@ i.icon.em-low_priority {
 
 	.msg {
 		padding: dp(16);
+
+		img {
+			// no horizontal scrolling in email
+			max-width: 100% !important;
+		}
 	}
 }
 
