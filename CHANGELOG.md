@@ -2,6 +2,7 @@
 - Projects2: fix display of expense budgets in project panel
 - Projects2: Fixed project ID sent as text
 - Core: Fixed phantom error in randompassword method (Github #961)
+- SMIME: Remove GO password field and check
 
 06-02-2023 6.6.148
 - Core / Files: Uploading files in files module could corrupt blob system
