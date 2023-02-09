@@ -1241,7 +1241,9 @@ class StringHelper {
 			}
 		}
 
-		mt_srand((int) microtime(true) * 1000000);
+		list($usec, $sec) = explode(' ', microtime());
+		mt_srand($sec + $usec * 1000000);
+//		mt_srand((int) microtime(true) * 1000000);
 
 		// Generate array of allowed characters by removing disallowed
 		// characters from array.
