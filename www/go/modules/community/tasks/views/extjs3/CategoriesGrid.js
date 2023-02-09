@@ -6,7 +6,10 @@ go.modules.community.tasks.CategoriesGrid = Ext.extend(go.NavGrid, {
 			//hideMenuButton: !go.Modules.get("community", 'tasks').userRights.mayChangeCategories,
 			store: new go.data.Store({
 				fields: ['id', 'name'],
-				entityStore: "TaskCategory"
+				entityStore: "TaskCategory",
+				sortInfo: {
+					field: "name"
+				}
 			}),
 			menuItems: [
 				{

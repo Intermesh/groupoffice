@@ -323,8 +323,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						const dlg = new go.modules.community.tasks.CategoryDialog()
-						dlg.tasklistCombo.store.setFilter("role", {role: "list"});
+						const dlg = new go.modules.community.tasks.CategoryDialog({
+							role:  !this.support ? go.modules.community.tasks.listTypes.List : go.modules.community.tasks.listTypes.Support
+						})
 
 						const firstSelected = this.tasklistsGrid.getSelectionModel().getSelected();
 						if(firstSelected) {
