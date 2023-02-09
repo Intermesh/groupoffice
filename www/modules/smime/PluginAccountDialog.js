@@ -87,12 +87,7 @@ GO.moduleManager.onModuleReady('email',function(){
 								style:'display:block;margin-bottom:10px'
 							},
 							this.accountIdFld = new Ext.form.Hidden({name:'account_id'}),
-							this.goPasswordField = new Ext.form.TextField({
-								fieldLabel:GO.settings.config.product_name + ' ' + t("Password"),
-								inputType:'password',
-								name:'go_password',
-								width:200
-							}),this.passwordField = new Ext.form.TextField({
+							this.passwordField = new Ext.form.TextField({
 								fieldLabel:'SMIME ' + t("Password"),
 								inputType:'password',
 								name:'smime_password',

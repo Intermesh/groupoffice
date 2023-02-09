@@ -47,26 +47,15 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 			throw new \Exception("No file was received");
 		}
 
-		//check Group-Office password
-		if (!\GO::user()->checkPassword($params['go_password']))
-			throw new \Exception(\GO::t("The Group-Office password was incorrect.", "smime"));
-
 		$certData = file_get_contents($_FILES['cert']['tmp_name'][0]);
 		if(!$certData) {
 			throw new Exception("No certificate data was found");
 		}
-		//Smime::import($certData, $params['smime_password']);
-
-		//smime password may not match the Group-Office password
-//		if($params['go_password'] === $params['smime_password'])
-//			throw new \Exception(\GO::t("Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!", "smime"));
 
 		//password may not be empty.
 		if (empty($params['smime_password']))
 			throw new \Exception(\GO::t("Your SMIME key has no password. This is prohibited for security reasons!", "smime"));
 
-
-		//$cert = Model\Certificate::model()->findByPk($params['account_id']);
 		$success = false;
 		$cert = new Certificate();
 		$cert->cert = $certData;
@@ -87,17 +76,6 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 				go()->error($cert->getValidationErrors());
 			}
 		}
-
-
-//		if (isset($certData))
-//			$cert->cert = $certData;
-//		if (!empty($params['delete_cert']) || empty($cert->cert)) {
-//			//$cert->cert = null;
-//			$cert->delete();
-//		} else {
-//			$cert->always_sign = !empty($params['always_sign']);
-//			$cert->save();
-//		}
 
 		return ['success' => $success, 'feedback' => $success ? "" : go()->t("This certificate already exists","legacy","smime") ];
 	}
