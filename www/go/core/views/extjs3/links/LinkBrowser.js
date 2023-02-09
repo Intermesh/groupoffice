@@ -131,7 +131,10 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 					sortable: true,
 					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-
+						if(!record.data || !record.data.to) {
+							console.warn(record);
+							return '';
+						}
 						if (!record.data.to.description) {
 							record.data.to.description = "-";
 						}
@@ -241,7 +244,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			return panel;
 		});
 		
-		console.log(items);
+		// console.log(items);
 		
 		return this.previewPanel = new Ext.Panel({
 			split: true,
