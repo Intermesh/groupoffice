@@ -1,3 +1,4 @@
+10-02-2023 6.6.149
 - Studio: fix permissions for ACL entities
 - Projects2: fix display of expense budgets in project panel
 - Projects2: Fixed project ID sent as text
