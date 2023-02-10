@@ -4,6 +4,7 @@
 - Core: Fixed phantom error in randompassword method (Github #961)
 - SMIME: Remove GO password field and check
 - Leave days: fix display of special leave budgets over years.
+- Sieve: support :matches in GUI
 
 06-02-2023 6.6.148
 - Core / Files: Uploading files in files module could corrupt blob system
