@@ -729,9 +729,15 @@ abstract class Module extends Singleton {
 	 *
 	 * @return bool
 	 */
-	public function isInstalled(): bool
+	public function isInstalled(bool $andEnabled = true): bool
 	{
-		return !!$this->getModel();
+		$model = $this->getModel();
+
+		if(!$andEnabled) {
+			return !!$model;
+		}else {
+			return $model->enabled;
+		}
 	}
 
 	/**
