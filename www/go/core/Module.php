@@ -736,7 +736,7 @@ abstract class Module extends Singleton {
 		if(!$andEnabled) {
 			return !!$model;
 		}else {
-			return $model->enabled;
+			return $model && $model->enabled;
 		}
 	}
 
