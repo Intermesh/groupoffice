@@ -879,6 +879,8 @@ abstract class Entity extends Property {
 			if (!empty($value['id'])) {
 				$criteria->andWhere('fromId', '=', $value['id']);
 			}
+
+			$query->groupBy([$query->getTableAlias() . '.id']);
 		});
 
 		static::fireEvent(self::EVENT_FILTER, $filters);
