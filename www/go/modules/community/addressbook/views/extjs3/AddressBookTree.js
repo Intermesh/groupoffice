@@ -208,6 +208,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		if(!this.groupMoreMenu) {
 			this.groupMoreMenu = new Ext.menu.Menu({									
 				items: [{
+						itemId: 'edit',
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function () {
@@ -233,6 +234,8 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		}
 		
 		this.groupMoreMenu.data = node.attributes.data;
+		this.groupMoreMenu.getComponent("edit").setDisabled(this.groupMoreMenu.data.permissionLevel < go.permissionLevels.writeAndDelete);
+		this.groupMoreMenu.getComponent("delete").setDisabled(this.groupMoreMenu.data.permissionLevel  < go.permissionLevels.manage);
 		this.groupMoreMenu.showAt(e.getXY());
 	}
 });
