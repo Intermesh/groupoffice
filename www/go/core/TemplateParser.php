@@ -176,6 +176,21 @@ class TemplateParser {
 	public $encloseVars = false;
 
 	public $enableBlocks = true;
+
+
+	/**
+	 * Configuration which can be altered with:
+	 *
+	 * ```
+	 * [config thousandsSeparator=.]
+	 * [config decimalSeparator=,]
+	 * ``
+	 * @var string[]
+	 */
+	public $config = [
+		'decimalSeparator' => '.',
+		'thousandsSeparator' => ',',
+	];
 	
 	public function __construct() {
 		$this->addFilter('date', [$this, "filterDate"]);		
@@ -274,8 +289,16 @@ class TemplateParser {
 		return $entityCls::findByLink($entity,!empty($properties) ? explode(",", $properties) : [], true);
 	}
 
-	private function filterNumber($number,$decimals=2, $decimalSeparator='.', $thousandsSeparator=','): string
+
+
+	private function filterNumber($number,$decimals = 2, $decimalSeparator = null, $thousandsSeparator = null): string
 	{
+		if(!isset($decimalSeparator) ){
+			$decimalSeparator = $this->config['decimalSeparator'];
+		}
+		if(!isset($thousandsSeparator) ){
+			$thousandsSeparator = $this->config['thousandsSeparator'];
+		}
 		return number_format($number,$decimals, $decimalSeparator, $thousandsSeparator);
 	}
 
@@ -440,7 +463,8 @@ class TemplateParser {
 		preg_match_all('/\[\/(each|if)\]/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		
+		preg_match_all('/\\[config\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $configMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
 			throw new Exception("Invalid template open and close tags of [if] and/or [each] don't match");
@@ -469,6 +493,13 @@ class TemplateParser {
 		foreach($assignMatches as $a) {
 			$offset = $a[0][1];
 			$tag = ['tagName' => 'assign', 'type'=> null, 'offset' => $offset, 'tagLength' => strlen($a[0][0]), 'expression' => $a[2][0], 'varName' => $a[1][0]];
+			$tag['close'] = $tag;
+			$tags[$offset] = $tag;
+		}
+
+		foreach($configMatches as $a) {
+			$offset = $a[0][1];
+			$tag = ['tagName' => 'config', 'type'=> null, 'offset' => $offset, 'tagLength' => strlen($a[0][0]), 'value' => $a[2][0], 'name' => $a[1][0]];
 			$tag['close'] = $tag;
 			$tags[$offset] = $tag;
 		}
@@ -638,6 +669,10 @@ class TemplateParser {
 				case 'assign':
 					$tags[$i] = $this->replaceAssign($tags[$i]);
 					break;
+
+				case 'config':
+					$tags[$i] = $this->replaceConfig($tags[$i]);
+					break;
 			}
 		}
 		
@@ -666,6 +701,19 @@ class TemplateParser {
 		$replaced = preg_replace("/<template>[\s]*<\/template>/i", "", $replaced);
 
 		return preg_replace("/(.*)\r?\n?$/", "$1", $replaced);
+	}
+
+
+
+
+	/**
+	 * @throws Exception
+	 */
+	private function replaceConfig($tag) {
+		//config won't output
+		$tag['replacement'] = "";
+		$this->config[$tag['name']] = $tag['value'];
+		return $tag;
 	}
 
 	/**
