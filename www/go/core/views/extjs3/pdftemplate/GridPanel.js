@@ -79,7 +79,10 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 				entityStore: "PdfTemplate",
 				filters: {
 					module: {module: this.module, key: this.key}
-				}	
+				},
+				sortInfo: {
+					field: "name"
+				}
 			}),
 
 			columns: [

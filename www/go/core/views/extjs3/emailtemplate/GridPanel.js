@@ -78,7 +78,10 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 				entityStore: "EmailTemplate",
 				filters: {
 					module: {module: this.module, key: this.key}
-				}	
+				},
+				sortInfo: {
+					field: "name"
+				}
 			}),
 			autoHeight: true,
 			columns: [

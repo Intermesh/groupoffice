@@ -70,6 +70,15 @@ use function GO;
  *   [/if]
  * [/each]
  * ````````````````````````````````````````````````````````````````````````````
+ *
+ *
+ * @example If with and operator
+ * `````````````````````````````````````````````````````````````````````````````
+ * [if {{document.customFields.downPayment}} && {{document.totalPrice}} > 4000]
+ *  [assign downPayment = document.totalPrice|multiply:0.3]
+ *  {{downPaymnent|number}}
+ * [/if]
+ * ````````````````````````````````````````````````````````````````````````````
  * 
  * @example iterate through filtered array and only write first match using "eachIndex"
  * ````````````````````````````````````````````````````````````````````````````
