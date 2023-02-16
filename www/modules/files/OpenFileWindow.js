@@ -47,7 +47,7 @@ GO.files.OpenFileWindow = Ext.extend(GO.Window, {
 		}),{
 			region:'south',
 			xtype:'form',
-			height:40,
+			autoHeight: true,
 			cls:'go-form-panel',
 			items:[this.rememberCB = new Ext.form.Checkbox({
 				xtype:'checkbox',
