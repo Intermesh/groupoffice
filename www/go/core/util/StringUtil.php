@@ -603,11 +603,11 @@ END;
 	/**
 	 * Detect known XSS attacks.
 	 * 
-	 * @param boolean $string
-	 * @return boolean
+	 * @param string $string
+	 * @return bool
 	 * @throws Exception 
 	 */
-	public static function detectXSS(bool $string): bool
+	public static function detectXSS(string $string): bool
 	{
 
 // Keep a copy of the original string before cleaning up
@@ -946,6 +946,65 @@ END;
 
 		return $keywords;
 
+	}
+
+	/**
+	 * Convert Dangerous HTML to safe HTML for display inside of Group-Office
+	 *
+	 * This also removes everything outside the body and replaces mailto links
+	 *
+	 * @todo do this all client side in the next email module. Using DomParser api?
+	 * @param string $text Plain text string
+	 * @access public
+	 * @return string HTML formatted string
+	 */
+	public static function sanitizeHtml($html) {
+		//needed for very large strings when data is embedded in the html with an img tag
+		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
+
+
+		//remove strange white spaces in tags first
+		//sometimes things like this happen <style> </ style >
+		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
+
+		// extract style before removing comments because sometimes style is wrapped in a comment
+		// <style><!-- body{} --></style>
+
+
+		// remove comments because they might interfere. Some commands  in style tags may be improperly formatted
+		// because the user appears to paste from Word
+		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
+		$html = preg_replace('!/\*.*?\*/!s', '', $html);
+
+		$to_removed_array = array (
+			"'<bgsound[^>]*>'usi",
+			"'<script[^>]*>.*?</script>'usi",
+			"'<iframe[^>]*>.*?</iframe>'usi",
+			"'<object[^>]*>.*?</object>'usi",
+			"'<embed[^>]*>.*?</embed>'usi",
+			"'<applet[^>]*>.*?</applet>'usi",
+		);
+
+//		 $html = "<div onclick=\"yo\" online='1' test='onclick' onclick=\"yo\"></div>\n\n\n" . $html;
+
+		$html = preg_replace($to_removed_array, '', $html);
+
+
+		$html = preg_replace_callback('#<([^>]+)>#u', function($matches) {
+			return "<" . preg_replace('#\s(?:on|xmlns)[^\s]+#iu', "", $matches[1]) . ">";
+		}, $html);
+
+
+		//remove high z-indexes
+		$matched_tags = array();
+		preg_match_all( "/(z-index)[\s]*:[\s]*([0-9]+)[\s]*/u", $html, $matched_tags, PREG_SET_ORDER );
+		foreach ($matched_tags as $tag) {
+			if ($tag[2]>8000) {
+				$html = str_replace($tag[0],'z-index:8000',$html);
+			}
+		}
+
+		return $html;
 	}
 
 	/**

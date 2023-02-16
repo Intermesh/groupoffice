@@ -625,9 +625,9 @@ go.util =  (function () {
 
 					if(response.name.toLowerCase().substr(-3) == 'csv' || response.name.toLowerCase().substr(-4) == 'xlsx') {
 						Ext.getBody().unmask();
-
 						var dlg = new go.import.CsvMappingDialog({
 							entity: entity,
+							fileName: response.name,
 							blobId: response.blobId,
 							values: values,
 							fields: options.fields || {},

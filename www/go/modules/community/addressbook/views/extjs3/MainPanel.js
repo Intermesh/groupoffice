@@ -9,7 +9,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		triggerWidth: 1000
 	},
 
-	addAddressBookId: 1,
+	addAddressBookId: undefined,
 
 	initComponent: function () {	
 		
@@ -188,8 +188,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		
 		//because the root node is not visible it will auto expand on render. This depends on the user address book settings
 		this.addressBookTree.getRootNode().on('expand', function (node) {
-
 			var abSettings = go.User.addressBookSettings, abNode = null;
+
+			this.addAddressBookId = abSettings.defaultAddressBookId;
+
 			if (abSettings.startIn == "allcontacts") {
 				//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
 				//abNode = node.firstChild;

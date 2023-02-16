@@ -9,20 +9,143 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	height: dp(900),
 	title: t("Import Comma Separated values"),
 	autoScroll: true,
-	
+
+	newProfileRecord: null, // set and added to store on reload when new profile record needs to be created
 	
 	initComponent : function() {
-		
+
+		const renameWindow = new go.Window({
+			title: t('Rename profile'),
+			cls:'go-form-panel',
+			layout:'form',
+			width: 400,
+			mode: 'r',
+			listeners: {'show': () => this.nameField.focus()},
+			items: [this.nameField = new Ext.form.TextField({
+				//xtype:'textfield',
+				anchor: '100%',
+				fieldLabel: t('Name'),
+				name: 'saveName',
+				hintText: t('Enter a name to save the column mapping')
+			})],
+			buttons: ['->',{
+				text: t('Ok'),
+				handler: () => {
+					switch(renameWindow.mode) {
+						case 'r': this.renameCurrent(this.nameField.getValue()); break;
+						case 'c': this.copyTo(this.nameField.getValue()); break;
+					}
+					renameWindow.hide();
+				}
+			}]
+		}),
+			profileMenu = new Ext.menu.Menu({
+				items: [{
+					text:t('Rename')+'…',
+					itemId: 'rename',
+					handler: () => {
+						renameWindow.setTitle(t('Rename profile'));
+						renameWindow.mode = 'r'; // rename
+						renameWindow.show();
+					}
+				},{
+					text: t('Copy as')+'…',
+					itemId: 'copy',
+					handler: () => {
+						renameWindow.setTitle(t('Copy profile as'));
+						renameWindow.mode = 'c'; // copy
+						renameWindow.show();
+					}
+				},{
+				// 	itemId: 'update',
+				// 	text: t('Update'),
+				// 	handler: () => {
+				// 		const id = this.csvMappings.getValue();
+				// 		this.csvMappings.store.entityStore.update(_[id]:_);
+				// 	}
+				// },{
+					itemId: 'delete',
+					text: t('Delete'),
+					handler: () => {
+						const id = this.csvMappings.getValue();
+						this.csvMappings.store.entityStore.destroy(id).then(() => {
+							this.csvMappings.store.reload();
+						});
+					}
+				}]
+			});
+
 		this.formPanel = new Ext.form.FormPanel({
 			
 			items: [
 				this.fieldSet = new Ext.form.FieldSet({
 					labelWidth: dp(300),
 					items: [{
-							xtype: 'box',
-							autoEl: 'p',
-							html: t("Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue.")
-					}, this.createLookupCombo()]
+						xtype: 'box',
+						autoEl: 'p',
+						html: t("Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue.")+
+							'<br>'+t('The column profile will be saved with the name provided field below.')
+					},this.csvMappings= new go.form.ComboBoxReset({
+						fieldLabel: t("Column profile"),
+						anchor: '99%',
+						pageSize: 50,
+						trigger1Class: 'ic-edit',
+						onTrigger1Click: function(ev,btn) {
+							const isNew = (this.getValue()=='new');
+							profileMenu.get('delete').setDisabled(isNew);
+							profileMenu.get('copy').setDisabled(isNew);
+							//profileMenu.get('rename').setDisabled(!isNew);
+							profileMenu.show(btn);
+						},
+						valueField: 'id',
+						submit:false,
+						hiddenName: 'mappingId',
+						displayField: 'name',
+						triggerAction: 'all',
+						editable: false,
+						selectOnFocus: true,
+						forceSelection: true,
+						listeners: {
+							'render' : me => me.store.load(),
+							'setvalue' : (me,v) => {
+								console.log(v);
+								if(v) {
+									if(typeof v === "number" || v === 'new') {
+										const rec = me.store.getById(v);
+										this.formPanel.form.setValues(rec.data.columnMapping); // do column mapping
+										v = rec.data.name;
+									}
+									//todo: column mapping
+
+									this.nameField.setValue(v);
+								}
+							}
+							// 'select' : (me,rec) => {
+							// 	this.nameField.setValue(rec.data.name);
+							// }
+						},
+						store: {
+							xtype: "gostore",
+							fields: ['id', 'name', 'columnMapping'],
+							entityStore: "ImportMapping",
+							filters: {
+								default: {entity: this.entity}
+							},
+							listeners: {
+								'load': s => {
+									if(this.foundId)
+										this.csvMappings.setValue(this.foundId);
+									if(this.newProfileRecord) {
+										this.csvMappings.store.insert(0, this.newProfileRecord);
+										this.csvMappings.setValue('new');
+									}
+									//this.csvMappings.setValue();
+								}
+							}
+						}
+					}),
+					{html:'<hr>'},
+					this.createLookupCombo()]
 				})
 			]
 		});
@@ -69,11 +192,18 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 
 				this.fieldSet.add(this.createMappingFields(response.goHeaders, this.fields));
 
-				if(response.mapping) {
-					this.formPanel.form.setValues(response.mapping);
+				if(response.columnMapping) { // mapping found!
+					this.foundId = response.id;
+					this.formPanel.form.setValues(response.columnMapping);
 					this.formPanel.form.setValues({updateBy: response.updateBy});
-				} else {
+				} else { // columns unknown, generate
 					var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
+					this.foundId = 0;
+					this.newProfileRecord = new this.csvMappings.store.recordType({
+						name: this.fileName,
+						columnMapping:v,
+						id:'new'
+					},'new');
 					Ext.apply(v, this.findAliases());
 					this.formPanel.form.setValues(v);
 				}
@@ -82,6 +212,26 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			},
 			scope: this
 		});
+	},
+
+	copyTo(name) {
+		const current = this.csvMappings.store.getById(this.csvMappings.getValue());
+		this.newProfileRecord = new this.csvMappings.store.recordType({
+			name: name,
+			columnMapping:current.get('columnMapping'),
+			id:'new'
+		},'new');
+		if(this.newProfileRecord) {
+			this.csvMappings.store.insert(0, this.newProfileRecord);
+			this.csvMappings.setValue('new');
+		}
+	},
+
+	renameCurrent(name) {
+		const rec = this.csvMappings.store.getById(this.csvMappings.getValue());
+		rec.set('name',name);
+		this.csvMappings.setRawValue(name);
+		// Import action will save the rename so no SET action needed here
 	},
 
 	fieldLabelsToAliases : function() {
@@ -325,7 +475,10 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	doImport: function() {
 		this.getEl().mask(t("Importing..."));
 		var mapping = this.formPanel.form.getFieldValues();
+		var mappingId = this.csvMappings.getValue();
 		var updateBy = mapping.updateBy;
+		var saveName = this.nameField.getValue();
+
 		delete mapping.updateBy;
 
 		go.Jmap.request({
@@ -333,8 +486,10 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			params: {
 				blobId: this.blobId,
 				values: this.values,
-				mapping: mapping,
-				updateBy: updateBy
+				mappingId,
+				mapping,
+				saveName,
+				updateBy
 			},
 			callback: function (options, success, response) {
 				this.getEl().unmask();

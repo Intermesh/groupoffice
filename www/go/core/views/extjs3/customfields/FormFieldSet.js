@@ -56,7 +56,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				max = fieldsPerColumn;
 			}
 		});
-
 		items.push(currentCol);
 		
 		Ext.apply(this, {
@@ -77,7 +76,52 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			});
 			}, this);
 
-		go.customfields.FormFieldSet.superclass.initComponent.call(this);
+		this.on('render', () => {
+			this.formTabPanel = this.findParentByType('tabpanel');
+			const form = this.findParentByType("form");
+			if(!form || form.changeListenersAdded) return;
+			form.changeListenersAdded = true;
+			if (form.getXType() == "entityform") {
+				form.on("setvalues",  () => {
+					this.onLoad(form, form.getValues(), fields);
+				});
+			} else {
+				form?.getForm().on("beforeaction", (form, action) => {
+					if (action.type === "load") {
+						this.onLoad(form, form.getFieldValues(), fields);
+					}
+				});
+			}
+		});
+
+		this.supr().initComponent.call(this);
+	},
+
+	onLoad(form, values, customFields) {
+
+		if(this.fieldSet.collapseIfEmpty) {
+			isModified = false;
+			for (const field of customFields) {
+				const name = field.name?.replace('customFields.', '');
+				if (name) {
+					if (!(name in values.customFields) || values.customFields[name] == field.value ||
+						(Ext.isEmpty(values.customFields[name]) && Ext.isEmpty(field.value))) {
+						// not modified
+					} else {
+						isModified = true;
+						break;
+						//console.log('modified', name, field.value, '!=', values.customFields[name]);
+					}
+				}
+			}
+			if(!isModified)
+				this.collapse();
+			else
+				this.expand();
+		}
+		// for(const name in values.customFields) {
+		// 	if(customFields)
+		// }
 	},
 
 	setupFilter: function() {
@@ -92,7 +136,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		}
 
 		var me = this;
-
 		//Add a beforeaction event listener that will send the custom field data JSON encoded.
 		//The old framework will use this to save custom fields.
 		if (!form.changeListenersAdded) {
@@ -100,7 +143,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			form.changeListenersAdded = true;
 
 			if (form.getXType() == "entityform") {
-
 				form.on("setvalues", function () {
 					this.filter(form.getValues());
 					// form.isValid();
@@ -111,7 +153,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				}, this);
 			} else {
 				//Legacy code
-
 				form.getForm().on("beforeaction", function (form, action) {
 					if (action.type !== "submit") {
 						return true;
@@ -153,6 +194,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			});
 
 			form.on("setvalues", function () {
+
 				this.filter(form.getValues());
 			}, this);
 
@@ -191,7 +233,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	 * @returns {undefined}
 	 */
 	filter: function (entity) {
-
 		for (var name in this.fieldSet.filter) {
 
 			var v = this.fieldSet.filter[name];

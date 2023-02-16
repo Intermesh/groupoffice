@@ -1838,6 +1838,27 @@ table[id^="comments-ext"] b {
 	}
 }
 
+// make button to add an item to a form group look like the field you are going to fill
+//.field-like-btn {
+//	cursor: text;
+//	width:100%;
+//	background-color: white;
+//	border: 1px solid rgba(68, 68, 68, 0.26) !important;
+//	display: inline-block;
+//	padding: 2.625px 7px;
+//	min-height: 38.5px;
+//	line-height: 17.5px;
+//	transition: border-color 100ms linear, box-shadow 225ms linear;
+//	border-radius: 8.75px;
+//	&:hover {
+//		background-color: white;
+//	}
+//	.x-btn-text {
+//		cursor: text;
+//		color: rgba(black, 0.5) !important;
+//		padding:0;
+//	}
+//}
 
 .go-form-group {
 

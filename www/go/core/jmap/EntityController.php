@@ -1070,29 +1070,42 @@ abstract class EntityController extends Controller {
 	 */
 	protected function defaultImportCSVMapping(array $params): ArrayObject
 	{
-		$blob = Blob::findById($params['blobId']);
+		$entityClass = $this->entityClass();
+		$response = [
+			'checksum' => null,
+			'columnMapping' => null,
+			'updateBy' => null
+		];
+		if(!empty($params['blobId'])) {
+			$blob = Blob::findById($params['blobId']);
 
-		$extension = (new File($blob->name))->getExtension();
+			$extension = (new File($blob->name))->getExtension();
 
-		if($extension == 'csv') {
-			$file = $blob->getFile()->copy(File::tempFile($extension));
-			$file->convertToUtf8();
-		} else{
-			$file = $blob->getFile();
+			if ($extension == 'csv') {
+				$file = $blob->getFile()->copy(File::tempFile($extension));
+				$file->convertToUtf8();
+			} else {
+				$file = $blob->getFile();
+			}
+
+			$converter = $this->findConverter($extension);
+
+			$response['goHeaders'] = $converter->getEntityMapping();
+			$response['csvHeaders'] = $converter->getCsvHeaders($file);
+
+			$checkSum = md5(implode(',', array_map("trim", $response['csvHeaders'])));
+			$entityClass = $this->entityClass();
+			$mapping = ImportMapping::findByChecksum($entityClass::entityType()->getId(), $checkSum);
+		} else if(!empty($params['id'])) {
+			$mapping = ImportMapping::findById($params['id']);
 		}
 
-		$converter = $this->findConverter($extension);
-		
-		$response['goHeaders'] = $converter->getEntityMapping();
-		$response['csvHeaders'] = $converter->getCsvHeaders($file);
+		if(!empty($mapping)) {
+			$response['id'] = $mapping->id;
+			$response['columnMapping'] = $mapping->getColumnMapping();
+			$response['updateBy'] = $mapping->updateBy;
+		}
 
-		$checkSum = md5(implode(',', array_map("trim", $response['csvHeaders'])));
-		$entityClass = $this->entityClass();
-		$mapping = ImportMapping::findById($entityClass::entityType()->getId() . "-" . $checkSum);
-
-		$response['mapping'] = $mapping ? $mapping->getMap() : null;
-		$response['updateBy'] = $mapping ? $mapping->updateBy : null;
-		
 		if(!$response) {
 			throw new Exception("Invalid response from import convertor");
 		}

@@ -57,6 +57,8 @@ class FieldSet extends AclOwnerEntity {
 	 */
 	public $isTab = false;
 
+	public $collapseIfEmpty;
+
 	/**
 	 * Amount of columns the fieldset should render.
 	 *

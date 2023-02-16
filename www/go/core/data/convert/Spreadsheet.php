@@ -82,6 +82,13 @@ class Spreadsheet extends AbstractConverter {
 	 */
 	public $updateBy = null;
 
+	/**
+	 * @var null Used as the name when the header mapping is saved
+	 */
+	public $saveName = null;
+
+	public $mappingId; // when not 'new' mapping will be found and updated
+
 	protected $fp;
 	/**
 	 * @var File
@@ -638,6 +645,12 @@ th {
 		if(isset($this->clientParams['updateBy'])) {
 			$this->updateBy = $this->clientParams['updateBy'];
 		}
+		if(isset($this->clientParams['saveName'])) {
+			$this->saveName = $this->clientParams['saveName'];
+		}
+		if(isset($this->clientParams['mappingId'])) {
+			$this->mappingId = $this->clientParams['mappingId'];
+		}
 
 
 	}
@@ -645,11 +658,17 @@ th {
 	private function saveMapping(array $headers) {
 		$checkSum = md5(implode(",", array_map("trim", $headers)));
 		$entityClass = $this->entityClass;
+		$entityTypeId = $entityClass::entityType()->getId();
 
-
-		$mapping = ImportMapping::findOrCreate($entityClass::entityType()->getId() . "-" . $checkSum);
+		$mapping = ImportMapping::findById($this->mappingId);
+		if(empty($mapping)) {
+			$mapping = new ImportMapping();
+			$mapping->checksum = $checkSum;
+			$mapping->entityTypeId = $entityTypeId;
+		}
 		$mapping->setMap($this->clientParams['mapping']);
 		$mapping->updateBy =$this->updateBy;
+		$mapping->name = $this->saveName;
 		$mapping->save();
 
 	}

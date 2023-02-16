@@ -6,6 +6,7 @@ views/Extjs3/javascript/vendor/chartist-plugin-pointlabels.js
 views/Extjs3/javascript/vendor/chartist-plugin-fill-donut.js
 views/Extjs3/javascript/vendor/chartist-plugin-accessibility.js
 views/Extjs3/javascript/vendor/promise-polyfill.js
+views/Extjs3/javascript/vendor/purify.min.js
 
 go/core/views/extjs3/namespaces.js
 go/core/views/extjs3/Translate.js

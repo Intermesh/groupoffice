@@ -132,6 +132,7 @@ CREATE TABLE `core_customfields_field_set` (
   `sortOrder` tinyint(4) NOT NULL DEFAULT 0,
   `filter` text DEFAULT NULL,
   `isTab` BOOLEAN NOT NULL DEFAULT FALSE,
+  `collapseIfEmpty` BOOLEAN NOT NULL DEFAULT FALSE,
   `columns` TINYINT NOT NULL DEFAULT '2',
   parentFieldSetId int null
 ) ENGINE=InnoDB;
@@ -1184,15 +1185,14 @@ alter table core_customfields_field_set
 
 create table core_import_mapping
 (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     entityTypeId int                        null,
     checksum     char(32) collate ascii_bin null,
+    `name` VARCHAR(120) NOT NULL DEFAULT '(unnamed)',
     mapping      text                       null,
     updateBy     varchar(100) default null  null,
+    PRIMARY KEY (`id`),
     constraint core_import_mapping_core_entity_null_fk
         foreign key (entityTypeId) references core_entity (id)
             on delete cascade
 );
-
-alter table core_import_mapping
-    add constraint core_import_mapping_pk
-        primary key (entityTypeId, checksum);

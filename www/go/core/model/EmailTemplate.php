@@ -3,10 +3,12 @@ namespace go\core\model;
 
 use Exception;
 use GO\Base\Mail\SmimeMessage;
+use GO\Base\Util\StringHelper;
 use go\core\cron\GarbageCollection;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
+use go\core\fs\Folder;
 use go\core\jmap\Entity;
 use go\core\mail\Message;
 use go\core\model\Module as ModuleModel;
@@ -158,10 +160,41 @@ class EmailTemplate extends Entity
 		return parent::internalSave();
 	}
 
-	protected function internalGetPermissionLevel(): int
-	{
-		return Module::findById($this->moduleId)->getPermissionLevel();
+	public static function fromBlob(Blob $blob) {
+
+		if(!class_exists("\ZipArchive")) {
+			throw new \Exception('ZIP extension is not available for PHP please install it before uploading templates');
+		}
+		$folder = Folder::tempFolder();
+		$zip = new \ZipArchive;
+		if(!$zip->open($blob->path()) === true) {
+			throw new \Exception('Failed to open uploaded Zip file');
+		}
+
+		$zip->extractTo($folder->getPath());
+		$zip->close();
+
+		$tpl = new self();
+		$indexFile = $folder->getFiles()[0];
+		$tpl->body = $indexFile->getContents();
+
+		$imgFolder = $folder->getFolder('images');
+		$tpl->attachments = [];
+		foreach($imgFolder->getFiles() as $imageFile) {
+			$imgBlob = Blob::fromFile($imageFile);
+			$tpl->body = str_replace('images/'.$imageFile->getName(), Blob::url($imgBlob->id), $tpl->body);
+			$imgBlob->save();
+			$tpl->attachments[] = (new EmailTemplateAttachment($tpl))->setValues(['blobId' => $imgBlob->id, 'name' => $imgBlob->name, 'inline' => true]);
+		}
+
+		return $tpl;
+
 	}
+
+//	protected function internalGetPermissionLevel(): int
+//	{
+//		return Module::findById($this->moduleId)->getPermissionLevel();
+//	}
 
 	private function parseImages()
 	{

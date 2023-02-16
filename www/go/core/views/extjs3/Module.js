@@ -94,6 +94,7 @@ go.Modules.register("core", 'core', {
 		'SmtpAccount',
 		'EmailTemplate',
 		'PdfTemplate',
+		'ImportMapping',
 		'CronJobSchedule',
 		{
 			name: 'AuthAllowGroup',

@@ -50,6 +50,12 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 							},
 							scope: this
 						}
+					}, {
+						xtype: "checkbox",
+						name: 'collapseIfEmpty',
+						hideLabel: true,
+						boxLabel: t("Collapse when empty"),
+						hint: t('Show this fieldset collapsed when all of its field have the initial value'),
 					},
 					this.fieldSetCombo = new go.customfields.FieldSetCombo({
 						disabled: true,

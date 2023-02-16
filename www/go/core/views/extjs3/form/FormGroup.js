@@ -240,9 +240,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			Ext.apply(this.btnCfg,{
 				//iconCls: this.addButtonIconCls,
 				text: this.addButtonText || this.btnCfg.text || t("Add"),
+				//cls: 'field-like-btn',
+				width:'100%',
 				handler: function() {
 					this.addRow();
-					this.fireEvent("change", this, this.getValue());
+					//this.fireEvent("change", this, this.getValue());
 				
 				},
 				scope: this
@@ -250,28 +252,29 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		];
 	},
 	
-//	focusNewField : function(wrap) {
-//		var item;
-//		for(var i = 0, l = wrap.items.getCount();i < l;i++) {
-//			item = wrap.items.get(i);
-//			
-//			if(item.setFocus) {				
-//				item.getEl().focus();
-//				return true;
-//			}
-//			
-//			if(item.items && this.focusNewField(item)) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	},
+	focusNewField : function(wrap) {
+		var item;
+		for(var i = 0, l = wrap.items.getCount();i < l;i++) {
+			item = wrap.items.get(i);
+
+			if(item.setFocus) {
+				item.focus();
+				return true;
+			}
+
+			if(item.items && this.focusNewField(item)) {
+				return true;
+			}
+		}
+		return false;
+	},
 
 	addRow : function(auto) {
 		var wrap = this.addPanel(auto);
 		this.doLayout();
 
-		wrap.formField.focus();
+		this.focusNewField(wrap);
+		//wrap.formField.focus();
 
 		this.fireEvent("newitem", this, wrap);
 	},

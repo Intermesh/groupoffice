@@ -1352,3 +1352,19 @@ $updates['202301121428'][] ="delete FROM `go_holidays` WHERE region like 'en_uk'
 $updates['202301231301'][] = 'delete from go_settings where name = "file_storage_usage"';
 $updates['202301231301'][] = 'delete from go_settings where name = "database_usage"';
 $updates['202301231301'][] = 'delete from go_settings where name = "mailbox_usage"';
+
+$updates['202302011409'][] = "ALTER TABLE core_import_mapping` DROP FOREIGN KEY `core_import_mapping_core_entity_null_fk`;";
+$updates['202302011409'][] = "ALTER TABLE `core_import_mapping` 
+ADD COLUMN `id` INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST,
+    ADD COLUMN `name` VARCHAR(120) NOT NULL DEFAULT '(unnamed)' AFTER `checksum`,
+	DROP PRIMARY KEY,
+	ADD PRIMARY KEY (`id`);";
+
+$updates['202302011409'][] = "ALTER TABLE `core_import_mapping` 
+ADD CONSTRAINT `core_import_mapping_core_entity_null_fk`
+  FOREIGN KEY (`entityTypeId`)
+  REFERENCES `core_entity` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE NO ACTION;";
+
+$updates['202302071520'][] = "ALTER TABLE `core_customfields_field_set` ADD `collapseIfEmpty` BOOLEAN NOT NULL DEFAULT FALSE AFTER `isTab`;";
