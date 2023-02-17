@@ -278,7 +278,9 @@ class EmailTemplate extends Entity
 
 		$blobs = [];
 		foreach($this->attachments as $attachment) {
-			$blobs[] = Blob::findById($attachment->blobId);
+			if($attachment->attachment) {
+				$blobs[] = Blob::findById($attachment->blobId);
+			}
 		}
 
 		return [
