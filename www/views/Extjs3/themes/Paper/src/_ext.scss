@@ -687,8 +687,8 @@ input[type="radio"] {
 		&.x-form-date-trigger::before {content: 'event';}
 		&.x-form-edit-trigger::before{content: 'edit';}
 		.x-small-editor & {
-			height: dp(36);
-			width: dp(36);
+			//height: dp(36);
+			//width: dp(36);
 		}
 	} 
 	.x-trigger-noedit {
@@ -2725,7 +2725,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 }
 .x-html-editor-tb {
 	.x-toolbar {
-		height: dp(40);
+		height: dp(64);
 		background-color: transparent;
 
 		.x-toolbar-cell {
