@@ -813,7 +813,7 @@ class TemplateParser {
 		return $tag;		
 	}
 
-	private static $tokens = ['==','!=','>','<', '(', ')', '&&', '||', '*', '/', '%', '-', '+', '!'];
+	private static $tokens = ['==','!=','>','<', '(', ')', '&&', '||', '*', '/', '%', '-', '+', '!', '?', ':'];
 
 	/**
 	 * @throws Exception
