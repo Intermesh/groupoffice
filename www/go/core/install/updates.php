@@ -1353,7 +1353,7 @@ $updates['202301231301'][] = 'delete from go_settings where name = "file_storage
 $updates['202301231301'][] = 'delete from go_settings where name = "database_usage"';
 $updates['202301231301'][] = 'delete from go_settings where name = "mailbox_usage"';
 
-$updates['202302011409'][] = "ALTER TABLE core_import_mapping` DROP FOREIGN KEY `core_import_mapping_core_entity_null_fk`;";
+$updates['202302011409'][] = "ALTER TABLE `core_import_mapping` DROP FOREIGN KEY `core_import_mapping_core_entity_null_fk`;";
 $updates['202302011409'][] = "ALTER TABLE `core_import_mapping` 
 ADD COLUMN `id` INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST,
     ADD COLUMN `name` VARCHAR(120) NOT NULL DEFAULT '(unnamed)' AFTER `checksum`,
