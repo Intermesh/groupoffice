@@ -9,8 +9,9 @@ GO.base.email.EmailEditorAttachmentsView = function(config){
 		config.store.on('load', function(){
 			if(this.store.data.length) {
 				this.show();
-			} else
+			} else {
 				this.hide();
+			}
 			if(this.maxSizeExceeded()){
 				this.fireEvent('maxsizeexceeded',this, this.maxSize, this.getTotalSize());
 			}
