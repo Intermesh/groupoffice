@@ -1234,23 +1234,25 @@ class StringHelper {
 	 *
 	 * @access static
 	 *
-	 * @param StringHelper $characters_allow
-	 * @param StringHelper $characters_disallow
-	 * @param int $password_length
-	 * @param int $repeat
+	 * @param int|null $password_length
 	 *
-	 * @return StringHelper
+	 * @param string|null $characters_allow
+	 * @param string|null  $characters_disallow
+	 *
+	 * @return string
+	 * @throws \Exception
 	 */
-	static function randomPassword($password_length = 0, $characters_allow = 'a-z,1-9', $characters_disallow = 'i,o' ) {
+	static function randomPassword(?int $password_length = 0, ?string $characters_allow = 'a-z,1-9', ?string $characters_disallow = 'i,o' ): string
+	{
 
-		if($password_length==0)
-		{
-			$password_length=\GO::config()->default_password_length;
+		if($password_length==0) {
+			$password_length = \GO::config()->default_password_length;
 		}
 
 		// Generate array of allowable characters.
 		$characters_allow = explode(',', $characters_allow);
 
+		$array_allow = [];
 		for ($i = 0; $i < count($characters_allow); $i ++) {
 			if (substr_count($characters_allow[$i], '-') > 0) {
 				$character_range = explode('-', $characters_allow[$i]);
@@ -1265,7 +1267,7 @@ class StringHelper {
 
 		// Generate array of disallowed characters.
 		$characters_disallow = explode(',', $characters_disallow);
-
+		$array_disallow = [];
 		for ($i = 0; $i < count($characters_disallow); $i ++) {
 			if (substr_count($characters_disallow[$i], '-') > 0) {
 				$character_range = explode('-', $characters_disallow[$i]);
@@ -1278,102 +1280,94 @@ class StringHelper {
 			}
 		}
 
-		mt_srand(( double ) microtime() * 1000000);
-
 		// Generate array of allowed characters by removing disallowed
 		// characters from array.
 		$array_allow = array_diff($array_allow, $array_disallow);
 		// Resets the keys since they won't be consecutive after
 		// removing the disallowed characters.
-		reset($array_allow);
-    $array_allow = array_values($array_allow);
+		$array_allow = array_values($array_allow);
 
 		$password = '';
 		while (strlen($password) < $password_length) {
-			$character = mt_rand(0, count($array_allow) - 1);
-
-			// If characters are not allowed to repeat,
-			// only add character if not found in partial password string.
-//			if ($repeat == 0) {
-				if (substr_count($password, $array_allow[$character]) == 0) {
-					$password .= $array_allow[$character];
-				}
-//			} else {
-//				$password .= $array_allow[$character];
-//			}
+			$character = random_int(0, count($array_allow) - 1);
+			// Characters are not allowed to repeat
+			if (substr_count($password, $array_allow[$character]) == 0) {
+				$password .= $array_allow[$character];
+			}
 		}
 		return $password;
 	}
 
-/*
 
-	function quoted_printable_encode($sText,$bEmulate_imap_8bit=false) {
-		// split text into lines
+	/*
 
-		$sText = str_replace("\r", '', $sText);
+		function quoted_printable_encode($sText,$bEmulate_imap_8bit=false) {
+			// split text into lines
 
-		$aLines=explode("\n",$sText);
+			$sText = str_replace("\r", '', $sText);
 
-		//var_dump($aLines);
+			$aLines=explode("\n",$sText);
 
-		for ($i=0;$i<count($aLines);$i++) {
-			$sLine =& $aLines[$i];
-			if (strlen($sLine)===0) continue; // do nothing, if empty
+			//var_dump($aLines);
 
-			$sRegExp = '/[^\x09\x20\x21-\x3C\x3E-\x7E]/e';
+			for ($i=0;$i<count($aLines);$i++) {
+				$sLine =& $aLines[$i];
+				if (strlen($sLine)===0) continue; // do nothing, if empty
 
-			// imap_8bit encodes x09 everywhere, not only at lineends,
-			// for EBCDIC safeness encode !"#$@[\]^`{|}~,
-			// for complete safeness encode every character :)
-			if ($bEmulate_imap_8bit)
-			$sRegExp = '/[^\x21-\x3C\x3E-\x7E]/e';
+				$sRegExp = '/[^\x09\x20\x21-\x3C\x3E-\x7E]/e';
 
-			$sReplmt = 'sprintf( "=%02X", ord ( "$0" ) ) ;';
-			$sLine = preg_replace( $sRegExp, $sReplmt, $sLine );
+				// imap_8bit encodes x09 everywhere, not only at lineends,
+				// for EBCDIC safeness encode !"#$@[\]^`{|}~,
+				// for complete safeness encode every character :)
+				if ($bEmulate_imap_8bit)
+				$sRegExp = '/[^\x21-\x3C\x3E-\x7E]/e';
 
-			// encode x09,x20 at lineends
-			{
-				$iLength = strlen($sLine);
-				$iLastChar = ord($sLine{$iLength-1});
+				$sReplmt = 'sprintf( "=%02X", ord ( "$0" ) ) ;';
+				$sLine = preg_replace( $sRegExp, $sReplmt, $sLine );
 
-				//              !!!!!!!!
-				// imap_8_bit does not encode x20 at the very end of a text,
-				// here is, where I don't agree with imap_8_bit,
-				// please correct me, if I'm wrong,
-				// or comment next line for RFC2045 conformance, if you like
-				if (!($bEmulate_imap_8bit && ($i==count($aLines)-1)))
+				// encode x09,x20 at lineends
+				{
+					$iLength = strlen($sLine);
+					$iLastChar = ord($sLine{$iLength-1});
 
-				if (($iLastChar==0x09)||($iLastChar==0x20)) {
-					$sLine{$iLength-1}='=';
-					$sLine .= ($iLastChar==0x09)?'09':'20';
+					//              !!!!!!!!
+					// imap_8_bit does not encode x20 at the very end of a text,
+					// here is, where I don't agree with imap_8_bit,
+					// please correct me, if I'm wrong,
+					// or comment next line for RFC2045 conformance, if you like
+					if (!($bEmulate_imap_8bit && ($i==count($aLines)-1)))
+
+					if (($iLastChar==0x09)||($iLastChar==0x20)) {
+						$sLine{$iLength-1}='=';
+						$sLine .= ($iLastChar==0x09)?'09':'20';
+					}
+				}    // imap_8bit encodes x20 before chr(13), too
+				// although IMHO not requested by RFC2045, why not do it safer :)
+				// and why not encode any x20 around chr(10) or chr(13)
+				if ($bEmulate_imap_8bit) {
+					$sLine=str_replace(' =0D','=20=0D',$sLine);
+					$sLine=str_replace(' =0A','=20=0A',$sLine);
+					$sLine=str_replace('=0D ','=0D=20',$sLine);
+					$sLine=str_replace('=0A ','=0A=20',$sLine);
 				}
-			}    // imap_8bit encodes x20 before chr(13), too
-			// although IMHO not requested by RFC2045, why not do it safer :)
-			// and why not encode any x20 around chr(10) or chr(13)
-			if ($bEmulate_imap_8bit) {
-				$sLine=str_replace(' =0D','=20=0D',$sLine);
-				$sLine=str_replace(' =0A','=20=0A',$sLine);
-				$sLine=str_replace('=0D ','=0D=20',$sLine);
-				$sLine=str_replace('=0A ','=0A=20',$sLine);
+
+				//merijn$sLine  = str_replace(' ','=20',$sLine);
+
+				// finally split into softlines no longer than 76 chars,
+				// for even more safeness one could encode x09,x20
+				// at the very first character of the line
+				// and after soft linebreaks, as well,
+				// but this wouldn't be caught by such an easy RegExp
+
+				//preg_match_all( '/.{1,73}([^=]{0,2})?/', $sLine, $aMatch );
+				//$sLine = implode( '=' . chr(13).chr(10), $aMatch[0] ); // add soft crlf's
 			}
 
-			//merijn$sLine  = str_replace(' ','=20',$sLine);
-
-			// finally split into softlines no longer than 76 chars,
-			// for even more safeness one could encode x09,x20
-			// at the very first character of the line
-			// and after soft linebreaks, as well,
-			// but this wouldn't be caught by such an easy RegExp
-
-			//preg_match_all( '/.{1,73}([^=]{0,2})?/', $sLine, $aMatch );
-			//$sLine = implode( '=' . chr(13).chr(10), $aMatch[0] ); // add soft crlf's
+			// join lines into text
+			return implode('=0D=0A',$aLines);
+			//return implode(chr(13).chr(10),$aLines);
 		}
-
-		// join lines into text
-		return implode('=0D=0A',$aLines);
-		//return implode(chr(13).chr(10),$aLines);
-	}
-*/
+	*/
 
 	/**
 	 * This function generates the view with a template
