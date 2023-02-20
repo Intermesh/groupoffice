@@ -1,6 +1,7 @@
 - Tasks: Create user broken when tasks module was disabled
 - Addressbook: disable delete button for groups if insufficient permissions
-- Core: use random_int() instead of mt_rand and mt_srand in random password generator
+- Core: use random_int() instead of mt_rand and mt_srand in random password generator Github #961
+- Core: fix typo seperator to separator Github #956
 
 10-02-2023 6.6.149
 - Studio: fix permissions for ACL entities
