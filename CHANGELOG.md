@@ -3,6 +3,7 @@
 - Core: use random_int() instead of mt_rand and mt_srand in random password generator Github #961
 - Core: fix typo seperator to separator Github #956
 - Core: focus custom select text field by default
+- Core: Fix conditionally required or empty for empty or not-empty selectbox
 
 10-02-2023 6.6.149
 - Studio: fix permissions for ACL entities
