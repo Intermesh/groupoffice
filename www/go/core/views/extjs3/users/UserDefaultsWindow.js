@@ -104,12 +104,12 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 									name: 'defaultTextSeparator'
 								}, {
 									xtype: 'textfield',
-									fieldLabel: t("Thousand Seperator", "users", "core"),
+									fieldLabel: t("Thousand Separator", "users", "core"),
 									name: 'defaultThousandSeparator'
 								},
 								{
 									xtype: 'textfield',
-									fieldLabel: t("Decimal Seperator", "users", "core"),
+									fieldLabel: t("Decimal Separator", "users", "core"),
 									name: 'defaultDecimalSeparator'
 								}, {
 									xtype: "textfield",
