@@ -1196,18 +1196,19 @@ class StringHelper {
 	 *
 	 * @access static
 	 *
-	 * @param StringHelper $characters_allow
-	 * @param StringHelper $characters_disallow
-	 * @param int $password_length
-	 * @param int $repeat
+	 * @param int|null $password_length
 	 *
-	 * @return StringHelper
+	 * @param string|null $characters_allow
+	 * @param string|null  $characters_disallow
+	 *
+	 * @return string
+	 * @throws \Exception
 	 */
-	static function randomPassword($password_length = 0, $characters_allow = 'a-z,1-9', $characters_disallow = 'i,o' ) {
+	static function randomPassword(?int $password_length = 0, ?string $characters_allow = 'a-z,1-9', ?string $characters_disallow = 'i,o' ): string
+	{
 
-		if($password_length==0)
-		{
-			$password_length=\GO::config()->default_password_length;
+		if($password_length==0) {
+			$password_length = \GO::config()->default_password_length;
 		}
 
 		// Generate array of allowable characters.
@@ -1241,24 +1242,17 @@ class StringHelper {
 			}
 		}
 
-		list($usec, $sec) = explode(' ', microtime());
-		mt_srand($sec + $usec * 1000000);
-//		mt_srand((int) microtime(true) * 1000000);
-
 		// Generate array of allowed characters by removing disallowed
 		// characters from array.
 		$array_allow = array_diff($array_allow, $array_disallow);
 		// Resets the keys since they won't be consecutive after
 		// removing the disallowed characters.
-		reset($array_allow);
-    $array_allow = array_values($array_allow);
+		$array_allow = array_values($array_allow);
 
 		$password = '';
 		while (strlen($password) < $password_length) {
-			$character = mt_rand(0, count($array_allow) - 1);
-
-			// If characters are not allowed to repeat,
-			// only add character if not found in partial password string.
+			$character = random_int(0, count($array_allow) - 1);
+			// Characters are not allowed to repeat
 			if (substr_count($password, $array_allow[$character]) == 0) {
 				$password .= $array_allow[$character];
 			}
