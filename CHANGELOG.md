@@ -2,6 +2,7 @@
 - Addressbook: disable delete button for groups if insufficient permissions
 - Core: use random_int() instead of mt_rand and mt_srand in random password generator Github #961
 - Core: fix typo seperator to separator Github #956
+- Core: focus custom select text field by default
 
 10-02-2023 6.6.149
 - Studio: fix permissions for ACL entities
