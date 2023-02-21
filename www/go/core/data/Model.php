@@ -157,12 +157,15 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			$c = $config[$pkgName][$modName];
 		}
 
-		$props = array_filter(static::getApiProperties(), function($p) {
+		$props = array_keys(array_filter(static::getApiProperties(), function($p) {
 			// only defined props
 			return isset($p['access']);
-		});
+		}));
 
-		return array_filter($c, function($key) use ($props) { return in_array($key, $props);}, ARRAY_FILTER_USE_KEY);
+		return array_filter($c, function($key) use ($props) {
+			return in_array($key, $props);
+			},
+			ARRAY_FILTER_USE_KEY);
 	}
 
   /**
