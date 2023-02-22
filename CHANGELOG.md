@@ -4,6 +4,7 @@
 - Core: fix typo seperator to separator Github #956
 - Core: focus custom select text field by default
 - Core: Fix conditionally required or empty for empty or not-empty selectbox
+- Leave days: tweak display of special leave budgets over years.
 
 10-02-2023 6.6.149
 - Studio: fix permissions for ACL entities
