@@ -131,10 +131,10 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 
 	
 	getActiveEditor : function(){
-		if(this.getContentType()=='html')
+		if(this.getContentType()=='html') {
 			return this.htmlEditor;
-		else
-			return this.textEditor;
+		}
+		return this.textEditor;
 	},
 	
 	buildForm : function(config) {
@@ -341,8 +341,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			});
 
 			this.hiddenAttachmentsField.setValue(Ext.encode(this.attachments));
-		}else
-		{
+		} else {
 			this.attachmentsView.store.loadData({
 				results:[]
 			});
@@ -467,19 +466,20 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		// Highlight attachments bar upon hovering
 		if (!this.oldTpl) {
 			this.oldTpl = this.attachmentsView.tpl;
-			this.attachmentsView.update('<div class="go-dropzone">' + t("Drop emails here") + '</div>');
+			this.attachmentsView.update('<div class="go-dropzone">' + t("Drop email messages here") + '</div>');
 		}
+
 		return true;
 	},
 
 	onNotifyOut: function(dd,e,data) {
-		this.resetAttachmentsView();
+		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
 		return true;
 	},
 
 	onNotifyDrop: function(dd,e,data) {
 		if(!data.grid) {
-			this.resetAttachmentsView();
+			this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
 			return false;
 		}
 
@@ -506,11 +506,9 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				{
 					if(data.success) {
 						this.attachmentsView.addBlob(data.blob);
-						// this.resetAttachmentsView();
 					}
 				},
 				failure: function(options, response, data) {
-					// Now what?
 					this.resetAttachmentsView();
 				}
 			});
@@ -537,12 +535,10 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			this.attachmentsView.update({
 				tpl: this.oldTpl
 			});
-			this.oldTpl = null;
-
+			delete this.oldTpl;
 		}
-		const records = this.attachmentsView.store.getRange();
-		this.attachmentsView.setVisible((records.length > 0)).setHeight("auto");
 		this.resizeEditorFrame();
+		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
 	}
 
 });

@@ -1936,7 +1936,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$message) {
 			throw new NotFound();
 		}
-		$fileName = FileSystemObject::stripInvalidChars($message->subject . '.eml');
+		$fileName = FileSystemObject::stripInvalidChars(($message->subject ?? GO::t('No subject')) . '.eml');
 		$tmpFile = File::tempFile($fileName);
 
 		$imap->save_to_file($params['uid'], $tmpFile->getPath(), $params['number'], $params['encoding']);
