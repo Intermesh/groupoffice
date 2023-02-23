@@ -131,7 +131,7 @@ try {
 	  go()->getInstaller()->upgrade();
 
     $mod = \go\modules\community\test\Module::get();
-    if(!$mod->isInstalled()) {
+    if(!$mod->isInstalled(false)) {
 	    $mod->install();
     }
 
