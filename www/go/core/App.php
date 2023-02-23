@@ -554,7 +554,7 @@ namespace go\core {
 			return $this->dbConnection;
 		}
 
-		public function isInstalled(): bool
+		public function isInstalled(bool $andEnabled = true): bool
 		{
 			try {
 				return go()->getDatabase()->hasTable('core_module');
