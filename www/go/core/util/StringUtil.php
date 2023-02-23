@@ -602,7 +602,7 @@ END;
 
 	/**
 	 * Detect known XSS attacks.
-	 * 
+	 *
 	 * @param string $string
 	 * @return bool
 	 * @throws Exception 
@@ -642,7 +642,7 @@ END;
 // Match style attributes
 			'#(<[^>]*+[\x00-\x20\"\'\/])*style=[^>]*(expression|behavior)[^>]*>?#iUu',
 // Match unneeded tags
-			'#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>?#i'
+			'#</*(applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>?#i'
 		);
 
 		foreach ($patterns as $pattern) {
