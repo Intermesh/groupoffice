@@ -647,16 +647,25 @@ class Installer {
 			
 			$updates = array();
 			require($updatesFile);
-			
+
+
 			//put the updates in an extra array dimension so we know to which module
 			//they belong too.
+			$count = 0;
 			foreach ($updates as $timestamp => $updatequeries) {
 				//somehow this doesn't always match on some installations with Ioncube !?
 			  if(go()->getDebugger()->enabled && !preg_match("/^[0-9]{12}$/", $timestamp)) {
 			    throw new Exception("Invalid timestamp '$timestamp' in file '$updatesFile'");
         }
 				$u["$timestamp"][$module->id] = $updatequeries;
+				$count += count($updatequeries);
 			}
+
+			if(go()->getDebugger()->enabled && $count < $module->version) {
+				$modStr = '[' . ($module->package ?? "legacy") .'/'. $module->name .'] ';
+				throw new Exception("Less queries than version for module " . $modStr ." " . $count .' < '. $module->version);
+			}
+
 		}
 
 		ksort($u);
@@ -671,7 +680,6 @@ class Installer {
 
 				//echo "Getting updates for ".$module."\n";
 				$module = $modulesById[$moduleId];
-
 				$modStr = '[' . ($module->package ?? "legacy") .'/'. $module->name .'] ';
 
 				if (!is_array($queries)) {
