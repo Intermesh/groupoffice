@@ -603,11 +603,11 @@ END;
 	/**
 	 * Detect known XSS attacks.
 	 * 
-	 * @param boolean $string
+	 * @param string $string
 	 * @return boolean
 	 * @throws Exception 
 	 */
-	public static function detectXSS(bool $string): bool
+	public static function detectXSS(string $string): bool
 	{
 
 // Keep a copy of the original string before cleaning up
@@ -642,7 +642,7 @@ END;
 // Match style attributes
 			'#(<[^>]*+[\x00-\x20\"\'\/])*style=[^>]*(expression|behavior)[^>]*>?#iUu',
 // Match unneeded tags
-			'#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>?#i'
+			'#</*(applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>?#i'
 		);
 
 		foreach ($patterns as $pattern) {

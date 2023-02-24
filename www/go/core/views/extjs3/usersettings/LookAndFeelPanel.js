@@ -262,12 +262,12 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 						name: 'textSeparator'
 					},{
 						xtype: 'textfield', 
-						fieldLabel: t("Thousand Seperator", "users", "core"), 
+						fieldLabel: t("Thousand Separator", "users", "core"),
 						name: 'thousandsSeparator'
 					},
 					{
 						xtype: 'textfield', 
-						fieldLabel: t("Decimal Seperator", "users", "core"), 
+						fieldLabel: t("Decimal Separator", "users", "core"),
 						name: 'decimalSeparator'
 					},
 					{

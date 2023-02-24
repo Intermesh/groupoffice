@@ -94,7 +94,7 @@ $density: 110;
 $font-scale: 1.1;
 
 @function dp($width) {
-  @return math.div(($width * $density) , 160) *1px;
+  @return math.floor(math.div(($width * $density) , 160) *1px);
 }
 @function sp($size) {
   @return ceil(dp($size) * $font-scale);

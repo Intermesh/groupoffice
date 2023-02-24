@@ -23,14 +23,14 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 				xtype: "fieldset",
 				labelWidth: dp(160),
 				items: [
-					{
+					this.optionTextField = new Ext.form.TextField({
 						xtype: "textfield",
 						fieldLabel: t("Text"),
 						name: "text",
 						allowBlank: false,
 						maskRe: /[^:]/,
 						width: 200
-					},
+					}),
 					this.fgColorField = new GO.form.ColorField({
 						fieldLabel: t("Text color"),
 						name: "foregroundColor"
@@ -93,8 +93,6 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 					}
 					this.doSave = true;
 					let values = form.getValues();
-					console.clear();
-					console.log(values);
 					Ext.apply(this.nodeAttributes, form.getValues(), this.oldAttributes);
 					this.close();
 				},
@@ -102,6 +100,10 @@ go.customfields.type.OptionDialog = Ext.extend(go.Window, {
 			})
 		];
 		this.supr().initComponent.call(this);
+
+		this.addListener('show', function(pnl){
+			this.optionTextField.focus(false, 100);
+		}, this);
 	},
 
 	load: function(node) {

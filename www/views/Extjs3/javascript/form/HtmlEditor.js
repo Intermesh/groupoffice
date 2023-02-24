@@ -9,8 +9,9 @@ GO.form.HtmlEditor = function (config) {
 
 	config.plugins = config.plugins || [];
 
-	if (!Ext.isArray(config.plugins))
+	if (!Ext.isArray(config.plugins)) {
 		config.plugins = [config.plugins];
+	}
 
 	var spellcheckInsertPlugin = new GO.plugins.HtmlEditorSpellCheck(this);
 	var wordPastePlugin = new Ext.ux.form.HtmlEditor.Word();
@@ -20,8 +21,9 @@ GO.form.HtmlEditor = function (config) {
 	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
 
 
-	if (GO.settings.pspellSupport)
+	if (GO.settings.pspellSupport) {
 		config.plugins.unshift(spellcheckInsertPlugin);
+	}
 
 	config.plugins.unshift(
 					ioDentPlugin,
@@ -233,11 +235,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			//Chrome /safari has clibBoardData.items
 			for (var i = 0, l = clipboardData.items.length; i < l; i++) {
 				var item = clipboardData.items[i];
-
-				// item.getAsString((s) => {
-				// 	console.warn(item.type);
-				// 	console.warn(s);
-				// })
 
 				//Some times clipboard data holds multiple versions. When copy pasting from excel you get html, plain text and an image.
 				//We prefer to use the html in that case so we exit if found.
@@ -593,19 +590,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.execCmd('FontSize', v);
 	},
 
-	// private
-//	onEditorEvent : function(e){
-//		this.updateToolbar();
-////		console.log(e);
-//		
-//		if(e.keyCode==32 || e.keyCode==12)
-//			this.urlify();
-//	},
-
-
 	createLink: function () {
-
-
 		var url = prompt(this.createLinkText, this.defaultLinkValue);
 		if (url && url != 'http:/' + '/') {
 			if (Ext.isSafari) {
