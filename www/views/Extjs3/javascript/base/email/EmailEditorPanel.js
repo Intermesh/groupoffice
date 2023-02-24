@@ -159,9 +159,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		config.items.push(this.hiddenCtField);
 		config.items.push(this.hiddenAttachmentsField);
 		config.items.push(this.hiddenInlineImagesField);
-		
-		var anchorHeight = config.enableSubjectField ?	 "-" + dp(32) : "100%";
 
+		const anchorHeight = config.enableSubjectField ? "-" + dp(32) : "100%";
 
 		this.htmlEditor = new GO.form.HtmlEditor({
 			mobile: {
@@ -198,6 +197,17 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			cls:'em-plaintext-body-field'
 		});
 
+		this.dropZone = new Ext.BoxComponent({
+			hidden: true,
+			tag: 'div',
+			cls: 'go-dropzone',
+			style: {
+				height: "90%"
+			},
+			html: t("Drop email messages here")
+		});
+
+
 		if (!GO.util.empty(config.enableSubjectField))
 			config.items.push({
 				xtype: 'textfield',
@@ -207,8 +217,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				fieldLabel: t("Subject")
 			});
 
-		config.items.push(this.htmlEditor);
-		config.items.push(this.textEditor);
+		config.items.push([this.htmlEditor, this.textEditor, this.dropZone]);
 
 		this.attachmentsView = new GO.base.email.EmailEditorAttachmentsView({
 			autoHeight:true,
@@ -245,7 +254,6 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	},
 
 	htmlEditorAttach : function(htmlEditor,blob, file, img) {
-
 		if(img) {
 			//inline will be processed from body
 			return;
@@ -329,7 +337,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		this.attachments=[];
 		
 		if(attachments){
-			for(var i=0;i<attachments.length;i++)
+			for(let i=0,l=attachments.length; i<l; i++)
 				this.attachments.push({
 					tmp_file: attachments[i].tmp_file,
 					from_file_storage:false,
@@ -445,7 +453,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		// TODO: Determine when to return false
 
 		// Unhide attachments bar if hidden and set a minimum height
-		this.attachmentsView.show();
+		// this.attachmentsView.show();
+		/*
 		const attachmentsEl = this.attachmentsView.getEl();
 		attachmentsEl.setHeight("auto");
 		let attachmentsElHeight = attachmentsEl.getHeight();
@@ -468,12 +477,17 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			this.oldTpl = this.attachmentsView.tpl;
 			this.attachmentsView.update('<div class="go-dropzone">' + t("Drop email messages here") + '</div>');
 		}
-
+		*/
+		this.dropZone.style = {height: this.getActiveEditor().getHeight()};
+		this.dropZone.show();
+		this.getActiveEditor().hide();
 		return true;
 	},
 
 	onNotifyOut: function(dd,e,data) {
 		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
+		this.dropZone.hide();
+		this.getActiveEditor().show();
 		return true;
 	},
 
@@ -507,9 +521,15 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 					if(data.success) {
 						this.attachmentsView.addBlob(data.blob);
 					}
+					this.dropZone.hide();
+					this.getActiveEditor().show();
+
 				},
 				failure: function(options, response, data) {
-					this.resetAttachmentsView();
+					// this.resetAttachmentsView();
+					this.dropZone.hide();
+					this.getActiveEditor().show();
+
 				}
 			});
 		}
@@ -527,18 +547,19 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		delete this.textEditor.anchorSpec;
 
 		this.htmlEditor.syncSize();
+		this.dropZone.style = {height: this.htmlEditor.getHeight()};
 		this.ownerCt.doLayout();
 	},
-
-	resetAttachmentsView: function() {
-		if(this.oldTpl) {
-			this.attachmentsView.update({
-				tpl: this.oldTpl
-			});
-			delete this.oldTpl;
-		}
-		this.resizeEditorFrame();
-		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
-	}
+	//
+	// resetAttachmentsView: function() {
+	// 	if(this.oldTpl) {
+	// 		this.attachmentsView.update({
+	// 			tpl: this.oldTpl
+	// 		});
+	// 		delete this.oldTpl;
+	// 	}
+	// 	this.resizeEditorFrame();
+	// 	this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
+	// }
 
 });
