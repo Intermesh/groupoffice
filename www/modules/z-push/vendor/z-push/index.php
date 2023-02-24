@@ -87,7 +87,7 @@ include_once(ZPUSH_CONFIG);
 
         // Do the actual processing of the request
         if (Request::IsMethodGET())
-            throw new NoPostRequestException("This is the Z-Push location and can only be accessed by Microsoft ActiveSync-capable devices", NoPostRequestException::GET_REQUEST);
+            throw new NoPostRequestException("This location can only be accessed by Microsoft ActiveSync-capable devices. <br /><br />Use <strong>" . \go\core\http\Request::get()->getHost() ."</strong> as server name when setting up your device.", NoPostRequestException::GET_REQUEST);
 
         // Do the actual request
         header(ZPush::GetServerHeader());
@@ -152,7 +152,7 @@ include_once(ZPUSH_CONFIG);
             if (Request::GetUserAgent())
                 ZLog::Write(LOGLEVEL_INFO, sprintf("User-agent: '%s'", Request::GetUserAgent()));
             if (!headers_sent() && $nopostex->showLegalNotice())
-                ZPush::PrintZPushLegal('GET not supported', $nopostex->getMessage());
+                ZPush::PrintZPushLegal('ActiveSync is working!', $nopostex->getMessage());
         }
     }
 

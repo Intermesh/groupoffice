@@ -28,7 +28,7 @@ $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Insta
 	<meta name="msapplication-TileColor" content="#2b5797">
 	<meta name="theme-color" content="#ffffff">
 
-	<title><?= $goTitle; ?><?= isset($title) ? '- ' . $title : "" ?></title>
+	<title><?= $goTitle; ?><?= isset($title) ? ' - ' . $title : "" ?></title>
 	<?php
 	$cssMtime = filemtime(__DIR__ . "/style.css");
 	?>

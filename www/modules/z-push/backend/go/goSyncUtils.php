@@ -505,7 +505,7 @@ class GoSyncUtils {
 				$astz['dstbias'] = ($dst_end['offset'] / -60) - $astz['bias'];
 			}
 			date_default_timezone_set($old);
-			GO::session()->values['activesync_timezone'] = base64_encode(call_user_func_array('pack', $astz));
+			GO::session()->values['activesync_timezone'] = base64_encode(call_user_func_array('pack', array_values($astz)));
 		}
 
 		/* $timezone = base64_encode(

@@ -41,8 +41,7 @@ class IpcSharedMemoryProvider implements IIpcProvider {
         $this->type = $type;
         $this->allocate = $allocate;
 
-        if ($this->initSharedMem())
-            ZLog::Write(LOGLEVEL_DEBUG, sprintf("%s(): Initialized mutexid %s and memid %s.", $class, $this->mutexid, $this->memid));
+        $this->initSharedMem();
     }
 
     /**

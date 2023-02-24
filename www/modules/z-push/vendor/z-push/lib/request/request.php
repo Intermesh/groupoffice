@@ -66,7 +66,7 @@ class Request {
     static private $getUser;
     static private $devid;
     static private $devtype;
-    static private $authUserString;
+    static private $authUserString = "";
     static private $authUser;
     static private $authDomain;
     static private $authPassword;
