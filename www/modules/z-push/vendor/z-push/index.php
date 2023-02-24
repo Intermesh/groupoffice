@@ -170,8 +170,6 @@ include_once(ZPUSH_CONFIG);
         if (Request::GetUserAgent())
             ZLog::Write(LOGLEVEL_INFO, sprintf("User-agent: '%s'", Request::GetUserAgent()));
 
-        ZLog::Write(LOGLEVEL_FATAL, sprintf('Exception: (%s) - %s', $exclass, $exception_message));
-
         if(!headers_sent()) {
             if ($ex instanceof ZPushException) {
                 header('HTTP/1.1 '. $ex->getHTTPCodeString());
@@ -194,9 +192,7 @@ include_once(ZPUSH_CONFIG);
             // log the failed login attemt e.g. for fail2ban
             if (defined('LOGAUTHFAIL') && LOGAUTHFAIL != false)
                 ZLog::Write(LOGLEVEL_WARN, sprintf("IP: %s failed to authenticate user '%s'",  Request::GetRemoteAddr(), Request::GetAuthUser()? Request::GetAuthUser(): Request::GetGETUser() ));
-        }
-
-        // This could be a WBXML problem.. try to get the complete request
+        }       // This could be a WBXML problem.. try to get the complete request
         else if ($ex instanceof WBXMLException) {
             ZLog::Write(LOGLEVEL_FATAL, "Request could not be processed correctly due to a WBXMLException. Please report this including the 'WBXML debug data' logged. Be aware that the debug data could contain confidential information.");
         }
@@ -205,10 +201,13 @@ include_once(ZPUSH_CONFIG);
         // the output had not started yet. If it has started already, we can't show the user the error, and
         // the device will give its own (useless) error message.
         else if (!($ex instanceof ZPushException) || $ex->showLegalNotice()) {
-            $cmdinfo = (Request::GetCommand())? sprintf(" processing command <i>%s</i>", Request::GetCommand()): "";
-            $extrace = $ex->getTrace();
-            $trace = (!empty($extrace))? "\n\nTrace:\n". print_r($extrace,1):"";
-            ZPush::PrintZPushLegal($exclass . $cmdinfo, sprintf('<pre>%s</pre>',$ex->getMessage() . $trace));
+	        ZLog::Write(LOGLEVEL_FATAL, sprintf('Exception: (%s) - %s', $exclass, $exception_message));
+          $cmdinfo = (Request::GetCommand())? sprintf(" processing command <i>%s</i>", Request::GetCommand()): "";
+          $extrace = $ex->getTrace();
+          $trace = (!empty($extrace))? "\n\nTrace:\n". print_r($extrace,1):"";
+          ZPush::PrintZPushLegal($exclass . $cmdinfo, sprintf('<pre>%s</pre>',$ex->getMessage() . $trace));
+        } else {
+	        ZLog::Write(LOGLEVEL_FATAL, sprintf('Exception: (%s) - %s', $exclass, $exception_message));
         }
 
         // Announce exception to process loop detection

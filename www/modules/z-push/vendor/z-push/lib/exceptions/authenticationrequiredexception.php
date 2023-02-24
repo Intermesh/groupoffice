@@ -27,6 +27,6 @@ class AuthenticationRequiredException extends HTTPReturnCodeException {
     protected $defaultLogLevel = LOGLEVEL_INFO;
     protected $httpReturnCode = HTTP_CODE_401;
     protected $httpReturnMessage = "Unauthorized";
-    protected $httpHeaders = array('WWW-Authenticate: Basic realm="ZPush"');
+    protected $httpHeaders = array('WWW-Authenticate: Basic realm="Group-Office ActiveSync"');
     protected $showLegal = true;
 }
