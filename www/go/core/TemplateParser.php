@@ -106,7 +106,7 @@ use function GO;
  * `````````````````````````````````````````````````````````````````````
  * {{contact.name}}
  * [assign address = contact.addresses | filter:type:"postal" | first]
- * [if !{{address}}]
+ * [if {{address|empty}}]
  * [assign address = contact.addresses | first]
  * [/if]
  * {{address.formatted}}
@@ -209,6 +209,7 @@ class TemplateParser {
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
 		$this->addFilter('nl2br', "nl2br");
+		$this->addFilter('empty', [$this, "filterEmpty"]);
 		$this->addFilter('t', [$this, "filterTranslate"]);
 
 		$this->addModel('now', new DateTime());
@@ -227,6 +228,10 @@ class TemplateParser {
 			$this->_currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone' ]);
 		}
 		return $this->_currentUser;
+	}
+
+	private function filterEmpty($v) {
+		return empty($v) ? "1" : "0";
 	}
 
 	/** @noinspection PhpSameParameterValueInspection */
@@ -828,7 +833,7 @@ class TemplateParser {
 		
 		$expression = $this->validateExpression($parsed);	
 		try {
-			$ret = eval($expression);	
+			$ret = eval($expression);
 		} catch(Throwable $e) {
 			go()->warn('eval() failed '. $e->getMessage());
 			go()->warn($tag['expression']);
@@ -884,8 +889,8 @@ class TemplateParser {
 							$part == 'true' ||
 							$part == 'false' ||
 							$part == 'null' ||
-							in_array($part, self::$tokens) ||
-							$this->isString($part)											
+							in_array($part, self::$tokens)
+							//$this->isString($part)
 				) {
 				$str .= $part.' ';
 			}else
@@ -896,10 +901,10 @@ class TemplateParser {
 		return empty($str) ? 'return false;' : 'return ('.$str.');';
 	} 
 	
-	private function isString ($str): bool
-	{
-		return preg_match('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/s', $str) || preg_match("/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'/s", $str);
-	}
+//	private function isString ($str): bool
+//	{
+//		return preg_match('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/s', $str) || preg_match("/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'/s", $str);
+//	}
 
 	/**
 	 * @throws Exception
