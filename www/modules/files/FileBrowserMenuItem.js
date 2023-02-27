@@ -21,6 +21,7 @@ GO.files.openDetailViewFileBrowser = function () {
 			var fb = GO.files.openFolder(result.files_folder_id);
 			fb.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
 			fb.model_id = dv.data.id;
+			fb.contact_id = dv.data.contact_id || dv.data.contactId || null; // if you want to email or sign files later
 
 			folderId = result.files_folder_id;
 
@@ -36,6 +37,7 @@ GO.files.openDetailViewFileBrowser = function () {
 
 				fb.model_id = null;
 				fb.model = null;
+				fb.contact_id = null;
 
 				var filesDetailPanels = dv.findByType("filesdetailpanel");
 				filesDetailPanels.forEach(function(fdp) {
