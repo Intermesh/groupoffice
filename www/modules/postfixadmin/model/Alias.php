@@ -94,7 +94,7 @@ class Alias extends \GO\Base\Db\ActiveRecord {
 		parent::afterLoad();
 		
 		//append wildcard
-		if(substr($this->address,0,1) == '@') {
+		if(isset($this->address) && substr($this->address,0,1) == '@') {
 			$this->address = '*' . $this->address;
 		}
 	}
