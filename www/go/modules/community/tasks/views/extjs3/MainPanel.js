@@ -40,7 +40,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		});
 
 		const showCompleted = Ext.state.Manager.get(this.statePrefix + "show-completed");
-		const assignedToMe = Ext.state.Manager.get(this.statePrefix + "assigned-to-me");
+		const showAssignedToMe = Ext.state.Manager.get(this.statePrefix + "assigned-to-me");
+		const showUnassigned = Ext.state.Manager.get(this.statePrefix + "show-unassigned");
 
 		if(this.support) {
 			this.filterPanel = new go.modules.community.tasks.ProgressGrid({
@@ -142,13 +143,25 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						hideLabel: true,
 						xtype: "checkbox",
 						boxLabel: t("Mine", 'tasks','community'),
-						checked: assignedToMe,
+						checked: showAssignedToMe,
 						listeners: {
 							scope: this,
 							check: function(cb, checked) {
-
-								this.assignedToMe(checked);
 								Ext.state.Manager.set(this.statePrefix + "assigned-to-me", checked);
+								this.setAssignmentFilters();
+								this.taskGrid.store.load();
+							}
+						}
+					},{
+						hideLabel: true,
+						xtype: "checkbox",
+						boxLabel: t("Unassigned", "tasks", "community"),
+						checked: showUnassigned,
+						listeners: {
+							scope: this,
+							check: function(cb, checked) {
+								Ext.state.Manager.set(this.statePrefix + "show-unassigned", checked);
+								this.setAssignmentFilters();
 								this.taskGrid.store.load();
 							}
 						}
@@ -193,21 +206,37 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.taskGrid.store.setFilter('completed', show ? null : {complete:  false});
 	},
 
-	assignedToMe : function(show) {
-		this.taskGrid.store.setFilter('assignedToMe', show ?
-			{
-				operator: "OR",
-				conditions: [
-					{responsibleUserId: go.User.id},
-					{responsibleUserId: null}
-				]
-			} : null);
+	setAssignmentFilters: function() {
+		let numSelectedFilters = 0;
+		if(Ext.state.Manager.get(this.statePrefix + "assigned-to-me")) {
+			numSelectedFilters++
+		}
+		if(Ext.state.Manager.get(this.statePrefix + "show-unassigned")) {
+			numSelectedFilters++;
+		}
+
+		if(numSelectedFilters === 0) {
+			this.taskGrid.store.setFilter('assignedToMe', null);
+		} else if(numSelectedFilters === 1) {
+			const cnd = Ext.state.Manager.get(this.statePrefix + "assigned-to-me") ? go.User.id : null;
+			this.taskGrid.store.setFilter('assignedToMe', {responsibleUserId: cnd})
+		} else {
+			this.taskGrid.store.setFilter('assignedToMe',
+				{
+					operator: "OR",
+					conditions: [
+						{responsibleUserId: go.User.id},
+						{responsibleUserId: null}
+					]
+				}
+			);
+		}
 	},
-	
+
 	runModule : function() {
 
 		if(this.support) {
-			this.assignedToMe(Ext.state.Manager.get(this.statePrefix + "assigned-to-me"));
+			this.setAssignmentFilters();
 		} else {
 
 			this.filterPanel.on("afterrender", () => {
