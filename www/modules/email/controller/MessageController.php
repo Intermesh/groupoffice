@@ -401,7 +401,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 	private function _link(array $params, \GO\Base\Mail\Message $message, $tags=array())
 	{
-		$autoLinkContacts = \go\core\model\Module::isInstalled('community','addressbook') &&  Settings::get()->autoLinkEmail;
+		$settings = Settings::get();
+		$autoLinkContacts = \go\core\model\Module::isInstalled('community','addressbook') &&  in_array($settings->autoLink,['on','incl','excl']);
 
 		if (!empty($params['link']) || $autoLinkContacts || count($tags)) {
 			$path = 'email/' . date('mY') . '/sent_' .\GO::user()->id.'-'. uniqid(time()) . '.eml';
@@ -469,6 +470,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 
 			if ($autoLinkContacts) {
+				$bookIds = $settings->getAutoLinkAddressBookIds();
 				$to = new \GO\Base\Mail\EmailRecipients($params['to'].",".$params['bcc']);
 				$to = $to->getAddresses();
 
@@ -484,6 +486,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					}
 
 					foreach($contacts as $contact){
+						// autoLink == 'on' always continue
+						// autoLink == 'off' we never get here
+						if(($settings->autoLink == 'incl' && !in_array($contact->addressBookId, $bookIds)) ||
+							($settings->autoLink == 'excl' && in_array($contact->addressBookId, $bookIds)))
+								continue; // skip linking
+
+
 						if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){
 							$attributes['acl_id']= $contact->findAclId();
 							$linkedEmail = \GO\Savemailas\Model\LinkedEmail::model()->findSingleByAttributes(array(
@@ -1724,7 +1733,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 */
 	private function _handleAutoContactLinkFromSender(\GO\Email\Model\ImapMessage $imapMessage, $linkedModels)
 	{
-		if(GO::modules()->addressbook && GO::modules()->savemailas && Settings::get()->autoLinkEmail) {
+		$settings = Settings::get();
+
+		if(GO::modules()->addressbook && GO::modules()->savemailas && in_array($settings->autoLink,['on','incl','excl'])) {
 			$from = $imapMessage->from->getAddress();
 
 			$contacts = Contact::findByEmail($from['email'], ['id', 'isOrganization', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE])->all();
@@ -1738,7 +1749,14 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				}
 			}
 
+			$bookIds = $settings->getAutoLinkAddressBookIds();
 			foreach($contacts as $contact) {
+				// autoLink == 'on' always continue
+				// autoLink == 'off' we never get here
+				if(($settings->autoLink == 'incl' && !in_array($contact->addressBookId, $bookIds)) ||
+					($settings->autoLink == 'excl' && in_array($contact->addressBookId, $bookIds)))
+								continue; // skip linking
+
 				if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
 					\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $contact);
 					$linkedModels[]=$contact;					

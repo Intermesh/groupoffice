@@ -19,4 +19,19 @@ class Settings extends core\Settings {
 	 */
 	public $createPersonalAddressBooks = true;
 
+	// on: auto link all contacts
+	// off: never auto link
+	// incl: auto link contact in addressbooks listed in $autoLinkaddressBookIds
+	// excl auto link all contact except from addressbooks listed in $autoLinkaddressBookIds
+	public $autoLink;
+	protected $autoLinkAddressBookIds;
+
+	public function getAutoLinkAddressBookIds() {
+		return json_decode($this->autoLinkAddressBookIds);
+	}
+
+	public function setAutoLinkAddressBookIds($v) {
+		$this->autoLinkAddressBookIds = json_encode($v);
+	}
+
 }

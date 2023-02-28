@@ -149,4 +149,10 @@ return array (
   'Display options for address books' => 'Weergave instellingen voor adresboeken',
   'Start in' => 'Start in',
   'Last selected address book' => 'Laatst geselecteerde adresboek',
+	//autolink
+	"Automatic linking" => 'Automatisch koppelen',
+	"Don't link automatically to contacts" => 'Email niet automatisch aan contacten koppelen',
+	"Link to all contacts" => 'Koppel aan alle contacten',
+	"Exclude contacts from the address books below" => 'Contacten uit onderstaand adresboek uitsluiten',
+	"Only link to the contacts from the address books below"=> 'Alleen koppelen als contact in onderstaadn adresboek zit',
 );
