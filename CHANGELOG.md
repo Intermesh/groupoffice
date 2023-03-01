@@ -1,3 +1,4 @@
+01-03-2023: 6.6.151
 - Email / SaveMailAs: fix saving uid of message for very large Message-IDs
 
 24-02-2023: 6.6.150
