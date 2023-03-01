@@ -669,6 +669,22 @@ class Instance extends Entity {
 						->andWhere('user_id', '=', 0)
 						->single();
 
+			$this->storageUsage += (int) (new \go\core\db\Query())
+				->setDbConnection($this->getInstanceDbConnection())
+				->selectSingleValue('value')
+				->from('go_settings')
+				->where('name', '=', "email_usage")
+				->andWhere('user_id', '=', 0)
+				->single();
+
+			$this->storageUsage += (int) (new \go\core\db\Query())
+				->setDbConnection($this->getInstanceDbConnection())
+				->selectSingleValue('value')
+				->from('go_settings')
+				->where('name', '=', "database_usage")
+				->andWhere('user_id', '=', 0)
+				->single();
+
 			$this->version = (new \go\core\db\Query())
 						->setDbConnection($this->getInstanceDbConnection())
 						->selectSingleValue('value')

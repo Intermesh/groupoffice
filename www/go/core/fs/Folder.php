@@ -411,7 +411,7 @@ class Folder extends FileSystemObject {
 	 * @return int | null
 	 */
 	public function calculateSize() : ?int {
-		$cmd = 'du -sb "' . $this->path . '" 2>/dev/null';
+		$cmd = 'du -sbL "' . $this->path . '" 2>/dev/null';
 
 		$io = popen($cmd, 'r');
 

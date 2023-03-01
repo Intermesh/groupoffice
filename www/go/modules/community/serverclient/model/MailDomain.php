@@ -19,7 +19,7 @@ class MailDomain {
 
 	private function getBaseUrl($url) {
 		if(empty(GO::config()->serverclient_server_url)){
-			GO::config()->serverclient_server_url= GO::config()->full_url;
+			GO::config()->serverclient_server_url= go()->getSettings()->URL;
 		}
 
 		if(empty(GO::config()->serverclient_token)){
@@ -115,6 +115,31 @@ class MailDomain {
 		}
 		
 	}
+
+	/**
+	 * Get mail usage in bytes
+	 * @param array $domains
+	 * @return int
+	 * @throws Exception
+	 */
+	public function getUsage(array $domains) {
+		$url = $this->getBaseUrl("postfixadmin/domain/getUsage");
+		$response = $this->http->post($url, [
+			'domains' => json_encode($domains)
+		]);
+
+		if($response['status'] != 200) {
+			throw new Exception("Unexpected HTTP status " .$response['status'] ." from ". $url);
+		}
+
+		$result = json_decode($response['body']);
+
+		if(!$result->success)
+			throw new Exception("Could not set mailbox password on postfixadmin module. ".$result->feedback);
+
+		return (int) $result->usage * 1024;
+	}
+
 	
 	public function addAccount($user,$domain) {
 		
