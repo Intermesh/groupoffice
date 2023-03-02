@@ -208,7 +208,8 @@ class TemplateParser {
 		$this->addFilter('entity', [$this, "filterEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
-		$this->addFilter('nl2br', "nl2br");
+
+		$this->addFilter('nl2br', [$this, "filterNl2br"]);
 		$this->addFilter('empty', [$this, "filterEmpty"]);
 		$this->addFilter('t', [$this, "filterTranslate"]);
 
@@ -232,6 +233,10 @@ class TemplateParser {
 
 	private function filterEmpty($v) {
 		return empty($v) ? "1" : "0";
+	}
+
+	private function filterNl2br(?string $v) {
+		return isset($v) ? nl2br($v) : "";
 	}
 
 	/** @noinspection PhpSameParameterValueInspection */
@@ -1031,7 +1036,7 @@ class TemplateParser {
 					return null;
 				}
 				$model = $model[$pathPart];
-			}else 
+			}else if(is_object($model))
 			{				
 				if (!isset($model->$pathPart)) {
 
@@ -1046,6 +1051,8 @@ class TemplateParser {
 					$model = $model->$pathPart;
 				}
 
+			} else{
+				return null;
 			}
 			
 			if(isset($index)) {
