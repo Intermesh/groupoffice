@@ -315,9 +315,7 @@ class Html2Text
 	 */
 	public function __construct( $source = '', $from_file = false )
 	{
-		if ( !empty($source) ) {
-			$this->set_html($source, $from_file);
-		}
+		$this->set_html($source, $from_file);
 		$this->set_base_url();
 	}
 
@@ -331,7 +329,7 @@ class Html2Text
 	 */
 	public function set_html( $source, $from_file = false )
 	{
-		$this->html = $source;
+		$this->html = (string) $source;
 
 		if ( $from_file && file_exists($source) ) {
 			$fp = fopen($source, 'r');
@@ -451,7 +449,7 @@ class Html2Text
 		$text = preg_replace_callback('/<th[^>]*>(.*?)<\/th>/i', function($matches){			
 			return strtoupper("\t\t".$matches[1]."\n");
 		}, $text);
-		
+
 		// Strip any other HTML tags
 		$text = strip_tags($text, $this->allowed_tags);
 

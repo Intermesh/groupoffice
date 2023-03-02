@@ -32,15 +32,15 @@ class StringUtil {
 	public static function normalizeCrlf(?string $text, string $crlf = "\r\n"): ?string
 	{
 		if(empty($text)) {
-			return $text;
+			return "";
 		}
 		
 		$normalized =  preg_replace('/\R/u', $crlf, $text);
 		if(empty($normalized)) {
 			//fallback on str_replace in case of bad utf8
-			return preg_replace("/\r\n|\r|\n/", $crlf, $text);
+			return (string) preg_replace("/\r\n|\r|\n/", $crlf, $text);
 			//throw new \Exception(array_flip(get_defined_constants(true)['pcre'])[preg_last_error()]. ': while normalizing crlf for: '. $text);
-	}
+		}
 		return $normalized;
 	}
 

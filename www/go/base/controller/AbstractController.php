@@ -137,7 +137,7 @@ abstract class AbstractController extends Observable {
 	 */
 	protected function lockAction(){
 		
-		$this->lock = new \go\core\util\Lock('action_'.str_replace('/','_', GO::router()->getControllerRoute()), false);
+		$this->lock = new \go\core\util\Lock('action_'.str_replace('/','_', (GO::router()->getControllerRoute() ?? $this->_action)), false);
 		
 		return $this->lock->lock();
 	}
