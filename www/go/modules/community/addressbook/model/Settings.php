@@ -23,14 +23,14 @@ class Settings extends core\Settings {
 	// off: never auto link
 	// incl: auto link contact in addressbooks listed in $autoLinkaddressBookIds
 	// excl auto link all contact except from addressbooks listed in $autoLinkaddressBookIds
-	public $autoLink;
+	public $autoLink = "off";
 	protected $autoLinkAddressBookIds;
 
-	public function getAutoLinkAddressBookIds() {
-		return json_decode($this->autoLinkAddressBookIds);
+	public function getAutoLinkAddressBookIds() : array {
+		return !empty($this->autoLinkAddressBookIds) ? json_decode($this->autoLinkAddressBookIds) : [];
 	}
 
-	public function setAutoLinkAddressBookIds($v) {
+	public function setAutoLinkAddressBookIds(array $v) {
 		$this->autoLinkAddressBookIds = json_encode($v);
 	}
 
