@@ -71,26 +71,20 @@ GO.base.email.EmailEditorPanel = function(config){
 		},this);
 
 		// Used for dragging and dropping emails as attachments
-		this.dropTarget = new Ext.dd.DropTarget(this.container,
-			{
-				ddGroup : 'EmailDD',
-				copy:false,
-				notifyOver: this.onNotifyOver.createDelegate(this),
-				notifyDrop : this.onNotifyDrop.createDelegate(this),
-				notifyOut: this.onNotifyOut.createDelegate(this)
-			});
+		this.dropTarget = new Ext.dd.DropTarget(this.container, {
+			ddGroup : 'EmailDD',
+			copy:false,
+			notifyOver: this.onNotifyOver.createDelegate(this),
+			notifyDrop : this.onNotifyDrop.createDelegate(this),
+			notifyOut: this.onNotifyOut.createDelegate(this)
+		});
 
 		// Used for dragging and dropping files as attachments
 		this.getEl().dom.addEventListener("dragover", this.onDragOver.createDelegate(this));
 		this.getEl().dom.addEventListener("dragleave", this.onDragLeave.createDelegate(this));
 		this.getEl().dom.addEventListener("drop", this.onDrop.createDelegate(this));
-		// document.getElementById(dropZoneId).addEventListener("drop", (e) => {
-		// 	console.warn("Anonymous drop");
-		// 	console.warn(e);
-		// 	e.preventDefault();
-		// },false);
 	}, this);
-	
+
 	this.addEvents({
 		submitshortcut : true
 	});
@@ -208,10 +202,10 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		});
 
 		this.dropZone = new Ext.BoxComponent({
+			autoEl: 'div',
 			hidden: true,
-			tag: 'div',
 			cls: 'go-dropzone',
-			html: t("Drop email messages here")
+			html: t("Drop here to attach")
 		});
 
 		if (!GO.util.empty(config.enableSubjectField))
@@ -467,13 +461,27 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		});
 	},
 
+	/**
+	 * When dragging an email, display a nice icon and display the dropzone
+	 * @param dd
+	 * @param e
+	 * @param data
+	 * @returns {string}
+	 */
 	onNotifyOver(dd,e,data) {
-		// TODO: Determine when to return false
 		this.dropZone.show();
 		this.setEditorHeight();
-		return true;
+		return "x-dd-drop-ok";
 	},
 
+	/**
+	 * When dragging an email out, revert to full editor size
+	 *
+	 * @param dd
+	 * @param e
+	 * @param data
+	 * @returns {boolean}
+	 */
 	onNotifyOut: function(dd,e,data) {
 		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
 		this.dropZone.hide();
@@ -482,6 +490,14 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		return true;
 	},
 
+	/**
+	 * When an email is dropped, make a blob and attach to current email.
+	 *
+	 * @param dd
+	 * @param e
+	 * @param data
+	 * @returns {boolean}
+	 */
 	onNotifyDrop: function(dd,e,data) {
 		if(!data.grid) {
 			this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
@@ -507,8 +523,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				url: 'email/message/saveToBlob',
 				params: params,
 				scope: this,
-				success: function(options, response, data)
-				{
+				success: function(options, response, data) {
 					if(data.success) {
 						this.attachmentsView.addBlob(data.blob);
 					}
@@ -525,57 +540,66 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		return true;
 	},
 
+	/**
+	 * If a file is being dragged, show dropzone and update the editor height
+	 *
+	 * @param e
+	 */
+	onDragOver: function(e) {
+		if (!e.dataTransfer || !e.dataTransfer.files) {
+			return;
+		}
+		e.preventDefault();
+		e.stopPropagation();
+		e.dataTransfer.dropEffect = "copy";
+		this.dropZone.show();
+		this.setEditorHeight();
+		// return "x-dd-drop-ok";
+	},
+
+	/**
+	 * If a file is being dragged out, just hide the dropzone and enlarge the editor if needed
+	 *
+	 * @param e
+	 */
+	onDragLeave: function(e) {
+		if (!e.dataTransfer || !e.dataTransfer.files) {
+			return;
+		}
+		e.preventDefault();
+		e.stopPropagation();
+		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
+		this.dropZone.hide();
+		this.setEditorHeight();
+		// return true;
+	},
+
+	/**
+	 * If a file is being dropped, upload it via JMAP, attach the resulting blob to the message.
+	 *
+	 * @param e
+	 */
 	onDrop: function(e) {
-		console.warn("ONDROP");
-		console.log(e);
-		if(!e.dataTransfer.files) {
+		if (!e.dataTransfer || !e.dataTransfer.files) {
+			this.dropZone.hide();
+			this.setEditorHeight();
 			return;
 		}
 
 		//prevent browser from navigating to dropped file
 		e.preventDefault();
-
-		// //make sure editor has focus
-		// this.focus();
-		//
-		// //this is needed if the editor has not been activated yet.
-		// this.updateToolbar();
+		e.stopPropagation();
 
 		Array.from(e.dataTransfer.files).forEach(function(file) {
 			go.Jmap.upload(file, {
 				scope: this,
 				success: function(response) {
-					const imgEl = null;
-					debugger;
-					// if (file.type.match(/^image\//)) {
-					// 	var domId = Ext.id(), img = '<img style="max-width: 100%" id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
-					// 	this.insertAtCursor(img);
-					// 	imgEl = this.getDoc().getElementById(domId);
-					// }
-
-					this.fireEvent('attach', this, response, file, imgEl);
+					this.attachmentsView.addBlob(response);
+					this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
+					this.dropZone.hide();
+					this.setEditorHeight();
 				}
 			});
 		}, this);
-
-
 	},
-
-	onDragOver: function(e) {
-		console.warn("DRAGOVER");
-		console.warn(e);
-		e.preventDefault();
-		this.dropZone.show();
-		this.setEditorHeight();
-		return true;
-	},
-
-	onDragLeave: function(e) {
-		// console.warn("DRAGLEAVE");
-		e.preventDefault();
-		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
-		this.dropZone.hide();
-		this.setEditorHeight();
-		return true;
-	}
 });
