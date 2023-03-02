@@ -41353,7 +41353,10 @@ Ext.form.DisplayField = Ext.extend(Ext.form.Field,  {
 
 				this.fireEvent("setvalue", this, v);
         return this;
-    }
+    },
+	labelShouldFloat: function() {
+		return true;
+	}
     
     
     
