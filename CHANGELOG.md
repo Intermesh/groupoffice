@@ -1,3 +1,7 @@
+27-02-2023: 6.7.16
+- Core: fix issues with license being misread
+- Support: Add 'unassigned' filter
+
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 

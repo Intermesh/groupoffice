@@ -69,6 +69,7 @@ return array (
   'Group name' => 'Groepsnaam',
   'Assigned' => 'Toegewezen',
   'Mine' => 'Mijn',
+  'Unassigned' => 'Niet toegewezen',
   'Lists' => 'Lijsten',
   'Private notes' => 'Privé notities',
   'Contracts' => 'Contracten',

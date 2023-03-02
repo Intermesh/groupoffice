@@ -83,12 +83,12 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			form.changeListenersAdded = true;
 			if (form.getXType() == "entityform") {
 				form.on("setvalues",  () => {
-					this.onLoad(form, form.getValues(), fields);
+					this.load(form, form.getValues(), fields);
 				});
 			} else {
 				form?.getForm().on("beforeaction", (form, action) => {
 					if (action.type === "load") {
-						this.onLoad(form, form.getFieldValues(), fields);
+						this.load(form, form.getFieldValues(), fields);
 					}
 				});
 			}
@@ -97,7 +97,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		this.supr().initComponent.call(this);
 	},
 
-	onLoad(form, values, customFields) {
+	load(form, values, customFields) {
 
 		if(this.fieldSet.collapseIfEmpty) {
 			isModified = false;

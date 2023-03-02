@@ -195,3 +195,6 @@ $updates['202211071330'][] = function() {
 
 
 };
+
+$updates['202302281622'][] = "UPDATE core_setting s JOIN core_module m ON s.moduleId = m.id
+SET s.value = IF(s.value = '1', 'on', 'off'), s.name = 'autoLink' WHERE m.name = 'addressbook' AND s.name = 'autoLinkEmail';";
