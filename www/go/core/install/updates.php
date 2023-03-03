@@ -1359,3 +1359,11 @@ $updates['202302211524'][] = "";
 $updates['202302211524'][] = "";
 $updates['202302211524'][] = "";
 $updates['202302211524'][] = ""; //empty for fixing duplicates in file
+
+
+$updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
+  ADD PRIMARY KEY (`id`)";
+
+
+$updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
+  MODIFY `id` bigint unsigned auto_increment";
