@@ -169,7 +169,9 @@ abstract class EntityController extends Controller {
 //		} else{
 
 		$keys = $cls::getPrimaryKey(true);
-		if(count($keys) == 1) {
+		if(empty($keys)) {
+			throw new \LogicException($cls . " must have a primary key");
+		} else if(count($keys) == 1) {
 			$query->select($keys);
 		} else{
 			$query->select("CONCAT(" . implode(", '-', ", $keys) . ")");

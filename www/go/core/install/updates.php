@@ -1211,8 +1211,6 @@ $updates['202207041200'][] = "alter table core_customfields_field_set
         foreign key (parentFieldSetId) references core_customfields_field_set (id)
             on delete set null;";
 
-
-
 $updates['202209291100'][] = "ALTER TABLE `core_customfields_select_option` ADD COLUMN `foregroundColor` VARCHAR(6) DEFAULT NULL AFTER `text`, 
     ADD COLUMN `backgroundColor` VARCHAR(6) DEFAULT NULL AFTER `foregroundColor`, 
     ADD COLUMN `renderMode` VARCHAR(20) DEFAULT NULL AFTER `backgroundColor`;";
