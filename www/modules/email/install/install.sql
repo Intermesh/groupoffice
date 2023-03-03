@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS `em_links` (
   `mtime` int(11) NOT NULL DEFAULT '0',
 	`muser_id` int(11) NOT NULL DEFAULT '0',
   `acl_id` int(11) NOT NULL,
-  `uid` varchar(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
+  `uid` varchar(350) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `account_id` (`user_id`),
   KEY `uid` (`uid`)

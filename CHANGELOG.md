@@ -5,6 +5,9 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+01-03-2023: 6.6.151
+- Email / SaveMailAs: fix saving uid of message for very large Message-IDs
+
 24-02-2023: 6.6.150
 - Tasks: Create user broken when tasks module was disabled
 - Addressbook: disable delete button for groups if insufficient permissions

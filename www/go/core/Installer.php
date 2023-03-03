@@ -850,7 +850,7 @@ class Installer {
 				go()->getDbConnection()->query($sql);	
 				
 				if($record['Name'] === 'em_links') {
-					go()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(350) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
 					go()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
 				}
 			}	
