@@ -75,6 +75,10 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					title:t("This instance is using"),
 					items:[
 						new GO.form.PlainField({
+							fieldLabel:t("Users"),
+							name:'users'
+						}),
+						new GO.form.PlainField({
 							fieldLabel:t("Files"),
 							name:'file_storage_usage'
 						}),
@@ -89,7 +93,11 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 						new GO.form.PlainField({
 							fieldLabel:t("Total"),
 							name:'total_usage'
-						})						
+						}),
+						new GO.form.PlainField({
+							fieldLabel:t("Date"),
+							name:'date'
+						}),
 					]					
 				})
 				
