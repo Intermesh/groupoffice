@@ -13,6 +13,11 @@ class ZpushadminModule extends \GO\Base\Module {
 		return parent::install();
 	}
 
+	public function autoInstall()
+	{
+		return true;
+	}
+
 	public function depends() {
 		return array('sync');
 	}
