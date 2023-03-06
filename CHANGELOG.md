@@ -1,3 +1,6 @@
+06-03-2023: 6.6.152
+- Email: drag and drop mail messages into email attachments
+
 01-03-2023: 6.6.151
 - Email / SaveMailAs: fix saving uid of message for very large Message-IDs
 
