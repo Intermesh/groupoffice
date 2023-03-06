@@ -19,11 +19,14 @@ use function GO;
  *
  * Replaces variables {{varname}} and parse structural blocks like [if] and [each]
  *
- * Structurabl blocks may be wrapped with <template>[if ...]</template> so they can be valid html inside wysywig editors
+ * Structural blocks may be wrapped with <template>[if ...]</template> so they can be valid html inside wysywig editors
  * 
- * By default two variable are already present:
+ * By default some variables are already present:
  * 
  * {{now|date:Y-m-d}} The current date time object. In this example a date filter is used.
+ *
+ * {{system.title}}
+ * {{system.url}}
  * 
  * @example
  * 
