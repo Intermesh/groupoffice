@@ -69,23 +69,6 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 					},
 					scope: this
 				},
-//				{
-//					iconCls: 'btn-edit',
-//					text: t("Edit"),
-//					handler: function(){
-//						var composer = GO.email.showComposer({
-//							task:'opendraft',
-//							loadParams : {
-//								is_tmp_file:this.data.is_tmp_file,
-//								path:this.data.path
-//							},
-//							saveToPath:this.data.path
-//						});
-//						
-//						composer.on('hide', this.reload, this, {single:true});
-//					},
-//					scope: this
-//				},
 				this.addButton = this.newMenuButton = new go.detail.addButton({			
 					detailView: this,
 					noFiles: true

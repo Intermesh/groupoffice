@@ -1,7 +1,3 @@
-
-
-
-
 GO.form.HtmlEditor = function (config) {
 	config = config || {};
 
@@ -13,21 +9,21 @@ GO.form.HtmlEditor = function (config) {
 
 	config.plugins = config.plugins || [];
 
-	if (!Ext.isArray(config.plugins))
+	if (!Ext.isArray(config.plugins)) {
 		config.plugins = [config.plugins];
+	}
 
 	var spellcheckInsertPlugin = new GO.plugins.HtmlEditorSpellCheck(this);
 	var wordPastePlugin = new Ext.ux.form.HtmlEditor.Word();
-	//var dividePlugin = new Ext.ux.form.HtmlEditor.Divider();
-	//var tablePlugin = new Ext.ux.form.HtmlEditor.Table();
 	var hrPlugin = new Ext.ux.form.HtmlEditor.HR();
 	var ioDentPlugin = new Ext.ux.form.HtmlEditor.IndentOutdent();
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
 	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
 
 
-	if (GO.settings.pspellSupport)
+	if (GO.settings.pspellSupport) {
 		config.plugins.unshift(spellcheckInsertPlugin);
+	}
 
 	config.plugins.unshift(
 					ioDentPlugin,
@@ -53,27 +49,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	headingsMenu: true,
 
-	// hideToolbar : function() {
-	// 	this.toolbarHidden = true;
-	//
-	// 	if(this.initialized) {
-	// 		this.wrap.dom.firstChild.style.position = 'absolute';
-	// 		this.wrap.dom.firstChild.style.top = "-1000000px";
-	// 		this.wrap.dom.firstChild.style.height = "0px";
-	// 	}
-	// },
-	//
-	// showToolbar : function*() {
-	//
-	// 	this.toolbarHidden = false;
-	//
-	// 	if(this.initialized) {
-	// 		this.wrap.dom.firstChild.style.position = 'relative';
-	// 		delete this.wrap.dom.firstChild.style.top;
-	// 		this.wrap.dom.firstChild.style.height = dp(40) + "px";
-	// 	}
-	// },
-
 	initComponent: function() {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
 
@@ -85,25 +60,9 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.on('initialize', function(){
 
 			if(this.grow) {
-
-
-
 				this.doGrow();
 				this.on("sync", this.doGrow, this);
 			}
-
-			// if(Ext.isEmpty(this.emptyText)) {
-			// 	return;
-			// }
-			// Ext.EventManager.on(this.getEditorBody(),{
-			// 	focus:this.handleEmptyText,
-			// 	blur:this.applyEmptyText,
-			// 	scope:this
-			// });
-
-
-
-
 		},this);
 
 		this.on('activate', function() {
@@ -138,28 +97,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		}
 	},
 
-
-
-	// applyEmptyText: function() {
-	// 	var value = this.getValue();
-	// 	if(Ext.isEmpty(value)) {
-	// 		var emptyText = go.util.Format.string(this.emptyTextTpl,this.emptyText);
-	// 		go.form.HtmlEditor.superclass.setValue.apply(this, [emptyText]);
-	// 	}
-	// },
-	// handleEmptyText: function() {
-	// 	var value = this.getValue(),
-	// 		regex = new RegExp(go.util.Format.string( this.emptyTextRegex,this.emptyText ) );
-	// 	if(!Ext.isEmpty(value) && regex.test(value)) {
-	// 		go.form.HtmlEditor.superclass.setValue.apply(this, ['']);
-	// 	}
-	// },
-	// setValue : function(v){
-	// 	go.form.HtmlEditor.superclass.setValue.apply(this, arguments);
-	// 	//this.applyEmptyText();
-	// 	return this;
-  //  },
-
 	initEditor: function () {
 
 		GO.form.HtmlEditor.superclass.initEditor.call(this);
@@ -167,7 +104,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.addEvents({attach: true});
 
 		//Following is needed when using animateTarget in windows. But since that doesn't perform well we should look at using css transitions instead of js animations
-		//this.getToolbar().doLayout();
 		var doc = this.getEditorBody();
 
 		doc.addEventListener('paste', this.onPaste.createDelegate(this));
@@ -279,7 +215,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			go.Jmap.upload(file, {
 				scope: this,
 				success: function(response) {
-					console.warn(response);
 					var imgEl = null;
 					if (file.type.match(/^image\//)) {
 						var domId = Ext.id(), img = '<img style="max-width: 100%" id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
@@ -294,119 +229,12 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	},
 
-// 	getCursorPosition : function() {
-// 		var win = this.getWin();
-//
-// 		// node_walk: walk the element tree, stop when func(node) returns false
-// 		function node_walk(node, func) {
-// 			var result = func(node);
-// 			for(node = node.firstChild; result !== false && node; node = node.nextSibling)
-// 				result = node_walk(node, func);
-// 			return result;
-// 		};
-//
-//
-// // getCaretPosition: return [start, end] as offsets to elem.textContent that
-// //   correspond to the selected portion of text
-// //   (if start == end, caret is at given position and no text is selected)
-// 		function getCaretPosition(elem) {
-// 			var sel = win.getSelection();
-// 			var cum_length = [0, 0];
-//
-// 			if(sel.anchorNode == elem)
-// 				cum_length = [sel.anchorOffset, sel.extentOffset];
-// 			else {
-// 				var nodes_to_find = [sel.anchorNode, sel.extentNode];
-// 				if(!elem.contains(sel.anchorNode) || !elem.contains(sel.extentNode))
-// 					return undefined;
-// 				else {
-// 					var found = [0,0];
-// 					var i;
-// 					node_walk(elem, function(node) {
-// 						for(i = 0; i < 2; i++) {
-// 							if(node == nodes_to_find[i]) {
-// 								found[i] = true;
-// 								if(found[i == 0 ? 1 : 0])
-// 									return false; // all done
-// 							}
-// 						}
-//
-// 						if(node.textContent && !node.firstChild) {
-// 							for(i = 0; i < 2; i++) {
-// 								if(!found[i])
-// 									cum_length[i] += node.textContent.length;
-// 							}
-// 						}
-// 					});
-// 					cum_length[0] += sel.anchorOffset;
-// 					cum_length[1] += sel.extentOffset;
-// 				}
-// 			}
-// 			if(cum_length[0] <= cum_length[1])
-// 				return cum_length;
-// 			return [cum_length[1], cum_length[0]];
-// 		}
-//
-// 		return getCaretPosition(this.getDoc().body)[1];
-// 	},
-//
-// 	setCursorPosition :  function(pos) {
-//
-// 		var win = this.getWin();
-// 		var doc = this.getDoc();
-//
-// 		function createRange(node, chars, range) {
-// 			if (!range) {
-// 				range = doc.createRange()
-// 				range.selectNode(node);
-// 				range.setStart(node, 0);
-// 			}
-//
-// 			if (chars.count === 0) {
-// 				range.setEnd(node, chars.count);
-// 			} else if (node && chars.count >0) {
-// 				console.warn(node);
-// 				if (node.nodeType === Node.TEXT_NODE) {
-// 					if (node.textContent.length < chars.count) {
-// 						chars.count -= node.textContent.length;
-// 					} else {
-// 						range.setEnd(node, chars.count);
-// 						chars.count = 0;
-// 					}
-// 				} else {
-// 					for (var lp = 0; lp < node.childNodes.length; lp++) {
-// 						range = createRange(node.childNodes[lp], chars, range);
-//
-// 						if (chars.count === 0) {
-// 							break;
-// 						}
-// 					}
-// 				}
-// 			}
-//
-// 			return range;
-// 		}
-//
-//
-// 		var sel = win.getSelection();
-// 		var range = createRange(doc.body, {count: pos});
-//
-// 		range.collapse(false);
-// 		sel.removeAllRanges();
-// 		sel.addRange(range);
-// 	},
-
 	onPaste: function (e) {
 		var clipboardData = e.clipboardData, me = this;
 		if (clipboardData.items) {
 			//Chrome /safari has clibBoardData.items
 			for (var i = 0, l = clipboardData.items.length; i < l; i++) {
 				var item = clipboardData.items[i];
-
-				// item.getAsString((s) => {
-				// 	console.warn(item.type);
-				// 	console.warn(s);
-				// })
 
 				//Some times clipboard data holds multiple versions. When copy pasting from excel you get html, plain text and an image.
 				//We prefer to use the html in that case so we exit if found.
@@ -608,15 +436,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	 */
 	growMaxHeight: dp(480),
 
-	// syncValue: function(){
-	// 	//In BasicForm.js this method is called by EXT
-	// 	// When using the editor in sourceEdit then it may not call the syncValue function
-	// 	if(!this.sourceEditMode){
-	// 		GO.form.HtmlEditor.superclass.syncValue.call(this);
-	//
-	// 	}
-	// },
-
 	doGrow : function() {
 		var body = this.getEditorBody();
 
@@ -652,51 +471,13 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	},
 
-//	correctify: function(full, prefix, letter){
-//		var regex = /([:\?]\s+)(.)/g;
-//		return prefix + letter.toUpperCase();
-//	},
-
-//	urlify : function () {
-//		
-//		var inputText = this.getEditorBody().innerHTML;
-//		var replacedText, replacePattern1, replacePattern2, replacePattern3;
-//
-////		//URLs starting with http://, https://, or ftp://
-////		replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-////		replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank">$1</a>');
-////
-////		//URLs starting with "www." (without // before it, or it'd re-link the ones done above).
-////		replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
-////		replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>');
-////
-////		//Change email addresses to mailto:: links.
-////		replacePattern3 = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/gim;
-////		replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
-//
-//	replacedText = inputText.replace(/(?:^|[^\>])((ftp|http|https|file):\/\/[\S]+(\b|$))/gim, '<a href="http://$1">$1</a>');
-//
-//		
-//		this.getEditorBody().innerHTML=replacedText;
-//		
-//		console.log(this.getEditorBody().innerHTML);
-//		
-//	},
 	onFirstFocus: function () {
 
 		this.initPunctuationCorrection();
 
 		this.activated = true;
 		this.disableItems(this.readOnly);
-		if (Ext.isGecko) { // prevent silly gecko errors
-			/*this.win.focus();
-			 var s = this.win.getSelection();
-			 if(!s.focusNode || s.focusNode.nodeType != 3){
-			 var r = s.getRangeAt(0);
-			 r.selectNodeContents(this.getEditorBody());
-			 r.collapse(true);
-			 this.deferFocus();
-			 }*/
+		if (Ext.isGecko) {
 			try {
 				this.execCmd('useCSS', true);
 				this.execCmd('styleWithCSS', false);
@@ -809,19 +590,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.execCmd('FontSize', v);
 	},
 
-	// private
-//	onEditorEvent : function(e){
-//		this.updateToolbar();
-////		console.log(e);
-//		
-//		if(e.keyCode==32 || e.keyCode==12)
-//			this.urlify();
-//	},
-
-
 	createLink: function () {
-
-
 		var url = prompt(this.createLinkText, this.defaultLinkValue);
 		if (url && url != 'http:/' + '/') {
 			if (Ext.isSafari) {

@@ -12,10 +12,15 @@ use GO\Base\Mail\Mailer;
 use GO\Base\Mail\SmimeMessage;
 use GO\Base\Model\Acl;
 use go\core\ErrorHandler;
+use go\core\fs\Blob;
+use go\core\fs\File;
+use go\core\fs\FileSystemObject;
 use go\core\model\Acl as GoAcl;
 use go\core\model\User;
+use go\core\util\StringUtil;
 use GO\Email\Model\Alias;
 use GO\Email\Model\Account;
+use GO\Email\Model\ImapMessage;
 use GO\Email\Model\Label;
 use GO\Email\Transport;
 use go\modules\community\addressbook\model\Contact;
@@ -108,7 +113,7 @@ class MessageController extends \GO\Base\Controller\AbstractController
 		if (count($filters)) {
 			$imap = $account->openImapConnection($mailbox);
 
-			$messages = \GO\Email\Model\ImapMessage::model()->find($account, $mailbox,0, 100, Imap::SORT_ARRIVAL, false, "UNSEEN");
+			$messages = ImapMessage::model()->find($account, $mailbox,0, 100, Imap::SORT_ARRIVAL, false, "UNSEEN");
 			if(count($messages)){
 				while ($filter = array_shift($filters)) {
 					$matches = array();
@@ -147,7 +152,7 @@ class MessageController extends \GO\Base\Controller\AbstractController
 		$account = Account::model()->findByPk(145);
 		$imap = $account->openImapConnection('INBOX');
 
-		$messages = \GO\Email\Model\ImapMessage::model()->find(
+		$messages = ImapMessage::model()->find(
 						$account,
 						'INBOX',
 						0, 
@@ -286,7 +291,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['multipleFolders'] = true;
 		}
 
-		$messages = \GO\Email\Model\ImapMessage::model()->find(
+		$messages = ImapMessage::model()->find(
 						$account,
 						$params['mailbox'],
 						$params['start'],
@@ -418,7 +423,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 			$attributes = array();
 
-			$alias = \GO\Email\Model\Alias::model()->findByPk($params['alias_id']);
+			$alias = Alias::model()->findByPk($params['alias_id']);
 
 			$attributes['from'] = (string) \GO\Base\Mail\EmailRecipients::createSingle($alias->email, $alias->name);
 			if (isset($params['to'])) {
@@ -508,7 +513,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		GO::session()->closeWriting();
 
-		$alias = \GO\Email\Model\Alias::model()->findByPk($params['alias_id']);
+		$alias = Alias::model()->findByPk($params['alias_id']);
 		$account = Account::model()->findByPk($alias->account_id);
 
 		if (empty($account->drafts)) {
@@ -554,7 +559,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	protected function actionSaveToFile(array $params)
 	{
 		$message = new \GO\Base\Mail\Message();
-		$alias = \GO\Email\Model\Alias::model()->findByPk($params['alias_id']);
+		$alias = Alias::model()->findByPk($params['alias_id']);
 		$message->handleEmailFormInput($params);
 		$message->setFrom($alias->email, $alias->name);
 
@@ -780,7 +785,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$account = Account::model()->findByPk($params['account_id']);
 			$numberAttachment = 1;
 			foreach ($addEmailAsAttachmentList as $value) {
-				$attachmentMessage = \GO\Email\Model\ImapMessage::model()->findByUid($account, $value->mailbox, $value->uid);
+				$attachmentMessage = ImapMessage::model()->findByUid($account, $value->mailbox, $value->uid);
 
 				$filename = GO\Base\Fs\File::stripInvalidChars($attachmentMessage->subject);
 
@@ -862,7 +867,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceUserTags($response['data']['htmlbody'],true);
 				}
 				
-				if(!empty($params['alias_id']) && ($alias = GO\Email\Model\Alias::model()->findByPk($params['alias_id']))) {
+				if(!empty($params['alias_id']) && ($alias = Alias::model()->findByPk($params['alias_id']))) {
 					$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceModelTags($response['data']['htmlbody'], $alias, 'alias:', true);
 				}
 				//cleanup empty tags
@@ -969,7 +974,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		if (!empty($params['uid'])) {
 			$account = Account::model()->findByPk($params['account_id']);
-			$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+			$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
 			$message->createTempFilesForAttachments();
 			$response['sendParams']['draft_uid'] = $message->uid;
 		} else {
@@ -1003,7 +1008,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				throw new NotFound();
 			}
 
-			$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+			$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
 			if(!$message) {
 				throw new NotFound();
 			}
@@ -1056,7 +1061,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		if ($html) {
 			//saved messages always create temp files
-			if($message instanceof \GO\Email\Model\ImapMessage) {
+			if($message instanceof ImapMessage) {
 				$message->createTempFilesForAttachments(true);
 			}
 
@@ -1121,7 +1126,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(isset($params['includeAttachments'])){
 			// Include attachments
 
-			if($message instanceof \GO\Email\Model\ImapMessage){
+			if($message instanceof ImapMessage){
 				//saved messages always create temp files
 				$message->createTempFilesForAttachments();
 			}
@@ -1160,7 +1165,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		//for saving sent items in actionSend
-		if ($message instanceof \GO\Email\Model\ImapMessage) {
+		if ($message instanceof ImapMessage) {
 			$response['sendParams']['reply_uid'] = $message->uid;
 			$response['sendParams']['reply_mailbox'] = $params['mailbox'];
 			$response['sendParams']['reply_account_id'] = $params['account_id'];
@@ -1200,7 +1205,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 *
 	 * @param Account $account
 	 * @param \GO\Base\Mail\EmailRecipients $recipients
-	 * @return \GO\Email\Model\Alias|false 
+	 * @return Alias|false
 	 */
 	private function _findAliasFromRecipients($account, \GO\Base\Mail\EmailRecipients $recipients, $alias_id=0, $allAvailableAliases=false)
 	{
@@ -1221,7 +1226,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 
 		//find the right sender alias
-		$stmt = !$allAvailableAliases && $account && $account->checkPermissionLevel(Acl::CREATE_PERMISSION) ? $account->aliases : \GO\Email\Model\Alias::model()->find($findParams);
+		$stmt = !$allAvailableAliases && $account && $account->checkPermissionLevel(Acl::CREATE_PERMISSION) ? $account->aliases : Alias::model()->find($findParams);
 		while($possibleAlias = $stmt->fetch()){
 			if(!$defaultAlias) {
 				$defaultAlias = $possibleAlias;
@@ -1234,7 +1239,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		if(!$alias) {
-			$alias = empty($alias_id) ? $defaultAlias : \GO\Email\Model\Alias::model()->findByPk($alias_id);
+			$alias = empty($alias_id) ? $defaultAlias : Alias::model()->findByPk($alias_id);
 		}
 		return $alias;
 	}
@@ -1248,7 +1253,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		if (!empty($params['uid'])) {
 			$account = Account::model()->findByPk($params['account_id']);
-			$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+			$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
 		} else {
 			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($params['path'], !empty($params['is_tmp_file']) && $params['is_tmp_file']!='false');
 		}
@@ -1270,7 +1275,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$headerLines = $this->_getFollowUpHeaders($message);
 
-		if($message instanceof \GO\Email\Model\ImapMessage){
+		if($message instanceof ImapMessage){
 			//saved messages always create temp files
 			$message->createTempFilesForAttachments();
 		}
@@ -1309,7 +1314,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['data']['plainbody'] .= $header . $oldMessage['plainbody'];
 		}
 
-		if($message instanceof \GO\Email\Model\ImapMessage){
+		if($message instanceof ImapMessage){
 			//for saving sent items in actionSend
 			$response['sendParams']['forward_uid'] = $message->uid;
 			$response['sendParams']['forward_mailbox'] = $params['mailbox'];
@@ -1348,7 +1353,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new NotFound();
 		}
 
-		$imapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+		$imapMessage = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
 
 		if(!$imapMessage) {
 			throw new NotFound();
@@ -1452,7 +1457,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		);
 	}
 
-	private function _getContactInfo(\GO\Email\Model\ImapMessage $imapMessage,$params, $response, $account)
+	private function _getContactInfo(ImapMessage $imapMessage, $params, $response, $account)
 	{
 		$response['sender_contact_id']=0;
 		$response['sender_company_id']=0;
@@ -1521,7 +1526,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		return $response;
 	}
 
-	private function _handleInvitations(\GO\Email\Model\ImapMessage $imapMessage, $params, $response)
+	private function _handleInvitations(ImapMessage $imapMessage, $params, $response)
 	{
 		if(!GO::modules()->isInstalled('calendar')) {
 			return $response;
@@ -1531,7 +1536,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if($vcalendar){
 			$vevent = $vcalendar->vevent[0];
 
-			$aliases = GO\Email\Model\Alias::model()->find(
+			$aliases = Alias::model()->find(
 				GO\Base\Db\FindParams::newInstance()
 					->select('email')
 					->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id' , $imapMessage->account->id))
@@ -1673,12 +1678,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	/**
 	 * Finds an autolink tag inserted by Group-Office and links the message to the model
 	 *
-	 * @param \GO\Email\Model\ImapMessage $imapMessage
+	 * @param ImapMessage $imapMessage
 	 * @param type $params
 	 * @param StringHelper $response
 	 * @return StringHelper
 	 */
-	private function _handleAutoLinkTag(\GO\Email\Model\ImapMessage $imapMessage, $response)
+	private function _handleAutoLinkTag(ImapMessage $imapMessage, $response)
 	{
 		//seen flag is expensive because it can't be recovered from cache
 		$linkedModels = new \go\core\util\ArrayObject();
@@ -1712,13 +1717,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	/**
 	 * When automatic contact linking is enabled this will link received messages to the sender in the addressbook
 	 *
-	 * @param \GO\Email\Model\ImapMessage $imapMessage
+	 * @param ImapMessage $imapMessage
 	 * @param type $params
 	 * @param StringHelper $response
 	 * @return StringHelper
 	 * @todo system setting (MS-2-9-19)
 	 */
-	private function _handleAutoContactLinkFromSender(\GO\Email\Model\ImapMessage $imapMessage, $linkedModels)
+	private function _handleAutoContactLinkFromSender(ImapMessage $imapMessage, $linkedModels)
 	{
 		if(GO::modules()->addressbook && GO::modules()->savemailas && Settings::get()->autoLinkEmail) {
 			$from = $imapMessage->from->getAddress();
@@ -1904,6 +1909,55 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 		return $response;
 	}
+
+	/**
+	 * Save an email as a blob, return blob data
+	 *
+	 * @param array $params [account_id, uid, mailbox, number, encoding]
+	 *
+	 * @return array
+	 * @throws NotFound
+	 * @throws AccessDenied
+	 * @throws Exception
+	 */
+	protected function actionSaveToBlob(array $params): array
+	{
+		$account = Account::model()->findByPk($params['account_id']);
+
+		try {
+			$imap = $account->openImapConnection($params['mailbox']);
+		} catch (GO\Base\Mail\Exception\ImapAuthenticationFailedException|GO\Base\Mail\Exception\MailboxNotFound $e) {
+			return [
+				'success' => false,
+				'feedback' => $e->getMessage()
+			];
+		}
+		$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+		if(!$message) {
+			throw new NotFound();
+		}
+		$fileName = FileSystemObject::stripInvalidChars((strlen($message->subject)  ? $message->subject : GO::t('No subject')) . '.eml');
+		$tmpFile = File::tempFile($fileName);
+
+		$imap->save_to_file($params['uid'], $tmpFile->getPath(), $params['number'], $params['encoding']);
+
+		$blob = Blob::fromTmp($tmpFile);
+		$blob->save();
+
+		$blobData = [
+			'extension' => $tmpFile->getExtension(),
+			'size' => $tmpFile->getSize(),
+			'type' =>  $tmpFile->getMimeType(),
+			'name' =>  $fileName,
+			'fileName' =>  $fileName,
+			'from_file_storage' => true,
+			'tmp_file' => $tmpFile->getPath(),
+			'id' => $blob->id
+
+		];
+
+		return ['success' => true, 'blob' => $blobData];
+	}
 	
 	/**
 	 * Save all attachments of the given message to the given folder
@@ -1945,7 +1999,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				throw new NotFound("Specified account not found");
 			}
 
-			$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $mailbox, $uid);
+			$message = ImapMessage::model()->findByUid($account, $mailbox, $uid);
 		}
 		if(!$message){
 			trigger_error("GO\Email\Controller\Message::actionSaveAllAttachments(". $mailbox." - ". $uid.") message not found", E_USER_WARNING);
@@ -1988,7 +2042,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$account = Account::model()->findByPk($params['account_id']);
 		$imap  = $account->openImapConnection($params['mailbox']);
 
-		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+		$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
 		
 		$filename = GO\Base\Fs\File::stripInvalidChars($message->subject.' - '.\GO\Base\Util\Date::get_timestamp($message->udate));
 		$filename .= empty($params['download']) ? ".txt" :".eml";
@@ -2137,7 +2191,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		$account = Account::model()->findByPk($params['account_id']);
 		$response = ['success' => true];
-		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
+		$message = ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
 		if ($message->deleteAttachments()) {
 			$message->delete();
 			$message->getImapConnection()->expunge();
@@ -2151,7 +2205,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		$account = Account::model()->findByPk($params['account_id']);
 
-		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
+		$message = ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
 
 		$tmpFolder = \GO\Base\Fs\Folder::tempFolder(uniqid(time()));
 		$atts = $message->getAttachments();
