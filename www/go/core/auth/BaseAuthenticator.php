@@ -4,6 +4,7 @@ namespace go\core\auth;
 
 use Exception;
 use go\core\db\Query;
+use go\core\event\EventEmitterTrait;
 use go\core\model\Module;
 use go\core\validate\ValidationTrait;
 use JsonSerializable;
@@ -11,6 +12,7 @@ use JsonSerializable;
 abstract class BaseAuthenticator implements JsonSerializable {
 	
 	use ValidationTrait;
+	use EventEmitterTrait;
 	
 	/**
 	 * The ID of the authenticator
