@@ -1,3 +1,6 @@
+07-03-2023: 6.6.153
+- Email: minor bugfix drag and drop messages
+
 06-03-2023: 6.6.152
 - Email: drag and drop mail messages into email attachments.
 
