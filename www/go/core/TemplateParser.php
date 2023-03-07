@@ -172,13 +172,13 @@ class TemplateParser {
 	private $models = [];
 
 	/**
-	 * Values in IF expressions will be enlosed with quotes.
+	 * Values in IF expressions will returned as "false" or "true"
 	 *
 	 * @var bool
 	 */
-	public $encloseVars = false;
+	private $varsForIfStatement = false;
 
-	public $enableBlocks = true;
+	private $enableBlocks = true;
 
 
 	/**
@@ -214,6 +214,7 @@ class TemplateParser {
 
 		$this->addFilter('nl2br', [$this, "filterNl2br"]);
 		$this->addFilter('empty', [$this, "filterEmpty"]);
+		$this->addFilter('dump', [$this, "filterDump"]);
 		$this->addFilter('t', [$this, "filterTranslate"]);
 
 		$this->addModel('now', new DateTime());
@@ -313,6 +314,13 @@ class TemplateParser {
 			$thousandsSeparator = $this->config['thousandsSeparator'];
 		}
 		return number_format($number,$decimals, $decimalSeparator, $thousandsSeparator);
+	}
+
+	private function filterDump($value): string
+	{
+		ob_start();
+		var_dump($value);
+		return ob_get_clean();
 	}
 
 	private function filterMultiply($number,$factor): string
@@ -833,10 +841,10 @@ class TemplateParser {
 	 */
 	private function replaceIf($tag) {
 		
-		$this->encloseVars = true;
+		$this->varsForIfStatement = true;
 		$this->enableBlocks = false;
 		$parsed = $this->parse($tag['expression']);		
-		$this->encloseVars = false;
+		$this->varsForIfStatement = false;
 		$this->enableBlocks = true;
 		
 		$expression = $this->validateExpression($parsed);	
@@ -907,12 +915,7 @@ class TemplateParser {
 			}			
 		}		
 		return empty($str) ? 'return false;' : 'return ('.$str.');';
-	} 
-	
-//	private function isString ($str): bool
-//	{
-//		return preg_match('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/s', $str) || preg_match("/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'/s", $str);
-//	}
+	}
 
 	/**
 	 * @throws Exception
@@ -925,64 +928,15 @@ class TemplateParser {
 
 		//If replace value is array use first value for convenience
 		if(is_array($value)) {
-			return array_shift($value);
+			$value = array_shift($value);
 		}
 
-		if($this->encloseVars) {		
-			$value = is_scalar($value) || 
-				!isset($value) || 
-				(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', (string) $value) . '"' : !empty($value);
+		if($this->varsForIfStatement) {
+			$value = empty($value) ? "false" : "true";
 		}
 
 		return $value;
 	}
-
-
-//	private function replaceVar($matches) {
-//
-//		//take off {{ .. }}
-//		$str = substr($matches[0], 2, -2);
-//
-//		//split for allowing simple calculations
-//		$parts = preg_split('/([+\-\/\*])/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
-//
-//		$math = "";
-//
-//		$mathExpression = count($parts) > 1;
-//
-//		while($part = array_shift($parts)) {
-//
-//			$varName = trim($part);
-//			$operator = array_shift($parts);
-//
-//			$value = $this->getVarFiltered($varName);
-//
-//			//If replace value is array use first value for convenience
-//			if (is_array($value)) {
-//				$value = array_shift($value);
-//			}
-//
-//			if ($this->encloseVars) {
-//				$value = is_scalar($value) ||
-//				!isset($value) ||
-//				(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
-//			}
-//
-//			if(!$mathExpression) {
-//				return $value;
-//			}
-//
-//			$math .= $value . $operator;
-//		}
-//
-//
-//		try {
-//			return eval($math);
-//		}catch(\Throwable $e) {
-//			return $e->getMessage();
-//		}
-//
-//	}
 
 	/**
 	 * @throws Exception
