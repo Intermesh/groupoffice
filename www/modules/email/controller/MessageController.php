@@ -1937,7 +1937,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new NotFound();
 		}
 		$fileName = FileSystemObject::stripInvalidChars((strlen($message->subject)  ? $message->subject : GO::t('No subject')) . '.eml');
-		$tmpFile = File::tempFile($fileName);
+		$tmpFile = File::tempFile('eml');
 
 		$imap->save_to_file($params['uid'], $tmpFile->getPath(), $params['number'], $params['encoding']);
 
@@ -1946,8 +1946,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$blobData = [
 			'extension' => $tmpFile->getExtension(),
-			'size' => $tmpFile->getSize(),
-			'type' =>  $tmpFile->getMimeType(),
+			'size' => $blob->size,
+			'type' =>  $blob->type,
 			'name' =>  $fileName,
 			'fileName' =>  $fileName,
 			'from_file_storage' => true,
