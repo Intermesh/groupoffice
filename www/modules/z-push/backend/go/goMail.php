@@ -264,6 +264,7 @@ class goMail extends GoBaseBackendDiff {
 					$message->contentclass = "urn:content-classes:message";
 				}
 
+				$imapMessage->autoLink();
 				//don't flag as read right IS ALREADY DEFAULT
 //			$imapMessage->peek = true;
 				unset($imapMessage);
@@ -1051,9 +1052,8 @@ class goMail extends GoBaseBackendDiff {
 			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~SEND~~'.$success);
 			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~FAILED RECIPIENTS~~'.var_export($failedRecipients,true));
 			//if a sent items folder is set in the account then save it to the imap folder
-			if($success && $imapAccount->sent && $saveInSent) {
-				$imap = $imapAccount->openImapConnection($imapAccount->sent);
-				$imap->append_message($imapAccount->sent, $sendMessage->toString(), "\Seen");
+			if($success) {
+				$imapAccount->saveToSentItems($sendMessage);
 			}
 			
 			ZLog::Write(LOGLEVEL_DEBUG, 'MAIL IS SENT SUCCESSFULLY::::::::'.$success);

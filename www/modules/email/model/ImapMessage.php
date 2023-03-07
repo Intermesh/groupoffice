@@ -2,8 +2,13 @@
 
 namespace GO\Email\Model;
 
+use go\core\model\Acl;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
+use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\Settings;
+use GO\Savemailas\Model\LinkedEmail;
+use GO\Savemailas\SavemailasModule;
 
 /**
  * A message from the imap server
@@ -113,10 +118,8 @@ class ImapMessage extends ComposerMessage {
 		$imap = $account->openImapConnection($mailbox);
 		$headersSet = $imap->get_message_headers_set($start, $limit, $sortField , $descending, $query);
 		foreach($headersSet as $uid=>$headers){
-			$message = ImapMessage::model()->createFromHeaders(
-							$account, $mailbox, $headers);	
-			
-			$results[]=$message;
+			$message = ImapMessage::model()->createFromHeaders($account, $mailbox, $headers);
+			$results[] = $message;
 		}
 		\GO::debug($mailbox);
 		//find recursive in subfolders
@@ -137,6 +140,80 @@ class ImapMessage extends ComposerMessage {
 		
 		return $results;
 		
+	}
+
+	/**
+	 * When automatic contact linking is enabled this will link received messages to the sender in the addressbook
+	 *
+	 * @param \GO\Email\Model\ImapMessage $imapMessage
+	 * @param type $params
+	 * @param StringHelper $response
+	 */
+	public function autoLink()
+	{
+		if($this->seen ||
+			in_array($this->mailbox, [$this->account->sent, $this->account->trash, $this->account->drafts]) ||
+			!\GO::modules()->savemailas
+		) return;
+
+		//seen flag is expensive because it can't be recovered from cache
+		$linkedModels = new \go\core\util\ArrayObject();
+
+		$tags = SavemailasModule::findAutoLinkTags($this->getHtmlBody(), $this->account->id);
+
+		if(!isset($response['autolink_items'])) {
+			$response['autolink_items'] = array();
+		}
+		while ($tag = array_shift($tags)) {
+			try{
+				$linkModel = \GO\Savemailas\SavemailasModule::getLinkModel($tag['model'], $tag['model_id']);
+
+				if($linkModel && !$linkedModels->findKeyBy(function($i) use($linkModel) { return $linkModel->equals($i); })){
+
+					\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($this, $linkModel);
+
+					$linkedModels[] = $linkModel;
+				}
+			}
+			catch(\Exception $e){
+				\go\core\ErrorHandler::logException($e);
+			}
+		}
+
+		if(!\GO::modules()->addressbook)
+			return;
+
+		$settings = Settings::get();
+
+		if(!in_array($settings->autoLink,['on','incl','excl']))
+			return;
+
+		$from = $this->from->getAddress();
+
+		$contacts = Contact::findByEmail($from['email'], ['id', 'isOrganization', 'addressBookId', 'name'])->filter(['permissionLevel' => Acl::LEVEL_WRITE])->all();
+
+		foreach($contacts as $contact) {
+			/** @var Contact $contact */
+			if(!$contact->isOrganization) {
+				foreach($contact->findOrganizations(['id', 'addressBookId', 'name'])->filter(['permissionLevel' => Acl::LEVEL_WRITE]) as $o) {
+					$contacts[] = $o;
+				}
+			}
+		}
+
+		$bookIds = $settings->getAutoLinkAddressBookIds();
+		foreach($contacts as $contact) {
+			// autoLink == 'on' always continue
+			// autoLink == 'off' we never get here
+			if(($settings->autoLink == 'incl' && !in_array($contact->addressBookId, $bookIds)) ||
+				($settings->autoLink == 'excl' && in_array($contact->addressBookId, $bookIds)))
+				continue; // skip linking
+
+			if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){
+				LinkedEmail::model()->createFromImapMessage($this, $contact);
+				$linkedModels[]=$contact;
+			}
+		}
 	}
 	
 	/**
