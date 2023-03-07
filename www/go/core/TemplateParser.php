@@ -979,9 +979,6 @@ class TemplateParser {
 		foreach ($pathParts as $pathPart) {
 			//check for array access eg. contact.emailAddresses[0];
 			if(preg_match('/(.*)\[(\d+)]/', $pathPart, $matches)) {
-
-				// var_dump($matches);
-				
 				$index = (int) $matches[2];
 				$pathPart = $matches[1];
 			} else{
