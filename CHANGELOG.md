@@ -10,6 +10,10 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+
+06-03-2023: 6.6.152
+- Email: drag and drop mail messages into email attachments.
+
 01-03-2023: 6.6.151
 - Email / SaveMailAs: fix saving uid of message for very large Message-IDs
 

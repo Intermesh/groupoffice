@@ -2257,8 +2257,9 @@ GO.files.openFolder = function(id, folder_id)
 		});
 	}
 	
-	if(!folder_id)
-		folder_id=id;
+	if(!folder_id) {
+		folder_id = id;
+	}
 	
 	GO.files.fileBrowser.setRootID(id, folder_id);
 	GO.files.fileBrowserWin.show();
