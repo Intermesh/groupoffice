@@ -72,9 +72,8 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		
 		
 		tbar.push(this.editButton = new Ext.Button({
-				iconCls: 'btn-edit', 
-				tooltip: t("Edit"), 
-				cls: 'x-btn-text-icon', 
+				iconCls: 'ic-edit',
+				tooltip: t("Edit"),
 				handler:this.editHandler, 
 				scope: this,
 				disabled : true
