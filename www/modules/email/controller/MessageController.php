@@ -404,119 +404,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	}
 
 
-	private function _link(array $params, \GO\Base\Mail\Message $message, $tags=array())
-	{
-		$settings = Settings::get();
-		$autoLinkContacts = \go\core\model\Module::isInstalled('community','addressbook') &&  in_array($settings->autoLink,['on','incl','excl']);
 
-		if (!empty($params['link']) || $autoLinkContacts || count($tags)) {
-			$path = 'email/' . date('mY') . '/sent_' .\GO::user()->id.'-'. uniqid(time()) . '.eml';
-
-			$file = new \GO\Base\Fs\File(GO::config()->file_storage_path . $path);
-			$file->parent()->create();
-
-			$fbs = new \Swift_ByteStream_FileByteStream($file->path(), true);
-			$message->toByteStream($fbs);
-
-			if (!$file->exists()) {
-				throw new \Exception("Failed to save email to file!");
-			}
-
-			$attributes = array();
-
-			$alias = Alias::model()->findByPk($params['alias_id']);
-
-			$attributes['from'] = (string) \GO\Base\Mail\EmailRecipients::createSingle($alias->email, $alias->name);
-			if (isset($params['to'])) {
-				$attributes['to'] = $params['to'];
-			}
-
-			if (isset($params['cc'])) {
-				$attributes['cc'] = $params['cc'];
-			}
-			if (isset($params['bcc'])) {
-				$attributes['bcc'] = $params['bcc'];
-			}
-			$attributes['subject'] = !empty($params['subject']) ? $params['subject'] : GO::t("No subject", "email");
-			$attributes['path'] = $path;
-
-			$date = $message->getDate();
-
-			$attributes['time'] = $date ? $date->format('U') : time();
-			$attributes['uid']= '<'.$message->getId().'>';// $alias->email.'-'.$message->getDate();
-
-			$linkedModels = new \go\core\util\ArrayObject();
-
-			if (!empty($link)) {
-				//add link sent by composer as a tag to unify code
-				$linkProps = explode(':', $params['link']);
-				$tags = array_unshift($tags, ['model' => $linkProps[0], 'model_id' => $linkProps[1]]);
-			}
-
-			//process tags in the message body
-			while($tag = array_shift($tags)){
-				$linkModel = \GO\Savemailas\SavemailasModule::getLinkModel($tag['model'], $tag['model_id']);
-				if($linkModel && $linkedModels->findKeyBy(function($item) use ($linkModel) { return $item->equals($linkModel); } ) === false){
-					$attributes['acl_id']=$linkModel->findAclId();
-					$linkedEmail = \GO\Savemailas\Model\LinkedEmail::model()->findSingleByAttributes(array(
-						'uid'=>$attributes['uid'],
-						'acl_id'=>$attributes['acl_id']));
-
-					if(!$linkedEmail){
-						$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
-						$linkedEmail->setAttributes($attributes);
-						$linkedEmail->save(true);
-					}
-					$linkedEmail->link($linkModel);
-
-					$linkedModels[]=$linkModel;
-				}
-			}
-
-
-			if ($autoLinkContacts) {
-				$bookIds = $settings->getAutoLinkAddressBookIds();
-				$to = new \GO\Base\Mail\EmailRecipients($params['to'].",".$params['bcc']);
-				$to = $to->getAddresses();
-
-				foreach ($to as $email=>$name) {
-					$contacts = Contact::findByEmail($email, ['id', 'addressBookId', 'isOrganization'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE])->all();
-					foreach($contacts as $contact) {
-						/** @var Contact $contact */
-						if(!$contact->isOrganization) {
-							foreach($contact->findOrganizations(['id', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]) as $o) {
-								$contacts[] = $o;
-							}
-						}
-					}
-
-					foreach($contacts as $contact){
-						// autoLink == 'on' always continue
-						// autoLink == 'off' we never get here
-						if(($settings->autoLink == 'incl' && !in_array($contact->addressBookId, $bookIds)) ||
-							($settings->autoLink == 'excl' && in_array($contact->addressBookId, $bookIds)))
-								continue; // skip linking
-
-
-						if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){
-							$attributes['acl_id']= $contact->findAclId();
-							$linkedEmail = \GO\Savemailas\Model\LinkedEmail::model()->findSingleByAttributes(array(
-								'uid'=>$attributes['uid'],
-								'acl_id'=>$attributes['acl_id']));
-
-							if(!$linkedEmail){
-								$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
-								$linkedEmail->setAttributes($attributes);
-								$linkedEmail->save(true);
-							}
-
-							$linkedEmail->link($contact);
-						}
-					}
-				}
-			}
-		}
-	}
 
 	protected function actionSave(array $params)
 	{
@@ -658,6 +546,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$message = new SmimeMessage();
 
+		// add tags in new mail for linking later
 		$tag = $this->_createAutoLinkTagFromParams($params, $account);
 
 		if(!empty($tag)){
@@ -668,6 +557,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 		}
 
+		// insert params into new SmimeMessage
 		$message->handleEmailFormInput($params);
 		$recipientCount = $message->countRecipients();
 		if(!$recipientCount) {
@@ -747,11 +637,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$account->sent = $params['reply_mailbox'];
 		}
 
-		if ($account->sent && $recipientCount > count($failedRecipients)) {
-			GO::debug("Sent");
+		if ($recipientCount > count($failedRecipients)) {
 			//if a sent items folder is set in the account then save it to the imap folder
-			$imap = $account->openImapConnection($account->sent);
-			if(!$imap->append_message($account->sent, $message, "\Seen")){
+			// auto linking will happen on save to sent items
+			if(!$account->saveToSentItems($message, $params)){
+				//$imap->append_message($account->sent, $message, "\Seen");
 				$response['success']=false;
 				$response['feedback'].='Failed to save sent item to '.$account->sent;
 			}
@@ -776,11 +666,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 			throw new Exception($msg.$logStr);
 		}
-		
-		//if there's an autolink tag in the message we want to link outgoing messages too.
-		$tags = $this->_findAutoLinkTags($params['content_type']=='html' ? $params['htmlbody'] : $params['plainbody'], $account->id);
-		
-		$this->_link($params, $message, $tags);
 
 		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
 
@@ -1395,12 +1280,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 
 			$response = $this->_blockImages($params, $response);
-
-			//Don't do these special actions in the special folders
-			if(!$imapMessage->seen && $params['mailbox']!=$account->sent && $params['mailbox']!=$account->trash && $params['mailbox']!=$account->drafts){
-				$linkedModels = $this->_handleAutoLinkTag($imapMessage, $response);
-				$linkedModels = $this->_handleAutoContactLinkFromSender($imapMessage, $linkedModels);
-			}
+			$imapMessage->autoLink();
 
 			$response = $this->_handleInvitations($imapMessage, $params, $response);
 			
@@ -1654,124 +1534,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		return $response;
 	}
 
-	private function _findAutoLinkTags($data, $account_id=0)
-	{
-		preg_match_all('/\[link:([^]]+)\]/',$data, $matches, PREG_SET_ORDER);
-
-		$tags = array();
-		$unique=array();
-		while($match=array_shift($matches)){
-
-			$match[1] = strip_tags($match[1]);
-			$match[1] = preg_replace('/\s+/', '',$match[1]);
-			$match[1] = preg_replace('/&.+;/', '',$match[1]);
-			
-			//make sure we don't parse the same tag twice.
-			if(!in_array($match[1], $unique)){				
-				$props = explode(',',base64_decode($match[1]));
-				if($props[0]==$_SERVER['SERVER_NAME'] && count($props) == 4){
-					$tag=array();
-					
-					if(!$account_id || $account_id==$props[1]){
-						$tag['account_id'] = $props[1];
-						$tag['model'] = $props[2];
-						$tag['model_id'] = $props[3];
-
-						$tags[]=$tag;
-					}
-				}
-
-				$unique[]=$match[1];
-			}
-
-		}
-		return $tags;
-	}
-
-	/**
-	 * Finds an autolink tag inserted by Group-Office and links the message to the model
-	 *
-	 * @param ImapMessage $imapMessage
-	 * @param type $params
-	 * @param StringHelper $response
-	 * @return StringHelper
-	 */
-	private function _handleAutoLinkTag(ImapMessage $imapMessage, $response)
-	{
-		//seen flag is expensive because it can't be recovered from cache
-		$linkedModels = new \go\core\util\ArrayObject();
-		if(GO::modules()->savemailas){
-			$tags = $this->_findAutoLinkTags($response['htmlbody'], $imapMessage->account->id);
-
-			if(!isset($response['autolink_items'])) {
-				$response['autolink_items'] = array();
-			}
-			while ($tag = array_shift($tags)) {
-				try{
-					$linkModel = \GO\Savemailas\SavemailasModule::getLinkModel($tag['model'], $tag['model_id']);
-
-					if($linkModel && !$linkedModels->findKeyBy(function($i) use($linkModel) { return $linkModel->equals($i); })){
-
-						\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $linkModel);
-
-						$linkedModels[]=$linkModel;
-					}
-				}
-				catch(\Exception $e){
-					\go\core\ErrorHandler::logException($e);
-				}
-			}
-		}
-
-		return $linkedModels;
-	}
-
-
-	/**
-	 * When automatic contact linking is enabled this will link received messages to the sender in the addressbook
-	 *
-	 * @param ImapMessage $imapMessage
-	 * @param type $params
-	 * @param StringHelper $response
-	 * @return StringHelper
-	 * @todo system setting (MS-2-9-19)
-	 */
-	private function _handleAutoContactLinkFromSender(ImapMessage $imapMessage, $linkedModels)
-	{
-		$settings = Settings::get();
-
-		if(GO::modules()->addressbook && GO::modules()->savemailas && in_array($settings->autoLink,['on','incl','excl'])) {
-			$from = $imapMessage->from->getAddress();
-
-			$contacts = Contact::findByEmail($from['email'], ['id', 'isOrganization', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE])->all();
-
-			foreach($contacts as $contact) {
-				/** @var Contact $contact */
-				if(!$contact->isOrganization) {
-					foreach($contact->findOrganizations(['id', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]) as $o) {
-						$contacts[] = $o;
-					}
-				}
-			}
-
-			$bookIds = $settings->getAutoLinkAddressBookIds();
-			foreach($contacts as $contact) {
-				// autoLink == 'on' always continue
-				// autoLink == 'off' we never get here
-				if(($settings->autoLink == 'incl' && !in_array($contact->addressBookId, $bookIds)) ||
-					($settings->autoLink == 'excl' && in_array($contact->addressBookId, $bookIds)))
-								continue; // skip linking
-
-				if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
-					\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $contact);
-					$linkedModels[]=$contact;					
-				}
-			}
-		}
-
-		return $linkedModels;
-	}
-
 
 	/**
 	 * Block external images if sender is not in addressbook.
@@ -1980,7 +1742,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		return ['success' => true, 'blob' => $blobData];
 	}
-	
+
 	/**
 	 * Save all attachments of the given message to the given folder
 	 * 
