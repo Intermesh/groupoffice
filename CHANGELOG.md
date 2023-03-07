@@ -1,3 +1,6 @@
+- ActiveSync: Autolinking will also work when mail is send/received using z-push
+- Core: Authenticator fires a "before authenticate" event.
+
 06-03-2023: 6.7.17
 - Core: several fixes for PHP8.1 compatibility
 - Core: Email autolinking has option to include / exclude addressbooks
