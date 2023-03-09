@@ -1,6 +1,9 @@
+- OnlyOffice: Was broken becaue of Firebase/JWT upgrade
+
+07-03-2023: 6.7.18
 - ActiveSync: Autolinking will also work when mail is send/received using z-push
 - Core: Authenticator fires a "before authenticate" event.
-- OnlyOffice: Was broken becaue of Firebase/JWT upgrade
+- Email: drag and drop mail messages into email attachments.
 
 06-03-2023: 6.7.17
 - Core: several fixes for PHP8.1 compatibility

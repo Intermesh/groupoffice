@@ -307,7 +307,7 @@ class Builder
 
 
         // for some reason this file causes a segmentation fault with Ioncube on PHP 8.1 :(
-        run('cp ' . $this->sourceDir . '/go/modules/newsletters/model/Newsletter.php ' . $this->buildDir . "/" . $this->packageName . '/go/modules/newsletters/model/Newsletter.php');
+        run('cp ' . $this->sourceDir . '/business/newsletters/model/Newsletter.php ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/newsletters/model/Newsletter.php');
 
         run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');
 
