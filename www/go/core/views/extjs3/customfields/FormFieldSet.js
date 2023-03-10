@@ -79,8 +79,8 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		this.on('render', () => {
 			this.formTabPanel = this.findParentByType('tabpanel');
 			const form = this.findParentByType("form");
-			if(!form || form.changeListenersAdded) return;
-			form.changeListenersAdded = true;
+			if(!form || form.changeListenersAdded2) return;
+			form.changeListenersAdded2 = true;
 			if (form.getXType() == "entityform") {
 				form.on("setvalues",  () => {
 					this.load(form, form.getValues(), fields);
