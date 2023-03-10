@@ -586,6 +586,9 @@ class StringHelper {
 	 */
 
 	public static function cut_string($string, $maxlength, $cut_whole_words = true, $append='...') {
+		if(!isset($string)) {
+			return "";
+		}
 		if (strlen($string) > $maxlength) {
 			
 			$substrFunc = function_exists('mb_substr') ? 'mb_substr' : 'substr';
