@@ -1,4 +1,5 @@
 - OnlyOffice: Was broken becaue of Firebase/JWT upgrade
+- Core: Fixed 8.1 deprecated error
 
 07-03-2023: 6.7.18
 - ActiveSync: Autolinking will also work when mail is send/received using z-push
