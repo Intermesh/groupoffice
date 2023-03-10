@@ -114,6 +114,11 @@ class Field extends AclItemEntity {
 	public $createdAt;
 
 	/**
+	 * @var Relation[]
+	 */
+	public $customFieldRelations = [];
+
+	/**
 	 * Hide field by default in grids
 	 *
 	 * @var bool
@@ -139,7 +144,8 @@ class Field extends AclItemEntity {
 	
 	protected static function defineMapping(): Mapping
 	{
-		return parent::defineMapping()->addTable('core_customfields_field', 'f');
+		return parent::defineMapping()->addTable('core_customfields_field', 'f')
+			->addArray('customFieldRelations', Relation::class, ['id' => 'fieldId']);
 	}
 
 	protected static function aclEntityClass(): string

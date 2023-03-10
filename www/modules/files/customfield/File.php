@@ -7,12 +7,13 @@ use GO\Files\Model;
 
 class File extends Base {
 
-	public function getModelClass()
+	public function getModelClass(): string
 	{
 		return Model\File::class;
 	}
 	
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		$d = $this->field->getDefault();
 		$d = isset($d) ? (int) $d : "NULL";
 		return "VARCHAR(512) DEFAULT " . $d;

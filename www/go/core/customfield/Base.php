@@ -2,12 +2,9 @@
 namespace go\core\customfield;
 
 use Exception;
-use GO;
 use GO\Base\Db\ActiveRecord;
 use go\core\data\Model;
 use go\core\db\Criteria;
-use go\core\db\Expression;
-use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\ErrorHandler;
 use go\core\model\Field;
@@ -55,7 +52,8 @@ abstract class Base extends Model {
 	 *
 	 * @return bool
 	 */
-	public function isModified() {
+	public function isModified(): bool
+	{
 		return false;
 	}
 
@@ -85,11 +83,13 @@ abstract class Base extends Model {
    * @return bool
    * @throws Exception
    */
-	public function hasColumn() {
+	public function hasColumn(): bool
+	{
 		return $this->getFieldSQL() != false;
 	}
 	
-	public function onFieldValidate() {
+	public function onFieldValidate(): bool
+	{
 		$fieldSql = $this->getFieldSQL();
 		if(!$fieldSql) {
 			return true;
@@ -97,19 +97,21 @@ abstract class Base extends Model {
 		
 		if($this->field->isModified("databaseName") && preg_match('/[^a-zA-Z_0-9]/', $this->field->databaseName)) {
 			$this->field->setValidationError('databaseName', ErrorCode::INVALID_INPUT, go()->t("Invalid database name. Only use alpha numeric chars and underscores.", 'core','customfields'));
+			return false;
 		}
 
 		//check database name exists
-
+		return true;
 	}
 
   /**
    * Called when the field is saved
    *
-   * @return boolean
+   * @return bool
    * @throws Exception
    */
-	public function onFieldSave() {
+	public function onFieldSave(): bool
+	{
 		
 		$fieldSql = $this->getFieldSQL();
 		if(!$fieldSql) {
@@ -163,7 +165,7 @@ abstract class Base extends Model {
 			}
 		}
 
-    go()->rebuildCache(true);
+        go()->rebuildCache(true);
 		
 		return true;
 	}
@@ -171,10 +173,11 @@ abstract class Base extends Model {
   /**
    * Called when a field is deleted
    *
-   * @return boolean
+   * @return bool
    * @throws Exception
    */
-	public function onFieldDelete() {
+	public function onFieldDelete(): bool
+	{
 		
 		$fieldSql = $this->getFieldSQL();
 		if(!$fieldSql) {
@@ -259,7 +262,7 @@ abstract class Base extends Model {
 	 * @param mixed $value The value for this field
 	 * @param CustomFieldsModel $customFieldData The custom fields data
 	 * @param Entity|ActiveRecord $entity
-	 * @return boolean
+	 * @return bool
 	 * @see MultiSelect for an advaced example
 	 */
 	public function afterSave($value, CustomFieldsModel &$customFieldModel, $entity) : bool
@@ -272,10 +275,11 @@ abstract class Base extends Model {
 	 * Validate the input on the model. 
 	 * 
 	 * Use setValidationError if data is invalid:
-	 * 
+	 * @return bool
 	 * 
 	 */
-	public function validate($value, Field $field, $model) {
+	public function validate($value, Field $field, $model): bool
+	{
 		if (!empty($field->requiredCondition)) {
 			if (!$this->validateRequiredCondition($value, $field, $model)) {
                 $model->setValidationError("customFields." . $field->databaseName, ErrorCode::REQUIRED);
@@ -379,12 +383,11 @@ abstract class Base extends Model {
 	 * @param CustomFieldsModel $model
 	 * @param Entity|ActiveRecord $entity
 	 * @param array $record The values inserted in the database
-	 * @return boolean
+	 * @return bool
 	 * @see MultiSelect for an advaced example
 	 */
-	public function beforeSave($value, CustomFieldsModel $model, $entity, &$record)
+	public function beforeSave($value, CustomFieldsModel $model, $entity, &$record): bool
 	{
-		
 		return true;
 	}
 	
@@ -394,7 +397,8 @@ abstract class Base extends Model {
 	 *
 	 * @return bool|string
 	 */
-	public function getModelClass() {
+	public function getModelClass()
+	{
 		return false;
 	}
 	/**
@@ -438,14 +442,16 @@ abstract class Base extends Model {
 		
 		return $types;		
 	}
-	
+
 	/**
 	 * Find the class for a type
-	 * 
+	 *
 	 * @param string $name
 	 * @return string
+	 * @throws Exception
 	 */
-	public static function findByName($name) {
+	public static function findByName(string $name): string
+	{
 		
 		//for compatibility with old version
 		//TODO remove when refactored completely
@@ -477,7 +483,7 @@ abstract class Base extends Model {
 	 * Defines an entity filter for this field.
 	 * 
 	 * @see Entity::defineFilters()
-	 * @param Filters $filter
+	 * @param Filters $filters
 	 */
 	public function defineFilter(Filters $filters) {
 		$filters->addText($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){

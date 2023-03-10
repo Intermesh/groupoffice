@@ -965,7 +965,7 @@ abstract class EntityController extends Controller {
    * Handles the Foo entity's getFooUpdates command
    *
    * @param array $params
-   * @return array
+   * @return ArrayObject
    * @throws InvalidArguments
    * @throws Exception
    */

@@ -6,11 +6,10 @@ use go\core\customfield\Base;
 
 class EncryptedText extends Base {
 	/**
-	 * Get column definition for SQL
-	 * 
-	 * @return string
+	 * @inheritdoc
 	 */
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		return "TEXT NULL";
 	}
 	

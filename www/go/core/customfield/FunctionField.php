@@ -2,30 +2,37 @@
 
 namespace go\core\customfield;
 
-class FunctionField extends Number {
+use Exception;
+
+class FunctionField extends Number
+{
 
 	private static $loopIds = [];
 	
 	//no db field for functions
-	public function onFieldSave() {
+	public function onFieldSave(): bool
+	{
 		return true;
 	}
 	
-	public function onFieldDelete() {
+	public function onFieldDelete(): bool
+	{
 		return true;
 	}
 
-	public function hasColumn()
+	public function hasColumn(): bool
 	{
 		return false;
 	}
-	
+
 	/**
 	 * Get column definition for SQL
-	 * 
+	 *
 	 * @return string
+	 * @throws Exception
 	 */
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		$d = $this->field->getDefault();
 		$d = isset($d) && $d != "" ? number_format($d, 4) : "NULL";
 		
@@ -34,7 +41,8 @@ class FunctionField extends Number {
 		return "decimal(19,$decimals) DEFAULT " . $d;
 	}
 
-	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity) {
+	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity): ?string
+	{
 
 		$f = $this->field->getOption("function");
 
@@ -57,15 +65,14 @@ class FunctionField extends Number {
 			eval("\$result = " . $f . ";");
 		} catch (\Error $e) {
 			$result = null;
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			$result = null;
 		}
 
 		return $result;
 	}
 
-	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record)
-	{
+	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record): bool	{
 		//remove data because it's not saved to the database
 		unset($record[$this->field->databaseName]);
 

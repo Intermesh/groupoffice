@@ -6,6 +6,7 @@ use go\core\acl\model\AclItemEntity;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
+use go\core\model\Relation;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Entity;
@@ -247,7 +248,12 @@ class Contact extends AclItemEntity {
 	 *
 	 * @var Address[]
 	 */
-	public $addresses = [];	
+	public $addresses = [];
+
+	/**
+	 * @var Relation[]
+	 */
+	public $customFieldRelations = [];
 	
 	/**
 	 *
@@ -371,14 +377,15 @@ class Contact extends AclItemEntity {
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-						->addTable("addressbook_contact", 'c')
-						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
-						->addArray('dates', Date::class, ['id' => 'contactId'])
-						->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
-						->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
-						->addArray('addresses', Address::class, ['id' => 'contactId'])
-						->addArray('urls', Url::class, ['id' => 'contactId'])
-						->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);
+			->addTable("addressbook_contact", 'c')
+			->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
+			->addArray('dates', Date::class, ['id' => 'contactId'])
+			->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
+			->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
+			->addArray('addresses', Address::class, ['id' => 'contactId'])
+			->addArray('customFieldRelations', Relation::class, ['id' => 'entityId'])
+			->addArray('urls', Url::class, ['id' => 'contactId'])
+			->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);
 	}
 	
 	public function setNameFromParts() {

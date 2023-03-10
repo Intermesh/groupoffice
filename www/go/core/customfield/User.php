@@ -12,13 +12,15 @@ use go\core\orm\Filters;
 
 class User extends Base {
 
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		$d = $this->field->getDefault();
 		$d = isset($d) ? (int) $d : "NULL";
 		return "int(11) DEFAULT " . $d;
 	}
 	
-	public function onFieldSave() {
+	public function onFieldSave(): bool
+	{
 		if (!parent::onFieldSave()) {
 			return false;
 		}		
@@ -35,7 +37,7 @@ class User extends Base {
 		go()->getDbConnection()->query($sql);
 	}
 
-	private function getConstraintName()
+	private function getConstraintName(): string
 	{
 		$strName = $this->field->tableName() . "_ibfk_go_" . $this->field->id;
 		if (strlen($strName) > 64) { // Constraint names are restricted to 64 characters!
@@ -44,7 +46,8 @@ class User extends Base {
 		return $strName;
 	}
 	
-	public function onFieldDelete() {
+	public function onFieldDelete(): bool
+	{
 		try {
 			$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
 			if(!go()->getDbConnection()->query($sql)) {
@@ -63,7 +66,7 @@ class User extends Base {
 	 * Defines an entity filter for this field.
 	 * 
 	 * @see Entity::defineFilters()
-	 * @param Filters $filter
+	 * @param Filters $filters
 	 */
 	public function defineFilter(Filters $filters) {		
 		
