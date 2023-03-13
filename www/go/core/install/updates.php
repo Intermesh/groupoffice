@@ -1367,3 +1367,6 @@ $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
 
 $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
   MODIFY `id` bigint unsigned auto_increment";
+
+$updates['202303131003'][] = "delete from core_acl_group where groupId = (select id from core_group where isUserGroupFor=1);";
+
