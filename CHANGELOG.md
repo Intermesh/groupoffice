@@ -1,3 +1,5 @@
+- Email: Prevent double tags upon saving draft messages
+
 07-03-2023: 6.6.153
 - Email: minor bugfix drag and drop messages
 

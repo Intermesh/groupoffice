@@ -977,7 +977,10 @@ class StringHelper {
 		if(!empty($styles)) {
 			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="msg '.$prefix.'">'. $html .'</div>';
 		} else if($preserveHtmlStyle) {
-			$html = '<div class="msg">'. $html .'</div>';
+			$html = trim($html);
+			if(substr($html,0, 17) !== '<div class="msg">') {
+				$html = '<div class="msg">'. $html .'</div>';
+			}
 		}
 
 		return $html;
