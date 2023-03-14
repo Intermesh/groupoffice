@@ -45,13 +45,14 @@ $grey-fabric: (
 	1000: #000000
 );
 
-$grey: $grey-material !default;
+$_grey: $grey-material !default;
 
 // LIGHT
 $fg: (
 	base: black,
 	divider: rgba(black, 0.04),
 	line: rgba(black, 0.12),
+	border: #1b1b1b,
 	disabled: rgba(black, 0.38),
 	disabled-button: rgba(black, 0.26),
 	track: rgba(#444444, 0.26),
@@ -62,13 +63,15 @@ $fg: (
 	unfocused: rgba(black, 0.54),
 	icon: rgba(black, 0.54),
 	icons: rgba(black, 0.54),
-	text: rgba(black, 0.87)
+	text: rgba(black, 0.87),
+	alt: color($_grey, 100),
 ) !default;
 $bg: (
-	status-bar: color($grey, 200),
-	app-bar: color($grey, 100),
-	form: color($grey, 50),
-	background: color($grey, 50),
+		body: var(--c-primary),
+	status-bar: color($_grey, 200),
+	app-bar: color($_grey, 100),
+	form: color($_grey, 50),
+	background: color($_grey, 50),
 	hover: rgba(black, .04),
 	pressed: rgba(black, .08),
 	selected: rgba(black, .08),
@@ -76,7 +79,8 @@ $bg: (
 	box: white,
 	tbar: white,
 	card: white,
-	dialog: color($grey, 100),
+	alt: color($_grey, 900), //tip
+	dialog: color($_grey, 100),
 	disabled-button: rgba(black, 0.12)
 ) !default;
 
@@ -101,7 +105,7 @@ $cWarning:		#f57c00 !default;
 
 $cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
 $cHover: 		color($bg, 'hover') !default;
-$cActive: 		color($grey, 200) !default; // focussed
+$cActive: 		color($bg, 'status-bar') !default; // focussed
 $cAnchor: 		$cPrimary !default;
 
 $hue: (

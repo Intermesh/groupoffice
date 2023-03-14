@@ -397,7 +397,6 @@ input[type="radio"] {
 .x-form{
 
 	.x-panel, .x-fieldset {
-		border-radius: dp(10);
 		overflow: hidden;
 	}
 	background-color: color($bg, 'form');
@@ -597,7 +596,7 @@ input[type="radio"] {
 
 		label.x-form-invalid-label {
 			color: $cDanger;
-			background-color: $cDangerBg;
+			//background-color: $cDangerBg;
 		}
 
 		label.x-form-readonly-label {
@@ -621,7 +620,7 @@ input[type="radio"] {
 
 	&-invalid, textarea.x-form-invalid {
 		border-color: rgba($cDanger,0.54);
-		background-color: $cDangerBg;
+		//background-color: $cDangerBg;
 	}
 	
 	&-helptext {
@@ -1173,12 +1172,12 @@ input[type="radio"] {
 
 
 	.x-panel-tbar & {
-		border-bottom: 1px solid color($fg, 'line');
+		border-bottom: 1px solid color($fg, 'border');
 	}
 
 	.x-panel-bbar & {
 		height: dp(56);
-		border-top: 1px solid color($fg, 'line');
+		border-top: 1px solid color($fg, 'border');
 	}
 
 /*	.go-module-panel > div > .x-panel-tbar & {
@@ -1347,7 +1346,7 @@ input[type="radio"] {
 			@extend %font-caption;
 			color: color($fg, 'text');
 			border-left:0;
-			border-right: 1px solid color($fg, 'divider');
+			border-right: 1px solid color($fg, 'border');
 			//border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
 			height: dp(32);
 
@@ -1369,7 +1368,7 @@ input[type="radio"] {
 	&-header{
 		//margin-top: dp(9); //don't understand why +1 here?
 		height:dp(32);
-		border-bottom: 1px solid color($fg, 'line');
+		border-bottom: 1px solid color($fg, 'border');
 		background-color: color($bg, 'background');
 	}
 
@@ -2132,7 +2131,7 @@ td.x-date-mp-sep {
 .x-tip { 
 	border-radius: $borderRadius;
 	box-sizing:content-box;
-	background-color: color($grey, 900);
+	background-color: color($bg, 'alt');
 	opacity: .9;
 	// Todo ext doesn't put classes on floating elements (yet)
 	//transform: scale(1);
@@ -2147,7 +2146,7 @@ td.x-date-mp-sep {
 	}
 	.x-tip-body {
 		@extend %font-body2;
-		color:color($grey, 100);
+		color:color($fg, 'alt');
 		letter-spacing: 0.04em; // fixes ugly ext bug for Lato font
 	}
 	.x-tip-close {
@@ -2415,7 +2414,7 @@ $menuScrollerSize : dp(4);
 	@extend %font-body1;
 	border: 1px solid color($fg, 'line');
 	border-radius: $borderRadius;
-	background-color: color($bg, 'dialog');
+	background-color: color($bg, 'card');
 	&-inner {
 		padding: dp(8) 0;
 		//background-color:#fff;
@@ -2435,7 +2434,7 @@ $menuScrollerSize : dp(4);
 		@extend %font-caption;
 	}
 	.x-combo-selected {
-		background-color: $cSelected; //color($grey, 100);
+		background-color: $cSelected;
 	}
 	.x-toolbar {
 		height: dp(40);
@@ -2640,10 +2639,14 @@ $menuScrollerSize : dp(4);
 // ##############
 .x-window{
 	@extend .z24;
+	backdrop-filter: blur(20px);
 	background-color:color($bg,'dialog');
 	border-radius: $borderRadius;
 	overflow:hidden;
 	border: 1px solid color($fg, 'line');
+	form > div:not(.x-tab-panel) {
+		background-color:color($bg,'background');
+	}
 	&-noborder, &-maximized{
 		border: 0;
 		.x-window-header {
@@ -2660,7 +2663,7 @@ $menuScrollerSize : dp(4);
 	&-header {
 		@extend %font-title;
 		background-color:color($bg,'app-bar');
-		border-radius: $borderRadius;
+		border-radius: $borderRadius $borderRadius 0 0;
 		padding: 0 dp(16);
 		&-text {
 			display:block;
@@ -2685,10 +2688,8 @@ $menuScrollerSize : dp(4);
 	&-bbar .x-toolbar {
 		border-top-color: color($fg, 'divider');;
 	}
-	&-maximized .x-window-tc {
-		background-color:#fff;
-	}
 	&-maximized {
+		background-color:color($bg,'card');
 		border-radius: 0;
 	}
 }
@@ -2799,8 +2800,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 
 $resizerSize : dp(3);
 .x-layout-split {
-	border-right: 1px solid color($fg,'line');
-	border-top: 1px solid color($fg,'line');
+	background-color: color($fg,'border');
 	&.x-splitbar {
 		&-h {
 			width:$resizerSize;
@@ -3045,7 +3045,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 							 top:0;
 							 height: dp(24);
 							 width: dp(24);
-							 background-color: color($grey, 50);
+							 background-color: color($bg, 'form');
 							 z-index:1;
 							 border-radius: 50%;
 		}
@@ -3095,7 +3095,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 
 		&[disabled] {
 			~ .thumb {
-				background-color: color($grey, 400);
+				background-color: rgba(black, .42);
 				&::before {
 					background-color: rgba(black, .12);
 				}

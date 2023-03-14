@@ -83,21 +83,21 @@ $cWarning:		#f57c00;
 
 $cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
 $cHover: 		color($bg, 'hover');
-$cActive: 		color($grey, 200); // focussed
+$cActive: 		color($bg, 'pressed'); // focussed
 $cAnchor: 		#0000FF;
 
 // end colors
 
 
 $resourcePath: '../Paper/';
-$density: 110;
-$font-scale: 1.15;
+$density: 115;
+$font-scale: 1.1;
 
 @function dp($width) {
   @return math.floor(math.div(($width * $density) , 160) *1px);
 }
 @function sp($size) {
-  @return ceil(dp($size) * $font-scale);
+  @return ceil(math.div(($size * $density) , 160) * $font-scale) *1px;
 }
 
 $layout-xs:     600px !default;
@@ -194,14 +194,4 @@ $vars: (
   text-rendering: optimizeLegibility; // Support for Safari and Chrome.
   -moz-osx-font-smoothing: grayscale; // Support for Firefox.
   font-feature-settings: 'liga'; // Support for IE
-}
-
-@function str-replace($string, $search, $replace: '') {
-  $index: str-index($string, $search);
-
-  @if $index {
-    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
-  }
-
-  @return $string;
 }
