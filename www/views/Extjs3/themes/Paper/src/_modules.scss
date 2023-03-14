@@ -175,9 +175,14 @@ i.icon.em-low_priority {
 	}
 }
 
-.message-body {
+.message-body{
 	background-color: white;
-	position: relative;	
+	position: relative;
+	color: black;
+
+	> {
+		color:inherit;
+	}
 	
 	p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
 	{
