@@ -231,6 +231,7 @@ class User extends AclItemEntity {
 	public $start_module;
 	public $language;
 	public $theme;
+	public $themeColorScheme;
 	public $firstWeekday;
 	public $sort_name;
 

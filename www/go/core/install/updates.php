@@ -1370,3 +1370,7 @@ $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
 
 $updates['202303131003'][] = "delete from core_acl_group where groupId = (select id from core_group where isUserGroupFor=1);";
 
+
+$updates['202303151524'][] = "ALTER TABLE `core_user` 
+ADD COLUMN `themeColorScheme` ENUM('light', 'dark', 'system') NOT NULL DEFAULT 'light' AFTER `theme`;";
+

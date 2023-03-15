@@ -1,6 +1,6 @@
 $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 
-:root {
+:root, :root.light {
 	--fg-base:			 black;
 	--fg-divider:			#{rgba(black, 0.08)};
 	--fg-border:			#{rgba(black, 0.16)};
@@ -32,39 +32,70 @@ $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 	--bg-card:        	white;
 	--bg-alt: 			#{mix(#000, $ambientColor, 65%)};
 }
-//@media (prefers-color-scheme: dark) {
-//	:root {
-//		--fg-base:				white;
-//		--fg-divider:			rgba(0,0,0, 0.94);
-//		--fg-border:			black;
-//		--fg-line:				#555555;
-//		--fg-disabled:       rgba(255,255,255, 0.3);
-//		--fg-textfield-box:  #555555;
-//		--fg-textbox-line: 	#{rgba(white, 0.62)};
-//
-//		--fg-track: 	#{rgba(white, 0.36)};
-//		--fg-text:           white;
-//		--fg-secondary-text: rgba(255,255,255, 0.7);
-//		--fg-unfocused:	   rgba(255,255,255, 0.7);
-//		--fg-alt:			black;
-//
-//		--bg-body: 			#1b1b1b;
-//		--bg-button:	  #{mix(#555, $ambientColor, 87%)} ;//rgba(255,255,255,.25); //#606060;
-//		//--bg-app-bar:    #{mix(#333, $ambientColor, 95%)}; // #383838; aside
-//		--bg-dialog: 		#{rgba(mix(#333, $ambientColor, 95%),.74)};
-//		--bg-side-bar:		#{mix(#222, $ambientColor, 87%)};
-//		--bg-background: #{mix(#333, $ambientColor, 92%)} ; //rgba(0,0,0,.85); //#1e1e1e;
-//
-//		--bg-hover:      rgba(255,255,255, 0.04);
-//		--bg-selected:   #{rgba(white, .08)};
-//		--bg-pressed:	#{rgba(#cccccc, .25)};
-//		--bg-disabled: rgba(255,255,255, 0.12);
-//
-//		--bg-box:      #{mix(#2a2a2a, $ambientColor, 95%)}; // cant be transparent because line of label is same color
-//		--bg-card:       #{mix(#202020, $ambientColor, 86%)}; // rgba(0,0,0,.35);
-//		--bg-alt: 			#888;
-//	}
-//}
+body.dark {
+	--fg-base:				white;
+	--fg-divider:			rgba(0,0,0, 0.94);
+	--fg-border:			black;
+	--fg-line:				#555555;
+	--fg-disabled:       rgba(255,255,255, 0.3);
+	--fg-textfield-box:  #555555;
+	--fg-textbox-line: 	#{rgba(white, 0.62)};
+
+	--fg-track: 	#{rgba(white, 0.36)};
+	--fg-text:           white;
+	--fg-secondary-text: rgba(255,255,255, 0.7);
+	--fg-unfocused:	   rgba(255,255,255, 0.7);
+	--fg-alt:			black;
+
+	--bg-body: 			#1b1b1b;
+	--bg-button:	  #{mix(#555, $ambientColor, 87%)} ;//rgba(255,255,255,.25); //#606060;
+	//--bg-app-bar:    #{mix(#333, $ambientColor, 95%)}; // #383838; aside
+	--bg-dialog: 		#{rgba(mix(#333, $ambientColor, 95%),.74)};
+	--bg-side-bar:		#{mix(#222, $ambientColor, 87%)};
+	--bg-background: #{mix(#333, $ambientColor, 92%)} ; //rgba(0,0,0,.85); //#1e1e1e;
+
+	--bg-hover:      rgba(255,255,255, 0.04);
+	--bg-selected:   #{rgba(white, .08)};
+	--bg-pressed:	#{rgba(#cccccc, .25)};
+	--bg-disabled: rgba(255,255,255, 0.12);
+
+	--bg-box:      #{mix(#2a2a2a, $ambientColor, 95%)}; // cant be transparent because line of label is same color
+	--bg-card:       #{mix(#202020, $ambientColor, 86%)}; // rgba(0,0,0,.35);
+	--bg-alt: 			#888;
+}
+@media (prefers-color-scheme: dark) {
+	body.system {
+		--fg-base:				white;
+		--fg-divider:			rgba(0,0,0, 0.94);
+		--fg-border:			black;
+		--fg-line:				#555555;
+		--fg-disabled:       rgba(255,255,255, 0.3);
+		--fg-textfield-box:  #555555;
+		--fg-textbox-line: 	#{rgba(white, 0.62)};
+
+		--fg-track: 	#{rgba(white, 0.36)};
+		--fg-text:           white;
+		--fg-secondary-text: rgba(255,255,255, 0.7);
+		--fg-unfocused:	   rgba(255,255,255, 0.7);
+		--fg-alt:			black;
+
+		--bg-body: 			#1b1b1b;
+		--bg-button:	  #{mix(#555, $ambientColor, 87%)} ;//rgba(255,255,255,.25); //#606060;
+		//--bg-app-bar:    #{mix(#333, $ambientColor, 95%)}; // #383838; aside
+		--bg-dialog: 		#{rgba(mix(#333, $ambientColor, 95%),.74)};
+		--bg-side-bar:		#{mix(#222, $ambientColor, 87%)};
+		--bg-background: #{mix(#333, $ambientColor, 92%)} ; //rgba(0,0,0,.85); //#1e1e1e;
+
+		--bg-hover:      rgba(255,255,255, 0.04);
+		--bg-selected:   #{rgba(white, .08)};
+		--bg-pressed:	#{rgba(#cccccc, .25)};
+		--bg-disabled: rgba(255,255,255, 0.12);
+
+		--bg-box:      #{mix(#2a2a2a, $ambientColor, 95%)}; // cant be transparent because line of label is same color
+		--bg-card:       #{mix(#202020, $ambientColor, 86%)}; // rgba(0,0,0,.35);
+		--bg-alt: 			#888;
+	}
+}
 
 //compatability meuk
 $fg: fg;

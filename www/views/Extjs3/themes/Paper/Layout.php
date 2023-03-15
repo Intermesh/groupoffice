@@ -113,7 +113,7 @@ $lang = GO::language()->getLanguage(); ?>
     }
   ?>
 </head>
-<body class="go-compact">
+<body class="go-compact <?=\GO::user()?\GO::user()->themeColorScheme:''?>">
     <div id="goui"></div>
 	<div id="sound"></div>
     <div id="paper"></div>
