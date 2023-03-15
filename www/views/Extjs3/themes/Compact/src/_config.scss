@@ -1,11 +1,11 @@
 @use "sass:math";
-
-@function color($color, $hue: 500, $contrast: 0) {
-  @if $contrast == 1 {
-    @return map-get(map-get($color, contrast), $hue);
-  }
-  @return map-get($color,$hue);
-}
+//
+//@function color($color, $hue: 500, $contrast: 0) {
+//  @if $contrast == 1 {
+//    @return map-get(map-get($color, contrast), $hue);
+//  }
+//  @return map-get($color,$hue);
+//}
 
 @font-face {
   font-family: 'Material Icons Outline';
@@ -14,9 +14,7 @@
   src:  url('./fonts/icons.woff2') format("woff2"); // Super Modern
 }
 
-$black-87-opacity: rgba(black, 0.87) !default;
-$white-87-opacity: rgba(white, 0.87) !default;
-
+//
 //$cPrimary:		rgb(120, 162, 47);
 //$cPrimaryTp:	rgba(2, 119, 189, 0.16);
 //$cHeaderBg: rgb(2, 119, 189);
@@ -24,54 +22,57 @@ $white-87-opacity: rgba(white, 0.87) !default;
 //$cSecondary: #006d98;
 //$cAccent:		#ff9100;
 //$cAccentTp:		$cPrimaryTp;
+//// for both?
+//$cTertiary: rgb(243,219,0) !default;
 
-$grey: (
-        0: #ffffff,
-        50: #faf9f8,
-        100: #edebe9,
-        200: #e1dfdd,
-        300: #d2d0ce,
-        400: #a19f9d,
-        500: #979593,
-        600: #797775,
-        700: #484644,
-        800: #323130,
-        900: #201f1e,
-        1000: #000000
-);
 
-$fg: (
-        base: black,
-        divider: rgba(black, 0.04),
-        line: rgba(black, 0.12),
-        disabled: rgba(black, 0.38),
-        disabled-button: rgba(black, 0.26),
-        track: rgba(black, 0.26),
-        disabled-text: rgba(black, 0.38),
-        hint-text: rgba(black, 0.38),
-        textbox-line: rgba(black, 0.42),
-        secondary-text: rgba(black, 0.64),
-        unfocused: rgba(black, 0.54),
-        icon: rgba(black, 0.54),
-        icons: rgba(black, 0.54),
-        text: rgba(black, 0.87)
-);
-
-$bg: (
-        status-bar: #d2d0ce,
-        app-bar: #e1dfdd,
-        form: #edebe9,
-        background: #edebe9,
-        hover: rgba(black, .04),
-        pressed: rgba(black, .08),
-        selected: rgba(22, 82, 161, 0.16),
-        readonly: #e8e8e8,
-        box: white,
-        tbar: white,
-        card: white,
-        dialog: #edebe9,
-        disabled-button: rgba(black, 0.12)
-);
+//$grey: (
+//        0: #ffffff,
+//        50: #faf9f8,
+//        100: #edebe9,
+//        200: #e1dfdd,
+//        300: #d2d0ce,
+//        400: #a19f9d,
+//        500: #979593,
+//        600: #797775,
+//        700: #484644,
+//        800: #323130,
+//        900: #201f1e,
+//        1000: #000000
+//);
+//
+//$fg: (
+//        base: black,
+//        divider: rgba(black, 0.04),
+//        line: rgba(black, 0.12),
+//        disabled: rgba(black, 0.38),
+//        disabled-button: rgba(black, 0.26),
+//        track: rgba(black, 0.26),
+//        disabled-text: rgba(black, 0.38),
+//        hint-text: rgba(black, 0.38),
+//        textbox-line: rgba(black, 0.42),
+//        secondary-text: rgba(black, 0.64),
+//        unfocused: rgba(black, 0.54),
+//        icon: rgba(black, 0.54),
+//        icons: rgba(black, 0.54),
+//        text: rgba(black, 0.87)
+//);
+//
+//$bg: (
+//        status-bar: #d2d0ce,
+//        app-bar: #e1dfdd,
+//        form: #edebe9,
+//        background: #edebe9,
+//        hover: rgba(black, .04),
+//        pressed: rgba(black, .08),
+//        selected: rgba(22, 82, 161, 0.16),
+//        readonly: #e8e8e8,
+//        box: white,
+//        tbar: white,
+//        card: white,
+//        dialog: #edebe9,
+//        disabled-button: rgba(black, 0.12)
+//);
 
 
 
@@ -81,10 +82,10 @@ $cDanger:		#E53935;
 $cDangerBg: #FFEBEE;
 $cWarning:		#f57c00;
 
-$cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
-$cHover: 		color($bg, 'hover');
-$cActive: 		color($bg, 'pressed'); // focussed
-$cAnchor: 		#0000FF;
+//$cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
+//$cHover: 		color($bg, 'hover');
+//$cActive: 		color($bg, 'pressed'); // focussed
+//$cAnchor: 		#0000FF;
 
 // end colors
 
@@ -113,6 +114,12 @@ $curve-deceleration: cubic-bezier(0.0, 0.0, 0.2, 1);
 $curve-acceleration: cubic-bezier(0.4, 0.0, 1, 1);
 $curve-sharp: cubic-bezier(0.4, 0.0, 0.6, 1);
 $curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider
+
+
+//shadows
+$umbra: rgba(black, .2)!default;
+$penumbra: rgba(black, .14)!default;
+$ambient: rgba(black, .12)!default;
 
 // for providing a fallback for browser not supporting css variables
 // used for developemnt in PHP replace "var(--c-primary)" with actual configured color for IE support
