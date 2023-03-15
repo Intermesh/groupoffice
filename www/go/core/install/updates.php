@@ -1374,3 +1374,4 @@ $updates['202303131003'][] = "delete from core_acl_group where groupId = (select
 $updates['202303151524'][] = "ALTER TABLE `core_user` 
 ADD COLUMN `themeColorScheme` ENUM('light', 'dark', 'system') NOT NULL DEFAULT 'light' AFTER `theme`;";
 
+$updates['202303151524'][] = "UPDATE `core_user` SET theme = 'Paper', themeColorScheme = 'dark' WHERE theme = 'Dark';";

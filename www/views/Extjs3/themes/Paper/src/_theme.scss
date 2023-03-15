@@ -32,7 +32,7 @@ $ambientColor: #1e1246;
 body.dark {
 	--fg-base:				white;
 	--fg-divider:			#{rgba(white, 0.12)};
-	--fg-border:			black;
+	--fg-border:			#1b1b1b; //black;
 	--fg-line:				#{rgba(white, 0.3)};
 	--fg-disabled:       rgba(255,255,255, 0.3);
 	--fg-textfield-box:  #555555;
