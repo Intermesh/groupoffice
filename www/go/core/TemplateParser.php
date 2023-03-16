@@ -874,12 +874,11 @@ class TemplateParser {
 	 */
 	private function validateExpression($expression): string
 	{
-		
-		$expression = html_entity_decode($expression);
+		$expression = html_entity_decode(trim($expression));
 
 		//split string into tokens. See http://stackoverflow.com/questions/5475312/explode-string-into-tokens-keeping-quoted-substr-intact		
 		foreach(self::$tokens as $token) {
-			if($token == '-') {
+			if($token == '-' || $token == '!') {
 				//skip for negative numbers
 				continue;
 			}
@@ -898,9 +897,12 @@ class TemplateParser {
 			if($part == ';') {
 				throw new Exception('; not allowed in expression: ' . $expression);
 			}
+
+			if($part == "") {
+				continue;
+			}
 			
 			if(
-							empty($part) ||
 							is_numeric($part) ||
 							$part == 'true' ||
 							$part == 'false' ||
@@ -911,7 +913,7 @@ class TemplateParser {
 				$str .= $part.' ';
 			}else
 			{
-				$str .= '"'. $part . '" ';
+				$str .= '"'. addslashes($part) . '" ';
 			}			
 		}		
 		return empty($str) ? 'return false;' : 'return ('.$str.');';
@@ -932,7 +934,12 @@ class TemplateParser {
 		}
 
 		if($this->varsForIfStatement) {
-			$value = empty($value) ? "false" : "true";
+			//$value = empty($value) ? "false" : "true";
+
+			$value = is_scalar($value) ||
+			!isset($value) ||
+			(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', (string) $value) . '"' : !empty($value);
+
 		}
 
 		return $value;
