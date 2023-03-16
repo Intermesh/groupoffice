@@ -1,4 +1,5 @@
 - Email: Prevent double tags upon saving draft messages
+- Core: updated German translations - Danke, Daniel!
 
 07-03-2023: 6.6.153
 - Email: minor bugfix drag and drop messages
