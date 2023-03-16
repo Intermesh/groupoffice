@@ -2800,7 +2800,9 @@ body.x-body-masked .x-window-plain .x-window-mc {
 
 $resizerSize : dp(3);
 .x-layout-split {
-	background-color: color($fg,'border');
+	//background-color: color($fg,'border');
+	border-right: 1px solid color($fg,'line');
+	border-top: 1px solid color($fg,'line');
 	&.x-splitbar {
 		&-h {
 			width:$resizerSize;
