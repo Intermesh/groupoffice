@@ -30,7 +30,6 @@ return array (
     'home' => 'Privat',
     'mobile' => 'Mobil',
     'workmobile' => 'Arbeit Mobil',
-    'fax' => 'Fax',
     'workfax' => 'Arbeit Fax',
   ),
   'addressTypes' => 
@@ -139,4 +138,5 @@ return array (
   'Last selected address book' => 'Zuletzt ausgewähltes Adressbuch',
   'Please select at least two contacts' => 'Bitte wählen Sie mindestens zwei Kontakte aus',
   'Web page' => 'Webseite',
+  'The selected contacts will be merged into one contact. Are you sure?' => 'Die ausgewählten Kontakte werden zu einem Kontakt zusammengefasst. Sind Sie sicher?',
 );

@@ -19,6 +19,12 @@
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
 
+- Email: Prevent double tags upon saving draft messages
+- Core: updated German translations - Danke, Daniel!
+
+07-03-2023: 6.6.153
+- Email: minor bugfix drag and drop messages
+
 06-03-2023: 6.6.152
 - Email: drag and drop mail messages into email attachments.
 
