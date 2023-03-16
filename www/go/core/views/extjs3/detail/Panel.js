@@ -244,6 +244,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		return this.add(go.customfields.CustomFields.getDetailPanels(this.entityStore.entity.name));
 	},
 
+	addCFRelationGrids : async function(resolve) {
+		const panels = await go.customfields.CustomFields.getRelationPanels(this.entityStore.entity.name, this.currentId);
+		this.add(panels);
+		// resolve(true);
+	},
+
 	addLinks : function(sortFn) {
 		return this.add(new go.links.getDetailPanels(sortFn));
 	},

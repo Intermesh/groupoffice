@@ -36,7 +36,7 @@
 		 },{
 			 xtype: "checkbox",
 			 fieldLabel: t("Show selections in the information panel"),
-			 name: "options.showInInformationPanel",
+			 name: "options.showInformationPanel",
 			 value: true
 		 },{
 			 xtype: "checkbox",

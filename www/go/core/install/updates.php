@@ -1367,11 +1367,3 @@ $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
 
 $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
   MODIFY `id` bigint unsigned auto_increment";
-
-$updates['202303081500'][] = "CREATE TABLE IF NOT EXISTS `core_customfields_relation` (
-	`fieldId` INT(11) NOT NULL,
-	`entityTypeId` INT(11) NOT NULL,
-	`entityId` INT(11) NOT NULL,
-	CONSTRAINT `core_customfields_relation_field_fk` FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field` (`id`) ON DELETE CASCADE,
-	CONSTRAINT `core_customfields_relation_entity_fk`FOREIGN KEY (`entityTypeId`)  REFERENCES `core_entity` (`id`) ON DELETE CASCADE
-) ENGINE InnoDB;";

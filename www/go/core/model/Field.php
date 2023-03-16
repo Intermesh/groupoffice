@@ -144,8 +144,7 @@ class Field extends AclItemEntity {
 	
 	protected static function defineMapping(): Mapping
 	{
-		return parent::defineMapping()->addTable('core_customfields_field', 'f')
-			->addArray('customFieldRelations', Relation::class, ['id' => 'fieldId']);
+		return parent::defineMapping()->addTable('core_customfields_field', 'f');
 	}
 
 	protected static function aclEntityClass(): string
@@ -384,6 +383,9 @@ class Field extends AclItemEntity {
 		return parent::defineFilters()
 						->add('fieldSetId', function (Criteria $criteria, $value){
 							$criteria->andWhere(['fieldSetId' => $value]);
+						})
+						->add('type', function(Criteria $criteria, string $value){
+							$criteria->andWhere(['type' => $value]);
 						});
 	}
 

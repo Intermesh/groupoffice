@@ -6,7 +6,6 @@ use go\core\acl\model\AclItemEntity;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
-use go\core\model\Relation;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Entity;
@@ -23,7 +22,6 @@ use go\modules\community\addressbook\convert\VCard;
 use function GO;
 use go\core\mail\Message;
 use go\core\TemplateParser;
-use go\core\db\Expression;
 use go\core\fs\File;
 use go\core\model\Acl;
 use GO\Files\Model\Folder;
@@ -251,11 +249,6 @@ class Contact extends AclItemEntity {
 	public $addresses = [];
 
 	/**
-	 * @var Relation[]
-	 */
-	public $customFieldRelations = [];
-	
-	/**
 	 *
 	 * @var int[]
 	 */
@@ -383,7 +376,6 @@ class Contact extends AclItemEntity {
 			->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
 			->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
 			->addArray('addresses', Address::class, ['id' => 'contactId'])
-			->addArray('customFieldRelations', Relation::class, ['id' => 'entityId'])
 			->addArray('urls', Url::class, ['id' => 'contactId'])
 			->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);
 	}

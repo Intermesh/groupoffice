@@ -81,7 +81,7 @@
 				return f.entity === entity;
 			});
 		},
-		
+
 		/**
 		 * Get filter definitions for tbsearch and user filter dialogs
 		 * 
@@ -295,12 +295,74 @@
 		 * @returns {Array}
 		 */
 		getDetailPanels: function (entity) {
-			var fieldSets = this.getFieldSets(entity), panels = [], me = this;
+			const fieldSets = this.getFieldSets(entity);
+			let panels = [];
 
-			fieldSets.forEach(function (fieldSet) {
+			fieldSets.forEach( (fieldSet) => {
 				panels.push(new go.customfields.DetailPanel({
 					fieldSet: fieldSet
 				}));
+			});
+			return panels;
+		},
+
+		/**
+		 * Get fields that have the current entity as its value
+		 *
+		 * @param {string} entity
+		 * @param {int} id
+		 * @returns {Promise}
+		 */
+		getCFRelations: function(entity, id) {
+			let rels = [], ids;
+			return new Promise((resolve) => {
+				go.Db.store("Field").query({
+					filter: {type: entity}
+				}, function (response) {
+					if (!response.ids.length) {
+						resolve([]);
+					}
+					ids = response.ids;
+				}, this).then(() => {
+					go.Db.store("Field").get(ids, function (fields) {
+						fields.forEach(function (fld) {
+							const fldOptions = fld.options;
+							if (Ext.isDefined(fldOptions.showInformationPanel) && fldOptions.showInformationPanel) {
+								rels.push({
+									title: fldOptions.informationPanelTitle,
+									expandByDefault: fldOptions.expandByDefault,
+									entity: entity,
+									currentId: id,
+									fieldId: fld.id
+								});
+							}
+						});
+						resolve(rels);
+					});
+				});
+			});
+		},
+
+		/**
+		 * Get panels with grids of related items per custom field.
+		 *
+		 * If an entity type has a custom field that is an entity, list the entities linked to the target entity through
+		 * said custom field
+		 *
+		 * @param entity
+		 * @param id
+		 */
+		getRelationPanels: async function(entity, id) {
+
+			let panels = [];
+			const rels = await this.getCFRelations(entity, id);
+			rels.forEach((config) => {
+				// TODO: This should be more intelligent, maybe with an xtype?
+				if(entity === "Contact") {
+					panels.push(new go.modules.community.addressbook.customfield.ContactRelationGrid(config));
+				} else if(entity === "Aap") {
+					panels.push(new go.modules.studio.apen.customfield.AapRelationGrid(config));
+				}
 			});
 			return panels;
 		}

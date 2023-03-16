@@ -292,6 +292,10 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		go.modules.community.addressbook.ContactDetail.superclass.initComponent.call(this);
 
 		this.addCustomFields();
+		this.addCFRelationGrids().then(() => {
+			// Now what do we de?
+		});
+
 		//Sort contact types to top
 		this.addLinks(function(a, b) {
 

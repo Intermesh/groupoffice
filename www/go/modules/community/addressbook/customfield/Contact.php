@@ -7,12 +7,10 @@ use go\core\db\Utils;
 use go\core\customfield\Base;
 use go\core\db\Criteria;
 use go\core\model\Acl;
-use go\core\orm\CustomFieldsModel;
 use go\core\orm\Entity;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Query;
-use go\core\util\ArrayObject;
 use go\modules\community\addressbook\model;
 
 class Contact extends Base {
@@ -141,40 +139,6 @@ class Contact extends Base {
 		}
 
 		return $id;
-	}
-
-	/**
-	 * Called after the data is saved to API.
-	 *
-	 * @param mixed $value The value for this field
-	 * @param CustomFieldsModel $customFieldModel The custom fields data
-	 * @param Entity $entity
-	 * @return bool
-	 * @throws Exception
-	 * @see MultiSelect for an advaced example
-	 */
-	public function afterSave($value, CustomFieldsModel &$customFieldModel, $entity) : bool
-	{
-		if(empty($value)) {
-			return true;
-		}
-
-		$tgt = model\Contact::findById($value);
-		$entityTypeId = $tgt::entityType()->getId();
-		foreach($tgt->customFieldRelations as &$relation) {
-			if($relation['entityTypeId'] === $entityTypeId && $relation['fieldId'] === $this->field->id()) {
-				$relation['entityId'] = $value;
-				$tgt->save();
-				return true;
-			}
-		}
-		$tgt->customFieldRelations[] = [
-			'entityTypeId' => $entityTypeId,
-			'entityId' => $value,
-			'fieldId' => $this->field->id()
-		];
-		$tgt->save();
-		return true;
 	}
 
 }
