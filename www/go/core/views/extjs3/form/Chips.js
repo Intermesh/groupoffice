@@ -320,8 +320,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 
 		if(!this.allowBlank && go.util.empty(this.getValue())) {
 			this.markInvalid(Ext.form.TextField.prototype.blankText);
+			this.fireEvent('invalid', this);
 			return false;
 		}
+		this.fireEvent('valid', this);
 		return true;
 	},
 
