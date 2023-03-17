@@ -344,7 +344,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		if(empty($params['tmp_file'])){
 			$account = Account::model()->findByPk($params['account_id']);
 			$imap = $account->openImapConnection($params['mailbox']);
-			if(!$imap->save_to_file($params['uid'], $file->path(), $params['number'], $params['encoding'], true)) {
+			if(!$imap->save_to_file($params['uid'], $file->path(), $params['number'], $params['encoding'])) {
 				throw new Exception("Could not save file from IMAP");
 			}
 		}else

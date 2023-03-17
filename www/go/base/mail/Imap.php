@@ -2448,7 +2448,7 @@ class Imap extends ImapBodyStruct
 	 * @param false $peek
 	 * @return bool
 	 */
-	public function save_to_file($uid, $path, $imap_part_id=-1, $encoding='', $peek=false) :bool
+	public function save_to_file($uid, $path, $imap_part_id=-1, $encoding='', $peek=true) :bool
 	{
 
 		$fp = fopen($path, 'w+');

@@ -1677,7 +1677,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(empty($params['tmp_file'])){
 			$account = Account::model()->findByPk($params['account_id']);
 			$imap = $account->openImapConnection($params['mailbox']);
-			$response['success'] = $imap->save_to_file($params['uid'], $file->path(), $params['number'], $params['encoding'], true);
+			$response['success'] = $imap->save_to_file($params['uid'], $file->path(), $params['number'], $params['encoding']);
 		} else {
 			$tmpfile = new \GO\Base\Fs\File(GO::config()->tmpdir.$params['tmp_file']);
 			$file = $tmpfile->copy($file->parent(), $params['filename']);

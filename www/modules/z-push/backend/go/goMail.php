@@ -537,7 +537,7 @@ class goMail extends GoBaseBackendDiff {
 		$this->_tmpFiles[]=$tmpfile;
 		
 
-		if(!$imap->save_to_file($uid, $tmpfile->path(), $part, $enc, true)){
+		if(!$imap->save_to_file($uid, $tmpfile->path(), $part, $enc)){
 			throw new StatusException("Failed to save attachment");
 		}
 		
