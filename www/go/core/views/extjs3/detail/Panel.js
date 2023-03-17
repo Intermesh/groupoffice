@@ -247,7 +247,6 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	addCFRelationGrids : async function(resolve) {
 		const panels = await go.customfields.CustomFields.getRelationPanels(this.entityStore.entity.name, this.currentId);
 		this.add(panels);
-		// resolve(true);
 	},
 
 	addLinks : function(sortFn) {

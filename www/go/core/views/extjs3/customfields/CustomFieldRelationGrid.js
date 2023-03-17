@@ -13,9 +13,36 @@ go.customfields.CustomFieldRelationGrid = Ext.extend(go.grid.GridPanel, {
 	title: "",
 	hidden: true,
 
+	store: null,
+	viewConfig: {
+		emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
+		totalDisplay: false
+	},
+	columns: [],
+
 	initComponent: function() {
 		go.customfields.CustomFieldRelationGrid.superclass.initComponent.call(this);
 	},
 
+
+	onLoad: function(dv) {
+		if(this.fieldId && dv.currentId) {
+			go.Db.store("Field").single(this.fieldId).then( (response) => {
+				const dbName = response.databaseName;
+				this.store.setFilter("conditions", {
+					"operator": "AND",
+					"conditions": [{
+						[dbName]: dv.currentId
+					}]
+				}).load().then(() => {
+					if(this.store.getTotalCount() === 0) {
+						this.hide();
+					} else if(!this.expandByDefault) {
+						this.collapse();
+					}
+				});
+			});
+		}
+	}
 
 });

@@ -325,25 +325,29 @@
 					ids = response.ids;
 				}, this).then(() => {
 					go.Db.store("Field").get(ids, function (fields) {
-						if(entity === "Aap") {
-							console.clear();
-							debugger;
-						}
+						let p = [], arFlds = [];
 						fields.forEach(function (fld) {
-							console.log(fld);
-							const currFldSet = go.Db.store("Fieldset").single(fld.fieldSetId);
 							const fldOptions = fld.options;
 							if (Ext.isDefined(fldOptions.showInformationPanel) && fldOptions.showInformationPanel) {
+								arFlds.push(fld);
+								p.push(go.Db.store("Fieldset").single(fld.fieldSetId));
+							}
+						});
+						Promise.all(p).then((result)=> {
+							result.forEach((fldset, index) =>
+							{
+								const tgtEntity = fldset.entity, fld=arFlds[index];
 								rels.push({
-									title: fldOptions.informationPanelTitle,
-									expandByDefault: fldOptions.expandByDefault,
-									entity: entity,
+									title: fld.options.informationPanelTitle,
+									expandByDefault: fld.options.expandByDefault,
+									entity: tgtEntity,
+									xtype: tgtEntity + "relationgrid",
 									currentId: id,
 									fieldId: fld.id
 								});
-							}
+							});
+							resolve(rels);
 						});
-						resolve(rels);
 					});
 				});
 			});
@@ -364,9 +368,11 @@
 			const rels = await this.getCFRelations(entity, id);
 			rels.forEach((config) => {
 				// TODO: This should be more intelligent, maybe with an xtype?
-				if(entity === "Contact") {
+				// panels.push(new go.customfields.CustomFieldRelationGrid(config));
+
+				if(config.entity === "Contact") {
 					panels.push(new go.modules.community.addressbook.customfield.ContactRelationGrid(config));
-				} else if(entity === "Aap") {
+				} else if(config.entity === "Aap") {
 					panels.push(new go.modules.studio.apen.customfield.AapRelationGrid(config));
 				}
 			});
