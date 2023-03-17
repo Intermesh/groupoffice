@@ -1,7 +1,8 @@
 17-03-2023: 6.7.19
 - OnlyOffice: Was broken becaue of Firebase/JWT upgrade
 - Core: Fixed 8.1 deprecated error
-- Core: vastly improved dark themes, theme lightness / darkness follows system settings
+- Core: vastly improved themes, theme lightness / darkness follows system settings
+- Core: remove obsolete Dark theme
 - Core: Imap -> imap->save_to_file will use peek by default
 
 07-03-2023: 6.7.18
