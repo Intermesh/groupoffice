@@ -2,8 +2,8 @@
 
 $font-family:  -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
-$font-weight-r: 300;
 $font-weight-m: bold;
+$font-weight-r: normal;
 $font-weight-l: 100;
 
 @function letter-space($space, $font-size) {
@@ -20,7 +20,6 @@ $font-weight-l: 100;
 %font-caption { //Used as labels and grid headers
 	font-size: sp(13);
 	font-weight: $font-weight-r;
-    @include var('color', c-accent)
 }
 
 %font-body1 {
@@ -77,9 +76,8 @@ $font-weight-l: 100;
 %font-title {
 	font-size: sp(14);
   line-height: dp(24);
-	font-weight: $font-weight-m;
+	font-weight: 500;
 	letter-spacing: 0.2px;
-	color: color($fg, 'base');
 }
 
 %font-headline {
@@ -87,7 +85,6 @@ $font-weight-l: 100;
 	line-height: dp(32);
 	font-weight: $font-weight-r;
 	letter-spacing: 0.2px;
-	color: color($fg, 'base');
 }
 
 %font-display1 {
@@ -95,5 +92,4 @@ $font-weight-l: 100;
 	line-height: dp(40);
 	font-weight: $font-weight-r;
 	letter-spacing: 0.2px;
-	color: color($fg, 'base');
 }

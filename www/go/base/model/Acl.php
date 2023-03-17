@@ -240,19 +240,21 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 
 	protected function afterSave($wasNew) {
 
-		if($wasNew){
-			if($this->usedIn!='readonly'){
-				if($this->ownedBy != 1) { //not for admin
+		if($this->ownedBy != 1) { //not for admin
+			if ($wasNew) {
+				if ($this->usedIn != 'readonly') {
+
 					$userGroup = Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy);
-					if($userGroup) {
-						$this->addGroup($userGroup->id, Acl::MANAGE_PERMISSION);						
+					if ($userGroup) {
+						$this->addGroup($userGroup->id, Acl::MANAGE_PERMISSION);
 					}
+
 				}
-			}
-		}elseif($this->isModified('ownedBy')){
-			$group = Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy);
-			if(!empty($group)) {
-				$this->addGroup($group->id, Acl::MANAGE_PERMISSION);
+			} elseif ($this->isModified('ownedBy')) {
+				$group = Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy);
+				if (!empty($group)) {
+					$this->addGroup($group->id, Acl::MANAGE_PERMISSION);
+				}
 			}
 		}
 

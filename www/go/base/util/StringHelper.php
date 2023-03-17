@@ -586,6 +586,9 @@ class StringHelper {
 	 */
 
 	public static function cut_string($string, $maxlength, $cut_whole_words = true, $append='...') {
+		if(!isset($string)) {
+			return "";
+		}
 		if (strlen($string) > $maxlength) {
 			
 			$substrFunc = function_exists('mb_substr') ? 'mb_substr' : 'substr';
@@ -977,7 +980,10 @@ class StringHelper {
 		if(!empty($styles)) {
 			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="msg '.$prefix.'">'. $html .'</div>';
 		} else if($preserveHtmlStyle) {
-			$html = '<div class="msg">'. $html .'</div>';
+			$html = trim($html);
+			if(substr($html,0, 17) !== '<div class="msg">') {
+				$html = '<div class="msg">'. $html .'</div>';
+			}
 		}
 
 		return $html;
