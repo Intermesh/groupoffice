@@ -2769,3 +2769,41 @@ body.go-compact {
 		}
 	}
 }
+
+.go-theme-color {
+	height: 80px;
+	width:100%;
+	display:flex;
+	> table {
+		width: 33%;
+		min-height: 74px;
+		margin: dp(4);
+		background-size: 200% 74px;
+		background-image: url('img/dark_light.png');
+		border: 1px solid color($fg, 'track');
+		border-radius: $borderRadius;
+		&.x-btn.x-btn-pressed {
+			> tbody {
+				background-color: transparent;
+			}
+			outline: 2px solid var(--c-primary);
+		}
+		&.mode-light { background-position:100% 0; }
+		&.mode-dark { background-position: 0 0; }
+		&.mode-system {
+			background-position:0 0;
+			position:relative;
+			&:before {
+				position:absolute;
+				top:0;left:0;
+				bottom:0;right:0;
+				content:'';
+				background-image: url('img/dark_light.png');
+				background-size: 200% 74px;
+				background-position: 100% 0;
+				clip-path: polygon(0 0, 0 100%, 100% 0, 100% 0);
+			}
+		}
+
+	}
+}

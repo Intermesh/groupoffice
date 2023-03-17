@@ -241,6 +241,7 @@ CREATE TABLE `core_user` (
   `start_module` varchar(50) NOT NULL DEFAULT 'summary',
   `language` varchar(20) NOT NULL DEFAULT 'en',
   `theme` varchar(20) NOT NULL DEFAULT 'Paper',
+  `themeColorScheme` ENUM('light', 'dark', 'system') NOT NULL DEFAULT 'light',
   `firstWeekday` tinyint(4) NOT NULL DEFAULT 1,
   `sort_name` varchar(20) NOT NULL DEFAULT 'first_name',
   `muser_id` int(11) NOT NULL DEFAULT 0,

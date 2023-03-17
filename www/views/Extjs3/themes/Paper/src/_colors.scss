@@ -67,7 +67,7 @@ $fg: (
 	alt: color($_grey, 100),
 ) !default;
 $bg: (
-		body: var(--c-primary),
+	body: var(--c-primary),
 	status-bar: color($_grey, 200),
 	app-bar: color($_grey, 100),
 	form: color($_grey, 50),

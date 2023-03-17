@@ -1,5 +1,5 @@
 .ext-el-mask {
-	background-color: $black-87-opacity;
+	background-color: color($fg,'text');
 	&-msg { // replace with loading bar
 		@extend .x-mask-loading;
 	}
@@ -112,7 +112,7 @@
 }
 
 .x-ie-shadow {
-	background-color:$black-87-opacity;
+	background-color:color($fg,'text');;
 }
 
 //.x-shadow {
