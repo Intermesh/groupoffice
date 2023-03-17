@@ -335,6 +335,7 @@
 		text-shadow: 0 0 1px black;
 	}
 	&[type="checkbox"],
+	//&.x-tree-node-cb,
 	.x-grid3-check-col-td &,
 	.x-menu-check-item:not(.x-menu-group-item) &.x-menu-item-icon,
 	&.x-grid3-row-checker,
@@ -353,8 +354,8 @@
 		}
 	}
 }
-input[type="checkbox"],
-input[type="radio"] {
+
+input.x-tree-node-cb {
 	@extend %checkbox2;
 }
 
