@@ -46,3 +46,5 @@ go.customfields.CustomFieldRelationGrid = Ext.extend(go.grid.GridPanel, {
 	}
 
 });
+
+Ext.reg('customfieldrelationgrid', go.customfields.CustomFieldRelationGrid);

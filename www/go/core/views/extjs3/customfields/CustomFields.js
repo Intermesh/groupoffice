@@ -359,22 +359,15 @@
 		 * If an entity type has a custom field that is an entity, list the entities linked to the target entity through
 		 * said custom field
 		 *
-		 * @param entity
-		 * @param id
+		 * @param {string} entity
+		 * @param {int} id
 		 */
 		getRelationPanels: async function(entity, id) {
 
 			let panels = [];
-			const rels = await this.getCFRelations(entity, id);
-			rels.forEach((config) => {
-				// TODO: This should be more intelligent, maybe with an xtype?
-				// panels.push(new go.customfields.CustomFieldRelationGrid(config));
-
-				if(config.entity === "Contact") {
-					panels.push(new go.modules.community.addressbook.customfield.ContactRelationGrid(config));
-				} else if(config.entity === "Aap") {
-					panels.push(new go.modules.studio.apen.customfield.AapRelationGrid(config));
-				}
+			const configs = await this.getCFRelations(entity, id);
+			configs.forEach((config) => {
+				panels.push(config);
 			});
 			return panels;
 		}
