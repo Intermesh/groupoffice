@@ -325,7 +325,13 @@
 					ids = response.ids;
 				}, this).then(() => {
 					go.Db.store("Field").get(ids, function (fields) {
+						if(entity === "Aap") {
+							console.clear();
+							debugger;
+						}
 						fields.forEach(function (fld) {
+							console.log(fld);
+							const currFldSet = go.Db.store("Fieldset").single(fld.fieldSetId);
 							const fldOptions = fld.options;
 							if (Ext.isDefined(fldOptions.showInformationPanel) && fldOptions.showInformationPanel) {
 								rels.push({
