@@ -102,21 +102,6 @@ $bg: bg;
 }
 
 
-//override color
-$cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
-$cHover: 		color($bg, 'hover') !default;
-$cActive: 		color($bg, 'status-bar') !default; // focussed
-
-// other override !!for dark mode only??
-$cPrimary: #009BC9;
-$cPrimaryTp: #0277BD;
-$cHeaderBg: #202020;
-
-$cDanger:		#E53935 !default;
-$cDangerBg: #B71C1C;
-$cWarning:		#f57c00 !default;
-$cSuccess:		#43A047 !default;
-$cAnchor: 		$cPrimary !default;
 
 $hue: (
 		"blue": #1976D2,
@@ -140,7 +125,13 @@ $ambient: rgba(#6a6a6a, .12)!default;
 $cPrimary: rgb(22, 82, 161) !default;
 $cPrimaryTp:	rgba(22, 82, 161, 0.16) !default;
 $cHeaderBg: 	$cPrimary !default;
-$cDangerBg: #FFEBEE !default;
+
+// other override !!for dark mode only??
+//$cPrimary: #009BC9;
+//$cPrimaryTp: #0277BD;
+//$cHeaderBg: #202020;
+
+
 
 $hue: (
 		"blue": #039BE5,
@@ -165,3 +156,15 @@ $cAccentTp:		rgba(255,114,0, 0.16) !default;
 $umbra: rgba(black, .2)!default;
 $penumbra: rgba(black, .14)!default;
 $ambient: rgba(black, .12)!default;
+
+
+//override color
+$cSelected: 	color($bg, 'selected') !default; // click on menus, tree items, table
+$cHover: 		color($bg, 'hover') !default;
+$cActive: 		color($bg, 'status-bar') !default; // focussed
+
+$cDanger:		#E53935 !default;
+$cDangerBg: #B71C1C !default;
+$cWarning:		#f57c00 !default;
+$cSuccess:		#43A047 !default;
+$cAnchor: 		$cPrimary !default;
