@@ -1,3 +1,6 @@
+- Core: Add Hebrew language pt. 1. Thanks Elhanan!
+- Core: RTL support for Arabic and Hebrew
+
 17-03-2023: 6.6.154
 - Email: Prevent double tags upon saving draft messages
 - Core: updated German translations - Danke, Daniel!
