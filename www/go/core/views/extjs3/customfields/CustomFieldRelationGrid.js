@@ -21,6 +21,8 @@ go.customfields.CustomFieldRelationGrid = Ext.extend(go.grid.GridPanel, {
 	columns: [],
 
 	initComponent: function() {
+		this.addListener('cellclick', this.onCellClick, this);
+		this.addListener('celldblclick', this.onCellClick, this);
 		go.customfields.CustomFieldRelationGrid.superclass.initComponent.call(this);
 	},
 
@@ -44,7 +46,18 @@ go.customfields.CustomFieldRelationGrid = Ext.extend(go.grid.GridPanel, {
 				});
 			});
 		}
+	},
+
+	onCellClick: function(cb, rowIdx, colIdx, evt) {
+		evt.preventDefault();
+		const record = this.store.getAt(rowIdx),
+			win = new go.links.LinkDetailWindow({
+			entity: this.store.entityStore.entity.name
+		});
+		win.load(record.id);
 	}
+
+
 
 });
 
