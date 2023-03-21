@@ -2469,7 +2469,7 @@ table[id^="comments-ext"] b {
 		font-weight: 400;
 		letter-spacing: normal;
 		line-height: 2rem;
-		color: rgba(0, 0, 0, 0.87); }
+		color: color($fg,'text'); }
 
 	fieldset, .card {
 		border: none;
@@ -2525,7 +2525,7 @@ table[id^="comments-ext"] b {
 		left: 50%;
 		margin-top: dp(-24);
 		margin-left: dp(-100);
-		background-color: white;
+		background-color: color($bg, 'card');
 		border: 1px solid color($fg, 'line');
 		text-align: center;
 		padding: dp(16);
