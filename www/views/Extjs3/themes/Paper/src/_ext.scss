@@ -1,3 +1,26 @@
+%badge {
+	vertical-align: text-bottom;
+	display: inline-block;
+	font-size: sp(13);
+	font-weight: 600;
+	color: rgba(white, 0.87);
+	//margin-top: dp(1.5);
+	min-width:dp(21);
+	width: content-box;
+	height:dp(21);
+	padding: 0 dp(4);
+	line-height:dp(21);
+	letter-spacing: 0;
+	text-align:center;
+	border-radius: dp(10.5); // only round with 1 char
+	background-color: #727272; //color($fg, 'secondary-text');
+
+	.x-tree-node & {
+		//position: absolute;
+		//right: 8px;
+	}
+}
+
 .ext-el-mask {
 	background-color: color($fg,'text');
 	&-msg { // replace with loading bar
@@ -2641,6 +2664,7 @@ $menuScrollerSize : dp(4);
 .x-window{
 	@extend .z24;
 	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
 	background-color:color($bg,'dialog');
 	border-radius: $borderRadius;
 	overflow:hidden;

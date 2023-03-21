@@ -1,0 +1,40 @@
+$fg: fg;
+$bg: bg;
+@function color($color, $color-variant: 500) {
+	@return var(--#{$color}-#{$color-variant});
+}
+
+@mixin var($property, $varName) {
+	#{$property}: var(--#{$varName});
+}
+
+$cPrimary:		var(--c-primary);
+$cPrimaryTp:	var(--c-primary-tp);
+$cHeaderBg: 	var(--c-header-bg);
+$cSecondary: 	var(--c-secondary);
+$cTertiary: 	var(--c-tertiary);
+$cAccent: 		var(--c-accent);
+$cAccentTp:		var(--c-accent-tp);
+
+$cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
+$cHover: 		color($bg, 'hover') !default;
+$cActive: 		color($bg, 'status-bar') !default; // focussed
+$cAnchor: 		$cPrimary !default;
+
+$cDanger:		#E53935 !default;
+$cDangerBg: 	#B71C1C !default;
+$cWarning:		#f57c00 !default;
+$cSuccess:		#43A047 !default;
+$cAnchor: 		$cPrimary !default;
+
+//shadows
+$umbra: rgba(black, .2)!default;
+$penumbra: rgba(black, .14)!default;
+$ambient: rgba(black, .12)!default;
+
+// Bezier easing curve
+$curve-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+$curve-deceleration: cubic-bezier(0.0, 0.0, 0.2, 1);
+$curve-acceleration: cubic-bezier(0.4, 0.0, 1, 1);
+$curve-sharp: cubic-bezier(0.4, 0.0, 0.6, 1);
+$curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider

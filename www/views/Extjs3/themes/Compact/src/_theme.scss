@@ -1,6 +1,6 @@
 $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 
-:root, :root.light {
+@mixin light-theme {
 	--fg-base:			 black;
 	--fg-divider:			#{rgba(black, 0.08)};
 	--fg-border:			#{rgba(black, 0.16)};
@@ -31,8 +31,27 @@ $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 	--bg-box: 			white; //rgba(black, 0.06),
 	--bg-card:        	white;
 	--bg-alt: 			#{mix(#000, $ambientColor, 65%)};
+
+	--c-primary: 		rgb(22, 82, 161);
+	--c-primary-tp:	rgba(22, 82, 161, 0.16);
+	--c-header-bg: 	var(--c-primary);
+	--c-secondary: 	rgb(0, 176, 173);
+	--c-tertiary: 		rgb(243,219,0);
+	--c-accent: 		rgb(255, 114, 0);
+	--c-accent-tp: 	rgba(255,114,0, 0.16);
+
+	--hue-blue: #039BE5;
+	--hue-red:#E57373;
+	--hue-pink: #EC407A;
+	--hue-purple: #8E24AA;
+	--hue-cyan: #00ACC1;
+	--hue-green:#43A047;
+	--hue-orange: #FB8C00;
+	--hue-brown: #6D4C41;
+	--hue-yellow: #FDD170;
+	--hue-bluegrey: #607D8;
 }
-body.dark {
+@mixin dark-theme {
 	--fg-base:				white;
 	--fg-divider:			rgba(0,0,0, 0.94);
 	--fg-border:			black;
@@ -62,73 +81,19 @@ body.dark {
 	--bg-box:      #{mix(#2a2a2a, $ambientColor, 95%)}; // cant be transparent because line of label is same color
 	--bg-card:       #{mix(#202020, $ambientColor, 86%)}; // rgba(0,0,0,.35);
 	--bg-alt: 			#888;
+
+	--c-primary: #009BC9;
+	--c-primary-tp: #0277BD;
+	--c-header-bg: #202020;
+
+	--hue-blue: #1976D2;
+	--hue-red:#E53935;
+	--hue-pink: #D81B60;
+	--hue-purple: #7B1FA2;
+	--hue-cyan: #0097A7;
+	--hue-green:#388E3C;
+	--hue-orange: #FF8F00;
+	--hue-brown: #6D4C41;
+	--hue-yellow: #F57F17;
+	--hue-bluegrey: #546E7;
 }
-@media (prefers-color-scheme: dark) {
-	body.system {
-		--fg-base:				white;
-		--fg-divider:			rgba(0,0,0, 0.94);
-		--fg-border:			black;
-		--fg-line:				#555555;
-		--fg-disabled:       rgba(255,255,255, 0.3);
-		--fg-textfield-box:  #555555;
-		--fg-textbox-line: 	#{rgba(white, 0.62)};
-
-		--fg-track: 	#{rgba(white, 0.36)};
-		--fg-text:           white;
-		--fg-secondary-text: rgba(255,255,255, 0.7);
-		--fg-unfocused:	   rgba(255,255,255, 0.7);
-		--fg-alt:			black;
-
-		--bg-body: 			#1b1b1b;
-		--bg-button:	  #{mix(#555, $ambientColor, 87%)} ;//rgba(255,255,255,.25); //#606060;
-		//--bg-app-bar:    #{mix(#333, $ambientColor, 95%)}; // #383838; aside
-		--bg-dialog: 		#{rgba(mix(#333, $ambientColor, 95%),.74)};
-		--bg-side-bar:		#{mix(#222, $ambientColor, 87%)};
-		--bg-background: #{mix(#333, $ambientColor, 92%)} ; //rgba(0,0,0,.85); //#1e1e1e;
-
-		--bg-hover:      rgba(255,255,255, 0.04);
-		--bg-selected:   #{rgba(white, .08)};
-		--bg-pressed:	#{rgba(#cccccc, .25)};
-		--bg-disabled: rgba(255,255,255, 0.12);
-
-		--bg-box:      #{mix(#2a2a2a, $ambientColor, 95%)}; // cant be transparent because line of label is same color
-		--bg-card:       #{mix(#202020, $ambientColor, 86%)}; // rgba(0,0,0,.35);
-		--bg-alt: 			#888;
-	}
-}
-
-//compatability meuk
-$fg: fg;
-$bg: bg;
-@function color($color, $color-variant: 500) {
-	@return var(--#{$color}-#{$color-variant});
-}
-
-//bc
-$cPrimary:		rgb(120, 162, 47);
-$cPrimaryTp:	rgba(2, 119, 189, 0.16);
-$cHeaderBg: rgb(2, 119, 189);
-$cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
-$cHover: 		color($bg, 'hover') !default;
-$cActive: 		color($bg, 'status-bar') !default; // focussed
-$cAnchor: 		$cPrimary !default;
-
-// for both?
-$cSecondary: rgb(0, 176, 173) !default;
-$cTertiary: rgb(243,219,0) !default;
-$cAccent: rgb(255, 114, 0) !default;
-$cAccentTp:		rgba(255,114,0, 0.16) !default;
-
-
-$hue: (
-		"blue": #039BE5,
-		"red":#E57373,
-		"pink": #EC407A,
-		"purple": #8E24AA,
-		"cyan": #00ACC1,
-		"green":#43A047,
-		"orange": #FB8C00,
-		"brown": #6D4C41,
-		"yellow": #FDD170,
-		"bluegrey": #607D8B
-) !default;
