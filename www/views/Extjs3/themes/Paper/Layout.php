@@ -7,9 +7,9 @@ if(!isset($primaryColor)) {
 	$primaryColor = (go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)');
 }
 $webclient = Extjs3::get();
-$lang = GO::language()->getLanguage(); ?>
+?>
 <!DOCTYPE html>
-<html lang="<?= $lang; ?>">
+<html lang="<?= go()->getLanguage()->getIsoCode(); ?>" dir="<?=go()->getLanguage()->getTextDirection();?>">
 <head>
 	<?php GO::router()->getController()->fireEvent('headstart'); ?>
 	<meta name="viewport" content="width=device-width, initial-scale=1">

@@ -64,13 +64,23 @@ class Language {
 		return $this->isoCode;
 	}
 
+
+	public function getTextDirection(): string
+	{
+		if(in_array($this->getIsoCode(), ['ar', 'he', 'ur'])) {
+			return 'rtl';
+		}
+		return 'ltr';
+	}
+
+
 	/**
 	 * Set new language
 	 *
 	 * @param string|null $isoCode when not given it's detected from the browser
 	 * @return string|false Old language setting
 	 */
-	public function setLanguage($isoCode = null) {
+	public function setLanguage(?string $isoCode = null) {
 		$old = $this->getIsoCode();
 		if(!isset($isoCode)) {
 			$isoCode = $this->getBrowserLanguage();
@@ -112,9 +122,7 @@ class Language {
 	}
 
 	private $af;
-	public function getAddressFormat(string $isoCode) {
-
-		$isoCode = strtoupper($isoCode);
+	public function getAddressFormat($isoCode) {
 
 		if(!isset($this->af)) {
 			require(\go\core\Environment::get()->getInstallFolder() . '/language/addressformats.php');
