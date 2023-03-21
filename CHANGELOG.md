@@ -1,3 +1,5 @@
+- Email: Fixed long hang when trying to delete all attachments
+
 17-03-2023: 6.7.19
 - OnlyOffice: Was broken becaue of Firebase/JWT upgrade
 - Core: Fixed 8.1 deprecated error
