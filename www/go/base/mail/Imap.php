@@ -2414,15 +2414,13 @@ class Imap extends ImapBodyStruct
 			$this->message_part_read+=strlen($line);
 		}
 
-		if ($this->message_part_size < $this->message_part_read) {
-
+		if ($line && $this->message_part_size < $this->message_part_read) {
 			$line = substr($line, 0, ($this->message_part_read-$this->message_part_size)*-1);
 		}
 
 		if($line===false) {
 			if($this->readFullLiteral) {
 				//don't attempt to read response after already have done that because it will hang for a long time
-				$this->readFullLiteral = true;
 				return false;
 			}
 
