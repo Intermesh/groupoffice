@@ -361,6 +361,7 @@
 		 *
 		 * @param {string} entity
 		 * @param {int} id
+		 * @return {array} panels
 		 */
 		getRelationPanels: async function(entity, id) {
 

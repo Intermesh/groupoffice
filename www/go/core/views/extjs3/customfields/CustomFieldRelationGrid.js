@@ -26,13 +26,14 @@ go.customfields.CustomFieldRelationGrid = Ext.extend(go.grid.GridPanel, {
 
 
 	onLoad: function(dv) {
-		if(this.fieldId && dv.currentId) {
+		if(this.fieldId && (dv.currentId || dv.model_id)) {
+			const tgtId = dv.currentId || dv.model_id;
 			go.Db.store("Field").single(this.fieldId).then( (response) => {
 				const dbName = response.databaseName;
 				this.store.setFilter("conditions", {
 					"operator": "AND",
 					"conditions": [{
-						[dbName]: dv.currentId
+						[dbName]: tgtId
 					}]
 				}).load().then(() => {
 					if(this.store.getTotalCount() === 0) {
