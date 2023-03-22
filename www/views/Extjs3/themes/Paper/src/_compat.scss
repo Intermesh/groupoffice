@@ -18,7 +18,6 @@ $cAccentTp:		var(--c-accent-tp);
 
 $cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
 $cHover: 		color($bg, 'hover') !default;
-$cActive: 		color($bg, 'status-bar') !default; // focussed
 $cAnchor: 		$cPrimary !default;
 
 $cDanger:		#E53935 !default;

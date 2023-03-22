@@ -2,7 +2,7 @@
 
 ::-webkit-scrollbar-thumb {
 	//border: none;
-	background:color($bg,'status-bar');
+	background:color($bg,'side-bar');
 }
 input[type="time"]::-webkit-clear-button {
     display: none;
@@ -2081,7 +2081,7 @@ table[id^="comments-ext"] b {
 			border-bottom-right-radius: dp(8);
 
 			background-image: none;
-			background-color: color($bg, 'status-bar');
+			background-color: color($bg, 'card');
 			padding-top: dp(16);
 		}
 
@@ -2117,7 +2117,7 @@ table[id^="comments-ext"] b {
 				top: dp(12);
 				width: 0; height: 0;
 				border: 0;
-				border-right: dp(16) solid color($bg, 'status-bar');
+				border-right: dp(16) solid color($bg, 'box');
 				border-bottom: dp(16) solid transparent;
 			}
 			&.mine {
@@ -2141,7 +2141,7 @@ table[id^="comments-ext"] b {
 			//margin-left: dp(56);
 			overflow:hidden;
 			max-width: 100%;
-			background-color: color($bg, 'status-bar');
+			background-color: color($bg, 'card');
 			.content {
 				padding: dp(8) dp(16);
 			}
@@ -2656,7 +2656,7 @@ table[id^="comments-ext"] b {
 		right:0;
 		border-left: 1px solid color($fg,'line');
 		border-bottom: 1px solid color($fg,'line');
-		background-color: color($bg, 'status-bar');
+		background-color: color($bg, 'box');
 		display:inline-block;
 		border-bottom-left-radius: $borderRadius;
 	}
