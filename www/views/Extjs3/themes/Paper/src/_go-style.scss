@@ -27,14 +27,14 @@ body {
 }
 body.dark {
 	@include dark-theme;
-	input {
+	* {
 		color-scheme: dark;
 	}
 }
 @media (prefers-color-scheme: dark) {
 	body.system {
 		@include dark-theme;
-		input {
+		* {
 			color-scheme: dark;
 		}
 	}

@@ -1,25 +1,3 @@
-%icon {
-	display: inline-block;
-	font-family: 'Icons';
-	font-weight: normal;
-	font-style: normal;
-	font-size: dp(24);  /* Preferred icon size */
-	color:inherit;
-	width: auto;
-	height: auto;
-	text-transform: none;
-	letter-spacing: normal;
-	vertical-align:middle;
-	word-wrap: normal;
-	white-space: nowrap;
-	direction: ltr;
-	-webkit-font-smoothing: antialiased; // Support for all WebKit browsers.
-	text-rendering: optimizeLegibility; // Support for Safari and Chrome.
-	-moz-osx-font-smoothing: grayscale; // Support for Firefox.
-	font-feature-settings: 'liga'; // Support for IE
-	line-height: normal;
-}
-
 i.icon {
 	@extend %icon;
 	background-size: contain;

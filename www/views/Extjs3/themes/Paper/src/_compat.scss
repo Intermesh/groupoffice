@@ -37,3 +37,25 @@ $curve-deceleration: cubic-bezier(0.0, 0.0, 0.2, 1);
 $curve-acceleration: cubic-bezier(0.4, 0.0, 1, 1);
 $curve-sharp: cubic-bezier(0.4, 0.0, 0.6, 1);
 $curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider
+
+%icon {
+	display: inline-block;
+	font-family: 'Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: dp(24);  /* Preferred icon size */
+	color:inherit;
+	width: auto;
+	height: auto;
+	text-transform: none;
+	letter-spacing: normal;
+	vertical-align:middle;
+	word-wrap: normal;
+	white-space: nowrap;
+	direction: ltr;
+	-webkit-font-smoothing: antialiased; // Support for all WebKit browsers.
+	text-rendering: optimizeLegibility; // Support for Safari and Chrome.
+	-moz-osx-font-smoothing: grayscale; // Support for Firefox.
+	font-feature-settings: 'liga'; // Support for IE
+	line-height: normal;
+}
