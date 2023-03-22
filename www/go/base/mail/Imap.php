@@ -2561,8 +2561,6 @@ class Imap extends ImapBodyStruct
 	{
 		$this->clean($mailbox, 'mailbox');
 
-		$uid_string = implode(',',$uids);
-
 		$command = "UID COPY %s \"".$this->addslashes($this->utf7_encode($mailbox))."\"\r\n";
 		$status = $this->_runInChunks($command, $uids);
 		return $status;
@@ -2856,7 +2854,7 @@ class Imap extends ImapBodyStruct
 
 		$this->clean($mailbox, 'mailbox');
 		$this->clean($size, 'uid');
-		$command = 'APPEND "'.$this->utf7_encode($mailbox).'" ('.$flags.') {'.$size."}\r\n";
+		$command = 'APPEND "'.$this->addslashes($this->utf7_encode($mailbox)).'" ('.$flags.') {'.$size."}\r\n";
 		$this->send_command($command);
 		$result = fgets($this->handle);
 		if (substr($result, 0, 1) == '+') {

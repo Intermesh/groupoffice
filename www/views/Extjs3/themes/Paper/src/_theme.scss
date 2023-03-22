@@ -1,6 +1,4 @@
-$ambientColor: #1e1246;
-
-:root, :root.light {
+@mixin light-theme {
 	--fg-base:			 black;
 	--fg-divider:			#{rgba(black, 0.04)};
 	--fg-border:			rgba(0, 0, 0, 0.12);
@@ -8,28 +6,48 @@ $ambientColor: #1e1246;
 	--fg-disabled:       #{rgba(black, 0.38)};
 	--fg-textfield-box:  rgba(255, 255, 255, 0.8);
 	--fg-textbox-line: 	#{rgba(black, 0.42)};
-	--fg-track: 	#{rgba(#444444, 0.26)};
+	--fg-track: 			#{rgba(#444444, 0.26)};
 	--fg-text:           #{rgba(black, 0.87)};
 	--fg-secondary-text: #{rgba(black, 0.64)};
 	--fg-unfocused:		#{rgba(black, 0.54)};
-	--fg-alt:			#f5f5f5;
+	--fg-alt:				#f5f5f5;
 
-	--bg-body: 			var(--c-primary);
+	--bg-body: 			var(--c-primary); // same as primary
 	--bg-button:	  	transparent;
 	--bg-dialog: 		#f5f5f5;
 	--bg-side-bar:		#eeeeee;
 	--bg-background:  #fafafa;
 
-	--bg-hover:      #{rgba(black, 0.04)};
-	--bg-selected:   #{rgba(black, .08)};
+	--bg-hover:      	#{rgba(black, 0.04)};
+	--bg-selected:   	#{rgba(black, .08)};
 	--bg-pressed:		#{rgba(black, .08)};
-	--bg-disabled:   #{rgba(black, 0.12)};
+	--bg-disabled:   	#{rgba(black, 0.12)};
 
 	--bg-box: 			white; //rgba(black, 0.06),
-	--bg-card:        	white;
+	--bg-card:        white;
 	--bg-alt: 			#212121;
+
+	--c-primary: 		rgb(22, 82, 161);
+	--c-primary-tp:	rgba(22, 82, 161, 0.16);
+	--c-header-bg: 	var(--c-primary);
+	--c-secondary: 	rgb(0, 176, 173);
+	--c-tertiary: 		rgb(243,219,0);
+	--c-accent: 		rgb(255, 114, 0);
+	--c-accent-tp: 	rgba(255,114,0, 0.16);
+
+	--hue-blue: #039BE5;
+	--hue-red:#E57373;
+	--hue-pink: #EC407A;
+	--hue-purple: #8E24AA;
+	--hue-cyan: #00ACC1;
+	--hue-green:#43A047;
+	--hue-orange: #FB8C00;
+	--hue-brown: #6D4C41;
+	--hue-yellow: #FDD170;
+	--hue-bluegrey: #607D8;
 }
-body.dark {
+
+@mixin dark-theme {
 	--fg-base:				white;
 	--fg-divider:			#{rgba(white, 0.12)};
 	--fg-border:			#1b1b1b; //black;
@@ -59,112 +77,19 @@ body.dark {
 	--bg-box:      #272727; // cant be transparent because line of label is same color
 	--bg-card:       #202020;
 	--bg-alt: 			#888;
+
+	--c-primary: #009BC9;
+	--c-primary-tp: #0277BD;
+	--c-header-bg: #202020;
+
+	--hue-blue: #1976D2;
+	--hue-red:#E53935;
+	--hue-pink: #D81B60;
+	--hue-purple: #7B1FA2;
+	--hue-cyan: #0097A7;
+	--hue-green:#388E3C;
+	--hue-orange: #FF8F00;
+	--hue-brown: #6D4C41;
+	--hue-yellow: #F57F17;
+	--hue-bluegrey: #546E7;
 }
-@media (prefers-color-scheme: dark) {
-	body.system {
-		--fg-base:				white;
-		--fg-divider:			#{rgba(white, 0.12)};
-		--fg-border:			black;
-		--fg-line:				#{rgba(white, 0.3)};
-		--fg-disabled:       rgba(255,255,255, 0.3);
-		--fg-textfield-box:  #555555;
-		--fg-textbox-line: 	#{rgba(white, 0.42)};
-
-		--fg-track: 			#{rgba(white, 0.3)};
-		--fg-text:           white;
-		--fg-secondary-text: rgba(255,255,255, 0.7);
-		--fg-unfocused:	   rgba(255,255,255, 0.7);
-		--fg-alt:			black;
-
-		--bg-body: 			#1b1b1b;
-		--bg-button:	  transparent;
-		--bg-app-bar:    #303030;
-		--bg-dialog: 		#303030;
-		--bg-side-bar:		#1b1b1b;
-		--bg-background: #343638;
-
-		--bg-hover:      rgba(255,255,255, 0.04);
-		--bg-selected:   #{rgba(white, .08)};
-		--bg-pressed:	#{rgba(#cccccc, .25)};
-		--bg-disabled: rgba(255,255,255, 0.12);
-
-		--bg-box:      #272727; // cant be transparent because line of label is same color
-		--bg-card:       #202020;
-		--bg-alt: 			#888;
-	}
-}
-
-//compatability meuk
-$fg: fg;
-$bg: bg;
-@function color($color, $color-variant: 500) {
-	@return var(--#{$color}-#{$color-variant});
-}
-
-
-
-$hue: (
-		"blue": #1976D2,
-		"red":#E53935,
-		"pink": #D81B60,
-		"purple": #7B1FA2,
-		"cyan": #0097A7,
-		"green":#388E3C,
-		"orange": #FF8F00,
-		"brown": #6D4C41,
-		"yellow": #F57F17,
-		"bluegrey": #546E7A
-);
-
-$umbra: rgba(#6a6a6a, .2)!default;
-$penumbra: rgba(#6a6a6a, .14)!default;
-$ambient: rgba(#6a6a6a, .12)!default;
-
-
-// other override !!fr light mode only??
-$cPrimary: rgb(22, 82, 161) !default;
-$cPrimaryTp:	rgba(22, 82, 161, 0.16) !default;
-$cHeaderBg: 	$cPrimary !default;
-
-// other override !!for dark mode only??
-//$cPrimary: #009BC9;
-//$cPrimaryTp: #0277BD;
-//$cHeaderBg: #202020;
-
-
-
-$hue: (
-		"blue": #039BE5,
-		"red":#E57373,
-		"pink": #EC407A,
-		"purple": #8E24AA,
-		"cyan": #00ACC1,
-		"green":#43A047,
-		"orange": #FB8C00,
-		"brown": #6D4C41,
-		"yellow": #FDD170,
-		"bluegrey": #607D8B
-) !default;
-
-// for both?
-$cSecondary: rgb(0, 176, 173) !default;
-$cTertiary: rgb(243,219,0) !default;
-$cAccent: rgb(255, 114, 0) !default;
-$cAccentTp:		rgba(255,114,0, 0.16) !default;
-
-//shadows
-$umbra: rgba(black, .2)!default;
-$penumbra: rgba(black, .14)!default;
-$ambient: rgba(black, .12)!default;
-
-
-//override color
-$cSelected: 	color($bg, 'selected') !default; // click on menus, tree items, table
-$cHover: 		color($bg, 'hover') !default;
-$cActive: 		color($bg, 'status-bar') !default; // focussed
-
-$cDanger:		#E53935 !default;
-$cDangerBg: #B71C1C !default;
-$cWarning:		#f57c00 !default;
-$cSuccess:		#43A047 !default;
-$cAnchor: 		$cPrimary !default;

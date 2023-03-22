@@ -1,18 +1,25 @@
-/* main: style.scss*/
-@font-face {
-	font-family: 'Material Icons';
+%icon {
+	display: inline-block;
+	font-family: 'Icons';
+	font-weight: normal;
 	font-style: normal;
-	font-weight: 400;
-	//src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
-	src: local("Material Icons"), 
-		local("MaterialIcons-Regular"), 
-		url(#{$resourcePath}fonts/icons.woff2) format("woff2"), // Super Modern
-		//url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
-		url(#{$resourcePath}fonts/icons.ttf) format("truetype"); // Android, Safari, iOS
+	font-size: dp(24);  /* Preferred icon size */
+	color:inherit;
+	width: auto;
+	height: auto;
+	text-transform: none;
+	letter-spacing: normal;
+	vertical-align:middle;
+	word-wrap: normal;
+	white-space: nowrap;
+	direction: ltr;
+	-webkit-font-smoothing: antialiased; // Support for all WebKit browsers.
+	text-rendering: optimizeLegibility; // Support for Safari and Chrome.
+	-moz-osx-font-smoothing: grayscale; // Support for Firefox.
+	font-feature-settings: 'liga'; // Support for IE
+	line-height: normal;
 }
-// #################
-// ##### ICONS #####
-// #################
+
 i.icon {
 	@extend %icon;
 	background-size: contain;
