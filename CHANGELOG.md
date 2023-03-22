@@ -1,4 +1,11 @@
+- Email: Fixed long hang when trying to delete all attachments
+
+17-03-2023: 6.7.19
 - OnlyOffice: Was broken becaue of Firebase/JWT upgrade
+- Core: Fixed 8.1 deprecated error
+- Core: vastly improved themes, theme lightness / darkness follows system settings
+- Core: remove obsolete Dark theme
+- Core: Imap -> imap->save_to_file will use peek by default
 
 07-03-2023: 6.7.18
 - ActiveSync: Autolinking will also work when mail is send/received using z-push
@@ -17,6 +24,12 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+
+- Email: Prevent double tags upon saving draft messages
+- Core: updated German translations - Danke, Daniel!
+
+07-03-2023: 6.6.153
+- Email: minor bugfix drag and drop messages
 
 06-03-2023: 6.6.152
 - Email: drag and drop mail messages into email attachments.

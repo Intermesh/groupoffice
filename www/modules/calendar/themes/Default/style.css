@@ -242,7 +242,7 @@ border-collapse:collapse;
 
 .x-calGrid-indicator{
 	position:absolute;
-	border-top:2px solid #177ea3; /* #dd4b39; */
+	border-top:2px solid var(--c-primary); /* #dd4b39; */
 	z-index:3001;
 }
 .x-calGrid-table{

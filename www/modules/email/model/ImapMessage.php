@@ -806,7 +806,9 @@ class ImapMessage extends ComposerMessage {
 			}
 		}
 
-		$this->getImapConnection()->append_message($this->mailbox, $swiftMsg, '\Seen');
+		if(!$this->getImapConnection()->append_message($this->mailbox, $swiftMsg, '\Seen')) {
+			throw new \Exception("Failed to append new message");
+		}
 
 		return true;
 	}

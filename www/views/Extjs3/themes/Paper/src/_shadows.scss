@@ -81,6 +81,11 @@ $ambient-elevation: (
   24: '#{dp(0) dp(9) dp(46) dp(8)}'
 );
 
+//shadows
+$umbra: rgba(black, .2)!default;
+$penumbra: rgba(black, .14)!default;
+$ambient: rgba(black, .12)!default;
+
 $i: 0;
 @while $i <= 24 {
 	.z#{$i} {

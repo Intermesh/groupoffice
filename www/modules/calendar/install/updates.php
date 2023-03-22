@@ -341,3 +341,11 @@ left join cal_events e2 on e.exception_for_event_id = e2.id
 set e.exception_for_event_id = 0 where e.exception_for_event_id != 0 AND e2.id is null;";
 
 
+$updates['202303140904'][] = "alter table cal_events
+    drop column repeat_type;";
+
+$updates['202303140904'][] = "alter table cal_events
+    drop column repeat_forever;";
+
+$updates['202303140904'][] = "alter table cal_events
+    drop column repeat_every;";

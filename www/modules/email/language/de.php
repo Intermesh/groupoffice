@@ -290,7 +290,7 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   '<p>To set Group-Office as your default e-mail program please <a class="normal-link" href="http://www.Group-Office.com/wiki/E-mail#Set_Group-Office_as_your_default_e-mail_client" target="_blank">read the instructions</a>.</p><p>Then if you are using Windows you must download and run <a class="normal-link" href="{url}">this register file</a></p>' => '<p>Um {product_name} als Ihr Standard E-Mail-Programm zu wählen, lesen Sie bitte <a class="normal-link" href="http://www.{product_name}.com/wiki/E-mail#Set_{product_name}_as_your_default_e-mail_client" target="_blank">diese Anleitung</a>.</p><p>Wenn Sie Windows verwenden, müssen Sie dann noch <a class="normal-link" href="{url}">diese Regdatei</a> herunterladen und ausführen/importieren.</p>',
   'Allow the use of a self signed certificate when using SSL or TLS' => 'Bei Verwendung von SSL oder TLS die Verwendung eines selbst signierten Zertifikats zulassen',
   'Email' => 'E-Mail',
-  'Sieve filter port number' => 'Dsieve Filter Port Nummer',
+  'Sieve filter port number' => 'Sieve Filter Port Nummer',
   'Use secure connection for (Sieve) email filters' => 'Verwenden Sie eine sichere Verbindung für (Sieve) E-Mail-Filter',
   'Ok' => 'OK',
   'Companies' => 'Firmen',

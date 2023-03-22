@@ -1,16 +1,8 @@
 @use "sass:math";
 
-:root {
-  --c-primary: #{map-get($vars, c-primary)};
-  --c-primary-tp: #{map-get($vars, c-primary-tp)};
-	--c-secondary: #{map-get($vars, c-secondary)};
-	--c-tertiary: #{map-get($vars, c-tertiary)};
-	--c-accent: #{map-get($vars, c-accent)};
-}
-
 ::-webkit-scrollbar-thumb {
 	//border: none;
-	background:color($bg,'status-bar');
+	background:color($bg,'side-bar');
 }
 input[type="time"]::-webkit-clear-button {
     display: none;
@@ -28,6 +20,24 @@ html {
 body {
 	background-color: color($bg, 'body');
 	//background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(239,166,76,1) 0%, rgba(245,184,184,1) 100.2% );
+}
+
+:root, body {
+	@include light-theme;
+}
+body.dark {
+	@include dark-theme;
+	* {
+		color-scheme: dark;
+	}
+}
+@media (prefers-color-scheme: dark) {
+	body.system {
+		@include dark-theme;
+		* {
+			color-scheme: dark;
+		}
+	}
 }
 
 body * {
@@ -89,10 +99,25 @@ p {
 	margin: dp(16) 0;
 }
 
-@each $name, $color in $hue {
-	.#{$name} { color: #{$color} !important;}
-	.#{$name}-fill { background-color: #{$color} !important; fill: #{$color} }
+$hue: (
+		"blue",
+		"red",
+		"pink",
+		"purple",
+		"cyan",
+		"green",
+		"orange",
+		"brown",
+		"yellow",
+		"bluegrey"
+);
+@each $name in $hue {
+	.#{$name} { color: var(--hue-#{$name}) !important;}
+	.#{$name}-fill { background-color: var(--hue-#{$name}) !important; fill: var(--hue-#{$name}) }
 }
+.c-primary {color: var(--c-primary) !important; }
+.c-secondary {color: var(--c-secondary) !important; }
+.c-tertiary {color: var(--c-tertiary) !important; }
 .info {
 	background-color: $cPrimaryTp;
 	color: $cPrimary;
@@ -474,7 +499,7 @@ a {
 	
 	position: relative;
 	color: white;
-	background-color: var(--bg-body);
+	background-color: var(--c-header-bg);
 }
 .go-main-tab-panel.x-tab-panel {
 	> .x-tab-panel-header {
@@ -956,7 +981,8 @@ hr {
 	display: inline-block;
 	border-radius: $borderRadius;
 	color: color($fg, 'text');
-	text-shadow: 0px 0px 4px white;
+	font-weight:600;
+	text-shadow: 0 0 4px var(--bg-card);
 	border:1px solid color($fg, 'divider');
 	line-height: dp(24);
 
@@ -2065,13 +2091,13 @@ table[id^="comments-ext"] b {
 			border-bottom-right-radius: dp(8);
 
 			background-image: none;
-			background-color: color($bg, 'status-bar');
+			background-color: color($bg, 'card');
 			padding-top: dp(16);
 		}
 
 		&.mine {
 			.more {
-				background-color: rgba-to-rgb($cPrimaryTp);
+				background-color: $cPrimary;
 			}
 		}
 	}
@@ -2101,7 +2127,7 @@ table[id^="comments-ext"] b {
 				top: dp(12);
 				width: 0; height: 0;
 				border: 0;
-				border-right: dp(16) solid color($bg, 'status-bar');
+				border-right: dp(16) solid color($bg, 'box');
 				border-bottom: dp(16) solid transparent;
 			}
 			&.mine {
@@ -2125,7 +2151,7 @@ table[id^="comments-ext"] b {
 			//margin-left: dp(56);
 			overflow:hidden;
 			max-width: 100%;
-			background-color: color($bg, 'status-bar');
+			background-color: color($bg, 'card');
 			.content {
 				padding: dp(8) dp(16);
 			}
@@ -2453,7 +2479,7 @@ table[id^="comments-ext"] b {
 		font-weight: 400;
 		letter-spacing: normal;
 		line-height: 2rem;
-		color: rgba(0, 0, 0, 0.87); }
+		color: color($fg,'text'); }
 
 	fieldset, .card {
 		border: none;
@@ -2509,7 +2535,7 @@ table[id^="comments-ext"] b {
 		left: 50%;
 		margin-top: dp(-24);
 		margin-left: dp(-100);
-		background-color: white;
+		background-color: color($bg, 'card');
 		border: 1px solid color($fg, 'line');
 		text-align: center;
 		padding: dp(16);
@@ -2563,43 +2589,38 @@ table[id^="comments-ext"] b {
 
 
 //compact header
-body.go-compact {
-	#mainNorthPanel {
-		height: dp(64);
-
-		.x-panel-body {
-			min-height: dp(64);
-		}
-	}
-
-	.go-main-tab-panel {
-		overflow: visible;
-	}
-
-	.go-main-tab-panel.x-tab-panel > .x-tab-panel-header {
-		position: absolute;
-		top: dp(-64);
-		left: dp(272);
-		right: dp(272);
-		width: auto !important;
-		height:0 ;
-		overflow: visible;
-		.x-tab-strip-top {
-			height: dp(64);
-		}
-		.x-tab-strip > li {
-			height: dp(64);
-			line-height: dp(64);
-			.x-tab-strip-text {
-				font-weight: bold;
-			}
-		}
-	}
-
-	.go-main-tab-panel {
-		bottom: 0;
+#mainNorthPanel {
+	height: dp(64);
+	.x-panel-body {
+		min-height: dp(64);
 	}
 }
+.go-main-tab-panel {
+	overflow: visible;
+}
+.go-main-tab-panel.x-tab-panel > .x-tab-panel-header {
+	position: absolute;
+	top: dp(-64);
+	left: dp(272);
+	right: dp(272);
+	width: auto !important;
+	height:0 ;
+	overflow: visible;
+	.x-tab-strip-top {
+		height: dp(64);
+	}
+	.x-tab-strip > li {
+		height: dp(64);
+		line-height: dp(64);
+		.x-tab-strip-text {
+			font-weight: bold;
+		}
+	}
+}
+.go-main-tab-panel {
+	bottom: 0;
+}
+// end compact header
 
 .go-progressbar{
 	height:dp(12);
@@ -2645,7 +2666,7 @@ body.go-compact {
 		right:0;
 		border-left: 1px solid color($fg,'line');
 		border-bottom: 1px solid color($fg,'line');
-		background-color: color($bg, 'status-bar');
+		background-color: color($bg, 'box');
 		display:inline-block;
 		border-bottom-left-radius: $borderRadius;
 	}
@@ -2767,5 +2788,44 @@ body.go-compact {
 		> button:after {
 			display: none;
 		}
+	}
+}
+
+.go-theme-color {
+	height: 80px;
+	width:100%;
+	display:flex;
+	> table {
+		width: 33%;
+		min-height: 74px;
+		margin: dp(4);
+		background-clip: content-box;
+		background-size: 200% 74px;
+		background-image: url('img/dark_light.png');
+		border: 1px solid color($fg, 'track');
+		border-radius: $borderRadius;
+		&.x-btn.x-btn-pressed {
+			> tbody {
+				background-color: transparent;
+			}
+			box-shadow: 0 0 0 2px var(--c-primary);
+		}
+		&.mode-light { background-position:100% 0; }
+		&.mode-dark { background-position: 0 0; }
+		&.mode-system {
+			background-position:0 0;
+			position:relative;
+			&:after {
+				position:absolute;
+				top:0;left:0;
+				bottom:0;right:0;
+				content:'';
+				background-image: url('img/dark_light.png');
+				background-size: 200% 74px;
+				background-position: 100% 0;
+				clip-path: polygon(0 0, 0 100%, 100% 0, 100% 0);
+			}
+		}
+
 	}
 }

@@ -849,7 +849,7 @@ GO.calendar.MainPanel = function(config){
 			new Ext.Panel({
 				region:'north',
 				border:true,
-				height:dp(241),
+				height:dp(251),
 				split:false,
 				baseCls:'x-plain',
 				layout: {

@@ -1,5 +1,28 @@
+%badge {
+	vertical-align: text-bottom;
+	display: inline-block;
+	font-size: sp(13);
+	font-weight: 600;
+	color: rgba(white, 0.87);
+	//margin-top: dp(1.5);
+	min-width:dp(21);
+	width: content-box;
+	height:dp(21);
+	padding: 0 dp(4);
+	line-height:dp(21);
+	letter-spacing: 0;
+	text-align:center;
+	border-radius: dp(10.5); // only round with 1 char
+	background-color: #727272; //color($fg, 'secondary-text');
+
+	.x-tree-node & {
+		//position: absolute;
+		//right: 8px;
+	}
+}
+
 .ext-el-mask {
-	background-color: $black-87-opacity;
+	background-color: color($fg,'text');
 	&-msg { // replace with loading bar
 		@extend .x-mask-loading;
 	}
@@ -112,7 +135,7 @@
 }
 
 .x-ie-shadow {
-	background-color:$black-87-opacity;
+	background-color:color($fg,'text');;
 }
 
 //.x-shadow {
@@ -335,6 +358,7 @@
 		text-shadow: 0 0 1px black;
 	}
 	&[type="checkbox"],
+	//&.x-tree-node-cb,
 	.x-grid3-check-col-td &,
 	.x-menu-check-item:not(.x-menu-group-item) &.x-menu-item-icon,
 	&.x-grid3-row-checker,
@@ -353,8 +377,8 @@
 		}
 	}
 }
-input[type="checkbox"],
-input[type="radio"] {
+
+input.x-tree-node-cb {
 	@extend %checkbox2;
 }
 
@@ -2640,6 +2664,7 @@ $menuScrollerSize : dp(4);
 .x-window{
 	@extend .z24;
 	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
 	background-color:color($bg,'dialog');
 	border-radius: $borderRadius;
 	overflow:hidden;
@@ -2800,7 +2825,9 @@ body.x-body-masked .x-window-plain .x-window-mc {
 
 $resizerSize : dp(3);
 .x-layout-split {
-	background-color: color($fg,'border');
+	//background-color: color($fg,'border');
+	border-right: 1px solid color($fg,'line');
+	border-top: 1px solid color($fg,'line');
 	&.x-splitbar {
 		&-h {
 			width:$resizerSize;
@@ -2819,7 +2846,7 @@ $resizerSize : dp(3);
 		}
 	}
 	.x-layout-mini {
-		background-color: color($bg, 'status-bar');
+		background-color: color($bg, 'box');
 		opacity: 1;
 	}
 }

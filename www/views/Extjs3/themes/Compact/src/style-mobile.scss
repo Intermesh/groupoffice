@@ -1,4 +1,3 @@
-@import '../../Paper/src/_colors';
-@import 'config';
-@import '../../Paper/src/style-mobile';
-@import 'overrides';
+$density: 160;
+$font-scale: 1;
+@import 'style'; 

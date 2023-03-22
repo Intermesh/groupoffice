@@ -1421,7 +1421,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Last year' => 'Letztes Jahr',
   'Custom' => 'Benutzerdefiniert',
   'Drag to sort' => 'Ziehen zum Sortieren',
-  'Logout when inactive' => 'Logout wenn inaktiv',
+  'Logout when inactive' => 'Abmelden wenn inaktiv',
   'Secondary color' => 'Sekundäre Farbe',
   'Accent color' => 'Akzentfarbe',
   'Archive user' => 'Benutzer archivieren',
@@ -1429,7 +1429,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'You can\' t archive yourself' => 'Sie können sich nicht selbst archivieren',
   'Show users' => 'Benutzer zeigen',
   'Show groups' => 'Gruppen zeigen',
-  'Users can login without this domain behind the username. Note that if the user exists in the Group-Office database it will take precedence.' => 'Users can login without this domain behind the username. Note that if the user exists in the {product_name} database it will take precedence.',
+  'Users can login without this domain behind the username. Note that if the user exists in the Group-Office database it will take precedence.' => 'Nutzer können sich ohne diese Domain hinter dem Nutzernamen anmelden. Bitte beachten Sie, wenn der Nutzer bereits in der {product_name} Datenbank vorhanden ist, wird dieser den Vorrang haben.',
   'Last week' => 'Letzte Woche',
   'This year' => 'Dieses Jahr',
   'Setup notifications' => 'Einrichtungsbenachrichtigung',
@@ -1551,4 +1551,5 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Show' => 'Zeige',
   'Domain' => 'Domain',
   'The item was successfully deleted' => 'Das Element wurde erfolgreich gelöscht',
+  'Logins' => 'Anmeldungen',
 );
