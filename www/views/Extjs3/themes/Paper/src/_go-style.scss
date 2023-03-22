@@ -978,7 +978,8 @@ hr {
 	display: inline-block;
 	border-radius: $borderRadius;
 	color: color($fg, 'text');
-	text-shadow: 0px 0px 4px white;
+	font-weight:600;
+	text-shadow: 0 0 4px var(--bg-card);
 	border:1px solid color($fg, 'divider');
 	line-height: dp(24);
 

@@ -1,3 +1,7 @@
+$density: 140 !default; // LARGE SCREEN
+$font-scale: 1 !default;
+$resourcePath: './' !default;
+
 @mixin light-theme {
 	--fg-base:			 black;
 	--fg-divider:			#{rgba(black, 0.04)};

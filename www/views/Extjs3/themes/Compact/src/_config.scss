@@ -1,9 +1,3 @@
-@use "sass:math";
-
-$resourcePath: '../Paper/';
-$density: 115;
-$font-scale: 1.1;
-
 @font-face {
 	font-family: 'Icons';
 	font-style: normal;
@@ -11,11 +5,4 @@ $font-scale: 1.1;
 	src:  url('./fonts/icons.woff2') format("woff2"); // Super Modern
 }
 
-@function dp($width) {
-  @return math.floor(math.div(($width * $density) , 160) *1px);
-}
-@function sp($size) {
-  @return ceil(math.div(($size * $density) , 160) * $font-scale) *1px;
-}
-
-$borderRadius: 8px;
+$borderRadius: dp(8);

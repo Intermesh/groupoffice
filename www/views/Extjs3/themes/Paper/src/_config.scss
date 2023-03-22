@@ -1,12 +1,3 @@
-@use "sass:math";
-
-//--------------------------------------------------------------
-// 0. Density independent pixels
-//--------------------------------------------------------------
-$density: 140 !default; // LARGE SCREEN
-$font-scale: 1 !default;
-$resourcePath: './' !default;
-
 @font-face {
 	font-family: 'Icons';
 	font-style: normal;
@@ -17,14 +8,6 @@ $resourcePath: './' !default;
 	url(#{$resourcePath}fonts/icons.woff2) format("woff2"), // Super Modern
 		//url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
 	url(#{$resourcePath}fonts/icons.ttf) format("truetype"); // Android, Safari, iOS
-}
-
-@function dp($width) {
-  @return math.div(($width * $density) , 160) * 1px;
-}
-
-@function sp($size) {
-  @return ceil(dp($size) * $font-scale);
 }
 
 $borderRadius: dp(12) !default;

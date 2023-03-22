@@ -6,10 +6,6 @@ $font-weight-m: bold;
 $font-weight-r: normal;
 $font-weight-l: 100;
 
-@function letter-space($space, $font-size) {
-	@return (($space / $font-size)  * $density / 160) * 1em;
-}
-
 %font-button {
 	font-size: sp(15);
 	font-weight: $font-weight-m;
