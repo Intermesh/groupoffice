@@ -28020,6 +28020,9 @@ Ext.Window = Ext.extend(Ext.Panel, {
 
     
     ghost : function(cls){
+			// MOD: This will disable extJs it's drag ghost for dialogs
+			return this.getEl();
+
         var ghost = this.createGhost(cls);
         var box = this.getBox(true);
         ghost.setLeftTop(box.x, box.y);

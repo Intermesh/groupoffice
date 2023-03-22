@@ -115,6 +115,9 @@ $hue: (
 	.#{$name} { color: var(--hue-#{$name}) !important;}
 	.#{$name}-fill { background-color: var(--hue-#{$name}) !important; fill: var(--hue-#{$name}) }
 }
+.c-primary {color: var(--c-primary) !important; }
+.c-secondary {color: var(--c-secondary) !important; }
+.c-tertiary {color: var(--c-tertiary) !important; }
 .info {
 	background-color: $cPrimaryTp;
 	color: $cPrimary;

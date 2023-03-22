@@ -315,7 +315,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 						'isAccount'=>true,
 						'permission_level'=>$account->getPermissionLevel(),
 						'hasError'=>false,
-						'iconCls' => 'ic-account-box',
+						'iconCls' => 'ic-account-box c-primary',
 						'expanded' => $this->_isExpanded($nodeId),
 						'noselect' => false,
 						'account_id' => $account->id,
@@ -423,30 +423,31 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 			}
 
 			$sortIndex = 5;
-
+			$node['iconCls'] = 'c-secondary ';
 			switch ($mailbox->name) {
 				case 'INBOX':
-					$node['iconCls'] = 'ic-inbox';
-					$sortIndex = 0;
+					$node['iconCls'] .= 'ic-inbox';
+ 					$sortIndex = 0;
 					break;
 				case $mailbox->getAccount()->sent:
-					$node['iconCls'] = 'ic-send';
+					$node['iconCls'] .= 'ic-send';
 					$sortIndex = 1;
 					break;
 				case $mailbox->getAccount()->trash:
-					$node['iconCls'] = 'ic-delete';
+					$node['iconCls'] .= 'ic-delete';
 					$sortIndex = 3;
 					break;
 				case $mailbox->getAccount()->drafts:
-					$node['iconCls'] = 'ic-drafts';
+					$node['iconCls'] .= 'ic-drafts';
 					$sortIndex = 2;
 					break;
 				case 'INBOX/Spam':
 				case 'INBOX.Spam':
 				case 'Spam':
-					$node['iconCls'] = 'ic-new-releases';
+					$node['iconCls'] .= 'ic-new-releases';
 					$sortIndex = 4;
 					break;
+				default: $node['iconCls'] .= 'ic-folder';
 			}
 
 			//don't return empty namespaces
