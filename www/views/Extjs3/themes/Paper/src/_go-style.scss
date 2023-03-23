@@ -762,6 +762,9 @@ a {
 .card {
 	background-color: color($bg, 'card');
 }
+.bgbox {
+	background-color: color($bg, 'box');
+}
 /*.go-global-search {
 	//width: 65%;
 	height: dp(40);
