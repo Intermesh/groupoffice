@@ -1,3 +1,7 @@
+$density: 140 !default; // LARGE SCREEN
+$font-scale: 1 !default;
+$resourcePath: './' !default;
+
 @mixin light-theme {
 	--fg-base:			 black;
 	--fg-divider:			#{rgba(black, 0.04)};
@@ -44,7 +48,7 @@
 	--hue-orange: #FB8C00;
 	--hue-brown: #6D4C41;
 	--hue-yellow: #FDD170;
-	--hue-bluegrey: #607D8;
+	--hue-bluegrey: #607D8B;
 }
 
 @mixin dark-theme {
@@ -91,5 +95,5 @@
 	--hue-orange: #FF8F00;
 	--hue-brown: #6D4C41;
 	--hue-yellow: #F57F17;
-	--hue-bluegrey: #546E7;
+	--hue-bluegrey: #546E70;
 }

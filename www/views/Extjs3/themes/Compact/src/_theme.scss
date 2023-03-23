@@ -1,5 +1,9 @@
 $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 
+$resourcePath: '../Paper/';
+$density: 115;
+$font-scale: 1.1;
+
 @mixin light-theme {
 	--fg-base:			 black;
 	--fg-divider:			#{rgba(black, 0.08)};
@@ -15,18 +19,15 @@ $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 	--fg-alt:			white;
 
 	--bg-body: 			var(--c-primary);
-	--bg-button:	  	#{mix(#fff, $ambientColor, 98%)}; //rgba(255,255,255,.75);
-	//--bg-app-bar:     #{mix(#ddd, $ambientColor, 86%)}; // rgba(0,0,0,.35);
-	//--bg-form:   #{mix(#eee, $ambientColor, 92%)}; //only dialog body
+	--bg-button:	  	#{mix(#fff, $ambientColor, 98%)};
 	--bg-dialog: 		#{rgba(mix(#eee, $ambientColor, 92%),.74)};
-	--bg-side-bar:		#{mix(white, $ambientColor, 81%)}; //rgba(255,255,255,.81);
-	--bg-background:  #{mix(#fafafa, $ambientColor, 95%)};// rgba(255,255,255,.92);
+	--bg-side-bar:		#{mix(white, $ambientColor, 81%)};
+	--bg-background:  #{mix(#fafafa, $ambientColor, 95%)};
 
 	--bg-hover:      #{rgba(black, 0.08)};
 	--bg-selected:   #{rgba(black, .10)};
 	--bg-pressed:		#{rgba(black, .25)};
 	--bg-disabled:   #{rgba(black, 0.12)};
-	//--bg-active: #{rgba($primary500, .24)}; // active state can me differend from selected
 
 	--bg-box: 			white; //rgba(black, 0.06),
 	--bg-card:        	white;
@@ -49,7 +50,7 @@ $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 	--hue-orange: #FB8C00;
 	--hue-brown: #6D4C41;
 	--hue-yellow: #FDD170;
-	--hue-bluegrey: #607D8;
+	--hue-bluegrey: #607D8B;
 }
 @mixin dark-theme {
 	--fg-base:				white;
@@ -68,7 +69,6 @@ $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 
 	--bg-body: 			#1b1b1b;
 	--bg-button:	  #{mix(#555, $ambientColor, 87%)} ;//rgba(255,255,255,.25); //#606060;
-	//--bg-app-bar:    #{mix(#333, $ambientColor, 95%)}; // #383838; aside
 	--bg-dialog: 		#{rgba(mix(#333, $ambientColor, 95%),.74)};
 	--bg-side-bar:		#{mix(#222, $ambientColor, 87%)};
 	--bg-background: #{mix(#333, $ambientColor, 92%)} ; //rgba(0,0,0,.85); //#1e1e1e;
@@ -79,7 +79,7 @@ $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 	--bg-disabled: rgba(255,255,255, 0.12);
 
 	--bg-box:      #{mix(#2a2a2a, $ambientColor, 95%)}; // cant be transparent because line of label is same color
-	--bg-card:       #{mix(#202020, $ambientColor, 86%)}; // rgba(0,0,0,.35);
+	--bg-card:       #{mix(#202020, $ambientColor, 86%)};
 	--bg-alt: 			#888;
 
 	--c-primary: #009BC9;
@@ -95,5 +95,5 @@ $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 	--hue-orange: #FF8F00;
 	--hue-brown: #6D4C41;
 	--hue-yellow: #F57F17;
-	--hue-bluegrey: #546E7;
+	--hue-bluegrey: #546E70;
 }

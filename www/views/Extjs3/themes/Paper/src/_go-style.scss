@@ -115,6 +115,9 @@ $hue: (
 	.#{$name} { color: var(--hue-#{$name}) !important;}
 	.#{$name}-fill { background-color: var(--hue-#{$name}) !important; fill: var(--hue-#{$name}) }
 }
+.c-primary {color: var(--c-primary) !important; }
+.c-secondary {color: var(--c-secondary) !important; }
+.c-tertiary {color: var(--c-tertiary) !important; }
 .info {
 	background-color: $cPrimaryTp;
 	color: $cPrimary;
@@ -978,7 +981,8 @@ hr {
 	display: inline-block;
 	border-radius: $borderRadius;
 	color: color($fg, 'text');
-	text-shadow: 0px 0px 4px white;
+	font-weight:600;
+	text-shadow: 0 0 4px var(--bg-card);
 	border:1px solid color($fg, 'divider');
 	line-height: dp(24);
 
