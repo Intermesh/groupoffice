@@ -27,10 +27,9 @@ $font-scale: 1.1;
 	--bg-hover:      #{rgba(black, 0.08)};
 	--bg-selected:   #{rgba(black, .10)};
 	--bg-pressed:		#{rgba(black, .25)};
-	--bg-disabled:   #{rgba(black, 0.12)};
 
 	--bg-box: 			white; //rgba(black, 0.06),
-	--bg-card:        	white;
+	--bg-card:        #eeeeee;
 	--bg-alt: 			#{mix(#000, $ambientColor, 65%)};
 
 	--c-primary: 		rgb(22, 82, 161);
@@ -76,7 +75,6 @@ $font-scale: 1.1;
 	--bg-hover:      rgba(255,255,255, 0.04);
 	--bg-selected:   #{rgba(white, .08)};
 	--bg-pressed:	#{rgba(#cccccc, .25)};
-	--bg-disabled: rgba(255,255,255, 0.12);
 
 	--bg-box:      #{mix(#2a2a2a, $ambientColor, 95%)}; // cant be transparent because line of label is same color
 	--bg-card:       #{mix(#202020, $ambientColor, 86%)};

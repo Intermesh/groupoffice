@@ -24,11 +24,10 @@ $resourcePath: './' !default;
 
 	--bg-hover:      	#{rgba(black, 0.04)};
 	--bg-selected:   	#{rgba(black, .08)};
-	--bg-pressed:		#{rgba(black, .08)};
-	--bg-disabled:   	#{rgba(black, 0.12)};
+	--bg-pressed:		#{rgba(black, .12)};
 
 	--bg-box: 			white; //rgba(black, 0.06),
-	--bg-card:        white;
+	--bg-card:        #eeeeee;
 	--bg-alt: 			#212121;
 
 	--c-primary: 		rgb(22, 82, 161);
@@ -76,7 +75,6 @@ $resourcePath: './' !default;
 	--bg-hover:      rgba(255,255,255, 0.04);
 	--bg-selected:   #{rgba(white, .08)};
 	--bg-pressed:	#{rgba(#cccccc, .25)};
-	--bg-disabled: rgba(255,255,255, 0.12);
 
 	--bg-box:      #272727; // cant be transparent because line of label is same color
 	--bg-card:       #202020;
