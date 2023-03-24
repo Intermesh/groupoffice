@@ -158,6 +158,7 @@ CREATE TABLE `core_entity` (
   `defaultAclId` INT NULL DEFAULT NULL
 ) ENGINE=InnoDB;
 
+
 CREATE TABLE `core_group` (
   `id` int(11) NOT NULL,
   `name` varchar(190) NOT NULL,

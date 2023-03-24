@@ -13,7 +13,8 @@ class Date extends Base {
   /**
    * @inheritDoc
    */
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		$d = $this->field->getDefault();
 		$d = isset($d) && $d != "" ? go()->getDbConnection()->getPDO()->quote($d) : "NULL";
 		return "DATE DEFAULT " . $d;

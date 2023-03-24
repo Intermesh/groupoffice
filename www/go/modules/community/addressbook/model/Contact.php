@@ -22,7 +22,6 @@ use go\modules\community\addressbook\convert\VCard;
 use function GO;
 use go\core\mail\Message;
 use go\core\TemplateParser;
-use go\core\db\Expression;
 use go\core\fs\File;
 use go\core\model\Acl;
 use GO\Files\Model\Folder;
@@ -247,8 +246,8 @@ class Contact extends AclItemEntity {
 	 *
 	 * @var Address[]
 	 */
-	public $addresses = [];	
-	
+	public $addresses = [];
+
 	/**
 	 *
 	 * @var int[]
@@ -371,14 +370,14 @@ class Contact extends AclItemEntity {
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-						->addTable("addressbook_contact", 'c')
-						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
-						->addArray('dates', Date::class, ['id' => 'contactId'])
-						->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
-						->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
-						->addArray('addresses', Address::class, ['id' => 'contactId'])
-						->addArray('urls', Url::class, ['id' => 'contactId'])
-						->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);
+			->addTable("addressbook_contact", 'c')
+			->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
+			->addArray('dates', Date::class, ['id' => 'contactId'])
+			->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
+			->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
+			->addArray('addresses', Address::class, ['id' => 'contactId'])
+			->addArray('urls', Url::class, ['id' => 'contactId'])
+			->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);
 	}
 	
 	public function setNameFromParts() {

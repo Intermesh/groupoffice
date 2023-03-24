@@ -9,7 +9,8 @@ class YesNo extends Base {
 	 * 
 	 * @return string
 	 */
-	protected function getFieldSQL() {		
+	protected function getFieldSQL(): string
+	{
 		return "tinyint DEFAULT NULL";
 	}
 

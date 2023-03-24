@@ -11,7 +11,8 @@ class Text extends Base {
 	 * @return string|boolean
 	 * @throws Exception
 	 */
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		$def = $this->field->getDefault();
 		if(!empty($def)) {
 			$def = go()->getDbConnection()->getPDO()->quote($def);

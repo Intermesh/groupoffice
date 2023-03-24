@@ -14,11 +14,19 @@ class Html extends Base {
 	 * 
 	 * @return string
 	 */
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		return "TEXT NULL";
 	}
 
-	public function validate($value, Field $field, $model)
+	/**
+	 * @param $value
+	 * @param Field $field
+	 * @param $model
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function validate($value, Field $field, $model): bool
 	{
 		if(!empty($value) && StringUtil::detectXSS($value)) {
 			$model->setValidationError("customFields." . $field->databaseName, ErrorCode::INVALID_INPUT, "You're not allowed to put scripts in customFields." . $field->databaseName);				

@@ -14,7 +14,8 @@ class Number extends Base {
 	 *
 	 * @return string
 	 */
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		$d = $this->field->getDefault();
 		$d = isset($d) && $d != "" ? number_format($d, 4) : "NULL";
 		
@@ -27,7 +28,7 @@ class Number extends Base {
 	 * Defines an entity filter for this field.
 	 * 
 	 * @see Entity::defineFilters()
-	 * @param Filters $filter
+	 * @param Filters $filters
 	 */
 	public function defineFilter(Filters $filters) {		
 		
