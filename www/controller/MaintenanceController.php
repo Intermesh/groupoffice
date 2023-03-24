@@ -15,6 +15,7 @@ use go\core\App;
 use go\core\auth\TemporaryState;
 use go\core\db\Table;
 use go\core\db\Utils;
+use go\core\orm\EntityType;
 use go\core\orm\SearchableTrait;
 use go\modules\community\history\Module;
 use PDOException;
@@ -436,6 +437,8 @@ class MaintenanceController extends AbstractController {
 		
 		$sql = "delete from core_acl where id = 0;";
 		GO::getDbConnection()->query($sql);
+
+		EntityType::checkDatabase();
 		
 		$classes= GO::findClasses('model');
 		foreach($classes as $model){

@@ -141,53 +141,14 @@ abstract class AclOwnerEntity extends AclEntity {
 	
 	protected static function internalDelete(Query $query): bool
 	{
-
-		$aclsToDelete = static::getAclsToDelete($query);
-
 		if(!parent::internalDelete($query)) {
 			return false;
-		}
-		
-		if(!empty($aclsToDelete)) {
-			if(!Acl::delete((new Query)->where('id', 'IN', $aclsToDelete))) {
-				throw new Exception("Could not delete ACL");
-			}
 		}
 		
 		return true;
 	}
 
-	private static $keepAcls = [];
 
-	/**
-	 * Keep acl's when deleting. This is used by the community/history module because it wasnts to take over the ACL
-	 * on delete. It will remove the acl when the log entry is delete.
-	 */
-	public static function keepAcls() {
-		self::$keepAcls[static::class] = true;
-	}
-
-	/**
-	 * @param Query $query
-	 * @return array
-	 * @throws Exception
-	 */
-	protected static function getAclsToDelete(Query $query): array
-	{
-
-		if(!empty(self::$keepAcls[static::class])) {
-			return [];
-		}
-
-		$q = clone $query;
-
-		$q->select(static::$aclColumnName);
-		return $q->all();
-
-	}
-
-
-	
 	/**
 	 * Get the permission level of the current user
 	 * 
@@ -366,6 +327,7 @@ abstract class AclOwnerEntity extends AclEntity {
 			throw new Exception("Could not update ACL");
 		}
 	}
+
 
 	/**
 	 * This function joins the enity table so that the check function can set the usedIn property on the acl.

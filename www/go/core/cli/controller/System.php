@@ -14,6 +14,7 @@ use go\core\fs\File;
 use go\core\jmap\Entity;
 use go\core\jmap\Response;
 use go\core\jmap\Router;
+use go\core\model\Acl;
 use go\core\model\Alert;
 use go\core\http\Client;
 use go\core\model\Alert as CoreAlert;
@@ -224,17 +225,17 @@ JSON;
 		}
 
 		echo "Cleaning up....\n";
-		Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
-
-		if(Module::isInstalled("legacy", "files")) {
-			$this->cleanupEmptyFolders();
-		}
+//		Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
+//
+//		if(Module::isInstalled("legacy", "files")) {
+//			$this->cleanupEmptyFolders();
+//		}
 
 		$this->cleanupAcls();
 
-		$this->fireEvent(self::EVENT_CLEANUP);
-
-		$this->reportUnknownTables();
+//		$this->fireEvent(self::EVENT_CLEANUP);
+//
+//		$this->reportUnknownTables();
 
 	}
 
@@ -246,8 +247,12 @@ JSON;
 
 	private function cleanupAcls() {
 
+
+		echo (string) Acl::findStale();
+		exit();
+
 		// for memory problems
-		go()->getDebugger()->enabled = false;
+//		go()->getDebugger()->enabled = false;
 		CoreAlert::$enabled = false;
 
 		// Speed things up.
@@ -256,12 +261,8 @@ JSON;
 
 		echo "Cleaning up unused ACL's\n";
 
-//		go()->getDatabase()->getTable('core_acl')->backup();
-//		go()->getDatabase()->getTable('core_acl_group')->backup();
 
 		go()->getDbConnection()->exec("update core_acl set usedIn = null, entityTypeId = null, entityId = null");
-		go()->getDbConnection()->exec("update core_acl set usedIn = 'core_entity.defaultAclId' where id in (select defaultAclId from core_entity)");
-
 
 		echo "Checking database\n";
 
@@ -275,6 +276,8 @@ JSON;
 			$module->module()->checkAcls();
 		}
 
+		EntityType::checkDatabase();
+
 		echo "\n\n";
 
 		//hack for folders which are skipped in the checkDatabase
@@ -283,7 +286,7 @@ JSON;
 			", entityId = f.id where usedIn is null"
 		);
 
-		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where entityTypeId is null");
 
 		echo "Delete " . $deleteCount ." unused ACL's\n";
 

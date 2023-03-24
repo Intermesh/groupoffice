@@ -127,11 +127,6 @@ class Module extends core\Module
 			return;
 		}
 
-		//Don't delete ACL's because we're taking them over.
-		if(is_a($cls, AclOwnerEntity::class, true)) {
-			$cls::keepAcls();
-		}
-
 		$entities = $cls::find()->mergeWith(clone $query);
 		foreach($entities as $e) {
 			static::logEntity($e, 'delete');

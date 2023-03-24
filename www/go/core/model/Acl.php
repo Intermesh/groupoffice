@@ -2,10 +2,13 @@
 namespace go\core\model;
 
 use Exception;
+use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\fs\Blob;
 use go\core\orm\Entity;
 use go\core\jmap\Entity as JmapEntity;
+use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
@@ -521,5 +524,59 @@ class Acl extends Entity {
 		go()->getCache()->set('readonlyaclid', $acl->id);
 
 		return $acl->id;
+	}
+
+
+	/**
+	 * Get all tables referencing the acl's
+	 *
+	 * New framework uses foreign keys to do this but for the old ActiveRecords
+	 * we use the EntityType's to find them
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public static function getReferences(): array
+	{
+		$refs = self::getMapping()->getPrimaryTable()->getReferences();
+
+		// old framework does not have foreign keys
+		$entities = EntityType::findAll();
+		foreach ($entities as $et) {
+			$cls = $et->getClassName();
+			if (!is_subclass_of($cls, ActiveRecord::class, true)) {
+				continue;
+			}
+
+			if ($et->isAclOwner()) {
+				$table = $cls::model()->tableName();
+				$column = $cls::model()->aclField();
+
+				$refs[] = ['table' => $table, 'column' => $column];
+			}
+		}
+
+		return $refs;
+	}
+
+	public static function findStale() {
+		$refs = self::getReferences();
+
+		foreach($refs as $ref) {
+			$q = 	(new Query())
+				->select($ref['column'].' as aclId')
+				->from($ref['table'])
+				->where($ref['column'], '!=', null);
+
+			if(!isset($refsQuery)) {
+				$refsQuery = $q;
+			} else {
+				$refsQuery->union($q);
+			}
+		}
+
+		return static::find()
+			->join($refsQuery, 'refs', 'core_acl.id = refs.aclId', 'left')
+			->where('refs.aclId is null');
 	}
 }

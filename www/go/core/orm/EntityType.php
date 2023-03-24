@@ -56,6 +56,7 @@ class EntityType implements ArrayableInterface {
 	 * @var bool
 	 */
 	private $userModSeqIncremented = false;
+	private $enabled;
 
 
 	/**
@@ -77,6 +78,14 @@ class EntityType implements ArrayableInterface {
 	public function getClassName(): string
 	{
 		return $this->className;
+	}
+
+	/**
+	 * If the module is disabled this will return false
+	 * @return bool
+	 */
+	public function isEnabled() : bool {
+		return $this->enabled;
 	}
 	
 	/**
@@ -237,10 +246,10 @@ class EntityType implements ArrayableInterface {
 		}
 		
 		$records = $query
-						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
+						->select('e.*, m.name AS moduleName, m.package AS modulePackage, m.enabled')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where(['m.enabled' => true])
+//						->where(['m.enabled' => true])
 						->all();
 		
 		$i = [];
@@ -349,7 +358,8 @@ class EntityType implements ArrayableInterface {
 		$e->moduleId = $record['moduleId'];
 		$e->highestModSeq = (int) $record['highestModSeq'];
 		$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
-
+		$e->enabled = $record['enabled'];
+		
 		if (isset($record['modulePackage'])) {
 			if($record['modulePackage'] == 'core') {
 				$e->className = 'go\\core\\model\\' . ucfirst($e->name);	
@@ -755,12 +765,44 @@ class EntityType implements ArrayableInterface {
 	{
 		$acl = new Acl();
 		$acl->usedIn = 'core_entity.defaultAclId';
+		$acl->entityTypeId = $this->id;
 		$acl->ownedBy = 1;
 		if(!$acl->save()) {
 			throw new SaveException($acl);
 		}
 		
 		return $acl;
+	}
+
+	public static function checkDatabase() {
+
+		$all = static::findAll();
+
+		foreach($all as $type) {
+
+			if($type->isAclOwner()) {
+				$defaultAclId = $type->getDefaultAclId();
+				if (!$defaultAclId) {
+					return;
+				}
+				$acl = Acl::findById($defaultAclId);
+
+				$acl->usedIn = 'core_entity.defaultAclId';
+				$acl->entityTypeId = $type->id;
+				$acl->ownedBy = 1;
+				if (!$acl->save()) {
+					throw new SaveException($acl);
+				}
+			} else{
+				if($type->defaultAclId) {
+					$type->defaultAclId = null;
+					go()->getDbConnection()->update('core_entity',
+						['defaultAclId' => null], ['id' => $type->getId()])
+						->execute();
+
+				}
+			}
+		}
 	}
 
 	/**
