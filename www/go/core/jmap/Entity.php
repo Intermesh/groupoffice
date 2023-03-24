@@ -846,4 +846,12 @@ abstract class Entity  extends OrmEntity {
 	}
 
 
+	/**
+	 * Does nothing by default
+	 * @return void
+	 */
+	public static function checkAcls() {
+
+	}
+
 }

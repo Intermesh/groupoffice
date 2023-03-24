@@ -471,6 +471,10 @@ abstract class Entity extends Property {
 	/**
 	 * Delete the entity
 	 *
+	 * The statement is kept in {@see self::$lastDeleteStmt}
+	 *
+	 * So you can get the number with self::$lastDeleteStmt->rowCount();
+	 *
 	 * @param DbQuery|Entity|array $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
 	 *  Or pass ['id' => $id];
@@ -478,6 +482,7 @@ abstract class Entity extends Property {
 	 *  Or:
 	 *
 	 *  SomeEntity::delete($instance->primaryKeyValues());
+	 *
 	 *
 	 * @return boolean
 	 * @throws Exception
@@ -1402,22 +1407,8 @@ abstract class Entity extends Property {
 		$cacheKey = "refs-table-" . static::class;
 		$refs = go()->getCache()->get($cacheKey);
 		if($refs === null) {
-			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
-			$dbName = go()->getDatabase()->getName();
-			try {
-				go()->getDbConnection()->exec("USE information_schema");
-				//somehow bindvalue didn't work here
-				/** @noinspection SqlResolve */
-				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
-					"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . 
-					" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
 
-				$stmt = go()->getDbConnection()->getPDO()->query($sql);
-				$refs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			}
-			finally{
-				go()->getDbConnection()->exec("USE `" . $dbName . "`");	
-			}	
+			$refs = static::getMapping()->getPrimaryTable()->getReferences();
 
 			//don't find the entity itself
 			$refs = array_filter($refs, function($r) {

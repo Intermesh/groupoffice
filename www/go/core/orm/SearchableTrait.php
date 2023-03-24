@@ -225,6 +225,8 @@ trait SearchableTrait {
 		$cls = static::class;
 		echo $cls."\n";
 
+		flush();
+
 		echo "Deleting old values\n";
 
 		$stmt = go()->getDbConnection()->delete('core_search', (new Query)
@@ -243,7 +245,8 @@ trait SearchableTrait {
 		$offset = 0;
 		
 		//In small batches to keep memory low	
-		while($stmt->rowCount()) {	
+		while($stmt->rowCount()) {
+			flush();
 
 			while ($m = $stmt->fetch()) {
 

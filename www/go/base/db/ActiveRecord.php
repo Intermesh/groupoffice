@@ -4257,22 +4257,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			if($folder)
 				$folder->delete(true);
 		}
-		
 
-		if($this->aclField() && (!$this->isJoinedAclField || $this->isAclOverwritten()) && !go()->getModule('community', 'history')){
-			//echo 'Deleting acl '.$this->{$this->aclField()}.' '.$this->aclField().'<br />';
-			$aclField = $this->isAclOverwritten() ? $this->aclOverwrite() : $this->aclField();
-
-			$acl = \GO\Base\Model\Acl::model()->findByPk($this->{$aclField});
-			if($acl) {
-				$acl->delete();
-			}
-		}
-
-		
 		$this->_deleteLinks();	
-		
-		
+
 		if(!$this->afterDelete()) {
 			return false;
 		}

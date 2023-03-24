@@ -119,27 +119,7 @@ class Blob extends orm\Entity {
 	 */
 	public static function getReferences(): array
 	{
-		
-		$refs = go()->getCache()->get("blob-refs");
-		if($refs === null) {
-			$dbName = go()->getDatabase()->getName();
-			go()->getDbConnection()->exec("USE information_schema");
-			
-			try {
-				//somehow bindvalue didn't work here
-				/** @noinspection SqlResolve */
-				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
-				$stmt = go()->getDbConnection()->query($sql);
-				$refs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			}
-			finally{
-				go()->getDbConnection()->exec("USE `" . $dbName . "`");		
-			}	
-			
-			go()->getCache()->set("blob-refs", $refs);			
-		}		
-		
-		return $refs;
+		return Table::getInstance("core_blob")->getReferences();
 	}
 
 	/**
