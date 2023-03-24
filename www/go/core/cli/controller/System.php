@@ -3,6 +3,7 @@ namespace go\core\cli\controller;
 
 use Exception;
 use go\core\Controller;
+use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\Forbidden;
 use go\core\exception\NotFound;
