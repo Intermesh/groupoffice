@@ -6,6 +6,7 @@ use ErrorException;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\model\Acl;
 use go\core\model\CronJobSchedule;
 use go\core\model\OauthAccessToken;
 use go\core\model\RememberMe;
@@ -52,6 +53,7 @@ class GarbageCollection extends CronJob {
 		$this->blobs();
 		$this->change();
 		$this->links();
+		$this->acls();
 
 		Token::collectGarbage();
 		OauthAccessToken::collectGarbage();
@@ -81,7 +83,13 @@ class GarbageCollection extends CronJob {
 	private function blobs() {
 		go()->debug("Cleaning up BLOB's");
 		Blob::delete(Blob::findStale());
-		go()->debug("Deleted stale blobs");
+		go()->debug("Deleted " . Blob::$lastDeleteStmt->rowCount() . " stale blobs");
+	}
+
+	private function acls() {
+		go()->debug("Cleaning up ACL's");
+		Acl::delete(Acl::findStale());
+		go()->debug("Deleted " . Acl::$lastDeleteStmt->rowCount() . " stale ACL's");
 	}
 
 	private function change() {
