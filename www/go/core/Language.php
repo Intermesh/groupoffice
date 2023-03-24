@@ -162,12 +162,12 @@ class Language {
 	/**
 	 * Format an address
 	 *
-	 * @param string $countryCode
 	 * @param array $address array with street, street2, city, zipCode and state
+	 * @param string|null $countryCode
 	 * @param boolean|null $showCountry When null it will be false if the country isthe system default
 	 * @return string
 	 */
-	public function formatAddress(string $countryCode, array $address, bool $showCountry = true) : string
+	public function formatAddress(array $address, ?string $countryCode, bool $showCountry = true) : string
 	{
 		if(empty($countryCode)) {
 			$countryCode = self::defaultCountry();

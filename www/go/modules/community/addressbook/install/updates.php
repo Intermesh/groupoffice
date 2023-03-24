@@ -183,7 +183,7 @@ $updates['202211071330'][] = function() {
 			->from("addressbook_address");
 		foreach ($addresses as $address) {
 
-			$a = go()->getLanguage()->formatAddress($address['countryCode'], ['street' => $address['street'], 'street2' => $address['street2']], false);
+			$a = go()->getLanguage()->formatAddress(['street' => $address['street'], 'street2' => $address['street2']], $address['countryCode'], false);
 
 			go()->getDbConnection()->update("addressbook_address", ['address' => $a], ['id' => $address['id']])->execute();
 		}
