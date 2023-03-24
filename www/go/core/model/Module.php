@@ -495,7 +495,20 @@ class Module extends Entity {
 		return !empty($mod) && $mod->getPermissionLevel($userId) >= $level;
 	}
 
-	// for backwards compatibility
+	/**
+	 * for backwards compatibility only!
+	 * @deprecated
+	 *
+	 * Create this in your Module.php instead:
+	 * ```
+	 * protected function rights(): array
+	 * {
+	 *   return ['mayXXX'];
+	 * }
+	 * ```
+	 * Add the text labels in the english language file
+	 * Then use go()->getModel()->getUserRights()->mayXXX;
+	 */
 	public function getPermissionLevel($userId = null): int
 	{
 
