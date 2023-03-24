@@ -1,4 +1,6 @@
 - Email: Fixed long hang when trying to delete all attachments
+- Core: Fixed rebuild search cache error "Already active transaction"
+- Core: ACL's are not deleted immediately but collected by garbage collection (not active yet)
 
 17-03-2023: 6.7.19
 - OnlyOffice: Was broken becaue of Firebase/JWT upgrade
