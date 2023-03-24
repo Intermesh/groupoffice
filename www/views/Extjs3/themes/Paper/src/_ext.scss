@@ -2553,7 +2553,10 @@ $menuScrollerSize : dp(4);
 	}
 }
 .x-tool{
-	margin: dp(12) 0;
+	margin: dp(8) 0;
+	.x-window-header & {
+		margin: dp(12) 0;
+	}
 	position:relative;
 	width:dp(32);
 	height:dp(32);
