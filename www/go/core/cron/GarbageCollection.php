@@ -53,7 +53,8 @@ class GarbageCollection extends CronJob {
 		$this->blobs();
 		$this->change();
 		$this->links();
-		$this->acls();
+		// TODO Enable after extensive testing
+//		$this->acls();
 
 		Token::collectGarbage();
 		OauthAccessToken::collectGarbage();
