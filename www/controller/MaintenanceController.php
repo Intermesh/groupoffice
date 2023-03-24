@@ -294,17 +294,10 @@ class MaintenanceController extends AbstractController {
 		}
 
 		//speed things up
-		go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0; SET autocommit=0");
-
-//		$this->removeSearchCacheKeys();
-
-		go()->getDbConnection()->exec("commit");
+		go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0");
 		
 		if(!empty($params['reset'])) {
 			echo "Resetting cache!\n";
-//			go()->getDbConnection()->exec("truncate core_search_word");
-//			go()->getDbConnection()->exec("truncate core_search");
-
 			//change mtime's so they will be updated
 			if(!empty($params['modelName'])){
 				$entityTypeId = $params['modelName']::entityType()->getId();
@@ -323,27 +316,25 @@ class MaintenanceController extends AbstractController {
 		
 		$response = array();
 				
-		if(!empty($params['modelName'])){
-			$modelName = $params['modelName'];
-			$models = array(new ReflectionClass($modelName));
-		} else {
-			$models= GO::findClasses('model');
-		}
-		
-		foreach($models as $model){
-			if($model->isSubclassOf("GO\Base\Db\ActiveRecord") && !$model->isAbstract()){
-				GO::getModel($model->getName())->rebuildSearchCache();
+		if(!empty($params['modelName'])){;
+
+			if(is_a($params['modelName'], Entity::class, true)){
+				SearchableTrait::rebuildSearchForEntity($params['modelName']);
+			}else {
+				$models = array(new ReflectionClass($params['modelName']));
+
+				foreach ($models as $model) {
+					if ($model->isSubclassOf("GO\Base\Db\ActiveRecord") && !$model->isAbstract()) {
+						GO::getModel($model->getName())->rebuildSearchCache();
+					}
+				}
 			}
-		}
-		
-		if(empty($params['modelName'])){
+		}else {
 			GO::modules()->callModuleMethod('buildSearchCache', array(&$response));
 			go()->rebuildSearch();
-		} else if(is_a($params['modelName'], Entity::class, true)){
-			SearchableTrait::rebuildSearchForEntity($params['modelName']);
 		}
 
-		go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1; SET autocommit=1");
+		go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1");
 
 		echo "Resettings JMAP sync state\n";
 		go()->rebuildCache();

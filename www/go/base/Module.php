@@ -525,7 +525,7 @@ class Module extends Observable {
 		foreach($models as $model){
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord")){
 				//$response[] = "Processing ".$model->getName()."\n";
-				$stmt = \GO::getModel($model->getName())->rebuildSearchCache();
+				\GO::getModel($model->getName())->rebuildSearchCache();
 			
 			}
 		}
