@@ -122,10 +122,13 @@ class Language {
 	}
 
 	private $af;
-	public function getAddressFormat($isoCode) {
+	public function getAddressFormat(string $isoCode) : string {
+
+		$isoCode = strtoupper($isoCode);
 
 		if(!isset($this->af)) {
 			require(\go\core\Environment::get()->getInstallFolder() . '/language/addressformats.php');
+			/** @noinspection PhpUndefinedVariableInspection */
 			$this->af = $af;
 		}
 
@@ -159,12 +162,12 @@ class Language {
 	/**
 	 * Format an address
 	 *
-	 * @param $countryCode
-	 * @param $address array with street, street2, city, zipCode and state
+	 * @param string $countryCode
+	 * @param array $address array with street, street2, city, zipCode and state
 	 * @param boolean|null $showCountry When null it will be false if the country isthe system default
 	 * @return string
 	 */
-	public function formatAddress($countryCode, $address, bool $showCountry = true)
+	public function formatAddress(string $countryCode, array $address, bool $showCountry = true) : string
 	{
 		if(empty($countryCode)) {
 			$countryCode = self::defaultCountry();
@@ -173,6 +176,7 @@ class Language {
 		if (empty($address['street']) && empty($address['street2']) && empty($address['city']) && empty($address['state'])) {
 			return "";
 		}
+
 		$format = go()->getLanguage()->getAddressFormat($countryCode);
 
 		$format = str_replace('{address}', $address['address'] ?? $address['street'] ?? "", $format);
