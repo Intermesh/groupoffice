@@ -2663,6 +2663,7 @@ $menuScrollerSize : dp(4);
 // ##############
 .x-window{
 	@extend .z24;
+	will-change: left, top;
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
 	background-color:color($bg,'dialog');
