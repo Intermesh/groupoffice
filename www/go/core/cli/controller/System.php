@@ -2,10 +2,7 @@
 namespace go\core\cli\controller;
 
 use Exception;
-use GO\Base\Observable;
 use go\core\Controller;
-use go\core\db\Table;
-use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\Forbidden;
 use go\core\exception\NotFound;
@@ -19,7 +16,6 @@ use go\core\model\Alert;
 use go\core\http\Client;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\CronJobSchedule;
-use go\core\event\Listeners;
 use go\core\model\Module;
 use Faker;
 
@@ -225,17 +221,17 @@ JSON;
 		}
 
 		echo "Cleaning up....\n";
-//		Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
-//
+		Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
+
 //		if(Module::isInstalled("legacy", "files")) {
 //			$this->cleanupEmptyFolders();
 //		}
 
 		$this->cleanupAcls();
 
-//		$this->fireEvent(self::EVENT_CLEANUP);
-//
-//		$this->reportUnknownTables();
+		$this->fireEvent(self::EVENT_CLEANUP);
+
+		$this->reportUnknownTables();
 
 	}
 
@@ -246,49 +242,18 @@ JSON;
 	}
 
 	private function cleanupAcls() {
-
-
-		echo (string) Acl::findStale();
-		exit();
-
-		// for memory problems
-//		go()->getDebugger()->enabled = false;
+		echo "Cleaning up unused ACL's\n";
 		CoreAlert::$enabled = false;
 
 		// Speed things up.
 		Entity::$trackChanges = false;
+
 		\go\modules\community\history\Module::$enabled = false;
+		Acl::delete(Acl::findStale());
+		Acl::$lastDeleteStmt->rowCount();
 
-		echo "Cleaning up unused ACL's\n";
 
-
-		go()->getDbConnection()->exec("update core_acl set usedIn = null, entityTypeId = null, entityId = null");
-
-		echo "Checking database\n";
-
-		$modules = Module::find();
-
-		foreach($modules as $module) {
-			if(!$module->isAvailable()) {
-				continue;
-			}
-			echo "Checking module ". ($module->package ?? "legacy") . "/" .$module->name ."\n";
-			$module->module()->checkAcls();
-		}
-
-		EntityType::checkDatabase();
-
-		echo "\n\n";
-
-		//hack for folders which are skipped in the checkDatabase
-		go()->getDbConnection()->exec(
-			"update core_acl a inner join fs_folders f on f.acl_id = a.id set usedIn = 'fs_folders.acl_id', entityTypeId = ". \GO\Files\Model\Folder::entityType()->getId() .
-			", entityId = f.id where usedIn is null"
-		);
-
-		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where entityTypeId is null");
-
-		echo "Delete " . $deleteCount ." unused ACL's\n";
+		echo "Delete " . Acl::$lastDeleteStmt->rowCount() ." unused ACL's\n";
 
 	}
 

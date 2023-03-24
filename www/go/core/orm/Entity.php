@@ -471,6 +471,10 @@ abstract class Entity extends Property {
 	/**
 	 * Delete the entity
 	 *
+	 * The statement is kept in {@see self::$lastDeleteStmt}
+	 *
+	 * So you can get the number with self::$lastDeleteStmt->rowCount();
+	 *
 	 * @param DbQuery|Entity|array $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
 	 *  Or pass ['id' => $id];
@@ -478,6 +482,7 @@ abstract class Entity extends Property {
 	 *  Or:
 	 *
 	 *  SomeEntity::delete($instance->primaryKeyValues());
+	 *
 	 *
 	 * @return boolean
 	 * @throws Exception
