@@ -115,8 +115,6 @@ class GarbageCollection extends CronJob {
 					continue;
 				}
 
-				go()->debug("Cleaning ". $type->getName());
-
 				$cls = $type->getClassName();
 
 				if(is_a($cls,  ActiveRecord::class, true)) {
@@ -136,6 +134,8 @@ class GarbageCollection extends CronJob {
 
 					$tableName = $cls::getMapping()->getPrimaryTable()->getName();
 				}
+
+				go()->debug("Cleaning links for ". $type->getName());
 
 				$query = (new Query)->select('sub.id')->from($tableName);
 
