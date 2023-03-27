@@ -50,7 +50,7 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 
 			// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
 			if($mailer->getTransport() instanceof \GO\Email\Transport) {
-				$message->setSender($this->user->email);
+				$message->setSender(\GO::user()->email);
 			} else {
 				$message->setSender(go()->getSettings()->systemEmail);
 			}
