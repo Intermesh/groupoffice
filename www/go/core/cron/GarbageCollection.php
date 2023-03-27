@@ -152,7 +152,7 @@ class GarbageCollection extends CronJob {
 
 				go()->debug("Deleted ". $stmt->rowCount() . " links to $cls");
 			}catch(Exception $e) {
-				ErrorHandler::logException($e);
+				ErrorHandler::logException($e, "Trying to clean up links for " . $type->getName());
 			}
 
 		}
