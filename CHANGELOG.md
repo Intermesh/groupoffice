@@ -1,4 +1,5 @@
 - Caldav: Use email account for caldav invites
+- API: Fix XSS vulnerability in page.php
 
 24-03-2023: 6.6.155
 - Core: Add Hebrew language pt. 1. Thanks Elhanan!
