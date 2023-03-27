@@ -120,8 +120,20 @@ class GarbageCollection extends CronJob {
 				$cls = $type->getClassName();
 
 				if(is_a($cls,  ActiveRecord::class, true)) {
+
+					if(!$cls::model()->hasLinks()) {
+						continue;
+					}
+
 					$tableName = $cls::model()->tableName();
+
 				} else {
+
+					if(!method_exists($cls, 'hasSearch')) {
+						//without search there are no links
+						continue;
+					}
+
 					$tableName = $cls::getMapping()->getPrimaryTable()->getName();
 				}
 
