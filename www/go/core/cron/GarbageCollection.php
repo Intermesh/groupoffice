@@ -34,7 +34,7 @@ use Throwable;
  *
  * For testing:
  *
- * docker-compose exec -u www-data groupoffice-finance ./www/cli.php core/System/runCron --name='GarbageCollection'
+ * docker-compose exec -u www-data groupoffice ./www/cli.php core/System/runCron --name='GarbageCollection' --debug
  * 
  */
 class GarbageCollection extends CronJob {
