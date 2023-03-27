@@ -32,6 +32,15 @@
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
 
+
+
+- Caldav: Use email account for caldav invites
+
+24-03-2023: 6.6.155
+- Core: Add Hebrew language pt. 1. Thanks Elhanan!
+- Core: RTL support for Arabic and Hebrew
+
+17-03-2023: 6.6.154
 - Email: Prevent double tags upon saving draft messages
 - Core: updated German translations - Danke, Daniel!
 
