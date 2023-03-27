@@ -1,3 +1,6 @@
+- Core: Smaller login dialog when logout timer is enabled
+- Core: Enabled ACL Garbage Collection
+
 24-03-3023: 6.7.20
 - Email: Fixed long hang when trying to delete all attachments
 - Core: Fixed rebuild search cache error "Already active transaction"
