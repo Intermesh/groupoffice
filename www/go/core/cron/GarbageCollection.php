@@ -83,13 +83,13 @@ class GarbageCollection extends CronJob {
 	private function blobs() {
 		go()->debug("Cleaning up BLOB's");
 		Blob::delete(Blob::findStale());
-		go()->debug("Deleted " . Blob::$lastDeleteStmt->rowCount() . " stale blobs");
+		go()->debug("Deleted " . (isset(Blob::$lastDeleteStmt) ? Blob::$lastDeleteStmt->rowCount() : 0) . " stale blobs");
 	}
 
 	private function acls() {
 		go()->debug("Cleaning up ACL's");
 		Acl::delete(Acl::findStale());
-		go()->debug("Deleted " . Acl::$lastDeleteStmt->rowCount() . " stale ACL's");
+		go()->debug("Deleted " .  (isset(Acl::$lastDeleteStmt) ? Acl::$lastDeleteStmt->rowCount() : 0). " stale ACL's");
 	}
 
 	private function change() {
