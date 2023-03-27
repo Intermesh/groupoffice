@@ -5,6 +5,7 @@ namespace GO\Caldav\Schedule;
 
 
 use go\core\ErrorHandler;
+use go\core\model\Module;
 
 class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 
@@ -45,13 +46,40 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 				->addReplyTo(\GO::user()->email)
 				->addTo($to['email'], $to['personal']);
 
+			$mailer = $this->getUserMailer();
+
+			// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
+			if($mailer->getTransport() instanceof \GO\Email\Transport) {
+				$message->setSender(\GO::user()->email);
+			} else {
+				$message->setSender(go()->getSettings()->systemEmail);
+			}
+
 			$message->setBody($body, "text/calendar; method=" . (string)$this->itipMessage->method, "utf-8");
 
-			\GO\Base\Mail\Mailer::newGoInstance()->send($message);
+			$mailer->send($message);
 		} catch(\Throwable $e) {
 			ErrorHandler::log("Error sending CalDAV IMip mail to " . implode("," , $to));
 			ErrorHandler::logException($e);
 		}
+	}
+
+
+	private function getUserMailer() {
+
+		if(Module::isInstalled('legacy', 'email')) {
+			$account = \GO\Email\Model\Account::model()->findByEmail(\GO::user()->email);
+			if($account) {
+				$transport = \GO\Email\Transport::newGoInstance($account);
+				return \GO\Base\Mail\Mailer::newGoInstance($transport);
+			}
+			go()->debug("Can't find e-mail account for " . \GO::user()->email ." so will fall back on main SMTP configuration");
+
+		}
+
+		go()->debug("Using main SMTP configuration");
+
+		return \GO\Base\Mail\Mailer::newGoInstance();
 	}
 
 }

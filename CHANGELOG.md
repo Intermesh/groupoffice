@@ -1,3 +1,5 @@
+- Caldav: Use email account for caldav invites
+
 24-03-2023: 6.6.155
 - Core: Add Hebrew language pt. 1. Thanks Elhanan!
 - Core: RTL support for Arabic and Hebrew
