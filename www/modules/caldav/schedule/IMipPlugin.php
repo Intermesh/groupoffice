@@ -68,9 +68,9 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 	private function getUserMailer() {
 
 		if(Module::isInstalled('legacy', 'email')) {
-			$account = GO\Email\Model\Account::model()->findByEmail(\GO::user()->email);
+			$account = \GO\Email\Model\Account::model()->findByEmail(\GO::user()->email);
 			if($account) {
-				$transport = GO\Email\Transport::newGoInstance($account);
+				$transport = \GO\Email\Transport::newGoInstance($account);
 				return \GO\Base\Mail\Mailer::newGoInstance($transport);
 			}
 			go()->debug("Can't find e-mail account for " . \GO::user()->email ." so will fall back on main SMTP configuration");
