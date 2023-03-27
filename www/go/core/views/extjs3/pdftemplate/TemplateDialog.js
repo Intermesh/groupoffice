@@ -12,7 +12,16 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 	modal: false,
 
 	closeOnSubmit: false,
+
 	initFormItems: function () {
+
+		this.on("submit", function(dlg, success, serverId) {
+			if(success) {
+				go.Notifier.flyout({
+					description: t("Saved successfully")
+				})
+			}
+		}, this);
 
 		this.addPanel({
 			title: t("Content blocks"),

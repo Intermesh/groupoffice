@@ -166,6 +166,10 @@ class PdfTemplate extends Entity {
 		return $template;
 	}
 
+	/**
+	 * @todo Template permissions should be connected to an entity just like a comment.
+	 * @return int
+	 */
 	protected function internalGetPermissionLevel(): int
 	{
 		return Module::findById($this->moduleId)->getPermissionLevel();
