@@ -18,7 +18,10 @@
 		<testsuite name="modules">
 			<directory>./go/modules</directory>
 		</testsuite>
-		
+		<testsuite name="api">
+			<directory>./go/api</directory>
+		</testsuite>
+
 	</testsuites>
 
 	<!--	<filter>
