@@ -8,7 +8,7 @@ class Settings extends core\Settings {
 	/**
 	 * Delete history after this number of days
 	 * 
-	 * @var bool
+	 * @var int
 	 */
 	public $deleteAfterDays = 365;
 

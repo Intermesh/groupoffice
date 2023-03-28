@@ -12,10 +12,10 @@ use go\core\orm\Property;
 use go\core\util\StringUtil;
 use PDO;
 
-class Module extends Controller {
-
-
-	private function columnToPhpType(Column $column) {
+class Module extends Controller
+{
+	private function columnToPhpType(Column $column): string
+	{
 		switch ($column->dbType) {
 			case 'int':
 			case 'tinyint':
@@ -42,7 +42,8 @@ class Module extends Controller {
 		}
 	}
 
-	private function getDefaultValue($column) {
+	private function getDefaultValue($column): string
+	{
 		if (!isset($column->default)) {
 			return "";
 		}
@@ -50,7 +51,8 @@ class Module extends Controller {
 		return " = " . var_export($column->default, true);
 	}
 
-	private function createModuleFile($folder, $namespace) {
+	private function createModuleFile($folder, $namespace)
+	{
 		$moduleFile = $folder->getFile('Module.php');
 		if (!$moduleFile->exists()) {
 
@@ -64,15 +66,22 @@ namespace $namespace;
 use go\core;
 							
 /**						
- * @copyright (c) $year, Intermesh BV http://www.intermesh.nl
+ * @copyright (c) $year, Intermesh BV https://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
- * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
+ * @license https://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-class Module extends core\Module {
-							
-	public function getAuthor() {
+class Module extends core\Module 
+{							
+	public function getAuthor(): string
+	{
 		return "Intermesh BV <info@intermesh.nl>";
 	}
+
+	public function getStatus(): string
+	{
+		return self::STATUS_BETA;
+	}
+
 							
 }
 EOD;
@@ -81,77 +90,77 @@ EOD;
 		}
 	}
 
-  /**
-   * mschering@mschering-UX31A:/var/www/groupoffice-server/GO/Modules/GroupOffice/Tasks$ ../../../../bin/groupoffice devtools/module/init --tablePrefix=tasks
-   *
-   * @param $package
-   * @param $name
-   * @param type $tablePrefix
-   * @throws Exception
-   */
-	public function init($package, $name, $tablePrefix = null) {
-
-//		$className = \GO\Modules\GroupOffice\DevTools\Model\RecordTest::class;
-//		$className = \GO\Core\Users\Model\User::class;
-//		$this->convertClass($className);
-//		
-//		exit();
-
-    if($package == 'core' &&  $name == 'core') {
-      $folder = \go\core\Environment::get()->getInstallFolder()->getFolder('go/core');
-      $namespace = "go\\core";
-      $tablePrefix = "core";
-    } else {
-      $folder = \go\core\Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package . '/' . $name);
-      $folder->create();
+	/**
+	 * Initialize a new module.
+	 *
+	 * Check https://groupoffice.readthedocs.io/en/latest/developer/building-a-server-module.html for full documenation,
+	 * CLI:
+	 * $ php {PATH_TO_GROUPOFFICE}/cli.php community/dev/Module/init --package=tutorial --name=music
+	 *
+	 * @param string $package
+	 * @param string $name
+	 * @param string|null $tablePrefix
+	 * @throws Exception
+	 */
+	public function init(string $package, string $name, ?string $tablePrefix = null)
+	{
+		if ($package == 'core' && $name == 'core') {
+			$folder = \go\core\Environment::get()->getInstallFolder()->getFolder('go/core');
+			$namespace = "go\\core";
+			$tablePrefix = "core";
+		} else {
+			$folder = \go\core\Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package . '/' . $name);
+			$folder->create();
 
 
-      $folder->getFolder('model')->create();
-      $folder->getFolder('controller')->create();
-      $folder->getFolder('language')->create();
-      $folder->getFolder('install')->create();
-      $folder->getFile('install/install.sql')->touch();
-      $folder->getFile('install/uninstall.sql')->touch();
+			$folder->getFolder('model')->create();
+			$folder->getFolder('controller')->create();
+			$folder->getFolder('language')->create();
+			$folder->getFolder('install')->create();
+			$folder->getFile('install/install.sql')->touch();
+			$folder->getFile('install/uninstall.sql')->touch();
 
 
-      $updatesFile = $folder->getFile('install/updates.php');
-      if (!$updatesFile->exists()) {
-        $updatesFile->putContents("<?php\n\n\$updates = [];\n\n");
-      }
+			$updatesFile = $folder->getFile('install/updates.php');
+			if (!$updatesFile->exists()) {
+				$updatesFile->putContents("<?php\n\n\$updates = [];\n\n");
+			}
 
 
-      $this->initView($folder, $package, $name);
+			$this->initView($folder, $package, $name);
 
-      if (!isset($tablePrefix)) {
-        $tablePrefix = $folder->getName();
-      }
+			if (!isset($tablePrefix)) {
+				$tablePrefix = $folder->getName();
+			}
 
-      $namespace = "go\\modules\\" . $package . "\\" . $name;
+			$namespace = "go\\modules\\" . $package . "\\" . $name;
 
-      $this->createModuleFile($folder, $namespace);
-    }
+			$this->createModuleFile($folder, $namespace);
+		}
 
 		$result = go()->getDbConnection()->query("SHOW TABLES");
 
-		while ($record = $result->fetch(PDO::FETCH_NUM)) {			
+		while ($record = $result->fetch(PDO::FETCH_NUM)) {
 			if (strpos($record[0], $tablePrefix . '_') === 0) {
 				$this->tableToModel($folder, $namespace, $tablePrefix, $record[0]);
 			}
 		}
-		
+
 		echo "Done\n";
 	}
-	
-	private function createFile(\go\core\fs\File $file, $text) {
-		if(!$file->exists()) {
+
+	private function createFile(\go\core\fs\File $file, string $text)
+	{
+		if (!$file->exists()) {
 			$file->putContents($text);
 		}
 	}
-	
-	private function initView(Folder $folder, $package, $module) {
+
+	private function initView(Folder $folder, string $package, string $module)
+	{
 		$folder->getFolder('views/extjs3')->create();
 		$folder->getFile('views/extjs3/themes/default/style.css')->touch(true);
-		
+
 		$this->createFile($folder->getFile('views/extjs3/scripts.txt'), "Module.js\nMainPanel.js\n");
 		$moduleUCFirst = ucfirst($module);
 		$moduleJS = <<<EOD
@@ -164,32 +173,33 @@ go.Modules.register("$package", "$module", {
 
 EOD;
 		$this->createFile($folder->getFile('views/extjs3/Module.js'), $moduleJS);
-		
+
 		$mainPanelJS = <<<EOD
 go.modules.$package.$module.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	html: "Hello world"
 });
 
 EOD;
-		
+
 		$this->createFile($folder->getFile('views/extjs3/MainPanel.js'), $mainPanelJS);
-		
-		
+
+
 	}
 
 
-	private function tableToController($namespace, $modelName, Folder $folder) {
+	private function tableToController(string $namespace, string $modelName, Folder $folder)
+	{
 
 		$file = $folder->getFolder('controller')->getFile($modelName . '.php');
 
 
 		if (!$file->exists()) {
-			
+
 			echo "Generating controller/$modelName.php\n";
 
 			$replacements = [
-					'namespace' => $namespace,
-					'model' => $modelName
+				'namespace' => $namespace,
+				'model' => $modelName
 			];
 
 			$controllerTpl = file_get_contents(__DIR__ . '/../../Controller.tpl');
@@ -201,21 +211,21 @@ EOD;
 		}
 	}
 
-	private function tableToModel(Folder $folder, $namespace, $tablePrefix, $tableName)
-  {
+	private function tableToModel(Folder $folder, string $namespace, string $tablePrefix, string $tableName)
+	{
 
-    $modelName = StringUtil::upperCamelCasify(str_replace($tablePrefix . '_', '', $tableName));
-    $className = $namespace . '\\model\\' . $modelName;
-    $tableAlias = strtolower($modelName);
+		$modelName = StringUtil::upperCamelCasify(str_replace($tablePrefix . '_', '', $tableName));
+		$className = $namespace . '\\model\\' . $modelName;
+		$tableAlias = strtolower($modelName);
 
-    $file = $folder->getFolder('model')->getFile($modelName . '.php');
+		$file = $folder->getFolder('model')->getFile($modelName . '.php');
 
-    if (!$file->exists()) {
-      echo "Generating model/$modelName.php\n";
+		if (!$file->exists()) {
+			echo "Generating model/$modelName.php\n";
 
-      $year = date('Y');
+			$year = date('Y');
 
-      $data = <<<EOD
+			$data = <<<EOD
 <?php
 namespace $namespace\model;
 						
@@ -237,22 +247,22 @@ class $modelName extends Property {
 
 }
 EOD;
-      $file->putContents($data);
-    }else if (is_a($className, Entity::class, true)) {
-      $this->tableToController($namespace, $modelName, $folder);
-    }
+			$file->putContents($data);
+		} else if (is_a($className, Entity::class, true)) {
+			$this->tableToController($namespace, $modelName, $folder);
+		}
 
 
-    if (is_a($className, Property::class, true)) {
-      $this->convertClass($className, $file);
-    }
+		if (is_a($className, Property::class, true)) {
+			$this->convertClass($className, $file);
+		}
 	}
 
-	protected function convertClass($className, $file) {
-
+	protected function convertClass($className, $file)
+	{
 		$columns = [];
-		
-		foreach($className::getMapping()->getTables() as $table) {
+
+		foreach ($className::getMapping()->getTables() as $table) {
 			$columns = array_merge($columns, $table->getColumns());
 		}
 
@@ -279,17 +289,17 @@ EOD;
 
 EOD;
 		}
-		
-		if(empty($vars)) {
+
+		if (empty($vars)) {
 			return;
 		}
-		
-		echo "Updating ".$className." with new properties\n";
+
+		echo "Updating " . $className . " with new properties\n";
 
 		//find position to insert properties
-		if(!preg_match('/class .*\{\s*\n/', $source, $matches, PREG_OFFSET_CAPTURE)) {
-		  throw new \Exception();
-    }
+		if (!preg_match('/class .*\{\s*\n/', $source, $matches, PREG_OFFSET_CAPTURE)) {
+			throw new \Exception();
+		}
 		$pos = $matches[0][1] + strlen($matches[0][0]);
 
 		$source = substr($source, 0, $pos) . $vars . substr($source, $pos);
