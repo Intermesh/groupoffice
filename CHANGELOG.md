@@ -1,5 +1,7 @@
+30-03-3023: 6.7.21
 - Core: Smaller login dialog when logout timer is enabled
 - Core: Enabled ACL Garbage Collection
+- Email: Fixed bug in MIME header decode
 
 24-03-3023: 6.7.20
 - Email: Fixed long hang when trying to delete all attachments
