@@ -13,6 +13,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		Ext.apply(this, {
 			items: [{
 				xtype: "panel",
+				// id: "contactOuterPanel",
 				onLoad: function (detailView) {
 					detailView.data.jobTitle = detailView.data.jobTitle || "";
 

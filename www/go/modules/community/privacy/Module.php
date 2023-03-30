@@ -5,7 +5,9 @@ use Exception;
 use go\core;
 use go\core\model\Acl;
 use go\core\model\Group;
+use go\core\orm\Mapping;
 use go\modules\community\addressbook\model\AddressBook;
+use go\modules\community\addressbook\model\Contact;
 use go\modules\community\privacy;
 
 /**						
@@ -85,6 +87,9 @@ class Module extends core\Module
 	public function defineListeners()
 	{
 		parent::defineListeners();
+
+		Contact::on(core\orm\Property::EVENT_MAPPING, static::class, 'onContactMap');
+
 		// TODO: Contacts!
 	}
 
@@ -92,13 +97,17 @@ class Module extends core\Module
 	{
 		return privacy\model\Settings::get();
 	}
+//
+//	public function setSettings($value) {
+//		$v = $value['monitorAddressBooks'] ?? [];
+//		unset($value['monitorAddressBooks']);
+//		$value['monitorAddressBooks'] = implode(',', $v);
+//		$this->getSettings()->setValues($value);
+//		$this->change(true);
+//	}
 
-	public function setSettings($value) {
-		$v = $value['monitorAddressBooks'] ?? [];
-		unset($value['monitorAddressBooks']);
-		$value['monitorAddressBooks'] = implode(',', $v);
-		$this->getSettings()->setValues($value);
-		$this->change(true);
+	public static function onContactMap(Mapping $mapping)
+	{
+		$mapping->addHasOne('deletionDate', privacy\model\ContactDeletion::class, ['id' => 'contactId']);
 	}
-
 }
