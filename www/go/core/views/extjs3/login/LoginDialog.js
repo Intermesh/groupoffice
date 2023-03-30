@@ -11,7 +11,7 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 	minWidth : 40,
 	minHeight: 40,
 	width: dp(480),
-	height: dp(380),
+	height: GO.settings.config.logoutWhenInactive > 0 ? dp(300) : dp(356),
 	layout:'card',
 	title: t("Login required"),
 

@@ -214,6 +214,7 @@ customfields/DetailPanel.js
 customfields/EntityPanel.js
 customfields/EntityDialog.js
 customfields/SystemSettingsPanel.js
+customfields/CustomFieldRelationGrid.js
 customfields/FieldSetDialog.js
 customfields/type/Text.js
 customfields/type/TextDialog.js

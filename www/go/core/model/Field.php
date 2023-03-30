@@ -114,6 +114,11 @@ class Field extends AclItemEntity {
 	public $createdAt;
 
 	/**
+	 * @var Relation[]
+	 */
+	public $customFieldRelations = [];
+
+	/**
 	 * Hide field by default in grids
 	 *
 	 * @var bool
@@ -378,6 +383,9 @@ class Field extends AclItemEntity {
 		return parent::defineFilters()
 						->add('fieldSetId', function (Criteria $criteria, $value){
 							$criteria->andWhere(['fieldSetId' => $value]);
+						})
+						->add('type', function(Criteria $criteria, string $value){
+							$criteria->andWhere(['type' => $value]);
 						});
 	}
 

@@ -313,18 +313,10 @@ class Blob extends orm\Entity {
 	 */
 	protected static function internalDelete(Query $query): bool
 	{
-
 		$ids = [];
 		$paths = [];
 
-		// debug disappearing blobs
-		go()->getDebugger()->enable(true);
-
-		go()->debug("BLOB GC");
-
 		$blobs = Blob::find()->mergeWith($query);
-
-		go()->debug($blobs);
 
 		foreach($blobs as $blob) {
 			if($blob->id != go()->getSettings()->logoId) {
@@ -338,14 +330,8 @@ class Blob extends orm\Entity {
 			return true;
 		}
 
-
-
-		go()->debug($query);
-		go()->debug($ids);
-
 		//for performance use Id's gathered above
 		$justIds = (new Query)->where(['id' => $ids]);
-		
 		if(parent::internalDelete($justIds)) {
 
 			foreach($paths as $path) {
@@ -360,20 +346,6 @@ class Blob extends orm\Entity {
 		
 		return false;
 	}
-	
-	// private $deleteHard = false;
-	
-	// /**
-	//  * Delete without checking isUsed()
-	//  * 
-	//  * It will throw an PDOException if you call this when it's in use.
-	//  * 
-	//  * @return true
-	//  */
-	// public function hardDelete() {
-	// 	$this->deleteHard = true;
-	// 	return $this->delete();
-	// }
 
 	/**
 	 * Return file system path of blob data

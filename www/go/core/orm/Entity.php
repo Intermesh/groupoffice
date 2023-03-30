@@ -116,7 +116,7 @@ abstract class Entity extends Property {
 	/**
 	 * Fires when filtering on permission level.
 	 *
-	 * Normal behaviour can be overriden by returning false in your listener.
+	 * Normal behaviour can be overridden by returning false in your listener.
 	 *
 	 * @param Criteria $criteria
 	 * @param int $value
@@ -433,22 +433,12 @@ abstract class Entity extends Property {
 		return true;
 	}
 
-	// private $isDeleting = false;
-
-	// /**
-	//  * Check if this entity is being deleted.
-	//  * 
-	//  * @return bool
-	//  */
-	// public function isDeleting() {
-	// 	return $this->isDeleting;
-	// }
-
 	/**
 	 * Normalize a query value passed to delete()
 	 *
 	 * @param mixed $query
 	 * @return Query
+	 * @throws Exception
 	 */
 	protected static function normalizeDeleteQuery($query): Query
 	{
@@ -596,7 +586,8 @@ abstract class Entity extends Property {
 	 * @todo make final but there's a backwards compatibility override in model/Module.php
 	 * @return int
 	 */
-	public function getPermissionLevel() {
+	public function getPermissionLevel(): int
+	{
 
 		$permissionLevel = static::fireEvent(self::EVENT_PERMISSION_LEVEL, $this);
 
@@ -888,9 +879,18 @@ abstract class Entity extends Property {
 			$query->groupBy([$query->getTableAlias() . '.id']);
 		});
 
+		$filters->add("customrelations", function(Criteria $criteria, $value, Query $query) {
+			$cfRelationAlias = 'relation_' . uniqid();
+			$on =  $cfRelationAlias .'entityTypeId=' . static::entityType()->getId();
+			$query->join('core_customfields_relation', $cfRelationAlias,$on, 'LEFT');
+			if (!empty($value['id'])) {
+				$criteria->andWhere('entityId', '=', $value['id']);
+			}
+			$query->groupBy([$query->getTableAlias() . '.id']);
+		});
+
 		static::fireEvent(self::EVENT_FILTER, $filters);
-		
-		
+
 		return $filters;
 	}
 

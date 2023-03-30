@@ -19,7 +19,8 @@ class Select extends Base {
 		return "int(11) DEFAULT " . $d;
 	}
 
-	public function getOptions() {
+	public function getOptions(): array
+	{
 		return $this->internalGetOptions();
 	}
 
@@ -29,12 +30,13 @@ class Select extends Base {
 		$this->options = $options;
 	}
 
-	public function isModified()
+	public function isModified(): bool
 	{
 		return isset($this->options);
 	}
 
-	protected function internalGetOptions($parentId = null) {
+	protected function internalGetOptions($parentId = null): array
+	{
 		$options = (new Query())
 										->select("*")
 										->from('core_customfields_select_option')
@@ -50,7 +52,8 @@ class Select extends Base {
 		return $options;		
 	}
 
-	public function onFieldSave() {
+	public function onFieldSave(): bool
+	{
 
 		if ($this->field->isModified('databaseName') && !$this->field->isNew()) {
 			$this->dropConstraint();
@@ -80,7 +83,7 @@ class Select extends Base {
 		return go()->getDbConnection()->exec($sql);
 	}
 
-	private function getConstraintName()
+	private function getConstraintName(): string
 	{
 		$strName = $this->field->tableName() . "_ibfk_go_" . $this->field->id;
 		if (strlen($strName) > 64) { // Constraint names are restricted to 64 characters!
@@ -174,14 +177,15 @@ class Select extends Base {
 		}
 	}
 	
-	public function onFieldDelete() {		
+	public function onFieldDelete(): bool
+	{
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
 
 		try {
-      go()->getDbConnection()->query($sql);
-    }catch (Exception $e) {
-		  ErrorHandler::logException($e);
-		  //ignore so we can continue with delete
+            go()->getDbConnection()->query($sql);
+        }catch (Exception $e) {
+			ErrorHandler::logException($e);
+			//ignore so we can continue with delete
 		}
 			
 		return parent::onFieldDelete();
@@ -191,7 +195,7 @@ class Select extends Base {
 	 * Defines an entity filter for this field.
 	 * 
 	 * @see Entity::defineFilters()
-	 * @param Filters $filter
+	 * @param Filters $filters
 	 */
 	public function defineFilter(Filters $filters) {
 		

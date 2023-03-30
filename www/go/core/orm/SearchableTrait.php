@@ -18,6 +18,22 @@ use function go;
 trait SearchableTrait {
 
 	public static $updateSearch = true;
+
+	/**
+	 * Function to determine if entities have search capabilities
+	 *
+	 * @example
+	 * ```
+	 * if(method_exists($entity, 'hasSearch')) {
+	 *
+	 *    //do something
+	 * }
+	 * ``
+	 * @return bool
+	 */
+	public function hasSearch() : bool {
+		return true;
+	}
 	
 	/**
 	 * The description in the search results

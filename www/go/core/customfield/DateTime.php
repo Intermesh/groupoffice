@@ -14,7 +14,8 @@ class DateTime extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		$d = $this->field->getDefault();
 		$d = isset($d) && $d != "" ? go()->getDbConnection()->getPDO()->quote((new util\DateTime($d))->format('Y-m-d H:i')) : "NULL";
 		return "DATETIME DEFAULT " . $d;

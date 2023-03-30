@@ -8,7 +8,8 @@ class TextArea extends Base {
 	 * 
 	 * @return string
 	 */
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		return "TEXT NULL";
 	}
 	

@@ -167,28 +167,6 @@ class Token extends Entity {
 		return false;
 	}
 
-//	/**
-//	 * Set an authentication method to completed and add it to the
-//	 * "completedAuth" property
-//	 *
-//	 * @param int $authId
-//	 * @param boolean $lastAuth
-//	 * @return boolean save success
-//	 * @throws Exception
-//	 */
-//	public function authCompleted($authId, $lastAuth=false): bool
-//	{
-//		$auths = explode(',',$this->completedAuth);
-//		$auths[] = $authId;
-//		$this->completedAuth = implode(',',$auths);
-//
-//		if($lastAuth){
-//			return $this->refresh();
-//		}
-//
-//		return $this->save();
-//	}
-//
 	private function setClient() {
 		if(isset($_SERVER['REMOTE_ADDR'])) {
 			$this->remoteIpAddress = $_SERVER['REMOTE_ADDR'];
@@ -517,7 +495,6 @@ class Token extends Entity {
 		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
 
 		foreach($deleteQuery as $accessToken) {
-			go()->debug("Deleting token: " . $accessToken);
 			go()->getCache()->delete('token-' . $accessToken);
 		}
 
@@ -534,14 +511,8 @@ class Token extends Entity {
 	 */
 	public function getClassRights(string $cls): stdClass
 	{
-		//if(!isset($this->classRights[$cls])) {
-			$mod = Module::findByClass($cls, ['id', 'name', 'package']);
-			return  $mod->getUserRights();
-//			$this->classRights[$cls]= $mod->getUserRights();
-//			go()->getCache()->set('token-'.$this->accessToken,$this);
-		//}
-
-		//return $this->classRights[$cls];
+		$mod = Module::findByClass($cls, ['id', 'name', 'package']);
+		return  $mod->getUserRights();
 	}
 
 
