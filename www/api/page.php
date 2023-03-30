@@ -6,75 +6,93 @@
  * /api/page.php/$PACKAGE/$MODULENAME/$CONTROLLER/$METHOD
  *
  * eg. /api/page.php/nuw/projectsdsgvo/answer/accept
- * 
- * 
+ *
+ *
  */
-use go\core\fs\Blob;
+
 use go\core\App;
-use go\core\jmap\State;
+use go\core\ErrorHandler;
+use go\core\fs\Blob;
+use go\core\http\Request;
+use go\core\http\Response;
 use go\core\util\StringUtil;
 
 require("../vendor/autoload.php");
 App::get();
 
-/**
- * DRY wrapper for XSS stuff
- *
- * If it looks ugly but it works, it works.
- *
- * @param string $s : string to check for bad XSS stuff
- * @throws Exception
- */
-function doDetectXss(string $s)
-{
-	if (StringUtil::detectXSS($s)) {
+
+//Only allow words in controller and method
+function checkPathInput(string $path) {
+	if(preg_match("/[^a-z0-9\/_]/i", $path)) {
 		http_response_code(400);
-		exit("Bad request");
+		exit("Bad request, only alpha numeric _/ characters are allowed in the path.");
 	}
 }
 
-
-if(strpos($_SERVER['PATH_INFO'], '/') === false) {
-
-  $blob = Blob::findById(App::get()->getSettings()->logoId);
-
-  if (!$blob) {
-    echo "Not found";
-    http_response_code(404);
-    exit();
-  }
-
-  $blob->output();	
+if (Request::get()->getMethod() == 'OPTIONS') {
+	Response::get()->output();
+	exit();
 }
 
-$parts = explode("/", $_SERVER['PATH_INFO']);
-array_shift($parts);
-$package = array_shift($parts);
-doDetectXss($package);
+try {
 
-if($package == "core") {
-	$c = go();
-	$method = "page" . array_shift($parts);
-} else {
-	$module = array_shift($parts);
-	doDetectXss($module);
-	$method = "page" . array_shift($parts);
-	//left over are params
+	Response::get()->sendDocumentSecurityHeaders();
 
-	$ctrlCls = "go\\modules\\" . $package . "\\". $module . "\\Module";
-	if(!class_exists($ctrlCls)) {
-		http_response_code(404);	
-		exit("Controller class '$ctrlCls' not found");
+	if (strpos($_SERVER['PATH_INFO'], '/') === false) {
+
+		$blob = Blob::findById(App::get()->getSettings()->logoId);
+
+		if (!$blob) {
+			echo "Not found";
+			http_response_code(404);
+			exit();
+		}
+
+		$blob->output();
 	}
-	
-	$c = $ctrlCls::get();
+
+	$parts = explode("/", $_SERVER['PATH_INFO']);
+	array_shift($parts);
+	$package = array_shift($parts);
+
+	if ($package == "core") {
+		$c = go();
+
+		$ctrlCls = App::class;
+		$method = "page" . array_shift($parts);
+	} else {
+		$module = array_shift($parts);
+		$method = "page" . array_shift($parts);
+
+		//left over are params
+		$ctrlCls = "go\\modules\\" . $package . "\\" . $module . "\\Module";
+
+		checkPathInput($ctrlCls);
+
+		if (!class_exists($ctrlCls)) {
+			http_response_code(404);
+			exit("Class '$ctrlCls' not found");
+		}
+
+		$c = $ctrlCls::get();
+	}
+
+	checkPathInput($method);
+
+	if (!method_exists($c, $method)) {
+		http_response_code(404);
+		exit("method '$method' not found in '$ctrlCls'");
+	}
+
+	call_user_func_array([$c, $method], $parts);
+
+} catch (Exception $e) {
+	ErrorHandler::logException($e);
+	Response::get()->setStatus(500);
+	Response::get()->setContentType("text/plain");
+	Response::get()->output($e->getMessage());
+
+	if(go()->getDebugger()->enabled) {
+		go()->getDebugger()->printEntries();
+	}
 }
-
-doDetectXss($method);
-
-if(!method_exists($c, $method)) {
-	http_response_code(404);	
-	exit("Controller method '$method' not found");
-}
-
-call_user_func_array([$c, $method], $parts);
