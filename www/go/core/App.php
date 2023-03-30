@@ -1044,9 +1044,7 @@ namespace go\core {
 		{
 			//one legacy model that needs checking
 			$stmt = GO\Base\Model\Template::model()->find(['ignoreAcl'=>true]);
-			while($stmt->rowCount()) {
-				$stmt->callOnEach('checkAcl', true);
-			}
+			$stmt->callOnEach('checkAcl', true);
 
 			return parent::checkAcls();
 		}

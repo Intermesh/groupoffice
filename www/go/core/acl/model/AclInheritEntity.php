@@ -88,31 +88,6 @@ abstract class AclInheritEntity extends AclOwnerEntity {
 		return $aclEntity;
 	}
 
-
-	/**
-	 *
-	 * @param Query $query
-	 * @return array
-	 * @throws Exception
-	 */
-	protected static function getAclsToDelete(Query $query) : array {
-
-		if(!empty(self::$keepAcls[static::class])) {
-			return [];
-		}
-
-		// Delete only overriden acl's
-		$q = clone $query;
-		$ownerAclAlias = static::joinAclEntity($q);
-
-		$q->groupWhere()->where($query->getTableAlias() . '.' .static::$aclColumnName . " != " . $ownerAclAlias );
-
-		$q->select($query->getTableAlias() . '.' . static::$aclColumnName);
-
-		return $q->all();
-
-	}
-
 	protected function saveAcl()
 	{
 		if(!isset($this->setAcl)) {

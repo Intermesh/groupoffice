@@ -1,4 +1,8 @@
+24-03-3023: 6.7.20
 - Email: Fixed long hang when trying to delete all attachments
+- Core: Fixed rebuild search cache error "Already active transaction"
+- Core: ACL's are not deleted immediately but collected by garbage collection (not active yet)
+- Projects2: Disable 'Invoice' button when permission level insufficient
 
 17-03-2023: 6.7.19
 - OnlyOffice: Was broken becaue of Firebase/JWT upgrade

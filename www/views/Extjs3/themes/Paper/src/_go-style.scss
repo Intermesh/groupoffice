@@ -828,6 +828,7 @@ button {
 	}
 
 	.go-detail-view & {
+		margin-top: dp(8);
 		margin-right: dp(8);
 	}
 
@@ -1290,7 +1291,7 @@ button.filetype-pdf, button.filetype-doc {
 		padding-left: dp(16);
 		padding-right: dp(16);
 	}
-    * { overflow:hidden;}
+    //* { overflow:hidden;} // messes up comments arrow and avatar with name on support
 
 	label {
 		@extend %font-caption;
@@ -2120,7 +2121,7 @@ table[id^="comments-ext"] b {
 			//position:absolute;
 			//top: 0;
 			margin-top:0 !important;
-			margin-right: dp(16);
+			margin-right: dp(16) !important;
 			float: left;
 			text-align: center;
 			&:after {
@@ -2130,7 +2131,7 @@ table[id^="comments-ext"] b {
 				top: dp(12);
 				width: 0; height: 0;
 				border: 0;
-				border-right: dp(16) solid color($bg, 'box');
+				border-right: dp(16) solid color($bg, 'card');
 				border-bottom: dp(16) solid transparent;
 			}
 			&.mine {

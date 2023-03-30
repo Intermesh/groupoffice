@@ -396,6 +396,51 @@ class Table {
 		return $this->pk;
 	}
 
+
+	/**
+	 * Get all table columns referencing the core_blob.id column.
+	 *
+	 * It uses the 'information_schema' to read all foreign key relations.
+	 * So it's important that every blob is saved in a column with a 'RESTRICT'
+	 * foreign key relation to core_blob.id. For example:
+	 *
+	 * ```
+	 * ALTER TABLE `addressbook_contact`
+	 *    ADD CONSTRAINT `addressbook_contact_ibfk_2` FOREIGN KEY (`photoBlobId`) REFERENCES `core_blob` (`id`);
+	 * ```
+	 * @link https://groupoffice-developer.readthedocs.io/en/latest/blob.html
+	 * @return array [['table'=>'foo', 'column' => 'blobId']]
+	 */
+	public function getReferences(string $key = 'id'): array
+	{
+
+		$cacheKey = "table-refs-" . $this->getName();
+		$refs = go()->getCache()->get($cacheKey);
+		if($refs === null) {
+			$dbName = go()->getDatabase()->getName();
+			go()->getDbConnection()->exec("USE information_schema");
+
+
+			try {
+				//somehow bindvalue didn't work here
+				/** @noinspection SqlResolve */
+				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
+					"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . " AND ".
+					"referenced_table_name=" . go()->getDbConnection()->getPDO()->quote($this->getName()) . " and referenced_column_name = " .  go()->getDbConnection()->getPDO()->quote($key);
+
+				$stmt = go()->getDbConnection()->query($sql);
+				$refs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			}
+			finally{
+				go()->getDbConnection()->exec("USE `" . $dbName . "`");
+			}
+
+			go()->getCache()->set($cacheKey, $refs);
+		}
+
+		return $refs;
+	}
+
 	// Only works from php 7.4 and up
 //	public function __serialize()
 //	{

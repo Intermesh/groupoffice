@@ -164,7 +164,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 		const percentComplete = new Ext.form.SliderField({
 			fieldLabel: t("Percent complete"),
-			flex: 1,
 			name: 'percentComplete',
 			minValue: 0,
 			maxValue: 100,

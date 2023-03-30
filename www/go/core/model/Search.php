@@ -44,6 +44,9 @@ class Search extends AclOwnerEntity {
 
 		return parent::check();
 	}
+	public static function checkAcls() {
+		// do nothing for search
+	}
 
 	/**
 	 * Prepares the query for a search
