@@ -15,17 +15,16 @@ modules.register(  {
 				return;
 			}
 
-			let notes: Main;
+			let notes: Main = new Main();
 
 			router.add(/^goui-notes\/(\d+)$/, (noteId) => {
 				modules.openMainPanel("goui-notes");
 				notes.showNote(parseInt(noteId));
 			});
-			
+
 			modules.addMainPanel("community", "goui","goui-notes", "GOUI Notes", () => {
 
 				//this will lazy load Notes when module panel is opened.
-				notes = new Main();
 				return notes;
 			});
 		});
