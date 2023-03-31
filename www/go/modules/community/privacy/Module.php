@@ -6,6 +6,7 @@ use go\core;
 use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\orm\Mapping;
+use go\core\orm\Query;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\privacy;
@@ -50,7 +51,7 @@ class Module extends core\Module
 		if(!$incomingAB) {
 			$incomingAB = new AddressBook();
 			$incomingAB->setValues(['name' => go()->t('Incoming')]);
-			$trashAB->setAcl([
+			$incomingAB->setAcl([
 				Group::ID_INTERNAL => Acl::LEVEL_DELETE
 			]);
 			$incomingAB->save();
@@ -89,6 +90,7 @@ class Module extends core\Module
 		parent::defineListeners();
 
 		Contact::on(core\orm\Property::EVENT_MAPPING, static::class, 'onContactMap');
+		Contact::on(core\orm\Entity::EVENT_BEFORE_SAVE, static::class, 'onContactBeforeSave');
 
 		// TODO: Contacts!
 	}
@@ -97,17 +99,55 @@ class Module extends core\Module
 	{
 		return privacy\model\Settings::get();
 	}
-//
-//	public function setSettings($value) {
-//		$v = $value['monitorAddressBooks'] ?? [];
-//		unset($value['monitorAddressBooks']);
-//		$value['monitorAddressBooks'] = implode(',', $v);
-//		$this->getSettings()->setValues($value);
-//		$this->change(true);
-//	}
 
+	/**
+	 *
+	 * @param Mapping $mapping
+	 * @return void
+	 * @throws Exception
+	 */
 	public static function onContactMap(Mapping $mapping)
 	{
+		// Get settings first
+//		$settings = privacy\model\Settings::get();
+//		$dt = new core\util\DateTime();
+//		$trashAfterXMonths = $settings->trashAfterXMonths;
+//		$gracePeriod = $settings->warnXDaysBeforeDeletion;
+//
+//		$dt->sub(new \DateInterval("P".$trashAfterXMonths."M"))
+//			->add(new \DateInterval("P".$gracePeriod."D"));
+//
 		$mapping->addHasOne('deletionDate', privacy\model\ContactDeletion::class, ['id' => 'contactId']);
+//			->addQuery((new Query())
+//				->select('IF (c.createdAt <="'.$dt.'" AND c.addressbookId IN ('.$settings->monitorAddressBooks.'), 1,0) AS showExpirationWarning')
+//			);
+	}
+
+	/**
+	 * Before a new contact is saved, move it to the "Incoming" address book.
+	 *
+	 * @param Contact $contact
+	 * @return bool
+	 * @throws Exception
+	 */
+	public static function onContactBeforeSave(Contact $contact): bool
+	{
+		if ($contact->isNew()) {
+			$settings = privacy\model\Settings::get();
+			$arABs = explode(',', $settings->monitorAddressBooks );
+			if (!count($arABs)) {
+				throw new Exception("Privacy settings incomplete");
+			}
+
+			$incomingAB = AddressBook::find()->where(['name' => go()->t('Incoming')])->single();
+			if (!$incomingAB || !in_array($incomingAB->id, $arABs)) {
+				$tgtAddressBookId = $arABs[0];
+			} else {
+				$tgtAddressBookId = $incomingAB->id;
+			}
+
+			$contact->addressBookId = $tgtAddressBookId;
+		}
+		return true;
 	}
 }

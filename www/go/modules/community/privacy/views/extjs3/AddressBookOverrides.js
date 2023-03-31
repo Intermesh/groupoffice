@@ -1,12 +1,13 @@
 GO.moduleManager.onModuleReady('addressbook',function() {
 	Ext.override(go.modules.community.addressbook.ContactDetail, {
 		initComponent: go.modules.community.addressbook.ContactDetail.prototype.initComponent.createSequence(function () {
-			// TODO: Display warning when a contact is to be removed
+			this.deleteInXDays = -1;
 			this.privacyPanel = new Ext.Panel({
 				title: t("Privacy"),
+				hidden: true,
 				onLoad: (detailView) => {
 					this.privacyPanel.hide();
-					if(detailView.data.deletionDate) {
+					if(detailView.data.deletionDate || this.deleteInXDays > -1) {
 						this.privacyPanel.show();
 					}
 				},
@@ -18,9 +19,52 @@ GO.moduleManager.onModuleReady('addressbook',function() {
 					'</p>'+
 					'</div>'
 			})
-
+			this.deletionPanel = new Ext.Panel({
+				hidden: true,
+				cls: "go-message-panel",
+				html: "<i class='icon danger'>warning</i> " + t("This contact is inactive and will be moved to trash in {x} days.").replace("{x}", this.deleteInXDays),
+				onLoad: (dv) => {
+					this.deletionPanel.hide();
+					if(this.deleteInXDays > -1) {
+						this.deletionPanel.update({
+							html: "<i class='icon danger'>warning</i> " +
+								t("This contact is inactive and will be moved to trash in {x} days.").
+								replace("{x}", this.deleteInXDays),
+						});
+						this.deletionPanel.show();
+					}
+				}
+			});
 			this.insert(2, this.privacyPanel);
-		})
+			this.insert(0, this.deletionPanel);
+		}),
+
+		onLoad: function () {
+			this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
+
+			this.deleteInXDays = -1;
+			const module = go.Modules.get("community", "privacy"), settings = module.settings,
+				arAbs = settings.monitorAddressBooks.split(",").map(x => parseInt(x)),
+				today = new Date();
+			let referenceDate, deletionDate;
+
+			// First check whether there is an explicit deletion date
+			if (this.data.deletionDate && this.data.deletionDate.deleteAt && this.data.addressBookId !== settings.trashAddressBook) {
+				deletionDate = new Date(this.data.deletionDate.deleteAt);
+			} else if (arAbs.indexOf(this.data.addressBookId) > -1) {
+				// Otherwise, check whether contact is in one of the monitored address book and should be deleted
+				deletionDate = new Date(this.data.createdAt).add(Date.MONTH, settings.trashAfterXMonths);
+			}
+			if (deletionDate) {
+				referenceDate = deletionDate.add(Date.DAY, (0 - settings.warnXDaysBeforeDeletion))
+				if (referenceDate <= today) {
+					this.deleteInXDays = deletionDate.calculateDaysBetweenDates(today);
+				}
+			}
+			go.modules.community.addressbook.ContactDetail.superclass.onLoad.call(this);
+
+		},
+
 	});
 
 	Ext.override(go.modules.community.addressbook.ContactDialog, {
@@ -37,7 +81,7 @@ GO.moduleManager.onModuleReady('addressbook',function() {
 				})],
 				title: t("Privacy")
 			});
-			this.mainPanel.insert(1,this.privacyFieldset);
+			this.mainPanel.insert(1, this.privacyFieldset);
 		})
 	});
 });
