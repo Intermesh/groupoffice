@@ -23,7 +23,7 @@ App::get();
 
 //Only allow words in controller and method
 function checkPathInput(string $path) {
-	if(preg_match("/[^a-z0-9\/_]/i", $path)) {
+	if(preg_match("/[^a-z0-9\/\\\_]/i", $path, $matches)) {
 		http_response_code(400);
 		exit("Bad request, only alpha numeric _/ characters are allowed in the path.");
 	}
