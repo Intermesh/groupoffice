@@ -6,7 +6,6 @@ use go\core;
 use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\orm\Mapping;
-use go\core\orm\Query;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\privacy;
@@ -16,7 +15,7 @@ use go\modules\community\privacy;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-class Module extends core\Module
+final class Module extends core\Module
 {
 
 	public function getAuthor(): string
@@ -35,6 +34,8 @@ class Module extends core\Module
 	 */
 	protected function afterInstall(core\model\Module $model): bool
 	{
+		cron\TrashContacts::install("45 0 * * *");
+
 		// Create a 'Trash' address book for only admins
 		$trashAB = AddressBook::find()->where(['name' => go()->t('Trash')])->single();
 		if(!$trashAB) {
@@ -108,19 +109,7 @@ class Module extends core\Module
 	 */
 	public static function onContactMap(Mapping $mapping)
 	{
-		// Get settings first
-//		$settings = privacy\model\Settings::get();
-//		$dt = new core\util\DateTime();
-//		$trashAfterXMonths = $settings->trashAfterXMonths;
-//		$gracePeriod = $settings->warnXDaysBeforeDeletion;
-//
-//		$dt->sub(new \DateInterval("P".$trashAfterXMonths."M"))
-//			->add(new \DateInterval("P".$gracePeriod."D"));
-//
 		$mapping->addHasOne('deletionDate', privacy\model\ContactDeletion::class, ['id' => 'contactId']);
-//			->addQuery((new Query())
-//				->select('IF (c.createdAt <="'.$dt.'" AND c.addressbookId IN ('.$settings->monitorAddressBooks.'), 1,0) AS showExpirationWarning')
-//			);
 	}
 
 	/**

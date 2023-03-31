@@ -5,9 +5,8 @@ namespace go\modules\community\privacy\model;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\util\DateTime;
-use go\modules\community\addressbook\model\Contact;
 
-class ContactDeletion extends Property
+final class ContactDeletion extends Property
 {
 
 	/**

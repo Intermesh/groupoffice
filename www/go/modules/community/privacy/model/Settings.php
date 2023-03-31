@@ -5,7 +5,7 @@ namespace go\modules\community\privacy\model;
 use go\core;
 use go\core\orm\Mapping;
 
-class Settings extends core\SettingsEntity
+final class Settings extends core\SettingsEntity
 {
 	protected $id = 1;
 	public $warnXDaysBeforeDeletion;
