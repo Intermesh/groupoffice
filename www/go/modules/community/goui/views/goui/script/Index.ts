@@ -1,7 +1,6 @@
-import {modules} from "@go-core/Modules.js";
+import {modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {router} from "@go-core/Router.js";
-import {client} from "@goui/jmap/Client.js";
+import {client} from "@intermesh/goui";
 
 modules.register(  {
 	package: "community",
@@ -22,8 +21,8 @@ modules.register(  {
 				modules.openMainPanel("goui-notes");
 				notes.showNote(parseInt(noteId));
 			});
-
-			modules.addMainPanel("goui-notes", "GOUI Notes", () => {
+			
+			modules.addMainPanel("community", "goui","goui-notes", "GOUI Notes", () => {
 
 				//this will lazy load Notes when module panel is opened.
 				notes = new Main();

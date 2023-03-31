@@ -1,21 +1,13 @@
-
 import {NoteDialog} from "./NoteDialog.js";
-import {Table} from "@goui/component/table/Table.js";
-import {JmapStore, jmapstore} from "@goui/jmap/JmapStore.js";
-import {t} from "@goui/Translate.js";
-import {column, datetimecolumn} from "@goui/component/table/TableColumns.js";
+import {column, datasourcestore, datetimecolumn, JmapDataSource, t, Table, DataSourceStore} from "@intermesh/goui";
 
-export interface NoteGrid {
-	store: JmapStore
-}
-
-export class NoteGrid extends Table {
+export class NoteGrid extends Table<DataSourceStore> {
 
 	constructor() {
 
 		super(
-			jmapstore({
-				entity: "Note",
+			datasourcestore({
+				dataSource: JmapDataSource.store("Note"),
 				sort: [{
 					property: "name"
 				}]

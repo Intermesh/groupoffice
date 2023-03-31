@@ -1,20 +1,24 @@
-
 import {NoteDialog} from "./NoteDialog.js";
-import {btn, Button} from "@goui/component/Button.js";
-import {Entity} from "@goui/jmap/EntityStore.js";
-import {tbar, Toolbar} from "@goui/component/Toolbar.js";
-import {t} from "@goui/Translate.js";
-import {client} from "@goui/jmap/Client.js";
-import {Window} from "@goui/component/Window.js";
-import {Image} from "@goui/jmap/Image.js";
-import {comp, Component} from "@goui/component/Component.js";
-import {FunctionUtil} from "@goui/util/FunctionUtil.js";
+import {
+	btn,
+	Button,
+	JmapDataSource,
+	comp,
+	Component,
+	DefaultEntity,
+	FunctionUtil,
+	Image,
+	t,
+	tbar,
+	Toolbar,
+	Window
+} from "@intermesh/goui";
 
 
 export class NoteDetail extends Component {
 	private titleCmp!: Component;
 	private editBtn!: Button;
-	private entity?: Entity;
+	private entity?: DefaultEntity;
 	private content: Component;
 	private scroller: Component;
 	private detailView: any;
@@ -71,7 +75,7 @@ export class NoteDetail extends Component {
 				title: t("Edit"),
 				handler: (button, ev) => {
 					const dlg = new NoteDialog();
-					dlg.load(this.entity!.id);
+					void dlg.load(this.entity!.id);
 					dlg.show();
 				}
 			})
@@ -88,7 +92,11 @@ export class NoteDetail extends Component {
 		this.mask();
 
 		try {
-			this.entity = await client.store("Note").single(id);
+			this.entity = await JmapDataSource.store("Note").single(id);
+
+			if(!this.entity) {
+				throw "notfound";
+			}
 
 			this.title = this.entity.name;
 

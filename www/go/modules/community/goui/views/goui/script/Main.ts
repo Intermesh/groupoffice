@@ -1,16 +1,16 @@
-import {comp, Component} from "@goui/component/Component.js";
-import {splitter} from "@goui/component/Splitter.js";
-import {tbar} from "@goui/component/Toolbar.js";
-import {btn} from "@goui/component/Button.js";
-import {checkboxselectcolumn, column} from "@goui/component/table/TableColumns.js";
-import {StoreRecord} from "@goui/data/Store.js";
+import {comp, Component} from "@intermesh/goui";
+import {splitter} from "@intermesh/goui";
+import {tbar} from "@intermesh/goui";
+import {btn} from "@intermesh/goui";
+import {checkboxselectcolumn, column} from "@intermesh/goui";
+import {StoreRecord} from "@intermesh/goui";
 
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
-import {router} from "@goui/Router.js";
-import {t} from "@goui/Translate.js";
+import {router} from "@intermesh/goui";
+import {t} from "@intermesh/goui";
 
 
 export class Main extends Component {
