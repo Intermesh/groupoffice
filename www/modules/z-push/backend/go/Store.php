@@ -1,6 +1,6 @@
 <?php
 
-class GoBaseBackendDiff extends \BackendDiff {
+abstract class Store extends \BackendDiff {
 	
 	protected $_server_delimiter;
 	private static $_account=false;
@@ -34,26 +34,6 @@ class GoBaseBackendDiff extends \BackendDiff {
 			}
 		}
 		return self::$_account;
-	}
-	
-	/**
-	 * Get the folder ID of the imap trash folder
-	 * 
-	 * @return StringHelper
-	 */
-	public function getImapTrashFolderId(){
-		$imapAccount = $this->getImapAccount();
-		return $imapAccount ? $imapAccount->trash : false;
-	}
-	
-	/**
-	 * Get the folder ID of the imap sent items folder
-	 * 
-	 * @return StringHelper
-	 */
-	public function getImapSentFolderId(){
-		$imapAccount = $this->getImapAccount();
-		return $imapAccount ? $imapAccount->sent : false;
 	}
 		
 	/**
@@ -91,8 +71,8 @@ class GoBaseBackendDiff extends \BackendDiff {
 	/**
 	 * Modify the folderid string so it will use the correct server delimiter
 	 * 
-	 * @param StringHelper $folderid
-	 * @return StringHelper
+	 * @param string $folderid
+	 * @return string
 	 */
 	protected function _replaceDotWithServerDelimiter($folderid) {
 		return str_replace('.', $this->_getServerDelimiter(), $folderid);
@@ -101,7 +81,7 @@ class GoBaseBackendDiff extends \BackendDiff {
 	/**
 	 * Get the server delimiter of the imap server
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	protected function _getServerDelimiter() {
 		if (!$this->_server_delimiter) {
@@ -117,85 +97,61 @@ class GoBaseBackendDiff extends \BackendDiff {
 	/**
 	 * Get the stat of the folder with the given id
 	 * 
-	 * @param StringHelper $id
+	 * @param string $id
 	 * @return array
 	 */
 	public function StatFolder($id) {
 		$folder = $this->GetFolder($id);
 		if(!$folder) {
-			ZLog::Write(LOGLEVEL_DEBUG, "Calendar with $id could not be found");
-
+			ZLog::Write(LOGLEVEL_DEBUG, "Folder with id $id could not be found");
 			return false;
 		}
-		$stat = array();
-		$stat['id'] = $id;
-		$stat['parent'] = $folder->parentid;
-		$stat['mod'] = $folder->displayname ;
 		ZLog::Write(LOGLEVEL_DEBUG, 'ZPUSH2::StatFolder('.$id.')');
-		return $stat;
-	}
-		
-	/**
-	 * Get the folder
-	 * 
-	 * ** THIS FUNCTION NEEDS TO BE OVERRIDDEN BY BACKENDS THAT EXTEND FROM THIS BACKEND **
-	 * 
-	 * @param StringHelper $id
-	 * @return boolean
-	 */
-	public function GetFolder($id) {
-		return false;
-	}
-	
-	
-	
-	public function GetMessage($folderid, $id, $contentparameters) {
-		return false;
+		return [
+			'id' => $id,
+			'parent' => $folder->parentid,
+			'mod' => $folder->displayname
+		];
 	}
 
-	public function ChangeMessage($folderid, $id, $message, $contentParameters) {
-		return false;
-	}
-	
-	public function StatMessage($folderid, $id) {
-		return false;
-	}
-
-	public function GetMessageList($folderid, $cutoffdate) {
-		return false;
-	}
-	
-	public function GetFolderList() {
-		return false;
-	}
-	
 	/**
-	 * Login function
-	 * 
-	 * This function is a dummy one, 
+	 * This function is a dummy one,
 	 * the login process is already been handled in the go.php file.
-	 * 
-	 * @param StringHelper $username
-	 * @param StringHelper $domain
-	 * @param StringHelper $password
-	 * @return boolean
 	 */
 	public function Logon($username, $domain, $password){
 		return true;
 	}
-	
-	/**
-	 * Logout function
-	 * 
-	 * This function is a dummy one,
-	 * the logout process is already been handled in the go.php file.
-	 * 
-	 * @return boolean
-	 */
+
 	public function Logoff(){
 		return true;
 	}
-	
+
+	public function GetImporter($folderid = false) {
+		return new ChangeImporter($this, $folderid);
+	}
+
+	public function GetExporter($folderid = false) {
+		return new ChangeExporter($this, $folderid);
+	}
+
+	abstract public function GetFolder($id);
+
+	abstract public function GetMessage($folderid, $id, $contentparameters);
+
+	abstract public function ChangeMessage($folderid, $id, $message, $contentParameters);
+
+	abstract public function StatMessage($folderid, $id);
+
+	abstract public function GetMessageList($folderid, $cutoffdate);
+
+	abstract public function GetFolderList();
+
+	abstract public function DeleteMessage($folderid, $id, $contentParameters) ;
+
+	public function MoveMessage($folderid, $id, $newfolderid, $contentParameters) {
+		return false;
+	}
+
 	public function ChangeFolder($folderid, $oldid, $displayname, $type) {
 		return false;
 	}
@@ -203,28 +159,20 @@ class GoBaseBackendDiff extends \BackendDiff {
 	public function DeleteFolder($id, $parentid) {
 		return false;
 	}
-	
-	public function SetReadFlag($folderid, $id, $flags, $contentParameters) {
-		return false;
-	}
-
-	public function DeleteMessage($folderid, $id, $contentParameters) {
-		return false;
-	}
-
-	public function MoveMessage($folderid, $id, $newfolderid, $contentParameters) {
-		return false;
-	}
 
 	public function SendMail($sm) {
-		return false;
+		return false; // only implemented in MailProvider
+	}
+
+	public function SetReadFlag($folderid, $id, $flags, $contentParameters) {
+		return false; // only implemented in MailProvider
 	}
 
 	public function GetWasteBasket() {
-		return false;
+		return false; // unused, deletes are permanent
 	}
 
 	public function GetAttachmentData($attname) {
-		return false;
+		return false; // only implemented in MailProvider
 	}
 }

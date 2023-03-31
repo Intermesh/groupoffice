@@ -1,99 +1,79 @@
 <?php
 
-//// https://github.com/fmbiete/Z-Push-contrib/issues/135
-//// This line hsould be in php.ini to completly avoid the $HTTP_RAW_POST_DATA depricated message
-//ini_set('always_populate_raw_post_data', -1);
-//
+// https://github.com/fmbiete/Z-Push-contrib/issues/135
+// This line should be in php.ini to completely avoid the $HTTP_RAW_POST_DATA deprecated message
+// ini_set('always_populate_raw_post_data', -1);
+
 use go\core\auth\Authenticate;
 use go\core\auth\TemporaryState;
+use go\core\model\Settings;
+use go\core\util\DateTime;
 
-
-/**
- * The base backend of the Group-Office Z-PUSH 2 implementation.
- * This class loads all needed backends
- */
 class BackendGO extends Backend implements IBackend, ISearchProvider {
 
+	const VERSION = 407;
+
+	const FolderProviders = [
+		SYNC_FOLDER_TYPE_INBOX => 'm',
+		SYNC_FOLDER_TYPE_DRAFTS => 'm',
+		SYNC_FOLDER_TYPE_WASTEBASKET => 'm',
+		SYNC_FOLDER_TYPE_SENTMAIL => 'm',
+		SYNC_FOLDER_TYPE_OUTBOX => 'm',
+		SYNC_FOLDER_TYPE_TASK => 't',
+		SYNC_FOLDER_TYPE_APPOINTMENT => 'a',
+		SYNC_FOLDER_TYPE_CONTACT => 'c',
+		SYNC_FOLDER_TYPE_NOTE => 'n',
+		SYNC_FOLDER_TYPE_USER_MAIL => 'm',
+	];
 	/**
-	 * This is the array with all the used backends
-	 * 
-	 * @var array 
+	 * Map with 5 provider for mail, notes, contacts, calendar and tasks
+	 * Mapped by their root directory name
+	 * @var Store[]
 	 */
 	public $backends;
 
 	/**
-	 * The configuration for this base backend file
-	 * 
-	 * @var array 
+	 * Needed by the combined importer/exported
 	 */
-	public $config;
+	public $config = [
+		'backends' => [
+			'c' => 'ContactStore',
+			't' => 'TaskStore',
+			'n' => 'NoteStore',
+			'a' => 'CalendarStore',
+			'm' => 'MailStore'
+		],
+		'delimiter' => '/', // also for combined importer
+		'rootcreatefolderbackend' => 'm' // needed by combined importer
+	];
 
-	/**
-	 * The backend that is currently active in this scope
-	 * 
-	 * @var BackendDiff 
-	 */
-	private $_activeBackend;
-
-	/**
-	 * The id of the backend that is currently active in this scope
-	 * @var BackendDiff 
-	 */
-	private $_activeBackendID;
-
-	/**
-	 * Indicates which AS version is supported by the backend.
-	 *
-	 * @access public
-	 * @return string       AS version constant
-	 */
-	public function GetSupportedASVersion() {
-		return ZPush::ASV_14;
-	}
-
-	/**
-	 * The constuctor of this class.
-	 * This loads the diffBackends that are needed by this base backends
-	 */
 	public function __construct() {
-
 		parent::__construct();
-		$this->config = BackendGoConfig::GetBackendGoConfig();
-
 		go()->getDebugger()->setRequestId("ActiveSync");
-
-		foreach ($this->config['backends'] as $i => $b) {
-			// load and instatiate backend
-//			$this->_includeBackend($b['name']);
-			$this->backends[$i] = new $b['name']($b['config']);
-		}
-		ZLog::Write(LOGLEVEL_INFO, sprintf("Combined %d backends loaded.", count($this->backends)));
 	}
 
-//	/**
-//	 * Loads a backend class file identified by filename
-//	 * 
-//	 * @param string $backendname
-//	 * @return boolean
-//	 */
-//	private function _includeBackend($backendname) {
-//
-//		$backend = REAL_BASE_PATH . "backend/go/" . $backendname . ".php";
-//
-//		if (is_file($backend))
-//			$toLoad = $backend;
-//		else
-//			return false;
-//
-//		ZLog::Write(LOGLEVEL_DEBUG, sprintf("Including partial backend file: '%s'", $toLoad));
-//		include_once($toLoad);
-//		return true;
-//	}
+	public function GetBackend($folderid) {
+		ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetBackend($folderid)");
+		$root = strtok($folderid, '/');
+		if (isset($this->backends[$root])){
+			return $this->backends[$root];
+		}
+		ZLog::Write(LOGLEVEL_ERROR,"Backend ".$root. 'does not exist');
+	}
+
+	public function Setup($store, $checkACLonly = false, $folderid = false, $readonly = false) {
+		//$this->store = $store;
+
+		// we don't know if and how diff backends implement the "admin" check, but this will disable it for the webservice
+		// backends which want to implement this, need to overwrite this method explicitely. For more info see https://jira.zarafa.com/browse/ZP-462
+		if ($store == "SYSTEM" && $checkACLonly == true)
+			return false;
+
+		return true;
+	}
 
 	/**
-	 * Login to Group-Office with this base backend. 
-	 * All other backends are automatically logged in when they are connecting 
-	 * through this base backend.
+	 * Login to Group-Office.
 	 * 
 	 * @param string $username
 	 * @param string $domain
@@ -108,9 +88,8 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		}
 		
 		
-		ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2::Logon(GO version: ' . \GO::config()->version . ', backend version: ' . BackendGoConfig::GOBACKENDVERSION . ', user: ' . $username . ', domain: ' . $domain . ')');
-		
-		
+		ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2::Logon(GO version: ' . \GO::config()->version . ', backend version: ' . self::VERSION . ', user: ' . $username . ', domain: ' . $domain . ')');
+
 		try {
 
 			$auth = new Authenticate();
@@ -119,52 +98,52 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 				return false;
 			}
 
-			$state = new TemporaryState();
-			$state->setUserId($user->id);
+			$state = new TemporaryState($user->id);
 			go()->setAuthState($state);
+
+			$devId = \Request::GetDeviceID();
 			
 			if(!GO::modules()->sync) {
-				ZLog::Write(LOGLEVEL_INFO, 'User '. $user->username .' logged on but has no access to the sync module');
+				ZLog::Write(LOGLEVEL_INFO, 'User '. $user->username .' logged on but has no access to the sync module or it\'s not installed');
 				return false;
 			}
 
 			if (!$user) {
-				ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2::ERROR::Username and/or password incorrect.');
-				//throw new \Exception('<b>Username and/or password unknown.</b>');
+				ZLog::Write(LOGLEVEL_INFO, 'Username and/or password incorrect.');
 				return false;
 			} else {
-				
+
 				if (\GO::modules()->isInstalled("zpushadmin")) {
 					ZLog::Write(LOGLEVEL_INFO, 'The zpushadmin module is installed, checking access for device.');
 
-					$devId = Request::GetDeviceID();
 					if (empty($devId)) {
 						ZLog::Write(LOGLEVEL_INFO, 'Cannot identify the device ID, problably you are using the webbrowser to access z-push.');
 					} else {
-						$deviceRequest = new \GO\Zpushadmin\Model\Devicerequest();
-						$deviceRequest->setNotNew();
-						if (!$deviceRequest->hasAccess()) {
+						if (!\GO\Zpushadmin\Model\Device::requestAccess()) {
 							ZLog::Write(LOGLEVEL_ERROR, 'This device is not enabled for sync. Your deviceId is: ' . Request::GetDeviceID());
-							Throw new \GO\Base\Exception\AccessDenied('This device is not enabled for sync. Your deviceId is: ' . Request::GetDeviceID());
+							//Throw new \GO\Base\Exception\AccessDenied('This device is not enabled for sync. Your deviceId is: ' . Request::GetDeviceID());
 							return false;
 						}
 					}
-				} else {
-					ZLog::Write(LOGLEVEL_INFO, 'The zpushadmin module is NOT installed.');
 				}
 			}
 		} catch (\Exception $e) {
-			ZLog::Write(LOGLEVEL_ERROR, 'ZPUSH2::ERROR::Could not authenticate to Group-Office');
+			ZLog::Write(LOGLEVEL_ERROR, 'Could not authenticate to Group-Office');
 			ZLog::Write(LOGLEVEL_INFO, $e->getMessage());
 			return false;
 		}
 
-		$this->_username = $username;
-
-		if (!\GO::modules()->sync) {
-			ZLog::Write(LOGLEVEL_ERROR, 'ZPUSH2::ERROR::User doesn\'t have permission for the sync module or it\'s not installed');
-			return false;
+		if(empty($devId) || !$this->getClient($devId, $user)->isAllowed()) {
+			ZLog::Write(LOGLEVEL_INFO, 'Device not fully authenticated, using stub');
+			$this->config['backends'] = [
+				'm' => 'StubStore'
+			];
 		}
+
+		foreach ($this->config['backends'] as $i => $b) {
+			$this->backends[$i] = new $b();
+		}
+
 		return true;
 	}
 
@@ -180,17 +159,26 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		$user = go()->getAuthState()->getUser(['id', 'username', 'displayName', 'email']);
 		return array('emailaddress' => $user->email, 'fullname' => $user->displayName);
 	}
-	
-		/**
-	 * for old framework to work in GO::session()
-	 * 
-	 * @param \GO\Dav\Auth\User $user
-	 */
-	private function oldLogin(\go\core\model\User $user) {
-		if(!defined('GO_NO_SESSION')) {
-			define("GO_NO_SESSION", true);
+
+	private function getClient($deviceId, \go\core\model\User $user) {
+		$client = $user->clientByDevice($deviceId);
+		if($client->isNew()) {
+			$client->deviceId = \Request::GetDeviceID();
+			$client->platform = \Request::GetDeviceType();
+			$client->ip = \Request::GetRemoteAddr();
+			$client->name = 'ActiveSync ' . \Request::GetProtocolVersion();
+			$client->status = Settings::get()->activeSyncEnable2FA ? 'new' : 'allowed';
+			$client->version = \Request::GetUserAgent();
+		} else if($client->needResync) {
+			$client->needResync = false;
+			ZLOG::Write(LOGLEVEL_INFO, sprintf("Resync of device '%s' of user '%s'", $deviceId, $user->username));
+			//ZPushAdmin::ResyncDevice(\Request::GetAuthUser(), $deviceId);
 		}
-		$_SESSION['GO_SESSION'] = ['user_id' => $user->id];
+		$client->lastSeen = new DateTime("now", new DateTimeZone("UTC"));
+		if(!$client->save()) {
+			ZLog::Write(LOGLEVEL_ERROR, 'Failed to save the client identity by device '.var_export($client->getValidationErrors(), true));
+		}
+		return $client;
 	}
 
 	/**
@@ -203,95 +191,17 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	}
 
 	/**
-	 * Setup the backend to work on a specific store or checks ACLs there.
-	 * If only the $store is submitted, all Import/Export/Fetch/Etc operations should be
-	 * performed on this store (switch operations store).
-	 * If the ACL check is enabled, this operation should just indicate the ACL status on
-	 * the submitted store, without changing the store for operations.
-	 * For the ACL status, the currently logged on user MUST have access rights on
-	 *  - the entire store - admin access if no folderid is sent, or
-	 *  - on a specific folderid in the store (secretary/full access rights)
-	 *
-	 * The ACLcheck MUST fail if a folder of the authenticated user is checked!
-	 *
-	 * @param string        $store              target store, could contain a "domain\user" value
-	 * @param boolean       $checkACLonly       if set to true, Setup() should just check ACLs
-	 * @param string        $folderid           if set, only ACLs on this folderid are relevant
-	 * @return boolean
-	 */
-	public function Setup($store, $checkACLonly = false, $folderid = false, $readonly = false) {
-		ZLog::Write(LOGLEVEL_INFO, "BackendGO->Setup() ~~ START");
-	//	ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendGO->Setup('%s', '%s', '%s')", $store, Utils::PrintAsString($checkACLonly), $folderid));
-		if (!is_array($this->backends)) {
-			return false;
-		}
-		foreach ($this->backends as $i => $b) {
-			$u = $store;
-			if (isset($this->config['backends'][$i]['users']) && isset($this->config['backends'][$i]['users'][$store]['username'])) {
-				$u = $this->config['backends'][$i]['users'][$store]['username'];
-			}
-			if ($this->backends[$i]->Setup($u, $checkACLonly, $folderid) == false) {
-				ZLog::Write(LOGLEVEL_FATAL, "BackendGO->Setup() failed");
-				return false;
-			}
-		}
-//		ZLog::Write(LOGLEVEL_INFO, "BackendGO->Setup() ~~ SUCCESS");
-		return true;
-	}
-
-	/**
 	 * Returns an understandable folderid for the backend
-	 * For example it looks like: "c/GroupOfficeContacts"
+	 * For example it looks like: "c/1" become "1"
 	 *
 	 * @param string        $folderid       combinedid of the folder
 	 * @return string
 	 */
 	public function GetBackendFolder($folderid) {
-	//	ZLog::Write(LOGLEVEL_DEBUG, "BackendGO->GetBackendFolder('.$folderid.')");
-		$pos = strpos($folderid, $this->config['delimiter']);
-		if ($pos === false)
+		$pos = strpos($folderid, '/');
+		if($pos === false)
 			return false;
-//		ZLog::Write(LOGLEVEL_INFO, "BackendGO->GetBackendFolder('.$folderid.') ~~ SUCCESS");
-		return substr($folderid, $pos + strlen($this->config['delimiter']));
-	}
-
-	/**
-	 * Returns backend id for a folder
-	 *
-	 * @param string $folderid	combined id of the folder
-	 * @return object
-	 */
-	public function GetBackendId($folderid) {
-	//	ZLog::Write(LOGLEVEL_DEBUG, "BackendGO->GetBackendId('.$folderid.')");
-		$pos = strpos($folderid, $this->config['delimiter']);
-		if ($pos === false)
-			return false;
-//		ZLog::Write(LOGLEVEL_INFO, 'BackendGO->GetBackendId('.$folderid.') ~~ SUCCESS');
-		return substr($folderid, 0, $pos);
-	}
-
-	/**
-	 * Finds the correct backend for a folder
-	 *
-	 * @param string $folderid	combined id of the folder
-	 * @return object
-	 */
-	public function GetBackend($folderid) {
-		//ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetBackend($folderid)");
-		$pos = strpos($folderid, $this->config['delimiter']);
-		if ($pos !== false){			
-			$id = substr($folderid, 0, $pos);
-		}else
-		{
-			$id=$folderid;
-		}
-		if (!isset($this->backends[$id]))
-			return false;
-
-		$this->_activeBackend = $this->backends[$id];
-		$this->_activeBackendID = $id;
-//		ZLog::Write(LOGLEVEL_DEBUG, 'BackendGO->GetBackend('.$folderid.') ~~ SUCCESS');
-		return $this->backends[$id];
+		return substr($folderid,$pos + strlen('/'));
 	}
 
 	/**
@@ -343,29 +253,11 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	public function GetAttachmentData($attname) {
 		ZLog::Write(LOGLEVEL_DEBUG, sprintf("Combined->GetAttachmentData('%s')", $attname));
 		
-		$attachment = $this->backends[BackendGoConfig::MAILBACKENDID]->GetAttachmentData($attname);
+		$attachment = $this->backends['m']->GetAttachmentData($attname);
 		if ($attachment instanceof SyncItemOperationsAttachment)
 			return $attachment;
 		else
 			throw new StatusException("Combined->GetAttachmentData(): no backend found", SYNC_ITEMOPERATIONSSTATUS_INVALIDATT);
-	}
-
-	/**
-	 * Returns the exporter to send changes to the mobile
-	 * the exporter from right backend for contents exporter and our own exporter for hierarchy exporter
-	 *
-	 * @param string        $folderid (opt)
-	 * @return object(ExportChanges)
-	 */
-	public function GetExporter($folderid = false) {
-		ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetExporter($folderid)");
-		if ($folderid) {
-			$backend = $this->GetBackend($folderid);
-			if ($backend == false)
-				return false;
-			return $backend->GetExporter($this->GetBackendFolder($folderid));
-		}
-		return new GoExporter($this);
 	}
 
 	/**
@@ -377,7 +269,10 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * @throws StatusException
 	 */
 	public function SendMail($sm) {
-		if ($this->backends[BackendGoConfig::MAILBACKENDID]->SendMail($sm) == true)
+		if (isset($sm->source->folderid)) {
+			$sm->source->folderid = $this->GetBackendFolder($sm->source->folderid);
+		}
+		if ($this->backends['m']->SendMail($sm) == true)
 			return true;
 		return false;
 	}
@@ -399,23 +294,8 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		return $backend->Fetch($this->GetBackendFolder($folderid), $id, $contentparameters);
 	}
 
-	/**
-	 * Returns the waste basket
-	 * If the wastebasket is set to one backend, return the wastebasket of that backend
-	 * else return the first waste basket we can find
-	 * @return string
-	 */
 	function GetWasteBasket() {
-		ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetWasteBasket()");
-
-		if (isset($this->_activeBackend)) {
-			if (!$this->_activeBackend->GetWasteBasket())
-				return false;
-			else
-				return $this->_activeBackendID . $this->config['delimiter'] . $this->_activeBackend->GetWasteBasket();
-		}
-
-		return false;
+		return false; // none of the providers implement this
 	}
 
 	/**
@@ -428,35 +308,46 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 */
 	public function GetHierarchy() {
 		ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetHierarchy()");
+
 		$ha = array();
 		foreach ($this->backends as $i => $b) {
-			if (!empty($this->config['backends'][$i]['subfolder'])) {
-				$f = new SyncFolder();
-				$f->serverid = $i . $this->config['delimiter'] . '0';
-				$f->parentid = '0';
-				$f->displayname = $this->config['backends'][$i]['subfolder'];
-				$f->type = SYNC_FOLDER_TYPE_OTHER;
-				$ha[] = $f;
-			}
+
 			$h = $this->backends[$i]->GetHierarchy();
 			if (is_array($h)) {
 				foreach ($h as $j => $f) {
-					$h[$j]->serverid = $i . $this->config['delimiter'] . $h[$j]->serverid;
-					if ($h[$j]->parentid != '0' || !empty($this->config['backends'][$i]['subfolder'])) {
-						$h[$j]->parentid = $i . $this->config['delimiter'] . $h[$j]->parentid;
+					$h[$j]->serverid = $i . '/' . $h[$j]->serverid;
+					if ($h[$j]->parentid != '0') {
+						$h[$j]->parentid = $i . '/' . $h[$j]->parentid;
 					}
-					if (isset($this->config['folderbackend'][$h[$j]->type]) && $this->config['folderbackend'][$h[$j]->type] != $i) {
+					if (isset(self::FolderProviders[$h[$j]->type]) && self::FolderProviders[$h[$j]->type] != $i) {
 						$h[$j]->type = SYNC_FOLDER_TYPE_OTHER;
 					}
 				}
 				$ha = array_merge($ha, $h);
 			}
 		}
-		
-		//ZLog::Write(LOGLEVEL_DEBUG, var_export($ha, true));
-
 		ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetHierarchy() success");
 		return $ha;
+	}
+
+	/**
+	 * Returns the exporter to send changes to the mobile
+	 * the exporter from right backend for contents exporter and our own exporter for hierarchy exporter
+	 *
+	 * @param string        $folderid (opt)
+	 * @return object(ExportChanges)
+	 */
+	public function GetExporter($folderid = false) {
+		ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetExporter($folderid)");
+		if ($folderid) {
+			$backend = $this->GetBackend($folderid);
+			if ($backend == false)
+				return false;
+
+			//return new ExportChangesDiff($backend, $this->GetBackendFolder($folderid));
+			return $backend->GetExporter($this->GetBackendFolder($folderid));
+		}
+		return new ExportChangesCombined($this);
 	}
 
 	/**
@@ -466,10 +357,10 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * @return object(ImportChanges)
 	 */
 	public function GetImporter($folderid = false) {
-		
+
 		ZLog::Write(LOGLEVEL_DEBUG, sprintf("Combined->GetImporter() Content: ImportChangesCombined:('%s')", $folderid));
-		
-		if ($folderid !== false) {		
+
+		if ($folderid !== false) {
 
 			// get the contents importer from the folder in a backend
 			// the importer is wrapped to check foldernames in the ImportMessageMove function
@@ -478,14 +369,14 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 				return false;
 			$importer = $backend->GetImporter($this->GetBackendFolder($folderid));
 			if ($importer) {
-				return new GoImporter($this, $folderid, $importer);
+				return new ImportChangesCombined($this, $folderid, $importer);
 			}
 			return false;
 		} else {
 			ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetImporter() -> Hierarchy: ImportChangesCombined()");
 			//return our own hierarchy importer which send each change to the right backend
 //			throw new StatusException();
-			return new GoImporter($this);
+			return new ImportChangesCombined($this);
 		}
 	}
 
@@ -559,18 +450,9 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2Search::TerminateSearch');
 		return true;
 	}
-
-//	/**
-//	 * Get the Group-Office Sync settings for the current user
-//	 * 
-//	 * @return \GO\Sync\Model\Settings 
-//	 */
-//	private function _getSettings() {
-//		return \GO\Sync\Model\Settings::model()->findForUser(\GO::user());
-//	}
 	
-	protected $syncstates=array();
-	protected $sinkfolders=array();
+	protected $syncstates = [];
+	protected $sinkfolders = [];
 	
 	/**
 	 * Indicates if the backend has a ChangesSink.
@@ -620,10 +502,6 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 		$notifications = array();
 //		$stopat = time() + $timeout - 1;
-
-
-//		while ($stopat > time() && empty($notifications)) {
-			
 			foreach ($this->sinkfolders as $folder) {
 				
 				$f = $this->GetBackendFolder($folder);
@@ -657,17 +535,24 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	}
 
 	/**
-     * Searches the GAL.
-     *
-     * @param string                        $searchquery        string to be searched for
-     * @param string                        $searchrange        specified searchrange
-     * @param SyncResolveRecipientsPicture  $searchpicture      limitations for picture
-     *
-     * @access public
-     * @return array        search results
-     * @throws StatusException
-     */
-		public function GetGALSearchResults($searchquery, $searchrange, $searchpicture) {
-			return [];
-		}
+	 * Searches the GAL.
+	 *
+	 * @param string                        $searchquery        string to be searched for
+	 * @param string                        $searchrange        specified searchrange
+	 * @param SyncResolveRecipientsPicture  $searchpicture      limitations for picture
+	 *
+	 * @access public
+	 * @return array        search results
+	 * @throws StatusException
+	 */
+	public function GetGALSearchResults($searchquery, $searchrange, $searchpicture) {
+		return [];
+	}
+
+	/**
+	 * Indicates which AS version is supported by the backend.
+	 */
+	public function GetSupportedASVersion() {
+		return ZPush::ASV_14;
+	}
 }

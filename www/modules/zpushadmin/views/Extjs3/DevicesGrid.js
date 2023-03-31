@@ -10,155 +10,72 @@
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
-
 GO.zpushadmin.DevicesGrid = Ext.extend(GO.grid.GridPanel,{
-	changed : false,
 	
 	// These 2 parameters are used in the render function of the comments column
 	maxLength : 20,
 	cutWholeWords : true,
 
-	initComponent : function(){
+	standardTbar:false,
+	border: false,
+	paging:true,
+
+	initComponent(){
 		
 		Ext.apply(this,{
-			standardTbar:false,
 			store: GO.zpushadmin.deviceStore,
-			border: false,
-			paging:true,
 			view:new Ext.grid.GridView({
 				emptyText: t("No items to display"),
-				getRowClass: this.getRowClass
+				getRowClass: r => {
+					if(r.data.new)
+						return 'zpushadmin-new-device';
+					return r.data.can_connect ? 'zpushadmin-enabled-device' : 'zpushadmin-disabled-device';
+				}
 			}),
 			cm:new Ext.grid.ColumnModel({
-				defaults:{
-					sortable:true
-				},
+				defaults: { sortable:true, width:100 },
 				columns:[
-				{
-					header: t("Status", "zpushadmin"),
-					dataIndex: 'can_connect',
-					sortable: true,
-					renderer: this.statusRenderer,
-					width:100
-				},
-				{
-					header: t("User", "zpushadmin"),
-					dataIndex: 'username',
-					sortable: true,
-					width:180
-				},
-				{
-					header: t("Can connect", "zpushadmin"),
-					dataIndex: 'can_connect',
-					sortable: true,
-					renderer: GO.grid.ColumnRenderers.yesNo,
-					width:100,
-					hidden:true
-				},
-				{
-					header: t("Device ID", "zpushadmin"),
-					dataIndex: 'device_id',
-					sortable: true,
-					width:200
-				},
-				{
-					header: t("Device Type", "zpushadmin"),
-					dataIndex: 'device_type',
-					sortable: true,
-					width:200
-				},
-				{
-					header: t("Activesync version", "zpushadmin"),
-					dataIndex: 'as_version',
-					sortable: true,
-					width:120
-				},
-				{
-					header: t("Ip-Address", "zpushadmin"),
-					dataIndex: 'remote_addr',
-					sortable: true,
-					width:100
-				},
-				{
-					header: t("First synchronisation attempt", "zpushadmin"),
-					dataIndex: 'ctime',
-					sortable: true,
-					width:180
-				},{
-					header: t("Last synchronisation attempt", "zpushadmin"),
-					dataIndex: 'mtime',
-					sortable: true,
-					width:180
-				},
-				{
-					header: t("Comments", "zpushadmin"),
-					dataIndex: 'comment',
-					sortable: false,
-					renderer: {
+					{header: t("Status"), dataIndex: 'can_connect', renderer: (v, meta, r) => {
+						if(r.data.new)
+							return t("New");
+						return t(r.data.can_connect ? "Enabled" : "Disabled");
+					}},
+					{header: t("User"), dataIndex: 'username', width:180},
+					{header: t("Can connect"), dataIndex: 'can_connect', hidden:true, renderer: GO.grid.ColumnRenderers.yesNo},
+					{header: t("Device ID"), dataIndex: 'device_id', width:200},
+					{header: t("Device Type"), dataIndex: 'device_type', width:200},
+					{header: t("Activesync version"), dataIndex: 'as_version', width:120},
+					{header: t("Ip-Address"), dataIndex: 'remote_addr'},
+					{header: t("First synchronisation attempt"), dataIndex: 'ctime'},
+					{header: t("Last synchronisation attempt"), dataIndex: 'mtime'},
+					{header: t("Comments"), dataIndex: 'comment', sortable: false, renderer: {
 						fn: GO.grid.ColumnRenderers.Text,
 						scope: this
-					},
-					width:180
-				}
+					}}
 				]
 			})
 		});
 		
-		GO.zpushadmin.DevicesGrid.superclass.initComponent.call(this);
+		this.supr().initComponent.call(this);
 		
-		this.on("afterrender", function() {
+		this.on("afterrender", () => {
 			GO.zpushadmin.deviceStore.load();
-		}, this);
+		});
 	},
 	
-	dblClick : function(grid, record, rowIndex){
+	dblClick(grid, record, rowIndex){
 		this.showDeviceDialog(record.id);
 	},
-//	
-//	btnAdd : function(){				
-//		this.showDeviceDialog();	  	
-//	},
-	showDeviceDialog : function(id){
+
+	showDeviceDialog(id){
 		if(!this.deviceDialog){
 			this.deviceDialog = new GO.zpushadmin.DeviceDialog();
 
 			this.deviceDialog.on('save', function(){   
 				this.store.load();
-				this.changed=true;	    			    			
 			}, this);	
 		}
 		this.deviceDialog.show(id);	  
-	},
-	showSettingsDialog : function(){
-		if(!this.settingsDialog){
-			this.settingsDialog = new GO.zpushadmin.SettingsDialog();
-
-			this.settingsDialog.on('save', function(){   
-				this.store.load();
-				this.changed=true;	    			    			
-			}, this);	
-		}
-		this.settingsDialog.show();	  
-	},
-	deleteSelected : function(){
-		GO.zpushadmin.DevicesGrid.superclass.deleteSelected.call(this);
-		this.changed=true;
-	},
-	statusRenderer : function(value, metaData, record, rowIndex, colIndex, store){
-		if(record.data['new']==true)
-			return t("New", "zpushadmin");
-		else if(record.data['can_connect']==true)
-			return t("Enabled", "zpushadmin");
-		else
-			return t("Disabled", "zpushadmin");		
-	},
-	getRowClass : function(record, index){
-		if(record.data['new']==true)
-			return 'zpushadmin-new-device';
-		else if(record.data['can_connect']==true)
-			return 'zpushadmin-enabled-device';
-		else
-			return 'zpushadmin-disabled-device';
 	}
 	
 });
