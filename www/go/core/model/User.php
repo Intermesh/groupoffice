@@ -299,7 +299,7 @@ class User extends AclItemEntity {
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
-			->addScalar('clients', Client::class, ['id' => 'userId'])
+			->addMap('clients', Client::class, ['id' => 'userId'])
 			->addScalar('groups', 'core_user_group', ['id' => 'userId']);
 	}
 

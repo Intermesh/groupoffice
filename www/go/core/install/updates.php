@@ -29,6 +29,7 @@ $updates["201803161130"][] = function() {
 	$globalConfig = [];
 	if (file_exists('/etc/groupoffice/globalconfig.inc.php')) {
 		require('/etc/groupoffice/globalconfig.inc.php');
+		/** @var array $config */
 		$globalConfig = $config;
 	}
 
@@ -1429,8 +1430,8 @@ FROM (
 GROUP BY `remoteIpAddress`, `platform`, `browser`, `userId`";
 
 //set clientIds
-$updates['202303231016'][] = "UPDATE `core_auth_token` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
-$updates['202303231016'][] = "UPDATE `core_auth_remember_me` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
+$updates['202303231016'][] = "UPDATE `core_auth_token` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.userId = t.userId AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
+$updates['202303231016'][] = "UPDATE `core_auth_remember_me` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.userId = t.userId AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
 //remove tokens without client
 $updates['202303231016'][] = "DELETE from `core_auth_token` WHERE clientId = 0;";
 $updates['202303231016'][] = "DELETE FROM `core_auth_remember_me` WHERE clientId = 0;";

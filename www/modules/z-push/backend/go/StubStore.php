@@ -85,7 +85,7 @@ $system->title";
 	{
 		return [
 			[
-				'id'=>'root',
+				'id'=>'INBOX',
 				"parent"=>"0",
 				"mod"=>'INBOX'
 			]

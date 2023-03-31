@@ -171,7 +171,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 			$client->version = \Request::GetUserAgent();
 		} else if($client->needResync) {
 			$client->needResync = false;
-			ZLOG::Write(LOGLEVEL_INFO, sprintf("Resync of device '%s' of user '%s'", $deviceId, $user->username));
+			//ZLOG::Write(LOGLEVEL_INFO, sprintf("Resync of device '%s' of user '%s'", $deviceId, $user->username));
 			//ZPushAdmin::ResyncDevice(\Request::GetAuthUser(), $deviceId);
 		}
 		$client->lastSeen = new DateTime("now", new DateTimeZone("UTC"));

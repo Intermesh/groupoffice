@@ -61,10 +61,10 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 						': <br>'+client.version,
 					buttons: Ext.Msg.YESNO,
 					fn: (me,s) => {
-						const status = me == 'yes' ? 'allowed' : 'denied';
+						client.status = me == 'yes' ? 'allowed' : 'denied';
 						go.Db.store("User").set({
 							update: {[user.id]: {
-								clients: {[id]: {status}}
+								clients: user.clients
 							}}
 						})
 					},

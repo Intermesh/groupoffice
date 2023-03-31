@@ -256,6 +256,10 @@ go.Jmap = {
 				}
 			}, false);
 
+			source.addEventListener('error', () => {
+				this.poll();
+			});
+
 			// source.addEventListener('alert', function(e) {
 			// 	var data = JSON.parse(e.data);
 			// 	go.Db.store(data.entityType).single(data.entityId).then(function(entity) {

@@ -32,11 +32,24 @@ class Client extends Property
 		if(!$this->isNew() && $this->isModified('status')) {
 			$this->needResync = true;
 		}
-		return $this->internalSave();
+		$success = $this->internalSave();
+//		if($success) {
+//			$this->owner->change(true);
+//		}
+		return $success;
 	}
 
 	public function isAllowed() : bool {
 		return $this->status === 'allowed';
+	}
+
+	protected static function internalDelete(Query $query): bool
+	{
+		$query->select('id')->setModel(self::class)->from('core_client', 'cl'); // needed for proerty
+		if(!Token::delete(['clientId' => $query])) {
+			throw new \Exception("Could not delete token");
+		}
+		return parent::internalDelete($query);
 	}
 
 	protected function init()
