@@ -768,7 +768,14 @@ ALTER TABLE `core_user_group`
 ALTER TABLE `core_acl`
   ADD CONSTRAINT `core_acl_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
 
-CREATE TABLE IF NOT EXISTS `go_templates` (
+CREATE TABLE `go_template_group` (
+   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+   `name` VARCHAR(100) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+CREATE TABLE  `go_templates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT 0,
   `type` tinyint(4) NOT NULL DEFAULT 0,
@@ -777,8 +784,14 @@ CREATE TABLE IF NOT EXISTS `go_templates` (
   `content` longblob NOT NULL,
   `filename` varchar(100) DEFAULT NULL,
   `extension` varchar(4) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+   `group_id` INT UNSIGNED NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_go_templates_go_template_group_idx` (`group_id` ASC),
+    CONSTRAINT `fk_go_templates_go_template_group`
+    FOREIGN KEY (`group_id`)
+    REFERENCES `go_template_group` (`id`)
+    ON DELETE SET NULL)
+ENGINE = InnoDB
 
 ALTER TABLE `core_group` ADD UNIQUE(`name`);
 
