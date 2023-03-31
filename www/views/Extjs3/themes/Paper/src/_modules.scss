@@ -170,7 +170,8 @@ i.icon.em-low_priority {
 
 .message-body {
 	background-color: white;
-	position: relative;	
+	position: relative;
+	will-change: transform; // this will prevent position:fixed from breaking out of the DIV
 	
 	p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
 	{
