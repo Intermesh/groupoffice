@@ -1,3 +1,4 @@
+03-04-2023: 6.6.157
 - OAuth2Client: remove obsolete FK from uninstall script
 - Core: Added Japanese translations
 - Core: Extra check if store is in sync when viewing entities (Task, contact etc.)
