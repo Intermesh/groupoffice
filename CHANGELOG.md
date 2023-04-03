@@ -1,3 +1,8 @@
+- OAuth2Client: remove obsolete FK from uninstall script
+- Core: Added Japanese translations
+- Core: Extra check if store is in sync when viewing entities (Task, contact etc.)
+- Calendar: minor bugfix when trying to delete an event with a participant with missing user_id
+
 30-03-3023: 6.7.21
 - Core: Smaller login dialog when logout timer is enabled
 - Core: Enabled ACL Garbage Collection
