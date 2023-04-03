@@ -77,6 +77,8 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 
 		this.detailView = dv;
 
+		this.hide();
+
 		this.store.setFilter("link" , {link: {
 				entity: dv.entity ? dv.entity : dv.entityStore.entity.name, //dv.entity exists on old DetailView or display panels
 				id: dv.model_id ? dv.model_id : dv.currentId //model_id is from old display panel
