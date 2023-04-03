@@ -84,4 +84,28 @@ GO.moduleManager.onModuleReady('addressbook',function() {
 			this.mainPanel.insert(1, this.privacyFieldset);
 		})
 	});
+
+	Ext.override(go.modules.community.addressbook.MainPanel, {
+		initComponent: go.modules.community.addressbook.MainPanel.prototype.initComponent.createSequence(function () {
+			// debugger;
+			const module = go.Modules.get("community", "privacy"), settings = module.settings;
+			const tt = this.grid.topToolbar;
+			this.emptyTrashBtn = new Ext.Button({
+				iconCls: 'btn-delete',
+				hidden: !go.User.isAdmin,
+				cls: 'danger',
+				text: t("Empty trash"),
+				tooltip: t('Empty trash'),
+				handler: function(btn) {
+					Ext.MessageBox.alert("TODO", "Werk in uitvoering");
+					return false;
+				}
+
+			});
+			tt.insertButton(0, this.emptyTrashBtn);
+			console.log(tt);
+
+		}),
+
+	});
 });
