@@ -47,5 +47,3 @@ ALTER TABLE `oauth2client_account`
 
 ALTER TABLE `oauth2client_account`
     ADD CONSTRAINT `oauth2client_account_ibfk_2` FOREIGN KEY (`accountId`) REFERENCES `em_accounts` (`id`) ON DELETE CASCADE;
-# TODO: Do we still need this shit?
-# ALTER TABLE `em_accounts` ADD CONSTRAINT `em_account_defaultclt_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `oauth2client_account` (`id`) ON DELETE CASCADE;
