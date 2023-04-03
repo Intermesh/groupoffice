@@ -1,6 +1,7 @@
 - OAuth2Client: remove obsolete FK from uninstall script
 - Core: Added Japanaese translations
 - Core: Extra check if store is in sync when viewing entities (Task, contact etc.)
+- Calendar: minor bugfix when trying to delete an event with a participant with missing user_id
 
 27-03-2023: 6.6.156
 - Caldav: Use email account for caldav invites
