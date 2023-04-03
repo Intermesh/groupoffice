@@ -1,4 +1,5 @@
 - OAuth2Client: remove obsolete FK from uninstall script
+- Core: Added Japanaese translations
 
 27-03-2023: 6.6.156
 - Caldav: Use email account for caldav invites
