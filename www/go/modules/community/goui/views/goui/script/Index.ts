@@ -7,8 +7,7 @@ modules.register(  {
 	name: "goui",
 	async init () {
 
-		client.on("authenticated", async () => {
-			const session = await client.session;
+		client.on("authenticated", (client, session) => {
 
 			if(!session.capabilities["go:community:goui"]) {
 				// User has no access to this module
