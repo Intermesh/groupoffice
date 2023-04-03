@@ -211,6 +211,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			});
 		}
 
+		this.entityStore.checkState();
+
 		if(this.currentId == id) {
 			return Promise.resolve(this.data);
 		}

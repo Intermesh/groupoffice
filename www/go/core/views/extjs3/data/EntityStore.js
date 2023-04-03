@@ -472,6 +472,26 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	},
 
 	/**
+	 * This function makes sure the store is up to date. Should not be necessary but we ran into problems where tasks
+	 * were out of date when viewed. This should always prevent that.
+	 * @return {Promise<self>}
+	 */
+	checkState : async function() {
+		const r = await go.Jmap.request({
+			method: this.entity.name + "/get",
+			params: {
+				ids: []
+			}
+		});
+
+		if(r.state != await this.getState()) {
+			await this.getUpdates();
+		}
+
+		return this;
+	},
+
+	/**
 	 * We use a setTimeout to group all /get requests into one HTTP requests. WHen IndexedDB is accessed the event queue is processed.
 	 * We don't want that so we temporary pause the execution and continue it when done with indexedDB.
 	 */
@@ -497,7 +517,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					ids: this.scheduled
 				}
 			};
-			go.Jmap.request(options).then((response) => {
+			go.Jmap.request(options).then(async (response) => {
+
+				const state = await this.getState();
+				if (response.state !== state) {
+					await this.getUpdates();
+				}
 
 				if(!go.util.empty(response.notFound)) {
 					this.notFound = this.notFound.concat(response.notFound);
@@ -584,7 +609,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	/**
 	 * Get entities
 	 * 
-	 * Also see singele() for fetching a single entity
+	 * Also see single() for fetching a single entity
 	 * 
 	 * @example
 	 * ```
