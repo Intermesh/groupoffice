@@ -346,6 +346,13 @@
 		transition: 90ms transform ease-in-out;
 		@include var(background, c-primary);
 	}
+	&:disabled {
+		background-color: var(--bg-background);
+		border-color: var(--fg-disabled);
+		&:before {
+			background-color: var(--fg-disabled);
+		}
+	}
 	&:checked:before { // tick-on
 		transform: scale(1);
 	}
@@ -378,8 +385,12 @@
 	}
 }
 
-input.x-tree-node-cb {
+input.x-tree-node-cb, .x-tree-node-cb input {
 	@extend %checkbox2;
+}
+span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
+	margin-top:dp(4);
+	margin-left: dp(4);
 }
 
 .x-form-grow-sizer {
