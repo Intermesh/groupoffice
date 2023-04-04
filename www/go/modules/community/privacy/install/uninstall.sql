@@ -1,1 +1,2 @@
 DROP TABLE IF EXISTS `community_privacy_settings`;
+DROP TABLE IF EXISTS `community_privacy_contact`;

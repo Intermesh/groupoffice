@@ -96,15 +96,35 @@ GO.moduleManager.onModuleReady('addressbook',function() {
 				cls: 'danger',
 				text: t("Empty trash"),
 				tooltip: t('Empty trash'),
-				handler: function(btn) {
-					Ext.MessageBox.alert("TODO", "Werk in uitvoering");
+				handler: (btn) => {
+					const trashABId = settings.trashAddressBook;
+					Ext.MessageBox.confirm(t("Confirm"),
+						t("Are you sure that you want to empty the trash address book?"),
+						(b) => {
+							if(b !== "yes") {
+								return false;
+							}
+							go.Db.store("Contact").query({
+								limit: 0,
+								filter: {
+									addressBookId: [trashABId]
+								}},
+							(result) => {
+								if (!go.util.empty(result.ids)) {
+									go.Db.store("Contact").set({
+										destroy: result.ids
+									}).then(() => {
+										Ext.MessageBox.alert(t("Success"), t("The trash address book has been successfully emptied"));
+									});
+								}
+							}, this);
+						}
+					);
 					return false;
 				}
 
 			});
 			tt.insertButton(0, this.emptyTrashBtn);
-			console.log(tt);
-
 		}),
 
 	});
