@@ -791,7 +791,7 @@ CREATE TABLE  `go_templates` (
     FOREIGN KEY (`group_id`)
     REFERENCES `go_template_group` (`id`)
     ON DELETE SET NULL)
-ENGINE = InnoDB
+ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 ALTER TABLE `core_group` ADD UNIQUE(`name`);
 
