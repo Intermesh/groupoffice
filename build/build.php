@@ -57,7 +57,7 @@ class Builder
 	 *
 	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $distro = "testing";
+	public $distro = "sixseven";
 
 
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
@@ -216,7 +216,7 @@ class Builder
 
 	    cd($this->buildDir . "/" . $this->packageName);
 
-	    $packageFiles = array_reverse(run("find views -name package.json -not -path '*/node_modules/*'"));
+	    $packageFiles = array_reverse(run("find views/goui -name package.json -not -path '*/node_modules/*'"));
 
 	    $packageFiles = array_merge($packageFiles, run("find go/modules -name package.json -not -path '*/node_modules/*'"));
 

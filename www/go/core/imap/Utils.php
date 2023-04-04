@@ -33,23 +33,16 @@ class Utils {
 	 * @param string $defaultCharset
 	 * @return array|string|string[]
 	 */
-	public static function mimeHeaderDecode(?string $string, string $defaultCharset = 'UTF-8') {
-
-		if(empty($string)) {
-			return $string;
-		}
-
+	public static function mimeHeaderDecode(?string $string, string $defaultCharset='UTF-8') : string {
 		/*
 		 * (=?ISO-8859-1?Q?a?= =?ISO-8859-1?Q?b?=)     (ab)
 		 *  White space between adjacent 'encoded-word's is not displayed.
 		 *
 		 *  http://www.faqs.org/rfcs/rfc2047.html
 		 */
-		
-		//probably an error in header parsing and not needed anymore.
-//		$string = preg_replace("/\?=[\s]*=\?/", "?==?", $string);
+		$string = preg_replace("/\?=[\s]*=\?/","?==?", $string);
 
-		if (preg_match_all("/(=\?[^?]+\?([qb])\?[^?]+\?=)/i", $string, $matches)) {
+		if (preg_match_all("/(=\?[^?]+\?([qb])\?(?!\?=).+\?=)/iU", $string, $matches)) {
 			foreach ($matches[1] as $v) {
 				$fld = substr($v, 2, -2);
 				$charset = strtolower(substr($fld, 0, strpos($fld, '?')));
@@ -59,26 +52,26 @@ class Utils {
 				$fld = str_replace('_', '=20', $fld);
 				if (strtoupper($encoding) == 'B') {
 					$fld = base64_decode($fld);
-				} elseif (strtoupper($encoding) == 'Q') {
+				}
+				elseif (strtoupper($encoding) == 'Q') {
 					$fld = quoted_printable_decode($fld);
 				}
 				$fld = StringUtil::cleanUtf8($fld, $charset);
 
 				$string = str_replace($v, $fld, $string);
 			}
-		} elseif (($pos = strpos($string, "''")) && $pos < 64) { //check pos for not being to great
+		}	elseif(preg_match('/([^=]*)\'\'(.*)/', $string, $matches)){ //check pos for not being to great
 			//eg. iso-8859-1''%66%6F%73%73%2D%69%74%2D%73%6D%61%6C%6C%2E%67%69%66
-			$charset = substr($string, 0, $pos);
-
-//			throw new \Exception($charset.' : '.substr($string, $pos+2));
-			$string = rawurldecode(substr($string, $pos + 2));
+			$charset = $matches[1];
+			$string = rawurldecode($matches[2]);
 
 			$string = StringUtil::cleanUtf8($string, $charset);
-		} else {
+		}else
+		{
 			$string = StringUtil::cleanUtf8($string, $defaultCharset);
 		}
 
-		return str_replace(array('\\\\', '\\(', '\\)'), array('\\', '(', ')'), $string);
+		return str_replace(array('\\\\', '\\(', '\\)'), array('\\','(', ')'), $string);
 	}
 
 	/**

@@ -1374,3 +1374,19 @@ $updates['202303151524'][] = "ALTER TABLE `core_user`
 ADD COLUMN `themeColorScheme` ENUM('light', 'dark', 'system') NOT NULL DEFAULT 'light' AFTER `theme`;";
 
 $updates['202303151524'][] = "UPDATE `core_user` SET theme = 'Paper', themeColorScheme = 'dark' WHERE theme = 'Dark';";
+
+$updates['202303311400'][] = "CREATE TABLE `go_template_group` (
+   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+   `name` VARCHAR(100) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id`))
+ENGINE = InnoDB;";
+
+$updates['202303311400'][] = "ALTER TABLE `go_templates` 
+ADD COLUMN `group_id` INT(10) UNSIGNED NULL DEFAULT NULL AFTER `extension`,
+ADD INDEX `fk_go_templates_go_template_group_idx` (`group_id` ASC);";
+
+$updates['202303311400'][] = "ALTER TABLE `go_templates` 
+ADD CONSTRAINT `fk_go_templates_go_template_group`
+  FOREIGN KEY (`group_id`)
+  REFERENCES `go_template_group` (`id`)
+  ON DELETE SET NULL";

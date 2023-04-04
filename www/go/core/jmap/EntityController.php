@@ -283,7 +283,8 @@ abstract class EntityController extends Controller {
 
 			$response = new ArrayObject([
 				'accountId' => $p['accountId'],
-				'state' => $state,
+				'state' => $state, //deprecated
+				'queryState' => $state,
 				'ids' => $ids,
 				'notfound' => [],
 				'canCalculateUpdates' => false

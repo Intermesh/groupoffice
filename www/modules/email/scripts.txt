@@ -19,6 +19,8 @@ modules/email/AllAttachmentContextMenu.js
 modules/email/Settings.js
 modules/email/LinkedMessagePanel.js
 modules/email/LinkAttachmentDialog.js
+modules/email/TemplateGroupDialog.js
+modules/email/TemplateGroupGrid.js
 modules/email/EmailClient.js
 modules/email/ContactsGrid.js
 modules/email/FindContactDialog.js

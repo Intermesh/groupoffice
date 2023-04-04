@@ -237,21 +237,13 @@ class Router {
 	 * @return array
 	 * @throws InvalidResultReference
 	 */
-	private function resolveResultReferences(array $params, bool $forFilter = false) : array {
-
-		if($forFilter && isset($params['operator'])) {
-			foreach($params['conditions'] as &$filterCondition) {
-				$filterCondition = $this->resolveResultReferences($filterCondition, true);
-			}
-			return $params;
-		}
-
+	private function resolveResultReferences(array $params) : array {
 		foreach ($params as $name => $possibleResultReference) {
-			if(!$forFilter && $name == 'filter') {
-				$params['filter'] = $this->resolveResultReferences($possibleResultReference, true);
-			} elseif (substr($name, 0, 1) == '#') {
+			if (substr($name, 0, 1) == '#') {
 				$params[substr($name, 1)] = $this->resolveResultReference($possibleResultReference);
 				unset($params[$name]);
+			} else if(is_array($possibleResultReference)) {
+				$params[$name] = $this->resolveResultReferences($possibleResultReference);
 			}
 		}
 

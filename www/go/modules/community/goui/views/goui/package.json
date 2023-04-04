@@ -8,7 +8,7 @@
     "start": "esbuild script/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist",
 
     "build": "npm run build:sass && npm run build:ts",
-    "build:ts": "npx esbuild script/Index.ts --external:../../../../../../views/goui/* --bundle --sourcemap --format=esm --target=esnext --outdir=dist",
+    "build:ts": "npx esbuild script/Index.ts --minify --external:../../../../../../views/goui/* --bundle --sourcemap --format=esm --target=esnext --outdir=dist",
     "build:sass": "npx sass --style=compressed style:dist"
   }
 }

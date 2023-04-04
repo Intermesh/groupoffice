@@ -128,9 +128,13 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			baseParams: {sort: [{property: "date", isAscending:false}]},
 			remoteSort: true
 		});
-		
+
+		this.store.on("beforeload", () => {
+			this.el.mask(t("Loading..."));
+		});
 		this.store.on('load', function(store,records,options) {		
 			this.updateView(options);
+			this.el.unmask();
 		}, this);
 
 		this.store.on('remove', function() {
@@ -198,6 +202,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	},
 
 	onLoad: function (dv) {
+
 		var id = dv.model_id ? dv.model_id : dv.currentId; //model_id is from old display panel
 		var type = dv.entity || dv.model_name || dv.entityStore.entity.name;
 		if(this.entityId === id) {

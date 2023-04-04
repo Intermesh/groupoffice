@@ -76,6 +76,8 @@ Ext.extend(GO.email.EmailTemplateDialog, go.Window,{
 				success:function(form, action)
 				{
 					this.readPermissionsTab.setAcl(action.result.data.acl_id);
+
+					GO.dialog.TabbedFormDialog.prototype.setRemoteComboTexts.call(this, action);
 										
 					GO.email.EmailTemplateDialog.superclass.show.call(this);
 				},
@@ -366,7 +368,21 @@ Ext.extend(GO.email.EmailTemplateDialog, go.Window,{
 					anchor: '100%',
 					allowBlank: true,
 					fieldLabel: t("Subject")
-				}
+				},this.templateGroupCombo = new GO.form.ComboBox({
+						hiddenName: 'group_id',
+						fieldLabel: t("Group"),
+						store:new GO.data.JsonStore({
+							url: GO.url('email/templateGroup/store'),
+							fields: ['id','name'],
+							remoteSort: true
+						}),
+						valueField:'id',
+						displayField:'name',
+						mode: 'remote',
+						triggerAction: 'all',
+						anchor: '100%',
+						editable: false
+					})
 			]
 			},
 			this.htmlEditPanel = new GO.base.email.EmailEditorPanel({

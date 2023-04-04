@@ -2517,12 +2517,10 @@ The following is the error message:
 			$language = false;
 			if(!empty($participant->user_id)){
 				$user = \GO\Base\Model\User::model()->findByPk($participant->user_id, false, true);
-				if (!$user->enabled) {
+				if (!$user || !$user->enabled) {
 					continue;
 				}
-				if($user) {
-					\GO::language()->setLanguage($user->language);
-				}
+				\GO::language()->setLanguage($user->language);
 			}
 
 			$subject =  \GO::t("Cancellation", "calendar").': '.$this->name;
