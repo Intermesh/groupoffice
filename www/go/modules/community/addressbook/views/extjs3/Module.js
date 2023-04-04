@@ -419,7 +419,8 @@ go.Modules.register("community", "addressbook", {
 	 * Extra custom field types this module offers
 	 */
 	customFieldTypes: [
-		"go.modules.community.addressbook.customfield.Contact"
+		"go.modules.community.addressbook.customfield.Contact",
+		"go.modules.community.addressbook.customfield.MultiContact"
 	]
 });
 
