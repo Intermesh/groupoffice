@@ -1,14 +1,16 @@
+04-04-2023: 6.7.22
 - OAuth2Client: remove obsolete FK from uninstall script
 - Core: Added Japanese translations
 - Core: Extra check if store is in sync when viewing entities (Task, contact etc.)
 - Calendar: minor bugfix when trying to delete an event with a participant with missing user_id
+- Core / Studio: Use studio entities as custom fields
 
-30-03-3023: 6.7.21
+30-03-2023: 6.7.21
 - Core: Smaller login dialog when logout timer is enabled
 - Core: Enabled ACL Garbage Collection
 - Email: Fixed bug in MIME header decode
 
-24-03-3023: 6.7.20
+24-03-2023: 6.7.20
 - Email: Fixed long hang when trying to delete all attachments
 - Core: Fixed rebuild search cache error "Already active transaction"
 - Core: ACL's are not deleted immediately but collected by garbage collection (not active yet)
