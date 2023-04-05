@@ -8,6 +8,9 @@ go.modules.community.addressbook.customfield.MultiContact = Ext.extend(go.custom
 
 	iconCls: "ic-contacts",
 
+	// Do NOT offer this field as a new field. Instead, make the end user explicitly set it as multiple upon creation
+	hideInNewFieldTypes: true,
+
 	/**
 	 * Return dialog to edit this type of field
 	 *
