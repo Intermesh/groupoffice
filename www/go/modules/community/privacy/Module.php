@@ -59,12 +59,12 @@ final class Module extends core\Module
 		}
 
 		// Create default settings in core_setting
-		$settings = new privacy\model\Settings();
+		$settings = $this->getSettings();//new privacy\model\Settings();
 		$settings->setValues([
             'warnXDaysBeforeDeletion' => 7,
 			'monitorAddressBooks' => $incomingAB->id,
 			'trashAddressBook' => $trashAB->id,
-            'trashAfterXMonths' => 6
+            'trashAfterXDays' => 42
 		]);
 		$settings->save();
 		return parent::afterInstall($model);
@@ -92,8 +92,6 @@ final class Module extends core\Module
 
 		Contact::on(core\orm\Property::EVENT_MAPPING, static::class, 'onContactMap');
 		Contact::on(core\orm\Entity::EVENT_BEFORE_SAVE, static::class, 'onContactBeforeSave');
-
-		// TODO: Contacts!
 	}
 
 	public function getSettings()

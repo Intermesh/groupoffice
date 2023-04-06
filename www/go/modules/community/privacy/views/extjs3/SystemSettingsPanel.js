@@ -18,8 +18,8 @@ go.modules.community.privacy.SystemSettingsPanel = Ext.extend(go.systemsettings.
 				minValue: 0,
 				decimals: 0,
 				fieldLabel: t("Inactivity period"),
-				hint: t("Move inactive contacts to trash after the configured number of months"),
-				name: "trashAfterXMonths",
+				hint: t("Move inactive contacts to trash after the configured number of days"),
+				name: "trashAfterXDays",
 				allowBlank: false
 			}, {
 				xtype: "gonumberfield",

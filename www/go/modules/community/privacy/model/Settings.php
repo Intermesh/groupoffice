@@ -14,21 +14,12 @@ final class Settings extends core\SettingsEntity
 
 	public $trashAddressBook;
 
-	public $trashAfterXMonths;
+	public $trashAfterXDays;
 
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 			->addTable('community_privacy_settings');
 	}
-//
-//	public function getMonitorAddressBooks(): array
-//	{
-//		return !empty($this->monitorAddressBooks) ? explode(',', $this->monitorAddressBooks) : [];
-//	}
-//
-//	public function setMonitorAddressBooks(array $v)
-//	{
-//		$this->monitorAddressBooks = implode(",", $v);
-//	}
+
 }

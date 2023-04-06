@@ -7,7 +7,7 @@ GO.moduleManager.onModuleReady('addressbook',function() {
 				hidden: true,
 				onLoad: (detailView) => {
 					this.privacyPanel.hide();
-					if(detailView.data.deletionDate || this.deleteInXDays > -1) {
+					if (detailView.data.deletionDate || this.deleteInXDays > -1) {
 						this.privacyPanel.show();
 					}
 				},
@@ -15,8 +15,8 @@ GO.moduleManager.onModuleReady('addressbook',function() {
 					'<p class="s6">' +
 					'<i class="icon label">security</i>' +
 					'<span>{[go.util.Format.date(values.deletionDate?.deleteAt)]}</span>	' +
-					'<label>'+ t("Delete at") + '</label>' +
-					'</p>'+
+					'<label>' + t("Delete at") + '</label>' +
+					'</p>' +
 					'</div>'
 			})
 			this.deletionPanel = new Ext.Panel({
@@ -25,11 +25,10 @@ GO.moduleManager.onModuleReady('addressbook',function() {
 				html: "<i class='icon danger'>warning</i> " + t("This contact is inactive and will be moved to trash in {x} days.").replace("{x}", this.deleteInXDays),
 				onLoad: (dv) => {
 					this.deletionPanel.hide();
-					if(this.deleteInXDays > -1) {
+					if (this.deleteInXDays > -1) {
 						this.deletionPanel.update({
 							html: "<i class='icon danger'>warning</i> " +
-								t("This contact is inactive and will be moved to trash in {x} days.").
-								replace("{x}", this.deleteInXDays),
+								t("This contact is inactive and will be moved to trash in {x} days.").replace("{x}", this.deleteInXDays),
 						});
 						this.deletionPanel.show();
 					}
@@ -53,7 +52,7 @@ GO.moduleManager.onModuleReady('addressbook',function() {
 				deletionDate = new Date(this.data.deletionDate.deleteAt);
 			} else if (arAbs.indexOf(this.data.addressBookId) > -1) {
 				// Otherwise, check whether contact is in one of the monitored address book and should be deleted
-				deletionDate = new Date(this.data.createdAt).add(Date.MONTH, settings.trashAfterXMonths);
+				deletionDate = new Date(this.data.createdAt).add(Date.DAY, settings.trashAfterXDays);
 			}
 			if (deletionDate) {
 				referenceDate = deletionDate.add(Date.DAY, (0 - settings.warnXDaysBeforeDeletion))
@@ -87,45 +86,53 @@ GO.moduleManager.onModuleReady('addressbook',function() {
 
 	Ext.override(go.modules.community.addressbook.MainPanel, {
 		initComponent: go.modules.community.addressbook.MainPanel.prototype.initComponent.createSequence(function () {
-			// debugger;
-			const module = go.Modules.get("community", "privacy"), settings = module.settings;
 			const tt = this.grid.topToolbar;
 			this.emptyTrashBtn = new Ext.Button({
-				iconCls: 'btn-delete',
-				hidden: !go.User.isAdmin,
+				iconCls: 'ic-delete-forever',
+				hidden: true,
 				cls: 'danger',
 				text: t("Empty trash"),
 				tooltip: t('Empty trash'),
-				handler: (btn) => {
-					const trashABId = settings.trashAddressBook;
-					Ext.MessageBox.confirm(t("Confirm"),
-						t("Are you sure that you want to empty the trash address book?"),
-						(b) => {
-							if(b !== "yes") {
-								return false;
-							}
-							go.Db.store("Contact").query({
-								limit: 0,
-								filter: {
-									addressBookId: [trashABId]
-								}},
-							(result) => {
-								if (!go.util.empty(result.ids)) {
-									go.Db.store("Contact").set({
-										destroy: result.ids
-									}).then(() => {
-										Ext.MessageBox.alert(t("Success"), t("The trash address book has been successfully emptied"));
-									});
-								}
-							}, this);
-						}
-					);
-					return false;
-				}
-
+				handler: go.modules.community.privacy.emptyTrashHandler
 			});
 			tt.insertButton(0, this.emptyTrashBtn);
 		}),
+		setAddressBookId: go.modules.community.addressbook.MainPanel.prototype.setAddressBookId.createSequence(function (addressBookIds) {
+			this.emptyTrashBtn.hide();
+			if (go.User.isAdmin) {
+				const module = go.Modules.get("community", "privacy"), settings = module.settings,
+					trashABId = settings.trashAddressBook;
+				if (!go.util.empty(addressBookIds) && addressBookIds.indexOf(trashABId) > -1) {
+					this.emptyTrashBtn.show();
+				}
+			}
+		}),
+	});
 
+	Ext.override(go.modules.community.addressbook.AddressBookTree, {
+		initComponent: go.modules.community.addressbook.AddressBookTree.prototype.initComponent.createSequence(function () {
+			this.emptyTrashBtn = null;
+		}),
+
+		showAddressBookMoreMenu: go.modules.community.addressbook.AddressBookTree.prototype.showAddressBookMoreMenu.createSequence(function (node, e) {
+			const module = go.Modules.get("community", "privacy"), settings = module.settings, trashABId = settings.trashAddressBook;
+
+			if(!this.emptyTrashBtn && go.User.isAdmin) {
+				this.emptyTrashBtn = new Ext.menu.Item({
+					itemId: "empty-trash",
+					iconCls: "ic-delete-forever",
+					text: t("Empty trash"),
+					handler: go.modules.community.privacy.emptyTrashHandler,
+					scope: this
+				});
+				this.addressBookMoreMenu.insert(2, this.emptyTrashBtn);
+			}
+			if(node.attributes.data.id === trashABId && go.User.isAdmin) {
+				this.addressBookMoreMenu.getComponent("empty-trash").enable();
+			} else {
+				this.addressBookMoreMenu.getComponent("empty-trash").disable();
+			}
+
+		}),
 	});
 });

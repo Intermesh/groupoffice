@@ -28,7 +28,7 @@ final class TrashContacts extends CronJob
 
 		// Retrieve IDs of contacts in monitored address books that are to be moved
 		$dt = new DateTime();
-		$dt->sub(new DateInterval("P" . $settings->trashAfterXMonths . 'M'));
+		$dt->sub(new DateInterval("P" . $settings->trashAfterXDays . 'D'));
 
 		$res = Contact::find(['id'])->where('createdAt', '<', $dt)
 			->andWhere('addressBookId', 'IN', $monABs)
