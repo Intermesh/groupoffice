@@ -256,24 +256,6 @@ go.Jmap = {
 				}
 			}, false);
 
-			// source.addEventListener('alert', function(e) {
-			// 	var data = JSON.parse(e.data);
-			// 	go.Db.store(data.entityType).single(data.entityId).then(function(entity) {
-			// 		go.Notifier.msg({
-			// 			title: t(data.entityType),
-			// 			html: entity.title || entity.name || entity.subject || entity.description,
-			// 			buttons: [{
-			// 				text: t('Open'),
-			// 				handler: function() {
-			// 					var window = new go.links.LinkDetailWindow({entity:data.entityType});
-			// 					window.load(data.entityId).show();
-			// 				}
-			// 			}]
-			// 		});
-			// 	});
-			//
-			//
-			// },false);
 
 			window.addEventListener('beforeunload', () => {
 				console.log("Closing SSE")

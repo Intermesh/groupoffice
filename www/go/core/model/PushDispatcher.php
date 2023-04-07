@@ -86,7 +86,6 @@ class PushDispatcher
 
 	private function diff($old, $new): array
 	{
-
 		$diff = [];
 
 		foreach ($new as $key => $value) {

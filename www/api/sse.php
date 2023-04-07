@@ -8,6 +8,8 @@
  */
 
 use go\core\App;
+use go\core\jmap\Request;
+use go\core\jmap\Response;
 use go\core\jmap\State;
 use go\core\model\PushDispatcher;
 
@@ -16,9 +18,20 @@ require("../vendor/autoload.php");
 //Create the app with the database connection
 App::get()->setAuthState(new State());
 
+
+if(Request::get()->getMethod() == "OPTIONS") {
+	Response::get()
+		->sendHeaders()
+		->output();
+	exit();
+}
+
 if(!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
-	http_response_code(401);
-	exit("Unauthorized.");
+	Response::get()
+		->setStatus(401)
+		->output();
+
+	exit();
 }
 
 //for servers with session.autostart
@@ -27,20 +40,23 @@ if(!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
 //Check availability
 if(!go()->getConfig()['sseEnabled']) {
 	// Service Unavailable
-	http_response_code(503);
-	echo "Server Sent Events not available";
+
+	Response::get()
+		->setStatus(503, "Server Sent Events not available")
+		->output();
 	exit();
 }
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 ini_set("max_execution_time", PushDispatcher::MAX_LIFE_TIME + 10);
 
-header('Cache-Control: no-cache');
-header('Pragma: no-cache');
-header("Content-Type: text/event-stream");
-header('Connection: keep-alive');
-header('X-Accel-Buffering: no');
-
+Response::get()
+	->setHeader("Cache-Control", "no-cache")
+	->setContentType(" text/event-stream")
+	->setHeader("Pragma", "no-cache")
+	->setHeader("Connection", "keep-alive")
+	->setHeader("X-Accel-Buffering", "no")
+	->output();
 
 try {
 // Client may specify 'types' and a 'ping' interval
