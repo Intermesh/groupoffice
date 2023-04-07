@@ -539,6 +539,7 @@ abstract class Entity  extends OrmEntity {
 		];
 
 		if($sinceState == self::getState()) {
+			$result['newState'] = $sinceState;
 			return $result;
 		}
 		
