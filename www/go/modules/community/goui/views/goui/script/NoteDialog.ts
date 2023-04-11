@@ -4,7 +4,6 @@ import {
 	CardContainer,
 	cardmenu,
 	cards,
-	client,
 	comp,
 	containerfield,
 	Fieldset,
@@ -12,15 +11,15 @@ import {
 	form,
 	Form,
 	htmlfield,
-	JmapDataSource,
 	Notifier,
 	root,
 	t,
 	tbar,
 	textfield,
 	Window,
-	EntityID, jmapds
+	EntityID
 } from "@intermesh/goui";
+import {client, jmapds} from "@intermesh/groupoffice-core";
 
 export class NoteDialog extends Window {
 	readonly form: Form;

@@ -2,17 +2,16 @@ import {NoteDialog} from "./NoteDialog.js";
 import {
 	btn,
 	Button,
-	JmapDataSource,
 	comp,
 	Component,
 	DefaultEntity,
 	FunctionUtil,
-	Image,
 	t,
 	tbar,
 	Toolbar,
-	Window, jmapds
+	Window
 } from "@intermesh/goui";
+import {Image, jmapds} from "@intermesh/groupoffice-core";
 
 
 export class NoteDetail extends Component {

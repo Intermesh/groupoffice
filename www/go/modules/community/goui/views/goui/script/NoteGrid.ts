@@ -5,9 +5,9 @@ import {
 	datetimecolumn,
 	t,
 	Table,
-	DataSourceStore,
-	jmapds
+	DataSourceStore
 } from "@intermesh/goui";
+import {jmapds} from "@intermesh/groupoffice-core";
 
 export class NoteGrid extends Table<DataSourceStore> {
 

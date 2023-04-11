@@ -1,9 +1,7 @@
-
 import {NoteBookGrid} from "./NoteBookGrid.js";
-import {AutocompleteField, jmapds} from "@intermesh/goui";
-import {t} from "@intermesh/goui";
-import {Config, createComponent} from "@intermesh/goui";
-import {client} from "@intermesh/goui";
+import {AutocompleteField, Config, createComponent, t} from "@intermesh/goui";
+import {jmapds} from "@intermesh/groupoffice-core";
+
 
 export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
 	constructor() {

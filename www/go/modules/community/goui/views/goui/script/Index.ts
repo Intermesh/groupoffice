@@ -1,6 +1,5 @@
-import {modules, router} from "@intermesh/groupoffice-core";
+import {client, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {client} from "@intermesh/goui";
 
 modules.register(  {
 	package: "community",

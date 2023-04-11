@@ -4,10 +4,10 @@ import {
 	createComponent,
 	datasourcestore,
 	DataSourceStore,
-	jmapds,
 	t,
 	Table
 } from "@intermesh/goui";
+import {jmapds} from "@intermesh/groupoffice-core";
 
 
 export class NoteBookGrid extends Table<DataSourceStore> {

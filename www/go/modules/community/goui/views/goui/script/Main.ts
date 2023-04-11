@@ -1,16 +1,9 @@
-import {comp, Component} from "@intermesh/goui";
-import {splitter} from "@intermesh/goui";
-import {tbar} from "@intermesh/goui";
-import {btn} from "@intermesh/goui";
-import {checkboxselectcolumn, column} from "@intermesh/goui";
-import {StoreRecord} from "@intermesh/goui";
+import {btn, checkboxselectcolumn, column, comp, Component, router, splitter, t, tbar} from "@intermesh/goui";
 
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
-import {router} from "@intermesh/goui";
-import {t} from "@intermesh/goui";
 
 
 export class Main extends Component {
