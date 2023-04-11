@@ -1,6 +1,7 @@
 6.6.158
 - Projects2: Fix bug in time registration PDF report
 - Core: Prevent shitty CSS from breaking email viewer
+- Workflow: support landscape page in history PDF
 
 03-04-2023: 6.6.157
 - OAuth2Client: remove obsolete FK from uninstall script
