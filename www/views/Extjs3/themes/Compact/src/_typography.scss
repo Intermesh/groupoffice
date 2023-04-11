@@ -2,8 +2,8 @@
 
 $font-family:  -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
-$font-weight-r: 300;
 $font-weight-m: bold;
+$font-weight-r: normal;
 $font-weight-l: 100;
 
 @function letter-space($space, $font-size) {
