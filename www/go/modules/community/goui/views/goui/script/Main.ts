@@ -134,7 +134,8 @@ export class Main extends Component {
 				// 	]
 				// }),
 				btn({
-					cls: "primary",
+					cls: "filled primary",
+					text: "Add",
 					icon: "add",
 					handler: () => {
 						const dlg = new NoteDialog();
