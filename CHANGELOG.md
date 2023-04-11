@@ -1,3 +1,6 @@
+6.6.158
+- Projects2: Fix bug in time registration PDF report
+
 03-04-2023: 6.6.157
 - OAuth2Client: remove obsolete FK from uninstall script
 - Core: Added Japanese translations
