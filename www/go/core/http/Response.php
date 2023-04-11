@@ -86,8 +86,13 @@ class Response extends Singleton{
 	 */
 	public $jsonOptions = 0;
 
-	public function setContentType($contentType) {
-		$this->setHeader('Content-Type', $contentType);
+	/**
+	 * Set the Content-Type header
+	 * @param $contentType eg. "text/html"
+	 * @return $this
+	 */
+	public function setContentType(string $contentType) : self {
+		return $this->setHeader('Content-Type', $contentType);
 	}
 
 	private $cspNonce;
@@ -95,7 +100,8 @@ class Response extends Singleton{
 	/**
 	 * @throws CoreException
 	 */
-	public function getCspNonce() {
+	public function getCspNonce(): string
+	{
 		if(!isset($this->cspNonce)) {
 			$this->cspNonce = hash("sha256", random_bytes(16));
 		}
@@ -114,7 +120,7 @@ class Response extends Singleton{
 	 * @param string|StringUtil[] $value
 	 * @return $this
 	 */
-	public function setHeader(string $name, $value): Response
+	public function setHeader(string $name, $value): self
 	{
 		$lcname = strtolower($name);
 
@@ -133,7 +139,7 @@ class Response extends Singleton{
 	 * @param string $name
 	 * @return $this;
 	 */
-	public function removeHeader(string $name): Response
+	public function removeHeader(string $name): self
 	{
 
 		$name = strtolower($name);
@@ -181,7 +187,7 @@ class Response extends Singleton{
 	 * @param int $httpCode
 	 * @param string|null $text Status text. May not contain new lines in headers.
 	 */
-	public function setStatus(int $httpCode, string $text = null)
+	public function setStatus(int $httpCode, string $text = null): Response
 	{
 		if (!isset($text)) {
 			$text = http\Exception::$codes[$httpCode];
@@ -191,9 +197,12 @@ class Response extends Singleton{
 			$status = "Status: " . $httpCode . " " . $text;
 		} else
 		{
-			$status = "HTTP/" . $this->httpVersion . " " . $httpCode . " " . $text;
+			$protocol = $_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/' . $this->httpVersion;
+			$status = $protocol . " " . $httpCode . " " . $text;
 		}
 		header($status);
+
+		return $this;
 	}
 
 	/**
@@ -210,25 +219,35 @@ class Response extends Singleton{
 	 * Set Modified At header and enable HTTP caching
 	 * @param DateTime $modifiedAt
 	 */
-	public function setModifiedAt(DateTime $modifiedAt) {
+	public function setModifiedAt(DateTime $modifiedAt): Response
+	{
 		$this->modifiedAt = $modifiedAt;
-		$this->setHeader('Last-Modified', $this->modifiedAt->format('D, d M Y H:i:s') . ' GMT');
+		return $this->setHeader('Last-Modified', $this->modifiedAt->format('D, d M Y H:i:s') . ' GMT');
 	}
 
 	private $etag;
 
 	/**
 	 * Set ETag header and enable HTTP caching
-	 * 
+	 *
 	 * @param string $etag
+	 * @return self
 	 */
-	public function setETag(string $etag) {
+	public function setETag(string $etag): self
+	{
 		$this->etag = $etag;
-		$this->setHeader('ETag', $this->etag);
+		return $this->setHeader('ETag', $this->etag);
 	}
 
-	public function setExpires(DateTime $expires = null) {
-		$this->setHeader("Expires", $expires->format('D, d M Y H:i:s'));
+	/**
+	 * Set tyhe Expires header
+	 *
+	 * @param CoreDateTime|null $expires
+	 * @return self
+	 */
+	public function setExpires(DateTime $expires = null): self
+	{
+		return $this->setHeader("Expires", $expires->format('D, d M Y H:i:s'));
 	}
 
 	/**
@@ -249,7 +268,8 @@ class Response extends Singleton{
 	 * ```
 	 *
 	 */
-	public function setCookie(string $name, string $value, array $options = []) {
+	public function setCookie(string $name, string $value, array $options = []): self
+	{
 
 		if(version_compare(phpversion(), "7.3.0") > -1) {
 			setcookie($name, $value, $options);
@@ -261,8 +281,10 @@ class Response extends Singleton{
 				$options['path'] .= '; samesite=' . $options['samesite'];
 			}
 			setcookie($name, $value, $options['expires'] ?? 0, $options['path'] ?? "", $options['domain'] ?? "", $options['secure'] ?? false, $options['httponly'] ?? false);
+
 		}
 
+		return $this;
 
 	}
 
@@ -312,7 +334,7 @@ class Response extends Singleton{
 		}
 	}
 
-	public function sendDocumentSecurityHeaders() {
+	public function sendDocumentSecurityHeaders(): self {
 		$frameAncestors = go()->getConfig()['frameAncestors'];
 
 		if(empty($frameAncestors)) {
@@ -324,14 +346,21 @@ class Response extends Singleton{
 		$this->setHeader("Strict-Transport-Security","max-age=31536000");
 		$this->setHeader("X-XSS-Protection", "1;mode=block");
 		$this->setHeader('X-Robots-Tag', 'noindex');
+
+		return $this;
 	}
 
-	public function sendHeaders() {		
+	/**
+	 * Send the headers to output
+	 * @return self
+	 */
+	public function sendHeaders() : self {
 		foreach ($this->headers as $h) {
 			foreach ($h[1] as $v) {				// go()->debug($h[0] . ': '. $v);
 				header($h[0] . ': ' . $v);
 			}
-		}		
+		}
+		return $this;
 	}
 
 	/**
