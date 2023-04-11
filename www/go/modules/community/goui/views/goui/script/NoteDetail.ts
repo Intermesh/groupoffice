@@ -11,7 +11,7 @@ import {
 	t,
 	tbar,
 	Toolbar,
-	Window
+	Window, jmapds
 } from "@intermesh/goui";
 
 
@@ -92,7 +92,7 @@ export class NoteDetail extends Component {
 		this.mask();
 
 		try {
-			this.entity = await JmapDataSource.store("Note").single(id);
+			this.entity = await jmapds("Note").single(id);
 
 			if(!this.entity) {
 				throw "notfound";

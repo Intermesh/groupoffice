@@ -1,4 +1,13 @@
-import {column, Config, createComponent, datasourcestore,DataSourceStore, JmapDataSource, t, Table} from "@intermesh/goui";
+import {
+	column,
+	Config,
+	createComponent,
+	datasourcestore,
+	DataSourceStore,
+	jmapds,
+	t,
+	Table
+} from "@intermesh/goui";
 
 
 export class NoteBookGrid extends Table<DataSourceStore> {
@@ -7,7 +16,7 @@ export class NoteBookGrid extends Table<DataSourceStore> {
 
 		super(
 			datasourcestore({
-				dataSource: JmapDataSource.store("NoteBook"),
+				dataSource: jmapds("NoteBook"),
 				sort: [{
 					property: "name"
 				}]

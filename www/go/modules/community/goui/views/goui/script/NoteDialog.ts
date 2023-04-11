@@ -19,7 +19,7 @@ import {
 	tbar,
 	textfield,
 	Window,
-	EntityID
+	EntityID, jmapds
 } from "@intermesh/goui";
 
 export class NoteDialog extends Window {
@@ -42,7 +42,7 @@ export class NoteDialog extends Window {
 		this.items.add(
 			this.form = form(
 				{
-					store: JmapDataSource.store("Note"),
+					store: jmapds("Note"),
 					cls: "vbox",
 					flex: 1,
 					// handler: async (form) => {

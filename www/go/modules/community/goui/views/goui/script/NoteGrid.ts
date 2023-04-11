@@ -1,5 +1,13 @@
 import {NoteDialog} from "./NoteDialog.js";
-import {column, datasourcestore, datetimecolumn, JmapDataSource, t, Table, DataSourceStore} from "@intermesh/goui";
+import {
+	column,
+	datasourcestore,
+	datetimecolumn,
+	t,
+	Table,
+	DataSourceStore,
+	jmapds
+} from "@intermesh/goui";
 
 export class NoteGrid extends Table<DataSourceStore> {
 
@@ -7,7 +15,7 @@ export class NoteGrid extends Table<DataSourceStore> {
 
 		super(
 			datasourcestore({
-				dataSource: JmapDataSource.store("Note"),
+				dataSource: jmapds("Note"),
 				sort: [{
 					property: "name"
 				}]
