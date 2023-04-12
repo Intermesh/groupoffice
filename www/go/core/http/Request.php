@@ -426,7 +426,7 @@ class Request extends Singleton{
    */
   public static function headerDecode($string) {
       $pos = strpos($string, "''");
-      if($pos == false || $pos > 64) {
+      if($pos === false || $pos > 64) {
         return false;
       }
 			//eg. iso-8859-1''%66%6F%73%73%2D%69%74%2D%73%6D%61%6C%6C%2E%67%69%66
