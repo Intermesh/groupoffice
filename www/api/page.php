@@ -36,7 +36,7 @@ if (Request::get()->getMethod() == 'OPTIONS') {
 
 try {
 
-	Response::get()->sendDocumentSecurityHeaders();
+//	Response::get()->sendDocumentSecurityHeaders();
 
 	if (strpos($_SERVER['PATH_INFO'], '/') === false) {
 
