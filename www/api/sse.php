@@ -8,6 +8,7 @@
  */
 
 use go\core\App;
+use go\core\ErrorHandler;
 use go\core\jmap\Request;
 use go\core\jmap\Response;
 use go\core\jmap\State;
@@ -61,9 +62,9 @@ Response::get()
 try {
 // Client may specify 'types' and a 'ping' interval
 	(new PushDispatcher($_GET['types']))->start($_GET['ping'] ?? 10);
-} catch(Exception $e) {
+} catch(Throwable $e) {
 	echo "event: error\n";
 	echo 'data: ' . $e->getMessage(). "\n\n";
 
-	\go\core\ErrorHandler::logException($e);
+	ErrorHandler::logException($e);
 }
