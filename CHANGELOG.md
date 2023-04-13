@@ -44,8 +44,17 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+13-04-2023: 6.6.158
+- Projects2: Fix bug in time registration PDF report
+- Core: Prevent shitty CSS from breaking email viewer
+- Workflow: support landscape page in history PDF
+- Core: fix minor bug in API
 
-
+03-04-2023: 6.6.157
+- OAuth2Client: remove obsolete FK from uninstall script
+- Core: Added Japanese translations
+- Core: Extra check if store is in sync when viewing entities (Task, contact etc.)
+- Calendar: minor bugfix when trying to delete an event with a participant with missing user_id
 
 27-03-2023: 6.6.156
 - Caldav: Use email account for caldav invites
@@ -195,9 +204,6 @@
 - Tasks: Add possibility to import tasklistId from CSV
 - Core: Set global SMTP timeout value in System Settings -> Notifications
 
-24-11-2022 6.7.3
-- Core: small fixes and Dutch translation
-
 24-11-2022 6.6.135
 - Calendar: tasklist_id cannot be null error on user create.
 
@@ -240,7 +246,6 @@
 - ActiveSync: duplicate Reference and in-reply-to header
 - Core: Added Kosovo to the countries list
 - Core: fix date custom filter to display date on before/after value
-- Email: unreadable text in background. White font on white background.
 
 09-11-2022 6.6.128
 - Core: rollback of fix for autocomplete. Probably fixed by always creating an address book entry

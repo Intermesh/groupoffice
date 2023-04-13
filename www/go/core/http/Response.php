@@ -88,7 +88,7 @@ class Response extends Singleton{
 
 	/**
 	 * Set the Content-Type header
-	 * @param $contentType eg. "text/html"
+	 * @param string $contentType eg. "text/html"
 	 * @return $this
 	 */
 	public function setContentType(string $contentType) : self {
@@ -218,6 +218,7 @@ class Response extends Singleton{
 	/**
 	 * Set Modified At header and enable HTTP caching
 	 * @param DateTime $modifiedAt
+	 * @return Response
 	 */
 	public function setModifiedAt(DateTime $modifiedAt): Response
 	{
