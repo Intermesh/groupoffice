@@ -496,7 +496,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 		+ .x-form-twin-triggers, + .x-form-trigger {
 			border-radius: 0;
-			border-left: 1px solid color($fg, 'line');
+			border-left: 1px solid var(--fg-track);
 		}
 		
 		&[readonly] {
@@ -713,8 +713,9 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 			content: 'arrow_drop_down';
 		}
 		&.x-form-trigger-over {
-			color:black;
-			//background-color: color($bg, 'hover');
+			//color:black;
+			color:var(--fg-base);
+			background-color: var(--bg-hover);
 		}
 		&.x-form-clear-trigger::before {content: 'clear'; font-size: sp(18)}
 		&.x-form-search-trigger::before {content: 'search';}
@@ -1455,7 +1456,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 			}
 			background-color: $cSelected;
 
-			border-bottom-color: transparent;
+			//border-bottom-color: transparent;
 			background-image: none;
 		}
 		
@@ -2221,12 +2222,12 @@ td.x-date-mp-sep {
 // ### MENU ###
 // ############
 .x-menu{
-	@extend .z2;
+	@extend .z5;
 	border-radius: $borderRadius;
-	background-color:color($bg,'card');
+	background-color:color($bg,'layer');
 	opacity: 1;
 	transition: opacity 90ms $curve-standard, transform 120ms $curve-deceleration;
-	transform-origin: left top 0px;
+	transform-origin: left top 0;
 	transform: scale(1);
 	will-change: transform, opacity;
 	
@@ -2263,7 +2264,7 @@ td.x-date-mp-sep {
 		content: 'arrow_drop_up';
 		transform: rotate(90deg);
 		position: absolute;
-		right: dp(32);
+		right: dp(16);
 	} 
 	&-item-active { // this is actualy hover in ext
 		background-color: $cHover;
@@ -2312,7 +2313,7 @@ td.x-date-mp-sep {
 a.x-menu-item {
 	@extend %font-body1;
 	user-select: none;
-	padding: 0 dp(56) 0 dp(16);
+	padding: 0 dp(40) 0 dp(16);
 	border:0 !important;
 }
 .menu-title {
@@ -2678,9 +2679,7 @@ $menuScrollerSize : dp(4);
 .x-window{
 	@extend .z24;
 	will-change: left, top;
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-	background-color:color($bg,'dialog');
+	background-color:color($bg,'layer');
 	border-radius: $borderRadius;
 	overflow:hidden;
 	border: 1px solid color($fg, 'line');
@@ -2733,7 +2732,10 @@ $menuScrollerSize : dp(4);
 		border-radius: 0;
 	}
 }
-
+.x-window, .x-layer {
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+}
 
 .x-panel-ghost .x-window-tl {
 	border-bottom-color: color($fg, 'divider');
@@ -2840,12 +2842,16 @@ body.x-body-masked .x-window-plain .x-window-mc {
 
 $resizerSize : dp(3);
 .x-layout-split {
-	//background-color: color($fg,'border');
-	border-right: 1px solid color($fg,'line');
-	border-top: 1px solid color($fg,'line');
+	border-style: solid;
+	border-width: 0;
+	border-color: var(--fg-border);
+	&:hover{
+		border-color: var(--fg-divider);
+	}
 	&.x-splitbar {
 		&-h {
 			width:$resizerSize;
+			border-right-width: 1px;
 			.x-layout-mini {
 				&-east{}
 				&-west{
@@ -2856,6 +2862,7 @@ $resizerSize : dp(3);
 		}
 		&-v {
 			height:$resizerSize;
+			border-top-width: 1px ;
 			.x-layout-mini {
 			}
 		}
@@ -3023,7 +3030,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 // ### DIALOG ###
 // ##############
 .x-window-dlg {
-	background-color: color($bg, 'dialog');
+	background-color: color($bg, 'layer');
 	border-radius: $borderRadius;
 }
 .x-window-dlg .ext-mb-text,
@@ -3199,7 +3206,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	&-btn {
 		&-clear:before { @extend %icon; content: 'clear'; font-size:dp(18);width: dp(24);text-align: center }
 		&-expand:before { @extend %icon; content: 'arrow_drop_down'; line-height:dp(18); }
-		&-over { color: black; }
+		&-over { color: var(--fg-base); }
 		&-hide { display:none; }
 	}
 	&-item {
@@ -3222,7 +3229,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 				font-size: 1em;
 			}
 			&:hover, &:active {
-				color: black;
+				color: var(--fg-base);
 			}
 			.x-superboxselect-item-focus & {
 				color:white;

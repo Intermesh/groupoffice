@@ -2424,7 +2424,7 @@ table[id^="comments-ext"] b {
 }
 
 .go-page {
-	background: color($bg, 'dialog');
+	background: color($bg, 'layer');
 	header {
 		text-align: center;
 		@include var(background-color, c-primary);

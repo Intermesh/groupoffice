@@ -10,7 +10,7 @@ $useThemeSettings = $useThemeSettings ?? true;
 
 $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Installation") : go()->getSettings()->title;
 $primaryColor = go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)';
-if(\GO::user()) {
+if(\GO::user() && \GO::user()->hasAttribute('themeColorScheme')) {
 	$bodyCls .= ' '.\GO::user()->themeColorScheme;
 }
 $webclient = Extjs3::get();

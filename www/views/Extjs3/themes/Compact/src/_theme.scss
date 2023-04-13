@@ -20,7 +20,7 @@ $font-scale: 1.1;
 
 	--bg-body: 			var(--c-primary);
 	--bg-button:	  	#{mix(#fff, $ambientColor, 98%)};
-	--bg-dialog: 		#{rgba(mix(#eee, $ambientColor, 92%),.74)};
+	--bg-layer: 		#{rgba(mix(#eee, $ambientColor, 92%),.74)};
 	--bg-side-bar:		#{mix(white, $ambientColor, 81%)};
 	--bg-background:  #{mix(#fafafa, $ambientColor, 95%)};
 
@@ -53,22 +53,22 @@ $font-scale: 1.1;
 }
 @mixin dark-theme {
 	--fg-base:				white;
-	--fg-divider:			rgba(0,0,0, 0.94);
+	--fg-divider:			rgba(255,255,255, 0.2);
 	--fg-border:			black;
-	--fg-line:				#555555;
+	--fg-line:				rgba(0,0,0, 0.94);
 	--fg-disabled:       rgba(255,255,255, 0.3);
 	--fg-textfield-box:  #555555;
 	--fg-textbox-line: 	#{rgba(white, 0.62)};
 
 	--fg-track: 	#{rgba(white, 0.36)};
-	--fg-text:           white;
+	--fg-text:           rgba(255,255,255, .89);
 	--fg-secondary-text: rgba(255,255,255, 0.7);
 	--fg-unfocused:	   rgba(255,255,255, 0.7);
 	--fg-alt:			black;
 
 	--bg-body: 			#1b1b1b;
 	--bg-button:	  #{mix(#555, $ambientColor, 87%)} ;//rgba(255,255,255,.25); //#606060;
-	--bg-dialog: 		#{rgba(mix(#333, $ambientColor, 95%),.74)};
+	--bg-layer: 		#{rgba(mix(#222, $ambientColor, 95%),.84)};
 	--bg-side-bar:		#{mix(#222, $ambientColor, 87%)};
 	--bg-background: #{mix(#333, $ambientColor, 92%)} ; //rgba(0,0,0,.85); //#1e1e1e;
 
