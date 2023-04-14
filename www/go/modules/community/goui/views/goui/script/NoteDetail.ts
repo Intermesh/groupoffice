@@ -42,24 +42,24 @@ export class NoteDetail extends Component {
 
 		// Legacy stuff
 
-		// const ro = new ResizeObserver(FunctionUtil.buffer(100,() =>{
-		// 	this.detailView.doLayout();
-		// }));
-		//
-		// ro.observe(this.el);
+		const ro = new ResizeObserver(FunctionUtil.buffer(100,() =>{
+			this.detailView.doLayout();
+		}));
 
-		// this.detailView = new go.detail.Panel({
-		// 	width: undefined,
-		// 	entityStore: go.Db.store("Note"),
-		// 	header: false
-		// });
-		// this.detailView.addCustomFields();
-		// this.detailView.addLinks();
-		// this.detailView.addComments();
-		// this.detailView.addFiles();
-		// this.detailView.addHistory();
+		ro.observe(this.el);
 
-		// this.scroller.items.add(this.detailView);
+		this.detailView = new go.detail.Panel({
+			width: undefined,
+			entityStore: go.Db.store("Note"),
+			header: false
+		});
+		this.detailView.addCustomFields();
+		this.detailView.addLinks();
+		this.detailView.addComments();
+		this.detailView.addFiles();
+		this.detailView.addHistory();
+
+		this.scroller.items.add(this.detailView);
 	}
 
 	private createToolbar() {

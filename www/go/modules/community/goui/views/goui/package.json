@@ -1,7 +1,7 @@
 {
   "type": "module",
   "devDependencies": {
-    "esbuild": "^0.17.16"
+    "esbuild": "latest"
   },
 
   "scripts": {

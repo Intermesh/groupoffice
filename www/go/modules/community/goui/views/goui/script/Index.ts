@@ -6,6 +6,8 @@ modules.register(  {
 	name: "goui",
 	async init () {
 
+		let notes: Main;
+
 		client.on("authenticated", (client, session) => {
 
 			if(!session.capabilities["go:community:goui"]) {
@@ -13,15 +15,13 @@ modules.register(  {
 				return;
 			}
 
-			let notes: Main = new Main();
-
 			router.add(/^goui-notes\/(\d+)$/, (noteId) => {
 				modules.openMainPanel("goui-notes");
 				notes.showNote(parseInt(noteId));
 			});
 
 			modules.addMainPanel("community", "goui","goui-notes", "GOUI Notes", () => {
-
+				notes = new Main();
 				//this will lazy load Notes when module panel is opened.
 				return notes;
 			});
