@@ -79,7 +79,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * Always called after all scripts are loaded in Ext.onReady();
 	 * @returns {undefined}
 	 */
-	boot : function() {
+	boot : async function() {
+
+		window.groupofficeCore = await import(BaseHref + "views/goui/groupoffice-core/dist/index.js");
+		window.GOUI = await import(BaseHref + "views/goui/goui/dist/index.js");
+
 		var me = this;
 		go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
@@ -95,7 +99,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					me.fireEvent('boot', me);
 				}, me, {single:true});
 				me.onAuthentication(); // <- start Group-Office
-			}).catch(() => {
+			}).catch((e) => {
+				console.warn(e);
 				me.fireEvent("boot", me);
 				go.Router.check();
 			})
