@@ -221,11 +221,12 @@ class Builder
 	    $packageFiles = array_merge($packageFiles, run("find go/modules -name package.json -not -path '*/node_modules/*'"));
 
         foreach($packageFiles as $packageFile)  {
-            $nodeDir = dirname($packageFile);
-            cd($nodeDir);
+					$nodeDir = dirname($packageFile);
+          cd($nodeDir);
 	        run("npm install");
-            run("pwd");
-            run("npm run build");
+          run("pwd");
+					run("npm run build");
+	        run("npm prune --production");
 	        cd($this->buildDir . "/" . $this->packageName);
         }
     }
