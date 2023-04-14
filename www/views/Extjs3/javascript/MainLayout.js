@@ -85,7 +85,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		window.GOUI = await import(BaseHref + "views/goui/goui/dist/index.js");
 
 		var me = this;
-		go.browserStorage.connect().finally(function() {
+		// go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
 			Ext.apply(Ext.QuickTips.getQuickTip(), {
 				dismissDelay: 0,
@@ -106,7 +106,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			})
 
 				
-		});
+		// });
 
 	},
 

@@ -37,27 +37,6 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	},
 
 	/**
-	 * Inititalizes IndexedDB storage and state variables
-	 *
-	 * @returns {Promise<T>}
-	 */
-	initState : function() {
-
-		if (this.initialized) {
-			return this.initialized;
-		}
-
-		window.groupofficeCore.jmapds(this.entity.name).on('change', changes => {
-			this.fireEvent('changes', this, changes.created, changes.updated, changes.destroyed);
-		})
-
-		this.initialized = Promise.resolve();
-
-		return this.initialized;
-
-	},
-
-	/**
 	 * Saves the JMAP state for this entity
 	 *
 	 * @param state
@@ -322,15 +301,15 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		const proms = [], response = {};
 
 		if(params.create) {
-			for (let e of params.create) {
+			for (let id in params.create) {
 				proms.push(
 					window.groupofficeCore.jmapds(this.entity.name)
-						.create(e)
+						.create(params.create[id], id)
 						.then(e => {
 							if(!response.created) {
 								response.created = {};
 							}
-							response.created[e.id] = e;
+							response.created[id] = e;
 						})
 						.catch(setError => {
 							if(!response.notCreated) {

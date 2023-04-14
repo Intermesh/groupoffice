@@ -284,7 +284,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					handler: function(item) {
 						var record = this.store.getAt(item.parentMenu.rowIndex);
 						//Drop local data
-						go.browserStorage.deleteDatabase().then(function() {
+						window.GOUI.browserStoreConnection.deleteDatabase().then(function() {
 
 							go.Jmap.request({
 								method: "User/loginAs",
