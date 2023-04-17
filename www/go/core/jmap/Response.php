@@ -16,7 +16,7 @@ class Response extends HttpResponse
 	
 	private $methodName;
 	
-	private $data = [];
+	private $data = null;
 	
 	public function __construct() {
 		parent::__construct();
