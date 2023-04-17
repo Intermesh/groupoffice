@@ -377,7 +377,7 @@ class Module extends Observable {
 			\GO::getDbConnection()->query($sql);
 			
 			
-			$stmt = GO::getDbConnection()->query('SHOW TABLES');
+			$stmt = \GO::getDbConnection()->query('SHOW TABLES');
 			while ($r = $stmt->fetch()) {
 				$tableName = $r[0];
 
