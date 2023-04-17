@@ -1,3 +1,5 @@
+- Core: Yes/No field has a default value now.
+
 13-04-2023: 6.6.158
 - Projects2: Fix bug in time registration PDF report
 - Core: Prevent shitty CSS from breaking email viewer
