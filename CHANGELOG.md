@@ -1,6 +1,7 @@
 6.7.23
 
 - Core: Upload attachments to entities through the JMAP API
+- Addressbook: fix error in selectDialogPanel when no address book selected
 
 04-04-2023: 6.7.22
 - OAuth2Client: remove obsolete FK from uninstall script
