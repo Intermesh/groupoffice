@@ -9,7 +9,7 @@
     "start": "npm run build:clean && npm run start:parallel",
     "start:parallel": "npm run start:watch",
     "start:watch": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --minify --watch --bundle --splitting --sourcemap --format=esm --target=esnext --outdir=dist",
-    "build": "npm run build:clean && npm run build:ts && npm run build:goui-dts &&  npm run build:groupoffice-core-dts",
+    "build": "npm run build:clean && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --minify --bundle --splitting --sourcemap --format=esm --target=esnext --outdir=dist",
     "build:goui-dts": "npx tsc -p goui/tsconfig.json --emitDeclarationOnly --outDir ./dist/goui/script/",
