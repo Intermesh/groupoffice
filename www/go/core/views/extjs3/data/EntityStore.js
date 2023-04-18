@@ -422,10 +422,6 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	query : function(params, cb, scope) {
 
-		if(!params || !params.limit) {
-			console.warn(this.entity.name + "/query call without limit");
-		}
-
 		const callId = window.groupofficeCore.jmapds(this.entity.name).nextCallId;
 		let retProm = window.groupofficeCore.jmapds(this.entity.name)
 			.query(params)
