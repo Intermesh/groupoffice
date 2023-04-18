@@ -58,7 +58,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		if (isset($this->backends[$root])){
 			return $this->backends[$root];
 		}
-		ZLog::Write(LOGLEVEL_ERROR,"Backend ".$root. 'does not exist');
+		ZLog::Write(LOGLEVEL_ERROR,"Backend ".$root. ' does not exist');
 	}
 
 	public function Setup($store, $checkACLonly = false, $folderid = false, $readonly = false) {
@@ -506,7 +506,10 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 				
 				$f = $this->GetBackendFolder($folder);
 				$b = $this->GetBackend($folder);
-				
+				if(!$b) {
+                    ZLog::Write(LOGLEVEL_DEBUG, "Backend not found for $folder");
+                    continue;
+                }
 				$newstate = $b->getNotification($f);
 				
 				ZLog::Write(LOGLEVEL_DEBUG, $folder.': '.$newstate);

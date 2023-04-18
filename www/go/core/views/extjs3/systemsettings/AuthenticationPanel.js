@@ -62,12 +62,12 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 					]
 				},{
 					xtype: "fieldset",
-					title: t("Synchonisation"),
+					title: t("Synchronization"),
 					items: [
 						{
 							xtype: "checkbox",
 							hideLabel: true,
-							boxLabel: "Enable 2-Factor Authentication for ActiveSync devices",
+							boxLabel: "Enable 2-Factor authentication for ActiveSync devices",
 							name: "activeSyncEnable2FA"
 						},{
 							xtype: "checkbox",
