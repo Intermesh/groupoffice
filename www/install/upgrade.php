@@ -12,12 +12,13 @@ ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 
 try {
-	
+
+
 	require('../vendor/autoload.php');
 	App::get();
 	go()->setCache(new \go\core\cache\None());
 
-	// needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
+    // needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
 	// system.
 	go()->disableEvents();
 

@@ -5,7 +5,7 @@ use go\core\model\Acl;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
 
-class goContact extends GoBaseBackendDiff {
+class ContactStore extends Store {
 	
 	private $convertor;
 	public function __construct() {

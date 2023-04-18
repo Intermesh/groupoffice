@@ -8,7 +8,7 @@ use go\modules\community\tasks\model\Progress;
 use go\modules\community\tasks\model\Task;
 use go\modules\community\tasks\model\TaskList;
 
-class goTask extends GoBaseBackendDiff {
+class TaskStore extends Store {
 
 	public function DeleteMessage($folderid, $id, $contentparameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goTask->DeleteMessage(' . $folderid . ',' . $id . ')');

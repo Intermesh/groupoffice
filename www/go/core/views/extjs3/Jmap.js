@@ -256,6 +256,9 @@ go.Jmap = {
 				}
 			}, false);
 
+			source.addEventListener('error', () => {
+				this.poll();
+			});
 
 			window.addEventListener('beforeunload', () => {
 				console.log("Closing SSE")
