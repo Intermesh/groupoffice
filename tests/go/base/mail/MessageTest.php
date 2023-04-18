@@ -29,4 +29,13 @@ class MessageTest extends TestCase {
 //		echo $message->toString();
 
 	}
+
+	public function testMimeWords() {
+		$subject = "=?UTF-8?Q?Vergeet_u_niet_de_watermeterstand_door_te_geven?_|_Klantnumme?=
+ =?UTF-8?Q?r_12345?=";
+
+		$decoded = Utils::mimeHeaderDecode($subject);
+
+		$this->assertEquals("Vergeet u niet de watermeterstand door te geven? | Klantnummer 12345", $decoded);
+	}
 }

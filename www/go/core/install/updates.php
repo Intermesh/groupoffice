@@ -1376,13 +1376,31 @@ ADD COLUMN `themeColorScheme` ENUM('light', 'dark', 'system') NOT NULL DEFAULT '
 
 $updates['202303151524'][] = "UPDATE `core_user` SET theme = 'Paper', themeColorScheme = 'dark' WHERE theme = 'Dark';";
 
-$updates['202303231016'][] = "ALTER TABLE `core_auth_token` 
+$updates['202303311400'][] = "CREATE TABLE `go_template_group` (
+   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+   `name` VARCHAR(100) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id`))
+ENGINE = InnoDB;";
+
+$updates['202303311400'][] = "ALTER TABLE `go_templates` 
+ADD COLUMN `group_id` INT(10) UNSIGNED NULL DEFAULT NULL AFTER `extension`,
+ADD INDEX `fk_go_templates_go_template_group_idx` (`group_id` ASC);";
+
+$updates['202303311400'][] = "ALTER TABLE `go_templates` 
+ADD CONSTRAINT `fk_go_templates_go_template_group`
+  FOREIGN KEY (`group_id`)
+  REFERENCES `go_template_group` (`id`)
+  ON DELETE SET NULL";
+
+//ZPUSH-2FA
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token` 
 ADD CONSTRAINT `fk_auth_token_user`
   FOREIGN KEY (`userId`)
   REFERENCES `core_user` (`id`)
   ON DELETE CASCADE;";
 
-$updates['202303231016'][] = "CREATE TABLE `core_client` (
+$updates['202303311400'][] = "CREATE TABLE `core_client` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `deviceId` VARCHAR(80) NOT NULL,
     `platform` VARCHAR(45) NOT NULL,
@@ -1402,14 +1420,14 @@ $updates['202303231016'][] = "CREATE TABLE `core_client` (
     
 ) ENGINE = InnoDB;";
 
-$updates['202303231016'][] = "ALTER TABLE `core_auth_token` 
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token` 
 ADD COLUMN `clientId` INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `passedAuthenticators`";
 
-$updates['202303231016'][] = "ALTER TABLE `core_auth_remember_me` 
+$updates['202303311400'][] = "ALTER TABLE `core_auth_remember_me` 
 ADD COLUMN `clientId` INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `userId`";
 
 // create clients
-$updates['202303231016'][] = "INSERT INTO core_client (`deviceId`, `ip`,`platform`, `name`, `version`, `lastSeen`, `createdAt`, `status`, `userId`) SELECT '-' as deviceId, remoteIpAddress, platform, browser as name, userAgent as version, max(lastSeen) as lastSeen, NOW() as createdAt, 'allowed' as status, userId
+$updates['202303311400'][] = "INSERT INTO core_client (`deviceId`, `ip`,`platform`, `name`, `version`, `lastSeen`, `createdAt`, `status`, `userId`) SELECT '-' as deviceId, remoteIpAddress, platform, browser as name, userAgent as version, max(lastSeen) as lastSeen, NOW() as createdAt, 'allowed' as status, userId
 FROM (
 	(
 	SELECT remoteIpAddress, platform, browser, userAgent, max(lastActiveAt) as lastSeen, userId
@@ -1430,21 +1448,21 @@ FROM (
 GROUP BY `remoteIpAddress`, `platform`, `browser`, `userId`";
 
 //set clientIds
-$updates['202303231016'][] = "UPDATE `core_auth_token` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.userId = t.userId AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
-$updates['202303231016'][] = "UPDATE `core_auth_remember_me` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.userId = t.userId AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
+$updates['202303311400'][] = "UPDATE `core_auth_token` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.userId = t.userId AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
+$updates['202303311400'][] = "UPDATE `core_auth_remember_me` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.userId = t.userId AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
 //remove tokens without client
-$updates['202303231016'][] = "DELETE from `core_auth_token` WHERE clientId = 0;";
-$updates['202303231016'][] = "DELETE FROM `core_auth_remember_me` WHERE clientId = 0;";
+$updates['202303311400'][] = "DELETE from `core_auth_token` WHERE clientId = 0;";
+$updates['202303311400'][] = "DELETE FROM `core_auth_remember_me` WHERE clientId = 0;";
 
 // drop old columns and add constraints
-$updates['202303231016'][] = "ALTER TABLE `core_auth_remember_me` 
+$updates['202303311400'][] = "ALTER TABLE `core_auth_remember_me` 
 DROP COLUMN `browser`,
 DROP COLUMN `platform`,
 DROP COLUMN `userAgent`,
 DROP COLUMN `remoteIpAddress`,
 ADD INDEX `fk_core_auth_remember_me_core_client1_idx` (`clientId` ASC);";
 
-$updates['202303231016'][] = "ALTER TABLE `core_auth_token` 
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token` 
 DROP COLUMN `browser`,
 DROP COLUMN `platform`,
 DROP COLUMN `userAgent`,
@@ -1452,13 +1470,13 @@ DROP COLUMN `remoteIpAddress`,
 DROP COLUMN `lastActiveAt`,
 ADD INDEX `fk_core_auth_token_core_client1_idx` (`clientId` ASC);";
 
-$updates['202303231016'][] = "ALTER TABLE `core_auth_remember_me` 
+$updates['202303311400'][] = "ALTER TABLE `core_auth_remember_me` 
 ADD CONSTRAINT `fk_core_auth_remember_me_core_client1`
   FOREIGN KEY (`clientId`)
   REFERENCES `core_client` (`id`)
   ON DELETE CASCADE;";
 
-$updates['202303231016'][] = "ALTER TABLE `core_auth_token`
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token`
 ADD CONSTRAINT `fk_core_auth_token_core_client1`
   FOREIGN KEY (`clientId`)
   REFERENCES `core_client` (`id`)

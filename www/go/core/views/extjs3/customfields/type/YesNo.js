@@ -14,7 +14,7 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog: function () {
-		return new go.customfields.FieldDialog();
+		return new go.customfields.type.YesNoDialog ();
 	},
 
 	/**

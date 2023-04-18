@@ -1,9 +1,7 @@
-
 import {NoteBookGrid} from "./NoteBookGrid.js";
-import {AutocompleteField} from "@goui/component/form/AutocompleteField.js";
-import {t} from "@goui/Translate.js";
-import {Config, createComponent} from "@goui/component/Component.js";
-import {client} from "@goui/jmap/Client.js";
+import {AutocompleteField, Config, createComponent, t} from "@intermesh/goui";
+import {jmapds} from "@intermesh/groupoffice-core";
+
 
 export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
 	constructor() {
@@ -24,10 +22,10 @@ export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
 			const loadText = async () => {
 				// record not available in store. Load it.
 				if (this.input?.value == this.value) {
-					const entityStore = client.store("NoteBook");
+					const entityStore = jmapds("NoteBook");
 					const nb = await entityStore.single(this.value);
 
-					this.setInputValue(nb.name);
+					this.setInputValue(nb!.name);
 				}
 			}
 

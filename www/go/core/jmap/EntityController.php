@@ -283,7 +283,8 @@ abstract class EntityController extends Controller {
 
 			$response = new ArrayObject([
 				'accountId' => $p['accountId'],
-				'state' => $state,
+				'state' => $state, //deprecated
+				'queryState' => $state,
 				'ids' => $ids,
 				'notfound' => [],
 				'canCalculateUpdates' => false
@@ -977,6 +978,12 @@ abstract class EntityController extends Controller {
 		$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);
 
 		$result['accountId'] = $p['accountId'];
+
+		//TODO comply with new spec: https://jmap.io/spec-core.html#changes
+		// We can only get "changes" and not "updated" and "created".
+		if(isset($result['changed'])) {
+			$result['updated'] = $result['changed'];
+		}
 
 		return new ArrayObject($result);
 	}

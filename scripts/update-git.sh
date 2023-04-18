@@ -51,20 +51,26 @@ do
 done
 
 
-echo BUILDING node modules...
-cd $DIR;
-for line in $(find . -name package.json -not -path '*/node_modules/*');
-do
-  NODE_DIR="$(dirname "${line}")";
-  echo "BUILD:" $NODE_DIR;
-  cd $NODE_DIR;
-  npm install;
-  npm run build;
+function buildGOUI() {
+  echo BUILDING node modules inside "$1"...
   cd $DIR;
+  for line in $(find $1 -name package.json -not -path '*/node_modules/*');
+  do
+    local NODE_DIR="$(dirname "${line}")";
+    echo "BUILD:" $NODE_DIR;
+    cd $NODE_DIR;
+    npm install;
+    npm run build;
+    cd $DIR;
 
-done
+  done
 
-echo "DONE";
+  echo "DONE";
+}
+
+buildGOUI "./www/views/goui"
+
+buildGOUI "./www/go/modules"
 
 cd www
 

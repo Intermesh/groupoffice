@@ -839,8 +839,8 @@ GO.calendar.MainPanel = function(config){
 	config.items=[
 		this.westPanel = new Ext.Panel({
 			region:'west',
-			width: dp(224),
-			boxMinWidth: dp(224),
+			width: dp(240),
+			boxMinWidth: dp(240),
 			stateId: 'cal-west',
 			cls:'go-sidenav',
 			split:true,
@@ -849,7 +849,7 @@ GO.calendar.MainPanel = function(config){
 			new Ext.Panel({
 				region:'north',
 				border:true,
-				height:dp(251),
+				height:dp(256),
 				split:false,
 				baseCls:'x-plain',
 				layout: {

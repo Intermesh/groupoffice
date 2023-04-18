@@ -25,7 +25,7 @@ class PageTest extends TestCase
 			$cmd  = "curl -s -X GET ". $this->url . '/' . $testUrl . $badUrl;
 
 			$data = shell_exec($cmd);
-			$this->assertEquals("Bad request", $data);
+			$this->assertEquals("Bad request, only alpha numeric _/ characters are allowed in the path.", $data);
 		}
 	}
 
@@ -41,7 +41,7 @@ class PageTest extends TestCase
 			$cmd  = "curl -s -X GET ". $this->url . '/' . $testUrl;
 
 			$data = shell_exec($cmd);
-			$this->assertEquals("Controller method 'pageB' not found", $data);
+			$this->assertEquals("method 'pageB' not found in 'go\modules\community\\test\Module'", $data);
 		}
 	}
 }

@@ -1,16 +1,9 @@
-import {comp, Component} from "@goui/component/Component.js";
-import {splitter} from "@goui/component/Splitter.js";
-import {tbar} from "@goui/component/Toolbar.js";
-import {btn} from "@goui/component/Button.js";
-import {checkboxselectcolumn, column} from "@goui/component/table/TableColumns.js";
-import {StoreRecord} from "@goui/data/Store.js";
+import {btn, checkboxselectcolumn, column, comp, Component, router, splitter, t, tbar} from "@intermesh/goui";
 
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
-import {router} from "@goui/Router.js";
-import {t} from "@goui/Translate.js";
 
 
 export class Main extends Component {
@@ -141,7 +134,8 @@ export class Main extends Component {
 				// 	]
 				// }),
 				btn({
-					cls: "primary",
+					cls: "filled primary",
+					text: "Add",
 					icon: "add",
 					handler: () => {
 						const dlg = new NoteDialog();

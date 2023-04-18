@@ -180,19 +180,6 @@ class Router {
 		return [$controllerClass, $controllerMethod];
 	}
 
-//	/**
-//	 * JMAP doesn't support passing multiple account ID's. We need this in Group-Office
-//	 * so we offer this feature with the accountIds parameter. To be backwards compatible we translate "accountId" to the "accountIds" array.
-//	 * @param type $params
-//	 * @return type
-//	 */
-//	private function normalizeAccountId($params) {
-//		if(isset($params->accountId)) {
-//			$params->accountIds = [$params->accountId];
-//		}
-//		
-//		return $params;
-//	}
 
 	/**
 	 * Runs controller method
@@ -231,27 +218,18 @@ class Router {
 	 *
 	 * It also recurses into the "filter" parameters to resolve. This is not according to the JMAP spec but very handy :)
 	 *
-	 * @link http://jmap.io/spec-core.html#references-to-previous-method-results
+	 * @link https://jmap.io/spec-core.html#references-to-previous-method-results
 	 * @param array $params
-	 * @param bool $forFilter
 	 * @return array
 	 * @throws InvalidResultReference
 	 */
-	private function resolveResultReferences(array $params, bool $forFilter = false) : array {
-
-		if($forFilter && isset($params['operator'])) {
-			foreach($params['conditions'] as &$filterCondition) {
-				$filterCondition = $this->resolveResultReferences($filterCondition, true);
-			}
-			return $params;
-		}
-
+	private function resolveResultReferences(array $params) : array {
 		foreach ($params as $name => $possibleResultReference) {
-			if(!$forFilter && $name == 'filter') {
-				$params['filter'] = $this->resolveResultReferences($possibleResultReference, true);
-			} elseif (substr($name, 0, 1) == '#') {
+			if (substr($name, 0, 1) == '#') {
 				$params[substr($name, 1)] = $this->resolveResultReference($possibleResultReference);
 				unset($params[$name]);
+			} else if(is_array($possibleResultReference)) {
+				$params[$name] = $this->resolveResultReferences($possibleResultReference);
 			}
 		}
 

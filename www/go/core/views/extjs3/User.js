@@ -18,8 +18,6 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		// Needed for every non-GET request when using the access token as cookie.
 		Ext.Ajax.defaultHeaders['X-CSRF-Token'] = session.CSRFToken;
 
-		console.warn(session);
-
 		this.capabilities = go.Jmap.capabilities = session.capabilities;
 		this.session = session;
 
