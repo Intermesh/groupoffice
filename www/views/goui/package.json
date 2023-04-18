@@ -7,10 +7,10 @@
     "test": "mocha",
     "start": "npm run build:clean && npm run start:parallel",
     "start:parallel": "npm run start:watch",
-    "start:watch": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --watch --bundle --splitting --format=esm --target=esnext --outdir=dist",
+    "start:watch": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --minify --watch --bundle --splitting --sourcemap --format=esm --target=esnext --outdir=dist",
     "build": "npm run build:clean && npm run build:ts && npm run build:goui-dts &&  npm run build:groupoffice-core-dts",
     "build:clean": "rm -rf ./dist/*",
-    "build:ts": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --bundle --splitting --format=esm --target=esnext --outdir=dist",
+    "build:ts": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --minify --bundle --splitting --sourcemap --format=esm --target=esnext --outdir=dist",
     "build:goui-dts": "npx tsc -p goui/tsconfig.json --emitDeclarationOnly --outDir ./dist/goui/script/",
     "build:groupoffice-core-dts": "npx tsc -p groupoffice-core/tsconfig.json --emitDeclarationOnly --outDir ./dist/groupoffice-core/script/",
     "prepublishOnly": "npm run build"
