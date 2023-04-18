@@ -1,7 +1,8 @@
 {
   "type": "module",
   "devDependencies": {
-    "esbuild": "latest"
+    "esbuild": "latest",
+    "typescript": "latest"
   },
   "scripts": {
     "test": "mocha",
