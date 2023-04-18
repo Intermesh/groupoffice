@@ -286,7 +286,7 @@ abstract class BackendDiff extends Backend {
      *
      * @param string              $folderid            id of the folder
      * @param string              $id                  id of the message
-     * @param SyncXXX             $message             the SyncObject containing a message
+     * @param SyncObject          $message             the SyncObject containing a message
      * @param ContentParameters   $contentParameters
      *
      * @access public

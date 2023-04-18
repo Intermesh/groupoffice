@@ -51,6 +51,8 @@ class EmailRecipients{
 			return false;
 
 		$this->_addresses[trim(strtolower($email))]=!empty($personal) ? trim($personal) : null;
+
+        return $this;
 	}
 	
 	/**
@@ -187,6 +189,9 @@ class EmailRecipients{
 	*/
 
 	private $_emailFound=false;
+
+
+	private $escape = false;
 	
 
 	/**
@@ -202,23 +207,28 @@ class EmailRecipients{
 		//$this->_addresses = array();
 
 		$recipientListString = trim((string) $recipientListString,',; ');
-		
-		
-		
+
 		for($i=0;$i<strlen($recipientListString);$i++)
 		{
-			$char = $recipientListString[$i];	
+			$char = $recipientListString[$i];
+
+			// escape character '\' found. Add next char to buffer in that case
+			if($this->escape) {
+				$this->_buffer .= $char;
+				$this->escape = false;
+				continue;
+			}
 			
 			switch($char)
 			{
+				case '\\':
+					$this->escape = true;
+					break;
+				case "'":
 				case '"':
 					$this->_handleQuote($char);
 				break;
-				
-				case "'":
-					$this->_handleQuote($char);
-				break;
-				
+
 				case '<':
 					$this->_personal = trim($this->_buffer);
 					$this->_buffer = '';

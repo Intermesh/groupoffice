@@ -4,7 +4,6 @@ import {
 	CardContainer,
 	cardmenu,
 	cards,
-	client,
 	comp,
 	containerfield,
 	Fieldset,
@@ -12,7 +11,6 @@ import {
 	form,
 	Form,
 	htmlfield,
-	JmapDataSource,
 	Notifier,
 	root,
 	t,
@@ -21,6 +19,7 @@ import {
 	Window,
 	EntityID
 } from "@intermesh/goui";
+import {client, jmapds} from "@intermesh/groupoffice-core";
 
 export class NoteDialog extends Window {
 	readonly form: Form;
@@ -42,7 +41,7 @@ export class NoteDialog extends Window {
 		this.items.add(
 			this.form = form(
 				{
-					store: JmapDataSource.store("Note"),
+					store: jmapds("Note"),
 					cls: "vbox",
 					flex: 1,
 					// handler: async (form) => {

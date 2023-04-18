@@ -20,7 +20,7 @@ go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
 		var module = go.Modules.get(this.package, this.module);
 
 		if(!module.settings){
-			console.error("Could not load the settings for module: "+this.package+"/"+this.module+". Fields will be empty.");
+			console.debug("Module: "+this.package+"/"+this.module+" has no settings model.");
 			return;
 		}
 

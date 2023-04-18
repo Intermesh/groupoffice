@@ -490,52 +490,6 @@ class StringHelper {
 		}
 	}
 
-//	/**
-//	 * Return a formatted address string
-//	 *
-//	 * @param	array $object User or contact
-//	 * @access public
-//	 * @return string Address formatted
-//	 */
-//	public static function address_format($object, $linebreak = '<br />') {
-//		if (isset ($object['name'])) {
-//			$name = $object['name'];
-//		} else {
-//			$middle_name = $object['middle_name'] == '' ? '' : $object['middle_name'].' ';
-//
-//			if ($object['title'] != '' && $object['initials'] != '') {
-//				$name = $object['title'].' '.$object['initials'].' '.$middle_name.$object['last_name'];
-//			} else {
-//				$name = $object['first_name'].' '.$middle_name.$object['last_name'];
-//			}
-//		}
-//
-//		$address = $name.$linebreak;
-//
-//		if ($object['address'] != '') {
-//			$address .= $object['address'];
-//			if (isset ($object['address_no'])) {
-//				$address .= ' '.$object['address_no'];
-//			}
-//			$address .= $linebreak;
-//		}
-//		if ($object['zip'] != '') {
-//			$address .= $object['zip'].' ';
-//		}
-//		if ($object['city'] != '') {
-//			$address .= $object['city'].$linebreak;
-//		}
-//		if ($object['country'] != '') {
-//			global $lang;
-//			require_once($GLOBALS['GO_LANGUAGE']->get_base_language_file('countries'));
-//
-//			$address .= $countries[$object['country']].$linebreak;
-//		}
-//		return $address;
-//
-//	}
-
-
 	/**
 	 * Formats a name in Group-Office
 	 *
@@ -780,7 +734,8 @@ class StringHelper {
 		return $style;
 	}
 
-	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
+	private static function prefixCSSSelectors(string $css, string $prefix = '.go-html-formatted')
+	{
 		# Wipe all block comments
 		$css = preg_replace('!/\*.*?\*/!s', '', $css);
 
@@ -788,15 +743,12 @@ class StringHelper {
 		$keyframeStarted = false;
 		$mediaQueryStarted = false;
 
-		foreach($parts as &$part)
-		{
+		foreach($parts as $key => &$part) {
 			$part = trim($part); # Wht not trim immediately .. ?
 			if(empty($part)) {
 				$keyframeStarted = false;
 				continue;
-			}
-			else # This else is also required
-			{
+			} else { # This else is also required
 				$partDetails = explode('{', $part);
 
 				if (strpos($part, 'keyframes') !== false) {
@@ -808,40 +760,42 @@ class StringHelper {
 					continue;
 				}
 
-				if(substr_count($part, "{")==2)
-				{
+				if(substr_count($part, "{")==2) {
 					$mediaQuery = $partDetails[0]."{";
 					$partDetails[0] = $partDetails[1];
 					$mediaQueryStarted = true;
 				}
 
 				$subParts = explode(',', $partDetails[0]);
-				foreach($subParts as &$subPart)
-				{
-					if(trim($subPart)==="@font-face") continue;
-					else $subPart = $prefix . ' ' . trim($subPart);
+				foreach($subParts as &$subPart) {
+					if(trim($subPart)==="@font-face") {
+						continue;
+					} else {
+						$subPart = $prefix . ' ' . trim($subPart);
+					}
 				}
 
-				if(substr_count($part,"{")==2)
-				{
+				if(substr_count($part,"{")==2) {
 					$part = $mediaQuery."\n".implode(', ', $subParts)."{".$partDetails[2];
-				}
-				elseif(empty($part[0]) && $mediaQueryStarted)
-				{
+				} elseif(empty($part[0]) && $mediaQueryStarted) {
 					$mediaQueryStarted = false;
+					// Shitty CSS. Looking at you, Outlook...
+					if(count($partDetails) < 3) {
+						continue;
+					}
+
 					$part = implode(', ', $subParts)."{".$partDetails[2]."}\n"; //finish media query
-				}
-				else
-				{
-					if(isset($partDetails[1]))
-					{   # Sometimes, without this check,
+				} else {
+					if(isset($partDetails[1])) {
+						# Sometimes, without this check,
 						# there is an error-notice, we don't need that..
 						$part = implode(', ', $subParts)."{".$partDetails[1];
 					}
 				}
 
 				unset($partDetails, $mediaQuery, $subParts); # Kill those three ..
-			}   unset($part); # Kill this one as well
+			}
+			unset($part); # Kill this one as well
 		}
 
 		# Finish with the whole new prefixed string/file in one line

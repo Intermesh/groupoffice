@@ -2,17 +2,16 @@ import {NoteDialog} from "./NoteDialog.js";
 import {
 	btn,
 	Button,
-	JmapDataSource,
 	comp,
 	Component,
 	DefaultEntity,
 	FunctionUtil,
-	Image,
 	t,
 	tbar,
 	Toolbar,
 	Window
 } from "@intermesh/goui";
+import {Image, jmapds} from "@intermesh/groupoffice-core";
 
 
 export class NoteDetail extends Component {
@@ -92,7 +91,7 @@ export class NoteDetail extends Component {
 		this.mask();
 
 		try {
-			this.entity = await JmapDataSource.store("Note").single(id);
+			this.entity = await jmapds("Note").single(id);
 
 			if(!this.entity) {
 				throw "notfound";

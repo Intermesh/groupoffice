@@ -698,7 +698,7 @@ abstract class Property extends Model {
 			$this->dynamicProperties[$name] = $value;
 		} else
 		{
-			throw new Exception("Can't set not existing property '$name' in '".static::class."'");
+			throw new Exception("Cannot set non-existing property '$name' in '".static::class."'");
 		}
 	}
 
