@@ -69,6 +69,7 @@ function buildGOUI() {
 }
 
 echo "Building GOUI shared libs..."
+cd $DIR;
 cd ./www/views/goui/goui
 npm update --dev
 cd ../groupoffice-core
