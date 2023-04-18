@@ -216,7 +216,7 @@ class Builder
         cd($this->buildDir . "/" . $this->packageName);
         cd("views/goui/goui");
         run("npm install --omit=dev");
-        cd(" ../groupoffice-core");
+        cd("../groupoffice-core");
         run("npm install --omit=dev");
         cd ("..");
         run("npm install --include=dev");
