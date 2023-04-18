@@ -2,18 +2,25 @@
   "type": "module",
   "devDependencies": {
     "esbuild": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "concurrently": "latest"
   },
   "scripts": {
     "test": "mocha",
+
     "start": "npm run build:clean && npm run start:parallel",
-    "start:parallel": "npm run start:watch",
+    "start:parallel": "npx concurrently --kill-others \"npm run start:watch\"  \"npm run start:watch-goui-dts\" \"npm run start:watch-groupoffice-core-dts\"",
     "start:watch": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --minify --watch --bundle --splitting --sourcemap --format=esm --target=esnext --outdir=dist",
+    "start:watch-goui-dts": "npx tsc -w -p goui/tsconfig.json --emitDeclarationOnly --outDir ./dist/goui/script/",
+    "start:watch-groupoffice-core-dts": "npx tsc -w -p groupoffice-core/tsconfig.json --emitDeclarationOnly --outDir ./dist/groupoffice-core/script/",
+
     "build": "npm run build:clean && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --minify --bundle --splitting --sourcemap --format=esm --target=esnext --outdir=dist",
+
     "build:goui-dts": "npx tsc -p goui/tsconfig.json --emitDeclarationOnly --outDir ./dist/goui/script/",
     "build:groupoffice-core-dts": "npx tsc -p groupoffice-core/tsconfig.json --emitDeclarationOnly --outDir ./dist/groupoffice-core/script/",
+
     "prepublishOnly": "npm run build"
   },
   "name": "goui",
