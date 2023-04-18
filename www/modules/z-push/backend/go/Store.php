@@ -126,13 +126,13 @@ abstract class Store extends \BackendDiff {
 		return true;
 	}
 
-	public function GetImporter($folderid = false) {
-		return new ChangeImporter($this, $folderid);
-	}
-
-	public function GetExporter($folderid = false) {
-		return new ChangeExporter($this, $folderid);
-	}
+//	public function GetImporter($folderid = false) {
+//		return new ChangeImporter($this, $folderid);
+//	}
+//
+//	public function GetExporter($folderid = false) {
+//		return new ChangeExporter($this, $folderid);
+//	}
 
 	abstract public function GetFolder($id);
 
