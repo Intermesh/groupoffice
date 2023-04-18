@@ -1,5 +1,6 @@
 - Sync: 2FA for ActiveSync devices
 - Address book: Multiple contact/org select field added
+- Scanbox: make dialog bigger to reflect new styles
 
 17-04-2023: 6.7.23
 
