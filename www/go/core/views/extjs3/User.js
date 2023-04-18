@@ -20,8 +20,6 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 
 		window.groupofficeCore.client.session = session;
 
-		console.warn(session);
-
 		this.capabilities = go.Jmap.capabilities = session.capabilities;
 		this.session = session;
 
