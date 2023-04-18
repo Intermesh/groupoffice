@@ -81,8 +81,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 */
 	boot : async function() {
 
-		window.groupofficeCore = await import(BaseHref + "views/goui/groupoffice-core/dist/index.js");
-		window.GOUI = await import(BaseHref + "views/goui/goui/dist/index.js");
+		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
+		window.GOUI = await import(BaseHref + "views/goui/dist/goui/script/index.js");
 
 		var me = this;
 		// go.browserStorage.connect().finally(function() {
