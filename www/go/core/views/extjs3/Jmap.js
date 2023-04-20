@@ -231,6 +231,10 @@ go.Jmap = {
 				go.Notifier.flyout({title:"New message",description: event.data, time: 5000});
 			});
 
+			source.addEventListener('exception', function(e) {
+				console.error(e);
+			});
+
 			source.addEventListener('state', function(e) {
 
 				var data = JSON.parse(e.data);
@@ -255,10 +259,6 @@ go.Jmap = {
 					}
 				}
 			}, false);
-
-			source.addEventListener('error', () => {
-				this.poll();
-			});
 
 			window.addEventListener('beforeunload', () => {
 				console.log("Closing SSE")
