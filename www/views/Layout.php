@@ -21,7 +21,10 @@ $cssMtime = filemtime(GO::view()->getTheme()->getPath() . "/style.css");
 ?><!DOCTYPE html>
 <html lang="<?= go()->getLanguage()->getIsoCode(); ?>" dir="<?=go()->getLanguage()->getTextDirection();?>">
 <head>
-	<?php $authController->fireEvent('headstart'); ?>
+	<?php
+    if($loadExt) {
+        $authController->fireEvent('headstart');
+    }?>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="HandheldFriendly" content="true">
