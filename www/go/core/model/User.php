@@ -18,6 +18,7 @@ use go\core\convert\UserSpreadsheet;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\Environment;
 use go\core\exception\ConfigurationException;
 use go\core\exception\NotFound;
 use go\core\Installer;
@@ -996,12 +997,17 @@ class User extends AclItemEntity {
 	}
 	
 	public function currentClient() {
+        if(Environment::get()->isCli()) {
+            return null;
+        }
 		$ua_info = \donatj\UserAgent\parse_user_agent();
+
 		return Client::internalFind([],false, $this)->where([
 			'userId' => $this->id,
 			'ip' => $_SERVER['REMOTE_ADDR'] ?? 'CLI',
 			'platform' => $ua_info['platform'],
-			'name' => $ua_info['browser']])->single();
+			'name' => $ua_info['browser']
+        ])->single();
 	}
 
 	public function clientByDevice($deviceId) {
