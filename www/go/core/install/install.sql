@@ -202,7 +202,7 @@ CREATE TABLE `core_setting` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_user` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(190) NOT NULL,
   `displayName` varchar(190) NOT NULL,
   `avatarId` binary(40) DEFAULT NULL,
@@ -247,8 +247,10 @@ CREATE TABLE `core_user` (
   `last_password_change` int(11) NOT NULL DEFAULT 0,
   `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
   `homeDir` varchar (190) not null,
-  `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB;
+  `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+)
+  ENGINE=InnoDB;
 
 CREATE TABLE `core_client` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -265,7 +267,7 @@ CREATE TABLE `core_client` (
     CONSTRAINT `core_client_core_user_id_fk`
         FOREIGN KEY (`userId`)
             REFERENCES `core_user` (`id`)
-            ON DELETE CASCADE
+            ON DELETE CASCADE,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
@@ -592,7 +594,7 @@ ALTER TABLE `core_setting`
   ADD PRIMARY KEY (`moduleId`,`name`);
 
 ALTER TABLE `core_user`
-  ADD PRIMARY KEY (`id`),
+#   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`),
   ADD KEY `fk_user_avatar_id_idx` (`avatarId`),
   ADD KEY `email` (`email`);
@@ -704,9 +706,6 @@ ALTER TABLE `core_module`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `core_search`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `core_user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `go_advanced_searches`
