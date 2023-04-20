@@ -1417,7 +1417,6 @@ $updates['202303311400'][] = "CREATE TABLE `core_client` (
         FOREIGN KEY (`userId`)
             REFERENCES `core_user` (`id`)
             ON DELETE CASCADE
-    
 ) ENGINE = InnoDB;";
 
 $updates['202303311400'][] = "ALTER TABLE `core_auth_token` 
@@ -1432,17 +1431,14 @@ FROM (
 	(
 	SELECT remoteIpAddress, platform, browser, userAgent, max(lastActiveAt) as lastSeen, userId
 		FROM `core_auth_token` `sub`
-		WHERE 
-		 `sub`.`expiresAt` > NOW()
+		WHERE  `sub`.`expiresAt` > NOW() OR `sub`.`expiresAt` IS NULL
 		GROUP BY `sub`.`remoteIpAddress`, `sub`.`platform`, `sub`.`browser`, `sub`.`userId`
 	
 ) UNION (
 	SELECT DISTINCT remoteIpAddress, platform, browser, userAgent, max(DATE_SUB(expiresAt, INTERVAL 7 DAY)) as lastSeen, userId
 		FROM `core_auth_remember_me` `t`
-		WHERE 
-		 `t`.`expiresAt` > NOW()
+		WHERE  `t`.`expiresAt` > NOW()
 		GROUP BY `t`.`remoteIpAddress`, `t`.`platform`, `t`.`browser`, `t`.`userId`
-
 )
 ) `t`
 GROUP BY `remoteIpAddress`, `platform`, `browser`, `userId`";
