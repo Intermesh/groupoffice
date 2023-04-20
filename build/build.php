@@ -47,7 +47,7 @@ function cd($dir)
 
 class Builder
 {
-    public $test = true;
+    public $test = false;
 
 	private $majorVersion = "6.7";
 
@@ -215,9 +215,13 @@ class Builder
     private function buildNodeCore() {
         cd($this->buildDir . "/" . $this->packageName);
         cd("views/goui/goui");
-        run("npm install --omit=dev");
+        run("npm install --include=dev");
+        run("npm run build");
+        run("npm prune --production");
         cd("../groupoffice-core");
-        run("npm install --omit=dev");
+        run("npm install --include=dev");
+        run("npm run build");
+        run("npm prune --production");
         cd ("..");
         run("npm install --include=dev");
         run("npm run build");

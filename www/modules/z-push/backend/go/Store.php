@@ -126,13 +126,14 @@ abstract class Store extends \BackendDiff {
 		return true;
 	}
 
-	public function GetImporter($folderid = false) {
-		return new ChangeImporter($this, $folderid);
-	}
-
-	public function GetExporter($folderid = false) {
-		return new ChangeExporter($this, $folderid);
-	}
+    // These classes are broken! They won't sync more than 25 items per folder and keep syncing forever.
+//	public function GetImporter($folderid = false) {
+//		return new ChangeImporter($this, $folderid);
+//	}
+//
+//	public function GetExporter($folderid = false) {
+//		return new ChangeExporter($this, $folderid);
+//	}
 
 	abstract public function GetFolder($id);
 
