@@ -998,16 +998,23 @@ class User extends AclItemEntity {
 	
 	public function currentClient() {
         if(Environment::get()->isCli()) {
-            return null;
+            $where = [
+                'userId' => $this->id,
+                'ip' => 'CLI',
+                'platform' => 'CLI',
+                'name' => 'CLI'
+            ];
+        } else {
+            $ua_info = \donatj\UserAgent\parse_user_agent();
+            $where = [
+                'userId' => $this->id,
+                'ip' => $_SERVER['REMOTE_ADDR'] ?? 'CLI',
+                'platform' => $ua_info['platform'],
+                'name' => $ua_info['browser']
+            ];
         }
-		$ua_info = \donatj\UserAgent\parse_user_agent();
 
-		return Client::internalFind([],false, $this)->where([
-			'userId' => $this->id,
-			'ip' => $_SERVER['REMOTE_ADDR'] ?? 'CLI',
-			'platform' => $ua_info['platform'],
-			'name' => $ua_info['browser']
-        ])->single();
+		return Client::internalFind([],false, $this)->where($where)->single();
 	}
 
 	public function clientByDevice($deviceId) {

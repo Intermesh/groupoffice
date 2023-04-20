@@ -74,6 +74,8 @@ class Client extends Property
 
 			}else if(Environment::get()->isCli()) {
 				$this->version = 'CLI';
+                $this->platform = 'CLI';
+                $this->name = 'CLI';
 			}
 		}
 	}
