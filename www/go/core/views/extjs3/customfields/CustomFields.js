@@ -297,7 +297,8 @@
 		 * @returns {Array}
 		 */
 		getDetailPanels: function (entity) {
-			var fieldSets = this.getFieldSets(entity), panels = [], me = this;
+			const fieldSets = this.getFieldSets(entity);
+			let panels = [];
 
 			fieldSets.forEach(function (fieldSet) {
 				panels.push(new go.customfields.DetailPanel({
