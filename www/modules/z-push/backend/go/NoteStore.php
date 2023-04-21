@@ -6,7 +6,7 @@ use go\modules\community\notes\model\Note;
 
 
 
-class goNote extends GoBaseBackendDiff {
+class NoteStore extends Store {
 
 	public function DeleteMessage($folderid, $id, $contentparameters) {
 

@@ -224,7 +224,7 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 		const abIds = Object.keys(this.selectedAbs)
 			.filter(k=> this.selectedAbs[k])
 			.map(Number)
-		this.setAddressBookId(abIds);
+		this.setAddressBookIds(abIds);
 	},
 	
 	createFilterPanel: function () {
@@ -285,11 +285,14 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 		});
 	},
 	
-	setAddressBookId: function (addressBookId) {		
-		this.grid.store.setFilter("addressbooks", addressBookId ? {
-			addressBookId: addressBookId
-		} : null);
-		
+	setAddressBookIds: function ( addressBookIds) {
+		if(!Array.isArray(addressBookIds) || addressBookIds.length === 0) {
+			this.grid.store.setFilter("addressbooks", null);
+		} else {
+			this.grid.store.setFilter("addressbooks", {
+				addressBookId: addressBookIds
+			});
+		}
 
 		this.search(this.searchField.getValue());				
 	},

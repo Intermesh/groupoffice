@@ -47,10 +47,10 @@ abstract class AclEntity extends Entity {
 
 	public static function getChanges(string $sinceState, int $maxChanges): array
 	{
-
 		if($sinceState == self::getState()) {
 			return  [
 				'oldState' => $sinceState,
+				'newState' => $sinceState,
 				'changed' => [],
 				'removed' => []
 			];

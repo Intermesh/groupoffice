@@ -1,4 +1,4 @@
-go.modules.community.apikeys.SystemSettingsPanel = Ext.extend(Ext.Panel, {
+go.modules.community.apikeys.SystemSettingsPanel = Ext.extend(go.systemsettings.Panel, {
 	iconCls: 'ic-lock',
 	layout: "border",
 	initComponent: function () {

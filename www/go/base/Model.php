@@ -102,7 +102,7 @@ abstract class Model extends Observable {
 			if (method_exists($this, $getter)) {
 				$errorMsg = "Can't set read only property '$name' in '" . $this->className() . "'";
 			} else {
-				$errorMsg = "Can't set not existing property '$name' in '" . $this->className() . "'";
+				$errorMsg = "Cannot set non-existing property '$name' in '" . $this->className() . "'";
 			}
 
 			if (\GO::config()->debug)

@@ -237,7 +237,6 @@ class ContactConvertor {
 	 */
 	private function flatToHasMany(Contact $contact, array $items, SyncContact $message, array $mapping, string $cls): array
 	{
-		ZLog::Write(LOGLEVEL_DEBUG, "flatToHasMany");
 		//create array of values by type:
 		//[
 		//  'work' => [['number' => 123], ['number' => 123]],

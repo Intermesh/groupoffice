@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright Intermesh
  *
@@ -13,46 +12,36 @@
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
 
-/**
- * 
- * The Device controller
- * 
- */
-
 namespace GO\Zpushadmin\Controller;
 
+use GO\Base\Util\Date\DateTime;
 
 class DeviceController extends \GO\Base\Controller\AbstractModelController {
 	
 	protected $model = 'GO\Zpushadmin\Model\Device';
 	
-	
 	protected function beforeDisplay(&$response, &$model, &$params) {
 		$model->loadDetails();
+
 		return parent::beforeDisplay($response, $model, $params);
 	}
 		
 	protected function beforeStoreStatement(array &$response, array &$params, \GO\Base\Data\AbstractStore &$store, \GO\Base\Db\FindParams $storeParams) {
-		
 		$storeParams->select('*');
 
 		return parent::beforeStoreStatement($response, $params, $store, $storeParams);
 	}
-	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel)
-	{
+	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
 		$columnModel->getColumn('can_connect')->setSortAlias(['new', 'can_connect']);
+
 		return parent::formatColumns($columnModel);
 	}
 
 	protected function afterDisplay(&$response, &$model, &$params) {
-		
-		$response['data']['deviceWiperequestOn'] = \GO\Base\Util\Date\DateTime::fromUnixtime($model->deviceWiperequestOn)->format();
-		$response['data']['deviceWiped'] = \GO\Base\Util\Date\DateTime::fromUnixtime($model->deviceWiped)->format();
-		
+		$response['data']['deviceWiperequestOn'] = DateTime::fromUnixtime($model->deviceWiperequestOn)->format();
+		$response['data']['deviceWiped'] = DateTime::fromUnixtime($model->deviceWiped)->format();
 		$response['data']['deviceErrors'] = nl2br($model->deviceErrors);
 		
 		return parent::afterDisplay($response, $model, $params);
 	}
-	
-	
 }

@@ -59,7 +59,14 @@ class Token extends Entity {
 	 * @var DateTime
 	 */
 	public $createdAt;
-	
+
+	/**
+	 * FK to the core_client table
+	 *
+	 * @var int
+	 */
+	public $clientId;
+
 	/**
 	 *
 	 * When the user was last active. Updated every 5 minutes.
@@ -67,30 +74,6 @@ class Token extends Entity {
 	 * @var DateTime
 	 */
 	public $lastActiveAt;
-
-	/**
-	 * The remote IP address of the client connecting to the server
-	 * 
-	 * @var string 
-	 */
-	public $remoteIpAddress;
-	
-	/**
-	 * The user agent sent by the client
-	 * 
-	 * @var string 
-	 */
-	public $userAgent;
-
-	/**
-	 * @var string
-	 */
-	public $platform;
-
-	/**
-	 * @var string
-	 */
-	public $browser;
 
 	/**
 	 * | separated list of "core_auth" id's that are successfully applied 
@@ -134,7 +117,6 @@ class Token extends Entity {
 		if($this->isNew()) {	
 			$this->setExpiryDate();
 			$this->lastActiveAt = new DateTime("now", new DateTimeZone("UTC"));
-			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
 		}else if($this->isAuthenticated ()) {
@@ -167,25 +149,51 @@ class Token extends Entity {
 		return false;
 	}
 
+	protected function internalSave(): bool
+	{
+		$this->setClient();
+		return parent::internalSave();
+	}
+
+//	/**
+//	 * Set an authentication method to completed and add it to the
+//	 * "completedAuth" property
+//	 *
+//	 * @param int $authId
+//	 * @param boolean $lastAuth
+//	 * @return boolean save success
+//	 * @throws Exception
+//	 */
+//	public function authCompleted($authId, $lastAuth=false): bool
+//	{
+//		$auths = explode(',',$this->completedAuth);
+//		$auths[] = $authId;
+//		$this->completedAuth = implode(',',$auths);
+//
+//		if($lastAuth){
+//			return $this->refresh();
+//		}
+//
+//		return $this->save();
+//	}
+//
 	private function setClient() {
-		if(isset($_SERVER['REMOTE_ADDR'])) {
-			$this->remoteIpAddress = $_SERVER['REMOTE_ADDR'];
-		} else if(Environment::get()->isCli()) {
-			$this->remoteIpAddress = 'CLI';
+
+		if(empty($this->clientId)) {
+			$user = $this->getUser();
+			$client = $user->currentClient();
+			if (!$client) {
+				$client = new Client($user);
+				$client->userId = $this->userId;
+				$client->status = 'allowed';
+			}
+			$client->lastSeen = $this->lastActiveAt;
+			if($client->save()) {
+				$this->clientId = $client->id;
+			} else {
+				throw new Exception('Failed to save the client identity'.var_export($client->getValidationErrors(), true));
+			}
 		}
-
-		if(isset($_SERVER['HTTP_USER_AGENT'])) {
-			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
-
-			$ua_info = \donatj\UserAgent\parse_user_agent();
-
-			$this->platform = $ua_info['platform'];
-			$this->browser = $ua_info['browser'];
-
-		}else if(Environment::get()->isCli()) {
-			$this->userAgent = 'CLI';
-		}
-
 	}
 
 	/**

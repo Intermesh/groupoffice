@@ -1,7 +1,5 @@
 .x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
-  border: 1px solid color($fg,'line');
   background-color: color($bg, 'button');
-  border-radius: 4px;
   .x-btn-group & {
     border-radius: 0;
   }
@@ -17,13 +15,20 @@
     @include var(background-color, c-primary-tp);
   }
   &.primary, &.raised {
-    color: white;
-    @include var('background-color', c-secondary);
-    //&:hover{ background-color: #387002;}
+		color: white;
+		background-color: var(--c-secondary);
+		@include var('background-color', c-secondary);
   }
   &.accent {
-    @include var('background-color', c-accent);
+	  background-color: var(--c-accent);
   }
+}
+.x-menu {
+	border: 1px solid var(--fg-disabled);
+}
+.x-menu-sep {
+	margin-left: dp(16);
+	margin-right: dp(16);
 }
 .x-toolbar .xtb-sep{
   margin-left:0;
@@ -35,7 +40,7 @@
 
 .x-btn-group{
   //@extend .z1;
-  border:1px solid color($fg,'line');
+  border:1px solid var(--fg-divider);
   .x-btn {
     border: 0;
   }
@@ -51,27 +56,14 @@
     border: 0;
   }
 }
-
-.x-btn.primary .x-btn-text, .x-date-mp-btns button.primary .x-btn-text {
-  color: white;
+.x-window{
+	border: 1px solid var(--fg-divider);
 }
 
-.x-btn-icon button {
-  min-height:1px;
-  &::before{
-    top: 0;
-  }
-}
 #global-search-panel .x-btn {
   background-color: transparent;
   border: none;
   box-shadow: none;
-}
-#search_query {
-  padding-top: 14px;
-}
-.x-date-picker {
-  width: dp(264);
 }
 
 .go-form-group .x-panel-bbar .x-btn-text {
@@ -86,11 +78,9 @@
   color: inherit;
 }
 
-
 .cal-display-panel {
   background-color: color($bg, 'card');
 }
-
 
 //html editor icons in outline set:
 .x-edit-forecolor:before, img.x-edit-forecolor + span::before {content: 'color_lens';}
@@ -102,6 +92,9 @@
 
 .go-detail-view > .x-panel-bwrap > .x-panel-body > .x-panel, .x-portlet {
   box-shadow:none;
-  outline: 1px solid rgba(0,0,0,0.089);
+  outline: 1px solid var(--fg-divider);
+}
+.go-detail-view > .x-panel-bwrap > .x-panel-body > .x-panel > .x-panel-header {
+	border-top: 0;
 }
 .x-portlet { overflow:hidden;}

@@ -13,6 +13,8 @@ CustomFieldSetDialog.js
 customfield/Contact.js
 customfield/ContactDialog.js
 customfield/ContactRelationGrid.js
+customfield/MultiContact.js
+customfield/MultiContactDialog.js
 Utils.js
 SelectDialogPanel.js
 SettingsPanel.js

@@ -1,20 +1,51 @@
 GO.zpushadmin.DeviceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 
-	initComponent : function(){
+	initComponent(){
 		
 		Ext.apply(this, {
 			goDialogId:'zpushadmindevice',
 			title:t("Device", "zpushadmin"),
 			formControllerUrl: 'zpushadmin/device',
 			height:dp(500),
-			width: dp(500),
+			width: dp(600),
+			enableApplyButton: false,
+			buttonAlign:'left',
 			helppage:'Z-push_admin_user_manual#Device_dialog'
 		});
-		
-		GO.zpushadmin.DeviceDialog.superclass.initComponent.call(this);	
+
+		this.supr().initComponent.call(this);
+
+		this.buttons.unshift(
+			this.resyncButton = new Ext.Button({
+				text : t("Resync"),
+				handler : function() {
+					Ext.Msg.show({
+						title: t("Resync Device"),
+						icon: Ext.MessageBox.WARNING,
+						msg: t("Do you really want to resynchronize ALL data on the device?", "zpushadmin"),
+						buttons: Ext.Msg.YESNO,
+						scope:this,
+						fn: function(btn) {
+							if (btn=='yes') {
+								GO.request({
+									maskEl:Ext.getBody(),
+									url:'zpushadmin/admin/resyncDevice',
+									params:{
+										deviceId:this.loadData.device_id,
+										username:this.loadData.username
+									},
+									scope:this
+								});
+							}
+						}
+					})
+				},
+				scope : this
+			}), new Ext.Toolbar.Fill()
+		);
 	},
 	  
-	buildForm : function () {
+	buildForm() {
 		
 		this.deviceIDTextField = new Ext.form.TextField({
 			name: 'device_id',
@@ -35,34 +66,7 @@ GO.zpushadmin.DeviceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			disabled:true,
 			fieldLabel: t("Device Type", "zpushadmin")
 		});
-		
-		this.resyncButton = new Ext.Button({
-			text : t("Resync Device", "zpushadmin"),
-			handler : function() {
-				Ext.Msg.show({
-					title: t("Resync Device", "zpushadmin"),
-					icon: Ext.MessageBox.WARNING,
-					msg: t("Do you really want to resynchronize ALL data on the device?", "zpushadmin"),
-					buttons: Ext.Msg.YESNO,
-					scope:this,
-					fn: function(btn) {
-						if (btn=='yes') {
-							GO.request({
-								maskEl:Ext.getBody(),
-								url:'zpushadmin/admin/resyncDevice',
-								params:{
-									deviceId:this.loadData.device_id,
-									username:this.loadData.username
-								},
-								scope:this
-							});
-						}
-					}
-				})
-			},
-			scope : this
-		});
-		
+
 //		this.wipeDeviceButton = new Ext.Button({
 //			text : t("Wipe this device", "zpushadmin"),
 //			handler : function() {
@@ -107,19 +111,6 @@ GO.zpushadmin.DeviceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			disabled:false,
 			fieldLabel: t("Comments", "zpushadmin")
 		});
-			
-			
-		this.buttonContainer = new Ext.Container({
-			layout: {
-				type: 'hbox',
-				padding: '20px'
-			},
-			items: [
-				this.resyncButton
-//				,
-//				this.wipeDeviceButton
-			]
-		});	
 		
 		this.propertiesPanel = new Ext.Panel({
 			title:t("Properties"),			
@@ -129,15 +120,14 @@ GO.zpushadmin.DeviceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				this.deviceIDTextField,
 				this.deviceTypeTextField,
 				this.canConnectCheckbox,
-				this.commentsTextArea,
-				this.buttonContainer
+				this.commentsTextArea
       ]				
 		});
 
-    this.addPanel(this.propertiesPanel);
+    	this.addPanel(this.propertiesPanel);
 	},
-	afterLoad : function(remoteModelId, config, action){
-		
+
+	afterLoad(remoteModelId, config, action) {
 //		this.resyncButton.setDisabled(!action.result.zpushAdminFound);
 //		//this.wipeDeviceButton.setDisabled(!action.result.zpushAdminFound);
 	}

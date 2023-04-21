@@ -86,7 +86,6 @@ class PushDispatcher
 
 	private function diff($old, $new): array
 	{
-
 		$diff = [];
 
 		foreach ($new as $key => $value) {
@@ -129,7 +128,7 @@ class PushDispatcher
 
 			$sleeping += self::CHECK_INTERVAL;
 
-			time_sleep_until($start + $i + self::CHECK_INTERVAL);
+            sleep(self::CHECK_INTERVAL);
 		}
 	}
 }

@@ -1,5 +1,8 @@
 <?php
 return array (
+	'name' => 'ActiveSync',
+	'description' => 'Beheer z-push synchronisatie.',
+
   'Device' => 'Apparaat',
   'Device ID' => 'Apparaat ID',
   'Device Type' => 'Apparaat Type',
@@ -27,9 +30,6 @@ return array (
   'Wipe requested on' => 'Wipe aangevraagd op',
   'Wipe requested by' => 'Wipe aangevraagd door',
   'Is wiped' => 'Is gewiped',
-  'name' => 'ActiveSync beheer module',
-  'description' => 'Een module om de z-push synchronisatie te beheren.',
-  'ActiveSync management' => 'ActiveSync beheer module',
   'Status' => 'Status',
   'Model' => 'Model',
   'Imei' => 'Imei',

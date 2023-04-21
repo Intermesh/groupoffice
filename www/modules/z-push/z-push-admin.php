@@ -20,6 +20,6 @@ if(strstr($scriptPath, '/home/govhosts')) {
 }
 
 define('ZPUSH_CONFIG', __DIR__ . '/config.php');
-require_once 'vendor/z-push/vendor/autoload.php';
-require_once ("backend/go/autoload.php");
+//require_once 'vendor/z-push/vendor/autoload.php';
+//
 require_once 'vendor/z-push/z-push-admin.php';

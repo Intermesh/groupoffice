@@ -16,7 +16,7 @@ class Response extends HttpResponse
 	
 	private $methodName;
 	
-	private $data = [];
+	private $data = null;
 	
 	public function __construct() {
 		parent::__construct();
@@ -25,11 +25,11 @@ class Response extends HttpResponse
 		$this->setHeader('Pragma', 'no-cache');
 	}
 
-	protected function sendSecurityHeaders()
-	{
-		//no headers needed for JMAP
-		$this->sendCorsHeaders();
-	}
+//	protected function sendSecurityHeaders()
+//	{
+//		//no headers needed for JMAP
+//		$this->sendCorsHeaders();
+//	}
 
 	/**
 	 * Output a response

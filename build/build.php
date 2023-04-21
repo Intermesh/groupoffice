@@ -191,6 +191,7 @@ class Builder
 
         $this->encode();
 
+        $this->buildNodeCore();
         $this->buildNodeModules();
 
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
@@ -211,21 +212,38 @@ class Builder
 		echo "Created " . $this->buildDir . '/'. $this->packageName . ".tar.gz\n";
 	}
 
+    private function buildNodeCore() {
+        cd($this->buildDir . "/" . $this->packageName);
+        cd("views/goui/goui");
+        run("npm install --include=dev");
+        run("npm run build");
+        run("npm prune --production");
+        cd("../groupoffice-core");
+        run("npm install --include=dev");
+        run("npm run build");
+        run("npm prune --production");
+        cd ("..");
+        run("npm install --include=dev");
+        run("npm run build");
+        run("npm prune --production");
+    }
+
 
     private function buildNodeModules() {
 
 	    cd($this->buildDir . "/" . $this->packageName);
 
-	    $packageFiles = array_reverse(run("find views/goui -name package.json -not -path '*/node_modules/*'"));
+	    //$packageFiles = array_reverse(run("find views/goui -name package.json -not -path '*/node_modules/*'"));
 
-	    $packageFiles = array_merge($packageFiles, run("find go/modules -name package.json -not -path '*/node_modules/*'"));
+	    $packageFiles = run("find go/modules -name package.json -not -path '*/node_modules/*'");
 
         foreach($packageFiles as $packageFile)  {
-            $nodeDir = dirname($packageFile);
-            cd($nodeDir);
+					$nodeDir = dirname($packageFile);
+          cd($nodeDir);
 	        run("npm install");
-            run("pwd");
-            run("npm run build");
+          run("pwd");
+					run("npm run build");
+	        run("npm prune --production");
 	        cd($this->buildDir . "/" . $this->packageName);
         }
     }

@@ -141,7 +141,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			resizable : true,
 			collapsible:true,
 			maximizable:true,
-			width : dp(672),
+			width : dp(768),
 			height : dp(800),
 			stateId:'calendar_event_dialog',
 			closeAction : 'hide',
@@ -823,7 +823,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			cls:'go-form-panel',
 			layout : 'form',
 			autoScroll : true,
-			defaults: { anchor: '100%'},
+			defaults: { anchor: '99%'}, // 99 needed to prevent horizontal scroll with go-hbox container
 			items : [
 				{
 				xtype : 'container',

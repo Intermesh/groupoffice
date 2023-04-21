@@ -4,14 +4,6 @@ namespace GO\Zpushadmin;
 
 class ZpushadminModule extends \GO\Base\Module {
 
-	public function install() {
-
-		$settings = new Model\Settings();
-		$settings->zpushadmin_can_connect = true;
-		$settings->save();
-
-		return parent::install();
-	}
 
 	public function autoInstall()
 	{

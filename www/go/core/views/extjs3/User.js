@@ -18,8 +18,6 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		// Needed for every non-GET request when using the access token as cookie.
 		Ext.Ajax.defaultHeaders['X-CSRF-Token'] = session.CSRFToken;
 
-		console.warn(session);
-
 		this.capabilities = go.Jmap.capabilities = session.capabilities;
 		this.session = session;
 
@@ -39,6 +37,8 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			// me.firstWeekDay = parseInt(user.firstWeekday);
 			this.legacySettings(user);
 
+			this.checkForNewDevices(user);
+
 			go.ActivityWatcher.activity();
 			go.ActivityWatcher.init(GO.settings.config.logoutWhenInactive);
 
@@ -47,6 +47,30 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			return this;
 		});
 		
+	},
+
+	checkForNewDevices(user) {
+		for(const id in user.clients) {
+			const client = user.clients[id];
+			if(client.status === 'new') {
+				Ext.Msg.show({
+					title:'New ActiveSync device',
+					msg: 'A new account was setup on your mobile device. Please confirm that it was you to enable this device'+
+						': <br>'+client.version,
+					buttons: Ext.Msg.YESNO,
+					fn: (me,s) => {
+						client.status = me == 'yes' ? 'allowed' : 'denied';
+						go.Db.store("User").set({
+							update: {[user.id]: {
+								clients: user.clients
+							}}
+						})
+					},
+					icon: Ext.MessageBox.QUESTION
+				});
+
+			}
+		}
 	},
 	
 	legacySettings : function (user) {

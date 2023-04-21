@@ -6,16 +6,19 @@ namespace go\core\orm;
 
 use Exception;
 use GO\Base\Db\ActiveRecord;
+use GO\Base\Exception\AccessDenied;
 use go\core\data\convert\AbstractConverter;
 use go\core\data\convert\Json;
 use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
+use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
+use go\core\orm\go\core\exception\NotFound;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
@@ -398,22 +401,40 @@ abstract class Entity extends Property {
 		parent::internalValidate();
 	}
 
-  /**
-   * Saves the model and property relations to the database
-   *
-   * Important: When you override this make sure you call this parent function first so
-   * that validation takes place!
-   *
-   * @return boolean
-   * @throws Exception
-   */
+	/**
+	 * Saves the model and property relations to the database
+	 *
+	 * Important: When you override this make sure you call this parent function first so
+	 * that validation takes place!
+	 *
+	 * @return boolean
+	 * @throws Exception
+	 */
 	protected function internalSave(): bool
 	{
+		if (property_exists($this, 'filesFolderId') && count($this->attachments)) {
+			$folder = Folder::model()->findForEntity($this, false);
+			if (!isset($this->filesFolderId)) {
+				$this->filesFolderId = $folder->id;
+			}
+			foreach ($this->attachments as $attachment) {
+				$b = Blob::findById($attachment['blobId']);
+				if (!$b) {
+					throw new Exception("No blob found");
+				}
+				$dest = go()->getDataFolder()->getFile($folder->path . '/' . $b->name);
+				$dest->appendNumberToNameIfExists();
+				$f = $b->getFile();
+				$f->copy($dest);
+			}
+		}
+
+
 		if(!parent::internalSave()) {
 			App::get()->debug(static::class."::internalSave() returned false");
 			return false;
 		}
-		
+
 		//See \go\core\orm\CustomFieldsTrait;
 		if(method_exists($this, 'saveCustomFields')) {
 			if(!$this->saveCustomFields()) {
@@ -662,6 +683,7 @@ abstract class Entity extends Property {
 	 * routing short routes like "Note/get"
 	 *
 	 * @return EntityType
+	 * @throws Exception
 	 */
 	public static function entityType(): EntityType
 	{
@@ -1449,6 +1471,17 @@ abstract class Entity extends Property {
 		}
 
 		return static::class;
+	}
+
+
+	/**
+	 * @var array
+	 */
+	protected $attachments = [];
+
+	public function setAttachments(array $attachments)
+	{
+		$this->attachments = $attachments;
 	}
 	
 }

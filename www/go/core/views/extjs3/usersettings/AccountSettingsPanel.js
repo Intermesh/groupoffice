@@ -158,27 +158,20 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					},
 					layout: "hbox",
 					items: [
-						{
-							html: "IP"
-						},{
-							html: t("Platform")
-						},{
-							html: t("Browser")
-						}
-						,{
-							html: t("Expires At")
-						}
-						,
-						{
-							width: dp(34)
-						}
+						{html: "IP"},
+						{html: t("Platform")},
+						{html: t("Name")},
+						{html: t("Last seen")},
+						{html: t("Status")},
+						{width: dp(34)}
 					]
 				},
 				this.authorizedClients = new go.form.FormGroup({
-					name: "authorizedClients",
+					name: "clients",
 					hideLabel: true,
 					hideBbar: true,
 					startWithItem: false,
+					mapKey:'id',
 					anchor: "100%",
 					itemCfg: {
 						anchor: "100%",
@@ -189,28 +182,26 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 							submit: true
 						},
 						items: [{
-							name: "remoteIpAddress"
+							name: "ip"
 						},{
 							name: "platform",
-							renderer: function(v) {
-								return v || t("Unknown");
-							}
+							renderer: v => v || t("Unknown")
 						},{
-							name: "browser",
-							renderer: function(v) {
-								return v || t("Unknown");
-							}
-						}
-						,{
+							name: "name",
+							renderer: v => v || t("Unknown")
+						},{
 							submit: false,
-							name: "expiresAt",
-							renderer: function(v) {
-								return (new Date(v)).format(go.User.dateFormat+" " + go.User.timeFormat);
-
-							}
-						}
-						]
-
+							name: "lastSeen",
+							renderer: v => (new Date(v)).format(go.User.dateFormat+" " + go.User.timeFormat)
+						},{
+							xtype:'selectfield',
+							name:'status',
+							options: [
+								['new', t('New')],
+								['allowed', t('Allowed')],
+								['denied', t('Denied')]
+							]
+						}]
 					}
 				}),{
 					xtype: "button",

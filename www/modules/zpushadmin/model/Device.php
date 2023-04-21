@@ -16,7 +16,11 @@
  * @copyright Copyright Intermesh BV.
  * @author <<FIRST_NAME>> <<LAST_NAME>> <<EMAIL>>@intermesh.nl
  */
- 
+
+namespace GO\Zpushadmin\Model;
+
+use go\core\model\Settings;
+
 /**
  * The Device model
  *
@@ -32,11 +36,6 @@
  * @property string $comment
  * @property string $as_version
  */
-
-
-namespace GO\Zpushadmin\Model;
-
-
 class Device extends \GO\Base\Db\ActiveRecord {
 	
 	public $devicePhoneNumber;
@@ -56,13 +55,7 @@ class Device extends \GO\Base\Db\ActiveRecord {
 	public function primaryKey() {
 		return 'id';
 	}
-	
-	/**
-	 * Returns a static model of itself
-	 * 
-	 * @param String $className
-	 * @return \GO\Workflow\Model\Process
-	 */
+
 	public static function model($className=__CLASS__)
 	{	
 		return parent::model($className);
@@ -74,6 +67,30 @@ class Device extends \GO\Base\Db\ActiveRecord {
 			$this->device_id=strtolower($this->device_id);
 		
 		return parent::afterLoad();
+	}
+
+	static function findBy($id, $username) {
+		return self::model()->findSingleByAttributes([
+			'device_id' => $id,
+			'username' => $username
+		]);
+	}
+
+	static function requestAccess() {
+		$device = Device::findBy(\Request::GetDeviceID(), \GO::user()->username);
+		if(empty($device)){
+			$device = new Device();
+			$device->device_id = \Request::GetDeviceID();
+			$device->device_type = \Request::GetDeviceType();
+			$device->remote_addr = \Request::GetRemoteAddr();
+			$device->username = \GO::user()->username;
+			$device->can_connect = Settings::get()->activeSyncCanConnect;
+		}
+		$device->new = false;
+		$device->forceSave(); // needed for updating the mtime field
+		$device->save();
+
+		return $device->can_connect;
 	}
 	
 	/**

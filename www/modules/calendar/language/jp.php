@@ -19,7 +19,7 @@ return array (
   'Status' => 'スターテス',
   'No reminder' => 'リマインダーなし',
   'Enable reminder for this event' => 'このイベントのリマインダーを有効にする',
-  'Resources' => '資力',
+  'Resources' => 'リソース',
   'There are no extra options available.' => '利用可能な追加オプションはありません。',
   'Only show this field set for selected calendar groups' => '選択したカレンダー グループに設定されたこのフィールドのみを表示する',
   'Give each calendar a unique color' => '各カレンダーに独自の色を付ける',

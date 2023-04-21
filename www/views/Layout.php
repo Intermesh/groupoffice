@@ -10,7 +10,7 @@ $useThemeSettings = $useThemeSettings ?? true;
 
 $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Installation") : go()->getSettings()->title;
 $primaryColor = go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)';
-if(\GO::user()) {
+if(go()->getUserId() && \GO::user()->hasAttribute('themeColorScheme')) {
 	$bodyCls .= ' '.\GO::user()->themeColorScheme;
 }
 $webclient = Extjs3::get();
@@ -21,7 +21,10 @@ $cssMtime = filemtime(GO::view()->getTheme()->getPath() . "/style.css");
 ?><!DOCTYPE html>
 <html lang="<?= go()->getLanguage()->getIsoCode(); ?>" dir="<?=go()->getLanguage()->getTextDirection();?>">
 <head>
-	<?php $authController->fireEvent('headstart'); ?>
+	<?php
+    if($loadExt) {
+        $authController->fireEvent('headstart');
+    }?>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="HandheldFriendly" content="true">

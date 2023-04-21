@@ -1,6 +1,6 @@
 <?php /** @noinspection PhpUndefinedFieldInspection */
 
-class goCalendar extends GoBaseBackendDiff {
+class CalendarStore extends Store {
 
 	
 	public function DeleteMessage($folderid, $id, $contentparameters) {
@@ -510,6 +510,7 @@ class goCalendar extends GoBaseBackendDiff {
 		if(!empty($oldid)) {
 
 			//remove t/ from the folder ? Shouldn't this already have been done by the combined backend wrapper?
+			// No: the combined importer is always adding this. it's also never empty
 			$oldid = substr($oldid, 2);
 
 			$calendar = \GO\Calendar\Model\Calendar::model()->findByPk($oldid);
@@ -551,7 +552,7 @@ class goCalendar extends GoBaseBackendDiff {
 	 * @param \SyncAppointment $message
 	 * @return array
 	 */
-	public function  ChangeMessage($folderid, $id, $message,$contentParameters) {
+	public function ChangeMessage($folderid, $id, $message,$contentParameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goCalendar->ChangeMessage('.$folderid.','.$id.',)');
 		try {
 

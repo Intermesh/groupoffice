@@ -12,7 +12,7 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 		}, this);
 
 		this.formPanel.on("load", function (form, entity) {
-			var types = go.customfields.CustomFields.getTypes();
+			const types = go.customfields.CustomFields.getTypes();
 			form.getForm().findField('typeLabel').setValue(types[entity.type] ? types[entity.type].label : entity.type);
 		}, this);
 		this.isReserved = function (value) {

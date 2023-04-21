@@ -2,14 +2,13 @@
 namespace go\core\auth;
 
 use go\core\auth\State as AbstractState;
-use go\core\jmap\Request;
 use go\core\model\User;
 
 /**
  * TemporaryState class
  * 
  * Temporary state that will last for one script run.
- * It doesn't require a token in the database. It's used in *DAV modules that 
+ * It doesn't require a token in the database. It's used in *DAV / AS modules that
  * authenticate on each request.
  */
 class TemporaryState extends AbstractState {
@@ -22,8 +21,8 @@ class TemporaryState extends AbstractState {
 	}
 
 	private $user;
-	private $userId;	
-	
+	private $userId;
+
 	public function getUser(array $properties = []): ?User
 	{
 		if(!empty($properties)) {

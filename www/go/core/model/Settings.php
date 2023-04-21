@@ -636,6 +636,17 @@ class Settings extends core\Settings {
 			}
 		}
 	}
+
+
+	// SYNCHRONISATION SETTINGS
+	/**
+	 * when true user will get popup to allow its own device.
+	 */
+	public $activeSyncEnable2FA = false;
+	/**
+	 * When false administrator has to enable each new device
+	 */
+	public $activeSyncCanConnect = true;
 	
 	
 	public function save(): bool

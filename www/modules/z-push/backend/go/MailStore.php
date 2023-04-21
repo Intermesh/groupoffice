@@ -1,6 +1,6 @@
 <?php
 
-class goMail extends GoBaseBackendDiff {
+class MailStore extends Store {
 
 	
 	/**
@@ -415,62 +415,7 @@ class goMail extends GoBaseBackendDiff {
 		
 		return $return;
 	}
-	
-//	/**
-//	 * Get the message body for a HTML/MIME message
-//	 * 
-//	 * @param \GO\Email\Model\ImapMessage $imapMessage
-//	 * @param int $sbReturnType
-//	 * @return \SyncBaseBody
-//	 */
-//	private function _getASBody($imapMessage, $sbReturnType=SYNC_BODYPREFERENCE_HTML){
-//		
-//		$sbBody = new SyncBaseBody();
-//		$sbBody->type = $sbReturnType;
-//
-//		if ($sbReturnType == SYNC_BODYPREFERENCE_HTML){
-//			$sbBody->data = str_replace("\n", "\r\n", str_replace("\r", "", $imapMessage->getHtmlBody())); //Utils::ConvertCodepageStringToUtf8($message->internetcpid, $body);
-//		}else if($sbReturnType == SYNC_BODYPREFERENCE_MIME){
-//			$sbBody->data = $imapMessage->getSource();
-//		}		
-//		else{
-//			$sbBody->data = $imapMessage->getPlainBody(); //w2u($body); 
-//		}
-//
-//		$sbBody->estimatedDataSize = strlen($sbBody->data);
-//		$sbBody->truncated = 0;
-//		return $sbBody;
-//	}
-	
-	
-//	public function GetAttachmentData($attname) {
-//		ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetAttachmentData(' . $attname .')');
-//		
-//		$attname = $this->_decodeFileReference($attname);
-//		$attparts = explode(":", $attname);
-//		if(count($attparts)!=4)
-//		{
-//			ZLog::Write(LOGLEVEL_ERROR, "Malformed attachment name '$attname' in GetAttachmentData!");
-//			throw new StatusException("Malformed attachment name '$attname' in GetAttachmentData!");
-//		}
-//		
-//		list($uid, $part, $encoding, $mailbox) = explode(":", $attname);
-//
-//		if (empty($mailbox))
-//			$mailbox = 'INBOX';
-//
-//		$imap = $this->_imapLogon($mailbox);
-//		if(!$imap)
-//			throw new StatusException("Unable to connect to IMAP server in GetAttachmentData!");
-//		
-//		include_once('backend/go/GoImapStreamWrapper.php');
-//		$attachment = new SyncItemOperationsAttachment();
-//		$attachment->data = GoImapStreamWrapper::Open($imap, $uid, $part, $encoding);
-//		return $attachment;
-//	}
-	
 
-	
 	/**
 	 * Holds temporary attachments
 	 * @var type 
@@ -610,10 +555,6 @@ class goMail extends GoBaseBackendDiff {
 		}
 
 		return $this->StatMessage($folderid, $id);
-	}
-	
-	public function GetWasteBasket() {
-		return false;
 	}
 	
 	/**

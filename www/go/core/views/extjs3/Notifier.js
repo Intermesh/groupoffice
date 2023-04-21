@@ -306,8 +306,6 @@
 
 		showNotifications : function() {
 
-			console.trace("notifications");
-
 			//added here to make sure it comes last
 			if(!this.notificationArea.tools['close']) {
 

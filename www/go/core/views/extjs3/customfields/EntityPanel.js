@@ -410,14 +410,16 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 			let items = [], types = go.customfields.CustomFields.getTypes();
 
-			for (var name in types) {
+			for (const name in types) {
+				if(types[name].hideInNewFieldTypes) {
+					continue;
+				}
 				items.push({
 					iconCls: types[name].iconCls,
 					text: types[name].label,
 					type: types[name],
-					handler: function (item) {
-						console.warn(item);
-						var dlg = item.type.getDialog();
+					handler: (item) => {
+						const dlg = item.type.getDialog();
 						dlg.setValues({
 							fieldSetId: this.addFieldMenu.record.data.fieldSetId,
 							type: item.type.name,
@@ -425,8 +427,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 						});
 
 						dlg.show();
-					},
-					scope: this
+					}
 				});
 			}
 
