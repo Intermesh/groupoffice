@@ -32,9 +32,10 @@ final class MultiContact extends MultiSelect
 	{
 		$tableName = $this->field->tableName();
 		$multiSelectTableName = $this->getMultiSelectTableName();
+		$entityColumn = $this->getTableDefinition()->getColumn('id');
 
 		$sql = "CREATE TABLE IF NOT EXISTS `" . $multiSelectTableName . "` (
-			`id` int(11) NOT NULL,
+			`id` $entityColumn->dataType NOT NULL,
 			`contactId` int(11) NOT NULL,
 			PRIMARY KEY (`id`,`contactId`),
 			KEY `contactId` (`contactId`)
