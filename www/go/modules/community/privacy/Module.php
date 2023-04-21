@@ -119,7 +119,7 @@ final class Module extends core\Module
 	 */
 	public static function onContactBeforeSave(Contact $contact): bool
 	{
-		if ($contact->isNew()) {
+		if ($contact->isNew() && !isset($contact->addressBookId)) {
 			$settings = privacy\model\Settings::get();
 			$arABs = explode(',', $settings->monitorAddressBooks );
 			if (!count($arABs)) {
