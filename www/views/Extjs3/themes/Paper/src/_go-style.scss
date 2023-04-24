@@ -2833,3 +2833,20 @@ table[id^="comments-ext"] b {
 
 	}
 }
+
+
+.go-color-field-dot {
+
+	border-radius: dp(8);
+	width: dp(16);
+	height: dp(16);
+	position:absolute;
+	top: dp(14);
+	left: dp(16);
+
+}
+
+.go-color-field {
+		padding-left: dp(40);
+
+}
