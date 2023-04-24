@@ -13,10 +13,16 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 					xtype: "fieldset",
 					items: [
 						{
+							xtype: "label",
+							html: t("Logo")
+						},
+						{
+
 							xtype: 'compositefield',
 							items: [
+
 								this.logoField = new go.form.FileField({
-									fieldLabel: t("Logo"),
+									hideLabel: true,
 									buttonOnly: true,
 									name: 'logoId',
 									height: dp(72),
