@@ -1,6 +1,7 @@
 - Core: Yes/No field has a default value now.
 - Leavedays: bugfix - retrieve agreementId for special leave budget in the past
 - Notesencrypt: close edit screen when cancelling password input.
+- Tasks: enable estimated duration in grid (hidden by default)
 
 13-04-2023: 6.6.158
 - Projects2: Fix bug in time registration PDF report

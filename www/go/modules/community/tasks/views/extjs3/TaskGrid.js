@@ -259,6 +259,20 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					},
 					hidden: true,
 					groupable: false
+				},{
+					id:"estimatedDuration",
+					header: t("Estimated duration", "tasks", 'community' ),
+					dataIndex: 'estimatedDuration',
+					align: "right",
+					hidden: !this.forProject,
+					width: dp(100),
+					renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
+						if(parseInt(value) > 0) {
+							return go.util.Format.duration(value, false , false);
+						}
+						return '';
+					},
+					groupable: false
 				}
 			];
 
@@ -276,19 +290,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 							metaData.css = 'projects-late';
 						}
 						return go.util.Format.duration(v);
-					}
-					return '';
-				},
-				groupable: false
-			},{
-				id:"estimatedDuration",
-				header: t("Estimated duration", "tasks", 'community' ),
-				dataIndex: 'estimatedDuration',
-				align: "right",
-				width: dp(100),
-				renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
-					if(parseInt(value) > 0) {
-						return go.util.Format.duration(value, false , false);
 					}
 					return '';
 				},
