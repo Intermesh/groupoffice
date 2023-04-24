@@ -1419,6 +1419,10 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
 		padding: dp(6) dp(8) dp(6) dp(12); // 10 top = middle of row line-height 20dp
 
+		.x-form-radio.x-form-field {
+			margin-right: 0;
+		}
+
 		.ux-row-action-cell & {
 			padding: 0;
 		}
