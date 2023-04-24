@@ -1,4 +1,5 @@
 - Tasks: Continue task didn't save comment
+- Support: Wrong task lists displayed when editing support categories
 
 20-04-2023: 6.7.24
 - Sync: 2FA for ActiveSync devices
