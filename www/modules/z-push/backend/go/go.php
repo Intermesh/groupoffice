@@ -204,6 +204,21 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		return substr($folderid,$pos + strlen('/'));
 	}
 
+    /**
+     * Returns backend id for a folder
+     *
+     * @param string        $folderid       combinedid of the folder
+     *
+     * @access public
+     * @return object
+     */
+    public function GetBackendId($folderid){
+        $pos = strpos($folderid, $this->config['delimiter']);
+        if($pos === false)
+            return false;
+        return substr($folderid, 0, $pos);
+    }
+
 	/**
 	 * Processes a response to a meeting request.
 	 *
