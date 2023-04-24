@@ -10,3 +10,5 @@ $updates['201610281659'][] = 'ALTER TABLE `zpa_devices` CHANGE `username` `usern
 
 $updates['201610281650'][] = 'ALTER TABLE `zpa_devices` ENGINE=InnoDB;';
 $updates['201610281650'][] = 'ALTER TABLE `zpa_devices` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;';
+$updates['202304241649'][] = 'alter table zpa_devices
+    modify remote_addr varchar(45) not null;';
