@@ -1,3 +1,4 @@
+25-04-2023: 6.7.25
 - Tasks: Continue task didn't save comment
 - Support: Wrong task lists displayed when editing support categories
 - Core: Fixed colorfield appearance
