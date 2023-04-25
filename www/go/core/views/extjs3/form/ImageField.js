@@ -44,10 +44,6 @@ go.form.ImageField = Ext.extend(Ext.BoxComponent, {
 
 	style: "cursor: pointer",
 
-	height: dp(120),
-
-	width: dp(120),
-
 	hideLabel: true,
 
 	autoUpload: false,
@@ -59,6 +55,9 @@ go.form.ImageField = Ext.extend(Ext.BoxComponent, {
 	// private
 	initComponent: function () {
 		go.form.ImageField.superclass.initComponent.call(this);
+
+		this.height= dp(120);
+		this.width= dp(120);
 
 		this.menu = new Ext.menu.Menu({
 			items: [{
