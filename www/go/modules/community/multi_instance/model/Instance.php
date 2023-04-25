@@ -604,11 +604,12 @@ class Instance extends Entity {
 		$expiresAt = new DateTime("+1 hour");
 		
 		$data = [
-				"loginToken" => uniqid().bin2hex(random_bytes(16)),
-				"accessToken" => uniqid().bin2hex(random_bytes(16)),
-				"expiresAt" => $expiresAt,
-				"userId" => 1,
-				"createdAt" => $now,
+
+            "loginToken" => uniqid().bin2hex(random_bytes(16)),
+            "accessToken" => uniqid().bin2hex(random_bytes(16)),
+            "expiresAt" => $expiresAt,
+            "userId" => 1,
+            "createdAt" => $now,
 		];
 
 
@@ -634,7 +635,7 @@ class Instance extends Entity {
             }
 
             $data['clientId'] = $this->getInstanceDbConnection()->getPDO()->lastInsertId();
-
+            $data["CSRFToken"] = uniqid().bin2hex(random_bytes(16));
         }
 
 		if($this->getInstanceDbConnection()->getDatabase()->getTable("core_auth_token")->hasColumn('platform')) {
