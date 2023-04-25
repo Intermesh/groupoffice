@@ -63,6 +63,19 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		}, this);
 	},
 
+	rememberLastAddressboek(addressBookId) {
+		const abSettings = go.User.addressBookSettings;
+		if(abSettings.startIn == "remember" && abSettings.lastAddressBookId != addressBookId) {
+			var update = {};
+			update[go.User.id] = {'addressBookSettings': {
+					lastAddressBookId:addressBookId
+				}};
+			go.Db.store("User").set({
+				'update': update
+			});
+		}
+	},
+
 	findAddressbookNode: function (id) {
 		var rootNode = this.getRootNode(), found = false;
 

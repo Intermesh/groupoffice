@@ -1,27 +1,30 @@
 .x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
-  background-color: color($bg, 'button');
-  .x-btn-group & {
-    border-radius: 0;
-  }
-  &:hover{
-    @extend .z1;
-    //background-color: $cHover;
-  }
-  &.x-btn-click{
-    box-shadow:none;
-    .x-btn-text{color:inherit;}
-  }
-  &.x-btn-focus {
-    @include var(background-color, c-primary-tp);
-  }
-  &.primary, &.raised {
+	background-color: color($bg, 'button');
+	.x-btn-group & {
+	 border-radius: 0;
+	}
+	&:hover{
+	 @extend .z1;
+	 //background-color: $cHover;
+	}
+	&.x-btn-click{
+	 box-shadow:none;
+	 .x-btn-text{color:inherit;}
+	}
+	&.x-btn-focus {
+	 @include var(background-color, c-primary-tp);
+	}
+	&.primary, &.raised {
 		color: white;
 		background-color: var(--c-secondary);
 		@include var('background-color', c-secondary);
-  }
-  &.accent {
+	}
+	&.accent {
 	  background-color: var(--c-accent);
-  }
+	}
+}
+.go-main-tab-panel.x-tab-panel > .x-tab-panel-header .x-tab-strip > li {
+	padding: 0 dp(20);
 }
 .x-menu {
 	border: 1px solid var(--fg-disabled);
@@ -29,6 +32,9 @@
 .x-menu-sep {
 	margin-left: dp(16);
 	margin-right: dp(16);
+}
+.x-menu-item-text, .go-sidenav *, .go-nav * {
+	@extend %font-menu;
 }
 .x-toolbar .xtb-sep{
   margin-left:0;
