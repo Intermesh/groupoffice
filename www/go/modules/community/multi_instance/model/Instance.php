@@ -871,7 +871,7 @@ class Instance extends Entity {
 					'package' => 'legacy',
 					'module' => $mod->name(),
 					'title' => $mod->localizedName(),
-					'icon' => $mod->icon(),
+//					'icon' => $mod->icon(),
 					'localizedPackage' => ucfirst($mod->package())
 				];
 			} elseif ($mod instanceof Module) {
@@ -882,7 +882,7 @@ class Instance extends Entity {
 					'package' => $mod->getPackage(),
 					'module' => $mod->getName(),
 					'title' => $mod->getTitle(),
-					'icon' => $mod->getIcon(),
+//					'icon' => $mod->getIcon(),
 					'localizedPackage' => ucfirst($mod->getPackage())
 				];
 			}
