@@ -1,3 +1,4 @@
+25-04-2023: 6.6.159
 - Core: Yes/No field has a default value now.
 - Leavedays: bugfix - retrieve agreementId for special leave budget in the past
 - Notesencrypt: close edit screen when cancelling password input.
