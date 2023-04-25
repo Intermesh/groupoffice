@@ -17,7 +17,11 @@ $font-weight-l: 100;
 	font-size: sp(13);
 	font-weight: $font-weight-r;
 }
-
+%font-menu {
+	font-size: sp(16);
+	font-weight: 600;
+	letter-spacing: -0.1px;
+}
 %font-body1 {
 	font-size: sp(16);
 	color: color($fg, 'text');
