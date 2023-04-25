@@ -2,6 +2,7 @@
 - Support: Wrong task lists displayed when editing support categories
 - Core: Fixed colorfield appearance
 - ActiveSync: Z-push admin could not store remote ipv6 addresses
+- ActiveSync: Fixed deleting mail
 
 20-04-2023: 6.7.24
 - Sync: 2FA for ActiveSync devices
