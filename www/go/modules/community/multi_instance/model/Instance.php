@@ -5,6 +5,7 @@ use Exception;
 use GO\Base\ModuleCollection;
 use go\core\db\Connection;
 use go\core\db\Criteria;
+use go\core\db\Database;
 use go\core\db\Utils;
 use go\core\ErrorHandler;
 use go\core\fs\File;
@@ -606,22 +607,51 @@ class Instance extends Entity {
 				"loginToken" => uniqid().bin2hex(random_bytes(16)),
 				"accessToken" => uniqid().bin2hex(random_bytes(16)),
 				"expiresAt" => $expiresAt,
-				"userAgent" => "Multi Instance Module",
 				"userId" => 1,
 				"createdAt" => $now,
-				"lastActiveAt" => $now,
-				"remoteIpAddress" => $_SERVER['REMOTE_ADDR']
 		];
 
+
+        if($this->getInstanceDbConnection()->getDatabase()->getTable("core_auth_token")->hasColumn('userAgent')) {
+            $data["userAgent"] = "Multi Instance Module";
+            $data["lastActiveAt"] = $now;
+            $data["remoteIpAddress"] = $_SERVER['REMOTE_ADDR'];
+        } else
+        {
+            //6.7 with clients
+            $client = go()->getAuthState()->getUser()->currentClient();
+            $db = new Database($this->getInstanceDbConnection());
+            $table = $db->getTable('core_client');
+
+            $arr = [];
+            foreach($table->getColumnNames() as $col) {
+                $arr[$col] = $client->$col;
+            }
+            unset($arr['id']);
+
+            if(!$this->getInstanceDbConnection()->insert('core_client', $arr)->execute()) {
+                throw new Exception("Failed to create access token");
+            }
+
+            $data['clientId'] = $this->getInstanceDbConnection()->getPDO()->lastInsertId();
+
+        }
+
 		if($this->getInstanceDbConnection()->getDatabase()->getTable("core_auth_token")->hasColumn('platform')) {
-			//available since 6.5
-			$data["platform"] = go()->getAuthState()->getToken()->platform;
-			$data["browser"] = go()->getAuthState()->getToken()->browser;
+
+            //available since 6.5
+
+            $client = go()->getAuthState()->getUser()->currentClient();
+
+			$data["platform"] = $client->platform;
+			$data["browser"] = $client->name;
 		}
 
 		if(!$this->getInstanceDbConnection()->insert('core_auth_token', $data)->execute()) {
 			throw new Exception("Failed to create access token");
 		}
+
+        $this->getInstanceDbConnection()->disconnect();
 		
 		return $data['accessToken'];	
 	}
