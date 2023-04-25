@@ -1,6 +1,6 @@
 <?php
 
-class MailStore extends Store {
+class MailStore extends Store implements ISearchProvider {
 
 	
 	/**
@@ -1073,8 +1073,7 @@ class MailStore extends Store {
 		
 //		$query = ' FROM "kadaster"  OR TO "kadaster"  OR CC "kadaster"  OR SUBJECT "kadaster" BEFORE 28-Feb-2013 SINCE 28-Aug-2012 ';
 //		
-		ZLog::Write(LOGLEVEL_INFO,'QUERY ~~ '.var_export($query,true));
-		
+
 		$maxPageSize = 30;
 		
 		$searchrange = $cpo->GetSearchRange();
@@ -1090,9 +1089,10 @@ class MailStore extends Store {
 		if($rangeend-$rangestart>$maxPageSize){
 			$rangeend=$rangestart+$maxPageSize;
 		}
-		
 
-		$messages = \GO\Email\Model\ImapMessage::model()->find(
+        ZLog::Write(LOGLEVEL_INFO,'QUERY ~~ '.var_export($query,true) . ' range: ' . $rangestart.' - '. $rangeend);
+
+        $messages = \GO\Email\Model\ImapMessage::model()->find(
 					$imapAccount, 
 					$searchFolder,
 					$rangestart, 
@@ -1103,7 +1103,7 @@ class MailStore extends Store {
 		
 		$items = array();
 		$items['searchtotal'] = $imapAccount->getImapConnection()->sort_count;
-    $items["range"] = $rangestart.'-'.$rangeend;
+        $items["range"] = $rangestart.'-'.$rangeend;
 		
 		foreach($messages as $message){
 			$items[] = array(
@@ -1138,5 +1138,25 @@ class MailStore extends Store {
 		return $state;
 	}
 
+    public function SupportsType($searchtype)
+    {
+        return ($searchtype == ISearchProvider::SEARCH_MAILBOX);
+    }
+
+    public function GetGALSearchResults($searchquery, $searchrange, $searchpicture)
+    {
+        return false;
+    }
+
+    public function TerminateSearch($pid)
+    {
+        return true;
+    }
+
+    public function Disconnect()
+    {
+        // Don't close the mailbox, we will need it open in the Backend methods
+        return true;
+    }
 }
 

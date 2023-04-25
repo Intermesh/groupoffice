@@ -67,8 +67,12 @@ include_once(ZPUSH_CONFIG);
         }
 
         // Check required GET parameters
-        if(Request::IsMethodPOST() && (Request::GetCommandCode() === false || !Request::GetDeviceID() || !Request::GetDeviceType()))
-            throw new FatalException("Requested the Z-Push URL without the required GET parameters");
+        if(Request::IsMethodPOST() && (Request::GetCommandCode() === false || !Request::GetDeviceID() || !Request::GetDeviceType())) {
+            ZLog::Write(LOGLEVEL_DEBUG,
+                var_export($_SERVER, true));
+
+            throw new FatalException("Requested the Microsoft ActiveSync URL without the required GET parameters");
+        }
 
         // Load the backend
         $backend = ZPush::GetBackend();

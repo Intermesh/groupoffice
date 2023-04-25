@@ -395,76 +395,161 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		}
 	}
 
-	// Functions for search
+    /**
+     * Indicates which AS version is supported by the backend.
+     * Return the lowest version supported by the backends used.
+     *
+     * @access public
+     * @return string       AS version constant
+     */
+    public function GetSupportedASVersion() {
 
-	/**
-	 * Disconnect function to close things after the search is completed.
-	 * 
-	 * Note: Not needed for us now.
-	 * 
-	 * @return boolean Success
-	 */
-	public function Disconnect() {
-		ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2Search::Disconnect');
-		return true;
-	}
+        return ZPush::ASV_14;
+//        $version = ZPush::ASV_14;
+//        foreach ($this->backends as $i => $b) {
+//            $subversion = $this->backends[$i]->GetSupportedASVersion();
+//            if ($subversion < $version) {
+//                $version = $subversion;
+//            }
+//        }
+//        return $version;
+    }
+
+    /**
+     * Returns the BackendCombined as it implements the ISearchProvider interface
+     * This could be overwritten by the global configuration
+     *
+     * @access public
+     * @return object       Implementation of ISearchProvider
+     */
+    public function GetSearchProvider() {
+        return $this;
+    }
 
 
-	public function GetMailboxSearchResults($cpo) {
-		$searchFolderId = $cpo->GetSearchFolderid();
-		
-		if(empty($searchFolderId)){
-			
-			ZLog::Write(LOGLEVEL_WARN, 'Client sent empty search folder! Defaulting to INBOX');
-			
-			$searchFolderId = 'm/INBOX';
-		}
-		
-		$mailBackend = $this->GetBackend($searchFolderId);
-		if(!$mailBackend){
-			
-			ZLog::Write(LOGLEVEL_ERROR, 'Search folder: '.$searchFolderId.' not found');
-			
-			return array();
-		}
-		
-		return $mailBackend->GetMailboxSearchResults($cpo);
-	}
+    /*-----------------------------------------------------------------------------------------
+    -- ISearchProvider
+    ------------------------------------------------------------------------------------------*/
+    /**
+     * Indicates if a search type is supported by this SearchProvider
+     * It supports all the search types, searches are delegated.
+     *
+     * @param string        $searchtype
+     *
+     * @access public
+     * @return boolean
+     */
+    public function SupportsType($searchtype) {
+        ZLog::Write(LOGLEVEL_DEBUG, sprintf("Combined->SupportsType('%s')", $searchtype));
+        $i = $this->getSearchBackend($searchtype);
 
-	/**
-	 * Get the supported search options for the GO backend
-	 * 
-	 * @param string $searchtype GAL / MAILBOX
-	 * @return boolean
-	 */
-	public function SupportsType($searchtype) {
-		//return in_array($searchtype,array(ISearchProvider::SEARCH_GAL, ISearchProvider::SEARCH_MAILBOX));
-		return in_array(strtoupper($searchtype), array(ISearchProvider::SEARCH_MAILBOX));
-	}
-	
-	/**
-	 * Returns the backend as it implements the ISearchProvider interface
-	 * This could be overwritten by the global configuration
-	 *
-	 * @access public
-	 * @return object       Implementation of ISearchProvider
-	 */
-	public function GetSearchProvider() {
-		return $this;
-	}
+        return $i !== false;
+    }
 
-	/**
-	 * Terminate the search while it is searching.
-	 * 
-	 * Note: Not needed for us now.
-	 * 
-	 * @param int $pid
-	 * @return boolean Success
-	 */
-	public function TerminateSearch($pid) {
-		ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2Search::TerminateSearch');
-		return true;
-	}
+
+    /**
+     * Queries the LDAP backend
+     *
+     * @param string                        $searchquery        string to be searched for
+     * @param string                        $searchrange        specified searchrange
+     * @param SyncResolveRecipientsPicture  $searchpicture      limitations for picture
+     *
+     * @access public
+     * @return array        search results
+     * @throws StatusException
+     */
+    public function GetGALSearchResults($searchquery, $searchrange, $searchpicture) {
+        ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetGALSearchResults()");
+        $i = $this->getSearchBackend(ISearchProvider::SEARCH_GAL);
+
+        $result = false;
+        if ($i !== false) {
+            $result = $this->backends[$i]->GetGALSearchResults($searchquery, $searchrange, $searchpicture);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Searches for the emails on the server
+     *
+     * @param ContentParameter $cpo
+     *
+     * @return array
+     */
+    public function GetMailboxSearchResults($cpo) {
+        ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetMailboxSearchResults()");
+        $i = $this->getSearchBackend(ISearchProvider::SEARCH_MAILBOX);
+
+        $result = false;
+        if ($i !== false) {
+            //Convert $cpo GetSearchFolderid
+            $cpo->SetSearchFolderid($this->GetBackendFolder($cpo->GetSearchFolderid()));
+            $result = $this->backends[$i]->GetMailboxSearchResults($cpo, $i . $this->config['delimiter']);
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Terminates a search for a given PID
+     *
+     * @param int $pid
+     *
+     * @return boolean
+     */
+    public function TerminateSearch($pid) {
+        ZLog::Write(LOGLEVEL_DEBUG, "Combined->TerminateSearch()");
+        foreach ($this->backends as $i => $b) {
+            if ($this->backends[$i] instanceof ISearchProvider) {
+                $this->backends[$i]->TerminateSearch($pid);
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Disconnects backends
+     *
+     * @access public
+     * @return boolean
+     */
+    public function Disconnect() {
+        ZLog::Write(LOGLEVEL_DEBUG, "Combined->Disconnect()");
+        foreach ($this->backends as $i => $b) {
+            if ($this->backends[$i] instanceof ISearchProvider) {
+                $this->backends[$i]->Disconnect();
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Returns the first backend that support a search type
+     *
+     * @param string    $searchtype
+     *
+     * @access private
+     * @return string
+     */
+    private function getSearchBackend($searchtype) {
+        foreach ($this->backends as $i => $b) {
+            if ($this->backends[$i] instanceof ISearchProvider) {
+                if ($this->backends[$i]->SupportsType($searchtype)) {
+                    return $i;
+                }
+            }
+        }
+        ZLog::Write(LOGLEVEL_DEBUG, sprintf("Combined->getSearchBackend('%s') No support found!", $searchtype));
+
+        return false;
+    }
+
 	
 	protected $syncstates = [];
 	protected $sinkfolders = [];
@@ -550,27 +635,5 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 				sleep($timeout);
 			}
 		return $notifications;
-	}
-
-	/**
-	 * Searches the GAL.
-	 *
-	 * @param string                        $searchquery        string to be searched for
-	 * @param string                        $searchrange        specified searchrange
-	 * @param SyncResolveRecipientsPicture  $searchpicture      limitations for picture
-	 *
-	 * @access public
-	 * @return array        search results
-	 * @throws StatusException
-	 */
-	public function GetGALSearchResults($searchquery, $searchrange, $searchpicture) {
-		return [];
-	}
-
-	/**
-	 * Indicates which AS version is supported by the backend.
-	 */
-	public function GetSupportedASVersion() {
-		return ZPush::ASV_14;
 	}
 }
