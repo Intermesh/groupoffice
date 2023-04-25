@@ -386,11 +386,15 @@ class Instance extends Entity {
 			if(!$tmpFolder->create()) {
 				throw new Exception("Could not create temporary files folder");
 			}
-		
+
+            go()->getDbConnection()->pauseTransactions();
+
 			$this->createDatabase($instanceConfig['db_name']);
 			$databaseCreated = true;
 			$this->createDatabaseUser($instanceConfig['db_name'], $instanceConfig['db_user'], $instanceConfig['db_pass']);
 			$databaseUserCreated = true;
+
+            go()->getDbConnection()->resumeTransactions();
 
 			if(!isset($instanceConfig['db_host'])) {
 				$instanceConfig['db_host'] = go()->getConfig()['db_host'];
@@ -412,6 +416,8 @@ class Instance extends Entity {
 			$this->writeConfig();
 
 		} catch(Exception $e) {
+
+            go()->getDbConnection()->resumeTransactions();
 			
 			//cleanup
 			$tmpFolder->delete();
@@ -699,6 +705,7 @@ class Instance extends Entity {
 		}
 		catch(Exception $e) {
 			//ignore
+            go()->getDebugger()->debug($e);
 		}
 	}	
 	
