@@ -706,7 +706,9 @@ class Instance extends Entity {
 		catch(Exception $e) {
 			//ignore
             go()->getDebugger()->debug($e);
-		}
+		} finally {
+            $this->getInstanceDbConnection()->disconnect();
+        }
 	}	
 	
 	
