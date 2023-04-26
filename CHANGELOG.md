@@ -1,3 +1,5 @@
+- Calendar: prevent error when printing calendar view while user has no permissions for calendar
+
 25-04-2023: 6.6.159
 - Core: Yes/No field has a default value now.
 - Leavedays: bugfix - retrieve agreementId for special leave budget in the past
