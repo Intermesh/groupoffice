@@ -320,7 +320,7 @@ namespace go\core {
 					}
 				} else
 				{
-					$usage = GO::config()->get_setting('file_storage_usage');
+					$usage = GO::config()->get_setting('file_storage_usage') ?? 0;
 					$this->storageFreeSpace = $quota - $usage;
 				}
 			}
