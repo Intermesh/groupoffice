@@ -1,4 +1,5 @@
 - Calendar: prevent error when printing calendar view while user has no permissions for calendar
+- Leavedays: Better display of leave budgets and spent hours per budget
 
 25-04-2023: 6.6.159
 - Core: Yes/No field has a default value now.
