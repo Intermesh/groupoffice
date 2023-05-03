@@ -64,7 +64,10 @@
 		},
 
 		show : function(alert) {
-			const now = new Date(), id = 'core-alert-' + alert.id;
+			const now = new Date(), triggerDate = new Date (alert.triggerAt), id = 'core-alert-' + alert.id;
+			debugger;
+
+			if(triggerDate > now) return;
 
 			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
 
