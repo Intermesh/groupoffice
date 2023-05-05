@@ -122,6 +122,7 @@ go.Modules.register("core", 'core', {
 		"go.customfields.type.Group",
 		"go.customfields.type.Html",
 		"go.customfields.type.MultiSelect",
+		"go.customfields.type.Attachments",
 		"go.customfields.type.Notes",
 		"go.customfields.type.Number",
 		"go.customfields.type.Select",
