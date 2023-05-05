@@ -64,6 +64,15 @@
 }
 .x-window{
 	border: 1px solid var(--fg-divider);
+	&-header-text {
+		height: dp(40);
+		line-height:dp(40);
+		text-align: center;
+		margin-left: dp(120);
+	}
+	&-header .x-tool {
+		margin:dp(6) 0;
+	}
 }
 
 #global-search-panel .x-btn {

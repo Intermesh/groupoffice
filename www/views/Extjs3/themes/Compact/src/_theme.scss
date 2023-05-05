@@ -9,7 +9,7 @@ $font-scale: 1.1;
 	--fg-divider:			#{rgba(black, 0.08)};
 	--fg-border:			#{rgba(black, 0.16)};
 	--fg-line:				#{rgba(black, 0.12)};
-	--fg-disabled:       #{rgba(black, 0.38)};
+	--fg-disabled:       #{rgba(black, 0.34)};
 	--fg-textfield-box:  rgba(255, 255, 255, 0.8); // for the border
 	--fg-textbox-line: 	#{rgba(black, 0.42)};
 	--fg-track: 	#{rgba(black, 0.26)};
@@ -20,7 +20,7 @@ $font-scale: 1.1;
 
 	--bg-body: 			var(--c-primary);
 	--bg-button:	  	#{mix(#fff, $ambientColor, 98%)};
-	--bg-layer: 		#{rgba(mix(#eee, $ambientColor, 92%),.74)};
+	--bg-layer: 		#{rgba(mix(#eee, $ambientColor, 92%),.84)};
 	--bg-side-bar:		#{mix(white, $ambientColor, 81%)};
 	--bg-background:  #{mix(#fafafa, $ambientColor, 95%)};
 
