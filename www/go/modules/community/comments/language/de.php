@@ -9,4 +9,7 @@ return array (
   'The date was changed to {date}' => 'Das Datum wurde auf {date} geändert',
   'A comment was made by {creator}' => '{creator} hat einen Kommentar geschrieben',
   'Could not find this user in the address book for you.' => 'Dieser Benutzer konnte nicht in Ihrem Adressbuch gefunden werden.',
+  'Attach file' => 'Datei anhängen',
+  'Scroll to top' => 'Nach oben scrollen',
+  'You have an unsaved comment. Are you sure you want to discard the comment?' => 'Der Kommentar ist noch nicht gespeichert. Sind Sie sicher, dass Sie ihn verwerfen möchten?',
 );
