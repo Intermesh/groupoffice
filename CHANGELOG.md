@@ -1,5 +1,6 @@
 - Core: prevent exception in disk usage calculation in very specific use case
 - Updated German language files. Danke, Daniel!
+- Finance: Fixed payment search
 
 25-04-2023: 6.7.25
 - Tasks: Continue task didn't save comment
