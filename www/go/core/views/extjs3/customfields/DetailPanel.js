@@ -70,26 +70,37 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
      return''
     }
 
-    var vis = false, panel = this;
+    var vis = false, panel = this, promisses = [];
     go.customfields.CustomFields.getFields(this.fieldSet.id).forEach(function (field) {
 
       var cmp = panel.fieldMap[field.databaseName], type = go.customfields.CustomFields.getType(field.type);
       if(cmp && cmp.setValue) {
         var v = type.renderDetailView(dv.data.customFields[field.databaseName], dv.data, field, cmp);
-        if(typeof(v) !== "undefined") {
+
+        if(v && v.finally) {
+
+          v.finally(() => {
+
+            if(cmp.value){
+              vis = true;
+            }
+          })
+
+          promisses.push(v);
+        } else if(typeof(v) !== "undefined") {
           cmp.setVisible(!!v);
           cmp.setValue(v);
           if(!!v) {
             vis = true;
           }
-        } else if(!vis && (field.type === 'Contact' || field.type === 'User')) {
-          // Hack: relation CFs are dependent on promises and will never return anything. They should be displayed though
-          vis = true;
         }
       }
     });
 
-    this.setVisible(vis);
+    Promise.all(promisses).then(() => {
+      this.setVisible(vis);
+    });
+
   },
 
   /**
