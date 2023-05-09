@@ -10,9 +10,6 @@ $useThemeSettings = $useThemeSettings ?? true;
 
 $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Installation") : go()->getSettings()->title;
 $primaryColor = go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)';
-if(go()->getUserId() && \GO::user()->hasAttribute('themeColorScheme')) {
-	$bodyCls .= ' '.\GO::user()->themeColorScheme;
-}
 $webclient = Extjs3::get();
 $themeUrl = $webclient->getThemeUrl();
 $authController = new \GO\Core\Controller\AuthController(); // for some reason the event listeners are in this class

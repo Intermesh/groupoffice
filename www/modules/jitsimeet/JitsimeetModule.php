@@ -30,7 +30,7 @@ class JitsimeetModule extends \GO\Base\Module{
 	}
 
 	static function hasLink($event) {
-		return !$event->isNew() && strpos($event->description, Settings::get()->jitsiUri) !== false;
+		return !$event->isNew() && !empty($event->description) && strpos($event->description, Settings::get()->jitsiUri) !== false;
 	}
 
 //	public static function addJitsiLink(&$self,&$response,&$model,&$params,$modifiedAttributes){

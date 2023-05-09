@@ -38,6 +38,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			this.legacySettings(user);
 
 			this.checkForNewDevices(user);
+			document.body.classList.add(user.themeColorScheme);
 
 			go.ActivityWatcher.activity();
 			go.ActivityWatcher.init(GO.settings.config.logoutWhenInactive);
