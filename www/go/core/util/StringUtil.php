@@ -568,7 +568,7 @@ END;
 		}
 
 		//replace repeating spaces with &nbsp;		
-		$text = htmlspecialchars($text, ENT_COMPAT);
+		$text = htmlspecialchars($text);
 		$text = str_replace('  ', '&nbsp;&nbsp;', $text);
 
 
