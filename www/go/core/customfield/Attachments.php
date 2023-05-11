@@ -1,15 +1,14 @@
 <?php
 
-namespace go\modules\community\addressbook\customfield;
+namespace go\core\customfield;
 
 use Exception;
-use go\core\customfield\MultiSelect;
 use go\core\db\Criteria;
 use go\core\orm\CustomFieldsModel;
 use go\core\orm\Filters;
 use go\core\orm\Query;
 
-final class MultiContact extends MultiSelect
+final class Attachments extends MultiSelect
 {
 	public function onFieldSave(): bool
 	{
@@ -22,7 +21,7 @@ final class MultiContact extends MultiSelect
 
 	public function getMultiSelectTableName(): string
 	{
-		return "addressbook_customfields_multicontact_" . $this->field->id;
+		return "core_customfields_attachments_" . $this->field->id;
 	}
 
 	/**
@@ -35,19 +34,15 @@ final class MultiContact extends MultiSelect
 		$entityColumn = $this->getTableDefinition()->getColumn('id');
 
 		$sql = "CREATE TABLE IF NOT EXISTS `" . $multiSelectTableName . "` (
-			`id` $entityColumn->dataType NOT NULL,
-			`contactId` int(11) NOT NULL,
-			PRIMARY KEY (`id`,`contactId`),
-			KEY `contactId` (`contactId`)
+			`modelId` $entityColumn->dataType NOT NULL,
+			`blobId` BINARY(40) NOT NULL,
+			`name` VARCHAR(192),
+			`description` MEDIUMTEXT,
+			PRIMARY KEY (`modelId`, `blobId`),
+			KEY `idx_blobId` (`blobId`),
+			CONSTRAINT `" . $multiSelectTableName . "_ibfk_1` FOREIGN KEY (`modelId`) REFERENCES `" . $tableName . "` (`id`) ON DELETE CASCADE,
+		   CONSTRAINT `" . $multiSelectTableName . "_ibfk_2` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;";
-
-		if(!go()->getDbConnection()->query($sql)) {
-			return false;
-		}
-
-		$sql = "ALTER TABLE `" . $multiSelectTableName . "`
-			ADD CONSTRAINT `" . $multiSelectTableName . "_ibfk_1` FOREIGN KEY (`id`) REFERENCES `" . $tableName . "` (`id`) ON DELETE CASCADE,
-		  ADD CONSTRAINT `" . $multiSelectTableName . "_ibfk_2` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;";
 
 		return go()->getDbConnection()->query($sql);
 	}
@@ -65,17 +60,22 @@ final class MultiContact extends MultiSelect
 		if(!isset($this->optionsToSave)) {
 			return true;
 		}
-
-		foreach($this->optionsToSave as $optionId) {
-			if(!go()->getDbConnection()->replace($this->getMultiSelectTableName(), ['id' => $entity->id, 'contactId' => $optionId])->execute()) {
+		$blobs = [];
+		foreach($this->optionsToSave as $attachment) {
+			$blobs[$attachment['blobId']] = true;
+			if(!go()->getDbConnection()->replace($this->getMultiSelectTableName(), [
+				'modelId' => $entity->id,
+				'blobId' => $attachment['blobId'],
+				'name' => $attachment['name']
+			])->execute()) {
 				return false;
 			}
 		}
 
 
-		$query  = (new Query)->where(['id' => $entity->id]);
-		if (!empty($this->optionsToSave)) {
-			$query	->andWhere('contactId', 'not in', $this->optionsToSave);
+		$query = (new Query)->where(['modelId' => $entity->id]);
+		if (!empty($blobs)) {
+			$query->andWhere('blobId', 'not in', array_keys($blobs));
 		}
 
 		if(!go()->getDbConnection()->delete($this->getMultiSelectTableName(), $query)->execute()) {
@@ -94,9 +94,9 @@ final class MultiContact extends MultiSelect
 		}
 
 		return (new Query())
-			->selectSingleValue("contactId")
+			->select("blobId, name")
 			->from($this->getMultiSelectTableName())
-			->where(['id' => $entity->id])
+			->where(['modelId' => $entity->id])
 			->all();
 	}
 
@@ -108,11 +108,11 @@ final class MultiContact extends MultiSelect
 		}
 
 		return implode(", ", (new Query())
-			->selectSingleValue("ac.name")
-			->join("addressbook_contact", "ac", "ac.id = ms.contactId")
+			->selectSingleValue("blb.name")
+			->join("core_blob", "blb", "blb.id = ms.blobId")
 			->from($this->getMultiSelectTableName(), 'ms')
-			->where(['id' => $entity->id])
-			->orderBy(['ac.name' => 'ASC'])
+			->where(['modelId' => $entity->id])
+			->orderBy(['blb.name' => 'ASC'])
 			->all());
 	}
 
@@ -129,10 +129,10 @@ final class MultiContact extends MultiSelect
 
 		$ids = (new Query())
 			->selectSingleValue("id")
-			->from("addressbook_contact", 'o')
+			->from("core_blob", 'b')
 			->where(['name' => $texts])
 			->andWhere(['fieldId' => $this->field->id])
-			->orderBy(['o.name' => 'ASC'])
+			->orderBy(['b.name' => 'ASC'])
 			->all();
 
 		if(count($ids) != count($texts)) {
@@ -163,15 +163,15 @@ final class MultiContact extends MultiSelect
 			$cls = $query->getModel();
 			$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
 			$joinAlias = $this->getJoinAlias();
-			$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id', 'left');
+			$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.modelId = '.$primaryTableAlias.'.id', 'left');
 
 			if(isset($value[0]) && is_numeric($value[0])) {
 				//When field option ID is passed by a saved filter
-				$criteria->where($joinAlias. '.contactId', '=', $value);
+				$criteria->where($joinAlias. '.blobId', '=', $value);
 			} else{
 				//for text queries we must join the contacts.
-				$alias = 'ac_' . uniqid();
-				$query->join('addressbook_contact', $alias, $alias . '.id = '.$joinAlias. '.contactId', 'left');
+				$alias = 'blob_' . uniqid();
+				$query->join('core_blob', $alias, $alias . '.id = '.$joinAlias. '.blobId', 'left');
 				$criteria->where($alias . '.name', $comparator, $value);
 			}
 

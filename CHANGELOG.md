@@ -1,3 +1,16 @@
+11-05-2023: 6.7.26
+- Core: prevent exception in disk usage calculation in very specific use case
+- Updated German language files. Danke, Daniel!
+- Finance: Fixed payment search
+- Addressbook: fix error deleting address book
+
+25-04-2023: 6.7.25
+- Tasks: Continue task didn't save comment
+- Support: Wrong task lists displayed when editing support categories
+- Core: Fixed colorfield appearance
+- ActiveSync: Z-push admin could not store remote ipv6 addresses
+- ActiveSync: Fixed deleting mail
+
 20-04-2023: 6.7.24
 - Sync: 2FA for ActiveSync devices
 - Address book: Multiple contact/org select field added

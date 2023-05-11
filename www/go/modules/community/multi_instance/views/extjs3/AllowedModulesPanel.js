@@ -1,5 +1,6 @@
 go.modules.community.multi_instance.AllowedModulesPanel = Ext.extend(go.grid.GridPanel, {
 	title: t('Modules'),
+	scrollLoader: false,
 	initComponent: function() {
 
 		this.columns = [

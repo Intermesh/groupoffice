@@ -10,9 +10,6 @@ $useThemeSettings = $useThemeSettings ?? true;
 
 $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Installation") : go()->getSettings()->title;
 $primaryColor = go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)';
-if(go()->getUserId() && \GO::user()->hasAttribute('themeColorScheme')) {
-	$bodyCls .= ' '.\GO::user()->themeColorScheme;
-}
 $webclient = Extjs3::get();
 $themeUrl = $webclient->getThemeUrl();
 $authController = new \GO\Core\Controller\AuthController(); // for some reason the event listeners are in this class
@@ -54,6 +51,9 @@ $cssMtime = filemtime(GO::view()->getTheme()->getPath() . "/style.css");
 	$authController->fireEvent('head');
     go()->fireEvent(App::EVENT_HEAD);
 ?>
+	<script type="text/javascript">
+		GO.util.density = GO.util.isMobileOrTablet() ? 160 :  <?= isset($density) ? $density : 140?>;
+	</script>
     <link rel="stylesheet" media="screen and (max-device-width:1200px)" href="<?= $themeUrl; ?>style-mobile.css?v=<?=$cssMtime;?>">
     <?php if (!\go\core\Installer::isInstalling()): ?>
     <link rel="stylesheet" href="<?= GO::view()->getUrl()?>css.php?theme=<?=$themeUrl; ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>"  />
@@ -88,9 +88,3 @@ $cssMtime = filemtime(GO::view()->getTheme()->getPath() . "/style.css");
 <body class="<?=$bodyCls;?>">
 <div id="goui"><!-- GOUI's Root component default element --></div>
 <div id="paper"><!-- dom for printing will be inserted into this DIV --></div>
-
-<?php if($loadExt): ?>
-<script type="text/javascript">
-   GO.util.density = GO.util.isMobileOrTablet() ? 160 :  <?= isset($density) ? $density : 140?>;
-</script>
-<?php endif; ?>

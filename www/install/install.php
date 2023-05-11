@@ -119,21 +119,27 @@ if (!empty($_POST)) {
 		$cron->weekdays = '*';
 		$cron->job = 'GO\Base\Cron\EmailReminders';
 
-		$cron->save();
+		if(!$cron->save()) {
+			var_dump($cron->getValidationErrors());
+			throw new Exception("Could not save email reminders cron");
+		}
 
 		$cron = new CronJob();
 
 		$cron->name = 'Calculate disk usage';
 		$cron->active = true;
 		$cron->runonce = false;
-		$cron->minutes = '0';
-		$cron->hours = '0';
+		$cron->minutes = '1';
+		$cron->hours = '1';
 		$cron->monthdays = '*';
 		$cron->months = '*';
 		$cron->weekdays = '*';
 		$cron->job = 'GO\Base\Cron\CalculateDiskUsage';
 
-		$cron->save();
+		if(!$cron->save()) {
+			var_dump($cron->getValidationErrors());
+			throw new Exception("Could not save calculate disk usage cron");
+		}
 
 		Observable::cacheListeners();
 

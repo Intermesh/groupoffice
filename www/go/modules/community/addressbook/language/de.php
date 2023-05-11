@@ -139,4 +139,13 @@ return array (
   'Please select at least two contacts' => 'Bitte wählen Sie mindestens zwei Kontakte aus',
   'Web page' => 'Webseite',
   'The selected contacts will be merged into one contact. Are you sure?' => 'Die ausgewählten Kontakte werden zu einem Kontakt zusammengefasst. Sind Sie sicher?',
+  'Multiple Contacts' => 'Mehrfachkontakte',
+  'Could not find this user in the address book for you.' => 'Dieser Nutzer konnte im Adressbuch nicht gefunden werden',
+  'Automatic linking' => 'Automatische Verknüpfung',
+  'Don\'t link automatically to contacts' => 'Nicht automatisch mit Kontakten verknüpfen',
+  'Link to all contacts' => 'Verknüpfen zu allen Kontakten',
+  'Exclude contacts from the address books below' => 'Kontakte von folgenden Adressbüchern ausschließen',
+  'Only link to the contacts from the address books below' => 'Nur auf Kontakte von folgenden Adressbüchern verlinken',
+  'Add to group' => 'Zur Gruppe hinzufügen',
+  'Delete %d items' => '%d Einträge löschen',
 );

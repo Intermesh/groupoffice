@@ -996,7 +996,7 @@ class User extends AclItemEntity {
 		}
 	}
 	
-	public function currentClient() {
+	public function currentClient() : ?Client {
         if(Environment::get()->isCli()) {
             $where = [
                 'userId' => $this->id,

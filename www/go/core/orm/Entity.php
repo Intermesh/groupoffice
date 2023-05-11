@@ -993,6 +993,8 @@ abstract class Entity extends Property {
 	
 	/**
 	 * Return columns to search on with the "text" filter. {@see filter()}
+     *
+     * If you need joins you can override {@see search()}. You can access the joined table with ['alias.colName']
 	 * 
 	 * @return string[]
 	 */
@@ -1037,15 +1039,14 @@ abstract class Entity extends Property {
    */
 	protected static function search(Criteria $criteria, string $expression, DbQuery $query): Criteria
 	{
-
-		$columns = static::textFilterColumns();
-
 		if(static::useSearchableTraitForSearch($query)) {
 			Search::addCriteria( $criteria, $query, $expression);
 			return $criteria;
 		}
 
-		if(empty($columns)) {
+        $columns = static::textFilterColumns();
+
+        if(empty($columns)) {
 			go()->warn(static::class . ' entity has no textFilterColumns() defined. The "text" filter will not work.');
 		}
 		

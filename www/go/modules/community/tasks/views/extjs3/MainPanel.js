@@ -341,6 +341,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	createCategoriesGrid: function() {
 		this.categoriesGrid = new go.modules.community.tasks.CategoriesGrid({
+			role:  !this.support ? go.modules.community.tasks.listTypes.List : go.modules.community.tasks.listTypes.Support,
 			filterName: "categories",
 			filteredStore: this.taskGrid.store,
 			autoHeight: true,

@@ -115,7 +115,7 @@ GO.email.EmailComposer = function(config) {
 					go.Jmap.request({
 						method: "Contact/get",
 						params: {
-							properties: ["name", "emailAddresses"],
+							properties: ["name", "emailAddresses", 'addressBookId'],
 							ids: ids
 						}
 					}).then(function(result) {										

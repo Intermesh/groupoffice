@@ -553,6 +553,7 @@ class Installer {
 		self::$isUpgrading = false;
 
 		$this->enableGarbageCollection();
+        $this->enableDiskUsage();;
 		echo "Done!\n";
 
 		ob_flush();
@@ -560,6 +561,29 @@ class Installer {
 
 		ob_end_clean();
 	}
+
+    private function enableDiskUsage() {
+
+        $cron = \GO\Base\Cron\CronJob::model()->findSingleByAttribute('job', 'GO\Base\Cron\CalculateDiskUsage');
+        if(!$cron) {
+            $cron = new \GO\Base\Cron\CronJob();
+            $cron->name = 'Calculate disk usage';
+            $cron->job = 'GO\Base\Cron\CalculateDiskUsage';
+        }
+
+        $cron->active = true;
+        $cron->runonce = false;
+        $cron->minutes = '1';
+        $cron->hours = '1';
+        $cron->monthdays = '*';
+        $cron->months = '*';
+        $cron->weekdays = '*';
+
+        if(!$cron->save()) {
+            var_dump($cron->getValidationErrors());
+            throw new Exception("Could not save calculate disk usage cron");
+        }
+    }
 	
 	/**
 	 * Use full for dev when you want to check what's going to happen.

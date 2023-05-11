@@ -235,6 +235,8 @@ customfields/type/Select.js
 customfields/type/TreeSelectField.js
 customfields/type/MultiSelectDialog.js
 customfields/type/MultiSelect.js
+customfields/type/AttachmentsDialog.js
+customfields/type/Attachments.js
 customfields/type/FunctionFieldDialog.js
 customfields/type/FunctionField.js
 customfields/type/CheckboxDialog.js

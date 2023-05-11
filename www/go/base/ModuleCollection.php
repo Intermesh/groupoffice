@@ -77,7 +77,7 @@ class ModuleCollection extends Model\ModelCollection{
 				} Else  {
 					if(\GO::config()->debug) {
 						if(! $this->isAvailable($folder->name(), false)) {
-							\GO::debug("************ Model load error ************");
+							\GO::debug("************ Module load error ************");
 							\GO::debug("Folder is not a module :: ". $folder->name());
 							\GO::debug("Class  :: GO\\".$ucfirst."\\".$ucfirst."Module");
 							\GO::debug("file  :: ".$folder->path()."/".$ucfirst."Module.php");

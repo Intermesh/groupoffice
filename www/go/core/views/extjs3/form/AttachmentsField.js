@@ -99,7 +99,7 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 					}
 				},
 				{
-					iconCls:'btn-delete',
+					iconCls:'ic-delete',
 					text:t("Delete"),
 					scope:this,
 					handler: function()
@@ -262,7 +262,7 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 		}
 
 		return new Ext.Button({
-			iconCls: 'btn-attach',
+			iconCls: 'ic-attach',
 			tooltip: t("Attach files"),
 			menu: {
 				items: uploadItems
@@ -283,3 +283,5 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 	// 	}
 	// }
 });
+
+Ext.reg('attachmentfield', go.form.AttachmentsField);

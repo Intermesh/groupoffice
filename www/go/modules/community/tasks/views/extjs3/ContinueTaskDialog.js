@@ -34,7 +34,7 @@ go.modules.community.tasks.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 		const comment = this.commentField.getValue();
 		if(!Ext.isEmpty(comment)) {
 			go.Db.store('Comment').set({create:
-				{'#continueComment':{text: comment, entity: 'Task', entityId: this.currentId}}
+				{'continueComment':{text: comment, entity: 'Task', entityId: this.currentId}}
 			});
 		}
 		return true;

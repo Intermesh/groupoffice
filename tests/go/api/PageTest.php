@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class PageTest extends TestCase
 {
-	private $url = 'http://host.docker.internal:6680/api/page.php'; // TODO: Get from URL? This is
+	private $url = 'http://localhost/api/page.php'; // TODO: Get from URL? This is
 
 	/**
 	 * There's some bad stuff in the URL

@@ -100,8 +100,9 @@ go.modules.community.addressbook.ContactContextMenu = Ext.extend(Ext.menu.Menu,{
 				text: t("Delete"),
 				handler: () => {
 					Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), btn => {
-						if (btn === "yes")
-							this.entityStore.set({destroy: [this.currentId]});
+						if (btn === "yes") {
+							go.Db.store("Contact").set({destroy: this.records.map(r => r.id)});
+						}
 					});
 				}
 			})

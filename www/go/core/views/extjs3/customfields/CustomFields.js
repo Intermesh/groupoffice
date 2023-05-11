@@ -337,11 +337,16 @@
 							result.forEach((fldset, index) =>
 							{
 								const tgtEntity = fldset.entity, fld=arFlds[index];
+								let tgtXtype = tgtEntity + "relationgrid";
+								if (!Ext.ComponentMgr.isRegistered(tgtXtype)) {
+									return; // TODO: implement generic grid?
+									tgtXtype = "customfieldrelationgrid";
+								}
 								rels.push({
 									title: fld.options.informationPanelTitle,
 									expandByDefault: fld.options.expandByDefault,
 									entity: tgtEntity,
-									xtype: tgtEntity + "relationgrid",
+									xtype: tgtXtype,
 									currentId: id,
 									fieldId: fld.id
 								});

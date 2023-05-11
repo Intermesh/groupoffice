@@ -201,9 +201,10 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								]
 							},
 							{
-								width: dp(152),
+								xtype:'container',
+								width: dp(136),
 								style: "padding-left: " + dp(16) + "px",
-								layout: "form",
+								//layout: "form",
 								items: [
 									this.avatarComp = new go.form.ImageField({			
 										name: 'photoBlobId'										

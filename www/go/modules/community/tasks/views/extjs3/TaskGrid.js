@@ -231,7 +231,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					groupable: true
 				},
 				{
-					header: t('Tasklist'),
+					header: t('Task list'),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'tasklist',

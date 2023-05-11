@@ -64,7 +64,7 @@ class Search extends EntityController {
 
 		if ($hasAddressbook) {
 
-			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.photoBlobId';
+			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, IF(c.department IS NULL or c.department = "", c.name, CONCAT(c.name, " (", c.department, ")")) as name, c.photoBlobId';
 
 			if($isEmailModuleAvailable && $optionEnabled == "1") {
 				$selectQuery .= ', em.last_mail_time AS priority';
