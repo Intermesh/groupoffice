@@ -1,7 +1,8 @@
+11-05-2023: 6.6.160
 - Calendar: prevent error when printing calendar view while user has no permissions for calendar
 - Leavedays: Better display of leave budgets and spent hours per budget
 - Projects2: show icon in task list if hours were booked on task
-- Summary: new option to set RSS feeds for all users 
+- Summary: new option to set RSS feeds for all users
 
 25-04-2023: 6.6.159
 - Core: Yes/No field has a default value now.
