@@ -143,8 +143,11 @@ namespace go\core {
 		
 		private $version;
 
+        private $systemTimeZone;
+
 		protected function __construct() {
 			parent::__construct();
+            $this->systemTimeZone = date_default_timezone_get();
 			date_default_timezone_set("UTC");
 
 			mb_internal_encoding("UTF-8");
@@ -155,6 +158,17 @@ namespace go\core {
 
 			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
+
+        /**
+         * Get the PHP system timezone.
+         *
+         * The API works with UTC dates.
+         *
+         * @return string
+         */
+        public function getSystemTimeZone() : string {
+            return $this->systemTimeZone;
+        }
 
 		/**
 		 * Capabilities of core module
