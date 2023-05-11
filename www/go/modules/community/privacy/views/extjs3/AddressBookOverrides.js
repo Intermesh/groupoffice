@@ -67,20 +67,22 @@ GO.moduleManager.onModuleReady('addressbook',function() {
 	});
 
 	Ext.override(go.modules.community.addressbook.ContactDialog, {
-		initComponent: go.modules.community.addressbook.ContactDialog.prototype.initComponent.createSequence(function () {
-			this.privacyFieldset = new Ext.form.FieldSet({
-				xtype: 'fieldset',
-				items: [new go.form.DateField({
-					flex: 1,
-					xtype: "datefield",
-					allowBlank: true,
-					name: "deletionDate.deleteAt",
-					setFocus: true,
-					fieldLabel: t("Delete at"),
-				})],
-				title: t("Privacy")
-			});
-			this.mainPanel.insert(1, this.privacyFieldset);
+		initFormItems: go.modules.community.addressbook.ContactDialog.prototype.initFormItems.createSequence(function () {
+			this.addPanel(this.privacyPanel = new Ext.Panel({
+				title: t("Privacy Options","privacy","community"),
+				items: [new Ext.form.FieldSet({
+					xtype: 'fieldset',
+					items: [new go.form.DateField({
+						flex: 1,
+						xtype: "datefield",
+						allowBlank: true,
+						name: "deletionDate.deleteAt",
+						setFocus: true,
+						fieldLabel: t("Deletion date","privacy","community"),
+					})],
+				})
+				]
+			}));
 		})
 	});
 

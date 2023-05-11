@@ -1,6 +1,21 @@
 <?php
-
-return [
-	"name" => "Privacy opties",
-	"description" => "Privacy-instellingen voor persoonsgegevens"
-];
+return array (
+  'name' => 'Privacy opties',
+  'description' => 'Privacy-instellingen voor persoonsgegevens',
+  'Deletion date' => 'Verwijderdatum',
+  'Privacy Options' => 'Privacy-opties',
+  'Privacy' => 'Privacy',
+  'Are you sure that you want to empty the trash address book?' => 'Weet u zeker dat u het adresboek genaamd ‘Prullenbak’ wilt legen?',
+  'The trash address book has been successfully emptied' => 'The trash address book has been successfully emptied',
+  'Delete at' => 'Verwijderen op',
+  'This contact is inactive and will be moved to trash in {x} days.' => 'Deze contactpersoon is inactief en zal over {x} naar de prullenbak worden verplaatst',
+  'Empty trash' => 'Prullenbak legen',
+  'Privacy Settings' => 'Privacy-instellingen',
+  'Inactivity period' => 'Periode van inactiviteit',
+  'Move inactive contacts to trash after the configured number of days' => 'Verplaats inactieve contacten naar prullenbak na het hier ingestelde aantal dagen',
+  'Warning period' => 'Waarschuwingsperiode',
+  'Warn configured number of days before moving contact to trash' => 'Ingesteld aantal dagen voordat contactpersoon naar prullenbak wordt verplaatst',
+  'Address books' => 'Adresboeken',
+  'These address books are to be monitored for inactive contacts' => 'Deze adresboeken worden gecontroleerd op inactieve contactpersonen',
+  'Expired contacts will be moved into this address book' => 'Inactieve contactpersonen worden naar dit adresboek verplaatst',
+);
