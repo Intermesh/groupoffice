@@ -12,7 +12,10 @@ class Tasklist extends Controller {
 	/**
 	 * ./cli.php community/tasks/Tasklist/export --tasklistId=1 --format=csv
 	 */
-	public function export($tasklistId, $format = 'csv') {
+	public function export($params) {
+
+		extract($this->checkParams($params, ['tasklistId', 'format'=>'csv']));
+
 		$json = <<<JSON
 [
   [
@@ -57,7 +60,10 @@ JSON;
 	/**
 	 * /cli.php community/tasks/Tasklist/delete --tasklistId=1.
 	 */
-	public function delete($tasklistId, $format = 'csv') {
+	public function delete($params) {
+
+		extract($this->checkParams($params, ['tasklistId']));
+
 		$json = <<<JSON
 [
   [

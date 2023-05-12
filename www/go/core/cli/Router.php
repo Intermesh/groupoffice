@@ -127,24 +127,6 @@ class Router {
 		$this->callMethod($ctrl, $method, $args);
 	}
 
-	/**
-	 * @throws ReflectionException
-	 */
-	private function getMethodParams($controller, $methodName): array
-	{
-
-		$method = new ReflectionMethod($controller, $methodName);
-		$rParams = $method->getParameters();
-
-		$methodArgs = [];
-
-		foreach ($rParams as $param) {
-			$arg = ['isOptional' => $param->isOptional(), 'default' => $param->isOptional() ? $param->getDefaultValue() : null];
-			$methodArgs[$param->getName()] = $arg;
-		}
-
-		return $methodArgs;
-	}
 
 	/**
 	 * Runs controller method with URL query and route params.
@@ -159,33 +141,7 @@ class Router {
 	 */
 	private function callMethod(Controller $controller, string $methodName, array $requestParams) {
 
-		//call method with all parameters from the $_REQUEST object.
-		$methodArgs = [];
-
-		$paramNames = [];
-
-		foreach ($this->getMethodParams($controller, $methodName) as $paramName => $paramMeta) {
-			if (!isset($requestParams[$paramName]) && !$paramMeta['isOptional']) {
-				throw new InvalidArguments("Bad request. Missing argument '" . $paramName . "' for action method '" . get_class($controller) . "->" . $methodName . "'");
-			}
-
-			$methodArgs[] = $requestParams[$paramName] ?? $paramMeta['default'];
-			unset($requestParams[$paramName]);
-
-			$paramNames[] = $paramName . ($paramMeta['isOptional'] ? ' = ' . var_export($paramMeta['default'], true) : "*" );
-		}
-
-		// unset some params supported in cli.php that we don't want to check for a bad request.
-		unset($requestParams['c']);
-		unset($requestParams['debug']);
-		unset($requestParams['userId']);
-		unset($requestParams['debugSql']);
-
-		if(!empty($requestParams)) {
-			throw new InvalidArguments("Bad request. The following parameters are not supported: " . implode(",", array_keys($requestParams))."\n\nSupported are: \n- " . implode("\n- ",  $paramNames));
-		}
-
-		call_user_func_array([$controller, $methodName], $methodArgs);
+		call_user_func([$controller, $methodName], $requestParams);
 	}
 
 }

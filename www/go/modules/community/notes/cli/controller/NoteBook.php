@@ -12,7 +12,9 @@ class NoteBook extends Controller {
 	/**
 	 * ./cli.php community/notes/NoteBook/export --noteBookId=1 --format=csv
 	 */
-	public function export($noteBookId, $format = 'csv') {
+	public function export($params) {
+
+		extract($this->checkParams($params, ['noteBookId', 'format'=>'csv']));
 		$json = <<<JSON
 [
   [
@@ -58,7 +60,10 @@ JSON;
 	/**
 	 * ./cli.php community/notes/NoteBook/delete --noteBookId=1
 	 */
-	public function delete($noteBookId, $format = 'csv') {
+	public function delete($params) {
+
+		extract($this->checkParams($params, ['noteBookId']));
+
 		$json = <<<JSON
 [
   [

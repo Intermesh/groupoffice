@@ -13,7 +13,9 @@ class Instance extends Controller {
 	 * @param null $trashPath
 	 * @throws NotFound
 	 */
-	public function restore($name, $trashPath = null) {
+	public function restore($params) {
+
+		extract($this->checkParams($params, ['name', 'trashPath'=>null]));
 
 		if(isset($trashPath)) {
 			$trashFolder = new Folder($trashPath);

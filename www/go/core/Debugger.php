@@ -251,10 +251,10 @@ class Debugger {
 		return $this->requestId;
 	}
 
-    /**
-     * @throws Exception
-     */
-    protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
+  /**
+   * @throws Exception
+   */
+  protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
 
 		if(is_array($mixed) || $mixed instanceof ArrayableInterface) {
 			$print = print_r(Model::convertValueToArray($mixed), true);
@@ -266,8 +266,8 @@ class Debugger {
 			$print = $mixed;
 		}
 
-        // report date in system time
-        $date = new DateTime("now", new DateTimeZone(go()->getSystemTimeZone()));
+    // report date in system time
+	  $date = new DateTime("now", new DateTimeZone(go()->getSystemTimeZone()));
 
 		$line = '[' . $date->format('Y-m-d H:i:s') . '][' . $this->getRequestId() . '][' . $level . ']';
 		

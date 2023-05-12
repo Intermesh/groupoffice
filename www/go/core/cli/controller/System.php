@@ -49,15 +49,15 @@ class System extends Controller {
 	 * @param string $file
 	 * @return void
 	 */
-	public function addPDFFont(string $file) {
+	public function addPDFFont($params) {
 
-		$f = new File($file);
+		$f = new File($params['file']);
 		if(!$f->exists()) {
 			throw new NotFound($f->getPath());
 		}
 
 		// convert TTF font to TCPDF format and store it on the fonts folder
-		$result = PdfRenderer::addTTFFont($file);
+		$result = PdfRenderer::addTTFFont($params['file']);
 
 
 		var_dump($result);
@@ -82,12 +82,12 @@ class System extends Controller {
 	/**
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteGroup --id=29
 	 */
-	public function deleteGroup($id) {
+	public function deleteGroup($params) {
 		$json = <<<JSON
 [
   [
     "Group/set", {
-      "destroy": [$id]
+      "destroy": [{$params['id']}]
     },
     "call-1"
   ]
@@ -106,12 +106,12 @@ JSON;
 	/**
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteUser --id=1
 	 */
-	public function deleteUser($id) {
+	public function deleteUser($params) {
 		$json = <<<JSON
 [
   [
     "User/set", {
-      "destroy": [$id]
+      "destroy": [{$params['id']}]
     },
     "call-1"
   ]
@@ -129,13 +129,13 @@ JSON;
 	/**
 	 * @throws NotFound
 	 */
-	public function resetSyncState(string $entity = null) {
-		if(!isset($entity)) {
+	public function resetSyncState($params) {
+		if(!isset($params['entity'])) {
 			EntityType::resetAllSyncState();
 		} else{
-			$et = EntityType::findByName($entity);
+			$et = EntityType::findByName($params['entity']);
 			if(!$et) {
-				throw new NotFound("Entity '$entity' not found");
+				throw new NotFound("Entity '{$params['entity']}' not found");
 			}
 			$et->resetSyncState();
 		}
@@ -150,7 +150,11 @@ JSON;
 	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=core --package=core --name=GarbageCollection
 	 */
-	public function runCron($name, $module = "core", $package = "core") {
+	public function runCron($params) {
+
+        $name = $params['name'];
+        $module = $params['module'] ?? 'core';
+        $module = $params['package'] ?? 'core';
 
 		$mod = Module::findByName($package, $module);
 		if(!$mod) {
@@ -308,7 +312,7 @@ JSON;
 	 * docker-compose exec --user www-data groupoffice-finance ./www/cli.php core/System/demo --package=business --module=catalog
 	 * ```
 	 */
-	public function demo(?string $package = null, ?string $module = null) {
+	public function demo($params) {
 
 		$faker = Faker\Factory::create();
 
@@ -318,12 +322,12 @@ JSON;
 
 		$modules = Module::find();
 
-		if(isset($package)) {
-			$modules->andWhere('package', '=', $package);
+		if(isset($params['package'])) {
+			$modules->andWhere('package', '=', $params['package']);
 		}
 
-		if(isset($module)) {
-			$modules->andWhere('name', '=', $module);
+		if(isset($params['module'])) {
+			$modules->andWhere('name', '=', $params['module']);
 		}
 
 //		$modules = [Module::findByName("community", "tasks")];
@@ -352,8 +356,8 @@ JSON;
 	}
 
 
-	public function alert($username) {
-		$user = User::find()->where('username', '=', $username)->single();
+	public function alert($params) {
+		$user = User::find()->where('username', '=', $params['username'])->single();
 
 		/* @var \go\core\model\User $user */
 
@@ -391,7 +395,7 @@ JSON;
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkBlobs(bool $delete = false) {
-		Blob::removeMissingFromFilesystem($delete);
+	public function checkBlobs() {
+		Blob::removeMissingFromFilesystem(!empty($params['delete']));
 	}
 }
