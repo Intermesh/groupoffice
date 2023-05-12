@@ -1,3 +1,6 @@
+12-05-2023: 6.7.28
+- Core: Ioncube problems on PHP 8.1
+
 12-05-2023: 6.7.27
 - Core: Ioncube problems on PHP 8.1
 
