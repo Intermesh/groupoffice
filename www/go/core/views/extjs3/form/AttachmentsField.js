@@ -1,181 +1,179 @@
 go.form.AttachmentsField = Ext.extend(Ext.Panel, {
-  layout: "border",
-  height: dp(40),
-  name: null,
-  isFormField: true,
-  _isDirty: false,
-  hidden:false,  
-  
-  initComponent: function() {    
+	layout: "border",
+	height: dp(40),
+	name: null,
+	isFormField: true,
+	_isDirty: false,
+	hidden: false,
 
-    this.store = new go.data.Store({
-      fields: [
-        // {
-        //   name: "id",
-        //   type: "int",
-        //   useNull: true
-        // },
-        "blobId",
-        "name",
-        {
+	initComponent: function () {
+
+		this.store = new go.data.Store({
+			fields: [
+				// {
+				//   name: "id",
+				//   type: "int",
+				//   useNull: true
+				// },
+				"blobId",
+				"name",
+				{
 					name: "inline",
 					type: "bool"
-				},{
+				}, {
 					name: "attachment",
 					type: "bool"
 				}
-        
-      ]
-    });
 
-    this.dataView = new Ext.DataView({
-      store: this.store,
-      region: "center",
-      overClass:'x-view-over',
-      multiSelect:true,
-      autoScroll:true,
-      itemSelector:'span.filetype-link',
-      tpl: new Ext.XTemplate(
-      '<div style="overflow-x:hidden" tabindex="0" class="go-attachments">'+
-      '<tpl for=".">',				
-      '<span class="filetype-link filetype-{[this.getExtension(values.name)]} x-unselectable" unselectable="on" style="float:left" id="{id}">{name}</span>'+
-      '</tpl>'+
-      '</div>',
-      '<div class="x-clear"></div>',
-      {
-        getExtension : function(name) {
-          var dotPos = name.lastIndexOf(".");
-          if(dotPos == -1) {
-            return "unknown";
-          }
+			]
+		});
 
-          return name.substring(dotPos + 1, name.length);
-        }
-      }
-      ),
-      listeners: {
-        click: this.onAttachmentClick,
-        scope: this
-      }
-    });
+		this.dataView = new Ext.DataView({
+			store: this.store,
+			region: "center",
+			overClass: 'x-view-over',
+			multiSelect: true,
+			autoScroll: true,
+			itemSelector: 'span.filetype-link',
+			tpl: new Ext.XTemplate(
+				'<div style="overflow-x:hidden" tabindex="0" class="go-attachments">' +
+				'<tpl for=".">',
+				'<span class="filetype-link filetype-{[this.getExtension(values.name)]} x-unselectable" unselectable="on" style="float:left" id="{id}">{name}</span>' +
+				'</tpl>' +
+				'</div>',
+				'<div class="x-clear"></div>',
+				{
+					getExtension: function (name) {
+						var dotPos = name.lastIndexOf(".");
+						if (dotPos == -1) {
+							return "unknown";
+						}
 
-    this.items = [
-      this.dataView,
-      {
-        width: dp(48),
-        region: "east",
-        xtype: "container",
-        items: [this.createAttachBtn()]
-      }
-    ];
+						return name.substring(dotPos + 1, name.length);
+					}
+				}
+			),
+			listeners: {
+				click: this.onAttachmentClick,
+				scope: this
+			}
+		});
 
-    go.form.AttachmentsField.superclass.initComponent.call(this);
-  },
+		this.items = [
+			this.dataView,
+			{
+				width: dp(48),
+				region: "east",
+				xtype: "container",
+				items: [this.createAttachBtn()]
+			}
+		];
 
-  afterRender : function() {
-    go.form.AttachmentsField.superclass.afterRender.call(this);
+		go.form.AttachmentsField.superclass.initComponent.call(this);
+	},
 
-    this.getEl().dom.addEventListener('drop', this.onDrop.createDelegate(this));
-     
-    this.getEl().dom.addEventListener("dragover", function( event ) {
-        // prevent default to allow drop
-        event.preventDefault();
-    }, false);
+	afterRender: function () {
+		go.form.AttachmentsField.superclass.afterRender.call(this);
 
-  },
+		this.getEl().dom.addEventListener('drop', this.onDrop.createDelegate(this));
 
-  onAttachmentClick: function(me, index, node, e) {
-    if(!this.menu)
-		{
+		this.getEl().dom.addEventListener("dragover", function (event) {
+			// prevent default to allow drop
+			event.preventDefault();
+		}, false);
+
+	},
+
+	onAttachmentClick: function (me, index, node, e) {
+		if (!this.menu) {
 			this.menu = new Ext.menu.Menu({
 				items: [{
-					iconCls:'ic-cloud-download',
+					iconCls: 'ic-cloud-download',
 					text: t("Open"),
-					scope:this,
-					handler: function()
-					{
-            var records= this.dataView.getSelectedRecords();
-            window.open(go.Jmap.downloadUrl(records[0].data.blobId, true));
+					scope: this,
+					handler: function () {
+						var records = this.dataView.getSelectedRecords();
+						window.open(go.Jmap.downloadUrl(records[0].data.blobId, true));
 					}
 				},
-				{
-					iconCls:'ic-delete',
-					text:t("Delete"),
-					scope:this,
-					handler: function()
 					{
-            var records = this.dataView.getSelectedRecords();
-            this.store.remove(records);
-            this.syncHeight();
-					}
-				}]
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						scope: this,
+						handler: function () {
+							var records = this.dataView.getSelectedRecords();
+							this.store.remove(records);
+							this.syncHeight();
+						}
+					}]
 			});
 		}
 
-		if(!this.dataView.isSelected(node))
-		{
+		if (!this.dataView.isSelected(node)) {
 			this.dataView.select(node);
-		}		
+		}
 
 		e.preventDefault();
-		this.menu.showAt(e.getXY());	
-  },
-
-  onDrop: function(e) {
-		if(!e.dataTransfer.files) {
-			return;
-    }
-    e.preventDefault();
-
-		Array.from(e.dataTransfer.files).forEach(function(file) {    
-        go.Jmap.upload(file, {
-          scope: this,
-          success: function(response) {
-            this.addAttachment({
-              blobId: response.blobId,
-              attachment: true,
-              inline: false,
-              name: file.name
-            });					
-          }
-        });      
-      }, this);
-		
+		this.menu.showAt(e.getXY());
 	},
 
-  getName: function () {
+	onDrop: function (e) {
+		if (!e.dataTransfer.files) {
+			return;
+		}
+		e.preventDefault();
+
+		Array.from(e.dataTransfer.files).forEach(function (file) {
+			go.Jmap.upload(file, {
+				scope: this,
+				success: function (response) {
+					this.addAttachment({
+						blobId: response.blobId,
+						attachment: true,
+						inline: false,
+						name: file.name
+					});
+				}
+			});
+		}, this);
+
+	},
+
+	getName: function () {
 		return this.name;
-  },
-  
-  reset: function () {
+	},
+
+	reset: function () {
 		this.setValue({});
-  },
-  
-  isDirty: function () {
+	},
+
+	isDirty: function () {
 		return true; //// TODO ///
 	},
 
 	setValue: function (records) {
 		var data = {};
-    data[this.store.root] = records;   
-    
-    this.store.loadData(data);
-    this.dataView.refresh();
-    this.syncHeight();
-  },
+		data[this.store.root] = records;
 
-  syncHeight : function() {
-    this.setHeight(dp(40));
-    this.dataView.setHeight(dp(40));
-    this.setHeight(Math.max(dp(40), this.dataView.getEl().dom.scrollHeight));
-    if(this.rendered) {
-      this.ownerCt.doLayout();
-    }
-  },
-  
-  addAttachment : function(record) {
-    this.setValue(this.getValue().concat(record));
-  },
+		this.store.loadData(data);
+		if (this.rendered) {
+			this.dataView.refresh();
+		}
+		this.syncHeight();
+	},
+
+	syncHeight: function () {
+		this.setHeight(dp(40));
+		this.dataView.setHeight(dp(40));
+		if (this.rendered) {
+			this.setHeight(Math.max(dp(40), this.dataView.getEl().dom.scrollHeight));
+			this.ownerCt.doLayout();
+		}
+	},
+
+	addAttachment: function (record) {
+		this.setValue(this.getValue().concat(record));
+	},
 
 	getValue: function () {
 		var records = this.store.getRange(), v = [];
@@ -193,15 +191,15 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 		return true;
 	},
 
-	isValid : function(preventMark){
+	isValid: function (preventMark) {
 		return true;
 	},
 
 	validate: function () {
 		return true;
-  },
-  
-  createAttachBtn: function () {
+	},
+
+	createAttachBtn: function () {
 
 		var uploadItems = [
 			{
