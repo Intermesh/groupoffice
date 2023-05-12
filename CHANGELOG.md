@@ -1,3 +1,6 @@
+- Leavedays: Filter out disabled / archived users in employee list
+- Leavedays: include users that quit during the current year in employee list
+
 11-05-2023: 6.6.160
 - Calendar: prevent error when printing calendar view while user has no permissions for calendar
 - Leavedays: Better display of leave budgets and spent hours per budget
