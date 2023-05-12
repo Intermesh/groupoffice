@@ -1,3 +1,6 @@
+12-05-2023: 6.7.27
+- Core: Ioncube problems on PHP 8.1
+
 11-05-2023: 6.7.26
 - Core: prevent exception in disk usage calculation in very specific use case
 - Updated German language files. Danke, Daniel!
