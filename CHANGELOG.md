@@ -2,6 +2,7 @@
 - Core: prevent exception in disk usage calculation in very specific use case
 - Updated German language files. Danke, Daniel!
 - Finance: Fixed payment search
+- Address book: Fixed right-click -> delete
 - Addressbook: fix error deleting address book
 
 25-04-2023: 6.7.25
