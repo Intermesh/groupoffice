@@ -157,7 +157,7 @@ class Builder
 
 		run("git fetch");
 		run("git checkout " . $this->gitBranch);
-		run("git pull");
+		run("git pull --recurse-submodules");
 
 		cd($this->sourceDir);
 
@@ -189,10 +189,10 @@ class Builder
 
 		cd($this->buildDir . "/" . $this->packageName);
 
-        $this->encode();
+    $this->encode();
 
-        $this->buildNodeCore();
-        $this->buildNodeModules();
+    $this->buildNodeCore();
+    $this->buildNodeModules();
 
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
 
@@ -203,8 +203,8 @@ class Builder
 		}
 
 
-        // remove sensitive files OWASP WSTG - WSTG-INFO-05
-        run("rm composer.json composer.lock vendor/composer/installed.json");
+    // remove sensitive files OWASP WSTG - WSTG-INFO-05
+    run("rm composer.json composer.lock vendor/composer/installed.json");
 
 		cd($this->buildDir);
 
@@ -213,19 +213,19 @@ class Builder
 	}
 
     private function buildNodeCore() {
-        cd($this->buildDir . "/" . $this->packageName);
-        cd("views/goui/goui");
-        run("npm install --include=dev");
-        run("npm run build");
-        run("npm prune --production");
-        cd("../groupoffice-core");
-        run("npm install --include=dev");
-        run("npm run build");
-        run("npm prune --production");
-        cd ("..");
-        run("npm install --include=dev");
-        run("npm run build");
-        run("npm prune --production");
+      cd($this->buildDir . "/" . $this->packageName);
+      cd("views/goui/goui");
+      run("npm install --include=dev");
+      run("npm run build");
+      run("npm prune --production");
+      cd("../groupoffice-core");
+      run("npm install --include=dev");
+      run("npm run build");
+      run("npm prune --production");
+      cd ("..");
+      run("npm install --include=dev");
+      run("npm run build");
+      run("npm prune --production");
     }
 
 
