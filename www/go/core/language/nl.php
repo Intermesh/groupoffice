@@ -899,6 +899,7 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
     'LB' => 'Libanon',
     'LT' => 'Lithouwen',
     'LU' => 'Luxemburg',
+	'LY' => 'Libië',
     'MA' => 'Marokko',
     'NL' => 'Nederland',
     'AN' => 'Nederlandse Antillen',
@@ -1344,5 +1345,8 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Do you want to generate some fake demonstration data? This will take about one or two minutes to generate.' => 'Wilt u demonstratie data genereren? Dit duurt ongeveer 1 a 2 minuten om te genereren.',
 	'Information panel' => 'Détailpaneel',
 	'Show selections in the information panel' => 'Toon geselecteerd item als paneel in détails',
-	'Expand panel by default' => 'Klap paneel standaard uit'
+	'Expand panel by default' => 'Klap paneel standaard uit',
+	'Define which groups are allowed to login from which IP addresses. You can use \'*\' to match any characters and \'?\' to match any single character. eg. \'192.168.1?.*\'. Be careful, You can lock yourself out!' =>
+	'Geef aan welke groepen vanaf welk IP-adres mogen inloggen. Je kan \'*\' gebruiken om meerdere karakters te matchen of \'?\' voor een enkel karakter, bijvoorbeeld \'192.168.11?.*\'. Wees voorzichtig dat je jezelf niet buiten sluit.' ,
+	 "Wilt u demonstratie data genereren? Dit duurt ongeveer 1 a 2 minuten om te genereren."
 );

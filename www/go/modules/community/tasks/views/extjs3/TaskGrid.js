@@ -116,8 +116,9 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hideable: false,
 					id: 'icons',
 					width: dp(60),
-					renderer: function(v,m,rec) {
-						var v = "";
+					renderer: function(value,m,rec) {
+						let v = "";
+						console.debug(rec.json);
 						if(rec.json.priority != 0) {
 							if (rec.json.priority < 5) {
 								v += '<i class="icon small orange">priority_high</i>';
@@ -134,6 +135,10 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						}
 						if(!Ext.isEmpty(rec.json.alerts)) {
 							v += '<i class="icon small">alarm</i>';
+						}
+
+						if(Ext.isDefined(rec.json.timeBooked) && parseInt(rec.json.timeBooked) > 0) {
+							v += '<i class="icon small">timer</i>';
 						}
 
 						return v;
@@ -263,6 +268,20 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					},
 					hidden: true,
 					groupable: false
+				},{
+					id:"estimatedDuration",
+					header: t("Estimated duration", "tasks", 'community' ),
+					dataIndex: 'estimatedDuration',
+					align: "right",
+					hidden: !this.forProject,
+					width: dp(100),
+					renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
+						if(parseInt(value) > 0) {
+							return go.util.Format.duration(value, false , false);
+						}
+						return '';
+					},
+					groupable: false
 				}
 			];
 
@@ -275,24 +294,11 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				align: "right",
 				renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
 					if (parseInt(value) > 0) {
-						var v = parseInt(value);
+						const v = parseInt(value);
 						if (parseInt(record.data.estimatedDuration) > 0 && v > parseInt(record.data.estimatedDuration)) {
 							metaData.css = 'projects-late';
 						}
 						return go.util.Format.duration(v);
-					}
-					return '';
-				},
-				groupable: false
-			},{
-				id:"estimatedDuration",
-				header: t("Estimated duration", "tasks", 'community' ),
-				dataIndex: 'estimatedDuration',
-				align: "right",
-				width: dp(100),
-				renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
-					if(parseInt(value) > 0) {
-						return go.util.Format.duration(value, false , false);
 					}
 					return '';
 				},

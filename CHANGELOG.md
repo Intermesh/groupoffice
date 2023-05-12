@@ -63,6 +63,18 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+11-05-2023: 6.6.160
+- Calendar: prevent error when printing calendar view while user has no permissions for calendar
+- Leavedays: Better display of leave budgets and spent hours per budget
+- Projects2: show icon in task list if hours were booked on task
+- Summary: new option to set RSS feeds for all users
+
+25-04-2023: 6.6.159
+- Core: Yes/No field has a default value now.
+- Leavedays: bugfix - retrieve agreementId for special leave budget in the past
+- Notesencrypt: close edit screen when cancelling password input.
+- Tasks: enable estimated duration in grid (hidden by default)
+
 13-04-2023: 6.6.158
 - Projects2: Fix bug in time registration PDF report
 - Core: Prevent shitty CSS from breaking email viewer

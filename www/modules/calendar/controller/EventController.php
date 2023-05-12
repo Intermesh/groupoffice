@@ -809,11 +809,15 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 		unset($params['view_id'], $params['print']);
 
-		//$calendars = $view->calendars;
 		$calendars=array();
 		$unsortedCalendars = array_merge($view->getGroupCalendars()->fetchAll(), $view->calendars->fetchAll());
 		foreach($unsortedCalendars as $calendar){
-			$calendars[$calendar->name]=$calendar;
+			$permLvl = $calendar->getPermissionLevel();
+			if ($permLvl >= 10) {
+				$calendars[$calendar->name]=$calendar;
+			} else {
+				GO()->debug("actionViewStore:  User " . GO()->getUserId() . " has  no permissions for calendar " . $calendar->id );
+			}
 		}
 		ksort($calendars);
 		$calendars = array_values($calendars);
@@ -823,9 +827,9 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$results = array();
 		foreach ($calendars as $calendar) {
 			$params['calendars'] = '[' . $calendar->id . ']';
-		//	$params['events_only']=true;
-			if (!isset($results[$calendar->id]))
+			if (!isset($results[$calendar->id])) {
 				$results[$calendar->id] = $this->actionStore($params);
+			}
 		}
 		$response['results'] = array_values($results);
 		
