@@ -321,7 +321,6 @@ abstract class Message extends \GO\Base\Model
 		$response['bcc'] = $recipientsAsString ? (string) $this->bcc :  $this->_convertRecipientArray($this->bcc->getAddresses());
 		$response['reply_to'] = (string) $this->reply_to;
 		$response['message_id'] = $this->message_id;
-		$response['date'] = $this->date;
 
 		$response['to_string'] = (string) $this->to;
 
