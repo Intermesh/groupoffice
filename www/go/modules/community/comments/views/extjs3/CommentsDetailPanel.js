@@ -68,16 +68,12 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 						name: e.target.attributes.alt ? e.target.attributes.alt.value : e.target.attributes.src.value,
 						src: e.target.attributes.src.value
 					}]);
-
-
 				}
 			})
 		});
 
 		this.on("expand", function() {
 			this.updateView();
-
-			// this.composer.textField.syncSize();
 		}, this);
 
 		this.on("added", (cont) => {
@@ -87,10 +83,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 					if(confirm(t("You have an unsaved comment. Are you sure you want to discard the comment?"))) {
 						this.composer.reset();
 						return true;
-					} else
-					{
-						return false;
 					}
+					return false;
 				}
 			});
 		})
@@ -99,8 +93,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		if(go.User.isAdmin && this.title) {
 			this.tools = [{			
 				id: "gear",
-				handler: function () {		
-					var dlg = new go.modules.comments.Settings();					
+				handler: function () {
+					const dlg = new go.modules.comments.Settings();
 					dlg.show(go.User.id);
 				}
 			}];
@@ -427,8 +421,6 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			if (this.large) {
 				this.scrollToTopButton.getEl().scrollIntoView(this.ownerCt.body);
 			}
-
-			console.warn("scrollDown2");
 		});
 
 	}

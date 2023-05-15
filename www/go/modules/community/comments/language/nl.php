@@ -4,6 +4,7 @@ return array (
   'Add Link' => 'Link toevoegen',
   '{author} wrote at {date}' => '{author} schreef op {date}',
   'Unknown user' => 'Onbekende gebruiker',
+  'Add labels' => 'Labels toevoegen',
   'Labels' => 'Labels',
   'Edited by {author} at {date}' => 'Bewerkt door {author} op {date}',
   'The date was changed to {date}' => 'De datum is veranderd naar {date}',
