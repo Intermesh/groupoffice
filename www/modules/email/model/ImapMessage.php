@@ -793,11 +793,11 @@ class ImapMessage extends ComposerMessage {
 		$swiftMsg->setBcc($this->bcc->getAddresses());
 		$swiftMsg->setSubject($this->subject);
 		$swiftMsg->setDate(new DateTime($this->date));
-		$swiftMsg->setContentType($this->content_type);
+
 		if(!$bIsPlain) {
-			$swiftMsg->setBody($this->getHtmlBody(), 'text/html');
+			$swiftMsg->addPart($this->getHtmlBody(), 'text/html');
 		} else {
-			$swiftMsg->setBody($this->getPlainBody(), 'text/plain');
+			$swiftMsg->addPart($this->getPlainBody(), 'text/plain');
 		}
 		while ($att = array_shift($atts)) {
 			if ($att->disposition == 'attachment' || empty($att->content_id)) {
@@ -805,6 +805,8 @@ class ImapMessage extends ComposerMessage {
 				$swiftMsg->addPart($str, ($bIsPlain ? 'text/plain' : 'text/html'));
 			}
 		}
+		$swiftMsg->setContentType("multipart/mixed");
+
 
 		if(!$this->getImapConnection()->append_message($this->mailbox, $swiftMsg, '\Seen')) {
 			throw new \Exception("Failed to append new message");
