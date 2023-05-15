@@ -625,8 +625,8 @@ END;
 // Clean up entities
 		$string = preg_replace('!(&#0+[0-9]+)!', '$1;', $string);
 
-// Decode entities
-		$string = html_entity_decode($string, ENT_NOQUOTES, 'UTF-8');
+// Decode entities not needed because they won't be decoded for display.
+//		$string = html_entity_decode($string, ENT_NOQUOTES, 'UTF-8');
 
 // Strip whitespace characters
 		$string = preg_replace('!\s!', '', $string);
