@@ -15395,7 +15395,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
     },
 
     
-    getLabelStyle: function(s){
+    getLabelStyle: function(s, target){
         var ls = '', items = [this.labelStyle, s];
         for (var i = 0, len = items.length; i < len; ++i){
             if (items[i]){
@@ -15405,6 +15405,10 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
                 }
             }
         }
+
+        ls += 'background-color: ' + target.getBackgroundColor() + ';';
+
+        console.warn(ls.backGroundColor);
         return ls;
     },
 
@@ -15413,7 +15417,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
     
     renderItem : function(c, position, target){
         if(c && (c.isFormField || c.fieldLabel) && c.inputType != 'hidden'){
-            var args = this.getTemplateArgs(c);
+            var args = this.getTemplateArgs(c, target);
             if(Ext.isNumber(position)){
                 position = target.dom.childNodes[position] || null;
             }
@@ -15479,21 +15483,17 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
     },
 
     
-    getTemplateArgs: function(field) {
+    getTemplateArgs: function(field, target) {
         var noLabelSep = !field.fieldLabel || field.hideLabel,
             itemCls = (field.itemCls || this.container.itemCls || '') + (field.hideLabel ? ' x-hide-label' : '');
 
-        
-        if (Ext.isIE9 && Ext.isIEQuirks && field instanceof Ext.form.TextField) {
-            itemCls += ' x-input-wrapper';
-        }
 
         return {
             id            : field.id,
             label         : field.fieldLabel,
             itemCls       : itemCls,
             clearCls      : field.clearCls || 'x-form-clear-left',
-            labelStyle    : this.getLabelStyle(field.labelStyle),
+            labelStyle    : this.getLabelStyle(field.labelStyle, target),
             elementStyle  : this.elementStyle || '',
             labelSeparator: noLabelSep ? '' : (Ext.isDefined(field.labelSeparator) ? field.labelSeparator : this.labelSeparator)
         };

@@ -60,6 +60,8 @@ function dp(size) {
 
 	Ext.override(Ext.Component, {
 
+
+
 		/**
 		 * For GOUI
 		 */
@@ -716,7 +718,42 @@ Ext.override(Ext.layout.ToolbarLayout, {
 Ext.override(Ext.Element, {
 	getTextWidth : function(text, min, max){
       return (Ext.util.TextMetrics.measure(this.dom, Ext.value(text, this.dom.innerHTML, true)).width+1).constrain(min || 0, max || 1000000);
-   }
+   },
+
+	_bgColor: undefined,
+
+	getBackgroundColor() {
+		if(!this._bgColor) {
+			this._bgColor = this._getInheritedBackgroundColor(this.dom);
+		}
+		return this._bgColor;
+	},
+
+	_getInheritedBackgroundColor: function(el) {
+		// get default style for current browser
+		var defaultStyle = this._getDefaultBackground() // typically "rgba(0, 0, 0, 0)"
+
+		// get computed color for el
+		var backgroundColor = window.getComputedStyle(el).backgroundColor
+
+		// if we got a real value, return it
+		if (backgroundColor != defaultStyle) return backgroundColor
+
+		// if we've reached the top parent el without getting an explicit color, return default
+		if (!el.parentElement) return defaultStyle
+
+		// otherwise, recurse and try again on parent element
+		return this._getInheritedBackgroundColor(el.parentElement)
+	},
+
+	_getDefaultBackground: function() {
+		// have to add to the document in order to use getComputedStyle
+		var div = document.createElement("div")
+		document.head.appendChild(div)
+		var bg = window.getComputedStyle(div).backgroundColor
+		document.head.removeChild(div)
+		return bg
+	},
 });
 
 /* password vtype */ 
