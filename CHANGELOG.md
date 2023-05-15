@@ -2,6 +2,7 @@
 - Billing: Fixed PHP 8.1 deprecated warning
 - Calendar: Take holidays into account when viewing availability in participants tab
 - Support: task list grid bigger limit
+- Comments: If no labels available, disable 'Add label' button. Update tooltip.
 - Core: label color matches parent
 - Freebusypermissions: Fixed freebusy acl disappearing
 

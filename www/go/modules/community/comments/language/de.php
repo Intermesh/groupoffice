@@ -3,6 +3,7 @@ return array (
   'Upload file' => 'Datei hochladen',
   'Add Link' => 'Link hinzufügen',
   'Labels' => 'Label',
+  'Add labels' => 'Hinzufügen von Beschriftungen',
   'Unknown user' => 'Unbekannter Benutzer',
   '{author} wrote at {date}' => '{author} schrieb an {date}',
   'Edited by {author} at {date}' => 'Bearbeitet von {author} am {date}',
