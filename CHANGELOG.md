@@ -1,3 +1,6 @@
+- Email: fixed display issue in mac mail after removing attachments
+- Billing: Fixed PHP 8.1 deprecated warning
+
 12-05-2023: 6.7.28
 - Core: Ioncube problems on PHP 8.1
 
