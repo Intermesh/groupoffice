@@ -134,6 +134,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		const estimatedDuration = {
 			name: "estimatedDuration",
 			xtype: "durationfield",
+			maxHours: 9000, // tasks should not take longer than 2h tho
 			flex: 1,
 			fieldLabel: t("Estimated duration"),
 			asInteger: true
