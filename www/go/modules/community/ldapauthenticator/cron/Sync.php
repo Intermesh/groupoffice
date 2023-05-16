@@ -16,11 +16,21 @@ class Sync extends CronJob {
 
     foreach($records as $record) {
       if($record['syncUsers']) {
-        $c->users($record['id'], false, !empty($record['syncUsersDelete']), $record['syncUsersMaxDeletePercentage']);
+        $c->users([
+					'id' => $record['id'],
+	        'dryRun' => false,
+	        'delete' => !empty($record['syncUsersDelete']),
+	        'maxDeletePercentage' => $record['syncUsersMaxDeletePercentage']
+        ]);
       }
 
       if($record['syncGroups']) {
-        $c->groups($record['id'],false, !empty($record['syncGroupsDelete']), $record['syncGroupsMaxDeletePercentage']);
+	      $c->groups([
+		      'id' => $record['id'],
+		      'dryRun' => false,
+		      'delete' => !empty($record['syncGroupsDelete']),
+		      'maxDeletePercentage' => $record['syncGroupsMaxDeletePercentage']
+	      ]);
       }
     }
 	}
