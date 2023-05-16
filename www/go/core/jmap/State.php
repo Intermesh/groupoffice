@@ -107,7 +107,7 @@ class State extends AbstractState {
 	public function changeUser($userId) {
 		$token = $this->getToken();
 		$token->userId = $userId;
-		$success = $token->setAuthenticated();
+		$success = $token->setAuthenticated(false);
 
 		go()->getCache()->delete('token-' . $token->accessToken);
 		go()->getCache()->delete('session-' . $token->accessToken);

@@ -257,18 +257,21 @@ class Token extends Entity {
 	 * @return bool success
 	 * @throws \Exception
 	 */
-	public function setAuthenticated(){
+	public function setAuthenticated($increaseLogins = true){
 		
 		$user = $this->getUser();
-		$user->lastLogin = new DateTime();
-		$user->loginCount++;
-		$user->language = go()->getLanguage()->getIsoCode();
-		if(!$user->save()) {
-			return false;
-		}
 
 		if(!$this->refresh()) {
 			return false;
+		}
+
+		if($increaseLogins) {
+			$user->lastLogin = new DateTime();
+			$user->loginCount++;
+			$user->language = go()->getLanguage()->getIsoCode();
+			if (!$user->save()) {
+				return false;
+			}
 		}
 		
 		// For backwards compatibility, set the server session for the old code
