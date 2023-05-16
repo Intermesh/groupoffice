@@ -10,6 +10,7 @@
 - Comments: Removed comments from all entities search keywords and made comments a separate search result instead.
     Full re-index is required for existing items.
 - Finance: number of decimals configurable in System Settings -> Finance
+- Finance: Show inclusive price in B2C books
 
 12-05-2023: 6.7.28
 - Core: Ioncube problems on PHP 8.1
