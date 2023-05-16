@@ -401,15 +401,23 @@ namespace go\core {
 			
 			return $config ?? [];
 		}
-		
+
+		/**
+		 * @throws Throwable
+		 */
 		private function getInstanceConfig(): array
 		{
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
 				return [];
 			}
-			
-			require($configFile);	
+
+			try {
+				require($configFile);
+			} catch(Throwable $e) {
+				ErrorHandler::log("Failed to require config file: " . $configFile);
+				throw $e;
+			}
 			
 			if(!isset($config)) {
 				$config = [];
