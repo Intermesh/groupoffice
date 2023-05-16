@@ -344,7 +344,7 @@
 		width: dp(22);
 		height: dp(22);
 		transition: 90ms transform ease-in-out;
-		@include var(background, c-primary);
+		background-color: var(--fg-tick);
 	}
 	&:disabled {
 		background-color: var(--bg-background);
