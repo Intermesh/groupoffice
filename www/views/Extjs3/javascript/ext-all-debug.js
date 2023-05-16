@@ -15408,7 +15408,6 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
 
         ls += 'background-color: ' + target.getBackgroundColor() + ';';
 
-        console.warn(ls.backGroundColor);
         return ls;
     },
 
