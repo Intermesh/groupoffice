@@ -7,7 +7,8 @@
 - Core: Renamed several translations of Lybia to its current official name
 - Freebusypermissions: Fixed freebusy acl disappearing
 - LDAP: Fixed broken LDAP sync
-- Comments: Removed comments from all entities search keywords and made it a separate search result instead.
+- Comments: Removed comments from all entities search keywords and made comments a separate search result instead.
+    Full re-index is required for existing items.
 
 12-05-2023: 6.7.28
 - Core: Ioncube problems on PHP 8.1
