@@ -12,6 +12,7 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
+use go\core\orm\SearchableTrait;
 use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use go\core\orm\EntityType;
@@ -72,6 +73,8 @@ class Comment extends AclItemEntity {
 	 * @var string
 	 */
 	public $mimeMessageId;
+
+	use SearchableTrait;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -353,4 +356,8 @@ class Comment extends AclItemEntity {
 	}
 
 
+	protected function getSearchDescription(): string
+	{
+		return StringUtil::cutString(strip_tags($this->text), 50);
+	}
 }
