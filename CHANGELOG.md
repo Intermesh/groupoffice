@@ -4,6 +4,7 @@
 - Support: task list grid bigger limit
 - Comments: If no labels available, disable 'Add label' button. Update tooltip.
 - Core: label color matches parent
+- Core: Renamed several translations of Lybia to its current official name
 
 12-05-2023: 6.7.28
 - Core: Ioncube problems on PHP 8.1
