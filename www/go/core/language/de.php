@@ -895,7 +895,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
     'LA' => 'Demokratische Volksrepublik Laos',
     'LV' => 'Lettland',
     'LB' => 'Libanon',
-    'LY' => 'Libysch-Arabische Dschamahirija',
+    'LY' => 'Staat Libien',
     'LT' => 'Litauen',
     'LU' => 'Luxemburg',
     'MO' => 'Macao',
