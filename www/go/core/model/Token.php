@@ -311,10 +311,6 @@ class Token extends Entity {
 			return false;
 		}
 
-		if(!$this->refresh()) {
-			return false;
-		}
-
 		if($increaseLogins) {
 			$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
 			$user->loginCount++;
