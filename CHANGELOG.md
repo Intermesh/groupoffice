@@ -14,6 +14,7 @@
 
 12-05-2023: 6.7.28
 - Core: Ioncube problems on PHP 8.1
+- Core: only show the alerts when triggerAt is larger then or equal to "now"
 
 12-05-2023: 6.7.27
 - Core: Ioncube problems on PHP 8.1
