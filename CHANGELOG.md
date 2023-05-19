@@ -1,3 +1,5 @@
+19-05-2023: 6.6.161
+- Tickets: increase max size subject
 - Leavedays: Filter out disabled / archived users in employee list
 - Leavedays: include users that quit during the current year in employee list
 - Freebusypermissions: Fixed freebusy acl disappearing
