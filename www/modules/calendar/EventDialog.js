@@ -264,21 +264,14 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		params.exception_date=config.exception_date;
 		
 		
-			// if the newMenuButton from another passed a linkTypeId then set this
+		// if the newMenuButton from another passed a linkTypeId then set this
 		// value in the select link field
-
-
 		this.recurrencePanel.reset();
-
-
 			this.formPanel.load({
 				params:params,
 				url : config.url || GO.url('calendar/event/load'),
 				waitMsg:t("Loading..."),
 				success : function(form, action) {
-					//this.win.show();
-
-					
 					this.setData(action);
 					
 					if(action.result.data.enable_reminder){
@@ -320,8 +313,9 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					this.selectCategory.setCalendarId(action.result.data.calendar_id);
 					this.selectCategory.setRemoteText(action.result.remoteComboTexts.category_id);
 
-					if(action.result.data.category_name)
+					if(action.result.data.category_name) {
 						this.selectCategory.setRemoteText(action.result.data.category_name);
+					}
 
 					if(this.resourceGroupsStore.data.items.length == 0 || action.result.group_id != '1') {
 						this.tabPanel.hideTabStripItem('resources-panel');
@@ -636,8 +630,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 	},
 
 	buildForm : function() {
-
-	
 		this.subjectField = new Ext.form.TextField({
 			//name : 'subject',
 			name : 'name',
