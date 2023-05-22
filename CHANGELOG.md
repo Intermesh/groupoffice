@@ -1,3 +1,5 @@
+- Support: In 'my account', display support task lists in default tasklist combo.
+
 19-05-2023: 6.7.29
 - Email: fixed display issue in mac mail after removing attachments
 - Billing: Fixed PHP 8.1 deprecated warning
