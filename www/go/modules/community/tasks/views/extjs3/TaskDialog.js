@@ -8,6 +8,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	role: "list",
 	support: null,
 	redirectOnSave: false,
+	collapsible: true,
 
 	onReady: async function () {
 		if (this.currentId) {
