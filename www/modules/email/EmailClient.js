@@ -35,8 +35,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			groupField: 'udate'
 		});
 
-//		this.messagesStore.setDefaultSort('udate', 'DESC');
-
 		this.messagesStore.on('load', function(){
 
 			this.isManager = this.messagesGrid.store.reader.jsonData.permission_level == GO.permissionLevels.manage;
@@ -665,17 +663,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.messagesGrid.store.baseParams['account_id']=account_id;
 		this.messagesGrid.store.baseParams['mailbox']=mailbox;
 
-		// if(reload) {
-		// 	this.messagesGrid.store.reload({
-		// 		keepScrollPosition: true
-		// 	})
-		// } else {
-			this.messagesGrid.store.load({
-				params: {
-					start: 0
-				}
-			});
-		// }
+		this.messagesGrid.store.load({
+			params: {
+				start: 0
+			}
+		});
 
 		this.treePanel.setUsage(usage);
 	},
@@ -683,6 +675,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	getFolderNodeId : function (account_id, mailbox){
 		return GO.util.Base64.encode("f_"+account_id+"_"+mailbox);
 	},
+
 	/**
 	 * Returns true if the current folder needs to be refreshed in the grid
 	 */
