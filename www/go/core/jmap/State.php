@@ -159,6 +159,7 @@ class State extends AbstractState {
 	{
 		$token = $this->getToken();
 		$token->userId = $userId;
+		$token->clientId = null;
 		$success = $token->setAuthenticated(false);
 
 		go()->getCache()->delete('token-' . $token->accessToken);
