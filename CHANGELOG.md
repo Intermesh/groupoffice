@@ -1,3 +1,4 @@
+22-05-2023: 6.7.30
 - Support: In 'my account', display support task lists in default tasklist combo.
 - Core: Set authorized client in account when using switch user
 - Finance: Enable B2B and B2C together in a book.
