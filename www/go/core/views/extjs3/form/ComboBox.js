@@ -271,6 +271,12 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 					me.store.loadData({records:[entity]}, false);
 
 				}).catch(function(e) {
+
+					if(me.isDestroyed) {
+						resolve(me);
+						return;
+
+					}
 					console.error(e);
 					var data = {};
 					//console.warn("Invalid entity ID '" + value + "' for entity store '" + me.store.entityStore.entity.name + "'");

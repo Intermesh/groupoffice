@@ -39722,7 +39722,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent, {
 
 	labelShouldFloat: function () {
 
-		if(this.emptyText || this.placeholder) {
+		if(this.isDestroyed || this.emptyText || this.placeholder) {
 			return true;
 		}
 
