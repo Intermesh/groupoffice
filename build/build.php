@@ -326,6 +326,10 @@ class Builder
 
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');
 
+
+		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/kanban');
+		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/projects3');
+
 	}
 
 	private function sendTarToSF()
