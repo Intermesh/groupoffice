@@ -10,6 +10,7 @@ use go\core\orm\EntityType;
 use go\core\db\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
+use GO\Files\Model\Folder;
 use Throwable;
 use Traversable;
 use function GO;
@@ -212,10 +213,14 @@ class TemplateParser {
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
 
+		$this->addFilter('entityFiles', [$this, "filterEntityFiles"]);
+
 		$this->addFilter('nl2br', [$this, "filterNl2br"]);
 		$this->addFilter('empty', [$this, "filterEmpty"]);
+		$this->addFilter('htmlEncode', [$this, "filterHtmlEncode"]);
 		$this->addFilter('dump', [$this, "filterDump"]);
 		$this->addFilter('t', [$this, "filterTranslate"]);
+		$this->addFilter('bloburl', [$this, "filterBlobUrl"]);
 
 		$this->addModel('now', new DateTime());
 
@@ -239,8 +244,35 @@ class TemplateParser {
 		return empty($v) ? "1" : "0";
 	}
 
+	private function filterHtmlEncode($v) {
+		return  isset($v) ? htmlspecialchars($v) : "";
+	}
+
 	private function filterNl2br(?string $v) {
 		return isset($v) ? nl2br($v) : "";
+	}
+
+	private function filterBlobUrl($blob) {
+		return go()->getAuthState()->getDownloadUrl($blob);
+	}
+
+	/**
+	 * @param Entity $entity
+	 * @return void
+	 */
+	private function filterEntityFiles($entity) {
+		if(!$entity->filesFolderId) {
+			return [];
+		}
+		$folder = Folder::model()->findForEntity($entity);
+		return array_map(function($file) {
+			$blob = $file->getBlob();
+			return [
+				'blobId' => $blob->id,
+				'name' => $blob->name,
+				'type' => $blob->type
+				];
+		}, $folder->files->fetchAll());
 	}
 
 	/** @noinspection PhpSameParameterValueInspection */

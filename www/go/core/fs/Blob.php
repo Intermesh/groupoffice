@@ -90,6 +90,9 @@ class Blob extends orm\Entity {
 	
 	private $tmpFile;
 	private $removeFile = true;
+
+	private $hardLink = false;
+
 	private $strContent;
 
 
@@ -192,7 +195,7 @@ class Blob extends orm\Entity {
 	 * @return self
 	 * @throws Exception
 	 */
-	public static function fromFile(File $file, bool $removeFile = false): Blob
+	public static function fromFile(File $file, bool $hardLink = false): Blob
 	{
 		$hash = bin2hex(sha1_file($file->getPath(), true));
 		$blob = self::findById($hash);
@@ -213,7 +216,8 @@ class Blob extends orm\Entity {
 		}
 
 		$blob->modifiedAt = $file->getModifiedAt();
-		$blob->removeFile = $removeFile;
+		$blob->hardLink = $hardLink;
+
 		return $blob;
 	}
 
@@ -228,7 +232,9 @@ class Blob extends orm\Entity {
 	 */
 	public static function fromTmp(File $file): Blob
 	{
-		return self::fromFile($file, true);
+		$blob = self::fromFile($file);
+		$blob->removeFile = true;
+		return $blob;
 	}
 
 	/**
@@ -291,7 +297,9 @@ class Blob extends orm\Entity {
 
 				if($this->removeFile) {
 					$tempFile->move(new File($this->path()));
-				} else{
+				} else if($this->hardLink) {
+					$tempFile->link(new File($this->path()));
+				} else {
 					$tempFile->copy(new File($this->path()));					
 				}
 			} else if (!empty($this->strContent)) {

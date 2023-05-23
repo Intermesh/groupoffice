@@ -211,6 +211,9 @@ class EmailTemplate extends Entity
 		$this->attachments = [];
 		foreach ($cids as $blobId) {
 			$blob = Blob::findById($blobId);
+			if(!$blob) {
+				continue;
+			}
 			if(isset($existing[$blobId])) {
 				$existing[$blobId]->inline = true;
 				$this->attachments[] = $existing[$blobId];
