@@ -1,3 +1,5 @@
+- Email save as: Apple mail didn't include link tag in response.
+
 22-05-2023: 6.7.30
 - Support: In 'my account', display support task lists in default tasklist combo.
 - Core: Set authorized client in account when using switch user
