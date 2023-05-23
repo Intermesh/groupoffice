@@ -1,3 +1,5 @@
+- Email / OAuth2Client: More friendly message when refresh token needs to be renewed
+
 19-05-2023: 6.6.161
 - Tickets: increase max size subject
 - Leavedays: Filter out disabled / archived users in employee list

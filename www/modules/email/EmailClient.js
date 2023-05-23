@@ -22,6 +22,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			root: 'results',
 			totalProperty: 'total',
 			remoteSort: true,
+			suppressError: true,
 			reader: new Ext.data.JsonReader({
 				root: 'results',
 				totalProperty: 'total',
@@ -46,8 +47,44 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			
 			this.messagesGrid.deleteButton.setDisabled(this.readOnly);
 		}, this);
-		
-		
+		this.messagesStore.on('exception',
+			function( store, type, action, options, response){
+				if(response.isTimeout){
+					console.error(response);
+					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+				} else if(!options.reader.jsonData || GO.jsonAuthHandler(options.reader.jsonData, this.load, this)) {
+					let msg;
+
+					if (!GO.errorDialog.isVisible()) {
+						if(options.reader.jsonData && options.reader.jsonData.feedback) {
+							const feedback = options.reader.jsonData.feedback;
+
+							if(feedback.toLowerCase().indexOf("oauth2") > -1) {
+								Ext.MessageBox.alert(t("Refresh token"),
+									t("Your token has possibly expired. A new window will be opened in which you can renew your token.", "email"),
+									() => {
+										window.open(window.location.pathname + 'go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id, 'do_da_auth_thingy');
+									}
+									,this);
+								// we done!
+								return;
+							}
+							msg = feedback;
+							GO.errorDialog.show(msg);
+						} else {
+							msg = t("An error occurred on the webserver. Contact your system administrator and supply the detailed error.");
+							msg += '<br /><br />JsonStore load exception occurred';
+							GO.errorDialog.show(msg);
+						}
+					}
+				} else {
+					console.error(response);
+
+					GO.errorDialog.show(t("Failed to send the request to the server. Please check your internet connection."));
+				}
+			}
+			, this
+		);
 
 	var messagesAtTop = Ext.state.Manager.get('em-msgs-top');
 	if(messagesAtTop) {
