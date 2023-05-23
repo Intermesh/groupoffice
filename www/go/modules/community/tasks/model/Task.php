@@ -10,7 +10,7 @@ namespace go\modules\community\tasks\model;
 
 use DateTimeInterface;
 use Exception;
-use go\core\acl\model\AclInheritEntity;
+use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\db\Expression;
 use go\core\model\Alert as CoreAlert;
@@ -35,7 +35,7 @@ use PDO;
 /**
  * Task model
  */
-class Task extends AclInheritEntity {
+class Task extends AclItemEntity {
 
 	const PRIORITY_LOW = 9;
 	const PRIORITY_HIGH = 1;

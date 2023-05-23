@@ -57,7 +57,6 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `percentComplete` TINYINT(4) NOT NULL DEFAULT 0,
   `uri` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
   `vcalendarBlobId` BINARY(40) NULL,
-  aclId int null,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -93,9 +92,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   constraint tasks_task_core_user_id_fk
     foreign key (responsibleUserId)
     references core_user (id)
-    on DELETE set null,
-  constraint tasks_task_core_acl_id_fk
-      foreign key (aclId) references core_acl (id) ON DELETE RESTRICT
+    on DELETE set null
     )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4

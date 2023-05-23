@@ -223,3 +223,5 @@ $updates['202301301230'][] = "alter table tasks_tasklist
                     add constraint tasks_tasklist_tasks_tasklist_grouping_null_fk
                         foreign key (groupingId) references tasks_tasklist_grouping (id)
                             on delete set null;";
+$updates['202305231613'][] = "ALTER TABLE `tasks_task` DROP FOREIGN KEY `tasks_task_core_acl_id_fk`;";
+$updates['202305231613'][] = "ALTER TABLE `tasks_task` DROP COLUMN `aclId`, DROP INDEX `tasks_task_core_acl_id_fk` ;";
