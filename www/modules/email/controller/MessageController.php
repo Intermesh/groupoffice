@@ -551,7 +551,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		if(!empty($tag)){
 			if($params['content_type']=='html') {
-				$params['htmlbody'] .= '<div style="display:none">' . $tag . '</div>';
+				$params['htmlbody'] .= '<div style="width:1px;height:1px;padding-left:1px;overflow:hidden">' . $tag . '</div>';
 			} else {
 				$params['plainbody'] .= "\n\n" . $tag . "\n\n";
 			}
