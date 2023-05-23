@@ -3,7 +3,6 @@ namespace go\modules\community\addressbook\model;
 
 use Exception;
 use go\core\acl\model\AclItemEntity;
-use go\core\data\convert\Xlsx;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
@@ -21,7 +20,6 @@ use go\modules\community\addressbook\convert\VCard;
 use function GO;
 use go\core\mail\Message;
 use go\core\TemplateParser;
-use go\core\db\Expression;
 use go\core\fs\File;
 use go\core\model\Acl;
 use GO\Files\Model\Folder;
@@ -1033,6 +1031,10 @@ class Contact extends AclItemEntity {
 			}
 		}
 
+		foreach($this->urls as $url) {
+			$keywords[] = $url->url;
+		}
+
 		if(!empty($this->notes)) {
 			$keywords[] = $this->notes;
 		}
@@ -1137,11 +1139,12 @@ class Contact extends AclItemEntity {
 
 
 	/**
-	 * Because we've implemented the getter method "getOrganizationIds" the contact 
-	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * Because we've implemented the getter method "getOrganizationIds" the contact
+	 * modSeq must be incremented when a link between two contacts is deleted or
 	 * created.
-	 * 
-	 * @param Link $link
+	 *
+	 * @param Query $links
+	 * @throws Exception
 	 */
 	public static function onLinkDelete(Query $links) {
 		
