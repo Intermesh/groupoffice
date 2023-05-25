@@ -149,12 +149,13 @@ JSON;
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
 	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=core --package=core --name=GarbageCollection
+	 * @throws NotFound
 	 */
 	public function runCron($params) {
 
         $name = $params['name'];
         $module = $params['module'] ?? 'core';
-        $module = $params['package'] ?? 'core';
+		$package = $params['package'] ?? 'core';
 
 		$mod = Module::findByName($package, $module);
 		if(!$mod) {
