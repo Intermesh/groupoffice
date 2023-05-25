@@ -1,7 +1,3 @@
-/**
-* Copyright FileRun Lda 
-* Should we talk Merijn?
-*/
 
 Ext.ux.FieldHelp = Ext.extend(Object, (function(){
 	function syncInputSize(w, h) {
