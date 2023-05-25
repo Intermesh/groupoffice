@@ -1,4 +1,7 @@
+25-05-2023: 6.6.162
 - Email / OAuth2Client: More friendly message when refresh token needs to be renewed
+- Addressbook: generate search words for contact urls too
+- Don't panic!
 
 19-05-2023: 6.6.161
 - Tickets: increase max size subject
