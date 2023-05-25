@@ -1173,13 +1173,13 @@ abstract class EntityController extends Controller {
    * Merge entities into one
    *
    * The first ID in the list will be kept after the merge.
-   * @param $params
-   * @return array
+   * @param array $params
+   * @return ArrayObject
    * @throws Forbidden
    * @throws InvalidArguments
    * @throws Exception
    */
-	protected function defaultMerge($params): ArrayObject
+	protected function defaultMerge(array $params): ArrayObject
 	{
 		if(empty($params['ids'])) {
 			throw new InvalidArguments('ids is required');
