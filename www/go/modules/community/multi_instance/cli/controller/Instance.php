@@ -7,7 +7,7 @@ use go\core\fs\Folder;
 
 class Instance extends Controller {
 	/**
-	 * docker-compose exec --user www-data groupoffice php ./www/cli.php community/multi_instance/Instance/retore --name=test.example.com
+	 * docker-compose exec --user www-data groupoffice php ./www/cli.php community/multi_instance/Instance/restore --name=test.example.com
 	 *
 	 * @param $name
 	 * @param null $trashPath
@@ -41,8 +41,6 @@ class Instance extends Controller {
 		$dest = new Folder($config['file_storage_path']);
 		$dest->delete();
 		$trashFolder->move($dest);
-
-
 
 		echo "$name is restored!\n";
 	}

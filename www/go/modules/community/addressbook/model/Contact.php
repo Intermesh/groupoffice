@@ -1064,6 +1064,10 @@ class Contact extends AclItemEntity {
 			}
 		}
 
+		foreach($this->urls as $url) {
+			$keywords[] = $url->url;
+		}
+
 		if(!empty($this->notes)) {
 			$keywords[] = $this->notes;
 		}
@@ -1169,11 +1173,12 @@ class Contact extends AclItemEntity {
 
 
 	/**
-	 * Because we've implemented the getter method "getOrganizationIds" the contact 
-	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * Because we've implemented the getter method "getOrganizationIds" the contact
+	 * modSeq must be incremented when a link between two contacts is deleted or
 	 * created.
-	 * 
-	 * @param Link $link
+	 *
+	 * @param Query $links
+	 * @throws Exception
 	 */
 	public static function onLinkDelete(Query $links) {
 		

@@ -95,6 +95,17 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+25-05-2023: 6.6.162
+- Email / OAuth2Client: More friendly message when refresh token needs to be renewed
+- Addressbook: generate search words for contact urls too
+- Don't panic!
+
+19-05-2023: 6.6.161
+- Tickets: increase max size subject
+- Leavedays: Filter out disabled / archived users in employee list
+- Leavedays: include users that quit during the current year in employee list
+- Freebusypermissions: Fixed freebusy acl disappearing
+
 11-05-2023: 6.6.160
 - Calendar: prevent error when printing calendar view while user has no permissions for calendar
 - Leavedays: Better display of leave budgets and spent hours per budget
