@@ -431,8 +431,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		if(this.support) {
 			this.tasklistsGrid.getStore().setFilter("role", {role: "support"});
-			// TODO? Make this available for all tasks?
-			this.tasklistsGrid.getStore().baseParams = {'limit': 1000};
+
+			this.tasklistsGrid.getStore().baseParams = this.tasklistsGrid.getStore().baseParams || {};
+			this.tasklistsGrid.getStore().baseParams.limit = 1000;
 		}
 
 		this.tasklistsGrid.on('selectionchange', this.onTasklistSelectionChange, this); //add buffer because it clears selection first
