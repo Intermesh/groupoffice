@@ -1,6 +1,7 @@
 - Carddav: Fixed: CardDAV: REV is given as timestamp, leads to exceptions #1001
 - Calendar: ICS Import not working, exception on server #1002
 - Core: validate html input didn't check for style tags anymore
+- Core: Fixed: Strange issue with notes and text being deleted #995
 
 26-05-2023: 6.7.31
 - Email save as: Apple mail didn't include link tag in response.
