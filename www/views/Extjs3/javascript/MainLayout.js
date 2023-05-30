@@ -729,7 +729,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				},{
 					iconCls: 'ic-info',
 					text: t("About {product_name}"),
-					hidden: !go.User.isAdmin,
+					hidden: !!GO.settings.config.hideAbout && !go.User.isAdmin,
 					handler: function () {
 						if (!this.aboutDialog)
 						{

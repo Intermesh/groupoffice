@@ -762,8 +762,19 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	protected function actionAbout($params){
 
-		if(!go()->getAuthState()->isAdmin())
-			return ['success'=>false, 'feedback'=> 'Only admins may view details about system'];
+		$about = strtr(GO::t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved."),[
+			'{version}' => GO::config()->version,
+			'{current_year}' => date('Y'),
+			'{company_name}' => 'Group-Office by Intermesh B.V.',
+			'{product_name}' => GO::config()->product_name
+		]);
+
+		if(!go()->getAuthState()->isAdmin()) {
+			return [
+				'success' => true,
+				'data' => ['about' => strstr($about, '<br/>')] // cut off first line with version
+			];
+		}
 
 		$lastRun = go()->getDbConnection()->selectSingleValue('lastrun')
 			->from("go_cron")
@@ -774,25 +785,18 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$mailUsage = (int) GO::config()->get_setting('mailbox_usage');
 		$dbUsage = (int) GO::config()->get_setting('database_usage');
 
-		$data = [
-			'about' => strtr(GO::t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved."),[
-				'{version}' => GO::config()->version,
-				'{current_year}' => date('Y'),
-				'{company_name}' => 'Group-Office by Intermesh B.V.',
-				'{product_name}' => GO::config()->product_name
-			]),
-			'date' => $lastRun ? \GO\Base\Util\Date::get_timestamp($lastRun) : go()->t("Never"),
-			'users' => \go\core\model\User::find()->where('enabled=1')->selectSingleValue('count(*)')->single(),
-			'mailbox_usage' => Number::formatSize($mailUsage),
-			'file_storage_usage' => Number::formatSize($fileUsage) .' / '. Number::formatSize(GO::config()->quota * 1024),
-			'database_usage' => Number::formatSize($dbUsage),
-			'total_usage' => Number::formatSize($dbUsage + $fileUsage + $mailUsage),
-			'has_usage' => true
-		];
-
 		return [
 			'success' => true,
-			'data' => $data
+			'data' => [
+				'about' => $about,
+				'date' => $lastRun ? \GO\Base\Util\Date::get_timestamp($lastRun) : go()->t("Never"),
+				'users' => \go\core\model\User::find()->where('enabled=1')->selectSingleValue('count(*)')->single(),
+				'mailbox_usage' => Number::formatSize($mailUsage),
+				'file_storage_usage' => Number::formatSize($fileUsage) .' / '. Number::formatSize(GO::config()->quota * 1024),
+				'database_usage' => Number::formatSize($dbUsage),
+				'total_usage' => Number::formatSize($dbUsage + $fileUsage + $mailUsage),
+				'has_usage' => true
+			]
 		];
 	}
 	
