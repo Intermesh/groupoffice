@@ -442,6 +442,10 @@ class Imap extends ImapBodyStruct
 	{
 		\GO::debug("list_folders($listSubscribed, $withStatus, $namespace, $pattern)");
 
+		if($pattern == "shared/intermesh@clapham.de/%") {
+			$pattern = "shared/intermesh@clapham.de/*";
+		}
+
 		$listCmd = $listSubscribed ? 'LSUB' : 'LIST';
 
 		$cmd = $listCmd.' "'.$this->addslashes($this->utf7_encode($namespace)).'" "'.$this->addslashes($this->utf7_encode($pattern)).'"';
