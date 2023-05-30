@@ -1,4 +1,5 @@
 - Carddav: Fixed: CardDAV: REV is given as timestamp, leads to exceptions #1001
+- Calendar: ICS Import not working, exception on server #1002
 
 26-05-2023: 6.7.31
 - Email save as: Apple mail didn't include link tag in response.
