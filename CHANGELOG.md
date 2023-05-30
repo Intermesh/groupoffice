@@ -1,4 +1,5 @@
 - Core: updated Japanese holidays
+- Webdav: recover if directories are missing
 
 25-05-2023: 6.6.162
 - Email / OAuth2Client: More friendly message when refresh token needs to be renewed
@@ -10,7 +11,7 @@
 - Leavedays: Filter out disabled / archived users in employee list
 - Leavedays: include users that quit during the current year in employee list
 - Freebusypermissions: Fixed freebusy acl disappearing
-- Webdav: recover if directories are missing
+
 
 11-05-2023: 6.6.160
 - Calendar: prevent error when printing calendar view while user has no permissions for calendar
