@@ -24,6 +24,7 @@ $languages['he']= '(Hebrew) עִבְרִית';
 $languages['hr']='Hrvatski';
 $languages['it']='Italiano';
 $languages['id']='Bahasa Indonesia';
+$languages['ja']='Japanese';
 $languages['hu']='Magyar';
 $languages['mn']='Монгол хэл';
 $languages['nl']='Nederlands';
