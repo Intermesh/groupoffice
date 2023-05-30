@@ -5,6 +5,8 @@
 
 26-05-2023: 6.7.31
 - Email save as: Apple mail didn't include link tag in response.
+- The about dialog will only be available for the Admin users.
+- Tasks: when moving a task to another list the ACL would not change to the correct list (fixed)
 - Core: bugfix in system CLI controller
 - Core: bugfix in module deletion script
 - Tasks: All tasklists of all types were shown
@@ -31,6 +33,7 @@
     Full re-index is required for existing items.
 - Finance: number of decimals configurable in System Settings -> Finance
 - Finance: Show inclusive price in B2C books
+- Tasks: Fixed estimated duration field validation and max amount of hours.
 
 12-05-2023: 6.7.28
 - Core: Ioncube problems on PHP 8.1
