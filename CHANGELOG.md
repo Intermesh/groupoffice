@@ -109,7 +109,7 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
-6.6.163
+31-05-2023: 6.6.163
 - Core: updated Japanese holidays
 - Webdav: recover if directories are missing
 
