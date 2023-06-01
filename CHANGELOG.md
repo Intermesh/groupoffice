@@ -1,3 +1,5 @@
+- Core: Updated Spanish language. Gracias, Ivan!
+
 31-05-2023: 6.7.32
 - Carddav: Fixed: CardDAV: REV is given as timestamp, leads to exceptions #1001
 - Calendar: ICS Import not working, exception on server #1002
