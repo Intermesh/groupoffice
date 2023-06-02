@@ -367,8 +367,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.fireReady();
 
-		//Ext need to know where this charting swf file is in order to draw charts
-//		Ext.chart.Chart.CHART_URL = 'views/Extjs3/ext/resources/charts.swf';
 
 		var allPanels = GO.moduleManager.getAllPanelConfigs();
 
@@ -528,9 +526,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				id: 'go-start-menu-' + allPanels[i].moduleName,
 				moduleName: allPanels[i].moduleName,
 				text: allPanels[i].title,
-				//iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
 				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+"&mtime="+go.User.session.cacheClearedAt+")",
-				//icon: ,
 				handler: function (item, e) {
 					this.openModule(item.moduleName);
 				},
@@ -872,7 +868,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	welcome : function() {
-
 		if(go.User.id == 1)
 		{
 			const coreMod = go.Modules.get("core", "core");
