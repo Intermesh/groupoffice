@@ -313,7 +313,7 @@ JSON;
 	 * docker-compose exec --user www-data groupoffice-finance ./www/cli.php core/System/demo --package=business --module=catalog
 	 * ```
 	 */
-	public function demo($params) {
+	public function demo($params = []) {
 
 		$faker = Faker\Factory::create();
 

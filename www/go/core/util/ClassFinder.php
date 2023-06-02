@@ -189,7 +189,7 @@ class ClassFinder {
 	public static function fileIsEncoded(File $file): bool
 	{
 		//Check if file is encoded
-		$data = $file->getContents(0, 100);
+		$data = $file->getContents(0, 200);
 		return strpos($data, 'ionCube') !== false;
 	}
 
@@ -201,9 +201,8 @@ class ClassFinder {
 			if ($file->getExtension() == 'php') {
 
 				$name = $file->getNameWithoutExtension();
-				$firstChar = substr($name, 0, 1);
-				if($firstChar !== strtoupper($firstChar)) {
-					//skip filenames that start with a lower case char
+				if(preg_match('/^[^A-Z]/', $name)) {
+					//skip filenames that do not start with an upper case char
 					continue;
 				}
 
