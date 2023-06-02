@@ -330,7 +330,12 @@ class Builder
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/kanban');
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/projects3');
 
-	}
+
+        //needs to be open source as it's used by Module files
+        run('cp ' . $this->sourceDir . '/go/modules/business/finance/model/PaymentProviderInterface.php ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/finance/model/PaymentProviderInterface.php');
+
+
+    }
 
 	private function sendTarToSF()
 	{
