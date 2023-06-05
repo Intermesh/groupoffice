@@ -271,11 +271,7 @@ GO.email.EmailComposer = function(config) {
 	]
 	}
 	];
-								
-	// var anchor = -113;
-						
-	
-	
+
 	items.push(
 
 		{
