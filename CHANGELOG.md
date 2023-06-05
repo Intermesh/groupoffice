@@ -1,6 +1,7 @@
 - Core: Updated Spanish language. Gracias, Ivan!
 - Core: Didn't install without Ioncube
 - Projects2: fix error when generating demo-data
+- Tasks: fix error in ContinueTaskDialog with progressbar
 
 31-05-2023: 6.7.32
 - Carddav: Fixed: CardDAV: REV is given as timestamp, leads to exceptions #1001

@@ -84,7 +84,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 					</p>\
 				</tpl>',{
 					rruleToText: function(rrule) {
-						var fieldDummy = new go.form.RecurrenceField();
+						const fieldDummy = new go.form.RecurrenceField();
 						return fieldDummy.parseRule(rrule);
 					},
 					progressColor: function(p) {
