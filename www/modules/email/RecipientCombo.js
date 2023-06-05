@@ -37,7 +37,7 @@ GO.email.RecipientCombo = Ext.extend(GO.form.ComboBoxMulti, {
 
 		this.on({
 			autosize: function () {
-				var win = this.findParentByType("window");
+				const win = this.findParentByType("window");
 
 				// for some reason this is required twice when pasting multiple lines :(
 				win.doLayout();
