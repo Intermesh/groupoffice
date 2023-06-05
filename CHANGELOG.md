@@ -1,3 +1,4 @@
+05-06-2023: 6.7.33
 - Core: Updated Spanish language. Gracias, Ivan!
 - Core: Didn't install without Ioncube
 - Projects2: fix error when generating demo-data
