@@ -607,7 +607,7 @@ END;
 	 * @return bool
 	 * @throws Exception 
 	 */
-	public static function detectXSS(string $string): bool
+	public static function detectXSS(string $string, $withStyle = false): bool
 	{
 
 // Keep a copy of the original string before cleaning up
@@ -631,6 +631,12 @@ END;
 // Strip whitespace characters
 		$string = preg_replace('!\s!', '', $string);
 
+		$tags = 'applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base';
+
+		if($withStyle) {
+			$tags .= '|style';
+		}
+
 // Set the patterns we'll test against
 		$patterns = array(
 // Match any attribute starting with "on" or xmlns
@@ -642,12 +648,14 @@ END;
 // Match style attributes
 			'#(<[^>]*+[\x00-\x20\"\'\/])*style=[^>]*(expression|behavior)[^>]*>?#iUu',
 // Match unneeded tags
-			'#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>?#i'
+			'#</*('.$tags .')[^>]*>?#i'
 		);
 
 		foreach ($patterns as $pattern) {
 // Test both the original string and clean string
 			if (preg_match($pattern, $string, $matches) || preg_match($pattern, $orig, $matches)) {
+				go()->debug("XSS detected: ");
+				go()->debug($matches);
 				return true;
 			}
 		}
