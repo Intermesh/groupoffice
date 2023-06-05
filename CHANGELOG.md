@@ -2,6 +2,7 @@
 - Core: Didn't install without Ioncube
 - Projects2: fix error when generating demo-data
 - Tasks: fix error in ContinueTaskDialog with progressbar
+- Core: Detect XSS bug with lots of false positives fixed. Fixes #1007
 
 31-05-2023: 6.7.32
 - Carddav: Fixed: CardDAV: REV is given as timestamp, leads to exceptions #1001
