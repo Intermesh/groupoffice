@@ -189,7 +189,7 @@ class ClassFinder {
 	public static function fileIsEncoded(File $file): bool
 	{
 		//Check if file is encoded
-		$data = $file->getContents(0, 100);
+		$data = $file->getContents(0, 200);
 		return strpos($data, 'ionCube') !== false;
 	}
 

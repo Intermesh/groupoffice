@@ -224,7 +224,7 @@ class Comment extends AclItemEntity {
 
 	protected function internalValidate()
 	{
-		if($this->isModified(['text']) && StringUtil::detectXSS($this->text)) {
+		if($this->isModified(['text']) && StringUtil::detectXSS($this->text, true)) {
 			$this->setValidationError('text', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
 		}
 

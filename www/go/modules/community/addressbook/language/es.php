@@ -56,16 +56,16 @@ return array (
   'Look for duplicates' => 'Buscar duplicados',
   'Filters' => 'Filtros',
   'Add phone number' => 'Añadir número de teléfono',
-  'Middle' => 'Medio',
+  'Middle' => 'Seg. Nombre',
   'Add street address' => 'Añadir dirección',
   'Street' => 'Calle',
   'Street 2' => 'Calle 2',
   'ZIP code' => 'Código postal',
   'emailTypes' => 
   array (
-    'work' => 'emailTypes[work]',
-    'home' => 'emailTipos[home]',
-    'billing' => 'emailTypes[billing]',
+    'work' => 'Trabajo',
+    'home' => 'Personalización',
+    'billing' => 'Facturación',
   ),
   'Are you sure you want to select all {count} results?' => '¿Está seguro de que desea seleccionar todos los resultados de {count}?',
   'Add group' => 'Añadir grupo',
@@ -80,20 +80,20 @@ return array (
   'All contacts' => 'Todos los contactos',
   'phoneTypes' => 
   array (
-    'work' => 'phoneTypes[work]',
-    'home' => 'phoneTypes[home]',
-    'mobile' => 'phoneTypes[mobile]',
-    'workmobile' => 'tipos de teléfono[trabajomóvil].',
-    'fax' => 'tiposTeléfono[fax]',
-    'workfax' => 'tiposTeléfono[faxtrabajo]',
+    'work' => 'Trabajo',
+    'home' => 'Casa',
+    'mobile' => 'Celular',
+    'workmobile' => 'Celular de Trabajo',
+    'fax' => 'Fax',
+    'workfax' => 'Fax de Trabajo',
   ),
   'addressTypes' => 
   array (
-    'visit' => 'direcciónTipos[visita]',
-    'postal' => 'direcciónTipos[postal]',
-    'work' => 'direcciónTipos[trabajo]',
-    'home' => 'direcciónTipos[casa]',
-    'delivery' => 'direcciónTipos[entrega]',
+    'visit' => 'Visita',
+    'postal' => 'Código Postal',
+    'work' => 'Trabajo',
+    'home' => 'Casa',
+    'delivery' => 'Envío o Despacho',
   ),
   'dateTypes' => 
   array (
