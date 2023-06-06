@@ -50,6 +50,7 @@ $settings['config']['checker_interval'] = (int) GO::config()->checker_interval;
 $settings['config']['remember_login'] = GO::config()->remember_login;
 $settings['config']['encode_callto_link'] = GO::config()->encode_callto_link;
 $settings['config']['login_message'] = GO::config()->login_message;
+$settings['config']['hideAbout'] = \GO::config()->hideAbout;
 $settings['config']['email_allow_body_search'] = GO::config()->email_allow_body_search;
 
 $settings['config']['lostPasswordURL'] = go()->getSettings()->lostPasswordURL;
