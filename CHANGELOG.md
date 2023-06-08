@@ -1,3 +1,5 @@
+- Finance: Customer not loading when using B2B and B2C together. Show total price incl. in B2C mode.
+
 05-06-2023: 6.7.33
 - Core: Updated Spanish language. Gracias, Ivan!
 - Core: Didn't install without Ioncube
