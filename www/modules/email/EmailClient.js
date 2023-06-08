@@ -71,7 +71,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 							}
 							msg = feedback;
 							GO.errorDialog.show(msg);
-						} else {
+						} else if (!response.isAbort) {
 							msg = t("An error occurred on the webserver. Contact your system administrator and supply the detailed error.");
 							msg += '<br /><br />JsonStore load exception occurred';
 							GO.errorDialog.show(msg);
