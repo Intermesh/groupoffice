@@ -1,6 +1,7 @@
 - Finance: Customer not loading when using B2B and B2C together. Show total price incl. in B2C mode.
 - Core: renamed Japanese translation files as per ISO-639-1 standard.
 - ActiveSync: Reply email on phone raised error on iphone.
+- Finance: Fixed number matching on finance payment import
 
 05-06-2023: 6.7.33
 - Core: Updated Spanish language. Gracias, Ivan!
