@@ -1,3 +1,6 @@
+6.6.164
+- Newsletters: do not throw an exception when a shipping report does not find an entity
+
 31-05-2023: 6.6.163
 - Core: updated Japanese holidays
 - Webdav: recover if directories are missing
