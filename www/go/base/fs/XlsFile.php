@@ -229,6 +229,7 @@ class XlsFile extends File{
 	public function writeToFile() {
 		
 		$objWriter = new \PHPExcel_Writer_Excel2007($this->phpExcelObj);
+		$objWriter->setPreCalculateFormulas(false);
 		$objWriter->save($this->path);
 				
 	}
