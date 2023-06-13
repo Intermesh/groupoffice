@@ -2,7 +2,7 @@ Ext.ns("go.customfields.type");
 
 go.customfields.type.Data = Ext.extend(go.customfields.type.Text, {
 
-	name: "DataField",
+	name: "Data",
 
 	label: t("Data"),
 

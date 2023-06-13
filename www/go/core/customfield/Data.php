@@ -8,7 +8,7 @@ class Data extends Base {
 	 * 
 	 * @return string
 	 */
-	protected function getFieldSQL(): string
+	protected function getFieldSQL()
 	{
 		return "MEDIUMTEXT NULL";
 	}
