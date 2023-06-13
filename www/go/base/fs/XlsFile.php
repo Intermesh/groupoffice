@@ -22,6 +22,8 @@
 namespace GO\Base\Fs;
 
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+
 class XlsFile extends File{
 		
 	/**
@@ -220,7 +222,14 @@ class XlsFile extends File{
 				$this->columnWidths[$colNr] = strlen($field);
 				$this->phpExcelObj->getSheet($this->sheetNr)->getColumnDimensionByColumn($colNr)->setWidth($this->columnWidths[$colNr]);
 			}
-			$this->phpExcelObj->getSheet($this->sheetNr)->setCellValueByColumnAndRow($colNr,$this->nextRowNr, $field);
+
+
+			if(is_string($field) && isset($field[0]) && $field[0] == '=') {
+				//prevent formula detection
+				$this->phpExcelObj->getSheet($this->sheetNr)->setCellValueExplicitByColumnAndRow($colNr, $this->nextRowNr, $field, DataType::TYPE_STRING);
+			} else {
+				$this->phpExcelObj->getSheet($this->sheetNr)->setCellValueByColumnAndRow($colNr, $this->nextRowNr, $field);
+			}
 			
 		}
 		$this->nextRowNr++;
