@@ -1,5 +1,6 @@
 - Core: updated DE translations
 - Core: Fixed some false positivies in XSS detection
+- Support: Ticket import failed to import comment because it failed on XSS check
 
 12-06-2023: 6.7.34
 - Finance: Customer not loading when using B2B and B2C together. Show total price incl. in B2C mode.
