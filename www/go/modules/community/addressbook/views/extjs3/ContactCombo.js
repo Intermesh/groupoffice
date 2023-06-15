@@ -101,7 +101,12 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 
 		go.modules.community.addressbook.ContactCombo.superclass.initComponent.call(this);
 
-	}
+	},
+
+	// setValue : function(v) {
+	// 	debugger;
+	// 	return this.supr().setValue(v);
+	// }
 });
 
 Ext.reg("contactcombo", go.modules.community.addressbook.ContactCombo);
