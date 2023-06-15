@@ -35,7 +35,7 @@ Roadmap
     x limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
     - permissions per account?
     - Auto clean spam and trash
-    - DKIM generator and implementation
+    - DKIM generator and implementation: https://github.com/trusteddomainproject/OpenDKIM/blob/master/opendkim/README.SQL
     - Cronb job that checks every hour:
         - SPF record is correct
         - DKIM record is set and valid. Automatically configure opendkim if right key is found.
