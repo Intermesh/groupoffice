@@ -86,5 +86,5 @@ $cssMtime = filemtime(GO::view()->getTheme()->getPath() . "/style.css");
 </style>
 </head>
 <body class="<?=$bodyCls;?>">
-<div id="goui"><!-- GOUI's Root component default element --></div>
+<div id="goui" class="dark"><!-- GOUI's Root component default element --></div>
 <div id="paper"><!-- dom for printing will be inserted into this DIV --></div>
