@@ -411,7 +411,8 @@ JSON;
 	 * @return void
 	 */
 	public function convertInts() {
-		echo "SET foreign_key_checks = 0;\n";
+
+		go()->getDbConnection()->exec("SET foreign_key_checks = 0;");
 
 		$this->installSqls = go()->getEnvironment()->getInstallFolder()->find([
 			'regex' => '/^install\.sql$/'
@@ -446,7 +447,7 @@ JSON;
 				}
 			}
 		}
-		echo "SET foreign_key_checks = 1;\n";
+		go()->getDbConnection()->exec("SET foreign_key_checks = 1;");
 	}
 
 	private function convertAlterCol(Column $column) {
