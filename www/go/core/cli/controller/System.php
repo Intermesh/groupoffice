@@ -3,6 +3,7 @@ namespace go\core\cli\controller;
 
 use Exception;
 use go\core\Controller;
+use go\core\db\Column;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\Forbidden;
@@ -36,6 +37,10 @@ class System extends Controller {
 	use EventEmitterTrait;
 
 	const EVENT_CLEANUP = 'cleanup';
+	/**
+	 * @var File[]|\go\core\fs\Folder[]
+	 */
+	private $installSqls;
 
 	protected function authenticate()
 	{
@@ -398,5 +403,110 @@ JSON;
 	 */
 	public function checkBlobs() {
 		Blob::removeMissingFromFilesystem(!empty($params['delete']));
+	}
+
+	/**
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/convertInts
+	 *
+	 * @return void
+	 */
+	public function convertInts() {
+		echo "SET foreign_key_checks = 0;\n";
+
+		$this->installSqls = go()->getEnvironment()->getInstallFolder()->find([
+			'regex' => '/^install\.sql$/'
+		], false);
+
+//		array_map(function($file) {
+//			echo $file->getPath() ."\n";
+//		},$installSqls);
+
+
+		foreach(go()->getDatabase()->getTables() as $table) {
+
+			//skip old framework with short prefix
+			if(explode("_", $table->getName())[0] != "core") {
+				continue;
+			}
+
+			foreach($table->getColumns() as $column) {
+				if($column->autoIncrement) {
+
+					$this->convertAlterCol($column);
+
+					$refs = $table->getReferences($column->name);
+
+					foreach($refs as $ref) {
+						$refTable = go()->getDatabase()->getTable($ref['table']);
+						$refCol = $refTable->getColumn($ref['column']);
+						$this->convertAlterCol($refCol);
+					}
+
+
+				}
+			}
+		}
+		echo "SET foreign_key_checks = 1;\n";
+	}
+
+	private function convertAlterCol(Column $column) {
+		if($column->unsigned) {
+			return;
+		}
+		$column->unsigned = true;
+		$sql = "alter table `" . $column->getTable()->getName() . "` modify `" . $column->name . "` ".
+			str_replace("11", "10", $column->getCreateSQL() ) . ";\n";
+		try {
+			echo $sql;
+			$this->replaceInSQL($column);
+			go()->getDbConnection()->exec($sql);
+		} catch(Exception $e) {
+			echo $e ."\n\n";
+		}
+	}
+
+	private function replaceInSQL(Column $column) {
+
+		$count = 0;
+
+		$search = "/\b". preg_quote($column->name) ."(`?\s+)INT[^\s]*/i";
+		$replace = $column->name."$1INT(10) UNSIGNED";
+
+		echo "\n\n======\n\n";
+		echo $search."\n";
+		echo $replace."\n";
+
+		foreach($this->installSqls as $file) {
+			$contents = $file->getContents();
+
+			$tableSearch  = '/create table[^\n]+`?' . preg_quote($column->getTable()->getName()).'`?[\s\n]*\((.*);/Usi';
+			$contents = preg_replace_callback($tableSearch, function($matches) use ($column, &$count, $file, $search, $replace) {
+
+				return preg_replace(
+					$search,
+					$replace, $matches[0] ,-1, $count
+				);
+			}, $contents);
+
+			if($count > 1) {
+				throw new Exception($count. " Could not update ".$column->getTable()->getName().".". $column->name ." in ". $file->getPath());
+			}
+
+			if($count == 1) {
+
+				$file->putContents($contents);
+
+				echo $column->getTable()->getName().".". $column->name ." replaced in " . $file->getPath() ."\n";
+
+				break;
+			}
+
+
+
+
+		}
+		if($count != 1) {
+			throw new Exception($count. " Could not update ".$column->getTable()->getName().".". $column->name);
+		}
 	}
 }
