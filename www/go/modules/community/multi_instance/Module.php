@@ -91,7 +91,7 @@ class Module extends \go\core\Module {
 
 		$failed = 0;
 
-		foreach(Instance::find()->orderBy(['isTrial' => 'ASC', 'lastLogin', 'DESC']) as $instance) {
+		foreach(Instance::find()->orderBy(['enabled' => 'DESC', 'isTrial' => 'ASC', 'lastLogin' => 'DESC']) as $instance) {
 			if(!$instance->isInstalled()) {
 				echo "Skipping not installed instance: " . $instance->hostname ."\n";
 				continue;
