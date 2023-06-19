@@ -6,8 +6,8 @@ Roadmap
  - Any item with time entries shows a summary too.
  - Items can be invoiced just like projects -> more menu -> invoice
 
-- Tickets module (extension for tasks)
-- Billing module refactor
+x Tickets module (extension for tasks)
+x Billing module refactor
     - JMAP
     - Debtor management
     - PayPal and other payment provider integration
