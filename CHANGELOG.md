@@ -1,4 +1,4 @@
-6.6.164
+ 19-05-2023: 6.6.164
 - Newsletters: do not throw an exception when a shipping report does not find an entity
 - Core: renamed Japanese translation files as per ISO-639-1
 
