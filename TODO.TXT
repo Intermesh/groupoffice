@@ -7,12 +7,15 @@ Roadmap
  - Items can be invoiced just like projects -> more menu -> invoice
 
 x Tickets module (extension for tasks)
+    - Easily pick categories from display panel
 x Billing module refactor
-    - JMAP
-    - Debtor management
-    - PayPal and other payment provider integration
-    - Integrate accountant packages. Invoice Sync API
-    - Item with links to invoices shows summary too
+    x JMAP
+    x Debtor management
+    x PayPal and other payment provider integration
+    x Integrate accountant packages. Invoice Sync API
+    x Item with links to invoices shows summary too
+    - Catalog categories
+    - Catalog picker in invoices
 
 - Email module
  - JMAP
