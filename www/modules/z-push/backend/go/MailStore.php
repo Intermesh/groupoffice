@@ -905,7 +905,7 @@ class MailStore extends Store implements ISearchProvider {
 			$oldMessageFolderID = isset($sm->source->folderid) && !empty($sm->source->folderid)?$sm->source->folderid:false;
 
 			 // REMOVE THE "m/" from the folder id
-			if(!empty($oldMessageFolderID))
+			if(!empty($oldMessageFolderID) && substr($oldMessageFolderID, 0, 2) == 'm/')
 				$oldMessageFolderID = substr($oldMessageFolderID, 2);
 			
 			$imapAccount = $this->getImapAccount();

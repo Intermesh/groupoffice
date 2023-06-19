@@ -49,7 +49,7 @@ return array (
   'Are you sure you want to unlink this item?' => 'このアイテムのリンクを解除してもよろしいですか?',
   'Open' => '開ける',
   'Continue task' => 'タスクを続行',
-  'Status' => 'スターテス',
+  'Status' => '状況',
   'Start at' => '開始',
   'Due at' => '期日',
   '% complete' => '％ 完了',

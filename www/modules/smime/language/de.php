@@ -1,6 +1,6 @@
 <?php
 return array (
-  'Please enter the password of your SMIME certificate.' => 'Geben Sie bitte das Kennwort für Ihren SMIME-Schlüssel ein.',
+  'Please enter the password of your SMIME certificate.' => 'Geben Sie bitte das Passwort für den SMIME-Schlüssel ein.',
   'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'Diese E-Mail ist kryptographisch signiert. Klicken Sie hier, um die Signatur zu überprüfen und das Zertifikat zu importieren.',
   'SMIME Certificate' => 'SMIME-Zertifikat',
   'Sign with SMIME' => 'Signieren mit SMIME',
@@ -31,7 +31,7 @@ return array (
   'Valid from' => 'Gültig ab',
   'name' => 'SMIME Unterstützung',
   'description' => 'Erweitert das E-Mailmodul mit SMIME-Signatur und -Verschlüsselung',
-  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Um ein neues PCSK12-Zertifikat hochzuladen, müssen Sie Ihr -Kennwort eingeben. Dieses Kennwort muß sich aufgrund von Sicherheitsrichtlinien vom PCSK12-Schlüsselkennwort unterscheiden. Ein leeres Kennwort ist ebenso nicht zugelassen.',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Um ein neues PCSK12-Zertifikat hochzuladen, müssen Sie Ihr Passwort eingeben. Dieses Passwort muss sich vom PCSK12-Schlüsselpasswort unterscheiden. Ein leeres Passwort ist nicht zugelassen.',
   'The Group-Office password was incorrect.' => 'Das {product_name}-Kennwort war nicht korrekt.',
   'Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!' => 'Ihr SMIME-Schlüsselkennwort entspricht Ihrem {product_name}-Kennwort. Dies widerspricht den Sicherheitsrichtlinien!',
   'Version' => 'Version',

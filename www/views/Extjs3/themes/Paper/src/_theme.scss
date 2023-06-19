@@ -16,6 +16,7 @@ $resourcePath: './' !default;
 	--fg-secondary-text: #{rgba(black, 0.64)};
 	--fg-unfocused:		#{rgba(black, 0.54)};
 	--fg-alt:				#f5f5f5;
+	--fg-selected: var(--fg-text);
 
 	--bg-body: 			var(--c-primary); // same as primary
 	--bg-button:	  	transparent;
@@ -27,7 +28,13 @@ $resourcePath: './' !default;
 	--bg-selected:   	#{rgba(black, .08)};
 	--bg-pressed:		#{rgba(black, .12)};
 
+	//from goui
+	--bg-focus: 		rgba(2, 119, 189, 0.16);
+	--bg-read-only: #f1f1f1;
+	--bg-input: white;
+
 	--bg-box: 			white; //rgba(black, 0.06),
+	--bg-main: var(--bg-box);
 	--bg-card:        #f5f5f5
 ;
 	--bg-alt: 			#212121;
@@ -80,6 +87,7 @@ $resourcePath: './' !default;
 	--bg-pressed:	#{rgba(#cccccc, .25)};
 
 	--bg-box:      #272727; // cant be transparent because line of label is same color
+	--bg-main: var(--bg-box);
 	--bg-card:       #202020;
 	--bg-alt: 			#888;
 
@@ -97,4 +105,9 @@ $resourcePath: './' !default;
 	--hue-brown: #6D4C41;
 	--hue-yellow: #F57F17;
 	--hue-bluegrey: #546E70;
+
+//from goui
+	--bg-focus: 		rgba(2, 119, 189, 0.16);
+	--bg-read-only: #1b1b1b;
+	--bg-input: #272727;
 }

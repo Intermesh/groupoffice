@@ -391,13 +391,14 @@ Ext.extend(GO.email.AccountsTree, Ext.tree.TreePanel, {
 	
 	moveFolder : function(account_id, targetNode, node)
 	{
-		if(node.attributes['mailbox'] === 'INBOX') { // Disable moveing the inbox folder.
+		if(node.attributes['mailbox'] === 'INBOX') { // Disable moving the inbox folder.
 			this.refresh();
 			return false;
 		}
-		
+
 		GO.request({
-			url:"email/folder/move",
+			url: "email/folder/move",
+			maskEl: GO.mainLayout.getModulePanel('email').getEl(),
 			params:{				
 				account_id:account_id,
 				sourceMailbox:node.attributes.mailbox,

@@ -66,7 +66,7 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 		];
 
 		const change = (me, val) => {
-			if(!Ext.isEmpty(this.hFld.getValue()) && !Ext.isEmpty(this.mFld.getValue()) )
+			if(!Ext.isEmpty(this.hFld.getValue()) )// && !Ext.isEmpty(this.mFld.getValue()) )
 				this.fireEvent('change', me, this.getValue())
 		}
 		this.hFld.on('change', change);

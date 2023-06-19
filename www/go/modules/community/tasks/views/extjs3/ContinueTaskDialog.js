@@ -15,7 +15,7 @@ go.modules.community.tasks.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 	height: 640,
 	width:600,
 	goDialogId: 'continuetask',
-	title: t("Continue task", "tasks"),
+	title: t("Continue task", "tasks", "community"),
 	entityStore: 'Task',
 	showLinks: false,
 	showCustomfields: false,

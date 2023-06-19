@@ -55,7 +55,7 @@ go.Modules.register("community", "addressbook", {
 				name: 'text',
 				type: "string",
 				multiple: false,
-				title: "Query"
+				title: t("Query")
 			},
 			{
 				title: t("Comment"),

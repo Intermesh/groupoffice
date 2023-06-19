@@ -117,6 +117,17 @@ class PdfTemplate extends Entity {
 	 */
 	public $blocks = [];
 
+
+	public $footer = "";
+	public $header = "";
+
+	public $headerX = 0;
+	public $headerY = 20;
+
+
+	public $footerX = 0;
+	public $footerY = 20;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()

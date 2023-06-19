@@ -23,7 +23,7 @@ go.Modules.register("core", 'core', {
 					name: 'text',
 					type: "string",
 					multiple: false,
-					title: "Query"
+					title: t("Query")
 				},
 				{
 					title: t("Comment"),
@@ -128,6 +128,7 @@ go.Modules.register("core", 'core', {
 		"go.customfields.type.Select",
 		"go.customfields.type.Text",
 		"go.customfields.type.TextArea",
+		"go.customfields.type.Data",
 		"go.customfields.type.User",
 		"go.customfields.type.YesNo",
 		"go.customfields.type.TemplateField"

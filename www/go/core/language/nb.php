@@ -570,7 +570,7 @@ Alle rettigheter forbeholdt.<br />
   'Outdent Text' => 'Reduser innrykk',
   'Remove Formatting' => 'Fjern formatering',
   'Insert Horizontal Rule' => 'Sett inn vannrett linje',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => 'Angi linjebredde i prosent<br/> etterfulgt av %-tegnet, eller<br/> angi en fast bredde ved å unnlate %-tegnet.',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => 'Angi linjebredde i prosent<br/> etterfulgt av %-tegnet, eller<br/> angi en fast bredde ved å unnlate %-tegnet.',
   'Width' => 'Bredde',
   'Keywords' => 'Nøkkelord',
   'Thank you' => 'Takk',

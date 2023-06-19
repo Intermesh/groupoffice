@@ -138,8 +138,34 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			maxHours: 9000, // tasks should not take longer than 2h tho
 			flex: 1,
 			fieldLabel: t("Estimated duration"),
-			asInteger: true
+			asInteger: true,
+			listeners: {
+				change: (df, duration) => {
+					const days = Math.floor(duration / 86400);
+
+					if(!days) {
+						estimatedDurationLbl.hide();
+						return;
+					}
+
+					duration = duration % 86400;
+
+					const hours = Math.floor(duration / 3600);
+					duration = duration % 3600;
+
+					const mins = Math.floor(duration / 60);
+
+					estimatedDurationLbl.show();
+
+					estimatedDurationLbl.setValue(days +" "+ t("days") + ", " + hours + ":" + (mins + "").padStart(2, "0") + " " + t("hours"));
+				}
+			}
 		};
+
+		const estimatedDurationLbl = new Ext.form.DisplayField({
+			hidden: true,
+			flex: 1
+		});
 
 		const priority = {
 			flex: 1,
@@ -245,7 +271,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						desktop: {
 							items: [
 								{
-									items: [start, due, estimatedDuration]
+									items: [start, due, estimatedDuration, estimatedDurationLbl]
 								},{
 									items: [progress, percentComplete, priority]
 								},

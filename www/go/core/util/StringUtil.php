@@ -640,8 +640,8 @@ END;
 // Set the patterns we'll test against
 		$patterns = array(
 // Match any attribute starting with "on" or xmlns
-			//'#(<[^>]+[\x00-\x20\"\'\/])(on|xmlns)[^>]*>?#iUu',
-			'#(<[^>]+[\s])(on|xmlns)[^>]*>?#iUu',
+			'#(<[^>]+[\x00-\x20\"\'\/])(on|xmlns)[a-z]+\s?=[^>]*>?#iUu',
+//			'#(<[^>]+[\s])(on|xmlns)[^>]*>?#iUu',
 // Match javascript:, livescript:, vbscript: and mocha: protocols
 			'!((java|live|vb)script|mocha):(\w)*!iUu',
 			'#-moz-binding[\x00-\x20]*:#u',
