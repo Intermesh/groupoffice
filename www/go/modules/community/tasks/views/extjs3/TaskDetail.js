@@ -119,7 +119,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		if(!this.support) {
 			this.buttons = [{
 				iconCls: 'ic-forward',
-				text:t("Continue task", "tasks"),
+				text:t("Continue task", "tasks", "community"),
 				handler:() => {
 					const continueTaskDialog = new go.modules.community.tasks.ContinueTaskDialog();
 					continueTaskDialog.load(this.currentId).show();

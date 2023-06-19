@@ -71,7 +71,7 @@ go.Modules.register("community", "tasks", {
 				name: 'text',
 				type: "string",
 				multiple: false,
-				title: "Query"
+				title: t("Query")
 			},
 			{
 				title: t("Commented at"),

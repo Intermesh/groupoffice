@@ -4,6 +4,8 @@
 - History: Add index on removeAcl and action to speed up garbage collection
 - Support: option to create users or not
 - Email: apply mask when moving IMAP folders to prevent timing problems
+- Core: Fixed several missing translations
+- Email: minor usability tweaks
 - Tasks: Duration fields will show days if hours exceed 24 hours.
 - Finance: Show line breaks in description
 
@@ -131,6 +133,10 @@
 
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
+
+6.6.164
+- Newsletters: do not throw an exception when a shipping report does not find an entity
+- Core: renamed Japanese translation files as per ISO-639-1
 
 31-05-2023: 6.6.163
 - Core: updated Japanese holidays
