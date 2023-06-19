@@ -8,6 +8,7 @@
 - Email: minor usability tweaks
 - Tasks: Duration fields will show days if hours exceed 24 hours.
 - Finance: Show line breaks in description
+- Finance: Page numbers in templates
 
 12-06-2023: 6.7.34
 - Finance: Customer not loading when using B2B and B2C together. Show total price incl. in B2C mode.
