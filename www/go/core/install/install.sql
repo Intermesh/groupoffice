@@ -1087,7 +1087,7 @@ create table core_pdf_template
 (
     id               bigint unsigned auto_increment
         primary key,
-    moduleId         int(11) unsigned                               not null,
+    moduleId         int(11)                                not null,
     `key`            varchar(20) collate ascii_bin                  null,
     language         varchar(20)                   default 'en'     not null,
     name             varchar(50)                                    not null,
