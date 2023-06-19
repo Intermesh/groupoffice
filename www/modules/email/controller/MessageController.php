@@ -830,10 +830,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 * When changing content type or template in email composer we don't want to
 	 * reset some header fields.
 	 *
-	 * @param type $response
-	 * @param type $params
+	 * @param array $response
+	 * @param array $params
+	 * @param bool $unsetSubject
+	 *
 	 */
-	private function _keepHeaders(&$response, $params, $unsetSubject = true)
+	private function _keepHeaders(array &$response, array $params, bool $unsetSubject = true)
 	{
 		if (!empty($params['keepHeaders'])) {
 			unset(

@@ -159,7 +159,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			me.getEl().unmask();
 
 			if(!go.util.empty(response.notCreated)) {
-				Ext.MessageBox.alert(t("Error"), "Could not link the items.");
+				Ext.MessageBox.alert(t("Error"), "Could not create link");
 			} else{
 				me.close();
 			}

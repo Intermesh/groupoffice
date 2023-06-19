@@ -23,7 +23,7 @@ go.Modules.register("core", 'core', {
 					name: 'text',
 					type: "string",
 					multiple: false,
-					title: "Query"
+					title: t("Query")
 				},
 				{
 					title: t("Comment"),
