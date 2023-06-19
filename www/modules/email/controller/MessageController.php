@@ -1321,10 +1321,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	protected function _getSpamMoveMailboxName($mailUid,$mailboxName,$accountId)
 	{
 		if (strtolower($mailboxName)=='spam') {
-			//return '<div class="em-spam-move-block">'.\GO::t("This message has been identified as spam. Click", "email").' <a style="color:blue;" href="javascript:GO.email.moveToInbox(\''.$mailUid.'\','.$accountId.');">'.\GO::t("here", "email").'</a> '.\GO::t("if you think this message is NOT spam.", "email").'</div>';
 			return 1;
 		} else {
-			//return '<div class="em-spam-move-block">'.\GO::t("Click", "email").' <a style="color:blue;" href="javascript:GO.email.moveToSpam(\''.$mailUid.'\',\''.$mailboxName.'\','.$accountId.');">'.\GO::t("here", "email").'</a> '.\GO::t("if you think this message is spam.", "email").'</div>';
 			return 0;
 		}
 		
