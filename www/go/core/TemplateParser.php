@@ -695,7 +695,7 @@ class TemplateParser {
 			$str = $this->parseBlocks($str);
 		}
 //		$str = preg_replace_callback('/\n?\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*)(?<!\\\\)\\]\n?/', [$this, 'replaceAssign'], $str);
-		return preg_replace_callback('/{{[^:]*?}}/', [$this, 'replaceVar'], $str);
+		return preg_replace_callback('/{{[^:].*?}}/', [$this, 'replaceVar'], $str);
 	}
 
 
