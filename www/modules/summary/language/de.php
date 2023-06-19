@@ -13,7 +13,7 @@ return array (
   'Manage announcements' => 'Ankündigungen verwalten',
   'Manage webfeeds' => 'RSS-Feeds verwalten',
   'Type' => 'Typ',
-  'Summary' => 'Übersicht',
+  'Summary' => 'Übersicht anzeigen',
   'Rss Feeds' => 'RSS-Feeds',
   'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Es sind keine RSS-Feeds vorhanden.<br />Klicken Sie in diesem Fenster oben rechts auf das Options-Symbol, um RSS-Feeds hinzuzufügen.',
   'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://rss.sueddeutsche.de/rss/Topthemen/topthemen.xml',
@@ -23,5 +23,5 @@ return array (
   'name' => 'Übersicht',
   'description' => 'Modul zum Anpassen der Startübersicht',
   'Start page' => 'Übersicht',
-  'webfeeds' => 'Web-Feeds',
+  'webfeeds' => 'RSS/Atom-Feeds',
 );
