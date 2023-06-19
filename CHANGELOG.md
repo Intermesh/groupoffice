@@ -4,6 +4,7 @@
 - History: Add index on removeAcl and action to speed up garbage collection
 - Support: option to create users or not
 - Email: apply mask when moving IMAP folders to prevent timing problems
+- Tasks: Duration fields will show days if hours exceed 24 hours.
 
 12-06-2023: 6.7.34
 - Finance: Customer not loading when using B2B and B2C together. Show total price incl. in B2C mode.
