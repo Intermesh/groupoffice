@@ -1,3 +1,6 @@
+- Finance: Prefer contact email for quotes and billing email for invoices
+- Finance: Fixed bug in copying document
+
 19-06-2023: 6.7.35
 - Core: updated DE translations
 - Core: Fixed some false positivies in XSS detection
