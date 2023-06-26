@@ -82,6 +82,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 		}, this, {buffer: 1});
 
 		this.selectUser = new go.users.UserComboReset({
+			value: null,
 			emptyText: t('All users'),
 			allowBlank: true,
 			listeners: {
