@@ -1043,9 +1043,9 @@ abstract class Entity extends Property {
 			return $criteria;
 		}
 
-        $columns = static::textFilterColumns();
+    $columns = static::textFilterColumns();
 
-        if(empty($columns)) {
+    if(empty($columns)) {
 			go()->warn(static::class . ' entity has no textFilterColumns() defined. The "text" filter will not work.');
 		}
 		
