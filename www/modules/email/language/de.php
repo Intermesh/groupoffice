@@ -351,4 +351,6 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Copy image' => 'Bild kopieren',
   'Sory, this is not supported by Firefox' => 'Sorry, dies wird von Firefox nicht unterstützt',
   'Autodata' => 'Daten automatisch einfügen',
+	'None' => 'Ohne',
+	'' => ''
 );

@@ -319,5 +319,6 @@ Instellingen -> Accounts -> Dubbelklik account -> Mappen.',
 	'Show CC field by default' => 'Toon CC veld standaard',
 	'Default template' => 'Standaard sjabloon',
 	'Your token has possibly expired. A new window will be opened in which you can renew your token.' => 'Um token is mogelijk verlopen. Er wordt een nieuw venster geopend waarbinnen u uw token kunt vernieuwen.',
+	'None' => 'Geen',
 	'' => ''
 );
