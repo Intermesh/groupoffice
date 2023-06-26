@@ -28,6 +28,7 @@ do
 
     echo "Pulling $line"
     cd $line
+    git reset --hard
     git pull
     cd ..
   fi
@@ -35,7 +36,12 @@ done
 
 # pull main github repo
 cd ../../
-#git reset --hard
+git reset --hard
+cd www/views/goui/goui
+git reset --hard
+cd ../groupoffice-core
+git reset --hard
+cd $DIR/../www;
 
 echo "Pulling main repository"
 
