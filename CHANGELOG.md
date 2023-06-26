@@ -3,6 +3,7 @@
 - Savemailas: Correct UID's in database preventing links to be shown in email
 - Core: when generating a user password, use minimum password length
 - Core: Fixed rotated images / thumbnails that were uploaded from Apple products
+- Finance: Convert quote to contract
 
 19-06-2023: 6.7.35
 - Core: updated DE translations
