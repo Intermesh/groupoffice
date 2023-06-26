@@ -1369,7 +1369,21 @@ $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
 $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
   MODIFY `id` bigint unsigned auto_increment";
 
-$updates['202303131003'][] = "delete from core_acl_group where groupId = (select id from core_group where isUserGroupFor=1);";
+$updates['202303131003'][] = function() {
+	$sql = "delete from core_acl_group where groupId = (select id from core_group where isUserGroupFor=1)";
+
+	if(go()->getDatabase()->hasTable("em_accounts")) {
+		$sql .= " AND aclId not IN (select acl_id from em_accounts)";
+	}
+
+	echo $sql ."\n";
+
+	try {
+		go()->getDbConnection()->exec($sql);
+	}catch(Exception $e) {
+		echo "Exception: " . $e->getMessage() ."\n";
+	}
+};
 
 $updates['202303151524'][] = "ALTER TABLE `core_user` 
 ADD COLUMN `themeColorScheme` ENUM('light', 'dark', 'system') NOT NULL DEFAULT 'light' AFTER `theme`;";
