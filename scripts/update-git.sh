@@ -37,7 +37,7 @@ done
 # pull main github repo
 cd ../../
 git reset --hard
-cd www/views/goui/goui
+cd views/goui/goui
 git reset --hard
 cd ../groupoffice-core
 git reset --hard
