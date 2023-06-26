@@ -745,6 +745,14 @@ class Task extends AclItemEntity {
 			return;
 		}
 
+		if($this->createdBy != $comment->createdBy) {
+			//agent makes this message
+			if($this->responsibleUserId == null) {
+				// auto assign task on first comment
+				$this->responsibleUserId = $comment->createdBy;
+			}
+		}
+
 		if($comment->createdBy == $this->responsibleUserId) {
 			$this->progress = Progress::InProcess;
 		} else {
