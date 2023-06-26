@@ -146,6 +146,29 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		this.addFiles();
 		this.addHistory();
 
+		// Testing GOUI in ext
+		// const container = new Ext.BoxComponent({
+		// 	listeners: {
+		// 		scope: this,
+		// 		render: () => {
+		//
+		//
+		// 			const c = goui.chips({
+		// 				name: "test",
+		// 				label: "Test",
+		// 				value: []
+		// 			});
+		//
+		// 			c.render(container.el.dom);
+		// 		}
+		//
+		// 	}
+		// });
+		//
+		// this.add(container);
+		//
+
+
 		this.on("destroy" , () => {
 			this.progressMenu.destroy();
 		})
