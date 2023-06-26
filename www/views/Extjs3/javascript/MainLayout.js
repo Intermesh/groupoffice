@@ -79,8 +79,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * Always called after all scripts are loaded in Ext.onReady();
 	 * @returns {undefined}
 	 */
-	boot : function() {
+	boot : async function() {
 		var me = this;
+
+		// GOUI in ext
+		// window.goui = await import(BaseHref + "views/goui/dist/goui/script/index.js");
+
 		go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
 			Ext.apply(Ext.QuickTips.getQuickTip(), {

@@ -439,13 +439,19 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		if (!empty($params['nocache']) || !$thumbExists || $thumbMtime < $file->mtime() || $thumbMtime < $file->ctime()) {
 			
 			GO::debug("Resizing image");
-			$image = new \GO\Base\Util\Image($file->path());
-			if (!$image->load_success) {
+			$image = new \go\core\util\Image($file->path());
+
+
+
+			if (!$image->loadSuccess) {
 				GO::debug("Failed to load image for thumbnailing");
 				//failed. Stream original image
 				$readfile = $file->path();
 			} else {
 
+				if($image->getImageType() == IMAGETYPE_JPEG) {
+					$image->fixOrientation();
+				}
 
 				if ($zc) {
 					$image->zoomcrop($w, $h);
