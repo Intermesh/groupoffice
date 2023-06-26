@@ -1,3 +1,4 @@
+26-06-2023: 6.7.36
 - Finance: Prefer contact email for quotes and billing email for invoices
 - Finance: Fixed bug in copying document
 - Savemailas: Correct UID's in database preventing links to be shown in email
