@@ -1,4 +1,5 @@
  - Leavedays: Split 'hours' column into spent and budgeted special leave hours in year overview
+ - Newsletters: shipping report will work for user entities without profile
 
  19-05-2023: 6.6.164
 - Newsletters: do not throw an exception when a shipping report does not find an entity
