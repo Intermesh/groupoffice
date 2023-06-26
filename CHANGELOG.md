@@ -144,7 +144,12 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
-6.6.164
+
+26-06-2023: 6.6.165
+ - Leavedays: Split 'hours' column into spent and budgeted special leave hours in year overview
+ - Newsletters: shipping report will work for user entities without profile
+
+ 19-06-2023: 6.6.164
 - Newsletters: do not throw an exception when a shipping report does not find an entity
 - Core: renamed Japanese translation files as per ISO-639-1
 
