@@ -1730,7 +1730,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 				$response['images'][]=array(
 					"name"=>$file->name,
-					"download_path"=>$file->downloadUrl,
+					"download_path"=>$file->getDownloadURL(false),
 					"src"=>$file->getThumbUrl($thumbParams)
 				);
 			}

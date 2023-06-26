@@ -1344,7 +1344,7 @@ class User extends AclItemEntity {
 		if (!$user) {
 
 			if(!go()->getSettings()->allowRegistration) {
-				throw new NotFound("User not found");
+				throw new NotFound("User not found and registration not allowed");
 			}
 
 			$user = new User();
