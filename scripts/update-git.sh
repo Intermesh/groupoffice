@@ -41,7 +41,7 @@ cd views/goui/goui
 git reset --hard
 cd ../groupoffice-core
 git reset --hard
-cd $DIR/../www;
+cd $DIR/www;
 
 echo "Pulling main repository"
 
