@@ -119,10 +119,10 @@ export class NoteDialog extends Window {
 		this.mask();
 
 		try {
-			this.form.load(id);
+			await this.form.load(id);
 			this.currentId = id;
 		} catch (e) {
-			Window.alert(t("Error"), e + "");
+			void Window.alert(t("Error"), e + "");
 		} finally {
 			this.unmask();
 		}

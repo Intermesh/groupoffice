@@ -1,9 +1,21 @@
-import {btn, checkboxselectcolumn, column, comp, Component, router, splitter, t, tbar} from "@intermesh/goui";
+import {
+	btn,
+	checkboxselectcolumn,
+	column,
+	comp,
+	Component, menu,
+	router,
+	splitter,
+	t, Table,
+	TableColumn,
+	tbar
+} from "@intermesh/goui";
 
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
+import {NoteBookDialog} from "./NoteBookDialog";
 
 
 export class Main extends Component {
@@ -93,6 +105,37 @@ export class Main extends Component {
 							id: "name",
 							sortable: true,
 							resizable: false
+						}),
+						column({
+							width: 48,
+							id: "btn",
+							// headerRenderer: (col: TableColumn, headerEl: HTMLTableCellElement, table: Table) => {
+							// 	headerEl.style.position = "sticky";
+							// 	headerEl.style.right = "0";
+							// 	return "";
+							// },
+							renderer: (columnValue: any, record, td, table, rowIndex) => {
+								// td.style.position = "sticky";
+								// td.style.right = "0";
+								return btn({
+									icon: "more_vert",
+									menu: menu({
+
+									},
+										btn({
+											icon: "edit",
+											text: t("Edit"),
+											handler: () => {
+												const record = table.store.get(rowIndex)!
+
+												const dlg = new NoteBookDialog();
+												dlg.load(record.id);
+												dlg.show();
+											}
+										}))
+
+								})
+							}
 						})
 					]
 				})
@@ -162,7 +205,7 @@ export class Main extends Component {
 		)
 	}
 
-	public  showNote(noteId: number) {
+	public  showNote(noteId: string) {
 		this.noteDetail.load(noteId);
 	}
 
