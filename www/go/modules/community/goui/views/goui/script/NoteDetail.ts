@@ -26,6 +26,13 @@ export class NoteDetail extends Component {
 	constructor() {
 		super();
 
+		// reload on entity change
+		jmapds("Note").on("change", (ds, changes) => {
+			if(this.entity && changes.updated && changes.updated.indexOf(this.entity.id+"") > -1) {
+				this.load(this.entity.id);
+			}
+		})
+
 		this.cls = "vbox";
 		this.width = 400;
 

@@ -19,7 +19,7 @@ import {
 	Window,
 	EntityID, datasourceform, DataSourceForm
 } from "@intermesh/goui";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {client, Image, jmapds} from "@intermesh/groupoffice-core";
 
 export class NoteDialog extends Window {
 	readonly form: DataSourceForm;
@@ -71,6 +71,10 @@ export class NoteDialog extends Window {
 						htmlfield({
 							name: "content",
 							listeners: {
+
+								setvalue: (field, newValue, oldValue) => {
+									Image.replaceImages(field.el);
+								},
 
 								insertimage: (htmlfield, file, img) => {
 									root.mask();
