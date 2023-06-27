@@ -66,7 +66,8 @@ final class Attachments extends MultiSelect
 			if(!go()->getDbConnection()->replace($this->getMultiSelectTableName(), [
 				'modelId' => $entity->id,
 				'blobId' => $attachment['blobId'],
-				'name' => $attachment['name'] ?? ''
+				'name' => $attachment['name'] ?? '',
+				'description' => $attachment['description'] ?? ''
 			])->execute()) {
 				return false;
 			}
@@ -94,7 +95,7 @@ final class Attachments extends MultiSelect
 		}
 
 		return (new Query())
-			->select("blobId, name")
+			->select("blobId, name, description")
 			->from($this->getMultiSelectTableName())
 			->where(['modelId' => $entity->id])
 			->all();
