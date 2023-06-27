@@ -17,12 +17,12 @@ import {
 	tbar,
 	textfield,
 	Window,
-	EntityID
+	EntityID, datasourceform, DataSourceForm
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 
 export class NoteDialog extends Window {
-	readonly form: Form;
+	readonly form: DataSourceForm;
 
 	private currentId?: EntityID;
 	private cards: CardContainer;
@@ -39,28 +39,21 @@ export class NoteDialog extends Window {
 		this.maximizable = true;
 
 		this.items.add(
-			this.form = form(
+			this.form = datasourceform(
 				{
-					store: jmapds("Note"),
+					dataSource: jmapds("Note"),
 					cls: "vbox",
 					flex: 1,
-					// handler: async (form) => {
-					// 	try {
-					// 		await form.save();
-					// 		this.close();
-					// 	} catch (e) {
-					// 		Window.alert(t("Error"), e);
-					// 	} finally {
-					// 		this.unmask();
-					// 	}
-					// }
+					listeners: {
+						submit: ()=> {
+							this.close();
+						}
+					}
 				},
 				cardmenu(),
 
 				this.cards = cards({flex: 1},
 					this.general = fieldset({cls: "scroll fit", title: t("General")},
-
-
 
 						comp({cls: "hbox gap"},
 							textfield({

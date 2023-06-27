@@ -86,7 +86,7 @@ export class NoteDetail extends Component {
 		this.titleCmp.text = title;
 	}
 
-	public async load(id: number) {
+	public async load(id: string) {
 
 		this.mask();
 
