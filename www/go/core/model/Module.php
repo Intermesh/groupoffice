@@ -106,13 +106,14 @@ class Module extends Entity {
 			return false;
 		}
 		go()->getCache()->set('module-' . $this->package.'/'.$this->name, $this);
-		
-		$settings = $this->getSettings();
-		if($settings && !$settings->save()) {
-			return false;
+
+		if ($this->enabled && $settings = $this->getSettings()) {
+			if (!$settings->save()) {
+				return false;
+			}
 		}
 
-		if($this->isModified(['enabled']) || $this->isNew()) {
+		if ($this->isModified(['enabled']) || $this->isNew()) {
 			go()->rebuildCache();
 		}
 
