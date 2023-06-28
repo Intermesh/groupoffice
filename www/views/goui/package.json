@@ -10,13 +10,13 @@
 
     "start": "npm run build:clean && npm run start:parallel",
     "start:parallel": "npx concurrently --kill-others \"npm run start:watch\"  \"npm run start:watch-goui-dts\" \"npm run start:watch-groupoffice-core-dts\"",
-    "start:watch": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --minify --watch --bundle --splitting --sourcemap --format=esm --target=esnext --outdir=dist",
+    "start:watch": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --splitting --minify --watch --bundle --sourcemap --format=esm --target=esnext --outdir=dist --external:@intermesh/goui",
     "start:watch-goui-dts": "npx tsc -w -p goui/tsconfig.json --emitDeclarationOnly --outDir ./dist/goui/script/",
     "start:watch-groupoffice-core-dts": "npx tsc -w -p groupoffice-core/tsconfig.json --emitDeclarationOnly --outDir ./dist/groupoffice-core/script/",
 
     "build": "npm run build:clean && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
-    "build:ts": "npx esbuild goui/script/index.ts groupoffice-core/script/index.ts --minify --bundle --splitting --sourcemap --format=esm --target=esnext --outdir=dist",
+    "build:ts": "node esbuild.mjs",
 
     "build:goui-dts": "npx tsc -p goui/tsconfig.json --emitDeclarationOnly --outDir ./dist/goui/script/",
     "build:groupoffice-core-dts": "npx tsc -p groupoffice-core/tsconfig.json --emitDeclarationOnly --outDir ./dist/groupoffice-core/script/",
