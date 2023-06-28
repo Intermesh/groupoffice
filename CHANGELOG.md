@@ -1,5 +1,6 @@
 - Savemailas: Merge linked emails to show all links inside the linked e-mail
 - Finance: Don't change book on existing docs
+- Billing: fix calculation of profit when billingextracosts module enabled
 
 26-06-2023: 6.7.36
 - Finance: Prefer contact email for quotes and billing email for invoices
