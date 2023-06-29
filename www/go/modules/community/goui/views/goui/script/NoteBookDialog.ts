@@ -27,7 +27,7 @@ export class NoteBookDialog extends Window {
 
 		this.cls = "vbox";
 		this.title = t("Note book");
-		this.width = 600;
+		this.width = 500;
 		this.height = 400;
 		this.stateId = "note-book-dialog";
 		// this.maximizable = true;
