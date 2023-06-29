@@ -4,7 +4,7 @@ import {
 	column,
 	comp,
 	Component, menu,
-	router,
+	router, searchbtn,
 	splitter,
 	t, Table,
 	TableColumn,
@@ -16,6 +16,7 @@ import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
 import {NoteBookDialog} from "./NoteBookDialog";
+import {FilterCondition} from "@intermesh/groupoffice-core";
 
 
 export class Main extends Component {
@@ -174,12 +175,14 @@ export class Main extends Component {
 					cls: "border-bottom"
 				},
 				"->",
-				// textfield({
-				// 	label: t("Search"),
-				// 	buttons: [
-				// 		btn({icon: "clear", handler:(btn) => (btn.parent!.parent! as Field).value = ""})
-				// 	]
-				// }),
+				searchbtn({
+					listeners: {
+						input: (sender, text) => {
+							(this.noteGrid.store.queryParams.filter as FilterCondition).text = text;
+							void this.noteGrid.store.load();
+						}
+					}
+				}),
 				btn({
 					cls: "filled primary",
 					text: "Add",

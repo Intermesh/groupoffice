@@ -20,6 +20,7 @@ export class NoteBookDialog extends Window {
 
 	private currentId?: EntityID;
 	private cards: CardContainer;
+	private readonly sharePanel: SharePanel;
 
 	constructor() {
 		super();
@@ -40,6 +41,10 @@ export class NoteBookDialog extends Window {
 					listeners: {
 						submit: ()=> {
 							this.close();
+						},
+						load: (form1, data) => {
+							this.sharePanel.setEntity("NoteBook", data.id);
+							this.sharePanel.load();
 						}
 					}
 				},
@@ -64,15 +69,10 @@ export class NoteBookDialog extends Window {
 						)
 					),
 
-					sharepanel({
-											
+					this.sharePanel = sharepanel({
+						cls: "fit"
 					}),
-					
 
-					comp({
-						html: 'test',
-						title: "Test"
-					})
 				),
 
 				tbar({cls: "border-top"},
