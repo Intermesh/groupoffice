@@ -1,4 +1,5 @@
 - Leavedays: Automatically finish previous agreement when creating a new one
+- Leavedays: reload when editing special leave
 
 28-06-2023: 6.7.37
 - Savemailas: Merge linked emails to show all links inside the linked e-mail
