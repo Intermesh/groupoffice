@@ -43,7 +43,6 @@ export class NoteBookDialog extends Window {
 						}
 					}
 				},
-
 			
 
 				cardmenu(),

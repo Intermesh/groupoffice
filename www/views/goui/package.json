@@ -9,14 +9,23 @@
     "test": "mocha",
 
     "start": "npm run build:clean && npm run start:parallel",
-    "start:parallel": "npx concurrently --kill-others \"npm run start:watch\"  \"npm run start:watch-goui-dts\" \"npm run start:watch-groupoffice-core-dts\"",
+    "start:parallel": "npx concurrently --kill-others \"npm run start:watch\"  \"npm run start:watch-goui-dts\" \"npm run start:watch-groupoffice-core-dts\" \"npm run start:goui\" \"npm run start:groupoffice-core\"",
 
     "start:watch": "node esbuild.mjs watch",
+
+    "start:goui": "cd goui && npm start",
+    "start:groupoffice-core": "cd groupoffice-core && npm start",
+
     "start:watch-goui-dts": "npx tsc -w -p goui/tsconfig.json --emitDeclarationOnly --outDir ./dist/goui/script/",
     "start:watch-groupoffice-core-dts": "npx tsc -w -p groupoffice-core/tsconfig.json --emitDeclarationOnly --outDir ./dist/groupoffice-core/script/",
 
-    "build": "npm run build:clean && npm run build:ts",
+    "build": "npm run build:clean && npm run build:goui && npm run build:groupoffice-core && npm run build:ts  && npm run build:goui-dts && npm run build:groupoffice-core-dts",
+
     "build:clean": "rm -rf ./dist/*",
+
+    "build:goui": "cd goui && npm run build",
+    "build:groupoffice-core": "cd groupoffice-core && npm run build",
+
     "build:ts": "node esbuild.mjs",
 
     "build:goui-dts": "npx tsc -p goui/tsconfig.json --emitDeclarationOnly --outDir ./dist/goui/script/",
