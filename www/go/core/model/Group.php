@@ -109,7 +109,7 @@ class Group extends AclOwnerEntity {
 
 						if(is_array($value)) {
 							$type = EntityType::findByName($value['entity']);
-							if (!empty($value['default'])) {
+							if (!empty($value['default']) || empty($value['id'])) {
 								$aclId = $type->getDefaultAclId();
 							} else {
 								$cls = $type->getClassName();

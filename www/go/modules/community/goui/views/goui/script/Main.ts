@@ -76,7 +76,8 @@ export class Main extends Component {
 				btn({
 					icon: "add",
 					handler: () => {
-
+						const dlg = new NoteBookDialog();
+						dlg.show();
 					}
 				})
 			),

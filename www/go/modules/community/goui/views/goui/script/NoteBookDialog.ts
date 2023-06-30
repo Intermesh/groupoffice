@@ -32,6 +32,14 @@ export class NoteBookDialog extends Window {
 		this.stateId = "note-book-dialog";
 		// this.maximizable = true;
 
+		this.on("show", () => {
+			setTimeout(() => {
+				if(!this.currentId) {
+					this.sharePanel.setEntity("NoteBook");
+				}
+			});
+		})
+
 		this.items.add(
 			this.form = datasourceform(
 				{
@@ -44,7 +52,6 @@ export class NoteBookDialog extends Window {
 						},
 						load: (form1, data) => {
 							this.sharePanel.setEntity("NoteBook", data.id);
-							this.sharePanel.load();
 						}
 					}
 				},
@@ -70,7 +77,12 @@ export class NoteBookDialog extends Window {
 					),
 
 					this.sharePanel = sharepanel({
-						cls: "fit"
+						cls: "fit",
+						listeners: {
+							show: () => {
+								this.sharePanel.load();
+							}
+						}
 					}),
 
 				),
