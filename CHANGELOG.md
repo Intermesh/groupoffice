@@ -5,6 +5,7 @@
 - Finance: install templates in English and Dutch
 - Core: Custom date range queries included one day too much.
 - Finance: fixed resize bug where grid became smaller instead of larger
+- Email: larger drop zone for dragging and dropping attachments as files
 
 28-06-2023: 6.7.37
 - Savemailas: Merge linked emails to show all links inside the linked e-mail
