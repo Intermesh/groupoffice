@@ -296,6 +296,12 @@ class Task extends AclItemEntity {
 		return $keywords;
 	}
 
+	protected function getSearchFilter(): ?string
+	{
+		$tasklist = TaskList::findById($this->tasklistId);
+		return $tasklist->getRole() == "support" ? "support" : null;
+	}
+
 	protected function getSearchDescription(): string
 	{
 		$tasklist = TaskList::findById($this->tasklistId);
