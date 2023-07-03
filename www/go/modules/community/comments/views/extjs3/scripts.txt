@@ -5,3 +5,4 @@ LabelGrid.js
 CommentForm.js
 Settings.js
 Composer.js
+ComposerFieldset.js

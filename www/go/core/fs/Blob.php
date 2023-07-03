@@ -4,12 +4,14 @@ namespace go\core\fs;
 
 use Exception;
 use go\core\db\Table;
+use go\core\jmap\Request;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm;
 use go\core\util\DateTime;
 
+use go\core\webclient\Extjs3;
 use PDO;
 use ReflectionException;
 use function GO;
@@ -392,9 +394,9 @@ class Blob extends orm\Entity {
 	 * @param string $blobId
 	 * @return string
 	 */
-	public static function url(string $blobId): string
+	public static function url(string $blobId, $relative = false): string
 	{
-		return go()->getSettings()->URL . 'api/download.php?blob=' . $blobId;
+		return ($relative ? Extjs3::get()->getRelativeUrl() : go()->getSettings()->URL) . 'api/download.php?blob=' . $blobId;
 	}
 
 	/**
@@ -432,6 +434,29 @@ class Blob extends orm\Entity {
 			});
 		}
 		return $matches;
+	}
+
+	public static function parseTmpFilesFromHtml(?string &$html) {
+		if(empty($html)) {
+			return [];
+		}
+
+		$blobs = [];
+
+		if(preg_match_all('/<img [^>]*src="(.*core\/downloadTempFile[^>]+path=([^"&]+)[^"]*)"/', $html, $matches)) {
+			for($i = 0; $i < count($matches[0]); $i ++) {
+				$file =go()->getTmpFolder()->getFile(go()->getUserId().'/'.urldecode($matches[2][$i]));
+				if($file->exists()) {
+					$blob = self::fromFile($file, true);
+					$blob->save();
+					$html = str_replace($matches[1][$i], self::url($blob->id), $html);
+					$blobs[] = $blob->id;
+				}
+			}
+		}
+
+		return $blobs;
+
 	}
 
 	/**

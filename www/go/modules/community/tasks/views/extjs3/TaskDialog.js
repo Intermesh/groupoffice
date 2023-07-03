@@ -18,6 +18,25 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		} else {
 			this.tasklistCombo.store.setFilter("role", {role: this.role});
 		}
+
+
+		if(this.role == "support" && !this.currentId) {
+			this.commentComposer.show();
+			this.descriptionFieldset.hide();
+
+			this.commentComposer.editor.on("ctrlenter", () => {
+				this.submit();
+			})
+
+			this.on("submit", () => {
+				if(this.commentComposer.editor.isDirty())
+					this.commentComposer.save("Task", this.currentId);
+			}, {single:true})
+		} else
+		{
+			this.commentComposer.hide();
+			this.descriptionFieldset.show();
+		}
 	},
 
 	onSubmit : function() {
@@ -90,7 +109,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		},
 
 	initFormItems: function () {
-
 		const start = {
 			flex: 1,
 			xtype: 'datefield',
@@ -344,8 +362,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					,
 
 					{xtype: 'hidden', name: 'groupId'},
+					this.commentComposer = new go.modules.comments.ComposerFieldset(),
 
-					{
+					this.descriptionFieldset = new Ext.form.FieldSet({
 						xtype: "fieldset",
 						// collapsible: true,
 						// title: t("Other"),
@@ -370,7 +389,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 							}
 						]
-					},
+					}),
 
 					{
 						xtype: "fieldset",
@@ -378,9 +397,18 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						title: t("Alerts"),
 						items: [new go.modules.community.tasks.AlertFields()]
 					}
+
+
+
 				]
 			}]
+
+
 		});
+
+
+
+
 
 		//this.recurrencePanel = new go.modules.community.tasks.RecurrencePanel();
 

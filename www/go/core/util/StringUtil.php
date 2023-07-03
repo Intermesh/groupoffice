@@ -609,9 +609,15 @@ END;
 	 */
 	public static function detectXSS(string $string, $withStyle = false): bool
 	{
-
+		if($withStyle) {
+			// remove GO injected style
+			$string = preg_replace('/<style id="groupoffice-extracted-style">.*<\/style>/usi', '', $string);
+		}
 // Keep a copy of the original string before cleaning up
 		$orig = $string;
+
+
+
 
 // URL decode
 		$string = urldecode($string);
@@ -636,6 +642,7 @@ END;
 		if($withStyle) {
 			$tags .= '|style';
 		}
+
 
 // Set the patterns we'll test against
 		$patterns = array(
