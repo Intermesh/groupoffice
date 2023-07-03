@@ -102,7 +102,7 @@ go.Modules.register("community", "tasks", {
 				typeConfig: {value: null}
 			},
 			{
-				title: t("Task list"),
+				title: t("List"),
 				name: 'tasklistid',
 				multiple: false,
 				type: "go.modules.community.tasks.TasklistCombo"

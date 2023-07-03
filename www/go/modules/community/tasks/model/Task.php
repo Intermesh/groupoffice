@@ -690,7 +690,7 @@ class Task extends AclItemEntity {
 	 * Try to find conflicting tasks.
 	 *
 	 * A task is considered conflicting when it has a start date and user id and there are other tasks with the same
-	 * responsible userId and start date which are part of a project task list.
+	 * responsible userId and start date which are part of a project list.
 	 *
 	 * @return bool
 	 */

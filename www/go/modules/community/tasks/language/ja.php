@@ -3,7 +3,7 @@ return array (
   'Add alert' => 'アラートを追加',
   'When' => 'いつ',
   'Choose a tasklist' => 'タスクリストを選択してください',
-  'Import task list ID from CSV file' => 'CSVファイルからタスクリストIDをインポート',
+  'Import list ID from CSV file' => 'CSVファイルからタスクリストIDをインポート',
   'Tasklist not selected' => 'タスクリストが選択されていません',
   'You have not selected any tasklist. Select a tasklist before proceeding.' => 'タスクリストが選択されていません。続行する前にタスクリストを選択してください。',
   'start' => '始める',

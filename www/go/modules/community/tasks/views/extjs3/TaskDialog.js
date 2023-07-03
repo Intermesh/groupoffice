@@ -303,7 +303,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 									flex: 1,
 									anchor: undefined,
 									role: this.role,
-									fieldLabel: this.role == "support" ? t("Type", "support", "business") : t("Task list"),
 									listeners: {
 										change: this.onTaskListChange,
 										setvalue: this.onTaskListChange,

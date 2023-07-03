@@ -134,7 +134,7 @@ class TaskList extends AclOwnerEntity
 
 
 	/**
-	 * Create a task list for a project and return its id
+	 * Create a list for a project and return its id
 	 *
 	 * @param int $projectId
 	 * @return TaskList

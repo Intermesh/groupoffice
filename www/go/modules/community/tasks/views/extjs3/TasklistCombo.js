@@ -1,6 +1,6 @@
 (function() {
 	const cfg = {
-		fieldLabel: t("Task list"),
+		fieldLabel: t("List"),
 		hiddenName: 'tasklistId',
 		anchor: '100%',
 		emptyText: t("Please select..."),
