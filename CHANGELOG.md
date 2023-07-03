@@ -7,6 +7,7 @@
 - Finance: fixed resize bug where grid became smaller instead of larger
 - Email: larger drop zone for dragging and dropping attachments as files
 - Support: Save e-mail as ticket
+- Comments: Fixed global search
 
 28-06-2023: 6.7.37
 - Savemailas: Merge linked emails to show all links inside the linked e-mail
