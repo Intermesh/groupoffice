@@ -100,14 +100,17 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 	},
 
 	getFilterCmpWrap : function(cmp) {
-		cmp.flex = 1;
+
 		var wrap = {
-			anchor: "100%",
 			xtype: "container",
 			cls: "go-hbox",
-			layout: "form",
 			items: [
-				cmp,
+				{
+					flex: 1,
+					layout: "form",
+					items: [cmp]
+				},
+
 				{
 					style: "align-self: center",
 					width: dp(24),
