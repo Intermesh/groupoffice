@@ -118,6 +118,10 @@ class Comment extends AclItemEntity {
 
 		return $this;
 	}
+
+	public function getEntity() {
+		return $this->entity;
+	}
 	
 	protected static function defineFilters(): Filters
 	{
@@ -360,6 +364,21 @@ class Comment extends AclItemEntity {
 
 	protected function getSearchDescription(): string
 	{
-		return StringUtil::cutString(strip_tags($this->text), 50);
+		return StringUtil::cutString($this->getAsText(), 100);
+	}
+
+	private function getAsText() : string {
+		if(!isset($this->asText)) {
+			$this->asText = preg_replace("/<style.*<\/style>/usi", "", $this->text);
+			$this->asText = strip_tags($this->asText);
+		}
+		return $this->asText;
+	}
+
+	private $asText;
+
+	protected function getSearchKeywords(): ?array
+	{
+		return [$this->getAsText()];
 	}
 }

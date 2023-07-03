@@ -29,7 +29,13 @@ go.Modules.register('community', 'comments', {
 			const comment = await go.Db.store("Comment").single(commentId);
 			console.warn(comment);
 
-			go.Entities.get(comment.entity).goto(comment.entityId);
+			const ent = go.Entities.get(comment.entity);
+
+			if(!ent) {
+				GO.errorDialog.show("Could not find entity " + comment.entity);
+			}
+
+			ent.goto(comment.entityId);
 		});
 		go.Alerts.on("beforeshow", function(alerts, alertConfig) {
 			const alert = alertConfig.alert;
