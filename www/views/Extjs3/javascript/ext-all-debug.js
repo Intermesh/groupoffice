@@ -17951,7 +17951,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         this.bwrap.enableDisplayMode('block');
 
         if(this.header){
-            this.header.unselectable();
+            // this.header.unselectable();
 
             
             if(this.headerAsText){
