@@ -3,6 +3,7 @@
 - Business: New permission to access employee tab
 - Core: Fixed reminding language and install in selected language
 - Finance: install templates in English and Dutch
+- Core: Custom date range queries included one day too much.
 
 28-06-2023: 6.7.37
 - Savemailas: Merge linked emails to show all links inside the linked e-mail
