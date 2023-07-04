@@ -442,6 +442,13 @@ go.Jmap = {
 					console.warn('Connection aborted', response);
 					return;
 				}
+
+				if(response.isTimeout) {
+					console.error(response);
+
+					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+					return;
+				}
 				console.error('server-side failure with status code ' + response.status);
 				console.error(response);
 
@@ -451,7 +458,7 @@ go.Jmap = {
 					delete this.requestOptions[clientCallId];
 				}
 				if(response.status !== 504) // gateway timeout
-					Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + response.responseText);
+					GO.errorDialog.show(t("Sorry, an error occurred") + ": " + response.responseText);
 				
 			}
 		});
