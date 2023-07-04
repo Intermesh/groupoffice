@@ -242,10 +242,13 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				text: t("Assign me"),
 				scope: this,
 				handler: function() {
+					this.getEl().mask(t("Saving..."));
 					go.Db.store("Task").save({
 						responsibleUserId: go.User.id,
 						// progress: "in-progress"
-					}, this.data.id);
+					}, this.data.id).finally(() => {
+						this.getEl().unmask();
+					})
 				}
 			}),
 			'->',

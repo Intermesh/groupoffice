@@ -71,6 +71,7 @@ go.modules.comments.ComposerFieldset = Ext.extend(Ext.form.FieldSet, {
 	},
 
 	save : function(entityName, entityId) {
+		this.getEl().mask(t("Saving..."));
 		return go.Db.store("Comment").save(
 			{
 				entity: entityName,
@@ -78,6 +79,8 @@ go.modules.comments.ComposerFieldset = Ext.extend(Ext.form.FieldSet, {
 				text: this.editor.getValue(),
 				attachments: this.attachmentBox.getValue()
 			}
-		)
+		).finally(() => {
+			this.getEl().unmask();
+		})
 	}
 })
