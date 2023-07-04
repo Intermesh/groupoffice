@@ -498,8 +498,12 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @returns {string}
 	 */
 	onNotifyOver(dd,e,data) {
-		this.dropZone.show();
-		this.setEditorHeight();
+		console.log('onNotifyOver')
+		if(!this.dropZone.isVisible()) {
+			this.dropZone.show();
+			this.htmlEditor.hide();
+			this.setEditorHeight();
+		}
 		return "x-dd-drop-ok";
 	},
 
@@ -512,8 +516,10 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @returns {boolean}
 	 */
 	onNotifyOut: function(dd,e,data) {
+		console.log('onNotifyOut')
 		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
 		this.dropZone.hide();
+		this.htmlEditor.show();
 		this.setEditorHeight();
 		this.getActiveEditor().show();
 		return true;
@@ -528,6 +534,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @returns {boolean}
 	 */
 	onNotifyDrop: function(dd,e,data) {
+		console.log('onNotifyDrop')
 		if(!data.grid) {
 			this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
 			return false;
@@ -557,11 +564,13 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 						this.attachmentsView.addBlob(data.blob);
 					}
 					this.dropZone.hide();
+					this.htmlEditor.show();
 					this.setEditorHeight();
 
 				},
 				failure: function(options, response, data) {
 					this.dropZone.hide();
+					this.htmlEditor.show();
 					this.setEditorHeight();
 				}
 			});
