@@ -349,12 +349,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			}
 			
 			var module = entityObj.module; 
-			var mainPanel = GO.mainLayout.openModule(module);
+			var mainPanel = GO.mainLayout.getModulePanel(module);
 			var detailViewName = entity.charAt(0).toLowerCase() + entity.slice(1) + "Detail";
 
 			if (mainPanel.route) {
 				mainPanel.route(id, entityObj);
 			} else if(mainPanel[detailViewName]) {
+				mainPanel.show();
 				mainPanel[detailViewName].load(id);
 				mainPanel[detailViewName].show();
 			} else {
