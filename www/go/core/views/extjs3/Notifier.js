@@ -85,9 +85,12 @@
 				this._icons[key].setVisible(visible);
 				if(visible) {
 					const anim = ()  => {
-						this._icons[key].el.dom.classList.remove("unseen");
-						this._icons[key].el.dom.offsetWidth; //trigger reflow
-						this._icons[key].el.dom.classList.add("unseen");
+						if(this._icons[key].flash) {
+							this._icons[key].el.dom.classList.remove("unseen");
+							this._icons[key].el.dom.offsetWidth; //trigger reflow
+							this._icons[key].el.dom.classList.add("unseen");
+							this._icons[key].flash = false;
+						}
 					}
 					if(this._icons[key].el) {
 						anim();
@@ -116,6 +119,8 @@
 				autoEl: 'i',
 				cls: 'icon '+iconCls
 			});
+
+			this._icons[key].flash = true;
 
 			if(this.statusBar) {
 				this.statusBar.add(this._icons[key]);
@@ -206,6 +211,10 @@
 				this._messages[msg.itemId].destroy();
 				isNew = false;
 			}
+
+			if(isNew) {
+				this._icons[msgPanel.statusIcon].flash = true;
+			}
 			this._messages[msg.itemId] = msgPanel;
 
 			msgPanel.on("destroy", this.onMsgDestroy, this);
@@ -292,7 +301,7 @@
 
 			me.notifications.add(msgPanel);
 
-			this.updateStatusIcons();
+			this.updateStatusIcons(isNew);
 			me.notifications.doLayout();
 			return msgPanel;
 		},
