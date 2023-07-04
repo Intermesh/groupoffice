@@ -20,7 +20,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 
 
-		if(this.role == "support" && !this.currentId) {
+		if(!this.currentId) {
 			this.commentComposer.show();
 			this.descriptionFieldset.hide();
 
