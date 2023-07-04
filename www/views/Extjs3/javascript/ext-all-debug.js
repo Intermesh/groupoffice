@@ -20504,7 +20504,8 @@ Ext.ProgressBar = Ext.extend(Ext.BoxComponent, {
             this.textEl = new Ext.CompositeElement([this.textTopEl.dom.firstChild, textBackEl.dom.firstChild]);
             this.textEl.setWidth(inner.offsetWidth);
         }
-        this.progressBar.setHeight(inner.offsetHeight);
+				this.progressBar.dom.style.height = "100%";
+        // this.progressBar.setHeight(inner.offsetHeight);
     },
     
     

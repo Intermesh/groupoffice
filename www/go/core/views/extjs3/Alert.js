@@ -86,23 +86,21 @@
 					handler: () => {
 						go.Entities.get(alert.entity).goto(alert.entityId);
 					},
-					buttons: [{
-						text: t("Open"),
-						handler: (btn) => {
-							go.Notifier.hideNotifications();
-							btn.findParentByType("panel").handler();
-						}
-					}, {
-						text: t("Dismiss"),
-						handler: (btn, e) => {
-							//needed to prevent notification area closing
-							e.stopEvent();
-							btn.findParentByType("panel").destroy();
-						}
-					}]
+					// buttons: [{
+					// 	text: t("Open"),
+					// 	handler: (btn) => {
+					// 		go.Notifier.hideNotifications();
+					// 		btn.findParentByType("panel").handler();
+					// 	}
+					// }, {
+					// 	text: t("Dismiss"),
+					// 	handler: (btn, e) => {
+					// 		//needed to prevent notification area closing
+					// 		e.stopEvent();
+					// 		btn.findParentByType("panel").destroy();
+					// 	}
+					// }]
 				};
-
-
 
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
 
