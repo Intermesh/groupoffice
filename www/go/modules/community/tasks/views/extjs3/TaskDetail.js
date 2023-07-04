@@ -216,9 +216,13 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	},
 
 	changeProgress : function(progress) {
+		this.getEl().mask(t("Saving..."));
 		go.Db.store("Task").save({
 			progress: progress
-		}, this.data.id);
+		}, this.data.id).finally(() => {
+			this.getEl().unmask();
+			}
+		)
 	},
 
 
