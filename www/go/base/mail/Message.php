@@ -575,6 +575,8 @@ class Message extends \Swift_Message{
 						}
 						if(in_array(substr($ia->tmp_file,0,14), ['saved_messages', 'imap_messages/'])) {
 							$path = \GO::config()->tmpdir.$ia->tmp_file;
+						} elseif($ia->blobId) {
+							$path = Blob::buildPath($ia->blobId);
 						} else {
 							$path = empty($ia->from_file_storage) ? Blob::buildPath($ia->tmp_file) : \GO::config()->file_storage_path . $ia->tmp_file;
 						}
