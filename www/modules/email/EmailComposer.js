@@ -396,6 +396,7 @@ GO.email.EmailComposer = function(config) {
 	tbar.push(this.emailEditor.getAttachmentsButton(), 
 			this.showMenuButton = new Ext.Button({
 				tooltip : t("Add recipients", "email"),
+				// iconCls : 'ic-contact-mail',
 				iconCls : 'ic-people',
 				menu : this.showMenu
 			}));
@@ -510,6 +511,8 @@ GO.email.EmailComposer = function(config) {
 									template_id: "default_for_account"
 								});
 
+								
+								
 								this.fireEvent('load', this, records);
 								this.loaded = true;
 							}
@@ -539,6 +542,11 @@ GO.email.EmailComposer = function(config) {
 								var fromComboValue = this.fromCombo.getValue();
 								this.fromCombo.store.load();
 								this.fromCombo.setValue(fromComboValue);
+								
+								
+								
+								
+								
 							},
 							scope : this
 						}),
@@ -1225,6 +1233,16 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		}
 	},
 	
+
+	HandleResult : function (btn){
+		if (btn == 'yes'){
+			//this.htmlEditor.SpellCheck = true;
+			this.sendMail();
+		}else{
+			//this.editor.plugins[1].spellcheck();
+		}
+	},
+
 	submitForm : function(hide){
 		this.sendMail(false, false);
 	},
