@@ -65,9 +65,12 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 		this.checkColumn.on('change', function(record){
 
 			var wasComplete = record.json.progress == 'completed' || record.json.progress == 'cancelled';
+			this.getEl().mask(t("Saving..."));
 			go.Db.store("Task").set({update: {
 				[record.data.id]: {progress: (!wasComplete ? 'completed' : 'needs-action')}}
-			});
+			}).finally(() => {
+				this.getEl().unmask();
+			})
 
 		}, this);
 
