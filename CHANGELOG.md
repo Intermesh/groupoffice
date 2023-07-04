@@ -9,6 +9,8 @@
 - Support: Save e-mail as ticket
 - Comments: Fixed global search (reindex for comments will trigger after update)
 - Support: Fixed routing to ticket
+- Core: Improved notifications
+
 
 28-06-2023: 6.7.37
 - Savemailas: Merge linked emails to show all links inside the linked e-mail
