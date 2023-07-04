@@ -53,6 +53,35 @@ GO.base.email.EmailEditorPanel = function(config){
 	
 	GO.base.email.EmailEditorPanel.superclass.constructor.call(this,config);
 
+
+	this.htmlEditor.on("initialize", () => {
+		setTimeout(() => {
+			this.htmlEditor.getDoc().addEventListener("dragenter", this.onDragEnter.createDelegate(this))
+			this.htmlEditor.getDoc().addEventListener("dragleave", () => {
+				this.onDropZone = false;
+				this.onDragLeave();
+			})
+
+			this.dropZone.getEl().dom.addEventListener("drop", this.onDrop.createDelegate(this));
+			this.dropZone.getEl().dom.addEventListener("dragover", (e) => {
+				e.dataTransfer.dropEffect = "copy";
+				e.preventDefault();
+				e.stopPropagation();
+			});
+			this.dropZone.getEl().dom.addEventListener("dragenter", (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				this.onDropZone = true;
+			});
+
+			this.dropZone.getEl().dom.addEventListener("dragleave", (e) => {
+				this.onDropZone = false;
+				e.preventDefault();
+				this.onDragLeave();
+			});
+		})
+	})
+
 	this.on("render", function(){
 		const formPanel = this.findParentByType(Ext.form.FormPanel);
 		formPanel.form.on('actioncomplete', function(form, action){
@@ -79,10 +108,6 @@ GO.base.email.EmailEditorPanel = function(config){
 			notifyOut: this.onNotifyOut.createDelegate(this)
 		});
 
-		// Used for dragging and dropping files as attachments
-		this.getEl().dom.addEventListener("dragover", this.onDragOver.createDelegate(this));
-		this.getEl().dom.addEventListener("dragleave", this.onDragLeave.createDelegate(this));
-		this.getEl().dom.addEventListener("drop", this.onDrop.createDelegate(this));
 	}, this);
 
 	this.addEvents({
@@ -254,12 +279,16 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	},
 
 	htmlEditorAttach : function(htmlEditor,blob, file, img) {
+		this.onDropZone = false;
+		this.onDragLeave();
+
 		if(img) {
 			//inline will be processed from body
 			return;
 		}
 
 		this.attachmentsView.addBlob(blob);
+
 	},
 	
 	reset : function(){
@@ -545,16 +574,24 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 *
 	 * @param e
 	 */
-	onDragOver: function(e) {
+	onDragEnter: function(e) {
+
+		this.onDropZone = true;
+
 		if (!e.dataTransfer || !e.dataTransfer.files) {
 			return;
 		}
 		e.preventDefault();
-		e.stopPropagation();
-		e.dataTransfer.dropEffect = "copy";
-		this.dropZone.show();
-		this.setEditorHeight();
-		// return "x-dd-drop-ok";
+
+		if(!this.dropZone.isVisible()) {
+			e.dataTransfer.dropEffect = "copy";
+			this.dropZone.show();
+			this.setEditorHeight();
+
+			document.body.addEventListener("dragend", () => {
+				this.onDragLeave();
+			}, {once: true})
+		}
 	},
 
 	/**
@@ -563,15 +600,19 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @param e
 	 */
 	onDragLeave: function(e) {
-		if (!e.dataTransfer || !e.dataTransfer.files) {
-			return;
+
+		if(e) {
+			e.preventDefault();
 		}
-		e.preventDefault();
-		e.stopPropagation();
-		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
-		this.dropZone.hide();
-		this.setEditorHeight();
-		// return true;
+		// e.stopPropagation();
+		setTimeout(() => {
+			if(!this.onDropZone) {
+				this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
+				this.dropZone.hide();
+				this.setEditorHeight();
+			}
+		}, 200)
+		return true;
 	},
 
 	/**
@@ -580,6 +621,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @param e
 	 */
 	onDrop: function(e) {
+		this.onDropZone = false;
 		if (!e.dataTransfer || !e.dataTransfer.files) {
 			this.dropZone.hide();
 			this.setEditorHeight();
