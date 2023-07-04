@@ -10,6 +10,7 @@
 - Comments: Fixed global search (reindex for comments will trigger after update)
 - Support: Fixed routing to ticket
 - Core: Improved notifications
+- Projects: Fixed display of project custom field
 
 
 28-06-2023: 6.7.37
