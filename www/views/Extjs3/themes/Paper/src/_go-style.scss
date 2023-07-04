@@ -757,7 +757,7 @@ a {
 	> * {
 		@extend %icon;
 		&.unseen {
-			animation: blink .3s 7 alternate;
+			animation: blink .3s 30 alternate;
 		}
 		margin: 0 dp(4);
 		text-shadow: 0px 1px 0px rgba(black, 0.56);

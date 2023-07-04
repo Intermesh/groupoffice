@@ -83,10 +83,18 @@
 
 			if (this._icons[key]) {
 				this._icons[key].setVisible(visible);
-				if(visible && this._icons[key].el) {
-					this._icons[key].el.dom.classList.remove("unseen");
-					this._icons[key].el.dom.offsetWidth; //trigger reflow
-					this._icons[key].el.dom.classList.add("unseen");
+				if(visible) {
+					const anim = ()  => {
+						this._icons[key].el.dom.classList.remove("unseen");
+						this._icons[key].el.dom.offsetWidth; //trigger reflow
+						this._icons[key].el.dom.classList.add("unseen");
+					}
+					if(this._icons[key].el) {
+						anim();
+					} else
+					{
+						this._icons[key].on("render", anim);
+					}
 				}
 			}
 			if(visible) {
@@ -323,6 +331,7 @@
 					id:'dismiss',
 					qtip: t('Dismiss all'),
 					handler: function() {
+						this.hideNotifications();
 						Ext.MessageBox.confirm(t("Confirm"), t('Are you sure you want to dismiss all notifications?'), function(btn){
 							if(btn=='yes') {
 								go.Notifier.removeAll();
