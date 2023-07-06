@@ -250,7 +250,7 @@ class Task extends AclItemEntity {
 
 	public function getProgress(): string
 	{
-		return isset(Progress::$db[$this->progress]) ? Progress::$db[$this->progress] : Progress::$db[1];
+		return Progress::$db[$this->progress] ?? Progress::$db[1];
 	}
 
 	public function getTimeBooked(): ?int
@@ -258,7 +258,13 @@ class Task extends AclItemEntity {
 		return $this->timeBooked;
 	}
 
-	public function setProgress($value) {
+	/**
+	 * Set progress status
+	 *
+	 * @param string $value "needs-action" {@see Progress::$db}
+	 * @return void
+	 */
+	public function setProgress(string $value) {
 		$key = array_search($value, Progress::$db, true);
 		if($key === false) {
 			$this->setValidationError('progress', ErrorCode::INVALID_INPUT, 'Incorrect Progress value for task: ' . $value);
@@ -441,6 +447,9 @@ class Task extends AclItemEntity {
 		if($this->isModified('responsibleUserId') && CoreAlert::$enabled) {
 
 			if (isset($this->responsibleUserId)) {
+
+				// when assigned to someone else it's progress should be needs action
+				$this->progress = Progress::NeedsAction;
 
 				if($this->responsibleUserId != go()->getUserId()) {
 					$alert = $this->createAlert(new \DateTime(), 'assigned', $this->responsibleUserId)

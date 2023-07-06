@@ -12,7 +12,8 @@
 - Core: Improved notifications
 - Projects: Fixed display of project custom field
 - Support: remove you were assigned to alert when commenting
-
+- Billing: fixed status filter losing the setting when only status "None" was selected
+- Support/Task: change status to needs action when reassigning
 
 28-06-2023: 6.7.37
 - Savemailas: Merge linked emails to show all links inside the linked e-mail
