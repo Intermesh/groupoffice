@@ -782,6 +782,9 @@ class Task extends AclItemEntity {
 		// Remove alert for creator of this comment. Other users will get a replaced alert below.
 		CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);
 
+		// remove you were assigned to alert when commenting
+		CoreAlert::deleteByEntity($this, "assigned", $comment->createdBy);
+
 		foreach($commenters as $userId) {
 			$alert = $this->createAlert(new DateTime(), 'comment', $userId)
 				->setData([
