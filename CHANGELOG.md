@@ -15,6 +15,7 @@
 - Billing: fixed status filter losing the setting when only status "None" was selected
 - Support/Task: change status to needs action when reassigning
 - Core: remove alerts when they are dismissed server side
+- Core: Hide personal groups when adding groups to popup reminders and announcements
 
 28-06-2023: 6.7.37
 - Savemailas: Merge linked emails to show all links inside the linked e-mail
