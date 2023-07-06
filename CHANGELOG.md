@@ -11,6 +11,7 @@
 - Support: Fixed routing to ticket
 - Core: Improved notifications
 - Projects: Fixed display of project custom field
+- Support: remove you were assigned to alert when commenting
 
 
 28-06-2023: 6.7.37
