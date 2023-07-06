@@ -32,7 +32,7 @@ class StringUtil {
 	public static function normalizeCrlf(?string $text, string $crlf = "\r\n"): ?string
 	{
 		if(empty($text)) {
-			return "";
+			return $text;
 		}
 		
 		$normalized =  preg_replace('/\R/u', $crlf, $text);
