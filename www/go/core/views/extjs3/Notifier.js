@@ -388,6 +388,10 @@
 			msg.destroy();
 		},
 
+		getAll: function() {
+			return Object.values(this._messages);
+		},
+
 		getById : function(msgId) {
 			if(!this._messages[msgId]) {
 				return false;
