@@ -217,13 +217,18 @@ class Builder
 		run("npm install --include=dev");
 		run("npm run build");
 		run("npm prune --production");
-		cd("../groupoffice-core");
+			cd("../groupoffice-core");
 		run("npm install --include=dev");
 		run("npm run build");
-		run("npm prune --production");
+
 		cd("..");
 		run("npm install --include=dev");
 		run("npm run build");
+		run("npm prune --production");
+
+        cd("../groupoffice-core");
+        run("npm prune --production");
+        cd("../goui");
 		run("npm prune --production");
 	}
 
