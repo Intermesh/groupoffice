@@ -215,17 +215,14 @@ class Builder
 		cd($this->buildDir . "/" . $this->packageName);
 		cd("views/goui/goui");
 		run("npm install --include=dev");
-        run("npm up");
 		run("npm run build");
 		run("npm prune --production");
 		cd("../groupoffice-core");
 		run("npm install --include=dev");
-        run("npm up");
 		run("npm run build");
 		run("npm prune --production");
 		cd("..");
 		run("npm install --include=dev");
-        run("npm up");
 		run("npm run build");
 		run("npm prune --production");
 	}
