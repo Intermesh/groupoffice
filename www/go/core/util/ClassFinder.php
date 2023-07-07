@@ -131,7 +131,11 @@ class ClassFinder {
 	public function findByTrait(string $name): array
 	{
 		 return $this->findBy(function($className) use($name){
-			return in_array($name, class_uses($className));
+			 try {
+				return in_array($name, class_uses($className));
+			 } catch(\Error $e) { // class not found?
+				 return false;
+			 }
 		});
 	}
 
