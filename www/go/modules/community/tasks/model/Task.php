@@ -250,7 +250,7 @@ class Task extends AclItemEntity {
 
 	public function getProgress(): string
 	{
-		return isset(Progress::$db[$this->progress]) ? Progress::$db[$this->progress] : Progress::$db[1];
+		return Progress::$db[$this->progress] ?? Progress::$db[1];
 	}
 
 	public function getTimeBooked(): ?int
@@ -258,7 +258,13 @@ class Task extends AclItemEntity {
 		return $this->timeBooked;
 	}
 
-	public function setProgress($value) {
+	/**
+	 * Set progress status
+	 *
+	 * @param string $value "needs-action" {@see Progress::$db}
+	 * @return void
+	 */
+	public function setProgress(string $value) {
 		$key = array_search($value, Progress::$db, true);
 		if($key === false) {
 			$this->setValidationError('progress', ErrorCode::INVALID_INPUT, 'Incorrect Progress value for task: ' . $value);
@@ -442,6 +448,9 @@ class Task extends AclItemEntity {
 
 			if (isset($this->responsibleUserId)) {
 
+				// when assigned to someone else it's progress should be needs action
+				$this->progress = Progress::NeedsAction;
+
 				if($this->responsibleUserId != go()->getUserId()) {
 					$alert = $this->createAlert(new \DateTime(), 'assigned', $this->responsibleUserId)
 						->setData([
@@ -549,6 +558,7 @@ class Task extends AclItemEntity {
 		$values = $this->toArray();
 		unset($values['id']);
 		unset($values['progress']);
+		unset($values['responsibleUserId']);
 		unset($values['percentComplete']);
 		unset($values['progressUpdated']);
 		unset($values['freeBusyStatus']);
@@ -781,6 +791,9 @@ class Task extends AclItemEntity {
 
 		// Remove alert for creator of this comment. Other users will get a replaced alert below.
 		CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);
+
+		// remove you were assigned to alert when commenting
+		CoreAlert::deleteByEntity($this, "assigned", $comment->createdBy);
 
 		foreach($commenters as $userId) {
 			$alert = $this->createAlert(new DateTime(), 'comment', $userId)

@@ -1,81 +1,29 @@
 import {NoteDialog} from "./NoteDialog.js";
-import {
-	btn,
-	Button,
-	comp,
-	Component,
-	DefaultEntity,
-	FunctionUtil,
-	t,
-	tbar,
-	Toolbar,
-	Window
-} from "@intermesh/goui";
-import {Image, jmapds} from "@intermesh/groupoffice-core";
+import {btn, Button, comp, Component, t} from "@intermesh/goui";
+import {DetailPanel, Image} from "@intermesh/groupoffice-core";
 
 
-export class NoteDetail extends Component {
-	private titleCmp!: Component;
+export class NoteDetail extends DetailPanel {
 	private editBtn!: Button;
-	private entity?: DefaultEntity;
+
 	private content: Component;
-	private scroller: Component;
-	private detailView: any;
-	private toolbar!: Toolbar;
 
 	constructor() {
-		super();
+		super("Note");
 
-		// reload on entity change
-		jmapds("Note").on("change", (ds, changes) => {
-			if(this.entity && changes.updated && changes.updated.indexOf(this.entity.id+"") > -1) {
-				this.load(this.entity.id);
-			}
-		})
+		this.scroller.items.add(
+			this.content = comp({
+				cls: "normalize goui-card pad"
+			})
+		)
 
-		this.cls = "vbox";
-		this.width = 400;
+		this.addCustomFields();
+		this.addComments();
+		this.addFiles();
+		this.addLinks();
+		this.addHistory();
 
-		this.style.position = "relative";
-
-		this.items.add(
-			this.createToolbar(),
-			this.scroller = comp({flex: 1, cls: "scroll vbox"},
-				this.content = comp({
-					cls: "normalize goui-card pad"
-				})
-			)
-		);
-
-		// Legacy stuff
-
-		const ro = new ResizeObserver(FunctionUtil.buffer(100,() =>{
-			this.detailView.doLayout();
-		}));
-
-		ro.observe(this.el);
-
-		this.detailView = new go.detail.Panel({
-			width: undefined,
-			entityStore: go.Db.store("Note"),
-			header: false
-		});
-		this.detailView.addCustomFields();
-		this.detailView.addLinks();
-		this.detailView.addComments();
-		this.detailView.addFiles();
-		this.detailView.addHistory();
-
-		this.scroller.items.add(this.detailView);
-	}
-
-	private createToolbar() {
-		return this.toolbar = tbar({
-				disabled: true,
-				cls: "border-bottom"
-			},
-			this.titleCmp = comp({tagName: "h3"}),
-			'->',
+		this.toolbar.items.add(
 			this.editBtn = btn({
 				icon: "edit",
 				title: t("Edit"),
@@ -85,45 +33,14 @@ export class NoteDetail extends Component {
 					dlg.show();
 				}
 			})
-		);
-	}
+		)
 
-	set title(title: string) {
-		super.title = title;
-		this.titleCmp.text = title;
-	}
+		this.on("load",(detailPanel, entity) => {
+			this.title = entity.name;
 
-	public async load(id: string) {
-
-		this.mask();
-
-		try {
-			this.entity = await jmapds("Note").single(id);
-
-			if(!this.entity) {
-				throw "notfound";
-			}
-
-			this.title = this.entity.name;
 
 			this.content.items.clear();
-			this.content.items.add(Image.replace(this.entity.content));
-
-			this.legacyOnLoad();
-
-			this.toolbar.disabled = false;
-
-		} catch (e) {
-			Window.alert(t("Error"), e + "");
-		} finally {
-			this.unmask();
-		}
-
-		return this;
-	}
-
-	private legacyOnLoad() {
-		this.detailView.currentId = this.entity!.id;
-		this.detailView.internalLoad(this.entity);
+			this.content.items.add(Image.replace(entity.content));
+		});
 	}
 }
