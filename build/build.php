@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use Github\Client;
+
 require(__DIR__ . '/vendor/autoload.php');
 $config = require(__DIR__ . '/config.php');
 
@@ -78,29 +80,9 @@ class Builder
 	private $sourceDir = __DIR__ . "/deploy/source";
 	private $encodedDir = __DIR__ . "/deploy/encoded";
 	private $buildDir = __DIR__ . "/deploy/build";
-	private $proModules = [
-		"gota",
-		"documenttemplates",
-		"savemailas",
-		"professional",
-		"tickets",
-		"scanbox",
-		"leavedays",
-		"projects2",
-		"timeregistration2",
-		"hoursapproval2",
-		"pr2analyzer",
-		"workflow",
-		"filesearch",
-		"assistant",
-		"billing"
-	];
+	private $proModules = ["gota", "documenttemplates", "savemailas", "professional", "tickets", "scanbox", "leavedays", "projects2", "timeregistration2", "hoursapproval2", "pr2analyzer", "workflow", "filesearch", "assistant", "billing"];
 
-	private $github = [
-		'PERSONAL_ACCESS_TOKEN' => "secret",
-		'USERNAME' => 'intermesh',
-		'REPOSITORY' => 'groupoffice'
-	];
+	private $github = ['PERSONAL_ACCESS_TOKEN' => "secret", 'USERNAME' => 'intermesh', 'REPOSITORY' => 'groupoffice'];
 
 	private $ioncubePassword = "secret";
 	private $githubRelease;
@@ -221,14 +203,15 @@ class Builder
 //		run("npm install --include=dev");
 //		run("npm run build");
 
-        cd("views/goui");
+		cd("views/goui");
 		run("npm install --include=dev");
+        run("npm up");
 		run("npm run build");
 		run("npm prune --production");
 
-        cd("../groupoffice-core");
-        run("npm prune --production");
-        cd("../goui");
+		cd("../groupoffice-core");
+		run("npm prune --production");
+		cd("../goui");
 		run("npm prune --production");
 	}
 
@@ -246,6 +229,7 @@ class Builder
 			$nodeDir = dirname($packageFile);
 			cd($nodeDir);
 			run("npm install");
+			run("npm up");
 			run("pwd");
 			run("npm run build");
 			run("npm prune --production");
@@ -255,11 +239,9 @@ class Builder
 
 	private function runEncoder($sourcePath, $targetPath)
 	{
-		run($this->encoder . ' -72 --allow-reflection-all -B --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
+		run($this->encoder . ' -72 --allow-reflection-all -B --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' . '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
 
-		run($this->encoder . ' -81 --allow-reflection-all --add-to-bundle --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
+		run($this->encoder . ' -81 --allow-reflection-all --add-to-bundle --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' . '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
 
 	}
 
@@ -273,8 +255,7 @@ class Builder
 		$this->runEncoder('/promodules/tickets/customfields/model', '/modules/tickets/customfields/');
 		$this->runEncoder('/promodules/tickets/customfields/model', '/modules/tickets/customfields/');
 
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target ' . $this->sourceDir . '/promodules/tickets/TicketsModule.php ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/');
+		run($this->encoder . " " . $this->encoderOptions . ' --replace-target ' . $this->sourceDir . '/promodules/tickets/TicketsModule.php ' . '--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/');
 
 
 		foreach ($this->proModules as $module) {
@@ -336,11 +317,11 @@ class Builder
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/projects3');
 
 
-        //needs to be open source as it's used by Module files
-        run('cp ' . $this->sourceDir . '/business/finance/model/PaymentProviderInterface.php ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/finance/model/PaymentProviderInterface.php');
+		//needs to be open source as it's used by Module files
+		run('cp ' . $this->sourceDir . '/business/finance/model/PaymentProviderInterface.php ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/finance/model/PaymentProviderInterface.php');
 
 
-    }
+	}
 
 	private function sendTarToSF()
 	{
@@ -360,35 +341,18 @@ class Builder
 
 		cd($this->buildDir);
 
-		$client = new \Github\Client();
-		$client->authenticate($this->github['PERSONAL_ACCESS_TOKEN'], null, \Github\Client::AUTH_ACCESS_TOKEN);
+		$client = new Client();
+		$client->authenticate($this->github['PERSONAL_ACCESS_TOKEN'], null, Client::AUTH_ACCESS_TOKEN);
 
 		$tagName = 'v' . $this->majorVersion . "." . $this->minorVersion;
 
 		$r = $client->api('repo')->releases();
 
 		if (!isset($this->githubRelease)) {
-			$this->githubRelease = $r->create(
-				$this->github['USERNAME'],
-				$this->github['REPOSITORY'],
-				array(
-					'tag_name' => $tagName,
-					'name' => $tagName,
-					'prerelease' => $this->distro == "testing",
-					'target_commitish' => $this->gitBranch,
-					'body' => 'Use the ' . $this->packageName . '.tar.gz file for installations. It contains all the code, libraries and compiled code. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'
-				)
-			);
+			$this->githubRelease = $r->create($this->github['USERNAME'], $this->github['REPOSITORY'], array('tag_name' => $tagName, 'name' => $tagName, 'prerelease' => $this->distro == "testing", 'target_commitish' => $this->gitBranch, 'body' => 'Use the ' . $this->packageName . '.tar.gz file for installations. It contains all the code, libraries and compiled code. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'));
 		}
 
-		$asset = $r->assets()->create(
-			$this->github['USERNAME'],
-			$this->github['REPOSITORY'],
-			$this->githubRelease['id'],
-			$this->packageName . '.tar.gz',
-			'application/tar+gzip',
-			file_get_contents($this->packageName . '.tar.gz')
-		);
+		$asset = $r->assets()->create($this->github['USERNAME'], $this->github['REPOSITORY'], $this->githubRelease['id'], $this->packageName . '.tar.gz', 'application/tar+gzip', file_get_contents($this->packageName . '.tar.gz'));
 
 	}
 
@@ -409,9 +373,7 @@ class Builder
 		run("mkdir " . $debTarget);
 		run("cp -r " . __DIR__ . "/debian/* " . $debTarget);
 
-		file_put_contents($debTarget . '/debian/changelog', str_replace(
-			array('{package}', '{version}', '{date}'), array("groupoffice", $this->majorVersion . '.' . $this->minorVersion, $date), $tpl
-		));
+		file_put_contents($debTarget . '/debian/changelog', str_replace(array('{package}', '{version}', '{date}'), array("groupoffice", $this->majorVersion . '.' . $this->minorVersion, $date), $tpl));
 
 		run("cp -r " . $this->buildDir . "/" . $this->packageName . "/* " . $debTarget . "/usr/share/groupoffice");
 		cd($debTarget);
@@ -420,7 +382,6 @@ class Builder
 
 	public function addToDebianRepository()
 	{
-
 		if (!is_dir($this->repreproDir)) {
 			run("mkdir -p " . $this->repreproDir . "/conf");
 			run("cp " . $this->sourceDir . "/debian-groupoffice/reprepro/distributions " . $this->repreproDir . "/conf");
@@ -428,7 +389,6 @@ class Builder
 
 		run("reprepro -b " . $this->repreproDir . " include " . $this->distro . " " . $this->buildDir . "/groupoffice_" . $this->majorVersion . "." . $this->minorVersion . "-" . $this->distro . "_amd64.changes");
 	}
-
 }
 
 
