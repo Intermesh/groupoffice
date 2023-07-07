@@ -688,19 +688,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 	},
 
-	rememberLastAddressboek(addressBookId) {
-		const abSettings = go.User.addressBookSettings;
-		if(abSettings.startIn == "remember" && abSettings.lastAddressBookId != addressBookId) {
-			var update = {};
-			update[go.User.id] = {'addressBookSettings': {
-					lastAddressBookId:addressBookId
-				}};
-			go.Db.store("User").set({
-				'update': update
-			});
-		}
-	},
-
 	setAddressBookId: function (addressBookIds) {
 		this.addButton.setDisabled(false);
 		const mayExportContacts = go.Modules.get("community", 'addressbook').userRights.mayExportContacts;
@@ -709,7 +696,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		this.exportButton.setDisabled(!mayExportContacts);
 		if (addressBookIds.length) {
 			this.addAddressBookId = addressBookIds[0];
-			this.rememberLastAddressboek(addressBookIds[0]);
+			this.addressBookTree.rememberLastAddressboek(addressBookIds[0]);
 			
 			this.grid.store.setFilter("addressbooks", {
 				addressBookId: addressBookIds

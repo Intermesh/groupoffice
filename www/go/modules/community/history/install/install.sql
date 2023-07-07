@@ -30,3 +30,6 @@ ENGINE = InnoDB;
 ALTER TABLE `history_log_entry` ADD INDEX(`entityId`);
 create index history_log_entry_createdAt_index
     on history_log_entry (createdAt);
+
+create index history_log_entry_removeAcl_action_index
+    on history_log_entry (removeAcl, action);

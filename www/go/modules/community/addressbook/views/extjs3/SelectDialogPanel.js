@@ -150,8 +150,19 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 		this.selectedAbs = {};
 		//because the root node is not visible it will auto expand on render.
 		this.addressBookTree.getRootNode().on('expand', function (node) {
-			//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
-			this.addressBookTree.getSelectionModel().select(node.firstChild);
+			var abSettings = go.User.addressBookSettings, abNode = null;
+
+			if (abSettings.startIn == "remember" && abSettings.lastAddressBookId > 0) {
+				abNode = node.findChild('id', 'AddressBook-' + abSettings.lastAddressBookId);
+			} else {
+				abNode = node.findChild('id', 'AddressBook-' + abSettings.defaultAddressBookId);
+			}
+			if (abNode) {
+				this.addressBookTree.getSelectionModel().select(abNode);
+			} else {
+				//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
+				this.addressBookTree.getSelectionModel().select(node.firstChild);
+			}
 		}, this);
 
 		this.addressBookTree.on('checkchange', function (node, checked) {
@@ -289,6 +300,7 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 		if(!Array.isArray(addressBookIds) || addressBookIds.length === 0) {
 			this.grid.store.setFilter("addressbooks", null);
 		} else {
+			this.addressBookTree.rememberLastAddressboek(addressBookIds[0]);
 			this.grid.store.setFilter("addressbooks", {
 				addressBookId: addressBookIds
 			});

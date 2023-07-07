@@ -60,6 +60,24 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							border: true
 						})
 					]
+				},{
+					xtype: "fieldset",
+					title: t("Synchronization"),
+					items: [
+						{
+							xtype: "checkbox",
+							hideLabel: true,
+							boxLabel: "Enable 2-Factor authentication for ActiveSync devices",
+							name: "activeSyncEnable2FA"
+						},{
+							xtype: "checkbox",
+							hideLabel: true,
+							boxLabel: "ActiveSync devices can connect by default.",
+							hint: 'When disabled the administrator has to allow each new device manually',
+							name: "activeSyncCanConnect"
+						}
+					]
+
 				},
 				{
 					xtype: "fieldset",

@@ -2,6 +2,7 @@
 namespace go\modules\community\multi_instance;
 
 use go\core\App;
+use go\core\ErrorHandler;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\Installer;
@@ -90,7 +91,7 @@ class Module extends \go\core\Module {
 
 		$failed = 0;
 
-		foreach(Instance::find() as $instance) {
+		foreach(Instance::find()->orderBy(['enabled' => 'DESC', 'isTrial' => 'ASC', 'lastLogin' => 'DESC']) as $instance) {
 			if(!$instance->isInstalled()) {
 				echo "Skipping not installed instance: " . $instance->hostname ."\n";
 				continue;
@@ -103,7 +104,12 @@ class Module extends \go\core\Module {
 
 			echo "Upgrading instance: " . $instance->hostname . ": ";
 			flush();
-			$success = $instance->upgrade();
+			try {
+				$success = $instance->upgrade();
+			} catch(\Throwable $e) {
+				ErrorHandler::logException($e, "Failed to upgrade " . $instance->hostname);
+				$success = false;
+			}
 
 			echo $success ? "ok" : "!!! FAILED !!!";
 

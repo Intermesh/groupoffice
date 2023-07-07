@@ -115,7 +115,7 @@ GO.email.EmailComposer = function(config) {
 					go.Jmap.request({
 						method: "Contact/get",
 						params: {
-							properties: ["name", "emailAddresses"],
+							properties: ["name", "emailAddresses", 'addressBookId'],
 							ids: ids
 						}
 					}).then(function(result) {										
@@ -271,11 +271,7 @@ GO.email.EmailComposer = function(config) {
 	]
 	}
 	];
-								
-	// var anchor = -113;
-						
-	
-	
+
 	items.push(
 
 		{
@@ -1162,38 +1158,39 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 	},
 	
 	loadForm : function(url, params){
-		
 		params.content_type = this.emailEditor.getContentType();
 		
 		var attachmentmentsData=[];
 		var attachments = this.emailEditor.attachmentsView.store.getRange(); 
-		for(var i=0;i<attachments.length;i++)
+		for(var i=0;i<attachments.length;i++) {
 			attachmentmentsData.push(attachments[i].data);
+		}
 		
 		this.formPanel.form.load({
-					url : url,
-					params : params,
-					waitMsg : t("Loading..."),
-					failure:function(form, action)
-					{
-						Ext.getBody().unmask();
-						GO.errorDialog.show(action.result.feedback)
-					},
-					success : function(form, action) {
-						
-						this.addSignature();
+			url : url,
+			params : params,
+			waitMsg : t("Loading..."),
+			failure:function(form, action){
+				Ext.getBody().unmask();
+				GO.errorDialog.show(action.result.feedback)
+			},
+			success : function(form, action) {
 
-						if(action.result.sendParams)
-							Ext.apply(this.sendParams, action.result.sendParams);
-						
-						//add existing attachments to result so emailEditor will set this after form load.
-						if(action.result.data.attachments)
-							attachmentmentsData=attachmentmentsData.concat(action.result.data.attachments);						
-						
-						action.result.data.attachments=attachmentmentsData;
-					},
-					scope : this
-				});
+				this.addSignature();
+
+				if(action.result.sendParams) {
+					Ext.apply(this.sendParams, action.result.sendParams);
+				}
+
+				//add existing attachments to result so emailEditor will set this after form load.
+				if(action.result.data.attachments) {
+					attachmentmentsData = attachmentmentsData.concat(action.result.data.attachments);
+				}
+
+				action.result.data.attachments=attachmentmentsData;
+			},
+			scope : this
+		});
 	},
 
 	

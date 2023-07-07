@@ -40,6 +40,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 						me.nextSibling().items.each(btn => {
 							btn.toggle(btn.inputValue === me.value)
 						});
+						if(this.userId !== go.User.id) return;
 						['light','dark','system'].forEach(name => {
 							document.body.classList.remove(name);
 						});
@@ -423,8 +424,10 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			});
 		}
 	},
-	
-	onLoadComplete : function(data){
+	onLoadStart : function(userId){
+		this.userId = userId;
+	},
+	onLoadComplete : function(user){
 
 	},
 	

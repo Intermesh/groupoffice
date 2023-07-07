@@ -84,7 +84,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 					</p>\
 				</tpl>',{
 					rruleToText: function(rrule) {
-						var fieldDummy = new go.form.RecurrenceField();
+						const fieldDummy = new go.form.RecurrenceField();
 						return fieldDummy.parseRule(rrule);
 					},
 					progressColor: function(p) {
@@ -119,7 +119,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		if(!this.support) {
 			this.buttons = [{
 				iconCls: 'ic-forward',
-				text:t("Continue task", "tasks"),
+				text:t("Continue task", "tasks", "community"),
 				handler:() => {
 					const continueTaskDialog = new go.modules.community.tasks.ContinueTaskDialog();
 					continueTaskDialog.load(this.currentId).show();
@@ -145,6 +145,29 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		this.addLinks();
 		this.addFiles();
 		this.addHistory();
+
+		// Testing GOUI in ext
+		// const container = new Ext.BoxComponent({
+		// 	listeners: {
+		// 		scope: this,
+		// 		render: () => {
+		//
+		//
+		// 			const c = goui.chips({
+		// 				name: "test",
+		// 				label: "Test",
+		// 				value: []
+		// 			});
+		//
+		// 			c.render(container.el.dom);
+		// 		}
+		//
+		// 	}
+		// });
+		//
+		// this.add(container);
+		//
+
 
 		this.on("destroy" , () => {
 			this.progressMenu.destroy();
@@ -193,9 +216,13 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	},
 
 	changeProgress : function(progress) {
+		this.getEl().mask(t("Saving..."));
 		go.Db.store("Task").save({
 			progress: progress
-		}, this.data.id);
+		}, this.data.id).finally(() => {
+			this.getEl().unmask();
+			}
+		)
 	},
 
 
@@ -219,10 +246,13 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				text: t("Assign me"),
 				scope: this,
 				handler: function() {
+					this.getEl().mask(t("Saving..."));
 					go.Db.store("Task").save({
 						responsibleUserId: go.User.id,
 						// progress: "in-progress"
-					}, this.data.id);
+					}, this.data.id).finally(() => {
+						this.getEl().unmask();
+					})
 				}
 			}),
 			'->',
@@ -231,7 +261,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				iconCls: 'ic-edit',
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
-					const taskEdit = new go.modules.community.tasks.TaskDialog({role: "support"});
+					const taskEdit = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
 					taskEdit.load(this.data.id).show();
 				},
 				scope: this

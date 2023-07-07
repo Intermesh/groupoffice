@@ -1,5 +1,5 @@
 go.modules.community.tasks.CategoriesGrid = Ext.extend(go.NavGrid, {
-
+	role: "list",
 	initComponent: function () {
 
 		Ext.apply(this, {
@@ -18,7 +18,7 @@ go.modules.community.tasks.CategoriesGrid = Ext.extend(go.NavGrid, {
 					text: t("Edit"),
 					handler: function() {
 						var dlg = new go.modules.community.tasks.CategoryDialog();
-						dlg.tasklistCombo.store.setFilter("role", {role: "list"});
+						dlg.tasklistCombo.store.setFilter("role", {role: this.role});
 						dlg.load(this.moreMenu.record.id).show();
 					},
 					scope: this

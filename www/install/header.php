@@ -4,6 +4,8 @@ use go\core\App;
 use go\core\cache\None;
 
 App::get()->setCache(new None());
+// no logged in user because it can cause trouble with tables not existing yet
+App::get()->setAuthState(new \go\core\auth\TemporaryState(null));
 
 require('../views/Extjs3/themes/Paper/pageHeader.php');
 

@@ -27,7 +27,7 @@ go.modules.community.tasks.Portlet = Ext.extend(go.modules.community.tasks.TaskG
 });
 
 go.modules.community.tasks.PortletSettingsDialog = Ext.extend(go.form.Dialog, {
-	title: t("Visible task lists"),
+	title: t("Visible lists"),
 	entityStore: "User",
 	width: dp(500),
 	height: dp(500),

@@ -80,8 +80,25 @@
 		},
 
 		toggleIcon: function(key, visible) {
+
 			if (this._icons[key]) {
 				this._icons[key].setVisible(visible);
+				if(visible) {
+					const anim = ()  => {
+						if(this._icons[key].flash) {
+							this._icons[key].el.dom.classList.remove("unseen");
+							this._icons[key].el.dom.offsetWidth; //trigger reflow
+							this._icons[key].el.dom.classList.add("unseen");
+							this._icons[key].flash = false;
+						}
+					}
+					if(this._icons[key].el) {
+						anim();
+					} else
+					{
+						this._icons[key].on("render", anim);
+					}
+				}
 			}
 			if(visible) {
 				if(this.statusBar) {
@@ -102,10 +119,14 @@
 				autoEl: 'i',
 				cls: 'icon '+iconCls
 			});
+
+			this._icons[key].flash = true;
+
 			if(this.statusBar) {
 				this.statusBar.add(this._icons[key]);
 				this.statusBar.doLayout();
 			}
+
 		},
 
 		msgByKey: function(key) {
@@ -183,12 +204,16 @@
 				});
 			}
 
-			let openNotifications = true;
+			let isNew = true;
 
 			if(this._messages[msg.itemId]) {
 				this._messages[msg.itemId].replaced = true;
 				this._messages[msg.itemId].destroy();
-				openNotifications = false;
+				isNew = false;
+			}
+
+			if(isNew) {
+				this._icons[msgPanel.statusIcon].flash = true;
 			}
 			this._messages[msg.itemId] = msgPanel;
 
@@ -241,41 +266,43 @@
 			}
 
 			var me = this;
-			function moveToNotificationArea(msgPanel) {
-				me.notifications.add(msgPanel);
-				me.notifications.doLayout();
-			}
+			// function moveToNotificationArea(msgPanel) {
+			// 	me.notifications.add(msgPanel);
+			// 	me.notifications.doLayout();
+			// }
 
-			if(openNotifications) {
+			// if(openNotifications) {
 				// this.showNotifications();
 				//this.flyout(msg);
 
-				msgPanel.render(this.messageCt);
+				// msgPanel.render(this.messageCt);
 
-				msgPanel.getEl().on("mouseenter", (e) => {
-					msgPanel.mouseEntered = true;
-				});
+				// msgPanel.getEl().on("mouseenter", (e) => {
+				// 	msgPanel.mouseEntered = true;
+				// });
+				//
+				// msgPanel.getEl().on("mouseout", (e) => {
+				//
+				// 	if(!e.within(	msgPanel.getEl(), true)) {
+				// 		moveToNotificationArea(msgPanel);
+				// 	}
+				// });
+				//
+				// setTimeout(() => {
+				//
+				// 	if(!msgPanel.mouseEntered && !msgPanel.isDestroyed) {
+				// 		moveToNotificationArea(msgPanel);
+				// 	}
+				// }, 2000);
 
-				msgPanel.getEl().on("mouseout", (e) => {
+			// } else {
+			// 	moveToNotificationArea(msgPanel);
+			// }
 
-					if(!e.within(	msgPanel.getEl(), true)) {
-						moveToNotificationArea(msgPanel);
-					}
-				});
+			me.notifications.add(msgPanel);
 
-				setTimeout(() => {
-
-					if(!msgPanel.mouseEntered && !msgPanel.isDestroyed) {
-						moveToNotificationArea(msgPanel);
-					}
-				}, 2000);
-
-			} else {
-				moveToNotificationArea(msgPanel);
-			}
-
-			this.updateStatusIcons();
-
+			this.updateStatusIcons(isNew);
+			me.notifications.doLayout();
 			return msgPanel;
 		},
 
@@ -313,6 +340,7 @@
 					id:'dismiss',
 					qtip: t('Dismiss all'),
 					handler: function() {
+						this.hideNotifications();
 						Ext.MessageBox.confirm(t("Confirm"), t('Are you sure you want to dismiss all notifications?'), function(btn){
 							if(btn=='yes') {
 								go.Notifier.removeAll();
@@ -360,6 +388,10 @@
 			msg.destroy();
 		},
 
+		getAll: function() {
+			return Object.values(this._messages);
+		},
+
 		getById : function(msgId) {
 			if(!this._messages[msgId]) {
 				return false;
@@ -381,6 +413,10 @@
 					this.remove(this._messages[id]);
 				}
 			}
+		},
+
+		count : function() {
+			return Object.values(this._messages).length;
 		},
 		/**
 		 * Create a desktop notification if permitted
@@ -476,7 +512,6 @@
 		 * @returns The created Ext.Panel
 		 */
 		flyout: function(msg) {
-
 			msg.renderTo = this.messageCt;
 			if(!msg.html && !msg.items) {
 				msg.html = msg.description; // backward compat

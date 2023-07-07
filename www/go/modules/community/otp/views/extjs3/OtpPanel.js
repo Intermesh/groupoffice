@@ -18,14 +18,14 @@ go.modules.community.otp.OtpPanel = Ext.extend(go.login.BaseLoginPanel, {
 
 		//nested panel is required so that submit button is inside form. 
 		//Otherwise firefox won't prompt to save password and all browsers won't handle "enter" to submit.
-		var panel = new Ext.Panel({
+		const panel = new Ext.Panel({
 			items: [{
-					xtype: 'fieldset',
-					items: [
-						this.secretText,
-						this.secretField
-					]
-				}],
+				xtype: 'fieldset',
+				items: [
+					this.secretText,
+					this.secretField
+				]
+			}],
 			bbar: [
 				this.resetButton = new Ext.Button({
 					text: t("Cancel"),

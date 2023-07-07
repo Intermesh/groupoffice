@@ -11,7 +11,6 @@ views/Extjs3/javascript/vendor/purify.min.js
 go/core/views/extjs3/namespaces.js
 go/core/views/extjs3/Translate.js
 
-views/Extjs3/javascript/goui.js
 views/Extjs3/javascript/common.js
 
 views/Extjs3/javascript/MainLayout.js

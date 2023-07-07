@@ -86,7 +86,9 @@ class CalculateDiskUsage extends AbstractCron {
 			$result = \GO\Postfixadmin\Model\Mailbox::model()->find($findParams);
 	
 			\GO::config()->save_setting('mailbox_usage', $result->usage*1024);
-		}
+		} else {
+            \GO::config()->save_setting('mailbox_usage', 0);
+        }
 
 	}
 	

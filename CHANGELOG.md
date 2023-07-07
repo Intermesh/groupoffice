@@ -1,5 +1,131 @@
-17-04-2023: 6.7.23
+- Leavedays: Automatically finish previous agreement when creating a new one
+- Leavedays: reload when editing special leave
+- Business: New permission to access employee tab
+- Core: Fixed reminding language and install in selected language
+- Finance: install templates in English and Dutch
+- Core: Custom date range queries included one day too much.
+- Finance: fixed resize bug where grid became smaller instead of larger
+- Email: larger drop zone for dragging and dropping attachments as files
+- Support: Save e-mail as ticket
+- Comments: Fixed global search (reindex for comments will trigger after update)
+- Support: Fixed routing to ticket
+- Core: Improved notifications
+- Projects: Fixed display of project custom field
+- Support: remove you were assigned to alert when commenting
+- Billing: fixed status filter losing the setting when only status "None" was selected
+- Support/Task: change status to needs action when reassigning
+- Core: remove alerts when they are dismissed server side
+- Core: Hide personal groups when adding groups to popup reminders and announcements
 
+28-06-2023: 6.7.37
+- Savemailas: Merge linked emails to show all links inside the linked e-mail
+- Finance: Don't change book on existing docs
+- Billing: fix calculation of profit when billingextracosts module enabled
+- Support: fix uninstall script
+- Core: prevent exception when uninstalling module with settings model
+
+26-06-2023: 6.7.36
+- Finance: Prefer contact email for quotes and billing email for invoices
+- Finance: Fixed bug in copying document
+- Savemailas: Correct UID's in database preventing links to be shown in email
+- Core: when generating a user password, use minimum password length
+- Core: Fixed rotated images / thumbnails that were uploaded from Apple products
+- Finance: Convert quote to contract
+- Support: Auto assign ticket to first commenting agent
+
+19-06-2023: 6.7.35
+- Core: updated DE translations
+- Core: Fixed some false positivies in XSS detection
+- Support: Ticket import failed to import comment because it failed on XSS check
+- History: Add index on removeAcl and action to speed up garbage collection
+- Support: option to create users or not
+- Email: apply mask when moving IMAP folders to prevent timing problems
+- Core: Fixed several missing translations
+- Email: minor usability tweaks
+- Tasks: Duration fields will show days if hours exceed 24 hours.
+- Finance: Show line breaks in description
+- Finance: Page numbers in templates
+
+12-06-2023: 6.7.34
+- Finance: Customer not loading when using B2B and B2C together. Show total price incl. in B2C mode.
+- Core: renamed Japanese translation files as per ISO-639-1 standard.
+- ActiveSync: Reply email on phone raised error on iphone.
+- Finance: Fixed number matching on finance payment import
+
+05-06-2023: 6.7.33
+- Core: Updated Spanish language. Gracias, Ivan!
+- Core: Didn't install without Ioncube
+- Projects2: fix error when generating demo-data
+- Tasks: fix error in ContinueTaskDialog with progressbar
+- Core: Detect XSS bug with lots of false positives fixed. Fixes #1007
+- Core: Updated German translation
+
+31-05-2023: 6.7.32
+- Carddav: Fixed: CardDAV: REV is given as timestamp, leads to exceptions #1001
+- Calendar: ICS Import not working, exception on server #1002
+- Core: validate html input didn't check for style tags anymore
+- Core: Fixed: Strange issue with notes and text being deleted #995
+- Studio: minor cleanup controller generation script
+
+26-05-2023: 6.7.31
+- Email save as: Apple mail didn't include link tag in response.
+- The about dialog will only be available for the Admin users.
+- Tasks: when moving a task to another list the ACL would not change to the correct list (fixed)
+- Core: bugfix in system CLI controller
+- Core: bugfix in module deletion script
+- Tasks: All tasklists of all types were shown
+
+22-05-2023: 6.7.30
+- Support: In 'my account', display support task lists in default tasklist combo.
+- Core: Set authorized client in account when using switch user
+- Finance: Enable B2B and B2C together in a book.
+- Tasks: Custom field from support showed when using edit button in detail panel
+- Tasks: Fixed: Feature request: Minimize tasks #994
+- Paypal: fixed error in return page.
+
+19-05-2023: 6.7.29
+- Email: fixed display issue in mac mail after removing attachments
+- Billing: Fixed PHP 8.1 deprecated warning
+- Calendar: Take holidays into account when viewing availability in participants tab
+- Support: task list grid bigger limit
+- Comments: If no labels available, disable 'Add label' button. Update tooltip.
+- Core: label color matches parent
+- Core: Renamed several translations of Lybia to its current official name
+- Freebusypermissions: Fixed freebusy acl disappearing
+- LDAP: Fixed broken LDAP sync
+- Comments: Removed comments from all entities search keywords and made comments a separate search result instead.
+    Full re-index is required for existing items.
+- Finance: number of decimals configurable in System Settings -> Finance
+- Finance: Show inclusive price in B2C books
+- Tasks: Fixed estimated duration field validation and max amount of hours.
+
+12-05-2023: 6.7.28
+- Core: Ioncube problems on PHP 8.1
+- Core: only show the alerts when triggerAt is larger then or equal to "now"
+
+12-05-2023: 6.7.27
+- Core: Ioncube problems on PHP 8.1
+
+11-05-2023: 6.7.26
+- Core: prevent exception in disk usage calculation in very specific use case
+- Updated German language files. Danke, Daniel!
+- Finance: Fixed payment search
+- Address book: Fixed right-click -> delete
+- Addressbook: fix error deleting address book
+
+25-04-2023: 6.7.25
+- Tasks: Continue task didn't save comment
+- Support: Wrong task lists displayed when editing support categories
+- Core: Fixed colorfield appearance
+- ActiveSync: Z-push admin could not store remote ipv6 addresses
+- ActiveSync: Fixed deleting mail
+
+20-04-2023: 6.7.24
+- Sync: 2FA for ActiveSync devices
+- Address book: Multiple contact/org select field added
+- Scanbox: make dialog bigger to reflect new styles
+
+17-04-2023: 6.7.23
 - Core: Upload attachments to entities through the JMAP API
 - Addressbook: fix error in selectDialogPanel when no address book selected
 
@@ -44,6 +170,43 @@
 
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
+
+
+26-06-2023: 6.6.165
+ - Leavedays: Split 'hours' column into spent and budgeted special leave hours in year overview
+ - Newsletters: shipping report will work for user entities without profile
+
+ 19-06-2023: 6.6.164
+- Newsletters: do not throw an exception when a shipping report does not find an entity
+- Core: renamed Japanese translation files as per ISO-639-1
+
+31-05-2023: 6.6.163
+- Core: updated Japanese holidays
+- Webdav: recover if directories are missing
+
+25-05-2023: 6.6.162
+- Email / OAuth2Client: More friendly message when refresh token needs to be renewed
+- Addressbook: generate search words for contact urls too
+- Don't panic!
+
+19-05-2023: 6.6.161
+- Tickets: increase max size subject
+- Leavedays: Filter out disabled / archived users in employee list
+- Leavedays: include users that quit during the current year in employee list
+- Freebusypermissions: Fixed freebusy acl disappearing
+
+
+11-05-2023: 6.6.160
+- Calendar: prevent error when printing calendar view while user has no permissions for calendar
+- Leavedays: Better display of leave budgets and spent hours per budget
+- Projects2: show icon in task list if hours were booked on task
+- Summary: new option to set RSS feeds for all users
+
+25-04-2023: 6.6.159
+- Core: Yes/No field has a default value now.
+- Leavedays: bugfix - retrieve agreementId for special leave budget in the past
+- Notesencrypt: close edit screen when cancelling password input.
+- Tasks: enable estimated duration in grid (hidden by default)
 
 13-04-2023: 6.6.158
 - Projects2: Fix bug in time registration PDF report

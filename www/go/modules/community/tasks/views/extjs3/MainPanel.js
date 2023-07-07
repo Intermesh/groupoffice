@@ -17,6 +17,23 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		triggerWidth: 1000
 	},
 
+	route: async function(id, entity) {
+		const task = await go.Db.store("Task").single(id);
+		const tasklist = await go.Db.store("TaskList").single(task.tasklistId);
+
+		if (tasklist.role == "support") {
+			// hack to prevent route update
+			go.Router.routing = true;
+			const support = GO.mainLayout.openModule("support");
+			go.Router.routing = false;
+
+			support.taskDetail.load(id);
+
+		} else {
+			this.supr().route.call(this, id, entity);
+		}
+	},
+
 	initComponent: function () {
 		this.statePrefix = this.support ? 'support-' : 'tasks-';
 		this.createTaskGrid();
@@ -341,6 +358,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	createCategoriesGrid: function() {
 		this.categoriesGrid = new go.modules.community.tasks.CategoriesGrid({
+			role:  !this.support ? go.modules.community.tasks.listTypes.List : go.modules.community.tasks.listTypes.Support,
 			filterName: "categories",
 			filteredStore: this.taskGrid.store,
 			autoHeight: true,
@@ -430,6 +448,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		if(this.support) {
 			this.tasklistsGrid.getStore().setFilter("role", {role: "support"});
+
+			this.tasklistsGrid.getStore().baseParams = this.tasklistsGrid.getStore().baseParams || {};
+			this.tasklistsGrid.getStore().baseParams.limit = 1000;
 		}
 
 		this.tasklistsGrid.on('selectionchange', this.onTasklistSelectionChange, this); //add buffer because it clears selection first

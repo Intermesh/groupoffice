@@ -143,8 +143,11 @@ namespace go\core {
 		
 		private $version;
 
+        private $systemTimeZone;
+
 		protected function __construct() {
 			parent::__construct();
+            $this->systemTimeZone = date_default_timezone_get();
 			date_default_timezone_set("UTC");
 
 			mb_internal_encoding("UTF-8");
@@ -155,6 +158,17 @@ namespace go\core {
 
 			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
+
+        /**
+         * Get the PHP system timezone.
+         *
+         * The API works with UTC dates.
+         *
+         * @return string
+         */
+        public function getSystemTimeZone() : string {
+            return $this->systemTimeZone;
+        }
 
 		/**
 		 * Capabilities of core module
@@ -320,7 +334,7 @@ namespace go\core {
 					}
 				} else
 				{
-					$usage = GO::config()->get_setting('file_storage_usage');
+					$usage = GO::config()->get_setting('file_storage_usage') ?? 0;
 					$this->storageFreeSpace = $quota - $usage;
 				}
 			}
@@ -387,15 +401,23 @@ namespace go\core {
 			
 			return $config ?? [];
 		}
-		
+
+		/**
+		 * @throws Throwable
+		 */
 		private function getInstanceConfig(): array
 		{
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
 				return [];
 			}
-			
-			require($configFile);	
+
+			try {
+				require($configFile);
+			} catch(Throwable $e) {
+				ErrorHandler::log("Failed to require config file: " . $configFile);
+				throw $e;
+			}
 			
 			if(!isset($config)) {
 				$config = [];

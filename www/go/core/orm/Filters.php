@@ -428,9 +428,6 @@ class Filters {
 		}
 
 		$parts['endHasTime'] = $endHasTime;
-		if(!$endHasTime) {
-			$parts[1]->add(new DateInterval("P1D"));
-		}
 
 		return $parts;
 	}

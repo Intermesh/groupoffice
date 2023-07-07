@@ -16,6 +16,7 @@
 namespace GO\Files\Model;
 
 use GO;
+use go\core\fs\Blob;
 use go\core\model\Module;
 use go\modules\community\history\model\LogEntry;
 use go\core\exception\NotFound;
@@ -534,6 +535,12 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	 */
 	public function getDownloadURL($downloadAttachment=true, $relative=false) {
 		return \GO::url('files/file/download', array('id'=>$this->id, 'inline'=>$downloadAttachment?'false':'true'), $relative);
+	}
+
+	public function getBlob():Blob {
+		$blob =  Blob::fromFile(new \go\core\fs\File($this->fsFile->path()), true);
+		$blob->save();
+		return $blob;
 	}
 
 

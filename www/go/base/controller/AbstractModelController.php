@@ -429,8 +429,9 @@ class AbstractModelController extends AbstractController {
 		$modelName = $this->model;
 		$model = \GO::getModel($modelName)->findByPk($this->getPrimaryKeyFromParams($params));
 		
-		if(!$model)
+		if(!$model) {
 			throw new \GO\Base\Exception\NotFound();
+		}
 		
 		$response = $this->beforeDisplay($response, $model, $params);
 		

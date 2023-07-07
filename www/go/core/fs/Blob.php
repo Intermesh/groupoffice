@@ -4,12 +4,14 @@ namespace go\core\fs;
 
 use Exception;
 use go\core\db\Table;
+use go\core\jmap\Request;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm;
 use go\core\util\DateTime;
 
+use go\core\webclient\Extjs3;
 use PDO;
 use ReflectionException;
 use function GO;
@@ -90,6 +92,9 @@ class Blob extends orm\Entity {
 	
 	private $tmpFile;
 	private $removeFile = true;
+
+	private $hardLink = false;
+
 	private $strContent;
 
 
@@ -192,7 +197,7 @@ class Blob extends orm\Entity {
 	 * @return self
 	 * @throws Exception
 	 */
-	public static function fromFile(File $file, bool $removeFile = false): Blob
+	public static function fromFile(File $file, bool $hardLink = false): Blob
 	{
 		$hash = bin2hex(sha1_file($file->getPath(), true));
 		$blob = self::findById($hash);
@@ -213,7 +218,8 @@ class Blob extends orm\Entity {
 		}
 
 		$blob->modifiedAt = $file->getModifiedAt();
-		$blob->removeFile = $removeFile;
+		$blob->hardLink = $hardLink;
+
 		return $blob;
 	}
 
@@ -228,7 +234,9 @@ class Blob extends orm\Entity {
 	 */
 	public static function fromTmp(File $file): Blob
 	{
-		return self::fromFile($file, true);
+		$blob = self::fromFile($file);
+		$blob->removeFile = true;
+		return $blob;
 	}
 
 	/**
@@ -291,7 +299,9 @@ class Blob extends orm\Entity {
 
 				if($this->removeFile) {
 					$tempFile->move(new File($this->path()));
-				} else{
+				} else if($this->hardLink) {
+					$tempFile->link(new File($this->path()));
+				} else {
 					$tempFile->copy(new File($this->path()));					
 				}
 			} else if (!empty($this->strContent)) {
@@ -384,9 +394,9 @@ class Blob extends orm\Entity {
 	 * @param string $blobId
 	 * @return string
 	 */
-	public static function url(string $blobId): string
+	public static function url(string $blobId, $relative = false): string
 	{
-		return go()->getSettings()->URL . 'api/download.php?blob=' . $blobId;
+		return ($relative ? Extjs3::get()->getRelativeUrl() : go()->getSettings()->URL) . 'api/download.php?blob=' . $blobId;
 	}
 
 	/**
@@ -424,6 +434,29 @@ class Blob extends orm\Entity {
 			});
 		}
 		return $matches;
+	}
+
+	public static function parseTmpFilesFromHtml(?string &$html) {
+		if(empty($html)) {
+			return [];
+		}
+
+		$blobs = [];
+
+		if(preg_match_all('/<img [^>]*src="(.*core\/downloadTempFile[^>]+path=([^"&]+)[^"]*)"/', $html, $matches)) {
+			for($i = 0; $i < count($matches[0]); $i ++) {
+				$file =go()->getTmpFolder()->getFile(go()->getUserId().'/'.urldecode($matches[2][$i]));
+				if($file->exists()) {
+					$blob = self::fromFile($file, true);
+					$blob->save();
+					$html = str_replace($matches[1][$i], self::url($blob->id), $html);
+					$blobs[] = $blob->id;
+				}
+			}
+		}
+
+		return $blobs;
+
 	}
 
 	/**

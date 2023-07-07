@@ -32,21 +32,6 @@ CREATE TABLE `core_auth_password` (
   `password` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE `core_auth_token` (
-  `loginToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `accessToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
-  `CSRFToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
-  `userId` int(11) NOT NULL,
-  `createdAt` datetime NOT NULL,
-  `expiresAt` datetime DEFAULT NULL,
-  `lastActiveAt` datetime NOT NULL,
-  `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  platform varchar(190) null,
-  browser varchar(190) null,
-  `passedAuthenticators` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB;
-
 CREATE TABLE `core_blob` (
   `id` binary(40) NOT NULL,
   `type` varchar(129) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -217,7 +202,7 @@ CREATE TABLE `core_setting` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_user` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(190) NOT NULL,
   `displayName` varchar(190) NOT NULL,
   `avatarId` binary(40) DEFAULT NULL,
@@ -262,8 +247,73 @@ CREATE TABLE `core_user` (
   `last_password_change` int(11) NOT NULL DEFAULT 0,
   `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
   `homeDir` varchar (190) not null,
-  `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB;
+  `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+)
+  ENGINE=InnoDB;
+
+CREATE TABLE `core_client` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `deviceId` VARCHAR(80) NOT NULL,
+    `platform` VARCHAR(45) NOT NULL,
+    `name` VARCHAR(80) NOT NULL,
+    `version` VARCHAR(190) NOT NULL,
+    `ip` VARCHAR(45) NOT NULL,
+    `lastSeen` DATETIME NOT NULL,
+    `createdAt` DATETIME NOT NULL,
+    `status` ENUM('new', 'allowed', 'denied') NOT NULL DEFAULT 'new',
+    `needResync` TINYINT(1) NULL NULL DEFAULT 0,
+    `userId` INT(11) NOT NULL,
+    CONSTRAINT `core_client_core_user_id_fk`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE CASCADE,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `core_auth_remember_me` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `token` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+    `series` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+    `expiresAt` DATETIME NULL DEFAULT NULL,
+    `userId` INT(11) NOT NULL,
+    `clientId` INT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `core_auth_remember_me_series_index` (`series` ASC),
+    INDEX `core_auth_remember_me_core_user_id_fk` (`userId` ASC),
+    INDEX `fk_core_auth_remember_me_core_client1_idx` (`clientId` ASC),
+    CONSTRAINT `core_auth_remember_me_core_user_id_fk`
+    FOREIGN KEY (`userId`)
+    REFERENCES `core_user` (`id`)
+    ON DELETE CASCADE,
+    CONSTRAINT `fk_core_auth_remember_me_core_client1`
+    FOREIGN KEY (`clientId`)
+    REFERENCES `core_client` (`id`)
+    ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `core_auth_token` (
+    `loginToken` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NOT NULL,
+    `accessToken` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+    `CSRFToken` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+    `userId` INT(11) NOT NULL,
+    `createdAt` DATETIME NOT NULL,
+    `expiresAt` DATETIME NULL DEFAULT NULL,
+    `passedAuthenticators` VARCHAR(190) NULL DEFAULT NULL,
+    `clientId` INT UNSIGNED NOT NULL,
+    PRIMARY KEY (`loginToken`),
+    INDEX `accessToken` (`accessToken` ASC),
+    INDEX `fk_core_auth_token_core_client1_idx` (`clientId` ASC),
+    INDEX `fk_core_auth_token_core_user1_idx` (`userId` ASC),
+    CONSTRAINT `fk_core_auth_token_core_client1`
+    FOREIGN KEY (`clientId`)
+    REFERENCES `core_client` (`id`)
+    ON DELETE CASCADE,
+    CONSTRAINT `fk_core_auth_token_core_user1`
+    FOREIGN KEY (`userId`)
+    REFERENCES `core_user` (`id`)
+    ON DELETE CASCADE
+) ENGINE = InnoDB;
 
 CREATE TABLE `core_user_custom_fields` (
   `id` int(11) NOT NULL
@@ -468,11 +518,6 @@ ADD INDEX `moduleId_sortOrder` (`moduleId`, `sortOrder`);
 ALTER TABLE `core_auth_password`
   ADD PRIMARY KEY (`userId`);
 
-ALTER TABLE `core_auth_token`
-  ADD PRIMARY KEY (`loginToken`),
-  ADD KEY `userId` (`userId`),
-  ADD KEY `accessToken` (`accessToken`);
-
 ALTER TABLE `core_blob`
   ADD PRIMARY KEY (`id`),
   ADD KEY `staleAt` (`staleAt`);
@@ -549,7 +594,7 @@ ALTER TABLE `core_setting`
   ADD PRIMARY KEY (`moduleId`,`name`);
 
 ALTER TABLE `core_user`
-  ADD PRIMARY KEY (`id`),
+#   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`),
   ADD KEY `fk_user_avatar_id_idx` (`avatarId`),
   ADD KEY `email` (`email`);
@@ -661,9 +706,6 @@ ALTER TABLE `core_module`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `core_search`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `core_user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `go_advanced_searches`
@@ -1045,19 +1087,25 @@ create table core_pdf_template
 (
     id               bigint unsigned auto_increment
         primary key,
-    moduleId         int                                           not null,
-    `key`            varchar(20) collate ascii_bin                 null,
-    language         varchar(20)                   default 'en'    not null,
-    name             varchar(50)                                   not null,
-    stationaryBlobId binary(40)                                    null,
-    logoBlobId       binary(40)                                    null,
-    landscape        tinyint(1)                    default 0       not null,
-    pageSize         varchar(20)                   default 'A4'    not null,
-    measureUnit      enum ('mm', 'pt', 'cm', 'in') default 'mm'    not null,
-    marginTop        decimal(19, 4)                default 10.0000 not null,
-    marginRight      decimal(19, 4)                default 10.0000 not null,
-    marginBottom     decimal(19, 4)                default 10.0000 not null,
-    marginLeft       decimal(19, 4)                default 10.0000 not null,
+    moduleId         int(11)                                not null,
+    `key`            varchar(20) collate ascii_bin                  null,
+    language         varchar(20)                   default 'en'     not null,
+    name             varchar(50)                                    not null,
+    stationaryBlobId binary(40)                                     null,
+    logoBlobId       binary(40)                                     null,
+    landscape        tinyint(1)                    default 0        not null,
+    pageSize         varchar(20)                   default 'A4'     not null,
+    measureUnit      enum ('mm', 'pt', 'cm', 'in') default 'mm'     not null,
+    marginTop        decimal(19, 4)                default 20.0000  not null,
+    marginRight      decimal(19, 4)                default 10.0000  not null,
+    marginBottom     decimal(19, 4)                default 20.0000  not null,
+    marginLeft       decimal(19, 4)                default 10.0000  not null,
+    header           text                                           null,
+    headerX          decimal(19, 4)                default 0.0000   null,
+    headerY          decimal(19, 4)                default 10.0000  null,
+    footer           text                                           null,
+    footerX          decimal(19, 4)                default 0.0000   null,
+    footerY          decimal(19, 4)                default -20.0000 null,
     constraint core_pdf_template_core_blob_id_fk
         foreign key (logoBlobId) references core_blob (id),
     constraint core_pdf_template_ibfk_1
@@ -1144,28 +1192,7 @@ alter table go_state
             on delete cascade;
 
 
-create table core_auth_remember_me
-(
-    id int auto_increment,
-    token varchar(190) collate ascii_bin null,
-    series varchar(190) collate ascii_bin null,
-    userId int not null,
-    expiresAt datetime null,
-    `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `userAgent` varchar(190) NOT NULL,
-  platform varchar(190) null,
-  browser varchar(190) null,
-    constraint core_auth_remember_me_pk
-        primary key (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create index core_auth_remember_me_series_index
-    on core_auth_remember_me (series);
-
-alter table core_auth_remember_me
-    add constraint core_auth_remember_me_core_user_id_fk
-        foreign key (userId) references core_user (id)
-            on delete cascade;
 
 CREATE TABLE `core_permission` (
   `moduleId` INT NOT NULL,

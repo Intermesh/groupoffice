@@ -15,7 +15,7 @@ go.modules.community.tasks.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 	height: 640,
 	width:600,
 	goDialogId: 'continuetask',
-	title: t("Continue task", "tasks"),
+	title: t("Continue task", "tasks", "community"),
 	entityStore: 'Task',
 	showLinks: false,
 	showCustomfields: false,
@@ -34,7 +34,7 @@ go.modules.community.tasks.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 		const comment = this.commentField.getValue();
 		if(!Ext.isEmpty(comment)) {
 			go.Db.store('Comment').set({create:
-				{'#continueComment':{text: comment, entity: 'Task', entityId: this.currentId}}
+				{'continueComment':{text: comment, entity: 'Task', entityId: this.currentId}}
 			});
 		}
 		return true;
@@ -76,21 +76,35 @@ go.modules.community.tasks.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 					fieldLabel: t("Time"),
 					anchor: '100%'
 				}),
-				this.statusProgressField = this.statusProgressField = new Ext.form.CompositeField({
-						fieldLabel: t("Status", "tasks"),
-						items: [new go.modules.community.tasks.ProgressCombo ({
-							width:dp(150),
-							value : 'needs-action'
-						}),new Ext.form.SliderField({
-							flex: 1,
+				{
+					xtype: 'fieldset',
+					layout: 'hbox',
+					style: {
+						padding: '7px 0'
+					},
+					items: [
+						this.progressCombo = new go.modules.community.tasks.ProgressCombo({
+							flex: 30,
+							value: 'needs-action',
+							style: {
+								paddingRight: dp(32)
+							}
+
+
+						}),
+						this.percentCompleteFld = new Ext.form.SliderField({
+							fieldLabel: t("Percent complete"),
 							name: 'percentComplete',
 							minValue: 0,
 							maxValue: 100,
 							increment: 10,
-							value: 0
-						})]
-				}),
-				this.selectTaskList = new go.modules.community.tasks.TasklistCombo({
+							value: 0,
+							flex: 70
+						}),
+					]
+				},
+
+			this.selectTaskList = new go.modules.community.tasks.TasklistCombo({
 					anchor: '100%',
 					value: go.User.tasksSettings.defaultTasklistId
 				})

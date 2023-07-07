@@ -399,8 +399,8 @@ class Account extends \GO\Base\Db\ActiveRecord
 	/**
 	 * Connect to the IMAP server without selecting a mailbox
 	 *
-	 * @throws ImapAuthenticationFailedException
 	 * @return Imap|null
+	 * @throws ImapAuthenticationFailedException|\go\core\exception\NotFound
 	 */
 	public function justConnect() :?Imap
 	{
@@ -411,7 +411,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 			$acctSettings = $acct->oauth2_account;
 			if($acctSettings) {
 				if(!$token = $acctSettings->token) {
-					throw new ImapAuthenticationFailedException('OAuth2: Error retrieving token');
+					throw new ImapAuthenticationFailedException('OAuth2: Error retrieving token. Please update your refresh token.');
 				}
 				$client = Oauth2Client::findById($acctSettings->oauth2ClientId);
 				$tokenParams = [

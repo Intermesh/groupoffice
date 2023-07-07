@@ -142,10 +142,6 @@ abstract class Property extends Model {
 	public function __construct($owner, bool $isNew = true, array $fetchProperties = [], bool $readOnly = false) {
 		$this->isNew = $isNew;
 
-
-		//test
-		$readOnly = false;
-
 		if (empty($fetchProperties)) {
 			$fetchProperties = static::getDefaultFetchProperties();
 		}
@@ -698,7 +694,7 @@ abstract class Property extends Model {
 			$this->dynamicProperties[$name] = $value;
 		} else
 		{
-			throw new Exception("Can't set not existing property '$name' in '".static::class."'");
+			throw new Exception("Cannot set non-existing property '$name' in '".static::class."'");
 		}
 	}
 

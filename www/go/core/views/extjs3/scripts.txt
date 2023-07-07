@@ -220,6 +220,8 @@ customfields/type/Text.js
 customfields/type/TextDialog.js
 customfields/type/TextArea.js
 customfields/type/TextAreaDialog.js
+customfields/type/Data.js
+customfields/type/DataDialog.js
 customfields/type/Html.js
 customfields/type/HtmlDialog.js
 customfields/type/NumberDialog.js
@@ -235,6 +237,8 @@ customfields/type/Select.js
 customfields/type/TreeSelectField.js
 customfields/type/MultiSelectDialog.js
 customfields/type/MultiSelect.js
+customfields/type/AttachmentsDialog.js
+customfields/type/Attachments.js
 customfields/type/FunctionFieldDialog.js
 customfields/type/FunctionField.js
 customfields/type/CheckboxDialog.js

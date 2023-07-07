@@ -48,6 +48,13 @@ class Column {
 	 */
 	public $unique = false;
 
+
+	/**
+	 * Check if the value is unsigned
+	 * @var bool
+	 */
+	public $unsigned = false;
+
 	/**
 	 * Is this part of the primary key
 	 * 
@@ -162,7 +169,11 @@ class Column {
 	 */
 	public function getCreateSQL(): string
 	{
-		$sql = $this->dataType;		
+		$sql = $this->dataType;
+
+		if($this->unsigned) {
+			$sql .= " UNSIGNED";
+		}
 		
 		if(!$this->nullAllowed) {
 			$sql .= ' NOT NULL';

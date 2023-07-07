@@ -8,6 +8,8 @@ use GO\Base\Model\Module as LegacyModuleModel;
 use GO\Base\Module as LegacyModule;
 use GO\Base\ModuleCollection;
 use go\core\Module as CoreModule;
+use go\core\orm\EntityType;
+use go\core\orm\Query;
 use LegacyModuleCollection;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Utils;
@@ -226,12 +228,15 @@ abstract class Module extends Singleton {
 		}catch(Exception $e) {}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function checkDependenciesForUninstall() {
-		$dependentModuleNames = \go\core\Module::getModulesThatDependOn($this);
+		$dependentModuleNames = Module::getModulesThatDependOn($this);
 
-		if (count($dependentModuleNames)>0)
-			throw new Exception(sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."),implode(', ',$dependentModuleNames)));
-
+		if (count($dependentModuleNames)>0) {
+			throw new Exception(sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."), implode(', ', $dependentModuleNames)));
+		}
 	}
 
 	/**
@@ -263,6 +268,14 @@ abstract class Module extends Singleton {
 
 		if(!Installer::isInstalling()) {
 			go()->rebuildCache();
+		}
+
+		foreach(EntityType::findAll((new Query)->where(['moduleId' => $model->id])) as $e) {
+			if($e->getDefaultAclId()) {
+				go()->getDbConnection()->update('core_entity',
+					['defaultAclId' => null], ['id' => $e->getId()])
+					->execute();
+			}
 		}
 
 

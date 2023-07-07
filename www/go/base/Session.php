@@ -109,7 +109,7 @@ class Session extends Observable{
 
 		// if access token from new JMAP API connected to this session was destroyed then destroy this session too!
 		// this is set in go/core/model/Token.php
-		if(!empty($this->values['accessToken']) && !go()->getCache()->get('token-' . $this->values['accessToken']) && !Token::find()->where('accessToken' , '=', $this->values['accessToken'])->single()) {
+		if(go()->getUserId() && !empty($this->values['accessToken']) && !go()->getCache()->get('token-' . $this->values['accessToken']) && !Token::find()->where('accessToken' , '=', $this->values['accessToken'])->single()) {
 			ErrorHandler::log("Destroying session because access token '" . $this->values['accessToken'] . "' not found");
 			$this->values = [];
 		}
@@ -236,36 +236,33 @@ class Session extends Observable{
 	 * @return Model\User The logged in user model
 	 */
 	public function user(){
-		if(empty($this->values['user_id'])){
-			// Check Bearer token before returning null
-			$state = go()->getAuthState();
-			if(!$state) {
-				$state = new \go\core\jmap\State();
-			}
-			if(!empty($state->getUserId())) {
-				$this->values['user_id'] = $state->getUserId();
-				return Model\User::model()->findByPk($state->getUserId(), array(), true);
-			}
-			return null;
-		}else{		
-			
-			//also check if the user_id matches because \GO::session()->runAsRoot() may haver changed it.
-			if(empty($this->_user) || $this->_user->id!=$this->values['user_id']){
-				
-//				$cacheKey = 'GO\Base\Model\User:'.\GO::session()->values['user_id'];
-//				$cachedUser = \GO::cache()->get($cacheKey);
-//				
-//				if($cachedUser){
-////					\GO::debug("Returned cached user");
-//					self::$_user=$cachedUser;
-//				}else
-//				{
+
+		try {
+			if(empty($this->values['user_id'])){
+				// Check Bearer token before returning null
+				$state = go()->getAuthState();
+				if(!$state) {
+					$state = new \go\core\jmap\State();
+				}
+				if(!empty($state->getUserId())) {
+					$this->values['user_id'] = $state->getUserId();
+					return Model\User::model()->findByPk($state->getUserId(), array(), true);
+				}
+				return null;
+			}else {
+				//also check if the user_id matches because \GO::session()->runAsRoot() may haver changed it.
+				if(empty($this->_user) || $this->_user->id!=$this->values['user_id']){
 					$this->_user = Model\User::model()->findByPk($this->values['user_id'], array(), true);
-//					\GO::cache()->set($cacheKey, self::$_user);
-//				}
+				}
+
+				return $this->_user;
 			}
 
-			return $this->_user;
+		} catch(\PDOException $e) {
+			// not installed?
+			ErrorHandler::logException($e);
+			$this->values['user_id'] = null;
+			return null;
 		}
 	}
 	

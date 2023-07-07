@@ -695,19 +695,24 @@ a {
 				transform: scale(.8);
 				margin-top: dp(12);
 			}
-			.x-tool, .x-panel-inline-icon {
-				transform: scale(.8);
+			.x-tool {
+				//transform: scale(.8);
 				margin-top: dp(4);
 			};
+
+		.x-panel-inline-icon {
+			margin-top: dp(6);
+		}
 			height: dp(40);
 			//line-height: dp(40);
 	    }
 		.x-panel-header-text {
 			color: color($fg,'secondary-text');
 			font-size: dp(16);
+			line-height: dp(36);
 		}
 		.x-panel-body {
-			padding: dp(8) dp(16);
+			padding: 0 dp(16) dp(8);
 		}
 	}
 }
@@ -751,7 +756,9 @@ a {
 	border-radius: dp(16);
 	> * {
 		@extend %icon;
-		animation: blink .3s 7 alternate;
+		&.unseen {
+			animation: blink .3s 30 alternate;
+		}
 		margin: 0 dp(4);
 		text-shadow: 0px 1px 0px rgba(black, 0.56);
 		transform: scale(0.7);
@@ -2832,4 +2839,21 @@ table[id^="comments-ext"] b {
 		}
 
 	}
+}
+
+
+.go-color-field-dot {
+
+	border-radius: dp(8);
+	width: dp(16);
+	height: dp(16);
+	position:absolute;
+	top: dp(14);
+	left: dp(16);
+
+}
+
+.go-color-field {
+		padding-left: dp(40);
+
 }

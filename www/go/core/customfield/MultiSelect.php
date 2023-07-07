@@ -4,8 +4,11 @@ namespace go\core\customfield;
 
 use GO;
 use go\core\db\Criteria;
+use go\core\db\Table;
+use go\core\model\FieldSet;
 use go\core\orm\CustomFieldsModel;
 use go\core\orm\Entity;
+use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Query;
 
@@ -15,6 +18,17 @@ class MultiSelect extends Select {
 	
 	protected function getFieldSQL() {
 		return false;
+	}
+
+	/**
+	 * @return Table the table definition of the Entity the fieldset of this
+	 * customfield belongs to.
+	 */
+	protected function getTableDefinition() {
+		$fieldSet = FieldSet::findById($this->field->fieldSetId);
+		$entityType = EntityType::findByName($fieldSet->getEntity());
+		$table = $entityType->getClassName()::getMapping()->getPrimaryTable();
+		return $table;
 	}
 
 	public function onFieldSave(): bool
@@ -39,9 +53,10 @@ class MultiSelect extends Select {
 
 		$tableName = $this->field->tableName();
 		$multiSelectTableName = $this->getMultiSelectTableName();
+		$entityColumn = $this->getTableDefinition()->getColumn('id');
 
-		$sql = "CREATE TABLE IF NOT EXISTS `" . $multiSelectTableName . "` (
-			`id` int(11) NOT NULL,
+		$sql = "CREATE TABLE IF NOT EXISTS `$multiSelectTableName` (
+			`id` $entityColumn->dataType NOT NULL,
 			`optionId` int(11) NOT NULL,
 			PRIMARY KEY (`id`,`optionId`),
 			KEY `optionId` (`optionId`)
@@ -148,7 +163,7 @@ class MultiSelect extends Select {
 
 	public function onFieldDelete(): bool
 	{
-		return go()->getDbConnection()->query("DROP TABLE IF EXISTS `" . $this->getMultiSelectTableName() . "`;");
+		return go()->getDbConnection()->query("DROP TABLE IF EXISTS `" . $this->getMultiSelectTableName() . "`;")->execute();
 	}
 	
 	private static $joinCount = 0;

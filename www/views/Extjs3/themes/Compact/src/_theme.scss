@@ -9,10 +9,11 @@ $font-scale: 1.1;
 	--fg-divider:			#{rgba(black, 0.08)};
 	--fg-border:			#{rgba(black, 0.16)};
 	--fg-line:				#{rgba(black, 0.12)};
-	--fg-disabled:       #{rgba(black, 0.38)};
+	--fg-disabled:       #{rgba(black, 0.34)};
 	--fg-textfield-box:  rgba(255, 255, 255, 0.8); // for the border
 	--fg-textbox-line: 	#{rgba(black, 0.42)};
 	--fg-track: 	#{rgba(black, 0.26)};
+	--fg-tick: 		var(--c-primary);
 	--fg-text:           #{rgba(black, 0.87)};
 	--fg-secondary-text: #{rgba(black, 0.64)};
 	--fg-unfocused:		#{rgba(black, 0.54)};
@@ -20,7 +21,7 @@ $font-scale: 1.1;
 
 	--bg-body: 			var(--c-primary);
 	--bg-button:	  	#{mix(#fff, $ambientColor, 98%)};
-	--bg-layer: 		#{rgba(mix(#eee, $ambientColor, 92%),.74)};
+	--bg-layer: 		#{rgba(mix(#eee, $ambientColor, 92%),.84)};
 	--bg-side-bar:		#{mix(white, $ambientColor, 81%)};
 	--bg-background:  #{mix(#fafafa, $ambientColor, 95%)};
 
@@ -56,11 +57,12 @@ $font-scale: 1.1;
 	--fg-divider:			rgba(255,255,255, 0.2);
 	--fg-border:			black;
 	--fg-line:				rgba(0,0,0, 0.94);
-	--fg-disabled:       rgba(255,255,255, 0.3);
+	--fg-disabled:       rgba(255,255,255, 0.28);
 	--fg-textfield-box:  #555555;
 	--fg-textbox-line: 	#{rgba(white, 0.62)};
 
 	--fg-track: 	#{rgba(white, 0.36)};
+	--fg-tick: 		white;
 	--fg-text:           rgba(255,255,255, .89);
 	--fg-secondary-text: rgba(255,255,255, 0.7);
 	--fg-unfocused:	   rgba(255,255,255, 0.7);

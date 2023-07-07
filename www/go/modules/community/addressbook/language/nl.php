@@ -155,4 +155,5 @@ return array (
 	"Link to all contacts" => 'Koppel aan alle contacten',
 	"Exclude contacts from the address books below" => 'Contacten uit onderstaand adresboek uitsluiten',
 	"Only link to the contacts from the address books below"=> 'Alleen koppelen als contact in onderstaadn adresboek zit',
+	"Multiple Contacts" => "Meerdere contacten"
 );

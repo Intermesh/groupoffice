@@ -8,20 +8,28 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 
 	submit: true, //override for compositefield
 
+	maxHours: 23,
+
 	width: 72,
 
 	initComponent() {
+		console.log((this.maxHours+"").length);
+		const w = (this.maxHours+"").length;
 		this.items = [
 			this.hFld = new Ext.form.NumberField({
 				name:t('Hours'),
-				maxValue:23,
-				autoCreate: {tag: 'input', type: 'text', size: '2', autocomplete: 'off', maxlength: '2'},
-				maxLength:2,
+				maxValue:this.maxHours,
+				autoCreate: {tag: 'input', type: 'text', size: w, autocomplete: 'off', maxlength: w},
+				maxLength:w,
 				enableKeyEvents: true,
 				listeners: {
 					// When hour field is bigger then 2 or has string length 2 "01"
-					'keyup': (me,e) => { const v = e.target.value, key =  e.keyCode;
-						if(key >= 48 && key <= 57 && (v.length > 1 || parseInt(v) > 2)) {me.nextSibling().nextSibling().focus(); } }
+					'keyup': (me,e) => {
+						const v = e.target.value, key =  e.keyCode;
+						if(this.maxHours===23 && key >= 48 && key <= 57 && (v.length > 1 || parseInt(v) > 2)) {
+							me.nextSibling().nextSibling().focus();
+						}
+					}
 				},
 				style:{textAlign:'right'},
 				allowNegative:false,
@@ -29,7 +37,7 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 				decimals: 0,
 				selectOnFocus:true,
 				emptyText:'--',
-				width: 18,
+				width: w*9,
 				fieldClass:'',
 				focusClass:''
 			}),
@@ -58,7 +66,7 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 		];
 
 		const change = (me, val) => {
-			if(!Ext.isEmpty(this.hFld.getValue()) && !Ext.isEmpty(this.mFld.getValue()) )
+			if(!Ext.isEmpty(this.hFld.getValue()) )// && !Ext.isEmpty(this.mFld.getValue()) )
 				this.fireEvent('change', me, this.getValue())
 		}
 		this.hFld.on('change', change);
@@ -79,7 +87,10 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 
 	// override if needed
 	getErrors: function(v) {
-		return [];
+		//return [];
+		const hErrors = this.hFld.getErrors();
+		hErrors.push(...this.mFld.getErrors());
+		return hErrors;
 	},
 
 	validate : function(){

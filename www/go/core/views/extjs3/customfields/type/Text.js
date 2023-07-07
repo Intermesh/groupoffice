@@ -6,7 +6,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	
 	label: t("Text"),
 	
-	iconCls: "ic-description",	
+	iconCls: "ic-description",
+
+	// By default, a custom field type should be shown in a 'new field' menu
+	hideInNewFieldTypes: false,
 	
 	/**
 	 * Return dialog to edit this type of field

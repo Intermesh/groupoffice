@@ -29,6 +29,7 @@ $updates["201803161130"][] = function() {
 	$globalConfig = [];
 	if (file_exists('/etc/groupoffice/globalconfig.inc.php')) {
 		require('/etc/groupoffice/globalconfig.inc.php');
+		/** @var array $config */
 		$globalConfig = $config;
 	}
 
@@ -1368,7 +1369,21 @@ $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
 $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
   MODIFY `id` bigint unsigned auto_increment";
 
-$updates['202303131003'][] = "delete from core_acl_group where groupId = (select id from core_group where isUserGroupFor=1);";
+$updates['202303131003'][] = function() {
+	$sql = "delete from core_acl_group where groupId = (select id from core_group where isUserGroupFor=1)";
+
+	if(go()->getDatabase()->hasTable("em_accounts")) {
+		$sql .= " AND aclId not IN (select acl_id from em_accounts)";
+	}
+
+	echo $sql ."\n";
+
+	try {
+		go()->getDbConnection()->exec($sql);
+	}catch(Exception $e) {
+		echo "Exception: " . $e->getMessage() ."\n";
+	}
+};
 
 $updates['202303151524'][] = "ALTER TABLE `core_user` 
 ADD COLUMN `themeColorScheme` ENUM('light', 'dark', 'system') NOT NULL DEFAULT 'light' AFTER `theme`;";
@@ -1390,3 +1405,116 @@ ADD CONSTRAINT `fk_go_templates_go_template_group`
   FOREIGN KEY (`group_id`)
   REFERENCES `go_template_group` (`id`)
   ON DELETE SET NULL";
+
+//ZPUSH-2FA
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token` 
+ADD CONSTRAINT `fk_auth_token_user`
+  FOREIGN KEY (`userId`)
+  REFERENCES `core_user` (`id`)
+  ON DELETE CASCADE;";
+
+$updates['202303311400'][] = "CREATE TABLE `core_client` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `deviceId` VARCHAR(80) NOT NULL,
+    `platform` VARCHAR(45) NOT NULL,
+    `name` VARCHAR(80) NOT NULL,
+    `version` VARCHAR(190) NOT NULL,
+    `ip` VARCHAR(45) NOT NULL,
+    `lastSeen` DATETIME NOT NULL,
+    `createdAt` DATETIME NOT NULL,
+    `status` ENUM('new', 'allowed', 'denied') NOT NULL DEFAULT 'new',
+    `needResync` TINYINT(1) NULL NULL DEFAULT 0,
+    `userId` INT(11) NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_client_core_user_id_fk`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE CASCADE
+) ENGINE = InnoDB;";
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token` 
+ADD COLUMN `clientId` INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `passedAuthenticators`";
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_remember_me` 
+ADD COLUMN `clientId` INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `userId`";
+
+// create clients
+$updates['202303311400'][] = "INSERT INTO core_client (`deviceId`, `ip`,`platform`, `name`, `version`, `lastSeen`, `createdAt`, `status`, `userId`) SELECT '-' as deviceId, remoteIpAddress, platform, browser as name, userAgent as version, max(lastSeen) as lastSeen, NOW() as createdAt, 'allowed' as status, userId
+FROM (
+	(
+	SELECT remoteIpAddress, platform, browser, userAgent, max(lastActiveAt) as lastSeen, userId
+		FROM `core_auth_token` `sub`
+		WHERE  `sub`.`expiresAt` > NOW() OR `sub`.`expiresAt` IS NULL
+		GROUP BY `sub`.`remoteIpAddress`, `sub`.`platform`, `sub`.`browser`, `sub`.`userId`
+	
+) UNION (
+	SELECT DISTINCT remoteIpAddress, platform, browser, userAgent, max(DATE_SUB(expiresAt, INTERVAL 7 DAY)) as lastSeen, userId
+		FROM `core_auth_remember_me` `t`
+		WHERE  `t`.`expiresAt` > NOW()
+		GROUP BY `t`.`remoteIpAddress`, `t`.`platform`, `t`.`browser`, `t`.`userId`
+)
+) `t`
+GROUP BY `remoteIpAddress`, `platform`, `browser`, `userId`";
+
+//set clientIds
+$updates['202303311400'][] = "UPDATE `core_auth_token` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.userId = t.userId AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
+$updates['202303311400'][] = "UPDATE `core_auth_remember_me` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.userId = t.userId AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
+//remove tokens without client
+$updates['202303311400'][] = "DELETE from `core_auth_token` WHERE clientId = 0;";
+$updates['202303311400'][] = "DELETE FROM `core_auth_remember_me` WHERE clientId = 0;";
+
+// drop old columns and add constraints
+$updates['202303311400'][] = "ALTER TABLE `core_auth_remember_me` 
+DROP COLUMN `browser`,
+DROP COLUMN `platform`,
+DROP COLUMN `userAgent`,
+DROP COLUMN `remoteIpAddress`,
+ADD INDEX `fk_core_auth_remember_me_core_client1_idx` (`clientId` ASC);";
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token` 
+DROP COLUMN `browser`,
+DROP COLUMN `platform`,
+DROP COLUMN `userAgent`,
+DROP COLUMN `remoteIpAddress`,
+DROP COLUMN `lastActiveAt`,
+ADD INDEX `fk_core_auth_token_core_client1_idx` (`clientId` ASC);";
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_remember_me` 
+ADD CONSTRAINT `fk_core_auth_remember_me_core_client1`
+  FOREIGN KEY (`clientId`)
+  REFERENCES `core_client` (`id`)
+  ON DELETE CASCADE;";
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token`
+ADD CONSTRAINT `fk_core_auth_token_core_client1`
+  FOREIGN KEY (`clientId`)
+  REFERENCES `core_client` (`id`)
+  ON DELETE CASCADE;";
+
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add header text null;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add footer text null;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    alter column marginTop set default 20;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    alter column marginBottom set default 20.0000;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add headerX decimal(19, 4) default 0 null after header;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add headerY decimal(19, 4) default 10 null after headerX;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add footerX decimal(19, 4) default 0 null;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add footerY decimal(19, 4) default -12 null;";
+
+

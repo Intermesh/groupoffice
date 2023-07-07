@@ -25,7 +25,7 @@
  */
 
 namespace GO\Base\Db;
-use GO\Base\Db\PDO;
+use IteratorIterator;
 
 class Statement implements \IteratorAggregate
 {
@@ -573,7 +573,7 @@ class Statement implements \IteratorAggregate
 	
 	/**
 	 * Making the activefinder iterable
-	 * @return \IteratorIterator 
+	 * @return IteratorIterator
 	 */
 	public function getIterator()
 	{

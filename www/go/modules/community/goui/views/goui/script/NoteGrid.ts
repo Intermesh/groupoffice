@@ -39,8 +39,10 @@ export class NoteGrid extends Table<DataSourceStore> {
 		this.on("rowdblclick", async (table, rowIndex, ev) => {
 			const dlg = new NoteDialog();
 			dlg.show();
-			await dlg.load(table.store.get(rowIndex).id);
+			await dlg.load(table.store.get(rowIndex)!.id);
 		});
+
+		this.fitParent = true;
 	}
 
 }

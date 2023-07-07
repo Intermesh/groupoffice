@@ -3,6 +3,7 @@
 namespace go\core\jmap;
 
 use Exception;
+use go\core\ErrorHandler;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
 use go\core\acl\model\AclOwnerEntity;
@@ -495,10 +496,14 @@ abstract class EntityController extends Controller {
 
 		foreach($query as $e) {
 			if($this->canRead($e)) {
-				$arr = $e->toArray();
-				$arr['id'] = $e->id();
-				$unsorted[$arr['id']] = $arr;
-				$foundIds[] = $arr['id'];
+				try {
+					$arr = $e->toArray();
+					$arr['id'] = $e->id();
+					$unsorted[$arr['id']] = $arr;
+					$foundIds[] = $arr['id'];
+				} catch(\Throwable $e) {
+					ErrorHandler::logException($e);
+				}
 			}
 		}
 
@@ -1173,13 +1178,13 @@ abstract class EntityController extends Controller {
    * Merge entities into one
    *
    * The first ID in the list will be kept after the merge.
-   * @param $params
-   * @return array
+   * @param array $params
+   * @return ArrayObject
    * @throws Forbidden
    * @throws InvalidArguments
    * @throws Exception
    */
-	protected function defaultMerge($params): ArrayObject
+	protected function defaultMerge(array $params): ArrayObject
 	{
 		if(empty($params['ids'])) {
 			throw new InvalidArguments('ids is required');

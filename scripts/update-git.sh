@@ -28,6 +28,7 @@ do
 
     echo "Pulling $line"
     cd $line
+    git reset --hard
     git pull
     cd ..
   fi
@@ -35,7 +36,12 @@ done
 
 # pull main github repo
 cd ../../
-#git reset --hard
+git reset --hard
+cd views/goui/goui
+git reset --hard
+cd ../groupoffice-core
+git reset --hard
+cd $DIR/www;
 
 echo "Pulling main repository"
 
@@ -59,7 +65,7 @@ function buildGOUI() {
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
     cd $NODE_DIR;
-    npm install;
+    npm update;
     npm run build;
     cd $DIR;
 
@@ -68,7 +74,20 @@ function buildGOUI() {
   echo "DONE";
 }
 
-buildGOUI "./www/views/goui"
+echo "Building GOUI shared libs..."
+cd $DIR;
+cd ./www/views/goui/goui
+npm update --include=dev
+npm run build
+cd ../groupoffice-core
+npm update --include=dev
+npm run build
+cd ..
+npm update --include=dev
+npm run build
+npm prune --production
+cd $DIR;
+echo "DONE";
 
 buildGOUI "./www/go/modules"
 

@@ -13,6 +13,7 @@ namespace GO\Core\Controller;
 use Exception;
 use GO;
 use GO\Base\Language;
+use GO\Base\Util\Number;
 use GO\Base\Util\StringHelper;
 
 
@@ -384,7 +385,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$file = new \GO\Base\Fs\File($src);
 		
 		if($file->size() > \GO::config()->max_thumbnail_size*1024*1024){
-			throw new \Exception("Image may not be larger than " . \GO\Base\Util\Number::formatSize(\GO::config()->max_thumbnail_size*1024*1024));
+			throw new \Exception("Image may not be larger than " . Number::formatSize(\GO::config()->max_thumbnail_size*1024*1024));
 		}
 		
 
@@ -438,13 +439,19 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		if (!empty($params['nocache']) || !$thumbExists || $thumbMtime < $file->mtime() || $thumbMtime < $file->ctime()) {
 			
 			GO::debug("Resizing image");
-			$image = new \GO\Base\Util\Image($file->path());
-			if (!$image->load_success) {
+			$image = new \go\core\util\Image($file->path());
+
+
+
+			if (!$image->loadSuccess) {
 				GO::debug("Failed to load image for thumbnailing");
 				//failed. Stream original image
 				$readfile = $file->path();
 			} else {
 
+				if($image->getImageType() == IMAGETYPE_JPEG) {
+					$image->fixOrientation();
+				}
 
 				if ($zc) {
 					$image->zoomcrop($w, $h);
@@ -759,149 +766,45 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	
-	protected function actionAbout($params){	
-		$response['data']['about']=GO::t("Version: {version}<br/>
-Copyright (c) 2003-{current_year}, {company_name}<br/>
-All rights reserved.");
-		
-		$response['data']['about']=str_replace('{company_name}', 'Group-Office by Intermesh B.V.', $response['data']['about']);
+	protected function actionAbout($params){
 
-		
-		$strVersion = GO::config()->version;
-		
-//		$rssUrl = "https://sourceforge.net/api/file/index/project-id/76359/mtime/desc/limit/20/rss";
-//		
-//		$httpClient = new  \GO\Base\Util\HttpClient();
-//		
-//		$res = $httpClient->request($rssUrl);	
-//	
-//		$sXml = simplexml_load_string($res);	
-//		
-//			if($sXml){
-//
-//			$firstItem = $sXml->channel->item[0];		
-//
-//			$link = (string) $firstItem->link;
-//
-//			preg_match('/-([0-9]\.[0-9]{1,2}\.[0-9]{1,2})\./', $link, $matches);
-//
-//			$version = $matches[1];
-//
-//			$ret = version_compare(GO::config()->version, $version);
-//
-//			if($ret!== -1){
-//				$strVersion .= " <span style=\"color: red\">(v$version available)</span>";
-//			}else
-//			{
-//				$strVersion .= " (latest)";
-//			}
-//		}
-		
-		
-		$response['data']['about']=str_replace('{version}', $strVersion, $response['data']['about']);
-		$response['data']['about']=str_replace('{current_year}', date('Y'), $response['data']['about']);
-		$response['data']['about']=str_replace('{product_name}', GO::config()->product_name, $response['data']['about']);
+		$about = strtr(GO::t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved."),[
+			'{version}' => GO::config()->version,
+			'{current_year}' => date('Y'),
+			'{company_name}' => 'Group-Office by Intermesh B.V.',
+			'{product_name}' => GO::config()->product_name
+		]);
 
-		$lastRun = go()->getDbConnection()->selectSingleValue('lastrun')->from("go_cron")->where('job', '=', 'GO\\Base\\Cron\\CalculateDiskUsage')->single();
-		$response['data']['date'] =$lastRun ? \GO\Base\Util\Date::get_timestamp($lastRun) : go()->t("Never");
+		if(!go()->getAuthState()->isAdmin()) {
+			return [
+				'success' => true,
+				'data' => ['about' => strstr($about, '<br/>')] // cut off first line with version
+			];
+		}
 
-		$response['data']['users'] = \go\core\model\User::find()->where('enabled=1')->selectSingleValue('count(*)')->single();
-		
-		$response['data']['mailbox_usage']=\GO\Base\Util\Number::formatSize((int) GO::config()->get_setting('mailbox_usage'));
-		$response['data']['file_storage_usage']= \GO\Base\Util\Number::formatSize((int) GO::config()->get_setting('file_storage_usage')) .' / '.\GO\Base\Util\Number::formatSize(GO::config()->quota * 1024);
-		
-		$response['data']['database_usage']=\GO\Base\Util\Number::formatSize((int) GO::config()->get_setting('database_usage'));
-		$response['data']['total_usage']=\GO\Base\Util\Number::formatSize((int)GO::config()->get_setting('database_usage') + (int) GO::config()->get_setting('file_storage_usage') + (int) GO::config()->get_setting('mailbox_usage'));
-		$response['data']['has_usage']=true;//$response['data']['total_usage']>0;
-		
-		$response['success']=true;
-		
-		return $response;
+		$lastRun = go()->getDbConnection()->selectSingleValue('lastrun')
+			->from("go_cron")
+			->where('job', '=', 'GO\\Base\\Cron\\CalculateDiskUsage')
+			->single();
+
+		$fileUsage = (int) GO::config()->get_setting('file_storage_usage');
+		$mailUsage = (int) GO::config()->get_setting('mailbox_usage');
+		$dbUsage = (int) GO::config()->get_setting('database_usage');
+
+		return [
+			'success' => true,
+			'data' => [
+				'about' => $about,
+				'date' => $lastRun ? \GO\Base\Util\Date::get_timestamp($lastRun) : go()->t("Never"),
+				'users' => \go\core\model\User::find()->where('enabled=1')->selectSingleValue('count(*)')->single(),
+				'mailbox_usage' => Number::formatSize($mailUsage),
+				'file_storage_usage' => Number::formatSize($fileUsage) .' / '. Number::formatSize(GO::config()->quota * 1024),
+				'database_usage' => Number::formatSize($dbUsage),
+				'total_usage' => Number::formatSize($dbUsage + $fileUsage + $mailUsage),
+				'has_usage' => true
+			]
+		];
 	}
-	
-	
- /* MOVED TO CRONFILE IN Email/Cron/EmailReminders.php
-  * 
-  * Run a cron job every 5 minutes. Add this to /etc/cron.d/groupoffice :
-  *
-  STAR/5 * * * * root php /usr/share/groupoffice/groupofficecli.php -c=/path/to/config.php -r=core/cron
-  *
-  * Replace STAR with a *.
-	*
-	* @DEPRECATED
-  */
-//	protected function actionCron($params){		
-//		
-//		$this->requireCli();
-//		GO::session()->runAsRoot();
-//		
-//		$this->_emailReminders();
-//		
-//		$this->fireEvent("cron");
-//	}
-	
-// 	/**
-// 	 * MOVED TO CRONFILE IN Email/Cron/EmailReminders.php
-// 	 *
-// 	 *
-// 	 *  @DEPRECATED
-// 	 */
-//	private function _emailReminders(){
-//		$usersStmt = \GO\Base\Model\User::model()->find();
-//		while ($userModel = $usersStmt->fetch()) {
-//			if ($userModel->mail_reminders==1) {
-//				$remindersStmt = \GO\Base\Model\Reminder::model()->find(
-//					\GO\Base\Db\FindParams::newInstance()
-//						->joinModel(array(
-//							'model' => 'GO\Base\Model\ReminderUser',
-//							'localTableAlias' => 't',
-//							'localField' => 'id',
-//							'foreignField' => 'reminder_id',
-//							'tableAlias' => 'ru'								
-//						))
-//						->criteria(
-//							\GO\Base\Db\FindCriteria::newInstance()
-//								->addCondition('user_id', $userModel->id, '=', 'ru')
-//								->addCondition('time', time(), '<', 'ru')
-//								->addCondition('mail_sent', '0', '=', 'ru')
-//						)
-//				);
-//
-//				while ($reminderModel = $remindersStmt->fetch()) {
-////					$relatedModel = $reminderModel->getRelatedModel();
-//					
-////					var_dump($relatedModel->name);
-//					
-////					$modelName = $relatedModel ? $relatedModel->localizedName : GO::t("Unknown");
-//					$subject = GO::t("Reminder").': '.$reminderModel->name;
-//
-//					$time = !empty($reminderModel->vtime) ? $reminderModel->vtime : $reminderModel->time;
-//			
-//					date_default_timezone_set($userModel->timezone);
-//					
-//					$body = GO::t("Time").': '.date($userModel->completeDateFormat.' '.$userModel->time_format,$time)."\n";
-//					$body .= GO::t("Name").': '.str_replace('<br />',',',$reminderModel->name)."\n";
-//			
-////					date_default_timezone_set(GO::user()->timezone);
-//					
-//					$message = \GO\Base\Mail\Message::newInstance($subject, $body);
-//					$message->addFrom(GO::config()->webmaster_email,GO::config()->title);
-//					$message->addTo($userModel->email,$userModel->name);
-//					\GO\Base\Mail\Mailer::newGoInstance()->send($message);
-//					
-//					$reminderUserModelSend = \GO\Base\Model\ReminderUser::model()
-//						->findSingleByAttributes(array(
-//							'user_id' => $userModel->id,
-//							'reminder_id' => $reminderModel->id
-//						));
-//					$reminderUserModelSend->mail_sent = 1;
-//					$reminderUserModelSend->save();
-//				}
-//				
-//				date_default_timezone_set(GO::user()->timezone);
-//			}
-//		}
-//	}
 	
 	protected function actionThemes($params){
 		$store = new \GO\Base\Data\ArrayStore();

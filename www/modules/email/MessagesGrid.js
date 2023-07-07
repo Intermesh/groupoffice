@@ -122,28 +122,7 @@ GO.email.MessagesGrid = function(config){
 	config.animCollapse=false;
 
 	this.searchType = new Ext.form.Hidden({
-		// width:dp(140),
-		// store: new Ext.data.SimpleStore({
-		// 	fields: ['value', 'text'],
-		// 	data : [
-		// 	['any', t("Any field", "email")],
-		// 	['fts', t("Full message", "email")],
-		// 	['from', t("Sender", "email")],
-		// 	['subject', t("Subject", "email")],
-		// 	['to', t("Recipient", "email")],
-		// 	['cc', t("Recipient (CC)", "email")]
-		// 	]
-		// }),
 		value:GO.email.search_type_default || 'any'
-		// valueField:'value',
-		// displayField:'text',
-		// mode:'local',
-		// minListWidth: dp(168),
-		// triggerAction:'all',
-		// editable:false,
-		// selectOnFocus:true,
-		// forceSelection:true,
-
 	});
 
 	this.updateSearchTypeChecks = function() {
@@ -205,7 +184,7 @@ GO.email.MessagesGrid = function(config){
 			items: [{
 				value: 'any',
 				text:  t("Any field", "email"),
-				icon: 'star'
+				icon: 'select-all'
 			}, {
 				value: 'from',
 				text:  t("From", "email"),

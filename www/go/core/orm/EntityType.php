@@ -354,7 +354,7 @@ class EntityType implements ArrayableInterface {
 		$e = new static;
 		$e->id = $record['id'];
 		$e->name = $record['name'];
-    $e->clientName = $record['clientName'];
+        $e->clientName = $record['clientName'];
 		$e->moduleId = $record['moduleId'];
 		$e->highestModSeq = (int) $record['highestModSeq'];
 		$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
@@ -366,8 +366,7 @@ class EntityType implements ArrayableInterface {
 				if(!class_exists($e->className)) {
 					$e->className = 'GO\\Base\\Model\\' . ucfirst($e->name);	
 				}
-			} else
-			{
+			} else {
 				$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
 			}
 		} else {			
@@ -774,6 +773,9 @@ class EntityType implements ArrayableInterface {
 		return $acl;
 	}
 
+	/**
+	 * @throws SaveException|Exception
+	 */
 	public static function checkDatabase() {
 
 		$all = static::findAll();

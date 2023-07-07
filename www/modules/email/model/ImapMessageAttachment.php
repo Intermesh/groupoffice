@@ -94,8 +94,10 @@ class ImapMessageAttachment extends MessageAttachment
 				$imap = $this->account->openImapConnection($this->mailbox);
 				$imap->save_to_file($this->uid, $tmpFile->path(), $this->number, $this->encoding);
 			}
-			$this->setTempFile($tmpFile);
+
 			$this->size = $tmpFile->size();
+			$this->setTempFile($tmpFile);
+
 		}
 
 		return $this->getTempFile();

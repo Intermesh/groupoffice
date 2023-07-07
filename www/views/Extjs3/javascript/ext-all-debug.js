@@ -15395,7 +15395,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
     },
 
     
-    getLabelStyle: function(s){
+    getLabelStyle: function(s, target){
         var ls = '', items = [this.labelStyle, s];
         for (var i = 0, len = items.length; i < len; ++i){
             if (items[i]){
@@ -15405,6 +15405,9 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
                 }
             }
         }
+
+        ls += 'background-color: ' + target.getBackgroundColor() + ';';
+
         return ls;
     },
 
@@ -15413,7 +15416,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
     
     renderItem : function(c, position, target){
         if(c && (c.isFormField || c.fieldLabel) && c.inputType != 'hidden'){
-            var args = this.getTemplateArgs(c);
+            var args = this.getTemplateArgs(c, target);
             if(Ext.isNumber(position)){
                 position = target.dom.childNodes[position] || null;
             }
@@ -15479,21 +15482,17 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
     },
 
     
-    getTemplateArgs: function(field) {
+    getTemplateArgs: function(field, target) {
         var noLabelSep = !field.fieldLabel || field.hideLabel,
             itemCls = (field.itemCls || this.container.itemCls || '') + (field.hideLabel ? ' x-hide-label' : '');
 
-        
-        if (Ext.isIE9 && Ext.isIEQuirks && field instanceof Ext.form.TextField) {
-            itemCls += ' x-input-wrapper';
-        }
 
         return {
             id            : field.id,
             label         : field.fieldLabel,
             itemCls       : itemCls,
             clearCls      : field.clearCls || 'x-form-clear-left',
-            labelStyle    : this.getLabelStyle(field.labelStyle),
+            labelStyle    : this.getLabelStyle(field.labelStyle, target),
             elementStyle  : this.elementStyle || '',
             labelSeparator: noLabelSep ? '' : (Ext.isDefined(field.labelSeparator) ? field.labelSeparator : this.labelSeparator)
         };
@@ -17952,7 +17951,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         this.bwrap.enableDisplayMode('block');
 
         if(this.header){
-            this.header.unselectable();
+            // this.header.unselectable();
 
             
             if(this.headerAsText){
@@ -20505,7 +20504,8 @@ Ext.ProgressBar = Ext.extend(Ext.BoxComponent, {
             this.textEl = new Ext.CompositeElement([this.textTopEl.dom.firstChild, textBackEl.dom.firstChild]);
             this.textEl.setWidth(inner.offsetWidth);
         }
-        this.progressBar.setHeight(inner.offsetHeight);
+				this.progressBar.dom.style.height = "100%";
+        // this.progressBar.setHeight(inner.offsetHeight);
     },
     
     
@@ -39723,7 +39723,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent, {
 
 	labelShouldFloat: function () {
 
-		if(this.emptyText || this.placeholder) {
+		if(this.isDestroyed || this.emptyText || this.placeholder) {
 			return true;
 		}
 

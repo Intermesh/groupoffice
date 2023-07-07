@@ -51,6 +51,8 @@ class EmailRecipients{
 			return false;
 
 		$this->_addresses[trim(strtolower($email))]=!empty($personal) ? trim($personal) : null;
+
+        return $this;
 	}
 	
 	/**

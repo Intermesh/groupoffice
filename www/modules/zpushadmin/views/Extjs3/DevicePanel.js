@@ -6,28 +6,23 @@ GO.zpushadmin.DevicePanel = Ext.extend(GO.DisplayPanel,{
 	showLinks: false,
 	showComments: false,
 	
-	createTopToolbar : function(){	
-		var tbar=[];
-	
-		tbar.push({            
-	      iconCls: "btn-refresh",
-	      tooltip:t("Refresh"),      
-	      handler: this.reload,
-	      scope:this
-	  });
-	  tbar.push({            
-	      iconCls: "btn-print",
-	      tooltip:t("Print"),
-	 			handler: function(){
-					this.body.print({title:this.getTitle()});
-				},
-				scope:this
-	  });
-	  
-	  return tbar;
+	createTopToolbar(){
+	  return [{
+		  iconCls: "ic-refresh",
+		  tooltip:t("Refresh"),
+		  handler: this.reload,
+		  scope:this
+	  },{
+		  iconCls: "ic-print",
+		  tooltip:t("Print"),
+		  handler: function(){
+			  this.body.print({title:this.getTitle()});
+		  },
+		  scope:this
+	  }];
 	},
 	
-	initComponent : function(){
+	initComponent(){
 		
 		this.loadUrl=('zpushadmin/device/display');
 	
@@ -142,6 +137,6 @@ GO.zpushadmin.DevicePanel = Ext.extend(GO.DisplayPanel,{
 						'</td>'+
 					'</tr>';
 		
-		GO.zpushadmin.DevicePanel.superclass.initComponent.call(this);
+		this.supr().initComponent.call(this);
 	}
 });			

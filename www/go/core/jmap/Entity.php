@@ -7,15 +7,11 @@ use Exception;
 use GO\Base\Exception\AccessDenied;
 use go\core\App;
 use go\core\ErrorHandler;
-use go\core\fs\FileSystemObject;
 use go\core\model\Alert;
 use go\core\model\Module;
-use go\core\model\User;
-use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
-use LogicException;
 use PDO;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\acl\model\AclItemEntity;
@@ -370,7 +366,7 @@ abstract class Entity  extends OrmEntity {
   }
 
   /**
-   * Delete's the entiyy. Implements change logging for sync.
+   * Deletes the entity. Implements change logging for sync.
    *
    * @param Query $query The query to select entities in the delete statement
    * @return boolean

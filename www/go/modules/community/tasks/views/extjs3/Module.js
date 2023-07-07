@@ -71,7 +71,7 @@ go.Modules.register("community", "tasks", {
 				name: 'text',
 				type: "string",
 				multiple: false,
-				title: "Query"
+				title: t("Query")
 			},
 			{
 				title: t("Commented at"),
@@ -102,7 +102,7 @@ go.Modules.register("community", "tasks", {
 				typeConfig: {value: null}
 			},
 			{
-				title: t("Task list"),
+				title: t("List"),
 				name: 'tasklistid',
 				multiple: false,
 				type: "go.modules.community.tasks.TasklistCombo"

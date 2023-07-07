@@ -344,7 +344,7 @@
 		width: dp(22);
 		height: dp(22);
 		transition: 90ms transform ease-in-out;
-		@include var(background, c-primary);
+		background-color: var(--fg-tick);
 	}
 	&:disabled {
 		background-color: var(--bg-background);
@@ -1419,6 +1419,10 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
 		padding: dp(6) dp(8) dp(6) dp(12); // 10 top = middle of row line-height 20dp
 
+		.x-form-radio.x-form-field {
+			margin-right: 0;
+		}
+
 		.ux-row-action-cell & {
 			padding: 0;
 		}
@@ -1904,7 +1908,7 @@ td.grid-hd-group-cell {
 		}
 	}
 	&-node {
-		@extend %font-body1;
+		//@extend %font-body1;
 		
 		.x-tree-node-el:hover {background-color: $cHover;}
 		.x-tree-selected {background-color: $cSelected;}
@@ -2168,22 +2172,14 @@ td.x-date-mp-sep {
 	border-radius: $borderRadius;
 	box-sizing:content-box;
 	background-color: color($bg, 'alt');
-	opacity: .9;
-	// Todo ext doesn't put classes on floating elements (yet)
-	//transform: scale(1);
-	//transition: transform 120ms $curve-deceleration, opacity 120ms $curve-standard;
-	//&.x-hide-nosize {
-	//	transform: scale(.8);
-	//	opacity: 0;
-	//}
 	.x-tip-header-text {
 		@extend %font-body2;
 		color:white;
 	}
 	.x-tip-body {
-		@extend %font-body2;
+		@extend %font-data;
 		color:color($fg, 'alt');
-		letter-spacing: 0.04em; // fixes ugly ext bug for Lato font
+		//letter-spacing: 0.04em; // fixes ugly ext bug for Lato font
 	}
 	.x-tip-close {
 		// &:before {
@@ -2191,10 +2187,10 @@ td.x-date-mp-sep {
 		//   content: 'close';
 		// }
 	}
-	.x-tip-mr { padding-right:dp(8);}
-	.x-tip-ml,.x-tip-tl,.x-tip-bl { padding-left: dp(8);}
-	.x-tip-tc { padding-top: dp(6);}
-	.x-tip-bc { padding-bottom: dp(6);}
+	.x-tip-mr { padding-right:dp(12);}
+	.x-tip-ml,.x-tip-tl,.x-tip-bl { padding-left: dp(12);}
+	.x-tip-tc { padding-top: dp(8);}
+	.x-tip-bc { padding-bottom: dp(8);}
 	.x-tip-mc { @extend %font-body2;}
 }
 

@@ -551,7 +551,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		if(!empty($tag)){
 			if($params['content_type']=='html') {
-				$params['htmlbody'] .= '<div style="display:none">' . $tag . '</div>';
+				$params['htmlbody'] .= '<div style="width:1px;height:1px;padding-left:1px;overflow:hidden">' . $tag . '</div>';
 			} else {
 				$params['plainbody'] .= "\n\n" . $tag . "\n\n";
 			}
@@ -830,10 +830,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 * When changing content type or template in email composer we don't want to
 	 * reset some header fields.
 	 *
-	 * @param type $response
-	 * @param type $params
+	 * @param array $response
+	 * @param array $params
+	 * @param bool $unsetSubject
+	 *
 	 */
-	private function _keepHeaders(&$response, $params, $unsetSubject = true)
+	private function _keepHeaders(array &$response, array $params, bool $unsetSubject = true)
 	{
 		if (!empty($params['keepHeaders'])) {
 			unset(
@@ -1321,10 +1323,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	protected function _getSpamMoveMailboxName($mailUid,$mailboxName,$accountId)
 	{
 		if (strtolower($mailboxName)=='spam') {
-			//return '<div class="em-spam-move-block">'.\GO::t("This message has been identified as spam. Click", "email").' <a style="color:blue;" href="javascript:GO.email.moveToInbox(\''.$mailUid.'\','.$accountId.');">'.\GO::t("here", "email").'</a> '.\GO::t("if you think this message is NOT spam.", "email").'</div>';
 			return 1;
 		} else {
-			//return '<div class="em-spam-move-block">'.\GO::t("Click", "email").' <a style="color:blue;" href="javascript:GO.email.moveToSpam(\''.$mailUid.'\',\''.$mailboxName.'\','.$accountId.');">'.\GO::t("here", "email").'</a> '.\GO::t("if you think this message is spam.", "email").'</div>';
 			return 0;
 		}
 		

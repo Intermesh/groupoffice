@@ -90,7 +90,7 @@ class Request extends Singleton{
 	 * @return string
 	 */
 	public function getPath() : string {
-		return isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : "";
+		return $_SERVER['PATH_INFO'] ?? "";
 	}
 	
 	/**

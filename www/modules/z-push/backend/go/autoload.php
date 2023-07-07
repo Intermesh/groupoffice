@@ -1,14 +1,14 @@
 <?php
-require(__DIR__ . "/config.php");
 require(__DIR__ . "/goSyncUtils.php");
-require(__DIR__ . "/goImporter.php");
-require(__DIR__ . "/goExporter.php");
-require(__DIR__ . "/goBaseBackendDiff.php");
-require(__DIR__ . "/GoImapStreamWrapper.php");
-require(__DIR__ . "/goCalendar.php");
+require(__DIR__ . "/Store.php");
+require(__DIR__ . "/ChangeState.php");
+require(__DIR__ . "/ChangeImporter.php");
+require(__DIR__ . "/ChangeExporter.php");
+require(__DIR__ . "/StubStore.php");
+require(__DIR__ . "/CalendarStore.php");
 require(__DIR__ . "/ContactConvertor.php");
-require(__DIR__ . "/goContact.php");
-require(__DIR__ . "/goMail.php");
-require(__DIR__ . "/goNote.php");
-require(__DIR__ . "/goTask.php");
+require(__DIR__ . "/ContactStore.php");
+require(__DIR__ . "/MailStore.php");
+require(__DIR__ . "/NoteStore.php");
+require(__DIR__ . "/TaskStore.php");
 require(__DIR__ . "/go.php");

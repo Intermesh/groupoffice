@@ -61,10 +61,23 @@
 			this.store.getRange().forEach((rec) => {
 				this.show(rec.data);
 			});
+
+			//remove alerts that are no longer in the store
+			go.Notifier.getAll().forEach((alert) => {
+				if(alert.itemId.substring(0,11) == 'core-alert-') {
+					const alertId = alert.itemId.substring(11);
+					if(!this.store.getById(alertId)) {
+						alert.replaced = true;
+						alert.destroy();
+					}
+				}
+			});
 		},
 
 		show : function(alert) {
-			const now = new Date(), id = 'core-alert-' + alert.id;
+			const now = new Date(), triggerDate = new Date (alert.triggerAt), id = 'core-alert-' + alert.id;
+
+			if(triggerDate > now) return;
 
 			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
 
@@ -84,23 +97,21 @@
 					handler: () => {
 						go.Entities.get(alert.entity).goto(alert.entityId);
 					},
-					buttons: [{
-						text: t("Open"),
-						handler: (btn) => {
-							go.Notifier.hideNotifications();
-							btn.findParentByType("panel").handler();
-						}
-					}, {
-						text: t("Dismiss"),
-						handler: (btn, e) => {
-							//needed to prevent notification area closing
-							e.stopEvent();
-							btn.findParentByType("panel").destroy();
-						}
-					}]
+					// buttons: [{
+					// 	text: t("Open"),
+					// 	handler: (btn) => {
+					// 		go.Notifier.hideNotifications();
+					// 		btn.findParentByType("panel").handler();
+					// 	}
+					// }, {
+					// 	text: t("Dismiss"),
+					// 	handler: (btn, e) => {
+					// 		//needed to prevent notification area closing
+					// 		e.stopEvent();
+					// 		btn.findParentByType("panel").destroy();
+					// 	}
+					// }]
 				};
-
-
 
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
 

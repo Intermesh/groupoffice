@@ -18,6 +18,7 @@ use go\core\convert\UserSpreadsheet;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\Environment;
 use go\core\exception\ConfigurationException;
 use go\core\exception\NotFound;
 use go\core\Installer;
@@ -292,11 +293,14 @@ class User extends AclItemEntity {
 	 */
 	private $passwordVerified = true;
 
+	public $clients;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
+			->addMap('clients', Client::class, ['id' => 'userId'])
 			->addScalar('groups', 'core_user_group', ['id' => 'userId']);
 	}
 
@@ -806,10 +810,6 @@ class User extends AclItemEntity {
 			UserDisplay::entityType()->changes([[$this->id, $this->findAclId(), 0]]);
 		}
 
-		if(!$this->saveAuthorizedClients()) {
-			return false;
-		}
-
 		return true;
 	}
 
@@ -996,7 +996,40 @@ class User extends AclItemEntity {
 		}
 	}
 	
+	public function currentClient() : ?Client {
+        if(Environment::get()->isCli()) {
+            $where = [
+                'userId' => $this->id,
+                'ip' => 'CLI',
+                'platform' => 'CLI',
+                'name' => 'CLI'
+            ];
+        } else {
+            $ua_info = \donatj\UserAgent\parse_user_agent();
+            $where = [
+                'userId' => $this->id,
+                'ip' => $_SERVER['REMOTE_ADDR'] ?? 'CLI',
+                'platform' => $ua_info['platform'],
+                'name' => $ua_info['browser']
+            ];
+        }
 
+		return Client::internalFind([],false, $this)->where($where)->single();
+	}
+
+	public function clientByDevice($deviceId) {
+		if($deviceId === '-'){
+			return null;
+		}
+		$client = Client::internalFind([],false, $this)->where(['deviceId' => $deviceId, 'userId' => $this->id])->single();
+		if(empty($client)) {
+			$client = new Client($this);
+			$client->userId = $this->id;
+			$client->deviceId = $deviceId;
+			return $client;
+		}
+		return $client;
+	}
 	
 	/**
 	 * Add user to group if not already in it.
@@ -1296,85 +1329,6 @@ class User extends AclItemEntity {
 		}
 	}
 
-	private $getAuthorizedClients;
-
-	/**
-	 * Get authorized clients with ['remoteIpAddress', 'platform', 'browser']
-	 * @return array[]
-	 * @throws Exception
-	 */
-	public function getAuthorizedClients(): array
-	{
-		if(!isset($this->getAuthorizedClients)) {
-			$this->getAuthorizedClients =
-				go()->getDbConnection()->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
-					->from(
-						go()->getDbConnection()
-							->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
-							->from('core_auth_token')
-							->where('userId', '=', $this->id)
-							->andWhere('expiresAt', '>', new DateTime())
-							->groupBy(['remoteIpAddress', 'platform', 'browser'])
-							->union(
-								go()->getDbConnection()
-									->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
-									->distinct()
-									->from('core_auth_remember_me')
-									->where('userId', '=', $this->id)
-									->andWhere('expiresAt', '>', new DateTime())
-									->groupBy(['remoteIpAddress', 'platform', 'browser'])
-							)
-					)->groupBy(['remoteIpAddress', 'platform', 'browser'])
-				->all();
-
-			foreach ($this->getAuthorizedClients as &$client) {
-//			try {
-//				$geo = Geolocation::locate($client['remoteIpAddress']);
-//				$client['countryCode'] = $geo['countryCode'];
-//			} catch(\Exception $e) {
-//				ErrorHandler::logException($e);
-//				$client['countryCode'] = null;
-//			}
-
-				$client['expiresAt'] = (DateTime::createFromFormat(Column::DATETIME_FORMAT, $client['expiresAt']));
-			}
-		}
-
-		return $this->getAuthorizedClients;
-	}
-
-	private $authorizedClients;
-
-	public function setAuthorizedClients($clients) {
-		$this->authorizedClients = $clients;
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	private function saveAuthorizedClients(): bool
-	{
-		if(!isset($this->authorizedClients)) {
-			return true;
-		}
-
-		$query = (new Query)
-			->where('userId', '=', $this->id)
-			->andWhere('expiresAt', '>', new DateTime());
-
-		if(!empty($this->authorizedClients)) {
-			$c = new Criteria();
-			foreach ($this->authorizedClients as $client) {
-				unset($client['countryCode'], $client['expiresAt']);
-				$c->andWhereNot($client);
-			}
-
-			$query->andWhere($c);
-		}
-
-		return Token::delete($query) && RememberMe::delete($query);
-	}
-
 	public function findAclId(): ?int
 	{
 		return $this->getPersonalGroup()->findAclId();
@@ -1390,7 +1344,7 @@ class User extends AclItemEntity {
 		if (!$user) {
 
 			if(!go()->getSettings()->allowRegistration) {
-				throw new NotFound("User not found");
+				throw new NotFound("User not found and registration not allowed");
 			}
 
 			$user = new User();

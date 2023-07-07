@@ -29,6 +29,7 @@ namespace GO\Email\Model;
 
 use GO\Base\Fs\Folder;
 use GO\Base\Fs\File;
+use go\core\fs\Blob;
 
 class MessageAttachment extends \GO\Base\Model
 {
@@ -40,6 +41,7 @@ class MessageAttachment extends \GO\Base\Model
 	public $size = 0;
 	public $encoding = "";
 	public $disposition = "";
+	public $blobId;
 	public $_tmp_file;
 	
 	/**
@@ -105,8 +107,15 @@ class MessageAttachment extends \GO\Base\Model
 		if(!$file->isTempFile()) {
 			throw new \Exception("File $file->name is not a temporary file");
 		}
-		$this->_tmp_file = $file->stripTempPath();
+
 		$this->size = $file->size();
+
+		$blob = Blob::fromTmp(new \go\core\fs\File($file->path()));
+		$blob->save();
+		$this->blobId = $blob->id;
+
+		$this->_tmp_file = $blob->getFile()->getPath();
+
 	}
 	
 	/**
@@ -137,6 +146,10 @@ class MessageAttachment extends \GO\Base\Model
 	 */
 	public function getUrl(): string
 	{
+		if($this->blobId) {
+			return Blob::url($this->blobId, true);
+		}
+
 		if ($this->getExtension()=='dat') {
 			return \GO::url('email/message/tnefAttachmentFromTempFile', array('tmp_file' => $this->getTempFile()));
 		}
@@ -172,7 +185,8 @@ class MessageAttachment extends \GO\Base\Model
 			"extension" => $this->getExtension(),
 			"encoding" => $this->encoding,
 			"disposition" => $this->disposition,
-			"isInvite" => $this->isVcalendar()
+			"isInvite" => $this->isVcalendar(),
+			"blobId" => $this->blobId
 		);
 	}
 

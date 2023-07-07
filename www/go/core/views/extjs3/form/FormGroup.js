@@ -237,7 +237,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 
 		this.bbar = [
-			Ext.apply(this.btnCfg,{
+			this.addButton = new Ext.Button(Ext.apply(this.btnCfg,{
 				//iconCls: this.addButtonIconCls,
 				text: this.addButtonText || this.btnCfg.text || t("Add"),
 				//cls: 'field-like-btn',
@@ -248,7 +248,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				
 				},
 				scope: this
-			})
+			}))
 		];
 	},
 	
@@ -302,7 +302,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			this.addRow(true);
 		} else
 		{
-			c.items.get('edit-tb').items.get('del-btn').focus();
+			const delBtn = c.items.get('edit-tb').items.get('del-btn');
+
+			if(delBtn.rendered) {
+				delBtn.focus();
+			} else {
+				this.addButton.focus();
+			}
 		}
 
 	},
@@ -335,7 +341,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				this.ownerCt.ownerCt.destroy();
 				me.dirty = true;
 
-				this.fireEvent("change", me, me.getValue());
+				me.fireEvent("change", me, me.getValue());
 			}
 		}),
 			rowId  = Ext.id();
@@ -469,6 +475,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	reset : function() {
 		this.setValue([]);
 		this.dirty = false;
+		if(this.startWithItem && this.items.getCount() == 0) {
+			this.addPanel(true);
+		}
 	},
 
 	setValue: function (records) {

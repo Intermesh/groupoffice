@@ -31,6 +31,8 @@ GO.form.ColorField =  Ext.extend(function(config){
 
 	config = config || {};
 
+	config.cls = "go-color-field";
+
 	if(!config.colors) {
 		if(config.dark) {
 			config.colors = [
@@ -225,10 +227,8 @@ GO.form.ColorField =  Ext.extend(function(config){
 			
 			this.curColor = hex;
 
-			this.el.setStyle( {
-				'background-color': hex ? '#' + hex : "transparent",
-				'background-image': 'none'
-			});
+			this.dot.style.backgroundColor = hex ? '#' + hex : "transparent";
+
 			if(!this.showHexValue) {
 				this.el.setStyle({'text-indent': '-100px'});
 			}
@@ -236,6 +236,17 @@ GO.form.ColorField =  Ext.extend(function(config){
 			if(this.menu && !GO.util.empty(this.curColor) && Ext.isDefined(this.colors) && this.colors.indexOf(this.curColor)>-1)
 				this.menu.palette.select(this.curColor);
 		}
+	},
+
+	onRender : function(ct, position){
+		GO.form.ColorField.superclass.onRender.call(this, ct, position);
+		this.initColorDot();
+	},
+
+	initColorDot : function() {
+		this.dot = document.createElement("div");
+		this.dot.classList.add("go-color-field-dot");
+		this.wrap.dom.append(this.dot)
 	},
 	
 	checkHex : function(hex) {
