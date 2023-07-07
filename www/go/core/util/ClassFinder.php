@@ -107,14 +107,17 @@ class ClassFinder {
 	 * @template T
 	 * @param class-string<T> $name Parent class name or interface eg. go\core\orm\Record::class
 	 * @return class-string<T>[]
-	 * @noinspection PhpDocMissingThrowsInspection
 	 */
 	public function findByParent(string $name): array
 	{
 		return $this->findBy(function($className) use ($name) {
-			/** @noinspection PhpUnhandledExceptionInspection */
-			$reflection = new ReflectionClass($className);
-			return !$reflection->isTrait()  && !$reflection->isInterface() && !$reflection->isAbstract() && ($reflection->isSubclassOf($name) || in_array($name, $reflection->getInterfaceNames()));
+			try {
+				$reflection = new ReflectionClass($className);
+				return !$reflection->isTrait()  && !$reflection->isInterface() && !$reflection->isAbstract() && ($reflection->isSubclassOf($name) || in_array($name, $reflection->getInterfaceNames()));
+			} catch(\Error $e) { // class not found?
+				return false;
+			}
+
 		});
 	}
 	
@@ -128,7 +131,11 @@ class ClassFinder {
 	public function findByTrait(string $name): array
 	{
 		 return $this->findBy(function($className) use($name){
-			return in_array($name, class_uses($className));
+			 try {
+				return in_array($name, class_uses($className));
+			 } catch(\Error $e) { // class not found?
+				 return false;
+			 }
 		});
 	}
 
@@ -236,3 +243,4 @@ class ClassFinder {
 	}
 
 }
+

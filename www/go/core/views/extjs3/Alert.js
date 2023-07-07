@@ -61,6 +61,17 @@
 			this.store.getRange().forEach((rec) => {
 				this.show(rec.data);
 			});
+
+			//remove alerts that are no longer in the store
+			go.Notifier.getAll().forEach((alert) => {
+				if(alert.itemId.substring(0,11) == 'core-alert-') {
+					const alertId = alert.itemId.substring(11);
+					if(!this.store.getById(alertId)) {
+						alert.replaced = true;
+						alert.destroy();
+					}
+				}
+			});
 		},
 
 		show : function(alert) {
