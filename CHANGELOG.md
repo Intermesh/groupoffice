@@ -13,7 +13,7 @@
 - Core: Improved notifications
 - Projects: Fixed display of project custom field
 - Support: remove you were assigned to alert when commenting
-- Billing: fixed status filter losing the setting when only status "None" was selected
+- Billing: fixed status filter losing the setting when only status "None" was selected 
 - Support/Task: change status to needs action when reassigning
 - Core: remove alerts when they are dismissed server side
 - Core: Hide personal groups when adding groups to popup reminders and announcements
