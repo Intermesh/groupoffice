@@ -558,6 +558,7 @@ class Task extends AclItemEntity {
 		$values = $this->toArray();
 		unset($values['id']);
 		unset($values['progress']);
+		unset($values['responsibleUserId']);
 		unset($values['percentComplete']);
 		unset($values['progressUpdated']);
 		unset($values['freeBusyStatus']);
