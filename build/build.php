@@ -195,15 +195,17 @@ class Builder
 	private function buildNodeCore()
 	{
 		cd($this->buildDir . "/" . $this->packageName);
-//		cd("views/goui/goui");
-//		run("npm install --include=dev");
+		cd("views/goui/goui");
+		run("npm install --include=dev");
+        run("npm up");
 //		run("npm run build");
 //		run("npm prune --production");
-//        cd("../groupoffice-core");
-//		run("npm install --include=dev");
+        cd("../groupoffice-core");
+		run("npm install --include=dev");
+        run("npm up");
 //		run("npm run build");
 
-		cd("views/goui");
+		cd("../");
 		run("npm install --include=dev");
         run("npm up");
 		run("npm run build");
