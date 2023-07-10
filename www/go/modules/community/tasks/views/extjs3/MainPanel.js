@@ -145,47 +145,48 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					}
 				]
 			}));
-		} else {
-			this.sidePanel.items.insert(1, Ext.create({
-				xtype: "panel",
-				layout: "form",
-				tbar: [
-					{
-						xtype:"tbtitle",
-						text: t("Assigned", 'tasks','community')
-					}
-				],
-				items: [
-					{xtype:'fieldset',items:[{
-						hideLabel: true,
-						xtype: "checkbox",
-						boxLabel: t("Mine", 'tasks','community'),
-						checked: showAssignedToMe,
-						listeners: {
-							scope: this,
-							check: function(cb, checked) {
-								Ext.state.Manager.set(this.statePrefix + "assigned-to-me", checked);
-								this.setAssignmentFilters();
-								this.taskGrid.store.load();
-							}
-						}
-					},{
-						hideLabel: true,
-						xtype: "checkbox",
-						boxLabel: t("Unassigned", "tasks", "community"),
-						checked: showUnassigned,
-						listeners: {
-							scope: this,
-							check: function(cb, checked) {
-								Ext.state.Manager.set(this.statePrefix + "show-unassigned", checked);
-								this.setAssignmentFilters();
-								this.taskGrid.store.load();
-							}
-						}
-					}]}
-				]
-			}));
 		}
+
+		this.sidePanel.items.insert(this.support ? 1 : 2, Ext.create({
+			xtype: "panel",
+			layout: "form",
+			tbar: [
+				{
+					xtype:"tbtitle",
+					text: t("Assigned", 'tasks','community')
+				}
+			],
+			items: [
+				{xtype:'fieldset',items:[{
+					hideLabel: true,
+					xtype: "checkbox",
+					boxLabel: t("Mine", 'tasks','community'),
+					checked: showAssignedToMe,
+					listeners: {
+						scope: this,
+						check: function(cb, checked) {
+							Ext.state.Manager.set(this.statePrefix + "assigned-to-me", checked);
+							this.setAssignmentFilters();
+							this.taskGrid.store.load();
+						}
+					}
+				},{
+					hideLabel: true,
+					xtype: "checkbox",
+					boxLabel: t("Unassigned", "tasks", "community"),
+					checked: showUnassigned,
+					listeners: {
+						scope: this,
+						check: function(cb, checked) {
+							Ext.state.Manager.set(this.statePrefix + "show-unassigned", checked);
+							this.setAssignmentFilters();
+							this.taskGrid.store.load();
+						}
+					}
+				}]}
+			]
+		}));
+
 
 		this.centerPanel = new Ext.Panel({
 			layout:'responsive',
