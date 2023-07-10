@@ -196,13 +196,13 @@ class Builder
 	{
 		cd($this->buildDir . "/" . $this->packageName);
 		cd("views/goui/goui");
-		run("npm install --include=dev");
+		run("npm ci");
 
         cd("../groupoffice-core");
-		run("npm install --include=dev");
+		run("npm ci");
 
 		cd("../");
-		run("npm install --include=dev");
+		run("npm ci");
 		run("npm run build");
 		run("npm prune --production");
 
@@ -225,8 +225,7 @@ class Builder
 		foreach ($packageFiles as $packageFile) {
 			$nodeDir = dirname($packageFile);
 			cd($nodeDir);
-			run("npm install");
-			run("npm up");
+			run("npm ci");
 			run("pwd");
 			run("npm run build");
 			run("npm prune --production");

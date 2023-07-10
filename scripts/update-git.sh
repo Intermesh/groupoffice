@@ -77,13 +77,13 @@ function buildGOUI() {
 echo "Building GOUI shared libs..."
 cd $DIR;
 cd ./www/views/goui/goui
-npm update --include=dev
+npm ci
 
 cd ../groupoffice-core
-npm update --include=dev
+npm ci
 
 cd ..
-npm update --include=dev
+npm ci
 npm run build
 npm prune --production
 cd $DIR;
