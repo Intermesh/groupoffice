@@ -1,3 +1,5 @@
+- Core: Obsolete noreply_email setting will return systemEmail system setting
+
 07-07-2023: 6.7.38
 - Leavedays: Automatically finish previous agreement when creating a new one
 - Leavedays: reload when editing special leave
