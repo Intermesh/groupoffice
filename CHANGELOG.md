@@ -1,6 +1,7 @@
 - Core: Obsolete noreply_email setting will return systemEmail system setting
 - Tasks: fix sorting of task lists on change
 - Tasks: filter on assigned to.
+- Addressbook: bugfix in adding recipients from addressbook group
 
 07-07-2023: 6.7.38
 - Leavedays: Automatically finish previous agreement when creating a new one
