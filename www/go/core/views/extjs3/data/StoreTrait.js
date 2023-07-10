@@ -45,7 +45,7 @@ go.data.StoreTrait = {
 
 				if(response.isAbort) {
 					//ignore aborts.
-				} else if(response.isTimeout){
+				} else if(response.isTimeout || response.status == 0){
 					console.error(response);
 
 					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));

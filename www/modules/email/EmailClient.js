@@ -49,7 +49,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		}, this);
 		this.messagesStore.on('exception',
 			function( store, type, action, options, response){
-				if(response.isTimeout){
+				if(response.isTimeout || response.status == 0){
 					console.error(response);
 					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
 				} else if(!options.reader.jsonData || GO.jsonAuthHandler(options.reader.jsonData, this.load, this)) {

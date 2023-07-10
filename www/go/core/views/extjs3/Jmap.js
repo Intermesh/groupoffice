@@ -443,7 +443,7 @@ go.Jmap = {
 					return;
 				}
 
-				if(response.isTimeout) {
+				if(response.isTimeout || response.status == 0) {
 					console.error(response);
 
 					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
@@ -457,8 +457,16 @@ go.Jmap = {
 					this.requestOptions[clientCallId].reject({message: response.responseText});
 					delete this.requestOptions[clientCallId];
 				}
-				if(response.status !== 504) // gateway timeout
-					GO.errorDialog.show(t("Sorry, an error occurred") + ": " + response.responseText);
+				if(response.status !== 504) {// gateway timeout
+
+					let msg = t("Sorry, an error occurred");
+
+					if(response.responseText) {
+						msg += ": " + response.responseText;
+					}
+
+					GO.errorDialog.show(msg);
+				}
 				
 			}
 		});
