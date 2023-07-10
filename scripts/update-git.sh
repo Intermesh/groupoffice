@@ -93,7 +93,7 @@ buildGOUI "./www/go/modules"
 
 cd www
 
-composer update -n --no-dev -o
+composer install -n --no-dev -o
 
 if [ -z "$CONFIG" ]; then
   echo NOTE: Not upgrading database because no config file was passed. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php
