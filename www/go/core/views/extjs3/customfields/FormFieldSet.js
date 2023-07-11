@@ -86,7 +86,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					this.load(form, form.getValues(), fields);
 				});
 			} else {
-				form?.getForm().on("beforeaction", (form, action) => {
+				form.getForm().on("beforeaction", (form, action) => {
 					if (action.type === "load") {
 						this.load(form, form.getFieldValues(), fields);
 					}
@@ -102,7 +102,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		if(this.fieldSet.collapseIfEmpty) {
 			isModified = false;
 			for (const field of customFields) {
-				const name = field.name?.replace('customFields.', '');
+				const name = field.name.replace('customFields.', '');
 				if (name) {
 					if (!(name in values.customFields) || values.customFields[name] == field.value ||
 						(Ext.isEmpty(values.customFields[name]) && Ext.isEmpty(field.value))) {
