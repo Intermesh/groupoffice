@@ -34,6 +34,7 @@ final class Attachments extends MultiSelect
 		$entityColumn = $this->getTableDefinition()->getColumn('id');
 
 		$sql = "CREATE TABLE IF NOT EXISTS `" . $multiSelectTableName . "` (
+			`order` unsigned bigint AUTO_INCREMENT,
 			`modelId` $entityColumn->dataType NOT NULL,
 			`blobId` BINARY(40) NOT NULL,
 			`name` VARCHAR(192),
@@ -61,10 +62,11 @@ final class Attachments extends MultiSelect
 			return true;
 		}
 		$blobs = [];
-		foreach($this->optionsToSave as $attachment) {
+		foreach($this->optionsToSave as $i => $attachment) {
 			$blobs[$attachment['blobId']] = true;
 			if(!go()->getDbConnection()->replace($this->getMultiSelectTableName(), [
 				'modelId' => $entity->id,
+				'order' => $i,
 				'blobId' => $attachment['blobId'],
 				'name' => $attachment['name'] ?? '',
 				'description' => $attachment['description'] ?? ''
@@ -98,6 +100,7 @@ final class Attachments extends MultiSelect
 			->select("blobId, name, description")
 			->from($this->getMultiSelectTableName())
 			->where(['modelId' => $entity->id])
+			->orderBy(['order'=>'ASC'])
 			->all();
 	}
 
