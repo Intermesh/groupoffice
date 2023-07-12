@@ -1,12 +1,15 @@
-<?php /** @noinspection ALL */
+<?php
 
 namespace go\core\http;
 
+use Exception as ExceptionAlias;
 use go\core\exception\Forbidden;
 use go\core\exception\NotFound;
 use go\core\ErrorHandler;
+use go\core\util\StringUtil;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
+use Throwable;
 
 /**
  * Simple RESTful router
@@ -53,11 +56,12 @@ class Router {
    * @param string $regex The regular expression to match with the router path. The path is relative to the script the router is created in.
    * @param string $httpMethod eg. GET, POST, PUT etc.
    * @param string $controller Controller class name
-   * @param string $methodController method This method may output directly or return data to pass to Response::get()->output(). (An array for json);
+   * @param string $method Controller method This method may output directly or return data to pass to Response::get()->output(). (An array for json);
    * 
    * @return $this 
    */
-  public function addRoute($regex, $httpMethod, $controller, $method) {
+  public function addRoute(string $regex, string $httpMethod, string $controller, string $method): Router
+  {
     if(!isset($this->routes[$regex])) {
       $this->routes[$regex] = [];
     }
@@ -86,12 +90,12 @@ class Router {
 
       $response = call_user_func_array([$c, $route['method']], $route['params']);		
       
-    } catch(\go\core\exception\Forbidden $e) {
+    } catch(Forbidden $e) {
     	if(!headers_sent()) {
 		    Response::get()->setStatus(401, $e->getMessage());
 	    }
       ErrorHandler::logException($e);
-    } catch(\go\core\exception\NotFound $e) {
+    } catch(NotFound $e) {
 	    if(!headers_sent()) {
 		    Response::get()->setStatus(404, $e->getMessage());
 	    }
@@ -101,9 +105,9 @@ class Router {
 		    Response::get()->setStatus($e->code, $e->getMessage());
 	    }
       ErrorHandler::logException($e);      
-    } catch(\Exception $e) {
+    } catch(Throwable $e) {
 	    if(!headers_sent()) {
-		    Response::get()->setStatus(500, str_replace("\n", " - ",$e->getMessage()));
+		    Response::get()->setStatus(500, StringUtil::normalizeCrlf($e->getMessage(), " - "));
 	    }
 
       echo '<h1>' . $e->getMessage() .'</h1>';
@@ -148,8 +152,9 @@ class Router {
 	  echo $response->getBody();
   }
 
-  private function findRoute() {
-    $path = isset($_SERVER['PATH_INFO']) ? ltrim($_SERVER['PATH_INFO'], '/') : "";
+  private function findRoute()
+  {
+    $path = ltrim(Request::get()->getPath(), '/');
     
     $method = Request::get()->getHeader('X-WOPI-Override');
     if(!$method) {

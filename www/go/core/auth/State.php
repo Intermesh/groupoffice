@@ -63,11 +63,17 @@ abstract class State {
 	 */
 	protected function getBaseUrl(): string
 	{
-		if(go()->getEnvironment()->isCli()) {
+		if(go()->getEnvironment()->isCli() || strpos(dirname($_SERVER['SCRIPT_NAME']), 'modules') !== false) {
 			return go()->getSettings()->URL . 'api';
 		} else{
 			$url = Request::get()->isHttps() ? 'https://' : 'http://';
 			$url .= Request::get()->getHost(false) . dirname($_SERVER['SCRIPT_NAME']);
+
+			// HACK for old framework index.php
+			if(substr($url, -4) !== '/api'){
+				$url .= '/api';
+			}
+
 			return $url;
 		}
 	}

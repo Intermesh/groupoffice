@@ -22,8 +22,10 @@ namespace go\core {
 	use go\core\orm\EntityType;
 	use go\core\orm\exception\SaveException;
 	use go\core\orm\Property;
+	use go\core\orm\SearchableTrait;
 	use go\core\Settings as CoreSettings;
 	use go\core\util\ArrayObject;
+	use go\core\util\ClassFinder;
 	use go\core\webclient\Extjs3;
 	use go\core\model\User;
 	use go\core\model\Settings;
@@ -54,6 +56,20 @@ namespace go\core {
 
 
 		private $eventsEnabled = true;
+
+		/**
+		 * @throws Exception
+		 */
+		public function rebuildSearch()
+		{
+			$classFinder = new ClassFinder();
+			$entities = $classFinder->findByTrait(SearchableTrait::class);
+
+			foreach ($entities as $cls) {
+				$cls::rebuildSearchForEntity();
+				echo "\nDone\n\n";
+			}
+		}
 
 		/**
 		 * Disable events
@@ -127,8 +143,11 @@ namespace go\core {
 		
 		private $version;
 
+        private $systemTimeZone;
+
 		protected function __construct() {
 			parent::__construct();
+            $this->systemTimeZone = date_default_timezone_get();
 			date_default_timezone_set("UTC");
 
 			mb_internal_encoding("UTF-8");
@@ -139,6 +158,17 @@ namespace go\core {
 
 			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
+
+        /**
+         * Get the PHP system timezone.
+         *
+         * The API works with UTC dates.
+         *
+         * @return string
+         */
+        public function getSystemTimeZone() : string {
+            return $this->systemTimeZone;
+        }
 
 		/**
 		 * Capabilities of core module
@@ -304,7 +334,7 @@ namespace go\core {
 					}
 				} else
 				{
-					$usage = GO::config()->get_setting('file_storage_usage');
+					$usage = GO::config()->get_setting('file_storage_usage') ?? 0;
 					$this->storageFreeSpace = $quota - $usage;
 				}
 			}
@@ -371,15 +401,23 @@ namespace go\core {
 			
 			return $config ?? [];
 		}
-		
+
+		/**
+		 * @throws Throwable
+		 */
 		private function getInstanceConfig(): array
 		{
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
 				return [];
 			}
-			
-			require($configFile);	
+
+			try {
+				require($configFile);
+			} catch(Throwable $e) {
+				ErrorHandler::log("Failed to require config file: " . $configFile);
+				throw $e;
+			}
 			
 			if(!isset($config)) {
 				$config = [];
@@ -538,7 +576,7 @@ namespace go\core {
 			return $this->dbConnection;
 		}
 
-		public function isInstalled(): bool
+		public function isInstalled(bool $andEnabled = true): bool
 		{
 			try {
 				return go()->getDatabase()->hasTable('core_module');
@@ -724,23 +762,23 @@ namespace go\core {
 		 * @param string|callable|array|object $msg
 		 */
 		public function debug($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->log($msg, $traceBackSteps);
+			$this->getDebugger()->log($msg, $traceBackSteps + 1);
 		}
 		
 		public function log($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->log($msg, $traceBackSteps);
+			$this->getDebugger()->log($msg, $traceBackSteps + 1);
 		}
 		
 		public function warn($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->warn($msg, $traceBackSteps);
+			$this->getDebugger()->warn($msg, $traceBackSteps + 1);
 		}
 		
 		public function error($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->error($msg, $traceBackSteps);
+			$this->getDebugger()->error($msg, $traceBackSteps + 1);
 		}
 		
 		public function info($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->info($msg, $traceBackSteps);
+			$this->getDebugger()->info($msg, $traceBackSteps + 1);
 		}
 
 		private $authState;
@@ -1028,9 +1066,7 @@ namespace go\core {
 		{
 			//one legacy model that needs checking
 			$stmt = GO\Base\Model\Template::model()->find(['ignoreAcl'=>true]);
-			while($stmt->rowCount()) {
-				$stmt->callOnEach('checkAcl', true);
-			}
+			$stmt->callOnEach('checkAcl', true);
 
 			return parent::checkAcls();
 		}

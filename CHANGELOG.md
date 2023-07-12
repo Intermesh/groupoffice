@@ -1,9 +1,462 @@
+11-07-2023: 6.7.39
+- Core: Obsolete noreply_email setting will return systemEmail system setting
+- Tasks: fix sorting of task lists on change
+- Tasks: filter on assigned to.
+- Addressbook: bugfix in adding recipients from addressbook group
+
+07-07-2023: 6.7.38
+- Leavedays: Automatically finish previous agreement when creating a new one
+- Leavedays: reload when editing special leave
+- Business: New permission to access employee tab
+- Core: Fixed reminding language and install in selected language
+- Finance: install templates in English and Dutch
+- Core: Custom date range queries included one day too much.
+- Finance: fixed resize bug where grid became smaller instead of larger
+- Email: larger drop zone for dragging and dropping attachments as files
+- Support: Save e-mail as ticket
+- Comments: Fixed global search (reindex for comments will trigger after update)
+- Support: Fixed routing to ticket
+- Core: Improved notifications
+- Projects: Fixed display of project custom field
+- Support: remove you were assigned to alert when commenting
+- Billing: fixed status filter losing the setting when only status "None" was selected 
+- Support/Task: change status to needs action when reassigning
+- Core: remove alerts when they are dismissed server side
+- Core: Hide personal groups when adding groups to popup reminders and announcements
+
+28-06-2023: 6.7.37
+- Savemailas: Merge linked emails to show all links inside the linked e-mail
+- Finance: Don't change book on existing docs
+- Billing: fix calculation of profit when billingextracosts module enabled
+- Support: fix uninstall script
+- Core: prevent exception when uninstalling module with settings model
+
+26-06-2023: 6.7.36
+- Finance: Prefer contact email for quotes and billing email for invoices
+- Finance: Fixed bug in copying document
+- Savemailas: Correct UID's in database preventing links to be shown in email
+- Core: when generating a user password, use minimum password length
+- Core: Fixed rotated images / thumbnails that were uploaded from Apple products
+- Finance: Convert quote to contract
+- Support: Auto assign ticket to first commenting agent
+
+19-06-2023: 6.7.35
+- Core: updated DE translations
+- Core: Fixed some false positivies in XSS detection
+- Support: Ticket import failed to import comment because it failed on XSS check
+- History: Add index on removeAcl and action to speed up garbage collection
+- Support: option to create users or not
+- Email: apply mask when moving IMAP folders to prevent timing problems
+- Core: Fixed several missing translations
+- Email: minor usability tweaks
+- Tasks: Duration fields will show days if hours exceed 24 hours.
+- Finance: Show line breaks in description
+- Finance: Page numbers in templates
+
+12-06-2023: 6.7.34
+- Finance: Customer not loading when using B2B and B2C together. Show total price incl. in B2C mode.
+- Core: renamed Japanese translation files as per ISO-639-1 standard.
+- ActiveSync: Reply email on phone raised error on iphone.
+- Finance: Fixed number matching on finance payment import
+
+05-06-2023: 6.7.33
+- Core: Updated Spanish language. Gracias, Ivan!
+- Core: Didn't install without Ioncube
+- Projects2: fix error when generating demo-data
+- Tasks: fix error in ContinueTaskDialog with progressbar
+- Core: Detect XSS bug with lots of false positives fixed. Fixes #1007
+- Core: Updated German translation
+
+31-05-2023: 6.7.32
+- Carddav: Fixed: CardDAV: REV is given as timestamp, leads to exceptions #1001
+- Calendar: ICS Import not working, exception on server #1002
+- Core: validate html input didn't check for style tags anymore
+- Core: Fixed: Strange issue with notes and text being deleted #995
+- Studio: minor cleanup controller generation script
+
+26-05-2023: 6.7.31
+- Email save as: Apple mail didn't include link tag in response.
+- The about dialog will only be available for the Admin users.
+- Tasks: when moving a task to another list the ACL would not change to the correct list (fixed)
+- Core: bugfix in system CLI controller
+- Core: bugfix in module deletion script
+- Tasks: All tasklists of all types were shown
+
+22-05-2023: 6.7.30
+- Support: In 'my account', display support task lists in default tasklist combo.
+- Core: Set authorized client in account when using switch user
+- Finance: Enable B2B and B2C together in a book.
+- Tasks: Custom field from support showed when using edit button in detail panel
+- Tasks: Fixed: Feature request: Minimize tasks #994
+- Paypal: fixed error in return page.
+
+19-05-2023: 6.7.29
+- Email: fixed display issue in mac mail after removing attachments
+- Billing: Fixed PHP 8.1 deprecated warning
+- Calendar: Take holidays into account when viewing availability in participants tab
+- Support: task list grid bigger limit
+- Comments: If no labels available, disable 'Add label' button. Update tooltip.
+- Core: label color matches parent
+- Core: Renamed several translations of Lybia to its current official name
+- Freebusypermissions: Fixed freebusy acl disappearing
+- LDAP: Fixed broken LDAP sync
+- Comments: Removed comments from all entities search keywords and made comments a separate search result instead.
+    Full re-index is required for existing items.
+- Finance: number of decimals configurable in System Settings -> Finance
+- Finance: Show inclusive price in B2C books
+- Tasks: Fixed estimated duration field validation and max amount of hours.
+
+12-05-2023: 6.7.28
+- Core: Ioncube problems on PHP 8.1
+- Core: only show the alerts when triggerAt is larger then or equal to "now"
+
+12-05-2023: 6.7.27
+- Core: Ioncube problems on PHP 8.1
+
+11-05-2023: 6.7.26
+- Core: prevent exception in disk usage calculation in very specific use case
+- Updated German language files. Danke, Daniel!
+- Finance: Fixed payment search
+- Address book: Fixed right-click -> delete
+- Addressbook: fix error deleting address book
+
+25-04-2023: 6.7.25
+- Tasks: Continue task didn't save comment
+- Support: Wrong task lists displayed when editing support categories
+- Core: Fixed colorfield appearance
+- ActiveSync: Z-push admin could not store remote ipv6 addresses
+- ActiveSync: Fixed deleting mail
+
+20-04-2023: 6.7.24
+- Sync: 2FA for ActiveSync devices
+- Address book: Multiple contact/org select field added
+- Scanbox: make dialog bigger to reflect new styles
+
+17-04-2023: 6.7.23
+- Core: Upload attachments to entities through the JMAP API
+- Addressbook: fix error in selectDialogPanel when no address book selected
+
+04-04-2023: 6.7.22
+- OAuth2Client: remove obsolete FK from uninstall script
+- Core: Added Japanese translations
+- Core: Extra check if store is in sync when viewing entities (Task, contact etc.)
+- Calendar: minor bugfix when trying to delete an event with a participant with missing user_id
+- Core / Studio: Use studio entities as custom fields
+
+30-03-2023: 6.7.21
+- Core: Smaller login dialog when logout timer is enabled
+- Core: Enabled ACL Garbage Collection
+- Email: Fixed bug in MIME header decode
+
+24-03-2023: 6.7.20
+- Email: Fixed long hang when trying to delete all attachments
+- Core: Fixed rebuild search cache error "Already active transaction"
+- Core: ACL's are not deleted immediately but collected by garbage collection (not active yet)
+- Projects2: Disable 'Invoice' button when permission level insufficient
+
+17-03-2023: 6.7.19
+- OnlyOffice: Was broken becaue of Firebase/JWT upgrade
+- Core: Fixed 8.1 deprecated error
+- Core: vastly improved themes, theme lightness / darkness follows system settings
+- Core: remove obsolete Dark theme
+- Core: Imap -> imap->save_to_file will use peek by default
+
+07-03-2023: 6.7.18
+- ActiveSync: Autolinking will also work when mail is send/received using z-push
+- Core: Authenticator fires a "before authenticate" event.
+- Email: drag and drop mail messages into email attachments.
+
+06-03-2023: 6.7.17
+- Core: several fixes for PHP8.1 compatibility
+- Core: Email autolinking has option to include / exclude addressbooks
+- Core: Several database migration fixes
+
+27-02-2023: 6.7.16
+- Core: fix issues with license being misread
+- Support: Add 'unassigned' filter
+
+24-02-2023: 6.7.15
+- ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
+
+
+26-06-2023: 6.6.165
+ - Leavedays: Split 'hours' column into spent and budgeted special leave hours in year overview
+ - Newsletters: shipping report will work for user entities without profile
+
+ 19-06-2023: 6.6.164
+- Newsletters: do not throw an exception when a shipping report does not find an entity
+- Core: renamed Japanese translation files as per ISO-639-1
+
+31-05-2023: 6.6.163
+- Core: updated Japanese holidays
+- Webdav: recover if directories are missing
+
+25-05-2023: 6.6.162
+- Email / OAuth2Client: More friendly message when refresh token needs to be renewed
+- Addressbook: generate search words for contact urls too
+- Don't panic!
+
+19-05-2023: 6.6.161
+- Tickets: increase max size subject
+- Leavedays: Filter out disabled / archived users in employee list
+- Leavedays: include users that quit during the current year in employee list
+- Freebusypermissions: Fixed freebusy acl disappearing
+
+
+11-05-2023: 6.6.160
+- Calendar: prevent error when printing calendar view while user has no permissions for calendar
+- Leavedays: Better display of leave budgets and spent hours per budget
+- Projects2: show icon in task list if hours were booked on task
+- Summary: new option to set RSS feeds for all users
+
+25-04-2023: 6.6.159
+- Core: Yes/No field has a default value now.
+- Leavedays: bugfix - retrieve agreementId for special leave budget in the past
+- Notesencrypt: close edit screen when cancelling password input.
+- Tasks: enable estimated duration in grid (hidden by default)
+
+13-04-2023: 6.6.158
+- Projects2: Fix bug in time registration PDF report
+- Core: Prevent shitty CSS from breaking email viewer
+- Workflow: support landscape page in history PDF
+- Core: fix minor bug in API
+
+03-04-2023: 6.6.157
+- OAuth2Client: remove obsolete FK from uninstall script
+- Core: Added Japanese translations
+- Core: Extra check if store is in sync when viewing entities (Task, contact etc.)
+- Calendar: minor bugfix when trying to delete an event with a participant with missing user_id
+
+27-03-2023: 6.6.156
+- Caldav: Use email account for caldav invites
+- API: Fix XSS vulnerability in page.php
+
+24-03-2023: 6.6.155
+- Core: Add Hebrew language pt. 1. Thanks Elhanan!
+- Core: RTL support for Arabic and Hebrew
+
+17-03-2023: 6.6.154
+- Email: Prevent double tags upon saving draft messages
+- Core: updated German translations - Danke, Daniel!
+
+07-03-2023: 6.6.153
+- Email: minor bugfix drag and drop messages
+
+06-03-2023: 6.6.152
+- Email: drag and drop mail messages into email attachments.
+
+01-03-2023: 6.6.151
+- Email / SaveMailAs: fix saving uid of message for very large Message-IDs
+
+24-02-2023: 6.6.150
+- Tasks: Create user broken when tasks module was disabled
+- Addressbook: disable delete button for groups if insufficient permissions
+- Core: use random_int() instead of mt_rand and mt_srand in random password generator Github #961
+- Core: fix typo seperator to separator Github #956
+- Core: focus custom select text field by default
+- Core: Fix conditionally required or empty for empty or not-empty selectbox
+- Leave days: tweak display of special leave budgets over years.
+- Core: DetectXSS didn't function
+
+10-02-2023 6.6.149
+- Studio: fix permissions for ACL entities
+- Projects2: fix display of expense budgets in project panel
+- Projects2: Fixed project ID sent as text
+- Core: Fixed phantom error in randompassword method (Github #961)
+- SMIME: Remove GO password field and check
+- Leave days: fix display of special leave budgets over years.
+- Sieve: support :matches in GUI
+
+06-02-2023 6.6.148
+- Core / Files: Uploading files in files module could corrupt blob system
+- Projects2: fix bug in resource dialog when budgeted hours greater than or equal to 1000
+- Savemailas/Projects: Fix linked e-mail acl's when overriding a project's default permissions.
+- Core: Minor security enhancements
+- Onlyoffice: Fixed save a copy in onlyoffice
+- Core: Raise JMAP timeout to 180s
+- Email: fixed templates not loading on mobile
+
+31-01-2023 6.6.147
+- Calendar: Fixed: ErrorException in /usr/share/groupoffice/go/base/util/icalendar/RRuleIterator.php at line 98: Illegal offset type
+- Timeregistration2: fix check on overwriting travel distance for existing time entry
+- Core: Updated German translation
+- Core: Fixed XSS vulnerability through GO_LANGUAGE cookie
+- Tasks: Clean up task lists when project is being deleted
+- smime: Fixed account losing 'always sign' setting
+- Core: force update search upon saving entity
+
+19-01-2023 6.6.146
+- Email: Fixed vcard import from email
+- Core: When printing, Replace characters not valid for file names
+- Core: Fall back on disk cache is apcu fails.
+- Core: Fixed install
+
+13-01-2023 6.6.145
+- Caldav: Task sync failed with reminder: Fixed: Too few arguments to
+    function go\\core\\orm\\Property::__construct(), 0 passed in
+    /usr/share/groupoffice/go/modules/community/tasks/convert/VCalendar.php on line 360
+- Core: Don't log more than 10000 changes at once. Resync the whole entity in that case. This is to solve an issue where
+    the garbage collection tried to delete millions of log entries.
+- Tickets: Fixed SQLSTATE[42S22]: Column not found: 1054 Unknown column 's.starred' in 'field list'
+- Address book: Fixed import when VCF had empty phone number or emails in it.
+- Email: Fixed email templates not visible on mobile screen
+- Core: Clear cache on request with invalid license error to prevent invalid cache creation without licensed modules.
+
+10-01-2023 6.6.144
+- Leavedays: fix error when saving existing leave day registration
+- Email: Fix error message upon deleting email label
+- Core: Don't render HTML in attachments to prevent XSS
+- Core: Bugfix in user archival
+- apikeys: Fixed double collation in update query
+- multi instance: generate wopi apache config for Microsoft Office Online
+- Core: Archive user also removes them from groups
+- Email: Folders with double quotes in the name didn't show up
+- Tasks: Portlet had a timezone bug where it queried tasks in UTC times.
+- Core: Remove window.onerror and unhandled rejection error dialog as it's of no use for the end user.
+- Core: Keep scroll position when adding new custom fields
+- Tickets: Fix rendering HTML characters
+- Core: Fixed bug where custom field sets put on another tab didn't show in the right layout
+- Core: Fixed bug where "Show on tab" combo was empty when creating a new field set.
+
+19-12-2022 6.6.143
+- Email: fix print button
+
+19-12-2022 6.6.142
+- Core: No HTML in server errors
+- ActiveSync: Fixed error  Argument 1 passed to GoSyncUtils::getBodyPreferenceMatch() must be of the type array or null, bool given, called in modules/z-push/backend/go/goMail.php on line 120
+- Core: Permission overview sorted by group name and sometimes it showed +2000 results if name of the item could not be found.
+- Core: main menu search field hides menu when focussed on iphone. Clear button was invisible.
+
+15-12-2022 6.6.141
+- Core: HTML encode errors in Error dialog to prevent XSS
+- Core: Better error message on partial installed database
+- Notes: fixed Feature request: Show note categories in alphabetical order when choosing a note's category #940
+- Core: Add more than one item to multiselect field. Fixes Feature request: Automatically add new notes to Synchronization #927 partially.
+- Core: Some images missing due to incorrect URL's in css.
+
+09-12-2022 6.6.140
+- Core: Default permissions for custom field categories are write now
+- Calendar: Set sender header on e-mails
+- Custom fields: upgrade custom field set permissions to write
+- Core: disallow multiple references and in-reply-to headers when parsing messages
+- Leavedays: upon loading existing leave request with special leave budget, display currently selected budget.
+- Leavedays: Warn manager when leave request without budget is being aprroved.
+- Core: Make sure users have permissions to see themselves.
+
+06-12-2022 6.6.139
+- Core / addressbook: Fixed disappearing custom fields after saving a new contact to an organization
+- Summary: Creating an announcement is allways shared with "everyone" group by default #930
+- Caldav: Fixed problem in fetching participants and sending mail via IMip
+- Core: Security issue in JMAP API
+
+05-12-2022 6.6.138
+- Core: typo in update script
+
+05-12-2022 6.6.137
+- Tasks: Search task lists in upload dialog
+- Newsletters: Prevent sending messages to empty recipient lists
+- Postfixadmin: Restrict SMTP service via username login by default to prevent abuse.
+- Core / email: used map of charset aliases to fix conversion problem with Korean emails
+- Core / email: fixed Sanitize corrupted html #922
+
+29-11-2022 6.6.136
+- Core: export to web page (html)
+- Fixed: dav_event sql data column too small #916
+- Fixed: core_auth_remember_me foreign key error #913
+- Fixed: Addressbook CSV import bug #902
+- Fixed: Semaphore buildup due to faulty unlock #901
+- Fixed: 6.6.128 - PHP8.1 complains about loosing precision #907
+- Jitsi: Add JWT capability to jitsimeet module #900
+- Files: Add event listeners
+- Core: retrieve maximum of 50 alerts
+- Email: Feature request: Save to drafts #851
+- Calendar: Description got lost on exceptions
+- Email: remove linked item from message panel
+- Tasks: Add possibility to import tasklistId from CSV
+- Core: Set global SMTP timeout value in System Settings -> Notifications
+
+24-11-2022 6.6.135
+- Calendar: tasklist_id cannot be null error on user create.
+
+22-11-2022 6.6.134
+- Email: Error in /usr/local/share/src/www/modules/files/controller/FileController.php at line 362: Call to a member function delete() on bool
+
+22-11-2022 6.6.133
+- Core: Fixed running and installing without Ionbcube
+
+22-11-2022 6.6.132
+- Caldav: set caldav tasklist automatically for new users
+- Core: background color when button is focussed
+- WOPI: Two attachments with same name caused problems when opening via WOPI (Libreoffice or o365)
+- OAuth2Client / Email: Refactor renewing of access token, better check access token on sending email
+- OAuth2Client: Better check for expired Refresh token
+- ActiveSync: All day events could shift when made with phone in another timezone
+- Core: turning mobile didn't resize screen correctly
+- Core: don't focus on search in start menu as it causes it to close on android phones
+- Sync: Allow deleting of items by default again
+- Core: install without ioncube
+
+17-11-2022 6.6.131
+- Wrong build
+
+17-11-2022 6.6.130
+- Carddav/ caldav: Log exceptions in carddav and caldav
+- Caldav: Fixed Apple caldav sync
+- Calendar: fixed accept invitation on MySQL 5.7 servers.
+- ActiveSync management: didn't load in some cases
+
+17-11-2022 6.6.129
+- Email: Set large minWidth so messages grid can't be removed.
+- Calendar: SQLSTATE[HY000]: General error: 1093 Table 'p1' is specified twice, both as a target for 'UPDATE' and as a separate source for data
+- Billing: fixed display of lists in the frontpage
+- Core: Prevent invalid cache without licensed modules if system is accessed via unlicensed host
+- Billing: Add project name to search cache
+- Core: Updated Hungarian language
+- LDAP: Disable creation of IMAP accounts didn't work
+- Newsletter: Bug when an image was both attached as attachment and inline.
+- ActiveSync: duplicate Reference and in-reply-to header
+- Core: Added Kosovo to the countries list
+- Core: fix date custom filter to display date on before/after value
+
+09-11-2022 6.6.128
+- Core: rollback of fix for autocomplete. Probably fixed by always creating an address book entry
+
+08-11-2022 6.6.127
+- Billing: Fixed Call to undefined method go\core\orm\SearchableTrait::splitTextKeywords()
+
+08-11-2022 6.6.126
+- Core: Fixed Creating default object from empty value on install
+
+07-11-2022 6.6.125
+- Core: Switch user will not update last login and login count.
+- Billing: fixed division by zero
+- Email: 16px on mobile in htmleditor so iphone won't zoom in
+- Core: fix search user and contact search in email address bar
+- Core / Address book: Always create address book entry for user
+- Core: Error dialog could display nothing when horizontal scrollbar was present
+- Core: Accent color for combo group headers
+
+31-10-2022 6.6.124
+- Core: Add extra CSS options to custom comboboxes
+- Billing: add profit and profit percentage fields, also add both fields to customer report
+- Billing: add customer report export
+- Comments: Only the creator or admin may edit and delete comments
+- Core: Added "Is empty" filter to custom date filter
+- Calendar: When an appointment was opened from an email it was set as declined for the organizer immediately
+- Email: Fix: open linked email in popup
+
+24-10-2022: 6.6.123
 - Core: Remember user selected language
 - Core: Remove old modules
 - Address book: Merge selected contacts
 - Smime: SMIME signed as attachment didn't show if signature was invalid
 - Core: validate / and \ in email address as it's allowed by RC822
 - Address book: increased max size for salutation column in contacts table
+- Address book: Fixed merge with two contacts in the same address list
+- Tasks: Don't reset project task lists permissions when using this option
+- Email: Fix attaching file to email from existing item
+- Core: profile not saving in users
+- Core: Append custom field set name to filters when searching
 
 17-10-2022: 6.6.122
 - Projects2: add approved boolean field to expense budget table

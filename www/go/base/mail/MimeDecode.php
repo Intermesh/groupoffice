@@ -241,7 +241,7 @@ class MimeDecode
 	    return $structure;
     }
 
-    const SINGLE_HEADERS = ['subject', 'to', 'from', 'cc', 'bcc', 'from', 'date', 'message-id', 'content-type'];
+    const SINGLE_HEADERS = ['subject', 'to', 'from', 'cc', 'bcc', 'from', 'date', 'message-id', 'content-type', 'references', 'in-reply-to'];
 
 
 	/**

@@ -69,7 +69,12 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
     this.originalValue = this.getValue();
 	},
 
+
 	getValue : function(){
+		return this.value;
+	},
+
+	getRawValue : function() {
 		return this.value;
 	},
 
@@ -95,6 +100,8 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
 		if(this.rendered){
 			this.el.update(this.renderer(v));
 		}
+
+		this.fireEvent("setvalue", this, v);
 	},
 
 	renderer : function(v) {

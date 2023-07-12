@@ -4,7 +4,9 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 	titleField: "name",
 	resizable: false,
 	width: dp(400),
-	autoHeight: true,
+	height: dp(400),
+	redirectOnSave: false,
+	role: null,
 	initFormItems: function () {
 		var items = [{
 				xtype: 'fieldset',
@@ -18,7 +20,8 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 					},
 					this.tasklistCombo = new go.modules.community.tasks.TasklistComboBoxReset({
 						allowBlank: true,
-						emptyText: t("All")
+						emptyText: t("All"),
+						role: this.role
 					})
 					]
 			}

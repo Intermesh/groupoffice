@@ -193,12 +193,13 @@ class Filters {
 						call_user_func($filterConfig['fn'], $criteria, $v['comparator'], (int) $v['query'], $query, $filter, $this);
 					}
 					break;
-					
+
+				case 'datetime':
 				case 'date':					
-					$range = $this->checkDateRange($value);
+					$range = $this->checkDateRange($value, $filterConfig['type']=='datetime');
 					if($range) {
 						call_user_func($filterConfig['fn'], $criteria, '>=', $range[0], $query, $filter, $this);
-						call_user_func($filterConfig['fn'], $criteria, $range['endHasTime'] ? '<=' : '<', $range[1], $query, $filter, $this);
+						call_user_func($filterConfig['fn'], $criteria, '<=', $range[1], $query, $filter, $this);
 					} else
 					{
 						if($value == null) {
@@ -254,10 +255,42 @@ class Filters {
 	}	
 	
 	/**
-	 * Add date filter.
-	 * 
+	 * Add date time filter.
+	 *
 	 * Supports ranges. For example last week..now,  >last year, >2019-01-01
-	 * 
+	 *
+	 * Values are converted to DateTime objects. Supports all strtotime formats as input.
+	 *
+	 * NOTE: The time input is converted from the user time zone to UTC.
+	 *
+	 * @param string $name
+	 * @param Callable $fn Called with: Criteria $criteria, $comparator, DateTime $value, Query $query, array $filters
+	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
+	 *
+	 * @return $this
+	 * @example
+	 *
+	 * ->addDateTime('date',function(Criteria $criteria, $comparator, $value){
+	 * 	$criteria->where('date', $comparator, $value);
+	 * })
+	 *
+	 * @return $this
+	 */
+	public function addDateTime(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
+	{
+		$this->filters[strtolower($name)] = ['type' => 'datetime', 'fn' => $fn, 'default' => $default, 'name' => $name];
+
+		return $this;
+	}
+
+
+	/**
+	 * Add date filter.
+	 *
+	 * NOTE: this is for fields without time. No timezone conversion takes place. If time is applicable use {@see self::addDateTime()}
+	 *
+	 * Supports ranges. For example last week..now,  >last year, >2019-01-01
+	 *
 	 * Values are converted to DateTime objects. Supports all strtotime formats as input.
 	 *
 	 * @param string $name
@@ -267,7 +300,7 @@ class Filters {
 	 * @return $this
 	 *@example
 	 *
-	 * ->addDate('date',function(Criteria $criteria, $comparator, ?DateTime $value){
+	 * ->addDateTime('date',function(Criteria $criteria, $comparator, ?DateTime $value){
 	 * 	$criteria->where('date', $comparator, $value);
 	 * })
 	 *
@@ -276,10 +309,10 @@ class Filters {
 	public function addDate(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
 	{
 		$this->filters[strtolower($name)] = ['type' => 'date', 'fn' => $fn, 'default' => $default, 'name' => $name];
-		
+
 		return $this;
-	}	
-	
+	}
+
 	/**
 	 * Add text filter.
 	 * 
@@ -365,7 +398,7 @@ class Filters {
 	/**
 	 * @throws Exception
 	 */
-	private function checkDateRange($value) {
+	private function checkDateRange($value, bool $convertTimezone = true) {
 		//Operators >, <, =, !=,
 		//Range ..
 
@@ -381,18 +414,20 @@ class Filters {
 
 		$endHasTime = strpos($parts[1], ':') !== false;
 
-		$tz = go()->getAuthState()->getUser()->timezone;
+		if($convertTimezone) {
+			$tz = go()->getAuthState()->getUser()->timezone;
 
-		$parts[0] = new DateTime($parts[0],new \DateTimeZone($tz));
-		$parts[0]->setTimezone(new \DateTimeZone('UTC'));
+			$parts[0] = new DateTime($parts[0], new \DateTimeZone($tz));
+			$parts[0]->setTimezone(new \DateTimeZone('UTC'));
 
-		$parts[1] = new DateTime($parts[1], new \DateTimeZone($tz));
-		$parts[1]->setTimezone(new \DateTimeZone('UTC'));
+			$parts[1] = new DateTime($parts[1], new \DateTimeZone($tz));
+			$parts[1]->setTimezone(new \DateTimeZone('UTC'));
+		} else {
+			$parts[0] = new DateTime($parts[0], new \DateTimeZone('UTC'));
+			$parts[1] = new DateTime($parts[1], new \DateTimeZone('UTC'));
+		}
 
 		$parts['endHasTime'] = $endHasTime;
-		if(!$endHasTime) {
-			$parts[1]->add(new DateInterval("P1D"));
-		}
 
 		return $parts;
 	}

@@ -2,6 +2,7 @@
 
 namespace go\core\model;
 
+use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\db\Expression;
 use go\core\jmap\Entity;
@@ -12,7 +13,7 @@ use go\core\orm\SearchableTrait;
 use go\core\util\ArrayObject;
 
 
-class UserDisplay extends Entity {
+class UserDisplay extends AclItemEntity {
 
 
 	/**
@@ -76,6 +77,12 @@ class UserDisplay extends Entity {
 					$criteria->andWhere('enabled', '=', 1);
 				}
 			}, false)
+			->add('email', function (Criteria $criteria, $value, Query $query){
+				$criteria->where('email', '=', $value);
+			})
+			->add('username', function (Criteria $criteria, $value, Query $query){
+				$criteria->where('username', '=', $value);
+			})
 			->add('groupId', function (Criteria $criteria, $value, Query $query){
 				$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $value]);
 			})
@@ -99,5 +106,15 @@ class UserDisplay extends Entity {
 
 				$criteria->where('aclIdAg.level', '>=', $value);
 			});
+	}
+
+	protected static function aclEntityClass(): string
+	{
+		return Group::class;
+	}
+
+	protected static function aclEntityKeys(): array
+	{
+		return ['id' => 'isUserGroupFor'];
 	}
 }

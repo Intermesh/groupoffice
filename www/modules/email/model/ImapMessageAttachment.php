@@ -79,7 +79,7 @@ class ImapMessageAttachment extends MessageAttachment
 		$path = $targetFolder->createChild($filename)->path();
 
 		$imap = $this->account->openImapConnection($this->mailbox);
-		if($imap->save_to_file($this->uid, $path, $this->number, $this->encoding, true)) {
+		if($imap->save_to_file($this->uid, $path, $this->number, $this->encoding)) {
 			return new File($path);
 		};
 		throw new \Exception("Error saving attachment to temp folder");
@@ -92,10 +92,12 @@ class ImapMessageAttachment extends MessageAttachment
 			$tmpFile = new File($this->getTempDir() . File::stripInvalidChars($this->name));
 			if (!$tmpFile->exists()) {
 				$imap = $this->account->openImapConnection($this->mailbox);
-				$imap->save_to_file($this->uid, $tmpFile->path(), $this->number, $this->encoding, true);
+				$imap->save_to_file($this->uid, $tmpFile->path(), $this->number, $this->encoding);
 			}
-			$this->setTempFile($tmpFile);
+
 			$this->size = $tmpFile->size();
+			$this->setTempFile($tmpFile);
+
 		}
 
 		return $this->getTempFile();

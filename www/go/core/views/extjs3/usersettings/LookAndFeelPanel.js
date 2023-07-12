@@ -24,7 +24,48 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			idField: 'id',
 			data: data
 		});
-		
+
+		this.themeFieldset = new Ext.form.FieldSet({
+			title: t('Theme', 'users', 'core'),
+			items: [
+				{xtype:'radiogroup',
+				name:'theme',
+				value: GO.settings.config.theme,
+				items: [
+					{inputValue: 'Paper', boxLabel: t('Paper')},
+					{inputValue: 'Compact', boxLabel: t('Compact')}
+				]},
+				{xtype:'hidden', name: 'themeColorScheme', listeners: {
+					'setvalue': me => {
+						me.nextSibling().items.each(btn => {
+							btn.toggle(btn.inputValue === me.value)
+						});
+						if(this.userId !== go.User.id) return;
+						['light','dark','system'].forEach(name => {
+							document.body.classList.remove(name);
+						});
+						document.body.classList.add(me.value);
+					}
+					}},
+				{xtype:'container', cls: 'go-theme-color', defaults: {
+					enableToggle:true,
+					handler: function(me,ev) {
+						const hiddenField = this.ownerCt.previousSibling();
+						hiddenField.setValue(me.inputValue);
+					}
+				},
+				items: [
+					{xtype:'button', inputValue: 'light', cls:'mode-light', tooltip:t('Light')},
+					{xtype:'button', inputValue: 'dark', cls:'mode-dark', tooltip:t('Dark')},
+					{xtype:'button', inputValue: 'system', cls:'mode-system', tooltip:t('System default')}
+				]},
+				{xtype:'container',layout: 'hbox',defaults: {style:'width:33%;text-align:center;'},items:[
+						{html: t('Light')},
+						{html: t('Dark')},
+						{html: t('System')}
+					]}
+			]
+		});
 		
 		
 		this.globalFieldset = new Ext.form.FieldSet({
@@ -109,27 +150,27 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			]
 		});
 
-		if(GO.settings.config.allow_themes) {
-			this.globalFieldset.insert(0, this.themeCombo = new Ext.form.ComboBox({
-				fieldLabel: t("Theme", "users", "core"),
-				name: 'theme',
-				store: new GO.data.JsonStore({
-					url: GO.url('core/themes'),
-					fields:['theme','label'],
-					remoteSort: true,
-					autoLoad:true
-				}),
-				visible:GO.settings.config.allow_themes,
-				displayField:'label',
-				valueField: 'theme',
-				mode:'local',
-				triggerAction:'all',
-				editable: false,
-				selectOnFocus:true,
-				forceSelection: true,
-				value: GO.settings.config.theme
-			}));
-		}
+		// if(GO.settings.config.allow_themes) {
+		// 	this.globalFieldset.insert(0, this.themeCombo = new Ext.form.ComboBox({
+		// 		fieldLabel: t("Theme", "users", "core"),
+		// 		name: 'theme',
+		// 		store: new GO.data.JsonStore({
+		// 			url: GO.url('core/themes'),
+		// 			fields:['theme','label'],
+		// 			remoteSort: true,
+		// 			autoLoad:true
+		// 		}),
+		// 		visible:GO.settings.config.allow_themes,
+		// 		displayField:'label',
+		// 		valueField: 'theme',
+		// 		mode:'local',
+		// 		triggerAction:'all',
+		// 		editable: false,
+		// 		selectOnFocus:true,
+		// 		forceSelection: true,
+		// 		value: GO.settings.config.theme
+		// 	}));
+		// }
 
 
 		this.regionFieldset = new Ext.form.FieldSet({
@@ -262,12 +303,12 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 						name: 'textSeparator'
 					},{
 						xtype: 'textfield', 
-						fieldLabel: t("Thousand Seperator", "users", "core"), 
+						fieldLabel: t("Thousand Separator", "users", "core"),
 						name: 'thousandsSeparator'
 					},
 					{
 						xtype: 'textfield', 
-						fieldLabel: t("Decimal Seperator", "users", "core"), 
+						fieldLabel: t("Decimal Separator", "users", "core"),
 						name: 'decimalSeparator'
 					},
 					{
@@ -361,6 +402,10 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		});
 		
 		go.usersettings.LookAndFeelPanel.superclass.initComponent.call(this);
+
+		if(GO.settings.config.allow_themes) {
+			this.items.items[0].insert(0, this.themeFieldset);
+		}
 	},
 	
 	// OLD FRAMEWORK CODE, refactor when clientSettings: {} property is available for User
@@ -379,8 +424,10 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			});
 		}
 	},
-	
-	onLoadComplete : function(data){
+	onLoadStart : function(userId){
+		this.userId = userId;
+	},
+	onLoadComplete : function(user){
 
 	},
 	

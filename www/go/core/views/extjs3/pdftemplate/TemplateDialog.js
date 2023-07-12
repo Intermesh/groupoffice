@@ -12,7 +12,16 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 	modal: false,
 
 	closeOnSubmit: false,
+
 	initFormItems: function () {
+
+		this.on("submit", function(dlg, success, serverId) {
+			if(success) {
+				go.Notifier.flyout({
+					description: t("Saved successfully")
+				})
+			}
+		}, this);
 
 		this.addPanel({
 			title: t("Content blocks"),
@@ -25,6 +34,7 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 				}
 			]
 		});
+
 
 		return [{
 			columnWidth: 1,
@@ -129,7 +139,56 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 				value: 10
 			}]
 
-		}];
+		},{
+			columnWidth: 1,
+			labelAlign: "top",
+			xtype: 'fieldset',
+			title: t("Header"),
+
+			items: [{
+				xtype: 'gonumberfield',
+				fieldLabel: "x",
+				name: 'headerX',
+				value: 10
+			},{
+				xtype: 'gonumberfield',
+				fieldLabel: "y",
+				name: 'headerY',
+				value: 10
+			},{
+				xtype: "textarea",
+				fieldLabel: t("Header") + " (HTML)",
+				name: "header",
+				grow: true,
+				anchor: '100%'
+			}]
+		},{
+				columnWidth: 1,
+				labelAlign: "top",
+				xtype: 'fieldset',
+				title: t("Footer"),
+
+				items: [{
+					xtype: 'gonumberfield',
+					fieldLabel: "x",
+					name: 'footerX',
+					value: 10
+				},{
+					xtype: 'gonumberfield',
+					fieldLabel: "y",
+					name: 'footerY',
+					value: 10
+				},{
+					xtype: "textarea",
+					fieldLabel: t("Footer") + " (HTML)",
+					name: "footer",
+					grow: true,
+					anchor: '100%',
+					hint: t("For page numbers use") + ': &lt;div style="text-align: right; width: 100%;"&gt;{{pageNumberWithTotal}}&lt;/div&gt;'
+				}]
+			}
+
+		];
 	}
 });
 

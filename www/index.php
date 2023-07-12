@@ -5,6 +5,8 @@ use go\core\http\Request;
 use go\core\ErrorHandler;
 
 use go\core\http\Response;
+use go\modules\business\license\model\License;
+
 /**
  * Copyright Intermesh
  *
@@ -72,7 +74,14 @@ try {
 
             require('views/Extjs3/externalFooter.php');
             exit();
+        }
 
+        if(!empty(go()->getSettings()->license) && !License::isValid()) {
+	        require('views/Extjs3/externalHeader.php');
+            echo "<h1>Invalid license</h1>";
+            echo "<p>" . License::$validationError. "</p>";
+	        require('views/Extjs3/externalFooter.php');
+            exit();
         }
 
 		//Server manager uses this when directly signing in
@@ -83,6 +92,8 @@ try {
 			//this token is used in default_scripts.inc.php too
 			$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
 			if($token) {
+
+                go()->getAuthState()->setToken($token);
 				$token->setAuthenticated();
 				$token->setCookie();
 
@@ -100,6 +111,7 @@ try {
 
             $token = new Token();
             $token->userId = $rememberMe->userId;
+            go()->getAuthState()->setToken($token);
             $token->setAuthenticated();
             $token->setCookie();
 
@@ -109,7 +121,7 @@ try {
 
 		go()->fireEvent(\go\core\App::EVENT_INDEX);
 
-		Response::get()->sendHeaders();
+
 	}
 
 	GO::router()->runController();

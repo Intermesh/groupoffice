@@ -14,14 +14,17 @@
 namespace GO\Email\Controller;
 
 
+use GO\Base\Model\TemplateGroup;
+
 class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	
 	protected $model = 'GO\Base\Model\Template';
 	
 	protected function remoteComboFields() {
 		return array(
-				'user_name'=>'$model->user->name'
-				);
+				'user_name'=>'$model->user->name',
+			'group_id' => '$model->getGroupName()'
+		);
 	}
 	
 	protected function getStoreParams($params) {
@@ -77,6 +80,9 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	
 	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
 		$columnModel->formatColumn('user_name', '$model->user->name');
+		$columnModel->formatColumn('group_name', function($model) {
+			return $model->getGroupName();
+		});
 		return parent::formatColumns($columnModel);
 	}
 
@@ -128,7 +134,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$store->addRecord(array(
 			'group' => 'templates',
 			'checked'=>isset($this->_defaultTemplate->template_id) && $this->_defaultTemplate->template_id==0,
-			'text' => \GO::t("None"),
+			'text' => \GO::t("None", "legacy", "email"),
 			'template_id'=>0
 		));
 		

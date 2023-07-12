@@ -1,17 +1,22 @@
-import {Table} from "@goui/component/table/Table.js";
-import {JmapStore, jmapstore} from "@goui/jmap/JmapStore.js";
-import {t} from "@goui/Translate.js";
-import {Config, createComponent} from "@goui/component/Component.js";
-import {column} from "@goui/component/table/TableColumns.js";
+import {
+	column,
+	Config,
+	createComponent,
+	datasourcestore,
+	DataSourceStore,
+	t,
+	Table
+} from "@intermesh/goui";
+import { jmapds } from "@intermesh/groupoffice-core";
 
 
-export class NoteBookGrid extends Table<JmapStore> {
+export class NoteBookGrid extends Table<DataSourceStore> {
 
 	constructor() {
 
 		super(
-			jmapstore({
-				entity: "NoteBook",
+			datasourcestore({
+				dataSource: jmapds("NoteBook"),
 				sort: [{
 					property: "name"
 				}]

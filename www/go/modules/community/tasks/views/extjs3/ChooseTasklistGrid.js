@@ -5,13 +5,14 @@ go.modules.community.tasks.ChooseTasklistGrid = Ext.extend(go.grid.GridPanel, {
 			fields: [
 				'id', 
                 'name',
+				'role',
                 {name: 'creator', type: "relation"}
 			],
 			entityStore: "TaskList"
 		});
 
 		Ext.apply(this, {		
-		
+			singleSelect: true,
 			columns: [
 				{
 					id: 'id',
@@ -27,7 +28,17 @@ go.modules.community.tasks.ChooseTasklistGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(75),
 					sortable: true,
 					dataIndex: 'name'
-                },
+                },{
+					id: 'role',
+					header: t('Role'),
+					width: dp(75),
+					sortable: true,
+					hidden: true,
+					dataIndex: 'role',
+					renderer: (v) => {
+						return t((v).ucFirst());
+					}
+				},
 				{	
 					hidden: true,
 					header: t('Created by'),
@@ -46,8 +57,8 @@ go.modules.community.tasks.ChooseTasklistGrid = Ext.extend(go.grid.GridPanel, {
             listeners: {
 				scope: this,
 				rowclick: function (grid, rowIndex, e) {
-                    var row = this.getSelectionModel().getSelections()[0];
-                    this.selectedId = row.get("id");
+					const row = this.getSelectionModel().getSelections()[0];
+					this.selectedId = row.get("id");
 				}
 			},
 			autoExpandColumn: 'name',

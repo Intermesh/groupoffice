@@ -22,6 +22,8 @@
 namespace GO\Base\Fs;
 
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+
 class XlsFile extends File{
 		
 	/**
@@ -220,7 +222,14 @@ class XlsFile extends File{
 				$this->columnWidths[$colNr] = strlen($field);
 				$this->phpExcelObj->getSheet($this->sheetNr)->getColumnDimensionByColumn($colNr)->setWidth($this->columnWidths[$colNr]);
 			}
-			$this->phpExcelObj->getSheet($this->sheetNr)->setCellValueByColumnAndRow($colNr,$this->nextRowNr, $field);
+
+
+			if(is_string($field) && isset($field[0]) && $field[0] == '=') {
+				//prevent formula detection
+				$this->phpExcelObj->getSheet($this->sheetNr)->setCellValueExplicitByColumnAndRow($colNr, $this->nextRowNr, $field, DataType::TYPE_STRING);
+			} else {
+				$this->phpExcelObj->getSheet($this->sheetNr)->setCellValueByColumnAndRow($colNr, $this->nextRowNr, $field);
+			}
 			
 		}
 		$this->nextRowNr++;
@@ -229,8 +238,45 @@ class XlsFile extends File{
 	public function writeToFile() {
 		
 		$objWriter = new \PHPExcel_Writer_Excel2007($this->phpExcelObj);
+		$objWriter->setPreCalculateFormulas(false);
 		$objWriter->save($this->path);
 				
 	}
-	
+
+	/**
+	 * @return \PHPExcel
+	 */
+	public function getExcelObject(): \PHPExcel
+	{
+		return $this->phpExcelObj;
+	}
+
+	/**
+	 * @return \PHPExcel_Worksheet
+	 * @throws \PHPExcel_Exception
+	 */
+	public function getCurrentSheet(): \PHPExcel_Worksheet
+	{
+		return $this->phpExcelObj->getSheet($this->sheetNr);
+	}
+
+	/**
+	 * Switch sheets, to be chained with the getCurrentSheet() method
+	 *
+	 * @param int $i
+	 * @return $this
+	 * @throws \PHPExcel_Exception
+	 */
+	public function setSheetNumber(int $i)
+	{
+		$numSheets = $this->phpExcelObj->getSheetCount();
+		if( $i < 0 || $i > $numSheets) {
+			throw new \PHPExcel_Exception(
+				"Your requested sheet index: {$i} is out of bounds. The actual number of sheets is {$numSheets}."
+			);
+		}
+		$this->sheetNr = $i;
+		$this->nextRowNr = 1; // Back to the top
+		return $this;
+	}
 }

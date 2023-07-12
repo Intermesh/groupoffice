@@ -558,7 +558,9 @@ class Imap extends ImapBodyStruct
 					$has_no_kids = true;
 				}
 
-				$subscribed = $listSubscribed || $this->_isSubscribed($folder, $flags);
+				$folder = $this->_unescape($folder);
+				$decodedName = $this->utf7_decode($folder);
+				$subscribed = $listSubscribed || $this->_isSubscribed($decodedName, $flags);
 
 				$nonexistent = stristr($flags, 'NonExistent');
 
@@ -566,11 +568,11 @@ class Imap extends ImapBodyStruct
 					$no_select = true;
 				}
 
-				if (!isset($folders[$folder]) && $folder) {
-					$folder = $this->_unescape($folder);
-					$folders[$folder] = array(
+				if (!isset($folders[$decodedName]) && $decodedName) {
+
+					$folders[$decodedName] = array(
 									'delimiter' => $delim,
-									'name' => $this->utf7_decode($folder),
+									'name' => $decodedName,
 									'marked' => $marked,
 									'noselect' => $no_select,
 									'nonexistent' => $nonexistent,
@@ -591,9 +593,9 @@ class Imap extends ImapBodyStruct
 					}
 					else {
 						if($lastProp=='MESSAGES'){
-							$folders[$folder]['messages']=intval($v);
+							$folders[$decodedName]['messages']=intval($v);
 						}elseif($lastProp=='UNSEEN'){
-							$folders[$folder]['unseen']=intval($v);
+							$folders[$decodedName]['unseen']=intval($v);
 						}
 					}
 
@@ -641,8 +643,6 @@ class Imap extends ImapBodyStruct
 		}
 
 		\GO\Base\Util\ArrayUtil::caseInsensitiveSort($folders);
-
-		\GO::debug($folders);
 
 		return $folders;
 	}
@@ -855,7 +855,7 @@ class Imap extends ImapBodyStruct
 			$this->touched_folders[] = $mailbox_name;
 		}
 
-		$box = $this->utf7_encode($mailbox_name);
+		$box = $this->addslashes($this->utf7_encode($mailbox_name));
 		$this->clean($box, 'mailbox');
 
 		\GO::debug("Selecting IMAP mailbox $box");
@@ -2414,15 +2414,13 @@ class Imap extends ImapBodyStruct
 			$this->message_part_read+=strlen($line);
 		}
 
-		if ($this->message_part_size < $this->message_part_read) {
-
+		if ($line && $this->message_part_size < $this->message_part_read) {
 			$line = substr($line, 0, ($this->message_part_read-$this->message_part_size)*-1);
 		}
 
 		if($line===false) {
 			if($this->readFullLiteral) {
 				//don't attempt to read response after already have done that because it will hang for a long time
-				$this->readFullLiteral = true;
 				return false;
 			}
 
@@ -2448,7 +2446,7 @@ class Imap extends ImapBodyStruct
 	 * @param false $peek
 	 * @return bool
 	 */
-	public function save_to_file($uid, $path, $imap_part_id=-1, $encoding='', $peek=false) :bool
+	public function save_to_file($uid, $path, $imap_part_id=-1, $encoding='', $peek=true) :bool
 	{
 
 		$fp = fopen($path, 'w+');
@@ -2563,9 +2561,7 @@ class Imap extends ImapBodyStruct
 	{
 		$this->clean($mailbox, 'mailbox');
 
-		$uid_string = implode(',',$uids);
-
-		$command = "UID COPY %s \"".$this->utf7_encode($mailbox)."\"\r\n";
+		$command = "UID COPY %s \"".$this->addslashes($this->utf7_encode($mailbox))."\"\r\n";
 		$status = $this->_runInChunks($command, $uids);
 		return $status;
 	}
@@ -2858,7 +2854,7 @@ class Imap extends ImapBodyStruct
 
 		$this->clean($mailbox, 'mailbox');
 		$this->clean($size, 'uid');
-		$command = 'APPEND "'.$this->utf7_encode($mailbox).'" ('.$flags.') {'.$size."}\r\n";
+		$command = 'APPEND "'.$this->addslashes($this->utf7_encode($mailbox)).'" ('.$flags.') {'.$size."}\r\n";
 		$this->send_command($command);
 		$result = fgets($this->handle);
 		if (substr($result, 0, 1) == '+') {

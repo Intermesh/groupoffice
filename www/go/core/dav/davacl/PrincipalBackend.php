@@ -63,11 +63,11 @@ class PrincipalBackend extends AbstractBackend {
 		go()->debug('GO\DAV\Auth\Backend::getUsers()');
 
 		if (!isset($this->users)) {
-			//$this->users = [];
-			// $users = User::find(['id', 'username', 'displayName', 'email']);
-			// foreach($users as $user) {
-				$this->users = [$this->modelToDAVUser(go()->getAuthState()->getUser(['id', 'username', 'displayName', 'email']))];
-			// }
+			$this->users = [];
+			 $users = User::find(['id', 'username', 'displayName', 'email']);
+			 foreach($users as $user) {
+				$this->users[] = $this->modelToDAVUser($user);
+			 }
 		}
 		return $this->users;
 	}
@@ -115,20 +115,7 @@ class PrincipalBackend extends AbstractBackend {
 	 * @return array 
 	 */
 	public function getGroupMemberSet($principal) {
-
 		go()->debug("getGroupMemberSet($principal)");
-//        $principal = $this->getPrincipalByPath($principal);
-//        if (!$principal) throw new Sabre\DAV\Exception('Principal not found');
-//
-//        $stmt = $this->pdo->prepare('SELECT principals.uri as uri FROM groupmembers LEFT JOIN principals ON groupmembers.member_id = principals.id WHERE groupmembers.principal_id = ?');
-//        $stmt->execute(array($principal['id']));
-//
-//        $result = array();
-//        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-//            $result[] = $row['uri'];
-//        }
-//        return $result;
-
 		return array();
 	}
 
@@ -163,7 +150,11 @@ class PrincipalBackend extends AbstractBackend {
 
 	function searchPrincipals($prefixPath, array $searchProperties, $test = 'allof') {
 
-		go()->debug("searchPrincipals");
+		go()->debug("searchPrincipals($prefixPath, ". var_export($searchProperties, true) . ', ' . $test .')');
+
+		if($prefixPath != "principals") {
+			return [];
+		}
 		
 		$query = go()->getDbConnection()
 						->selectSingleValue('username')
@@ -175,9 +166,9 @@ class PrincipalBackend extends AbstractBackend {
 				case '{DAV:}displayname' :					
 					$query->where('displayName', 'LIKE', '%' . $value . '%');
 					break;
-				
-				case '{http://sabredav.org/ns}email-address' :
-					$query->where('email', 'LILE', '%' . $value . '%');					
+
+				case '{http://sabredav.org/ns}email-address':
+					$query->where('email', 'LIKE', '%' . $value . '%');
 					break;
 				default :
 					// Unsupported property
@@ -187,39 +178,10 @@ class PrincipalBackend extends AbstractBackend {
 		
 		$principals = [];
 		foreach($query as $username) {			
-			$principals[] = $username;
+			$principals[] = 'principals/' . $username;
 		}
 
 		return $principals;
-	}
-
-	public function findByUri($uri, $principalPrefix) {
-//		$value = null;
-//        $scheme = null;
-//        list($scheme, $value) = explode(":", $uri, 2);
-//        if (empty($value)) return null;
-//
-//        $uri = null;
-//        switch ($scheme){
-//            case "mailto":
-//                $query = 'SELECT uri FROM ' . $this->tableName . ' WHERE lower(email)=lower(?)';
-//                $stmt = $this->pdo->prepare($query);
-//                $stmt->execute([ $value ]);
-//            
-//                while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-//                    // Checking if the principal is in the prefix
-//                    list($rowPrefix) = URLUtil::splitPath($row['uri']);
-//                    if ($rowPrefix !== $principalPrefix) continue;
-//                    
-//                    $uri = $row['uri'];
-//                    break; //Stop on first match
-//                }
-//                break;
-//            default:
-//                //unsupported uri scheme
-//                return null;
-//        }
-//        return $uri;
 	}
 
 }

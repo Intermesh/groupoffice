@@ -82,9 +82,10 @@ Ext.define('go.form.ArrayFieldGrid',{
 
 			tbar: {
 				items: [
-					{xtype: "tbtitle", text: config.tbtitle},'->',
+					{xtype: "tbtitle", text: config.tbtitle}, '->',
 					this.addCombo = new go.form.ComboBox({
 						//iconCls: "ic-add",
+						width: dp(260),
 						allowBlank: true,
 						hiddenName: null,
 						emptyText: t('Add'),

@@ -5,6 +5,7 @@ namespace go\core;
 use Exception;
 use go\core\cache\None;
 use go\core\fs\File;
+use go\core\http\Response;
 use go\core\jmap\Request;
 use go\core\model\Module;
 use go\core\model\User;
@@ -43,24 +44,38 @@ class Language {
 	 */
 	public function getIsoCode(): string
 	{
-
 		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
-			if(!headers_sent())
-				setcookie('GO_LANGUAGE', $_GET['SET_LANGUAGE'], time() + (10 * 365 * 24 * 60 * 60));
+			$this->isoCode = $_GET['SET_LANGUAGE'];
+			$this->setCookie();
 			return $_GET['SET_LANGUAGE'];
 		}
 
 		if(!isset($this->isoCode)) {
-			if(isset($_COOKIE['GO_LANGUAGE'])) {
+			if(isset($_COOKIE['GO_LANGUAGE']) && $this->hasLanguage($_COOKIE['GO_LANGUAGE'])) {
 				$this->isoCode = $_COOKIE['GO_LANGUAGE'];
 			} else {
 				$this->isoCode = go()->getAuthState() && go()->getAuthState()->isAuthenticated() ? go()->getAuthState()->getUser(['language'])->language : $this->getBrowserLanguage();
-				if(!headers_sent())
-					setcookie('GO_LANGUAGE', $this->isoCode, time() + (10 * 365 * 24 * 60 * 60));
 			}
 		}
 		return $this->isoCode;
 	}
+
+	private function setCookie() {
+		if(empty($_COOKIE['GO_LANGUAGE']) || $_COOKIE['GO_LANGUAGE'] != $this->isoCode) {
+			$_COOKIE['GO_LANGUAGE'] = $this->isoCode;
+			setcookie("GO_LANGUAGE", $this->isoCode, time() + (10 * 365 * 24 * 60 * 60), "/", Request::get()->getHost(), Request::get()->isHttps(), true);
+		}
+	}
+
+
+	public function getTextDirection(): string
+	{
+		if(in_array($this->getIsoCode(), ['ar', 'he', 'ur'])) {
+			return 'rtl';
+		}
+		return 'ltr';
+	}
+
 
 	/**
 	 * Set new language
@@ -68,7 +83,7 @@ class Language {
 	 * @param string|null $isoCode when not given it's detected from the browser
 	 * @return string|false Old language setting
 	 */
-	public function setLanguage($isoCode = null) {
+	public function setLanguage(?string $isoCode = null) {
 		$old = $this->getIsoCode();
 		if(!isset($isoCode)) {
 			$isoCode = $this->getBrowserLanguage();
@@ -110,12 +125,13 @@ class Language {
 	}
 
 	private $af;
-	public function getAddressFormat(string $isoCode) {
+	public function getAddressFormat(string $isoCode) : string {
 
 		$isoCode = strtoupper($isoCode);
 
 		if(!isset($this->af)) {
 			require(\go\core\Environment::get()->getInstallFolder() . '/language/addressformats.php');
+			/** @noinspection PhpUndefinedVariableInspection */
 			$this->af = $af;
 		}
 
@@ -149,12 +165,12 @@ class Language {
 	/**
 	 * Format an address
 	 *
-	 * @param $countryCode
-	 * @param $address array with street, street2, city, zipCode and state
+	 * @param array $address array with street, street2, city, zipCode and state
+	 * @param string|null $countryCode
 	 * @param boolean|null $showCountry When null it will be false if the country isthe system default
 	 * @return string
 	 */
-	public function formatAddress($countryCode, $address, bool $showCountry = true)
+	public function formatAddress(array $address, ?string $countryCode, bool $showCountry = true) : string
 	{
 		if(empty($countryCode)) {
 			$countryCode = self::defaultCountry();
@@ -163,6 +179,7 @@ class Language {
 		if (empty($address['street']) && empty($address['street2']) && empty($address['city']) && empty($address['state'])) {
 			return "";
 		}
+
 		$format = go()->getLanguage()->getAddressFormat($countryCode);
 
 		$format = str_replace('{address}', $address['address'] ?? $address['street'] ?? "", $format);

@@ -9,9 +9,17 @@
     "esModuleInterop": true,
     "outDir": "./dist", //set this in the extended
     "baseUrl": ".", //set this in the extended too
+
     "paths": {
-      "@goui/*": ["../../../../../../views/goui/goui/dist/*"],
-      "@go-core/*": ["../../../../../../views/goui/groupoffice-core/dist/*"]
+      "@intermesh/goui": [
+        "../../../../../../views/goui/dist/goui/script/index.d.ts",
+        "../../../../../../views/goui/dist/goui/script/index.js"
+
+      ],
+      "@intermesh/groupoffice-core": [
+        "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
+        "../../../../../../views/goui/dist/groupoffice-core/script/index.js"
+      ]
     }
   }
 

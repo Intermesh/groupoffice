@@ -25,16 +25,34 @@ GO.email.TemplatesGrid = function(config)
 	});
 	config.title= t("Templates");
 	
-	config.store = new GO.data.JsonStore({
-		url: GO.url('email/template/store'),
+	// config.store = new GO.data.JsonStore({
+	// 	url: GO.url('email/template/store'),
+	// 	baseParams: {
+	// 		permissionLevel: GO.permissionLevels.write
+	// 	},
+	// 	root: 'results',
+	// 	id: 'id',
+	// 	fields: ['id', 'user_id', 'owner', 'name', 'type', 'acl_id','extension','group_id'],
+	// 	remoteSort: true
+	// });
+
+	config.store = new Ext.data.GroupingStore({
+		url:GO.url("email/template/store"),
+		sortInfo:{field: 'name',direction: "ASC"},
 		baseParams: {
 			permissionLevel: GO.permissionLevels.write
 		},
-		root: 'results',
-		id: 'id',
-		fields: ['id', 'user_id', 'owner', 'name', 'type', 'acl_id','extension'],
-		remoteSort: true
+		reader: new Ext.data.JsonReader({
+			root: 'results',
+			totalProperty: 'total',
+			id: 'id',
+			fields: ['id', 'user_id', 'owner', 'name', 'type', 'acl_id','extension','group_name', 'group_id'],
+		}),
+		groupField:'group_id',
+		remoteSort:true,
+		remoteGroup:true
 	});
+
 	config.store.setDefaultSort('name', 'ASC');
 //	if (GO.util.empty(config.noDocumentTemplates)) {
 //		config.store.on('load', function(){
@@ -68,6 +86,20 @@ GO.email.TemplatesGrid = function(config)
 			this.deleteSelected();
 		},
 		scope: this
+	},{
+		iconCls: 'ic-list',
+		text: t('Groups'),
+		handler() {
+			(new GO.Window({
+				title: t('Groups'),
+				width: 500,
+				layout:'fit',
+				height: 400,
+				items: [
+					new GO.email.TemplateGroupGrid()
+				]
+			})).show()
+		}
 	},'->',{
 		xtype:'tbsearch',
 		store: config.store
@@ -89,8 +121,11 @@ GO.email.TemplatesGrid = function(config)
 		{
 			header: t("Name"),
 			dataIndex: 'name'
-		},
-		{
+		},{
+			header: t('Group'),
+			dataIndex: 'group_id',
+			renderer: (v,meta,rec) => rec.data.group_name
+		}, {
 			header: t("Owner"),
 			dataIndex: 'owner' ,
 			width: 200,
@@ -99,12 +134,15 @@ GO.email.TemplatesGrid = function(config)
 		]
 	});
 
-
-	config.view=new Ext.grid.GridView({
+	config.view = new Ext.grid.GroupingView({
+		showGroupName: false,
+		enableNoGroups:false, // REQUIRED!
+		hideGroupedColumn: true,
+		emptyText: t("No items to display"),
 		autoFill: true,
-		forceFit: true,
-		emptyText: t("No items to display")
+		forceFit: true
 	});
+
 	config.cm= columnModel;
 	config.border= false;
 	config.paging= true;
@@ -146,7 +184,7 @@ Ext.extend(GO.email.TemplatesGrid, GO.grid.GridPanel,{
 		if(!this.emailTemplateDialog){
 			this.emailTemplateDialog = new GO.email.EmailTemplateDialog();
 			this.emailTemplateDialog.on('save', function(){
-				this.store.load();
+				this.store.reload();
 			}, this);
 		}
 		this.emailTemplateDialog.show(template_id);
@@ -157,15 +195,10 @@ Ext.extend(GO.email.TemplatesGrid, GO.grid.GridPanel,{
 	afterRender : function()
 	{
 		GO.email.TemplatesGrid.superclass.afterRender.call(this);
-		
-		if(this.isVisible())
+		if(!this.store.loaded)
 		{
-			if(!this.store.loaded)
-			{
-				this.store.load();
-			}
+			this.store.load();
 		}
-
 	},
 	
 	onShow : function(){

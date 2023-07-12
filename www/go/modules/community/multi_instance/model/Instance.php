@@ -5,6 +5,7 @@ use Exception;
 use GO\Base\ModuleCollection;
 use go\core\db\Connection;
 use go\core\db\Criteria;
+use go\core\db\Database;
 use go\core\db\Utils;
 use go\core\ErrorHandler;
 use go\core\fs\File;
@@ -386,11 +387,15 @@ class Instance extends Entity {
 			if(!$tmpFolder->create()) {
 				throw new Exception("Could not create temporary files folder");
 			}
-		
+
+            go()->getDbConnection()->pauseTransactions();
+
 			$this->createDatabase($instanceConfig['db_name']);
 			$databaseCreated = true;
 			$this->createDatabaseUser($instanceConfig['db_name'], $instanceConfig['db_user'], $instanceConfig['db_pass']);
 			$databaseUserCreated = true;
+
+            go()->getDbConnection()->resumeTransactions();
 
 			if(!isset($instanceConfig['db_host'])) {
 				$instanceConfig['db_host'] = go()->getConfig()['db_host'];
@@ -412,6 +417,8 @@ class Instance extends Entity {
 			$this->writeConfig();
 
 		} catch(Exception $e) {
+
+            go()->getDbConnection()->resumeTransactions();
 			
 			//cleanup
 			$tmpFolder->delete();
@@ -597,25 +604,57 @@ class Instance extends Entity {
 		$expiresAt = new DateTime("+1 hour");
 		
 		$data = [
-				"loginToken" => uniqid().bin2hex(random_bytes(16)),
-				"accessToken" => uniqid().bin2hex(random_bytes(16)),
-				"expiresAt" => $expiresAt,
-				"userAgent" => "Multi Instance Module",
-				"userId" => 1,
-				"createdAt" => $now,
-				"lastActiveAt" => $now,
-				"remoteIpAddress" => $_SERVER['REMOTE_ADDR']
+
+            "loginToken" => uniqid().bin2hex(random_bytes(16)),
+            "accessToken" => uniqid().bin2hex(random_bytes(16)),
+            "expiresAt" => $expiresAt,
+            "userId" => 1,
+            "createdAt" => $now,
 		];
 
+
+        if($this->getInstanceDbConnection()->getDatabase()->getTable("core_auth_token")->hasColumn('userAgent')) {
+            $data["userAgent"] = "Multi Instance Module";
+            $data["lastActiveAt"] = $now;
+            $data["remoteIpAddress"] = $_SERVER['REMOTE_ADDR'];
+        } else
+        {
+            //6.7 with clients
+            $client = go()->getAuthState()->getUser()->currentClient();
+            $db = new Database($this->getInstanceDbConnection());
+            $table = $db->getTable('core_client');
+
+            $arr = [];
+            foreach($table->getColumnNames() as $col) {
+                $arr[$col] = $client->$col;
+            }
+            unset($arr['id']);
+
+						$arr['userId'] = 1;
+
+            if(!$this->getInstanceDbConnection()->insert('core_client', $arr)->execute()) {
+                throw new Exception("Failed to create access token");
+            }
+
+            $data['clientId'] = $this->getInstanceDbConnection()->getPDO()->lastInsertId();
+            $data["CSRFToken"] = uniqid().bin2hex(random_bytes(16));
+        }
+
 		if($this->getInstanceDbConnection()->getDatabase()->getTable("core_auth_token")->hasColumn('platform')) {
-			//available since 6.5
-			$data["platform"] = go()->getAuthState()->getToken()->platform;
-			$data["browser"] = go()->getAuthState()->getToken()->browser;
+
+            //available since 6.5
+
+            $client = go()->getAuthState()->getUser()->currentClient();
+
+			$data["platform"] = $client->platform;
+			$data["browser"] = $client->name;
 		}
 
 		if(!$this->getInstanceDbConnection()->insert('core_auth_token', $data)->execute()) {
 			throw new Exception("Failed to create access token");
 		}
+
+        $this->getInstanceDbConnection()->disconnect();
 		
 		return $data['accessToken'];	
 	}
@@ -666,7 +705,24 @@ class Instance extends Entity {
 						->selectSingleValue('value')
 						->from('go_settings')
 						->where('name', '=', "file_storage_usage")
+						->andWhere('user_id', '=', 0)
 						->single();
+
+			$this->storageUsage += (int) (new \go\core\db\Query())
+				->setDbConnection($this->getInstanceDbConnection())
+				->selectSingleValue('value')
+				->from('go_settings')
+				->where('name', '=', "email_usage")
+				->andWhere('user_id', '=', 0)
+				->single();
+
+			$this->storageUsage += (int) (new \go\core\db\Query())
+				->setDbConnection($this->getInstanceDbConnection())
+				->selectSingleValue('value')
+				->from('go_settings')
+				->where('name', '=', "database_usage")
+				->andWhere('user_id', '=', 0)
+				->single();
 
 			$this->version = (new \go\core\db\Query())
 						->setDbConnection($this->getInstanceDbConnection())
@@ -682,7 +738,15 @@ class Instance extends Entity {
 		}
 		catch(Exception $e) {
 			//ignore
-		}
+      go()->getDebugger()->debug($e);
+		} finally {
+			try {
+				$this->getInstanceDbConnection()->disconnect();
+			} catch(Exception $e) {
+				//ignore
+				go()->getDebugger()->debug($e);
+			}
+    }
 	}	
 	
 	
@@ -845,7 +909,7 @@ class Instance extends Entity {
 					'package' => 'legacy',
 					'module' => $mod->name(),
 					'title' => $mod->localizedName(),
-					'icon' => $mod->icon(),
+//					'icon' => $mod->icon(),
 					'localizedPackage' => ucfirst($mod->package())
 				];
 			} elseif ($mod instanceof Module) {
@@ -856,7 +920,7 @@ class Instance extends Entity {
 					'package' => $mod->getPackage(),
 					'module' => $mod->getName(),
 					'title' => $mod->getTitle(),
-					'icon' => $mod->getIcon(),
+//					'icon' => $mod->getIcon(),
 					'localizedPackage' => ucfirst($mod->getPackage())
 				];
 			}

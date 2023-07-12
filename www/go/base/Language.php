@@ -51,11 +51,11 @@ class Language{
 	 * Set the language to translate into. Clears the cached language strings too.
 	 * 
 	 * @param StringHelper $isoCode Leave empty to set the default user language.
-	 * @return StringHelper Old ISO code that was set.
+	 * @return string|false Old ISO code that was set.
 	 */
 	public function setLanguage($isoCode = null){		
-		if(!isset($isoCode) || \go()->getLanguage()->hasLanguage($isoCode)) {
-			return \go()->getLanguage()->setLanguage($isoCode);	
+		if(!isset($isoCode) || go()->getLanguage()->hasLanguage($isoCode)) {
+			return go()->getLanguage()->setLanguage($isoCode);
 		}
 
 		return $this->_langIso;
@@ -65,12 +65,13 @@ class Language{
 	
 	
 	/**
-	 * @return StringHelper Language ISO code. eg. en,nl or en_UK
+	 * @return string Language ISO code. eg. en,nl or en_UK
 	 */
-	public function getLanguage(){
-		return 	\go()->getLanguage()->getIsoCode();
+	public function getLanguage(): string
+	{
+		return 	go()->getLanguage()->getIsoCode();
 	}
-	
+
 	
 	/**
 	 * Check if language is supported
@@ -79,7 +80,7 @@ class Language{
 	 * @return boolean 
 	 */
 	public function hasLanguage($langIso){
-		return 	\go()->getLanguage()->hasLanguage($langIso);
+		return 	go()->getLanguage()->hasLanguage($langIso);
 	}
 	
 	/**
@@ -102,7 +103,7 @@ class Language{
 	 * @return array array('en'=>'English');
 	 */
 	public function getLanguages(){
-		return \go()->getLanguage()->getLanguages();
+		return go()->getLanguage()->getLanguages();
 	}
 	
 	/**

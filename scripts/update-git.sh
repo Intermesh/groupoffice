@@ -10,8 +10,9 @@ CONFIG=$1
 
 SASS="sass --no-source-map"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
 cd $DIR/../;
+DIR="$(pwd)";
+
 
 # pull promodules
 echo "Pulling promodules"
@@ -27,6 +28,7 @@ do
 
     echo "Pulling $line"
     cd $line
+    git reset --hard
     git pull
     cd ..
   fi
@@ -34,15 +36,18 @@ done
 
 # pull main github repo
 cd ../../
-#git reset --hard
+git reset --hard
+cd views/goui/goui
+git reset --hard
+cd ../groupoffice-core
+git reset --hard
+cd $DIR/www;
 
 echo "Pulling main repository"
 
-git pull
+git pull --recurse-submodules
 
-echo `pwd`
-
-for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \));
+for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
 do
   replace1=${line/src\/style.scss/style.css};
   replace2=${replace1/src\/style-mobile.scss/style-mobile.css};
@@ -51,7 +56,44 @@ do
 	$SASS $line $replace3;
 done
 
-composer update -n --no-dev -o
+
+function buildGOUI() {
+  echo BUILDING node modules inside "$1"...
+  cd $DIR;
+  for line in $(find $1 -name package.json -not -path '*/node_modules/*');
+  do
+    local NODE_DIR="$(dirname "${line}")";
+    echo "BUILD:" $NODE_DIR;
+    cd $NODE_DIR;
+    npm update;
+    npm run build;
+    cd $DIR;
+
+  done
+
+  echo "DONE";
+}
+
+echo "Building GOUI shared libs..."
+cd $DIR;
+cd ./www/views/goui/goui
+npm ci
+
+cd ../groupoffice-core
+npm ci
+
+cd ..
+npm ci
+npm run build
+npm prune --production
+cd $DIR;
+echo "DONE";
+
+buildGOUI "./www/go/modules"
+
+cd www
+
+composer install -n --no-dev -o
 
 if [ -z "$CONFIG" ]; then
   echo NOTE: Not upgrading database because no config file was passed. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php

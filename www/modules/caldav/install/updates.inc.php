@@ -56,3 +56,6 @@ $updates['201711161544'][] = 'ALTER TABLE `dav_tasks` ADD FOREIGN KEY (`id`) REF
 
 $updates['202004011205'][] = "ALTER TABLE `dav_events` CHANGE `uri` `uri` VARCHAR(512) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';";
 $updates['202004011205'][] = "ALTER TABLE `dav_tasks` CHANGE `uri` `uri` VARCHAR(512) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';";
+
+$updates['202211250804'][] = "alter table dav_events
+    modify data MEDIUMTEXT not null;";

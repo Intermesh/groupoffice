@@ -40,9 +40,7 @@
 GO.base.email.EmailEditorPanel = function(config){
 	
 	config = config || {};
-	 
-	//Ext.apply(this, config);	
-	
+
 	config.htmlEditorConfig = config.htmlEditorConfig || {};
 	
 	if(!config.maxAttachmentsSize)
@@ -54,9 +52,38 @@ GO.base.email.EmailEditorPanel = function(config){
 	config.border=false;	
 	
 	GO.base.email.EmailEditorPanel.superclass.constructor.call(this,config);
-	
+
+
+	this.htmlEditor.on("initialize", () => {
+		setTimeout(() => {
+			this.htmlEditor.getDoc().addEventListener("dragenter", this.onDragEnter.createDelegate(this))
+			this.htmlEditor.getDoc().addEventListener("dragleave", () => {
+				this.onDropZone = false;
+				this.onDragLeave();
+			})
+
+			this.dropZone.getEl().dom.addEventListener("drop", this.onDrop.createDelegate(this));
+			this.dropZone.getEl().dom.addEventListener("dragover", (e) => {
+				e.dataTransfer.dropEffect = "copy";
+				e.preventDefault();
+				e.stopPropagation();
+			});
+			this.dropZone.getEl().dom.addEventListener("dragenter", (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				this.onDropZone = true;
+			});
+
+			this.dropZone.getEl().dom.addEventListener("dragleave", (e) => {
+				this.onDropZone = false;
+				e.preventDefault();
+				this.onDragLeave();
+			});
+		})
+	})
+
 	this.on("render", function(){
-		var formPanel = this.findParentByType(Ext.form.FormPanel);
+		const formPanel = this.findParentByType(Ext.form.FormPanel);
 		formPanel.form.on('actioncomplete', function(form, action){
 			if(action.type=='load'){
 				this.afterLoad(action);
@@ -67,44 +94,30 @@ GO.base.email.EmailEditorPanel = function(config){
 			if(action.type=='submit'){
 				// When the editor is in sourceEditMode then the value needs to be pushed to the HTML editor before it is saved.
 				if(this.htmlEditor.sourceEditMode){
-//					this.emailEditor.htmlEditor.syncValue(); // From HTML to SOURCE
 					this.htmlEditor.pushValue(); // From SOURCE to HTML
 				}
 			}
 		},this);
-		
-// EXT ALREADY DOES THIS IN BasicForm.js
-//		formPanel.form.on('beforeaction', function(form, action){
-//			if(action.type=='submit'){
-//				
-//				//make sure we are in wysiwyg mode.
-//				//won't toggle if not done twice...
-////				if(this.sourceEditMode){
-////					this.htmlEditor.toggleSourceEdit(false);
-////					this.htmlEditor.toggleSourceEdit(false);
-////				}else
-////					{
-////						//extra syncvalue because we disable it on every keypress.
-////						this.htmlEditor.syncValue();	
-////					}
-////				
-//				//extra syncvalue because we disable it on every keypress.
-//				if(!this.htmlEditor.sourceEditMode){
-//					this.htmlEditor.syncValue();
-//				}
-//			}
-//		}, this);		
-			
+
+		// Used for dragging and dropping emails as attachments
+		this.dropTarget = new Ext.dd.DropTarget(this.container, {
+			ddGroup : 'EmailDD',
+			copy:false,
+			notifyOver: this.onNotifyOver.createDelegate(this),
+			notifyDrop : this.onNotifyDrop.createDelegate(this),
+			notifyOut: this.onNotifyOut.createDelegate(this)
+		});
+
 	}, this);
-	
+
 	this.addEvents({
 		submitshortcut : true
 	});
+
 };
 
 Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	
-	// [ [url:"",tmp_file:"relative/path"]]
 	inlineAttachments : [],
 	
 	originalValue : "",
@@ -113,11 +126,13 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	
 	afterLoad : function(action){
 		
-		if(action.result.data.inlineAttachments)
+		if(action.result.data.inlineAttachments) {
 			this.setInlineAttachments(action.result.data.inlineAttachments);
+		}
 		
-		if(action.result.data.attachments)
-			this.setAttachments(action.result.data.attachments);		
+		if(action.result.data.attachments) {
+			this.setAttachments(action.result.data.attachments);
+		}
 		
 		this.setOriginalValue();
 	},
@@ -125,43 +140,42 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	focus : function(){
 		if(this.getContentType()=='html'){
 			return this.htmlEditor.focus();
-		}else	{
+		} else {
 			//focus textarea at beginning
 			var elem = this.textEditor.getEl().dom;
 			if(elem.createTextRange) {
 				var range = elem.createTextRange();
 				range.move('character', 0);
 				range.select();
-			}
-			else {
+			} else {
 				if(elem.selectionStart) {
 					elem.focus();
 					elem.setSelectionRange(0, 0);
-				}
-				else
+				} else {
 					elem.focus();
+				}
 			}
 		}
 	},
 
 	
 	getActiveEditor : function(){
-		if(this.getContentType()=='html')
+		if(this.getContentType()=='html') {
 			return this.htmlEditor;
-		else
-			return this.textEditor;
+		}
+		return this.textEditor;
 	},
 	
 	buildForm : function(config) {
 
-		config.items = config.items || new Array();				
+		config.items = config.items || [];
 
-		this.inlineAttachments = new Array();
+		this.inlineAttachments = [];
 		this.hiddenInlineImagesField = new Ext.form.Hidden({
 			name: 'inlineAttachments'
 		});
 
-		this.attachments = new Array();
+		this.attachments = [];
 		this.hiddenAttachmentsField = new Ext.form.Hidden({
 			name: 'attachments'
 		});
@@ -174,14 +188,14 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		config.items.push(this.hiddenCtField);
 		config.items.push(this.hiddenAttachmentsField);
 		config.items.push(this.hiddenInlineImagesField);
-		
-		var anchorHeight = config.enableSubjectField ?	 "-" + dp(32) : "100%";
 
+		const anchorHeight = config.enableSubjectField ? "-" + dp(32) : "100%";
 
 		this.htmlEditor = new GO.form.HtmlEditor({
 			mobile: {
 				grow: true,
 				growMinHeight: 300,
+				growMaxHeight: 0,
 				anchor: "100%"
 			},
 			desktop: {
@@ -190,7 +204,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			name:'htmlbody',
 			hideLabel: true,
 			headingsMenu: false,
-
+			enableDragDrop: true,
 			plugins:this.initHtmlEditorPlugins(),
 			//this font is applied here because it must match the one in htmleditor.scss. Ext will copy this style to the body tag.
 			style: "font: " + dp(16) + "px  Helvetica, Arial, sans-serif",
@@ -212,6 +226,13 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			cls:'em-plaintext-body-field'
 		});
 
+		this.dropZone = new Ext.BoxComponent({
+			autoEl: 'div',
+			hidden: true,
+			cls: 'go-dropzone',
+			html: t("Drop here to attach")
+		});
+
 		if (!GO.util.empty(config.enableSubjectField))
 			config.items.push({
 				xtype: 'textfield',
@@ -221,17 +242,13 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				fieldLabel: t("Subject")
 			});
 
-		config.items.push(this.htmlEditor);
-		config.items.push(this.textEditor);
-//		console.log(this.maxAttachmentsSize);
-
-		
+		config.items.push([this.htmlEditor, this.textEditor, this.dropZone]);
 
 		this.attachmentsView = new GO.base.email.EmailEditorAttachmentsView({
 			autoHeight:true,
 			maxSize:config.maxAttachmentsSize,
 			listeners:{
-				render:function(){
+				render: function(){
 					//reset this element on render of last element.
 					this.setContentTypeHtml(true);
 				},
@@ -239,12 +256,12 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 					
 					GO.errorDialog.show(av.getMaxSizeExceededErrorMsg());
 				},
-				attachmentschanged:function(av){
+				attachmentschanged: function(av) {
 					this.setEditorHeight();
-					var records = av.store.getRange();
-					
+					const records = av.store.getRange();
+
 					this.attachments=[];
-					for(var i=0, l=records.length;i<l;i++) {
+					for(let i=0, l=records.length;i<l;i++) {
 						this.attachments.push({
 							tmp_file: records[i].data.tmp_file,
 							from_file_storage: records[i].data.from_file_storage,
@@ -262,6 +279,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	},
 
 	htmlEditorAttach : function(htmlEditor,blob, file, img) {
+		this.onDropZone = false;
+		this.onDragLeave();
 
 		if(img) {
 			//inline will be processed from body
@@ -269,6 +288,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		}
 
 		this.attachmentsView.addBlob(blob);
+
 	},
 	
 	reset : function(){
@@ -292,34 +312,32 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	},
 
 	setEditorHeight : function() {
-
-		var height=0;
-		
-		var attachmentsEl = this.attachmentsView.getEl();
+		let height = 0;
+		const attachmentsEl = this.attachmentsView.getEl();
 		attachmentsEl.setHeight("auto");
-		var attachmentsElHeight = attachmentsEl.getHeight();
-		
-		if(attachmentsElHeight > dp(89))
-		{
+		let attachmentsElHeight = attachmentsEl.getHeight();
+		if(attachmentsElHeight > dp(89)) {
 			attachmentsElHeight = dp(89);
 			this.attachmentsView.getEl().setHeight(attachmentsElHeight);
 		}			
 		height += attachmentsElHeight+attachmentsEl.getMargins('tb')  + dp(24);
 		
-		if(this.enableSubjectField)
-			height+=dp(32);
-		
-	
-		
-		var newAnchor = "100% -"+height;
-		
-		//reset anchor and delete cached anchorSpec
-		this.htmlEditor.anchor=newAnchor;
+		if(this.enableSubjectField) {
+			height += dp(32);
+		}
+
+		if(this.dropZone.isVisible()) {
+			height += this.dropZone.getHeight();
+		}
+
+		const newAnchor = "100% -" + height;
+
+		this.htmlEditor.anchor = newAnchor;
 		delete this.htmlEditor.anchorSpec;
-		
-		this.textEditor.anchor=newAnchor;
+
+		this.textEditor.anchor = newAnchor;
 		delete this.textEditor.anchorSpec;
-		
+
 		this.htmlEditor.syncSize();
 		this.ownerCt.doLayout();
 	},
@@ -360,7 +378,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		this.attachments=[];
 		
 		if(attachments){
-			for(var i=0;i<attachments.length;i++)
+			for(let i=0,l=attachments.length; i<l; i++)
 				this.attachments.push({
 					tmp_file: attachments[i].tmp_file,
 					from_file_storage:false,
@@ -372,8 +390,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			});
 
 			this.hiddenAttachmentsField.setValue(Ext.encode(this.attachments));
-		}else
-		{
+		} else {
 			this.attachmentsView.store.loadData({
 				results:[]
 			});
@@ -471,8 +488,169 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				scope : this
 			}]
 		});
-	}
+	},
+
+	/**
+	 * When dragging an email, display a nice icon and display the dropzone
+	 * @param dd
+	 * @param e
+	 * @param data
+	 * @returns {string}
+	 */
+	onNotifyOver(dd,e,data) {
+		console.log('onNotifyOver')
+		if(!this.dropZone.isVisible()) {
+			this.dropZone.show();
+			this.htmlEditor.hide();
+			this.setEditorHeight();
+		}
+		return "x-dd-drop-ok";
+	},
+
+	/**
+	 * When dragging an email out, revert to full editor size
+	 *
+	 * @param dd
+	 * @param e
+	 * @param data
+	 * @returns {boolean}
+	 */
+	onNotifyOut: function(dd,e,data) {
+		console.log('onNotifyOut')
+		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
+		this.dropZone.hide();
+		this.htmlEditor.show();
+		this.setEditorHeight();
+		this.getActiveEditor().show();
+		return true;
+	},
+
+	/**
+	 * When an email is dropped, make a blob and attach to current email.
+	 *
+	 * @param dd
+	 * @param e
+	 * @param data
+	 * @returns {boolean}
+	 */
+	onNotifyDrop: function(dd,e,data) {
+		console.log('onNotifyDrop')
+		if(!data.grid) {
+			this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
+			return false;
+		}
+
+		const selections = data.grid.getSelectionModel().getSelections();
+		for(let i=0,l=selections.length;i<l;i++) {
+			const curr = selections[i];
+
+			let attIdx = i;
+			if(this.attachments && this.attachments.length) {
+				attIdx += this.attachments.length;
+			}
+			const params = {
+				account_id: curr.data.account_id,
+				uid: curr.data.uid,
+				mailbox: curr.data.mailbox,
+				number: attIdx,
+				encoding: ''
+			}
+			GO.request({
+				url: 'email/message/saveToBlob',
+				params: params,
+				scope: this,
+				success: function(options, response, data) {
+					if(data.success) {
+						this.attachmentsView.addBlob(data.blob);
+					}
+					this.dropZone.hide();
+					this.htmlEditor.show();
+					this.setEditorHeight();
+
+				},
+				failure: function(options, response, data) {
+					this.dropZone.hide();
+					this.htmlEditor.show();
+					this.setEditorHeight();
+				}
+			});
+		}
+		return true;
+	},
+
+	/**
+	 * If a file is being dragged, show dropzone and update the editor height
+	 *
+	 * @param e
+	 */
+	onDragEnter: function(e) {
+
+		this.onDropZone = true;
+
+		if (!e.dataTransfer || !e.dataTransfer.files) {
+			return;
+		}
+		e.preventDefault();
+
+		if(!this.dropZone.isVisible()) {
+			e.dataTransfer.dropEffect = "copy";
+			this.dropZone.show();
+			this.setEditorHeight();
+
+			document.body.addEventListener("dragend", () => {
+				this.onDragLeave();
+			}, {once: true})
+		}
+	},
+
+	/**
+	 * If a file is being dragged out, just hide the dropzone and enlarge the editor if needed
+	 *
+	 * @param e
+	 */
+	onDragLeave: function(e) {
+
+		if(e) {
+			e.preventDefault();
+		}
+		// e.stopPropagation();
+		setTimeout(() => {
+			if(!this.onDropZone) {
+				this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
+				this.dropZone.hide();
+				this.setEditorHeight();
+			}
+		}, 200)
+		return true;
+	},
+
+	/**
+	 * If a file is being dropped, upload it via JMAP, attach the resulting blob to the message.
+	 *
+	 * @param e
+	 */
+	onDrop: function(e) {
+		this.onDropZone = false;
+		if (!e.dataTransfer || !e.dataTransfer.files) {
+			this.dropZone.hide();
+			this.setEditorHeight();
+			return;
+		}
+
+		//prevent browser from navigating to dropped file
+		e.preventDefault();
+		e.stopPropagation();
+
+		Array.from(e.dataTransfer.files).forEach(function(file) {
+			go.Jmap.upload(file, {
+				scope: this,
+				success: function(response) {
+					this.attachmentsView.addBlob(response);
+					this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
+					this.dropZone.hide();
+					this.setEditorHeight();
+				}
+			});
+		}, this);
+	},
 });
-
-
-

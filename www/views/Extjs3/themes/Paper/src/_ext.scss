@@ -1,5 +1,28 @@
+%badge {
+	vertical-align: text-bottom;
+	display: inline-block;
+	font-size: sp(13);
+	font-weight: 600;
+	color: rgba(white, 0.87);
+	//margin-top: dp(1.5);
+	min-width:dp(21);
+	width: content-box;
+	height:dp(21);
+	padding: 0 dp(4);
+	line-height:dp(21);
+	letter-spacing: 0;
+	text-align:center;
+	border-radius: dp(10.5); // only round with 1 char
+	background-color: #727272; //color($fg, 'secondary-text');
+
+	.x-tree-node & {
+		//position: absolute;
+		//right: 8px;
+	}
+}
+
 .ext-el-mask {
-	background-color: $black-87-opacity;
+	background-color: color($fg,'text');
 	&-msg { // replace with loading bar
 		@extend .x-mask-loading;
 	}
@@ -112,7 +135,7 @@
 }
 
 .x-ie-shadow {
-	background-color:$black-87-opacity;
+	background-color:color($fg,'text');;
 }
 
 //.x-shadow {
@@ -299,19 +322,75 @@
 // ##################
 // ### FORM FIELD ###
 // ##################
-%checkbox {
-	@extend %icon;
-	content: 'check_box_outline_blank'; // 'check_box' when on
-	position: relative;
-	color: inherit;
-	display:inline-block;
-	height: dp(32);
-	width: dp(32);
-	left:dp(-4);
-	box-sizing: border-box;
-	background-color: transparent;
-	border-radius: 50%;
-	padding:dp(4);
+%checkbox2 {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	display: inline-block;
+	cursor: pointer;
+	min-width: dp(22);
+	min-height: dp(22);
+	width: dp(22);
+	height:dp(22);
+	background-color: color($bg, 'box');
+	border: 1px solid color($fg, 'textbox-line');
+	border-radius: dp(4);
+	&:before { // tick
+		content: '';
+		transform: scale(0);
+		display:inline-block;
+		vertical-align: baseline;
+		margin: -1px;
+		width: dp(22);
+		height: dp(22);
+		transition: 90ms transform ease-in-out;
+		background-color: var(--fg-tick);
+	}
+	&:disabled {
+		background-color: var(--bg-background);
+		border-color: var(--fg-disabled);
+		&:before {
+			background-color: var(--fg-disabled);
+		}
+	}
+	&:checked:before { // tick-on
+		transform: scale(1);
+	}
+	&:focus {
+		@include var(border-color, c-primary);
+		box-shadow: 0 0 0 1px $cPrimary;
+	}
+	&[style]:checked:before {
+		color:inherit;
+		text-shadow: 0 0 1px black;
+	}
+	&[type="checkbox"],
+	//&.x-tree-node-cb,
+	.x-grid3-check-col-td &,
+	.x-menu-check-item:not(.x-menu-group-item) &.x-menu-item-icon,
+	&.x-grid3-row-checker,
+	.x-grid3-hd-checker &.x-grid3-hd-checker {
+		&:before {
+			clip-path: polygon(39.375% 74.375%, 16% 51%, 20.48% 46.52%, 39.33% 65.37%, 79.33% 25.37%, 83.81% 29.85%)
+		}
+	}
+	&[type="radio"],
+	.x-grid3-col-complete & {
+		border-radius: 50%;
+		&:checked:before {
+			content: '';
+			border-radius: 50%;
+			transform: scale(.4);
+		}
+	}
+}
+
+input.x-tree-node-cb, .x-tree-node-cb input {
+	@extend %checkbox2;
+}
+span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
+	margin-top:dp(4);
+	margin-left: dp(4);
 }
 
 .x-form-grow-sizer {
@@ -340,9 +419,21 @@
 	padding: dp(6) dp(8);
 }
 
+// hack to detect browser autofill https://github.com/matteobad/detect-autofill/
+@keyframes onautofillstart { from {} }
+@keyframes onautofillcancel { from {} }
 
-
+.x-fieldset {
+	.x-panel  {
+		border-radius: dp(10);
+		overflow:hidden;
+	}
+}
 .x-form{
+
+	.x-panel, .x-fieldset {
+		overflow: hidden;
+	}
 	background-color: color($bg, 'form');
 	> .x-tab-panel {
 		 > .x-tab-panel-bwrap> .x-tab-panel-body > div { // tabbed form dialog
@@ -387,7 +478,7 @@
 	&-display-field, &-plainfield {
 		@extend %font-data;
 		line-height: dp(20);
-		padding: dp(15) dp(16);
+		padding: dp(10) dp(16);
 		border-radius: dp(10);
 		border: 1px solid color($fg, 'line');
 	}
@@ -395,7 +486,7 @@
 	&-field {
 		@extend %font-data;
 		color: color($fg, 'text');
-		min-height: dp(50);
+		min-height: dp(44); //line-height 20 + padding 11 + borders = 44
 		line-height: dp(20);
 		//line-height: dp(18);
 		transition: border-color 100ms linear, box-shadow 225ms linear;
@@ -405,7 +496,7 @@
 		}
 		+ .x-form-twin-triggers, + .x-form-trigger {
 			border-radius: 0;
-			border-left: 1px solid color($fg, 'line');
+			border-left: 1px solid var(--fg-track);
 		}
 		
 		&[readonly] {
@@ -417,24 +508,41 @@
 		}
 
 		.x-small-editor & {
-			min-height: dp(36);
-			padding: dp(4) dp(8);
+			//min-height: dp(36); //messes up checkbox in billing
+			//padding: dp(4) dp(8);
 		}
 
 
 	}
-	&-text, textarea.x-form-field, &-time {
+	&-duration, &-text, textarea.x-form-field, &-time {
 		@extend %font-data;
 		background-color:color($bg, 'box');
 		border: 1px solid color($fg, 'track');
 		display: inline-block;
-		padding: dp(13) dp(16);
+		padding: dp(11) dp(16);
+
+		&:-webkit-autofill {
+			background-color: transparent !important;
+			-webkit-box-shadow: 0 0 0 50px color($bg, 'box') inset;
+			animation-name: onautofillstart;
+		}
+		&:not(:-webkit-autofill) {
+			animation-name: onautofillcancel;
+		}
 	}
+
+	&-duration > input {
+		border:0;
+		background:transparent;
+		padding:0;
+		@extend %font-data;
+	}
+
 	&-time { max-height: dp(32);  }
 	
 	textarea.x-form-field {
 		/*height: min-content;*/
-		height: dp(32);
+		min-height: dp(44); //line-height 20 + padding 11 + borders = 44
 	}
 	//&-empty-field + .x-form-twin-triggers > .x-form-clear-trigger {
 	//	visibility:hidden; // only show clear button when not
@@ -448,47 +556,26 @@
       color: color($fg, 'text');
 	}
 	&-cb-label {
-		display: inline-block;
-		height: dp(32);
-		line-height: dp(32);
+		//top:4px;
+		line-height: dp(24);
+		margin-left: dp(12);
 	}
 	&-check-wrap {
 		padding: dp(9) 0;
 	}
-	&-checkbox {
-		position:absolute;
-		opacity: 0;
-		line-height: normal;
-		min-height: auto;
-		+ .x-form-cb-label::before {
-			@extend %checkbox;
-			//margin-right: dp(12);
-		}
-		&:checked + .x-form-cb-label::before {
-			content: 'check_box';
-		}
-		&:focus + .x-form-cb-label::before {
-			@include var(background-color, c-primary-tp);
-		}
+	&-checkbox.x-form-field { // the <input>
+		@extend %checkbox2;
+		//margin-right: dp(12);
+		//+ .x-form-cb-label {
+		//	height: dp(24);
+		//}
 	}
-	&-radio {
-		position:absolute;
-		line-height: normal;
-		min-height: auto;
-		opacity:0;
-		+ label {
-			margin-left: 0;
-		}
-		+ label:before {
-			@extend %checkbox; // different icon    |
-			content: 'radio_button_unchecked'; // <--
-		}
-		&:checked + label:before {
-			content: 'radio_button_checked';
-		}
-		&:focus + label::before {
-			@include var(background-color, c-primary-tp);
-		}
+	&-radio.x-form-field {
+		@extend %checkbox2;
+		margin-right: dp(12);
+		//+ label {
+		//	height: dp(24);
+		//}
 	}
 	&-radio-group {
 		padding: dp(4) dp(16);
@@ -500,7 +587,7 @@
 	&-item {
 		position: relative;
 		padding-top: dp(8);
-		margin-bottom:dp(8);
+		margin-bottom:dp(6);
 		//Following line made grid in forms appear in disabled like text
 		/*@extend %font-caption;*/
 
@@ -517,20 +604,18 @@
 			align-items: center;
 			float:none;
 			position:absolute !important;
+			pointer-events: none;
 
 			//top: dp(15);
 			left: dp(12);
-			font-size: sp(16);
-			top: dp(32);
-			transform: translateY(dp(-24)) scale(.8);
-			//below performs better but looks ugly on windows :(
-			will-change: transform;
-			transform-origin: top left;
-			transition: transform linear 100ms;
+			font-size: sp(13);
+			top: dp(8);
+			will-change: top, font-size;
+			transition: all linear 100ms;
 			&.x-form-empty-label:not(&.x-form-focus-label) {
-			 transform: none;
+				top: dp(28);
+				font-size: sp(16);
 			}
-
 
 			padding: 0 dp(4);
 			overflow: visible;
@@ -546,7 +631,7 @@
 
 		label.x-form-invalid-label {
 			color: $cDanger;
-			background-color: $cDangerBg;
+			//background-color: $cDangerBg;
 		}
 
 		label.x-form-readonly-label {
@@ -563,14 +648,14 @@
 		color: $cDanger;
 	}
 	
-	&-focus, textarea.x-form-focus {
+	&-focus, textarea.x-form-focus, &:focus-within {
 		@extend .z2;
 		@include var(border-color, c-primary);
 	}
 
 	&-invalid, textarea.x-form-invalid {
 		border-color: rgba($cDanger,0.54);
-		background-color: $cDangerBg;
+		//background-color: $cDangerBg;
 	}
 	
 	&-helptext {
@@ -579,7 +664,7 @@
 		line-height: 1.6em;
 		//overflow: hidden;
 		//text-overflow: ellipsis;
-		padding-bottom: dp(8);
+		padding: dp(8) dp(16);
 	}
 	
 }
@@ -610,33 +695,35 @@
 	}
 	.x-form-twin-triggers {
 		padding: 0 dp(4);
+		height: 100%;
 		.x-form-trigger {
 			width: dp(32);
 		}
 	}
 	.x-form-trigger {
-		height: dp(50);
-		width: dp(50);
+		height: dp(44);
+		width: dp(44);
 		vertical-align: middle;
 		padding:0;
 		color: color($fg, 'icon');
 		&::before {
-			max-height: dp(50);
-			max-width: dp(50);
+			max-height: dp(44);
+			max-width: dp(44);
 			@extend %icon;
 			content: 'arrow_drop_down';
 		}
 		&.x-form-trigger-over {
-			color:black;
-			//background-color: color($bg, 'hover');
+			//color:black;
+			color:var(--fg-base);
+			background-color: var(--bg-hover);
 		}
 		&.x-form-clear-trigger::before {content: 'clear'; font-size: sp(18)}
 		&.x-form-search-trigger::before {content: 'search';}
 		&.x-form-date-trigger::before {content: 'event';}
 		&.x-form-edit-trigger::before{content: 'edit';}
 		.x-small-editor & {
-			height: dp(36);
-			width: dp(36);
+			//height: dp(36);
+			//width: dp(36);
 		}
 	} 
 	.x-trigger-noedit {
@@ -718,7 +805,7 @@
 		
 		@extend %font-subheading; //changed this to be the same as panel headers as they are mixed in forms
 		//float:left;
-		padding:dp(8) 0 dp(16);
+		padding:dp(8) 0;
 		position: initial;
 		top: dp(32);
 		width: 100%;
@@ -728,7 +815,7 @@
 	
 		.x-tool {
 			float: right;
-			margin: dp(-12) 0;
+			margin: dp(-3.5);
 		}
 /*		.x-tool +.x-fieldset-header-text {
 			line-height: dp(40);
@@ -739,26 +826,9 @@
 			position:relative;
 		}
 
-		input{
-			opacity:0;
-			width:dp(24);
-			height:dp(24);
-			
-			+ .x-fieldset-header-text{
-				padding-left:dp(8);
-				&::before{
-					@extend %checkbox;
-					top:dp(-7);
-					left:dp(-36);
-					pointer-events:none;
-				}
-			}
-			&:checked + .x-fieldset-header-text::before{
-				content: 'check_box';
-			}
-			&:focus + .x-fieldset-header-text::before{
-				@include var(background-color, c-primary-tp);
-			}
+		input {
+			@extend %checkbox2;
+			margin-right: dp(8);
 		}
 	}
 }
@@ -891,8 +961,8 @@
 
 	&:focus, &-focus,  &:hover {
 		//transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		//@include var(background-color, c-primary-tp);
-		filter: brightness(120%);
+		@include var(background-color, c-primary-tp);
+		//filter: brightness(120%);
 	}
 
 	&-icon-small-top {
@@ -1138,12 +1208,12 @@
 
 
 	.x-panel-tbar & {
-		border-bottom: 1px solid color($fg, 'line');
+		border-bottom: 1px solid color($fg, 'border');
 	}
 
 	.x-panel-bbar & {
 		height: dp(56);
-		border-top: 1px solid color($fg, 'line');
+		border-top: 1px solid color($fg, 'border');
 	}
 
 /*	.go-module-panel > div > .x-panel-tbar & {
@@ -1181,7 +1251,7 @@
 		padding: 0 dp(8) 0 0;
 	}
 	.xtb-title {
-		padding-left: dp(8);
+		//padding-left: dp(8);
 		@extend %font-title;
 	}
 
@@ -1312,7 +1382,7 @@
 			@extend %font-caption;
 			color: color($fg, 'text');
 			border-left:0;
-			border-right: 1px solid color($fg, 'divider');
+			border-right: 1px solid color($fg, 'border');
 			//border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
 			height: dp(32);
 
@@ -1334,19 +1404,24 @@
 	&-header{
 		//margin-top: dp(9); //don't understand why +1 here?
 		height:dp(32);
-		border-bottom: 1px solid color($fg, 'line');
+		border-bottom: 1px solid color($fg, 'border');
 		background-color: color($bg, 'background');
 	}
 
 	&-cell-first {
-		.x-grid3-cell-inner {
-			padding-left: dp(24);
+		.x-grid3-cell-inner { // -col-checker
+			padding-left: dp(16);
+			padding-right:0;
 		}
 	}
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
 		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
 		padding: dp(6) dp(8) dp(6) dp(12); // 10 top = middle of row line-height 20dp
+
+		.x-form-radio.x-form-field {
+			margin-right: 0;
+		}
 
 		.ux-row-action-cell & {
 			padding: 0;
@@ -1362,19 +1437,15 @@
 		}
 	}
 	&-row-checker, .x-grid3-hd-checker &-hd-checker {
-		height:dp(20); // same as line-height of text
-		&::before {
-			@extend %checkbox;
-			padding:0; // grid row has the padding
-			top: -1px; // grid col need 1px up
-		}
+		@extend %checkbox2;
+		top:2px;
+		position: relative;
+		//height:dp(20); // same as line-height of text
 		.x-grid3-row-selected &::before {
-			content: 'check_box';
+			transform: scale(1);
 		}
 	}
-	
-	
-	
+
 	&-row {
 		border:0;
 		border-bottom:1px solid color($fg, 'divider');
@@ -1389,7 +1460,7 @@
 			}
 			background-color: $cSelected;
 
-			border-bottom-color: transparent;
+			//border-bottom-color: transparent;
 			background-image: none;
 		}
 		
@@ -1410,17 +1481,15 @@
 	}
 	&-check-col-td > div {
 		text-overflow: initial;
-		 > div {
-			height:dp(20);
-			&::before{
-				@extend %checkbox;
-				padding:0;
-				top: -1px;
-			}
-			&.x-grid3-check-col-on::before {
-				content: 'check_box';
-			}
-		}
+		// > div { //
+	}
+	.x-grid3-check-col, .x-grid3-check-col-on {
+		@extend %checkbox2;
+		height:dp(20);
+		vertical-align: middle;
+	}
+	.x-grid3-check-col-on:before { // tick-on
+		transform: scale(1);
 	}
 	&-row td, &-summary-row td {
 		@extend %font-data;
@@ -1801,12 +1870,10 @@ td.grid-hd-group-cell {
 	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor, &-node-cb {
 		display:table-cell;
 		vertical-align: top; //required for Firefox
-		
-		
 	}
-	&-node-cb {
-		padding: 0 dp(4);
-	}
+	//&-node-cb {
+	//	padding: 0 dp(4);
+	//}
 	&-node-anchor {
 		width:auto;
 		overflow:visible;
@@ -1841,7 +1908,7 @@ td.grid-hd-group-cell {
 		}
 	}
 	&-node {
-		@extend %font-body1;
+		//@extend %font-body1;
 		
 		.x-tree-node-el:hover {background-color: $cHover;}
 		.x-tree-selected {background-color: $cSelected;}
@@ -1860,7 +1927,7 @@ td.grid-hd-group-cell {
 }
 .x-tree-node a > span, .x-dd-drag-ghost a > span {
 	@extend .ellipsis;
-	padding: 0 dp(6);
+	padding: 0 dp(6) 0 dp(12);
 	display:block;
 	top:0;
 	left:0;
@@ -2104,23 +2171,15 @@ td.x-date-mp-sep {
 .x-tip { 
 	border-radius: $borderRadius;
 	box-sizing:content-box;
-	background-color: color($grey, 900);
-	opacity: .9;
-	// Todo ext doesn't put classes on floating elements (yet)
-	//transform: scale(1);
-	//transition: transform 120ms $curve-deceleration, opacity 120ms $curve-standard;
-	//&.x-hide-nosize {
-	//	transform: scale(.8);
-	//	opacity: 0;
-	//}
+	background-color: color($bg, 'alt');
 	.x-tip-header-text {
 		@extend %font-body2;
 		color:white;
 	}
 	.x-tip-body {
-		@extend %font-body2;
-		color:color($grey, 100);
-		letter-spacing: 0.04em; // fixes ugly ext bug for Lato font
+		@extend %font-data;
+		color:color($fg, 'alt');
+		//letter-spacing: 0.04em; // fixes ugly ext bug for Lato font
 	}
 	.x-tip-close {
 		// &:before {
@@ -2128,10 +2187,10 @@ td.x-date-mp-sep {
 		//   content: 'close';
 		// }
 	}
-	.x-tip-mr { padding-right:dp(8);}
-	.x-tip-ml,.x-tip-tl,.x-tip-bl { padding-left: dp(8);}
-	.x-tip-tc { padding-top: dp(6);}
-	.x-tip-bc { padding-bottom: dp(6);}
+	.x-tip-mr { padding-right:dp(12);}
+	.x-tip-ml,.x-tip-tl,.x-tip-bl { padding-left: dp(12);}
+	.x-tip-tc { padding-top: dp(8);}
+	.x-tip-bc { padding-bottom: dp(8);}
 	.x-tip-mc { @extend %font-body2;}
 }
 
@@ -2159,12 +2218,12 @@ td.x-date-mp-sep {
 // ### MENU ###
 // ############
 .x-menu{
-	@extend .z2;
+	@extend .z5;
 	border-radius: $borderRadius;
-	background-color:color($bg,'card');
+	background-color:color($bg,'layer');
 	opacity: 1;
 	transition: opacity 90ms $curve-standard, transform 120ms $curve-deceleration;
-	transform-origin: left top 0px;
+	transform-origin: left top 0;
 	transform: scale(1);
 	will-change: transform, opacity;
 	
@@ -2201,7 +2260,7 @@ td.x-date-mp-sep {
 		content: 'arrow_drop_up';
 		transform: rotate(90deg);
 		position: absolute;
-		right: dp(32);
+		right: dp(16);
 	} 
 	&-item-active { // this is actualy hover in ext
 		background-color: $cHover;
@@ -2209,30 +2268,35 @@ td.x-date-mp-sep {
 	}
 	&-item-icon {
 		display:inline-block;
-		width: dp(40) !important; // <- some modules mess this up
+		margin-right:dp(12);
+		//width: dp(40) !important; // <- some modules mess this up (michael:we have a launcher now)
 		height: dp(20); // 4 dp smaller
 		position:relative;
 		background-size: contain; // <- for svg backgrounds
+		background-position: center center !important; // why is the default left important?
 		li > & {
 			position:absolute;
 		}
 	}
-	&-check-item .x-menu-item-text:before {
-		position: absolute;
-		left: dp(16);
-		top: 0;
-		@extend %icon;
-		content: 'check_box_outline_blank';
+	&-check-item .x-menu-item-icon {
+		@extend %checkbox2;
+		position: relative;
+		top: 1px;
 	}
-	&-item-checked .x-menu-item-text:before {
-		position: absolute;
-		left: dp(16);
-		top: 0;
-		@extend %icon;
-		content: 'check_box';
+	&-item-checked .x-menu-item-icon:before {
+		transform: scale(1);
 	}
-	&-item-checked a.x-menu-group-item .x-menu-item-text:before {
-		content: 'radio_button_checked';
+	a.x-menu-group-item {
+		.x-menu-item-icon {
+			border-radius: 50%;
+		}
+	}
+	&-item-checked a.x-menu-group-item {
+		.x-menu-item-icon:before {
+			content: '';
+			border-radius: 50%;
+			transform: scale(.4);
+		}
 	}
 	&-group-item .x-menu-item-icon{ background-image:none;}
 	&-plain {
@@ -2245,16 +2309,13 @@ td.x-date-mp-sep {
 a.x-menu-item {
 	@extend %font-body1;
 	user-select: none;
-	padding: 0 dp(56) 0 dp(16);
+	padding: 0 dp(40) 0 dp(16);
 	border:0 !important;
-}
-a.x-menu-group-item .x-menu-item-text:before{
-	content: 'radio_button_unchecked';
 }
 .menu-title {
 	@extend %font-caption;
-	@include var(color, c-primary);
-	padding: dp(8) dp(16) 0;
+	@include var(color, c-accent);
+	padding: dp(8) dp(8) 0;
 }
 
 .x-combo-list-group {
@@ -2385,7 +2446,7 @@ $menuScrollerSize : dp(4);
 	@extend %font-body1;
 	border: 1px solid color($fg, 'line');
 	border-radius: $borderRadius;
-	background-color: color($bg, 'dialog');
+	background-color: color($bg, 'card');
 	&-inner {
 		padding: dp(8) 0;
 		//background-color:#fff;
@@ -2405,7 +2466,7 @@ $menuScrollerSize : dp(4);
 		@extend %font-caption;
 	}
 	.x-combo-selected {
-		background-color: $cSelected; //color($grey, 100);
+		background-color: $cSelected;
 	}
 	.x-toolbar {
 		height: dp(40);
@@ -2500,7 +2561,10 @@ $menuScrollerSize : dp(4);
 	}
 }
 .x-tool{
-	margin: dp(12) 0;
+	margin: dp(8) 0;
+	.x-window-header & {
+		margin: dp(12) 0;
+	}
 	position:relative;
 	width:dp(32);
 	height:dp(32);
@@ -2610,10 +2674,14 @@ $menuScrollerSize : dp(4);
 // ##############
 .x-window{
 	@extend .z24;
-	background-color:color($bg,'dialog');
+	will-change: left, top;
+	background-color:color($bg,'layer');
 	border-radius: $borderRadius;
 	overflow:hidden;
 	border: 1px solid color($fg, 'line');
+	form > div:not(.x-tab-panel) {
+		background-color:color($bg,'background');
+	}
 	&-noborder, &-maximized{
 		border: 0;
 		.x-window-header {
@@ -2630,7 +2698,7 @@ $menuScrollerSize : dp(4);
 	&-header {
 		@extend %font-title;
 		background-color:color($bg,'app-bar');
-		border-radius: $borderRadius;
+		border-radius: $borderRadius $borderRadius 0 0;
 		padding: 0 dp(16);
 		&-text {
 			display:block;
@@ -2655,14 +2723,15 @@ $menuScrollerSize : dp(4);
 	&-bbar .x-toolbar {
 		border-top-color: color($fg, 'divider');;
 	}
-	&-maximized .x-window-tc {
-		background-color:#fff;
-	}
 	&-maximized {
+		background-color:color($bg,'card');
 		border-radius: 0;
 	}
 }
-
+.x-window, .x-layer {
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+}
 
 .x-panel-ghost .x-window-tl {
 	border-bottom-color: color($fg, 'divider');
@@ -2687,10 +2756,15 @@ body.x-body-masked .x-window-plain .x-window-mc {
 .x-html-editor-wrap {
 	border-radius: dp(10);
 	border:1px solid color($fg, 'track');
+	background-color:color($bg, 'box');
+
+	iframe {
+		border-radius: dp(10);
+	}
 }
 .x-html-editor-tb {
 	.x-toolbar {
-		height: dp(40);
+		height: dp(64);
 		background-color: transparent;
 
 		.x-toolbar-cell {
@@ -2764,11 +2838,16 @@ body.x-body-masked .x-window-plain .x-window-mc {
 
 $resizerSize : dp(3);
 .x-layout-split {
-	border-right: 1px solid color($fg,'line');
-	border-top: 1px solid color($fg,'line');
+	border-style: solid;
+	border-width: 0;
+	border-color: var(--fg-border);
+	&:hover{
+		border-color: var(--fg-divider);
+	}
 	&.x-splitbar {
 		&-h {
 			width:$resizerSize;
+			border-right-width: 1px;
 			.x-layout-mini {
 				&-east{}
 				&-west{
@@ -2779,12 +2858,13 @@ $resizerSize : dp(3);
 		}
 		&-v {
 			height:$resizerSize;
+			border-top-width: 1px ;
 			.x-layout-mini {
 			}
 		}
 	}
 	.x-layout-mini {
-		background-color: color($bg, 'status-bar');
+		background-color: color($bg, 'box');
 		opacity: 1;
 	}
 }
@@ -2893,10 +2973,10 @@ $resizerSize : dp(3);
 // ### SLIDER ### todo
 // ##############
 .x-slider-horz {
-	height: dp(32);
+	height: dp(44);
 	overflow:visible;
 	.x-slider-inner {
-		top: dp(16);
+		top: dp(24);
 		background-color: color($fg, 'track');
 		border-radius: $borderRadius;
 		height: dp(2);
@@ -2946,7 +3026,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 // ### DIALOG ###
 // ##############
 .x-window-dlg {
-	background-color: color($bg, 'dialog');
+	background-color: color($bg, 'layer');
 	border-radius: $borderRadius;
 }
 .x-window-dlg .ext-mb-text,
@@ -3010,7 +3090,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 							 top:0;
 							 height: dp(24);
 							 width: dp(24);
-							 background-color: color($grey, 50);
+							 background-color: color($bg, 'form');
 							 z-index:1;
 							 border-radius: 50%;
 		}
@@ -3060,7 +3140,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 
 		&[disabled] {
 			~ .thumb {
-				background-color: color($grey, 400);
+				background-color: rgba(black, .42);
 				&::before {
 					background-color: rgba(black, .12);
 				}
@@ -3122,7 +3202,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	&-btn {
 		&-clear:before { @extend %icon; content: 'clear'; font-size:dp(18);width: dp(24);text-align: center }
 		&-expand:before { @extend %icon; content: 'arrow_drop_down'; line-height:dp(18); }
-		&-over { color: black; }
+		&-over { color: var(--fg-base); }
 		&-hide { display:none; }
 	}
 	&-item {
@@ -3145,7 +3225,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 				font-size: 1em;
 			}
 			&:hover, &:active {
-				color: black;
+				color: var(--fg-base);
 			}
 			.x-superboxselect-item-focus & {
 				color:white;

@@ -22,6 +22,10 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 	submit: true,
 	
 	dirty:false,
+
+	labelShouldFloat: function() {
+		return true;
+	},
 	
 	initComponent: function () {
 		
@@ -33,36 +37,37 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 		var uploadBtnCfg = Ext.applyIf(this.uploadBtnCfg || {}, {
 			text: this.uploadButtonText,
 			handler: function(){
-				go.util.openFileDialog({
-					multiple: false, // We do not yet support multiple file upload
-					accept: this.accept,
-					directory: false, // We do not yet support directories
-					autoUpload: this.autoUpload,
-					listeners: {
-						upload: this.onUpload,
-						uploadComplete: this.onUploadComplete,
-						select: this.onSelect,
-						scope: this
-					}
-				});
+
+				if(this.blob) {
+					go.util.downloadFile(go.Jmap.downloadUrl(this.blob.id));
+				} else {
+					go.util.openFileDialog({
+						multiple: false, // We do not yet support multiple file upload
+						accept: this.accept,
+						directory: false, // We do not yet support directories
+						autoUpload: this.autoUpload,
+						listeners: {
+							upload: this.onUpload,
+							uploadComplete: this.onUploadComplete,
+							select: this.onSelect,
+							scope: this
+						}
+					});
+				}
 			},
 			scope:this
 		});
 		this.uploadButton = new Ext.Button(uploadBtnCfg);
 		
 		var clearBtnCfg = Ext.applyIf(this.clearBtnCfg || {}, {
-			text: this.clearButtonText,
+			iconCls: "ic-delete",
+			tooltip: this.clearButtonText,
 			handler: function(){
 				this.clearField();
 			},
 			scope:this
 		});
 		this.clearButton = new Ext.Button(clearBtnCfg);
-		
-		var filenameFieldCfg = Ext.applyIf(this.filenameFieldCfg || {}, {
-			submit: false
-		});
-		this.filenameField = new GO.form.PlainField(filenameFieldCfg);
 				
 		this.items = [this.hiddenField];
 	
@@ -70,10 +75,6 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 		
 		if(this.showClearButton){
 			this.items.push(this.clearButton);
-		}
-		
-		if(this.showFileName){
-			this.items.push(this.filenameField);
 		}
 
 		go.form.FileButtonField.superclass.initComponent.call(this);
@@ -99,7 +100,7 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 				name += ' ('+go.util.humanFileSize(size,true)+')';
 			}
 
-			this.filenameField.setValue(name);
+			this.uploadButton.setText(name);
 		}
 	},
 	
@@ -120,15 +121,15 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 		this.blob = blob;
 		if(blob !== null){
 			this.hiddenField.setValue(blob.id);
-			this.uploadButton.disable();
 			this.clearButton.enable();
-			this.setFileNameField(blob.name,blob.size);	
+			this.setFileNameField(blob.name,blob.size);
 		} else {
-			this.uploadButton.enable();
 			this.clearButton.disable();
 			this.hiddenField.setValue(null);
-			this.filenameField.setValue(null);
+			this.uploadButton.setText(t("Upload"));
 		}
+
+		this.fireEvent("setvalue", this, this.getRawValue());
 	},
 	
 	getValue: function(){

@@ -25,7 +25,7 @@ GO.email.SelectAccount = function (config) {
 
 	Ext.apply(config, {
 		fieldLabel: t("E-mail Account", "email"),
-		anchor:'-20',
+
 
 		store: new GO.data.JsonStore({
 			url: GO.url("email/account/store"),

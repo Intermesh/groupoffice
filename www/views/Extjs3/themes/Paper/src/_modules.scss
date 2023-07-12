@@ -15,6 +15,7 @@
 
   &:before {
       content: " ";
+	  position:absolute;
       background-image: url(#{$resourcePath}img/logo-white.svg);
       background-size: contain;
       background-repeat: no-repeat;
@@ -26,6 +27,7 @@
 
   ul {
       max-width: 95%;
+	  padding-top:dp(40);
       display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(10rem, 17%), 1fr));
       justify-content: space-between;
@@ -51,6 +53,7 @@
   .x-menu-item-icon {
       max-width: dp(96);
       height: dp(96);
+	  margin-right:0;
       width: 100% !important;
       background-position: center !important;
   }
@@ -58,12 +61,17 @@
   li.x-menu-textfield-item {
     grid-column: 1 / -1;
     height: 50px;
-    min-width: 100%;
+	  //max-width: 500px;
+	  margin: 0 auto;
+	  width:400px;
+	  position:relative;
     > div {
       @extend .search-field-wrap;
       background-color: transparent !important;
     }
-    > div > div { margin: 0 auto; max-width: 640px; overflow:hidden;}
+    > div > div {
+		 overflow:hidden;
+	 }
 
   }
   .x-menu-item-text {
@@ -168,9 +176,14 @@ i.icon.em-low_priority {
 	}
 }
 
-.message-body {
+.message-body{
 	background-color: white;
-	position: relative;	
+	position: relative;
+	color: black;
+
+	> * {
+		color:inherit;
+	}
 	
 	p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
 	{
@@ -184,6 +197,11 @@ i.icon.em-low_priority {
 
 	.msg {
 		padding: dp(16);
+
+		img {
+			// no horizontal scrolling in email
+			max-width: 100% !important;
+		}
 	}
 }
 
@@ -307,10 +325,4 @@ i.icon.em-low_priority {
 
 .finance-document-item-group-title {
 	display: none;
-}
-
-.go-form-group.multiple {
-	.finance-document-item-group-title {
-		display: block;
-	}
 }

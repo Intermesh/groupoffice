@@ -101,7 +101,7 @@ class Recurrence extends RRuleIterator {
 	 */
 	static function fromArray(array $rule, DateTimeInterface $start): Recurrence
 	{
-		$me = new self(null, $start);
+		$me = new self($start);
 		foreach(['frequency', 'interval', 'count',
 					  'byMonth', 'byYearDay', 'byWeekNo', 'byMonthDay'] as $key) {
 			if(!empty($rule[$key])) {

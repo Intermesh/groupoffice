@@ -1,18 +1,15 @@
-/* main: style.scss*/
 @font-face {
-	font-family: 'Material Icons';
+	font-family: 'Icons';
 	font-style: normal;
 	font-weight: 400;
 	//src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
-	src: local("Material Icons"), 
-		local("MaterialIcons-Regular"), 
-		url(#{$resourcePath}fonts/icons.woff2) format("woff2"), // Super Modern
+	src: local("Material Icons"),
+	local("MaterialIcons-Regular"),
+	url(#{$resourcePath}fonts/icons.woff2) format("woff2"), // Super Modern
 		//url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
-		url(#{$resourcePath}fonts/icons.ttf) format("truetype"); // Android, Safari, iOS
+	url(#{$resourcePath}fonts/icons.ttf) format("truetype"); // Android, Safari, iOS
 }
-// #################
-// ##### ICONS #####
-// #################
+
 i.icon {
 	@extend %icon;
 	background-size: contain;
@@ -506,6 +503,7 @@ $material-icons : (
 	cast_connected,
 	center_focus_strong,
 	center_focus_weak,
+	change_circle,
 	change_history,
 	chat,
 	chat_bubble,
@@ -1293,6 +1291,15 @@ $material-icons : (
 	zoom_out,
 	zoom_out_map
 );
+@function str-replace($string, $search, $replace: '') {
+	$index: str-index($string, $search);
+
+	@if $index {
+		@return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+	}
+
+	@return $string;
+}
 
 @each $icon in $material-icons {
 	.ic-#{str-replace('' + $icon, '_', '-')}:before {

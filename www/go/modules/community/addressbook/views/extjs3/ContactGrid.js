@@ -34,12 +34,14 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'modifier', type: "relation"},
 				{name: 'addressbook', type: "relation"},
 				// 'starred',
+				'groups',
 				'permissionLevel',
 				'photoBlobId',
 				"isOrganization",
 				"emailAddresses",
 				"phoneNumbers",
 				"dates",
+				'starred',
 				"birthday", //dummy
 				"actionDate", //dummy
 				"gender",

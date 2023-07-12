@@ -22,7 +22,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 			});
 		}
 
-		// this.selModel = new Ext.tree.MultiSelectionModel();
+		//this.selModel = new Ext.tree.MultiSelectionModel();
 		
 		this.root = {
 			nodeType: 'groupoffice',
@@ -61,6 +61,19 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 				}
 			}
 		}, this);
+	},
+
+	rememberLastAddressboek(addressBookId) {
+		const abSettings = go.User.addressBookSettings;
+		if(abSettings.startIn == "remember" && abSettings.lastAddressBookId != addressBookId) {
+			var update = {};
+			update[go.User.id] = {'addressBookSettings': {
+					lastAddressBookId:addressBookId
+				}};
+			go.Db.store("User").set({
+				'update': update
+			});
+		}
 	},
 
 	findAddressbookNode: function (id) {
@@ -208,6 +221,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		if(!this.groupMoreMenu) {
 			this.groupMoreMenu = new Ext.menu.Menu({									
 				items: [{
+						itemId: 'edit',
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function () {
@@ -233,6 +247,8 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		}
 		
 		this.groupMoreMenu.data = node.attributes.data;
+		this.groupMoreMenu.getComponent("edit").setDisabled(this.groupMoreMenu.data.permissionLevel < go.permissionLevels.writeAndDelete);
+		this.groupMoreMenu.getComponent("delete").setDisabled(this.groupMoreMenu.data.permissionLevel  < go.permissionLevels.manage);
 		this.groupMoreMenu.showAt(e.getXY());
 	}
 });

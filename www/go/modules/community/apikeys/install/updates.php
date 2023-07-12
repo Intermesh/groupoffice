@@ -23,5 +23,5 @@ $updates['201911071216'][] = function() {
 $updates['201911071216'][] = "ALTER TABLE `apikeys_key` ADD FOREIGN KEY (`accessToken`) REFERENCES `core_auth_token`(`accessToken`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
 
 $updates['202205121321'][] = "set foreign_key_checks = 0;";
-$updates['202205121321'][] = "alter table apikeys_key change accessToken accessToken varchar(100) character set ascii collate ascii_bin collate ascii_bin not null;";
+$updates['202205121321'][] = "alter table apikeys_key change accessToken accessToken varchar(100) character set ascii collate ascii_bin not null;";
 $updates['202205121321'][] = "set foreign_key_checks = 1;";

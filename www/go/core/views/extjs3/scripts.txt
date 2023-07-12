@@ -44,6 +44,7 @@ form/PasteButtonField.js
 form/DateField.js
 form/DateTimeField.js
 form/TimeField.js
+form/DurationField.js
 form/FileField.js
 form/ImageField.js
 form/FileButtonField.js
@@ -77,7 +78,6 @@ toolbar/SearchButton.js
 toolbar/TitleItem.js
 
 layout/ResponsiveLayout.js
-layout/FitWidthLayout.js
 
 AuthenticationManager.js
 ActivityWatcher.js
@@ -117,6 +117,7 @@ util/Cookies.js
 util/SelectDialog.js
 util/Object.js
 util/Autolinker.js
+util/QuoteStripper.js
 
 User.js
 String.js
@@ -213,11 +214,14 @@ customfields/DetailPanel.js
 customfields/EntityPanel.js
 customfields/EntityDialog.js
 customfields/SystemSettingsPanel.js
+customfields/CustomFieldRelationGrid.js
 customfields/FieldSetDialog.js
 customfields/type/Text.js
 customfields/type/TextDialog.js
 customfields/type/TextArea.js
 customfields/type/TextAreaDialog.js
+customfields/type/Data.js
+customfields/type/DataDialog.js
 customfields/type/Html.js
 customfields/type/HtmlDialog.js
 customfields/type/NumberDialog.js
@@ -226,12 +230,15 @@ customfields/type/DateDialog.js
 customfields/type/Date.js
 customfields/type/DateTimeDialog.js
 customfields/type/DateTime.js
+customfields/type/OptionDialog.js
 customfields/type/SelectOptionsTree.js
 customfields/type/SelectDialog.js
 customfields/type/Select.js
 customfields/type/TreeSelectField.js
 customfields/type/MultiSelectDialog.js
 customfields/type/MultiSelect.js
+customfields/type/AttachmentsDialog.js
+customfields/type/Attachments.js
 customfields/type/FunctionFieldDialog.js
 customfields/type/FunctionField.js
 customfields/type/CheckboxDialog.js
@@ -271,6 +278,7 @@ filter/FilterGrid.js
 filter/FilterCombo.js
 filter/FilterDialog.js
 filter/FilterAddButton.js
+filter/FilterPanel.js
 filter/VariableFilterPanel.js
 filter/VariableFilterDialog.js
 filter/variabletypes/date.js

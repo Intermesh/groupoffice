@@ -41,7 +41,12 @@ class UserSettings extends Property
 	public $addressBooks = [];
 
 
-	public $allowDeletes = false;
+	/**
+	 * Allow deletion of items
+	 *
+	 * @var bool
+	 */
+	public $allowDeletes = true;
 
 
 	private $doSetup = false;

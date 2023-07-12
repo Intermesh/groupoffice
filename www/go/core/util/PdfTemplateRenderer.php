@@ -120,12 +120,46 @@ class PdfTemplateRenderer extends PdfRenderer {
 
 	public function Header() {
 
+		$this->SetFont($this->defaultFont, "", $this->defaultFontSize);
+
+		//Set normal font
+		$this->normal();
+
 		//use stationary PDF
 		if(isset($this->tplIdx) && count($this->tplIdx)) {
 
 			//use every page of the template. If the invoice has more pages use the last page.
 			$tplIdx = isset($this->tplIdx[$this->page]) ? $this->tplIdx[$this->page] : $this->tplIdx[count($this->tplIdx)];
 			$this->useTemplate($tplIdx);
+		}
+
+
+		$w_page = isset($this->l['w_page']) ? $this->l['w_page'].' ' : '';
+		if (empty($this->pagegroups)) {
+			$pagenumtxt = $w_page.$this->getAliasNumPage().' / '.$this->getAliasNbPages();
+		} else {
+			$pagenumtxt = $w_page.$this->getPageNumGroupAlias().' / '.$this->getPageGroupAlias();
+		}
+
+		$this->parser->addModel('pageNumber', $this->getPage());
+		//Print page number
+		if ($this->getRTL()) {
+			$this->parser->addModel('pageNumberWithTotal', $pagenumtxt);
+		} else {
+			$this->parser->addModel('pageNumberWithTotal', $this->getAliasRightShift().$pagenumtxt);
+
+		}
+
+
+		if($this->template->header) {
+			$this->setX($this->template->headerX);
+			$this->setY($this->template->headerY);
+			$data = $this->previewMode ? $this->template->header : $this->parser->parse($this->template->header);
+			$this->writeHTML($data);
+
+
+			$this->setX(0);
+			$this->setY($this->template->marginTop);
 		}
 	}
 
@@ -135,26 +169,18 @@ class PdfTemplateRenderer extends PdfRenderer {
 	 * @public
 	 */
 	public function Footer() {
-		$cur_y = $this->y;
-		$this->SetTextColorArray($this->footer_text_color);
-		//set style for cell border
-		$line_width = (0.85 / $this->k);
-		$this->SetLineStyle(array('width' => $line_width, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => $this->footer_line_color));
 
-		$w_page = isset($this->l['w_page']) ? $this->l['w_page'].' ' : '';
-		if (empty($this->pagegroups)) {
-			$pagenumtxt = $w_page.$this->getAliasNumPage().' / '.$this->getAliasNbPages();
-		} else {
-			$pagenumtxt = $w_page.$this->getPageNumGroupAlias().' / '.$this->getPageGroupAlias();
-		}
-		$this->SetY($cur_y);
-		//Print page number
-		if ($this->getRTL()) {
-			$this->SetX($this->original_rMargin);
-			$this->Cell(0, 0, $pagenumtxt, 0, 0, 'L');
-		} else {
-			$this->SetX($this->original_lMargin);
-			$this->Cell(0, 0, $this->getAliasRightShift().$pagenumtxt, 0, 0, 'R');
+		$this->SetFont($this->defaultFont, "", $this->defaultFontSize);
+
+		//Set normal font
+		$this->normal();
+
+		if($this->template->footer) {
+
+			$this->setX($this->template->footerX);
+			$this->setY($this->template->footerY);
+			$data = $this->previewMode ? $this->template->footer : $this->parser->parse($this->template->footer);
+			$this->writeHTML( $data);
 		}
 	}
 
@@ -171,6 +197,9 @@ class PdfTemplateRenderer extends PdfRenderer {
 	public function render() {
 
 		try {
+
+			$oldLang = go()->getLanguage()->setLanguage($this->template->language);
+
 			$this->AddPage();
 
 			$currentX = $this->getX();
@@ -231,7 +260,11 @@ class PdfTemplateRenderer extends PdfRenderer {
 				$this->MultiCell($this->w - $this->lMargin - $this->rMargin, 14, $e->getTraceAsString(), 0, "L");
 			}
 		}
-		return parent::render();
+		$ret =  parent::render();
+
+		go()->getLanguage()->setLanguage($oldLang);
+
+		return $ret;
 	}
 
 

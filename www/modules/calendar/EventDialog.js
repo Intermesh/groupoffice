@@ -141,7 +141,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			resizable : true,
 			collapsible:true,
 			maximizable:true,
-			width : dp(672),
+			width : dp(768),
 			height : dp(800),
 			stateId:'calendar_event_dialog',
 			closeAction : 'hide',
@@ -232,9 +232,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		} else {
 			this.oldDomId = false;
 		}
-		// propertiesPanel.show();
-
-
 
 		//tmpfiles on the server ({name:'Name',tmp_file:/tmp/name.ext} will be attached)
 		this.formPanel.baseParams.tmp_files = config.tmp_files ? Ext.encode(config.tmp_files) : '';
@@ -267,22 +264,14 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		params.exception_date=config.exception_date;
 		
 		
-			// if the newMenuButton from another passed a linkTypeId then set this
+		// if the newMenuButton from another passed a linkTypeId then set this
 		// value in the select link field
-
-
 		this.recurrencePanel.reset();
-
-
-		//if (config.event_id > 0) {
 			this.formPanel.load({
 				params:params,
 				url : config.url || GO.url('calendar/event/load'),
 				waitMsg:t("Loading..."),
 				success : function(form, action) {
-					//this.win.show();
-
-					
 					this.setData(action);
 					
 					if(action.result.data.enable_reminder){
@@ -312,8 +301,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 					
 					this.setValues(config.values);
-					//this.setWritePermission(action.result.data.write_permission);
-					//this.selectCalendar.setValue(action.result.data.calendar_id);
 					this.selectCalendar.setRemoteText(action.result.remoteComboTexts.calendar_id);
 					
 					this.setPermissionLevel(action.result.data.permission_level);
@@ -325,14 +312,11 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 					this.selectCategory.setCalendarId(action.result.data.calendar_id);
 					this.selectCategory.setRemoteText(action.result.remoteComboTexts.category_id);
-					//this.selectCategory.store.load();
 
-					//this.selectCategory.container.up('div.x-form-item').setDisplayed(this.formPanel.form.baseParams['group_id']==1);
-					
-					if(action.result.data.category_name)
+					if(action.result.data.category_name) {
 						this.selectCategory.setRemoteText(action.result.data.category_name);
+					}
 
-//					this.has_other_participants=action.result.data.has_other_participants;					
 					if(this.resourceGroupsStore.data.items.length == 0 || action.result.group_id != '1') {
 						this.tabPanel.hideTabStripItem('resources-panel');
 						
@@ -528,8 +512,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				
 				GO.dialog.TabbedFormDialog.prototype.refreshActiveDisplayPanels.call(this);
 
-			
-
 				if(action.result.feedback){
 					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 				}else	if (hide) {
@@ -649,8 +631,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 	},
 
 	buildForm : function() {
-
-	
 		this.subjectField = new Ext.form.TextField({
 			//name : 'subject',
 			name : 'name',
@@ -835,7 +815,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			cls:'go-form-panel',
 			layout : 'form',
 			autoScroll : true,
-			defaults: { anchor: '100%'},
+			defaults: { anchor: '99%'}, // 99 needed to prevent horizontal scroll with go-hbox container
 			items : [
 				{
 				xtype : 'container',
@@ -905,11 +885,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				]
 			},
 			this.selectCategory,
-//			new GO.form.PlainField({
-//				fieldLabel: t("Owner"),
-//				value: GO.settings.name,
-//				name:'user_name'
-//			}),
 			{
 				xtype:'textarea',
 				fieldLabel:t("Description"),
@@ -930,7 +905,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		this.reminderValue = new GO.form.NumberField({
 			decimals:0,
 			name : 'reminder_value',
-//			minValue:1,
 			width : 50,
 			value : GO.calendar.defaultReminderValue
 		});
@@ -1005,7 +979,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			id:'resources-panel',
 			title:t("Resources", "calendar"),
 			border:true,
-			//layout:'accordion',
 			forceLayout:true,
 			autoScroll:true,
 			tbar: [
@@ -1018,11 +991,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					scope : this
 				})
 			],
-//			layoutConfig:{
-//				titleCollapse:true,
-//				animate:false,
-//				activeOnTop:false
-//			},
 			defaults:{
 				forceLayout:true,
 				border:false
@@ -1074,12 +1042,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 								for(var m=0; m<cf.length; m++)
 								{
 									if (typeof(resources[j][cf[m].field.databaseName]) != 'undefined') {
-//										if (cf[m].type == 'checkbox' && resources[j][cf[m].dataname]==t("No")) {
-//											continue;
-//										}
-//										if (cf[m].type == 'html' && resources[j][cf[m].dataname]=='<br>') {
-//											continue;
-//										}
 										newFormField = new GO.form.PlainField({
 											fieldLabel: cf[m].field.name,
 											value: resources[j][cf[m].field.databaseName]

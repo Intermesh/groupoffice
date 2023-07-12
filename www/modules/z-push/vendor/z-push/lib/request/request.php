@@ -66,7 +66,7 @@ class Request {
     static private $getUser;
     static private $devid;
     static private $devtype;
-    static private $authUserString;
+    static private $authUserString = "";
     static private $authUser;
     static private $authDomain;
     static private $authPassword;
@@ -219,6 +219,8 @@ class Request {
      */
     static public function ProcessHeaders() {
         self::$headers = array_change_key_case(apache_request_headers(), CASE_LOWER);
+        ZLog::Write(LOGLEVEL_DEBUG, sprintf("Request::ProcessHeaders() headers: %s", var_export(self::$headers, true)));
+
         self::$useragent = (isset(self::$headers["user-agent"]))? self::$headers["user-agent"] : self::UNKNOWN;
         if (!isset(self::$asProtocolVersion))
             self::$asProtocolVersion = (isset(self::$headers["ms-asprotocolversion"]))? self::filterEvilInput(self::$headers["ms-asprotocolversion"], self::NUMBERSDOT_ONLY) : ZPush::GetLatestSupportedASVersion();

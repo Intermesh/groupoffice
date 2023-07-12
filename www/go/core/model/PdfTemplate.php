@@ -6,6 +6,7 @@ use go\core\cron\GarbageCollection;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
+use go\core\model\Module as ModuleModel;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\validate\ErrorCode;
@@ -116,6 +117,17 @@ class PdfTemplate extends Entity {
 	 */
 	public $blocks = [];
 
+
+	public $footer = "";
+	public $header = "";
+
+	public $headerX = 0;
+	public $headerY = 20;
+
+
+	public $footerX = 0;
+	public $footerY = 20;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -140,6 +152,35 @@ class PdfTemplate extends Entity {
 
 	}
 
+	protected static function textFilterColumns(): array
+	{
+		return ['name'];
+	}
+
+	/**
+	 * Find templates by module key and language
+	 *
+	 * @param string $package
+	 * @param string $name
+	 * @param string|null $preferredLanguage
+	 * @param string|null $key
+	 * @return PdfTemplate|null
+	 */
+	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?PdfTemplate {
+		$moduleModel = ModuleModel::findByName($package, $name);
+
+		$template = isset($preferredLanguage) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
+		if (!$template) {
+			$template = static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key])->single();
+		}
+
+		return $template;
+	}
+
+	/**
+	 * @todo Template permissions should be connected to an entity just like a comment.
+	 * @return int
+	 */
 	protected function internalGetPermissionLevel(): int
 	{
 		return Module::findById($this->moduleId)->getPermissionLevel();

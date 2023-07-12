@@ -191,7 +191,7 @@ class Connection {
 	public function exec(string $sql): int
 	{
 		if($this->debug) {
-			go()->getDebugger()->debug($sql, 1, false);
+			go()->getDebugger()->debug($sql, 1, true);
 		}
 		try {
 			return $this->getPdo()->exec($sql);
@@ -231,7 +231,7 @@ class Connection {
 		$this->transactionSavePointLevel++;
 
 		if($this->debug) {
-			go()->debug("START DB TRANSACTION " . $this->transactionSavePointLevel, 1);
+			go()->debug("beginTransaction " . $this->transactionSavePointLevel, 1);
 		}
 
 		return $ret;
@@ -633,10 +633,10 @@ class Connection {
 			 * @var Statement $stmt;
 			 */
 			return $stmt;
-		}catch(PDOException $e) {
+		} catch(PDOException $e) {
 			go()->error("Failed SQL: ". QueryBuilder::debugBuild($build));
-      go()->error($e->getMessage());
-      go()->error($e->getTraceAsString());
+            go()->error($e->getMessage());
+            go()->error($e->getTraceAsString());
 			throw $e;
 		}
 	}

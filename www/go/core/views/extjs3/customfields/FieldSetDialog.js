@@ -12,7 +12,7 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 		this.formPanel.on("setvalues", (form, v) => {
 			this.fieldSetCombo.store.setFilter("default", {
 				entities: [v.entity],
-				exclude: [this.currentId],
+				exclude: this.currentId ? [this.currentId] : undefined,
 				isTab: true
 			});
 
@@ -21,20 +21,23 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 	},
 	initFormItems: function () {
 
-
-		this.addPanel(new go.permissions.SharePanel());
+		this.addPanel(new go.permissions.SharePanel(
+			{
+				addLevel: go.permissionLevels.write
+			}
+		));
 		return [{
 				xtype: 'fieldset',
-				items: [{
-						xtype: "hidden",
-						name: "entity"
-					},
+				items: [
 					{
 						xtype: 'textfield',
 						name: 'name',
 						fieldLabel: t("Name"),
 						anchor: '100%',
 						allowBlank: false
+					},{
+						xtype: "hidden",
+						name: "entity"
 					}, {
 						xtype: "checkbox",
 						name: 'isTab',
@@ -47,6 +50,12 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 							},
 							scope: this
 						}
+					}, {
+						xtype: "checkbox",
+						name: 'collapseIfEmpty',
+						hideLabel: true,
+						boxLabel: t("Collapse when empty"),
+						hint: t('Show this fieldset collapsed when all of its field have the initial value'),
 					},
 					this.fieldSetCombo = new go.customfields.FieldSetCombo({
 						disabled: true,

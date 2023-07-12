@@ -145,24 +145,30 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function validate() {
 		
-		if(!$this->_validateExpression('minutes'))
-			$this->setValidationError('minutes', GO::t("Minutes does not match the required format.", "cron"));
-		
-		if(!$this->_validateExpression('hours'))
-			$this->setValidationError('hours', GO::t("Hours does not match the required format.", "cron"));
-		
-		if(!$this->_validateExpression('monthdays'))
-			$this->setValidationError('monthdays', GO::t("Monthdays does not match the required format.", "cron"));
-		
-		if(!$this->_validateExpression('months'))
-			$this->setValidationError('months', GO::t("Months does not match the required format.", "cron"));
-		
-		if(!$this->_validateExpression('weekdays'))
-			$this->setValidationError('weekdays', GO::t("Weekdays does not match the required format.", "cron"));
-		
-		if(!$this->_validateExpression('years'))
-			$this->setValidationError('years', GO::t("Years does not match the required format.", "cron"));
-		
+//		if(!$this->_validateExpression('minutes'))
+//			$this->setValidationError('minutes', GO::t("Minutes does not match the required format.", "cron"));
+//
+//		if(!$this->_validateExpression('hours'))
+//			$this->setValidationError('hours', GO::t("Hours does not match the required format.", "cron"));
+//
+//		if(!$this->_validateExpression('monthdays'))
+//			$this->setValidationError('monthdays', GO::t("Monthdays does not match the required format.", "cron"));
+//
+//		if(!$this->_validateExpression('months'))
+//			$this->setValidationError('months', GO::t("Months does not match the required format.", "cron"));
+//
+//		if(!$this->_validateExpression('weekdays'))
+//			$this->setValidationError('weekdays', GO::t("Weekdays does not match the required format.", "cron"));
+//
+//		if(!$this->_validateExpression('years'))
+//			$this->setValidationError('years', GO::t("Years does not match the required format.", "cron"));
+
+        try {
+            $this->_calculateNextRun();
+        } catch(Exception $e) {
+            $this->setValidationError('expression', "There's an error in your expression: '" . $this->_buildExpression()."' " . $e->getMessage());
+        }
+
 		if($this->hasValidationErrors())
 			$this->setValidationError('active', '<br /><br />'.$this->_getExampleFormats());
 

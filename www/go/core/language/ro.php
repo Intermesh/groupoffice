@@ -55,11 +55,11 @@ return array (
   'Timezone' => 'Fus orar',
   'Automatically adjust time to Daylight Savings Time' => 'Treci automatic la ora legală',
   'Date Format' => 'Format dată',
-  'Date Seperator' => 'Separator dată',
+  'Date Separator' => 'Separator dată',
   'Time Format' => 'Format timp',
   'First weekday' => 'Prima zi a săptămânii',
-  'Thousand Seperator' => 'Separator de mii',
-  'Decimal Seperator' => 'Separator de zecimi',
+  'Thousand Separator' => 'Separator de mii',
+  'Decimal Separator' => 'Separator de zecimi',
   'Currency' => 'Valută',
   'Account' => 'Cont',
   'Company profile' => 'Profil firmă',
@@ -481,6 +481,7 @@ Password: %s',
     'VI' => 'Insulele Vergini (US)',
     'WF' => 'Insulele Wallis e Futuna',
     'EH' => 'Sahara Occidentale',
+	  'XK' => 'Kosovo'
   ),
   'filetypes' => 
   array (

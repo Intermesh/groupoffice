@@ -32,6 +32,7 @@ class Number {
 	 * @param	int $decimals Number of decimals to display
 	 * @access public
 	 * @return string
+	 * @deprecated - use go\core\util\StringHelper\localize
 	 */
 
 	public static function localize($number, $decimals=2): string
@@ -52,6 +53,7 @@ class Number {
 	 * @param	int $decimals Number of decimals to display
 	 * @access public
 	 * @return StringHelper
+ 	 * @deprecated - use go\core\util\StringHelper\unlocalize
 	 */
 
 	public static function unlocalize($number)
@@ -142,4 +144,3 @@ class Number {
 		}
 	}
 }
-?>

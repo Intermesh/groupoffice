@@ -23,7 +23,7 @@
 * Consult LICENSE file for details
 ************************************************/
 
-class StateObject implements Serializable {
+class StateObject {
     private $SO_internalid;
     protected $data = array();
     protected $unsetdata = array();
@@ -191,11 +191,11 @@ class StateObject implements Serializable {
      * @access public
      * @return array
      */
-    public function serialize() {
+    public function __serialize() {
         // perform tasks just before serialization
         $this->preSerialize();
 
-        return serialize(array($this->SO_internalid,$this->data));
+        return array($this->SO_internalid,$this->data);
     }
 
     /**
@@ -205,11 +205,11 @@ class StateObject implements Serializable {
      * @return array
      * @throws StateInvalidException
      */
-    public function unserialize($data) {
+    public function __unserialize($data) {
         // throw a StateInvalidException if unserialize fails
         ini_set('unserialize_callback_func', 'StateObject::ThrowStateInvalidException');
 
-        list($this->SO_internalid, $this->data) = unserialize($data);
+        list($this->SO_internalid, $this->data) = $data;
 
         // perform tasks just after unserialization
         $this->postUnserialize();

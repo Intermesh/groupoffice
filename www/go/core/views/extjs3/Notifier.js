@@ -3,7 +3,7 @@
 	function setInteracted(e) {
 
 		if(e instanceof KeyboardEvent) {
-			var keyCode = e.which ? e.which : e.keyCode;
+			const keyCode = e.which ? e.which : e.keyCode;
 
 			if(keyCode == 18 || keyCode == 91 || keyCode == 17|| keyCode == 16|| keyCode == 20) {
 				return;
@@ -20,7 +20,7 @@
 	window.addEventListener("click", setInteracted);
 	window.addEventListener("keydown", setInteracted);
 
-	var Notifier = Ext.extend(Ext.util.Observable, {
+	let Notifier = Ext.extend(Ext.util.Observable, {
 
 		constructor: function() {
 
@@ -38,7 +38,7 @@
 		notificationArea: null,
 		init: function(notificationArea) {
 
-			var me = this;
+			let me = this;
 
 			this.messageCt = Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true);
 
@@ -46,7 +46,7 @@
 
 			this.addStatusIcon('upload', 'ic-file-upload');
 			this.statusBar = new Ext.Container({applyTo: "status-bar", hidden:!this.showStatusBar});
-			for(var key in this._icons) {
+			for(const key in this._icons) {
 				this.statusBar.add(this._icons[key]);
 			}
 			this.statusBar.doLayout();
@@ -80,8 +80,25 @@
 		},
 
 		toggleIcon: function(key, visible) {
+
 			if (this._icons[key]) {
 				this._icons[key].setVisible(visible);
+				if(visible) {
+					const anim = ()  => {
+						if(this._icons[key].flash) {
+							this._icons[key].el.dom.classList.remove("unseen");
+							this._icons[key].el.dom.offsetWidth; //trigger reflow
+							this._icons[key].el.dom.classList.add("unseen");
+							this._icons[key].flash = false;
+						}
+					}
+					if(this._icons[key].el) {
+						anim();
+					} else
+					{
+						this._icons[key].on("render", anim);
+					}
+				}
 			}
 			if(visible) {
 				if(this.statusBar) {
@@ -91,7 +108,7 @@
 				}
 				return;
 			}
-			for(var icon in this._icons) {
+			for(const icon in this._icons) {
 				if(!this._icons[icon].hidden) return;
 			}
 			this.statusBar.hide();
@@ -102,10 +119,14 @@
 				autoEl: 'i',
 				cls: 'icon '+iconCls
 			});
+
+			this._icons[key].flash = true;
+
 			if(this.statusBar) {
 				this.statusBar.add(this._icons[key]);
 				this.statusBar.doLayout();
 			}
+
 		},
 
 		msgByKey: function(key) {
@@ -169,7 +190,7 @@
 			//msg.renderTo = this.messageCt;
 			msg.html = msg.description || msg.html || msg.body; // backward compat
 
-			var msgPanel = Ext.create(msg, "panel");
+			let msgPanel = Ext.create(msg, "panel");
 
 			if(!msgPanel.tools || !msgPanel.getTool('close')) {
 				msgPanel.addTool({
@@ -183,12 +204,16 @@
 				});
 			}
 
-			let openNotifications = true;
+			let isNew = true;
 
 			if(this._messages[msg.itemId]) {
 				this._messages[msg.itemId].replaced = true;
 				this._messages[msg.itemId].destroy();
-				openNotifications = false;
+				isNew = false;
+			}
+
+			if(isNew) {
+				this._icons[msgPanel.statusIcon].flash = true;
 			}
 			this._messages[msg.itemId] = msgPanel;
 
@@ -241,41 +266,43 @@
 			}
 
 			var me = this;
-			function moveToNotificationArea(msgPanel) {
-				me.notifications.add(msgPanel);
-				me.notifications.doLayout();
-			}
+			// function moveToNotificationArea(msgPanel) {
+			// 	me.notifications.add(msgPanel);
+			// 	me.notifications.doLayout();
+			// }
 
-			if(openNotifications) {
+			// if(openNotifications) {
 				// this.showNotifications();
 				//this.flyout(msg);
 
-				msgPanel.render(this.messageCt);
+				// msgPanel.render(this.messageCt);
 
-				msgPanel.getEl().on("mouseenter", (e) => {
-					msgPanel.mouseEntered = true;
-				});
+				// msgPanel.getEl().on("mouseenter", (e) => {
+				// 	msgPanel.mouseEntered = true;
+				// });
+				//
+				// msgPanel.getEl().on("mouseout", (e) => {
+				//
+				// 	if(!e.within(	msgPanel.getEl(), true)) {
+				// 		moveToNotificationArea(msgPanel);
+				// 	}
+				// });
+				//
+				// setTimeout(() => {
+				//
+				// 	if(!msgPanel.mouseEntered && !msgPanel.isDestroyed) {
+				// 		moveToNotificationArea(msgPanel);
+				// 	}
+				// }, 2000);
 
-				msgPanel.getEl().on("mouseout", (e) => {
+			// } else {
+			// 	moveToNotificationArea(msgPanel);
+			// }
 
-					if(!e.within(	msgPanel.getEl(), true)) {
-						moveToNotificationArea(msgPanel);
-					}
-				});
+			me.notifications.add(msgPanel);
 
-				setTimeout(() => {
-
-					if(!msgPanel.mouseEntered && !msgPanel.isDestroyed) {
-						moveToNotificationArea(msgPanel);
-					}
-				}, 2000);
-
-			} else {
-				moveToNotificationArea(msgPanel);
-			}
-
-			this.updateStatusIcons();
-
+			this.updateStatusIcons(isNew);
+			me.notifications.doLayout();
 			return msgPanel;
 		},
 
@@ -313,6 +340,7 @@
 					id:'dismiss',
 					qtip: t('Dismiss all'),
 					handler: function() {
+						this.hideNotifications();
 						Ext.MessageBox.confirm(t("Confirm"), t('Are you sure you want to dismiss all notifications?'), function(btn){
 							if(btn=='yes') {
 								go.Notifier.removeAll();
@@ -336,7 +364,7 @@
 		},
 
 		hasMessages: function() {
-			for(var id in this._messages) {
+			for(let id in this._messages) {
 				return true;
 			}
 			return false;
@@ -360,6 +388,10 @@
 			msg.destroy();
 		},
 
+		getAll: function() {
+			return Object.values(this._messages);
+		},
+
 		getById : function(msgId) {
 			if(!this._messages[msgId]) {
 				return false;
@@ -376,11 +408,15 @@
 		},
 
 		removeAll : function() {
-			for(var id in this._messages) {
+			for(const id in this._messages) {
 				if(!this._messages[id].persistent) {
 					this.remove(this._messages[id]);
 				}
 			}
+		},
+
+		count : function() {
+			return Object.values(this._messages).length;
 		},
 		/**
 		 * Create a desktop notification if permitted
@@ -410,12 +446,12 @@
 					return;
 				}
 
-				var title = msg.title || t("Reminders");
+				const title = msg.title || t("Reminders");
 
 				msg.icon = msg.icon || GO.settings.config.full_url + 'views/Extjs3/themes/Paper/img/notify/reminder.png';
 				msg.body = msg.description || msg.body;
 				//delete msg.title;
-
+				let notification;
 				try {
 					switch(Notification.permission) {
 						case 'denied':
@@ -430,7 +466,7 @@
 							});
 							break;
 						case 'granted':
-							var notification = new Notification(title,msg);
+							notification = new Notification(title,msg);
 					}
 				} catch (e) {
 					/* ignore failure on mobiles */
@@ -476,14 +512,13 @@
 		 * @returns The created Ext.Panel
 		 */
 		flyout: function(msg) {
-
 			msg.renderTo = this.messageCt;
 			if(!msg.html && !msg.items) {
 				msg.html = msg.description; // backward compat
 			}
-			var msgCtr = new Ext.create(msg, "panel");
+			let msgCtr = new Ext.create(msg, "panel");
 
-			var me = this;
+			let me = this;
 			if (msg.time) {
 				setTimeout(function () {
 					// prevent destroy event dismissing alert

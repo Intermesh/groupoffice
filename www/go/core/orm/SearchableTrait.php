@@ -18,6 +18,22 @@ use function go;
 trait SearchableTrait {
 
 	public static $updateSearch = true;
+
+	/**
+	 * Function to determine if entities have search capabilities
+	 *
+	 * @example
+	 * ```
+	 * if(method_exists($entity, 'hasSearch')) {
+	 *
+	 *    //do something
+	 * }
+	 * ``
+	 * @return bool
+	 */
+	public function hasSearch() : bool {
+		return true;
+	}
 	
 	/**
 	 * The description in the search results
@@ -29,7 +45,10 @@ trait SearchableTrait {
 	/**
 	 * All the keywords that can be searched on.
 	 *
-	 * Note: for larger text fields it might be useful to use {@see self::splitTextKeywords()} on it.
+	 * Note: All strings you return will  be optimized for searching using {@see StringUtil::splitTextKeywords()}.
+	 *
+	 * If you have numbers that should be searched on endings then use {@see StringUtil::numberToKeywords()}. For example
+	 * an invoice ID "I2022-001234" should be found by searching on "1234" or with phone numbers.
 	 * 
 	 * @return string[]|null
 	 */
@@ -48,78 +67,6 @@ trait SearchableTrait {
 		return null;
 	}
 
-
-
-	/**
-	 * Split numbers into multipe partials so we can match them using an index
-	 * eg.
-	 *
-	 * ticket no
-	 *
-	 * 2002-12341234
-	 *
-	 * Will be found on:
-	 *
-	 * 002-12341234
-	 * 02-12341234
-	 * 2-12341234
-	 * -12341234
-	 * 12341234
-	 * 2341234
-	 * 341234
-	 * 41234
-	 * 1234
-	 * 234
-	 *
-	 * this is faster then searchgin for
-	 *
-	 * %234 because it can't use an index
-	 *
-	 * @param string|int $number
-	 * @param int $minSearchLength
-	 * @return array
-	 */
-	public static function numberToKeywords($number, int $minSearchLength = 3): array
-	{
-		$keywords = [$number];
-
-		while(strlen($number) > $minSearchLength) {
-			$number = substr($number, 1);
-			$keywords[] = $number;
-		}
-
-		return $keywords;
-
-	}
-
-	/**
-	 * Prepares the query for a search
-	 *
-	 * @param Criteria $criteria
-	 * @param Query $query
-	 * @param string $searchPhrase
-	 * @throws Exception
-	 */
-	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase) {
-
-		go()->setOptimizerSearchDepth();
-
-		$i = 0;
-		$words = StringUtil::splitTextKeywords($searchPhrase, false);
-		$words = array_unique($words);
-
-		foreach($words as $word) {
-			$query->join(
-				"core_search_word",
-				'w'.$i, 'w'.$i.'.searchId = search.id',
-				'INNER'
-			);
-
-			$criteria->where('w'.$i.'.word', 'LIKE', $word . '%');
-
-			$i++;
-		}
-	}
 
 	/**
 	 * Save entity to search cache
@@ -162,10 +109,10 @@ trait SearchableTrait {
 		$keywords = $this->getSearchKeywords();
 
 		if(!isset($keywords)) {
-			$keywords = array_merge(StringUtil::splitTextKeywords($search->name), StringUtil::splitTextKeywords($search->description));
+			$keywords = [$search->name, $search->description];
 		}
 
-		$keywords = $this->getCommentKeywords($keywords);
+//		$keywords = $this->getCommentKeywords($keywords);
 
 		$links = (new Query())
 			->select('description')
@@ -205,6 +152,7 @@ trait SearchableTrait {
 
 		if(!$isNew) {
 			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
+			$search->change(true);
 		}
 
 		if(empty($keywords)) {
@@ -222,17 +170,17 @@ trait SearchableTrait {
 
 	}
 
-	private function getCommentKeywords(array $keywords) : array {
-		if(Module::isInstalled("community", "comments")) {
-			$comments = Comment::findFor($this, ['text']);
-			foreach($comments as $comment) {
-				$plain = strip_tags($comment->text);
-				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
-			}
-		}
-
-		return $keywords;
-	}
+//	private function getCommentKeywords(array $keywords) : array {
+//		if(Module::isInstalled("community", "comments")) {
+//			$comments = Comment::findFor($this, ['text']);
+//			foreach($comments as $comment) {
+//				$plain = strip_tags($comment->text);
+//				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
+//			}
+//		}
+//
+//		return $keywords;
+//	}
 
 
 	/**
@@ -267,16 +215,16 @@ trait SearchableTrait {
 	 * @return Statement
 	 * @throws Exception
 	 */
-	private static function queryMissingSearchCache(string $cls, int $offset = 0): Statement
+	private static function queryMissingSearchCache(int $offset = 0): Statement
 	{
 		
 		$limit = 1000;
 
-		/** @var Entity $cls */
-		$query = $cls::find();
+
+		$query = static::find();
 		/* @var $query OrmQuery */
 		$query
-			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT")
+			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . static::entityType()->getId(), "LEFT")
 			->andWhere('search.id IS NULL')
 			->orWhere('search.rebuild = true')
 			->limit($limit)
@@ -289,8 +237,11 @@ trait SearchableTrait {
 	 * @param class-string<Entity> $cls
 	 * @throws Exception
 	 */
-	public static function rebuildSearchForEntity(string $cls) {
+	public static function rebuildSearchForEntity() {
+		$cls = static::class;
 		echo $cls."\n";
+
+		flush();
 
 		echo "Deleting old values\n";
 
@@ -305,12 +256,13 @@ trait SearchableTrait {
 		echo "Deleted ". $stmt->rowCount() . " entries\n";
 
 		//In small batches to keep memory low
-		$stmt = self::queryMissingSearchCache($cls);			
+		$stmt = static::queryMissingSearchCache();
 		
 		$offset = 0;
 		
 		//In small batches to keep memory low	
-		while($stmt->rowCount()) {	
+		while($stmt->rowCount()) {
+			flush();
 
 			while ($m = $stmt->fetch()) {
 
@@ -330,7 +282,7 @@ trait SearchableTrait {
 			echo "\n";
 			go()->getDbConnection()->exec("commit");
 
-			$stmt = self::queryMissingSearchCache($cls, $offset);
+			$stmt = static::queryMissingSearchCache($offset);
 		}
 
 
@@ -339,16 +291,4 @@ trait SearchableTrait {
 
 	}
 
-	/**
-	 * @throws Exception
-	 */
-	public static function rebuildSearch() {
-		$classFinder = new ClassFinder();
-		$entities = $classFinder->findByTrait(SearchableTrait::class);
-		
-		foreach($entities as $cls) {
-			self::rebuildSearchForEntity($cls);			
-			echo "\nDone\n\n";
-		}
-	}
 }

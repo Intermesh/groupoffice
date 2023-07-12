@@ -81,7 +81,7 @@ class Zip {
 			exec($cmd, $output, $ret);
 
 			if ($ret!=0 || !$archiveFile->exists()) {
-				throw new \Exception('Command failed: ' . $cmd . "<br /><br />" . implode("<br />", $output));
+				throw new \Exception('Command failed: ' . $cmd . "\n\n" . implode("\n", $output));
 			}
 			
 			return true;

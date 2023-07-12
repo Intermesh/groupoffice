@@ -17,6 +17,23 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		triggerWidth: 1000
 	},
 
+	route: async function(id, entity) {
+		const task = await go.Db.store("Task").single(id);
+		const tasklist = await go.Db.store("TaskList").single(task.tasklistId);
+
+		if (tasklist.role == "support") {
+			// hack to prevent route update
+			go.Router.routing = true;
+			const support = GO.mainLayout.openModule("support");
+			go.Router.routing = false;
+
+			support.taskDetail.load(id);
+
+		} else {
+			this.supr().route.call(this, id, entity);
+		}
+	},
+
 	initComponent: function () {
 		this.statePrefix = this.support ? 'support-' : 'tasks-';
 		this.createTaskGrid();
@@ -40,13 +57,14 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		});
 
 		const showCompleted = Ext.state.Manager.get(this.statePrefix + "show-completed");
-		const assignedToMe = Ext.state.Manager.get(this.statePrefix + "assigned-to-me");
+		const showAssignedToMe = Ext.state.Manager.get(this.statePrefix + "assigned-to-me");
+		const showUnassigned = Ext.state.Manager.get(this.statePrefix + "show-unassigned");
 
 		if(this.support) {
 			this.filterPanel = new go.modules.community.tasks.ProgressGrid({
 				tbar: [{
 					xtype: "tbtitle",
-					text: t("Status")
+					text: t("Status", 'tasks','community')
 				}],
 				filterName: "progress",
 				filteredStore: this.taskGrid.store
@@ -95,15 +113,15 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}]
 			}),
 
-			bodyStyle: 'overflow-y: auto',
-
-			layout:'fitwidth',
+			autoScroll: true,
+			layout: "anchor",
+			defaultAnchor: '100%',
 
 			items:[
 				this.filterPanel,
 				this.tasklistsGrid,
 				this.categoriesGrid,
-				this.createFilterPanel(),
+				{xtype:'filterpanel', store: this.taskGrid.store, entity: 'Task'}
 
 			]
 		});
@@ -127,36 +145,48 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					}
 				]
 			}));
-		} else {
-			this.sidePanel.items.insert(1, Ext.create({
-				xtype: "panel",
-				layout: "form",
-				bodyStyle: "padding-left: 18px;", // TODO wtf 18px?
-				tbar: [
-					{
-						xtype:"tbtitle",
-						text: t("Assigned")
-					}
-				],
-				items: [
-					{
-						hideLabel: true,
-						xtype: "checkbox",
-						boxLabel: t("Mine"),
-						checked: assignedToMe,
-						listeners: {
-							scope: this,
-							check: function(cb, checked) {
+		}
 
-								this.assignedToMe(checked);
-								Ext.state.Manager.set(this.statePrefix + "assigned-to-me", checked);
-								this.taskGrid.store.load();
-							}
+		this.sidePanel.items.insert(this.support ? 1 : 2, Ext.create({
+			xtype: "panel",
+			layout: "form",
+			tbar: [
+				{
+					xtype:"tbtitle",
+					text: t("Assigned", 'tasks','community')
+				}
+			],
+			items: [
+				{xtype:'fieldset',items:[{
+					hideLabel: true,
+					xtype: "checkbox",
+					boxLabel: t("Mine", 'tasks','community'),
+					checked: showAssignedToMe,
+					listeners: {
+						scope: this,
+						check: function(cb, checked) {
+							Ext.state.Manager.set(this.statePrefix + "assigned-to-me", checked);
+							this.setAssignmentFilters();
+							this.taskGrid.store.load();
 						}
 					}
-				]
-			}));
-		}
+				},{
+					hideLabel: true,
+					xtype: "checkbox",
+					boxLabel: t("Unassigned", "tasks", "community"),
+					checked: showUnassigned,
+					listeners: {
+						scope: this,
+						check: function(cb, checked) {
+							Ext.state.Manager.set(this.statePrefix + "show-unassigned", checked);
+							this.setAssignmentFilters();
+							this.taskGrid.store.load();
+						}
+					}
+				}]}
+			]
+		}));
+
 
 		this.centerPanel = new Ext.Panel({
 			layout:'responsive',
@@ -194,21 +224,37 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.taskGrid.store.setFilter('completed', show ? null : {complete:  false});
 	},
 
-	assignedToMe : function(show) {
-		this.taskGrid.store.setFilter('assignedToMe', show ?
-			{
-				operator: "OR",
-				conditions: [
-					{responsibleUserId: go.User.id},
-					{responsibleUserId: null}
-				]
-			} : null);
+	setAssignmentFilters: function() {
+		let numSelectedFilters = 0;
+		if(Ext.state.Manager.get(this.statePrefix + "assigned-to-me")) {
+			numSelectedFilters++
+		}
+		if(Ext.state.Manager.get(this.statePrefix + "show-unassigned")) {
+			numSelectedFilters++;
+		}
+
+		if(numSelectedFilters === 0) {
+			this.taskGrid.store.setFilter('assignedToMe', null);
+		} else if(numSelectedFilters === 1) {
+			const cnd = Ext.state.Manager.get(this.statePrefix + "assigned-to-me") ? go.User.id : null;
+			this.taskGrid.store.setFilter('assignedToMe', {responsibleUserId: cnd})
+		} else {
+			this.taskGrid.store.setFilter('assignedToMe',
+				{
+					operator: "OR",
+					conditions: [
+						{responsibleUserId: go.User.id},
+						{responsibleUserId: null}
+					]
+				}
+			);
+		}
 	},
-	
+
 	runModule : function() {
 
 		if(this.support) {
-			this.assignedToMe(Ext.state.Manager.get(this.statePrefix + "assigned-to-me"));
+			this.setAssignmentFilters();
 		} else {
 
 			this.filterPanel.on("afterrender", () => {
@@ -311,56 +357,23 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		Ext.state.Manager.set(this.statePrefix + "status-filter", inputValue);
 	},
 
-	createFilterPanel: function () {
-
-
-		return new Ext.Panel({
-			minHeight: dp(200),
-			autoScroll: true,
-			tbar: [
-				{
-					xtype: 'tbtitle',
-					text: t("Filters")
-				},
-				'->',
-				{
-					xtype: 'filteraddbutton',
-					entity: 'Task'
-				}
-			],
-			items: [
-				{
-					xtype: 'filtergrid',
-					filterStore: this.taskGrid.store,
-					entity: "Task"
-				},
-				{
-					xtype: 'variablefilterpanel',
-					filterStore: this.taskGrid.store,
-					entity: "Task"
-				}
-			]
-		});
-
-
-	},
-
-
 	createCategoriesGrid: function() {
 		this.categoriesGrid = new go.modules.community.tasks.CategoriesGrid({
+			role:  !this.support ? go.modules.community.tasks.listTypes.List : go.modules.community.tasks.listTypes.Support,
 			filterName: "categories",
 			filteredStore: this.taskGrid.store,
 			autoHeight: true,
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: t('Categories')
+					text: t('Categories', 'tasks','community')
 				}, '->', {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						const dlg = new go.modules.community.tasks.CategoryDialog()
-						dlg.tasklistCombo.store.setFilter("role", {role: "list"});
+						const dlg = new go.modules.community.tasks.CategoryDialog({
+							role:  !this.support ? go.modules.community.tasks.listTypes.List : go.modules.community.tasks.listTypes.Support
+						})
 
 						const firstSelected = this.tasklistsGrid.getSelectionModel().getSelected();
 						if(firstSelected) {
@@ -392,7 +405,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: t('Lists')
+					text: t('Lists', 'tasks','community')
 				}, '->', {
 					xtype: "tbsearch"
 				},{
@@ -415,9 +428,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								dropRowIndex = grid.getView().findRowIndex(e.target),
 								tasklistId = grid.getView().grid.store.data.items[dropRowIndex].id;
 
+							const update = {};
 							selections.forEach((r) => {
-								go.Db.store("Task").save({tasklistId: tasklistId}, r.id);
+								update[r.id] = {tasklistId: tasklistId};
 							})
+
+							go.Db.store("Task").set({update: update});
 						}
 					});
 				},
@@ -433,6 +449,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		if(this.support) {
 			this.tasklistsGrid.getStore().setFilter("role", {role: "support"});
+
+			this.tasklistsGrid.getStore().baseParams = this.tasklistsGrid.getStore().baseParams || {};
+			this.tasklistsGrid.getStore().baseParams.limit = 1000;
 		}
 
 		this.tasklistsGrid.on('selectionchange', this.onTasklistSelectionChange, this); //add buffer because it clears selection first
@@ -455,6 +474,44 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			ddGroup: 'TasklistsDD',
 			split: true,
 			region: 'center',
+			multiSelectToolbarItems: [
+				{
+					iconCls: "ic-merge-type",
+					tooltip: t("Merge"),
+					handler: function() {
+						const ids = this.taskGrid.getSelectionModel().getSelections().column('id');
+						console.warn(ids);
+						if(ids.length < 2) {
+							Ext.MessageBox.alert(t("Error"), t("Please select at least two items"));
+						} else
+						{
+							Ext.MessageBox.confirm(t("Merge"), t("The selected items will be merged into one. The item you selected first will be used primarily. Are you sure?"), async function(btn) {
+
+								if(btn != "yes") {
+									return;
+								}
+
+								try {
+									Ext.getBody().mask(t("Saving..."));
+									const result = await go.Db.store("Task").merge(ids);
+									await go.Db.store("Task").getUpdates();
+
+									setTimeout(() => {
+										const dlg = new go.modules.community.tasks.TaskDialog();
+										dlg.load(result.id);
+										dlg.show();
+									})
+								} catch(e) {
+									Ext.MessageBox.alert(t("Error"), e.message);
+								} finally {
+									Ext.getBody().unmask();
+								}
+							}, this);
+						}
+					},
+					scope: this
+				}
+				],
 			tbar: [
 					this.showNavButton = new Ext.Button({
 						hidden: true,
@@ -474,7 +531,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						tooltip: t('Add'),
 						cls: 'primary',
 						handler: function (btn) {
-							let dlg = new go.modules.community.tasks.TaskDialog({support: this.support});
+							let dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
 							dlg.setValues({
 								tasklistId: this.addTasklistId
 							}).show();
@@ -543,6 +600,16 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 												'Task',
 												Object.assign(go.util.clone(this.taskGrid.store.baseParams), this.taskGrid.store.lastOptions.params, {limit: 0, position: 0}),
 												'csv');
+										},
+										scope: this
+									},{
+										text: t("Web page") + ' (HTML)',
+										iconCls: 'filetype filetype-html',
+										handler: function() {
+											go.util.exportToFile(
+												'Task',
+												Object.assign(go.util.clone(this.taskGrid.store.baseParams), this.taskGrid.store.lastOptions.params, {limit: 0, position: 0}),
+												'html');
 										},
 										scope: this
 									}
@@ -659,7 +726,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		let dlg = new go.modules.community.tasks.TaskDialog({support: this.support});
+		let dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
 		dlg.load(record.id).show();
 	},
 	
@@ -676,7 +743,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		var dlg = new go.modules.community.tasks.TaskDialog({support: this.support});
+		var dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
 		dlg.load(record.id).show();
 	}	
 });

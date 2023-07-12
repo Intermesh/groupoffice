@@ -27,7 +27,7 @@ function output(array $data = [], int $status = 200, string $statusMsg = null) {
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 	Response::get()->setHeader('Pragma', 'no-cache');
 
-	Response::get()->setStatus($status, str_replace("\n", " - " , $statusMsg));
+	Response::get()->setStatus($status, $statusMsg ? str_replace("\n", " - " , $statusMsg) : null);
 	Response::get()->sendHeaders();
 
 	go()->getDebugger()->groupEnd();
@@ -51,9 +51,16 @@ function finishLogin(Token $token, string $rememberMeToken = null) {
 	$authState = new State();
 	$authState->setToken($token);
 	go()->setAuthState($authState);
+
+	$token->setAuthenticated();
+
 	$response = $authState->getSession();
 
+	// Browsers should not store this for security. They must use the httpOnly flagged cookie that
+	// can't be stolen. The CSRFToken must be used to prevent CSRF attacks.
+	// @see Token::CSRFToken
 	$response['accessToken'] = $token->accessToken;
+	$response['CSRFToken'] = $token->CSRFToken;
 
 	if($rememberMeToken != null) {
 		$response['rememberMeToken'] = $rememberMeToken;
@@ -69,14 +76,13 @@ try {
 
 
 //Create the app with the config.php file
-	App::get()->setAuthState(new State());
+	App::get();
 
 	if (Request::get()->getMethod() == "OPTIONS") {
 		output();
 	}
 
 	go()->getDebugger()->group("auth");
-	$auth = new Authenticate();
 
 	if (Request::get()->getMethod() == "DELETE") {
 		$data = ['action' => 'logout'];
@@ -91,7 +97,16 @@ try {
 			$data['action'] = 'login';
 		}
 		Response::get()->setContentType("application/json;charset=utf-8");
+
+		// we don't want to use that here. Because otherwise the CSRFToken is needed too.
+		unset($_COOKIE['accessToken']);
 	}
+
+	go()->setAuthState(new State());
+	go()->getDebugger()->group("auth");
+	$auth = new Authenticate();
+
+
 
 	switch ($data['action']) {
 
@@ -108,12 +123,8 @@ try {
 				throw new SaveException($user);
 			}
 
-
-
 			$token = new Token();
 			$token->userId = $user->id;
-			$token->setAuthenticated();
-			$token->setCookie();
 
 			finishLogin($token);
 
@@ -160,8 +171,7 @@ try {
 
 					$token = new Token();
 					$token->userId = $rememberMe->userId;
-					$token->setAuthenticated();
-					$token->setCookie();
+
 
 					finishLogin($token, $rememberMe->getToken());
 				} else {
@@ -172,7 +182,7 @@ try {
 			} else {
 
 				if (empty($data['username']) || empty($data['password'])) {
-					$msg = "Missing arguments 'username' and 'password' for authenticatoin.";
+					$msg = "Missing arguments 'username' and 'password' for authentication.";
 					output(["error" => $msg], 400, $msg);
 				}
 
@@ -212,17 +222,9 @@ try {
 				return $o::id();
 			}, $token->getPendingAuthenticators());
 
-			if (empty($authenticators) && !$token->isAuthenticated()) {
-				$token->setAuthenticated();
-			}
+			$authenticated = empty($authenticators);
 
-			if (!$token->save()) {
-				throw new Exception("Could not save token: " . var_export($token->getValidationErrors(), true));
-			}
-
-
-
-			if ($token->isAuthenticated()) {
+			if ($authenticated) {
 
 				$rememberMeToken = null;
 				if(!empty($data['rememberLogin'])) {
@@ -244,7 +246,6 @@ try {
 				'authenticators' => $authenticators
 			];
 
-
 			$validationErrors = [];
 			foreach ($testedAuthenticators as $authenticator) {
 				$errors = $authenticator->getValidationErrors();
@@ -255,7 +256,6 @@ try {
 					$validationErrors[$authenticator::id()] = [$authenticator::id() . ' ' . go()->t('failed')];
 				}
 			}
-
 
 			if (!empty($validationErrors)) {
 				$user = $token->getUser();

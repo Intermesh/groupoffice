@@ -125,7 +125,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function getETag() {
-		return '"' . date('Ymd H:i:s', $this->mtime). '-'.$this->id.'"';
+		return '"' . date('Ymd-H:i:s', $this->mtime). '-'.$this->id.'"';
 	}
 	
 	protected function init() {
@@ -160,14 +160,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	public function hasLinks() {
 		return true;
 	}
-//
-//	public function countLinks() {
-//		$sql = "SELECT count(*) FROM `go_links_$table` WHERE ".
-//			"`id`=".intval($this_id).";";
-//		$stmt = $this->getDbConnection()->query($sql);
-//		return !empty($stmt) ? $stmt->rowCount() : 0;
-//	}
-	
+
 	public function countReminders() {
 		
 		$modelTypeModel = \GO\Base\Model\ModelType::model()->findSingleByAttribute('model_name',$this->className());
@@ -615,19 +608,9 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		if(!GO::user()->isAdmin()) {		
 			//if this is not the organizer event it may only be modified by the organizer
 			if(!$this->is_organizer && !$this->updatingRelatedEvent && !$this->_isImport && !$this->isNew && $this->isModified($this->getRelevantMeetingAttributes())){		
-	//			$organizerEvent = $this->getOrganizerEvent();
-	//			if($organizerEvent && !$organizerEvent->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION) || !$organizerEvent && !$this->is_organizer){
-	//				\GO::debug($this->getModifiedAttributes());
-	//				\GO::debug($this->_attributes);
-					throw new \GO\Base\Exception\AccessDenied();
-	//			}			
+				throw new \GO\Base\Exception\AccessDenied();
 			}
 		}
-		
-//		//Don't set reminders for the superadmin
-//		if($this->calendar->user_id==1 && \GO::user()->id!=1 && !\GO::config()->debug)
-//			$this->reminder=0;
-		
 		
 		$this->reevaluateStatus();
 		
@@ -659,21 +642,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 		$this->deleteReminders();		
 		
-		if($this->is_organizer){
-//
-//	This is dangerous: when you first import the same ICS into two different calendars,
-//	and the delete one of the calendars, all the imported events in the other calendars
-//	would be deleted also.
-//	
-//			$stmt = $this->getRelatedParticipantEvents();
-//			
-//			foreach($stmt as $event){
-//				//prevent loop for invalid is_organizer flag
-//				$event->is_organizer=false;
-//				$event->delete(true);
-//			}
-		}else
-		{
+		if( !$this->is_organizer){
 			$participants = $this->getParticipantsForUser();
 			
 			foreach($participants as $participant){
@@ -830,11 +799,6 @@ class Event extends \GO\Base\Db\ActiveRecord {
 						$event->setAttributes($updateAttr, false);
 						$event->updatingRelatedEvent=true;
 						$event->save(true);
-						
-//						$stmt = $event->participants;
-//						$stmt->callOnEach('delete');
-//	
-//						$this->duplicateRelation('participants', $event);
 					}
 				}
 			}
@@ -881,7 +845,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	 * @return Event
 	 */
 	public function getRelatedParticipantEvents($includeThisEvent=false){
-		$findParams = \GO\Base\Db\FindParams::newInstance()->ignoreAcl();
+		$findParams = \GO\Base\Db\FindParams::newInstance()->ignoreAcl()->select('t.*');
 		
 		$start_time = $this->isModified('start_time') ? $this->getOldAttributeValue('start_time') : $this->start_time;
 		
@@ -1081,18 +1045,12 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 		$findParams->join(Exception::model()->tableName(), $exceptionJoinCriteria, 'e');
 
-//			$dayStart = \GO\Base\Util\Date::clear_time($exceptionDate);
-//			$dayEnd = \GO\Base\Util\Date::date_add($dayStart,1);	
 		$whereCriteria = \GO\Base\Db\FindCriteria::newInstance()
 						->addCondition('exception_for_event_id', $this->id)
 						->addCondition('time', $startOfDay, '>=', 'e')
 						->addCondition('time', $endOfDay, '<', 'e');
 		$findParams->criteria($whereCriteria);
-//		$findParams->getCriteria()
-//						->addCondition('exception_for_event_id', $this->id)
-//						->addCondition('start_time', $startOfDay,'>=')
-//						->addCondition('end_time', $endOfDay,'<=');
-		
+
 		$event = Event::model()->findSingle($findParams);
 
 		return $event;
@@ -1182,9 +1140,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		
 		$findParams->select("t.*");
 		
-//		if($periodEndTime)
-//			$findParams->getCriteria()->addCondition('start_time', $periodEndTime, '<');
-		
+
 		$findParams->getCriteria()->addModel(Event::model(), "t");
 		
 		if ($onlyBusyEvents)
@@ -1203,7 +1159,6 @@ class Event extends \GO\Base\Db\ActiveRecord {
 					->mergeWith(
 									\GO\Base\Db\FindCriteria::newInstance()
 										->addModel(Event::model())					
-//										->addCondition('repeat_end_time', $periodStartTime, '>=')
 										->addRawCondition('`t`.`repeat_end_time`', '('.intval($periodStartTime).'-(`t`.`end_time`-`t`.`start_time`))', '>=', true)
 										->addCondition('repeat_end_time', 0,'=','t',false))
 					->addCondition('start_time', $periodStartTime, '<');
@@ -1356,19 +1311,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 							->addCondition('time', $dayEnd, '<','e');
 			
 			$whereCriteria->mergeWith($dateCriteria);
-			
-//			//the code below only find exceptions on the same day which is wrong
-//			$whereCriteria->addCondition('exception_for_event_id', 0,'>');
-//			
-//			$dayStart = \GO\Base\Util\Date::clear_time($exceptionDate);
-//			$dayEnd = \GO\Base\Util\Date::date_add($dayStart,1);
-//			
-//			$dateCriteria = \GO\Base\Db\FindCriteria::newInstance()
-//							->addCondition('start_time', $dayStart, '>=')
-//							->addCondition('start_time', $dayEnd, '<','t',false);
-//			
-//			$whereCriteria->mergeWith($dateCriteria);
-			
+
 		}else
 		{
 			$whereCriteria->addCondition('exception_for_event_id', 0);
@@ -1379,17 +1322,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		return $this->find($params);			
 	}
 
-//	/**
-//	 * Find an event that belongs to a group of participant events. They all share the same uuid field.
-//	 * 
-//	 * @param int $calendar_id
-//	 * @param string $uuid
-//	 * @return Event 
-//	 */
-//	public function findParticipantEvent($calendar_id, $uuid) {
-//		return $this->findSingleByAttributes(array('uuid' => $event->uuid, 'calendar_id' => $calendar->id));
-//	}
-	
+
 	/**
 	 * Find the resource booking that belongs to this event
 	 * 
@@ -1450,19 +1383,6 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		if($this->isRecurring()){
 			$html .= '<tr><td colspan="2">' .$this->getRecurrencePattern()->getAsText().'</td></tr>';;
 		}
-
-		//don't calculate timezone offset for all day events
-//		$timezone_offset_string = \GO\Base\Util\Date::get_timezone_offset($this->start_time);
-//
-//		if ($timezone_offset_string > 0) {
-//			$gmt_string = '(\G\M\T +' . $timezone_offset_string . ')';
-//		} elseif ($timezone_offset_string < 0) {
-//			$gmt_string = '(\G\M\T -' . $timezone_offset_string . ')';
-//		} else {
-//			$gmt_string = '(\G\M\T)';
-//		}
-
-		//$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 
 		$cfRecord = $this->getCustomFields()->returnAsText(true)->toArray();
 
@@ -1576,9 +1496,6 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		
 		$dateType = $this->all_day_event ? "DATE" : "DATETIME";
 		
-//		if($this->all_day_event){
-//			$e->{"X-FUNAMBOL-ALLDAY"}=1;
-//		}
 		if($this->exception_for_event_id>0) {
 			if (!$recurrenceTime){
 				//this is an exception
@@ -1624,8 +1541,6 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		$rrule = str_replace('RRULE:','',$this->rrule);
 		if(!empty($rrule)){
 			
-//			$rRule = $this->getRecurrencePattern();
-//			$rRule->shiftDays(false);
 			$e->add('rrule',$rrule);
 			
 			$findParams = \GO\Base\Db\FindParams::newInstance();
@@ -1669,12 +1584,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		if($this->reminder !== null){
 			
 			$a=$calendar->createComponent('VALARM');
-//			BEGIN:VALARM
-//ACTION:DISPLAY
-//TRIGGER;VALUE=DURATION:-PT5M
-//DESCRIPTION:Default Mozilla Description
-//END:VALARM
-			
+
 			$a->action='DISPLAY';
 			
 			if(empty($this->reminder)){
@@ -1922,42 +1832,6 @@ $sub = $offset>0;
 		
 		$this->reminder=null;
 		
-//		if($vobject->valarm && $vobject->valarm->trigger){
-//			
-//			$type = (string) $vobject->valarm->trigger["value"];
-//			
-//			
-//			if($type == "DURATION") {
-//				$duration = \GO\Base\VObject\Reader::parseDuration($vobject->valarm->trigger);
-//				if($duration>0){
-//					$this->reminder = $duration*-1;
-//				}
-//			}else
-//			{
-//				\GO::debug("WARNING: Ignoring unsupported reminder value of type: ".$type);			
-//			}
-//	
-		// if($vobject->valarm && $vobject->valarm->trigger) {
-		// 	$date = false;
-		// 	try {
-		// 		$date = $vobject->valarm->getEffectiveTriggerTime();
-		// 	}
-		// 	catch(\Exception $e) {
-		// 		//invalid trigger.
-		// 	}
-		// 	if($date) {
-		// 		if($this->all_day_event)
-		// 			$this->_utcToLocal($date);
-		// 		$this->reminder = $this->start_time-$date->format('U');
-		// 	}
-		// }elseif($vobject->aalarm){ //funambol sends old vcalendar 1.0 format
-		// 	$aalarm = explode(';', (string) $vobject->aalarm);
-		// 	if(!empty($aalarm[0])) {
-		// 		$p = Sabre\VObject\DateTimeParser::parse($aalarm[0]);
-		// 		$this->reminder = $this->start_time-$p->format('U');
-		// 	}
-		// }
-		
 		$this->setAttributes($attributes, false);
 		
 		$recurrenceIds = $vobject->select('recurrence-id');
@@ -2079,7 +1953,6 @@ $sub = $offset>0;
 		
 		if(!$dontSave){
 			$this->cutAttributeLengths();
-//			try {
 				$this->_isImport=true;
 				
 				if (!$importExternal)
@@ -2125,10 +1998,7 @@ The following is the error message:
 					
 				}
 				$this->_isImport=false;
-//			} catch (\Exception $e) {
-//				throw new \Exception($this->name.' ['.\GO\Base\Util\Date::get_timestamp($this->start_time).' - '.\GO\Base\Util\Date::get_timestamp($this->end_time).'] '.$e->getMessage());
-//			}
-			
+
 			if(!empty($exception)){			
 				//save the exception we found by recurrence-id
 				$exception->exception_event_id=$this->id;
@@ -2218,8 +2088,6 @@ The following is the error message:
 					//We should store the RECURRENCE-ID value so we can find it later.
 					$this->addException($exceptionEventModel->start_time, $exceptionEventModel->id);
 					
-					
-//					\GO::debug('=== EXCEPTION EVENT === ['.\GO\Base\Util\Date::get_timestamp($exceptionEventModel->start_time).'] '.$exceptionEventModel->name.' (\Exception for event: '.$exceptionEventModel->exception_for_event_id.')');
 				}
 			}
 		}
@@ -2365,14 +2233,7 @@ The following is the error message:
 	 * @return Event 
 	 */
 	public function createCopyForParticipant(Participant $participant){
-//		$calendar = Calendar::model()->getDefault($user);
-//		
-//		return $this->duplicate(array(
-//			'user_id'=>$user->id,
-//			'calendar_id'=>$calendar->id,
-//			'is_organizer'=>false
-//		));
-		
+
 		\GO::debug("Creating event copy for ".$participant->name);
 		
 		//create event in participant's default calendar if the current user has the permission to do that
@@ -2391,7 +2252,6 @@ The following is the error message:
 						'calendar_id' => $calendar->id,
 						'user_id'=>$participant->user_id,
 						'is_organizer'=>false, 
-	//					'status'=>  Event::STATUS_NEEDS_ACTION
 						),
 								true,true);			
 				return $participantEvent;
@@ -2586,12 +2446,7 @@ The following is the error message:
 	 * @throws Exception
 	 */
 	public function replyToOrganizer($recurrenceTime=false, $sendingParticipant=false, $includeIcs=true){
-		
-//		if($this->is_organizer)
-//			throw new \Exception("Meeting reply can't be send from the organizer's event");
-		
-
-		//we need to pass the sending participant to the toIcs function. 
+		//we need to pass the sending participant to the toIcs function.
 		//Only the organizer and current participant should be included
 		if(!$sendingParticipant)
 			$sendingParticipant = $this->getParticipantOfCalendar();
@@ -2621,7 +2476,6 @@ The following is the error message:
 		
 		$body .= '<br /><a href="'.$url.'">'.\GO::t("Open calendar", "calendar").'</a>';
 
-//		if(!$this->getOrganizerEvent()){
 			//organizer is not a Group-Office user with event. We must send a message to him an ICS attachment
 		if($includeIcs){
 			$ics=$this->toICS("REPLY", $sendingParticipant, $recurrenceTime);				
@@ -2631,16 +2485,20 @@ The following is the error message:
 			$a->setContentType("text/calendar;method=REPLY;charset=utf-8");
 			$message->attach($a);
 			
-			//for outlook 2003 compatibility
-//			$a2 = new Swift_Attachment($ics, 'invite.ics', 'application/ics');
-//			$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-//			$message->attach($a2);
 		}
-//		}
+
+		$mailer = $this->getUserMailer();
+
+		// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
+		if($mailer->getTransport() instanceof \GO\Email\Transport) {
+			$message->setSender($this->user->email);
+		} else {
+			$message->setSender(go()->getSettings()->systemEmail);
+		}
 
 		$message->setHtmlAlternateBody($body);
 
-		$this->getUserMailer()->send($message);
+		$mailer->send($message);
 
 	}
 	
@@ -2659,12 +2517,10 @@ The following is the error message:
 			$language = false;
 			if(!empty($participant->user_id)){
 				$user = \GO\Base\Model\User::model()->findByPk($participant->user_id, false, true);
-				if (!$user->enabled) {
+				if (!$user || !$user->enabled) {
 					continue;
 				}
-				if($user) {
-					\GO::language()->setLanguage($user->language);
-				}
+				\GO::language()->setLanguage($user->language);
 			}
 
 			$subject =  \GO::t("Cancellation", "calendar").': '.$this->name;
@@ -2680,9 +2536,6 @@ The following is the error message:
 
 			$body = '<p>'.\GO::t("The following event has been cancelled by the organizer", "calendar").': </p>'.$this->toHtml();
 			
-//			if(!$participantEvent){
-				
-
 				$ics=$this->toICS("CANCEL", $participant);
 				$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL"');
 				$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
@@ -2690,12 +2543,6 @@ The following is the error message:
 				$a->setContentType("text/calendar;method=CANCEL;charset=utf-8");
 				$message->attach($a);
 				
-//				//for outlook 2003 compatibility
-//				$a2 = new \Swift_Attachment($ics, 'invite.ics', 'application/ics');
-//				$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-//				$message->attach($a2);
-				
-//			}else{
 			if($participantEvent){
 				$url = \GO::createExternalUrl('calendar', 'openCalendar', array(
 				'unixtime'=>$this->start_time
@@ -2710,7 +2557,16 @@ The following is the error message:
 			if($language !== false)
 				\GO::language()->setLanguage($language);
 
-			$this->getUserMailer()->send($message);
+			$mailer = $this->getUserMailer();
+
+			// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
+			if($mailer->getTransport() instanceof \GO\Email\Transport) {
+				$message->setSender($this->user->email);
+			} else {
+				$message->setSender(go()->getSettings()->systemEmail);
+			}
+
+			$mailer->send($message);
 		}
 
 		return true;
@@ -2778,18 +2634,13 @@ The following is the error message:
 
 					$body = '<p>'.$bodyLine.': </p>'.$this->toHtml();			
 
-
-	//				if(!$participantEvent){					
-
 					//build message for external program
 					$acceptUrl = \GO::url("calendar/event/invitation",array("id"=>$this->id,'accept'=>1,'email'=>$participant->email,'participantToken'=>$participant->getSecurityToken()),false, false, false);
 					$declineUrl = \GO::url("calendar/event/invitation",array("id"=>$this->id,'accept'=>0,'email'=>$participant->email,'participantToken'=>$participant->getSecurityToken()),false, false, false);
 
-	//				if($participantEvent){	
 						//hide confusing buttons if user has a GO event.
 						$body .= '<div class="go-hidden">';
-	//				}
-					$body .= 
+					$body .=
 
 							'<p><br /><b>' . \GO::t("Only use the links below if your mail client does not support calendaring functions.", "calendar") . '</b></p>' .
 							'<p>' . \GO::t("Do you accept this event?", "calendar") . '</p>' .
@@ -2797,9 +2648,7 @@ The following is the error message:
 							'&nbsp;|&nbsp;' .
 							'<a href="'.$declineUrl.'">'.\GO::t("Decline", "calendar") . '</a>';
 
-	//				if($participantEvent){	
 						$body .= '</div>';
-	//				}
 
 					$ics=$this->toICS("REQUEST");				
 					$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REQUEST"');
@@ -2808,11 +2657,6 @@ The following is the error message:
 					$a->setContentType("text/calendar;method=REQUEST;charset=utf-8");
 
 					$message->attach($a);
-
-					//for outlook 2003 compatibility
-//					$a2 = new \Swift_Attachment($ics, 'invite.ics', 'application/ics');
-//					$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-//					$message->attach($a2);
 
 					if($participantEvent){
 						$url = \GO::createExternalUrl('calendar', 'openCalendar', array(
@@ -2828,7 +2672,18 @@ The following is the error message:
 					if($language !== false)
 						\GO::language()->setLanguage($language);
 
-					if(!$this->getUserMailer()->send($message)) {
+
+
+					$mailer = $this->getUserMailer();
+
+					// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
+					if($mailer->getTransport() instanceof \GO\Email\Transport) {
+						$message->setSender($this->user->email);
+					} else {
+						$message->setSender(go()->getSettings()->systemEmail);
+					}
+
+					if(!$mailer->send($message)) {
 						throw new \Exception("Failed to send invite");
 					}
 					

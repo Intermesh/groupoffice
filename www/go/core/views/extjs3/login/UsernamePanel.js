@@ -51,11 +51,8 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 		//Otherwise firefox won't prompt to save password and all browsers won't handle "enter" to submit
 		var panel = new Ext.Panel({
 			id: 'usernameCheck',
-			layout: "vbox",
-			layoutConfig: {
-				align: "stretch",
-				pack: "center"
-			},
+			layout: "fit",
+
 			bbar: [
 				this.forgotBtn = new Ext.Button({
 					cls: "go-login-forgot-username",

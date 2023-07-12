@@ -13,18 +13,16 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 	iconCls: 'ic-add',
 	menu: [],
 	detailView: null,
+	documentTemplates: true,
 	initComponent: function () {
 		
 		this.menu = this.buildMenu();
 		
 		go.detail.addButton.superclass.initComponent.call(this);
-		
-		
 
-		
 		//TODO refactor
 		
-		if(!this.noFiles) {
+		if(!this.noFiles && this.documentTemplates) {
 
 
 			//noFiles is used in GO.email.LinkedMessagePanel
@@ -89,6 +87,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 		this.on("afterrender", this.onAfterRender, this);
 		
 	},
+
 	
 	onAfterRender : function() {
 

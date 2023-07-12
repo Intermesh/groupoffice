@@ -9,7 +9,7 @@ GO.moduleManager.onModuleReady('email',function() {
 					id : account_id
 				},
 				waitMsg : t("Loading..."),
-				success : function(form, action) {
+				success : (form, action) => {
 					this.setAccountId(account_id);
 					this.selectUser.setRemoteText(action.result.remoteComboTexts.user_id);
 					this.aliasesButton.setDisabled(false);
@@ -30,8 +30,7 @@ GO.moduleManager.onModuleReady('email',function() {
 					}
 					
 					this.refreshNeeded = false;
-				},
-				scope : this
+				}
 			});
 			return false;
 		}),
@@ -44,7 +43,7 @@ GO.moduleManager.onModuleReady('email',function() {
 					'id' : this.account_id
 				},
 				waitMsg : t("Saving..."),
-				success : function(form, action) {
+				success : (form, action) => {
 					action.result.refreshNeeded = (this.refreshNeeded || this.account_id === 0);
 					if (action.result.id) {
 						this.loadAccount(action.result.id);
@@ -71,7 +70,7 @@ GO.moduleManager.onModuleReady('email',function() {
 
 				},
 
-				failure : function(form, action) {
+				failure : (form, action) => {
 					let error = '';
 					if (action.failureType === 'client') {
 						error = t("You have errors in your form. The invalid fields are marked.");
@@ -88,9 +87,7 @@ GO.moduleManager.onModuleReady('email',function() {
 							form.findField(field).markInvalid(action.result.validationErrors[field]);
 						}
 					}
-				},
-				scope : this
-
+				}
 			});
 			return false;
 		})

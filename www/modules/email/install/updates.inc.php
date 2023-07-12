@@ -255,3 +255,5 @@ $updates['202206020910'][] = function() {
 };
 
 $updates['202208101034'][] = "ALTER TABLE `em_accounts` CHANGE COLUMN `smtp_encryption` `smtp_encryption` CHAR(10) NOT NULL;";
+
+$updates['202302271615'][] = "ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(350) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';";

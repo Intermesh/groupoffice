@@ -195,7 +195,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 * @return mixed
 	 */
 	public function createCalendar($principalUri, $calendarUri, array $properties) {
-		throw new Sabre\DAV\Exception\Forbidden();
+		throw new Sabre\DAV\Exception\Forbidden("Create calendar is not supported");
 	}
 
 	/**
@@ -235,7 +235,21 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 * @return bool|array
 	 */
 	public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $properties) {
-		return true;
+
+		\GO::debug("updateCalendar($calendarId,[data])");
+
+		// we don't really support this but if we don't act like we do then apple calendar will show an error.
+		$supported = [
+			'{DAV:}displayname',
+			'{urn:ietf:params:xml:ns:caldav}calendar-description',
+			'{urn:ietf:params:xml:ns:caldav}calendar-timezone',
+			'{http://apple.com/ns/ical/}calendar-order',
+			'{http://apple.com/ns/ical/}calendar-color'
+		];
+
+		$properties->handle($supported, function($mutations) {
+			return true;
+		});
 	}
 
 	/**
@@ -366,7 +380,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 					'uri' => $davEvent->uri,
 					'calendardata' => $davEvent->data,
 					'lastmodified' => $event->mtime,
-					'etag'=>'"' . date('Ymd H:i:s', $event->mtime). '-'.$event->id.'"',
+					'etag'=> $event->getEtag(),
 					'size' => strlen($davEvent->data),
 					'component' => 'vevent'
 				);
@@ -498,7 +512,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				'uri' => $event->uri,
 				'calendardata' => $data,
 				'lastmodified' => $event->mtime,
-				'etag'=>'"' . date('Ymd H:i:s', $event->mtime). '-'.$event->id.'"',
+				'etag'=> $event->getEtag(),
 				'size' => strlen($data),
 				'component' => 'vevent'
 			);

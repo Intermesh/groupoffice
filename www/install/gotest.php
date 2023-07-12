@@ -136,8 +136,8 @@ function test_system() :array
 	
 	$test['name']='PHP version';
 	$test['showSuccessFeedback'] = false;
-	$test['pass']=function_exists('version_compare') && version_compare( phpversion(), "7.2", ">=") && version_compare( phpversion(), "8.0", "<");
-	$test['feedback']='Fatal error: Your PHP version ('.phpversion().') is not supported. PHP 7.2 or higher is required. PHP 8+ is not supported yet.';
+	$test['pass']=function_exists('version_compare') && version_compare( phpversion(), "7.3", ">=");
+	$test['feedback']='Fatal error: Your PHP version ('.phpversion().') is not supported. PHP 7.3 or higher is required.';
 	$test['fatal']=true;
 
 	$tests[]=$test;
@@ -205,6 +205,15 @@ function test_system() :array
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=function_exists('getimagesize');
 	$test['feedback']='Warning: No GD extension for PHP found. Without GD Group-Office can\'t create thumbnails.';
+	$test['fatal']=false;
+
+	$tests[]=$test;
+
+
+	$test['name']='EXIF support';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=function_exists('exif_read_data');
+	$test['feedback']='Warning: No EXIF extension for PHP found. Without EXIF Group-Office can\'t create thumbnails.';
 	$test['fatal']=false;
 
 	$tests[]=$test;
@@ -686,11 +695,11 @@ function ioncube_version_tester() :array
 		
 		$ioncube_loader_version = ioncube_loader_version_array();
 
-	  if ($ioncube_loader_version['major'] < 5 ) {// || ($ioncube_loader_version['major'] == 4 && $ioncube_loader_version['minor'] < 6) ) {
+	  if ($ioncube_loader_version['major'] < 10  || ($ioncube_loader_version['major'] == 10 && $ioncube_loader_version['minor'] < 2) ) {
 			$test = array(
 				'status'	=>'ERROR',
 				'problem'	=>'Installed: version '. $ioncube_loader_version['version'],
-				'solution'=>'Ioncube loader is installed but needs to be updated. Group-Office will only work reliably with ioncube loader version 5.0 or later. The most recent version of the loader can be found <a href="http://www.ioncube.com/loaders.php" target="_blank">here</a>.'
+				'solution'=>'Ioncube loader is installed but needs to be updated. Group-Office will only work reliably with ioncube loader version 10.2 or later. The most recent version of the loader can be found <a href="http://www.ioncube.com/loaders.php" target="_blank">here</a>.'
 			);
 	  } else {
 			$test = array(

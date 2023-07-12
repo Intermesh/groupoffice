@@ -2,6 +2,7 @@
 
 namespace go\core\controller;
 
+use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Query;
@@ -43,12 +44,24 @@ class Acl extends Controller {
 			$col = $cls::$aclColumnName;
 		}
 
+
+		$fullAclCol = "$table.$col";
+
+		go()->getDbConnection()->debug = true;
+
+
 		if(!$params['add']) {
 			$stmt = go()->getDbConnection()->delete('core_acl_group',(new Query())
-			->where('aclId', 'IN', go()->getDbConnection()->selectSingleValue($col)->from($table)));
+			->where('aclId', 'IN',
+				go()->getDbConnection()
+					->selectSingleValue($col)->from($table, "t2")
+					->join("core_acl", "acl", "acl.id = t2.$col")
+					->where("acl.usedIn = '$fullAclCol'")
+			));
 
 			$stmt->execute();
 
+			// Add ACL owners
 			$stmt = go()->getDbConnection()->insert('core_acl_group',
 				go()->getDbConnection()
 					->select('t.'.$col.', g.id, "' . model\Acl::LEVEL_MANAGE .'"')
@@ -57,6 +70,7 @@ class Acl extends Controller {
 					->join('core_acl', 'a', 'a.id=t.'.$col)
 					->join('core_group', 'g', 'g.isUserGroupFor=a.ownedBy')
 					->where('a.ownedBy != '.model\User::ID_SUPER_ADMIN)
+					->where("a.usedIn = '$fullAclCol'")
 			);
 
 			$stmt->execute();
@@ -67,30 +81,33 @@ class Acl extends Controller {
 			$stmt = go()->getDbConnection()
 				->insertIgnore(
 					'core_acl_group',
-					go()->getDbConnection()->select($col.', "'.$groupId.'", "' . $level .'"')->from($table),
+					go()->getDbConnection()
+						->select($col . ', "' . $groupId . '", "' . $level . '"')
+						->from($table, 't')
+						->join("core_acl", "acl", "acl.id = t.$col")
+						->where("acl.usedIn = '$fullAclCol'"),
 					['aclId', 'groupId', 'level']
-			);
+				);
 
 			$stmt->execute();
-
-
-			if($cls::entityType()->getName() == "Group") {
-				$stmt = go()->getDbConnection()
-					->insertIgnore(
-						'core_acl_group',
-						go()->getDbConnection()->select($col.', id, "' . model\Acl::LEVEL_READ .'"')->from($table),
-						['aclId', 'groupId', 'level']
-					);
-
-				$stmt->execute();
-			}
-
-			EntityType::resetAllSyncState();
-			go()->getSettings()->cacheClearedAt = time();
-			/** @noinspection PhpUnhandledExceptionInspection */
-			go()->getSettings()->save();
-
 		}
+
+		if($cls::entityType()->getName() == "Group") {
+			//share groups with themselves
+			$stmt = go()->getDbConnection()
+				->insertIgnore(
+					'core_acl_group',
+					go()->getDbConnection()->select($col.', id, "' . model\Acl::LEVEL_READ .'"')->from($table),
+					['aclId', 'groupId', 'level']
+				);
+
+			$stmt->execute();
+		}
+
+		EntityType::resetAllSyncState();
+		go()->getSettings()->cacheClearedAt = time();
+		/** @noinspection PhpUnhandledExceptionInspection */
+		go()->getSettings()->save();
 
 		return [];
 	}
@@ -106,11 +123,18 @@ class Acl extends Controller {
 			->join('core_user', 'u', 'g.isUserGroupFor = u.id', 'LEFT')
 			->join('core_entity', 'e', 'a.entityTypeId = e.id')
 			->join('core_module', 'm', 'e.moduleId = m.id')
+			->where('m.enabled = 1')
 			->where('(u.enabled = 1 OR u.enabled IS NULL)') // NULL for group
 			//->andWhere('e.name', '!=', "LogEntry") // Should not be needed because the ACL is copied from other item. a.entityTypeId is not the LogEntry
+				->andwhere("e.name != 'Search'")
+			->andwhere("e.name != 'LogEntry'")
 			->andWhere('a.entityTypeId IS NOT NULL') // default ACLS for type do not have ids
-			->andWhere('a.entityId IS NOT NULL')->limit(2000)
-			->fetchMode(\PDO::FETCH_OBJ);
+			->andWhere('a.entityId IS NOT NULL')
+			->andWhere('a.entityId != 0') //??
+			->limit(2000)
+			->fetchMode(\PDO::FETCH_OBJ)
+			->orderBy(['g.name' => 'ASC']);
+
 		if(isset($params['filter'])) {
 			$filters = isset($params['filter']['conditions']) ? $params['filter']['conditions'] : [$params['filter']];
 			foreach($filters as $filter) {
@@ -141,7 +165,7 @@ class Acl extends Controller {
 			foreach($types as $typeId => $ids) {
 				$et = EntityType::findById($typeId);
 				if(!$et) {
-					throw new \Exception($typeId);
+					continue;
 				}
 				$cls = $et->getClassName();
 				if(is_a($cls, ActiveRecord::class, true)) {
@@ -154,7 +178,7 @@ class Acl extends Controller {
 				}
 			}
 			foreach($acgs as $record) {
-				$record->name = isset($names[$record->entityId]) ? $names[$record->entityId] : '';
+				$record->name = isset($names[$record->entityId]) ? $names[$record->entityId] : go()->t("Unknown");
 			}
 		}
 

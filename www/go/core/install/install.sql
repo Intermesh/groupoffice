@@ -32,20 +32,6 @@ CREATE TABLE `core_auth_password` (
   `password` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE `core_auth_token` (
-  `loginToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `accessToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
-  `userId` int(11) NOT NULL,
-  `createdAt` datetime NOT NULL,
-  `expiresAt` datetime DEFAULT NULL,
-  `lastActiveAt` datetime NOT NULL,
-  `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  platform varchar(190) null,
-  browser varchar(190) null,
-  `passedAuthenticators` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB;
-
 CREATE TABLE `core_blob` (
   `id` binary(40) NOT NULL,
   `type` varchar(129) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -131,6 +117,7 @@ CREATE TABLE `core_customfields_field_set` (
   `sortOrder` tinyint(4) NOT NULL DEFAULT 0,
   `filter` text DEFAULT NULL,
   `isTab` BOOLEAN NOT NULL DEFAULT FALSE,
+  `collapseIfEmpty` BOOLEAN NOT NULL DEFAULT FALSE,
   `columns` TINYINT NOT NULL DEFAULT '2',
   parentFieldSetId int null
 ) ENGINE=InnoDB;
@@ -139,8 +126,11 @@ CREATE TABLE `core_customfields_select_option` (
   `id` int(11) NOT NULL,
   `fieldId` int(11) NOT NULL,
   `parentId` int(11) DEFAULT NULL,
-  `text` varchar(255) DEFAULT NULL,
-  `sortOrder` int(11) UNSIGNED DEFAULT 0,
+  `text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `foregroundColor` varchar(6) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `backgroundColor` varchar(6) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `renderMode` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sortOrder` int(11) unsigned DEFAULT 0,
   `enabled` BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 
@@ -152,6 +142,7 @@ CREATE TABLE `core_entity` (
   `highestModSeq` int(11) NOT NULL DEFAULT 0,
   `defaultAclId` INT NULL DEFAULT NULL
 ) ENGINE=InnoDB;
+
 
 CREATE TABLE `core_group` (
   `id` int(11) NOT NULL,
@@ -211,7 +202,7 @@ CREATE TABLE `core_setting` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_user` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(190) NOT NULL,
   `displayName` varchar(190) NOT NULL,
   `avatarId` binary(40) DEFAULT NULL,
@@ -235,6 +226,7 @@ CREATE TABLE `core_user` (
   `start_module` varchar(50) NOT NULL DEFAULT 'summary',
   `language` varchar(20) NOT NULL DEFAULT 'en',
   `theme` varchar(20) NOT NULL DEFAULT 'Paper',
+  `themeColorScheme` ENUM('light', 'dark', 'system') NOT NULL DEFAULT 'light',
   `firstWeekday` tinyint(4) NOT NULL DEFAULT 1,
   `sort_name` varchar(20) NOT NULL DEFAULT 'first_name',
   `muser_id` int(11) NOT NULL DEFAULT 0,
@@ -255,8 +247,73 @@ CREATE TABLE `core_user` (
   `last_password_change` int(11) NOT NULL DEFAULT 0,
   `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
   `homeDir` varchar (190) not null,
-  `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB;
+  `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+)
+  ENGINE=InnoDB;
+
+CREATE TABLE `core_client` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `deviceId` VARCHAR(80) NOT NULL,
+    `platform` VARCHAR(45) NOT NULL,
+    `name` VARCHAR(80) NOT NULL,
+    `version` VARCHAR(190) NOT NULL,
+    `ip` VARCHAR(45) NOT NULL,
+    `lastSeen` DATETIME NOT NULL,
+    `createdAt` DATETIME NOT NULL,
+    `status` ENUM('new', 'allowed', 'denied') NOT NULL DEFAULT 'new',
+    `needResync` TINYINT(1) NULL NULL DEFAULT 0,
+    `userId` INT(11) NOT NULL,
+    CONSTRAINT `core_client_core_user_id_fk`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE CASCADE,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `core_auth_remember_me` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `token` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+    `series` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+    `expiresAt` DATETIME NULL DEFAULT NULL,
+    `userId` INT(11) NOT NULL,
+    `clientId` INT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `core_auth_remember_me_series_index` (`series` ASC),
+    INDEX `core_auth_remember_me_core_user_id_fk` (`userId` ASC),
+    INDEX `fk_core_auth_remember_me_core_client1_idx` (`clientId` ASC),
+    CONSTRAINT `core_auth_remember_me_core_user_id_fk`
+    FOREIGN KEY (`userId`)
+    REFERENCES `core_user` (`id`)
+    ON DELETE CASCADE,
+    CONSTRAINT `fk_core_auth_remember_me_core_client1`
+    FOREIGN KEY (`clientId`)
+    REFERENCES `core_client` (`id`)
+    ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `core_auth_token` (
+    `loginToken` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NOT NULL,
+    `accessToken` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+    `CSRFToken` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+    `userId` INT(11) NOT NULL,
+    `createdAt` DATETIME NOT NULL,
+    `expiresAt` DATETIME NULL DEFAULT NULL,
+    `passedAuthenticators` VARCHAR(190) NULL DEFAULT NULL,
+    `clientId` INT UNSIGNED NOT NULL,
+    PRIMARY KEY (`loginToken`),
+    INDEX `accessToken` (`accessToken` ASC),
+    INDEX `fk_core_auth_token_core_client1_idx` (`clientId` ASC),
+    INDEX `fk_core_auth_token_core_user1_idx` (`userId` ASC),
+    CONSTRAINT `fk_core_auth_token_core_client1`
+    FOREIGN KEY (`clientId`)
+    REFERENCES `core_client` (`id`)
+    ON DELETE CASCADE,
+    CONSTRAINT `fk_core_auth_token_core_user1`
+    FOREIGN KEY (`userId`)
+    REFERENCES `core_user` (`id`)
+    ON DELETE CASCADE
+) ENGINE = InnoDB;
 
 CREATE TABLE `core_user_custom_fields` (
   `id` int(11) NOT NULL
@@ -461,11 +518,6 @@ ADD INDEX `moduleId_sortOrder` (`moduleId`, `sortOrder`);
 ALTER TABLE `core_auth_password`
   ADD PRIMARY KEY (`userId`);
 
-ALTER TABLE `core_auth_token`
-  ADD PRIMARY KEY (`loginToken`),
-  ADD KEY `userId` (`userId`),
-  ADD KEY `accessToken` (`accessToken`);
-
 ALTER TABLE `core_blob`
   ADD PRIMARY KEY (`id`),
   ADD KEY `staleAt` (`staleAt`);
@@ -542,9 +594,10 @@ ALTER TABLE `core_setting`
   ADD PRIMARY KEY (`moduleId`,`name`);
 
 ALTER TABLE `core_user`
-  ADD PRIMARY KEY (`id`),
+#   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`),
-  ADD KEY `fk_user_avatar_id_idx` (`avatarId`);
+  ADD KEY `fk_user_avatar_id_idx` (`avatarId`),
+  ADD KEY `email` (`email`);
 
 ALTER TABLE `core_user_custom_fields`
   ADD PRIMARY KEY (`id`);
@@ -655,9 +708,6 @@ ALTER TABLE `core_module`
 ALTER TABLE `core_search`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `core_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
 ALTER TABLE `go_advanced_searches`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
@@ -760,7 +810,14 @@ ALTER TABLE `core_user_group`
 ALTER TABLE `core_acl`
   ADD CONSTRAINT `core_acl_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
 
-CREATE TABLE IF NOT EXISTS `go_templates` (
+CREATE TABLE `go_template_group` (
+   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+   `name` VARCHAR(100) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+CREATE TABLE  `go_templates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT 0,
   `type` tinyint(4) NOT NULL DEFAULT 0,
@@ -769,8 +826,14 @@ CREATE TABLE IF NOT EXISTS `go_templates` (
   `content` longblob NOT NULL,
   `filename` varchar(100) DEFAULT NULL,
   `extension` varchar(4) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+   `group_id` INT UNSIGNED NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_go_templates_go_template_group_idx` (`group_id` ASC),
+    CONSTRAINT `fk_go_templates_go_template_group`
+    FOREIGN KEY (`group_id`)
+    REFERENCES `go_template_group` (`id`)
+    ON DELETE SET NULL)
+ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 ALTER TABLE `core_group` ADD UNIQUE(`name`);
 
@@ -833,15 +896,26 @@ ALTER TABLE `core_smtp_account`
   ADD CONSTRAINT `core_smtp_account_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
 
 
-CREATE TABLE `core_email_template` (
-  `id` int(11) NOT NULL,
-  `moduleId` int(11) NOT NULL,
-  `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL,
-  `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en',
-  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `subject` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `body` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+create table core_email_template
+(
+    id       int auto_increment
+        primary key,
+    moduleId int                                        not null,
+    `key`    varchar(20) collate ascii_bin              null,
+    language varchar(20) collate ascii_bin default 'en' not null,
+    name     varchar(190)                               not null,
+    subject  varchar(190)                               null,
+    body     mediumtext                                 not null,
+    constraint core_email_template_ibfk_2
+        foreign key (moduleId) references core_module (id)
+            on delete cascade
+);
+
+create index core_email_template_moduleId_key_index
+    on core_email_template (moduleId, `key`);
+
+create index moduleId
+    on core_email_template (moduleId);
 
 CREATE TABLE `core_email_template_attachment` (
   `id` int(11) NOT NULL,
@@ -852,33 +926,17 @@ CREATE TABLE `core_email_template_attachment` (
   `attachment` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
-
-ALTER TABLE `core_email_template`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `moduleId` (`moduleId`);
-
 ALTER TABLE `core_email_template_attachment`
   ADD PRIMARY KEY (`id`),
   ADD KEY `templateId` (`emailTemplateId`),
   ADD KEY `blobId` (`blobId`);
 
-
-ALTER TABLE `core_email_template`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
 ALTER TABLE `core_email_template_attachment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `core_email_template`
-  ADD CONSTRAINT `core_email_template_ibfk_2` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `core_email_template_attachment`
   ADD CONSTRAINT `core_email_template_attachment_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `core_email_template_attachment_ibfk_2` FOREIGN KEY (`emailTemplateId`) REFERENCES `core_email_template` (`id`) ON DELETE CASCADE;
-
-create unique index core_email_template_moduleId_key_uindex
-    on core_email_template (moduleId, `key`);
 
 ALTER TABLE `core_change` ADD INDEX(`entityId`);
 
@@ -1029,19 +1087,25 @@ create table core_pdf_template
 (
     id               bigint unsigned auto_increment
         primary key,
-    moduleId         int                                           not null,
-    `key`            varchar(20) collate ascii_bin                 null,
-    language         varchar(20)                   default 'en'    not null,
-    name             varchar(50)                                   not null,
-    stationaryBlobId binary(40)                                    null,
-    logoBlobId       binary(40)                                    null,
-    landscape        tinyint(1)                    default 0       not null,
-    pageSize         varchar(20)                   default 'A4'    not null,
-    measureUnit      enum ('mm', 'pt', 'cm', 'in') default 'mm'    not null,
-    marginTop        decimal(19, 4)                default 10.0000 not null,
-    marginRight      decimal(19, 4)                default 10.0000 not null,
-    marginBottom     decimal(19, 4)                default 10.0000 not null,
-    marginLeft       decimal(19, 4)                default 10.0000 not null,
+    moduleId         int(11)                                not null,
+    `key`            varchar(20) collate ascii_bin                  null,
+    language         varchar(20)                   default 'en'     not null,
+    name             varchar(50)                                    not null,
+    stationaryBlobId binary(40)                                     null,
+    logoBlobId       binary(40)                                     null,
+    landscape        tinyint(1)                    default 0        not null,
+    pageSize         varchar(20)                   default 'A4'     not null,
+    measureUnit      enum ('mm', 'pt', 'cm', 'in') default 'mm'     not null,
+    marginTop        decimal(19, 4)                default 20.0000  not null,
+    marginRight      decimal(19, 4)                default 10.0000  not null,
+    marginBottom     decimal(19, 4)                default 20.0000  not null,
+    marginLeft       decimal(19, 4)                default 10.0000  not null,
+    header           text                                           null,
+    headerX          decimal(19, 4)                default 0.0000   null,
+    headerY          decimal(19, 4)                default 10.0000  null,
+    footer           text                                           null,
+    footerX          decimal(19, 4)                default 0.0000   null,
+    footerY          decimal(19, 4)                default -20.0000 null,
     constraint core_pdf_template_core_blob_id_fk
         foreign key (logoBlobId) references core_blob (id),
     constraint core_pdf_template_ibfk_1
@@ -1051,15 +1115,12 @@ create table core_pdf_template
         foreign key (stationaryBlobId) references core_blob (id)
 );
 
-create index moduleId
-    on core_pdf_template (moduleId);
+create index core_pdf_template_key_index
+    on core_pdf_template (moduleId, `key`);
 
 create index stationaryBlobId
     on core_pdf_template (stationaryBlobId);
 
-
-create index core_pdf_template_key_index
-    on core_pdf_template (`key`);
 
 
 
@@ -1131,27 +1192,8 @@ alter table go_state
             on delete cascade;
 
 
-create table core_auth_remember_me
-(
-    id int auto_increment,
-    token varchar(190) collate ascii_bin null,
-    series varchar(190) collate ascii_bin null,
-    userId int not null,
-    expiresAt datetime null,
-    `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `userAgent` varchar(190) NOT NULL,
-  platform varchar(190) null,
-  browser varchar(190) null,
-    constraint core_auth_remember_me_pk
-        primary key (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create index core_auth_remember_me_series_index
-    on core_auth_remember_me (series);
 
-alter table core_auth_remember_me
-    add constraint core_auth_remember_me_core_user_id_fk
-        foreign key (userId) references core_user (id);
 CREATE TABLE `core_permission` (
   `moduleId` INT NOT NULL,
   `groupId` INT NOT NULL,
@@ -1180,3 +1222,19 @@ alter table core_customfields_field_set
     add constraint core_customfields_field_set_core_customfields_field_set_id_fk
         foreign key (parentFieldSetId) references core_customfields_field_set (id)
             on delete set null;
+
+
+
+create table core_import_mapping
+(
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    entityTypeId int                        null,
+    checksum     char(32) collate ascii_bin null,
+    `name` VARCHAR(120) NOT NULL DEFAULT '(unnamed)',
+    mapping      text                       null,
+    updateBy     varchar(100) default null  null,
+    PRIMARY KEY (`id`),
+    constraint core_import_mapping_core_entity_null_fk
+        foreign key (entityTypeId) references core_entity (id)
+            on delete cascade
+);

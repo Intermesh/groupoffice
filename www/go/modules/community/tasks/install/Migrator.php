@@ -39,7 +39,7 @@ class Migrator
       if($project) {
         $projectId = $project->id;
 
-				// If for some reason there are more task lists, just select the first task list
+				// If for some reason there are more lists, just select the first list
 				$prt = go()->getDbConnection()
 					->select('id')
 					->from('tasks_tasklist')

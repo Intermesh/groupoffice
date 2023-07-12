@@ -167,7 +167,7 @@ abstract class AbstractUserDefaultModel extends \GO\Base\Db\ActiveRecord {
 			$user=$this->user;
 		
 		if(!$user)
-			throw new \Exception(" - ".\GO::t(get_class($this),'settings')." '".$this->name."' ".\GO::t("could not be renamed, because it has no owner to name after", "settings").".<br />");
+			throw new \Exception(" - ".\GO::t(get_class($this),'settings')." '".$this->name."' ".\GO::t("could not be renamed, because it has no owner to name after", "settings").".\n\n");
 	
 //		$template = self::getNameTemplate($this->className());
 

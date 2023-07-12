@@ -7,6 +7,11 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 		emptyText: 	'<p>' +t("No items to display") + '</p>'
 	},
 
+	/**
+	 * Set defaults for new templates
+	 */
+	templateDefaults: undefined,
+
 	setKey: function(key) {
 		this.key = key,
 		this.store.setFilter("module", {module: this.module, key: this.key});
@@ -62,6 +67,9 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 					handler: function() {
 						var dlg = new go.pdftemplate.TemplateDialog();
 						dlg.setValues({module: this.module, key: this.key}).show();
+						if(this.templateDefaults) {
+							dlg.setValues(this.templateDefaults);
+						}
 					},
 					scope: this
 			}],
@@ -71,7 +79,10 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 				entityStore: "PdfTemplate",
 				filters: {
 					module: {module: this.module, key: this.key}
-				}	
+				},
+				sortInfo: {
+					field: "name"
+				}
 			}),
 
 			columns: [
@@ -98,7 +109,16 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 			autoExpandColumn: "name"
 		});
 
-		go.smtp.GridPanel.superclass.initComponent.call(this);
+		// if(this.title) {
+		// 	this.tbar.unshift({
+		// 		xtype:'tbtitle',
+		// 		text: this.title
+		// 	})
+		//
+		// 	delete this.title;
+		// }
+
+		go.pdftemplate.GridPanel.superclass.initComponent.call(this);
 		
 		this.on("rowdblclick", function(grid, rowIndex, e) {
 			var record = grid.getStore().getAt(rowIndex);

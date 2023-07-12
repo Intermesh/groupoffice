@@ -4,12 +4,14 @@ namespace go\core\fs;
 
 use Exception;
 use go\core\db\Table;
+use go\core\jmap\Request;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm;
 use go\core\util\DateTime;
 
+use go\core\webclient\Extjs3;
 use PDO;
 use ReflectionException;
 use function GO;
@@ -90,6 +92,9 @@ class Blob extends orm\Entity {
 	
 	private $tmpFile;
 	private $removeFile = true;
+
+	private $hardLink = false;
+
 	private $strContent;
 
 
@@ -119,27 +124,7 @@ class Blob extends orm\Entity {
 	 */
 	public static function getReferences(): array
 	{
-		
-		$refs = go()->getCache()->get("blob-refs");
-		if($refs === null) {
-			$dbName = go()->getDatabase()->getName();
-			go()->getDbConnection()->exec("USE information_schema");
-			
-			try {
-				//somehow bindvalue didn't work here
-				/** @noinspection SqlResolve */
-				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
-				$stmt = go()->getDbConnection()->query($sql);
-				$refs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			}
-			finally{
-				go()->getDbConnection()->exec("USE `" . $dbName . "`");		
-			}	
-			
-			go()->getCache()->set("blob-refs", $refs);			
-		}		
-		
-		return $refs;
+		return Table::getInstance("core_blob")->getReferences();
 	}
 
 	/**
@@ -212,7 +197,7 @@ class Blob extends orm\Entity {
 	 * @return self
 	 * @throws Exception
 	 */
-	public static function fromFile(File $file, bool $removeFile = false): Blob
+	public static function fromFile(File $file, bool $hardLink = false): Blob
 	{
 		$hash = bin2hex(sha1_file($file->getPath(), true));
 		$blob = self::findById($hash);
@@ -233,7 +218,8 @@ class Blob extends orm\Entity {
 		}
 
 		$blob->modifiedAt = $file->getModifiedAt();
-		$blob->removeFile = $removeFile;
+		$blob->hardLink = $hardLink;
+
 		return $blob;
 	}
 
@@ -248,7 +234,9 @@ class Blob extends orm\Entity {
 	 */
 	public static function fromTmp(File $file): Blob
 	{
-		return self::fromFile($file, true);
+		$blob = self::fromFile($file);
+		$blob->removeFile = true;
+		return $blob;
 	}
 
 	/**
@@ -311,7 +299,9 @@ class Blob extends orm\Entity {
 
 				if($this->removeFile) {
 					$tempFile->move(new File($this->path()));
-				} else{
+				} else if($this->hardLink) {
+					$tempFile->link(new File($this->path()));
+				} else {
 					$tempFile->copy(new File($this->path()));					
 				}
 			} else if (!empty($this->strContent)) {
@@ -333,30 +323,32 @@ class Blob extends orm\Entity {
 	 */
 	protected static function internalDelete(Query $query): bool
 	{
-
-		$new = [];
+		$ids = [];
 		$paths = [];
 
-		foreach(Blob::find()->mergeWith($query) as $blob) {
+		$blobs = Blob::find()->mergeWith($query);
+
+		foreach($blobs as $blob) {
 			if($blob->id != go()->getSettings()->logoId) {
-				$new[] = $blob->id;
+				$ids[] = $blob->id;
 				$paths[] = $blob->path();
 			}
 		}
 
-		if(empty($new)) {
+		if(empty($ids)) {
 			go()->debug("No blobs to delete");
 			return true;
 		}
 
 		//for performance use Id's gathered above
-		$justIds = (new Query)->where(['id' => $new]);
-		
+		$justIds = (new Query)->where(['id' => $ids]);
 		if(parent::internalDelete($justIds)) {
 
 			foreach($paths as $path) {
 				if(is_file($path)) {
 					unlink($path);
+
+					go()->debug("GC unlink blob: " . $path);
 				}
 			}
 			return true;
@@ -364,20 +356,6 @@ class Blob extends orm\Entity {
 		
 		return false;
 	}
-	
-	// private $deleteHard = false;
-	
-	// /**
-	//  * Delete without checking isUsed()
-	//  * 
-	//  * It will throw an PDOException if you call this when it's in use.
-	//  * 
-	//  * @return true
-	//  */
-	// public function hardDelete() {
-	// 	$this->deleteHard = true;
-	// 	return $this->delete();
-	// }
 
 	/**
 	 * Return file system path of blob data
@@ -416,9 +394,9 @@ class Blob extends orm\Entity {
 	 * @param string $blobId
 	 * @return string
 	 */
-	public static function url(string $blobId): string
+	public static function url(string $blobId, $relative = false): string
 	{
-		return go()->getSettings()->URL . 'api/download.php?blob=' . $blobId;
+		return ($relative ? Extjs3::get()->getRelativeUrl() : go()->getSettings()->URL) . 'api/download.php?blob=' . $blobId;
 	}
 
 	/**
@@ -456,6 +434,29 @@ class Blob extends orm\Entity {
 			});
 		}
 		return $matches;
+	}
+
+	public static function parseTmpFilesFromHtml(?string &$html) {
+		if(empty($html)) {
+			return [];
+		}
+
+		$blobs = [];
+
+		if(preg_match_all('/<img [^>]*src="(.*core\/downloadTempFile[^>]+path=([^"&]+)[^"]*)"/', $html, $matches)) {
+			for($i = 0; $i < count($matches[0]); $i ++) {
+				$file =go()->getTmpFolder()->getFile(go()->getUserId().'/'.urldecode($matches[2][$i]));
+				if($file->exists()) {
+					$blob = self::fromFile($file, true);
+					$blob->save();
+					$html = str_replace($matches[1][$i], self::url($blob->id), $html);
+					$blobs[] = $blob->id;
+				}
+			}
+		}
+
+		return $blobs;
+
 	}
 
 	/**
@@ -507,5 +508,37 @@ class Blob extends orm\Entity {
 	public static function atypicalApiProperties(): array
 	{
 		return array_merge(parent::atypicalApiProperties(), ['file']);
+	}
+
+
+	/**
+	 * Iterates all blobs on disk and checks if they are in the database
+	 *
+	 * @param bool $delete
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function removeMissingFromFilesystem(bool $delete = false) {
+		$folder = go()->getDataFolder()->getFolder("data");
+
+		foreach($folder->getFolders() as $level1) {
+			foreach($level1->getFolders() as $level2) {
+				foreach($level2->getFiles() as $file) {
+					$blobId = $file->getName();
+
+					echo $blobId . ": ";
+
+					$blob = static::findById($blobId);
+
+					echo $blob ? "found" : "NOT FOUND";
+
+					if(!$blob && $delete) {
+						$file->delete();
+					}
+
+					echo "\n";
+				}
+			}
+		}
 	}
 }

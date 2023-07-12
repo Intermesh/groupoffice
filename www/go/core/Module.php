@@ -8,6 +8,8 @@ use GO\Base\Model\Module as LegacyModuleModel;
 use GO\Base\Module as LegacyModule;
 use GO\Base\ModuleCollection;
 use go\core\Module as CoreModule;
+use go\core\orm\EntityType;
+use go\core\orm\Query;
 use LegacyModuleCollection;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Utils;
@@ -38,6 +40,10 @@ use function GO;
  */
 abstract class Module extends Singleton {
 
+	const STATUS_STABLE = "stable";
+	const STATUS_BETA = "beta";
+	const STATUS_DEPRECATED = "deprecated";
+
 	/**
 	 * Find module class file by name
 	 * 
@@ -55,6 +61,14 @@ abstract class Module extends Singleton {
 		}
 		
 		return null;
+	}
+
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_BETA;
 	}
 
 
@@ -113,28 +127,13 @@ abstract class Module extends Singleton {
 			return true;
 		}
 
-		if(!go()->getEnvironment()->hasIoncube() && static::sourceIsEncoded()) {
+		if(!go()->getEnvironment()->hasIoncube()) {
 			return false;
 		}
 
 		return License::has($license);
 		
 	}
-
-	private static function sourceIsEncoded() : bool {
-
-		$isEncoded = go()->getCache()->get('source-is-encoded');
-
-		if($isEncoded === null) {
-			$isEncoded = ClassFinder::fileIsEncoded(new File(dirname(__DIR__) . '/modules/business/license/model/License.php'));
-			go()->getCache()->set('source-is-encoded', $isEncoded);
-		}
-
-		return $isEncoded;
-
-
-	}
-
 
 	/**
 	 * Install the module
@@ -229,12 +228,15 @@ abstract class Module extends Singleton {
 		}catch(Exception $e) {}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function checkDependenciesForUninstall() {
-		$dependentModuleNames = \go\core\Module::getModulesThatDependOn($this);
+		$dependentModuleNames = Module::getModulesThatDependOn($this);
 
-		if (count($dependentModuleNames)>0)
-			throw new Exception(sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."),implode(', ',$dependentModuleNames)));
-
+		if (count($dependentModuleNames)>0) {
+			throw new Exception(sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."), implode(', ', $dependentModuleNames)));
+		}
 	}
 
 	/**
@@ -256,7 +258,7 @@ abstract class Module extends Singleton {
 		
 		$model = model\Module::find()->where(['name' => static::getName(), 'package' => static::getPackage()])->single();
 		if(!$model) {
-			throw new NotFound("Module not found: ". static::getName() . "/" . static::getPackage());
+			throw new NotFound("Module not found: ".  static::getPackage() . "/" . static::getName());
 		}
 		$model->enabled = false;
 		
@@ -266,6 +268,14 @@ abstract class Module extends Singleton {
 
 		if(!Installer::isInstalling()) {
 			go()->rebuildCache();
+		}
+
+		foreach(EntityType::findAll((new Query)->where(['moduleId' => $model->id])) as $e) {
+			if($e->getDefaultAclId()) {
+				go()->getDbConnection()->update('core_entity',
+					['defaultAclId' => null], ['id' => $e->getId()])
+					->execute();
+			}
 		}
 
 
@@ -744,9 +754,15 @@ abstract class Module extends Singleton {
 	 *
 	 * @return bool
 	 */
-	public function isInstalled(): bool
+	public function isInstalled(bool $andEnabled = true): bool
 	{
-		return !!$this->getModel();
+		$model = $this->getModel();
+
+		if(!$andEnabled) {
+			return !!$model;
+		}else {
+			return $model && $model->enabled;
+		}
 	}
 
 	/**
@@ -841,8 +857,15 @@ abstract class Module extends Singleton {
 		}
 	}
 
+
+	/**
+	 * Check and fixes all enitties ACL's
+	 * @see AclOwnerEntity::checkAcls()
+	 * @return void
+	 */
 	public function checkAcls() {
-		$entities = $this->getClassFinder()->findByParent(AclOwnerEntity::class);
+		echo "Finding AclOwner entities";
+		$entities = $this->getClassFinder()->findByParent(Entity::class);
 		foreach($entities as $entity) {
 			if($entity == model\Search::class) {
 				continue;

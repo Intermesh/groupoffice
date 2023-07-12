@@ -9,18 +9,18 @@ use go\modules\community\addressbook\model\Contact;
 class LanguageTest extends \PHPUnit\Framework\TestCase
 {
 	public function testFormatAddress() {
-		$address = go()->getLanguage()->formatAddress("nl", [
+		$address = go()->getLanguage()->formatAddress([
 			'street' => 'Veemarktkade',
 			'street2' => '8'
-		]);
+		], "nl");
 
 		$this->assertEquals('Veemarktkade 8', $address);
 
 
-		$address = go()->getLanguage()->formatAddress("gb", [
+		$address = go()->getLanguage()->formatAddress([
 			'street' => 'Veemarktkade',
 			'street2' => '8'
-		]);
+		], "gb");
 
 		$this->assertEquals("Veemarktkade\n8", $address);
 	}

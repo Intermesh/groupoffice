@@ -35,6 +35,7 @@ go.form.multiselect.Window = Ext.extend(go.Window, {
 			viewConfig: {
 				emptyText: t("No items to display")
 			},
+			multiSelectToolbarEnabled: false,
 			store: new go.data.Store(storeConfig),
 			columns: [
 				{
@@ -49,7 +50,7 @@ go.form.multiselect.Window = Ext.extend(go.Window, {
 			],
 			autoExpandColumn: "name",
 			listeners: {
-				rowclick : function(grid, rowIndex, e) {
+				rowdblclick : function(grid, rowIndex, e) {
 					
 					var r = {}, selected = grid.store.getAt(rowIndex);
 					r[this.field.idField] = selected.data.id;
@@ -63,6 +64,25 @@ go.form.multiselect.Window = Ext.extend(go.Window, {
 		});
 		
 		this.items = [this.grid];
+
+		this.buttons = [
+			"->",
+			{
+				text: t("Ok"),
+				handler: function() {
+					var records = [], selected = this.grid.getSelectionModel().getSelections();
+					selected.forEach((r) => {
+						records.push({[this.field.idField] : r.data.id})
+					})
+
+					this.field.store.loadData({records: records}, true);
+
+					this.field._isDirty = true;
+					this.close();
+				},
+				scope: this
+			}
+		]
 
 		go.form.multiselect.Window.superclass.initComponent.call(this);
 		

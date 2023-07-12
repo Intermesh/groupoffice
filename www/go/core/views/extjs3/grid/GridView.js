@@ -121,7 +121,7 @@ Ext.define('go.grid.GridView', {
 
 		this.actionBtn.show();
 
-  	var rowEl = Ext.get(this.getRow(rowIndex));
+  	    var rowEl = Ext.get(this.getRow(rowIndex));
 
 		var offset = (rowEl.getHeight() - this.actionBtn.getHeight()) / 2;
 
@@ -140,8 +140,7 @@ Ext.define('go.grid.GridView', {
 
 		if(GO.util.isMobileOrTablet()) {
 			this.actionBtn.showMenu();
-		} else
-		{
+		} else {
 			if(this.actionBtn.menu) {
 				this.actionBtn.menu.hide();
 			}
@@ -170,5 +169,19 @@ Ext.define('go.grid.GridView', {
 		if(this.actionBtn) {
 			this.actionBtn.destroy();
 		}
+	},
+
+	getRowCFStyle: function(record, columns) {
+		for (let i = 0, l = columns.length; i < l; i++) {
+			const column = columns[i];
+			const val = record.data[column.name]
+
+			if(!go.util.empty(val) && typeof column.scope.rowRenderer === "function") {
+				return column.scope.rowRenderer(val);
+			}
+
+
+		}
+		return false;
 	}
 });

@@ -162,13 +162,19 @@ $updates['202205101237'][] = "update addressbook_contact set filesFolderId = nul
 $updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD nameBank varchar(50);';
 $updates['202206020948'][] = 'ALTER TABLE addressbook_contact ADD BIC varchar(11);';
 
+$updates['202210171545'][] = 'ALTER TABLE `addressbook_contact` CHANGE `salutation` `salutation` VARCHAR(382) DEFAULT NULL;';
+
+$updates['202211041158'][] = 'alter table addressbook_contact
+    modify department varchar(200) null;';
+
+$updates['202211071330'][] = "ALTER TABLE `addressbook_email_address` ADD KEY `email` (`email`);";
 
 // 6.7
 
-$updates['202206020948'][] = "alter table addressbook_address
+$updates['202211071330'][] = "alter table addressbook_address
     add address text null;";
 
-$updates['202206020948'][] = function() {
+$updates['202211071330'][] = function() {
 
 	go()->getDbConnection()->exec("alter table addressbook_address ADD id INT AUTO_INCREMENT PRIMARY KEY;");
 	go()->getDatabase()->clearCache();
@@ -177,7 +183,7 @@ $updates['202206020948'][] = function() {
 			->from("addressbook_address");
 		foreach ($addresses as $address) {
 
-			$a = go()->getLanguage()->formatAddress($address['countryCode'], ['street' => $address['street'], 'street2' => $address['street2']], false);
+			$a = go()->getLanguage()->formatAddress(['street' => $address['street'], 'street2' => $address['street2']], $address['countryCode'], false);
 
 			go()->getDbConnection()->update("addressbook_address", ['address' => $a], ['id' => $address['id']])->execute();
 		}
@@ -189,3 +195,6 @@ $updates['202206020948'][] = function() {
 
 
 };
+
+$updates['202302281622'][] = "UPDATE core_setting s JOIN core_module m ON s.moduleId = m.id
+SET s.value = IF(s.value = '1', 'on', 'off'), s.name = 'autoLink' WHERE m.name = 'addressbook' AND s.name = 'autoLinkEmail';";

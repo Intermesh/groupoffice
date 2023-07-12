@@ -21,6 +21,13 @@ use GO\Projects2\Model\TimeEntry;
 
 class Module extends core\Module
 {
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
 
 	public static $enabled = true;
 
@@ -118,11 +125,6 @@ class Module extends core\Module
 
 		if(is_a($cls, LogEntry::class, true) || is_a($cls, Search::class, true)) {
 			return;
-		}
-
-		//Don't delete ACL's because we're taking them over.
-		if(is_a($cls, AclOwnerEntity::class, true)) {
-			$cls::keepAcls();
 		}
 
 		$entities = $cls::find()->mergeWith(clone $query);
@@ -285,7 +287,11 @@ class Module extends core\Module
 		$days = (int) Module::get()->getSettings()->deleteAfterDays;
 
 		if(!empty($days)) {
-			LogEntry::delete(LogEntry::find()->where('createdAt', '<', (new core\util\DateTime("-" . $days . " days"))));
+			LogEntry::delete(
+				LogEntry::find()
+					->removeJoin('core_entity')
+					->where('createdAt', '<', (new core\util\DateTime("-" . $days . " days")))
+			);
 		}
 	}
 

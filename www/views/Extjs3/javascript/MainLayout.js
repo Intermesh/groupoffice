@@ -1,3 +1,4 @@
+
 /* global GO, Ext, go */
 
 /** 
@@ -78,8 +79,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * Always called after all scripts are loaded in Ext.onReady();
 	 * @returns {undefined}
 	 */
-	boot : function() {
+	boot : async function() {
 		var me = this;
+
+		// GOUI in ext
+		window.goui = await import(BaseHref + "views/goui/dist/goui/script/index.js");
+		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
+
 		go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
 			Ext.apply(Ext.QuickTips.getQuickTip(), {
@@ -89,28 +95,16 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			
 			Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
 
-			if(go.User.accessToken){
-				Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + go.User.accessToken;
-				go.User.authenticate().then((user) => {
-					
-					me.on('render', function() {
-						me.fireEvent('boot', me);
-					}, me, {single:true});
-					me.onAuthentication(); // <- start Group-Office
-				}).catch(() => {
-					go.User.clearAccessToken();
-
-					me.fireEvent("boot", me);
-					go.Router.check();
-				})
-			} else {
-
-
-
-				me.fireEvent("boot", me); // In the router there is an event attached.
-
+			go.User.authenticate().then((user) => {
+				me.on('render', function() {
+					me.fireEvent('boot', me);
+				}, me, {single:true});
+				me.onAuthentication(); // <- start Group-Office
+			}).catch(() => {
+				me.fireEvent("boot", me);
 				go.Router.check();
-			}
+			})
+
 				
 		});
 
@@ -307,31 +301,31 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				expires: new Date(new Date().getTime()+(1000*60*60*24*30)), //30 days
 			}));
 		}
-		
 
 		var me = this;
 
-		Ext.getBody().mask(t("Loading..."));
-
 		return go.Modules.init().then(function() {
 			go.User.loadLegacyModules();
-			Promise.all([
+			return Promise.all([
 				go.customfields.CustomFields.init(),				
 				me.loadLegacyModuleScripts()
 			]).then(function(){
 				go.Entities.init();
-				me.addDefaultRoutes();
 
 				me.fireEvent('authenticated', this, go.User, password);
+				window.groupofficeCore.client.fireAuth();
 
 				me.renderUI();
 				Ext.getBody().unmask();
-				go.Router.check();
-			}).catch(GO.settings.config.debug ? undefined : function(error){
-				console.error(error);
-				Ext.getBody().unmask();
-				Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
+				setTimeout(() => {
+					//give "authenticated" listeners above a change to add routes
+					me.addDefaultRoutes();
+					go.Router.check();
+				})
 			});
+		}).catch(function(error) {
+			// Ext.getBody().unmask();
+			GO.errorDialog.show(error);
 		});
 		
 		
@@ -357,12 +351,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			}
 			
 			var module = entityObj.module; 
-			var mainPanel = GO.mainLayout.openModule(module);
+			var mainPanel = GO.mainLayout.getModulePanel(module);
 			var detailViewName = entity.charAt(0).toLowerCase() + entity.slice(1) + "Detail";
 
 			if (mainPanel.route) {
 				mainPanel.route(id, entityObj);
 			} else if(mainPanel[detailViewName]) {
+				mainPanel.show();
 				mainPanel[detailViewName].load(id);
 				mainPanel[detailViewName].show();
 			} else {
@@ -379,8 +374,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.fireReady();
 
-		//Ext need to know where this charting swf file is in order to draw charts
-//		Ext.chart.Chart.CHART_URL = 'views/Extjs3/ext/resources/charts.swf';
 
 		var allPanels = GO.moduleManager.getAllPanelConfigs();
 
@@ -428,8 +421,21 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				},
 			}),
 			listeners: {
+				afterrender: function(menu, e) {
+					menu.getEl().dom.addEventListener("click", (e) => {
+						menu.hide();
+					});
+
+					me.startMenuSearchField.on("render", (sf) => {
+						sf.getEl().dom.addEventListener("click", (e) => {
+							e.stopPropagation();
+						});
+					});
+				},
 				show: function() {
-					this.startMenuSearchField.focus(false, 500);
+					if(!GO.util.isMobileOrTablet()) {
+						this.startMenuSearchField.focus(false, 500);
+					}
 				},
 				itemclick : function(item, e) {
 					if (!item.textField) {
@@ -442,6 +448,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				me.openModule(moduleName);
 				me.startMenuSearchField.textField.reset();
 				me.startMenuSearchField.fireEvent('clear');
+
 				me.startMenu.hide();
 			},
 			updateMenuItems: function() {
@@ -526,9 +533,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				id: 'go-start-menu-' + allPanels[i].moduleName,
 				moduleName: allPanels[i].moduleName,
 				text: allPanels[i].title,
-				//iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
 				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+"&mtime="+go.User.session.cacheClearedAt+")",
-				//icon: ,
 				handler: function (item, e) {
 					this.openModule(item.moduleName);
 				},
@@ -638,7 +643,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					region:'east',
 					title: t('Notifications'),
 					floating:true,
-					width: GO.util.isMobileOrTablet() ? window.innerWidth : dp(408),
+					width: GO.util.isMobileOrTablet() ? window.innerWidth : dp(500),
 					animCollapse:false,
 					animFloat: false,
 					collapsible: true,
@@ -670,7 +675,18 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					text: '<i class="icon">apps</i>',
 					renderTo: 'start-menu-link',
 					clickEvent: 'mousedown',
+					tooltip: t("Main menu") + " (" + (Ext.isMac ? '⌘ + ⇧' : 'CTRL + SHIFT') + ' + M)',
 					template: new Ext.XTemplate('<span><button></button></span>')
+				});
+
+				new Ext.KeyMap(document, {
+					stopEvent:true,
+					key:Ext.EventObject.M,
+					ctrl:true,
+					shift: true,
+					fn: () => {
+						this.startMenuLink.showMenu();
+					}
 				});
 
 				var userBtn = Ext.get('user-menu');
@@ -716,6 +732,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				},{
 					iconCls: 'ic-info',
 					text: t("About {product_name}"),
+					hidden: !!GO.settings.config.hideAbout && !go.User.isAdmin,
 					handler: function () {
 						if (!this.aboutDialog)
 						{
@@ -858,7 +875,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	welcome : function() {
-
 		if(go.User.id == 1)
 		{
 			const coreMod = go.Modules.get("core", "core");
@@ -943,6 +959,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			}
 
 			var newTitle = number ? panel.origTitle + ' <div class="go-tab-notification" style="background-color:' + color + '">' + number + '</div>' : panel.origTitle;
+
+			panel.notification = number;
 
 			panel.setTitle(newTitle);
 		}

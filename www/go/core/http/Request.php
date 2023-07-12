@@ -83,6 +83,15 @@ class Request extends Singleton{
 		$accept = explode(',', strtolower($_SERVER['HTTP_ACCEPT']));		
 		return array_map('trim', $accept);				
 	}
+
+	/**
+	 * Get the path part
+	 *
+	 * @return string
+	 */
+	public function getPath() : string {
+		return $_SERVER['PATH_INFO'] ?? "";
+	}
 	
 	/**
 	 * Get the accepted languages sent by the request in lower case
@@ -324,7 +333,7 @@ class Request extends Singleton{
 	}
 
 	/**
-	 * Get full URL
+	 * Get full URL used for the request
 	 *
 	 * @return string
 	 */
@@ -333,6 +342,13 @@ class Request extends Singleton{
 		return $this->getProtocol(). '//' .$this->getHost(false) . $this->getUri();
 	}
 
+	/**
+	 * Get start of URL with protocol, host and port number.
+	 *
+	 * eg. http://localhost:8080
+	 *
+	 * @return string
+	 */
 	public function getBaseUrl(): string
 	{
 		return $this->getProtocol(). '//' .$this->getHost(false);
@@ -410,7 +426,7 @@ class Request extends Singleton{
    */
   public static function headerDecode($string) {
       $pos = strpos($string, "''");
-      if($pos == false || $pos > 64) {
+      if($pos === false || $pos > 64) {
         return false;
       }
 			//eg. iso-8859-1''%66%6F%73%73%2D%69%74%2D%73%6D%61%6C%6C%2E%67%69%66

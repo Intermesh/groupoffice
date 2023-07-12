@@ -1,10 +1,19 @@
 {
   "type": "module",
   "devDependencies": {
-    "esbuild": "^0.14.49"
+    "concurrently": "latest",
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "latest"
   },
 
   "scripts": {
-    "start": "esbuild script/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist"
+    "start": "concurrently --kill-others \"npm run start:ts\"  \"npm run start:sass\"",
+    "start:ts": "npx esbuild script/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist",
+    "start:sass": "npx sass --watch style:dist",
+
+    "build": "npm run build:sass && npm run build:ts",
+    "build:ts": "npx esbuild script/Index.ts --external:../../../../../../views/goui/* --bundle --minify --sourcemap --format=esm --target=esnext --outdir=dist",
+    "build:sass": "npx sass --style=compressed style:dist"
   }
 }

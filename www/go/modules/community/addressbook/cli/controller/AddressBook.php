@@ -12,7 +12,9 @@ class AddressBook extends Controller {
 	/**
 	 * ./cli.php community/addressbook/AddressBook/export --addressBookId=1 --format=csv
 	 */
-	public function export($addressBookId, $format = 'csv') {
+	public function export($params) {
+
+		extract($this->checkParams($params, ['addressBookId', 'format'=>'csv']));
 		$json = <<<JSON
 [
   [
@@ -57,7 +59,9 @@ JSON;
 	/**
 	 * /cli.php community/addressbook/AddressBook/delete --addressBookId=1
 	 */
-	public function delete($addressBookId) {
+	public function delete($params) {
+
+		extract($this->checkParams($params, ['addressBookId']));
 		$json = <<<JSON
 [
   [

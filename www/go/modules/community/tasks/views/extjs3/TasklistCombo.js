@@ -1,6 +1,6 @@
 (function() {
 	const cfg = {
-		fieldLabel: t("Task list"),
+		fieldLabel: t("List"),
 		hiddenName: 'tasklistId',
 		anchor: '100%',
 		emptyText: t("Please select..."),
@@ -34,12 +34,13 @@
 					this.store.setFilter('role', {role: this.initialConfig.role});
 				}
 				if (go.User.tasksSettings && !("value" in this.initialConfig)) {
-					this.value = go.User.tasksSettings.defaultTasklistId;
+					this.value = this.initialConfig.role == "support" ? go.User.supportSettings.defaultTasklistId : go.User.tasksSettings.defaultTasklistId;
 				}
 			}
 	}));
 
 	go.modules.community.tasks.TasklistComboBoxReset = Ext.extend(go.form.ComboBoxReset, Ext.apply(cfg, {
+		allowBlank: true,
 		initComponent: function() {
 			this.supr().initComponent.call(this);
 

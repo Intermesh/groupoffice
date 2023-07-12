@@ -6,16 +6,55 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	modal: false,
 	stateId: 'communityTasksTaskDialog',
 	role: "list",
+	support: null,
+	redirectOnSave: false,
+	collapsible: true,
 
 	onReady: async function () {
 		if (this.currentId) {
 			const tl = await go.Db.store("TaskList").single(this.tasklistCombo.getValue());
+			this.role = tl.role;
 			this.tasklistCombo.store.setFilter("role", {role: tl.role});
 		} else {
 			this.tasklistCombo.store.setFilter("role", {role: this.role});
 		}
+
+
+		if(!this.currentId) {
+			this.commentComposer.show();
+			this.descriptionFieldset.hide();
+
+			this.commentComposer.editor.on("ctrlenter", () => {
+				this.submit();
+			})
+
+			this.on("submit", () => {
+				if(this.commentComposer.editor.isDirty())
+					this.commentComposer.save("Task", this.currentId);
+			}, {single:true})
+		} else
+		{
+			this.commentComposer.hide();
+			this.descriptionFieldset.show();
+		}
 	},
-	support: null,
+
+	onSubmit : function() {
+
+		switch(this.role) {
+			case "support":
+				go.Router.goto("support/" + this.currentId);
+				break;
+
+			case "board":
+			case "project":
+				break;
+
+			default:
+				this.entityStore.entity.goto(this.currentId);
+				break;
+		}
+	},
 
 	setLinkEntity: function (cfg) {
 
@@ -51,21 +90,29 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 
 		go.Db.store("Tasklist").single(val).then((tasklist) => {
-			this.userCombo.store.setFilter("acl", {
+			this.responsibleCombo.store.setFilter("acl", {
 				aclId: tasklist.aclId,
 				aclPermissionLevel: go.permissionLevels.write
 			});
 
-			delete this.userCombo.lastQuery;
+			delete this.responsibleCombo.lastQuery;
 		}).catch((e) => {
 			console.error(e);
 		})
 	},
 
-	initFormItems: function () {
+	initComponent: function() {
+		if(this.role == "support") {
+			this.title = t("Ticket", "support", "business");
+		}
+		this.supr().initComponent.call(this);
+		},
 
+	initFormItems: function () {
 		const start = {
+			flex: 1,
 			xtype: 'datefield',
+			width: undefined,
 			name: 'start',
 			itemId: 'start',
 			fieldLabel: t("Start"),
@@ -87,6 +134,8 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		};
 
 		const due = {
+			flex: 1,
+			width: undefined,
 			xtype: 'datefield',
 			name: 'due',
 			itemId: 'due',
@@ -104,28 +153,53 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		};
 
 		const progress = new go.modules.community.tasks.ProgressCombo({
-			width: dp(150),
-
+			flex: 1,
 			value: 'needs-action'
 		});
 
 		const estimatedDuration = {
 			name: "estimatedDuration",
-			xtype: "nativetimefield",
-			width: dp(150),
+			xtype: "durationfield",
+			maxHours: 9000, // tasks should not take longer than 2h tho
+			flex: 1,
 			fieldLabel: t("Estimated duration"),
-			asInteger: true
+			asInteger: true,
+			listeners: {
+				change: (df, duration) => {
+					const days = Math.floor(duration / 86400);
+
+					if(!days) {
+						estimatedDurationLbl.hide();
+						return;
+					}
+
+					duration = duration % 86400;
+
+					const hours = Math.floor(duration / 3600);
+					duration = duration % 3600;
+
+					const mins = Math.floor(duration / 60);
+
+					estimatedDurationLbl.show();
+
+					estimatedDurationLbl.setValue(days +" "+ t("days") + ", " + hours + ":" + (mins + "").padStart(2, "0") + " " + t("hours"));
+				}
+			}
 		};
 
+		const estimatedDurationLbl = new Ext.form.DisplayField({
+			hidden: true,
+			flex: 1
+		});
+
 		const priority = {
-			anchor: "100%",
+			flex: 1,
 			xtype: 'combo',
 			name: 'priority_text',
 			hiddenName: 'priority',
 			triggerAction: 'all',
 			editable: false,
 			selectOnFocus: true,
-			width: dp(150),
 			forceSelection: true,
 			fieldLabel: t("Priority"),
 			mode: 'local',
@@ -143,14 +217,20 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 		const percentComplete = new Ext.form.SliderField({
 			fieldLabel: t("Percent complete"),
-			flex: 1,
 			name: 'percentComplete',
 			minValue: 0,
 			maxValue: 100,
 			increment: 10,
 			value: 0,
-			anchor: "100%"
+			flex: 1,
 		});
+
+		this.recurrenceField = new go.form.RecurrenceField({
+			anchor: "100%",
+			name: 'recurrenceRule',
+			hidden: this.hideRecurrence || this.role == "support",
+			disabled: true
+		})
 
 
 		const propertiesPanel = new Ext.Panel({
@@ -167,123 +247,96 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					{
 
 						xtype: 'fieldset',
-						layout: 'column',
 						items: [
 							{
-								columnWidth: .8,
 								xtype: "container",
 								layout: "form",
+								cls: 'go-hbox',
 								items: [{
-									anchor: "100%",
+									flex: 1,
 									xtype: 'textfield',
 									name: 'title',
 									allowBlank: false,
 									fieldLabel: t("Subject")
-								}]
+								},
+									{xtype: 'colorfield', emptyText: 'color', name: 'color', hideLabel: true}
+								]
 							},
 
-							{html:' ', columnWidth:.03},
-
-							{
-								columnWidth: .17,
-								xtype: "container",
-								layout: "form",
-								items: [
-									{xtype: 'colorfield', emptyText: 'color', name: 'color', hideLabel: true, anchor: "100%"}
-								]
-							}
+							this.customerCombo = new go.users.UserCombo({
+								flex: 1,
+								disabled: this.role != "support",
+								hidden: this.role != "support",
+								anchor: undefined,
+								fieldLabel: t('Customer'),
+								hiddenName: 'createdBy',
+								allowBlank: false,
+								value: null
+							})
 						]
 
 
 					}, {
 						xtype: 'fieldset',
-						// collapsible: true,
-						// title: t("Schedule"),
-
-
-						items: [
-							{
-								layout: 'column',
-								defaults: {
-									layout: 'form',
-									xtype: 'container',
-									labelAlign: 'top',
-									defaults: {
-										anchor: "90%"
-									}
-								},
-								mobile: {
-									items: [
-										{
-											columnWidth: .5,
-											items: [start, due, priority]
-										},
-										{
-											columnWidth: .5,
-											items: [progress, estimatedDuration, percentComplete]
-										}
-									]
-								},
-								items: [
-									{
-										columnWidth: .35,
-										items: [start, due]
-									},
-									{
-										columnWidth: .35,
-										items: [progress, estimatedDuration]
-									},
-									{
-										columnWidth: .3,
-										items: [priority, percentComplete]
-									}
-								],
+						defaults: {
+							layout: 'form',
+							xtype: 'container',
+							cls: "go-hbox"
+						},
+						mobile: {
+							items: [{
+								items: [start, due]
+							},{
+								items: [estimatedDuration, progress]
+							}, {
+								items: [percentComplete, priority]
 							},
-							this.recurrenceField = new go.form.RecurrenceField({
-								anchor: "100%",
-								name: 'recurrenceRule',
-								hidden: this.hideRecurrence,
-								disabled: true,
-							})
-						]
+								this.recurrenceField]
+						},
+						desktop: {
+							items: [
+								{
+									items: [start, due, estimatedDuration, estimatedDurationLbl]
+								},{
+									items: [progress, percentComplete, priority]
+								},
+								this.recurrenceField
+							]
+						},
+
+
+
+
 					},
 					{
 						xtype: "fieldset",
 						// collapsible: true,
 						// title: t("Assignment"),
 						items: [{
-							layout: "hbox",
+							xtype: "container",
+							cls: "go-hbox",
+							layout: "form",
 							items: [
-								{
-									style: "padding-right: 8px",
-									layout: "form",
-									xtype: "container",
+								this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
 									flex: 1,
-									items: [
-										this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
-											role: this.support ? "support" : null,
-											listeners: {
-												change: this.onTaskListChange,
-												setvalue: this.onTaskListChange,
-												scope: this
-											}
-										})
-									]
-								},
-								{
-									layout: "form",
-									xtype: "container",
+									anchor: undefined,
+									role: this.role,
+									listeners: {
+										change: this.onTaskListChange,
+										setvalue: this.onTaskListChange,
+										scope: this
+									}
+								}),
+								this.responsibleCombo = new go.users.UserCombo({
 									flex: 1,
-									items: [
-										this.userCombo = new go.users.UserCombo({
-											fieldLabel: t('Responsible'),
-											hiddenName: 'responsibleUserId',
-											anchor: '100%',
-											allowBlank: true,
-											value: null
-										})
-									]
-								}]
+									anchor: undefined,
+									fieldLabel: t('Responsible'),
+									hiddenName: 'responsibleUserId',
+									allowBlank: true,
+									value: null
+								})
+
+								]
 						},
 							{
 								xtype: "chips",
@@ -309,8 +362,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					,
 
 					{xtype: 'hidden', name: 'groupId'},
+					this.commentComposer = new go.modules.comments.ComposerFieldset(),
 
-					{
+					this.descriptionFieldset = new Ext.form.FieldSet({
 						xtype: "fieldset",
 						// collapsible: true,
 						// title: t("Other"),
@@ -335,7 +389,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 							}
 						]
-					},
+					}),
 
 					{
 						xtype: "fieldset",
@@ -343,9 +397,18 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						title: t("Alerts"),
 						items: [new go.modules.community.tasks.AlertFields()]
 					}
+
+
+
 				]
 			}]
+
+
 		});
+
+
+
+
 
 		//this.recurrencePanel = new go.modules.community.tasks.RecurrencePanel();
 

@@ -70,7 +70,7 @@ GO.files.ImageViewer = Ext.extend(go.Window, {
 			iconCls: 'ic-open-in-browser',
 			text: t("Open in browser"),
 			handler: function(){
-				window.open(this.viewerImages[this.currentImgIndex].src);
+				window.open(this.viewerImages[this.currentImgIndex].download_path);
 			},
 			scope: this
 		},{

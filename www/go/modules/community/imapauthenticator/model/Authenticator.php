@@ -39,6 +39,9 @@ class Authenticator extends PrimaryAuthenticator {
 	}
 	
 	public function authenticate($username, $password) {
+
+		$this->fireEvent('beforeauthenticate' , [$username]);
+
 		$server = $this->findServer($username);
 		
 		go()->debug("Attempting IMAP authentication on ".$server->imapHostname);

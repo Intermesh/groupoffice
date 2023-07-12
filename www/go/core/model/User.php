@@ -9,6 +9,7 @@ use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
 use GO\Calendar\Model\Calendar;
 use GO\Calendar\Model\UserSettings as CalendarUserSettings;
+use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\auth\Authenticate;
 use go\core\auth\BaseAuthenticator;
@@ -17,6 +18,7 @@ use go\core\convert\UserSpreadsheet;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\Environment;
 use go\core\exception\ConfigurationException;
 use go\core\exception\NotFound;
 use go\core\Installer;
@@ -50,7 +52,7 @@ use go\modules\community\tasks\model\UserSettings as TasksUserSettings;
  * @property ?UserSettings $addressBookSettings
  * @property ?CalendarUserSettings $calendarSettings
  */
-class User extends Entity {
+class User extends AclItemEntity {
 	
 	use CustomFieldsTrait;
 
@@ -230,6 +232,7 @@ class User extends Entity {
 	public $start_module;
 	public $language;
 	public $theme;
+	public $themeColorScheme;
 	public $firstWeekday;
 	public $sort_name;
 
@@ -290,11 +293,14 @@ class User extends Entity {
 	 */
 	private $passwordVerified = true;
 
+	public $clients;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
+			->addMap('clients', Client::class, ['id' => 'userId'])
 			->addScalar('groups', 'core_user_group', ['id' => 'userId']);
 	}
 
@@ -498,7 +504,7 @@ class User extends Entity {
 			return false;
 		}						
 		
-		return App::get()->getAuthState()->isAdmin();
+		return go()->getModel()->getUserRights()->mayChangeUsers;
 	}
 	
 	protected function internalValidate() {
@@ -518,9 +524,8 @@ class User extends Entity {
 			}
 		}
 
-		if($this->isModified('groups')) {	
-			
-			
+		if($this->isModified('groups')) {
+
 			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
 				$this->groups[] = Group::ID_EVERYONE;
 				// $this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group everyone"));
@@ -649,7 +654,16 @@ class User extends Entity {
       }, false)
       ->add('groupId', function (Criteria $criteria, $value, Query $query){
         $query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $value]);
-      });
+      })
+			->addText("username", function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('username', $comparator, $value);
+			})
+			->addText("email", function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('email', $comparator, $value);
+			})
+			->addText("displayName", function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('displayName', $comparator, $value);
+			});
 	}
 
 	private $isAdmin;
@@ -752,6 +766,9 @@ class User extends Entity {
 	
 	protected function internalSave(): bool
 	{
+		if($this->archive) {
+			$this->groups = [Group::ID_EVERYONE, $this->getPersonalGroup()->id];
+		}
 		
 		if(isset($this->plainPassword)) {
 			$this->password = $this->passwordHash($this->plainPassword);
@@ -769,7 +786,6 @@ class User extends Entity {
 			return false;
 		}
 
-		/// TODO change log problem with deadlocks
 		$this->saveContact();
 
 		if(isset($this->personalGroup) && $this->personalGroup->isModified()) {
@@ -792,10 +808,6 @@ class User extends Entity {
 
 		if($this->isModified(['username', 'displayName', 'avatarId', 'email']) && !Installer::isInstalling()) {
 			UserDisplay::entityType()->changes([[$this->id, $this->findAclId(), 0]]);
-		}
-
-		if(!$this->saveAuthorizedClients()) {
-			return false;
 		}
 
 		return true;
@@ -875,23 +887,45 @@ class User extends Entity {
 	 */
 	private function saveContact(): bool
 	{
-		if (!isset($this->contact)) {
+		$contact = $this->getProfile();
+
+		if(!$contact) {
 			return true;
 		}
 
-		$this->contact->photoBlobId = $this->avatarId;
-		if (!isset($this->contact->emailAddresses[0])) {
-			$this->contact->emailAddresses = [(new EmailAddress($this->contact))->setValues(['email' => $this->email])];
-		}
-		if (empty($this->contact->name) || $this->isModified(['displayName'])) {
-			$this->contact->name = $this->displayName;
-			$parts = explode(' ', $this->displayName);
-			$this->contact->firstName = array_shift($parts);
-			$this->contact->lastName = implode(' ', $parts);
+		if(!$this->isModified(['displayName', 'email', 'avatarId']) && !$contact->isModified()) {
+			return true;
 		}
 
-		$this->contact->goUserId = $this->id;
-		return $this->contact->save();
+		$contact->photoBlobId = $this->avatarId;
+
+		$compare = $this->isModified('email') ? $this->getOldValue("email") : $this->email;
+		if($this->isModified("email")) {
+			$hasEmail = false;
+			foreach ($contact->emailAddresses as $emailAddress) {
+				if ($emailAddress->email == $compare) {
+					$hasEmail = $emailAddress;
+					break;
+				}
+			}
+
+			if (!$hasEmail) {
+				$contact->emailAddresses[] = (new EmailAddress($contact))->setValues(['email' => $this->email]);
+			} else if($hasEmail != $this->email) {
+				$hasEmail->email = $this->email;
+			}
+		}
+
+		if (empty($contact->name) || $this->isModified(['displayName'])) {
+			$contact->name = $this->displayName;
+			$parts = explode(' ', $this->displayName);
+			$contact->firstName = array_shift($parts);
+			$contact->lastName = implode(' ', $parts);
+		}
+
+		$contact->goUserId = $this->id;
+
+		return $contact->save();
 	}
 
 
@@ -962,7 +996,40 @@ class User extends Entity {
 		}
 	}
 	
+	public function currentClient() : ?Client {
+        if(Environment::get()->isCli()) {
+            $where = [
+                'userId' => $this->id,
+                'ip' => 'CLI',
+                'platform' => 'CLI',
+                'name' => 'CLI'
+            ];
+        } else {
+            $ua_info = \donatj\UserAgent\parse_user_agent();
+            $where = [
+                'userId' => $this->id,
+                'ip' => $_SERVER['REMOTE_ADDR'] ?? 'CLI',
+                'platform' => $ua_info['platform'],
+                'name' => $ua_info['browser']
+            ];
+        }
 
+		return Client::internalFind([],false, $this)->where($where)->single();
+	}
+
+	public function clientByDevice($deviceId) {
+		if($deviceId === '-'){
+			return null;
+		}
+		$client = Client::internalFind([],false, $this)->where(['deviceId' => $deviceId, 'userId' => $this->id])->single();
+		if(empty($client)) {
+			$client = new Client($this);
+			$client->userId = $this->id;
+			$client->deviceId = $deviceId;
+			return $client;
+		}
+		return $client;
+	}
 	
 	/**
 	 * Add user to group if not already in it.
@@ -1024,7 +1091,7 @@ class User extends Entity {
 	protected static function internalDelete(Query $query): bool
 	{
 
-		$query->andWhere('id != 1');
+		$query->andWhere($query->getTableAlias() . '.id != 1');
 
 		go()->getDbConnection()->delete('go_settings', (new Query)->where('user_id', 'in', $query))->execute();
 		//go()->getDbConnection()->delete('go_reminders', (new Query)->where('user_id', 'in', $query))->execute();
@@ -1101,20 +1168,23 @@ class User extends Entity {
 			return null;
 		}
 
-		$contact = !$this->isNew() ? Contact::findForUser($this->id) : null;
-		if(!$contact) {
-			$contact = new Contact();
-			$contact->goUserId = $this->id;
-			$contact->addressBookId = go()->getSettings()->userAddressBook()->id;
-			if($this->email) {
-				$contact->emailAddresses[0] = (new EmailAddress($contact))->setValues(['email' => $this->email]);
-			}
-			$nameParts = explode(" ", $this->displayName);
-			$contact->firstName = array_shift($nameParts);
-			$contact->lastName = implode(" ", $nameParts);
+		if(isset($this->contact)) {
+			return $this->contact;
 		}
 		
-		return $contact;
+		$this->contact = !$this->isNew() ? Contact::findForUser($this->id) : null;
+		if(!$this->contact) {
+			$this->contact = new Contact();
+			$this->contact->addressBookId = go()->getSettings()->userAddressBook()->id;
+			if($this->email) {
+				$this->contact->emailAddresses[0] = (new EmailAddress($this->contact))->setValues(['email' => $this->email]);
+			}
+			$nameParts = explode(" ", $this->displayName);
+			$this->contact->firstName = array_shift($nameParts);
+			$this->contact->lastName = implode(" ", $nameParts);
+		}
+		
+		return $this->contact;
 	}
 
 	/**
@@ -1132,7 +1202,7 @@ class User extends Entity {
 		} else {
 			$this->contact = $this->getProfile();
 			$this->contact->setValues($values);
-			if (!empty($this->contact->name)) {
+			if ($this->contact->isModified("name")) {
 				$this->displayName = $this->contact->name;
 			}
 		}
@@ -1230,14 +1300,16 @@ class User extends Entity {
 			go()->getDbConnection()->delete('pr2_default_resources', ['user_id' => $this->id] )->execute();
 		}
 
-		$grpId = $this->getPersonalGroup()->id();
-		foreach (Acl::findByIds($aclIds) as $rec) {
-			foreach ($rec->groups as $aclGrp) {
-				if ($aclGrp->groupId != $grpId) {
-					$rec->removeGroup($aclGrp->groupId);
+		if (count($aclIds)) {
+			$grpId = $this->getPersonalGroup()->id();
+			foreach (Acl::findByIds($aclIds) as $rec) {
+				foreach ($rec->groups as $aclGrp) {
+					if ($aclGrp->groupId != $grpId) {
+						$rec->removeGroup($aclGrp->groupId);
+					}
 				}
+				$rec->save();
 			}
-			$rec->save();
 		}
 	}
 
@@ -1257,85 +1329,6 @@ class User extends Entity {
 		}
 	}
 
-	private $getAuthorizedClients;
-
-	/**
-	 * Get authorized clients with ['remoteIpAddress', 'platform', 'browser']
-	 * @return array[]
-	 * @throws Exception
-	 */
-	public function getAuthorizedClients(): array
-	{
-		if(!isset($this->getAuthorizedClients)) {
-			$this->getAuthorizedClients =
-				go()->getDbConnection()->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
-					->from(
-						go()->getDbConnection()
-							->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
-							->from('core_auth_token')
-							->where('userId', '=', $this->id)
-							->andWhere('expiresAt', '>', new DateTime())
-							->groupBy(['remoteIpAddress', 'platform', 'browser'])
-							->union(
-								go()->getDbConnection()
-									->select("remoteIpAddress, platform, browser, max(expiresAt) as expiresAt")
-									->distinct()
-									->from('core_auth_remember_me')
-									->where('userId', '=', $this->id)
-									->andWhere('expiresAt', '>', new DateTime())
-									->groupBy(['remoteIpAddress', 'platform', 'browser'])
-							)
-					)->groupBy(['remoteIpAddress', 'platform', 'browser'])
-				->all();
-
-			foreach ($this->getAuthorizedClients as &$client) {
-//			try {
-//				$geo = Geolocation::locate($client['remoteIpAddress']);
-//				$client['countryCode'] = $geo['countryCode'];
-//			} catch(\Exception $e) {
-//				ErrorHandler::logException($e);
-//				$client['countryCode'] = null;
-//			}
-
-				$client['expiresAt'] = (DateTime::createFromFormat(Column::DATETIME_FORMAT, $client['expiresAt']));
-			}
-		}
-
-		return $this->getAuthorizedClients;
-	}
-
-	private $authorizedClients;
-
-	public function setAuthorizedClients($clients) {
-		$this->authorizedClients = $clients;
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	private function saveAuthorizedClients(): bool
-	{
-		if(!isset($this->authorizedClients)) {
-			return true;
-		}
-
-		$query = (new Query)
-			->where('userId', '=', $this->id)
-			->andWhere('expiresAt', '>', new DateTime());
-
-		if(!empty($this->authorizedClients)) {
-			$c = new Criteria();
-			foreach ($this->authorizedClients as $client) {
-				unset($client['countryCode'], $client['expiresAt']);
-				$c->andWhereNot($client);
-			}
-
-			$query->andWhere($c);
-		}
-
-		return Token::delete($query) && RememberMe::delete($query);
-	}
-
 	public function findAclId(): ?int
 	{
 		return $this->getPersonalGroup()->findAclId();
@@ -1351,7 +1344,7 @@ class User extends Entity {
 		if (!$user) {
 
 			if(!go()->getSettings()->allowRegistration) {
-				throw new NotFound("User not found");
+				throw new NotFound("User not found and registration not allowed");
 			}
 
 			$user = new User();
@@ -1368,5 +1361,15 @@ class User extends Entity {
 		}
 
 		return $user;
+	}
+
+	protected static function aclEntityClass(): string
+	{
+		return Group::class;
+	}
+
+	protected static function aclEntityKeys(): array
+	{
+		return ['id' => 'isUserGroupFor'];
 	}
 }

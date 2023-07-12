@@ -21,7 +21,14 @@ use go\modules\community\notes\model\Note;
 use go\modules\community\notes\model\NoteBook;
 use go\modules\community\notes\model\UserSettings;
 
-class Module extends core\Module {	
+class Module extends core\Module {
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
 
 	public function getAuthor(): string
 	{

@@ -4,8 +4,11 @@ namespace go\core\customfield;
 
 use GO;
 use go\core\db\Criteria;
+use go\core\db\Table;
+use go\core\model\FieldSet;
 use go\core\orm\CustomFieldsModel;
 use go\core\orm\Entity;
+use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Query;
 
@@ -17,7 +20,19 @@ class MultiSelect extends Select {
 		return false;
 	}
 
-	public function onFieldSave() {
+	/**
+	 * @return Table the table definition of the Entity the fieldset of this
+	 * customfield belongs to.
+	 */
+	protected function getTableDefinition() {
+		$fieldSet = FieldSet::findById($this->field->fieldSetId);
+		$entityType = EntityType::findByName($fieldSet->getEntity());
+		$table = $entityType->getClassName()::getMapping()->getPrimaryTable();
+		return $table;
+	}
+
+	public function onFieldSave(): bool
+	{
 
 		if ($this->field->isNew()) {
 			$this->createMultiSelectTable();
@@ -28,7 +43,8 @@ class MultiSelect extends Select {
 		return true;
 	}
 
-	public function getMultiSelectTableName() {
+	public function getMultiSelectTableName(): string
+	{
 		return "core_customfields_multiselect_" . $this->field->id;
 	}
 
@@ -37,9 +53,10 @@ class MultiSelect extends Select {
 
 		$tableName = $this->field->tableName();
 		$multiSelectTableName = $this->getMultiSelectTableName();
+		$entityColumn = $this->getTableDefinition()->getColumn('id');
 
-		$sql = "CREATE TABLE IF NOT EXISTS `" . $multiSelectTableName . "` (
-			`id` int(11) NOT NULL,
+		$sql = "CREATE TABLE IF NOT EXISTS `$multiSelectTableName` (
+			`id` $entityColumn->dataType NOT NULL,
 			`optionId` int(11) NOT NULL,
 			PRIMARY KEY (`id`,`optionId`),
 			KEY `optionId` (`optionId`)
@@ -57,16 +74,16 @@ class MultiSelect extends Select {
 	}
 	
 	
-	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record) {
-		
+	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record): bool
+	{
 		//remove options from record to be inserted and save them for the afterSave method.
 		$this->optionsToSave = $value;
 		unset($record[$this->field->databaseName]);
 		return true;
 	}
 	
-	public function afterSave($value,CustomFieldsModel &$customFieldModel, $entity) : bool {
-		
+	public function afterSave($value,CustomFieldsModel &$customFieldModel, $entity) : bool
+	{
 		if(!isset($this->optionsToSave)) {
 			return true;
 		}
@@ -144,13 +161,15 @@ class MultiSelect extends Select {
 		return $ids;
 	}
 
-	public function onFieldDelete() {
-		return go()->getDbConnection()->query("DROP TABLE IF EXISTS `" . $this->getMultiSelectTableName() . "`;");
+	public function onFieldDelete(): bool
+	{
+		return go()->getDbConnection()->query("DROP TABLE IF EXISTS `" . $this->getMultiSelectTableName() . "`;")->execute();
 	}
 	
 	private static $joinCount = 0;
 	
-	private function getJoinAlias() {
+	private function getJoinAlias(): string
+	{
 		static::$joinCount++;
 		
 		return $this->field->databaseName .'_' . static::$joinCount;
@@ -160,7 +179,7 @@ class MultiSelect extends Select {
 	 * Defines an entity filter for this field.
 	 * 
 	 * @see Entity::defineFilters()
-	 * @param Filters $filter
+	 * @param Filters $filters
 	 */
 	public function defineFilter(Filters $filters) {
 		

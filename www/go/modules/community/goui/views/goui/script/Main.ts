@@ -1,16 +1,22 @@
-import {comp, Component} from "@goui/component/Component.js";
-import {splitter} from "@goui/component/Splitter.js";
-import {tbar} from "@goui/component/Toolbar.js";
-import {btn} from "@goui/component/Button.js";
-import {checkboxselectcolumn, column} from "@goui/component/table/TableColumns.js";
-import {StoreRecord} from "@goui/data/Store.js";
+import {
+	btn,
+	checkboxselectcolumn,
+	column,
+	comp,
+	Component, menu,
+	router, searchbtn,
+	splitter,
+	t, Table,
+	TableColumn,
+	tbar
+} from "@intermesh/goui";
 
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
-import {router} from "@goui/Router.js";
-import {t} from "@goui/Translate.js";
+import {NoteBookDialog} from "./NoteBookDialog";
+import {FilterCondition} from "@intermesh/groupoffice-core";
 
 
 export class Main extends Component {
@@ -70,56 +76,92 @@ export class Main extends Component {
 				btn({
 					icon: "add",
 					handler: () => {
-
+						const dlg = new NoteBookDialog();
+						dlg.show();
 					}
 				})
 			),
-			this.noteBookGrid = notebookgrid({
-				flex: 1,
-				cls: "fit no-row-lines",
-				rowSelectionConfig: {
-					multiSelect: true,
-					listeners: {
-						selectionchange: (tableRowSelect) => {
+			comp({flex: 1, cls: "scroll"},
+	this.noteBookGrid = notebookgrid({
+					fitParent: true,
+					cls: "no-row-lines",
+					rowSelectionConfig: {
+						multiSelect: true,
+						listeners: {
+							selectionchange: (tableRowSelect) => {
 
-							const noteBookIds = tableRowSelect.selected.map((index) => tableRowSelect.table.store.get(index).id);
+								const noteBookIds = tableRowSelect.selected.map((index) => tableRowSelect.list.store.get(index)!.id);
 
-							this.noteGrid.store.queryParams.filter = {
-								noteBookId: noteBookIds
-							};
+								this.noteGrid.store.queryParams.filter = {
+									noteBookId: noteBookIds
+								};
 
-							this.noteGrid.store.load();
+								this.noteGrid.store.load();
+							}
 						}
-					}
-				},
-				columns: [
-					checkboxselectcolumn(),
-					column({
-						header: t("Name"),
-						id: "name",
-						sortable: true,
-						resizable: false
-					})
-				]
-			})
+					},
+					columns: [
+						checkboxselectcolumn(),
+						column({
+							header: t("Name"),
+							id: "name",
+							sortable: true,
+							resizable: false
+						}),
+						column({
+							width: 48,
+							id: "btn",
+							// headerRenderer: (col: TableColumn, headerEl: HTMLTableCellElement, table: Table) => {
+							// 	headerEl.style.position = "sticky";
+							// 	headerEl.style.right = "0";
+							// 	return "";
+							// },
+							renderer: (columnValue: any, record, td, table, rowIndex) => {
+								// td.style.position = "sticky";
+								// td.style.right = "0";
+								return btn({
+									icon: "more_vert",
+									menu: menu({
+
+									},
+										btn({
+											icon: "edit",
+											text: t("Edit"),
+											handler: () => {
+												const record = table.store.get(rowIndex)!
+
+												const dlg = new NoteBookDialog();
+												dlg.load(record.id);
+												dlg.show();
+											}
+										}))
+
+								})
+							}
+						})
+					]
+				})
+			)
 		);
 	}
 
 	private createCenter() {
 
 		this.noteGrid = new NoteGrid();
-		this.noteGrid.flex = 1;
+
 		this.noteGrid.title = "Notes";
-		this.noteGrid.cls = "fit light-bg";
+
 		this.noteGrid.rowSelectionConfig = {
 			multiSelect: true,
 			listeners: {
 				selectionchange: (tableRowSelect) => {
 					if (tableRowSelect.selected.length == 1) {
-						const table = tableRowSelect.table;
+						const table = tableRowSelect.list;
 						const record = table.store.get(tableRowSelect.selected[0]);
 
-						router.goto("goui-notes/" + record.id);
+						if(record) {
+							router.goto("goui-notes/" + record.id);
+						}
 					}
 				}
 			}
@@ -134,18 +176,21 @@ export class Main extends Component {
 					cls: "border-bottom"
 				},
 				"->",
-				// textfield({
-				// 	label: t("Search"),
-				// 	buttons: [
-				// 		btn({icon: "clear", handler:(btn) => (btn.parent!.parent! as Field).value = ""})
-				// 	]
-				// }),
+				searchbtn({
+					listeners: {
+						input: (sender, text) => {
+							(this.noteGrid.store.queryParams.filter as FilterCondition).text = text;
+							void this.noteGrid.store.load();
+						}
+					}
+				}),
 				btn({
-					cls: "primary",
+					cls: "filled primary",
+					text: "Add",
 					icon: "add",
 					handler: () => {
 						const dlg = new NoteDialog();
-						const noteBookId = this.noteBookGrid.store.get(this.noteBookGrid.rowSelection!.selected[0]).id;
+						const noteBookId = this.noteBookGrid.store.get(this.noteBookGrid.rowSelection!.selected[0])!.id;
 
 						dlg.form.setValues({
 							noteBookId: noteBookId
@@ -155,11 +200,16 @@ export class Main extends Component {
 					}
 				})
 			),
-			this.noteGrid
+			comp({
+					cls: "scroll light-bg",
+					flex: 1
+				},
+				this.noteGrid
+			)
 		)
 	}
 
-	public  showNote(noteId: number) {
+	public  showNote(noteId: string) {
 		this.noteDetail.load(noteId);
 	}
 

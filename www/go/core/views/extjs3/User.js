@@ -1,6 +1,5 @@
 go.User = new (Ext.extend(Ext.util.Observable, {
 	loaded : false,
-	accessToken: go.util.Cookies.get('accessToken'),
 	authenticate: function(cb, scope) {
 		return this.load();
 	},
@@ -10,32 +9,21 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			return this.onLoad(data);
 		});
 	},
-	
-	clearAccessToken : function() {
-		this.accessToken = null;
-		go.util.Cookies.unset('accessToken');
-	},
-	
-	setAccessToken : function(accessToken) {
-		this.accessToken = accessToken;
-		
-		if(!Ext.Ajax.defaultHeaders) {
-			Ext.Ajax.defaultHeaders = {};
-		}
-		
-		Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + accessToken;
-		
-	},
 
 	onLoad : function(session) {
-		console.warn(session);
+
+		// we only want this in a httpOnly cookie for security
+		delete session.accessToken;
+
+		// Needed for every non-GET request when using the access token as cookie.
+		Ext.Ajax.defaultHeaders['X-CSRF-Token'] = session.CSRFToken;
 
 		this.capabilities = go.Jmap.capabilities = session.capabilities;
 		this.session = session;
 
-	    this.apiUrl = session.apiUrl;
-	    this.downloadUrl = session.downloadUrl;
-	    this.uploadUrl = session.uploadUrl;
+		this.apiUrl = session.apiUrl;
+		this.downloadUrl = session.downloadUrl;
+		this.uploadUrl = session.uploadUrl;
 		this.pageUrl = session.pageUrl;
 		this.eventSourceUrl = session.eventSourceUrl;		
 		this.loaded = true;
@@ -49,6 +37,9 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			// me.firstWeekDay = parseInt(user.firstWeekday);
 			this.legacySettings(user);
 
+			this.checkForNewDevices(user);
+			document.body.classList.add(user.themeColorScheme);
+
 			go.ActivityWatcher.activity();
 			go.ActivityWatcher.init(GO.settings.config.logoutWhenInactive);
 
@@ -57,6 +48,30 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			return this;
 		});
 		
+	},
+
+	checkForNewDevices(user) {
+		for(const id in user.clients) {
+			const client = user.clients[id];
+			if(client.status === 'new') {
+				Ext.Msg.show({
+					title:'New ActiveSync device',
+					msg: 'A new account was setup on your mobile device. Please confirm that it was you to enable this device'+
+						': <br>'+client.version,
+					buttons: Ext.Msg.YESNO,
+					fn: (me,s) => {
+						client.status = me == 'yes' ? 'allowed' : 'denied';
+						go.Db.store("User").set({
+							update: {[user.id]: {
+								clients: user.clients
+							}}
+						})
+					},
+					icon: Ext.MessageBox.QUESTION
+				});
+
+			}
+		}
 	},
 	
 	legacySettings : function (user) {
@@ -91,28 +106,6 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			,'text_separatoe.r' : user.textSeparator
 			,'modules' : []
 		});
-
-		/*
-		 "core": {
-                "id": 1,
-                "name": "core",
-                "package": "core",
-                "version": 148,
-                "sort_order": 1,
-                "admin_menu": false,
-                "aclId": 5,
-                "enabled": true,
-                "modifiedAt": null,
-                "modSeq": null,
-                "deletedAt": null,
-                "url": "/api/modules/core/",
-                "full_url": "https://office.group-office.com/modules/core/",
-                "permission_level": 50,
-                "read_permission": true,
-                "write_permission": true
-						},*/
-						
-
 	},
 
 	loadLegacyModules : function() {

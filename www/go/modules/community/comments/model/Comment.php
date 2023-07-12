@@ -12,6 +12,7 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
+use go\core\orm\SearchableTrait;
 use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use go\core\orm\EntityType;
@@ -38,6 +39,8 @@ class Comment extends AclItemEntity {
 	public $modifiedBy;
 	/** @var DateTime */
 	public $date;
+
+	public $validateXSS = true;
 
 	/**
 	 * Label ID's
@@ -72,6 +75,8 @@ class Comment extends AclItemEntity {
 	 * @var string
 	 */
 	public $mimeMessageId;
+
+	use SearchableTrait;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -112,6 +117,10 @@ class Comment extends AclItemEntity {
 		$this->entityTypeId = $entity->getId();
 
 		return $this;
+	}
+
+	public function getEntity() {
+		return $this->entity;
 	}
 	
 	protected static function defineFilters(): Filters
@@ -200,7 +209,7 @@ class Comment extends AclItemEntity {
 			return Acl::LEVEL_MANAGE;
 		}
 
-		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_WRITE : false;
+		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_CREATE : false;
 
 	}
 
@@ -221,7 +230,7 @@ class Comment extends AclItemEntity {
 
 	protected function internalValidate()
 	{
-		if($this->isModified(['text']) && StringUtil::detectXSS($this->text)) {
+		if($this->validateXSS && $this->isModified(['text']) && StringUtil::detectXSS($this->text, true)) {
 			$this->setValidationError('text', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
 		}
 
@@ -353,4 +362,23 @@ class Comment extends AclItemEntity {
 	}
 
 
+	protected function getSearchDescription(): string
+	{
+		return StringUtil::cutString($this->getAsText(), 100);
+	}
+
+	private function getAsText() : string {
+		if(!isset($this->asText)) {
+			$this->asText = preg_replace("/<style.*<\/style>/usi", "", $this->text);
+			$this->asText = strip_tags($this->asText);
+		}
+		return $this->asText;
+	}
+
+	private $asText;
+
+	protected function getSearchKeywords(): ?array
+	{
+		return [$this->getAsText()];
+	}
 }

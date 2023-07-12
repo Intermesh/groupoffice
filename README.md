@@ -28,19 +28,41 @@ https://github.com/Intermesh/docker-groupoffice-development
 ## Manual from source
 
 1. Install regularly like on https://groupoffice.readthedocs.io/en/latest/install/install.html
-2. If using the Debian packages then disable the APT repositoty to avoid overwritten source on update.
+2. If using the Debian packages then disable the APT repository to avoid overwritten source on update.
 3. Clone this repository
 4. Change into the "www" directory.
-5. Install composer libraries: 
+5. Create subdirectories for the GOUI Framework and the GroupOffice Core libraries:
+```
+mkdir -p views/goui/goui
+mkdir -p views/goui/groupoffice-core
+```
+6. Clone the GOUI and GroupOffice Core libraries in the newly created directories. Please note that these are to be git
+submodules:
+```
+git submodule add git@github.com:Intermesh/goui.git www/views/goui/goui/
+git submodule add git@github.com:Intermesh/groupoffice-core.git www/views/goui/groupoffice-core/
+```
+
+7. Initialize the submodules:
+```
+git submodule init
+git submodule update
+```
+
+8. Follow the instructions in the README.md file for the GOUI library. This will install dependencies and compile the
+typescript code.
+9. Do the same for the GroupOffice Core library. As this library depends on the GOUI library.
+
+10. Install composer libraries:
    ```
    "composer install"
    ```
-6. Compile sass: 
+11. Compile sass:
    ```
    sass views/Extjs3/themes/Paper/src/style.scss views/Extjs3/themes/Paper/style.css
    sass views/Extjs3/themes/Paper/src/style-mobile.scss views/Extjs3/themes/Paper/style-mobile.css
    ```
-7. Symlink the original source directory to your development files. For example:
+12. Symlink the original source directory to your development files. For example:
 
    Move Debian package folder away:
    
@@ -54,5 +76,6 @@ https://github.com/Intermesh/docker-groupoffice-development
    ln -s ~/Projects/groupoffice/master/www /usr/share/groupoffice
    ```
      
-8. Launch it in the web browser and follow the installer's instructions.
+13. Launch it in the web browser and follow the installer's instructions.
 
+Happy coding!

@@ -32,6 +32,17 @@ class Token extends Entity {
 	public $accessToken;
 
 	/**
+	 * Cross Site Request Forgery token
+	 *
+	 * It's checked on each request that is not a GET request and where the accessToken is sent as a cookie.
+	 *
+	 * It can be passed as a 'X-CSRF-Token' header or 'CSRFToken' parameter
+	 *
+	 * @var string
+	 */
+	public $CSRFToken;
+
+	/**
 	 * 
 	 * @var int
 	 */							
@@ -48,7 +59,14 @@ class Token extends Entity {
 	 * @var DateTime
 	 */
 	public $createdAt;
-	
+
+	/**
+	 * FK to the core_client table
+	 *
+	 * @var int
+	 */
+	public $clientId;
+
 	/**
 	 *
 	 * When the user was last active. Updated every 5 minutes.
@@ -56,30 +74,6 @@ class Token extends Entity {
 	 * @var DateTime
 	 */
 	public $lastActiveAt;
-
-	/**
-	 * The remote IP address of the client connecting to the server
-	 * 
-	 * @var string 
-	 */
-	public $remoteIpAddress;
-	
-	/**
-	 * The user agent sent by the client
-	 * 
-	 * @var string 
-	 */
-	public $userAgent;
-
-	/**
-	 * @var string
-	 */
-	public $platform;
-
-	/**
-	 * @var string
-	 */
-	public $browser;
 
 	/**
 	 * | separated list of "core_auth" id's that are successfully applied 
@@ -123,7 +117,6 @@ class Token extends Entity {
 		if($this->isNew()) {	
 			$this->setExpiryDate();
 			$this->lastActiveAt = new DateTime("now", new DateTimeZone("UTC"));
-			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
 		}else if($this->isAuthenticated ()) {
@@ -156,6 +149,12 @@ class Token extends Entity {
 		return false;
 	}
 
+	protected function internalSave(): bool
+	{
+		$this->setClient();
+		return parent::internalSave();
+	}
+
 //	/**
 //	 * Set an authentication method to completed and add it to the
 //	 * "completedAuth" property
@@ -179,24 +178,22 @@ class Token extends Entity {
 //	}
 //
 	private function setClient() {
-		if(isset($_SERVER['REMOTE_ADDR'])) {
-			$this->remoteIpAddress = $_SERVER['REMOTE_ADDR'];
-		} else if(Environment::get()->isCli()) {
-			$this->remoteIpAddress = 'CLI';
+
+		if(empty($this->clientId)) {
+			$user = $this->getUser();
+			$client = $user->currentClient();
+			if (!$client) {
+				$client = new Client($user);
+				$client->userId = $this->userId;
+				$client->status = 'allowed';
+			}
+			$client->lastSeen = $this->lastActiveAt;
+			if($client->save()) {
+				$this->clientId = $client->id;
+			} else {
+				throw new Exception('Failed to save the client identity'.var_export($client->getValidationErrors(), true));
+			}
 		}
-
-		if(isset($_SERVER['HTTP_USER_AGENT'])) {
-			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
-
-			$ua_info = \donatj\UserAgent\parse_user_agent();
-
-			$this->platform = $ua_info['platform'];
-			$this->browser = $ua_info['browser'];
-
-		}else if(Environment::get()->isCli()) {
-			$this->userAgent = 'CLI';
-		}
-
 	}
 
 	/**
@@ -229,6 +226,9 @@ class Token extends Entity {
 	private function internalRefresh() {
 		if(!isset($this->accessToken)) {
 			$this->accessToken = $this->generateToken();
+		}
+		if(!isset($this->CSRFToken)) {
+			$this->CSRFToken = $this->generateToken();
 		}
 		if(isset($this->expiresAt)) {
 			$this->setExpiryDate();
@@ -298,26 +298,30 @@ class Token extends Entity {
 	/**
 	 * Authenticate this token
 	 *
+	 * @param bool $increaseLogins True if login must be counted and last login must be updated.
 	 * @return bool success
 	 * @throws Exception
 	 */
-	public function setAuthenticated(): bool
+	public function setAuthenticated(bool $increaseLogins = true): bool
 	{
 		
 		$user = $this->getUser(['loginCount', 'lastLogin', 'language']);
-		$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
-		$user->loginCount++;
-
-		if(isset($_COOKIE['GO_LANGUAGE'])) {
-			$user->language = $_COOKIE['GO_LANGUAGE'];
-		}
-
-		if(!$user->save()) {
-			return false;
-		}
 
 		if(!$this->refresh()) {
 			return false;
+		}
+
+		if($increaseLogins) {
+			$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
+			$user->loginCount++;
+
+			if (isset($_COOKIE['GO_LANGUAGE'])) {
+				$user->language = $_COOKIE['GO_LANGUAGE'];
+			}
+
+			if (!$user->save()) {
+				return false;
+			}
 		}
 		
 		// For backwards compatibility, set the server session for the old code
@@ -492,29 +496,13 @@ class Token extends Entity {
 	 */
 	protected static function internalDelete(Query $query): bool
 	{
-
-		// todo remove this part when logout issue is solved
-		$debugEnabled = go()->getDebugger()->enabled;
-		if(!$debugEnabled) {
-			go()->getDebugger()->enable(true);
-		}
-
 		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
-		go()->debug("Deleting token query: " . $deleteQuery);
-		go()->getDebugger()->debugCalledFrom();
-		foreach($deleteQuery as $accessToken) {
 
-			go()->debug("Deleting token: " . $accessToken);
+		foreach($deleteQuery as $accessToken) {
 			go()->getCache()->delete('token-' . $accessToken);
 		}
 
-		$success =  parent::internalDelete($query);
-
-		if(!$debugEnabled) {
-			go()->getDebugger()->enabled = false;
-		}
-
-		return $success;
+		return parent::internalDelete($query);
 	}
 
 	/**
@@ -527,14 +515,8 @@ class Token extends Entity {
 	 */
 	public function getClassRights(string $cls): stdClass
 	{
-		//if(!isset($this->classRights[$cls])) {
-			$mod = Module::findByClass($cls, ['id', 'name', 'package']);
-			return  $mod->getUserRights();
-//			$this->classRights[$cls]= $mod->getUserRights();
-//			go()->getCache()->set('token-'.$this->accessToken,$this);
-		//}
-
-		//return $this->classRights[$cls];
+		$mod = Module::findByClass($cls, ['id', 'name', 'package']);
+		return  $mod->getUserRights();
 	}
 
 
@@ -560,8 +542,10 @@ class Token extends Entity {
 		Response::get()->setCookie('accessToken', $this->accessToken, [
 			'expires' => 0,
 			"path" => "/",
-			"samesite" => "Lax",
-			"domain" => Request::get()->getHost()
+			"samesite" => "Lax", // strict not possible or oauth won't work as it will not send cookie on callback page
+			"secure" => Request::get()->isHttps(),
+			"domain" => Request::get()->getHost(),
+			"httpOnly" => true
 		]);
 	}
 
@@ -569,8 +553,10 @@ class Token extends Entity {
 		Response::get()->setCookie('accessToken', "", [
 			'expires' => time() - 3600,
 			"path" => "/",
-			"samesite" => "Lax",
-			"domain" => Request::get()->getHost()
+			"samesite" => "Lax", // strict not possible or oauth won't work as it will not send cookie on callback page
+			"secure" => Request::get()->isHttps(),
+			"domain" => Request::get()->getHost(),
+			"httpOnly" => true
 		]);
 	}
 	

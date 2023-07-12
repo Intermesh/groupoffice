@@ -44,11 +44,11 @@ GO.moduleManager.onModuleReady('email',function(){
 				
 				if(this.messagePanel.data.smime_signed && !this.messagePanel.smimeChecked){
 					this.messagePanel.checkCert(true, function(){
-						this.messagePanel.body.print();
+						this.messagePanel.print();
 					}, this);
 				}else
 				{
-					this.messagePanel.body.print();
+					this.messagePanel.print();
 				}
 			};
 		})

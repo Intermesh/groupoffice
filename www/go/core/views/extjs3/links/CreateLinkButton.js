@@ -303,8 +303,6 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	
 	reset : function() {
 
-		console.log("reset",this.linkGrid.store.setFilter("link"));
-		
 		// Clear the new attached links list
 		this.newLinks = [];		
 		this.linkGrid.store.removeAll();

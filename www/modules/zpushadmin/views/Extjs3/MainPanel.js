@@ -1,75 +1,56 @@
-GO.zpushadmin.MainPanel = function(config){
-	
-	if(!config)
-		config = {};
-	
+GO.zpushadmin.MainPanel = Ext.extend(Ext.Panel, {
+	layout: 'border',
+
+	initComponent() {
+
 		this.centerPanel = new GO.zpushadmin.DevicesGrid({
-		region:'center',
-		id:'zpadmin-center-panel',
-		border:true
-	});
-	
-	this.devicePanel = new GO.zpushadmin.DevicePanel({
-		region:'east',
-		width:400,
-		border:true
-	});
-	
-	this.centerPanel.on("delayedrowselect",function(grid, rowIndex, r){
-		this.devicePanel.load(r.data.id);
-	}, this);
-
-	config.tbar = new Ext.Toolbar({
-		cls:'go-head-tb',
-		items: [{
-				xtype:'htmlcomponent',
-				html:t("ActiveSync management", "zpushadmin"),
-				cls:'go-module-title-tbar'
-			},{
-			itemId:'delete',
-			iconCls: 'btn-delete',
-			text: t("Delete"),
-			cls: 'x-btn-text-icon',
-			disabled:this.standardTbarDisabled,
-			handler: function(){
-				this.deleteSelected();
+			region:'center',
+			id:'zpadmin-center-panel',
+			border:true,
+			tbar: [{
+				xtype:'tbtitle',
+				html:t("ActiveSync management"),
 			},
-			scope: this.centerPanel
-		},{
-			itemId:'settings',
-			iconCls: 'btn-settings',
-			text: t("Settings"),
-			cls: 'x-btn-text-icon',
-			disabled:this.standardTbarDisabled,
-			handler: function(){
-				this.showSettingsDialog();
-			},
-			scope: this.centerPanel
-		},
-		'-',
-		new GO.form.SearchField({
-			store: this.centerPanel.store,
-			width:150
-		})]
-	});
+			'->',
+			new GO.form.SearchField({
+				store: GO.zpushadmin.deviceStore,
+				width:150
+			}),{
+				itemId:'delete',
+				iconCls: 'btn-delete',
+				text: t("Delete"),
+				disabled:this.standardTbarDisabled,
+				handler: function(){
+					this.deleteSelected();
+				},
+				scope: this.centerPanel
+			}],
+			listeners: {
+				"delayedrowselect": (grid, rowIndex, r) => {
+					this.devicePanel.load(r.data.id);
+				}
+			}
+		});
 
+		this.devicePanel = new GO.zpushadmin.DevicePanel({
+			region:'east',
+			width:400,
+			border:true
+		});
 
-	config.items=[
-		this.centerPanel,
-		this.devicePanel
-	];	
-	
-	config.layout='border';
+		this.items = [
+			this.centerPanel,
+			this.devicePanel
+		];
 
-	GO.zpushadmin.MainPanel.superclass.constructor.call(this, config);	
-};
-
-Ext.extend(GO.zpushadmin.MainPanel, Ext.Panel, {
-
+		this.supr().initComponent.call(this);
+	}
 });
 
+
+
 GO.moduleManager.addModule('zpushadmin', GO.zpushadmin.MainPanel, {
-	title : t("ActiveSync management", "zpushadmin"),
+	title : t("ActiveSync", "zpushadmin"),
 	iconCls : 'go-tab-icon-zpushadmin',
 	admin :true
 });

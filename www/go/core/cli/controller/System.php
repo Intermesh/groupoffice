@@ -2,22 +2,22 @@
 namespace go\core\cli\controller;
 
 use Exception;
-use GO\Base\Observable;
 use go\core\Controller;
-use go\core\db\Table;
+use go\core\db\Column;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\Forbidden;
 use go\core\exception\NotFound;
+use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\Entity;
 use go\core\jmap\Response;
 use go\core\jmap\Router;
+use go\core\model\Acl;
 use go\core\model\Alert;
 use go\core\http\Client;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\CronJobSchedule;
-use go\core\event\Listeners;
 use go\core\model\Module;
 use Faker;
 
@@ -37,6 +37,10 @@ class System extends Controller {
 	use EventEmitterTrait;
 
 	const EVENT_CLEANUP = 'cleanup';
+	/**
+	 * @var File[]|\go\core\fs\Folder[]
+	 */
+	private $installSqls;
 
 	protected function authenticate()
 	{
@@ -50,15 +54,15 @@ class System extends Controller {
 	 * @param string $file
 	 * @return void
 	 */
-	public function addPDFFont(string $file) {
+	public function addPDFFont($params) {
 
-		$f = new File($file);
+		$f = new File($params['file']);
 		if(!$f->exists()) {
 			throw new NotFound($f->getPath());
 		}
 
 		// convert TTF font to TCPDF format and store it on the fonts folder
-		$result = PdfRenderer::addTTFFont($file);
+		$result = PdfRenderer::addTTFFont($params['file']);
 
 
 		var_dump($result);
@@ -83,12 +87,12 @@ class System extends Controller {
 	/**
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteGroup --id=29
 	 */
-	public function deleteGroup($id) {
+	public function deleteGroup($params) {
 		$json = <<<JSON
 [
   [
     "Group/set", {
-      "destroy": [$id]
+      "destroy": [{$params['id']}]
     },
     "call-1"
   ]
@@ -107,12 +111,12 @@ JSON;
 	/**
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteUser --id=1
 	 */
-	public function deleteUser($id) {
+	public function deleteUser($params) {
 		$json = <<<JSON
 [
   [
     "User/set", {
-      "destroy": [$id]
+      "destroy": [{$params['id']}]
     },
     "call-1"
   ]
@@ -130,13 +134,13 @@ JSON;
 	/**
 	 * @throws NotFound
 	 */
-	public function resetSyncState(string $entity = null) {
-		if(!isset($entity)) {
+	public function resetSyncState($params) {
+		if(!isset($params['entity'])) {
 			EntityType::resetAllSyncState();
 		} else{
-			$et = EntityType::findByName($entity);
+			$et = EntityType::findByName($params['entity']);
 			if(!$et) {
-				throw new NotFound("Entity '$entity' not found");
+				throw new NotFound("Entity '{$params['entity']}' not found");
 			}
 			$et->resetSyncState();
 		}
@@ -148,8 +152,15 @@ JSON;
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticator --package=community --name=Sync
 	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
+	 *
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=core --package=core --name=GarbageCollection
+	 * @throws NotFound
 	 */
-	public function runCron($name, $module = "core", $package = "core") {
+	public function runCron($params) {
+
+        $name = $params['name'];
+        $module = $params['module'] ?? 'core';
+		$package = $params['package'] ?? 'core';
 
 		$mod = Module::findByName($package, $module);
 		if(!$mod) {
@@ -223,9 +234,9 @@ JSON;
 		echo "Cleaning up....\n";
 		Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
 
-		if(Module::isInstalled("legacy", "files")) {
-			$this->cleanupEmptyFolders();
-		}
+//		if(Module::isInstalled("legacy", "files")) {
+//			$this->cleanupEmptyFolders();
+//		}
 
 		$this->cleanupAcls();
 
@@ -242,47 +253,18 @@ JSON;
 	}
 
 	private function cleanupAcls() {
-
-		// for memory problems
-		go()->getDebugger()->enabled = false;
+		echo "Cleaning up unused ACL's\n";
 		CoreAlert::$enabled = false;
 
 		// Speed things up.
 		Entity::$trackChanges = false;
+
 		\go\modules\community\history\Module::$enabled = false;
-
-		echo "Cleaning up unused ACL's\n";
-
-//		go()->getDatabase()->getTable('core_acl')->backup();
-//		go()->getDatabase()->getTable('core_acl_group')->backup();
-
-		go()->getDbConnection()->exec("update core_acl set usedIn = null, entityTypeId = null, entityId = null");
-		go()->getDbConnection()->exec("update core_acl set usedIn = 'core_entity.defaultAclId' where id in (select defaultAclId from core_entity)");
+		Acl::delete(Acl::findStale());
+		Acl::$lastDeleteStmt->rowCount();
 
 
-		echo "Checking database\n";
-
-		$modules = Module::find();
-
-		foreach($modules as $module) {
-			if(!$module->isAvailable()) {
-				continue;
-			}
-			echo "Checking module ". ($module->package ?? "legacy") . "/" .$module->name ."\n";
-			$module->module()->checkAcls();
-		}
-
-		echo "\n\n";
-
-		//hack for folders which are skipped in the checkDatabase
-		go()->getDbConnection()->exec(
-			"update core_acl a inner join fs_folders f on f.acl_id = a.id set usedIn = 'fs_folders.acl_id', entityTypeId = ". \GO\Files\Model\Folder::entityType()->getId() .
-			", entityId = f.id where usedIn is null"
-		);
-
-		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
-
-		echo "Delete " . $deleteCount ." unused ACL's\n";
+		echo "Delete " . Acl::$lastDeleteStmt->rowCount() ." unused ACL's\n";
 
 	}
 
@@ -336,7 +318,7 @@ JSON;
 	 * docker-compose exec --user www-data groupoffice-finance ./www/cli.php core/System/demo --package=business --module=catalog
 	 * ```
 	 */
-	public function demo(?string $package = null, ?string $module = null) {
+	public function demo($params = []) {
 
 		$faker = Faker\Factory::create();
 
@@ -346,12 +328,12 @@ JSON;
 
 		$modules = Module::find();
 
-		if(isset($package)) {
-			$modules->andWhere('package', '=', $package);
+		if(isset($params['package'])) {
+			$modules->andWhere('package', '=', $params['package']);
 		}
 
-		if(isset($module)) {
-			$modules->andWhere('name', '=', $module);
+		if(isset($params['module'])) {
+			$modules->andWhere('name', '=', $params['module']);
 		}
 
 //		$modules = [Module::findByName("community", "tasks")];
@@ -380,8 +362,8 @@ JSON;
 	}
 
 
-	public function alert($username) {
-		$user = User::find()->where('username', '=', $username)->single();
+	public function alert($params) {
+		$user = User::find()->where('username', '=', $params['username'])->single();
 
 		/* @var \go\core\model\User $user */
 
@@ -410,4 +392,122 @@ JSON;
 		
 	// 	echo "\n\nFound " . $staleCount ." stale blobs\n";
 	// }
+
+
+
+	/**
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/checkBlobs --delete
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function checkBlobs() {
+		Blob::removeMissingFromFilesystem(!empty($params['delete']));
+	}
+
+	/**
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/convertInts
+	 *
+	 * @return void
+	 */
+	public function convertInts() {
+
+		go()->getDbConnection()->exec("SET foreign_key_checks = 0;");
+
+		$this->installSqls = go()->getEnvironment()->getInstallFolder()->find([
+			'regex' => '/^install\.sql$/'
+		], false);
+
+//		array_map(function($file) {
+//			echo $file->getPath() ."\n";
+//		},$installSqls);
+
+
+		foreach(go()->getDatabase()->getTables() as $table) {
+
+			//skip old framework with short prefix
+			if(explode("_", $table->getName())[0] != "core") {
+				continue;
+			}
+
+			foreach($table->getColumns() as $column) {
+				if($column->autoIncrement) {
+
+					$this->convertAlterCol($column);
+
+					$refs = $table->getReferences($column->name);
+
+					foreach($refs as $ref) {
+						$refTable = go()->getDatabase()->getTable($ref['table']);
+						$refCol = $refTable->getColumn($ref['column']);
+						$this->convertAlterCol($refCol);
+					}
+
+
+				}
+			}
+		}
+		go()->getDbConnection()->exec("SET foreign_key_checks = 1;");
+	}
+
+	private function convertAlterCol(Column $column) {
+		if($column->unsigned) {
+			return;
+		}
+		$column->unsigned = true;
+		$sql = "alter table `" . $column->getTable()->getName() . "` modify `" . $column->name . "` ".
+			str_replace("11", "10", $column->getCreateSQL() ) . ";\n";
+		try {
+			echo $sql;
+			$this->replaceInSQL($column);
+			go()->getDbConnection()->exec($sql);
+		} catch(Exception $e) {
+			echo $e ."\n\n";
+		}
+	}
+
+	private function replaceInSQL(Column $column) {
+
+		$count = 0;
+
+		$search = "/\b". preg_quote($column->name) ."(`?\s+)INT[^\s]*/i";
+		$replace = $column->name."$1INT(10) UNSIGNED";
+
+		echo "\n\n======\n\n";
+		echo $search."\n";
+		echo $replace."\n";
+
+		foreach($this->installSqls as $file) {
+			$contents = $file->getContents();
+
+			$tableSearch  = '/create table[^\n]+`?' . preg_quote($column->getTable()->getName()).'`?[\s\n]*\((.*);/Usi';
+			$contents = preg_replace_callback($tableSearch, function($matches) use ($column, &$count, $file, $search, $replace) {
+
+				return preg_replace(
+					$search,
+					$replace, $matches[0] ,-1, $count
+				);
+			}, $contents);
+
+			if($count > 1) {
+				throw new Exception($count. " Could not update ".$column->getTable()->getName().".". $column->name ." in ". $file->getPath());
+			}
+
+			if($count == 1) {
+
+				$file->putContents($contents);
+
+				echo $column->getTable()->getName().".". $column->name ." replaced in " . $file->getPath() ."\n";
+
+				break;
+			}
+
+
+
+
+		}
+		if($count != 1) {
+			throw new Exception($count. " Could not update ".$column->getTable()->getName().".". $column->name);
+		}
+	}
 }

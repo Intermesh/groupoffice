@@ -8,7 +8,7 @@ use go\core\TemplateParser;
 class TemplateField extends TextArea {
 
 
-	public function onFieldSave()
+	public function onFieldSave(): bool
 	{
 		if(!parent::onFieldSave()) {
 			return false;
@@ -39,7 +39,7 @@ class TemplateField extends TextArea {
 		return self::$parser ?? (self::$parser = new TemplateParser());
 	}
 
-	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record)
+	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record): bool
 	{
 		$tpl = $this->field->getOption('template');
 
@@ -73,7 +73,8 @@ class TemplateField extends TextArea {
 		return parent::dbToApi($value, $values, $entity);
 	}
 
-	public function hasColumn() {
+	public function hasColumn(): bool
+	{
 		return false;
 	}
 

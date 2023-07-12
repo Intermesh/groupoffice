@@ -1,9 +1,10 @@
 go.Modules.register("community", "tasks", {
 	mainPanel: "go.modules.community.tasks.MainPanel",
 	title: t("Tasks"),
-	entities: ["TaskCategory","PortletTasklist","Settings",{
+	entities: ["TaskListGrouping", "TaskCategory","PortletTasklist","Settings",{
 		name: "TaskList",
 		relations: {
+			group: {store: "TaskListGrouping", fk: "groupingId"},
 			creator: {store: "UserDisplay", fk: "createdBy"},
 			groups: {name: 'Groups'}
 		}
@@ -70,7 +71,7 @@ go.Modules.register("community", "tasks", {
 				name: 'text',
 				type: "string",
 				multiple: false,
-				title: "Query"
+				title: t("Query")
 			},
 			{
 				title: t("Commented at"),
@@ -101,7 +102,7 @@ go.Modules.register("community", "tasks", {
 				typeConfig: {value: null}
 			},
 			{
-				title: t("Task list"),
+				title: t("List"),
 				name: 'tasklistid',
 				multiple: false,
 				type: "go.modules.community.tasks.TasklistCombo"
@@ -144,6 +145,10 @@ go.Modules.register("community", "tasks", {
 				//replace panel promise
 				alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
 					return go.Db.store("User").single(alert.data.assignedBy).then((assigner) =>{
+						if(!assigner) {
+							assigner = {displayName: t("Unknown")};
+						}
+
 						panelCfg.items = [{html: go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.displayName) }];
 						panelCfg.notificationBody = panelCfg.html;
 						return panelCfg;
@@ -168,9 +173,9 @@ go.modules.community.tasks.progress = {
 };
 
 go.modules.community.tasks.listTypes = {
-	List : 1,
-	Board : 2,
-	Project : 3,
-	Support : 4
+	List : "list",
+	Board : "board",
+	Project : "project",
+	Support : "support"
 
 }

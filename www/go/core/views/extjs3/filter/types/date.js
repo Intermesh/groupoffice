@@ -26,7 +26,8 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 						['after', t("is after, today plus")],
 						['beforedate', t("is before")],
 						['afterdate', t("is after")],
-							['equals', t("equals")]
+						['equals', t("equals")],
+						['empty', t("Is empty")]
 					]
 				}),
 				valueField: 'value',
@@ -46,7 +47,6 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 								this.valueField.setVisible(true);
 								this.periodCombo.setVisible(true);
 								this.dateField.setVisible(false);
-								this.doLayout();
 								break;
 
 							case 'beforedate':
@@ -55,8 +55,15 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 								this.valueField.setVisible(false);
 								this.periodCombo.setVisible(false);
 								this.dateField.setVisible(true);
-								this.doLayout();
+								break;
+							case 'empty':
+							default:
+								this.valueField.setVisible(false);
+								this.periodCombo.setVisible(false);
+								this.dateField.setVisible(false);
+								break;
 						}
+						this.doLayout();
 					}
 				}
 			});
@@ -120,7 +127,7 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 	},
 	
 	setValue: function (v) {
-
+debugger;
 		v = v + "";
 
 		var regex = /([>< ]+)?([0-9]{4}-[0-9]{2}-[0-9]{2})/;
@@ -209,7 +216,10 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 
 			case'equals':
 				return v;
-			
+
+			case 'empty':
+				return null;
+
 		}
 	},
 	validate: function() {

@@ -3,7 +3,10 @@ go.print = function(tmpl, data) {
 	var paper = document.getElementById('paper');
 
 	paper.innerHTML = Ext.isEmpty(data) ? tmpl : tmpl.apply(data);
-	Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
+
+	Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+		Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
+	});
 
 };
 
@@ -233,7 +236,7 @@ go.util =  (function () {
 
 			var adr = config.address;
 			if(config.zipCode) {
-				adr += ", " + config.zipCode.replace(/ /g, ''); 
+				adr += ", " + config.zipCode.replace(/ /g, '');
 			}
 			if(config.country) {
 				adr += ", " + config.country;
@@ -242,7 +245,7 @@ go.util =  (function () {
 			if(Ext.isSafari || Ext.isMac) {
 				document.location = "http://maps.apple.com/?address=" + encodeURIComponent(adr);
 			} else {
-				window.open("https://www.google.com/maps/place/" + encodeURIComponent(adr));	
+				window.open("https://maps.google.com/maps?q=" + encodeURIComponent(adr));
 			}
 
 			//window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));
@@ -582,7 +585,7 @@ go.util =  (function () {
 			})
 		}
 
-		if(extension == 'csv' || extension == 'xlsx') {
+		if(extension == 'csv' || extension == 'xlsx' || extension == 'html') {
 			const win = new go.import.ColumnSelectDialog({
 				entity: entity,
 				handler: doExport,
@@ -622,9 +625,9 @@ go.util =  (function () {
 
 					if(response.name.toLowerCase().substr(-3) == 'csv' || response.name.toLowerCase().substr(-4) == 'xlsx') {
 						Ext.getBody().unmask();
-
 						var dlg = new go.import.CsvMappingDialog({
 							entity: entity,
+							fileName: response.name,
 							blobId: response.blobId,
 							values: values,
 							fields: options.fields || {},
@@ -720,38 +723,47 @@ go.util =  (function () {
 		return a;
 	},
 
-		blobCache : {},
-
-		getBlobURL : function(blobId) {
-			let fetchOptions = {
-				method: 'GET',
-				headers: {
-					'Authorization': 'Bearer ' + go.User.accessToken
-				}
+	getBlobURL : function(blobId) {
+		let fetchOptions = {
+			method: 'GET',
+			headers: {
+				'Authorization': 'Bearer ' + go.User.accessToken
 			}
+		}
+
+		let type;
+		return fetch(go.Jmap.downloadUrl(blobId), fetchOptions)
+			.then( r => {
 
 
-		if(!this.blobCache[blobId]) {
-			let type;
-			this.blobCache[blobId] = fetch(go.Jmap.downloadUrl(blobId), fetchOptions)
-				.then( r => {
-
+				if(r.ok) {
 					type = r.headers.get("Content-Type") || undefined
 
-					return r.arrayBuffer()
+					return r.arrayBuffer().then( ab => URL.createObjectURL( new Blob( [ ab ], { type: type } ) ) );
+				} else
+				{
+					console.error(r);
 
-				})
-				.then( ab => URL.createObjectURL( new Blob( [ ab ], { type: type } ) ) );
-		}
+					return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
+				}
+
+			})
+			.catch((e) => {
+				console.error(e);
+
+				return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
+			});
 
 		return this.blobCache[blobId];
 	},
 
 		/**
-		 * Replaces all img tags with a blob ID source from group-office with an objectURL
+		 * Replaces all img tags with a blob ID source from group-office with an objectURL.
+		 *
+		 * Don't forget to free memory with URL.revokeObjectURL(img.src); when they are no longer needed.
 		 *
 		 * @param el
-		 * @return Promise that resolves when all images are fully loaded
+		 * @return Promise<HTMLImageElement[]> that resolves when all images are fully loaded
 		 */
 		replaceBlobImages : function (el) {
 
@@ -770,14 +782,14 @@ go.util =  (function () {
 				if(blobId) {
 
 					img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-
 					promises.push(this.getBlobURL(blobId).then(src => {
-
 						img.src = src;
-					}).then(() => {
+					})
+						.then(() => {
 						//wait till image is fully loaded
-						return new Promise(resolve => { img.onload = img.onerror = resolve; })
-					}));
+						return new Promise(resolve => { img.onload = img.onerror = resolve(img) })
+					}))
+
 				}
 			});
 

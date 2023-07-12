@@ -15,7 +15,7 @@
 GO.grid.CheckColumn = Ext.extend(Ext.grid.Column, {
 
 	disabled_field: 'disabled',
-	width: dp(48),
+	width: dp(40),
 	resizable: false,
 	fixed: true,
 	initComponent: function () {

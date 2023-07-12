@@ -94,16 +94,21 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 				scope: this,
 				select: this.onSelect,
 				beforeselect: this.onBeforeSelect,
-				change: this.onChange
+				change: this.onChange,
+				setvalue: this.onChange // to hide conditional fields on select (also when in lazy render tab)
 			}
 		};
 	},
 
+	_isDirty: false,
+
 	onChange: function() {
+		this._isDirty = true;
 		this.fireEvent('change', this, this.getValue());
 	},
 	
 	reset:function() {
+		this._isDirty = false;
 		this.items.each(function(f){
 			f.reset();
 	  });
@@ -130,12 +135,11 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		} else {
 			this.fireEvent('select', this, record);
 		}
-		
 		this.doLayout();
 	},
 	
 	isDirty: function () {
-		return true;
+		return this._isDirty;
 	},
 
 	

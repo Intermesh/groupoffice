@@ -1,12 +1,17 @@
 <?php
 namespace go\core\model;
 
+use Exception;
 use GO\Base\Mail\SmimeMessage;
+use GO\Base\Util\StringHelper;
 use go\core\cron\GarbageCollection;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
+use go\core\fs\Folder;
 use go\core\jmap\Entity;
+use go\core\mail\Message;
+use go\core\model\Module as ModuleModel;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\TemplateParser;
@@ -110,6 +115,27 @@ class EmailTemplate extends Entity
 	{
 		return ['name'];
 	}
+
+
+	/**
+	 * Find templates by module key and language
+	 *
+	 * @param string $package
+	 * @param string $name
+	 * @param string|null $preferredLanguage
+	 * @param string|null $key
+	 * @return EmailTemplate|null
+	 */
+	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?EmailTemplate {
+		$moduleModel = ModuleModel::findByName($package, $name);
+
+		$template = isset($preferredLanguage) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
+		if (!$template) {
+			$template = static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key])->single();
+		}
+
+		return $template;
+	}
 	
 	/**
 	 * @param $module array{package:string, module:string} | int
@@ -134,6 +160,41 @@ class EmailTemplate extends Entity
 		return parent::internalSave();
 	}
 
+	public static function fromBlob(Blob $blob) {
+
+		if(!class_exists("\ZipArchive")) {
+			throw new \Exception('ZIP extension is not available for PHP please install it before uploading templates');
+		}
+		$folder = Folder::tempFolder();
+		$zip = new \ZipArchive;
+		if(!$zip->open($blob->path()) === true) {
+			throw new \Exception('Failed to open uploaded Zip file');
+		}
+
+		$zip->extractTo($folder->getPath());
+		$zip->close();
+
+		$tpl = new self();
+		$indexFile = $folder->getFiles()[0];
+		$tpl->body = $indexFile->getContents();
+
+		$imgFolder = $folder->getFolder('images');
+		$tpl->attachments = [];
+		foreach($imgFolder->getFiles() as $imageFile) {
+			$imgBlob = Blob::fromFile($imageFile);
+			$tpl->body = str_replace('images/'.$imageFile->getName(), Blob::url($imgBlob->id), $tpl->body);
+			$imgBlob->save();
+			$tpl->attachments[] = (new EmailTemplateAttachment($tpl))->setValues(['blobId' => $imgBlob->id, 'name' => $imgBlob->name, 'inline' => true]);
+		}
+
+		return $tpl;
+
+	}
+
+	/**
+	 * @todo Template permissions should be connected to an entity just like a comment.
+	 * @return int
+	 */
 	protected function internalGetPermissionLevel(): int
 	{
 		return Module::findById($this->moduleId)->getPermissionLevel();
@@ -150,6 +211,9 @@ class EmailTemplate extends Entity
 		$this->attachments = [];
 		foreach ($cids as $blobId) {
 			$blob = Blob::findById($blobId);
+			if(!$blob) {
+				continue;
+			}
 			if(isset($existing[$blobId])) {
 				$existing[$blobId]->inline = true;
 				$this->attachments[] = $existing[$blobId];
@@ -182,9 +246,11 @@ class EmailTemplate extends Entity
 	 * Create message from this template
 	 *
 	 * @param TemplateParser $templateParser
-	 * @return \go\core\mail\Message
+	 * @return Message
+	 * @throws Exception
 	 */
-	public function toMessage(TemplateParser $templateParser) {
+	public function toMessage(TemplateParser $templateParser): Message
+	{
   	$message = go()->getMailer()->compose();
 		$subject = $templateParser->parse($this->subject);
 		$body = $templateParser->parse($this->body);
@@ -213,5 +279,21 @@ class EmailTemplate extends Entity
 		}
 
 		return $message;
+	}
+
+	public function toMessageArray(TemplateParser $templateParser) : array {
+
+		$blobs = [];
+		foreach($this->attachments as $attachment) {
+			if($attachment->attachment) {
+				$blobs[] = Blob::findById($attachment->blobId);
+			}
+		}
+
+		return [
+			"subject" => $templateParser->parse($this->subject),
+			"body" => $templateParser->parse($this->body),
+			"blobs" => $blobs
+			];
 	}
 }

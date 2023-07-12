@@ -30,35 +30,24 @@
  * ```
  */
 go.NavMenu = Ext.extend(Ext.DataView,{
-	
-	initComponent: function() {
-		
-		Ext.applyIf(this,{
-			trackOver: false,
-			cls: 'go-nav',
-			autoScroll: true,
-			style: {'padding-top':dp(8)+'px'},
-			store:this.store,
-			singleSelect: true,
-			//overClass:'x-view-over',
-			itemSelector:'div',
-			tpl:'<tpl for=".">\
-					<div class="{cls}"><i class="icon {iconCls}">{icon}</i>\
-					<span>{name}</span></div>\
-					</tpl>\
-				</tpl>',
-			columns: [{dataIndex:'name'}]
-		});
-		
-		go.NavMenu.superclass.initComponent.call(this);
-	}
-	//separater messed up select() function because of mismathing index
+	emptyText: '<div class="pad">' + t("No items found") + "</div>",
+	trackOver: false,
+	cls: 'go-nav',
+	autoScroll: true,
+	style: {'padding-top':dp(8)+'px'},
+	singleSelect: true,
 
-	// addSeparator : function() {
-	// 	this.store.add(new Ext.data.Record({
-	// 		name: "-"
-	// 	}));
-	// }
+	//overClass:'x-view-over',
+	itemSelector:'div.go-nav-item',
+	tpl:'<tpl for=".">\
+					<div class="go-nav-item {cls}"><i class="icon {iconCls}">{icon}</i>\
+					<span>{name}</span>\
+					<tpl if="values.badge">\
+					<span class="badge right">{badge}</span>\
+					</tpl>\
+					</div>\
+					</tpl>\
+				</tpl>'
 });
 
 Ext.reg('navmenu', go.NavMenu);

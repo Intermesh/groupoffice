@@ -10,16 +10,24 @@ use go\core\orm\EntityType;
 use go\core\db\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
+use GO\Files\Model\Folder;
 use Throwable;
 use Traversable;
 use function GO;
 
 /**
  * Template parser
+ *
+ * Replaces variables {{varname}} and parse structural blocks like [if] and [each]
+ *
+ * Structural blocks may be wrapped with <template>[if ...]</template> so they can be valid html inside wysywig editors
  * 
- * By default two variable are already present:
+ * By default some variables are already present:
  * 
  * {{now|date:Y-m-d}} The current date time object. In this example a date filter is used.
+ *
+ * {{system.title}}
+ * {{system.url}}
  * 
  * @example
  * 
@@ -66,6 +74,15 @@ use function GO;
  *   [/if]
  * [/each]
  * ````````````````````````````````````````````````````````````````````````````
+ *
+ *
+ * @example If with and operator
+ * `````````````````````````````````````````````````````````````````````````````
+ * [if {{document.customFields.downPayment}} && {{document.totalPrice}} > 4000]
+ *  [assign downPayment = document.totalPrice|multiply:0.3]
+ *  {{downPaymnent|number}}
+ * [/if]
+ * ````````````````````````````````````````````````````````````````````````````
  * 
  * @example iterate through filtered array and only write first match using "eachIndex"
  * ````````````````````````````````````````````````````````````````````````````
@@ -93,7 +110,7 @@ use function GO;
  * `````````````````````````````````````````````````````````````````````
  * {{contact.name}}
  * [assign address = contact.addresses | filter:type:"postal" | first]
- * [if !{{address}}]
+ * [if {{address|empty}}]
  * [assign address = contact.addresses | first]
  * [/if]
  * {{address.formatted}}
@@ -156,29 +173,54 @@ class TemplateParser {
 	private $models = [];
 
 	/**
-	 * Values in IF expressions will be enlosed with quotes.
+	 * Values in IF expressions will returned as "false" or "true"
 	 *
 	 * @var bool
 	 */
-	public $encloseVars = false;
+	private $varsForIfStatement = false;
 
-	public $enableBlocks = true;
+	private $enableBlocks = true;
+
+
+	/**
+	 * Configuration which can be altered with:
+	 *
+	 * ```
+	 * [config thousandsSeparator=.]
+	 * [config decimalSeparator=,]
+	 * ``
+	 * @var string[]
+	 */
+	public $config = [
+		'decimalSeparator' => '.',
+		'thousandsSeparator' => ',',
+	];
 	
 	public function __construct() {
 		$this->addFilter('date', [$this, "filterDate"]);		
+		$this->addFilter('timestamp', [$this, "filterUnixTimestamp"]);
 		$this->addFilter('number', [$this, "filterNumber"]);
 		$this->addFilter('filter', [$this, "filterFilter"]);
 		$this->addFilter('sort', [$this, "filterSort"]);
 		$this->addFilter('rsort', [$this, "filterRsort"]);
 		$this->addFilter('count', [$this, "filterCount"]);
+		$this->addFilter('multiply', [$this, "filterMultiply"]);
+		$this->addFilter('add', [$this, "filterAdd"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
 		$this->addFilter('column', [$this, "filterColumn"]);
 		$this->addFilter('implode', [$this, "filterImplode"]);
 		$this->addFilter('entity', [$this, "filterEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
-		$this->addFilter('nl2br', "nl2br");
+
+		$this->addFilter('entityFiles', [$this, "filterEntityFiles"]);
+
+		$this->addFilter('nl2br', [$this, "filterNl2br"]);
+		$this->addFilter('empty', [$this, "filterEmpty"]);
+		$this->addFilter('htmlEncode', [$this, "filterHtmlEncode"]);
+		$this->addFilter('dump', [$this, "filterDump"]);
 		$this->addFilter('t', [$this, "filterTranslate"]);
+		$this->addFilter('bloburl', [$this, "filterBlobUrl"]);
 
 		$this->addModel('now', new DateTime());
 
@@ -196,6 +238,41 @@ class TemplateParser {
 			$this->_currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone' ]);
 		}
 		return $this->_currentUser;
+	}
+
+	private function filterEmpty($v) {
+		return empty($v) ? "1" : "0";
+	}
+
+	private function filterHtmlEncode($v) {
+		return  isset($v) ? htmlspecialchars($v) : "";
+	}
+
+	private function filterNl2br(?string $v) {
+		return isset($v) ? nl2br($v) : "";
+	}
+
+	private function filterBlobUrl($blob) {
+		return go()->getAuthState()->getDownloadUrl($blob);
+	}
+
+	/**
+	 * @param Entity $entity
+	 * @return void
+	 */
+	private function filterEntityFiles($entity) {
+		if(!$entity->filesFolderId) {
+			return [];
+		}
+		$folder = Folder::model()->findForEntity($entity);
+		return array_map(function($file) {
+			$blob = $file->getBlob();
+			return [
+				'blobId' => $blob->id,
+				'name' => $blob->name,
+				'type' => $blob->type
+				];
+		}, $folder->files->fetchAll());
 	}
 
 	/** @noinspection PhpSameParameterValueInspection */
@@ -217,6 +294,19 @@ class TemplateParser {
 		$date->setTimezone(new DateTimeZone($this->_currentUser()->timezone));
 
 		return $date->format($format);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function filterUnixTimestamp(int $ts, $format = null): string
+	{
+		if(!isset($ts)) {
+			return "";
+		}
+
+		$dt = DateTime::createFromFormat('U', $ts);
+		return $this->filterDate($dt, $format);
 	}
 
 	private function filterEntity($id, $entityName, $properties = null) {
@@ -245,9 +335,34 @@ class TemplateParser {
 		return $entityCls::findByLink($entity,!empty($properties) ? explode(",", $properties) : [], true);
 	}
 
-	private function filterNumber($number,$decimals=2, $decimalSeparator='.', $thousandsSeparator=','): string
+
+
+	private function filterNumber($number,$decimals = 2, $decimalSeparator = null, $thousandsSeparator = null): string
 	{
+		if(!isset($decimalSeparator) ){
+			$decimalSeparator = $this->config['decimalSeparator'];
+		}
+		if(!isset($thousandsSeparator) ){
+			$thousandsSeparator = $this->config['thousandsSeparator'];
+		}
 		return number_format($number,$decimals, $decimalSeparator, $thousandsSeparator);
+	}
+
+	private function filterDump($value): string
+	{
+		ob_start();
+		var_dump($value);
+		return ob_get_clean();
+	}
+
+	private function filterMultiply($number,$factor): string
+	{
+		return $number * $factor;
+	}
+
+	private function filterAdd($number,$add): string
+	{
+		return $number + $add;
 	}
 	
 	private function filterFilter($array, $propName, $propValue): ?array
@@ -401,7 +516,8 @@ class TemplateParser {
 		preg_match_all('/\[\/(each|if)\]/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		
+		preg_match_all('/\\[config\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $configMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
 			throw new Exception("Invalid template open and close tags of [if] and/or [each] don't match");
@@ -430,6 +546,13 @@ class TemplateParser {
 		foreach($assignMatches as $a) {
 			$offset = $a[0][1];
 			$tag = ['tagName' => 'assign', 'type'=> null, 'offset' => $offset, 'tagLength' => strlen($a[0][0]), 'expression' => $a[2][0], 'varName' => $a[1][0]];
+			$tag['close'] = $tag;
+			$tags[$offset] = $tag;
+		}
+
+		foreach($configMatches as $a) {
+			$offset = $a[0][1];
+			$tag = ['tagName' => 'config', 'type'=> null, 'offset' => $offset, 'tagLength' => strlen($a[0][0]), 'value' => $a[2][0], 'name' => $a[1][0]];
 			$tag['close'] = $tag;
 			$tags[$offset] = $tag;
 		}
@@ -572,7 +695,7 @@ class TemplateParser {
 			$str = $this->parseBlocks($str);
 		}
 //		$str = preg_replace_callback('/\n?\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*)(?<!\\\\)\\]\n?/', [$this, 'replaceAssign'], $str);
-		return preg_replace_callback('/{{.*?}}/', [$this, 'replaceVar'], $str);
+		return preg_replace_callback('/{{[^:].*?}}/', [$this, 'replaceVar'], $str);
 	}
 
 
@@ -599,6 +722,10 @@ class TemplateParser {
 				case 'assign':
 					$tags[$i] = $this->replaceAssign($tags[$i]);
 					break;
+
+				case 'config':
+					$tags[$i] = $this->replaceConfig($tags[$i]);
+					break;
 			}
 		}
 		
@@ -623,7 +750,23 @@ class TemplateParser {
 
 		$replaced = $this->returnMicrosoftIfs($replaced);
 
+		// remove empty <template></template>
+		$replaced = preg_replace("/<template>[\s]*<\/template>/i", "", $replaced);
+
 		return preg_replace("/(.*)\r?\n?$/", "$1", $replaced);
+	}
+
+
+
+
+	/**
+	 * @throws Exception
+	 */
+	private function replaceConfig($tag) {
+		//config won't output
+		$tag['replacement'] = "";
+		$this->config[$tag['name']] = $tag['value'];
+		return $tag;
 	}
 
 	/**
@@ -723,22 +866,22 @@ class TemplateParser {
 		return $tag;		
 	}
 
-	private static $tokens = ['==','!=','>','<', '(', ')', '&&', '||', '*', '/', '%', '-', '+', '!'];
+	private static $tokens = ['==','!=','>','<', '(', ')', '&&', '||', '*', '/', '%', '-', '+', '!', '?', ':'];
 
 	/**
 	 * @throws Exception
 	 */
 	private function replaceIf($tag) {
 		
-		$this->encloseVars = true;
+		$this->varsForIfStatement = true;
 		$this->enableBlocks = false;
 		$parsed = $this->parse($tag['expression']);		
-		$this->encloseVars = false;
+		$this->varsForIfStatement = false;
 		$this->enableBlocks = true;
 		
 		$expression = $this->validateExpression($parsed);	
 		try {
-			$ret = eval($expression);	
+			$ret = eval($expression);
 		} catch(Throwable $e) {
 			go()->warn('eval() failed '. $e->getMessage());
 			go()->warn($tag['expression']);
@@ -763,12 +906,11 @@ class TemplateParser {
 	 */
 	private function validateExpression($expression): string
 	{
-		
-		$expression = html_entity_decode($expression);
+		$expression = html_entity_decode(trim($expression));
 
 		//split string into tokens. See http://stackoverflow.com/questions/5475312/explode-string-into-tokens-keeping-quoted-substr-intact		
 		foreach(self::$tokens as $token) {
-			if($token == '-') {
+			if($token == '-' || $token == '!') {
 				//skip for negative numbers
 				continue;
 			}
@@ -776,7 +918,8 @@ class TemplateParser {
 		}
 		$expression = str_replace(';', ' ; ', $expression);
 		
-		$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);		
+		//$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$parts = empty($expression) ? [] : str_getcsv($expression,' ','"');
 		$parts = array_map('trim', $parts);
 		
 		$str = '';
@@ -786,28 +929,26 @@ class TemplateParser {
 			if($part == ';') {
 				throw new Exception('; not allowed in expression: ' . $expression);
 			}
+
+			if($part == "") {
+				continue;
+			}
 			
 			if(
-							empty($part) ||
 							is_numeric($part) ||
 							$part == 'true' ||
 							$part == 'false' ||
 							$part == 'null' ||
-							in_array($part, self::$tokens) ||
-							$this->isString($part)											
+							in_array($part, self::$tokens)
+							//$this->isString($part)
 				) {
 				$str .= $part.' ';
 			}else
 			{
-				$str .= '"'. str_replace('"', '\"', $part) . '" ';
+				$str .= '"'. addslashes($part) . '" ';
 			}			
 		}		
 		return empty($str) ? 'return false;' : 'return ('.$str.');';
-	} 
-	
-	private function isString ($str): bool
-	{
-		return preg_match('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/s', $str) || preg_match("/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'/s", $str);
 	}
 
 	/**
@@ -821,64 +962,20 @@ class TemplateParser {
 
 		//If replace value is array use first value for convenience
 		if(is_array($value)) {
-			return array_shift($value);
+			$value = array_shift($value);
 		}
 
-		if($this->encloseVars) {		
-			$value = is_scalar($value) || 
-				!isset($value) || 
-				(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
+		if($this->varsForIfStatement) {
+			//$value = empty($value) ? "false" : "true";
+
+			$value = is_scalar($value) ||
+			!isset($value) ||
+			(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', (string) $value) . '"' : !empty($value);
+
 		}
 
 		return $value;
 	}
-
-
-//	private function replaceVar($matches) {
-//
-//		//take off {{ .. }}
-//		$str = substr($matches[0], 2, -2);
-//
-//		//split for allowing simple calculations
-//		$parts = preg_split('/([+\-\/\*])/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
-//
-//		$math = "";
-//
-//		$mathExpression = count($parts) > 1;
-//
-//		while($part = array_shift($parts)) {
-//
-//			$varName = trim($part);
-//			$operator = array_shift($parts);
-//
-//			$value = $this->getVarFiltered($varName);
-//
-//			//If replace value is array use first value for convenience
-//			if (is_array($value)) {
-//				$value = array_shift($value);
-//			}
-//
-//			if ($this->encloseVars) {
-//				$value = is_scalar($value) ||
-//				!isset($value) ||
-//				(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
-//			}
-//
-//			if(!$mathExpression) {
-//				return $value;
-//			}
-//
-//			$math .= $value . $operator;
-//		}
-//
-//
-//		try {
-//			return eval($math);
-//		}catch(\Throwable $e) {
-//			return $e->getMessage();
-//		}
-//
-//	}
 
 	/**
 	 * @throws Exception
@@ -921,9 +1018,6 @@ class TemplateParser {
 		foreach ($pathParts as $pathPart) {
 			//check for array access eg. contact.emailAddresses[0];
 			if(preg_match('/(.*)\[(\d+)]/', $pathPart, $matches)) {
-
-				// var_dump($matches);
-				
 				$index = (int) $matches[2];
 				$pathPart = $matches[1];
 			} else{
@@ -935,7 +1029,7 @@ class TemplateParser {
 					return null;
 				}
 				$model = $model[$pathPart];
-			}else 
+			}else if(is_object($model))
 			{				
 				if (!isset($model->$pathPart)) {
 
@@ -950,6 +1044,8 @@ class TemplateParser {
 					$model = $model->$pathPart;
 				}
 
+			} else{
+				return null;
 			}
 			
 			if(isset($index)) {

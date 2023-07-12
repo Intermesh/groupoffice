@@ -103,7 +103,7 @@ GO.email.AddressContextMenu = function(config)
 		
 		this.createItem = new Ext.menu.Item({
 			iconCls: 'ic-add',
-			text: t("Create contact"),
+			text: t("Create contact", "email"),
 			handler: function() {
 				
 				var nameParts = this.personal.split(" "), v = {
@@ -126,7 +126,7 @@ GO.email.AddressContextMenu = function(config)
 
 		this.updateItem = new Ext.menu.Item({
 			iconCls: 'ic-add',
-			text: t("Add to contact"),
+			text: t("Add to contact", "email"),
 			handler: function() {
 
 				var me = this;

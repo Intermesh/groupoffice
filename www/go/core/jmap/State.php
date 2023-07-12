@@ -4,6 +4,7 @@ namespace go\core\jmap;
 use Exception;
 use GO\Base\Model\State as OldState;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\http\Response as HttpResponse;
 use go\core\model\Module;
 use go\core\model\Token;
@@ -28,15 +29,13 @@ class State extends AbstractState {
 		return $matches[1];
 	}
 	
-	private static function getFromCookie() : ?string {
-//		if(Request::get()->getMethod() != "GET") {
-//			return false;
-//		}
-		
-		if(!isset($_COOKIE['accessToken'])) {
-			return null;
+	private static function getFromCookie() : ?string
+	{
+		if(isset($_COOKIE['accessToken'])) {
+			return $_COOKIE['accessToken'];
 		}
-		return $_COOKIE['accessToken'];
+
+		return null;
 	}
 
 	/**
@@ -44,12 +43,48 @@ class State extends AbstractState {
 	 */
 	public static function getClientAccessToken(): ?string
 	{
-		$tokenStr = static::getFromHeader();
+		$tokenStr = static::getFromCookie();
+
 		if(!$tokenStr) {
-			$tokenStr = static::getFromCookie();
+			$tokenStr = static::getFromHeader();
+		} else{
+			self::$cookieAccessTokenUsed = true;
 		}
 
 		return $tokenStr;
+	}
+
+	private static $cookieAccessTokenUsed = false;
+
+
+	/**
+	 * Check CSRF token on each POST request.
+	 * @var bool
+	 */
+	public static $CSRFcheck = true;
+
+	/**
+	 * @throws Forbidden
+	 */
+	private static function checkCSRF(Token $token) : bool {
+
+		if(!self::$CSRFcheck || !self::$cookieAccessTokenUsed || $_SERVER['REQUEST_METHOD'] == 'GET') {
+			return true;
+		}
+
+		// if cookie is used then we must also check the CSRF token
+		$csrfToken = Request::get()->getHeader('X-CSRF-Token') ?: $_REQUEST['CSRFToken'] ?? null;
+		if(!$csrfToken) {
+			go()->debug("'X-CSRF-Token' header or 'CSRFToken' request parameter missing");
+			return false;
+		}
+
+		if($csrfToken != $token->CSRFToken) {
+			go()->debug("CSRFToken mismatch");
+			return false;
+		}
+
+		return true;
 	}
 	
 	/**	
@@ -62,6 +97,7 @@ class State extends AbstractState {
 	 * Get the authorization token by reading the request header "Authorization"
 	 *
 	 * @return boolean|Token
+	 * @throws Exception
 	 */
 	public function getToken() {
 		
@@ -75,6 +111,9 @@ class State extends AbstractState {
 
 			$this->token = go()->getCache()->get('token-' . $tokenStr);
 			if($this->token) {
+				if(!self::checkCSRF($this->token)) {
+					return false;
+				}
 				$this->token->activity();
 				return $this->token;
 			}
@@ -88,13 +127,18 @@ class State extends AbstractState {
 			if($this->token->isExpired()) {
 				try {
 					$this->token->delete($this->token->primaryKeyValues());
+					Token::unsetCookie();
 				} catch(Exception $e) {
 					ErrorHandler::logException($e);
 				}
 				$this->token = false;
 			} else{
+				if(!self::checkCSRF($this->token)) {
+					$this->token = null;
+					return false;
+				}
 				go()->getCache()->set('token-' . $tokenStr, $this->token);
-			}			
+			}
 		}
 		
 		return $this->token;
@@ -115,7 +159,8 @@ class State extends AbstractState {
 	{
 		$token = $this->getToken();
 		$token->userId = $userId;
-		$success = $token->setAuthenticated();
+		$token->clientId = null;
+		$success = $token->setAuthenticated(false);
 
 		go()->getCache()->delete('token-' . $token->accessToken);
 		go()->getCache()->delete('session-' . $token->accessToken);
@@ -191,20 +236,17 @@ class State extends AbstractState {
 		//todo optimize
 		$response['state'] = OldState::model()->getFullClientState($this->getUserId());
 
+		$response['CSRFToken'] = $this->getToken()->CSRFToken;
+
 		return $response;
 	}
 
 	private function addModuleCapabilities(array $response) {
 		$modules = Module::getInstalled();
-		$groupedRights = "SELECT moduleId, BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".go()->getAuthState()->getUserId().") GROUP BY moduleId;";
-		$rights = go()->getDbConnection()->query($groupedRights)->fetchAll(PDO::FETCH_KEY_PAIR);
 		foreach ($modules as $module) {
-			if(go()->getAuthState()->isAdmin()) {
-				$p = $module->may(PHP_INT_MAX);
-			} else if(isset($rights[$module->id])) {
-				$p = $module->may($rights[$module->id]);
-			}
-			if(!empty($p)) {
+			$p = $module->getUserRights();
+
+			if($p->mayRead) {
 				$response['capabilities']->{'go:' . ($module->package ?? 'legacy') . ':' . $module->name} = $p;
 			}
 		}

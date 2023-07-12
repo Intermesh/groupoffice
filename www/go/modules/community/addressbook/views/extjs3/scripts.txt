@@ -12,6 +12,9 @@ ContactCombo.js
 CustomFieldSetDialog.js
 customfield/Contact.js
 customfield/ContactDialog.js
+customfield/ContactRelationGrid.js
+customfield/MultiContact.js
+customfield/MultiContactDialog.js
 Utils.js
 SelectDialogPanel.js
 SettingsPanel.js
@@ -27,3 +30,4 @@ DuplicateDialog.js
 LabelsDialog.js
 BirthdaysPortlet.js
 BirthdaysPortletSettingsDialog.js
+ContactContextMenu.js

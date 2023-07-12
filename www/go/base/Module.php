@@ -64,6 +64,14 @@ class Module extends Observable {
 	}
 
 	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return \go\core\Module::STATUS_STABLE;
+	}
+
+	/**
 	 * For compatibility with new framework
 	 *
 	 * @return string
@@ -517,7 +525,7 @@ class Module extends Observable {
 		foreach($models as $model){
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord")){
 				//$response[] = "Processing ".$model->getName()."\n";
-				$stmt = \GO::getModel($model->getName())->rebuildSearchCache();
+				\GO::getModel($model->getName())->rebuildSearchCache();
 			
 			}
 		}

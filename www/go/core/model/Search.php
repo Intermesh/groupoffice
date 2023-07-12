@@ -2,6 +2,7 @@
 
 namespace go\core\model;
 
+use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\jmap\Entity;
 use go\core\model\Acl;
@@ -42,6 +43,39 @@ class Search extends AclOwnerEntity {
 
 
 		return parent::check();
+	}
+	public static function checkAcls() {
+		// do nothing for search
+	}
+
+	/**
+	 * Prepares the query for a search
+	 *
+	 * @param Criteria $criteria
+	 * @param Query $query
+	 * @param string $searchPhrase
+	 * @throws Exception
+	 */
+	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase)
+	{
+
+		go()->setOptimizerSearchDepth();
+
+		$i = 0;
+		$words = StringUtil::splitTextKeywords($searchPhrase, false);
+		$words = array_unique($words);
+
+		foreach ($words as $word) {
+			$query->join(
+				"core_search_word",
+				'w' . $i, 'w' . $i . '.searchId = search.id',
+				'INNER'
+			);
+
+			$criteria->where('w' . $i . '.word', 'LIKE', $word . '%');
+
+			$i++;
+		}
 	}
 
 	protected function createAcl()
@@ -189,7 +223,7 @@ class Search extends AclOwnerEntity {
 							
 						})
 						->add('text', function(Criteria $criteria, $value, Query $query) {
-							SearchableTrait::addCriteria( $criteria, $query, $value);
+							Search::addCriteria( $criteria, $query, $value);
 						});					
 	}
 

@@ -1,1 +1,0 @@
-a:4:{i:0;a:2:{s:5:"table";s:21:"sync_addressbook_user";s:6:"column";s:13:"addressBookId";}i:2;a:2:{s:5:"table";s:25:"addressbook_user_settings";s:6:"column";s:20:"defaultAddressBookId";}i:3;a:2:{s:5:"table";s:19:"addressbook_contact";s:6:"column";s:13:"addressBookId";}i:4;a:2:{s:5:"table";s:28:"addressbook_portlet_birthday";s:6:"column";s:13:"addressBookId";}}

@@ -37,11 +37,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		this.bodyId = Ext.id();
 		this.attachmentsId = Ext.id();
 
-
 		this.linkMessageId = Ext.id();
 		this.downloadAllMenuId = Ext.id();
 
-		var templateStr =
+		let templateStr =
 						
 		'<div class="message-header">'+
 			
@@ -55,7 +54,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'</tr>'+
 			'<tr><td><b>'+t("Subject", "email")+'</b></td><td>: {subject}</td></tr>'+
 			'<tr><td><b>'+t("Date")+'</b></td><td>: {date}</td></tr>'+
-			//'<tr><td><b>'+t("Size")+'</b></td><td>: {size}</td></tr>'+
 			'<tr><td><b>'+t("To", "email")+'</b></td><td>: '+
 			'<tpl for="to">'+
 			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
@@ -94,9 +92,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<i class="icon ic-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'"></i>'+
 			'</tpl>'+
 							
-							
-			
-			
 			'</td></tr>'+
 			'</table>'+
 			'</tpl>'+			
@@ -106,7 +101,16 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<h5 class="em-links-header">'+t("Links")+'</h5>'+
 				'<div class="em-links">'+
 				'<tpl for="links">'+
-					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> <a href="#{entity}/{model_id}">{name}</a> <label>{description}</label></p></div>'+
+					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> ' +
+					'<tpl if="entity==\'LinkedEmail\'">'+
+					'<a href="#email"  onclick="const win = new go.links.LinkDetailWindow({entity\:\'LinkedEmail\'});win.load({model_id});">'+
+					'</tpl>' +
+					'<tpl if="entity!=\'LinkedEmail\'">' +
+						'<a href="#{entity}/{model_id}">' +
+					'</tpl>' +
+					'{name}</a> <label>{description}</label>' +
+					'{[this.addDeleteBtn(values)]}</p>' +
+					'</div>' +
 				'</tpl>'+
 			'</div></tpl>'+
 			
@@ -213,12 +217,15 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				return go.Entities.getLinkIcon(link.entity, link.filter);
 
 			},
+			addDeleteBtn: function(link) {
+				return '<a class="simple-link" onclick="GO.email.unlink('+link.link_id+');">'+t('Delete') + '</a>';
+			},
 			addSlashes : function(str)
 			{
 				str = GO.util.html_entity_decode(str, 'ENT_QUOTES');
 				str = GO.util.add_slashes(str);
 				return str;
-			}
+			},
 
 		});
 		
@@ -226,6 +233,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 	},
 
 	data: null,
+
+	print : function() {
+		this.body.print({title: this.data.date + " - " + this.data.sender + " - " + this.data.subject});
+	},
 
 	popup : function(){
 
@@ -464,8 +475,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			}, this);
 		}
 
-		// this.messageBodyEl = Ext.get(this.bodyId);
-		
 		if(data.attachments.length)
 		{
 			this.attachmentsEl = Ext.get(this.attachmentsId);

@@ -15,7 +15,67 @@ go.Modules.register("core", 'core', {
 			}
 		},
 
-		'User',
+		{
+			name: 'User',
+			filters: [
+				{
+					wildcards: false,
+					name: 'text',
+					type: "string",
+					multiple: false,
+					title: t("Query")
+				},
+				{
+					title: t("Comment"),
+					name: 'comment',
+					multiple: true,
+					type: 'string'
+				},
+				{
+					title: t("Commented at"),
+					name: 'commentedat',
+					multiple: false,
+					type: 'date'
+				}, {
+					title: t("Modified at"),
+					name: 'modifiedat',
+					multiple: false,
+					type: 'date'
+				}, {
+					title: t("Modified by"),
+					name: 'modifiedBy',
+					multiple: true,
+					type: 'string'
+				}, {
+					title: t("Created at"),
+					name: 'createdat',
+					multiple: false,
+					type: 'date'
+				}, {
+					title: t("Created by"),
+					name: 'createdby',
+					multiple: true,
+					type: 'string'
+				},
+				{
+					title: t("Username"),
+					name: 'username',
+					multiple: true,
+					type: 'string'
+				},{
+					title: t("Display name"),
+					name: 'displayName',
+					multiple: true,
+					type: 'string'
+				},{
+					title: t("E-mail"),
+					name: 'email',
+					multiple: true,
+					type: 'string'
+				},
+			]
+
+		},
 		'UserDisplay',
 		'Field', 
 		{
@@ -34,6 +94,7 @@ go.Modules.register("core", 'core', {
 		'SmtpAccount',
 		'EmailTemplate',
 		'PdfTemplate',
+		'ImportMapping',
 		'CronJobSchedule',
 		{
 			name: 'AuthAllowGroup',
@@ -61,11 +122,13 @@ go.Modules.register("core", 'core', {
 		"go.customfields.type.Group",
 		"go.customfields.type.Html",
 		"go.customfields.type.MultiSelect",
+		"go.customfields.type.Attachments",
 		"go.customfields.type.Notes",
 		"go.customfields.type.Number",
 		"go.customfields.type.Select",
 		"go.customfields.type.Text",
 		"go.customfields.type.TextArea",
+		"go.customfields.type.Data",
 		"go.customfields.type.User",
 		"go.customfields.type.YesNo",
 		"go.customfields.type.TemplateField"
@@ -164,23 +227,4 @@ GO.mainLayout.on('render', function () {
 		e.preventDefault();
 	},false);
 
-
-	// if(!GO.settings.config.debug) {
-		window.onerror = function (message, source, lineno, colno, error) {
-			GO.errorDialog.show(t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
-		}
-	// }
-
-	window.addEventListener('unhandledrejection', function (event) {
-
-		if(Ext.isObject(event.reason)) {
-			var txt = event.reason.message || event.reason.detail || event.reason.description || t("An error occurred. More details can be found in the console.");
-		} else if(Ext.isString(event.reason)) {
-			var txt = event.reason;
-		} else
-		{
-			var txt = t("An error occurred. More details can be found in the console.");
-		}
-		GO.errorDialog.show(txt);
-	});
 });

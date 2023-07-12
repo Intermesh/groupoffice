@@ -13,6 +13,7 @@ namespace GO\Core\Controller;
 
 use GO;
 use GO\Base\Model\User;
+use go\core\http\Response;
 
 class AuthController extends \GO\Base\Controller\AbstractController {
 
@@ -44,6 +45,9 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 	}
 
 	protected function actionInit($params) {
+
+		Response::get()->sendDocumentSecurityHeaders();
+		Response::get()->sendHeaders();
 		
 		if(!empty($params['SET_LANGUAGE']))
 			\GO::config()->language=$params['SET_LANGUAGE'];

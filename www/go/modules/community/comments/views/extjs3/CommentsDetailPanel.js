@@ -21,8 +21,28 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 		this.origTitle = this.title;
 
-
-		this.buttons = [this.scrollToTopButton = new Ext.Button({
+		this.buttonAlign = 'left';
+		this.buttons = [new Ext.Button({
+			text:t('Attach file'),
+			iconCls: 'ic-file-upload',
+			handler: () => {
+				go.util.openFileDialog({
+					multiple: true,
+					autoUpload: true,
+					listeners: {
+						upload: function(response) {
+							const att = this.composer.attachmentBox;
+							att.setValue(att.getValue().concat([{
+								blobId: response.blobId,
+								name: response.name
+							}]));
+							this.composer.onSync();
+						},
+						scope: this
+					}
+				})
+			}
+		}), '->',this.scrollToTopButton = new Ext.Button({
 			xtype: "button",
 			iconCls: "ic-arrow-circle-up",
 			text: t("Scroll to top"),
@@ -48,16 +68,12 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 						name: e.target.attributes.alt ? e.target.attributes.alt.value : e.target.attributes.src.value,
 						src: e.target.attributes.src.value
 					}]);
-
-
 				}
 			})
 		});
 
 		this.on("expand", function() {
 			this.updateView();
-
-			// this.composer.textField.syncSize();
 		}, this);
 
 		this.on("added", (cont) => {
@@ -67,10 +83,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 					if(confirm(t("You have an unsaved comment. Are you sure you want to discard the comment?"))) {
 						this.composer.reset();
 						return true;
-					} else
-					{
-						return false;
 					}
+					return false;
 				}
 			});
 		})
@@ -79,8 +93,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		if(go.User.isAdmin && this.title) {
 			this.tools = [{			
 				id: "gear",
-				handler: function () {		
-					var dlg = new go.modules.comments.Settings();					
+				handler: function () {
+					const dlg = new go.modules.comments.Settings();
 					dlg.show(go.User.id);
 				}
 			}];
@@ -108,9 +122,13 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			baseParams: {sort: [{property: "date", isAscending:false}]},
 			remoteSort: true
 		});
-		
+
+		this.store.on("beforeload", () => {
+			this.el.mask(t("Loading..."));
+		});
 		this.store.on('load', function(store,records,options) {		
 			this.updateView(options);
+			this.el.unmask();
 		}, this);
 
 		this.store.on('remove', function() {
@@ -119,6 +137,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 		this.contextMenu = new Ext.menu.Menu({
 			items:[{
+
+				itemId: "delete",
 				iconCls: 'ic-delete',
 				text: t("Delete"),
 				handler: function() {
@@ -133,6 +153,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				},
 				scope:this
 			},{
+				itemId: "edit",
 				iconCls: 'ic-edit',
 				text: t("Edit"),
 				handler: function() {
@@ -175,6 +196,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	},
 
 	onLoad: function (dv) {
+
 		var id = dv.model_id ? dv.model_id : dv.currentId; //model_id is from old display panel
 		var type = dv.entity || dv.model_name || dv.entityStore.entity.name;
 		if(this.entityId === id) {
@@ -194,17 +216,27 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			section: this.section
 		});
 
-		if(this.large) {
-			this.commentsContainer.el.dom.style.maxHeight = (document.body.offsetHeight * 0.7) + "px";
-		}
-		
+
+
 		this.store.load();
 	},
 		
 	updateView : function(o) {
+
+		if(this.lastImages) {
+			this.lastImages.forEach(img => {
+				URL.revokeObjectURL(img.src);
+			});
+		}
+
 		if(this.collapsed || !this.commentsContainer.rendered) {
 			return;
 		}
+
+		if(this.large) {
+			this.commentsContainer.el.dom.style.maxHeight = (document.body.offsetHeight * 0.7) + "px";
+		}
+
 		o = o || {};
 
 		let badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
@@ -216,6 +248,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		this.curScrollHeight = dom.scrollHeight;// - dom.clientHeight;
 
 		this.commentsContainer.removeAll();
+
+		const imagePromises = [];
 
 		this.store.each(function(r) {
 			let labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
@@ -278,7 +312,19 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				cls: 'go-html-formatted ' + mineCls
 			});
 
-			readMore.insert(1, {xtype:'box',html:r.get('text'), itemId:"content", cls: 'content ' +mineCls});
+			const qs = new go.util.QuoteStripper(r.get("text")),
+
+				quote = qs.getQuote(), quoteId = Ext.id();
+
+			let quoteLess = qs.getBodyWithoutQuote();
+
+			if(quote) {
+				quoteLess += '<a class="normal-link" id="' + quoteId + '">' + t("More") + "</a>";
+			}
+
+			const content = Ext.create({xtype:'box',html: quoteLess, itemId:"content", cls: 'content ' +mineCls});
+
+			readMore.insert(1, content);
 			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
 
 			if(r.data.attachments && r.data.attachments.length) {
@@ -311,24 +357,38 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 			readMore.on('afterrender',function(me){
 
+
+
 				me.getEl().on("contextmenu", function(e, target, obj){
 					e.stopEvent();
 
-					if(r.data.permissionLevel > go.permissionLevels.read) {
-						this.contextMenu.record = r;
-						this.contextMenu.showAt(e.xy);
-					}
+					this.contextMenu.record = r;
+					this.contextMenu.showAt(e.xy);
+
+					this.contextMenu.items.get("delete").setDisabled(r.data.permissionLevel < go.permissionLevels.writeAndDelete);
+					this.contextMenu.items.get("edit").setDisabled(r.data.permissionLevel < go.permissionLevels.write);
+
 				}, this);
 
 			},this);
 
 			readMore.getComponent("content").on("afterrender" , (content) => {
 
-				go.util.replaceBlobImages(content.getEl().dom);
+				imagePromises.push(go.util.replaceBlobImages(content.getEl().dom));
+
+
+				if(quote) {
+
+					document.getElementById(quoteId).addEventListener("click", () => {
+						content.getContentTarget().update(r.get("text"));
+					});
+
+				}
 			})
 
 			prevStr = go.util.Format.date(r.get('date'));
 		}, this);
+
 
 		// Put a date on top
 		this.commentsContainer.insert(0,{
@@ -342,18 +402,26 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			]
 		});
 		this.doLayout();
-		this.scrollDown();
+		this.scrollDown(imagePromises);
+
 
 	},
-	scrollDown : function() {
-		var dom = this.commentsContainer.getEl().dom;
-		dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
+	scrollDown : function(imagePromises) {
 
-		if(this.large) {
-			this.scrollToTopButton.getEl().scrollIntoView(this.ownerCt.body);
-		}
+		this.lastImages = [];
 
-		//console.log(scroll.dom.scrollTop, scroll.dom.scrollHeight, this.initScrollHeight, this.initScrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
-		//scroll.scroll("b", scroll.dom.scrollTop + (scroll.dom.scrollHeight - this.initScrollHeight));
+		Promise.all(imagePromises).then((imgs) => {
+
+			// we will clear the memory on the next load or reset.
+			this.lastImages = this.lastImages.concat(...imgs);
+
+			const dom = this.commentsContainer.getEl().dom;
+			dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
+
+			if (this.large) {
+				this.scrollToTopButton.getEl().scrollIntoView(this.ownerCt.body);
+			}
+		});
+
 	}
 });

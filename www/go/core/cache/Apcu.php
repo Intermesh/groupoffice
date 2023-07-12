@@ -65,6 +65,9 @@ class Apcu implements CacheInterface {
 	 * Get a value from the cache
 	 *
 	 * Make sure to do a strict check on null to check if it existed. $value === null.
+	 *
+	 * Never trust that this value will persist. APCu has misses or is cleared on apache restart. Always
+	 * expect this to fail sometimes.
 	 * 
 	 * @param string $key 
 	 * @return mixed null if it doesn't exist
@@ -83,7 +86,8 @@ class Apcu implements CacheInterface {
 		$value = apcu_fetch($this->prefix . '-' .$key, $success);
 		
 		if(!$success) {
-			return null;
+			// if acpu fails fallback on disk cache
+			return $this->getDiskCache()->get($key);
 		}
 		
 		$this->cache[$key] = $value;

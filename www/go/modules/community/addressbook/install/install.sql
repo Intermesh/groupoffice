@@ -47,7 +47,7 @@ CREATE TABLE `addressbook_contact` (
   `photoBlobId` binary(40) DEFAULT NULL,
   `language` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `jobTitle` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `department` VARCHAR(100) NULL DEFAULT NULL,
+  `department` VARCHAR(200) NULL DEFAULT NULL,
   `filesFolderId` int(11) DEFAULT NULL,
   `uid` varchar(512) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
   `vcardBlobId` binary(40) DEFAULT NULL,
@@ -142,7 +142,8 @@ ALTER TABLE `addressbook_date`
   ADD KEY `contactId` (`contactId`);
 
 ALTER TABLE `addressbook_email_address`
-  ADD KEY `contactId` (`contactId`);
+  ADD KEY `contactId` (`contactId`),
+  ADD KEY `email` (`email`);
 
 ALTER TABLE `addressbook_group`
   ADD PRIMARY KEY (`id`),

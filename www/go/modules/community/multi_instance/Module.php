@@ -2,6 +2,7 @@
 namespace go\modules\community\multi_instance;
 
 use go\core\App;
+use go\core\ErrorHandler;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\Installer;
@@ -9,7 +10,14 @@ use go\core\webclient\Extjs3;
 use go\modules\community\multi_instance\model\Instance;
 
 class Module extends \go\core\Module {
-	
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
+
 	public function getAuthor(): string
 	{
 		return "Intermesh BV";
@@ -83,7 +91,7 @@ class Module extends \go\core\Module {
 
 		$failed = 0;
 
-		foreach(Instance::find() as $instance) {
+		foreach(Instance::find()->orderBy(['enabled' => 'DESC', 'isTrial' => 'ASC', 'lastLogin' => 'DESC']) as $instance) {
 			if(!$instance->isInstalled()) {
 				echo "Skipping not installed instance: " . $instance->hostname ."\n";
 				continue;
@@ -96,7 +104,12 @@ class Module extends \go\core\Module {
 
 			echo "Upgrading instance: " . $instance->hostname . ": ";
 			flush();
-			$success = $instance->upgrade();
+			try {
+				$success = $instance->upgrade();
+			} catch(\Throwable $e) {
+				ErrorHandler::logException($e, "Failed to upgrade " . $instance->hostname);
+				$success = false;
+			}
 
 			echo $success ? "ok" : "!!! FAILED !!!";
 
@@ -149,13 +162,38 @@ class Module extends \go\core\Module {
 		echo $this->parseTemplate($tpl, "DEFAULT", $i['DEFAULT']);
 	}
 
+	private function getTLD() : string {
+		$hostname = Request::get()->getHost();
+		$dotPos = strpos($hostname, '.');
+
+		if(!$dotPos) {
+			return "localdomain";
+		}
+
+		return substr($hostname, $dotPos + 1);
+	}
+
 	private function parseTemplate($tpl, $version, $hostnames) {
 
-		$tld = substr($_SERVER['HTTP_HOST'], strpos($_SERVER['HTTP_HOST'], '.') + 1);
+
+		$tld = $this->getTLD();
+
+		// Each instance must have a dedicated WOPI subdomain for Microsoft: https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/online/build-test-ship/environments#wopi-discovery-urls
+		$wopialiases = array_map(function($hostname) {
+			$parts = explode(".", $hostname);
+			$first = array_shift($parts);
+			$alias = $first . '.wopi';
+
+			if(count($parts)) {
+				$alias .= '.' . implode("." , $parts);
+			}
+			return $alias;
+		}, $hostnames);
 
 		$replacements = [
 			'{docroot}' => $version == 'DEFAULT' ? go()->getEnvironment()->getInstallFolder()->getPath() : '/usr/local/share/groupoffice-' . $version . '/www',
 			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld .' ' .$this->implode($hostnames) : $this->implode($hostnames),
+			'{wopialiases}' => $version == 'DEFAULT' ? '*.wopi.' . $tld .' ' .$this->implode($wopialiases) : $this->implode($wopialiases),
 			'{tld}' => $tld,
 			'{servername}' => strtolower(str_replace('.', '', $version)) . '.' . $tld,
 			'{version}' => str_replace('.', '', $version)
@@ -185,6 +223,6 @@ class Module extends \go\core\Module {
 			}
 		}
 
-		return trim($str);
+		return trim($str, " \n\\");
 	}
 }

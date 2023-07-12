@@ -29,6 +29,7 @@ $updates["201803161130"][] = function() {
 	$globalConfig = [];
 	if (file_exists('/etc/groupoffice/globalconfig.inc.php')) {
 		require('/etc/groupoffice/globalconfig.inc.php');
+		/** @var array $config */
 		$globalConfig = $config;
 	}
 
@@ -40,15 +41,15 @@ $updates["201803161130"][] = function() {
 
 
 	$values = [
-			'title' => 'title',
-			'language' => 'language',
-			'webmaster_email' => 'systemEmail',
-			'smtp_host' => 'smtpHost',
-			'smtp_port' => 'smtpPort',
-			'smtp_username' => 'smtpUsername',
-			'smtp_password' => 'smtpPassword',
-			'smtp_encryption' => 'smtpEncryption',
-			'password_min_length' => 'passwordMinLength'
+		'title' => 'title',
+		'language' => 'language',
+		'webmaster_email' => 'systemEmail',
+		'smtp_host' => 'smtpHost',
+		'smtp_port' => 'smtpPort',
+		'smtp_username' => 'smtpUsername',
+		'smtp_password' => 'smtpPassword',
+		'smtp_encryption' => 'smtpEncryption',
+		'password_min_length' => 'passwordMinLength'
 	];
 
 	foreach ($values as $old => $new) {
@@ -62,15 +63,15 @@ $updates["201803161130"][] = function() {
 	}
 
 	$values = [
-			'default_timezone' => 'defaultTimezone',
-			'default_time_format' => 'defaultTimeFormat',
-			'default_currency' => 'defaultCurrency',
-			'default_first_weekday' => 'defaultFirstWeekday',
-			'default_list_separator' => 'defaultListSeparator',
-			'default_text_separator' => 'defaultTextSeparator',
-			'default_thousands_separator' => 'defaultThousandSeparator',
-			'default_decimal_separator' => 'defaultDecimalSeparator'
-			//'register_user_groups' => 'defaultGroups'
+		'default_timezone' => 'defaultTimezone',
+		'default_time_format' => 'defaultTimeFormat',
+		'default_currency' => 'defaultCurrency',
+		'default_first_weekday' => 'defaultFirstWeekday',
+		'default_list_separator' => 'defaultListSeparator',
+		'default_text_separator' => 'defaultTextSeparator',
+		'default_thousands_separator' => 'defaultThousandSeparator',
+		'default_decimal_separator' => 'defaultDecimalSeparator'
+		//'register_user_groups' => 'defaultGroups'
 	];
 
 	foreach ($values as $old => $new) {
@@ -85,10 +86,10 @@ $updates["201803161130"][] = function() {
 
 	if (isset($config['default_date_format']) && isset($config['default_date_separator'])) {
 		$f = $config['default_date_format'][0] .
-						$config['default_date_separator'] .
-						$config['default_date_format'][1] .
-						$config['default_date_separator'] .
-						$config['default_date_format'][2];
+			$config['default_date_separator'] .
+			$config['default_date_format'][1] .
+			$config['default_date_separator'] .
+			$config['default_date_format'][2];
 
 		$sql = "replace into core_setting select id as moduleId, 'defaultDateFormat' as name, :value as value from core_module where name='users'";
 		$stmt = go()->getDbConnection()->getPDO()->prepare($sql);
@@ -526,7 +527,7 @@ $updates['201905101208'][] = "ALTER TABLE `core_email_template_attachment`
 $updates['201905101208'][] = "ALTER TABLE `core_email_template`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
 
-  $updates['201905101208'][] = "ALTER TABLE `core_email_template_attachment`
+$updates['201905101208'][] = "ALTER TABLE `core_email_template_attachment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
 
 
@@ -543,53 +544,53 @@ $updates['201905201227'][] = "ALTER TABLE `core_acl` ADD `entityTypeId` INT NULL
 $dupates['201905201227'][] = "ALTER TABLE `core_acl` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
 $updates['201905201227'][] = function() {
 
-  $cf = new ClassFinder();
-  $classes = $cf->findByParent(AclOwnerEntity::class);
+	$cf = new ClassFinder();
+	$classes = $cf->findByParent(AclOwnerEntity::class);
 
-  $mods = GO::modules()->getAll();
-  foreach($mods as $m) {
-    if($m->package == null && $m->isAvailable()) {
-      $classes = array_merge($classes, array_map(function($c){return $c->getName();},$m->moduleManager->getModels()));
-    }
-  }
+	$mods = GO::modules()->getAll();
+	foreach($mods as $m) {
+		if($m->package == null && $m->isAvailable()) {
+			$classes = array_merge($classes, array_map(function($c){return $c->getName();},$m->moduleManager->getModels()));
+		}
+	}
 
 
-  foreach($classes as $cls) {
+	foreach($classes as $cls) {
 
-    if($cls === Search::class || $cls === SearchCacheRecord::class) {
-      continue;
-    }
+		if($cls === Search::class || $cls === SearchCacheRecord::class) {
+			continue;
+		}
 
-    if(is_subclass_of($cls, AclOwnerEntity::class)) {
-      $type = $cls::entityType();
-      $tables = $cls::getMapping()->getTables();
-      $table = array_values($tables)[0]->getName();
-      $colName = 'aclId';
-    } else {
-      if(!is_subclass_of($cls, ActiveRecord::class)) {
-        continue;
-      }
-      $colName = $cls::model()->aclField();
-      if(!$colName || ($cls::model()->isJoinedAclField && $cls != "GO\\Files\\Model\\Folder")) {
-        continue;
-      }
-      $type = $cls::entityType();
-      $table = $cls::model()->tableName();
-    }
+		if(is_subclass_of($cls, AclOwnerEntity::class)) {
+			$type = $cls::entityType();
+			$tables = $cls::getMapping()->getTables();
+			$table = array_values($tables)[0]->getName();
+			$colName = 'aclId';
+		} else {
+			if(!is_subclass_of($cls, ActiveRecord::class)) {
+				continue;
+			}
+			$colName = $cls::model()->aclField();
+			if(!$colName || ($cls::model()->isJoinedAclField && $cls != "GO\\Files\\Model\\Folder")) {
+				continue;
+			}
+			$type = $cls::entityType();
+			$table = $cls::model()->tableName();
+		}
 
-    $stmt = go()->getDbConnection()->update(
-      'core_acl',
-      [
-        'acl.entityTypeId' => $type->getId(),
-        'acl.entityId' => new Expression('entity.id')],
-      (new Query())
-        ->tableAlias('acl')
-        ->join($table, 'entity', 'entity.'.$colName.' = acl.id'));
+		$stmt = go()->getDbConnection()->update(
+			'core_acl',
+			[
+				'acl.entityTypeId' => $type->getId(),
+				'acl.entityId' => new Expression('entity.id')],
+			(new Query())
+				->tableAlias('acl')
+				->join($table, 'entity', 'entity.'.$colName.' = acl.id'));
 
-   if(!$stmt->execute()) {
-     throw new \Exception("Could not update ACL");
-   }
-  }
+		if(!$stmt->execute()) {
+			throw new \Exception("Could not update ACL");
+		}
+	}
 };
 
 $updates['201906032000'][] = "ALTER TABLE `core_search` DROP INDEX `keywords`;";
@@ -607,21 +608,21 @@ $updates['201906211622'][] = function() {
 };
 
 $updates['201906211622'][] = function() {
-  EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+	EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 };
 
 
 $updates['201908300937'][] = function() {
-  //Ensure all custom fields are correcty created in the databaase
+	//Ensure all custom fields are correcty created in the databaase
 
-  foreach(Field::find() as $field) {
-    echo "Checking custom field " . $field->id ."\n";
-    try {
-      $field->save();
-    } catch(\Exception $e) {
-      echo "WARNING: Checking custom field failed: ". $e->getMessage() . "\n";
-    }
-  }
+	foreach(Field::find() as $field) {
+		echo "Checking custom field " . $field->id ."\n";
+		try {
+			$field->save();
+		} catch(\Exception $e) {
+			echo "WARNING: Checking custom field failed: ". $e->getMessage() . "\n";
+		}
+	}
 };
 
 
@@ -1211,58 +1212,309 @@ $updates['202207041200'][] = "alter table core_customfields_field_set
         foreign key (parentFieldSetId) references core_customfields_field_set (id)
             on delete set null;";
 
+$updates['202209291100'][] = "ALTER TABLE `core_customfields_select_option` ADD COLUMN `foregroundColor` VARCHAR(6) DEFAULT NULL AFTER `text`, 
+    ADD COLUMN `backgroundColor` VARCHAR(6) DEFAULT NULL AFTER `foregroundColor`, 
+    ADD COLUMN `renderMode` VARCHAR(20) DEFAULT NULL AFTER `backgroundColor`;";
+
+$updates['202211071330'][] = "ALTER TABLE `core_user` ADD KEY `email` (`email`);";
+
+
+$updates['202211251153'][] = "alter table core_auth_remember_me
+    drop foreign key core_auth_remember_me_core_user_id_fk;";
+
+$updates['202211251153'][] = "alter table core_auth_remember_me
+    add constraint core_auth_remember_me_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade;";
+
+$updates['202211291426'][] = "alter table `core_customfields_field` add column `filterable` BOOLEAN NOT NULL DEFAULT FALSE";
+
+$updates['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId in (SELECT aclId FROM core_customfields_field_set);";
+$updates['202212081208'][] = "UPDATE core_acl_group SET level = 30 WHERE level = 10 AND aclId = (SELECT defaultAclId FROM core_entity WHERE name = 'FieldSet');";
+
+$updates['202212090912'][] = function() {
+	// make sure groups are visible to themselves
+	$stmt = go()->getDbConnection()
+		->insertIgnore(
+			'core_acl_group',
+			go()->getDbConnection()->select('aclId, id, "10"')->from("core_group"),
+			['aclId', 'groupId', 'level']
+		);
+
+	$stmt->execute();
+};
+
+$updates['202212231031'][] = "alter table core_auth_token
+    add `CSRFToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL after accessToken;";
+
+
+$updates['202301091428'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+$updates['202301121428'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+$updates['202301231301'][] = 'delete from go_settings where name = "file_storage_usage"';
+$updates['202301231301'][] = 'delete from go_settings where name = "database_usage"';
+$updates['202301231301'][] = 'delete from go_settings where name = "mailbox_usage"';
+
 
 
 
 
 
 // Start 6.7
-$updates['202207041200'][] = "alter table core_pdf_block modify x int null;";
+$updates['202302211524'][] = "alter table core_pdf_block modify x int null;";
 
-$updates['202207041200'][] = "alter table core_pdf_block modify y int null;";
+$updates['202302211524'][] = "alter table core_pdf_block modify y int null;";
 
-$updates['202207041200'][] = "alter table core_pdf_block modify width int null;";
+$updates['202302211524'][] = "alter table core_pdf_block modify width int null;";
 
-$updates['202207041200'][] = "alter table core_pdf_block modify height int null;";
+$updates['202302211524'][] = "alter table core_pdf_block modify height int null;";
 
-$updates['202207041200'][] = "alter table core_pdf_template
+$updates['202302211524'][] = "alter table core_pdf_template
 	add `key` varchar(20) default null null after moduleId;";
 
 
-$updates['202207041200'][] = "drop index name on core_email_template;";
+$updates['202302211524'][] = "drop index name on core_email_template;";
 
 
-$updates['202207041200'][] = "create unique index core_email_template_moduleId_key_uindex
+$updates['202302211524'][] = "create unique index core_email_template_moduleId_key_uindex
     on core_email_template (moduleId, `key`);";
 
 
-$updates["202209010941"][] = "TRUNCATE TABLE go_state"; //for fixed non resizable columns getting 100px width
+$updates["202302211524"][] = "TRUNCATE TABLE go_state"; //for fixed non resizable columns getting 100px width
 
 
-$updates["202209051226"][] = "alter table core_pdf_template
+$updates["202302211524"][] = "alter table core_pdf_template
     add logoBlobId binary(40) null after stationaryBlobId;";
 
-$updates["202209051226"][] = "alter table core_pdf_template
+$updates["202302211524"][] = "alter table core_pdf_template
     add constraint core_pdf_template_core_blob_id_fk
         foreign key (logoBlobId) references core_blob (id);";
 
 
-$updates["202209121148"][] = "alter table core_email_template
+$updates["202302211524"][] = "alter table core_email_template
     drop foreign key core_email_template_ibfk_1;";
 
-$updates["202209121148"][] = "alter table core_email_template
+$updates["202302211524"][] = "alter table core_email_template
     drop column aclId;";
 
-$updates["202209121148"][] = "create index core_pdf_template_key_index
+$updates["202302211524"][] = "create index core_pdf_template_key_index
     on core_pdf_template (moduleId, `key`);";
 
 
-$updates["202209121148"][] = "alter table core_email_template
+$updates["202302211524"][] = "alter table core_email_template
     drop key core_email_template_moduleId_key_uindex;";
 
-$updates["202209121148"][] = "create index core_email_template_moduleId_key_index
+$updates["202302211524"][] = "create index core_email_template_moduleId_key_index
     on core_email_template (moduleId, `key`);";
 
 
-$updates["202209121148"][] = "alter table core_change
+$updates["202302211524"][] = "alter table core_change
     modify entityId varchar(100) collate ascii_bin not null;";
+
+
+$updates['202302211524'][] = "alter table core_auth_remember_me
+    drop foreign key core_auth_remember_me_core_user_id_fk;";
+
+$updates['202302211524'][] = "alter table core_auth_remember_me
+    add constraint core_auth_remember_me_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade;";
+
+
+$updates['202302211524'][] = "create table core_import_mapping
+(
+	entityTypeId int                        null,
+    checksum     char(32) collate ascii_bin null,
+    mapping      text                       null,
+    updateBy     varchar(100) default null  null,
+    constraint core_import_mapping_core_entity_null_fk
+        foreign key (entityTypeId) references core_entity (id)
+            on delete cascade
+)";
+
+$updates['202302211524'][] = "alter table core_import_mapping
+    add constraint core_import_mapping_pk
+        primary key (entityTypeId, checksum);";
+
+$updates['202302211524'][] = "drop index moduleId on core_pdf_template;";
+
+
+
+$updates['202302211524'][] = "ALTER TABLE `core_import_mapping` DROP FOREIGN KEY `core_import_mapping_core_entity_null_fk`;";
+$updates['202302211524'][] = "ALTER TABLE `core_import_mapping` 
+ADD COLUMN `id` INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST,
+    ADD COLUMN `name` VARCHAR(120) NOT NULL DEFAULT '(unnamed)' AFTER `checksum`,
+	DROP PRIMARY KEY,
+	ADD PRIMARY KEY (`id`);";
+
+$updates['202302211524'][] = "ALTER TABLE `core_import_mapping` 
+ADD CONSTRAINT `core_import_mapping_core_entity_null_fk`
+  FOREIGN KEY (`entityTypeId`)
+  REFERENCES `core_entity` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE NO ACTION;";
+
+$updates['202302211524'][] = "ALTER TABLE `core_customfields_field_set` ADD `collapseIfEmpty` BOOLEAN NOT NULL DEFAULT FALSE AFTER `isTab`;";
+
+$updates['202302211524'][] = "";
+$updates['202302211524'][] = "";
+$updates['202302211524'][] = "";
+$updates['202302211524'][] = "";
+$updates['202302211524'][] = ""; //empty for fixing duplicates in file
+
+
+$updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
+  ADD PRIMARY KEY (`id`)";
+
+
+$updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
+  MODIFY `id` bigint unsigned auto_increment";
+
+$updates['202303131003'][] = function() {
+	$sql = "delete from core_acl_group where groupId = (select id from core_group where isUserGroupFor=1)";
+
+	if(go()->getDatabase()->hasTable("em_accounts")) {
+		$sql .= " AND aclId not IN (select acl_id from em_accounts)";
+	}
+
+	echo $sql ."\n";
+
+	try {
+		go()->getDbConnection()->exec($sql);
+	}catch(Exception $e) {
+		echo "Exception: " . $e->getMessage() ."\n";
+	}
+};
+
+$updates['202303151524'][] = "ALTER TABLE `core_user` 
+ADD COLUMN `themeColorScheme` ENUM('light', 'dark', 'system') NOT NULL DEFAULT 'light' AFTER `theme`;";
+
+$updates['202303151524'][] = "UPDATE `core_user` SET theme = 'Paper', themeColorScheme = 'dark' WHERE theme = 'Dark';";
+
+$updates['202303311400'][] = "CREATE TABLE `go_template_group` (
+   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+   `name` VARCHAR(100) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id`))
+ENGINE = InnoDB;";
+
+$updates['202303311400'][] = "ALTER TABLE `go_templates` 
+ADD COLUMN `group_id` INT(10) UNSIGNED NULL DEFAULT NULL AFTER `extension`,
+ADD INDEX `fk_go_templates_go_template_group_idx` (`group_id` ASC);";
+
+$updates['202303311400'][] = "ALTER TABLE `go_templates` 
+ADD CONSTRAINT `fk_go_templates_go_template_group`
+  FOREIGN KEY (`group_id`)
+  REFERENCES `go_template_group` (`id`)
+  ON DELETE SET NULL";
+
+//ZPUSH-2FA
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token` 
+ADD CONSTRAINT `fk_auth_token_user`
+  FOREIGN KEY (`userId`)
+  REFERENCES `core_user` (`id`)
+  ON DELETE CASCADE;";
+
+$updates['202303311400'][] = "CREATE TABLE `core_client` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `deviceId` VARCHAR(80) NOT NULL,
+    `platform` VARCHAR(45) NOT NULL,
+    `name` VARCHAR(80) NOT NULL,
+    `version` VARCHAR(190) NOT NULL,
+    `ip` VARCHAR(45) NOT NULL,
+    `lastSeen` DATETIME NOT NULL,
+    `createdAt` DATETIME NOT NULL,
+    `status` ENUM('new', 'allowed', 'denied') NOT NULL DEFAULT 'new',
+    `needResync` TINYINT(1) NULL NULL DEFAULT 0,
+    `userId` INT(11) NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_client_core_user_id_fk`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE CASCADE
+) ENGINE = InnoDB;";
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token` 
+ADD COLUMN `clientId` INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `passedAuthenticators`";
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_remember_me` 
+ADD COLUMN `clientId` INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `userId`";
+
+// create clients
+$updates['202303311400'][] = "INSERT INTO core_client (`deviceId`, `ip`,`platform`, `name`, `version`, `lastSeen`, `createdAt`, `status`, `userId`) SELECT '-' as deviceId, remoteIpAddress, platform, browser as name, userAgent as version, max(lastSeen) as lastSeen, NOW() as createdAt, 'allowed' as status, userId
+FROM (
+	(
+	SELECT remoteIpAddress, platform, browser, userAgent, max(lastActiveAt) as lastSeen, userId
+		FROM `core_auth_token` `sub`
+		WHERE  `sub`.`expiresAt` > NOW() OR `sub`.`expiresAt` IS NULL
+		GROUP BY `sub`.`remoteIpAddress`, `sub`.`platform`, `sub`.`browser`, `sub`.`userId`
+	
+) UNION (
+	SELECT DISTINCT remoteIpAddress, platform, browser, userAgent, max(DATE_SUB(expiresAt, INTERVAL 7 DAY)) as lastSeen, userId
+		FROM `core_auth_remember_me` `t`
+		WHERE  `t`.`expiresAt` > NOW()
+		GROUP BY `t`.`remoteIpAddress`, `t`.`platform`, `t`.`browser`, `t`.`userId`
+)
+) `t`
+GROUP BY `remoteIpAddress`, `platform`, `browser`, `userId`";
+
+//set clientIds
+$updates['202303311400'][] = "UPDATE `core_auth_token` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.userId = t.userId AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
+$updates['202303311400'][] = "UPDATE `core_auth_remember_me` t JOIN `core_client` c ON c.ip = t.remoteIpAddress AND c.userId = t.userId AND c.platform = t.platform AND c.name = t.browser SET t.clientId = c.id;";
+//remove tokens without client
+$updates['202303311400'][] = "DELETE from `core_auth_token` WHERE clientId = 0;";
+$updates['202303311400'][] = "DELETE FROM `core_auth_remember_me` WHERE clientId = 0;";
+
+// drop old columns and add constraints
+$updates['202303311400'][] = "ALTER TABLE `core_auth_remember_me` 
+DROP COLUMN `browser`,
+DROP COLUMN `platform`,
+DROP COLUMN `userAgent`,
+DROP COLUMN `remoteIpAddress`,
+ADD INDEX `fk_core_auth_remember_me_core_client1_idx` (`clientId` ASC);";
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token` 
+DROP COLUMN `browser`,
+DROP COLUMN `platform`,
+DROP COLUMN `userAgent`,
+DROP COLUMN `remoteIpAddress`,
+DROP COLUMN `lastActiveAt`,
+ADD INDEX `fk_core_auth_token_core_client1_idx` (`clientId` ASC);";
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_remember_me` 
+ADD CONSTRAINT `fk_core_auth_remember_me_core_client1`
+  FOREIGN KEY (`clientId`)
+  REFERENCES `core_client` (`id`)
+  ON DELETE CASCADE;";
+
+$updates['202303311400'][] = "ALTER TABLE `core_auth_token`
+ADD CONSTRAINT `fk_core_auth_token_core_client1`
+  FOREIGN KEY (`clientId`)
+  REFERENCES `core_client` (`id`)
+  ON DELETE CASCADE;";
+
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add header text null;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add footer text null;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    alter column marginTop set default 20;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    alter column marginBottom set default 20.0000;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add headerX decimal(19, 4) default 0 null after header;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add headerY decimal(19, 4) default 10 null after headerX;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add footerX decimal(19, 4) default 0 null;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add footerY decimal(19, 4) default -12 null;";
+
+

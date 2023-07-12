@@ -48,6 +48,13 @@ class Column {
 	 */
 	public $unique = false;
 
+
+	/**
+	 * Check if the value is unsigned
+	 * @var bool
+	 */
+	public $unsigned = false;
+
 	/**
 	 * Is this part of the primary key
 	 * 
@@ -162,7 +169,11 @@ class Column {
 	 */
 	public function getCreateSQL(): string
 	{
-		$sql = $this->dataType;		
+		$sql = $this->dataType;
+
+		if($this->unsigned) {
+			$sql .= " UNSIGNED";
+		}
 		
 		if(!$this->nullAllowed) {
 			$sql .= ' NOT NULL';
@@ -297,6 +308,11 @@ class Column {
 			case 'date':
 			case 'datetime':
 			case 'localdatetime':
+
+				if(strtolower(substr($value, 0, 3)) == "cur") {
+					return new DateTime();
+				}
+
 				//Work around date problem
 				if($value == "0000-00-00") {
 					return null;

@@ -1,16 +1,9 @@
 /* global go, Ext */
 
 go.customfields.type.SelectDialog = Ext.extend(go.customfields.FieldDialog, {
-	// height: dp(800),
-	// formPanelLayout:"border",
-	// initComponent: function() {
-	// 	this.supr().initComponent.call(this);
-	// },
 	deferredRender: false,
 	initFormItems: function () {
-		var items = go.customfields.type.SelectDialog.superclass.initFormItems.call(this);
-		// items[0].autoHeight = true;
-		// items[0].region = "north";
+		const items = go.customfields.type.SelectDialog.superclass.initFormItems.call(this);
 
 		this.addPanel({
 				layout: "border",

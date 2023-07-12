@@ -115,7 +115,7 @@ GO.email.EmailComposer = function(config) {
 					go.Jmap.request({
 						method: "Contact/get",
 						params: {
-							properties: ["name", "emailAddresses"],
+							properties: ["name", "emailAddresses", 'addressBookId'],
 							ids: ids
 						}
 					}).then(function(result) {										
@@ -161,20 +161,6 @@ GO.email.EmailComposer = function(config) {
 					});		
 			break;
 		}
-		
-
-		// go.Db.store("Contact").get(ids).then(function(result) {										
-
-		// 	result.entities.forEach(function(contact) {
-		// 		if(!go.util.empty(v)) {
-		// 			v += ", ";
-		// 		}							
-		// 		v += '"' + contact.name.replace(/"/g, '\\"') + '" <' + contact.emailAddresses[0].email + '>';							
-		// 		combo.setValue(v);
-		// 	});
-		// }).finally(function(){
-		// 	me.getEl().unmask();
-		// });
 
 	}, fillSingleRecipient = function(combo, name, email, id, entityName) {
 		var v = combo.getValue();
@@ -187,32 +173,15 @@ GO.email.EmailComposer = function(config) {
 
 
 	var items = [
-	this.fromCombo = new Ext.form.ComboBox({
-		store : GO.email.aliasesStore,
-		editable:false,
-		fieldLabel : t("From", "email"),
-		name : 'alias_name',
-		anchor : '100%',
-		displayField : 'from',
-		valueField : 'id',
-		hiddenName : 'alias_id',
-		forceSelection : true,
-		triggerAction : 'all',
-		mode : 'local',
-		tpl: '<tpl for="."><div class="x-combo-list-item">{from:htmlEncode}</div></tpl>',
-		listeners:{
-			beforeselect: function(cb, newAccountRecord){
-				this._checkLoadTemplate(cb,newAccountRecord);
-			},
-			scope:this
-		}
-	}),
+
 	{
 		xtype:'compositefield',
 		anchor : '100%',
 		items: [
 
-			this.toCombo = new GO.email.RecipientCombo(),
+			this.toCombo = new GO.email.RecipientCombo({
+				flex: 1
+			}),
 			new Ext.Button({				
 				iconCls : 'ic-add',
 				handler: function() {
@@ -242,7 +211,7 @@ GO.email.EmailComposer = function(config) {
 		items: [this.ccCombo = new GO.email.RecipientCombo({
 			fieldLabel : t("CC", "email"),
 			name : 'cc',
-			anchor : '100%'
+			flex: 1
 		}),
 		new Ext.Button({				
 				iconCls : 'ic-add',
@@ -275,7 +244,7 @@ GO.email.EmailComposer = function(config) {
 		items: [this.bccCombo = new GO.email.RecipientCombo({
 			fieldLabel : t("BCC", "email"),
 			name : 'bcc',
-			anchor : '100%'
+			flex: 1
 		}),
 			new Ext.Button({				
 				iconCls : 'ic-add',
@@ -302,16 +271,45 @@ GO.email.EmailComposer = function(config) {
 	]
 	}
 	];
-								
-	// var anchor = -113;
-						
-	
-	
-	items.push(this.subjectField = new Ext.form.TextField({
-		fieldLabel : t("Subject", "email"),
-		name : 'subject',
-		anchor : '100%'
-	}));
+
+	items.push(
+
+		{
+			xtype: "container",
+			cls: "go-hbox",
+			layout: "form",
+			items: [
+				this.subjectField = new Ext.form.TextField({
+					fieldLabel : t("Subject", "email"),
+					name : 'subject',
+					flex: 1
+				}),
+
+				this.fromCombo = new Ext.form.ComboBox({
+					store : GO.email.aliasesStore,
+					editable:false,
+					fieldLabel : t("From", "email"),
+					name : 'alias_name',
+					flex: 1,
+					displayField : 'from',
+					valueField : 'id',
+					hiddenName : 'alias_id',
+					forceSelection : true,
+					triggerAction : 'all',
+					mode : 'local',
+					tpl: '<tpl for="."><div class="x-combo-list-item">{from:htmlEncode}</div></tpl>',
+					listeners:{
+						beforeselect: function(cb, newAccountRecord){
+							this._checkLoadTemplate(cb,newAccountRecord);
+						},
+						scope:this
+					}
+				})
+			]
+		}
+
+
+	);
 	this.emailEditor = new GO.base.email.EmailEditorPanel({
 		maxAttachmentsSize:parseInt(GO.settings.config.max_attachment_size),
 		region:'center'
@@ -324,7 +322,7 @@ GO.email.EmailComposer = function(config) {
 	this.formPanel = new Ext.form.FormPanel({
 		border : false,		
 		waitMsgTarget : true,
-		cls : 'go-form-panel',
+		// cls : 'go-form-panel',
 		desktop: {
 			layout: "border",
 		},
@@ -341,7 +339,20 @@ GO.email.EmailComposer = function(config) {
 			autoHeight:true,
 			border:false,
 			items: items
-		},this.emailEditor],
+		},
+
+			{
+				xtype: "fieldset",
+				region:'center',
+				desktop: {
+					layout: "fit",
+				},
+				mobile: {
+					autoHeight: true
+				},
+				items: [this.emailEditor]
+			}
+			],
 		keys:[{
 			key: Ext.EventObject.ENTER,
 			ctrl:true,
@@ -389,30 +400,6 @@ GO.email.EmailComposer = function(config) {
 				iconCls : 'ic-people',
 				menu : this.showMenu
 			}));
-
-
-		
-//		this.btnAddressbook = new Ext.Button({
-//			tooltip : t("Address book", "addressbook"),
-//			iconCls : 'ic-import-contacts',
-//			handler : function() {
-//				if (!this.addressbookDialog) {
-//					this.addressbookDialog = new GO.email.AddressbookDialog();
-//					this.addressbookDialog.on('addrecipients',
-//						function(fieldName, selections) {
-//							this.addRecipients(fieldName,selections);
-//						}, this);
-//				}
-//
-//				this.addressbookDialog.show();
-//			},
-//			scope : this
-//		});
-//		
-//		tbar.push(this.btnAddressbook);
-		
-	
-	
 		
 		this.templatesStore = new GO.data.JsonStore({
 			url : GO.url("email/template/emailSelection"),
@@ -595,38 +582,12 @@ GO.email.EmailComposer = function(config) {
 				
 				this.templateSelectionDialog.grid.on("rowdblclick", function(grid, rowIndex){
 					var record = grid.getStore().getAt(rowIndex);
-//					console.log(record.template_id)
-//					this._changeTemplate(record.get('template_id'));
 						if (this.isVisible()) {
 							if(!this.emailEditor.isDirty() || confirm(t("Changes will be lost. Are you sure?", "email"))) {
 								this._changeTemplate(record.get('template_id'));
 							}
 						}
-					
-					
-					
-//					if(record.get('template_id')=='default' || record.get('template_id')=='default_for_account'){
-//							this.templatesStore.baseParams.default_template_id=this.lastLoadParams.template_id;
-//							this.templatesStore.baseParams.type = record.get('template_id');
-//							if (record.get('template_id')=='default_for_account') {
-//								var fromAccountRecord = this.fromCombo.store.getById(this.fromCombo.getValue());
-//								this.templatesStore.baseParams.account_id = fromAccountRecord['data']['account_id'];
-//							}
-//							this.templatesStore.load();
-//							delete this.templatesStore.baseParams.default_template_id;
-//							delete this.templatesStore.baseParams.type;
-//							delete this.templatesStore.baseParams.account_id;
-//							var fromComboValue = this.fromCombo.getValue();
-//							this.fromCombo.store.load();
-//							this.fromCombo.setValue(fromComboValue);
-//						}else if(!this.emailEditor.isDirty() || confirm(t("Changes will be lost. Are you sure?", "email")))
-//						{							
-//							
-//						}else
-//						{
-//							return false;							
-//						}
-					
+
 					this._changeTemplate(record.get('template_id'));			
 					
 					this.templateSelectionDialog.hide();
@@ -643,13 +604,8 @@ GO.email.EmailComposer = function(config) {
 					
 					this.templatesMenu.store = this.templatesStore;
 					this.templatesMenu.updateMenuItems();
-			
-			
 			}
-			
-			
-			
-			
+
 		}, this);
 		
 
@@ -665,7 +621,11 @@ GO.email.EmailComposer = function(config) {
 		animCollapse : false,
 		closeAction : 'hide',
 		buttonAlign : 'center',
-		tbar : tbar,
+
+		tbar: {
+			enableOverflow: true,
+			items: tbar
+		},
 		items : this.formPanel
 	});
 	
@@ -675,8 +635,6 @@ GO.email.EmailComposer = function(config) {
 
 	this.addEvents({
 		'dialog_ready' :true,
-		//		attachmentDblClicked : true,
-		//zipOfAttachmentsDblClicked : true,
 		'send' : true,
 		'reset' : true,
 		afterShowAndLoad:true,
@@ -717,27 +675,14 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 	sendParams : {},
 	
 	_checkLoadTemplate : function(cb,newAccountRecord) {
-//			GO.request({
-//				url: 'addressbook/template/defaultTemplateId',
-//				params:{
-//					account_id: newAccountRecord.data['account_id']
-//				},
-//				success: function(options, response, result)
-//				{
 
 			var previousAccountRecord = cb.store.getById(cb.getValue());
-			if (this.templatesBtn.disabled == true || this.showConfig.emailFromTemplate) {
-				//console.log('disable template changing');
-				// do not switch template when switching From addres
-			} else if (newAccountRecord.get('template_id')!=previousAccountRecord.get('template_id')){
+			if (newAccountRecord.get('template_id')!=previousAccountRecord.get('template_id')){
 					this.templatesMenu.setChecked(newAccountRecord.get('template_id'));
 					if (!this.emailEditor.isDirty() || confirm(t("Changes will be lost. Are you sure?", "email")))
 						this._changeTemplate(newAccountRecord.get('template_id'));
 			}
 			this._setSignature(cb,newAccountRecord);
-//				},
-//				scope:this
-//			});
 	},
 	
 	_setSignature : function(cb,newAccountRecord) {
@@ -818,7 +763,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			run: this.autoSave,
 			scope:this,
 			interval:120000
-		//interval:5000
 		};
 		
 		this.on('hide', this.stopAutoSave, this);
@@ -830,9 +774,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 
 		this.sendParams = {};
 		Ext.apply(this.sendParams, this.defaultSendParams);
-
-//		GO.email.showCCfield = true;
-//		GO.email.showBCCfield = false;
 
 		this.showFrom(go.User.emailSettings.show_from);
 		this.showCC(go.User.emailSettings.show_cc);
@@ -901,15 +842,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 
 	initTemplateMenu :  function(config){
 		config = config||{};
-		
-//		if (typeof(config.template_id) == 'undefined' && this.templatesStore){
-//			var templateRecordIndex = this.templatesStore.findBy(function(record,id){
-//				return record.get('checked');
-//			});
-//
-//			if(templateRecordIndex>-1)
-//				config.template_id=this.templatesStore.getAt(templateRecordIndex).get('template_id');
-//		}
+
 		//check the right template menu item.
 		if(this.templatesStore && this.templatesMenu && this.templatesMenu.items){
 			var templateId = config.template_id || this.getDefaultTemplateId();
@@ -925,8 +858,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			} else {
 				this.templatesBtn.setDisabled(false);
 			}
-		
-		
 	},
 					
 					
@@ -957,7 +888,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			index=0;
 		}
 		this.fromCombo.setValue(this.fromCombo.store.data.items[index].id);
-//		this._checkLoadTemplate(this.fromCombo,this.fromCombo.store.getAt(0));
 	},
 
 	show : function(config) {
@@ -1017,13 +947,8 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				},
 				scope:this
 			});
-			
-			//this.htmlEditor.SpellCheck = false;
 		} else {
-
-
-			
-			//keep attachments when switchting from text <> html
+			//keep attachments when switching from text <> html
 			this.reset();
 			
 			//save the mail to a file location
@@ -1086,15 +1011,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				this.sendParams.campaign_id = config.campaign_id;
 
 				this.saveButton.setDisabled(true);
-			}else
-			{
-				
-//				if(go.Modules.isAvailable("legacy", "addressbook")) {
-//					// Enable the addressbook button when not creating newsletters
-//					this.btnAddressbook.setDisabled(false);
-//				}
-//				this.ccFieldCheck.setChecked(GO.email.showCCfield == '1');
-//				this.bccFieldCheck.setChecked(GO.email.showBCCfield == '1');
 			}
 			
 			var params = config.loadParams ? config.loadParams : {
@@ -1131,10 +1047,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			}
 
 			if (config.uid || config.template_id!='undefined' || config.loadUrl || config.loadParams) {
-		
-//				if(config.task=='opendraft')
-//					this.sendParams.draft_uid = config.uid;
-//				
 				var fromRecord = this.fromCombo.store.getById(this.fromCombo.getValue());
 
 				
@@ -1176,6 +1088,9 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 
 				if (typeof(config.values)!='undefined' && typeof(config.values.body)!='undefined')
 					params.body = config.values.body;
+
+				if (typeof(config.values)!='undefined' && typeof(config.values.subject)!='undefined')
+					params.subject = config.values.subject;
 				
 				this.lastLoadUrl = url;
 				this.lastLoadParams = params;
@@ -1210,8 +1125,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 
 						this.initTemplateMenu({template_id: this.lastLoadParams.template_id}); // set template menu
 							
-//						action.result.data.account_id
-
 						Ext.defer(function() {
 							// show() of EmailEditorPanel is deferred 100ms by Ext and the ready event comes to early
 							this.fireEvent('dialog_ready', this);
@@ -1231,9 +1144,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				this.afterShowAndLoad(config);
 				
 			}
-			
-			
-				
+
 		}
 	},
 	
@@ -1247,41 +1158,39 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 	},
 	
 	loadForm : function(url, params){
-		
 		params.content_type = this.emailEditor.getContentType();
 		
-//		var ctFieldVal = this.emailEditor.hiddenCtField.getValue();
-//		var inlineImgVal = this.emailEditor.hiddenInlineImagesField.getValue();
-//		var attachVal = this.emailEditor.hiddenAttachmentsField.getValue(); // remember attachment
 		var attachmentmentsData=[];
 		var attachments = this.emailEditor.attachmentsView.store.getRange(); 
-		for(var i=0;i<attachments.length;i++)
+		for(var i=0;i<attachments.length;i++) {
 			attachmentmentsData.push(attachments[i].data);
+		}
 		
 		this.formPanel.form.load({
-					url : url,
-					params : params,
-					waitMsg : t("Loading..."),
-					failure:function(form, action)
-					{
-						Ext.getBody().unmask();
-						GO.errorDialog.show(action.result.feedback)
-					},
-					success : function(form, action) {
-						
-						this.addSignature();
+			url : url,
+			params : params,
+			waitMsg : t("Loading..."),
+			failure:function(form, action){
+				Ext.getBody().unmask();
+				GO.errorDialog.show(action.result.feedback)
+			},
+			success : function(form, action) {
 
-						if(action.result.sendParams)
-							Ext.apply(this.sendParams, action.result.sendParams);
-						
-						//add existing attachments to result so emailEditor will set this after form load.
-						if(action.result.data.attachments)
-							attachmentmentsData=attachmentmentsData.concat(action.result.data.attachments);						
-						
-						action.result.data.attachments=attachmentmentsData;
-					},
-					scope : this
-				});
+				this.addSignature();
+
+				if(action.result.sendParams) {
+					Ext.apply(this.sendParams, action.result.sendParams);
+				}
+
+				//add existing attachments to result so emailEditor will set this after form load.
+				if(action.result.data.attachments) {
+					attachmentmentsData = attachmentmentsData.concat(action.result.data.attachments);
+				}
+
+				action.result.data.attachments=attachmentmentsData;
+			},
+			scope : this
+		});
 	},
 
 	
@@ -1305,14 +1214,11 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		Ext.getBody().unmask();
 		GO.email.EmailComposer.superclass.show.call(this);
 
-
 		this.focus();
 
 		if(this.showConfig.entity && this.showConfig.entityId) {
 			this.setLinkEntity(config);
 		}
-
-
 		
 		this.fireEvent('afterShowAndLoad',this);
 
@@ -1362,6 +1268,13 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.saveButton.setDisabled(true);
 		this.sendButton.setDisabled(true);
 
+		if(autoSave) {
+			go.Notifier.flyout({
+				description: t("Autosaving e-mail message to drafts (every 2 mins)"),
+				time: 2000
+			});
+		}
+
 		var strNoSubjectMsg = draft ?
 			t("You didn't fill in a subject. Are you sure you want to save this message without a subject?", "email")
 			: t("You didn't fill in a subject. Are you sure you want to send this message without a subject?", "email");
@@ -1383,10 +1296,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			else if(draft || autoSave)
 				sendUrl = GO.url("email/message/save");
 			
-//			if(this.link) {
-//				this.sendParams.link = this.link.entity + ":" + this.link.entityId;
-//			}
-
 			const newLinks = this.createLinkButton.getNewLinks();
 			this.sendParams.links = Ext.encode(newLinks);
 
@@ -1450,7 +1359,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 					{
 						var fb = action.result && action.result.feedback ? action.result.feedback : t("Could not connect to the server. Please check your internet connection.");
 						
-						GO.errorDialog.show(Ext.util.Format.nl2br(Ext.util.Format.htmlEncode(fb)));
+						GO.errorDialog.show(fb);
 					}
 					this.saveButton.setDisabled(false);
 					this.sendButton.setDisabled(false);
@@ -1483,37 +1392,3 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 	}
 	
 });
-
-//GO.email.TemplatesList = function(config) {
-//
-//	Ext.apply(config);
-//	var tpl = new Ext.XTemplate(
-//		'<div id="template-0" class="go-item-wrap">'+t("No template", "addressbook")+'</div>',
-//		'<tpl for=".">',
-//		'<div id="template-{id}" class="go-item-wrap"">{name}</div>',
-//		'<tpl if="!GO.util.empty(default_template)"><div class="ml-template-default-spacer"></div></tpl>',
-//		'</tpl>');
-//
-//	GO.email.TemplatesList.superclass.constructor.call(this, {
-//		store : config.store,
-//		tpl : tpl,
-//		singleSelect : true,
-//		autoHeight : true,
-//		overClass : 'go-view-over',
-//		itemSelector : 'div.go-item-wrap',
-//		selectedClass : 'go-view-selected'
-//	});
-//}
-
-//Ext.extend(GO.email.TemplatesList, Ext.DataView, {
-//	onRender : function(ct, position) {
-//		this.el = ct.createChild({
-//			tag : 'div',
-//			cls : 'go-select-list'
-//		});
-//
-//		GO.email.TemplatesList.superclass.onRender.apply(this,
-//			arguments);
-//	}
-//
-//});

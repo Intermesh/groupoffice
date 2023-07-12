@@ -190,11 +190,7 @@ abstract class Message extends \GO\Base\Model
 		$ids= preg_replace('/[[:^print:]]/', '', $ids);
 
 		//remove whitespaces
-		$ids = preg_replace('/[\s,]+/',',',$ids);
-
-		//explode id's
-		$ids = trim(str_replace('><', ',', $ids),'<> ');
-		$ids = str_replace(',,', ',', $ids); //wierd stuff:
+		$arr = preg_split('/[\s,]+/', $ids);
 
 		/*
 		 * References: <DUB124-W490C3E1C3A57E495104C6FF34A0@phx.gbl>
@@ -202,7 +198,14 @@ abstract class Message extends \GO\Base\Model
 		 *  <DUB124-W4084488AD7C09D18C33FE8F3300@phx.gbl>,<A5CC2BCF-A755-4471-AB58-0BEBECF918D7@intermesh.nl>
 		 */
 
-		return empty($ids) ? [] : array_unique(explode(',',$ids));
+		$arr = array_map(function($id) {
+			return trim($id, " <>");
+		}, $arr);
+
+		$arr = array_unique($arr);
+		return array_filter($arr, function($id) {
+			return !empty($id);
+		});
 	}
 
 	/**
@@ -355,7 +358,6 @@ abstract class Message extends \GO\Base\Model
 		$response['bcc'] = $recipientsAsString ? (string) $this->bcc :  $this->_convertRecipientArray($this->bcc->getAddresses());
 		$response['reply_to'] = (string) $this->reply_to;
 		$response['message_id'] = $this->message_id;
-		$response['date'] = $this->date;
 
 		$response['to_string'] = (string) $this->to;
 

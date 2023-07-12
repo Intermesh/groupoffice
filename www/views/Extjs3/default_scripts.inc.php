@@ -50,6 +50,7 @@ $settings['config']['checker_interval'] = (int) GO::config()->checker_interval;
 $settings['config']['remember_login'] = GO::config()->remember_login;
 $settings['config']['encode_callto_link'] = GO::config()->encode_callto_link;
 $settings['config']['login_message'] = GO::config()->login_message;
+$settings['config']['hideAbout'] = \GO::config()->hideAbout;
 $settings['config']['email_allow_body_search'] = GO::config()->email_allow_body_search;
 
 $settings['config']['lostPasswordURL'] = go()->getSettings()->lostPasswordURL;
@@ -114,7 +115,22 @@ if (isset(GO::session()->values['security_token']))
 </script>
 <?php
 $gouiScripts = [];
+$rootFolder = new Folder(GO::config()->root_path);
+$strip = strlen($rootFolder->getPath()) + 1;
 if ($cacheFile->exists()) {
+    $gouiScripts = go()->getCache()->get("gouiScripts");
+
+    if(!$gouiScripts) {
+	    $gouiScripts = [];
+	    $load_modules = GO::modules()->getAllModules(true);
+	    foreach ($load_modules as $module) {
+            $bundleFile = new File($module->moduleManager->path(). 'views/goui/dist/Index.js');
+            if($bundleFile->exists()) {
+                $gouiScripts[] = $bundleFile;
+            }
+        }
+    }
+
 	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='.$cacheFile->getModifiedAt()->format("U"). '"></script>';
 } else {
 
@@ -154,8 +170,6 @@ if ($cacheFile->exists()) {
 			} else {
 				$scriptsFile = false;
 				$modulePath = $module->moduleManager->path();
-				
-				
 			}
 			$pkg = $module->package ? $module->package : "legacy";
 			
@@ -169,29 +183,27 @@ if ($cacheFile->exists()) {
 			$bundleFile = new File($module->moduleManager->path(). 'views/goui/dist/Index.js');
 			if($bundleFile->exists()) {
 				$gouiScripts[] = $bundleFile;
-			} else {
-
-				if (!$scriptsFile || !file_exists($scriptsFile)) {
-					$scriptsFile = $modulePath . 'scripts.txt';
-					if (!file_exists($scriptsFile))
-						$scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
-                    $prefix = "";
-                    if (!file_exists($scriptsFile)) { // GOUI
-                      $scriptsFile = $module->moduleManager->path() . 'scripts.txt';
-                      $prefix = dirname(str_replace("\\", "/", get_class($module->moduleManager)))."/";
-                    }
-				}
-				
-				if (file_exists($scriptsFile)) {
-					$data = file_get_contents($scriptsFile);
-					$lines = array_map('trim', explode("\n", $data));
-					foreach ($lines as $line) {
-						if (!empty($line)) {
-							$scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
-						}
-					}
-				}
 			}
+
+
+            if (!$scriptsFile || !file_exists($scriptsFile)) {
+                $scriptsFile = $modulePath . 'scripts.txt';
+                if (!file_exists($scriptsFile))
+                    $scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
+
+                $prefix = "";
+            }
+
+            if (file_exists($scriptsFile)) {
+                $data = file_get_contents($scriptsFile);
+                $lines = array_map('trim', explode("\n", $data));
+                foreach ($lines as $line) {
+                    if (!empty($line)) {
+                        $scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
+                    }
+                }
+            }
+
 		}
 	}
 
@@ -207,8 +219,7 @@ if ($cacheFile->exists()) {
     $js = "";
   }
 
-	$rootFolder = new Folder(GO::config()->root_path);
-	$strip = strlen($rootFolder->getPath()) + 1;
+
 	foreach ($scripts as $script) {
 
 		if (go()->getDebugger()->enabled) {
@@ -239,6 +250,9 @@ if ($cacheFile->exists()) {
 //    fclose($fp);
   }
 //  echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
+
+
+	go()->getCache()->set("gouiScripts", $gouiScripts);
 }
 
 foreach($gouiScripts as $gouiScript) {
@@ -257,18 +271,6 @@ if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 ?>
 <script type="text/javascript">
 <?php
-
-//direct login with token
-if(isset($_POST['accessToken'])) { //defined in index.php
-	if(preg_match('/[^0-9a-z]/i', $_POST['accessToken'], $matches)) {
-    throw new \Exception("Invalid acccess token format: " .$_POST['accessToken']);
-	}
-	
-	?>	
-	go.User.setAccessToken('<?= $_POST['accessToken']; ?>');
-	<?php
-
-}
 
 //these parameter are passed by dialog.php. These are used to directly link to
 //a dialog.

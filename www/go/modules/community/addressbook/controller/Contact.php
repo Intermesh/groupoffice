@@ -1,17 +1,15 @@
 <?php
 namespace go\modules\community\addressbook\controller;
 
-use go\core\exception\Forbidden;
 use go\core\fs\Blob;
-use go\core\fs\File;
 use go\core\http\Exception;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\model\Acl;
+use go\core\util\ArrayObject;
 use GO\Email\Model\Account;
 use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\addressbook\model;
-use go\modules\community\addressbook\Module;
 
 /**
  * The controller for the Contact entity
@@ -48,24 +46,30 @@ class Contact extends EntityController {
 //		//merge sort on start to beginning of array
 //		return array_merge(['s.starred' => 'DESC'], $sort);
 //	}
-	
+
 	/**
 	 * Handles the Foo entity's Foo/query command
 	 *
 	 * @param array $params
+	 * @return ArrayObject
+	 * @throws InvalidArguments
 	 * @see https://jmap.io/spec-core.html#/query
 	 */
-	public function query($params) {
+	public function query(array $params): ArrayObject
+	{
 		return $this->defaultQuery($params);
 	}
-	
+
 	/**
 	 * Handles the Foo entity's Foo/get command
-	 * 
+	 *
 	 * @param array $params
+	 * @return ArrayObject
+	 * @throws \Exception
 	 * @see https://jmap.io/spec-core.html#/get
 	 */
-	public function get($params) {
+	public function get(array $params) : ArrayObject
+	{
 		return $this->defaultGet($params);
 	}
 	
@@ -73,50 +77,69 @@ class Contact extends EntityController {
 	 * Handles the Foo entity's Foo/set command
 	 * 
 	 * @see https://jmap.io/spec-core.html#/set
-	 * @param array $params
 	 */
-	public function set($params) {
+	public function set(array $params): ArrayObject
+	{
 		return $this->defaultSet($params);
 	}
-	
-	
+
+
 	/**
 	 * Handles the Foo entity's Foo/changes command
-	 * 
+	 *
 	 * @param array $params
+	 * @return ArrayObject
+	 * @throws InvalidArguments
 	 * @see https://jmap.io/spec-core.html#/changes
 	 */
-	public function changes($params) {
+	public function changes(array $params): ArrayObject
+	{
 		return $this->defaultChanges($params);
 	}
-	
-	public function export($params) {
+
+	/**
+	 * @throws InvalidArguments
+	 */
+	public function export(array $params): ArrayObject
+	{
 		return $this->defaultExport($params);
 	}
-	
-	public function import($params) {
-		if($this->checkPermissionsForAddressBook($params)) {
+
+	/**
+	 *
+	 * @param array $params
+	 * @return ArrayObject
+	 * @throws Exception
+	 */
+	public function import(array $params): ArrayObject
+	{
+		if ($this->checkPermissionsForAddressBook($params)) {
 			return $this->defaultImport($params);
 		}
+		return new ArrayObject([]);
 	}
 
 	/**
 	 * @param $params
-	 * @return array
+	 * @return ArrayObject
 	 */
-	public function exportColumns($params) {
+	public function exportColumns($params): ArrayObject
+	{
 		return $this->defaultExportColumns($params);
 	}
 	
-	public function importCSVMapping($params) {
+	public function importCSVMapping(array $params): ArrayObject
+	{
 		return $this->defaultImportCSVMapping($params);
 	}
 
-	public function merge($params) {
+	public function merge($params): ArrayObject
+	{
 		return $this->defaultMerge($params);
 	}
 
-	public function labels($params) {
+	public function labels($params): array
+	{
 		$tpl = <<<EOT
 {{contact.name}}
 [assign address = contact.addresses | filter:type:"postal" | first]

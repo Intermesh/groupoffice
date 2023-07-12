@@ -6,6 +6,7 @@ namespace GO\Files\Controller;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
 use go\core\http\Client;
+use go\core\http\Request;
 use go\core\http\Response;
 use go\core\util\StringUtil;
 use GO\Email\Model\Account;
@@ -343,7 +344,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		if(empty($params['tmp_file'])){
 			$account = Account::model()->findByPk($params['account_id']);
 			$imap = $account->openImapConnection($params['mailbox']);
-			if(!$imap->save_to_file($params['uid'], $file->path(), $params['number'], $params['encoding'], true)) {
+			if(!$imap->save_to_file($params['uid'], $file->path(), $params['number'], $params['encoding'])) {
 				throw new Exception("Could not save file from IMAP");
 			}
 		}else
@@ -358,11 +359,12 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$file->shortenFileName($maxLength);
 
 		$dbFile = $tmpFolder->hasFile($file->name());
-		if(!$dbFile) {
-			$dbFile = $tmpFolder->addFile($file->name(), true);
-		} else {
-			$dbFile->touch();
+		if($dbFile) {
+			File::$deleteInDatabaseOnly = true;
+			$dbFile->delete();
 		}
+		$dbFile = $tmpFolder->addFile($file->name(), true);
+
 		return ['success' => true, 'data' => $dbFile->getAttributes()];
 	}
 	
@@ -436,6 +438,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	
 
 	protected function actionDownload($params) {
+
 		\GO::session()->closeWriting();
 		
 		\GO::setMaxExecutionTime(0);
@@ -470,6 +473,13 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 				}
 			}
 
+			$ua_info = \donatj\UserAgent\parse_user_agent();
+			if($ua_info['browser'] == 'Safari' && $file->extension == 'webm' && !strstr(Request::get()->getUri(), 'webm')) {
+				//workaround webm bug in safari that needs a webm extension :(
+				header("Location: " . str_replace('index.php?', 'index.php/' . rawurlencode($file->name) . '?', Request::get()->getFullUrl()));
+				exit();
+			}
+
 
 			// Show the file inside the browser or give it as a download
 			$inline = true; // Defaults to show inside the browser
@@ -477,7 +487,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 				$inline = false;
 			}
 
-			\GO\Base\Util\Http::outputDownloadHeaders($file->fsFile, $inline, !empty($params['cache']));
+//			\GO\Base\Util\Http::outputDownloadHeaders($file->fsFile, $inline, !empty($params['cache']));
 			$file->open();
 
 			$this->fireEvent('beforedownload', array(
@@ -490,7 +500,15 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 				Module::logActiveRecord($file, 'download');
 			}
 
-			$file->fsFile->output();
+			//Supports range download
+			$coreFsFile = new \go\core\fs\File($file->fsFile->path());
+
+			// prevent html to render on same domain having access to all global JS stuff
+			if($coreFsFile->getContentType() == 'text/html') {
+				$inline = false;
+			}
+
+			$coreFsFile->output(true, !array_key_exists('cache', $params) || !empty($params['cache']), [], $inline);
 
 		}catch(NotFound $e) {
 			Response::get()->setStatus(404);

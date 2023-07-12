@@ -6,15 +6,19 @@ namespace go\core\orm;
 
 use Exception;
 use GO\Base\Db\ActiveRecord;
+use GO\Base\Exception\AccessDenied;
 use go\core\data\convert\AbstractConverter;
 use go\core\data\convert\Json;
 use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
+use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\model\Search;
 use go\core\orm\exception\SaveException;
+use go\core\orm\go\core\exception\NotFound;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
@@ -115,7 +119,7 @@ abstract class Entity extends Property {
 	/**
 	 * Fires when filtering on permission level.
 	 *
-	 * Normal behaviour can be overriden by returning false in your listener.
+	 * Normal behaviour can be overridden by returning false in your listener.
 	 *
 	 * @param Criteria $criteria
 	 * @param int $value
@@ -212,13 +216,17 @@ abstract class Entity extends Property {
 	 * $models = ModelWithDoublePK::findById("1-1");
 	 * ```
 	 *
-	 * @param string $id
+	 * @param string|null $id
 	 * @param string[] $properties
 	 * @param bool $readOnly
 	 * @return ?static
 	 */
-	public static final function findById(string $id, array $properties = [], bool $readOnly = false): ?Entity
+	public static final function findById(?string $id, array $properties = [], bool $readOnly = false): ?Entity
 	{
+		if($id == null) {
+			return null;
+		}
+
 		$query = static::internalFind($properties, $readOnly);
 		$keys = static::idToPrimaryKeys($id);
 		$query->where($keys);
@@ -234,11 +242,9 @@ abstract class Entity extends Property {
 	 *
 	 * @param string|int|null $id
 	 * @return bool
-	 * @throws Exception
 	 */
-	public static function exists($id): bool
+	public static function exists(?string $id): bool
 	{
-
 		if(empty($id)) {
 			return false;
 		}
@@ -395,22 +401,40 @@ abstract class Entity extends Property {
 		parent::internalValidate();
 	}
 
-  /**
-   * Saves the model and property relations to the database
-   *
-   * Important: When you override this make sure you call this parent function first so
-   * that validation takes place!
-   *
-   * @return boolean
-   * @throws Exception
-   */
+	/**
+	 * Saves the model and property relations to the database
+	 *
+	 * Important: When you override this make sure you call this parent function first so
+	 * that validation takes place!
+	 *
+	 * @return boolean
+	 * @throws Exception
+	 */
 	protected function internalSave(): bool
 	{
+		if (property_exists($this, 'filesFolderId') && count($this->attachments)) {
+			$folder = Folder::model()->findForEntity($this, false);
+			if (!isset($this->filesFolderId)) {
+				$this->filesFolderId = $folder->id;
+			}
+			foreach ($this->attachments as $attachment) {
+				$b = Blob::findById($attachment['blobId']);
+				if (!$b) {
+					throw new Exception("No blob found");
+				}
+				$dest = go()->getDataFolder()->getFile($folder->path . '/' . $b->name);
+				$dest->appendNumberToNameIfExists();
+				$f = $b->getFile();
+				$f->copy($dest);
+			}
+		}
+
+
 		if(!parent::internalSave()) {
 			App::get()->debug(static::class."::internalSave() returned false");
 			return false;
 		}
-		
+
 		//See \go\core\orm\CustomFieldsTrait;
 		if(method_exists($this, 'saveCustomFields')) {
 			if(!$this->saveCustomFields()) {
@@ -430,22 +454,12 @@ abstract class Entity extends Property {
 		return true;
 	}
 
-	// private $isDeleting = false;
-
-	// /**
-	//  * Check if this entity is being deleted.
-	//  * 
-	//  * @return bool
-	//  */
-	// public function isDeleting() {
-	// 	return $this->isDeleting;
-	// }
-
 	/**
 	 * Normalize a query value passed to delete()
 	 *
 	 * @param mixed $query
 	 * @return Query
+	 * @throws Exception
 	 */
 	protected static function normalizeDeleteQuery($query): Query
 	{
@@ -468,6 +482,10 @@ abstract class Entity extends Property {
 	/**
 	 * Delete the entity
 	 *
+	 * The statement is kept in {@see self::$lastDeleteStmt}
+	 *
+	 * So you can get the number with self::$lastDeleteStmt->rowCount();
+	 *
 	 * @param DbQuery|Entity|array $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
 	 *  Or pass ['id' => $id];
@@ -475,6 +493,7 @@ abstract class Entity extends Property {
 	 *  Or:
 	 *
 	 *  SomeEntity::delete($instance->primaryKeyValues());
+	 *
 	 *
 	 * @return boolean
 	 * @throws Exception
@@ -584,11 +603,11 @@ abstract class Entity extends Property {
 	 * Note: when overriding this function you also need to override applyAclToQuery() so that queries return only
 	 * readable entities.
 	 *
-	 * @final
 	 * @todo make final but there's a backwards compatibility override in model/Module.php
 	 * @return int
 	 */
-	public function getPermissionLevel() {
+	public function getPermissionLevel(): int
+	{
 
 		$permissionLevel = static::fireEvent(self::EVENT_PERMISSION_LEVEL, $this);
 
@@ -663,6 +682,7 @@ abstract class Entity extends Property {
 	 * routing short routes like "Note/get"
 	 *
 	 * @return EntityType
+	 * @throws Exception
 	 */
 	public static function entityType(): EntityType
 	{
@@ -779,7 +799,7 @@ abstract class Entity extends Property {
 			});
 
 		if (static::getMapping()->getColumn('modifiedAt')) {
-			$filters->addDate("modifiedAt", function (Criteria $criteria, $comparator, $value) {
+			$filters->addDateTime("modifiedAt", function (Criteria $criteria, $comparator, $value) {
 				$criteria->where('modifiedAt', $comparator, $value);
 			});
 		}
@@ -802,7 +822,7 @@ abstract class Entity extends Property {
 		}
 
 		if (static::getMapping()->getColumn('createdAt')) {
-			$filters->addDate("createdAt", function (Criteria $criteria, $comparator, $value) {
+			$filters->addDateTime("createdAt", function (Criteria $criteria, $comparator, $value) {
 				$criteria->where('createdAt', $comparator, $value);
 			});
 		}
@@ -833,7 +853,7 @@ abstract class Entity extends Property {
 			static::defineCustomFieldFilters($filters);
 		}
 
-		$filters->addDate('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
+		$filters->addDateTime('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
 			if (!$query->isJoined('comments_comment', 'comment')) {
 				$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
 			}
@@ -876,11 +896,22 @@ abstract class Entity extends Property {
 			if (!empty($value['id'])) {
 				$criteria->andWhere('fromId', '=', $value['id']);
 			}
+
+			$query->groupBy([$query->getTableAlias() . '.id']);
+		});
+
+		$filters->add("customrelations", function(Criteria $criteria, $value, Query $query) {
+			$cfRelationAlias = 'relation_' . uniqid();
+			$on =  $cfRelationAlias .'entityTypeId=' . static::entityType()->getId();
+			$query->join('core_customfields_relation', $cfRelationAlias,$on, 'LEFT');
+			if (!empty($value['id'])) {
+				$criteria->andWhere('entityId', '=', $value['id']);
+			}
+			$query->groupBy([$query->getTableAlias() . '.id']);
 		});
 
 		static::fireEvent(self::EVENT_FILTER, $filters);
-		
-		
+
 		return $filters;
 	}
 
@@ -892,13 +923,13 @@ abstract class Entity extends Property {
 	 */
 	private static function defineLegacyFilters(Filters $filters) {
 		if (static::getMapping()->getColumn('ctime')) {
-			$filters->addDate('createdAt', function (Criteria $criteria, $comparator, DateTime $value) {
+			$filters->addDateTime('createdAt', function (Criteria $criteria, $comparator, DateTime $value) {
 				$criteria->andWhere('ctime', $comparator, $value->format("U"));
 			});
 		}
 
 		if (static::getMapping()->getColumn('mtime')) {
-			$filters->addDate('modifiedAt', function (Criteria $criteria, $comparator, DateTime $value) {
+			$filters->addDateTime('modifiedAt', function (Criteria $criteria, $comparator, DateTime $value) {
 				$criteria->andWhere('mtime', $comparator, $value->format("U"));
 			});
 		}
@@ -961,6 +992,8 @@ abstract class Entity extends Property {
 	
 	/**
 	 * Return columns to search on with the "text" filter. {@see filter()}
+     *
+     * If you need joins you can override {@see search()}. You can access the joined table with ['alias.colName']
 	 * 
 	 * @return string[]
 	 */
@@ -1005,15 +1038,14 @@ abstract class Entity extends Property {
    */
 	protected static function search(Criteria $criteria, string $expression, DbQuery $query): Criteria
 	{
-
-		$columns = static::textFilterColumns();
-
 		if(static::useSearchableTraitForSearch($query)) {
-			SearchableTrait::addCriteria( $criteria, $query, $expression);
+			Search::addCriteria( $criteria, $query, $expression);
 			return $criteria;
 		}
 
-		if(empty($columns)) {
+    $columns = static::textFilterColumns();
+
+    if(empty($columns)) {
 			go()->warn(static::class . ' entity has no textFilterColumns() defined. The "text" filter will not work.');
 		}
 		
@@ -1091,7 +1123,7 @@ abstract class Entity extends Property {
    */
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
-		if(empty($sort)) {
+		if(empty($sort->getArray())) {
 			$sort->exchangeArray(static::defaultSort());
 		}
 
@@ -1200,7 +1232,7 @@ abstract class Entity extends Property {
 		switch($relation->type) {
 			case Relation::TYPE_MAP:
 				if(isset($entity->$name)) {
-					$this->$name = is_array($this->$name) ? array_merge($this->$name, $entity->$name) : $this->$name = $entity->$name;
+					$this->$name = is_array($this->$name) ? array_replace($this->$name, $entity->$name) : $this->$name = $entity->$name;
 				}
 				break;
 			case Relation::TYPE_HAS_ONE:
@@ -1397,22 +1429,8 @@ abstract class Entity extends Property {
 		$cacheKey = "refs-table-" . static::class;
 		$refs = go()->getCache()->get($cacheKey);
 		if($refs === null) {
-			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
-			$dbName = go()->getDatabase()->getName();
-			try {
-				go()->getDbConnection()->exec("USE information_schema");
-				//somehow bindvalue didn't work here
-				/** @noinspection SqlResolve */
-				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
-					"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . 
-					" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
 
-				$stmt = go()->getDbConnection()->getPDO()->query($sql);
-				$refs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			}
-			finally{
-				go()->getDbConnection()->exec("USE `" . $dbName . "`");	
-			}	
+			$refs = static::getMapping()->getPrimaryTable()->getReferences();
 
 			//don't find the entity itself
 			$refs = array_filter($refs, function($r) {
@@ -1453,6 +1471,17 @@ abstract class Entity extends Property {
 		}
 
 		return static::class;
+	}
+
+
+	/**
+	 * @var array
+	 */
+	protected $attachments = [];
+
+	public function setAttachments(array $attachments)
+	{
+		$this->attachments = $attachments;
 	}
 	
 }

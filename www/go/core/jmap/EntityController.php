@@ -3,6 +3,7 @@
 namespace go\core\jmap;
 
 use Exception;
+use go\core\ErrorHandler;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
 use go\core\acl\model\AclOwnerEntity;
@@ -16,6 +17,7 @@ use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
+use go\core\model\ImportMapping;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
@@ -35,6 +37,26 @@ abstract class EntityController extends Controller {
 	const EVENT_SET = "set";
 	const EVENT_BEFORE_GET = "beforeget";
 	const EVENT_GET = "get";
+	const EVENT_BEFORE_CAN_CREATE = "beforecanupdate";
+	const EVENT_BEFORE_CAN_UPDATE = "beforecanupdate";
+	const EVENT_BEFORE_CAN_DESTROY = "beforecanupdate";
+
+	/**
+	 * Can be used to return true or false and override the default {@see self::checkModulePermissions()}
+	 */
+	const EVENT_CHECK_PERMISSION = "checkpermission";
+
+
+	protected function checkModulePermissions(): bool
+	{
+		$ret = static::fireEvent(self::EVENT_CHECK_PERMISSION, $this);
+
+		if(isset($ret)) {
+			return $ret;
+		}
+
+		return parent::checkModulePermissions();
+	}
 
 	/**
 	 * The class name of the entity this controller is for.
@@ -148,7 +170,9 @@ abstract class EntityController extends Controller {
 //		} else{
 
 		$keys = $cls::getPrimaryKey(true);
-		if(count($keys) == 1) {
+		if(empty($keys)) {
+			throw new \LogicException($cls . " must have a primary key");
+		} else if(count($keys) == 1) {
 			$query->select($keys);
 		} else{
 			$query->select("CONCAT(" . implode(", '-', ", $keys) . ")");
@@ -260,7 +284,8 @@ abstract class EntityController extends Controller {
 
 			$response = new ArrayObject([
 				'accountId' => $p['accountId'],
-				'state' => $state,
+				'state' => $state, //deprecated
+				'queryState' => $state,
 				'ids' => $ids,
 				'notfound' => [],
 				'canCalculateUpdates' => false
@@ -425,6 +450,10 @@ abstract class EntityController extends Controller {
 		
 		if(!isset($params['ids'])) {
 			$query = $cls::find($params['properties'], static::$getReadOnly);
+
+			//filter permissions
+			$cls::applyAclToQuery($query, Acl::LEVEL_READ);
+
 		} else
 		{
 			$query = $cls::findByIds($params['ids'], $params['properties'], static::$getReadOnly);
@@ -467,10 +496,14 @@ abstract class EntityController extends Controller {
 
 		foreach($query as $e) {
 			if($this->canRead($e)) {
-				$arr = $e->toArray();
-				$arr['id'] = $e->id();
-				$unsorted[$arr['id']] = $arr;
-				$foundIds[] = $arr['id'];
+				try {
+					$arr = $e->toArray();
+					$arr['id'] = $e->id();
+					$unsorted[$arr['id']] = $arr;
+					$foundIds[] = $arr['id'];
+				} catch(\Throwable $e) {
+					ErrorHandler::logException($e);
+				}
 			}
 		}
 
@@ -780,6 +813,9 @@ abstract class EntityController extends Controller {
 	 */
 	protected function canUpdate(Entity $entity): bool
 	{
+		if($ret = self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity)) {
+			return $ret;
+		}
 		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE) && $this->checkAclChange($entity);
 	}
 
@@ -935,7 +971,7 @@ abstract class EntityController extends Controller {
    * Handles the Foo entity's getFooUpdates command
    *
    * @param array $params
-   * @return array
+   * @return ArrayObject
    * @throws InvalidArguments
    * @throws Exception
    */
@@ -947,6 +983,12 @@ abstract class EntityController extends Controller {
 		$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);
 
 		$result['accountId'] = $p['accountId'];
+
+		//TODO comply with new spec: https://jmap.io/spec-core.html#changes
+		// We can only get "changes" and not "updated" and "created".
+		if(isset($result['changed'])) {
+			$result['updated'] = $result['changed'];
+		}
 
 		return new ArrayObject($result);
 	}
@@ -1042,22 +1084,42 @@ abstract class EntityController extends Controller {
 	 */
 	protected function defaultImportCSVMapping(array $params): ArrayObject
 	{
-		$blob = Blob::findById($params['blobId']);
+		$entityClass = $this->entityClass();
+		$response = [
+			'checksum' => null,
+			'columnMapping' => null,
+			'updateBy' => null
+		];
+		if(!empty($params['blobId'])) {
+			$blob = Blob::findById($params['blobId']);
 
-		$extension = (new File($blob->name))->getExtension();
+			$extension = (new File($blob->name))->getExtension();
 
-		if($extension == 'csv') {
-			$file = $blob->getFile()->copy(File::tempFile($extension));
-			$file->convertToUtf8();
-		} else{
-			$file = $blob->getFile();
+			if ($extension == 'csv') {
+				$file = $blob->getFile()->copy(File::tempFile($extension));
+				$file->convertToUtf8();
+			} else {
+				$file = $blob->getFile();
+			}
+
+			$converter = $this->findConverter($extension);
+
+			$response['goHeaders'] = $converter->getEntityMapping();
+			$response['csvHeaders'] = $converter->getCsvHeaders($file);
+
+			$checkSum = md5(implode(',', array_map("trim", $response['csvHeaders'])));
+			$entityClass = $this->entityClass();
+			$mapping = ImportMapping::findByChecksum($entityClass::entityType()->getId(), $checkSum);
+		} else if(!empty($params['id'])) {
+			$mapping = ImportMapping::findById($params['id']);
 		}
 
-		$converter = $this->findConverter($extension);
-		
-		$response['goHeaders'] = $converter->getEntityMapping();
-		$response['csvHeaders'] = $converter->getCsvHeaders($file);
-		
+		if(!empty($mapping)) {
+			$response['id'] = $mapping->id;
+			$response['columnMapping'] = $mapping->getColumnMapping();
+			$response['updateBy'] = $mapping->updateBy;
+		}
+
 		if(!$response) {
 			throw new Exception("Invalid response from import convertor");
 		}
@@ -1116,13 +1178,13 @@ abstract class EntityController extends Controller {
    * Merge entities into one
    *
    * The first ID in the list will be kept after the merge.
-   * @param $params
-   * @return array
+   * @param array $params
+   * @return ArrayObject
    * @throws Forbidden
    * @throws InvalidArguments
    * @throws Exception
    */
-	protected function defaultMerge($params): ArrayObject
+	protected function defaultMerge(array $params): ArrayObject
 	{
 		if(empty($params['ids'])) {
 			throw new InvalidArguments('ids is required');

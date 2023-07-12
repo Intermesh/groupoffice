@@ -67,16 +67,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		this.setTitle(title);
 	},
-	setDialogValues: function(firstName, middleName, lastName,email) {
-		this.nameField.firstName.setValue(firstName);
-		this.nameField.middleName.setValue(middleName);
-		this.nameField.lastName.setValue(lastName);
-		var panel = this.emailAddressesField.items.get(0);
-		this.emailAddressesField.doLayout();
-		var emailField = panel.formField.items.items[0].items.items[1];
-		emailField.setValue(email);
-		//var example = panel.formField.find("name","email");//.setValue(firstName);
-	},
+
 	initFormItems: function () {
 
 		this.addPanel(this.businessPanel = new Ext.Panel({
@@ -210,9 +201,10 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								]
 							},
 							{
-								width: dp(152),
+								xtype:'container',
+								width: dp(136),
 								style: "padding-left: " + dp(16) + "px",
-								layout: "form",
+								//layout: "form",
 								items: [
 									this.avatarComp = new go.form.ImageField({			
 										name: 'photoBlobId'										

@@ -17,7 +17,7 @@
     "ext-calendar": "*",
     "ext-xml": "*",
     "ext-intl": "*",
-    "sabre/dav": "4.3.*",
+    "sabre/dav": "^4.4.0",
     "ext-json": "*",
     "ext-openssl": "*",
     "swiftmailer/swiftmailer": "^6.3.0",
@@ -36,8 +36,8 @@
     "guzzlehttp/guzzle": "@stable",
     "steverhoades/oauth2-openid-connect-server": "^2.3.0",
     "phpoffice/phpspreadsheet": "^1.15",
-    "lcobucci/jwt": "^3.4.0",
-    "firebase/php-jwt": "^5.2",
+    "lcobucci/jwt": "*",
+    "firebase/php-jwt": "^v6.0",
     "donatj/phpuseragentparser": "^1.4",
     "league/oauth2-google": "^4.0",
     "fakerphp/faker": "^1.19",
@@ -63,7 +63,7 @@
   "config": {
     "optimize-autoloader": true,
     "platform": {
-      "php": "7.3.0"
+      "php": "7.3"
     }
   }
 }

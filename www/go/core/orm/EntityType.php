@@ -56,6 +56,7 @@ class EntityType implements ArrayableInterface {
 	 * @var bool
 	 */
 	private $userModSeqIncremented = false;
+	private $enabled;
 
 
 	/**
@@ -77,6 +78,14 @@ class EntityType implements ArrayableInterface {
 	public function getClassName(): string
 	{
 		return $this->className;
+	}
+
+	/**
+	 * If the module is disabled this will return false
+	 * @return bool
+	 */
+	public function isEnabled() : bool {
+		return $this->enabled;
 	}
 	
 	/**
@@ -237,18 +246,23 @@ class EntityType implements ArrayableInterface {
 		}
 		
 		$records = $query
-						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
+						->select('e.*, m.name AS moduleName, m.package AS modulePackage, m.enabled')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where(['m.enabled' => true])
+//						->where(['m.enabled' => true])
 						->all();
 		
 		$i = [];
 		foreach($records as $record) {
 			$type = static::fromRecord($record);
 			$cls = $type->getClassName();
-			if(!class_exists($cls) || (!is_a($cls, Entity::class, true) && !is_a($cls, ActiveRecord::class, true))) {
-				go()->warn('Entity class "' . $cls .'" in database but it is not found on disk!');
+			try {
+				if (!class_exists($cls) || (!is_a($cls, Entity::class, true) && !is_a($cls, ActiveRecord::class, true))) {
+					go()->warn('Entity class "' . $cls . '" in database but it is not found on disk!');
+					continue;
+				}
+			} catch(Exception $e) {
+				go()->warn('Entity class "' . $cls . '" in database but there was an error loading it: ' . $e->getMessage());
 				continue;
 			}
 			$i[] = $type;
@@ -340,19 +354,19 @@ class EntityType implements ArrayableInterface {
 		$e = new static;
 		$e->id = $record['id'];
 		$e->name = $record['name'];
-    $e->clientName = $record['clientName'];
+        $e->clientName = $record['clientName'];
 		$e->moduleId = $record['moduleId'];
 		$e->highestModSeq = (int) $record['highestModSeq'];
 		$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
-
+		$e->enabled = $record['enabled'];
+		
 		if (isset($record['modulePackage'])) {
 			if($record['modulePackage'] == 'core') {
 				$e->className = 'go\\core\\model\\' . ucfirst($e->name);	
 				if(!class_exists($e->className)) {
 					$e->className = 'GO\\Base\\Model\\' . ucfirst($e->name);	
 				}
-			} else
-			{
+			} else {
 				$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
 			}
 		} else {			
@@ -382,11 +396,23 @@ class EntityType implements ArrayableInterface {
 			return true;
 		}
 
+		$maxChanges = 10000;
+
 		if(!is_array($changedEntities)) {
-			$changedEntities = $changedEntities->fetchMode(PDO::FETCH_ASSOC)->all();
+			//we have to select now because later these id's are gone from the db
+			$changedEntities = $changedEntities
+				->limit(++$maxChanges)
+				->fetchMode(PDO::FETCH_ASSOC)
+				->all();
 		}
 
 		if(empty($changedEntities)) {
+			return true;
+		}
+
+		if(count($changedEntities) == $maxChanges) {
+			// if there are more than the max resync the entity
+			$this->resetSyncState();
 			return true;
 		}
 
@@ -476,12 +502,13 @@ class EntityType implements ArrayableInterface {
 	 * We do it like this so these entries are written outside of transactions. Otherwise
 	 * this will lead to concurrency problems with deadlocks in mysql.
 	 *
+	 * @param int $minChanges Only do it if there are more changes than this number
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function push() {
+	public static function push(int $minChanges = 1) {
 
-		if(empty(self::$changes)) {// && empty(self::$changeQueries)) {
+		if(count(self::$changes) < $minChanges) {
 			return;
 		}
 
@@ -522,6 +549,8 @@ class EntityType implements ArrayableInterface {
 			}, $changes));
 		}
 
+		$allChanges = array_values($allChanges);
+
 		go()->debug("Pushing " . count($allChanges). " JMAP sync changes");
 
 		foreach(self::splitRecords($allChanges) as $chunk) {
@@ -557,7 +586,7 @@ class EntityType implements ArrayableInterface {
 		go()->getDbConnection()
 			->update(
 				"core_entity",
-				['highestModSeq' => null],
+				['highestModSeq' => 0],
 				Query::normalize(["id" => $this->id])
 					->tableAlias('entity')
 			)->execute(); //mod seq is a global integer that is incremented on any entity update
@@ -735,12 +764,47 @@ class EntityType implements ArrayableInterface {
 	{
 		$acl = new Acl();
 		$acl->usedIn = 'core_entity.defaultAclId';
+		$acl->entityTypeId = $this->id;
 		$acl->ownedBy = 1;
 		if(!$acl->save()) {
 			throw new SaveException($acl);
 		}
 		
 		return $acl;
+	}
+
+	/**
+	 * @throws SaveException|Exception
+	 */
+	public static function checkDatabase() {
+
+		$all = static::findAll();
+
+		foreach($all as $type) {
+
+			if($type->isAclOwner()) {
+				$defaultAclId = $type->getDefaultAclId();
+				if (!$defaultAclId) {
+					return;
+				}
+				$acl = Acl::findById($defaultAclId);
+
+				$acl->usedIn = 'core_entity.defaultAclId';
+				$acl->entityTypeId = $type->id;
+				$acl->ownedBy = 1;
+				if (!$acl->save()) {
+					throw new SaveException($acl);
+				}
+			} else{
+				if($type->defaultAclId) {
+					$type->defaultAclId = null;
+					go()->getDbConnection()->update('core_entity',
+						['defaultAclId' => null], ['id' => $type->getId()])
+						->execute();
+
+				}
+			}
+		}
 	}
 
 	/**

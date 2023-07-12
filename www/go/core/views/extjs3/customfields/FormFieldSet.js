@@ -23,7 +23,12 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 		var fields = go.customfields.CustomFields.getFormFields(this.fieldSet.id);
 
-
+		// add field sets that should be added to this tab
+		go.customfields.CustomFields.getFieldSets(this.fieldSet.entity).forEach((fs) => {
+			if( fs.parentFieldSetId == this.fieldSet.id) {
+				fields.push(new go.customfields.FormFieldSet({fieldSet: fs, layout: "column"}));
+			}
+		});
 
 		var c = fields.length;
 		var fieldsPerColumn = Math.floor(c / this.fieldSet.columns);
@@ -41,7 +46,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			me = this,
 			max = fieldsInFirstColumn;
 
-
 		fields.forEach(function (field) {
 			currentCol.items.push(field);
 			colItemCount++;
@@ -52,15 +56,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				max = fieldsPerColumn;
 			}
 		});
-
 		items.push(currentCol);
-
-
-		go.customfields.CustomFields.getFieldSets(this.fieldSet.entity).forEach((fs) => {
-			if( fs.parentFieldSetId == this.fieldSet.id) {
-				items.push(new go.customfields.FormFieldSet({fieldSet: fs}));
-			}
-		});
 		
 		Ext.apply(this, {
 			title: this.fieldSet.name,
@@ -80,7 +76,52 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			});
 			}, this);
 
-		go.customfields.FormFieldSet.superclass.initComponent.call(this);
+		this.on('render', () => {
+			this.formTabPanel = this.findParentByType('tabpanel');
+			const form = this.findParentByType("form");
+			if(!form || form.changeListenersAdded2) return;
+			form.changeListenersAdded2 = true;
+			if (form.getXType() == "entityform") {
+				form.on("setvalues",  () => {
+					this.load(form, form.getValues(), fields);
+				});
+			} else {
+				form?.getForm().on("beforeaction", (form, action) => {
+					if (action.type === "load") {
+						this.load(form, form.getFieldValues(), fields);
+					}
+				});
+			}
+		});
+
+		this.supr().initComponent.call(this);
+	},
+
+	load(form, values, customFields) {
+
+		if(this.fieldSet.collapseIfEmpty) {
+			isModified = false;
+			for (const field of customFields) {
+				const name = field.name?.replace('customFields.', '');
+				if (name) {
+					if (!(name in values.customFields) || values.customFields[name] == field.value ||
+						(Ext.isEmpty(values.customFields[name]) && Ext.isEmpty(field.value))) {
+						// not modified
+					} else {
+						isModified = true;
+						break;
+						//console.log('modified', name, field.value, '!=', values.customFields[name]);
+					}
+				}
+			}
+			if(!isModified)
+				this.collapse();
+			else
+				this.expand();
+		}
+		// for(const name in values.customFields) {
+		// 	if(customFields)
+		// }
 	},
 
 	setupFilter: function() {
@@ -95,7 +136,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		}
 
 		var me = this;
-
 		//Add a beforeaction event listener that will send the custom field data JSON encoded.
 		//The old framework will use this to save custom fields.
 		if (!form.changeListenersAdded) {
@@ -103,7 +143,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			form.changeListenersAdded = true;
 
 			if (form.getXType() == "entityform") {
-
 				form.on("setvalues", function () {
 					this.filter(form.getValues());
 					// form.isValid();
@@ -114,7 +153,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				}, this);
 			} else {
 				//Legacy code
-
 				form.getForm().on("beforeaction", function (form, action) {
 					if (action.type !== "submit") {
 						return true;
@@ -156,6 +194,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			});
 
 			form.on("setvalues", function () {
+
 				this.filter(form.getValues());
 			}, this);
 
@@ -194,7 +233,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	 * @returns {undefined}
 	 */
 	filter: function (entity) {
-
 		for (var name in this.fieldSet.filter) {
 
 			var v = this.fieldSet.filter[name];
@@ -232,6 +270,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			setDisabled(this, !v);
 		} else{
 			setDisabled(this.ownerCt, !v);
+			this.formTabPanel = this.formTabPanel || this.findParentByType('tabpanel');
 			if(v) {
 			 	this.formTabPanel.unhideTabStripItem(this.ownerCt);
 			} else

@@ -32,7 +32,7 @@ go.emailtemplate.TemplateFieldset = Ext.extend(Ext.form.FieldSet, {
 					name: 'subject',
 					fieldLabel: t("Subject")
 				}, {
-					anchor: "100% -" + dp(96),
+					anchor: "100% -" + (this.noName ? dp(150) : dp(200)),
 					xtype: 'xhtmleditor',
 					plugins: [new GO.plugins.HtmlEditorImageInsert()],
 					name: 'body',

@@ -115,15 +115,6 @@ class Store extends AbstractStore {
 		  }
         foreach ($deleteIds as $modelPk) {
 
-//          $deleteModelName = $this->_stmt->model->className();
-//
-//          //If this is a MANY_MANY relational query. For example when you're displaying the users in a 
-//          // group in a grid then you don't want to delete the \GO\BAse\Model\User but the linking table record \GO\Base\MOdel\UserGroup
-//          if (!empty($this->_stmt->relation)) {
-//            $relations = $this->stmt->model->relations();
-//            if (isset($relations[$this->stmt->relation]['linksModel']))
-//              $deleteModelName = $relations[$this->stmt->relation]['linksModel'];
-//          }
           $staticModel = call_user_func(array($deleteModelName,'model'));
           if($extraPkValue){           
             

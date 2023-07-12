@@ -54,7 +54,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					return '<div class="user">' + go.util.avatar(value, record.data.avatarId)  +
 						'<div class="wrap">'+
 						'<div class="displayName">' + value + '</div>' +
-						'<small class="username">' + Ext.util.Format.htmlDecode(record.get('username')) + '</small>' +
+						'<small class="username">' + Ext.util.Format.htmlEncode(record.get('username')) + '</small>' +
 						'</div>'+
 						'</div>';
 				}
@@ -74,7 +74,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				header: t('Modified at'),
 				width: dp(160),
 				sortable: true,
-				dataIndex: 'createdAt',
+				dataIndex: 'modifiedAt',
 				hidden: true
 			},
 			{

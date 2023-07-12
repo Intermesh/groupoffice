@@ -237,11 +237,14 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 			if(!value) {
 				resolve(me);
-				return go.form.ComboBox.superclass.setValue.call(me, value);
+				go.form.ComboBox.superclass.setValue.call(me, value);
+				me.clearInvalid();
+
+				return;
 			}
 
 			//create record from entity store if not exists
-			if (me.store.entityStore && me.store.entityStore.entity && !me.findRecord(me.valueField, value)) {
+			if (me.store && me.store.entityStore && me.store.entityStore.entity && !me.findRecord(me.valueField, value)) {
 
 				me.value = value;
 
@@ -258,6 +261,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 						go.form.ComboBox.superclass.setValue.call(me, value);
 
+						me.clearInvalid();
+
 						me.hasFocus = origHasFocus;
 						resolve(me);
 					}, me, {single: true});
@@ -266,6 +271,12 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 					me.store.loadData({records:[entity]}, false);
 
 				}).catch(function(e) {
+
+					if(me.isDestroyed) {
+						resolve(me);
+						return;
+
+					}
 					console.error(e);
 					var data = {};
 					//console.warn("Invalid entity ID '" + value + "' for entity store '" + me.store.entityStore.entity.name + "'");
@@ -309,6 +320,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				}
 				Ext.form.ComboBox.superclass.setValue.call(me, text);
 				me.value = value;
+				me.clearInvalid();
 
 				resolve(me);
 				return me;
@@ -326,6 +338,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	},
 
 	getParams: function (text) {
+
 		//override to add 'text' filter for JMAP API
 		this.store.setFilter('combotext', {text: text});
 

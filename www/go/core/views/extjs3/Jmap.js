@@ -10,6 +10,8 @@ go.Jmap = {
 
 	paused: 0,
 
+	requestTimeout: 180000,
+
 	/**
 	 * Enable for XDEBUG profiling
 	 */
@@ -224,7 +226,15 @@ go.Jmap = {
 							entities.column("name").join(',');
 			
 			var source = new EventSource(url), me = this;
-			
+
+			source.addEventListener('msg', function(e) {
+				go.Notifier.flyout({title:"New message",description: event.data, time: 5000});
+			});
+
+			source.addEventListener('exception', function(e) {
+				console.error(e);
+			});
+
 			source.addEventListener('state', function(e) {
 
 				var data = JSON.parse(e.data);
@@ -249,25 +259,6 @@ go.Jmap = {
 					}
 				}
 			}, false);
-
-			// source.addEventListener('alert', function(e) {
-			// 	var data = JSON.parse(e.data);
-			// 	go.Db.store(data.entityType).single(data.entityId).then(function(entity) {
-			// 		go.Notifier.msg({
-			// 			title: t(data.entityType),
-			// 			html: entity.title || entity.name || entity.subject || entity.description,
-			// 			buttons: [{
-			// 				text: t('Open'),
-			// 				handler: function() {
-			// 					var window = new go.links.LinkDetailWindow({entity:data.entityType});
-			// 					window.load(data.entityId).show();
-			// 				}
-			// 			}]
-			// 		});
-			// 	});
-			//
-			//
-			// },false);
 
 			window.addEventListener('beforeunload', () => {
 				console.log("Closing SSE")
@@ -395,6 +386,7 @@ go.Jmap = {
 		}
 
 		Ext.Ajax.request({
+			timeout: this.requestTimeout,
 			url: this.getApiUrl(),
 			method: 'POST',
 			jsonData: this.requests,
@@ -450,6 +442,13 @@ go.Jmap = {
 					console.warn('Connection aborted', response);
 					return;
 				}
+
+				if(response.isTimeout || response.status == 0) {
+					console.error(response);
+
+					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+					return;
+				}
 				console.error('server-side failure with status code ' + response.status);
 				console.error(response);
 
@@ -458,8 +457,16 @@ go.Jmap = {
 					this.requestOptions[clientCallId].reject({message: response.responseText});
 					delete this.requestOptions[clientCallId];
 				}
-				
-				Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + response.responseText);
+				if(response.status !== 504) {// gateway timeout
+
+					let msg = t("Sorry, an error occurred");
+
+					if(response.responseText) {
+						msg += ": " + response.responseText;
+					}
+
+					GO.errorDialog.show(msg);
+				}
 				
 			}
 		});

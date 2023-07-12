@@ -1,13 +1,13 @@
 /* global go, Ext */
 
-/** 
+/**
  * Copyright Intermesh
- * 
+ *
  * This file is part of Group-Office. You should have received a copy of the
  * Group-Office license along with Group-Office. See the file /LICENSE.TXT
- * 
+ *
  * If you have questions write an e-mail to info@intermesh.nl
- * 
+ *
  * @version $Id: MainPanel.js 19225 2015-06-22 15:07:34Z wsmits $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
@@ -18,20 +18,20 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 	entity: null,
 
 	createFieldSetDialog: function () {
-		
+
 		var e = go.Entities.get(this.entity)
-		
+
 		if(e.customFields && e.customFields.fieldSetDialog) {
 			var cls = eval(e.customFields.fieldSetDialog);
 			console.log(cls);
 			return new cls;
-		} 
+		}
 
 		return new go.customfields.FieldSetDialog();
 	},
 
 	initComponent: function () {
-	
+
 		this.plugins = [new go.grid.plugin.Sortable(this.onSort, this, this.isDropAllowed)];
 
 		this.store = new Ext.data.ArrayStore({
@@ -50,7 +50,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 		go.Db.store("FieldSet").on("changes", this.onFieldSetChanges, this);
 		go.Db.store("Field").on("changes", this.onFieldChanges, this);
-		
+
 		this.on('destroy', function() {
 			go.Db.store("FieldSet").un("changes", this.onFieldSetChanges, this);
 			go.Db.store("Field").un("changes", this.onFieldChanges, this);
@@ -194,10 +194,10 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 		this.on('render', function () {
 			this.load();
 		}, this);
-		
+
 		this.on('rowdblclick', this.onRowDblClick, this);
 	},
-	
+
 	onFieldSetChanges : function (store, added, changed, destroyed) {
 			if (this.loading || !this.rendered) {
 				return;
@@ -231,14 +231,14 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					}
 				});
 			});
-			
+
 			if(destroyed.length) {
 				this.store.remove(this.store.getRange().filter(function(r) {
 					return destroyed.indexOf(r.data.fieldSetId) > -1;
 				}));
 			}
 		},
-	
+
 	onFieldChanges : function (store, added, changed, destroyed) {
 			if (this.loading || !this.rendered) {
 				return;
@@ -276,7 +276,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					}
 				});
 			});
-			
+
 			if(destroyed.length) {
 				this.store.remove(this.store.getRange().filter(function(r) {
 					return destroyed.indexOf(r.data.fieldId) > -1;
@@ -284,7 +284,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			}
 
 		},
-	
+
 	onRowDblClick : function(grid, rowIndex, e) {
 		this.edit(this.store.getAt(rowIndex));
 	},
@@ -312,8 +312,8 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				//Quick and dirty way: reload on fieldset reorder so fields are moved.
 				this.load();
 			}, this);
-			
-			
+
+
 		} else
 		{
 			var fieldRecords = this.store.getRange().filter(function (r) {
@@ -394,7 +394,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 		this.moreMenu.showAt(e.getXY());
 	},
-	
+
 	edit: function (record) {
 		if (record.data.isFieldSet) {
 			var dlg = this.createFieldSetDialog();
@@ -410,14 +410,16 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 			let items = [], types = go.customfields.CustomFields.getTypes();
 
-			for (var name in types) {
+			for (const name in types) {
+				if(types[name].hideInNewFieldTypes) {
+					continue;
+				}
 				items.push({
 					iconCls: types[name].iconCls,
 					text: types[name].label,
 					type: types[name],
-					handler: function (item) {
-						console.warn(item);
-						var dlg = item.type.getDialog();
+					handler: (item) => {
+						const dlg = item.type.getDialog();
 						dlg.setValues({
 							fieldSetId: this.addFieldMenu.record.data.fieldSetId,
 							type: item.type.name,
@@ -425,8 +427,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 						});
 
 						dlg.show();
-					},
-					scope: this
+					}
 				});
 			}
 
@@ -477,6 +478,8 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 	load: function () {
 
+		const ss = this.getView().getScrollState();
+
 		this.loading = true;
 		this.store.removeAll();
 
@@ -488,7 +491,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				entities: [this.entity]
 			}
 		}, function (response) {
-			
+
 			if(!response.ids.length) {
 				this.store.loadData([], false);
 				this.loading = false;
@@ -548,6 +551,9 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 						{field: 'sortOrder', direction: 'ASC'}
 					]);
 					this.loading = false;
+
+					this.getView().restoreScroll(ss);
+
 				}, this);
 			}, this);
 

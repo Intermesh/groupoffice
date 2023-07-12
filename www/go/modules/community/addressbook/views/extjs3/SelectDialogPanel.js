@@ -145,38 +145,94 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 					})
 				]
 			})
-		});	
-		
+		});
+
+		this.selectedAbs = {};
 		//because the root node is not visible it will auto expand on render.
 		this.addressBookTree.getRootNode().on('expand', function (node) {
-			//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
-			this.addressBookTree.getSelectionModel().select(node.firstChild);
+			var abSettings = go.User.addressBookSettings, abNode = null;
+
+			if (abSettings.startIn == "remember" && abSettings.lastAddressBookId > 0) {
+				abNode = node.findChild('id', 'AddressBook-' + abSettings.lastAddressBookId);
+			} else {
+				abNode = node.findChild('id', 'AddressBook-' + abSettings.defaultAddressBookId);
+			}
+			if (abNode) {
+				this.addressBookTree.getSelectionModel().select(abNode);
+			} else {
+				//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
+				this.addressBookTree.getSelectionModel().select(node.firstChild);
+			}
+		}, this);
+
+		this.addressBookTree.on('checkchange', function (node, checked) {
+			this.grid.store.setFilter('groups', null);
+			if (node) {
+				this.doNotSelected = true;
+				this.addressBookTree.getSelectionModel().select(node);
+			}
+			this.selectAddressbook(node.attributes.data.id, checked);
+		},this );
+
+		this.addressBookTree.getSelectionModel().on('selectionchange', function (sm, node) {
+			if (!node || this.doNotSelected) {
+				this.doNotSelected = false;
+				return;
+			}
+			if (node.attributes.entity.name === "AddressBook") {
+				this.grid.store.setFilter('groups', null);
+				this.deselectNodes();
+				node.ui.checkbox.checked = true;
+				this.selectAddressbook(node.attributes.data.id, true);
+			} else { // treenode is group
+				this.deselectNodes();
+				node.parentNode.ui.checkbox.checked = true;
+				this.selectAddressbook(node.parentNode.attributes.data.id, true);
+
+				this.grid.store.setFilter('groups', {groupId: node.attributes.data.id, addressbookId: node.parentNode.attributes.data.id} );
+				this.grid.store.load()
+			}
+
 		}, this);
 
 		//load the grid on selection change.
-		this.addressBookTree.getSelectionModel().on('selectionchange', function (sm, node) {
-			
-			if (!node) {
-				return;
-			}
-
-			this.grid.store.setFilter("starred", null);
-
-			if (node.id === "all") {
-				this.setAddressBookId(null);
-			} else if (node.id === "starred") {
-
-				this.grid.store.setFilter("starred", {starred: true});
-				this.setAddressBookId(null);
-			} else if (node.attributes.entity.name === "AddressBook") {
-				this.setAddressBookId(node.attributes.data.id);
-			} else
-			{
-				this.setGroupId(node.attributes.data.id, node.attributes.data.addressBookId);
-			}
-		}, this);
+		// this.addressBookTree.getSelectionModel().on('selectionchange', function (sm, node) {
+		//
+		// 	if (!node) {
+		// 		return;
+		// 	}
+		//
+		// 	this.grid.store.setFilter("starred", null);
+		//
+		// 	if (node.id === "all") {
+		// 		this.setAddressBookId(null);
+		// 	} else if (node.id === "starred") {
+		//
+		// 		this.grid.store.setFilter("starred", {starred: true});
+		// 		this.setAddressBookId(null);
+		// 	} else if (node.attributes.entity.name === "AddressBook") {
+		// 		this.setAddressBookId(node.attributes.data.id);
+		// 	} else
+		// 	{
+		// 		this.setGroupId(node.attributes.data.id, node.attributes.data.addressBookId);
+		// 	}
+		// }, this);
 		
 		return this.addressBookTree;
+	},
+
+	deselectNodes() {
+		this.selectedAbs = {};
+		this.addressBookTree.getRootNode().childNodes.forEach(node => {node.ui.checkbox.checked = false});
+	},
+
+	selectAddressbook(id, enabled) {
+		this.selectedAbs[id] = enabled;
+
+		const abIds = Object.keys(this.selectedAbs)
+			.filter(k=> this.selectedAbs[k])
+			.map(Number)
+		this.setAddressBookIds(abIds);
 	},
 	
 	createFilterPanel: function () {
@@ -237,11 +293,15 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 		});
 	},
 	
-	setAddressBookId: function (addressBookId) {		
-		this.grid.store.setFilter("addressbooks", addressBookId ? {
-			addressBookId: addressBookId
-		} : null);
-		
+	setAddressBookIds: function ( addressBookIds) {
+		if(!Array.isArray(addressBookIds) || addressBookIds.length === 0) {
+			this.grid.store.setFilter("addressbooks", null);
+		} else {
+			this.addressBookTree.rememberLastAddressboek(addressBookIds[0]);
+			this.grid.store.setFilter("addressbooks", {
+				addressBookId: addressBookIds
+			});
+		}
 
 		this.search(this.searchField.getValue());				
 	},

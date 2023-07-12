@@ -795,18 +795,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$response['cm_state']=isset($folder->cm_state) && !empty($folder->apply_state) ? $folder->cm_state : "";
 		$response['may_apply_state']=\GO\Base\Model\Acl::hasPermission($folder->getPermissionLevel(), \GO\Base\Model\Acl::MANAGE_PERMISSION);
 
-//      if($response["lock_state"]){
-//          $state = json_decode($response["cm_state"]);
-//
-//          if(isset($state->sort)){
-//              $params['sort']=$state->sort->field;
-//              $params['dir']=$state->sort->direction;
-//          }
-//      }
-
-
-
-
 		$store = \GO\Base\Data\Store::newInstance(Folder::model());
 
 		//set sort aliases
@@ -927,6 +915,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$params['delete_keys'] = json_encode($ids['files']);
 			$store->processDeleteActions($params, "GO\Files\Model\File");
+			$this->fireEvent('afterListDeleteActionFolder', [$params]);
 		}
 	}
 
@@ -1316,13 +1305,15 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		$response['success'] = true;
 
-		if (!isset($params['overwrite']))
+		if (!isset($params['overwrite'])) {
 			$params['overwrite'] = 'ask'; //can be ask, yes, no
+		}
 
 		$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
 
-		if (!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION))
+		if (!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
 			throw new \GO\Base\Exception\AccessDenied();
+		}
 
 		if(isset($params['blobs'])) {
 			$paths = json_decode($params['blobs']);
@@ -1333,7 +1324,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		$this->processPaths($paths, $destinationFolder, $params['overwrite'], $response);
-
+		$this->fireEvent('afterUpload', [$params, $destinationFolder]);
 		return $response;
 	}
 
@@ -1372,9 +1363,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						}
 					}
 					$filename = $blob->name;
-					$removeBlob = $this->removeBlob($blob->id);
-				}else{
-					$removeBlob = false;
+
 				}
 
 				if ($file->exists()) {
@@ -1390,14 +1379,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								$params['overwrite'] = 'ask';
 							case 'yestoall':
 								//we dont want overwrite file in no case
-								if(!$removeBlob || $this->blobIsNeededAgain($removeBlob->id, $paths)) {
-									$newFile = GO\Base\Fs\File::tempFile();
-									$file = $file->copy($newFile->parent(), $newFile->name());
-								}
+								$newFile = GO\Base\Fs\File::tempFile();
+								$file = $file->linkOrCopy($newFile);
+
 								$existingFile->replace($file);
-								if($removeBlob) {
-									$removeBlobs[] = $removeBlob->id;
-								}
+
 								break;
 							case 'no':
 								$params['overwrite'] = 'ask';
@@ -1405,23 +1391,17 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								continue 2;
 						}
 					} else {
-						if(!$removeBlob || $this->blobIsNeededAgain($removeBlob->id, $paths)) {
-							$newFile = GO\Base\Fs\File::tempFile();
-							$file = $file->copy($newFile->parent(), $newFile->name());
-						}
+						$newFile = GO\Base\Fs\File::tempFile();
+						$file = $file->linkOrCopy($newFile);
+
 						$destinationFolder->addFileSystemFile($file, false, $filename);
-						if($removeBlob) {
-							$removeBlobs[] = $removeBlob->id;
-						}
+
 					}
 					$response['success'] = true;
 				}
 			}
 		}
 
-		if(count($removeBlobs)) {
-			//Blob::delete(['id' => $removeBlobs]);
-		}
 	}
 
 	/**
@@ -1750,7 +1730,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 				$response['images'][]=array(
 					"name"=>$file->name,
-					"download_path"=>$file->downloadUrl,
+					"download_path"=>$file->getDownloadURL(false),
 					"src"=>$file->getThumbUrl($thumbParams)
 				);
 			}

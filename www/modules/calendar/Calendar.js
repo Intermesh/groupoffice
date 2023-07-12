@@ -839,8 +839,8 @@ GO.calendar.MainPanel = function(config){
 	config.items=[
 		this.westPanel = new Ext.Panel({
 			region:'west',
-			width: dp(224),
-			boxMinWidth: dp(224),
+			width: dp(232),
+			boxMinWidth: dp(232),
 			stateId: 'cal-west',
 			cls:'go-sidenav',
 			split:true,
@@ -849,7 +849,7 @@ GO.calendar.MainPanel = function(config){
 			new Ext.Panel({
 				region:'north',
 				border:true,
-				height:dp(241),
+				height:dp(256),
 				split:false,
 				baseCls:'x-plain',
 				layout: {
@@ -2228,7 +2228,7 @@ go.Modules.register("legacy", 'calendar', {
 				linkDetailCards: function() {
 					var forth = new go.links.DetailPanel({
 						link: {
-							title: t("Forthcoming events"),
+							title: t("Forthcoming appointments"),
 							iconCls: 'icon ic-event orange',
 							entity: "Event",
 							filter: null
@@ -2239,7 +2239,7 @@ go.Modules.register("legacy", 'calendar', {
 
 					var past = new go.links.DetailPanel({						
 						link: {
-							title: t("Past events"),
+							title: t("Past appointments"),
 							iconCls: 'icon ic-event orange',
 							entity: "Event",
 							filter: null
@@ -2371,19 +2371,11 @@ GO.calendar.openCalendar = function(displayConfig){
 			GO.calendar.openState=displayConfig;
 			mp.show();
 		}
-//	}else
-//	{
-//		GO.calendar.openState=displayConfig;
-//		GO.mainLayout.on('render', function(){
-//			 GO.mainLayout.openModule('calendar');
-//		});
-//	}
-	
 }
 
 
 GO.calendar.handleMeetingRequest=function(responseResult){
-	
+
 	if (responseResult.askForMeetingRequestForNewParticipants) {
 		Ext.Msg.show({
 			title:t("Notify participants?", "calendar"),

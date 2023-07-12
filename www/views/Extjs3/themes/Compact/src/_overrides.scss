@@ -1,33 +1,40 @@
-body{
-  background-color: $cHeaderBg;
-}
-
 .x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
-  border: 1px solid color($fg,'line');
-  background-color: color($grey, 50);
-  border-radius: 4px;
-  .x-btn-group & {
-    border-radius: 0;
-  }
-  &:hover{
-    @extend .z1;
-    //background-color: $cHover;
-  }
-  &.x-btn-click{
-    box-shadow:none;
-    .x-btn-text{color:inherit;}
-  }
-  &.x-btn-focus {
-    @include var(background-color, c-primary-tp);
-  }
-  &.primary, &.raised {
-    color: white;
-    @include var('background-color', c-secondary);
-    //&:hover{ background-color: #387002;}
-  }
-  &.accent {
-    @include var('background-color', c-accent);
-  }
+	background-color: color($bg, 'button');
+	.x-btn-group & {
+	 border-radius: 0;
+	}
+	&:hover{
+	 @extend .z1;
+	 //background-color: $cHover;
+	}
+	&.x-btn-click{
+	 box-shadow:none;
+	 .x-btn-text{color:inherit;}
+	}
+	&.x-btn-focus {
+	 @include var(background-color, c-primary-tp);
+	}
+	&.primary, &.raised {
+		color: white;
+		background-color: var(--c-secondary);
+		@include var('background-color', c-secondary);
+	}
+	&.accent {
+	  background-color: var(--c-accent);
+	}
+}
+.go-main-tab-panel.x-tab-panel > .x-tab-panel-header .x-tab-strip > li {
+	padding: 0 dp(20);
+}
+.x-menu {
+	border: 1px solid var(--fg-disabled);
+}
+.x-menu-sep {
+	margin-left: dp(16);
+	margin-right: dp(16);
+}
+.x-menu-item-text, .go-sidenav *, .go-nav * {
+	@extend %font-menu;
 }
 .x-toolbar .xtb-sep{
   margin-left:0;
@@ -39,7 +46,7 @@ body{
 
 .x-btn-group{
   //@extend .z1;
-  border:1px solid color($fg,'line');
+  border:1px solid var(--fg-divider);
   .x-btn {
     border: 0;
   }
@@ -55,27 +62,21 @@ body{
     border: 0;
   }
 }
-
-.x-btn.primary .x-btn-text, .x-date-mp-btns button.primary .x-btn-text {
-  color: white;
+.x-window{
+	border: 1px solid var(--fg-divider);
+	&-header-text {
+		height: dp(40);
+		line-height:dp(40);
+	}
+	&-header .x-tool {
+		margin:dp(6) 0;
+	}
 }
 
-.x-btn-icon button {
-  min-height:1px;
-  &::before{
-    top: 0;
-  }
-}
 #global-search-panel .x-btn {
   background-color: transparent;
   border: none;
   box-shadow: none;
-}
-#search_query {
-  padding-top: 14px;
-}
-.x-date-picker {
-  width: dp(264);
 }
 
 .go-form-group .x-panel-bbar .x-btn-text {
@@ -90,82 +91,8 @@ body{
   color: inherit;
 }
 
-.x-tab-strip > li {
-  padding: 0 dp(16);
-}
-
 .cal-display-panel {
   background-color: color($bg, 'card');
-}
-
-.notificationArea, .notifications {
-  background-color: color($bg, 'status-bar');
-}
-.notificationArea > .x-panel-header {
-  background-color: $cHeaderBg;
-}
-
-.x-grid3-header,
-.go-grid .go-grid-hd-btn,
-.message-header,
-.cal-monthgrid-week-no,
-table.x-calGrid-headings-table {
-  background-color: #faf9f8;
-}
-
-// fancy app bar
-@media screen and (max-width: 1200px){
-.go-main-tab-panel > .x-tab-panel-header {
-  display: block;
-}
-}
-#mainNorthPanel {
-  height: 44px;
-}
-.go-main-tab-panel{
-  overflow:visible;
-}
-.go-main-tab-panel.x-tab-panel > .x-tab-panel-header{
-  position: absolute;
-  top: -38px;
-  left: 176px;
-  right: 172px;
-  width:auto !important;
-  height: 0;
-  overflow: visible;
-}
-
-  .go-main-tab-panel.x-tab-panel > .x-tab-panel-header {
-    top: dp(-58);
-    left: dp(272);
-    right: dp(272);
-    width: auto !important;
-    .x-tab-strip-top {
-      height: dp(48);
-    }
-    .x-tab-strip > li {
-      height: dp(48);
-      line-height: dp(48);
-      .x-tab-strip-text {
-        font-weight: bold;
-      }
-    }
-  }
-
-  .go-main-tab-panel {
-    bottom: 0;
-  }
-
-.go-main-tab-panel.x-tab-panel > .x-tab-panel-header .x-tab-strip-active {
-  border: 1px solid rgba(0,0,0,.16);
-  background-color: rgba(0,0,0,.12);
-  border-radius: 15px;
-}
-.go-main-tab-panel {
-  bottom:0;
-}
-.go-main-tab-panel .x-tab-strip > li {
-  border:1px solid transparent;
 }
 
 //html editor icons in outline set:
@@ -178,6 +105,9 @@ table.x-calGrid-headings-table {
 
 .go-detail-view > .x-panel-bwrap > .x-panel-body > .x-panel, .x-portlet {
   box-shadow:none;
-  outline: 1px solid rgba(0,0,0,0.089);
+  outline: 1px solid var(--fg-divider);
+}
+.go-detail-view > .x-panel-bwrap > .x-panel-body > .x-panel > .x-panel-header {
+	border-top: 0;
 }
 .x-portlet { overflow:hidden;}

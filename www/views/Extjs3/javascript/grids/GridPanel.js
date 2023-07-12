@@ -63,6 +63,7 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 
 	stateEvents : ['columnmove', 'columnresize', 'sortchange', 'groupchange', 'collapse', 'expand'],
 
+
 	getState : function() {
 		var o = Ext.grid.GridPanel.prototype.getState.apply(this);
 		o.collapsed = this.collapsed;
@@ -70,8 +71,7 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 	},
 	
 	initComponent : function() {
-		
-		
+
 		if(!this.view && !this.viewConfig){
 			this.view = new Ext.grid.GridView({
 				autoFill: true,

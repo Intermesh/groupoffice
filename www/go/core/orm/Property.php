@@ -48,6 +48,18 @@ abstract class Property extends Model {
 
 	use EventEmitterTrait;
 
+	private static $_mapping;
+
+	/**
+	 * For reusing prepared statements
+	 *
+	 * @var Statement[]
+	 */
+	private static $cachedRelationStmts = [];
+	private static $apiProperties = [];
+	private static $findCache = [];
+	private static $requiredProps = [];
+
 	/**
 	 * Fires when the mapping is defined. Other modules can add new properties
 	 *
@@ -129,10 +141,6 @@ abstract class Property extends Model {
 	 */
 	public function __construct($owner, bool $isNew = true, array $fetchProperties = [], bool $readOnly = false) {
 		$this->isNew = $isNew;
-
-
-		//test
-		$readOnly = false;
 
 		if (empty($fetchProperties)) {
 			$fetchProperties = static::getDefaultFetchProperties();
@@ -341,12 +349,7 @@ abstract class Property extends Model {
 		return $stmt;
 	}
 
-	/**
-	 * For reusing prepared statements
-	 *
-	 * @var Statement[]
-	 */
-	private static $cachedRelationStmts = [];
+
 
 
 	/**
@@ -540,10 +543,12 @@ abstract class Property extends Model {
 		return new Mapping(static::class);
 	}
 
-	private static $mapping;
-
 	public static function clearCache() {
-		self::$mapping = [];
+		self::$_mapping = [];
+		self::$requiredProps = [];
+		self::$cachedRelationStmts = [];
+		self::$apiProperties = [];
+		self::$findCache = [];
 	}
 
 	/**
@@ -555,23 +560,23 @@ abstract class Property extends Model {
 	public final static function getMapping(): Mapping
 	{
 		$cls = static::class;
-		if(isset(self::$mapping[$cls])) {
-			return self::$mapping[$cls];
+		if(isset(self::$_mapping[$cls])) {
+			return self::$_mapping[$cls];
 		}
 		$cacheKey = 'mapping-' . $cls;
 
-		self::$mapping[$cls] = go()->getCache()->get($cacheKey);
-		if(self::$mapping[$cls] === null) {
-			self::$mapping[$cls] = static::defineMapping();
+		self::$_mapping[$cls] = go()->getCache()->get($cacheKey);
+		if(self::$_mapping[$cls] === null) {
+			self::$_mapping[$cls] = static::defineMapping();
 
-			self::$mapping[$cls]->dynamic = true;
+			self::$_mapping[$cls]->dynamic = true;
 
-			static::fireEvent(self::EVENT_MAPPING, self::$mapping[$cls]);
+			static::fireEvent(self::EVENT_MAPPING, self::$_mapping[$cls]);
 
-			go()->getCache()->set($cacheKey, self::$mapping[$cls]);
+			go()->getCache()->set($cacheKey, self::$_mapping[$cls]);
 		}
 
-		return self::$mapping[$cls];
+		return self::$_mapping[$cls];
 	}
 
 	/**
@@ -590,7 +595,6 @@ abstract class Property extends Model {
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
 
-	private static $apiProperties = [];
 
   /**
    * @inheritDoc
@@ -690,7 +694,7 @@ abstract class Property extends Model {
 			$this->dynamicProperties[$name] = $value;
 		} else
 		{
-			throw new Exception("Can't set not existing property '$name' in '".static::class."'");
+			throw new Exception("Cannot set non-existing property '$name' in '".static::class."'");
 		}
 	}
 
@@ -757,7 +761,6 @@ abstract class Property extends Model {
 		return $props;
 	}
 
-	private static $findCache = [];
 
 	/**
 	 * Find entities
@@ -771,6 +774,10 @@ abstract class Property extends Model {
 	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null) {
 
 		$tables = self::getMapping()->getTables();
+
+		if(empty($tables)) {
+			throw new LogicException("No table defined for " . static::class);
+		}
 
 		$mainTableName = array_keys($tables)[0];
 
@@ -806,7 +813,7 @@ abstract class Property extends Model {
 		return array_combine($keys, $ids);
 	}
 
-	private static $requiredProps = [];
+
   /**
    * Get properties that are minimally required to load for the object to function properly.
    *
@@ -1774,8 +1781,7 @@ abstract class Property extends Model {
 				}
 				throw $e;
 			}
-		} catch (Exception $e) {
-    }
+		}
 
     return true;
 	}

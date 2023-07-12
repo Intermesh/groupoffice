@@ -9,6 +9,7 @@ use go\core\fs\File;
 use go\core\model\Acl;
 use go\core\model\Field;
 use go\core\model\FieldSet;
+use go\core\model\ImportMapping;
 use go\core\orm\Entity;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
@@ -81,6 +82,13 @@ class Spreadsheet extends AbstractConverter {
 	 */
 	public $updateBy = null;
 
+	/**
+	 * @var null Used as the name when the header mapping is saved
+	 */
+	public $saveName = null;
+
+	public $mappingId; // when not 'new' mapping will be found and updated
+
 	protected $fp;
 	/**
 	 * @var File
@@ -107,7 +115,7 @@ class Spreadsheet extends AbstractConverter {
 	 */
 	public static function supportedExtensions(): array
 	{
-		return ['csv', 'xlsx'];
+		return ['csv', 'xlsx', "html"];
 	}
 
 	protected function init()
@@ -130,12 +138,36 @@ class Spreadsheet extends AbstractConverter {
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
 
-		if($this->extension != 'csv') {
-			$this->spreadsheet = new PhpSpreadsheet();
-			$this->spreadSheetIndex = 1;
-		}else{
-			//add UTF-8 BOM char for excel to recognize UTF-8 in the CSV
-			fputs($this->fp, chr(239) . chr(187) . chr(191));
+		switch($this->extension) {
+			case'csv':
+				//add UTF-8 BOM char for excel to recognize UTF-8 in the CSV
+				fputs($this->fp, chr(239) . chr(187) . chr(191));
+			break;
+			case "html":
+				fputs($this->fp, "<html><body><style>
+body{
+	font: 14px Helvetica;
+}
+table{
+	border: 1px solid black;
+ 	border-collapse: collapse;
+ 	min-width: 100%; 	
+}
+td, th {
+  padding: 8px;
+}
+
+th {
+  text-align: left;
+  background-color: #f1f1f1;
+}
+</style><table border='1'>");
+				break;
+
+			default:
+				$this->spreadsheet = new PhpSpreadsheet();
+				$this->spreadSheetIndex = 1;
+				break;
 		}
 	}
 
@@ -153,10 +185,23 @@ class Spreadsheet extends AbstractConverter {
 		}
 	}
 
-	protected function writeRecord($array) {
-		if($this->extension == 'csv') {
-			fputcsv($this->fp, $array, $this->delimiter, $this->enclosure);
-		} else{
+	protected function writeRecord(array $array, bool $headers = false) {
+		switch($this->extension) {
+			case 'html':
+
+				if($headers) {
+					fputs($this->fp, "<tr><th>" . implode("</th><th>", array_map("htmlspecialchars", $array)) . "</th></tr>");
+				}else {
+					fputs($this->fp, "<tr><td>" . implode("</td><td>", array_map("htmlspecialchars", $array)) . "</td></tr>");
+				}
+
+				break;
+			case 'csv':
+				fputcsv($this->fp, $array, $this->delimiter, $this->enclosure);
+				break;
+			default:
+
+
 			$this->arrayToSpreadSheet($this->spreadSheetIndex++, $array);
 		}
 	}
@@ -165,7 +210,7 @@ class Spreadsheet extends AbstractConverter {
 	{
 
 		if ($this->index == 0) {
-			$this->writeRecord(array_column($this->getHeaders(), 'name'));
+			$this->writeRecord(array_column($this->getHeaders(), 'name'), true);
 		}
 
 		$headers = $this->getHeaders();
@@ -186,30 +231,38 @@ class Spreadsheet extends AbstractConverter {
 
 	protected function finishExport(): Blob
 	{
-		if($this->extension != 'csv') {
+		switch($this->extension) {
+			case 'html':
+				fputs($this->fp, "</table></body></html>");
+				break;
+			case 'csv':
 
-			$headerStyle = [
-				'font' => [
-					'bold' => true,
-					'color' => ['argb' => 'ffffff']
-				],
-				'fill' => [
-					// SOLID FILL
-					'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-					'color' => ['argb' => '0277bd']
-				]
-			];
-			foreach($this->spreadsheet->getActiveSheet()->getColumnIterator() as $col) {
-				$style = $this->spreadsheet->getActiveSheet()->getStyle($col->getColumnIndex() . "1");
-				$style->applyFromArray($headerStyle);
+				break;
+			default:
 
-				$colDim = $this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex());
-				$colDim->setAutoSize(true);
-			}
+				$headerStyle = [
+					'font' => [
+						'bold' => true,
+						'color' => ['argb' => 'ffffff']
+					],
+					'fill' => [
+						// SOLID FILL
+						'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+						'color' => ['argb' => '0277bd']
+					]
+				];
+				foreach($this->spreadsheet->getActiveSheet()->getColumnIterator() as $col) {
+					$style = $this->spreadsheet->getActiveSheet()->getStyle($col->getColumnIndex() . "1");
+					$style->applyFromArray($headerStyle);
 
-			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
-			$writer->setPreCalculateFormulas(false);
-			$writer->save($this->tempFile->getPath());
+					$colDim = $this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex());
+					$colDim->setAutoSize(true);
+				}
+
+				$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
+				$writer->setPreCalculateFormulas(false);
+				$writer->save($this->tempFile->getPath());
+				break;
 
 		}
 
@@ -592,6 +645,32 @@ class Spreadsheet extends AbstractConverter {
 		if(isset($this->clientParams['updateBy'])) {
 			$this->updateBy = $this->clientParams['updateBy'];
 		}
+		if(isset($this->clientParams['saveName'])) {
+			$this->saveName = $this->clientParams['saveName'];
+		}
+		if(isset($this->clientParams['mappingId'])) {
+			$this->mappingId = $this->clientParams['mappingId'];
+		}
+
+
+	}
+
+	private function saveMapping(array $headers) {
+		$checkSum = md5(implode(",", array_map("trim", $headers)));
+		$entityClass = $this->entityClass;
+		$entityTypeId = $entityClass::entityType()->getId();
+
+		$mapping = ImportMapping::findById($this->mappingId);
+		if(empty($mapping)) {
+			$mapping = new ImportMapping();
+			$mapping->checksum = $checkSum;
+			$mapping->entityTypeId = $entityTypeId;
+		}
+		$mapping->setMap($this->clientParams['mapping']);
+		$mapping->updateBy =$this->updateBy;
+		$mapping->name = $this->saveName;
+		$mapping->save();
+
 	}
 
 	protected $record;
@@ -601,6 +680,7 @@ class Spreadsheet extends AbstractConverter {
 		if($this->index == 0) {
 			//skip headers
 			$headers = $this->readRecord();
+			$this->saveMapping($headers);
 		}
 		$this->record = $this->readRecord();
 
@@ -684,8 +764,6 @@ class Spreadsheet extends AbstractConverter {
 
 		$entityClass = $this->entityClass;
 
-
-
 		$entity = false;
 		//lookup entity by id if given
 		if($this->updateBy == 'id' && !empty($values['id'])) {
@@ -693,6 +771,8 @@ class Spreadsheet extends AbstractConverter {
 			if($entity && $entity->getPermissionLevel() < Acl::LEVEL_WRITE) {
 				$entity = false;
 			}
+		} elseif(!empty($this->updateBy) && !empty($values[$this->updateBy])) {
+			$entity = $entityClass::find()->where($this->updateBy,'=', $values[$this->updateBy])->single();
 		}
 		if(!$entity) {
 			$entity = new $entityClass;
@@ -702,8 +782,10 @@ class Spreadsheet extends AbstractConverter {
 	
 	protected function importCustomColumns(Entity $entity, $values){
 		foreach($this->customColumns as $c) {
-			call_user_func_array( $c['importFunction'], [$entity, $values[$c['name']] ?? null, &$values, $c['name']]);
-			unset($values[$c['name']]);
+			if(isset($values[$c['name']])) {
+				call_user_func_array($c['importFunction'], [$entity, $values[$c['name']], &$values, $c['name']]);
+				unset($values[$c['name']]);
+			}
 		}
 		return $values;
 	}

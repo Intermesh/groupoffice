@@ -33,7 +33,7 @@ class Installer {
 	
 	use event\EventEmitterTrait;
 	
-	const MIN_UPGRADABLE_VERSION = "6.5.94";
+	const MIN_UPGRADABLE_VERSION = "6.6.120";
 	
 	const EVENT_UPGRADE = 'upgrade';
 
@@ -140,6 +140,9 @@ class Installer {
 
 		$admin = $this->installAdminUser($adminValues);
 
+		go()->getSettings()->language = $admin->language;
+		go()->getLanguage()->setLanguage($admin->language);
+
 		$this->installCoreModule();
 				
 		$this->registerCoreEntities();		
@@ -219,7 +222,7 @@ class Installer {
 		//Allow people to read filters by default
 		model\EntityFilter::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 		//Allow people to read custom fieldsets by default
-		model\FieldSet::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		model\FieldSet::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_WRITE]);
 		//groups readble to everyone
 		Group::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}
@@ -325,6 +328,10 @@ class Installer {
 	public function isValidDb() {
 		if (!go()->getDatabase()->hasTable("core_module")) {
 			throw new Exception("This is not a Group-Office 6.3+ database. Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
+		}
+
+		if(!go()->getSettings()->databaseVersion) {
+			throw new Exception("It looks like a previous installation attempt failed. Please try to reinstall with an empty database. If the problem persists please report the error.");
 		}
 
 		if (version_compare(go()->getSettings()->databaseVersion, self::MIN_UPGRADABLE_VERSION) === -1) {
@@ -498,9 +505,11 @@ class Installer {
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
+		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 		while (!$this->upgradeModules()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";			
 		}
+		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 
 		echo "Rebuilding cache\n";
 
@@ -544,6 +553,7 @@ class Installer {
 		self::$isUpgrading = false;
 
 		$this->enableGarbageCollection();
+        $this->enableDiskUsage();;
 		echo "Done!\n";
 
 		ob_flush();
@@ -551,6 +561,29 @@ class Installer {
 
 		ob_end_clean();
 	}
+
+    private function enableDiskUsage() {
+
+        $cron = \GO\Base\Cron\CronJob::model()->findSingleByAttribute('job', 'GO\Base\Cron\CalculateDiskUsage');
+        if(!$cron) {
+            $cron = new \GO\Base\Cron\CronJob();
+            $cron->name = 'Calculate disk usage';
+            $cron->job = 'GO\Base\Cron\CalculateDiskUsage';
+        }
+
+        $cron->active = true;
+        $cron->runonce = false;
+        $cron->minutes = '1';
+        $cron->hours = '1';
+        $cron->monthdays = '*';
+        $cron->months = '*';
+        $cron->weekdays = '*';
+
+        if(!$cron->save()) {
+            var_dump($cron->getValidationErrors());
+            throw new Exception("Could not save calculate disk usage cron");
+        }
+    }
 	
 	/**
 	 * Use full for dev when you want to check what's going to happen.
@@ -638,23 +671,32 @@ class Installer {
 			
 			$updates = array();
 			require($updatesFile);
-			
+
+
 			//put the updates in an extra array dimension so we know to which module
 			//they belong too.
+			$count = 0;
 			foreach ($updates as $timestamp => $updatequeries) {
 				//somehow this doesn't always match on some installations with Ioncube !?
 			  if(go()->getDebugger()->enabled && !preg_match("/^[0-9]{12}$/", $timestamp)) {
 			    throw new Exception("Invalid timestamp '$timestamp' in file '$updatesFile'");
         }
 				$u["$timestamp"][$module->id] = $updatequeries;
+				$count += count($updatequeries);
 			}
+
+			if(go()->getDebugger()->enabled && $count < $module->version) {
+				$modStr = '[' . ($module->package ?? "legacy") .'/'. $module->name .'] ';
+				throw new Exception("Less queries than version for module " . $modStr ." " . $count .' < '. $module->version);
+			}
+
 		}
 
 		ksort($u);
 
 		$counts = array();
 
-		$aModuleWasUpgradedToNewBackend = false;		
+		$aModuleWasUpgradedToNewBackend = false;
 		
 		foreach ($u as $updateQuerySet) {
 
@@ -662,7 +704,6 @@ class Installer {
 
 				//echo "Getting updates for ".$module."\n";
 				$module = $modulesById[$moduleId];
-
 				$modStr = '[' . ($module->package ?? "legacy") .'/'. $module->name .'] ';
 
 				if (!is_array($queries)) {
@@ -833,7 +874,7 @@ class Installer {
 				go()->getDbConnection()->query($sql);	
 				
 				if($record['Name'] === 'em_links') {
-					go()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(350) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
 					go()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
 				}
 			}	

@@ -121,12 +121,9 @@ class Mailer {
 			if(!$this->smtpAccount->verifyCertificate) {
 				$o->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name'  => false)));
 			}
-			
-			return $o;
 		} else if (isset($this->emailAccount)) {
-			return \GO\Email\Transport::newGoInstance($this->emailAccount);
+			$o = \GO\Email\Transport::newGoInstance($this->emailAccount);
 		} else {
-
 			$o = new \Swift_SmtpTransport(
 				go()->getSettings()->smtpHost,
 				go()->getSettings()->smtpPort,
@@ -140,8 +137,10 @@ class Mailer {
 			if (!go()->getSettings()->smtpEncryptionVerifyCertificate) {
 				$o->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false)));
 			}
-
-			return $o;
 		}
+
+		$o->setTimeout(go()->getSettings()->smtpTimeout);
+
+		return $o;
 	}
 }

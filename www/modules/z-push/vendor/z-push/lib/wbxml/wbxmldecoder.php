@@ -118,6 +118,10 @@ class WBXMLDecoder extends WBXMLDefs {
     public function getElement() {
         $element = $this->getToken();
 
+				if(!$element) {
+					return false;
+				}
+
         switch($element[EN_TYPE]) {
             case EN_TYPE_STARTTAG:
                 return $element;

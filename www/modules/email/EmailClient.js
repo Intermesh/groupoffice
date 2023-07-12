@@ -22,6 +22,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			root: 'results',
 			totalProperty: 'total',
 			remoteSort: true,
+			suppressError: true,
 			reader: new Ext.data.JsonReader({
 				root: 'results',
 				totalProperty: 'total',
@@ -35,8 +36,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			groupField: 'udate'
 		});
 
-//		this.messagesStore.setDefaultSort('udate', 'DESC');
-
 		this.messagesStore.on('load', function(){
 
 			this.isManager = this.messagesGrid.store.reader.jsonData.permission_level == GO.permissionLevels.manage;
@@ -48,8 +47,44 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			
 			this.messagesGrid.deleteButton.setDisabled(this.readOnly);
 		}, this);
-		
-		
+		this.messagesStore.on('exception',
+			function( store, type, action, options, response){
+				if(response.isTimeout || response.status == 0){
+					console.error(response);
+					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+				} else if(!options.reader.jsonData || GO.jsonAuthHandler(options.reader.jsonData, this.load, this)) {
+					let msg;
+
+					if (!GO.errorDialog.isVisible()) {
+						if(options.reader.jsonData && options.reader.jsonData.feedback) {
+							const feedback = options.reader.jsonData.feedback;
+
+							if(feedback.toLowerCase().indexOf("oauth2") > -1) {
+								Ext.MessageBox.alert(t("Refresh token"),
+									t("Your token has possibly expired. A new window will be opened in which you can renew your token.", "email"),
+									() => {
+										window.open(window.location.pathname + 'go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id, 'do_da_auth_thingy');
+									}
+									,this);
+								// we done!
+								return;
+							}
+							msg = feedback;
+							GO.errorDialog.show(msg);
+						} else if (!response.isAbort) {
+							msg = t("An error occurred on the webserver. Contact your system administrator and supply the detailed error.");
+							msg += '<br /><br />JsonStore load exception occurred';
+							GO.errorDialog.show(msg);
+						}
+					}
+				} else {
+					console.error(response);
+
+					GO.errorDialog.show(t("Failed to send the request to the server. Please check your internet connection."));
+				}
+			}
+			, this
+		);
 
 	var messagesAtTop = Ext.state.Manager.get('em-msgs-top');
 	if(messagesAtTop) {
@@ -384,7 +419,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				tooltip: t("Print"),
 				overflowText: t("Print"),
 				handler: function(){
-					this.messagePanel.body.print();
+					this.messagePanel.print();
 				},
 				scope: this
 			}),
@@ -433,6 +468,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		split: true,
 		narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
 		width: dp(700),
+		minWidth: dp(300),
 		stateId: 'go-email-west',
 		items: [			
 			this.leftMessagesGrid,
@@ -522,6 +558,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	},
 
 	_permissionDelegated : false,
+
+
 
 	addGridHandlers : function(grid)
 	{
@@ -662,17 +700,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.messagesGrid.store.baseParams['account_id']=account_id;
 		this.messagesGrid.store.baseParams['mailbox']=mailbox;
 
-		// if(reload) {
-		// 	this.messagesGrid.store.reload({
-		// 		keepScrollPosition: true
-		// 	})
-		// } else {
-			this.messagesGrid.store.load({
-				params: {
-					start: 0
-				}
-			});
-		// }
+		this.messagesGrid.store.load({
+			params: {
+				start: 0
+			}
+		});
 
 		this.treePanel.setUsage(usage);
 	},
@@ -680,6 +712,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	getFolderNodeId : function (account_id, mailbox){
 		return GO.util.Base64.encode("f_"+account_id+"_"+mailbox);
 	},
+
 	/**
 	 * Returns true if the current folder needs to be refreshed in the grid
 	 */
@@ -1040,8 +1073,7 @@ GO.email.deleteAllAttachments = function(panel) {
 		}, this);
 };
 
-GO.email.saveAttachment = function(attachment,panel)
-	{
+GO.email.saveAttachment = function(attachment,panel) {
 		if(!GO.files.saveAsDialog)
 		{
 			GO.files.saveAsDialog = new GO.files.SaveAsDialog({
@@ -1084,10 +1116,7 @@ GO.email.saveAttachment = function(attachment,panel)
 		});
 	}
 
-
-
-GO.email.openAttachment = function(attachment, panel, forceDownload)
-{
+GO.email.openAttachment = function(attachment, panel, forceDownload) {
 		if(!panel)
 			return false;
 
@@ -1138,7 +1167,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 							}
 							Ext.getBody().mask(t("Importing..."));
 							go.Jmap.request({
-								method: "Contact/loadVCS",
+								method: "Contact/loadVCF",
 								params: {
 									account_id: panel.account_id,
 									mailbox: panel.mailbox,
@@ -1210,6 +1239,22 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 			}
 		}
 	};
+
+/**
+ * Unlink an email
+ * @param linkId
+ */
+GO.email.unlink = function(linkId) {
+	Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to unlink this item?"), function (btn) {
+		if (btn === "yes") {
+			go.Db.store("Link").set({
+				destroy: [linkId]
+			}).then(() => {
+				GO.mainLayout.getModulePanel('email').messagePanel.reload();
+			});
+		}
+	}, this);
+};
 
 /**
  * Function that will open an email composer. If a composer is already open it will create a new one. Otherwise it will reuse an already created one.

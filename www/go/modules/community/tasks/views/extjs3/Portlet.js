@@ -14,6 +14,10 @@ go.modules.community.tasks.Portlet = Ext.extend(go.modules.community.tasks.TaskG
 		const lists = go.User.taskPortletTaskLists.length ? go.User.taskPortletTaskLists : [go.User.tasksSettings.defaultTasklistId];
 		this.store.setFilter('tasklistIds', {tasklistId: lists});
 		this.store.setFilter('incomplete', {complete: false, start: "<=now"});
+		this.store.on("beforeload", () => {
+			const date = go.util.Format.dateToUserTZ(new Date()).format("Y-m-d");
+			this.store.setFilter('incomplete', {complete: false, start: "<=" + date});
+		})
 		this.store.load();
 
 		this.on("rowclick", function (grid, rowClicked, e) {
@@ -23,7 +27,7 @@ go.modules.community.tasks.Portlet = Ext.extend(go.modules.community.tasks.TaskG
 });
 
 go.modules.community.tasks.PortletSettingsDialog = Ext.extend(go.form.Dialog, {
-	title: t("Visible task lists"),
+	title: t("Visible lists"),
 	entityStore: "User",
 	width: dp(500),
 	height: dp(500),

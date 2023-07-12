@@ -2,6 +2,9 @@
 
 namespace GO\Calendar\Model;
 
+use go\core\model\User;
+use go\modules\community\tasks\Module;
+
 /**
  * Copyright Intermesh
  *
@@ -96,8 +99,18 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 		
 		return $this->find($findParams);
 	}
-	
-	
+
+	public function setDefaultAttributes($user = false, &$feedback = '')
+	{
+		if(Module::get()->isInstalled()) {
+			$coreUser = User::findById($user->id, ['tasksSettings']);
+
+			$this->tasklist_id = $coreUser->tasksSettings->getDefaultTasklistId() ?? 0;
+		}
+		return parent::setDefaultAttributes($user, $feedback);
+	}
+
+
 	public function settingsModelName() {
 		return "GO\Calendar\Model\Settings";
 	}

@@ -106,13 +106,14 @@ class Module extends Entity {
 			return false;
 		}
 		go()->getCache()->set('module-' . $this->package.'/'.$this->name, $this);
-		
-		$settings = $this->getSettings();
-		if($settings && !$settings->save()) {
-			return false;
+
+		if ($this->enabled && $settings = $this->getSettings()) {
+			if (!$settings->save()) {
+				return false;
+			}
 		}
 
-		if($this->isModified(['enabled']) || $this->isNew()) {
+		if ($this->isModified(['enabled']) || $this->isNew()) {
 			go()->rebuildCache();
 		}
 
@@ -495,7 +496,33 @@ class Module extends Entity {
 		return !empty($mod) && $mod->getPermissionLevel($userId) >= $level;
 	}
 
-	// for backwards compatibility
+	public static function getApiProperties(): array
+	{
+		return array_merge(
+			parent::getApiProperties(),
+			[
+				'permissionLevel' => ["setter" => false, "getter" => true, "access" => null],
+				'userRights' => ["setter" => false, "getter" => true, "access" => null]
+			]
+		);
+
+	}
+
+	/**
+	 * for backwards compatibility only!
+	 * @deprecated
+	 *
+	 * Create this in your Module.php instead:
+	 * ```
+	 * protected function rights(): array
+	 * {
+	 *   return ['mayXXX'];
+	 * }
+	 * ```
+	 * Add the text labels in the english language file
+	 * Then use go()->getModel()->getUserRights()->mayXXX;
+	 *
+	 */
 	public function getPermissionLevel($userId = null): int
 	{
 

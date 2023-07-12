@@ -122,28 +122,7 @@ GO.email.MessagesGrid = function(config){
 	config.animCollapse=false;
 
 	this.searchType = new Ext.form.Hidden({
-		// width:dp(140),
-		// store: new Ext.data.SimpleStore({
-		// 	fields: ['value', 'text'],
-		// 	data : [
-		// 	['any', t("Any field", "email")],
-		// 	['fts', t("Full message", "email")],
-		// 	['from', t("Sender", "email")],
-		// 	['subject', t("Subject", "email")],
-		// 	['to', t("Recipient", "email")],
-		// 	['cc', t("Recipient (CC)", "email")]
-		// 	]
-		// }),
 		value:GO.email.search_type_default || 'any'
-		// valueField:'value',
-		// displayField:'text',
-		// mode:'local',
-		// minListWidth: dp(168),
-		// triggerAction:'all',
-		// editable:false,
-		// selectOnFocus:true,
-		// forceSelection:true,
-
 	});
 
 	this.updateSearchTypeChecks = function() {
@@ -205,7 +184,7 @@ GO.email.MessagesGrid = function(config){
 			items: [{
 				value: 'any',
 				text:  t("Any field", "email"),
-				icon: 'star'
+				icon: 'select-all'
 			}, {
 				value: 'from',
 				text:  t("From", "email"),
@@ -449,6 +428,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		GO.email.messagesGrid.store.load();
 	},
 
+	/* @deprecated
 	renderNorthMessageRow : function(value, metaData, record){
 
 		if( this.isSpoofed(record)) {
@@ -462,7 +442,8 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		else
 			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-mail">{0}</div>', value);
 	},
-
+	*/
+	/* @deprecated
 	renderMessageSmallRes : function(value, metaData, record){
 
 		if( this.isSpoofed(record)) {
@@ -477,7 +458,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		{
 			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-from">{0}</div><div class="ml-seen-subject">{1}</div>', value, record.data['subject']);
 		}
-	},
+	},*/
 
 	createQtipTemplate: function(record){
 		var qtipTemplate = '';
@@ -541,11 +522,12 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		}
 
 		return unseen + icons.map(function(i) {
-			return '<i class="icon em-'+i+'">' + i + '</i>';
+			return '<i class="icon '+(i!=='flag'?'c-secondary':'red')+'">' + i + '</i>';
 		}).join("");
 		
 	},
 
+	/* @deprecated
 	renderFlagged : function(value, p, record){
 
 		var str = '';
@@ -563,4 +545,5 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		return str;
 
 	}
+	 */
 });

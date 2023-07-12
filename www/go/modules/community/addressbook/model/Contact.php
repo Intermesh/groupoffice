@@ -15,13 +15,13 @@ use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\ArrayObject;
 use go\core\util\DateTime;
+use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\modules\community\addressbook\convert\Spreadsheet;
 use go\modules\community\addressbook\convert\VCard;
 use function GO;
 use go\core\mail\Message;
 use go\core\TemplateParser;
-use go\core\db\Expression;
 use go\core\fs\File;
 use go\core\model\Acl;
 use GO\Files\Model\Folder;
@@ -246,8 +246,8 @@ class Contact extends AclItemEntity {
 	 *
 	 * @var Address[]
 	 */
-	public $addresses = [];	
-	
+	public $addresses = [];
+
 	/**
 	 *
 	 * @var int[]
@@ -370,14 +370,14 @@ class Contact extends AclItemEntity {
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-						->addTable("addressbook_contact", 'c')
-						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
-						->addArray('dates', Date::class, ['id' => 'contactId'])
-						->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
-						->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
-						->addArray('addresses', Address::class, ['id' => 'contactId'])
-						->addArray('urls', Url::class, ['id' => 'contactId'])
-						->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);
+			->addTable("addressbook_contact", 'c')
+			->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
+			->addArray('dates', Date::class, ['id' => 'contactId'])
+			->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
+			->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
+			->addArray('addresses', Address::class, ['id' => 'contactId'])
+			->addArray('urls', Url::class, ['id' => 'contactId'])
+			->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);
 	}
 	
 	public function setNameFromParts() {
@@ -617,21 +617,21 @@ class Contact extends AclItemEntity {
 										->add('gender', function(Criteria $criteria, $value) {
 											$criteria->andWhere(['gender' => $value, 'isOrganization'=> false]);
 										})
-										->addDate("dateofbirth", function(Criteria $criteria, $comparator, $value, Query $query) {
+										->addDateTime("dateofbirth", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'dob')) {
 												$query->join('addressbook_date', 'dob', 'dob.contactId = c.id');
 											}
 											$criteria->where('dob.type', '=', Date::TYPE_BIRTHDAY)
 												->andWhere('dob.date',$comparator, $value);
 										})
-										->addDate("actionDate", function(Criteria $criteria, $comparator, $value, Query $query) {
+										->addDateTime("actionDate", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'actionDate')) {
 												$query->join('addressbook_date', 'actionDate', 'actionDate.contactId = c.id');
 											}
 											$criteria->where('actionDate.type', '=', Date::TYPE_ACTION)
 												->andWhere('actionDate.date',$comparator, $value);
 										})
-										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
+										->addDateTime("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'bdate')) {
 												$query->join('addressbook_date', 'bdate', 'bdate.contactId = c.id AND bdate.type = "'.Date::TYPE_BIRTHDAY .'"');
 											}
@@ -651,7 +651,12 @@ class Contact extends AclItemEntity {
 											// normal count query will fail with the above select overwritten with count(*)
 											$query->calcFoundRows();
 
-										})->add('userGroupId', function(Criteria $criteria, $value, Query $query) {
+										})
+										->addText("vatNo", function(Criteria $criteria, $comparator, $value, Query $query) {
+											$criteria->where('c.vatNo', $comparator, $value);
+										})
+
+										->add('userGroupId', function(Criteria $criteria, $value, Query $query) {
 											$query->join('core_user_group', 'ug', 'ug.userId = c.goUserId');
 											$criteria->where(['ug.groupId' => $value]);
 										})->add('isUser', function(Criteria $criteria, $value, Query $query) {
@@ -1035,7 +1040,7 @@ class Contact extends AclItemEntity {
 		}
 		foreach($this->phoneNumbers as $e) {
 			$santiziedNumber = preg_replace("/[^0-9+]/", "", $e->number);
-			$keywords = array_merge($keywords, SearchableTrait::numberToKeywords($santiziedNumber));
+			$keywords = array_merge($keywords, StringUtil::numberToKeywords($santiziedNumber));
 		}
 		if(!$this->isOrganization) {
 			$keywords = array_merge($keywords, $this->findOrganizations()->selectSingleValue('name')->all());
@@ -1057,6 +1062,10 @@ class Contact extends AclItemEntity {
 			if(!empty($address->zipCode)) {
 				$keywords[] = $address->zipCode;
 			}
+		}
+
+		foreach($this->urls as $url) {
+			$keywords[] = $url->url;
 		}
 
 		if(!empty($this->notes)) {
@@ -1164,11 +1173,12 @@ class Contact extends AclItemEntity {
 
 
 	/**
-	 * Because we've implemented the getter method "getOrganizationIds" the contact 
-	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * Because we've implemented the getter method "getOrganizationIds" the contact
+	 * modSeq must be incremented when a link between two contacts is deleted or
 	 * created.
-	 * 
-	 * @param Link $link
+	 *
+	 * @param Query $links
+	 * @throws Exception
 	 */
 	public static function onLinkDelete(Query $links) {
 		

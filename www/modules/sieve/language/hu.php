@@ -98,4 +98,6 @@ return array (
   'Filters' => 'Szűrők',
   'Filterset:' => 'szűrő szett:',
   'Please click \'add\' to add an action' => 'Kérjük, kattintson a „hozzáadás” adni egy akció',
+  'Activate' => 'Aktiválás',
+  'Set action' => 'Művelet beállítása',
 );

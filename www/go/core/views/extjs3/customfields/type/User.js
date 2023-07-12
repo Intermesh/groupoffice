@@ -31,11 +31,10 @@ go.customfields.type.User = Ext.extend(go.customfields.type.Text, {
 		if(!value) {
 			return "";
 		}
-		go.Db.store("User").get([value], function(users) {
+		return go.Db.store("User").get([value], function(users) {
 			cmp.setValue(!users[0] ? t("Not found or no access") : Ext.util.Format.htmlEncode(users[0].displayName));
 			cmp.setVisible(true);
 		});
-		return value;
 	},
 	
 	/**

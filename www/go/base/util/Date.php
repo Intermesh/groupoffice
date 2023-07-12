@@ -252,7 +252,7 @@ class Date {
 	 * @param int $seconds
 	 * @return int
 	 */
-	public static function date_add($time,$days=0,$months=0,$years=0, $hours=0, $minutes=0, $seconds=0)
+	public static function date_add(int $time,$days=0,$months=0,$years=0, $hours=0, $minutes=0, $seconds=0)
 	{
 		$date=getdate($time);
 		return mktime($date['hours']+$hours,$date['minutes']+$minutes, $date['seconds']+$seconds,$date['mon']+$months,$date['mday']+$days,$date['year']+$years);

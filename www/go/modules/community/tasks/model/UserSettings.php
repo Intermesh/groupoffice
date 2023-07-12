@@ -2,6 +2,7 @@
 
 namespace go\modules\community\tasks\model;
 
+use GO\Calendar\Model\Calendar;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;

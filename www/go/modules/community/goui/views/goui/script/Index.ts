@@ -1,24 +1,30 @@
-import {modules} from "@go-core/Modules.js";
+import {client, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {router} from "@go-core/Router.js";
 
 modules.register(  {
 	package: "community",
 	name: "goui",
-	init () {
+	async init () {
 
-		let notes: Main;
+		client.on("authenticated", (client, session) => {
 
-		router.add(/^goui-notes\/(\d+)$/, (noteId) => {
-			modules.openMainPanel("goui-notes");
-			notes.showNote(parseInt(noteId));
-		});
+			if(!session.capabilities["go:community:goui"]) {
+				// User has no access to this module
+				return;
+			}
 
-		modules.addMainPanel("goui-notes", "GOUI Notes", () => {
+			let notes: Main = new Main();
 
-			//this will lazy load Notes when module panel is opened.
-			notes = new Main();
-			return notes;
+			router.add(/^goui-notes\/(\d+)$/, (noteId) => {
+				modules.openMainPanel("goui-notes");
+				notes.showNote(parseInt(noteId));
+			});
+
+			modules.addMainPanel("community", "goui","goui-notes", "GOUI Notes", () => {
+
+				//this will lazy load Notes when module panel is opened.
+				return notes;
+			});
 		});
 	}
 });

@@ -60,6 +60,8 @@ function dp(size) {
 
 	Ext.override(Ext.Component, {
 
+
+
 		/**
 		 * For GOUI
 		 */
@@ -138,7 +140,11 @@ Ext.override(Ext.form.TextArea,{
 
 		if (this.grow) {
 			// debugger;
-				this.autoSize();
+			setTimeout(() => {
+				if(!this.isDestroyed) {
+					this.autoSize();
+				}
+			})
 		}
 	},
 
@@ -365,7 +371,7 @@ Ext.override(Ext.form.TriggerField,{
 		}
 	},
 
-	
+
 
 	 getTriggerWidth: function(){
 		 return 0;
@@ -590,7 +596,100 @@ Ext.override(Ext.tree.TreeNodeUI, {
 });
 
 Ext.override(Ext.grid.GridView, {
-	
+	doRender : function(columns, records, store, startRow, colCount, stripe) {
+		let templates = this.templates,
+			cellTemplate = templates.cell,
+			rowTemplate = templates.row,
+			last = colCount - 1,
+			// buffers
+			rowBuffer = [],
+			colBuffer = [],
+			rowParams,
+			meta = {},
+			len = records.length,
+			alt,
+			column,
+			record, rowIndex;
+		//build up each row's HTML
+		for (let j = 0; j < len; j++) {
+			let tstyle = 'width:' + this.getTotalWidth() + ';', rowCFStyle = false;
+
+			record    = records[j];
+			colBuffer = [];
+
+			rowIndex = j + startRow;
+
+			if(!rowCFStyle) {
+				rowCFStyle = this.getRowCFStyle(record, columns);
+				if(rowCFStyle) {
+					tstyle += rowCFStyle;
+				}
+			}
+
+			//build up each column's HTML
+			for (let i = 0; i < colCount; i++) {
+				column = columns[i];
+
+				meta.id    = column.id;
+				meta.css   = i === 0 ? 'x-grid3-cell-first ' : (i == last ? 'x-grid3-cell-last ' : '');
+				meta.attr  = meta.cellAttr = '';
+				meta.style = column.style;
+
+				let v = this.encodeGridValue(store, column, record);
+				try {
+					meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
+				} catch(e) {
+					console.error(e);
+				}
+
+				if (Ext.isEmpty(meta.value)) {
+					meta.value = '&#160;';
+				}
+
+				if (this.markDirty && record.dirty && typeof record.modified[column.name] != 'undefined') {
+					meta.css += ' x-grid3-dirty-cell';
+				}
+
+				colBuffer[colBuffer.length] = cellTemplate.apply(meta);
+			}
+
+			alt = [];
+			//set up row striping and row dirtiness CSS classes
+			if (stripe && ((rowIndex + 1) % 2 === 0)) {
+				alt[0] = 'x-grid3-row-alt';
+			}
+
+			if (record.dirty) {
+				alt[1] = ' x-grid3-dirty-row';
+			}
+			rowParams = {tstyle: tstyle};
+			rowParams.cols = colCount;
+
+			if (this.getRowClass) {
+				alt[2] = this.getRowClass(record, rowIndex, rowParams, store);
+			}
+
+			rowParams.alt   = alt.join(' ');
+			rowParams.cells = colBuffer.join('');
+
+			rowBuffer[rowBuffer.length] = rowTemplate.apply(rowParams);
+		}
+
+		return rowBuffer.join('');
+	},
+
+	getRowCFStyle: function(record, columns) {
+		for (let i = 0, l = columns.length; i < l; i++) {
+			const column = columns[i];
+			const val = record.data[column.name]
+
+			if(!go.util.empty(val) && typeof column.scope.rowRenderer === "function") {
+				return column.scope.rowRenderer(val);
+			}
+		}
+		return false;
+	},
+
 	origOnLoad: Ext.grid.GridView.prototype.onLoad,
 	
 	//emptyText: 	'<i>add_circle_outline</i><p>' +t("No items to display") + '</p>',
@@ -606,11 +705,11 @@ Ext.override(Ext.grid.GridView, {
 });
 
 Ext.override(Ext.grid.CheckboxSelectionModel, {
-	width: dp(48),
+	width: dp(40),
 });
 
 Ext.override(Ext.layout.ToolbarLayout, {
-	triggerWidth: dp(40)
+	triggerWidth: dp(50)
 });
 
 /**
@@ -619,7 +718,42 @@ Ext.override(Ext.layout.ToolbarLayout, {
 Ext.override(Ext.Element, {
 	getTextWidth : function(text, min, max){
       return (Ext.util.TextMetrics.measure(this.dom, Ext.value(text, this.dom.innerHTML, true)).width+1).constrain(min || 0, max || 1000000);
-   }
+   },
+
+	_bgColor: undefined,
+
+	getBackgroundColor() {
+		if(!this._bgColor) {
+			this._bgColor = this._getInheritedBackgroundColor(this.dom);
+		}
+		return this._bgColor;
+	},
+
+	_getInheritedBackgroundColor: function(el) {
+		// get default style for current browser
+		var defaultStyle = this._getDefaultBackground() // typically "rgba(0, 0, 0, 0)"
+
+		// get computed color for el
+		var backgroundColor = window.getComputedStyle(el).backgroundColor
+
+		// if we got a real value, return it
+		if (backgroundColor != defaultStyle) return backgroundColor
+
+		// if we've reached the top parent el without getting an explicit color, return default
+		if (!el.parentElement) return defaultStyle
+
+		// otherwise, recurse and try again on parent element
+		return this._getInheritedBackgroundColor(el.parentElement)
+	},
+
+	_getDefaultBackground: function() {
+		// have to add to the document in order to use getComputedStyle
+		var div = document.createElement("div")
+		document.head.appendChild(div)
+		var bg = window.getComputedStyle(div).backgroundColor
+		document.head.removeChild(div)
+		return bg
+	},
 });
 
 /* password vtype */ 
@@ -698,19 +832,9 @@ Ext.override(Ext.Element, {
 		Ext.apply(this, config);
         
 		var el = Ext.get(this.id).dom;
-		// var c = document.getElementById('printcontainer');
-		// var iFrame = document.getElementById('printframe');
-        
-		var strTemplate = '<HTML><HEAD>{0}<TITLE>{1}</TITLE></HEAD><BODY onload="{2}" style="background-color:white;"><div style="position:fixed; top:0; left:0; right:0; bottom:0; z-index:99;"></div>{3}</BODY></HTML>';
 		var strAttr = '';
 		var strFormat;
-		var strHTML;
-        
-		//Get rid of the old crap so we don't copy it
-		//to our iframe
-		// if (iFrame != null) c.removeChild(iFrame);
-		// if (c != null) el.removeChild(c);
-        
+
 		//Copy attributes from this element.
 		for (var i = 0; i < el.attributes.length; i++) {
 			if (Ext.isEmpty(el.attributes[i].value) || el.attributes[i].value.toLowerCase() != 'null') {
@@ -726,26 +850,20 @@ Ext.override(Ext.Element, {
 		}
 
 		this.printCSS+='<style>body{overflow:visible !important;}</style>';
+		var html = "<div " + strAttr+">" + el.innerHTML + "</div>";
+		if(config.title) {
+			// set document title for saving to PDF
+			const oldTitle = document.title;
 
-		var html = el.innerHTML;
-		if(config.title)
-			html = '<h1 style="margin-left:5px;font-size:16px;margin:10px 5px;">'+config.title+'</h1>'+html;
-        
-		//Build our HTML document for the iframe
-		// strHTML = String.format(
-		// 	strTemplate
-		// 	, Ext.isEmpty(this.printCSS)? '#': this.printCSS
-		// 	, this.printTitle
-		// 	, Ext.isIE? 'document.execCommand(\'print\');': 'window.print();'
-		// 	, html
-		// 	);
+			// Replace characters not valid for file names
+			document.title = config.title.replace(':', '.').replace(/[/\\?%*|"<>]+/g, '-');
 
-      go.print(html);
-		// var popup = window.open('about:blank');
-		// if (!popup.opener) popup.opener = self
-		// popup.document.write(strHTML);
-		// popup.document.close();
-		// popup.focus();
+			window.addEventListener("afterprint" , function(){
+				document.title = oldTitle;
+			}, {once: true});
+		}
+
+		go.print(html);
 	}
 });
 
@@ -1098,6 +1216,7 @@ Ext.override(Ext.form.Field, {
 			var fieldHelp = new Ext.ux.FieldHelp(this.hint);
 			this.plugins = this.plugins || [];
 			this.plugins.push(fieldHelp);
+			delete this.hint;
 		}
 		
 		

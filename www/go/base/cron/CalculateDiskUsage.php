@@ -3,6 +3,10 @@
 namespace GO\Base\Cron;
 
 
+use go\core\ErrorHandler;
+use go\modules\community\serverclient\model\MailDomain;
+use go\modules\community\serverclient\Module;
+
 class CalculateDiskUsage extends AbstractCron {
 	
 	/**
@@ -59,8 +63,20 @@ class CalculateDiskUsage extends AbstractCron {
 		
 		$folder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path);
 		\GO::config()->save_setting('file_storage_usage', $folder->calculateSize());
-		
-		if(\GO::modules()->postfixadmin){
+
+		if(\GO::modules()->serverclient) {
+			$domains = Module::getDomains();
+			if(!empty($domains)) {
+				$maildomain = new MailDomain("");
+
+				try {
+					$usage = $maildomain->getUsage($domains);
+					\GO::config()->save_setting('mailbox_usage', $usage);
+				} catch(\Exception $e) {
+					ErrorHandler::logException($e);
+				}
+			}
+		} else if(\GO::modules()->postfixadmin){
 			
 			$findParams = \GO\Base\Db\FindParams::newInstance()
 							->select('sum(`usage`) AS `usage`')
@@ -70,7 +86,9 @@ class CalculateDiskUsage extends AbstractCron {
 			$result = \GO\Postfixadmin\Model\Mailbox::model()->find($findParams);
 	
 			\GO::config()->save_setting('mailbox_usage', $result->usage*1024);
-		}
+		} else {
+            \GO::config()->save_setting('mailbox_usage', 0);
+        }
 
 	}
 	

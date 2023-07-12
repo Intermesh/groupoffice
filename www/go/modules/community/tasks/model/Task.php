@@ -10,7 +10,7 @@ namespace go\modules\community\tasks\model;
 
 use DateTimeInterface;
 use Exception;
-use go\core\acl\model\AclInheritEntity;
+use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\db\Expression;
 use go\core\model\Alert as CoreAlert;
@@ -35,7 +35,7 @@ use PDO;
 /**
  * Task model
  */
-class Task extends AclInheritEntity {
+class Task extends AclItemEntity {
 
 	const PRIORITY_LOW = 9;
 	const PRIORITY_HIGH = 1;
@@ -250,7 +250,7 @@ class Task extends AclInheritEntity {
 
 	public function getProgress(): string
 	{
-		return isset(Progress::$db[$this->progress]) ? Progress::$db[$this->progress] : Progress::$db[1];
+		return Progress::$db[$this->progress] ?? Progress::$db[1];
 	}
 
 	public function getTimeBooked(): ?int
@@ -258,7 +258,13 @@ class Task extends AclInheritEntity {
 		return $this->timeBooked;
 	}
 
-	public function setProgress($value) {
+	/**
+	 * Set progress status
+	 *
+	 * @param string $value "needs-action" {@see Progress::$db}
+	 * @return void
+	 */
+	public function setProgress(string $value) {
 		$key = array_search($value, Progress::$db, true);
 		if($key === false) {
 			$this->setValidationError('progress', ErrorCode::INVALID_INPUT, 'Incorrect Progress value for task: ' . $value);
@@ -294,6 +300,12 @@ class Task extends AclInheritEntity {
 			}
 		}
 		return $keywords;
+	}
+
+	protected function getSearchFilter(): ?string
+	{
+		$tasklist = TaskList::findById($this->tasklistId);
+		return $tasklist->getRole() == "support" ? "support" : null;
 	}
 
 	protected function getSearchDescription(): string
@@ -349,9 +361,9 @@ class Task extends AclInheritEntity {
 					}
 					$criteria->where(['categories.categoryId' => $value]);
 				}
-			})->addDate("start", function(Criteria $criteria, $comparator, $value) {
+			})->addDateTime("start", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('start',$comparator,$value);
-			})->addDate("due", function(Criteria $criteria, $comparator, $value) {
+			})->addDateTime("due", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('due', $comparator, $value);
 			})->addNumber('percentComplete', function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('percentComplete', $comparator, $value);
@@ -435,6 +447,9 @@ class Task extends AclInheritEntity {
 		if($this->isModified('responsibleUserId') && CoreAlert::$enabled) {
 
 			if (isset($this->responsibleUserId)) {
+
+				// when assigned to someone else it's progress should be needs action
+				$this->progress = Progress::NeedsAction;
 
 				if($this->responsibleUserId != go()->getUserId()) {
 					$alert = $this->createAlert(new \DateTime(), 'assigned', $this->responsibleUserId)
@@ -543,6 +558,7 @@ class Task extends AclInheritEntity {
 		$values = $this->toArray();
 		unset($values['id']);
 		unset($values['progress']);
+		unset($values['responsibleUserId']);
 		unset($values['percentComplete']);
 		unset($values['progressUpdated']);
 		unset($values['freeBusyStatus']);
@@ -684,7 +700,7 @@ class Task extends AclInheritEntity {
 	 * Try to find conflicting tasks.
 	 *
 	 * A task is considered conflicting when it has a start date and user id and there are other tasks with the same
-	 * responsible userId and start date which are part of a project task list.
+	 * responsible userId and start date which are part of a project list.
 	 *
 	 * @return bool
 	 */
@@ -745,10 +761,18 @@ class Task extends AclInheritEntity {
 			return;
 		}
 
-		if($comment->createdBy != $this->responsibleUserId && $this->progress != Progress::NeedsAction) {
-			$this->progress = Progress::NeedsAction;
-		} else if($this->progress == Progress::NeedsAction) {
+		if($this->createdBy != $comment->createdBy) {
+			//agent makes this message
+			if($this->responsibleUserId == null) {
+				// auto assign task on first comment
+				$this->responsibleUserId = $comment->createdBy;
+			}
+		}
+
+		if($comment->createdBy == $this->responsibleUserId) {
 			$this->progress = Progress::InProcess;
+		} else {
+			$this->progress = Progress::NeedsAction;
 		}
 
 		// make sure modified at is updated
@@ -767,6 +791,9 @@ class Task extends AclInheritEntity {
 
 		// Remove alert for creator of this comment. Other users will get a replaced alert below.
 		CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);
+
+		// remove you were assigned to alert when commenting
+		CoreAlert::deleteByEntity($this, "assigned", $comment->createdBy);
 
 		foreach($commenters as $userId) {
 			$alert = $this->createAlert(new DateTime(), 'comment', $userId)

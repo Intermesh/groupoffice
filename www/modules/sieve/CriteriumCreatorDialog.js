@@ -155,6 +155,16 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 					this.cmbBodyOperator.setValue('contains');
 				}
 				break;
+
+			case 'matches':
+				if (not) {
+					this.cmbOperator.setValue('notmatches');
+					this.cmbBodyOperator.setValue('notmatches');
+				}else {
+					this.cmbOperator.setValue('matches');
+					this.cmbBodyOperator.setValue('matches');
+				}
+				break;
 			case 'is':
 				if (not)
 					this.cmbOperator.setValue('notis');
@@ -307,8 +317,8 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 					break;
 				case 'body':
 					_test = 'body';
-					_not = (this.cmbBodyOperator.getValue() == 'notexists' || this.cmbBodyOperator.getValue() == 'notcontains');
-					_type = 'contains';
+					_not = (this.cmbBodyOperator.getValue() == 'notexists' || this.cmbBodyOperator.getValue() == 'notcontains' || this.cmbBodyOperator.getValue() == 'notmatches');
+					_type = this.cmbBodyOperator.getValue() == 'contains' || this.cmbBodyOperator.getValue() == 'notcontains' ? 'contains' : 'matches';
 					_arg = this.txtCriterium.getValue();
 					_arg1 = '';
 					_arg2 = '';
@@ -370,12 +380,14 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 	},
 	
 	_evaluateIfNotFields : function() {
-		return this.cmbOperator.getValue() == 'notexists' || this.cmbOperator.getValue() == 'notcontains' || this.cmbOperator.getValue() == 'notis';
+		return this.cmbOperator.getValue() == 'notexists' || this.cmbOperator.getValue() == 'notcontains' || this.cmbOperator.getValue() == 'notis' || this.cmbOperator.getValue() == 'notmatches';
 	},
 	
 	_evaluateTypeFields : function() {
 		if(this.cmbOperator.getValue() == 'contains' ||this.cmbOperator.getValue() == 'notcontains')
 			return 'contains';
+		else if(this.cmbOperator.getValue() == 'matches' ||this.cmbOperator.getValue() == 'notmatches')
+			return 'matches';
 		else if(this.cmbOperator.getValue() == 'is' ||this.cmbOperator.getValue() == 'notis')
 			return 'is';
 		else

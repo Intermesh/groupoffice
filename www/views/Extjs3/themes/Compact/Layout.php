@@ -1,4 +1,3 @@
 <?php
-$useThemeSettings = true;
-$density = 110;
+$density = 114;
 require(__DIR__ . "/../Paper/Layout.php");

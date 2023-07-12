@@ -91,9 +91,9 @@ class RRuleIterator implements Iterator {
 				} else {
 
 					$bySetPositions = \GO::t("month_times");
-					
-					$bySetPos = !empty($this->bySetPos) ? $this->bySetPos : 1;
 
+					// todo, multiple bysetpos not supported
+					$bySetPos = !empty($this->bySetPos) ? $this->bySetPos[0] : 1;
 					if (count($days) == 1) {						
 						$daysStr = $bySetPositions[$bySetPos] . ' ' . $days[0];
 					} else {
@@ -141,6 +141,7 @@ class RRuleIterator implements Iterator {
 
     /* Implementation of the Iterator interface {{{ */
 
+		#[\ReturnTypeWillChange]
     function current() {
 
         if (!$this->valid()) return;
@@ -153,6 +154,7 @@ class RRuleIterator implements Iterator {
      *
      * @return int
      */
+		#[\ReturnTypeWillChange]
     function key() {
 
         return $this->counter;
@@ -166,6 +168,7 @@ class RRuleIterator implements Iterator {
      *
      * @return bool
      */
+		#[\ReturnTypeWillChange]
     function valid() {
 
         if (!is_null($this->count)) {
@@ -180,6 +183,7 @@ class RRuleIterator implements Iterator {
      *
      * @return void
      */
+		#[\ReturnTypeWillChange]
     function rewind() {
 
         $this->currentDate = clone $this->startDate;
@@ -192,6 +196,7 @@ class RRuleIterator implements Iterator {
      *
      * @return void
      */
+		#[\ReturnTypeWillChange]
     function next() {
 
         // Otherwise, we find the next event in the normal RRULE

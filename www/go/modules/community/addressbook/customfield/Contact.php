@@ -2,11 +2,13 @@
 
 namespace go\modules\community\addressbook\customfield;
 
-use GO;
+use Exception;
 use go\core\db\Utils;
 use go\core\customfield\Base;
 use go\core\db\Criteria;
 use go\core\model\Acl;
+use go\core\orm\Entity;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Query;
 use go\modules\community\addressbook\model;
@@ -19,13 +21,20 @@ class Contact extends Base {
 		return model\Contact::class;
 	}
 	
-	protected function getFieldSQL() {
+	protected function getFieldSQL(): string
+	{
 		$d = $this->field->getDefault();
 		$d = isset($d) ? (int) $d : "NULL";
 		return "int(11) DEFAULT " . $d;
 	}
-	
-	public function onFieldSave() {
+
+	/**
+	 * @return bool
+	 * @see Base::onFieldSave()
+	 * @throws Exception
+	 */
+	public function onFieldSave(): bool
+	{
 		if (!parent::onFieldSave()) {
 			return false;
 		}		
@@ -41,7 +50,7 @@ class Contact extends Base {
 		go()->getDbConnection()->query($sql);
 	}
 
-	private function getConstraintName()
+	private function getConstraintName(): string
 	{
 		$strName = $this->field->tableName() . "_ibfk_go_" . $this->field->id;
 		if (strlen($strName) > 64) { // Constraint names are restricted to 64 characters!
@@ -50,12 +59,12 @@ class Contact extends Base {
 		return $strName;
 	}
 	
-	public function onFieldDelete() {
-
+	public function onFieldDelete(): bool
+	{
 		try {
 			$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
 			if (!go()->getDbConnection()->query($sql)) {
-				throw new \Exception("Couldn't drop foreign key");
+				throw new Exception("Couldn't drop foreign key");
 			}
 		} catch(\PDOException $e) {
 
@@ -70,11 +79,10 @@ class Contact extends Base {
 	 * Defines an entity filter for this field.
 	 * 
 	 * @see Entity::defineFilters()
-	 * @param Filters $filter
+	 * @param Filters $filters
 	 */
-	public function defineFilter(Filters $filters) {
-		
-		
+	public function defineFilter(Filters $filters)
+	{
 		$filters->addText($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
 			$this->joinCustomFieldsTable($query);	
 			
@@ -103,6 +111,9 @@ class Contact extends Base {
 			->single();
 	}
 
+	/**
+	 * @throws SaveException|Exception
+	 */
 	public function textToDb($value, \go\core\orm\CustomFieldsModel $values, $entity) {
 
 		if(empty($value)) {
@@ -121,7 +132,7 @@ class Contact extends Base {
 			$contact->name = $contact->lastName = $value;
 			$contact->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
 			if(!$contact->save()) {
-				throw new \Exception("Could not save contact: " . $contact->getValidationErrorsAsString());
+				throw new Exception("Could not save contact: " . $contact->getValidationErrorsAsString());
 			}
 
 			$id = $contact->id;
@@ -129,5 +140,6 @@ class Contact extends Base {
 
 		return $id;
 	}
+
 }
 

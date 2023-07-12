@@ -25,15 +25,16 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.createNoteGrid();
 
 		this.sidePanel = new Ext.Panel({
-			layout: 'fitwidth',
-			bodyStyle: 'overflow-y: auto',
+			autoScroll: true,
+			layout: "anchor",
+			defaultAnchor: '100%',
 			width: dp(300),
 			cls: 'go-sidenav',
 			region: "west",
 			split: true,
 			items: [
 				this.createNoteBookGrid(),
-				this.createFilterPanel()
+				{xtype:'filterpanel', store: this.noteGrid.store, entity: 'Note'}
 			]
 		});
 
@@ -94,40 +95,6 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.noteBookGrid.setDefaultSelection(selectedListIds);
 		this.checkCreateNoteBook();
 	},
-
-	createFilterPanel: function () {
-
-		return new Ext.Panel({
-			region: "center",
-			minHeight: dp(200),
-			autoScroll: true,
-			tbar: [
-				{
-					xtype: 'tbtitle',
-					text: t("Filters")
-				},
-				'->',
-				{
-					xtype: 'filteraddbutton',
-					entity: 'Note'
-				}
-			],
-			items: [
-				{
-					xtype: 'filtergrid',
-					filterStore: this.noteGrid.store,
-					entity: "Note"
-				},
-				{
-					xtype: 'variablefilterpanel',
-					filterStore: this.noteGrid.store,
-					entity: "Note"
-				}
-			]
-		});
-		
-		
-	},
 	
 	createNoteBookGrid : function() {
 		this.noteBookGrid = new go.modules.community.notes.NoteBookGrid({
@@ -136,7 +103,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			filteredStore: this.noteGrid.store,
 			showMoreLoader: true,
 
-			tbar: [{
+			tbar: [
+				{
 					xtype: 'tbtitle',
 					text: t('Notebooks')
 				}, '->', {
@@ -169,9 +137,14 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								dropRowIndex = grid.getView().findRowIndex(e.target),
 								noteBookId = grid.getView().grid.store.data.items[dropRowIndex].id;
 
+
+							const update = {};
 							selections.forEach((r) => {
-								go.Db.store("Note").save({noteBookId: noteBookId}, r.id);
+								update[r.id] = {noteBookId: noteBookId};
 							})
+
+							go.Db.store("Note").set({update: update});
+
 						}
 					});
 				},
@@ -288,6 +261,21 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							},
 							scope: this
 						},{
+							text: t("Web page") + " (HTML)",
+							iconCls: 'filetype filetype-html',
+							handler: function() {
+								go.util.exportToFile(
+									'Note',
+									Object.assign(go.util.clone(this.noteGrid.store.baseParams), this.noteGrid.store.lastOptions.params, {
+										limit: 0,
+										position: 0
+									}),
+									'html');
+							},
+							scope: this
+						},
+
+							{
 							iconCls: 'filetype filetype-json',
 							text: 'JSON',
 							handler: function() {

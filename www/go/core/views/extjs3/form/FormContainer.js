@@ -17,7 +17,14 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		this.additionalFields = [];
 
 		// required when component is added after constructing a component
-		this.on("add", function (e) {
+		this.on("add", function (pnl, cmp, index) {
+
+			if(cmp.isFormField) {
+				cmp.on("change", () => {
+					this.fireEvent("change", this, this.getValue());
+				})
+			}
+
 			//to prevent adding to Ext.form.BasicForm with add event.
 			//Cancels event bubbling
 			return false;

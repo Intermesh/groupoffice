@@ -109,7 +109,7 @@ class Group extends AclOwnerEntity {
 
 						if(is_array($value)) {
 							$type = EntityType::findByName($value['entity']);
-							if (!empty($value['default'])) {
+							if (!empty($value['default']) || empty($value['id'])) {
 								$aclId = $type->getDefaultAclId();
 							} else {
 								$cls = $type->getClassName();
@@ -144,9 +144,18 @@ class Group extends AclOwnerEntity {
 			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the admin user from the administrators group"));
 		}
 
+		// If this is a personal user group the user must be in it.
 		if($this->isUserGroupFor && !in_array($this->isUserGroupFor, $this->users))
 		{
 			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the group owner from the group"));
+		}
+
+		// the group itself may not be removed from the ACL of the group
+		if($this->isUserGroupFor && $this->isAclModified())
+		{
+			if(!isset($this->setAcl[$this->id])) {
+				$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the group owner from the group"));
+			}
 		}
 
 		if($this->id == self::ID_EVERYONE && $this->isModified(['users'])) {
@@ -160,6 +169,17 @@ class Group extends AclOwnerEntity {
 	{
 		//make sure all users are in group everyone
 		go()->getDbConnection()->exec("INSERT IGNORE INTO core_user_group (SELECT " . self::ID_EVERYONE .", id from core_user)");
+
+		//share groups with themselves
+		$stmt = go()->getDbConnection()
+			->insertIgnore(
+				'core_acl_group',
+				go()->getDbConnection()->select('aclId, id, "' . Acl::LEVEL_READ .'"')->from("core_group"),
+				['aclId', 'groupId', 'level']
+			);
+
+		$stmt->execute();
+
 		return parent::check();
 	}
 

@@ -56,6 +56,10 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 				cmp.on(event, function(cmp) {
 					var v = cmp.getValue();
 
+					if(!v) {
+						return;
+					}
+
 					if(v instanceof Date) {
 						v = v.serialize();
 					}
@@ -64,7 +68,9 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 							display: cmp.getRawValue()
 						}]}, true);
 
-					cmp.reset();
+					setTimeout( () => {
+						cmp.reset();
+					})
 
 
 				});
@@ -94,13 +100,19 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 	},
 
 	getFilterCmpWrap : function(cmp) {
-		cmp.flex = 1;
+
 		var wrap = {
-			anchor: "100%",
-			xtype: "compositefield",
+			xtype: "container",
+			cls: "go-hbox",
 			items: [
-				cmp,
 				{
+					flex: 1,
+					layout: "form",
+					items: [cmp]
+				},
+
+				{
+					style: "align-self: center",
 					width: dp(24),
 					xtype: "button",
 					iconCls: 'ic-more-vert',
@@ -162,7 +174,7 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 		});
 
 		this.filterStore.setFilter('customfilters', filter);
-		this.filterStore.load();
+		this.filterStore.load().then(() => {this.fireEvent('resize');});
 	},
 
 

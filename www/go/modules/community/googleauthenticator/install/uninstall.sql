@@ -1,1 +1,0 @@
-DROP TABLE IF EXISTS `googleauth_secret`;

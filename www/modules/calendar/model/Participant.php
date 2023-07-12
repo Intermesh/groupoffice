@@ -37,6 +37,7 @@
 namespace GO\Calendar\Model;
 
 use go\core\model\Link;
+use GO\Leavedays\Model\Leaveday;
 
 class Participant extends \GO\Base\Db\ActiveRecord {
 
@@ -169,11 +170,20 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 
 		$events = Event::model()->findCalculatedForPeriod($findParams, $periodStartTime, $periodEndTime, true);
 
-		foreach ($events as $event) {
-			\GO::debug($event->getName());
+
+		if(!empty($events)) {
+			return false;
+		};
+
+		if(\GO::modules()->leavedays) {
+			$leavedays = Leaveday::model()->findForPeriod([$userId], $periodStartTime, $periodEndTime);
+
+			if (!empty($leavedays)) {
+				return false;
+			};
 		}
 
-		return count($events) == 0;
+		return true;
 	}
 	
 	/**
@@ -440,6 +450,7 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 		
 		return parent::afterDelete();
 	}
+
 	
 //	private function _updateEvents(){
 //

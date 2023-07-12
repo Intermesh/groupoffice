@@ -2,6 +2,7 @@
 namespace go\core\acl\model;
 
 use Exception;
+use go\core\ErrorHandler;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\orm\exception\SaveException;
@@ -19,7 +20,7 @@ use go\core\db\Expression;
 abstract class AclOwnerEntity extends AclEntity {
 
 	use AclSetterTrait;
-	
+
 	/**
 	 * The ID of the {@see Acl}
 	 * 
@@ -53,6 +54,12 @@ abstract class AclOwnerEntity extends AclEntity {
 		return true;
 	}
 
+	protected static function internalRequiredProperties(): array
+	{
+		$arr =  parent::internalRequiredProperties();
+		$arr[] = static::$aclColumnName;
+		return $arr;
+	}
 
 
 	/**
@@ -128,60 +135,20 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		$tableAlias = $query->getTableAlias();
 
-		$records = $changes->select($tableAlias.'.id as entityId, '.$tableAlias.'.aclId, "1" as destroyed')
-			->all(); //we have to select now because later these id's are gone from the db
-
+		$records = $changes->select($tableAlias.'.id as entityId, '.$tableAlias.'.aclId, "1" as destroyed');
 		return static::entityType()->changes($records);
 	}
 	
 	protected static function internalDelete(Query $query): bool
 	{
-
-		$aclsToDelete = static::getAclsToDelete($query);
-
 		if(!parent::internalDelete($query)) {
 			return false;
-		}
-		
-		if(!empty($aclsToDelete)) {
-			if(!Acl::delete((new Query)->where('id', 'IN', $aclsToDelete))) {
-				throw new Exception("Could not delete ACL");
-			}
 		}
 		
 		return true;
 	}
 
-	private static $keepAcls = [];
 
-	/**
-	 * Keep acl's when deleting. This is used by the community/history module because it wasnts to take over the ACL
-	 * on delete. It will remove the acl when the log entry is delete.
-	 */
-	public static function keepAcls() {
-		self::$keepAcls[static::class] = true;
-	}
-
-	/**
-	 * @param Query $query
-	 * @return array
-	 * @throws Exception
-	 */
-	protected static function getAclsToDelete(Query $query): array
-	{
-
-		if(!empty(self::$keepAcls[static::class])) {
-			return [];
-		}
-
-		$q = clone $query;
-		$q->select(static::$aclColumnName);
-		return $q->all();
-
-	}
-
-
-	
 	/**
 	 * Get the permission level of the current user
 	 * 
@@ -194,7 +161,10 @@ abstract class AclOwnerEntity extends AclEntity {
 			return parent::internalGetPermissionLevel();
 		}
 
-		if(!isset($this->permissionLevel)) {
+		if(!isset($this->{static::$aclColumnName})) {
+			ErrorHandler::log(static::$aclColumnName .' not set for ' . static::class . '::' . $this->id());
+			$this->permissionLevel = 	(go()->getAuthState() && go()->getAuthState()->isAdmin()) ? Acl::LEVEL_MANAGE : 0;
+		} else if(!isset($this->permissionLevel)) {
 			$this->permissionLevel =
 				(go()->getAuthState() && go()->getAuthState()->isAdmin()) ?
 					Acl::LEVEL_MANAGE :
@@ -229,9 +199,14 @@ abstract class AclOwnerEntity extends AclEntity {
 	 */
 	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
 	{
-		$tables = static::getMapping()->getTables();
-		$firstTable = array_shift($tables);
-		$tableAlias = $firstTable->getAlias();
+//		$tables = static::getMapping()->getTables();
+
+		$col = static::getMapping()->getColumn(static::$aclColumnName);
+		$tableAlias = $col->table->getAlias();
+//		$firstTable = array_shift($tables);
+//		$tableAlias = $firstTable->getAlias();
+
+
 		Acl::applyToQuery($query, $tableAlias . '.' . static::$aclColumnName, $level, $userId, $groups);
 		
 		return $query;
@@ -291,10 +266,18 @@ abstract class AclOwnerEntity extends AclEntity {
 	}
 
 	/**
+	 * Fixes broken ACL's
+	 *
 	 * Executed when a database check is performed
 	 *
 	 * It registers the table and for which entity the acl is used and updates the ownedBy from
 	 * createdBy if present.
+	 *
+	 * 1. Adds new if missing
+	 * 2. Set't the correct values for entityTypeId, entityId and usedIn
+	 * 3. Copies ownedBy from createdBy if present
+	 * 4. @todo: when old framework ACl is deprecated then it should add's owner to ACL if missing
+	 *
 	 *
 	 * When ACL's are no longer used they may be cleaned up.
 	 *
@@ -308,6 +291,9 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		//set owner and entity properties of acl
 		$aclColumn = static::getMapping()->getColumn(static::$aclColumnName);
+
+		$updateQuery = 	static::checkAclJoinEntityTable();
+		$updateQuery->tableAlias('acl');
 
 		$updates = [
 			'acl.entityTypeId' => static::entityType()->getId(),
@@ -331,31 +317,27 @@ abstract class AclOwnerEntity extends AclEntity {
 			$updates['acl.ownedBy'] = new Expression('coalesce(entity.createdBy, 1)');
 		}
 
-		$updateQuery = static::getCheckAclUpdateQuery();
-
 		$stmt = go()->getDbConnection()->update(
 			'core_acl',
 			$updates,
-			$updateQuery);
+			$updateQuery
+		);
 
 		if(!$stmt->execute()) {
 			throw new Exception("Could not update ACL");
 		}
 	}
 
-	/**
-	 * Builds the query to update ACL's on the database check
-	 *
-	 * @return Query
-	 * @throws Exception
-	 */
-	protected static function getCheckAclUpdateQuery(): Query
-	{
-		$table = static::getMapping()->getPrimaryTable();
-		$updateQuery = 	(new Query())
-			->tableAlias('acl')
-			->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id');
-		return $updateQuery;
-	}
 
+	/**
+	 * This function joins the enity table so that the check function can set the usedIn property on the acl.
+	 * The table alias must be 'entity'.
+	 *
+	 * @return \go\core\db\Query|Query
+	 */
+	protected static function checkAclJoinEntityTable() {
+		$table = static::getMapping()->getColumn(static::$aclColumnName)->getTable();
+		return (new Query())
+			->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id');
+	}
 }

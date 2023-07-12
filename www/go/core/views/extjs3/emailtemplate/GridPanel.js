@@ -2,6 +2,12 @@
 go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 	module: null,
 	key: null,
+
+	/**
+	 * Set defaults for new templates
+	 */
+	templateDefaults: undefined,
+
 	viewConfig: {
 		emptyText: 	'<p>' +t("No items to display") + '</p>'
 	},
@@ -60,6 +66,9 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 					handler: function() {
 						var dlg = new go.emailtemplate.TemplateDialog();
 						dlg.setValues({module: this.module, key: this.key}).show();
+						if(this.templateDefaults) {
+							dlg.setValues(this.templateDefaults);
+						}
 					},
 					scope: this
 			}],
@@ -69,7 +78,10 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 				entityStore: "EmailTemplate",
 				filters: {
 					module: {module: this.module, key: this.key}
-				}	
+				},
+				sortInfo: {
+					field: "name"
+				}
 			}),
 			autoHeight: true,
 			columns: [
@@ -95,7 +107,16 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 			autoExpandColumn: "name"
 		});
 
-		go.smtp.GridPanel.superclass.initComponent.call(this);
+		// if(this.title) {
+		// 	this.tbar.unshift({
+		// 		xtype:'tbtitle',
+		// 		text: this.title
+		// 	})
+		//
+		// 	delete this.title;
+		// }
+
+		go.emailtemplate.GridPanel.superclass.initComponent.call(this);
 		
 		this.on("rowdblclick", function(grid, rowIndex, e) {
 			var record = grid.getStore().getAt(rowIndex);

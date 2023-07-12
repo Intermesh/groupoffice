@@ -6,6 +6,7 @@ use ErrorException;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\model\Acl;
 use go\core\model\CronJobSchedule;
 use go\core\model\OauthAccessToken;
 use go\core\model\RememberMe;
@@ -30,6 +31,10 @@ use Throwable;
  * - core_change sync changelog
  *
  * Modules can use EVENT_RUN to extend the process
+ *
+ * For testing:
+ *
+ * docker-compose exec -u www-data groupoffice ./www/cli.php core/System/runCron --name='GarbageCollection' --debug
  * 
  */
 class GarbageCollection extends CronJob {
@@ -48,6 +53,7 @@ class GarbageCollection extends CronJob {
 		$this->blobs();
 		$this->change();
 		$this->links();
+		$this->acls();
 
 		Token::collectGarbage();
 		OauthAccessToken::collectGarbage();
@@ -76,8 +82,16 @@ class GarbageCollection extends CronJob {
 
 	private function blobs() {
 		go()->debug("Cleaning up BLOB's");
-		Blob::delete(Blob::findStale());
-		go()->debug("Deleted stale blobs");
+		$query = Blob::findStale();
+		go()->debug($query);
+		Blob::delete($query);
+		go()->debug("Deleted " . (isset(Blob::$lastDeleteStmt) ? Blob::$lastDeleteStmt->rowCount() : 0) . " stale blobs");
+	}
+
+	private function acls() {
+		go()->debug("Cleaning up ACL's");
+		Acl::delete(Acl::findStale());
+		go()->debug("Deleted " .  (isset(Acl::$lastDeleteStmt) ? Acl::$lastDeleteStmt->rowCount() : 0). " stale ACL's");
 	}
 
 	private function change() {
@@ -103,15 +117,27 @@ class GarbageCollection extends CronJob {
 					continue;
 				}
 
-				go()->debug("Cleaning ". $type->getName());
-
 				$cls = $type->getClassName();
 
 				if(is_a($cls,  ActiveRecord::class, true)) {
+
+					if(!$cls::model()->hasLinks()) {
+						continue;
+					}
+
 					$tableName = $cls::model()->tableName();
+
 				} else {
+
+					if(!method_exists($cls, 'hasSearch')) {
+						//without search there are no links
+						continue;
+					}
+
 					$tableName = $cls::getMapping()->getPrimaryTable()->getName();
 				}
+
+				go()->debug("Cleaning links for ". $type->getName());
 
 				$query = (new Query)->select('sub.id')->from($tableName);
 
@@ -139,7 +165,7 @@ class GarbageCollection extends CronJob {
 
 				go()->debug("Deleted ". $stmt->rowCount() . " links to $cls");
 			}catch(Exception $e) {
-				ErrorHandler::logException($e);
+				ErrorHandler::logException($e, "Trying to clean up links for " . $type->getName());
 			}
 
 		}

@@ -55,7 +55,7 @@ go.Modules.register("community", "addressbook", {
 				name: 'text',
 				type: "string",
 				multiple: false,
-				title: "Query"
+				title: t("Query")
 			},
 			{
 				title: t("Comment"),
@@ -288,6 +288,11 @@ go.Modules.register("community", "addressbook", {
 						title: t("No")
 					}
 				]
+			}, {
+				title: t("VAT number"),
+				name: 'vatNo',
+				type:"text",
+				multiple: true
 			}
 		],
 
@@ -414,7 +419,8 @@ go.Modules.register("community", "addressbook", {
 	 * Extra custom field types this module offers
 	 */
 	customFieldTypes: [
-		"go.modules.community.addressbook.customfield.Contact"
+		"go.modules.community.addressbook.customfield.Contact",
+		"go.modules.community.addressbook.customfield.MultiContact"
 	]
 });
 

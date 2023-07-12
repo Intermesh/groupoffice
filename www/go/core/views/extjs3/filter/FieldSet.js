@@ -1,5 +1,5 @@
 go.filter.FieldSet = Ext.extend(Ext.form.FieldSet, {
-	title: t("Conditions"),
+	//title: t("Conditions"),
 	entity: null,
 
 	setEntity: function (name) {
@@ -14,24 +14,24 @@ go.filter.FieldSet = Ext.extend(Ext.form.FieldSet, {
 			this.conditionsField = new go.form.FormContainer({
 				xtype: "formcontainer",
 				name: "filter",
-				hideLabel: true,
 				items: [
 					{
 						xtype: "radiogroup",
 						name: 'operator',
+						fieldLabel: t('How many condition should match?'),
 						value: "AND",
 						items: [{
 								xtype: "radio",
 								inputValue: "AND",
-								boxLabel: t("Match ALL of the conditions")
+								boxLabel: t('All')// t("Match ALL of the conditions")
 							}, {
 								xtype: "radio",
 								inputValue: "OR",
-								boxLabel: t("Match ANY of the conditions")
+								boxLabel: t('At least one')// t("Match ANY of the conditions")
 							}, {
 								xtype: "radio",
 								inputValue: "NOT",
-								boxLabel: t("Match NONE of the conditions")
+								boxLabel: t('None')// t("Match NONE of the conditions")
 							}]
 					}, this.filterConditions = new go.filter.Conditions({
 						xtype: "filterconditions",

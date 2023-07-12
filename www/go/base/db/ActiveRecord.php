@@ -763,33 +763,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 
-//	private function _joinAclTable(){
-//		$arr = explode('.',$this->aclField());
-//		if(count($arr)==2){
-//			//we need to join a table for the acl field
-//			$r= $this->getRelation($arr[0]);
-//			$model = GO::getModel($r['model']);
-//
-//			$ret['relation']=$arr[0];
-//			$ret['aclField']=$arr[1];
-//			$ret['join']="\nINNER JOIN `".$model->tableName().'` '.$ret['relation'].' ON ('.$ret['relation'].'.`'.$model->primaryKey().'`=t.`'.$r['field'].'`) ';
-//			$ret['fields']='';
-//
-//			$cols = $model->getColumns();
-//
-//			foreach($cols as $field=>$props){
-//				$ret['fields'].=', '.$ret['relation'].'.`'.$field.'` AS `'.$ret['relation'].'@'.$field.'`';
-//			}
-//			$ret['table']=$ret['relation'];
-//
-//		}else
-//		{
-//			return false;
-//		}
-//
-//		return $ret;
-//	}
-
 	/**
 	 * Makes an attribute unique in the table by adding a number behind the name.
 	 * eg. Name becomes Name (1) if it already exists.
@@ -1222,7 +1195,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 	}
 
-	private $useSqlCalcFoundRows=true;
+	protected $useSqlCalcFoundRows=true;
 
 	/**
 	 * Find models
@@ -3275,7 +3248,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			
 			//change ACL owner
-			if($this->aclField() && $this->isModified('user_id')) {
+			if($this->aclField() && !$this->getIsJoinedAclField() && $this->isModified('user_id')) {
 				$this->acl->ownedBy = $this->user_id;
 				$this->acl->save();
 			}
@@ -3541,29 +3514,40 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * When you move a contact to another contact all the acl id's must change.
 	 */
 	private function _fixLinkedEmailAcls(){
-		if($this->hasLinks() && GO::modules()->isInstalled('savemailas')){
-			$arr = explode('.', $this->aclField());
-			if (count($arr) > 1) {
+		if(!$this->hasLinks() || !GO::modules()->isInstalled('savemailas')) {
+			return;
+		}
+		$arr = explode('.', $this->aclField());
+		if (count($arr) > 1) {
 
-				$relation = $this->getRelation($arr[0]);
+			$relation = $this->getRelation($arr[0]);
 
-				if($relation && $this->isModified($relation['field'])){
-					//acl relation changed. We must update linked emails
+			if($relation && $this->isModified($relation['field'])){
+				//acl relation changed. We must update linked emails
 
-					GO::debug("Fixing linked e-mail acl's because relation ".$arr[0]." changed.");
+				GO::debug("Fixing linked e-mail acl's because relation ".$arr[0]." changed.");
+				$this->_doFixLinkedEmailAcls();
+				return;
+			}
+		}
 
-					$stmt = \GO\Savemailas\Model\LinkedEmail::model()->findLinks($this);
-					if($stmt->rowCount()) {
-						$aclId = $this->findAclId();
-						while ($linkedEmail = $stmt->fetch()) {
+		$acl_overwrite_col = $this->aclOverwrite();
+		if($acl_overwrite_col && $this->isModified([$acl_overwrite_col])) {
+			$this->_doFixLinkedEmailAcls();
+		}
 
-							GO::debug("Updating " . $linkedEmail->subject);
+	}
 
-							$linkedEmail->acl_id = $aclId;
-							$linkedEmail->save();
-						}
-					}
-				}
+	private function _doFixLinkedEmailAcls() {
+		$stmt = \GO\Savemailas\Model\LinkedEmail::model()->findLinks($this);
+		if($stmt->rowCount()) {
+			$aclId = $this->findAclId();
+			while ($linkedEmail = $stmt->fetch()) {
+
+				GO::debug("Updating " . $linkedEmail->subject);
+
+				$linkedEmail->acl_id = $aclId;
+				$linkedEmail->save();
 			}
 		}
 	}
@@ -4126,8 +4110,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		GO::setMaxExecutionTime(180); // Added this because the deletion of all relations sometimes takes a lot of time (3 minutes)
 
-		//GO::debug("Delete ".$this->className()." pk: ".$this->pk);
-
 		if($this->isNew)
 			return true;
 
@@ -4275,22 +4257,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			if($folder)
 				$folder->delete(true);
 		}
-		
 
-		if($this->aclField() && (!$this->isJoinedAclField || $this->isAclOverwritten()) && !go()->getModule('community', 'history')){
-			//echo 'Deleting acl '.$this->{$this->aclField()}.' '.$this->aclField().'<br />';
-			$aclField = $this->isAclOverwritten() ? $this->aclOverwrite() : $this->aclField();
-
-			$acl = \GO\Base\Model\Acl::model()->findByPk($this->{$aclField});
-			if($acl) {
-				$acl->delete();
-			}
-		}
-
-		
 		$this->_deleteLinks();	
-		
-		
+
 		if(!$this->afterDelete()) {
 			return false;
 		}

@@ -93,7 +93,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this->groupBy;
 	}
 
-	public function getLimit() {
+	public function getLimit() : ?int {
 		return $this->limit;
 	}
 

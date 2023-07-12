@@ -90,12 +90,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			return;
 		}
 
-		changed.forEach((id) => {
+		for(const id of changed) {
 			if(this.watchRelations[entityStore.entity.name].indexOfLoose(id) > -1) {
 				this.internalLoad(this.data);
 				return;
 			}
-		});
+		}
 	},
 	
 	// listen to relational stores as well
@@ -213,6 +213,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			});
 		}
 
+		this.entityStore.checkState();
+
 		if(this.currentId == id) {
 			return Promise.resolve(this.data);
 		}
@@ -242,6 +244,11 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 	addCustomFields : function() {
 		return this.add(go.customfields.CustomFields.getDetailPanels(this.entityStore.entity.name));
+	},
+
+	addCFRelationGrids : async function(resolve) {
+		const panels = await go.customfields.CustomFields.getRelationPanels(this.entityStore.entity.name, this.currentId);
+		this.add(panels);
 	},
 
 	addLinks : function(sortFn) {

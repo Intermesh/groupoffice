@@ -16,6 +16,7 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\orm\Query;
+use go\core\util\ArrayObject;
 use GO\Projects2\Model\ProjectEntity;
 
 /**
@@ -44,7 +45,7 @@ class TaskList extends AclOwnerEntity
 	/** @var string What kind of list: 'list', 'board' */
 	protected $role = self::List;
 
-	public function getRole() {
+	public function getRole() : string {
 		return self::Roles[$this->role] ?? 'list';
 	}
 
@@ -78,6 +79,8 @@ class TaskList extends AclOwnerEntity
 	public $groups = [];
 
 	public $projectId = null;
+
+	public $groupingId = null;
 
 	protected static function defineFilters(): Filters
 	{
@@ -131,7 +134,7 @@ class TaskList extends AclOwnerEntity
 
 
 	/**
-	 * Create a task list for a project and return its id
+	 * Create a list for a project and return its id
 	 *
 	 * @param int $projectId
 	 * @return TaskList
@@ -158,5 +161,21 @@ class TaskList extends AclOwnerEntity
 	{
 		return Module::findByName('community', 'tasks')
 			->getUserRights()->mayChangeTasklists;
+	}
+
+	protected static function checkAclJoinEntityTable()
+	{
+		return (new Query())
+			->join("tasks_tasklist", 'entity', 'entity.aclId = acl.id and entity.role != ' . self::Project);
+
+	}
+
+	public static function sort(Query $query, ArrayObject $sort): Query
+	{
+		if(isset($sort['group'])) {
+			$query->join("tasks_tasklist_grouping", "grouping", "grouping.id = tasklist.groupingId", "LEFT");
+			$sort->renameKey("group", "grouping.name");
+		}
+		return parent::sort($query, $sort);
 	}
 }

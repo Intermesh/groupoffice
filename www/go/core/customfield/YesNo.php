@@ -9,8 +9,16 @@ class YesNo extends Base {
 	 * 
 	 * @return string
 	 */
-	protected function getFieldSQL() {		
-		return "tinyint DEFAULT NULL";
+	protected function getFieldSQL(): string
+	{
+		$def = $this->field->getDefault();
+		if(!empty($def)) {
+			$def = intval($def);
+		} else{
+			$def = "NULL";
+		}
+
+		return "tinyint DEFAULT " . $def;
 	}
 
 	public function dbToText($value, \go\core\orm\CustomFieldsModel $values, $entity)

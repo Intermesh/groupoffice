@@ -16,6 +16,13 @@ use go\core\model\User;
 use go\core\fs\Blob;
 
 class Module extends core\Module implements DomainProvider {
+	/**
+	 * The development status of this module
+	 * @return string
+	 */
+	public function getStatus() : string{
+		return self::STATUS_STABLE;
+	}
 
 	public function getAuthor(): string
 	{
@@ -83,7 +90,7 @@ class Module extends core\Module implements DomainProvider {
 //				'addressType' => function($record) {
 //					return \go\modules\community\addressbook\model\Address::TYPE_WORK;
 //				},
-				'street' => 'street',
+				'address' => 'street',
 				'zipCode' => 'postalCode',
 				'city' => 'l',
 				'state' => 's',

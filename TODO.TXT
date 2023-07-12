@@ -6,13 +6,16 @@ Roadmap
  - Any item with time entries shows a summary too.
  - Items can be invoiced just like projects -> more menu -> invoice
 
-- Tickets module (extension for tasks)
-- Billing module refactor
-    - JMAP
-    - Debtor management
-    - PayPal and other payment provider integration
-    - Integrate accountant packages. Invoice Sync API
-    - Item with links to invoices shows summary too
+x Tickets module (extension for tasks)
+    - Easily pick categories from display panel
+x Billing module refactor
+    x JMAP
+    x Debtor management
+    x PayPal and other payment provider integration
+    x Integrate accountant packages. Invoice Sync API
+    x Item with links to invoices shows summary too
+    - Catalog categories
+    - Catalog picker in invoices
 
 - Email module
  - JMAP
@@ -32,16 +35,18 @@ Roadmap
 
 - Mailserver
     - Quota warning: https://doc.dovecot.org/configuration_manual/quota/#quota-warning-scripts
-    - limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
+    x limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
     - permissions per account?
     - Auto clean spam and trash
-    - DKIM generator and implementation
+    - DKIM generator and implementation: https://github.com/trusteddomainproject/OpenDKIM/blob/master/opendkim/README.SQL
     - Cronb job that checks every hour:
         - SPF record is correct
         - DKIM record is set and valid. Automatically configure opendkim if right key is found.
         - MX record points to the server
         - PTR record for server IP is set
         - Perhaps black list check?
+
+     - sender acl https://beechy.de/postfix-sender_login_maps/
 
 
 - Rocket chat

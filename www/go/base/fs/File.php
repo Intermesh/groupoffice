@@ -215,12 +215,12 @@ class File extends Base{
 	/**
 	 * Put data in the file. (See php function file_put_contents())
 	 * 
-	 * @param StringHelper $data
-	 * @param type $flags
+	 * @param string $data
+	 * @param int $flags
 	 * @param type $context
 	 * @return boolean 
 	 */
-	public function putContents($data, $flags=null, $context=null){
+	public function putContents($data, $flags=0, $context=null){
 		if(file_put_contents($this->path, $data, $flags, $context)){
 			$this->setDefaultPermissions();
 			return true;
@@ -427,6 +427,34 @@ class File extends Base{
 		}
 		
 		return false;						
+	}
+
+	/**
+	 * Create a hard link
+	 *
+	 * @link http://php.net/manual/en/function.link.php
+	 *
+	 * @param File $targetLink The link name.
+	 *
+	 * @return bool <b>File</b> on success or <b>FALSE</b> on failure.
+	 */
+	public function link(File $targetLink): bool
+	{
+		return link($this->path(), $targetLink->path());
+	}
+
+	public function linkOrCopy(File $targetLink) {
+
+		try {
+			if($this->link($targetLink)) {
+				go()->debug("Link success");
+				return $targetLink;
+			}
+		}catch(\Throwable $e) {
+			go()->debug($e);
+		}
+
+		return $this->copy($targetLink->parent(), $targetLink->name());
 	}
 	
 	/**

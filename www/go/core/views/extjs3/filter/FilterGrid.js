@@ -5,6 +5,7 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 		totalDisplay: false
 	},
 	autoHeight: true,
+	autoScroll:true,
 	
 	filterStore: null,
 	
@@ -18,10 +19,8 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 
 	initComponent: function () {
 
-		var actions = this.initRowActions();
-
-		var selModel = new Ext.grid.CheckboxSelectionModel();
-		
+		const actions = this.initRowActions(),
+			selModel = new Ext.grid.CheckboxSelectionModel();
 
 		Ext.apply(this, {			
 			store: new go.data.Store({
@@ -73,14 +72,12 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 	},
 
 	applyFilters : function() {
-		var selected = this.getSelectionModel().getSelections();
+		const selected = this.getSelectionModel().getSelections();
 
 		if(!selected.length) {
 			this.filterStore.setFilter("user", null);
-		} else
-		{
-
-			var filter = {
+		} else {
+			let filter = {
 				operator: "AND",
 				conditions: []
 			};
@@ -96,7 +93,7 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 
 	initRowActions: function () {
 
-		var actions = new Ext.ux.grid.RowActions({
+		const actions = new Ext.ux.grid.RowActions({
 			menuDisabled: true,
 			hideable: false,
 			draggable: false,
@@ -106,8 +103,8 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 			keepSelection: true,
 
 			actions: [{
-					iconCls: 'ic-more-vert'
-				}]
+				iconCls: 'ic-more-vert'
+			}]
 		});
 
 		actions.on({
@@ -131,7 +128,7 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function() {
-							var dlg = new go.filter.FilterDialog({
+							const dlg = new go.filter.FilterDialog({
 								entity: this.entity
 							});
 							dlg.load(this.moreMenu.record.id).show();

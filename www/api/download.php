@@ -48,7 +48,28 @@ try {
 			exit();
 		}
 
-		$blob->output(!empty($_GET['inline']));
+		$inline = !empty($_GET['inline']);
+
+		// prevent html to render on same domain having access to all global JS stuff
+		if($blob->type == 'text/html') {
+			$inline = false;
+		}
+
+		$ua_info = \donatj\UserAgent\parse_user_agent();
+		if($ua_info['browser'] == 'Safari' && substr(strtolower($blob->name), -5) == '.webm' && !strstr(Request::get()->getUri(), 'webm')) {
+			//workaround webm bug in safari that needs a webm extension :(
+			header("Location: " . str_replace('download.php?', 'download.php/' . rawurlencode($blob->name) . '?', Request::get()->getFullUrl()));
+			exit();
+		}
+
+		$inline = !empty($_GET['inline']);
+
+		// prevent html to render on same domain having access to all global JS stuff
+		if($blob->type == 'text/html') {
+			$inline = false;
+		}
+
+		$blob->output($inline);
 		exit();
 	}
 
@@ -85,7 +106,12 @@ try {
 
 	call_user_func_array([$c, $method], $parts);
 } catch(Exception $e) {
+	Response::get()->setContentType('text/plain');
 	ErrorHandler::logException($e);
 	Response::get()->setStatus(500);
 	Response::get()->output($e->getMessage());
+
+	if(go()->getDebugger()->enabled) {
+		go()->getDebugger()->printEntries();
+	}
 }

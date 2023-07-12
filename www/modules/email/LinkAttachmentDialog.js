@@ -24,7 +24,7 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 		this.attachmentsView = attachmentsView;
 	},
 	link : function()	{
-		var record = this.grid.getSelectionModel().getSelected();
+		const record = this.grid.getSelectionModel().getSelected();
 		
 		this.getEl().mask();
 
@@ -34,6 +34,26 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 			} else {
 				this.saveToItem(record, record.data.entityId);
 			}
+
+			return;
+		} else if (record.data.entity === 'File') {
+			GO.request({
+				url:'files/file/display',
+				params:{
+					id: record.data.entityId
+				},
+				success:function(response, options, result) {
+					// In order for createButton to work:
+					if (!this.entity) {
+						this.entity = record.data.entity;
+					}
+					if (!this.data) {
+						this.data = {id: record.data.entityId};
+					}
+					GO.email.emailFiles(result.data, this);
+				},
+				scope: this
+			});
 
 			return;
 		}
@@ -46,7 +66,6 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 				id:record.data.entityId
 			},
 			success:function(response, options, result){
-				
 				if(GO.util.empty(this.attachmentItem)){
 					if(this.attachmentHandle) {
 						this.attachmentHandle(result);

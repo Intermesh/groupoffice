@@ -42,7 +42,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					defaults: {
 						anchor: "100%"
 					},
-					items: [this.usernameField = new Ext.form.TextField({
+					items: [
+						this.usernameField = new Ext.form.TextField({
 						xtype: 'textfield',
 						name: 'username',
 						fieldLabel: t("Username"),
@@ -52,11 +53,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						regex: /^[A-Za-z0-9_\-\.\@]*$/,
 						regexText: t("You have invalid characters in the username") + " (a-z, 0-9, -, _, ., @)."
 					}),
-					this.displayNameField = new Ext.form.TextField({
-						fieldLabel: t('Display name','users','core'),
-						name: 'displayName',
-						allowBlank:false
-					}),
+
 					this.emailField = new Ext.form.TextField({
 						fieldLabel: t('E-mail','users','core'),
 						name: 'email',
@@ -76,6 +73,16 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				
 			}]
 		});
+
+		if(!go.Modules.isInstalled("community", "addressbook")) {
+			this.displayNameField = new Ext.form.TextField({
+				fieldLabel: t('Display name','users','core'),
+				name: 'displayName',
+				allowBlank:false
+			});
+
+			this.userFieldset.insert(1, this.displayNameField);
+		}
 
 		this.quotaFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),		
@@ -151,27 +158,20 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					},
 					layout: "hbox",
 					items: [
-						{
-							html: "IP"
-						},{
-							html: t("Platform")
-						},{
-							html: t("Browser")
-						}
-						,{
-							html: t("Expires At")
-						}
-						,
-						{
-							width: dp(34)
-						}
+						{html: "IP"},
+						{html: t("Platform")},
+						{html: t("Name")},
+						{html: t("Last seen")},
+						{html: t("Status")},
+						{width: dp(34)}
 					]
 				},
 				this.authorizedClients = new go.form.FormGroup({
-					name: "authorizedClients",
+					name: "clients",
 					hideLabel: true,
 					hideBbar: true,
 					startWithItem: false,
+					mapKey:'id',
 					anchor: "100%",
 					itemCfg: {
 						anchor: "100%",
@@ -182,28 +182,26 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 							submit: true
 						},
 						items: [{
-							name: "remoteIpAddress"
+							name: "ip"
 						},{
 							name: "platform",
-							renderer: function(v) {
-								return v || t("Unknown");
-							}
+							renderer: v => v || t("Unknown")
 						},{
-							name: "browser",
-							renderer: function(v) {
-								return v || t("Unknown");
-							}
-						}
-						,{
+							name: "name",
+							renderer: v => v || t("Unknown")
+						},{
 							submit: false,
-							name: "expiresAt",
-							renderer: function(v) {
-								return (new Date(v)).format(go.User.dateFormat+" " + go.User.timeFormat);
-
-							}
-						}
-						]
-
+							name: "lastSeen",
+							renderer: v => (new Date(v)).format(go.User.dateFormat+" " + go.User.timeFormat)
+						},{
+							xtype:'selectfield',
+							name:'status',
+							options: [
+								['new', t('New')],
+								['allowed', t('Allowed')],
+								['denied', t('Denied')]
+							]
+						}]
 					}
 				}),{
 					xtype: "button",

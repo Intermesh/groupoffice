@@ -349,7 +349,7 @@ class VCalendar extends AbstractConverter {
 
 		if($todo->valarm && $todo->valarm->trigger){
 			$date = $todo->valarm->getEffectiveTriggerTime();
-			$alert = new Alert();
+			$alert = new Alert($task);
 			$alert->when($date);
 			$task->alerts = [$alert];
 		}

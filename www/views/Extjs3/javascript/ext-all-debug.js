@@ -1,20 +1,3 @@
-/*
-This file is part of Ext JS 3.4
-
-Copyright (c) 2011-2014 Sencha Inc
-
-Contact:  http://www.sencha.com/contact
-
-Commercial Usage
-Licensees holding valid commercial licenses may use this file in accordance with the Commercial
-Software License Agreement provided with the Software or, alternatively, in accordance with the
-terms contained in a written agreement between you and Sencha.
-
-If you are unsure which license is appropriate for your use, please contact the sales department
-at http://www.sencha.com/contact.
-
-Build date: 2014-10-27 12:52:39
-*/
 (function(){
 
 var EXTUTIL = Ext.util,
@@ -6952,18 +6935,15 @@ Ext.apply(Ext.EventManager, function(){
                resizeEvent = new Ext.util.Event();
                resizeTask = new Ext.util.DelayedTask(this.doResizeEvent);
                Ext.EventManager.on(window, "resize", this.fireWindowResize, this);
-							 Ext.EventManager.on(window, "orientationchange", function() {
-								this.doResizeEvent();
-							 }, this, {delay: 500});
            }
            resizeEvent.addListener(fn, scope, options);
        },
 
        //dont fire on mobiles
        fireWindowResize : function(){
-				 if(GO.util.isMobileOrTablet()) {
-					 return;
-				 }
+				 // if(GO.util.isMobileOrTablet()) {
+					//  return;
+				 // }
            if(resizeEvent){
                resizeTask.delay(100);
            }
@@ -15415,7 +15395,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
     },
 
     
-    getLabelStyle: function(s){
+    getLabelStyle: function(s, target){
         var ls = '', items = [this.labelStyle, s];
         for (var i = 0, len = items.length; i < len; ++i){
             if (items[i]){
@@ -15425,6 +15405,9 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
                 }
             }
         }
+
+        ls += 'background-color: ' + target.getBackgroundColor() + ';';
+
         return ls;
     },
 
@@ -15433,7 +15416,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
     
     renderItem : function(c, position, target){
         if(c && (c.isFormField || c.fieldLabel) && c.inputType != 'hidden'){
-            var args = this.getTemplateArgs(c);
+            var args = this.getTemplateArgs(c, target);
             if(Ext.isNumber(position)){
                 position = target.dom.childNodes[position] || null;
             }
@@ -15458,7 +15441,9 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
 
 								if(c.flex) {
 									c.itemCt.dom.style.flex = c.flex;
-									c.el.dom.style.width="100%";
+									if(c.xtype != "checkbox") {
+										c.el.dom.style.width = "100%";
+									}
 								}
 
                 /* start extra code */
@@ -15497,21 +15482,17 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
     },
 
     
-    getTemplateArgs: function(field) {
+    getTemplateArgs: function(field, target) {
         var noLabelSep = !field.fieldLabel || field.hideLabel,
             itemCls = (field.itemCls || this.container.itemCls || '') + (field.hideLabel ? ' x-hide-label' : '');
 
-        
-        if (Ext.isIE9 && Ext.isIEQuirks && field instanceof Ext.form.TextField) {
-            itemCls += ' x-input-wrapper';
-        }
 
         return {
             id            : field.id,
             label         : field.fieldLabel,
             itemCls       : itemCls,
             clearCls      : field.clearCls || 'x-form-clear-left',
-            labelStyle    : this.getLabelStyle(field.labelStyle),
+            labelStyle    : this.getLabelStyle(field.labelStyle, target),
             elementStyle  : this.elementStyle || '',
             labelSeparator: noLabelSep ? '' : (Ext.isDefined(field.labelSeparator) ? field.labelSeparator : this.labelSeparator)
         };
@@ -17970,7 +17951,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         this.bwrap.enableDisplayMode('block');
 
         if(this.header){
-            this.header.unselectable();
+            // this.header.unselectable();
 
             
             if(this.headerAsText){
@@ -20523,7 +20504,8 @@ Ext.ProgressBar = Ext.extend(Ext.BoxComponent, {
             this.textEl = new Ext.CompositeElement([this.textTopEl.dom.firstChild, textBackEl.dom.firstChild]);
             this.textEl.setWidth(inner.offsetWidth);
         }
-        this.progressBar.setHeight(inner.offsetHeight);
+				this.progressBar.dom.style.height = "100%";
+        // this.progressBar.setHeight(inner.offsetHeight);
     },
     
     
@@ -28038,6 +28020,9 @@ Ext.Window = Ext.extend(Ext.Panel, {
 
     
     ghost : function(cls){
+			// MOD: This will disable extJs it's drag ghost for dialogs
+			return this.getEl();
+
         var ghost = this.createGhost(cls);
         var box = this.getBox(true);
         ghost.setLeftTop(box.x, box.y);
@@ -39576,162 +39561,181 @@ Ext.reg('menucheckitem', Ext.menu.CheckItem);
 });
 Ext.reg('colormenu', Ext.menu.ColorMenu);
 
-Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
-    
-    
-    
-    
-    
-    
-
-    
-    invalidClass : 'x-form-invalid',
-    
-    invalidText : 'The value in this field is invalid',
-    
-    focusClass : 'x-form-focus',
-    
-    
-    validationEvent : 'keyup',
-    
-    validateOnBlur : true,
-    
-    validationDelay : 250,
-    
-    defaultAutoCreate : {tag: 'input', type: 'text', size: '20', autocomplete: 'off'},
-    
-    autocomplete: "off",
-
-    placeholder: "",
-
-    spellCheck: false,
-
-    fieldClass : 'x-form-field',
-    
-    msgTarget : 'under',
-    
-    msgFx : 'normal',
-    
-    readOnly : false,
-    
-    disabled : false,
-    
-    submitValue: true,
-
-    
-    isFormField : true,
-
-    
-    msgDisplay: '',
-
-    
-    hasFocus : false,
-
-    
-    initComponent : function(){
-        Ext.form.Field.superclass.initComponent.call(this);
-        this.addEvents(
-            
-            'focus',
-            
-            'blur',
-            
-            'specialkey',
-            
-            'change',
-            
-            'invalid',
-            
-            'valid'
-        );
-    },
-
-    
-    getName : function(){
-        return this.rendered && this.el.dom.name ? this.el.dom.name : this.name || this.id || '';
-    },
-
-    
-    onRender : function(ct, position){
-        if(!this.el){
-            var cfg = this.getAutoCreate();
-
-            if(!cfg.name){
-                cfg.name = this.name || this.id;
-            }
-            if(this.inputType){
-                cfg.type = this.inputType;
-            }
-
-            cfg.autocomplete = this.autocomplete;
-            cfg.placeholder = this.placeholder;
-
-            if(!this.spellCheck) {
-              cfg.autocorrect="off";
-              cfg.autocapitalize="off";
-              cfg.spellcheck="false";
-            }
-            
-            this.autoEl = cfg;
-        }
-        Ext.form.Field.superclass.onRender.call(this, ct, position);
-        if(this.submitValue === false){
-            this.el.dom.removeAttribute('name');
-        }
-        var type = this.el.dom.type;
-        if(type){
-            if(type == 'password'){
-                type = 'text';
-            }
-            this.el.addClass('x-form-'+type);
-        }
-        if(this.readOnly){
-            this.setReadOnly(true);
-        }
-        if(this.tabIndex !== undefined){
-            this.el.dom.setAttribute('tabIndex', this.tabIndex);
-        }
-
-        this.el.addClass([this.fieldClass, this.cls]);
+Ext.form.Field = Ext.extend(Ext.BoxComponent, {
 
 
-				this.initLabelClasses();
-    },
+	invalidClass: 'x-form-invalid',
+
+	invalidText: 'The value in this field is invalid',
+
+	focusClass: 'x-form-focus',
 
 
-		initLabelClasses : function() {
-			this.on("invalid", () => {
-				const labelEl = this.findLabelEl();
+	validationEvent: 'keyup',
 
-				if(labelEl) {
-					labelEl.classList.add(this.invalidClass + "-label");
-				}
-			});
+	validateOnBlur: true,
 
-			this.on("valid", () => {
-				const labelEl = this.findLabelEl();
+	validationDelay: 250,
 
-				if(labelEl) {
-					labelEl.classList.remove(this.invalidClass + "-label");
-				}
-			});
+	defaultAutoCreate: {tag: 'input', type: 'text', size: '20', autocomplete: 'off'},
 
-			this.on("change", (field, v) => {
-				this.applyEmptyLabelCls(v)
-			});
+	autocomplete: "off",
 
-			this.on("setvalue", (field, v) => {
-				this.applyEmptyLabelCls(v)
-			});
+	placeholder: "",
 
-			this.applyEmptyLabelCls(this.getValue());
-		},
+	spellCheck: false,
 
-		applyEmptyLabelCls: function(v) {
+	fieldClass: 'x-form-field',
+
+	msgTarget: 'under',
+
+	msgFx: 'normal',
+
+	readOnly: false,
+
+	disabled: false,
+
+	submitValue: true,
+
+
+	isFormField: true,
+
+
+	msgDisplay: '',
+
+
+	hasFocus: false,
+
+
+	initComponent: function () {
+		Ext.form.Field.superclass.initComponent.call(this);
+		this.addEvents(
+			'focus',
+
+			'blur',
+
+			'specialkey',
+
+			'change',
+
+			'invalid',
+
+			'valid'
+		);
+	},
+
+
+	getName: function () {
+		return this.rendered && this.el.dom.name ? this.el.dom.name : this.name || this.id || '';
+	},
+
+
+	onRender: function (ct, position) {
+		if (!this.el) {
+			var cfg = this.getAutoCreate();
+
+			if (!cfg.name) {
+				cfg.name = this.name || this.id;
+			}
+			if (this.inputType) {
+				cfg.type = this.inputType;
+			}
+
+			cfg.autocomplete = this.autocomplete;
+			cfg.placeholder = this.placeholder;
+
+			if (!this.spellCheck) {
+				cfg.autocorrect = "off";
+				cfg.autocapitalize = "off";
+				cfg.spellcheck = "false";
+			}
+
+			this.autoEl = cfg;
+		}
+		Ext.form.Field.superclass.onRender.call(this, ct, position);
+		if (this.submitValue === false) {
+			this.el.dom.removeAttribute('name');
+		}
+		var type = this.el.dom.type;
+		if (type) {
+			if (type == 'password') {
+				type = 'text';
+			}
+			this.el.addClass('x-form-' + type);
+		}
+		if (this.readOnly) {
+			this.setReadOnly(true);
+		}
+		if (this.tabIndex !== undefined) {
+			this.el.dom.setAttribute('tabIndex', this.tabIndex);
+		}
+
+		this.el.addClass([this.fieldClass, this.cls]);
+
+
+		this.initLabelClasses();
+	},
+
+
+	initLabelClasses: function () {
+		this.on("invalid", () => {
+			const labelEl = this.findLabelEl();
+
+			if (labelEl) {
+				labelEl.classList.add(this.invalidClass + "-label");
+			}
+		});
+
+		this.on("valid", () => {
+			const labelEl = this.findLabelEl();
+
+			if (labelEl) {
+				labelEl.classList.remove(this.invalidClass + "-label");
+			}
+		});
+
+		const updateLabelClass = (field, v) => {
+			// console.warn(v,this.emptyText,this.placeholder);
+			this.applyEmptyLabelCls(!this.labelShouldFloat())
+		};
+
+		this.on("change", updateLabelClass);
+
+		this.on("setvalue", updateLabelClass);
+
+
+		//hack or detecting browser autofill
+		this.el.dom.addEventListener("animationstart", ({target, animationName}) => {
+			switch (animationName) {
+				case 'onautofillstart':
+					this.applyEmptyLabelCls(false);
+					break;
+				case 'onautofillcancel':
+					this.applyEmptyLabelCls(!this.labelShouldFloat());
+					break;
+			}
+		}, false);
+		this.applyEmptyLabelCls(!this.labelShouldFloat());
+
+	},
+
+
+
+	labelShouldFloat: function () {
+
+		if(this.isDestroyed || this.emptyText || this.placeholder) {
+			return true;
+		}
+
+		const v = this.getRawValue();
+		return !!v;
+	},
+
+		applyEmptyLabelCls: function(isEmpty) {
 			const labelEl = this.findLabelEl();
 
 			if(labelEl) {
-				labelEl.classList.toggle("x-form-empty-label", v + "" === "");
+				labelEl.classList.toggle("x-form-empty-label", isEmpty);
 			}
 		},
 
@@ -39996,7 +40000,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
 
     
     alignErrorEl : function(){
-        this.errorEl.setWidth(this.getErrorCt().getWidth(true) - 20);
+       // this.errorEl.setWidth(this.getErrorCt().getWidth(true) - 20);
     },
 
     
@@ -40342,10 +40346,10 @@ Ext.form.TextField = Ext.extend(Ext.form.Field,  {
     },
 
     applyEmptyText : function(){
-        // if(this.rendered && this.emptyText && this.getRawValue().length < 1 && !this.hasFocus){
-        //     this.setRawValue(this.emptyText);
-        //     this.el.addClass(this.emptyClass);
-        // }
+        if(this.rendered && this.emptyText && this.getRawValue().length < 1 && !this.hasFocus){
+            this.setRawValue(this.emptyText);
+            this.el.addClass(this.emptyClass);
+        }
     },
 
     
@@ -40558,6 +40562,9 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
 			Ext.form.TriggerField.superclass.onRender.call(this, ct, position);
 
 			this.wrap = this.el.wrap({cls: 'x-form-field-wrap x-form-field-trigger-wrap'});
+			if(this.flex) {
+				this.wrap.dom.style.flex = this.flex;
+			}
 			this.trigger = this.wrap.createChild(this.triggerConfig ||
 				{tag: "button", type: "button", tabindex: "-1", cls: "x-form-trigger " + this.triggerClass});
 			this.initTrigger();
@@ -41346,8 +41353,13 @@ Ext.form.DisplayField = Ext.extend(Ext.form.Field,  {
 
     setValue : function(v){
         this.setRawValue(v);
+
+				this.fireEvent("setvalue", this, v);
         return this;
-    }
+    },
+	labelShouldFloat: function() {
+		return true;
+	}
     
     
     
@@ -42285,7 +42297,7 @@ Ext.form.Checkbox = Ext.extend(Ext.form.Field,  {
     
     checked : false,
     
-    boxLabel: '&#160;',
+    boxLabel: '',
     
     defaultAutoCreate : { tag: 'input', type: 'checkbox', autocomplete: 'off'},
     
@@ -42297,6 +42309,12 @@ Ext.form.Checkbox = Ext.extend(Ext.form.Field,  {
 
 	
     initComponent : function(){
+
+			if(this.fieldLabel && !this.boxLabel) {
+				this.boxLabel = this.fieldLabel;
+				delete this.fieldLabel;
+			}
+
         Ext.form.Checkbox.superclass.initComponent.call(this);
         this.addEvents(
             
@@ -42844,9 +42862,9 @@ Ext.form.CompositeField = Ext.extend(Ext.form.Field, {
         Ext.form.CompositeField.superclass.initComponent.apply(this, arguments);
         
         this.innerCt = new Ext.Container({
-            layout  : 'hbox',
+            layout  : 'auto',
             items   : this.items,
-            cls     : 'x-form-composite',
+            cls     : 'x-form-composite go-hbox',
             defaultMargins: '0 3 0 0',
             ownerCt: this
         });
@@ -42861,6 +42879,26 @@ Ext.form.CompositeField = Ext.extend(Ext.form.Field, {
         this.items.addAll(fields);
         
     },
+
+	labelShouldFloat: function () {
+		if(this.emptyText || this.placeholder) {
+			return true;
+		}
+
+		const first = this.items.first();
+
+		if(!first) {
+			return false;
+		}
+
+		if(first.emptyText || first.placeholder) {
+			return true;
+		}
+
+		const v = first.getRawValue();
+
+		return !!v;
+	},
 
     
     onRender: function(ct, position) {
@@ -43239,6 +43277,9 @@ Ext.form.Hidden = Ext.extend(Ext.form.Field, {
     inputType : 'hidden',
     
     shouldLayout: false,
+
+
+    initLabelClasses: function() {},
 
     
     onRender : function(){
@@ -44625,7 +44666,9 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             if(doc){
                 try{
                     Ext.EventManager.removeAll(doc);
-                }catch(e){}
+                }catch(e){
+									console.warn(e);
+								}
             }
 
             
@@ -44650,7 +44693,9 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             this.pushValue();
             this.setReadOnly(this.readOnly);
             this.fireEvent('initialize', this);
-        }catch(e){}
+        }catch(e){
+					console.warn(e);
+				}
     },
 
     
@@ -45204,6 +45249,10 @@ Ext.form.SliderField = Ext.extend(Ext.form.Field, {
     
     
     actionMode: 'wrap',
+
+	labelShouldFloat: function() {
+			return true;
+	},
     
     
     initComponent : function() {
@@ -51563,7 +51612,7 @@ Ext.grid.GroupingView = Ext.extend(Ext.grid.GridView, {
 
         if(!this.startGroup){
             this.startGroup = new Ext.XTemplate(
-                '<div id="{groupId}" class="x-grid-group {cls}">',
+                '<div id="{groupId}" class="x-grid-group {cls} x-grid-group-val-{[Ext.util.Format.htmlEncode(values.gvalue || "empty")]}">',
                     '<div id="{groupId}-hd" class="x-grid-group-hd" style="{style}"><div class="x-grid-group-title">', this.groupTextTpl ,'</div></div>',
                     '<div id="{groupId}-bd" class="x-grid-group-body">'
             );

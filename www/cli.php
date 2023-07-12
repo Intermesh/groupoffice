@@ -24,13 +24,17 @@ if(!Environment::get()->isCli()) {
 }
 
 go()->getDebugger()->setRequestId('cli');
-go()->getDebugger()->output = true;
+//go()->getDebugger()->output = true;
 if(!empty($args['debug'])) {
 	go()->getDebugger()->enable(true);
 }
 
 if(array_key_exists('debug', $args)) {
     go()->getDebugger()->enabled = !empty($args['debug']);
+}
+
+if(array_key_exists('debugSql', $args)) {
+	go()->getDbConnection()->debug = !empty($args['debugSql']);
 }
 
 $router = new Router();

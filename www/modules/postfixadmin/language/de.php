@@ -51,4 +51,9 @@ return array (
   'Mailbox' => 'Mailbox',
   'Ok' => 'OK',
   'Use \'*\' for a catch all alias (not recommended).' => 'Verwenden Sie \'*\' für einen CatchAll (nicht empfohlen).',
+  'Are you sure you wan to reset all the passwords?' => 'Sind Sie sicher, dass Sie alle Passwörter zurücksetzen wollen?',
+  'Export domain' => 'Domäne exportieren',
+  'Reset passwords' => 'Passwörter zurücksetzen',
+  'Allow external SMTP usage' => 'Externe SMTP-Nutzung zulassen',
+  'If you enable reset passwords then a new password will be generated and exported for each account. Warning! Existing client configuration will need to be updated after this action.' => 'Wenn Sie Passwort zurücksetzen aktivieren, wird ein neues Passwort generiert und für jeden Account exportiert. Achtung! Vorhandene Clients müssen danach aktualisiert werden!',
 );

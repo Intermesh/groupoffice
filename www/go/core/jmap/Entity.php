@@ -7,15 +7,11 @@ use Exception;
 use GO\Base\Exception\AccessDenied;
 use go\core\App;
 use go\core\ErrorHandler;
-use go\core\fs\FileSystemObject;
 use go\core\model\Alert;
 use go\core\model\Module;
-use go\core\model\User;
-use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
-use LogicException;
 use PDO;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\acl\model\AclItemEntity;
@@ -338,7 +334,7 @@ abstract class Entity  extends OrmEntity {
 			foreach($classes as $cls) {
 			  $query = $cls::find();
         $query->where('id', 'IN', $ids);
-        $this->changesQuery($query, $cls);
+        static::changesQuery($query, $cls);
 			}			
 		}
 	}
@@ -358,7 +354,7 @@ abstract class Entity  extends OrmEntity {
       $aclAlias = $cls::joinAclEntity($query);
       $query->select($aclAlias, true);
     } else if(is_a($cls, AclOwnerEntity::class, true)) {
-      $query->select($cls::$aclColumnName, true);
+      $query->select($query->getTableAlias() . "." . $cls::$aclColumnName, true);
     } else{
       $query->select('NULL AS aclId', true);
     }
@@ -370,7 +366,7 @@ abstract class Entity  extends OrmEntity {
   }
 
   /**
-   * Delete's the entiyy. Implements change logging for sync.
+   * Deletes the entity. Implements change logging for sync.
    *
    * @param Query $query The query to select entities in the delete statement
    * @return boolean
@@ -443,8 +439,7 @@ abstract class Entity  extends OrmEntity {
 		$idsQuery = clone $query;
 		$records = $idsQuery
 			->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed')
-			->fetchMode(PDO::FETCH_ASSOC)
-			->all(); //we have to select now because later these id's are gone from the db
+			->fetchMode(PDO::FETCH_ASSOC);
 		return static::entityType()->changes($records);
 	}
 
@@ -540,6 +535,7 @@ abstract class Entity  extends OrmEntity {
 		];
 
 		if($sinceState == self::getState()) {
+			$result['newState'] = $sinceState;
 			return $result;
 		}
 		
@@ -846,5 +842,13 @@ abstract class Entity  extends OrmEntity {
 		return go()->getSettings()->URL . '#' . strtolower(static::entityType()->getName()) . "/" . $this->id();
 	}
 
+
+	/**
+	 * Does nothing by default
+	 * @return void
+	 */
+	public static function checkAcls() {
+
+	}
 
 }

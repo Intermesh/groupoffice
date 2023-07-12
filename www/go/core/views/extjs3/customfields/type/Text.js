@@ -6,7 +6,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	
 	label: t("Text"),
 	
-	iconCls: "ic-description",	
+	iconCls: "ic-description",
+
+	// By default, a custom field type should be shown in a 'new field' menu
+	hideInNewFieldTypes: false,
 	
 	/**
 	 * Return dialog to edit this type of field
@@ -115,16 +118,28 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			console.warn("Field " + fieldName + ' not found in string.'); // TODO: Alert?
 			return ''; // As yet, return an empty string if a field is not found
 		}
-		var fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();
+		let fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();
 
-		if (field.xtype === 'xcheckbox' || field.xtype === 'checkbox') {
-			fieldValue = fieldValue | 0;
-			if (fieldValue === "true") {
-				fieldValue = '1';
-			} else if (fieldValue === "false") {
-				fieldValue = '0';
-			}
+		switch (field.xtype) {
+			case 'xcheckbox':
+			case 'checkbox':
+				fieldValue = fieldValue | 0;
+				if (fieldValue === "true") {
+					fieldValue = '1';
+				} else if (fieldValue === "false") {
+					fieldValue = '0';
+				}
+				break;
+			case 'treeselectfield':
+			case 'chips':
+				if(fieldValue === null) {
+					fieldValue = "";
+				}
+				break
+			default:
+				break;
 		}
+
 		return String(fieldValue); // TODO: Actually string?
 	},
 

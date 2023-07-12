@@ -81,7 +81,7 @@
 				return f.entity === entity;
 			});
 		},
-		
+
 		/**
 		 * Get filter definitions for tbsearch and user filter dialogs
 		 * 
@@ -295,12 +295,85 @@
 		 * @returns {Array}
 		 */
 		getDetailPanels: function (entity) {
-			var fieldSets = this.getFieldSets(entity), panels = [], me = this;
+			const fieldSets = this.getFieldSets(entity);
+			let panels = [];
 
-			fieldSets.forEach(function (fieldSet) {
+			fieldSets.forEach( (fieldSet) => {
 				panels.push(new go.customfields.DetailPanel({
 					fieldSet: fieldSet
 				}));
+			});
+			return panels;
+		},
+
+		/**
+		 * Get fields that have the current entity as its value
+		 *
+		 * @param {string} entity
+		 * @param {int} id
+		 * @returns {Promise}
+		 */
+		getCFRelations: function(entity, id) {
+			let rels = [], ids;
+			return new Promise((resolve) => {
+				go.Db.store("Field").query({
+					filter: {type: entity}
+				}, function (response) {
+					if (!response.ids.length) {
+						resolve([]);
+					}
+					ids = response.ids;
+				}, this).then(() => {
+					go.Db.store("Field").get(ids, function (fields) {
+						let p = [], arFlds = [];
+						fields.forEach(function (fld) {
+							const fldOptions = fld.options;
+							if (Ext.isDefined(fldOptions.showInformationPanel) && fldOptions.showInformationPanel) {
+								arFlds.push(fld);
+								p.push(go.Db.store("Fieldset").single(fld.fieldSetId));
+							}
+						});
+						Promise.all(p).then((result)=> {
+							result.forEach((fldset, index) =>
+							{
+								const tgtEntity = fldset.entity, fld=arFlds[index];
+								let tgtXtype = tgtEntity + "relationgrid";
+								if (!Ext.ComponentMgr.isRegistered(tgtXtype)) {
+									return; // TODO: implement generic grid?
+									tgtXtype = "customfieldrelationgrid";
+								}
+								rels.push({
+									title: fld.options.informationPanelTitle,
+									expandByDefault: fld.options.expandByDefault,
+									entity: tgtEntity,
+									xtype: tgtXtype,
+									currentId: id,
+									fieldId: fld.id
+								});
+							});
+							resolve(rels);
+						});
+					});
+				});
+			});
+		},
+
+		/**
+		 * Get panels with grids of related items per custom field.
+		 *
+		 * If an entity type has a custom field that is an entity, list the entities linked to the target entity through
+		 * said custom field
+		 *
+		 * @param {string} entity
+		 * @param {int} id
+		 * @return {array} panels
+		 */
+		getRelationPanels: async function(entity, id) {
+
+			let panels = [];
+			const configs = await this.getCFRelations(entity, id);
+			configs.forEach((config) => {
+				panels.push(config);
 			});
 			return panels;
 		}

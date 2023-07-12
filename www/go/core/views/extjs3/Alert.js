@@ -25,7 +25,8 @@
 				sortInfo: {
 					field: "triggerAt",
 					direction: "DESC"
-				}
+				},
+				baseParams: {limit: 50}
 			});
 
 			this.store.on("load", () => {
@@ -60,10 +61,23 @@
 			this.store.getRange().forEach((rec) => {
 				this.show(rec.data);
 			});
+
+			//remove alerts that are no longer in the store
+			go.Notifier.getAll().forEach((alert) => {
+				if(alert.itemId.substring(0,11) == 'core-alert-') {
+					const alertId = alert.itemId.substring(11);
+					if(!this.store.getById(alertId)) {
+						alert.replaced = true;
+						alert.destroy();
+					}
+				}
+			});
 		},
 
 		show : function(alert) {
-			const now = new Date(), id = 'core-alert-' + alert.id;
+			const now = new Date(), triggerDate = new Date (alert.triggerAt), id = 'core-alert-' + alert.id;
+
+			if(triggerDate > now) return;
 
 			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
 
@@ -83,28 +97,21 @@
 					handler: () => {
 						go.Entities.get(alert.entity).goto(alert.entityId);
 					},
-					buttons: [{
-						text: t("Open"),
-						handler: (btn) => {
-							go.Notifier.hideNotifications();
-							btn.findParentByType("panel").handler();
-						}
-					}, {
-						text: t("Dismiss"),
-						handler: (btn, e) => {
-							//needed to prevent notification area closing
-							e.stopEvent();
-							btn.findParentByType("panel").destroy();
-						}
-					}]
+					// buttons: [{
+					// 	text: t("Open"),
+					// 	handler: (btn) => {
+					// 		go.Notifier.hideNotifications();
+					// 		btn.findParentByType("panel").handler();
+					// 	}
+					// }, {
+					// 	text: t("Dismiss"),
+					// 	handler: (btn, e) => {
+					// 		//needed to prevent notification area closing
+					// 		e.stopEvent();
+					// 		btn.findParentByType("panel").destroy();
+					// 	}
+					// }]
 				};
-
-				// if("progress" in alert.data) {
-				// 	c.items.push(new Ext.ProgressBar({
-				// 		text: t("Progress") + " " + alert.data.progress + "%",
-				// 		value: alert.data.progress / 100
-				// 	}))
-				// }
 
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
 
@@ -117,17 +124,39 @@
 
 					if(!panelCfg.title) {
 						//default title
-						panelCfg.title = entity.name || entity.title || entity.description || alert.entity;
+						panelCfg.title = alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity;
 					}
+
 
 					if(!panelCfg.items && !panelCfg.html) {
 
 						//default alert body
 						let body = go.util.Format.dateTime(alert.triggerAt);
-						if(alert.data) {
-							body += "<br />" + JSON.stringify(alert.data, undefined, 1);
+
+						if(alert.data.body) {
+							body = alert.data.body;
 						}
+
 						panelCfg.html = body;
+
+
+						if(alert.data && "progress" in alert.data) {
+
+							if(!panelCfg.items) {
+								panelCfg.items = [
+									{
+										xtype: "box",
+										html:panelCfg.html
+									}
+								];
+
+								delete panelCfg.html;
+							}
+							panelCfg.items.push(new Ext.ProgressBar({
+								text: t("Progress") + " " + alert.data.progress + "%",
+								value: alert.data.progress / 100
+							}))
+						}
 					}
 
 					if(!("notificationBody" in c)) {

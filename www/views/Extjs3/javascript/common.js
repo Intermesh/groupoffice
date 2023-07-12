@@ -24,7 +24,7 @@ Ext.namespace('GO.util');
 Ext.Ajax.on('requestexception', function(conn, response, options) {
 	if(response.isAbort) {
 		console.warn("Connection aborted", conn, response, options);
-	} else if(response.isTimeout) {
+	} else if(response.isTimeout || response.status == 0) {
 		GO.errorDialog.show(t("The connection to the server timed out. Please check your internet connection."), t("Request error"));
 	} else
 	{
@@ -238,8 +238,9 @@ GO.request = function(config){
 	
 	
 	if(config.maskEl){
-		if(!config.maskText)
-			config.maskText=t("Loading...");
+		if(!config.maskText) {
+			config.maskText = t("Loading...");
+		}
 	
 		config.maskEl.mask(config.maskText);
 	}
@@ -250,12 +251,9 @@ GO.request = function(config){
 	var p = Ext.apply({
 		url:url,
 		callback:function(options, success, response){
-			
-//			console.log(response);
-//
-			if(config.maskEl)
+			if(config.maskEl) {
 				config.maskEl.unmask();
-
+			}
 			if(!success) {
 				if(response.isTimeout){
 					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
@@ -273,7 +271,7 @@ GO.request = function(config){
 		},
 		success: function(response, options)
 		{
-			var result = Ext.decode(response.responseText);
+			const result = Ext.decode(response.responseText);
 			if(!result.success)
 			{
 				if(config.fail){
@@ -281,21 +279,21 @@ GO.request = function(config){
 				} else {
 					GO.errorDialog.show(result.feedback);
 				}
-			}else 
-			{
+			} else {
 				//the same happens in GO.data.JSonStore.
 				if(result.exportVariables){					
 					GO.util.mergeObjects(window, result.exportVariables);				
 				}
 				
-				if(origSuccess)					
-					origSuccess.call(config.scope, response, options, result);				
+				if(origSuccess) {
+					origSuccess.call(config.scope, response, options, result);
+				}
 			}
 			
 		}
 	}, config);
-	
-	Ext.Ajax.request(p)
+
+	Ext.Ajax.request(p);
 }
 
 GO.util.mergeObjects = function(a, b) {

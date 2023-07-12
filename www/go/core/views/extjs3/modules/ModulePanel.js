@@ -21,6 +21,8 @@ go.modules.ModulePanel = Ext.extend(Ext.Panel, {
 	 */
 	
 	route : function(id, entity) {
+
+		this.show();
 		
 		//cast to int if nummeric
 		var int = parseInt(id);

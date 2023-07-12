@@ -175,7 +175,7 @@ class FieldSet extends EntityController {
 		$blob = Blob::findById($params['blobId']);
 		$json = $blob->getFile()->getContents();
 		$jsonArray = json_decode($json, true);
-		if ($jsonArray['goVersion'] !== go()->getVersion()) {
+		if (false && $jsonArray['goVersion'] !== go()->getVersion()) {
 			$success = false;
 			$errorMsg = 'Only possible in same version. File version = ' . $jsonArray['goVersion'] . ', current version = ' . go()->getVersion();
 //		}
@@ -203,13 +203,13 @@ class FieldSet extends EntityController {
 						error_log(print_r($newFieldSet->getValidationErrors(), true));
 					}
 				} else {
-					$errorMsg .= 'Fieldset ' . $fieldSet->name . ' already exists, merged fields in that Fieldset <br/>';
+					$errorMsg .= 'Fieldset ' . $fieldSet->name . ' already exists, merged fields in that Fieldset' . "\n";
 				}
 				foreach ($fieldSet->fields as $fieldArray) {
 					$field = (object)$fieldArray;
 					// check if field->databaseName || $field->name exists
 					if (!strpos(Base::findByName($field->type), $field->type)) {
-						$errorMsg .= 'CustomfieldType ' . $field->type . ' not available in this installation <br/>';
+						$errorMsg .= 'CustomfieldType ' . $field->type . ' not available in this installation' . "\n";
 						continue;
 					}
 					$newField = model\Field::find()
@@ -232,9 +232,9 @@ class FieldSet extends EntityController {
 						if (!$newField->save()) {
 							error_log(print_r($newField->getValidationErrors(), true));
 						}
-						$errorMsg .= 'Field: ' . $field->name . ' with databaseName (' . $field->databaseName . ') appended <br/>';
+						$errorMsg .= 'Field: ' . $field->name . ' with databaseName (' . $field->databaseName . ') appended' . "\n";
 					} else {
-						$errorMsg .= 'Field: ' . $field->name . ' with databaseName (' . $field->databaseName . ') exists <br/>';
+						$errorMsg .= 'Field: ' . $field->name . ' with databaseName (' . $field->databaseName . ') exists' . "\n";
 					}
 
 				}

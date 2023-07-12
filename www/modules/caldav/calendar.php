@@ -15,6 +15,9 @@
  */
 
 //session writing doesn't make any sense because
+use go\core\ErrorHandler;
+use Sabre\DAV\Exception\NotAuthenticated;
+
 define("GO_NO_SESSION", true);
 
 // settings
@@ -46,19 +49,14 @@ if (!\GO::modules()->isInstalled('caldav')){
 
 go()->getDebugger()->setRequestId("CalDAV " . ($_SERVER['REQUEST_METHOD'] ?? ""));
 
-/* Backends */
-//if(empty(\GO::config()->webdav_auth_basic)) {
-//	$authBackend = new \GO\Dav\Auth\Backend();
-//}else
-//{
-	$authBackend = new \GO\Dav\Auth\BasicBackend();
-//}
+$authBackend = new \go\core\dav\auth\BasicBackend();
 $authBackend->checkModulePermission('legacy','caldav');
+
 $calendarBackend = new \GO\Caldav\CalendarsBackend();
-$principalBackend = new \GO\Dav\DavAcl\PrincipalBackend();
+$principalBackend = new \go\core\dav\davacl\PrincipalBackend();
 
 $tree = array(
-		new \Sabre\CalDAV\Principal\Collection($principalBackend),
+		new \go\core\dav\davacl\PrincipalCollection($principalBackend),
 		new \Sabre\CalDAV\CalendarRoot($principalBackend, $calendarBackend),
 );
 
@@ -67,7 +65,11 @@ $server = new Sabre\DAV\Server($tree);
 $server->debugExceptions = go()->getDebugger()->enabled;
 
 $server->on('exception', function($e){
-	go()->warn($e);
+
+	if(!($e instanceof NotAuthenticated)) {
+		ErrorHandler::logException($e);
+	}
+
 });
 
 //baseUri can also be /caldav/ with:
@@ -87,6 +89,7 @@ $server->addPlugin($caldavPlugin);
 // ACL plugin
 $aclPlugin = new Sabre\DAVACL\Plugin();
 $aclPlugin->allowUnauthenticatedAccess = false;
+//$aclPlugin->adminPrincipals = ['principals/admin'];
 $server->addPlugin($aclPlugin);
 
 $server->addPlugin(

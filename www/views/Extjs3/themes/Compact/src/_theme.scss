@@ -1,0 +1,99 @@
+$ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
+
+$resourcePath: '../Paper/';
+$density: 114;
+$font-scale: 1.1;
+
+@mixin light-theme {
+	--fg-base:			 black;
+	--fg-divider:			#{rgba(black, 0.08)};
+	--fg-border:			#{rgba(black, 0.16)};
+	--fg-line:				#{rgba(black, 0.12)};
+	--fg-disabled:       #{rgba(black, 0.34)};
+	--fg-textfield-box:  rgba(255, 255, 255, 0.8); // for the border
+	--fg-textbox-line: 	#{rgba(black, 0.42)};
+	--fg-track: 	#{rgba(black, 0.26)};
+	--fg-tick: 		var(--c-primary);
+	--fg-text:           #{rgba(black, 0.87)};
+	--fg-secondary-text: #{rgba(black, 0.64)};
+	--fg-unfocused:		#{rgba(black, 0.54)};
+	--fg-alt:			white;
+
+	--bg-body: 			var(--c-primary);
+	--bg-button:	  	#{mix(#fff, $ambientColor, 98%)};
+	--bg-layer: 		#{rgba(mix(#eee, $ambientColor, 92%),.84)};
+	--bg-side-bar:		#{mix(white, $ambientColor, 81%)};
+	--bg-background:  #{mix(#fafafa, $ambientColor, 95%)};
+
+	--bg-hover:      #{rgba(black, 0.08)};
+	--bg-selected:   #{rgba(black, .10)};
+	--bg-pressed:		#{rgba(black, .25)};
+
+	--bg-box: 			white; //rgba(black, 0.06),
+	--bg-card:        #eeeeee;
+	--bg-alt: 			#{mix(#000, $ambientColor, 65%)};
+
+	--c-primary: 		rgb(22, 82, 161);
+	--c-primary-tp:	rgba(22, 82, 161, 0.16);
+	--c-header-bg: 	var(--c-primary);
+	--c-secondary: 	rgb(0, 176, 173);
+	--c-tertiary: 		rgb(243,219,0);
+	--c-accent: 		rgb(255, 114, 0);
+	--c-accent-tp: 	rgba(255,114,0, 0.16);
+
+	--hue-blue: #039BE5;
+	--hue-red:#E57373;
+	--hue-pink: #EC407A;
+	--hue-purple: #8E24AA;
+	--hue-cyan: #00ACC1;
+	--hue-green:#43A047;
+	--hue-orange: #FB8C00;
+	--hue-brown: #6D4C41;
+	--hue-yellow: #FDD170;
+	--hue-bluegrey: #607D8B;
+}
+@mixin dark-theme {
+	--fg-base:				white;
+	--fg-divider:			rgba(255,255,255, 0.2);
+	--fg-border:			black;
+	--fg-line:				rgba(0,0,0, 0.94);
+	--fg-disabled:       rgba(255,255,255, 0.28);
+	--fg-textfield-box:  #555555;
+	--fg-textbox-line: 	#{rgba(white, 0.62)};
+
+	--fg-track: 	#{rgba(white, 0.36)};
+	--fg-tick: 		white;
+	--fg-text:           rgba(255,255,255, .89);
+	--fg-secondary-text: rgba(255,255,255, 0.7);
+	--fg-unfocused:	   rgba(255,255,255, 0.7);
+	--fg-alt:			black;
+
+	--bg-body: 			#1b1b1b;
+	--bg-button:	  #{mix(#555, $ambientColor, 87%)} ;//rgba(255,255,255,.25); //#606060;
+	--bg-layer: 		#{rgba(mix(#222, $ambientColor, 95%),.84)};
+	--bg-side-bar:		#{mix(#222, $ambientColor, 87%)};
+	--bg-background: #{mix(#333, $ambientColor, 92%)} ; //rgba(0,0,0,.85); //#1e1e1e;
+
+	--bg-hover:      rgba(255,255,255, 0.04);
+	--bg-selected:   #{rgba(white, .08)};
+	--bg-pressed:	#{rgba(#cccccc, .25)};
+
+	--bg-box:      #{mix(#2a2a2a, $ambientColor, 95%)}; // cant be transparent because line of label is same color
+	--bg-card:       #{mix(#202020, $ambientColor, 86%)};
+	--bg-alt: 			#888;
+
+	--c-primary: #009BC9;
+	--c-primary-tp: #0277BD;
+	--c-header-bg: #202020;
+
+	--hue-blue: #1976D2;
+	--hue-red:#E53935;
+	--hue-pink: #D81B60;
+	--hue-purple: #7B1FA2;
+	--hue-cyan: #0097A7;
+	--hue-green:#388E3C;
+	--hue-orange: #FF8F00;
+	--hue-brown: #6D4C41;
+	--hue-yellow: #F57F17;
+	--hue-bluegrey: #546E70;
+}

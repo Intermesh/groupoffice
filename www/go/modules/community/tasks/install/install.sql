@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist` (
   `ownerId` INT(11) NOT NULL DEFAULT 1,
   `filesFolderId` INT(11) DEFAULT null,
   projectId int(11) null,
+  groupingId int unsigned null,
   PRIMARY KEY (`id`),
   INDEX `fkCreatedBy` (`createdBy` ASC),
   INDEX `fkAcl` (`aclId` ASC),
@@ -56,7 +57,6 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `percentComplete` TINYINT(4) NOT NULL DEFAULT 0,
   `uri` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
   `vcalendarBlobId` BINARY(40) NULL,
-  aclId int null,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -92,9 +92,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   constraint tasks_task_core_user_id_fk
     foreign key (responsibleUserId)
     references core_user (id)
-    on DELETE set null,
-  constraint tasks_task_core_acl_id_fk
-      foreign key (aclId) references core_acl (id) ON DELETE RESTRICT
+    on DELETE set null
     )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
@@ -309,3 +307,25 @@ alter table tasks_user_settings
 
 create index tasks_task_progress_index
     on tasks_task (progress);
+
+
+
+
+create table tasks_tasklist_grouping
+(
+    id      int unsigned auto_increment,
+    name    varchar(190) not null,
+    `order` int unsigned null,
+    constraint tasks_tasklist_grouping_pk
+        primary key (id),
+    constraint tasks_tasklist_grouping_name
+        unique (name)
+);
+
+
+
+
+alter table tasks_tasklist
+    add constraint tasks_tasklist_tasks_tasklist_grouping_null_fk
+        foreign key (groupingId) references tasks_tasklist_grouping (id)
+            on delete set null;

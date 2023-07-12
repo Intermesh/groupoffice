@@ -3,10 +3,14 @@
 namespace go\modules\community\oauth2client;
 
 use go\core;
+use go\core\exception\NotFound;
+use go\core\http\Exception;
 use go\core\orm\Property;
 use go\core\webclient\CSP;
 use GO\Email\Controller\AccountController;
+use GO\Email\Controller\MessageController;
 use GO\Email\Model\Account as ActiveRecordAccount;
+use GO\Email\Model\Alias;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model\Oauth2Account;
 
@@ -17,6 +21,10 @@ use go\modules\community\oauth2client\model\Oauth2Account;
  */
 class Module extends core\Module
 {
+	public function getStatus() : string
+	{
+		return self::STATUS_STABLE;
+	}
 
 	public function getAuthor(): string
 	{
@@ -33,6 +41,9 @@ class Module extends core\Module
 		$c = new AccountController();
 		$c->addListener('load', 'go\modules\community\oauth2client\Module', 'loadAccountSettings');
 		$c->addListener('submit', 'go\modules\community\oauth2client\Module', 'saveAccountSettings');
+
+		$m = new MessageController();
+		$m->addListener('beforesend', 'go\modules\community\oauth2client\Module', 'beforeSend');
 	}
 
 	public function defineListeners()
@@ -99,6 +110,36 @@ class Module extends core\Module
 				$acct->oauth2_account->oauth2ClientId = $params['oauth2_client_id'];
 				$acct->save();
 			}
+		}
+	}
+
+	/**
+	 * If this module is enabled AND the current account has an OAuth2 connection, check and renew the accesstoken as
+	 * needed
+	 *
+	 * @param MessageController $self
+	 * @param array $response
+	 * @param \GO\Base\Mail\SmimeMessage $message
+	 * @param \GO\Base\Mail\Mailer $mailer
+	 * @param ActiveRecordAccount $activeRecordAccount
+	 * @param Alias $alias
+	 * @param array $params
+	 * @return void
+	 * @throws Exception
+	 * @throws NotFound
+	 */
+	public static function beforeSend(MessageController $self, array $response, \GO\Base\Mail\SmimeMessage &$message,
+	                                  \GO\Base\Mail\Mailer &$mailer , ActiveRecordAccount $activeRecordAccount, Alias $alias, array $params) {
+		$account = Account::findById($activeRecordAccount->id); // Need the JMAP entity for this!
+		if ($acctSettings = $account->oauth2_account) {
+			$client = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
+			$tokenParams = [
+				'access_token' => $acctSettings->token,
+				'refresh_token' => $acctSettings->refreshToken,
+				'expires_in' => $acctSettings->expires - time()
+			];
+
+			$client->maybeRefreshAccessToken($account, $tokenParams);
 		}
 	}
 }

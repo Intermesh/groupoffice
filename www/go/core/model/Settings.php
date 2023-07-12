@@ -146,6 +146,15 @@ class Settings extends core\Settings {
 	 */
 	protected $smtpPassword = null;
 
+	/**
+	 * Global SMTP timeout value in seconds
+	 *
+	 * Also used for the e-mail module.
+	 *
+	 * @var int
+	 */
+	public $smtpTimeout = 30;
+
 
 	/**
 	 * @throws Exception
@@ -627,6 +636,17 @@ class Settings extends core\Settings {
 			}
 		}
 	}
+
+
+	// SYNCHRONISATION SETTINGS
+	/**
+	 * when true user will get popup to allow its own device.
+	 */
+	public $activeSyncEnable2FA = false;
+	/**
+	 * When false administrator has to enable each new device
+	 */
+	public $activeSyncCanConnect = true;
 	
 	
 	public function save(): bool
@@ -673,7 +693,8 @@ class Settings extends core\Settings {
 					throw new Exception("License data was corrupted");
 				}
 
-				if (!License::validate($data)) {
+				// force validation because the license was just replaced
+				if (!License::validate($data, true)) {
 					throw new Exception(License::$validationError);
 				}
 			}
