@@ -2,6 +2,7 @@
 - Tickets: fixed IMAP import
 - Email: Should fix v6.7.39 , Error: inline attachment missing on server #1029
 - Contacts: Fixed install bug
+- Core: Default to system language for templates
 
 11-07-2023: 6.7.40
 - Core: Fixed old safari incompatibility
