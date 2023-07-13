@@ -1,3 +1,8 @@
+- Email: Only create blobs on request for save as ticket.
+- Tickets: fixed IMAP import
+- Email: Should fix v6.7.39 , Error: inline attachment missing on server #1029
+- Contacts: Fixed install bug
+
 11-07-2023: 6.7.40
 - Core: Fixed old safari incompatibility
 
