@@ -598,6 +598,16 @@ class ImapMessage extends ComposerMessage {
 			}
 		}
 	}
+
+	public function createBlobsForAttachments($inlineOnly=false){
+		$atts = $this->getAttachments();
+
+		foreach($atts as $a){
+			if(!$inlineOnly || $a->isInline()){
+				$a->createBlob();
+			}
+		}
+	}
 	
 	
 	private $_imapAttachmentsLoaded=false;

@@ -78,7 +78,7 @@ class MessageAttachment extends \GO\Base\Model
 	/**
 	 * Get the temporary file for this attachment
 	 * 
-	 * @return maxed path  Relative to \GO::config()->tmp_dir
+	 * @return string|bool path  Relative to \GO::config()->tmp_dir
 	 */
 	public function getTempFile()
 	{
@@ -109,13 +109,7 @@ class MessageAttachment extends \GO\Base\Model
 		}
 
 		$this->size = $file->size();
-
-		$blob = Blob::fromTmp(new \go\core\fs\File($file->path()));
-		$blob->save();
-		$this->blobId = $blob->id;
-
-		$this->_tmp_file = $blob->getFile()->getPath();
-
+		$this->_tmp_file = $file->stripTempPath();
 	}
 	
 	/**
