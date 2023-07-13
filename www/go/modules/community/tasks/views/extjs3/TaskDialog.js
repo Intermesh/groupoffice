@@ -29,7 +29,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			})
 
 			this.on("submit", () => {
-				if(this.commentComposer.editor.isDirty())
+				if(this.commentComposer.editor.getValue() != "")
 					this.commentComposer.save("Task", this.currentId);
 			}, {single:true})
 		} else
