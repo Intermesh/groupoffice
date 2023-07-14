@@ -1,3 +1,4 @@
+14-07-2023: 6.6.166
 - Email: fixed error message on aborted request in e-mail (happens on double click on folder for example)
 
 26-05-2023: 6.6.165
