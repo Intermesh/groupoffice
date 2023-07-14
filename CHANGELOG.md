@@ -1,3 +1,5 @@
+- Email: fixed error message on aborted request in e-mail (happens on double click on folder for example)
+
 26-05-2023: 6.6.165
  - Leavedays: Split 'hours' column into spent and budgeted special leave hours in year overview
  - Newsletters: shipping report will work for user entities without profile
