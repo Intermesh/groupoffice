@@ -2,7 +2,7 @@
     "name": "Group-Office",
     "short_name": "Group-Office",
     "start_url": "/",
-    "display": "minimal-ui",
+    "display": "standalone",
     "description": "Group-Office is an enterprise CRM and groupware tool. Share projects, calendars, files and e-mail online with co-workers and clients. Easy to use and fully customizable.",
     "version": "6.5",
     "theme_color": "#0277bd",
