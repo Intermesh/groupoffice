@@ -9,5 +9,10 @@ class Module extends core\Module {
 	{
 		return "Intermesh BV <info@intermesh.nl>";
 	}
-							
+
+	public function autoInstall(): bool
+	{
+		return true;
+	}
+
 }
