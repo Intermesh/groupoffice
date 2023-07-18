@@ -94,9 +94,9 @@ class Task extends EntityController {
 	 * @return mixed|null
 	 * @throws Exception
 	 */
-	public function countMine($role = "list") {
+	public function countMine(array $params) {
 
-		if($role == "support") {
+		if(empty($params) || $params['role'] == "support") {
 			$query = model\Task::find(['id'])
 				->selectSingleValue("count(*)")
 				->filter([
