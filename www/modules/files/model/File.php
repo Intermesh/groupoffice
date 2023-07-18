@@ -780,17 +780,19 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		$storeParams->join(\GO\Base\Model\SearchCacheRecord::model()->tableName(), $joinSearchCacheCriteria, 'sc', 'INNER');
 
 
-		$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()
-							->addRawCondition('a.aclId', 'sc.aclId','=', false);
+		if(!go()->getAuthState()->isAdmin()) {
+			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()
+				->addRawCondition('a.aclId', 'sc.aclId', '=', false);
 
-		$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
-						->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id),"a", false);
+			$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
+				->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
-		$storeParams->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER');
+			$storeParams->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER');
 
-		$storeParams->criteria(\GO\Base\Db\FindCriteria::newInstance()
-								->addModel(Folder::model())
-								->mergeWith($aclWhereCriteria));
+			$storeParams->criteria(\GO\Base\Db\FindCriteria::newInstance()
+				->addModel(Folder::model())
+				->mergeWith($aclWhereCriteria));
+		}
 
 		$storeParams->group(array('t.id'))->order('mtime','DESC');
 

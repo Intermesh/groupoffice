@@ -2060,6 +2060,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	},
 	
 	route: function(id, entity) {
+
+		this.show();
 		
 		var detailViewName = entity.name.toLowerCase() + "Detail";
 		
