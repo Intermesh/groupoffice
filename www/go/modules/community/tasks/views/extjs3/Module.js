@@ -156,6 +156,25 @@ go.Modules.register("community", "tasks", {
 				});
 			}
 		});
+
+
+		async function showBadge() {
+			const count = await go.Jmap.request({method: "Task/countMine", params: {role: "list"}});
+
+			GO.mainLayout.setNotification('tasks', count,'orange');
+		}
+
+		GO.mainLayout.on("authenticated", () => {
+			if(go.Modules.isAvailable("community", "tasks")) {
+
+				go.Db.store("Task").on("changes", () => {
+					showBadge();
+				});
+
+				showBadge();
+			}
+		})
+
 	},
 
 
