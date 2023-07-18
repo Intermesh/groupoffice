@@ -151,8 +151,9 @@ go.Modules.register("community", "tasks", {
 									assigner = {displayName: t("Unknown")};
 								}
 
-								panelCfg.items = [{html: go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.displayName) }];
-								panelCfg.notificationBody = panelCfg.html;
+								const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.displayName);
+								panelCfg.items = [{html: msg }];
+								panelCfg.notificationBody = msg;
 								return panelCfg;
 							});
 						});
@@ -166,8 +167,9 @@ go.Modules.register("community", "tasks", {
 									creator = {displayName: t("Unknown")};
 								}
 
-								panelCfg.items = [{html: go.util.Format.dateTime(alert.triggerAt) + ": " +t("A new task was created in your list by {creator}").replace("{creator}", creator.displayName) }];
-								panelCfg.notificationBody = panelCfg.html;
+								const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("A new task was created in your list by {creator}").replace("{creator}", creator.displayName);
+								panelCfg.items = [{html: msg}];
+								panelCfg.notificationBody = msg
 								return panelCfg;
 							});
 						});
