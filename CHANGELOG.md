@@ -6,6 +6,8 @@
 - Finance: Switching to B2C was impossible
 - Files: Modified in past 7 days didn't work for admin
 - Tasks: Show incomplete tasks counter in main menu bar
+- Tasks: Create alert if another user adds task in your default list
+- Tasks: Create alert for creator when someone adds a comment
 
 11-07-2023: 6.7.40
 - Core: Fixed old safari incompatibility
