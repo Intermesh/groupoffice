@@ -444,7 +444,22 @@ class Task extends AclItemEntity {
 			return false;
 		}
 
-		if($this->isModified('responsibleUserId') && CoreAlert::$enabled) {
+		$this->createSystemAlerts();
+
+		// if alert can be based on start / due of task check those properties as well
+		$modified = $this->getModified('alerts');
+		if (!empty($modified)) {
+			$this->updateAlerts($modified['alerts']);
+		}
+
+		return true;
+	}
+
+	private function createSystemAlerts() {
+		if(!CoreAlert::$enabled) {
+			return;
+		}
+		if($this->isModified('responsibleUserId')) {
 
 			if (isset($this->responsibleUserId)) {
 
@@ -462,18 +477,33 @@ class Task extends AclItemEntity {
 						throw new SaveException($alert);
 					}
 				}
-			} else{
+			} else if(!$this->isNew()){
 				$this->deleteAlert('assigned', $this->getOldValue('responsibleUserId'));
 			}
 		}
 
-		// if alert can be based on start / due of task check those properties as well
-		$modified = $this->getModified('alerts');
-		if (!empty($modified)) {
-			$this->updateAlerts($modified['alerts']);
-		}
+		if($this->isNew()) {
 
-		return true;
+			// create an alert if someone else created a task in your default list
+			$tasklist = TaskList::findById($this->tasklistId, ['id', 'createdBy', 'role']);
+			if($tasklist->getRole() == "list" && $this->createdBy != $tasklist->createdBy) {
+
+				$defaultListId = User::findById($tasklist->createdBy, ['tasksSettings'])->tasksSettings->getDefaultTasklistId();
+				if($defaultListId == $this->tasklistId) {
+					$alert = $this->createAlert(new \DateTime(), 'createdforyou', $tasklist->createdBy)
+						->setData([
+							'type' => 'assigned',
+							'createdBy' => $this->createdBy
+						]);
+
+					if (!$alert->save()) {
+						throw new SaveException($alert);
+					}
+				}
+			}
+		} else if($this->modifiedBy != $this->createdBy){
+			$this->deleteAlert('createdforyou', $this->modifiedBy);
+		}
 	}
 
 
@@ -791,6 +821,11 @@ class Task extends AclItemEntity {
 		$commenters = Comment::findFor($this)->selectSingleValue("createdBy")->distinct()->all();
 		if($this->responsibleUserId && !in_array($this->responsibleUserId, $commenters)) {
 			$commenters[] = $this->responsibleUserId;
+		}
+
+		//add creator too
+		if(!in_array($this->createdBy, $commenters)) {
+			$commenters[] = $this->createdBy;
 		}
 
 		//remove creator of this comment

@@ -703,9 +703,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	},
 
 	checkCreateTaskList: function() {
-
-		this.addTasklistId = this.getSettings().defaultTasklistId;
-
+		this.addTasklistId = undefined;
 		go.Db.store("Tasklist").get(this.tasklistsGrid.getSelectedIds()).then((result) => {
 
 			result.entities.forEach((tasklist) => {
@@ -713,6 +711,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					this.addTasklistId = tasklist.id;
 				}
 			});
+
+			if(!this.addTasklistId) {
+				this.addTasklistId = this.getSettings().defaultTasklistId;
+			}
 
 			this.addButton.setDisabled(!this.addTasklistId);
 		});

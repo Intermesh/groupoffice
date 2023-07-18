@@ -5,6 +5,7 @@
 - Core: Default to system language for templates
 - Finance: Switching to B2C was impossible
 - Files: Modified in past 7 days didn't work for admin
+- Tasks: Show incomplete tasks counter in main menu bar
 
 11-07-2023: 6.7.40
 - Core: Fixed old safari incompatibility
