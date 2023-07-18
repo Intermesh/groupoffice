@@ -2475,7 +2475,14 @@ abstract class Property extends Model {
 		$props = $this->getApiProperties();
 
 		foreach($props as $name => $p) {
-			if(!isset($p['access'])) {
+			if(!isset($p['access']) && (!$p['getter'] || !$p['setter'])) {
+				continue;
+			}
+
+			if($p['getter'] && $p['setter']) {
+				$setter = "set".$name;
+				$getter = "get".$name;
+				$copy->$setter($this->$getter());
 				continue;
 			}
 			$col = static::getMapping()->getColumn($name);

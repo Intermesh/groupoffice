@@ -556,15 +556,22 @@ class Task extends AclItemEntity {
 	protected function createNewTask(DateTimeInterface $next) {
 
 		$values = $this->toArray();
-		unset($values['id']);
-		unset($values['progress']);
-		unset($values['responsibleUserId']);
-		unset($values['percentComplete']);
-		unset($values['progressUpdated']);
-		unset($values['freeBusyStatus']);
+//		unset($values['id']);
+//		unset($values['progress']);
+//		unset($values['responsibleUserId']);
+//		unset($values['percentComplete']);
+//		unset($values['progressUpdated']);
+//		unset($values['freeBusyStatus']);
+//		$nextTask = new Task();
+//		$nextTask->setValues($values);
 
-		$nextTask = new Task();
-		$nextTask->setValues($values);
+		$nextTask = $this->copy();
+		$nextTask->progress = Progress::NeedsAction;
+		$nextTask->responsibleUserId = null;
+		$nextTask->percentComplete = 0;
+		$nextTask->progressUpdated = null;
+		$nextTask->freeBusyStatus = 'free';
+
 		$rrule = $this->getRecurrenceRule();
 			
 		if(!empty($rrule->count)) {
