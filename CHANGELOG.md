@@ -1,3 +1,6 @@
+- Support: Create users during migration option could not be disabled
+- Email: UI tweaks for mobile
+
 11-07-2023: 6.7.41
 - Core: PWA installs as display = "standalone" as it works much better in iOS 16 now.
 - Email: Only create blobs on request for save as ticket.
