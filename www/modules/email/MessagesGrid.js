@@ -296,8 +296,13 @@ GO.email.MessagesGrid = function(config){
 				scope: this
 			},
 			this.composerButton = new Ext.Button({
-				iconCls: 'ic-drafts',
-				text: t("Compose", "email"),
+				iconCls: 'ic-edit',
+				desktop: {
+					text: t("Compose", "email"),
+				},
+				mobile: {
+					tooltip: t("Compose", "email"),
+				},
 				cls: 'primary',
 				handler: function () {
 					GO.email.showComposer({account_id: this.account_id});
@@ -311,6 +316,7 @@ GO.email.MessagesGrid = function(config){
 				},
 				scope: this
 			}), this.deleteButton = new Ext.Button({
+				hidden: GO.util.isMobileOrTablet(),
 				iconCls: 'ic-delete',
 				tooltip: t("Delete"),
 				handler: function () {
