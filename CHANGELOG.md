@@ -1,6 +1,7 @@
 - Support: Create users during migration option could not be disabled
 - Support: Grouping in system settings
 - Email: UI tweaks for mobile
+- Email: max-width 100% on items so it's more readable on mobiles
 - Business: Add delete button to agreements
 
 11-07-2023: 6.7.41
