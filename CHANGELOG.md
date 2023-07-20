@@ -5,6 +5,7 @@
 - Business: Add delete button to agreements
 - Core: No loading of classes in language files as it will break sites without ioncube
 - Freebusypermissions: check if user ID exists before creating ACL
+- Studio: acl entity permissions panel was missing
 
 11-07-2023: 6.7.41
 - Core: PWA installs as display = "standalone" as it works much better in iOS 16 now.
