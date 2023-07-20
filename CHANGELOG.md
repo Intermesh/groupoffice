@@ -1,5 +1,7 @@
 - Support: Create users during migration option could not be disabled
+- Support: Grouping in system settings
 - Email: UI tweaks for mobile
+- Business: Add delete button to agreements
 
 11-07-2023: 6.7.41
 - Core: PWA installs as display = "standalone" as it works much better in iOS 16 now.
