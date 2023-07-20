@@ -1,6 +1,7 @@
 - Core: PWA installs as display = "standalone" as it works much better in iOS 16 now.
 - Files: Modified in past 7 days didn't work for admin
 - Email: fixed removing labels
+- Freebusypermissions: check if user ID exists before creating ACL
 
 14-07-2023: 6.6.166
 - Email: fixed error message on aborted request in e-mail (happens on double click on folder for example)
