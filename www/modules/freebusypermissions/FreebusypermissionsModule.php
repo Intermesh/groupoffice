@@ -50,6 +50,10 @@ class FreebusypermissionsModule extends \GO\Base\Module{
 		$fbAcl = Model\FreeBusyAcl::model()->findSingleByAttribute('user_id', $userId);
 		
 		if(!$fbAcl){
+
+			if(!User::exists($userId)) {
+				return false;
+			}
 			
 			$acl = new \GO\Base\Model\Acl();
 			$acl->ownedBy = $userId;
