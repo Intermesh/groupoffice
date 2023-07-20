@@ -183,6 +183,11 @@ i.icon.em-low_priority {
 
 	> * {
 		color:inherit;
+
+	}
+
+	* {
+		max-width: 100% !important;
 	}
 	
 	p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
