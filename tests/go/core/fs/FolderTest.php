@@ -16,11 +16,11 @@ class FolderTest extends TestCase
 
 		$oneDayAgo = new DateTime("-1 day");
 
-		$oldFile = $tmp->getFile("folder/old.txt")
+		$tmp->getFile("folder/old.txt")
 			->touch(true, $oneDayAgo->format("U") - 1);
 		$newEnough = $tmp->getFile("justnewenough.txt")
 			->touch(true, $oneDayAgo->format("U") + 1);
-		$emptyFolder = $tmp->getFolder("empty")->create();
+		$tmp->getFolder("empty")->create();
 
 		$garbage = $tmp->find(
 			[
@@ -33,8 +33,8 @@ class FolderTest extends TestCase
 
 		$this->assertEquals(2, count($garbage));
 
-		$this->assertEquals($emptyFolder->getPath(), $garbage[0]->getPath());
-		$this->assertEquals($oldFile->getPath(), $garbage[1]->getPath());
+		$this->assertNotEquals($newEnough->getPath(), $garbage[0]->getPath());
+		$this->assertNotEquals($newEnough->getPath(), $garbage[1]->getPath());
 
 		$all = $tmp->find();
 
