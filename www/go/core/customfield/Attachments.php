@@ -32,10 +32,11 @@ final class Attachments extends MultiSelect
 		$tableName = $this->field->tableName();
 		$multiSelectTableName = $this->getMultiSelectTableName();
 		$entityColumn = $this->getTableDefinition()->getColumn('id');
+		$type = $entityColumn->dataType . ($entityColumn->unsigned?' UNSIGNED':'');
 
 		$sql = "CREATE TABLE IF NOT EXISTS `" . $multiSelectTableName . "` (
-			`order` unsigned bigint AUTO_INCREMENT,
-			`modelId` $entityColumn->dataType NOT NULL,
+			`order` bigint unsigned DEFAULT 0,
+			`modelId` $type NOT NULL,
 			`blobId` BINARY(40) NOT NULL,
 			`name` VARCHAR(192),
 			`description` MEDIUMTEXT,

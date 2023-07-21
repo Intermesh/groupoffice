@@ -1,5 +1,6 @@
 <?php
 return array (
+	"update available" => "update beschikbaar",
   'Input field' => 'Invoerveld',
   'Add sub group' => 'Subgroep toevoegen',
   '{count} selected' => '{count} geselecteerd',

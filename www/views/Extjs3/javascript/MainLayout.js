@@ -82,9 +82,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	boot : async function() {
 		var me = this;
 
-		// GOUI in ext
-		window.goui = await import(BaseHref + "views/goui/dist/goui/script/index.js");
-		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
+		// GOUI in ext , Warning: breaks old safari
+		// window.goui = await import(BaseHref + "views/goui/dist/goui/script/index.js");
+		// window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
 
 		go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
@@ -313,7 +313,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				go.Entities.init();
 
 				me.fireEvent('authenticated', this, go.User, password);
-				window.groupofficeCore.client.fireAuth();
+				// window.groupofficeCore.client.fireAuth();
 
 				me.renderUI();
 				Ext.getBody().unmask();

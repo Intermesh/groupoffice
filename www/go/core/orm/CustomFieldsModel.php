@@ -65,7 +65,8 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	public function setValues($data): CustomFieldsModel
 	{
 		$old = $this->internalGetCustomFields();
-		$this->data = array_merge($old, $this->normalizeCustomFieldsInput($data, $this->returnAsText));
+		$new = $this->normalizeCustomFieldsInput($data, $this->returnAsText);
+		$this->data = array_merge($old, $new);
 
 		return $this;
 	}

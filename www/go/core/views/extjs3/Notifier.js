@@ -244,7 +244,6 @@
 
 							//unfortunately this doesn't work on Firefox on Windows as it doesn't keep notifications. They auto close
 							// in a few seconds :(
-
 							if(!Ext.isWindows || !Ext.isGecko) {
 								// close group-office notification too.
 								msgPanel.destroy();
@@ -475,7 +474,7 @@
 				}
 
 				if(notification && msg.onclose) {
-					notification.onclose = msg.onclose;
+					notification.addEventListener("close", msg.onclose);
 				}
 
 				resolve(notification);

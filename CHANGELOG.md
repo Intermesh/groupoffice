@@ -1,3 +1,31 @@
+20-07-2023: 6.7.42
+- Support: Create users during migration option could not be disabled
+- Support: Grouping in system settings
+- Email: UI tweaks for mobile
+- Email: max-width 100% on items so it's more readable on mobiles
+- Business: Add delete button to agreements
+- Core: No loading of classes in language files as it will break sites without ioncube
+- Freebusypermissions: check if user ID exists before creating ACL
+- Studio: acl entity permissions panel was missing
+
+11-07-2023: 6.7.41
+- Core: PWA installs as display = "standalone" as it works much better in iOS 16 now.
+- Email: Only create blobs on request for save as ticket.
+- Tickets: fixed IMAP import
+- Email: Should fix v6.7.39 , Error: inline attachment missing on server #1029
+- Contacts: Fixed install bug
+- Core: Default to system language for templates
+- Finance: Switching to B2C was impossible
+- Files: Modified in past 7 days didn't work for admin
+- Tasks: Show incomplete tasks counter in main menu bar
+- Tasks: Create alert if another user adds task in your default list
+- Tasks: Create alert for creator when someone adds a comment
+- Core: Project and file links didn't open
+- Email: fixed removing labels
+
+11-07-2023: 6.7.40
+- Core: Fixed old safari incompatibility
+
 11-07-2023: 6.7.39
 - Core: Obsolete noreply_email setting will return systemEmail system setting
 - Tasks: fix sorting of task lists on change

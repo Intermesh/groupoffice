@@ -91,7 +91,7 @@ class Blob extends orm\Entity {
 	public $staleAt;
 	
 	private $tmpFile;
-	private $removeFile = true;
+	private $removeFile = false;
 
 	private $hardLink = false;
 
@@ -219,6 +219,7 @@ class Blob extends orm\Entity {
 
 		$blob->modifiedAt = $file->getModifiedAt();
 		$blob->hardLink = $hardLink;
+		$blob->removeFile = false;
 
 		return $blob;
 	}
@@ -300,7 +301,12 @@ class Blob extends orm\Entity {
 				if($this->removeFile) {
 					$tempFile->move(new File($this->path()));
 				} else if($this->hardLink) {
-					$tempFile->link(new File($this->path()));
+					try {
+						$tempFile->link(new File($this->path()));
+					} catch(Exception $e) {
+						//ignore
+						$tempFile->copy(new File($this->path()));
+					}
 				} else {
 					$tempFile->copy(new File($this->path()));					
 				}

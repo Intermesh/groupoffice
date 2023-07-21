@@ -755,6 +755,7 @@ a {
 	margin-right: dp(8);
 	border-radius: dp(16);
 	> * {
+		color: var(--c-tertiary);
 		@extend %icon;
 		&.unseen {
 			animation: blink .3s 30 alternate;

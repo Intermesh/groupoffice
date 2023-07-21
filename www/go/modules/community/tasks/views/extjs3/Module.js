@@ -140,22 +140,63 @@ go.Modules.register("community", "tasks", {
 	initModule: function () {
 		go.Alerts.on("beforeshow", function(alerts, alertConfig) {
 			const alert = alertConfig.alert;
-			if(alert.entity == "Task" && alert.tag == "assigned") {
+			if(alert.entity == "Task") {
 
-				//replace panel promise
-				alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
-					return go.Db.store("User").single(alert.data.assignedBy).then((assigner) =>{
-						if(!assigner) {
-							assigner = {displayName: t("Unknown")};
-						}
+				switch(alert.tag) {
+					case "assigned":
+						//replace panel promise
+						alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
+							return go.Db.store("UserDisplay").single(alert.data.assignedBy).then((assigner) =>{
+								if(!assigner) {
+									assigner = {displayName: t("Unknown")};
+								}
 
-						panelCfg.items = [{html: go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.displayName) }];
-						panelCfg.notificationBody = panelCfg.html;
-						return panelCfg;
-					});
-				});
+								const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.displayName);
+								panelCfg.items = [{html: msg }];
+								panelCfg.notificationBody = msg;
+								return panelCfg;
+							});
+						});
+						break;
+
+					case "createdforyou":
+//replace panel promise
+						alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
+							return go.Db.store("UserDisplay").single(alert.data.createdBy).then((creator) =>{
+								if(!creator) {
+									creator = {displayName: t("Unknown")};
+								}
+
+								const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("A new task was created in your list by {creator}").replace("{creator}", creator.displayName);
+								panelCfg.items = [{html: msg}];
+								panelCfg.notificationBody = msg
+								return panelCfg;
+							});
+						});
+						break;
+				}
+
 			}
 		});
+
+
+		async function showBadge() {
+			const count = await go.Jmap.request({method: "Task/countMine", params: {role: "list"}});
+
+			GO.mainLayout.setNotification('tasks', count,'orange');
+		}
+
+		GO.mainLayout.on("authenticated", () => {
+			if(go.Modules.isAvailable("community", "tasks")) {
+
+				go.Db.store("Task").on("changes", () => {
+					showBadge();
+				});
+
+				showBadge();
+			}
+		})
+
 	},
 
 

@@ -892,7 +892,7 @@ class EntityType implements ArrayableInterface {
 			$acl[$group->groupId] = $group->level;
 		}
 
-		return $acl;
+		return empty($acl) ? null : $acl;
 	}
 
 	/**

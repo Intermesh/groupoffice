@@ -37,8 +37,8 @@ GO.smime.checkCert = function(email,data) {
 
 GO.moduleManager.onModuleReady('email',function(){
 
-	Ext.override(GO.email.EmailClient, {
-		initComponent : GO.email.EmailClient.prototype.initComponent.createSequence(function(){
+	Ext.override(GO.email.MessageContextMenu, {
+		initComponent : GO.email.MessageContextMenu.prototype.initComponent.createSequence(function(){
 			
 			this.printButton.handler=function(){
 				

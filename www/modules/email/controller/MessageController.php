@@ -1263,7 +1263,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 //		if (!$imapMessage->seen && stripos($account->host, 'gmail') !== false)
 //			$imapMessage->getImapConnection()->set_message_flag(array($imapMessage->uid), "\Seen");
 
-		if(!empty($params['create_temporary_attachments'])) {
+
+		if(!empty($params['create_blobs'])) {
+			$imapMessage->createBlobsForAttachments();
+		} elseif(!empty($params['create_temporary_attachments'])) {
 			$imapMessage->createTempFilesForAttachments();
 		}
 

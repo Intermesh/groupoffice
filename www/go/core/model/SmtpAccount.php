@@ -20,7 +20,7 @@ class SmtpAccount extends AclOwnerEntity
 	public $port;
 	public $username;
 	protected $password;
-	public $encryption;
+	public $encryption; // null, 'tls' or 'ssl'
 	public $verifyCertificate;
 	public $fromName;
 	public $fromEmail;

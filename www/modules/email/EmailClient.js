@@ -413,16 +413,16 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				},
 				scope: this
 			}),'->',
-			this.printButton = new Ext.Button({
-				disabled: true,
-				iconCls: 'ic-print',
-				tooltip: t("Print"),
-				overflowText: t("Print"),
-				handler: function(){
-					this.messagePanel.print();
-				},
-				scope: this
-			}),
+			// this.printButton = new Ext.Button({
+			// 	disabled: true,
+			// 	iconCls: 'ic-print',
+			// 	tooltip: t("Print"),
+			// 	overflowText: t("Print"),
+			// 	handler: function(){
+			// 		this.messagePanel.print();
+			// 	},
+			// 	scope: this
+			// }),
 			{
 				iconCls: 'ic-more-vert',
 				menu: this.gridContextMenu
@@ -439,6 +439,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			menu:this.gridContextMenu.saveAsMenu
 		});
 
+
+
+
+	}
+
 		this.messageTbar.insert(-1, {
 			xtype:'button',
 			iconCls:'ic-delete',
@@ -448,9 +453,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				this.westPanel.show();
 			}
 		});
-
-
-	}
 
 	this.messagePanel = new GO.email.MessagePanel({
 		id:'email-message-panel',
@@ -497,7 +499,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this.replyAllButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.replyButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.forwardButton.setDisabled(this.readOnly && !this._permissionDelegated);
-			this.printButton.setDisabled(false);//this.readOnly && !this._permissionDelegated);
+			// this.printButton.setDisabled(false);//this.readOnly && !this._permissionDelegated);
 
 			var record = this.messagesGrid.store.getById(this.messagePanel.uid);
 
@@ -616,6 +618,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 					this.markAsRead.defer(2000, this, [r.data.uid, r.data['mailbox'], this.account_id]);
 				}
 			}
+			this.messagePanel.show();
 		},this)
 
 		// grid.getSelectionModel().on('selectionchange', function(grid, rowIndex, r){
