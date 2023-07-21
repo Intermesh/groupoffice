@@ -1029,7 +1029,7 @@ class MailStore extends Store implements ISearchProvider {
 		if(!$imapAccount)
 			return false;
 												
-		$searchwords = $cpo->GetSearchFreeText();
+		$searchwords = "yul";// $cpo->GetSearchFreeText();
 		// split the search on whitespache and look for every word
 //		$searchwords = preg_split("/\W+/", $searchwords);
 		
@@ -1038,7 +1038,9 @@ class MailStore extends Store implements ISearchProvider {
 			//happens when searching "All folders" on iphone but we don't support this yet.
 			$searchFolder = 'INBOX';
 		} else {
-			$searchFolder = substr($searchFolder, 2); // REMOVE THE "m/" from the folder id
+
+			if(!empty($searchFolder) && substr($searchFolder, 0, 2) == 'm/')
+				$searchFolder = substr($searchFolder, 2);// REMOVE THE "m/" from the folder id
 		}
 		
 		// Build the imap search query
@@ -1103,7 +1105,7 @@ class MailStore extends Store implements ISearchProvider {
 		
 		$items = array();
 		$items['searchtotal'] = $imapAccount->getImapConnection()->sort_count;
-        $items["range"] = $rangestart.'-'.$rangeend;
+        $items["range"] = $rangestart.'-'.min($rangeend, $items['searchtotal']);
 		
 		foreach($messages as $message){
 			$items[] = array(

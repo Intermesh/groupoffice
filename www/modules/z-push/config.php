@@ -95,11 +95,11 @@ const IPC_PROVIDER = '';
 // note: you can't use z-push constants in the GO config file!
 // use 16 for debug or 32 for wbxml
 if(!isset(\GO::config()->zpush2_loglevel)){
-	\GO::config()->zpush2_loglevel = \GO::config()->debug ? LOGLEVEL_FATAL | LOGLEVEL_ERROR | LOGLEVEL_WARN | LOGLEVEL_DEBUG : LOGLEVEL_OFF;
+	\GO::config()->zpush2_loglevel = \GO::config()->debug ? LOGLEVEL_FATAL | LOGLEVEL_ERROR | LOGLEVEL_WARN | LOGLEVEL_DEBUG | LOGLEVEL_WBXML : LOGLEVEL_OFF;
 }
 
 		define('LOGBACKEND', 'filelog');
-		define('LOGLEVEL', \GO::config()->zpush2_loglevel);
+		define('LOGLEVEL', LOGLEVEL_WBXML);//\GO::config()->zpush2_loglevel);
 		define('LOGAUTHFAIL', false);
 
 // To save e.g. WBXML data only for selected users, add the usernames to the array
