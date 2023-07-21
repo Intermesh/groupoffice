@@ -406,6 +406,8 @@ JSON;
 	}
 
 	/**
+	 * Make keys unsigned
+	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/convertInts
 	 *
 	 * @return void
