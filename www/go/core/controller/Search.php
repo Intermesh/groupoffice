@@ -59,12 +59,19 @@ class Search extends EntityController {
 						->orWhere('displayName', 'LIKE', '%' . $q . '%')
 				);
 			}
+
+
 			$query->andWhere('enabled', '=', 1);
 		}
 
 		if ($hasAddressbook) {
 
-			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, IF(c.department IS NULL or c.department = "", c.name, CONCAT(c.name, " (", c.department, ")")) as name, c.photoBlobId';
+			if(isset($query)) { // try to join contact for department property
+				$query->join("addressbook_contact", "c", "u.contactId=c.id", 'LEFT');
+				$query->select($selectQueryContact . ' e.department as extra');
+			}
+
+			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.department as extra, c.photoBlobId';
 
 			if($isEmailModuleAvailable && $optionEnabled == "1") {
 				$selectQuery .= ', em.last_mail_time AS priority';
