@@ -1,3 +1,5 @@
+- Zpushadmin: fixed delete button
+
 20-07-2023: 6.7.42
 - Support: Create users during migration option could not be disabled
 - Support: Grouping in system settings

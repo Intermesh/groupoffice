@@ -550,6 +550,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	/**
 	 * Skip this number of records
 	 *
+	 * Typically used in combination with {@see limit()}
+	 *
 	 * @param int $offset
 	 * @return static
 	 */
@@ -565,7 +567,9 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	}
 
 	/**
-	 * Limit the number of models returned
+	 * Limit the number of models returned.
+	 *
+	 * Typically used in combination with {@see offset()}
 	 *
 	 * @param int $limit
 	 * @return static
