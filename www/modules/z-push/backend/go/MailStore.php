@@ -1013,6 +1013,26 @@ class MailStore extends Store implements ISearchProvider {
 		
 		return true;
 	}
+
+
+	/**
+	 * Microsoft AQS
+	 *
+	 * https://support.microsoft.com/en-us/office/search-mail-and-people-in-outlook-com-88108edf-028e-4306-b87e-7400bbb40aa7?ui=en-us&rs=en-us&ad=us
+	 * @param string $text
+	 * @return void
+	 */
+	private function parseSearchFreeText(string $text) {
+		//to:"Test" OR cc:"Test" OR from:"Test" OR subject:"Test" OR "Test"
+		//
+
+		if(preg_match('/"([^"]+)"/', $text, $matches)) {
+			return $matches[1];
+		} else{
+			return $text;
+		}
+
+	}
 	
  /**
 	* Searches for the emails on the server
@@ -1029,9 +1049,11 @@ class MailStore extends Store implements ISearchProvider {
 		if(!$imapAccount)
 			return false;
 												
-		$searchwords = "yul";// $cpo->GetSearchFreeText();
+		$searchwords = $cpo->GetSearchFreeText();
 		// split the search on whitespache and look for every word
 //		$searchwords = preg_split("/\W+/", $searchwords);
+
+		$searchwords = $this->parseSearchFreeText($searchwords);
 		
 		$searchFolder = $cpo->GetSearchFolderid(); // RESULTS IN "m/INBOX" OR "m/Concepten"
 		if(!$searchFolder) {
@@ -1045,17 +1067,7 @@ class MailStore extends Store implements ISearchProvider {
 		
 		// Build the imap search query
 		$searchData = $cpo->GetData();
-//		$imapSearchQuery = new \GO\Email\Model\ImapSearchQuery();
-//		
-//		foreach($searchwords as $word){
-//			$imapSearchQuery->addSearchWord($word, \GO\Email\Model\ImapSearchQuery::FROM);
-//			$imapSearchQuery->addSearchWord($word, \GO\Email\Model\ImapSearchQuery::SUBJECT);
-//			$imapSearchQuery->addSearchWord($word, \GO\Email\Model\ImapSearchQuery::TO);
-//			$imapSearchQuery->addSearchWord($word, \GO\Email\Model\ImapSearchQuery::CC);
-//		}
-//		
-		
-		
+
 		$query = 'OR OR OR FROM "'.$searchwords.'" SUBJECT "'.$searchwords.'" TO "'.$searchwords.'" CC "'.$searchwords.'"';
 		
 		if(isset($searchData['searchdatereceivedgreater']) && $searchData['searchdatereceivedgreater']){
@@ -1071,10 +1083,6 @@ class MailStore extends Store implements ISearchProvider {
 			$query .= ' BEFORE '.date('d-M-Y',$searchLess);
 		}
 
-//		$query = $imapSearchQuery->getImapSearchQuery();
-		
-//		$query = ' FROM "kadaster"  OR TO "kadaster"  OR CC "kadaster"  OR SUBJECT "kadaster" BEFORE 28-Feb-2013 SINCE 28-Aug-2012 ';
-//		
 
 		$maxPageSize = 30;
 		
@@ -1092,20 +1100,20 @@ class MailStore extends Store implements ISearchProvider {
 			$rangeend=$rangestart+$maxPageSize;
 		}
 
-        ZLog::Write(LOGLEVEL_INFO,'QUERY ~~ '.var_export($query,true) . ' range: ' . $rangestart.' - '. $rangeend);
+    ZLog::Write(LOGLEVEL_INFO,'QUERY ~~ '.var_export($query,true) . ' range: ' . $rangestart.' - '. $rangeend);
 
-        $messages = \GO\Email\Model\ImapMessage::model()->find(
-					$imapAccount, 
-					$searchFolder,
-					$rangestart, 
-					$rangeend-$rangestart,
-					\GO\Base\Mail\Imap::SORT_DATE, 
-					true, 
-					$query);
+    $messages = \GO\Email\Model\ImapMessage::model()->find(
+			$imapAccount,
+			$searchFolder,
+			$rangestart,
+			$rangeend-$rangestart,
+			\GO\Base\Mail\Imap::SORT_DATE,
+			true,
+			$query);
 		
 		$items = array();
 		$items['searchtotal'] = $imapAccount->getImapConnection()->sort_count;
-        $items["range"] = $rangestart.'-'.min($rangeend, $items['searchtotal']);
+		$items["range"] = $rangestart.'-'.$rangeend;
 		
 		foreach($messages as $message){
 			$items[] = array(
@@ -1113,7 +1121,7 @@ class MailStore extends Store implements ISearchProvider {
 					'longid' => 'm/'.$searchFolder.':'.$message->uid,
 					'folderid' => 'm/'.$searchFolder
 			);
-		}		
+		}
 		return $items;
 	}
 	

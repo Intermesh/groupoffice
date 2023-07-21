@@ -200,6 +200,8 @@ class Find extends RequestProcessor {
 	      self::$encoder->startTag("Find:Response");
 
 	        self::$encoder->startTag("ItemOperations:Store");
+	        self::$encoder->content("m/INBOX");
+	        self::$encoder->endTag(); // Store
 
 				    self::$encoder->startTag("Find:Status");
 				      self::$encoder->content($status);
@@ -228,40 +230,41 @@ class Find extends RequestProcessor {
 
 						    self::$encoder->startTag("Find:Properties");
 
-//							    $message->Encode(self::$encoder);
-					      self::$encoder->startTag("POOMMAIL:Subject");
-						    self::$encoder->content($message->subject);
-						    self::$encoder->endTag();
-					      self::$encoder->startTag("POOMMAIL:DateReceived");
-						    self::$encoder->content(gmstrftime("%Y-%m-%dT%H:%M:%S.000Z", $message->datereceived));
-						    self::$encoder->endTag();
-					      self::$encoder->startTag("POOMMAIL:DisplayTo");
-						    self::$encoder->content($message->displayto);
-						    self::$encoder->endTag();
-						    self::$encoder->startTag("Find:DisplayCc");
-						    self::$encoder->content(implode(', ', $message->cc));
-						    self::$encoder->endTag();
-						    self::$encoder->startTag("Find:DisplayBcc");
-						    self::$encoder->content("");
-						    self::$encoder->endTag();
-						    self::$encoder->startTag("POOMMAIL:Importance");
-						    self::$encoder->content($message->importance);
-						    self::$encoder->endTag();
-						    self::$encoder->startTag("POOMMAIL:Read");
-						    self::$encoder->content($message->read);
-						    self::$encoder->endTag();
-					      self::$encoder->startTag("POOMMAIL2:IsDraft");
-					      self::$encoder->content("0");
-					      self::$encoder->endTag();
-						    self::$encoder->startTag("Find:Preview");
-						    self::$encoder->content("test 123 preview...");
-						    self::$encoder->endTag();
-						    self::$encoder->startTag("Find:HasAttachments");
-						    self::$encoder->content("0");
-						    self::$encoder->endTag();
-						    self::$encoder->startTag("POOMMAIL:From");
-						    self::$encoder->content($message->from);
-						    self::$encoder->endTag();
+							    $message->Encode(self::$encoder);
+									
+//					      self::$encoder->startTag("POOMMAIL:Subject");
+//						    self::$encoder->content($message->subject);
+//						    self::$encoder->endTag();
+//					      self::$encoder->startTag("POOMMAIL:DateReceived");
+//						    self::$encoder->content(gmstrftime("%Y-%m-%dT%H:%M:%S.000Z", $message->datereceived));
+//						    self::$encoder->endTag();
+//					      self::$encoder->startTag("POOMMAIL:DisplayTo");
+//						    self::$encoder->content($message->displayto);
+//						    self::$encoder->endTag();
+//						    self::$encoder->startTag("Find:DisplayCc");
+//						    self::$encoder->content(implode(', ', $message->cc));
+//						    self::$encoder->endTag();
+//						    self::$encoder->startTag("Find:DisplayBcc");
+//						    self::$encoder->content("");
+//						    self::$encoder->endTag();
+//						    self::$encoder->startTag("POOMMAIL:Importance");
+//						    self::$encoder->content($message->importance);
+//						    self::$encoder->endTag();
+//						    self::$encoder->startTag("POOMMAIL:Read");
+//						    self::$encoder->content($message->read);
+//						    self::$encoder->endTag();
+//					      self::$encoder->startTag("POOMMAIL2:IsDraft");
+//					      self::$encoder->content("0");
+//					      self::$encoder->endTag();
+//						    self::$encoder->startTag("Find:Preview");
+//						    self::$encoder->content("test 123 preview...");
+//						    self::$encoder->endTag();
+//						    self::$encoder->startTag("Find:HasAttachments");
+//						    self::$encoder->content("0");
+//						    self::$encoder->endTag();
+//						    self::$encoder->startTag("POOMMAIL:From");
+//						    self::$encoder->content($message->from);
+//						    self::$encoder->endTag();
 
 
 
@@ -280,7 +283,7 @@ class Find extends RequestProcessor {
 				    self::$encoder->content($searchtotal);
 				    self::$encoder->endTag();
 
-					self::$encoder->endTag(); // Store
+
 
 	      self::$encoder->endTag(); // Response
 
