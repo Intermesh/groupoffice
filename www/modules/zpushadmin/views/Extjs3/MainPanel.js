@@ -21,9 +21,9 @@ GO.zpushadmin.MainPanel = Ext.extend(Ext.Panel, {
 				text: t("Delete"),
 				disabled:this.standardTbarDisabled,
 				handler: function(){
-					this.deleteSelected();
+					this.centerPanel.deleteSelected();
 				},
-				scope: this.centerPanel
+				scope: this
 			}],
 			listeners: {
 				"delayedrowselect": (grid, rowIndex, r) => {
