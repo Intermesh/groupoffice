@@ -35,13 +35,11 @@ GO.smime.checkCert = function(email,data) {
 	return {cls,text,icon};
 }
 
-GO.moduleManager.onModuleReady('email',function(){
+Ext.onReady(function () {
 
 	Ext.override(GO.email.MessageContextMenu, {
 		initComponent : GO.email.MessageContextMenu.prototype.initComponent.createSequence(function(){
-			
-			this.printButton.handler=function(){
-				
+			this.printButton.setHandler(function(){
 				if(this.messagePanel.data.smime_signed && !this.messagePanel.smimeChecked){
 					this.messagePanel.checkCert(true, function(){
 						this.messagePanel.print();
@@ -50,10 +48,9 @@ GO.moduleManager.onModuleReady('email',function(){
 				{
 					this.messagePanel.print();
 				}
-			};
+			}, this.main);
 		})
 	});
-	
 
 	Ext.override(GO.email.MessagePanel, {
 		initComponent : GO.email.MessagePanel.prototype.initComponent.createSequence(function(){
