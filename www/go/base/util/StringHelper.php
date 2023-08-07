@@ -396,10 +396,6 @@ class StringHelper {
 
 	public static function get_html_body($html) {
 		$to_removed_array = array ("'<html[^>]*>'si", "'</html>'si", "'<body[^>]*>'si", "'</body>'si", "'<head[^>]*>.*?</head>'si", "'<style[^>]*>.*?</style>'si", "'<object[^>]*>.*?</object>'si",);
-
-		//$html = str_replace("\r", "", $html);
-		//$html = str_replace("\n", "", $html);
-
 		$html = preg_replace($to_removed_array, '', $html);
 		return $html;
 
@@ -409,12 +405,13 @@ class StringHelper {
 	/**
 	 * Give it a full name and it tries to determine the First, Middle and Lastname
 	 *
-	 * @param	StringHelper $full_name A full name
+	 * @param	StringHelper $full_name A full name (default value empty string)
 	 * @access public
 	 * @return array array with keys first, middle and last
 	 */
 
 	public static function split_name($full_name) {
+		$full_name = $full_name ?? "";
 		if (strpos($full_name,',')) {
 			
 			$parts = explode(',',$full_name);
@@ -460,7 +457,6 @@ class StringHelper {
 	 */
 	public static function get_email_validation_regex() {
 		return \go\core\mail\Util::EMAIL_REGEX;
-		//return "/^[_a-z0-9\-+\&\']+(\.[_a-z0-9\-+\&\']+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*(\.[a-z]{2,100})$/i";
 	}
 
 
