@@ -1,4 +1,5 @@
 - Zpushadmin: fixed delete button
+- Tasks: If available, filter on project tasks
 
 20-07-2023: 6.7.42
 - Support: Create users during migration option could not be disabled

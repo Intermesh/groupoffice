@@ -57,6 +57,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		});
 
 		const showCompleted = Ext.state.Manager.get(this.statePrefix + "show-completed");
+		const showProjectTasks = Ext.state.Manager.get(this.statePrefix + "show-project-tasks");
 		const showAssignedToMe = Ext.state.Manager.get(this.statePrefix + "assigned-to-me");
 		const showUnassigned = Ext.state.Manager.get(this.statePrefix + "show-unassigned");
 
@@ -81,15 +82,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						[t("Today"), 'content_paste', 'green', 'today'],
 						[t("Due in seven days"), 'filter_7', 'purple', '7days'],
 						[t("All"), 'assignment', 'red', 'all'],
-						// [t("Completed"), 'assignment_turned_in', 'grey', 'completed'],
 						[t("Unscheduled"), 'event_busy', 'blue', 'unscheduled'],
 						[t("Scheduled"), 'events', 'orange', 'scheduled'],
 
 					]
 				})
 			});
-
-
 		}
 
 
@@ -126,7 +124,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			]
 		});
 		if(!this.support) {
-			this.sidePanel.items.insert(1, Ext.create({
+
+			let cfToggles = Ext.create({
 				xtype: "fieldset",
 				items: [
 					{
@@ -144,7 +143,25 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						}
 					}
 				]
-			}));
+			});
+			if(go.Modules.isAvailable("legacy", "projects2")) {
+				cfToggles.add({
+					hideLabel: true,
+					xtype: "checkbox",
+					boxLabel: t("Show project tasks"),
+					checked: showProjectTasks,
+					listeners: {
+						scope: this,
+						check: function (cb, checked) {
+							this.toggleProjectTasks(checked);
+							Ext.state.Manager.set(this.statePrefix + "show-project-tasks", checked);
+							this.taskGrid.store.load();
+						}
+					}
+				})
+			}
+
+			this.sidePanel.items.insert(1, cfToggles);
 		}
 
 		this.sidePanel.items.insert(this.support ? 1 : 2, Ext.create({
@@ -187,7 +204,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			]
 		}));
 
-
 		this.centerPanel = new Ext.Panel({
 			layout:'responsive',
 			stateId: this.statePrefix + "west",
@@ -222,6 +238,17 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	showCompleted : function(show) {
 		this.taskGrid.store.setFilter('completed', show ? null : {complete:  false});
+	},
+
+	toggleProjectTasks: function(show) {
+		this.taskGrid.store.setFilter("role", show ? {role:  go.modules.community.tasks.listTypes.Project } : null);
+		if(show) {
+			this.taskGrid.store.setFilter(this.tasklistsGrid.getId(), null); // eew
+		} else {
+			this.setDefaultSelection();
+		}
+		this.tasklistsGrid.setVisible(!show);
+		this.categoriesGrid.setVisible(!show);
 	},
 
 	setAssignmentFilters: function() {
@@ -270,6 +297,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
 
 			this.showCompleted(Ext.state.Manager.get(this.statePrefix + "show-completed"));
+			this.toggleProjectTasks(Ext.state.Manager.get(this.statePrefix + "show-project-tasks"));
 
 			let statusFilter = Ext.state.Manager.get(this.statePrefix + "status-filter");
 			if (!statusFilter) {
@@ -280,7 +308,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		}
 
 
-		this.setDefaultSelection();
+		if(!Ext.state.Manager.get(this.statePrefix + "show-project-tasks")) {
+			this.setDefaultSelection();
+		}
 
 		this.tasklistsGrid.store.load();
 		this.taskGrid.store.load();
@@ -480,7 +510,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					tooltip: t("Merge"),
 					handler: function() {
 						const ids = this.taskGrid.getSelectionModel().getSelections().column('id');
-						console.warn(ids);
+						// console.warn(ids);
 						if(ids.length < 2) {
 							Ext.MessageBox.alert(t("Error"), t("Please select at least two items"));
 						} else
@@ -635,7 +665,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				keypress: this.onTaskGridKeyPress
 			}
 		});
-		//this.quickAddTaskListCombo.store.load();
+
 		this.taskGrid.on('navigate', function (grid, rowIndex, record) {
 			go.Router.goto((this.support ? "support/" : "task/") + record.id);
 		}, this);
@@ -745,7 +775,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		var dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
+		const dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
 		dlg.load(record.id).show();
 	}	
 });
