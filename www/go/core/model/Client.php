@@ -69,8 +69,8 @@ class Client extends Property
 				$this->version = $_SERVER['HTTP_USER_AGENT'];
 
 				$ua_info = \donatj\UserAgent\parse_user_agent();
-				$this->platform = $ua_info['platform'];
-				$this->name = $ua_info['browser'];
+				$this->platform = $ua_info['platform'] ?? '-';
+				$this->name = $ua_info['browser'] ?? '-';
 
 			}else if(Environment::get()->isCli()) {
 				$this->version = 'CLI';

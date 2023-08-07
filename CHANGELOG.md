@@ -1,6 +1,7 @@
 - Zpushadmin: fixed delete button
 - Tasks: If available, filter on project tasks
 - Core: fix deprecation error in StringHelper (Github 1034)
+- Core: fix token generation when platform not detected (Github 982)
 
 20-07-2023: 6.7.42
 - Support: Create users during migration option could not be disabled
