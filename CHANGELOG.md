@@ -1,7 +1,7 @@
 - Leavedays: bugfix in retrieving special leave budget with registered hours.
 
 20-07-2023: 6.6.167
-- C, hopeore: PWA installs as display = "standalone" as it works much better in iOS 16 now.
+- Core: PWA installs as display = "standalone" as it works much better in iOS 16 now.
 - Files: Modified in past 7 days didn't work for admin
 - Email: fixed removing labels
 - Freebusypermissions: check if user ID exists before creating ACL
