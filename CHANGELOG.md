@@ -1,4 +1,6 @@
 - Leavedays: bugfix in retrieving special leave budget with registered hours.
+- Leavedays: Make special leave budget dialog more pronounced
+- Leavedays: Add special leave budget grid to panel
 
 20-07-2023: 6.6.167
 - Core: PWA installs as display = "standalone" as it works much better in iOS 16 now.
