@@ -1,3 +1,4 @@
+11-08-2023: 6.6.168
 - Leavedays: bugfix in retrieving special leave budget with registered hours.
 - Leavedays: Make special leave budget dialog more pronounced
 - Leavedays: Add special leave budget grid to panel
