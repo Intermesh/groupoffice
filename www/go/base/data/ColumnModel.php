@@ -311,6 +311,7 @@ class ColumnModel {
 		}
 	}
 
+	private $_columnsSorted = false;
 	/**
 	 * Turn a sort alias into the real column name. 
 	 * 
