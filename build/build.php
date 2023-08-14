@@ -73,7 +73,7 @@ class Builder
 	private $packageName;
 
 
-	private $encoder = "/root/sg/sourceguardian-evaluation/bin/sourceguardian --phpversion 7.2+";
+	private $encoder = '/root/sg/sourceguardian-evaluation/bin/sourceguardian --phpversion 7.2+';
 
 	private $encoderOptions = null;
 	private $proRepos = "git@git.intermesh.nl:groupoffice/promodules.git";
@@ -97,7 +97,7 @@ class Builder
 		//dummy sign just to enter password at start
 		run("gpg --clear-sign -o- /dev/null");
 
-		$this->pullSource();
+//		$this->pullSource();
 		$this->minorVersion = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
 
 
@@ -232,7 +232,8 @@ class Builder
 
 	private function runEncoder($sourcePath, $targetPath)
 	{
-		run($this->encoder . ' -r ' . $this->sourceDir . $sourcePath . ' ' . '-o ' . $this->buildDir . "/" . $this->packageName . $targetPath);
+        	cd($this->sourceDir. dirname($sourcePath));
+		run($this->encoder . ' -r -f "*.php" -o ' . $this->buildDir . "/" . $this->packageName . $targetPath . " ".basename($sourcePath)."/*");
 	}
 
 	private function encode()
