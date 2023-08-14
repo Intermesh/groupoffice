@@ -1,6 +1,7 @@
 <?php
 namespace go\core\db;
 
+use GO\Base\Db\ActiveRecord;
 use go\core\data\ArrayableInterface;
 use go\core\ErrorHandler;
 use Exception;
@@ -16,7 +17,32 @@ use PDOStatement;
  * associated result set.
  */
 class Statement extends PDOStatement implements JsonSerializable, ArrayableInterface{
-	
+
+	/**
+	 * The model type this statement result returns.
+	 *
+	 * @var ActiveRecord
+	 * @deprecated Only needed for old ActiveRecord
+	 */
+	public $model;
+
+	/**
+	 * Parameters  that were passed to \GO\BaseDb\activeRecord::find()
+	 *
+	 * @var array
+	 *
+	 * @deprecated Only needed for old ActiveRecord
+	 */
+	public $findParams;
+
+	/**
+	 * If the statement was returned by a relational query eg. $model->relationName() then this
+	 * is set to the relation name.
+	 * @deprecated Only needed for old ActiveRecord
+	 * @var String
+	 */
+	public $relation;
+
 	private $query;
 
 	#[\ReturnTypeWillChange]
