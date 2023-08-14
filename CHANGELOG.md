@@ -1,3 +1,6 @@
+- Support: add comments to required modules
+- Comments: Fix uninstall script
+
 14-08-2023: 6.7.43
 - Core: Added markdown filter to TemplateParser.php
 - Zpushadmin: fixed delete button
