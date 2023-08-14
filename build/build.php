@@ -89,8 +89,6 @@ class Builder
 	public function __construct($config)
 	{
 		$this->github = $config['github'];
-		$this->ioncubePassword = $config['ioncubePassword'];
-
 	}
 
 	public function build()
@@ -119,13 +117,13 @@ class Builder
 		$this->buildFromSource();
 
 
-		$this->buildDebianPackage();
-
-		if (!$this->test) {
-			$this->createGithubRelease();
-			$this->addToDebianRepository();
-			$this->sendTarToSF();
-		}
+//		$this->buildDebianPackage();
+//
+//		if (!$this->test) {
+//			$this->createGithubRelease();
+//			$this->addToDebianRepository();
+//			$this->sendTarToSF();
+//		}
 	}
 
 	private function pullSource()
