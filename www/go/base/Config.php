@@ -1337,7 +1337,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 			return $this->{"get" . $name}();
 		}
 		
-		return null;
+		return $this->dyn[$name] ?? null;
 	}
 	
 	public function __isset($name) {
@@ -1372,9 +1372,16 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		return $config;
 	}
-		
-	
-	
+
+	private $dyn = [];
+
+	public function __set($name, $value)
+	{
+		$this->dyn[$name] = $value;
+	}
+
+
+
 	/**
 	 * Constructor. Initialises all public variables.
 	 *
