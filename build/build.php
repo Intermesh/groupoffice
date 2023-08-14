@@ -73,7 +73,7 @@ class Builder
 	private $packageName;
 
 
-	private $encoder = __DIR__ . "/deploy/ioncube_encoder5_12.0/ioncube_encoder.sh";
+	private $encoder = "/root/sg/sourceguardian-evaluation/bin/sourceguardian --phpversion 7.2+";
 
 	private $encoderOptions = null;
 	private $proRepos = "git@git.intermesh.nl:groupoffice/promodules.git";
@@ -84,7 +84,6 @@ class Builder
 
 	private $github = ['PERSONAL_ACCESS_TOKEN' => "secret", 'USERNAME' => 'intermesh', 'REPOSITORY' => 'groupoffice'];
 
-	private $ioncubePassword = "secret";
 	private $githubRelease;
 
 	public function __construct($config)
@@ -235,10 +234,7 @@ class Builder
 
 	private function runEncoder($sourcePath, $targetPath)
 	{
-		run($this->encoder . ' -72 --allow-reflection-all -B --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' . '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
-
-		run($this->encoder . ' -81 --allow-reflection-all --add-to-bundle --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' . '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
-
+		run($this->encoder . ' -r ' . $this->sourceDir . $sourcePath . ' ' . '-o ' . $this->buildDir . "/" . $this->packageName . $targetPath);
 	}
 
 	private function encode()
@@ -250,8 +246,6 @@ class Builder
 		$this->runEncoder('/promodules/tickets/model', '/modules/tickets/');
 		$this->runEncoder('/promodules/tickets/customfields/model', '/modules/tickets/customfields/');
 		$this->runEncoder('/promodules/tickets/customfields/model', '/modules/tickets/customfields/');
-
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target ' . $this->sourceDir . '/promodules/tickets/TicketsModule.php ' . '--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/');
 
 
 		foreach ($this->proModules as $module) {
