@@ -177,7 +177,7 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 					xtype: 'gonumberfield',
 					fieldLabel: "y",
 					name: 'footerY',
-					value: 10
+					value: -10
 				},{
 					xtype: "textarea",
 					fieldLabel: t("Footer") + " (HTML)",
