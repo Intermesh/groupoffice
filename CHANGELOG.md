@@ -1,3 +1,4 @@
+- Core: Added markdown filter to TemplateParser.php
 - Zpushadmin: fixed delete button
 - Tasks: If available, filter on project tasks
 - Core: fix deprecation error in StringHelper (Github 1034)
