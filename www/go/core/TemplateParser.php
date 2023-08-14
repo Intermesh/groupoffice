@@ -216,6 +216,7 @@ class TemplateParser {
 		$this->addFilter('entityFiles', [$this, "filterEntityFiles"]);
 
 		$this->addFilter('nl2br', [$this, "filterNl2br"]);
+		$this->addFilter('markdown', [$this, "filterMarkdown"]);
 		$this->addFilter('empty', [$this, "filterEmpty"]);
 		$this->addFilter('htmlEncode', [$this, "filterHtmlEncode"]);
 		$this->addFilter('dump', [$this, "filterDump"]);
@@ -333,6 +334,14 @@ class TemplateParser {
 		}
 		$entityCls = $entityType->getClassName();
 		return $entityCls::findByLink($entity,!empty($properties) ? explode(",", $properties) : [], true);
+	}
+
+	private function filterMarkDown(?string $text): string
+	{
+		$pd = new \Parsedown();
+		$pd->setSafeMode(true);
+		$pd->setBreaksEnabled(true);
+		return $pd->text($text);
 	}
 
 
