@@ -48,22 +48,26 @@ class Message extends \Swift_Message {
 	 *
 	 * @return int The number of successful recipients. Can be 0 which indicates failure
 	 */
-	public function send(&$failedRecipients = null) {
+	public function send(&$failedRecipients = null): int
+	{
 		return $this->mailer->send($this, $failedRecipients);
 	}
 
-	public function setSubject($subject) {
+	public function setSubject($subject): Message
+	{
 		$this->getHeaders();
 		return parent::setSubject($subject);
 	}
 
 	/**
 	 * Provide Blob. Blob attachment will be returned.
-	 * 
+	 *
 	 * @param Blob $blob
+	 * @param null $name
 	 * @return static
 	 */
-	public function addBlob(Blob $blob, $name = null) {
+	public function addBlob(Blob $blob, $name = null): Message
+	{
 		$this->attach(Attachment::fromBlob($blob)->setFilename($name ?? $blob->name));
 		return $this;
 	}
@@ -71,7 +75,8 @@ class Message extends \Swift_Message {
 	/**
 	 * @return Mailer
 	 */
-	public function getMailer() {
+	public function getMailer(): Mailer
+	{
 		return $this->mailer;
 	}
 
