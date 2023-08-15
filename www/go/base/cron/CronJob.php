@@ -310,7 +310,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 				if ($moduleId != 'base' && !GO::modules()->isAvailable($moduleId)) {
 					$msg = 'Aborted because module ' . $moduleId . ' is not available';
 					
-					$ioncubeInstalled = extension_loaded('ionCube Loader');
+					$ioncubeInstalled = go()->getEnvironment()->hasIoncube();
 					
 					if(!$ioncubeInstalled) {
 						$msg .= 'Ioncube is NOT installed on the CLI interface. This might be a problem if this is a professional module.';

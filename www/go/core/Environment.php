@@ -147,7 +147,7 @@ class Environment extends Singleton {
 	 */
 	public function hasIoncube(): bool
 	{
-		return extension_loaded('ionCube Loader') || !self::sourceIsEncoded();
+		return function_exists('sg_load') || !self::sourceIsEncoded();
 	}
 
 	private static function sourceIsEncoded() : bool {
