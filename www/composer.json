@@ -43,7 +43,8 @@
     "fakerphp/faker": "^1.19",
     "ext-fileinfo": "*",
     "thenetworg/oauth2-azure": "^2.1",
-    "erusev/parsedown": "^1.7"
+    "erusev/parsedown": "^1.7",
+    "phpmailer/phpmailer": "^6.8"
   },
   "license": "AGPL",
   "authors": [
