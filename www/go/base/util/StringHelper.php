@@ -289,8 +289,8 @@ class StringHelper {
 	 * @param StringHelper $str
 	 * @return boolean
 	 */
-	public static function isUtf8($str){
-		return strlen($str) != strlen(\utf8_decode($str));
+	public static function isUtf8($str) : bool{
+		return strlen($str) != mb_strlen($str);
 	}
 
 	/**
