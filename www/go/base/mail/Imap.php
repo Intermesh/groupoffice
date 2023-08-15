@@ -191,6 +191,12 @@ class Imap extends ImapBodyStruct
 		return false;
 	}
 
+	protected $commands = [];
+	protected $responses = [];
+	protected $short_responses = [];
+
+	private $state = "";
+	private $capability;
 	/**
 	 * Handles authentication. You can optionally set
 	 * $this->starttls or $this->auth to CRAM-MD5
@@ -2393,6 +2399,9 @@ class Imap extends ImapBodyStruct
 
 		return $size;
 	}
+
+	private $message_part_size;
+	private $message_part_read;
 
 	private $readFullLiteral = false;
 
