@@ -191,17 +191,19 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 	},
 	getValue: function() {
 
-		let v = this.dateField.getValue();
-		if(v) {
-			if (this.dateField.isVisible()) {
+		let v;
+		if (this.dateField.isVisible()) {
+			v = this.dateField.getValue();
+			if(v) {
 				v = v.format('Y-m-d');
-			} else {
-				v = v + ' ' + this.periodCombo.getValue();
+			} else
+			{
+				v = null;
 			}
-		}else
-		{
-			v = null;
+		} else {
+			v = this.valueField.getValue() + ' ' + this.periodCombo.getValue();
 		}
+
 
 		switch(this.operatorCombo.getValue()) {				
 
