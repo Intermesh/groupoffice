@@ -127,7 +127,6 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 	},
 	
 	setValue: function (v) {
-debugger;
 		v = v + "";
 
 		var regex = /([>< ]+)?([0-9]{4}-[0-9]{2}-[0-9]{2})/;
