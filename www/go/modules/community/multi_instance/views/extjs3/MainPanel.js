@@ -41,6 +41,25 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 		});
 
 		Ext.apply(this, {
+			multiSelectToolbarItems: [
+				{
+					iconCls: 'ic-email',
+					text: t("E-mail selected"),
+					handler: function () {
+						var records = this.getSelectionModel().getSelections();
+
+						var str = "";
+						Ext.each(records, function (r) {
+							if (r.data.adminEmail && str.indexOf(r.data.adminEmail) == -1) {
+								str += '"' + r.data.adminDisplayName.replace(/"/g, '\\"') + '" &lt;' + r.data.adminEmail + '&gt;, ';
+							}
+						});
+
+						Ext.MessageBox.alert("E-mail addresses", str);
+					},
+					scope: this
+				}
+			],
 			tbar: [{
 					iconCls: 'ic-block',
 					text: t('Show disabled'),
@@ -76,22 +95,6 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 				}, {
 					iconCls: 'ic-more-vert',
 					menu: [{
-							iconCls: 'ic-email',
-							text: t("E-mail selected"),
-							handler: function () {
-								var records = this.getSelectionModel().getSelections();
-
-								var str = "";
-								Ext.each(records, function (r) {
-									if (r.data.adminEmail && str.indexOf(r.data.adminEmail) == -1) {
-										str += '"' + r.data.adminDisplayName.replace(/"/g, '\\"') + '" &lt;' + r.data.adminEmail + '&gt;, ';
-									}
-								});
-
-								Ext.MessageBox.alert("E-mail addresses", str);
-							},
-							scope: this
-						},{
 							iconCls: 'ic-download',
 							text: t("Download site config"),
 							handler: function () {
