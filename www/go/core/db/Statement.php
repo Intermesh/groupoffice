@@ -16,7 +16,7 @@ use PDOStatement;
  * Represents a prepared statement and, after the statement is executed, an
  * associated result set.
  */
-class Statement extends PDOStatement implements JsonSerializable, ArrayableInterface{
+class Statement extends PDOStatement implements JsonSerializable, ArrayableInterface, \Countable {
 
 	/**
 	 * The model type this statement result returns.
@@ -164,5 +164,9 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 			throw $e;
 		}
 	}
-	
+
+	public function count(): int
+	{
+		return $this->rowCount();
+	}
 }

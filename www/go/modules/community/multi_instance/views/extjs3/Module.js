@@ -33,7 +33,19 @@ go.Modules.register("community", 'multi_instance', {
 				name: 'createdby',
 				multiple: true,
 				type: 'string'
-			}]
+			}, {
+				title: t("Is trial"),
+				name: 'isTrial',
+				type: "select",
+				options: [{
+					value: 1,
+					title: t("Yes")
+				},{
+					value: 0,
+					title: t("No")
+				}]
+			}
+			]
 	}],
 	initModule: function () {	
 		
