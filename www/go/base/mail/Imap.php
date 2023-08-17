@@ -2882,7 +2882,7 @@ class Imap extends ImapBodyStruct
 	 */
 	public function append_message($mailbox, $data, $flags="") :bool
 	{
-		if($data instanceof \Swift_Message){
+		if ($data instanceof \Swift_Message) {
 			$tmpfile = \GO\Base\Fs\File::tempFile();
 
 			$is = new \Swift_ByteStream_FileByteStream($tmpfile->path(), true);
@@ -2891,14 +2891,14 @@ class Imap extends ImapBodyStruct
 			unset($data);
 			unset($is);
 
-			if(!$this->append_start($mailbox, $tmpfile->size(), $flags)) {
+			if (!$this->append_start($mailbox, $tmpfile->size(), $flags)) {
 				return false;
 			}
 
 			$fp = fopen($tmpfile->path(), 'r');
 
-			while($line = fgets($fp, 1024)){
-				if(!$this->append_feed($line)) {
+			while ($line = fgets($fp, 1024)) {
+				if (!$this->append_feed($line)) {
 					return false;
 				}
 			}
@@ -2907,21 +2907,30 @@ class Imap extends ImapBodyStruct
 			$tmpfile->delete();
 		} else if ($data instanceof File) {
 
-			if(!$this->append_start($mailbox, $data->size(), $flags)) {
+			if (!$this->append_start($mailbox, $data->size(), $flags)) {
 				return false;
 			}
 
 			$fp = fopen($data->path(), 'r');
 
-			while($line = fgets($fp, 1024)){
-				if(!$this->append_feed($line)) {
+			while ($line = fgets($fp, 1024)) {
+				if (!$this->append_feed($line)) {
 					return false;
 				}
 			}
 
 			fclose($fp);
 
-		} else {
+		} else if(is_resource($data)) {
+			while ($line = fgets($data, 1024)) {
+				if (!$this->append_feed($line)) {
+					return false;
+				}
+			}
+
+			fclose($data);
+		}else {
+
 			if(!$this->append_start($mailbox, strlen($data), $flags)) {
 				return false;
 			}

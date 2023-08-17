@@ -5,7 +5,7 @@ namespace go\core\imap;
 use DateTimeZone;
 use Exception;
 use go\core\data\Model;
-use go\core\mail\RecipientList;
+use go\core\mail\AddressList;
 use go\core\util\StringUtil;
 use Swift_ByteStream_FileByteStream;
 use Swift_Message;
@@ -827,13 +827,13 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 				}
 
 				if ($prop == 'to' || $prop == 'cc' || $prop == 'bcc') {
-					$list = new RecipientList($value);
+					$list = new AddressList($value);
 					$value = $list->toArray();
 				}
 
 
 				if ($prop == 'from' || $prop == 'replyTo' || $prop == 'displayNotificationTo') {
-					$list = new RecipientList($value);
+					$list = new AddressList($value);
 					$value = isset($list[0]) ? $list[0] : null;
 				}
 

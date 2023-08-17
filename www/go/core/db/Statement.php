@@ -16,7 +16,7 @@ use PDOStatement;
  * Represents a prepared statement and, after the statement is executed, an
  * associated result set.
  */
-class Statement extends PDOStatement implements JsonSerializable, ArrayableInterface{
+class Statement extends PDOStatement implements JsonSerializable, ArrayableInterface, \Countable {
 
 	/**
 	 * The model type this statement result returns.
@@ -57,31 +57,31 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 
 	/**
 	 * Set's the select query object
-	 * 
+	 *
 	 * @param Query $query
 	 */
 	public function setQuery(Query $query) {
 		$this->query = $query;
 	}
-	
+
 	/**
 	 * Get query object that was used to create this statement.
-	 * 
+	 *
 	 * Only available for select queries
-	 *  
+	 *
 	 * @return Query
 	 */
 	public function getQuery(): Query
 	{
 		return $this->query;
 	}
-	
+
 	private $build;
-	
+
 	/**
 	 * Set's the build array produced by QueryBuilder. Only used to cast this object
 	 * to string when debugging.
-	 * 
+	 *
 	 * @param array $build
 	 */
 	public function setBuild(array $build) {
@@ -149,7 +149,7 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 				$sql = QueryBuilder::debugBuild($this->build);
 				go()->debug(str_replace(["\n","\t"], [" ", ""], $sql) , 5);
 			}
-			
+
 			parent::execute($params);
 
 			if(go()->getDbConnection()->debug && isset($this->build) && go()->getDebugger()->enabled) {
@@ -164,5 +164,9 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 			throw $e;
 		}
 	}
-	
+
+	public function count(): int
+	{
+		return $this->rowCount();
+	}
 }

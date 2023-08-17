@@ -106,6 +106,10 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 			method: "core/Settings/sendTestMessage",
 			params: this.getForm().getFieldValues(true)
 		}).then(function(response) {
+
+			if(!response.success) {
+				throw response;
+			}
 			Ext.MessageBox.alert(
 				t("Success"),
 				t("A message was sent successfully to {email}").replace('{email}', me.getForm().findField('systemEmail').getValue())

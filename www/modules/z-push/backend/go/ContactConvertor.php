@@ -2,7 +2,7 @@
 
 use GO\Base\Util\StringHelper;
 use go\core\fs\Blob;
-use go\core\mail\RecipientList;
+use go\core\mail\AddressList;
 use go\core\model\Acl;
 use go\core\model\Link;
 use go\core\orm\Property;
@@ -487,7 +487,7 @@ class ContactConvertor {
 		}		
 
 		//some Android phones send email as "email" <email>. So we're using RecipientList to parse this to just e-mail's
-		$clientEmails = new RecipientList();
+		$clientEmails = new AddressList();
 		
 		if(!empty($message->email1address)) {
 			$clientEmails->addString($message->email1address);

@@ -17,16 +17,18 @@ use Countable;
  * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com>
  * 
  */
-class RecipientList implements ArrayAccess, Countable {
+class AddressList implements ArrayAccess, Countable {
 
 	/**
 	 * Pass a e-mail string like:
-	 * 
-	 * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com>
 	 *
-	 * @param string $emailRecipientList 
+	 * "Merijn Schering" <mschering@intermesh.nl>, someone@somedomain.com, Pete <pete@pete.com>
+	 *
+	 * @param string $emailRecipientList
+	 * @param bool $strict
+	 * @throws Exception
 	 */
-	public function __construct($emailRecipientList = '', $strict = false) {
+	public function __construct(string $emailRecipientList = '', bool $strict = false) {
 		$this->strict = $strict;
 		$this->addString($emailRecipientList);
 	}
@@ -43,11 +45,9 @@ class RecipientList implements ArrayAccess, Countable {
 	 * @param string $email
 	 * @return int|false index of the array
 	 */
-	public function hasRecipient($email) {
-//		return isset($this->_addresses[$email]);
-
-		for ($i = 0, $c = count($this->recipients); $i < $c; $i++) {
-			if ($this->recipients[$i]->getEmail() == $email) {
+	public function hasAddress(string $email) {
+		for ($i = 0, $c = count($this->addresses); $i < $c; $i++) {
+			if ($this->addresses[$i]->getEmail() == $email) {
 				return $i;
 			}
 		}
@@ -60,18 +60,18 @@ class RecipientList implements ArrayAccess, Countable {
 	 * 
 	 * @param string $email 
 	 */
-	public function removeRecipient($email) {
+	public function remove(string $email) {
 
-		$index = $this->hasRecipient($email);
+		$index = $this->hasAddress($email);
 
 		if ($index !== false) {
-			unset($this->recipients[$index]);
+			unset($this->addresses[$index]);
 		}
 	}
 
 	public function __toString() {
 		$str = '';
-		foreach ($this->recipients as $recipient) {
+		foreach ($this->addresses as $recipient) {
 			$str .= $recipient . ', ';
 		}
 		return rtrim($str, ', ');
@@ -82,10 +82,11 @@ class RecipientList implements ArrayAccess, Countable {
 	 * 
 	 * $a[] = '"John Doe" <john@domain.com>';
 	 * 
-	 * @return Recipient[]
+	 * @return Address[]
 	 */
-	public function toArray() {
-		return $this->recipients;
+	public function toArray(): array
+	{
+		return $this->addresses;
 	}
 
 	/**
@@ -94,7 +95,7 @@ class RecipientList implements ArrayAccess, Countable {
 	 * @var     array
 	 * @access  private
 	 */
-	private $recipients = array();
+	private $addresses = array();
 
 	/**
 	 * Temporary storage of personal info of an e-mail address
@@ -102,7 +103,7 @@ class RecipientList implements ArrayAccess, Countable {
 	 * @var     StringUtil
 	 * @access  private
 	 */
-	private $personal = null;
+	private $name = null;
 
 	/**
 	 * Temporary storage
@@ -128,35 +129,36 @@ class RecipientList implements ArrayAccess, Countable {
 	 */
 	private $emailFound = false;
 
+
+	public function add(Address $address) {
+		$this->addresses[] = $address;
+	}
+
 	/**
 	 * Pass a e-mail string like:
-	 * 
+	 *
 	 * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com
-	 * 
-	 * @param string $emailRecipientList 
+	 *
+	 * @param string $addressStr
+	 * @return array
+	 * @throws Exception
 	 */
-	public function addString($recipientListString) {
-		//initiate addresses array
-		//$this->_addresses = array();
+	public function addString(string $addressStr): AddressList
+	{
 
-		$recipientListString = trim($recipientListString, ',; ');
+		$addressStr = trim($addressStr, ',; ');
 
-
-
-		for ($i = 0; $i < strlen($recipientListString); $i++) {
-			$char = $recipientListString[$i];
+		for ($i = 0; $i < strlen($addressStr); $i++) {
+			$char = $addressStr[$i];
 
 			switch ($char) {
+				case "'":
 				case '"':
 					$this->handleQuote($char);
 					break;
 
-				case "'":
-					$this->handleQuote($char);
-					break;
-
 				case '<':
-					$this->personal = trim($this->buffer);
+					$this->name = trim($this->buffer);
 					$this->buffer = '';
 					$this->emailFound = true;
 					break;
@@ -167,16 +169,6 @@ class RecipientList implements ArrayAccess, Countable {
 						$this->buffer .= $char;
 					}
 					break;
-
-//				case ' ':
-//					if($this->_inQuotedString){
-//						$this->_buffer .= $char;
-//					}else
-//					{
-//						$this->_addBuffer();
-//					}
-//						
-//					break;
 
 				case ',':
 				case ';':
@@ -195,7 +187,7 @@ class RecipientList implements ArrayAccess, Countable {
 		}
 		$this->addBuffer();
 
-		return $this->recipients;
+		return $this;
 	}
 
 	/**
@@ -203,10 +195,11 @@ class RecipientList implements ArrayAccess, Countable {
 	 *
 	 * @access private
 	 * @return void
+	 * @throws Exception
 	 */
 	private function addBuffer() {
 		$this->buffer = trim($this->buffer);
-		if (!empty($this->personal) && empty($this->buffer)) {
+		if (!empty($this->name) && empty($this->buffer)) {
 			$this->buffer = 'noaddress';
 		}
 
@@ -214,11 +207,11 @@ class RecipientList implements ArrayAccess, Countable {
 			if ($this->strict && !Util::validateEmail($this->buffer)) {
 				throw new Exception("Address " . $this->buffer . " is not valid");
 			} else {
-				$this->recipients[] = new Recipient($this->buffer, Utils::mimeHeaderDecode($this->personal));
+				$this->addresses[] = new Address($this->buffer, Utils::mimeHeaderDecode($this->name));
 			}
 		}
 		$this->buffer = '';
-		$this->personal = null;
+		$this->name = null;
 		$this->emailFound = false;
 		$this->inQuotedString = false;
 	}
@@ -238,27 +231,14 @@ class RecipientList implements ArrayAccess, Countable {
 			$this->buffer .= $char;
 		}
 	}
-
-//	/**
-//	 * Merge two address strings
-//	 * 
-//	 * @param RecipientList $recipients
-//	 * @return RecipientList 
-//	 */
-//	public function mergeWith(RecipientList $recipients) {
-//		$this->_addresses = array_merge($this->_addresses, $recipients->getAddresses());
-//
-//		return $this;
-//	}
-
 	public function offsetExists($offset): bool
 	{
-		return array_key_exists($offset, $this->recipients);
+		return array_key_exists($offset, $this->addresses);
 	}
 
 	#[\ReturnTypeWillChange]
 	public function offsetGet($offset) {
-		return $this->recipients[$offset];
+		return $this->addresses[$offset];
 	}
 
 	public function offsetSet($offset, $value) : void{
@@ -267,17 +247,17 @@ class RecipientList implements ArrayAccess, Countable {
 			return;
 		}
 
-		$recipients = new RecipientList($value);
+		$recipients = new AddressList($value);
 
-		$this->recipients[$offset] = $recipients[0];
+		$this->addresses[$offset] = $recipients[0];
 	}
 
 	public function offsetUnset($offset) : void {
-		unset($this->recipients[$offset]);
+		unset($this->addresses[$offset]);
 	}
 
 	public function count() : int
 	{
-		return count($this->recipients);
+		return count($this->addresses);
 	}
 }
