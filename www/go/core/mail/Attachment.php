@@ -73,6 +73,9 @@ class Attachment
 
 	public function getId(): ?string
 	{
+		if(!isset($this->id)) {
+			$this->id = bin2hex(random_bytes(16));
+		}
 		return $this->id;
 	}
 
@@ -90,6 +93,10 @@ class Attachment
 
 	public function getInline() : bool {
 		return $this->inline;
+	}
+
+	public function getContentType() : string {
+		return $this->contentType;
 	}
 
 	/**

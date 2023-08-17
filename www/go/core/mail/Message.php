@@ -337,6 +337,7 @@ class Message {
 
 	public function embed(Attachment $attachment): string
 	{
+		$attachment->setInline(true);
 		$this->attach($attachment);
 
 		return "cid:" . $attachment->getId();

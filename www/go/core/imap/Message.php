@@ -375,12 +375,12 @@ class Message extends Model {
 		if (!isset($this->body)) {
 			
 //			var_dump($this->getStructure()->toArray());
-			if (empty($this->getStructure()->parts)) {
+			if (empty($this->getStructure()->getParts())) {
 				go()->debug("No body parts found in message!");
 				return false;
 			}			
 	
-			$this->body = $this->findBody($this->getStructure()->parts,$asHtml);
+			$this->body = $this->findBody($this->getStructure()->getParts(),$asHtml);
 			
 		}
 		
