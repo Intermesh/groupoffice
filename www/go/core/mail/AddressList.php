@@ -3,11 +3,10 @@
 namespace go\core\mail;
 
 use ArrayAccess;
+use Countable;
 use Exception;
-use go\core\imap\Utils;
 use go\core\util\StringUtil;
 use go\core\validate\ValidateEmail;
-use Countable;
 
 /**
  * A list of e-mail recipients
@@ -207,7 +206,7 @@ class AddressList implements ArrayAccess, Countable {
 			if ($this->strict && !Util::validateEmail($this->buffer)) {
 				throw new Exception("Address " . $this->buffer . " is not valid");
 			} else {
-				$this->addresses[] = new Address($this->buffer, isset($this->name) ? Utils::mimeHeaderDecode($this->name) : null);
+				$this->addresses[] = new Address($this->buffer, isset($this->name) ? Util::mimeHeaderDecode($this->name) : null);
 			}
 		}
 		$this->buffer = '';

@@ -6,8 +6,8 @@ use DateTimeZone;
 use Exception;
 use go\core\data\Model;
 use go\core\mail\AddressList;
+use go\core\mail\Util;
 use go\core\util\StringUtil;
-
 
 
 /**
@@ -822,7 +822,7 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 			if ($message->hasWritableProperty($prop)) {
 
 				if (in_array($prop, self::$mimeDecodeAttributes)) {				
-					$value = Utils::mimeHeaderDecode($value);					
+					$value = Util::mimeHeaderDecode($value);
 				}
 
 				if ($prop == 'to' || $prop == 'cc' || $prop == 'bcc') {

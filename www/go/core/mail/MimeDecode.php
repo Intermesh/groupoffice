@@ -99,7 +99,6 @@ namespace go\core\mail;
 use Exception;
 use GO;
 use go\core\ErrorHandler;
-use go\core\imap\Utils;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use stdClass;
@@ -218,7 +217,7 @@ class MimeDecode
 		$headers = $this->parseHeaders($headers);
 
 		foreach ($headers as $value) {
-			$value['value'] = $this->decodeHeaders ? Utils::mimeHeaderDecode($value['value']) : $value['value'];
+			$value['value'] = $this->decodeHeaders ? Util::mimeHeaderDecode($value['value']) : $value['value'];
 			$name = strtolower($value['name']);
 			if (isset($return->headers[$name])) {
 				if (in_array($name, self::SINGLE_HEADERS)) {
@@ -449,13 +448,13 @@ class MimeDecode
 	private function parseHeaderValue(string $input): array
 	{
 		if (($pos = strpos($input, ';')) === false) {
-			$input = $this->decodeHeaders ? Utils::mimeHeaderDecode($input) : $input;
+			$input = $this->decodeHeaders ? Util::mimeHeaderDecode($input) : $input;
 			$return['value'] = trim($input);
 			return $return;
 		}
 
 		$value = substr($input, 0, $pos);
-		$value = $this->decodeHeaders ? Utils::mimeHeaderDecode($value) : $value;
+		$value = $this->decodeHeaders ? Util::mimeHeaderDecode($value) : $value;
 		$return['value'] = trim($value);
 		$input = trim(substr($input, $pos + 1));
 
@@ -597,7 +596,7 @@ class MimeDecode
 		}
 		// decode values.
 		foreach ($return['other'] as $key => $val) {
-			$return['other'][$key] = $this->decodeHeaders ? Utils::mimeHeaderDecode($val) : $val;
+			$return['other'][$key] = $this->decodeHeaders ? Util::mimeHeaderDecode($val) : $val;
 		}
 		return $return;
 	}

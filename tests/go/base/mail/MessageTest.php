@@ -2,6 +2,7 @@
 namespace go\base\mail;
 
 
+use go\core\mail\Util;
 use PHPUnit\Framework\TestCase;
 
 class MessageTest extends TestCase {
@@ -34,7 +35,7 @@ class MessageTest extends TestCase {
 		$subject = "=?UTF-8?Q?Vergeet_u_niet_de_watermeterstand_door_te_geven?_|_Klantnumme?=
  =?UTF-8?Q?r_12345?=";
 
-		$decoded = \go\core\imap\Utils::mimeHeaderDecode($subject);
+		$decoded = Util::mimeHeaderDecode($subject);
 
 		$this->assertEquals("Vergeet u niet de watermeterstand door te geven? | Klantnummer 12345", $decoded);
 	}
