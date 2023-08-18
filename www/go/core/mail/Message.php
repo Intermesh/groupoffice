@@ -200,7 +200,7 @@ class Message {
 	 *
 	 * @return string
 	 */
-	public function getInReplyTo() : string {
+	public function getInReplyTo() : ?string {
 		return $this->inReplyTo;
 	}
 

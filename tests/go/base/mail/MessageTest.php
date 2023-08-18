@@ -24,7 +24,7 @@ class MessageTest extends TestCase {
 		$message = new \GO\Base\Mail\Message();
 		$message->loadMimeMessage($mime);
 
-		$this->assertEquals(2, count($message->getChildren()));
+		$this->assertEquals("E727B9C5-4451-48A6-ABDD-BEFC26C23460@intermesh.localhost", $message->getId());
 
 //		echo $message->toString();
 
@@ -34,7 +34,7 @@ class MessageTest extends TestCase {
 		$subject = "=?UTF-8?Q?Vergeet_u_niet_de_watermeterstand_door_te_geven?_|_Klantnumme?=
  =?UTF-8?Q?r_12345?=";
 
-		$decoded = Utils::mimeHeaderDecode($subject);
+		$decoded = \go\core\imap\Utils::mimeHeaderDecode($subject);
 
 		$this->assertEquals("Vergeet u niet de watermeterstand door te geven? | Klantnummer 12345", $decoded);
 	}

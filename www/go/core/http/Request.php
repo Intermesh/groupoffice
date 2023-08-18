@@ -296,8 +296,12 @@ class Request extends Singleton{
 		if(!isset($this->host)) {
 
 			if(go()->getEnvironment()->isCli()) {
-				$parseUrl = parse_url(go()->getSettings()->URL, PHP_URL_HOST);
-				$this->host = $parseUrl['host'];
+				if(isset(go()->getSettings()->URL)) {
+					$parseUrl = parse_url(go()->getSettings()->URL, PHP_URL_HOST);
+					$this->host = $parseUrl['host'];
+				} else{
+					$this->host = "localhost.localdomain";
+				}
 			} else {
 
 				$possibleHostSources = array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST', 'SERVER_NAME', 'SERVER_ADDR');
