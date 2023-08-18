@@ -574,9 +574,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$params
 		));
 
-		$failedRecipients=array();	
 		
-		$success = $mailer->send($message, $failedRecipients);		
+		$success = $mailer->send($message);
+
+		if(!$success) {
+			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError();
+			throw new Exception($msg);
+		}
 
 		// Update "last mailed" time of the emailed contacts.
 		if ($success && GO::modules()->addressbook) {
@@ -631,7 +635,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$account->sent = $params['reply_mailbox'];
 		}
 
-		if ($recipientCount > count($failedRecipients)) {
+		if ($success) {
 			//if a sent items folder is set in the account then save it to the imap folder
 			// auto linking will happen on save to sent items
 			if(!$account->saveToSentItems($message, $params)){
@@ -647,21 +651,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$imap->delete(array($params['draft_uid']));
 		}
 		
-		if(count($failedRecipients)) {
 
-			// todo error???
-			$msg = GO::t("Failed to send mail", "email");
-
-//			$logStr = $logger->dump();
-//
-//			preg_match('/<< 55[0-9] .*>>/s', $logStr, $matches);
-//
-//			if (isset($matches[0])) {
-//				$logStr = trim(substr($matches[0], 2, -2));
-//			}
-
-			throw new Exception($msg);
-		}
 
 		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
 

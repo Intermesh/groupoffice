@@ -123,6 +123,13 @@ class Mailer {
 	}
 
 
+	/**
+	 * Output message to a readable stream
+	 *
+	 * @param Message $message
+	 * @return false|resource
+	 * @throws Exception
+	 */
 	public function toStream(Message $message) {
 		$this->prepareMessage($message);
 
@@ -136,6 +143,13 @@ class Mailer {
 		return $stream;
 	}
 
+	/**
+	 * Output message to string
+	 *
+	 * @param Message $message
+	 * @return string
+	 * @throws Exception
+	 */
 	public function toString(Message $message) :string {
 		$this->prepareMessage($message);
 
