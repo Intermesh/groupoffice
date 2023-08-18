@@ -5,7 +5,6 @@ namespace go\core\mail;
 use go\core\model\SmtpAccount;
 use GO\Email\Model\Account;
 use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\PHPMailer;
 
 /**
  * Sends mail messages
@@ -39,7 +38,8 @@ class Mailer {
 	 */
 	public function compose(): Message
 	{
-		$message = new Message($this);
+		$message = new Message();
+		$message->setMailer($this);
 
 		if($this->emailAccount) {
 			$alias = $this->emailAccount->getDefaultAlias();
@@ -75,6 +75,10 @@ class Mailer {
 		return $this;
 	}
 
+	public function hasAccount() : bool {
+		return isset($this->account);
+	}
+
 	private function prepareMessage(Message $message) {
 		if(!empty(go()->getConfig()['debugEmail'])){
 			$message->setTo(go()->getConfig()['debugEmail']);
@@ -86,6 +90,19 @@ class Mailer {
 		$this->initTransport();
 
 		$this->applyMessage($message);
+
+		if($message->isSmimeSinged()) {
+			$this->mail->smimeSign(
+				$message->getSmimeCertificate(),
+				$message->getSmimePrivateKey(),
+				$message->getSmimePassword(),
+				$message->getSmimeExtraCertsFile()
+			);
+		}
+
+		if($message->isSmimeEncrypted()) {
+			$this->mail->smimeEncrypt($message->getSmimeEncryptRecipientCertificates());
+		}
 	}
 
 	/**
@@ -117,7 +134,13 @@ class Mailer {
 		rewind($stream);
 
 		return $stream;
+	}
 
+	public function toString(Message $message) :string {
+		$this->prepareMessage($message);
+
+		$this->mail->preSend();
+		return $this->mail->getSentMIMEMessage();
 	}
 
 	public function lastError(): string
@@ -227,18 +250,29 @@ class Mailer {
 		$this->mail->MessageDate = $message->getDate();
 
 		if($message->getId())
-			$this->mail->MessageID = $message->getId();
+			$this->mail->MessageID = '<' . $message->getId() . '>';
 
 		$this->mail->Priority = $message->getPriority();
-		foreach($message->getReferences() as $ref) {
-			// TODO test
-			$this->mail->addCustomHeader("References", $ref);
+
+		$refs = $message->getReferences();
+		if(count($refs)) {
+			$refStr = "<" . implode("> <", $refs) . ">";
+			$this->mail->addCustomHeader("References", $refStr);
+		}
+
+		if($message->getInReplyTo()) {
+			$this->mail->addCustomHeader('In-Reply-To', "<" . $message->getInReplyTo() . ">");
 		}
 
 		foreach($message->getAttachments() as $attachment) {
+
+			// TODO, it seems PHPmailer is not so memory efficient. We can just as well add
+			// attachments as string because the lib also reads the full file into a string before encoding.
+			// Symfony mailer does this more memory efficient by using a stream filter. We might need to switch.
+
 			if($attachment->getInline()) {
 				$this->mail->addStringEmbeddedImage(
-					stream_get_contents($attachment->getStream()),
+					$attachment->getString(),
 					$attachment->getId(),
 					$attachment->getFilename(),
 					PHPMailer::ENCODING_BASE64,
@@ -246,7 +280,7 @@ class Mailer {
 				);
 			} else {
 				$this->mail->addStringAttachment(
-					stream_get_contents($attachment->getStream()),
+					$attachment->getString(),
 					$attachment->getFilename(),
 					PHPMailer::ENCODING_BASE64,
 					$attachment->getContentType()

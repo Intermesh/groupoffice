@@ -45,7 +45,7 @@ class StubStore extends Store {
             case SYNC_BODYPREFERENCE_MIME:
                 //we load the mime message and create a new mime string since we can't trust the IMAP source. It often contains wrong encodings that will crash the
                 //sync. eg. incredimail.
-                $message = new Swift_Message();
+                $message = new \go\core\mail\Message();
                 $message->setTo($msg->to);
                 $message->setFrom(go()->getSettings()->systemEmail,  go()->getSettings()->title);
                 $message->setSubject($subject);

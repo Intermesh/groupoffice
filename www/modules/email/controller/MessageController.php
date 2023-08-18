@@ -15,16 +15,12 @@ use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
-use go\core\model\Acl as GoAcl;
 use go\core\model\User;
-use go\core\util\StringUtil;
 use GO\Email\Model\Alias;
 use GO\Email\Model\Account;
 use GO\Email\Model\ImapMessage;
 use GO\Email\Model\Label;
-use GO\Email\Transport;
 use go\modules\community\addressbook\model\Contact;
-use go\modules\community\addressbook\model\Settings;
 
 
 class MessageController extends \GO\Base\Controller\AbstractController
@@ -82,7 +78,8 @@ class MessageController extends \GO\Base\Controller\AbstractController
 		$address=$toList->getAddress();
 		$message->setTo($address['email'], $address['personal']);
 
-		$mailer = Mailer::newGoInstance(\GO\Email\Transport::newGoInstance($account));
+		$mailer = Mailer::newGoInstance();
+		$mailer->setEmailAccount($account);
 		$response['success'] = $mailer->send($message);
 
 		return $response;
@@ -462,9 +459,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path.$params['save_to_path']);
 
-		$fbs = new \Swift_ByteStream_FileByteStream($file->path(), true);
-
-		$message->toByteStream($fbs);
+		$file->putContents($message->toStream());
 
 		$response['success']=$file->exists();
 
@@ -565,10 +560,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 		$message->setFrom($alias->email, $alias->name);
 		
-		$mailer = Mailer::newGoInstance(Transport::newGoInstance($account));
+		$mailer = Mailer::newGoInstance();
+		$mailer->setEmailAccount($account);
 
-		$logger = new \Swift_Plugins_Loggers_ArrayLogger();
-		$mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
 
 		$this->fireEvent('beforesend', array(
 				&$this,
@@ -654,17 +648,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 		
 		if(count($failedRecipients)) {
-			$msg = GO::t("Failed to send to", "email").': '.implode(', ',$failedRecipients)."\n\n";
 
-			$logStr = $logger->dump();
+			// todo error???
+			$msg = GO::t("Failed to send mail", "email");
 
-			preg_match('/<< 55[0-9] .*>>/s', $logStr, $matches);
+//			$logStr = $logger->dump();
+//
+//			preg_match('/<< 55[0-9] .*>>/s', $logStr, $matches);
+//
+//			if (isset($matches[0])) {
+//				$logStr = trim(substr($matches[0], 2, -2));
+//			}
 
-			if (isset($matches[0])) {
-				$logStr = trim(substr($matches[0], 2, -2));
-			}
-
-			throw new Exception($msg.$logStr);
+			throw new Exception($msg);
 		}
 
 		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);

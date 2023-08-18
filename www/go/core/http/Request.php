@@ -294,20 +294,27 @@ class Request extends Singleton{
 	{
 
 		if(!isset($this->host)) {
-			$possibleHostSources = array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST', 'SERVER_NAME', 'SERVER_ADDR');
-			$sourceTransformations = array(
-				"HTTP_X_FORWARDED_HOST" => function ($value) {
-					$elements = explode(',', $value);
-					return trim(end($elements));
-				}
-			);
-			$this->host = '';
-			foreach ($possibleHostSources as $source) {
-				if (!empty($this->host)) break;
-				if (empty($_SERVER[$source])) continue;
-				$this->host = $_SERVER[$source];
-				if (array_key_exists($source, $sourceTransformations)) {
-					$this->host = $sourceTransformations[$source]($this->host);
+
+			if(go()->getEnvironment()->isCli()) {
+				$parseUrl = parse_url(go()->getSettings()->URL, PHP_URL_HOST);
+				$this->host = $parseUrl['host'];
+			} else {
+
+				$possibleHostSources = array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST', 'SERVER_NAME', 'SERVER_ADDR');
+				$sourceTransformations = array(
+					"HTTP_X_FORWARDED_HOST" => function ($value) {
+						$elements = explode(',', $value);
+						return trim(end($elements));
+					}
+				);
+				$this->host = '';
+				foreach ($possibleHostSources as $source) {
+					if (!empty($this->host)) break;
+					if (empty($_SERVER[$source])) continue;
+					$this->host = $_SERVER[$source];
+					if (array_key_exists($source, $sourceTransformations)) {
+						$this->host = $sourceTransformations[$source]($this->host);
+					}
 				}
 			}
 

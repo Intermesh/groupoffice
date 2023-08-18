@@ -20,7 +20,6 @@
     "sabre/dav": "^4.4.0",
     "ext-json": "*",
     "ext-openssl": "*",
-    "swiftmailer/swiftmailer": "^6.3.0",
     "michelf/php-markdown": "^1.7",
     "phpoffice/phpexcel": "^1.8",
     "tecnickcom/tcpdf": "@stable",

@@ -973,7 +973,7 @@ class MailStore extends Store implements ISearchProvider {
 						//re-attach attachments
 						foreach ($attachments as $attachment) {		
 							$file = new \GO\Base\Fs\File(GO::config()->tmpdir.$attachment->getTempFile());				
-							$att = Swift_Attachment::fromPath($file->path(),$file->mimeType());
+							$att = \go\core\mail\Attachment::fromPath($file->path(),$file->mimeType());
 							$sendMessage->attach($att);			
 						}
 					}

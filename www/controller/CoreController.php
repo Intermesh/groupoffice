@@ -953,7 +953,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	 * @param string $email
 	 * @param string $subject
 	 * @param string $body
-	 * @param array $attachments Array like this: (The given className needs to implement the GO\Base\Mail\SwiftAttachableInterface)
+	 * @param array $attachments Array like this: (The given className needs to implement the GO\Base\Mail\AttachableInterface)
 	 *	array(
 	 *		array(
 	 *			'className'=>'GO\Files\Model\File',
@@ -988,10 +988,10 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 						$altName = $attachmentSpec['altName'];
 					}
 
-					$swiftAttachment = $record->getAttachment($altName);
+					$attachment = $record->getAttachment($altName);
 					
-					if($swiftAttachment !== false){
-						$systemMessage->attach($swiftAttachment);
+					if($attachment !== false){
+						$systemMessage->attach($attachment);
 					}
 				}
 			}			

@@ -3,7 +3,12 @@
 namespace go\core\mail;
 
 use DateTimeInterface;
+use Exception;
+use GO\Base\Mail\EmailRecipients;
+use GO\Base\Mail\MimeDecode;
+use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\http\Request;
 use go\core\util\DateTime;
 
 /**
@@ -78,15 +83,41 @@ class Message {
 	 * @var string
 	 */
 	private $bodyContentType;
+	/**
+	 * @var string
+	 */
+	private $inReplyTo;
+	/**
+	 * @var string
+	 */
+	private $smimeCertificate;
+	/**
+	 * @var string
+	 */
+	private $smimePrivateKey;
+	/**
+	 * @var array
+	 */
+	private $smimeEncryptRecipientCertificates;
+	/**
+	 * @var string|null
+	 */
+	private $smimeExtraCertsFile;
+	/**
+	 * @var string
+	 */
+	private $smimePassword;
 
-	public function __construct(Mailer $mailer) {
-		$this->mailer = $mailer;
+	public function __construct() {
 		$this->setFrom(go()->getSettings()->systemEmail, go()->getSettings()->title);
 	}
 
 
 	public function getId() : ?string
 	{
+		if(!isset($this->id)) {
+			$this->id = bin2hex(random_bytes(16)) .'@' . Request::get()->getHost();
+		}
 		return $this->id;
 	}
 
@@ -100,6 +131,16 @@ class Message {
 	{
 		$this->references = $references;
 		return $this;
+	}
+
+	public function setInReplyTo(string $messageId): Message
+	{
+		$this->inReplyTo = $messageId;
+		return $this;
+	}
+
+	public function getInReplyTo() : string {
+		return $this->inReplyTo;
 	}
 
 	public function getReferences(): array
@@ -284,6 +325,8 @@ class Message {
 		return $this->alternateBody;
 	}
 
+
+
 	/**
 	 * Send this Message like it would be sent in a mail client.
 	 *
@@ -355,10 +398,66 @@ class Message {
 	 */
 	public function getMailer(): Mailer
 	{
-		return $this->mailer;
+		return $this->mailer ?? go()->getMailer();
+	}
+
+	public function setMailer(Mailer $mailer): Message
+	{
+		$this->mailer = $mailer;
+		return $this;
 	}
 
 	public function toStream() {
-		return $this->mailer->toStream($this);
+		return $this->getMailer()->toStream($this);
+	}
+
+	public function toString(): string
+	{
+		return $this->getMailer()->toString($this);
+	}
+
+	/**
+	 * @param string $certificate The X.509 certificate used to digitally sign input_filename.
+	 * @param string $privateKey the private key corresponding to certificate.
+	 * @return void
+	 */
+
+	public function smimeSign(string $certificate, string $privateKey, string $password, string $extraCertsFile = null) {
+		$this->smimeCertificate = $certificate;
+		$this->smimePrivateKey = $privateKey;
+		$this->smimePassword = $password;
+		$this->smimeExtraCertsFile = $extraCertsFile;
+	}
+
+	public function isSmimeSinged() : bool {
+		return isset($this->smimeCertificate);
+	}
+
+	public function getSmimeCertificate() : ?string {
+		return $this->smimeCertificate;
+	}
+
+	public function getSmimePrivateKey() : ?string {
+		return $this->smimePrivateKey;
+	}
+
+	public function getSmimePassword() : ?string {
+		return $this->smimePassword;
+	}
+
+	public function getSmimeExtraCertsFile() : ?string {
+		return $this->smimeExtraCertsFile;
+	}
+
+	public function smimeEncrypt(array $recipientCertifcates) {
+		$this->smimeEncryptRecipientCertificates = $recipientCertifcates;
+	}
+
+	public function isSmimeEncrypted() : bool {
+		return isset($this->smimeEncryptRecipientCertificates);
+	}
+
+	public function getSmimeEncryptRecipientCertificates() : ?array {
+		return $this->smimeEncryptRecipientCertificates;
 	}
 }

@@ -117,30 +117,6 @@ class SystemMessage extends SmimeMessage
 		return !empty($this->_account);
 	}
 
-	/**
-	 * Get the Transport object for this message (Based on the account)
-	 * 
-	 * @return mixed Transport/\GO\Email\Transport
-	 */
-	public function getTransport()
-	{
-		if (!$this->hasAccount()) {
-			return Transport::newGoInstance ();
-		} else {
-			return \GO\Email\Transport::newGoInstance($this->_account);
-		}
-	}
-	
-	/**
-	 * Send the message with the GO mailer
-	 * Use this send function to be sure that the mailer is using the Transporter of the 
-	 * 
-	 * @return bool
-	 */
-	public function send(): bool
-	{
-		return Mailer::newGoInstance($this->getTransport())->send($this);
-	}
 	
 	
 }

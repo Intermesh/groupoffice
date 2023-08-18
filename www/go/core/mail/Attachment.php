@@ -9,7 +9,15 @@ use go\core\fs\File;
 class Attachment
 {
 
-	private $stream;
+	/**
+	 * @var string
+	 */
+	private $data;
+
+	/**
+	 * @var File
+	 */
+	private $file;
 	/**
 	 * @var string
 	 */
@@ -30,7 +38,9 @@ class Attachment
 	 */
 	public static function fromBlob(Blob $blob): Attachment
 	{
-		return self::fromPath($blob->path(), $blob->type);
+		$a = self::fromPath($blob->path(), $blob->type);
+		$a->setFilename($blob->name);
+		return $a;
 	}
 
 	public static function fromPath(string $path, ?string $contentType = null): Attachment
@@ -38,7 +48,7 @@ class Attachment
 		$file = new File($path);
 
 		$a = new self();
-		$a->stream = $file->open('r+');
+		$a->file = $file;
 		$a->contentType = $contentType ?? $file->getContentType();
 		$a->filename = $file->getName();
 
@@ -47,12 +57,10 @@ class Attachment
 
 	public static function fromString(string $data, string $filename, string $contentType = 'application/octet-stream'): Attachment
 	{
-		$stream = fopen('php://memory','r+');
-		fwrite($stream, $data);
-		rewind($stream);
+
 
 		$a = new self();
-		$a->stream = $stream;
+		$a->data = $data;
 		$a->contentType = $contentType;
 		$a->filename = $filename;
 
@@ -99,11 +107,43 @@ class Attachment
 		return $this->contentType;
 	}
 
+
+	public function isFile() :bool {
+		return $this->file !== null;
+	}
+
 	/**
 	 * @return resource
 	 */
 	public function getStream() {
-		return $this->stream;
+		if($this->file) {
+			return $this->file->open("r");
+		} else {
+			$stream = fopen('php://memory','r+');
+			fwrite($stream, $this->data);
+			rewind($stream);
+			return $stream;
+		}
+	}
+
+	public function getFile(): File
+	{
+		if ($this->file) {
+			return $this->file;
+		} else {
+			$this->file = File::tempFile();
+			$this->file->putContents($this->data);
+			$this->data = null;
+			return $this->file;
+		}
+	}
+
+	public function getString() :string {
+		if($this->file) {
+			return $this->file->getContents();
+		} else{
+			return $this->data ?? "";
+		}
 	}
 
 }

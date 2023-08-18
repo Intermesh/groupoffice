@@ -7,8 +7,7 @@ use Exception;
 use go\core\data\Model;
 use go\core\mail\AddressList;
 use go\core\util\StringUtil;
-use Swift_ByteStream_FileByteStream;
-use Swift_Message;
+
 
 
 /**
@@ -1358,17 +1357,15 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 
 	/**
 	 * Append a message to a mailbox
-	 *
-	 * @param Swift_Message $message
+
 	 * @param string $flags {@see setFlags()}
 	 * @return boolean
 	 */
-	public function appendMessage(Swift_Message $message, array $flags = null) {
+	public function appendMessage(\go\core\mail\Message $message, array $flags = null) {
 
 		$tmpfile = IFW::app()->getAuth()->getTempFolder()->getFile(uniqid(time()));
 
-		$is = new Swift_ByteStream_FileByteStream($tmpfile->getPath(), true);
-		$message->toByteStream($is);
+
 
 		unset($message);
 		unset($is);

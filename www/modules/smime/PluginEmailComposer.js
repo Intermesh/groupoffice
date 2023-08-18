@@ -48,7 +48,6 @@ GO.moduleManager.onModuleReady('email',function(){
 		
 			this.on('afterShowAndLoad',function(){
 
-
 				if(!this.sendParams.encrypt_smime) {
 					this.sendParams.encrypt_smime = "0";
 				}

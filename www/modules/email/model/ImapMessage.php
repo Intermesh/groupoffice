@@ -796,29 +796,29 @@ class ImapMessage extends ComposerMessage {
 		}
 
 		$bIsPlain = !$this->_htmlParts['text_found'];
-		$swiftMsg = new \Swift_Message();
-		$swiftMsg->setTo($this->to->getAddresses());
-		$swiftMsg->setFrom($this->from->getAddresses());
-		$swiftMsg->setCc($this->cc->getAddresses());
-		$swiftMsg->setBcc($this->bcc->getAddresses());
-		$swiftMsg->setSubject($this->subject);
-		$swiftMsg->setDate(new DateTime($this->date));
+		$msg = new \go\core\mail\Message();
+		$msg->setTo($this->to->getAddresses());
+		$msg->setFrom($this->from->getAddresses());
+		$msg->setCc($this->cc->getAddresses());
+		$msg->setBcc($this->bcc->getAddresses());
+		$msg->setSubject($this->subject);
+		$msg->setDate(new DateTime($this->date));
 
 		if(!$bIsPlain) {
-			$swiftMsg->addPart($this->getHtmlBody(), 'text/html');
+			$msg->setBody($this->getHtmlBody(), 'text/html');
 		} else {
-			$swiftMsg->addPart($this->getPlainBody(), 'text/plain');
+			$msg->setBody($this->getPlainBody(), 'text/plain');
 		}
 		while ($att = array_shift($atts)) {
 			if ($att->disposition == 'attachment' || empty($att->content_id)) {
 				$str = $this->addPartString($att, $bIsPlain);
-				$swiftMsg->addPart($str, ($bIsPlain ? 'text/plain' : 'text/html'));
+				$msg->attach($str, ($bIsPlain ? 'text/plain' : 'text/html'));
 			}
 		}
-		$swiftMsg->setContentType("multipart/mixed");
+		$msg->setContentType("multipart/mixed");
 
 
-		if(!$this->getImapConnection()->append_message($this->mailbox, $swiftMsg, '\Seen')) {
+		if(!$this->getImapConnection()->append_message($this->mailbox, $msg->toStream(), '\Seen')) {
 			throw new \Exception("Failed to append new message");
 		}
 
