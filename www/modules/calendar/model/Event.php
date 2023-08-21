@@ -2648,7 +2648,6 @@ The following is the error message:
 					$ics=$this->toICS("REQUEST");
 					$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REQUEST;charset=utf-8"');
 					$a->setInline(true);
-					$a->setContentType("text/calendar;method=REQUEST;charset=utf-8");
 
 					$message->attach($a);
 

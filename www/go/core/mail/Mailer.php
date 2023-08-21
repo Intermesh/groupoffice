@@ -14,6 +14,9 @@ use PHPMailer\PHPMailer\Exception;
  * $message = go()->getMailer()->compose();
  * $message->setTo()->setFrom()->setBody()->send();
  * ```
+ *
+ * @author Merijn Schering <mschering@intermesh.nl>
+ * @copyright Intermesh BV
  */
 class Mailer {
 

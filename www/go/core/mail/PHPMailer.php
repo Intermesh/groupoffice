@@ -4,6 +4,14 @@ namespace go\core\mail;
 
 use PHPMailer\PHPMailer\Exception;
 
+/**
+ * PHPMailer extension
+ *
+ * Extends PHPMailer with S/MIME signing and encryption
+ *
+ * @author Merijn Schering <mschering@intermesh.nl>
+ * @copyright Intermesh BV
+ */
 class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 	/**
 	 * @var string
@@ -116,6 +124,8 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 	}
 
 	/**
+	 * Sign the message
+	 *
 	 * @param string $certificate The X.509 certificate used to digitally sign input_filename.
 	 * @param string $privateKey the private key corresponding to certificate.
 	 * @return void
@@ -128,26 +138,55 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 		$this->smimePassword = $password;
 	}
 
+	/**
+	 * Check if message is signed
+	 *
+	 * @return bool
+	 */
 	public function isSmimeSinged() : bool {
 		return isset($this->smimeCertificate);
 	}
 
+	/**
+	 * Get the X.509 certificate used to digitally sign
+	 * @return string|null
+	 */
 	public function getSmimeCertificate() : ?string {
 		return $this->smimeCertificate;
 	}
 
+	/**
+	 * The private key corresponding to {@see getSmimeCertificate()}.
+	 * @return string|null
+	 */
 	public function getSmimePrivateKey() : ?string {
 		return $this->smimePrivateKey;
 	}
 
-	public function smimeEncrypt(array $recipientCertifcates) {
-		$this->smimeEncryptRecipientCertificates = $recipientCertifcates;
+	/**
+	 * Encrypt the message
+	 *
+	 * @param array $recipientCertificates An array of X.509 certificates of the recipients.
+	 * @return void
+	 */
+	public function smimeEncrypt(array $recipientCertificates) {
+		$this->smimeEncryptRecipientCertificates = $recipientCertificates;
 	}
 
+	/**
+	 * Check if the mail is encrypted
+	 *
+	 * @return bool
+	 */
 	public function isSmimeEncrypted() : bool {
 		return isset($this->smimeEncryptRecipientCertificates);
 	}
 
+	/**
+	 * X.509 certificates of the recipients.
+	 *
+	 * @return array
+	 */
 	public function getSmimeEncryptRecipientCertificates() : array {
 		return $this->smimeEncryptRecipientCertificates;
 	}

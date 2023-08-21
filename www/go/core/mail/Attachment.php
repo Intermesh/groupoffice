@@ -6,6 +6,12 @@ use Exception;
 use go\core\fs\Blob;
 use go\core\fs\File;
 
+/*
+ * The attachment class for e-mail messages
+ *
+ * @author Merijn Schering <mschering@intermesh.nl>
+ * @copyright Intermesh BV
+ */
 class Attachment
 {
 
@@ -43,6 +49,13 @@ class Attachment
 		return $a;
 	}
 
+	/**
+	 * Create attachment from file
+	 *
+	 * @param string $path
+	 * @param string|null $contentType Set the content type. If not given it will detect it from the file. eg. application/pdf
+	 * @return Attachment
+	 */
 	public static function fromPath(string $path, ?string $contentType = null): Attachment
 	{
 		$file = new File($path);
@@ -55,10 +68,16 @@ class Attachment
 		return $a;
 	}
 
+	/**
+	 * Create attachment from string
+	 *
+	 * @param string $data The file data
+	 * @param string $filename Filename
+	 * @param string $contentType The content type. eg. application/pdf
+	 * @return Attachment
+	 */
 	public static function fromString(string $data, string $filename, string $contentType = 'application/octet-stream'): Attachment
 	{
-
-
 		$a = new self();
 		$a->data = $data;
 		$a->contentType = $contentType;
@@ -79,6 +98,14 @@ class Attachment
 	}
 
 
+	/**
+	 * The attachment content ID
+	 * See also {@see setInline()}.
+	 *
+	 * @return string|null
+	 * @throws Exception
+	 */
+
 	public function getId(): ?string
 	{
 		if(!isset($this->id)) {
@@ -87,11 +114,28 @@ class Attachment
 		return $this->id;
 	}
 
+
+	/**
+	 * The attachment content ID.
+	 * See also {@see setInline()}.
+	 *
+	 * @param string $id
+	 * @return Attachment
+	 */
 	public function setId(string $id): Attachment
 	{
 		$this->id = $id;
 		return $this;
 	}
+
+
+	/**
+	 * Set the file to inline. The ID of this attachment should occur in an image tag with src="cid:$id".
+	 * See also {@see setId()}.
+	 *
+	 * @param bool $inline
+	 * @return $this
+	 */
 
 	public function setInline(bool $inline): Attachment
 	{
@@ -105,6 +149,11 @@ class Attachment
 
 	public function getContentType() : string {
 		return $this->contentType;
+	}
+
+	public function setContentType(string $contentType) : Attachment {
+		$this->contentType = $contentType;
+		return $this;
 	}
 
 
