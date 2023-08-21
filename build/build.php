@@ -49,7 +49,7 @@ class Builder
 {
 	public $test = false;
 
-	private $majorVersion = "6.7";
+	private $majorVersion = "6.8";
 
 	private $gitBranch = 'sourceguardian';
 
@@ -57,7 +57,7 @@ class Builder
 	 *
 	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $distro = "sixseven";
+	public $distro = "testing";
 
 
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
@@ -73,7 +73,7 @@ class Builder
 	private $packageName;
 
 
-	private $encoder = '/root/sg/sourceguardian-evaluation/bin/sourceguardian --phpversion 7.2+';
+	private $encoder = '/root/sg/sourceguardian-evaluation/bin/sourceguardian --phpversion 8.1+';
 
 	private $encoderOptions = null;
 	private $proRepos = "git@git.intermesh.nl:groupoffice/promodules.git";
@@ -117,13 +117,13 @@ class Builder
 		$this->buildFromSource();
 
 
-//		$this->buildDebianPackage();
-//
-//		if (!$this->test) {
-//			$this->createGithubRelease();
-//			$this->addToDebianRepository();
-//			$this->sendTarToSF();
-//		}
+		$this->buildDebianPackage();
+
+		if (!$this->test) {
+			$this->createGithubRelease();
+			$this->addToDebianRepository();
+			$this->sendTarToSF();
+		}
 	}
 
 	private function pullSource()
