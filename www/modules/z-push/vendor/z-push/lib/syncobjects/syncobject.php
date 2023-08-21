@@ -170,7 +170,7 @@ abstract class SyncObject extends Streamer {
      * @access public
      * @return array with one property per line, key being the property instance variable name
      */
-    public function EvaluateAndCompare($odo, $odoName = "", $supportedFields, $keyprefix = "", $recCount = 0) {
+    public function EvaluateAndCompare($odo, $odoName = "", $supportedFields = false, $keyprefix = "", $recCount = 0) {
         if ($odo === false)
             return false;
 
