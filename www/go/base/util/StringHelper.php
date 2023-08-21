@@ -415,6 +415,7 @@ class StringHelper {
 	 */
 
 	public static function split_name($full_name) {
+		$full_name = $full_name ?? "";
 		if (strpos($full_name,',')) {
 			
 			$parts = explode(',',$full_name);
