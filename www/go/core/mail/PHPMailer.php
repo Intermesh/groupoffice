@@ -190,4 +190,10 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 	public function getSmimeEncryptRecipientCertificates() : array {
 		return $this->smimeEncryptRecipientCertificates;
 	}
+
+
+	public function getSMTPInstance()
+	{
+		return new PHPMailerSMTP();
+	}
 }
