@@ -4,7 +4,9 @@ namespace go\core\mail;
 
 use go\core\model\SmtpAccount;
 use GO\Email\Model\Account;
+use League\OAuth2\Client\Provider\Google;
 use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\OAuth;
 
 /**
  * Sends mail messages
@@ -194,15 +196,30 @@ class Mailer {
 
 			$cltAcct = null;
 			if (go()->getModule('community', 'oauth2client')) {
-				$cltAcct = go()->getDbConnection()->select('token')
-					->from('oauth2client_account')
+				$cltAcct = go()->getDbConnection()->select('refreshToken,clientId,clientSecret')
+					->from('oauth2client_account', 'a')
+					->join("oauth2client_oauth2client", "c", "c.id=a.oauth2ClientId")
 					->where(['accountId' => $this->emailAccount->id])
 					->single();
 			}
 			if ($cltAcct) {
+
+				$this->mail->SMTPAuth = true;
 				$this->mail->AuthType = 'XOAUTH2';
 
-				throw new \LogicException("XOAUTH2 TODO!");
+				$provider = new Google([
+					'clientId' => $cltAcct['clientId'],
+					'clientSecret' => $cltAcct['clientSecret']
+				]);
+
+				$this->mail->setOAuth(new OAuth([
+					'provider' => $provider,
+					'clientId' => $cltAcct['clientId'],
+					'clientSecret' => $cltAcct['clientSecret'],
+					'refreshToken' => $cltAcct['refreshToken'],
+					'userName' => $this->emailAccount->username,
+				]));
+
 
 
 			} else if (!empty($account->smtp_username)){
