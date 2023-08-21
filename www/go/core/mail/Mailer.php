@@ -170,6 +170,7 @@ class Mailer {
 	private function initTransport() {
 
 		$this->mail = new PHPMailer();
+		$this->mail->setSMTPInstance(new PHPMailerSMTP());
 		$this->mail->isSMTP();
 		$this->mail->SMTPAutoTLS = false;
 		$this->mail->XMailer = 'Group-Office';
