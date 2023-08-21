@@ -775,11 +775,11 @@ function _PEAR_call_destructors()
         sizeof($_PEAR_destructor_object_list))
     {
         reset($_PEAR_destructor_object_list);
-        if (PEAR_ZE2) {
-            $destructLifoExists = PEAR5::getStaticProperty('PEAR', 'destructlifo');
-        } else {
+//        if (PEAR_ZE2) {
+//            $destructLifoExists = PEAR5::getStaticProperty('PEAR', 'destructlifo');
+//        } else {
             $destructLifoExists = PEAR::getStaticProperty('PEAR', 'destructlifo');
-        }
+//        }
 
         if ($destructLifoExists) {
             $_PEAR_destructor_object_list = array_reverse($_PEAR_destructor_object_list);
@@ -876,11 +876,9 @@ class PEAR_Error
         $this->mode      = $mode;
         $this->userinfo  = $userinfo;
 
-        if (PEAR_ZE2) {
-            $skiptrace = PEAR5::getStaticProperty('PEAR_Error', 'skiptrace');
-        } else {
+
             $skiptrace = PEAR::getStaticProperty('PEAR_Error', 'skiptrace');
-        }
+
 
         if (!$skiptrace) {
             $this->backtrace = debug_backtrace();
