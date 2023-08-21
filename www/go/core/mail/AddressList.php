@@ -6,25 +6,26 @@ use ArrayAccess;
 use Countable;
 use Exception;
 use go\core\util\StringUtil;
-use go\core\validate\ValidateEmail;
 
 /**
- * A list of e-mail recipients
+ * A list of e-mail addresses
  * 
  * example:
  * 
  * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com>
- * 
+ *
+ * @copyright Intermesh BV
+ * @author Merijn Schering <mschering@intermesh.nl>
  */
 class AddressList implements ArrayAccess, Countable {
 
 	/**
-	 * Pass a e-mail string like:
+	 * Pass an e-mail string like:
 	 *
 	 * "Merijn Schering" <mschering@intermesh.nl>, someone@somedomain.com, Pete <pete@pete.com>
 	 *
 	 * @param string $emailRecipientList
-	 * @param bool $strict
+	 * @param bool $strict Throw exception if an invalid e-mail address was found
 	 * @throws Exception
 	 */
 	public function __construct(string $emailRecipientList = '', bool $strict = false) {
@@ -94,7 +95,7 @@ class AddressList implements ArrayAccess, Countable {
 	 * @var     array
 	 * @access  private
 	 */
-	private $addresses = array();
+	private $addresses = [];
 
 	/**
 	 * Temporary storage of personal info of an e-mail address
@@ -121,14 +122,11 @@ class AddressList implements ArrayAccess, Countable {
 	private $inQuotedString = false;
 
 	/**
-	 * Bool to check if we found an e-mail address
+	 * Add single address
 	 *
-	 * @var     bool
-	 * @access  private
+	 * @param Address $address
+	 * @return $this
 	 */
-	private $emailFound = false;
-
-
 	public function add(Address $address): AddressList
 	{
 		$this->addresses[] = $address;
@@ -141,12 +139,11 @@ class AddressList implements ArrayAccess, Countable {
 	 * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com
 	 *
 	 * @param string $addressStr
-	 * @return array
+	 * @return AddressList
 	 * @throws Exception
 	 */
 	public function addString(string $addressStr): AddressList
 	{
-
 		$addressStr = trim($addressStr, ',; ');
 
 		for ($i = 0; $i < strlen($addressStr); $i++) {
@@ -161,7 +158,6 @@ class AddressList implements ArrayAccess, Countable {
 				case '<':
 					$this->name = trim($this->buffer);
 					$this->buffer = '';
-					$this->emailFound = true;
 					break;
 
 				case '>':
@@ -173,7 +169,7 @@ class AddressList implements ArrayAccess, Countable {
 
 				case ',':
 				case ';':
-					if ($this->inQuotedString) {// || (!$this->strict && !$this->_emailFound && !ValidateEmail::check(trim($this->_buffer)))) {
+					if ($this->inQuotedString) {
 						$this->buffer .= $char;
 					} else {
 						$this->addBuffer();
@@ -214,14 +210,14 @@ class AddressList implements ArrayAccess, Countable {
 		}
 		$this->buffer = '';
 		$this->name = null;
-		$this->emailFound = false;
 		$this->inQuotedString = false;
 	}
 
 	/**
-	 * Hanldes a quote character (' or ")
+	 * Handles a quote character (' or ")
 	 *
 	 * @access private
+	 * @param $char
 	 * @return void
 	 */
 	private function handleQuote($char): void
