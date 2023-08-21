@@ -129,8 +129,10 @@ class AddressList implements ArrayAccess, Countable {
 	private $emailFound = false;
 
 
-	public function add(Address $address) {
+	public function add(Address $address): AddressList
+	{
 		$this->addresses[] = $address;
+		return $this;
 	}
 
 	/**
@@ -196,7 +198,8 @@ class AddressList implements ArrayAccess, Countable {
 	 * @return void
 	 * @throws Exception
 	 */
-	private function addBuffer() {
+	private function addBuffer(): void
+	{
 		$this->buffer = trim($this->buffer);
 		if (!empty($this->name) && empty($this->buffer)) {
 			$this->buffer = 'noaddress';
@@ -221,7 +224,8 @@ class AddressList implements ArrayAccess, Countable {
 	 * @access private
 	 * @return void
 	 */
-	private function handleQuote($char) {
+	private function handleQuote($char): void
+	{
 		if (!$this->inQuotedString && trim($this->buffer) == "") {
 			$this->inQuotedString = $char;
 		} elseif ($char == $this->inQuotedString) {
@@ -235,11 +239,21 @@ class AddressList implements ArrayAccess, Countable {
 		return array_key_exists($offset, $this->addresses);
 	}
 
+	/**
+	 * @param $offset
+	 * @return Address
+	 */
 	#[\ReturnTypeWillChange]
 	public function offsetGet($offset) {
 		return $this->addresses[$offset];
 	}
 
+	/**
+	 * @param int $offset
+	 * @param Address $value
+	 * @return void
+	 * @throws Exception
+	 */
 	public function offsetSet($offset, $value) : void{
 
 		if (!is_string($value)) {

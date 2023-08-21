@@ -246,22 +246,23 @@ class Mailer {
 	{
 		$this->mail->setFrom($message->getFrom()->getEmail(), $message->getFrom()->getName());
 		foreach($message->getTo() as $a) {
-			$this->mail->addAddress($a->getEmail(), $a->getEmail());
+			$this->mail->addAddress($a->getEmail(), $a->getName());
 		}
 		foreach($message->getBcc() as $a) {
-			$this->mail->addBCC($a->getEmail(), $a->getEmail());
+			$this->mail->addBCC($a->getEmail(), $a->getName());
 		}
 		foreach($message->getCc() as $a) {
-			$this->mail->addCC($a->getEmail(), $a->getEmail());
+			$this->mail->addCC($a->getEmail(), $a->getName());
 		}
 
 		foreach($message->getReplyTo() as $a) {
-			$this->mail->addReplyTo($a->getEmail(), $a->getEmail());
+			$this->mail->addReplyTo($a->getEmail(), $a->getName());
 		}
 
 		$this->mail->Subject = $message->getSubject();
 
-		$this->mail->MessageDate = $message->getDate();
+		$this->mail->MessageDate = $message->getDate()->format("D, j M Y H:i:s O");
+
 
 		if($message->getId())
 			$this->mail->MessageID = '<' . $message->getId() . '>';
@@ -307,6 +308,7 @@ class Mailer {
 
 		$this->mail->Body = $message->getBody();
 		$this->mail->ContentType = $message->getContentType();
+		$this->mail->CharSet = PHPMailer::CHARSET_UTF8;
 
 		if($message->getAlternateBody()) {
 			$this->mail->AltBody = $message->getAlternateBody();

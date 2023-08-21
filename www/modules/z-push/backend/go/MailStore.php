@@ -944,11 +944,8 @@ class MailStore extends Store implements ISearchProvider {
 				$refImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($imapAccount, $oldMessageFolderID, $oldMessageUID);
 				
 				if($refImapMessage) {
-					$headers = $sendMessage->getHeaders();
-					$headers->removeAll("In-Reply-To");
-					$headers->removeAll("References");
-					$headers->addTextHeader('In-Reply-To', "<" . $refImapMessage->message_id . ">");
-					$headers->addTextHeader('References', "<" . $refImapMessage->message_id  . ">");
+					$sendMessage->setReplyTo($refImapMessage->message_id);
+					$sendMessage->setReferences($refImapMessage->message_id);
 				}
 			}
 			
@@ -986,15 +983,15 @@ class MailStore extends Store implements ISearchProvider {
 			// Implement to always set the GO alias to sent emails
 			$alias = $imapAccount->getDefaultAlias();
 			$sendMessage->setFrom($alias->email, $alias->name);
+			$sendMessage->getMailer()->setEmailAccount($imapAccount);
 			ZLog::Write(LOGLEVEL_DEBUG, 'beforesend');
-			$mailer = \GO\Base\Mail\Mailer::newGoInstance(\GO\Email\Transport::newGoInstance($imapAccount));
-			$failedRecipients=array();
-			$success = $mailer->send($sendMessage, $failedRecipients);
+			$success = $sendMessage->send();
 			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~SEND~~'.$success);
-			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~FAILED RECIPIENTS~~'.var_export($failedRecipients,true));
 			//if a sent items folder is set in the account then save it to the imap folder
 			if($success) {
 				$imapAccount->saveToSentItems($sendMessage);
+			} else{
+				ZLog::Write(LOGLEVEL_ERROR, 'goMail->SendMail()~~SENDERROR: '.$sendMessage->getMailer()->lastError());
 			}
 			
 			ZLog::Write(LOGLEVEL_DEBUG, 'MAIL IS SENT SUCCESSFULLY::::::::'.$success);

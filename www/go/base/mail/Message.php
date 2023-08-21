@@ -106,45 +106,25 @@ class Message extends \go\core\mail\Message {
 		$to = str_replace('mailto:','', $to);
 		$cc = str_replace('mailto:','', $cc);
 		$bcc = str_replace('mailto:','', $bcc);
-	
-		$toList = new EmailRecipients($to);
-		$to = $toList->getAddresses();
-		foreach($to as $email=>$personal){
-			try{
-				$this->addTo($email, $personal);
-			} catch (Exception $e){
-				ErrorHandler::logException($e);
-			}
-		}
-		
-		$ccList = new EmailRecipients($cc);
-		$cc =$ccList->getAddresses();
-		foreach($cc as $email=>$personal){
-			try{
-				$this->addCc($email, $personal);
-			} catch (Exception $e){
-				ErrorHandler::logException($e);
-			}
-		}
-		
-		$bccList = new EmailRecipients($bcc);
-		$bcc =$bccList->getAddresses();
-		foreach($bcc as $email=>$personal){
-			try{
-				$this->addBcc($email, $personal);
-			} catch (Exception $e){
-				ErrorHandler::logException($e);
-			}
-		}
+
+		$toList = new AddressList($to);
+		$this->addTo(...$toList->toArray());
+
+		$ccList = new AddressList($cc);
+		$this->addCc(...$ccList->toArray());
+
+		$bccList = new AddressList($bcc);
+		$this->addBcc(...$bccList->toArray());
+
 
 		if(isset($structure->headers['from'])) {
 
-			$fromList = new EmailRecipients(str_replace('mailto:','',$structure->headers['from']));
-			$from =$fromList->getAddress();
+			$fromList = new AddressList(str_replace('mailto:','',$structure->headers['from']));
+			$from = $fromList[0];
 		
 			if($from){
 				try {
-					$this->setFrom($from['email'], $from['personal']);
+					$this->setFrom($from->getEmail(), $from->getEmail());
 				} catch(Exception $e)  {
 					\GO::debug('Failed to add from address: '.$e);
 				}

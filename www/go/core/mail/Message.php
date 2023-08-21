@@ -231,6 +231,8 @@ class Message {
 		foreach($addresses as &$address) {
 			if(is_string($address)) {
 				$address = new Address($address);
+			} else if (!($address instanceof Address)) {
+				throw new \InvalidArgumentException("Address must be a string or \go\core\mail\Address");
 			}
 		}
 		return $addresses;
@@ -536,7 +538,7 @@ class Message {
 	 */
 	public function send(): bool
 	{
-		return $this->mailer->send($this);
+		return $this->getMailer()->send($this);
 	}
 
 	/**
@@ -619,7 +621,10 @@ class Message {
 	 */
 	public function getMailer(): Mailer
 	{
-		return $this->mailer ?? go()->getMailer();
+		if(!isset($this->mailer)) {
+			$this->mailer = go()->getMailer();
+		}
+		return $this->mailer;
 	}
 
 	/**
