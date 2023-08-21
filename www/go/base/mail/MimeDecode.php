@@ -162,6 +162,10 @@ class MimeDecode
 	 * @access private
 	 */
 	private $rfc822_bodies;
+	/**
+	 * @var \go\core\mail\MimeDecode
+	 */
+	private $coreDecode;
 
 	/**
 	 * Constructor.
