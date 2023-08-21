@@ -297,8 +297,7 @@ class Request extends Singleton{
 
 			if(go()->getEnvironment()->isCli()) {
 				if(isset(go()->getSettings()->URL)) {
-					$parseUrl = parse_url(go()->getSettings()->URL, PHP_URL_HOST);
-					$this->host = $parseUrl['host'];
+					$this->host = parse_url(go()->getSettings()->URL, PHP_URL_HOST);
 				} else{
 					$this->host = "localhost.localdomain";
 				}
