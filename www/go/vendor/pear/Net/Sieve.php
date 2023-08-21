@@ -183,6 +183,13 @@ class Net_Sieve
      */
     var $_maxReferralCount = 15;
 
+
+		var $_capability;
+
+		var $_active;
+
+	var $_activeScript;
+
     /**
      * Constructor.
      *

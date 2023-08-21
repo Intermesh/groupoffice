@@ -840,6 +840,8 @@ class PEAR_Error
     var $userinfo             = '';
     var $backtrace            = null;
 
+		private $callback;
+
     // }}}
     // {{{ constructor
 

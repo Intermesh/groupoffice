@@ -36,18 +36,23 @@ class SieveController extends \GO\Base\Controller\AbstractModelController{
 	}
 	
 	protected function actionIsSupported($params){
-		
+
+		$error = null;
 		try{
 			$supported=$this->_sieveConnect($params['account_id']);
 		}catch (\Exception $e){
 			$supported=false;
+
+			go()->debug($e);
+
+			$error = (string) $e;
 		}
 		$extensions = array();
 		if($supported){
 			$extensions = (array) $this->_sieve->get_extensions();
 		}
 		
-		return array('success'=>true, 'supported'=>$supported,'server_extensions'=>$extensions);
+		return array('success'=>true, 'supported'=>$supported,'server_extensions'=>$extensions, 'error'=>$error);
 	}
 	
 	protected function actionScripts($params) {
