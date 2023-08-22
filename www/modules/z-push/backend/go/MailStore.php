@@ -944,7 +944,7 @@ class MailStore extends Store implements ISearchProvider {
 				$refImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($imapAccount, $oldMessageFolderID, $oldMessageUID);
 				
 				if($refImapMessage) {
-					$sendMessage->setReplyTo($refImapMessage->message_id);
+					$sendMessage->setInReplyTo($refImapMessage->message_id);
 					$sendMessage->setReferences($refImapMessage->message_id);
 				}
 			}
