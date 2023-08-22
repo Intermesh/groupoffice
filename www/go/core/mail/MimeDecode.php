@@ -940,34 +940,25 @@ class MimeDecode
 		$cc = str_replace('mailto:', '', $cc);
 		$bcc = str_replace('mailto:', '', $bcc);
 
-		$toList = new AddressList($to);
-		$to = $toList->getAddresses();
-		foreach ($to as $email => $personal) {
-			try {
-				$msg->addTo($email, $personal);
-			} catch (Exception $e) {
-				ErrorHandler::logException($e);
-			}
+		try {
+			$toList = new AddressList($to);
+			$msg->addTo(...$toList->toArray());
+		} catch (Exception $e) {
+			ErrorHandler::logException($e);
 		}
 
-		$ccList = new AddressList($cc);
-		$cc = $ccList->getAddresses();
-		foreach ($cc as $email => $personal) {
-			try {
-				$msg->addCc($email, $personal);
-			} catch (Exception $e) {
-				ErrorHandler::logException($e);
-			}
+		try {
+			$ccList = new AddressList($to);
+			$msg->addCc(...$ccList->toArray());
+		} catch (Exception $e) {
+			ErrorHandler::logException($e);
 		}
 
-		$bccList = new AddressList($bcc);
-		$bcc = $bccList->getAddresses();
-		foreach ($bcc as $email => $personal) {
-			try {
-				$msg->addBcc($email, $personal);
-			} catch (Exception $e) {
-				ErrorHandler::logException($e);
-			}
+		try {
+			$bccList = new AddressList($to);
+			$msg->addBcc(...$bccList->toArray());
+		} catch (Exception $e) {
+			ErrorHandler::logException($e);
 		}
 
 		if (isset($structure->headers['from'])) {
