@@ -211,7 +211,7 @@ class OAuthController {
 	 * @return Response
 	 * @throws Exception
 	 */
-	public function userinfo(): Response
+	public function userinfo(): ResponseInterfaceAlias
 	{
 		$request = ServerRequest::fromGlobals();
 		$response = new Response();
