@@ -62,7 +62,12 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 		$cert->account_id = $params['account_id'];
 		openssl_pkcs12_read($certData, $certs, $params['smime_password']);
 		if(!$certs) {
-			throw new \Exception(\GO::t("The SMIME password was incorrect.", "smime"));
+			$error =  openssl_error_string();
+			if(strpos($error, "11800071") !== false) {
+				throw new \Exception(\GO::t("The SMIME password was incorrect.", "smime"));
+			} else {
+				throw new \Exception(\GO::t("Could not read p12 file:", "smime").' ' .$error);
+			}
 		}
 		$data = openssl_x509_parse($certs['cert']);
 		if($data) {
