@@ -207,24 +207,24 @@ class PEAR
     * You MUST use a reference, or they will not persist!
     *
     * @access public
-    * @param  StringHelper $class  The calling classname, to prevent clashes
-    * @param  StringHelper $var    The variable to retrieve.
+    * @param  string $class  The calling classname, to prevent clashes
+    * @param  string $var    The variable to retrieve.
     * @return mixed   A reference to the variable. If not set it will be
     *                 auto initialised to NULL.
     */
-    function &getStaticProperty($class, $var)
-    {
-        static $properties;
-        if (!isset($properties[$class])) {
-            $properties[$class] = array();
-        }
+	static function &getStaticProperty($class, $var)
+	{
+		static $properties;
+		if (!isset($properties[$class])) {
+			$properties[$class] = array();
+		}
 
-        if (!array_key_exists($var, $properties[$class])) {
-            $properties[$class][$var] = null;
-        }
+		if (!array_key_exists($var, $properties[$class])) {
+			$properties[$class][$var] = null;
+		}
 
-        return $properties[$class][$var];
-    }
+		return $properties[$class][$var];
+	}
 
     // }}}
     // {{{ registerShutdownFunc()
