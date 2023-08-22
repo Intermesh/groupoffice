@@ -761,7 +761,7 @@ a {
 			animation: blink .3s 30 alternate;
 		}
 		margin: 0 dp(4);
-		text-shadow: 0px 1px 0px rgba(black, 0.56);
+		text-shadow: 0 1px 0 rgba(black, 0.56);
 		transform: scale(0.7);
 		cursor: pointer;
 	}
@@ -1081,7 +1081,7 @@ button.filetype-pdf, button.filetype-doc {
 	.btn-right-arrow,
 	.btn-left-arrow,
 	.btn-availability,
-	.btn-one-day,btn-five-days,btn-seven-days,btn-month
+	.btn-one-day
 	{
 		background-image: none !important;
 	}
@@ -1982,7 +1982,7 @@ table[id^="comments-ext"] b {
 	blockquote {
 		display: block;
 		margin: 1em 40px;
-		pading: 0px 10px;
+		//pading: 0px 10px;
 	}
 
 	td {
@@ -2031,7 +2031,7 @@ table[id^="comments-ext"] b {
 	}
 
 	p {
-		margin: dp(8) 0px;
+		margin: dp(8) 0;
 	}
 
 	p, span, div {
@@ -2291,7 +2291,7 @@ table[id^="comments-ext"] b {
 		}
 	}
 	&-row-inactive {
-		color: color($fg, 'disabled-text');
+		color: color($fg, 'disabled');
 	}
 	&.x-grid-panel .x-grid3-header {
 		position:relative;
