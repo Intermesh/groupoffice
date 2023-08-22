@@ -511,7 +511,7 @@ class VCard extends AbstractConverter {
 
 				// we don't have a way to store pref (yet). See https://github.com/Intermesh/groupoffice/issues/1042
 				case 'pref':
-					continue;
+					break;
 
 				case 'cell':
 					return 'mobile';
