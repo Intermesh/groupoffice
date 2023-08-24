@@ -757,10 +757,11 @@ class MimeDecode
 
 
 
-	private function loadMimeParts(stdCls $structure, Message $msg, string $part_number_prefix=''): void
+	private function loadMimeParts(stdClass $structure, Message $msg, string $part_number_prefix=''): void
 	{
 		// Apple sends contentID's that don't comply. So we replace them with new onces but we have to replace
 		// this in the body too.
+
 
 		$cidReplacements = [];
 		if (!isset($structure->parts))
