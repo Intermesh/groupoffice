@@ -994,7 +994,7 @@ class MimeDecode
 			$msg->setReferences(...$refs);
 		}
 
-		$this->loadMimeParts($structure);
+		$this->loadMimeParts($structure, $msg);
 
 
 		$date = isset($structure->headers['date']) ? preg_replace('/\([^\)]*\)/', '', $structure->headers['date']) : date('c');
