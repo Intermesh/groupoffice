@@ -203,7 +203,7 @@ class EventHandlers {
 		}
 
 		if ($encryptSmime) {
-			openssl_pkcs12_read($cert->cert, $certs, $password);
+			$certs = SmimeModule::readPKCS12($cert->cert, $password);
 
 			if (!isset($certs['cert']))
 				throw new \Exception("Failed to get your public key for encryption");

@@ -3,6 +3,8 @@
 namespace GO\Base\Mail;
 
 
+use GO\Smime\SmimeModule;
+
 class SmimeMessage extends Message
 {
 	
@@ -29,12 +31,7 @@ class SmimeMessage extends Message
 	
 	public function setSignParams($pkcs12_data, $passphrase){
 
-		openssl_pkcs12_read ($pkcs12_data, $certs, $passphrase);
-		if(!is_array($certs)){
-
-			//unfortunately exceptions are catched and it leads to an SMTP timeout somehow.
-			trigger_error("Could not decrypt key. Invalid passphrase?", E_USER_ERROR);
-		}
+		$certs = SmimeModule::readPKCS12($pkcs12_data, $passphrase);
 
 		$extraCerts = null;
 		if(!empty($certs['extracerts'])){

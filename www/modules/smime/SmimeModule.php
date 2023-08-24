@@ -3,6 +3,9 @@
 namespace GO\Smime;
 
 
+use Exception;
+use go\core\exception\Unauthorized;
+
 class SmimeModule extends \GO\Base\Module{
 	public static function initListeners() {
 		$accountController = new \GO\Email\Controller\AccountController();
@@ -23,5 +26,29 @@ class SmimeModule extends \GO\Base\Module{
 	
 	public static function deleteUser($user) {		
 		Model\PublicCertificate::model()->deleteByAttribute('user_id', $user->id);
+	}
+
+
+	/**
+	 * Read certificates from a PKCS12 file
+	 *
+	 * @param string $data
+	 * @param string $passphrase
+	 * @return string[]
+	 * @throws Exception
+	 */
+	public static function readPKCS12(string $data, string $passphrase): array
+	{
+		openssl_pkcs12_read($data, $certs, $passphrase);
+		if(!$certs) {
+			$error =  openssl_error_string();
+			if(str_contains($error, "11800071")) {
+				throw new Unauthorized(go()->t("The SMIME password was incorrect.",  "legacy", "smime"));
+			} else {
+				throw new Exception(go()->t("Could not read p12 file:", "legacy", "smime").' ' .$error);
+			}
+		}
+
+		return $certs;
 	}
 }
