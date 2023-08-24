@@ -948,14 +948,14 @@ class MimeDecode
 		}
 
 		try {
-			$ccList = new AddressList($to);
+			$ccList = new AddressList($cc);
 			$msg->addCc(...$ccList->toArray());
 		} catch (Exception $e) {
 			ErrorHandler::logException($e);
 		}
 
 		try {
-			$bccList = new AddressList($to);
+			$bccList = new AddressList($bcc);
 			$msg->addBcc(...$bccList->toArray());
 		} catch (Exception $e) {
 			ErrorHandler::logException($e);
@@ -963,15 +963,15 @@ class MimeDecode
 
 		if (isset($structure->headers['from'])) {
 
+			try {
 			$fromList = new AddressList(str_replace('mailto:', '', $structure->headers['from']));
-			$from = $fromList->getAddress();
+			$from = $fromList[0];
 
-			if ($from) {
-				try {
-					$msg->setFrom($from['email'], $from['personal']);
-				} catch (Exception $e) {
-					GO::debug('Failed to add from address: ' . $e);
+				if ($from) {
+						$msg->setFrom($from->getEmail(), $from->getName());
 				}
+			} catch (Exception $e) {
+				GO::debug('Failed to add from address: ' . $e);
 			}
 		}
 
