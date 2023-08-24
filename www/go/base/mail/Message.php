@@ -124,7 +124,7 @@ class Message extends \go\core\mail\Message {
 		
 			if($from){
 				try {
-					$this->setFrom($from->getEmail(), $from->getEmail());
+					$this->setFrom($from->getEmail(), $from->getName());
 				} catch(Exception $e)  {
 					\GO::debug('Failed to add from address: '.$e);
 				}
