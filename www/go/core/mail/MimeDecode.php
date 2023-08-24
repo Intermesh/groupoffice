@@ -214,6 +214,8 @@ class MimeDecode
 	{
 		$return = new stdClass;
 		$return->headers = array();
+		$return->ctype_primary = null;
+		$return->ctype_secondary = null;
 		$headers = $this->parseHeaders($headers);
 
 		foreach ($headers as $value) {
@@ -308,7 +310,7 @@ class MimeDecode
         case 'message/rfc822':
 
 						$encoding = isset($content_transfer_encoding) ? $content_transfer_encoding['value'] : '7bit';
-						$return->body = ($this->decode_bodies ? $this->decodeBody($body, $encoding) : $body);
+						$return->body = ($this->decodeBodies ? $this->decodeBody($body, $encoding) : $body);
 
             $obj = new MimeDecode($body);
             $return->parts[] = $obj->decode();
