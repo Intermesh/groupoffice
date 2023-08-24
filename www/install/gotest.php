@@ -437,6 +437,13 @@ function test_system() :array
 	$test['fatal']=false;
 	
 	$tests[]=$test;
+
+	$test['name'] = 'Legacy OpenSSL Provider';
+	$test['showSuccessFeedback'] = false;
+	$test['pass'] = in_array("rc4-40", openssl_get_cipher_methods ());
+	$test['feedback'] = "Warning: Your OpenSSL doesn't enable legacy encryption algorithms. You may not be able to use *.p12 files for S/MIME that were created with an older version of openssl.";
+	$test['fatal'] = false;
+	$tests[] = $test;
 	
 	
 	if(class_exists('GO')) {
@@ -503,6 +510,8 @@ function test_system() :array
 				$test['feedback'] = "Warning: The main cron job doesn't appear to be running. Please add a cron job: \n\n* * * * * www-data php " . \GO::config()->root_path . "cron.php " . \GO::config()->get_config_file();
 				$test['fatal'] = false;
 				$tests[] = $test;
+
+
 			}
 		} catch(Exception $e) {
 			//var_dump($e);
