@@ -1007,7 +1007,7 @@ class MimeDecode
 
 		$msg->setDate($udate);
 
-		$msg->setBody($this->loadedBody);
+		$msg->setBody($this->loadedBody ?? "");
 
 
 		return $msg;
