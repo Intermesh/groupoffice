@@ -508,6 +508,11 @@ class VCard extends AbstractConverter {
 		foreach($types as $type) {
 
 			switch($type) {
+
+				// we don't have a way to store pref (yet). See https://github.com/Intermesh/groupoffice/issues/1042
+				case 'pref':
+					break;
+
 				case 'cell':
 					return 'mobile';
 
