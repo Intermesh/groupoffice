@@ -2,6 +2,7 @@
 - Comments: Fix uninstall script
 - Core: Fixed creating custom filters for dates with relative date.
 - Automation: Fixed sending emails
+- Core: Logout other sessions when you change password.
 
 14-08-2023: 6.7.43
 - Core: Added markdown filter to TemplateParser.php

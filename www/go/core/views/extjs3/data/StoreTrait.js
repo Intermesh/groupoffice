@@ -41,22 +41,22 @@ go.data.StoreTrait = {
     }, this);
 
 		this.on('exception',
-			function( store, type, action, options, response){
+			function( store, type, action, options, response) {
 
-				if(response.isAbort) {
+				if (response.isAbort) {
 					//ignore aborts.
-				} else if(response.isTimeout || response.status == 0){
+				} else if (response.isTimeout || response.status == 0) {
 					console.error(response);
 
 					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
-				}else if(response.type =="unsupportedSort") {
+				} else if (response.type == "unsupportedSort") {
 
 					// Handle invalid sort state which may happen when a (custom) column has been removed.
 
 					console.warn("Clearing invalid sort state:", store.sortInfo);
 					store.sortInfo = {};
 					//caused infinite loop while developing
-					if(!GO.debug) {
+					if (!GO.debug) {
 						store.reload();
 					} else {
 						GO.errorDialog.show(response.description);
@@ -65,6 +65,8 @@ go.data.StoreTrait = {
 					//cancel further exception handling
 					// return false;
 
+				} else if (response.type == "unauthorized") {
+					go.Router.login();
 				} else
 				{
 					console.error(response);

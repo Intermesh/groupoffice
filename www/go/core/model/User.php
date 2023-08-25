@@ -810,6 +810,10 @@ class User extends AclItemEntity {
 			UserDisplay::entityType()->changes([[$this->id, $this->findAclId(), 0]]);
 		}
 
+		if($this->isModified(['password'])) {
+			Token::destroyOtherSessons();
+		}
+
 		return true;
 	}
 
