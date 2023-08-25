@@ -103,11 +103,27 @@ class Router {
 			}
 			
 		} catch (Throwable $e) {
+
+			if($e instanceof Exception) {
+				switch($e->getCode()) {
+					case 401:
+						$type = "unauthorized";
+						break;
+					case 403:
+						$type = "forbidden";
+						break;
+
+					default:
+						$type = "serverFail";
+				}
+			} else{
+				$type = lcfirst((new ReflectionClass($e))->getShortName());
+			}
 			// convert jmap classes to set error response
 			// https://jmap.io/spec-core.html#errors
 			$error = [
 				"message" => $e->getMessage(),
-				"type" => lcfirst((new ReflectionClass($e))->getShortName())
+				"type" => $type
 			];
 			
 			if(go()->getDebugger()->enabled) {
