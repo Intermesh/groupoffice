@@ -34,6 +34,133 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 	private $smimePassword;
 
 
+	public function preSend()
+	{
+		if (
+			'smtp' === $this->Mailer
+			|| ('mail' === $this->Mailer && (\PHP_VERSION_ID >= 80000 || stripos(PHP_OS, 'WIN') === 0))
+		) {
+			//SMTP mandates RFC-compliant line endings
+			//and it's also used with mail() on Windows
+			static::setLE(self::CRLF);
+		} else {
+			//Maintain backward compatibility with legacy Linux command line mailers
+			static::setLE(PHP_EOL);
+		}
+		//Check for buggy PHP versions that add a header with an incorrect line break
+		if (
+			'mail' === $this->Mailer
+			&& ((\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70017)
+				|| (\PHP_VERSION_ID >= 70100 && \PHP_VERSION_ID < 70103))
+			&& ini_get('mail.add_x_header') === '1'
+			&& stripos(PHP_OS, 'WIN') === 0
+		) {
+			trigger_error($this->lang('buggy_php'), E_USER_WARNING);
+		}
+
+		try {
+			$this->error_count = 0; //Reset errors
+			$this->mailHeader = '';
+
+			//Dequeue recipient and Reply-To addresses with IDN
+			foreach (array_merge($this->RecipientsQueue, $this->ReplyToQueue) as $params) {
+				$params[1] = $this->punyencodeAddress($params[1]);
+				call_user_func_array([$this, 'addAnAddress'], $params);
+			}
+//			if (count($this->to) + count($this->cc) + count($this->bcc) < 1) {
+//				throw new Exception($this->lang('provide_address'), self::STOP_CRITICAL);
+//			}
+
+			//Validate From, Sender, and ConfirmReadingTo addresses
+			foreach (['From', 'Sender', 'ConfirmReadingTo'] as $address_kind) {
+				$this->{$address_kind} = trim($this->{$address_kind});
+				if (empty($this->{$address_kind})) {
+					continue;
+				}
+				$this->{$address_kind} = $this->punyencodeAddress($this->{$address_kind});
+				if (!static::validateAddress($this->{$address_kind})) {
+					$error_message = sprintf(
+						'%s (%s): %s',
+						$this->lang('invalid_address'),
+						$address_kind,
+						$this->{$address_kind}
+					);
+					$this->setError($error_message);
+					$this->edebug($error_message);
+					if ($this->exceptions) {
+						throw new Exception($error_message);
+					}
+
+					return false;
+				}
+			}
+
+			//Set whether the message is multipart/alternative
+			if ($this->alternativeExists()) {
+				$this->ContentType = static::CONTENT_TYPE_MULTIPART_ALTERNATIVE;
+			}
+
+			$this->setMessageType();
+			//Refuse to send an empty message unless we are specifically allowing it
+			if (!$this->AllowEmpty && empty($this->Body)) {
+				throw new Exception($this->lang('empty_message'), self::STOP_CRITICAL);
+			}
+
+			//Trim subject consistently
+			$this->Subject = trim($this->Subject);
+			//Create body before headers in case body makes changes to headers (e.g. altering transfer encoding)
+			$this->MIMEHeader = '';
+			$this->MIMEBody = $this->createBody();
+			//createBody may have added some headers, so retain them
+			$tempheaders = $this->MIMEHeader;
+			$this->MIMEHeader = $this->createHeader();
+			$this->MIMEHeader .= $tempheaders;
+
+			//To capture the complete message when using mail(), create
+			//an extra header list which createHeader() doesn't fold in
+			if ('mail' === $this->Mailer) {
+				if (count($this->to) > 0) {
+					$this->mailHeader .= $this->addrAppend('To', $this->to);
+				} else {
+					$this->mailHeader .= $this->headerLine('To', 'undisclosed-recipients:;');
+				}
+				$this->mailHeader .= $this->headerLine(
+					'Subject',
+					$this->encodeHeader($this->secureHeader($this->Subject))
+				);
+			}
+
+			//Sign with DKIM if enabled
+			if (
+				!empty($this->DKIM_domain)
+				&& !empty($this->DKIM_selector)
+				&& (!empty($this->DKIM_private_string)
+					|| (!empty($this->DKIM_private)
+						&& static::isPermittedPath($this->DKIM_private)
+						&& file_exists($this->DKIM_private)
+					)
+				)
+			) {
+				$header_dkim = $this->DKIM_Add(
+					$this->MIMEHeader . $this->mailHeader,
+					$this->encodeHeader($this->secureHeader($this->Subject)),
+					$this->MIMEBody
+				);
+				$this->MIMEHeader = static::stripTrailingWSP($this->MIMEHeader) . static::$LE .
+					static::normalizeBreaks($header_dkim) . static::$LE;
+			}
+
+			return true;
+		} catch (Exception $exc) {
+			$this->setError($exc->getMessage());
+			if ($this->exceptions) {
+				throw $exc;
+			}
+
+			return false;
+		}
+	}
+
 	public function postSend()
 	{
 		if($this->isSmimeSinged()) {
