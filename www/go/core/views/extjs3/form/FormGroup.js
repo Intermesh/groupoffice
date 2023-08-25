@@ -473,7 +473,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 	
 	reset : function() {
-		this.setValue([]);
+		this.setValue(this.mapKey ? {} : []);
 		this.dirty = false;
 		if(this.startWithItem && this.items.getCount() == 0) {
 			this.addPanel(true);
