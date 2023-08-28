@@ -439,7 +439,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}, '->', {
 					xtype: "tbsearch"
 				},{
-				hidden: !go.Modules.get("community", 'tasks') || !go.Modules.get("community", 'tasks').userRights.mayChangeTasklists,
+				// hidden: !go.Modules.get("community", 'tasks') || !go.Modules.get("community", 'tasks').userRights.mayChangeTasklists,
+				hidden: !this.canEditTaskLists(),
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
@@ -494,6 +495,16 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	// 		this.addTaskButton.setDisabled(true);
 	// 	}
 	// },
+
+	canEditTaskLists: function() {
+		if(this.support) {
+			const modRights = go.Modules.get("business", "support").userRights;
+			return modRights.mayManage;
+		} else {
+			return go.Modules.get("community", 'tasks') && go.Modules.get("community", 'tasks').userRights.mayChangeTasklists;
+		}
+
+	},
 	
 	createTaskGrid : function() {
 
