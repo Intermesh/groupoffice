@@ -181,6 +181,7 @@ class MimeDecode
 	 * Begins the decoding process. If called statically
 	 * it will create an object and call the decode() method
 	 * of it.
+	 * @deprecated Use {@see decode()}
 	 * @return stdClass Decoded results
 	 * @throws Exception
 	 */
@@ -307,15 +308,15 @@ class MimeDecode
 					}
 					break;
 
-        case 'message/rfc822':
-
-						$encoding = isset($content_transfer_encoding) ? $content_transfer_encoding['value'] : '7bit';
-						$return->body = ($this->decodeBodies ? $this->decodeBody($body, $encoding) : $body);
-
-            $obj = new MimeDecode($body);
-            $return->parts[] = $obj->decode();
-            unset($obj);
-        break;
+//        case 'message/rfc822':
+//
+//						$encoding = isset($content_transfer_encoding) ? $content_transfer_encoding['value'] : '7bit';
+//						$return->body = ($this->decodeBodies ? $this->decodeBody($body, $encoding) : $body);
+//
+//            $obj = new MimeDecode($body);
+//            $return->parts[] = $obj->decode();
+//            unset($obj);
+//        break;
 
 				default:
 					if (!isset($content_transfer_encoding['value'])) $content_transfer_encoding['value'] = '7bit';
@@ -766,7 +767,7 @@ class MimeDecode
 
 
 		$cidReplacements = [];
-		if (!isset($structure->parts))
+		if (isset($structure->parts))
 		{
 			//$part_number=0;
 			foreach ($structure->parts as $part_number=>$part) {
