@@ -33,7 +33,27 @@ class TaskList extends EntityController
 
 	public function set($params)
 	{
-		if(!$this->rights->mayChangeTasklists) {
+		// Support module should not be dependent on mayChangeTasklists permission
+		if (!property_exists($this->rights, 'mayChangeTasklists')) {
+			$yesWeCan = false;
+			foreach (['create', 'update'] as $action) {
+				if (!isset($params[$action])) {
+					continue;
+				}
+				foreach ($params[$action] as $k => $p) {
+					if ($p["role"] === model\TaskList::Roles[model\TaskList::Support]) {
+						$tmpRights = go()->getAuthState()->getClassRights(\go\modules\business\support\controller\Migrate::class);
+						if ($tmpRights->mayManage) {
+							$yesWeCan = true;
+							break 2;
+						}
+					}
+				}
+			}
+			if (!$yesWeCan) {
+				throw new Forbidden();
+			}
+		} elseif (!$this->rights->mayChangeTasklists) {
 			throw new Forbidden();
 		}
 		return $this->defaultSet($params);
