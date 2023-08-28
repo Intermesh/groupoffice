@@ -2876,7 +2876,7 @@ class Imap extends ImapBodyStruct
 	 * Append a message to a mailbox
 	 *
 	 * @param string $mailbox
-	 * @param string|resource|File $data
+	 * @param string|File $data
 	 * @param string $flags See set_message_flag
 	 * @return boolean
 	 */
@@ -2898,15 +2898,7 @@ class Imap extends ImapBodyStruct
 
 			fclose($fp);
 
-		} else if(is_resource($data)) {
-			while ($line = fgets($data, 1024)) {
-				if (!$this->append_feed($line)) {
-					return false;
-				}
-			}
-
-			fclose($data);
-		}else {
+		} else {
 
 			if(!$this->append_start($mailbox, strlen($data), $flags)) {
 				return false;

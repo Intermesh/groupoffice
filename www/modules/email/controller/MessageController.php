@@ -428,7 +428,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['success'] = $response['sendParams']['draft_uid'] > 0;
 		}
 
-		if(!$imap->append_message($account->drafts, $message, "\Seen")){
+		if(!$imap->append_message($account->drafts, $message->toString(), "\Seen")){
 			$response['success'] = false;
 			$response['feedback']=$imap->last_error();
 		}
