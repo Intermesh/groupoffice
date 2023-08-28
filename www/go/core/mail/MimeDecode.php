@@ -245,8 +245,8 @@ class MimeDecode
 					$content_type = $this->parseHeaderValue($headers[$key]['value']);
 
 					if (preg_match('/([0-9a-z+.-]+)\/([0-9a-z+.-]+)/i', $content_type['value'], $regs)) {
-						$return->ctype_primary = $regs[1];
-						$return->ctype_secondary = $regs[2];
+						$return->ctype_primary = strtolower($regs[1]);
+						$return->ctype_secondary = strtolower($regs[2]);
 					}
 
 					if (isset($content_type['other'])) {
@@ -326,8 +326,8 @@ class MimeDecode
 
 		} else {
 			$ctype = explode('/', $default_ctype);
-			$return->ctype_primary = $ctype[0];
-			$return->ctype_secondary = $ctype[1];
+			$return->ctype_primary = strtolower($ctype[0]);
+			$return->ctype_secondary = strtolower($ctype[1]);
 			$this->includeBodies ? $return->body = ($this->decodeBodies ? $this->decodeBody($body) : $body) : null;
 		}
 
@@ -825,7 +825,7 @@ class MimeDecode
 					$mime_type = $this->buildContentType($part);
 
 					//only embed if we can find the content-id in the body
-					if(isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && strpos($this->loadedBody, $content_id) !== false)
+					if(isset($this->loadedBody) && isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && str_contains($this->loadedBody, $content_id))
 					{
 						$img = Attachment::fromString ($part->body, $filename, $mime_type);
 

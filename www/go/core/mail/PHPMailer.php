@@ -33,6 +33,7 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 
 	private $smimePassword;
 
+	public $AllowEmpty = true;
 
 	public function preSend()
 	{

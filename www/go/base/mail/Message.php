@@ -189,6 +189,10 @@ class Message extends \go\core\mail\Message {
 	 * @return Message
 	 */
 	public function setHtmlAlternateBody($htmlBody){
+
+		if(empty($htmlBody)) {
+			return "";
+		}
 	
 		//add body
 		$htmlBody = \GO\Base\Util\StringHelper::normalizeCrlf($htmlBody);
@@ -288,7 +292,7 @@ class Message extends \go\core\mail\Message {
 					$mime_type = $this->buildContentType($part);
 
           //only embed if we can find the content-id in the body
-					if(isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && strpos($this->_loadedBody, $content_id) !== false)
+					if(isset($this->_loadedBody) && isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && strpos($this->_loadedBody, $content_id) !== false)
 					{
 						$img = Attachment::fromString ($part->body, $filename, $mime_type);
 
