@@ -92,6 +92,12 @@ class Mapping {
 		if(!$alias) {
 			$alias = $name;
 		}
+		$this->internalAddTable($name, $alias, $keys, $columns, $constantValues);
+		return $this;
+	}
+
+
+	private function internalAddTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []) {
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
 		$this->tables[$name]->dynamic = $this->dynamic;
 		foreach($this->tables[$name]->getMappedColumns() as $col) {
@@ -100,7 +106,8 @@ class Mapping {
 				$this->columns[$col->name] = $col;
 			}
 		}
-		return $this;
+
+		return $this->tables[$name];
 	}
 
   /**
@@ -121,8 +128,9 @@ class Mapping {
    */
 	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []): Mapping
 	{
-		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
-		$this->tables[$name]->isUserTable = true;
+		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues);
+		$table->isUserTable = true;
+
 		$this->hasUserTable = true;
 
 		if(!Table::getInstance($name)->getColumn('modSeq')) {

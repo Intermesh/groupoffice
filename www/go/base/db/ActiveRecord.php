@@ -1949,8 +1949,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		try{
 			$result = $this->getDbConnection()->query($sql);
-			$result->model=$this;
-			$result->findParams=$findParams;
+//			$result->model=$this;
+//			$result->findParams=$findParams;
 
 			$result->setFetchMode(PDO::FETCH_CLASS, $this->className(),array(false));
 

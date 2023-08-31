@@ -146,11 +146,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this->noCache;
 	}
 
-	public function getFetchMode(): array
+	public function getFetchMode(): array | null
 	{
-		if (!isset($this->fetchMode)) {
-			return [PDO::FETCH_ASSOC];
-		}
 		return $this->fetchMode;
 	}
 
@@ -632,12 +629,13 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		$build = $queryBuilder->buildSelect($this);
-		if($this->dbConn->debug) {
-			$build['start'] = go()->getDebugger()->getTimeStamp();
-		}
 
 		$stmt = $this->getDbConnection()->createStatement($build);
-		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
+		$fetchMode = $this->getFetchMode();
+		if($fetchMode != null) {
+			$stmt->setFetchMode(...$fetchMode);
+		}
+
 		$stmt->setQuery($this);		
 
 		return $stmt;
@@ -687,7 +685,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    *   when nothing is found
    * @throws PDOException
    */
-	public function single() {		
+	public function single() {
 		$entity =  $this->offset()
 						->limit(1)
 						->execute()

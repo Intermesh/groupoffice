@@ -138,8 +138,10 @@ abstract class Property extends Model {
 	 * @param bool $readOnly Entities can be fetched readonly to improve performance
 	 *
 	 * @noinspection PhpMissingParamTypeInspection
+	 * @throws Exception
 	 */
-	public function __construct($owner, bool $isNew = true, array $fetchProperties = [], bool $readOnly = false) {
+	public function __construct($owner, bool $isNew = true, array $fetchProperties = [], bool $readOnly = false)
+	{
 		$this->isNew = $isNew;
 
 		if (empty($fetchProperties)) {
@@ -151,20 +153,57 @@ abstract class Property extends Model {
 		$this->owner = $owner;
 		$this->selectedProperties = array_unique(array_merge($this->getRequiredProperties(), $this->fetchProperties));
 
-		$this->initDatabaseColumns($this->isNew);
+		$this->loadConstants();
+
+		if ($this->isNew) {
+			$this->initRelations();
+
+			$this->loadDatabaseDefaults();
+
+			if(!$readOnly) {
+				$this->trackModifications();
+			}
+
+			$this->init();
+		}
+
+	}
+
+	/**
+	 * Populate model with values from database
+	 *
+	 * Used by {@see Statement} to populate the record.
+	 *
+	 * @param array $record
+	 * @return $this
+	 * @throws Exception
+	 */
+	public function populate(array $record): static
+	{
+		$m = static::getMapping();
+		foreach($record as $colName => $value) {
+
+			if(str_contains($colName, '.')) {
+				$this->setPrimaryKey($colName, $value);
+			} else {
+
+				$col = $m->getColumn($colName);
+				if($col) {
+					$value = $col->castFromDb($value);
+				}
+				$this->$colName = $value;
+			}
+		}
+
 		$this->initRelations();
-		if(!$readOnly) {
+
+		if(!$this->readOnly) {
 			$this->trackModifications();
 		}
 
-		// When properties have default values in the model they are overwritten by the database defaults. We change them back here so the
-		// modification is tracked and it will be saved.
-		if($this->isNew) {
-			foreach($this->defaults as $key => $value) {
-				$this->$key = $value;
-			}
-		}
 		$this->init();
+
+		return $this;
 	}
 
 	/**
@@ -187,30 +226,33 @@ abstract class Property extends Model {
 	/**
 	 * Loads defaults from the database or casts the database value to the right type in PHP
 	 *
-	 * @param boolean $loadDefault
-	 * @throws Exception
 	 */
-	private function initDatabaseColumns(bool $loadDefault) {
+	private function loadDatabaseDefaults(): void
+	{
 		$m = static::getMapping();
 		foreach($this->selectedProperties as $propName) {
 			$col = $m->getColumn($propName);
 			if($col) {
-				if($loadDefault) {
-					if(isset($this->$propName)) {
-						$this->defaults[$propName] = $this->$propName;
-					}
+				if(!isset($this->$propName) && $col->default !== null) {
 					$this->$propName = $col->castFromDb($col->default);
-				} else{
-					$this->$propName = $col->castFromDb($this->$propName);
 				}
 			}
 		}
+
+	}
+
+
+	private function loadConstants(): void
+	{
+		$m = static::getMapping();
 		foreach ($m->getTables() as $table) {
 			foreach($table->getConstantValues() as $colName => $value) {
 				$this->$colName  = $value;
 			}
 		}
 	}
+
+
 
   /**
    * Returns all relations that were requested in "fetchProperties".
@@ -234,7 +276,8 @@ abstract class Property extends Model {
   /**
    * Fetches the related properties when requested
    */
-	private function initRelations() {
+	private function initRelations(): void
+	{
 		foreach ($this->getFetchedRelations() as $relation) {
 			$cls = $relation->propertyName;
 
@@ -389,7 +432,8 @@ abstract class Property extends Model {
 			$stmt = self::$cachedRelationStmts[$cacheKey] ;
 			$query = $stmt->getQuery();
 			/** @var Query $query */
-			$stmt->setFetchMode(PDO::FETCH_CLASS, $cls, [$owner, false, [], $query->getReadOnly()]);
+//			$stmt->setFetchMode(PDO::FETCH_CLASS, $cls, [$owner, false, [], $query->getReadOnly()]);
+			$stmt->fetchTypedModel($cls, [$owner, false, [], $query->getReadOnly()]);
 
 			foreach($where as $field => $value) {
 				$stmt->bindValue(':'.$field, $value);
@@ -491,11 +535,23 @@ abstract class Property extends Model {
 		return $p;
 	}
 
-  /**
-   * Copies all properties so isModified() can detect changes.
-   */
-	private function trackModifications() {
+	/**
+	 * Copies all properties so isModified() can detect changes.
+	 * @throws Exception
+	 */
+	private function trackModifications(): void
+	{
 		foreach ($this->watchProperties() as $propName) {
+
+			if($this->isNew()) {
+				// if this model is new then store the database default as the old value
+				$col = static::getMapping()->getColumn($propName);
+				if($col) {
+					$this->oldProps[$propName] = $col->default;
+					continue;
+				}
+			}
+
 			$v = $this->$propName;
 
 			if(is_object($v)) {
@@ -684,10 +740,6 @@ abstract class Property extends Model {
    * @throws Exception
    */
 	public function __set($name, $value) {
-		if(!$this->readOnly && $this->setPrimaryKey($name, $value)) {
-			return ;
-		}
-
 		//Support for dynamically mapped props via EVENT_MAP
 		$props = static::getApiProperties();
 		if(isset($props[$name]) && !empty($props[$name]['dynamic'])) {
