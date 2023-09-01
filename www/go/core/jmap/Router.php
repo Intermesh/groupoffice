@@ -58,11 +58,6 @@ class Router {
 		if(!isset($requests)) {
 			$requests = Request::get()->getBody();
 		}
-		
-//		if(!is_array($body)) {
-//			return $this->error("urn:ietf:params:jmap:error:notRequest", 400, "The request parsed as JSON but did not match the type signature of the Request object.");
-//
-//		}
 
 		while($method = array_shift($requests)) {
 			$this->callMethod($method);

@@ -169,12 +169,28 @@ $updates['202211041158'][] = 'alter table addressbook_contact
 
 $updates['202211071330'][] = "ALTER TABLE `addressbook_email_address` ADD KEY `email` (`email`);";
 
+$updates['202309010949'][] = function() {
+	$c = go()->getDbConnection();
+	try {
+		$c->exec("alter table addressbook_portlet_birthday
+    drop foreign key addressbook_portlet_birthday_fk2;");
+		$c->exec("alter table addressbook_portlet_birthday
+    modify addressBookId int(11) unsigned not null;");
+		$c->exec("alter table addressbook_portlet_birthday
+    add constraint addressbook_portlet_birthday_addressbook_addressbook_id_fk
+        foreign key (addressBookId) references addressbook_addressbook (id)
+            on delete cascade;");
+	} catch(Exception $e) {
+		echo "Exception " . $e->getMessage() ."\n";
+	}
+};
+
 // 6.7
 
-$updates['202211071330'][] = "alter table addressbook_address
+$updates['202309010949'][] = "alter table addressbook_address
     add address text null;";
 
-$updates['202211071330'][] = function() {
+$updates['202309010949'][] = function() {
 
 	go()->getDbConnection()->exec("alter table addressbook_address ADD id INT AUTO_INCREMENT PRIMARY KEY;");
 	go()->getDatabase()->clearCache();
@@ -196,5 +212,11 @@ $updates['202211071330'][] = function() {
 
 };
 
-$updates['202302281622'][] = "UPDATE core_setting s JOIN core_module m ON s.moduleId = m.id
+$updates['202309010949'][] = "UPDATE core_setting s JOIN core_module m ON s.moduleId = m.id
 SET s.value = IF(s.value = '1', 'on', 'off'), s.name = 'autoLink' WHERE m.name = 'addressbook' AND s.name = 'autoLinkEmail';";
+
+$updates['202309010949'][] = "UPDATE core_setting s JOIN core_module m ON s.moduleId = m.id
+SET s.value = IF(s.value = '1', 'on', 'off'), s.name = 'autoLink' WHERE m.name = 'addressbook' AND s.name = 'autoLinkEmail';";
+
+
+
