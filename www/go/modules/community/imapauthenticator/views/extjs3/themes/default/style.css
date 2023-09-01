@@ -1,3 +1,4 @@
-.go-module-icon-imaputhenticator , .go-menu-icon-googleauthenticator{
-	background-image:url('images/imapauthenticator.png') !important;	
+.go-module-icon-imapauthenticator, .go-module-icon-imap .go-menu-icon-googleauthenticator{
+	background-image:url('images/icon.png') !important;
+    background-repeat: no-repeat;
 }
