@@ -1,3 +1,5 @@
+- Addressbook: Corrected foreign key of birthday portlet
+
 21-08-2023: 6.6.169
 - Leavedays: When requesting leave with special leavebudget, filter out the rejected ones
 - Core: fix deprecation message in split_name method
