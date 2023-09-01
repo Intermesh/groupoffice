@@ -1,3 +1,4 @@
-.go-module-icon-ldaputhenticator , .go-menu-icon-googleauthenticator{
-	background-image:url('images/ldapauthenticator.png') !important;	
+.go-module-icon-ldap {
+	background-image:url('images/icon.png') !important;
+    background-repeat: no-repeat;
 }
