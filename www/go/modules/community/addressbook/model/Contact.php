@@ -1116,11 +1116,12 @@ class Contact extends AclItemEntity {
 	 * Find a birthday, calculate diff in years
 	 *
 	 * @return int
+	 * @throws Exception
 	 */
 	public function getAge(): int
 	{
 		$bday = $this->getBirthday();
-		if($bday === '') {
+		if (empty($bday)) {
 			return 0;
 		}
 		$date = new DateTime($bday);
