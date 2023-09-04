@@ -6,6 +6,7 @@
 - Support: use own permissions when adding task lists.
 - Core: updated Swedish translations. Tack, Johan!
 - S/MIME: fix deprecation error
+- Core: Fix contact search in email
 
 14-08-2023: 6.7.43
 - Core: Added markdown filter to TemplateParser.php
