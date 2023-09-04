@@ -278,4 +278,5 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Din brevlåda är 
   'Group-Office has already been started. The e-mail composer is now loaded in Group-Office. Close this window and compose your message in Group-Office.' => '{product_name} har redan startats. E-posten laddas nu i {product_name}. Stäng det här fönstret och skriv ditt meddelande i {product_name}.',
   'Alias' => 'Alias',
   '<p>To set Group-Office as your default e-mail program please <a class="normal-link" href="http://www.Group-Office.com/wiki/E-mail#Set_Group-Office_as_your_default_e-mail_client" target="_blank">read the instructions</a>.</p><p>Then if you are using Windows you must download and run <a class="normal-link" href="{url}">this register file</a></p>' => '<p>För att ange {product_name} som ditt standard-program för e-post vänligen <a class="normal-link" href="http://www.{product_name}.com/wiki/E-mail#Set_{product_name}_as_your_default_e-mail_client" target="_blank">läs instruktionerna</a>.</p><p>Om du använder Windows måste du sedan ladda ner och köra <a class="normal-link" href="{url}">denna registerfil</a></p>',
+  'Contact' => 'Kontakt',
 );

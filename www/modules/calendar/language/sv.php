@@ -246,4 +246,5 @@ The following is the error message:
   'till' => 'till',
   'Total' => 'Total',
   'Tooltip text' => 'Tooltip text',
+  'Remove duplicates' => 'Radera dubletter',
 );

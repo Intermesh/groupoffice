@@ -4,6 +4,7 @@
 - Automation: Fixed sending emails
 - Core: Logout other sessions when you change password.
 - Support: use own permissions when adding task lists.
+- Core: updated Swedish translations. Tack, Johan!
 
 14-08-2023: 6.7.43
 - Core: Added markdown filter to TemplateParser.php
