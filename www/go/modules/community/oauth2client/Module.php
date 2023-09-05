@@ -68,6 +68,7 @@ class Module extends core\Module
 			echo '
 			this.addSignInButton({
 				xtype: "button",
+				width: "100%",
 				cls: "oauth2client-signin-btn",
 				iconCls: "oauth2client-login-'.$def->name.'",
 				text: t("Sign in with {name}").replace("{name}", "'.addslashes($client->name).'"),
