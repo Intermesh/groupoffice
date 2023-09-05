@@ -4,6 +4,9 @@
 - Automation: Fixed sending emails
 - Core: Logout other sessions when you change password.
 - Support: use own permissions when adding task lists.
+- Core: updated Swedish translations. Tack, Johan!
+- S/MIME: fix deprecation error
+- Core: Fix contact search in email
 
 14-08-2023: 6.7.43
 - Core: Added markdown filter to TemplateParser.php
@@ -62,7 +65,7 @@
 - Core: Improved notifications
 - Projects: Fixed display of project custom field
 - Support: remove you were assigned to alert when commenting
-- Billing: fixed status filter losing the setting when only status "None" was selected 
+- Billing: fixed status filter losing the setting when only status "None" was selected
 - Support/Task: change status to needs action when reassigning
 - Core: remove alerts when they are dismissed server side
 - Core: Hide personal groups when adding groups to popup reminders and announcements
@@ -223,6 +226,28 @@
 
 
 26-06-2023: 6.6.165
+- Addressbook: Corrected foreign key of birthday portlet
+
+21-08-2023: 6.6.169
+- Leavedays: When requesting leave with special leavebudget, filter out the rejected ones
+- Core: fix deprecation message in split_name method
+
+11-08-2023: 6.6.168
+- Leavedays: bugfix in retrieving special leave budget with registered hours.
+- Leavedays: Make special leave budget dialog more pronounced
+- Leavedays: Add special leave budget grid to panel
+- Leavedays: current year is irrelevant for special leave budgets
+
+20-07-2023: 6.6.167
+- Core: PWA installs as display = "standalone" as it works much better in iOS 16 now.
+- Files: Modified in past 7 days didn't work for admin
+- Email: fixed removing labels
+- Freebusypermissions: check if user ID exists before creating ACL
+
+14-07-2023: 6.6.166
+- Email: fixed error message on aborted request in e-mail (happens on double click on folder for example)
+
+26-05-2023: 6.6.165
  - Leavedays: Split 'hours' column into spent and budgeted special leave hours in year overview
  - Newsletters: shipping report will work for user entities without profile
 
