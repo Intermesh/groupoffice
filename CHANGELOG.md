@@ -1,3 +1,4 @@
+05-09-2023: 6.7.44
 - Support: add comments to required modules
 - Comments: Fix uninstall script
 - Core: Fixed creating custom filters for dates with relative date.
