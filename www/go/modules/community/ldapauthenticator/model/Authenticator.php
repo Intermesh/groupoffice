@@ -27,7 +27,8 @@ class Authenticator extends PrimaryAuthenticator {
 		return "ldap";
 	}
 
-	public static function isAvailableFor(string $username) : bool {
+	public static function isAvailableFor(string $username) : bool
+	{
 		
 		list($username, $domain) = self::splitUserName($username);
 		
@@ -63,7 +64,8 @@ class Authenticator extends PrimaryAuthenticator {
 	 * @throws Exception
 	 *
 	 */
-	public function authenticate($username, $password) {
+	public function authenticate(string $username, string $password): bool|User
+	{
 		
 		list($ldapUsername, $domain) = $this->splitUserName($username);
 
