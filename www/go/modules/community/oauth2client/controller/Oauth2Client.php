@@ -10,9 +10,10 @@ use go\core\model\User;
 use go\core\webclient\Extjs3;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model;
+use go\modules\community\oauth2client\provider\Azure;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use TheNetworg\OAuth2\Client\Provider\Azure;
+
 use TheNetworg\OAuth2\Client\Token\AccessToken;
 
 final class Oauth2Client extends EntityController
@@ -92,25 +93,22 @@ final class Oauth2Client extends EntityController
 			'code' => $_GET['code']
 		]);
 
-		// Mention Microsoft Graph scope when initializing the provider
-		$baseGraphUri = $provider->getRootMicrosoftGraphUri(null);
-		//$provider->scope = 'openid profile email ' . $baseGraphUri . '/User.Read';
-
-
-		$response = $provider->get($provider->getRootMicrosoftGraphUri($token) . '/oidc/userinfo', $token);
+		$userinfoEndPoint = $provider->getResourceOwnerDetailsUrl($token);
+		/*
+		 * eg.
+ * {
+"sub": "OLu859SGc2Sr9ZsqbkG-QbeLgJlb41KcdiPoLYNpSFA",
+"name": "Mikah Ollenburg", // all names require the “profile” scope.
+"family_name": " Ollenburg",
+"given_name": "Mikah",
+"picture": "https://graph.microsoft.com/v1.0/me/photo/$value",
+"email": "mikoll@contoso.com" // requires the “email” scope.
+}
+ */
+		$request  = $provider->getAuthenticatedRequest("GET", $userinfoEndPoint, $token);
+		$response = $provider->getParsedResponse($request);
 
 		$this->createUser($response, $token, $client);
-		/*
-		 * {
-    "sub": "OLu859SGc2Sr9ZsqbkG-QbeLgJlb41KcdiPoLYNpSFA",
-    "name": "Mikah Ollenburg", // all names require the “profile” scope.
-    "family_name": " Ollenburg",
-    "given_name": "Mikah",
-    "picture": "https://graph.microsoft.com/v1.0/me/photo/$value",
-    "email": "mikoll@contoso.com" // requires the “email” scope.
-}
-		 */
-
 	}
 
 	private function createUser(array $response, AccessTokenInterface $token, model\Oauth2Client $client) {

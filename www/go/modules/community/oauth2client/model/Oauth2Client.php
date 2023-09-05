@@ -7,7 +7,9 @@ use go\core\http\Exception;
 use go\core\jmap\Entity;
 use go\core\orm\Mapping;
 use go\modules\community\email\model\Account;
+use go\modules\community\oauth2client\provider\Azure;
 use League\OAuth2\Client\Provider\AbstractProvider;
+use League\OAuth2\Client\Provider\Google;
 
 final class Oauth2Client extends Entity
 {
@@ -78,7 +80,9 @@ final class Oauth2Client extends Entity
 			case 'Google':
 				$params['accessType'] = 'offline';
 				$params['scopes'] = $scopes ?? ['https://mail.google.com/'];
-				break;
+
+				return new Google($params);
+
 			case 'Azure':
 				// https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
 				// https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
@@ -92,13 +96,12 @@ final class Oauth2Client extends Entity
 					'https://outlook.office.com/SMTP.Send'
 				];
 				$params['defaultEndPointVersion'] = '2.0';
-				break;
+
+				return new Azure($params);
+
 			default:
 				throw new NotFound('Default client ' . $defaultClient->name . ' not supported');
 		}
-		$prvClsName = $prvVendorName . "\\OAuth2\\Client\\Provider\\" . ucfirst($defaultClient->name);
-
-		return new $prvClsName($params);
 
 	}
 

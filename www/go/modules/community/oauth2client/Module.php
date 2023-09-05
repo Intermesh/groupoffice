@@ -3,6 +3,7 @@
 namespace go\modules\community\oauth2client;
 
 use go\core;
+use GO\Core\Controller\CoreController;
 use go\core\exception\NotFound;
 use go\core\http\Exception;
 use go\core\orm\Property;
@@ -12,6 +13,8 @@ use GO\Email\Controller\MessageController;
 use GO\Email\Model\Account as ActiveRecordAccount;
 use GO\Email\Model\Alias;
 use go\modules\community\email\model\Account;
+use go\modules\community\oauth2client\controller\Oauth2Client;
+use go\modules\community\oauth2client\model\DefaultClient;
 use go\modules\community\oauth2client\model\Oauth2Account;
 
 /**
@@ -44,6 +47,40 @@ class Module extends core\Module
 
 		$m = new MessageController();
 		$m->addListener('beforesend', 'go\modules\community\oauth2client\Module', 'beforeSend');
+
+		go()->on(core\App::EVENT_HEAD, static::class, 'onHead');
+	}
+
+
+	public static function onHead() {
+		$clients = \go\modules\community\oauth2client\model\Oauth2Client::find()->where('openId', '=', true)->execute();
+		if(!count($clients)) {
+			return;
+		}
+		echo '<script>Ext.override(go.login.LoginDialog, {
+
+		initComponent: go.login.LoginDialog.prototype.initComponent.createSequence(function () {';
+
+		foreach($clients as $client) {
+
+			$def = DefaultClient::findById($client->defaultClientId);
+
+			echo '
+			this.addSignInButton({
+				xtype: "button",
+				cls: "oauth2client-signin-btn",
+				iconCls: "oauth2client-login-'.$def->name.'",
+				text: t("Sign in with {name}").replace("{name}", "'.addslashes($client->name).'"),
+				handler: function() {
+					document.location = BaseHref + \'go/modules/community/oauth2client/gauth.php/openid/'.$client->id.'\';
+				}
+			})
+';
+
+		}
+		echo '})
+	});</script>';
+
 	}
 
 	public function defineListeners()

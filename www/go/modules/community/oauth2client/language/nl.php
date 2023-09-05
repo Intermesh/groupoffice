@@ -15,5 +15,5 @@ return array(
 	'Client ID' => 'Client ID',
 	'Client Secret' => 'Client Secret',
 	'Project ID' => 'Project ID',
-	'' => ''
+	'Sign in with {name}' => 'Inloggen met {name}'
 );
