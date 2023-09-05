@@ -4,12 +4,11 @@ namespace go\core\oauth\server\responsetypes;
 
 use DateTimeImmutable;
 use go\core\oauth\server\requesttypes\AuthorizationRequest;
-//use Lcobucci\JWT\Encoding\ChainedFormatter;
-//use Lcobucci\JWT\Encoding\JoseEncoder;
-use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Encoding\ChainedFormatter;
+use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Key\LocalFileReference;
-//use Lcobucci\JWT\Token\Builder;
+use Lcobucci\JWT\Token\Builder;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
@@ -32,17 +31,13 @@ class IdTokenResponse extends BaseIdTokenResponse
      */
     protected function getBuilder(AccessTokenEntityInterface $accessToken, UserEntityInterface $userEntity)
     {
-				// for future version of open id connect server with php 8
-//		    $claimsFormatter = ChainedFormatter::withUnixTimestampDates();
-//		    $builder = new Builder(new JoseEncoder(), $claimsFormatter);
+	    $claimsFormatter = ChainedFormatter::withUnixTimestampDates();
+	    $builder = new Builder(new JoseEncoder(), $claimsFormatter);
 
-	    $builder = new Builder();
-
-	    // Since version 8.0 league/oauth2-server returns \DateTimeImmutable
 	    $expiresAt = $accessToken->getExpiryDateTime();
-	    if ($expiresAt instanceof \DateTime) {
-		    $expiresAt = DateTimeImmutable::createFromMutable($expiresAt);
-	    }
+//	    if ($expiresAt instanceof \DateTime) {
+//		    $expiresAt = DateTimeImmutable::createFromMutable($expiresAt);
+//	    }
 
 	    // Add required id_token claims
 	    return $builder

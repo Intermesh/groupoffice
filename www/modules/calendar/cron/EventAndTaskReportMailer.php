@@ -4,6 +4,8 @@
 namespace GO\Calendar\Cron;
 
 
+use go\core\mail\Attachment;
+
 class EventAndTaskReportMailer extends \GO\Base\Cron\AbstractCron {
 	
 	/**
@@ -97,7 +99,7 @@ class EventAndTaskReportMailer extends \GO\Base\Cron\AbstractCron {
 										->addTo($user->email);
 
 		$message->setHtmlAlternateBody(nl2br($body));
-		$message->attach(new \Swift_Attachment($pdf,$filename,'application/pdf'));
+		$message->attach(Attachment::fromString($pdf,$filename,'application/pdf'));
 		\GO::debug('CRON SEND MAIL TO: '.$user->email);
 		return \GO\Base\Mail\Mailer::newGoInstance()->send($message);
 	}

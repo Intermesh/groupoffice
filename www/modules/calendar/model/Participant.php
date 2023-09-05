@@ -452,57 +452,6 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 	}
 
 	
-//	private function _updateEvents(){
-//
-//		if(!$this->event) {
-//			return;
-//		}
-//		// Update mtime of all events (For each participant)
-//		$stmt = $this->event->getRelatedParticipantEvents(true);
-//		
-//		foreach($stmt as $event){
-//			$event->mtime = time();
-//			$event->save(true);
-//		}
-//	}
-	
-	
-//	private function _notifyOrganizer(){
-//
-////		if(!$sendingParticipant)
-////			throw new \Exception("Could not find your participant model");
-//
-//		$organizer = $this->event->getOrganizer();
-//		if(!$organizer)
-//			throw new \Exception("Could not find organizer to send message to!");
-//
-//		$updateReponses = \GO::t("updateReponses", "calendar");
-//		$subject= sprintf($updateReponses[$this->status], $this->user->name, $this->event->name);
-//
-//
-//		//create e-mail message
-//		$message = \GO\Base\Mail\Message::newInstance($subject)
-//							->setFrom($this->user->email, $this->user->name)
-//							->addTo($organizer->email, $organizer->name);
-//
-//		$body = '<p>'.$subject.': </p>'.$this->event->toHtml();
-//
-//		if(!$this->event->getOrganizerEvent()){
-//			//organizer is not a Group-Office user with event. We must send a message to him an ICS attachment
-//			$ics=$this->event->toICS("REPLY", $this, $this->notifyRecurrenceTime);				
-//			$a = \Swift_Attachment::newInstance($ics, \GO\Base\Fs\File::stripInvalidChars($this->event->name) . '.ics', 'text/calendar; METHOD="REPLY"');
-//			$a->setEncoder(new \Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-//			$a->setDisposition("inline");
-//			$message->attach($a);
-//		}
-//
-//		$message->setHtmlAlternateBody($body);
-//
-//		\GO\Base\Mail\Mailer::newGoInstance()->send($message);
-//		
-//	}
-	
-	
 	/**
 	 * Returns all participant models for this event and all the related events for a meeting.
 	 * 

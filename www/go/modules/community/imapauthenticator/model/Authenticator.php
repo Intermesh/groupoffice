@@ -14,7 +14,8 @@ class Authenticator extends PrimaryAuthenticator {
 		return "imap";
 	}
 
-	public static function isAvailableFor(string $username) :bool{
+	public static function isAvailableFor(string $username) : bool
+	{
 		return static::findServer($username) != false;
 	}
 	
@@ -38,7 +39,8 @@ class Authenticator extends PrimaryAuthenticator {
 						->single();
 	}
 	
-	public function authenticate($username, $password) {
+	public function authenticate(string $username, string $password): bool|User
+	{
 
 		$this->fireEvent('beforeauthenticate' , [$username]);
 

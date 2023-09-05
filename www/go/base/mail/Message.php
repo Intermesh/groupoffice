@@ -17,6 +17,8 @@ use GO\Base\Fs\Folder;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\mail\AddressList;
+use go\core\mail\Attachment;
 use go\core\webclient\Extjs3;
 
 
@@ -33,10 +35,7 @@ $cacheFolder->create();
  * @copyright Copyright Intermesh BV.
  */
 
-
-
-
-class Message extends \Swift_Message{
+class Message extends \go\core\mail\Message {
 	
 	private $_loadedBody;
 	
@@ -47,45 +46,11 @@ class Message extends \Swift_Message{
 	 */
 	private $_tmpDir = false;
 	
-	public function __construct($subject = null, $body = null, $contentType = null, $charset = null) {
-		parent::__construct($subject, $body, $contentType, $charset);
+	public function __construct($subject = "", $body = "", $contentType = 'text/plain') {
+		parent::__construct();
 
-    $headers = $this->getHeaders();
-    $headers->addTextHeader("X-Mailer", "Group-Office");
-
-		// See Mailer.php at line 105 for header encoding
-		if(GO::config()->swift_email_body_force_to_base64) {
-			//Override qupted-prinatble encdoding with base64 because it uses much less memory on larger bodies. See also:
-			//https://github.com/swiftmailer/swiftmailer/issues/356
-			$this->setEncoder(new \Swift_Mime_ContentEncoder_Base64ContentEncoder());
-		}
-	}
-	
-	public function setBody($body, $contentType = null, $charset = null) {
-		
-		$this->switchEncoder($body);		
-		
-		return parent::setBody($body, $contentType, $charset);
-	}
-	
-	private function switchEncoder($body) {
-		
-		if(GO::config()->swift_email_body_force_to_base64 || empty($body)) {
-			return;
-		}
-		
-		if(strlen($body) * 8 > 200 * 1024) {
-			//Override quoted-prinatble encdoding with base64 because it uses much less memory on larger bodies. See also:
-			//https://github.com/swiftmailer/swiftmailer/issues/356
-			$this->setEncoder(new \Swift_Mime_ContentEncoder_Base64ContentEncoder());
-		}
-	}
-	
-	public function addPart($body, $contentType = null, $charset = null) {
-		
-		$this->switchEncoder($body);
-		
-		return parent::addPart($body, $contentType, $charset);		
+		$this->setSubject($subject);
+		$this->setBody($body, $contentType);
 	}
 	
 	/**
@@ -105,10 +70,10 @@ class Message extends \Swift_Message{
    * @param StringHelper $charset
    * @return Message
    */
-  public static function newInstance($subject = null, $body = null,
-    $contentType = null, $charset = null)
+  public static function newInstance($subject = "", $body = "",
+    $contentType = 'text/plain')
   {
-    return new self($subject, $body, $contentType, $charset);
+    return new self($subject, $body, $contentType);
   }
 	
 	/**
@@ -141,45 +106,25 @@ class Message extends \Swift_Message{
 		$to = str_replace('mailto:','', $to);
 		$cc = str_replace('mailto:','', $cc);
 		$bcc = str_replace('mailto:','', $bcc);
-	
-		$toList = new EmailRecipients($to);
-		$to = $toList->getAddresses();
-		foreach($to as $email=>$personal){
-			try{
-				$this->addTo($email, $personal);
-			} catch (Exception $e){
-				\go\core\ErrorHandler::logException($e);
-			}
-		}
-		
-		$ccList = new EmailRecipients($cc);
-		$cc =$ccList->getAddresses();
-		foreach($cc as $email=>$personal){
-			try{
-				$this->addCc($email, $personal);
-			} catch (Exception $e){
-				\go\core\ErrorHandler::logException($e);
-			}
-		}
-		
-		$bccList = new EmailRecipients($bcc);
-		$bcc =$bccList->getAddresses();
-		foreach($bcc as $email=>$personal){
-			try{
-				$this->addBcc($email, $personal);
-			} catch (Exception $e){
-				\go\core\ErrorHandler::logException($e);
-			}
-		}
+
+		$toList = new AddressList($to);
+		$this->addTo(...$toList->toArray());
+
+		$ccList = new AddressList($cc);
+		$this->addCc(...$ccList->toArray());
+
+		$bccList = new AddressList($bcc);
+		$this->addBcc(...$bccList->toArray());
+
 
 		if(isset($structure->headers['from'])) {
 
-			$fromList = new EmailRecipients(str_replace('mailto:','',$structure->headers['from']));
-			$from =$fromList->getAddress();
+			$fromList = new AddressList(str_replace('mailto:','',$structure->headers['from']));
+			$from = $fromList[0];
 		
 			if($from){
 				try {
-					$this->setFrom($from['email'], $from['personal']);
+					$this->setFrom($from->getEmail(), $from->getName());
 				} catch(Exception $e)  {
 					\GO::debug('Failed to add from address: '.$e);
 				}
@@ -192,24 +137,23 @@ class Message extends \Swift_Message{
 		}
 
 		if(isset($structure->headers['in-reply-to'])) {
-			$headers = $this->getHeaders();
-			$headers->addTextHeader('In-Reply-To', $structure->headers['in-reply-to']);
+			$this->setInReplyTo(trim($structure->headers['in-reply-to'], '<>'));
 		}
 
-		if(isset($structure->headers['references'])) {
-			$headers = $this->getHeaders();
-			$headers->addTextHeader('References', $structure->headers['references']);
+		if(!empty($structure->headers['references'])) {
+			$refs = explode(" ", $structure->headers['references']);
+			$refs = array_map(function($ref) {
+				return trim($ref, '<>');
+			}, $refs);
+
+			$this->setReferences(...$refs);
 		}
 		
 		$this->_getParts($structure);
 		
-		if($replaceCallback){			
-				
-			
+		if($replaceCallback){
 			$bodyStart = strpos($this->_loadedBody, '<body');
-			
-			if($bodyStart){		  
-			
+			if($bodyStart){
 			  $body = substr($this->_loadedBody, $bodyStart);
 			  array_unshift($replaceCallbackArgs, $body);
 			  $body = call_user_func_array($replaceCallback, $replaceCallbackArgs);
@@ -232,9 +176,7 @@ class Message extends \Swift_Message{
 
 			$this->setDate($udate);
 		}
-		
-		
-		
+
 		$this->setHtmlAlternateBody($this->_loadedBody);
 		
 		return $this;
@@ -247,45 +189,25 @@ class Message extends \Swift_Message{
 	 * @return Message
 	 */
 	public function setHtmlAlternateBody($htmlBody){
+
+		if(empty($htmlBody)) {
+			return "";
+		}
 	
 		//add body
 		$htmlBody = \GO\Base\Util\StringHelper::normalizeCrlf($htmlBody);
 		$htmlBody = str_replace("\r\n\r\n", "\r\n", $htmlBody);
 		
-		$this->setBody($htmlBody, 'text/html','UTF-8');
+		$this->setBody($htmlBody, 'text/html');
 			
 		//add text version of the HTML body
 		$htmlToText = new \GO\Base\Util\Html2Text(str_replace('<div><br></div>', '<br>', $htmlBody));
 		$plainText = $htmlToText->get_text();
-		$part= $this->addPart($plainText, 'text/plain','UTF-8');
-		
-		
-		//Override qupted-prinatble encdoding with base64 because it uses much less memory on larger bodies. See also:
-		//https://github.com/swiftmailer/swiftmailer/issues/356
-		if(GO::config()->swift_email_body_force_to_base64) {
-			$part->setEncoder(new \Swift_Mime_ContentEncoder_Base64ContentEncoder());
-		}
-		
+		$this->setAlternateBody($plainText);
+
 		return $this;
 	}
-	
-	/**
-	 * 
-	 * @return \Swift_MimePart
-	 */
-	public function findPlainTextBody(){
-		
-		//the body was already set so find the text version and replace it.
-		$children = (array) $this->getChildren();
-		foreach($children as $child){
 
-			if($child->getContentType()=='text/plain'){
-				return $child;
-			}					
-		}
-		return false;
-	}
-	
 	/**
 	 * Try to convert the encoding of the email to UTF-8
 	 * 
@@ -308,7 +230,7 @@ class Message extends \Swift_Message{
 	
 	private function _getParts($structure, $part_number_prefix='')
 	{
-		// Apple sends contentID's that SwiftMailer doesn't like. So we replace them with new onces but we have to replace
+		// Apple sends contentID's that don't comply. So we replace them with new onces but we have to replace
 		// this in the body too.
 
 		$cidReplacements = [];
@@ -370,10 +292,9 @@ class Message extends \Swift_Message{
 					$mime_type = $this->buildContentType($part);
 
           //only embed if we can find the content-id in the body
-					if(isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && strpos($this->_loadedBody, $content_id) !== false)
+					if(isset($this->_loadedBody) && isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && strpos($this->_loadedBody, $content_id) !== false)
 					{
-						$img = new \Swift_EmbeddedFile($part->body, $filename, $mime_type);
-						$img->setContentType($mime_type);
+						$img = Attachment::fromString ($part->body, $filename, $mime_type);
 
 						//Only set valid ID's. Iphone sends invalid content ID's sometimes.
 						if (preg_match('/^.+@.+$/D',$content_id))
@@ -387,7 +308,7 @@ class Message extends \Swift_Message{
 
 					}else
 					{
-						$attachment = new \Swift_Attachment($part->body, $filename,$mime_type);
+						$attachment = Attachment::fromString ($part->body, $filename,$mime_type);
 						$this->attach($attachment);
 					}
 				}
@@ -419,7 +340,8 @@ class Message extends \Swift_Message{
 		}
 	}
 
-	private function buildContentType($part) {
+	private function buildContentType($part): string
+	{
 		$mime_type = $part->ctype_primary.'/'.$part->ctype_secondary;
 		if(!empty($part->ctype_parameters)) {
 			foreach ($part->ctype_parameters as $name => $value) {
@@ -433,7 +355,8 @@ class Message extends \Swift_Message{
 		return $mime_type;
 	}
 	
-	private function _hasHtmlPart($structure){
+	private function _hasHtmlPart($structure): bool
+	{
 		if(isset($structure->parts)){
 			foreach($structure->parts as $part){
 				if($part->ctype_primary == 'text' && $part->ctype_secondary=='html')
@@ -452,10 +375,9 @@ class Message extends \Swift_Message{
 	 * 
 	 * In outgoing messages we don't want them so we make them absolute again.
 	 * 
-	 * @param StringHelper $body
-	 * @return type 
+	 * @param string $body
 	 */
-	private function _fixRelativeUrls($body){		
+	private function _fixRelativeUrls(string $body) : string{
 		return str_replace('href="?r=','href="'.\GO::config()->full_url, $body);
 	}
 	
@@ -466,23 +388,22 @@ class Message extends \Swift_Message{
 		foreach($allMatches as $matches){
 			if($matches[2]=='base64'){
 				$extension = $matches[1];
-				$img = new \Swift_EmbeddedFile(base64_decode($matches[3]), uniqid() . '.'. $extension);
+				$img = Attachment::fromString(base64_decode($matches[3]), uniqid() . '.'. $extension);
 				$contentId = $this->embed($img);
 
 				$body = str_replace($matches[0],'src="'.$contentId, $body);
 			}
 		}
 		
-		$blobIds = \go\core\fs\Blob::parseFromHtml($body);
+		$blobIds = Blob::parseFromHtml($body);
 		foreach($blobIds as $blobId) {
-			$blob = \go\core\fs\Blob::findById($blobId);
+			$blob = Blob::findById($blobId);
 			
 			if($blob) {
-				$img = \Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
-				$img->setContentType($blob->type);
-				$img->setFilename($blob->name);
+				$img = Attachment::fromBlob($blob);
+
 				$contentId = $this->embed($img);
-				$body = \go\core\fs\Blob::replaceSrcInHtml($body, $blobId, $contentId);
+				$body = Blob::replaceSrcInHtml($body, $blobId, $contentId);
 			}
 		}
 		
@@ -494,11 +415,13 @@ class Message extends \Swift_Message{
 	 * 
 	 * @return boolean 
 	 */
-	public function hasRecipients(){
+	public function hasRecipients(): bool
+	{
 		return $this->countRecipients() > 0;
 	}
 	
-	public function countRecipients(){
+	public function countRecipients(): int
+	{
 		return count($this->getTo() ?? []) + count($this->getCc() ?? []) + count($this->getBcc() ?? []);
 	}
 	
@@ -510,29 +433,26 @@ class Message extends \Swift_Message{
 	 * and inline (image) attachments from the client in the message, which can
 	 * then be used for storage in the database or sending emails.
 	 * 
-	 * @param Array $params Must contain elements: body (string) and
+	 * @param array $params Must contain elements: body (string) and
 	 * 
 	 * inlineAttachments (string).
 	 */
-	public function handleEmailFormInput($params){
+	public function handleEmailFormInput(array $params){
 		
 		if(!empty($params['subject']))
 			$this->setSubject($params['subject']);		
 		
 		if(!empty($params['to'])){		
-			$to = new EmailRecipients($params['to']);
-			foreach($to->getAddresses() as $email=>$personal)
-				$this->addTo($email,$personal);
+			$to = new AddressList($params['to']);
+			$this->addTo(...$to->toArray());
 		}
-		if(!empty($params['cc'])){		
-			$cc = new EmailRecipients($params['cc']);
-			foreach($cc->getAddresses() as $email=>$personal)
-				$this->addCc($email,$personal);
+		if(!empty($params['cc'])){
+			$to = new AddressList($params['cc']);
+			$this->addTo(...$to->toArray());
 		}
-		if(!empty($params['bcc'])){		
-			$bcc = new EmailRecipients($params['bcc']);
-			foreach($bcc->getAddresses() as $email=>$personal)
-				$this->addBcc($email,$personal);
+		if(!empty($params['bcc'])){
+			$to = new AddressList($params['bcc']);
+			$this->addTo(...$to->toArray());
 		}
 		
 		if(isset($params['alias_id'])){
@@ -548,13 +468,11 @@ class Message extends \Swift_Message{
 		
 		
 		if(isset($params['in_reply_to'])){
-			$headers = $this->getHeaders();
-			$headers->addTextHeader('In-Reply-To', "<" . $params['in_reply_to'] . ">");
-			$headers->addTextHeader('References', "<" .$params['in_reply_to'] . ">");
+			$this->setInReplyTo($params['in_reply_to']);
+			$this->setReferences($params['in_reply_to']);
 		}	
 
 		if($params['content_type']=='html'){
-			
 						
 			$params['htmlbody'] = $this->_embedPastedImages($params['htmlbody']);
 			
@@ -590,7 +508,7 @@ class Message extends \Swift_Message{
 						//$filename = rawurlencode($tmpFile->name());
 						$result = preg_match('/="([^"]*'.preg_quote($ia->token).'[^"]*)"/',$params['htmlbody'],$matches);
 						if($result){
-							$img = \Swift_EmbeddedFile::fromPath($tmpFile->path());
+							$img = Attachment::fromPath($tmpFile->path());
 							$img->setContentType($tmpFile->mimeType());
 							$contentId = $this->embed($img);
 
@@ -636,15 +554,9 @@ class Message extends \Swift_Message{
 				}
 				$tmpFile = new \GO\Base\Fs\File($path);
 				if ($tmpFile->exists()) {
-					$file = \Swift_Attachment::fromPath($tmpFile->path());
-					$file->setContentType($tmpFile->mimeType());
+					$file = Attachment::fromPath($tmpFile->path());
 					$file->setFilename($att->fileName);
-					if($tmpFile->mimeType() == "message/rfc822") {
-						$file->setEncoder(new \Swift_Mime_ContentEncoder_NullContentEncoder("8bit"));
-					}
 					$this->attach($file);
-					
-					//$tmpFile->delete();
 				}else
 				{
 					throw new \Exception("Error: attachment missing on server: ".$tmpFile->stripTempPath().".\n\nThe temporary files folder is cleared on each login. Did you relogin?");
@@ -652,5 +564,11 @@ class Message extends \Swift_Message{
 			}
 		}
 	}
-	
+
+
+	public function addFrom(string $address, ?string $name = null): \go\core\mail\Message
+	{
+		return \go\core\mail\Message::setFrom($address, $name); // TODO: Change the autogenerated stub
+	}
+
 }

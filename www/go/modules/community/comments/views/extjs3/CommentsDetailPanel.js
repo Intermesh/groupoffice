@@ -412,15 +412,16 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 		Promise.all(imagePromises).then((imgs) => {
 
-			// we will clear the memory on the next load or reset.
-			this.lastImages = this.lastImages.concat(...imgs);
+			setTimeout(() => {
+				// we will clear the memory on the next load or reset.
+				this.lastImages = this.lastImages.concat(...imgs);
+				const dom = this.commentsContainer.getEl().dom;
+				dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
 
-			const dom = this.commentsContainer.getEl().dom;
-			dom.scrollTop = this.curScrollPos + (dom.scrollHeight - this.curScrollHeight);
-
-			if (this.large) {
-				this.scrollToTopButton.getEl().scrollIntoView(this.ownerCt.body);
-			}
+				if (this.large) {
+					this.scrollToTopButton.getEl().scrollIntoView(this.ownerCt.body);
+				}
+			}, 100);// somehow it only works with this timeout :(
 		});
 
 	}

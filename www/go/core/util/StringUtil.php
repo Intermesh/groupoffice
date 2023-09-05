@@ -487,7 +487,7 @@ END;
 	 */
 	public static function isUtf8(string $str): bool
 	{
-		return strlen($str) != strlen(utf8_decode($str));
+		return strlen($str) != mb_strlen($str);
 	}
 
   /**

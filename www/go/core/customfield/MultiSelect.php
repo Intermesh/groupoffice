@@ -14,7 +14,7 @@ use go\core\orm\Query;
 
 class MultiSelect extends Select {
 	
-	private $optionsToSave;
+	protected $optionsToSave;
 	
 	protected function getFieldSQL() {
 		return false;

@@ -2,6 +2,7 @@
 
 namespace go\core\auth;
 
+use Exception;
 use go\core\model\User;
 
 abstract class PrimaryAuthenticator extends BaseAuthenticator {
@@ -12,9 +13,10 @@ abstract class PrimaryAuthenticator extends BaseAuthenticator {
 	 * @param string $username
 	 * @param string $password
 	 * 
-	 * @return User|boolean
+	 * @return boolean|User
 	 */
-	public function authenticate($username, $password) {
+	public function authenticate(string $username, string $password): bool|User
+	{
 		return false;
 	}
 	

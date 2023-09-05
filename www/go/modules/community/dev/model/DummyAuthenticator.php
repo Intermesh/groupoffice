@@ -17,7 +17,8 @@ class DummyAuthenticator extends SecondaryAuthenticator {
 		return "dummy";
 	}
 
-	public static function isAvailableFor(string $username) :bool{
+	public static function isAvailableFor(string $username) : bool
+	{
 		return true;
 	}
 

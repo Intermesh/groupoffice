@@ -3,30 +3,32 @@
 namespace go\core\mail;
 
 use ArrayAccess;
-use Exception;
-use go\core\imap\Utils;
-use go\core\util\StringUtil;
-use go\core\validate\ValidateEmail;
 use Countable;
+use Exception;
+use go\core\util\StringUtil;
 
 /**
- * A list of e-mail recipients
+ * A list of e-mail addresses
  * 
  * example:
  * 
  * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com>
- * 
+ *
+ * @copyright Intermesh BV
+ * @author Merijn Schering <mschering@intermesh.nl>
  */
-class RecipientList implements ArrayAccess, Countable {
+class AddressList implements ArrayAccess, Countable {
 
 	/**
-	 * Pass a e-mail string like:
-	 * 
-	 * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com>
+	 * Pass an e-mail string like:
 	 *
-	 * @param string $emailRecipientList 
+	 * "Merijn Schering" <mschering@intermesh.nl>, someone@somedomain.com, Pete <pete@pete.com>
+	 *
+	 * @param string $emailRecipientList
+	 * @param bool $strict Throw exception if an invalid e-mail address was found
+	 * @throws Exception
 	 */
-	public function __construct($emailRecipientList = '', $strict = false) {
+	public function __construct(string $emailRecipientList = '', bool $strict = false) {
 		$this->strict = $strict;
 		$this->addString($emailRecipientList);
 	}
@@ -43,11 +45,9 @@ class RecipientList implements ArrayAccess, Countable {
 	 * @param string $email
 	 * @return int|false index of the array
 	 */
-	public function hasRecipient($email) {
-//		return isset($this->_addresses[$email]);
-
-		for ($i = 0, $c = count($this->recipients); $i < $c; $i++) {
-			if ($this->recipients[$i]->getEmail() == $email) {
+	public function hasAddress(string $email) {
+		for ($i = 0, $c = count($this->addresses); $i < $c; $i++) {
+			if ($this->addresses[$i]->getEmail() == $email) {
 				return $i;
 			}
 		}
@@ -60,18 +60,18 @@ class RecipientList implements ArrayAccess, Countable {
 	 * 
 	 * @param string $email 
 	 */
-	public function removeRecipient($email) {
+	public function remove(string $email) {
 
-		$index = $this->hasRecipient($email);
+		$index = $this->hasAddress($email);
 
 		if ($index !== false) {
-			unset($this->recipients[$index]);
+			unset($this->addresses[$index]);
 		}
 	}
 
 	public function __toString() {
 		$str = '';
-		foreach ($this->recipients as $recipient) {
+		foreach ($this->addresses as $recipient) {
 			$str .= $recipient . ', ';
 		}
 		return rtrim($str, ', ');
@@ -82,10 +82,11 @@ class RecipientList implements ArrayAccess, Countable {
 	 * 
 	 * $a[] = '"John Doe" <john@domain.com>';
 	 * 
-	 * @return Recipient[]
+	 * @return Address[]
 	 */
-	public function toArray() {
-		return $this->recipients;
+	public function toArray(): array
+	{
+		return $this->addresses;
 	}
 
 	/**
@@ -94,7 +95,7 @@ class RecipientList implements ArrayAccess, Countable {
 	 * @var     array
 	 * @access  private
 	 */
-	private $recipients = array();
+	private $addresses = [];
 
 	/**
 	 * Temporary storage of personal info of an e-mail address
@@ -102,7 +103,7 @@ class RecipientList implements ArrayAccess, Countable {
 	 * @var     StringUtil
 	 * @access  private
 	 */
-	private $personal = null;
+	private $name = null;
 
 	/**
 	 * Temporary storage
@@ -121,44 +122,42 @@ class RecipientList implements ArrayAccess, Countable {
 	private $inQuotedString = false;
 
 	/**
-	 * Bool to check if we found an e-mail address
+	 * Add single address
 	 *
-	 * @var     bool
-	 * @access  private
+	 * @param Address $address
+	 * @return $this
 	 */
-	private $emailFound = false;
+	public function add(Address $address): AddressList
+	{
+		$this->addresses[] = $address;
+		return $this;
+	}
 
 	/**
 	 * Pass a e-mail string like:
-	 * 
+	 *
 	 * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com
-	 * 
-	 * @param string $emailRecipientList 
+	 *
+	 * @param string $addressStr
+	 * @return AddressList
+	 * @throws Exception
 	 */
-	public function addString($recipientListString) {
-		//initiate addresses array
-		//$this->_addresses = array();
+	public function addString(string $addressStr): AddressList
+	{
+		$addressStr = trim($addressStr, ',; ');
 
-		$recipientListString = trim($recipientListString, ',; ');
-
-
-
-		for ($i = 0; $i < strlen($recipientListString); $i++) {
-			$char = $recipientListString[$i];
+		for ($i = 0; $i < strlen($addressStr); $i++) {
+			$char = $addressStr[$i];
 
 			switch ($char) {
+				case "'":
 				case '"':
 					$this->handleQuote($char);
 					break;
 
-				case "'":
-					$this->handleQuote($char);
-					break;
-
 				case '<':
-					$this->personal = trim($this->buffer);
+					$this->name = trim($this->buffer);
 					$this->buffer = '';
-					$this->emailFound = true;
 					break;
 
 				case '>':
@@ -168,19 +167,9 @@ class RecipientList implements ArrayAccess, Countable {
 					}
 					break;
 
-//				case ' ':
-//					if($this->_inQuotedString){
-//						$this->_buffer .= $char;
-//					}else
-//					{
-//						$this->_addBuffer();
-//					}
-//						
-//					break;
-
 				case ',':
 				case ';':
-					if ($this->inQuotedString) {// || (!$this->strict && !$this->_emailFound && !ValidateEmail::check(trim($this->_buffer)))) {
+					if ($this->inQuotedString) {
 						$this->buffer .= $char;
 					} else {
 						$this->addBuffer();
@@ -195,7 +184,7 @@ class RecipientList implements ArrayAccess, Countable {
 		}
 		$this->addBuffer();
 
-		return $this->recipients;
+		return $this;
 	}
 
 	/**
@@ -203,10 +192,12 @@ class RecipientList implements ArrayAccess, Countable {
 	 *
 	 * @access private
 	 * @return void
+	 * @throws Exception
 	 */
-	private function addBuffer() {
+	private function addBuffer(): void
+	{
 		$this->buffer = trim($this->buffer);
-		if (!empty($this->personal) && empty($this->buffer)) {
+		if (!empty($this->name) && empty($this->buffer)) {
 			$this->buffer = 'noaddress';
 		}
 
@@ -214,22 +205,23 @@ class RecipientList implements ArrayAccess, Countable {
 			if ($this->strict && !Util::validateEmail($this->buffer)) {
 				throw new Exception("Address " . $this->buffer . " is not valid");
 			} else {
-				$this->recipients[] = new Recipient($this->buffer, Utils::mimeHeaderDecode($this->personal));
+				$this->addresses[] = new Address($this->buffer, isset($this->name) ? Util::mimeHeaderDecode($this->name) : null);
 			}
 		}
 		$this->buffer = '';
-		$this->personal = null;
-		$this->emailFound = false;
+		$this->name = null;
 		$this->inQuotedString = false;
 	}
 
 	/**
-	 * Hanldes a quote character (' or ")
+	 * Handles a quote character (' or ")
 	 *
 	 * @access private
+	 * @param $char
 	 * @return void
 	 */
-	private function handleQuote($char) {
+	private function handleQuote($char): void
+	{
 		if (!$this->inQuotedString && trim($this->buffer) == "") {
 			$this->inQuotedString = $char;
 		} elseif ($char == $this->inQuotedString) {
@@ -238,46 +230,43 @@ class RecipientList implements ArrayAccess, Countable {
 			$this->buffer .= $char;
 		}
 	}
-
-//	/**
-//	 * Merge two address strings
-//	 * 
-//	 * @param RecipientList $recipients
-//	 * @return RecipientList 
-//	 */
-//	public function mergeWith(RecipientList $recipients) {
-//		$this->_addresses = array_merge($this->_addresses, $recipients->getAddresses());
-//
-//		return $this;
-//	}
-
 	public function offsetExists($offset): bool
 	{
-		return array_key_exists($offset, $this->recipients);
+		return array_key_exists($offset, $this->addresses);
 	}
 
+	/**
+	 * @param $offset
+	 * @return Address
+	 */
 	#[\ReturnTypeWillChange]
 	public function offsetGet($offset) {
-		return $this->recipients[$offset];
+		return $this->addresses[$offset];
 	}
 
+	/**
+	 * @param int $offset
+	 * @param Address $value
+	 * @return void
+	 * @throws Exception
+	 */
 	public function offsetSet($offset, $value) : void{
 
 		if (!is_string($value)) {
 			return;
 		}
 
-		$recipients = new RecipientList($value);
+		$recipients = new AddressList($value);
 
-		$this->recipients[$offset] = $recipients[0];
+		$this->addresses[$offset] = $recipients[0];
 	}
 
 	public function offsetUnset($offset) : void {
-		unset($this->recipients[$offset]);
+		unset($this->addresses[$offset]);
 	}
 
 	public function count() : int
 	{
-		return count($this->recipients);
+		return count($this->addresses);
 	}
 }

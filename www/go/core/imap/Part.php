@@ -3,6 +3,7 @@
 namespace go\core\imap;
 
 use go\core\data\Model;
+use go\core\mail\Util;
 
 /**
  * Abstract Part class
@@ -145,13 +146,13 @@ abstract class Part extends Model {
 			
 			
 			if($dispositionType && !empty($this->disposition[$dispositionType]['filename'])){
-				$decoded = Utils::mimeHeaderDecode($this->disposition[$dispositionType]['filename']);
+				$decoded = Util::mimeHeaderDecode($this->disposition[$dispositionType]['filename']);
 				return $decoded;
 			}
 		} 
 			
 		if(!empty($this->params['name'])){
-			return Utils::mimeHeaderDecode($this->params['name']);
+			return Util::mimeHeaderDecode($this->params['name']);
 		}
 //		We had mails that had content description
 //		else if(isset($this->description)){

@@ -686,33 +686,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 
 	#email variables
-	/**
-	 * The E-mail mailer type to use. Valid options are: smtp, qmail, sendmail, mail
-	 *
-	 * @var     int
-	 * @access  public
-	 */
-
-
-	/**
-	 * The Swift mailer component auto detects the domain you are connecting from.
-	 * In some cases it fails and uses an invalid IPv6 IP like ::1. You can
-	 * override it here.
-	 *
-	 * @var     string
-	 * @access  public
-	 */
-	var $smtp_local_domain = '';
-
-
-	/**
-	 * A special Swift preference to escape dots. For some buggy SMTP servers this
-	 * is necessary.
-	 *
-	 * @var boolean
-	 */
-	var $swift_qp_dot_escape=false;
-
 
 	/**
 	 * Set to true to prevent users from changing their e-mail aliases in the email module.
@@ -1286,18 +1259,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 */
 	public $use_single_login = false;
 	
-	
-	/**
-	 * This set the swift email body to base64
-	 * 
-	 * //Override qupted-prinatble encdoding with base64 because it uses much less memory on larger bodies. See also:
-	 * //https://github.com/swiftmailer/swiftmailer/issues/356
-	 * 
-	 * @var bool 
-	 */
-	public $swift_email_body_force_to_base64 = false;
-	
-	
 	/**
 	 * Will link the event to every participants except for the organizer
 	 * 
@@ -1345,8 +1306,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 			$var =  $this->{"get" . $name}();
 			return isset($var);
 		}
-		
-		return false;
+
+		return isset($this->dyn[$name]);
 	}
 	
 	private function getGlobalConfig() {

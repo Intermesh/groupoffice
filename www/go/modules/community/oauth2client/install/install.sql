@@ -4,8 +4,12 @@ CREATE TABLE IF NOT EXISTS `oauth2client_oauth2client` (
     `defaultClientId` INT(11) UNSIGNED DEFAULT NULL,
     `clientId` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
     `clientSecret` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `projectId` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
+    `projectId` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+    openId bool default false
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+create index oauth2client_oauth2client_openId_index
+    on oauth2client_oauth2client (openId);
 
 ALTER TABLE `oauth2client_oauth2client`
     ADD KEY `defaultClientId` (`defaultClientId`);

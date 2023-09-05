@@ -12,14 +12,14 @@ use go\core\data\Model;
  * "Personal" <email@address.com>
  * 
  */
-class Recipient extends Model {
+class Address extends Model {
 
 	private $email;
-	private $personal;
+	private $name;
 
-	public function __construct($email, $personal = null) {
+	public function __construct(string $email, ?string $name = null) {
 		$this->email = $email;
-		$this->personal = $personal;
+		$this->name = $name;
 	}
 
 	/**
@@ -27,22 +27,24 @@ class Recipient extends Model {
 	 * 
 	 * @param string
 	 */
-	public function getEmail() {
+	public function getEmail(): string
+	{
 		return $this->email;
 	}
 
 	/**
 	 * Get personal name
-	 * 
-	 * @param string
+	 *
+	 * @return string|null
 	 */
-	public function getPersonal() {
-		return $this->personal;
+	public function getName(): ?string
+	{
+		return $this->name;
 	}
 
 	public function __toString() {
-		if (!empty($this->personal)) {
-			return '"' . $this->personal . '" <' . $this->email . '>';
+		if (!empty($this->name)) {
+			return '"' . $this->name . '" <' . $this->email . '>';
 		} else {
 			return $this->email;
 		}

@@ -2,7 +2,12 @@
 
 namespace GO\Base\Mail;
 
+use go\core\mail\AddressList;
 
+/**
+ * Use {@see AddressList} instead
+ * @deprecated
+ */
 class EmailRecipients{
 	/**
 	 * Pass a e-mail string like:
