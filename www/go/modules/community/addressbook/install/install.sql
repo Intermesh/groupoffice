@@ -225,7 +225,7 @@ ALTER TABLE `addressbook_contact` ADD INDEX(`lastName`);
 ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`);
 
 CREATE TABLE IF NOT EXISTS `addressbook_portlet_birthday` (
-    `userId` int(11) NOT NULL, `addressBookId` int(11) unsigned NOT NULL, PRIMARY KEY (`userId`, `addressBookId`) )
+    `userId` int(11) NOT NULL, `addressBookId` int(11) NOT NULL, PRIMARY KEY (`userId`, `addressBookId`) )
     ENGINE=InnoDB;
 
 ALTER TABLE `addressbook_portlet_birthday`
