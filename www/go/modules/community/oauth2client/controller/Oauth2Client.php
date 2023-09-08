@@ -244,6 +244,8 @@ final class Oauth2Client extends EntityController
 		// If we don't have an authorization code then get one
 		$authUrl = $provider->getAuthorizationUrl();
 
+		//todo, perhaps add login_hint=username to url here?
+
 		$_SESSION['oauth2state'] = $provider->getState();
 		\GO::session()->closeWriting();
 		$r = \go\core\http\Response::get();
