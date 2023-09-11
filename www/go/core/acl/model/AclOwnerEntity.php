@@ -138,16 +138,6 @@ abstract class AclOwnerEntity extends AclEntity {
 		$records = $changes->select($tableAlias.'.id as entityId, '.$tableAlias.'.aclId, "1" as destroyed');
 		return static::entityType()->changes($records);
 	}
-	
-	protected static function internalDelete(Query $query): bool
-	{
-		if(!parent::internalDelete($query)) {
-			return false;
-		}
-		
-		return true;
-	}
-
 
 	/**
 	 * Get the permission level of the current user
