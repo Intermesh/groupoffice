@@ -471,15 +471,10 @@ class Contact extends AclItemEntity {
 											$criteria->andWhere('isOrganization', '=', (bool) $value);
 										})
 										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
-//
-//											if(!$query->isJoined('addressbook_email_address', 'e')) {
-//												$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
-//													->groupBy(['c.id']);
-//											}
-
 											$criteria->andWhere('c.id in (select contactId from addressbook_email_address)');
-
-//											$criteria->andWhere('e.email', $value ? 'IS NOT' : 'IS', null);
+										})
+										->add("hasPhoneNumbers", function(Criteria $criteria, $value, Query $query) {
+											$criteria->andWhere('c.id in (select contactId from addressbook_phone_number)');
 										})
 
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
