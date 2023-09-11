@@ -289,6 +289,21 @@ go.Modules.register("community", "addressbook", {
 					}
 				]
 			}, {
+				title: t("Has phone numbers"),
+				name: 'hasPhoneNumbers',
+				multiple: false,
+				type: 'select',
+				options: [
+					{
+						value: true,
+						title: t("Yes")
+					},
+					{
+						value: false,
+						title: t("No")
+					}
+				]
+			}, {
 				title: t("VAT number"),
 				name: 'vatNo',
 				type:"text",
