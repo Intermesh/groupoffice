@@ -125,10 +125,30 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 	getName : function() {
 		return this.name;
 	},
+
+
+	_setStaticDate(operator, date) {
+		this.dateField.setValue(date);
+
+		this.operatorCombo.setValue(operator);
+		this.valueField.setVisible(false);
+		this.periodCombo.setVisible(false);
+		this.dateField.setVisible(true);
+		this.doLayout();
+	},
 	
 	setValue: function (v) {
+
+		console.warn(v);
+
+		if(v == null) {
+			this._setStaticDate("equals", null);
+			return;
+		}
+
 		v = v + "";
 
+		// check if the value is a static date. eg. > 2023-09-11
 		var regex = /([>< ]+)?([0-9]{4}-[0-9]{2}-[0-9]{2})/;
 		var matches = v.match(regex);
 
@@ -147,16 +167,13 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 					operator = 'equals';
 			}
 
-			this.dateField.setValue(matches[2]);
-
-			this.operatorCombo.setValue(operator);
-			this.valueField.setVisible(false);
-			this.periodCombo.setVisible(false);
-			this.dateField.setVisible(true);
-			this.doLayout();
+			this._setStaticDate(operator, matches[2]);
 
 			return;
 		}
+
+
+		// if we get here it's a date relative to today.
 
 		var regex = /([><]+) ([\-0-9]+) (days|months|years)/,
 			operator = 'before', period = 'days', number = 0;
