@@ -1234,14 +1234,13 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 			$findParams->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'LEFT');
 
-
-			$findParams->mergeWith($aclWhereCriteria);
+			$findParams->getCriteria()->mergeWith($aclWhereCriteria);
 
 			if (!$noGrouping)
 				$findParams->group(array('t.id'));
 		}
 
-			return Folder::model()->find($findParams);
+		return Folder::model()->find($findParams);
 	}
 	
 	/**
