@@ -6,7 +6,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	modal: false,
 	stateId: 'communityTasksTaskDialog',
 	role: "list",
-	support: null,
 	redirectOnSave: false,
 	collapsible: true,
 
@@ -20,7 +19,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 
 
-		if(!this.currentId && this.support) {
+		if(!this.currentId && this.role == "support") {
 			this.commentComposer.show();
 			this.descriptionFieldset.hide();
 
