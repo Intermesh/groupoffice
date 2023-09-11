@@ -1,5 +1,6 @@
 - Core: Custom date filter equals null didn't load in dialog properly
 - Addressbook: Added 'hasPhoneNumbers' custom filter
+- Files: Not all folders were listed as admin
 
 05-09-2023: 6.7.45
 - Addressbook: Some upgrade queries were missing
