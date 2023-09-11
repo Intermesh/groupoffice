@@ -378,9 +378,14 @@ class Filters {
 	/**
 	 * @throws Exception
 	 */
-	private function checkRange($value) {
+	private function checkRange($value): bool|array
+	{
 		//Operators >, <, =, !=,
 		//Range ..
+
+		if($value == null) {
+			return false;
+		}
 		
 		$parts = array_map('trim', explode('..', $value));
 		if(count($parts) > 2) {
@@ -398,9 +403,13 @@ class Filters {
 	/**
 	 * @throws Exception
 	 */
-	private function checkDateRange($value, bool $convertTimezone = true) {
+	private function checkDateRange(?string $value, bool $convertTimezone = true): array|false{
 		//Operators >, <, =, !=,
 		//Range ..
+
+		if($value == null) {
+			return false;
+		}
 
 		$parts = array_map('trim', explode('..', $value));
 		if(count($parts) > 2) {
