@@ -784,6 +784,10 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 			$currentVersion = go()->getVersion();
 			foreach ($releases as $release) {
 
+				if($release->prerelease) {
+					continue;
+				}
+
 				$version = substr($release->tag_name, 1);
 				if (version_compare($currentVersion, $version) == -1) {
 					$currentVersion = $version;
