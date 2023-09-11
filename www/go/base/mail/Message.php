@@ -547,7 +547,7 @@ class Message extends \Swift_Message{
 			$this->setPriority ($params['priority']);
 		
 		
-		if(isset($params['in_reply_to'])){
+		if(isset($params['in_reply_to']) && strlen($params['in_reply_to'])){
 			$headers = $this->getHeaders();
 			$headers->addTextHeader('In-Reply-To', "<" . $params['in_reply_to'] . ">");
 			$headers->addTextHeader('References', "<" .$params['in_reply_to'] . ">");

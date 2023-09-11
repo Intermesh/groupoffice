@@ -1,3 +1,5 @@
+- Email: prevent sending empty in_reply_to header
+
 05-09-2023: 6.7.45
 - Addressbook: Some upgrade queries were missing
 
