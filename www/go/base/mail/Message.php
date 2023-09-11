@@ -467,7 +467,7 @@ class Message extends \go\core\mail\Message {
 			$this->setPriority ($params['priority']);
 		
 		
-		if(isset($params['in_reply_to'])){
+		if(!empty($params['in_reply_to'])){
 			$this->setInReplyTo($params['in_reply_to']);
 			$this->setReferences($params['in_reply_to']);
 		}	
