@@ -1,3 +1,4 @@
+12-09-2023: 6.6.170
 - Addressbook: Corrected foreign key of birthday portlet
 - Files: Not all folders were listed as admin
 
