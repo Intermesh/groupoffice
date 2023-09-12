@@ -380,7 +380,7 @@ function test_system() :array
 	$tests[]=$test;
 	
 	$test['name']='SourceGuardian enabled';
-	$test['pass']=$ioncubeWorks = function_exists('sg_load');
+	$test['pass']=$sgInstalled = function_exists('sg_load');
 	$test['feedback']='Warning: SourceGuardian is not installed. The professional modules will not be enabled.';
 	$test['fatal']=false;
 
@@ -448,8 +448,7 @@ function test_system() :array
 	
 	if(class_exists('GO')) {
 		
-		if($ioncubeWorks) {
-			$tests[]=$test;
+		if($sgInstalled) {
 
 			$moduleFolder = Environment::get()->getInstallFolder()->getFolder('go' . DIRECTORY_SEPARATOR . 'modules');
 			$test['name'] = 'Modules directory writable';
