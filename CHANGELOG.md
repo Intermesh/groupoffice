@@ -1,3 +1,5 @@
+Addressbook: Name bug when middle name was entered contact was connected to user.
+
 12-09-2023: 6.7.46
 - Email: prevent sending empty in_reply_to header
 - Core: Custom date filter equals null didn't load in dialog properly
