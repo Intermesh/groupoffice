@@ -47,7 +47,7 @@ function cd($dir)
 
 class Builder
 {
-	public $test = true;
+	public $test = false;
 
 	private $majorVersion = "6.8";
 
@@ -57,7 +57,7 @@ class Builder
 	 *
 	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $distro = "testing";
+	public $distro = "sixeight";
 
 
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
