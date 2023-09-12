@@ -33,6 +33,11 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 	public function getChildren() {
 		
 		$children = array();
+
+		if(!is_dir(GO::user()->homeDir)) {
+			\GO\Files\Model\Folder::model()->findHomeFolder(GO::user());
+		}
+
 		$children[] = new Directory(GO::user()->homeDir);
 		$children[] = new SharedDirectory();
 	
@@ -40,13 +45,13 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 		if(GO::modules()->addressbook && is_dir(GO::config()->file_storage_path . 'addressbook'))
 			$children[] = new Directory('addressbook');
 
-		if(GO::modules()->projects2)
+		if(GO::modules()->projects2 && is_dir(GO::config()->file_storage_path . 'projects2'))
 			$children[] = new Directory('projects2');
 		
-		if(GO::modules()->tickets)
+		if(GO::modules()->tickets && is_dir(GO::config()->file_storage_path . 'tickets'))
 			$children[] = new Directory('tickets');
 		
-		if(GO::modules()->billing)
+		if(GO::modules()->billing && is_dir(GO::config()->file_storage_path . 'billing'))
 			$children[] = new Directory('billing');
 		
 		return $children;

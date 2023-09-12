@@ -881,7 +881,7 @@ Minden jog fenntartva.<br />
   'Remove Formatting' => 'Formázás eltávolítása',
   'Cleans text pasted from Word or other Rich Text applications' => 'Tisztítsa meg a szöveget Word vagy más Rich Text alkalmazásokhoz',
   'Insert Horizontal Rule' => 'Vízszintes vonal beszúrása',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => 'Adja meg a csík szélességét százalékban <br/> % jellel a végén, vagy <br/> adjon meg egy fix szélességet.',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => 'Adja meg a csík szélességét százalékban <br/> % jellel a végén, vagy <br/> adjon meg egy fix szélességet.',
   'Width' => 'Szélesség',
   'Insert' => 'Beszúrás',
   'Add from Group-Office' => 'Hozzáadás a  {product_name}-ból',

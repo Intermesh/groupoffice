@@ -163,7 +163,7 @@ go.import.ColumnSelectDialog = Ext.extend(go.Window, {
 
 			const me = this;
 
-			me.getEl().mask();
+			me.getEl().mask(t("Saving..."));
 
 			go.Db.store("SpreadSheetExport").save({
 				name: name,

@@ -112,7 +112,7 @@ trait SearchableTrait {
 			$keywords = [$search->name, $search->description];
 		}
 
-		$keywords = $this->getCommentKeywords($keywords);
+//		$keywords = $this->getCommentKeywords($keywords);
 
 		$links = (new Query())
 			->select('description')
@@ -170,17 +170,17 @@ trait SearchableTrait {
 
 	}
 
-	private function getCommentKeywords(array $keywords) : array {
-		if(Module::isInstalled("community", "comments")) {
-			$comments = Comment::findFor($this, ['text']);
-			foreach($comments as $comment) {
-				$plain = strip_tags($comment->text);
-				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
-			}
-		}
-
-		return $keywords;
-	}
+//	private function getCommentKeywords(array $keywords) : array {
+//		if(Module::isInstalled("community", "comments")) {
+//			$comments = Comment::findFor($this, ['text']);
+//			foreach($comments as $comment) {
+//				$plain = strip_tags($comment->text);
+//				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
+//			}
+//		}
+//
+//		return $keywords;
+//	}
 
 
 	/**

@@ -3,9 +3,9 @@
     "strict" : true,
     "target": "ES2017",
     "sourceMap": true,
-    "lib": ["es2020", "dom"],
+    "lib": ["es2017", "dom"],
     "moduleResolution": "node",
-    "module":"es2020",
+    "module":"es2017",
     "esModuleInterop": true,
     "outDir": "./dist", //set this in the extended
     "baseUrl": ".", //set this in the extended too

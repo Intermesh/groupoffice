@@ -468,7 +468,7 @@ This program is protected by copyright law and the {product_name} license.<br />
   'Outdent Text' => 'Outdent Tekst',
   'Remove Formatting' => 'Eemalda formatting',
   'Insert Horizontal Rule' => 'Sisesta horisontaalne Rule',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => 'Sisesta Rule laius protsentides <br/> järgides lõpus the % märki või <br/> määra kindel laius % sümbloites.',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => 'Sisesta Rule laius protsentides <br/> järgides lõpus the % märki või <br/> määra kindel laius % sümbloites.',
   'Insert' => 'Sisesta',
   'Width' => 'Laius',
   'Apply multiselect' => 'Rakenda mitu valikut',

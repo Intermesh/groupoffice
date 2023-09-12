@@ -32,7 +32,7 @@ class StringUtil {
 	public static function normalizeCrlf(?string $text, string $crlf = "\r\n"): ?string
 	{
 		if(empty($text)) {
-			return "";
+			return $text;
 		}
 		
 		$normalized =  preg_replace('/\R/u', $crlf, $text);
@@ -568,7 +568,7 @@ END;
 		}
 
 		//replace repeating spaces with &nbsp;		
-		$text = htmlspecialchars($text, ENT_COMPAT);
+		$text = htmlspecialchars($text);
 		$text = str_replace('  ', '&nbsp;&nbsp;', $text);
 
 
@@ -607,11 +607,17 @@ END;
 	 * @return bool
 	 * @throws Exception 
 	 */
-	public static function detectXSS(string $string): bool
+	public static function detectXSS(string $string, $withStyle = false): bool
 	{
-
+		if($withStyle) {
+			// remove GO injected style
+			$string = preg_replace('/<style id="groupoffice-extracted-style">.*<\/style>/usi', '', $string);
+		}
 // Keep a copy of the original string before cleaning up
 		$orig = $string;
+
+
+
 
 // URL decode
 		$string = urldecode($string);
@@ -625,29 +631,38 @@ END;
 // Clean up entities
 		$string = preg_replace('!(&#0+[0-9]+)!', '$1;', $string);
 
-// Decode entities
-		$string = html_entity_decode($string, ENT_NOQUOTES, 'UTF-8');
+// Decode entities not needed because they won't be decoded for display.
+//		$string = html_entity_decode($string, ENT_NOQUOTES, 'UTF-8');
 
 // Strip whitespace characters
 		$string = preg_replace('!\s!', '', $string);
 
+		$tags = 'applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base';
+
+		if($withStyle) {
+			$tags .= '|style';
+		}
+
+
 // Set the patterns we'll test against
 		$patterns = array(
 // Match any attribute starting with "on" or xmlns
-			//'#(<[^>]+[\x00-\x20\"\'\/])(on|xmlns)[^>]*>?#iUu',
-			'#(<[^>]+[\s])(on|xmlns)[^>]*>?#iUu',
+			'#(<[^>]+[\x00-\x20\"\'\/])(on|xmlns)[a-z]+\s?=[^>]*>?#iUu',
+//			'#(<[^>]+[\s])(on|xmlns)[^>]*>?#iUu',
 // Match javascript:, livescript:, vbscript: and mocha: protocols
 			'!((java|live|vb)script|mocha):(\w)*!iUu',
 			'#-moz-binding[\x00-\x20]*:#u',
 // Match style attributes
 			'#(<[^>]*+[\x00-\x20\"\'\/])*style=[^>]*(expression|behavior)[^>]*>?#iUu',
 // Match unneeded tags
-			'#</*(applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>?#i'
+			'#</*('.$tags .')[^>]*>?#i'
 		);
 
 		foreach ($patterns as $pattern) {
 // Test both the original string and clean string
 			if (preg_match($pattern, $string, $matches) || preg_match($pattern, $orig, $matches)) {
+				go()->debug("XSS detected: ");
+				go()->debug($matches);
 				return true;
 			}
 		}

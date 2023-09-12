@@ -54,21 +54,21 @@ Ext.onReady(function () {
 		},
 		
 		onLoad : function(user){
-			
-			var isActive = (user.otp && user.otp.isEnabled);
-			
+
+			const isActive = (user.otp && user.otp.isEnabled);
+
 			this.enableAuthenticatorBtn.setVisible(!isActive);
 			this.disableAuthenticatorBtn.setVisible(isActive);
 			this.currentUser = user;
 		},
 		
 		disableAuthenticator : function(user, callback){
-			var me = this;
-			
+			const me = this;
+
 			function execute(currentPassword){
-				var data = {
-						otp: null
-					};
+				const data = {
+					otp: null
+				};
 				if(currentPassword) {
 					data.currentPassword = currentPassword;
 				}

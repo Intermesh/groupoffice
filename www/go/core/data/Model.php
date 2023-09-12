@@ -73,11 +73,17 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			if (substr($method->getName(), 0, 3) == 'get') {
 
 				$params = $method->getParameters();
-				foreach ($params as $p) {
-					if (!$p->isDefaultValueAvailable()) {
-						continue 2;
-					}
+				if(count($params)) {
+					continue;
 				}
+
+//				This code breaks ioncube. It's not possible to use reflection parameters on encoded files from
+				// non encoded files. It will result in a segmentation fault.
+//				foreach ($params as $p) {
+//					if (!$p->isDefaultValueAvailable()) {
+//						continue 2;
+//					}
+//				}
 
 				$propName = lcfirst(substr($method->getName(), 3));
 				if(!isset($arr[$propName])) {

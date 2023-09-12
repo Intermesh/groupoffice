@@ -258,7 +258,7 @@ return array (
   'Remove Formatting' => 'إزالة التنسيق',
   'Cleans text pasted from Word or other Rich Text applications' => 'ينقي النصوص الملصقة من برنامج الوورد إلى تطبيقات النصوص الغنية الأخرى',
   'Insert Horizontal Rule' => 'إدراج مسطرة أفقية',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => ' أدخل عرض المسطرة بالنسبة المئوية<br/>   متبوعًا بعلامة % و<br/> لتحديد عرض ثابت قم بإزالة العلامة %.',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => ' أدخل عرض المسطرة بالنسبة المئوية<br/>   متبوعًا بعلامة % و<br/> لتحديد عرض ثابت قم بإزالة العلامة %.',
   'Insert' => 'إدراج',
   'Width' => 'عرض',
   'Thank you' => 'شكرًا لك',

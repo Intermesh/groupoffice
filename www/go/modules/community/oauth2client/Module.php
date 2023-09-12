@@ -21,6 +21,10 @@ use go\modules\community\oauth2client\model\Oauth2Account;
  */
 class Module extends core\Module
 {
+	public function getStatus() : string
+	{
+		return self::STATUS_STABLE;
+	}
 
 	public function getAuthor(): string
 	{

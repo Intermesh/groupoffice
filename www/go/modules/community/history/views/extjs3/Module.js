@@ -12,7 +12,7 @@ go.Modules.register("community", "history", {
 				name: 'text',
 				type: "string",
 				multiple: false,
-				title: "Query"
+				title: t("Query")
 			},
 			{
 				title: t("Entity ID"),

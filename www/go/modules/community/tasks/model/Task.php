@@ -10,7 +10,7 @@ namespace go\modules\community\tasks\model;
 
 use DateTimeInterface;
 use Exception;
-use go\core\acl\model\AclInheritEntity;
+use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\db\Expression;
 use go\core\model\Alert as CoreAlert;
@@ -35,7 +35,7 @@ use PDO;
 /**
  * Task model
  */
-class Task extends AclInheritEntity {
+class Task extends AclItemEntity {
 
 	const PRIORITY_LOW = 9;
 	const PRIORITY_HIGH = 1;
@@ -250,7 +250,7 @@ class Task extends AclInheritEntity {
 
 	public function getProgress(): string
 	{
-		return isset(Progress::$db[$this->progress]) ? Progress::$db[$this->progress] : Progress::$db[1];
+		return Progress::$db[$this->progress] ?? Progress::$db[1];
 	}
 
 	public function getTimeBooked(): ?int
@@ -258,7 +258,13 @@ class Task extends AclInheritEntity {
 		return $this->timeBooked;
 	}
 
-	public function setProgress($value) {
+	/**
+	 * Set progress status
+	 *
+	 * @param string $value "needs-action" {@see Progress::$db}
+	 * @return void
+	 */
+	public function setProgress(string $value) {
 		$key = array_search($value, Progress::$db, true);
 		if($key === false) {
 			$this->setValidationError('progress', ErrorCode::INVALID_INPUT, 'Incorrect Progress value for task: ' . $value);
@@ -294,6 +300,12 @@ class Task extends AclInheritEntity {
 			}
 		}
 		return $keywords;
+	}
+
+	protected function getSearchFilter(): ?string
+	{
+		$tasklist = TaskList::findById($this->tasklistId);
+		return $tasklist->getRole() == "support" ? "support" : null;
 	}
 
 	protected function getSearchDescription(): string
@@ -432,9 +444,27 @@ class Task extends AclInheritEntity {
 			return false;
 		}
 
-		if($this->isModified('responsibleUserId') && CoreAlert::$enabled) {
+		$this->createSystemAlerts();
+
+		// if alert can be based on start / due of task check those properties as well
+		$modified = $this->getModified('alerts');
+		if (!empty($modified)) {
+			$this->updateAlerts($modified['alerts']);
+		}
+
+		return true;
+	}
+
+	private function createSystemAlerts() {
+		if(!CoreAlert::$enabled) {
+			return;
+		}
+		if($this->isModified('responsibleUserId')) {
 
 			if (isset($this->responsibleUserId)) {
+
+				// when assigned to someone else it's progress should be needs action
+				$this->progress = Progress::NeedsAction;
 
 				if($this->responsibleUserId != go()->getUserId()) {
 					$alert = $this->createAlert(new \DateTime(), 'assigned', $this->responsibleUserId)
@@ -447,18 +477,33 @@ class Task extends AclInheritEntity {
 						throw new SaveException($alert);
 					}
 				}
-			} else{
+			} else if(!$this->isNew()){
 				$this->deleteAlert('assigned', $this->getOldValue('responsibleUserId'));
 			}
 		}
 
-		// if alert can be based on start / due of task check those properties as well
-		$modified = $this->getModified('alerts');
-		if (!empty($modified)) {
-			$this->updateAlerts($modified['alerts']);
-		}
+		if($this->isNew()) {
 
-		return true;
+			// create an alert if someone else created a task in your default list
+			$tasklist = TaskList::findById($this->tasklistId, ['id', 'createdBy', 'role']);
+			if($tasklist->getRole() == "list" && $this->createdBy != $tasklist->createdBy) {
+
+				$defaultListId = User::findById($tasklist->createdBy, ['tasksSettings'])->tasksSettings->getDefaultTasklistId();
+				if($defaultListId == $this->tasklistId) {
+					$alert = $this->createAlert(new \DateTime(), 'createdforyou', $tasklist->createdBy)
+						->setData([
+							'type' => 'assigned',
+							'createdBy' => $this->createdBy
+						]);
+
+					if (!$alert->save()) {
+						throw new SaveException($alert);
+					}
+				}
+			}
+		} else if($this->modifiedBy != $this->createdBy){
+			$this->deleteAlert('createdforyou', $this->modifiedBy);
+		}
 	}
 
 
@@ -541,14 +586,22 @@ class Task extends AclInheritEntity {
 	protected function createNewTask(DateTimeInterface $next) {
 
 		$values = $this->toArray();
-		unset($values['id']);
-		unset($values['progress']);
-		unset($values['percentComplete']);
-		unset($values['progressUpdated']);
-		unset($values['freeBusyStatus']);
+//		unset($values['id']);
+//		unset($values['progress']);
+//		unset($values['responsibleUserId']);
+//		unset($values['percentComplete']);
+//		unset($values['progressUpdated']);
+//		unset($values['freeBusyStatus']);
+//		$nextTask = new Task();
+//		$nextTask->setValues($values);
 
-		$nextTask = new Task();
-		$nextTask->setValues($values);
+		$nextTask = $this->copy();
+		$nextTask->progress = Progress::NeedsAction;
+		$nextTask->responsibleUserId = null;
+		$nextTask->percentComplete = 0;
+		$nextTask->progressUpdated = null;
+		$nextTask->freeBusyStatus = 'free';
+
 		$rrule = $this->getRecurrenceRule();
 			
 		if(!empty($rrule->count)) {
@@ -684,7 +737,7 @@ class Task extends AclInheritEntity {
 	 * Try to find conflicting tasks.
 	 *
 	 * A task is considered conflicting when it has a start date and user id and there are other tasks with the same
-	 * responsible userId and start date which are part of a project task list.
+	 * responsible userId and start date which are part of a project list.
 	 *
 	 * @return bool
 	 */
@@ -745,6 +798,14 @@ class Task extends AclInheritEntity {
 			return;
 		}
 
+		if($this->createdBy != $comment->createdBy) {
+			//agent makes this message
+			if($this->responsibleUserId == null) {
+				// auto assign task on first comment
+				$this->responsibleUserId = $comment->createdBy;
+			}
+		}
+
 		if($comment->createdBy == $this->responsibleUserId) {
 			$this->progress = Progress::InProcess;
 		} else {
@@ -762,11 +823,19 @@ class Task extends AclInheritEntity {
 			$commenters[] = $this->responsibleUserId;
 		}
 
+		//add creator too
+		if(!in_array($this->createdBy, $commenters)) {
+			$commenters[] = $this->createdBy;
+		}
+
 		//remove creator of this comment
 		$commenters = array_filter($commenters, function($c) use($comment) {return $c != $comment->createdBy;});
 
 		// Remove alert for creator of this comment. Other users will get a replaced alert below.
 		CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);
+
+		// remove you were assigned to alert when commenting
+		CoreAlert::deleteByEntity($this, "assigned", $comment->createdBy);
 
 		foreach($commenters as $userId) {
 			$alert = $this->createAlert(new DateTime(), 'comment', $userId)

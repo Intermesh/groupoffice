@@ -471,15 +471,10 @@ class Contact extends AclItemEntity {
 											$criteria->andWhere('isOrganization', '=', (bool) $value);
 										})
 										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
-//
-//											if(!$query->isJoined('addressbook_email_address', 'e')) {
-//												$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
-//													->groupBy(['c.id']);
-//											}
-
 											$criteria->andWhere('c.id in (select contactId from addressbook_email_address)');
-
-//											$criteria->andWhere('e.email', $value ? 'IS NOT' : 'IS', null);
+										})
+										->add("hasPhoneNumbers", function(Criteria $criteria, $value, Query $query) {
+											$criteria->andWhere('c.id in (select contactId from addressbook_phone_number)');
 										})
 
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
@@ -1064,6 +1059,10 @@ class Contact extends AclItemEntity {
 			}
 		}
 
+		foreach($this->urls as $url) {
+			$keywords[] = $url->url;
+		}
+
 		if(!empty($this->notes)) {
 			$keywords[] = $this->notes;
 		}
@@ -1112,11 +1111,12 @@ class Contact extends AclItemEntity {
 	 * Find a birthday, calculate diff in years
 	 *
 	 * @return int
+	 * @throws Exception
 	 */
 	public function getAge(): int
 	{
 		$bday = $this->getBirthday();
-		if($bday === '') {
+		if (empty($bday)) {
 			return 0;
 		}
 		$date = new DateTime($bday);
@@ -1169,11 +1169,12 @@ class Contact extends AclItemEntity {
 
 
 	/**
-	 * Because we've implemented the getter method "getOrganizationIds" the contact 
-	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * Because we've implemented the getter method "getOrganizationIds" the contact
+	 * modSeq must be incremented when a link between two contacts is deleted or
 	 * created.
-	 * 
-	 * @param Link $link
+	 *
+	 * @param Query $links
+	 * @throws Exception
 	 */
 	public static function onLinkDelete(Query $links) {
 		

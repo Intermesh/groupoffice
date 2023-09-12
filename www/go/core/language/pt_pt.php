@@ -77,7 +77,7 @@ return array (
   'Remove Formatting' => 'Remover Formatação',
   'Cleans text pasted from Word or other Rich Text applications' => 'Limpa texto colado do Word ou outros aplicativos Rich Text',
   'Insert Horizontal Rule' => 'Inserir Linha Horizontal',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => 'Introduza a largura da linha em percentagem<br/> seguida do sinal de % no fim, ou para<br/> configurar uma largura fixa, omita o símbolo de %.',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => 'Introduza a largura da linha em percentagem<br/> seguida do sinal de % no fim, ou para<br/> configurar uma largura fixa, omita o símbolo de %.',
   'Width' => 'Largura',
   'Insert' => 'Inserir',
   'Minutes' => 'Minutos',

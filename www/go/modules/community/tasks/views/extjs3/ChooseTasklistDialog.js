@@ -16,7 +16,7 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(go.Window, {
 
         this.taskListFromCsvCB = new Ext.form.Checkbox({
             xtype: 'xcheckbox',
-            boxLabel: t('Import task list ID from CSV file'),
+            boxLabel: t('Import list ID from CSV file'),
             handler: (cb,checked) => {
                 const el = this.chooseTasklistGrid.getEl();
 
@@ -36,8 +36,8 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(go.Window, {
             handler: function() {
                 if(!this.chooseTasklistGrid.selectedId && !this.taskListFromCsvCB.checked) {
                     Ext.Msg.show({
-                        title:t("Task list not selected"),
-                        msg: t("You have not selected any task list. Select a task list before proceeding."),
+                        title:t("List not selected"),
+                        msg: t("You have not selected any list. Select a list before proceeding."),
                         buttons: Ext.Msg.OK,
                         animEl: 'elId',
                         icon: Ext.MessageBox.WARNING

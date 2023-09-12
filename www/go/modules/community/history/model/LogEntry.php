@@ -156,7 +156,8 @@ class LogEntry extends AclOwnerEntity {
 
 	protected static function search(Criteria $criteria, string $expression, DbQuery $query): Criteria
 	{
-		if(is_numeric($expression)) {
+		$int = intval($expression);
+		if($int == $expression && strlen($int) == strlen($expression)) {
 			return $criteria->andWhere('entityId', '=', $expression);
 		} else{
 			return parent::search($criteria, $expression, $query);

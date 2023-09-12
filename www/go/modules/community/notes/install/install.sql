@@ -10,7 +10,7 @@ CREATE TABLE `notes_note` (
   `createdBy` int(11) NULL,
   `modifiedBy` int(11) NULL,
   `name` varchar(100) NOT NULL,
-  `content` text,
+  `content` MEDIUMTEXT,
   `filesFolderId` int(11) DEFAULT NULL,
   `password` varchar(255) DEFAULT '',
   `createdAt` datetime DEFAULT NULL,

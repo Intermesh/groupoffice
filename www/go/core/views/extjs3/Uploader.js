@@ -25,6 +25,7 @@
 					persistent: true,
 					iconCls: 'ic-file-upload',
 					title: t('Uploads'),
+					statusIcon: "upload",
 
 					updateCount: function() {
 

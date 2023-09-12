@@ -177,11 +177,11 @@ class Table {
 		$c->nullAllowed = strtoupper($field['Null']) == 'YES';
 		$c->autoIncrement = strpos($field['Extra'], 'auto_increment') !== false;
 		$c->trimInput = false;
-		$c->dataType = strtoupper($field['Type']);
-
+		$c->unsigned = stripos($field['Type'], 'unsigned') !== false;
 		//remove "unsigned" or any other extra info that might be there.
 		$field['Type'] = explode(" ", $field['Type'])[0];
 
+		$c->dataType = strtoupper($field['Type']);
 		preg_match('/(.*)\(([1-9].*)\)/', $field['Type'], $matches);
 		if ($matches) {
 			$c->length  = intval($matches[2]);

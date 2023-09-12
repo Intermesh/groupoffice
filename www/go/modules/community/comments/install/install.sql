@@ -35,6 +35,9 @@ create index fk_comments_comment_core_user2_idx
 create index section
     on comments_comment (section);
 
+create index comments_comment_mimeMessageId_index
+    on comments_comment (mimeMessageId);
+
 create table comments_comment_attachment
 (
     id        int unsigned auto_increment

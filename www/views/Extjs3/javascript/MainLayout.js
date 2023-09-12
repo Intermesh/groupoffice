@@ -79,8 +79,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * Always called after all scripts are loaded in Ext.onReady();
 	 * @returns {undefined}
 	 */
-	boot : function() {
+	boot : async function() {
 		var me = this;
+
+		// GOUI in ext , Warning: breaks old safari
+		// window.goui = await import(BaseHref + "views/goui/dist/goui/script/index.js");
+		// window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
+
 		go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
 			Ext.apply(Ext.QuickTips.getQuickTip(), {
@@ -308,6 +313,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				go.Entities.init();
 
 				me.fireEvent('authenticated', this, go.User, password);
+				// window.groupofficeCore.client.fireAuth();
 
 				me.renderUI();
 				Ext.getBody().unmask();
@@ -345,12 +351,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			}
 			
 			var module = entityObj.module; 
-			var mainPanel = GO.mainLayout.openModule(module);
+			var mainPanel = GO.mainLayout.getModulePanel(module);
 			var detailViewName = entity.charAt(0).toLowerCase() + entity.slice(1) + "Detail";
 
 			if (mainPanel.route) {
 				mainPanel.route(id, entityObj);
 			} else if(mainPanel[detailViewName]) {
+				mainPanel.show();
 				mainPanel[detailViewName].load(id);
 				mainPanel[detailViewName].show();
 			} else {
@@ -367,8 +374,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.fireReady();
 
-		//Ext need to know where this charting swf file is in order to draw charts
-//		Ext.chart.Chart.CHART_URL = 'views/Extjs3/ext/resources/charts.swf';
 
 		var allPanels = GO.moduleManager.getAllPanelConfigs();
 
@@ -528,9 +533,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				id: 'go-start-menu-' + allPanels[i].moduleName,
 				moduleName: allPanels[i].moduleName,
 				text: allPanels[i].title,
-				//iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
 				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+"&mtime="+go.User.session.cacheClearedAt+")",
-				//icon: ,
 				handler: function (item, e) {
 					this.openModule(item.moduleName);
 				},
@@ -640,7 +643,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					region:'east',
 					title: t('Notifications'),
 					floating:true,
-					width: GO.util.isMobileOrTablet() ? window.innerWidth : dp(408),
+					width: GO.util.isMobileOrTablet() ? window.innerWidth : dp(500),
 					animCollapse:false,
 					animFloat: false,
 					collapsible: true,
@@ -729,6 +732,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				},{
 					iconCls: 'ic-info',
 					text: t("About {product_name}"),
+					hidden: !!GO.settings.config.hideAbout && !go.User.isAdmin,
 					handler: function () {
 						if (!this.aboutDialog)
 						{
@@ -871,7 +875,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	welcome : function() {
-
 		if(go.User.id == 1)
 		{
 			const coreMod = go.Modules.get("core", "core");

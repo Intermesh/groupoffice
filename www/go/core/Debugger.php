@@ -2,11 +2,13 @@
 namespace go\core;
 
 use Closure;
+use DateTimeZone;
 use Exception;
 use go\core\data\ArrayableInterface;
 use go\core\data\Model;
 use go\core\http\Request;
 use go\core\jmap\Router;
+use go\core\util\DateTime;
 
 /**
  * Debugger class. All entries are stored and the view can render them eventually.
@@ -249,7 +251,10 @@ class Debugger {
 		return $this->requestId;
 	}
 
-	protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
+  /**
+   * @throws Exception
+   */
+  protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
 
 		if(is_array($mixed) || $mixed instanceof ArrayableInterface) {
 			$print = print_r(Model::convertValueToArray($mixed), true);
@@ -261,7 +266,10 @@ class Debugger {
 			$print = $mixed;
 		}
 
-		$line = '[' . date('Y-m-d H:i:s') . '][' . $this->getRequestId() . '][' . $level . ']';
+    // report date in system time
+	  $date = new DateTime("now", new DateTimeZone(go()->getSystemTimeZone()));
+
+		$line = '[' . $date->format('Y-m-d H:i:s') . '][' . $this->getRequestId() . '][' . $level . ']';
 		
 		if(isset($cls)) {
 			$line .= '[' . $cls .':'. $lineNo.']';

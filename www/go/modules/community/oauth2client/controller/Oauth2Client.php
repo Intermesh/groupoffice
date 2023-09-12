@@ -89,10 +89,10 @@ final class Oauth2Client extends EntityController
 			unset(\GO::session()->values['accountId']);
 			\GO::session()->closeWriting();
 
-			$str = '<div class="card"><h3>' . go()->t('Hello') . '&nbsp;' . $ownerDetails->getFirstName() . '</h3>' .
-				'<p>' . go()->t('OAuth2 authentication was successful.') . '</p>' .
-				'<p><a href="javascript:window.close()">' . go()->t("Click here") . '</a>&nbsp;' .
-				go()->t("to close this window.") . '</p></div>';
+			$str = '<div class="card"><h3>' . go()->t('Hello', 'community','oauth2client') . '&nbsp;' . $ownerDetails->getFirstName() . '</h3>' .
+				'<p>' . go()->t('OAuth2 authentication was successful.', 'community','oauth2client') . '</p>' .
+				'<p><a href="javascript:window.close()">' . go()->t("Click here", 'community','oauth2client') . '</a>&nbsp;' .
+				go()->t("to close this window.", 'community','oauth2client') . '</p></div>';
 
 			$webClient = Extjs3::get();
 			$webClient->renderPage($str, go()->t('Success'));

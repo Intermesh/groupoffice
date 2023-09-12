@@ -230,9 +230,12 @@ class FieldSet extends EntityController {
 						$newField->fieldSetId = $newFieldSet->id;
 						$newField->id = null;
 						if (!$newField->save()) {
-							error_log(print_r($newField->getValidationErrors(), true));
+							error_log($newField->getValidationErrorsAsString());
+							$errorMsg .= 'ERROR: Field ' . $field->name . ' with databaseName (' . $field->databaseName . ') ' . $newField->getValidationErrorsAsString() . "\n";
+						} else {
+							$errorMsg .= 'Field: ' . $field->name . ' with databaseName (' . $field->databaseName . ') appended' . "\n";
 						}
-						$errorMsg .= 'Field: ' . $field->name . ' with databaseName (' . $field->databaseName . ') appended' . "\n";
+
 					} else {
 						$errorMsg .= 'Field: ' . $field->name . ' with databaseName (' . $field->databaseName . ') exists' . "\n";
 					}

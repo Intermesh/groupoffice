@@ -86,7 +86,8 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		return parent::formatColumns($columnModel);
 	}
 
-	
+	private $_defaultTemplate;
+
 	public function actionEmailSelection($params){	
 				
 		// 'type' is only set by the client if a template should be selected as default.
@@ -134,7 +135,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$store->addRecord(array(
 			'group' => 'templates',
 			'checked'=>isset($this->_defaultTemplate->template_id) && $this->_defaultTemplate->template_id==0,
-			'text' => \GO::t("None"),
+			'text' => \GO::t("None", "legacy", "email"),
 			'template_id'=>0
 		));
 		

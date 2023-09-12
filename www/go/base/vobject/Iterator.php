@@ -3,7 +3,6 @@
 
 namespace GO\Base\Vobject;
 
-
 class Iterator implements \Iterator {
 
 	private $file;
@@ -60,6 +59,7 @@ class Iterator implements \Iterator {
 		return $found && !empty($buffer) ? $this->header.$buffer."END:VCALENDAR" : false;
 	}
 
+	#[\ReturnTypeWillChange]
 	public function rewind() {
 //		\GO::debug("rewind");
 		if(is_resource($this->fp))
@@ -75,16 +75,21 @@ class Iterator implements \Iterator {
 		$this->next();
 	}
 
+	#[\ReturnTypeWillChange]
 	public function current() {
 //		\GO::debug("current");
 		return $this->current;
 	}
 
+	#[\ReturnTypeWillChange]
 	public function key() {
 //		\GO::debug("key");
 		return $this->key;
 	}
 
+
+
+	#[\ReturnTypeWillChange]
 	public function next() {
 //		\GO::debug("next");
 		$data = $this->getNextData();
@@ -113,6 +118,7 @@ class Iterator implements \Iterator {
 		
 	}
 
+	#[\ReturnTypeWillChange]
 	public function valid() {
 //		\GO::debug("valid");
 		$ret = $this->current!=false;

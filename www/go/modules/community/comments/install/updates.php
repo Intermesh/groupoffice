@@ -181,3 +181,14 @@ $updates['202206031337'][] = "alter table comments_comment
 
 $updates['202206031337'][] = "alter table comments_comment
     add mimeMessageId varchar(255) collate ascii_bin null;";
+
+
+$updates['202307031650'][] = "delete from core_search where entityTypeId = (select id from core_entity where clientName='Comment');";
+
+$updates['202307031650'][] = function() {
+	\go\core\cron\BuildSearchCache::install("* * * * *", true);
+};
+
+
+$updates['202308221033'][] = "create index comments_comment_mimeMessageId_index
+    on comments_comment (mimeMessageId);";

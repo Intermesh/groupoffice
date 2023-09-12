@@ -71,7 +71,6 @@ class ModuleCollection extends Model\ModelCollection{
 		foreach($folders as $folder){
 			if($folder->isFolder()){
 				$ucfirst = ucfirst($folder->name());
-//				$moduleClass = $folder->path().'/'.$ucfirst.'Module.php';
 				if($this->isAvailable($folder->name(), false) && ($returnInstalled || !Model\Module::model()->findByPk($folder->name(), false, true))){
 					$modules[]='GO\\'.$ucfirst.'\\'.$ucfirst.'Module';
 				} Else  {
@@ -130,18 +129,11 @@ class ModuleCollection extends Model\ModelCollection{
 		if($checkModuleAvailabiltiy){
 			$mod = new $moduleClass;
 			return $mod->isAvailable();			
-		}else
-		{
+		}else {
 			return true;
 		}
-		
-
 	}
 	
-	
-	
-	
-
 	/**
 	 * Call a method of a module class. eg. \GO\Notes\NotesModule::firstRun
 	 * 
@@ -154,16 +146,11 @@ class ModuleCollection extends Model\ModelCollection{
 		$oldIgnore = \GO::setIgnoreAclPermissions($ignoreAclPermissions);
 		$modules = $this->getAllModules();
 		
-		foreach($modules as $module)
-		{	
-				$object = $module->moduleManager;
-				if(method_exists($object, $method)){					
-//						\GO::debug('Calling '.$class.'::'.$method);
-					call_user_func_array(array($object, $method), $params);
-					//$object->$method($params);
-				}
-				
-//			}
+		foreach($modules as $module) {
+			$object = $module->moduleManager;
+			if(method_exists($object, $method)){
+				call_user_func_array(array($object, $method), $params);
+			}
 		}
 		
 		\GO::setIgnoreAclPermissions($oldIgnore);
@@ -201,18 +188,20 @@ class ModuleCollection extends Model\ModelCollection{
    * Default check if module is enabled an treat a disabled module as not installed. When checking from within moduleController return the model if record is in core_module
 	 * 
 	 * @param string $name
-   * @param boolean $checkEnabled
-	 * @return Model\Module 
+     * @param boolean $checkEnabled
+	 * @return Model\Module|false
 	 */
 	public function isInstalled($name, $checkEnabled = true)
 	{
 			$model = $this->model->findByName($name);
 
-			if (!$model || !static::isAllowed($model->name))
-					return false;
+			if (!$model || !static::isAllowed($model->name)) {
+				return false;
+			}
 
-			if ($checkEnabled && !$model->enabled)
-					return false;
+			if ($checkEnabled && !$model->enabled) {
+				return false;
+			}
 
 			return $model;
 	}

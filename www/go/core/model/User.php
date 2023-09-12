@@ -810,6 +810,10 @@ class User extends AclItemEntity {
 			UserDisplay::entityType()->changes([[$this->id, $this->findAclId(), 0]]);
 		}
 
+		if($this->isModified(['password'])) {
+			Token::destroyOtherSessons();
+		}
+
 		return true;
 	}
 
@@ -1344,7 +1348,7 @@ class User extends AclItemEntity {
 		if (!$user) {
 
 			if(!go()->getSettings()->allowRegistration) {
-				throw new NotFound("User not found");
+				throw new NotFound("User not found and registration not allowed");
 			}
 
 			$user = new User();

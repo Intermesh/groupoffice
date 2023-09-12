@@ -184,6 +184,18 @@ i.icon.em-low_priority {
 	> * {
 		color:inherit;
 	}
+
+	// to prevent horizontal scrolling on mobiles
+	* {
+		max-width: 100vw !important;
+	}
+
+	@media screen and (max-width: 1000px) {
+		table {
+			width: auto !important;
+		}
+	}
+	//  end to prevent horizontal scrolling on mobiles
 	
 	p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
 	{

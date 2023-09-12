@@ -299,35 +299,9 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				return true;
 			}
 
-			// Get Leave days in period for selected users
-			$findParams = FindParams::newInstance();
-			$findParams->getCriteria()->addInCondition("user_id", $userIds)
-				->addCondition('status',1)
-				->mergeWith(
-					\GO\Base\Db\FindCriteria::newInstance()
-						->addCondition('first_date', $event->end_time, '<=')
-						->addRawCondition('(t.last_date + 86400) >=' . intval($event->start_time))
-				);
-			$findParams->debugSql();
+			$leavedays = Leaveday::model()->findForPeriod($userIds, intval($event->start_time), intval($event->end_time));
 
-			$stmt = Leaveday::model()->find($findParams);
-
-			foreach($stmt as $item) {
-				// Now we have to take the start time and duration of the leave day into account. These are saved in
-				// a peculiar way, so we have to make a hack.
-
-				if(!empty($item->from_time)) {
-					$itemStartTime = (new DateTime())->setTimeStamp($item->first_date);
-					$tsItemStart = GODate::to_unixtime($itemStartTime->format('Y-m-d') . ' ' . $item->from_time . ':00');
-					$tsItemEnd = GODate::dateTime_add($tsItemStart, 0, (($item->n_hours + $item->n_nat_holiday_hours) * 60));
-				} else{
-					$tsItemStart = $item->first_date;
-					$tsItemEnd = GODate::dateTime_add($item->first_date, 0, 0, 0, 1);
-				}
-				if($tsItemStart < $event->end_time && $tsItemEnd > $event->start_time) {
-					$num_conflicts++;
-				}
-			}
+			$num_conflicts += count($leavedays);
 
 			if($num_conflicts > 0) {
 				$response["feedback"] = 'Ask permission';
@@ -809,11 +783,15 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 		unset($params['view_id'], $params['print']);
 
-		//$calendars = $view->calendars;
 		$calendars=array();
 		$unsortedCalendars = array_merge($view->getGroupCalendars()->fetchAll(), $view->calendars->fetchAll());
 		foreach($unsortedCalendars as $calendar){
-			$calendars[$calendar->name]=$calendar;
+			$permLvl = $calendar->getPermissionLevel();
+			if ($permLvl >= 10) {
+				$calendars[$calendar->name]=$calendar;
+			} else {
+				GO()->debug("actionViewStore:  User " . GO()->getUserId() . " has  no permissions for calendar " . $calendar->id );
+			}
 		}
 		ksort($calendars);
 		$calendars = array_values($calendars);
@@ -823,9 +801,9 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$results = array();
 		foreach ($calendars as $calendar) {
 			$params['calendars'] = '[' . $calendar->id . ']';
-		//	$params['events_only']=true;
-			if (!isset($results[$calendar->id]))
+			if (!isset($results[$calendar->id])) {
 				$results[$calendar->id] = $this->actionStore($params);
+			}
 		}
 		$response['results'] = array_values($results);
 		

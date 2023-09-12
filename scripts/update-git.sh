@@ -28,6 +28,7 @@ do
 
     echo "Pulling $line"
     cd $line
+    git reset --hard
     git pull
     cd ..
   fi
@@ -35,7 +36,12 @@ done
 
 # pull main github repo
 cd ../../
-#git reset --hard
+git reset --hard
+cd views/goui/goui
+git reset --hard
+cd ../groupoffice-core
+git reset --hard
+cd $DIR/www;
 
 echo "Pulling main repository"
 
@@ -71,13 +77,13 @@ function buildGOUI() {
 echo "Building GOUI shared libs..."
 cd $DIR;
 cd ./www/views/goui/goui
-npm update --include=dev
-npm run build
+npm ci
+
 cd ../groupoffice-core
-npm update --include=dev
-npm run build
+npm ci
+
 cd ..
-npm update --include=dev
+npm ci
 npm run build
 npm prune --production
 cd $DIR;
@@ -87,7 +93,7 @@ buildGOUI "./www/go/modules"
 
 cd www
 
-composer update -n --no-dev -o
+composer install -n --no-dev -o
 
 if [ -z "$CONFIG" ]; then
   echo NOTE: Not upgrading database because no config file was passed. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php

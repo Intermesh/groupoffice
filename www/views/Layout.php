@@ -14,9 +14,9 @@ $webclient = Extjs3::get();
 $themeUrl = $webclient->getThemeUrl();
 $authController = new \GO\Core\Controller\AuthController(); // for some reason the event listeners are in this class
 $cssMtime = filemtime(GO::view()->getTheme()->getPath() . "/style.css");
-
+$lang = go()->getLanguage()->getIsoCode();
 ?><!DOCTYPE html>
-<html lang="<?= go()->getLanguage()->getIsoCode(); ?>" dir="<?=go()->getLanguage()->getTextDirection();?>">
+<html lang="<?= $lang; ?>" dir="<?=go()->getLanguage()->getTextDirection();?>">
 <head>
 	<?php
     if($loadExt) {

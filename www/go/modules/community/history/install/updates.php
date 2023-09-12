@@ -42,3 +42,7 @@ $updates['202205161600'][] = "update core_setting set name='deleteAfterDays', va
 $updates['202205161600'][] = "alter table history_log_entry
     modify entityId varchar(100) collate ascii_bin null;";
 
+$updates['202306151226'][] = "create index history_log_entry_removeAcl_action_index
+    on history_log_entry (removeAcl, action);";
+
+

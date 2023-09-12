@@ -1,9 +1,8 @@
 Ext.onReady(function() {
 	Ext.override(go.modules.community.notes.NoteDialog, {
 		onLoad: go.modules.community.notes.NoteDialog.prototype.onLoad.createSequence(function(entityValues) {
-			var me = this;
-			var contentField = this.find('name', 'content')[0];
-			var content = contentField.getRawValue();
+			const me = this,contentField = this.find('name', 'content')[0];
+			let content = contentField.getRawValue();
 
 			if(go.modules.community.notes.isEncrypted(content)) {
 				contentField.setValue(t("Encrypted data"));
@@ -26,11 +25,11 @@ Ext.onReady(function() {
 						me.confirmPasswordField.setValue(go.modules.community.notes.decrypted[entityValues.id].password);
 					} else {
 
-						var dlg = new GO.dialog.PasswordDialog({
+						const dlg = new GO.dialog.PasswordDialog({
 							title: t("Enter password to decrypt"),
 							scope: this,
-							handler: function (dlg, btn, password) {
-								if (btn == "ok") {
+							handler: function(dlg, btn, password) {
+								if (btn === "ok") {
 									go.modules.community.notes.aesGcmDecrypt(content, password).then(function (plaintext) {
 										contentField.setValue(plaintext);
 
@@ -42,6 +41,8 @@ Ext.onReady(function() {
 										Ext.Msg.alert(t("Error", "Password"), t("Wrong password"));
 										me.hide();
 									});
+								} else {
+									this.hide();
 								}
 							}
 						});

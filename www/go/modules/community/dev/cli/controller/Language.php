@@ -38,7 +38,11 @@ class Language extends Controller {
 	 * @param type $params
 	 * @throws \Exception
 	 */
-	public function import($path) {
+	public function import($params) {
+
+
+		extract($this->checkParams($params, ['path']));
+
 		$sourceFile = new File($path);
 		$file = File::tempFile('csv');
 		if(!$sourceFile->copy($file)) {
@@ -146,7 +150,11 @@ class Language extends Controller {
 	 * docker-compose exec groupoffice-master php /usr/local/share/groupoffice/cli.php community/dev/Language/convertModule --name=inventaire
 	 * 
 	 */
-	public function convertModule($name) {
+	public function convertModule($params) {
+
+
+		extract($this->checkParams($params, ['name']));
+
 		$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $name);
 		if(!$folder->exists()) {
 			throw new \Exception("Folder for module ". $name ." does not exist");

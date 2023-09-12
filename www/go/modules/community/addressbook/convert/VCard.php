@@ -100,7 +100,7 @@ class VCard extends AbstractConverter {
 
 		$vcard->N = $contact->isOrganization ? [$contact->name] : [$contact->lastName, $contact->firstName, $contact->middleName, $contact->prefixes, $contact->suffixes];
 		$vcard->FN = $contact->name;
-		$vcard->REV = $contact->modifiedAt->getTimestamp();
+		$vcard->REV = $contact->modifiedAt->format("Ymd\THis\Z");
 		$vcard->TITLE = (string) $contact->jobTitle;
 
 		foreach ($contact->emailAddresses as $emailAddr) {
@@ -508,6 +508,11 @@ class VCard extends AbstractConverter {
 		foreach($types as $type) {
 
 			switch($type) {
+
+				// we don't have a way to store pref (yet). See https://github.com/Intermesh/groupoffice/issues/1042
+				case 'pref':
+					break;
+
 				case 'cell':
 					return 'mobile';
 

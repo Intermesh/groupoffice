@@ -2,12 +2,12 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	title: t("Task"),
 	entityStore: "Task",
 	width: dp(800),
-	height: dp(600),
+	height: dp(800),
 	modal: false,
 	stateId: 'communityTasksTaskDialog',
 	role: "list",
-	support: null,
 	redirectOnSave: false,
+	collapsible: true,
 
 	onReady: async function () {
 		if (this.currentId) {
@@ -16,6 +16,25 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			this.tasklistCombo.store.setFilter("role", {role: tl.role});
 		} else {
 			this.tasklistCombo.store.setFilter("role", {role: this.role});
+		}
+
+
+		if(!this.currentId && this.role == "support") {
+			this.commentComposer.show();
+			this.descriptionFieldset.hide();
+
+			this.commentComposer.editor.on("ctrlenter", () => {
+				this.submit();
+			})
+
+			this.on("submit", () => {
+				if(this.commentComposer.editor.getValue() != "")
+					this.commentComposer.save("Task", this.currentId);
+			}, {single:true})
+		} else
+		{
+			this.commentComposer.hide();
+			this.descriptionFieldset.show();
 		}
 	},
 
@@ -81,8 +100,14 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		})
 	},
 
-	initFormItems: function () {
+	initComponent: function() {
+		if(this.role == "support") {
+			this.title = t("Ticket", "support", "business");
+		}
+		this.supr().initComponent.call(this);
+		},
 
+	initFormItems: function () {
 		const start = {
 			flex: 1,
 			xtype: 'datefield',
@@ -134,10 +159,37 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		const estimatedDuration = {
 			name: "estimatedDuration",
 			xtype: "durationfield",
+			maxHours: 9000, // tasks should not take longer than 2h tho
 			flex: 1,
 			fieldLabel: t("Estimated duration"),
-			asInteger: true
+			asInteger: true,
+			listeners: {
+				change: (df, duration) => {
+					const days = Math.floor(duration / 86400);
+
+					if(!days) {
+						estimatedDurationLbl.hide();
+						return;
+					}
+
+					duration = duration % 86400;
+
+					const hours = Math.floor(duration / 3600);
+					duration = duration % 3600;
+
+					const mins = Math.floor(duration / 60);
+
+					estimatedDurationLbl.show();
+
+					estimatedDurationLbl.setValue(days +" "+ t("days") + ", " + hours + ":" + (mins + "").padStart(2, "0") + " " + t("hours"));
+				}
+			}
 		};
+
+		const estimatedDurationLbl = new Ext.form.DisplayField({
+			hidden: true,
+			flex: 1
+		});
 
 		const priority = {
 			flex: 1,
@@ -243,7 +295,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						desktop: {
 							items: [
 								{
-									items: [start, due, estimatedDuration]
+									items: [start, due, estimatedDuration, estimatedDurationLbl]
 								},{
 									items: [progress, percentComplete, priority]
 								},
@@ -309,8 +361,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					,
 
 					{xtype: 'hidden', name: 'groupId'},
+					this.commentComposer = new go.modules.comments.ComposerFieldset(),
 
-					{
+					this.descriptionFieldset = new Ext.form.FieldSet({
 						xtype: "fieldset",
 						// collapsible: true,
 						// title: t("Other"),
@@ -335,7 +388,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 							}
 						]
-					},
+					}),
 
 					{
 						xtype: "fieldset",
@@ -343,9 +396,18 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						title: t("Alerts"),
 						items: [new go.modules.community.tasks.AlertFields()]
 					}
+
+
+
 				]
 			}]
+
+
 		});
+
+
+
+
 
 		//this.recurrencePanel = new go.modules.community.tasks.RecurrencePanel();
 

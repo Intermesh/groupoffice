@@ -524,7 +524,7 @@ All rights reserved.<br />
   'Outdent Text' => 'เลื่อนตัวอักษรออก',
   'Remove Formatting' => 'ลบรูปแบบ',
   'Insert Horizontal Rule' => 'เพิ่มเส้นใต้',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => 'กำหนดค่าความกว้างแบบยืดหยุ่นได้<br/> โดยตามด้วยเครื่องหมาย % ต่อท้าย, หรือ<br/> กำหนดขนาดความกว้างโดยตรงได้ <br/>โดยไม่ต้องใส่เครื่องหมาย % ต่อท้าย',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => 'กำหนดค่าความกว้างแบบยืดหยุ่นได้<br/> โดยตามด้วยเครื่องหมาย % ต่อท้าย, หรือ<br/> กำหนดขนาดความกว้างโดยตรงได้ <br/>โดยไม่ต้องใส่เครื่องหมาย % ต่อท้าย',
   'Width' => 'กว้าง',
   'Thank you' => 'ขอบคุณ',
   'Apply multiselect' => 'ปรับปรุงรายการที่ถูกเลือก',

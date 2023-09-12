@@ -1210,32 +1210,37 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @return \GO\Base\Db\ActiveStatement
 	 */
 	public function getSubFolders($findParams=false, $noGrouping=false){
-			if(!$findParams)
-				$findParams=\GO\Base\Db\FindParams::newInstance();
+
+		if (!$findParams)
+			$findParams = \GO\Base\Db\FindParams::newInstance();
+
+		$findParams->criteria(\GO\Base\Db\FindCriteria::newInstance()
+			->addModel(Folder::model())
+			->addCondition('parent_id', $this->id));
+
+		if(!go()->getAuthState()->isAdmin()) {
 
 			$findParams->ignoreAcl(); //We'll build a special acl check for folders that inherit permissions here.
 
 			//$findParams->debugSql();
 
 			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()
-							->addRawCondition('a.aclId', 't.acl_id','=', false);
+				->addRawCondition('a.aclId', 't.acl_id', '=', false);
 
 			$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
-							//->addRawCondition('a.acl_id', 'NULL','IS', false)
-							->addCondition('acl_id', 0,'=','t',false)
-							->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id),"a", false);
+				//->addRawCondition('a.acl_id', 'NULL','IS', false)
+				->addCondition('acl_id', 0, '=', 't', false)
+				->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
 			$findParams->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'LEFT');
 
-			$findParams->criteria(\GO\Base\Db\FindCriteria::newInstance()
-									->addModel(Folder::model())
-									->addCondition('parent_id', $this->id)
-									->mergeWith($aclWhereCriteria));
+			$findParams->getCriteria()->mergeWith($aclWhereCriteria);
 
-			if(!$noGrouping)
+			if (!$noGrouping)
 				$findParams->group(array('t.id'));
+		}
 
-			return Folder::model()->find($findParams);
+		return Folder::model()->find($findParams);
 	}
 	
 	/**

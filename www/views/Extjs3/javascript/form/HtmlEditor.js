@@ -143,13 +143,19 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	onKeyUp : function(e) {
 
 		//Only run on enter, space or tab
-		if(e.keyCode != 13 && e.keyCode != 32 && e.keyCode != 9) {
+		if(!this.debounceTimeout && e.keyCode != 13 && e.keyCode != 32 && e.keyCode != 9) {
 			return;
 		}
 
+		this.scheduleAutoLink();
+	},
+
+	scheduleAutoLink : function() {
 		clearTimeout(this.debounceTimeout);
 		this.debounceTimeout = setTimeout( () => {
 			clearTimeout(this.debounceTimeout);
+			this.debounceTimeout = undefined;
+
 			this.storeCursorPosition();
 			var h = this.getEditorBody().innerHTML;
 			var anchored = Autolinker.link(h, {
@@ -173,11 +179,39 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				this.forgetCursorPosition();
 			}
 
+			console.warn("autolink");
+
 		}, 500);
 	},
 
 	storeCursorPosition : function() {
-		this.insertAtCursor("<div style='display:none' id='go-stored-cursor'></div>");
+
+		var win = this.getWin(),
+			doc = this.getDoc(),
+			sel, range, el, frag, node, lastNode, firstNode;
+
+		sel = win.getSelection();
+		if (sel.getRangeAt && sel.rangeCount) {
+			range = sel.getRangeAt(0);
+
+			el = doc.createElement("div");
+			el.innerHTML = "<div style='display:none' id='go-stored-cursor'></div>";
+			frag = doc.createDocumentFragment();
+			while ((node = el.firstChild)) {
+				lastNode = frag.appendChild(node);
+			}
+			firstNode = frag.firstChild;
+			range.insertNode(frag);
+
+			if (lastNode) {
+				range = range.cloneRange();
+				range.setStartAfter(lastNode);
+				range.setStartBefore(firstNode);
+				// range.collapse(true);
+				sel.removeAllRanges();
+				sel.addRange(range);
+			}
+		}
 	},
 
 	forgetCursorPosition: function() {

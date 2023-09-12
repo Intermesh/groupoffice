@@ -50,31 +50,39 @@ class Module extends core\Module
 
 	
 	public static function garbageCollection() {
-//		$types = EntityType::findAll();
-//
-//		go()->debug("Cleaning up comments");
-//		foreach($types as $type) {
-//			if($type->getName() == "Link" || $type->getName() == "Search" ||  !is_a($type->getClassName(), Entity::class, true)) {
-//				continue;
-//			}
-//
-//			$cls = $type->getClassName();
-//
-//			if(is_a($cls,  ActiveRecord::class, true)) {
-//				$tableName = $cls::model()->tableName();
-//			} else{
-//				$tableName = array_values($cls::getMapping()->getTables())[0]->getName();
-//			}
-//			$query = (new Query)->select('sub.id')->from($tableName);
-//
-//			$stmt = go()->getDbConnection()->delete('comments_comment', (new Query)
-//				->where('entityTypeId', '=', $type->getId())
-//				->andWhere('entityId', 'NOT IN', $query)
-//			);
-//			$stmt->execute();
-//
-//			go()->debug("Deleted ". $stmt->rowCount() . " comments for $cls");
-//		}
+		$types = core\orm\EntityType::findAll();
+
+		go()->debug("Cleaning up comments");
+		foreach($types as $type) {
+			if($type->getName() == "Comment" || $type->getName() == "Link" || $type->getName() == "Search" ||
+				(!is_a($type->getClassName(), Entity::class, true) && !is_a($type->getClassName(), ActiveRecord::class, true))
+			) {
+				continue;
+			}
+
+			$cls = $type->getClassName();
+
+			if(is_a($cls,  ActiveRecord::class, true)) {
+				$tableName = $cls::model()->tableName();
+			} else{
+				$tableName = array_values($cls::getMapping()->getTables())[0]->getName();
+			}
+
+			if(!go()->getDatabase()->getTable($tableName)->getColumn('id')) {
+				continue;
+			}
+			$query = (new core\orm\Query())->select('sub.id')->from($tableName, 'sub');
+
+			$stmt = go()->getDbConnection()->delete('comments_comment', (new core\orm\Query())
+				->where('entityTypeId', '=', $type->getId())
+				->andWhere('entityId', 'NOT IN', $query)
+			);
+//			echo $stmt ." \n\n";
+
+			$stmt->execute();
+
+			go()->debug("Deleted ". $stmt->rowCount() . " comments for $cls");
+		}
 	}
 
 	private static $demoTexts;

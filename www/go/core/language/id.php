@@ -394,7 +394,7 @@ return array (
   'Remove Formatting' => 'Memformat Penghapusan',
   'Cleans text pasted from Word or other Rich Text applications' => 'Membersihkan teks yang disisipkan dari Word atau aplikasi Rich Text lainnya',
   'Insert Horizontal Rule' => 'Sisipkan Aturan Horizontal',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => 'Masukkan lebar Aturan dalam persentase<br/> diikuti dengan tanda % di bagian akhir, atau untuk<br/> mengatur lebar tetap, hapus simbol %.',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => 'Masukkan lebar Aturan dalam persentase<br/> diikuti dengan tanda % di bagian akhir, atau untuk<br/> mengatur lebar tetap, hapus simbol %.',
   'Width' => 'Lebar',
   'Insert' => 'Sisipkan',
   'Reminders' => 'Pengingat',

@@ -7,7 +7,7 @@ go.filter.FilterAddButton = Ext.extend(Ext.Button,{
 				text: t("Filter"),
 				iconCls: 'ic-filter-list',
 				handler: function() {
-					var dlg = new go.filter.FilterDialog({
+					const dlg = new go.filter.FilterDialog({
 						entity: this.entity
 					});
 					dlg.show();
@@ -18,7 +18,7 @@ go.filter.FilterAddButton = Ext.extend(Ext.Button,{
 				text: t("Input field"),
 				iconCls: 'ic-search',
 				handler: function() {
-					var dlg = new go.filter.VariableFilterDialog({
+					const dlg = new go.filter.VariableFilterDialog({
 						entity: this.entity
 					});
 					dlg.show();

@@ -51,7 +51,7 @@ class Message extends \Swift_Message{
 		parent::__construct($subject, $body, $contentType, $charset);
 
     $headers = $this->getHeaders();
-    $headers->addTextHeader("X-Mailer", "Group-Office (" . go()->getVersion() . ")");
+    $headers->addTextHeader("X-Mailer", "Group-Office");
 
 		// See Mailer.php at line 105 for header encoding
 		if(GO::config()->swift_email_body_force_to_base64) {
@@ -547,7 +547,7 @@ class Message extends \Swift_Message{
 			$this->setPriority ($params['priority']);
 		
 		
-		if(isset($params['in_reply_to'])){
+		if(isset($params['in_reply_to']) && strlen($params['in_reply_to'])){
 			$headers = $this->getHeaders();
 			$headers->addTextHeader('In-Reply-To', "<" . $params['in_reply_to'] . ">");
 			$headers->addTextHeader('References', "<" .$params['in_reply_to'] . ">");
@@ -575,6 +575,8 @@ class Message extends \Swift_Message{
 						}
 						if(in_array(substr($ia->tmp_file,0,14), ['saved_messages', 'imap_messages/'])) {
 							$path = \GO::config()->tmpdir.$ia->tmp_file;
+						} elseif($ia->blobId) {
+							$path = Blob::buildPath($ia->blobId);
 						} else {
 							$path = empty($ia->from_file_storage) ? Blob::buildPath($ia->tmp_file) : \GO::config()->file_storage_path . $ia->tmp_file;
 						}

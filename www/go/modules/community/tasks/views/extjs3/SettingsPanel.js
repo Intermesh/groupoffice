@@ -10,12 +10,12 @@ go.modules.community.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 		//The account dialog is an go.form.Dialog that loads the current User as entity.
 		this.items = [{
 			xtype: "fieldset",
-			title: t("Display options for task lists"),
+			title: t("Display options for lists"),
 			items: [
 				{
 					xtype: "tasklistcombo",
 					hiddenName: "tasksSettings.defaultTasklistId",
-					fieldLabel: t("Default task list"),
+					fieldLabel: t("Default list"),
 					role: 'list',
 					allowBlank: true
 				},

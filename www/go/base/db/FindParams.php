@@ -369,7 +369,7 @@ class FindParams{
 	 * Execute a simple search query
 	 * 
 	 * @param StringHelper $query
-	 * @param array $fields When you ommit this it will search all text fields
+	 * @param array $fields When you omit this it will search all text fields
 	 * @return FindParams 
 	 */
 	public function searchQuery($query, $fields=array()){

@@ -42,7 +42,8 @@
     "league/oauth2-google": "^4.0",
     "fakerphp/faker": "^1.19",
     "ext-fileinfo": "*",
-    "thenetworg/oauth2-azure": "^2.1"
+    "thenetworg/oauth2-azure": "^2.1",
+    "erusev/parsedown": "^1.7"
   },
   "license": "AGPL",
   "authors": [

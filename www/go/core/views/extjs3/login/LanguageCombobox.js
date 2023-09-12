@@ -19,7 +19,7 @@ go.login.LanguageCombobox = Ext.extend(Ext.form.ComboBox,{
 			editable: false,
 			// value: GO.lang.iso,
 			maxHeight:999999,
-			width:dp(192)
+			width:dp(240)
  		});
 
 //		this.tpl = '<tpl for="."><div class="x-combo-list-item">' +

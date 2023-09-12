@@ -493,7 +493,7 @@ Sva prava pridržana.<br />
   'Outdent Text' => 'Izvuci Tekst',
   'Remove Formatting' => 'Ukloni Oblikovanja',
   'Insert Horizontal Rule' => 'Umetni Horizontalnu Povlaku',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => 'Unesi širinu povlake u postotku<br/> sa znakom % na kraju, ili da<br/> postavite fiksnu širinu izbacite znak %.',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => 'Unesi širinu povlake u postotku<br/> sa znakom % na kraju, ili da<br/> postavite fiksnu širinu izbacite znak %.',
   'Insert' => 'Umetni',
   'Width' => 'Širina',
   'Thank you' => 'Hvala',

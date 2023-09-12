@@ -46,13 +46,16 @@ class Image {
 	 */
 	public function load(string $filename): bool
 	{
-
 		if (!function_exists("imagecreatefromjpeg")) {
 			trigger_error("Can't resize image because the PHP GD extension is not installed", E_USER_WARNING);
 			return false;
 		}
 
 		$image_info = getimagesize($filename);
+		if(!$image_info) {
+			return false;
+		}
+
 		$this->imageType = $image_info[2];
 
 		$this->originalFilename = $filename;
@@ -105,6 +108,33 @@ class Image {
 
 				// Restore transparency blending
 				imagesavealpha($this->resizedImage, true);
+			}
+		}
+	}
+
+	/**
+	 * Automatically rotate image according to exif data
+	 * @return void
+	 */
+	public function fixOrientation() {
+		if(!function_exists("exif_read_data")) {
+			return false;
+		}
+		$exif = exif_read_data($this->originalFilename);
+
+		if (!empty($exif['Orientation'])) {
+			switch ($exif['Orientation']) {
+				case 3:
+					$this->resizedImage = imagerotate($this->getImage(), 180, 0);
+					break;
+
+				case 6:
+					$this->resizedImage = imagerotate($this->getImage(), -90, 0);
+					break;
+
+				case 8:
+					$this->resizedImage = imagerotate($this->getImage(), 90, 0);
+					break;
 			}
 		}
 	}
@@ -163,8 +193,11 @@ class Image {
 	 * @param int $compression
 	 * @return boolean
 	 */
-	public function save(string $filename, ?int $imageType = null, int $compression = 85): bool
+	public function save(?string $filename = null, ?int $imageType = null, int $compression = 85): bool
 	{
+		if($filename == null) {
+			$filename = $this->originalFilename;
+		}
 
 		if (isset($this->resizedImage) || $imageType != $this->imageType) {
 
@@ -185,7 +218,7 @@ class Image {
 				return false;
 		}else {
 			//image type and dimension unchanged. Simply copy original.
-			if (!copy($this->originalFilename, $filename))
+			if ($this->originalFilename != $filename && !copy($this->originalFilename, $filename))
 				return false;
 		}
 
@@ -199,7 +232,7 @@ class Image {
 	 */
 	public function getWidth(): int
 	{
-		return imagesx($this->originalImage);
+		return imagesx($this->getImage());
 	}
 
 	/**
@@ -208,7 +241,7 @@ class Image {
 	 */
 	public function getHeight(): int
 	{
-		return imagesy($this->originalImage);
+		return imagesy($this->getImage());
 	}
 
 	/**
@@ -231,7 +264,7 @@ class Image {
 	public function resizeToHeight(int $height): bool
 	{
 		$ratio = $height / $this->getHeight();
-		$width = $this->getWidth() * $ratio;
+		$width = floor($this->getWidth() * $ratio);
 
 		return $this->resize($width, $height);
 	}
@@ -246,7 +279,7 @@ class Image {
 	public function resizeToWidth(int $width): bool
 	{
 		$ratio = $width / $this->getWidth();
-		$height = $this->getheight() * $ratio;
+		$height = floor($this->getheight() * $ratio);
 		return $this->resize($width, $height);
 	}
 
@@ -259,8 +292,8 @@ class Image {
 	 */
 	public function scale(float $scale): bool
 	{
-		$width = $this->getWidth() * $scale / 100;
-		$height = $this->getheight() * $scale / 100;
+		$width = floor($this->getWidth() * $scale / 100);
+		$height = floor($this->getheight() * $scale / 100);
 		return $this->resize($width, $height);
 	}
 
@@ -282,6 +315,7 @@ class Image {
 
 		$currentWidth = $this->getWidth();
 		$currentHeight = $this->getHeight();
+		$original = $this->getImage();
 
 		if(!$this->resizedImage = imagecreatetruecolor($width, $height)){
 			throw new Exception("Could not create image");
@@ -289,7 +323,7 @@ class Image {
 
 		$this->transperancy();
 
-		return imagecopyresampled($this->resizedImage, $this->originalImage, 0, 0, 0, 0, $width, $height, $currentWidth, $currentHeight);
+		return imagecopyresampled($this->resizedImage, $original, 0, 0, 0, 0, $width, $height, $currentWidth, $currentHeight);
 	}
 
 	/**

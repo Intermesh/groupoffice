@@ -24,10 +24,16 @@ if(!Environment::get()->isCli()) {
 }
 
 go()->getDebugger()->setRequestId('cli');
-go()->getDebugger()->output = true;
+//go()->getDebugger()->output = true;
 if(!empty($args['debug'])) {
 	go()->getDebugger()->enable(true);
+
+    if($args['debug'] == "output") {
+        go()->getDebugger()->output = true;
+    }
+
 }
+
 
 if(array_key_exists('debug', $args)) {
     go()->getDebugger()->enabled = !empty($args['debug']);

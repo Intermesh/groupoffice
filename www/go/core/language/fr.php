@@ -229,7 +229,7 @@ return array (
   'Outdent Text' => 'Désindenter Texte',
   'Remove Formatting' => 'Supprimer le formatage',
   'Insert Horizontal Rule' => 'Insérer une règle horizontale',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => 'Entrez la largeur de la règle en pourcentage <br/> suivi du signe % à la fin ou <br/> pour définir une largeur fixe en omettant le symbole %.',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => 'Entrez la largeur de la règle en pourcentage <br/> suivi du signe % à la fin ou <br/> pour définir une largeur fixe en omettant le symbole %.',
   'Insert' => 'Insérer',
   'Width' => 'Largeur',
   'Thank you' => 'Merci',

@@ -1369,7 +1369,21 @@ $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
 $updates['202302211524'][] = "ALTER TABLE `core_pdf_template`
   MODIFY `id` bigint unsigned auto_increment";
 
-$updates['202303131003'][] = "delete from core_acl_group where groupId = (select id from core_group where isUserGroupFor=1);";
+$updates['202303131003'][] = function() {
+	$sql = "delete from core_acl_group where groupId = (select id from core_group where isUserGroupFor=1)";
+
+	if(go()->getDatabase()->hasTable("em_accounts")) {
+		$sql .= " AND aclId not IN (select acl_id from em_accounts)";
+	}
+
+	echo $sql ."\n";
+
+	try {
+		go()->getDbConnection()->exec($sql);
+	}catch(Exception $e) {
+		echo "Exception: " . $e->getMessage() ."\n";
+	}
+};
 
 $updates['202303151524'][] = "ALTER TABLE `core_user` 
 ADD COLUMN `themeColorScheme` ENUM('light', 'dark', 'system') NOT NULL DEFAULT 'light' AFTER `theme`;";
@@ -1477,3 +1491,30 @@ ADD CONSTRAINT `fk_core_auth_token_core_client1`
   FOREIGN KEY (`clientId`)
   REFERENCES `core_client` (`id`)
   ON DELETE CASCADE;";
+
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add header text null;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add footer text null;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    alter column marginTop set default 20;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    alter column marginBottom set default 20.0000;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add headerX decimal(19, 4) default 0 null after header;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add headerY decimal(19, 4) default 10 null after headerX;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add footerX decimal(19, 4) default 0 null;";
+
+$updates['202306191435'][] = "alter table core_pdf_template
+    add footerY decimal(19, 4) default -12 null;";
+
+

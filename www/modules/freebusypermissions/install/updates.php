@@ -14,3 +14,10 @@ $updates['202102111524'][] = 'alter table fb_acl
 		foreign key (user_id) references core_user (id)
 			on delete cascade;';
 
+
+$updates['202102111524'][] = "delete from fb_acl where acl_id not in (select id from core_acl);";
+
+$updates['202305151438'][] = 'alter table fb_acl
+    add constraint fb_acl_core_acl_id_fk
+        foreign key (acl_id) references core_acl (id) on delete cascade;
+';

@@ -114,7 +114,9 @@ class Disk implements CacheInterface {
 		unset($this->cache[$key]);
 
 		$file = $this->folder->getFile($key);
-		$file->delete();
+		if($file->exists()) {
+			$file->delete();
+		}
 	}
 
 	private $flushOnDestruct = false;

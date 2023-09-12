@@ -153,3 +153,4 @@ $updates['202104021322'][] = "ALTER TABLE `notes_user_settings` ADD (`rememberLa
 
 
 $updates['202205101237'][] = "update notes_note set filesFolderId = null where filesFolderId=0;";
+$updates['202308011518'][] = "ALTER TABLE `notes_note` CHANGE COLUMN `content` `content` MEDIUMTEXT NULL DEFAULT NULL ;";

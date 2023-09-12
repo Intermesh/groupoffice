@@ -40,6 +40,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 			store: new go.data.GroupingStore({
 				groupField: "group",
 				remoteGroup: true,
+				remoteSort: true,
 				fields: [
 					'id',
 					'name',

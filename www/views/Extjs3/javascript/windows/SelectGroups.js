@@ -30,6 +30,9 @@ GO.dialog.SelectGroups = function(config){
 
 	this.store = new GO.data.JsonStore({
 		url: GO.url('core/groups'),
+		baseParams: {
+			hideUserGroups: true
+		},
 		fields: ['id','name','user_id','user_name'],
 		remoteSort: true		
 	});

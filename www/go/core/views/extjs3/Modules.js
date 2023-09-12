@@ -75,7 +75,7 @@ go.Modules = (function () {
 		 * 
 		 * @param {string} package
 		 * @param {string} name
-		 * @param {int} @deprecated Required permission level
+		 * @param {int} @deprecated Required permission level Use: go.Modules.get("studio","animals").userRights.mayManage
 		 * @param {User} User entity
 		 * @returns {boolean}
 		 */

@@ -28,7 +28,7 @@ go.Entity = function (cfg) {
 				name: 'text',
 				type: "string",
 				multiple: false,
-				title: "Query"
+				title: t("Query")
 		}];
 	}
 	

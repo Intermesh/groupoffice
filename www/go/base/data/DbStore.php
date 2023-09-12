@@ -40,6 +40,8 @@ class DbStore extends AbstractStore {
 	 */
 	protected $_stmt;
 
+	private $_loaded = false;
+
 	/**
 	 * The column name to sort the resulting record set on
 	 * @var StringHelper

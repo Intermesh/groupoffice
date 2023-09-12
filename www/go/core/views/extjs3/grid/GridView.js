@@ -15,7 +15,7 @@
  * 				text: t("Edit"),
  * 				handler: function(item) {
  * 					//use item.parentMenu.rowIndex to find record
- * 					var record = this.store.getAt(item.parentMenu.rowIndex);
+ * 					var record = item.parentMenu.grid.store.getAt(item.parentMenu.rowIndex);
  * 					this.edit(record.id);
  * 				},
  * 				scope: this
@@ -104,6 +104,8 @@ Ext.define('go.grid.GridView', {
 				scope: this.actionConfig.scope,
 				menu: this.actionConfig.menu
 			});
+
+			this.actionConfig.menu.grid = this.grid;
 			// this.scroller.dom.addEventListener("scroll", () => {
 			// 	this.actionBtn.hide()
 			// 	if(this.actionBtn.menu) {

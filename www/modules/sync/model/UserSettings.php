@@ -89,7 +89,7 @@ class UserSettings extends Property
 	  }
 
 		if (empty($this->addressBooks) || empty($this->noteBooks)  || empty($this->tasklists)) {
-			$user = User::findById($this->user_id, ['addressBookSettings', 'notesSettings', 'syncSettings']);
+			$user = User::findById($this->user_id, ['addressBookSettings', 'notesSettings', 'syncSettings', 'tasksSettings']);
 
 			if (empty($this->addressBooks)) {
 				if (isset($user->addressBookSettings) && ($addressBookId = $user->addressBookSettings->getDefaultAddressBookId())) {

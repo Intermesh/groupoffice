@@ -20,6 +20,10 @@ class Notify extends Controller {
 						->setSubject($params['subject'] ?? "")
 						->setBody($params['body'] ?? "", $params['contentType'] ?? null);
 
+		if(isset($params['replyTo'])) {
+			$message->setReplyTo($params['replyTo']);
+		}
+
 		$success = $message->send();
 		
 		Response::get()->addResponse(['success' => $success]);

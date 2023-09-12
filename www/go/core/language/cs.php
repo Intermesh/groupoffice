@@ -605,7 +605,7 @@ Tento program je chráněn autorským zákonem a {product_name} licencí.<br />
   'Remove Formatting' => 'Odstranit formátování',
   'Cleans text pasted from Word or other Rich Text applications' => 'Vyčistí text vložený z Wordu nebo jiné textové aplikace',
   'Insert Horizontal Rule' => 'Vložit vodorovnou čáru',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => 'Vložte šířku čáry v procentech<br/> poté následuje znak % na konci, nebo<br/> zadejte pevnou šířku a vynechtejte znak %.',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => 'Vložte šířku čáry v procentech<br/> poté následuje znak % na konci, nebo<br/> zadejte pevnou šířku a vynechtejte znak %.',
   'Width' => 'Šířka',
   'Thank you' => 'Děkujeme',
   'Apply multiselect' => 'Použít vícenásobný výběr',

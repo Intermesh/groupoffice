@@ -11,49 +11,62 @@
 
 namespace GO\Summary\Controller;
 
+use GO\Base\Db\FindCriteria;
+use GO\Base\Db\FindParams;
+use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\Validation;
+use go\core\model\User;
 use GO\Summary\Model\RssFeed;
 
 class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 
 	protected $model = 'GO\Summary\Model\RssFeed';
 
-	protected function actionSaveFeeds($params) {
-
+	protected function actionSaveFeeds(array $params)
+	{
 		$feeds = json_decode($params['feeds'], true);
 		$ids = array();
+		$currUserId = \GO::User()->id;
+		$stmt = User::find(['id'])->where(['enabled' => true])->all();
+		foreach($stmt as $u) {
+			$allUsers[] = $u->id;
+		}
 
 		$response['data'] = array();
 		foreach ($feeds as $feed) {
-			//$feed['user_id'] = \GO::user()->id;
-			
-			if(!empty($feed['id']))
-				$feedModel = \GO\Summary\Model\RssFeed::model()->findByPk($feed['id']);
-			else
-				$feedModel = new \GO\Summary\Model\RssFeed();
-			
-			$feedModel->setAttributes($feed);
-			if(!$feedModel->save()) {
-				throw new Validation($feedModel->getValidationError('url'));
+			if(!empty($feed['id'])) {
+				$feedModel = RssFeed::model()->findByPk($feed['id']);
+				$this->doSave($feedModel, $feed, $currUserId);
+				$ids[] = $feed['id'];
+				$response['data'][$feed['id']] = $feed;
+			} else {
+				$ar = [$currUserId];
+				if(isset($feed['allUsers'])) {
+					$ar = $allUsers;
+				}
+				foreach($ar as $userId) {
+					$feedModel = new RssFeed();
+					$this->doSave($feedModel, $feed, $userId);
+//					$feed['id'] = $feedModel->id;
+					$ids[] = $feedModel->id;
+					$response['data'][$feedModel->id] = $feed;
+				}
 			}
-			$feed['id'] = $feedModel->id;
-
-			$ids[] = $feed['id'];
-			$response['data'][$feed['id']] = $feed;
 		}
 
 		// delete other feeds
-		$feedStmt = \GO\Summary\Model\RssFeed::model()
+		$feedStmt = RssFeed::model()
 						->find(
-						\GO\Base\Db\FindParams::newInstance()
+						FindParams::newInstance()
 						->criteria(
-										\GO\Base\Db\FindCriteria::newInstance()
-										->addCondition('user_id', \GO::user()->id)
+										FindCriteria::newInstance()
+										->addCondition('user_id', $currUserId)
 										->addInCondition('id', $ids, 't', true, true)
 						)
 		);
-		while ($deleteFeedModel = $feedStmt->fetch())
+		while ($deleteFeedModel = $feedStmt->fetch()) {
 			$deleteFeedModel->delete();
+		}
 
 		$response['ids'] = $ids;
 		$response['success'] = true;
@@ -61,15 +74,15 @@ class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 		return $response;
 	}
 
-	protected function beforeStoreStatement(array &$response, array &$params, \GO\Base\Data\AbstractStore &$store, \GO\Base\Db\FindParams $storeParams) {
+	protected function beforeStoreStatement(array &$response, array &$params, \GO\Base\Data\AbstractStore &$store, FindParams $storeParams) {
 		$storeParams->getCriteria()->addCondition('user_id', \GO::user()->id);
 		return parent::beforeStoreStatement($response, $params, $store, $storeParams);
 	}
 	
 	protected function getStoreParams($params) {
-		$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
+		$findCriteria = FindCriteria::newInstance()
 						->addCondition('user_id', \GO::user()->id);
-		return \GO\Base\Db\FindParams::newInstance()
+		return FindParams::newInstance()
 						->select('t.*')
 						->criteria($findCriteria);
 	}
@@ -111,6 +124,25 @@ class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 				echo str_replace('<dc:creator', '<author', $xml);
 			}
 		}
+	}
+
+	/**
+	 *
+	 * @param RssFeed $feedModel
+	 * @param array $feed
+	 * @param int $userId
+	 *
+	 * @throws Validation
+	 * @throws AccessDenied
+	 */
+	private function doSave(RssFeed &$feedModel, array $feed, int $userId)
+	{
+		$feedModel->setAttributes($feed);
+		$feedModel->user_id = $userId;
+		if(!$feedModel->save()) {
+			throw new Validation($feedModel->getValidationError('url'));
+		}
+
 	}
 
 }

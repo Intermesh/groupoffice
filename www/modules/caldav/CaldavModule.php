@@ -12,7 +12,12 @@ class CaldavModule extends \GO\Base\Module {
 	public function depends() {
 		return array("dav","sync","calendar");
 	}
-	
+
+	public function autoInstall()
+	{
+		return true;
+	}
+
 	public static function initListeners() {
 		
 //		if(\GO::modules()->isInstalled('calendar')) {

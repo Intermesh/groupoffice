@@ -41,6 +41,16 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	isValid : function() {
 		return this.getForm().isValid();
 	},
+
+	/**
+	 * Override to fetch sync async before loading form. See go.modules.business.finance.FinanceDocumentDialog for an example.
+	 *
+	 * @param values
+	 * @return {Promise<*>}
+	 */
+	onBeforeLoad: async function (values) {
+		return values;
+	},
 	
 	load: function (id, callback, scope) {
 		this.currentId = id;
@@ -48,17 +58,20 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		this.getEl().mask(t("Loading..."));
 
 		this.entityStore.single(id).then((entity) => {
-			this.entity = entity;
 
-			this.on('setvalues', () => {
-				this.fireEvent("load", this, entity);
-			}, this, {single: true});
+			this.onBeforeLoad(entity).then((entity) => {
+				this.entity = entity;
 
-			this.setValues(entity, true);
-			
-			if(callback) {
-				callback.call(scope || me, entity);
-			}
+				this.on('setvalues', () => {
+					this.fireEvent("load", this, entity);
+				}, this, {single: true});
+
+				this.setValues(entity, true);
+
+				if(callback) {
+					callback.call(scope || me, entity);
+				}
+			})
 		}).finally(() => {
 			this.getEl().unmask();
 		})

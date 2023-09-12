@@ -11,22 +11,11 @@ go.customfields.type.Attachments = Ext.extend(go.customfields.type.Text, {
 	},
 
 	renderDetailView (values, data, customfield) {
-		//debugger; // also used for column render
 		if(!values || !values.length) {
 			return "";
 		}
-		return '<i class="icon ic-attachment"></i> '+ values.length;
-		// let filesdetial = new go.modules.files.FilesDetailPanel();
-		// var options = [];
-		// values.forEach(function(value){
-		// 	var opt = customfield.dataType.options.find(o => o.id == value);
-		//
-		// 	if(opt) {
-		// 		options.push(opt.text);
-		// 	}
-		// });
-		//
-		// return options.join(", ");
+		return '<i class="icon ic-attachment"></i> '+
+			values.map(a => '<a target="_blank" href="'+ go.Jmap.downloadUrl(a.blobId, true) + '">'+ a.name + '</a>').join(", ");
 	},
 
 	createFormFieldConfig (customfield, config) {

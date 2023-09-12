@@ -232,4 +232,91 @@ class ContactStore extends Store {
 		return $newstate;
 	}
 
+
+	public function GetGALSearchResults($searchquery, $searchrange, $searchpicture) {
+		ZLog::Write(LOGLEVEL_DEBUG, sprintf("ContactStore->GetGALSearchResults(%s, %s)", $searchquery, $searchrange));
+
+
+
+			// range for the search results, default symbian range end is 50, wm 99,
+			// so we'll use that of nokia
+			$rangestart = 0;
+			$rangeend = 50;
+
+			if ($searchrange != '0') {
+				$pos = strpos($searchrange, '-');
+				$rangestart = substr($searchrange, 0, $pos);
+				$rangeend = substr($searchrange, ($pos + 1));
+			}
+			$items = array();
+
+
+			$contacts = Contact::find()->filter([
+				"permissionLevel" => Acl::LEVEL_READ,
+				"text" => $searchquery
+			])
+				->limit($rangeend - $rangestart)
+				->offset($rangestart)
+				->calcFoundRows();
+
+			$items['searchtotal'] = $contacts->foundRows();
+
+			//do not return more results as requested in range
+			$querylimit = (($rangeend + 1) < $items['searchtotal']) ? ($rangeend + 1) : ($items['searchtotal'] == 0 ? 1 : $items['searchtotal']);
+			$items['range'] = $rangestart.'-'.($querylimit - 1);
+
+
+			ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendCardDAV->GetGALSearchResults : %s entries found, returning %s to %s", $items['searchtotal'], $rangestart, $querylimit));
+
+			$rc = 0;
+			foreach ($contacts as $contact) {
+				$items[$rc][SYNC_GAL_EMAILADDRESS] = !empty($contact->emailAddresses) ? $contact->emailAddresses[0] : '';
+				$items[$rc][SYNC_GAL_DISPLAYNAME] = $contact->name;
+				$items[$rc][SYNC_GAL_FIRSTNAME] = $contact->firstName;
+				$items[$rc][SYNC_GAL_LASTNAME] = $contact->lastName;
+
+				$items[$rc][SYNC_GAL_PHONE] = $contact->findPhoneNumberByType(\go\modules\community\addressbook\model\PhoneNumber::TYPE_WORK);
+				$items[$rc][SYNC_GAL_HOMEPHONE] = $contact->findPhoneNumberByType(\go\modules\community\addressbook\model\PhoneNumber::TYPE_HOME);
+				$items[$rc][SYNC_GAL_MOBILEPHONE] = $contact->findPhoneNumberByType(\go\modules\community\addressbook\model\PhoneNumber::TYPE_MOBILE);
+
+
+				$items[$rc][SYNC_GAL_TITLE] = $contact->jobTitle;
+				$org = $contact->findOrganizations(['name'])->single();
+				if ($org) {
+					$items[$rc][SYNC_GAL_COMPANY] = $org->name;
+				}
+				$items[$rc][SYNC_GAL_OFFICE] = $contact->department;
+				$rc++;
+			}
+
+			return $items;
+	}
+
+	/**
+	 * Indicates if a search type is supported by this SearchProvider
+	 * Currently only the type ISearchProvider::SEARCH_GAL (Global Address List) is implemented
+	 *
+	 * @param string        $searchtype
+	 *
+	 * @access public
+	 * @return boolean
+	 */
+	public function SupportsType($searchtype) {
+
+		return ($searchtype == ISearchProvider::SEARCH_GAL);
+
+	}
+
+
+	/**
+	 * Searches for the emails on the server
+	 *
+	 * @param ContentParameter $cpo
+	 *
+	 * @return array
+	 */
+	public function GetMailboxSearchResults($cpo) {
+		return false;
+	}
+
 }

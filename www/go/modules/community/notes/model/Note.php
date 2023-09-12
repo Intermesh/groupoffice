@@ -111,7 +111,7 @@ class Note extends AclItemEntity {
 
 	protected function internalValidate()
 	{
-		if($this->isModified(['content']) && StringUtil::detectXSS($this->content)) {
+		if($this->isModified(['content']) && StringUtil::detectXSS($this->content, true)) {
 			$this->setValidationError('content', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
 		}
 		return parent::internalValidate();

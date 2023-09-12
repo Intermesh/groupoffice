@@ -22,6 +22,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			root: 'results',
 			totalProperty: 'total',
 			remoteSort: true,
+			suppressError: true,
 			reader: new Ext.data.JsonReader({
 				root: 'results',
 				totalProperty: 'total',
@@ -35,8 +36,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			groupField: 'udate'
 		});
 
-//		this.messagesStore.setDefaultSort('udate', 'DESC');
-
 		this.messagesStore.on('load', function(){
 
 			this.isManager = this.messagesGrid.store.reader.jsonData.permission_level == GO.permissionLevels.manage;
@@ -48,8 +47,44 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			
 			this.messagesGrid.deleteButton.setDisabled(this.readOnly);
 		}, this);
-		
-		
+		this.messagesStore.on('exception',
+			function( store, type, action, options, response){
+				if(response.isTimeout || response.status == 0){
+					console.error(response);
+					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+				} else if(!options.reader.jsonData || GO.jsonAuthHandler(options.reader.jsonData, this.load, this)) {
+					let msg;
+
+					if (!GO.errorDialog.isVisible()) {
+						if(options.reader.jsonData && options.reader.jsonData.feedback) {
+							const feedback = options.reader.jsonData.feedback;
+
+							if(feedback.toLowerCase().indexOf("oauth2") > -1) {
+								Ext.MessageBox.alert(t("Refresh token"),
+									t("Your token has possibly expired. A new window will be opened in which you can renew your token.", "email"),
+									() => {
+										window.open(window.location.pathname + 'go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id, 'do_da_auth_thingy');
+									}
+									,this);
+								// we done!
+								return;
+							}
+							msg = feedback;
+							GO.errorDialog.show(msg);
+						} else if (!response.isAbort) {
+							msg = t("An error occurred on the webserver. Contact your system administrator and supply the detailed error.");
+							msg += '<br /><br />JsonStore load exception occurred';
+							GO.errorDialog.show(msg);
+						}
+					}
+				} else {
+					console.error(response);
+
+					GO.errorDialog.show(t("Failed to send the request to the server. Please check your internet connection."));
+				}
+			}
+			, this
+		);
 
 	var messagesAtTop = Ext.state.Manager.get('em-msgs-top');
 	if(messagesAtTop) {
@@ -378,16 +413,16 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				},
 				scope: this
 			}),'->',
-			this.printButton = new Ext.Button({
-				disabled: true,
-				iconCls: 'ic-print',
-				tooltip: t("Print"),
-				overflowText: t("Print"),
-				handler: function(){
-					this.messagePanel.print();
-				},
-				scope: this
-			}),
+			// this.printButton = new Ext.Button({
+			// 	disabled: true,
+			// 	iconCls: 'ic-print',
+			// 	tooltip: t("Print"),
+			// 	overflowText: t("Print"),
+			// 	handler: function(){
+			// 		this.messagePanel.print();
+			// 	},
+			// 	scope: this
+			// }),
 			{
 				iconCls: 'ic-more-vert',
 				menu: this.gridContextMenu
@@ -404,6 +439,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			menu:this.gridContextMenu.saveAsMenu
 		});
 
+
+
+
+	}
+
 		this.messageTbar.insert(-1, {
 			xtype:'button',
 			iconCls:'ic-delete',
@@ -413,9 +453,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				this.westPanel.show();
 			}
 		});
-
-
-	}
 
 	this.messagePanel = new GO.email.MessagePanel({
 		id:'email-message-panel',
@@ -462,7 +499,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this.replyAllButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.replyButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.forwardButton.setDisabled(this.readOnly && !this._permissionDelegated);
-			this.printButton.setDisabled(false);//this.readOnly && !this._permissionDelegated);
+			// this.printButton.setDisabled(false);//this.readOnly && !this._permissionDelegated);
 
 			var record = this.messagesGrid.store.getById(this.messagePanel.uid);
 
@@ -581,6 +618,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 					this.markAsRead.defer(2000, this, [r.data.uid, r.data['mailbox'], this.account_id]);
 				}
 			}
+			this.messagePanel.show();
 		},this)
 
 		// grid.getSelectionModel().on('selectionchange', function(grid, rowIndex, r){
@@ -665,17 +703,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.messagesGrid.store.baseParams['account_id']=account_id;
 		this.messagesGrid.store.baseParams['mailbox']=mailbox;
 
-		// if(reload) {
-		// 	this.messagesGrid.store.reload({
-		// 		keepScrollPosition: true
-		// 	})
-		// } else {
-			this.messagesGrid.store.load({
-				params: {
-					start: 0
-				}
-			});
-		// }
+		this.messagesGrid.store.load({
+			params: {
+				start: 0
+			}
+		});
 
 		this.treePanel.setUsage(usage);
 	},
@@ -683,6 +715,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	getFolderNodeId : function (account_id, mailbox){
 		return GO.util.Base64.encode("f_"+account_id+"_"+mailbox);
 	},
+
 	/**
 	 * Returns true if the current folder needs to be refreshed in the grid
 	 */

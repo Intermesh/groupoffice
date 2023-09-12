@@ -1337,7 +1337,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 			return $this->{"get" . $name}();
 		}
 		
-		return null;
+		return $this->dyn[$name] ?? null;
 	}
 	
 	public function __isset($name) {
@@ -1372,9 +1372,16 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		return $config;
 	}
-		
-	
-	
+
+	private $dyn = [];
+
+	public function __set($name, $value)
+	{
+		$this->dyn[$name] = $value;
+	}
+
+
+
 	/**
 	 * Constructor. Initialises all public variables.
 	 *
@@ -1458,24 +1465,14 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	/**
-	 * The no-reply e-mail which will be used to send system messages
-	 * Check if the noreply_email variable is set in the config.php file.
-	 * If it is not set, then use noreply@ {webmaster_email domain name}
-	 * When the webmaster email is not set, then this will be noreply@example.com
-	 * 
+	 * Older modules and cron jobs still use the obsolete noreply_email configuration option. In the new
+	 * framework, we use the systemEmail System Setting, so we simply return this.
+	 *
 	 * @return     string
 	 */
-	public function getNoreply_email(){
-
-		$wmdomain = 'example.com';
-
-		if(!empty($this->webmaster_email)){
-			$extractedEmail = explode('@',$this->webmaster_email);
-			if(isset($extractedEmail[1]))
-				$wmdomain = $extractedEmail[1];
-		}
-
-		return 'noreply@'.$wmdomain;
+	public function getNoreply_email(): string
+	{
+		return go()->getSettings()->systemEmail;
 	}
 	
 	public function getVersion() {

@@ -82,16 +82,16 @@ trait AclSetterTrait {
 	/**
 	 * Set the ACL
 	 *
-	 * @param array $acl An array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
+	 * @param array|null $acl An array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
 	 *
 	 * @example
 	 * ```
 	 * $addressBook->setAcl([
-	 * 	Group::ID_INTERNAL => Acl::LEVEL_DELETE
+	 *  Group::ID_INTERNAL => Acl::LEVEL_DELETE
 	 * ]);
 	 * ```
 	 */
-	public function setAcl(array $acl)
+	public function setAcl(?array $acl)
 	{
 		$this->setAcl = $acl;
 	}

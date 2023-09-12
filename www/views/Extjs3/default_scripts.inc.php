@@ -50,6 +50,7 @@ $settings['config']['checker_interval'] = (int) GO::config()->checker_interval;
 $settings['config']['remember_login'] = GO::config()->remember_login;
 $settings['config']['encode_callto_link'] = GO::config()->encode_callto_link;
 $settings['config']['login_message'] = GO::config()->login_message;
+$settings['config']['hideAbout'] = \GO::config()->hideAbout;
 $settings['config']['email_allow_body_search'] = GO::config()->email_allow_body_search;
 
 $settings['config']['lostPasswordURL'] = go()->getSettings()->lostPasswordURL;
@@ -182,26 +183,27 @@ if ($cacheFile->exists()) {
 			$bundleFile = new File($module->moduleManager->path(). 'views/goui/dist/Index.js');
 			if($bundleFile->exists()) {
 				$gouiScripts[] = $bundleFile;
-			} else {
-
-				if (!$scriptsFile || !file_exists($scriptsFile)) {
-					$scriptsFile = $modulePath . 'scripts.txt';
-					if (!file_exists($scriptsFile))
-						$scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
-
-					$prefix = "";
-				}
-				
-				if (file_exists($scriptsFile)) {
-					$data = file_get_contents($scriptsFile);
-					$lines = array_map('trim', explode("\n", $data));
-					foreach ($lines as $line) {
-						if (!empty($line)) {
-							$scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
-						}
-					}
-				}
 			}
+
+
+            if (!$scriptsFile || !file_exists($scriptsFile)) {
+                $scriptsFile = $modulePath . 'scripts.txt';
+                if (!file_exists($scriptsFile))
+                    $scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
+
+                $prefix = "";
+            }
+
+            if (file_exists($scriptsFile)) {
+                $data = file_get_contents($scriptsFile);
+                $lines = array_map('trim', explode("\n", $data));
+                foreach ($lines as $line) {
+                    if (!empty($line)) {
+                        $scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
+                    }
+                }
+            }
+
 		}
 	}
 

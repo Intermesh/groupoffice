@@ -38,7 +38,9 @@ class Sync extends Controller {
 	 * @throws NotFound
 	 * @throws Exception
 	 */
-  public function test($id, $username) {
+  public function test($params) {
+
+      extract($this->checkParams($params,['id','username']));
 	  //objectClass	inetOrgPerson)
 	  $server = Server::findById($id);
 	  if(!$server) {
@@ -65,12 +67,14 @@ class Sync extends Controller {
 	  }
   }
 
+
 	/**
 	 * docker-compose exec --user www-data groupoffice php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
 	 * @throws NotFound
 	 * @throws Exception
 	 */
-  public function users($id, $dryRun = false, $delete = false, $maxDeletePercentage = 5) {
+  public function users($params) {
+      extract($this->checkParams($params, ['id', 'dryRun'=>false, 'delete'=>false, 'maxDeletePercentage' => 5]));
     //objectClass	inetOrgPerson)
     $server = Server::findById($id);
     if(!$server) {
@@ -276,7 +280,9 @@ class Sync extends Controller {
 	 * docker-compose exec --user www-data groupoffice php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
 	 * @throws Exception
 	 */
-  public function groups($id, $dryRun = false, $delete = false, $maxDeletePercentage = 5) {
+  public function groups($params) {
+
+    extract($this->checkParams($params, ['id', 'dryRun'=>false, 'delete'=>false, 'maxDeletePercentage' => 5]));
 
     $server = Server::findById($id);
     if(!$server) {

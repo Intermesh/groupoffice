@@ -14,29 +14,20 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		});
 		
 		this.addBtn = new Ext.Button({
-			tooltip: t('Add'),
+			disabled: true,
+			tooltip: t('Add labels'),
 			iconCls: 'ic-add',
 			region:"west",
 			style: 'max-width: 32px',
 			menu: {
-				items:[
-
-//					{
-//					iconCls: 'ic-attach-file', 
-//					text: t('Select file')
-//				},{
-//					iconCls: 'ic-file-upload', 
-//					text: t('Upload file')
-//				},'-'
-//				},{
-//					iconCls: 'ic-link', 
-//					text: t('Add Link')
-//				}
-			]
+				items:[]
 			}
 		});
 		this.store.on('load', function() {
 			this.loadLabels();
+			if(this.store.getTotalCount() > 0) {
+				this.addBtn.enable();
+			}
 		},this);
 
 		this.textField = new go.form.HtmlEditor({
@@ -128,8 +119,6 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 				defaults: {
 					anchor: "100%"
 				},
-				 // align: "stretch",
-				 // flex: 1,
 
 				items: [
 					this.commentBox = new Ext.Container({

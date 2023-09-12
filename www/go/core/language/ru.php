@@ -483,7 +483,7 @@ All rights reserved.
   'Outdent Text' => 'Убрать выравнивание',
   'Remove Formatting' => 'Убрать форматирование',
   'Insert Horizontal Rule' => 'Вставить горизонтальный разделитель',
-  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.' => 'Укажите ширину разделителя в процентах <br/> с обязательным знаком % в конце или <br/> как фиксированное значение без знака %.',
+  'Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width omit the % symbol.' => 'Укажите ширину разделителя в процентах <br/> с обязательным знаком % в конце или <br/> как фиксированное значение без знака %.',
   'Insert' => 'Вставить',
   'Width' => 'Ширина',
   'Thank you' => 'Спасибо',

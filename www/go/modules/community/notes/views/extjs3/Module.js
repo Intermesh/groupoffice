@@ -17,7 +17,7 @@ go.Modules.register("community", 'notes', {
 				name: 'text',
 				type: "string",
 				multiple: false,
-				title: "Query"
+				title: t("Query")
 			},
 			{
 				name: 'name',

@@ -630,6 +630,8 @@ class Instance extends Entity {
             }
             unset($arr['id']);
 
+						$arr['userId'] = 1;
+
             if(!$this->getInstanceDbConnection()->insert('core_client', $arr)->execute()) {
                 throw new Exception("Failed to create access token");
             }
@@ -736,10 +738,15 @@ class Instance extends Entity {
 		}
 		catch(Exception $e) {
 			//ignore
-            go()->getDebugger()->debug($e);
+      go()->getDebugger()->debug($e);
 		} finally {
-            $this->getInstanceDbConnection()->disconnect();
-        }
+			try {
+				$this->getInstanceDbConnection()->disconnect();
+			} catch(Exception $e) {
+				//ignore
+				go()->getDebugger()->debug($e);
+			}
+    }
 	}	
 	
 	

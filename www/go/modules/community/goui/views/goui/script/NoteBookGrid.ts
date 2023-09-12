@@ -7,7 +7,7 @@ import {
 	t,
 	Table
 } from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import { jmapds } from "@intermesh/groupoffice-core";
 
 
 export class NoteBookGrid extends Table<DataSourceStore> {

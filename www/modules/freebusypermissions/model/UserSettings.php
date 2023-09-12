@@ -19,6 +19,9 @@ class UserSettings extends Property {
 	protected function init()
 	{
 		if(!isset($this->acl_id) && isset($this->owner) && isset($this->owner->id)) {
+
+			$this->user_id = $this->owner->id;
+
 			$this->createAcl();
 
 			go()->getDbConnection()

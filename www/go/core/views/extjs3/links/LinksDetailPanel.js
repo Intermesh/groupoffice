@@ -95,13 +95,16 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 
 						if(e.target.tagName === "I" && e.target.innerHTML == 'more_vert'){
 							this.showLinkMoreMenu(node,e, record);
-						} else {
+						} else if(go.Entities.get(record.data.toEntity).links[0].linkDetail){
 							var record = this.store.getById(node.getAttribute('data-id'));
 							var win = new go.links.LinkDetailWindow({
 								entity: record.data.toEntity
 							});
 
 							win.load(record.data.toId);
+						} else
+						{
+							go.Entities.get(record.data.toEntity).goto(record.data.toId);
 						}
 					}
 				}

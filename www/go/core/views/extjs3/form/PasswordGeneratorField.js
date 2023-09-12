@@ -23,7 +23,7 @@ go.form.PasswordGeneratorField = Ext.extend(Ext.form.TriggerField, {
 		});
 	},
 	onTriggerClick: function () {
-		var pass = this.generatePassword(8);
+		const pass = this.generatePassword(go.Modules.get("core","core").settings.passwordMinLength);
 		this.setValue(pass);
 		this.fireEvent('generated', this, pass);
 		

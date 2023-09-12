@@ -13,6 +13,7 @@ $font-scale: 1.1;
 	--fg-textfield-box:  rgba(255, 255, 255, 0.8); // for the border
 	--fg-textbox-line: 	#{rgba(black, 0.42)};
 	--fg-track: 	#{rgba(black, 0.26)};
+	--fg-tick: 		var(--c-primary);
 	--fg-text:           #{rgba(black, 0.87)};
 	--fg-secondary-text: #{rgba(black, 0.64)};
 	--fg-unfocused:		#{rgba(black, 0.54)};
@@ -61,6 +62,7 @@ $font-scale: 1.1;
 	--fg-textbox-line: 	#{rgba(white, 0.62)};
 
 	--fg-track: 	#{rgba(white, 0.36)};
+	--fg-tick: 		white;
 	--fg-text:           rgba(255,255,255, .89);
 	--fg-secondary-text: rgba(255,255,255, 0.7);
 	--fg-unfocused:	   rgba(255,255,255, 0.7);

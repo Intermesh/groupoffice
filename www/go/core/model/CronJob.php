@@ -4,6 +4,13 @@ namespace go\core\model;
 
 use Exception;
 
+/**
+ * CronJob class
+ *
+ * You can run your cronjob with this cli command:
+ *
+ * docker-compose exec -u www-data groupoffice ./www/cli.php core/System/runCron --name=MyJobClassName --module=mymodule --package=community --debug
+ */
 abstract class CronJob {
 	abstract public function run(CronJobSchedule $schedule);
 

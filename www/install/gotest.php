@@ -210,6 +210,15 @@ function test_system() :array
 	$tests[]=$test;
 
 
+	$test['name']='EXIF support';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=function_exists('exif_read_data');
+	$test['feedback']='Warning: No EXIF extension for PHP found. Without EXIF Group-Office can\'t create thumbnails.';
+	$test['fatal']=false;
+
+	$tests[]=$test;
+
+
 	$test['name']='File upload support';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=ini_is_enabled('file_uploads');

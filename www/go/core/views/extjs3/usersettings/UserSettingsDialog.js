@@ -205,7 +205,15 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 					continue;
 				}
 
-				if((pnl.adminOnly && go.User.isAdmin) || (!pnl.adminOnly && go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user)))
+				let add = false;
+				if(pnl.isAllowed) {
+					add = pnl.isAllowed();
+				} else
+				{
+					add = (pnl.adminOnly && go.User.isAdmin) || (!pnl.adminOnly && go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user));
+				}
+
+				if(add)
 				{
 					this._addPanelCmp(pnl);
 				}

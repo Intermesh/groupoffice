@@ -208,7 +208,7 @@ class Image {
 
 	public function resizeToHeight($height) {
 		$ratio = $height / $this->getHeight();
-		$width = $this->getWidth() * $ratio;
+		$width = floor($this->getWidth() * $ratio);
 		$this->resize($width, $height);
 	}
 
@@ -219,7 +219,7 @@ class Image {
 	 */
 	public function resizeToWidth($width) {
 		$ratio = $width / $this->getWidth();
-		$height = $this->getheight() * $ratio;
+		$height = floor($this->getheight() * $ratio);
 		$this->resize($width, $height);
 	}
 
@@ -229,8 +229,8 @@ class Image {
 	 * @param int $scale eg. 0.5
 	 */
 	public function scale($scale) {
-		$width = $this->getWidth() * $scale / 100;
-		$height = $this->getheight() * $scale / 100;
+		$width = floor($this->getWidth() * $scale / 100);
+		$height = floor($this->getheight() * $scale / 100);
 		$this->resize($width, $height);
 	}
 
@@ -285,10 +285,10 @@ class Image {
 		$ratio_orig = $width_orig / $height_orig;
 
 		if ($thumbnail_width / $thumbnail_height > $ratio_orig) {
-			$new_height = $thumbnail_width / $ratio_orig;
+			$new_height = floor($thumbnail_width / $ratio_orig);
 			$new_width = $thumbnail_width;
 		} else {
-			$new_width = $thumbnail_height * $ratio_orig;
+			$new_width = floor($thumbnail_height * $ratio_orig);
 			$new_height = $thumbnail_height;
 		}
 

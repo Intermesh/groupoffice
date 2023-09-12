@@ -47,6 +47,7 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 				text: t("Mark as read", "email"),
 				handler: function(){
 					this.main.flagMessages('Seen', false);
+					this.main.westPanel.show();
 				},
 				scope:this,
 				multiple:true
@@ -56,6 +57,7 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 				text: t("Mark as unread", "email"),
 				handler: function(){
 					this.main.flagMessages('Seen', true);
+					this.main.westPanel.show();
 				},
 				scope: this,
 				multiple:true
@@ -65,6 +67,8 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 				text: t("Add flag", "email"),
 				handler: function(){
 					this.main.flagMessages('Flagged', false);
+					this.main.westPanel.show();
+					this.main.westPanel.show();
 				},
 				scope: this,
 				multiple:true
@@ -74,6 +78,7 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 				text: t("Remove flag", "email"),
 				handler: function(){
 					this.main.flagMessages('Flagged', true);
+					this.main.westPanel.show();
 				},
 				scope: this,
 				multiple:true
@@ -92,7 +97,19 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 
 				},
 				scope: this
-			}),'-',
+			}),
+			this.printButton = new Ext.menu.Item({
+				// disabled: true,
+				iconCls: 'ic-print',
+				text: t("Print"),
+				overflowText: t("Print"),
+				handler: function(){
+					this.main.messagePanel.print();
+				},
+				scope: this
+			}),
+
+			'-',
 			this.contextMenuCopyTo = new Ext.menu.Item ({
 				iconCls: 'ic-content-copy',
 				text: t("Copy email to...", "email"),

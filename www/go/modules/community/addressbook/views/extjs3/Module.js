@@ -55,7 +55,7 @@ go.Modules.register("community", "addressbook", {
 				name: 'text',
 				type: "string",
 				multiple: false,
-				title: "Query"
+				title: t("Query")
 			},
 			{
 				title: t("Comment"),
@@ -276,6 +276,21 @@ go.Modules.register("community", "addressbook", {
 			}, {
 				title: t("Has e-mail addresses"),
 				name: 'hasEmailAddresses',
+				multiple: false,
+				type: 'select',
+				options: [
+					{
+						value: true,
+						title: t("Yes")
+					},
+					{
+						value: false,
+						title: t("No")
+					}
+				]
+			}, {
+				title: t("Has phone numbers"),
+				name: 'hasPhoneNumbers',
 				multiple: false,
 				type: 'select',
 				options: [

@@ -10,6 +10,8 @@ if [[ "$DPKG_ARCH" = "i386" ]]; then
   ARCH="x86"
 elif [[ "$DPKG_ARCH" = "amd64" ]]; then
   ARCH="x86-64"
+elif [[ "$DPKG_ARCH" = "arm64" ]]; then
+  ARCH="aarch64"
 fi
 
 # Download and extract

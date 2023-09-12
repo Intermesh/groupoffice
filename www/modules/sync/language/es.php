@@ -24,6 +24,9 @@ return array (
   'Synchronization' => 'Sincronización',
   'Delete older events and tasks at the client (they will be kept in Group-Office)' => 'Eliminar eventos y tareas antiguas en el cliente (se mantendrán en {product_name})',
   '<h1>Group-Office SyncML Server</h1><p>This is the Group-Office SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with Group-Office.</p>' => '<h1>{product_name} Servidor SyncML</h1><p>Este es el servidor SyncML de {product_name}. Utiliza un cliente SyncML Seleccionar calendarios a sincronizar.',
-  'Notebooks' => 'Libretas de notas',
+  'Notebooks' => 'Libretas',
   'Address books' => 'Libretas de direcciones',
+  'Allow delete via synchronization' => 'Permitir borrar a través de la sincronización',
+  'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'Por defecto, los dispositivos no pueden borrar elementos. Esto se añadió debido a un error en Android 12 que eliminaba contactos después de una actualización.',
+  'Tasklists' => 'Listas de tareas',
 );

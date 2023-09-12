@@ -383,7 +383,12 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	public function findAclId(): ?int
 	{
-		return $this->findAclEntity()->findAclId();
+		$entity = $this->findAclEntity();
+
+		if(!$entity) {
+			throw new Exception("Entity not found for AclItemEntity " . $this->title() . ":".$this->id());
+		}
+		return $entity->findAclId();
 	}
 
 }

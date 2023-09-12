@@ -77,6 +77,12 @@ class UserDisplay extends AclItemEntity {
 					$criteria->andWhere('enabled', '=', 1);
 				}
 			}, false)
+			->add('email', function (Criteria $criteria, $value, Query $query){
+				$criteria->where('email', '=', $value);
+			})
+			->add('username', function (Criteria $criteria, $value, Query $query){
+				$criteria->where('username', '=', $value);
+			})
 			->add('groupId', function (Criteria $criteria, $value, Query $query){
 				$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $value]);
 			})

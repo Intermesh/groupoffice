@@ -11,21 +11,33 @@
  * @author Danny Wijffelaars <dwijffelaars@intermesh.nl>
  */
 GO.summary.WebFeedsGrid = function(config){
-	if(!config)
-	{
-		config = {};
-	}
+	config = config || {};
+
 	config.title = t("webfeeds", "summary");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
 
-	 var SummaryColumn = new GO.grid.CheckColumn({
-        header: t("Summary", "summary"),
-        dataIndex: 'summary',
-        width: 55,
-        disabled_field:''
-    });
+	let hasManagePerms = false;
+	const module = go.Modules.get("legacy", "summary");
+	if (module.userRights.mayManage) {
+		hasManagePerms = true;
+	}
+
+	const SummaryColumn = new GO.grid.CheckColumn({
+		header: t("Summary", "summary"),
+		dataIndex: 'summary',
+		width: 75,
+		disabled_field: ''
+	}), allUsersColumn = new GO.grid.CheckColumn({
+		header: t("All users", "summary"),
+		dataIndex: 'allUsers',
+		width: 75,
+		disabled_field: '',
+		hidden: !hasManagePerms,
+		disabled: !hasManagePerms
+	});
+
 
 	var fields ={
 		fields:['title', 'url', 'summary'],
@@ -44,7 +56,8 @@ GO.summary.WebFeedsGrid = function(config){
 //				 vtype: 'url'
 			})
 		},
-		SummaryColumn
+		SummaryColumn,
+		allUsersColumn
 	]
 	};
 	config.store = new GO.data.JsonStore({
@@ -66,14 +79,13 @@ GO.summary.WebFeedsGrid = function(config){
 		emptyMsg: t("No items to display")
 	});
 
-	var columnModel =  new Ext.grid.ColumnModel({
-		defaults:{
-			sortable:true
+	config.cm = new Ext.grid.ColumnModel({
+		defaults: {
+			sortable: true
 		},
-		columns:fields.columns
+		columns: fields.columns
 	});
-	
-	config.cm=columnModel;
+
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
@@ -85,25 +97,22 @@ GO.summary.WebFeedsGrid = function(config){
 	config.clicksToEdit=1;
 	config.plugins = [SummaryColumn];
 
-	var Feed = Ext.data.Record.create([
-	{
-		name: 'id',
-		type: 'int'
-	},
-	{
-		name: 'title',
-		type: 'string'
-	},
-	{
-		name: 'url',
-		type: 'string'
-	},
-	{
-		name: 'summary',
-		type: 'boolean'
+	let arFlds = [
+		{
+			name: 'id', type: 'int'
+		}, {
+			name: 'title', type: 'string'
+		}, {
+			name: 'url', type: 'string'
+		}, {
+			name: 'summary', type: 'boolean'
+		}
+	];
+	if (hasManagePerms) {
+		arFlds.push({name: 'allUsers', type: 'boolean'});
 	}
-	]);
 
+	const Feed = Ext.data.Record.create(arFlds);
 
 	config.tbar=[{
 		iconCls: 'btn-add',
@@ -123,9 +132,8 @@ GO.summary.WebFeedsGrid = function(config){
 		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
-			var selectedRows = this.selModel.getSelections();
-			for(var i=0;i<selectedRows.length;i++)
-			{
+			const selectedRows = this.selModel.getSelections();
+			for (let i = 0, l = selectedRows.length; i < l; i++) {
 				selectedRows[i].commit();
 				this.store.remove(selectedRows[i]);
 			}

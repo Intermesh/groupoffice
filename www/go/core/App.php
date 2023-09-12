@@ -143,8 +143,11 @@ namespace go\core {
 		
 		private $version;
 
+        private $systemTimeZone;
+
 		protected function __construct() {
 			parent::__construct();
+            $this->systemTimeZone = date_default_timezone_get();
 			date_default_timezone_set("UTC");
 
 			mb_internal_encoding("UTF-8");
@@ -155,6 +158,17 @@ namespace go\core {
 
 			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
+
+        /**
+         * Get the PHP system timezone.
+         *
+         * The API works with UTC dates.
+         *
+         * @return string
+         */
+        public function getSystemTimeZone() : string {
+            return $this->systemTimeZone;
+        }
 
 		/**
 		 * Capabilities of core module
@@ -387,15 +401,23 @@ namespace go\core {
 			
 			return $config ?? [];
 		}
-		
+
+		/**
+		 * @throws Throwable
+		 */
 		private function getInstanceConfig(): array
 		{
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
 				return [];
 			}
-			
-			require($configFile);	
+
+			try {
+				require($configFile);
+			} catch(Throwable $e) {
+				ErrorHandler::log("Failed to require config file: " . $configFile);
+				throw $e;
+			}
 			
 			if(!isset($config)) {
 				$config = [];
@@ -715,6 +737,12 @@ namespace go\core {
 				ErrorHandler::logException($e, "Error occurred in App destructor");
 			}
 		}
+
+		/**
+		 * @var Debugger
+		 */
+
+		private $debugger;
 
 		/**
 		 * Get a simple key value caching object

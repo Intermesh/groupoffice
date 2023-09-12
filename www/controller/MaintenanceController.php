@@ -201,67 +201,6 @@ class MaintenanceController extends AbstractController {
 			echo '<br /><br /><a href="'. GO::url('maintenance/removeDuplicates').'">Show all models.</a>';
 		}
 	}
-
-//	private function removeSearchCacheKeys() {
-//		$queries[] = "alter table core_search drop foreign key core_search_ibfk_1;";
-//		$queries[] = "alter table core_search drop foreign key core_search_ibfk_2;";
-//
-//		$queries[] = "drop index acl_id on core_search;";
-//		$queries[] = "drop index core_search_entityTypeId_filter_modifiedAt_aclId_index on core_search;";
-//		$queries[] = "drop index moduleId on core_search;";
-//
-//		$queries[] = "alter table core_search_word drop foreign key core_search_word_ibfk_1;";
-//		$queries[] = "drop index searchId on core_search_word;";
-//
-//		//this one wont be deleted before indexing because its important for querying missing entities
-////		$c->exec("create index entityId
-////    on core_search (entityTypeId, entityId);");
-//
-//		foreach($queries as $query) {
-//			try {
-//				go()->getDbConnection()->exec($query);
-//			}
-//			catch(\Exception $e) {
-//				//ignore
-//			}
-//		}
-//
-//		Table::destroyInstances();
-//	}
-
-//	private function addSearchCacheKeys() {
-//		//make sure this is set for speed:
-//		// SET unique_checks=0; SET foreign_key_checks=0; autocommit=0"
-//
-//		$c = go()->getDbConnection();
-//		$c->exec("create index searchId on core_search_word (searchId);");
-//
-//		$c->exec("alter table core_search_word add constraint core_search_word_ibfk_1
-//    foreign key (searchId) references core_search (id)
-//        on delete cascade;");
-//
-//		$c->exec("create index acl_id
-//    on core_search (aclId);");
-//
-//		$c->exec("create index core_search_entityTypeId_filter_modifiedAt_aclId_index
-//    on core_search (entityTypeId, filter, modifiedAt, aclId);");
-//
-//		$c->exec("create index moduleId
-//    on core_search (moduleId);");
-//
-////		$c->exec("alter table core_search add constraint entityId
-////    unique (entityId, entityTypeId);");
-//
-//		$c->exec("alter table core_search add constraint core_search_ibfk_1
-//    foreign key (entityTypeId) references core_entity (id)
-//        on delete cascade;");
-//
-//		//Todo fix orphan acl id's
-//		$c->exec("delete from core_search where aclId not in (select id from core_acl);");
-//		$c->exec("alter table core_search add constraint core_search_ibfk_2
-//    foreign key (aclId) references core_acl (id)
-//        on delete cascade;");
-//	}
 	
 	/**
 	 * Calls buildSearchIndex on each Module class.
@@ -283,8 +222,7 @@ class MaintenanceController extends AbstractController {
 
 		\go\core\jmap\Entity::$trackChanges = false;
 		Module::$enabled = false;
-//		go()->getDebugger()->enabled = false;
-		
+
 		if(!$this->lockAction()) {
 			exit("Already running!");
 		}

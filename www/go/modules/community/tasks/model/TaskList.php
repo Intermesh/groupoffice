@@ -121,6 +121,8 @@ class TaskList extends AclOwnerEntity
 						['name' => go()->t('Completed', 'community', 'tasks'), 'progressChange' => Progress::$db[Progress::Completed]]
 					]);
 				}
+			} elseif($this->role == self::Support) {
+
 			}
 
 			//If this tasklist is for a project then take over the ACL
@@ -134,7 +136,7 @@ class TaskList extends AclOwnerEntity
 
 
 	/**
-	 * Create a task list for a project and return its id
+	 * Create a list for a project and return its id
 	 *
 	 * @param int $projectId
 	 * @return TaskList
@@ -159,6 +161,10 @@ class TaskList extends AclOwnerEntity
 
 	protected function canCreate(): bool
 	{
+		if($this->role == self::Support) {
+			return Module::findByName('business', 'support')
+				->getUserRights()->mayManage;
+		}
 		return Module::findByName('community', 'tasks')
 			->getUserRights()->mayChangeTasklists;
 	}

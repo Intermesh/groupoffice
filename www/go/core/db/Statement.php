@@ -1,6 +1,7 @@
 <?php
 namespace go\core\db;
 
+use GO\Base\Db\ActiveRecord;
 use go\core\data\ArrayableInterface;
 use go\core\ErrorHandler;
 use Exception;
@@ -15,8 +16,33 @@ use PDOStatement;
  * Represents a prepared statement and, after the statement is executed, an
  * associated result set.
  */
-class Statement extends PDOStatement implements JsonSerializable, ArrayableInterface{
-	
+class Statement extends PDOStatement implements JsonSerializable, ArrayableInterface, \Countable {
+
+	/**
+	 * The model type this statement result returns.
+	 *
+	 * @var ActiveRecord
+	 * @deprecated Only needed for old ActiveRecord
+	 */
+	public $model;
+
+	/**
+	 * Parameters  that were passed to \GO\BaseDb\activeRecord::find()
+	 *
+	 * @var array
+	 *
+	 * @deprecated Only needed for old ActiveRecord
+	 */
+	public $findParams;
+
+	/**
+	 * If the statement was returned by a relational query eg. $model->relationName() then this
+	 * is set to the relation name.
+	 * @deprecated Only needed for old ActiveRecord
+	 * @var String
+	 */
+	public $relation;
+
 	private $query;
 
 	#[\ReturnTypeWillChange]
@@ -138,5 +164,9 @@ class Statement extends PDOStatement implements JsonSerializable, ArrayableInter
 			throw $e;
 		}
 	}
-	
+
+	public function count(): int
+	{
+		return $this->rowCount();
+	}
 }
