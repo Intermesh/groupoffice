@@ -47,7 +47,7 @@ function cd($dir)
 
 class Builder
 {
-	public $test = false;
+	public $test = true;
 
 	private $majorVersion = "6.8";
 
@@ -97,7 +97,7 @@ class Builder
 		//dummy sign just to enter password at start
 		run("gpg --clear-sign -o- /dev/null");
 
-//		$this->pullSource();
+		$this->pullSource();
 		$this->minorVersion = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
 
 
