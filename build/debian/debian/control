@@ -9,16 +9,16 @@ Homepage: http://www.group-office.com
 Package: groupoffice
 Architecture: all
 Depends:
-    php-common,
-    php-json,
-	php-mysql,
-	php-gd,
-	php-cli,
-	php-curl,
-	php-xsl,
-	php-xml,
-	php-mbstring,
-	php-intl,
+    php-common (>= 8.1.0),
+    php-json (>= 8.1.0),
+	php-mysql (>= 8.1.0),
+	php-gd (>= 8.1.0),
+	php-cli (>= 8.1.0),
+	php-curl (>= 8.1.0),
+	php-xsl (>= 8.1.0),
+	php-xml (>= 8.1.0),
+	php-mbstring (>= 8.1.0),
+	php-intl (>= 8.1.0),
 	unzip,
 	tar,
 	zip,
@@ -28,7 +28,7 @@ Depends:
 	dbconfig-common,
 	dbconfig-mysql,
 	ucf (>= 0.28)
-Recommends: apache2, libapache2-mod-php, default-mysql-server
+Recommends: apache2, libapache2-mod-php (>= 8.1.0), default-mysql-server
 Suggests: php-apcu
 Conflicts: groupoffice-com,
 	groupoffice-pro,
