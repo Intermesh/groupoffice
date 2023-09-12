@@ -73,7 +73,7 @@ class Builder
 	private $packageName;
 
 
-	private $encoder = '/usr/local/share/sourceguardian --phpversion 8.1+';
+	private $encoder = '/usr/local/share/sourceguardian/sourceguardian --phpversion 8.1+';
 
 	private $encoderOptions = null;
 	private $proRepos = "git@git.intermesh.nl:groupoffice/promodules.git";
