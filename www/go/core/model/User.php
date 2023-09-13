@@ -920,10 +920,11 @@ class User extends AclItemEntity {
 			}
 		}
 
-		if (empty($contact->name) || $this->isModified(['displayName'])) {
+		if (empty($contact->name) || ($this->isModified(['displayName']) && $contact->name != $this->displayName)) {
 			$contact->name = $this->displayName;
 			$parts = explode(' ', $this->displayName);
 			$contact->firstName = array_shift($parts);
+			$contact->middleName = "";
 			$contact->lastName = implode(' ', $parts);
 		}
 
@@ -1185,6 +1186,7 @@ class User extends AclItemEntity {
 			}
 			$nameParts = explode(" ", $this->displayName);
 			$this->contact->firstName = array_shift($nameParts);
+			$this->contact->middleName = "";
 			$this->contact->lastName = implode(" ", $nameParts);
 		}
 		

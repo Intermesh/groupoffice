@@ -73,7 +73,7 @@ class Builder
 	private $packageName;
 
 
-	private $encoder = '/root/sg/sourceguardian-evaluation/bin/sourceguardian --phpversion 8.1+';
+	private $encoder = '/usr/local/share/sourceguardian/bin/sourceguardian --phpversion 8.1+';
 
 	private $encoderOptions = null;
 	private $proRepos = "git@git.intermesh.nl:groupoffice/promodules.git";
@@ -97,7 +97,7 @@ class Builder
 		//dummy sign just to enter password at start
 		run("gpg --clear-sign -o- /dev/null");
 
-//		$this->pullSource();
+		$this->pullSource();
 		$this->minorVersion = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
 
 
@@ -171,6 +171,7 @@ class Builder
 		$this->buildNodeCore();
 		$this->buildNodeModules();
 
+        putenv("COMPOSER_ALLOW_SUPERUSER=1");
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
 
 		$sassFiles = run("find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*'");
