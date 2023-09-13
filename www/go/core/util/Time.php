@@ -24,6 +24,9 @@ class Time
 	 */
 	public static function toSeconds(string $strTime) :int
 	{
+		if(preg_match('/^\d{1,2}:\d{2}$/', $strTime)) {
+			$strTime .= ':00';
+		}
 		if(!preg_match('/^\d{1,2}:\d{2}:\d{2}$/', $strTime)) {
 			throw new \InvalidArgumentException('Invalid time format');
 		}
