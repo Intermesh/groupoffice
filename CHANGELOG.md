@@ -1,3 +1,5 @@
+- Email: SMTP Authentication was not performed
+
 12-09-2023: 6.8.3
 - First public release
 - Add privacy options module
