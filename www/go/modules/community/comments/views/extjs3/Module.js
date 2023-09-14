@@ -41,15 +41,19 @@ go.Modules.register('community', 'comments', {
 			const alert = alertConfig.alert;
 			if(alert.tag == "comment") {
 				//replace panel promise
-				alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
-					return go.Db.store("User").single(alert.data.createdBy).then((creator) =>{
-						if(!creator) {
-							creator = {displayName: t("Unknown")};
-						}
-						panelCfg.html = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}").replace("{creator}", creator.displayName) + "<br /><br /><i>"+alert.data.excerpt+"</i>";
-						panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}").replace("{creator}", creator.displayName) + "\n\n"+alert.data.excerpt;
-						return panelCfg;
-					});
+				alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg) => {
+
+					let creator;
+					try {
+						creator = await go.Db.store("UserDisplay").single(alert.data.createdBy);
+					} catch (e) {
+						creator = {displayName: t("Unknown user")};
+					}
+
+					panelCfg.html = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}").replace("{creator}", creator.displayName) + "<br /><br /><i>"+alert.data.excerpt+"</i>";
+					panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}").replace("{creator}", creator.displayName) + "\n\n"+alert.data.excerpt;
+					return panelCfg;
+
 				});
 			}
 		});

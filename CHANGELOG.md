@@ -5,11 +5,18 @@
 - First public release
 - Add privacy options module
 
-05-09-2023: 6.7.44
+-- 6.8 --
+
+
+Addressbook: Name bug when middle name was entered contact was connected to user.
+
+12-09-2023: 6.7.46
 - Email: prevent sending empty in_reply_to header
 - Core: Custom date filter equals null didn't load in dialog properly
 - Addressbook: Added 'hasPhoneNumbers' custom filter
 - Files: Not all folders were listed as admin
+- Support: Comment composer wasn't shown instead of description
+- Core: Update available showed for pre-releases
 
 05-09-2023: 6.7.45
 - Addressbook: Some upgrade queries were missing
