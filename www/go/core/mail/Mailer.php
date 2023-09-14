@@ -221,11 +221,11 @@ class Mailer {
 					'userName' => $this->emailAccount->username,
 				]));
 
-			} else if (!empty($account->smtp_username)){
+			} else if (!empty($this->emailAccount->smtp_username)){
 
 				$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
-				$this->mail->Username = $account->smtp_username;                     //SMTP username
-				$this->mail->Password = $account->decryptSmtpPassword();
+				$this->mail->Username = $this->emailAccount->smtp_username;                     //SMTP username
+				$this->mail->Password = $this->emailAccount->decryptSmtpPassword();
 			}
 
 		} else {
