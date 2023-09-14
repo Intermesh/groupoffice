@@ -47,7 +47,7 @@ go.Modules.register('community', 'comments', {
 					try {
 						creator = await go.Db.store("UserDisplay").single(alert.data.createdBy);
 					} catch (e) {
-						creator = {displayName: t("Unknown")};
+						creator = {displayName: t("Unknown user")};
 					}
 
 					panelCfg.html = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}").replace("{creator}", creator.displayName) + "<br /><br /><i>"+alert.data.excerpt+"</i>";

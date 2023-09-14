@@ -150,7 +150,7 @@ go.Modules.register("community", "tasks", {
 							try {
 								assigner = await go.Db.store("UserDisplay").single(alert.data.assignedBy);
 							} catch (e) {
-								assigner = {displayName: t("Unknown")};
+								assigner = {displayName: t("Unknown user")};
 							}
 
 							const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.displayName);
@@ -168,7 +168,7 @@ go.Modules.register("community", "tasks", {
 							try {
 								creator = await go.Db.store("UserDisplay").single(alert.data.createdBy);
 							} catch (e) {
-								creator = {displayName: t("Unknown")};
+								creator = {displayName: t("Unknown user")};
 							}
 
 							const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("A new task was created in your list by {creator}").replace("{creator}", creator.displayName);
