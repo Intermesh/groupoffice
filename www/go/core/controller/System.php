@@ -6,8 +6,10 @@ use Exception;
 use GO;
 use go\core\cli\controller\System as CliSystemCtrl;
 use go\core\Controller;
+use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
+use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\Response;
 use go\core\model;
 
@@ -42,5 +44,14 @@ class System extends Controller {
 
 		$blob->getFile()->output();
 		exit();
+	}
+
+	public function logClientError($params) {
+		if(!isset($params['message'])) {
+			throw new InvalidArguments("Required parameter 'message' is missing");
+		}
+		ErrorHandler::log("CLIENT: " . $params['message']);
+
+		return ['success'=>true];
 	}
 }

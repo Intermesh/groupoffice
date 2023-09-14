@@ -67,6 +67,13 @@ Ext.extend(GO.ErrorDialog, GO.Window, {
 		else if(error.message) {
 			error = error.message;
 		}
+
+		go.Jmap.request({
+			method: "core/System/logClientError",
+			params: {
+				message: error + " - " + Error().stack
+			}
+		}).catch(e=>console.error(e))
 		
 		this.setHeight(dp(120));
 		this.messagePanel.body.update(Ext.util.Format.nl2br(Ext.util.Format.htmlEncode(error)));
