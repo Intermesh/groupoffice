@@ -168,6 +168,8 @@
 					}
 
 					go.Notifier.msg(panelCfg);
+				}).catch(reason => {
+					console.warn("Failed to process alert: ", reason, alert);
 				});
 
 			}).catch((reason) => {
