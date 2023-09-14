@@ -6,10 +6,14 @@
 - First public release
 - Add privacy options module
 
+
 -- 6.8 --
 
 
+14-09-2023: 6.7.47
 Addressbook: Name bug when middle name was entered contact was connected to user.
+Core: Fixed install failure when MySQL's default engine was not set to InnoDB (GitHub issue #1049)
+Core: Log client errors on server via JMAP call
 
 12-09-2023: 6.7.46
 - Email: prevent sending empty in_reply_to header
