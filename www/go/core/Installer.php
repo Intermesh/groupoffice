@@ -133,6 +133,9 @@ class Installer {
 
 		$database->setUtf8();
 
+		// set default engine to InnoDB
+		go()->getDbConnection()->exec("SET default_storage_engine=InnoDB;");
+
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
 		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 		
@@ -502,6 +505,7 @@ class Installer {
 
 		$database = go()->getDatabase();
 		$database->setUtf8();
+		go()->getDbConnection()->exec("SET default_storage_engine=InnoDB;");
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
