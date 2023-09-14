@@ -309,14 +309,14 @@ class Mailer {
 					$attachment->getString(),
 					$attachment->getId(),
 					$attachment->getFilename(),
-					PHPMailer::ENCODING_BASE64,
+					$attachment->getEncoding(),
 					$attachment->getContentType()
 				);
 			} else {
 				$this->mail->addStringAttachment(
 					$attachment->getString(),
 					$attachment->getFilename(),
-					PHPMailer::ENCODING_BASE64,
+					$attachment->getEncoding(),
 					$attachment->getContentType()
 				);
 			}

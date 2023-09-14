@@ -319,4 +319,36 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 		return $this->smimeEncryptRecipientCertificates;
 	}
 
+	/**
+	 * Get the message MIME type headers.
+	 *
+	 * @return string
+	 */
+	public function getMailMIME()
+	{
+		//override this for the "Remove attachments" feature. It will attach inline texts and
+		//we need the content type of the message to be "multipart/mixed". The only way PHPMailer will
+		// set this is by settings message type to "inline_attach" temporarily.
+		if($this->inlineTextExists()) {
+			$org = $this->message_type;
+			$this->message_type = 'inline_attach';
+		}
+		$result = parent::getMailMIME();
+		$this->message_type = $org;
+		return $result;
+	}
+
+
+	private function inlineTextExists(): bool
+	{
+		foreach ($this->attachment as $attachment) {
+			// Check for empty content type and ID as well so we set multipart/mixed to display inline text
+			if ('inline' === $attachment[6] && empty($attachment[7]) && str_contains($attachment[4], 'text')) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 }
