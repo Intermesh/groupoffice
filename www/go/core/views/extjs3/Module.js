@@ -242,18 +242,18 @@ GO.mainLayout.on('render', function () {
 	window.addEventListener('unhandledrejection', function (event) {
 
 		if(Ext.isObject(event.reason)) {
-			var txt = event.reason.message || event.reason.detail || event.reason.description || t("An error occurred. More details can be found in the console.");
+			var txt = event.reason.message || event.reason.detail || event.reason.description || t("Unknown error");
 		} else if(Ext.isString(event.reason)) {
 			var txt = event.reason;
 		} else
 		{
-			var txt = t("An error occurred. More details can be found in the console.");
+			var txt = t("Unknown error");
 		}
 
 		go.Jmap.request({
 			method: "core/System/logClientError",
 			params: {
-				message: txt + " - " + Error().stack
+				message: txt + " - " + ((new Error()).stack)
 			}
 		}).catch(e=>console.error(e))
 	});
