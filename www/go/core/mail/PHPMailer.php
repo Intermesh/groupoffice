@@ -329,8 +329,8 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 		//override this for the "Remove attachments" feature. It will attach inline texts and
 		//we need the content type of the message to be "multipart/mixed". The only way PHPMailer will
 		// set this is by settings message type to "inline_attach" temporarily.
+		$org = $this->message_type;
 		if($this->inlineTextExists()) {
-			$org = $this->message_type;
 			$this->message_type = 'inline_attach';
 		}
 		$result = parent::getMailMIME();
