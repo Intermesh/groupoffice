@@ -2,6 +2,7 @@
 
 namespace GO\Email\Model;
 
+use go\core\mail\Attachment;
 use go\core\model\Acl;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
@@ -797,10 +798,14 @@ class ImapMessage extends ComposerMessage {
 
 		$bIsPlain = !$this->_htmlParts['text_found'];
 		$msg = new \go\core\mail\Message();
-		$msg->setTo($this->to->getAddresses());
-		$msg->setFrom($this->from->getAddresses());
-		$msg->setCc($this->cc->getAddresses());
-		$msg->setBcc($this->bcc->getAddresses());
+		$msg->setTo(...$this->to->convertToNewApi());
+
+		$from = $this->from->convertToNewApi();
+		if(isset($from[0])) {
+			$msg->setFrom($from[0]->getEmail(), $from[0]->getName());
+		}
+		$msg->setCc(...$this->cc->convertToNewApi());
+		$msg->setBcc(...$this->bcc->convertToNewApi());
 		$msg->setSubject($this->subject);
 		$msg->setDate(new DateTime($this->date));
 
@@ -812,10 +817,12 @@ class ImapMessage extends ComposerMessage {
 		while ($att = array_shift($atts)) {
 			if ($att->disposition == 'attachment' || empty($att->content_id)) {
 				$str = $this->addPartString($att, $bIsPlain);
-				$msg->attach($str, ($bIsPlain ? 'text/plain' : 'text/html'));
+				$a = Attachment::fromString($str, "", ($bIsPlain ? 'text/plain' : 'text/html'), Attachment::ENCODING_7BIT);
+				$a->setId("");
+				$msg->embed($a);
 			}
 		}
-		$msg->setContentType("multipart/mixed");
+//		$msg->setContentType("multipart/mixed");
 
 
 		if(!$this->getImapConnection()->append_message($this->mailbox, $msg->toString(), '\Seen')) {

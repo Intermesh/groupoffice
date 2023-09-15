@@ -15,25 +15,20 @@ use go\core\fs\File;
 class Attachment
 {
 
-	/**
-	 * @var string
-	 */
-	private $data;
+	const ENCODING_7BIT = '7bit';
+	const ENCODING_8BIT = '8bit';
+	const ENCODING_BASE64 = 'base64';
+	const ENCODING_BINARY = 'binary';
+	const ENCODING_QUOTED_PRINTABLE = 'quoted-printable';
 
-	/**
-	 * @var File
-	 */
-	private $file;
-	/**
-	 * @var string
-	 */
-	private $contentType;
+	private ?string $data = null;
+	private ?File $file = null;
+	private ?string $contentType = null;
+	private ?string $filename = null;
+	private ?string $id = null;
+	private bool $inline = false;
 
-	private $filename;
-
-	private $id;
-
-	private $inline = false;
+	private string $encoding = self::ENCODING_BASE64;
 
 	/**
 	 * Provide Blob. Extracts path from blob and returns attachment
@@ -42,10 +37,11 @@ class Attachment
 	 * @return Attachment
 	 * @throws Exception
 	 */
-	public static function fromBlob(Blob $blob): Attachment
+	public static function fromBlob(Blob $blob, string $encoding = self::ENCODING_BASE64): Attachment
 	{
 		$a = self::fromPath($blob->path(), $blob->type);
 		$a->setFilename($blob->name);
+		$a->encoding = $encoding;
 		return $a;
 	}
 
@@ -56,7 +52,7 @@ class Attachment
 	 * @param string|null $contentType Set the content type. If not given it will detect it from the file. eg. application/pdf
 	 * @return Attachment
 	 */
-	public static function fromPath(string $path, ?string $contentType = null): Attachment
+	public static function fromPath(string $path, ?string $contentType = null, string $encoding = self::ENCODING_BASE64): Attachment
 	{
 		$file = new File($path);
 
@@ -64,6 +60,7 @@ class Attachment
 		$a->file = $file;
 		$a->contentType = $contentType ?? $file->getContentType();
 		$a->filename = $file->getName();
+		$a->encoding = $encoding;
 
 		return $a;
 	}
@@ -76,25 +73,31 @@ class Attachment
 	 * @param string $contentType The content type. eg. application/pdf
 	 * @return Attachment
 	 */
-	public static function fromString(string $data, string $filename, string $contentType = 'application/octet-stream'): Attachment
+	public static function fromString(string $data, string $filename, string $contentType = 'application/octet-stream', string $encoding = self::ENCODING_BASE64): Attachment
 	{
 		$a = new self();
 		$a->data = $data;
 		$a->contentType = $contentType;
 		$a->filename = $filename;
+		$a->encoding = $encoding;
 
 		return $a;
 	}
 
-	public function setFilename(string $filename): Attachment
+	public function setFilename(?string $filename): Attachment
 	{
 		$this->filename = $filename;
 		return $this;
 	}
 
-	public function getFilename()
+	public function getFilename(): ?string
 	{
 		return $this->filename;
+	}
+
+	public function getEncoding(): ?string
+	{
+		return $this->encoding;
 	}
 
 
@@ -188,7 +191,7 @@ class Attachment
 	}
 
 	public function getString() :string {
-		if($this->file) {
+		if(isset($this->file)) {
 			return $this->file->getContents();
 		} else{
 			return $this->data ?? "";

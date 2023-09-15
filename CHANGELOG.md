@@ -1,12 +1,31 @@
+- Email: Fixed SMTP auth without verifying certificate
+- Email: Fixed "Use IMAP credentials"
+
+14-09-2023: 6.8.5
+- Email: SMTP Authentication was not performed
+- Email: Fixed "Remove attachments" feature to work with new mail API0
+- 6.7.47 fixes
+
 12-09-2023: 6.8.3
 - First public release
 - Add privacy options module
 
-05-09-2023: 6.7.44
+
+-- 6.8 --
+
+
+14-09-2023: 6.7.47
+Addressbook: Name bug when middle name was entered contact was connected to user.
+Core: Fixed install failure when MySQL's default engine was not set to InnoDB (GitHub issue #1049)
+Core: Log client errors on server via JMAP call
+
+12-09-2023: 6.7.46
 - Email: prevent sending empty in_reply_to header
 - Core: Custom date filter equals null didn't load in dialog properly
 - Addressbook: Added 'hasPhoneNumbers' custom filter
 - Files: Not all folders were listed as admin
+- Support: Comment composer wasn't shown instead of description
+- Core: Update available showed for pre-releases
 
 05-09-2023: 6.7.45
 - Addressbook: Some upgrade queries were missing
