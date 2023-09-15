@@ -14,6 +14,7 @@ elif [[ "$DPKG_ARCH" = "amd64" ]]; then
 ARCH="x86-64"
 elif [[ "$DPKG_ARCH" = "arm64" ]]; then
 ARCH="aarch64"
+fi
 
 echo Detected architecture $ARCH;
 
