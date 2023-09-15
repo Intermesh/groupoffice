@@ -1,3 +1,6 @@
+- Email: Fixed SMTP auth without verifying certificate
+- Email: Fixed "Use IMAP credentials"
+
 14-09-2023: 6.8.5
 - Email: SMTP Authentication was not performed
 - Email: Fixed "Remove attachments" feature to work with new mail API0
