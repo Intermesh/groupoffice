@@ -35,6 +35,8 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 
 	public $AllowEmpty = true;
 
+	protected $exceptions = true;
+
 	public function preSend()
 	{
 		if (

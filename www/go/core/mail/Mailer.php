@@ -192,6 +192,11 @@ class Mailer {
 				$this->disableSSLVerification();
 			}
 		} else if (isset($this->emailAccount)) {
+
+			if($this->emailAccount->smtp_allow_self_signed) {
+				$this->disableSSLVerification();
+			}
+
 			$this->mail->SMTPSecure = $this->emailAccount->smtp_encryption;
 			$this->mail->Host = $this->emailAccount->smtp_host;
 			$this->mail->Port = $this->emailAccount->smtp_port;
@@ -221,8 +226,13 @@ class Mailer {
 					'userName' => $this->emailAccount->username,
 				]));
 
-			} else if (!empty($this->emailAccount->smtp_username)){
+			} else if (!empty($this->emailAccount->force_smtp_login)){
+				// weird name force_smtp_login but it means use the IMAP credentials
+				$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
+				$this->mail->Username = $this->emailAccount->username;                     //SMTP username
+				$this->mail->Password = $this->emailAccount->decryptPassword();
 
+			}else if (!empty($this->emailAccount->smtp_username)){
 				$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
 				$this->mail->Username = $this->emailAccount->smtp_username;                     //SMTP username
 				$this->mail->Password = $this->emailAccount->decryptSmtpPassword();
