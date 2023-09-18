@@ -203,11 +203,15 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			}));
 
 			this.on("load", async () => {
+
+				if(!this.data.createdBy) {
+					this.noContractWarning.show();
+					return;
+				}
 				this.noContractWarning.hide();
 				this.contractGrid.store.setFilter("def", {createdBy: this.data.createdBy, active: true});
 
 				const records = await this.contractGrid.store.load();
-
 				if (!records.length) {
 					this.noContractWarning.show();
 				}
