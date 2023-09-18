@@ -9,9 +9,9 @@ hash curl 2>/dev/null || { echo >&2 "The script requires curl but it's not insta
 # Find the system architecture
 DPKG_ARCH=$(dpkg --print-architecture)
 if [[ "$DPKG_ARCH" = "i386" ]]; then
-ARCH="x86-64"
+ARCH="x86_64"
 elif [[ "$DPKG_ARCH" = "amd64" ]]; then
-ARCH="x86-64"
+ARCH="x86_64"
 elif [[ "$DPKG_ARCH" = "arm64" ]]; then
 ARCH="aarch64"
 fi
