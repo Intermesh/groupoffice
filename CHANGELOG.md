@@ -1,3 +1,6 @@
+6.7.48
+Leavedays: fix error upon exporting leaveday hours
+
 14-09-2023: 6.7.47
 Addressbook: Name bug when middle name was entered contact was connected to user.
 Core: Fixed install failure when MySQL's default engine was not set to InnoDB (GitHub issue #1049)
