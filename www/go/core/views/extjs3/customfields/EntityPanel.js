@@ -140,7 +140,10 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					sortable: false,
 					dataIndex: 'type',
 					renderer: function(v) {
-						return types[v] ? types[v].label : types[v];
+						if(!v) {
+							return "";
+						}
+						return types[v] ? types[v].label : v + " <span class='danger'>(" + t("Unknown") + ')</span>';
 					}
 				},
 				{
