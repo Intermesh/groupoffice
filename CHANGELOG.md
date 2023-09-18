@@ -1,6 +1,7 @@
 6.7.48
 - Leavedays: fix error upon exporting leaveday hours
 - Core: fix error in user export
+- Supportclient: New Italian translations. Grazie, CENSEA DUE
 
 14-09-2023: 6.7.47
 - Addressbook: Name bug when middle name was entered contact was connected to user.
