@@ -1,5 +1,6 @@
 - Email: Fixed SMTP auth without verifying certificate
 - Email: Fixed "Use IMAP credentials"
+- Studio: Fix deprecation issues
 
 14-09-2023: 6.8.5
 - Email: SMTP Authentication was not performed
