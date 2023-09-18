@@ -40,7 +40,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				'timeBooked',
 				'permissionLevel'
 			],
-			entityStore: "Task",
+			entityStore: this.support ? "SupportTicket" : "Task",
 			sortInfo: this.support ? {
 					field: "modifiedAt",
 					direction: "DESC"

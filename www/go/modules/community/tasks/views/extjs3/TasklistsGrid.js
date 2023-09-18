@@ -46,7 +46,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 					'name',
 					{name: "group", type: "relation", mapping: "group.name"}
 				],
-				entityStore: "TaskList",
+				entityStore: this.support ? "SupportList" : "Tasklist",
 				filters: {role: {role: 'list'}},
 				sortInfo: {
 					field: 'name',
@@ -60,7 +60,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 					iconCls: 'ic-edit',
 					text: t("Edit"),
 					handler: function() {
-						var dlg = new go.modules.community.tasks.TasklistDialog();
+						var dlg = new go.modules.community.tasks.TasklistDialog({entityStore: this.support ? "SupportList" : "TaskList"});
 						dlg.load(this.moreMenu.record.id).show();
 					},
 					scope: this
@@ -73,7 +73,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 							if (btn != "yes") {
 								return;
 							}
-							go.Db.store("TaskList").set({destroy: [this.moreMenu.record.id]});
+							go.Db.store(this.support ? "SupportList" : "Tasklist").set({destroy: [this.moreMenu.record.id]});
 						}, this);
 					},
 					scope: this

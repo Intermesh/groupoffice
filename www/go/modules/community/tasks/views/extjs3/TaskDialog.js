@@ -11,7 +11,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 	onReady: async function () {
 		if (this.currentId) {
-			const tl = await go.Db.store("TaskList").single(this.tasklistCombo.getValue());
+			const tl = await go.Db.store(this.support ? "SupportList" : "TaskList").single(this.tasklistCombo.getValue());
 			this.role = tl.role;
 			this.tasklistCombo.store.setFilter("role", {role: tl.role});
 		} else {
@@ -29,7 +29,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 			this.on("submit", () => {
 				if(this.commentComposer.editor.getValue() != "")
-					this.commentComposer.save("Task", this.currentId);
+					this.commentComposer.save("SupportTicket", this.currentId);
 			}, {single:true})
 		} else
 		{
@@ -88,7 +88,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		delete categories.comboBox.lastQuery;
 
 
-		go.Db.store("Tasklist").single(val).then((tasklist) => {
+		go.Db.store(this.support ? "SupportList" : "Tasklist").single(val).then((tasklist) => {
 			this.responsibleCombo.store.setFilter("acl", {
 				aclId: tasklist.aclId,
 				aclPermissionLevel: go.permissionLevels.write

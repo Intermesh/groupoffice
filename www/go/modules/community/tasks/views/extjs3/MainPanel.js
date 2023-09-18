@@ -18,6 +18,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	},
 
 	route: async function(id, entity) {
+
+
+		//TODO SUPPORT TICKET???
+
+
 		const task = await go.Db.store("Task").single(id);
 		const tasklist = await go.Db.store("TaskList").single(task.tasklistId);
 
@@ -42,6 +47,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.taskDetail = new go.modules.community.tasks.TaskDetail({
 			support: this.support,
+			entityStore: this.support ? "SupportTicket" : "Task",
 			region: 'east',
 			split: true,
 			stateId: this.statePrefix  + '-task-detail',
@@ -119,7 +125,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				this.filterPanel,
 				this.tasklistsGrid,
 				this.categoriesGrid,
-				{xtype:'filterpanel', store: this.taskGrid.store, entity: 'Task'}
+				{xtype:'filterpanel', store: this.taskGrid.store, entity: this.support ? "SupportTicket" : "Task",}
 
 			]
 		});
@@ -431,7 +437,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			filteredStore: this.taskGrid.store,
 			filterName: 'tasklistId',
 			selectFirst: false,
-
+			support: this.support,
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
@@ -444,8 +450,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						let dlg = new go.modules.community.tasks.TasklistDialog();
-						dlg.setValues({role: this.support ? "support" : "list"})
+						let dlg = new go.modules.community.tasks.TasklistDialog({entityStore: this.support ? "SupportList" : "Tasklist"});
 						dlg.show();
 					},
 					scope: this
@@ -572,7 +577,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						tooltip: t('Add'),
 						cls: 'primary',
 						handler: function (btn) {
-							let dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
+							let dlg = new go.modules.community.tasks.TaskDialog({
+								entityStore: this.support ? "SupportTicket" : "Task",
+								role: this.support ? "support" : "list"
+							});
 							dlg.setValues({
 								tasklistId: this.addTasklistId
 							}).show();
@@ -745,7 +753,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	checkCreateTaskList: function() {
 		this.addTasklistId = undefined;
-		go.Db.store("Tasklist").get(this.tasklistsGrid.getSelectedIds()).then((result) => {
+		go.Db.store(this.support ? "SupportList" : "TaskList").get(this.tasklistsGrid.getSelectedIds()).then((result) => {
 
 			result.entities.forEach((tasklist) => {
 				if (!this.addTasklistId && tasklist.permissionLevel >= go.permissionLevels.create) {
@@ -769,7 +777,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		let dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
+		let dlg = new go.modules.community.tasks.TaskDialog({
+			entityStore: this.support ? "SupportTicket" : "Task",
+			role: this.support ? "support" : "list"
+		});
 		dlg.load(record.id).show();
 	},
 	

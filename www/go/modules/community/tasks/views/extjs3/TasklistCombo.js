@@ -12,23 +12,25 @@
 		selectOnFocus: true,
 		forceSelection: true,
 		role: null, // set to "list" or "board" to filter the tasklist store
-		allowBlank: false,
-		store: {
-			xtype: "gostore",
-			fields: ['id', 'name'],
-			entityStore: "TaskList",
-			filters: {
-				permissionLevel: {
-					permissionLevel: go.permissionLevels.write
-				}
-			}
-		}
+		allowBlank: false
 	};
 
 	go.modules.community.tasks.TasklistCombo = Ext.extend(go.form.ComboBox, Ext.apply(cfg,
 		{
 			initComponent: function () {
 				this.supr().initComponent.call(this);
+
+				this.store = new go.data.Store(
+					{
+						fields: ['id', 'name'],
+						entityStore: this.initialConfig.role && this.initialConfig.role == "support" ? "SupportList" : "TaskList",
+						filters: {
+							permissionLevel: {
+								permissionLevel: go.permissionLevels.write
+							}
+						}
+					}
+				)
 
 				if (this.initialConfig.role) {
 					this.store.setFilter('role', {role: this.initialConfig.role});
@@ -43,6 +45,18 @@
 		allowBlank: true,
 		initComponent: function() {
 			this.supr().initComponent.call(this);
+
+			this.store = new go.data.Store(
+				{
+					fields: ['id', 'name'],
+					entityStore: this.initialConfig.role && this.initialConfig.role == "support" ? "SupportList" : "TaskList",
+					filters: {
+						permissionLevel: {
+							permissionLevel: go.permissionLevels.write
+						}
+					}
+				}
+			)
 
 			if(this.initialConfig.role) {
 				this.store.setFilter('role', {role: this.initialConfig.role});
