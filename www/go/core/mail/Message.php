@@ -27,89 +27,45 @@ use go\core\util\DateTime;
  */
 class Message {
 
-	/**
-	 * @var Mailer
-	 */
-	private $mailer;
 
-	/**
-	 * @var DateTimeInterface
-	 */
-	private $date;
-	/**
-	 * @var int
-	 */
-	private $priority;
+	private ?Mailer $mailer;
+	private ?DateTimeInterface $date = null;
+	private ?int $priority = null;
+	private string $body = "";
+	private ?string $alternateBody = null;
+	private string $subject = "";
+	private array $to = [];
+	private array $cc = [];
+	private array $bcc = [];
+	private array $attachments = [];
 
-	/**
-	 * @var string
-	 */
-	private $body;
-	/**
-	 * @var string
-	 */
-	private $alternateBody;
-	/**
-	 * @var string
-	 */
-	private $subject;
-
-
-	private $to = [];
-	private $cc = [];
-	private $bcc = [];
-	private $attachments = [];
-
-	private $headers = [];
-	/**
-	 * @var Address
-	 */
-	private $from;
+	private array $headers = [];
+	private ?Address $from = null;
 
 	/**
 	 * @var Address[]
 	 */
-	private $replyTo = [];
-	/**
-	 * @var Address
-	 */
-	private $sender;
-	/**
-	 * @var string
-	 */
-	private $id;
+	private array $replyTo = [];
+	private ?Address $sender = null;
+
+	private ?string $id = null;
 	/**
 	 * @var array
 	 */
-	private $references = [];
-	/**
-	 * @var string
-	 */
-	private $bodyContentType;
-	/**
-	 * @var string
-	 */
-	private $inReplyTo;
-	/**
-	 * @var string
-	 */
-	private $smimeCertificate;
-	/**
-	 * @var string
-	 */
-	private $smimePrivateKey;
-	/**
-	 * @var array
-	 */
-	private $smimeEncryptRecipientCertificates;
-	/**
-	 * @var string|null
-	 */
-	private $smimeExtraCertsFile;
-	/**
-	 * @var string
-	 */
-	private $smimePassword;
+	private array $references = [];
+	private ?string $bodyContentType = null;
+	private ?string $inReplyTo = null;
+
+	private ?string $smimeCertificate = null;
+
+	private ?string $smimePrivateKey = null;
+
+	private ?array $smimeEncryptRecipientCertificates = null;
+
+	private ?string $smimeExtraCertsFile = null;
+
+	private ?string $smimePassword = null;
+	private array $readReceiptTo = [];
 
 	public function __construct() {
 		$this->setFrom(go()->getSettings()->systemEmail, go()->getSettings()->title);
@@ -265,7 +221,7 @@ class Message {
 	}
 
 	/**
-	 * Add to addresses
+	 * Add "To" addresses
 	 *
 	 * @link https://www.rfc-editor.org/rfc/rfc4021#section-2.1.5
 	 * @param string|Address ...$addresses
@@ -340,7 +296,7 @@ class Message {
 
 
 	/**
-	 * Set CC addresses
+	 * Add CC addresses
 	 *
 	 * @link https://www.rfc-editor.org/rfc/rfc4021#section-2.1.5
 	 * @param string|Address ...$addresses
@@ -352,8 +308,46 @@ class Message {
 		return $this;
 	}
 
+
 	/**
-	 * Set from addresss
+	 * Set addresses to request a read notification for
+	 *
+	 * @param ...$addresses
+	 * @return $this
+	 */
+	public function setReadReceiptTo (...$addresses): Message
+	{
+		$this->readReceiptTo = $this->normalizeRecipients($addresses);
+		return $this;
+	}
+
+	/**
+	 *
+	 * Get addresses to request a read notification for
+	 *
+	 * @return Address[]
+	 */
+	public function getReadReceiptTo(): array
+	{
+		return $this->readReceiptTo;
+	}
+
+
+	/**
+	 * Add addresses to request a read notification for
+	 *
+	 * @link https://www.rfc-editor.org/rfc/rfc4021#section-2.1.5
+	 * @param string|Address ...$addresses
+	 * @return $this
+	 */
+	public function addReadReceiptTo(...$addresses): Message
+	{
+		$this->readReceiptTo = array_merge($this->readReceiptTo, $this->normalizeRecipients($addresses));
+		return $this;
+	}
+
+	/**
+	 * Set from address
 	 *
 	 * @param string $address
 	 * @param string|null $name
@@ -720,4 +714,7 @@ class Message {
 	public function getSmimeEncryptRecipientCertificates() : ?array {
 		return $this->smimeEncryptRecipientCertificates;
 	}
+
+
+
 }

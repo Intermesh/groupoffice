@@ -17,6 +17,7 @@ use GO\Base\Fs\Folder;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\mail\Address;
 use go\core\mail\AddressList;
 use go\core\mail\Attachment;
 use go\core\webclient\Extjs3;
@@ -460,7 +461,7 @@ class Message extends \go\core\mail\Message {
 			$this->setFrom($alias->email, $alias->name);
 			
 			if(!empty($params['notification']))
-				$this->setReadReceiptTo(array($alias->email=>$alias->name));
+				$this->setReadReceiptTo(new Address($alias->email, $alias->name));
 		}
 		
 		if(isset($params['priority']) && $params['priority'] != 3)

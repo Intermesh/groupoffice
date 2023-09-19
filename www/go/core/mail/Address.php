@@ -44,7 +44,7 @@ class Address extends Model {
 
 	public function __toString() {
 		if (!empty($this->name)) {
-			return '"' . $this->name . '" <' . $this->email . '>';
+			return '"' . Util::mimeHeaderDecode($this->name ). '" <' . $this->email . '>';
 		} else {
 			return $this->email;
 		}

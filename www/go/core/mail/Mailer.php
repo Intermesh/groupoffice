@@ -23,20 +23,9 @@ use PHPMailer\PHPMailer\OAuth;
  */
 class Mailer {
 
-	/**
-	 * @var PHPMailer
-	 */
-	private $mail;
-
-	/**
-	 * @var SmtpAccount
-	 */
-	private $smtpAccount;
-
-	/**
-	 * @var Account
-	 */
-	private $emailAccount;
+	private PHPMailer $mail;
+	private ?SmtpAccount $smtpAccount = null;
+	private ?Account $emailAccount = null;
 
 	/**
 	 * Create a new mail message
@@ -60,7 +49,8 @@ class Mailer {
 	 * @param SmtpAccount $account
 	 * @return $this
 	 */
-	public function setSmtpAccount(SmtpAccount $account) {
+	public function setSmtpAccount(SmtpAccount $account): static
+	{
 		$this->smtpAccount = $account;
 
 		$this->emailAccount = null;
@@ -73,7 +63,8 @@ class Mailer {
 	 * @param Account $account
 	 * @return $this
 	 */
-	public function setEmailAccount(Account $account) {
+	public function setEmailAccount(Account $account): static
+	{
 		$this->emailAccount = $account;
 		$this->smtpAccount = null;
 
@@ -85,7 +76,8 @@ class Mailer {
 		return isset($this->account);
 	}
 
-	private function prepareMessage(Message $message) {
+	private function prepareMessage(Message $message): void
+	{
 		if(!empty(go()->getConfig()['debugEmail'])){
 			$message->setTo(go()->getConfig()['debugEmail']);
 			$message->setBcc(array());
@@ -271,8 +263,11 @@ class Mailer {
 	/**
 	 * @throws Exception
 	 */
-	private function applyMessage(Message $message)
+	private function applyMessage(Message $message): void
 	{
+		// important to set before using encodeHeader in disposition-notification-to below.
+		$this->mail->CharSet = PHPMailer::CHARSET_UTF8;
+
 		$this->mail->setFrom($message->getFrom()->getEmail(), $message->getFrom()->getName());
 		foreach($message->getTo() as $a) {
 			$this->mail->addAddress($a->getEmail(), $a->getName());
@@ -308,6 +303,16 @@ class Mailer {
 			$this->mail->addCustomHeader('In-Reply-To', "<" . $message->getInReplyTo() . ">");
 		}
 
+		$readReceiptTo = $message->getReadReceiptTo();
+		if(count($readReceiptTo)) {
+			$headerValue = [];
+			foreach ($readReceiptTo as $a) {
+				$headerValue[] = $this->mail->addrFormat([$a->getEmail(), $a->getName()]);
+			}
+
+			$this->mail->addCustomHeader("Disposition-Notification-To", implode(", ", $headerValue));
+		}
+
 		foreach($message->getAttachments() as $attachment) {
 
 			// TODO, it seems PHPmailer is not so memory efficient. We can just as well add
@@ -337,7 +342,7 @@ class Mailer {
 
 		$this->mail->Body = $message->getBody();
 		$this->mail->ContentType = $message->getContentType();
-		$this->mail->CharSet = PHPMailer::CHARSET_UTF8;
+
 
 		if($message->getAlternateBody()) {
 			$this->mail->AltBody = $message->getAlternateBody();
