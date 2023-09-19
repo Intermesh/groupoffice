@@ -1,0 +1,1 @@
+a:3:{s:8:"password";s:21:"go\core\auth\Password";s:4:"ldap";s:58:"go\modules\community\ldapauthenticator\model\Authenticator";s:16:"otpauthenticator";s:41:"go\modules\community\otp\OtpAuthenticator";}
