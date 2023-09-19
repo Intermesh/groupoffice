@@ -17,28 +17,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		triggerWidth: 1000
 	},
 
-	route: async function(id, entity) {
-
-
-		//TODO SUPPORT TICKET???
-
-
-		const task = await go.Db.store("Task").single(id);
-		const tasklist = await go.Db.store("TaskList").single(task.tasklistId);
-
-		if (tasklist.role == "support") {
-			// hack to prevent route update
-			go.Router.routing = true;
-			const support = GO.mainLayout.openModule("support");
-			go.Router.routing = false;
-
-			support.taskDetail.load(id);
-
-		} else {
-			this.supr().route.call(this, id, entity);
-		}
-	},
-
 	initComponent: function () {
 		this.statePrefix = this.support ? 'support-' : 'tasks-';
 		this.createTaskGrid();

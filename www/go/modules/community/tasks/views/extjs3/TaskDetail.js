@@ -251,7 +251,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				scope: this,
 				handler: function() {
 					this.getEl().mask(t("Saving..."));
-					go.Db.store("Task").save({
+					go.Db.store(this.support ? "SupportTicket" : "Task").save({
 						responsibleUserId: go.User.id,
 						// progress: "in-progress"
 					}, this.data.id).finally(() => {
