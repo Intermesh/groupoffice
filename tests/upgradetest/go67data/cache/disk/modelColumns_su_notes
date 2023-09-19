@@ -1,1 +1,0 @@
-a:2:{s:7:"user_id";a:7:{s:4:"type";i:1;s:8:"required";b:0;s:6:"length";i:0;s:6:"gotype";s:4:"user";s:7:"default";N;s:6:"dbtype";s:3:"int";s:4:"null";b:0;}s:4:"text";a:7:{s:4:"type";i:2;s:8:"required";b:0;s:6:"length";i:65535;s:6:"gotype";s:8:"textarea";s:7:"default";N;s:6:"dbtype";s:4:"text";s:4:"null";b:1;}}

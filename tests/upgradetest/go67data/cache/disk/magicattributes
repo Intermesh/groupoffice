@@ -1,1 +1,0 @@
-a:3:{s:26:"GO\Calendar\Model\Calendar";a:2:{i:0;s:12:"displayColor";i:1;s:12:"returnAsText";}s:23:"GO\Calendar\Model\Event";a:7:{i:0;s:14:"exception_date";i:1;s:14:"dontSendEmails";i:2;s:8:"sequence";i:3;s:20:"updatingRelatedEvent";i:4;s:14:"skipValidation";i:5;s:19:"importedParticiants";i:6;s:12:"returnAsText";}s:21:"GO\Summary\Model\Note";a:0:{}}

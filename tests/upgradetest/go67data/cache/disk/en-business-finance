@@ -1,1 +1,0 @@
-a:5:{s:4:"name";s:7:"Finance";s:11:"description";s:34:"Create quotes, invoices and orders";s:15:"FinanceDocument";s:9:"Financial";s:5:"types";a:5:{s:5:"quote";s:5:"Quote";s:10:"salesorder";s:5:"Order";s:12:"salesinvoice";s:7:"Invoice";s:13:"purchaseorder";s:14:"Purchase order";s:15:"purchaseinvoice";s:16:"Purchase invoice";}s:11:"InvoiceVerb";s:7:"Invoice";}
