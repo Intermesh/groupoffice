@@ -139,6 +139,8 @@ class Field extends AclItemEntity {
 	 */
 	public $forceAlterTable = false;
 
+	public $skipAlterTable = false;
+
 	private $dataType;
 	
 	
@@ -272,7 +274,8 @@ class Field extends AclItemEntity {
 	 * 
 	 * @return Base
 	 */
-	public function getDataType() {
+	public function getDataType(): Base
+	{
 		
 		if(!isset($this->dataType)) {			
 			$dataType = Base::findByName($this->type);
@@ -287,8 +290,13 @@ class Field extends AclItemEntity {
    * @param $values
    * @throws Exception
    */
-	public function setDataType($values) {
-		$this->getDataType()->setValues($values);
+	public function setDataType(array|Base $values): void
+	{
+		if($values instanceof Base) {
+			$this->dataType = $values;
+		} else {
+			$this->getDataType()->setValues($values);
+		}
 	}
 
 	protected function internalSave(): bool
@@ -296,6 +304,11 @@ class Field extends AclItemEntity {
 		if(!parent::internalSave()) {
 			return false;
 		}
+
+		if($this->skipAlterTable) {
+			return true;
+		}
+
 
 		$modified = $this->forceAlterTable || $this->isNew() || $this->uniqueModified || $this->defaultModified || $this->getDataType()->isModified() || $this->isModified(['databaseName', 'options', 'required']);
 		if(!$modified) {

@@ -330,4 +330,11 @@ abstract class AclOwnerEntity extends AclEntity {
 		return (new Query())
 			->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id');
 	}
+
+	public function copy() : static
+	{
+		$copy = parent::copy();
+		$copy->{self::$aclColumnName} = null;
+		return $copy;
+	}
 }

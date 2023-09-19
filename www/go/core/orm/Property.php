@@ -2513,7 +2513,7 @@ abstract class Property extends Model {
 	 * @return static
 	 * @throws Exception
 	 */
-	public function copy()
+	public function copy() : static
 	{
 
 		if($this instanceof Entity) {

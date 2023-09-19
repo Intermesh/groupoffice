@@ -265,7 +265,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				iconCls: 'ic-edit',
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
-					const taskEdit = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
+					const taskEdit = new go.modules.community.tasks.TaskDialog({
+						entityStore: this.support ? "SupportTicket" : "Task",
+						role: this.support ? "support" : "list"
+					});
 					taskEdit.load(this.data.id).show();
 				},
 				scope: this
