@@ -15,6 +15,7 @@ use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
+use go\core\mail\AddressList;
 use go\core\model\User;
 use GO\Email\Model\Alias;
 use GO\Email\Model\Account;
@@ -74,9 +75,10 @@ class MessageController extends \GO\Base\Controller\AbstractController
 						$body
 						);
 		$message->setFrom($alias->email, $alias->name);
-		$toList = new \GO\Base\Mail\EmailRecipients($params['notification_to']);
-		$address=$toList->getAddress();
-		$message->setTo($address['email'], $address['personal']);
+
+		$toList = new AddressList($params['notification_to']);
+
+		$message->setTo(...$toList->toArray());
 
 		$mailer = Mailer::newGoInstance();
 		$mailer->setEmailAccount($account);

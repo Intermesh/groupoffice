@@ -83,7 +83,13 @@ class Message {
 	public function getId() : ?string
 	{
 		if(!isset($this->id)) {
-			$this->id = bin2hex(random_bytes(16)) .'@' . Request::get()->getHost();
+			try {
+				$this->id = bin2hex(random_bytes(16)) . '@' . Request::get()->getHost();
+			}catch(Exception $e) {
+
+				// no random source found
+				$this->id = uniqid((string) mt_rand(), true) . '@' . Request::get()->getHost();
+			}
 		}
 		return $this->id;
 	}
