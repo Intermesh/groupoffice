@@ -1,6 +1,8 @@
 - Email: Fixed SMTP auth without verifying certificate
 - Email: Fixed "Use IMAP credentials"
 - Studio: Fix deprecation issues
+- Email: Fixed Set read notification github issue #1052
+- Support: Tickets have there own entity with custom fields and filters
 
 14-09-2023: 6.8.5
 - Email: SMTP Authentication was not performed
