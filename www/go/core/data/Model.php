@@ -213,9 +213,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
    * Convert model into array for API output.
    *
    * @param string[]|null $properties
-   * @return array
+   * @return array|null
    */
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		$arr = [];
 		
@@ -310,7 +310,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
    * @return $this
    * @throws InvalidArgumentException
    */
-	public function setValue(string $propName, $value): Model
+	public function setValue(string $propName, mixed $value): Model
 	{
 
 		$props = $this->getApiProperties();
@@ -340,7 +340,8 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	protected function normalizeValue(string $propName, $value) {
+	protected function normalizeValue(string $propName, $value): mixed
+	{
 		return $value;
 	}
 
@@ -368,8 +369,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		}
 	}
 
-	#[\ReturnTypeWillChange]
-	public function jsonSerialize()
+	public function jsonSerialize(): mixed
 	{
 		return $this->toArray();
 	}
