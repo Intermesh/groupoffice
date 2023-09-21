@@ -196,10 +196,5 @@ abstract class Part extends Model {
 		$streamer = new Streamer($filePointer, $this->encoding);
 		
 		$this->getData(true, $streamer);
-	}	
-	
-	public function toArray(array $attributes = null): array
-	{
-		return parent::toArray($attributes);
 	}
 }

@@ -346,7 +346,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	/**
 	 * @throws Exception
 	 */
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		$fn = $this->returnAsText ? 'dbToText' : 'dbToApi';
 		$record = $this->internalGetCustomFields();

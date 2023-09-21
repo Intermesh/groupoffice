@@ -5,7 +5,6 @@ use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Criteria;
-use go\core\fs\Blob;
 use go\core\orm\Entity;
 use go\core\jmap\Entity as JmapEntity;
 use go\core\orm\EntityType;

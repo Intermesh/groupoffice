@@ -68,7 +68,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, \Ite
 		return $this->fetchAll();
 	}
 
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		return $this->fetchAll();
 	}

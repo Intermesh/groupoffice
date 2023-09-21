@@ -925,7 +925,7 @@ class EntityType implements ArrayableInterface {
 	/**
 	 * @throws SaveException
 	 */
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		return [
 				"name" => $this->getName(),

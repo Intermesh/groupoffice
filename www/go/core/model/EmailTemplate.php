@@ -233,7 +233,7 @@ class EmailTemplate extends Entity
 		}
 	}
 
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		$array =  parent::toArray($properties);
 

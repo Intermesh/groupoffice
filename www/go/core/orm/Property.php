@@ -2127,7 +2127,7 @@ abstract class Property extends Model {
 		}
 	}
 
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		if (empty($properties)) {
 			$properties = $this->fetchProperties;
@@ -2144,7 +2144,8 @@ abstract class Property extends Model {
    * @return mixed
    * @throws Exception
    */
-	protected function normalizeValue(string $propName, $value) {
+	protected function normalizeValue(string $propName, $value): mixed
+	{
 		$relation = static::getMapping()->getRelation($propName);
 		if ($relation) {
 
