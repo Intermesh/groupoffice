@@ -161,10 +161,6 @@ class TaskList extends AclOwnerEntity
 
 	protected function canCreate(): bool
 	{
-		if($this->role == self::Support) {
-			return Module::findByName('business', 'support')
-				->getUserRights()->mayManage;
-		}
 		return Module::findByName('community', 'tasks')
 			->getUserRights()->mayChangeTasklists;
 	}

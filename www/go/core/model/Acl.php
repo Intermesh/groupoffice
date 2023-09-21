@@ -20,7 +20,7 @@ use go\core\exception\Forbidden;
  * Is an Access Control List to restrict access to data.
  */
 class Acl extends Entity {
-	
+
 	const LEVEL_READ = 10;
 	const LEVEL_CREATE = 20;
 	const LEVEL_WRITE = 30;
@@ -335,7 +335,7 @@ class Acl extends Entity {
 	 * Get the maximum permission level a user has for an ACL
 	 * 
 	 * @param int $aclId
-	 * @param int $userId
+	 * @param ?int $userId
 	 * @return int See the self::LEVEL_* constants
 	 */
 	public static function getUserPermissionLevel(int $aclId, ?int $userId): int

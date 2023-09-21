@@ -267,8 +267,6 @@ class User extends AclItemEntity {
 	protected $last_password_change;
 	public $force_password_change;
 
-	protected $permissionLevel;
-	
 	public function getDateTimeFormat(): string
 	{
 		return $this->dateFormat . ' ' . $this->timeFormat;
