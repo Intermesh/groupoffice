@@ -1,3 +1,5 @@
+- Core: fix for isset() on dynamic config properties. (Sieve rewrite_hosts failed to work)
+
 19-09-2023: 6.7.48
 - Leavedays: fix error upon exporting leaveday hours
 - Core: fix error in user export
