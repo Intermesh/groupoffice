@@ -253,7 +253,8 @@ class Acl extends Entity {
 	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @throws Forbidden
 	 */
-	public static function applyToQuery(Query $query, string $column, int $level = self::LEVEL_READ, int $userId = null, array $groups = null) {
+	public static function applyToQuery(Query $query, string $column, int $level = self::LEVEL_READ, int $userId = null, array $groups = null): void
+	{
 
 		if(!isset($userId)) {
 
@@ -274,25 +275,21 @@ class Acl extends Entity {
 		}
 
 		// WHERE in
-		 $subQuery = (new Query)
-		 				->select('aclId')
-		 				->from('core_acl_group', 'acl_g');
+		$subQuery = (new Query)
+		      ->select('aclId')
+		      ->from('core_acl_group', 'acl_g');
 
 
-		 if(isset($groups)) {
-		 	$subQuery->andWhere('acl_g.groupId', 'IN', $groups);
-		 } else {
-		 	$subQuery->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
-		 		->andWhere([
-		 			'acl_u.userId' => $userId
-		 					]);
-		 	}
-
-		 if($level != self::LEVEL_READ) {
-		 	$subQuery->andWhere('acl_g.level', '>=', $level);
-		 }
-
-		 $query->where($column, 'IN', $subQuery);
+		if(isset($groups)) {
+		$subQuery->andWhere('acl_g.groupId', 'IN', $groups);
+		} else {
+		$subQuery->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
+		  ->andWhere([
+		    'acl_u.userId' => $userId
+		        ]);
+		}
+		$subQuery->andWhere('acl_g.level', '>=', $level);
+		$query->where($column, 'IN', $subQuery);
 
 		//where exists
 		// $subQuery = (new Query)
@@ -332,7 +329,7 @@ class Acl extends Entity {
 		
 	}
 	
-	private static $permissionLevelCache = [];
+	private static array $permissionLevelCache = [];
 	
 	/**
 	 * Get the maximum permission level a user has for an ACL
@@ -384,7 +381,8 @@ class Acl extends Entity {
 	/**
 	 * @return UserDisplay[]|Query
 	 */
-	public function findAuthorizedUsers() {
+	public function findAuthorizedUsers(): Query
+	{
 		return UserDisplay::find()
 			->join('core_user_group', 'ug', 'ug.userId = u.id')
 			->join('core_acl_group', 'ag', 'ag.groupId = ug.id')
