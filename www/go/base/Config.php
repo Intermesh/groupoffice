@@ -1339,14 +1339,14 @@ var $billing_clear_payment_method_on_duplicate = true;
 		
 		return $this->dyn[$name] ?? null;
 	}
-	
+
 	public function __isset($name) {
 		if(method_exists($this, "get" . $name)) {
 			$var =  $this->{"get" . $name}();
 			return isset($var);
 		}
-		
-		return false;
+
+		return isset($this->dyn[$name]);
 	}
 	
 	private function getGlobalConfig() {
