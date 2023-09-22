@@ -1,7 +1,7 @@
 @use "sass:math";
 
 @function density($size) {
-	@return $size / 160 * 62.5%
+	@return math.div($size, 160) * 62.5%
 }
 @function dp($width) {
 	@return $width * .1rem;
