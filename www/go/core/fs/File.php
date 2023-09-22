@@ -478,7 +478,7 @@ class File extends FileSystemObject {
 	 */
 	public function open(string $mode){
 		
-		//$this->create();
+		$this->create();
 		
 		return fopen($this->getPath(), $mode);
 	}

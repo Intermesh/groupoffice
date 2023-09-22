@@ -1,3 +1,4 @@
+12-09-2023: 6.6.170
 - Core: fix for isset() on dynamic config properties. (Sieve rewrite_hosts failed to work)
 
 19-09-2023: 6.7.48
