@@ -9,14 +9,18 @@ input[type="time"]::-webkit-clear-button {
 }
 
 html {
-	font-size: 100%;
+	font-size: var(--density);
 	letter-spacing: normal;
 	-moz-osx-font-smoothing: grayscale;
    -webkit-font-smoothing: antialiased;
 	-ms-text-size-adjust: 100%;
    -webkit-text-size-adjust: 100%;
 }
-
+@media (max-device-width:1200px) {
+	html {
+		font-size: var(--mobile-density);
+	}
+}
 body {
 	background-color: color($bg, 'body');
 	//background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(239,166,76,1) 0%, rgba(245,184,184,1) 100.2% );

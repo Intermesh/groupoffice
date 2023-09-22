@@ -1,8 +1,10 @@
-$density: 140 !default; // LARGE SCREEN
 $font-scale: 1 !default;
 $resourcePath: './' !default;
 
 @mixin light-theme {
+	--density: #{density(140)}; // 140 - LARGE SCREEN
+	--mobile-density: #{density(160)}; // 160
+
 	--fg-base:			 black;
 	--fg-divider:			#{rgba(black, 0.04)};
 	--fg-border:			rgba(0, 0, 0, 0.12);
