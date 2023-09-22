@@ -249,9 +249,8 @@
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
 
-26-06-2023: 6.6.165
-- Addressbook: Corrected foreign key of birthday portlet
-- Files: Not all folders were listed as admin
+12-09-2023: 6.6.170
+- Core: fix for isset() on dynamic config properties. (Sieve rewrite_hosts failed to work)
 
 21-08-2023: 6.6.169
 - Leavedays: When requesting leave with special leavebudget, filter out the rejected ones
@@ -275,6 +274,8 @@
 26-05-2023: 6.6.165
  - Leavedays: Split 'hours' column into spent and budgeted special leave hours in year overview
  - Newsletters: shipping report will work for user entities without profile
+ - Addressbook: Corrected foreign key of birthday portlet
+ - Files: Not all folders were listed as admin
 
  19-06-2023: 6.6.164
 - Newsletters: do not throw an exception when a shipping report does not find an entity
