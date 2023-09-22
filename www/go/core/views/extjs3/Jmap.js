@@ -265,6 +265,16 @@ go.Jmap = {
 				source.close();
 			});
 
+			window.addEventListener('offline', () => {
+				console.log("Closing SSE because we're offline")
+				source.close();
+			});
+
+			window.addEventListener('online', () => {
+				console.log("Starting SSE because we're online")
+				go.Jmap.sse();
+			})
+
 		}
 		catch(e) {
 			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
