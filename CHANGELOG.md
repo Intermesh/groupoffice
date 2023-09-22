@@ -1,3 +1,5 @@
+- Core: fix casting error when saving cropped blob (e.g. avatar)
+
 19-09-2023: 6.7.48
 - Leavedays: fix error upon exporting leaveday hours
 - Core: fix error in user export
