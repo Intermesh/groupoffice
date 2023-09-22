@@ -54,7 +54,8 @@ class Connection {
 				PDO::ATTR_PERSISTENT => false, //doesn't work with ATTR_STATEMENT_CLASS but should not have many benefits anyway
 //				PDO::ATTR_STATEMENT_CLASS => [Statement::class],
 				PDO::ATTR_EMULATE_PREPARES => false, //for native data types int, bool etc.
-				PDO::ATTR_STRINGIFY_FETCHES => false
+				PDO::ATTR_STRINGIFY_FETCHES => false,
+				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
 		];
 	}
 
