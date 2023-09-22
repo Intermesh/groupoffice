@@ -1,6 +1,12 @@
+html {
+	font-size: var(--density);
+}
+:root, body {
+	@include light-theme;
+}
 body, p, span, div {
 	font-family: Helvetica, Arial, sans-serif;
-	font-size: sp(16);
+	font-size: sp(16)	;
 	color: color($fg, 'text');
 	font-weight: $font-weight-r;
 	line-height: dp(24);
