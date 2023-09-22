@@ -55,16 +55,36 @@ class Environment extends Singleton {
 		return self::configToBytes(ini_get('memory_limit'));
 	}
 
-	public function setMemoryLimit($limit) {
-		ini_set('memory_limit', $limit);
+	/**
+	 * Set the memory limit. It will only set if it's higher than the current limit.
+	 *
+	 * @param string $limit
+	 * @return bool|string
+	 */
+	public function setMemoryLimit(string $limit): bool|string
+	{
+		$current = ini_get('memory_limit');
+		$currentBytes = self::configToBytes($current);
+		$newBytes = self::configToBytes($limit);
+		if($newBytes > $currentBytes) {
+			return ini_set('memory_limit', $limit);
+		} else {
+			return $current;
+		}
 	}
 
 	/**
+	 * Set the max execution time. It will only set if it's higher than the current time
 	 * @param int $time In seconds
-	 * @return void
 	 */
-	public function setMaxExecutionTime(int $time) {
-		ini_set('max_execution_time', $time);
+	public function setMaxExecutionTime(int $time): bool|string
+	{
+		$current = ini_get("max_execution_time");
+		if($current != 0 && ($time == 0 || $time > $current)){
+			return ini_set('max_execution_time', $time);
+		} else {
+			return $current;
+		}
 	}
 	
 	/**
