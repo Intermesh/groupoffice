@@ -263,17 +263,17 @@ go.Jmap = {
 			window.addEventListener('beforeunload', () => {
 				console.log("Closing SSE")
 				source.close();
-			});
+			}, {once:true});
 
 			window.addEventListener('offline', () => {
 				console.log("Closing SSE because we're offline")
 				source.close();
-			});
+			}, {once:true});
 
 			window.addEventListener('online', () => {
 				console.log("Starting SSE because we're online")
 				go.Jmap.sse();
-			})
+			}, {once:true})
 
 		}
 		catch(e) {

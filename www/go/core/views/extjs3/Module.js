@@ -229,33 +229,33 @@ GO.mainLayout.on('render', function () {
 
 
 	// if(!GO.settings.config.debug) {
-	window.onerror = function (message, source, lineno, colno, error) {
-		go.Jmap.request({
-			method: "core/System/logClientError",
-			params: {
-				message: message + (error && error.stack ? " - " + error.stack : "")
-			}
-		}).catch(e=>console.error(e))
-	}
+	// window.onerror = function (message, source, lineno, colno, error) {
+	// 	go.Jmap.request({
+	// 		method: "core/System/logClientError",
+	// 		params: {
+	// 			message: message + (error && error.stack ? " - " + error.stack : "")
+	// 		}
+	// 	}).catch(e=>console.error(e))
 	// }
-
-	window.addEventListener('unhandledrejection', function (event) {
-
-		if(Ext.isObject(event.reason)) {
-			var txt = event.reason.message || event.reason.detail || event.reason.description || t("Unknown error");
-		} else if(Ext.isString(event.reason)) {
-			var txt = event.reason;
-		} else
-		{
-			var txt = t("Unknown error");
-		}
-
-		go.Jmap.request({
-			method: "core/System/logClientError",
-			params: {
-				message: txt + " - " + ((new Error()).stack)
-			}
-		}).catch(e=>console.error(e))
-	});
+	// // }
+	//
+	// window.addEventListener('unhandledrejection', function (event) {
+	//
+	// 	if(Ext.isObject(event.reason)) {
+	// 		var txt = event.reason.message || event.reason.detail || event.reason.description || t("Unknown error");
+	// 	} else if(Ext.isString(event.reason)) {
+	// 		var txt = event.reason;
+	// 	} else
+	// 	{
+	// 		var txt = t("Unknown error");
+	// 	}
+	//
+	// 	go.Jmap.request({
+	// 		method: "core/System/logClientError",
+	// 		params: {
+	// 			message: txt + " - " + ((new Error()).stack)
+	// 		}
+	// 	}).catch(e=>console.error(e))
+	// });
 
 });
