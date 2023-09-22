@@ -1,4 +1,4 @@
-
+- Core: stop and start checker and SSE when going off- or online
 - Email: Fixed SMTP auth without verifying certificate
 - Email: Fixed "Use IMAP credentials"
 - Studio: Fix deprecation issues
