@@ -518,7 +518,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								try {
 									Ext.getBody().mask(t("Saving..."));
 									const result = await go.Db.store("Task").merge(ids);
-									await go.Db.store("Task").getUpdates();
+									await go.Db.store(this.support ? "SupportTicket" : "Task").getUpdates();
 
 									setTimeout(() => {
 										const dlg = new go.modules.community.tasks.TaskDialog();
