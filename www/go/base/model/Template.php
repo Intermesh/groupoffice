@@ -35,7 +35,7 @@ use go\modules\community\addressbook\model\Date;
  * @property int $user_id
  * @property int $id
  * @property int $acl_write
- * @property int $group_id FK to the go_tempalte_group table
+ * @property int $group_id FK to the go_template_group table
  */
 class Template extends \GO\Base\Db\ActiveRecord{
 	
