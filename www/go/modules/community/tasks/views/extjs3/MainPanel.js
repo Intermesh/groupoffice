@@ -447,7 +447,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								update[r.id] = {tasklistId: tasklistId};
 							})
 
-							go.Db.store("Task").set({update: update});
+							go.Db.store(this.support ? "SupportTicket" : "Task").set({update: update});
 						}
 					});
 				},
