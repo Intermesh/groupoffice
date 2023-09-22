@@ -1,3 +1,4 @@
+
 - Email: Fixed SMTP auth without verifying certificate
 - Email: Fixed "Use IMAP credentials"
 - Studio: Fix deprecation issues
@@ -265,6 +266,8 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+12-09-2023: 6.6.170
+- Core: fix for isset() on dynamic config properties. (Sieve rewrite_hosts failed to work)
 
 26-06-2023: 6.6.165
 - Addressbook: Corrected foreign key of birthday portlet
