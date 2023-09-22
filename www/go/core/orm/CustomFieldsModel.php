@@ -437,8 +437,8 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	{
 		return $this->__isset($offset);
 	}
-	#[\ReturnTypeWillChange]
-	public function offsetGet($offset)
+
+	public function offsetGet($offset): mixed
 	{
 		return $this->__get($offset);
 	}
@@ -456,8 +456,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	/**
 	 * @throws Exception
 	 */
-	#[\ReturnTypeWillChange]
-	public function jsonSerialize()
+	public function jsonSerialize(): mixed
 	{
 		return $this->toArray();
 	}

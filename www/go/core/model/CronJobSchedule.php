@@ -172,7 +172,7 @@ class CronJobSchedule extends Entity
 			$cron = new $cls;			
 			$cron->run($this);
 			
-		} catch (Exception $ex) {			
+		} catch (\Throwable $ex) {
 			$errorString = ErrorHandler::logException($ex);
 			echo $errorString . "\n";
 			$this->lastError = $errorString;
