@@ -1,3 +1,4 @@
+
 - Core: stop and start checker and SSE when going off- or online
 - Email: Fixed SMTP auth without verifying certificate
 - Email: Fixed "Use IMAP credentials"
@@ -6,6 +7,7 @@
 - Support: Tickets have there own entity with custom fields and filters
 - Addressbook: Added filter for has organization
 - Core: Made cor/Notify/mail backwards compatible
+- Core: fix casting error when saving cropped blob (e.g. avatar)
 
 14-09-2023: 6.8.5
 - Email: SMTP Authentication was not performed
@@ -268,12 +270,13 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
-12-09-2023: 6.6.170
-- Core: fix for isset() on dynamic config properties. (Sieve rewrite_hosts failed to work)
+25-09-2023: 6.6.171
+- Leavedays: bugfix - employee can request leave day budgets
+- Core: Add Jersey and Isle of Man to countries list
 
-26-06-2023: 6.6.165
+12-09-2023: 6.6.170
 - Addressbook: Corrected foreign key of birthday portlet
-- Files: Not all folders were listed as admin
+- Core: fix for isset() on dynamic config properties. (Sieve rewrite_hosts failed to work)
 
 21-08-2023: 6.6.169
 - Leavedays: When requesting leave with special leavebudget, filter out the rejected ones
@@ -297,6 +300,8 @@
 26-05-2023: 6.6.165
  - Leavedays: Split 'hours' column into spent and budgeted special leave hours in year overview
  - Newsletters: shipping report will work for user entities without profile
+ - Addressbook: Corrected foreign key of birthday portlet
+ - Files: Not all folders were listed as admin
 
  19-06-2023: 6.6.164
 - Newsletters: do not throw an exception when a shipping report does not find an entity
