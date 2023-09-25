@@ -1,4 +1,5 @@
 - Leavedays: bugfix - employee can request leave day budgets
+- Core: Add Jersey and Isle of Man to countries list
 
 12-09-2023: 6.6.170
 - Addressbook: Corrected foreign key of birthday portlet
