@@ -4,6 +4,8 @@
 - Studio: Fix deprecation issues
 - Email: Fixed Set read notification github issue #1052
 - Support: Tickets have there own entity with custom fields and filters
+- Addressbook: Added filter for has organization
+- Core: Made cor/Notify/mail backwards compatible
 
 14-09-2023: 6.8.5
 - Email: SMTP Authentication was not performed
