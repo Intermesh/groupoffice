@@ -5,7 +5,7 @@ use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Column;
 use go\core\db\Criteria;
-use go\core\mail\Address;
+use go\core\mail\Address as MailAddress;
 use go\core\model\Link;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
@@ -1300,7 +1300,7 @@ class Contact extends AclItemEntity {
 		if(!isset($this->emailAddresses[0])) {
 			return false;
 		}
-		$message->setTo(new Address($this->emailAddresses[0]->email, $this->name));
+		$message->setTo(new MailAddress($this->emailAddresses[0]->email, $this->name));
 		return true;
 	}
 
