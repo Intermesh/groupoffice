@@ -330,17 +330,17 @@ class Image {
 		$ratioOrig = $widthOrig / $heightOrig;
 
 		if ($thumbnailWidth / $thumbnailHeight > $ratioOrig) {
-			$newHeight = $thumbnailWidth / $ratioOrig;
+			$newHeight = round($thumbnailWidth / $ratioOrig);
 			$newWidth = $thumbnailWidth;
 		} else {
-			$newWidth = $thumbnailHeight * $ratioOrig;
+			$newWidth = round($thumbnailHeight * $ratioOrig);
 			$newHeight = $thumbnailHeight;
 		}
 
 		$this->resizedImage = imagecreatetruecolor($thumbnailWidth, $thumbnailHeight);
 
-		$x = ($newWidth - $thumbnailWidth) / -2;
-		$y = ($newHeight - $thumbnailHeight) / -2;
+		$x = round(($newWidth - $thumbnailWidth) / -2);
+		$y = round(($newHeight - $thumbnailHeight) / -2);
 
 		$this->transperancy();
 		return imagecopyresampled($this->resizedImage, $this->originalImage, $x, $y, 0, 0, $newWidth, $newHeight, $widthOrig, $heightOrig);
