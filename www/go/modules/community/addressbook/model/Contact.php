@@ -476,6 +476,19 @@ class Contact extends AclItemEntity {
 										->add("hasPhoneNumbers", function(Criteria $criteria, $value, Query $query) {
 											$criteria->andWhere('c.id in (select contactId from addressbook_phone_number)');
 										})
+										->add("hasOrganizations", function(Criteria $criteria, $value, Query $query) {
+
+											$sub = Contact::find()
+												->selectSingleValue('org.id')
+												->tableAlias('org')
+												->where('isOrganization', '=', true)
+												->join('core_link', 'l',
+													'c.id=l.fromId AND org.id=l.toId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId(), 'INNER');
+
+
+											$criteria->andWhereExists($sub, empty($value));
+
+										})
 
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_email_address', 'em')) {

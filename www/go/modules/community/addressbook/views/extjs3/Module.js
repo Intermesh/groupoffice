@@ -303,7 +303,22 @@ go.Modules.register("community", "addressbook", {
 						title: t("No")
 					}
 				]
-			}, {
+			},  {
+				title: t("Has organizations"),
+				name: 'hasOrganizations',
+				multiple: false,
+				type: 'select',
+				options: [
+					{
+						value: true,
+						title: t("Yes")
+					},
+					{
+						value: false,
+						title: t("No")
+					}
+				]
+			},{
 				title: t("VAT number"),
 				name: 'vatNo',
 				type:"text",
