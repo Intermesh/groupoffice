@@ -521,7 +521,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 									await go.Db.store(this.support ? "SupportTicket" : "Task").getUpdates();
 
 									setTimeout(() => {
-										const dlg = new go.modules.community.tasks.TaskDialog();
+										const dlg = new go.modules.community.tasks.TaskDialog({
+											role: this.support ? "support" : "list",
+											entityStore: this.support ? "SupportTicket" : "Task",
+										});
 										dlg.load(result.id);
 										dlg.show();
 									})
@@ -775,7 +778,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		const dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
+		const dlg = new go.modules.community.tasks.TaskDialog({
+			role: this.support ? "support" : "list",
+			entityStore: this.support ? "SupportTicket" : "Task",
+		});
 		dlg.load(record.id).show();
 	}	
 });
