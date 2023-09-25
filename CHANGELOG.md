@@ -248,8 +248,12 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+25-09-2023: 6.6.171
+- Leavedays: bugfix - employee can request leave day budgets
+- Core: Add Jersey and Isle of Man to countries list
 
 12-09-2023: 6.6.170
+- Addressbook: Corrected foreign key of birthday portlet
 - Core: fix for isset() on dynamic config properties. (Sieve rewrite_hosts failed to work)
 
 21-08-2023: 6.6.169
