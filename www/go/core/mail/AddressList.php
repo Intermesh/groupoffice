@@ -24,13 +24,18 @@ class AddressList implements ArrayAccess, Countable {
 	 *
 	 * "Merijn Schering" <mschering@intermesh.nl>, someone@somedomain.com, Pete <pete@pete.com>
 	 *
-	 * @param string $emailRecipientList
+	 * @param string|array $emailRecipientList
 	 * @param bool $strict Throw exception if an invalid e-mail address was found
 	 * @throws Exception
 	 */
-	public function __construct(string $emailRecipientList = '', bool $strict = false) {
+	public function __construct(string|array $emailRecipientList = '', bool $strict = false) {
 		$this->strict = $strict;
-		$this->addString($emailRecipientList);
+
+		if(is_string($emailRecipientList)) {
+			$this->addString($emailRecipientList);
+		} else {
+			$this->addArray($emailRecipientList);
+		}
 	}
 
 	/**
@@ -60,7 +65,8 @@ class AddressList implements ArrayAccess, Countable {
 	 * 
 	 * @param string $email 
 	 */
-	public function remove(string $email) {
+	public function remove(string $email): void
+	{
 
 		$index = $this->hasAddress($email);
 
@@ -130,6 +136,22 @@ class AddressList implements ArrayAccess, Countable {
 	public function add(Address $address): AddressList
 	{
 		$this->addresses[] = $address;
+		return $this;
+	}
+
+
+	/**
+	 * Add key value array where index is the email and value is the name.
+	 *
+	 * @param array $keyValueArr eg. ['mailbox@example.com' => "Example user"]
+	 * @return $this
+	 */
+	public function addArray(array $keyValueArr): static
+	{
+		foreach ($keyValueArr as $email => $name) {
+			$this->add(new Address($email, $name));
+		}
+
 		return $this;
 	}
 

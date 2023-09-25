@@ -7,6 +7,7 @@ use GO;
 use go\core\Controller;
 use go\core\jmap\Response;
 use go\core\mail\Address;
+use go\core\mail\AddressList;
 use go\core\model;
 
 class Notify extends Controller {
@@ -16,19 +17,14 @@ class Notify extends Controller {
 		$settings = go()->getSettings();
 
 		if(!empty($params['to'])) {
-			$to = [];
-			foreach($params['to'] as $email=>$name) {
-				$to[] = new Address($email, $name);
-			}
-		} else {
-			$to = [new Address($settings->systemEmail, $settings->title)];
+			$params['to'] = new Address($settings->systemEmail, $settings->title);
 		}
 		
 		$message = go()->getMailer()->compose()
 						->setFrom($settings->systemEmail, $settings->title)
-						->setTo(...$to)
+						->setTo($params['to'])
 						->setSubject($params['subject'] ?? "")
-						->setBody($params['body'] ?? "", $params['contentType'] ?? null);
+						->setBody($params['body'] ?? "", $params['contentType'] ?? 'text/plain');
 
 		if(isset($params['replyTo'])) {
 			$message->setReplyTo($params['replyTo']);
@@ -36,7 +32,7 @@ class Notify extends Controller {
 
 		$success = $message->send();
 		
-		Response::get()->addResponse(['success' => $success]);
+		return ['success' => $success];
 	}
 }
 

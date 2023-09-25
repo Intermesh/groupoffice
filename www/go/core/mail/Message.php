@@ -193,21 +193,27 @@ class Message {
 
 	private function normalizeRecipients(array $addresses): array
 	{
+		$new = [];
 		foreach($addresses as &$address) {
-			if(is_string($address)) {
-				$address = new Address($address);
-			} else if (!($address instanceof Address)) {
+			if (is_string($address)) {
+				$addressList = new AddressList($address);
+				$new = array_merge($new, $addressList->toArray());
+			} else if ($address instanceof AddressList) {
+				$new = array_merge($new, $address->toArray());
+			}else if ($address instanceof Address) {
+				$new[] = $address;
+			} else {
 				throw new \InvalidArgumentException("Address must be a string or \go\core\mail\Address");
 			}
 		}
-		return $addresses;
+		return $new;
 	}
 
 	/**
 	 * Set to addresses
 	 *
 	 * @link https://www.rfc-editor.org/rfc/rfc4021#section-2.1.5
-	 * @param string|Address ...$addresses
+	 * @param string|Address|AddressList ...$addresses
 	 * @return $this
 	 */
 	public function setTo(...$addresses): Message
@@ -230,7 +236,7 @@ class Message {
 	 * Add "To" addresses
 	 *
 	 * @link https://www.rfc-editor.org/rfc/rfc4021#section-2.1.5
-	 * @param string|Address ...$addresses
+	 * @param string|Address|AddressList ...$addresses
 	 * @return $this
 	 */
 	public function addTo(...$addresses): Message
@@ -243,7 +249,7 @@ class Message {
 	 * Set Bcc addresses
 	 *
 	 * @link https://www.rfc-editor.org/rfc/rfc4021#section-2.1.5
-	 * @param string|Address ...$addresses
+	 * @param string|Address|AddressList ...$addresses
 	 * @return $this
 	 */
 
@@ -268,7 +274,7 @@ class Message {
 	 * Add Bcc addresses
 	 *
 	 * @link https://www.rfc-editor.org/rfc/rfc4021#section-2.1.5
-	 * @param string|Address ...$addresses
+	 * @param string|Address|AddressList ...$addresses
 	 * @return $this
 	 */
 	public function addBcc(...$addresses): Message
@@ -281,7 +287,7 @@ class Message {
 	 * Set CC addresses
 	 *
 	 * @link https://www.rfc-editor.org/rfc/rfc4021#section-2.1.5
-	 * @param string|Address ...$addresses
+	 * @param string|Address|AddressList ...$addresses
 	 * @return $this
 	 */
 	public function setCc(...$addresses): Message
