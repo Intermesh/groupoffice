@@ -5,14 +5,6 @@ class Notify extends \PHPUnit\Framework\TestCase {
 	public function testMail() {
 
 
-		go()->getSettings()->systemEmail = 'admin@intermesh.localhost';
-		go()->getSettings()->smtpHost = 'mailserver';
-		go()->getSettings()->smtpPort = 25;
-		go()->getSettings()->smtpEncryption = null;
-		go()->getSettings()->save();
-
-
-
 		$ctrl = new \go\core\controller\Notify();
 		$response = $ctrl->mail([
 			"subject" => "Test message",

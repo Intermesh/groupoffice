@@ -142,6 +142,13 @@ try {
 
 	go()->setAuthState(new State());
 
+
+	go()->getSettings()->systemEmail = 'admin@intermesh.localhost';
+	go()->getSettings()->smtpHost = 'mailserver';
+	go()->getSettings()->smtpPort = 25;
+	go()->getSettings()->smtpEncryption = null;
+	go()->getSettings()->save();
+
 } catch (Exception $e) {
 	echo $e;
 	throw $e;
