@@ -4,6 +4,7 @@ namespace GO\Base\Cron;
 
 
 use go\core\ErrorHandler;
+use go\core\mail\Address;
 use go\core\model\Alert;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
@@ -142,7 +143,7 @@ class EmailReminders extends AbstractCron {
 						->compose()
 						->setSubject($subject)
 						->setBody($body, 'text/html')
-						->setTo($user->email, $user->displayName)
+						->setTo(new Address($user->email, $user->displayName))
 						->send();
 
 					$alert->sendMail = false;

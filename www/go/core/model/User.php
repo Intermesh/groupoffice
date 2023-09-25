@@ -22,6 +22,7 @@ use go\core\Environment;
 use go\core\exception\ConfigurationException;
 use go\core\exception\NotFound;
 use go\core\Installer;
+use go\core\mail\Address;
 use go\core\mail\Message;
 use go\core\mail\Util;
 use go\core\orm\exception\SaveException;
@@ -753,7 +754,7 @@ class User extends AclItemEntity {
 		
 		$message = go()->getMailer()->compose()	  
 			->setFrom(go()->getSettings()->systemEmail, $siteTitle)
-			->setTo(!empty($to) ? $to : $this->recoveryEmail, $this->displayName)
+			->setTo(new Address(!empty($to) ? $to : $this->recoveryEmail, $this->displayName))
 			->setSubject(go()->t('Lost password'))
 			->setBody($emailBody);
 		
@@ -1229,7 +1230,7 @@ class User extends AclItemEntity {
 	 */
 	public function decorateMessage(Message $message)
 	{
-		$message->setTo($this->email, $this->displayName);
+		$message->setTo(new Address($this->email, $this->displayName));
 	}
 
 	private $country;
