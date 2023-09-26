@@ -21,10 +21,8 @@ use Throwable;
  */
 class ErrorHandler {
 
-	public function __construct() {		
-		
-//		error_reporting(E_ALL);
-		
+	public function __construct()
+	{
 		set_error_handler([$this, 'errorHandler'], E_ALL);
 		register_shutdown_function([$this, 'shutdown']);
 		set_exception_handler([$this, 'exceptionHandler']);

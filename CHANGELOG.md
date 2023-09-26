@@ -1,4 +1,4 @@
-
+26-09-2023: 6.8.6
 - Core: stop and start checker and SSE when going off- or online
 - Email: Fixed SMTP auth without verifying certificate
 - Email: Fixed "Use IMAP credentials"
