@@ -57,6 +57,7 @@ use GO\Base\Db\FindParams;
 use GO\Calendar\Model\Exception;
 use GO;
 use GO\Base\Util\StringHelper;
+use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\Module;
 use Sabre;
@@ -957,7 +958,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 					$message = \GO\Base\Mail\Message::newInstance(
 										$subject
 										)->setFrom(go()->getSettings()->systemEmail, go()->getSettings()->title)
-										->addTo($adminUser->email, $adminUser->name);
+										->addTo(new Address($adminUser->email, $adminUser->name));
 
 					$message->setHtmlAlternateBody($body);					
 
@@ -1002,7 +1003,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 				$message = \GO\Base\Mail\Message::newInstance(
 									$subject
 									)->setFrom(go()->getSettings()->systemEmail, go()->getSettings()->title)
-									->addTo($this->user->email, $this->user->name);
+									->addTo(new Address($this->user->email, $this->user->name));
 
 				$message->setHtmlAlternateBody($body);					
 
@@ -2465,7 +2466,7 @@ The following is the error message:
 		//create e-mail message
 		$message = \GO\Base\Mail\Message::newInstance($subject)
 							->setFrom($sendingParticipant->email, $sendingParticipant->name)
-							->addTo($organizer->email, $organizer->name);
+							->addTo(new Address($organizer->email, $organizer->name));
 
 		$body = '<p>'.$subject.': </p>'.$this->toHtml();
 		
@@ -2525,7 +2526,7 @@ The following is the error message:
 			//create e-mail message
 			$message = \GO\Base\Mail\Message::newInstance($subject)
 								->setFrom($this->user->email, $this->user->name)
-								->addTo($participant->email, $participant->name);
+								->addTo(new Address($participant->email, $participant->name));
 
 
 			//check if we have a Group-Office event. If so, we can handle accepting and declining in Group-Office. Otherwise we'll use ICS calendar objects by mail
@@ -2620,7 +2621,7 @@ The following is the error message:
 					//create e-mail message
 					$message = \GO\Base\Mail\Message::newInstance($subject)
 										->setFrom($this->user->email, $this->user->name)
-										->addTo($participant->email, $participant->name);
+										->addTo(new Address($participant->email, $participant->name));
 
 
 					//check if we have a Group-Office event. If so, we can handle accepting 

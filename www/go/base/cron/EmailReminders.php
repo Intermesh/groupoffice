@@ -99,7 +99,7 @@ class EmailReminders extends AbstractCron {
 
 				$message = \GO\Base\Mail\Message::newInstance($subject, $body);
 				$message->addFrom(\GO::config()->noreply_email,\GO::config()->title);
-				$message->addTo($userModel->email,$userModel->name);
+				$message->addTo(new Address($userModel->email,$userModel->name));
 				$success =\GO\Base\Mail\Mailer::newGoInstance()->send($message);
 				
 				if(!$success)

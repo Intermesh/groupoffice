@@ -5,6 +5,7 @@ use GO;
 use GO\Base\Mail\Message;
 use GO\Base\Mail\Mailer;
 use go\core\db\Query;
+use go\core\mail\Address;
 use go\modules\business\business\model\EmployeeAgreement;
 
 /**
@@ -853,7 +854,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		
 		$message->setBody($emailBody);
 		$message->addFrom($fromEmail,$fromName);
-		$message->addTo($toEmail,$this->getName());
+		$message->addTo(new Address($toEmail,$this->getName()));
 
 		\GO\Base\Mail\Mailer::newGoInstance()->send($message);
 	}
@@ -912,7 +913,7 @@ Password: {password}", "users");
 		}
 		$message->setSubject($title)
 			->setBody($emailBody, $type)
-			->addTo($this->email,$this->getName());
+			->addTo(new Address($this->email,$this->getName()));
 
 		return Mailer::newGoInstance()->send($message);
 	}
