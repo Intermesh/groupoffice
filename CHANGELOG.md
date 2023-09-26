@@ -5,6 +5,7 @@
 - Studio: Fix deprecation issues
 - Email: Fixed Set read notification github issue #1052
 - Support: Tickets have there own entity with custom fields and filters
+- Support: When migrating from old tickets module, custom fields are migrated too.
 - Addressbook: Added filter for has organization
 - Core: Made cor/Notify/mail backwards compatible
 - Core: fix casting error when saving cropped blob (e.g. avatar)
