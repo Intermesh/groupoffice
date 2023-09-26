@@ -116,46 +116,46 @@ class EmailReminders extends AbstractCron {
 
 			date_default_timezone_set(\GO::user()->timezone);
 
-			$alerts = Alert::find()
-				->where('userId', '=', $userModel->id)
-				->where('triggerAt', '<=', new DateTime("now", new \DateTimeZone("UTC")))
-				->where('sendMail', '=', true);
-
-//			echo $alerts ."\n";
-
-			foreach($alerts as $alert) {
-				try {
-					$subject = go()->t("Alert") . ': ' . $alert->getTitle();
-
-					$user = User::findById($alert->userId, ['id', 'displayName', 'email', 'timezone', 'dateFormat', 'timeFormat']);
-
-					go()->getLanguage()->setLanguage($user->language);
-
-					//$body = go()->t("Time") . ': ' . $alert->triggerAt->toUserFormat(true, $user) . "\n\n";
-					$body = $alert->getBody() ."<br /><br/>";
-					$url = $alert->findEntity()->url();
-					$body .= '<a href="' . $url . '">' . $url . '</a>';
-
-//					date_default_timezone_set(\GO::user()->timezone);
-
-					go()
-						->getMailer()
-						->compose()
-						->setSubject($subject)
-						->setBody($body, 'text/html')
-						->setTo(new Address($user->email, $user->displayName))
-						->send();
-
-					$alert->sendMail = false;
-					if(!$alert->save()) {
-						throw new SaveException($alert);
-					}
-
-				} catch(Throwable $e) {
-
-					ErrorHandler::logException($e, "Failed sending alert e-mail ". $alert->id);
-				}
-			}
+//			$alerts = Alert::find()
+//				->where('userId', '=', $userModel->id)
+//				->where('triggerAt', '<=', new DateTime("now", new \DateTimeZone("UTC")))
+//				->where('sendMail', '=', true);
+//
+////			echo $alerts ."\n";
+//
+//			foreach($alerts as $alert) {
+//				try {
+//					$subject = go()->t("Alert") . ': ' . $alert->getTitle();
+//
+//					$user = User::findById($alert->userId, ['id', 'displayName', 'email', 'timezone', 'dateFormat', 'timeFormat']);
+//
+//					go()->getLanguage()->setLanguage($user->language);
+//
+//					//$body = go()->t("Time") . ': ' . $alert->triggerAt->toUserFormat(true, $user) . "\n\n";
+//					$body = $alert->getBody() ."<br /><br/>";
+//					$url = $alert->findEntity()->url();
+//					$body .= '<a href="' . $url . '">' . $url . '</a>';
+//
+////					date_default_timezone_set(\GO::user()->timezone);
+//
+//					go()
+//						->getMailer()
+//						->compose()
+//						->setSubject($subject)
+//						->setBody($body, 'text/html')
+//						->setTo(new Address($user->email, $user->displayName))
+//						->send();
+//
+//					$alert->sendMail = false;
+//					if(!$alert->save()) {
+//						throw new SaveException($alert);
+//					}
+//
+//				} catch(Throwable $e) {
+//
+//					ErrorHandler::logException($e, "Failed sending alert e-mail ". $alert->id);
+//				}
+//			}
 
 			go()->getLanguage()->setLanguage(\GO::user()->language);
 		}
