@@ -114,6 +114,9 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		}).catch(function(response) {
 			//hack to pass error message to load callback in Store.js
 			o.request.arg.error = response;
+
+			me.fireEvent('loadexception', this, o, response);
+
 			var ret = me.fireEvent('exception', me.store, 'remote', action, o, response, null);
 			o.request.callback.call(o.request.scope, response, o.request.arg, false);
 		});
@@ -186,6 +189,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		}, this);		
 		
 		Promise.all(promises).catch(function(e) {
+			debugger;
 			console.error(e);
 		}).finally(function(){
 			cb.call(scope);

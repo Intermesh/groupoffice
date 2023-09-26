@@ -46,9 +46,11 @@ go.data.StoreTrait = {
 				if (response.isAbort) {
 					//ignore aborts.
 				} else if (response.isTimeout || response.status == 0) {
-					console.error(response);
 
-					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+					console.warn("Connection timeout", response, options);
+					if(document.visibilityState === "visible") {
+						GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+					}
 				} else if (response.type == "unsupportedSort") {
 
 					// Handle invalid sort state which may happen when a (custom) column has been removed.

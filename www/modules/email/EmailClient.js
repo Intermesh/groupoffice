@@ -50,8 +50,10 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.messagesStore.on('exception',
 			function( store, type, action, options, response){
 				if(response.isTimeout || response.status == 0){
-					console.error(response);
-					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+					console.warn("Connection timeout", response, options);
+					if(document.visibilityState === "visible") {
+						GO.errorDialog.show(t("The connection to the server timed out. Please check your internet connection."), t("Request error"));
+					}
 				} else if(!options.reader.jsonData || GO.jsonAuthHandler(options.reader.jsonData, this.load, this)) {
 					let msg;
 
