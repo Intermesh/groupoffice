@@ -284,16 +284,18 @@ class Field extends AclItemEntity {
 		return $this->dataType;
 	}
 
-  /**
-   * Used by the API to set values on the datatype
-   *
-   * @param $values
-   * @throws Exception
-   */
+	/**
+	 * Used by the API to set values on the datatype
+	 *
+	 * @param array|Base $values
+	 */
 	public function setDataType(array|Base $values): void
 	{
 		if($values instanceof Base) {
-			$this->dataType = $values;
+			//ignore
+			$this->type = $values::getName();
+			$this->dataType = null;
+			$this->getDataType()->setValues($values->toArray());
 		} else {
 			$this->getDataType()->setValues($values);
 		}
@@ -377,7 +379,7 @@ class Field extends AclItemEntity {
    * @throws Exception
    */
 	public function tableName() {
-		if(!isset($this->tableName)) {
+		if(!isset($this->tableName) || $this->isModified(['fieldSetId'])) {
 			$fieldSet = FieldSet::findById($this->fieldSetId);
 			$entityName = $fieldSet->getEntity();
 			$entityType = EntityType::findByName($entityName);
