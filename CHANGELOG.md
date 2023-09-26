@@ -9,6 +9,7 @@
 - Core: Made cor/Notify/mail backwards compatible
 - Core: fix casting error when saving cropped blob (e.g. avatar)
 - Tasks: Fixed changing sort order when sorting on start
+- Core: Multiselect custom field was broken for activerecord
 
 14-09-2023: 6.8.5
 - Email: SMTP Authentication was not performed
