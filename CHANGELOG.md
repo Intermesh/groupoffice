@@ -1,4 +1,5 @@
 - Core: fix casting error when saving cropped blob (e.g. avatar)
+- Core: Multiselect custom field was broken for activerecord
 
 19-09-2023: 6.7.48
 - Leavedays: fix error upon exporting leaveday hours
