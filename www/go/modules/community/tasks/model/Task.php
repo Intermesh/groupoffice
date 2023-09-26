@@ -663,6 +663,7 @@ class Task extends AclItemEntity {
 
 			$i = array_search('start', $sort->keys());
 			$sort->insert($i, new Expression($query->getTableAlias() . '.`start` ' . $null));
+			$sort->insert($i + 2, $sort['start'], 'id');
 		}
 
 		if(isset($sort['responsible'])) {
