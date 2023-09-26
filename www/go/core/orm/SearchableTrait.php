@@ -67,6 +67,17 @@ trait SearchableTrait {
 		return null;
 	}
 
+	/**
+	 * Override and return false if you don't want the entity to be indexed.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	protected function includeInSearch(): bool
+	{
+		return true;
+	}
+
 
 	/**
 	 * Save entity to search cache
@@ -87,6 +98,14 @@ trait SearchableTrait {
 				->where('entityTypeId','=', static::entityType()->getId())
 				->andWhere('entityId', '=', $this->id)->single()
 			: false;
+
+		if(!$this->includeInSearch()) {
+			if($search) {
+				Search::delete($search->primaryKeyValues());
+			}
+			return true;
+		}
+
 
 		if(!$search) {
 			$search = new Search();

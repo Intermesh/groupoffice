@@ -97,8 +97,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			return false;
 		}
 
-		$path = $this->path;
+		// Don't search these folders because it may show too much
+		if($this->findAclId() == Acl::getReadOnlyAclId()) {
+			return false;
+		}
 
+		$path = $this->path;
 		//Don't cache tickets files because there are permissions issues. Everyone has read access to the types but may not see other peoples files.
 		if(strpos($path, 'tickets/')===0){
 			return false;
