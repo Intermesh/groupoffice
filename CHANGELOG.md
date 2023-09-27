@@ -1,3 +1,5 @@
+- Leavedays: bugfix in leave day requset
+
 25-09-2023: 6.6.171
 - Leavedays: bugfix - employee can request leave day budgets
 - Core: Add Jersey and Isle of Man to countries list
