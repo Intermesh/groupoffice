@@ -500,7 +500,6 @@ class Token extends Entity {
 		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
 
 		foreach($deleteQuery as $accessToken) {
-			//64e8763f7f0b73110355f8682432c75fcfa72fc1748d0
 			go()->debug("Delete token: " . $accessToken);
 			go()->getCache()->delete('token-' . $accessToken);
 		}
