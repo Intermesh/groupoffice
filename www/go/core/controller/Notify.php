@@ -16,7 +16,7 @@ class Notify extends Controller {
 		
 		$settings = go()->getSettings();
 
-		if(!empty($params['to'])) {
+		if(empty($params['to'])) {
 			$params['to'] = new Address($settings->systemEmail, $settings->title);
 		}
 		
