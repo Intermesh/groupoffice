@@ -188,12 +188,14 @@ class TemplateParser {
 	 * ```
 	 * [config thousandsSeparator=.]
 	 * [config decimalSeparator=,]
+	 * [config dateFormat=d-m-Y]
 	 * ``
 	 * @var string[]
 	 */
 	public $config = [
 		'decimalSeparator' => '.',
 		'thousandsSeparator' => ',',
+		'dateFormat' => 'd-m-Y'
 	];
 	
 	public function __construct() {
@@ -289,7 +291,7 @@ class TemplateParser {
 		}
 
 		if(!isset($format)) {
-			$format = $this->_currentUser()->dateFormat;
+			$format = $this->config['dateFormat'];
 		}
 
 		$date->setTimezone(new DateTimeZone($this->_currentUser()->timezone));
