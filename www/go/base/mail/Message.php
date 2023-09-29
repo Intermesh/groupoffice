@@ -448,12 +448,12 @@ class Message extends \go\core\mail\Message {
 			$this->addTo(...$to->toArray());
 		}
 		if(!empty($params['cc'])){
-			$to = new AddressList($params['cc']);
-			$this->addTo(...$to->toArray());
+			$cc = new AddressList($params['cc']);
+			$this->addCc(...$cc->toArray());
 		}
 		if(!empty($params['bcc'])){
-			$to = new AddressList($params['bcc']);
-			$this->addTo(...$to->toArray());
+			$bcc = new AddressList($params['bcc']);
+			$this->addBcc(...$bcc->toArray());
 		}
 		
 		if(isset($params['alias_id'])){
