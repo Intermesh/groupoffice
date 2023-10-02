@@ -1,5 +1,4 @@
 go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
-	//autoExpandColumn: 'title',
 	// config options for stateful behavior
 	stateful: true,
 	stateId: 'tasks-grid-main',
@@ -114,7 +113,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(60),
 					renderer: function(value,m,rec) {
 						let v = "";
-						console.debug(rec.json);
 						if(rec.json.priority != 0) {
 							if (rec.json.priority < 5) {
 								v += '<i class="icon small orange">priority_high</i>';
