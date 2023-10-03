@@ -448,7 +448,7 @@ class MailStore extends Store implements ISearchProvider {
 		if(count($attparts)!=4)
 		{
 			ZLog::Write(LOGLEVEL_ERROR, "Malformed attachment name '$attname' in GetAttachmentData!");
-			throw new StatusException("Malformed attachment name '$attname' in GetAttachmentData!");
+			throw new StatusException("Malformed attachment name '$attname' in GetAttachmentData!", SYNC_ITEMOPERATIONSSTATUS_INVALIDATT);
 		}
 		
 		list($uid, $part, $encoding, $mailbox) = explode(":", $attname);
@@ -476,20 +476,20 @@ class MailStore extends Store implements ISearchProvider {
 
 		$imap = $this->_imapLogon($mailbox);
 		if(!$imap)
-			throw new StatusException("Unable to connect to IMAP server in GetAttachmentData!");
+			throw new StatusException("Unable to connect to IMAP server in GetAttachmentData!", SYNC_ITEMOPERATIONSSTATUS_INVALIDATT);
 		
 		$tmpfile = \GO\Base\Fs\File::tempFile();
 		$this->_tmpFiles[]=$tmpfile;
 		
 
 		if(!$imap->save_to_file($uid, $tmpfile->path(), $part, $enc)){
-			throw new StatusException("Failed to save attachment");
+			throw new StatusException("Failed to save attachment", SYNC_ITEMOPERATIONSSTATUS_INVALIDATT);
 		}
 		
 		$fp = fopen($tmpfile->path(),'r');
 		
 		if(!$fp){
-			throw new StatusException("Could not open attachment file stream");
+			throw new StatusException("Could not open attachment file stream", SYNC_ITEMOPERATIONSSTATUS_INVALIDATT);
 		}
 	
 		$attachment = new SyncItemOperationsAttachment();
@@ -999,11 +999,11 @@ class MailStore extends Store implements ISearchProvider {
 		catch (Exception $e){
 			ZLog::Write(LOGLEVEL_FATAL, 'goMail->SendMail() ~~ ERROR:'.$e);
 			
-			throw new StatusException($e->getMessage());
+			throw new StatusException($e->getMessage(), SYNC_COMMONSTATUS_MAILSUBMISSIONFAILED);
 		}
 		
 		if(!$success){
-			throw new StatusException("Could not send mail. Please check the logs.");
+			throw new StatusException("Could not send mail. Please check the logs.", SYNC_COMMONSTATUS_MAILSUBMISSIONFAILED);
 		}
 		
 		ZLog::Write(LOGLEVEL_DEBUG, 'endsend: '.var_export($success, true));

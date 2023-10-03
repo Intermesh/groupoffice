@@ -15,7 +15,7 @@ class TaskStore extends Store {
 
 		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
 			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
 		$task = Task::findById($id);
@@ -23,14 +23,14 @@ class TaskStore extends Store {
 		if (!$task) {
 			return true;
 		} else if($task->getPermissionLevel() < Acl::LEVEL_DELETE){
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		} else {
 			try {
 				return Task::delete($task->primaryKeyValues());
 			} catch (Exception $e) {
 				ZLog::Write(LOGLEVEL_FATAL, 'Task::EXCEPTION ~~ ' .  $e->getMessage());
 				ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
-				throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+				throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 			}
 		}
 	}
@@ -56,7 +56,7 @@ class TaskStore extends Store {
 
 				return false;
 			} else if ($task->getPermissionLevel() < Acl::LEVEL_DELETE) {
-				throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+				throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 			}
 
 			$task->tasklistId = $newfolderid;

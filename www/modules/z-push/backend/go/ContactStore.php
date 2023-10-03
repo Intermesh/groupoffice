@@ -19,7 +19,7 @@ class ContactStore extends Store {
 
 		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
 			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
 		$contact = Contact::findById($id);
@@ -27,7 +27,7 @@ class ContactStore extends Store {
 		if (!$contact) {
 			return true;
 		} else if($contact->getPermissionLevel() < Acl::LEVEL_DELETE){
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		} else {
 			return $contact->delete($contact->primaryKeyValues()); // This throws an error when the contact is read only
 		}
@@ -55,7 +55,7 @@ class ContactStore extends Store {
 		}
 
 		if(!$contact->getPermissionLevel()) {
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
 		try {
@@ -102,7 +102,7 @@ class ContactStore extends Store {
 		}
 
 		if ($contact->getPermissionLevel() < Acl::LEVEL_WRITE) {
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
 		try {
