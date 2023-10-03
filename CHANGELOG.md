@@ -1,6 +1,7 @@
 - Addressbook: Added filter for has organization
 - Core: Raised SSE check interval from 10s to 30s for performance
 - Core: Moved disk cache to temp dir so it can be put on faster partitions
+- Serverclient: check for default setting serverclient_force_smtp_login to force SMTP login through IMAP credentials
 
 26-09-2023: 6.7.49
 - Core: fix casting error when saving cropped blob (e.g. avatar)
