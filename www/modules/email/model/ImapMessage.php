@@ -541,11 +541,6 @@ class ImapMessage extends ComposerMessage {
 			$uniqueNames = array();
 			
 			foreach ($parts as $part) {
-				//ignore applefile's
-				//	Don't ignore it as it seems to be a valid attachment in some mails.
-//				if($part['subtype']=='applefile')
-//					continue;
-					
 				$a = new ImapMessageAttachment();
 				$a->setImapParams($this->account, $this->mailbox, $this->uid);
 				
@@ -566,7 +561,6 @@ class ImapMessage extends ComposerMessage {
 				} else {
 					$a->name = \GO\Base\Fs\File::stripInvalidChars(\GO\Base\Mail\Utils::mimeHeaderDecode($part['name']));
 					
-					//$extension = \GO\Base\Fs\File::getExtension($a->name);
 					if(!empty($part['filename'])){//} && empty($extension)){
 						$a->name = \GO\Base\Fs\File::stripInvalidChars(\GO\Base\Mail\Utils::mimeHeaderDecode($part['filename']));
 					}

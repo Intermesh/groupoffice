@@ -1359,10 +1359,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new NotFound();
 		}
 
-		//workaround for gmail. It doesn't flag messages as seen automatically.
-//		if (!$imapMessage->seen && stripos($account->host, 'gmail') !== false)
-//			$imapMessage->getImapConnection()->set_message_flag(array($imapMessage->uid), "\Seen");
-
 		if(!empty($params['create_temporary_attachments'])) {
 			$imapMessage->createTempFilesForAttachments();
 		}

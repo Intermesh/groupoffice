@@ -2110,17 +2110,18 @@ class Imap extends ImapBodyStruct
 		}
 
 		foreach ($struct as $id => $vals) {
-			//if(!is_array($vals) || in_array($id, $skip_ids))
-			if(!is_array($vals))
+			if(!is_array($vals)) {
 				continue;
+			}
 
 			// Strict must be true as 2.1 == 2.10 if false
 			if(isset($vals['type']) && !in_array($id, $skip_ids, true)){
 				$vals['number'] = $id;
 
 				//sometimes NIL is returned from Dovecot?!?
-				if($vals['id']=='NIL')
-					$vals['id']='';
+				if($vals['id']=='NIL') {
+					$vals['id'] = '';
+				}
 
 				$attachments[]=$vals;
 			} elseif(isset($vals['subs'])) {
