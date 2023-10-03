@@ -19,9 +19,11 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 
 
-		if(!this.currentId && this.role == "support") {
+		if(!this.currentId) {//} && this.role == "support") {
 			this.commentComposer.show();
-			this.descriptionFieldset.hide();
+			if(this.role == "support") {
+				this.descriptionFieldset.hide();
+			}
 
 			this.commentComposer.editor.on("ctrlenter", () => {
 				this.submit();
@@ -361,7 +363,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					,
 
 					{xtype: 'hidden', name: 'groupId'},
-					this.commentComposer = new go.modules.comments.ComposerFieldset(),
+
 
 					this.descriptionFieldset = new Ext.form.FieldSet({
 						xtype: "fieldset",
@@ -389,6 +391,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 							}
 						]
 					}),
+					this.commentComposer = new go.modules.comments.ComposerFieldset(),
 
 					{
 						xtype: "fieldset",
