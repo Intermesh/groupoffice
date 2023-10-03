@@ -1,3 +1,5 @@
+- Addressbook: Added filter for has organization
+
 26-09-2023: 6.7.49
 - Core: fix casting error when saving cropped blob (e.g. avatar)
 - Core: Multiselect custom field was broken for activerecord
