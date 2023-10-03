@@ -26,7 +26,7 @@ class Disk implements CacheInterface {
 	 * @throws Exception
 	 */
 	public function __construct() {
-		$this->folder = go()->getDataFolder()->getFolder('cache/disk');
+		$this->folder = go()->getTmpFolder()->getFolder('cache/disk');
 		$this->folder->create();
 	}
 
