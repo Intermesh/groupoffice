@@ -4,6 +4,8 @@ namespace GO\Email\Model;
 
 
 use GO\Base\Fs\File;
+use GO\Base\Util\StringHelper;
+use go\core\ErrorHandler;
 
 class SavedMessage extends ComposerMessage
 {
@@ -66,10 +68,11 @@ class SavedMessage extends ComposerMessage
 	{
 		$decoder = new \GO\Base\Mail\MimeDecode($mimeData);
 		$structure = $decoder->decode(array(
-				'include_bodies' => true,
-				'decode_headers' => true,
-				'decode_bodies' => true
-						));
+			'include_bodies' => true,
+			'decode_headers' => true,
+			'decode_bodies' => true,
+			'rfc_822bodies' => true
+		));
 		
 		if (!$structure)
 			throw new \Exception("Could not decode mime data:\n\n $mimeData");
@@ -84,8 +87,15 @@ class SavedMessage extends ComposerMessage
 		$attributes['cc'] = isset($structure->headers['cc']) && strpos($structure->headers['cc'], 'undisclosed') === false ? $structure->headers['cc'] : '';
 		$attributes['bcc'] = isset($structure->headers['bcc']) && strpos($structure->headers['bcc'], 'undisclosed') === false ? $structure->headers['bcc'] : '';		
 		$attributes['from'] = isset($structure->headers['from']) ? $structure->headers['from'] : '';
-		$attributes['date']=isset($structure->headers['date']) ? $structure->headers['date'] : null;
-		$attributes['udate']=isset($structure->headers['date']) ? strtotime($attributes['date']) : null;
+
+		$attributes['date'] = isset($structure->headers['date']) ? preg_replace('/\([^\)]*\)/', '', $structure->headers['date']) : date('c');
+		try {
+			$attributes['udate'] = strtotime($attributes['date']);
+		} catch (Exception $e) {
+			ErrorHandler::logException($e);
+			$attributes['udate'] = time();
+		}
+
 		$attributes['size']=strlen($mimeData);
 		
 		$attributes['message_id']=isset($structure->headers['message-id']) ? $structure->headers['message-id'] : "";
@@ -154,7 +164,6 @@ class SavedMessage extends ComposerMessage
 		if (isset($structure->parts)) {
 			$structure->ctype_primary = strtolower($structure->ctype_primary);
 			$structure->ctype_secondary = strtolower($structure->ctype_secondary);
-			//$part_number=0;
 			foreach ($structure->parts as $part_number => $part) {
 			
 				$part->ctype_primary = !empty($part->ctype_primary) ? strtolower($part->ctype_primary) : "text";
@@ -168,16 +177,21 @@ class SavedMessage extends ComposerMessage
 						continue;
 					}
 				}
-
-				if ($part->ctype_primary == 'text' && ($part->ctype_secondary == 'plain' || $part->ctype_secondary == 'html') && (!isset($part->disposition) || $part->disposition != 'attachment') && empty($part->d_parameters['filename'])) {
+				if($part->ctype_primary === 'message' && $part->ctype_secondary === 'rfc822') {
+					$tmpPart = $this->createFromMimeData($part->body, $preserveHtmlStyle);
+					foreach($tmpPart->getAttachments() as $idx => &$att) {
+						$att->number = $part_number_prefix . $part_number . '.' .  $idx;
+						$this->attachments[$att->number] = $att;
+					}
+				} else if ($part->ctype_primary == 'text' && ($part->ctype_secondary == 'plain' || $part->ctype_secondary == 'html') && (!isset($part->disposition) || $part->disposition != 'attachment') && empty($part->d_parameters['filename'])) {
 					$charset = isset($part->ctype_parameters['charset']) ? $part->ctype_parameters['charset'] : 'UTF-8';
-					$body = \GO\Base\Util\StringHelper::clean_utf8($part->body, $charset);
+					$body = StringHelper::clean_utf8($part->body, $charset);
 					
 					if (stripos($part->ctype_secondary, 'plain') !== false) {
 						$body = $preserveHtmlStyle ? '<div class="msg">' . nl2br($body) . '</div>' : nl2br($body);
 					} else {
-						$body = \GO\Base\Util\StringHelper::convertLinks($body);
-						$body = \GO\Base\Util\StringHelper::sanitizeHtml($body, $preserveHtmlStyle);
+						$body = StringHelper::convertLinks($body);
+						$body = StringHelper::sanitizeHtml($body, $preserveHtmlStyle);
 					}
 					$this->_loadedBody .= $body;
 				} elseif ($part->ctype_primary == 'multipart') {
@@ -208,9 +222,7 @@ class SavedMessage extends ComposerMessage
 
 					$filename = File::stripInvalidChars($filename);
 					
-					$f = new \GO\Base\Fs\File($filename);
-					
-					$a = new MessageAttachment();										
+					$a = new MessageAttachment();
 					$a->name=$filename;
 					$a->number=$part_number_prefix.$part_number;
 					$a->content_id=$content_id;
@@ -231,7 +243,6 @@ class SavedMessage extends ComposerMessage
 					
 				}
 
-				//$part_number++;
 				if (isset($part->parts)) {
 					$this->_getParts($part, $part_number_prefix . $part_number . '.', $preserveHtmlStyle);
 				}
@@ -239,13 +250,57 @@ class SavedMessage extends ComposerMessage
 		} elseif (isset($structure->body)) {			
 			$charset = isset($structure->ctype_parameters['charset']) ? $structure->ctype_parameters['charset'] : 'UTF-8';
 			$text_part = \GO\Base\Util\StringHelper::clean_utf8( $structure->body,$charset);
+
+			// Convert text to PDF
+			if(stripos($structure->ctype_secondary, 'pdf') !== false) {
+				if (isset($structure->ctype_parameters['name'])) {
+					$filename = $structure->ctype_parameters['name'];
+				} else {
+					$filename = uniqid(time()) . ".pdf";
+				}
+
+				$mime_type = $structure->ctype_primary . '/' . $structure->ctype_secondary;
+
+				if (isset($structure->headers['content-id'])) {
+					$content_id = trim($structure->headers['content-id']);
+					if (strpos($content_id, '>')) {
+						$content_id = substr($structure->headers['content-id'], 1, strlen($structure->headers['content-id']) - 2);
+					}
+				} else {
+					$content_id = '';
+				}
+				$filename = File::stripInvalidChars($filename);
+
+
+				$a = new MessageAttachment();
+				$a->name = $filename;
+				$a->number = $part_number_prefix . "1";
+				$a->content_id = $content_id;
+				$a->mime = $mime_type;
+				if (!empty($structure->body)) {
+					$tmp_file = new \GO\Base\Fs\File($this->_getTempDir() . \GO\Base\Fs\File::stripInvalidChars($filename));
+					$tmp_file->appendNumberToNameIfExists();
+					$tmp_file->putContents($structure->body);
+
+					$a->setTempFile($tmp_file);
+				}
+
+				$a->index = count($this->attachments);
+				$a->encoding = isset($structure->headers['content-transfer-encoding']) ? $structure->headers['content-transfer-encoding'] : '';
+				$a->disposition = isset($structure->disposition) ? $structure->disposition : '';
+
+				$this->addAttachment($a);
+
+				$text_part = ""; // We moved the contents of the PDF into the attachment!
+
+
 			//convert text to html
-			if (stripos($structure->ctype_secondary, 'plain') !== false) {
+			} else if (stripos($structure->ctype_secondary, 'plain') !== false) {
 				$this->extractUuencodedAttachments($text_part);
 				$text_part = $preserveHtmlStyle ? '<div class="msg">' . nl2br($text_part) . '</div>' : nl2br($text_part);
 			}else{
-				$text_part = \GO\Base\Util\StringHelper::convertLinks($text_part);
-				$text_part = \GO\Base\Util\StringHelper::sanitizeHtml($text_part, $preserveHtmlStyle);
+				$text_part = StringHelper::convertLinks($text_part);
+				$text_part = StringHelper::sanitizeHtml($text_part, $preserveHtmlStyle);
 			}
 			
 			$this->_loadedBody .= $text_part;

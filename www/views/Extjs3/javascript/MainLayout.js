@@ -111,44 +111,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	fireReady: function () {
 		this.fireEvent('ready', this);
 		this.ready = true;
-//		this.initLogoutTimer();
-//		GO.playAlarm('desktop-login');
 	},
-
-//	/**
-//	 * Set a timer that will automatically logout when no mouseclicks or keypresses
-//	 * @param start set the false to stop the logout timer
-//	 * @see fireReady
-//	 */
-//	initLogoutTimer: function (start) {
-//		//Does work in IE since 3-jan-2014
-//
-//		if (!GO.util.empty(GO.settings.config['session_inactivity_timeout'])) {
-//			var ms = GO.settings.config['session_inactivity_timeout'] * 1000;
-//			var delay = (function () {
-//				var timer = 0;
-//				return function (ms) {
-//					clearTimeout(timer);
-//					if (ms > 0)
-//						timer = setTimeout(function () {
-//							window.location = GO.url('core/auth/logout');
-//						}, ms);
-//				};
-//			})();
-//			var keyevent = (Ext.isIE || Ext.isWebKit || Ext.isOpera) ? 'keydown' : 'keypress';
-//			Ext.EventManager.on(document, keyevent, function () {
-//				delay(ms);
-//			});
-//			Ext.EventManager.on(document, 'click', function () {
-//				delay(ms);
-//			});
-//			this.timeout = delay;
-//			this.timeout(ms);
-//		} else {
-//			//dummy
-//			this.timeout = function (ms) {}
-//		}
-//	},
 
 	getOpenModules: function () {
 		var openModules = [];
@@ -172,7 +135,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			titlebar: false,
 			enableTabScroll: true,
 			border: false,
-//			activeTab:'go-module-panel-'+GO.settings.start_module,
 			tabPosition: 'top',
 			items: items,
 			deferedRender:true
@@ -214,9 +176,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				tp.hideTabStripItem(panel);
 				panel.hide();
 
-				//var menuItem = this.startMenu.items.item('go-start-menu-'+panel.moduleName);
-				//menuItem.show();
-
 				if (panel == tp.activeTab) {
 					var next = tp.stack.next();
 					if (next) {
@@ -227,7 +186,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						tp.activeTab = null;
 					}
 				}
-				//this.refreshMenu();
 				this.saveState();
 			}
 		}, this);
@@ -311,8 +269,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				pnl.routeDefault();
 			}
 		});
-		
-		//this.initModule(moduleName);
 	},
 
 	onAuthentication: function (password) {
@@ -404,13 +360,124 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.fireReady();
 
-		//Ext need to know where this charting swf file is in order to draw charts
-//		Ext.chart.Chart.CHART_URL = 'views/Extjs3/ext/resources/charts.swf';
-
 		var allPanels = GO.moduleManager.getAllPanelConfigs();
 
 		var items = [];
 
+		/*
+		 * Start global Add Button Code
+		 */
+		me.globalAddMenu = new GO.menu.JsonMenu({
+			id: 'globalAddMenu',
+			enableScrolling: false,
+			store: new Ext.data.JsonStore({
+				root: 'root',
+				proxy: new Ext.data.MemoryProxy(),
+				fields: ['id', 'text', 'iconCls', 'handler'],
+				sortInfo: {
+					field: 'text',
+					direction: 'ASC'
+				}
+			}),
+			listeners: {
+				afterrender: function(menu, e) {
+					menu.getEl().dom.addEventListener("click", (e) => {
+						menu.hide();
+					});
+				},
+				show: function() {
+
+				},
+				itemclick : function(item, e) {
+				},
+				scope: me
+
+			},
+			updateMenuItems: function() {
+				const gaMenu = me.globalAddMenu;
+				if(gaMenu.rendered){
+
+					gaMenu.removeAll();
+					gaMenu.el.sync();
+
+					const records = gaMenu.store.getRange();
+
+					for(let i= 0, len=records.length; i<len; i++){
+						// if (records[i].json.handler) {
+						// 	eval("records[i].json.handler = "+records[i].json.handler);
+						// }
+						// if (records[i].json.menu) {
+						// 	eval("records[i].json.menu = "+records[i].json.menu);
+						// }
+
+						gaMenu.add(records[i].json);
+					}
+
+					gaMenu.fireEvent('load', gaMenu, records);
+					gaMenu.loaded = true;
+				}
+
+			}
+		});
+		me.globalAddMenu.on('afterrender', (menu) => {
+			menu.updateMenuItems();
+
+		});
+		this.globalAddMenuItems = [];
+		go.Entities.getLinkConfigs().filter(function(l) {
+			return !!l.linkWindow;
+		}).forEach(function (l) {
+			this.globalAddMenuItems.push({
+				iconCls: l.iconCls,
+				text: l.title,
+				handler: function () {
+					const window = l.linkWindow.call(l.scope, null, 0, {},{});
+					if (!window) {
+						return;
+					}
+					window.redirectOnSave = false;
+
+					if (!window.isVisible()) {
+						window.show();
+					}
+					window.on("save", function (window, entity) {
+						let id;
+						const goEntity = go.Entities.get(l.entity);
+
+						if(Ext.isNumber(entity)) {
+							id = entity;
+						} else if (window.event_id) {
+							// for some reason, calendar events have a different onSave
+							id = window.event_id;
+						} else if(entity.id) {
+							id = entity.id;
+						}
+
+						if(go.util.empty(id)) {
+							console.warn("Unable to open new " + l.entity);
+							return false;
+						}
+						goEntity.goto(id);
+					}, this, {single: true});
+
+					window.on("send", function(window) {
+						if(l.title !== "E-mail") {
+							return false;
+						}
+						me.openModule("email");
+					}, this, {});
+				}
+			});
+		}, this);
+
+		me.globalAddMenu.store.loadData({root:this.globalAddMenuItems});
+		/*
+		 * END global add menu code
+		 */
+
+		/*
+		 * Begin start menu code
+		 */
 		me.startMenuSearchField = new Ext.menu.SearchFieldItem({
 			cls: 'go-menu-search-field',
 			placeholder: t("Module name") + "...",
@@ -520,24 +587,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		me.startMenu.on('afterrender', (menu) => {
 			menu.updateMenuItems();
 
-			/*
-			this.startMenu.getEl().on('click', (e) => {
-				var t = this.startMenu.findTargetItem(e);
-				if(!t){
-					this.startMenu.hide();
-				}
-			});*/
 		});
 
 		this.startMenuItems = [];
-
-		// if(GO.util.isMobileOrTablet()) {
-		// 	this.startMenu.on("show", function() {
-		// 		this.startMenu.setPosition(0,0);
-		// 		this.startMenu.setWidth(Ext.getBody().getWidth());
-		// 		this.startMenu.setHeight(Ext.getBody().getHeight());
-		// 	}, this);
-		// }
 
 		if (allPanels.length == 0) {
 			items = new Ext.Panel({
@@ -567,9 +619,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				id: 'go-start-menu-' + allPanels[i].moduleName,
 				moduleName: allPanels[i].moduleName,
 				text: allPanels[i].title,
-				//iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
 				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+"&mtime="+go.User.session.cacheClearedAt+")",
-				//icon: ,
 				handler: function (item, e) {
 					this.openModule(item.moduleName);
 				},
@@ -582,11 +632,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 				// Check the subMenu property, if it is a submenu then don't add this item to the start menu
 				if (!allPanels[i].inSubmenu) {
-					//this.startMenu.add(menuItemConfig);
 					this.startMenuItems.push(menuItemConfig);
 				}
-			} else
-			{
+			} else {
 				adminMenuItems.push(menuItemConfig);
 			}
 		}
@@ -627,13 +675,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			Ext.apply(subitemConfig, subMenus[key].subMenuConfig);
 
-			//this.startMenu.add(new Ext.menu.Item(subitemConfig));
 			this.startMenuItems.push(subitemConfig);
 		}
 
 		if (adminMenuItems.length) {
-
-			//this.startMenu.add(new Ext.menu.TextItem({id: 'go-start-menu-admin-menu', text: '<div class="menu-title">' + t("Admin menu") + '</div>'}));
 
 			for (var i = 0; i < adminMenuItems.length; i++) {
 				//this.startMenu.add(adminMenuItems[i]);
@@ -649,13 +694,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		this.rendered = true;
 		this.fireEvent("beforerender", this);
 
-		// function getUserImgStyle() {
-		// 	if(!go.User.avatarId) {
-		// 		return "";
-		// 	}
-		// 	return 'background-image:url('+go.Jmap.thumbUrl(go.User.avatarId, {w: 40, h: 40, zc: 1})+');'
-		// }
-
 				var topPanel = new Ext.Panel({
 					id:"mainNorthPanel",
 					region: 'north',
@@ -664,11 +702,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						<div id="secondary-menu">\
 							<div id="status-bar" class="x-hide-display"></div>\
 							<div id="search_query"></div>\
+							<div id="global-add-btn"></div>\
 							<div id="start-menu-link" ></div>\
 							<a id="user-menu" class="user-img"></a>\
 						</div>\
 					</div>',
-					//height: dp(64),
 					autoHeight: true,
 					titlebar: false,
 					border: false
@@ -689,8 +727,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					cmargins:{left:0,top:0,right:0,bottom:0}
 				});
 
-	//			var winSize = [window.scrollWidth , window.scrollHeight];
-
 				GO.viewport = new Ext.Viewport({
 					layout: 'border',
 					split: false,
@@ -704,6 +740,24 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					},  notificationArea]
 				});
 
+				this.globalAddBtn = new Ext.Button({
+					menu: this.globalAddMenu,
+					menuAlign: 'tr-br?',
+					text: '<i class="icon">add</i>',
+					renderTo: 'global-add-btn',
+					clickEvt: 'mousedown',
+					tooltip: t("Add") + " ("+ (Ext.isMac ? '⌘ + ⇧' : 'CTRL + SHIFT') + ' + N)',
+					template: new Ext.XTemplate('<span><button></button></span>')
+				});
+				new Ext.KeyMap(document, {
+					stopEvent:true,
+					key:Ext.EventObject.N,
+					ctrl:true,
+					shift: true,
+					fn: () => {
+						this.globalAddBtn.showMenu();
+					}
+				});
 
 				this.startMenuLink = new Ext.Button({
 					menu: this.startMenu,
@@ -726,7 +780,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				});
 
 				var userBtn = Ext.get('user-menu');
-				var userMenuTpl = userBtn.dom.innerHTML;
 				this.userMenuLink = new Ext.Button({
 					text: go.util.avatar(go.User.displayName, go.User.avatarId),
 					renderTo: userBtn,
@@ -765,15 +818,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 								}
 							},
 							scope: this
-				}
-//						,{
-//							iconCls: 'ic-connect',
-//							text:t("Connect your device"),
-//							handler: function() {
-//								var cyd;
-//							}
-//						}
-				,{
+				},{
 					iconCls: 'ic-info',
 					text: t("About {product_name}"),
 					handler: function () {
@@ -814,38 +859,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				});
 			}
 		}
-
-
-		// this.userMenuLink.menu.insert(6, this.installBtn = new Ext.menu.Item({
-		// 	iconCls: 'ic-download-for-offline',
-		// 	text: t("Install on your desktop"),
-		// 	hidden: true,
-		// 	handler: function () {
-		//
-		// 		// hide our user interface that shows our A2HS button
-		// 		this.installBtn.hide();
-		// 		this.userMenuLink.menu.doLayout();
-		// 		// Show the prompt
-		// 		this.deferredPrompt.prompt();
-		// 		// Wait for the user to respond to the prompt
-		// 		this.deferredPrompt.userChoice.then((choiceResult) => {
-		// 			if (choiceResult.outcome === 'accepted') {
-		// 				console.log('User accepted the A2HS prompt');
-		// 			} else {
-		// 				console.log('User dismissed the A2HS prompt');
-		// 			}
-		// 			this.deferredPrompt = null;
-		// 		});
-		// 	},
-		// 	scope: this
-		// }));
-
-
-
-
-
-
-
 
 		var c = go.User.capabilities['go:core:core'] || {};
 
@@ -959,31 +972,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					}
 				}, this);
 			}
-
-			// if(!coreMod.settings.licenseDenied && !coreMod.settings.license) {
-			// 	const licenseDialog = new go.license.LicenseDialog();
-			// 	licenseDialog.show();
-			// }
 		}
 	},
-//
-//	search: function (query) {
-//		if (!this.searchPanel) {
-//			this.searchPanel = new GO.grid.SearchPanel(
-//							{
-//								query: query,
-//								id: 'go-search-panel'
-//							}
-//			);
-//			this.tabPanel.add(this.searchPanel);
-//		} else
-//		{
-//			this.searchPanel.query = query;
-//			this.searchPanel.load();
-//		}
-//		this.tabPanel.unhideTabStripItem(this.searchPanel);
-//		this.searchPanel.show();
-//	},
 
 		initModule: function (moduleName) {
 			if(!this.tabPanel) {

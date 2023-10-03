@@ -25,7 +25,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			region: 'east',
 			split: true,
 			tbar: [this.taskBackButton = new Ext.Button({
-				//cls: 'go-narrow',
 				hidden: true,
 				iconCls: "ic-arrow-back",
 				handler: function () {
@@ -43,7 +42,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					[t("Today"), 'content_paste', 'green', 'today'],
 					[t("Due in seven days"), 'filter_7', 'purple', '7days'],
 					[t("All"), 'assignment', 'red', 'all'],
-					// [t("Completed"), 'assignment_turned_in', 'grey', 'completed'],
 					[t("Unscheduled"), 'event_busy', 'blue','unscheduled'],
 					[t("Scheduled"), 'events', 'orange', 'scheduled'],
 
@@ -399,24 +397,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					{
 						iconCls: 'ic-more-vert',
 						menu: [
-							// {
-							// 	text: "refresh",
-							// 	handler: function () {
-							// 		const store = this.taskGrid.store, o = go.util.clone(store.lastOptions);
-							// 		o.params = o.params || {};
-							// 		o.params.position = 0;
-							// 		o.add = false;
-							// 		o.keepScrollPosition = true;
-							//
-							// 		if (store.lastOptions.params && store.lastOptions.params.position) {
-							// 			o.params.limit = store.lastOptions.params.position + (store.lastOptions.limit || store.baseParams.limit || 20);
-							// 		}
-							//
-							// 		store.load(o);
-							// 	},
-							// 	scope: this
-							// }
-							// ,
 							{
 								iconCls: 'ic-cloud-upload',
 								text: t("Import"),
@@ -486,62 +466,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					}
 
 				],
-			// bbar: new Ext.Toolbar({
-			// 	layout:'hbox',
-			// 	layoutConfig: {
-			// 		align: 'middle',
-			// 		defaultMargins: {left: dp(4), right: dp(4),bottom:0,top:0}
-			// 	},
-			// 	items:[this.taskNameTextField = new Ext.form.TextField({
-			// 		enableKeyEvents: true,
-			// 		emptyText: t("Add a task..."),
-			// 		flex:1,
-			// 		listeners: {
-			// 			specialkey: (field, e) => {
-			// 				// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
-			// 				// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
-			// 				if (e.getKey() == e.ENTER) {
-			// 					this.createTask();
-			// 				}
-			// 			}
-			// 		}
-			// 	}),
-			// 		this.taskDateField = new go.form.DateField({
-			// 			fieldLabel:t("Due date"),
-			// 			enableKeyEvents: true,
-			// 			listeners: {
-			// 				scope: this,
-			// 				keyup: function(field, e) {
-			// 					this.checkValues();
-			// 				},
-			// 				select: function(field,date) {
-			// 					this.checkValues();
-			// 				},
-			// 				specialkey: (field, e) => {
-			// 					// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
-			// 					// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
-			// 					if (e.getKey() == e.ENTER) {
-			// 						this.addTaskButton.handler.call(this);
-			// 					}
-			// 				}
-			// 			}
-			// 		}),
-			// 		this.addTaskButton = new Ext.Button({
-			// 			disabled: true,
-			// 			iconCls: 'ic-add',
-			// 			cls:'primary',
-			// 			handler: this.createTask,
-			// 			scope: this
-			// 		})
-			// 	]
-			// }),
-			listeners: {				
+			listeners: {
 				rowdblclick: this.onTaskGridDblClick,
 				scope: this,				
 				keypress: this.onTaskGridKeyPress
 			}
 		});
-		//this.quickAddTaskListCombo.store.load();
 		this.taskGrid.on('navigate', function (grid, rowIndex, record) {
 			go.Router.goto("task/" + record.id);
 		}, this);
