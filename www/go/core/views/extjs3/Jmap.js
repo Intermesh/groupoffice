@@ -517,7 +517,7 @@ go.Jmap = {
 				}
 
 				if(response.isTimeout || response.status == 0) {
-					console.warn((new Date()).now.format("Y-m-d G:i:s")+ ": Connection timeout", response, opts);
+					console.warn((new Date()).format("Y-m-d G:i:s")+ ": Connection timeout", response, opts);
 					if(document.visibilityState === "visible") {
 						GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
 					}
