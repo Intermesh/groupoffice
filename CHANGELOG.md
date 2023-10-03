@@ -1,3 +1,6 @@
+- Core: Raised SSE check interval from 10s to 30s for performance
+- Core: Moved disk cache to temp dir so it can be put on faster partitions
+
 29-09-2023: 6.8.7
 - Email: bcc and cc bug
 
