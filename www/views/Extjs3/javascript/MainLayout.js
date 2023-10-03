@@ -427,49 +427,48 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		go.Entities.getLinkConfigs().filter(function(l) {
 			return !!l.linkWindow;
 		}).forEach(function (l) {
-			console.log(l);
 			this.globalAddMenuItems.push({
 				iconCls: l.iconCls,
 				text: l.title,
 				handler: function () {
-					const window = l.linkWindow.call(l.scope, null, 0, {});
-
+					const window = l.linkWindow.call(l.scope, null, 0, {},{});
 					if (!window) {
 						return;
 					}
-					window.redirectOnSave = true;
+					window.redirectOnSave = false;
 
-					if (!window.isVisible() && !(window instanceof GO.email.EmailComposer)) {
+					if (!window.isVisible()) {
 						window.show();
 					}
-					window.on('save', function (window, entity) {
-						// TODO: Old framework dialogs do not particularly support the redirectOnSave option
-						if(window.prototype.package === "legacy") {
-							const module = window.prototype.module;
+					window.on("save", function (window, entity) {
+						let id;
+						const goEntity = go.Entities.get(l.entity);
 
+						if(Ext.isNumber(entity)) {
+							id = entity;
+						} else if (window.event_id) {
+							// for some reason, calendar events have a different onSave
+							id = window.event_id;
+						} else if(entity.id) {
+							id = entity.id;
 						}
-						debugger;
-						// TODO: Get corresponding module
-						// Open detail panel for corresponding new entity
 
-						//hack for event dialog because save event is different
-
+						if(go.util.empty(id)) {
+							console.warn("Unable to open new " + l.entity);
+							return false;
+						}
+						goEntity.goto(id);
 					}, this, {single: true});
+
+					window.on("send", function(window) {
+						if(l.title !== "E-mail") {
+							return false;
+						}
+						const accountId = window.fromCombo.value;
+						me.openModule("email");
+					}, this, {});
 				}
 			});
-			// add E-mail files after E-mail
-			if(l.title === "E-mail") {
-				this.globalAddMenuItems.push({
-					iconCls: "entity LinkedEmail bluegrey",
-					text: t("E-mail files"),
-					handler: function () {
-						const dv = this.detailView;
-						this.folderId = dv.data.filesFolderId || dv.data.files_folder_id;
-						GO.email.openFolderTree(this.folderId, this.folderId, dv);
-					},
-					scope: this
-				});
-			}
 		}, this);
 
 		me.globalAddMenu.store.loadData({root:this.globalAddMenuItems});
