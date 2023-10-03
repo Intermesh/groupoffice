@@ -464,7 +464,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						if(l.title !== "E-mail") {
 							return false;
 						}
-						const accountId = window.fromCombo.value;
 						me.openModule("email");
 					}, this, {});
 				}
