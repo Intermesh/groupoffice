@@ -1,4 +1,6 @@
 - Addressbook: Added filter for has organization
+- Core: Raised SSE check interval from 10s to 30s for performance
+- Core: Moved disk cache to temp dir so it can be put on faster partitions
 
 26-09-2023: 6.7.49
 - Core: fix casting error when saving cropped blob (e.g. avatar)
