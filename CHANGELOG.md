@@ -1,5 +1,6 @@
 - Email: show attachments if sent as email, both for IMAP and as linked email.
 - Core: global 'Add' button
+- Core: fixed awkward DE translation
 
 27-09-2023: 6.6.172
 - Leavedays: bugfix in leave day requset
