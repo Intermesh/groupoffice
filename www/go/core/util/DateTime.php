@@ -92,4 +92,21 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 		return date("L", mktime(0, 0, 0, 1, 1, $year)) ? 366 : 365;
 	}
 
+	/**
+	 * Get the number of weeks for a given year
+	 *
+	 * @param int $year
+	 * @return int
+	 * @throws Exception
+	 */
+	public static function weeksInYear(int $year): int
+	{
+		$dt = new DateTime($year . '-12-28');
+		$n = intval($dt->format('W'));
+		if ($dt->format('w') > 4) {
+			$n++;
+		}
+		return $n;
+	}
+
 }
