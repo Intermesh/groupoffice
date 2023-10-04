@@ -814,7 +814,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Could not find the supplied e-mail address.' => 'Konnte die angegebene E-Mail-Adresse nicht finden.',
   'An e-mail with instructions has been sent to your e-mail address.' => 'Eine E-Mail mit weiteren Anweisungen wurde an Ihr E-Mail-Konto versendet.',
   'Please enter a new password' => 'Bitte geben Sie ein neues Kennwort an',
-  'Lost password' => 'Altes Kennwort',
+  'Lost password' => 'Vergessenes Kennwort',
   'countries' => 
   array (
     'AE' => 'Vereinigte Arabische Emirate',
