@@ -552,7 +552,7 @@ abstract class Property extends Model {
 				}
 			}
 
-			$v = $this->$propName;
+			$v = $this->$propName ?? null;
 
 			if(is_object($v)) {
 				$this->oldProps[$propName] = clone $v;
@@ -1069,7 +1069,8 @@ abstract class Property extends Model {
 	 * @param bool $forIsModified
 	 * @return array|bool eg. ["propName" => [newval, oldval]]
 	 */
-	protected function internalGetModified(&$properties = [], bool $forIsModified = false) {
+	protected function internalGetModified(array|string &$properties = [], bool $forIsModified = false): bool|array
+	{
 
 		if($this->readOnly) {
 			return $forIsModified ? false : [];
@@ -1095,7 +1096,7 @@ abstract class Property extends Model {
 		foreach($properties as $key) {
 
 			$oldValue = $this->oldProps[$key] ?? null;
-			$newValue = $this->{$key};
+			$newValue = $this->{$key} ?? null;
 
 			$propModified = $this->internalIsModified($newValue, $oldValue, static::isScalarRelation($key));
 			if ($propModified) {
@@ -1783,7 +1784,7 @@ abstract class Property extends Model {
 				//this if for cases when a second table extends the model but the key is not part of the properties
 				//For example Password extends User but the ket "userId" of password is not part of the properties
 				foreach($table->getKeys() as $from => $to) {
-					$modifiedForTable[$to] = $this->{$from};
+					$modifiedForTable[$to] = $this->{$from} ?? null;
 				}
 
 				if($table->isUserTable || $this instanceof UserProperty) {
@@ -1990,7 +1991,7 @@ abstract class Property extends Model {
 				continue;
 			}
 
-			$this->validateColumn($column, $this->$colName);
+			$this->validateColumn($column, $this->$colName ?? null);
 		}
 	}
 

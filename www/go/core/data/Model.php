@@ -360,7 +360,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			$getter = 'get' . $propName;	
 			return $this->$getter();
 		} elseif($props[$propName]['access'] === self::PROP_PUBLIC){
-			return $this->{$propName};
+			return $this->{$propName} ?? null;
 		}	else{
 			throw new InvalidArgumentException("Can't get write only property ". $propName . " in " . static::class);
 		}
