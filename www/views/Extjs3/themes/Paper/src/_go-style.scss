@@ -1467,8 +1467,8 @@ table.display-panel {
 		border-right: 1px solid color($fg, 'divider');
 	}
 
-	tr.bold-line td, td.bold-line,  tr.line th, th.line {
-		border-bottom: 1px solid color($fg, 'line');
+	tr.bold-line td, td.bold-line,  tr.bold-line th, th.bold-line {
+		border-bottom: 1px solid color($fg, 'track');
 	}
 
 	table { 

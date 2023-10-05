@@ -185,6 +185,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 		this.data = data;
 
+		console.log(this.entityStore.entity.name, data)
+
 		if(!this.relations.length) {
 			this.onLoad();
 			this.fireEvent('load', this);
