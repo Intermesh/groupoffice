@@ -66,7 +66,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	// When mapKey is set we remember the keys of properties that are going to be deleted here
 	markDeleted: [],
 
-	startWithItem: false,
+	startWithItem: undefined,
 
 	required: false,
 
@@ -94,7 +94,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		this.markDeleted = [];
 		this.itemCfg.columnWidth = 1;
 
-		if(this.required) {
+		if(this.required && this.startWithItem === undefined) {
 			this.startWithItem = true;
 		}
 
