@@ -36,6 +36,8 @@ class Participant extends Property
 		'contact'
 	];
 
+	protected $id;
+	protected $eventId;
 	/** @var string display name of participant */
 	public $name;
 
@@ -56,7 +58,7 @@ class Participant extends Property
 	/** @var string What kind of entity this participant is: 'individuel', 'group', 'location', 'resource */
 	public $kind;
 
-	/** @var string[bool] 'owner','attendee','optional','informational','chair','contact' */
+	/** @var array string[bool] 'owner','attendee','optional','informational','chair','contact' */
 	public $roles;
 
 	/** @var string An id from the CalendarObject its `locations` array Where this participant is expected to be attending */

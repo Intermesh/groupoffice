@@ -119,10 +119,11 @@ class Mapping {
    * @param string[] $constantValues
    * @return Mapping
    */
-	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []): Mapping
+	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], $required = false): Mapping
 	{
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
 		$this->tables[$name]->isUserTable = true;
+		$this->tables[$name]->required = $required;
 		$this->hasUserTable = true;
 
 		if(!Table::getInstance($name)->getColumn('modSeq')) {

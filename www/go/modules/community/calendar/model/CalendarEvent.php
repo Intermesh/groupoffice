@@ -8,8 +8,11 @@
 namespace go\modules\community\calendar\model;
 
 use go\core\acl\model\AclItemEntity;
+use go\core\fs\Blob;
+use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Mapping;
+use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\UUID;
 use go\core\util\DateTime;
@@ -38,9 +41,10 @@ class CalendarEvent extends AclItemEntity {
 	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
 		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
 
-	const EventProperties = ['id','uid','prodId', 'sequence','title','description','locale', 'showWithoutTime', 'start','timeZone','duration','priority','privacy','status', 'recurrenceRule'];
+	const EventProperties = ['uid','isOrigin', 'prodId', 'sequence','title','description','locale', 'showWithoutTime', 'start',
+		'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt','createdBy','modifiedBy'];
 
-	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'calendarId'];
+	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts','veventBlobId'];
 
 	// If any of this properties is in the recurrenceOverrides the Object most be ignored
 	const IgnoredPropertiesInException = [
@@ -50,8 +54,12 @@ class CalendarEvent extends AclItemEntity {
 
 
 	public $calendarId;
-	public $groupId;
 	public $eventId;
+	/**
+	 * @var boolean true when this event is created by this calendar system
+	 * false if the event is imported from an invitation and the organizer is in another system
+	 */
+	public $isOrigin;
 
 	public $responseStatus;
 	public $role;
@@ -100,7 +108,7 @@ class CalendarEvent extends AclItemEntity {
 	 * The title
 	 * @var string
 	 */
-	public $title;
+	public $title = '';
 
 	/**
 	 * free text that would describe the event
@@ -139,77 +147,132 @@ class CalendarEvent extends AclItemEntity {
 	public $freeBusyStatus = 'busy';
 
 	/**
-	 * The exception object that is applied to this instance
-	 * @var DateTime
+	 * @var string
 	 */
-	public $recurrenceId = null;
 	protected $recurrenceRule;
-	public $participants;
-	public $alerts;
+	protected $veventBlobId;
+
+	public $participants = [];
+	public $recurrenceOverrides = [];
+	public $alerts = [];
+
+	public $modifiedAt;
+	public $createdAt;
+	public $modifiedBy;
+	public $createdBy;
+
+	protected $lastOccurrence;
+
+	public static function customFieldsTableName(): string
+	{
+		return 'calendar_event_custom_fields';
+	}
 
 	protected static function defineMapping(): Mapping {
 		return parent::defineMapping()
-			->addTable('calendar_event', "eventdata", null, self::EventProperties)
-			->addUserTable('calendar_event_user', 'eventuser', ['id' => 'eventId'],self::UserProperties)
+			->addTable('calendar_calendar_event', 'cce', ['id' => 'eventId'], ['id', 'calendarId'])
+			->addTable('calendar_event', "eventdata", ['eventId' => 'id'], self::EventProperties)
+			->addUserTable('calendar_event_user', 'eventuser', ['id' => 'eventId'],self::UserProperties, [], true)
 			//->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
 			->addMap('participants', Participant::class, ['id' => 'eventId'])
+			->addMap('recurrenceOverrides', RecurrenceOverride::class, ['id'=>'fk'])
 			->addMap('alerts', Alert::class, ['id' => 'eventId']);
 			//->addMap('locations', Location::class, ['id' => 'eventId']);
 	}
 
-//	public static function find($query = null) {
-//		if($query instanceof Query) {
-//			$query->andWhere('calendarId IS NOT NULL');
-//			$query->joinRelation('event', 't.*, event.allDay, event.startAt, event.endAt, event.location, event.title', 'LEFT');
-////			$query->select('t.*, event.allDay, event.startAt, event.endAt, event.location, event.title')
-////					->join(Event::tableName(), 'event', 't.eventId = event.id', 'LEFT');
-//		}
-//		return parent::find($query);
-//	}
-
-	static public function findByUID($uid) {
-		return self::find(['uid'=>$uid])->single();
-	}
-	
-	static public function findRecurring(DateTime $start, DateTime $end, $query = null) {
-		if($query === null) {
-			$query = new Query();
+	public function currentUserParticipant(): Participant {
+		foreach($this->participants as $k => $participant) {
+			if($k == 'u'.go()->getUserId()) {
+				$me = $participant;
+				break;
+			}
 		}
-		$query->joinRelation('recurrenceRule')->andWhere('frequency IS NOT NULL');
-		$events = self::find($query);
-		$allOccurrences = [];
-		foreach($events as $calEvent) {
-			$rule = $calEvent->recurrenceRule;
-			$rule->forAttendee($calEvent);
-			$allOccurrences += $rule->getOccurences($start, $end);
+		return $me;
+	}
+
+	//public function getRecurrenceOverrides() {
+		// todo merge general overrides with the per-user override properties
+		// the following properties should be overriden per user:
+		// - keywords
+		// - color
+		// - freeBusyStatus
+		// - useDefaultAlerts
+		// - alerts
+		//return $this->recurrenceOverrides;
+	//}
+
+
+	public function attachBlob($blobId) {
+		$this->veventBlobId = $blobId;
+	}
+
+	public function icsBlob() {
+
+		$blob = isset($this->veventBlobId) ? Blob::findById($this->veventBlobId) : null;
+		if(!$blob || $blob->modifiedAt < $this->modifiedAt) {
+			$blob = ICalendarHelper::makeBlob($this);
+			$this->attachBlob($blob->id);
+
+			if(!$this->isNew()) {
+				// save the blobId without updating the state (this property is not part of the spec
+				$stmt = go()->getDbConnection()->update('calendar_event_user',
+					['veventBlobId'=>$blob->id,'modifiedAt'=>$blob->modifiedAt],
+					(new Query)
+						->join('calendar_calendar_event', 'cce', 'cce.eventId = t.eventId')
+						->where(['userId' => go()->getUserId(), 'id' => $this->id]));
+				$stmt->execute();
+			}
 		}
-		return $allOccurrences;
+		return $blob;
 	}
 
-	public function getTitle() {
-		return $this->title;
+	public function dateTimeZone() {
+		if(!empty($this->timeZone)) {
+			return new \DateTimeZone($this->timeZone);
+		}
+		static $currentTZUser;
+		if(empty($currentTZUser)) {
+			$currentTZUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat' ]);
+			if(empty($currentTZUser)) {
+				$currentTZUser = User::findById(1, ['dateFormat', 'timezone', 'timeFormat'], true);
+			}
+		}
+		return new \DateTimeZone($currentTZUser->timezone);
 	}
 
+	public function icsBlobId() {
+		if(!empty($this->veventBlobId)) {
+			return $this->veventBlobId;
+		}
+		return $this->icsBlob()->id;
+	}
+
+	/**
+	 * @return RecurrenceRule | null
+	 */
 	public function getRecurrenceRule() {
 		return !empty($this->recurrenceRule) ? json_decode($this->recurrenceRule): null;
 	}
 
 	public function setRecurrenceRule($rule) {
-		$this->recurrenceRule = json_encode($rule);
+		$this->recurrenceRule = empty($rule) ? null : json_encode($rule);
 	}
 
+	public function getTitle() {
+		return $this->title;
+	}
 	/**
 	 * Set the tag property when the title contains a certain word
 	 * @todo function is not called when the attributes of events are set relational
 	 * @param string $value Title of event
 	 */
 	public function setTitle($value) {
-		$tags = require(dirname(__FILE__) . '/../Resources/tags/nl.php'); //<-- @todo: use users language
+		$tags = require(dirname(__FILE__) . '/../tags/nl.php'); //<-- @todo: use users language
 		$this->tag = null;
 		foreach($tags as $tag => $possibleMatches) {
 			foreach($possibleMatches as $possibleMatch) {
 				if (stripos($value, $possibleMatch) !== false) {
-					$this->tag = $tag;
+					$this->keywords[] = $tag;
 					break 2;
 				}
 			}
@@ -217,22 +280,14 @@ class CalendarEvent extends AclItemEntity {
 		$this->title = $value;
 	}
 
-	public function getRecurrenceId() {
-		return !empty($this->instance) ? $this->instance->recurrenceId : null;
+	public function start($withoutTime = false) {
+		return new \DateTime($this->start->format("Y-m-d". $withoutTime?:" H:i:s"), $this->timeZone());
 	}
 
+	public function end($withoutTime = false) {
 
-//
-//	public function getStartAt() {
-//		if(!empty($this->instance)) {
-//			return $this->instance->startAt;
-//		}
-//		return $this->startAt;
-//	}
-
-	public function end() {
-		$end = new DateTime($this->start);
-		$end->add($this->duration);
+		$end = new DateTime($this->start->format("Y-m-d". $withoutTime?:" H:i:s"),$this->timeZone()) ;
+		$end->add(new \DateInterval($this->duration));
 		return $end;
 	}
 
@@ -244,30 +299,6 @@ class CalendarEvent extends AclItemEntity {
 		return $this->alarms->getRowCount() > 0;
 	}
 
-//	public function isOrganizer() {
-//		return $this->email === $this->organizerEmail;
-//	}
-
-	/**
-	 * This function can only be called on a recurring series. After that the object
-	 * represents an instance of the series. This instance is loaded
-	 * @param Datetime $recurrenceId
-	 */
-	public function addRecurrenceId(DateTime $recurrenceId, $view = false) {
-		
-		$instance = EventInstance::find(['eventId'=>$this->event->id, 'recurrenceId'=>$recurrenceId])->single();
-		if(empty($instance)) { // new override (should not save if not changed)
-			$instance = $this->createInstance($recurrenceId);
-		} elseif($view && $instance->isPatched()) {
-			$this->event = $instance->patch();
-		}
-		$this->instance = $instance;
-		return $this->instance;
-	}
-
-//	public function setInstance(EventInstance $instance) {
-//		$this->instance = $instance;
-//	}
 
 	public function addAlarms($alarms) {
 		$alarms = (array)$alarms;
@@ -285,20 +316,65 @@ class CalendarEvent extends AclItemEntity {
 
 		if($this->isRecurring()) {
 
-			if(isset($this->instance) && !$this->fromHere)
-			{
+			if(isset($this->instance) && !$this->fromHere) {
 				$this->instance->applyPatch($this);
 				return $this->instance->save();
-
 			} else if(!$this->isFirstInSeries()) {
 				return $this->saveNewSeries();
 			}
-			return parent::internalSave();
-		} else {
-			return parent::internalSave();
+		}
+		if($this->isNew() || $this->isModified('start') || $this->isModified('recurrenceRule')) {
+			$this->findLastOccurence();
 		}
 
+		// is modiified, but not calendarId, isDraft or modifiedAt, per-user prop, participants
+		if($this->isModified(self::EventProperties) &&
+			$this->isOrigin &&
+			(!$this->isModified('sequence') || $this->sequence <= $this->getOldValue('sequence'))) {
+			$this->sequence += 1;
+		}
+
+		$success = parent::internalSave();
+		if($success) {
+			Calendar::updateHighestModSeq($this->calendarId);
+			if($this->isModified('calendarId')) {
+				Calendar::updateHighestModSeq($this->getOldValue('calendarId'));
+			}
+		}
+		return $success;
 		 // save none recurring or complete series
+	}
+
+	protected static function internalDelete(Query $q): bool
+	{
+//		if($this->isRecurring()) {
+//			if(isset($this->instance) && !$this->fromHere) {
+//				$this->instance->applyException(); // EXDATE
+//				return $this->instance->save();
+//			}
+//			else if(!$this->isFirstInSeries()) {
+//				$this->recurrenceRule->stopBefore($this->getRecurrenceId());
+//				return $this->recurrenceRule->save();
+//			}
+//		}
+		//TODO: update all calendars highest modseq with id = calendarId of the deleted ids
+
+//		self::$lastDeleteStmt = go()->getDbConnection()->delete('calendar_event_user', (new Query)
+//			->where('userId', '=', go()->getUserId())
+//			->where('eventId', 'in', $q)
+//		);
+//		if(!self::$lastDeleteStmt->execute()) {
+//			return false;
+//		}
+//		return true;
+		$calendarModSeq = clone $q;
+		$calIds = $calendarModSeq->selectSingleValue('calendarId')->distinct()->all();
+		// Garbage collector will delete event when last user instance is removed
+		$success =  parent::internalDelete($q); // delete none recurring or complete series
+		if($success) {
+			Calendar::updateHighestModSeq($calIds);
+		}
+		return $success;
 	}
 
 	public function saveFromHere() {
@@ -306,21 +382,6 @@ class CalendarEvent extends AclItemEntity {
 		$success = $this->save();
 		$this->fromHere = false;
 		return $success;
-	}
-	
-	protected function internaDelete($hard) {
-		if($this->isRecurring()) {
-			if(isset($this->instance) && !$this->fromHere) {
-				$this->instance->applyException(); // EXDATE
-				return $this->instance->save();
-			}
-			else if(!$this->isFirstInSeries()) {
-				$this->recurrenceRule->stopBefore($this->getRecurrenceId());
-				return $this->recurrenceRule->save();
-			}
-		}
-
-		//return parent::internaDelete($hard); // delete none recurring or complete series
 	}
 
 	public function deleteFromHere() {
@@ -368,19 +429,58 @@ class CalendarEvent extends AclItemEntity {
 
 	}
 
-	/**
-	 * When the recurrenceId of an event was set it represents a single instance
-	 * of a recurring event. When editing we create an exception
-	 * @return bool
-	 */
-	public function isInstance() {
-		return !empty($this->recurrenceId);
-	}
-
 	public function isRecurring() {
-		return (!empty($this->recurrenceRule)); // && !empty($this->recurrenceRule->frequency));
+		return !empty($this->recurrenceRule); // && !empty($this->recurrenceRule->frequency));
 	}
 
+	public function timeZone() {
+		return $this->timeZone ? new \DateTimeZone($this->timeZone) : null;
+	}
+
+	private function findLastOccurence() {
+		if($this->isRecurring()) {
+			$this->lastOccurrence = null;
+			$r = $this->getRecurrenceRule();
+			if(isset($r->until)) {
+				$this->lastOccurrence = new DateTime($r->until,$this->timeZone());
+			} else if(isset($r->count)) {
+				$it = ICalendarHelper::makeRecurrenceIterator($r);
+				$maxDate = new \DateTime('2038-01-01');
+				while ($it->valid() && $this->lastOccurrence < $maxDate) {
+					$this->lastOccurrence = $it->current(); // will clone :(
+					$it->next();
+				}
+			}
+		} else {
+			$this->lastOccurrence = $this->end();
+		}
+	}
+
+	private function sendMeetingRequest($cancel = false, $date = null) {
+		// should we include resources?
+
+		// should we book the resources when the invite is sent?
+
+		if($this->isRecurring()) {
+			$occurence = $this; // find occurence, apply exception if any, then submit
+			$this->submitMeetingRequest($occurence, $cancel);
+		} else {
+			$this->submitMeetingRequest($this, $cancel);
+		}
+	}
+
+	private function submitMeetingRequest($event, $cancel){
+		$ical = ICalendarHelper::toVObject($this);
+
+
+		go()->getMailer()->compose()
+			->setFrom($this->organizer->email, $this->organizer->name)
+			->addTo($this->participants)
+			->setSubject(go()->t("Cancellation",'community', "calendar").': '.$this->name)
+			->setSender(go()->getSettings()->systemEmail)
+			->attach($ical->makeAttachment())
+			->send();
+	}
 
 
 	protected static function aclEntityClass(): string
@@ -397,6 +497,6 @@ class CalendarEvent extends AclItemEntity {
 	{
 		$calendar = Calendar::findById($this->calendarId, ['name'], true);
 
-		return $calendar->name .': '. $this->start;
+		return $calendar->name .': '. $this->title . ' - '. $this->start->format('Y-m-d');
 	}
 }

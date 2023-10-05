@@ -1,10 +1,4 @@
-import {Component} from "@goui/component/Component.js";
-import {t} from "@goui/Translate.js";
-import {MapField, mapfield} from "@goui/component/form/MapField.js";
-import {containerfield} from "@goui/component/form/ContainerField.js";
-import {select} from "@goui/component/form/SelectField.js";
-import {numberfield} from "@goui/component/form/NumberField.js";
-import {btn} from "@goui/component/Button.js";
+import {btn, Component, containerfield, MapField, mapfield, numberfield, select, t} from "@intermesh/goui";
 
 interface Alert {
 	trigger:any // {offset, relativeTo} | {when}

@@ -7,7 +7,7 @@
 namespace go\modules\community\calendar\model;
 
 use go\core\orm\Mapping;
-use go\core\orm\Property;
+use go\core\orm\UserProperty;
 
 /**
  * An alarms will ring a bell on a set datum / time
@@ -15,7 +15,7 @@ use go\core\orm\Property;
  *
  * @property string $individualEmail emai lof the attendee that the alarm is for
  */
-class Alert extends Property {
+class Alert extends UserProperty {
 
 	/* relatedTo */
 	const Start = 'start';

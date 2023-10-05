@@ -4,9 +4,7 @@ namespace go\modules\community\calendar\model;
 
 use go\core\orm\Mapping;
 
-class DefaultAlertWT extends Alert {
-	// Omit for the default alerts (with or without time)
-	protected $calendarId;
+class DefaultAlertWT extends DefaultAlert {
 
 	protected static function defineMapping(): Mapping
 	{

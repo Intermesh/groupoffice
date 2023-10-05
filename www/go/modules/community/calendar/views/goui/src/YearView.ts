@@ -1,102 +1,96 @@
-import {CalendarView, CalendarEvent} from "./CalendarView.js";
-import {EventDialog} from "./EventDialog";
-import {DateTime} from "@goui/util/DateTime.js";
-import {datepicker} from "@goui/component/picker/DatePicker";
-import {E} from "@goui/util/Element.js";
+import {CalendarView} from "./CalendarView.js";
+import {DateTime, E} from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
+import {Main} from "./Main.js";
 
 export class YearView extends CalendarView {
-	constructor() {
+	main: Main
+	constructor(main: Main) {
 		super();
+		this.main = main;
 		this.cls = 'yearview';
 	}
 
-	setDate(day:any) {
-		if(!day) {
-			day = new DateTime();
+	protected populateViewModel() {
+		this.clear()
+		const viewEnd = this.day.clone().addYears(1);
+		for (const e of this.store.items) {
+			this.viewModel.push(...super.makeItems(e, this.day, viewEnd));
 		}
-		// if(this.isRendered()) {
-		// 	this.el.cls('reverse',(day < this.day));
-		// }
-		day.setDate(1).setMonth(1); // 1st jan
-		this.day = day.clone();
-		let end = day.clone();
-		end.addYears(1);
-		this.renderView();
-		//this.dom.cls('+loading');
-		//this.store.filter('date', {after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00')}).fetch(0,500);
+		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
+
+		this.renderView()
 	}
 
-	// renderView() {
-	// 	let day = new DateTime(this.day ? this.day.getYear() : (new DateTime()).getFullYear(),0,1);
-	// 	this.items.clear();
-	// 	for(var m = 0; m < 12; m++) {
-	// 		this.items.add((datepicker()).setDate(day));
-	// 	}
-	// 	this.items.render();
-	// }
+	goto(date: DateTime, days: number) {
+		this.day= date.clone().setDate(1).setMonth(1); // 1st jan;
+		this.populateViewModel();
+	}
 
 	renderView() {
-		const el = E('div').cls('yearview active');
-		let html = ``;
-		 var it=0, e,
-			now = new DateTime(),
-			day = this.day.clone().setDate(1).setMonth(1);
-		for(var m = 0; m < 12; m++) {
-		 	var firstDay = day.getWeekDay(),
-				totalDays = day.getDaysInMonth();
+		this.iterator = 0;
+		this.el.innerHTML = '';
+		let start = this.day.clone();
+		for(var m = 1; m <= 12; m++) {
+			this.renderMonth(m, start);
+		}
+	}
 
-			html += `<div>
-				<table>
-					<caption class="${day.format('mY') == now.format('mY') ?'current':''}" data-month="${m}">
-						${DateTime.monthNames[m]}
-					</caption>
-					<tr>
-						<td>&nbsp;</td>`;
-						for(var i=0;i < 7;i++) {
-							html += `<th>${DateTime.dayNames[i][0]}</th>`;
-						}
-					html += `</tr>
-					<tr>
-						<td class="weeknb" data-week="${day.getWeekOfYear()}">${day.getWeekOfYear()}</td>`;
-						for(var j = 0; j < firstDay; j++) {
-							html += `<td>&nbsp;</td>`;
-						}
-						for(var i = firstDay; i < totalDays+firstDay; i++) {
-						if((i) % 7 === 0 && i !== 0) {
-						html += `</tr><tr>
-						<td class="weeknb" data-week="${day.getWeekOfYear()}">${day.getWeekOfYear()}</td>`;
-						}
-						var cls=[];
-						if (day.format('Ymd') === now.format('Ymd')) cls.push('today');
-						if (day.format('Ymd') < now.format('Ymd')) cls.push('past');
+	iterator!: number
+	renderMonth(m:number, day:DateTime) {
+		var now = new DateTime(),
+			caption = E('caption', DateTime.monthNames[m-1])
+				.cls('current', day.format('mY') == now.format('mY'))
+				.attr('data-month', m)
+				.on('click', ev => this.main.goto(day).setSpan('month', 31));
 
-						html += `<td class="${cls.join(' ')}">
-							<span>${day.getDate()}</span>
-							<div class="events">`;
-							// for(var storeIt in this.recur) {
-							// 	if(this.recur[storeIt].current.format('Ymd') == day.format('Ymd')){
-							// 		const cal = $.db.stores.Calendar.get(e.calendarId);
-							// 		e = this.store.get(this.query.ids[storeIt]);
-							// 		html += `<p title="${e.title+' - '+e.start.date().format('H:i')}" style="background-color:#${cal ? cal.color : '356772'}"></p>`;
-							// 		this.recur[storeIt].next();
-							// 	}
-							// }
-							for (const e of this.store.items) {
-								if(new DateTime(e.start).format('Ymd') != day.format('Ymd')) break;
-								const cal = calendarStore.items.find(c => c.id == e.calendarId);
-								html += `<p title="${e.title+' - '+(new DateTime(e.start)).format('H:i')}" style="background-color:#${cal ? cal.color : '356772'}"></p>`;
-								it++;
-							}
-							html += `</div>
-						</td>`;
-						 day.addDays(1);
-						}
-						html += `</tr>
-				</table>
-			</div>`;
+		const header = E('tr',E('td'));
+		for(let i=0;i < 7;i++) {
+			header.append(E('th',Object.values(DateTime.dayNames)[i][0]))
+		}
+		const rows = [];
+		day.setDate(1).setWeekDay(0);
+		let row,e;
+		for (let i = 0; i < 42; i++) {
+			if (i % 7 == 0){
+				const weekDay = day.clone();
+				row = E('tr',
+					E('td', weekDay.getWeekOfYear()).cls('weeknb').on('click', ev => {
+						this.main.goto(weekDay).setSpan('week', 7);
+					})
+				);
+				rows.push(row);
+			}
+			const ev = E('div').cls('events');
+			while(e = this.viewModel[this.iterator]) {
+				//console.log(e.start.format('Ymd'), day.format('Ymd'));
+				if(e.start.format('Ymd') > day.format('Ymd')) {
+					break;
+				}
+				this.iterator++;
+				if(e.start.format('Ymd') < day.format('Ymd')) { // ff
+					continue;
+				}
+				ev.append(E('p')
+					.attr('title', e.data.title+' - '+e.start.format('H:i'))
+					//.attr('data-color', e.color)
+					.css({backgroundColor: '#'+e.color})
+				);
+			}
+			const td = E('td');
+			if(+day.format('m') === m) {
+				td.cls('today', day.format('Ymd') === now.format('Ymd'))
+					.cls('past', day.format('Ymd') < now.format('Ymd'))
+					.append(E('span', day.getDate()), ev)
+			}
+			row!.append(td);
+			day.addDays(1);
 		}
 
-		this.el.innerHTML = (html+'');
+		this.el.append(E('div',E('table',
+			caption,
+			header,
+			...rows
+		)));
 	}
 }

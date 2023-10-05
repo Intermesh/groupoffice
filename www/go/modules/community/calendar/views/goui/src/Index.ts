@@ -1,12 +1,12 @@
-import {modules} from "@go-core/Modules.js";
+import {jmapds, modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {router} from "@go-core/Router.js";
-import {jmapstore} from "@goui/jmap/JmapStore.js";
+import {router} from "@intermesh/groupoffice-core";
+import {datasourcestore, t} from "@intermesh/goui";
 
-export const calendarStore = jmapstore({
-	entity:'Calendar',
-	properties: ['id', 'name', 'color', 'isVisible', 'isSubscribed'],
-	sort: [{property:'name'}]
+export const calendarStore = datasourcestore({
+	dataSource:jmapds('Calendar'),
+	//properties: ['id', 'name', 'color', 'isVisible', 'isSubscribed'],
+	sort: [{property:'sortOrder'}]
 })
 
 modules.register(  {
@@ -14,24 +14,23 @@ modules.register(  {
 	name: "calendar",
 	init () {
 
-		let ui: Main;
+		modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => {
+			let ui = new Main();
 
-		router.add(/^calendar\/year\/(\d+)$/, (year) => {
-			modules.openMainPanel("calendar");
-			ui.data.view = 'year';
-			ui.tabs.change('year');
-		}).add(/^calendar\/month\/(\d+)$/, (year, month) => {
-			modules.openMainPanel("calendar");
-			ui.data.view = 'month';
-			ui.tabs.change('month');
-		}).add(/^calendar\/week\/(\d+)$/, (year, week) => {
-			modules.openMainPanel("calendar");
-			ui.data.view = 'week';
-			ui.tabs.change('week');
-		});
+			router.add(/^calendar\/year\/(\d+)$/, (year) => {
+				modules.openMainPanel("calendar");
+				//ui.data.view = 'year';
+				ui.cards.activeItem = -1; //'year');
+			}).add(/^calendar\/month\/(\d+)$/, (year, month) => {
+				modules.openMainPanel("calendar");
+				//ui.data.view = 'month';
+				ui.cards.activeItem = 1; // month
+			}).add(/^calendar\/week\/(\d+)$/, (year, week) => {
+				modules.openMainPanel("calendar");
+				//ui.data.view = 'week';
+				ui.cards.activeItem = 0; // week
+			});
 
-		modules.addMainPanel("calendar", "Calendar", () => {
-			ui = new Main();
 			return ui;
 		});
 	}

@@ -157,10 +157,10 @@ class RecurrenceRule extends Property {
 	 * @return bool true when this recurs forever
 	 */
 	public function isInfinite() {
-		return $this->getIterator()->isInfinite();
+		return $this->iterator()->isInfinite();
 	}
 
-	private function getIterator() {
+	public function iterator() {
 		if(empty($this->iterator)) {
 			$this->iterator = ICalendarHelper::makeRecurrenceIterator($this);
 		}
@@ -178,15 +178,15 @@ class RecurrenceRule extends Property {
 			throw new \Exception('Can get occurrences, select Attendee first');
 		}
 		$result = [];
-		$this->getIterator()->fastForward($start);
-		while($recurrenceId = $this->getIterator()->current()) {
+		$this->iterator()->fastForward($start);
+		while($recurrenceId = $this->iterator()->current()) {
 			if($recurrenceId > $end)
 				break;
 			$calEvent = new CalendarEvent();
 			$calEvent->setValues($this->forAttendee->toArray());
 			$calEvent->addRecurrenceId($recurrenceId);
 			$result[$recurrenceId->format('Y-m-d').$this->forAttendee->calendarId.'-'.$this->eventId] = $calEvent;
-			$this->getIterator()->next();
+			$this->iterator()->next();
 		}
 		$overrides = $this->event->overrides($start, $end);
 		foreach($overrides as $override) {

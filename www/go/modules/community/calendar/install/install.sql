@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
     `aclId` INT NOT NULL,
     `createdBy` INT NULL,
     `ownedBy` INT NULL,
+    `highestItemModSeq` VARCHAR(32) NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_calendar_calendar_core_acl1`
     FOREIGN KEY (`aclId`)
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `isVisible` TINYINT(1) NOT NULL DEFAULT 0,
     `sortOrder` INT NOT NULL DEFAULT 0,
     `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL,
-    PRIMARY KEY (`calenderId`, `userId`),
+    PRIMARY KEY (`calendarId`, `userId`),
     CONSTRAINT `fk_calendar_calendar_user_calendar_calendar1`
     FOREIGN KEY (`calendarId`)
     REFERENCES `calendar_calendar` (`id`)
@@ -87,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
 
 CREATE TABLE IF NOT EXISTS `calendar_event` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `prodId` VARCHAR(100) NOT NULL DEFAULT 'Deskware',
+    `prodId` VARCHAR(100) NOT NULL DEFAULT 'GroupOffice',
     `uid` VARCHAR(45) NOT NULL,
     `sequence` INT UNSIGNED NOT NULL DEFAULT 1,
     `title` VARCHAR(45) NOT NULL,
@@ -106,9 +107,8 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `modifiedAt` DATETIME NULL,
     `createdBy` INT NULL,
     `modifiedBy` INT NULL,
+    `isOrigin` TINYINT(1) NOT NULL DEFAULT 1,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `createdAt_UNIQUE` (`createdAt` ASC),
-    UNIQUE INDEX `modifiedAt_UNIQUE` (`modifiedAt` ASC),
     INDEX `fk_calendar_event_core_user1_idx` (`createdBy` ASC),
     INDEX `fk_calendar_event_core_user2_idx` (`modifiedBy` ASC),
     CONSTRAINT `fk_calendar_event_core_user1`
@@ -123,6 +123,24 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
+     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+     `eventId` INT UNSIGNED NOT NULL,
+     `calendarId` INT UNSIGNED NOT NULL,
+     PRIMARY KEY (`id`),
+    INDEX `fk_calendar_calendar_event_calendar_event1_idx` (`eventId` ASC),
+    INDEX `fk_calendar_calendar_event_calendar_calendar1_idx` (`calendarId` ASC),
+    CONSTRAINT `fk_calendar_calendar_event_calendar_event1`
+    FOREIGN KEY (`eventId`)
+    REFERENCES `calendar_event` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+    CONSTRAINT `fk_calendar_calendar_event_calendar_calendar1`
+    FOREIGN KEY (`calendarId`)
+    REFERENCES `calendar_calendar` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+    ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `calendar_participant`
@@ -143,7 +161,7 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
     CONSTRAINT `fk_participant_calendar_event1`
     FOREIGN KEY (`eventId`)
     REFERENCES `calendar_event` (`id`)
-    ON DELETE NO ACTION
+    ON DELETE CASCADE
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
 
@@ -157,28 +175,26 @@ CREATE TABLE IF NOT EXISTS `calendar_event_user` (
      `freeBusyStatus` ENUM('free', 'busy') NULL DEFAULT 'busy',
     `color` CHAR(6) NULL DEFAULT NULL,
     `useDefaultAlerts` TINYINT(1) NULL DEFAULT 1,
-    `calendarId` INT UNSIGNED NULL,
+    `veventBlobId` BINARY(40) NULL,
     `modSeq` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`eventId`, `userId`),
     INDEX `fk_calendar_event_user_calendar_event1_idx` (`eventId` ASC),
     INDEX `fk_calendar_event_user_core_user1_idx` (`userId` ASC),
-    INDEX `fk_calendar_event_user_calendar_calendar1_idx` (`calendarId` ASC),
+    INDEX `fk_calendar_event_user_core_blob1_idx` (`veventBlobId` ASC),
     CONSTRAINT `fk_calendar_event_user_calendar_event1`
     FOREIGN KEY (`eventId`)
     REFERENCES `calendar_event` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE NO ACTION,
     CONSTRAINT `fk_calendar_event_user_core_user1`
     FOREIGN KEY (`userId`)
     REFERENCES `core_user` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-    CONSTRAINT `fk_calendar_event_user_calendar_calendar1`
-    FOREIGN KEY (`calendarId`)
-    REFERENCES `calendar_calendar` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
+    ON DELETE CASCADE,
+    CONSTRAINT `fk_calendar_event_user_core_blob1`
+    FOREIGN KEY (`veventBlobId`)
+    REFERENCES `core_blob` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -206,7 +222,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_recurrence_override` (
       `fk` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-      `recurrenceId` DATETIME NOT NULL,
+      `recurrenceId` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
       `patch` TEXT NOT NULL,
       PRIMARY KEY (`fk`, `recurrenceId`),
     INDEX `fk_recurrence_override_calendar_event1_idx` (`fk` ASC),

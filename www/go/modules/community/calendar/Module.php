@@ -2,6 +2,8 @@
 namespace go\modules\community\calendar;
 
 use go\core;
+use go\modules\community\calendar\model\CalendarEvent;
+use go\modules\community\calendar\model\ICalendarHelper;
 
 class Module extends core\Module
 {
@@ -16,11 +18,21 @@ class Module extends core\Module
 		return 'Calendar GOUI';
 	}
 
-	protected function rights(): array
-	{
-		return [
-			'mayChangeAddressbooks', // allows AddressBook/set (hide ui elements that use this)
-			'mayExportContacts', // Allows users to export contacts
-		];
+	public function downloadIcs($key) {
+		$ev = CalendarEvent::findById($key);
+
+
+		header('Content-Type: text/calendar; charset=UTF-8; component=vevent');
+		header('Content-Disposition: attachment; filename="bestand.ics"');
+		echo ICalendarHelper::toVObject($ev)->serialize();
 	}
+
+
+//	protected function rights(): array
+//	{
+//		return [
+//			'mayChangeAddressbooks', // allows AddressBook/set (hide ui elements that use this)
+//			'mayExportContacts', // Allows users to export contacts
+//		];
+//	}
 }

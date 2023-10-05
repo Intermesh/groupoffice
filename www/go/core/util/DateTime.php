@@ -18,7 +18,7 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	public $hasTime = true;
 	/**
 	 * When true this is a date-time string with no time zone/offset information.
-	 * The timezone information is save in a different property
+	 * The timezone information is saved in a different property
 	 * @var bool
 	 */
 	public $isLocal = false;
@@ -43,6 +43,11 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	public function __toString() {
 		return $this->jsonSerialize();
 	}
+
+//	public function toLocal() {
+//		$this->isLocal = true;
+//		$this->setTimezone(new \DateTimeZone(self::currentUser()->timezone)); // prevent GO from converting to UTC
+//	}
 
 	private static $currentUser;
 

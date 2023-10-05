@@ -45,6 +45,14 @@ class Mailer {
 		return $message;
 	}
 
+	public function getSender() {
+		if(!empty($this->emailAccount)) {
+			return $this->emailAccount->getDefaultAlias()->email;
+		} else if ($this->smtpAccount) {
+			return $this->smtpAccount->fromEmail;
+		}
+	}
+
 	/**
 	 * Provide SMTP account. If omited the system notification settings will be used.
 	 * 

@@ -1,9 +1,5 @@
-import {CalendarView, CalendarEvent, CalendarItem} from "./CalendarView.js";
-import {EventDialog} from "./EventDialog";
-import {DateTime} from "@goui/util/DateTime.js";
-import {E} from "@goui/util/Element.js";
-import {calendarStore} from "./Index.js";
-import {t} from "@goui/Translate.js";
+import {CalendarView, CalendarItem} from "./CalendarView.js";
+import {DateTime, E, t} from "@intermesh/goui";
 
 interface CalendarDayItem extends CalendarItem {
 	pos: number
@@ -59,6 +55,7 @@ export class WeekView extends CalendarView {
 		const SNAP = 30; // minutes
 
 		let ev: CalendarDayItem,
+			changed: boolean,
 			offset: number,
 			last:number,
 			anchor: number,
@@ -87,6 +84,7 @@ export class WeekView extends CalendarView {
 				this.dayItems.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
 				Object.values(ev.divs).forEach(d => d.remove());
 				ev.divs = {};
+				changed = true;
 				this.updateItems(ev.start.clone());
 				this.updateItems(prevDay);
 			}
@@ -94,11 +92,13 @@ export class WeekView extends CalendarView {
 				last = minute;
 				[from, till] = action(minute);
 				if(from === till) return;
+
 				ev.start.setHours(0, from);
 				ev.end.setHours(0, till);
 				const firstDiv = Object.values(ev.divs)[0];
 				if(firstDiv)
 					firstDiv.lastElementChild!.textContent = ev.start.format('G:i') + ' - ' + ev.end.format('G:i');
+				changed = true;
 				this.updateItems(ev.start.clone());
 			}
 
@@ -107,13 +107,14 @@ export class WeekView extends CalendarView {
 			this.el.un('mousemove', mouseMove);
 			window.removeEventListener('mouseup', mouseUp);
 
-			this.save(ev, () => {
+			changed && this.save(ev, () => {
 				this.dayItems.shift()
 				this.updateItems();
 			});
 		};
 
 		this.el.on('mousedown', (e: MouseEvent) => {
+			changed = false;
 			if (e.button !== 0) return;
 
 			const li = this.el.lastElementChild!.lastElementChild as HTMLElement,
@@ -156,7 +157,6 @@ export class WeekView extends CalendarView {
 				action = resize;
 				this.el.on('mousemove', mouseMove);
 			}
-
 			window.addEventListener('mouseup', mouseUp);
 		});
 	}
@@ -238,7 +238,7 @@ export class WeekView extends CalendarView {
 	private updateFullDayItems() {
 		this.slots = {0:{},1:{},2:{},3:{},4:{},5:{},6:{}};
 		this.alldayCtr.prepend(...this.viewModel.map(e =>
-			super.eventHtml(e).attr('style',this.makestyle(e, this.day))
+			super.eventHtml(e).css(this.makestyle(e, this.day))
 		));
 		var lengths = Object.values(this.slots).map((i: any) => Object.keys(i).length);
 		this.alldayCtr.style.height = (Math.max(...lengths) * this.ROWHEIGHT)+'px';
@@ -317,15 +317,15 @@ export class WeekView extends CalendarView {
 		if(!e.divs[i]) {
 			e.divs[i] = super.eventHtml(e);
 		}
-		if(!e.divs[i].isConnected)  dd.append(e.divs[i]);
-		Object.assign(e.divs[i].style,{
+		if(!e.divs[i].isConnected)
+			dd.append(e.divs[i]);
+		return e.divs[i].css({
 			color: '#'+e.color,
 			top: (100 / 1440 * e.startM)+'%',
 			left: (e.pos * (100 / e.lanes))+'%',
 			width: (100 / e.lanes) +'%',
 			height: (100 / 1440 * (e.endM - e.startM))+'%'
 		});
-		return e.divs[i]
 	}
 
 }

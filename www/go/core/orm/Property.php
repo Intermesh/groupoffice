@@ -968,7 +968,7 @@ abstract class Property extends Model {
 		if(!empty($joinedTable->getConstantValues())) {
 			$on = Criteria::normalize($on)->andWhere($joinedTable->getConstantValues());
 		}
-		$query->join($joinedTable->getName(), $joinedTable->getAlias(), $on, "LEFT");
+		$query->join($joinedTable->getName(), $joinedTable->getAlias(), $on, $joinedTable->required ? 'LEFT' : 'INNER');
 	}
 
 	/**
@@ -1206,6 +1206,9 @@ abstract class Property extends Model {
 
 			if($bHasAI && !$aHasAI) {
 				return 1;
+			}
+			if($aHasAI && $bHasAI) {
+				return 1; // do B First as A is likely the primary table linking a data table
 			}
 
 			return 0;
@@ -1962,6 +1965,7 @@ abstract class Property extends Model {
 		switch ($column->dbType) {
 			case 'date':
 			case 'datetime':
+			case 'localdatetime':
 				if(!($value instanceof CoreDateTime) && !($value instanceof DateTimeImmutable)){
 					$this->setValidationError($column->name, ErrorCode::MALFORMED, "No date object given for date column");
 				}
@@ -2041,8 +2045,8 @@ abstract class Property extends Model {
 			case 'double':
 			case 'decimal':
 
+			case 'localdatetime':
 			case 'datetime':
-
 			case 'date':
 
 			case 'binary':
@@ -2250,13 +2254,12 @@ abstract class Property extends Model {
 			return [];
 		}
 
-		$values = explode("-", $id);
-
 		$cls = $relation->propertyName;
 
 		$pk = $cls::getPrimaryKey();
 
 		$diff = array_diff($pk, array_values($relation->keys));
+		$values = explode("-", $id, count($diff));
 
 		$id = [];
 		foreach($diff as $field) {

@@ -9,27 +9,28 @@
 }
 
 %event {
+	position: absolute;
 	cursor: pointer;
 	word-wrap: break-word;
 	overflow: hidden;
 	box-sizing: border-box;
 	border-radius: $borderRadius;
 	//background-color: $colorPrimary;
-	background-color:currentColor;
-	//border-right-color:white;
-	//border-bottom-color:white;
+	//background-color:currentColor;
+
 	//border-color: currentcolor;
 	//border-width: 1px;
 	//border-style: solid;
 	//border-left: 3px solid;
 	//background-color: #f7f7f7;
+
 	padding: dp(2) dp(6);
 	//text-shadow: 0 0 5px rgba(0, 0, 0, 0.38);
 	text-align: left;
 	user-select: none;
-	transition: all .15s ease-out;
+	//transition: all .15s ease-out;
 	> em, > span {
-		color:white;
+		color:$colorText;
 	}
 	> em {
 		text-overflow:ellipsis;
@@ -39,32 +40,39 @@
 		text-align:right;
 		flex: 1 0 auto;
 		white-space: nowrap;
-		font-weight: 100;
+		font-weight: 300;
 		font-size: .9em;
 	}
 	&::first-letter {
 		text-transform: capitalize;
 	}
-	&:focus {
-		box-shadow:
-				0 dp(3) dp(1) dp(-2) rgba(#6a6a6a, .2),
-				0 dp(2) dp(2) 0 rgba(#6a6a6a, .14),
-				0 dp(1) dp(5) 0 rgba(#6a6a6a, .12);
-		border-color: rgba(0,0,0,.5);
-		filter: brightness(90%);
-		//transform: scale(1.01);
-	}
-	 &:hover {
-			filter: brightness(110%);
-	 }
+	//&:focus {
+	//	box-shadow:
+	//			0 dp(3) dp(1) dp(-2) rgba(#6a6a6a, .2),
+	//			0 dp(2) dp(2) 0 rgba(#6a6a6a, .14),
+	//			0 dp(1) dp(5) 0 rgba(#6a6a6a, .12);
+	//	border-color: rgba(0,0,0,.5);
+	//	filter: brightness(90%);
+	//	//transform: scale(1.01);
+	//}
+	// &:hover {
+	//		//filter: brightness(110%);
+	// }
 	&.new {
 		background-color: white !important;
 		border-width: 1px;
 		border-style: solid;
 	}
+	&.allday, dd > & {
+		background-color: color-mix(in srgb, currentColor 76%, transparent);
+		//background-color:currentcolor;
+		> em {color:$colorTextSecondary;}
+	}
 	&.selected {
-		filter: brightness(80%);
-		> * {color:white; font-weight: 600;}
+		//filter: brightness(80%);
+		background-color: currentColor;
+		color:white;
+		> *, &:not(.allday)::before {color:white; }
 	}
 	&.declined {
 		text-decoration: line-through;
@@ -73,10 +81,7 @@
 	&.tentative {
 		opacity: .6;
 	}
-	&.allday {
-		background-color:currentcolor;
-		> em {color:rgba(255,255,255, .86);}
-	}
+
 
 	i {
 		font-size: inherit !important;
@@ -171,17 +176,23 @@
 }
 
 .cal {
+	i.icon {
+		display:inline-block !important;
+	}
 	li {
 		color: $colorText;
 
 		&.today {
 			color: $colorPrimary;
 			font-weight: 600;
-			border-top: 1px solid $colorPrimary;
 			> em {
 				border-color: $colorPrimary;
 				font-weight: 600;
-				color: $colorPrimary;
+				background-color: $colorPrimary;
+				color:white;
+				width: dp(24);
+				border-radius: 999px;
+				text-align:center;
 			}
 		}
 
@@ -240,7 +251,7 @@
 	}
 }
 
-.cal.month {
+.cal.month,.cal.split {
 	display: flex;
 	flex-direction: column;
 
@@ -271,13 +282,14 @@
 		flex: 1 0 0;
 		position: relative;
 		align-items: stretch;
-		border-top: 1px solid $colorBorder;
+		border-top: 1px solid $colorLine;
 		user-select:none;
 		> li { // day
 			//&:not(.events):hover {
 			//	background-color: $colorHover;
 			//}
 
+			border-right: 1px solid $colorLine;
 			&.events {
 				position: absolute;
 				margin-left: dp(24); // week numbers
@@ -287,12 +299,19 @@
 				bottom: 0;
 				top: 0;
 				pointer-events:none;
-
 				> div {
 					@extend %event;
 					display:flex;
-					position: absolute;
 					pointer-events: all;
+					//&:not(.allday.selected) {
+					//	background-color: transparent; // for none allday
+					//}
+					&:not(.allday)::before {
+						content: '·';
+						font-size: 5em;
+						line-height: dp(8);
+						color: currentColor;
+					}
 					&.continues {
 						border-bottom-left-radius: 0;
 						border-top-left-radius: 0;
@@ -321,15 +340,41 @@
 			outline: none;
 			box-shadow: none;
 		}
-
 		> em { // date number
 			font-style: normal;
 			display: block;
 			text-align: center;
-			border-top: 2px solid transparent;
-			//width: dp(24);
+			margin: 0 auto;
 			height: dp(24);
 			line-height: dp(24);
+		}
+	}
+}
+
+.cal.split {
+	ul {
+		padding-left:0;
+		> li {
+			&:first-child {
+				max-width: dp(140);
+			}
+		}
+	}
+	ol > li {
+		&:first-child {
+			max-width: dp(140);
+		}
+		&.events {
+			margin-left: dp(140);
+			margin-top:dp(4);
+			width: calc(100% - #{dp(140)});
+		}
+		&.cal-name {
+			color: $colorTextSecondary;
+			border-right: 1px solid $colorBorder;
+			font-size: .8em;
+			max-width: dp(140);
+			font-weight: 300;
 		}
 	}
 }
@@ -344,7 +389,6 @@ $halfHour: 3.5vh;
 	> ul li:first-child {
 		font-size: .9em;
 		text-align: center;
-		line-height: dp(36);
 		min-height: dp(36);
 	}
 	.all-days { // container
@@ -361,17 +405,19 @@ $halfHour: 3.5vh;
 			min-height: dp(36);
 			> li {
 				padding: dp(4);
-				line-height: dp(24);
 				> em { // date number
 					font-style: normal;
-					color: inherit;
 					margin-left: dp(8);
 					padding: dp(4) 0;
+					display: inline-block;
 					font-size: 1.2em;
 					//border: 1px solid currentColor;
 				}
 			}
 
+		}
+		+ ul { // all-day only
+			background-color:var(--bg-base);
 		}
 		> li {
 			border-right: 1px solid $colorBorder;
@@ -430,10 +476,10 @@ $halfHour: 3.5vh;
 			max-width: dp(64);
 		}
 	}
-	.event {
+	dd > div, .all-days > div {
 		@extend %event;
 	}
-	dl .event {
+	dl dd > div {
 		left:0;
 		top:0;
 		position: absolute;
@@ -460,10 +506,20 @@ $halfHour: 3.5vh;
 	}
 }
 
-.calendar-list ul > li {
-	//padding: 6px 0;
-	padding-left: 11px;
-	display: flex;
-	cursor: pointer;
-	align-items:center;
+.check-list {
+	.control { width: 100%;}
+	li {
+		padding-left: 11px;
+	}
+}
+.goui.goui-toolbar.dense {
+	padding: 7px 3.5px 7px 11px !important;
+	> h3 {
+		flex: 1 !important;
+
+		~ button {
+			padding: 5.25px;
+			margin-right: 0;
+		}
+	}
 }

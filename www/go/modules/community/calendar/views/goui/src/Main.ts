@@ -1,23 +1,26 @@
-import {comp, Component} from "@goui/component/Component.js";
-import {tbar} from "@goui/component/Toolbar.js";
-import {menu} from "@goui/component/menu/Menu.js";
-import {btn} from "@goui/component/Button.js";
-import {checkboxselectcolumn, column} from "@goui/component/table/TableColumns.js";
-import {t} from "@goui/Translate.js";
+import {comp, Component} from "@intermesh/goui";
+import {tbar} from "@intermesh/goui";
+import {menu} from "@intermesh/goui";
+import {btn} from "@intermesh/goui";
+import {checkboxselectcolumn, column} from "@intermesh/goui";
+import {t} from "@intermesh/goui";
 import {EventDialog} from "./EventDialog";
-import {splitter} from "@goui/component/Splitter";
-import {DatePicker, datepicker} from "@goui/component/picker/DatePicker";
+import {splitter} from "@intermesh/goui";
+import {DatePicker, datepicker} from "@intermesh/goui";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
-import {CardContainer, cards} from "@goui/component/CardContainer.js";
-import {DateTime} from "@goui/util/DateTime.js";
+import {CardContainer, cards} from "@intermesh/goui";
+import {DateTime} from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
 import {CalendarDialog} from "./CalendarDialog.js";
-import {list} from "@goui/component/List.js";
-import {checkbox} from "@goui/component/form/CheckboxField.js";
-import {FunctionUtil} from "@goui/util/FunctionUtil.js";
+import {list} from "@intermesh/goui";
+import {checkbox} from "@intermesh/goui";
+import {FunctionUtil} from "@intermesh/goui";
+import {YearView} from "./YearView.js";
+import {SplitView} from "./SpltView.js";
 
-type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month';
+type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year';
+type ValidView = 'split' | 'merge';
 
 export class Main extends Component {
 
@@ -32,6 +35,8 @@ export class Main extends Component {
 	date: DateTime
 
 	timeSpan: ValidTimeSpan = 'month'
+	viewType: ValidView = 'merge'
+
 	picker: DatePicker
 	spanAmount?: number // 2-7, 14, 21, 28
 
@@ -43,11 +48,13 @@ export class Main extends Component {
 		this.date = new DateTime();
 
 		this.items.add(
-			this.west = comp({tagName: 'aside', width: 226},
+			this.west = comp({tagName: 'aside', width: 286},
 				tbar({},
 					btn({icon: 'add', cls:'primary', style:{width:'100%'}, text: t('Create event'), handler: _ => (new EventDialog()).show() })
 				),
 				this.picker = datepicker({
+					showWeekNbs: false,
+					enableRangeSelect: true,
 					listeners: {
 						'select': (_dp,date) => {
 							this.date = date;
@@ -65,15 +72,15 @@ export class Main extends Component {
 						}
 					}
 				}),
-				tbar({},
-					comp({html: 'Calendars'}),
+				tbar({cls:'dense'},
+					comp({tagName:'h3',html: 'Calendars'}),
 					btn({icon: 'home'}),
 					btn({icon: 'settings'}),
 					btn({icon: 'done_all'})
 				),
 				list({
 					store: calendarStore,
-					cls:'calendar-list',
+					cls:'check-list',
 					// rowSelectionConfig: {
 					// 	multiSelect: true,
 					// 	listeners: {
@@ -93,30 +100,28 @@ export class Main extends Component {
 						'render': me => {me.store.load();}
 					},
 					//multiSelect: true,
-					renderer: data => [
-						checkbox({
-							flex:'1 0',
-							style: {backgroundColor: '#'+data.color},
-							width: 32,
-							label: data.name,
-							listeners: {
-								'change': (p, newValue) => {
-									// implement
-									debugger;
-									FunctionUtil.buffer(700, () => {
-										//save isVisible
-										//pending
-									});
-								}
+					renderer: (data, row) => [checkbox({
+						color: '#'+data.color,
+						//style: 'padding: 0 8px',
+						label: data.name,
+						listeners: {
+							'change': (p, newValue) => {
+								// implement
+								debugger;
+								FunctionUtil.buffer(700, () => {
+									//save isVisible
+									//pending
+								});
 							}
-						}),
-						btn({icon: 'more_horiz', handler: _ =>  {
+						},
+						buttons: [btn({icon: 'edit', handler: _ =>  {
 								const dlg = new CalendarDialog();
 								dlg.form.load(data.id);
 								dlg.show();
 							}
-						})
-					]
+						})]
+					})]
+
 
 					// columns: [
 					// 	//checkboxselectcolumn(),
@@ -140,15 +145,21 @@ export class Main extends Component {
 				tbar({},
 					comp({cls: 'group'},
 						btn({icon: 'keyboard_arrow_left', title: t('Previous'), handler: b => this.backward()}),
+						btn({text: t('Today'), handler: b => {this.goto().updateView()}}),
 						btn({icon: 'keyboard_arrow_right', title: t('Next'), handler: b => this.forward()}),
 					),
-					this.currentText = comp({text:t('Today'), style:{minWidth:'100px'}}),
-					btn({icon: 'delete'}),
-					btn({cls: 'primary', icon: 'event'}),
+					this.currentText = comp({tagName:'h3',text:t('Today'), style:{minWidth:'100px'}}),
+					'->',
 					this.cardMenu = comp({cls: 'group'},
 						btn({icon: 'view_day', text: t('Day'), handler: b => this.setSpan('day', 1)}),
 						btn({icon: 'view_week', text: t('Week'), handler: b => this.setSpan('week', 7)}),
-						btn({icon: 'view_module', text: t('Month'),handler: b => this.setSpan('month', 31)})
+						btn({icon: 'view_module', text: t('Month'),handler: b => this.setSpan('month', 31)}),
+						btn({icon: 'view_module', text: t('Year'),handler: b => this.setSpan('year', 365)})
+					),
+					'->',
+					comp({cls:'group'},
+						btn({icon:'call_merge', cls:'active', handler: b => this.setView('merge') }),
+						btn({icon:'call_split', handler: b => this.setView('split')})
 					),
 					'->',
 					btn({icon: 'info'}),
@@ -165,17 +176,23 @@ export class Main extends Component {
 				),
 				this.cards = cards({flex: 1},
 					new WeekView(),
-					this.monthView = new MonthView()
-					//new YearView()
+					this.monthView = new MonthView(),
+					new YearView(this),
+					new SplitView()
 				)
 			)
 		);
-		this.monthView.on('selectweek',(day) => {
+		this.monthView.on('selectweek',(me, day) => {
 			this.date = day;
 			this.setSpan('week', 7);
 		})
 		// default start need to fetch from state?
 		this.setSpan('week', 7);
+	}
+
+	goto(date = new DateTime()): this {
+		this.date = date;
+		return this;
 	}
 
 	onFilter() {
@@ -193,6 +210,7 @@ export class Main extends Component {
 			case 'weeks': this.date.addDays(value * this.spanAmount!); break;
 			case 'week' : this.date.addDays(value*7); break;
 			case 'month': this.date.addMonths(value); break;
+			case 'year': this.date.addYears(value); break;
 		}
 		this.updateView();
 	}
@@ -203,6 +221,11 @@ export class Main extends Component {
 		this.updateView();
 	}
 
+	setView(value: ValidView) {
+		this.viewType = value;
+		this.updateView();
+	}
+
 	updateView() {
 		const tabs = ({
 			// timeSpan : [cardIndex, cardnameIndex]
@@ -210,17 +233,26 @@ export class Main extends Component {
 			'days': [0,-1],
 			'week': [0,1],
 			'weeks': [1,-1],
-			'month': [1,2]
+			'month': [1,2],
+			'year': [2,3]
 		})[this.timeSpan];
+
+		if(this.viewType === 'split') {
+			tabs[0] = 3; // use 3th tabpanel
+		}
 
 		this.cardMenu.items.forEach(i=>i.el.cls('-active'));
 		this.cards.activeItem = tabs[0];
 		if(tabs[1] !== -1) {
-			this.cardMenu.items.get(tabs[1]).el.cls('+active');
+			this.cardMenu.items.get(tabs[1])!.el.cls('+active');
 		}
 		const start = this.date.clone();
 		let end;
 		switch(this.timeSpan) {
+			case 'year':
+				this.spanAmount = undefined;
+				this.currentText.text = start.format('Y');
+				break;
 			case 'month':
 				this.spanAmount = undefined;
 				this.currentText.text = (start.format('F'));
@@ -244,6 +276,6 @@ export class Main extends Component {
 				break;
 		}
 		this.picker.setValue(start, end);
-		this.cards.items.get(this.cards.activeItem).goto(start, this.spanAmount);
+		(this.cards.items.get(this.cards.activeItem) as WeekView)!.goto(start, this.spanAmount!);
 	}
 }

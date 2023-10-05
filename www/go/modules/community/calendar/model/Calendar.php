@@ -46,6 +46,23 @@ class Calendar extends AclOwnerEntity {
 	public $ownerId;
 	public $createdBy;
 
+	protected $highestItemModSeq;
+
+	/**
+	 * @return int highest mod
+	 */
+	public function highestItemModSeq() {
+		return $this->highestItemModSeq;
+	}
+
+	static function updateHighestModSeq($calendarId) {
+		go()->getDbConnection()
+			->update(self::getMapping()->getPrimaryTable()->getName(),
+				['highestItemModSeq' => CalendarEvent::getState()],
+				['id' => $calendarId]
+			)->execute();
+	}
+
 	/**
 	 *  per-user OR default = true ONLY IF current user is the owner
 	 * @return bool
@@ -54,8 +71,12 @@ class Calendar extends AclOwnerEntity {
 		return ($this->isSubscribed === NULL) ? $this->isOwner() :  $this->isSubscribed;
 	}
 
-	private function isOwner() {
+	public function isOwner() {
 		return $this->ownerId === go()->getUserId();
+	}
+
+	public function isOwned() {
+		return !empty($this->ownerId);
 	}
 
 	public function getMyRights() {

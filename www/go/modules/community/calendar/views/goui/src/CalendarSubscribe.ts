@@ -1,15 +1,12 @@
-import {Window} from "@goui/component/Window.js";
-import {table} from "@goui/component/table/Table.js";
-import {column} from "@goui/component/table/TableColumns.js";
-import {jmapstore} from "@goui/jmap/JmapStore.js";
-
+import {Window, table, column, datasourcestore} from "@intermesh/goui";
+import {jmapds} from "@intermesh/groupoffice-core";
 export class CalendarSubscribe extends Window {
 	constructor() {
 		super();
 		this.items.add(table({
-			store: jmapstore({
-				entity: 'Calendar',
-				properties: ['id', 'name', 'color', 'isSubscribed']
+			store: datasourcestore({
+				dataSource: jmapds('Calendar'),
+				//properties: ['id', 'name', 'color', 'isSubscribed']
 			}),
 			columns: [
 				column({id:'id'}),
