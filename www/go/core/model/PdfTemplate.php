@@ -126,7 +126,7 @@ class PdfTemplate extends Entity {
 
 
 	public $footerX = 0;
-	public $footerY = 20;
+	public $footerY = -10;
 
 	protected static function defineMapping(): Mapping
 	{

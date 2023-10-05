@@ -57,10 +57,10 @@ use GO\Base\Db\FindParams;
 use GO\Calendar\Model\Exception;
 use GO;
 use GO\Base\Util\StringHelper;
+use go\core\mail\Address;
+use go\core\mail\Attachment;
 use go\core\model\Module;
 use Sabre;
-use Swift_Attachment;
-use Swift_Mime_ContentEncoder_PlainContentEncoder;
 
 /**
  * @property int $start_time
@@ -958,7 +958,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 					$message = \GO\Base\Mail\Message::newInstance(
 										$subject
 										)->setFrom(go()->getSettings()->systemEmail, go()->getSettings()->title)
-										->addTo($adminUser->email, $adminUser->name);
+										->addTo(new Address($adminUser->email, $adminUser->name));
 
 					$message->setHtmlAlternateBody($body);					
 
@@ -1003,7 +1003,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 				$message = \GO\Base\Mail\Message::newInstance(
 									$subject
 									)->setFrom(go()->getSettings()->systemEmail, go()->getSettings()->title)
-									->addTo($this->user->email, $this->user->name);
+									->addTo(new Address($this->user->email, $this->user->name));
 
 				$message->setHtmlAlternateBody($body);					
 
@@ -2466,7 +2466,7 @@ The following is the error message:
 		//create e-mail message
 		$message = \GO\Base\Mail\Message::newInstance($subject)
 							->setFrom($sendingParticipant->email, $sendingParticipant->name)
-							->addTo($organizer->email, $organizer->name);
+							->addTo(new Address($organizer->email, $organizer->name));
 
 		$body = '<p>'.$subject.': </p>'.$this->toHtml();
 		
@@ -2479,10 +2479,8 @@ The following is the error message:
 			//organizer is not a Group-Office user with event. We must send a message to him an ICS attachment
 		if($includeIcs){
 			$ics=$this->toICS("REPLY", $sendingParticipant, $recurrenceTime);				
-			$a = new Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REPLY"');
-			$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-			$a->setDisposition("inline");
-			$a->setContentType("text/calendar;method=REPLY;charset=utf-8");
+			$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REPLY;charset=utf-8"');
+			$a->setInline(true);
 			$message->attach($a);
 			
 		}
@@ -2490,7 +2488,7 @@ The following is the error message:
 		$mailer = $this->getUserMailer();
 
 		// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
-		if($mailer->getTransport() instanceof \GO\Email\Transport) {
+		if($mailer->hasAccount()) {
 			$message->setSender($this->user->email);
 		} else {
 			$message->setSender(go()->getSettings()->systemEmail);
@@ -2528,7 +2526,7 @@ The following is the error message:
 			//create e-mail message
 			$message = \GO\Base\Mail\Message::newInstance($subject)
 								->setFrom($this->user->email, $this->user->name)
-								->addTo($participant->email, $participant->name);
+								->addTo(new Address($participant->email, $participant->name));
 
 
 			//check if we have a Group-Office event. If so, we can handle accepting and declining in Group-Office. Otherwise we'll use ICS calendar objects by mail
@@ -2537,10 +2535,8 @@ The following is the error message:
 			$body = '<p>'.\GO::t("The following event has been cancelled by the organizer", "calendar").': </p>'.$this->toHtml();
 			
 				$ics=$this->toICS("CANCEL", $participant);
-				$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL"');
-				$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-				$a->setDisposition("inline");
-				$a->setContentType("text/calendar;method=CANCEL;charset=utf-8");
+				$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL; charset=utf8"');
+				$a->setInline(true);
 				$message->attach($a);
 				
 			if($participantEvent){
@@ -2560,7 +2556,7 @@ The following is the error message:
 			$mailer = $this->getUserMailer();
 
 			// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
-			if($mailer->getTransport() instanceof \GO\Email\Transport) {
+			if($mailer->hasAccount()) {
 				$message->setSender($this->user->email);
 			} else {
 				$message->setSender(go()->getSettings()->systemEmail);
@@ -2625,7 +2621,7 @@ The following is the error message:
 					//create e-mail message
 					$message = \GO\Base\Mail\Message::newInstance($subject)
 										->setFrom($this->user->email, $this->user->name)
-										->addTo($participant->email, $participant->name);
+										->addTo(new Address($participant->email, $participant->name));
 
 
 					//check if we have a Group-Office event. If so, we can handle accepting 
@@ -2650,11 +2646,9 @@ The following is the error message:
 
 						$body .= '</div>';
 
-					$ics=$this->toICS("REQUEST");				
-					$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REQUEST"');
-					$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-					$a->setDisposition("inline");
-					$a->setContentType("text/calendar;method=REQUEST;charset=utf-8");
+					$ics=$this->toICS("REQUEST");
+					$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REQUEST;charset=utf-8"');
+					$a->setInline(true);
 
 					$message->attach($a);
 
@@ -2677,7 +2671,7 @@ The following is the error message:
 					$mailer = $this->getUserMailer();
 
 					// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
-					if($mailer->getTransport() instanceof \GO\Email\Transport) {
+					if($mailer->hasAccount()) {
 						$message->setSender($this->user->email);
 					} else {
 						$message->setSender(go()->getSettings()->systemEmail);
@@ -2705,8 +2699,9 @@ The following is the error message:
 		if(Module::isInstalled('legacy', 'email')) {
 			$account = GO\Email\Model\Account::model()->findByEmail($this->user->email);
 			if($account) {
-				$transport = GO\Email\Transport::newGoInstance($account);
-				return \GO\Base\Mail\Mailer::newGoInstance($transport);
+				$mailer = \GO\Base\Mail\Mailer::newGoInstance();
+				$mailer->setEmailAccount($account);
+				return $mailer;
 			}
 			go()->debug("Can't find e-mail account for " . $this->user->email ." so will fall back on main SMTP configuration");
 

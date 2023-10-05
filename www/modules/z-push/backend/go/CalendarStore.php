@@ -8,7 +8,7 @@ class CalendarStore extends Store {
 
 		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
 			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
 		try {

@@ -199,6 +199,13 @@ JSON;
 		date_default_timezone_set("UTC");
 		go()->getInstaller()->upgrade();
 
+		$this->clearCache();
+
+		echo "Done!\n";
+	}
+
+
+	public function clearCache() {
 		try {
 			$http = new Client();
 			$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
@@ -213,8 +220,6 @@ JSON;
 		} catch(Exception $e) {
 			echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "install/' in the browser.\n";
 		}
-
-		echo "Done!\n";
 	}
 
 
@@ -406,6 +411,8 @@ JSON;
 	}
 
 	/**
+	 * Make keys unsigned
+	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/convertInts
 	 *
 	 * @return void

@@ -15,16 +15,13 @@ use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
-use go\core\model\Acl as GoAcl;
+use go\core\mail\AddressList;
 use go\core\model\User;
-use go\core\util\StringUtil;
 use GO\Email\Model\Alias;
 use GO\Email\Model\Account;
 use GO\Email\Model\ImapMessage;
 use GO\Email\Model\Label;
-use GO\Email\Transport;
 use go\modules\community\addressbook\model\Contact;
-use go\modules\community\addressbook\model\Settings;
 
 
 class MessageController extends \GO\Base\Controller\AbstractController
@@ -78,11 +75,13 @@ class MessageController extends \GO\Base\Controller\AbstractController
 						$body
 						);
 		$message->setFrom($alias->email, $alias->name);
-		$toList = new \GO\Base\Mail\EmailRecipients($params['notification_to']);
-		$address=$toList->getAddress();
-		$message->setTo($address['email'], $address['personal']);
 
-		$mailer = Mailer::newGoInstance(\GO\Email\Transport::newGoInstance($account));
+		$toList = new AddressList($params['notification_to']);
+
+		$message->setTo(...$toList->toArray());
+
+		$mailer = Mailer::newGoInstance();
+		$mailer->setEmailAccount($account);
 		$response['success'] = $mailer->send($message);
 
 		return $response;
@@ -431,7 +430,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['success'] = $response['sendParams']['draft_uid'] > 0;
 		}
 
-		if(!$imap->append_message($account->drafts, $message, "\Seen")){
+		if(!$imap->append_message($account->drafts, $message->toString(), "\Seen")){
 			$response['success'] = false;
 			$response['feedback']=$imap->last_error();
 		}
@@ -462,9 +461,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path.$params['save_to_path']);
 
-		$fbs = new \Swift_ByteStream_FileByteStream($file->path(), true);
-
-		$message->toByteStream($fbs);
+		$file->putContents($message->toStream());
 
 		$response['success']=$file->exists();
 
@@ -565,10 +562,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 		$message->setFrom($alias->email, $alias->name);
 		
-		$mailer = Mailer::newGoInstance(Transport::newGoInstance($account));
+		$mailer = Mailer::newGoInstance();
+		$mailer->setEmailAccount($account);
 
-		$logger = new \Swift_Plugins_Loggers_ArrayLogger();
-		$mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
 
 		$this->fireEvent('beforesend', array(
 				&$this,
@@ -580,9 +576,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$params
 		));
 
-		$failedRecipients=array();	
 		
-		$success = $mailer->send($message, $failedRecipients);		
+		$success = $mailer->send($message);
+
+		if(!$success) {
+			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError();
+			throw new Exception($msg);
+		}
 
 		// Update "last mailed" time of the emailed contacts.
 		if ($success && GO::modules()->addressbook) {
@@ -637,7 +637,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$account->sent = $params['reply_mailbox'];
 		}
 
-		if ($recipientCount > count($failedRecipients)) {
+		if ($success) {
 			//if a sent items folder is set in the account then save it to the imap folder
 			// auto linking will happen on save to sent items
 			if(!$account->saveToSentItems($message, $params)){
@@ -653,19 +653,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$imap->delete(array($params['draft_uid']));
 		}
 		
-		if(count($failedRecipients)) {
-			$msg = GO::t("Failed to send to", "email").': '.implode(', ',$failedRecipients)."\n\n";
 
-			$logStr = $logger->dump();
-
-			preg_match('/<< 55[0-9] .*>>/s', $logStr, $matches);
-
-			if (isset($matches[0])) {
-				$logStr = trim(substr($matches[0], 2, -2));
-			}
-
-			throw new Exception($msg.$logStr);
-		}
 
 		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
 

@@ -83,3 +83,4 @@ lang.csv
 
 node_modules
 dist
+/tests/.phpunit.cache/

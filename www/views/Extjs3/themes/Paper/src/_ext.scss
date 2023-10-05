@@ -6,7 +6,7 @@
 	color: rgba(white, 0.87);
 	//margin-top: dp(1.5);
 	min-width:dp(21);
-	width: content-box;
+	//width: content-box;
 	height:dp(21);
 	padding: 0 dp(4);
 	line-height:dp(21);
@@ -40,15 +40,14 @@
 	height: dp(32);
 	width: dp(32);
 	animation: rotate 0.8s infinite $curve-deceleration;
-	border: dp(8) solid transparent;
-	@include var(border-color, c-primary);
+	border: dp(8) solid var(--c-primary);
 	border-right-color: transparent;
 	border-radius: 50%;
 }
 @keyframes indeterminate1 {
 	0% {
 		left: 10%;
-		width: 0%
+		width: 0
 	}
 
 	50% {
@@ -58,7 +57,7 @@
 
 	75% {
 		left: 90%;
-		width: 0%
+		width: 0
 	}
 }
 
@@ -78,7 +77,7 @@
 		position: absolute;
 		top: dp(5);
 		bottom: 0;
-		width: 0%;
+		width: 0;
 		transition: width .2s cubic-bezier(.4,0,.2,1);
 		text-indent: -9999px;
 	}
@@ -911,6 +910,9 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	.x-small-editor & {
 		border: 0;
 	}
+	& button {
+		width: 100%;
+	}
 	// transition: background 400ms cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
    & button, & em {
 		@extend %font-button;
@@ -1066,8 +1068,8 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 } 
 
 .x-btn-tl, .x-btn-tr, .x-btn-tc, .x-btn-ml, .x-btn-mr, .x-btn-bl, .x-btn-br, .x-btn-bc{
-	height: 0px; // remove sliding doors
-	i { height: 0px; }
+	height: 0; // remove sliding doors
+	i { height: 0; }
 }
 .x-btn-ml, .x-btn-mr {
 	min-width: dp(8);
@@ -1115,10 +1117,10 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		color: inherit;
 	}
 	&-tl,&-tc, &-tr {
-		height:0px;
+		height:0;
 	}
 	&-bl, &-bc , &-br {
-		height:0px;
+		height:0;
 	}
 	&-ml, &-mr {
 		width:dp(8);
@@ -1665,9 +1667,6 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 	top:dp(-24);
 }
 
-td.grid-hd-group-cell {
-	background: url(../images/default/grid/grid3-hrow.gif) repeat-x bottom;
-}
 .x-grid-editor {
 	.x-form-field {
 		min-height: dp(40);
@@ -1761,7 +1760,7 @@ td.grid-hd-group-cell {
 	transform: translate(-50%, -50%);*/
 	padding: dp(16);
 	text-align:center;
-	color: color($fg, 'disabled-text');
+	color: color($fg, 'disabled');
 	&::before {
 		@extend %icon;
 		font-size: sp(120) !important;
@@ -2194,17 +2193,17 @@ td.x-date-mp-sep {
 	.x-tip-mc { @extend %font-body2;}
 }
 
-.x-form-invalid-tip .x-tip-tc, 
-.x-form-invalid-tip .x-tip-tl, 
-.x-form-invalid-tip .x-tip-tr, 
-.x-form-invalid-tip .x-tip-bc,
-.x-form-invalid-tip .x-tip-bl, 
-.x-form-invalid-tip .x-tip-br, 
-.x-form-invalid-tip .x-tip-ml, 
-.x-form-invalid-tip .x-tip-mr
-{
-	background-image: url(../images/default/form/error-tip-corners.gif);
-}
+//.x-form-invalid-tip .x-tip-tc,
+//.x-form-invalid-tip .x-tip-tl,
+//.x-form-invalid-tip .x-tip-tr,
+//.x-form-invalid-tip .x-tip-bc,
+//.x-form-invalid-tip .x-tip-bl,
+//.x-form-invalid-tip .x-tip-br,
+//.x-form-invalid-tip .x-tip-ml,
+//.x-form-invalid-tip .x-tip-mr
+//{
+//	background-image: url(../images/default/form/error-tip-corners.gif);
+//}
 
 .x-form-invalid-tip .x-tip-body::before {
 	@extend %icon;
@@ -2484,10 +2483,10 @@ $menuScrollerSize : dp(4);
     margin-bottom:dp(16);
 }
 .x-portlet .x-panel-ml {
-	padding-left: 0px;
+	padding-left: 0;
 }
 .x-portlet .x-panel-mr {
-	padding-right: 0px;
+	padding-right: 0;
 }
 
 // #################
@@ -2985,22 +2984,19 @@ $resizerSize : dp(3);
 		height: dp(2);
 		transform-origin: 0 0;
 		width:100%;
-		@include var(background-color, c-primary);
+		background-color: var(--c-primary);
 	}
 	.x-slider-thumb {
-		cursor: -webkit-grab;
 		cursor: grab;
 		top: dp(-9);
-		border: 3px solid transparent;
-		@include var(border-color, c-primary);
+		border: 3px solid var(--c-primary);
 		width:dp(20);
 		height: dp(20);
 		transform: scale(.7);
 		transform: .4s $curve-sharper,background-color .4s $curve-sharper, border-color .4s $curve-sharper;
 		border-radius: 50%;
-		@include var(background-color, c-primary);
+		background-color:var(--c-primary);
 		&.x-slider-thumb-drag {
-			cursor: -webkit-grabbing;
 			cursor: grabbing;
 			transform: scale(1);
 		}
@@ -3065,9 +3061,9 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	@include var(color, c-primary);
 }
 
-.x-window-dlg .ext-mb-error {
-	background-image:url(../images/default/window/icon-error.gif);
-}
+//.x-window-dlg .ext-mb-error {
+//	background-image:url(../images/default/window/icon-error.gif);
+//}
 
 // EXTENSION
 

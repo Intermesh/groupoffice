@@ -86,9 +86,6 @@ class Link extends AclItemEntity
 		return null;
 	}
 
-	protected $permissionLevel;
-	
-
 	/**
 	 * The id of the entity it links from
 	 * 

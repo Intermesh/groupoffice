@@ -191,6 +191,12 @@ class Imap extends ImapBodyStruct
 		return false;
 	}
 
+	protected $commands = [];
+	protected $responses = [];
+	protected $short_responses = [];
+
+	private $state = "";
+	private $capability;
 	/**
 	 * Handles authentication. You can optionally set
 	 * $this->starttls or $this->auth to CRAM-MD5
@@ -2394,6 +2400,9 @@ class Imap extends ImapBodyStruct
 		return $size;
 	}
 
+	private $message_part_size;
+	private $message_part_read;
+
 	private $readFullLiteral = false;
 
 	/**
@@ -2867,45 +2876,22 @@ class Imap extends ImapBodyStruct
 	 * Append a message to a mailbox
 	 *
 	 * @param string $mailbox
-	 * @param string|\Swift_Message $data
+	 * @param string|File $data
 	 * @param string $flags See set_message_flag
 	 * @return boolean
 	 */
 	public function append_message($mailbox, $data, $flags="") :bool
 	{
-		if($data instanceof \Swift_Message){
-			$tmpfile = \GO\Base\Fs\File::tempFile();
+		if ($data instanceof File) {
 
-			$is = new \Swift_ByteStream_FileByteStream($tmpfile->path(), true);
-			$data->toByteStream($is);
-
-			unset($data);
-			unset($is);
-
-			if(!$this->append_start($mailbox, $tmpfile->size(), $flags)) {
-				return false;
-			}
-
-			$fp = fopen($tmpfile->path(), 'r');
-
-			while($line = fgets($fp, 1024)){
-				if(!$this->append_feed($line)) {
-					return false;
-				}
-			}
-
-			fclose($fp);
-			$tmpfile->delete();
-		} else if ($data instanceof File) {
-
-			if(!$this->append_start($mailbox, $data->size(), $flags)) {
+			if (!$this->append_start($mailbox, $data->size(), $flags)) {
 				return false;
 			}
 
 			$fp = fopen($data->path(), 'r');
 
-			while($line = fgets($fp, 1024)){
-				if(!$this->append_feed($line)) {
+			while ($line = fgets($fp, 1024)) {
+				if (!$this->append_feed($line)) {
 					return false;
 				}
 			}
@@ -2913,6 +2899,7 @@ class Imap extends ImapBodyStruct
 			fclose($fp);
 
 		} else {
+
 			if(!$this->append_start($mailbox, strlen($data), $flags)) {
 				return false;
 			}

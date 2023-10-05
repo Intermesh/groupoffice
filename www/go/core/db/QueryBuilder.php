@@ -871,7 +871,8 @@ class QueryBuilder {
 		return "HAVING" . $this->buildWhere($h);
 	}
 
-	private function addBuildBindParameter(string $paramTag, $value, string $tableAlias, string $columnName) {
+	private function addBuildBindParameter(string $paramTag, $value, string $tableAlias, string $columnName): void
+	{
 
 		$columnObj = $this->findColumn($tableAlias, $columnName);
 

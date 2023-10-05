@@ -25,7 +25,10 @@ Ext.Ajax.on('requestexception', function(conn, response, options) {
 	if(response.isAbort) {
 		console.warn("Connection aborted", conn, response, options);
 	} else if(response.isTimeout || response.status == 0) {
-		GO.errorDialog.show(t("The connection to the server timed out. Please check your internet connection."), t("Request error"));
+		console.warn("Connection timeout", conn, response, options);
+		if(document.visibilityState === "visible") {
+			GO.errorDialog.show(t("The connection to the server timed out. Please check your internet connection."), t("Request error"));
+		}
 	} else
 	{
 		console.warn("Request exception", conn, response, options);
@@ -256,7 +259,10 @@ GO.request = function(config){
 			}
 			if(!success) {
 				if(response.isTimeout){
-					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+					console.warn("Connection timeout", response, options);
+					if(document.visibilityState === "visible") {
+						GO.errorDialog.show(t("The connection to the server timed out. Please check your internet connection."), t("Request error"));
+					}
 				}
 
 				if (config.fail) {

@@ -125,11 +125,30 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 	getName : function() {
 		return this.name;
 	},
+
+
+	_setStaticDate(operator, date) {
+		this.dateField.setValue(date);
+
+		this.operatorCombo.setValue(operator);
+		this.valueField.setVisible(false);
+		this.periodCombo.setVisible(false);
+		this.dateField.setVisible(true);
+		this.doLayout();
+	},
 	
 	setValue: function (v) {
-debugger;
+
+		console.warn(v);
+
+		if(v == null) {
+			this._setStaticDate("equals", null);
+			return;
+		}
+
 		v = v + "";
 
+		// check if the value is a static date. eg. > 2023-09-11
 		var regex = /([>< ]+)?([0-9]{4}-[0-9]{2}-[0-9]{2})/;
 		var matches = v.match(regex);
 
@@ -148,16 +167,13 @@ debugger;
 					operator = 'equals';
 			}
 
-			this.dateField.setValue(matches[2]);
-
-			this.operatorCombo.setValue(operator);
-			this.valueField.setVisible(false);
-			this.periodCombo.setVisible(false);
-			this.dateField.setVisible(true);
-			this.doLayout();
+			this._setStaticDate(operator, matches[2]);
 
 			return;
 		}
+
+
+		// if we get here it's a date relative to today.
 
 		var regex = /([><]+) ([\-0-9]+) (days|months|years)/,
 			operator = 'before', period = 'days', number = 0;
@@ -192,17 +208,19 @@ debugger;
 	},
 	getValue: function() {
 
-		let v = this.dateField.getValue();
-		if(v) {
-			if (this.dateField.isVisible()) {
+		let v;
+		if (this.dateField.isVisible()) {
+			v = this.dateField.getValue();
+			if(v) {
 				v = v.format('Y-m-d');
-			} else {
-				v = v + ' ' + this.periodCombo.getValue();
+			} else
+			{
+				v = null;
 			}
-		}else
-		{
-			v = null;
+		} else {
+			v = this.valueField.getValue() + ' ' + this.periodCombo.getValue();
 		}
+
 
 		switch(this.operatorCombo.getValue()) {				
 

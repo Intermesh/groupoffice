@@ -97,10 +97,10 @@ class Store implements IteratorAggregate, ArrayableInterface, Countable  {
 	 * {@see \go\core\data\Model::toArray()}
 	 *
 	 * @param array|null $properties
-	 * @return array
+	 * @return array|null
 	 */
 	
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		$records = [];
 		

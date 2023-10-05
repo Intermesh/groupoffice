@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\multi_instance\cron;
 
+use go\core\cli\controller\System;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\modules\community\multi_instance\model\Instance;
@@ -21,6 +22,10 @@ class DeactivateTrials extends CronJob {
 		}
 
 		Instance::delete((new Query())->where('id', 'IN', $expiredTrials));
+
+		// clear cache because some studio modules might have been removed
+		$cliCtrl =  new System();
+		$cliCtrl->clearCache();
 	}
 }
 

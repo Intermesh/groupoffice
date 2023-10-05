@@ -12,4 +12,12 @@ return array (
   'manageCategories' => 'Hantera kategorier',
   'Note' => 'Anteckning',
   'Content is encrypted' => 'Innehållet är krypterat',
+  'Web page' => 'Webb sida',
+  'Enter password to decrypt' => 'Ange lösenord för upplåsning',
+  'Encrypted data' => 'Krypterad data',
+  'Content' => 'Innehåll',
+  'Display options for notebooks' => 'Visningsalternativ för kategori',
+  'Default note book' => 'Förvald kategori',
+  'Start in' => 'Påbörja inom',
+  'Remember last selected note book' => 'Kom ihåg senast valda kategori',
 );

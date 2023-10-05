@@ -1,3 +1,93 @@
+- Core: Raised SSE check interval from 10s to 30s for performance
+- Core: Moved disk cache to temp dir so it can be put on faster partitions
+- Tasks: Add message field for first comment
+
+29-09-2023: 6.8.7
+- Email: bcc and cc bug
+
+26-09-2023: 6.8.6
+- Core: stop and start checker and SSE when going off- or online
+- Email: Fixed SMTP auth without verifying certificate
+- Email: Fixed "Use IMAP credentials"
+- Studio: Fix deprecation issues
+- Email: Fixed Set read notification github issue #1052
+- Support: Tickets have there own entity with custom fields and filters
+- Support: When migrating from old tickets module, custom fields are migrated too.
+- Addressbook: Added filter for has organization
+- Core: Made cor/Notify/mail backwards compatible
+- Core: fix casting error when saving cropped blob (e.g. avatar)
+- Tasks: Fixed changing sort order when sorting on start
+- Core: Multiselect custom field was broken for activerecord
+
+14-09-2023: 6.8.5
+- Email: SMTP Authentication was not performed
+- Email: Fixed "Remove attachments" feature to work with new mail API0
+- 6.7.47 fixes
+
+12-09-2023: 6.8.3
+- First public release
+- Add privacy options module
+
+
+-- 6.8 --
+
+- Addressbook: Added filter for has organization
+
+26-09-2023: 6.7.49
+- Core: fix casting error when saving cropped blob (e.g. avatar)
+- Core: Multiselect custom field was broken for activerecord
+
+19-09-2023: 6.7.48
+- Leavedays: fix error upon exporting leaveday hours
+- Core: fix error in user export
+- Supportclient: New Italian translations. Grazie, CENSEA DUE
+
+14-09-2023: 6.7.47
+- Addressbook: Name bug when middle name was entered contact was connected to user.
+- Core: Fixed install failure when MySQL's default engine was not set to InnoDB (GitHub issue #1049)
+- Core: Log client errors on server via JMAP call
+
+
+19-09-2023: 6.7.48
+- Leavedays: fix error upon exporting leaveday hours
+- Core: fix error in user export
+- Supportclient: New Italian translations. Grazie, CENSEA DUE
+
+14-09-2023: 6.7.47
+- Addressbook: Name bug when middle name was entered contact was connected to user.
+- Core: Fixed install failure when MySQL's default engine was not set to InnoDB (GitHub issue #1049)
+- Core: Log client errors on server via JMAP call
+
+12-09-2023: 6.7.46
+- Email: prevent sending empty in_reply_to header
+- Core: Custom date filter equals null didn't load in dialog properly
+- Addressbook: Added 'hasPhoneNumbers' custom filter
+- Files: Not all folders were listed as admin
+- Support: Comment composer wasn't shown instead of description
+- Core: Update available showed for pre-releases
+
+05-09-2023: 6.7.45
+- Addressbook: Some upgrade queries were missing
+
+05-09-2023: 6.7.44
+- Support: add comments to required modules
+- Comments: Fix uninstall script
+- Core: Fixed creating custom filters for dates with relative date.
+- Automation: Fixed sending emails
+- Core: Logout other sessions when you change password.
+- Support: use own permissions when adding task lists.
+- Core: updated Swedish translations. Tack, Johan!
+- S/MIME: fix deprecation error
+- Core: Fix contact search in email
+
+14-08-2023: 6.7.43
+- Core: Added markdown filter to TemplateParser.php
+- Zpushadmin: fixed delete button
+- Tasks: If available, filter on project tasks
+- Core: fix deprecation error in StringHelper (Github 1034)
+- Core: fix token generation when platform not detected (Github 982)
+- Core: validate international e-mail addresses correctly
+
 20-07-2023: 6.7.42
 - Support: Create users during migration option could not be disabled
 - Support: Grouping in system settings
@@ -47,7 +137,7 @@
 - Core: Improved notifications
 - Projects: Fixed display of project custom field
 - Support: remove you were assigned to alert when commenting
-- Billing: fixed status filter losing the setting when only status "None" was selected 
+- Billing: fixed status filter losing the setting when only status "None" was selected
 - Support/Task: change status to needs action when reassigning
 - Core: remove alerts when they are dismissed server side
 - Core: Hide personal groups when adding groups to popup reminders and announcements
@@ -206,10 +296,38 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+25-09-2023: 6.6.171
+- Leavedays: bugfix - employee can request leave day budgets
+- Core: Add Jersey and Isle of Man to countries list
 
-26-06-2023: 6.6.165
+12-09-2023: 6.6.170
+- Addressbook: Corrected foreign key of birthday portlet
+- Core: fix for isset() on dynamic config properties. (Sieve rewrite_hosts failed to work)
+
+21-08-2023: 6.6.169
+- Leavedays: When requesting leave with special leavebudget, filter out the rejected ones
+- Core: fix deprecation message in split_name method
+
+11-08-2023: 6.6.168
+- Leavedays: bugfix in retrieving special leave budget with registered hours.
+- Leavedays: Make special leave budget dialog more pronounced
+- Leavedays: Add special leave budget grid to panel
+- Leavedays: current year is irrelevant for special leave budgets
+
+20-07-2023: 6.6.167
+- Core: PWA installs as display = "standalone" as it works much better in iOS 16 now.
+- Files: Modified in past 7 days didn't work for admin
+- Email: fixed removing labels
+- Freebusypermissions: check if user ID exists before creating ACL
+
+14-07-2023: 6.6.166
+- Email: fixed error message on aborted request in e-mail (happens on double click on folder for example)
+
+26-05-2023: 6.6.165
  - Leavedays: Split 'hours' column into spent and budgeted special leave hours in year overview
  - Newsletters: shipping report will work for user entities without profile
+ - Addressbook: Corrected foreign key of birthday portlet
+ - Files: Not all folders were listed as admin
 
  19-06-2023: 6.6.164
 - Newsletters: do not throw an exception when a shipping report does not find an entity

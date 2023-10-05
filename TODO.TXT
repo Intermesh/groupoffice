@@ -32,6 +32,7 @@ x Billing module refactor
     - Database redesign with single object per meeting with multiple participants
     - Subscribe to external calendars
     - Birthdays from address book as special calendar
+    - Auto dismiss reminders after event start time
 
 - Mailserver
     - Quota warning: https://doc.dovecot.org/configuration_manual/quota/#quota-warning-scripts

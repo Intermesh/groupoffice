@@ -139,6 +139,8 @@ class Field extends AclItemEntity {
 	 */
 	public $forceAlterTable = false;
 
+	public $skipAlterTable = false;
+
 	private $dataType;
 	
 	
@@ -272,7 +274,8 @@ class Field extends AclItemEntity {
 	 * 
 	 * @return Base
 	 */
-	public function getDataType() {
+	public function getDataType(): Base
+	{
 		
 		if(!isset($this->dataType)) {			
 			$dataType = Base::findByName($this->type);
@@ -281,14 +284,21 @@ class Field extends AclItemEntity {
 		return $this->dataType;
 	}
 
-  /**
-   * Used by the API to set values on the datatype
-   *
-   * @param $values
-   * @throws Exception
-   */
-	public function setDataType($values) {
-		$this->getDataType()->setValues($values);
+	/**
+	 * Used by the API to set values on the datatype
+	 *
+	 * @param array|Base $values
+	 */
+	public function setDataType(array|Base $values): void
+	{
+		if($values instanceof Base) {
+			//ignore
+			$this->type = $values::getName();
+			$this->dataType = null;
+			$this->getDataType()->setValues($values->toArray());
+		} else {
+			$this->getDataType()->setValues($values);
+		}
 	}
 
 	protected function internalSave(): bool
@@ -296,6 +306,11 @@ class Field extends AclItemEntity {
 		if(!parent::internalSave()) {
 			return false;
 		}
+
+		if($this->skipAlterTable) {
+			return true;
+		}
+
 
 		$modified = $this->forceAlterTable || $this->isNew() || $this->uniqueModified || $this->defaultModified || $this->getDataType()->isModified() || $this->isModified(['databaseName', 'options', 'required']);
 		if(!$modified) {
@@ -364,7 +379,7 @@ class Field extends AclItemEntity {
    * @throws Exception
    */
 	public function tableName() {
-		if(!isset($this->tableName)) {
+		if(!isset($this->tableName) || $this->isModified(['fieldSetId'])) {
 			$fieldSet = FieldSet::findById($this->fieldSetId);
 			$entityName = $fieldSet->getEntity();
 			$entityType = EntityType::findByName($entityName);

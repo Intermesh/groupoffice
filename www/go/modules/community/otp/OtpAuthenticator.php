@@ -31,7 +31,8 @@ class OtpAuthenticator extends SecondaryAuthenticator {
 		return true;
 	}
 
-	public static function isAvailableFor(string $username) :bool {
+	public static function isAvailableFor(string $username) : bool
+	{
 		
 		$id = (new Query)
 						->selectSingleValue('id')

@@ -49,7 +49,7 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 			$mailer = $this->getUserMailer();
 
 			// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
-			if($mailer->getTransport() instanceof \GO\Email\Transport) {
+			if($mailer->hasAccount()) {
 				$message->setSender(\GO::user()->email);
 			} else {
 				$message->setSender(go()->getSettings()->systemEmail);
@@ -70,8 +70,9 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 		if(Module::isInstalled('legacy', 'email')) {
 			$account = \GO\Email\Model\Account::model()->findByEmail(\GO::user()->email);
 			if($account) {
-				$transport = \GO\Email\Transport::newGoInstance($account);
-				return \GO\Base\Mail\Mailer::newGoInstance($transport);
+				$mailer = \GO\Base\Mail\Mailer::newGoInstance();
+				$mailer->setEmailAccount($account);
+				return $mailer;
 			}
 			go()->debug("Can't find e-mail account for " . \GO::user()->email ." so will fall back on main SMTP configuration");
 

@@ -6,6 +6,8 @@ use Exception;
 use GO;
 use go\core\Controller;
 use go\core\jmap\Response;
+use go\core\mail\Address;
+use go\core\mail\AddressList;
 use go\core\model;
 
 class Notify extends Controller {
@@ -13,12 +15,16 @@ class Notify extends Controller {
 	public function mail($params) {		
 		
 		$settings = go()->getSettings();
+
+		if(empty($params['to'])) {
+			$params['to'] = new Address($settings->systemEmail, $settings->title);
+		}
 		
 		$message = go()->getMailer()->compose()
 						->setFrom($settings->systemEmail, $settings->title)
-						->setTo($params['to'] ?? $settings->systemEmail)
+						->setTo($params['to'])
 						->setSubject($params['subject'] ?? "")
-						->setBody($params['body'] ?? "", $params['contentType'] ?? null);
+						->setBody($params['body'] ?? "", $params['contentType'] ?? 'text/plain');
 
 		if(isset($params['replyTo'])) {
 			$message->setReplyTo($params['replyTo']);
@@ -26,7 +32,7 @@ class Notify extends Controller {
 
 		$success = $message->send();
 		
-		Response::get()->addResponse(['success' => $success]);
+		return ['success' => $success];
 	}
 }
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env php
+#!/usr/bin/env php7.4
 <?php
 
 use Github\Client;
@@ -49,7 +49,7 @@ class Builder
 {
 	public $test = false;
 
-	private $majorVersion = "6.7";
+	private $majorVersion = "6.8";
 
 	private $gitBranch = 'master';
 
@@ -57,7 +57,7 @@ class Builder
 	 *
 	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $distro = "sixseven";
+	public $distro = "sixeight";
 
 
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
@@ -73,7 +73,7 @@ class Builder
 	private $packageName;
 
 
-	private $encoder = __DIR__ . "/deploy/ioncube_encoder5_12.0/ioncube_encoder.sh";
+	private $encoder = '/usr/local/share/sourceguardian/bin/sourceguardian --phpversion 8.1+';
 
 	private $encoderOptions = null;
 	private $proRepos = "git@git.intermesh.nl:groupoffice/promodules.git";
@@ -84,14 +84,11 @@ class Builder
 
 	private $github = ['PERSONAL_ACCESS_TOKEN' => "secret", 'USERNAME' => 'intermesh', 'REPOSITORY' => 'groupoffice'];
 
-	private $ioncubePassword = "secret";
 	private $githubRelease;
 
 	public function __construct($config)
 	{
 		$this->github = $config['github'];
-		$this->ioncubePassword = $config['ioncubePassword'];
-
 	}
 
 	public function build()
@@ -136,7 +133,7 @@ class Builder
 		cd(dirname(__DIR__));
 
 		run("git fetch");
-		run("git checkout " . $this->gitBranch);
+		//run("git checkout " . $this->gitBranch);
 		run("git pull --recurse-submodules");
 
 		cd($this->sourceDir);
@@ -174,6 +171,7 @@ class Builder
 		$this->buildNodeCore();
 		$this->buildNodeModules();
 
+        putenv("COMPOSER_ALLOW_SUPERUSER=1");
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
 
 		$sassFiles = run("find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*'");
@@ -235,10 +233,8 @@ class Builder
 
 	private function runEncoder($sourcePath, $targetPath)
 	{
-		run($this->encoder . ' -72 --allow-reflection-all -B --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' . '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
-
-		run($this->encoder . ' -81 --allow-reflection-all --add-to-bundle --exclude "Site*Controller.php" --encode "*.inc" ' . $this->sourceDir . $sourcePath . ' ' . '--into ' . $this->buildDir . "/" . $this->packageName . $targetPath);
-
+        	cd($this->sourceDir. dirname($sourcePath));
+		run($this->encoder . ' -r -f "*.php" -o ' . $this->buildDir . "/" . $this->packageName . $targetPath . " ".basename($sourcePath)."/*");
 	}
 
 	private function encode()
@@ -250,8 +246,6 @@ class Builder
 		$this->runEncoder('/promodules/tickets/model', '/modules/tickets/');
 		$this->runEncoder('/promodules/tickets/customfields/model', '/modules/tickets/customfields/');
 		$this->runEncoder('/promodules/tickets/customfields/model', '/modules/tickets/customfields/');
-
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target ' . $this->sourceDir . '/promodules/tickets/TicketsModule.php ' . '--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/');
 
 
 		foreach ($this->proModules as $module) {

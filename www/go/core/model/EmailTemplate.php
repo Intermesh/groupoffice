@@ -10,14 +10,13 @@ use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\fs\Folder;
 use go\core\jmap\Entity;
+use go\core\mail\Attachment;
 use go\core\mail\Message;
 use go\core\model\Module as ModuleModel;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\TemplateParser;
 use go\core\validate\ErrorCode;
-use Swift_Attachment;
-use Swift_EmbeddedFile;
 
 /**
  * E-mail template model
@@ -234,7 +233,7 @@ class EmailTemplate extends Entity
 		}
 	}
 
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		$array =  parent::toArray($properties);
 
@@ -267,8 +266,7 @@ class EmailTemplate extends Entity
 			$blob = Blob::findById($attachment->blobId);
 
 			if($attachment->inline) {
-				$img = Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
-				$img->setContentType($blob->type);
+				$img = Attachment::fromBlob($blob);
 				$img->setFilename($attachment->name);
 				$contentId = $message->embed($img);
 
@@ -276,8 +274,7 @@ class EmailTemplate extends Entity
 			}
 
 			if($attachment->attachment) {
-				$a = Swift_Attachment::fromPath($blob->getFile()->getPath());
-				$a->setContentType($blob->type);
+				$a = Attachment::fromBlob($blob);
 				$a->setFilename($attachment->name);
 				$message->attach($a);
 			}

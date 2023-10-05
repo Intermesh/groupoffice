@@ -82,7 +82,7 @@ class FieldSet extends AclOwnerEntity {
 	 * @return array
 	 */
 	public function getFilter() {
-		return empty($this->filter) || $this->filter == '[]'  ? new \stdClass() : json_decode($this->filter, true);
+		return empty($this->filter) || $this->filter == '[]' || $this->filter == '{}' ? new \stdClass() : json_decode($this->filter, true);
 	}
 
 	protected function canCreate(): bool
@@ -90,8 +90,9 @@ class FieldSet extends AclOwnerEntity {
 		return go()->getAuthState()->isAdmin();
 	}
 	
-	public function setFilter($filter) {
-		$this->filter = json_encode($filter);
+	public function setFilter($filter): void
+	{
+		$this->filter = empty($filter) ? null : json_encode($filter);
 	}
 	
 	protected static function defineMapping(): Mapping
@@ -145,7 +146,7 @@ class FieldSet extends AclOwnerEntity {
 	 * Find all fields for an entity
 	 * 
 	 * @param string $name
-	 * @return Query
+	 * @return Query|static[]
 	 */
 	public static function findByEntity(string $name) : Query {
 		$e = \go\core\orm\EntityType::findByName($name);

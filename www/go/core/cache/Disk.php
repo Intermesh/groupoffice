@@ -26,7 +26,7 @@ class Disk implements CacheInterface {
 	 * @throws Exception
 	 */
 	public function __construct() {
-		$this->folder = go()->getDataFolder()->getFolder('cache/disk');
+		$this->folder = go()->getTmpFolder()->getFolder('cache/disk');
 		$this->folder->create();
 	}
 
@@ -114,7 +114,9 @@ class Disk implements CacheInterface {
 		unset($this->cache[$key]);
 
 		$file = $this->folder->getFile($key);
-		$file->delete();
+		if($file->exists()) {
+			$file->delete();
+		}
 	}
 
 	private $flushOnDestruct = false;

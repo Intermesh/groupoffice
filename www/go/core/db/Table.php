@@ -175,7 +175,7 @@ class Table {
 		$c->default = $field['Default'];
 		$c->comment = $field['Comment'];
 		$c->nullAllowed = strtoupper($field['Null']) == 'YES';
-		$c->autoIncrement = strpos($field['Extra'], 'auto_increment') !== false;
+		$c->autoIncrement = str_contains($field['Extra'], 'auto_increment');
 		$c->trimInput = false;
 		$c->unsigned = stripos($field['Type'], 'unsigned') !== false;
 		//remove "unsigned" or any other extra info that might be there.

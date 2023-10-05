@@ -96,7 +96,10 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 				text: t("Edit"),
 				handler: function (item) {
 					const record = this.store.getAt(item.parentMenu.rowIndex);
-					const dlg = new go.modules.community.tasks.TaskDialog();
+					const dlg = new go.modules.community.tasks.TaskDialog({
+						role: this.support ? "support" : "list",
+						entityStore: this.support ? "SupportTicket" : "Task",
+					});
 					dlg.load(record.id).show();
 				},
 				scope: this

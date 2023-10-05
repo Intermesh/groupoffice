@@ -17,6 +17,7 @@ namespace GO\Files\Model;
 
 use GO;
 use go\core\fs\Blob;
+use go\core\mail\Attachment;
 use go\core\model\Module;
 use go\modules\community\history\model\LogEntry;
 use go\core\exception\NotFound;
@@ -52,7 +53,7 @@ use go\core\exception\NotFound;
  *
  * @property boolean $delete_when_expired
  */
-class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttachableInterface {
+class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableInterface {
 
 	use \go\core\orm\CustomFieldsTrait;
 
@@ -871,16 +872,16 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	}
 
 	/**
-	 * Returns this file as swift attachment
+	 * Returns this file as attachment
 	 * 
 	 * @param string $altName
-	 * @return Swift_Attachment
+	 * @return Attachment
 	 */
 	public function getAttachment($altName = null) {
 	
 		$fullPath = $this->getFsFile()->path();
 		
-		$attachment = \Swift_Attachment::fromPath($fullPath);
+		$attachment = Attachment::fromPath($fullPath);
 		
 		if($altName !== null){
 			$attachment->setFilename($altName);

@@ -469,7 +469,6 @@ abstract class Base extends Model {
 		return $all[$name];
 	}
 	
-	
 	protected function joinCustomFieldsTable(Query $query) {
 		if(!$query->isJoined($this->field->tableName())){
 			$cls = $query->getModel();

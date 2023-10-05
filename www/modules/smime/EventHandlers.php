@@ -140,7 +140,7 @@ class EventHandlers {
 
 		//check if also signed
 		$data = $outfile->getContents();
-		if (strpos($data, 'signed-data')) {
+		if (strpos($data, 'signed-data') || strpos($data, 'multipart/signed')) {
 			$verifyOutfile = \GO\Base\Fs\File::tempFile();
 			openssl_pkcs7_verify($outfile->path(), PKCS7_NOVERIFY, "/dev/null", array(), GO::config()->root_path . "modules/smime/dummycert.pem", $verifyOutfile->path());
 
@@ -203,7 +203,7 @@ class EventHandlers {
 		}
 
 		if ($encryptSmime) {
-			openssl_pkcs12_read($cert->cert, $certs, $password);
+			$certs = SmimeModule::readPKCS12($cert->cert, $password);
 
 			if (!isset($certs['cert']))
 				throw new \Exception("Failed to get your public key for encryption");
@@ -223,10 +223,10 @@ class EventHandlers {
 			//lookup all recipients
 			$failed = array();
 			$publicCerts = array($certs['cert']);
-			foreach ($to as $email => $name) {
-				$pubCert = Model\PublicCertificate::model()->findSingleByAttributes(array('user_id' => GO::user()->id, 'email' => $email));
+			foreach ($to as $address) {
+				$pubCert = Model\PublicCertificate::model()->findSingleByAttributes(array('user_id' => GO::user()->id, 'email' => $address->getEmail()));
 				if (!$pubCert) {
-					$failed[] = $email;
+					$failed[] = $address->getEmail();
 				}else
 				{
 					$publicCerts[] = $pubCert->cert;

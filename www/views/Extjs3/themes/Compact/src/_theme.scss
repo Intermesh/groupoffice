@@ -1,10 +1,12 @@
 $ambientColor: #1e1246; //#72575e;// #356772;// ; //#f6f0eb; // #004440; //
 
 $resourcePath: '../Paper/';
-$density: 114;
 $font-scale: 1.1;
 
 @mixin light-theme {
+	--density: #{density(114)};
+	--mobile-density: #{density(160)};
+
 	--fg-base:			 black;
 	--fg-divider:			#{rgba(black, 0.08)};
 	--fg-border:			#{rgba(black, 0.16)};

@@ -17,23 +17,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		triggerWidth: 1000
 	},
 
-	route: async function(id, entity) {
-		const task = await go.Db.store("Task").single(id);
-		const tasklist = await go.Db.store("TaskList").single(task.tasklistId);
-
-		if (tasklist.role == "support") {
-			// hack to prevent route update
-			go.Router.routing = true;
-			const support = GO.mainLayout.openModule("support");
-			go.Router.routing = false;
-
-			support.taskDetail.load(id);
-
-		} else {
-			this.supr().route.call(this, id, entity);
-		}
-	},
-
 	initComponent: function () {
 		this.statePrefix = this.support ? 'support-' : 'tasks-';
 		this.createTaskGrid();
@@ -42,6 +25,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.taskDetail = new go.modules.community.tasks.TaskDetail({
 			support: this.support,
+			entityStore: this.support ? "SupportTicket" : "Task",
 			region: 'east',
 			split: true,
 			stateId: this.statePrefix  + '-task-detail',
@@ -57,6 +41,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		});
 
 		const showCompleted = Ext.state.Manager.get(this.statePrefix + "show-completed");
+		const showProjectTasks = Ext.state.Manager.get(this.statePrefix + "show-project-tasks");
 		const showAssignedToMe = Ext.state.Manager.get(this.statePrefix + "assigned-to-me");
 		const showUnassigned = Ext.state.Manager.get(this.statePrefix + "show-unassigned");
 
@@ -81,15 +66,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						[t("Today"), 'content_paste', 'green', 'today'],
 						[t("Due in seven days"), 'filter_7', 'purple', '7days'],
 						[t("All"), 'assignment', 'red', 'all'],
-						// [t("Completed"), 'assignment_turned_in', 'grey', 'completed'],
 						[t("Unscheduled"), 'event_busy', 'blue', 'unscheduled'],
 						[t("Scheduled"), 'events', 'orange', 'scheduled'],
 
 					]
 				})
 			});
-
-
 		}
 
 
@@ -121,12 +103,13 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				this.filterPanel,
 				this.tasklistsGrid,
 				this.categoriesGrid,
-				{xtype:'filterpanel', store: this.taskGrid.store, entity: 'Task'}
+				{xtype:'filterpanel', store: this.taskGrid.store, entity: this.support ? "SupportTicket" : "Task",}
 
 			]
 		});
 		if(!this.support) {
-			this.sidePanel.items.insert(1, Ext.create({
+
+			let cfToggles = Ext.create({
 				xtype: "fieldset",
 				items: [
 					{
@@ -144,7 +127,25 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						}
 					}
 				]
-			}));
+			});
+			if(go.Modules.isAvailable("legacy", "projects2")) {
+				cfToggles.add({
+					hideLabel: true,
+					xtype: "checkbox",
+					boxLabel: t("Show project tasks"),
+					checked: showProjectTasks,
+					listeners: {
+						scope: this,
+						check: function (cb, checked) {
+							this.toggleProjectTasks(checked);
+							Ext.state.Manager.set(this.statePrefix + "show-project-tasks", checked);
+							this.taskGrid.store.load();
+						}
+					}
+				})
+			}
+
+			this.sidePanel.items.insert(1, cfToggles);
 		}
 
 		this.sidePanel.items.insert(this.support ? 1 : 2, Ext.create({
@@ -187,7 +188,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			]
 		}));
 
-
 		this.centerPanel = new Ext.Panel({
 			layout:'responsive',
 			stateId: this.statePrefix + "west",
@@ -222,6 +222,17 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	showCompleted : function(show) {
 		this.taskGrid.store.setFilter('completed', show ? null : {complete:  false});
+	},
+
+	toggleProjectTasks: function(show) {
+		this.taskGrid.store.setFilter("role", show ? {role:  go.modules.community.tasks.listTypes.Project } : null);
+		if(show) {
+			this.taskGrid.store.setFilter(this.tasklistsGrid.getId(), null); // eew
+		} else {
+			this.setDefaultSelection();
+		}
+		this.tasklistsGrid.setVisible(!show);
+		this.categoriesGrid.setVisible(!show);
 	},
 
 	setAssignmentFilters: function() {
@@ -270,6 +281,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
 
 			this.showCompleted(Ext.state.Manager.get(this.statePrefix + "show-completed"));
+			this.toggleProjectTasks(Ext.state.Manager.get(this.statePrefix + "show-project-tasks"));
 
 			let statusFilter = Ext.state.Manager.get(this.statePrefix + "status-filter");
 			if (!statusFilter) {
@@ -280,7 +292,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		}
 
 
-		this.setDefaultSelection();
+		if(!Ext.state.Manager.get(this.statePrefix + "show-project-tasks")) {
+			this.setDefaultSelection();
+		}
 
 		this.tasklistsGrid.store.load();
 		this.taskGrid.store.load();
@@ -401,7 +415,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			filteredStore: this.taskGrid.store,
 			filterName: 'tasklistId',
 			selectFirst: false,
-
+			support: this.support,
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
@@ -409,12 +423,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}, '->', {
 					xtype: "tbsearch"
 				},{
-				hidden: !go.Modules.get("community", 'tasks') || !go.Modules.get("community", 'tasks').userRights.mayChangeTasklists,
+				// hidden: !go.Modules.get("community", 'tasks') || !go.Modules.get("community", 'tasks').userRights.mayChangeTasklists,
+				hidden: !this.canEditTaskLists(),
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						let dlg = new go.modules.community.tasks.TasklistDialog();
-						dlg.setValues({role: this.support ? "support" : "list"})
+						let dlg = new go.modules.community.tasks.TasklistDialog({entityStore: this.support ? "SupportList" : "Tasklist"});
 						dlg.show();
 					},
 					scope: this
@@ -433,7 +447,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								update[r.id] = {tasklistId: tasklistId};
 							})
 
-							go.Db.store("Task").set({update: update});
+							go.Db.store(this.support ? "SupportTicket" : "Task").set({update: update});
 						}
 					});
 				},
@@ -464,6 +478,16 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	// 		this.addTaskButton.setDisabled(true);
 	// 	}
 	// },
+
+	canEditTaskLists: function() {
+		if(this.support) {
+			const modRights = go.Modules.get("business", "support").userRights;
+			return modRights.mayManage;
+		} else {
+			return go.Modules.get("community", 'tasks') && go.Modules.get("community", 'tasks').userRights.mayChangeTasklists;
+		}
+
+	},
 	
 	createTaskGrid : function() {
 
@@ -480,7 +504,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					tooltip: t("Merge"),
 					handler: function() {
 						const ids = this.taskGrid.getSelectionModel().getSelections().column('id');
-						console.warn(ids);
+						// console.warn(ids);
 						if(ids.length < 2) {
 							Ext.MessageBox.alert(t("Error"), t("Please select at least two items"));
 						} else
@@ -494,10 +518,13 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								try {
 									Ext.getBody().mask(t("Saving..."));
 									const result = await go.Db.store("Task").merge(ids);
-									await go.Db.store("Task").getUpdates();
+									await go.Db.store(this.support ? "SupportTicket" : "Task").getUpdates();
 
 									setTimeout(() => {
-										const dlg = new go.modules.community.tasks.TaskDialog();
+										const dlg = new go.modules.community.tasks.TaskDialog({
+											role: this.support ? "support" : "list",
+											entityStore: this.support ? "SupportTicket" : "Task",
+										});
 										dlg.load(result.id);
 										dlg.show();
 									})
@@ -531,7 +558,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						tooltip: t('Add'),
 						cls: 'primary',
 						handler: function (btn) {
-							let dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
+							let dlg = new go.modules.community.tasks.TaskDialog({
+								entityStore: this.support ? "SupportTicket" : "Task",
+								role: this.support ? "support" : "list"
+							});
 							dlg.setValues({
 								tasklistId: this.addTasklistId
 							}).show();
@@ -635,7 +665,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				keypress: this.onTaskGridKeyPress
 			}
 		});
-		//this.quickAddTaskListCombo.store.load();
+
 		this.taskGrid.on('navigate', function (grid, rowIndex, record) {
 			go.Router.goto((this.support ? "support/" : "task/") + record.id);
 		}, this);
@@ -704,7 +734,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	checkCreateTaskList: function() {
 		this.addTasklistId = undefined;
-		go.Db.store("Tasklist").get(this.tasklistsGrid.getSelectedIds()).then((result) => {
+		go.Db.store(this.support ? "SupportList" : "TaskList").get(this.tasklistsGrid.getSelectedIds()).then((result) => {
 
 			result.entities.forEach((tasklist) => {
 				if (!this.addTasklistId && tasklist.permissionLevel >= go.permissionLevels.create) {
@@ -728,7 +758,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		let dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
+		let dlg = new go.modules.community.tasks.TaskDialog({
+			entityStore: this.support ? "SupportTicket" : "Task",
+			role: this.support ? "support" : "list"
+		});
 		dlg.load(record.id).show();
 	},
 	
@@ -745,7 +778,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		var dlg = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
+		const dlg = new go.modules.community.tasks.TaskDialog({
+			role: this.support ? "support" : "list",
+			entityStore: this.support ? "SupportTicket" : "Task",
+		});
 		dlg.load(record.id).show();
 	}	
 });

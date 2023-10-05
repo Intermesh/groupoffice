@@ -808,7 +808,13 @@ abstract class Entity extends Property {
 		if (static::getMapping()->getColumn('modifiedBy')) {
 			$filters->addText("modifiedBy", function (Criteria $criteria, $comparator, $value, Query $query) {
 
-				if(is_numeric($value)) {
+				foreach($value as &$v) {
+					if ($v == "{{me}}") {
+						$v = go()->getUserId();
+					}
+				}
+
+				if(is_int($value[1])) {
 					$criteria->andWhere('modifiedBy', '=', $value);
 				} else {
 
@@ -835,7 +841,13 @@ abstract class Entity extends Property {
 			});
 			$filters->addText("createdBy", function (Criteria $criteria, $comparator, $value, Query $query) {
 
-				if(is_int($value) || is_array($value) && is_int($value[0])) {
+				foreach($value as &$v) {
+					if ($v == "{{me}}") {
+						$v = go()->getUserId();
+					}
+				}
+
+				if(is_int($value[0])) {
 					$criteria->andWhere('createdBy', '=', $value);
 				} else {
 					if (!$query->isJoined('core_user', 'creator')) {

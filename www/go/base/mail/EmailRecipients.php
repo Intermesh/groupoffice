@@ -2,7 +2,13 @@
 
 namespace GO\Base\Mail;
 
+use go\core\mail\Address;
+use go\core\mail\AddressList;
 
+/**
+ * Use {@see AddressList} instead
+ * @deprecated
+ */
 class EmailRecipients{
 	/**
 	 * Pass a e-mail string like:
@@ -91,6 +97,20 @@ class EmailRecipients{
 	 */
 	public function getAddresses(){
 		return $this->_addresses;
+	}
+
+	/**
+	 * Convert this object to the new Address API
+	 *
+	 * @return Address[]
+	 */
+	public function convertToNewApi(): array
+	{
+		$a = [];
+		foreach($this->_addresses as $email => $name) {
+			$a[] = new Address($email, $name);
+		}
+		return $a;
 	}
 	
 	/**

@@ -19,9 +19,9 @@ class SystemMessage extends SmimeMessage
 	 * @param string|null $charset
 	 * @throws \GO\Base\Exception\NotFound
 	 */
-	public function __construct(?string $subject = null, ?string $body = null, ?string $contentType = null, ?string $charset = null)
+	public function __construct(string $subject = "", string $body = "", string $contentType = "text/plain")
 	{
-		parent::__construct($subject, $body, $contentType, $charset);
+		parent::__construct($subject, $body, $contentType);
 
 		if (!empty(\GO::config()->smtp_account_id)){
 			// Check if the account needs to be set
@@ -63,6 +63,8 @@ class SystemMessage extends SmimeMessage
 		$this->_alias = $this->_account->defaultAlias;
 
 		$this->setFrom($this->_alias->email,$this->_alias->name);
+
+		$this->getMailer()->setEmailAccount($this->_account);
 	}
 	
 	/**
@@ -117,30 +119,6 @@ class SystemMessage extends SmimeMessage
 		return !empty($this->_account);
 	}
 
-	/**
-	 * Get the Transport object for this message (Based on the account)
-	 * 
-	 * @return mixed Transport/\GO\Email\Transport
-	 */
-	public function getTransport()
-	{
-		if (!$this->hasAccount()) {
-			return Transport::newGoInstance ();
-		} else {
-			return \GO\Email\Transport::newGoInstance($this->_account);
-		}
-	}
-	
-	/**
-	 * Send the message with the GO mailer
-	 * Use this send function to be sure that the mailer is using the Transporter of the 
-	 * 
-	 * @return bool
-	 */
-	public function send(): bool
-	{
-		return Mailer::newGoInstance($this->getTransport())->send($this);
-	}
 	
 	
 }

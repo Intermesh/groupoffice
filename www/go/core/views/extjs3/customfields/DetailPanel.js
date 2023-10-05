@@ -40,7 +40,7 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
     fields.forEach(function (field) {
       var type = go.customfields.CustomFields.getType(field.type);
       if(!type) {
-        console.error("Custom field type " + field.type + " not found");
+	      console.error(`Custom field type '${field.type}' for field with name '${field.databaseName}' for entity '${me.fieldSet.entity}' not found`);
         return;
       }
       var cmp = type.getDetailField(field);

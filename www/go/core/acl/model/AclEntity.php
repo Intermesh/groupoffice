@@ -22,7 +22,7 @@ abstract class AclEntity extends Entity {
 	const EVENT_ACL_CHANGED = 'aclchanged';
 
 
-	protected $permissionLevel;
+	protected ?int $permissionLevel = null;
 
 	/**
 	 * Get the current state of this entity

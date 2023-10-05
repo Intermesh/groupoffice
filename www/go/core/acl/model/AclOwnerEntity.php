@@ -139,16 +139,6 @@ abstract class AclOwnerEntity extends AclEntity {
 		return static::entityType()->changes($records);
 	}
 
-	protected static function internalDelete(Query $query): bool
-	{
-		if(!parent::internalDelete($query)) {
-			return false;
-		}
-
-		return true;
-	}
-
-
 	/**
 	 * Get the permission level of the current user
 	 *
@@ -339,5 +329,12 @@ abstract class AclOwnerEntity extends AclEntity {
 		$table = static::getMapping()->getColumn(static::$aclColumnName)->getTable();
 		return (new Query())
 			->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id');
+	}
+
+	public function copy() : static
+	{
+		$copy = parent::copy();
+		$copy->{self::$aclColumnName} = null;
+		return $copy;
 	}
 }

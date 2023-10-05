@@ -42,6 +42,29 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 			this.add(go.AuthenticationManager.panels[i].panel);
 		}
 	},
+
+
+	firstSigninButtonAdded: false,
+
+
+	addSignInButton: function (btn) {
+
+		const pnl = this.userNamePanel.items.first().items.first();
+
+		if(!this.firstSigninButtonAdded) {
+			this.firstSigninButtonAdded = true;
+			this.height += dp(48);
+
+			pnl.insert(0, {
+				xtype: "box",
+				autoEl: "hr"
+			})
+		}
+
+		pnl.insert(0, btn);
+
+		this.height += dp(72);
+	},
 	
 	next : function(index){
 

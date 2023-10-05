@@ -22,6 +22,7 @@
 namespace GO\Smime\Model;
 
 use go\core\util\DateTime;
+use GO\Smime\SmimeModule;
 
 /**
  * The Certificate model
@@ -57,8 +58,7 @@ class Certificate extends \GO\Base\Db\ActiveRecord {
 		if($passphrase === null) {
 			$passphrase = \GO::session()->values['smime']['passwords'][$this->account_id];
 		}
-		openssl_pkcs12_read($this->cert, $certs, $passphrase);
-		return $certs;
+		return SmimeModule::readPKCS12($this->cert, $passphrase);
 	}
 
 	public function isValid() {
@@ -75,7 +75,7 @@ class Certificate extends \GO\Base\Db\ActiveRecord {
 	public function decryptFile($file) {
 		\GO::debug('decrypting message');
 
-		openssl_pkcs12_read($this->cert, $certs, $this->password);
+		$certs = SmimeModule::readPKCS12($this->cert, $this->password);
 
 		if (empty($certs)) {
 			//password invalid

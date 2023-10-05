@@ -28,7 +28,7 @@ class UserSettings extends Property {
 	/**
 	 * @var bool
 	 */
-	public $rememberLastItems;
+	public $rememberLastItems = true;
 
 	/** @var string */
 	protected $lastNoteBookIds;

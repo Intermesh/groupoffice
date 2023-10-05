@@ -69,7 +69,7 @@ class Structure extends Model {
 		return $this->parts;
 	}
 	
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		$arr=[];
 		foreach($this->parts as $part){

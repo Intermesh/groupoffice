@@ -197,7 +197,7 @@ class ClassFinder {
 	{
 		//Check if file is encoded
 		$data = $file->getContents(0, 200);
-		return strpos($data, 'ionCube') !== false;
+		return strpos($data, 'sg_load') !== false;
 	}
 
 	private function folderToClassNames(Folder $folder, string $namespace): array

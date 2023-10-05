@@ -194,13 +194,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 				&& $this->checkImapConnectionOnSave
 			){
 
-			$imap = $this->openImapConnection();
-			$this->mbroot=$imap->check_mbroot($this->mbroot);
-
-			$this->_createDefaultFolder('sent');
-			$this->_createDefaultFolder('trash');
-			$this->_createDefaultFolder('spam');
-			$this->_createDefaultFolder('drafts');	
+			$this->createDefaultFolders();
 		}
 		
 		if (empty($this->store_password)) {
@@ -215,6 +209,17 @@ class Account extends \GO\Base\Db\ActiveRecord
 		}
 		
 		return parent::beforeSave();
+	}
+
+
+	public function createDefaultFolders() {
+		$imap = $this->openImapConnection();
+		$this->mbroot=$imap->check_mbroot($this->mbroot);
+
+		$this->_createDefaultFolder('sent');
+		$this->_createDefaultFolder('trash');
+		$this->_createDefaultFolder('spam');
+		$this->_createDefaultFolder('drafts');
 	}
 
 	protected function afterLoad() {		

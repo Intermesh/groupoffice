@@ -61,7 +61,7 @@ class MailDomain {
 		$result = json_decode($response['body']);	
 
 		if(!$result) {
-			throw new Exception("Could not create mailbox on postfixadmin module. " . $response);
+			throw new Exception("Could not create mailbox on postfixadmin module. " . $response['body']);
 		}
 
 		if (!$result->success)
@@ -97,7 +97,7 @@ class MailDomain {
 		$result = json_decode($response['body']);
 
 		if(!$result) {
-			throw new Exception("Could not create mailbox on postfixadmin module. " . $response);
+			throw new Exception("Could not create mailbox on postfixadmin module. " . $response['body']);
 		}
 
 		if(!$result->success)

@@ -5,6 +5,7 @@ use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\mail\Address as MailAddress;
 use go\core\model\Link;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
@@ -471,15 +472,23 @@ class Contact extends AclItemEntity {
 											$criteria->andWhere('isOrganization', '=', (bool) $value);
 										})
 										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
-//
-//											if(!$query->isJoined('addressbook_email_address', 'e')) {
-//												$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
-//													->groupBy(['c.id']);
-//											}
-
 											$criteria->andWhere('c.id in (select contactId from addressbook_email_address)');
+										})
+										->add("hasPhoneNumbers", function(Criteria $criteria, $value, Query $query) {
+											$criteria->andWhere('c.id in (select contactId from addressbook_phone_number)');
+										})
+										->add("hasOrganizations", function(Criteria $criteria, $value, Query $query) {
 
-//											$criteria->andWhere('e.email', $value ? 'IS NOT' : 'IS', null);
+											$sub = Contact::find()
+												->selectSingleValue('org.id')
+												->tableAlias('org')
+												->where('isOrganization', '=', true)
+												->join('core_link', 'l',
+													'c.id=l.fromId AND org.id=l.toId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId(), 'INNER');
+
+
+											$criteria->andWhereExists($sub, empty($value));
+
 										})
 
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
@@ -1116,11 +1125,12 @@ class Contact extends AclItemEntity {
 	 * Find a birthday, calculate diff in years
 	 *
 	 * @return int
+	 * @throws Exception
 	 */
 	public function getAge(): int
 	{
 		$bday = $this->getBirthday();
-		if($bday === '') {
+		if (empty($bday)) {
 			return 0;
 		}
 		$date = new DateTime($bday);
@@ -1290,7 +1300,7 @@ class Contact extends AclItemEntity {
 		if(!isset($this->emailAddresses[0])) {
 			return false;
 		}
-		$message->setTo($this->emailAddresses[0]->email, $this->name);
+		$message->setTo(new MailAddress($this->emailAddresses[0]->email, $this->name));
 		return true;
 	}
 

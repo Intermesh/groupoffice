@@ -188,12 +188,14 @@ class TemplateParser {
 	 * ```
 	 * [config thousandsSeparator=.]
 	 * [config decimalSeparator=,]
+	 * [config dateFormat=d-m-Y]
 	 * ``
 	 * @var string[]
 	 */
 	public $config = [
 		'decimalSeparator' => '.',
 		'thousandsSeparator' => ',',
+		'dateFormat' => 'd-m-Y'
 	];
 	
 	public function __construct() {
@@ -216,6 +218,7 @@ class TemplateParser {
 		$this->addFilter('entityFiles', [$this, "filterEntityFiles"]);
 
 		$this->addFilter('nl2br', [$this, "filterNl2br"]);
+		$this->addFilter('markdown', [$this, "filterMarkdown"]);
 		$this->addFilter('empty', [$this, "filterEmpty"]);
 		$this->addFilter('htmlEncode', [$this, "filterHtmlEncode"]);
 		$this->addFilter('dump', [$this, "filterDump"]);
@@ -288,7 +291,7 @@ class TemplateParser {
 		}
 
 		if(!isset($format)) {
-			$format = $this->_currentUser()->dateFormat;
+			$format = $this->config['dateFormat'];
 		}
 
 		$date->setTimezone(new DateTimeZone($this->_currentUser()->timezone));
@@ -333,6 +336,14 @@ class TemplateParser {
 		}
 		$entityCls = $entityType->getClassName();
 		return $entityCls::findByLink($entity,!empty($properties) ? explode(",", $properties) : [], true);
+	}
+
+	private function filterMarkDown(?string $text): string
+	{
+		$pd = new \Parsedown();
+		$pd->setSafeMode(true);
+		$pd->setBreaksEnabled(true);
+		return $pd->text($text);
 	}
 
 

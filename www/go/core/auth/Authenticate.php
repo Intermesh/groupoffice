@@ -120,6 +120,23 @@ class Authenticate {
 	}
 
 	/**
+	 * Danger: Set's a user to authenticated state
+	 * @param User $user
+	 * @return Token
+	 * @throws Exception
+	 */
+	public function setAuthenticated(User $user): Token
+	{
+		$token = new Token();
+		$token->userId = $user->id;
+		$token->setAuthenticated(true);
+
+		$token->setCookie();
+
+		return $token;
+	}
+
+	/**
 	 * Does the password authentication.
 	 *
 	 * Our web interface may require secondary authenticator like OTP. But some other protocols like DAV and ActiveSync
@@ -130,13 +147,13 @@ class Authenticate {
 	 * @return false|User For performance reasons the user is fetched read only and partially with properties: ['id', 'username', 'password', 'enabled']
 	 * @throws Exception
 	 */
-	public function passwordLogin(string $username, string $password) {
-
+	public function passwordLogin(string $username, string $password): bool|User
+	{
 		$isLocalUser = $this->isLocalUser($username);
 
 		go()->debug("Auth ". $username . " is " . ($isLocalUser ? "local" : "not local"));
 		// When the user is local don't use
-		if(!$isLocalUser && !strstr($username, '@') && go()->getSettings()->defaultAuthenticationDomain) {
+		if(!$isLocalUser && !str_contains($username, '@') && go()->getSettings()->defaultAuthenticationDomain) {
 			$username .= '@' . go()->getSettings()->defaultAuthenticationDomain;
 		}
 

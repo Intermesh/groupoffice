@@ -120,9 +120,9 @@ $tagList: (beer, xmas, drinks, xmasparty);
 	}
 }
 %multiday {
-	&.start { margin-right:0; overflow:hidden; border-radius: 2px 0px 0px 2px; border-right: none; }
+	&.start { margin-right:0; overflow:hidden; border-radius: 2px 0 0 2px; border-right: none; }
 	&.mid { margin-left:-3px; margin-right:-3px; border-radius: 0; text-indent: -9999px; border-width: 1px 0 1px 0; }
-	&.end { margin-left:0; margin-right:0; border-radius: 0px 2px 2px 0px; text-indent: -9999px; border-left: none;}
+	&.end { margin-left:0; margin-right:0; border-radius: 0 2px 2px 0; text-indent: -9999px; border-left: none;}
 	span.event-ghost { background-color:transparent; border-left:0; }
 }
 
@@ -218,7 +218,7 @@ $tagList: (beer, xmas, drinks, xmasparty);
 			color:white;
 		}
 		&-prev, &-next {
-			color: color($fg, 'disabled-text');
+			color: color($fg, 'disabled');
 		}
 	} 
 	.ext-cal-week {
@@ -260,7 +260,7 @@ $tagList: (beer, xmas, drinks, xmasparty);
 		top: 0;
 		height: 100%;
 		border-top: 1px solid color($fg, 'line');
-		color: color($fg, 'disabled-text');
+		color: color($fg, 'disabled');
 		padding: 3px 0 0;
 		text-align: center;
 		cursor: pointer;

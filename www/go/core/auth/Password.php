@@ -14,9 +14,10 @@ class Password extends PrimaryAuthenticator {
 	 * Checks if the given password matches the password in the core_auth_password table.
 	 * 
 	 * @param string $password
-	 * @return boolean 
+	 * @return boolean|User
 	 */
-	public function authenticate($username, $password) {		
+	public function authenticate(string $username, string $password): bool|User
+	{
 		$user = User::find(['id', 'username', 'password', 'enabled'], true)->where(['username' => $username])->single();
 		if(!$user) {
 			return false;

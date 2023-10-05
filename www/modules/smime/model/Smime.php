@@ -23,6 +23,8 @@ use GO\Base\Fs\Base;
 use GO\Base\Fs\File;
 use GO\Base\Util\HttpClient;
 use \GO\Base\Util\StringHelper;
+use go\core\exception\Unauthorized;
+use GO\Smime\SmimeModule;
 
 class Smime {
 
@@ -61,31 +63,31 @@ class Smime {
 		// todo: may need to fetch again when cert is revoked??
 		return $latest->fetch();
 	}
-
-	/**
-	 * @param $accountId int the EmailAccount id
-	 * @param $certData string the PKS12 file data
-	 * @param $passphrase string for the certificate
-	 * @return bool when ok
-	 * @throws \Exception
-	 */
-	public function import($certData, $passphrase) {
-		if(empty($passphrase)) {//password may not be empty.
-			throw new \Exception(\GO::t("Your SMIME key has no password. This is prohibited for security reasons!", "smime"));
-		}
-		openssl_pkcs12_read($certData, $certs, $passphrase);
-		if (!empty($certs))
-			throw new \Exception(\GO::t("Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!", "smime"));
-
-		$cert = Certificate::model()->findByPk($this->accountId);
-		if (!$cert) {
-			$cert = new Certificate();
-			$cert->account_id = $this->accountId;
-			$cert->always_sign = !empty($params['always_sign']); // move to different table
-		}
-
-		return true;
-	}
+//
+//	/**
+//	 * @param $accountId int the EmailAccount id
+//	 * @param $certData string the PKS12 file data
+//	 * @param $passphrase string for the certificate
+//	 * @return bool when ok
+//	 * @throws \Exception
+//	 */
+//	public function import($certData, $passphrase) {
+//		if(empty($passphrase)) {//password may not be empty.
+//			throw new \Exception(\GO::t("Your SMIME key has no password. This is prohibited for security reasons!", "smime"));
+//		}
+//		openssl_pkcs12_read($certData, $certs, $passphrase);
+//		if (!empty($certs))
+//			throw new \Exception(\GO::t("Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!", "smime"));
+//
+//		$cert = Certificate::model()->findByPk($this->accountId);
+//		if (!$cert) {
+//			$cert = new Certificate();
+//			$cert->account_id = $this->accountId;
+//			$cert->always_sign = !empty($params['always_sign']); // move to different table
+//		}
+//
+//		return true;
+//	}
 
 	static function rootCertificates() {
 		$certs = array();

@@ -739,6 +739,12 @@ namespace go\core {
 		}
 
 		/**
+		 * @var Debugger
+		 */
+
+		private $debugger;
+
+		/**
 		 * Get a simple key value caching object
 		 * 
 		 * @return Debugger

@@ -44,7 +44,7 @@ $lang = go()->getLanguage()->getIsoCode();
     <title><?= $goTitle; ?><?= isset($title) ? ' - ' . $title : "" ?></title>
 
     <link rel="preload" href="<?= $themeUrl;?>fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" media="print, (min-device-width:1201px)"  href="<?= $themeUrl;?>style.css?v=<?=$cssMtime ?>">
+    <link rel="stylesheet" media="print, screen"  href="<?= $themeUrl;?>style.css?v=<?=$cssMtime ?>">
 <?php if($loadExt):
     require(GO::config()->root_path.'views/Extjs3/default_scripts.inc.php');
     go()->fireEvent(App::EVENT_SCRIPTS);
@@ -54,7 +54,6 @@ $lang = go()->getLanguage()->getIsoCode();
 	<script type="text/javascript">
 		GO.util.density = GO.util.isMobileOrTablet() ? 160 :  <?= isset($density) ? $density : 140?>;
 	</script>
-    <link rel="stylesheet" media="screen and (max-device-width:1200px)" href="<?= $themeUrl; ?>style-mobile.css?v=<?=$cssMtime;?>">
     <?php if (!\go\core\Installer::isInstalling()): ?>
     <link rel="stylesheet" href="<?= GO::view()->getUrl()?>css.php?theme=<?=$themeUrl; ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>"  />
 	<?php endif;?>
@@ -63,6 +62,7 @@ $lang = go()->getLanguage()->getIsoCode();
 <?php if($loadGoui): ?>
     <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/goui/dist/groupoffice.css" />
     <link rel="stylesheet" media="screen and (max-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/goui/dist/groupoffice-mobile.css" />
+    <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/groupoffice-core/dist/style.css" />
 <?php endif; ?>
 
 <?php if(!empty(GO()->getConfig()['custom_css_url'])): ?>

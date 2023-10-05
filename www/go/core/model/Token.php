@@ -9,6 +9,7 @@ use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
 use go\core\Environment;
 use go\core\ErrorHandler;
+use go\core\jmap\State;
 use go\core\orm\Mapping;
 use stdClass;
 use go\core\http\Request;
@@ -499,6 +500,7 @@ class Token extends Entity {
 		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
 
 		foreach($deleteQuery as $accessToken) {
+			go()->debug("Delete token: " . $accessToken);
 			go()->getCache()->delete('token-' . $accessToken);
 		}
 
@@ -536,6 +538,32 @@ class Token extends Entity {
 		ErrorHandler::log("Logout everyone but admins is used!");
 
 		return self::delete($q) && RememberMe::delete($q);
+	}
+
+	/**
+	 * Destroy all sessions for the current user except the current.
+	 * Used on password change.
+	 * @throws Exception
+	 */
+	public static function destroyOtherSessons() : bool {
+
+		$q = (new Query)
+			->where('expiresAt', '!=', null)
+			->where('userId', '=', go()->getUserId()
+			);
+
+		if(!RememberMe::delete($q)) {
+			return false;
+		}
+		$authState = go()->getAuthState();
+		if($authState instanceof State) {
+			$token = $authState->getToken();
+			if($token) {
+				$q->andWhere('loginToken', '!=', $token->loginToken);
+			}
+		}
+
+		return self::delete($q);
 	}
 
 	public function setCookie() {

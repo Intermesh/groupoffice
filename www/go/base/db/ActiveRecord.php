@@ -1762,9 +1762,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	private function _appendAclJoin($findParams, $aclJoinProps){
 
 		$sql = "\nINNER JOIN core_acl_group ON (`".$aclJoinProps['table']."`.`".$aclJoinProps['attribute']."` = core_acl_group.aclId";
-		if(isset($findParams['permissionLevel']) && $findParams['permissionLevel']>\GO\Base\Model\Acl::READ_PERMISSION){
-			$sql .= " AND core_acl_group.level>=".intval($findParams['permissionLevel']);
-		}
+
+		$sql .= " AND core_acl_group.level>=".intval($findParams['permissionLevel'] ?? \GO\Base\Model\Acl::READ_PERMISSION);
 
 		$groupIds = \GO\Base\Model\User::getGroupIds($findParams['userId']);
 
@@ -1949,8 +1948,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		try{
 			$result = $this->getDbConnection()->query($sql);
-			$result->model=$this;
-			$result->findParams=$findParams;
+//			$result->model=$this;
+//			$result->findParams=$findParams;
 
 			$result->setFetchMode(PDO::FETCH_CLASS, $this->className(),array(false));
 

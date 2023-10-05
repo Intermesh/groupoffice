@@ -48,8 +48,12 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	private $removedParticipants;
 	
 	private $_uuidEvents = array();
-	
-	
+	/**
+	 * @var array
+	 */
+	private $_tasklists;
+
+
 	protected function allowGuests() {
 		return array('invitation');
 	}

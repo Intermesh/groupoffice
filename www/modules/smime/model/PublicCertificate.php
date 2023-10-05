@@ -88,7 +88,7 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 		}
 
 		$pubCertFile = \GO\Base\Fs\File::tempFile();
-		$valid = openssl_pkcs7_verify($inputFile->path(), null, $pubCertFile->path(), Smime::rootCertificates());
+		$valid = openssl_pkcs7_verify($inputFile->path(), 0, $pubCertFile->path(), Smime::rootCertificates());
 
 		if (!$valid) {
 			openssl_pkcs7_verify($inputFile->path(), PKCS7_NOVERIFY, $pubCertFile->path(), Smime::rootCertificates());

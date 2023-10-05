@@ -852,12 +852,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		});
 
 		window.addEventListener('online', () => {
-			// todo enable checker and SSE when online.
 			console.log('online');
 			offlineDialog.hide();
 		});
 		window.addEventListener('offline', () => {
-			// todo disable checker and SSE when offline.
 			offlineDialog.show();
 			console.log('offline');
 		});

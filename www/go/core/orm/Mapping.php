@@ -92,6 +92,12 @@ class Mapping {
 		if(!$alias) {
 			$alias = $name;
 		}
+		$this->internalAddTable($name, $alias, $keys, $columns, $constantValues);
+		return $this;
+	}
+
+
+	private function internalAddTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []) {
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
 		$this->tables[$name]->dynamic = $this->dynamic;
 		foreach($this->tables[$name]->getMappedColumns() as $col) {
@@ -100,7 +106,8 @@ class Mapping {
 				$this->columns[$col->name] = $col;
 			}
 		}
-		return $this;
+
+		return $this->tables[$name];
 	}
 
   /**
@@ -121,9 +128,9 @@ class Mapping {
    */
 	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], $required = false): Mapping
 	{
-		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
-		$this->tables[$name]->isUserTable = true;
-		$this->tables[$name]->required = $required;
+		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues);
+		$table->isUserTable = true;
+		$table->required = $required;
 		$this->hasUserTable = true;
 
 		if(!Table::getInstance($name)->getColumn('modSeq')) {
@@ -225,17 +232,17 @@ class Mapping {
 	 *
 	 * An empty value is null and not an empty object. Set to null to remove.
 	 *
-	 * @param string $name
-	 * @param string $propertyName
+	 * @param string $name Property name
+	 * @param class-string<Property> $propertyClsName The class name of the property model
 	 * @param array $keys
 	 * @param bool $autoCreate If not found then automatically create an empty object
 	 *
 	 * @return $this;
 	 */
-	public function addHasOne(string $name, string $propertyName, array $keys, bool $autoCreate = false): Mapping
+	public function addHasOne(string $name, string $propertyClsName, array $keys, bool $autoCreate = false): Mapping
 	{
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_HAS_ONE);
-		$this->relations[$name]->setPropertyName($propertyName);
+		$this->relations[$name]->setPropertyName($propertyClsName);
 		$this->relations[$name]->autoCreate = $autoCreate;
 		$this->relations[$name]->dynamic = $this->dynamic;
 		return $this;
@@ -252,17 +259,17 @@ class Mapping {
 	 * - When updating the array property, the client must send all items. Items not included will be removed.
 	 *
 	 * @param string $name Name of the property
-	 * @param string $propertyName The name of the Property model
+	 * @param class-string<Property> $propertyClsName The name of the Property model
 	 * @param array $keys The keys of the relation. eg. ['id' => 'articleId']
 	 * @param array $options pass ['orderBy' => 'sortOrder'] to save the sort order in this int column. This property can
 	 *   be a protected property because the client does not need to know of it's existence.
 	 *
 	 * @return $this;
 	 */
-	public function addArray(string $name, string $propertyName, array $keys, array $options = []): Mapping
+	public function addArray(string $name, string $propertyClsName, array $keys, array $options = []): Mapping
 	{
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_ARRAY);
-		$this->relations[$name]->setPropertyName($propertyName);
+		$this->relations[$name]->setPropertyName($propertyClsName);
 		$this->relations[$name]->dynamic = $this->dynamic;
 		foreach($options as $option => $value) {
 			$this->relations[$name]->$option = $value;
@@ -279,15 +286,15 @@ class Mapping {
 	 * - Setting a value to null or false will remove it from the map.
 	 *
 	 * @param string $name
-	 * @param string $propertyName
+	 * @param class-string<Property> $propertyClsName
 	 * @param array $keys
 	 *
 	 * @return $this
 	 */
-	public function addMap(string $name, string $propertyName, array $keys): Mapping
+	public function addMap(string $name, string $propertyClsName, array $keys): Mapping
 	{
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_MAP);
-		$this->relations[$name]->setPropertyName($propertyName);
+		$this->relations[$name]->setPropertyName($propertyClsName);
 		$this->relations[$name]->dynamic = $this->dynamic;
 		return $this;
 	}

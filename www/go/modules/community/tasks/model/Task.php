@@ -13,6 +13,7 @@ use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\db\Expression;
+use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\User;
 use go\core\model\Module;
@@ -302,11 +303,6 @@ class Task extends AclItemEntity {
 		return $keywords;
 	}
 
-	protected function getSearchFilter(): ?string
-	{
-		$tasklist = TaskList::findById($this->tasklistId);
-		return $tasklist->getRole() == "support" ? "support" : null;
-	}
 
 	protected function getSearchDescription(): string
 	{
@@ -668,6 +664,7 @@ class Task extends AclItemEntity {
 
 			$i = array_search('start', $sort->keys());
 			$sort->insert($i, new Expression($query->getTableAlias() . '.`start` ' . $null));
+			$sort->insert($i + 2, $sort['start'], 'id');
 		}
 
 		if(isset($sort['responsible'])) {
@@ -801,8 +798,12 @@ class Task extends AclItemEntity {
 		if($this->createdBy != $comment->createdBy) {
 			//agent makes this message
 			if($this->responsibleUserId == null) {
-				// auto assign task on first comment
-				$this->responsibleUserId = $comment->createdBy;
+				// auto assign task on first comment, check if the comment creator is an agent.
+				// this is the case when the permission level is write or greater.
+				$tasklist = TaskList::findById($this->tasklistId,['aclId']);
+				if(Acl::getUserPermissionLevel($tasklist->aclId, $comment->createdBy) >= Acl::LEVEL_WRITE) {
+					$this->responsibleUserId = $comment->createdBy;
+				}
 			}
 		}
 

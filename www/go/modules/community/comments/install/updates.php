@@ -188,3 +188,7 @@ $updates['202307031650'][] = "delete from core_search where entityTypeId = (sele
 $updates['202307031650'][] = function() {
 	\go\core\cron\BuildSearchCache::install("* * * * *", true);
 };
+
+
+$updates['202308221033'][] = "create index comments_comment_mimeMessageId_index
+    on comments_comment (mimeMessageId);";

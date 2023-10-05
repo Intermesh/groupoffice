@@ -14,7 +14,7 @@ use go\core\orm\Query;
 
 class MultiSelect extends Select {
 	
-	private $optionsToSave;
+	protected $optionsToSave;
 	
 	protected function getFieldSQL() {
 		return false;
@@ -27,7 +27,13 @@ class MultiSelect extends Select {
 	protected function getTableDefinition() {
 		$fieldSet = FieldSet::findById($this->field->fieldSetId);
 		$entityType = EntityType::findByName($fieldSet->getEntity());
-		$table = $entityType->getClassName()::getMapping()->getPrimaryTable();
+		$cls = $entityType->getClassName();
+
+		if(is_a($cls, \GO\Base\Db\ActiveRecord::class, true)) {
+			$table = go()->getDatabase()->getTable($cls::model()->tableName());
+		} else {
+			$table = $cls::getMapping()->getPrimaryTable();
+		}
 		return $table;
 	}
 

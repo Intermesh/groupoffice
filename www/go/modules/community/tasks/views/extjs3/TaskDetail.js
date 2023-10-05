@@ -203,11 +203,15 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			}));
 
 			this.on("load", async () => {
+
+				if(!this.data.createdBy) {
+					this.noContractWarning.show();
+					return;
+				}
 				this.noContractWarning.hide();
 				this.contractGrid.store.setFilter("def", {createdBy: this.data.createdBy, active: true});
 
 				const records = await this.contractGrid.store.load();
-
 				if (!records.length) {
 					this.noContractWarning.show();
 				}
@@ -217,7 +221,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 	changeProgress : function(progress) {
 		this.getEl().mask(t("Saving..."));
-		go.Db.store("Task").save({
+		go.Db.store(this.support ? "SupportTicket" : "Task").save({
 			progress: progress
 		}, this.data.id).finally(() => {
 			this.getEl().unmask();
@@ -247,7 +251,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				scope: this,
 				handler: function() {
 					this.getEl().mask(t("Saving..."));
-					go.Db.store("Task").save({
+					go.Db.store(this.support ? "SupportTicket" : "Task").save({
 						responsibleUserId: go.User.id,
 						// progress: "in-progress"
 					}, this.data.id).finally(() => {
@@ -261,7 +265,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				iconCls: 'ic-edit',
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
-					const taskEdit = new go.modules.community.tasks.TaskDialog({role: this.support ? "support" : "list"});
+					const taskEdit = new go.modules.community.tasks.TaskDialog({
+						entityStore: this.support ? "SupportTicket" : "Task",
+						role: this.support ? "support" : "list"
+					});
 					taskEdit.load(this.data.id).show();
 				},
 				scope: this

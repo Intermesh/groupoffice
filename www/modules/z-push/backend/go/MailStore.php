@@ -448,7 +448,7 @@ class MailStore extends Store implements ISearchProvider {
 		if(count($attparts)!=4)
 		{
 			ZLog::Write(LOGLEVEL_ERROR, "Malformed attachment name '$attname' in GetAttachmentData!");
-			throw new StatusException("Malformed attachment name '$attname' in GetAttachmentData!");
+			throw new StatusException("Malformed attachment name '$attname' in GetAttachmentData!", SYNC_ITEMOPERATIONSSTATUS_INVALIDATT);
 		}
 		
 		list($uid, $part, $encoding, $mailbox) = explode(":", $attname);
@@ -476,20 +476,20 @@ class MailStore extends Store implements ISearchProvider {
 
 		$imap = $this->_imapLogon($mailbox);
 		if(!$imap)
-			throw new StatusException("Unable to connect to IMAP server in GetAttachmentData!");
+			throw new StatusException("Unable to connect to IMAP server in GetAttachmentData!", SYNC_ITEMOPERATIONSSTATUS_INVALIDATT);
 		
 		$tmpfile = \GO\Base\Fs\File::tempFile();
 		$this->_tmpFiles[]=$tmpfile;
 		
 
 		if(!$imap->save_to_file($uid, $tmpfile->path(), $part, $enc)){
-			throw new StatusException("Failed to save attachment");
+			throw new StatusException("Failed to save attachment", SYNC_ITEMOPERATIONSSTATUS_INVALIDATT);
 		}
 		
 		$fp = fopen($tmpfile->path(),'r');
 		
 		if(!$fp){
-			throw new StatusException("Could not open attachment file stream");
+			throw new StatusException("Could not open attachment file stream", SYNC_ITEMOPERATIONSSTATUS_INVALIDATT);
 		}
 	
 		$attachment = new SyncItemOperationsAttachment();
@@ -944,11 +944,8 @@ class MailStore extends Store implements ISearchProvider {
 				$refImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($imapAccount, $oldMessageFolderID, $oldMessageUID);
 				
 				if($refImapMessage) {
-					$headers = $sendMessage->getHeaders();
-					$headers->removeAll("In-Reply-To");
-					$headers->removeAll("References");
-					$headers->addTextHeader('In-Reply-To', "<" . $refImapMessage->message_id . ">");
-					$headers->addTextHeader('References', "<" . $refImapMessage->message_id  . ">");
+					$sendMessage->setInReplyTo($refImapMessage->message_id);
+					$sendMessage->setReferences($refImapMessage->message_id);
 				}
 			}
 			
@@ -973,7 +970,7 @@ class MailStore extends Store implements ISearchProvider {
 						//re-attach attachments
 						foreach ($attachments as $attachment) {		
 							$file = new \GO\Base\Fs\File(GO::config()->tmpdir.$attachment->getTempFile());				
-							$att = Swift_Attachment::fromPath($file->path(),$file->mimeType());
+							$att = \go\core\mail\Attachment::fromPath($file->path(),$file->mimeType());
 							$sendMessage->attach($att);			
 						}
 					}
@@ -986,15 +983,15 @@ class MailStore extends Store implements ISearchProvider {
 			// Implement to always set the GO alias to sent emails
 			$alias = $imapAccount->getDefaultAlias();
 			$sendMessage->setFrom($alias->email, $alias->name);
+			$sendMessage->getMailer()->setEmailAccount($imapAccount);
 			ZLog::Write(LOGLEVEL_DEBUG, 'beforesend');
-			$mailer = \GO\Base\Mail\Mailer::newGoInstance(\GO\Email\Transport::newGoInstance($imapAccount));
-			$failedRecipients=array();
-			$success = $mailer->send($sendMessage, $failedRecipients);
+			$success = $sendMessage->send();
 			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~SEND~~'.$success);
-			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~FAILED RECIPIENTS~~'.var_export($failedRecipients,true));
 			//if a sent items folder is set in the account then save it to the imap folder
 			if($success) {
 				$imapAccount->saveToSentItems($sendMessage);
+			} else{
+				ZLog::Write(LOGLEVEL_ERROR, 'goMail->SendMail()~~SENDERROR: '.$sendMessage->getMailer()->lastError());
 			}
 			
 			ZLog::Write(LOGLEVEL_DEBUG, 'MAIL IS SENT SUCCESSFULLY::::::::'.$success);
@@ -1002,16 +999,36 @@ class MailStore extends Store implements ISearchProvider {
 		catch (Exception $e){
 			ZLog::Write(LOGLEVEL_FATAL, 'goMail->SendMail() ~~ ERROR:'.$e);
 			
-			throw new StatusException($e->getMessage());
+			throw new StatusException($e->getMessage(), SYNC_COMMONSTATUS_MAILSUBMISSIONFAILED);
 		}
 		
 		if(!$success){
-			throw new StatusException("Could not send mail. Please check the logs.");
+			throw new StatusException("Could not send mail. Please check the logs.", SYNC_COMMONSTATUS_MAILSUBMISSIONFAILED);
 		}
 		
 		ZLog::Write(LOGLEVEL_DEBUG, 'endsend: '.var_export($success, true));
 		
 		return true;
+	}
+
+
+	/**
+	 * Microsoft AQS
+	 *
+	 * https://support.microsoft.com/en-us/office/search-mail-and-people-in-outlook-com-88108edf-028e-4306-b87e-7400bbb40aa7?ui=en-us&rs=en-us&ad=us
+	 * @param string $text
+	 * @return void
+	 */
+	private function parseSearchFreeText(string $text) {
+		//to:"Test" OR cc:"Test" OR from:"Test" OR subject:"Test" OR "Test"
+		//
+
+		if(preg_match('/"([^"]+)"/', $text, $matches)) {
+			return $matches[1];
+		} else{
+			return $text;
+		}
+
 	}
 	
  /**
@@ -1032,28 +1049,22 @@ class MailStore extends Store implements ISearchProvider {
 		$searchwords = $cpo->GetSearchFreeText();
 		// split the search on whitespache and look for every word
 //		$searchwords = preg_split("/\W+/", $searchwords);
+
+		$searchwords = $this->parseSearchFreeText($searchwords);
 		
 		$searchFolder = $cpo->GetSearchFolderid(); // RESULTS IN "m/INBOX" OR "m/Concepten"
 		if(!$searchFolder) {
 			//happens when searching "All folders" on iphone but we don't support this yet.
 			$searchFolder = 'INBOX';
 		} else {
-			$searchFolder = substr($searchFolder, 2); // REMOVE THE "m/" from the folder id
+
+			if(!empty($searchFolder) && substr($searchFolder, 0, 2) == 'm/')
+				$searchFolder = substr($searchFolder, 2);// REMOVE THE "m/" from the folder id
 		}
 		
 		// Build the imap search query
 		$searchData = $cpo->GetData();
-//		$imapSearchQuery = new \GO\Email\Model\ImapSearchQuery();
-//		
-//		foreach($searchwords as $word){
-//			$imapSearchQuery->addSearchWord($word, \GO\Email\Model\ImapSearchQuery::FROM);
-//			$imapSearchQuery->addSearchWord($word, \GO\Email\Model\ImapSearchQuery::SUBJECT);
-//			$imapSearchQuery->addSearchWord($word, \GO\Email\Model\ImapSearchQuery::TO);
-//			$imapSearchQuery->addSearchWord($word, \GO\Email\Model\ImapSearchQuery::CC);
-//		}
-//		
-		
-		
+
 		$query = 'OR OR OR FROM "'.$searchwords.'" SUBJECT "'.$searchwords.'" TO "'.$searchwords.'" CC "'.$searchwords.'"';
 		
 		if(isset($searchData['searchdatereceivedgreater']) && $searchData['searchdatereceivedgreater']){
@@ -1069,10 +1080,6 @@ class MailStore extends Store implements ISearchProvider {
 			$query .= ' BEFORE '.date('d-M-Y',$searchLess);
 		}
 
-//		$query = $imapSearchQuery->getImapSearchQuery();
-		
-//		$query = ' FROM "kadaster"  OR TO "kadaster"  OR CC "kadaster"  OR SUBJECT "kadaster" BEFORE 28-Feb-2013 SINCE 28-Aug-2012 ';
-//		
 
 		$maxPageSize = 30;
 		
@@ -1090,20 +1097,20 @@ class MailStore extends Store implements ISearchProvider {
 			$rangeend=$rangestart+$maxPageSize;
 		}
 
-        ZLog::Write(LOGLEVEL_INFO,'QUERY ~~ '.var_export($query,true) . ' range: ' . $rangestart.' - '. $rangeend);
+    ZLog::Write(LOGLEVEL_INFO,'QUERY ~~ '.var_export($query,true) . ' range: ' . $rangestart.' - '. $rangeend);
 
-        $messages = \GO\Email\Model\ImapMessage::model()->find(
-					$imapAccount, 
-					$searchFolder,
-					$rangestart, 
-					$rangeend-$rangestart,
-					\GO\Base\Mail\Imap::SORT_DATE, 
-					true, 
-					$query);
+    $messages = \GO\Email\Model\ImapMessage::model()->find(
+			$imapAccount,
+			$searchFolder,
+			$rangestart,
+			$rangeend-$rangestart,
+			\GO\Base\Mail\Imap::SORT_DATE,
+			true,
+			$query);
 		
 		$items = array();
 		$items['searchtotal'] = $imapAccount->getImapConnection()->sort_count;
-        $items["range"] = $rangestart.'-'.$rangeend;
+		$items["range"] = $rangestart.'-'.$rangeend;
 		
 		foreach($messages as $message){
 			$items[] = array(
@@ -1111,7 +1118,7 @@ class MailStore extends Store implements ISearchProvider {
 					'longid' => 'm/'.$searchFolder.':'.$message->uid,
 					'folderid' => 'm/'.$searchFolder
 			);
-		}		
+		}
 		return $items;
 	}
 	

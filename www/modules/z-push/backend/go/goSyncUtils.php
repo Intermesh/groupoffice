@@ -188,11 +188,9 @@ class GoSyncUtils {
 				return $message->body;
 
 			if (isset($message->rtf)) {
-				$rtfParser = new RtfAlias();
-				$rtfParser->output('ascii');
-				$rtfParser->loadrtf(base64_decode($message->rtf));
-				$rtfParser->parse();
-				return $rtfParser->out;
+				ZLog::Write(LOGLEVEL_DEBUG, "BackendGO RTF Format NOT SUPPORTED");
+				// TODO: this is broken. This is no RTF.
+				$data = base64_encode($message->rtf);
 			}
 		}
 		return "";

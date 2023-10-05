@@ -86,7 +86,8 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		return parent::formatColumns($columnModel);
 	}
 
-	
+	private $_defaultTemplate;
+
 	public function actionEmailSelection($params){	
 				
 		// 'type' is only set by the client if a template should be selected as default.
