@@ -134,6 +134,27 @@ class GoSyncUtils {
 		return $sbBody;
 	}
 
+	public static function createASBody($data, $contentparameters): SyncBaseBody
+	{
+		$sbReturnType = GoSyncUtils::getBodyPreferenceMatch($contentparameters->GetBodyPreference());
+		$asBodyData = StringUtil::normalizeCrlf($data);
+		$isHTML = ($sbReturnType == SYNC_BODYPREFERENCE_HTML);
+
+		if(!isset($asBodyData)) {
+			$asBodyData = "";
+		}
+		if ($isHTML) {
+			$asBodyData = StringHelper::text_to_html($asBodyData);
+		}
+		$sbBody = new SyncBaseBody();
+		$sbBody->truncated = 0;
+		$sbBody->type = $isHTML ? SYNC_BODYPREFERENCE_HTML : SYNC_BODYPREFERENCE_PLAIN;
+		$sbBody->estimatedDataSize = strlen($asBodyData);
+		$sbBody->data = StringStreamWrapper::Open($asBodyData);
+
+		return $sbBody;
+	}
+
 	/**
 	 * Get the body text of the message
 	 *
