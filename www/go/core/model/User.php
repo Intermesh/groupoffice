@@ -817,7 +817,7 @@ class User extends AclItemEntity {
 	}
 
 
-	protected function internalGetModified(&$properties = [], bool $forIsModified = false)
+	protected function internalGetModified(array|string &$properties = [], bool $forIsModified = false): bool|array
 	{
 		// check if it's empty because the parent method will fill it with all props
 		$allProps = empty($properties);
