@@ -242,7 +242,8 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	public static function convertValueToArray($value) {
+	public static function convertValueToArray(mixed $value): mixed
+	{
 		if ($value instanceof ArrayableInterface) {
 			return $value->toArray();
 		} elseif (is_array($value)) {
@@ -251,18 +252,14 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			}
 			return $value;
 		} else if($value instanceof ArrayObject) {
-
-			if(empty($value)) {
-				return $value;
-			}
 			$arr = $value->getArray();
 			foreach ($arr as $key => $v) {
 				$arr[$key] = static::convertValueToArray($v);
 			}
 			return $arr;
-		} else if($value instanceof DateTime) { //if (is_null($value) || is_scalar($value) || $value instanceof \StdClass) {
+		} else if($value instanceof DateTime) {
 			return (string) $value;
-		} else if($value instanceof \DateTimeInterface) { //if (is_null($value) || is_scalar($value) || $value instanceof \StdClass) {
+		} else if($value instanceof \DateTimeInterface) {
 			return $value->format(DateTime::FORMAT_API);
 		}else{
 			return $value;

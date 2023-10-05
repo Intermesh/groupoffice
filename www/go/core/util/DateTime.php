@@ -4,7 +4,6 @@ namespace go\core\util;
 use DateTime as PHPDateTime;
 use DateTimeZone;
 use Exception;
-use go\core\data\ArrayableInterface;
 use go\core\model\User;
 use JsonSerializable;
 
@@ -15,7 +14,7 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	 *
 	 * @var bool
 	 */
-	public $hasTime = true;
+	public bool $hasTime = true;
 	
 	/**
 	 * The date outputted to the clients. It's according to ISO 8601;	 
@@ -27,8 +26,8 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	 */
 	const FORMAT_API_DATE_ONLY = "Y-m-d";
 
-	#[\ReturnTypeWillChange]
-	public function jsonSerialize() {
+	public function jsonSerialize(): mixed
+	{
 		return $this->format($this->hasTime ? self::FORMAT_API : self::FORMAT_API_DATE_ONLY);
 	}
 	
@@ -36,7 +35,7 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 		return $this->format($this->hasTime ? self::FORMAT_API : self::FORMAT_API_DATE_ONLY);
 	}
 
-	private static $currentUser;
+	private static ?User $currentUser;
 
 	private static function currentUser() : User {
 		if(!isset(self::$currentUser)) {
@@ -77,7 +76,7 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	 * @return static
 	 * @throws Exception
 	 */
-	public static function createFromFormat($format, $datetime, DateTimeZone $timezone = null): DateTime
+	public static function createFromFormat(string $format, string $datetime, DateTimeZone $timezone = null): DateTime
 	{
 		return new static("@" . parent::createFromFormat($format, $datetime, $timezone)->format("U"));
 	}
