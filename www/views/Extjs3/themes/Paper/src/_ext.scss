@@ -395,10 +395,13 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 .x-form-grow-sizer {
 	font-family: $font-family;
 	@extend %font-data;
-	padding: dp(6) dp(8);
-	min-height: dp(32);
-	line-height: dp(18);
-	border: 1px solid red;
+	padding: dp(11) dp(16);
+	min-height: dp(44);
+	line-height: dp(20);
+
+	//For debugging:
+	//background-color:white;
+	//border: 1px solid red;
 	//color: red;
 	//top: 10px;
 	//left: 10px;

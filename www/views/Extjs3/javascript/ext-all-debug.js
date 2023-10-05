@@ -40799,7 +40799,7 @@ Ext.form.TextArea = Ext.extend(Ext.form.TextField,  {
     growMin : 60,
     
     growMax: 1000,
-    growAppend : '&#160;\n&#160;',
+    growAppend : '',
 
     enterIsSpecial : false,
 
@@ -40866,9 +40866,7 @@ Ext.form.TextArea = Ext.extend(Ext.form.TextField,  {
             v = "&#160;&#160;";
         }else{
             v += this.growAppend;
-            if(Ext.isIE){
-                v = v.replace(/\n/g, '&#160;<br />');
-            }
+          
         }
         ts.innerHTML = v;
         h = Math.min(this.growMax, Math.max(ts.offsetHeight, this.growMin));
