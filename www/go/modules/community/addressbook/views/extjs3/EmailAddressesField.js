@@ -21,7 +21,7 @@
 				anchor: "100%",
 				layout: "form",
 				xtype: "container",
-				cls: "go-hbox",
+				cls: "go-hbox condensed-form",
 				items: [
 					{
 						fieldLabel: t("Type"),

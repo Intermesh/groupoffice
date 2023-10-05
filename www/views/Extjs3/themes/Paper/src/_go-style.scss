@@ -1953,33 +1953,9 @@ table[id^="comments-ext"] b {
 		margin-bottom: dp(16);
 	}
 
-	.go-form-group-row {
-		.go-hbox {
-			gap: 0;
-
-			.x-form-focus, x-form-invalid {
-				border-color: color($fg, 'track');
-				box-shadow: none;
-			}
-
-			.x-form-item:not(:last-child) {
-				.x-form-field {
-					border-top-right-radius: 0;
-					border-bottom-right-radius: 0;
-				}
 
 
-			}
 
-			.x-form-item + .x-form-item {
-				margin-left: -1px; //to hide border
-				.x-form-field {
-					border-top-left-radius: 0;
-					border-bottom-left-radius: 0;
-				}
-			}
-		}
-	}
 }
 
 
@@ -2889,4 +2865,31 @@ table[id^="comments-ext"] b {
 .go-color-field {
 		padding-left: dp(40);
 
+}
+
+
+.go-hbox.condensed-form {
+	gap: 0;
+
+	.x-form-focus, x-form-invalid {
+		border-color: color($fg, 'track');
+		box-shadow: none;
+	}
+
+	.x-form-item:not(:last-child) {
+		.x-form-field {
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+
+
+	}
+
+	.x-form-item + .x-form-item {
+		margin-left: -1px; //to hide border
+		.x-form-field {
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+	}
 }
