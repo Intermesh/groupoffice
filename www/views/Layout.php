@@ -60,9 +60,9 @@ $lang = go()->getLanguage()->getIsoCode();
 <?php endif;?>
 
 <?php if($loadGoui): ?>
-    <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/goui/dist/groupoffice.css" />
-    <link rel="stylesheet" media="screen and (max-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/goui/dist/groupoffice-mobile.css" />
-    <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/groupoffice-core/dist/style.css" />
+    <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/dist/goui/style/groupoffice.css" />
+    <link rel="stylesheet" media="screen and (max-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/dist/goui/style/groupoffice-mobile.css" />
+    <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/dist/groupoffice-core/style/style.css" />
 <?php endif; ?>
 
 <?php if(!empty(GO()->getConfig()['custom_css_url'])): ?>
