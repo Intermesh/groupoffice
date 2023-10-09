@@ -134,7 +134,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.fireEvent('reset', this);
 	},
 
-	onLoad: function () {
+	onLoad: async function () {
 		
 		go.Translate.setModule(this.package, this.module);
 
@@ -171,7 +171,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.load(id);
 	},
 	
-	internalLoad : function(data) {
+	internalLoad : async function(data) {
 
 		//in case user destroys panel while loading
 		if(this.isDestroyed) {
@@ -188,19 +188,18 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		console.log(this.entityStore.entity.name, data)
 
 		if(!this.relations.length) {
-			this.onLoad();
+			await this.onLoad();
 			this.fireEvent('load', this);
 			return Promise.resolve(data);
 		}	
 		
-		return go.Relations.get(this.entityStore, data, this.relations).then((result) => {
+		return go.Relations.get(this.entityStore, data, this.relations).then(async (result) => {
 			this.watchRelations = result.watch;
+			await this.onLoad();
+			this.fireEvent('load', this);
 			return data;
 		}).catch((result) => {
 			console.warn("Failed to fetch relation", result);
-		}).finally(() => {
-			this.onLoad();
-			this.fireEvent('load', this);
 		});
 		
 	},
