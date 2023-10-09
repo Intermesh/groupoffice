@@ -97,7 +97,7 @@ class Utils {
 	public static function databaseExists(string $databaseName): bool
 	{
 		$stmt = App::get()->getDbConnection()->query('SHOW DATABASES');
-		while ($r = $stmt->fetch()) {
+		while ($r = $stmt->fetch(PDO::FETCH_NUM)) {
 			if ($r[0] == $databaseName) {
 				$stmt->closeCursor();
 				return true;
