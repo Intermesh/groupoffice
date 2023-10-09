@@ -1,6 +1,7 @@
 - Core: Raised SSE check interval from 10s to 30s for performance
 - Core: Moved disk cache to temp dir so it can be put on faster partitions
 - Tasks: Add message field for first comment
+- Supportclient: add a mask when submitting a new request
 
 29-09-2023: 6.8.7
 - Email: bcc and cc bug
