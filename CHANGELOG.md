@@ -1,3 +1,4 @@
+10-10-2023: 6.8.8
 - Core: Raised SSE check interval from 10s to 30s for performance
 - Core: Moved disk cache to temp dir so it can be put on faster partitions
 - Tasks: Add message field for first comment
