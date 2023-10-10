@@ -1,4 +1,4 @@
-6.7.50
+10-10-2023: 6.7.50
 - Addressbook: Added filter for has organization
 - Core: Raised SSE check interval from 10s to 30s for performance
 - Core: Moved disk cache to temp dir so it can be put on faster partitions
