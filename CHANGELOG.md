@@ -1,3 +1,4 @@
+6.7.50
 - Addressbook: Added filter for has organization
 - Core: Raised SSE check interval from 10s to 30s for performance
 - Core: Moved disk cache to temp dir so it can be put on faster partitions
@@ -255,6 +256,14 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+10-10-2023: 6.6.173
+- Email: show attachments if sent as email, both for IMAP and as linked email.
+- Core: global 'Add' button
+- Core: fixed awkward DE translation
+
+27-09-2023: 6.6.172
+- Leavedays: bugfix in leave day requset
+>
 25-09-2023: 6.6.171
 - Leavedays: bugfix - employee can request leave day budgets
 - Core: Add Jersey and Isle of Man to countries list

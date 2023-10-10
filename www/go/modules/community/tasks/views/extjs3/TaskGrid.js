@@ -1,5 +1,4 @@
 go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
-	//autoExpandColumn: 'title',
 	// config options for stateful behavior
 	stateful: true,
 	stateId: 'tasks-grid-main',

@@ -5,7 +5,7 @@ namespace GO\Email\Model;
 
 use GO\Base\Fs\File;
 use go\core\ErrorHandler;
-use go\core\util\DateTime;
+use GO\Base\Util\StringHelper;
 
 class SavedMessage extends ComposerMessage
 {
@@ -68,10 +68,11 @@ class SavedMessage extends ComposerMessage
 	{
 		$decoder = new \GO\Base\Mail\MimeDecode($mimeData);
 		$structure = $decoder->decode(array(
-				'include_bodies' => true,
-				'decode_headers' => true,
-				'decode_bodies' => true
-						));
+			'include_bodies' => true,
+			'decode_headers' => true,
+			'decode_bodies' => true,
+			'rfc_822bodies' => true
+		));
 		
 		if (!$structure)
 			throw new \Exception("Could not decode mime data:\n\n $mimeData");
