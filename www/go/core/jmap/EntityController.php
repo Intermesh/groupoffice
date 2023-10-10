@@ -306,20 +306,29 @@ abstract class EntityController extends Controller {
 				} else{
 					 $totalQuery = clone $idsQuery;
 
-					 if(count($idsQuery->getGroupBy())) {
-					 	$totalQuery->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)");
-					 } else{
-						 //count(*) can be used because we use a subquery in AclItemEntity::applyAclToQuery()
-						 $totalQuery->selectSingleValue("count(*)");
+					 if(count($idsQuery->getHaving())) {
+						 $totalQuery->orderBy([], false)
+							 ->limit(0)
+							 ->offset(0);
+
+						 $totalQuery = (new Query())->selectSingleValue('count(*)')->from($totalQuery);
+					 } else {
+						 if (count($idsQuery->getGroupBy())) {
+							 $totalQuery->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)");
+						 } else {
+							 //count(*) can be used because we use a subquery in AclItemEntity::applyAclToQuery()
+							 $totalQuery->selectSingleValue("count(*)");
+						 }
+
+						 $totalQuery->orderBy([], false)
+							 ->groupBy([])
+							 ->limit(1)
+							 ->offset(0);
+
+
 					 }
 
-						$totalQuery->orderBy([], false)
-							->groupBy([])
-							->limit(1)
-							->offset(0);
-
-					 $response['total'] = $totalQuery->single();
-
+					$response['total'] = $totalQuery->single();
 					if(go()->getDebugger()->enabled) {
 						$response['totalQuery'] = (string) $totalQuery;
 					}
