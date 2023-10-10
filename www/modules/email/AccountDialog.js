@@ -307,7 +307,7 @@ GO.email.AccountDialog = function(config) {
 		this.smtpAllowSelfSignedCheck,
 		this.imapCredentialsCbx = new Ext.ux.form.XCheckbox({
 			hideLabel: true,
-			boxLabel: t("Use IMAP credentials", "email","communtiy"),
+			boxLabel: t("Use IMAP credentials", "email"),
 			name: 'force_smtp_login',
 			handler: function(cb, checked) {
 				if(checked) {
