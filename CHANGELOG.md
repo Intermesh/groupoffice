@@ -1,3 +1,4 @@
+10-10-2023: 6.6.173
 - Email: show attachments if sent as email, both for IMAP and as linked email.
 - Core: global 'Add' button
 - Core: fixed awkward DE translation
