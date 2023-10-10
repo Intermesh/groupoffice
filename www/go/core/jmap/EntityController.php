@@ -313,13 +313,16 @@ abstract class EntityController extends Controller {
 						 $totalQuery->selectSingleValue("count(*)");
 					 }
 
-					 $response['total'] = $totalQuery
+						$totalQuery->orderBy([], false)
+							->groupBy([])
+							->limit(1)
+							->offset(0);
 
-					 								->orderBy([], false)
-					 								->groupBy([])
-					 								->limit(1)
-					 								->offset(0)
-					 								->single();
+					 $response['total'] = $totalQuery->single();
+
+					if(go()->getDebugger()->enabled) {
+						$response['totalQuery'] = (string) $totalQuery;
+					}
 				}
 			}
 		}catch(PDOException $e) {
