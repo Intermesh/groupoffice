@@ -2876,6 +2876,8 @@ table[id^="comments-ext"] b {
 		box-shadow: none;
 	}
 
+
+
 	.x-form-item:not(:last-child) {
 		.x-form-field {
 			border-top-right-radius: 0;
@@ -2891,5 +2893,11 @@ table[id^="comments-ext"] b {
 			border-top-left-radius: 0;
 			border-bottom-left-radius: 0;
 		}
+	}
+}
+
+.go-composite-field {
+	.x-form-item {
+		padding: 0;
 	}
 }

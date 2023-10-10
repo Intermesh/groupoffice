@@ -1,5 +1,8 @@
-go.filter.types.number = Ext.extend(Ext.Panel, {
-	layout: "hbox",
+go.filter.types.number = Ext.extend(Ext.Container, {
+	layout: "form",
+	xtype: "container",
+	cls: "go-hbox condensed-form go-composite-field",
+hideLabel: true,
 	flex: 1,
 	/**
 	 * Filter definition
@@ -13,7 +16,6 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 	 */
 	filter: null,
 	initComponent: function () {
-		
 		this.operatorCombo = new go.form.ComboBox({
 				
 				hideLabel: true,
@@ -36,7 +38,7 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 				editable: false,
 				selectOnFocus: true,
 				forceSelection: true,
-				width: Math.ceil(dp(200))
+				width: dp(200)
 			});
 			
 			
