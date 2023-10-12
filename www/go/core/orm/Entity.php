@@ -1121,8 +1121,8 @@ abstract class Entity extends Property {
    * public static function sort(Query $query, array $sort) {
    *
    *    if(isset($sort['special'])) {
-   *      $query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);
-   *      unset($sort['special']);
+   *      $query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT');
+   *      $sort->renameKey('special', 'u.displayName');
    *    }
    *
    *
