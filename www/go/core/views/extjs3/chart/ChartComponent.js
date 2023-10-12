@@ -15,6 +15,10 @@ go.chart.ChartComponent = Ext.extend(Ext.BoxComponent, {
 		console.warn(datasets, labels);
 
 		if(!this.chart) {
+			// this.on("resize", () => {
+			// 	debugger;
+			// 	this.chart.resize();
+			// })
 			this.on("destroy", () => {
 				if(this.chart) {
 					this.chart.destroy();
