@@ -2905,8 +2905,10 @@ table[id^="comments-ext"] b {
 .chart-container {
 
 	margin: 0 auto;
+
+	text-align: center;
 	canvas {
-		margin: 0 auto;
+		display: inline-block;
 	}
 
 }
