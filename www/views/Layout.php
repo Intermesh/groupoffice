@@ -51,6 +51,8 @@ $lang = go()->getLanguage()->getIsoCode();
 	$authController->fireEvent('head');
     go()->fireEvent(App::EVENT_HEAD);
 ?>
+
+
 	<script type="text/javascript">
 		GO.util.density = GO.util.isMobileOrTablet() ? 160 :  <?= isset($density) ? $density : 140?>;
 	</script>

@@ -6,29 +6,76 @@ go.chart.ChartComponent = Ext.extend(Ext.BoxComponent, {
 		*/
 	cls:'chart-container',
 
-	chartType: "Line",
+	chartType: "bar",
 
-	update: function(series, labels){
+	options: null,
 
-		var data = {
-			series: series
-		};
+	update: function(datasets, labels){
 
-		if( this.labels && !labels) {
-			data.labels =  this.labels;
-		}
-
-		if(labels) {
-			data.labels = labels;
-		}
+		console.warn(datasets, labels);
 
 		if(!this.chart) {
-			this.chart = new Chartist[this.chartType]("#" + this.el.id, data, this.options || {});
-		} else
-		{
-			this.chart.update(data);
-		}
+			this.on("destroy", () => {
+				if(this.chart) {
+					this.chart.destroy();
+				}
+			}, this);
 
+			this.canvas = document.createElement("canvas");
+			this.el.dom.appendChild(this.canvas);
+
+			this.chart = new Chart(this.canvas, {
+
+				type: this.chartType,
+				data: {
+					labels: labels,
+					datasets: datasets
+				},
+				options: this.options || {}
+			});
+		} else {
+			this.chart.data.datasets = datasets;
+			this.chart.data.labels = labels;
+			this.chart.update();
+		}
+	},
+
+	download: function(filename) {
+
+		this.canvas.toBlob((blob) => {
+
+			// Create a temporary link element
+			const link = document.createElement('a');
+
+			// Set the download attribute and the filename
+			link.download = filename;
+
+			// Create a URL for the Blob object
+			link.href = window.URL.createObjectURL(blob);
+
+			// Simulate a click on the link element to trigger the download
+			link.click();
+
+			// Clean up the URL object
+			window.URL.revokeObjectURL(link.href);
+
+// Trigger the download
+			a.click();
+		});
+	},
+
+	copy: function() {
+		try {
+			this.canvas.toBlob((blob) => {
+				navigator.clipboard.write([
+					new ClipboardItem({
+						'image/png': blob
+					})
+				]);
+			})
+		} catch (error) {
+			console.error(error);
+		}
 	}
 	
 });
