@@ -105,14 +105,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	 * 
 	 */
 	modelName : false,
-	
 
-	
-	/**
-	 * Enable the customfields tab when the customfieldsmodule is installed
-	 */
-//	enableCustomfields : false,	 // NOT YET USED BUT NEEDS TO REPLACE THE customFieldType FIELD
-	
 	/**
 	 * If set this panel will automatically listen to an acl_id field in the model.
 	 */
@@ -222,15 +215,11 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 			});
 		}
 
-
-		
 		this._panels=[];
 		
 		this._relatedGrids=[];
 
 		this.buildForm();
-
-		
 
 		this.addCustomFields();
 	
@@ -419,8 +408,6 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		this.formPanel.form.baseParams = this.formPanel.form.baseParams || {};
 		
 		var p = Ext.apply(this.formPanel.form.baseParams, params);
-//		var values = Ext.apply(p,this.formPanel.form.getValues()); // BROKEN
-	//	var values = Ext.applyIf(this.formPanel.form.getFieldValues(),p); // APPLYIF NEEDED????
 		var values = Ext.apply(this.formPanel.form.getFieldValues(),p);
 		values = Ext.apply(this.formPanel.form.getValues(),values);
 
