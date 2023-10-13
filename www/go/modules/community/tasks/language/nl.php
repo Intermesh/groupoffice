@@ -8,8 +8,6 @@ return array (
   'Select category' => 'Selecteer categorie',
   'Task' => 'Taak',
   'Tasks' => 'Taken',
-  'List' => 'Lijst',
-  'Lists' => 'Lijsten',
   'start' => 'begin',
   'due' => 'eind',
   'completed' => 'voltooid',
