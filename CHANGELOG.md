@@ -1,3 +1,5 @@
+- Notes /Comments: Fixed you're not allowed to paste scripts
+
 10-10-2023: 6.7.50
 - Addressbook: Added filter for has organization
 - Core: Raised SSE check interval from 10s to 30s for performance
