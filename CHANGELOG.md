@@ -37,6 +37,8 @@
 
 -- 6.8 --
 
+- Notes /Comments: Fixed you're not allowed to paste scripts
+
 10-10-2023: 6.7.50
 - Addressbook: Added filter for has organization
 - Core: Raised SSE check interval from 10s to 30s for performance
@@ -46,17 +48,6 @@
 26-09-2023: 6.7.49
 - Core: fix casting error when saving cropped blob (e.g. avatar)
 - Core: Multiselect custom field was broken for activerecord
-
-19-09-2023: 6.7.48
-- Leavedays: fix error upon exporting leaveday hours
-- Core: fix error in user export
-- Supportclient: New Italian translations. Grazie, CENSEA DUE
-
-14-09-2023: 6.7.47
-- Addressbook: Name bug when middle name was entered contact was connected to user.
-- Core: Fixed install failure when MySQL's default engine was not set to InnoDB (GitHub issue #1049)
-- Core: Log client errors on server via JMAP call
-
 
 19-09-2023: 6.7.48
 - Leavedays: fix error upon exporting leaveday hours
