@@ -1,3 +1,5 @@
+- Core / newsletters: fix email template upload
+
 11-10-2023: 6.8.9
 - Hotfix: business install and update scripts
 

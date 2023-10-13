@@ -11,26 +11,44 @@ use go\core\model;
 
 class EmailTemplate extends EntityController {
 
-	protected function entityClass(): string {
+	protected function entityClass(): string
+	{
 		return model\EmailTemplate::class;
 	}
 
-	public function query($params) {
+	public function query(array $params)
+	{
 		return $this->defaultQuery($params);
 	}
 
-	public function get($params) {
+	public function get(array $params)
+	{
 		return $this->defaultGet($params);
 	}
 
-	public function fromZip($params) {
+	/**
+	 * @param array $params
+	 * @return false|model\EmailTemplate
+	 * @throws InvalidArguments
+	 */
+	public function fromZip(array $params)
+	{
 		// must have BlobId, Subject will be echoed back for result reference
-
 		$blob = Blob::findById($params['blobId']);
-		if(!empty($blob)) {
+		// For now, only newsletts uses this
+		if(!isset($params['module']) || !isset($params['package'])) {
+			throw new InvalidArguments();
+		}
+		$modName = $params['module'];
+		$package = $params['package'];
+
+		if (!empty($blob)) {
 			$tpl = model\EmailTemplate::fromBlob($blob);
-			if(!empty($params['subject']));
+			if (!empty($params['subject'])) {
 				$tpl->subject = $params['subject'];
+			}
+			$module = model\Module::findByName($package, $modName);
+			$tpl->moduleId = $module->id;
 			return $tpl;
 		}
 		return false;

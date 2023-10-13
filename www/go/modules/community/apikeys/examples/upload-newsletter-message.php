@@ -49,7 +49,9 @@ if(isset($_POST['blobId'])) {
 		["EmailTemplate/fromZip",
 			[
 				"blobId" => $_POST['blobId'],
-				"subject" => "Hello world!"
+				"subject" => "Hello world!",
+                "module" => "newsletters",
+                "package" => "business"
 			],
 			"clientCallId-1"
 		]
