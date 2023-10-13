@@ -434,9 +434,9 @@ abstract class EntityController extends Controller {
 
 		if(!empty($params['ids'])) {
 			$params['ids'] = array_unique($params['ids']);
-			$params['ids'] = array_filter($params['ids'], function($id) {
-				return !empty($id);
-			});
+//			$params['ids'] = array_filter($params['ids'], function($id) {
+//				return !empty($id);
+//			});
 		}
 
 		if(!isset($params['properties'])) {
