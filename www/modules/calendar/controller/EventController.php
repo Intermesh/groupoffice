@@ -31,6 +31,7 @@ use GO\Base\Db\FindParams;
 use GO\Base\Fs\File;
 use GO\Calendar\Exception\AskPermission;
 use GO\Calendar\Model\Event;
+use GO\Calendar\Model\UserSettings;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\model\Module;
@@ -846,11 +847,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			\GO::config()->save_setting('ms_categories', implode(',', json_decode($_REQUEST['categories'])), \GO::session()->values['user_id']);
 		}
 		
-		if(!empty($params['start_time']))
+		if (!empty($params['start_time'])) {
 			$startTime = $params['start_time'];
-		else
-			$startTime = date('Y-m-d h:m',time());
-		
+		} else {
+			$startTime = date('Y-m-d h:m', time());
+		}
 		if(!empty($params['end_time'])) {
 			$endTime = $params['end_time'];
 		} else {
@@ -858,25 +859,24 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		}
 		// Check for the given calendars if they have events in the given period
 		if(!empty($params['view_id'])){
-				$view = \GO\Calendar\Model\View::model()->findByPk($params['view_id']);
-				if(!$view)
-					throw new \GO\Base\Exception\NotFound();
-				
-				//$calendarModels = $view->calendars;
-				$calendarModels = array_merge($view->getGroupCalendars()->fetchAll(), $view->calendars->fetchAll());
-				$calendars=array();
-				foreach($calendarModels as $calendar){
-					$calendars[]=$calendar->id;
-				}
+			$view = \GO\Calendar\Model\View::model()->findByPk($params['view_id']);
+			if(!$view) {
+				throw new \GO\Base\Exception\NotFound();
+			}
 
-				if(!$view->owncolor) {
-					$this->overrideColors = false;
-				}
-		}else
-		{
-			if(!isset($params['calendars']))
+			$calendarModels = array_merge($view->getGroupCalendars()->fetchAll(), $view->calendars->fetchAll());
+			$calendars=array();
+			foreach($calendarModels as $calendar){
+				$calendars[]=$calendar->id;
+			}
+
+			if(!$view->owncolor) {
+				$this->overrideColors = false;
+			}
+		} else {
+			if(!isset($params['calendars'])) {
 				throw new \Exception("Missing parameter 'calendars'");
-			
+			}
 			$calendars = json_decode($params['calendars']);
 		}
 		
