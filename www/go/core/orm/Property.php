@@ -841,6 +841,12 @@ abstract class Property extends Model {
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())
 						->setModel(static::class, $fetchProperties, $readOnly, $owner);
 
+
+		$mappedQuery = static::getMapping()->getQuery();
+		if (isset($mappedQuery)) {
+			$query->mergeWith($mappedQuery);
+		}
+
 		self::joinAdditionalTables($tables, $query);
 		self::buildSelect($query, $fetchProperties, $readOnly);
 
@@ -959,10 +965,7 @@ abstract class Property extends Model {
 
 		$query->select($select, true);
 
-		$mappedQuery = static::getMapping()->getQuery();
-		if (isset($mappedQuery)) {
-			$query->mergeWith($mappedQuery);
-		}
+
 	}
 
   /**

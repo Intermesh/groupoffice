@@ -229,7 +229,6 @@ trait SearchableTrait {
 
 	/**
 	 *
-	 * @param class-string<Entity> $cls
 	 * @param int $offset
 	 * @return Statement
 	 * @throws Exception
@@ -253,7 +252,6 @@ trait SearchableTrait {
 	}
 
 	/**
-	 * @param class-string<Entity> $cls
 	 * @throws Exception
 	 */
 	public static function rebuildSearchForEntity() {
@@ -268,6 +266,7 @@ trait SearchableTrait {
 			->where('entityTypeId', '=', $cls::entityType()->getId())
 			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue($cls::getMapping()->getPrimaryTable()->getAlias() . '.id'))
 		);
+
 		$stmt->execute();
 
 		go()->getDbConnection()->exec("commit");
