@@ -41,6 +41,7 @@
 -- 6.8 --
 
 - Notes /Comments: Fixed you're not allowed to paste scripts
+- Finance: Remove invalid chars in PDF filename
 
 10-10-2023: 6.7.50
 - Addressbook: Added filter for has organization
