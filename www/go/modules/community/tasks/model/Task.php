@@ -598,7 +598,7 @@ class Task extends AclItemEntity {
 		}
 
 		if(isset($sort['responsible'])) {
-			$query->join('core_user', 'responsible', 'responsible.id = '.$query->getTableAlias() . '.createdBy');
+			$query->join('core_user', 'responsible', 'responsible.id = '.$query->getTableAlias() . '.responsibleUserId');
 			$sort->renameKey('responsible', 'responsible.displayName');
 		}
 
