@@ -1,3 +1,5 @@
+- Core: global add button will not redirect, instead show a flyout.
+
 10-10-2023: 6.6.173
 - Email: show attachments if sent as email, both for IMAP and as linked email.
 - Core: global 'Add' button

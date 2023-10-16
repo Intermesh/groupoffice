@@ -441,30 +441,41 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						window.show();
 					}
 					window.on("save", function (window, entity) {
-						let id;
-						const goEntity = go.Entities.get(l.entity);
-
-						if(Ext.isNumber(entity)) {
-							id = entity;
-						} else if (window.event_id) {
-							// for some reason, calendar events have a different onSave
-							id = window.event_id;
-						} else if(entity.id) {
-							id = entity.id;
-						}
-
-						if(go.util.empty(id)) {
-							console.warn("Unable to open new " + l.entity);
-							return false;
-						}
-						goEntity.goto(id);
+						go.Notifier.flyout({
+							title: t("Success"),
+							description: t("The data was saved successfully"),
+							time: 2000
+						});
+						// TODO: The code snippet works perfectly. If 'the field' asks for a redirect, put it back as a link...
+						// let id;
+						// const goEntity = go.Entities.get(l.entity);
+						//
+						// if(Ext.isNumber(entity)) {
+						// 	id = entity;
+						// } else if (window.event_id) {
+						// 	// for some reason, calendar events have a different onSave
+						// 	id = window.event_id;
+						// } else if(entity.id) {
+						// 	id = entity.id;
+						// }
+						//
+						// if(go.util.empty(id)) {
+						// 	console.warn("Unable to open new " + l.entity);
+						// 	return false;
+						// }
+						// goEntity.goto(id);
 					}, this, {single: true});
 
 					window.on("send", function(window) {
-						if(l.title !== "E-mail") {
-							return false;
-						}
-						me.openModule("email");
+						go.Notifier.flyout({
+							title: t("Success"),
+							description: t("Your message was sent successfully"),
+							time: 2000
+						});
+						// if(l.title !== "E-mail") {
+						// 	return false;
+						// }
+						// me.openModule("email");
 					}, this, {});
 				}
 			});
