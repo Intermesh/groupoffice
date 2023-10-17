@@ -187,7 +187,7 @@ return array (
   'Please enter try with a different IMAP password.' => 'Өөр IMAP нууц үгээ оруулна уу.',
   'Alias' => 'Алиас',
   'Are you sure you want to select all {count} results?' => 'Та бүх {count} үр дүн сонгохыг хүсэж байна уу?',
-  'Email address succesfully added to contact' => 'Холбоо барих хаяг дээр имэйл хаягийг амжилттай оруулсан.',
+  'Email address successfully added to contact' => 'Холбоо барих хаяг дээр имэйл хаягийг амжилттай оруулсан.',
   'Contact' => 'Contact',
   'Body' => 'Body',
   'Received before' => 'Received before',

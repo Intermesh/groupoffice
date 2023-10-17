@@ -416,7 +416,7 @@ All rights reserved.<br />
   'lost_password_error' => 'Η δοθείσα διεύθυνση ηλεκτρονικού ταχυδρομείου δεν ήταν δυνατόν να βρεθεί.',
   'lost_password_success' => 'Ένα νέο συνθηματικό έχει σταλεί στην διεύθυνση ηλεκτρονικού ταχυδρομείου σας.',
   'If you leave {product_name} you will loose unsaved changes' => 'Εάν βγείτε από την εφαρμογή {product_name} θα χάσετε πιθανώς μη αποθηκευμένες αλλαγές',
-  'The data was saved succesfully' => 'Τα δεδομένα αποθηκεύθηκαν με επιτυχία',
+  'The data was saved successfully' => 'Τα δεδομένα αποθηκεύθηκαν με επιτυχία',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Κάντε κλικ στο \'Περιήγηση\' για να επιλέξτε αρχεία ή/και καταλόγους από τον υπολογιστή σας. Κάντε κλίκ στο \'Ανέβασμα\' για να μεταφέρετε τα αρχεία στην εφαρμογή {product_name}. Το παράθυρο αυτό θα κλείσει αυτόματα όταν ολοκληρωθεί η μεταφορά.',
   'countries' => 
   array (

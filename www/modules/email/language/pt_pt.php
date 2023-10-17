@@ -184,7 +184,7 @@ return array (
   'Please enter try with a different IMAP password.' => 'Tente com outra palavra-passe para o servidor IMAP.',
   'Alias' => 'Apelido',
   'Are you sure you want to select all {count} results?' => 'Tem certeza de que deseja selecionar todos os {count} resultados?',
-  'Email address succesfully added to contact' => 'Endereço de e-mail adicionado com sucesso ao contacto',
+  'Email address successfully added to contact' => 'Endereço de e-mail adicionado com sucesso ao contacto',
   'Contact' => 'Contacto',
   'Body' => 'Corpo',
   'Received before' => 'Recebido antes de',

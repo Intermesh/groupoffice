@@ -370,12 +370,14 @@ class Folder extends Base {
 		if($io){
 			$size = fgets ( $io, 4096);
 			if($size === false) {
+				pclose($io);
 				return false;
 			}
 
 			$size = preg_replace('/[\t\s]+/', ' ', trim($size));
-			$size = substr ( $size, 0, strpos ( $size, ' ' ) );			
-			
+			$size = substr ( $size, 0, strpos ( $size, ' ' ) );
+			pclose($io);
+
 			return $size;
 		}else
 		{
