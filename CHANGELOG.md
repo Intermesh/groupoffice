@@ -1,4 +1,4 @@
-
+17-10-2023: 6.7.51
 - Notes /Comments: Fixed you're not allowed to paste scripts
 - Finance: Remove invalid chars in PDF filename
 - Tasks: fix grouping by responsible user
