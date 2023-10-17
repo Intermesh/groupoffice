@@ -1172,6 +1172,11 @@ abstract class Entity extends Property {
 		return null;
 	}
 
+
+	public static function cacheState(): ?string {
+		return null;
+	}
+
 	
 	/**
 	 * Map of file types to a converter class for importing and exporting.

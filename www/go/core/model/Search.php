@@ -48,6 +48,16 @@ class Search extends AclOwnerEntity {
 		// do nothing for search
 	}
 
+	public static function getState($entityState = null): string
+	{
+		return "-";
+	}
+
+	public function change(bool $force = false)
+	{
+
+	}
+
 	/**
 	 * Prepares the query for a search
 	 *

@@ -30,7 +30,7 @@ class PushDispatcher
 	/**
 	 * Interval in seconds between every check for changes to push
 	 */
-	const CHECK_INTERVAL = 30;
+	const CHECK_INTERVAL = 10;
 
 	private $map = [];
 	private $entityTypes = [];
@@ -39,6 +39,10 @@ class PushDispatcher
 	{
 		//Hard code debug to false to prevent spamming of log.
 		go()->getDebugger()->enabled = false;
+//		go()->getDbConnection()->debug = true;
+
+		// Don't put states in memory but read them from the cache driver each time
+		go()->getCache()->keepInMemory = false;
 
 		$query = new Query();
 
@@ -76,7 +80,7 @@ class PushDispatcher
 	{
 		$state = [];
 		foreach ($this->map as $name => $cls) {
-			$cls::entityType()->clearCache();
+			//$cls::entityType()->clearCache();
 			$state[$name] = $cls::getState();
 		}
 		// sendMessage('ping', $state);

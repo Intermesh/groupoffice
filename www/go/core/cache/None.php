@@ -14,6 +14,9 @@ class None implements CacheInterface {
 
 	private $cache = [];
 
+
+	public $keepInMemory = false;
+
 	/**
 	 * Store any value in the cache
 	 * 

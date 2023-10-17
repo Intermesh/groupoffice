@@ -547,6 +547,10 @@ class EntityType implements ArrayableInterface {
 				$change['entityTypeId'] = $entityTypeId;
 				return $change;
 			}, $changes));
+
+			$cls = $type->getClassName();
+
+			$cls::cacheState();
 		}
 
 		$allChanges = array_values($allChanges);
