@@ -1,3 +1,4 @@
+
 - Notes /Comments: Fixed you're not allowed to paste scripts
 - Finance: Remove invalid chars in PDF filename
 - Tasks: fix grouping by responsible user
@@ -259,6 +260,9 @@
 
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
+
+17-10-2023: 6.6.174
+- Core: global add button will not redirect, instead show a flyout.
 
 10-10-2023: 6.6.173
 - Email: show attachments if sent as email, both for IMAP and as linked email.

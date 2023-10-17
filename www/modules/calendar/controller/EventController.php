@@ -31,7 +31,6 @@ use GO\Base\Db\FindParams;
 use GO\Base\Fs\File;
 use GO\Calendar\Exception\AskPermission;
 use GO\Calendar\Model\Event;
-use GO\Calendar\Model\UserSettings;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\model\Module;
@@ -300,9 +299,35 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				return true;
 			}
 
-			$leavedays = Leaveday::model()->findForPeriod($userIds, intval($event->start_time), intval($event->end_time));
+			// Get Leave days in period for selected users
+			$findParams = FindParams::newInstance();
+			$findParams->getCriteria()->addInCondition("user_id", $userIds)
+				->addCondition('status',1)
+				->mergeWith(
+					\GO\Base\Db\FindCriteria::newInstance()
+						->addCondition('first_date', $event->end_time, '<=')
+						->addRawCondition('(t.last_date + 86400) >=' . intval($event->start_time))
+				);
+			$findParams->debugSql();
 
-			$num_conflicts += count($leavedays);
+			$stmt = Leaveday::model()->find($findParams);
+
+			foreach($stmt as $item) {
+				// Now we have to take the start time and duration of the leave day into account. These are saved in
+				// a peculiar way, so we have to make a hack.
+
+				if(!empty($item->from_time)) {
+					$itemStartTime = (new DateTime())->setTimeStamp($item->first_date);
+					$tsItemStart = GODate::to_unixtime($itemStartTime->format('Y-m-d') . ' ' . $item->from_time . ':00');
+					$tsItemEnd = GODate::dateTime_add($tsItemStart, 0, (($item->n_hours + $item->n_nat_holiday_hours) * 60));
+				} else{
+					$tsItemStart = $item->first_date;
+					$tsItemEnd = GODate::dateTime_add($item->first_date, 0, 0, 0, 1);
+				}
+				if($tsItemStart < $event->end_time && $tsItemEnd > $event->start_time) {
+					$num_conflicts++;
+				}
+			}
 
 			if($num_conflicts > 0) {
 				$response["feedback"] = 'Ask permission';
