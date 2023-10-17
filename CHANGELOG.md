@@ -1,3 +1,4 @@
+17-10-2023: 6.6.174
 - Core: global add button will not redirect, instead show a flyout.
 
 10-10-2023: 6.6.173
