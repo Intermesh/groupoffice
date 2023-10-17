@@ -59,7 +59,7 @@ return array (
   'Select one' => 'একটি নির্বাচন করুন',
   'Contact form' => 'যোগাযোগের ফর্ম',
   'No address book found with name \'%s\'.' => '\'%s\' নামের কোন ঠিকানাপঞ্জী খুঁজে পাওয়া গেল না ',
-  'We have succesfully received your registration.' => 'আমরা আপনার নিবন্ধন গ্রহণ করেছি ।',
+  'We have successfully received your registration.' => 'আমরা আপনার নিবন্ধন গ্রহণ করেছি ।',
   'name' => 'পূর্বনির্ধারিত সাইট',
   'description' => 'পূর্বনির্ধারিত সাইটগুলোর জন্য ছাঁচ',
 );

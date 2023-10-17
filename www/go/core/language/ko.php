@@ -341,7 +341,7 @@ All rights reserved.<br />
   'Database' => '데이타베이스',
   'Total' => '전체',
   'If you leave {product_name} you will loose unsaved changes' => '{product_name}를 떠나면 저장되지 않은 변경점을 잃어버립니다',
-  'The data was saved succesfully' => '데이터가 성공적으로 저장되었습니다',
+  'The data was saved successfully' => '데이터가 성공적으로 저장되었습니다',
   'Click here to login to {product_name}' => '여기를 눌러서 {product_name}에 로그인 하세요',
   '{product_name} website' => '{product_name} 웹사이트',
   'System' => '시스템',

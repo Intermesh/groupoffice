@@ -225,7 +225,7 @@ return array (
   'Always respond to a read notification' => 'Răspunde întotdeauna unei solicitari de notificare la citire',
   'Sort on last contact mail time' => 'Ordonează în funcție de timpul (ora) transmiterii către contacte',
   'Default font size' => 'Dimensiune implicită font',
-  'Email address succesfully added to contact' => 'Adresa de email a fost adăugată contactului',
+  'Email address successfully added to contact' => 'Adresa de email a fost adăugată contactului',
   'Contact' => 'Contact',
   'Address list' => 'Listă de adrese',
   'Forward as attachment ' => 'Redirecționează ca atașament ',

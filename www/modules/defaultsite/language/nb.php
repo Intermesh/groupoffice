@@ -55,7 +55,7 @@ return array (
   'Select one' => 'Vennligst velg',
   'Contact form' => 'Kontaktskjema',
   'No address book found with name \'%s\'.' => 'Fant ingen adressebok med navnet \'%s\'.',
-  'We have succesfully received your registration.' => 'Vi har mottatt din registrering!',
+  'We have successfully received your registration.' => 'Vi har mottatt din registrering!',
   'name' => 'Standard eksternside',
   'description' => 'Malen for standard eksternside',
   'Date' => 'Date',

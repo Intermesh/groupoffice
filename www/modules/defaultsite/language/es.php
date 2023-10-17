@@ -58,7 +58,7 @@ return array (
   'Select one' => 'Seleccionar uno',
   'Contact form' => 'Formulario de contacto',
   'No address book found with name \'%s\'.' => 'No se ha encontrado al contacto \'%s\' en ninguna libreta de contactos.',
-  'We have succesfully received your registration.' => 'Su solicitud de registro ha sido cumplimentada con éxito.',
+  'We have successfully received your registration.' => 'Su solicitud de registro ha sido cumplimentada con éxito.',
   'name' => 'Sitio predeterminado',
   'description' => 'Módulo de plantillas para la creación de sitios web predeterminados',
   'Ticket' => 'Ticket',

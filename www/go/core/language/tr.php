@@ -415,7 +415,7 @@ Kullanıcı Adı: %s<br />;
   'lost_password_error' => 'Verilen E-posta adresi bulunamıyor.',
   'lost_password_success' => 'E-posta adresinize yeni bir şifre gönderilmiştir.',
   'If you leave {product_name} you will loose unsaved changes' => '{product_name} ten ayrılırsanız kaydetmediklerinizi kaybedeceksiniz',
-  'The data was saved succesfully' => 'Veri başarılı şekilde kaydedilmiştir',
+  'The data was saved successfully' => 'Veri başarılı şekilde kaydedilmiştir',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Bilgisayarınızdan dosya ve/veya klasör seçmek için \'Göz At\' tıklayınız. Dosyaları {product_name} içersine yüklemek için \'Yükle\' tıklayınız. Veri transferi bittiğinde bu ekran otomatik olarak kapanacaktır.',
   'countries' => 
   array (
