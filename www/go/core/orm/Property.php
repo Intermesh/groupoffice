@@ -57,7 +57,6 @@ abstract class Property extends Model {
 	 */
 	private static $cachedRelationStmts = [];
 	private static $apiProperties = [];
-	private static $findCache = [];
 	private static $requiredProps = [];
 
 	/**
@@ -544,11 +543,10 @@ abstract class Property extends Model {
 	}
 
 	public static function clearCache() {
-		self::$_mapping = [];
-		self::$requiredProps = [];
+//		self::$_mapping = [];
+//		self::$requiredProps = [];
 		self::$cachedRelationStmts = [];
-		self::$apiProperties = [];
-		self::$findCache = [];
+//		self::$apiProperties = [];
 	}
 
 	/**
@@ -560,23 +558,21 @@ abstract class Property extends Model {
 	public final static function getMapping(): Mapping
 	{
 		$cls = static::class;
-		if(isset(self::$_mapping[$cls])) {
-			return self::$_mapping[$cls];
-		}
+
 		$cacheKey = 'mapping-' . $cls;
 
-		self::$_mapping[$cls] = go()->getCache()->get($cacheKey);
-		if(self::$_mapping[$cls] === null) {
-			self::$_mapping[$cls] = static::defineMapping();
+		$map = go()->getCache()->get($cacheKey);
+		if($map === null) {
+			$map = static::defineMapping();
 
-			self::$_mapping[$cls]->dynamic = true;
+			$map->dynamic = true;
 
-			static::fireEvent(self::EVENT_MAPPING, self::$_mapping[$cls]);
+			static::fireEvent(self::EVENT_MAPPING, $map);
 
-			go()->getCache()->set($cacheKey, self::$_mapping[$cls]);
+			go()->getCache()->set($cacheKey, $map);
 		}
 
-		return self::$_mapping[$cls];
+		return $map;
 	}
 
 	/**
@@ -604,9 +600,9 @@ abstract class Property extends Model {
 		$cls = static::class;
 
 		//this function is called many times. This seems to have a slight performance benefit
-		if(isset(self::$apiProperties[$cls])) {
-			return self::$apiProperties[$cls];
-		}
+//		if(isset(self::$apiProperties[$cls])) {
+//			return self::$apiProperties[$cls];
+//		}
 
 		$cacheKey = 'property-getApiProperties-' . $cls;
 
@@ -631,7 +627,7 @@ abstract class Property extends Model {
 			go()->getCache()->set($cacheKey, $props);
 		}
 
-		self::$apiProperties[$cls] = $props;
+//		self::$apiProperties[$cls] = $props;
 		return $props;
 	}
 
@@ -823,9 +819,9 @@ abstract class Property extends Model {
 	{
 
 		$cls = static::class;
-		if(isset(self::$requiredProps[$cls])) {
-			return self::$requiredProps[$cls];
-		}
+//		if(isset(self::$requiredProps[$cls])) {
+//			return self::$requiredProps[$cls];
+//		}
 
 		$cacheKey = $cls . '-required-props';
 
@@ -852,7 +848,7 @@ abstract class Property extends Model {
 			go()->getCache()->set($cacheKey, $required);
 		}
 
-		self::$requiredProps[$cls] = $required;
+//		self::$requiredProps[$cls] = $required;
 
 		return $required;
 	}

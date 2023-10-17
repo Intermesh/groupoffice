@@ -36,7 +36,12 @@ class Memcached implements CacheInterface {
 	 * Keep values in memory as long as the request lives. Disabled for SSE.
 	 * @var bool
 	 */
-	public $keepInMemory = true;
+	private $keepInMemory = true;
+
+	public function disableMemory():void{
+		$this->cache = [];
+		$this->keepInMemory = false;
+	}
 	
 	public function __construct() {
 		$this->prefix = go()->getConfig()['db_name'];

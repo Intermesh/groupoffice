@@ -67,24 +67,14 @@ abstract class Entity  extends OrmEntity {
 	 */
 	public static function getState($entityState = null): string
 	{
-		$state = go()->getCache()->get("state-" . static::class);
-		return $state ?? static::cacheState();
-	}
-
-
-	public static function cacheState() : ?string
-	{
 		$state = ($entityState ?? static::entityType()->getHighestModSeq()) . ':';
-
-		$state .= static::getMapping()->hasUserTable  ? static::entityType()->getHighestUserModSeq() : "0";
-
-		go()->getCache()->set("state-" . static::class, $state);
+		
+		$state .= static::getMapping()->hasUserTable  ? static::entityType()->getHighestUserModSeq() : "0";		
 
 		return $state;
-
 	}
 
-	/**
+  /**
    * Saves the model and property relations to the database
    *
    * Important: When you override this make sure you call this parent function first so

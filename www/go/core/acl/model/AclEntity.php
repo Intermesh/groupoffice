@@ -25,22 +25,15 @@ abstract class AclEntity extends Entity {
 	protected $permissionLevel;
 
 	/**
-	 * Cache the current state of this entity
+	 * Get the current state of this entity
 	 *
 	 * @todo ACL state should be per entity and not global. eg. Notebook should return highest mod seq of acl's used by note books.
+	 * @param null $entityState
+	 * @return string
 	 */
-
-	public static function cacheState(): ?string
+	public static function getState($entityState = null): string
 	{
-		$state = ($entityState ?? static::entityType()->getHighestModSeq()) . ':';
-
-		$state .= static::getMapping()->hasUserTable  ? static::entityType()->getHighestUserModSeq() : "0";
-
-		$state .= ':' . Acl::entityType()->getHighestModSeq();
-
-		go()->getCache()->set("state-" . static::class, $state);
-
-		return $state;
+		return parent::getState($entityState) . ':' . Acl::entityType()->getHighestModSeq();
 	}
 
 	protected static function getEntityChangesQuery($sinceModSeq): Query

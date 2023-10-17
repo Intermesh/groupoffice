@@ -13,9 +13,16 @@ namespace go\core\cache;
 class None implements CacheInterface {
 
 	private $cache = [];
+	/**
+	 * @var false
+	 */
+	private $keepInMemory = true;
 
 
-	public $keepInMemory = false;
+	public function disableMemory():void {
+		$this->cache = [];
+		$this->keepInMemory = false;
+	}
 
 	/**
 	 * Store any value in the cache
@@ -26,7 +33,8 @@ class None implements CacheInterface {
 	 * @param int $ttl Time to live in seconds
 	 */
 	public function set(string $key, $value, bool $persist = true, int $ttl = 0) {
-		$this->cache[$key] = $value;
+		if($this->keepInMemory)
+			$this->cache[$key] = $value;
 	}
 
 	/**

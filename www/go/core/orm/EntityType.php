@@ -548,9 +548,7 @@ class EntityType implements ArrayableInterface {
 				return $change;
 			}, $changes));
 
-			$cls = $type->getClassName();
-
-			$cls::cacheState();
+			//Notify SSE that there's a change
 		}
 
 		$allChanges = array_values($allChanges);
