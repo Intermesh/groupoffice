@@ -503,7 +503,7 @@ Wszystkie prawa zastrzeżone.<br />
   'Database' => 'Baza danych',
   'Total' => 'Razem',
   'If you leave {product_name} you will loose unsaved changes' => 'Jeśli opuścisz {product_name} to stracisz niezapisane zmiany',
-  'The data was saved succesfully' => 'Dane zostały zapisane',
+  'The data was saved successfully' => 'Dane zostały zapisane',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Kliknij \'Przeglądaj\' aby wybrać pliki i/lub foldery z komputera. Kliknij \'Wyślij\' aby przesłać dane do {product_name}. To okno zamknie się automatycznie po zakończeniu transferu.',
   'Click here to login to {product_name}' => 'Kliknij aby się zalogować do {product_name}',
   '{product_name} was already started. The requested screen is loaded in {product_name}. You can close this window or tab now and continue working in {product_name}.' => '{product_name} uruchomiony. Żądana operacja uruchomiona w {product_name}. Możesz już zamknąć te okno lub kartę i kontynuować pracę w {product_name}.',

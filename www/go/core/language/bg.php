@@ -521,7 +521,7 @@ Copyright (c) 2003-{current_year}, {company_name}<br/>
   'This {product_name} installation is using' => 'Инсталацията на {product_name} използва',
   'Database' => 'База данни',
   'If you leave {product_name} you will loose unsaved changes' => 'Ако излезете от {product_name} ще загубите незаписаните промени',
-  'The data was saved succesfully' => 'Данните бяха записани успешно',
+  'The data was saved successfully' => 'Данните бяха записани успешно',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Кликнете на \'Browse\' за да изберете файлове или папки от компютъра си. Кликнете на \'Качване\' за да качите файловете на {product_name}. Този прозорец ще се затвори автоматично, когато трансфера приключи.',
   'Click here to login to {product_name}' => 'Кликнете тук, за да се впишете в {product_name}',
   '{product_name} website' => 'Сайт на {product_name}',

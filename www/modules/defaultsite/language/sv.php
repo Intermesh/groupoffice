@@ -56,7 +56,7 @@ return array (
   'Select one' => 'Välj en status',
   'Contact form' => 'Kontaktformulär',
   'No address book found with name \'%s\'.' => 'Ingen adressbok med namnet \'%s\' hittades.',
-  'We have succesfully received your registration.' => 'Vi har tagit emot din registrering.',
+  'We have successfully received your registration.' => 'Vi har tagit emot din registrering.',
   'name' => 'Standard sidan',
   'description' => 'Mallen för standardsidan',
   'Status' => 'Status',

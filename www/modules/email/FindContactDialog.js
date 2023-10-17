@@ -90,7 +90,7 @@ Ext.extend(GO.email.FindContactDialog, go.Window, {
 						this.showReplaceDialog(data.addresses, data.contact_name);
 					}else
 					{
-						alert(t("Email address succesfully added to contact", "addressbook"));
+						alert(t("Email address successfully added to contact", "addressbook"));
 						this.fireEvent('email_merged',contact_id);
 						this.hide();
 					}

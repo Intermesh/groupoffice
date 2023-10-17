@@ -190,7 +190,7 @@ return array (
   'Move to spam folder' => '迷惑メールフォルダに移動',
   'Add senders to...' => '送信者を...に追加',
   'Delete senders from...' => '送信者を削除...',
-  'Email address succesfully added to contact' => 'メールアドレスが連絡先に正常に追加されました',
+  'Email address successfully added to contact' => 'メールアドレスが連絡先に正常に追加されました',
   'Contact' => 'コンタクト',
   'Received before' => '前に受け取った',
   'Received since' => 'それ以来受け取った',

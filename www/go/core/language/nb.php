@@ -349,7 +349,7 @@ Alle rettigheter forbeholdt.<br />
   'Files' => 'Filer',
   'E-mail' => 'E-post',
   'If you leave {product_name} you will loose unsaved changes' => 'Hvis du går ut av {product_name} vil du miste ikke lagrede endringer',
-  'The data was saved succesfully' => 'Data er lagret!',
+  'The data was saved successfully' => 'Data er lagret!',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Trykk på \'Bla gjennom\' ( eller \'Browse\' ) for å velge filer og/eller mapper fra din egen datamaskin. Trykk \'Last opp\' ( eller \'Upload\' ) for å overføre filene til {product_name}. Dette vinduet vil lukkes automatisk når overføringen er ferdig.',
   'Click here to login to {product_name}' => 'Trykk her for å logge inn i {product_name}',
   'Links' => 'Lenker',

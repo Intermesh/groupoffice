@@ -157,7 +157,7 @@ return array (
   'Show unread' => 'Olvasatlanok',
   'Show flagged' => 'Megjelöltek',
   'folder' => 'mappa',
-  'Email address succesfully added to contact' => 'E-mail cím hozzáadása sikeres',
+  'Email address successfully added to contact' => 'E-mail cím hozzáadása sikeres',
   'Contact' => 'Kapcsolat',
   'No folders have been added.' => 'Nem lett mappa hozzáadva.',
   'This message may contain malicious content. Click here to view the filtered message anyway.' => 'Ez az üzenet rosszindulatú kódot tartalmazhat. Ide kattintva megtekintheti a szűrt üzenetet.',
