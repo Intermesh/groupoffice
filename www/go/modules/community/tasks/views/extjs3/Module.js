@@ -185,7 +185,7 @@ go.Modules.register("community", "tasks", {
 
 
 		async function showBadge() {
-			const count = await go.Jmap.request({method: "Task/countMine", params: {role: "list"}});
+			const count = await go.Jmap.request({method: "Task/countMine"});
 
 			GO.mainLayout.setNotification('tasks', count,'orange');
 		}

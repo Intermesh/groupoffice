@@ -91,37 +91,17 @@ class Task extends EntityController {
 	/**
 	 * Used to show counter badge for support.
 	 *
-	 * @return mixed|null
-	 * @throws Exception
 	 */
-	public function countMine(array $params) {
+	public function countMine(): int{
 
-		if(empty($params) || $params['role'] == "support") {
-			$query = model\Task::find(['id'])
-				->selectSingleValue("count(*)")
-				->filter([
-					"operator" => "OR",
-					"conditions" => [
-						["responsibleUserId" => go()->getUserId()],
-						["responsibleUserId" => null]
-					]
-				])
-				->filter([
-					"permissionLevel" => Acl::LEVEL_WRITE,
-					"progress" => "needs-action",
-					"role" => "support"
-				]);
-		} else{
-			$defaultListId = go()->getAuthState()->getUser(['tasksSettings'])->tasksSettings->getDefaultTasklistId();
+		$defaultListId = go()->getAuthState()->getUser(['tasksSettings'])->tasksSettings->getDefaultTasklistId();
 
-			$query = model\Task::find(['id'])
-				->selectSingleValue("count(*)")
-				->filter([
-					"tasklistId" => $defaultListId,
-					"complete" => false
-				]);
-
-		}
+		$query = model\Task::find(['id'])
+			->selectSingleValue("IFNULL(count(*), 0)")
+			->filter([
+				"tasklistId" => $defaultListId,
+				"complete" => false
+			]);
 
 		$query->removeJoin("tasks_task_user");
 		$query->removeJoin("pr2_hours");
