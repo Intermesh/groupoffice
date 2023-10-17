@@ -1,4 +1,4 @@
-
+17-10-2023: 6.8.10
 - Core / newsletters: fix email template upload
 - Finance: Copy items in finance was broken
 - Support: Search found task and ticket
