@@ -6,7 +6,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	modal: false,
 	stateId: 'communityTasksTaskDialog',
 	role: "list",
-	redirectOnSave: false,
+	redirectOnSave: true,
 	collapsible: true,
 
 	onReady: async function () {
@@ -39,10 +39,11 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	onSubmit : function() {
-
 		switch(this.role) {
 			case "support":
-				go.Router.goto("support/" + this.currentId);
+				if(this.redirectOnSave) {
+					go.Router.goto("support/" + this.currentId);
+				}
 				break;
 
 			case "board":
@@ -50,7 +51,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 				break;
 
 			default:
-				this.entityStore.entity.goto(this.currentId);
+				if(this.redirectOnSave) {
+					this.entityStore.entity.goto(this.currentId);
+				}
 				break;
 		}
 	},
