@@ -201,6 +201,7 @@ class EntityType implements ArrayableInterface {
 		}
 
 		self::$highestModSeqStmt->bindValue(':id' , $this->id);
+		self::$highestModSeqStmt->execute();
 		$this->highestModSeq = self::$highestModSeqStmt->fetch();
 
 		return $this->highestModSeq ?? 0;
@@ -692,6 +693,7 @@ class EntityType implements ArrayableInterface {
 
 			self::$highestUserModSeqStmt->bindValue(':entityTypeId', $this->id);
 			self::$highestUserModSeqStmt->bindValue(':userId', go()->getUserId());
+			self::$highestUserModSeqStmt->execute();
 
 			$this->highestUserModSeq = self::$highestUserModSeqStmt
 				->fetch() ?? 0;

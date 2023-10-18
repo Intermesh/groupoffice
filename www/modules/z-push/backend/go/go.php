@@ -602,40 +602,44 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 		$notifications = array();
 //		$stopat = time() + $timeout - 1;
-			foreach ($this->sinkfolders as $folder) {
-				
-				$f = $this->GetBackendFolder($folder);
-				$b = $this->GetBackend($folder);
-				if(!$b) {
-                    ZLog::Write(LOGLEVEL_DEBUG, "Backend not found for $folder");
-                    continue;
-                }
-				$newstate = $b->getNotification($f);
-				
-				ZLog::Write(LOGLEVEL_DEBUG, $folder.': '.$newstate);
-				
-				if (!isset($this->sinkstates[$folder])) {					
-					$this->sinkstates[$folder] = $newstate;
-				}		
-				
-				if ($this->sinkstates[$folder] != $newstate) {
-					$notifications[] = $folder;
-					$this->sinkstates[$folder] = $newstate;
-				}				
+		foreach ($this->sinkfolders as $folder) {
+
+			$f = $this->GetBackendFolder($folder);
+			$b = $this->GetBackend($folder);
+			if(!$b) {
+                  ZLog::Write(LOGLEVEL_DEBUG, "Backend not found for $folder");
+                  continue;
+              }
+			$newstate = $b->getNotification($f);
+
+			ZLog::Write(LOGLEVEL_DEBUG, $folder.': '.$newstate);
+
+			if (!isset($this->sinkstates[$folder])) {
+				$this->sinkstates[$folder] = $newstate;
 			}
-			
-			ZLog::Write(LOGLEVEL_DEBUG, "All sink folders checked");
-			
-			ZLog::Write(LOGLEVEL_DEBUG, "Closing DB connection");
-			\GO::unsetDbConnection();
-			go()->getCache()->disableMemory();
-			gc_collect_cycles();
-			
-			if (empty($notifications)){
-				
-				ZLog::Write(LOGLEVEL_DEBUG, "Sleeping ".$timeout." seconds");
-				sleep($timeout);
+
+			if ($this->sinkstates[$folder] != $newstate) {
+				$notifications[] = $folder;
+				$this->sinkstates[$folder] = $newstate;
 			}
+		}
+
+		ZLog::Write(LOGLEVEL_DEBUG, "All sink folders checked");
+
+		ZLog::Write(LOGLEVEL_DEBUG, "Closing DB connection");
+
+		go()->getDbConnection()->disconnect();
+		\go\core\db\Table::destroyInstances();
+		go()->getCache()->disableMemory();
+		gc_collect_cycles();
+
+		ZLog::Write(LOGLEVEL_DEBUG, "Memory: " . memory_get_usage());
+
+		if (empty($notifications)){
+
+			ZLog::Write(LOGLEVEL_DEBUG, "Sleeping ".$timeout." seconds");
+			sleep($timeout);
+		}
 		return $notifications;
 	}
 }

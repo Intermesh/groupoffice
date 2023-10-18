@@ -3,6 +3,7 @@
 namespace go\core\model;
 
 use go\core\App;
+use go\core\db\Table;
 use go\core\event\EventEmitterTrait;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -32,7 +33,7 @@ class PushDispatcher
 	/**
 	 * Interval in seconds between every check for changes to push
 	 */
-	const CHECK_INTERVAL = 5;
+	const CHECK_INTERVAL = 30;
 
 	private $map = [];
 	private $entityTypes = [];
@@ -132,11 +133,10 @@ class PushDispatcher
 			//disconnect and free up memory
 			go()->getDbConnection()->disconnect();
 			go()->getCache()->disableMemory();
+			Table::destroyInstances();
 			gc_collect_cycles();
 
 			$sleeping += self::CHECK_INTERVAL;
-
-			echo memory_get_usage(true) ."\n";
 
 			sleep(self::CHECK_INTERVAL);
 		}
