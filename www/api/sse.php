@@ -16,6 +16,8 @@ use go\core\model\PushDispatcher;
 
 require("../vendor/autoload.php");
 
+
+
 //Create the app with the database connection
 App::get()->setAuthState(new State());
 
@@ -27,7 +29,7 @@ if(Request::get()->getMethod() == "OPTIONS") {
 	exit();
 }
 
-if(!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
+if(!App::get()->getAuthState()->isAuthenticated()) {
 	Response::get()
 		->setStatus(401)
 		->output();
@@ -35,8 +37,11 @@ if(!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
 	exit();
 }
 
+
+
 //for servers with session.autostart
 @session_write_close();
+
 
 //Check availability
 if(!go()->getConfig()['sseEnabled']) {
@@ -47,6 +52,9 @@ if(!go()->getConfig()['sseEnabled']) {
 		->output();
 	exit();
 }
+
+
+
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 ini_set("max_execution_time", PushDispatcher::MAX_LIFE_TIME + 10);

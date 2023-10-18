@@ -21,6 +21,16 @@ class Disk implements CacheInterface {
 	private $folder;
 	
 	private $cache;
+	/**
+	 * Keep values in memory as long as the request lives. Disabled for SSE.
+	 * @var bool
+	 */
+	private $keepInMemory = true;
+
+	public function disableMemory():void {
+		$this->cache = [];
+		$this->keepInMemory = false;
+	}
 
 	/**
 	 * @throws Exception
@@ -54,8 +64,10 @@ class Disk implements CacheInterface {
 				throw new Exception("Could not write to cache!");
 			}
 		}
-		
-		$this->cache[$key] = $value;
+
+		if($this->keepInMemory) {
+			$this->cache[$key] = $value;
+		}
 	}
 
 	/**
@@ -92,7 +104,10 @@ class Disk implements CacheInterface {
 					$v = $v['v'];
 				}
 			}
-			$this->cache[$key] = $v;
+			if($this->keepInMemory) {
+				$this->cache[$key] = $v;
+			}
+			return $v;
 		}
 		catch(Exception $e) {
 			ErrorHandler::log("Could not unserialize cache from file " . $key.' error: '. $e->getMessage());
@@ -100,7 +115,7 @@ class Disk implements CacheInterface {
 			return null;
 		}
 
-		return $this->cache[$key];
+
 	}
 
 	/**

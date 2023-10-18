@@ -547,6 +547,8 @@ class EntityType implements ArrayableInterface {
 				$change['entityTypeId'] = $entityTypeId;
 				return $change;
 			}, $changes));
+
+			//Notify SSE that there's a change
 		}
 
 		$allChanges = array_values($allChanges);

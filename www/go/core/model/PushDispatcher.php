@@ -5,6 +5,7 @@ namespace go\core\model;
 use go\core\event\EventEmitterTrait;
 use go\core\orm\EntityType;
 use go\core\db\Query;
+use go\core\orm\Property;
 
 /**
  * Class PushDispatcher
@@ -26,11 +27,10 @@ class PushDispatcher
 	 */
 	const MAX_LIFE_TIME = 120;
 
-
 	/**
 	 * Interval in seconds between every check for changes to push
 	 */
-	const CHECK_INTERVAL = 30;
+	const CHECK_INTERVAL = 20;
 
 	private $map = [];
 	private $entityTypes = [];
@@ -39,6 +39,9 @@ class PushDispatcher
 	{
 		//Hard code debug to false to prevent spamming of log.
 		go()->getDebugger()->enabled = false;
+//		go()->getDbConnection()->debug = true;
+
+//		go()->getCache()->disableMemory();
 
 		$query = new Query();
 
@@ -52,8 +55,6 @@ class PushDispatcher
 			$this->map[$e->getName()] = $e->getClassName();
 			$this->entityTypes[$e->getId()] = $e->getName();
 		}
-
-		$this->sendMessage('ping', []);
 	}
 
 	/**
@@ -79,7 +80,7 @@ class PushDispatcher
 			$cls::entityType()->clearCache();
 			$state[$name] = $cls::getState();
 		}
-		// sendMessage('ping', $state);
+
 		return $state;
 	}
 
@@ -98,10 +99,14 @@ class PushDispatcher
 	}
 
 	public function start(int $ping = 10) {
+
+
 		$sleeping = 0;
+
 		$changes = $this->checkChanges();
 
-		$start = time();
+		// send states on start so client can compare immediately
+		$this->sendMessage('state', $changes);
 		for($i = 0; $i < self::MAX_LIFE_TIME; $i += self::CHECK_INTERVAL) {
 			// break the loop if the client aborted the connection (closed the page)
 			if(connection_aborted()) {
@@ -128,7 +133,7 @@ class PushDispatcher
 
 			$sleeping += self::CHECK_INTERVAL;
 
-            sleep(self::CHECK_INTERVAL);
+			sleep(self::CHECK_INTERVAL);
 		}
 	}
 }

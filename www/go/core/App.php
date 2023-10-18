@@ -147,7 +147,8 @@ namespace go\core {
 
 		protected function __construct() {
 			parent::__construct();
-            $this->systemTimeZone = date_default_timezone_get();
+
+      $this->systemTimeZone = date_default_timezone_get();
 			date_default_timezone_set("UTC");
 
 			mb_internal_encoding("UTF-8");
@@ -159,16 +160,16 @@ namespace go\core {
 			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
 
-        /**
-         * Get the PHP system timezone.
-         *
-         * The API works with UTC dates.
-         *
-         * @return string
-         */
-        public function getSystemTimeZone() : string {
-            return $this->systemTimeZone;
-        }
+    /**
+     * Get the PHP system timezone.
+     *
+     * The API works with UTC dates.
+     *
+     * @return string
+     */
+    public function getSystemTimeZone() : string {
+        return $this->systemTimeZone;
+    }
 
 		/**
 		 * Capabilities of core module
@@ -797,6 +798,8 @@ namespace go\core {
 		 */
 		public function setAuthState(AuthState $authState): App
 		{
+
+
 			$this->authState = $authState;
 			
 			return $this;
