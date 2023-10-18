@@ -260,7 +260,9 @@ go.Jmap = {
 			console.log("Starting SSE");
 			
 			//filter out legacy modules
-			var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
+			var entities = go.Entities.getAll().filter(function(e) {
+				return e.package != "legacy" && e.name != "Search";
+			});
 			
 			var url = go.User.eventSourceUrl + '?types=' + 
 							entities.column("name").join(',');

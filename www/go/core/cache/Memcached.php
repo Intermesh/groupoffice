@@ -31,6 +31,17 @@ class Memcached implements CacheInterface {
 	 * @var \Memcached
 	 */
 	private $mem;
+
+	/**
+	 * Keep values in memory as long as the request lives. Disabled for SSE.
+	 * @var bool
+	 */
+	private $keepInMemory = true;
+
+	public function disableMemory():void{
+		$this->cache = [];
+		$this->keepInMemory = false;
+	}
 	
 	public function __construct() {
 		$this->prefix = go()->getConfig()['db_name'];
@@ -64,8 +75,10 @@ class Memcached implements CacheInterface {
 		if($persist) {
 			$this->mem->add($this->prefix . '-' .$key, $value, $ttl);
 		}
-		
-		$this->cache[$key] = $value;
+
+		if($this->keepInMemory) {
+			$this->cache[$key] = $value;
+		}
 	}
 
 	/**
@@ -87,9 +100,11 @@ class Memcached implements CacheInterface {
 		if($this->mem->getResultCode() == \Memcached::RES_NOTFOUND) {
 			return null;
 		}
-		
-		$this->cache[$key] = $value;
-		return $this->cache[$key];		
+
+		if($this->keepInMemory) {
+			$this->cache[$key] = $value;
+		}
+		return $value;
 	}
 
 	/**

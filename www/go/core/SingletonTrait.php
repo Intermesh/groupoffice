@@ -28,4 +28,10 @@ trait SingletonTrait {
 	protected static function isInitialized() {
 		return isset(self::$instances[static::class]);
 	}
+
+	public static function destroy() {
+
+		unset(self::$instances[static::class]);
+
+	}
 }

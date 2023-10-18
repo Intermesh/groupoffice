@@ -40,7 +40,7 @@ class Table {
 	 */
 	public static function getInstance(string $name, Connection $conn = null): Table
 	{
-		
+
 		if(!isset($conn)) {
 			$conn = go()->getDbConnection();
 		}
@@ -141,7 +141,7 @@ class Table {
 		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk, 'indexes' => $this->indexes]);
 
 	}
-	
+
 	/**
 	 * A column name may not have the name of a Record property name.
 	 * 
@@ -441,13 +441,9 @@ class Table {
 		return $refs;
 	}
 
-	// Only works from php 7.4 and up
+
 //	public function __serialize()
 //	{
-//		if($this->conn != go()->getDbConnection()) {
-//			throw new Exception("Can't serialize tables with custom database connection");
-//		}
-//
 //		return [
 //			'name' => $this->name,
 //			'columns' => $this->columns,
@@ -459,7 +455,6 @@ class Table {
 //
 //	public function __unserialize($data)
 //	{
-//		$this->conn = go()->getDbConnection();
 //
 //		$this->name = $data['name'];
 //		$this->columns = $data['columns'];

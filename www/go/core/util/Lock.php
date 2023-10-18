@@ -94,8 +94,9 @@ class Lock {
 		if($locked) {
 			$this->lockedByMe = true;
 
+			// removed this to reduce IO
 			// for debugging lock problem. Store request infor user ID and PID number
-			$this->getLockFile()->putContents($this->getRequestInfo());
+			//$this->getLockFile()->putContents($this->getRequestInfo());
 
 			//reset start time to take off the waiting time. We want to use it for measuring the lock time now.
 			$this->startTime = microtime(true);
@@ -107,8 +108,9 @@ class Lock {
 			}
 
 			if($this->timeout > 0 && $this->timeTaken() > $this->timeout) {
-				$info = $this->getLockFile()->getContents();
-				throw new Exception("Waiting for lock (" . $this->getRequestInfo() .") for longer than " . $this->timeout."s. Lock is held by (" . $info . ")");
+				throw new Exception("Lock timeout with name: " . $this->name);
+//				$info = $this->getLockFile()->getContents();
+//				throw new Exception("Waiting for lock (" . $this->getRequestInfo() .") for longer than " . $this->timeout."s. Lock is held by (" . $info . ")");
 			}
 			//sleep for 100 milliseconds
 			usleep(100000);
@@ -144,7 +146,7 @@ class Lock {
 
 	private function getLockFile() {
 		$lockFolder = GO()
-			->getDataFolder()
+			->getTmpFolder()
 			->getFolder('locks');
 
 		$name = File::stripInvalidChars($this->name);

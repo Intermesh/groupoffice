@@ -22,6 +22,18 @@ class Apcu implements CacheInterface {
 	private $disk;
 
 	private $apcuEnabled = false;
+
+	/**
+	 * Keep values in memory as long as the request lives. Disabled for SSE.
+	 * @var bool
+	 */
+	private $keepInMemory = true;
+
+	public function disableMemory():void {
+		$this->cache = [];
+		$this->keepInMemory = false;
+		$this->getDiskCache()->disableMemory();
+	}
 	
 	public function __construct() {
 		$this->prefix = go()->getConfig()['db_name'];
@@ -57,8 +69,10 @@ class Apcu implements CacheInterface {
 		if($persist) {
 			apcu_store($this->prefix . '-' .$key, $value, $ttl);
 		}
-		
-		$this->cache[$key] = $value;
+
+		if($this->keepInMemory) {
+			$this->cache[$key] = $value;
+		}
 	}
 
 	/**
@@ -78,20 +92,22 @@ class Apcu implements CacheInterface {
 			return $this->getDiskCache()->get($key);
 		}
 
-		if(isset($this->cache[$key])) {
+		if($this->keepInMemory && isset($this->cache[$key])) {
 			return $this->cache[$key];
 		}
+
 		$success = false;
 		
 		$value = apcu_fetch($this->prefix . '-' .$key, $success);
 		
 		if(!$success) {
-			// if acpu fails fallback on disk cache
-			return $this->getDiskCache()->get($key);
+			return null;
 		}
-		
-		$this->cache[$key] = $value;
-		return $this->cache[$key];		
+
+		if($this->keepInMemory) {
+			$this->cache[$key] = $value;
+		}
+		return $value;
 	}
 
 	/**

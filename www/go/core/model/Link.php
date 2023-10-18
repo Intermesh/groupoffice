@@ -71,6 +71,12 @@ class Link extends AclItemEntity
 	
 	protected $aclId;
 
+
+	public static function loggable(): bool
+	{
+		return false;
+	}
+
 	/**
 	 * @throws Exception
 	 */

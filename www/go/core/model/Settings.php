@@ -605,6 +605,9 @@ class Settings extends core\Settings {
 	 * @var bool
 	 */
 	public $demoDataAsked = false;
+
+
+	private $defaultGroups;
 	
 	/**
 	 * New users will be member of these groups
@@ -613,10 +616,16 @@ class Settings extends core\Settings {
 	 */
 	public function getDefaultGroups(): array
 	{
-		return array_map("intval", (new core\db\Query)
-						->selectSingleValue('groupId')
-						->from("core_group_default_group")
-						->all());
+		if(!isset($this->defaultGroups)) {
+			$this->defaultGroups = array_map("intval", (new core\db\Query)
+				->selectSingleValue('groupId')
+				->from("core_group_default_group")
+				->all());
+
+			go()->getCache()->set(static::class, $this);
+		}
+
+		return $this->defaultGroups;
 
 	}
 

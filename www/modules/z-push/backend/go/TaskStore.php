@@ -382,14 +382,20 @@ class TaskStore extends Store {
 		return $folders;
 	}
 
+	private $notificationStmt;
+
 	public function getNotification($folder = null) {
-		$record = Task::find()
-			->fetchMode(PDO::FETCH_ASSOC)
-			->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
-//						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
-//						->where(['s.userId' => go()->getUserId()])
-			->where('tasklistId','=',$folder)
-			->single();
+
+		if(!isset($this->notificationStmt)) {
+			$this->notificationStmt = Task::find()
+				->fetchMode(PDO::FETCH_ASSOC)
+				->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
+				->where('tasklistId = :tasklistId')
+				->createStatement();
+		}
+		$this->notificationStmt->bindValue(':tasklistId', $folder, PDO::PARAM_INT);
+		$this->notificationStmt->execute();
+		$record = $this->notificationStmt->fetch();
 
 		$newstate = $record ? 'M'.$record['modifiedAt'].':C'.$record['count'] : "M0:C0";
 
