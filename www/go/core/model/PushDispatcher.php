@@ -2,7 +2,9 @@
 
 namespace go\core\model;
 
+use go\core\App;
 use go\core\event\EventEmitterTrait;
+use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\db\Query;
 use go\core\orm\Property;
@@ -30,30 +32,28 @@ class PushDispatcher
 	/**
 	 * Interval in seconds between every check for changes to push
 	 */
-	const CHECK_INTERVAL = 20;
+	const CHECK_INTERVAL = 5;
 
 	private $map = [];
 	private $entityTypes = [];
 
-	public function __construct($types)
+	public function __construct(array $types = [])
 	{
 		//Hard code debug to false to prevent spamming of log.
 		go()->getDebugger()->enabled = false;
-//		go()->getDbConnection()->debug = true;
-
-//		go()->getCache()->disableMemory();
 
 		$query = new Query();
 
-		if(isset($types)) {
-			$entityNames = explode(",", $_GET['types']);
-			$query->where('e.clientName', 'IN', $entityNames);
+		if(!empty($types)) {
+			$query->where('e.clientName', 'IN', $types);
 		}
 
 		$entities = EntityType::findAll($query);
 		foreach($entities as $e) {
-			$this->map[$e->getName()] = $e->getClassName();
-			$this->entityTypes[$e->getId()] = $e->getName();
+			if(is_a($e->getClassName(), Entity::class, true)) {
+				$this->map[$e->getName()] = $e->getClassName();
+				$this->entityTypes[$e->getId()] = $e->getName();
+			}
 		}
 	}
 
@@ -129,9 +129,14 @@ class PushDispatcher
 
 			self::fireEvent(self::EVENT_INTERVAL, $this);
 
+			//disconnect and free up memory
 			go()->getDbConnection()->disconnect();
+			go()->getCache()->disableMemory();
+			gc_collect_cycles();
 
 			$sleeping += self::CHECK_INTERVAL;
+
+			echo memory_get_usage(true) ."\n";
 
 			sleep(self::CHECK_INTERVAL);
 		}

@@ -22,33 +22,38 @@ use PDOException;
 
 /**
  * The EntityType class
- * 
+ *
  * This holds information about the entity.
- * 
+ *
  * id: The ID in the database used for foreign keys
  * className: The PHP class name used in the PHP API
  * name: The name of the entity for the JMAP client API
  * moduleId: The module ID this entity belongs to
- * 
+ *
  * It's also used for routing short routes like "Note/get" instead of "community/notes/Note/get"
- * 
+ *
  */
 class EntityType implements ArrayableInterface {
 
-	private $className;	
+
+	private static $highestModSeqStmt;
+	private static $highestUserModSeqStmt;
+
+
+	private $className;
 	private $id;
 	private $name;
-	private $moduleId;	
+	private $moduleId;
 	private $clientName;
 	private $defaultAclId;
 
 	/**
 	 * The highest mod sequence used for JMAP data sync
-	 * 
+	 *
 	 * @var int
 	 */
 	protected $highestModSeq;
-	
+
 	private $highestUserModSeq;
 
 	private $modSeqIncremented = false;
@@ -61,7 +66,7 @@ class EntityType implements ArrayableInterface {
 
 	/**
 	 * The name of the entity for the JMAP client API
-	 * 
+	 *
 	 * eg. "note"
 	 * @return string
 	 */
@@ -69,10 +74,10 @@ class EntityType implements ArrayableInterface {
 	{
 		return $this->clientName;
 	}
-	
+
 	/**
 	 * The PHP class name used in the PHP API
-	 * 
+	 *
 	 * @return class-string<Entity>
 	 */
 	public function getClassName(): string
@@ -87,20 +92,20 @@ class EntityType implements ArrayableInterface {
 	public function isEnabled() : bool {
 		return $this->enabled;
 	}
-	
+
 	/**
 	 * The ID in the database used for foreign keys
-	 * 
+	 *
 	 * @return int
 	 */
 	public function getId(): int
 	{
 		return $this->id;
 	}
-	
+
 	/**
 	 * The module ID this entity belongs to
-	 * 
+	 *
 	 * @return int
 	 */
 	public function getModuleId(): int
@@ -127,10 +132,10 @@ class EntityType implements ArrayableInterface {
 	 * @throws Exception
 	 */
 	public static function findByClassName(string $className) : ?EntityType {
-
 		$clientName = $className::getClientName();
-		$c = self::getCache();	
-		
+		$c = self::getCache();
+
+
 		if(!isset($c['name'][$clientName])) {
 			$module = Module::findByClass($className, ['id']);
 
@@ -174,33 +179,41 @@ class EntityType implements ArrayableInterface {
 
 	private static $checkedClasses = [];
 
-  /**
-   * The highest mod sequence used for JMAP data sync
-   *
-   * @return int
-   * @throws PDOException
-   */
+	/**
+	 * The highest mod sequence used for JMAP data sync
+	 *
+	 * @return int
+	 * @throws PDOException
+	 */
 	public function getHighestModSeq(): int
 	{
 		if(isset($this->highestModSeq)) {
 			return $this->highestModSeq;
 		}
 
-		$this->highestModSeq = (new Query())
-			->selectSingleValue("highestModSeq")
-			->from("core_entity")
-			->where(["id" => $this->id])			
-			->single();
+		// create reusable statement
+		if(!isset(self::$highestModSeqStmt)) {
+			self::$highestModSeqStmt = (new Query())
+				->selectSingleValue("highestModSeq")
+				->from("core_entity")
+				->where('id = :id')
+				->createStatement();
+		}
+
+		self::$highestModSeqStmt->bindValue(':id' , $this->id);
+		$this->highestModSeq = self::$highestModSeqStmt->fetch();
 
 		return $this->highestModSeq ?? 0;
 	}
 
+
+
 	/**
 	 * Clear cached modseqs.
-	 * 
+	 *
 	 * Calling this function is needed when the request is running for a long time and multiple increments are possible.
 	 * For example when sending newsletters on a CLI script.
-	 * 
+	 *
 	 * @return $this
 	 */
 	public function clearCache(): EntityType
@@ -233,25 +246,25 @@ class EntityType implements ArrayableInterface {
 		$this->clearCache();
 	}
 
-  /**
-   * Find all registered.
-   *
-   * @return static[]
-   * @throws PDOException
-   */
+	/**
+	 * Find all registered.
+	 *
+	 * @return static[]
+	 * @throws PDOException
+	 */
 	public static function findAll(Query $query = null): array
 	{
 		if(!isset($query)) {
 			return array_values(static::getCache()['models']);
 		}
-		
+
 		$records = $query
-						->select('e.*, m.name AS moduleName, m.package AS modulePackage, m.enabled')
-						->from('core_entity', 'e')
-						->join('core_module', 'm', 'm.id = e.moduleId')
+			->select('e.*, m.name AS moduleName, m.package AS modulePackage, m.enabled')
+			->from('core_entity', 'e')
+			->join('core_module', 'm', 'm.id = e.moduleId')
 //						->where(['m.enabled' => true])
-						->all();
-		
+			->all();
+
 		$i = [];
 		foreach($records as $record) {
 			$type = static::fromRecord($record);
@@ -267,13 +280,13 @@ class EntityType implements ArrayableInterface {
 			}
 			$i[] = $type;
 		}
-		
+
 		return $i;
 	}
 
-  /**
-   * @return array
-   */
+	/**
+	 * @return array
+	 */
 	private static function getCache() :array {
 
 		$cache = go()->getCache()->get('entity-types');
@@ -286,7 +299,7 @@ class EntityType implements ArrayableInterface {
 			];
 
 			for($i = 0, $c = count($cache['models']); $i < $c; $i++) {
-			  	/** @var self $t */
+				/** @var self $t */
 				$t = $cache['models'][$i];
 				$cache['id'][$t->getId()] = $i;
 				$cache['name'][$t->getName()] = $i;
@@ -300,12 +313,12 @@ class EntityType implements ArrayableInterface {
 	}
 
 
-  /**
-   * Find by db id
-   *
-   * @param int $id
-   * @return static|bool
-   */
+	/**
+	 * Find by db id
+	 *
+	 * @param int $id
+	 * @return static|bool
+	 */
 	public static function findById(int $id) {
 
 		$c = self::getCache();
@@ -315,12 +328,12 @@ class EntityType implements ArrayableInterface {
 		return $c['models'][$c['id'][$id]] ?? false;
 	}
 
-  /**
-   * Find by client API name
-   *
-   * @param string $name
-   * @return static|bool
-   */
+	/**
+	 * Find by client API name
+	 *
+	 * @param string $name
+	 * @return static|bool
+	 */
 	public static function findByName(string $name) {
 
 		$c = self::getCache();
@@ -345,51 +358,51 @@ class EntityType implements ArrayableInterface {
 				throw new Exception("Entity '$name'  not found");
 			}
 			return $e->getId();
-		}, $names);	
+		}, $names);
 	}
-  
+
 
 	private static function fromRecord($record): EntityType
 	{
 		$e = new static;
 		$e->id = $record['id'];
 		$e->name = $record['name'];
-        $e->clientName = $record['clientName'];
+		$e->clientName = $record['clientName'];
 		$e->moduleId = $record['moduleId'];
 		$e->highestModSeq = (int) $record['highestModSeq'];
 		$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
 		$e->enabled = $record['enabled'];
-		
+
 		if (isset($record['modulePackage'])) {
 			if($record['modulePackage'] == 'core') {
-				$e->className = 'go\\core\\model\\' . ucfirst($e->name);	
+				$e->className = 'go\\core\\model\\' . ucfirst($e->name);
 				if(!class_exists($e->className)) {
-					$e->className = 'GO\\Base\\Model\\' . ucfirst($e->name);	
+					$e->className = 'GO\\Base\\Model\\' . ucfirst($e->name);
 				}
 			} else {
 				$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
 			}
-		} else {			
-			$e->className = 'GO\\' . ucfirst($record['moduleName']) . '\\Model\\' . ucfirst($e->name);			
+		} else {
+			$e->className = 'GO\\' . ucfirst($record['moduleName']) . '\\Model\\' . ucfirst($e->name);
 		}
-		
+
 		return $e;
 	}
 
-  /**
-   * Register multiple changes for JMAP
-   *
-   * This function increments the entity type's modSeq so the JMAP sync API
-   * can detect this change for clients.
-   *
-   * It writes the changes into the 'core_change' table.
-   *
-   * @param Query|array $changedEntities A query object or an array that provides "entityId", "aclId" and "destroyed"
-   * in this order. When using an array you may also provide a list of entity ID's. In that case it's assumed that these
-   * entites have no ACL and are not destroyed but modified.
-   * @return bool
-   * @throws Exception
-   */
+	/**
+	 * Register multiple changes for JMAP
+	 *
+	 * This function increments the entity type's modSeq so the JMAP sync API
+	 * can detect this change for clients.
+	 *
+	 * It writes the changes into the 'core_change' table.
+	 *
+	 * @param Query|array $changedEntities A query object or an array that provides "entityId", "aclId" and "destroyed"
+	 * in this order. When using an array you may also provide a list of entity ID's. In that case it's assumed that these
+	 * entites have no ACL and are not destroyed but modified.
+	 * @return bool
+	 * @throws Exception
+	 */
 	public function changes($changedEntities): bool
 	{
 		if(!jmap\Entity::$trackChanges) {
@@ -641,48 +654,58 @@ class EntityType implements ArrayableInterface {
 		if($force || $entityModified) {
 			$this->change($entity);
 		}
-		
+
 		if($userPropsModified) {
 			$this->userChange($entity);
 		}
 	}
-	
+
 	private function userChange(Entity $entity) {
 		$data = [
-				'modSeq' => $this->nextUserModSeq(),						
-				'entityTypeId' => $this->id,
-				'entityId' => $entity->id(),
-				'userId' => go()->getUserId()
-						];
+			'modSeq' => $this->nextUserModSeq(),
+			'entityTypeId' => $this->id,
+			'entityId' => $entity->id(),
+			'userId' => go()->getUserId()
+		];
 
 		$stmt = go()->getDbConnection()->replace('core_change_user', $data);
 		$stmt->execute();
 	}
 
-  /**
-   * Get the modSeq for the user specific properties.
-   *
-   * @return int
-   * @throws PDOException
-   */
+	/**
+	 * Get the modSeq for the user specific properties.
+	 *
+	 * @return int
+	 * @throws PDOException
+	 */
 	public function getHighestUserModSeq() : int {
 		if(!isset($this->highestUserModSeq)) {
-			$this->highestUserModSeq = (new Query())
-						->selectSingleValue("highestModSeq")
-						->from("core_change_user_modseq")
-						->where(["entityTypeId" => $this->id, "userId" => go()->getUserId()])
-						->single() ?? 0;
+
+			// create reusable statement
+			if(!isset(self::$highestUserModSeqStmt)) {
+				self::$highestUserModSeqStmt = (new Query())
+					->selectSingleValue("highestModSeq")
+					->from("core_change_user_modseq")
+					->where('entityTypeId = :entityTypeId AND userId = :userId')
+					->createStatement();
+			}
+
+			self::$highestUserModSeqStmt->bindValue(':entityTypeId', $this->id);
+			self::$highestUserModSeqStmt->bindValue(':userId', go()->getUserId());
+
+			$this->highestUserModSeq = self::$highestUserModSeqStmt
+				->fetch() ?? 0;
 		}
 		return $this->highestUserModSeq;
 	}
 
 
-  /**
-   * Get the modification sequence
-   *
-   * @return int
-   * @throws PDOException
-   */
+	/**
+	 * Get the modification sequence
+	 *
+	 * @return int
+	 * @throws PDOException
+	 */
 	public function nextModSeq() : int {
 
 		$stmt = go()->getDbConnection()
@@ -771,7 +794,7 @@ class EntityType implements ArrayableInterface {
 		if(!$acl->save()) {
 			throw new SaveException($acl);
 		}
-		
+
 		return $acl;
 	}
 
@@ -821,26 +844,26 @@ class EntityType implements ArrayableInterface {
 		if(!$this->isAclOwner()) {
 			return null;
 		}
-		
+
 		if(!isset($this->defaultAclId)) {
-			
+
 			go()->getDbConnection()->beginTransaction();
-			
+
 			$acl = $this->createAcl();
-			
+
 			go()->getDbConnection()->update('core_entity', ['defaultAclId' => $acl->id], ['id' => $this->getId()])->execute();
 
 			go()->getDbConnection()->commit();
-			
+
 			$this->defaultAclId = $acl->id;
 		}
-		
+
 		return $this->defaultAclId;
 	}
-	
+
 	/**
 	 * Returns true when this entity type holds an ACL id for permissions.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function isAclOwner(): bool
@@ -848,25 +871,25 @@ class EntityType implements ArrayableInterface {
 		$cls = $this->getClassName();
 		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 		return $cls != Search::class &&
-						(
-							is_subclass_of($cls, AclOwnerEntity::class) ||
-							(is_subclass_of($cls, ActiveRecord::class) && $cls::model()->aclField() && !$cls::model()->isJoinedAclField)
-						);
+			(
+				is_subclass_of($cls, AclOwnerEntity::class) ||
+				(is_subclass_of($cls, ActiveRecord::class) && $cls::model()->aclField() && !$cls::model()->isJoinedAclField)
+			);
 	}
-	
+
 	/**
 	 * Returns true if this entity supports custom fields
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function supportsCustomFields(): bool
 	{
 		return method_exists($this->getClassName(), "getCustomFields");
 	}
-	
+
 	/**
 	 * Returns true if the entity supports a files folder.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function supportsFiles(): bool
@@ -930,11 +953,11 @@ class EntityType implements ArrayableInterface {
 	public function toArray(array $properties = null): array
 	{
 		return [
-				"name" => $this->getName(),
-				"isAclOwner" => $this->isAclOwner(),
-				"defaultAcl" => $this->getDefaultAcl(),
-				"supportsCustomFields" => $this->supportsCustomFields(),
-				"supportsFiles" => $this->supportsFiles()
+			"name" => $this->getName(),
+			"isAclOwner" => $this->isAclOwner(),
+			"defaultAcl" => $this->getDefaultAcl(),
+			"supportsCustomFields" => $this->supportsCustomFields(),
+			"supportsFiles" => $this->supportsFiles()
 		];
 	}
 }

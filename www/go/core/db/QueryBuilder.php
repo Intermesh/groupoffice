@@ -138,7 +138,7 @@ class QueryBuilder {
 
 		$this->reset();
 		$this->setTableName($tableName);
-		$this->aliasMap[$tableName] = Table::getInstance($this->tableName, $this->conn);
+		$this->aliasMap[$tableName] = $this->tableName;
 
 		$sql = $command . " ";
 
@@ -209,7 +209,7 @@ class QueryBuilder {
 		$this->buildBindParameters = [];
 		$this->namedParameters = $query->getBindParameters();
 		$this->tableAlias = $this->query->getTableAlias();
-		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
+		$this->aliasMap[$this->tableAlias] = $this->tableName;
 
 		if (is_array($data)) {
 			$updates = [];
@@ -265,7 +265,7 @@ class QueryBuilder {
 		$this->buildBindParameters = [];
 		$this->namedParameters = $query->getBindParameters();
 		$this->tableAlias = $this->query->getTableAlias();
-		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
+		$this->aliasMap[$this->tableAlias] = $this->tableName;
 
 		$sql = "DELETE FROM `" . $this->tableAlias . "` USING `" . $this->tableName . "` AS `" . $this->tableAlias . "` ";
 
@@ -349,7 +349,7 @@ class QueryBuilder {
 		} else
 		{
 			$this->setTableName($from);
-			$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
+			$this->aliasMap[$this->tableAlias] = $this->tableName;
 			$fromSql = "FROM `" . $this->tableName . '`';
 		}
 
@@ -481,12 +481,11 @@ class QueryBuilder {
 	 */
 	private function findColumn(string $tableAlias, string $column): Column
 	{
-
 		if (!isset($this->aliasMap[$tableAlias])) {
 			throw new InvalidArgumentException("Alias '" . $tableAlias . "'  not found in the aliasMap for " . $column);
 		}
 
-		$col = $this->aliasMap[$tableAlias]->getColumn($column);
+		$col = Table::getInstance($this->aliasMap[$tableAlias], $this->conn)->getColumn($column);
 		if ($col === null) {
 			throw new InvalidArgumentException("Column '" . $column . "' not found in table " . $this->aliasMap[$tableAlias]->getName());
 		}
@@ -670,7 +669,7 @@ class QueryBuilder {
 		if (empty($columnParts[0])) {
 			$tables = [];
 			foreach($this->aliasMap as $table) {
-				$tables[] = $table->getName();
+				$tables[] = $table;
 			}
 			throw new InvalidArgumentException("Invalid column name '" . $columnName . "'. Not a column of any table: ".implode(', ', $tables));
 		}
@@ -765,7 +764,7 @@ class QueryBuilder {
 			
 			//find table for column
 			foreach($this->aliasMap as $tableAlias => $table) {
-				$columnObject = $table->getColumn($colName);
+				$columnObject = Table::getInstance($table, $this->conn)->getColumn($colName);
 				if ($columnObject) {
 					$alias = $tableAlias;
 					break;
@@ -912,7 +911,7 @@ class QueryBuilder {
 
 			$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 		} else {
-			$this->aliasMap[$config['joinTableAlias']] = Table::getInstance($config['src'], $this->query->getDbConnection());
+			$this->aliasMap[$config['joinTableAlias']] = $config['src'];
 			$joinTableName = '`' . $config['src'] . '`';
 		}
 
