@@ -628,6 +628,8 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 			
 			ZLog::Write(LOGLEVEL_DEBUG, "Closing DB connection");
 			\GO::unsetDbConnection();
+			go()->getCache()->disableMemory();
+			gc_collect_cycles();
 			
 			if (empty($notifications)){
 				
