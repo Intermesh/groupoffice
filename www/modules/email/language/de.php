@@ -350,4 +350,5 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Are you sure you want to unlink this item?' => 'Sind Sie sicher, dass Sie diese Verknüpfung aufheben möchten?',
   'Copy image' => 'Bild kopieren',
   'Sory, this is not supported by Firefox' => 'Sorry, dies wird von Firefox nicht unterstützt',
+  'Failed to send the request to the server. Please check your internet connection.' => 'Die Anforderung konnte nicht an den Server gesendet werden. Bitte überprüfen Sie Ihre Internetverbindung.',
 );
