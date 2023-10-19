@@ -143,7 +143,7 @@ namespace go\core {
 		
 		private $version;
 
-        private $systemTimeZone;
+    private $systemTimeZone;
 
 		protected function __construct() {
 			parent::__construct();

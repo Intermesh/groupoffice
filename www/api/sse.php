@@ -69,7 +69,7 @@ Response::get()
 
 try {
 // Client may specify 'types' and a 'ping' interval
-	(new PushDispatcher($_GET['types']))->start($_GET['ping'] ?? 10);
+	(new PushDispatcher(!empty($_GET['types']) ? explode(',', $_GET['types']) : []))->start($_GET['ping'] ?? 10);
 } catch(Throwable $e) {
 	echo "event: exception\n";
 	echo 'data: ' . $e->getMessage(). "\n\n";

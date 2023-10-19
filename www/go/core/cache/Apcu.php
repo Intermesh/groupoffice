@@ -95,13 +95,13 @@ class Apcu implements CacheInterface {
 		if($this->keepInMemory && isset($this->cache[$key])) {
 			return $this->cache[$key];
 		}
+
 		$success = false;
 		
 		$value = apcu_fetch($this->prefix . '-' .$key, $success);
 		
 		if(!$success) {
-			// if acpu fails fallback on disk cache
-			return $this->getDiskCache()->get($key);
+			return null;
 		}
 
 		if($this->keepInMemory) {
