@@ -64,10 +64,10 @@ class Alert extends UserProperty {
 	}
 
 	public function setTrigger($v) {
-		if($v['offset']) {
+		if(isset($v['offset'])) {
 			$this->offset = $v['offset'];
 			$this->relatedTo = isset($v['relatedTo']) ? $v['relatedTo'] : self::Start;
-		} elseif($v['when']) {
+		} elseif(isset($v['when'])) {
 			$this->when = $v['when'];
 		}
 	}

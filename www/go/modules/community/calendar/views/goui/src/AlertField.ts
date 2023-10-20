@@ -1,4 +1,4 @@
-import {btn, Component, containerfield, MapField, mapfield, numberfield, select, t} from "@intermesh/goui";
+import {t, SelectField, Config, createComponent, FieldEventMap} from "@intermesh/goui";
 
 interface Alert {
 	trigger:any // {offset, relativeTo} | {when}
@@ -6,38 +6,102 @@ interface Alert {
 	action?:'display'|'email'
 }
 
-export class AlertField extends Component {
+export class AlertField extends SelectField {
 
-	list: MapField
-
+	fullDay = false
+	isForDefault = false
 	constructor() {
 		super();
-		this.items.add(
-			this.list = mapfield({name: 'alerts',
-				buildField: (v) => containerfield({flex:'1 0 100%',cls: 'flow',itemId:'defaultAlertsWithTime'},
-					select({width: 120, name:'action', options:[
-							{name: t('Email'), value:'email'},
-							{name:t('Notification'), value: 'display'}
-						]}),
-					numberfield({width: 70, name:'offset', decimals:0, value:1}),
-					select({flex:'1 0', options: [
-							{value: '0', name: t('at start time')},
-							{value: 'minutes', name: t('minute(s) before')},
-							{value: 'hours', name: t('hour(s) before')},
-							{value: 'days', name: t('day(s) before')},
-						]})
-				)
-			}),
-			btn({
-				text: 'add alert',
-				handler: () => {
-					this.addAlert({trigger:{when:'now'}});
-				}
-			}),
-		)
+		this.name = 'alerts';
+		this.label = t('Alerts');
 	}
 
-	addAlert(data: Alert) {
-		this.list.add(data);
+	drawOptions() {
+		this.options = this.fullDay ? [
+			{value: '-P1D', name: t('1 day before')},
+			{value: '-P2D', name: t('2 days before')}
+		] : [
+			{value: '-PT5M', name: t('5 minutes before')},
+			{value: '-PT10M', name: t('10 minutes before')},
+			{value: '-PT15M', name: t('15 minutes before')},
+			{value: '-PT1H', name: t('1 hour before')},
+			{value: '-PT2H', name: t('2 hours before')},
+			{value: 'P0D', name: t('At the start')},
+		];
+		if(!this.isForDefault) {
+			super.value = 'default';
+			this.options.unshift({value: 'default', name: t('Default')});
+		}
+		this.options.unshift({value: null, name: t('None')})
+		super.drawOptions();
 	}
+
+	get value() {
+		const v = super.value;
+		return (v && v !=='default') ? {1:{trigger:{offset:v}}} : {};
+	}
+
+	set value(v: {[id:string]:Alert}) {
+		super.value = (v && v[1].trigger) ? v[1].trigger.offset : v;
+	}
+
+	setDefaultLabel(alert?: {[id:string]:Alert}) {
+		var txt = t('None');
+		if (alert && alert[1]) {
+			const duration = this.parseDuration(alert[1].trigger.offset);
+			txt = this.durationToText(duration);
+		}
+		this.input!.options[1].innerText = t('Default') + ' ('+txt+')';
+	}
+
+	private durationToText(duration:any) {
+		let str = [];
+		// if(duration.year) {
+		// 	str += (duration.year) + ' ' + (duration.year === 1 ? t('year') : t('years')));
+		// }
+		if(duration.day) {
+			str.push(duration.day + ' ' + (duration.day === 1 ? t('day') : t('days')));
+		}
+		if(duration.hour) {
+			str.push(duration.hour + ' ' + (duration.day === 1 ? t('hour') : t('hours')));
+		}
+		if(duration.minute) {
+			str.push(duration.minute + ' ' + (duration.day === 1 ? t('minute') : t('minutes')));
+		}
+
+		return str.join(', ') + ' ' + (duration.negative ? t('before') : t('after'));
+	}
+
+	private parseDuration(val: string) {
+		var value: any = {negative:false},
+			p = val.split('');
+		if(p[0] == '-') {
+			value.negative = true;
+			p.shift();
+		}
+		if(p[0] == 'P') p.shift();
+		let time = false;
+		let num = '';
+		for(const char of p) {
+			if(/[A-Z]/.test(char!)) {
+				const n = parseFloat(num);
+				switch(char) {
+					case 'T': time = true; break;
+					case 'Y': value.year = n; break;
+					case 'M': time ? (value.minute = n) : (value.month = n); break;
+					case 'D': value.day = n; break;
+					case 'W': value.week = n; break;
+					case 'H': value.hours = n; break;
+					case 'S': value.seconds = n; break;
+				}
+				num = '';
+			} else {
+				num += char;
+			}
+		}
+		return value;
+	}
+
 }
+
+export const alertfield = (config?: Config<AlertField, FieldEventMap<AlertField>>) => createComponent(new AlertField(), config);

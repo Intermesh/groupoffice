@@ -7,38 +7,10 @@ import {
 	E,
 	menu,
 	Recurrence,
-	t,
-	tbar,
-	win
+	t
 } from "@intermesh/goui";
-import {EventDialog} from "./EventDialog.js";
-import {calendarStore} from "./Index.js";
-import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
-
-export interface CalendarEvent {
-	recurrenceRule?: any
-	recurrenceOverrides?: any
-	links?: any
-	alerts?: any
-	showWithoutTime: boolean // isAllDay
-	duration: string
-	id?: string
-	start: string
-	title: string
-	color?: string
-	calendarId: string
-}
-
-export interface CalendarItem {
-	key: string // id/recurrenceId
-
-	recurrenceId?:string
-	data: CalendarEvent
-	start: DateTime
-	end: DateTime
-	color: string
-	divs: {[week: string] :HTMLElement}
-}
+import {JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
+import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
 export abstract class CalendarView extends Component {
 	
@@ -46,19 +18,19 @@ export abstract class CalendarView extends Component {
 	protected days: number = 1
 	protected firstDay?: DateTime
 	protected recur?: {[id:string]: Recurrence}
-	protected contextMenu = menu({removeOnClose:false},
+	protected contextMenu = menu({removeOnClose:false, isDropdown: true},
 		btn({icon:'open_with', text: t('Show')}),
-		btn({icon:'edit', text: t('Edit'), handler: _ => this.editItem()}),
+		btn({icon:'edit', text: t('Edit'), handler: _ => this.current!.edit()}),
 		btn({icon:'email', text: t('E-mail participants')}),
 		//'-',
-		btn({icon:'delete', text: t('Delete'), handler: _ => this.removeItem() }),
-		btn({icon: 'import_export', text: t('Download ICS'), handler: _ => this.downloadIcs() })
+		btn({icon:'delete', text: t('Delete'), handler: _ => this.current!.remove() }),
+		btn({icon: 'import_export', text: t('Download ICS'), handler: _ => this.current!.downloadIcs() })
 	);
 
 	protected selected: CalendarItem[] = []
 	protected viewModel: CalendarItem[] = []
 
-	protected store: DataSourceStore<JmapDataSource>
+	protected store: DataSourceStore<JmapDataSource<CalendarEvent>>
 
 	constructor() {
 		super();
@@ -78,41 +50,6 @@ export abstract class CalendarView extends Component {
 		this.on('render', () => { this.store.load() });
 	}
 
-	save(ev: CalendarItem, onCancel: Function) {
-		const newStart = ev.start.format('Y-m-dTH:i:s'),
-			newDuration = ev.start.diff(ev.end);
-
-		if (newStart != (ev.recurrenceId || ev.data.start) || newDuration != ev.data.duration) {
-			ev.data.start = newStart;
-			ev.data.duration = newDuration;
-			if(ev.data.id && !this.isRecurring(ev)) {
-				// quick save:
-				this.store.dataSource.update(ev.data); // await?
-			} else {
-				this.editItem(ev, onCancel);
-			}
-		}
-	}
-
-	private isRecurring(ev: CalendarItem) {
-		return ev.key.includes('/');
-	}
-
-	protected editItem(ev:CalendarItem = this.current!, onCancel?: Function) {
-		//if (!ev.data.id) {
-		const dlg = new EventDialog();
-		dlg.on('close', () => {
-			// cancel ?
-			onCancel && onCancel();
-			// did we save then show loading circle instead
-			if(!ev.key) // new
-				Object.values(ev.divs).forEach(d => d.remove());
-
-		})
-		dlg.show();
-		dlg.load(ev);
-	}
-
 	update = (data?: any) => {
 		//this.fire('change', data);
 		//this.dom.cls('-loading');
@@ -122,63 +59,17 @@ export abstract class CalendarView extends Component {
 		//}
 	}
 
-	protected makeItems(e: CalendarEvent, from: DateTime, until: DateTime) {
-		const start = new DateTime(e.start),
-			end = start.clone().addDuration(e.duration),
-			color = e.color || calendarStore.items.find((c:any) => c.id == e.calendarId)?.color || '356772',
-			items = [];
-		if(end.date > from.date && start.date < until.date && !e.recurrenceRule) {
-			items.push({
-				key: e.id+"",
-				start,
-				end,
-				data:e,
-				divs:{},
-				color
-			});
-		}
-		if(e.recurrenceRule) {
-			const r = new Recurrence({dtstart: new Date(e.start), rule: e.recurrenceRule, ff: from.date});
-			let rEnd = r.current.clone().addDuration(e.duration);
-			while(r.current.date < until.date && rEnd.date > from.date) {
-			//if(r.current.date < until.date) {
-				//do {
-					//const rEnd = r.current.clone().addDuration(e.duration);
-					//if(rEnd.date > from.date) {
-						const recurrenceId = r.current.format('Y-m-d\Th:i:s');
-						if (e.recurrenceOverrides?.[recurrenceId]) {
-							debugger; //todo
-						}
-						items.push({
-							key: e.id + '/' + recurrenceId,
-							recurrenceId: recurrenceId,
-							start: r.current.clone(),
-							end: rEnd,
-							data: e,
-							divs: {},
-							color
-						});
-						r.next();
-						rEnd = r.current.clone().addDuration(e.duration);
-					//}
-				//} while(r.current.date < until.date && r.next())
-			}
-		}
-		return items;
-	}
-
 	private current?: CalendarItem
 	protected eventHtml(item: CalendarItem) {
 		const e = item.data;
-		const icons = [],
-			 start = new DateTime(e.start);
+		const icons = []
 		if(e.recurrenceRule) icons.push(E('i','refresh').cls('icon'));
 		if(e.links) icons.push('attachment');
 		if(e.alerts) icons.push('notifications');
 
 		return E('div',
-			E('em',...icons, e.title || '('+t('Nameless')+')'),
-			E('span',  e.showWithoutTime === false ? start.format('G:i'):'')
+			E('em',...icons, item.title || '('+t('Nameless')+')'),
+			E('span',  e.showWithoutTime === false ? item.start.format('G:i'):'')
 		).cls('allday',e.showWithoutTime)
 			.attr('data-key', item.key || '_new_')
 			.attr('tabIndex', 0)
@@ -202,7 +93,7 @@ export abstract class CalendarView extends Component {
 				this.contextMenu.showAt(ev);
 				ev.preventDefault();
 			}).on('dblclick', ev => {
-				this.editItem(item, ()=>{});
+				item.edit();
 			});
 	}
 
@@ -211,46 +102,6 @@ export abstract class CalendarView extends Component {
 			Object.values(ev.divs).forEach(d => d.remove());
 		})
 		this.viewModel = [];
-	}
-
-	protected removeItem(ev:CalendarItem = this.current!) {
-		if(!this.isRecurring(ev)) {
-			this.store.dataSource.destroy(ev.data.id);
-		} else {
-			const w = win({
-					title: t('Do you want to delete a recurring event?'),
-					modal: true,
-				},comp({
-					cls:'pad',
-					html: t('You will be deleting a recurring event. Do you want to delete this occurrence only or all future occurrences?')
-				}),tbar({},btn({
-						text: t('This event'),
-						cls:'primary',
-						handler: b => { this.removeOccurrence(ev.data.id, ev.recurrenceId); }
-					}),btn({
-						text: t('All future events'),
-						handler: b => { this.removeFutureEvents(ev); }
-					}),'->',btn({
-						text: t('Cancel'), // save to series
-						handler: b => w.close()
-					})
-				)
-			)
-			w.show();
-		}
-	}
-
-	private removeOccurrence(id, recurrenceId) {
-		this.store.dataSource.update({id:id, recurrenceOverrides:{[recurrenceId]:{excluded:true}}});
-	}
-
-	private removeFutureEvents(ev: CalendarItem) {
-		ev.data.recurrenceRule.until = ev.recurrenceId;
-		this.store.dataSource.update({id: ev.data.id as string, recurrenceRule: ev.data.recurrenceRule});
-	}
-
-	protected downloadIcs(){
-		client.downloadBlobId('community/calendar/ics/'+this.current?.key, 'test.ics');
 	}
 
 	protected slots: any;

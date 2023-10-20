@@ -183,10 +183,11 @@ abstract class Property extends Model {
 		$m = static::getMapping();
 		foreach($record as $colName => $value) {
 
+
+
 			if(str_contains($colName, '.')) {
 				$this->setPrimaryKey($colName, $value);
 			} else {
-
 				$col = $m->getColumn($colName);
 				if($col) {
 					$value = $col->castFromDb($value);
@@ -758,11 +759,15 @@ abstract class Property extends Model {
 		}
 		//this is a primary key value. See buildSelect()
 		$alias = substr($name, 0, $pos);
-		$col = substr($name, $pos + 1);
+		$colName = substr($name, $pos + 1);
+		$column = static::getMapping()->getColumn($colName);
+		if($column) {
+			$value = $column->castFromDb($value);
+		}
 		if(!isset($this->primaryKeys[$alias])) {
 			$this->primaryKeys[$alias] = [];
 		}
-		$this->primaryKeys[$alias][$col] = $value;
+		$this->primaryKeys[$alias][$colName] = $value;
 
 		return true;
 	}

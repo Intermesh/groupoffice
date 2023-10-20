@@ -2,6 +2,7 @@ import {CalendarView} from "./CalendarView.js";
 import {DateTime, E} from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
 import {Main} from "./Main.js";
+import {CalendarItem} from "./CalendarItem.js";
 
 export class YearView extends CalendarView {
 	main: Main
@@ -15,7 +16,7 @@ export class YearView extends CalendarView {
 		this.clear()
 		const viewEnd = this.day.clone().addYears(1);
 		for (const e of this.store.items) {
-			this.viewModel.push(...super.makeItems(e, this.day, viewEnd));
+			this.viewModel.push(...CalendarItem.makeItems(e, this.day, viewEnd));
 		}
 		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 
@@ -72,7 +73,7 @@ export class YearView extends CalendarView {
 					continue;
 				}
 				ev.append(E('p')
-					.attr('title', e.data.title+' - '+e.start.format('H:i'))
+					.attr('title', e.title+' - '+e.start.format('H:i'))
 					//.attr('data-color', e.color)
 					.css({backgroundColor: '#'+e.color})
 				);

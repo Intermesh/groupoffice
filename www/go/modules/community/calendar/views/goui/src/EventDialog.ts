@@ -1,28 +1,33 @@
-
-import {DataSourceForm, datasourceform, DateField, form, Form} from "@intermesh/goui";
-import {fieldset} from "@intermesh/goui";
-import {textfield} from "@intermesh/goui";
-import {checkbox} from "@intermesh/goui";
-import {datefield} from "@intermesh/goui";
-import {select} from "@intermesh/goui";
-import {tbar} from "@intermesh/goui";
-import {t} from "@intermesh/goui";
-import {htmlfield} from "@intermesh/goui";
-import {btn} from "@intermesh/goui";
-import {win, Window} from "@intermesh/goui";
-import {comp} from "@intermesh/goui";
-import {TextField} from "@intermesh/goui";
+import {
+	browser,
+	btn,
+	checkbox,
+	column,
+	comp,
+	DataSourceForm,
+	datasourceform,
+	DateField,
+	datefield,
+	DateTime,
+	Format,
+	radio,
+	recurrencefield,
+	select,
+	store,
+	t,
+	table,
+	tbar,
+	textarea,
+	textfield,
+	TextField,
+	win,
+	Window
+} from "@intermesh/goui";
 import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
-import {DateTime} from "@intermesh/goui";
-import {radio} from "@intermesh/goui";
-import {textarea} from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
 import {ParticipantField} from "./ParticipantField.js";
-import {containerfield} from "@intermesh/goui";
-import {mapfield} from "@intermesh/goui";
-import {recurrencefield} from "@intermesh/goui";
-import {AlertField} from "./AlertField.js";
-import {CalendarEvent, CalendarItem} from "./CalendarView.js";
+import {alertfield} from "./AlertField.js";
+import {CalendarItem} from "./CalendarItem.js";
 
 
 export class EventDialog extends Window {
@@ -34,6 +39,7 @@ export class EventDialog extends Window {
 	startTime: TextField
 	endTime: TextField
 
+	item?: CalendarItem
 	recurrenceId?: string
 
 	store: JmapDataSource
@@ -41,12 +47,16 @@ export class EventDialog extends Window {
 	constructor() {
 		super();
 		this.title = t('New Event');
-		this.width = 540;
-		this.height = 550;
+		this.width = 400;
+		this.height = 700;
 		this.store = jmapds("CalendarEvent");
-		this.startTime = textfield({value: '12:00', width: 80})
-		this.endTime = textfield({value: '13:00', width: 80})
-		var recurrenceField = recurrencefield({name: 'recurrenceRule', label: t('Recurrence')});
+		this.startTime = textfield({value: '12:00', width: 100})
+		this.endTime = textfield({value: '13:00', width: 100})
+		var recurrenceField = recurrencefield({name: 'recurrenceRule',flex:1});
+		var alertField = alertfield();
+		alertField.on('change', (_, newValue) => {
+			this.form.value.useDefaultAlert = newValue === 'default';
+		});
 
 		this.items.add(this.form = datasourceform({
 				cls: 'scroll flow pad',
@@ -74,99 +84,130 @@ export class EventDialog extends Window {
 				}
 			},
 			textfield({placeholder: t('Enter a title, name or place'), name: 'title', flex: '0 1 70%' }),
-			select({name:'calendarId', required:true, flex: '1 20%', store: calendarStore, valueField:'id', textRenderer:(r:any)=>r.name }),
-			comp({flex: '1 40%'},
-				checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'), listeners: {'setvalue':(_,checked) => {
-					this.startTime.hidden = this.endTime.hidden = checked;
-				} }}),
-				comp({cls:'hbox'},
-					datefield({label: t('From'), name:'start', flex:1, timefield: this.startTime, listeners:{'setvalue': (me,v) => {
-						const date = DateTime.createFromFormat(v,me.inputFormat);
-						if(date)
-							recurrenceField.setStartDate(date);
-					}}}),
-					this.startTime
-				),
-				comp({cls:'hbox'},
-					datefield({label:t('To'), name: 'end', flex:1, timefield: this.endTime}),
-					this.endTime
-				),
+			select({
+				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 20%',
+				store: calendarStore, valueField: 'id',
+				textRenderer: (r: any) => r.name,
+				listeners: {
+					'setvalue': (me, v) => {
+						if(v)
+						calendarStore.dataSource.single(v).then(r => {
+							if(!r) return;
+							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+								alertField.setDefaultLabel(d)
+						});
+
+					}
+				}
+			}),
+			textfield({name: 'location', label:t('Location')}),
+			checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'), listeners: {'setvalue':(_,checked) => {
+				alertField.fullDay = checked;
+				alertField.drawOptions();
+				calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
+					if(!r) return;
+					const d = checked ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+					alertField.setDefaultLabel(d)
+				});
+				this.startTime.hidden = this.endTime.hidden = checked;
+			}}}),
+			comp({cls:'hbox'},
+				datefield({label: t('Start'), name:'start', flex:1, timeField: this.startTime, listeners:{'setvalue': (me,v) => {
+							const date = DateTime.createFromFormat(v,me.inputFormat);
+							if(date)
+								recurrenceField.setStartDate(date);
+						}}}),
+				this.startTime
+			),
+			comp({cls:'hbox'},
+				datefield({label:t('End'), name: 'end', flex:1, timeField: this.endTime}),
+				this.endTime
+			),
+			comp({cls:'hbox'},
 				recurrenceField,
+				btn({text:t('Exceptions'),width: 100, handler: b => {
+					this.openExceptionsDialog();
+				}}),
 			),
-			comp({flex: '1 40%', cls:'flow'},
-				textfield({name: 'location', label:t('Location')}),
-				new ParticipantField(),
-				radio({type:'button',value: 'busy', name: 'freeBusyStatus', flex:'1 40%',options: [
-					{value:'busy',text: t('Busy')},
-					{value:'free',text: t('Free')}
-				]}),
-				select({name: 'privacy', flex:'1 40%', required:true, value: 'public', label: t('Visibility'), options: [
-					{value:'public', name: t('Public')},
-					{value:'private',name:  t('Private')},
-					{value:'secret',name:  t('Secret')}
-				]})
-			),
+			new ParticipantField(),
+			alertField,
 			textarea({name:'description', label: t('Description')}),
-			new AlertField()
+
+			radio({type:'button',value: 'busy', name: 'freeBusyStatus', flex:'1 40%',options: [
+				{value:'busy',text: t('Busy')},
+				{value:'free',text: t('Free')}
+			]}),
+			select({name: 'privacy', flex:'1 40%', required:true, value: 'public', label: t('Visibility'), options: [
+				{value:'public', name: t('Public')},
+				{value:'private',name:  t('Private')},
+				{value:'secret',name:  t('Secret')}
+			]}),
+
 		),
 		tbar({},
+			btn({icon:'attach_file', handler: _ => this.attachFile() }),
 			'->',
 			btn({text:t('Save'), handler: _ => this.submit()})
 		));
+
+
+	}
+
+	private openExceptionsDialog() {
+		const o = this.form.value.recurrenceOverrides;
+		let d = [];
+		for(let recurrenceId in o) {
+			d.push({recurrenceId, excluded: o[recurrenceId]?.excluded})
+		}
+		const exceptionStore = store({items:d}),
+			exceptionView = win({
+				title: t('Exceptions'),
+				height:400,
+			}, table({
+				fitParent:true,
+				store: exceptionStore,
+				columns: [
+					column({id: "recurrenceId", header:t('Start'), renderer(v,record) {
+						return Format.dateTime(v)+ `<br><small>${record.excluded ? 'Excluded' : 'Override'}</small>`;
+					}}),
+					column({id: "excluded", header: '', width:90, renderer: (v,r) => btn({icon:'delete',handler:()=>{
+						this.removeException(r.recurrenceId).then(_=> { exceptionStore.remove(r)})
+					}})
+					}),
+				]
+			}));
+
+		exceptionView.show();
+	}
+
+	private removeException(recurrenceId:string) {
+		return this.form.dataSource.update(this.form.value.id, {recurrenceOverrides:{[recurrenceId]:null}});
 	}
 
 	load(ev: CalendarItem) {
-		delete this.recurrenceId;
-		if (!ev.data.id) {
+		this.item = ev;
+
+		if (!ev.key) {
 			this.form.create(ev.data);
 		} else {
-			if (ev.recurrenceId)
-				this.recurrenceId = ev.recurrenceId;
 			this.form.load(ev.data.id);
 		}
 	}
 
 	submit() {
-		if(!this.recurrenceId) {
+		if(!this.item!.isRecurring) {
 			this.form.submit();
-		} else {
-			const thisSeriesFutureDialog = win({
-					title: t('Edit recurring event')
-				},comp({
-					cls:'pad',
-					html: t('Which event would you like to edit?')
-				}),tbar({},btn({
-						text: t('This event'),
-						handler: b => this.patchOccurrence(this.form.value as CalendarEvent, this.recurrenceId!)
-					}),btn({
-						text: t('This and future'),
-						handler: b => this.patchThisAndFuture({} as CalendarItem)
-					}),btn({
-						text: t('All events'), // save to series
-						handler: b => this.form.submit()
-					})
-				)
-			);
-			thisSeriesFutureDialog.show();
+		} else{
+			this.item!.patch(this.form.modified, _=>this.close());
 		}
 	}
 
-
-
-	private patchOccurrence(data: CalendarEvent, recurrenceId: string) {
-		this.store.update({
-			id: data.id!,
-			recurrenceOverrides: {[recurrenceId]: data}
-		});
-	}
-
-	/**
-	 * @see  https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-10.html#section-5.5
-	 * @param ev CalendarItem data the event item created by the DnD view
-	 */
-	private patchThisAndFuture(ev:CalendarItem) {
-		//if(ev.data)
-		alert('todo');
+	private async attachFile() {
+		 const files = await browser.pickLocalFiles(true);
+		 this.mask();
+		 const blobs = await client.uploadMultiple(files);
+		 this.unmask();
+		 console.warn(blobs);
 	}
 
 }

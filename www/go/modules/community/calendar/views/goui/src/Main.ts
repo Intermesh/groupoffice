@@ -18,6 +18,7 @@ import {checkbox} from "@intermesh/goui";
 import {FunctionUtil} from "@intermesh/goui";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SpltView.js";
+import {SubscribeWindow} from "./SubscribeWindow.js";
 
 type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year';
 type ValidView = 'split' | 'merge';
@@ -50,7 +51,7 @@ export class Main extends Component {
 		this.items.add(
 			this.west = comp({tagName: 'aside', width: 286},
 				tbar({},
-					btn({icon: 'add', cls:'primary', style:{width:'100%'}, text: t('Create event'), handler: _ => (new EventDialog()).show() })
+					btn({icon: 'add', cls:'primary filled', style:{width:'100%'}, text: t('Create event'), handler: _ => (new EventDialog()).show() })
 				),
 				this.picker = datepicker({
 					showWeekNbs: false,
@@ -73,9 +74,19 @@ export class Main extends Component {
 					}
 				}),
 				tbar({cls:'dense'},
-					comp({tagName:'h3',html: 'Calendars'}),
-					btn({icon: 'home'}),
-					btn({icon: 'settings'}),
+					comp({tagName:'h3', html: 'Calendars'}),
+					btn({icon: 'add', menu: menu({},
+						btn({text:t('Create calendar')+'…', handler: () => {
+							const dlg = new CalendarDialog();
+							dlg.form.create({});
+							dlg.show();
+						}}),
+						btn({text: t('Subscribe to calendar')+'…', handler: () => {
+							const d = new SubscribeWindow();
+							d.show();
+						}}),
+						btn({text: t('Add calendar from link')+'…'})
+					)}),
 					btn({icon: 'done_all'})
 				),
 				list({
@@ -154,14 +165,15 @@ export class Main extends Component {
 						btn({icon: 'view_day', text: t('Day'), handler: b => this.setSpan('day', 1)}),
 						btn({icon: 'view_week', text: t('Week'), handler: b => this.setSpan('week', 7)}),
 						btn({icon: 'view_module', text: t('Month'),handler: b => this.setSpan('month', 31)}),
-						btn({icon: 'view_module', text: t('Year'),handler: b => this.setSpan('year', 365)})
+						btn({icon: 'view_module', text: t('Year'),handler: b => this.setSpan('year', 365)}),
+						btn({icon: 'call_split', text: t('Split'), handler: b => this.setView('split') }),
 					),
 					'->',
-					comp({cls:'group'},
-						btn({icon:'call_merge', cls:'active', handler: b => this.setView('merge') }),
-						btn({icon:'call_split', handler: b => this.setView('split')})
-					),
-					'->',
+					// comp({cls:'group'},
+					// 	btn({icon:'call_merge', cls:'active', handler: b => this.setView('merge') }),
+					// 	btn({icon:'call_split', handler: b => this.setView('split')})
+					// ),
+					// '->',
 					btn({icon: 'info'}),
 					btn({
 						icon: 'print', menu: menu({expandLeft: true},
@@ -218,6 +230,7 @@ export class Main extends Component {
 	setSpan(value: ValidTimeSpan, amount: number) {
 		this.timeSpan = value;
 		this.spanAmount = amount;
+		this.viewType = 'merge';
 		this.updateView();
 	}
 
@@ -239,6 +252,7 @@ export class Main extends Component {
 
 		if(this.viewType === 'split') {
 			tabs[0] = 3; // use 3th tabpanel
+			tabs[1] = 4; // use last tabmenu item
 		}
 
 		this.cardMenu.items.forEach(i=>i.el.cls('-active'));

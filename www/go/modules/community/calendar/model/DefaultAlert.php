@@ -4,8 +4,9 @@ namespace go\modules\community\calendar\model;
 
 use go\core\orm\Mapping;
 use go\core\orm\Property;
+use go\core\orm\UserProperty;
 
-class DefaultAlert extends Property {
+class DefaultAlert extends UserProperty {
 
 	/* relatedTo */
 	const Start = 'start';
@@ -36,6 +37,8 @@ class DefaultAlert extends Property {
 	/** @var string 'email' | 'display'  */
 	public $action;
 
+	protected $userId;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()->addTable('calendar_default_alert', "alert");
@@ -50,11 +53,12 @@ class DefaultAlert extends Property {
 	}
 
 	public function setTrigger($v) {
-		if($v['offset']) {
+		if(isset($v['offset'])) {
 			$this->offset = $v['offset'];
 			$this->relatedTo = isset($v['relatedTo']) ? $v['relatedTo'] : self::Start;
-		} elseif($v['when']) {
+		} elseif(isset($v['when'])) {
 			$this->when = $v['when'];
 		}
 	}
+
 }

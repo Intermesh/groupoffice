@@ -65,8 +65,9 @@ export class ParticipantField extends Component {
 					// },
 					'change': (me, newValue) => {
 						var r= me.list.store.get(newValue);
-						debugger;
-						this.addParticipant(r);
+						//debugger;
+						if(r)
+							this.addParticipant(r);
 						// debugger;
 						// if(newValue === undefined || newValue === null) {
 						// 	if(me.input && validateEmail(me.input.value)) {

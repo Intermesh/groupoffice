@@ -1,6 +1,7 @@
-import {CalendarView, CalendarEvent, CalendarItem} from "./CalendarView.js";
+import {CalendarView} from "./CalendarView.js";
 import {ComponentEventMap, DateTime, ObservableListenerOpts} from "@intermesh/goui";
 import {E} from "@intermesh/goui";
+import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
 // add selectweek event
 
@@ -77,7 +78,7 @@ export class MonthView extends CalendarView {
 			el.un('mousemove', mouseMove);
 			window.removeEventListener('mouseup', mouseUp);
 
-			this.save(ev, () => {
+			ev.save( () => {
 				//clean
 				this.viewModel.shift();
 				this.updateItems();
@@ -96,7 +97,7 @@ export class MonthView extends CalendarView {
 					},
 					start = new DateTime(data.start),
 					end = start.clone().addDays(1);
-				ev = {start,end,data, divs: {}, color: '356772', key: ''};
+				ev = new CalendarItem({start, end, data, key: ''});
 				this.viewModel.unshift(ev);
 				this.updateItems();
 				//this.drawEvent(ev, weekStart);
@@ -128,7 +129,7 @@ export class MonthView extends CalendarView {
 		const viewEnd = this.start.clone().addDays(this.days);
 		console.log(this.start, viewEnd, this.days);
 		for (const e of this.store.items) {
-			this.viewModel.push(...super.makeItems(e, this.start, viewEnd));
+			this.viewModel.push(...CalendarItem.makeItems(e, this.start, viewEnd));
 		}
 		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		console.log(this.viewModel);

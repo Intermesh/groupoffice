@@ -2,8 +2,8 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
    `name` VARCHAR(80) NOT NULL,
    `description` TEXT NULL,
-    `color` CHAR(6) NOT NULL,
-    `sortOrder` INT NOT NULL DEFAULT 0,
+    `color` VARCHAR(21) NOT NULL, # lightgoldenrodyellow
+    `timeZone` VARCHAR(45) NULL,
     `aclId` INT NOT NULL,
     `createdBy` INT NULL,
     `ownedBy` INT NULL,
@@ -35,7 +35,9 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `userId` INT NOT NULL,
     `isSubscribed` TINYINT(1) NOT NULL DEFAULT 0,
     `isVisible` TINYINT(1) NOT NULL DEFAULT 0,
+    `color` VARCHAR(21) NOT NULL,
     `sortOrder` INT NOT NULL DEFAULT 0,
+    `timeZone` VARCHAR(45) NULL,
     `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL,
     PRIMARY KEY (`calendarId`, `userId`),
     CONSTRAINT `fk_calendar_calendar_user_calendar_calendar1`
@@ -55,17 +57,19 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
 -- Table `calendar_default_alert`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_default_alert` (
-    `id` INT NOT NULL AUTO_INCREMENT,
+    `id` INT UNSIGNED NOT NULL,
     `offset` VARCHAR(20) NULL,
     `relativeTo` ENUM('start', 'end') NOT NULL DEFAULT 'start',
     `when` DATE NULL,
     `calendarId` INT UNSIGNED NOT NULL,
-    PRIMARY KEY (`id`, `calendarId`),
+    `userId` INT NOT NULL,
+    PRIMARY KEY (`id`, `calendarId`, `userId`),
+    INDEX `fk_calendar_default_alert_calendar_calendar1_idx` (`calendarId` ASC, `userId` ASC),
     CONSTRAINT `fk_calendar_default_alert_calendar_calendar1`
-    FOREIGN KEY (`calendarId`)
-    REFERENCES `calendar_calendar` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+        FOREIGN KEY (`calendarId`, `userId`)
+        REFERENCES `calendar_calendar_user` (`calendarId` , `userId`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE)
     ENGINE = InnoDB;
 
 
@@ -73,17 +77,19 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert` (
 -- Table `calendar_default_alert_with_time`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL,
   `offset` VARCHAR(20) NULL,
     `relativeTo` ENUM('start', 'end') NOT NULL DEFAULT 'start',
     `when` DATETIME NULL,
     `calendarId` INT UNSIGNED NOT NULL,
-    PRIMARY KEY (`id`, `calendarId`),
-    CONSTRAINT `fk_calendar_default_alert_with_time_calendar_calendar1`
-    FOREIGN KEY (`calendarId`)
-    REFERENCES `calendar_calendar` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    `userId` INT NOT NULL,
+    PRIMARY KEY (`id`, `calendarId`, `userId`),
+  INDEX `fk_calendar_default_alert_with_time_calendar_calendar1_idx` (`calendarId` ASC, `userId` ASC),
+  CONSTRAINT `fk_calendar_default_alert_with_time_calendar_calendar1`
+    FOREIGN KEY (`calendarId` , `userId`)
+    REFERENCES `calendar_calendar_user` (`calendarId` , `userId`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
     ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `calendar_event` (
@@ -93,6 +99,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `sequence` INT UNSIGNED NOT NULL DEFAULT 1,
     `title` VARCHAR(45) NOT NULL,
     `description` TEXT NULL,
+    `location` VARCHAR(255) NOT NULL DEFAULT '',
     `locale` VARCHAR(6) NULL,
     `showWithoutTime` TINYINT(1) NOT NULL DEFAULT 0,
     `start` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
@@ -173,7 +180,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_user` (
      `eventId` INT UNSIGNED NOT NULL,
      `userId` INT NOT NULL,
      `freeBusyStatus` ENUM('free', 'busy') NULL DEFAULT 'busy',
-    `color` CHAR(6) NULL DEFAULT NULL,
+    `color` VARCHAR(21) NULL DEFAULT NULL,
     `useDefaultAlerts` TINYINT(1) NULL DEFAULT 1,
     `veventBlobId` BINARY(40) NULL,
     `modSeq` INT NOT NULL DEFAULT 0,
@@ -201,8 +208,8 @@ CREATE TABLE IF NOT EXISTS `calendar_event_user` (
 -- Table `calendar_event_alert`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
-      `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-      `offset` VARCHAR(20) NULL,
+    `id` INT UNSIGNED NOT NULL,
+    `offset` VARCHAR(20) NULL,
     `relativeTo` ENUM('start', 'end') NULL DEFAULT 'start',
     `when` DATETIME NULL,
     `eventId` INT UNSIGNED NOT NULL,
@@ -215,15 +222,13 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
-
-
 -- -----------------------------------------------------
 -- Table `calendar_recurrence_override`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_recurrence_override` (
       `fk` INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `recurrenceId` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
-      `patch` TEXT NOT NULL,
+      `patch` MEDIUMTEXT NOT NULL DEFAULT '{}',
       PRIMARY KEY (`fk`, `recurrenceId`),
     INDEX `fk_recurrence_override_calendar_event1_idx` (`fk` ASC),
     CONSTRAINT `fk_recurrence_override_calendar_event1`

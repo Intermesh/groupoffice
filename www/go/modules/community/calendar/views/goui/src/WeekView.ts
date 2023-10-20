@@ -1,11 +1,12 @@
-import {CalendarView, CalendarItem} from "./CalendarView.js";
+import {CalendarView} from "./CalendarView.js";
 import {DateTime, E, t} from "@intermesh/goui";
+import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
-interface CalendarDayItem extends CalendarItem {
-	pos: number
-	lanes: number
-	startM:number
-	endM: number // not needed after calculation
+class CalendarDayItem extends CalendarItem {
+	pos!: number
+	lanes!: number
+	startM!:number
+	endM!: number // not needed after calculation
 }
 
 export class WeekView extends CalendarView {
@@ -107,7 +108,7 @@ export class WeekView extends CalendarView {
 			this.el.un('mousemove', mouseMove);
 			window.removeEventListener('mouseup', mouseUp);
 
-			changed && this.save(ev, () => {
+			changed && ev.save(() => {
 				this.dayItems.shift()
 				this.updateItems();
 			});
@@ -151,7 +152,7 @@ export class WeekView extends CalendarView {
 					},
 					start = new DateTime(data.start),
 					end = start.clone().addHours(1);
-				ev = {start,end,data, divs: {}, color: '356772'} as CalendarDayItem; // todo overlap
+				ev = new CalendarDayItem({start,end,data,key:''});
 				this.dayItems.unshift(ev);
 				this.updateItems(start.clone().setHours(0,0,0,0));
 				action = resize;
@@ -176,7 +177,7 @@ export class WeekView extends CalendarView {
 			withTime = []
 		for (const e of this.store.items) {
 
-			const items = super.makeItems(e, this.day, viewEnd);
+			const items = CalendarItem.makeItems(e as CalendarEvent, this.day, viewEnd);
 			if(e.showWithoutTime) {
 				allDay.push(...items as CalendarItem[]);
 			} else {
@@ -249,8 +250,10 @@ export class WeekView extends CalendarView {
 		this.continues = [];
 		this.iter = 0;
 		if(day) {
+			// update specified day
 			this.drawDay(day.setHours(0,0,0,0), this.dayCols[day.format('Ymd')])
 		} else {
+			// update all visible days
 			for (const ymd in this.dayCols) {
 				this.drawDay(DateTime.createFromFormat(ymd, 'Ymd')!, this.dayCols[ymd])
 			}
@@ -284,6 +287,9 @@ export class WeekView extends CalendarView {
 		return eventEls;
 	}
 
+	/**
+	 * Never ever touch this function. You have been warned.
+	 */
 	protected calculateOverlap(events: CalendarDayItem[], dayStart: DateTime) {
 		//events.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
 		let highestEnd = 0,

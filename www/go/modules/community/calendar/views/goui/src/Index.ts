@@ -5,6 +5,7 @@ import {datasourcestore, t} from "@intermesh/goui";
 
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
+	queryParams:{filter:{isSubscribed: true}},
 	//properties: ['id', 'name', 'color', 'isVisible', 'isSubscribed'],
 	sort: [{property:'sortOrder'}]
 })
