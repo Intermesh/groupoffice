@@ -1,3 +1,4 @@
+- Finance: Fix links when adding from detail view
 - Core: Fixed some firefox quirks. Error when opening file and SSE canceled when document.location = was used. See
   old bug: https://bugzilla.mozilla.org/show_bug.cgi?id=564744
 - Finance: migrate custom fields from billing
