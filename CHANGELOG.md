@@ -1,4 +1,5 @@
 - Calendar: make color dialog wider to reflect newer layout
+- Billing: create duplicate dialog if not there yet
 
 23-10-2023: 6.6.175
 - Core: Apcu doesn't fall back on disk cache anymore because it degraded performance.
