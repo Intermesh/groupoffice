@@ -166,56 +166,6 @@ class Field extends AclItemEntity {
 		return parent::internalValidate();
 	}
 
-//	/**
-//	 * LEGACY. $field->multiselect is used many times.
-//	 * fix before removing a property
-//	 */
-//	public function getMultiselect() {
-//		return $this->getOptions('multiselect');
-//	}
-
-	/**
-	 * Get field options. 
-	 * 
-	 * These options can vary per data type.
-	 * 
-	 * eg. "multiselect" for select fields or maxLength for text fields.
-	 * 
-	 * @return array
-	 */
-	public function getOptions() {
-		return empty($this->options) ? [] : json_decode($this->options, true);
-	}
-
-	public function setOptions($options) {
-		$this->options = json_encode(array_merge($this->getOptions(), $options));
-	}
-
-	/**
-	 * Get field option
-	 * 
-	 * @see getOptions()
-	 * @param string $name
-	 * @return mixed
-	 */
-	public function getOption($name) {
-		$o = $this->getOptions();
-		return isset($o[$name]) ? $o[$name] : null;
-	}
-
-	/**
-	 * Set a field option
-	 * 
-	 * @see getOptions()
-	 * @param string $name
-	 * @param mixed $value
-	 */
-	public function setOption($name, $value) {
-		$o = $this->getOptions();
-		$o[$name] = $value;
-		$this->setOptions($o);
-	}
-
   /**
    * Get default value for the column
    *
@@ -468,6 +418,15 @@ class Field extends AclItemEntity {
 			throw new Exception("Could not save field");
 		}
 		return $field;
+	}
+
+	public function copy(): static
+	{
+		$copy = parent::copy();
+
+		$copy->getDataType()->onCopy();
+
+		return $copy;
 	}
 
 }

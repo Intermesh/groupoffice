@@ -5,3 +5,5 @@ DROP TABLE IF EXISTS test_a_has_many;
 DROP TABLE IF EXISTS test_a_has_one;
 DROP TABLE if EXISTS test_a_map;
 DROP TABLE if EXISTS test_d;
+DROP TABLE if EXISTS test_a_custom_fields;
+DROP TABLE if EXISTS test_b_custom_fields;

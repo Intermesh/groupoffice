@@ -106,8 +106,13 @@ class FieldSet extends AclOwnerEntity {
 	public function getEntity() {
 		return $this->entity;
 	}
-	
-	public function setEntity($name) {
+
+	/**
+	 * Set the entity
+	 * @param string $name Entity name. eg. "User"
+	 * @return void
+	 */
+	public function setEntity(string $name) {
 		$this->entity = $name;
 		$e = \go\core\orm\EntityType::findByName($name);
 		$this->entityId = $e->getId();

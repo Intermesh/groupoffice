@@ -84,11 +84,10 @@ try {
 		$installer = go()->getInstaller();
 		$installer->install($admin);
 
-
-
-
-		\go\modules\community\test\Module::get()->install();
-
+		$success = \go\modules\community\test\Module::get()->install();
+		if(!$success) {
+			throw new Exception("Could not install test module");
+		}
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;
 		$modules = GO::modules()->getAvailableModules();
@@ -132,7 +131,11 @@ try {
 
     $mod = \go\modules\community\test\Module::get();
     if(!$mod->isInstalled(false)) {
-	    $mod->install();
+	    $success = $mod->install();
+
+			if(!$success) {
+				throw new Exception("Could not install test module");
+			}
     }
 
   } else {
