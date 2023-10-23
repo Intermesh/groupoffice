@@ -174,24 +174,27 @@ class FieldSet extends AclOwnerEntity {
 		$fromEntityType = $fromEntityCls::entityType();
 		$toEntityType = $toEntityCls::entityType();
 
-
 		$count = \go\core\model\FieldSet::findByEntity($toEntityType->getName())->selectSingleValue("count(*)")->single();
 		if($count) {
-			echo "Custom fields already migrated\n";
+			echo "Custom fields for ". $toEntityType->getName()." already migrated\n";
 
 			return false;
 		}
+
+		echo "Migrating entity " . $toEntityType->getName() ."\n";
 
 		$fieldSets = \go\core\model\FieldSet::findByEntity($fromEntityType->getName());
 
 		foreach($fieldSets as $fieldSet) {
 
-			echo "Migrating fieldset " . $fieldSet->name . "\n";
+			echo "Migrating fieldset " . $fieldSet->name . " (". $fieldSet->id .")\n";
 			$newFieldSet = $fieldSet->copy();
 			$newFieldSet->setEntity($toEntityType->getName());
 			if(!$newFieldSet->save()) {
 				throw new \go\core\orm\exception\SaveException($newFieldSet);
 			}
+
+			echo $newFieldSet->id ."\n";
 
 			$fields = \go\core\model\Field::find()->where('fieldSetId', '=', $fieldSet->id);
 			foreach($fields as $field) {
