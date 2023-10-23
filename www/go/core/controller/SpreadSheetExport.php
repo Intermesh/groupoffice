@@ -1,6 +1,7 @@
 <?php
 namespace go\core\controller;
 
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\model;
 
@@ -62,6 +63,30 @@ class SpreadSheetExport extends EntityController {
 	 */
 	public function changes($params) {
 		return $this->defaultChanges($params);
+	}
+
+
+	/**
+	 * Enable user to delete their own export preset
+	 *
+	 * @param Entity $entity
+	 * @return bool
+	 */
+	protected function canDestroy(Entity $entity): bool
+	{
+		return go()->getUserId() === $entity->userId ||go()->getAuthState()->isAdmin();
+	}
+
+	/**
+	 * Enable user to update their own export preset
+	 *
+	 * @param Entity $entity
+	 * @return bool
+	 */
+
+	protected function canUpdate(Entity $entity): bool
+	{
+		return go()->getUserId() === $entity->userId ||go()->getAuthState()->isAdmin();
 	}
 }
 
