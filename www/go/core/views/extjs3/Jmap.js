@@ -315,10 +315,10 @@ go.Jmap = {
 
 		this.SSEEventsRegistered = true;
 
-		window.addEventListener('beforeunload', () => {
-			console.log("Closing SSE")
-			go.Jmap.stopSse();
-		});
+		// window.addEventListener('beforeunload', () => {
+		// 	console.log("Closing SSE")
+		// 	go.Jmap.stopSse();
+		// });
 
 		window.addEventListener('offline', () => {
 			console.log("Closing SSE because we're offline")
