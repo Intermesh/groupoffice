@@ -46,6 +46,10 @@
 
 -- 6.8 --
 
+- Core: Fixed some firefox quirks. Error when opening file and SSE canceled when document.location = was used.
+  See old bug: https://bugzilla.mozilla.org/show_bug.cgi?id=564744
+- Billing: create duplicate dialog if not there yet
+
 17-10-2023: 6.7.51
 - Notes /Comments: Fixed you're not allowed to paste scripts
 - Finance: Remove invalid chars in PDF filename

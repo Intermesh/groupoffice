@@ -15,11 +15,11 @@ GO.calendar.ColorPickerDialog = function(config){
 	config.title=t("Calendar color", "calendar");
 	config.modal=false;
 	config.border=false;
-	config.width=420;
+	config.width=600;
 	config.autoHeight=true;
 	config.resizable=false;
 	config.plain=true;
-	config.shadow=false,
+	config.shadow=false;
 	config.closeAction='hide';
 	config.items=this.formPanel;
 	config.focus=focusFirstField.createDelegate(this);
@@ -133,10 +133,6 @@ Ext.extend(GO.calendar.ColorPickerDialog, Ext.Window, {
 			editor: 
 				new GO.form.ColorField({
 					value : "EBF1E2"
-//					fieldLabel : t("Color"),
-//					value : GO.calendar.defaultBackground,
-//					anchor:'50%',
-//					name : 'color',
 				})
 			}]
 		};
