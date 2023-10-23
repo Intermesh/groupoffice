@@ -1,3 +1,4 @@
+23-10-2023: 6.6.175
 - Core: Apcu doesn't fall back on disk cache anymore because it degraded performance.
 
 17-10-2023: 6.6.174
