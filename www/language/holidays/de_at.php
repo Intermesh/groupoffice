@@ -1,7 +1,7 @@
 <?php
 // holidays with fixed date
 $input_holidays['fix']['01-01'] = 'Neujahr';
-$input_holidays['fix']['01-06'] = 'Hl. 3 K&ouml;nige';
+$input_holidays['fix']['01-06'] = 'Hl. 3 Könige';
 $input_holidays['fix']['05-01'] = 'Staatsfeiertag';
 $input_holidays['fix']['08-15'] = 'Maria Himmelfahrt';
 $input_holidays['fix']['10-26'] = 'Nationalfeiertag';
