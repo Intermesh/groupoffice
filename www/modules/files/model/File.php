@@ -258,7 +258,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 			$enoughQuota = \GO::user()->disk_usage + $newBytes <= $userQuota;
 		}
 		if ($enoughQuota && \GO::config()->quota > 0) {
-			$currentQuota = \GO::config()->get_setting('file_storage_usage');
+			$currentQuota = (int) \GO::config()->get_setting('file_storage_usage', 0, 0);
 			$enoughQuota = $currentQuota + $newBytes <= (\GO::config()->quota * 1024);
 		}
 		
@@ -393,7 +393,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 				$this->folder->quotaUser->calculatedDiskUsage($sizeDiff)->save(true); //user quota
 			}
 			if(GO::config()->quota>0) {
-				GO::config()->save_setting("file_storage_usage", GO::config()->get_setting('file_storage_usage')+$sizeDiff); //system quota
+				GO::config()->save_setting("file_storage_usage", (int) \GO::config()->get_setting('file_storage_usage', 0, 0) + $sizeDiff); //system quota
 			}
 		}
 
@@ -402,7 +402,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	private function _removeQuota(){
 		if(\GO::config()->quota>0){
 			\GO::debug("Removing quota: $this->size");
-			\GO::config()->save_setting("file_storage_usage", \GO::config()->get_setting('file_storage_usage')-$this->size);
+			\GO::config()->save_setting("file_storage_usage", (int) \GO::config()->get_setting('file_storage_usage', 0, 0) - $this->size);
 		}
 
 		if($this->folder->quotaUser){
