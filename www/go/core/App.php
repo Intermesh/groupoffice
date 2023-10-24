@@ -324,7 +324,7 @@ namespace go\core {
 		public function getStorageFreeSpace(): float
 		{
 			if(!isset($this->storageFreeSpace)) {
-				$quota = $this->getConfig()['quota'];
+				$quota = (int) $this->getConfig()['quota'];
 				if(empty($quota)) {
 					try {
 						$this->storageFreeSpace = disk_free_space($this->getConfig()['file_storage_path']);
@@ -335,7 +335,7 @@ namespace go\core {
 					}
 				} else
 				{
-					$usage = GO::config()->get_setting('file_storage_usage') ?? 0;
+					$usage = (int) GO::config()->get_setting('file_storage_usage', 0 ,0);
 					$this->storageFreeSpace = $quota - $usage;
 				}
 			}

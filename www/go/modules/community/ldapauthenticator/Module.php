@@ -166,6 +166,8 @@ class Module extends core\Module implements DomainProvider {
 				throw new Exception("Could not save blob");
 			}
 			$user->avatarId = $blob->id;
+		} else {
+			$user->avatarId = null;
 		}
 
 		$user->displayName = $record->cn[0];		

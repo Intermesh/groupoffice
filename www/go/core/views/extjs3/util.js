@@ -367,11 +367,6 @@ go.util =  (function () {
 		},
 
 		viewFile : function(url) {
-
-			// if(Ext.isSafari && window.navigator.standalone) {
-			// 	url = "filewrap.php?url=" + encodeURIComponent(url);
-			// }
-
 			const win = this.getDownloadTargetWindow();
 
 			if(!win) {
