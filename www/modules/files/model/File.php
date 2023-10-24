@@ -396,7 +396,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 				$this->folder->quotaUser->calculatedDiskUsage($sizeDiff)->save(true); //user quota
 			}
 			if(GO::config()->quota>0) {
-				GO::config()->save_setting("file_storage_usage", GO::config()->get_setting('file_storage_usage')+$sizeDiff); //system quota
+				GO::config()->save_setting("file_storage_usage", (int) GO::config()->get_setting('file_storage_usage', 0 ,0) + $sizeDiff); //system quota
 			}
 		}
 
