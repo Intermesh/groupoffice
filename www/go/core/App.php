@@ -243,7 +243,7 @@ use const GO_CONFIG_FILE;
 					}
 				} else
 				{
-					$usage = GO::config()->get_setting('file_storage_usage');
+					$usage = (int) GO::config()->get_setting('file_storage_usage', 0, 0);
 					$this->storageFreeSpace = $quota - $usage;
 				}
 			}
