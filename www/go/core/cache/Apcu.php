@@ -53,7 +53,9 @@ class Apcu implements CacheInterface {
 	 */
 	public function set(string $key, $value, bool $persist = true, int $ttl = 0) {
 
-		$this->getDiskCache()->set($key, $value, $persist, $ttl);
+		if(!$this->apcuEnabled) {
+			return $this->getDiskCache()->set($key, $value, $persist, $ttl);
+		}
 		if($persist) {
 			apcu_store($this->prefix . '-' .$key, $value, $ttl);
 		}
