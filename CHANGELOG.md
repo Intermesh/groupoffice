@@ -1,6 +1,8 @@
+24-10-2023: 6.7.52
 - Core: Fixed some firefox quirks. Error when opening file and SSE canceled when document.location = was used.
   See old bug: https://bugzilla.mozilla.org/show_bug.cgi?id=564744
 - Billing: create duplicate dialog if not there yet
+- Core: enable user to delete and update own spreadsheet export presets
 
 17-10-2023: 6.7.51
 - Notes /Comments: Fixed you're not allowed to paste scripts
@@ -264,6 +266,12 @@
 
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
+- Calendar: make color dialog wider to reflect newer layout
+- Billing: create duplicate dialog if not there yet
+
+23-10-2023: 6.6.175
+- Core: Apcu doesn't fall back on disk cache anymore because it degraded performance.
+- Ldapauth: remove avatar if synced as such from LDAP server
 
 17-10-2023: 6.6.174
 - Core: global add button will not redirect, instead show a flyout.

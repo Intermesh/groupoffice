@@ -161,18 +161,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							loader.load(this.addressBookTree.getRootNode(), (node) => {
 								loader.clearOnLoad = true;
 							});
-
-
-							// let o = this.store.lastOptions ? GO.util.clone(this.store.lastOptions) : {};
-							// o.add = true;
-							// o.params = o.params || {};
-							//
-							// o.params.position = o.params.position || 0;
-							// o.params.position += (o.params.limit || this.loadMorePageSize);
-							// o.params.limit = this.loadMorePageSize;
-							// o.paging = true;
-							//
-							// this.store.load(o);
 						}
 					})
 				]
