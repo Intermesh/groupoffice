@@ -61,7 +61,7 @@ class ModuleCollection extends Model\ModelCollection{
 	 * will be returned even if they can't be decoded. Check the availability manually
 	 * if needed.
 	 * 
-	 * @return array Module class names eg. \GO\Calendar\Module
+	 * @return (\go\core\Module|Module)[] Module class names eg. \GO\Calendar\Module
 	 */
 	public function getAvailableModules($returnInstalled=false){
 		$folder = new Fs\Folder(\GO::config()->root_path.'modules');

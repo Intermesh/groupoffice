@@ -1,3 +1,10 @@
+- Finance: Remove amount from document title to improve privacy
+- Finance: Fix links when adding from detail view
+- Core: Fixed some firefox quirks. Error when opening file and SSE canceled when document.location = was used. See
+  old bug: https://bugzilla.mozilla.org/show_bug.cgi?id=564744
+- Finance: migrate custom fields from billing
+- Catalog: migrate custom fields from billing
+
 18-10-2023: 6.8.10
 - Core / newsletters: fix email template upload
 - Finance: Copy items in finance was broken
@@ -42,6 +49,10 @@
 
 
 -- 6.8 --
+
+- Core: Fixed some firefox quirks. Error when opening file and SSE canceled when document.location = was used.
+  See old bug: https://bugzilla.mozilla.org/show_bug.cgi?id=564744
+- Billing: create duplicate dialog if not there yet
 
 17-10-2023: 6.7.51
 - Notes /Comments: Fixed you're not allowed to paste scripts

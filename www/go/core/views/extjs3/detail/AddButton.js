@@ -190,10 +190,17 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 					}
 					var win = window.win || window; //for some old dialogs that have a "win" prop (TaskDialog and EventDialog)
 					var createLinkButton = this.findCreateLinkButton(win);
-					
+
 					if(createLinkButton) {
 						//if window has a create link button then use this. Otherwise add a save listener.
-						createLinkButton.addLink(this.getEntity(), this.getEntityId());
+						if(window.isVisible()) {
+							createLinkButton.addLink(this.getEntity(), this.getEntityId());
+						} else {
+							//sometimes show is overriden and perhaps does an async load before showing. See FinanceDocumentDialog for example.
+							window.on("show", () => {
+								createLinkButton.addLink(this.getEntity(), this.getEntityId());
+							}, this, {single: true});
+						}
 					} else {
 						window.on('save', function (window, entity) {
 

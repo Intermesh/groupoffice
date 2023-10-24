@@ -91,6 +91,11 @@ class PdfTemplateRenderer extends PdfRenderer {
 
 	}
 
+	public function getParser(): TemplateParser
+	{
+		return $this->parser;
+	}
+
 	public function getTemplate(): PdfTemplate
 	{
 		return $this->template;
