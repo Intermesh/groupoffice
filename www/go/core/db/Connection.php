@@ -125,7 +125,7 @@ class Connection {
 		self::$cachedStatements = [];
 	}
 
-	private static array $cachedStatements = [];
+	private static $cachedStatements = [];
 
 	/**
 	 * Register a cached statement that will be unset when we want to disconnect from the database.
