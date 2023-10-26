@@ -1,4 +1,5 @@
 - ActiveSync: Fixed extra day bug in for all day events
+- Core/ActiveSync: DB connection wasn't close on SSE / Push
 
 24-10-2023: 6.7.52
 - Core: Fixed some firefox quirks. Error when opening file and SSE canceled when document.location = was used.
