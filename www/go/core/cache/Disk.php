@@ -23,7 +23,7 @@ class Disk implements CacheInterface {
 	private $cache;
 
 	public function __construct() {		
-		$this->folder = App::get()->getDataFolder()->getFolder('cache2');
+		$this->folder = App::get()->getTmpFolder()->getFolder('cache2');
 		$this->folder->create();
 	}	
 	/**
