@@ -1,4 +1,5 @@
 - ActiveSync: Fixed extra day bug in for all day events
+- Core: DB connection wasn't close on SSE
 
 24-10-2023: 6.8.11
 - Finance: Remove amount from document title to improve privacy
