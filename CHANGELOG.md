@@ -1,3 +1,5 @@
+- ActiveSync: Fixed extra day bug in for all day events
+
 24-10-2023: 6.7.52
 - Core: Fixed some firefox quirks. Error when opening file and SSE canceled when document.location = was used.
   See old bug: https://bugzilla.mozilla.org/show_bug.cgi?id=564744
