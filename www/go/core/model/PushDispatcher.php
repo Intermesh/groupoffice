@@ -78,6 +78,7 @@ class PushDispatcher
 	{
 		$state = [];
 		foreach ($this->map as $name => $cls) {
+			/** @var Entity $cls */
 			$cls::entityType()->clearCache();
 			$state[$name] = $cls::getState();
 		}
@@ -101,11 +102,8 @@ class PushDispatcher
 
 	public function start(int $ping = 10) {
 
-
 		$sleeping = 0;
-
 		$changes = $this->checkChanges();
-
 		// send states on start so client can compare immediately
 		$this->sendMessage('state', $changes);
 		for($i = 0; $i < self::MAX_LIFE_TIME; $i += self::CHECK_INTERVAL) {

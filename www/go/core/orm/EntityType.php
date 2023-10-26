@@ -35,11 +35,6 @@ use PDOException;
  */
 class EntityType implements ArrayableInterface {
 
-
-	private static $highestModSeqStmt;
-	private static $highestUserModSeqStmt;
-
-
 	private $className;
 	private $id;
 	private $name;
@@ -191,18 +186,22 @@ class EntityType implements ArrayableInterface {
 			return $this->highestModSeq;
 		}
 
+		$stmt = go()->getDbConnection()->getCachedStatment("highestModSeq");
+
 		// create reusable statement
-		if(!isset(self::$highestModSeqStmt)) {
-			self::$highestModSeqStmt = (new Query())
+		if(!$stmt) {
+			$stmt = (new Query())
 				->selectSingleValue("highestModSeq")
 				->from("core_entity")
 				->where('id = :id')
 				->createStatement();
+
+			go()->getDbConnection()->cacheStatement("highestModSeq", $stmt);
 		}
 
-		self::$highestModSeqStmt->bindValue(':id' , $this->id);
-		self::$highestModSeqStmt->execute();
-		$this->highestModSeq = self::$highestModSeqStmt->fetch();
+		$stmt->bindValue(':id' , $this->id);
+		$stmt->execute();
+		$this->highestModSeq = $stmt->fetch();
 
 		return $this->highestModSeq ?? 0;
 	}
@@ -683,20 +682,23 @@ class EntityType implements ArrayableInterface {
 		if(!isset($this->highestUserModSeq)) {
 
 			// create reusable statement
-			if(!isset(self::$highestUserModSeqStmt)) {
-				self::$highestUserModSeqStmt = (new Query())
+			$stmt = go()->getDbConnection()->getCachedStatment("highestUserModSeqStmt");
+
+			if(!$stmt) {
+				$stmt = (new Query())
 					->selectSingleValue("highestModSeq")
 					->from("core_change_user_modseq")
 					->where('entityTypeId = :entityTypeId AND userId = :userId')
 					->createStatement();
+
+				go()->getDbConnection()->cacheStatement("highestUserModSeqStmt", $stmt);
 			}
 
-			self::$highestUserModSeqStmt->bindValue(':entityTypeId', $this->id);
-			self::$highestUserModSeqStmt->bindValue(':userId', go()->getUserId());
-			self::$highestUserModSeqStmt->execute();
+			$stmt->bindValue(':entityTypeId', $this->id);
+			$stmt->bindValue(':userId', go()->getUserId());
+			$stmt->execute();
 
-			$this->highestUserModSeq = self::$highestUserModSeqStmt
-				->fetch() ?? 0;
+			$this->highestUserModSeq = $stmt->fetch() ?? 0;
 		}
 		return $this->highestUserModSeq;
 	}
