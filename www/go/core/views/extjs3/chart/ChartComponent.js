@@ -28,6 +28,8 @@ go.chart.ChartComponent = Ext.extend(Ext.BoxComponent, {
 			this.canvas = document.createElement("canvas");
 			this.el.dom.appendChild(this.canvas);
 
+
+
 			this.chart = new Chart(this.canvas, {
 
 				type: this.chartType,
@@ -37,6 +39,25 @@ go.chart.ChartComponent = Ext.extend(Ext.BoxComponent, {
 				},
 				options: this.options || {}
 			});
+
+
+			this.canvas.onclick = (evt) => {
+				const res = this.chart.getElementsAtEventForMode(
+					evt,
+					'nearest',
+					{ intersect: true },
+					true
+				);
+				// If didn't click on a bar, `res` will be an empty array
+				if (res.length === 0) {
+					return;
+				}
+
+				const label = this.chart.data.labels[res[0].index]
+
+				this.fireEvent("chartclick", this, res.index, label, res);
+			};
+
 		} else {
 			this.chart.data.datasets = datasets;
 			this.chart.data.labels = labels;
