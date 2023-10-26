@@ -626,7 +626,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 		ZLog::Write(LOGLEVEL_DEBUG, "All sink folders checked");
 
-		ZLog::Write(LOGLEVEL_DEBUG, "Closing DB connection");
+		ZLog::Write(LOGLEVEL_DEBUG, "Closing DB connection: " . go()->getDbConnection()->getId());
 
 		go()->getDbConnection()->disconnect();
 		\go\core\db\Table::destroyInstances();

@@ -262,23 +262,18 @@ class NoteStore extends Store {
 
 		return $folders;
 	}
-
-
-	private $notificationStmt;
-	
 	
 	public function getNotification($folder=null) {
 		ZLog::Write(LOGLEVEL_DEBUG,'goNote->getNotification('.$folder.')');
-		if(!isset($this->notificationStmt)) {
-			$this->notificationStmt = Note::find()
+		$stmt = Note::find()
 				->fetchMode(PDO::FETCH_ASSOC)
 				->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
 				->where('n.noteBookId = :noteBookId')
 				->createStatement();
-		}
-		$this->notificationStmt->bindValue(':noteBookId', $folder, PDO::PARAM_INT);
-		$this->notificationStmt->execute();
-		$record = $this->notificationStmt->fetch();
+
+		$stmt->bindValue(':noteBookId', $folder, PDO::PARAM_INT);
+		$stmt->execute();
+		$record = $stmt->fetch();
 
 		$newstate = 'M'.$record['modifiedAt'].':C'.$record['count'];
 		ZLog::Write(LOGLEVEL_DEBUG,'goNote->getNotification('.$folder.') State: '.$newstate);

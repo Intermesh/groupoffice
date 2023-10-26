@@ -129,6 +129,7 @@ class PushDispatcher
 			self::fireEvent(self::EVENT_INTERVAL, $this);
 
 			//disconnect and free up memory
+			go()->getDebugger()->debug("Closing DB connection: " . go()->getDbConnection()->getId());
 			go()->getDbConnection()->disconnect();
 			go()->getCache()->disableMemory();
 			Table::destroyInstances();
