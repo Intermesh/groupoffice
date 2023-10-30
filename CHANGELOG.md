@@ -2,6 +2,7 @@
 - Core/ActiveSync: DB connection wasn't close on SSE / Push
 - Calendar: restore label 'Start' at start date field
 - Calendar: fix deprecation error on calendar report
+- Core: bugfix normalizing CC in new mail API
 
 24-10-2023: 6.8.11
 - Finance: Remove amount from document title to improve privacy
