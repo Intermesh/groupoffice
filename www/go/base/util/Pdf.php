@@ -5,6 +5,8 @@ require_once(__DIR__ . '/../../core/util/tcpdf_config.php');
 
 class Pdf extends Fpdi  {
 
+	private $pageWidth;
+
 	public function __construct($orientation = 'P') {
 		
 		parent::__construct($orientation,'pt');
