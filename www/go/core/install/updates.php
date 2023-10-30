@@ -1518,3 +1518,5 @@ $updates['202306191435'][] = "alter table core_pdf_template
     add footerY decimal(19, 4) default -12 null;";
 
 
+$updates['202310301525'][] = "ALTER TABLE groupoffice.core_entity DROP FOREIGN KEY core_entity_ibfk_2;";
+$updates['202310301526'][] = "ALTER TABLE groupoffice.core_entity ADD CONSTRAINT core_entity_ibfk_2 FOREIGN KEY (defaultAclId) REFERENCES groupoffice.core_acl(id) ON DELETE CASCADE ON UPDATE RESTRICT;";
