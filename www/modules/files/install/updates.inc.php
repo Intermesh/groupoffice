@@ -305,5 +305,5 @@ $updates['202310311413'][] = "update core_search set rebuild=1 where entityTypeI
 
 $updates['202310311413'][] = function() {
 	echo "\n\nNOTE: Search cache of files will be updated at midnight.\n\n";
-	\go\core\cron\BuildSearchCache::install("0 0 * * *");
+	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
 };
