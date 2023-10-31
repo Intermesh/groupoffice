@@ -300,3 +300,10 @@ $updates['202112231349'][] = "alter table fs_files
 
 
 $updates['202203241627'][] = "update core_permission set rights = rights + 2 where moduleId = (select id from core_module where name='files' and package is null);";
+
+$updates['202310311413'][] = "update core_search set rebuild=1 where entityTypeId = (select id from core_entity where name='File');";
+
+$updates['202310311413'][] = function() {
+	echo "\n\nNOTE: Search cache of files will be updated at midnight.\n\n";
+	\go\core\cron\BuildSearchCache::install("0 0 * * *");
+};
