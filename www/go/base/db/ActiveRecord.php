@@ -53,6 +53,7 @@ use go\core\model\Link;
 use go\core\model\Module;
 use go\core\model\User;
 use go\core\model\UserDisplay;
+use go\core\orm\exception\SaveException;
 use go\core\orm\SearchableTrait;
 use go\core\util\StringUtil;
 use go\modules\community\comments\model\Comment;
@@ -3748,7 +3749,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$isNew = $search->isNew();
 		$search->rebuild = false;
 		if(!$search->save()) {
-			throw new \Exception("Could not save search cache!");
+			throw new SaveException($search);
 		}
 
 		if(!$isNew) {
