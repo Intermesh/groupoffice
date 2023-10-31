@@ -1200,7 +1200,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	setRootID : function(rootID, folder_id)
 	{
 		
-		this.searchField.setDisabled(!!rootID);
+		// this.searchField.setDisabled(!!rootID);
 		rootID ? this.bookmarksGrid.hide() : this.bookmarksGrid.show();
 		
 		this.doLayout();		
