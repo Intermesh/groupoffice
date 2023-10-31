@@ -1,5 +1,8 @@
-31-10-2023: 6.8.13
+31-10-2023: 6.8.14
 - Files: When using search only search current folder and below
+
+31-10-2023: 6.8.13
+- Core: upgrade failed due to fixed database name in update queries
 
 31-10-2023: 6.8.12
 - ActiveSync: Fixed extra day bug in for all day events
