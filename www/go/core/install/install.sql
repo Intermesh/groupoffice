@@ -537,7 +537,7 @@ ALTER TABLE `core_change_user_modseq`
 
 ALTER TABLE `core_cron_job`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `description` (`description`),
+  ADD UNIQUE KEY `name` (`name`),
   ADD KEY `moduleId` (`moduleId`);
 
 ALTER TABLE `core_customfields_field`
