@@ -3748,6 +3748,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
 		$search->rebuild = false;
+		$search->cutPropertiesToColumnLength();
 		if(!$search->save()) {
 			throw new SaveException($search);
 		}

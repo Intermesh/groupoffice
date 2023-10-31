@@ -1527,3 +1527,9 @@ $updates['202310301526'][] = "alter table core_cron_job
 
 $updates['202310301526'][] = "create unique index name
     on core_cron_job (name);";
+
+$updates['202310301526'][] = "alter table core_search
+    modify filter varchar(190) null;";
+
+$updates['202310301526'][] = "create index core_search_filter_index
+    on core_search (filter);";

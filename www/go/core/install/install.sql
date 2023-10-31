@@ -189,7 +189,7 @@ CREATE TABLE `core_search` (
   `name` varchar(100) DEFAULT NULL,
   `description` varchar(190) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
-  `filter` VARCHAR(50) NULL DEFAULT NULL,
+  `filter` VARCHAR(190) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL,
   `rebuild` bool default false not null
@@ -1242,3 +1242,8 @@ create table core_import_mapping
             on delete cascade
 )
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+create index core_search_filter_index
+    on core_search (filter);
