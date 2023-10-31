@@ -1,3 +1,5 @@
+- Billing: Custom fields in ODF template work with prefix contact:, company: or user:
+
 31-10-2023: 6.7.53
 - ActiveSync: Fixed extra day bug in for all day events
 - Core/ActiveSync: DB connection wasn't close on SSE / Push
