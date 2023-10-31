@@ -100,13 +100,13 @@ class Task extends EntityController {
 			->selectSingleValue("IFNULL(count(*), 0)")
 			->filter([
 				"tasklistId" => $defaultListId,
-				"complete" => false
+				"complete" => false,
+				'due' => '< tomorrow'
 			]);
 
 		$query->removeJoin("tasks_task_user");
 		$query->removeJoin("pr2_hours");
 		$query->groupBy([]);
-
 
 		return $query->single();
 	}
