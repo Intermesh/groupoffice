@@ -258,7 +258,9 @@ trait SearchableTrait {
 		$cls = static::class;
 		echo $cls."\n";
 
+		ob_flush();
 		flush();
+
 
 		echo "Deleting old values\n";
 
@@ -280,11 +282,13 @@ trait SearchableTrait {
 		
 		//In small batches to keep memory low	
 		while($stmt->rowCount()) {
+			ob_flush();
 			flush();
 
 			while ($m = $stmt->fetch()) {
 
 				try {
+					ob_flush();
 					flush();
 
 					$m->saveSearch();
