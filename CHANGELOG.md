@@ -1,3 +1,4 @@
+31-10-2023: 6.6.176
 - Calendar: make color dialog wider to reflect newer layout
 - Billing: create duplicate dialog if not there yet
 - Ldapauth: remove avatar if synced as such from LDAP server
