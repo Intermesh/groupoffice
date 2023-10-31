@@ -1,3 +1,4 @@
+
 - ActiveSync: Fixed extra day bug in for all day events
 - Core/ActiveSync: DB connection wasn't close on SSE / Push
 - Calendar: restore label 'Start' at start date field
@@ -57,6 +58,10 @@
 
 
 -- 6.8 --
+
+31-10-2023: 6.7.53
+- ActiveSync: Fixed extra day bug in for all day events
+- Core/ActiveSync: DB connection wasn't close on SSE / Push
 
 24-10-2023: 6.7.52
 - Core: Fixed some firefox quirks. Error when opening file and SSE canceled when document.location = was used.
@@ -326,6 +331,8 @@
 
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
+
+31-10-2023: 6.6.176
 - Calendar: make color dialog wider to reflect newer layout
 - Billing: create duplicate dialog if not there yet
 
