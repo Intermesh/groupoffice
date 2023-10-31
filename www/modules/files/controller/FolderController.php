@@ -921,6 +921,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	private function _searchFiles($params) {
 
+		$params['folder_id'] = intval($params['folder_id']);
+
 			//handle delete request for both files and folder
 			$this->_processDeletes($params);
 
@@ -940,6 +942,27 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				->start($start)
 				->limit($limit)
 				->group(['t.id']);
+
+
+		/**
+		 * select  id,
+		 * name,
+		 * parent_id,
+		 * @pv
+		 * from    (select * from fs_folders
+		 * order by parent_id, id) fs_folders,
+		 * (select @pv := '2') initialisation
+		 * where   id=2 OR find_in_set(parent_id, @pv) > 0
+		 * and     @pv := concat(@pv, ',', id)
+		 */
+
+		// restrict to the current folder hierarchy
+		$findParams->getCriteria()->addRawCondition("folder_id in (select id
+from    (select * from fs_folders
+         order by parent_id, id) fs_folders,
+        (select @pv := ".$params['folder_id'].") initialisation
+where   id=".$params['folder_id']." OR find_in_set(parent_id, @pv) > 0
+            and     @pv := concat(@pv, ',', id))");
 
 			if(!go()->getAuthState()->isAdmin()) {
 				$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 's.aclId', '=', false);
