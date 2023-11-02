@@ -1,3 +1,4 @@
+- Finance: Improved charts
 - Task: task counter only counts tasks that are due today
 
 31-10-2023: 6.8.14
