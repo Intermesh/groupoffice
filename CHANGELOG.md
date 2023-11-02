@@ -1,6 +1,7 @@
 - Finance: Improved charts
 - Task: task counter only counts tasks that are due today
 - Support: Customize the outgoing e-mail message with a template
+- Support: Added support CC addresses
 
 31-10-2023: 6.8.14
 - Files: When using search only search current folder and below
