@@ -1783,6 +1783,8 @@ abstract class Property extends Model {
 				//this if for cases when a second table extends the model but the key is not part of the properties
 				//For example Password extends User but the ket "userId" of password is not part of the properties
 				foreach($table->getKeys() as $from => $to) {
+					$to = Utils::splitTableAndColumn($to)->name;
+					$from = Utils::splitTableAndColumn($from)->name;
 					$modifiedForTable[$to] = $this->{$from} ?? null;
 				}
 
@@ -1797,6 +1799,8 @@ abstract class Property extends Model {
 				//update primary key data for new state
 				$this->primaryKeys[$table->getAlias()] = [];
 				foreach($table->getKeys() as $from => $to) {
+					$to = Utils::splitTableAndColumn($to)->name;
+					$from = Utils::splitTableAndColumn($from)->name;
 					$this->primaryKeys[$table->getAlias()][$to] = $this->$from;
 				}
 				if($table->isUserTable) {

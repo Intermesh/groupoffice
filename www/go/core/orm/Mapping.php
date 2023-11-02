@@ -75,7 +75,7 @@ class Mapping {
 	 *
 	 * @param string $name The table name
 	 * @param string|null $alias The table alias to use in the queries
-	 * @param array|null $keys If null then it's assumed the key name is identical in
+	 * @param array|null $keys [thiscol => targetcol] If null then it's assumed the key name is identical in
 	 *   this and the last added table. eg. ['id' => 'id']
 	 * @param array|null $columns Leave this null if you want to automatically build
 	 *   this based on the properties the model has. If you're extending a model
@@ -157,7 +157,10 @@ class Mapping {
 		$rProps = $reflectionClass->getProperties();
 		$props = [];
 		foreach ($rProps as $prop) {
-			$props[] = $prop->getName();
+			// check if the column is already mapped by another table
+			if(!isset($this->columns[$prop->getName()])) {
+				$props[] = $prop->getName();
+			}
 		}		
 		
 		return $props;

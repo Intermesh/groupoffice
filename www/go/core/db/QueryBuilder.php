@@ -750,29 +750,27 @@ class QueryBuilder {
 
 	private function splitTableAndColumn($tableAndCol): array
 	{
-		$dot = strpos($tableAndCol, '.');
-		
-		if ($dot !== false) {
-			$column = substr($tableAndCol, $dot + 1);
-			$alias = substr($tableAndCol, 0, $dot);
-			return [trim($alias, ' `'), trim($column, ' `')];
-		} else {
-			$colName = trim($tableAndCol, ' `');
-						
-			//if column not found then don'use an alias. It could be an alias defined in the select part or a function.
+		$col = Utils::splitTableAndColumn($tableAndCol);
+
+		if ($col->alias == null) {
+			//if column not found then don't use an alias. It could be an alias defined in the select part or a function.
 			$alias = null;
 			
 			//find table for column
 			foreach($this->aliasMap as $tableAlias => $table) {
-				$columnObject = Table::getInstance($table, $this->conn)->getColumn($colName);
+				$columnObject = Table::getInstance($table, $this->conn)->getColumn($col->name);
 				if ($columnObject) {
 					$alias = $tableAlias;
 					break;
 				}
 			}
 			
-			return [$alias, $colName];
+
+		} else {
+			$alias = $col->alias;
 		}
+
+		return [$alias, $col->name];
 	}
 
 	/**
