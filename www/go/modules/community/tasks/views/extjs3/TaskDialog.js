@@ -276,6 +276,14 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								hiddenName: 'createdBy',
 								allowBlank: false,
 								value: null
+							}),
+
+							this.ccField = new GO.email.RecipientCombo({
+								fieldLabel : t("CC", "email"),
+								name : 'cc',
+								flex: 1,
+								hidden: this.role != "support",
+								value: ""
 							})
 						]
 

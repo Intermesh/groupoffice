@@ -5,7 +5,6 @@ namespace go\core\mail;
 use ArrayAccess;
 use Countable;
 use Exception;
-use go\core\util\StringUtil;
 
 /**
  * A list of e-mail addresses
@@ -42,7 +41,7 @@ class AddressList implements ArrayAccess, Countable {
 	 * Set to true if you want to throw an exception when an e-mail is invalid.
 	 * @var boolean 
 	 */
-	public $strict = false;
+	public bool $strict = false;
 
 	/**
 	 * Check if an e-mail address is in this list
@@ -50,7 +49,8 @@ class AddressList implements ArrayAccess, Countable {
 	 * @param string $email
 	 * @return int|false index of the array
 	 */
-	public function hasAddress(string $email) {
+	public function hasAddress(string $email): bool|int
+	{
 		for ($i = 0, $c = count($this->addresses); $i < $c; $i++) {
 			if ($this->addresses[$i]->getEmail() == $email) {
 				return $i;
@@ -76,6 +76,15 @@ class AddressList implements ArrayAccess, Countable {
 	}
 
 	public function __toString() {
+		return $this->toString();
+	}
+
+	/**
+	 * Create address string
+	 *
+	 * @return string
+	 */
+	public function toString() : string {
 		$str = '';
 		foreach ($this->addresses as $recipient) {
 			$str .= $recipient . ', ';
@@ -97,35 +106,26 @@ class AddressList implements ArrayAccess, Countable {
 
 	/**
 	 * The array of parsed addresses
-	 *
-	 * @var     array
-	 * @access  private
 	 */
-	private $addresses = [];
+	private array $addresses = [];
 
 	/**
 	 * Temporary storage of personal info of an e-mail address
-	 *
-	 * @var     StringUtil
-	 * @access  private
 	 */
-	private $name = null;
+	private ?string $name = null;
 
 	/**
 	 * Temporary storage
 	 *
-	 * @var     StringUtil
+	 * @var     string
 	 * @access  private
 	 */
-	private $buffer = '';
+	private string $buffer = '';
 
 	/**
 	 * Bool to check if a string is quoted or not
-	 *
-	 * @var     bool
-	 * @access  private
 	 */
-	private $inQuotedString = false;
+	private bool $inQuotedString = false;
 
 	/**
 	 * Add single address
@@ -257,22 +257,15 @@ class AddressList implements ArrayAccess, Countable {
 		return array_key_exists($offset, $this->addresses);
 	}
 
-	/**
-	 * @param $offset
-	 * @return Address
-	 */
-	#[\ReturnTypeWillChange]
-	public function offsetGet($offset) {
+	public function offsetGet(mixed $offset): Address
+	{
 		return $this->addresses[$offset];
 	}
 
 	/**
-	 * @param int $offset
-	 * @param Address $value
-	 * @return void
 	 * @throws Exception
 	 */
-	public function offsetSet($offset, $value) : void{
+	public function offsetSet(mixed $offset, mixed $value) : void{
 
 		if (!is_string($value)) {
 			return;
@@ -283,7 +276,7 @@ class AddressList implements ArrayAccess, Countable {
 		$this->addresses[$offset] = $recipients[0];
 	}
 
-	public function offsetUnset($offset) : void {
+	public function offsetUnset(mixed $offset) : void {
 		unset($this->addresses[$offset]);
 	}
 

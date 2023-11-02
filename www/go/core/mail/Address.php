@@ -14,8 +14,8 @@ use go\core\data\Model;
  */
 class Address extends Model {
 
-	private $email;
-	private $name;
+	private string $email;
+	private ?string $name;
 
 	public function __construct(string $email, ?string $name = null) {
 		$this->email = $email;
@@ -24,8 +24,6 @@ class Address extends Model {
 
 	/**
 	 *  Get e-mail address
-	 * 
-	 * @param string
 	 */
 	public function getEmail(): string
 	{
@@ -34,8 +32,6 @@ class Address extends Model {
 
 	/**
 	 * Get personal name
-	 *
-	 * @return string|null
 	 */
 	public function getName(): ?string
 	{
