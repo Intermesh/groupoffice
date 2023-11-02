@@ -259,9 +259,6 @@ class EmailTemplate extends Entity
 		$subject = $templateParser->parse($this->subject);
 		$body = $templateParser->parse($this->body);
 
-		$message->setSubject($subject)
-			->setBody($body, 'text/html');
-
 		foreach($this->attachments as $attachment) {
 			$blob = Blob::findById($attachment->blobId);
 
@@ -279,6 +276,9 @@ class EmailTemplate extends Entity
 				$message->attach($a);
 			}
 		}
+
+		$message->setSubject($subject)
+			->setBody($body, 'text/html');
 
 		return $message;
 	}
