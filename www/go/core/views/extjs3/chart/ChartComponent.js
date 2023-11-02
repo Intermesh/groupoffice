@@ -10,6 +10,8 @@ go.chart.ChartComponent = Ext.extend(Ext.BoxComponent, {
 
 	options: null,
 
+	chartConfig: null,
+
 	update: function(datasets, labels){
 
 		console.warn(datasets, labels);
@@ -29,8 +31,9 @@ go.chart.ChartComponent = Ext.extend(Ext.BoxComponent, {
 			this.el.dom.appendChild(this.canvas);
 
 
+			this.chartConfig = this.chartConfig || {};
 
-			this.chart = new Chart(this.canvas, {
+			Object.assign(this.chartConfig, {
 
 				type: this.chartType,
 				data: {
@@ -39,6 +42,8 @@ go.chart.ChartComponent = Ext.extend(Ext.BoxComponent, {
 				},
 				options: this.options || {}
 			});
+
+			this.chart = new Chart(this.canvas, this.chartConfig);
 
 
 			this.canvas.onclick = (evt) => {
