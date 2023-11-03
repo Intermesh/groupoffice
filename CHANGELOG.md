@@ -1,3 +1,6 @@
+03-11-2023 6.4.248
+- Core: Fixed security issue
+
 25-01-2022 6.4.247
 - Email: read greeting right after connect. Solves problem with German 1und1 and ionos IMAP service.
 
