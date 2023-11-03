@@ -275,8 +275,15 @@ class Settings extends core\Settings {
 	 * The full URL to Group-Office. With trailing /.
 	 * 
 	 * eg. https://my.groupoffice.net/
-	 * 
-	 * @var string 
+	 *
+	 * Alternatively to generate a URL based on the request you can use:
+	 *
+	 * @example
+	 * ```
+	 * Extjs3::get()->getBaseUrl();
+	 * ```
+	 *
+	 * @var string
 	 */
 	public $URL;
 
