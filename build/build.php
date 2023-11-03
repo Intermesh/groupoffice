@@ -174,6 +174,7 @@ class Builder
 		$this->buildNodeCore();
 		$this->buildNodeModules();
 
+        putenv("COMPOSER_ALLOW_SUPERUSER=1");
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
 
 		$sassFiles = run("find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*'");
