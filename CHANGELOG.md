@@ -1,3 +1,6 @@
+- Finance: Sort customer and contact
+- Finance: Bug in selecting article on existing rows
+
 03-11-2023: 6.7.54
 - Core: Fixed security issue
 - Billing: Custom fields in ODF template work with prefix contact:, company: or user:
