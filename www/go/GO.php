@@ -259,6 +259,8 @@ class GO{
 	 */
 	public static function unsetDbConnection(){
 		self::$db=null;
+
+		go()->getDbConnection()->disconnect();
 	}
 
 	public static function setDbConnection($dbname=false, $dbuser=false, $dbpass=false, $dbhost=false, $dbport=false, $options=array()){
