@@ -168,6 +168,8 @@ class Extjs3 {
 	/**
 	 * Get URL to webclient
 	 *
+	 * eg. https://groupoffice.example.com/groupoffice/
+	 *
 	 * @return string
 	 */
 	public function getBaseUrl() {
