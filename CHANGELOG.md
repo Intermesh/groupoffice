@@ -1,4 +1,6 @@
+03-11-2023 6.5.112
 - Core: refactor generatePassword method to use random_int instead of mt_rand()
+- Core: Fixed security issue
 
 10-09-2023 6.5.111
 - Core: minor bugfix in User archival
