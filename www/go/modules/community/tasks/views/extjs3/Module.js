@@ -140,7 +140,7 @@ go.Modules.register("community", "tasks", {
 	initModule: function () {
 		go.Alerts.on("beforeshow", function(alerts, alertConfig) {
 			const alert = alertConfig.alert;
-			if(alert.entity == "Task") {
+			if(alert.entity == "Task" || alert.entity == "SupportTicket") {
 
 				switch(alert.tag) {
 					case "assigned":
