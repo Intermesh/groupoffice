@@ -283,6 +283,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								name : 'cc',
 								flex: 1,
 								hidden: this.role != "support",
+								disabled: this.role != "support",
 								value: ""
 							})
 						]
