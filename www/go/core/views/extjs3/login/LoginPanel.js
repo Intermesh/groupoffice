@@ -3,9 +3,14 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 	initComponent: function () {
 
 
-		const menuItems = [], langHandler = (btn) => {
+		const langHandler = (btn) => {
 			document.location = BaseHref + 'index.php?SET_LANGUAGE=' + btn.lang
-		};
+		},
+			menuItems = [{
+			text: t("My selected language"),
+			lang: "",
+			handler: langHandler
+		}, "-"];
 
 		GO.Languages.forEach((l) => {
 			menuItems.push({
