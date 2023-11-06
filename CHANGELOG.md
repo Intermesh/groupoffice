@@ -1,3 +1,5 @@
+- Core: fixed issue when creating new property with relations
+
 03-11-2023: 6.8.15
 - Core: Fixed security issue
 - Finance: Improved charts
