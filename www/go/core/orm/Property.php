@@ -283,7 +283,7 @@ abstract class Property extends Model {
 			$shouldQuery = false;
 			if(!$this->isNew()) {
 				$where = $this->buildRelationWhere($relation);
-				$shouldQuery = !count($where);
+				$shouldQuery = count($where) > 0;
 			}
 
 
