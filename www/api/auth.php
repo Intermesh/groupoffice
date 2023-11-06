@@ -103,7 +103,6 @@ try {
 	}
 
 	go()->setAuthState(new State());
-	go()->getDebugger()->group("auth");
 	$auth = new Authenticate();
 
 
