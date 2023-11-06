@@ -280,9 +280,12 @@ abstract class Property extends Model {
 		foreach ($this->getFetchedRelations() as $relation) {
 			$cls = $relation->propertyName;
 
-			$where = $this->buildRelationWhere($relation);
+			$shouldQuery = false;
+			if(!$this->isNew()) {
+				$where = $this->buildRelationWhere($relation);
+				$shouldQuery = !count($where);
+			}
 
-			$shouldQuery = !$this->isNew() || !count($where);
 
 			switch($relation->type) {
 
