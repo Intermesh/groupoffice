@@ -124,12 +124,8 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 			}
 		}
 		
-		$findParams = \GO\Base\Db\FindParams::newInstance()->order('name');			
-		$findParams->getCriteria()->addCondition('type', \GO\Base\Model\Template::TYPE_EMAIL);
-		
-		
-		$store = new \GO\Base\Data\DbStore('GO\Base\Model\Template',new \GO\Base\Data\ColumnModel('GO\Base\Model\Template'),$params,$findParams);
-		
+		$store = new \GO\Base\Data\DbStore('GO\Base\Model\Template',new \GO\Base\Data\ColumnModel('GO\Base\Model\Template'),$params);
+		$store->getFindParams()->getCriteria()->addCondition('type', \GO\Base\Model\Template::TYPE_EMAIL);
 		$store->getColumnModel()->setFormatRecordFunction(array($this, 'formatEmailSelectionRecord'));
 		
 		$store->addRecord(array(
@@ -166,6 +162,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$formattedRecord['group'] = 'templates';
 		$formattedRecord['checked']=$this->_defaultTemplate->template_id==$model->id;
 		$formattedRecord['text']=  \GO\Base\Util\StringHelper::encodeHtml($model->name);
+		$formattedRecord['group_name'] = $model->getGroupName();
 		$formattedRecord['template_id']=$model->id;
 		unset($formattedRecord['id']);
 		return $formattedRecord;

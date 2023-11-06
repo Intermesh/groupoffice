@@ -19,4 +19,5 @@ return array (
   'description' => 'Opis strony',
   'Bookmarks' => 'Zakładki',
   'Logo' => 'Logo',
+  'Toggle view' => 'Przełącz widok',
 );

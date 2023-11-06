@@ -66,7 +66,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 
 	public function getGroupName() {
 		$group = TemplateGroup::model()->findByPk($this->group_id);
-		return !empty($group) ? $group->name : '-';
+		return !empty($group) ? $group->name : '('.go()->t('None').')';
 	}
 	
 	// TODO : move language from mailings module to addressbook module
