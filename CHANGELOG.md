@@ -1,3 +1,5 @@
+- Ticket crashes with ErrorException Trying to get property 'name' of non-object
+
 03-11-2023: 6.6.177
 - Core: Fixed security issue
 
