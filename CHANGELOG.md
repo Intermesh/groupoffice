@@ -1,3 +1,4 @@
+- Core: Updated PL translations. Thank you Piotr!
 - Finance: Sort customer and contact
 - Finance: Bug in selecting article on existing rows
 
