@@ -2,26 +2,48 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 	id: "login",
 	initComponent: function () {
 
+
+		const menuItems = [], langHandler = (btn) => {
+			document.location = BaseHref + 'index.php?SET_LANGUAGE=' + btn.lang
+		};
+
+		GO.Languages.forEach((l) => {
+			menuItems.push({
+				text: l[1],
+				lang: l[0],
+				handler: langHandler
+			})
+		});
+
 		this.languageContainer = new Ext.Container({
 			id: 'go-select-language',
 			//renderTo: 'go-select-language',
 			layout: 'form',
 			items: [
-				this.langCombo = new go.login.LanguageCombobox({
-					emptyText: t("My selected language"),
-					listeners: {
-						select: function (cmb) {
-							if (cmb.getValue() != '') {
-								document.location = BaseHref + 'index.php?SET_LANGUAGE=' + cmb.getValue();
-							}
-						},
-						scope: this
+				new Ext.Button({
+					tooltip: t("Language"),
+					iconCls: "ic-language",
+					menu: {
+						cls: 'x-menu-no-icons',
+						items: menuItems
 					}
-				})
+				}),
+
+				// this.langCombo = new go.login.LanguageCombobox({
+				// 	emptyText: t("My selected language"),
+				// 	listeners: {
+				// 		select: function (cmb) {
+				// 			if (cmb.getValue() != '') {
+				// 				document.location = BaseHref + 'index.php?SET_LANGUAGE=' + cmb.getValue();
+				// 			}
+				// 		},
+				// 		scope: this
+				// 	}
+				// })
 			]
 		});
 
-		var htmlText = 'Powered by Group-Office - <a target="_blank" href="https://www.group-office.com">https://www.group-office.com</a>';
+		var htmlText = 'Powered by Group-Office <br /> <a target="_blank" href="https://www.group-office.com">https://www.group-office.com</a>';
 
 		this.items = [{
 				xtype: 'box',

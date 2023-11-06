@@ -274,7 +274,9 @@ a {
 }
 #go-powered-by{
 	position:absolute;
+	text-align: center;
 	right:dp(16);
+	left: dp(16);
 	bottom:dp(16);
 	a {color:inherit;}
 }
@@ -335,6 +337,7 @@ a {
 	position:absolute;
 	top: dp(16);
 	right: dp(16);
+	color: white;
 	label {
 		@extend %font-body1;
 		text-align:right;
