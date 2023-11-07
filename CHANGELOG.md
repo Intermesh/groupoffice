@@ -1,4 +1,5 @@
 - Ticket crashes with ErrorException Trying to get property 'name' of non-object
+- Leavedays: make special leave budget optional for employee when requesting leave for special leave type
 
 03-11-2023: 6.6.177
 - Core: Fixed security issue
