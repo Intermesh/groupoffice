@@ -5,6 +5,7 @@
 - Finance: Fixed total calculation in groups
 - Tasks: bugfix when no CC available
 - Finance: remember selected statuses per book
+- Core: fixed login screen for mobiles
 
 03-11-2023: 6.8.15
 - Core: Fixed security issue

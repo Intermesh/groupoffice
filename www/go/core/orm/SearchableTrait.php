@@ -258,7 +258,7 @@ trait SearchableTrait {
 		$cls = static::class;
 		echo $cls."\n";
 
-		ob_flush();
+		if(ob_get_level() > 0) ob_flush();
 		flush();
 
 
@@ -282,13 +282,13 @@ trait SearchableTrait {
 		
 		//In small batches to keep memory low	
 		while($stmt->rowCount()) {
-			ob_flush();
+			if(ob_get_level() > 0) ob_flush();
 			flush();
 
 			while ($m = $stmt->fetch()) {
 
 				try {
-					ob_flush();
+					if(ob_get_level() > 0) ob_flush();
 					flush();
 
 					$m->saveSearch();
