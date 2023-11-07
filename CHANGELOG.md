@@ -1,3 +1,4 @@
+06-11-2023: 6.8.16
 - Core: fixed issue when creating new property with relations
 - Finance: Fixed total calculation in groups
 - Tasks: bugfix when no CC available
@@ -77,6 +78,15 @@
 
 
 -- 6.8 --
+=======
+- Core: Updated PL translations. Thank you Piotr!
+- Finance: Sort customer and contact
+- Finance: Bug in selecting article on existing rows
+- Core: fixed login screen for mobiles
+
+03-11-2023: 6.7.54
+- Core: Fixed security issue
+- Billing: Custom fields in ODF template work with prefix contact:, company: or user:
 
 31-10-2023: 6.7.53
 - ActiveSync: Fixed extra day bug in for all day events
@@ -350,6 +360,9 @@
 
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
+
+03-11-2023: 6.6.177
+- Core: Fixed security issue
 
 31-10-2023: 6.6.176
 - Calendar: make color dialog wider to reflect newer layout

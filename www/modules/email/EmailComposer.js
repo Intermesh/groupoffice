@@ -401,16 +401,21 @@ GO.email.EmailComposer = function(config) {
 				menu : this.showMenu
 			}));
 		
-		this.templatesStore = new GO.data.JsonStore({
+		this.templatesStore = new GO.data.GroupingStore({
 			url : GO.url("email/template/emailSelection"),
+			sortInfo:{field: 'name',direction: "ASC"},
 			baseParams : {
 				'type':"0"
 			},
-			root : 'results',
-			totalProperty : 'total',
-			id : 'id',
-			fields : ['id', 'name', 'group', 'text','template_id','checked'],
-			remoteSort : true
+			reader: new Ext.data.JsonReader({
+				root: 'results',
+				totalProperty: 'total',
+				id: 'id',
+				fields: ['id', 'name', 'group', 'text','template_id','checked','group_name', 'group_id'],
+			}),
+			groupField:'group_id',
+			remoteSort : true,
+			remoteGroup:true
 		});
 		
 		tbar.push(this.templatesBtn = new Ext.Button({
@@ -908,7 +913,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				aliases:{r:'email/alias/store','limit':0}
 			};
 			
-				requests.templates={r:'email/template/emailSelection'};
+				requests.templates={r:'email/template/emailSelection', 'groupBy':'group_id'};
 				if (!GO.util.empty(config.account_id))
 					requests.templates['account_id'] = config.account_id;
 			
