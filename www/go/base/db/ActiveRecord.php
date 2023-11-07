@@ -4912,14 +4912,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			echo "Processing ".static::class ."\n";
 
-			ob_flush();
+			if(ob_get_level() > 0) ob_flush();
 			flush();
 			
 			$entityTypeId = static::entityType()->getId();
 
 			echo "Deleting old values\n";
 
-			ob_flush();
+			if(ob_get_level() > 0) ob_flush();
 			flush();
 
 			$stmt = go()->getDbConnection()->delete('core_search', (new \go\core\orm\Query)
@@ -4930,7 +4930,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			echo "Deleted ". $stmt->rowCount() . " entries\n";
 
-			ob_flush();
+			if(ob_get_level() > 0) ob_flush();
 			flush();
 
 			$start = 0;
@@ -4955,7 +4955,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				while ($m = $stmt->fetch()) {
 				
 					try {
-						ob_flush();
+						if(ob_get_level() > 0) ob_flush();
 						flush();
 						
 						if($m->cacheSearchRecord()) {
@@ -4976,7 +4976,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 
 						echo \go\core\ErrorHandler::logException($e);
-						ob_flush();
+						if(ob_get_level() > 0) ob_flush();
 						flush();
 						$start++;
 					}
@@ -4988,7 +4988,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			echo "\nDone\n\n";
 
-			ob_flush();
+			if(ob_get_level() > 0) ob_flush();
 			flush();
 			
 		}
