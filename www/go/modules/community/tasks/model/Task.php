@@ -577,9 +577,9 @@ class Task extends AclItemEntity {
 		)->execute();
 
 		$changes = Task::find()
-			->select("task.id, tl.aclId, '0'")
+			->select("task.id, atl.aclId, '0'")
 			->fetchMode(PDO::FETCH_ASSOC)
-			->join("tasks_tasklist", "tl", "tl.id = task.taskListId")
+			->join("tasks_tasklist", "atl", "atl.id = task.taskListId")
 			->join("tasks_alert", "a", "a.taskId = task.id")
 			->where('a.id' , 'in', $alertIds)
 			->groupBy(['task.id'])
