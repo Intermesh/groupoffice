@@ -18,7 +18,7 @@ return array (
   'Are you sure you want to delete this?' => 'Czy na pewno chcesz usunąć?',
   'PKCS12 certificate' => 'Certyfikat PKCS12',
   'You have uploaded a certificate already. SMIME support is enabled for this account.' => 'Certyfikat został już podany. SMIME działa na tym koncie.',
-  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Aby przesłać nowy certyfikat PKCS12, musisz podać hasło GroupOffice. Ze względów bezpieczeństwa hasło GroupOffice musi być inne niż certyfikat PCSK12. Żadne hasło nie jest zabronione.',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Aby przesłać nowy certyfikat PKCS12, musisz podać hasło {product_name}. Ze względów bezpieczeństwa hasło {product_name} musi być inne niż certyfikat PCSK12. Żadne hasło nie jest zabronione.',
   'Select new PKCS12 Certificate' => 'Wybierz nowy certyfikat PKCS12',
   'Upload certificate' => 'Wprowadź certyfikat',
   'PKCS12 certificates' => 'Certyfikaty PKCS12',

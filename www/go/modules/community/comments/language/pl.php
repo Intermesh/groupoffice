@@ -1,7 +1,7 @@
 <?php
 return array (
   'Labels' => 'Etykiety',
-  '{author} wrote at {date}' => '{auhor} napisał dnia {date}',
+  '{author} wrote at {date}' => '{author} napisał dnia {date}',
   'Add Link' => 'Dodaj odnośnik',
   'Attach file' => 'Załącz plik',
   'Scroll to top' => 'Przejdź do góry',
