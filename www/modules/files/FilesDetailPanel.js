@@ -70,17 +70,6 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 				scope:this
 			})
 		];
-		
-		// this.browseBtn.on('closefilebrowser', function(btn, folderId) {
-		// 	this.folderId = folderId;
-		// 	this.store.load({
-		// 		params: {
-		// 			limit: 10,
-		// 			folder_id: this.folderId
-		// 		}
-		// 	});
-		// }, this);
-
 
 		go.modules.files.FilesDetailPanel.superclass.initComponent.call(this);
 
