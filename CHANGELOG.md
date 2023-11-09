@@ -1,3 +1,4 @@
+09-11-2023: 6.8.17
 - Tasks: fix error when trying to delete or update task with alert
 - Email: open links in window instead of routing to the module
 - Files: Show context menu in files detail view
