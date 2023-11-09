@@ -498,6 +498,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 					record.commit();
 				}).finally(() => {
 					this.getEl().unmask();
+				}).catch(e => {
+					GO.errorDialog.show(e.message);
 				})
 			} else {
 				GO.request({
