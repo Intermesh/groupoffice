@@ -17,7 +17,7 @@ return array (
   'Your system administrator requires you to setup two factor authentication' => 'Twój administrator ustawił weryfikację dwuetapową jako wymaganą',
   'OTP Authenticator' => 'Uwierzytelnianie OTP',
   'Enforce two factor authentication for users in a specific group' => 'Wymuś weryfikację dwuetapową dla użytkoników konkretnej grupy',
-  'Block Group-Office usage until setup is done' => 'Blokuj dostęp do GroupOffice dopóki zmienianie ustawień nie zostanie ukończone',
+  'Block Group-Office usage until setup is done' => 'Blokuj dostęp do {product_name} dopóki zmienianie ustawień nie zostanie ukończone',
   'Count down' => 'Odliczanie',
   'Count down this number of seconds until the user can cancel the setup' => 'Czas w sekundach zanim użytkownik będzie mógł odrzucić ustawienie',
   'Provide your current password before you can enable OTP Authenticator.' => 'Podaj obecne hasło zanim włączysz uwierzytelnianie OTP',
