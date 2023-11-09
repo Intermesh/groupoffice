@@ -1,5 +1,92 @@
 Ext.namespace('go.modules.files');
 
+
+go.modules.files.FileContextMenu = Ext.extend(Ext.menu.Menu, {
+	initComponent: function() {
+
+		this.openButton = new Ext.menu.Item({
+			text: t("Open", "files"),
+			iconCls: 'ic-open-in-new',
+			handler: function(){
+				if (this.record.data.extension == 'folder')
+				{
+					GO.files.openFolder(this.detail.folderId, this.record.id);
+				} else
+				{
+					if (go.Modules.isAvailable("legacy", "files")) {
+						//GO.files.openFile({id:file.id});
+						this.record.data.handler.call(this);
+					} else
+					{
+						window.open(GO.url("files/file/download", {id: this.record.data.id}));
+					}
+				}
+			},
+			scope: this
+		});
+
+		this.downloadButton = new Ext.menu.Item({
+			iconCls: 'ic-file-download',
+			text: t("Download"),
+			handler: function(){
+				go.util.downloadFile(GO.url("files/file/download",{id:this.record.data.id,inline:"0"}));
+			},
+			scope: this
+		});
+
+		this.items = [
+			this.openButton,
+			this.downloadButton,
+			{
+				iconCls: 'ic-settings-applications',
+				text: t("Properties"),
+				handler: function() {
+					GO.mainLayout.getModulePanel("files").showPropertiesDialog(this.record);
+				},
+				scope: this
+			}, "-", {
+				iconCls: 'ic-delete',
+				text: t("Delete"),
+				scope: this,
+				handler: function() {
+					if (this.record.data.extension == 'folder') {
+						GO.deleteItems({
+							url: GO.url('files/folder/delete'),
+							params: {
+								id: this.record.data.id
+							},
+							count: 1,
+							callback: function (responseParams) {
+								this.detail.load(this.detail.folderId);
+							},
+							scope: this
+						});
+					} else {
+						GO.deleteItems({
+							url: GO.url('files/file/delete'),
+							params: {
+								id: this.record.data.id
+							},
+							count: 1,
+							callback: function (responseParams) {
+								this.detail.load(this.detail.folderId);
+							},
+							scope: this
+						});
+					}
+				}
+			}
+		]
+
+		this.supr().initComponent.call(this);
+
+		this.on("beforeshow", () => {
+			this.downloadButton.setVisible(this.record.data.extension != 'folder');
+		})
+	}
+})
+
+
 go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 	title: t("Files", "files") + "<span class='badge'>0</span>",
 	collapsible: true,
@@ -27,10 +114,11 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 
 
 
-		var tpl = new Ext.XTemplate('<div class="icons"><tpl for="."><a>\
+		var tpl = new Ext.XTemplate('<div class="icons"><tpl for="."><a class="more-btn">\
 			<i class="icon label filetype filetype-{extension}"></i>\
 			<span>{name}</span>\
 			<label>{musername} {[t("at")]} {mtime}</label>\
+			<i class="icon">more_vert</i>\
 		</a></tpl></div>');
 
 
@@ -48,6 +136,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 
 				},
 				click: this.onClick,
+				contextmenu: this.onContextMenu,
 				scope: this
 			}
 		})];
@@ -268,6 +357,18 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 	
 	onClick: function (dataview, index, node, e) {
 
+		if(e.target.tagName == "I" && e.target.innerText == "more_vert") {
+			if(!this.contextmenu) {
+				this.contextmenu = new go.modules.files.FileContextMenu();
+				this.contextmenu.detail = this;
+			}
+			var record = this.store.getAt(index);
+			this.contextmenu.record = record;
+
+			this.contextmenu.show(e.target, "tr-br?");
+			return;
+		}
+
 		var record = this.store.getAt(index);
 
 		if (record.data.extension == 'folder')
@@ -283,6 +384,24 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 				window.open(GO.url("files/file/download", {id: record.data.id}));
 			}
 		}
+	},
+
+	onContextMenu: function (dataview, index, node, e) {
+
+		e.preventDefault();
+
+		if(!this.contextmenu) {
+			this.contextmenu = new go.modules.files.FileContextMenu();
+			this.contextmenu.detail = this;
+		}
+
+
+
+		var record = this.store.getAt(index);
+
+		this.contextmenu.record = record;
+
+		this.contextmenu.showAt(e.getXY());
 	},
 
 	load : function(folderId) {

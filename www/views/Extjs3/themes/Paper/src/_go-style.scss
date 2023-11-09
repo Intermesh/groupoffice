@@ -1154,6 +1154,7 @@ button.filetype-pdf, button.filetype-doc {
 
 %go-icon-list {
 	p, > a {
+		width: 100%;
 		min-height: dp(40);
 		box-sizing: border-box;
 		display:table;
@@ -1168,12 +1169,21 @@ button.filetype-pdf, button.filetype-doc {
 
 		i.label {
 			left: dp(16);
-			top: dp(12);
+			top: dp(16);
 			width:  dp(24);
 			height: dp(24);
 			position: absolute;
 			color: color($fg, 'icon');
 
+		}
+
+		&.more-btn {
+			i:last-child {
+				position: absolute;
+				right: dp(16);
+				top: dp(16);
+			}
+			padding-right: dp(32);
 		}
 
 		.avatar {
