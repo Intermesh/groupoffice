@@ -1,6 +1,8 @@
 - Tasks: fix error when trying to delete or update task with alert
 - Email: open links in window instead of routing to the module
 - Files: Show context menu in files detail view
+- Support: Fixed support accounts not being queried
+- Core: show error message when module delete fails
 
 06-11-2023: 6.8.16
 - Core: fixed issue when creating new property with relations
