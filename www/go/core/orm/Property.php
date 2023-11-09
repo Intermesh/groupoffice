@@ -280,12 +280,12 @@ abstract class Property extends Model {
 		foreach ($this->getFetchedRelations() as $relation) {
 			$cls = $relation->propertyName;
 
-			$shouldQuery = false;
-			if(!$this->isNew()) {
-				$where = $this->buildRelationWhere($relation);
-				$shouldQuery = count($where) > 0;
-			}
+			$where = $this->buildRelationWhere($relation);
 
+			// Should query when property is not new but also when there's an empty where.
+			// this means there is no foreign key and all records can be shown.
+			// this is used in {@see \go\modules\business\support\model\Settings} for example.
+			$shouldQuery = !$this->isNew() || !count($where);
 
 			switch($relation->type) {
 
@@ -459,7 +459,7 @@ abstract class Property extends Model {
 	{
 		$where = [];
 		foreach ($relation->keys as $from => $to) {
-			$where[$to] = $this->$from;
+			$where[$to] = $this->$from ?? null;
 		}
 		return $where;
 	}
