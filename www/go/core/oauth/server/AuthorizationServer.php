@@ -254,6 +254,6 @@ class AuthorizationServer implements EmitterAwareInterface
 		public static function getIssuer(): string {
 			$url = parse_url(go()->getSettings()->URL);
 
-			return $url['scheme'] . '://' . $url['hostname'];
+			return $url['scheme'] . '://' . $url['host'];
 		}
 }
