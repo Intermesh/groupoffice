@@ -3,6 +3,7 @@
 namespace go\core\oauth\server\responsetypes;
 
 use DateTimeImmutable;
+use go\core\oauth\server\AuthorizationServer;
 use go\core\oauth\server\requesttypes\AuthorizationRequest;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
@@ -42,7 +43,7 @@ class IdTokenResponse extends BaseIdTokenResponse
 	    // Add required id_token claims
 	    return $builder
 		    ->permittedFor($accessToken->getClient()->getIdentifier())
-		    ->issuedBy(rtrim(\go()->getSettings()->URL, '/') . '/api/oauth.php')
+		    ->issuedBy(AuthorizationServer::getIssuer())
 		    ->issuedAt(new DateTimeImmutable())
 		    ->expiresAt($expiresAt)
 		    ->relatedTo($userEntity->getIdentifier());

@@ -287,7 +287,7 @@ class OAuthController {
 		$signing_alg_values_supported = array('HS256', 'RS256');
 
 		$discovery = array(
-			'issuer' => $goUrl,
+			'issuer' => AuthorizationServer::getIssuer(),
 			'authorization_endpoint' => $endpointBase . '/authorize',
 			'token_endpoint' => $endpointBase . '/token',
 			'userinfo_endpoint' => $endpointBase . '/userinfo',

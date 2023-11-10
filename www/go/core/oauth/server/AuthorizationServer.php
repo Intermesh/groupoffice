@@ -249,4 +249,11 @@ class AuthorizationServer implements EmitterAwareInterface
 		{
 			$this->revokeRefreshTokens = $revokeRefreshTokens;
 		}
+
+
+		public static function getIssuer(): string {
+			$url = parse_url(go()->getSettings()->URL);
+
+			return $url['scheme'] . '://' . $url['hostname'];
+		}
 }
