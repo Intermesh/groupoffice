@@ -1,3 +1,4 @@
+13-11-2023: 6.8.18
 - Core: Fixed Wrong dependency on php-xsl on Debian 12? #1064
 
 09-11-2023: 6.8.17
