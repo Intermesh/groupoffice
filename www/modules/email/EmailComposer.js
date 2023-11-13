@@ -129,7 +129,7 @@ GO.email.EmailComposer = function(config) {
 							if(!go.util.empty(v)) {
 								v += ", ";
 							}							
-							v += '"' + contact.name.replace(/"/g, '\\"') + '" <' + contact.emailAddresses[0].email + '>';							
+							v += '"' + go.util.addSlashes(contact.name) + '" <' + contact.emailAddresses[0].email + '>';
 							combo.setValue(v);
 						});
 					}).finally(function(){
@@ -153,7 +153,7 @@ GO.email.EmailComposer = function(config) {
 							if(!go.util.empty(v)) {
 								v += ", ";
 							}							
-							v += '"' + user.displayName.replace(/"/g, '\\"') + '" <' + user.email + '>';							
+							v += '"' + go.util.addSlashes(user.displayName) + '" <' + user.email + '>';
 							combo.setValue(v);
 						});
 					}).finally(function(){
@@ -167,7 +167,7 @@ GO.email.EmailComposer = function(config) {
 		if(!go.util.empty(v)) {
 			v += ", ";
 		}	
-		v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
+		v += '"' + go.util.addSlashes(name) + '" <' + email + '>';
 		combo.setValue(v);
 	};
 

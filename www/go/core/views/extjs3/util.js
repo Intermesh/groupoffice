@@ -211,7 +211,7 @@ go.util =  (function () {
 			var link = config.to;
 
 			if (config.name) {
-				link = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.to + '>';
+				link = '"' + go.util.addSlashes(config.name) + '" <' + config.to + '>';
 			}
 			const qp = [];
 			if(config.body) {

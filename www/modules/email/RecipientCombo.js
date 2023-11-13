@@ -17,7 +17,7 @@ GO.email.RecipientCombo = Ext.extend(GO.form.ComboBoxMulti, {
 				{
 					name: "full_email",
 					convert: function (v, data) {						
-						return '"' + data.name.replace(/"/g, '\\"') + '" <' + data.email + '>';
+						return '"' + go.util.addSlashes(data.name) + '" <' + data.email + '>';
 					}
 				}]
 		});

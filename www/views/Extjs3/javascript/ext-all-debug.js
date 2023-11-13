@@ -10431,11 +10431,11 @@ Ext.extend(Ext.XTemplate, Ext.Template, {
         
         if(Ext.isGecko){
             body = "tpl.compiled = function(values, parent, xindex, xcount){ return '" +
-                   tpl.body.replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn).replace(this.codeRe, codeFn) +
+                   tpl.body.replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace("/\\/g","\\\\").replace(this.re, fn).replace(this.codeRe, codeFn) +
                     "';};";
         }else{
             body = ["tpl.compiled = function(values, parent, xindex, xcount){ return ['"];
-            body.push(tpl.body.replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn).replace(this.codeRe, codeFn));
+            body.push(tpl.body.replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace("/\\/g","\\\\").replace(this.re, fn).replace(this.codeRe, codeFn));
             body.push("'].join('');};");
             body = body.join('');
         }
