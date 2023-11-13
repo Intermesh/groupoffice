@@ -94,6 +94,9 @@
             var last = parts.pop();
 
             for(var i = 0, l = parts.length; i < l; i++) {
+								//protect against prototype pollution
+	              if (!obj.hasOwnProperty(parts[i])) return null;
+
                 obj = traverse(obj, parts[i]);
                 if(!obj) {
                     return null;

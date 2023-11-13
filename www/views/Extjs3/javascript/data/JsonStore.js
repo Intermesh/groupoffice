@@ -83,7 +83,7 @@ GO.data.JsonStore = function(config) {
 		this.loaded=true;
 
 		if(this.reader.jsonData.exportVariables){					
-			GO.util.mergeObjects(window,this.reader.jsonData.exportVariables);
+			Object.assign(window,this.reader.jsonData.exportVariables);
 		}
 		
 		if(!this.suppressError && this.reader.jsonData.feedback){
