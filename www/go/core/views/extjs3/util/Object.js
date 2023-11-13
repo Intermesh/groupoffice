@@ -37,6 +37,8 @@
             }
             obj = obj[part][arrayIndex];
         } else {
+	        //protect against prototype pollution
+	        if (!obj.hasOwnProperty(part)) return null;
 
             if (!obj[part]) {
                 if(!Ext.isDefined(value)) {
@@ -80,8 +82,6 @@
             var ret;
 
             parts.forEach(function(part) {
-	            if (!obj.hasOwnProperty(part)) return;
-
 							ret = obj = traverse(obj, part);
             });
 
@@ -96,9 +96,6 @@
             var last = parts.pop();
 
             for(var i = 0, l = parts.length; i < l; i++) {
-								//protect against prototype pollution
-	              if (!obj.hasOwnProperty(parts[i])) return null;
-
                 obj = traverse(obj, parts[i]);
                 if(!obj) {
                     return null;
