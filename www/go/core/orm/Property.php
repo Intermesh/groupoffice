@@ -1679,7 +1679,7 @@ abstract class Property extends Model {
 	private function applyRelationKeys(Relation $relation, Property $property) {
 
 		foreach ($relation->keys as $from => $to) {
-			$property->$to = $this->$from;
+			$property->$to = $this->$from ?? null;
 		}
 	}
 
