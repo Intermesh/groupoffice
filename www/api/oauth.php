@@ -112,7 +112,7 @@ class OAuthController {
 				$_SESSION['authRequest'] = $authRequest;
 				$authRedirectUrl = $_SERVER['PHP_SELF'] . '/authorize';
 
-				$loginUrl = dirname($_SERVER['PHP_SELF'], 3) . '?authRedirectUrl=' . urlencode($authRedirectUrl);
+				$loginUrl = dirname($_SERVER['PHP_SELF'], 3) . '?oauthAuthorize=1';
 				return $response->withStatus(302)->withHeader('Location', $loginUrl);
 			}
 

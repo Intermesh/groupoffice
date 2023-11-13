@@ -281,10 +281,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		//check if authRedirecUrl was given.
 		var urlParams = new URLSearchParams(window.location.search);
-		var authRedirectUrl = urlParams.get('authRedirectUrl');
+		var oauthAuthorize = urlParams.get('oauthAuthorize');
 
-		if(authRedirectUrl) {
-			document.location.replace(authRedirectUrl);
+		if(oauthAuthorize) {
+			document.location.replace(BaseHref + "api/oauth.php/authorize");
 			return;
 		}
 
