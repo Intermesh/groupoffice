@@ -80,7 +80,9 @@
             var ret;
 
             parts.forEach(function(part) {
-                ret = obj = traverse(obj, part);
+	            if (!obj.hasOwnProperty(part)) return;
+
+							ret = obj = traverse(obj, part);
             });
 
 
