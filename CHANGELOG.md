@@ -1,3 +1,5 @@
+- Core: fix error when autosaving relation to new entity
+
 13-11-2023: 6.8.18
 - Core: Fixed Wrong dependency on php-xsl on Debian 12? #1064
 
