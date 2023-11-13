@@ -195,14 +195,16 @@ class Settings extends core\Settings {
 		}
 		
 		try {
-			exec('locale -a', $output);
+			if(function_exists("exec")) {
+				exec('locale -a', $output);
 
-			if(isset($output) && is_array($output)){
-				foreach($output as $locale){
-					if(stripos($locale,'utf')!==false){
-						$this->locale = $locale;						
-						$this->save();						
-						return $this->locale;
+				if (isset($output) && is_array($output)) {
+					foreach ($output as $locale) {
+						if (stripos($locale, 'utf') !== false) {
+							$this->locale = $locale;
+							$this->save();
+							return $this->locale;
+						}
 					}
 				}
 			}
