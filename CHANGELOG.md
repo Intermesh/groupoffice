@@ -1,3 +1,4 @@
+14-11-2023: 6.8.19
 - Core: fix error when autosaving relation to new entity
 - Contracts: customer and contact variables were missing in the template for contract e-mails
 - Core: Check if exec function is available and use default locale C.UTF8 it's not there.
