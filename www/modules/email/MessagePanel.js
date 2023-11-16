@@ -101,13 +101,13 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 //			'<tpl if="attachments.length&gt;1 && zip_of_attachments_url!=\'\'">'+
 //			'<a class="filetype-link filetype-zip" href="{zip_of_attachments_url}" target="_blank">'+GO.email.lang.downloadAllAsZip+'</a>'+
 //			'</tpl>'+
-			
+
 			'<tpl if="attachments.length&gt;1">'+
 //				'<a class="filetype-link btn-menu" id="downloadAllMenu" href="#"></a>'+
 				'<a class="filetype-link btn-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'" href="#"></a>'+
 //				'<a class="filetype-link btn-expand-more" id="downloadAllMenu" href="#"></a>'+
 			'</tpl>'+
-			
+
 			'</td></tr>'+
 			'</table>'+
 			'</tpl>'+
@@ -156,18 +156,22 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 					'<tpl if="iCalendar.invitation.is_cancellation">'+
 						'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
 						'{[values.iCalendar.feedback]}</div>'+
-						'<div class="message-icalendar-actions">'+
-							'<a class="normal-link" id="em-icalendar-delete-event-'+this.bodyId+'" href="#">'+GO.email.lang.icalendarDeleteEvent+'</a>'+
+						'<tpl if="iCalendar.invitation.event_id">'+
+							'<div class="message-icalendar-actions">'+
+								'<a class="normal-link" id="em-icalendar-delete-event-'+this.bodyId+'" >'+t("Delete Event", "email")+'</a>'+
 							'</div>'+
+						'</tpl>'+
 					'</tpl>'+
 
 					'<tpl if="iCalendar.invitation.is_update">'+
 						'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
 						'{[values.iCalendar.feedback]}</div>'+
-						'<div class="message-icalendar-actions">'+
-						'<a id="em-icalendar-open-'+this.bodyId+'" class="normal-link" style="padding-right:20px;" href="#">'+GO.email.lang.icalendarOpenEvent+'</a>'+
-							'<a class="normal-link" id="em-icalendar-update-event-'+this.bodyId+'" href="#">'+GO.email.lang.icalendarUpdateEvent+'</a>'+
-							'</div>'+
+						'<tpl if="iCalendar.invitation.event_id">'+
+							'<div class="message-icalendar-actions">'+
+							'<a id="em-icalendar-open-'+this.bodyId+'" class="normal-link" style="padding-right:20px;" >'+t("Open Event", "email")+'</a>'+
+								'<a class="normal-link" id="em-icalendar-update-event-'+this.bodyId+'" >'+t("Update Event", "email")+'</a>'+
+								'</div>'+
+							'</tpl>'+
 					'</tpl>'+
 
 				'</tpl>'+
@@ -497,10 +501,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				this.attachmentsEl.on('contextmenu', this.onAttachmentContextMenu, this);
 			}
 		}
-		
+
 		if(data.attachments.length > 1 && this.allAttachmentContextMenu)	{
 			this.allAttachmentsMenuEl = Ext.get('downloadAllMenu-'+this.downloadAllMenuId);
-			
+
 			this.allAttachmentsMenuEl.on('click', this.onAllAttachmentContextMenu, this);
 			this.allAttachmentContextMenu.messagePanel = this;
 			this.allAttachmentsMenuEl.on('contextmenu', this.onAllAttachmentContextMenu, this);
