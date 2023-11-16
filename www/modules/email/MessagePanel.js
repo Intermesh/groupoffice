@@ -158,7 +158,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 						'{[values.iCalendar.feedback]}</div>'+
 						'<tpl if="iCalendar.invitation.event_id">'+
 							'<div class="message-icalendar-actions">'+
-								'<a class="normal-link" id="em-icalendar-delete-event-'+this.bodyId+'" >'+t("Delete Event", "email")+'</a>'+
+								'<a class="normal-link" id="em-icalendar-delete-event-'+this.bodyId+'" >'+GO.email.lang.icalendarDeleteEvent+'</a>'+
 							'</div>'+
 						'</tpl>'+
 					'</tpl>'+
@@ -168,8 +168,8 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 						'{[values.iCalendar.feedback]}</div>'+
 						'<tpl if="iCalendar.invitation.event_id">'+
 							'<div class="message-icalendar-actions">'+
-							'<a id="em-icalendar-open-'+this.bodyId+'" class="normal-link" style="padding-right:20px;" >'+t("Open Event", "email")+'</a>'+
-								'<a class="normal-link" id="em-icalendar-update-event-'+this.bodyId+'" >'+t("Update Event", "email")+'</a>'+
+							'<a id="em-icalendar-open-'+this.bodyId+'" class="normal-link" style="padding-right:20px;" >'+GO.email.lang.icalendarOpenEvent+'</a>'+
+								'<a class="normal-link" id="em-icalendar-update-event-'+this.bodyId+'" >'+GO.email.lang.icalendarUpdateEvent+'</a>'+
 								'</div>'+
 							'</tpl>'+
 					'</tpl>'+
