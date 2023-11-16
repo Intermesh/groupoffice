@@ -95,8 +95,8 @@ border-collapse:collapse;
 
 .go-model-icon-GO_Calendar_Model_Event{
 	background-image: url('images/calendar.png') !important;
-	width:16px;
-	height:16px;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 /* sets the padding for panels with forms or text in it */
