@@ -1,3 +1,5 @@
+- Calendar: Don't try to match email if it's a reply
+
 13-11-2023: 6.6.178
 - Ticket crashes with ErrorException Trying to get property 'name' of non-object
 - Leavedays: make special leave budget optional for employee when requesting leave for special leave type
