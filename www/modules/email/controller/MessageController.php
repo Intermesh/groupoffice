@@ -1427,37 +1427,42 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if($vcalendar){
 			$vevent = $vcalendar->vevent[0];
 
-			$aliases = Alias::model()->find(
-				GO\Base\Db\FindParams::newInstance()
-					->select('email')
-					->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id' , $imapMessage->account->id))
-			)->fetchAll(\PDO::FETCH_COLUMN, 0);
 
-			// for case insensitive match
-			$aliases = array_map('strtolower', $aliases);
+			if($vcalendar->method == 'REQUEST') {
+				// If this is an invite request, we must be sure we know which of the participants is the current user.
+				// We do this by checking all mail aliases
+				$aliases = Alias::model()->find(
+					GO\Base\Db\FindParams::newInstance()
+						->select('email')
+						->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id', $imapMessage->account->id))
+				)->fetchAll(\PDO::FETCH_COLUMN, 0);
 
-			$emailFound = false;
-			if(isset($vevent->attendee)) {
-				foreach ($vevent->attendee as $vattendee) {
-					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
+				// for case insensitive match
+				$aliases = array_map('strtolower', $aliases);
+
+				$emailFound = false;
+				if (isset($vevent->attendee)) {
+					foreach ($vevent->attendee as $vattendee) {
+						$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
+						if (in_array($attendeeEmail, $aliases)) {
+							$emailFound = true;
+							$accountEmail = $attendeeEmail;
+						}
+					}
+				}
+
+				if (!$emailFound && isset($vevent->organizer)) {
+					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
 					if (in_array($attendeeEmail, $aliases)) {
 						$emailFound = true;
 						$accountEmail = $attendeeEmail;
 					}
 				}
-			}
 
-			if(!$emailFound && isset($vevent->organizer)) {
-				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
-				if (in_array($attendeeEmail, $aliases)) {
-					$emailFound = true;
-					$accountEmail = $attendeeEmail;
+				if (!$emailFound) {
+					$response['iCalendar']['feedback'] = GO::t("None of the participants match your e-mail aliases for this e-mail account.", "email");
+					return $response;
 				}
-			}
-
-			if(!$emailFound) {
-				$response['iCalendar']['feedback'] = GO::t("None of the participants match your e-mail aliases for this e-mail account.", "email");
-				return $response;
 			}
 
 			//is this an update for a specific recurrence?
@@ -1497,7 +1502,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['iCalendar']['invitation'] = array(
 					'uuid' => $uuid,
 					'email_sender' => $response['sender'],
-					'email' => $accountEmail,
+					'email' => $accountEmail ?? null,
 					//'event_declined' => $event && $event->status == 'DECLINED',
 					'event_id' => $event ? $event->id : 0,
 					'is_organizer'=>$event && $event->is_organizer,
