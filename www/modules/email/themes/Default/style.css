@@ -264,22 +264,23 @@ margin:5px 2px;
 .message-icalendar{
 	background-color:#EBF0F2;
 	border-bottom:1px solid #d0d0d0;
-	padding: 0 8px 0 8px;
+	padding: 8px 16px;
 	text-align:left;
 	line-height:20px;
 }
 
 .message-move {
 	color: gray;
-	padding: 0 8px 0 8px;
+	padding: 16px;
 	text-align: right !important;
 	line-height: 20px;
 }
 
 .message-icalendar-icon{
+    background-size: contain;
 	background-repeat:no-repeat;
-	background-position:0 2px;
-	padding:0px 0px 2px 20px;
+
+	padding:0px 0px 2px 32px;
 	white-space:nowrap;
 	float:left;
 	width:auto !important;
