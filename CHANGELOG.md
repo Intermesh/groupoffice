@@ -2,6 +2,7 @@
 - Finance: Sort customer and contact
 - Finance: Bug in selecting article on existing rows
 - Core: fixed login screen for mobiles
+- Calendar: Don't try to match email if it's a reply
 
 03-11-2023: 6.7.54
 - Core: Fixed security issue
