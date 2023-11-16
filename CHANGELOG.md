@@ -1,3 +1,4 @@
+- Calendar: Don't try to match email if it's a reply
 - Core: added openid service discovery alias. See https://github.com/Intermesh/groupoffice/discussions/1063#discussioncomment-7582806
 
 14-11-2023: 6.8.19
