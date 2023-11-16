@@ -1,3 +1,6 @@
+16-11-2023 6.2.135
+- Calendar: Fixed calendar invite problem
+
 09-12-2021 6.2.134
 - Core: Fixed upgrade error when upgrading from v3.7
 
