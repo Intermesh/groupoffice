@@ -2,8 +2,6 @@
     "name": "intermesh/group-office-6",
     "description": "Group-Office",
     "require": {
-        "fkooman/php-oauth-client": "0.5.2",
-        "fkooman/guzzle-bearer-auth-plugin": "0.2.2",
         "sabre/dav": "3.1.*",
         "swiftmailer/swiftmailer": "<6.0.0",
         "defuse/php-encryption": "^2.1"
