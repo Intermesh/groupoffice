@@ -136,6 +136,11 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<tpl if="iCalendar.feedback">'+
 				'<div class="message-icalendar">'+
 
+				'<tpl if="!iCalendar.invitation">' +
+				'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
+				'{[values.iCalendar.feedback]}</div>'+
+				'</tpl>'+
+
 
 
 				'<tpl if="iCalendar.invitation">'+
