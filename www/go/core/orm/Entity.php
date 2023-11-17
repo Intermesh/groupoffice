@@ -1113,7 +1113,7 @@ abstract class Entity extends Property {
    *  You can override this to implement custom logic.
    *
    * @param Query $query
-   * @param ArrayObject $sort eg. ['field' => 'ASC']
+   * @param ArrayObject $sort Key value where field name is the key and value is ASC or DESC. eg. ['field' => 'ASC']
    * @return Query
    * @throws Exception
    * @example
