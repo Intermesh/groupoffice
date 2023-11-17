@@ -3,6 +3,8 @@
 - Finance: Bug in selecting article on existing rows
 - Core: fixed login screen for mobiles
 - Calendar: Don't try to match email if it's a reply
+- Finance: Sort on number too when sorting on date
+- Finance: Show total and subtotal in debtor view
 
 03-11-2023: 6.7.54
 - Core: Fixed security issue
