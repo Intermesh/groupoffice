@@ -1,5 +1,7 @@
 - Calendar: Don't try to match email if it's a reply
 - Core: added openid service discovery alias. See https://github.com/Intermesh/groupoffice/discussions/1063#discussioncomment-7582806
+- Finance: Sort on number too when sorting on date
+- Finance: Show total and subtotal in debtor view
 
 14-11-2023: 6.8.19
 - Core: fix error when autosaving relation to new entity
