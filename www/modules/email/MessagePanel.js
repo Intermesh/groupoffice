@@ -189,12 +189,12 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		templateStr += '<tpl if="values.isInSpamFolder==\'1\';">'+
 				'<div class="message-move">'+
-					t("This message has been identified as spam. Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" onclick="GO.email.moveToInbox(\'{values.uid}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is NOT spam.", "email")+
+					t("This message has been identified as spam. Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" onclick="GO.email.moveToInbox(\'{values.uid}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is NOT JUNK/SPAM.", "email")+
 				'</div>'+
 			'</tpl>'+
 			'<tpl if="values.isInSpamFolder==\'0\';">'+
 				'<div class="message-move">'+
-					t("Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" onclick="GO.email.moveToSpam(\'{values.uid}\',\'{values.mailbox}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is spam.", "email")+
+					t("Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" onclick="GO.email.moveToSpam(\'{values.uid}\',\'{values.mailbox}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is JUNK/SPAM.", "email")+
 				'</div>'+
 			'</tpl>';
 

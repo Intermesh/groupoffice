@@ -1557,9 +1557,9 @@ GO.email.showAttendanceWindow=function(event_id){
 GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 	this.messagesGrid.getView().scrollToTopOnLoad=false;
 	Ext.Msg.show({
-		title: t("Move to Spam folder?", "email"),
+		title: t("Move to Junk/Spam folder?", "email"),
 		icon: Ext.MessageBox.QUESTION,
-		msg: t("Are you sure you want to classify this message as spam?", "email"),
+		msg: t("Are you sure you want to classify this message as JUNK/SPAM?", "email"),
 		buttons: Ext.Msg.YESNO,
 		fn: function(btn) {
 			if (btn=='yes') {
@@ -1592,9 +1592,9 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 
 GO.email.moveToInbox = function(mailUid,fromAccountId) {
 	Ext.Msg.show({
-		title: t("Move out of Spam folder?", "email"),
+		title: t("Move out of Junk/Spam folder?", "email"),
 		icon: Ext.MessageBox.QUESTION,
-		msg: t("Are you sure you want to remove the spam mark and move this message into your inbox?", "email"),
+		msg: t("Are you sure you want to remove the JUNK/SPAM mark and move this message into your inbox?", "email"),
 		buttons: Ext.Msg.YESNO,
 		fn: function(btn) {
 			if (btn=='yes') {

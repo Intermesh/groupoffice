@@ -429,6 +429,20 @@ GO.email.AccountDialog = function(config) {
 			selectOnFocus : true,
 			forceSelection : true,
 			emptyText : t("Disabled")
+		}), new GO.form.ComboBoxReset({
+			fieldLabel : t("Junk/Spam folder", "email"),
+			hiddenName : 'spam',
+			value:'Spam',
+			store : GO.email.subscribedFoldersStore,
+			valueField : 'name',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			editable : false,
+			selectOnFocus : true,
+			forceSelection : true,
+			emptyText : t("Disabled")
 		})]
 	});
 	

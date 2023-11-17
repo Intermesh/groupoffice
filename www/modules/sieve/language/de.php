@@ -59,7 +59,7 @@ return array (
   'Subject exists' => 'Betreff vorhanden',
   'Sender exists' => 'Absender vorhanden',
   'Recipient exists' => 'Empfänger vorhanden',
-  'Marked as spam' => 'Als Spam markiert',
+  'Marked as spam' => 'Als Junk/Spam markiert',
   'Size is smaller than' => 'Kleiner als',
   'Size is bigger than' => 'Größer als',
   'Error while displaying test line' => 'Fehler beim Anzeigen der Testzeile',

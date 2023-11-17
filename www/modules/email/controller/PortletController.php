@@ -267,7 +267,7 @@ protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel)
 					$node['iconCls'] = 'email-folder-drafts';
 					$sortIndex = 2;
 					break;
-				case 'Spam':
+				case $mailbox->getAccount()->spam:
 					$node['iconCls'] = 'email-folder-spam';
 					$sortIndex = 4;
 					break;
