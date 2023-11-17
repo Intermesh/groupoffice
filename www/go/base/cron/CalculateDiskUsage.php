@@ -62,7 +62,11 @@ class CalculateDiskUsage extends AbstractCron {
 		\GO::config()->save_setting('database_usage', $database_usage);
 		
 		$folder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path);
-		\GO::config()->save_setting('file_storage_usage', $folder->calculateSize());
+		//disconnect mysql as it can take a long time to calculate
+		go()->getDbConnection()->disconnect();
+
+		$size = $folder->calculateSize();
+		\GO::config()->save_setting('file_storage_usage', $size);
 
 		if(\GO::modules()->serverclient) {
 			$domains = Module::getDomains();
@@ -84,11 +88,11 @@ class CalculateDiskUsage extends AbstractCron {
 							->single();
 			
 			$result = \GO\Postfixadmin\Model\Mailbox::model()->find($findParams);
-	
+
 			\GO::config()->save_setting('mailbox_usage', $result->usage*1024);
 		} else {
-            \GO::config()->save_setting('mailbox_usage', 0);
-        }
+			\GO::config()->save_setting('mailbox_usage', 0);
+    }
 
 	}
 	
