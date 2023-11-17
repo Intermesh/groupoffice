@@ -5,6 +5,7 @@
 - Calendar: Don't try to match email if it's a reply
 - Finance: Sort on number too when sorting on date
 - Finance: Show total and subtotal in debtor view
+- Core: Disconnect mysql when calculating disk usage to avoid Mysql General error: 2006 MySQL server has gone away.
 
 03-11-2023: 6.7.54
 - Core: Fixed security issue
