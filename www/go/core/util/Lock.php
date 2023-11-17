@@ -112,6 +112,8 @@ class Lock {
 //				$info = $this->getLockFile()->getContents();
 //				throw new Exception("Waiting for lock (" . $this->getRequestInfo() .") for longer than " . $this->timeout."s. Lock is held by (" . $info . ")");
 			}
+
+			go()->debug("Locked");
 			//sleep for 100 milliseconds
 			usleep(100000);
 			return $this->lock();
@@ -135,11 +137,15 @@ class Lock {
 		// prepend db name for multi instance
 		try {
 			$this->sem = sem_get((int)hexdec(substr(md5(go()->getConfig()['db_name'] . $this->name), 24)));
-			$acquired = sem_acquire($this->sem, true);
+			$acquired = $this->sem && sem_acquire($this->sem, true);
 		} catch(Exception $e) {
 			ErrorHandler::logException($e, "Failed to acquire lock for " . $this->name);
 			//identifier might be removed by other process
 			$acquired = false;
+		}
+
+		if(!$acquired) {
+			$this->sem = null;
 		}
 		return $acquired;
 	}
