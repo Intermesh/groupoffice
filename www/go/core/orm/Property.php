@@ -1977,9 +1977,9 @@ abstract class Property extends Model {
 		if(!self::$lastDeleteStmt->execute()) {
 			return false;
 		}
-		if(go()->getDebugger()->enabled) {
-			go()->debug("Deleted " . self::$lastDeleteStmt->rowCount() . " models of type " . static::class);
-		}
+//		if(go()->getDebugger()->enabled) {
+//			go()->debug("Deleted " . self::$lastDeleteStmt->rowCount() . " models of type " . static::class);
+//		}
 		return true;
 	}
 
