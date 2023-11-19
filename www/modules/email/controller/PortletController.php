@@ -259,15 +259,15 @@ protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel)
 					$node['iconCls'] = 'email-folder-sent';
 					$sortIndex = 1;
 					break;
-				case $mailbox->getAccount()->trash:
-					$node['iconCls'] = 'email-folder-trash';
-					$sortIndex = 3;
-					break;
 				case $mailbox->getAccount()->drafts:
 					$node['iconCls'] = 'email-folder-drafts';
 					$sortIndex = 2;
 					break;
-				case 'Spam':
+				case $mailbox->getAccount()->trash:
+					$node['iconCls'] = 'email-folder-trash';
+					$sortIndex = 3;
+					break;
+				case $mailbox->getAccount()->spam:
 					$node['iconCls'] = 'email-folder-spam';
 					$sortIndex = 4;
 					break;
