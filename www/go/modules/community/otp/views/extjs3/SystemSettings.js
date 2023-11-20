@@ -29,7 +29,7 @@ go.modules.community.otp.AuthenticatorSystemSettingsFieldset = Ext.extend(Ext.fo
 			this.blockField = new Ext.form.Checkbox({
 				submit: false,
 				xtype: "checkbox",
-				boxLabel: t("Block Group-Office usage until setup is done"),
+				boxLabel: t("Block Group-Office usage until setup is done", "otp", "community"),
 				name: "block",
 				checked: go.Modules.get("community", "otp").settings.block,
 				listeners: {
