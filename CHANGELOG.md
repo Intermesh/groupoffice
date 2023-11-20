@@ -1,3 +1,4 @@
+20-11-2023: 6.6.179
 - Calendar: Don't try to match email if it's a reply
 - Core: Disconnect mysql when calculating disk usage to avoid Mysql General error: 2006 MySQL server has gone away.
 
