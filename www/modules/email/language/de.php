@@ -35,6 +35,7 @@ return array (
   'Sent items folder' => 'Gesendet',
   'Trash folder' => 'Papierkorb',
   'Drafts folder' => 'Entwürfe ',
+  'Spam folder' => 'Spam',
   'From field' => 'Von',
   'To field' => 'An',
   'CC field' => 'CC',

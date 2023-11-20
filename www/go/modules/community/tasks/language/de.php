@@ -81,4 +81,5 @@ return array (
   'You have not selected any tasklist. Select a tasklist before proceeding.' => 'Sie haben keine Aufgabenliste ausgewählt.',
   'Visible tasklists' => 'Sichtbare Aufgabenlisten',
   'Display options for tasklists' => 'Optionen für Aufgabenliste anzeigen',
+	'Show project tasks' => 'Zeige Projeckteaufgaben'
 );

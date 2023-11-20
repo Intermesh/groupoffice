@@ -1311,7 +1311,9 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Update filesearch index' => 'Zoekindex voor bestanden bijwerken',
   'You can\' t archive yourself' => 'U kunt uw eigen account niet archiveren',
   'Authorized clients' => 'Geauthoriseerde clients',
-  'Expires At' => 'Verloopt op',
+	'Logout users when inactive for more than this number of seconds. This will also disable the \'Remember my login\' checkbox in the login dialog. 0 disables this setting.' => 'Meld gebruikers af als ze langer inactief zijn dan het hier ingestelde aantal seconden. This zal tevens de instelling \'Onthoud mijn login\' uitzetten. Om deze instelling uit te zetten geeft u deze de waarde 0.',
+	'Platform' => 'Platform',
+	'Expires At' => 'Verloopt op',
   'Logout all' => 'Allen uitloggen',
   'Permission denied' => 'Geen toegang',
   'Warning: removing select options also removes the data from the records. You can disable select options by unchecking them.' => 'Let op: wanneer u opties verwijdert, worden deze gegevens ook uit de recrods verwijderd. U kunt opties ook uitzetten door ze uit te vinken.',
@@ -1351,5 +1353,9 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
 	'Expand panel by default' => 'Klap paneel standaard uit',
 	'Define which groups are allowed to login from which IP addresses. You can use \'*\' to match any characters and \'?\' to match any single character. eg. \'192.168.1?.*\'. Be careful, You can lock yourself out!' =>
 	'Geef aan welke groepen vanaf welk IP-adres mogen inloggen. Je kan \'*\' gebruiken om meerdere karakters te matchen of \'?\' voor een enkel karakter, bijvoorbeeld \'192.168.11?.*\'. Wees voorzichtig dat je jezelf niet buiten sluit.' ,
-	 "Wilt u demonstratie data genereren? Dit duurt ongeveer 1 a 2 minuten om te genereren."
+	 "Wilt u demonstratie data genereren? Dit duurt ongeveer 1 a 2 minuten om te genereren.",
+	"Enable 2-Factor authentication for ActiveSync devices" => "Zet tweefactorauthenticatie aan voor ActiveSync apparaten",
+	"ActiveSync devices can connect by default." => "ActiveSync apparaten kunnen standaard koppelen",
+	"When disabled the administrator has to allow each new device manually" => "Indien deze optie uit staat, moet de beheerder ieder niew apparaat handmatig toestaan om te koppelen",
+	"Allow user registration requests by everyone. Be careful!" => "Sta verzoeken voor aanmelden gebruikers door iedereen toe. Wees voorzichtig!"
 );
