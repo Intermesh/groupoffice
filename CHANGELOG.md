@@ -1,3 +1,4 @@
+20-11-2023: 6.7.55
 - Core: Updated PL translations. Thank you Piotr!
 - Finance: Sort customer and contact
 - Finance: Bug in selecting article on existing rows
