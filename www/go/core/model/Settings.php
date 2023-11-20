@@ -19,24 +19,24 @@ class Settings extends core\Settings {
 	 */
 	protected function __construct() {
 		parent::__construct();
-		
+
 		$save = false;
-		
+
 		if(!isset($this->URL)) {
-			$this->URL = $this->detectURL();	
+			$this->URL = $this->detectURL();
 			$save = true;
 		}
-		
+
 		if(!isset($this->language)) {
 			$this->language = $this->getDefaultLanguage();
 			$save = true;
 		}
-		
+
 		if($save) {
 			try {
 				$this->save();
 			}catch(Exception $e) {
-				
+
 				//ignore error on install because core module is not there yet
 				if(!core\Installer::isInProgress()) {
 					throw $e;
@@ -49,13 +49,13 @@ class Settings extends core\Settings {
 	{
 		return core\Environment::get()->getInstallFolder()->getFile('go/modules/core/language/'.$lang.'.php')->exists();
 	}
-	
-	private function getDefaultLanguage() {		
+
+	private function getDefaultLanguage() {
 		//can't use Language here because an infinite loop will occur as it depends on this model.
 		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
 			return $_GET['SET_LANGUAGE'];
 		}
-		
+
 		$browserLanguages= JmapRequest::get()->getAcceptLanguages();
 		foreach($browserLanguages as $lang){
 			$lang = str_replace('-','_',explode(';', $lang)[0]);
@@ -63,14 +63,14 @@ class Settings extends core\Settings {
 				return $lang;
 			}
 		}
-		
+
 		return "en";
 	}
-	
-	
+
+
 	/**
 	 * Auto detects URL to Group-Office if we're running in a webserver
-	 * 
+	 *
 	 * @return string
 	 */
 	private function detectURL(): ?string
@@ -89,7 +89,7 @@ class Settings extends core\Settings {
 
 		$url = JmapRequest::get()->isHttps() ? 'https://' : 'http://';
 		$url .= JmapRequest::get()->getHost(false) . $path;
-		
+
 		return $url;
 	}
 
@@ -352,17 +352,17 @@ class Settings extends core\Settings {
 
 	/**
 	 * Keep log in core_change for this number of days.
-	 * 
+	 *
 	 * When a client has not logged in for this period the sync data will be deleted and resynchronized.
-	 * 
+	 *
 	 * @var int
 	 */
 	public $syncChangesMaxAge = 30;
-	
+
 	/**
 	 * This variable is checked against the code version.
 	 * If it doesn't match /install/upgrade.php will be executed.
-	 * 
+	 *
 	 * @var string
 	 */
 	public $databaseVersion;
@@ -373,10 +373,10 @@ class Settings extends core\Settings {
 	 * @var int
 	 */
 	public $cacheClearedAt;
-	
+
 	/**
 	 * Primary color in html notation 000000;
-	 * 
+	 *
 	 * @var string
 	 */
 	public $primaryColor;
@@ -401,10 +401,10 @@ class Settings extends core\Settings {
 	 * @var string
 	 */
 	public $accentColor;
-	
+
 	/**
 	 * Blob ID for the logo
-	 * 
+	 *
 	 * @var string
 	 */
 	public $logoId;
@@ -515,6 +515,10 @@ class Settings extends core\Settings {
 		return $this->userAddressBook;
 	}
 
+	/**
+	 * @var int
+	 */
+	public $archivedUsersAddressBook;
 	/**
 	 * When archiving a user, move profile user
 	 *
