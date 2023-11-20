@@ -7,6 +7,7 @@
 - Tasks: Set progress to needs action when changing assigned to
 - Finance: Add description from catalog too
 - Files: fix searching in shared folders
+- Email: Spam / Junk folder is now configurable.
 
 14-11-2023: 6.8.19
 - Core: fix error when autosaving relation to new entity
