@@ -37,9 +37,6 @@
             }
             obj = obj[part][arrayIndex];
         } else {
-	        //protect against prototype pollution
-	        if (!obj.hasOwnProperty(part)) return null;
-
             if (!obj[part]) {
                 if(!Ext.isDefined(value)) {
                     return null;

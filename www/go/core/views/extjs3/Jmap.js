@@ -261,7 +261,7 @@ go.Jmap = {
 			
 			//filter out legacy modules
 			var entities = go.Entities.getAll().filter(function(e) {
-				return e.package != "legacy" && e.name != "Search";
+				return e.package != "legacy";
 			});
 			
 			var url = go.User.eventSourceUrl + '?types=' + 

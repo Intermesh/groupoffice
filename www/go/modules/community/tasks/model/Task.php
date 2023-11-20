@@ -450,6 +450,10 @@ class Task extends AclItemEntity {
 			}
 		}
 
+		if($this->isModified('assignedTo') && !$this->isModified('progress')) {
+			$this->progress = Progress::NeedsAction;
+		}
+
 		if(!parent::internalSave()) {
 			return false;
 		}
