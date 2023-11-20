@@ -14,11 +14,11 @@ Ext.onReady(function () {
 		entityStore:"User",
 		currentUser: null,
 		labelWidth: dp(152),
-		title: t('Two Factor Authentication'),
+		title: t('Two Factor Authentication', "otp", "community"),
 
 		initComponent: function() {
 			this.enableAuthenticatorBtn = new Ext.Button({
-				text:t('Enable OTP Authenticator'),
+				text:t('Enable OTP Authenticator', "otp", "community"),
 				hidden:false,
 				handler:function(){
 
@@ -44,7 +44,7 @@ Ext.onReady(function () {
 				{
 					xtype: "box",
 					autoEl: "p",
-					html: t("Setup one-time password authentication using an OTP application which generates a unique PIN for each login.")
+					html: t("Setup one-time password authentication using an OTP application which generates a unique PIN for each login.", "otp", "community")
 				},
 				this.enableAuthenticatorBtn,
 				this.disableAuthenticatorBtn
@@ -91,8 +91,9 @@ Ext.onReady(function () {
 			} else {
 
 				go.AuthenticationManager.passwordPrompt(
-					t('Disable OTP Authenticator'),
-					t("When disabling OTP Authenticator this step will be removed from the login process.") + "<br><br>" + t("Provide your current password to disable OTP Authenticator.")
+					t('Disable OTP Authenticator', "otp", "community"),
+					t("When disabling OTP Authenticator this step will be removed from the login process.", "otp", "community") +
+					"<br><br>" + t("Provide your current password to disable OTP Authenticator.", "otp", "community")
 				). then((password) => {
 					execute.call(this,password);
 				});
