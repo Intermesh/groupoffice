@@ -1320,7 +1320,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	
 	protected function _getSpamMoveMailboxName($mailUid,$mailboxName,$accountId)
 	{
-		if (strtolower($mailboxName)=='spam') {
+		$pattern = "/^(junk|spam)$/";
+		if (preg_match($pattern, strtolower($mailboxName))) {
 			return 1;
 		} else {
 			return 0;
