@@ -284,6 +284,14 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+
+- Calendar: Don't try to match email if it's a reply
+- Core: Disconnect mysql when calculating disk usage to avoid Mysql General error: 2006 MySQL server has gone away.
+
+13-11-2023: 6.6.178
+- Ticket crashes with ErrorException Trying to get property 'name' of non-object
+- Leavedays: make special leave budget optional for employee when requesting leave for special leave type
+
 03-11-2023: 6.6.177
 - Core: Fixed security issue
 
