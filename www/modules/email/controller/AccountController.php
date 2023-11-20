@@ -441,9 +441,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 					$node['iconCls'] .= 'ic-drafts';
 					$sortIndex = 2;
 					break;
-				case 'INBOX/Spam':
-				case 'INBOX.Spam':
-				case 'Spam':
+				case $mailbox->getAccount()->spam:
 					$node['iconCls'] .= 'ic-new-releases';
 					$sortIndex = 4;
 					break;

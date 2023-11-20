@@ -142,7 +142,7 @@ class ImapMailbox extends \GO\Base\Model {
 			case $this->getAccount()->drafts:
 				return \GO::t("Drafts", "email");
 				break;
-			case 'Spam':
+			case $this->getAccount()->spam:
 				return \GO::t("Spam", "email");
 			default:
 				return $this->getBaseName(true);

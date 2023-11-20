@@ -17,7 +17,7 @@ go.modules.community.otp.AuthenticatorSystemSettingsFieldset = Ext.extend(Ext.fo
 			{
 				xtype:"box",
 				autoEl: "p",
-				html: t("Enforce two factor authentication for users in a specific group")
+				html: t("Enforce two factor authentication for users in a specific group", "otp", "community")
 			},
 			this.enforceForGroup = new go.groups.GroupComboReset({
 				submit: false,
