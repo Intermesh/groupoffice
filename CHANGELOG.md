@@ -5,6 +5,7 @@
 - Core: Disconnect mysql when calculating disk usage to avoid Mysql General error: 2006 MySQL server has gone away.
 - Calendar: System email account was used on calendar invites even when user had an email account configured
 - Tasks: Set progress to needs action when changing assigned to
+- Finance: Add description from catalog too
 
 14-11-2023: 6.8.19
 - Core: fix error when autosaving relation to new entity
