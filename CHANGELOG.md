@@ -6,6 +6,7 @@
 - Calendar: System email account was used on calendar invites even when user had an email account configured
 - Tasks: Set progress to needs action when changing assigned to
 - Finance: Add description from catalog too
+- Files: fix searching in shared folders
 
 14-11-2023: 6.8.19
 - Core: fix error when autosaving relation to new entity
