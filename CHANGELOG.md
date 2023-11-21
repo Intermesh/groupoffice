@@ -1,3 +1,5 @@
+- Core/Email: Sent items didn't have BCC address header since v6.8
+
 20-11-2023: 6.8.20
 - Calendar: Don't try to match email if it's a reply
 - Core: added openid service discovery alias. See https://github.com/Intermesh/groupoffice/discussions/1063#discussioncomment-7582806
@@ -17,7 +19,6 @@
 - Contracts: Use business model of target finance book
 - Core: better styling of invalid checkboxes
 - Core: Fixed some minor security advisories from GitHub's CodeQL scanner
-- Core/Email: Sent items didn't have BCC address header since v6.8
 
 13-11-2023: 6.8.18
 - Core: Fixed Wrong dependency on php-xsl on Debian 12? #1064
