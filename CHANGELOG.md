@@ -1,4 +1,7 @@
 - Core/Email: Sent items didn't have BCC address header since v6.8
+- Email: Fix for 'actionMoveToSpam' because of hardcoded 'Spam' folder
+  Now you can define a global value: 'spam_folder' => 'INBOX.Junk' or
+   use its defined value in account settings (account->spam)
 
 20-11-2023: 6.8.20
 - Calendar: Don't try to match email if it's a reply

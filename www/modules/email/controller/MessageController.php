@@ -2007,13 +2007,15 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 	protected function actionMoveToSpam(array $params)
 	{
-		
-		$accountModel = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
-				
-		$imap = $accountModel->openImapConnection($params['from_mailbox_name']);
-		
-		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : 'Spam';
-		
+
+		$account = Account::model()->findByPk($params['account_id']);
+		$imap = $account->openImapConnection($params['from_mailbox_name']);
+		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : $account->spam;
+
+		if (empty($spamFolder)) {
+			throw new \Exception(GO::t("Could not get 'Spam' folder. Maybe it is disabled.\n\nGo to E-mail -> Administration -> Accounts -> Double click account -> Folders to configure it.", "email"));
+		}
+
 		if(!$imap->get_status($spamFolder)){
 			$imap->create_folder($spamFolder);
 		}
