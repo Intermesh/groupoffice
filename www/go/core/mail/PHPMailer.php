@@ -353,4 +353,32 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 		return false;
 	}
 
+	/**
+	 * Returns the whole MIME message.
+	 * Includes complete headers and body.
+	 * Only valid post preSend().
+	 *
+	 * @see PHPMailer::preSend()
+	 *
+	 * @return string
+	 */
+	public function getSentMIMEMessage()
+	{
+		$header = $this->MIMEHeader;
+
+		// PHPMailer leaves BCC out of headers when using SMTP. We want this header for our sent items
+		// source. So we append it here.
+		if (
+			(
+				'sendmail' !== $this->Mailer && 'qmail' !== $this->Mailer && 'mail' !== $this->Mailer
+			)
+			&& count($this->bcc) > 0
+		) {
+			$header .= $this->addrAppend('Bcc', $this->bcc);
+		}
+
+		return static::stripTrailingWSP($header . $this->mailHeader) .
+			static::$LE . static::$LE . $this->MIMEBody;
+	}
+
 }
