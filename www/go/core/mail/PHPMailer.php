@@ -13,6 +13,9 @@ use PHPMailer\PHPMailer\Exception;
  * @copyright Intermesh BV
  */
 class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
+	// The php validator method will not validate icloud rsvp addresses
+	// e.g. "2_haytgnjxge3dsnjuhaytgnjxgh3b6mqy3inkhor6edr7cmefu6w7s2fptx4azi7iyoxpyp7lrquoi@imip.me.com"
+	public static $validator = 'html5';
 	/**
 	 * @var string
 	 */
