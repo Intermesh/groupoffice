@@ -153,8 +153,8 @@ class TemplateParser
 			//echo $tag .' -> '.$value."\n\n";
 			
 			if(!is_array($value) && !is_object($value)){		
-				$content = str_ireplace('{'.$tag.'}', $value, $content);
-				$content = str_ireplace('%'.$tag.'%', $value, $content);
+				$content = str_ireplace('{'.$tag.'}', $value ?? "", $content);
+				$content = str_ireplace('%'.$tag.'%', $value ?? "", $content);
 			}
 		}
 	
