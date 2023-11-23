@@ -36,7 +36,7 @@ class Disk implements CacheInterface {
 	 * @throws Exception
 	 */
 	public function __construct() {
-		$this->folder = go()->getTmpFolder()->getFolder('cache/disk');
+		$this->folder = go()->getDataFolder()->getFolder('cache/disk');
 		$this->folder->create();
 	}
 
@@ -184,7 +184,7 @@ class Disk implements CacheInterface {
 	 */
 	public static function isSupported(): bool
 	{
-		$folder = App::get()->getSettings()->getDataFolder();
+		$folder = go()->getDataFolder();
 		
 		if(!$folder->isWritable()) {
 			throw new Exception("diskcache folder is not writable!");
