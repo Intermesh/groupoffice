@@ -184,7 +184,7 @@ class Disk implements CacheInterface {
 	 */
 	public static function isSupported(): bool
 	{
-		$folder = go()->getDataFolder();
+		$folder = go()->getDataFolder()->getFolder('cache/disktrash');
 		
 		if(!$folder->isWritable()) {
 			throw new Exception("diskcache folder is not writable!");
