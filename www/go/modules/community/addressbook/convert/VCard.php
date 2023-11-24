@@ -33,6 +33,14 @@ use Sabre\VObject\Splitter\VCard as VCardSplitter;
  * When importing it also keeps the original vCard data.
  */
 class VCard extends AbstractConverter {
+	/**
+	 * @var File
+	 */
+	private $tempFile;
+	/**
+	 * @var resource
+	 */
+	private $fp;
 
 	public function __construct()
 	{
