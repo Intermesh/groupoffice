@@ -1,5 +1,3 @@
-
-
 - Core/Email: Fixed big fonts on some receiving e-mail clients (webclients for sure).
 - Core/Email: Sent items didn't have BCC address header since v6.8
 - Email: Fix for 'actionMoveToSpam' because of hardcoded 'Spam' folder
@@ -11,6 +9,8 @@
 - Finance: Fixed migration problem: Cannot set non-existing property 'showTotals' in 'go\modules\business\finance\model\FinanceDocumentItemGroup'
 - Email: Abort send if one of the recipients fails. Before it would send to all of the others.
 - Core: ID column in system settings > groups
+- Newsletters: Accounts from the e-mail module can be selected too.
+- ZpushAdmin: Make sure table zpa_devices exists
 
 20-11-2023: 6.8.20
 - Calendar: Don't try to match email if it's a reply
