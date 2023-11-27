@@ -1,3 +1,4 @@
+- Core/Email: Fixed big fonts on receiving end
 - Core/Email: Sent items didn't have BCC address header since v6.8
 - Email: Fix for 'actionMoveToSpam' because of hardcoded 'Spam' folder
   Now you can define a global value: 'spam_folder' => 'INBOX.Junk' or
