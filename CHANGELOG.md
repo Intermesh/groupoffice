@@ -1,3 +1,6 @@
+- Newsletters: fix missing dependency in install script
+- Addressbook: remove obsolete CLI script
+
 20-11-2023: 6.7.55
 - Core: Updated PL translations. Thank you Piotr!
 - Finance: Sort customer and contact
