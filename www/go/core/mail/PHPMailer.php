@@ -384,4 +384,106 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 			static::$LE . static::$LE . $this->MIMEBody;
 	}
 
+
+	/**
+	 * Abort sending of the message if one recipient fails.
+	 *
+	 * @var bool
+	 */
+	public $abortOnRecipientError = true;
+
+
+	/**
+	 * Send mail via SMTP.
+	 * Returns false if there is a bad MAIL FROM, RCPT, or DATA input.
+	 *
+	 * @see PHPMailer::setSMTPInstance() to use a different class.
+	 *
+	 * @uses \PHPMailer\PHPMailer\SMTP
+	 *
+	 * @param string $header The message headers
+	 * @param string $body   The message body
+	 *
+	 * @throws Exception
+	 *
+	 * @return bool
+	 */
+	protected function smtpSend($header, $body)
+	{
+		$header = static::stripTrailingWSP($header) . static::$LE . static::$LE;
+		$bad_rcpt = [];
+		if (!$this->smtpConnect($this->SMTPOptions)) {
+			throw new Exception($this->lang('smtp_connect_failed'), self::STOP_CRITICAL);
+		}
+		//Sender already validated in preSend()
+		if ('' === $this->Sender) {
+			$smtp_from = $this->From;
+		} else {
+			$smtp_from = $this->Sender;
+		}
+		if (!$this->smtp->mail($smtp_from)) {
+			$this->setError($this->lang('from_failed') . $smtp_from . ' : ' . implode(',', $this->smtp->getError()));
+			throw new Exception($this->ErrorInfo, self::STOP_CRITICAL);
+		}
+
+		$callbacks = [];
+		//Attempt to send to all recipients
+		foreach ([$this->to, $this->cc, $this->bcc] as $togroup) {
+			foreach ($togroup as $to) {
+				if (!$this->smtp->recipient($to[0], $this->dsn)) {
+					$error = $this->smtp->getError();
+					$bad_rcpt[] = ['to' => $to[0], 'error' => $error['detail']];
+					$isSent = false;
+				} else {
+					$isSent = true;
+				}
+
+				$callbacks[] = ['issent' => $isSent, 'to' => $to[0], 'name' => $to[1]];
+			}
+		}
+
+		if($this->abortOnRecipientError) {
+			$shouldSendData = count($bad_rcpt) === 0;
+		} else {
+			$shouldSendData = count($this->all_recipients) > count($bad_rcpt);
+		}
+			//Only send the DATA command if we have viable recipients
+		if ($shouldSendData && !$this->smtp->data($header . $body)) {
+			throw new Exception($this->lang('data_not_accepted'), self::STOP_CRITICAL);
+		}
+
+		$smtp_transaction_id = $this->smtp->getLastTransactionID();
+
+		if ($this->SMTPKeepAlive) {
+			$this->smtp->reset();
+		} else {
+			$this->smtp->quit();
+			$this->smtp->close();
+		}
+
+		foreach ($callbacks as $cb) {
+			$this->doCallback(
+				$cb['issent'],
+				[[$cb['to'], $cb['name']]],
+				[],
+				[],
+				$this->Subject,
+				$body,
+				$this->From,
+				['smtp_transaction_id' => $smtp_transaction_id]
+			);
+		}
+
+		//Create error message for any bad addresses
+		if (count($bad_rcpt) > 0) {
+			$errstr = '';
+			foreach ($bad_rcpt as $bad) {
+				$errstr .= $bad['to'] . ': ' . $bad['error'];
+			}
+			throw new Exception($this->lang('recipients_failed') . $errstr, self::STOP_CONTINUE);
+		}
+
+		return true;
+	}
+
 }
