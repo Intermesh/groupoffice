@@ -118,7 +118,8 @@ class Task extends EntityController {
 				->selectSingleValue("count(*)")
 				->filter([
 					"tasklistId" => $defaultListId,
-					"complete" => false
+					"complete" => false,
+					'due' => '< tomorrow'
 				]);
 
 		}
