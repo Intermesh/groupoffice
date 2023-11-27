@@ -31,4 +31,4 @@ $updates['202304241649'][] = function() {
 
 	go()->getDbConnection()->exec('alter table zpa_devices
     modify remote_addr varchar(45) not null;');
-}
+};
