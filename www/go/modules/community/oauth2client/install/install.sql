@@ -51,3 +51,17 @@ ALTER TABLE `oauth2client_account`
 
 ALTER TABLE `oauth2client_account`
     ADD CONSTRAINT `oauth2client_account_ibfk_2` FOREIGN KEY (`accountId`) REFERENCES `em_accounts` (`id`) ON DELETE CASCADE;
+
+create table oauth2client_openid_user
+(
+    userId   int          not null
+        primary key,
+    clientId int unsigned not null,
+    constraint oauth2client_openid_user_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade,
+    constraint oauth2client_openid_user_oauth2client_oauth2client_id_fk
+        foreign key (clientId) references oauth2client_oauth2client (id)
+            on delete cascade
+);
+

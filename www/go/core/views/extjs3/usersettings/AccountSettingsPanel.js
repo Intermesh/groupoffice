@@ -264,8 +264,10 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 	},
 	
 	checkPasswordAvailable : function(data) {
-		//disable password fieldset if there's no password authentication method. User logged in via imap or ldap autheticator for example.
-		var visible = data.authenticators.indexOf("password") > -1
+		//disable password fieldset if there's no password authentication method.
+		// User logged in via imap or ldap autheticator for example.
+		// If there are 0 authenticators we enable it too, so it's possible to set a password.
+		var visible = data.authenticators.length == 0 || data.authenticators.indexOf("password") > -1
 
 		this.usernameField.setDisabled(!visible);
 		this.passwordField1.setDisabled(!visible);

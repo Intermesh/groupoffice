@@ -719,7 +719,9 @@ class User extends AclItemEntity {
 		$auth = new Authenticate();
 		$primary = $auth->getPrimaryAuthenticatorForUser($this->username);
 
-		$authenticators[] = $primary;
+		if($primary) {
+			$authenticators[] = $primary;
+		}
 
 		foreach ($auth->getSecondaryAuthenticatorsForUser($this->username) as $authenticator) {
 			if ($authenticator::isAvailableFor($this->username)) {

@@ -6,6 +6,7 @@ use go\core;
 use GO\Core\Controller\CoreController;
 use go\core\exception\NotFound;
 use go\core\http\Exception;
+use go\core\model;
 use go\core\orm\Property;
 use go\core\webclient\CSP;
 use GO\Email\Controller\AccountController;
@@ -14,6 +15,7 @@ use GO\Email\Model\Account as ActiveRecordAccount;
 use GO\Email\Model\Alias;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\controller\Oauth2Client;
+use go\modules\community\oauth2client\model\Authenticator;
 use go\modules\community\oauth2client\model\DefaultClient;
 use go\modules\community\oauth2client\model\Oauth2Account;
 
@@ -37,6 +39,13 @@ class Module extends core\Module
 	public function getDependencies(): array
 	{
 		return ["legacy/email"];
+	}
+
+	protected function afterInstall(model\Module $model): bool
+	{
+		Authenticator::register();
+
+		return parent::afterInstall($model);
 	}
 
 	public static function initListeners()

@@ -114,16 +114,17 @@ final class Oauth2Client extends EntityController
 	private function createUser(array $response, AccessTokenInterface $token, model\Oauth2Client $client) {
 		$user = User::findOrCreateByUsername($response['email'], $response['email'], $response['name']);
 
+		//register as oauth user
+		go()->getDbConnection()->insertIgnore("oauth2client_openid_user", ['userId' => $user->id, 'clientId' => $client->id])->execute();
 
 		$auth = new Authenticate();
 		$auth->setAuthenticated($user);
-
 
 		$default = model\DefaultClient::findById($client->defaultClientId);
 
 		//old framework code here
 		$account = \GO\Email\Model\Account::model()->findSingleByAttributes(array(
-			'host' => 'outlook.office365.com',
+			'host' => $default->imapHost,
 			'username' => $response['email'],
 			'user_id' => $user->id
 		));
