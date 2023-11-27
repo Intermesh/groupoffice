@@ -1,3 +1,4 @@
+27-11-2023: 6.8.21
 - Core/Email: Fixed big fonts on some receiving e-mail clients (webclients for sure).
 - Core/Email: Sent items didn't have BCC address header since v6.8
 - Email: Fix for 'actionMoveToSpam' because of hardcoded 'Spam' folder
