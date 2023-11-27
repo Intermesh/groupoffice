@@ -1,3 +1,6 @@
+- openid: register users and show authenticator icon in system settings
+- core: Ability to set password for users that have no authentication option
+
 27-11-2023: 6.8.21
 - Core/Email: Fixed big fonts on some receiving e-mail clients (webclients for sure).
 - Core/Email: Sent items didn't have BCC address header since v6.8
