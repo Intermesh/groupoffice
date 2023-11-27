@@ -6,6 +6,7 @@
 - Core: moved cache back to data folder. Otherwise apache can't clear the cache that CLI uses.
 - Address book: Fixed rotated thumbnail in address book
 - Address book: fix deprecation error with VCards
+- Finance: Fixed migration problem: Cannot set non-existing property 'showTotals' in 'go\modules\business\finance\model\FinanceDocumentItemGroup'
 
 20-11-2023: 6.8.20
 - Calendar: Don't try to match email if it's a reply
