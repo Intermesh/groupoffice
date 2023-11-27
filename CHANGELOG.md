@@ -1,3 +1,5 @@
+
+
 - Core/Email: Fixed big fonts on some receiving e-mail clients (webclients for sure).
 - Core/Email: Sent items didn't have BCC address header since v6.8
 - Email: Fix for 'actionMoveToSpam' because of hardcoded 'Spam' folder
@@ -120,7 +122,15 @@
 
 
 -- 6.8 --
-=======
+
+
+- Newsletters: fix missing dependency in install script
+- Addressbook: remove obsolete CLI script
+- Addresbook: increase maximum size of name / lastName fields of Contact
+- Tasks: only show counter for tasks that are due
+- Newsletters: Accounts from the e-mail module can be selected too.
+- ZpushAdmin: Make sure table zpa_devices exists
+
 20-11-2023: 6.7.55
 - Core: Updated PL translations. Thank you Piotr!
 - Finance: Sort customer and contact
