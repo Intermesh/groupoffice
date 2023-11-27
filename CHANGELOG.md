@@ -1,5 +1,6 @@
 - Newsletters: fix missing dependency in install script
 - Addressbook: remove obsolete CLI script
+- Addresbook: increase maximum size of name / lastName fields of Contact
 
 20-11-2023: 6.7.55
 - Core: Updated PL translations. Thank you Piotr!
