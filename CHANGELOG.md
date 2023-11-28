@@ -1,3 +1,6 @@
+28-11-2023 6.5.113
+- Core: check and install license function added
+
 03-11-2023 6.5.112
 - Core: refactor generatePassword method to use random_int instead of mt_rand()
 - Core: Fixed security issue
