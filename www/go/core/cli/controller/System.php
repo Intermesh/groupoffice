@@ -15,6 +15,7 @@ use go\core\model\CronJobSchedule;
 use go\core\event\Listeners;
 use go\core\model\Module;
 
+use go\modules\business\license\model\License;
 use function GO;
 
 class System extends Controller {
@@ -180,6 +181,30 @@ class System extends Controller {
 		}
 
 		return $unknown;
+	}
+
+	public function checkLicense() {
+		$key = go()->getSettings()->license;
+
+		if(empty($key)) {
+			echo "No license key installed\n";
+		}
+
+		echo "Key: " . $key ."\n\n";
+
+		$data = License::getLicenseData();
+
+		print_r($data);
+
+		echo "----\n";
+	}
+
+
+	public function setLicense($key) {
+		go()->getSettings()->license = $key;
+		go()->getSettings()->save();
+
+		$this->checkLicense();
 	}
 
 

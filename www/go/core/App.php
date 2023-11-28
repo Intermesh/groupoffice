@@ -534,6 +534,8 @@ use const GO_CONFIG_FILE;
 			Table::destroyInstances();
 			Property::clearCache();
 
+			Settings::flushCache();
+
 			$webclient = Extjs3::get();
 			$webclient->flushCache();
 
