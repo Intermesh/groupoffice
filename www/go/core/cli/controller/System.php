@@ -30,6 +30,7 @@ use go\core\util\JSON;
 use go\modules\business\license\model\License;
 use go\modules\community\history\Module as HistoryModule;
 use JsonException;
+use go\modules\business\license\model\License;
 use function GO;
 
 class System extends Controller {
@@ -287,6 +288,30 @@ JSON;
 		}
 
 		return $unknown;
+	}
+
+	public function checkLicense() {
+		$key = go()->getSettings()->license;
+
+		if(empty($key)) {
+			echo "No license key installed\n";
+		}
+
+		echo "Key: " . $key ."\n\n";
+
+		$data = License::getLicenseData();
+
+		print_r($data);
+
+		echo "----\n";
+	}
+
+
+	public function setLicense($key) {
+		go()->getSettings()->license = $key;
+		go()->getSettings()->save();
+
+		$this->checkLicense();
 	}
 
 
