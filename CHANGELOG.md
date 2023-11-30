@@ -1,4 +1,5 @@
 - Core: Combo box could send typed search text instead of empty id.
+- Core: Added skip_license=1 parameter to upgrade.php so license check is skipped.
 
 27-11-2023: 6.7.56
 - Newsletters: fix missing dependency in install script
