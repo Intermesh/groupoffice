@@ -1,3 +1,4 @@
+- Core: Combo box could send typed search text instead of empty id.
 - openid: register users and show authenticator icon in system settings
 - core: Ability to set password for users that have no authentication option
 - debian package: Added example to disable /install from the web
