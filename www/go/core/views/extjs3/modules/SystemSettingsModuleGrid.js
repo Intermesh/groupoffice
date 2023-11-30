@@ -391,24 +391,24 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 				enabled: record.data.enabled,
 				sort_order: record.data.sort_order ? record.data.sort_order : 0
 			};
-			go.Db.store("Module").set(params, function(options, success, response) {
 
-				if(success){
-					if(record.data.enabled && record.isModified("enabled")) {
+			go.Db.store("Module").save({
+				enabled: record.data.enabled,
+				sort_order: record.data.sort_order ? record.data.sort_order : 0
+			}, record.data.id).then(() => {
+				if(record.data.enabled && record.isModified("enabled")) {
 
-						this.showRights(record.data.id, record.data.rights);
+					this.showRights(record.data.id, record.data.rights);
 
-					}
-					record.commit();
-				} else
-				{
-					Ext.MessageBox.alert(t("Error"), response.message);
-					this.store.load();
 				}
-
+				record.commit();
+			}).catch((err) =>{
+				Ext.MessageBox.alert(t("Error"), err.message);
+				this.store.load();
+			}).finally(() => {
 				this.getEl().unmask();
+			})
 
-			}, this);
 		} else
 		{
 
