@@ -1,3 +1,5 @@
+- Core: Combo box could send typed search text instead of empty id.
+
 27-11-2023: 6.7.56
 - Newsletters: fix missing dependency in install script
 - Addressbook: remove obsolete CLI script
