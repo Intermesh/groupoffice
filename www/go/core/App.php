@@ -471,6 +471,7 @@ namespace go\core {
 				'quota' => 0,
 				"allowed_modules" => "",
 				"product_name" => "Group-Office",
+				"lockWithFlock" => false,
 
 				"db_host" => "localhost",
 				"db_port" => 3306,
@@ -717,6 +718,7 @@ namespace go\core {
 		public function clearCache() {
 			App::get()->getCache()->flush( false);
 			go()->getDatabase()->clearCache();
+			Settings::flushCache();
 			Property::clearCache();
 			Property::clearCachedRelationStmts();
 			GO::clearCache();
