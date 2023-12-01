@@ -432,6 +432,7 @@ namespace go\core {
 				'quota' => 0,
 				"allowed_modules" => "",
 				"product_name" => "Group-Office",
+				"lockWithFlock" => false,
 
 				"db_host" => "localhost",
 				"db_port" => 3306,
