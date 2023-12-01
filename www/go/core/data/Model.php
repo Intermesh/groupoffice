@@ -368,7 +368,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 
 	public function jsonSerialize(): mixed
 	{
-		return $this->toArray();
+		return (object) $this->toArray();
 	}
 	
 	/**
