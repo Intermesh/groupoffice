@@ -1,5 +1,4 @@
-- Core: Combo box could send typed search text instead of empty id.
-- Core: Added skip_license=1 parameter to upgrade.php so license check is skipped.
+- Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 
 27-11-2023: 6.7.56
 - Newsletters: fix missing dependency in install script
@@ -298,7 +297,11 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+- Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 
+20-11-2023: 6.6.179
+- Core: Combo box could send typed search text instead of empty id.
+- Core: Added skip_license=1 parameter to upgrade.php so license check is skipped.
 - Calendar: Don't try to match email if it's a reply
 - Core: Disconnect mysql when calculating disk usage to avoid Mysql General error: 2006 MySQL server has gone away.
 

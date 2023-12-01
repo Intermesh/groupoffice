@@ -83,7 +83,7 @@ class Lock {
 			$this->startTime = microtime(true);
 		}
 
-		if(function_exists('sem_get')) {
+		if(function_exists('sem_get') && empty(go()->getConfig()['lockWithFlock'])) {
 			//performs better but is not always available
 			$locked = $this->lockWithSem();
 		} else
