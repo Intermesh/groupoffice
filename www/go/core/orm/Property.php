@@ -637,19 +637,19 @@ abstract class Property extends Model {
 	/**
 	 * Get ID which is are the primary keys combined with a "-".
 	 *
-	 * @return string eg. "1" or with multiple keys: "1-2"
+	 * @return string|null eg. "1" or with multiple keys: "1-2"
 	 */
-	public function id() {
+	public function id() : ?string {
 		if(property_exists($this, 'id')) {
-			return $this->id ?? null;
+			return (string) $this->id ?? null;
 		}
 		$keys = $this->primaryKeyValues();
 		if(empty($keys)) {
-			return false;
+			// can we ever get here?
+			return "";
 		}
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
-
 
   /**
    * @inheritDoc
