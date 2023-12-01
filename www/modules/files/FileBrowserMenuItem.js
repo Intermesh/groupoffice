@@ -2,9 +2,14 @@
 
 GO.files.openDetailViewFileBrowser = function () {
 
-	var dv = this.findParentByType("detailview"), entityId, entity;
-	if(!dv) {
-		dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
+	var dv;
+	if(this.detailView){
+		dv = this.detailView;
+	} else {
+		dv = this.findParentByType("detailview"), entityId, entity;
+		if (!dv) {
+			dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
+		}
 	}
 	var folder_id;
 
