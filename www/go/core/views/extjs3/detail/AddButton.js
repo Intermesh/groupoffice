@@ -174,7 +174,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 					//If go.form.Dialog turn off redirect to detail view.
 					window.redirectOnSave = false;
 
-					if (!window.isVisible() && !(window instanceof GO.email.EmailComposer)) {
+					if (!window.isVisible() &&  !(GO.email && window instanceof GO.email.EmailComposer)) {
 						window.show();
 					}
 					
