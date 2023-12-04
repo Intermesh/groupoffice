@@ -2,6 +2,7 @@
 - Core: Capture Cmd/ctrl + P and print the detail panel
 - Filesearch: Tidied up search form
 - Projects: Permissions were editable though delete button when they were not overwritten
+- Newsletters: Legacy email accounts load without an SMTP account
 
 27-11-2023: 6.7.56
 - Newsletters: fix missing dependency in install script
