@@ -62,7 +62,7 @@ $lang = go()->getLanguage()->getIsoCode();
 <?php endif;?>
 
 <?php if($loadGoui): ?>
-    <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/dist/goui/style/groupoffice.css" />
+    <link rel="stylesheet" media="screen and (min-device-width:1200px),print" href="<?= $webclient->getBaseUrl();?>views/goui/dist/goui/style/groupoffice.css" />
     <link rel="stylesheet" media="screen and (max-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/dist/goui/style/groupoffice-mobile.css" />
     <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/dist/groupoffice-core/style/style.css" />
 <?php endif; ?>
