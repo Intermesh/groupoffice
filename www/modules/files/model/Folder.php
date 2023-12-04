@@ -850,10 +850,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		if(\GO::config()->debug)
 			\GO::debug("syncFilesystem ".$this->path);
-		
-		if(\GO::environment()->isCli()){
-			echo $this->path."\n";
-		}
+
+		//this outputted in cronjobs (LDAP sync) and we don't want that
+//		if(\GO::environment()->isCli()){
+//			echo $this->path."\n";
+//		}
 
 		$oldIgnoreAcl = \GO::setIgnoreAclPermissions(true);
 
