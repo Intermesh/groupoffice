@@ -603,7 +603,7 @@ class Contact extends AclItemEntity {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
 											}
 											
-											$criteria->where('adr.street', $comparator, $value);
+											$criteria->where('adr.address', $comparator, $value);
 										})
                     ->addText("zip", function(Criteria $criteria, $comparator, $value, Query $query) {
                       if(!$query->isJoined('addressbook_address', 'adr')) {
