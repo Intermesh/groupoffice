@@ -4,6 +4,7 @@
 - Projects: Permissions were editable though delete button when they were not overwritten
 - Newsletters: Legacy email accounts load without an SMTP account
 - Newsletters: Fixed permissions of address list not respected in sent items grid
+- Email: Fixed printing mail with corrupted images in Firefox
 
 27-11-2023: 6.7.56
 - Newsletters: fix missing dependency in install script
