@@ -5,6 +5,7 @@
 - debian package: Added example to disable /install from the web
 - Libreoffice: fix deprecation error in PHP8 / LibXML version
 - Finance: Fixed The migration failed: Typed property go\modules\business\contracts\model\Contract::$contactId must not be accessed before initialization
+- Core: Capture Cmd/ctrl + P and print the detail panel
 - Addressbook: fix 'street' filter
 
 27-11-2023: 6.8.21
