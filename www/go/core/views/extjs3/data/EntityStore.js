@@ -761,7 +761,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	destroy : function(id) {
 		return this.set( {destroy: [id]}).then((response) => {
 			if(response.destroyed.indexOf(id) == -1) {
-				return Promise.reject({message: t("Failed to delete"), response: response, error: response.notDestroyed[id] || null});
+				return Promise.reject({message: response.notDestroyed[id] ?  response.notDestroyed[id].description : t("Failed to delete"), response: response, error: response.notDestroyed[id] || null});
 			} else {
 				return true;
 			}
