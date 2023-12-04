@@ -1,3 +1,4 @@
+04-12-2023: 6.7.57
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 - Core: Capture Cmd/ctrl + P and print the detail panel
 - Filesearch: Tidied up search form

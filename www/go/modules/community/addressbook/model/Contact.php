@@ -790,7 +790,7 @@ class Contact extends AclItemEntity {
 
 	private function generateUid(): string
 	{
-		$url = trim(go()->getSettings()->URL, '/');
+		$url = trim(go()->getSettings()->URL ?? "", '/');
 		$uid = substr($url, strpos($url, '://') + 3);
 		$uid = str_replace(['/', ':'], ['-', '-'], $uid );
 
