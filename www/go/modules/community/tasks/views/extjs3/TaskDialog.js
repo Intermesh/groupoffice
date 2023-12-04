@@ -278,7 +278,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								value: null
 							}),
 
-							this.ccField = new GO.email.RecipientCombo({
+							this.ccField = new go.form.RecipientCombo({
 								fieldLabel : t("CC", "email"),
 								name : 'cc',
 								flex: 1,

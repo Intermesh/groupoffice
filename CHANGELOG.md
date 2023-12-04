@@ -8,6 +8,7 @@
 - Core: Capture Cmd/ctrl + P and print the detail panel
 - Addressbook: fix 'street' filter
 - Billing: PHP compatibility PDF class
+- Support: Fixed merge of support tickets
 
 27-11-2023: 6.8.21
 - Core/Email: Fixed big fonts on some receiving e-mail clients (webclients for sure).
