@@ -7,6 +7,7 @@
 - Finance: Fixed The migration failed: Typed property go\modules\business\contracts\model\Contract::$contactId must not be accessed before initialization
 - Core: Capture Cmd/ctrl + P and print the detail panel
 - Addressbook: fix 'street' filter
+- Billing: PHP compatibility PDF class
 
 27-11-2023: 6.8.21
 - Core/Email: Fixed big fonts on some receiving e-mail clients (webclients for sure).
