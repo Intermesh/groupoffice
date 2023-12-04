@@ -133,6 +133,7 @@
 -- 6.8 --
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 
+- Core: Capture Cmd/ctrl + P and print the detail panel
 
 27-11-2023: 6.7.56
 - Newsletters: fix missing dependency in install script

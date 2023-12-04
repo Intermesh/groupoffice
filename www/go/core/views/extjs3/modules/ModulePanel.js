@@ -14,6 +14,17 @@ go.modules.ModulePanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
+	print: function() {
+		//Try to find detail view for entity and load it.
+		var detailViews = this.findBy(function(item) {
+			return item.isXType("detailview") && item.isVisible();
+		});
+
+		if(detailViews.length) {
+			detailViews[0].print();
+		}
+	},
+
 	/**
 	 * This route is called for entities. eg. Note/1
 	 * @param {int} id 

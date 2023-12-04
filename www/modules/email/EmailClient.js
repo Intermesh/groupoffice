@@ -565,6 +565,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 
 
+	print: function() {
+		this.messagePanel.print();
+	},
+
+
 	addGridHandlers : function(grid)
 	{
 		grid.on("rowcontextmenu", function(grid, rowIndex, e) {
