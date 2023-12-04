@@ -1,4 +1,5 @@
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
+- Files: Folder was outputted in CLI mode when filesystem was synced. (LDAP sync for example).
 
 20-11-2023: 6.6.179
 - Calendar: Don't try to match email if it's a reply
