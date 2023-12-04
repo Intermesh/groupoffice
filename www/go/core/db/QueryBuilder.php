@@ -487,7 +487,7 @@ class QueryBuilder {
 
 		$col = Table::getInstance($this->aliasMap[$tableAlias], $this->conn)->getColumn($column);
 		if ($col === null) {
-			throw new InvalidArgumentException("Column '" . $column . "' not found in table " . $this->aliasMap[$tableAlias]->getName());
+			throw new InvalidArgumentException("Column '" . $column . "' not found in table " . $this->aliasMap[$tableAlias]);
 		}
 		return $col;
 	}
