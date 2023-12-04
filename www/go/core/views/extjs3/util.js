@@ -4,9 +4,14 @@ go.print = function(tmpl, data) {
 
 	paper.innerHTML = Ext.isEmpty(data) ? tmpl : tmpl.apply(data);
 
-	Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-		Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
-	});
+	if(!Ext.isGecko) {
+		Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+			Ext.isSafari ? document.execCommand('print') : window.print();
+		});
+	} else {
+		// this is not needed in firefox and somehow it also fails to resolve the promises above.
+		window.print();
+	}
 
 };
 
