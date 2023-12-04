@@ -1,3 +1,4 @@
+04-12-2023: 6.8.22
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 - Core: Combo box could send typed search text instead of empty id.
 - openid: register users and show authenticator icon in system settings
