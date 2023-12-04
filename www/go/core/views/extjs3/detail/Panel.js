@@ -203,6 +203,10 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		
 	},
 
+	print() {
+		this.body.print();
+	},
+
 	load: function (id) {
 
 		id = parseInt(id);

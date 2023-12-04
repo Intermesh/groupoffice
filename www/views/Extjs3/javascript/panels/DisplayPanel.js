@@ -94,7 +94,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 					
 					text:t("Print"),      
 					handler: function(){
-						this.body.print({title:this.getTitle()});
+						this.print();
 					},
 					scope:this
 				},{            
@@ -124,6 +124,10 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 
 	initTemplate : function(){
 
+	},
+
+	print: function() {
+		this.body.print({title:this.getTitle()});
 	},
 	
 	initComponent : function(){
