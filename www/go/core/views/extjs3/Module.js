@@ -230,8 +230,10 @@ GO.mainLayout.on('render', function () {
 
 	document.addEventListener("keydown", ev => {
 
-		ev.preventDefault();
 		if((ev.metaKey || ev.ctrlKey) && ev.key == "p") {
+
+			ev.preventDefault();
+
 			const modPanel = GO.mainLayout.tabPanel.getActiveTab();
 
 			if(!modPanel) {
