@@ -1218,6 +1218,10 @@ abstract class EntityController extends Controller {
 
 		$entity = $cls::findById($primaryId);
 
+		if(!$entity) {
+			throw new NotFound($cls.':'.$primaryId);
+		}
+
 		if(!$this->canUpdate($entity)) {
 			throw new Forbidden();
 		}
