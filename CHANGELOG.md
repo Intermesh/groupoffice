@@ -9,6 +9,9 @@
 - Addressbook: fix 'street' filter
 - Billing: PHP compatibility PDF class
 - Support: Fixed merge of support tickets
+- Email: Fixed printing mail with corrupted images in Firefox
+- Newsletters: Legacy email accounts load without an SMTP account
+- Newsletters: Fixed permissions of address list not respected in sent items grid
 
 27-11-2023: 6.8.21
 - Core/Email: Fixed big fonts on some receiving e-mail clients (webclients for sure).
@@ -135,8 +138,8 @@
 
 
 -- 6.8 --
-- Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 
+- Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 - Core: Capture Cmd/ctrl + P and print the detail panel
 - Filesearch: Tidied up search form
 - Projects: Permissions were editable though delete button when they were not overwritten
