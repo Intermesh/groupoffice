@@ -13,6 +13,10 @@ go.print = function(tmpl, data) {
 		window.print();
 	}
 
+	window.addEventListener("afterprint" , function(){
+		paper.innerHTML = "";
+	}, {once: true});
+
 };
 
 go.reload = function() {
