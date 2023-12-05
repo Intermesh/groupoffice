@@ -31,14 +31,6 @@ body.dark {
 		color-scheme: dark;
 	}
 }
-@media (prefers-color-scheme: dark) {
-	body.system {
-		@include dark-theme;
-		* {
-			color-scheme: dark;
-		}
-	}
-}
 
 body * {
 	box-sizing: border-box;
