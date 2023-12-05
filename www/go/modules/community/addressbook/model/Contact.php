@@ -890,8 +890,7 @@ class Contact extends AclItemEntity {
 	protected function internalValidate() {
 
 		if($this->isOrganization) {
-			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = null;
-			$this->lastName = $this->name;
+			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = $this->lastName = null;
 		} else if(empty($this->name) || (!$this->isModified(['name']) && $this->isModified(['firstName', 'middleName', 'lastName']))) {
 			$this->setNameFromParts();
 		}
