@@ -4,8 +4,18 @@
 
 %font-caption {
 	text-transform: uppercase;
-	font-weight: 400;
-	font-size: .8em;
+	font-weight: 600;
+	//font-size: 1em;
+	color: $colorBorder;
+	> em { // date number
+		font-style: normal;
+		margin: 0 dp(8);
+		padding: dp(4) 0;
+		display: inline-block;
+		font-size: 1.2em;
+		color: $colorText;
+		//border: 1px solid currentColor;
+	}
 }
 
 %event {
@@ -15,20 +25,9 @@
 	overflow: hidden;
 	box-sizing: border-box;
 	border-radius: $borderRadius;
-	//background-color: $colorPrimary;
-	//background-color:currentColor;
-
-	//border-color: currentcolor;
-	//border-width: 1px;
-	//border-style: solid;
-	//border-left: 3px solid;
-	//background-color: #f7f7f7;
-
 	padding: dp(2) dp(6);
-	//text-shadow: 0 0 5px rgba(0, 0, 0, 0.38);
 	text-align: left;
 	user-select: none;
-	//transition: all .15s ease-out;
 	> em, > span {
 		color:$colorText;
 	}
@@ -46,18 +45,6 @@
 	&::first-letter {
 		text-transform: capitalize;
 	}
-	//&:focus {
-	//	box-shadow:
-	//			0 dp(3) dp(1) dp(-2) rgba(#6a6a6a, .2),
-	//			0 dp(2) dp(2) 0 rgba(#6a6a6a, .14),
-	//			0 dp(1) dp(5) 0 rgba(#6a6a6a, .12);
-	//	border-color: rgba(0,0,0,.5);
-	//	filter: brightness(90%);
-	//	//transform: scale(1.01);
-	//}
-	// &:hover {
-	//		//filter: brightness(110%);
-	// }
 	&.new {
 		background-color: white !important;
 		border-width: 1px;
@@ -170,7 +157,7 @@
 
 		td.weeknb {
 			color: $colorTextSecondary;
-			font-size: .9em;
+			//font-size: .9em;
 		}
 	}
 }
@@ -180,19 +167,12 @@
 		display:inline-block !important;
 	}
 	li {
-		color: $colorText;
 
 		&.today {
 			color: $colorPrimary;
-			font-weight: 600;
 			> em {
-				border-color: $colorPrimary;
 				font-weight: 600;
-				background-color: $colorPrimary;
-				color:white;
-				width: dp(24);
-				border-radius: 999px;
-				text-align:center;
+				color:$colorPrimary;
 			}
 		}
 
@@ -257,19 +237,15 @@
 
 	ul { // header
 		@extend %font-caption;
-		padding-left: dp(24); // for weeknbs
-		display: flex;
-		border-bottom: 1px solid $colorLine;
+		//padding-left: dp(24); // for weeknbs
+		display: flex;;
 		//background-color: color($bg, 'status-bar');
-		height: dp(32);
+		height: dp(36);
 
 		> li { //weekdays
-			color: $colorTextSecondary;
-			line-height: dp(32);
-			font-size: .9em;
+			line-height: dp(40);
 			text-align: center;
-			text-transform: uppercase;
-
+			padding-left: dp(8);
 			&.current {
 				color: $colorPrimary;
 			}
@@ -290,11 +266,12 @@
 			//}
 
 			border-right: 1px solid $colorLine;
+			&:last-child { border-right:0;}
 			&.events {
 				position: absolute;
-				margin-left: dp(24); // week numbers
+			//	margin-left: dp(24); // week numbers
 				margin-top: dp(24); // day numbers
-				width: calc(100% - 18px);
+				width: 100%;
 				overflow: hidden;
 				bottom: 0;
 				top: 0;
@@ -321,15 +298,15 @@
 					}
 				}
 			}
-
-			&.weeknb {
-				text-align: center;
-				color: $colorTextSecondary;
-				border-right: 1px solid $colorBorder;
-				font-size: .8em;
-				max-width: dp(24);
-				font-weight: 300;
-			}
+			//
+			//&.weeknb {
+			//	text-align: center;
+			//	color: $colorTextSecondary;
+			//	border-right: 1px solid $colorBorder;
+			//	font-size: .8em;
+			//	max-width: dp(24);
+			//	font-weight: 300;
+			//}
 		}
 	}
 
@@ -340,12 +317,24 @@
 			outline: none;
 			box-shadow: none;
 		}
-		> em { // date number
-			font-style: normal;
-			display: block;
+		> sub { // weeknb
+			float:left;
 			text-align: center;
-			margin: 0 auto;
+			padding: 0 dp(2);
+			cursor: pointer;
+			color: $colorTextSecondary;
+			font-size: .8em;
+			max-width: dp(24);
+			font-weight: 300;
+		}
+		> em { // date number
+			font-weight: 500;
+			font-style: normal;
+			text-align: right;
+			font-size:1.2em;
+			display: block;
 			height: dp(24);
+			margin-right: dp(8);
 			line-height: dp(24);
 		}
 	}
@@ -386,14 +375,16 @@ $halfHour: 3.5vh;
 	height:100%;
 	display: flex;
 	flex-direction: column;
-	> ul li:first-child {
-		font-size: .9em;
+	> ul li:first-child { // week-nb & all-day
+		//font-size: .9em;
+		justify-content: center;
+		min-height: dp(24);
 		text-align: center;
-		min-height: dp(36);
+		padding-top:dp(4);
 	}
 	.all-days { // container
 		position:relative;
-		margin-top:4px;
+		min-height: dp(24);
 	}
 	> ul { //header + all-day
 		display: flex;
@@ -401,27 +392,15 @@ $halfHour: 3.5vh;
 		max-height: dp(212); // x all-day events fit
 		border-bottom: 2px solid $colorBorder;
 		&:first-child { // header
-			@extend %font-caption;
-			min-height: dp(36);
 			> li {
+				@extend %font-caption;
 				padding: dp(4);
-				> em { // date number
-					font-style: normal;
-					margin-left: dp(8);
-					padding: dp(4) 0;
-					display: inline-block;
-					font-size: 1.2em;
-					//border: 1px solid currentColor;
-				}
 			}
-
 		}
 		+ ul { // all-day only
 			background-color:var(--bg-base);
 		}
-		> li {
-			border-right: 1px solid $colorBorder;
-		}
+
 		.event {
 			position:absolute;
 		}
@@ -510,6 +489,9 @@ $halfHour: 3.5vh;
 	.control { width: 100%;}
 	li {
 		padding-left: 11px;
+	}
+	.goui-form-field .wrap menu.goui-toolbar {
+		border-left:0;
 	}
 }
 .goui.goui-toolbar.dense {

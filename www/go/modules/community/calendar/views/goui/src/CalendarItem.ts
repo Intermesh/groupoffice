@@ -1,4 +1,4 @@
-import {BaseEntity, btn, comp, DateTime, Recurrence, t, tbar, win} from "@intermesh/goui";
+import {BaseEntity, btn, comp, DateTime, DefaultEntity, Recurrence, t, tbar, win} from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {EventDialog} from "./EventDialog.js";
@@ -13,6 +13,8 @@ export interface CalendarEvent extends BaseEntity {
 	start: string
 	title: string
 	color?: string
+	isOrigin: boolean
+	participants?: {[key:string]: any}
 	calendarId: string
 }
 
@@ -43,10 +45,15 @@ export class CalendarItem {
 	end!: DateTime
 	color!: string
 
+	private initStart: string
+	private initEnd: string
+
 	divs: {[week: string] :HTMLElement}
 
 	constructor(obj:CalendarItemConfig) {
 		Object.assign(this,obj);
+		this.initStart = obj.start.format('Y-m-d\TH:i:s');
+		this.initEnd = obj.end.format('Y-m-d\TH:i:s');
 		if(!obj.title) {
 			this.title = obj.data.title!;
 		}
@@ -56,20 +63,20 @@ export class CalendarItem {
 		this.divs = {};
 	}
 
+	private isNew() {
+		return this.key==='';
+	}
+
+	private isTimeModified() {
+		return this.isNew() || this.initStart !== this.start.format('Y-m-d\TH:i:s') || this.initEnd !== this.end.format('Y-m-d\TH:i:s');
+	}
+
 	static makeItems(e: CalendarEvent, from: DateTime, until: DateTime) : CalendarItem[] {
 		const start = new DateTime(e.start),
 			end = start.clone().addDuration(e.duration),
 			color = e.color || calendarStore.items.find((c:any) => c.id == e.calendarId)?.color,
 			items = [];
-		if(end.date > from.date && start.date < until.date && !e.recurrenceRule) {
-			items.push(new CalendarItem({
-				key: e.id+"",
-				start,
-				end,
-				data:e,
-				color
-			}));
-		}
+
 		if(e.recurrenceRule) {
 			const r = new Recurrence({dtstart: new Date(e.start), rule: e.recurrenceRule, ff: from.date});
 			let rEnd = r.current.clone().addDuration(e.duration);
@@ -105,18 +112,30 @@ export class CalendarItem {
 						color
 					}));
 				}
-				r.next();
+				if(!r.next()) {
+					break;
+				}
 				rEnd = r.current.clone().addDuration(e.duration);
 				//}
 				//} while(r.current.date < until.date && r.next())
 			}
+		} else if (end.date > from.date && start.date < until.date) {
+			items.push(new CalendarItem({
+				key: e.id+"",
+				start,
+				end,
+				data:e,
+				color
+			}));
 		}
 		return items;
 	}
 
 	remove() {
 		if(!this.isRecurring) {
-			eventDS.destroy(this.data.id);
+			this.confirmScheduleMessage(false, () => {
+				eventDS.destroy(this.data.id);
+			});
 		} else {
 			const w = win({
 					title: t('Do you want to delete a recurring event?'),
@@ -127,13 +146,13 @@ export class CalendarItem {
 				}),tbar({},btn({
 						text: t('This event'),
 						cls:'primary',
-						handler: b => { this.removeOccurrence(); w.close(); }
+						handler: _b => { this.removeOccurrence(); w.close(); }
 					}),btn({
 						text: t('All future events'),
-						handler: b => { this.removeFutureEvents(); }
+						handler: _b => { this.removeFutureEvents(); w.close(); }
 					}),'->',btn({
 						text: t('Cancel'), // save to series
-						handler: b => w.close()
+						handler: _b => w.close()
 					})
 				)
 			)
@@ -146,16 +165,16 @@ export class CalendarItem {
 	}
 
 	get isOverride() {
-		return (this.recurrenceId && this.recurrenceId in this.data.recurrenceOverrides);
+		return (this.recurrenceId && this.data.recurrenceOverrides && this.recurrenceId in this.data.recurrenceOverrides);
 	}
 
 	save(onCancel: Function) {
 		const start = this.start.format('Y-m-dTH:i:s'),
 			duration = this.start.diff(this.end);
 
-		if (start != (this.recurrenceId || this.data.start) || duration != this.data.duration) {
+		if (this.isTimeModified()) {
 			if(this.data.id) {
-				this.patch({start,duration}); // quick save
+				this.patch({start, duration}); // quick save
 			} else {
 				this.data.start = start;
 				this.data.duration = duration;
@@ -180,12 +199,67 @@ export class CalendarItem {
 	}
 
 	downloadIcs(){
-		client.downloadBlobId('community/calendar/ics/'+this.key, 'test.ics');
+		client.getBlobURL('community/calendar/ics/'+this.key).then(window.open)
 	}
 
-	patch(modified: any, onFinish?: Function) {
+	confirmScheduleMessage(modified: Partial<CalendarEvent>|false, onAccept: ()=>void) {
+		const type = this.shouldSchedule(modified);
+		if(type) {
+			const askScheduleWin = win({
+					width: 500,
+					modal: true,
+					closable: false,
+					title: t(type+'ScheduleTitle'),
+				},
+				comp({cls: 'pad', html: t(type+'ScheduleText')}),
+				tbar({},
+					btn({
+						text: t('Cancel'), handler: () => {
+							askScheduleWin.close()
+						}
+					}), '->',
+					btn({
+						text: t('Send'), cls:'primary', handler: () => {
+							eventDS.setParams.sendSchedulingMessages = true;
+							onAccept();
+							askScheduleWin.close()
+						}
+					})
+				));
+			askScheduleWin.show();
+		} else {
+			onAccept();
+		}
+	}
+
+	isOwner() {
+
+	}
+
+	shouldSchedule(m: Partial<CalendarEvent>|false) {
+		if(!this.data.isOrigin && this.key)
+			return;
+		if(m === false) {
+			return this.data.participants ? 'cancel' : undefined;
+		}
+		 if(m.participants || this.data.participants) {
+			if(!this.key) {
+				return 'new';
+			} else {
+				if(['start','duration','end','description','title','showWithoutTime','isAllDay', 'location','participants']
+					.some(k => m.hasOwnProperty(k)))
+				{
+					return 'update';
+				}
+			}
+		}
+	}
+
+	patch(modified: any, onFinish?: (value:DefaultEntity) => DefaultEntity) {
 		if(!this.isRecurring) {
-			eventDS.update(this.data.id, modified); // await?
+			this.confirmScheduleMessage(modified, () => {
+				eventDS.update(this.data.id, modified); // await?
+			});
 		} else if(this.isOverride) {
 			this.patchOccurrence(modified, onFinish);
 		} else {
@@ -198,13 +272,13 @@ export class CalendarItem {
 				}),tbar({},btn({
 						text: t('This event'),
 						cls:'primary',
-						handler: b => { this.patchOccurrence(modified, onFinish); w.close(); }
+						handler: _b => { this.patchOccurrence(modified, onFinish); w.close(); }
 					}),btn({
 						text: t('All future events'),
-						handler: b => { this.patchThisAndFuture(); }
+						handler: _b => { this.patchThisAndFuture(); }
 					}),'->',btn({
 						text: t('Cancel'), // save to series
-						handler: b => w.close()
+						handler: _b => w.close()
 					})
 				)
 			)
@@ -214,7 +288,7 @@ export class CalendarItem {
 
 	private static overridableProperties = ['start', 'duration', 'title', 'freeBusyStatus', 'participants','location','alerts', 'description']
 
-	private patchOccurrence(modified: any, onFinish?: Function) {
+	private patchOccurrence(modified: any, onFinish?: (value: DefaultEntity) => DefaultEntity) {
 		this.data.recurrenceOverrides ??= {};
 		for(const prop in modified) {
 			if(!CalendarItem.overridableProperties.includes(prop)) delete modified[prop]; // remove properties that can not be overridden
@@ -225,11 +299,14 @@ export class CalendarItem {
 		);
 		eventDS.single(this.data.id).then(original => {
 			if(!original) return; // why could this be undefined?
-			for(const name of CalendarItem.overridableProperties) {
-				if(o[name] == original[name]) delete o[name]; // remove properties that are the same as original TODO alerts and participants cannot be compared like this
-			}
-			this.data.recurrenceOverrides[this.recurrenceId!] = o;
-			eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides}).then(onFinish);
+			this.confirmScheduleMessage(modified, () => {
+				for(const name of CalendarItem.overridableProperties) {
+					if(o[name] == original[name]) delete o[name]; // remove properties that are the same as original TODO alerts and participants cannot be compared like this
+				}
+				this.data.recurrenceOverrides[this.recurrenceId!] = o;
+				const p = eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides});
+				if(onFinish) p.then(onFinish);
+			});
 		});
 	}
 
@@ -241,23 +318,32 @@ export class CalendarItem {
 		return;
 		//if(!ev.data.participants) { // is not scheduled ( split event)
 		// todo: add first and next relation in relatedTo property as per https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-11.html#name-splitting-an-event
-		this.data.start = this.recurrenceId!;
-		eventDS.create(this.data).then((data) => { // duplicate event
-			let rule = this.data.recurrenceRule;
-			rule.until = this.start.addSeconds(-1);
-			eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
-		}); // create duplicate
+		// this.data.start = this.recurrenceId!;
+		// eventDS.create(this.data).then((data) => { // duplicate event
+		// 	let rule = this.data.recurrenceRule;
+		// 	rule.until = this.start.addSeconds(-1);
+		// 	eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
+		// }); // create duplicate
 		//} else {
 		// todo: find all occurrences and create exceptions that match the original until this one, Then change the original
 		//}
 	}
 
 	private removeFutureEvents() {
-		this.data.recurrenceRule.until = this.recurrenceId;
+		this.data.recurrenceRule.until = (new DateTime(this.recurrenceId)).addDays(-1).format('Y-m-d'); // could be minus 1 seconds but we don't recur within day
 		eventDS.update(this.data.id,{recurrenceRule: this.data.recurrenceRule});
 	}
 
+	undoException(recurrenceId: string) {
+		delete this.data.recurrenceOverrides[recurrenceId];
+		return eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides});
+	}
+
 	private removeOccurrence() {
-		eventDS.update(this.data.id, {recurrenceOverrides:{[this.recurrenceId!]:{excluded:true}}});
+		this.confirmScheduleMessage(false, () => {
+			this.data.recurrenceOverrides ??= {};
+			this.data.recurrenceOverrides[this.recurrenceId!] = {excluded: true};
+			eventDS.update(this.data.id, {recurrenceOverrides: this.data.recurrenceOverrides});
+		});
 	}
 }

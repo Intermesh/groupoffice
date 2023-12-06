@@ -23,10 +23,18 @@ class Module extends core\Module
 
 
 		header('Content-Type: text/calendar; charset=UTF-8; component=vevent');
-		header('Content-Disposition: attachment; filename="bestand.ics"');
 		echo ICalendarHelper::toVObject($ev)->serialize();
 	}
 
+	public function pageTest($eventId) {
+
+		go()->setAuthState(new core\jmap\State());
+		$event = CalendarEvent::findById($eventId);
+		echo ICalendarHelper::mailBody($event,
+			(object)['name'=>'test','email'=>'admin@intermesh.nl'],
+			'Update');
+		exit();
+	}
 
 //	protected function rights(): array
 //	{

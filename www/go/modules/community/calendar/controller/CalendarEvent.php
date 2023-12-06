@@ -6,6 +6,10 @@ use go\core\jmap\EntityController;
 use go\modules\community\calendar\model;
 
 
+/**
+ * CalendarEvent controller.
+ * NOTE: The extra get and set parameter in the docblocks are according to RFC and might not (yet) be implemented
+ */
 class CalendarEvent extends EntityController {
 	
 	/**
@@ -52,6 +56,9 @@ class CalendarEvent extends EntityController {
 	 * changes only affect this account and no scheduling messages will be sent.
 	 */
 	public function set($params) {
+		if(!empty($params['sendSchedulingMessages'])) {
+			model\CalendarEvent::$sendSchedulingMessages = true;
+		}
 		return $this->defaultSet($params);
 	}
 	
@@ -63,5 +70,21 @@ class CalendarEvent extends EntityController {
 	 */
 	public function changes($params) {
 		return $this->defaultChanges($params);
+	}
+
+	public function processInvite($params) {
+		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
+		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'],$params['uid']);
+		$vcalendar = $message->getInvitationVcalendar();
+		$calendar = model\Calendar::fetchDefault($account->user_id);
+		//todo calendar should be associated with mail account!
+		//\GO::user()->id must be replaced with $account->calendar->user_id
+		$from = $message->from->getAddress();
+		$sender = (object)[
+			'email' => $from['email'],
+			'name' => $from['personal'],
+		];
+		$event = model\ICalendarHelper::processMessage($vcalendar, $calendar, $sender);
+		return ['success'=>$event->save()];
 	}
 }

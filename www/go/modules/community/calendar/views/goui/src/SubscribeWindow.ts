@@ -20,12 +20,13 @@ export class SubscribeWindow extends Window {
 		this.items.add(this.grid = table({
 			//fitParent:true,
 			style:{width:'100%'},
+			headers: false,
 			store,
 			columns: [
-				column({id:'name', header:t('Calendar')}),
-				column({id:'id', header:'', width:120, renderer: v=> btn({
+				column({id:'name'}),
+				column({id:'id', width:120, renderer: v=> btn({
 						text: "Subscribe",
-						cls:'primary outlined',
+						cls:'primary',
 						handler: () => { store.dataSource.update(v, {isSubscribed: true}); }
 					})
 				})

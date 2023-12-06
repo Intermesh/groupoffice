@@ -1,6 +1,6 @@
 import {
 	browser,
-	btn,
+	btn, Button,
 	checkbox,
 	column,
 	comp,
@@ -25,7 +25,7 @@ import {
 } from "@intermesh/goui";
 import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {calendarStore} from "./Index.js";
-import {ParticipantField} from "./ParticipantField.js";
+import {participantfield} from "./ParticipantField.js";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
 
@@ -43,7 +43,9 @@ export class EventDialog extends Window {
 	recurrenceId?: string
 
 	store: JmapDataSource
+	submitBtn:Button
 
+	private titleField: TextField
 	constructor() {
 		super();
 		this.title = t('New Event');
@@ -64,15 +66,17 @@ export class EventDialog extends Window {
 				dataSource: this.store,
 				listeners: {
 					'beforesave': (frm,data) => {
-						const end = frm.findField<DateField>('end')!.date!,// DateTime.createFromFormat(data.end, 'Y-m-dTh:i'),
-							start = frm.findField<DateField>('start')!.date!;
-						if(data.showWithoutTime) {
+						const end = frm.findField<DateField>('end')!.getValueAsDateTime()!,// DateTime.createFromFormat(data.end, 'Y-m-dTh:i'),
+							start = frm.findField<DateField>('start')!.getValueAsDateTime()!;
+						if(frm.value.showWithoutTime) {
 							end.setHours(0,0,0).addDays(1);
 							start.setHours(0,0,0);
 							data.start = start.format('Y-m-d');// remove time
 						}
-						data.timeZone = go.User.timezone; // todo: option to change in dialog
-						data.duration = start.diff(end);
+						if(frm.isNew)
+							data.timeZone = go.User.timezone; // todo: option to change in dialog
+						if(data.start || data.end)
+							data.duration = start.diff(end);
 						delete data.end;
 					},
 					'load': (_, data) => {
@@ -83,7 +87,7 @@ export class EventDialog extends Window {
 					'save' : () => {this.close();}
 				}
 			},
-			textfield({placeholder: t('Enter a title, name or place'), name: 'title', flex: '0 1 70%' }),
+			this.titleField = textfield({placeholder: t('Enter a title, name or place'), name: 'title', flex: '0 1 70%' }),
 			select({
 				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 20%',
 				store: calendarStore, valueField: 'id',
@@ -129,7 +133,13 @@ export class EventDialog extends Window {
 					this.openExceptionsDialog();
 				}}),
 			),
-			new ParticipantField(),
+			participantfield({
+				listeners: {'change': (_,v) => {
+					this.submitBtn.text = t((v && Object.keys(v).length) ? 'Send' : 'Save');
+
+					console.log(v);
+				}}
+			}),
 			alertField,
 			textarea({name:'description', label: t('Description')}),
 
@@ -147,7 +157,7 @@ export class EventDialog extends Window {
 		tbar({},
 			btn({icon:'attach_file', handler: _ => this.attachFile() }),
 			'->',
-			btn({text:t('Save'), handler: _ => this.submit()})
+			this.submitBtn = btn({text:t('Save'), handler: _ => this.submit()})
 		));
 
 
@@ -171,7 +181,7 @@ export class EventDialog extends Window {
 						return Format.dateTime(v)+ `<br><small>${record.excluded ? 'Excluded' : 'Override'}</small>`;
 					}}),
 					column({id: "excluded", header: '', width:90, renderer: (v,r) => btn({icon:'delete',handler:()=>{
-						this.removeException(r.recurrenceId).then(_=> { exceptionStore.remove(r)})
+						this.item!.undoException(r.recurrenceId).then(_=> { exceptionStore.remove(r)})
 					}})
 					}),
 				]
@@ -180,25 +190,33 @@ export class EventDialog extends Window {
 		exceptionView.show();
 	}
 
-	private removeException(recurrenceId:string) {
-		return this.form.dataSource.update(this.form.value.id, {recurrenceOverrides:{[recurrenceId]:null}});
-	}
-
 	load(ev: CalendarItem) {
 		this.item = ev;
-
+		this.title = t(!ev.key ? 'New event' : 'Edit event');
 		if (!ev.key) {
 			this.form.create(ev.data);
 		} else {
-			this.form.load(ev.data.id);
+			this.form.load(ev.data.id).then(() => {
+				if(ev.recurrenceId) {
+					this.form.findField('start')!.value = ev.start.format('Y-m-d\TH:i');
+					this.form.findField('end')!.value = ev.end.format('Y-m-d\TH:i');
+				}
+			});
 		}
+		this.titleField.focus();
+		this.titleField.input!.select();
 	}
 
 	submit() {
-		if(!this.item!.isRecurring) {
-			this.form.submit();
-		} else{
-			this.item!.patch(this.form.modified, _=>this.close());
+		if(this.item!.isRecurring) {
+			this.item!.patch(this.form.modified, v => {
+				this.close();
+				return v;
+			});
+		} else {
+			this.item!.confirmScheduleMessage(this.form.modified, () => {
+				this.form.submit();
+			});
 		}
 	}
 

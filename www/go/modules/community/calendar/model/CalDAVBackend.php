@@ -32,7 +32,7 @@ class CalDAVBackend extends AbstractBackend implements
 		$result = [];
 		$tz = new \GO\Base\VObject\VTimezone(); // same for each?
 		// using logged in user, but should use PrincipalUri
-		$calendars = Calendar::find();//->where(['isSubscribed'=>1]);
+		$calendars = Calendar::find()->where(['isSubscribed'=>1]);
 		foreach($calendars as $calendar) {
 
 			$uri = preg_replace('/[^\w-]*/', '', (strtolower(str_replace(' ', '-', $calendar->name)))).'-'.$calendar->id;
@@ -143,7 +143,7 @@ class CalDAVBackend extends AbstractBackend implements
 	{
 		//id, uri, lastmodified, etag, calendarid, size, componenttype
 		$events = CalendarEvent::find()
-			->select(['eventdata.id as id','uid','eventdata.modifiedAt as modified','size','veventBlobId'])
+			->select(['cce.id as id','uid','eventdata.modifiedAt as modified','size','veventBlobId'])
 			->join('core_blob', 'b','b.id = veventBlobId', 'LEFT')
 			->where(['calendarId'=> $calendarId])
 			->fetchMode(\PDO::FETCH_OBJ);
@@ -153,6 +153,7 @@ class CalDAVBackend extends AbstractBackend implements
 			//$blob = $event->icsBlob();
 			$result[] = [
 				'id' => $event->id,
+				'calendarid' => $calendarId, // needed for bug in local delivery schedualer
 				'uri' => str_replace('/', '+', $event->uid) . '.ics',
 				'lastmodified' => strtotime($event->modified),
 				'etag' => '"' . $event->veventBlobId . '"',
@@ -172,10 +173,12 @@ class CalDAVBackend extends AbstractBackend implements
 
 		/** @var CalendarEvent $event */
 		$event = CalendarEvent::find()
-			->join('core_blob', 'b','b.id = veventBlobId', 'LEFT')
+			//->join('core_blob', 'b','b.id = veventBlobId', 'LEFT')
 			//->join('calendar_event_user', 'u', 'u.eventId = eventdata.id')
 			->where(['cce.calendarId'=> $calendarId, 'eventdata.uid'=>$uid])->single();
-
+//if($event->uid === '0a3b1bbb-dcbc-42d2-8762-6ad7493eef34') {
+//	$e=0;
+//}
 		if (!$event) {
 			go()->log("Event $objectUri not found in calendar $calendarId!");
 			return false;

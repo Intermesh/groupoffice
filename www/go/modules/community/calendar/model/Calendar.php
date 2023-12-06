@@ -55,9 +55,15 @@ class Calendar extends AclOwnerEntity {
 	{
 		return parent::defineMapping()
 			->addTable("calendar_calendar")
-			->addUserTable('calendar_calendar_user', 'caluser',['id' => 'calendarId'], self::UserProperties)
+			->addUserTable('calendar_calendar_user', 'caluser',['id' => 'id'], self::UserProperties)
 			->addMap('defaultAlertsWithTime', DefaultAlert::class,  ['id'=>'calendarId'])
 			->addMap('defaultAlertsWithoutTime', DefaultAlertWT::class,  ['id'=>'calendarId']);
+	}
+
+	public static function fetchDefault($userId = null) {
+		if($userId === null)
+			$userId = \go()->getUserId();
+		return self::find()->where(['ownerId' => $userId])->orderBy(['sortOrder'=>'ASC'])->single();
 	}
 
 	protected static function defineFilters(): Filters

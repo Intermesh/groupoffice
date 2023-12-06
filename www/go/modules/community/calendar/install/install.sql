@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
     `timeZone` VARCHAR(45) NULL,
     `aclId` INT NOT NULL,
     `createdBy` INT NULL,
-    `ownedBy` INT NULL,
+    `ownerId` INT NULL,
     `highestItemModSeq` VARCHAR(32) NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_calendar_calendar_core_acl1`
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
     ON DELETE SET NULL
     ON UPDATE NO ACTION,
     CONSTRAINT `fk_calendar_calendar_core_user_owner`
-    FOREIGN KEY (`ownedBy`)
+    FOREIGN KEY (`ownerId`)
     REFERENCES `core_user` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
 -- Table `calendar_calendar_user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
-    `calendarId` INT UNSIGNED NOT NULL,
+    `id` INT UNSIGNED NOT NULL,
     `userId` INT NOT NULL,
     `isSubscribed` TINYINT(1) NOT NULL DEFAULT 0,
     `isVisible` TINYINT(1) NOT NULL DEFAULT 0,
@@ -39,9 +39,9 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `sortOrder` INT NOT NULL DEFAULT 0,
     `timeZone` VARCHAR(45) NULL,
     `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL,
-    PRIMARY KEY (`calendarId`, `userId`),
+    PRIMARY KEY (`id`, `userId`),
     CONSTRAINT `fk_calendar_calendar_user_calendar_calendar1`
-    FOREIGN KEY (`calendarId`)
+    FOREIGN KEY (`id`)
     REFERENCES `calendar_calendar` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert` (
     INDEX `fk_calendar_default_alert_calendar_calendar1_idx` (`calendarId` ASC, `userId` ASC),
     CONSTRAINT `fk_calendar_default_alert_calendar_calendar1`
         FOREIGN KEY (`calendarId`, `userId`)
-        REFERENCES `calendar_calendar_user` (`calendarId` , `userId`)
+        REFERENCES `calendar_calendar_user` (`id` , `userId`)
         ON DELETE CASCADE
         ON UPDATE CASCADE)
     ENGINE = InnoDB;
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
   INDEX `fk_calendar_default_alert_with_time_calendar_calendar1_idx` (`calendarId` ASC, `userId` ASC),
   CONSTRAINT `fk_calendar_default_alert_with_time_calendar_calendar1`
     FOREIGN KEY (`calendarId` , `userId`)
-    REFERENCES `calendar_calendar_user` (`calendarId` , `userId`)
+    REFERENCES `calendar_calendar_user` (`id` , `userId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
     ENGINE = InnoDB;
@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `locale` VARCHAR(6) NULL,
     `showWithoutTime` TINYINT(1) NOT NULL DEFAULT 0,
     `start` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
+		`end` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
     `timeZone` VARCHAR(45) NULL,
     `duration` VARCHAR(32) NOT NULL,
     `priority` TINYINT UNSIGNED NOT NULL DEFAULT 0,
@@ -115,19 +116,18 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `createdBy` INT NULL,
     `modifiedBy` INT NULL,
     `isOrigin` TINYINT(1) NOT NULL DEFAULT 1,
+	  `requestStatus` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_calendar_event_core_user1_idx` (`createdBy` ASC),
     INDEX `fk_calendar_event_core_user2_idx` (`modifiedBy` ASC),
     CONSTRAINT `fk_calendar_event_core_user1`
     FOREIGN KEY (`createdBy`)
     REFERENCES `core_user` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE SET NULL,
     CONSTRAINT `fk_calendar_event_core_user2`
     FOREIGN KEY (`modifiedBy`)
     REFERENCES `core_user` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE SET NULL)
     ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
@@ -159,10 +159,12 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
     `email` VARCHAR(45) NOT NULL,
     `kind` ENUM('individual', 'group', 'location', 'resource') NOT NULL,
     `rolesMask` INT NOT NULL DEFAULT 0,
+	  `language` VARCHAR(20),
     `participationStatus` ENUM('needs-action', 'tentative', 'accepted', 'declined', 'delegated') NULL DEFAULT 'needs-action',
-    `schedulePriority` INT NULL,
+    `scheduleAgent` ENUM('server', 'client', 'none') DEFAULT 'server',
     `expectReply` TINYINT(1) NOT NULL DEFAULT 0,
     `scheduleUpdated` TIMESTAMP NULL,
+		`scheduleStatus` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`, `eventId`),
     INDEX `fk_participant_calendar_event1_idx` (`eventId` ASC),
     CONSTRAINT `fk_participant_calendar_event1`
@@ -177,19 +179,19 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
 -- Table `calendar_event_user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_event_user` (
-     `eventId` INT UNSIGNED NOT NULL,
+     `id` INT UNSIGNED NOT NULL,
      `userId` INT NOT NULL,
      `freeBusyStatus` ENUM('free', 'busy') NULL DEFAULT 'busy',
     `color` VARCHAR(21) NULL DEFAULT NULL,
     `useDefaultAlerts` TINYINT(1) NULL DEFAULT 1,
     `veventBlobId` BINARY(40) NULL,
     `modSeq` INT NOT NULL DEFAULT 0,
-    PRIMARY KEY (`eventId`, `userId`),
-    INDEX `fk_calendar_event_user_calendar_event1_idx` (`eventId` ASC),
+    PRIMARY KEY (`id`, `userId`),
+    INDEX `fk_calendar_event_user_calendar_event1_idx` (`id` ASC),
     INDEX `fk_calendar_event_user_core_user1_idx` (`userId` ASC),
     INDEX `fk_calendar_event_user_core_blob1_idx` (`veventBlobId` ASC),
     CONSTRAINT `fk_calendar_event_user_calendar_event1`
-    FOREIGN KEY (`eventId`)
+    FOREIGN KEY (`id`)
     REFERENCES `calendar_event` (`id`)
     ON DELETE NO ACTION,
     CONSTRAINT `fk_calendar_event_user_core_user1`
@@ -218,7 +220,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
     INDEX `fk_calendar_event_alert_calendar_event_user1_idx` (`eventId` ASC, `userId` ASC),
     CONSTRAINT `fk_calendar_event_alert_calendar_event_user1`
     FOREIGN KEY (`eventId` , `userId`)
-    REFERENCES `calendar_event_user` (`eventId` , `userId`)
+    REFERENCES `calendar_event_user` (`id` , `userId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;

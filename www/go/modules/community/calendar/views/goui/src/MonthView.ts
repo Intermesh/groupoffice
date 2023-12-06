@@ -1,5 +1,5 @@
 import {CalendarView} from "./CalendarView.js";
-import {ComponentEventMap, DateTime, ObservableListenerOpts} from "@intermesh/goui";
+import {ComponentEventMap, createComponent, DateTime, ObservableListenerOpts} from "@intermesh/goui";
 import {E} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
@@ -20,28 +20,35 @@ export class MonthView extends CalendarView {
 
 	weekRows: [DateTime, HTMLElement][] = []
 
-	constructor() {
-		super();
+	protected internalRender() {
 		this.makeDraggable(this.el);
+		return super.internalRender();
 	}
 
 	goto(date: DateTime, days?: number) {
 		//this.el.cls('reverse',(day < this.day));
 		this.day = date.setHours(0,0,0, 0);
-		this.start = date.clone();
-
+		this.start = date.clone()
+		const endMonth = this.start.clone();
 		if(days) {
-			this.days = days + this.start.getWeekDay();
-		} else {
-			this.start.setDate(1)
-			this.days = this.day.getDaysInMonth()+this.start.getWeekDay();
-
+			this.start.setWeekDay(0);
+			this.days = days;
+			endMonth.addDays(days);
+		} else { // take full month
+			this.start.setDate(1).setWeekDay(0);
+			endMonth.addMonths(1).setDate(0).setWeekDay(6);
+			this.days = this.start.diffInDays(endMonth);
 		}
-		this.start.setWeekDay(0);
-		this.viewModel = [];
 
-		this.renderView();
-		this.populateViewModel();
+
+
+		Object.assign(this.store.queryParams.filter ||= {}, {
+			after: this.start.format('Y-m-d'),
+			before: endMonth.format('Y-m-d')
+		});
+
+		this.store.load()
+
 		//this.dom.cls('+loading');
 		//this.store.filter('date', {after: day.format('Y-m-dT00:00:00'), before: end.format('Y-m-dT00:00:00')}).fetch(0,500);
 	}
@@ -80,7 +87,8 @@ export class MonthView extends CalendarView {
 
 			ev.save( () => {
 				//clean
-				this.viewModel.shift();
+				const i = this.viewModel.indexOf(ev)
+				this.viewModel.splice(i, 1);
 				this.updateItems();
 			});
 		};
@@ -105,15 +113,15 @@ export class MonthView extends CalendarView {
 				anchor = from = till = day;
 				action = create;
 				el.on('mousemove', mouseMove);
+				window.addEventListener('mouseup', mouseUp);
 			}
 			const event = e.target.up('div[data-key]');
 			if(event) {
 				ev = this.viewModel.find(m => m.key == event.dataset.key)!;
 				action = move;
 				el.on('mousemove', mouseMove);
+				window.addEventListener('mouseup', mouseUp);
 			}
-
-			window.addEventListener('mouseup', mouseUp);
 		});
 	}
 
@@ -127,16 +135,17 @@ export class MonthView extends CalendarView {
 	protected populateViewModel() {
 		this.clear()
 		const viewEnd = this.start.clone().addDays(this.days);
-		console.log(this.start, viewEnd, this.days);
+		//console.log(this.start, viewEnd, this.days);
 		for (const e of this.store.items) {
 			this.viewModel.push(...CalendarItem.makeItems(e, this.start, viewEnd));
 		}
-		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
-		console.log(this.viewModel);
+		//this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
+		//console.log(this.viewModel);
 		this.updateItems()
 	}
 
 	renderView() {
+		this.viewModel = [];
 		this.el.innerHTML = ''; //clear
 		let it = 0, i =0;
 		let now = new DateTime(),
@@ -152,12 +161,12 @@ export class MonthView extends CalendarView {
 		while (it < this.days) {
 			const weekStart = day.clone(),
 				eventContainer = E('li',...this.drawWeek(weekStart)).cls('events'),
-				row = E('ol',
-					E('li',day.getWeekOfYear()).cls('weeknb').on('click',e => this.fire('selectweek', this, weekStart)),
-					eventContainer
-				);
+				row = E('ol',eventContainer);
 			for (i = 0; i < 7; i++) {
 				row.append(E('li',
+					i==0 ? E('sub',day.getWeekOfYear()).cls('weeknb')
+						.on('click',e => this.fire('selectweek', this, weekStart))
+						.on('mousedown',e=>e.stopPropagation()):'',
 					E('em',day.format(day.getDate() === 1 ? 'j M' : 'j'))
 				).attr('data-date', day.format('Y-m-d'))
 				 .cls('today', day.format('Ymd') === now.format('Ymd'))
@@ -175,6 +184,7 @@ export class MonthView extends CalendarView {
 	private updateItems() {
 		this.continues = [];
 		this.iterator = 0;
+		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		for(const [ws, container] of this.weekRows) {
 			container.append(...this.drawWeek(ws));
 		}

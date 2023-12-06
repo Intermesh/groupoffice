@@ -8,9 +8,11 @@
 namespace go\modules\community\calendar\model;
 
 use go\core\acl\model\AclItemEntity;
+use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
@@ -41,10 +43,11 @@ class CalendarEvent extends AclItemEntity {
 	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
 		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
 
-	const EventProperties = ['uid','isOrigin', 'prodId', 'sequence','title','description','locale', 'showWithoutTime', 'start',
-		'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt','createdBy','modifiedBy'];
+	const EventProperties = ['uid','isOrigin', 'prodId', 'sequence','title','description','locale', 'showWithoutTime',
+		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
+		'createdBy','modifiedBy', 'lastOccurrence'];
 
-	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts','veventBlobId'];
+	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
 
 	// If any of this properties is in the recurrenceOverrides the Object most be ignored
 	const IgnoredPropertiesInException = [
@@ -52,6 +55,8 @@ class CalendarEvent extends AclItemEntity {
 		'recurrenceId', 'recurrenceOverrides','recurrenceRule',
 		'relatedTo','replyTo','sentBy','timeZones'];
 
+
+	static $sendSchedulingMessages = false;
 
 	public $calendarId;
 	public $eventId;
@@ -61,7 +66,11 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public $isOrigin;
 
+	/**
+	 * @var string status is set after a scheduling action like sending a REPLY iTip to the organizer
+	 */
 	public $responseStatus;
+
 	public $role;
 	public $email;
 
@@ -96,11 +105,12 @@ class CalendarEvent extends AclItemEntity {
 	 * @var DateTime
 	 */
 	public $start;
+	protected $end; // cached to query later
 
 	/**
 	 * The duration of the event (or the occurence)
 	 * (optional, default: PT0S)
-	 * @var \DateInterval
+	 * @var string
 	 */
 	public $duration;
 
@@ -161,6 +171,7 @@ class CalendarEvent extends AclItemEntity {
 	public $modifiedBy;
 	public $createdBy;
 
+	/** The end time of the last occurrence in the series. or end time if not recurring */
 	protected $lastOccurrence;
 
 	public static function customFieldsTableName(): string
@@ -172,12 +183,29 @@ class CalendarEvent extends AclItemEntity {
 		return parent::defineMapping()
 			->addTable('calendar_calendar_event', 'cce', ['id' => 'eventId'], ['id', 'calendarId'])
 			->addTable('calendar_event', "eventdata", ['eventId' => 'id'], self::EventProperties)
-			->addUserTable('calendar_event_user', 'eventuser', ['id' => 'eventId'],self::UserProperties, [], true)
+			->addUserTable('calendar_event_user', 'eventuser', ['id' => 'id'],self::UserProperties, [], true)
 			//->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
 			->addMap('participants', Participant::class, ['id' => 'eventId'])
 			->addMap('recurrenceOverrides', RecurrenceOverride::class, ['id'=>'fk'])
 			->addMap('alerts', Alert::class, ['id' => 'eventId']);
 			//->addMap('locations', Location::class, ['id' => 'eventId']);
+	}
+	protected static function defineFilters(): Filters
+	{
+		return parent::defineFilters()->add('inCalendars', function(Criteria $criteria, $value, Query $query) {
+				if($value === 'subscribedOnly') {
+					$query->join('calendar_calendar_user', 'ucal', 'ucal.id = cce.calendarId AND ucal.userId = '.go()->getAuthState()->getUserId())
+						->where('ucal.isSubscribed','=', true);
+				} else if(!empty($value)) {
+					$query->andWhere('cce.calendarId', 'IN', $value);
+				}
+			}, 'subscribedOnly')
+			->addDate('after', function(Criteria $crit, $comparator, $value) {
+				$crit->where((new Criteria())->where('lastOccurrence', '>', $value)->orWhere('lastOccurrence', 'IS', null));
+			})
+			->addDate('before', function(Criteria $crit, $comparator, $value) {
+				$crit->where('start', '<', $value);
+			});
 	}
 
 	public function currentUserParticipant(): Participant {
@@ -214,13 +242,15 @@ class CalendarEvent extends AclItemEntity {
 			$this->attachBlob($blob->id);
 
 			if(!$this->isNew()) {
+				$this->veventBlobId = $blob->id;
+				$this->save();
 				// save the blobId without updating the state (this property is not part of the spec
-				$stmt = go()->getDbConnection()->update('calendar_event_user',
-					['veventBlobId'=>$blob->id,'modifiedAt'=>$blob->modifiedAt],
-					(new Query)
-						->join('calendar_calendar_event', 'cce', 'cce.eventId = t.eventId')
-						->where(['userId' => go()->getUserId(), 'id' => $this->id]));
-				$stmt->execute();
+//				$stmt = go()->getDbConnection()->update('calendar_event_user',
+//					['veventBlobId'=>$blob->id, 'modifiedAt'=>$blob->modifiedAt],
+//					(new Query)
+//						->join('calendar_calendar_event', 'cce', 'cce.eventId = t.id')
+//						->where(['userId' => go()->getUserId(), 'cce.id' => $this->id]));
+//				$stmt->execute();
 			}
 		}
 		return $blob;
@@ -281,31 +311,40 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function start($withoutTime = false) {
-		return new \DateTime($this->start->format("Y-m-d". $withoutTime?:" H:i:s"), $this->timeZone());
+		return new \DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
 	}
 
 	public function end($withoutTime = false) {
 
-		$end = new DateTime($this->start->format("Y-m-d". $withoutTime?:" H:i:s"),$this->timeZone()) ;
+		$end = new DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")),$this->timeZone()) ;
 		$end->add(new \DateInterval($this->duration));
 		return $end;
 	}
 
-	/**
-	 * @todo analyze rowCount performance
-	 * @return bool
-	 */
-	public function hasAlarms() {
-		return $this->alarms->getRowCount() > 0;
-	}
-
-
-	public function addAlarms($alarms) {
-		$alarms = (array)$alarms;
-
-		foreach($alarms as $alarm) {
-			$alarm->addTo($this);
+	public function humanReadableDate() {
+		$start = $this->start;
+		$end = $this->end();
+		$oneDay = $start->format('Ymd') === $end->format('Ymd');
+		$line1 = go()->t($oneDay ? 'At' : 'From') .' '.
+			go()->t($start->format('l')).
+			$start->format(' j ') . go()->t('full_months')[$start->format('m')].
+			$start->format(' Y');
+		if(!$oneDay) {
+			if(!$this->showWithoutTime)
+				$line1.= ', '.$start->format('H:i');
+			$line1 .= ' ' . go()->t('until');
 		}
+		if($oneDay) {
+			$line2 = $start->format('H:i').' - '.$end->format('H:i');
+		} else {
+			$line2 = go()->t($end->format('l')).
+				$end->format(' j ') . go()->t('full_months')[$end->format('m')].
+				$end->format(' Y');
+			if(!$this->showWithoutTime) {
+				$line2.= ', '.$end->format('H:i');
+			}
+		}
+		return [$line1,$line2];
 	}
 
 	protected function internalSave() : bool {
@@ -314,51 +353,92 @@ class CalendarEvent extends AclItemEntity {
 			$this->uid = UUID::v4();
 		}
 
-		if($this->isRecurring()) {
+		if($this->isNew() || $this->isModified(['start','duration','recurrenceRule'])) {
+			$this->updateLastOccurence();
+		}
 
-			if(isset($this->instance) && !$this->fromHere) {
-				$this->instance->applyPatch($this);
-				return $this->instance->save();
-			} else if(!$this->isFirstInSeries()) {
-				return $this->saveNewSeries();
-			}
-		}
-		if($this->isNew() || $this->isModified('start') || $this->isModified('recurrenceRule')) {
-			$this->findLastOccurence();
-		}
+		$this->resetICalBlob();
 
 		// is modiified, but not calendarId, isDraft or modifiedAt, per-user prop, participants
-		if($this->isModified(self::EventProperties) &&
-			$this->isOrigin &&
-			(!$this->isModified('sequence') || $this->sequence <= $this->getOldValue('sequence'))) {
-			$this->sequence += 1;
+		if($this->isModified(self::EventProperties) && $this->isOrigin) {
+			if(!$this->isModified('sequence') || $this->sequence <= $this->getOldValue('sequence'))
+				$this->sequence += 1;
+		}
+
+		if(self::$sendSchedulingMessages && !empty($this->participants) &&
+			$this->lastOccurrence > new DateTime()) {
+			ICalendarHelper::handleScheduling($this);
 		}
 
 		$success = parent::internalSave();
+
 		if($success) {
 			Calendar::updateHighestModSeq($this->calendarId);
 			if($this->isModified('calendarId')) {
+				// Event is put in a different calendar so update both modseqs
 				Calendar::updateHighestModSeq($this->getOldValue('calendarId'));
 			}
 		}
 		return $success;
-		 // save none recurring or complete series
+	}
+
+	/**
+	 * Only send updates it deemed “essential” to avoid flooding the recipient’s email with changes they do not care about.
+	 * @return boolean
+	 */
+//	private function changeWasEssential() {
+//		if(
+//			($this->lastOccurrence < new DateTime()) ||
+//			(!$this->isOrigin && (!$this->calendarParticipant() || !$this->calendarParticipant->isModified('participantionStatus')))
+//		) {
+//			return false; // dont send schedule messages
+//		}
+//		return true;
+//	}
+
+	private $calendarParticipant = null;
+
+	/**
+	 * The participant in the event that owns the calendar this event is in
+	 * @return false|Participant
+	 */
+	public function calendarParticipant() {
+		if($this->calendarParticipant === null) {
+			$scheduleId = Calendar::find(['id' => $this->calendarId])
+				->join('core_user', 'u', 'calendar_calendar.ownerId = u.id')
+				->selectSingleValue('u.email')->single();
+			foreach ($this->participants as $p) {
+				if ($scheduleId == $p->email) { // todo Use scheduleId when ParticipantIdentity is implemented
+					$found = true;
+					$this->calendarParticipant = $p;
+					break;
+				}
+			}
+			if (!isset($found)) {
+				$this->calendarParticipant = false;
+			}
+		}
+		return $this->calendarParticipant;
+	}
+
+	private function resetICalBlob() {
+		// TODO: if !this.isOrigin we need to keep and update the vevent
+		if(!$this->isNew() && ($this->isModified(self::EventProperties) || $this->isModified(self::UserProperties))) {
+			if(!$this->isModified('veventBlobId')) {
+				$this->veventBlobId = null;
+			}
+		}
 	}
 
 	protected static function internalDelete(Query $q): bool
 	{
-//		if($this->isRecurring()) {
-//			if(isset($this->instance) && !$this->fromHere) {
-//				$this->instance->applyException(); // EXDATE
-//				return $this->instance->save();
-//			}
-//			else if(!$this->isFirstInSeries()) {
-//				$this->recurrenceRule->stopBefore($this->getRecurrenceId());
-//				return $this->recurrenceRule->save();
-//			}
-//		}
-		//TODO: update all calendars highest modseq with id = calendarId of the deleted ids
+		$events = CalendarEvent::find()->mergeWith(clone $q);
+		foreach($events as $event) {
+			ICalendarHelper::handleScheduling($event, true);
+		}
+		//$q->andWhere(['isOrigin' => 1]);
 
+		//$ids = $q->all();
 //		self::$lastDeleteStmt = go()->getDbConnection()->delete('calendar_event_user', (new Query)
 //			->where('userId', '=', go()->getUserId())
 //			->where('eventId', 'in', $q)
@@ -377,58 +457,6 @@ class CalendarEvent extends AclItemEntity {
 		return $success;
 	}
 
-	public function saveFromHere() {
-		$this->fromHere = true;
-		$success = $this->save();
-		$this->fromHere = false;
-		return $success;
-	}
-
-	public function deleteFromHere() {
-		$this->fromHere = true;
-		$success = $this->delete();
-		$this->fromHere = false;
-		return $success;
-	}
-
-	protected function isFirstInSeries() {
-		if($this->isNew() || empty($this->instance)) {
-			return true;
-		}
-		$startAt = $this->isModified('startAt') ? $this->getOldValue('startAt') : $this->startAt;
-		return ($this->instance->recurrenceId == $startAt);
-	}
-
-	/**
-	 * Set the until time of this recurrence rule and create a new event
-	 * with the same recurring rule starting from The occurrence start time
-	 * @todo: if startAt in new series changes the moved exceptions need the same diff
-	 */
-	private function saveNewSeries() {
-		$calendar = Calendar::findById($this->calendarId);
-		$newSeries = $calendar->newEvent();
-		$newSeries->eventId = null;
-		$newSeries->event = $this->event->cloneMe();
-		$newSeries->event->uid = UUID::v4();
-		$newSeries->event->setStartAt($this->instance->recurrenceId);
-		$newSeries->event->setEndAt($this->instance->getEndAt());
-		$rrule = $this->recurrenceRule->toArray();
-		$newSeries->event->setValues(['recurrenceRule'=>$rrule]);
-		$success = $newSeries->save();
-
-		// Reattach instances to new series
-		foreach($this->instances as $instance) {
-			if($instance->recurrenceId < $this->getRecurrenceId()) {
-				continue;
-			}
-			$instance->eventId = $newSeries->id;
-			$success = $success && $instance->save();
-		}
-
-		return $success && $this->deleteFromHere();
-
-	}
-
 	public function isRecurring() {
 		return !empty($this->recurrenceRule); // && !empty($this->recurrenceRule->frequency));
 	}
@@ -437,49 +465,24 @@ class CalendarEvent extends AclItemEntity {
 		return $this->timeZone ? new \DateTimeZone($this->timeZone) : null;
 	}
 
-	private function findLastOccurence() {
+	private function updateLastOccurence() {
 		if($this->isRecurring()) {
 			$this->lastOccurrence = null;
 			$r = $this->getRecurrenceRule();
 			if(isset($r->until)) {
 				$this->lastOccurrence = new DateTime($r->until,$this->timeZone());
 			} else if(isset($r->count)) {
-				$it = ICalendarHelper::makeRecurrenceIterator($r);
+				$it = ICalendarHelper::makeRecurrenceIterator($this);
 				$maxDate = new \DateTime('2038-01-01');
 				while ($it->valid() && $this->lastOccurrence < $maxDate) {
 					$this->lastOccurrence = $it->current(); // will clone :(
 					$it->next();
 				}
 			}
+			$this->lastOccurrence->add(new \DateInterval($this->duration));
 		} else {
 			$this->lastOccurrence = $this->end();
 		}
-	}
-
-	private function sendMeetingRequest($cancel = false, $date = null) {
-		// should we include resources?
-
-		// should we book the resources when the invite is sent?
-
-		if($this->isRecurring()) {
-			$occurence = $this; // find occurence, apply exception if any, then submit
-			$this->submitMeetingRequest($occurence, $cancel);
-		} else {
-			$this->submitMeetingRequest($this, $cancel);
-		}
-	}
-
-	private function submitMeetingRequest($event, $cancel){
-		$ical = ICalendarHelper::toVObject($this);
-
-
-		go()->getMailer()->compose()
-			->setFrom($this->organizer->email, $this->organizer->name)
-			->addTo($this->participants)
-			->setSubject(go()->t("Cancellation",'community', "calendar").': '.$this->name)
-			->setSender(go()->getSettings()->systemEmail)
-			->attach($ical->makeAttachment())
-			->send();
 	}
 
 

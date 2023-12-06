@@ -1,6 +1,7 @@
 import {CalendarView} from "./CalendarView.js";
-import {DateTime, E, t} from "@intermesh/goui";
+import {DataSourceStore, DateTime, E, t} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
+import {JmapDataSource} from "@intermesh/groupoffice-core";
 
 class CalendarDayItem extends CalendarItem {
 	pos!: number
@@ -14,12 +15,11 @@ export class WeekView extends CalendarView {
 	dayCols: {[dayStartYMD:string]: HTMLElement} = {}
 	dayItems : CalendarDayItem[] = []
 	alldayCtr!: HTMLElement
+	baseCls = 'cal week';
 
-	constructor() {
-		super();
+	protected internalRender() {
 		this.makeDraggable();
 		this.el.tabIndex = 0;
-		this.el.cls('cal week');
 		this.el.on('keydown', (e: KeyboardEvent) => {
 			if(e.key == 'Delete') {
 				this.selected.forEach(item => {
@@ -32,20 +32,30 @@ export class WeekView extends CalendarView {
 				this.updateItems();
 			}
 		});
+
+		return super.internalRender();
 	}
 
 	goto(day: DateTime, amount: number) {
 		if(!day) {
 			day = new DateTime();
 		}
-		if(day.format('Ymd') === this.day.format('Ymd') && this.days === amount)
+		if(day.format('Ymd') === this.day.format('Ymd') && this.days === amount) {
+			this.update();
 			return;
+		}
 
 		this.days = amount;
 		this.day = day.setHours(0,0,0,0);
-		this.renderView();
-		// TODO : load store instead.
-		this.populateViewModel();
+		const startWeek = this.day.setWeekDay(0),
+			endWeek = startWeek.clone().addDays(7);
+
+		Object.assign(this.store.queryParams.filter ||= {}, {
+			after: startWeek.format('Y-m-d'),
+			before: endWeek.format('Y-m-d')
+		});
+
+		this.store.load();
 		//this.store.filter('date', {after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00')}).fetch(0,500);
 
 
@@ -192,8 +202,6 @@ export class WeekView extends CalendarView {
 		this.updateItems();
 	}
 
-
-
 	renderView() {
 		this.el.innerHTML = ''; // clear
 		let now = new DateTime(),
@@ -209,7 +217,7 @@ export class WeekView extends CalendarView {
 		this.dayCols = {};
 		for (var i = 0; i < this.days; i++) {
 
-			heads.push(E('li',day.format('l'),E('em',day.getDate()))
+			heads.push(E('li',E('em',day.getDate()), day.format('l'))
 				.cls('past', day.format('Ymd') < now.format('Ymd'))
 				.cls('today', day.format('Ymd') === now.format('Ymd'))
 			);
@@ -237,6 +245,7 @@ export class WeekView extends CalendarView {
 	}
 
 	private updateFullDayItems() {
+
 		this.slots = {0:{},1:{},2:{},3:{},4:{},5:{},6:{}};
 		this.alldayCtr.prepend(...this.viewModel.map(e =>
 			super.eventHtml(e).css(this.makestyle(e, this.day))

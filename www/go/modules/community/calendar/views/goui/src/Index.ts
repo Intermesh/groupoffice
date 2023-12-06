@@ -1,7 +1,7 @@
 import {jmapds, modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
-import {datasourcestore, t} from "@intermesh/goui";
+import {datasourcestore, t, translate} from "@intermesh/goui";
 
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
@@ -14,6 +14,8 @@ modules.register(  {
 	package: "community",
 	name: "calendar",
 	init () {
+
+		translate.load(GO.lang.community.calendar, "community", "calendar");
 
 		modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => {
 			let ui = new Main();

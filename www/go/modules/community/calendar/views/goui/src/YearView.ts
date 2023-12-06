@@ -1,16 +1,24 @@
 import {CalendarView} from "./CalendarView.js";
-import {DateTime, E} from "@intermesh/goui";
-import {calendarStore} from "./Index.js";
-import {Main} from "./Main.js";
+import {ComponentEventMap, DateTime, E, ObservableListenerOpts} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 
+export interface YearViewEventMap<Type> extends ComponentEventMap<Type> {
+
+	weekclick: (me: Type, week: any) => void
+	monthclick: (me: Type, month: any) => void
+	dayclick: (me: Type, day: any) => void
+
+}
+
+
+export interface YearView extends CalendarView {
+	on<K extends keyof YearViewEventMap<this>>(eventName: K, listener: Partial<YearViewEventMap<this>>[K], options?: ObservableListenerOpts): void;
+	fire<K extends keyof YearViewEventMap<this>>(eventName: K, ...args: Parameters<YearViewEventMap<any>[K]>): boolean
+}
+
 export class YearView extends CalendarView {
-	main: Main
-	constructor(main: Main) {
-		super();
-		this.main = main;
-		this.cls = 'yearview';
-	}
+
+	baseCls = 'yearview'
 
 	protected populateViewModel() {
 		this.clear()
@@ -43,7 +51,7 @@ export class YearView extends CalendarView {
 			caption = E('caption', DateTime.monthNames[m-1])
 				.cls('current', day.format('mY') == now.format('mY'))
 				.attr('data-month', m)
-				.on('click', ev => this.main.goto(day).setSpan('month', 31));
+				.on('click', ev =>  this.fire('monthclick', this, day) );
 
 		const header = E('tr',E('td'));
 		for(let i=0;i < 7;i++) {
@@ -57,7 +65,7 @@ export class YearView extends CalendarView {
 				const weekDay = day.clone();
 				row = E('tr',
 					E('td', weekDay.getWeekOfYear()).cls('weeknb').on('click', ev => {
-						this.main.goto(weekDay).setSpan('week', 7);
+						this.fire('weekclick', this, weekDay);
 					})
 				);
 				rows.push(row);

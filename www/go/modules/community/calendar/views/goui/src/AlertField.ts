@@ -38,18 +38,28 @@ export class AlertField extends SelectField {
 
 	get value() {
 		const v = super.value;
-		return (v && v !=='default') ? {1:{trigger:{offset:v}}} : {};
+		return (v && v !== 'default') ? {1:{trigger:{offset:v}}} : {};
 	}
 
 	set value(v: {[id:string]:Alert}) {
-		super.value = (v && v[1].trigger) ? v[1].trigger.offset : v;
+		if(!v) {
+			super.value = v;
+			return;
+		}
+		const firstKey = Object.keys(v)[0];
+		if(v[firstKey]) {
+			super.value = (v && v[firstKey].trigger) ? v[firstKey].trigger.offset : v;
+		}
 	}
 
-	setDefaultLabel(alert?: {[id:string]:Alert}) {
+	setDefaultLabel(alerts?: {[id:string]:Alert}) {
 		var txt = t('None');
-		if (alert && alert[1]) {
-			const duration = this.parseDuration(alert[1].trigger.offset);
-			txt = this.durationToText(duration);
+		if (alerts) {
+			const firstKey = Object.keys(alerts)[0];
+			if(alerts[firstKey]) {
+				const duration = this.parseDuration(alerts[firstKey].trigger.offset);
+				txt = this.durationToText(duration);
+			}
 		}
 		this.input!.options[1].innerText = t('Default') + ' ('+txt+')';
 	}

@@ -49,6 +49,12 @@ class RecurrenceOverride extends Property
 		$this->props->$name = $val;
 		$this->patch = json_encode($this->props);
 	}
+
+	public function __isset($name)
+	{
+		return isset($this->props->$name);
+	}
+
 	public function &__get($name) {
 		//$this->initProps();
 		return $this->props->$name;

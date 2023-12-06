@@ -28,12 +28,12 @@ class Participant extends Property
 
 	/* Roles */
 	const ValidRoles = [
-		'owner', // REQ-PARTICIPANT + ORGANIZER
-		'attendee', // REQ-PARTICIPANT
-		'optional', // OPT-PARTICIPANT
-		'informational', // NON-PARTICIPANT
-		'chair', // CHAIR
-		'contact'
+		'owner'=>0, // REQ-PARTICIPANT + ORGANIZER
+		'attendee'=>1, // REQ-PARTICIPANT
+		'optional'=>2, // OPT-PARTICIPANT
+		'informational'=>3, // NON-PARTICIPANT
+		'chair'=>4, // CHAIR
+		'contact'=>5
 	];
 
 	protected $id;
@@ -58,8 +58,8 @@ class Participant extends Property
 	/** @var string What kind of entity this participant is: 'individuel', 'group', 'location', 'resource */
 	public $kind;
 
-	/** @var array string[bool] 'owner','attendee','optional','informational','chair','contact' */
-	public $roles;
+	/** @var int mask to be converted to string[bool] 'owner','attendee','optional','informational','chair','contact' */
+	protected $rolesMask;
 
 	/** @var string An id from the CalendarObject its `locations` array Where this participant is expected to be attending */
 	//public $locationId;
@@ -76,8 +76,8 @@ class Participant extends Property
 	/** @var bool true if organizer is expecting the participant to notify them of their participation status. */
 	public $expectReply;
 
-	/** @var string is the client, server or none responsible for sending imip invites */
-	//public $scheduleAgent = 'server';
+	/** @var string is the 'client', 'server' or 'none' responsible for sending imip invites */
+	public $scheduleAgent;
 
 	/** @var int The sequence number of the last response from the participant.  */
 	public $scheduleSequence = 0;
@@ -87,6 +87,9 @@ class Participant extends Property
 
 	/** @var DateTime The timestamp for the most recent response from this participant. */
 	public $scheduleUpdated;
+
+	/** @var string The requestStatus received when the participant sends an REPLY iTip */
+	public $scheduleStatus;
 
 	/** @var string The participant id of the participant who invited this one, if known */
 	public $invitedBy;
@@ -108,7 +111,51 @@ class Participant extends Property
 	}
 
 	public function getRoles() {
-		$owner = $this->calendarId == $this->owner->calendarId;
-		return [];
+		$roles = [];
+		foreach (self::ValidRoles as $item => $bitPosition) {
+			// Check if the bit at the current position is set to 1
+			if (($this->rolesMask & (1 << $bitPosition)) !== 0) {
+				// Set the corresponding item to true in the decoded array
+				$roles[$item] = true;
+			}
+		}
+		return $roles;
+	}
+
+	/**
+	 * A client may set the property on a participant to true to request that the server send a scheduling message to
+	 * the participant when it would not normally do so (e.g., if no significant change is made the object or the
+	 * scheduleAgent is set to client). The property MUST NOT be stored in the JSCalendar object on the server or appear
+	 * in a scheduling message.
+	 */
+	public function setScheduleForceSend($val) {
+		$this->_sendTheSchedulingMessageAnyway = $val;
+	}
+
+	public function isOwner() {
+		return $this->hasRole('owner');
+	}
+
+	public function hasRole($name) {
+		$bitPosition = self::ValidRoles[$name];
+		return ($this->rolesMask & (1 << $bitPosition)) !== 0;
+	}
+
+	public function setRoles($roles) {
+		if(empty($roles)) {
+			$this->rolesMask = 0;
+			return;
+		}
+		foreach ($roles as $item => $value) {
+			if ($value === true) {
+				// Set the corresponding bit to 1
+				$this->rolesMask |= (1 << self::ValidRoles[$item]);
+			} elseif ($value === null) {
+				// Clear the corresponding bit to 0
+				$this->rolesMask &= ~(1 << self::ValidRoles[$item]);
+			}
+			// If the item is not in the input array, leave the bit unchanged
+		}
+
 	}
 }

@@ -1,12 +1,13 @@
 import {
-	colorfield,
+	btn,
+	colorfield, ComboBox, combobox,
 	comp,
 	hr,
 	radio,
 	t,
 	textfield,
 } from "@intermesh/goui";
-import {FormWindow} from "@intermesh/groupoffice-core";
+import {FormWindow, jmapds} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 
 export class CalendarDialog extends FormWindow {
@@ -18,6 +19,11 @@ export class CalendarDialog extends FormWindow {
 		this.width = 400;
 		this.height = 550;
 
+		const unsubscribeBtn = btn({text:t('Unsubscribe'), handler:()=> {
+        this.form.dataSource.update(this.currentId!, {isSubscribed:false});
+        this.close();
+     }});
+
 		this.generalTab.items.add(
 			comp({cls:'flow'},
 				textfield({name: 'name', label: t('Name'), flex:1}),
@@ -27,7 +33,11 @@ export class CalendarDialog extends FormWindow {
 					{text:t('Personal'), value: 'personal'},
 					{text:t('Shared'), value: 'shared'}
 				]}),
-				textfield({name: 'ownerId', flex:'1 0', label: t('Owner')}),
+				combobox({
+					dataSource: jmapds("User"), displayProperty: 'displayName',
+					label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0'
+				}),
+				//selectuser({name: 'ownerId', flex:'1 0', label: t('Owner')}),
 				hr(),
 				comp({tagName:'h3',flex:'1 0 100%',text:t('Default notifications') }),
 				alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events (with time)')}),
@@ -60,8 +70,13 @@ export class CalendarDialog extends FormWindow {
 			// 	comp({width: 15,'text': 'at'}),
 			// 	textfield({width: 80, name:'time', value: '09:00'})
 			// )
+				unsubscribeBtn
 			),
 		);
+
+		this.form.on('load', (me, data) => {
+			unsubscribeBtn.hidden = !data.id;
+		})
 
 		this.addSharePanel([
 			{value: "",name: ""},

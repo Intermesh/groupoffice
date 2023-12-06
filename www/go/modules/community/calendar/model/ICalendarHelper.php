@@ -7,11 +7,17 @@
 namespace go\modules\community\calendar\model;
 
 use go\core\fs\Blob;
+use go\core\mail\Address;
+use go\core\mail\Attachment;
+use go\core\model\Acl;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use Sabre\VObject;
+use Sabre\VObject\Component\VCalendar;
 
 class ICalendarHelper {
+
+	const PROD = '-//Intermesh//NONSGML GroupOffice 68//EN';
 
 	static $privacyMap = [
 		'public' => 'PUBLIC',
@@ -29,37 +35,57 @@ class ICalendarHelper {
 	/**
 	 * Parse an Event object to a VObject
 	 * @param Event $event
-	 * @param VObject\Component\VCalendar $vcalendar The original vcalendar to sync to
+	 * @param VCalendar $vcalendar The original vcalendar to sync to
 	 */
 	static function toVObject(CalendarEvent $event, $vcalendar = null) {
 
 		if($vcalendar === null) {
-			$vcalendar = new VObject\Component\VCalendar([
-				'PRODID' => '-//Intermesh//NONSGML GroupOffice '.go()->getVersion().'//EN',
+			$vcalendar = new VCalendar([
+				'PRODID' => self::PROD,
 			]);
 		}
 
-		$vcalendar->add('VEVENT', self::toVEvent($event));
+		$vevent = $vcalendar->add('VEVENT', self::toVEvent($event));
+		if($event->showWithoutTime) {
+			$vevent->DTSTART['VALUE'] = 'DATE';
+			$vevent->DTEND['VALUE'] = 'DATE';
+		}
 
 		if($event->participants) {
 			foreach ($event->participants as $participant) {
-				$vcalendar->VEVENT->add(...self::toAttendee($participant));
+				$vevent->add(...self::toAttendee($participant));
 			}
 		}
-		//@todo: VALARMS depend on who fetched the event. Need to be implemented when caldav is build
-		//@todo: ATTACHMENT Files
+
+		if(!$event->useDefaultAlerts && is_array($event->alarms)) {
+			foreach($event->alarms as $id => $alarm) {
+				$vevent->add('VALARM', [
+					'TRIGGER' => $alarm->offset, // 15 minutes before the event
+					'DESCRIPTION' => 'Alarm',
+					'ACTION' => 'DISPLAY',
+				]);
+			}
+		}
+		//@todo: ATTACHMENT Files?
 
 		if($event->isRecurring()) {
-			$vcalendar->VEVENT->RRULE = self::toRrule($event);
-			$exceptions = $event->getRecurrenceOverrides();
-			if(!empty($exceptions)) {
-				foreach ($exceptions as $recurrenceId => $patch) {
-					if (!empty($patch->excluded)) {
-						$vcalendar->VEVENT->add('EXDATE', $recurrenceId);
+			$vevent->RRULE = self::toRrule($event);
+			if(!empty($event->recurrenceOverrides)) {
+				foreach ($event->recurrenceOverrides as $recurrenceId => $patch) {
+					if (isset($patch->excluded)) {
+						$exdate = $vevent->add('EXDATE', new DateTime($recurrenceId, $event->timeZone()));
+						if($event->showWithoutTime)
+							$exdate['VALUE'] = 'DATE';
 					} else {
-						$props = self::toVEvent($patch);
+						$props = self::toVEvent((new CalendarEvent())->setValues($patch->toArray()), true);
 						$props['UID'] = $event->uid;
+						$props['RECURRENCE-ID'] = new DateTime($recurrenceId, $event->timeZone());
 						$vcalendar->add('VEVENT', $props);
+						if($event->showWithoutTime) {
+							$vevent->{'RECURRENCE-ID'}['VALUE'] = 'DATE';
+							if(isset($props['DTSTART'])) $vevent->DTSTART['VALUE'] = 'DATE';
+							if(isset($props['DTEND'])) $vevent->DTEND['VALUE'] = 'DATE';
+						}
 					}
 				}
 			}
@@ -68,13 +94,29 @@ class ICalendarHelper {
 		return $vcalendar;
 	}
 
-	static function toVEvent($event) {
+	private static function toInvite($method, $event, $occurrence) {
+		$c = new VCalendar([
+			'PRODID' => '-//Intermesh//NONSGML GroupOffice '.go()->getVersion().'//EN',
+			'METHOD' => $method
+		]);
+		$c->add('VEVENT', self::toVEvent($event));
+		return $c;
+	}
+
+	/**
+	 * @param CalendarEvent $event
+	 * @return array
+	 */
+	static function toVEvent($event, $isException=false) {
 		$props = [];
-		if(!empty($event->uid)) $props['UID'] = $event->uid;
+		if(!$isException) {
+			if(!empty($event->privacy) && $event->privacy !== 'public') $props['CLASS'] = self::$privacyMap[$event->privacy];
+			if(!empty($event->status)) $props['STATUS'] = strtoupper($event->status);
+			if(!empty($event->uid)) $props['UID'] = $event->uid;
+			if(!empty($event->modifiedAt)) $props['LAST-MODIFIED'] = $event->modifiedAt; // @todo: check if datetime must be UTC
+			if(!empty($event->createdAt)) $props['DTSTAMP'] = $event->createdAt;
+		}
 		if(!empty($event->title)) $props['SUMMARY'] = $event->title;
-		if(!empty($event->status)) $props['STATUS'] = strtoupper($event->status);
-		if(!empty($event->modifiedAt)) $props['LAST-MODIFIED'] = $event->modifiedAt; // @todo: check if datetime must be UTC
-		if(!empty($event->createdAt)) $props['DTSTAMP'] = $event->createdAt;
 		if(!empty($event->start)) $props['DTSTART'] = $event->start($event->showWithoutTime);
 		if(!empty($event->duration)) $props['DTEND'] = $event->end($event->showWithoutTime);
 		// Sequence is for updates on the event its used for ITIP
@@ -82,7 +124,6 @@ class ICalendarHelper {
 		if(!empty($event->description)) $props['DESCRIPTION'] = $event->description;
 		if(!empty($event->location)) $props['LOCATION'] = $event->location;
 		//empty($event->tag) ?: $vcalendar->VEVENT->CATEGORIES = $event->tag;
-		if(!empty($event->privacy) && $event->privacy !== 'public') $props['CLASS'] = self::$privacyMap[$event->privacy];
 
 
 		return $props;
@@ -90,17 +131,21 @@ class ICalendarHelper {
 
 	static function toAttendee(Participant $participant) {
 		$attr = ['CN' => $participant->name];
-		($participant->participationStatus === 'needs-action') ?: $attr['PARTSTAT'] = strtoupper($participant->participationStatus);
-		if ($participant->expectReply) $attr['RSVP'] = 'TRUE';
-		foreach ($participant->roles as $role) {
+		if($participant->participationStatus !== 'needs-action') {
+			$attr['PARTSTAT'] = strtoupper($participant->participationStatus);
+		}
+		if($participant->expectReply) {
+			$attr['RSVP'] = 'TRUE';
+		}
+		foreach ($participant->getRoles() as $role => $true) {
 			if (in_array($role, self::$roleMap)) {
 				$attr['ROLE'] = self::$roleMap[$role];
 				break;
 			}
 		}
 		return [
-			$participant->roles['owner'] ? 'ORGANIZER' : 'ATTENDEE',
-			$participant->email,
+			!empty($participant->roles['owner']) ? 'ORGANIZER' : 'ATTENDEE',
+			'mailto:'.$participant->email,
 			$attr
 		];
 	}
@@ -165,20 +210,21 @@ class ICalendarHelper {
 	//	$vCalendar = VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING);
 		$splitter = new VObject\Splitter\ICalendar(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 		if($vevent = $splitter->getNext())
-			return self::fromVObject($vevent, $event);
+			return self::parseVObject($vevent, $event);
 		return false;
 	}
 
 	/**
 	 * Parse a VObject to an Event object
-	 * @param VObject\Component\VCalendar $vcalendar
+	 * @param VCalendar $vcalendar
 	 * @param int $calendarId
 	 * @param CalendarEvent $event the event to insert the data into
 	 * @return CalendarEvent updated or new Event if not found
 	 */
-	static public function fromVObject($vcalendar, $event) {
+	static public function parseVObject(VCalendar $vcalendar, CalendarEvent $event) {
 
 		$exceptions = [];
+		$baseEvents = [];
 
 		foreach($vcalendar->VEVENT as $vevent) {
 			if(!empty($vevent->{'RECURRENCE-ID'})) {
@@ -192,6 +238,7 @@ class ICalendarHelper {
 			// if(!$event->isNew && $event->blobId) // merge vevent into current blob
 
 			$event = self::parseOccurrence($vevent,$event); // title, description, start, duration, location, status, privacy
+			$baseEvents[$event->uid] = $event;
 			if(!$vevent->DTSTART->isFloating())
 				$event->timeZone = $event->start->getTimezone()->getName();
 			if($event->isNew())
@@ -203,13 +250,13 @@ class ICalendarHelper {
 			$event->privacy = array_flip(self::$privacyMap)[$vevent->CLASS] ?? 'public';
 			//$event->organizerEmail = str_replace('mailto:', '',(string)$vevent->ORGANIZER);
 			if(isset($vevent->ORGANIZER)) {
-				$organizer = self::parseAttendee($vevent->ORGANIZER);
-				$organizer->roles['owner'] = true;
+				$organizer = self::parseAttendee(new Participant($event), $vevent->ORGANIZER);
+				$organizer->setRoles(['owner' => true]);
 				$event->participants[] = $organizer;
 			}
 			if(isset($vevent->attendee)) {
 				foreach ($vevent->ATTENDEE as $vattendee) {
-					$event->participants[] = self::parseAttendee($vattendee);
+					$event->participants[] = self::parseAttendee(new Participant($event), $vattendee);
 				}
 			}
 
@@ -227,10 +274,10 @@ class ICalendarHelper {
 		//Attach exceptions found in VCALENDAR
 		foreach($exceptions as $props) {
 			$uid = $props->uid;
-			if(isset($mainEvents[$uid]) && $mainEvents[$uid]->getIsRecurring()) {
-				unset($props['uid']);
+			if(isset($baseEvents[$uid]) && $baseEvents[$uid]->getIsRecurring()) {
 				$recurrenceId = $props['recurrenceId'];
-				$mainEvents[$uid]->recurrenceOverrides[$recurrenceId] = $props;
+				unset($props['recurrenceId'], $props['uid']);
+				$baseEvents[$uid]->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event))->setValues($props);
 			}
 		}
 		// All exceptions that do not have the recurrence ID are ignored here
@@ -253,19 +300,18 @@ class ICalendarHelper {
 		return $blob;
 	}
 
-	static private function parseAttendee($vattendee) {
-		$p = (object)[
-			'email'=>str_replace('mailto:', '',(string)$vattendee),
-			'roles' => [],
-			'kind' =>'individual'
-		];
+	static private function parseAttendee(Participant $p, $vattendee) {
+		$p->setValues([
+			'email'=>str_replace('mailto:', '',(string)$vattendee)
+		]);
+		$p->kind = !empty($vattendee['CUTYPE']) ? strtolower($vattendee['CUTYPE']) : 'induvidual';
 		if(!empty($vattendee['CN'])) $p->name = $vattendee['CN'];
 		if(!empty($vattendee['ROLE'])) $p->roles[] = $vattendee['ROLE'];
 		if(!empty($vattendee['RSVP'])) $p->expectReply = $vattendee['RSVP'];
 		$p->participationStatus = strtolower($vattendee['PARTSTAT']);
-		$roles = array_flip(self::$roleMap);
-		if(is_array((string)$vattendee['ROLE'], $roles)) {
-			$p->roles[$roles[(string)$vattendee['ROLE']]] = true;
+		$map = array_flip(self::$roleMap);
+		if(in_array((string)$vattendee['ROLE'], $map)) {
+			$p->setRoles([$map[(string)$vattendee['ROLE']] => true]);
 		}
 		return $p;
 	}
@@ -289,20 +335,9 @@ class ICalendarHelper {
 		return $props;
 	}
 
-//	static public function makeRecurrenceIterator(RecurrenceRule $rule) {
-//		$values = ['FREQ' => $rule->frequency];
-//		if(!empty($rule->count)) $values['COUNT'] = $rule->count;
-//		if(!empty($rule->until))	$values['UNTIL'] = $rule->until->format('Ymd');
-//		if(!empty($rule->interval)) $values['INTERVAL'] = $rule->interval;
-//		if(!empty($rule->bySetPos)) $values['BYSETPOS'] = $rule->bySetPos;
-//		if(!empty($rule->bySecond)) $values['BYSECOND'] = $rule->bySecond;
-//		if(!empty($rule->byMinute)) $values['BYMINUTE'] = $rule->byMinute;
-//		if(!empty($rule->byHour)) $values['BYHOUR'] = $rule->byHour;
-//		if(!empty($rule->byDay)) $values['BYDAY'] = $rule->byDay;
-//		if(!empty($rule->byMonthday)) $values['BYMONTHDAY'] = $rule->byMonthday;
-//		if(!empty($rule->byMonth)) $values['BYMONTH'] = $rule->byMonth;
-//		return new RRuleIterator($values, $rule->event->start);
-//	}
+	static public function makeRecurrenceIterator(CalendarEvent $event) {
+		return new VObject\Recur\RRuleIterator(self::toRrule($event), $event->start);
+	}
 
 
 	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, $event) {
@@ -331,8 +366,9 @@ class ICalendarHelper {
 		if(isset($patrs['BYWEEKNO'])) $values->byWeekNo = array_map('intval',explode(',', $parts['BYWEEKNO']));
 		// skip byHour, byMinute, bySecond
 		if(isset($patrs['BYSETPOS'])) $values->bySetPosition = array_map('intval',explode(',', $parts['BYSETPOS']));
-		if(isset($parts['COUNT'])) $values->count = intval($parts['COUNT']);
-		elseif(isset($parts['UNTIL'])) {
+		if(isset($parts['COUNT'])) {
+			$values->count = intval($parts['COUNT']);
+		} elseif(isset($parts['UNTIL'])) {
 			// could be "20240824T063000Z" or "20240824"
 			if(strlen($parts['UNTIL']) > 10) { // has time
 				// convert to localtime
@@ -369,86 +405,202 @@ class ICalendarHelper {
 		return VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING);
 	}
 
+	const EssentialScheduleProps = ['start', 'duration', 'location', 'title', 'description', 'showWithoutTime'];
 	/**
-	 * Sending invite, cancel, reply update via email
-	 *
-	 * @param Event $event the new, deleted or modified event
-	 * @param string $fromEmail Sending on behalf of
+	 * Send all the needed imip schedule messages
+	 * @param CalendarEvent $event
+	 * @parma bool $delete if the event is about to be deleted
 	 */
-	static public function sendItip(Event $event, $status = null) {
-		$oldCalendar = null;
-		$calendar = null;
-		if(!$event->isNew()) {
-			$oldAttributes = $event->getModifiedAttributes();
-			$oldCalendar = $oldAttributes['vevent'];
+	static public function handleScheduling(CalendarEvent $event, bool $willDelete = false) {
+
+		$current = $event->calendarParticipant();
+
+		if(empty($current) ||
+			(!$event->isOrigin && !$current->isModified('participantionStatus'))) {
+			return;
 		}
-		if(!$event->markDeleted) {
-			$calendar = $event->vevent;
-			if($status !== null) {
-				$calendar->VEVENT->ATTENDEE['PARTSTAT'] = $status;
+
+		if(!$event->isOrigin) {
+			$status = $willDelete ? Participant::Declined : $current->participationStatus;
+			self::replyImip($event, $status);
+			$title = ucfirst($status);
+		} elseif ($current->isOwner()) {
+			if($event->isRecurring()) {
+				throw new \Exception('Need to implement scheduling recurring instances');
+			}
+
+			$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
+
+			self::sendImip($event, $willDelete ? 'CANCEL': 'REQUEST', $newOnly);
+
+		}
+
+	}
+
+	private static function replyImip($event, $status) {
+
+	}
+
+	private static function sendImip(CalendarEvent $event, $method, $newOnly = false) {
+		$success=true;
+		$organizer = $event->calendarParticipant(); // must be organizer at this point
+		foreach($event->participants as $participant) {
+			/** @var $participant Participant */
+			if(($newOnly && !$participant->isNew()) || $participant->isOwner() || $participant->scheduleAgent !== 'server')
+				continue;
+
+			if(!empty($participant->language)) {
+				$old = go()->getLanguage()->setLanguage($participant->language);
+			}
+
+			$subject = go()->t($method=='REQUEST' ? 'Invitation' : 'Cancellation', 'community', 'calendar');
+			if($participant->participationStatus !== Participant::NeedsAction) {
+				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
+			}
+
+			$ics = self::toVObject($event, new VCalendar([
+				'PRODID' => self::PROD,
+				'METHOD'=>$method
+			]));
+
+			$success = go()->getMailer()->compose()
+					->setSubject($subject .': '.$event->title)
+					->setFrom(go()->getSettings()->systemEmail, $organizer->name)
+					->setReplyTo($organizer->email)
+					->setTo(new Address($participant->email, $participant->name))
+					->attach(Attachment::fromString($ics->serialize(),
+						'invite.ics',
+						'text/calendar;method='.$method.';charset=utf-8',Attachment::ENCODING_8BIT)
+						->setInline(true)
+					)
+					->setBody(self::mailBody($event,$method,$participant,$subject), 'text/html')
+					->send() && $success;
+
+			if(isset($old)) {
+				go()->getLanguage()->setLanguage($old);
+				unset($old);
 			}
 		}
-		
+		return $success;
+	}
 
-		$broker = new VObject\ITip\Broker();
-		$messages = $broker->parseEvent(
-			$calendar,
-			\GO()->getAuth()->user()->email,
-			$oldCalendar
-		);
-	
-		//\GO()->debug(\GO()->getAuth()->user()->email);
-		
-		foreach($messages as $message) {
-			self::sendMail($message);
+	static function mailBody($event, $method, $recipient, $title) {
+		if(!$event) {
+			return false;
 		}
+		ob_start();
+		$url = 'https://group-office.com/event';
+		include __DIR__.'/../views/imip.php';
+		return ob_get_clean();
 	}
 
 	/**
-	 * Just send the RSVP mail (used in Messages module)
-	 * @param VObject\Component\VCalendar $vcal
-	 * @param string $status the participation status
+	 * The "REQUEST" method in a "VEVENT" component provides the following
+	 * scheduling functions:
+	 *
+	 * o  Invite "Attendees" to an event.
+	 * o  Reschedule an existing event.
+	 * o  Response to a "REFRESH" request.
+	 * o  Update the details of an existing event, without rescheduling it.
+	 * o  Update the status of "Attendees" of an existing event, without rescheduling it.
+	 * o  Reconfirm an existing event, without rescheduling it.
+	 * o  Forward a "VEVENT" to another uninvited CU.
+	 * o  For an existing "VEVENT" calendar component, delegate the role of "Attendee" to another CU.
+	 * o  For an existing "VEVENT" calendar component, change the role of
+	 * "Organizer" to another CU.
+	 *
+	 * @return void
 	 */
-	static public function rsvp($vcal, $status, $currentUser) {
-
-		$broker = new VObject\ITip\Broker();
-
-		$old = clone $vcal;
-
-		//$vcal->VEVENT->ATTENDEE['RSVP'] = 'TRUE';
-		$vcal->VEVENT->ATTENDEE['PARTSTAT'] = $status;
-
-		$messages = $broker->parseEvent(
-			$vcal,
-			$currentUser, //'michael@intermesh.dev',//\GO()->getAuth()->user()->email,
-			$old
-		);
-
-		foreach($messages as $message) {
-			echo $message->message->serialize();
-			//self::sendMail($message);
-		}
+	static function sendRequest($event) {
 
 	}
 
+	static function processMessage($vcalendar, Calendar $calendar, $sender) {
+
+		if(!$calendar->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			return false;
+		}
+		$vevent = $vcalendar->VEVENT[0];
+		$existingEvent = CalendarEvent::find(['calendarId'=>$calendar->id, 'uid'=>(string)$vevent->uid])->single();
+		switch($vcalendar->method){
+			case 'REQUEST': return self::processRequest($vcalendar,$sender,$existingEvent);
+			case 'CANCEL': return self::precessCancel($vcalendar,$existingEvent);
+			case 'REPLY': return self::processReply($vcalendar,$sender,$existingEvent);
+		}
+		return false;
+	}
+
+	private static function processRequest(VCalendar $vcalendar, $sender, CalendarEvent $existingEvent = null) {
+		if(!$existingEvent) {
+			$existingEvent = new CalendarEvent();
+			$existingEvent->isOrigin = false;
+			$existingEvent->replyTo = $sender->email;
+		}
+		return self::parseVObject($vcalendar, $existingEvent);
+	}
+
+	private static function precessCancel(VCalendar $vcalendar, CalendarEvent $existingEvent = null) {
+		if($existingEvent) {
+			if ($existingEvent->isRecurring()) {
+				foreach($vcalendar->VEVENT as $vevent) {
+					if(!empty($vevent->{'RECURRENCE-ID'})) {
+						$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
+						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent))
+							->setValues(['status' => CalendarEvent::Cancelled]);
+					}
+				}
+			} else {
+				$existingEvent->status = CalendarEvent::Cancelled;
+			}
+			$existingEvent->sequence = $vcalendar->SEQUENCE;
+		}
+		return $existingEvent;
+	}
 
 	/**
-	 * Use Swift to send the ITIP message
-	 * @param VObject\ITip\Message $itip
+	 * The message is a reply. This is for example an attendee telling an organizer he accepted the invite, or declined it.
 	 */
-	static public function sendMail(VObject\ITip\Message $itip) {
+	private static function processReply(VCalendar $vcalendar, $sender, CalendarEvent $existingEvent = null) {
+		if(!$existingEvent) return;
 
-		$invite = new \Swift_Attachment($itip->message->serialize(), 'invite.ics','text/calendar;method=CANCEL;charset=utf-8');
-		$invite->setDisposition('inline');
-		
-		$message = new Message(GO()->getSettings()->smtpAccount);
-		$message
-			->setSubject($itip->message->VEVENT->SUMMARY)
-			->setFrom($itip->sender, (string)$itip->senderName)
-			->setTo($itip->recipient, (string)$itip->recipientName)
-			->attach($invite)
-			->setBody('tada')
-			->send();
+		$instances = [];
+		$requestStatus = '2.0'; // OK
+
+		foreach($vcalendar->VEVENT as $vevent) {
+			$status = strtolower($vevent->ATTENDEE['PARTSTAT']->getValue());
+			if (isset($vevent->{'REQUEST-STATUS'})) {
+				$responseStatus = strtok((string)$vevent->{'REQUEST-STATUS'}, ";");
+			}
+			$item = $existingEvent;
+			// occurrence
+			if(isset($vevent->{'RECURRENCE-ID'})) {
+				$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
+				if(!isset($item->recurrenceOverrides[$recurId])) {
+					// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
+					$item->recurrenceOverrides[$recurId] = new RecurrenceOverride($item);
+				}
+				$item = $item->recurrenceOverrides[$recurId];
+
+			}
+			// base event
+			$found = false;
+			foreach($item->participants as $participant) {
+				if($participant->email === $sender->email) {
+					$participant->participationStatus = $status;
+					$found = true;
+					break;
+				}
+			}
+			if(!$found) {
+				$item->participants[] = (new Participant($item))->setValues([
+					'email' => $sender->email,
+					'name' => $sender->name ?? $sender->email,
+					'participationStatus' => $status
+				]);
+			}
+
+		}
+		return $existingEvent;
 	}
 
 	/**

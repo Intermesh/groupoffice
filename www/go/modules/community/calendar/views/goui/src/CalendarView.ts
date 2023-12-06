@@ -19,7 +19,7 @@ export abstract class CalendarView extends Component {
 	protected firstDay?: DateTime
 	protected recur?: {[id:string]: Recurrence}
 	protected contextMenu = menu({removeOnClose:false, isDropdown: true},
-		btn({icon:'open_with', text: t('Show')}),
+		btn({icon:'open_with', text: t('Show'), handler:_ =>alert(this.current!.data.id)}),
 		btn({icon:'edit', text: t('Edit'), handler: _ => this.current!.edit()}),
 		btn({icon:'email', text: t('E-mail participants')}),
 		//'-',
@@ -32,13 +32,9 @@ export abstract class CalendarView extends Component {
 
 	protected store: DataSourceStore<JmapDataSource<CalendarEvent>>
 
-	constructor() {
+	constructor(store: DataSourceStore<JmapDataSource<CalendarEvent>>) {
 		super();
-		this.store = datasourcestore({
-			dataSource:jmapds('CalendarEvent'),
-			//properties: ['title', 'start','duration','calendarId','showWithoutTime','alerts','recurrenceRule','id'],
-			listeners: {'load': (me,records) => this.update()}
-		});
+		this.store = store
 		this.el.on('keydown', (e: KeyboardEvent) => {
 			if(e.key == 'Delete') {
 				const i = this.viewModel.indexOf(this.selected[0]);
@@ -47,16 +43,13 @@ export abstract class CalendarView extends Component {
 				}
 			}
 		});
-		this.on('render', () => { this.store.load() });
 	}
 
 	update = (data?: any) => {
-		//this.fire('change', data);
-		//this.dom.cls('-loading');
-		//if(this.isRendered()) {
-		this.populateViewModel();
-			//this.renderView();
-		//}
+		if(this.rendered) {
+			this.renderView();
+			this.populateViewModel();
+		}
 	}
 
 	private current?: CalendarItem
@@ -70,7 +63,7 @@ export abstract class CalendarView extends Component {
 		return E('div',
 			E('em',...icons, item.title || '('+t('Nameless')+')'),
 			E('span',  e.showWithoutTime === false ? item.start.format('G:i'):'')
-		).cls('allday',e.showWithoutTime)
+		).cls('allday',e.showWithoutTime).cls('schedule', !!e.participants)
 			.attr('data-key', item.key || '_new_')
 			.attr('tabIndex', 0)
 			.on('click',(ev)=> {
@@ -87,6 +80,7 @@ export abstract class CalendarView extends Component {
 				// 	dlg.form.load(e.id);
 				// }
 			})
+			//.on('mousedown', ev => ev.stopPropagation()) /* when enabled cant drag event in monthview */
 			.on('contextmenu', ev => {
 				// todo: set id first
 				this.current = item;
@@ -107,7 +101,7 @@ export abstract class CalendarView extends Component {
 	protected slots: any;
 	protected calcRow(start: number, days: number) {
 		let row = 0, end = Math.min(start+days, 7);
-		while(row < 7) {
+		while(row < 10) {
 			for(let i = start; i < end; i++) {
 				if(this.slots[i][row]){ // used
 					break; // next row

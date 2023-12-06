@@ -8,12 +8,7 @@ export class SplitView extends CalendarView {
 	start!: DateTime
 	calRows: [string, HTMLElement][] = []
 	calViewModel : {[calId:string]: CalendarItem[]} = {}
-
-	constructor() {
-		super();
-		this.el.tabIndex = 0; // focussable
-		this.el.cls('cal split month');
-	}
+	baseCls = 'cal split month'
 
 	goto(day: DateTime, amount: number) {
 		if(!day) {

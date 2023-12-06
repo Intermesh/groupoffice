@@ -1,11 +1,11 @@
 import {
-	autocomplete, btn,
+	autocomplete, btn, checkbox,
 	column,
 	comp,
-	Component, datasourcestore,
-	displayfield, hr,
+	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap,
+	hr,
 	MapField,
-	mapfield, menu,
+	mapfield, menu, ObservableListenerOpts,
 	t,
 	table
 } from "@intermesh/goui";
@@ -19,6 +19,12 @@ interface Participant {
 	kind:string
 }
 
+export const participantfield = (config?: Config<ParticipantField, FieldEventMap<ParticipantField>>) => createComponent(new ParticipantField(), config);
+
+export interface ParticipantField extends Component {
+	on<K extends keyof FieldEventMap<ParticipantField>>(eventName: K, listener: Partial<FieldEventMap<ParticipantField>>[K], options?: ObservableListenerOpts): void
+	fire<K extends keyof FieldEventMap<ParticipantField>>(eventName: K, ...args: Parameters<FieldEventMap<any>[K]>): boolean
+}
 export class ParticipantField extends Component {
 
 	list: MapField
@@ -29,23 +35,34 @@ export class ParticipantField extends Component {
 
 		);
 		this.items.add(
-			this.list = mapfield({name: 'participants',
-				buildField: (v: any) => displayfield({cls: "hbox"},
-					comp({tagName:'i',cls:'icon',html:v.name?'person':'email', style:{marginRight:'8px'}}),
-					comp({
-						flex: '1 0 80%',
-						html: v.name ? v.name + '<br>' + v.email : v.email
-					}),
-					btn({icon:'arrow_drop_down', menu: menu({},
-						btn({text: v.email, disabled: true}),
-							hr(),
-						btn({text:'Optioneel',/* enableToggle: true*/}),
-						btn({text:t('Delete')}),
-							hr(),
-						btn({text:'Invite again'}),
-						btn({text:t('Write email')})
-					)})
-				)
+			this.list = mapfield({name: 'participants', cls:'goui-pit',
+				listeners: {
+					'change': (me,v) => {
+						this.fire('change', this, v, null);
+					}
+				},
+				buildField: (v: any) => { const f = containerfield({cls:'hbox', style: {alignItems: 'center'}},
+						comp({tagName:'i',cls:'icon',html:v.name?'person':'email', style:{marginRight:'8px'}}),
+						comp({
+							flex: '1 0 60%',
+							html: v.name ? v.name + '<br>' + v.email : v.email
+						}),
+						btn({icon:'arrow_drop_down', menu: menu({},
+							btn({text: v.email, disabled: true}),
+								hr(),
+							checkbox({label:'Optioneel',/* enableToggle: true*/}),
+							btn({icon:'delete',text:t('Delete'), handler: _ => {
+									f.remove();
+									this.fire('change', this, this.list.value, null);
+								}
+							}),
+								hr(),
+							btn({icon:'insert_invitation',text:'Invite again'}),
+							btn({icon:'email',text:t('Write email')})
+						)})
+					);
+					return f;
+				}
 			}),
 			autocomplete({
 				label:t('Invite people'),
@@ -59,36 +76,29 @@ export class ParticipantField extends Component {
 							field.list.hide();
 						}
 					},
-					// 'select': (me, record) => {
-					// 	debugger;
-					// 	this.addParticipant(record);
-					// },
-					'change': (me, newValue) => {
-						var r= me.list.store.get(newValue);
-						//debugger;
-						if(r)
-							this.addParticipant(r);
-						// debugger;
-						// if(newValue === undefined || newValue === null) {
-						// 	if(me.input && validateEmail(me.input.value)) {
-						// 		this.addParticipant({email:me.input.value});
-						// 	}
-						// } else if(newValue?.email) { // todo: turn into valid participant record first because this is what is posted
-						// 	if(newValue.displayName) {
-						// 		newValue.name = newValue.displayName;
-						// 		delete newValue.displayName;
-						// 		delete newValue.id;
-						// 		this.addParticipant(newValue);
-						// 	}
-						//
-						// }
-						me.value = null;
+					'render' : (me) => {
+						me.el.on('keydown' , ev => {
+							if(ev.key === 'Enter') {
+								if(validateEmail(me.input!.value)) {
+									this.addParticipant({email:me.input!.value});
+									me.menu.hide();
+									me.value = null;
+								}
+							}
+						});
+					},
+					'select': (me, record) => {
+
+						if(record)
+							this.addParticipant(record);
+
+						me.value=null;
 					}
 				},
 				list:table({
 					style:{minWidth:'100%'},
 					headers: false,
-					store: datasourcestore({ // TODO: use Search/email mother but store doesn't support this yet
+					store: datasourcestore({ // TODO: use Search/email but store doesn't support this yet
 						dataSource: jmapds('UserDisplay')
 						//properties: ['id', 'displayName', 'email']
 					}),
@@ -104,13 +114,29 @@ export class ParticipantField extends Component {
 		)
 	}
 
-	addParticipant(user: any) {
+	addSelfAsOrganiser() {
+		this.list.add({
+			email: go.User.email,
+			name: go.User.displayName,
+			roles: {attendee:true, owner:true},
+			kind: 'individual',
+			participationStatus:"accepted",
+			expectReply:false
+		}, go.User.id);
+	}
 
+	addParticipant(user: any) {
+		if(this.list.isEmpty()) {
+			this.addSelfAsOrganiser();
+		}
 		this.list.add({
 			email:user.email,
 			name: user.displayName || user.email,
 			roles: {attendee:true},
-			kind: 'individual'
-		}, user.id);
+			scheduleAgent: user.id ? 'server' : 'server',
+			kind: 'individual',
+			participationStatus:"needs-action",
+			expectReply:true
+		}, user.id || Math.round(Math.random()*1000)+1000);
 	}
 }
