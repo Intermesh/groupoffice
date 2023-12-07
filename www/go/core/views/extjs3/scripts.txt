@@ -1,5 +1,6 @@
 polyfills.js
 Element.js
+GOUIWrapper.js
 
 Jmap.js
 Uploader.js
@@ -313,3 +314,4 @@ chart/BarChart.js
 license/LicenseDialog.js
 
 Alert.js
+

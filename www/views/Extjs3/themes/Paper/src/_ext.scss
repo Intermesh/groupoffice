@@ -2439,7 +2439,7 @@ $menuScrollerSize : dp(4);
 	border-radius: $borderRadius;
 	overflow:hidden;
 	border: 1px solid color($fg, 'line');
-	form > div:not(.x-tab-panel) {
+	form > div:not(.x-tab-panel, .goui) {
 		background-color:color($bg,'background');
 	}
 	&-noborder, &-maximized{

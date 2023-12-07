@@ -2926,3 +2926,11 @@ table[id^="comments-ext"] b {
 	}
 
 }
+
+
+.goui-wrapper {
+	> * {
+		height: 100%;
+		width: 100%;
+	}
+}
