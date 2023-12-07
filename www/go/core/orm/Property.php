@@ -1490,7 +1490,6 @@ abstract class Property extends Model {
 	 *
 	 * @param Property[] $models
 	 * @param Property $model
-	 * @return void
 	 * @throws Exception
 	 */
 	private static function arrayContains(array $models, self $model) {
@@ -2399,11 +2398,11 @@ abstract class Property extends Model {
   /**
    * Checks if the given property or entity is equal to this
    *
-   * @param mixed $property
+   * @param Property $property
    * @return boolean
    * @throws Exception
    */
-	public function equals($property): bool
+	public function equals(Property $property): bool
 	{
 		if(get_class($property) != get_class($this)) {
 			return false;
@@ -2413,12 +2412,7 @@ abstract class Property extends Model {
 			return false;
 		}
 
-		$pk1 = $this->primaryKeyValues();
-		$pk2 = $property->primaryKeyValues();
-
-		$diff = array_diff($pk1, $pk2);
-
-		return empty($diff);
+		return $this->id() == $property->id();
 	}
 
 	/**
