@@ -641,7 +641,7 @@ abstract class Property extends Model {
 	 */
 	public function id() : ?string {
 		if(property_exists($this, 'id')) {
-			return (string) $this->id ?? null;
+			return isset($this->id) ? (string) $this->id : null;
 		}
 		$keys = $this->primaryKeyValues();
 		if(empty($keys)) {
