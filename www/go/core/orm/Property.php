@@ -1551,7 +1551,8 @@ abstract class Property extends Model {
 	 * @param Property $model
 	 * @throws Exception
 	 */
-	private static function arrayContains(array $models, self $model) {
+	private static function arrayContains(array $models, self $model): bool
+	{
 		foreach($models as $m) {
 			if($m->equals($model)) {
 				return true;
