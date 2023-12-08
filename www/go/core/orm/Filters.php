@@ -185,12 +185,12 @@ class Filters {
 				case 'number':					
 					$range = $this->checkRange($value);
 					if($range) {
-						call_user_func($filterConfig['fn'], $criteria, '>=', (int) $range[0], $query, $filter, $this);
-						call_user_func($filterConfig['fn'], $criteria, '<=', (int) $range[1], $query, $filter, $this);
+						call_user_func($filterConfig['fn'], $criteria, '>=', (float) $range[0], $query, $filter, $this);
+						call_user_func($filterConfig['fn'], $criteria, '<=', (float) $range[1], $query, $filter, $this);
 					} else
 					{
 						$v = self::parseNumericValue($value);
-						call_user_func($filterConfig['fn'], $criteria, $v['comparator'], (int) $v['query'], $query, $filter, $this);
+						call_user_func($filterConfig['fn'], $criteria, $v['comparator'], (float) $v['query'], $query, $filter, $this);
 					}
 					break;
 

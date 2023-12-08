@@ -253,7 +253,7 @@ This program is protected by copyright law and the {product_name} license.<br />
   'Files' => 'Failid',
   'E-mail' => 'E-post',
   'If you leave {product_name} you will loose unsaved changes' => 'Kui lahkud programmist, kaotad kõik salvestamata materjali',
-  'The data was saved succesfully' => 'Andmed salvestatud',
+  'The data was saved successfully' => 'Andmed salvestatud',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Failide arvutist valimiseks vajuta \'Browse\'. Failide üles laadimiseks vajuta \'UPLOAD\'. Peale üles laadimist sulgub aken automaatselt.',
   'Click here to login to {product_name}' => 'Sisse logimiseks vajuta siia',
   'Links' => 'Lingid',

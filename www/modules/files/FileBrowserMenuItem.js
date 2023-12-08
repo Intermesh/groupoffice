@@ -2,9 +2,14 @@
 
 GO.files.openDetailViewFileBrowser = function () {
 
-	var dv = this.findParentByType("detailview"), entityId, entity;
-	if(!dv) {
-		dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
+	var dv;
+	if(this.detailView){
+		dv = this.detailView;
+	} else {
+		dv = this.findParentByType("detailview"), entityId, entity;
+		if (!dv) {
+			dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
+		}
 	}
 	var folder_id;
 
@@ -29,7 +34,6 @@ GO.files.openDetailViewFileBrowser = function () {
 			var store = go.Db.store(fb.model_name);
 			if (store && store.data[fb.model_id]) {
 				store.data[fb.model_id].filesFolderId = result.files_folder_id;
-				//store.saveState();
 			}
 
 			//reload display panel on close

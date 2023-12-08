@@ -26,6 +26,16 @@ Alias /wopi ${DOC_ROOT_{version}}/go/modules/business/wopi/wopi.php
 SSLEngine on
 SSLCertificateKeyFile /etc/letsencrypt/live/wopi.{tld}/privkey.pem
 SSLCertificateFile /etc/letsencrypt/live/wopi.{tld}/fullchain.pem
+
+# Optionally enable php fpm to run different PHP version
+## Increased timeout for long running requests (sse, activesync)
+#ProxyTimeout 1800
+#
+##Pass authorization header
+#SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+#<FilesMatch \.php$>
+#    SetHandler "proxy:unix:/run/php/php8.2-fpm.sock|fcgi://localhost"
+#</FilesMatch>
 </VirtualHost>
 
 <VirtualHost *:443>
@@ -73,6 +83,17 @@ Redirect 301 /.well-known/caldav /caldav
 SSLEngine on
 SSLCertificateKeyFile /etc/letsencrypt/live/{tld}/privkey.pem
 SSLCertificateFile /etc/letsencrypt/live/{tld}/fullchain.pem
+
+# Optionally enable php fpm to run different PHP version
+## Increased timeout for long running requests (sse, activesync)
+#ProxyTimeout 1800
+#
+##Pass authorization header
+#SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+#<FilesMatch \.php$>
+#    SetHandler "proxy:unix:/run/php/php8.2-fpm.sock|fcgi://localhost"
+#</FilesMatch>
+
 </VirtualHost>
 
 

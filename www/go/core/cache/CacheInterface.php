@@ -62,4 +62,7 @@ interface CacheInterface {
 	 * @return boolean
 	 */
 	public static function isSupported(): bool;
+
+
+	public function disableMemory():void;
 }

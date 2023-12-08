@@ -182,7 +182,7 @@ return array (
   'Authentication failed for user "%username".' => 'Autentikasi gagal untuk pengguna "%username".',
   'Please enter try with a different IMAP password.' => 'Masukkan percobaan dengan kata sandi IMAP yang berbeda.',
   'Alias' => 'Alias',
-  'Email address succesfully added to contact' => 'Alamat email berhasil ditambahkan ke kontak',
+  'Email address successfully added to contact' => 'Alamat email berhasil ditambahkan ke kontak',
   'Body' => 'Isi',
   'Received before' => 'Diterima sebelumnya',
   'Received since' => 'Diterima sejak',

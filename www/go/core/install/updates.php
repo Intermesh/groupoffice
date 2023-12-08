@@ -1518,3 +1518,18 @@ $updates['202306191435'][] = "alter table core_pdf_template
     add footerY decimal(19, 4) default -12 null;";
 
 
+$updates['202310301525'][] = "ALTER TABLE core_entity DROP FOREIGN KEY core_entity_ibfk_2;";
+$updates['202310301526'][] = "ALTER TABLE core_entity ADD CONSTRAINT core_entity_ibfk_2 FOREIGN KEY (defaultAclId) REFERENCES core_acl(id) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+
+$updates['202310301526'][] = "alter table core_cron_job
+    drop key description;";
+
+$updates['202310301526'][] = "create unique index name
+    on core_cron_job (name);";
+
+$updates['202310301526'][] = "alter table core_search
+    modify filter varchar(190) null;";
+
+$updates['202310301526'][] = "create index core_search_filter_index
+    on core_search (filter);";

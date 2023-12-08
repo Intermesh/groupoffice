@@ -54,7 +54,7 @@ return array (
   'Select one' => 'Sélectionner un',
   'Contact form' => 'Formulaire de contact',
   'No address book found with name \'%s\'.' => 'Aucun carnet d\\\'adresses n\\\'a été trouvé avec le nom \'%s\'.',
-  'We have succesfully received your registration.' => 'Nous avons bien reçu votre demande d\\\'enregistrement.',
+  'We have successfully received your registration.' => 'Nous avons bien reçu votre demande d\\\'enregistrement.',
   'name' => 'Site par defaut',
   'description' => 'Modèle pour les sites par défaut.',
   'Date' => 'Date',

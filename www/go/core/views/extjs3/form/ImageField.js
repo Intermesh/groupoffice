@@ -79,31 +79,6 @@ go.form.ImageField = Ext.extend(Ext.BoxComponent, {
 					});
 				},
 				scope: this
-			}, {
-				iconCls: 'ic-link',
-				text: t("From URL"),
-				handler: function () {
-					Ext.MessageBox.prompt(t("Set Image From URL"), t("Enter URL"), function(btn, url) {
-
-						
-						if(btn != "ok" || !url) {
-							return;
-						}
-
-
-						Ext.Ajax.request({
-							url: go.User.uploadUrl + "?url=" + encodeURIComponent(url),
-							method: "GET",
-							success: function(response) {
-								data = Ext.decode(response.responseText);
-								this.setValue(data.blobId);								
-							},
-							scope: this
-						});
-
-					}, this);
-				},
-				scope: this
 			},
 			{
 				iconCls: 'ic-delete',

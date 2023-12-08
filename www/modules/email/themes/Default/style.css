@@ -162,7 +162,7 @@ ul.actions li button.goui-button {
 
 .message-move {
     color: grey;
-    padding: 0 8px 0 8px;
+    padding: 8px;
     text-align: right !important;
     line-height: 20px;
 }

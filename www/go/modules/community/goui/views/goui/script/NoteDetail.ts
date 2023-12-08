@@ -13,7 +13,7 @@ export class NoteDetail extends DetailPanel {
 
 		this.scroller.items.add(
 			this.content = comp({
-				cls: "normalize goui-card pad"
+				cls: "normalize card pad"
 			})
 		)
 

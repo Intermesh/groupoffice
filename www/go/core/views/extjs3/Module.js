@@ -228,6 +228,32 @@ GO.mainLayout.on('render', function () {
 	},false);
 
 
+	document.addEventListener("keydown", ev => {
+
+		if((ev.metaKey || ev.ctrlKey) && ev.key == "p") {
+
+			ev.preventDefault();
+
+			const modPanel = GO.mainLayout.tabPanel.getActiveTab();
+
+			if(!modPanel) {
+				return;
+			}
+			if(modPanel.print) {
+				modPanel.print();
+
+			} else {
+				const pnl = modPanel.findByType("displaypanel");
+				if(pnl.length) {
+					pnl[0].print();
+				}
+			}
+
+
+		}
+	})
+
+
 	// if(!GO.settings.config.debug) {
 	// window.onerror = function (message, source, lineno, colno, error) {
 	// 	go.Jmap.request({

@@ -719,7 +719,9 @@ class User extends AclItemEntity {
 		$auth = new Authenticate();
 		$primary = $auth->getPrimaryAuthenticatorForUser($this->username);
 
-		$authenticators[] = $primary;
+		if($primary) {
+			$authenticators[] = $primary;
+		}
 
 		foreach ($auth->getSecondaryAuthenticatorsForUser($this->username) as $authenticator) {
 			if ($authenticator::isAvailableFor($this->username)) {
@@ -817,7 +819,7 @@ class User extends AclItemEntity {
 	}
 
 
-	protected function internalGetModified(&$properties = [], bool $forIsModified = false)
+	protected function internalGetModified(array|string &$properties = [], bool $forIsModified = false): bool|array
 	{
 		// check if it's empty because the parent method will fill it with all props
 		$allProps = empty($properties);

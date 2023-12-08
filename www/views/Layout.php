@@ -8,6 +8,8 @@ $loadGoui = $loadGoui ?? true;
 $bodyCls = $bodyCls ?? '';
 $useThemeSettings = $useThemeSettings ?? true;
 
+$gouiStyleSheet = $gouiStyleSheet ?? "groupoffice.css";
+
 $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Installation") : go()->getSettings()->title;
 $primaryColor = go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)';
 $webclient = Extjs3::get();
@@ -51,6 +53,8 @@ $lang = go()->getLanguage()->getIsoCode();
 	$authController->fireEvent('head');
     go()->fireEvent(App::EVENT_HEAD);
 ?>
+
+
 	<script type="text/javascript">
 		GO.util.density = GO.util.isMobileOrTablet() ? 160 :  <?= isset($density) ? $density : 140?>;
 	</script>
@@ -60,9 +64,8 @@ $lang = go()->getLanguage()->getIsoCode();
 <?php endif;?>
 
 <?php if($loadGoui): ?>
-    <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/goui/dist/groupoffice.css" />
-    <link rel="stylesheet" media="screen and (max-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/goui/dist/groupoffice-mobile.css" />
-    <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/groupoffice-core/dist/style.css" />
+    <link rel="stylesheet" media="screen and (min-device-width:1200px),print" href="<?= $webclient->getBaseUrl();?>views/goui/dist/goui/style/<?= $gouiStyleSheet ?>" />
+    <link rel="stylesheet" media="screen and (min-device-width:1200px)" href="<?= $webclient->getBaseUrl();?>views/goui/dist/groupoffice-core/style/style.css" />
 <?php endif; ?>
 
 <?php if(!empty(GO()->getConfig()['custom_css_url'])): ?>

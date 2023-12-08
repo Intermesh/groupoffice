@@ -260,7 +260,9 @@ go.Jmap = {
 			console.log("Starting SSE");
 			
 			//filter out legacy modules
-			var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
+			var entities = go.Entities.getAll().filter(function(e) {
+				return e.package != "legacy";
+			});
 			
 			var url = go.User.eventSourceUrl + '?types=' + 
 							entities.column("name").join(',');
@@ -313,10 +315,10 @@ go.Jmap = {
 
 		this.SSEEventsRegistered = true;
 
-		window.addEventListener('beforeunload', () => {
-			console.log("Closing SSE")
-			go.Jmap.stopSse();
-		});
+		// window.addEventListener('beforeunload', () => {
+		// 	console.log("Closing SSE")
+		// 	go.Jmap.stopSse();
+		// });
 
 		window.addEventListener('offline', () => {
 			console.log("Closing SSE because we're offline")

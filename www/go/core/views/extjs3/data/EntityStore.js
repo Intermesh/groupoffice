@@ -718,6 +718,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					let msg = t("Failed to save");
 					if(response.notCreated && id in response.notCreated) {
 						msg = response.notCreated[id].description;
+
+						if(!msg && response.notCreated[id].validationErrors) {
+							const errs = Object.values(response.notCreated[id].validationErrors);
+							if(errs.length)
+								msg = errs[0].description;
+						}
 					}
 
 					return Promise.reject({message: msg, response: response, error: response.notCreated[id] || null});
@@ -731,6 +737,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					let msg = t("Failed to save");
 					if(response.notUpdated && id in response.notUpdated) {
 						msg = response.notUpdated[id].description;
+
+						if(!msg && response.notUpdated[id].validationErrors) {
+							const errs = Object.values(response.notUpdated[id].validationErrors);
+							if(errs.length)
+								msg = errs[0].description;
+						}
 					}
 					return Promise.reject({message: msg, response: response, error: response.notUpdated[id] || null});
 				}
@@ -761,7 +773,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	destroy : function(id) {
 		return this.set( {destroy: [id]}).then((response) => {
 			if(response.destroyed.indexOf(id) == -1) {
-				return Promise.reject({message: t("Failed to delete"), response: response, error: response.notDestroyed[id] || null});
+				return Promise.reject({message: response.notDestroyed[id] ?  response.notDestroyed[id].description : t("Failed to delete"), response: response, error: response.notDestroyed[id] || null});
 			} else {
 				return true;
 			}

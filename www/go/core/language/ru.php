@@ -265,7 +265,7 @@ All rights reserved.
   'Database' => 'База данных',
   'Files' => 'Файлы',
   'If you leave {product_name} you will loose unsaved changes' => 'Вы потеряете все несохраненные данные, если выйдете из {product_name}',
-  'The data was saved succesfully' => 'Сохранено...',
+  'The data was saved successfully' => 'Сохранено...',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Нажмите на  \'Обзор\' для выбора файлов и/или папок на Вашем компьютере. Нажмите \'Загрузить\' для отправки этих файлов в {product_name}. Это окно закроется автоматически, когда закончится передача файлов.',
   'Click here to login to {product_name}' => 'Нажмите здесь чтобы войти в {product_name}',
   'Links' => 'Ссылки',

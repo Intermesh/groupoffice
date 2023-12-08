@@ -10431,11 +10431,11 @@ Ext.extend(Ext.XTemplate, Ext.Template, {
         
         if(Ext.isGecko){
             body = "tpl.compiled = function(values, parent, xindex, xcount){ return '" +
-                   tpl.body.replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn).replace(this.codeRe, codeFn) +
+                   tpl.body.replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace("/\\/g","\\\\").replace(this.re, fn).replace(this.codeRe, codeFn) +
                     "';};";
         }else{
             body = ["tpl.compiled = function(values, parent, xindex, xcount){ return ['"];
-            body.push(tpl.body.replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn).replace(this.codeRe, codeFn));
+            body.push(tpl.body.replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace("/\\/g","\\\\").replace(this.re, fn).replace(this.codeRe, codeFn));
             body.push("'].join('');};");
             body = body.join('');
         }
@@ -40799,7 +40799,7 @@ Ext.form.TextArea = Ext.extend(Ext.form.TextField,  {
     growMin : 60,
     
     growMax: 1000,
-    growAppend : '&#160;\n&#160;',
+    growAppend : '',
 
     enterIsSpecial : false,
 
@@ -40866,9 +40866,7 @@ Ext.form.TextArea = Ext.extend(Ext.form.TextField,  {
             v = "&#160;&#160;";
         }else{
             v += this.growAppend;
-            if(Ext.isIE){
-                v = v.replace(/\n/g, '&#160;<br />');
-            }
+          
         }
         ts.innerHTML = v;
         h = Math.min(this.growMax, Math.max(ts.offsetHeight, this.growMin));

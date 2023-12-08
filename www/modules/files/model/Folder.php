@@ -207,6 +207,24 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		return $this->_path;
 	}
 
+
+	public function getIdPath() {
+		$currentFolder = $this;
+		$path = $this->id;
+		$ids[]=$this->id;
+		while ($currentFolder = $currentFolder->parent) {
+
+			if(in_array($currentFolder->id, $ids))
+				throw new Exception("Infinite folder loop detected in ".$this->_path." ".implode(",", $ids));
+			else
+				$ids[]=$currentFolder->id;
+
+			$path = $currentFolder->id . '/' . $path;
+		}
+
+		return $path;
+	}
+
 	public function getFullPath() {
 		$currentFolder = $this;
 		
@@ -832,10 +850,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		if(\GO::config()->debug)
 			\GO::debug("syncFilesystem ".$this->path);
-		
-		if(\GO::environment()->isCli()){
-			echo $this->path."\n";
-		}
+
+		//this outputted in cronjobs (LDAP sync) and we don't want that
+//		if(\GO::environment()->isCli()){
+//			echo $this->path."\n";
+//		}
 
 		$oldIgnoreAcl = \GO::setIgnoreAclPermissions(true);
 

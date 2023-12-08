@@ -116,7 +116,8 @@ class Connection {
 	  \go\core\App::get()->unsetDbConnection();
 	  sleep(10);
 	 */
-	public function disconnect() {
+	public function disconnect(): void
+	{
 		$this->pdo = null;
 
 		Property::clearCachedRelationStmts();
@@ -124,8 +125,15 @@ class Connection {
 		self::$cachedStatements = [];
 	}
 
-	private static $cachedStatements = [];
+	private static array $cachedStatements = [];
 
+	/**
+	 * Register a cached statement that will be unset when we want to disconnect from the database.
+	 * If you don't unset these statement the connection will be kept open.
+	 * @param string $name
+	 * @param Statement $statement
+	 * @return void
+	 */
 	public function cacheStatement(string $name, Statement $statement) {
 		self::$cachedStatements[$name] = $statement;
 	}

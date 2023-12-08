@@ -143,11 +143,12 @@ namespace go\core {
 		
 		private $version;
 
-        private $systemTimeZone;
+    private $systemTimeZone;
 
 		protected function __construct() {
 			parent::__construct();
-            $this->systemTimeZone = date_default_timezone_get();
+
+      $this->systemTimeZone = date_default_timezone_get();
 			date_default_timezone_set("UTC");
 
 			mb_internal_encoding("UTF-8");
@@ -159,16 +160,16 @@ namespace go\core {
 			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
 
-        /**
-         * Get the PHP system timezone.
-         *
-         * The API works with UTC dates.
-         *
-         * @return string
-         */
-        public function getSystemTimeZone() : string {
-            return $this->systemTimeZone;
-        }
+    /**
+     * Get the PHP system timezone.
+     *
+     * The API works with UTC dates.
+     *
+     * @return string
+     */
+    public function getSystemTimeZone() : string {
+        return $this->systemTimeZone;
+    }
 
 		/**
 		 * Capabilities of core module
@@ -323,7 +324,7 @@ namespace go\core {
 		public function getStorageFreeSpace(): float
 		{
 			if(!isset($this->storageFreeSpace)) {
-				$quota = $this->getConfig()['quota'];
+				$quota = (int) $this->getConfig()['quota'];
 				if(empty($quota)) {
 					try {
 						$this->storageFreeSpace = disk_free_space($this->getConfig()['file_storage_path']);
@@ -334,7 +335,7 @@ namespace go\core {
 					}
 				} else
 				{
-					$usage = GO::config()->get_setting('file_storage_usage') ?? 0;
+					$usage = (int) GO::config()->get_setting('file_storage_usage', 0 ,0);
 					$this->storageFreeSpace = $quota - $usage;
 				}
 			}
@@ -470,6 +471,7 @@ namespace go\core {
 				'quota' => 0,
 				"allowed_modules" => "",
 				"product_name" => "Group-Office",
+				"lockWithFlock" => false,
 
 				"db_host" => "localhost",
 				"db_port" => 3306,
@@ -716,6 +718,7 @@ namespace go\core {
 		public function clearCache() {
 			App::get()->getCache()->flush( false);
 			go()->getDatabase()->clearCache();
+			Settings::flushCache();
 			Property::clearCache();
 			Property::clearCachedRelationStmts();
 			GO::clearCache();
@@ -797,6 +800,8 @@ namespace go\core {
 		 */
 		public function setAuthState(AuthState $authState): App
 		{
+
+
 			$this->authState = $authState;
 			
 			return $this;

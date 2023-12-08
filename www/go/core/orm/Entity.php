@@ -1113,7 +1113,7 @@ abstract class Entity extends Property {
    *  You can override this to implement custom logic.
    *
    * @param Query $query
-   * @param ArrayObject $sort eg. ['field' => 'ASC']
+   * @param ArrayObject $sort Key value where field name is the key and value is ASC or DESC. eg. ['field' => 'ASC']
    * @return Query
    * @throws Exception
    * @example
@@ -1121,8 +1121,8 @@ abstract class Entity extends Property {
    * public static function sort(Query $query, array $sort) {
    *
    *    if(isset($sort['special'])) {
-   *      $query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);
-   *      unset($sort['special']);
+   *      $query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT');
+   *      $sort->renameKey('special', 'u.displayName');
    *    }
    *
    *
@@ -1183,7 +1183,6 @@ abstract class Entity extends Property {
 	{
 		return null;
 	}
-
 	
 	/**
 	 * Map of file types to a converter class for importing and exporting.

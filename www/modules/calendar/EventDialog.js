@@ -645,6 +645,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		});
 		this.startDate = new go.form.DateField({
 			name : 'start_date',
+			fieldLabel:t("Start"),
 			format : GO.settings['date_format'],
 			allowBlank : false,			
 			listeners : {
@@ -659,7 +660,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			increment: 15,
 			format:GO.settings.time_format,
 			name:'start_time',
-			fieldLabel:t("Start"),
+			// fieldLabel:t("Start"),
 			width: dp(140),
 			hideLabel:true,
 			autoSelect :true,			

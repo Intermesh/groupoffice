@@ -458,6 +458,6 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	 */
 	public function jsonSerialize(): mixed
 	{
-		return $this->toArray();
+		return (object) $this->toArray();
 	}
 }

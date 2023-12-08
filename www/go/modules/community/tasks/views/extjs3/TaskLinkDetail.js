@@ -143,10 +143,9 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 		};
 	},
 
-	open : (id) => {
-
+	open : function(id)  {
 		const win = new go.links.LinkDetailWindow({
-			entity: "Task"
+			entity: this.support ? "SupportTicket" : "Task"
 		});
 
 		win.load(id);

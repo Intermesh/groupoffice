@@ -490,4 +490,12 @@ abstract class Base extends Model {
 			$criteria->where('customFields.' . $this->field->databaseName, $comparator, $value);
 		});
 	}
+
+
+	/**
+	 * Called when field is copied
+	 * @return void
+	 */
+	public function onCopy() {
+	}
 }

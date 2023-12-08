@@ -128,6 +128,10 @@ class EmailTemplate extends Entity
 	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?EmailTemplate {
 		$moduleModel = ModuleModel::findByName($package, $name);
 
+		if(!$moduleModel) {
+			return null;
+		}
+
 		$template = isset($preferredLanguage) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
 		if (!$template) {
 
@@ -259,9 +263,6 @@ class EmailTemplate extends Entity
 		$subject = $templateParser->parse($this->subject);
 		$body = $templateParser->parse($this->body);
 
-		$message->setSubject($subject)
-			->setBody($body, 'text/html');
-
 		foreach($this->attachments as $attachment) {
 			$blob = Blob::findById($attachment->blobId);
 
@@ -279,6 +280,9 @@ class EmailTemplate extends Entity
 				$message->attach($a);
 			}
 		}
+
+		$message->setSubject($subject)
+			->setBody($body, 'text/html');
 
 		return $message;
 	}

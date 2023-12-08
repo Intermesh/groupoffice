@@ -193,6 +193,7 @@ class TemplateParser {
 	 * @var string[]
 	 */
 	public $config = [
+		'decimals' => 2,
 		'decimalSeparator' => '.',
 		'thousandsSeparator' => ',',
 		'dateFormat' => 'd-m-Y'
@@ -348,8 +349,12 @@ class TemplateParser {
 
 
 
-	private function filterNumber($number,$decimals = 2, $decimalSeparator = null, $thousandsSeparator = null): string
+	private function filterNumber($number,$decimals = null, $decimalSeparator = null, $thousandsSeparator = null): string
 	{
+		if(!isset($decimals) ){
+			$decimals = $this->config['decimals'];
+		}
+
 		if(!isset($decimalSeparator) ){
 			$decimalSeparator = $this->config['decimalSeparator'];
 		}

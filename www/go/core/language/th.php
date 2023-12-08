@@ -298,7 +298,7 @@ All rights reserved.<br />
   'The e-mail address was invalid' => 'ที่อยู่อีเมล์ไม่ถูกต้อง',
   'You entered an invalid date' => 'คุณระบุวันที่ผิด',
   'Error' => 'เกิดข้อผิดพลาด',
-  'The data was saved succesfully' => 'ข้อมูลถูกบันทึกเรียบร้อยแล้ว',
+  'The data was saved successfully' => 'ข้อมูลถูกบันทึกเรียบร้อยแล้ว',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'คลิ๊กปุ่ม \'Browse\' เพื่อเลือกไฟล์หรือโพลเดอร์จากเครื่องคอมพิวเตอร์. คลิ๊กที่ \'อับโหลด\' เพื่อส่งไฟล์ไปยัง {product_name}. หน้าต่างนี้จะปิดอัตโนมัติเมื่อการทำงานเสร็จสิ้น',
   'Click here to login to {product_name}' => 'คลิ๊กที่นี่เพื่อล็อคอินเข้าสู่ {product_name}',
   'Links' => 'เปิดหน้าต่างเชื่อมโยง',

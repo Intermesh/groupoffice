@@ -1,5 +1,4 @@
 go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
-	//autoExpandColumn: 'title',
 	// config options for stateful behavior
 	stateful: true,
 	stateId: 'tasks-grid-main',
@@ -150,7 +149,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					xtype:"datecolumn",
 					id: 'start',
 					dateOnly: true,
-					header: t('Start at'),
+					header: t('Start at', "tasks","community"),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'start',
@@ -161,14 +160,14 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					xtype:"datecolumn",
 					id: 'due',
 					dateOnly: true,
-					header: t('Due at'),
+					header: t('Due at', "tasks","community"),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'due',
 					renderer: startRenderer,
 					groupable: false
 				},{
-					header: t('Responsible'),
+					header: t('Responsible', "tasks", "community"),
 					width: dp(180),
 					sortable: true,
 					dataIndex: 'responsible',

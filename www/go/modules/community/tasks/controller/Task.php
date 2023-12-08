@@ -91,27 +91,23 @@ class Task extends EntityController {
 	/**
 	 * Used to show counter badge for support.
 	 *
-	 * @return mixed|null
-	 * @throws Exception
 	 */
-	public function countMine():int {
+	public function countMine():int{
 
 
 			$defaultListId = go()->getAuthState()->getUser(['tasksSettings'])->tasksSettings->getDefaultTasklistId();
 
-			$query = model\Task::find(['id'])
-				->selectSingleValue("count(*)")
-				->filter([
-					"tasklistId" => $defaultListId,
-					"complete" => false
-				]);
-
-
+		$query = model\Task::find(['id'])
+			->selectSingleValue("IFNULL(count(*), 0)")
+			->filter([
+				"tasklistId" => $defaultListId,
+				"complete" => false,
+				'due' => '< tomorrow'
+			]);
 
 		$query->removeJoin("tasks_task_user");
 		$query->removeJoin("pr2_hours");
 		$query->groupBy([]);
-
 
 		return $query->single();
 	}

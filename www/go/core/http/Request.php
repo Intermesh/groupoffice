@@ -242,7 +242,7 @@ class Request extends Singleton{
 	 */
 	public function getMethod(): string
 	{
-		return strtoupper($_SERVER['REQUEST_METHOD']);
+		return strtoupper($_SERVER['REQUEST_METHOD'] ?? "GET");
 	}
 
 	/**

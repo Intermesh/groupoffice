@@ -57,7 +57,7 @@ return array (
   'Select one' => 'Vyberte...',
   'Contact form' => 'Kontaktní formulář',
   'No address book found with name \'%s\'.' => 'Nepovedlo se vyhledat adresář s názvem \'%s\'.',
-  'We have succesfully received your registration.' => 'Vaše registrace byla úspěšná.',
+  'We have successfully received your registration.' => 'Vaše registrace byla úspěšná.',
   'name' => 'Výchozí stránka',
   'description' => 'Modul, který vytvoří výchozí šablonu pro stránky.',
   'Status' => 'Status',

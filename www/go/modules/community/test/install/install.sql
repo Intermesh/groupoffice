@@ -8,6 +8,11 @@ CREATE TABLE `test_a` (
   `deletedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB;
 
+
+CREATE TABLE `test_a_custom_fields` (
+    `id` int(11) NOT NULL
+) ENGINE=InnoDB;
+
 -- --------------------------------------------------------
 
 --
@@ -44,6 +49,12 @@ CREATE TABLE `test_b` (
   `cId` int(11) DEFAULT NULL,
   `userId` int(11) NOT NULL
 ) ENGINE=InnoDB;
+
+CREATE TABLE `test_b_custom_fields` (
+    `id` int(11) NOT NULL
+) ENGINE=InnoDB;
+
+
 
 -- --------------------------------------------------------
 
@@ -179,3 +190,10 @@ ALTER TABLE `test_a_map`
 ALTER TABLE `test_a_map`
   ADD CONSTRAINT `test_a_map_ibfk_1` FOREIGN KEY (`aId`) REFERENCES `test_a` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `test_a_map_ibfk_2` FOREIGN KEY (`anotherAId`) REFERENCES `test_a` (`id`);
+
+
+ALTER TABLE `test_a_custom_fields`
+    ADD CONSTRAINT `test_a_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `test_a` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `test_b_custom_fields`
+    ADD CONSTRAINT `test_b_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `test_b` (`id`) ON DELETE CASCADE;

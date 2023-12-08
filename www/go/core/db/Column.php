@@ -349,5 +349,4 @@ class Column {
 	{
 		return $this->table;
 	}
-
 }

@@ -6,17 +6,14 @@ use Exception;
 use Faker\Generator;
 use GO\Base\Model\Module as LegacyModuleModel;
 use GO\Base\Module as LegacyModule;
-use GO\Base\ModuleCollection;
 use go\core\Module as CoreModule;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
-use LegacyModuleCollection;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Utils;
 use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\fs\Folder;
-use go\core\model;
 use go\core\jmap\Entity;
 use go\core\util\ClassFinder;
 use go\modules\business\license\exception\LicenseException;
@@ -250,8 +247,8 @@ abstract class Module extends Singleton {
 	{
 		$this->checkDependenciesForUninstall();
 
-		$oldTC = core\jmap\Entity::$trackChanges;
-		core\jmap\Entity::$trackChanges = false;
+		$oldTC = \go\core\jmap\Entity::$trackChanges;
+		\go\core\jmap\Entity::$trackChanges = false;
 		$oldHist = \go\modules\community\history\Module::$enabled;
 		\go\modules\community\history\Module::$enabled = false;
 
@@ -259,7 +256,7 @@ abstract class Module extends Singleton {
 			$ret = $this->beforeUninstall();
 		} finally {
 			if(empty($ret)) {
-				core\jmap\Entity::$trackChanges = $oldTC;
+				\go\core\jmap\Entity::$trackChanges = $oldTC;
 				\go\modules\community\history\Module::$enabled = $oldHist;
 			}
 		}

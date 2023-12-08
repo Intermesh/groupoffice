@@ -8,8 +8,6 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	cancelAdd: false,
 	addLink : function(entity, entityId) {
 
-
-		
 		var me = this;
 		me.cancelAdd = false;
 		//We need to query the ID of the search cache so the "to" relation can be resolved.
@@ -28,8 +26,6 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 				"toEntity": entity,
 				"toSearchId": response.ids[0]
 			};
-
-			console.log(newLink, me.linkGrid.store.setFilter("link"));
 
 			me.newLinks.push(newLink);
 			me.linkGrid.store.loadData({"records" :[newLink]}, true);
@@ -74,31 +70,6 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			}
 		});
 
-		// this.searchField = new go.search.SearchCombo({
-		// 	anchor: "100%",
-		// 	hideLabel: true,
-		// 	listeners: {
-		// 		scope: this,
-		// 		select: function (cmb, record, index) {					
-		// 			this.linkGrid.store.loadData({"records" :[{
-		// 				"toId": record.get('entityId'),
-		// 				"toEntity": record.get('entity'),
-		// 				"toSearchId": record.get('id')
-		// 			}]}, true);
-		// 			this.searchField.reset();
-					
-		// 			this.newLinks.push({						
-		// 				toEntity: record.get('entity'),
-		// 				toId: record.get('entityId')
-		// 			});
-		// 			this.setCount(++this.totalCount);
-		// 		}
-		// 	},
-		// 	getListParent: function () {
-		// 		//this avoids hiding the menu on click in the list
-		// 		return this.el.up('.x-menu');
-		// 	}
-		// });
 		this.store = new go.data.Store({
 			autoDestroy: true,
 			fields: ['id', 'toId', 'toEntity', {name: "to", type: "relation"}, 'description', {name: 'modifiedAt', type: 'date'}],
@@ -222,14 +193,6 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			doFocus: function () {
 				me.searchField.focus();
 			}
-//			listeners: {
-//				scope: this,	
-//				show: function() {
-//					if(this.linkGrid.store.baseParams.filter.entityId) {
-//						
-//					}
-//				}
-//			}
 		});
 
 		go.links.CreateLinkButton.superclass.initComponent.call(this);

@@ -69,6 +69,9 @@ $image = new Image($blob->path());
 if (!$image->loadSuccess) {
 	throw new \Exception("Could not load image");
 } else {
+	if($image->getImageType() == IMAGETYPE_JPEG) {
+		$image->fixOrientation();
+	}
 	if ($zc) {
 		$image->zoomcrop($w, $h);
 	} else {

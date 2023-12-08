@@ -37,14 +37,13 @@ class OauthUser implements UserEntityInterface, ClaimSetInterface
 	{
 		return [
 			"id" => $this->user->id(),
-			// profile
+			"profile" => go()->getSettings()->URL,
 			'name' => $this->user->displayName,
 			'family_name' => '',
 			'given_name' => '',
 			'middle_name' => '',
 			'nickname' => $this->user->displayName,
 			'preferred_username' => $this->user->username,
-			'profile' => '',
 			'picture' => '',
 			'website' => '',
 			'gender' => '',

@@ -5,6 +5,7 @@ namespace GO\Files\Controller;
 
 use Exception;
 use GO;
+use GO\Base\Db\FindCriteria;
 use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
@@ -692,25 +693,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 	private function _listShares($params) {
-
-		//$store = \GO\Base\Data\Store::newInstance(\GO\Files\Model\Folder::model());
-//
-//      //set sort aliases
-//      $store->getColumnModel()->formatColumn('type', '$model->type',array(),'name');
-//      $store->getColumnModel()->formatColumn('size', '"-"',array(),'name');
-//
-//      $store->getColumnModel()->setFormatRecordFunction(array($this, 'formatListRecord'));
-//      $findParams = $store->getDefaultParams($params);
-//      $stmt = \GO\Files\Model\Folder::model()->findShares($findParams);
-//      $store->setStatement($stmt);
-//
-//      $response = $store->getData();
-		
-		
-//		$fp = \GO\Base\Db\FindParams::newInstance()->limit(100);
-		
-		//$fp = \GO\Base\Db\FindParams::newInstance()->calcFoundRows();
-		
 		$cm = new \GO\Base\Data\ColumnModel('GO\Files\Model\Folder');
 		$cm->setFormatRecordFunction(array($this, 'formatListRecord'));
 		
@@ -727,14 +709,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$store = new \GO\Base\Data\DbStore('GO\Files\Model\Folder',$cm, $params, $findParams);
 		$response = $store->getData();
 		$response['permission_level']=\GO\Base\Model\Acl::READ_PERMISSION;
-//		$response['results']=array();
-//		$shares =\GO\Files\Model\Folder::model()->getTopLevelShares($fp);
-//		foreach($shares as $folder){
-//			$record=$folder->getAttributes("html");
-//			$record = $this->formatListRecord($record, $folder, false);
-//			$response['results'][]=$record;
-//		}
-//		$response['total']=$shares->foundRows;
 		return $response;
 	}
 
@@ -742,8 +716,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function actionList($params) {
 
-		if (!empty($params['query']))
-				return $this->_searchFiles($params);
+		if (!empty($params['query'])) {
+			return $this->_searchFiles($params);
+		}
             
 
 		
@@ -751,16 +726,16 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		//This will check permissions too.
 		if(empty($params['folder_id'])) {
 			$folder = Folder::model()->findHomeFolder (GO::user());
-		}else
-		{			
+		}else {
 			if ($params['folder_id'] == 'shared') {
 				return $this->_listShares($params);
 			}
 			$folder = Folder::model()->findByPk($params['folder_id']);
 		}
 		
-		if(!$folder)
-			throw new \Exception('No Folder found with id '.$params['folder_id']);
+		if(!$folder) {
+			throw new \Exception('No Folder found with id ' . $params['folder_id']);
+		}
 
 
 
@@ -920,82 +895,91 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 	private function _searchFiles($params) {
+		$searchInSharedFolders = $params['folder_id'] === 'shared';
+		if(!$searchInSharedFolders) {
+			$params['folder_id'] = intval($params['folder_id']);
+			$folder = Folder::model()->findByPk($params['folder_id']);
 
-			//handle delete request for both files and folder
-			$this->_processDeletes($params);
+			$stripPath = $folder->path;
+		}
+		//handle delete request for both files and folder
+		$this->_processDeletes($params);
 
-			$response['success'] = true;
+		$response['success'] = true;
 
-			$queryStr = !empty($params['query']) ? $params['query'] : '';
-			$limit = !empty($params['limit']) ? $params['limit'] : 30;
-			$start = !empty($params['start']) ? $params['start'] : 0;
+		$queryStr = !empty($params['query']) ? $params['query'] : '';
+		$limit = !empty($params['limit']) ? $params['limit'] : 30;
+		$start = !empty($params['start']) ? $params['start'] : 0;
+
+		$findParams = \GO\Base\Db\FindParams::newInstance()
+				->calcFoundRows()
+				->select('t.*')
+				->joinCustomFields()
+				->join("core_search", "s.entityId = t.id AND s.entityTypeId = " . \GO\Files\Model\File::entityType()->getId(), "s")
+			->start($start)
+			->limit($limit)
+			->group(['t.id']);
+
+		if(!$searchInSharedFolders) {
+			$findParams->getCriteria()->addCondition("filter", $folder->getIdPath() ."/%", "LIKE", "s");
+		}
+		// restrict to the current folder hierarchy
+
+		if(!go()->getAuthState()->isAdmin()) {
+			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 's.aclId', '=', false);
+
+			$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
+				->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
 
-			$findParams = \GO\Base\Db\FindParams::newInstance()
-					->calcFoundRows()
-					->select('t.*')
+			$findParams->ignoreAcl()
+				->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER')->debugSql()
+				->criteria($aclWhereCriteria);
+		}
 
-					->joinCustomFields()
-					->join("core_search", "s.entityId = t.id AND s.entityTypeId = " . \GO\Files\Model\File::entityType()->getId(), "s")
-				->start($start)
-				->limit($limit)
-				->group(['t.id']);
+		$i = 0;
 
-			if(!go()->getAuthState()->isAdmin()) {
-				$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 's.aclId', '=', false);
+		$words = StringUtil::splitTextKeywords($queryStr, false);
 
-				$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
-					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
+		foreach($words as $word) {
 
+			$findParams->join("core_search_word", 'w'.$i.'.searchId = s.id', 'w'.$i);
+			$findParams->getCriteria()->addCondition('word', $word . '%', 'LIKE', 'w'.$i);
+			$i++;
+		}
 
-				$findParams->ignoreAcl()
-					->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER')->debugSql()
-					->criteria($aclWhereCriteria);
+		if(isset($params['sort'])){
+
+			if($params['sort'] == 'name') {
+				 $findParams->order(new \go\core\db\Expression('t.name COLLATE utf8mb4_unicode_ci ' . (!isset($params['dir']) || $params['dir'] == 'ASC' ? 'ASC' : 'DESC')));
+			}else {
+				$findParams->order("t.".$params['sort'], $params['dir']);
 			}
+		}
 
-			$i = 0;
-
-			$words = StringUtil::splitTextKeywords($queryStr, false);
-
-			foreach($words as $word) {
-
-				$findParams->join("core_search_word", 'w'.$i.'.searchId = s.id', 'w'.$i);
-				$findParams->getCriteria()->addCondition('word', $word . '%', 'LIKE', 'w'.$i);
-				$i++;
-			}
-			
-			if(isset($params['sort'])){
-
-				if($params['sort'] == 'name') {
-					 $findParams->order(new \go\core\db\Expression('t.name COLLATE utf8mb4_unicode_ci ' . (!isset($params['dir']) || $params['dir'] == 'ASC' ? 'ASC' : 'DESC')));
-				}else
-				{				
-					$findParams->order("t.".$params['sort'], $params['dir']);
-				}
-			}
-
-			$filesStmt = \GO\Files\Model\File::model()->find(
-				$findParams
-
-			);
+		$filesStmt = \GO\Files\Model\File::model()->find($findParams);
 
 		$response['total'] = $filesStmt->foundRows;
+		$response['results'] = array();
+		$response['cm_state'] = '';
+		$response['may_apply_state'] = false;
+		$response['lock_state'] = false;
+		$response['permission_level'] = 0;
 
-			$response['results'] = array();
-			$response['cm_state'] = '';
-			$response['may_apply_state'] = false;
-			$response['lock_state'] = false;
-			$response['permission_level'] = 0;
-
-			foreach ($filesStmt as $searchFileModel) {
-				$record = $searchFileModel->getAttributes();
-				$record['customFields'] = $searchFileModel->getCustomFields()->toArray();
-				$record = $this->formatListRecord($record, $searchFileModel);
-				$record['name'] = $searchFileModel->path;
-				$response['results'][] = $record;
+		foreach ($filesStmt as $searchFileModel) {
+			$record = $searchFileModel->getAttributes();
+			$record['customFields'] = $searchFileModel->getCustomFields()->toArray();
+			$record = $this->formatListRecord($record, $searchFileModel);
+			if(!$searchInSharedFolders) {
+				$record['name'] = substr($searchFileModel->path, strlen($stripPath) + 1);
+			} else {
+				$arPath = explode("/", $searchFileModel->path);
+				$record['name'] = array_pop($arPath);
 			}
+			$response['results'][] = $record;
+		}
 
-			return $response;
+		return $response;
 	}
         
 	public function formatListRecord($record, $model) {

@@ -115,15 +115,17 @@ class Module extends core\Module
 	}
 
 	/**
+	 * @param Query $query
+	 * @param class-string<Entity> $cls
 	 * @throws Exception
 	 */
-	public static function onEntityDelete(Query $query, $cls) {
+	public static function onEntityDelete(Query $query, string $cls) {
 
 		if(!self::$enabled || core\Installer::isInProgress()) {
 			return;
 		}
 
-		if(is_a($cls, LogEntry::class, true) || is_a($cls, Search::class, true)) {
+		if(is_a($cls, LogEntry::class, true) || is_a($cls, Search::class, true) || !$cls::loggable()) {
 			return;
 		}
 

@@ -28,6 +28,7 @@ use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use go\core\util\JSON;
 use go\core\util\PdfRenderer;
+use go\modules\business\license\model\License;
 use go\modules\community\history\Module as HistoryModule;
 use JsonException;
 use function GO;
@@ -320,7 +321,7 @@ JSON;
 	 * ```
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo
 	 *
-	 * docker-compose exec --user www-data groupoffice-finance ./www/cli.php core/System/demo --package=business --module=catalog
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo --package=business --module=catalog
 	 * ```
 	 */
 	public function demo($params = []) {
@@ -377,6 +378,23 @@ JSON;
 		if(!$alert->save()) {
 			throw new SaveException($alert);
 		}
+	}
+
+
+	public function checkLicense() {
+		$key = go()->getSettings()->license;
+
+		if(empty($key)) {
+			echo "No license key installed\n";
+		}
+
+		echo "Key: " . $key ."\n\n";
+
+		$data = License::getLicenseData();
+
+		print_r($data);
+
+		echo "----\n";
 	}
 
 

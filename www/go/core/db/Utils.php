@@ -97,7 +97,7 @@ class Utils {
 	public static function databaseExists(string $databaseName): bool
 	{
 		$stmt = App::get()->getDbConnection()->query('SHOW DATABASES');
-		while ($r = $stmt->fetch()) {
+		while ($r = $stmt->fetch(PDO::FETCH_NUM)) {
 			if ($r[0] == $databaseName) {
 				$stmt->closeCursor();
 				return true;
@@ -222,6 +222,26 @@ class Utils {
 	{
 		return self::quoteTableName($name);
 	}
+
+
+	public static function splitTableAndColumn(string $tableAndCol) : Col {
+		$dot = strpos($tableAndCol, '.');
+
+		if($dot) {
+			$column = substr($tableAndCol, $dot + 1);
+
+			$alias = substr($tableAndCol, 0, $dot);
+
+			$col = new Col();
+			$col->alias = trim($alias, ' `');
+			$col->name = trim($column, ' `');
+		} else {
+			$col = new Col();
+			$col->name = trim($tableAndCol, ' `');
+		}
+
+		return $col;
+	}
 	
 	
 	public static function isUniqueKeyException(PDOException $e) {
@@ -240,4 +260,10 @@ class Utils {
 		return false;
 	}
 
+}
+
+
+class Col {
+	public string $name;
+	public ?string $alias = null;
 }

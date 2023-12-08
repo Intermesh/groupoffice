@@ -6,6 +6,7 @@ use go\core;
 use GO\Core\Controller\CoreController;
 use go\core\exception\NotFound;
 use go\core\http\Exception;
+use go\core\model;
 use go\core\orm\Property;
 use go\core\webclient\CSP;
 use GO\Email\Controller\AccountController;
@@ -14,6 +15,7 @@ use GO\Email\Model\Account as ActiveRecordAccount;
 use GO\Email\Model\Alias;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\controller\Oauth2Client;
+use go\modules\community\oauth2client\model\Authenticator;
 use go\modules\community\oauth2client\model\DefaultClient;
 use go\modules\community\oauth2client\model\Oauth2Account;
 
@@ -39,6 +41,13 @@ class Module extends core\Module
 		return ["legacy/email"];
 	}
 
+	protected function afterInstall(model\Module $model): bool
+	{
+		Authenticator::register();
+
+		return parent::afterInstall($model);
+	}
+
 	public static function initListeners()
 	{
 		$c = new AccountController();
@@ -47,13 +56,10 @@ class Module extends core\Module
 
 		$m = new MessageController();
 		$m->addListener('beforesend', 'go\modules\community\oauth2client\Module', 'beforeSend');
-
-		go()->on(core\App::EVENT_HEAD, static::class, 'onHead');
 	}
 
-
 	public static function onHead() {
-		$clients = \go\modules\community\oauth2client\model\Oauth2Client::find()->where('openId', '=', true)->execute();
+		$clients = \go\modules\community\oauth2client\model\Oauth2Client::find()->where('openId', '=', true)->all();
 		if(!count($clients)) {
 			return;
 		}
@@ -88,6 +94,7 @@ class Module extends core\Module
 	{
 		Account::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		CSP::on(Csp::EVENT_CREATE, static::class, 'onCspCreate');
+		core\App::on(core\App::EVENT_HEAD, static::class, 'onHead');
 	}
 
 

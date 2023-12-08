@@ -275,7 +275,7 @@ Sva prava pridržana.<br />
   'Database' => 'Baza podataka',
   'Files' => 'Datoteke',
   'If you leave {product_name} you will loose unsaved changes' => 'Ako napustite {product_name} izgubit ćete ne sačuvane promjene',
-  'The data was saved succesfully' => 'Podaci su uspješno sačuvani',
+  'The data was saved successfully' => 'Podaci su uspješno sačuvani',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Kliknite na \'Pregled\' kako biste izabrali datoteke i/ili direktorije sa vašeg računala. Kliknite na \'Prijenos\' kako biste prenijeli datoteke u {product_name}. Ovaj prozor će se automatski zatvoriti kada prijenos datoteka bude završen.',
   'Click here to login to {product_name}' => 'Kliknite ovdje kako biste se prijavili u {product_name}',
   'Links' => 'Poveznice',

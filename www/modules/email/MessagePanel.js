@@ -102,12 +102,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<div class="em-links">'+
 				'<tpl for="links">'+
 					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> ' +
-					'<tpl if="entity==\'LinkedEmail\'">'+
-					'<a href="#email"  onclick="const win = new go.links.LinkDetailWindow({entity\:\'LinkedEmail\'});win.load({model_id});">'+
-					'</tpl>' +
-					'<tpl if="entity!=\'LinkedEmail\'">' +
-						'<a href="#{entity}/{model_id}">' +
-					'</tpl>' +
+					'<a href="#email"  onclick="const win = new go.links.LinkDetailWindow({entity\:\'{entity}\'});win.load({model_id});">'+
 					'{name}</a> <label>{description}</label>' +
 					'{[this.addDeleteBtn(values)]}</p>' +
 					'</div>' +

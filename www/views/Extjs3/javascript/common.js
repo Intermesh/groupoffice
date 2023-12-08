@@ -288,7 +288,7 @@ GO.request = function(config){
 			} else {
 				//the same happens in GO.data.JSonStore.
 				if(result.exportVariables){					
-					GO.util.mergeObjects(window, result.exportVariables);				
+					Object.assign(window, result.exportVariables);
 				}
 				
 				if(origSuccess) {
@@ -302,23 +302,24 @@ GO.request = function(config){
 	Ext.Ajax.request(p);
 }
 
-GO.util.mergeObjects = function(a, b) {
-    for(var item in b){
-        if(a[item]){
-            if(typeof b[item] === 'object' && !b[item].length){
-                GO.util.mergeObjects (a[item], b[item]);
-            } else {
-                if(typeof a[item] === 'object' || typeof b[item] === 'object') {
-                    a[item] = [].concat(a[item],b[item]);
-                } else {
-                    a[item] = [a[item],b[item]];  // assumes that merged members that are common should become an array.
-                }
-            }
-        } else {
-            a[item] = b[item];
-        }
-    }
-    return a;
+GO.util.mergeObjects = function(dst, src) {
+  for(let key in src) {
+    if (!src.hasOwnProperty(key)) continue;
+      if(dst[key]){
+          if(typeof src[key] === 'object' && !src[key].length && dst.hasOwnProperty(key)){
+              GO.util.mergeObjects (dst[key], src[key]);
+          } else {
+              if(typeof dst[key] === 'object' || typeof src[key] === 'object') {
+                  dst[key] = [].concat(dst[key],src[key]);
+              } else {
+                  dst[key] = [dst[key],src[key]];  // assumes that merged members that are common should become an array.
+              }
+          }
+      } else {
+          dst[key] = src[key];
+      }
+  }
+  return dst;
 }
 
 //Ext.Ajax.on('requestcomplete', function(){

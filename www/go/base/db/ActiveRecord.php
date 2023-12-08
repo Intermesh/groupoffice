@@ -53,6 +53,7 @@ use go\core\model\Link;
 use go\core\model\Module;
 use go\core\model\User;
 use go\core\model\UserDisplay;
+use go\core\orm\exception\SaveException;
 use go\core\orm\SearchableTrait;
 use go\core\util\StringUtil;
 use go\modules\community\comments\model\Comment;
@@ -3747,8 +3748,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
 		$search->rebuild = false;
+		$search->cutPropertiesToColumnLength();
 		if(!$search->save()) {
-			throw new \Exception("Could not save search cache!");
+			throw new SaveException($search);
 		}
 
 		if(!$isNew) {
@@ -4909,10 +4911,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(in_array("getCacheAttributes", $overriddenMethods)){
 			
 			echo "Processing ".static::class ."\n";
+
+			if(ob_get_level() > 0) ob_flush();
+			flush();
 			
 			$entityTypeId = static::entityType()->getId();
 
 			echo "Deleting old values\n";
+
+			if(ob_get_level() > 0) ob_flush();
+			flush();
 
 			$stmt = go()->getDbConnection()->delete('core_search', (new \go\core\orm\Query)
 				->where('entityTypeId', '=',$entityTypeId)
@@ -4921,6 +4929,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$stmt->execute();
 
 			echo "Deleted ". $stmt->rowCount() . " entries\n";
+
+			if(ob_get_level() > 0) ob_flush();
+			flush();
 
 			$start = 0;
 			$limit = 1000;
@@ -4944,6 +4955,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				while ($m = $stmt->fetch()) {
 				
 					try {
+						if(ob_get_level() > 0) ob_flush();
 						flush();
 						
 						if($m->cacheSearchRecord()) {
@@ -4964,7 +4976,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 
 						echo \go\core\ErrorHandler::logException($e);
-
+						if(ob_get_level() > 0) ob_flush();
+						flush();
 						$start++;
 					}
 				}
@@ -4974,6 +4987,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 			
 			echo "\nDone\n\n";
+
+			if(ob_get_level() > 0) ob_flush();
+			flush();
 			
 		}
 	}

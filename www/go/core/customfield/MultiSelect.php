@@ -196,8 +196,8 @@ class MultiSelect extends Select {
 			$cls = $query->getModel();
 			$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
 			$joinAlias = $this->getJoinAlias();
-			$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id', 'left');
-
+			$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id', 'left')
+				->groupBy([$primaryTableAlias . '.id']);
 			if(isset($value[0]) && is_numeric($value[0])) {
 				//When field option ID is passed by a saved filter
 				$criteria->where($joinAlias. '.optionId', '=', $value);

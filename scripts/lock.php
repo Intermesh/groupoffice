@@ -21,4 +21,4 @@ $lock->lock();
 echo "Lock aquired by " .getmypid(). "!\n";
 
 // 1 sec longer than timeout
-sleep(11000);
+sleep(5);

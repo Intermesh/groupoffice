@@ -76,12 +76,16 @@ class Mailer {
 		$this->emailAccount = $account;
 		$this->smtpAccount = null;
 
-
 		return $this;
 	}
 
+	/**
+	 * Check if the mailer is configured with a user e-mail account
+	 *
+	 * @return bool
+	 */
 	public function hasAccount() : bool {
-		return isset($this->account);
+		return isset($this->emailAccount);
 	}
 
 	private function prepareMessage(Message $message): void

@@ -216,15 +216,19 @@ class ContactStore extends Store {
 
 		return $folders;
 	}
+
 	
 	public function getNotification($folder = null) {
-		$record = Contact::find()
+
+		$stmt = Contact::find()
 			->fetchMode(PDO::FETCH_ASSOC)
 			->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
-//						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
-//						->where(['s.userId' => go()->getUserId()])
-			->where('c.addressBookId','=',$folder)
-			->single();
+			->where('addressBookId = :addressBookId')
+			->createStatement();
+
+		$stmt->bindValue(':addressBookId', $folder, PDO::PARAM_INT);
+		$stmt->execute();
+		$record = $stmt->fetch();
 
 		$newstate = $record ? 'M'.$record['modifiedAt'].':C'.$record['count'] : "M0:C0";
 		ZLog::Write(LOGLEVEL_DEBUG,'goContact->getNotification('.$folder.') State: '.$newstate);

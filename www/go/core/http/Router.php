@@ -94,28 +94,24 @@ class Router {
     	if(!headers_sent()) {
 		    Response::get()->setStatus(401, $e->getMessage());
 	    }
-      ErrorHandler::logException($e);
+	    $this->printException($e);
     } catch(NotFound $e) {
 	    if(!headers_sent()) {
 		    Response::get()->setStatus(404, $e->getMessage());
 	    }
-      ErrorHandler::logException($e);      
+	    $this->printException($e);
     } catch(Exception $e) {
 	    if(!headers_sent()) {
 		    Response::get()->setStatus($e->code, $e->getMessage());
 	    }
-      ErrorHandler::logException($e);      
+	    $this->printException($e);;
     } catch(Throwable $e) {
 	    if(!headers_sent()) {
 		    Response::get()->setStatus(500, StringUtil::normalizeCrlf($e->getMessage(), " - "));
-	    }
+			}
 
-      echo '<h1>' . $e->getMessage() .'</h1>';
-      echo '<pre>';
-      echo $e->getTraceAsString();
-      echo '</pre>';
+			$this->printException($e);
 
-      ErrorHandler::logException($e);    
     }
 
 	  if(isset($response) && $response instanceof \GuzzleHttp\Psr7\Response) {
@@ -125,6 +121,24 @@ class Router {
 	  }
 
   }
+
+	private function printException(Throwable $e) {
+
+		ErrorHandler::logException($e);
+
+		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
+
+		echo '<h1>' . get_class($e) .'</h1><p>'.$e->getMessage().'</p>';
+
+		if(go()->getDebugger()->enabled) {
+			echo '<pre>';
+			echo $e->getTraceAsString();
+			echo '</pre>';
+		}
+
+		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
+
+	}
 
   private function emitPsr7Response(ResponseInterface $response){
 	  if (headers_sent()) {

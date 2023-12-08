@@ -37,7 +37,6 @@
             }
             obj = obj[part][arrayIndex];
         } else {
-
             if (!obj[part]) {
                 if(!Ext.isDefined(value)) {
                     return null;
@@ -80,7 +79,7 @@
             var ret;
 
             parts.forEach(function(part) {
-                ret = obj = traverse(obj, part);
+							ret = obj = traverse(obj, part);
             });
 
 

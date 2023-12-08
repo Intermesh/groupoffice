@@ -189,7 +189,7 @@ CREATE TABLE `core_search` (
   `name` varchar(100) DEFAULT NULL,
   `description` varchar(190) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
-  `filter` VARCHAR(50) NULL DEFAULT NULL,
+  `filter` VARCHAR(190) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL,
   `rebuild` bool default false not null
@@ -537,7 +537,7 @@ ALTER TABLE `core_change_user_modseq`
 
 ALTER TABLE `core_cron_job`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `description` (`description`),
+  ADD UNIQUE KEY `name` (`name`),
   ADD KEY `moduleId` (`moduleId`);
 
 ALTER TABLE `core_customfields_field`
@@ -773,7 +773,8 @@ ALTER TABLE `core_customfields_select_option`
 
 ALTER TABLE `core_entity`
   ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
-ALTER TABLE `core_entity` ADD FOREIGN KEY (`defaultAclId`) REFERENCES `core_acl`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `core_entity`
+    ADD CONSTRAINT `core_entity_ibfk_2` FOREIGN KEY (`defaultAclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 ALTER TABLE `core_group`
   ADD CONSTRAINT `core_group_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
@@ -1241,3 +1242,8 @@ create table core_import_mapping
             on delete cascade
 )
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+create index core_search_filter_index
+    on core_search (filter);

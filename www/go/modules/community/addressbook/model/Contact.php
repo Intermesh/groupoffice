@@ -603,7 +603,7 @@ class Contact extends AclItemEntity {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
 											}
 											
-											$criteria->where('adr.street', $comparator, $value);
+											$criteria->where('adr.address', $comparator, $value);
 										})
                     ->addText("zip", function(Criteria $criteria, $comparator, $value, Query $query) {
                       if(!$query->isJoined('addressbook_address', 'adr')) {
@@ -791,7 +791,7 @@ class Contact extends AclItemEntity {
 
 	private function generateUid(): string
 	{
-		$url = trim(go()->getSettings()->URL, '/');
+		$url = trim(go()->getSettings()->URL ?? "", '/');
 		$uid = substr($url, strpos($url, '://') + 3);
 		$uid = str_replace(['/', ':'], ['-', '-'], $uid );
 
@@ -891,8 +891,7 @@ class Contact extends AclItemEntity {
 	protected function internalValidate() {
 
 		if($this->isOrganization) {
-			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = null;
-			$this->lastName = $this->name;
+			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = $this->lastName = null;
 		} else if(empty($this->name) || (!$this->isModified(['name']) && $this->isModified(['firstName', 'middleName', 'lastName']))) {
 			$this->setNameFromParts();
 		}

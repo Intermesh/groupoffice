@@ -18,6 +18,14 @@ GO.email.TemplateGridPanel = Ext.extend(GO.grid.GridPanel,{
 				this.searchField
 			],
 			border: false,
+			view: new Ext.grid.GroupingView({
+				showGroupName: false,
+				enableNoGroups:false, // REQUIRED!
+				hideGroupedColumn: true,
+				emptyText: t("No items to display"),
+				autoFill: true,
+				forceFit: true
+			}),
 //			paging:true,
 			cm:new Ext.grid.ColumnModel({
 				defaults:{
@@ -27,6 +35,10 @@ GO.email.TemplateGridPanel = Ext.extend(GO.grid.GridPanel,{
 				{ 
 					header: 'name', 
 					dataIndex: 'text' 
+				},{
+					header: t('Group'),
+					dataIndex: 'group_id',
+					renderer: (v,meta,rec) => rec.data.group_name
 				},
 				new GO.grid.RadioColumn({
 					id:'checked',

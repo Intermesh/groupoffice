@@ -347,7 +347,7 @@ class Image {
 	}
 
 	/**
-	 * Zoom th image to fir the given height and width. Image aspect ratio is used
+	 * Zoom th image to fit the given height and width. Image aspect ratio is used
 	 * but if the image goes out of bounds then crop these parts.
 	 *
 	 * @param int $thumbnailWidth
@@ -371,12 +371,13 @@ class Image {
 			$newHeight = $thumbnailHeight;
 		}
 
+		$original = $this->getImage();
 		$this->resizedImage = imagecreatetruecolor($thumbnailWidth, $thumbnailHeight);
 
 		$x = round(($newWidth - $thumbnailWidth) / -2);
 		$y = round(($newHeight - $thumbnailHeight) / -2);
 
 		$this->transperancy();
-		return imagecopyresampled($this->resizedImage, $this->originalImage, $x, $y, 0, 0, $newWidth, $newHeight, $widthOrig, $heightOrig);
+		return imagecopyresampled($this->resizedImage, $original, $x, $y, 0, 0, $newWidth, $newHeight, $widthOrig, $heightOrig);
 	}
 }

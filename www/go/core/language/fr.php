@@ -344,7 +344,7 @@ return array (
   'This {product_name} installation is using' => 'Cette installation de {product_name} utilise ',
   'Database' => 'Base de données',
   'If you leave {product_name} you will loose unsaved changes' => 'Si vous quittez {product_name}, vous allez perdre les données non enregistrées',
-  'The data was saved succesfully' => 'Les données ont été sauvegardées avec succès',
+  'The data was saved successfully' => 'Les données ont été sauvegardées avec succès',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Cliquez sur \'Parcourir\' pour sélectionner le(s) fichier(s) ou répertoire(s) sur votre ordinateur. Cliquez sur \'Télécharger\' pour transférer le(s) fichier(s) ou répertoire(s) vers {product_name}. Cette fênetre sera fermée automatiquement à la fin du transfert.',
   'Click here to login to {product_name}' => 'Cliquez ici pour vous connecter à l\'application {product_name}',
   '{product_name} website' => 'Site web {product_name}',

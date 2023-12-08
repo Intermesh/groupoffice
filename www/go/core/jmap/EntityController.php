@@ -306,20 +306,32 @@ abstract class EntityController extends Controller {
 				} else{
 					 $totalQuery = clone $idsQuery;
 
-					 if(count($idsQuery->getGroupBy())) {
-					 	$totalQuery->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)");
-					 } else{
-						 //count(*) can be used because we use a subquery in AclItemEntity::applyAclToQuery()
-						 $totalQuery->selectSingleValue("count(*)");
+					 if(count($idsQuery->getHaving())) {
+						 $totalQuery->orderBy([], false)
+							 ->limit(0)
+							 ->offset(0);
+
+						 $totalQuery = (new Query())->selectSingleValue('count(*)')->from($totalQuery);
+					 } else {
+						 if (count($idsQuery->getGroupBy())) {
+							 $totalQuery->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)");
+						 } else {
+							 //count(*) can be used because we use a subquery in AclItemEntity::applyAclToQuery()
+							 $totalQuery->selectSingleValue("count(*)");
+						 }
+
+						 $totalQuery->orderBy([], false)
+							 ->groupBy([])
+							 ->limit(1)
+							 ->offset(0);
+
+
 					 }
 
-					 $response['total'] = $totalQuery
-
-					 								->orderBy([], false)
-					 								->groupBy([])
-					 								->limit(1)
-					 								->offset(0)
-					 								->single();
+					$response['total'] = $totalQuery->single();
+					if(go()->getDebugger()->enabled) {
+						$response['totalQuery'] = (string) $totalQuery;
+					}
 				}
 			}
 		}catch(PDOException $e) {
@@ -422,9 +434,9 @@ abstract class EntityController extends Controller {
 
 		if(!empty($params['ids'])) {
 			$params['ids'] = array_unique($params['ids']);
-			$params['ids'] = array_filter($params['ids'], function($id) {
-				return !empty($id);
-			});
+//			$params['ids'] = array_filter($params['ids'], function($id) {
+//				return !empty($id);
+//			});
 		}
 
 		if(!isset($params['properties'])) {
@@ -839,6 +851,7 @@ abstract class EntityController extends Controller {
    */
 	private function updateEntities(array $update, ArrayObject $result) {
 		foreach ($update as $id => $properties) {
+			$id = (string) $id;
 			if(empty($properties)) {
 				$properties = [];
 			}
@@ -904,6 +917,7 @@ abstract class EntityController extends Controller {
 
 		$doDestroy = [];
 		foreach ($destroy as $id) {
+			$id = (string) $id;
 			$entity = $this->getEntity($id);
 			if (!$entity) {
 				$result['notDestroyed'][$id] = new SetError('notFound', go()->t("Item not found"));
@@ -1161,7 +1175,9 @@ abstract class EntityController extends Controller {
    */
 	protected function defaultExport(array $params): ArrayObject
 	{
-		go()->getEnvironment()->setMaxExecutionTime(10 * 60);
+		if(!go()->getEnvironment()->isCli()) {
+			go()->getEnvironment()->setMaxExecutionTime(10 * 60);
+		}
 		
 		$params = $this->paramsExport($params);
 		
@@ -1201,6 +1217,10 @@ abstract class EntityController extends Controller {
 		/** @var Entity $cls */
 
 		$entity = $cls::findById($primaryId);
+
+		if(!$entity) {
+			throw new NotFound($cls.':'.$primaryId);
+		}
 
 		if(!$this->canUpdate($entity)) {
 			throw new Forbidden();

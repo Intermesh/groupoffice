@@ -1,6 +1,118 @@
+- Addressbook: Last name was wrongfully set on organizations
+- Billing: Fixed Undefined array key 0" when sending billing mail
+
+04-12-2023: 6.8.22
+- Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
+- Core: Combo box could send typed search text instead of empty id.
+- openid: register users and show authenticator icon in system settings
+- core: Ability to set password for users that have no authentication option
+- debian package: Added example to disable /install from the web
+- Libreoffice: fix deprecation error in PHP8 / LibXML version
+- Finance: Fixed The migration failed: Typed property go\modules\business\contracts\model\Contract::$contactId must not be accessed before initialization
+- Core: Capture Cmd/ctrl + P and print the detail panel
+- Addressbook: fix 'street' filter
+- Billing: PHP compatibility PDF class
+- Support: Fixed merge of support tickets
+- Email: Fixed printing mail with corrupted images in Firefox
+- Newsletters: Legacy email accounts load without an SMTP account
+- Newsletters: Fixed permissions of address list not respected in sent items grid
+
+27-11-2023: 6.8.21
+- Core/Email: Fixed big fonts on some receiving e-mail clients (webclients for sure).
+- Core/Email: Sent items didn't have BCC address header since v6.8
+- Email: Fix for 'actionMoveToSpam' because of hardcoded 'Spam' folder
+  Now you can define a global value: 'spam_folder' => 'INBOX.Junk' or
+   use its defined value in account settings (account->spam)
+- Core: moved cache back to data folder. Otherwise apache can't clear the cache that CLI uses.
+- Address book: Fixed rotated thumbnail in address book
+- Address book: fix deprecation error with VCards
+- Finance: Fixed migration problem: Cannot set non-existing property 'showTotals' in 'go\modules\business\finance\model\FinanceDocumentItemGroup'
+- Email: Abort send if one of the recipients fails. Before it would send to all of the others.
+- Core: ID column in system settings > groups
+- Newsletters: Accounts from the e-mail module can be selected too.
+- ZpushAdmin: Make sure table zpa_devices exists
+
+20-11-2023: 6.8.20
+- Calendar: Don't try to match email if it's a reply
+- Core: added openid service discovery alias. See https://github.com/Intermesh/groupoffice/discussions/1063#discussioncomment-7582806
+- Finance: Sort on number too when sorting on date
+- Finance: Show total and subtotal in debtor view
+- Core: Disconnect mysql when calculating disk usage to avoid Mysql General error: 2006 MySQL server has gone away.
+- Calendar: System email account was used on calendar invites even when user had an email account configured
+- Tasks: Set progress to needs action when changing assigned to
+- Finance: Add description from catalog too
+- Files: fix searching in shared folders
+- Email: Spam / Junk folder is now configurable.
+
+14-11-2023: 6.8.19
+- Core: fix error when autosaving relation to new entity
+- Contracts: customer and contact variables were missing in the template for contract e-mails
+- Core: Check if exec function is available and use default locale C.UTF8 it's not there.
+- Contracts: Use business model of target finance book
+- Core: better styling of invalid checkboxes
+- Core: Fixed some minor security advisories from GitHub's CodeQL scanner
+
+13-11-2023: 6.8.18
+- Core: Fixed Wrong dependency on php-xsl on Debian 12? #1064
+
+09-11-2023: 6.8.17
+- Tasks: fix error when trying to delete or update task with alert
+- Email: open links in window instead of routing to the module
+- Files: Show context menu in files detail view
+- Support: Fixed support accounts not being queried
+- Core: show error message when module delete fails
+
+06-11-2023: 6.8.16
+- Core: fixed issue when creating new property with relations
+- Finance: Fixed total calculation in groups
+- Tasks: bugfix when no CC available
+- Finance: remember selected statuses per book
+- Core: fixed login screen for mobiles
+
+03-11-2023: 6.8.15
+- Core: Fixed security issue
+- Finance: Improved charts
+- Task: task counter only counts tasks that are due today
+- Support: Customize the outgoing e-mail message with a template
+- Support: Added support CC addresses
+
+31-10-2023: 6.8.14
+- Files: When using search only search current folder and below
+
+31-10-2023: 6.8.13
+- Core: upgrade failed due to fixed database name in update queries
+
+31-10-2023: 6.8.12
+- ActiveSync: Fixed extra day bug in for all day events
+- Core/ActiveSync: DB connection wasn't close on SSE / Push
+- Calendar: restore label 'Start' at start date field
+- Calendar: fix deprecation error on calendar report
+- Core: bugfix normalizing CC in new mail API
+- Core: bugfix delete modules with entities
+
+24-10-2023: 6.8.11
+- Finance: Remove amount from document title to improve privacy
+- Finance: Fix links when adding from detail view
+- Core: Fixed some firefox quirks. Error when opening file and SSE canceled when document.location = was used. See
+  old bug: https://bugzilla.mozilla.org/show_bug.cgi?id=564744
+- Finance: migrate custom fields from billing
+- Catalog: migrate custom fields from billing
+
+18-10-2023: 6.8.10
+- Core / newsletters: fix email template upload
+- Finance: Copy items in finance was broken
+- Support: Search found task and ticket
+- Support: Links didn't show up in other entity
+
+11-10-2023: 6.8.9
+- Hotfix: business install and update scripts
+
+10-10-2023: 6.8.8
 - Core: Raised SSE check interval from 10s to 30s for performance
 - Core: Moved disk cache to temp dir so it can be put on faster partitions
 - Tasks: Add message field for first comment
+- Supportclient: add a mask when submitting a new request
+- Core: fix uncommon exception in databaseExists method
 
 29-09-2023: 6.8.7
 - Email: bcc and cc bug
@@ -31,22 +143,62 @@
 
 -- 6.8 --
 
+- Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
+- Core: Capture Cmd/ctrl + P and print the detail panel
+- Filesearch: Tidied up search form
+- Projects: Permissions were editable though delete button when they were not overwritten
+- Newsletters: Legacy email accounts load without an SMTP account
+- Newsletters: Fixed permissions of address list not respected in sent items grid
+- Email: Fixed printing mail with corrupted images in Firefox
+
+27-11-2023: 6.7.56
+- Newsletters: fix missing dependency in install script
+- Addressbook: remove obsolete CLI script
+- Addresbook: increase maximum size of name / lastName fields of Contact
+- Tasks: only show counter for tasks that are due
+- Newsletters: Accounts from the e-mail module can be selected too.
+- ZpushAdmin: Make sure table zpa_devices exists
+
+20-11-2023: 6.7.55
+- Core: Updated PL translations. Thank you Piotr!
+- Finance: Sort customer and contact
+- Finance: Bug in selecting article on existing rows
+- Core: fixed login screen for mobiles
+- Calendar: Don't try to match email if it's a reply
+- Finance: Sort on number too when sorting on date
+- Finance: Show total and subtotal in debtor view
+- Core: Disconnect mysql when calculating disk usage to avoid Mysql General error: 2006 MySQL server has gone away.
+- Core: Link items did not update because Search entity didn't sync anymore
+- Billing: Added sorting to project report
+
+03-11-2023: 6.7.54
+- Core: Fixed security issue
+- Billing: Custom fields in ODF template work with prefix contact:, company: or user:
+
+31-10-2023: 6.7.53
+- ActiveSync: Fixed extra day bug in for all day events
+- Core/ActiveSync: DB connection wasn't close on SSE / Push
+
+24-10-2023: 6.7.52
+- Core: Fixed some firefox quirks. Error when opening file and SSE canceled when document.location = was used.
+  See old bug: https://bugzilla.mozilla.org/show_bug.cgi?id=564744
+- Billing: create duplicate dialog if not there yet
+- Core: enable user to delete and update own spreadsheet export presets
+
+17-10-2023: 6.7.51
+- Notes /Comments: Fixed you're not allowed to paste scripts
+- Finance: Remove invalid chars in PDF filename
+- Tasks: fix grouping by responsible user
+
+10-10-2023: 6.7.50
 - Addressbook: Added filter for has organization
+- Core: Raised SSE check interval from 10s to 30s for performance
+- Core: Moved disk cache to temp dir so it can be put on faster partitions
+- Serverclient: check for default setting serverclient_force_smtp_login to force SMTP login through IMAP credentials
 
 26-09-2023: 6.7.49
 - Core: fix casting error when saving cropped blob (e.g. avatar)
 - Core: Multiselect custom field was broken for activerecord
-
-19-09-2023: 6.7.48
-- Leavedays: fix error upon exporting leaveday hours
-- Core: fix error in user export
-- Supportclient: New Italian translations. Grazie, CENSEA DUE
-
-14-09-2023: 6.7.47
-- Addressbook: Name bug when middle name was entered contact was connected to user.
-- Core: Fixed install failure when MySQL's default engine was not set to InnoDB (GitHub issue #1049)
-- Core: Log client errors on server via JMAP call
-
 
 19-09-2023: 6.7.48
 - Leavedays: fix error upon exporting leaveday hours
@@ -296,6 +448,41 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+- Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
+- Files: Folder was outputted in CLI mode when filesystem was synced. (LDAP sync for example).
+
+20-11-2023: 6.6.179
+- Core: Combo box could send typed search text instead of empty id.
+- Core: Added skip_license=1 parameter to upgrade.php so license check is skipped.
+- Calendar: Don't try to match email if it's a reply
+- Core: Disconnect mysql when calculating disk usage to avoid Mysql General error: 2006 MySQL server has gone away.
+
+13-11-2023: 6.6.178
+- Ticket crashes with ErrorException Trying to get property 'name' of non-object
+- Leavedays: make special leave budget optional for employee when requesting leave for special leave type
+
+03-11-2023: 6.6.177
+- Core: Fixed security issue
+
+31-10-2023: 6.6.176
+- Calendar: make color dialog wider to reflect newer layout
+- Billing: create duplicate dialog if not there yet
+
+23-10-2023: 6.6.175
+- Core: Apcu doesn't fall back on disk cache anymore because it degraded performance.
+- Ldapauth: remove avatar if synced as such from LDAP server
+
+17-10-2023: 6.6.174
+- Core: global add button will not redirect, instead show a flyout.
+
+10-10-2023: 6.6.173
+- Email: show attachments if sent as email, both for IMAP and as linked email.
+- Core: global 'Add' button
+- Core: fixed awkward DE translation
+
+27-09-2023: 6.6.172
+- Leavedays: bugfix in leave day requset
+>
 25-09-2023: 6.6.171
 - Leavedays: bugfix - employee can request leave day budgets
 - Core: Add Jersey and Isle of Man to countries list
@@ -3746,8 +3933,8 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 14-05-2019 6.3.73
 - Sync/email: Fixed paging and searching in select email in sync settings
 - Core: Created new setting callto_open_window to control if a phone number click will open a window
-- Core: Fixed issue that when a link is created on model->save and the Link/set is called afterwards, that an error is thrown when the link did    
-        already exist. Now the error is ignored when validationerror status == 11 
+- Core: Fixed issue that when a link is created on model->save and the Link/set is called afterwards, that an error is thrown when the link did
+        already exist. Now the error is ignored when validationerror status == 11
 - Core: Clear listeners before creating the new ones again.
 - Core: Fixed issue that the columnSelectGrid for export could crash when pressing "Delete" button to remove a column.
         Double click or drag/drop should be used. Delete is disabled now.
@@ -3791,7 +3978,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 01-04-2019 6.3.68
 - Email: Fixed subfolders with \ as delimiter
 - Timeregistration: Improved error message when time entry with break fails
-- Addressbook: Fixed custom field import 
+- Addressbook: Fixed custom field import
 - Core: Old framework registered entity incorrectly. "linkedEmail" instead of "LinkedEmail"
 - FileSearch: Fixed links to attached indexed attachments in the displaypanel. (Was broken due to new GO63 router)
 		*** Running the filesearch index again is needed to let this work ***
@@ -3805,14 +3992,14 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Email: Fixed filename issue with spaces in email attachment download
 
 07-03-2019 6.3.67
-- Customfields: fixed format of max fieldlength for customfields when it is set to 1000 or more. 
+- Customfields: fixed format of max fieldlength for customfields when it is set to 1000 or more.
 - Core: Updated Czech translation
 - Core: Fixed bug that 30 day trial button did not show.
 - Core: Upgraded to SabreDAV 3.2.3 to fix sync problem with some CardDAV clients (DAVDroid, em client)
 - Core: Add validation to Mapping::addRelation() so developers can't map entities.
 - Core: Dont' open new tab on tel:// click
 - Core: Added maxlength props to text and mediumtext dbtypes
-- Files: Decompress zipped files in folder with read only permissions will throw an access denied exception. 
+- Files: Decompress zipped files in folder with read only permissions will throw an access denied exception.
 - Tickets: Search didn't search message content anymore
 - Multi instance: Use cookie in when logging in from multi instance too.
 
@@ -3837,7 +4024,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Tasks/Start page: Put headers back so the startpage widget can be sorted on date.
 - Calendar: Fixed problem that opening event dialog the 2nd time did not work.
 - Core: Don't search in TEXT fields by default
-- Address Book: Removed automatic copy to post address because it makes more sense to 
+- Address Book: Removed automatic copy to post address because it makes more sense to
   use the button
 - Core: Fixed Combobox display of html entities.
 - Document templates: Fixed linking in new email from template
@@ -3874,7 +4061,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 31-01-2019 6.3.61
 - Core: Request SSL check works when server is behind proxy too
 - Core: Listeners relied on cache to be persistent causing missing properties "taskSettings" and "googleauthenticator"
-- Assistant: base64 encode paths so that it works with UTF-8 on all platforms and browsers. 
+- Assistant: base64 encode paths so that it works with UTF-8 on all platforms and browsers.
 
   *** Assistant 1.0.4 is required after this upgrade ***
 
@@ -3938,7 +4125,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Core: Fixed session reset problem (Export and Smime)
 - Calendar: Fixed link creating when adding event to another item
 - Core: Checkbox in tree panels never fired "checked" on checkchange.
-- Core: Fix for ticket #201817154. Unclosable window remained when window was 
+- Core: Fix for ticket #201817154. Unclosable window remained when window was
   hidden after submit while being dragged
 
 26-11-2018 6.3.54
@@ -3956,7 +4143,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Core: Added support for icon style in MenuItems with property iconStyle: cssProps
 - VCard: Fix import of phone number without a type are within a vcard group
 - Core: Numberfield broken when loaded before render
-- Tickets: First message content was not set on ticket when importing from imap 
+- Tickets: First message content was not set on ticket when importing from imap
   making {MESSAGE} unavailable in templates
 - Files: Recent file didn't show files from folders without ACL id
 - Files: Fixed shares folder with complex sharing structures
@@ -3966,10 +4153,10 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Core: Delete contact didn't work
 
 15-11-2018 6.3.51
-- Core: upgrade broke all passwords. If your password break again after this 
-        upgrade then move /var/lib/groupoffice/defuse-crypto.txt to 
+- Core: upgrade broke all passwords. If your password break again after this
+        upgrade then move /var/lib/groupoffice/defuse-crypto.txt to
         /home/groupoffice/defuse-crypto.txt
-- Notes: Removed adding createdBy in init of the Notebook entity. 
+- Notes: Removed adding createdBy in init of the Notebook entity.
 				 This causes issues when creating an instance of the object when no user is logged in.
 - Core: Implemented domain combo box with default setting on login screen so
 				LDAP and IMAP authenticator users can logon without entering the domain.
@@ -3997,7 +4184,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Calendar: Fixed bug when clicking on grid created appointment on the wrong day
 - Core: Fixed ZIP file bug with utf8 characters in filenames
 - Core: Added Create link button to email composer, task, note and event dialog.
-- Core: Fixed issue with form loading while it was not yet rendered. 
+- Core: Fixed issue with form loading while it was not yet rendered.
 				(Fixes loading of the user settings dialog when accessing it from the users grid.)
 
 30-10-2018 6.3.47
@@ -4036,7 +4223,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 
 15-10-2018 6.3.43
 - ATTENTION: System settings need attention for default user groups and group visibility.
-- Core: Group and user defaults are sub dialogs in system settings. 
+- Core: Group and user defaults are sub dialogs in system settings.
 - Core: Group visibility defaults can be configured and reset.
 - Core: Cleanup user data in old framework when user is deleted
 - Core: Added new preference to show long or short dates in lists.
@@ -4196,7 +4383,7 @@ Comments
 
 15-03-2018 6.2.86
 - Moved disk cache directory to file_storage_path because tmp is containerized on newer linux versions.
-- Removed Object class and put functionality in Model because Object is 
+- Removed Object class and put functionality in Model because Object is
   a reserved word in php 7.2
 - GOLog truncate data when content is longer than 500 chars
 - Remove users from ticket agent selection fields when user is disabled
@@ -4394,7 +4581,7 @@ Comments
 - Calendar: optimized save
 - Workflow: Also send notification when user approves a step
 - Workflow: Fixed incorrect label copy = move in administration
-- Core: Cleaned up code for forgot password functionality. 
+- Core: Cleaned up code for forgot password functionality.
 - Smime/Email: Fixed issue that sometimes the Date is not displayed correctly
 - Holidays: Fixed deletion of holiday entries
 - Holidays: make use of new gotype = 'time' option
@@ -4430,7 +4617,7 @@ Comments
 18-07-2017 6.2.51
 - Core: Fixed issue with the creation of listeners in the cache folder
 - Addressbook: Fixed SQL error in install.sql
-- Calender: fix cli export 
+- Calender: fix cli export
 
 18-07-2017 6.2.50
 - Error in German language
@@ -4489,7 +4676,7 @@ Comments
 
 12-06-2017 6.2.41
 - Merged 6.1 fixes
-- fix SQLSTATE[HY000]: General error: 1364 Field 'parent_id' doesn't have a default value 
+- fix SQLSTATE[HY000]: General error: 1364 Field 'parent_id' doesn't have a default value
 - Calendar: Reminders can be set to null from now. The behavior of a reminder with a "value" that is set to "0" will be that it will trigger on the exact moment of the event.
 - Chat: Add multi groups to chat view
 - Tickets: Added option to show a confirmation dialog when closing a ticket through the close button in the displaypanel
@@ -4538,7 +4725,7 @@ Comments
 - Core: Fixed some issues with the switch user module and the new "single login" feature
 
 19-04-2017 6.2.37
-- Holidays: Fixed loading issue cases by 
+- Holidays: Fixed loading issue cases by
 - Billing: Add field extra costs
 - Core: Fixed length issue with footprint column in go_clients table
 - E-mail encoding improvements so that hotmail does not detect it as spams
@@ -4579,7 +4766,7 @@ Comments
 - Projects2: Fixed setting the "Supplier" automatically when the "Contact" is selected in the Expense budget dialog.
 - Addressbook: Added a default addressbook selection tab to the global settings dialog so a user can select a default addressbook.
 - Calendar: The full day events imported from a ICalendar source are created in UTC timezone
-- Core: Added config variable to remove the "remember login" checkbox from the login dialog. 
+- Core: Added config variable to remove the "remember login" checkbox from the login dialog.
 				$config["remember_login"]=true; Set it to "false" to remove the checkbox.
 
 28-03-2017 6.2.32
@@ -4601,7 +4788,7 @@ Comments
 20-03-2017 6.2.29
 - 6.1 fixes
 - Included z-push fix states for server manager
-- Calendar: Event after save acl fix 
+- Calendar: Event after save acl fix
 - Solved issues with PHP 7.1 (cannot use $this as a parameter)
 - Set IE document model to IE10 to fix insert image problem
 - Updated Norwegian translation
@@ -4615,9 +4802,9 @@ Comments
 - Core: DateTime - Added getDayEnd and getDayStart functions
 - Email: Added functionality to save all attachments of an email to the files module.
 - Email: Added functionality to save all attachments to a linked model.
-- We've come to the conclusion that stack traces can't be logged securely. So 
-	we've removed the /home/groupoffice/log/error.log functionality completely 
-	since removing stack traces would make it identical to the normal apache error 
+- We've come to the conclusion that stack traces can't be logged securely. So
+	we've removed the /home/groupoffice/log/error.log functionality completely
+	since removing stack traces would make it identical to the normal apache error
 	log.
 - Calendar: Fix save exception event of participants
 - GO base router: Fix namespace error's
@@ -4707,7 +4894,7 @@ Comments
 
 09-06-2016 6.2.5
 - delete contact properties with carddav works now.
-- Update company properties if empty when updating from carddav 
+- Update company properties if empty when updating from carddav
 - Merged changes up to 6.1.87
 
 04-05-2016 6.2.4
@@ -4837,7 +5024,7 @@ Comments
 - Fix dual upload file select window in chrome
 - Add upload error on template manager
 - Check model folder if not found
-- Fix 'Add senders to' 'CC' and 'BCC' 
+- Fix 'Add senders to' 'CC' and 'BCC'
 
 16-12-2016 6.1.124
 - Added search bar to address list selection dialog via compose
@@ -5003,7 +5190,7 @@ Comments
 - Billing: make user/creator customfields available in the ODF parser
 - Sieve: Improved sieve so it can also check the vacation module on the server.
 - Sieve: Disable dates in the past for the out-of-office "Activate at" date picker
-- Fix tree sort in projects2capat 
+- Fix tree sort in projects2capat
 - Fixed install.sql query for tickets. (fresh install missed a required default value)
 
 10-08-2016 6.1.103
@@ -5030,7 +5217,7 @@ Comments
 
 28-07-2016 6.1.100
 - Fixed delay in time entry dialog
-- No longer possible to delete a user its default calendar. 
+- No longer possible to delete a user its default calendar.
 - Global search was broken
 - fix php5.4 array syntax error in rrule
 
@@ -5056,7 +5243,7 @@ Comments
 - fix bug file browser by reload wrong folder
 
 11-07-2016 6.1.96
-- Fix infinite loop in calendar week + day print when 2 recurring events would start at the same time 
+- Fix infinite loop in calendar week + day print when 2 recurring events would start at the same time
 - Fix calendar tooltip: description showing html code
 - Added email validation in the email-account dialog
 - Updated German language pack
@@ -5076,7 +5263,7 @@ Comments
 
 27-06-2016 6.1.94
 - XSS fixes caused some problems with rendering numbers and booleans (tasks and time registration)
-- Add by appointment  in tab particpants  in the add dialog fix search and paging by address lists and user groups 
+- Add by appointment  in tab particpants  in the add dialog fix search and paging by address lists and user groups
 
 23-06-2016 6.1.93
 - Home folder was displayed in items with missing folder
@@ -5099,7 +5286,7 @@ Comments
 
 20-06-2016 6.1.88
 - Fix remove user groups
-- Fix mt940 split statements 
+- Fix mt940 split statements
 - Fix leaveday manager order for multi managers
 - Removed security_token parameter from calendar invitations and address list unsubscribe link
 - CTRL+F& Debug only available for admin
@@ -5202,7 +5389,7 @@ Comments
 
 03-03-2016 6.1.79
 - Mail in gmail app marked as read bug fixed when using Exchange
-- Fix mail selection in billing 
+- Fix mail selection in billing
 - Fixed calendar freeze when displaying a Leave day that had a start time and a duration with a decimal and a dot a decimal separator.
 - Fixed remote combo field for holidays credit type
 - Fix export "Contacts with companies" for companies in address book
@@ -5214,9 +5401,9 @@ Comments
 - Fix leavedays bugs !!!
 - Fix CORE deleteFeedback for GO.grid.GridPanel
 - Fix by project the reload of the subgrid after set statuses
-- Fix invoices update customer information 
+- Fix invoices update customer information
 - Holidays: Repositioned the starttime field in the leaveday dialog.
-- MT940 Parser for German DATEV standard 
+- MT940 Parser for German DATEV standard
 - Removed libwbxml binaries for windows as they were detected (wrongly) as a virus.
 
 22-02-2016 6.1.78
@@ -5303,7 +5490,7 @@ Comments
 - Billing: Fixed costcode grid display problem. (Global vs book specific)
 - Documenttemplates: added contact:photo support
 - Documenttemplates: When printing multiselect fields in a template, then replace the | with a ,
-- Fix remove of mail folders and e-mail in it. 
+- Fix remove of mail folders and e-mail in it.
 - Calendar: Fixed display of tasks in the calendar list when using "calendar_tasklist_show=1" in the config.php file.
 
 15-12-2015 6.1.68
@@ -5745,7 +5932,7 @@ Comments
 - Calendar & Tasks: fixed displaying task details in calendar list view.
 - Email: Fixed bug in emailcomposer that didn't apply the changes made in the "Source editor" when saving/sending while the composer is in source edit mode.
 - Strip non ascii chars from message-id in mail to workaround Incredimail bug
-- Billing: optimized autocomplete in trackingcode combobox of the itemsgrid  
+- Billing: optimized autocomplete in trackingcode combobox of the itemsgrid
 - Email/Sieve: Out of office saving dates conversion bug fixed.
 - Tickets: Email to agent is now of content-type "text/html"
 
@@ -5769,7 +5956,7 @@ Comments
 - Billing: Fixed and optimized the trackingcode and costcode selects in the items grid. Added autocomplete to the select fields
 - Fixed updating calendar event from external email client
 - To utf8 bug in active directory
-- Email: Added $config['email_autolink_companies'] so email will also be linked to 
+- Email: Added $config['email_autolink_companies'] so email will also be linked to
          the company when a contact has a company relation.
          ($config['email_autolink_contacts'] also need to be set to true)
 - Sieve: Added :create after the fileinto action. This will autocreate the folder if it doesnt exist.
@@ -5807,7 +5994,7 @@ Comments
 - Ignore unsupported reminder values in icalendar
 - Delete task bug in community version
 - Uninstall of module did not work completely. Some installed checks still returned true.
-- Wrong parent ID in z-push mail folders which prevented sub/sub/sub folders from syncing 
+- Wrong parent ID in z-push mail folders which prevented sub/sub/sub folders from syncing
 
 19-01-2015 6.1.16
 - Resources not showing
@@ -5891,11 +6078,11 @@ Comments
 
 28-11-2014 6.1.7
 - Billing: Improved Costcode and trackingcode selection in the order items grid
-- Dropbox: Implemented new api for dropbox 
+- Dropbox: Implemented new api for dropbox
 
 26-11-2014 6.1.6
 - Projects2 - Fixed wrong check for internal and external rates with project resources
-- TimeEntry Dialog used the http POST method for submitting tasks 
+- TimeEntry Dialog used the http POST method for submitting tasks
 - Calendar: When adding participants, check if participant already can be found, if so then update the existing one, otherwise create a new one.
 - CalDAV tasks have support for "% complete" and "Priority"
 - CalDAV calanders will resync when tasks linked to the calendar are updated
@@ -5947,7 +6134,7 @@ Comments
 - Tasks: Added pagination to the category select combobox
 - Fixed AbstractController::getRoute() function with namespaces.
 - Accept YYYYMMDD format when importing vCard with birthdays
-- If fs/Folder fails to copy (because destination might be inside source folder) the already created folder record will be deleted 
+- If fs/Folder fails to copy (because destination might be inside source folder) the already created folder record will be deleted
 - Added clarification for CalDAV tasklist sync to the settings->synchronization panel
 - Calendar: fixed warning message for the event accept external page
 - Site module: Fixed some namespace problems that broke the site treepanel

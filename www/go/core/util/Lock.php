@@ -83,7 +83,7 @@ class Lock {
 			$this->startTime = microtime(true);
 		}
 
-		if(function_exists('sem_get')) {
+		if(function_exists('sem_get') && empty(go()->getConfig()['lockWithFlock'])) {
 			//performs better but is not always available
 			$locked = $this->lockWithSem();
 		} else
@@ -94,8 +94,9 @@ class Lock {
 		if($locked) {
 			$this->lockedByMe = true;
 
+			// removed this to reduce IO
 			// for debugging lock problem. Store request infor user ID and PID number
-			$this->getLockFile()->putContents($this->getRequestInfo());
+			//$this->getLockFile()->putContents($this->getRequestInfo());
 
 			//reset start time to take off the waiting time. We want to use it for measuring the lock time now.
 			$this->startTime = microtime(true);
@@ -107,9 +108,12 @@ class Lock {
 			}
 
 			if($this->timeout > 0 && $this->timeTaken() > $this->timeout) {
-				$info = $this->getLockFile()->getContents();
-				throw new Exception("Waiting for lock (" . $this->getRequestInfo() .") for longer than " . $this->timeout."s. Lock is held by (" . $info . ")");
+				throw new Exception("Lock timeout with name: " . $this->name);
+//				$info = $this->getLockFile()->getContents();
+//				throw new Exception("Waiting for lock (" . $this->getRequestInfo() .") for longer than " . $this->timeout."s. Lock is held by (" . $info . ")");
 			}
+
+			go()->debug("Locked");
 			//sleep for 100 milliseconds
 			usleep(100000);
 			return $this->lock();
@@ -133,10 +137,15 @@ class Lock {
 		// prepend db name for multi instance
 		try {
 			$this->sem = sem_get((int)hexdec(substr(md5(go()->getConfig()['db_name'] . $this->name), 24)));
-			$acquired = sem_acquire($this->sem, true);
+			$acquired = $this->sem && sem_acquire($this->sem, true);
 		} catch(Exception $e) {
+			ErrorHandler::logException($e, "Failed to acquire lock for " . $this->name);
 			//identifier might be removed by other process
 			$acquired = false;
+		}
+
+		if(!$acquired) {
+			$this->sem = null;
 		}
 		return $acquired;
 	}
@@ -144,7 +153,7 @@ class Lock {
 
 	private function getLockFile() {
 		$lockFolder = GO()
-			->getDataFolder()
+			->getTmpFolder()
 			->getFolder('locks');
 
 		$name = File::stripInvalidChars($this->name);

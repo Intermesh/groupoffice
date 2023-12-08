@@ -230,8 +230,12 @@ class Comment extends AclItemEntity {
 
 	protected function internalValidate()
 	{
-		if($this->validateXSS && $this->isModified(['text']) && StringUtil::detectXSS($this->text, true)) {
-			$this->setValidationError('text', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
+		if($this->isModified(['text'])) {
+			$this->text = preg_replace("/<style>.*<\/style>/usi", '', $this->text);
+
+			if ($this->validateXSS && StringUtil::detectXSS($this->text, false)) {
+				$this->setValidationError('text', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
+			}
 		}
 
 		if(!isset($this->date)) {
@@ -369,7 +373,7 @@ class Comment extends AclItemEntity {
 
 	private function getAsText() : string {
 		if(!isset($this->asText)) {
-			$this->asText = preg_replace("/<style.*<\/style>/usi", "", $this->text);
+			$this->asText = preg_replace("/<style>.*<\/style>/usi", "", $this->text);
 			$this->asText = strip_tags($this->asText);
 		}
 		return $this->asText;

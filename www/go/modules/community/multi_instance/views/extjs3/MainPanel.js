@@ -51,7 +51,7 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 						var str = "";
 						Ext.each(records, function (r) {
 							if (r.data.adminEmail && str.indexOf(r.data.adminEmail) == -1) {
-								str += '"' + r.data.adminDisplayName.replace(/"/g, '\\"') + '" &lt;' + r.data.adminEmail + '&gt;, ';
+								str += '"' + go.util.addSlashes(r.data.adminDisplayName) + '" &lt;' + r.data.adminEmail + '&gt;, ';
 							}
 						});
 

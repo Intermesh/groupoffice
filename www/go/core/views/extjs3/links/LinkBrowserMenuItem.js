@@ -33,7 +33,7 @@ go.links.LinkBrowserButton = Ext.extend(Ext.Button, {
 	tooltip: t("Links"),
 	handler: function(btn) {
 
-		var dv = this.findParentByType("detailview"), entityId, entity;
+		var dv = this.detailView || this.findParentByType("detailview"), entityId, entity;
 		if(dv) {
 			entity = dv.entityStore.entity.name;
 			entityId = dv.currentId;

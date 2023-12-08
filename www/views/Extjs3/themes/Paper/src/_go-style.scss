@@ -274,7 +274,9 @@ a {
 }
 #go-powered-by{
 	position:absolute;
+	text-align: center;
 	right:dp(16);
+	left: dp(16);
 	bottom:dp(16);
 	a {color:inherit;}
 }
@@ -335,6 +337,7 @@ a {
 	position:absolute;
 	top: dp(16);
 	right: dp(16);
+	color: white;
 	label {
 		@extend %font-body1;
 		text-align:right;
@@ -582,7 +585,7 @@ a {
 
 #secondary-menu {
 	padding-right: dp(56);
-	#start-menu-link, #search_query {
+	#start-menu-link, #search_query, #global-add-btn {
 		float: left;
 		text-decoration: none;
 		height:dp(40);
@@ -837,6 +840,7 @@ button {
 		font-size: inherit;			
 		height: 100%;
 		width: 100%;
+		display: block;
 	}
 
 	.go-detail-view & {
@@ -1150,6 +1154,7 @@ button.filetype-pdf, button.filetype-doc {
 
 %go-icon-list {
 	p, > a {
+		width: 100%;
 		min-height: dp(40);
 		box-sizing: border-box;
 		display:table;
@@ -1164,12 +1169,21 @@ button.filetype-pdf, button.filetype-doc {
 
 		i.label {
 			left: dp(16);
-			top: dp(12);
+			top: dp(16);
 			width:  dp(24);
 			height: dp(24);
 			position: absolute;
 			color: color($fg, 'icon');
 
+		}
+
+		&.more-btn {
+			i:last-child {
+				position: absolute;
+				right: dp(16);
+				top: dp(16);
+			}
+			padding-right: dp(32);
 		}
 
 		.avatar {
@@ -1467,8 +1481,8 @@ table.display-panel {
 		border-right: 1px solid color($fg, 'divider');
 	}
 
-	tr.bold-line td, td.bold-line,  tr.line th, th.line {
-		border-bottom: 1px solid color($fg, 'line');
+	tr.bold-line td, td.bold-line,  tr.bold-line th, th.bold-line {
+		border-bottom: 1px solid color($fg, 'track');
 	}
 
 	table { 
@@ -1728,7 +1742,7 @@ table[id^="comments-ext"] b {
 	}
 }
 
-.x-panel.text {
+.x-panel.text, .go-pad{
 	padding: dp(16);
 }
 
@@ -1953,33 +1967,9 @@ table[id^="comments-ext"] b {
 		margin-bottom: dp(16);
 	}
 
-	.go-form-group-row {
-		.go-hbox {
-			gap: 0;
-
-			.x-form-focus, x-form-invalid {
-				border-color: color($fg, 'track');
-				box-shadow: none;
-			}
-
-			.x-form-item:not(:last-child) {
-				.x-form-field {
-					border-top-right-radius: 0;
-					border-bottom-right-radius: 0;
-				}
 
 
-			}
 
-			.x-form-item + .x-form-item {
-				margin-left: -1px; //to hide border
-				.x-form-field {
-					border-top-left-radius: 0;
-					border-bottom-left-radius: 0;
-				}
-			}
-		}
-	}
 }
 
 
@@ -2888,5 +2878,51 @@ table[id^="comments-ext"] b {
 
 .go-color-field {
 		padding-left: dp(40);
+
+}
+
+
+.go-hbox.condensed-form {
+	gap: 0;
+
+	.x-form-focus, x-form-invalid {
+		border-color: color($fg, 'track');
+		box-shadow: none;
+	}
+
+
+
+	.x-form-item:not(:last-child) {
+		.x-form-field {
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+
+
+	}
+
+	.x-form-item + .x-form-item {
+		margin-left: -1px; //to hide border
+		.x-form-field {
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+	}
+}
+
+.go-composite-field {
+	.x-form-item {
+		padding: 0;
+	}
+}
+
+.chart-container {
+
+	margin: 0 auto;
+
+	text-align: center;
+	canvas {
+		display: inline-block;
+	}
 
 }

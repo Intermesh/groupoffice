@@ -192,9 +192,9 @@ export class Main extends Component {
 						const dlg = new NoteDialog();
 						const noteBookId = this.noteBookGrid.store.get(this.noteBookGrid.rowSelection!.selected[0])!.id;
 
-						dlg.form.setValues({
+						dlg.form.value = {
 							noteBookId: noteBookId
-						});
+						};
 						dlg.show();
 
 					}

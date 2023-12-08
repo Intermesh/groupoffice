@@ -180,11 +180,46 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 		var recordData = {};
 		recordData[this.displayField] = text;
+		recordData[this.valueField] = null;
 		var record = new def(recordData);
 		this.store.insert(0, record);
 
 		if(this.store.getCount() > 1) {
 			this.select(0);
+		}
+	},
+
+	// private
+	assertValue : function(){
+
+		var val = this.getRawValue(),
+			rec;
+
+		if(this.valueField && Ext.isDefined(this.value)){
+			rec = this.findRecord(this.valueField, this.value);
+		}
+		if(!rec || rec.get(this.displayField) != val){
+			rec = this.findRecord(this.displayField, val);
+		}
+		//filter out create new record
+		if((!rec || rec.get(this.valueField)===null) && this.forceSelection){
+			if(val.length > 0 && val != this.emptyText){
+				this.el.dom.value = Ext.value(this.lastSelectionText, '');
+				this.applyEmptyText();
+			}else{
+				this.clearValue();
+			}
+		}else{
+			if(rec && this.valueField){
+				// onSelect may have already set the value and by doing so
+				// set the display field properly.  Let's not wipe out the
+				// valueField here by just sending the displayField.
+				if (this.value == val){
+					return;
+				}
+				val = rec.get(this.valueField || this.displayField);
+			}
+			this.setValue(val);
 		}
 	},
 
@@ -196,6 +231,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	createNew : function(record) {
 
 		const entity = record.data;
+		delete entity[this.valueField]; //remove -1 id.
 		if(Ext.isObject(this.allowNew)) {
 			Ext.apply(entity, this.allowNew);
 		}

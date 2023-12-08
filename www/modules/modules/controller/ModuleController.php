@@ -203,39 +203,6 @@ class ModuleController extends AbstractJsonController{
 		echo $response;
 	}
 	
-	
-//	protected function actionInstall($params){
-//		
-//		$response =new JsonResponse(array('success'=>true,'results'=>array()));
-//		$modules = json_decode($params['modules'], true);
-//		foreach($modules as $moduleId)
-//		{
-//			if(!GO::modules()->$moduleId){
-//				$module = new Module();
-//				$module->name=$moduleId;
-//
-//
-//				$module->moduleManager->checkDependenciesForInstallation($modules);	
-//
-//				if(!$module->save())
-//					throw new \GO\Base\Exception\Save();
-//
-//				$response->data['results'][]=array_merge($module->getAttributes(), array('name'=>$module->moduleManager->name()));
-//			}
-//		}
-//		
-////		$defaultModels = \GO\Base\Model\AbstractUserDefaultModel::getAllUserDefaultModels();
-////		
-////		$stmt = \GO\Base\Model\User::model()->find(\GO\Base\Db\FindParams::newInstance()->ignoreAcl());		
-////		while($user = $stmt->fetch()){
-////			foreach($defaultModels as $model){
-////				$model->getDefault($user);
-////			}
-////		}
-//				
-//		echo $response;
-//	}
-	
 	public function actionPermissionsStore($params) {
 		
 		
@@ -333,15 +300,9 @@ class ModuleController extends AbstractJsonController{
 					}
 				}
 			}
-	//		GO::debug(count($users));
-
 			$module->acl->getAuthorizedUsers($module->acl_id, Acl::READ_PERMISSION, array("\\GO\\Modules\\Controller\\ModuleController","checkDefaultModelCallback"), array($models));
 		}
 		
-//		if(class_exists("GO_Professional_LicenseCheck")){
-//			$lc = new GO_Professional_LicenseCheck();
-//			$lc->checkProModules(true);
-//		}
 		echo new JsonResponse(array('success'=>true));
 	}
 	
@@ -382,20 +343,5 @@ class ModuleController extends AbstractJsonController{
 		
 		echo new \GO\Base\Data\JsonResponse($response);
 	}
-	
-	
-	
-//	public function actionSaveSortOrder($params){
-//		$modules = json_decode($params['modules']);
-//		
-//		$i=0;
-//		foreach($modules as $module){
-//			$moduleModel = Module::model()->findByPk($module->name);
-//			$moduleModel->sort_order=$i++;
-//			$moduleModel->save();
-//		}
-//		
-//		echo new JsonResponse(array('success'=>true));
-//	}
 
 }
