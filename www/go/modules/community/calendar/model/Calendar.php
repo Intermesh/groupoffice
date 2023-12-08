@@ -60,16 +60,22 @@ class Calendar extends AclOwnerEntity {
 			->addMap('defaultAlertsWithoutTime', DefaultAlertWT::class,  ['id'=>'calendarId']);
 	}
 
-	public static function fetchDefault($userId = null) {
-		if($userId === null)
-			$userId = \go()->getUserId();
-		return self::find()->where(['ownerId' => $userId])->orderBy(['sortOrder'=>'ASC'])->single();
+	/** @return Calendar */
+	public static function fetchDefault($scheduleId) {
+		return self::find()
+			->join('core_user', 'u', 'u.id = caluser.userId')
+			->where(['u.email' => $scheduleId])
+			->orderBy(['sortOrder'=>'ASC'])
+			->single();
 	}
 
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()->add('isSubscribed', function(Criteria $criteria, $value, Query $query) {
 			$query->where('isSubscribed','=', $value);
+				if($value === false) {
+					$query->orWhere('isSubscribed', 'IS', null);
+				}
 		});
 	}
 

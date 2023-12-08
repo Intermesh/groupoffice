@@ -72,19 +72,31 @@ class CalendarEvent extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
+	/**
+	 * Parse an iCalendar blobId to an CalendarEvent object
+	 * @param $params [ blobId ]
+	 * @return void
+	 */
+	public function parse($params) {
+
+	}
+
 	public function processInvite($params) {
-		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
+		$account = \GO\Email\Model\Account::model()->findByPk($params['accountId']);
 		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'],$params['uid']);
 		$vcalendar = $message->getInvitationVcalendar();
-		$calendar = model\Calendar::fetchDefault($account->user_id);
-		//todo calendar should be associated with mail account!
+
+		$calendar = model\Calendar::fetchDefault($params['scheduleId']);
+		if(empty($calendar) || !$calendar->getMyRights()['mayRSVP']) {
+			throw new \go\core\exception\Forbidden("You may not RSVP for this participant");
+		}
 		//\GO::user()->id must be replaced with $account->calendar->user_id
 		$from = $message->from->getAddress();
 		$sender = (object)[
 			'email' => $from['email'],
 			'name' => $from['personal'],
 		];
-		$event = model\ICalendarHelper::processMessage($vcalendar, $calendar, $sender);
+		$event = model\ICalendarHelper::processMessage($vcalendar, $sender, $calendar);
 		return ['success'=>$event->save()];
 	}
 }

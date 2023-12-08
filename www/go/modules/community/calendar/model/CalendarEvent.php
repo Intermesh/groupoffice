@@ -65,7 +65,11 @@ class CalendarEvent extends AclItemEntity {
 	 * false if the event is imported from an invitation and the organizer is in another system
 	 */
 	public $isOrigin;
-
+	/**
+	 * When isOrigin is false this is the organizers email
+	 * @var string email
+	 */
+	public $replyTo;
 	/**
 	 * @var string status is set after a scheduling action like sending a REPLY iTip to the organizer
 	 */
@@ -183,12 +187,46 @@ class CalendarEvent extends AclItemEntity {
 		return parent::defineMapping()
 			->addTable('calendar_calendar_event', 'cce', ['id' => 'eventId'], ['id', 'calendarId'])
 			->addTable('calendar_event', "eventdata", ['eventId' => 'id'], self::EventProperties)
-			->addUserTable('calendar_event_user', 'eventuser', ['id' => 'id'],self::UserProperties, [], true)
+			->addUserTable('calendar_event_user', 'eventuser', ['id' => 'id'],self::UserProperties, [], false)
 			//->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
 			->addMap('participants', Participant::class, ['id' => 'eventId'])
 			->addMap('recurrenceOverrides', RecurrenceOverride::class, ['id'=>'fk'])
 			->addMap('alerts', Alert::class, ['id' => 'eventId']);
 			//->addMap('locations', Location::class, ['id' => 'eventId']);
+	}
+
+	/**
+	 * If the UID of the event already exists in the system. Grab its ID and add the event to the given calendar.
+	 * Then select it again and return the selected event.
+	 * If it doesn't exists just set the calendarId and save() once to behave
+	 * @param $event CalendarEvent
+	 * @param $cal Calendar
+	 * @return CalendarEvent this one is saved in the provided calendar
+	 */
+	static function grabInto($event, $cal) {
+		$eventData = go()->getDbConnection()->select(['t.id, GROUP_CONCAT(calendarId) as calendarIds'])->from('calendar_event', 't')
+			->join('calendar_calendar_event', 'c', 'c.eventId = t.id', 'LEFT')->where(['uid'=>$event->uid])->single();
+		$calendarIds = explode(',', $eventData['calendarIds']);
+		//$existingEvent = CalendarEvent::find(['eventId', 'calendarId'])->where(['uid'=>$event->uid])->single();
+		if(!empty($eventData) || !empty($eventData['id'])) {
+			if(in_array($cal->id, $calendarIds)) {
+				// found and already in calendar
+				return CalendarEvent::find()->where(['calendarId'=>$cal->id, 'uid' => $event->uid])->single();
+			}
+			// found not in calendar (insert)
+			go()->getDbConnection()->insert('calendar_calendar_event', [
+				'calendarId' => $cal->id,
+				'eventId' => $eventData['id']
+			])->execute();
+			$id = go()->getDbConnection()->getPDO()->lastInsertId();
+
+			return CalendarEvent::findById($id);
+		}
+		//new, set calendarId save and return
+		$event->calendarId = $cal->id;
+		if($event->save()) {
+			return $event;
+		}
 	}
 	protected static function defineFilters(): Filters
 	{

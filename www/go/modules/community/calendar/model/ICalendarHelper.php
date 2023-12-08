@@ -137,6 +137,9 @@ class ICalendarHelper {
 		if($participant->expectReply) {
 			$attr['RSVP'] = 'TRUE';
 		}
+		if($participant->kind) {
+			$attr['CUTYPE'] = strtoupper($participant->kind);
+		}
 		foreach ($participant->getRoles() as $role => $true) {
 			if (in_array($role, self::$roleMap)) {
 				$attr['ROLE'] = self::$roleMap[$role];
@@ -237,13 +240,15 @@ class ICalendarHelper {
 			// todo
 			// if(!$event->isNew && $event->blobId) // merge vevent into current blob
 
-			$event = self::parseOccurrence($vevent,$event); // title, description, start, duration, location, status, privacy
+			$event = self::parseOccurrence($vevent, $event); // title, description, start, duration, location, status, privacy
+			$event->uid = (string)$vevent->UID;
 			$baseEvents[$event->uid] = $event;
 			if(!$vevent->DTSTART->isFloating())
 				$event->timeZone = $event->start->getTimezone()->getName();
 			if($event->isNew())
 				$event->createdAt = $vevent->DTSTAMP->getDateTime();
-			$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();
+			if(isset($vevent->{'LAST-MODIFIED'}))
+				$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();
 			$event->showWithoutTime = !$vevent->DTSTART->hasTime();
 			if(isset($vevent->SEQUENCE))
 				$event->sequence = (int)$vevent->SEQUENCE->getValue();
@@ -251,6 +256,7 @@ class ICalendarHelper {
 			//$event->organizerEmail = str_replace('mailto:', '',(string)$vevent->ORGANIZER);
 			if(isset($vevent->ORGANIZER)) {
 				$organizer = self::parseAttendee(new Participant($event), $vevent->ORGANIZER);
+				$event->replyTo = str_replace('mailto:', '',(string)$vevent->ORGANIZER);
 				$organizer->setRoles(['owner' => true]);
 				$event->participants[] = $organizer;
 			}
@@ -304,7 +310,8 @@ class ICalendarHelper {
 		$p->setValues([
 			'email'=>str_replace('mailto:', '',(string)$vattendee)
 		]);
-		$p->kind = !empty($vattendee['CUTYPE']) ? strtolower($vattendee['CUTYPE']) : 'induvidual';
+		if(!empty($vattendee['EMAIL'])) $p->email = $vattendee['EMAIL'];
+		$p->kind = !empty($vattendee['CUTYPE']) ? strtolower($vattendee['CUTYPE']) : 'individual';
 		if(!empty($vattendee['CN'])) $p->name = $vattendee['CN'];
 		if(!empty($vattendee['ROLE'])) $p->roles[] = $vattendee['ROLE'];
 		if(!empty($vattendee['RSVP'])) $p->expectReply = $vattendee['RSVP'];
@@ -515,26 +522,30 @@ class ICalendarHelper {
 
 	}
 
-	static function processMessage($vcalendar, Calendar $calendar, $sender) {
+	static function processMessage($vcalendar, $sender, Calendar $calendar) {
 
-		if(!$calendar->hasPermissionLevel(Acl::LEVEL_WRITE)) {
-			return false;
-		}
+//		if(!$calendar->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+//			return false;
+//		}
 		$vevent = $vcalendar->VEVENT[0];
-		$existingEvent = CalendarEvent::find(['calendarId'=>$calendar->id, 'uid'=>(string)$vevent->uid])->single();
+		$existingEvent = CalendarEvent::find()->where(['uid' => (string)$vevent->uid,'calendarId'=>$calendar->id])->single();
+//		$event = ICalendarHelper::parseVObject($vcalendar, (new CalendarEvent())->setValues(['isOrigin' => false]));
+//		$existingEvent = CalendarEvent::grabInto($event, $calendar);
+
 		switch($vcalendar->method){
-			case 'REQUEST': return self::processRequest($vcalendar,$sender,$existingEvent);
+			case 'REQUEST': return self::processRequest($vcalendar,$calendar,$existingEvent );
 			case 'CANCEL': return self::precessCancel($vcalendar,$existingEvent);
 			case 'REPLY': return self::processReply($vcalendar,$sender,$existingEvent);
 		}
 		return false;
 	}
 
-	private static function processRequest(VCalendar $vcalendar, $sender, CalendarEvent $existingEvent = null) {
+	private static function processRequest(VCalendar $vcalendar,$calendar, CalendarEvent $existingEvent = null) {
 		if(!$existingEvent) {
 			$existingEvent = new CalendarEvent();
 			$existingEvent->isOrigin = false;
-			$existingEvent->replyTo = $sender->email;
+			$existingEvent->calendarId = $calendar->id;
+			$existingEvent->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
 		}
 		return self::parseVObject($vcalendar, $existingEvent);
 	}
@@ -601,20 +612,6 @@ class ICalendarHelper {
 
 		}
 		return $existingEvent;
-	}
-
-	/**
-	 * Process an incomming Email VEVENT with ITIP
-	 *
-	 * @param Message $message the message containing ITIP information
-	 */
-	static public function processItip($message) {
-
-		$oldCal = null; //TodoL check if invite was not new
-
-		$broker = new VObject\ITip\Broker();
-		return $broker->processMessage($message, $oldCal);
-
 	}
 
 }
