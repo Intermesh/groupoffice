@@ -749,7 +749,7 @@ class ImapMessage extends ComposerMessage {
 	/**
 	 * Get the VCALENDAR object as SabreDav vobject component
 	 * 
-	 * @return Sabre\VObject\Component 
+	 * @return \Sabre\VObject\Component\VCalendar
 	 */
 	public function getInvitationVcalendar(){
 

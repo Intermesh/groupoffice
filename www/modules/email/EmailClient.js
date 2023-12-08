@@ -13,6 +13,9 @@
 
 Ext.namespace("GO.email");
 
+//placeholder overriden in calendar
+GO.email.handleITIP = function(dom, msg) {};
+
 GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 	initComponent : function() {

@@ -88,10 +88,6 @@ margin:5px 2px;
 	height:16px;
 }
 
-.em-btn-email-files{
-	background-image: url('images/16x16/attach.png') !important;
-}
-
 .go-module-icon-email , .go-menu-icon-email{
 	background-image: url('images/email.png') !important;
 }
@@ -115,11 +111,11 @@ margin:5px 2px;
 
 
 .ml-seen-mail{
-	margin:2px 0px;
+	margin:2px 0;
 }
 
 .ml-unseen-mail{
- margin:2px 0px;
+ margin:2px 0;
  font-weight:bold;
  color:#15428B;
 }
@@ -129,60 +125,48 @@ margin:5px 2px;
 
 
 .ml-seen-subject{
-	margin:0px;
+	margin:0;
 	font-weight:normal;
 }
 
 .ml-unseen-subject{
-	margin:0px;
+	margin:0;
 }
-
-
-
-
-
-
 
 .message-header-table td{
 	vertical-align:top;
 }
 
-.message-icalendar{
-	background-color:#EBF0F2;
-	border-bottom:1px solid #d0d0d0;
-	padding: 0 8px 0 8px;
-	text-align:left;
-	line-height:20px;
+ul.actions li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 2px 8px;
+    align-items: center;
+    border-bottom: 1px solid #ebf1e2;
+}
+ul.actions li > .btns {
+    float:right;
+    display:flex;
+    flex: 1;
+    margin-left: 1.6rem;
+}
+
+ul.actions li .goui.group {
+    flex: 1;
+}
+
+ul.actions li button.goui-button {
+    height: 30px;
 }
 
 .message-move {
-	color: gray;
-	padding: 0 8px 0 8px;
-	text-align: right !important;
-	line-height: 20px;
+    color: grey;
+    padding: 0 8px 0 8px;
+    text-align: right !important;
+    line-height: 20px;
 }
 
-.message-icalendar-icon{
-	background-repeat:no-repeat;
-	background-position:0 2px;
-	padding:0px 0px 2px 20px;
-	white-space:nowrap;
-	float:left;
-	width:auto !important;
-}
-.message-icalendar-actions{
-	float:right;
-	height:20px;
-}
-
-.message-icalendar a{
-	color: black;
-	text-decoration: none;
-}
-.message-icalendar a:hover{
-	color: black;
-	text-decoration: underline;
-}
 
 #email-message-panel .x-panel-body {
 	/*background-color:white;*/
