@@ -577,7 +577,7 @@ ALTER TABLE `core_link`
 
 ALTER TABLE `core_module`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD UNIQUE KEY `name` (`name`, `package`);
 
 ALTER TABLE `core_search`
   ADD PRIMARY KEY (`id`),
