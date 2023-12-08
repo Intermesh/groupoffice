@@ -949,7 +949,8 @@ abstract class Property extends Model {
 				}
 			}
 
-			//also select primary key values separately to check if tables were new when saving. They are stored in $this->primaryKeys when they go through the __set function.
+			//also select primary key values separately to check if tables were new when saving. They are stored in
+			// $this->primaryKeys when they go through the __set function.
 			if(!$readOnly) {
 				foreach($table->getPrimaryKey() as $pk) {
 					//$query->select("alias.id AS `alias.userId`");
