@@ -326,8 +326,12 @@ JSON;
 	}
 
 
-	public function setLicense($key) {
-		go()->getSettings()->license = $key;
+	public function setLicense($params) {
+		if(!isset($params['key'])) {
+			throw new \InvalidArgumentException("Parameter 'key' is required");
+		}
+
+		go()->getSettings()->license = $params['key'];
 		go()->getSettings()->save();
 
 		$this->checkLicense();
