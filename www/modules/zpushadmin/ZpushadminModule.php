@@ -44,16 +44,6 @@ class ZpushadminModule extends \GO\Base\Module {
 
 	public static function getModuleFolder() {
 		return 'z-push';
-		
-//		$folders = array('z-push', 'z-push22', 'z-push21', 'z-push2');
-//		$folder = false;
-//		foreach ($folders as $f) {
-//			if (is_dir(\GO::config()->root_path . 'modules/' . $f)) {
-//				$folder = $f;
-//				break;
-//			}
-//		}
-//		return $folder;
 	}
 
 	public static function includeZpushFiles() {

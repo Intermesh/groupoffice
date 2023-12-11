@@ -4291,29 +4291,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 	}
 
-//	/**
-//	 * Set the output mode for this model. The default value can be set globally
-//	 * too with ActiveRecord::$attributeOutputMode.
-//	 * It can be 'raw', 'formatted' or 'html'.
-//	 *
-//	 * @param type $mode
-//	 */
-//	public function setAttributeOutputMode($mode){
-//		if($mode!='raw' && $mode!='formatted' && $mode!='html')
-//			throw new \Exception("Invalid mode ".$mode." supplied to setAttributeOutputMode in ".$this->className());
-//
-//		$this->_attributeOutputMode=$mode;
-//	}
 
-//	/**
-//	 *Get the current attributeOutputmode
-//	 *
-//	 * @return string
-//	 */
-//	public function getAttributeOutputMode(){
-//
-//		return $this->_attributeOutputMode;
-//	}
 	/**
 	 * PHP getter magic method.
 	 * This method is overridden so that AR attributes can be accessed like properties.
