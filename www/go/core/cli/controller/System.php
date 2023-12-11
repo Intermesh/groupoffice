@@ -367,25 +367,6 @@ JSON;
 	}
 
 
-	// public function checkAllBlobs() {
-	// 	$blobs = Blob::find()->execute();
-		
-	// 	echo "Processing: ".$blobs->rowCount() ." blobs\n";
-	// 	$staleCount = 0;
-	// 	foreach($blobs as $blob) {
-	// 		if($blob->setStaleIfUnused()) {
-	// 			echo 'D';
-	// 			$staleCount++;
-	// 		}else
-	// 		{
-	// 			echo '.';
-	// 		}
-	// 	}
-		
-	// 	echo "\n\nFound " . $staleCount ." stale blobs\n";
-	// }
-
-
 
 	/**
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/checkBlobs --delete
