@@ -1,3 +1,4 @@
+11-12-2023: 6.8.23
 - Billing: Fixed Undefined array key 0" when sending billing mail
 - Core: bugfix in file browser menu item
 - Projects2: remove vestigial permissions panel
