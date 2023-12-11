@@ -310,6 +310,10 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+11-12-2023: 6.6.181
+- Core: Better license check
+- Projects: remove vestigial permissions panel
+
 04-12-2023: 6.6.180
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 - Files: Folder was outputted in CLI mode when filesystem was synced. (LDAP sync for example).
@@ -345,7 +349,7 @@
 
 27-09-2023: 6.6.172
 - Leavedays: bugfix in leave day requset
->
+
 25-09-2023: 6.6.171
 - Leavedays: bugfix - employee can request leave day budgets
 - Core: Add Jersey and Isle of Man to countries list
