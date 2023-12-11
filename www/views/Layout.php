@@ -79,11 +79,11 @@ $lang = go()->getLanguage()->getIsoCode();
     }
 <?php endif; ?>
 <?php if(isset($useThemeSettings)): ?>
-    :root, body, body.dark, body.system {
-        <?= !empty(go()->getSettings()->primaryColor) ? '--c-primary: #'.go()->getSettings()->primaryColor. ';  --c-primary-tp: '.go()->getSettings()->getPrimaryColorTransparent().';' : '' ?>
-        <?= !empty(go()->getSettings()->secondaryColor) ? '--c-secondary: #'.go()->getSettings()->secondaryColor.';' : '' ?>
-        <?= !empty(go()->getSettings()->tertiaryColor) ? '--c-tertiary: #'.go()->getSettings()->tertiaryColor.';' : '' ?>
-        <?= !empty(go()->getSettings()->accentColor) ? '--c-accent: #'.go()->getSettings()->accentColor.';' : '' ?>
+    :root, body{
+        <?= go()->getSettings()->printCssVars(); ?>
+    }
+    body.dark{
+        <?= go()->getSettings()->printCssVars('Dark'); ?>
     }
 <?php endif; ?>
 </style>

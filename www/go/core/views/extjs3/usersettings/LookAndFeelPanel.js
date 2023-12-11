@@ -45,6 +45,9 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 							document.body.classList.remove(name);
 						});
 						document.body.classList.add(me.value);
+						if(me.value === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+							document.body.classList.add('dark');
+						}
 					}
 					}},
 				{xtype:'container', cls: 'go-theme-color', defaults: {

@@ -112,6 +112,14 @@ class User extends AclItemEntity {
 	 */
 	public $email;
 
+
+	/**
+	 * Flag indicating if the user is allowed to receive newsletters
+	 *
+	 * @var bool
+	 */
+	public $newsletterAllowed = true;
+
 	/**
 	 * Alternative e-mail address for password reset
 	 * 

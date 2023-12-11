@@ -1,3 +1,9 @@
+11-12-2023: 6.8.23
+- Billing: Fixed Undefined array key 0" when sending billing mail
+- Core: bugfix in file browser menu item
+- Projects2: remove vestigial permissions panel
+- Core/newsletters: Fixed error in authentication from newsletter accounts
+- Newsletters: Added emailAllowed flag in contact dialog to disable all newsletters for a contact.
 - Addressbook: Last name was wrongfully set on organizations
 
 04-12-2023: 6.8.22
@@ -142,6 +148,12 @@
 
 -- 6.8 --
 
+11-12-2023: 6.7.58
+- Newsletters: Fixed null:null in composer
+- Core: Appearance colors can be set for dark mode too now in System settings.
+- Core: fix for grey lines in form field labels
+
+04-12-2023: 6.7.57
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 - Core: Capture Cmd/ctrl + P and print the detail panel
 - Filesearch: Tidied up search form
@@ -447,6 +459,11 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+11-12-2023: 6.6.181
+- Core: Better license check
+- Projects: remove vestigial permissions panel
+
+04-12-2023: 6.6.180
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 - Files: Folder was outputted in CLI mode when filesystem was synced. (LDAP sync for example).
 
@@ -481,7 +498,7 @@
 
 27-09-2023: 6.6.172
 - Leavedays: bugfix in leave day requset
->
+
 25-09-2023: 6.6.171
 - Leavedays: bugfix - employee can request leave day budgets
 - Core: Add Jersey and Isle of Man to countries list

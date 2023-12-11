@@ -121,9 +121,8 @@ class Message extends \go\core\mail\Message {
 		if(isset($structure->headers['from'])) {
 
 			$fromList = new AddressList(str_replace('mailto:','',$structure->headers['from']));
-			$from = $fromList[0];
-		
-			if($from){
+			if(isset($fromList[0])){
+				$from = $fromList[0];
 				try {
 					$this->setFrom($from->getEmail(), $from->getName());
 				} catch(Exception $e)  {
