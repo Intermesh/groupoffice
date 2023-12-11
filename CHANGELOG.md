@@ -147,6 +147,8 @@
 
 - Addressbook: Last name was wrongfully set on organizations
 - Newsletters: Fixed null:null in composer
+- Core: Appearance colors can be set for dark mode too now in System settings.
+- Core: fix for grey lines in form field labels
 
 04-12-2023: 6.7.57
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
