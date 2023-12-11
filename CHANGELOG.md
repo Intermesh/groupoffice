@@ -1,6 +1,7 @@
 - Addressbook: Last name was wrongfully set on organizations
 - Billing: Fixed Undefined array key 0" when sending billing mail
 - Core: bugfix in file browser menu item
+- Projects2: remove vestigial permissions panel
 
 04-12-2023: 6.8.22
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
