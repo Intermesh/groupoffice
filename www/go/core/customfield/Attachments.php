@@ -10,6 +10,8 @@ use go\core\orm\Query;
 
 final class Attachments extends MultiSelect
 {
+
+	private $optionsToSave;
 	public function onFieldSave(): bool
 	{
 		if ($this->field->isNew()) {
