@@ -335,7 +335,7 @@ class Blob extends orm\Entity {
 		$blobs = Blob::find()->mergeWith($query);
 
 		foreach($blobs as $blob) {
-			if($blob->id != go()->getSettings()->logoId) {
+			if($blob->id != go()->getSettings()->logoId && $blob->id != go()->getSettings()->logoIdDark) {
 				$ids[] = $blob->id;
 				$paths[] = $blob->path();
 			}

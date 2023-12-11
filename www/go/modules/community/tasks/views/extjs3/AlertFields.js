@@ -32,6 +32,7 @@ go.modules.community.tasks.AlertFields = Ext.extend(go.form.FormGroup, {
                         const start = taskDialog.formPanel.form.findField("start");
 
                         this.setDate(start.getValue());
+								this.updateValue();
                     }
                 }
             }]

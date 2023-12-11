@@ -31,6 +31,13 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 
 		GO.settings.state = session.state;
 
+		const prefersColorQuery = window.matchMedia('(prefers-color-scheme: dark)'),
+			changeTheme = e => {
+				if(document.body.classList.contains('system'))
+					document.body.classList[e.matches ? 'add':'remove']('dark')
+			}
+		prefersColorQuery.addEventListener('change', changeTheme);
+
 		// Ext.apply(this, session.user);
 		return go.Db.store("User").single(session.userId).then((user) => {
 			Ext.apply(this, user);
@@ -39,6 +46,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 
 			this.checkForNewDevices(user);
 			document.body.classList.add(user.themeColorScheme);
+			changeTheme(prefersColorQuery);
 
 			go.ActivityWatcher.activity();
 			go.ActivityWatcher.init(GO.settings.config.logoutWhenInactive);
