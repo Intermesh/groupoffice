@@ -306,6 +306,7 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+04-12-2023: 6.6.180
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 - Files: Folder was outputted in CLI mode when filesystem was synced. (LDAP sync for example).
 

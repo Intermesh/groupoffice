@@ -20,8 +20,6 @@ use go\core\model\Alert as CoreAlert;
 use go\core\model\CronJobSchedule;
 use go\core\model\Module;
 use Faker;
-
-
 use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
@@ -311,6 +309,30 @@ JSON;
 		return $unknown;
 	}
 
+	public function checkLicense() {
+		$key = go()->getSettings()->license;
+
+		if(empty($key)) {
+			echo "No license key installed\n";
+		}
+
+		echo "Key: " . $key ."\n\n";
+
+		$data = License::getLicenseData();
+
+		print_r($data);
+
+		echo "----\n";
+	}
+
+
+	public function setLicense($key) {
+		go()->getSettings()->license = $key;
+		go()->getSettings()->save();
+
+		$this->checkLicense();
+	}
+
 
 	/**
 	 * Generates demo data
@@ -378,23 +400,6 @@ JSON;
 		if(!$alert->save()) {
 			throw new SaveException($alert);
 		}
-	}
-
-
-	public function checkLicense() {
-		$key = go()->getSettings()->license;
-
-		if(empty($key)) {
-			echo "No license key installed\n";
-		}
-
-		echo "Key: " . $key ."\n\n";
-
-		$data = License::getLicenseData();
-
-		print_r($data);
-
-		echo "----\n";
 	}
 
 
