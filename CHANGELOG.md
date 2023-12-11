@@ -1,3 +1,4 @@
+11-12-2023: 6.7.58
 - Addressbook: Last name was wrongfully set on organizations
 - Newsletters: Fixed null:null in composer
 - Core: Appearance colors can be set for dark mode too now in System settings.
