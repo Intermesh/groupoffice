@@ -18,6 +18,7 @@ use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
+use go\modules\business\automation\action\Email;
 use go\modules\community\addressbook\convert\Spreadsheet;
 use go\modules\community\addressbook\convert\VCard;
 use function GO;
@@ -28,11 +29,9 @@ use go\core\model\Acl;
 use GO\Files\Model\Folder;
 
 /**
- * Contact model
+ * Class Contact
  *
- * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
- * @author Merijn Schering <mschering@intermesh.nl>
- * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
+ * Represents a contact entity.
  */
 
 class Contact extends AclItemEntity {
@@ -132,9 +131,9 @@ class Contact extends AclItemEntity {
 	public $notes;
 
 	/**
-	 * 
+	 *
 	 * @var bool
-	 */							
+	 */
 	public $isOrganization = false;
 	
 	/**
@@ -195,9 +194,10 @@ class Contact extends AclItemEntity {
 	public $vatReverseCharge = false;
 
 	/**
-	 * 
+	 * The debtor number.
+	 *
 	 * @var string
-	 */							
+	 */
 	public $debtorNumber;
 
 	/**
@@ -217,20 +217,23 @@ class Contact extends AclItemEntity {
 	 * @var int
 	 */
 	public $filesFolderId;
-	
+
 	/**
+	 * Holds an array of email addresses.
 	 *
 	 * @var EmailAddress[]
 	 */
 	 public $emailAddresses = [];
-	
+
 	/**
+	 * An array to hold phone numbers.
 	 *
 	 * @var PhoneNumber[]
 	 */
 	public $phoneNumbers = [];
-	
+
 	/**
+	 * Holds an array of dates.
 	 *
 	 * @var Date[];
 	 */
@@ -271,6 +274,14 @@ class Contact extends AclItemEntity {
 	 * @var boolean
 	 */
 	protected $starred = null;
+
+
+	/**
+	 * Indicates whether the contact has may receive newsletters
+	 *
+	 * @var bool $newsletterAllowed
+	 */
+	public bool $newsletterAllowed = true;
 
 	public function getStarred(): bool
 	{
