@@ -2,9 +2,7 @@
 namespace go\core\cli\controller;
 
 use Exception;
-use GO\Base\Observable;
 use go\core\Controller;
-use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\Forbidden;
@@ -17,11 +15,8 @@ use go\core\jmap\Router;
 use go\core\model\Alert;
 use go\core\http\Client;
 use go\core\model\CronJobSchedule;
-use go\core\event\Listeners;
 use go\core\model\Module;
 use Faker;
-
-
 use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
@@ -30,7 +25,6 @@ use go\core\util\JSON;
 use go\modules\business\license\model\License;
 use go\modules\community\history\Module as HistoryModule;
 use JsonException;
-use go\modules\business\license\model\License;
 use function GO;
 
 class System extends Controller {
@@ -370,23 +364,6 @@ JSON;
 		if(!$alert->save()) {
 			throw new SaveException($alert);
 		}
-	}
-
-
-	public function checkLicense() {
-		$key = go()->getSettings()->license;
-
-		if(empty($key)) {
-			echo "No license key installed\n";
-		}
-
-		echo "Key: " . $key ."\n\n";
-
-		$data = License::getLicenseData();
-
-		print_r($data);
-
-		echo "----\n";
 	}
 
 
