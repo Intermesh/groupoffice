@@ -1,3 +1,5 @@
+- Core: Equals must accept any argument
+
 11-12-2023: 6.7.58
 - Addressbook: Last name was wrongfully set on organizations
 - Newsletters: Fixed null:null in composer
