@@ -1,4 +1,5 @@
 - Core: Property->equals must accept any argument
+- Finance: Create invoice number when changing status to sent
 
 11-12-2023: 6.8.23
 - Billing: Fixed Undefined array key 0" when sending billing mail
