@@ -2464,11 +2464,11 @@ abstract class Property extends Model {
   /**
    * Checks if the given property or entity is equal to this
    *
-   * @param Property $property
+   * @param mixed $property
    * @return boolean
    * @throws Exception
    */
-	public function equals(Property $property): bool
+	public function equals($property): bool
 	{
 		if(get_class($property) != get_class($this)) {
 			return false;
