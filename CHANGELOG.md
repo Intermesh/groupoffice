@@ -4,7 +4,6 @@
 - Projects2: remove vestigial permissions panel
 - Core/newsletters: Fixed error in authentication from newsletter accounts
 - Newsletters: Added emailAllowed flag in contact dialog to disable all newsletters for a contact.
-- Addressbook: Last name was wrongfully set on organizations
 
 04-12-2023: 6.8.22
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
@@ -148,7 +147,10 @@
 
 -- 6.8 --
 
+- Core: Equals must accept any argument
+
 11-12-2023: 6.7.58
+- Addressbook: Last name was wrongfully set on organizations
 - Newsletters: Fixed null:null in composer
 - Core: Appearance colors can be set for dark mode too now in System settings.
 - Core: fix for grey lines in form field labels
