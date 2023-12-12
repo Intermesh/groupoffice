@@ -19,7 +19,7 @@ class JitsimeetModule extends \GO\Base\Module{
 	}
 	
 	public function depends(){
-		return ['calendar','email'];
+		return ['calendar'];
 	}
 
 	public static function initListeners() {
