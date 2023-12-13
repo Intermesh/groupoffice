@@ -43,9 +43,9 @@ class CalendarEvent extends AclItemEntity {
 	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
 		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
 
-	const EventProperties = ['uid','isOrigin', 'prodId', 'sequence','title','description','locale', 'showWithoutTime',
+	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence'];
+		'createdBy','modifiedBy', 'lastOccurrence', 'eventId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
 
@@ -59,7 +59,7 @@ class CalendarEvent extends AclItemEntity {
 	static $sendSchedulingMessages = false;
 
 	public $calendarId;
-	public $eventId;
+	protected $eventId;
 	/**
 	 * @var boolean true when this event is created by this calendar system
 	 * false if the event is imported from an invitation and the organizer is in another system
@@ -185,13 +185,13 @@ class CalendarEvent extends AclItemEntity {
 
 	protected static function defineMapping(): Mapping {
 		return parent::defineMapping()
-			->addTable('calendar_calendar_event', 'cce', ['id' => 'eventId'], ['id', 'calendarId'])
-			->addTable('calendar_event', "eventdata", ['eventId' => 'id'], self::EventProperties)
-			->addUserTable('calendar_event_user', 'eventuser', ['id' => 'id'],self::UserProperties, [], false)
+			->addTable('calendar_calendar_event', 'cce', ['eventId' => 'eventId'], ['id', 'calendarId'])
+			->addTable('calendar_event', "eventdata", ['eventId' => 'eventId'], self::EventProperties)
+			->addUserTable('calendar_event_user', 'eventuser', ['eventId' => 'eventId'],self::UserProperties)
 			//->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
-			->addMap('participants', Participant::class, ['id' => 'eventId'])
-			->addMap('recurrenceOverrides', RecurrenceOverride::class, ['id'=>'fk'])
-			->addMap('alerts', Alert::class, ['id' => 'eventId']);
+			->addMap('participants', Participant::class, ['eventId' => 'eventId'])
+			->addMap('recurrenceOverrides', RecurrenceOverride::class, ['eventId'=>'fk'])
+			->addMap('alerts', Alert::class, ['eventId' => 'eventId']);
 			//->addMap('locations', Location::class, ['id' => 'eventId']);
 	}
 
@@ -203,31 +203,43 @@ class CalendarEvent extends AclItemEntity {
 	 * @param $cal Calendar
 	 * @return CalendarEvent this one is saved in the provided calendar
 	 */
-	static function grabInto($event, $cal) {
-		$eventData = go()->getDbConnection()->select(['t.id, GROUP_CONCAT(calendarId) as calendarIds'])->from('calendar_event', 't')
-			->join('calendar_calendar_event', 'c', 'c.eventId = t.id', 'LEFT')->where(['uid'=>$event->uid])->single();
+	static function grabInto($event, $receiver) {
+		$cal = Calendar::fetchDefault($receiver);
+
+		$eventData = go()->getDbConnection()
+			->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
+			->from('calendar_event', 't')
+			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
+			->where(['uid'=>$event->uid])
+			->single();
 		$calendarIds = explode(',', $eventData['calendarIds']);
-		//$existingEvent = CalendarEvent::find(['eventId', 'calendarId'])->where(['uid'=>$event->uid])->single();
-		if(!empty($eventData) || !empty($eventData['id'])) {
+		if(!empty($eventData) || !empty($eventData['eventId'])) {
 			if(in_array($cal->id, $calendarIds)) {
 				// found and already in calendar
 				return CalendarEvent::find()->where(['calendarId'=>$cal->id, 'uid' => $event->uid])->single();
 			}
-			// found not in calendar (insert)
+			// found but not in calendar (insert)
 			go()->getDbConnection()->insert('calendar_calendar_event', [
 				'calendarId' => $cal->id,
-				'eventId' => $eventData['id']
+				'eventId' => $eventData['eventId']
 			])->execute();
 			$id = go()->getDbConnection()->getPDO()->lastInsertId();
 
 			return CalendarEvent::findById($id);
 		}
-		//new, set calendarId save and return
+		//not found, set calendarId save and return
 		$event->calendarId = $cal->id;
-		if($event->save()) {
-			return $event;
-		}
+		return $event->save() ? $event : null;
 	}
+
+	static function findByUID($scheduleId, $uid) {
+		return self::find()->join('calendar_calendar', 'cal', 'cal.id = cce.calendarId', 'LEFT')
+			->join('core_user', 'u', 'u.id = cal.ownerId')
+			->where(['u.email' => $scheduleId, 'eventdata.uid'=>$uid])
+			->filter(['permissionLevel' => 25]); // rsvp
+
+	}
+
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()->add('inCalendars', function(Criteria $criteria, $value, Query $query) {
@@ -244,16 +256,6 @@ class CalendarEvent extends AclItemEntity {
 			->addDate('before', function(Criteria $crit, $comparator, $value) {
 				$crit->where('start', '<', $value);
 			});
-	}
-
-	public function currentUserParticipant(): Participant {
-		foreach($this->participants as $k => $participant) {
-			if($k == 'u'.go()->getUserId()) {
-				$me = $participant;
-				break;
-			}
-		}
-		return $me;
 	}
 
 	//public function getRecurrenceOverrides() {
@@ -405,12 +407,14 @@ class CalendarEvent extends AclItemEntity {
 
 		if(self::$sendSchedulingMessages && !empty($this->participants) &&
 			$this->lastOccurrence > new DateTime()) {
-			ICalendarHelper::handleScheduling($this);
+			Scheduler::handle($this);
 		}
 
 		$success = parent::internalSave();
 
 		if($success) {
+			$this->changeEventsWithSameUID();
+
 			Calendar::updateHighestModSeq($this->calendarId);
 			if($this->isModified('calendarId')) {
 				// Event is put in a different calendar so update both modseqs
@@ -418,6 +422,17 @@ class CalendarEvent extends AclItemEntity {
 			}
 		}
 		return $success;
+	}
+
+	private function changeEventsWithSameUID() {
+		$changes = CalendarEvent::find()
+			->select("cce.id, cal.aclId, '0'")
+			->fetchMode(\PDO::FETCH_ASSOC)
+			->join("calendar_calendar", "cal", "cal.id = cce.calendarId")
+			->where('cce.eventId', '=', $this->eventId)
+			->all();
+		if(!empty($changes))
+			CalendarEvent::entityType()->changes($changes);
 	}
 
 	/**
@@ -442,21 +457,53 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public function calendarParticipant() {
 		if($this->calendarParticipant === null) {
-			$scheduleId = Calendar::find(['id' => $this->calendarId])
+			$scheduleId = Calendar::find()
 				->join('core_user', 'u', 'calendar_calendar.ownerId = u.id')
+				->where(['id' => $this->calendarId])
 				->selectSingleValue('u.email')->single();
 			foreach ($this->participants as $p) {
 				if ($scheduleId == $p->email) { // todo Use scheduleId when ParticipantIdentity is implemented
-					$found = true;
 					$this->calendarParticipant = $p;
 					break;
 				}
 			}
-			if (!isset($found)) {
+			if (!isset($this->calendarParticipant)) {
 				$this->calendarParticipant = false;
 			}
 		}
 		return $this->calendarParticipant;
+	}
+
+	/**
+	 * @param $email string the scheduleId
+	 * @return false|Participant
+	 */
+	public function participantByScheduleId($email) {
+		foreach($this->participants as $participant) {
+			if($participant->email === $email) {
+				return $participant;
+			}
+		}
+		return false;
+	}
+
+//	public function currentUserParticipant(): Participant {
+//		foreach($this->participants as $k => $participant) {
+//			if($k == 'u'.go()->getUserId()) {
+//				$me = $participant;
+//				break;
+//			}
+//		}
+//		return $me;
+//	}
+
+	public function organizer() {
+		foreach($this->participants as $participant) {
+			if($participant->isOwner()) {
+				return $participant;
+			}
+		}
+		return false;
 	}
 
 	private function resetICalBlob() {
@@ -468,11 +515,11 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
-	protected static function internalDelete(Query $q): bool
+	protected static function internalDelete(Query $query): bool
 	{
-		$events = CalendarEvent::find()->mergeWith(clone $q);
+		$events = CalendarEvent::find()->mergeWith(clone $query);
 		foreach($events as $event) {
-			ICalendarHelper::handleScheduling($event, true);
+			Scheduler::handle($event, true);
 		}
 		//$q->andWhere(['isOrigin' => 1]);
 
@@ -485,10 +532,10 @@ class CalendarEvent extends AclItemEntity {
 //			return false;
 //		}
 //		return true;
-		$calendarModSeq = clone $q;
+		$calendarModSeq = clone $query;
 		$calIds = $calendarModSeq->selectSingleValue('calendarId')->distinct()->all();
 		// Garbage collector will delete event when last user instance is removed
-		$success =  parent::internalDelete($q); // delete none recurring or complete series
+		$success =  parent::internalDelete($query); // delete none recurring or complete series
 		if($success) {
 			Calendar::updateHighestModSeq($calIds);
 		}

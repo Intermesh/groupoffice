@@ -21,20 +21,19 @@ class Module extends core\Module
 	public function downloadIcs($key) {
 		$ev = CalendarEvent::findById($key);
 
-
 		header('Content-Type: text/calendar; charset=UTF-8; component=vevent');
 		echo ICalendarHelper::toVObject($ev)->serialize();
 	}
 
-	public function pageTest($eventId) {
-
-		go()->setAuthState(new core\jmap\State());
-		$event = CalendarEvent::findById($eventId);
-		echo ICalendarHelper::mailBody($event,
-			(object)['name'=>'test','email'=>'admin@intermesh.nl'],
-			'Update');
-		exit();
-	}
+//	public function pageTest($eventId) {
+//
+//		go()->setAuthState(new core\jmap\State());
+//		$event = CalendarEvent::findById($eventId);
+//		echo Scheduler::mailBody($event,
+//			(object)['name'=>'test','email'=>'admin@intermesh.nl'],
+//			'Update');
+//		exit();
+//	}
 
 //	protected function rights(): array
 //	{

@@ -4,6 +4,7 @@ namespace go\modules\community\calendar\model;
 
 use go\core\orm\Mapping;
 use go\core\orm\Property;
+use go\core\util\DateTime;
 
 /**
  * Class Participant

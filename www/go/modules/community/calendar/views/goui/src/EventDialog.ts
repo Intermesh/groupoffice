@@ -1,7 +1,7 @@
 import {
 	browser,
 	btn, Button,
-	checkbox,
+	checkbox, CheckboxField,
 	column,
 	comp,
 	DataSourceForm,
@@ -44,13 +44,15 @@ export class EventDialog extends Window {
 
 	store: JmapDataSource
 	submitBtn:Button
+	endDate: DateField
+	timeToggle: CheckboxField
 
 	private titleField: TextField
 	constructor() {
 		super();
 		this.title = t('New Event');
-		this.width = 400;
-		this.height = 700;
+		this.width = 440;
+		this.height = 820;
 		this.store = jmapds("CalendarEvent");
 		this.startTime = textfield({value: '12:00', width: 100})
 		this.endTime = textfield({value: '13:00', width: 100})
@@ -59,6 +61,10 @@ export class EventDialog extends Window {
 		alertField.on('change', (_, newValue) => {
 			this.form.value.useDefaultAlert = newValue === 'default';
 		});
+
+		const exceptionsBtn = btn({text:t('Exceptions'),width: 100, handler: b => {
+			this.openExceptionsDialog();
+		}});
 
 		this.items.add(this.form = datasourceform({
 				cls: 'scroll flow pad',
@@ -74,14 +80,16 @@ export class EventDialog extends Window {
 							data.start = start.format('Y-m-d');// remove time
 						}
 						if(frm.isNew)
-							data.timeZone = go.User.timezone; // todo: option to change in dialog
+							data.timeZone = go.User.timezone; // enh: option to change in dialog?
+						debugger;
 						if(data.start || data.end)
 							data.duration = start.diff(end);
 						delete data.end;
 					},
 					'load': (_, data) => {
 						const start = new DateTime(data.start);
-						data.end = start.addDuration(data.duration).addDays(data.showWithoutTime? -1 : 0).format('c');
+						data.end = start.addDuration(data.duration).addDays(data.showWithoutTime? -1 : 0).format(data.showWithoutTime ? 'Y-m-d' : 'c');
+						exceptionsBtn.hidden = !data.recurrenceOverrides;
 						//recurrenceField.setStartDate(start)
 					},
 					'save' : () => {this.close();}
@@ -105,7 +113,7 @@ export class EventDialog extends Window {
 				}
 			}),
 			textfield({name: 'location', label:t('Location')}),
-			checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'), listeners: {'setvalue':(_,checked) => {
+			this.timeToggle = checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'), listeners: {'setvalue':(_,checked) => {
 				alertField.fullDay = checked;
 				alertField.drawOptions();
 				calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
@@ -117,21 +125,24 @@ export class EventDialog extends Window {
 			}}}),
 			comp({cls:'hbox'},
 				datefield({label: t('Start'), name:'start', flex:1, timeField: this.startTime, listeners:{'setvalue': (me,v) => {
-							const date = DateTime.createFromFormat(v,me.inputFormat);
-							if(date)
-								recurrenceField.setStartDate(date);
-						}}}),
+					const time = !this.timeToggle.value;
+					const dt = DateTime.createFromFormat(v,'Y-m-d'+(time ? "TH:i":''));
+					if(dt){
+						this.endDate.minDate = dt;
+					}
+					const date = DateTime.createFromFormat(v,me.inputFormat);
+					if(date)
+						recurrenceField.setStartDate(date);
+				}}}),
 				this.startTime
 			),
 			comp({cls:'hbox'},
-				datefield({label:t('End'), name: 'end', flex:1, timeField: this.endTime}),
+				this.endDate = datefield({label:t('End'), name: 'end', flex:1, timeField: this.endTime}),
 				this.endTime
 			),
 			comp({cls:'hbox'},
 				recurrenceField,
-				btn({text:t('Exceptions'),width: 100, handler: b => {
-					this.openExceptionsDialog();
-				}}),
+				exceptionsBtn,
 			),
 			participantfield({
 				listeners: {'change': (_,v) => {
@@ -141,7 +152,7 @@ export class EventDialog extends Window {
 				}}
 			}),
 			alertField,
-			textarea({name:'description', label: t('Description')}),
+			textarea({name:'description', label: t('Description'), autoHeight: true}),
 
 			radio({type:'button',value: 'busy', name: 'freeBusyStatus', flex:'1 40%',options: [
 				{value:'busy',text: t('Busy')},
@@ -159,7 +170,6 @@ export class EventDialog extends Window {
 			'->',
 			this.submitBtn = btn({text:t('Save'), handler: _ => this.submit()})
 		));
-
 
 	}
 

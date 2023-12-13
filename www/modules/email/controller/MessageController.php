@@ -23,9 +23,7 @@ use GO\Email\Model\Account;
 use GO\Email\Model\ImapMessage;
 use GO\Email\Model\Label;
 use go\modules\community\addressbook\model\Contact;
-use go\modules\community\calendar\model\Calendar;
-use go\modules\community\calendar\model\CalendarEvent;
-use go\modules\community\calendar\model\ICalendarHelper;
+use go\modules\community\calendar\model\Scheduler;
 
 
 class MessageController extends \GO\Base\Controller\AbstractController
@@ -1418,6 +1416,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$vcalendar = $imapMessage->getInvitationVcalendar();
 		if($vcalendar) {
+			$method = (string)$vcalendar->method;
 			$vevent = $vcalendar->vevent[0];
 
 			$aliases = Alias::model()->find(
@@ -1431,19 +1430,21 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 			//$participants = array_merge($vevent->attendee, [$vevent->organizer]);
 			$accountEmail = false;
-			if (isset($vevent->attendee)) {
-				foreach ($vevent->attendee as $vattendee) {
-					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
+			if($method ==='REPLY') {
+				if (isset($vevent->organizer)) {
+					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
 					if (in_array($attendeeEmail, $aliases)) {
 						$accountEmail = $attendeeEmail;
 					}
 				}
-			}
-
-			if (!$accountEmail && isset($vevent->organizer)) {
-				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
-				if (in_array($attendeeEmail, $aliases)) {
-					$accountEmail = $attendeeEmail;
+			} else {
+				if (isset($vevent->attendee)) {
+					foreach ($vevent->attendee as $vattendee) {
+						$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
+						if (in_array($attendeeEmail, $aliases)) {
+							$accountEmail = $attendeeEmail;
+						}
+					}
 				}
 			}
 
@@ -1451,21 +1452,30 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$response['itip']['feedback'] = GO::t("None of the participants match your e-mail aliases for this e-mail account.", "email");
 				return $response;
 			}
-			// If we are here then this is an ITIP scheduling attachment for us.
-			$cal = Calendar::fetchDefault($accountEmail);
-			if(empty($cal) || !$cal->getMyRights()['mayRSVP']) {
-				$response['itip']['feedback'] = GO::t('You cannot response to this event') . (empty($cal) ? ', calendar not found' : ", $cal->name insufficient permission ($cal->id)");
-				return $response;
-			}
-			$method = (string)$vcalendar->method;
-			$event = ICalendarHelper::parseVObject($vcalendar, (new CalendarEvent())->setValues(['isOrigin' => false]));
-			$event = CalendarEvent::grabInto($event, $cal);
+			$from = $imapMessage->from->getAddress();
+			$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
+				'email'=>$from['email'],
+				'name'=>$from['personal']
+			]);
+
 
 			$response['itip'] = [
 				'method' => $method,
 				'scheduleId' => $accountEmail,
 				'event' => $event
 			];
+			if($method ==='REPLY') {
+				$p = $event->participantByScheduleId($from['email']);
+				if($p) {
+					$lang = go()->t('replyImipBody', 'community', 'calendar');
+
+					$response['itip']['feedback'] = strtr($lang[$p->participationStatus], [
+						'{name}' => $p->name ?? '',
+						'{title}' => $event->title,
+						'{date}' => implode(' ', $event->humanReadableDate()),
+					]);
+				}
+			}
 
 			//filter out invites
 			$response['attachments'] = array_values(array_filter($response['attachments'], function($a) {

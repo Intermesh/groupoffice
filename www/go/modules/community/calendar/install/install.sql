@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
     ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `calendar_event` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `eventId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `prodId` VARCHAR(100) NOT NULL DEFAULT 'GroupOffice',
     `uid` VARCHAR(45) NOT NULL,
     `sequence` INT UNSIGNED NOT NULL DEFAULT 1,
@@ -116,8 +116,9 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `createdBy` INT NULL,
     `modifiedBy` INT NULL,
     `isOrigin` TINYINT(1) NOT NULL DEFAULT 1,
+	  `replyTo` VARCHAR(100),
 	  `requestStatus` varchar(255) DEFAULT NULL,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`eventId`),
     INDEX `fk_calendar_event_core_user1_idx` (`createdBy` ASC),
     INDEX `fk_calendar_event_core_user2_idx` (`modifiedBy` ASC),
     CONSTRAINT `fk_calendar_event_core_user1`
@@ -139,7 +140,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
     INDEX `fk_calendar_calendar_event_calendar_calendar1_idx` (`calendarId` ASC),
     CONSTRAINT `fk_calendar_calendar_event_calendar_event1`
     FOREIGN KEY (`eventId`)
-    REFERENCES `calendar_event` (`id`)
+    REFERENCES `calendar_event` (`eventId`)
     ON DELETE RESTRICT
     ON UPDATE NO ACTION,
     CONSTRAINT `fk_calendar_calendar_event_calendar_calendar1`
@@ -163,13 +164,13 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
     `participationStatus` ENUM('needs-action', 'tentative', 'accepted', 'declined', 'delegated') NULL DEFAULT 'needs-action',
     `scheduleAgent` ENUM('server', 'client', 'none') DEFAULT 'server',
     `expectReply` TINYINT(1) NOT NULL DEFAULT 0,
-    `scheduleUpdated` TIMESTAMP NULL,
+    `scheduleUpdated` DATETIME NULL,
 		`scheduleStatus` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`, `eventId`),
     INDEX `fk_participant_calendar_event1_idx` (`eventId` ASC),
     CONSTRAINT `fk_participant_calendar_event1`
     FOREIGN KEY (`eventId`)
-    REFERENCES `calendar_event` (`id`)
+    REFERENCES `calendar_event` (`eventId`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
@@ -179,20 +180,20 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
 -- Table `calendar_event_user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_event_user` (
-     `id` INT UNSIGNED NOT NULL,
+     `eventId` INT UNSIGNED NOT NULL,
      `userId` INT NOT NULL,
      `freeBusyStatus` ENUM('free', 'busy') NULL DEFAULT 'busy',
     `color` VARCHAR(21) NULL DEFAULT NULL,
     `useDefaultAlerts` TINYINT(1) NULL DEFAULT 1,
     `veventBlobId` BINARY(40) NULL,
     `modSeq` INT NOT NULL DEFAULT 0,
-    PRIMARY KEY (`id`, `userId`),
-    INDEX `fk_calendar_event_user_calendar_event1_idx` (`id` ASC),
+    PRIMARY KEY (`eventId`, `userId`),
+    INDEX `fk_calendar_event_user_calendar_event1_idx` (`eventId` ASC),
     INDEX `fk_calendar_event_user_core_user1_idx` (`userId` ASC),
     INDEX `fk_calendar_event_user_core_blob1_idx` (`veventBlobId` ASC),
     CONSTRAINT `fk_calendar_event_user_calendar_event1`
-    FOREIGN KEY (`id`)
-    REFERENCES `calendar_event` (`id`)
+    FOREIGN KEY (`eventId`)
+    REFERENCES `calendar_event` (`eventId`)
     ON DELETE NO ACTION,
     CONSTRAINT `fk_calendar_event_user_core_user1`
     FOREIGN KEY (`userId`)
@@ -220,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
     INDEX `fk_calendar_event_alert_calendar_event_user1_idx` (`eventId` ASC, `userId` ASC),
     CONSTRAINT `fk_calendar_event_alert_calendar_event_user1`
     FOREIGN KEY (`eventId` , `userId`)
-    REFERENCES `calendar_event_user` (`id` , `userId`)
+    REFERENCES `calendar_event_user` (`eventId` , `userId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
@@ -235,7 +236,7 @@ CREATE TABLE IF NOT EXISTS `calendar_recurrence_override` (
     INDEX `fk_recurrence_override_calendar_event1_idx` (`fk` ASC),
     CONSTRAINT `fk_recurrence_override_calendar_event1`
     FOREIGN KEY (`fk`)
-    REFERENCES `calendar_event` (`id`)
+    REFERENCES `calendar_event` (`eventId`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
@@ -252,7 +253,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_related` (
     INDEX `fk_calendar_event_related_calendar_event1_idx` (`eventId` ASC),
     CONSTRAINT `fk_calendar_event_related_calendar_event1`
     FOREIGN KEY (`eventId`)
-    REFERENCES `calendar_event` (`id`)
+    REFERENCES `calendar_event` (`eventId`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
@@ -274,7 +275,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_link` (
     INDEX `fk_calendar_event_link_core_blob1_idx` (`blobId` ASC),
     CONSTRAINT `fk_event_attachment_calendar_event1`
     FOREIGN KEY (`eventId`)
-    REFERENCES `calendar_event` (`id`)
+    REFERENCES `calendar_event` (`eventId`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
     CONSTRAINT `fk_calendar_event_link_core_blob1`
@@ -300,7 +301,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_location` (
     INDEX `fk_event_location_calendar_event1_idx` (`eventId` ASC),
     CONSTRAINT `fk_event_location_calendar_event1`
     FOREIGN KEY (`eventId`)
-    REFERENCES `calendar_event` (`id`)
+    REFERENCES `calendar_event` (`eventId`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
@@ -308,5 +309,5 @@ CREATE TABLE IF NOT EXISTS `calendar_event_location` (
 CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
     `id` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT `fk_event_calendar_event_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`id`) ON DELETE CASCADE
+    CONSTRAINT `fk_event_calendar_event_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE
 ) ENGINE = InnoDB;

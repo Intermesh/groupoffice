@@ -12,7 +12,7 @@ export interface YearViewEventMap<Type> extends ComponentEventMap<Type> {
 
 
 export interface YearView extends CalendarView {
-	on<K extends keyof YearViewEventMap<this>>(eventName: K, listener: Partial<YearViewEventMap<this>>[K], options?: ObservableListenerOpts): void;
+	on<K extends keyof YearViewEventMap<this>, L extends Function>(eventName: K, listener: Partial<YearViewEventMap<this>>[K], options?: ObservableListenerOpts): L;
 	fire<K extends keyof YearViewEventMap<this>>(eventName: K, ...args: Parameters<YearViewEventMap<any>[K]>): boolean
 }
 
@@ -20,38 +20,56 @@ export class YearView extends CalendarView {
 
 	baseCls = 'yearview'
 
+	goto(date: DateTime, days: number) {
+		this.day= date.clone().setDate(1).setMonth(1); // 1st jan;
+		const endYear = this.day.clone().addYears(1);
+		Object.assign(this.store.queryParams.filter ||= {}, {
+			after: this.day.format('Y-m-d'),
+			before: endYear.format('Y-m-d')
+		});
+
+		this.store.load()
+		//this.populateViewModel();
+	}
+
+	update = (data?: any) => {
+		if(this.rendered) {
+			//this.renderView(); this will be done in populateViewModel() for this view
+			this.populateViewModel();
+		}
+	}
+
 	protected populateViewModel() {
 		this.clear()
 		const viewEnd = this.day.clone().addYears(1);
 		for (const e of this.store.items) {
 			this.viewModel.push(...CalendarItem.makeItems(e, this.day, viewEnd));
 		}
-		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
+
 
 		this.renderView()
 	}
 
-	goto(date: DateTime, days: number) {
-		this.day= date.clone().setDate(1).setMonth(1); // 1st jan;
-		this.populateViewModel();
-	}
-
 	renderView() {
+		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		this.iterator = 0;
 		this.el.innerHTML = '';
-		let start = this.day.clone();
-		for(var m = 1; m <= 12; m++) {
-			this.renderMonth(m, start);
+		let d = this.day.clone();
+		for(let m = 1; m <= 12; m++) {
+			this.renderMonth(m, d);
 		}
 	}
 
 	iterator!: number
 	renderMonth(m:number, day:DateTime) {
+		const monthDay = day.clone();
 		var now = new DateTime(),
 			caption = E('caption', DateTime.monthNames[m-1])
 				.cls('current', day.format('mY') == now.format('mY'))
 				.attr('data-month', m)
-				.on('click', ev =>  this.fire('monthclick', this, day) );
+				.on('click', ev =>  {
+					this.fire('monthclick', this, monthDay)
+				} );
 
 		const header = E('tr',E('td'));
 		for(let i=0;i < 7;i++) {
@@ -63,11 +81,12 @@ export class YearView extends CalendarView {
 		for (let i = 0; i < 42; i++) {
 			if (i % 7 == 0){
 				const weekDay = day.clone();
-				row = E('tr',
-					E('td', weekDay.getWeekOfYear()).cls('weeknb').on('click', ev => {
+				row = E('tr');
+				if(+day.format('m') === m) {
+					row.append(E('td', weekDay.getWeekOfYear()).cls('weeknb').on('click', ev => {
 						this.fire('weekclick', this, weekDay);
-					})
-				);
+					}))
+				}
 				rows.push(row);
 			}
 			const ev = E('div').cls('events');
@@ -82,11 +101,13 @@ export class YearView extends CalendarView {
 				}
 				ev.append(E('p')
 					.attr('title', e.title+' - '+e.start.format('H:i'))
-					//.attr('data-color', e.color)
 					.css({backgroundColor: '#'+e.color})
 				);
 			}
-			const td = E('td');
+			const cDay = day.clone();
+			const td = E('td').on('click',ev => {
+				this.fire('dayclick', this, cDay);
+			});
 			if(+day.format('m') === m) {
 				td.cls('today', day.format('Ymd') === now.format('Ymd'))
 					.cls('past', day.format('Ymd') < now.format('Ymd'))

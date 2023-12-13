@@ -1,5 +1,5 @@
 import {
-	autocomplete, btn, checkbox,
+	autocomplete, AutocompleteField, btn, checkbox,
 	column,
 	comp,
 	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap,
@@ -22,18 +22,23 @@ interface Participant {
 export const participantfield = (config?: Config<ParticipantField, FieldEventMap<ParticipantField>>) => createComponent(new ParticipantField(), config);
 
 export interface ParticipantField extends Component {
-	on<K extends keyof FieldEventMap<ParticipantField>>(eventName: K, listener: Partial<FieldEventMap<ParticipantField>>[K], options?: ObservableListenerOpts): void
-	fire<K extends keyof FieldEventMap<ParticipantField>>(eventName: K, ...args: Parameters<FieldEventMap<any>[K]>): boolean
+	on<K extends keyof FieldEventMap<this>, L extends Function>(eventName: K, listener: Partial<FieldEventMap<this>>[K], options?: ObservableListenerOpts): L;
+	un<K extends keyof FieldEventMap<this>>(eventName: K, listener: Partial<FieldEventMap<this>>[K]): boolean;
+	fire<K extends keyof FieldEventMap<this>>(eventName: K, ...args: Parameters<FieldEventMap<any>[K]>): boolean;
 }
 export class ParticipantField extends Component {
 
-	list: MapField
+	list!: MapField
+
+	editable?: boolean
 
 	constructor() {
 		super();
-		const contextMenu = menu({removeOnClose:true},
+		this.cls = 'participant-field';
 
-		);
+	}
+
+	protected internalRender() {
 		this.items.add(
 			this.list = mapfield({name: 'participants', cls:'goui-pit',
 				listeners: {
@@ -42,30 +47,31 @@ export class ParticipantField extends Component {
 					}
 				},
 				buildField: (v: any) => { const f = containerfield({cls:'hbox', style: {alignItems: 'center'}},
-						comp({tagName:'i',cls:'icon',html:v.name?'person':'email', style:{marginRight:'8px'}}),
-						comp({
-							flex: '1 0 60%',
-							html: v.name ? v.name + '<br>' + v.email : v.email
-						}),
-						btn({icon:'arrow_drop_down', menu: menu({},
+					comp({tagName:'i',cls:'icon',html:v.name?'person':'email', style:{margin:'0 8px'}}),
+					comp({
+						flex: '1 0 60%',
+						html: v.name ? v.name + '<br>' + v.email : v.email
+					}),
+					btn({icon:'arrow_drop_down', menu: menu({},
 							btn({text: v.email, disabled: true}),
-								hr(),
+							hr(),
 							checkbox({label:'Optioneel',/* enableToggle: true*/}),
 							btn({icon:'delete',text:t('Delete'), handler: _ => {
 									f.remove();
 									this.fire('change', this, this.list.value, null);
 								}
 							}),
-								hr(),
+							hr(),
 							btn({icon:'insert_invitation',text:'Invite again'}),
 							btn({icon:'email',text:t('Write email')})
 						)})
-					);
+				);
 					return f;
 				}
 			}),
 			autocomplete({
-				label:t('Invite people'),
+				hidden: (this.editable===false),
+				placeholder:t('Invite people'),
 
 				//valueProperty: "id",
 				listeners: {
@@ -111,7 +117,9 @@ export class ParticipantField extends Component {
 				})
 				//	listeners: {'blur' : (_,v) => {/*check if valid email, if so add to _.previous.add(participant);*/}}
 			}),
-		)
+		);
+
+		return super.internalRender();
 	}
 
 	addSelfAsOrganiser() {

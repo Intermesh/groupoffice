@@ -92,7 +92,7 @@ class CalDAVBackend extends AbstractBackend implements
 			$ownerId = $properties[$transp]->getValue() === 'transparent' ? null : go()->getUserId();
 		}
 
-		$values = ['ownedBy' => $ownerId];
+		$values = ['ownerId' => $ownerId];
 		foreach ($this->propertyMap as $xmlName => $dbName) {
 			if (isset($properties[$xmlName])) {
 				$values[$dbName] = $properties[$xmlName];

@@ -10,7 +10,7 @@ export interface MonthViewEventMap<Type> extends ComponentEventMap<Type> {
 }
 
 export interface MonthView extends CalendarView {
-	on<K extends keyof MonthViewEventMap<this>>(eventName: K, listener: Partial<MonthViewEventMap<this>>[K], options?: ObservableListenerOpts): void
+	on<K extends keyof MonthViewEventMap<this>, L extends Function>(eventName: K, listener: Partial<MonthViewEventMap<this>>[K], options?: ObservableListenerOpts): L
 	fire<K extends keyof MonthViewEventMap<this>>(eventName: K, ...args: Parameters<MonthViewEventMap<any>[K]>): boolean
 }
 export class MonthView extends CalendarView {

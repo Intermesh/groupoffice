@@ -11,6 +11,7 @@ import {
 } from "@intermesh/goui";
 import {JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
+import {MonthView} from "./MonthView.js";
 
 export abstract class CalendarView extends Component {
 	
@@ -20,7 +21,7 @@ export abstract class CalendarView extends Component {
 	protected recur?: {[id:string]: Recurrence}
 	protected contextMenu = menu({removeOnClose:false, isDropdown: true},
 		btn({icon:'open_with', text: t('Show'), handler:_ =>alert(this.current!.data.id)}),
-		btn({icon:'edit', text: t('Edit'), handler: _ => this.current!.edit()}),
+		btn({icon:'edit', text: t('Edit'), handler: _ => this.current!.open()}),
 		btn({icon:'email', text: t('E-mail participants')}),
 		//'-',
 		btn({icon:'delete', text: t('Delete'), handler: _ => this.current!.remove() }),
@@ -56,14 +57,17 @@ export abstract class CalendarView extends Component {
 	protected eventHtml(item: CalendarItem) {
 		const e = item.data;
 		const icons = []
-		if(e.recurrenceRule) icons.push(E('i','refresh').cls('icon'));
+		if(!e.showWithoutTime && this instanceof MonthView) icons.push('fiber_manual_record')
+		if(e.recurrenceRule) icons.push('refresh');
 		if(e.links) icons.push('attachment');
 		if(e.alerts) icons.push('notifications');
+		if(!!e.participants) icons.push('group');
 
 		return E('div',
-			E('em',...icons, item.title || '('+t('Nameless')+')'),
+			...icons.map(i=>E('i',i).cls('icon')),
+			E('em', item.title || '('+t('Nameless')+')'),
 			E('span',  e.showWithoutTime === false ? item.start.format('G:i'):'')
-		).cls('allday',e.showWithoutTime).cls('schedule', !!e.participants)
+		).cls('allday',e.showWithoutTime)
 			.attr('data-key', item.key || '_new_')
 			.attr('tabIndex', 0)
 			.on('click',(ev)=> {
@@ -87,7 +91,7 @@ export abstract class CalendarView extends Component {
 				this.contextMenu.showAt(ev);
 				ev.preventDefault();
 			}).on('dblclick', ev => {
-				item.edit();
+				item.open();
 			});
 	}
 

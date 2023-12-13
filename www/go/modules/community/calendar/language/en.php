@@ -6,4 +6,10 @@ return [
 	'updateScheduleText' => 'You have made changes to an event with participants. By saving this event an update will be sent to notify them of these changes',
 	'cancelScheduleTitle' => 'Do you want to delete the event and notify the participants?',
 	'cancelScheduleText' => 'If you delete this event, the participants will be notified that the event is cancelled',
+
+	'replyImipBody' => [
+		'accepted' => '{name} accepted event "{title}" {date}',
+		'declined' => '{name} declined event "{title}" {date}',
+		'tentative' => '{name} is tentative about event "{title}" {date}',
+	],
 ];

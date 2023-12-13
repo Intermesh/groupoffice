@@ -2,6 +2,7 @@ import {BaseEntity, btn, comp, DateTime, DefaultEntity, Recurrence, t, tbar, win
 import {calendarStore} from "./Index.js";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {EventDialog} from "./EventDialog.js";
+import {EventDetail} from "./EventDetail.js";
 
 export interface CalendarEvent extends BaseEntity {
 	recurrenceRule?: any
@@ -27,6 +28,7 @@ interface CalendarItemConfig {
 	title?: string
 	start: DateTime
 	end: DateTime
+	participantId?:string
 	color?: string
 }
 
@@ -44,6 +46,7 @@ export class CalendarItem {
 	start!: DateTime
 	end!: DateTime
 	color!: string
+	participantId!: string
 
 	private initStart: string
 	private initEnd: string
@@ -54,6 +57,8 @@ export class CalendarItem {
 		Object.assign(this,obj);
 		this.initStart = obj.start.format('Y-m-d\TH:i:s');
 		this.initEnd = obj.end.format('Y-m-d\TH:i:s');
+		if(!obj.participantId)
+			this.participantId = go.User.id;
 		if(!obj.title) {
 			this.title = obj.data.title!;
 		}
@@ -74,7 +79,9 @@ export class CalendarItem {
 	static makeItems(e: CalendarEvent, from: DateTime, until: DateTime) : CalendarItem[] {
 		const start = new DateTime(e.start),
 			end = start.clone().addDuration(e.duration),
-			color = e.color || calendarStore.items.find((c:any) => c.id == e.calendarId)?.color,
+			cal = calendarStore.items.find((c:any) => c.id == e.calendarId),
+			color = e.color || cal?.color,
+			participantId = (cal && cal.ownerId) ? cal.ownerId+'' : go.User.id+'',
 			items = [];
 
 		if(e.recurrenceRule) {
@@ -93,6 +100,7 @@ export class CalendarItem {
 					} else {
 						const os = o.start ? new DateTime(o.start) : r.current.clone();
 						items.push(new CalendarItem({
+							participantId,
 							key: e.id + '/' + recurrenceId,
 							recurrenceId: recurrenceId,
 							start: os,
@@ -104,6 +112,7 @@ export class CalendarItem {
 					}
 				} else {
 					items.push(new CalendarItem({
+						participantId,
 						key: e.id + '/' + recurrenceId,
 						recurrenceId: recurrenceId,
 						start: r.current.clone(),
@@ -121,6 +130,7 @@ export class CalendarItem {
 			}
 		} else if (end.date > from.date && start.date < until.date) {
 			items.push(new CalendarItem({
+				participantId,
 				key: e.id+"",
 				start,
 				end,
@@ -169,7 +179,8 @@ export class CalendarItem {
 	}
 
 	save(onCancel: Function) {
-		const start = this.start.format('Y-m-dTH:i:s'),
+		const f = this.data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s';
+		const start = this.start.format(f),
 			duration = this.start.diff(this.end);
 
 		if (this.isTimeModified()) {
@@ -178,14 +189,15 @@ export class CalendarItem {
 			} else {
 				this.data.start = start;
 				this.data.duration = duration;
-				this.edit(onCancel); // open dialog
+				this.open(onCancel); // open dialog
 			}
 		}
 	}
 
-	edit(onCancel?: Function) {
+	open(onCancel?: Function) {
 		//if (!ev.data.id) {
-		const dlg = new EventDialog();
+
+		const dlg = !this.isOwner ? new EventDetail() :  new EventDialog();
 		dlg.on('close', () => {
 			// cancel ?
 			onCancel && onCancel();
@@ -232,8 +244,17 @@ export class CalendarItem {
 		}
 	}
 
-	isOwner() {
+	get isOwner() {
+		return !this.data.participants || this.data.participants[this.participantId]?.roles?.owner || false;
+	}
 
+	updateParticipation(status: "accepted"|"tentative"|"declined") {
+		if(!this.data.participants || !this.data.participants[this.participantId])
+			throw new Error('Not a participant');
+		this.data.participants[this.participantId].participationStatus = status;
+
+		eventDS.setParams.sendSchedulingMessages = true;
+		eventDS.update(this.data.id, {participants: this.data.participants});
 	}
 
 	shouldSchedule(m: Partial<CalendarEvent>|false) {

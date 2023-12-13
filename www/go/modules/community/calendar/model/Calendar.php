@@ -63,7 +63,7 @@ class Calendar extends AclOwnerEntity {
 	/** @return Calendar */
 	public static function fetchDefault($scheduleId) {
 		return self::find()
-			->join('core_user', 'u', 'u.id = caluser.userId')
+			->join('core_user', 'u', 'u.id = calendar_calendar.ownerId')
 			->where(['u.email' => $scheduleId])
 			->orderBy(['sortOrder'=>'ASC'])
 			->single();

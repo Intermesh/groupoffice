@@ -74,7 +74,7 @@ export class Main extends Component {
 			splitView = new SplitView(this.eventStore);
 
 		this.items.add(
-			this.west = comp({tagName: 'aside', width: 286},
+			this.west = comp({tagName: 'aside', width: 374},
 				tbar({},
 					btn({
 						icon: 'add',
@@ -87,14 +87,15 @@ export class Main extends Component {
 				this.picker = datepicker({
 					showWeekNbs: false,
 					enableRangeSelect: true,
+					withoutFooter: true,
 					listeners: {
 						'select': (_dp, date) => {
-							this.date = date;
+							this.date = date!;
 							this.updateView();
 						},
 						'select-range': (_dp, start, end) => {
-							const days = Math.round((end.clone().setHours(12).getTime() - start.clone().setHours(12).getTime()) / 8.64e7) + 1;
-							this.date = start;
+							const days = Math.round((end!.clone().setHours(12).getTime() - start!.clone().setHours(12).getTime()) / 8.64e7) + 1;
+							this.date = start!;
 							if (days < 8) {
 								this.setSpan('days', days);
 							} else {
@@ -143,7 +144,7 @@ export class Main extends Component {
 									delete this.eventStore.queryParams.filter?.inCalendars;
 								}
 
-								this.eventStore.load();
+								//this.eventStore.load();
 								this.updateView();
 							}
 						}
@@ -244,6 +245,9 @@ export class Main extends Component {
 		monthView.on('selectweek', (me, day) => {
 			this.goto(day).setSpan('week', 7);
 		});
+		yearView.on('dayclick', (me,day) => {
+			this.goto(day).setSpan('day', 1);
+		})
 		yearView.on('weekclick', (me,weekDay) => {
 			this.goto(weekDay).setSpan('week', 7);
 		});

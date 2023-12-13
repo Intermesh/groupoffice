@@ -147,7 +147,7 @@ class ICalendarHelper {
 			}
 		}
 		return [
-			!empty($participant->roles['owner']) ? 'ORGANIZER' : 'ATTENDEE',
+			!empty($participant->isOwner()) ? 'ORGANIZER' : 'ATTENDEE',
 			'mailto:'.$participant->email,
 			$attr
 		];
@@ -314,8 +314,8 @@ class ICalendarHelper {
 		$p->kind = !empty($vattendee['CUTYPE']) ? strtolower($vattendee['CUTYPE']) : 'individual';
 		if(!empty($vattendee['CN'])) $p->name = $vattendee['CN'];
 		if(!empty($vattendee['ROLE'])) $p->roles[] = $vattendee['ROLE'];
-		if(!empty($vattendee['RSVP'])) $p->expectReply = $vattendee['RSVP'];
-		$p->participationStatus = strtolower($vattendee['PARTSTAT']);
+		if(!empty($vattendee['RSVP'])) $p->expectReply = $vattendee['RSVP']->getValue() ? 1: 0; // bool
+		$p->participationStatus = !empty($vattendee['PARTSTAT']) ? strtolower($vattendee['PARTSTAT']) : 'needs-action';
 		$map = array_flip(self::$roleMap);
 		if(in_array((string)$vattendee['ROLE'], $map)) {
 			$p->setRoles([$map[(string)$vattendee['ROLE']] => true]);
@@ -410,208 +410,6 @@ class ICalendarHelper {
 			$data = file_get_contents($data->path());
 		}
 		return VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING);
-	}
-
-	const EssentialScheduleProps = ['start', 'duration', 'location', 'title', 'description', 'showWithoutTime'];
-	/**
-	 * Send all the needed imip schedule messages
-	 * @param CalendarEvent $event
-	 * @parma bool $delete if the event is about to be deleted
-	 */
-	static public function handleScheduling(CalendarEvent $event, bool $willDelete = false) {
-
-		$current = $event->calendarParticipant();
-
-		if(empty($current) ||
-			(!$event->isOrigin && !$current->isModified('participantionStatus'))) {
-			return;
-		}
-
-		if(!$event->isOrigin) {
-			$status = $willDelete ? Participant::Declined : $current->participationStatus;
-			self::replyImip($event, $status);
-			$title = ucfirst($status);
-		} elseif ($current->isOwner()) {
-			if($event->isRecurring()) {
-				throw new \Exception('Need to implement scheduling recurring instances');
-			}
-
-			$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
-
-			self::sendImip($event, $willDelete ? 'CANCEL': 'REQUEST', $newOnly);
-
-		}
-
-	}
-
-	private static function replyImip($event, $status) {
-
-	}
-
-	private static function sendImip(CalendarEvent $event, $method, $newOnly = false) {
-		$success=true;
-		$organizer = $event->calendarParticipant(); // must be organizer at this point
-		foreach($event->participants as $participant) {
-			/** @var $participant Participant */
-			if(($newOnly && !$participant->isNew()) || $participant->isOwner() || $participant->scheduleAgent !== 'server')
-				continue;
-
-			if(!empty($participant->language)) {
-				$old = go()->getLanguage()->setLanguage($participant->language);
-			}
-
-			$subject = go()->t($method=='REQUEST' ? 'Invitation' : 'Cancellation', 'community', 'calendar');
-			if($participant->participationStatus !== Participant::NeedsAction) {
-				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
-			}
-
-			$ics = self::toVObject($event, new VCalendar([
-				'PRODID' => self::PROD,
-				'METHOD'=>$method
-			]));
-
-			$success = go()->getMailer()->compose()
-					->setSubject($subject .': '.$event->title)
-					->setFrom(go()->getSettings()->systemEmail, $organizer->name)
-					->setReplyTo($organizer->email)
-					->setTo(new Address($participant->email, $participant->name))
-					->attach(Attachment::fromString($ics->serialize(),
-						'invite.ics',
-						'text/calendar;method='.$method.';charset=utf-8',Attachment::ENCODING_8BIT)
-						->setInline(true)
-					)
-					->setBody(self::mailBody($event,$method,$participant,$subject), 'text/html')
-					->send() && $success;
-
-			if(isset($old)) {
-				go()->getLanguage()->setLanguage($old);
-				unset($old);
-			}
-		}
-		return $success;
-	}
-
-	static function mailBody($event, $method, $recipient, $title) {
-		if(!$event) {
-			return false;
-		}
-		ob_start();
-		$url = 'https://group-office.com/event';
-		include __DIR__.'/../views/imip.php';
-		return ob_get_clean();
-	}
-
-	/**
-	 * The "REQUEST" method in a "VEVENT" component provides the following
-	 * scheduling functions:
-	 *
-	 * o  Invite "Attendees" to an event.
-	 * o  Reschedule an existing event.
-	 * o  Response to a "REFRESH" request.
-	 * o  Update the details of an existing event, without rescheduling it.
-	 * o  Update the status of "Attendees" of an existing event, without rescheduling it.
-	 * o  Reconfirm an existing event, without rescheduling it.
-	 * o  Forward a "VEVENT" to another uninvited CU.
-	 * o  For an existing "VEVENT" calendar component, delegate the role of "Attendee" to another CU.
-	 * o  For an existing "VEVENT" calendar component, change the role of
-	 * "Organizer" to another CU.
-	 *
-	 * @return void
-	 */
-	static function sendRequest($event) {
-
-	}
-
-	static function processMessage($vcalendar, $sender, Calendar $calendar) {
-
-//		if(!$calendar->hasPermissionLevel(Acl::LEVEL_WRITE)) {
-//			return false;
-//		}
-		$vevent = $vcalendar->VEVENT[0];
-		$existingEvent = CalendarEvent::find()->where(['uid' => (string)$vevent->uid,'calendarId'=>$calendar->id])->single();
-//		$event = ICalendarHelper::parseVObject($vcalendar, (new CalendarEvent())->setValues(['isOrigin' => false]));
-//		$existingEvent = CalendarEvent::grabInto($event, $calendar);
-
-		switch($vcalendar->method){
-			case 'REQUEST': return self::processRequest($vcalendar,$calendar,$existingEvent );
-			case 'CANCEL': return self::precessCancel($vcalendar,$existingEvent);
-			case 'REPLY': return self::processReply($vcalendar,$sender,$existingEvent);
-		}
-		return false;
-	}
-
-	private static function processRequest(VCalendar $vcalendar,$calendar, CalendarEvent $existingEvent = null) {
-		if(!$existingEvent) {
-			$existingEvent = new CalendarEvent();
-			$existingEvent->isOrigin = false;
-			$existingEvent->calendarId = $calendar->id;
-			$existingEvent->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
-		}
-		return self::parseVObject($vcalendar, $existingEvent);
-	}
-
-	private static function precessCancel(VCalendar $vcalendar, CalendarEvent $existingEvent = null) {
-		if($existingEvent) {
-			if ($existingEvent->isRecurring()) {
-				foreach($vcalendar->VEVENT as $vevent) {
-					if(!empty($vevent->{'RECURRENCE-ID'})) {
-						$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
-						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent))
-							->setValues(['status' => CalendarEvent::Cancelled]);
-					}
-				}
-			} else {
-				$existingEvent->status = CalendarEvent::Cancelled;
-			}
-			$existingEvent->sequence = $vcalendar->SEQUENCE;
-		}
-		return $existingEvent;
-	}
-
-	/**
-	 * The message is a reply. This is for example an attendee telling an organizer he accepted the invite, or declined it.
-	 */
-	private static function processReply(VCalendar $vcalendar, $sender, CalendarEvent $existingEvent = null) {
-		if(!$existingEvent) return;
-
-		$instances = [];
-		$requestStatus = '2.0'; // OK
-
-		foreach($vcalendar->VEVENT as $vevent) {
-			$status = strtolower($vevent->ATTENDEE['PARTSTAT']->getValue());
-			if (isset($vevent->{'REQUEST-STATUS'})) {
-				$responseStatus = strtok((string)$vevent->{'REQUEST-STATUS'}, ";");
-			}
-			$item = $existingEvent;
-			// occurrence
-			if(isset($vevent->{'RECURRENCE-ID'})) {
-				$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
-				if(!isset($item->recurrenceOverrides[$recurId])) {
-					// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
-					$item->recurrenceOverrides[$recurId] = new RecurrenceOverride($item);
-				}
-				$item = $item->recurrenceOverrides[$recurId];
-
-			}
-			// base event
-			$found = false;
-			foreach($item->participants as $participant) {
-				if($participant->email === $sender->email) {
-					$participant->participationStatus = $status;
-					$found = true;
-					break;
-				}
-			}
-			if(!$found) {
-				$item->participants[] = (new Participant($item))->setValues([
-					'email' => $sender->email,
-					'name' => $sender->name ?? $sender->email,
-					'participationStatus' => $status
-				]);
-			}
-
-		}
-		return $existingEvent;
 	}
 
 }

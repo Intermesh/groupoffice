@@ -37,37 +37,30 @@ function addEmailAction() {
 			if(itip) {
 				const btns = E('div').cls('btns');
 
-				let text = itip.feedback || "This message contains an appointment invitation that was already processed.";
+				let text = itip.feedback || {
+					CANCEL: t("Cancellation"),
+					REQUEST: t("Invitation")
+				}[itip.method] || "Unable to process appointment information.";
 
-				switch(itip.method) {
-					case "REPLY":
-						text = t("Reply");
-						btns.append(
-							E('button', t("Indicate whether you participate in this event")).cls('goui-button').on('click', _ => {processInvite(msg);})
-						);
-					break;
-					case 'CANCEL':
-						text = t("Cancellation");
-						btns.append(
-							E('button', t("Delete Event")).cls('goui-button').on('click', _ => {processInvite(msg);})
-						);
-					break;
-					case 'REQUEST':
-						text = t("Invitation"); // ma 4 dec 12:00
-						btns.append(
-							E('div',
-								E('button', t("Accept")).cls('goui-button').on('click', _ => {processInvite(msg,'accepted');}),
-								E('button', t("Maybe")).cls('goui-button').on('click', _ => {processInvite(msg,'tentative');}),
-								E('button', t("Decline")).cls('goui-button').on('click', _ => {processInvite(msg,'declined');})
-							).cls('goui group'),
-							E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
-								alert('todo: show day schedule for event start till end time');
-							})
-						);
-					break;
+				if(itip.method === 'REQUEST') {
+					btns.append(
+						E('div',
+							E('button', t("Accept")).cls('goui-button').on('click', _ => {processInvite(msg,'accepted');}),
+							E('button', t("Maybe")).cls('goui-button').on('click', _ => {processInvite(msg,'tentative');}),
+							E('button', t("Decline")).cls('goui-button').on('click', _ => {processInvite(msg,'declined');})
+						).cls('goui group'),
+						E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
+							alert('todo: show day schedule for event start till end time');
+						})
+					);
 				}
+
 				if(itip.event) {
-					text += ' "' + itip.event.title+'" '+t('at', 'community', 'calendar') +' '+ DateTime.createFromFormat(itip.event.start.replace('T', ' '),'Y-m-d H:i')!.format('D j M H:i')
+					if(typeof itip.event === "string") {
+						text += ', '+ itip.event;
+					} else if(itip.method !== 'REPLY') {
+						text += ' "' + itip.event.title + '" ' + t('at', 'community', 'calendar') + ' ' + DateTime.createFromFormat(itip.event.start.replace('T', ' '), 'Y-m-d H:i')!.format('D j M H:i')
+					}
 				}
 
 				container.append(

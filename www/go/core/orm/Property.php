@@ -1027,7 +1027,7 @@ abstract class Property extends Model {
 		if(!empty($joinedTable->getConstantValues())) {
 			$on = Criteria::normalize($on)->andWhere($joinedTable->getConstantValues());
 		}
-		$query->join($joinedTable->getName(), $joinedTable->getAlias(), $on, $joinedTable->required ? 'LEFT' : 'INNER');
+		$query->join($joinedTable->getName(), $joinedTable->getAlias(), $on, $joinedTable->required ? 'INNER' : 'LEFT');
 	}
 
 	/**
