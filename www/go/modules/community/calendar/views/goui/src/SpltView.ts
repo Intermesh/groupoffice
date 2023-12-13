@@ -45,7 +45,7 @@ export class SplitView extends CalendarView {
 			this.calViewModel[calendar.id] = [];
 		}
 		for (const e of this.store.items) {
-			this.calViewModel[e.calendarId].push(...CalendarItem.makeItems(e, this.start, viewEnd));
+			this.calViewModel[e.calendarId].push(...CalendarItem.expand(e, this.start, viewEnd));
 		}
 		for(let calId in this.calViewModel) {
 			this.calViewModel[calId].sort((a,b) => a.start.date < b.start.date ? -1 : 1);

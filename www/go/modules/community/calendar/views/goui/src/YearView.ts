@@ -43,7 +43,7 @@ export class YearView extends CalendarView {
 		this.clear()
 		const viewEnd = this.day.clone().addYears(1);
 		for (const e of this.store.items) {
-			this.viewModel.push(...CalendarItem.makeItems(e, this.day, viewEnd));
+			this.viewModel.push(...CalendarItem.expand(e, this.day, viewEnd));
 		}
 
 

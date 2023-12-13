@@ -176,7 +176,7 @@ class Scheduler {
 		return "invalid method ".$vcalendar->method;
 	}
 
-	private static function processRequest(VCalendar $vcalendar, $receiver, CalendarEvent $existingEvent) {
+	private static function processRequest(VCalendar $vcalendar, $receiver, ?CalendarEvent $existingEvent) {
 		if(!$existingEvent) {
 			$existingEvent = new CalendarEvent();
 			$existingEvent->isOrigin = false;
@@ -188,7 +188,7 @@ class Scheduler {
 		);
 	}
 
-	private static function precessCancel(VCalendar $vcalendar, CalendarEvent $existingEvent) {
+	private static function precessCancel(VCalendar $vcalendar, ?CalendarEvent $existingEvent) {
 		if($existingEvent) {
 			if ($existingEvent->isRecurring()) {
 				foreach($vcalendar->VEVENT as $vevent) {
@@ -210,7 +210,7 @@ class Scheduler {
 	/**
 	 * The message is a reply. This is for example an attendee telling an organizer he accepted the invite, or declined it.
 	 */
-	private static function processReply(VCalendar $vcalendar, CalendarEvent $existingEvent, $sender) {
+	private static function processReply(VCalendar $vcalendar, ?CalendarEvent $existingEvent, $sender) {
 		if(!$existingEvent) return "You may not update this event";
 
 		$instances = [];

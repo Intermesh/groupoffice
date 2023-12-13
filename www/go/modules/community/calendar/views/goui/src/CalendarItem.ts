@@ -26,10 +26,9 @@ interface CalendarItemConfig {
 	recurrenceId?:string
 	data: Partial<CalendarEvent>
 	title?: string
-	start: DateTime
-	end: DateTime
-	participantId?:string
-	color?: string
+	start?: DateTime
+	end?: DateTime
+	//color?: string
 }
 
 /**
@@ -45,26 +44,34 @@ export class CalendarItem {
 	title!: string
 	start!: DateTime
 	end!: DateTime
-	color!: string
-	participantId!: string
+	//color!: string
 
 	private initStart: string
 	private initEnd: string
+
+	private cal: any
 
 	divs: {[week: string] :HTMLElement}
 
 	constructor(obj:CalendarItemConfig) {
 		Object.assign(this,obj);
-		this.initStart = obj.start.format('Y-m-d\TH:i:s');
-		this.initEnd = obj.end.format('Y-m-d\TH:i:s');
-		if(!obj.participantId)
-			this.participantId = go.User.id;
+		if(!obj.start) {
+			this.start = new DateTime(obj.data.start);
+		}
+		if(!obj.end) {
+			this.end = this.start.clone().addDuration(obj.data.duration!);
+		}
+		this.cal = calendarStore.items.find((c:any) => c.id == obj.data.calendarId);
+
+		this.initStart = this.start.format('Y-m-d\TH:i:s');
+		this.initEnd = this.end.format('Y-m-d\TH:i:s');
+
 		if(!obj.title) {
 			this.title = obj.data.title!;
 		}
-		if(!obj.color) {
-			this.color = obj.data.color || '356772';
-		}
+		// if(!obj.color) {
+		// 	this.color = obj.data.color || '356772';
+		// }
 		this.divs = {};
 	}
 
@@ -76,49 +83,40 @@ export class CalendarItem {
 		return this.isNew() || this.initStart !== this.start.format('Y-m-d\TH:i:s') || this.initEnd !== this.end.format('Y-m-d\TH:i:s');
 	}
 
-	static makeItems(e: CalendarEvent, from: DateTime, until: DateTime) : CalendarItem[] {
+	static expand(e: CalendarEvent, from: DateTime, until: DateTime) : CalendarItem[] {
 		const start = new DateTime(e.start),
 			end = start.clone().addDuration(e.duration),
-			cal = calendarStore.items.find((c:any) => c.id == e.calendarId),
-			color = e.color || cal?.color,
-			participantId = (cal && cal.ownerId) ? cal.ownerId+'' : go.User.id+'',
 			items = [];
 
 		if(e.recurrenceRule) {
 			const r = new Recurrence({dtstart: new Date(e.start), rule: e.recurrenceRule, ff: from.date});
 			let rEnd = r.current.clone().addDuration(e.duration);
 			while(r.current.date < until.date && rEnd.date > from.date) {
-				//if(r.current.date < until.date) {
-				//do {
-				//const rEnd = r.current.clone().addDuration(e.duration);
-				//if(rEnd.date > from.date) {
+
 				const recurrenceId = r.current.format('Y-m-d\Th:i:s');
 				if (e.recurrenceOverrides && recurrenceId in e.recurrenceOverrides) {
 					const o = e.recurrenceOverrides[recurrenceId];
 					if(o.excluded) {
 						// excluded
 					} else {
-						const os = o.start ? new DateTime(o.start) : r.current.clone();
+						const overideStart = o.start ? new DateTime(o.start) : r.current.clone();
 						items.push(new CalendarItem({
-							participantId,
 							key: e.id + '/' + recurrenceId,
 							recurrenceId: recurrenceId,
-							start: os,
+							start: overideStart,
 							title: o.title || e.title,
-							end: (o.duration || o.start) ? os.clone().addDuration(o.duration || e.duration) : rEnd,
-							data: e,
-							color: o.color ?? color
+							end: (o.duration || o.start) ? overideStart.clone().addDuration(o.duration || e.duration) : rEnd,
+							data: e
+							//color: o.color??null
 						}));
 					}
 				} else {
 					items.push(new CalendarItem({
-						participantId,
 						key: e.id + '/' + recurrenceId,
 						recurrenceId: recurrenceId,
 						start: r.current.clone(),
 						end: rEnd,
-						data: e,
-						color
+						data: e
 					}));
 				}
 				if(!r.next()) {
@@ -130,12 +128,10 @@ export class CalendarItem {
 			}
 		} else if (end.date > from.date && start.date < until.date) {
 			items.push(new CalendarItem({
-				participantId,
 				key: e.id+"",
 				start,
 				end,
-				data:e,
-				color
+				data:e
 			}));
 		}
 		return items;
@@ -176,6 +172,10 @@ export class CalendarItem {
 
 	get isOverride() {
 		return (this.recurrenceId && this.data.recurrenceOverrides && this.recurrenceId in this.data.recurrenceOverrides);
+	}
+
+	get color() {
+		return this.data.color || this.cal.color || '356772';
 	}
 
 	save(onCancel: Function) {
@@ -248,6 +248,14 @@ export class CalendarItem {
 		return !this.data.participants || this.data.participants[this.participantId]?.roles?.owner || false;
 	}
 
+	private get isInPast() {
+		return this.end.date < new Date();
+	}
+
+	private get participantId() {
+		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
+	}
+
 	updateParticipation(status: "accepted"|"tentative"|"declined") {
 		if(!this.data.participants || !this.data.participants[this.participantId])
 			throw new Error('Not a participant');
@@ -258,7 +266,7 @@ export class CalendarItem {
 	}
 
 	shouldSchedule(m: Partial<CalendarEvent>|false) {
-		if(!this.data.isOrigin && this.key)
+		if((!this.data.isOrigin && this.key) || this.isInPast)
 			return;
 		if(m === false) {
 			return this.data.participants ? 'cancel' : undefined;

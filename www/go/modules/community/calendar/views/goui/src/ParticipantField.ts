@@ -62,8 +62,8 @@ export class ParticipantField extends Component {
 								}
 							}),
 							hr(),
-							btn({icon:'insert_invitation',text:'Invite again'}),
-							btn({icon:'email',text:t('Write email')})
+							//btn({icon:'insert_invitation',text:'Invite again'}),
+							btn({icon:'email',text:t('Write email'), handler: _ =>{ go.showComposer({to:v.email})}})
 						)})
 				);
 					return f;

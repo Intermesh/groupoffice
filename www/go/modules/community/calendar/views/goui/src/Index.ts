@@ -2,7 +2,7 @@ import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t, E, translate, DateTime} from "@intermesh/goui";
-import {CalendarEvent} from "./CalendarItem.js";
+import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
@@ -14,40 +14,24 @@ export const calendarStore = datasourcestore({
 function addEmailAction() {
 
 	if(GO.email) {
-		function processInvite(msg:any, status?:string){
-			client.jmap('community/calendar/CalendarEvent/processInvite', {
-				status,
-				scheduleId: msg.itip.scheduleId,
-				accountId: msg.account_id,
-				mailbox: msg.mailbox,
-				uid: msg.uid
-			}).then(data => {
-				console.log(data);
-				// if(data.attendance_event_id){
-				// 	GO.email.showAttendanceWindow(data.attendance_event_id);
-				// }
-				//this.loadMessage();
-			}).catch(r => {
-				if(r.type)
-					alert(r.message);
-			})
-		}
-		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent, feedback?:string}} ) => {
-			const itip = msg.itip;
-			if(itip) {
-				const btns = E('div').cls('btns');
 
-				let text = itip.feedback || {
+		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string}} ) => {
+			if(msg.itip) {
+				const event = msg.itip.event,
+					btns = E('div').cls('btns');
+
+				let text = msg.itip.feedback || {
 					CANCEL: t("Cancellation"),
 					REQUEST: t("Invitation")
-				}[itip.method] || "Unable to process appointment information.";
+				}[msg.itip.method] || "Unable to process appointment information.";
 
-				if(itip.method === 'REQUEST') {
+				if(msg.itip.method === 'REQUEST' && typeof event !== 'string') {
+					const item = new CalendarItem({data:event, key:event.id});
 					btns.append(
 						E('div',
-							E('button', t("Accept")).cls('goui-button').on('click', _ => {processInvite(msg,'accepted');}),
-							E('button', t("Maybe")).cls('goui-button').on('click', _ => {processInvite(msg,'tentative');}),
-							E('button', t("Decline")).cls('goui-button').on('click', _ => {processInvite(msg,'declined');})
+							E('button', t("Accept")).cls('goui-button').on('click', _ => {item.updateParticipation('accepted');}),
+							E('button', t("Maybe")).cls('goui-button').on('click', _ => {item.updateParticipation('tentative');}),
+							E('button', t("Decline")).cls('goui-button').on('click', _ => {item.updateParticipation('declined');})
 						).cls('goui group'),
 						E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
 							alert('todo: show day schedule for event start till end time');
@@ -55,11 +39,11 @@ function addEmailAction() {
 					);
 				}
 
-				if(itip.event) {
-					if(typeof itip.event === "string") {
-						text += ', '+ itip.event;
-					} else if(itip.method !== 'REPLY') {
-						text += ' "' + itip.event.title + '" ' + t('at', 'community', 'calendar') + ' ' + DateTime.createFromFormat(itip.event.start.replace('T', ' '), 'Y-m-d H:i')!.format('D j M H:i')
+				if(event) {
+					if(typeof event === "string") {
+						text += ', '+ event;
+					} else if(msg.itip.method !== 'REPLY') {
+						text += ' "' + event.title + '" ' + t('at', 'community', 'calendar') + ' ' + DateTime.createFromFormat(event.start.replace('T', ' '), 'Y-m-d H:i')!.format('D j M H:i')
 					}
 				}
 

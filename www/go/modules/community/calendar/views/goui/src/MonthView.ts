@@ -137,7 +137,7 @@ export class MonthView extends CalendarView {
 		const viewEnd = this.start.clone().addDays(this.days);
 		//console.log(this.start, viewEnd, this.days);
 		for (const e of this.store.items) {
-			this.viewModel.push(...CalendarItem.makeItems(e, this.start, viewEnd));
+			this.viewModel.push(...CalendarItem.expand(e, this.start, viewEnd));
 		}
 		//this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		//console.log(this.viewModel);

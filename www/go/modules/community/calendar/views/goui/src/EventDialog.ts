@@ -81,7 +81,6 @@ export class EventDialog extends Window {
 						}
 						if(frm.isNew)
 							data.timeZone = go.User.timezone; // enh: option to change in dialog?
-						debugger;
 						if(data.start || data.end)
 							data.duration = start.diff(end);
 						delete data.end;

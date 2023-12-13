@@ -187,7 +187,7 @@ export class WeekView extends CalendarView {
 			withTime = []
 		for (const e of this.store.items) {
 
-			const items = CalendarItem.makeItems(e as CalendarEvent, this.day, viewEnd);
+			const items = CalendarItem.expand(e as CalendarEvent, this.day, viewEnd);
 			if(e.showWithoutTime) {
 				allDay.push(...items as CalendarItem[]);
 			} else {

@@ -81,18 +81,18 @@ class CalendarEvent extends EntityController {
 
 	}
 
-	public function processInvite($params) {
-		$account = \GO\Email\Model\Account::model()->findByPk($params['accountId']);
-		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'],$params['uid']);
-		$vcalendar = $message->getInvitationVcalendar();
-
-		$from = $message->from->getAddress();
-
-		$event = model\Scheduler::processMessage($vcalendar, $params['scheduleId'], (object)[
-			'email' => $from['email'],
-			'name' => $from['personal'],
-		]);
-
-		return ['success'=>$event->save(), 'validation'=>$event->getValidationErrors()];
-	}
+//	public function processInvite($params) {
+//		$account = \GO\Email\Model\Account::model()->findByPk($params['accountId']);
+//		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'],$params['uid']);
+//		$vcalendar = $message->getInvitationVcalendar();
+//
+//		$from = $message->from->getAddress();
+//
+//		$event = model\Scheduler::processMessage($vcalendar, $params['scheduleId'], (object)[
+//			'email' => $from['email'],
+//			'name' => $from['personal'],
+//		]);
+//
+//		return ['success'=>$event->save(), 'validation'=>$event->getValidationErrors()];
+//	}
 }
