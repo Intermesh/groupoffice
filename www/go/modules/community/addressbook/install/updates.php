@@ -204,3 +204,5 @@ $updates['202311271130'][] = "";
 $updates['202311271130'][] = 'ALTER TABLE `addressbook_contact` CHANGE `lastName` `lastName` VARCHAR(100) DEFAULT NULL;';
 $updates['202311271130'][] = "ALTER TABLE `addressbook_contact` CHANGE `name` `name` VARCHAR(191) DEFAULT '';";
 
+$updates['202311271130'][] = "alter table addressbook_contact
+    add newsletterAllowed boolean default true null;";

@@ -186,10 +186,10 @@ class Mailer {
 			$this->mail->SMTPSecure = $this->smtpAccount->encryption;
 			$this->mail->Port = $this->smtpAccount->port;
 
-			if (!empty(go()->getSettings()->smtpUsername)) {
+			if (!empty($this->smtpAccount->username)) {
 				$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
-				$this->mail->Username = go()->getSettings()->smtpUsername;                     //SMTP username
-				$this->mail->Password = go()->getSettings()->decryptSmtpPassword();                               //SMTP password
+				$this->mail->Username = $this->smtpAccount->username;                     //SMTP username
+				$this->mail->Password = $this->smtpAccount->decryptPassword();                               //SMTP password
 			}
 			
 			if(!$this->smtpAccount->verifyCertificate) {

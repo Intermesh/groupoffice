@@ -6,12 +6,11 @@ GO.files.openDetailViewFileBrowser = function () {
 	if(this.detailView){
 		dv = this.detailView;
 	} else {
-		dv = this.findParentByType("detailview"), entityId, entity;
+		dv = this.findParentByType("detailview");
 		if (!dv) {
 			dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
 		}
 	}
-	var folder_id;
 
 	GO.request({
 		url: 'files/folder/checkModelFolder',

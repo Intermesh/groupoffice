@@ -342,11 +342,7 @@ class Settings extends core\Settings {
 	}
 
 
-	/**
-	 * Allow registration via the auth.php endpoint
-	 *
-	 * @var bool
-	 */
+	/** @var bool Allow registration via the auth.php endpoint */
 	public $allowRegistration = false;
 
 
@@ -368,63 +364,64 @@ class Settings extends core\Settings {
 	public $databaseVersion;
 
 
-	/**
-	 * Time the db cache was cleared. The client will invalidate it's indexeddb cache when this changes.
-	 * @var int
+	/** @var int Time the db cache was cleared. The client will invalidate it's indexeddb cache when this changes.
 	 */
 	public $cacheClearedAt;
-
-	/**
-	 * Primary color in html notation 000000;
-	 *
-	 * @var string
-	 */
+	
+	/** @var string Primary color in html notation 000000; */
 	public $primaryColor;
 
-	/**
-	 * Secondary color in html notation 000000;
-	 *
-	 * @var string
-	 */
+	/** @var string Secondary color in html notation 000000; */
 	public $secondaryColor;
 
-	/**
-	 * Secondary color in html notation 000000;
-	 *
-	 * @var string
-	 */
+	/** @var string Secondary color in html notation 000000; */
 	public $tertiaryColor;
 
-	/**
-	 * Secondary color in html notation 000000;
-	 *
-	 * @var string
-	 */
+	/** @var string Secondary color in html notation 000000; */
 	public $accentColor;
-
-	/**
-	 * Blob ID for the logo
-	 *
-	 * @var string
-	 */
+	
+	/** @var string Blob ID for the logo */
 	public $logoId;
 
-	
+
+	/** @var string Primary color in html notation 000000; */
+	public $primaryDark;
+
+	/** @var string Secondary color in html notation 000000; */
+	public $secondaryDark;
+
+	/** @var string Secondary color in html notation 000000; */
+	public $tertiaryDark;
+
+	/** @var string Secondary color in html notation 000000; */
+	public $accentDark;
+
+	/** @var string Blob ID for the logo */
+	public $logoIdDark;
+
 	/**
 	 * Get's the transparent color based on the primary color.
 	 * 
 	 * @return ?string
 	 */
-	public function getPrimaryColorTransparent(): ?string
+	public function getPrimaryColorTransparent($theme = 'Color'): ?string
 	{
-		if(!isset($this->primaryColor)) {
+		if(!isset($this->{'primary'.$theme})) {
 			return null;
 		}
-		list($r, $g, $b) = sscanf($this->primaryColor, "%02x%02x%02x");
+		list($r, $g, $b) = sscanf($this->{'primary'.$theme}, "%02x%02x%02x");
 		
 		return "rgba($r, $g, $b, .16)";
 	}
-	
+
+	public function printCssVars($theme = 'Color') {
+		$str = !empty($this->{'primary'.$theme}) ? '--c-primary-tp: '.$this->getPrimaryColorTransparent($theme).';' : '';
+		foreach(['primary', 'secondary', 'tertiary', 'accent'] as $type) {
+			if(!empty($this->{$type.$theme})) $str .= '--c-'.$type.': #'.$this->{$type.$theme}.';';
+		}
+		return $str;
+	}
+
 	/**
 	 * Default time zone for users
 	 * 
