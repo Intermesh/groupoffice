@@ -125,9 +125,13 @@ export class EventDialog extends Window {
 			comp({cls:'hbox'},
 				datefield({label: t('Start'), name:'start', flex:1, timeField: this.startTime, listeners:{'setvalue': (me,v) => {
 					const time = !this.timeToggle.value;
-					const dt = DateTime.createFromFormat(v,'Y-m-d'+(time ? "TH:i":''));
-					if(dt){
-						this.endDate.minDate = dt;
+					const start = DateTime.createFromFormat(v,'Y-m-d'+(time ? "TH:i":''));
+
+					if(start){
+						// if(this.endDate.changed) {
+						// 	this.endDate.value = start.addDuration(this.item!.data.duration || 'P1H').format(this.outputFormat+'TH:i');
+						// }
+						this.endDate.minDate = start;
 					}
 					const date = DateTime.createFromFormat(v,me.inputFormat);
 					if(date)

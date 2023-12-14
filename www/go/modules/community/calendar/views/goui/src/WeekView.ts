@@ -40,19 +40,19 @@ export class WeekView extends CalendarView {
 		if(!day) {
 			day = new DateTime();
 		}
-		if(day.format('Ymd') === this.day.format('Ymd') && this.days === amount) {
-			this.update();
-			return;
-		}
+		// if(day.format('Ymd') === this.day.format('Ymd') && this.days === amount) {
+		// 	this.update();
+		// 	return;
+		// }
 
 		this.days = amount;
 		this.day = day.setHours(0,0,0,0);
-		const startWeek = this.day.setWeekDay(0),
-			endWeek = startWeek.clone().addDays(7);
+		// const startWeek = this.day.setWeekDay(0),
+		// 	endWeek = startWeek.clone().addDays(7);
 
 		Object.assign(this.store.queryParams.filter ||= {}, {
-			after: startWeek.format('Y-m-d'),
-			before: endWeek.format('Y-m-d')
+			after: day.format('Y-m-d'),
+			before: day.clone().addDays(amount).format('Y-m-d')
 		});
 
 		this.store.load();
