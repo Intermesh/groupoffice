@@ -2,6 +2,22 @@
   "extends": "../../../../../../views/goui/tsconfig.module.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      "@intermesh/goui": [
+        "../../../../../../views/goui/dist/goui/script/index.d.ts",
+        "../../../../../../views/goui/dist/goui/script/index.js"
+
+      ],
+      "@intermesh/groupoffice-core": [
+        "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
+        "../../../../../../views/goui/dist/groupoffice-core/script/index.js"
+      ],
+
+      "@intermesh/business-business": [
+        "../../../business/views/goui/dist/Index.d.ts",
+        "../../../business/views/goui/dist/Index.js"
+      ]
+    }
   }
 }
