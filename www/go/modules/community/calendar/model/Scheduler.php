@@ -126,6 +126,7 @@ class Scheduler {
 				'METHOD'=>$method
 			]));
 
+
 			$success = go()->getMailer()->compose()
 					->setSubject($subject .': '.$event->title)
 					->setFrom(go()->getSettings()->systemEmail, $organizer->name)
@@ -147,12 +148,15 @@ class Scheduler {
 		return $success;
 	}
 
-	private static function mailBody($event, $method, $recipient, $title) {
+	private static function mailBody($event, $method, $participant, $title) {
 		if(!$event) {
 			return false;
 		}
 		ob_start();
-		$url = 'https://group-office.com/event';
+		$url = '';
+		if($method ==='REQUEST') {
+			$url = go()->getAuthState()->getPageUrl().'/community/calendar/invite/'.$event->uid.'/'.$participant->expectReply(true);
+		}
 		include __DIR__.'/../views/imip.php';
 		return ob_get_clean();
 	}

@@ -24,7 +24,7 @@
         line-height:28px;
         margin-left:13px;
     }
-    a.bord:hover { background-color:#DBE3F0;}
+    a.bord:hover,a.bord.active { background-color:#DBE3F0;}
     span { color: #70757a; }
     p { margin-bottom: 24px;}
     h1 { display: inline-block; overflow-wrap: break-word;
@@ -77,7 +77,14 @@
  * @var $title string
  * @var $method string
  * @var $url string
- * @var $recipient mixed */ ?>
+ * @var $status string[] could contain classname for the participant's current status
+ * @var $participant mixed */
+$icon = [
+   'accepted'=>'check_circle',
+   'tentative'=>'help',
+   'declined'=>'block',
+   'needs-action'=>'schedule']
+?>
 <div class="card bord">
 
     <div class="cal bord center">
@@ -95,19 +102,19 @@
 
             <?php if($event->participants):?>
             <h5><?=go()->t('Participants', 'community','calendar')?></h5>
-            <?php foreach($event->participants as $participant): ?>
-                <div><?=$participant->name ? '<a href="mailto:'.htmlentities($participant->email).'" target="_blank" rel="noopener noreferrer">'.htmlentities($participant->name).'</a>' :
-                      '<a href="mailto:'.htmlentities($participant->email).'" target="_blank" rel="noopener noreferrer">'.htmlentities($participant->email).'</a>'?>
-                    <?php if($participant->isOwner()) echo '&bull; <span>'.go()->t('Organizer').'</span>'; ?>
-                    <?php if($participant->email == $recipient->email) echo '&bull; <span>'.go()->t('You').'</span>'; ?>
+            <?php foreach($event->participants as $part):  ?>
+                <div><?=$method==="PAGE"?'<i class="icon">'.$icon[$part->participationStatus].'</i> ':''; ?><?=$part->name ? '<a href="mailto:'.htmlentities($part->email).'" target="_blank" rel="noopener noreferrer">'.htmlentities($part->name).'</a>' :
+                      '<a href="mailto:'.htmlentities($part->email).'" target="_blank" rel="noopener noreferrer">'.htmlentities($part->email).'</a>'?>
+                    <?php if($part->isOwner()) echo '&bull; <span>'.go()->t('Organizer').'</span>'; ?>
+                    <?php if($part->email == $participant->email) echo '&bull; <span>'.go()->t('You').'</span>'; ?>
                 </div>
             <?php endforeach; endif; ?>
         </div>
     </div>
-    <div class="foot"><?php if($method==='REQUEST'): ?>
-        <a class="bord" target="_blank" href="<?=$url?>?reply=accept" style="margin-left:112px; margin-top:0;" ><?=go()->t('Akkoord')?></a>
-        <a class="bord" target="_blank" href="<?=$url?>?reply=tentative"><?=go()->t('Misschien')?></a>
-        <a class="bord" target="_blank" href="<?=$url?>?reply=decline"><?=go()->t('Afwijzen')?></a>
+    <div class="foot"><?php if($method!=='CANCEL'): ?>
+        <a class="bord <?=$status['accepted']??''?>"  target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=accepted" style="margin-left:112px; margin-top:0;" ><?=go()->t('Akkoord')?></a>
+        <a class="bord <?=$status['tentative']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=tentative"><?=go()->t('Misschien')?></a>
+        <a class="bord <?=$status['declined']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=declined"><?=go()->t('Afwijzen')?></a>
 		<?php endif; ?>
     </div>
 

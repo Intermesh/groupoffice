@@ -91,6 +91,8 @@ class Participant extends Property
 
 	/** @var string The requestStatus received when the participant sends an REPLY iTip */
 	public $scheduleStatus;
+	/** @var string used for access to the invite page to accept/decline */
+	protected $scheduleSecret;
 
 	/** @var string The participant id of the participant who invited this one, if known */
 	public $invitedBy;
@@ -131,6 +133,23 @@ class Participant extends Property
 	 */
 	public function setScheduleForceSend($val) {
 		$this->_sendTheSchedulingMessageAnyway = $val;
+	}
+
+	public function expectReply(bool $v) {
+		$this->expectReply = $v;
+		if($v) {
+			$this->scheduleSecret = $this->generateSecret();
+		}
+		return $this->scheduleSecret;
+	}
+
+	private function generateSecret() {
+		$bits = openssl_random_pseudo_bytes(12); // 6bits per char, 96bits = 16 chars
+		return strtr(base64_encode($bits), '+/', '-_'); // translate to make url-safe
+	}
+
+	public function checkSecret($s) {
+		return $this->scheduleSecret === $s;
 	}
 
 	public function isOwner() {

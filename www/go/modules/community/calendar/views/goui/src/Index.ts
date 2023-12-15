@@ -59,30 +59,36 @@ function addEmailAction() {
 modules.register(  {
 	package: "community",
 	name: "calendar",
-	init () {
+	async init () {
 
 		translate.load(GO.lang.community.calendar, "community", "calendar");
 
 		addEmailAction();
 
-		modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => {
-			let ui = new Main();
+		client.on("authenticated",  (client, session) => {
 
-			router.add(/^calendar\/year\/(\d+)$/, (year) => {
+			if(!session.capabilities["go:community:calendar"]) {
+				return; // User has no access to this module
+			}
+
+			const ui = new Main();
+			router.add(/^calendar\/year\/(\d{4}-\d{2}-\d{2})$/, (year) => {
 				modules.openMainPanel("calendar");
-				//ui.data.view = 'year';
-				ui.cards.activeItem = -1; //'year');
-			}).add(/^calendar\/month\/(\d+)$/, (year, month) => {
+				ui.goto(new DateTime(year)).setSpan("year", 365);
+			}).add(/^calendar\/month\/(\d{4}-\d{2}-\d{2})$/, (yearMonth) => {
 				modules.openMainPanel("calendar");
-				//ui.data.view = 'month';
-				ui.cards.activeItem = 1; // month
-			}).add(/^calendar\/week\/(\d+)$/, (year, week) => {
+				ui.goto(new DateTime(yearMonth)).setSpan("month", 31);
+			}).add(/^calendar\/week\/(\d{4}-\d{2}-\d{2})$/, (date) => {
 				modules.openMainPanel("calendar");
-				//ui.data.view = 'week';
-				ui.cards.activeItem = 0; // week
+				ui.goto(new DateTime(date)).setSpan("week", 7);
+			}).add(/^calendar\/day\/(\d{4}-\d{2}-\d{2})$/, (date) => {
+				modules.openMainPanel("calendar");
+				ui.goto(new DateTime(date)).setSpan("day", 1);
 			});
 
-			return ui;
+			modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => {
+				return ui;
+			});
 		});
 	}
 });

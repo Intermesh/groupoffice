@@ -175,7 +175,7 @@ export class CalendarItem {
 	}
 
 	get color() {
-		return this.data.color || this.cal.color || '356772';
+		return this.data.color || this.cal?.color || '356772';
 	}
 
 	save(onCancel: Function) {

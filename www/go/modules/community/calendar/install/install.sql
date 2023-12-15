@@ -166,6 +166,7 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
     `expectReply` TINYINT(1) NOT NULL DEFAULT 0,
     `scheduleUpdated` DATETIME NULL,
 		`scheduleStatus` varchar(255) DEFAULT NULL,
+		`scheduleSecret` CHAR(16) COLLATE ascii_bin NULL,
     PRIMARY KEY (`id`, `eventId`),
     INDEX `fk_participant_calendar_event1_idx` (`eventId` ASC),
     CONSTRAINT `fk_participant_calendar_event1`

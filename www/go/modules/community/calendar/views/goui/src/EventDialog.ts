@@ -54,8 +54,8 @@ export class EventDialog extends Window {
 		this.width = 440;
 		this.height = 820;
 		this.store = jmapds("CalendarEvent");
-		this.startTime = textfield({value: '12:00', width: 100})
-		this.endTime = textfield({value: '13:00', width: 100})
+		this.startTime = textfield({type:'time',value: '12:00', width: 120})
+		this.endTime = textfield({type:'time',value: '13:00', width: 120})
 		var recurrenceField = recurrencefield({name: 'recurrenceRule',flex:1});
 		var alertField = alertfield();
 		alertField.on('change', (_, newValue) => {

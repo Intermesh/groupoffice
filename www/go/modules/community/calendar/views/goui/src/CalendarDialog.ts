@@ -16,16 +16,16 @@ export class CalendarDialog extends FormWindow {
 	constructor() {
 		super('Calendar');
 		this.title = t('Edit calendar');
-		this.width = 400;
-		this.height = 550;
+		this.width = 460;
+		this.height = 650;
 
-		const unsubscribeBtn = btn({text:t('Unsubscribe'), handler:()=> {
-        this.form.dataSource.update(this.currentId!, {isSubscribed:false});
-        this.close();
-     }});
+		// const unsubscribeBtn = btn({text:t('Unsubscribe'), handler:()=> {
+     //    this.form.dataSource.update(this.currentId!, {isSubscribed:false});
+     //    this.close();
+     // }});
 
 		this.generalTab.items.add(
-			comp({cls:'flow'},
+			comp({cls:'flow pad'},
 				textfield({name: 'name', label: t('Name'), flex:1}),
 				colorfield({name: 'color', label: t('Color'), width: 100}),
 				textfield({name:'description', label: t('Description')}),
@@ -41,7 +41,7 @@ export class CalendarDialog extends FormWindow {
 				hr(),
 				comp({tagName:'h3',flex:'1 0 100%',text:t('Default notifications') }),
 				alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events (with time)')}),
-				alertfield({name: 'defaultAlertsWithoutTime',isForDefault:true, fullDay:true, label:t('Full-day events (without time)')}),
+				alertfield({name: 'defaultAlertsWithoutTime',isForDefault:true, fullDay:true, label:t('Full-day events (without time)')})
 			// containerfield({flex:'1 0 100%',cls: 'flow',itemId:'defaultAlertsWithTime'},
 			// 	select({width: 120, name:'action', options:[
 			// 		{name: t('Email'), value:'email'},
@@ -70,13 +70,13 @@ export class CalendarDialog extends FormWindow {
 			// 	comp({width: 15,'text': 'at'}),
 			// 	textfield({width: 80, name:'time', value: '09:00'})
 			// )
-				unsubscribeBtn
+				//unsubscribeBtn
 			),
 		);
 
-		this.form.on('load', (me, data) => {
-			unsubscribeBtn.hidden = !data.id;
-		})
+		// this.form.on('load', (me, data) => {
+		// 	unsubscribeBtn.hidden = !data.id;
+		// })
 
 		this.addSharePanel([
 			{value: "",name: ""},

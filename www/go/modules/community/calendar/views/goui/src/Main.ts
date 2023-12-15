@@ -1,4 +1,5 @@
 import {
+	browser,
 	btn,
 	CardContainer,
 	cards,
@@ -10,9 +11,9 @@ import {
 	DatePicker,
 	datepicker,
 	DateTime,
-	FunctionUtil,
+	FunctionUtil, List,
 	list,
-	menu,
+	menu, router,
 	splitter,
 	t,
 	tbar
@@ -25,7 +26,7 @@ import {CalendarDialog} from "./CalendarDialog.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SpltView.js";
 import {SubscribeWindow} from "./SubscribeWindow.js";
-import {JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
+import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CalendarEvent} from "./CalendarItem.js";
 
@@ -52,6 +53,8 @@ export class Main extends Component {
 
 	eventStore: DataSourceStore<JmapDataSource<CalendarEvent>>
 
+	private calendarList: List
+
 	private visibleChanges: {[id:number]:boolean} = {};
 
 	constructor() {
@@ -72,6 +75,18 @@ export class Main extends Component {
 			monthView = new MonthView(this.eventStore),
 			yearView = new YearView(this.eventStore),
 			splitView = new SplitView(this.eventStore);
+		monthView.on('selectweek', (me, day) => {
+			this.routeTo('week', day);
+		});
+		yearView.on('dayclick', (me,day) => {
+			this.routeTo('day', day);
+		})
+		yearView.on('weekclick', (me,weekDay) => {
+			this.routeTo('week', weekDay);
+		});
+		yearView.on('monthclick', (me,day) => {
+			this.routeTo('month', day);
+		});
 
 		this.items.add(
 			this.west = comp({tagName: 'aside', width: 374},
@@ -125,9 +140,9 @@ export class Main extends Component {
 							btn({text: t('Add calendar from link') + '…'})
 						)
 					}),
-					btn({icon: 'done_all'})
+					btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}})
 				),
-				list({
+				this.calendarList = list({
 					store: calendarStore,
 					cls: 'check-list',
 					rowSelectionConfig: {
@@ -162,7 +177,7 @@ export class Main extends Component {
 							listeners: {
 								'render': (field) => {
 									field.el.addEventListener("mousedown", (ev) => {
-										ev.stopPropagation()
+										ev.stopPropagation(); // stop lists row selector event
 									});
 								},
 								'change': (p, newValue) => {
@@ -177,14 +192,20 @@ export class Main extends Component {
 							},
 							buttons: [btn({
 								icon: 'more_horiz', menu: menu({},
-									btn({icon:'edit', text: t('Edit'), handler: _ => {
-											const dlg = new CalendarDialog();
-											dlg.show();
-											dlg.load(data.id);
-										}}),
+									btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: _ => {
+										const dlg = new CalendarDialog();
+										dlg.show();
+										dlg.load(data.id);
+									}}),
 									btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-											calendarStore.dataSource.update(data.id, {isSubscribed: false});
-										}})
+										calendarStore.dataSource.update(data.id, {isSubscribed: false});
+									}}),
+									btn({icon:'import_export', text:t('Import'), handler: async ()=> {
+											const files = await browser.pickLocalFiles();
+											const blob = await client.upload(files[0]);
+											const resultReference = this.eventStore.dataSource.method('parse', {blobIds:[blob.id]});
+											this.eventStore.dataSource.update({update:resultReference});
+									}})
 								)
 							})]
 						})];
@@ -201,10 +222,10 @@ export class Main extends Component {
 					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px'}}),
 					//'->',
 					this.cardMenu = comp({cls: 'group', flex:'0 0 auto'},
-						btn({icon: 'view_day', text: t('Day'), handler: b => this.setSpan('day', 1)}),
-						btn({icon: 'view_week', text: t('Week'), handler: b => this.setSpan('week', 7)}),
-						btn({icon: 'view_module', text: t('Month'), handler: b => this.setSpan('month', 31)}),
-						btn({icon: 'view_module', text: t('Year'), handler: b => this.setSpan('year', 365)}),
+						btn({icon: 'view_day', text: t('Day'), handler: b => this.routeTo('day', this.date)}),
+						btn({icon: 'view_week', text: t('Week'), handler: b => this.routeTo('week', this.date)}),
+						btn({icon: 'view_module', text: t('Month'), handler: b => this.routeTo('month', this.date)}),
+						btn({icon: 'view_module', text: t('Year'), handler: b => this.routeTo('year', this.date)}),
 						btn({icon: 'call_split', text: t('Split'), handler: b => this.setView('split')}),
 					),
 					//'->',
@@ -242,22 +263,10 @@ export class Main extends Component {
 			)
 		);
 
-		monthView.on('selectweek', (me, day) => {
-			this.goto(day).setSpan('week', 7);
-		});
-		yearView.on('dayclick', (me,day) => {
-			this.goto(day).setSpan('day', 1);
-		})
-		yearView.on('weekclick', (me,weekDay) => {
-			this.goto(weekDay).setSpan('week', 7);
-		});
-		yearView.on('monthclick', (me,day) => {
-			this.goto(day).setSpan('month', 31);
-		});
-		// yearView.on('dayclick', (day) => {
-		//
-		// });
-		// default start need to fetch from state?
+	}
+
+	routeTo(view:string, date: DateTime) {
+		router.goto("calendar/"+view+"/"+date.format('Y-m-d'));
 	}
 
 	saveSelectionChanges = FunctionUtil.buffer(2000, () => {
@@ -271,10 +280,6 @@ export class Main extends Component {
 	goto(date = new DateTime()): this {
 		this.date = date;
 		return this;
-	}
-
-	onFilter() {
-		//this.store.filter('calendarIds' , {});
 	}
 
 	backward() {
@@ -300,7 +305,11 @@ export class Main extends Component {
 				this.date.addYears(value);
 				break;
 		}
-		this.updateView(true);
+		// set path silent to buffer the update
+		//router.suspendEvent = true;
+		router.setPath("calendar/"+this.timeSpan+"/"+this.date.format('Y-m-d'));
+		//todo: enable this line when the router is no longer broken
+		//this.updateView(true);
 	}
 
 
