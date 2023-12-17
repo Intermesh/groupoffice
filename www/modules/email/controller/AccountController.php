@@ -554,36 +554,65 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 
 		$move = !empty($params['move']);
 
-		foreach ($srcMessages as $srcMessageInfo) {
-			$srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
-			$srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
+		// This function is very inefficient because it essentially does a copy on each individual message, because it checks if it's between different accounts
+		// If we treat both cases differently, we can greatly speed things up
 
-			$targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
+		// We create two arrays. One for UIDs belonging to the same account, one for UIDs from different accounts
+		// This can probably be optimized further because now we lookup srcAccountModel / $targetAccountModel twice for the external case
+		$internalMove=[];
+                $externalMove=[];
 
-			if(!$targetAccountModel->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
-				throw new \GO\Base\Exception\AccessDenied();
-			}
+                foreach ($srcMessages as $srcMessageInfo) {
+                        $srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
 
-			if($move && $targetAccountModel->id == $srcAccountModel->id) {
-				$conn = $srcAccountModel->openImapConnection( $srcMessageInfo->mailboxPath);
+                        $targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
 
-				$conn->move([$srcImapMessage->uid],$params["targetMailboxPath"]);
+                        if(!$targetAccountModel->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
+                                throw new \GO\Base\Exception\AccessDenied();
+                        }
 
-			} else {
-				$targetImapConnection = $targetAccountModel->openImapConnection($params["targetMailboxPath"]);
+                        if($move && $targetAccountModel->id == $srcAccountModel->id) {
 
-				$flags = '';
+                                $srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
 
-				if ($srcMessageInfo->seen)
-					$flags = '\SEEN';
+                                $internalMove[]=$srcImapMessage->uid;
+                        } else {
+                                $externalMove[]=$srcMessageInfo;
+                        }
+                }
 
-				$targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
+		// Move everything in one shot vs foreach move
+                if (is_array($internalMove) && count($internalMove)>0) {
+                        $conn = $srcAccountModel->openImapConnection( $srcMessageInfo->mailboxPath);
 
-				if ($move) {
-					$srcImapMessage->delete();
-				}
-			}
-		}
+                        $conn->move($internalMove,$params["targetMailboxPath"]);
+                }
+
+		// Different accounts, do it the slow way
+                if (is_array($externalMove) && count($externalMove)>0) {
+
+                        foreach ($externalMove as $srcMessageInfo) {
+
+                                $srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
+
+                                $srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
+
+                                $targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
+
+                                $targetImapConnection = $targetAccountModel->openImapConnection($params["targetMailboxPath"]);
+
+                                $flags = '';
+
+                                if ($srcMessageInfo->seen)
+                                        $flags = '\SEEN';
+
+                                $targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
+
+                                if ($move) {
+                                        $srcImapMessage->delete();
+                                }
+                        }
+                }
 
 		return array('success'=>true);
 	}
