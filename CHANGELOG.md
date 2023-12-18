@@ -1,3 +1,4 @@
+18-12-2023: 6.7.60
 - Tickets: External URL didn't work
 - Addressbook: Fixed age in birthday portlet when it's in january
 - Addressbook: Added age column to main grid
