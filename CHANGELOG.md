@@ -1,4 +1,6 @@
 - Tickets: External URL didn't work
+- Addressbook: Fixed age in birthday portlet when it's in january
+- Addressbook: Added age column to main grid
 
 12-12-2023: 6.7.59
 - Core: Equals must accept any argument
