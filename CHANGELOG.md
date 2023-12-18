@@ -1,5 +1,6 @@
 - OAuth2Client: fix wrong path
 - Email: Fixed problem with quotes in folders
+- Tickets: External URL didn't work
 
 12-12-2023: 6.8.24
 - Core: Property->equals must accept any argument
