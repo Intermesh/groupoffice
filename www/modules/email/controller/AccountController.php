@@ -560,59 +560,59 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 		// We create two arrays. One for UIDs belonging to the same account, one for UIDs from different accounts
 		// This can probably be optimized further because now we lookup srcAccountModel / $targetAccountModel twice for the external case
 		$internalMove=[];
-                $externalMove=[];
+    $externalMove=[];
 
-                foreach ($srcMessages as $srcMessageInfo) {
-                        $srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
+    foreach ($srcMessages as $srcMessageInfo) {
+      $srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
 
-                        $targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
+      $targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
 
-                        if(!$targetAccountModel->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
-                                throw new \GO\Base\Exception\AccessDenied();
-                        }
+      if(!$targetAccountModel->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
+				throw new \GO\Base\Exception\AccessDenied();
+      }
 
-                        if($move && $targetAccountModel->id == $srcAccountModel->id) {
+      if($move && $targetAccountModel->id == $srcAccountModel->id) {
 
-                                $srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
+        $srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
 
-                                $internalMove[]=$srcImapMessage->uid;
-                        } else {
-                                $externalMove[]=$srcMessageInfo;
-                        }
-                }
+        $internalMove[]=$srcImapMessage->uid;
+      } else {
+        $externalMove[]=$srcMessageInfo;
+      }
+    }
 
 		// Move everything in one shot vs foreach move
-                if (is_array($internalMove) && count($internalMove)>0) {
-                        $conn = $srcAccountModel->openImapConnection( $srcMessageInfo->mailboxPath);
+    if (is_array($internalMove) && count($internalMove)>0) {
+      $conn = $srcAccountModel->openImapConnection( $srcMessageInfo->mailboxPath);
 
-                        $conn->move($internalMove,$params["targetMailboxPath"]);
-                }
+      $conn->move($internalMove,$params["targetMailboxPath"]);
+    }
 
 		// Different accounts, do it the slow way
-                if (is_array($externalMove) && count($externalMove)>0) {
+    if (is_array($externalMove) && count($externalMove)>0) {
 
-                        foreach ($externalMove as $srcMessageInfo) {
+      foreach ($externalMove as $srcMessageInfo) {
 
-                                $srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
+        $srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
 
-                                $srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
+        $srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
 
-                                $targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
+        $targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
 
-                                $targetImapConnection = $targetAccountModel->openImapConnection($params["targetMailboxPath"]);
+        $targetImapConnection = $targetAccountModel->openImapConnection($params["targetMailboxPath"]);
 
-                                $flags = '';
+        $flags = '';
 
-                                if ($srcMessageInfo->seen)
-                                        $flags = '\SEEN';
+        if ($srcMessageInfo->seen)
+					$flags = '\SEEN';
 
-                                $targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
+        $targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
 
-                                if ($move) {
-                                        $srcImapMessage->delete();
-                                }
-                        }
-                }
+        if ($move) {
+					$srcImapMessage->delete();
+        }
+      }
+    }
 
 		return array('success'=>true);
 	}

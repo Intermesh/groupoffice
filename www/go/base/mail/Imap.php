@@ -2587,16 +2587,15 @@ class Imap extends ImapBodyStruct
 	public function move(array $uids, $mailbox='INBOX', $expunge=true)
 	{
 		// Use the much faster UID MOVE command
-                if(!in_array($mailbox, $this->touched_folders)) {
-                        $this->touched_folders[]=$mailbox;
-                }
+    if(!in_array($mailbox, $this->touched_folders)) {
+			$this->touched_folders[]=$mailbox;
+    }
 
 		$this->clean($mailbox, 'mailbox');
-                $uid_string = implode(',',$uids);
-		
-                $command = "UID MOVE %s \"".$this->utf7_encode($mailbox)."\"\r\n";
-                $status = $this->_runInChunks($command, $uids);
-                return $status;
+
+    $command = "UID MOVE %s \"".$this->utf7_encode($mailbox)."\"\r\n";
+    $status = $this->_runInChunks($command, $uids);
+    return $status;
 
 	}
 
