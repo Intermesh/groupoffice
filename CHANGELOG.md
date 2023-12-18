@@ -3,6 +3,7 @@
 - Tickets: External URL didn't work
 - Newsletters: no paging in account combo
 - Newsletters: Sort accounts like in the email tree
+- Core: Fixed deprecation error in PHPMailer wrapper
 
 12-12-2023: 6.8.24
 - Core: Property->equals must accept any argument
