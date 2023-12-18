@@ -3,7 +3,6 @@
 namespace go\modules\community\oauth2client;
 
 use go\core;
-use GO\Core\Controller\CoreController;
 use go\core\exception\NotFound;
 use go\core\http\Exception;
 use go\core\model;
@@ -14,7 +13,7 @@ use GO\Email\Controller\MessageController;
 use GO\Email\Model\Account as ActiveRecordAccount;
 use GO\Email\Model\Alias;
 use go\modules\community\email\model\Account;
-use go\modules\community\oauth2client\controller\Oauth2Client;
+use go\modules\community\oauth2client\model\Oauth2Client;
 use go\modules\community\oauth2client\model\Authenticator;
 use go\modules\community\oauth2client\model\DefaultClient;
 use go\modules\community\oauth2client\model\Oauth2Account;
@@ -177,7 +176,7 @@ class Module extends core\Module
 	                                  \GO\Base\Mail\Mailer &$mailer , ActiveRecordAccount $activeRecordAccount, Alias $alias, array $params) {
 		$account = Account::findById($activeRecordAccount->id); // Need the JMAP entity for this!
 		if ($acctSettings = $account->oauth2_account) {
-			$client = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
+			$client = Oauth2Client::findById($acctSettings->oauth2ClientId);
 			$tokenParams = [
 				'access_token' => $acctSettings->token,
 				'refresh_token' => $acctSettings->refreshToken,

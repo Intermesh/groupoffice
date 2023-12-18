@@ -1,3 +1,5 @@
+- OAuth2Client: fix wrong path
+
 12-12-2023: 6.8.24
 - Core: Property->equals must accept any argument
 - Finance: Create invoice number when changing status to sent
