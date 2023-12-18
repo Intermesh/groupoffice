@@ -357,7 +357,7 @@ class Imap extends ImapBodyStruct
 
 	public function get_acl($mailbox){
 
-		$mailbox = $this->utf7_encode($this->_escape( $mailbox));
+		$mailbox = $this->addslashes($this->utf7_encode($mailbox));
 		$this->clean($mailbox, 'mailbox');
 
 		$command = "GETACL \"$mailbox\"\r\n";
@@ -380,7 +380,7 @@ class Imap extends ImapBodyStruct
 
 	public function set_acl($mailbox, $identifier, $permissions){
 
-		$mailbox = $this->utf7_encode($this->_escape( $mailbox));
+		$mailbox = $this->addslashes($this->utf7_encode($mailbox));
 		$this->clean($mailbox, 'mailbox');
 
 		$command = "SETACL \"$mailbox\" $identifier $permissions\r\n";
@@ -393,7 +393,7 @@ class Imap extends ImapBodyStruct
 	}
 
 	public function delete_acl($mailbox, $identifier){
-		$mailbox = $this->utf7_encode($this->_escape( $mailbox));
+		$mailbox = $this->addslashes($this->utf7_encode($mailbox));
 		$this->clean($mailbox, 'mailbox');
 
 		$command = "DELETEACL \"$mailbox\" $identifier\r\n";
@@ -691,7 +691,7 @@ class Imap extends ImapBodyStruct
 								$insideNamespace = false;
 
 								if(isset($namespace['name'])){
-									$namespace['name']=$this->utf7_decode(trim($namespace['name'], $namespace['delimiter']));
+									$namespace['name'] = $this->_unescape($this->utf7_decode(trim($namespace['name'], $namespace['delimiter'])));
 									$nss[] = $namespace;
 									$namespace = array('name' => null, 'delimiter' => null);
 								}
@@ -754,7 +754,7 @@ class Imap extends ImapBodyStruct
 			}
 			$flags = false;
 			$count = count($vals);
-			$folder = $this->utf7_decode($vals[($count - 1)]);
+			$folder = $this->_unescape($this->utf7_decode($vals[($count - 1)]));
 			$flag = false;
 			$delim_flag = false;
 			$parent = '';
@@ -804,7 +804,7 @@ class Imap extends ImapBodyStruct
 			if (!isset($folders[$folder]) && $folder) {
 				$folders[$folder] = array(
 								'delimiter' => $delim,
-								'name' => $this->utf7_decode($folder),
+								'name' => $folder,
 								'marked' => $marked,
 								'noselect' => $no_select,
 								'can_have_children' => $can_have_kids,
@@ -2593,7 +2593,7 @@ class Imap extends ImapBodyStruct
 
 		$this->clean($mailbox, 'mailbox');
 
-    $command = "UID MOVE %s \"".$this->utf7_encode($mailbox)."\"\r\n";
+    $command = "UID MOVE %s \"".$this->addslashes($this->utf7_encode($mailbox))."\"\r\n";
     $status = $this->_runInChunks($command, $uids);
     return $status;
 
