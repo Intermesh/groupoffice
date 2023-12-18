@@ -80,7 +80,7 @@ class Builder
 		    ]
 	];
 
-	private $encoder = __DIR__ . "/deploy/ioncube_encoder5_10.2/ioncube_encoder.sh";
+	private $encoder = __DIR__ . "/deploy/ioncube_encoder5_12.0/ioncube_encoder.sh";
 
 	private $encoderOptions = "-56 --allow-reflection-all";
 	private $proRepos = "git@git.intermesh.nl:groupoffice/promodules.git";
