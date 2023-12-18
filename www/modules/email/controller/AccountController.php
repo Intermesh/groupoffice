@@ -59,6 +59,21 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 				'criteria' => \GO\Base\Db\FindCriteria::newInstance()->addCondition('default', 1, '=', 'a')
 						));
 
+
+		if($params['sort'] = 'user') {
+			$findParams->ignoreAdminGroup();
+			$findParams->joinModel(array(
+				'model' => 'GO\Email\Model\AccountSort',
+				'foreignField' => 'account_id', //defaults to primary key of the remote model
+				'localField' => 'id', //defaults to primary key of the model
+				'type' => 'LEFT',
+				'tableAlias'=>'s',
+				'criteria'=>  \GO\Base\Db\FindCriteria::newInstance()->addCondition('user_id', \GO::user()->id,'=','s')
+			));
+			$findParams->order('s.order', 'ASC');
+			unset($params['sort']);
+		}
+
 		return $findParams;
 	}
 
