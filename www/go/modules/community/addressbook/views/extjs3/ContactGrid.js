@@ -42,8 +42,9 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"phoneNumbers",
 				"dates",
 				'starred',
-				"birthday", //dummy
-				"actionDate", //dummy
+				"birthday",
+				"age",
+				"actionDate",
 				"gender",
 				"streetAddresses",
 				{name: 'organizations', type: "relation"},
@@ -316,6 +317,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						return go.util.Format.date(bday);
 					},
 					hidden: this.enabledColumns.indexOf('birthday') == -1,
+				},{
+					id: 'age',
+					header: t("Age"),
+					sortable: true,
+					dataIndex: "age",
+					hidden: this.enabledColumns.indexOf('age') == -1,
 				},{
 					id: 'actionDate',
 					header: t('Action date'),
