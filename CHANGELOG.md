@@ -1,3 +1,4 @@
+18-12-2023: 6.8.25
 - OAuth2Client: fix wrong path
 - Email: Fixed problem with quotes in folders
 - Tickets: External URL didn't work
