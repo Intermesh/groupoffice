@@ -42,6 +42,8 @@ class Imap extends ImapBodyStruct
 	var $touched_folders =array();
 
 	var $delimiter=false;
+	// Store all search result UIDs
+	var $allUids = 0;
 
 	var $sort_count = 0;
 
@@ -1041,11 +1043,15 @@ class Imap extends ImapBodyStruct
 				if (stristr($this->capability, 'ORDEREDSUBJECT')) {
 					$ret =  $this->thread_sort($sort, $filter);
 					$this->sort_count = $ret['total'];
+					// Store all search result UIDs
+					// Unsure how to get UIDs here
 					return $ret;
 				}
 				else {
 					$uids=$this->server_side_sort('ARRIVAL', false, $filter);
 					$this->sort_count = count($uids);
+					// Store all search result UIDs
+					$this->allUids = $uids;
 					return $uids;
 				}
 			}
@@ -1053,10 +1059,14 @@ class Imap extends ImapBodyStruct
 				if (stristr($this->capability, 'THREAD')) {
 					$ret = $this->thread_sort($sort, $filter);
 					$this->sort_count = $ret['total'];
+					// Store all search result UIDs
+					// Unsure how to get UIDs here
 					return $ret;
 				} else {
 					$uids=$this->server_side_sort('ARRIVAL', false, $filter);
 					$this->sort_count = count($uids);
+					// Store all search result UIDs
+					$this->allUids = $uids;
 					return $uids;
 				}
 			}
@@ -1066,6 +1076,9 @@ class Imap extends ImapBodyStruct
 				throw new \Exception("Sort error: " . $this->last_error());
             }
 			$this->sort_count = count($uids); // <-- BAD
+			// Unsure why the above has the BAD comment (?)
+			// Store all search result UIDs
+			$this->allUids = $uids;
 			return $uids;
 		}
 		else {
@@ -1074,6 +1087,8 @@ class Imap extends ImapBodyStruct
                 throw new \Exception("Sort error: " . $this->last_error());
             }
 			$this->sort_count = count($uids);
+			// Store all search result UIDs
+			$this->allUids = $uids;
 			return $uids;
 		}
 	}
