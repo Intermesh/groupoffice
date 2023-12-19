@@ -7,6 +7,12 @@ use go\core\db\Query as DbQuery;
 use go\core\db\Statement;
 use PDO;
 
+/**
+ * Query object for entities
+ *
+ * @template T
+ * @extends DbQuery<T>
+ */
 class Query extends DbQuery {
 	/**
 	 * @var class-string<Entity>
@@ -56,7 +62,7 @@ class Query extends DbQuery {
 	/**
 	 * Get class name of the model to find
 	 * 
-	 * @return string
+	 * @return class-string<T>
 	 */
 	public function getModel(): string
 	{
@@ -132,7 +138,6 @@ class Query extends DbQuery {
 		/**
 		 * @var Entity $cls
 		 */
-		/** @noinspection PhpUndefinedMethodInspection */
 		$this->join($cls::customFieldsTableName(), $alias, $alias . '.id = '.$this->getTableAlias().'.id', 'LEFT');
 
 		return $this;
@@ -216,5 +221,4 @@ class Query extends DbQuery {
 	{
 		return $this->data;
 	}
-
 }
