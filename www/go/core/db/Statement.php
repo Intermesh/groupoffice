@@ -7,24 +7,29 @@ use go\core\data\ArrayableInterface;
 use go\core\data\Model;
 use go\core\ErrorHandler;
 use Exception;
+use Iterator;
 use JsonSerializable;
 use PDO;
 use PDOException;
 use PDOStatement;
+use stdClass;
 
 /**
  * PDO Statement
  * 
  * Represents a prepared statement and, after the statement is executed, an
  * associated result set.
+ *
+ * @template T
+ * @implements Iterator<T>
  */
-class Statement implements JsonSerializable, ArrayableInterface, Countable, \Iterator {
+class Statement implements JsonSerializable, ArrayableInterface, Countable, Iterator {
 
 
 	private PDOStatement $pdoStmt;
 
 	/**
-	 * @var class-string<Model>
+	 * @var ?class-string<T>
 	 */
 	private string|null $modelClassName = null;
 	private array|null $modelConstructorArgs = null;
@@ -151,7 +156,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, \Ite
 	 * Binding more values than specified is not possible; if more keys exist in input_parameters than in the SQL specified in the PDO::prepare(), then the statement will fail and an error is emitted.
 	 *
 	 * @return bool Always returns true but must be compatible with PHP function
-	 *@throws PDOException
+	 * @throws PDOException
 	 */
 	public function execute(array $params = null): bool
 	{
@@ -190,6 +195,9 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, \Ite
 		return $this->rowCount();
 	}
 
+	/**
+	 * @return T
+	 */
 	public function current(): mixed
 	{
 		return $this->current;
@@ -260,6 +268,8 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, \Ite
 
 	/**
 	 * Fetches the next row from a result set
+	 *
+	 * @return T
 	 */
 
 	public function fetch(): mixed {
@@ -357,7 +367,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, \Ite
 	/**
 
 	 * Returns an array containing all of the result set rows
-	 * @return array|false <b>PDOStatement::fetchAll</b> returns an array containing
+	 * @return T[]|false <b>PDOStatement::fetchAll</b> returns an array containing
 	 * all of the remaining rows in the result set. The array represents each
 	 * row as either an array of column values or an object with properties
 	 * corresponding to each column name.
@@ -386,18 +396,18 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, \Ite
 	}
 
 	/**
-	 * @template T
+	 * @template TObj
 	 *
 	 * (PHP 5 &gt;= 5.1.0, PHP 7, PECL pdo &gt;= 0.2.4)<br/>
 	 * Fetches the next row and returns it as an object.
 	 * @link https://php.net/manual/en/pdostatement.fetchobject.php
-	 * @param class-string<T>|null $class [optional] <p>
+	 * @param class-string<TObj>|null $class [optional] <p>
 	 * Name of the created class.
 	 * </p>
 	 * @param array $constructorArgs [optional] <p>
 	 * Elements of this array are passed to the constructor.
 	 * </p>
-	 * @return T|stdClass|null an instance of the required class with property names that
+	 * @return TObj|stdClass|null an instance of the required class with property names that
 	 * correspond to the column names or <b>FALSE</b> on failure.
 	 */
 

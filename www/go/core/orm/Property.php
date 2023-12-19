@@ -819,8 +819,9 @@ abstract class Property extends Model {
 	 * @param array $fetchProperties
 	 * @param bool $readOnly
 	 * @param Property|null $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
-	 * @return static[]|Query
+	 * @return Query<$this>
 	 * @noinspection PhpReturnDocTypeMismatchInspection
+	 * @throws Exception
 	 */
 	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null) {
 

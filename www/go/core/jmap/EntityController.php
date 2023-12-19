@@ -65,6 +65,29 @@ abstract class EntityController extends Controller {
 	 */
 	abstract protected function entityClass(): string;
 
+
+	/**
+	 * Find an entity and check permissions
+	 *
+	 * @template T
+	 * @param class-string<T> $cls
+	 * @param string $entityId
+	 * @return T
+	 * @throws Forbidden
+	 * @throws NotFound
+	 */
+	protected function findEntity(string $cls, string $entityId) : Entity {
+		$entity = $cls::findById($entityId);
+		if(!$entity) {
+			throw new NotFound();
+		}
+		if(!$entity->getPermissionLevel()) {
+			throw new Forbidden();
+		}
+
+		return $entity;
+	}
+
 	
 	/**
 	 * Creates a short name based on the class name.
