@@ -73,22 +73,7 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 				sortable: false,
 				width: 100,
 				renderer: function(v, meta, record) {
-
-					var birthDate;
-					record.data.dates.forEach(function(date) {
-						if(date.type == "birthday") {
-							birthDate = new Date(date.date);
-						}
-					});
-
-					var today = new Date();
-					var age = today.getFullYear() - birthDate.getFullYear();
-					// var m = today.getMonth() - birthDate.getMonth();
-					// if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-					// 	age--;
-					// }
-					return age;
-
+					return v + 1;
 				}
 			}];
 

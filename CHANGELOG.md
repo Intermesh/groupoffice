@@ -1,3 +1,6 @@
+- Addressbook: Fixed age in birthday portlet when it's in january
+- Addressbook: Added age column to main grid
+
 18-12-2023: 6.8.25
 - OAuth2Client: fix wrong path
 - Email: Fixed problem with quotes in folders
@@ -159,6 +162,13 @@
 
 -- 6.8 --
 
+18-12-2023: 6.7.60
+- Tickets: External URL didn't work
+- Addressbook: Fixed age in birthday portlet when it's in january
+- Addressbook: Added age column to main grid
+- Newsletters: Sort accounts like in the email tree
+
+12-12-2023: 6.7.59
 - Core: Equals must accept any argument
 
 11-12-2023: 6.7.58
