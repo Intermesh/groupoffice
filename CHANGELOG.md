@@ -1,5 +1,6 @@
 - Addressbook: Fixed age in birthday portlet when it's in january
 - Addressbook: Added age column to main grid
+- Email: Fix PHP deprecation error
 
 18-12-2023: 6.8.25
 - OAuth2Client: fix wrong path
