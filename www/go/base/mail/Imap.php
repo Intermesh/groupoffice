@@ -39,8 +39,6 @@ class Imap extends ImapBodyStruct
 
 	var $selected_mailbox=false;
 
-	var $touched_folders =array();
-
 	var $delimiter=false;
 
 	var $sort_count = 0;
@@ -856,9 +854,6 @@ class Imap extends ImapBodyStruct
 		}
 		if($this->selected_mailbox && $this->selected_mailbox['name']==$mailbox_name) {
 			return true;
-		}
-		if(!in_array($mailbox_name, $this->touched_folders)) {
-			$this->touched_folders[] = $mailbox_name;
 		}
 
 		$box = $this->addslashes($this->utf7_encode($mailbox_name));
@@ -2586,10 +2581,14 @@ class Imap extends ImapBodyStruct
 	 */
 	public function move(array $uids, $mailbox='INBOX', $expunge=true)
 	{
-		// Use the much faster UID MOVE command
-    if(!in_array($mailbox, $this->touched_folders)) {
-			$this->touched_folders[]=$mailbox;
-    }
+		if(!$this->has_capability("MOVE")) {
+			// some servers don't support UID MOVE
+			if(!$this->copy($uids, $mailbox)) {
+				return false;
+			}
+
+			return $this->delete($uids);
+		}
 
 		$this->clean($mailbox, 'mailbox');
 

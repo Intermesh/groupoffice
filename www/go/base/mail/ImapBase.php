@@ -5,8 +5,6 @@ namespace GO\Base\Mail;
 
 abstract class ImapBase {
 
-	var $touched_folders =array();
-
 	var $max_read=false;
 
 	var $imap_search_charsets = array(
