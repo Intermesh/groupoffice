@@ -27,25 +27,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 	}
 
 
-//	protected function actionTest($params){
-//
-//		\GO::$disableModelCache=true;
-//
-//		for($i=0;$i<1000;$i++){
-//
-//			echo $i."<br>";
-//			${"account".$i} = \GO\Email\Model\Account::model()->findSingle();
-//
-//			${"account".$i}->openImapConnection("INBOX");
-//		}
-//
-//
-//
-//	}
-
-//	protected function headers() {
-//		header('Content-Type: application/json; charset=UTF-8');
-//	}
 	protected function getStoreParams($params) {
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
@@ -60,7 +41,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 						));
 
 
-		if($params['sort'] = 'user') {
+		if($params['sort'] == 'user') {
 			$findParams->ignoreAdminGroup();
 			$findParams->joinModel(array(
 				'model' => 'GO\Email\Model\AccountSort',
