@@ -1,5 +1,6 @@
 - Email: fix sorting bug
 - Calendar: fix several deprecation errors, cleaned up old stuff
+- Email: increase size of 'move old mail' dialog, add more descriptive icons to mailbox context menu
 
 22-12-2023: 6.8.26
 - Email: Check if the IMAP server supports "MOVE" before using UID MOVE. Otherwise fall back on COPY + DELETE.
