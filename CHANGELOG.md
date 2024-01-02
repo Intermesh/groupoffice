@@ -1,4 +1,5 @@
 - Email: fix sorting bug
+- Calendar: fix several deprecation errors, cleaned up old stuff
 
 22-12-2023: 6.8.26
 - Email: Check if the IMAP server supports "MOVE" before using UID MOVE. Otherwise fall back on COPY + DELETE.
