@@ -65,6 +65,9 @@ try {
 	//check if GO is installed
 	if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 
+        //fire index event before version check so multi instance can check if it exists before comparing versions
+        go()->fireEvent(\go\core\App::EVENT_INDEX);
+
         if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 
             require('views/Extjs3/externalHeader.php');
@@ -119,7 +122,7 @@ try {
             $_POST['accessToken'] = $token->accessToken;
         }
 
-		go()->fireEvent(\go\core\App::EVENT_INDEX);
+
 
 
 	}
