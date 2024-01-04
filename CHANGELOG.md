@@ -1,3 +1,5 @@
+
+- Email: Sieve rule now uses configured Spam / Junk folder
 - Core: Set password via CLI: /cli.php core/System/setPassword --username=admin
 - Email: fix sorting bug
 - Calendar: fix several deprecation errors, cleaned up old stuff
