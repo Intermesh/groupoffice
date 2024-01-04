@@ -86,23 +86,6 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 								success: function(options, response, result)
 								{
 									this.treePanel.refresh(node.parentNode);
-									
-										//remove preloaded children otherwise it won't request the server
-//										delete node.parentNode.attributes.children;
-//
-//										var updateFolderName = function(){
-//											var node = this.treePanel.getNodeById('folder_'+this.folder_id);
-//											if(node){
-//												if(this.folder_id==node.attributes.folder_id){
-//													this.mailbox = node.attributes.mailbox;
-//													this.treePanel.getSelectionModel().select(node);
-//												}
-//											}
-//											this.el.unmask();
-//										}
-//										node.parentNode.reload(updateFolderName.createDelegate(this));
-										
-									
 								},
 								fail : function(response, options, result){
 									Ext.Msg.alert(t("Error"), result.feedback);
@@ -116,8 +99,8 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			},
 			scope:this
 		}),'-',	new Ext.menu.Item({
-//			iconCls: 'btn-delete',
 			text:t("Mark as read", "email"),
+			iconCls: 'btn-mark-email-read',
 			cls: 'x-btn-text-icon',
 			scope:this,
 			handler: function()
@@ -151,7 +134,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 				}, this);
 			}
 		}),	new Ext.menu.Item({
-			iconCls: 'btn-cut',
+			iconCls: 'btn-auto-delete',
 			text:t("Move old mails", "email"),
 			cls: 'x-btn-text-icon',
 			scope:this,
@@ -164,7 +147,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 				this.moveOldMailDialog.show();
 			}
 		}),this.emptyFolderButton = new Ext.menu.Item({
-			iconCls: 'btn-delete',
+			iconCls: 'btn-delete-sweep',
 			text: t("Empty folder", "email"),
 			handler: function(){
 

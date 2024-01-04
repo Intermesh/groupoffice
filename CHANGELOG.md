@@ -1,4 +1,15 @@
+
 - Email: Sieve rule now uses configured Spam / Junk folder
+- Core: Set password via CLI: /cli.php core/System/setPassword --username=admin
+- Email: fix sorting bug
+- Calendar: fix several deprecation errors, cleaned up old stuff
+- Email: increase size of 'move old mail' dialog, add more descriptive icons to mailbox context menu
+- Core: Don't take over label color of background using javascript so we can use pure css for form fields.
+- Core: Remove ellipsis on status badge in grid
+- Finance: Don't set expiresAt until sentAt is set
+- Finance: Added dutch translations
+- Finance: Sort articles and wider list to pick from
+- Core: Fixed saving reordering array relations when only the sort order was modified
 
 22-12-2023: 6.8.26
 - Email: Check if the IMAP server supports "MOVE" before using UID MOVE. Otherwise fall back on COPY + DELETE.
