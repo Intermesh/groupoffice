@@ -347,6 +347,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$response['total'] = $imap->sort_count;
+		
+		// Return all UIDs if we have a search query in case we need to perform actions on the entire set
+		if (!empty($query)) {
+			$response['allUids']=$imap->allUids;
+		}
 
 		$mailbox = new \GO\Email\Model\ImapMailbox($account, array('name'=>$params['mailbox']));
 		$mailbox->snoozeAlarm();

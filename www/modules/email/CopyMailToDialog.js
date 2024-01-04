@@ -143,6 +143,8 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 						seen : this._selectedEmailMessages[i].data.seen
 					});
 				}
+				// Block view while performing potentially large copy/move operation
+				Ext.getBody().mask(t("Processing..."));
 				GO.request({
 					url : "email/account/copyMailTo",
 					params : {
@@ -155,7 +157,11 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 						this.fireEvent('copy_email');
 						Ext.Msg.hide();
 						this.hide();
+						Ext.getBody().unmask();
 					},
+					failure:function(response){
+                                                Ext.getBody().unmask();
+                                        },
 					scope:this
 				});
 			}

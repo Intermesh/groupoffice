@@ -553,3 +553,94 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 	}
 	 */
 });
+
+
+// Adding our code here but it must be moved in a proper place - we used it as part of a module, not core
+
+Ext.override(go.toolbar.SearchButton, {
+        onRender: go.toolbar.SearchButton.prototype.onRender.createSequence(function (ct, position) {
+            this.searchToolBar.items.insert(3,
+                this.moveAllButton = new Ext.Button({
+                    iconCls: 'ic-move-to-inbox',
+                    tooltip: t('Move all'),
+                    disabled: true,
+                    handler: function (b) {
+                        if (this.hasActiveSearch()){
+                            Ext.MessageBox.confirm(t("Confirm move"), t("Are you sure you want to move all the emails from the search result? (" + GO.email.messagesGrid.store.reader.jsonData.allUids.length + " emails)"), function (btn) {
+                                if (btn !== "yes") {
+                                    return;
+                                }
+                                this.showMoveMailToDialog();
+                            }, this);
+                        }
+                    },
+                    scope: this
+                })
+            );
+
+            this.searchToolBar.items.insert(4,
+                this.deleteAllButton = new Ext.Button({
+                    iconCls: 'ic-delete-sweep',
+                    tooltip: t('Delete all'),
+                    disabled: true,
+                    handler: function (b) {
+                        if (this.hasActiveSearch()){
+                            Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete all the emails from the search result? (" + GO.email.messagesGrid.store.reader.jsonData.allUids.length + " emails)"), function (btn) {
+                                if (btn !== "yes") {
+                                    return;
+                                }
+
+                                delete GO.email.messagesGrid.store.baseParams['query'];
+                                GO.email.messagesGrid.store.baseParams['delete_keys'] = Ext.encode(GO.email.messagesGrid.store.reader.jsonData.allUids);
+                                //GO.email.messagesGrid.store.load();
+                                this.reset();
+                                this.back();
+                                delete GO.email.messagesGrid.store.baseParams['delete_keys'];
+
+                            }, this);
+                        }
+                    },
+                    scope: this
+                })
+            );
+
+            this.on('search', function(v, filters){
+                this.moveAllButton.setDisabled(false);
+                this.deleteAllButton.setDisabled(false);
+            });
+
+            this.on('reset', function(){
+                this.moveAllButton.setDisabled(true);
+                this.deleteAllButton.setDisabled(true);
+            });
+        }),
+
+        showMoveMailToDialog : function() {
+            if (!this._copyMailToDialog) {
+                this._copyMailToDialog = new GO.email.CopyMailToDialog({
+                    move: true
+                });
+                this._copyMailToDialog.on('copy_email',function(){
+                    this.reset();
+                    this.back();
+                },this);
+            }
+            this._copyMailToDialog.move = true;
+
+            var allUids = GO.email.messagesGrid.store.reader.jsonData.allUids;
+            var selectedEmailMessages = [];
+            for (var i=0; i<allUids.length;i++) {
+                selectedEmailMessages.push({
+                    data : {
+                    account_id : GO.email.messagesGrid.store.baseParams.account_id,
+                    mailbox : GO.email.messagesGrid.store.baseParams.mailbox,
+                    uid : allUids[i],
+                    seen: null,
+                    }
+                });
+            }
+
+            this._copyMailToDialog.show(selectedEmailMessages);
+        },
+    })
+
