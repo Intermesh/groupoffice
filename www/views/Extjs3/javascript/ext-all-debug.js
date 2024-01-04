@@ -15406,7 +15406,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
             }
         }
 
-        ls += 'background-color: ' + target.getBackgroundColor() + ';';
+        // ls += 'background-color: ' + target.getBackgroundColor() + ';';
 
         return ls;
     },
