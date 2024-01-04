@@ -112,9 +112,11 @@ export class Main extends Component {
 							const days = Math.round((end!.clone().setHours(12).getTime() - start!.clone().setHours(12).getTime()) / 8.64e7) + 1;
 							this.date = start!;
 							if (days < 8) {
-								this.setSpan('days', days);
+								this.routeTo('days-'+days, this.date);
+								//this.setSpan('days', days);
 							} else {
-								this.setSpan('weeks', days);
+								this.routeTo('weeks-'+days, this.date);
+								//this.setSpan('weeks', days);
 							}
 
 						}
@@ -192,10 +194,10 @@ export class Main extends Component {
 							},
 							buttons: [btn({
 								icon: 'more_horiz', menu: menu({},
-									btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: _ => {
+									btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: async _ => {
 										const dlg = new CalendarDialog();
+										await dlg.load(data.id);
 										dlg.show();
-										dlg.load(data.id);
 									}}),
 									btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
 										calendarStore.dataSource.update(data.id, {isSubscribed: false});
@@ -203,8 +205,12 @@ export class Main extends Component {
 									btn({icon:'import_export', text:t('Import'), handler: async ()=> {
 											const files = await browser.pickLocalFiles();
 											const blob = await client.upload(files[0]);
-											const resultReference = this.eventStore.dataSource.method('parse', {blobIds:[blob.id]});
-											this.eventStore.dataSource.update({update:resultReference});
+											client.jmap("CalendarEvent/parse", {blobIds:[blob.id]}, 'pIcs').then(r => {
+												// bult events.
+												// set calendarId op alle / flikker uid eruit
+												// call /set create met events
+
+											});
 									}})
 								)
 							})]
@@ -287,12 +293,14 @@ export class Main extends Component {
 	}
 
 	forward(value = 1) {
+		let route = this.timeSpan;
 		switch (this.timeSpan) {
 			case "day":
 				this.date.addDays(value);
 				break;
 			case 'days':
 			case 'weeks':
+				route += '-'+this.spanAmount;
 				this.date.addDays(value * this.spanAmount!);
 				break;
 			case 'week' :
@@ -307,7 +315,7 @@ export class Main extends Component {
 		}
 		// set path silent to buffer the update
 		//router.suspendEvent = true;
-		router.setPath("calendar/"+this.timeSpan+"/"+this.date.format('Y-m-d'));
+		router.setPath("calendar/"+route+"/"+this.date.format('Y-m-d'));
 		//todo: enable this line when the router is no longer broken
 		//this.updateView(true);
 	}

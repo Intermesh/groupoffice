@@ -1,5 +1,5 @@
 import {
-	autocomplete, AutocompleteField, btn, checkbox,
+	autocomplete, btn, checkbox,
 	column,
 	comp,
 	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap,
@@ -28,15 +28,21 @@ export interface ParticipantField extends Component {
 }
 export class ParticipantField extends Component {
 
-	list!: MapField
+	private static statusIcons : {[status:string]: string[]} = {
+		'accepted':		['check_circle', t('Accepted')],
+		'tentative':	['help', t('Maybe')],
+		'declined':		['block', t('Declined')],
+		'needs-action':['schedule', t('Awaiting reply')]
+	}
 
-	editable?: boolean
+	list!: MapField
 
 	constructor() {
 		super();
 		this.cls = 'participant-field';
-
 	}
+
+
 
 	protected internalRender() {
 		this.items.add(
@@ -46,33 +52,35 @@ export class ParticipantField extends Component {
 						this.fire('change', this, v, null);
 					}
 				},
-				buildField: (v: any) => { const f = containerfield({cls:'hbox', style: {alignItems: 'center'}},
-					comp({tagName:'i',cls:'icon',html:v.name?'person':'email', style:{margin:'0 8px'}}),
-					comp({
-						flex: '1 0 60%',
-						html: v.name ? v.name + '<br>' + v.email : v.email
-					}),
-					btn({icon:'arrow_drop_down', menu: menu({},
-							btn({text: v.email, disabled: true}),
-							hr(),
-							checkbox({label:'Optioneel',/* enableToggle: true*/}),
-							btn({icon:'delete',text:t('Delete'), handler: _ => {
-									f.remove();
-									this.fire('change', this, this.list.value, null);
-								}
-							}),
-							hr(),
-							//btn({icon:'insert_invitation',text:'Invite again'}),
-							btn({icon:'email',text:t('Write email'), handler: _ =>{ go.showComposer({to:v.email})}})
-						)})
-				);
+				buildField: (v: any) => {
+					const userIcon = v.name?'person':'email',
+						statusIcon = ParticipantField.statusIcons[v.participationStatus] || v.participationStatus;
+					const f = containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
+						comp({tagName:'i',cls:'icon',html:userIcon, style:{margin:'0 8px'}}),
+						comp({
+							flex: '1 0 60%',
+							html: v.name ? v.name + '<br>' + v.email : v.email
+						}),
+						comp({tagName:'i',cls:'icon',html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
+						btn({icon:'more_vert', menu: menu({},
+								btn({text: v.email, disabled: true}),
+								hr(),
+								checkbox({label:'Optioneel',/* enableToggle: true*/}),
+								btn({icon:'delete',text:t('Delete'), handler: _ => {
+										f.remove();
+										this.fire('change', this, this.list.value, null);
+									}
+								}),
+								hr(),
+								//btn({icon:'insert_invitation',text:'Invite again'}),
+								btn({icon:'email',text:t('Write email'), handler: _ =>{ go.showComposer({to:v.email})}})
+							)})
+					);
 					return f;
 				}
 			}),
 			autocomplete({
-				hidden: (this.editable===false),
 				placeholder:t('Invite people'),
-
 				//valueProperty: "id",
 				listeners: {
 					'autocomplete': async (field, input) => {

@@ -18,6 +18,8 @@ class Scheduler {
 	 * @parma bool $delete if the event is about to be deleted
 	 */
 	static public function handle(CalendarEvent $event, bool $willDelete = false) {
+		if(empty($event->participants) || $event->isInPast())
+			return;
 
 		$current = $event->calendarParticipant();
 
@@ -117,7 +119,7 @@ class Scheduler {
 			}
 
 			$subject = go()->t($method=='REQUEST' ? 'Invitation' : 'Cancellation', 'community', 'calendar');
-			if($participant->participationStatus !== Participant::NeedsAction) {
+			if($method==='REQUEST' && $participant->participationStatus !== Participant::NeedsAction) {
 				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
 			}
 
@@ -171,8 +173,7 @@ class Scheduler {
 //			return "You may not update this event";
 //		}
 		//$existingEvent = CalendarEvent::find()->where(['uid' => (string)$vevent->uid,'calendarId'=>$calendar->id])->single();
-
-		switch($vcalendar->method){
+		switch($vcalendar->method->getValue()){
 			case 'REQUEST': return self::processRequest($vcalendar,$receiver,$existingEvent);
 			case 'CANCEL': return self::precessCancel($vcalendar,$existingEvent);
 			case 'REPLY': return self::processReply($vcalendar,$existingEvent, $sender);

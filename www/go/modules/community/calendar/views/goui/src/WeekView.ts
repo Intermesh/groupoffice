@@ -1,7 +1,6 @@
 import {CalendarView} from "./CalendarView.js";
-import {DataSourceStore, DateTime, E, t} from "@intermesh/goui";
+import {DateTime, E, t} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
-import {JmapDataSource} from "@intermesh/groupoffice-core";
 
 class CalendarDayItem extends CalendarItem {
 	pos!: number
@@ -20,16 +19,18 @@ export class WeekView extends CalendarView {
 	protected internalRender() {
 		this.makeDraggable();
 		this.el.tabIndex = 0;
+
 		this.el.on('keydown', (e: KeyboardEvent) => {
 			if(e.key == 'Delete') {
 				this.selected.forEach(item => {
 					const i = this.dayItems.indexOf(item as CalendarDayItem);
 					if(i > -1) {
-						Object.values(item.divs).forEach(d => d.remove());
-						this.dayItems.splice(i,1);
+						//Object.values(item.divs).forEach(d => d.remove());
+						//this.dayItems.splice(i,1);
+						item.remove();
 					}
 				});
-				this.updateItems();
+				this.renderView();
 			}
 		});
 

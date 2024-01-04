@@ -5,7 +5,7 @@ import {
 	datasourceform,
 	DateTime, DisplayField, displayfield, Format, hr, mapfield, RecurrenceField,
 	t,
-	tbar,
+	tbar, Toolbar,
 	Window
 } from "@intermesh/goui";
 import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
@@ -24,6 +24,7 @@ export class EventDetail extends Window {
 	recurrenceId?: string
 
 	store: JmapDataSource
+	toolBar: Toolbar
 
 	constructor() {
 		super();
@@ -39,11 +40,11 @@ export class EventDetail extends Window {
 			renderer(this: DisplayField, v) {
 				return RecurrenceField.toText(v, this.dataSet.start);
 			}
-		}),
-		toolBar = tbar({hidden:true},
-			btn({itemId: 'accepted', text:t('Accept'), handler:()=>this.item!.updateParticipation('accepted')}),
-			btn({itemId: 'tentative', text:t('Maybe'), handler:()=>this.item!.updateParticipation('tentative')}),
-			btn({itemId: 'declined', text:t('Decline'), handler:()=>this.item!.updateParticipation('declined')})
+		});
+		this.toolBar = tbar({hidden:true, style:{alignItems:'space-between'}},
+			btn({itemId: 'accepted', text:t('Accept'), handler:()=>this.updateStatus('accepted')}),
+			btn({itemId: 'tentative', text:t('Maybe'), handler:()=>this.updateStatus('tentative')}),
+			btn({itemId: 'declined', text:t('Decline'), handler:()=>this.updateStatus('declined')})
 		);
 
 		this.items.add(this.form = datasourceform({
@@ -60,11 +61,9 @@ export class EventDetail extends Window {
 						else
 							recurrenceField.dataSet.start = start;
 
-						if(data.participants && this.item!.participantId in data.participants) {
-							toolBar.show();
-							const status = data.participants[this.item!.participantId].participationStatus,
-								btn = toolBar.items.find(v => v.itemId === status) as Button;
-							if(btn) btn.el.cls('pressed', true);
+						if(data.participants && this.item!.currentParticipant) {
+							this.toolBar.show();
+							this.pressButton(this.item!.currentParticipant.participationStatus);
 						}
 					},
 					'save' : () => {this.close();}
@@ -90,8 +89,19 @@ export class EventDetail extends Window {
 				}
 			}}),
 		),
-		toolBar
+			this.toolBar
 		);
+	}
+
+	private pressButton(v:'accepted'|'declined'|'tentative') {
+		this.toolBar.items.forEach(btn => {
+			btn.el.cls('pressed', btn.itemId === v);
+		});
+
+	}
+	private updateStatus(v:'accepted'|'declined'|'tentative') {
+		this.item!.updateParticipation(v);
+		this.pressButton(v);
 	}
 
 
@@ -108,10 +118,6 @@ export class EventDetail extends Window {
 				}
 			});
 		}
-	}
-
-	submit(response?:'accept'|'maybe'|'decline') {
-		// todo maybe
 	}
 
 }

@@ -22,6 +22,18 @@ export class MonthView extends CalendarView {
 
 	protected internalRender() {
 		this.makeDraggable(this.el);
+
+		this.el.tabIndex = 0;
+		this.el.on('keydown', (e: KeyboardEvent) => {
+			if(e.key == 'Delete') {
+				this.selected.forEach(item => {
+					const i = this.viewModel.indexOf(item);
+					if(i > -1) {
+						item.remove();
+					}
+				});
+			}
+		});
 		return super.internalRender();
 	}
 
@@ -36,7 +48,7 @@ export class MonthView extends CalendarView {
 			endMonth.addDays(days);
 		} else { // take full month
 			this.start.setDate(1).setWeekDay(0);
-			endMonth.addMonths(1).setDate(0).setWeekDay(6);
+			endMonth.addMonths(1).setDate(0).setWeekDay(6).addDays(1);
 			this.days = this.start.diffInDays(endMonth);
 		}
 
@@ -63,8 +75,8 @@ export class MonthView extends CalendarView {
 
 		const create = (day: HTMLElement) => {
 			[from, till] = (anchor.compareDocumentPosition(day) & 0x02) ? [day,anchor] : [anchor,day];
-			ev.start = new DateTime(from.dataset.date!);
-			ev.end = new DateTime(till.dataset.date!).addDays(1);
+			ev.start = new DateTime(from.dataset.date!+' 00:00:00.000');
+			ev.end = new DateTime(till.dataset.date!+' 00:00:00.000').addDays(1);
 		},
 		move = (day:HTMLElement) => {
 			let [y,m,d] = day.dataset.date!.split('-').map(Number);
@@ -103,7 +115,7 @@ export class MonthView extends CalendarView {
 						calendarId: '2',
 						showWithoutTime: true
 					},
-					start = new DateTime(data.start),
+					start = (new DateTime(data.start+' 00:00:00.000')),
 					end = start.clone().addDays(1);
 				ev = new CalendarItem({start, end, data, key: ''});
 				this.viewModel.unshift(ev);
@@ -160,7 +172,7 @@ export class MonthView extends CalendarView {
 		this.weekRows = [];
 		while (it < this.days) {
 			const weekStart = day.clone(),
-				eventContainer = E('li',...this.drawWeek(weekStart)).cls('events'),
+				eventContainer = E('li').cls('events'),
 				row = E('ol',eventContainer);
 			for (i = 0; i < 7; i++) {
 				row.append(E('li',
@@ -207,14 +219,14 @@ export class MonthView extends CalendarView {
 			}
 		}
 		this.continues = stillContinueing;
-		while((e = this.viewModel[this.iterator]) && e.start.format('YW') < end.format('YW')) {
+
+		while((e = this.viewModel[this.iterator]) && e.start.format('Ymd') < end.format('Ymd')) {
 			eventEls.push(this.drawEvent(e, wstart));
 			if(e.end.date > end.date) {
-				this.continues.push(e); // todo
+				this.continues.push(e);
 			}
 			this.iterator++;
 		}
-
 		return eventEls;
 	}
 

@@ -15,7 +15,7 @@ export class CalendarDialog extends FormWindow {
 
 	constructor() {
 		super('Calendar');
-		this.title = t('Edit calendar');
+		this.title = 'calendar';
 		this.width = 460;
 		this.height = 650;
 
@@ -23,6 +23,10 @@ export class CalendarDialog extends FormWindow {
      //    this.form.dataSource.update(this.currentId!, {isSubscribed:false});
      //    this.close();
      // }});
+
+		this.on('beforerender', () => {
+			this.title = t(this.currentId ? 'Edit calendar' : 'Create calendar');
+		})
 
 		this.generalTab.items.add(
 			comp({cls:'flow pad'},

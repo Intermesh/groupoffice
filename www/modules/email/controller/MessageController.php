@@ -1416,7 +1416,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$vcalendar = $imapMessage->getInvitationVcalendar();
 		if($vcalendar) {
-			$method = (string)$vcalendar->method;
+			$method = $vcalendar->method->getValue();
 			$vevent = $vcalendar->vevent[0];
 
 			$aliases = Alias::model()->find(
@@ -1464,7 +1464,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				'scheduleId' => $accountEmail,
 				'event' => $event
 			];
-			if($method ==='REPLY') {
+			if($method ==='REPLY' && !is_string($event)) {
 				$p = $event->participantByScheduleId($from['email']);
 				if($p) {
 					$lang = go()->t('replyImipBody', 'community', 'calendar');

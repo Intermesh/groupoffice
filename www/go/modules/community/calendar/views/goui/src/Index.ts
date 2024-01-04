@@ -84,6 +84,9 @@ modules.register(  {
 			}).add(/^calendar\/day\/(\d{4}-\d{2}-\d{2})$/, (date) => {
 				modules.openMainPanel("calendar");
 				ui.goto(new DateTime(date)).setSpan("day", 1);
+			}).add(/^calendar\/(days|weeks)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, date) => {
+				modules.openMainPanel("calendar");
+				ui.goto(new DateTime(date)).setSpan(span as 'days'|'weeks', Math.min(parseInt(amount),373));
 			});
 
 			modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => {

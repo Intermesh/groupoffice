@@ -57,10 +57,10 @@ class ICalendarHelper {
 			}
 		}
 
-		if(!$event->useDefaultAlerts && is_array($event->alarms)) {
-			foreach($event->alarms as $id => $alarm) {
+		if(!$event->useDefaultAlerts && is_array($event->alerts)) {
+			foreach($event->alerts as $id => $alert) {
 				$vevent->add('VALARM', [
-					'TRIGGER' => $alarm->offset, // 15 minutes before the event
+					'TRIGGER' => $alert->offset, // 15 minutes before the event
 					'DESCRIPTION' => 'Alarm',
 					'ACTION' => 'DISPLAY',
 				]);
@@ -188,7 +188,7 @@ class ICalendarHelper {
 					}
 				} elseif($jKey == 'byDay') {
 					// paste back together
-					$val = implode(',', array_map(fn($v) => $v->nthOfPeriod.$v->day, $val));
+					$val = implode(',', array_map(fn($v) => ($v->nthOfPeriod??'').$v->day, $val));
 				} elseif(is_array($val)) {
 					$val = implode(',', $val);
 				} else { //string?
@@ -274,8 +274,18 @@ class ICalendarHelper {
 					}
 				}
 			}
-
-			//TODO VALARM
+			if(!empty((string)$vevent->VALARM)) {
+				$event->alerts = [];
+				foreach ($vevent->VALARM as $valarm) {
+					$a = (new Alert($event))->setValues([
+						'action'=> $valarm->ACTION,
+						'offset' => $valarm->TRIGGER
+					]);
+					if(isset($valarm->ACKNOWLEDGED))
+						$a->acknowledged = !!$valarm->ACKNOWLEDGED;
+					$event->alerts[] = $a;
+				}
+			}
 		}
 		//Attach exceptions found in VCALENDAR
 		foreach($exceptions as $props) {
@@ -337,7 +347,7 @@ class ICalendarHelper {
 		if(!empty($vevent->DURATION)) {
 			$props->duration = (string)$vevent->DURATION;
 		} else if (!empty($vevent->DTEND) && !empty($props->start)) {
-			$props->duration = self::dateIntervalToISO($vevent->DTEND->getDateTime()->diff($props->start));
+			$props->duration = DateTime::intervalToISO($vevent->DTEND->getDateTime()->diff($props->start));
 		}
 		return $props;
 	}
@@ -389,13 +399,6 @@ class ICalendarHelper {
 			}
 		}
 		return $values;
-	}
-
-	static function dateIntervalToISO(\DateInterval $interval, $default = 'PT0S') {
-		static $f = ['M0S', 'H0M', 'DT0H', 'M0D', 'P0Y', 'Y0M', 'P0M'];
-		static $r = ['M', 'H', 'DT', 'M', 'P', 'Y', 'P'];
-
-		return rtrim(str_replace($f, $r, $interval->format('P%yY%mM%dDT%hH%iM%sS')), 'PT') ?: $default;
 	}
 
 	/**

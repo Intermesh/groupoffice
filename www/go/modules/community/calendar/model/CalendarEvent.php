@@ -367,7 +367,7 @@ class CalendarEvent extends AclItemEntity {
 		$oneDay = $start->format('Ymd') === $end->format('Ymd');
 		$line1 = go()->t($oneDay ? 'At' : 'From') .' '.
 			go()->t($start->format('l')).
-			$start->format(' j ') . go()->t('full_months')[$start->format('m')].
+			$start->format(' j ') . go()->t('full_months')[$start->format('n')].
 			$start->format(' Y');
 		if(!$oneDay) {
 			if(!$this->showWithoutTime)
@@ -378,7 +378,7 @@ class CalendarEvent extends AclItemEntity {
 			$line2 = $start->format('H:i').' - '.$end->format('H:i');
 		} else {
 			$line2 = go()->t($end->format('l')).
-				$end->format(' j ') . go()->t('full_months')[$end->format('m')].
+				$end->format(' j ') . go()->t('full_months')[$end->format('n')].
 				$end->format(' Y');
 			if(!$this->showWithoutTime) {
 				$line2.= ', '.$end->format('H:i');
@@ -405,8 +405,7 @@ class CalendarEvent extends AclItemEntity {
 				$this->sequence += 1;
 		}
 
-		if(self::$sendSchedulingMessages && !empty($this->participants) &&
-			$this->lastOccurrence > new DateTime()) {
+		if(self::$sendSchedulingMessages) {
 			Scheduler::handle($this);
 		}
 
@@ -456,7 +455,7 @@ class CalendarEvent extends AclItemEntity {
 	 * @return false|Participant
 	 */
 	public function calendarParticipant() {
-		if($this->calendarParticipant === null) {
+		if($this->calendarParticipant === null && !empty($this->participants)) {
 			$scheduleId = Calendar::find()
 				->join('core_user', 'u', 'calendar_calendar.ownerId = u.id')
 				->where(['id' => $this->calendarId])
@@ -517,9 +516,11 @@ class CalendarEvent extends AclItemEntity {
 
 	protected static function internalDelete(Query $query): bool
 	{
-		$events = CalendarEvent::find()->mergeWith(clone $query);
-		foreach($events as $event) {
-			Scheduler::handle($event, true);
+		if(self::$sendSchedulingMessages) {
+			$events = CalendarEvent::find()->mergeWith(clone $query);
+			foreach ($events as $event) {
+				Scheduler::handle($event, true);
+			}
 		}
 		//$q->andWhere(['isOrigin' => 1]);
 
@@ -542,6 +543,10 @@ class CalendarEvent extends AclItemEntity {
 		return $success;
 	}
 
+	public function isInPast() {
+		return $this->lastOccurrence <= new DateTime();
+	}
+
 	public function isRecurring() {
 		return !empty($this->recurrenceRule); // && !empty($this->recurrenceRule->frequency));
 	}
@@ -555,16 +560,17 @@ class CalendarEvent extends AclItemEntity {
 			$this->lastOccurrence = null;
 			$r = $this->getRecurrenceRule();
 			if(isset($r->until)) {
-				$this->lastOccurrence = new DateTime($r->until,$this->timeZone());
+				$this->lastOccurrence = (new DateTime($r->until,$this->timeZone()))
+					->add(new \DateInterval($this->duration));
 			} else if(isset($r->count)) {
 				$it = ICalendarHelper::makeRecurrenceIterator($this);
-				$maxDate = new \DateTime('2038-01-01');
+				$maxDate = new \DateTime('2058-01-01');
 				while ($it->valid() && $this->lastOccurrence < $maxDate) {
 					$this->lastOccurrence = $it->current(); // will clone :(
 					$it->next();
 				}
+				$this->lastOccurrence->add(new \DateInterval($this->duration));
 			}
-			$this->lastOccurrence->add(new \DateInterval($this->duration));
 		} else {
 			$this->lastOccurrence = $this->end();
 		}

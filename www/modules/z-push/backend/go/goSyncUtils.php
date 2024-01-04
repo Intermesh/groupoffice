@@ -73,7 +73,7 @@ class GoSyncUtils {
 	public static function getBodyPreferenceMatch($bpTypes, array $supported = array(SYNC_BODYPREFERENCE_PLAIN, SYNC_BODYPREFERENCE_HTML)): int
 	{
 
-		ZLog::Write(LOGLEVEL_DEBUG, 'GoSyncUtils->getBodyPreferenceMatch() ~~ bpTypes = ' . var_export($bpTypes, true));
+		//ZLog::Write(LOGLEVEL_DEBUG, 'GoSyncUtils->getBodyPreferenceMatch() ~~ bpTypes = ' . var_export($bpTypes, true));
 
 		if (is_array($bpTypes)) {
 
@@ -447,126 +447,6 @@ class GoSyncUtils {
 		return null;
 	}
 
-	public static function getTimeZoneForClient() {
-
-		if (!isset(GO::session()->values['activesync_timezone'])) {
-			$old = date_default_timezone_get();
-			date_default_timezone_set(GO::user()->timezone);
-			
-			$tz = new DateTimeZone(GO::user()->timezone);
-			$transitions = $tz->getTransitions();
-			$start_of_year = mktime(0, 0, 0, 1, 1);
-
-			for ($i = 0, $max = count($transitions); $i < $max; $i++) {
-				if ($transitions[$i]['ts'] > $start_of_year) {
-					$dst_end = $transitions[$i];
-					$dst_start = $transitions[$i + 1];
-					break;
-				}
-			}
-
-			$astz['format'] = "la64vvvvvvvv" . "la64vvvvvvvv" . "l";
-			if (!isset($dst_end) || !isset($dst_start)) {
-				$astz['bias'] = 0;
-				$astz['stdname'] = $tz->getName();
-				$astz['stdyear'] = 0;
-				$astz['stdmonth'] = 0;
-				$astz['stdday'] = 0;
-
-				$astz['stdweek'] = 0;
-				$astz['stdhour'] = 0;
-				$astz['stdminute'] = 0;
-				$astz['stdmillis'] = 0;
-				$astz['stdsecond'] = 0;
-				$astz['stdbias'] = 0;
-
-				$astz['dstname'] = "";
-				$astz['dstyear'] = 0;
-				$astz['dstmonth'] = 0;
-				$astz['dstday'] = 0;
-				$astz['dstweek'] = 0;
-				$astz['dsthour'] = 0;
-				$astz['dstminute'] = 0;
-				$astz['dstsecond'] = 0;
-				$astz['dstdmillis'] = 0;
-				$astz['dstbias'] = 0;
-			} else {
-				$astz['bias'] = $dst_start['offset'] / -60;
-				$astz['stdname'] = $tz->getName();
-				$astz['stdyear'] = 0;
-				$astz['stdmonth'] = date('n', $dst_start['ts']);
-				$astz['stdday'] = date('w', $dst_start['ts']);
-				$stdweek = Date::get_occurring_number_of_day_in_month($dst_start['ts']);
-				if ($stdweek == 4) {
-					$stdweek = 5;
-				}
-
-				$astz['stdweek'] = $stdweek;
-				$astz['stdhour'] = date('G', $dst_start['ts']);
-				$astz['stdminute'] = intval(date('i', $dst_start['ts']));
-				$astz['stdmillis'] = 0;
-				$astz['stdsecond'] = 0;
-				$astz['stdbias'] = 0;
-
-				$astz['dstname'] = "";
-				$astz['dstyear'] = 0;
-				$astz['dstmonth'] = date('n', $dst_end['ts']);
-				$astz['dstday'] = date('w', $dst_end['ts']);
-				$dstweek = Date::get_occurring_number_of_day_in_month($dst_end['ts']);
-				if ($dstweek == 4) {
-					$dstweek = 5;
-				}
-				$astz['dstweek'] = $dstweek;
-				$astz['dsthour'] = date('G', $dst_end['ts']);
-				$astz['dstminute'] = intval(date('i', $dst_end['ts']));
-				$astz['dstsecond'] = 0;
-				$astz['dstdmillis'] = 0;
-				$astz['dstbias'] = ($dst_end['offset'] / -60) - $astz['bias'];
-			}
-			date_default_timezone_set($old);
-			GO::session()->values['activesync_timezone'] = base64_encode(call_user_func_array('pack', array_values($astz)));
-		}
-
-		/* $timezone = base64_encode(
-		  pack("la64vvvvvvvv" . "la64vvvvvvvv" . "l",
-		  -60, //bias, the standard timezone UTC offset in minutes, in this case +2 hour
-
-		  "Europe/Amsterdam", //stdname, we could give this timezone a name, like EET
-		  0, //stdyear, the year off the timezone, 0 means every year
-		  10, //stdmonth, the month the dst ends, 10 equals october
-		  0, //stdday, the day the dst ends, 0 equeals sunday
-		  5, //stdweek, weeknumber in the month the dst ends, where 1 will give the first dstendday of dstendmonth, 5 is the last dstendday of dstendmonth
-		  2, //stdhour, the hour the dst ends
-		  0, //stdminute
-		  0, //stdsecond
-		  0, //stdmillis
-		  0, //stdbias, the difference between timezone and std in minutes usually 0
-
-		  "", //dstname, name of dst version, like EEST
-		  0, //dstyear, the year off the timezone, 0 means every year
-		  3, //dstmonth, the month the dst start, 3 equals march
-		  0, //dstday, the day the dst starts, 0 equeals sunday
-		  5, //dstweek, weeknumber in the month the dst starts, where 1 will give the first dstendday of dstendmonth, 5 is the last dstendday of dstendmonth
-		  3, //dsthour, the hour the dst starts
-		  0, //dstminute
-		  0, //dstsecond
-		  0, //dstmillis
-		  -60 //dstbias, the difference between timezone and dst in minutes usually -60
-		  ));
-		  return $timezone; */
-
-		//test n900
-		//return 'xP///0UAdQByAG8AcABlAC8AQQBtAHMAdABlAHIAZABhAG0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAIAAAAAAAAAAAAAAEUAdQByAG8AcABlAC8AQQBtAHMAdABlAHIAZABhAG0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAMAAAAAAAAAxP///w==';
-		//GMT
-		/* return base64_encode(
-		  pack("la64vvvvvvvv" . "la64vvvvvvvv" . "l",
-		  0, "", 0, 0, 0, 0, 0, 0, 0, 0,
-		  0, "", 0, 0, 0, 0, 0, 0, 0, 0,
-		  0
-		  )); */
-
-		return GO::session()->values['activesync_timezone'];
-	}
 
 	/**
 	 * Translates rrule field, repeat_end_time field, and start_time field from

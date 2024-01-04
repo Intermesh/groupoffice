@@ -69,7 +69,7 @@ export class YearView extends CalendarView {
 				.attr('data-month', m)
 				.on('click', ev =>  {
 					this.fire('monthclick', this, monthDay)
-				} );
+				});
 
 		const header = E('tr',E('td'));
 		for(let i=0;i < 7;i++) {

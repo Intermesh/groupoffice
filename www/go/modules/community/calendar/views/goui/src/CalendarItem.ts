@@ -141,14 +141,16 @@ export class CalendarItem {
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {
 				eventDS.destroy(this.data.id);
+				Object.values(this.divs).forEach(d => d.remove())
 			});
 		} else {
 			const w = win({
 					title: t('Do you want to delete a recurring event?'),
 					modal: true,
+					width: 500,
 				},comp({
 					cls:'pad',
-					html: t('You will be deleting a recurring event. Do you want to delete this occurrence only or all future occurrences?')
+					html: t('You will be deleting a recurring event. Do you want to delete this occurrence only or all future occurrences?'),
 				}),tbar({},btn({
 						text: t('This event'),
 						cls:'primary',
@@ -157,8 +159,8 @@ export class CalendarItem {
 						text: t('All future events'),
 						handler: _b => { this.removeFutureEvents(); w.close(); }
 					}),'->',btn({
-						text: t('Cancel'), // save to series
-						handler: _b => w.close()
+						text: t('All events'), // the series
+						handler: _b => { eventDS.destroy(this.data.id); w.close(); }
 					})
 				)
 			)
@@ -176,6 +178,12 @@ export class CalendarItem {
 
 	get color() {
 		return this.data.color || this.cal?.color || '356772';
+	}
+
+	/** amount of days this event is spanning */
+	get dayLength() {
+		// 1 day + the distance in days between start and end. - 1 second of end = 00:00:00
+		return 1 + this.start.diffInDays(this.end.clone().addSeconds(-1));
 	}
 
 	save(onCancel: Function) {
@@ -218,12 +226,15 @@ export class CalendarItem {
 		const type = this.shouldSchedule(modified);
 		if(type) {
 			const askScheduleWin = win({
-					width: 500,
+					width: 550,
 					modal: true,
 					closable: false,
 					title: t(type+'ScheduleTitle'),
 				},
-				comp({cls: 'pad', html: t(type+'ScheduleText')}),
+				comp({cls: 'pad flow'},
+					comp({tagName:'i',cls:'icon',html:'email', width:100, style:{fontSize:'3em'}}),
+					comp({html: t(type+'ScheduleText'), flex:1}),
+				),
 				tbar({},
 					btn({
 						text: t('Cancel'), handler: () => {
@@ -245,7 +256,13 @@ export class CalendarItem {
 	}
 
 	get isOwner() {
-		return !this.data.participants || this.data.participants[this.participantId]?.roles?.owner || false;
+		return !this.data.participants || this.currentParticipant?.roles?.owner || false;
+	}
+
+	get currentParticipant() {
+		if(!this.data.participants)
+			return
+		return this.data.participants[this.participantId];
 	}
 
 	private get isInPast() {
@@ -265,18 +282,18 @@ export class CalendarItem {
 		eventDS.update(this.data.id, {participants: this.data.participants});
 	}
 
-	shouldSchedule(m: Partial<CalendarEvent>|false) {
+	shouldSchedule(modified: Partial<CalendarEvent>|false) {
 		if((!this.data.isOrigin && this.key) || this.isInPast)
 			return;
-		if(m === false) {
+		if(modified === false) {
 			return this.data.participants ? 'cancel' : undefined;
 		}
-		 if(m.participants || this.data.participants) {
+		 if(modified.participants || this.data.participants) {
 			if(!this.key) {
 				return 'new';
 			} else {
 				if(['start','duration','end','description','title','showWithoutTime','isAllDay', 'location','participants']
-					.some(k => m.hasOwnProperty(k)))
+					.some(k => modified.hasOwnProperty(k)))
 				{
 					return 'update';
 				}
@@ -294,11 +311,12 @@ export class CalendarItem {
 		} else {
 			const w = win({
 					title: t('Do you want to edit a recurring event?'),
+					width:550,
 					modal: true,
-				},comp({
-					cls:'pad',
-					html: t('You will be editing a recurring event. Do you want to edit this occurrence only or all future occurrences?')
-				}),tbar({},btn({
+				},comp({cls: 'pad flow'},
+					comp({tagName:'i',cls:'icon',html:'recurring', width:100, style:{fontSize:'3em'}}),
+					comp({html: t('You will be editing a recurring event. Do you want to edit this occurrence only or all future occurrences?'), flex:1}),
+				),tbar({},btn({
 						text: t('This event'),
 						cls:'primary',
 						handler: _b => { this.patchOccurrence(modified, onFinish); w.close(); }
@@ -306,8 +324,8 @@ export class CalendarItem {
 						text: t('All future events'),
 						handler: _b => { this.patchThisAndFuture(); }
 					}),'->',btn({
-						text: t('Cancel'), // save to series
-						handler: _b => w.close()
+						text: t('All events'), // save to series
+						handler: _b => {eventDS.update(this.data.id, modified);  w.close(); }
 					})
 				)
 			)

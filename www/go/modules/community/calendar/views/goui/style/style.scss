@@ -49,12 +49,15 @@
 		border-width: 1px;
 		border-style: solid;
 	}
-	&.allday, dd > & {
+	&.allday,&.multiday, dd > & {
 		background-color: color-mix(in srgb, currentColor 76%, transparent);
 		//background-color:currentcolor;
 		> i, > em {color:$colorTextSecondary;}
 
 	}
+	//&.multiday {
+	//	box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 76%, transparent);
+	//}
 	&.selected {
 		//filter: brightness(80%);
 		background-color: currentColor;
@@ -62,7 +65,7 @@
 		> *, &:not(.allday)::before {color:white; }
 	}
 	&.declined {
-		text-decoration: line-through;
+		text-decoration: line-through white;
 	}
 
 	&.tentative {
@@ -119,6 +122,7 @@
 		}
 
 		td {
+			>span{cursor: pointer;}
 			&.today {
 				font-weight: 500;
 				color: $colorPrimary;
@@ -157,6 +161,7 @@
 		}
 
 		td.weeknb {
+			cursor: pointer;
 			color: $colorTextSecondary;
 			//font-size: .9em;
 		}
@@ -444,7 +449,7 @@ $halfHour: 3.5vh;
 		position: absolute;
 		border-left: 3px solid rgba(0,0,0,.25);
 		border-top: 1px solid rgba(0,0,0,.25);
-		> em, > span {
+		> em, > span, > i {
 			color: white;
 		}
 		> span { //time

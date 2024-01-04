@@ -20,9 +20,14 @@ export abstract class CalendarView extends Component {
 	protected firstDay?: DateTime
 	protected recur?: {[id:string]: Recurrence}
 	protected contextMenu = menu({removeOnClose:false, isDropdown: true},
-		btn({icon:'open_with', text: t('Show'), handler:_ =>alert(this.current!.data.id)}),
+		//btn({icon:'open_with', text: t('Show'), handler:_ =>alert(this.current!.data.id)}),
 		btn({icon:'edit', text: t('Edit'), handler: _ => this.current!.open()}),
-		btn({icon:'email', text: t('E-mail participants')}),
+		btn({icon:'email', text: t('E-mail participants'), handler: _ => {
+				if (this.current!.data.participants){
+					go.showComposer({to: Object.values(this.current!.data.participants).map((p:any) => p.email)});
+				}
+			}
+		}),
 		//'-',
 		btn({icon:'delete', text: t('Delete'), handler: _ => this.current!.remove() }),
 		btn({icon: 'import_export', text: t('Download ICS'), handler: _ => this.current!.downloadIcs() })
@@ -36,14 +41,6 @@ export abstract class CalendarView extends Component {
 	constructor(store: DataSourceStore<JmapDataSource<CalendarEvent>>) {
 		super();
 		this.store = store
-		this.el.on('keydown', (e: KeyboardEvent) => {
-			if(e.key == 'Delete') {
-				const i = this.viewModel.indexOf(this.selected[0]);
-				if(i > -1) {
-					this.viewModel.splice(i,1);
-				}
-			}
-		});
 	}
 
 	update = (data?: any) => {
@@ -57,17 +54,27 @@ export abstract class CalendarView extends Component {
 	protected eventHtml(item: CalendarItem) {
 		const e = item.data;
 		const icons = []
-		if(!e.showWithoutTime && this instanceof MonthView) icons.push('fiber_manual_record')
+		if(!e.showWithoutTime && this instanceof MonthView) icons.push('fiber_manual_record') // the dot
 		if(e.recurrenceRule) icons.push('refresh');
 		if(e.links) icons.push('attachment');
 		if(e.alerts) icons.push('notifications');
 		if(!!e.participants) icons.push('group');
 
+		let time = [];
+		if(!e.showWithoutTime) {
+			time.push(E('b',item.start.format('G:i')));
+			if(item.dayLength > 1) {
+				time.push(E('b',item.end.format(' - G:i')));
+			}
+		}
+
 		return E('div',
 			...icons.map(i=>E('i',i).cls('icon')),
 			E('em', item.title || '('+t('Nameless')+')'),
-			E('span',  e.showWithoutTime === false ? item.start.format('G:i'):'')
+			E('span',  time[0]||'',time[1]||'')
 		).cls('allday',e.showWithoutTime)
+			.cls('declined', item.currentParticipant?.participationStatus === 'declined')
+			.cls('multiday', !e.showWithoutTime && item.dayLength > 1)
 			.attr('data-key', item.key || '_new_')
 			.attr('tabIndex', 0)
 			.on('click',(ev)=> {
@@ -77,7 +84,7 @@ export abstract class CalendarView extends Component {
 				}
 				Object.values(item.divs).forEach(d => d.cls('+selected'));
 				this.selected.push(item);
-				console.log(item);
+				//console.log(item);
 				// if(!ev.target.has('.moving')) {
 				// 	const dlg = new EventDialog();
 				// 	dlg.show();
@@ -129,17 +136,18 @@ export abstract class CalendarView extends Component {
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
 		const day = weekstart.diffInDays(e.start),
 			pos = Math.max(0,day);
-		let length = e.start.diffInDays(e.end) || 1;
-		if(day < 0) {
-			length+= day
-		}
+		let length = e.dayLength;
+		//console.log(length, e.title,e.start.format('d-m-Y H:i:s'), e.end.format('d-m-Y H:i:s'));
+		// if(day < 0) {
+		// 	length+= day
+		// }
 		row = row ?? this.calcRow(pos, length);
 
 		const width = Math.min(14, length) * (100 / Math.min(this.days,7)),
 			left = pos * (100 / Math.min(this.days,7)),
 			top = row * this.ROWHEIGHT;
 		return {
-			width: (width-.5).toFixed(2)+'%',
+			width: (width-.3).toFixed(2)+'%',
 			left : left.toFixed(2)+'%',
 			top: top.toFixed(2)+'px',
 			color: '#'+e.color
