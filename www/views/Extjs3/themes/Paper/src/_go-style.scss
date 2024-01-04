@@ -985,6 +985,11 @@ hr {
 }
 
 .status {
+
+	.x-grid3-cell-inner & {
+		float: left; //to avoid ellipsis
+	}
+
 	@extend %font-subheading-dense;
 	text-transform:uppercase;
 	padding-left: dp(8);
