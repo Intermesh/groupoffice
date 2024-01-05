@@ -1,5 +1,7 @@
-- Email: Added buttons to move or delete the complete search result.
+- Core: Added "strike through" button in html editor
+
 05-01-2024: 6.8.27
+- Email: Added buttons to move or delete the complete search result.
 - Email: Sieve rule now uses configured Spam / Junk folder
 - Core: Set password via CLI: /cli.php core/System/setPassword --username=admin
 - Email: fix sorting bug
@@ -11,7 +13,7 @@
 - Finance: Added dutch translations
 - Finance: Sort articles and wider list to pick from
 - Core: Fixed saving reordering array relations when only the sort order was modified
-- Core: Added "strike through" button in html editor
+
 
 22-12-2023: 6.8.26
 - Email: Check if the IMAP server supports "MOVE" before using UID MOVE. Otherwise fall back on COPY + DELETE.
