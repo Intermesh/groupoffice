@@ -1,6 +1,8 @@
 - Core: Added "strike through" button in html editor
 - Finance: Customer filter can also select organizations now
 - Support: Migrate couldn't be started.
+- Business: E-mail account could not be selected.
+- Core: Group membership not shown at user.
 
 05-01-2024: 6.8.27
 - Email: Added buttons to move or delete the complete search result.
