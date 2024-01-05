@@ -41,7 +41,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 						));
 
 
-		if($params['sort'] == 'user') {
+		if(isset($params['sort'] ) && $params['sort'] == 'user') {
 			$findParams->ignoreAdminGroup();
 			$findParams->joinModel(array(
 				'model' => 'GO\Email\Model\AccountSort',
