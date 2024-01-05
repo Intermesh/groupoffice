@@ -121,7 +121,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			this.updateCls();
 		}, this);
 
+
+
 		go.form.FormGroup.superclass.initComponent.call(this);
+
+		if(this.value) {
+			this.setValue(this.value);
+		}
 	},
 
 	afterRender: function() {
