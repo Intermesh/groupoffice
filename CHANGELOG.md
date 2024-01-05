@@ -1,4 +1,5 @@
 - Email: Added buttons to move or delete the complete search result.
+05-01-2024: 6.8.27
 - Email: Sieve rule now uses configured Spam / Junk folder
 - Core: Set password via CLI: /cli.php core/System/setPassword --username=admin
 - Email: fix sorting bug
