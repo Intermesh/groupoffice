@@ -10,6 +10,7 @@
 - Finance: Added dutch translations
 - Finance: Sort articles and wider list to pick from
 - Core: Fixed saving reordering array relations when only the sort order was modified
+- Core: Added "strike through" button in html editor
 
 22-12-2023: 6.8.26
 - Email: Check if the IMAP server supports "MOVE" before using UID MOVE. Otherwise fall back on COPY + DELETE.
