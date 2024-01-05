@@ -637,11 +637,11 @@ abstract class Property extends Model {
 	/**
 	 * Get ID which is are the primary keys combined with a "-".
 	 *
-	 * @return string|null eg. "1" or with multiple keys: "1-2"
+	 * @return int|string|null eg. 1 or with multiple keys: "1-2"
 	 */
-	public function id() : ?string {
+	public function id() : string|int|null {
 		if(property_exists($this, 'id')) {
-			return isset($this->id) ? (string) $this->id : null;
+			return $this->id ?? null;
 		}
 		$keys = $this->primaryKeyValues();
 		if(empty($keys)) {
