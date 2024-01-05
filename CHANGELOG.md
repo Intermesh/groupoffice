@@ -1,4 +1,5 @@
 - Core: Added "strike through" button in html editor
+- Finance: Customer filter can also select organizations now
 
 05-01-2024: 6.8.27
 - Email: Added buttons to move or delete the complete search result.
