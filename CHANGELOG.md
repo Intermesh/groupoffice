@@ -1,4 +1,17 @@
+18-12-2023: 6.7.60
+- Tickets: External URL didn't work
+- Addressbook: Fixed age in birthday portlet when it's in january
+- Addressbook: Added age column to main grid
+- Newsletters: Sort accounts like in the email tree
+
+12-12-2023: 6.7.59
+- Core: Equals must accept any argument
+
+11-12-2023: 6.7.58
 - Addressbook: Last name was wrongfully set on organizations
+- Newsletters: Fixed null:null in composer
+- Core: Appearance colors can be set for dark mode too now in System settings.
+- Core: fix for grey lines in form field labels
 
 04-12-2023: 6.7.57
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
@@ -306,6 +319,11 @@
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
 
+11-12-2023: 6.6.181
+- Core: Better license check
+- Projects: remove vestigial permissions panel
+
+04-12-2023: 6.6.180
 - Core: Added $config['lockWithFlock'] to force locking with flock version as we have a server that sometimes fails with sem_get()
 - Files: Folder was outputted in CLI mode when filesystem was synced. (LDAP sync for example).
 
@@ -340,7 +358,7 @@
 
 27-09-2023: 6.6.172
 - Leavedays: bugfix in leave day requset
->
+
 25-09-2023: 6.6.171
 - Leavedays: bugfix - employee can request leave day budgets
 - Core: Add Jersey and Isle of Man to countries list

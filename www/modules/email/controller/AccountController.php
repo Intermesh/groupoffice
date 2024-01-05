@@ -27,25 +27,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 	}
 
 
-//	protected function actionTest($params){
-//
-//		\GO::$disableModelCache=true;
-//
-//		for($i=0;$i<1000;$i++){
-//
-//			echo $i."<br>";
-//			${"account".$i} = \GO\Email\Model\Account::model()->findSingle();
-//
-//			${"account".$i}->openImapConnection("INBOX");
-//		}
-//
-//
-//
-//	}
-
-//	protected function headers() {
-//		header('Content-Type: application/json; charset=UTF-8');
-//	}
 	protected function getStoreParams($params) {
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
@@ -58,6 +39,21 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 				'type' => 'INNER',
 				'criteria' => \GO\Base\Db\FindCriteria::newInstance()->addCondition('default', 1, '=', 'a')
 						));
+
+
+		if($params['sort'] == 'user') {
+			$findParams->ignoreAdminGroup();
+			$findParams->joinModel(array(
+				'model' => 'GO\Email\Model\AccountSort',
+				'foreignField' => 'account_id', //defaults to primary key of the remote model
+				'localField' => 'id', //defaults to primary key of the model
+				'type' => 'LEFT',
+				'tableAlias'=>'s',
+				'criteria'=>  \GO\Base\Db\FindCriteria::newInstance()->addCondition('user_id', \GO::user()->id,'=','s')
+			));
+			$findParams->order('s.order', 'ASC');
+			unset($params['sort']);
+		}
 
 		return $findParams;
 	}

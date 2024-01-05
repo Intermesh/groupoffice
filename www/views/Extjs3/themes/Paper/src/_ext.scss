@@ -614,6 +614,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 			&.x-form-empty-label:not(&.x-form-focus-label) {
 				top: dp(28);
 				font-size: sp(16);
+				height: 0;
 			}
 
 			padding: 0 dp(4);

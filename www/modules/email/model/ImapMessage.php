@@ -105,7 +105,7 @@ class ImapMessage extends ComposerMessage {
 		if($searchIn=="all") {
 			foreach ($account->getRootMailboxes(false, true) as $mailbox) {
 			
-				//only search visable mailboxes not subscriptions
+				//only search visible mailboxes not subscriptions
 				if(!$mailbox->isVisible() || $mailbox->noselect)
 					continue;
 
