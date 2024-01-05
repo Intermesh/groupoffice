@@ -44185,7 +44185,8 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             items.push(
                 btn('bold'),
                 btn('italic'),
-                btn('underline')
+                btn('underline'),
+	              btn('strikeThrough')
             );
         }
 
@@ -45017,6 +45018,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             text: 'Underline the selected text.',
             cls: 'x-html-editor-tip'
         },
+
         increasefontsize : {
             title: 'Grow Text',
             text: 'Increase the font size.',
