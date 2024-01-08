@@ -84,6 +84,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		
 		this.formPanel.on("save", function(fp, entity) {
+			this.currentId = entity.id;
 			this.fireEvent("save", this, entity);
 		}, this);
 		
