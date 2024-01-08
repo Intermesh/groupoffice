@@ -12,6 +12,7 @@
 - Finance: Create new articles from finance document dialog
 - Finance: check if there are unverified payments before sending out reminders
 - Core: New tab could be closed unexpectedly when viewing pdf attachments
+- Core: Fixed changing language after switching to user with another language
 
 05-01-2024: 6.8.27
 - Email: Added buttons to move or delete the complete search result.
