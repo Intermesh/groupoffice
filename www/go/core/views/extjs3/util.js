@@ -381,6 +381,8 @@ go.util =  (function () {
 			win.focus();
 			win.location.replace(url);
 
+			this.downloadTarget = undefined;
+
 		},
 
 		getDownloadTargetWindow : function() {
