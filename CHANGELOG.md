@@ -1,4 +1,4 @@
-
+08-01-2024: 6.8.28
 - Core: Added "strike through" button in html editor
 - Finance: Customer filter can also select organizations now
 - Support: Migrate couldn't be started.
