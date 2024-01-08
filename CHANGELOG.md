@@ -10,6 +10,7 @@
 - Addressbook: When creating new contacts / organizations from a combobox a dialog will open
 - Finance: Create new articles from finance document dialog
 - Finance: check if there are unverified payments before sending out reminders
+- Core: New tab could be closed unexpectedly when viewing pdf attachments
 
 05-01-2024: 6.8.27
 - Email: Added buttons to move or delete the complete search result.
