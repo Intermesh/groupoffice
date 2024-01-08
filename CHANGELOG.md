@@ -1,3 +1,4 @@
+08-01-2024: 6.7.61
 - Core: New tab could be closed unexpectedly when viewing pdf attachments
 - Newsletters: Sort accounts like in the email tree
 
