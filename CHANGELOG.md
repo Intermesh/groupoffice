@@ -1,3 +1,5 @@
+- Core: New tab could be closed unexpectedly when viewing pdf attachments
+
 18-12-2023: 6.7.60
 - Tickets: External URL didn't work
 - Addressbook: Fixed age in birthday portlet when it's in january
