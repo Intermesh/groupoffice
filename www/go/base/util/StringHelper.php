@@ -1353,17 +1353,11 @@ END;
 		// Generate array of allowed characters by removing disallowed
 		// characters from array.
 		$array_allow = array_diff($array_allow, $array_disallow);
-
 		// Resets the keys since they won't be consecutive after
 		// removing the disallowed characters.
 		reset($array_allow);
-		$new_key = 0;
-		while (list ($key, $val) = each($array_allow)) {
-			$array_allow_tmp[$new_key] = $val;
-			$new_key ++;
-		}
+    $array_allow = array_values($array_allow);
 
-		$array_allow = $array_allow_tmp;
 		$password = '';
 		while (strlen($password) < $password_length) {
 			$character = mt_rand(0, count($array_allow) - 1);
