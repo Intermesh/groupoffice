@@ -51,7 +51,8 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 				'tableAlias'=>'s',
 				'criteria'=>  \GO\Base\Db\FindCriteria::newInstance()->addCondition('user_id', \GO::user()->id,'=','s')
 			));
-			$findParams->order('s.order', 'ASC');
+			$findParams->order('s.order', 'DESC');
+
 			unset($params['sort']);
 		}
 

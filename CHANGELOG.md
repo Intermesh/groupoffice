@@ -1,3 +1,4 @@
+
 - Core: Added "strike through" button in html editor
 - Finance: Customer filter can also select organizations now
 - Support: Migrate couldn't be started.
@@ -193,6 +194,9 @@
 
 
 -- 6.8 --
+
+- Core: New tab could be closed unexpectedly when viewing pdf attachments
+- Newsletters: Sort accounts like in the email tree
 
 18-12-2023: 6.7.60
 - Tickets: External URL didn't work
