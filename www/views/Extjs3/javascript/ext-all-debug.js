@@ -27561,6 +27561,8 @@ Ext.Window = Ext.extend(Ext.Panel, {
     
     floating : true,
 
+	restoreFocusOnClose: true,
+
     
     initComponent : function(){
         this.initTools();
@@ -27598,7 +27600,7 @@ Ext.Window = Ext.extend(Ext.Panel, {
 		}, this);
 		
 		this.on("close", function() {
-			if(this.activeEl) {
+			if(this.activeEl && this.restoreFocusOnClose) {
 				setTimeout(() => {
 					this.activeEl.focus();
 				});
@@ -27606,7 +27608,7 @@ Ext.Window = Ext.extend(Ext.Panel, {
 		}, this);
 		
 		this.on("hide", function() {
-			if(this.activeEl) {
+			if(this.activeEl && this.restoreFocusOnClose) {
 				setTimeout(() => {
 					this.activeEl.focus();
 				});
