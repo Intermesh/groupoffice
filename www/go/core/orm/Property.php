@@ -637,6 +637,8 @@ abstract class Property extends Model {
 	/**
 	 * Get ID which is are the primary keys combined with a "-".
 	 *
+	 * Note: if this logic ever changes it must be changed here too: {@see \go\core\jmap\Entity::changesQuery()}
+	 *
 	 * @return int|string|null eg. 1 or with multiple keys: "1-2"
 	 */
 	public function id() : string|int|null {
