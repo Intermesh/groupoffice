@@ -5,6 +5,7 @@
 - Core: Group membership not shown at user.
 - Finance: Profiles of other businesses where shown in company dialog
 - Finance: Handle if business has no VAT rates set.
+- Filesearch: Fixed custom field filtering
 
 05-01-2024: 6.8.27
 - Email: Added buttons to move or delete the complete search result.
