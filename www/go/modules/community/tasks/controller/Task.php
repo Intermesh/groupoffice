@@ -118,8 +118,13 @@ class Task extends EntityController {
 				->selectSingleValue("count(*)")
 				->filter([
 					"tasklistId" => $defaultListId,
-					"complete" => false,
-					'due' => '< tomorrow'
+					"complete" => false
+				])->filter([
+					"operator" => "OR",
+					"conditions" => [
+						["due" => '< tomorrow'],
+						["due" => null]
+					]
 				]);
 
 		}
