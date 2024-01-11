@@ -17,10 +17,12 @@
 namespace GO\Calendar\Views\Pdf;
 
 use GO;
+use GO\Base\Util\Date;
+use GO\Base\Util\Pdf;
 
 
-class CalendarPdf extends \GO\Base\Util\Pdf {
-	
+final class CalendarPdf extends Pdf {
+	private $pageWidth;
 	private $_start_time = '';
 	private $_end_time = '';
 	private $_title = '';
@@ -33,13 +35,13 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 	private $_view=false;
 	
 	public $cell_height = 12;
+	private string|int $_daysDone;
 
 	public function setParams($response, $view=false) {
 		
 		if(!$view){
 			$responses = array($response);
-		}else
-		{
+		} else {
 			$responses = $response['results'];
 		}
 		
@@ -67,10 +69,6 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 		$this->SetTextColor(50, 135, 172);
 		$this->SetFont($this->font, 'B', 16);
 		
-		//$this->Write(16,$this->_headerTitle ." ");
-		
-	//	$this->Write(16, \GO::user()->name . ' ');					// Print the name of the user instead of the first calendar name.
-	//	$this->Write(16, $this->_calendar->name . ' ');
 		$this->SetTextColor(125, 162, 180);
 		$this->SetFont($this->font, '', 12);
 		$this->setY($this->getY() + 3.5, false);
@@ -104,8 +102,7 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 		}
 	
 		$fullDays = \GO::t("full_days");
-		$calendarPrinted=false;
-		
+
 		for ($i = 0; $i < $this->_days; $i++) {
 			$cellEvents[$i] = array();
 		}
@@ -118,7 +115,6 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 			if($headers)
 				$this->AddPage();
 
-			$calendarPrinted=true;
 			//green border
 			$this->SetDrawColor(125, 165, 65);
 
@@ -127,7 +123,6 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 
 			$nameColWidth = 100;
 			$cellWidth = !empty($calendar_name) ? ($this->pageWidth - $nameColWidth) / $maxCells : $this->pageWidth / $maxCells;
-			$timeColWidth = $this->GetStringWidth(date(\GO::user()->time_format, mktime(23, 59, 0)), $this->font, '', $this->font_size) + 5;
 
 			$time_format = str_replace('G', 'H', \GO::user()->time_format);
 			$time_format = str_replace('g', 'h', $time_format);
@@ -150,7 +145,7 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 						$cellEvents[$i][$key] = $event;
 					}
 					
-					$time = \GO\Base\Util\Date::date_add($time, 1);
+					$time = Date::date_add($time, 1);
 				}
 				$this->Ln();
 			}
@@ -167,7 +162,6 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 			$yBefore = $this->getY();
 			$tableLeftMargin = $this->lMargin;
 			if (!empty($calendar_name)) {
-				//$this->SetTextColor(125,165, 65);
 				$this->SetTextColor(0, 0, 0);
 				$this->SetX($this->lMargin);
 				$this->MultiCell($nameColWidth, $this->cell_height, $calendar_name, 0, 'L');
@@ -189,7 +183,7 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 				// If we are using the month view
 				if ($this->_days > 7) {
 					
-					$time = \GO\Base\Util\Date::date_add($this->_start_time, $i);
+					$time = Date::date_add($this->_start_time, $i);
 					
 					// Add the day we are printing to the events array
 					foreach ($cellEvents[$i] as $key=>$event) {
@@ -203,7 +197,6 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 
 				$nCellsOfColumn = 0;
 				
-				//while($event = array_shift($cellEvents[$i]))
 				foreach ($cellEvents[$i] as $event) {
 
 					if(isset($event['day_for_printing']) && empty($event['all_day_event']) && $event['day_for_printing'] > strtotime($event['start_time'])){
@@ -217,17 +210,13 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 					$event['description']= !empty($event['description']) ? html_entity_decode($event['description']) : '';
 					$event['location']= !empty($event['location']) ? html_entity_decode($event['location']) : '';
 
-					//$this->Cell($timeColWidth, $this->cell_height, $time, 0, 0, 'L');
-					//$this->MultiCell($cellWidth-$timeColWidth,$this->cell_height, $event['name'], 0, 1, 0, 1, '', '', true, 0, false, false, 0);
-					//$this->SetFillColor( hexdec(substr($event['background'], 0, 2)),hexdec(substr($event['background'], 2, 2)), hexdec(substr($event['background'], 4, 2)));
 					$this->SetFillColor(hexdec(substr($event['background'], 0, 2)), hexdec(substr($event['background'], 2, 2)), hexdec(substr($event['background'], 4, 2)));
 					
-					//$this->Cell($timeColWidth, $this->cell_height, $time, 0, 0, 'L', 1);
-					
-					if(!empty($event['status_color']))
+					if (!empty($event['status_color'])) {
 						$event_background_color = array(hexdec(substr($event['background'], 0, 2)), hexdec(substr($event['background'], 2, 2)), hexdec(substr($event['background'], 4, 2)));
-					else
+					} else {
 						$event_background_color = array(125, 165, 65);
+					}
 					
 					$event_name	= $event['name'];
 					
@@ -247,10 +236,9 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 
 					$this->SetFillColorArray($event_background_color);
 					
-					$nCells = $this->MultiCell($cellWidth /*- $timeColWidth*/, $this->cell_height,$event_name, array('B'=>array('width' => 2,'color' => array(255, 255, 255))), 1, 1, 1, '', '', true, 0, false, false, 0);
+					$nCells = $this->MultiCell($cellWidth, $this->cell_height,$event_name, array('B'=>array('width' => 2,'color' => array(255, 255, 255))), 1, 1, 1, '', '', true, 0, false, false, 0);
 					$nCellsOfColumn += $nCells;
 					
-					// $this->MultiCell($cellWidth /*- $timeColWidth*/, $this->cell_height, $event['name'], 'B', 1, 1, 1, '', '', true, 0, false, false, 0);	
 					$this->SetDrawColor(125,165, 65);
 					$this->SetLineWidth(1); //similiar to cellspacing
 					
@@ -282,11 +270,12 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 					$this->_daysDone+=$maxCells;
 
 					//minimum cell height
-						$cellHeight = $sizeOfLongestColumn;// $maxY - $cellStartY;
-						$sizeOfLongestColumn = 0;
-						$nCellsOfLongestColumn = 0;
-						if ($cellHeight < $minHeight)
-							$cellHeight = $minHeight;
+					$cellHeight = $sizeOfLongestColumn;// $maxY - $cellStartY;
+					$sizeOfLongestColumn = 0;
+					$nCellsOfLongestColumn = 0;
+					if ($cellHeight < $minHeight) {
+						$cellHeight = $minHeight;
+					}
 
 					if ($cellHeight + $this->getY() > $this->h - $this->bMargin) { // If cell height would exceed page's current writable space.
 						
@@ -303,11 +292,9 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 
 							if (!empty($calendar_name)) {
 								$this->Cell($nameColWidth, $cellHeightFirstPart, '', 'LTR', 0); // Draw cell with left-top-right border for the remaining writable space on the page.
-//								$this->setPage($pageStart);
 							}
 							for ($n = 0; $n < $maxCells; $n++) { // For at most 7 times...
 								$this->Cell($cellWidth, $cellHeightFirstPart, '', 'LTR', 0); // ...Draw a cell with left-top-right border for the remaining writable space on the page.
-//								$this->setPage($pageStart);
 							}
 							$this->ln(); // Draw horizontal line.
 
@@ -319,11 +306,9 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 						
 						if (!empty($calendar_name)) {
 							$this->Cell($nameColWidth, $cellHeightRemaining, '', 'LBR', 0); // 
-//							$this->setPage($pageStart);
 						}
 						for ($n = 0; $n < $maxCells; $n++) {
 							$this->Cell($cellWidth, $cellHeightRemaining, '', 'LBR', 0);
-//							$this->setPage($pageStart);
 						}
 						$this->ln();
 						
@@ -355,13 +340,7 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 
 			$this->CurOrientation = 'P';
 
-			/*if ($this->_days > 7) {
-				$this->AddPage();
-			} else {
-				$this->w = 595.28;
-			}*/
-			//if($calendarPrinted)
-				$this->AddPage();
+			$this->AddPage();
 
 			$this->H1(\GO::t("List of appointments", "calendar"));
 
@@ -446,15 +425,16 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 						$this->ln(10);
 					}
 				}
-				$time = \GO\Base\Util\Date::date_add($time, 1);
+				$time = Date::date_add($time, 1);
 			}
 		}
 	}
 
 	private function _loadCurrentCalendar($calendarId) {
 		
-		if(empty($calendarId))
-			throw new FileNotFoundException();
+		if(empty($calendarId)) {
+			throw new GO\Base\Exception\NotFound();
+		}
 		
 		$this->_calendar = \GO\Calendar\Model\Calendar::model()->findByPk($calendarId);
 	}
@@ -473,9 +453,8 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 				$event['location'] = '';
 			}
 
-			//$cellIndex = floor(($index_time-$this->_start_time)/86400);
-			$cellIndex = \GO\Base\Util\Date::date_diff_days($this->_start_time, $index_time);
-			$index_time = \GO\Base\Util\Date::date_add($index_time, 1);
+			$cellIndex = Date::date_diff_days($this->_start_time, $index_time);
+			$index_time = Date::date_add($index_time, 1);
 			$cellEvents[$cellIndex][] = $event;
 		}
 	}

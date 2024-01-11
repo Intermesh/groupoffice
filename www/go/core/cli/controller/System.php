@@ -23,6 +23,7 @@ use Faker;
 use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
+use go\core\util\Cli;
 use go\core\util\DateTime;
 use go\core\util\JSON;
 use go\core\util\PdfRenderer;
@@ -524,5 +525,40 @@ JSON;
 		if($count != 1) {
 			throw new Exception($count. " Could not update ".$column->getTable()->getName().".". $column->name);
 		}
+	}
+
+
+	/**
+	 * Set password for user
+	 *
+	 * @throws SaveException
+	 * @throws Exception
+	 */
+	public function setPassword(array $params): void
+	{
+
+		$this->checkParams($params, ['username']);
+
+		$user = User::find()->where('username', '=', $params['username'])->single();
+
+		if(!$user) {
+			echo "User '" . $params['username'] ."' not found";
+			exit(1);
+		}
+
+		$password1 = Cli::prompt("Enter new password for user '" . $params['username'] . "':", true);
+		$password2 = Cli::prompt("Confirm new password:", true);
+
+		if($password2 !== $password1) {
+			echo "Passwords didn't match\n";
+			exit(1);
+		}
+
+		$user->setPassword($password1);
+		if(!$user->save()) {
+			throw new SaveException($user);
+		}
+
+		echo "Password changed successfully\n";
 	}
 }

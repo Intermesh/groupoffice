@@ -874,7 +874,7 @@ abstract class EntityController extends Controller {
    */
 	private function updateEntities(array $update, ArrayObject $result) {
 		foreach ($update as $id => $properties) {
-			$id = (string) $id;
+//			$id = (string) $id;
 			if(empty($properties)) {
 				$properties = [];
 			}
@@ -940,7 +940,7 @@ abstract class EntityController extends Controller {
 
 		$doDestroy = [];
 		foreach ($destroy as $id) {
-			$id = (string) $id;
+//			$id = (string) $id;
 			$entity = $this->getEntity($id);
 			if (!$entity) {
 				$result['notDestroyed'][$id] = new SetError('notFound', go()->t("Item not found"));

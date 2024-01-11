@@ -16,6 +16,7 @@ namespace GO\Email\Model;
 
 use GO;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
+use GO\Base\Mail\Exception\MailboxNotFound;
 use GO\Base\Mail\Imap;
 use go\modules\community\oauth2client\model\DefaultClient;
 use go\modules\community\oauth2client\model\Oauth2Client;
@@ -212,9 +213,15 @@ class Account extends \GO\Base\Db\ActiveRecord
 	}
 
 
-	public function createDefaultFolders() {
+	/**
+	 * @throws MailboxNotFound
+	 * @throws ImapAuthenticationFailedException
+	 * @throws \Exception
+	 */
+	public function createDefaultFolders(): void
+	{
 		$imap = $this->openImapConnection();
-		$this->mbroot=$imap->check_mbroot($this->mbroot);
+		$this->mbroot=$imap->check_mbroot($this->mbroot ?? "INBOX");
 
 		$this->_createDefaultFolder('sent');
 		$this->_createDefaultFolder('trash');

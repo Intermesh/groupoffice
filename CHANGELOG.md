@@ -1,5 +1,44 @@
+- Core: Support double primary key in logging delete changes
+- Finance: Confirm overwrite of finance doc line with article data.
+- Files: Fixed Stored XSS Vulnerability via Malicious File Names in Upload Feature
+- Calendar/summary/Core: Add user was broken when start module was not installed and calendar was installed
+
+08-01-2024: 6.8.28
+- Core: Added "strike through" button in html editor
+- Finance: Customer filter can also select organizations now
+- Support: Migrate couldn't be started.
+- Business: E-mail account could not be selected.
+- Core: Group membership not shown at user.
+- Finance: Profiles of other businesses where shown in company dialog
+- Finance: Handle if business has no VAT rates set.
+- Filesearch: Fixed custom field filtering
+- Core: Combobox can open a dialog when adding a new item
+- Addressbook: When creating new contacts / organizations from a combobox a dialog will open
+- Finance: Create new articles from finance document dialog
+- Finance: check if there are unverified payments before sending out reminders
+- Core: New tab could be closed unexpectedly when viewing pdf attachments
+- Core: Fixed changing language after switching to user with another language
+
+05-01-2024: 6.8.27
+- Email: Added buttons to move or delete the complete search result.
+- Email: Sieve rule now uses configured Spam / Junk folder
+- Core: Set password via CLI: /cli.php core/System/setPassword --username=admin
+- Email: fix sorting bug
+- Calendar: fix several deprecation errors, cleaned up old stuff
+- Email: increase size of 'move old mail' dialog, add more descriptive icons to mailbox context menu
+- Core: Don't take over label color of background using javascript so we can use pure css for form fields.
+- Core: Remove ellipsis on status badge in grid
+- Finance: Don't set expiresAt until sentAt is set
+- Finance: Added dutch translations
+- Finance: Sort articles and wider list to pick from
+- Core: Fixed saving reordering array relations when only the sort order was modified
+
+
+22-12-2023: 6.8.26
+- Email: Check if the IMAP server supports "MOVE" before using UID MOVE. Otherwise fall back on COPY + DELETE.
 - Addressbook: Fixed age in birthday portlet when it's in january
 - Addressbook: Added age column to main grid
+- Email: Fix PHP deprecation error
 
 18-12-2023: 6.8.25
 - OAuth2Client: fix wrong path
@@ -161,6 +200,9 @@
 
 
 -- 6.8 --
+
+- Core: New tab could be closed unexpectedly when viewing pdf attachments
+- Newsletters: Sort accounts like in the email tree
 
 18-12-2023: 6.7.60
 - Tickets: External URL didn't work

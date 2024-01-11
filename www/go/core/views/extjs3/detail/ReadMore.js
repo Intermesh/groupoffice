@@ -38,9 +38,6 @@ go.detail.ReadMore = Ext.extend(Ext.Container, {
 			var content = this.getComponent('content');
 			if(content) {
 				content.update(text);
-			} else
-			{
-				console.log("wtf?");
 			}
 		} 
 	}

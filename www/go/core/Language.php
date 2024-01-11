@@ -76,7 +76,7 @@ class Language {
 		}
 	}
 
-	private function unsetCookie() {
+	public function unsetCookie() {
 		unset($_COOKIE['GO_LANGUAGE']);
 		setcookie("GO_LANGUAGE", "", -1, "/", Request::get()->getHost(), Request::get()->isHttps(), true);
 	}

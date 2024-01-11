@@ -93,6 +93,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		this.itemCfg.isFormField = false;
 		this.markDeleted = [];
 		this.itemCfg.columnWidth = 1;
+		this.itemCfg.submit = false;
 
 		if(this.required && this.startWithItem === undefined) {
 			this.startWithItem = true;
@@ -121,7 +122,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			this.updateCls();
 		}, this);
 
+
+
 		go.form.FormGroup.superclass.initComponent.call(this);
+
+		if(this.value) {
+			this.setValue(this.value);
+		}
 	},
 
 	afterRender: function() {

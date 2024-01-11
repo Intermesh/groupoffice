@@ -15406,7 +15406,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
             }
         }
 
-        ls += 'background-color: ' + target.getBackgroundColor() + ';';
+        // ls += 'background-color: ' + target.getBackgroundColor() + ';';
 
         return ls;
     },
@@ -27561,6 +27561,8 @@ Ext.Window = Ext.extend(Ext.Panel, {
     
     floating : true,
 
+	restoreFocusOnClose: true,
+
     
     initComponent : function(){
         this.initTools();
@@ -27598,7 +27600,7 @@ Ext.Window = Ext.extend(Ext.Panel, {
 		}, this);
 		
 		this.on("close", function() {
-			if(this.activeEl) {
+			if(this.activeEl && this.restoreFocusOnClose) {
 				setTimeout(() => {
 					this.activeEl.focus();
 				});
@@ -27606,7 +27608,7 @@ Ext.Window = Ext.extend(Ext.Panel, {
 		}, this);
 		
 		this.on("hide", function() {
-			if(this.activeEl) {
+			if(this.activeEl && this.restoreFocusOnClose) {
 				setTimeout(() => {
 					this.activeEl.focus();
 				});
@@ -44185,7 +44187,8 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             items.push(
                 btn('bold'),
                 btn('italic'),
-                btn('underline')
+                btn('underline'),
+	              btn('strikeThrough')
             );
         }
 
@@ -45017,6 +45020,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             text: 'Underline the selected text.',
             cls: 'x-html-editor-tip'
         },
+
         increasefontsize : {
             title: 'Grow Text',
             text: 'Increase the font size.',

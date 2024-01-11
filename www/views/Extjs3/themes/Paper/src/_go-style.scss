@@ -985,6 +985,11 @@ hr {
 }
 
 .status {
+
+	.x-grid3-cell-inner & {
+		float: left; //to avoid ellipsis
+	}
+
 	@extend %font-subheading-dense;
 	text-transform:uppercase;
 	padding-left: dp(8);
@@ -1908,8 +1913,8 @@ table[id^="comments-ext"] b {
 
 	.go-form-group-edit-tb
 	{
-		width: dp(50);
-		height: dp(58);
+		width: dp(40);
+		height: dp(52);
 		padding-top: dp(8);
 	}
 	&.required {

@@ -81,16 +81,14 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 	},
 
 	isDirty: function () {
-		var dirty = false, fn = function (i) {
-			if (i.isDirty && i.isDirty()) {
-				dirty = true;
-				//stops iteration
-				return false;
+		const fields = this.getAllFormFields();
+		for(let i = 0, l = fields.length; i < l; i++) {
+			if (fields[i].isDirty && fields[i].isDirty()) {
+				return true;
 			}
-		};
-		this.getAllFormFields().forEach(fn, this);
+		}
 
-		return dirty;
+		return false;
 	},
 
 	/**

@@ -16,6 +16,7 @@
 namespace GO\Sieve\Util;
 
 use GO;
+use GO\Email\Model\Account;
 
 // make sure path_separator is defined
 if (!defined('PATH_SEPARATOR')) {
@@ -315,6 +316,16 @@ class Sieve {
 	public function get_active($accountId) {
 		$aliasEmails = array();
 		$aliasesStmt = \GO\Email\Model\Alias::model()->findByAttribute('account_id',$accountId);
+
+		$account_model = array(
+			'account_id'	=> $accountId,
+		);
+		$account = Account::model()->findByPk($account_model['account_id']);
+		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : $account->spam;
+		if (empty($spamFolder)) {
+			$spamFolder = 'Spam';
+    }
+
 		while ($aliasModel = $aliasesStmt->fetch())
 			$aliasEmails[] = $aliasModel->email;
 		
@@ -331,17 +342,17 @@ class Sieve {
 			if(empty($all_scripts)){
 
 				$createFlag = '';
-				$require = array("fileinto");
-				
+				$require = array('fileinto', 'imap4flags', 'include');
+
 				if($this->sieve->hasExtension('vacation')){
 					$require[] = 'vacation';
 				}
 				
-				 // Check if the "mailbox" extension is supported
-				 if($this->sieve->hasExtension('mailbox')){
-				 	$require[] = 'mailbox';
-				 	$createFlag = ':create ';
-				 }
+				// Check if the "mailbox" extension is supported
+				if($this->sieve->hasExtension('mailbox')){
+					$require[] = 'mailbox';
+					$createFlag = ':create';
+				}
 								
 				$requireString = 'require ["'.implode('","', $require).'"];';
 
@@ -349,23 +360,46 @@ class Sieve {
 				if($this->sieve->hasExtension('vacation')){
 					
 				$content = $requireString."
+
+	# rule:[includeGlobal]
+	if false # anyof (true)
+	{
+	### include global rule
+	## /etc/dovecot/sieve/default.sieve
+	include :global \"default\";
+	}
+
 	# rule:[".GO::t("Standard vacation rule", "sieve")."]
 	if false # anyof (true)
 	{
 	\tvacation :days 3 :addresses [\"".implode('","',$aliasEmails)."\"] \"".GO::t("I am on vacation", "sieve")."\";
 	\tstop;
 	}
+
 	# rule:[Spam]
 	if anyof (header :contains \"X-Spam-Flag\" \"YES\")
 	{
-		fileinto ".$createFlag."\"Spam\";
+		setflag \"\\\Seen\";
+		fileinto ".$createFlag." \"".$spamFolder."\";
+		stop;
 	}";
 				} else {
 					$content = $requireString."
+
+	# rule:[includeGlobal]
+	if false # anyof (true)
+	{
+	### include global rule
+	## /etc/dovecot/sieve/default.sieve
+	include :global \"default\";
+	}
+
 	# rule:[Spam]
 	if anyof (header :contains \"X-Spam-Flag\" \"YES\")
 	{
-		fileinto ".$createFlag."\"Spam\";
+		setflag \"\\\Seen\";
+		fileinto ".$createFlag." \"".$spamFolder."\";
+		stop;
 	}";
 				}
 			

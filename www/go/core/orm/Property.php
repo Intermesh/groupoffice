@@ -637,11 +637,13 @@ abstract class Property extends Model {
 	/**
 	 * Get ID which is are the primary keys combined with a "-".
 	 *
-	 * @return string|null eg. "1" or with multiple keys: "1-2"
+	 * Note: if this logic ever changes it must be changed here too: {@see \go\core\jmap\Entity::changesQuery()}
+	 *
+	 * @return int|string|null eg. 1 or with multiple keys: "1-2"
 	 */
-	public function id() : ?string {
+	public function id() : string|int|null {
 		if(property_exists($this, 'id')) {
-			return isset($this->id) ? (string) $this->id : null;
+			return $this->id ?? null;
 		}
 		$keys = $this->primaryKeyValues();
 		if(empty($keys)) {
@@ -1430,6 +1432,8 @@ abstract class Property extends Model {
 	private function saveRelatedArray(Relation $relation): bool
 	{
 
+
+
 		$modified = $this->getModified([$relation->name]);
 		if(empty($modified)) {
 			return true;
@@ -1452,7 +1456,6 @@ abstract class Property extends Model {
 			}, $models);
 		}
 
-		$sortOrder = 0;
 		$this->{$relation->name} = [];
 		foreach ($models as $newProp) {
 
@@ -1462,10 +1465,6 @@ abstract class Property extends Model {
 			}
 
 			$this->applyRelationKeys($relation, $newProp);
-
-			if(isset($relation->orderBy)) {
-				$newProp->{$relation->orderBy} = $sortOrder++;
-			}
 
 			if (!$newProp->internalSave()) {
 				$this->relatedValidationErrors = $newProp->getValidationErrors();
@@ -2196,7 +2195,8 @@ abstract class Property extends Model {
 	 * @return mixed
 	 * @throws Exception
 	 */
-	protected function patchArray(Relation $relation, string $propName, ?array $value) {
+	protected function patchArray(Relation $relation, string $propName, ?array $value): mixed
+	{
 		$old = $this->$propName;
 		/** @var self[] $old */
 
@@ -2246,6 +2246,14 @@ abstract class Property extends Model {
 					//create new model
 					$this->{$propName}[] = $hasPK ? $temp : (new $relation->propertyName($this))->setValues($patch);
 				}
+			}
+		}
+
+		// set sort order column defined in relation
+		if(isset($relation->orderBy)) {
+			$sortOrder = 0;
+			foreach ($this->{$propName} as $newProp) {
+				$newProp->{$relation->orderBy} = $sortOrder++;
 			}
 		}
 

@@ -347,6 +347,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$response['total'] = $imap->sort_count;
+		
+		// Return all UIDs if we have a search query in case we need to perform actions on the entire set
+		if (!empty($query)) {
+			$response['allUids']=$imap->allUids;
+		}
 
 		$mailbox = new \GO\Email\Model\ImapMailbox($account, array('name'=>$params['mailbox']));
 		$mailbox->snoozeAlarm();
@@ -2013,7 +2018,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : $account->spam;
 
 		if (empty($spamFolder)) {
-			throw new \Exception(GO::t("Could not get 'Spam' folder. Maybe it is disabled.\n\nGo to E-mail -> Administration -> Accounts -> Double click account -> Folders to configure it.", "email"));
+			$spamFolder = 'Spam';
 		}
 
 		if(!$imap->get_status($spamFolder)){

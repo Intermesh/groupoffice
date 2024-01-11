@@ -52,6 +52,12 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	initComponent: function() {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
 
+		this.buttonTips['strikeThrough']= {
+			title: 'Strike through',
+				text: 'Strike through the selected text.',
+				cls: 'x-html-editor-tip'
+		};
+
 		if(this.grow && !this.height) {
 			this.height = this.growMinHeight;
 		}

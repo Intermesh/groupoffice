@@ -225,6 +225,11 @@ if(Ext.form.HtmlEditor){
         text: 'Onderstreep de geselecteerde tekst.',
         cls: 'x-html-editor-tip'
       },
+	    strikeThrough : {
+		    title: 'Strike through',
+		    text: 'Strike through the selected text.',
+		    cls: 'x-html-editor-tip'
+	    },
       increasefontsize: {
         title: 'Tekst vergroten',
         text: 'Vergroot het lettertype.',
