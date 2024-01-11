@@ -93,7 +93,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$response['info']='<table>';
 		
 		foreach($info as $key=>$value)
-			$response['info'] .= '<tr><td>'.$key.':</td><td>'.$value.'</td></tr>';
+			$response['info'] .= '<tr><td>'.$key.':</td><td>'.(is_scalar($value) ? $value : var_export($value, true)).'</td></tr>';
 		
 		$response['info'].='</table>';
 		
