@@ -323,7 +323,7 @@ class Sieve {
 		$account = Account::model()->findByPk($account_model['account_id']);
 		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : $account->spam;
 		if (empty($spamFolder)) {
-			throw new \Exception(GO::t("Could not get 'Spam' folder. Maybe it is disabled.\n\nGo to E-mail -> Administration -> Accounts -> Double click account -> Folders to configure it.", "email"));
+			$spamFolder = 'Spam';
     }
 
 		while ($aliasModel = $aliasesStmt->fetch())
