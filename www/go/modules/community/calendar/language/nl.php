@@ -9,6 +9,8 @@ return [
 	'Reply' => 'Antwoord',
 	'Participants' => 'Deelnemers',
 	'You' => 'Jij',
+	'Resources' => 'Faciliteiten',
+	'Resource' => 'Faciliteit',
 	'Organizer' => 'Organisator',
 	'Calendars' => 'Agenda\'s',
 	// schedule massages

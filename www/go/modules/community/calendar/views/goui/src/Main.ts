@@ -21,7 +21,7 @@ import {
 import {EventDialog} from "./EventDialog";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
-import {calendarStore} from "./Index.js";
+import {calendarStore,categoryStore} from "./Index.js";
 import {CalendarDialog} from "./CalendarDialog.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SpltView.js";
@@ -29,6 +29,9 @@ import {SubscribeWindow} from "./SubscribeWindow.js";
 import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CalendarEvent} from "./CalendarItem.js";
+import {CategoryDialog} from "./CategoryDialog.js";
+import {Settings} from "./Settings.js";
+import {ResourcePanel} from "./ResourcesPanel.js";
 
 type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year';
 type ValidView = 'split' | 'merge';
@@ -54,6 +57,7 @@ export class Main extends Component {
 	eventStore: DataSourceStore<JmapDataSource<CalendarEvent>>
 
 	private calendarList: List
+	private categoryList: List
 
 	private visibleChanges: {[id:number]:boolean} = {};
 
@@ -144,79 +148,24 @@ export class Main extends Component {
 					}),
 					btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}})
 				),
-				this.calendarList = list({
-					store: calendarStore,
-					cls: 'check-list',
-					rowSelectionConfig: {
-						multiSelect: true,
-						listeners: {
-							'selectionchange': (tableRowSelect) => {
+				this.calendarList = this.buildCalendarFilter(),
+				tbar({cls: 'dense'},
+					comp({tagName: 'h3', html: 'Categories'}),
+					btn({
+						icon: 'add', menu: menu({},
+							btn({
+								text: t('Create category') + '…', handler: () => {
+									const dlg = new CategoryDialog();
+									dlg.show();
+									dlg.form.create({});
 
-								const calendarIds = tableRowSelect.selected.map((index) => calendarStore.get(index)?.id);
-								if(calendarIds.length) {
-									Object.assign(this.eventStore.queryParams.filter ||= {}, {
-										inCalendars: calendarIds
-									});
-								} else {
-									delete this.eventStore.queryParams.filter?.inCalendars;
 								}
-
-								//this.eventStore.load();
-								this.updateView();
-							}
-						}
-					},
-					listeners: {'render': me => { me.store.load() }},
-					renderer: (data, row, list, storeIndex) => {
-						if(data.isVisible && list.rowSelection) {
-							list.rowSelection.add(storeIndex);
-						}
-						return [checkbox({
-							color: '#' + data.color,
-							//style: 'padding: 0 8px',
-							value: data.isVisible,
-							label: data.name,
-							listeners: {
-								'render': (field) => {
-									field.el.addEventListener("mousedown", (ev) => {
-										ev.stopPropagation(); // stop lists row selector event
-									});
-								},
-								'change': (p, newValue) => {
-									if (newValue) {
-										list.rowSelection!.add(storeIndex);
-									} else {
-										list.rowSelection!.remove(storeIndex);
-									}
-									this.visibleChanges[data.id] = newValue;
-									this.saveSelectionChanges();
-								}
-							},
-							buttons: [btn({
-								icon: 'more_horiz', menu: menu({},
-									btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: async _ => {
-										const dlg = new CalendarDialog();
-										await dlg.load(data.id);
-										dlg.show();
-									}}),
-									btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-										calendarStore.dataSource.update(data.id, {isSubscribed: false});
-									}}),
-									btn({icon:'import_export', text:t('Import'), handler: async ()=> {
-											const files = await browser.pickLocalFiles();
-											const blob = await client.upload(files[0]);
-											client.jmap("CalendarEvent/parse", {blobIds:[blob.id]}, 'pIcs').then(r => {
-												// bult events.
-												// set calendarId op alle / flikker uid eruit
-												// call /set create met events
-
-											});
-									}})
-								)
-							})]
-						})];
-					}
-				})
+							})
+						)
+					}),
+					btn({icon: 'done_all', handler: () => { this.categoryList.rowSelection!.selectAll();}})
+				),
+				this.categoryList = this.buildCategoryFilter()
 			),
 			splitter({
 				stateId: "calendar-splitter-west",
@@ -258,7 +207,11 @@ export class Main extends Component {
 							btn({icon: 'view_week', text: t('Week')}),
 							btn({icon: 'view_module', text: t('Month')})
 						)
-					})
+					}),
+					btn({icon:'more_vert', menu:menu({},
+						btn({icon:'video_call',text:'Video meeting', handler: _ => {(new Settings()).show()}}),
+						btn({icon:'meeting_room', text:t('Resources'), handler: _ => {(new ResourcePanel()).show()}})
+					)})
 				),
 				this.cards = cards({flex: 1},
 					weekView,
@@ -269,6 +222,146 @@ export class Main extends Component {
 			)
 		);
 
+	}
+
+	private buildCalendarFilter() {
+		return list({
+			store: calendarStore,
+			cls: 'check-list',
+			rowSelectionConfig: {
+				multiSelect: true,
+				listeners: {
+					'selectionchange': (tableRowSelect) => {
+
+						const calendarIds = tableRowSelect.selected.map((index) => calendarStore.get(index)?.id);
+						if(calendarIds.length) {
+							Object.assign(this.eventStore.queryParams.filter ||= {}, {
+								inCalendars: calendarIds
+							});
+						} else {
+							delete this.eventStore.queryParams.filter?.inCalendars;
+						}
+
+						//this.eventStore.load();
+						this.updateView();
+					}
+				}
+			},
+			listeners: {'render': me => { me.store.load() }},
+			renderer: (data, row, list, storeIndex) => {
+				if(data.isVisible && list.rowSelection) {
+					list.rowSelection.add(storeIndex);
+				}
+				return [checkbox({
+					color: '#' + data.color,
+					//style: 'padding: 0 8px',
+					value: data.isVisible,
+					label: data.name,
+					listeners: {
+						'render': (field) => {
+							field.el.addEventListener("mousedown", (ev) => {
+								ev.stopPropagation(); // stop lists row selector event
+							});
+						},
+						'change': (p, newValue) => {
+							if (newValue) {
+								list.rowSelection!.add(storeIndex);
+							} else {
+								list.rowSelection!.remove(storeIndex);
+							}
+							this.visibleChanges[data.id] = newValue;
+							this.saveSelectionChanges();
+						}
+					},
+					buttons: [btn({
+						icon: 'more_horiz', menu: menu({},
+							btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: async _ => {
+									const dlg = new CalendarDialog();
+									await dlg.load(data.id);
+									dlg.show();
+								}}),
+							btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
+									calendarStore.dataSource.update(data.id, {isSubscribed: false});
+								}}),
+							btn({icon:'import_export', text:t('Import'), handler: async ()=> {
+									const files = await browser.pickLocalFiles();
+									const blob = await client.upload(files[0]);
+									client.jmap("CalendarEvent/parse", {blobIds:[blob.id]}, 'pIcs').then(r => {
+										// bult events.
+										// set calendarId op alle / flikker uid eruit
+										// call /set create met events
+									});
+								}})
+						)
+					})]
+				})];
+			}
+		});
+	}
+
+	private buildCategoryFilter() {
+		return list({
+			store: categoryStore,
+			cls: 'check-list',
+			rowSelectionConfig: {
+				multiSelect: true,
+				listeners: {
+					'selectionchange': (tableRowSelect) => {
+
+						const categoryIds = tableRowSelect.selected.map((index) => categoryStore.get(index)?.id);
+						debugger;
+						if(categoryIds.length) {
+							Object.assign(this.eventStore.queryParams.filter ||= {}, {
+								inCategories: categoryIds
+							});
+						} else {
+							delete this.eventStore.queryParams.filter?.inCategories;
+						}
+
+						//this.eventStore.load();
+						this.updateView();
+					}
+				}
+			},
+			listeners: {'render': me => { me.store.load() }},
+			renderer: (data, row, list, storeIndex) => {
+				// if(data.isVisible && list.rowSelection) {
+				// 	list.rowSelection.add(storeIndex);
+				// }
+				return [checkbox({
+					//color: '#' + data.color,
+					//style: 'padding: 0 8px',
+					//value: data.isVisible,
+					label: data.name,
+					listeners: {
+						'render': (field) => {
+							field.el.addEventListener("mousedown", (ev) => {
+								ev.stopPropagation(); // stop lists row selector event
+							});
+						},
+						'change': (p, newValue) => {
+							if (newValue) {
+								list.rowSelection!.add(storeIndex);
+							} else {
+								list.rowSelection!.remove(storeIndex);
+							}
+						}
+					},
+					buttons: [btn({
+						icon: 'more_horiz', menu: menu({},
+							btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: async _ => {
+								const dlg = new CategoryDialog();
+								await dlg.load(data.id);
+								dlg.show();
+							}}),
+							btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
+								calendarStore.dataSource.update(data.id, {isSubscribed: false});
+							}})
+						)
+					})]
+				})];
+			}
+		})
 	}
 
 	routeTo(view:string, date: DateTime) {

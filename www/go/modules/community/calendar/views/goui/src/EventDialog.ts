@@ -1,15 +1,16 @@
 import {
+	autocompletechips,
 	browser,
 	btn, Button,
-	checkbox, CheckboxField,
+	checkbox, CheckboxField, checkboxselectcolumn, chips,
 	column,
-	comp,
+	comp, ContainerField, containerfield,
 	DataSourceForm,
-	datasourceform,
+	datasourceform, datasourcestore,
 	DateField,
-	datefield,
-	DateTime,
-	Format,
+	datefield, DateInterval,
+	DateTime, displayfield,
+	Format, hr, MapField, mapfield, menu, Notifier, numberfield,
 	radio,
 	recurrencefield,
 	select,
@@ -24,8 +25,8 @@ import {
 	Window
 } from "@intermesh/goui";
 import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
-import {calendarStore} from "./Index.js";
-import {participantfield} from "./ParticipantField.js";
+import {calendarStore, categoryStore} from "./Index.js";
+import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
 
@@ -46,6 +47,8 @@ export class EventDialog extends Window {
 	submitBtn:Button
 	endDate: DateField
 	withoutTimeToggle: CheckboxField
+
+	attachments:MapField
 
 	private titleField: TextField
 	constructor() {
@@ -76,7 +79,7 @@ export class EventDialog extends Window {
 					},
 					'load': (_, data) => {
 						const start = new DateTime(data.start);
-						data.end = start.addDuration(data.duration).addDays(data.showWithoutTime? -1 : 0).format(data.showWithoutTime ? 'Y-m-d' : 'c');
+						data.end = start.add(new DateInterval(data.duration)).addDays(data.showWithoutTime? -1 : 0).format(data.showWithoutTime ? 'Y-m-d' : 'c');
 						exceptionsBtn.hidden = !data.recurrenceOverrides;
 						//recurrenceField.setStartDate(start)
 					},
@@ -100,7 +103,8 @@ export class EventDialog extends Window {
 					}
 				}
 			}),
-			textfield({name: 'location', label:t('Location')}),
+			textfield({name: 'location',flex:1, label:t('Location')}),
+			btn({icon:'video_call', cls:'filled', width:50, handler(btn) { (btn.previousSibling() as TextField)!.value = 'link'}}),
 			this.withoutTimeToggle = checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'),
 				listeners: {'setvalue':(_, checked) => {
 					alertField.fullDay = checked;
@@ -145,7 +149,26 @@ export class EventDialog extends Window {
 			}),
 			alertField,
 			textarea({name:'description', label: t('Description'), autoHeight: true}),
-
+			autocompletechips({
+				list: table({fitParent: true, headers: false, store: datasourcestore({dataSource:categoryStore.dataSource}),
+					rowSelectionConfig: {multiSelect: true},
+					columns: [
+						checkboxselectcolumn(),
+						column({id: "name"})
+					]
+				}),
+				label: "Categories",
+				name: "categoryIds",
+				chipRenderer: async (chip, id) => {
+					categoryStore.dataSource.single(id).then(v => { chip.text = v?.name ?? '???'});
+				},
+				listeners: {
+					autocomplete: (field, input) => {
+						field.list.store.queryParams = {filter: {name: input}};
+						field.list.store.load();
+					}
+				}
+			}),
 			radio({type:'button',value: 'busy', name: 'freeBusyStatus', flex:'1 40%',options: [
 				{value:'busy',text: t('Busy')},
 				{value:'free',text: t('Free')}
@@ -155,7 +178,24 @@ export class EventDialog extends Window {
 				{value:'private',name:  t('Private')},
 				{value:'secret',name:  t('Secret')}
 			]}),
-
+			this.attachments = mapfield({name: 'links', cls:'goui-pit',
+				buildField: (v: any) => {
+					// const userIcon = v.name?'person':'email',
+					// 	statusIcon = ParticipantField.statusIcons[v.participationStatus] || v.participationStatus;
+					return containerfield({flex:'1 0 100%',cls: 'flow'},
+						textfield({hidden:true,name:'title'}),
+						numberfield({hidden:true,name:'size'}),
+						textfield({hidden:true,name:'contentType'}),
+						textfield({hidden:true,name:'blobId'}),
+						btn({icon: "description", text: v.title, flex:'1', style:{textAlign:'left'}, handler() {
+							client.downloadBlobId(v.blobId, v.title).catch((error) => {
+								Notifier.error(error);
+							})
+						}}),
+						btn({icon: "delete", width:50, handler(btn) {btn.parent!.remove();}})
+					);
+				}
+			})
 		),
 		tbar({cls: 'border-top'},
 			btn({icon:'attach_file', handler: _ => this.attachFile() }),
@@ -203,7 +243,7 @@ export class EventDialog extends Window {
 		if(this.form.isNew)
 			data.timeZone = go.User.timezone; // enh: option to change in dialog?
 		if(data.start || data.end)
-			data.duration = start.diff(end);
+			data.duration = start.diff(end).toIso8601();
 		delete data.end;
 		return data;
 	}
@@ -243,7 +283,9 @@ export class EventDialog extends Window {
 		 this.mask();
 		 const blobs = await client.uploadMultiple(files);
 		 this.unmask();
-		 console.warn(blobs);
+		 for(const r of blobs)
+		 	this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
+		 //console.warn(blobs);
 	}
 
 }

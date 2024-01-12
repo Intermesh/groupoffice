@@ -43,6 +43,13 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 		return $this->jsonSerialize();
 	}
 
+	static function intervalToISO(\DateInterval $interval, $default = 'PT0S') {
+		static $f = ['M0S', 'H0M', 'DT0H', 'M0D', 'P0Y', 'Y0M', 'P0M'];
+		static $r = ['M', 'H', 'DT', 'M', 'P', 'Y', 'P'];
+
+		return rtrim(str_replace($f, $r, $interval->format('P%yY%mM%dDT%hH%iM%sS')), 'PT') ?: $default;
+	}
+
 //	public function toLocal() {
 //		$this->isLocal = true;
 //		$this->setTimezone(new \DateTimeZone(self::currentUser()->timezone)); // prevent GO from converting to UTC

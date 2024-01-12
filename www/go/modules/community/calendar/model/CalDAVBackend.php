@@ -5,6 +5,7 @@ namespace go\modules\community\calendar\model;
 use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\orm\Query;
+use go\core\util\DateTime;
 use go\modules\community\tasks\model\TaskList;
 use Sabre\CalDAV\Backend\AbstractBackend;
 use Sabre\CalDAV;
@@ -142,10 +143,22 @@ class CalDAVBackend extends AbstractBackend implements
 	public function getCalendarObjects($calendarId)
 	{
 		//id, uri, lastmodified, etag, calendarid, size, componenttype
-		$events = CalendarEvent::find()
-			->select(['cce.id as id','uid','eventdata.modifiedAt as modified','size','veventBlobId'])
-			->join('core_blob', 'b','b.id = veventBlobId', 'LEFT')
-			->where(['calendarId'=> $calendarId])
+
+		$maxMonthsOld = isset(\GO::config()->caldav_max_months_old) ? abs(\GO::config()->caldav_max_months_old) : 6;
+		$pStart = date('Y-m-d', strtotime('-'.$maxMonthsOld.' months'));
+		$pEnd = date('Y-m-d', strtotime('+3 years'));
+
+		$etId = CalendarEvent::entityType()->getId();
+		$events = CalendarEvent::find(['id', 'modifiedAt', 'uid'])
+			->select(['cce.id as id','uid','eventdata.modifiedAt as modified','CONCAT(c.modSeq, "-", cu.modseq) as modseq'])
+			->join('core_change', 'c', 'c.entityId = cce.id AND c.entityTypeId = '.$etId)
+			->join('core_change_user', 'cu', 'cu.entityId = cce.id AND cu.userId = 1 AND cu.entityTypeId = '.$etId, 'LEFT')
+			//->join('core_blob', 'b','b.id = veventBlobId', 'LEFT')
+			->where(['calendarId' => $calendarId])
+			->filter([
+				'before'=> $pEnd,
+				'after' => $pStart
+			])
 			->fetchMode(\PDO::FETCH_OBJ);
 
 		$result = [];
@@ -153,16 +166,46 @@ class CalDAVBackend extends AbstractBackend implements
 			//$blob = $event->icsBlob();
 			$result[] = [
 				'id' => $event->id,
-				'calendarid' => $calendarId, // needed for bug in local delivery schedualer
+				'calendarid' => $calendarId, // needed for bug in local delivery scheduler
 				'uri' => str_replace('/', '+', $event->uid) . '.ics',
 				'lastmodified' => strtotime($event->modified),
-				'etag' => '"' . $event->veventBlobId . '"',
-				'size' => $event->size,
+				'etag' => '"' . $event->modseq . '"',
+				//'size' => $blob->size,
 				'component' => 'vevent'
 			];
 		}
 		return $result;
 	}
+
+	// TODO: pre-generate blobs for speedup
+//	public function getMultipleCalendarObjects($calendarId, array $uris)
+//	{
+//		$uids = [];
+//		foreach($uris as $uri) {
+//			$uid = pathinfo($uri,PATHINFO_FILENAME);
+//			$uids[$uid] = $uri;
+//		}
+//
+//		$events = CalendarEvent::find()
+//			->where(['cce.calendarId'=> $calendarId, 'eventdata.uid'=>array_keys($uids)])->all();
+//
+//		return array_map(function($event) use($uids) {
+//			$blob = $event->icsBlob();
+//			return [
+//				'id' => $event->id,
+//				'uri' => $uids[$event->uid],
+//				'lastmodified' => strtotime($event->modifiedAt),
+//				'etag' => '"' . $event->modseq . '"',
+//				//'size' => $blob->size,
+//				'calendardata' => $blob->getFile()->getContents(),
+//				'component' => 'vevent',
+//			];
+//		}, $events);
+//
+////		return array_map(function ($uri) use ($calendarId) {
+////			return $this->getCalendarObject($calendarId, $uri);
+////		}, $uris);
+//	}
 
 	/**
 	 * Check if this is only called when the getCalendarObjects does not provide the calendardata
@@ -196,8 +239,6 @@ class CalDAVBackend extends AbstractBackend implements
 			'component' => 'vevent',
 		];
 	}
-
-	// TODO: implement `public function getMultipleCalendarObjects($calendarId, array $uris)` for speedup
 
 	public function createCalendarObject($calendarId, $objectUri, $calendarData)
 	{

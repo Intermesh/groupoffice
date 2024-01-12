@@ -123,7 +123,8 @@ class ICalendarHelper {
 		if(isset($event->sequence)) $props['SEQUENCE'] = $event->sequence;
 		if(!empty($event->description)) $props['DESCRIPTION'] = $event->description;
 		if(!empty($event->location)) $props['LOCATION'] = $event->location;
-		//empty($event->tag) ?: $vcalendar->VEVENT->CATEGORIES = $event->tag;
+		if(!empty($event->color)) $props['COLOR'] = $event->color;
+		if(!empty($event->categoryIds)) $props['CATEGORIES'] = implode(',',$event->categoryNames());
 
 
 		return $props;
@@ -274,12 +275,17 @@ class ICalendarHelper {
 					}
 				}
 			}
-			if(!empty((string)$vevent->VALARM)) {
+			if(!empty((string)$vevent->CATEGORIES)) {
+				$names = explode(',', $vevent->CATEGORIES);
+				if(!empty($names))
+					$event->categoryIdsByName($names);
+			}
+			if(isset($vevent->VALARM)) {
 				$event->alerts = [];
 				foreach ($vevent->VALARM as $valarm) {
 					$a = (new Alert($event))->setValues([
 						'action'=> $valarm->ACTION,
-						'offset' => $valarm->TRIGGER
+						'trigger'=> ['offset' => $valarm->TRIGGER, 'relativeTo'=>'start']
 					]);
 					if(isset($valarm->ACKNOWLEDGED))
 						$a->acknowledged = !!$valarm->ACKNOWLEDGED;
@@ -344,6 +350,7 @@ class ICalendarHelper {
 		if(!empty($vevent->LOCATION)) $props->location = (string)$vevent->LOCATION;
 		if(!empty($vevent->STATUS)) $props->status = strtolower($vevent->STATUS);
 		if(!empty($vevent->CLASS)) $props->privacy = array_flip(self::$privacyMap)[$vevent->CLASS] ?? 'public';
+		if(!empty($vevent->COLOR)) $props->color = (string)$vevent->COLOR;
 		if(!empty($vevent->DURATION)) {
 			$props->duration = (string)$vevent->DURATION;
 		} else if (!empty($vevent->DTEND) && !empty($props->start)) {

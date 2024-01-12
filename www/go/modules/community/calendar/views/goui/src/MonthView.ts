@@ -1,5 +1,5 @@
 import {CalendarView} from "./CalendarView.js";
-import {ComponentEventMap, createComponent, DateTime, ObservableListenerOpts} from "@intermesh/goui";
+import {ComponentEventMap, createComponent, DateInterval, DateTime, ObservableListenerOpts} from "@intermesh/goui";
 import {E} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
@@ -49,7 +49,7 @@ export class MonthView extends CalendarView {
 		} else { // take full month
 			this.start.setDate(1).setWeekDay(0);
 			endMonth.addMonths(1).setDate(0).setWeekDay(6).addDays(1);
-			this.days = this.start.diffInDays(endMonth);
+			this.days = this.start.diff(endMonth).getTotalDays()!;
 		}
 
 
@@ -81,7 +81,7 @@ export class MonthView extends CalendarView {
 		move = (day:HTMLElement) => {
 			let [y,m,d] = day.dataset.date!.split('-').map(Number);
 			ev.start.setYear(y).setMonth(m).setDate(d);
-			ev.end = ev.start.clone().addDuration(ev.data.duration);
+			ev.end = ev.start.clone().add(new DateInterval(ev.data.duration));
 		},
 		mouseMove = ({target}: MouseEvent & {target: HTMLElement}) => {
 			const day = target.up('li[data-date]');
@@ -237,6 +237,6 @@ export class MonthView extends CalendarView {
 		return e.divs[weekstart.format('YW')]
 			.css(this.makestyle(e, weekstart))
 			//.attr('style',this.makestyle(e, weekstart))
-			.cls('continues', weekstart.diffInDays(e.start) < 0)
+			.cls('continues', weekstart.diff(e.start).getTotalDays()! < 0)
 	}
 }

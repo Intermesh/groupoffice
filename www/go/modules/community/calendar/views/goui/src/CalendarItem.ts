@@ -1,4 +1,4 @@
-import {BaseEntity, btn, comp, DateTime, DefaultEntity, Recurrence, t, tbar, win} from "@intermesh/goui";
+import {BaseEntity, btn, comp, DateInterval, DateTime, DefaultEntity, Recurrence, t, tbar, win} from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {EventDialog} from "./EventDialog.js";
@@ -59,7 +59,7 @@ export class CalendarItem {
 			this.start = new DateTime(obj.data.start);
 		}
 		if(!obj.end) {
-			this.end = this.start.clone().addDuration(obj.data.duration!);
+			this.end = this.start.clone().add(new DateInterval(obj.data.duration!));
 		}
 		this.cal = calendarStore.items.find((c:any) => c.id == obj.data.calendarId);
 
@@ -85,12 +85,12 @@ export class CalendarItem {
 
 	static expand(e: CalendarEvent, from: DateTime, until: DateTime) : CalendarItem[] {
 		const start = new DateTime(e.start),
-			end = start.clone().addDuration(e.duration),
+			end = start.clone().add(new DateInterval(e.duration)),
 			items = [];
 
 		if(e.recurrenceRule) {
 			const r = new Recurrence({dtstart: new Date(e.start), rule: e.recurrenceRule, ff: from.date});
-			let rEnd = r.current.clone().addDuration(e.duration);
+			let rEnd = r.current.clone().add(new DateInterval(e.duration));
 			while(r.current.date < until.date && rEnd.date > from.date) {
 
 				const recurrenceId = r.current.format('Y-m-d\Th:i:s');
@@ -105,7 +105,7 @@ export class CalendarItem {
 							recurrenceId: recurrenceId,
 							start: overideStart,
 							title: o.title || e.title,
-							end: (o.duration || o.start) ? overideStart.clone().addDuration(o.duration || e.duration) : rEnd,
+							end: (o.duration || o.start) ? overideStart.clone().add(new DateInterval(o.duration || e.duration)) : rEnd,
 							data: e
 							//color: o.color??null
 						}));
@@ -122,7 +122,7 @@ export class CalendarItem {
 				if(!r.next()) {
 					break;
 				}
-				rEnd = r.current.clone().addDuration(e.duration);
+				rEnd = r.current.clone().add(new DateInterval(e.duration));
 				//}
 				//} while(r.current.date < until.date && r.next())
 			}
@@ -156,7 +156,7 @@ export class CalendarItem {
 						cls:'primary',
 						handler: _b => { this.removeOccurrence(); w.close(); }
 					}),btn({
-						text: t('All future events'),
+						text: t('This and future events'),
 						handler: _b => { this.removeFutureEvents(); w.close(); }
 					}),'->',btn({
 						text: t('All events'), // the series
@@ -183,13 +183,13 @@ export class CalendarItem {
 	/** amount of days this event is spanning */
 	get dayLength() {
 		// 1 day + the distance in days between start and end. - 1 second of end = 00:00:00
-		return 1 + this.start.diffInDays(this.end.clone().addSeconds(-1));
+		return 1 + this.start.diff(this.end.clone().addSeconds(-1)).getTotalDays()!;
 	}
 
 	save(onCancel: Function) {
 		const f = this.data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s';
 		const start = this.start.format(f),
-			duration = this.start.diff(this.end);
+			duration = this.start.diff(this.end).toIso8601();
 
 		if (this.isTimeModified()) {
 			if(this.data.id) {
@@ -321,11 +321,20 @@ export class CalendarItem {
 						cls:'primary',
 						handler: _b => { this.patchOccurrence(modified, onFinish); w.close(); }
 					}),btn({
-						text: t('All future events'),
-						handler: _b => { this.patchThisAndFuture(); }
+						text: t('This and future events'),
+						disabled: this.data.start === this.recurrenceId,
+						handler: _b => {
+							this.patchThisAndFuture(modified, onFinish);
+							w.close();
+						}
 					}),'->',btn({
 						text: t('All events'), // save to series
-						handler: _b => {eventDS.update(this.data.id, modified);  w.close(); }
+						handler: _b => {
+							delete modified.start;
+							const p = eventDS.update(this.data.id, modified);
+							if(onFinish) p.then(onFinish);
+							w.close();
+						}
 					})
 				)
 			)
@@ -360,17 +369,21 @@ export class CalendarItem {
 	/**
 	 * @see  https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-10.html#section-5.5
 	 */
-	private patchThisAndFuture() {
-		alert('todo');
-		return;
+	private patchThisAndFuture(modified: any, onFinish?: (value: DefaultEntity) => DefaultEntity) {
 		//if(!ev.data.participants) { // is not scheduled ( split event)
 		// todo: add first and next relation in relatedTo property as per https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-11.html#name-splitting-an-event
-		// this.data.start = this.recurrenceId!;
-		// eventDS.create(this.data).then((data) => { // duplicate event
-		// 	let rule = this.data.recurrenceRule;
-		// 	rule.until = this.start.addSeconds(-1);
-		// 	eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
-		// }); // create duplicate
+		const rule = structuredClone(this.data.recurrenceRule);
+		rule.until = this.start.addSeconds(-1).format('Y-m-d');
+		debugger;
+		eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
+
+		const next = Object.assign({},
+			this.data,
+			{start: this.recurrenceId!, id:null, uid:null},
+			modified
+		);
+		const p = eventDS.create(next); // create duplicate
+		if(onFinish) p.then(onFinish);
 		//} else {
 		// todo: find all occurrences and create exceptions that match the original until this one, Then change the original
 		//}

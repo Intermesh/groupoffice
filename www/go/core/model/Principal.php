@@ -29,7 +29,7 @@ class Principal extends Entity
 	/** @var string The name of the principal, e.g. “Jane Doe”, or “Room 4B”. */
 	public $name;
 
-	/** @var ?string 40char hex of file */
+	/** @var ?string 40char hex hash of file */
 	public $avatarId;
 
 	/** @var ?string A longer description of the principal, for example details about the facilities of a resource, or null if no description available. */
@@ -42,7 +42,10 @@ class Principal extends Entity
 	public $timeZone;
 
 	public function getCapabilities() {
-		return [];
+		return [
+			'mayGetAvailability' => true, // met the user call Prinicpal/getAvailability
+			'mayShareWith' => true, // may the principal be added to the shareWith of a calendar.
+		];
 	}
 
 	protected static function textFilterColumns(): array

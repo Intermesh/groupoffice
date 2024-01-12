@@ -2,10 +2,10 @@ import {
 	btn, Button,
 	comp, containerfield,
 	DataSourceForm,
-	datasourceform,
-	DateTime, DisplayField, displayfield, Format, hr, mapfield, RecurrenceField,
+	datasourceform, DateInterval,
+	DateTime, DisplayField, displayfield, Format, hr, mapfield, Notifier, numberfield, RecurrenceField,
 	t,
-	tbar, Toolbar,
+	tbar, textfield, Toolbar,
 	Window
 } from "@intermesh/goui";
 import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
@@ -54,7 +54,7 @@ export class EventDetail extends Window {
 				listeners: {
 					'load': (_, data) => {
 						const start = new DateTime(data.start);
-						data.end = start.addDuration(data.duration).addDays(data.showWithoutTime? -1 : 0).format('c');
+						data.end = start.add(new DateInterval(data.duration)).addDays(data.showWithoutTime? -1 : 0).format('c');
 						this.title = data.title;
 						if(!data.recurrenceRule)
 							recurrenceField.hidden = true;
@@ -88,6 +88,15 @@ export class EventDetail extends Window {
 					this.form.value.useDefaultAlert = newValue === 'default';
 				}
 			}}),
+			mapfield({name: 'links', cls:'goui-pit',
+				buildField: (v: any) => containerfield({flex:'1 0 100%',cls: 'flow'},
+					btn({icon: "description", text: v.title, flex:'1', style:{textAlign:'left'}, handler() {
+						client.downloadBlobId(v.blobId, v.title).catch((error) => {
+							Notifier.error(error);
+						})
+					}})
+				)
+			})
 		),
 			this.toolBar
 		);

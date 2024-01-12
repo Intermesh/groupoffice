@@ -170,6 +170,9 @@ class CalendarEvent extends AclItemEntity {
 	public $recurrenceOverrides = [];
 	public $alerts = [];
 
+	public $categoryIds = [];
+	public $links = [];
+
 	public $modifiedAt;
 	public $createdAt;
 	public $modifiedBy;
@@ -191,7 +194,9 @@ class CalendarEvent extends AclItemEntity {
 			//->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
 			->addMap('participants', Participant::class, ['eventId' => 'eventId'])
 			->addMap('recurrenceOverrides', RecurrenceOverride::class, ['eventId'=>'fk'])
-			->addMap('alerts', Alert::class, ['eventId' => 'eventId']);
+			->addMap('alerts', Alert::class, ['eventId' => 'eventId'])
+			->addMap('links', Link::class, ['eventId' => 'eventId'])
+			->addScalar('categoryIds', 'calendar_event_category', ['eventId' => 'eventId']);
 			//->addMap('locations', Location::class, ['id' => 'eventId']);
 	}
 
@@ -250,6 +255,13 @@ class CalendarEvent extends AclItemEntity {
 					$query->andWhere('cce.calendarId', 'IN', $value);
 				}
 			}, 'subscribedOnly')
+			->add('inCategories', function(Criteria $criteria, $value, Query $query) {
+				if(!empty($value)) {
+					$query->join('calendar_event_category', 'cat', 'cat.eventId = cce.eventId')
+						->andWhere('cat.categoryId', 'IN', $value)
+						->groupBy(['cce.id']);
+				}
+			},[])
 			->addDate('after', function(Criteria $crit, $comparator, $value) {
 				$crit->where((new Criteria())->where('lastOccurrence', '>', $value)->orWhere('lastOccurrence', 'IS', null));
 			})
@@ -269,6 +281,25 @@ class CalendarEvent extends AclItemEntity {
 		//return $this->recurrenceOverrides;
 	//}
 
+	public function categoryNames() {
+			return go()->getDbConnection()
+				->select('name')
+				->from('calendar_category')
+				->where('id','IN', $this->categoryIds)
+			->fetchMode(\PDO::FETCH_COLUMN, 0)->all();
+	}
+	public function categoryIdsByName($names) {
+		$this->categoryIds = [];
+		foreach($names as $name) {
+			$id = go()->getDbConnection()->selectSingleValue('id')->from('calendar_category')
+				->where('name', '=', $name)
+				->andWhere((new Criteria())->where('ownerId','=', go()->getUserId())->orWhere('ownerId','IS', null))
+				->andWhere((new Criteria())->where('calendarId', '=', $this->calendarId)->orWhere('calendarId', 'IS', null))->single();
+			if(!empty($id)) {
+				$this->categoryIds[] = $id;
+			}
+		}
+	}
 
 	public function attachBlob($blobId) {
 		$this->veventBlobId = $blobId;

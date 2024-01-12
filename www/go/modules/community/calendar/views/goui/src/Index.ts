@@ -9,6 +9,13 @@ export const calendarStore = datasourcestore({
 	queryParams:{filter:{isSubscribed: true}},
 	//properties: ['id', 'name', 'color', 'isVisible', 'isSubscribed'],
 	sort: [{property:'sortOrder'}]
+});
+
+export const categoryStore = datasourcestore({
+	dataSource:jmapds('CalendarCategory'),
+	//queryParams:{filter:{isSubscribed: true}},
+	//properties: ['id', 'name', 'color', 'isVisible', 'isSubscribed'],
+	sort: [{property:'name'}]
 })
 
 function addEmailAction() {
@@ -59,6 +66,7 @@ function addEmailAction() {
 modules.register(  {
 	package: "community",
 	name: "calendar",
+	entities: ["Calendar", "CalendarEvent"],
 	async init () {
 
 		translate.load(GO.lang.community.calendar, "community", "calendar");

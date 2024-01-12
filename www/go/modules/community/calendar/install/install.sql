@@ -1,32 +1,52 @@
+CREATE TABLE IF NOT EXISTS `calendar_resource_group`
+(
+	id          int UNSIGNED NOT NULL auto_increment,
+	name        varchar(200) null,
+	description mediumtext   null,
+	constraint calendar_resource_group_pk
+		primary key (id)
+) ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS `calendar_calendar` (
    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
    `name` VARCHAR(80) NOT NULL,
    `description` TEXT NULL,
     `color` VARCHAR(21) NOT NULL, # lightgoldenrodyellow
     `timeZone` VARCHAR(45) NULL,
+	 `groupId` INT UNSIGNED NULL,
     `aclId` INT NOT NULL,
     `createdBy` INT NULL,
     `ownerId` INT NULL,
     `highestItemModSeq` VARCHAR(32) NULL DEFAULT 0,
     PRIMARY KEY (`id`),
+	  INDEX `fk_calendar_calendar_calendar_resource_group_idx` (`groupId` ASC),
+	 CONSTRAINT `fk_calendar_calendar_calendar_resource_group`
+		 FOREIGN KEY (`groupId`)
+			 REFERENCES `calendar_resource_group` (`id`)
+			 ON DELETE RESTRICT,
     CONSTRAINT `fk_calendar_calendar_core_acl1`
-    FOREIGN KEY (`aclId`)
-    REFERENCES `core_acl` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+			FOREIGN KEY (`aclId`)
+			REFERENCES `core_acl` (`id`),
     CONSTRAINT `fk_calendar_calendar_core_user_creator`
-    FOREIGN KEY (`createdBy`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE SET NULL
-    ON UPDATE NO ACTION,
+			FOREIGN KEY (`createdBy`)
+			REFERENCES `core_user` (`id`)
+			ON DELETE SET NULL,
     CONSTRAINT `fk_calendar_calendar_core_user_owner`
-    FOREIGN KEY (`ownerId`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
+			FOREIGN KEY (`ownerId`)
+			REFERENCES `core_user` (`id`)
+			ON DELETE CASCADE
+) ENGINE = InnoDB;
 
-
+ALTER TABLE `go_calendar`.`calendar_calendar`
+	ADD COLUMN `groupId` INT UNSIGNED NULL AFTER `timeZone`,
+	ADD INDEX `fk_calendar_calendar_calendar_resource_group_idx` (`groupId` ASC) VISIBLE;
+;
+ALTER TABLE `go_calendar`.`calendar_calendar`
+	ADD CONSTRAINT `fk_calendar_calendar_calendar_resource_group`
+		FOREIGN KEY (`groupId`)
+			REFERENCES `go_calendar`.`calendar_resource_group` (`id`)
+			ON DELETE RESTRICT
+			ON UPDATE NO ACTION;
 -- -----------------------------------------------------
 -- Table `calendar_calendar_user`
 -- -----------------------------------------------------
@@ -119,6 +139,8 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
 	  `replyTo` VARCHAR(100),
 	  `requestStatus` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`eventId`),
+		INDEX `calendar_event_lastOccurrence_index` (`lastOccurrence` ASC),
+		INDEX `calendar_event_start_index` (`start` ASC),
     INDEX `fk_calendar_event_core_user1_idx` (`createdBy` ASC),
     INDEX `fk_calendar_event_core_user2_idx` (`modifiedBy` ASC),
     CONSTRAINT `fk_calendar_event_core_user1`
@@ -195,7 +217,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_user` (
     CONSTRAINT `fk_calendar_event_user_calendar_event1`
     FOREIGN KEY (`eventId`)
     REFERENCES `calendar_event` (`eventId`)
-    ON DELETE NO ACTION,
+    ON DELETE CASCADE,
     CONSTRAINT `fk_calendar_event_user_core_user1`
     FOREIGN KEY (`userId`)
     REFERENCES `core_user` (`id`)
@@ -267,9 +289,10 @@ CREATE TABLE IF NOT EXISTS `calendar_event_link` (
      `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
      `eventId` INT UNSIGNED NOT NULL,
      `href` VARCHAR(100) NULL,
-    `type` VARCHAR(129) NOT NULL,
+     `title` VARCHAR(200) NULL,
+    `contentType` VARCHAR(129) NOT NULL,
     `size` INT NOT NULL,
-    `rel` INT NOT NULL,
+    `rel` VARCHAR(50) NOT NULL,
     `blobId` BINARY(40) NULL,
     PRIMARY KEY (`id`, `eventId`),
     INDEX `fk_event_attachment_calendar_event1_idx` (`eventId` ASC),
@@ -285,7 +308,6 @@ CREATE TABLE IF NOT EXISTS `calendar_event_link` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `calendar_event_location`
@@ -306,6 +328,41 @@ CREATE TABLE IF NOT EXISTS `calendar_event_location` (
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `calendar_category` (
+	`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL,
+	`ownerId` INT(11) NULL,
+	`calendarId` INT(11) UNSIGNED NULL,
+	PRIMARY KEY (`id`),
+	INDEX `user_id` (`ownerId` ASC),
+	constraint calendar_category_ibfk_1
+		foreign key (ownerId) references core_user (id)
+			on delete cascade,
+	constraint calendar_category_calendar_ibfk_9
+		foreign key (calendarId) references calendar_calendar (id)
+			on delete cascade)
+	ENGINE = InnoDB
+	DEFAULT CHARACTER SET = utf8mb4
+	COLLATE = utf8mb4_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `calendar_event_category` (
+	`eventId` INT(11) UNSIGNED NOT NULL,
+	`categoryId` INT(11) UNSIGNED NOT NULL,
+	PRIMARY KEY (`eventId`, `categoryId`),
+	INDEX `calendar_task_category_ibfk_2` (`categoryId` ASC),
+	CONSTRAINT `calendar_task_category_ibfk_1`
+		FOREIGN KEY (`eventId`)
+			REFERENCES `calendar_event` (`eventId`)
+			ON DELETE CASCADE,
+	CONSTRAINT `calendar_event_category_ibfk_2`
+		FOREIGN KEY (`categoryId`)
+			REFERENCES `calendar_category` (`id`)
+			ON DELETE CASCADE)
+	ENGINE = InnoDB
+	DEFAULT CHARACTER SET = utf8mb4
+	COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
     `id` INT UNSIGNED NOT NULL,

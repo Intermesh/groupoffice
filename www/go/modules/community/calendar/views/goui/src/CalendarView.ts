@@ -134,7 +134,7 @@ export abstract class CalendarView extends Component {
 
 	// for full day view
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
-		const day = weekstart.diffInDays(e.start),
+		const day = weekstart.diff(e.start).getTotalDays()!,
 			pos = Math.max(0,day);
 		let length = e.dayLength;
 		//console.log(length, e.title,e.start.format('d-m-Y H:i:s'), e.end.format('d-m-Y H:i:s'));
