@@ -1,3 +1,4 @@
+
 - Core: Support double primary key in logging delete changes
 - Finance: Confirm overwrite of finance doc line with article data.
 - Files: Fixed Stored XSS Vulnerability via Malicious File Names in Upload Feature
@@ -202,6 +203,11 @@
 
 -- 6.8 --
 
+15-01-2024: 6.7.62
+- Calendar/summary/Core: Add user was broken when start module was not installed and calendar was installed
+- Billing: display profit % over costs (opposed to profit over sales)
+
+08-01-2024: 6.7.61
 - Core: New tab could be closed unexpectedly when viewing pdf attachments
 - Newsletters: Sort accounts like in the email tree
 
