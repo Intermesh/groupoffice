@@ -296,9 +296,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 		var me = this;
 
 		me.loading = true;
+		me.currentId = id;
 
 		function innerLoad(){
-			me.currentId = id;
 			me.actionStart();
 			me.formPanel.load(id, function(entityValues) {
 				me.onLoad(entityValues);
