@@ -485,6 +485,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			return true;
 		}
 
+		if(!this.items) {
+			return false;
+		}
+
 		var dirty = false;
 		this.items.each(function(wrap) {
 			if(wrap.formField.isDirty()) {
