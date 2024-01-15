@@ -189,7 +189,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 	},
 
 	getValue : function() {
-		return this.curColor;
+		return this.value;
     },
 	/**
    * Sets the value of the color field.  Format as hex value 'FFFFFF'
