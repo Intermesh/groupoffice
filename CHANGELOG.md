@@ -1,4 +1,5 @@
-
+15-01-2024: 6.8.29
+- Finance: Update VAT rates when changing book in document dialog
 - Finance: Fixed docs not loading when there was no quote book
 - Core: Support double primary key in logging delete changes
 - Finance: Confirm overwrite of finance doc line with article data.
