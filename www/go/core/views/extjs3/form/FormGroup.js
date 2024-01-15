@@ -510,6 +510,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 
 	setValue: function (records) {
+
+		if(!records) {
+			records = [];
+		}
 		// this.dirty = true;
 		this.removeAll();
 		if(records === null) return;

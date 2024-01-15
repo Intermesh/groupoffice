@@ -53,25 +53,18 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 					this.sendBtn.handler.call(this);
 				},
 
-
 				attach: ( field, response, file, imgEl) => {
-
-
 					if(imgEl) {
 						return;
 					}
-
 
 					this.attachmentBox.setValue(this.attachmentBox.getValue().concat([{
 						blobId: response.blobId,
 						name: response.name
 					}]))
 
-					this.onSync()
-
+					this.onSync();
 				},
-
-
 				scope: this
 			}
 		});
@@ -92,17 +85,18 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 
 				try {
 					await this.submit();
-
-					this.reset(); // otherwise it will update the second time
-					this.textField.setHeight(this.minComposerHeight);
-
-					this.onSync()
-					this.textField.syncValue();
-					this.ownerCt.doLayout();
-					this.doLayout();
 				} catch(e) {
 					GO.errorDialog.show(e.message);
 				}
+				this.reset(); // otherwise it will update the second time
+				this.textField.setHeight(this.minComposerHeight);
+
+				this.onSync()
+				this.textField.syncValue();
+				this.ownerCt.doLayout();
+				this.doLayout();
+
+				this.textField.focus();
 
 				this.sendBtn.setDisabled(false);
 
