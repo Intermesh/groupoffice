@@ -1,4 +1,5 @@
 
+- Finance: Fixed docs not loading when there was no quote book
 - Core: Support double primary key in logging delete changes
 - Finance: Confirm overwrite of finance doc line with article data.
 - Files: Fixed Stored XSS Vulnerability via Malicious File Names in Upload Feature
