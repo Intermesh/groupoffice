@@ -2,6 +2,7 @@
 - Finance: Confirm overwrite of finance doc line with article data.
 - Files: Fixed Stored XSS Vulnerability via Malicious File Names in Upload Feature
 - Calendar/summary/Core: Add user was broken when start module was not installed and calendar was installed
+- Core: Confirm close window with changes
 
 08-01-2024: 6.8.28
 - Core: Added "strike through" button in html editor

@@ -81,6 +81,7 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 	},
 
 	isDirty: function () {
+
 		const fields = this.getAllFormFields();
 		for(let i = 0, l = fields.length; i < l; i++) {
 			if (fields[i].isDirty && fields[i].isDirty()) {
@@ -95,7 +96,7 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 	 * Required for  resetting after loading a form
 	 */
 	setNotDirty : function() {
-		var dirty = false, fn = function (i) {
+		var fn = function (i) {
 			i.originalValue = i.getValue();
 			i.dirty = false;
 			if(i.setNotDirty) {

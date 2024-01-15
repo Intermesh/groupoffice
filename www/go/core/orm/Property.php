@@ -1455,6 +1455,7 @@ abstract class Property extends Model {
 			}, $models);
 		}
 
+		$sortOrder = 0;
 		$this->{$relation->name} = [];
 		foreach ($models as $newProp) {
 
@@ -1464,6 +1465,12 @@ abstract class Property extends Model {
 			}
 
 			$this->applyRelationKeys($relation, $newProp);
+
+			// this is also done in {@see Property::patchArray()} but that is only done when settings the relation via {@see setValues()}
+			// when setting the objects directy it relies on this procedure:
+			if(isset($relation->orderBy)) {
+				$newProp->{$relation->orderBy} = $sortOrder++;
+			}
 
 			if (!$newProp->internalSave()) {
 				$this->relatedValidationErrors = $newProp->getValidationErrors();
@@ -2248,13 +2255,14 @@ abstract class Property extends Model {
 		}
 
 		// set sort order column defined in relation
+		// needs to be done before save because the order could be the only thing
+		// that has changed and relations need a modified property in order to be saved.
 		if(isset($relation->orderBy)) {
 			$sortOrder = 0;
 			foreach ($this->{$propName} as $newProp) {
 				$newProp->{$relation->orderBy} = $sortOrder++;
 			}
 		}
-
 
 		return $this->$propName;
 	}

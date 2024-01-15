@@ -251,6 +251,19 @@ Ext.override(Ext.form.BasicForm,{
 			this.doAction(submitAction, options);
 			return this;
 	},
+
+	/**
+	 * Sets all fields to "not" dirty.
+	 */
+	trackReset : function() {
+		this.items.each(i => {
+			i.originalValue = i.getValue();
+			i.dirty = false; //MS: for form group and possibly other components
+			if(i.setNotDirty) {
+				i.setNotDirty(false);
+			}
+		});
+	},
 	
 	setValuesOrig: Ext.form.BasicForm.prototype.setValues,
 	/**

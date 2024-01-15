@@ -108,6 +108,14 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		this.initTitleField();
 
+		this.on("beforeclose", this.onBeforeClose, this);
+
+	},
+
+	onBeforeClose : function() {
+		if(this.formPanel.isDirty()) {
+			return confirm(t("Are you sure you want to close this window and discard your changes?"));
+		}
 	},
 
 	initButtons: function() {
@@ -420,6 +428,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			if(me.redirectOnSave && isNew) {
 				me.entityStore.entity.goto(serverId);
 			}
+
 
 			if(me.closeOnSubmit) {
 				me.close();
