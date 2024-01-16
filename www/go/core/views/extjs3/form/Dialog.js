@@ -108,6 +108,16 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		this.initTitleField();
 
+		this.on("beforeclose", this.onBeforeClose, this);
+
+	},
+
+	closeWithModifications: false,
+
+	onBeforeClose : function() {
+		if(!this.closeWithModifications && this.formPanel.isDirty()) {
+			return confirm(t("Are you sure you want to close this window and discard your changes?"));
+		}
 	},
 
 	initButtons: function() {
@@ -288,9 +298,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 		var me = this;
 
 		me.loading = true;
+		me.currentId = id;
 
 		function innerLoad(){
-			me.currentId = id;
 			me.actionStart();
 			me.formPanel.load(id, function(entityValues) {
 				me.onLoad(entityValues);
@@ -422,7 +432,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 			}
 
 			if(me.closeOnSubmit) {
+				me.closeWithModifications = true;
 				me.close();
+			} else {
+				me.formPanel.trackReset();
 			}
 
 			return serverId;

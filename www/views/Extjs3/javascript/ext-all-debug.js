@@ -43405,6 +43405,7 @@ Ext.form.BasicForm = Ext.extend(Ext.util.Observable, {
         var dirty = false;
         this.items.each(function(f){
            if(f.isDirty()){
+						 console.log("Dirty form field",f);
                dirty = true;
                return false;
            }
