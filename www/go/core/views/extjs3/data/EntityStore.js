@@ -207,7 +207,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	save : function(entity, id) {
 		if(id) {
 			entity.id = id;
-			return window.groupofficeCore.jmapds(this.entity.name).update(entity);
+			return window.groupofficeCore.jmapds(this.entity.name).update(id, entity);
 		}else
 		{
 			return window.groupofficeCore.jmapds(this.entity.name).create(entity);
@@ -323,10 +323,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 		if(params.update) {
 			for (let id in params.update) {
-				params.update[id].id = id;
+				// params.update[id].id = id;
 				proms.push(
 					window.groupofficeCore.jmapds(this.entity.name)
-						.update(params.update[id])
+						.update(id, params.update[id])
 						.then(e => {
 							if(!response.updated) {
 								response.updated = {};
