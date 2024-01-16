@@ -263,44 +263,46 @@ go.Jmap = {
 			var entities = go.Entities.getAll().filter(function(e) {
 				return e.package != "legacy";
 			});
+
+			window.groupofficeCore.client.sse(entities.column("name"));
 			
-			var url = go.User.eventSourceUrl + '?types=' + 
-							entities.column("name").join(',');
-			
-			this.eventSource = new EventSource(url), me = this;
-
-			this.eventSource.addEventListener('msg', function(e) {
-				go.Notifier.flyout({title:"New message",description: event.data, time: 5000});
-			});
-
-			this.eventSource.addEventListener('exception', function(e) {
-				console.error(e);
-			});
-
-			this.eventSource.addEventListener('state', function(e) {
-
-				var data = JSON.parse(e.data);
-
-				for(var entity in data) {
-					var store = go.Db.store(entity);
-					if(store) {
-						(function(store) {
-							store.getState().then(function(state) {
-								// console.warn(store.entity.name, state);
-								if(!state || state == data[store.entity.name]) {
-									//don't fetch updates if there's no state yet because it never was used in that case.
-									return;
-								}
-								
-								store.getUpdates().catch((e) => {
-									console.warn(e);
-									//ignore changes error, sync will reset on error
-								});
-							});
-						})(store);
-					}
-				}
-			}, false);
+			// var url = go.User.eventSourceUrl + '?types=' +
+			// 				entities.column("name").join(',');
+			//
+			// this.eventSource = new EventSource(url), me = this;
+			//
+			// this.eventSource.addEventListener('msg', function(e) {
+			// 	go.Notifier.flyout({title:"New message",description: event.data, time: 5000});
+			// });
+			//
+			// this.eventSource.addEventListener('exception', function(e) {
+			// 	console.error(e);
+			// });
+			//
+			// this.eventSource.addEventListener('state', function(e) {
+			//
+			// 	var data = JSON.parse(e.data);
+			//
+			// 	for(var entity in data) {
+			// 		var store = go.Db.store(entity);
+			// 		if(store) {
+			// 			(function(store) {
+			// 				store.getState().then(function(state) {
+			// 					// console.warn(store.entity.name, state);
+			// 					if(!state || state == data[store.entity.name]) {
+			// 						//don't fetch updates if there's no state yet because it never was used in that case.
+			// 						return;
+			// 					}
+			//
+			// 					store.getUpdates().catch((e) => {
+			// 						console.warn(e);
+			// 						//ignore changes error, sync will reset on error
+			// 					});
+			// 				});
+			// 			})(store);
+			// 		}
+			// 	}
+			// }, false);
 
 
 
