@@ -268,16 +268,16 @@ go.form.Chips = Ext.extend(Ext.Container, {
 
 		
 		this.comboBox = new go.form.ComboBox({
-			listeners: {
-				focus: function(combo){
-					//use settimeout to give combo change to run initLis()
-					setTimeout(function() {
-						if(!combo.isExpanded()) {
-							combo.onTriggerClick();
-						}
-					});
-				}
-			},
+			// listeners: {
+			// 	focus: function(combo){
+			// 		//use settimeout to give combo change to run initLis()
+			// 		setTimeout(function() {
+			// 			if(!combo.isExpanded()) {
+			// 				combo.onTriggerClick();
+			// 			}
+			// 		});
+			// 	}
+			// },
 			submit: false,
 			fieldLabel: this.fieldLabel,
 			anchor: '100%',
