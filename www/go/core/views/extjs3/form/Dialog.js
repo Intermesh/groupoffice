@@ -112,8 +112,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 	},
 
+	closeWithModifications: false,
+
 	onBeforeClose : function() {
-		if(this.formPanel.isDirty()) {
+		if(!this.closeWithModifications && this.formPanel.isDirty()) {
 			return confirm(t("Are you sure you want to close this window and discard your changes?"));
 		}
 	},
@@ -429,9 +431,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 				me.entityStore.entity.goto(serverId);
 			}
 
-
 			if(me.closeOnSubmit) {
+				me.closeWithModifications = true;
 				me.close();
+			} else {
+				me.formPanel.trackReset();
 			}
 
 			return serverId;

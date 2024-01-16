@@ -181,8 +181,6 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 				me.fireEvent("submit", me, true, serverId);
 
-				me.form.trackReset();
-
 				return me.entityStore.single(serverId).then(function(entity) {
 					me.entity = entity;
 					me.currentId = serverId;
