@@ -2,6 +2,7 @@
 namespace go\modules\community\test\model;
 
 use go\core\jmap\Entity;
+use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Mapping;
 use go\core\util\DateTime;
 
@@ -10,6 +11,8 @@ use go\core\util\DateTime;
  * 
  */
 class A extends Entity {
+
+	use CustomFieldsTrait;
 	
 	/**
 	 * The primary key

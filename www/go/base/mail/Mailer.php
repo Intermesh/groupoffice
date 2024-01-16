@@ -22,28 +22,24 @@
 namespace GO\Base\Mail;
 
 
-class Mailer extends \Swift_Mailer
+class Mailer extends \go\core\mail\Mailer
 {
 
 	/**
 	 * Create a new Mailer instance.
 	 *
 	 * @return Mailer
-	 * @var \Swift_SmtpTransport $transport .
+
 	 * Optionally supply a transport class. If omitted a Transport
 	 * object will be created that uses the smtp settings from config.php
 	 *
 	 */
-	public static function newGoInstance($transport = false)
+	public static function newGoInstance()
 	{
-		if (!$transport) {
-			$transport = Transport::newGoInstance();
-		}
-		$mailer = new self($transport);
-		return $mailer;
+		return new self();
 	}
 	
-	public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null) {
+	public function send(\go\core\mail\Message $message) : bool {
 		
 		
 		if(!empty(\GO::config()->disable_mail)){
@@ -69,34 +65,8 @@ class Mailer extends \Swift_Mailer
 			$message->setCc(array());
 			\GO::debug("E-mail debugging is enabled in the Group-Office config.php file. All emails are sent to: ".\GO::config()->debug_email);
 		}
-		
-		//workaround https://github.com/swiftmailer/swiftmailer/issues/335
-		$messageId = $message->getId();
-		
-		if(!empty(\GO::config()->force_swift_header_base64_encoding)){
-			foreach($message->getHeaders()->getAll() as $header) {
-				if($header->getFieldName() != 'Subject')
-					$header->setEncoder(new \Swift_Mime_HeaderEncoder_Base64HeaderEncoder());
-			}
-		}
-		
-		$count = parent::send($message, $failedRecipients);
-		
-		$message->setId($messageId);
-		
-		// Check if a tmp dir is created to store attachments.
-		// If so, then remove the tmp dir if the mail is send successfully.
-		$tmpDir = $message->getTmpDir();
-		if(!empty($tmpDir)){
-			$folder = new \GO\Base\Fs\Folder($tmpDir);
-			// Check if folder is deleted successfully
-			if ($folder->delete()) {
-				\GO::debug('Clear attachments tmp directory: ' . $tmpDir);
-			} else {
-				\GO::debug('Failed to clear attachments tmp directory: ' . $tmpDir);
-			}
-		}
-		
+		$count = parent::send($message);
+
 		return $count;
 	}
 }

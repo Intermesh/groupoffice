@@ -690,6 +690,9 @@ class WBXMLDefs {
                         0x11 => "AccountId", // Since 14.1
                         0x12 => "FirstDayOfWeek", // Since 14.1
                         0x13 => "MeetingMessageType", // Since 14.1
+	                      0x15 => 'IsDraft', //since 16.0
+	                      0x16 => 'Bcc', //since 16.0
+	                      0x17 => 'Send', //since 16.0
                     ),
                     0x17 => array( //Since 14.0
                         0x05 => "Subject",
@@ -720,9 +723,33 @@ class WBXMLDefs {
                         0x17 => "ContentOwner",
                         0x18 => "RemoveRightsManagementProtection",
                     ),
+	                0x19 => array( // Since 16.1
+		                0x05 => "Find",
+		                0x06 => "SearchId",
+		                0x07 => "ExecuteSearch",
+		                0x08 => "MailBoxSearchCriterion",
+		                0x09 => "Query",
+		                0x0A => "Status",
+		                0x0B => "FreeText",
+		                0x0C => "Options",
+		                0x0D => "Range",
+		                0x0E => "DeepTraversal",
+		                0x11 => "Response",
+		                0x12 => "Result",
+		                0x13 => "Properties",
+		                0x14 => "Preview",
+		                0x15 => "HasAttachments",
+		                0x16 => "Total",
+		                0x17 => "DisplayCc",
+		                0x18 => "DisplayBcc",
+		                0x19 => "GalSearchCriterion",
+		                0x20 => "MaxPictures",
+		                0x21 => "MaxSize",
+		                0x22 => "Picture",
+	                ),
               ),
               "namespaces" => array(
-                  //0 => "AirSync", //
+//                  0 => "AirSync", //
                   1 => "POOMCONTACTS",
                   2 => "POOMMAIL",
                   3 => "AirNotify", //no longer used
@@ -747,6 +774,7 @@ class WBXMLDefs {
                   0x16 => "POOMMAIL2", //14.0
                   0x17 => "Notes", //14.0
                   0x18 => "RightsManagement",
+	                0x19 => "Find", //16.1
               )
           );
 }

@@ -5,10 +5,9 @@ namespace go\core\imap;
 use DateTimeZone;
 use Exception;
 use go\core\data\Model;
-use go\core\mail\RecipientList;
+use go\core\mail\AddressList;
+use go\core\mail\Util;
 use go\core\util\StringUtil;
-use Swift_ByteStream_FileByteStream;
-use Swift_Message;
 
 
 /**
@@ -823,17 +822,17 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 			if ($message->hasWritableProperty($prop)) {
 
 				if (in_array($prop, self::$mimeDecodeAttributes)) {				
-					$value = Utils::mimeHeaderDecode($value);					
+					$value = Util::mimeHeaderDecode($value);
 				}
 
 				if ($prop == 'to' || $prop == 'cc' || $prop == 'bcc') {
-					$list = new RecipientList($value);
+					$list = new AddressList($value);
 					$value = $list->toArray();
 				}
 
 
 				if ($prop == 'from' || $prop == 'replyTo' || $prop == 'displayNotificationTo') {
-					$list = new RecipientList($value);
+					$list = new AddressList($value);
 					$value = isset($list[0]) ? $list[0] : null;
 				}
 
@@ -1300,11 +1299,6 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 //		return $this->check_response($response);
 	}
 
-	public function toArray(array $properties = null): array
-	{
-		return parent::toArray($properties);
-	}
-
 	/**
 	 * Set or clear flags on messages in this mailbox 
 	 * 
@@ -1358,17 +1352,15 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 
 	/**
 	 * Append a message to a mailbox
-	 *
-	 * @param Swift_Message $message
+
 	 * @param string $flags {@see setFlags()}
 	 * @return boolean
 	 */
-	public function appendMessage(Swift_Message $message, array $flags = null) {
+	public function appendMessage(\go\core\mail\Message $message, array $flags = null) {
 
 		$tmpfile = IFW::app()->getAuth()->getTempFolder()->getFile(uniqid(time()));
 
-		$is = new Swift_ByteStream_FileByteStream($tmpfile->getPath(), true);
-		$message->toByteStream($is);
+
 
 		unset($message);
 		unset($is);

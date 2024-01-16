@@ -21,6 +21,7 @@ namespace GO\Email\Model;
 
 use GO\Base\Fs\Folder;
 use GO\Base\Fs\File;
+use go\core\fs\Blob;
 
 class ImapMessageAttachment extends MessageAttachment
 {
@@ -101,6 +102,18 @@ class ImapMessageAttachment extends MessageAttachment
 		}
 
 		return $this->getTempFile();
+	}
+
+	public function createBlob() : Blob {
+
+		$this->createTempFile();
+
+		$blob = Blob::fromTmp(new \go\core\fs\File(\GO::config()->tmpdir . $this->getTempFile()));
+		$blob->save();
+		$this->blobId = $blob->id;
+
+		return $blob;
+
 	}
 
 	public function getEstimatedSize(): float

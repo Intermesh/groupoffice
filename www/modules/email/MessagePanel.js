@@ -102,12 +102,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<div class="em-links">'+
 				'<tpl for="links">'+
 					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> ' +
-					'<tpl if="entity==\'LinkedEmail\'">'+
-					'<a href="#email"  onclick="const win = new go.links.LinkDetailWindow({entity\:\'LinkedEmail\'});win.load({model_id});">'+
-					'</tpl>' +
-					'<tpl if="entity!=\'LinkedEmail\'">' +
-						'<a href="#{entity}/{model_id}">' +
-					'</tpl>' +
+					'<a href="#email"  onclick="const win = new go.links.LinkDetailWindow({entity\:\'{entity}\'});win.load({model_id});">'+
 					'{name}</a> <label>{description}</label>' +
 					'{[this.addDeleteBtn(values)]}</p>' +
 					'</div>' +
@@ -141,6 +136,11 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<tpl if="iCalendar.feedback">'+
 				'<div class="message-icalendar">'+
 
+				'<tpl if="!iCalendar.invitation">' +
+				'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
+				'{[values.iCalendar.feedback]}</div>'+
+				'</tpl>'+
+
 
 
 				'<tpl if="iCalendar.invitation">'+
@@ -157,18 +157,22 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 					'<tpl if="iCalendar.invitation.is_cancellation">'+
 						'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
 						'{[values.iCalendar.feedback]}</div>'+
-						'<div class="message-icalendar-actions">'+
-							'<a class="normal-link" id="em-icalendar-delete-event-'+this.bodyId+'" >'+t("Delete Event", "email")+'</a>'+
+						'<tpl if="iCalendar.invitation.event_id">'+
+							'<div class="message-icalendar-actions">'+
+								'<a class="normal-link" id="em-icalendar-delete-event-'+this.bodyId+'" >'+t("Delete Event", "email")+'</a>'+
 							'</div>'+
+						'</tpl>'+
 					'</tpl>'+
 
 					'<tpl if="iCalendar.invitation.is_update">'+
 						'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
 						'{[values.iCalendar.feedback]}</div>'+
-						'<div class="message-icalendar-actions">'+
-						'<a id="em-icalendar-open-'+this.bodyId+'" class="normal-link" style="padding-right:20px;" >'+t("Open Event", "email")+'</a>'+
-							'<a class="normal-link" id="em-icalendar-update-event-'+this.bodyId+'" >'+t("Update Event", "email")+'</a>'+
-							'</div>'+
+						'<tpl if="iCalendar.invitation.event_id">'+
+							'<div class="message-icalendar-actions">'+
+							'<a id="em-icalendar-open-'+this.bodyId+'" class="normal-link" style="padding-right:20px;" >'+t("Open Event", "email")+'</a>'+
+								'<a class="normal-link" id="em-icalendar-update-event-'+this.bodyId+'" >'+t("Update Event", "email")+'</a>'+
+								'</div>'+
+							'</tpl>'+
 					'</tpl>'+
 
 				'</tpl>'+

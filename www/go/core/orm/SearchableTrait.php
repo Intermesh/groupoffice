@@ -67,6 +67,17 @@ trait SearchableTrait {
 		return null;
 	}
 
+	/**
+	 * Override and return false if you don't want the entity to be indexed.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	protected function includeInSearch(): bool
+	{
+		return true;
+	}
+
 
 	/**
 	 * Save entity to search cache
@@ -87,6 +98,14 @@ trait SearchableTrait {
 				->where('entityTypeId','=', static::entityType()->getId())
 				->andWhere('entityId', '=', $this->id)->single()
 			: false;
+
+		if(!$this->includeInSearch()) {
+			if($search) {
+				Search::delete($search->primaryKeyValues());
+			}
+			return true;
+		}
+
 
 		if(!$search) {
 			$search = new Search();
@@ -210,7 +229,6 @@ trait SearchableTrait {
 
 	/**
 	 *
-	 * @param class-string<Entity> $cls
 	 * @param int $offset
 	 * @return Statement
 	 * @throws Exception
@@ -234,14 +252,15 @@ trait SearchableTrait {
 	}
 
 	/**
-	 * @param class-string<Entity> $cls
 	 * @throws Exception
 	 */
 	public static function rebuildSearchForEntity() {
 		$cls = static::class;
 		echo $cls."\n";
 
+		if(ob_get_level() > 0) ob_flush();
 		flush();
+
 
 		echo "Deleting old values\n";
 
@@ -249,6 +268,7 @@ trait SearchableTrait {
 			->where('entityTypeId', '=', $cls::entityType()->getId())
 			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue($cls::getMapping()->getPrimaryTable()->getAlias() . '.id'))
 		);
+
 		$stmt->execute();
 
 		go()->getDbConnection()->exec("commit");
@@ -262,11 +282,13 @@ trait SearchableTrait {
 		
 		//In small batches to keep memory low	
 		while($stmt->rowCount()) {
+			if(ob_get_level() > 0) ob_flush();
 			flush();
 
 			while ($m = $stmt->fetch()) {
 
 				try {
+					if(ob_get_level() > 0) ob_flush();
 					flush();
 
 					$m->saveSearch();

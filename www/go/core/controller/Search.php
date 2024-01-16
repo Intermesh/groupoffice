@@ -24,24 +24,20 @@ class Search extends EntityController {
 		return model\Search::class;
 	}
 
-	public function email($params) {
-		
+	public function email(array $params)
+	{
 		$q = $params['filter']['text'] ?? null;
-
-
 
 		$hasAddressbook = Module::isAvailableFor("community", "addressbook");
 		$isEmailModuleAvailable = Module::isAvailableFor("legacy", "email");
 		//TODO change when email module has been refactored.
 		$optionEnabled = \GO::config()->get_setting("email_sort_email_addresses_by_time", go()->getAuthState()->getUserId());
 
-
 		if (!$hasAddressbook || !go()->getSettings()->userAddressBook()->getPermissionLevel()) {
 
 			$query = new Query();
 
 			$selectQueryContact = 'u.id as entityId, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId';
-
 
 			if ($isEmailModuleAvailable && $optionEnabled == "1") {
 				$selectQueryContact .= ', NULL as priority';
@@ -59,12 +55,18 @@ class Search extends EntityController {
 						->orWhere('displayName', 'LIKE', '%' . $q . '%')
 				);
 			}
+
 			$query->andWhere('enabled', '=', 1);
 		}
 
 		if ($hasAddressbook) {
 
-			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, IF(c.department IS NULL or c.department = "", c.name, CONCAT(c.name, " (", c.department, ")")) as name, c.photoBlobId';
+			if(isset($query)) { // try to join contact for department property
+				$query->join("addressbook_contact", "c", "c.goUserId=u.id", 'LEFT');
+				$query->select($selectQueryContact . ', "" as extra');
+			}
+
+			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.department as extra, c.photoBlobId';
 
 			if($isEmailModuleAvailable && $optionEnabled == "1") {
 				$selectQuery .= ', em.last_mail_time AS priority';

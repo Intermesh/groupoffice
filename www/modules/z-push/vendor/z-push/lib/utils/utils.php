@@ -665,6 +665,7 @@ class Utils {
             case 'MoveItems':            return ZPush::COMMAND_MOVEITEMS;
             case 'GetItemEstimate':      return ZPush::COMMAND_GETITEMESTIMATE;
             case 'MeetingResponse':      return ZPush::COMMAND_MEETINGRESPONSE;
+	          case 'Find':               return ZPush::COMMAND_FIND;
             case 'Search':               return ZPush::COMMAND_SEARCH;
             case 'Settings':             return ZPush::COMMAND_SETTINGS;
             case 'Ping':                 return ZPush::COMMAND_PING;

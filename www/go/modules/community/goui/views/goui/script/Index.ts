@@ -17,7 +17,7 @@ modules.register(  {
 
 			router.add(/^goui-notes\/(\d+)$/, (noteId) => {
 				modules.openMainPanel("goui-notes");
-				notes.showNote(parseInt(noteId));
+				notes.showNote(noteId);
 			});
 
 			modules.addMainPanel("community", "goui","goui-notes", "GOUI Notes", () => {

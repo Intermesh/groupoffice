@@ -35,7 +35,7 @@ use go\modules\community\addressbook\model\Date;
  * @property int $user_id
  * @property int $id
  * @property int $acl_write
- * @property int $group_id FK to the go_tempalte_group table
+ * @property int $group_id FK to the go_template_group table
  */
 class Template extends \GO\Base\Db\ActiveRecord{
 	
@@ -66,7 +66,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 
 	public function getGroupName() {
 		$group = TemplateGroup::model()->findByPk($this->group_id);
-		return !empty($group) ? $group->name : '-';
+		return !empty($group) ? $group->name : '('.go()->t('None').')';
 	}
 	
 	// TODO : move language from mailings module to addressbook module

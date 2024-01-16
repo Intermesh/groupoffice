@@ -469,7 +469,6 @@ abstract class Base extends Model {
 		return $all[$name];
 	}
 	
-	
 	protected function joinCustomFieldsTable(Query $query) {
 		if(!$query->isJoined($this->field->tableName())){
 			$cls = $query->getModel();
@@ -490,5 +489,13 @@ abstract class Base extends Model {
 			$this->joinCustomFieldsTable($query);						
 			$criteria->where('customFields.' . $this->field->databaseName, $comparator, $value);
 		});
+	}
+
+
+	/**
+	 * Called when field is copied
+	 * @return void
+	 */
+	public function onCopy() {
 	}
 }

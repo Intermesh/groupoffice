@@ -23,30 +23,40 @@ class SegmentIterator implements RecursiveIterator
         $this->key = 0;
         $this->keys = array_keys($this->ref);
     }
+
+		#[\ReturnTypeWillChange]
     public function hasChildren()
     {
         return $this->valid() && $this->current() instanceof Segment;
     }
+	#[\ReturnTypeWillChange]
     public function current()
     {
         return $this->ref[$this->keys[$this->key]];
     }
+
+	#[\ReturnTypeWillChange]
     function getChildren()
     {
         return new self($this->current()->children);
     }
+	#[\ReturnTypeWillChange]
     public function key()
     {
         return $this->key;
     }
+	#[\ReturnTypeWillChange]
     public function valid()
     {
         return array_key_exists($this->key, $this->keys);
     }
+	#[\ReturnTypeWillChange]
     public function rewind()
     {
         $this->key = 0;
     }
+
+	#[\ReturnTypeWillChange]
     public function next()
     {
         $this->key ++;

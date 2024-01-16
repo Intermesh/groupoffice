@@ -68,7 +68,24 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						vtype:'emailAddress',
 						allowBlank:false,
 						hint: t('The recovery e-mail is used to send a forgotten password request to.','users','core')+'<br>'+t('Please use an email address that you can access from outside Group-Office.','users','core')
-					})
+					}),
+						// new Ext.form.DisplayField({
+						// 	name: "authenticators",
+						// 	height: dp(44),
+						// 	fieldLabel: t("Authenticators"),
+						// 	setValue: function(v) {
+						//
+						// 			var result = '';
+						//
+						// 			for(var i = 0, method; method = v[i]; i++) {
+						// 				result += '<div style="display:inline-block;margin-right: 16px"><i title="'+method+'" class="icon go-module-icon-'+method+'"></i> ' + method + '</div>';
+						// 			}
+						//
+						// 			this.setRawValue(result);
+						//
+						//
+						// 	}
+						// })
 					]
 				
 			}]
@@ -207,7 +224,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					xtype: "button",
 					text: t("Logout all"),
 					handler : () => {
-						this.authorizedClients.setValue([]);
+						this.authorizedClients.setValue({});
 					}
 				}]
 		})
@@ -247,8 +264,10 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 	},
 	
 	checkPasswordAvailable : function(data) {
-		//disable password fieldset if there's no password authentication method. User logged in via imap or ldap autheticator for example.
-		var visible = data.authenticators.indexOf("password") > -1
+		//disable password fieldset if there's no password authentication method.
+		// User logged in via imap or ldap autheticator for example.
+		// If there are 0 authenticators we enable it too, so it's possible to set a password.
+		var visible = data.authenticators.length == 0 || data.authenticators.indexOf("password") > -1
 
 		this.usernameField.setDisabled(!visible);
 		this.passwordField1.setDisabled(!visible);

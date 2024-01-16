@@ -22,6 +22,7 @@ use go\core\Environment;
 use go\core\exception\ConfigurationException;
 use go\core\exception\NotFound;
 use go\core\Installer;
+use go\core\mail\Address;
 use go\core\mail\Message;
 use go\core\mail\Util;
 use go\core\orm\exception\SaveException;
@@ -110,6 +111,14 @@ class User extends AclItemEntity {
 	 * @var string
 	 */
 	public $email;
+
+
+	/**
+	 * Flag indicating if the user is allowed to receive newsletters
+	 *
+	 * @var bool
+	 */
+	public $newsletterAllowed = true;
 
 	/**
 	 * Alternative e-mail address for password reset
@@ -267,8 +276,6 @@ class User extends AclItemEntity {
 	protected $last_password_change;
 	public $force_password_change;
 
-	protected $permissionLevel;
-	
 	public function getDateTimeFormat(): string
 	{
 		return $this->dateFormat . ' ' . $this->timeFormat;
@@ -720,7 +727,9 @@ class User extends AclItemEntity {
 		$auth = new Authenticate();
 		$primary = $auth->getPrimaryAuthenticatorForUser($this->username);
 
-		$authenticators[] = $primary;
+		if($primary) {
+			$authenticators[] = $primary;
+		}
 
 		foreach ($auth->getSecondaryAuthenticatorsForUser($this->username) as $authenticator) {
 			if ($authenticator::isAvailableFor($this->username)) {
@@ -755,7 +764,7 @@ class User extends AclItemEntity {
 		
 		$message = go()->getMailer()->compose()	  
 			->setFrom(go()->getSettings()->systemEmail, $siteTitle)
-			->setTo(!empty($to) ? $to : $this->recoveryEmail, $this->displayName)
+			->setTo(new Address(!empty($to) ? $to : $this->recoveryEmail, $this->displayName))
 			->setSubject(go()->t('Lost password'))
 			->setBody($emailBody);
 		
@@ -810,11 +819,15 @@ class User extends AclItemEntity {
 			UserDisplay::entityType()->changes([[$this->id, $this->findAclId(), 0]]);
 		}
 
+		if($this->isModified(['password'])) {
+			Token::destroyOtherSessons();
+		}
+
 		return true;
 	}
 
 
-	protected function internalGetModified(&$properties = [], bool $forIsModified = false)
+	protected function internalGetModified(array|string &$properties = [], bool $forIsModified = false): bool|array
 	{
 		// check if it's empty because the parent method will fill it with all props
 		$allProps = empty($properties);
@@ -916,10 +929,11 @@ class User extends AclItemEntity {
 			}
 		}
 
-		if (empty($contact->name) || $this->isModified(['displayName'])) {
+		if (empty($contact->name) || ($this->isModified(['displayName']) && $contact->name != $this->displayName)) {
 			$contact->name = $this->displayName;
 			$parts = explode(' ', $this->displayName);
 			$contact->firstName = array_shift($parts);
+			$contact->middleName = "";
 			$contact->lastName = implode(' ', $parts);
 		}
 
@@ -1181,6 +1195,7 @@ class User extends AclItemEntity {
 			}
 			$nameParts = explode(" ", $this->displayName);
 			$this->contact->firstName = array_shift($nameParts);
+			$this->contact->middleName = "";
 			$this->contact->lastName = implode(" ", $nameParts);
 		}
 		
@@ -1225,7 +1240,7 @@ class User extends AclItemEntity {
 	 */
 	public function decorateMessage(Message $message)
 	{
-		$message->setTo($this->email, $this->displayName);
+		$message->setTo(new Address($this->email, $this->displayName));
 	}
 
 	private $country;

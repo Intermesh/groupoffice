@@ -44,7 +44,7 @@ class ColumnModel {
 	/**
 	 * @var bool
 	 */
-	private $_columnSorted;
+	private $_columnsSorted = false;
 
 	/**
 	 * @var string|array
@@ -121,21 +121,6 @@ class ColumnModel {
 					return $model->getCustomFields();
 				});
 				$this->addColumn($column);
-				
-				
-//				$cfAttributes = array_keys($model->customfieldsRecord->columns);
-//				array_shift($cfAttributes); //remove model_id column
-//
-//				foreach ($cfAttributes as $colName) {
-//					if(!in_array($colName, $excludeColumns)){
-//					
-//						$sortIndex = empty($includeColumns) ? 0 : array_search($colName, $includeColumns);				
-//						if($sortIndex!==false){
-//							$column = new Column($colName, $model->customfieldsRecord->getAttributeLabel($colName), $sortIndex);
-//							$this->addColumn($column);
-//						}
-//					}
-//				}
 			}
 	}
 
@@ -284,8 +269,12 @@ class ColumnModel {
 		unset($this->_columnsSorted);
 		$this->_sortColumns();
 	}
-	
-	
+
+
+	public function setColumnsSorted(bool $val)
+	{
+		$this->_columnsSorted = true;
+	}
 	/**
 	 * Give an array with the columnheaders in the order that you want.
 	 * The existing columns will be ordered to the given columnheaders array.

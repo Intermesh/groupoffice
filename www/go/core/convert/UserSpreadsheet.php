@@ -10,7 +10,8 @@ use go\modules\community\serverclient\Module as GoModule;
 
 class UserSpreadsheet extends Spreadsheet {
 
-	public static $excludeHeaders = ['syncSettings', 'taskSettings', 'notesSettings', 'addressBookSettings', 'calendarSettings', 'emailSettings', 'googleauthenticator'];
+	public static $excludeHeaders = ['syncSettings', 'tasksSettings', 'notesSettings', 'addressBookSettings',
+		'calendarSettings', 'emailSettings', 'supportSettings', 'projectsSettings', 'otp', 'password', 'authenticators'];
 
 	protected function init()
 	{

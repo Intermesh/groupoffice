@@ -17,6 +17,7 @@ namespace GO\Files\Model;
 
 use GO;
 use go\core\fs\Blob;
+use go\core\mail\Attachment;
 use go\core\model\Module;
 use go\modules\community\history\model\LogEntry;
 use go\core\exception\NotFound;
@@ -52,7 +53,7 @@ use go\core\exception\NotFound;
  *
  * @property boolean $delete_when_expired
  */
-class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttachableInterface {
+class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableInterface {
 
 	use \go\core\orm\CustomFieldsTrait;
 
@@ -112,7 +113,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 			return false;
 		}
 
-		return array('name'=>$this->name, 'description'=>$path);
+		return array('name'=>$this->name, 'description'=>$path, 'filter' => $this->folder->getIdPath() . "/");
 	}
 
 	public function getLogMessage($action){
@@ -259,7 +260,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 			$enoughQuota = \GO::user()->disk_usage + $newBytes <= $userQuota;
 		}
 		if ($enoughQuota && \GO::config()->quota > 0) {
-			$currentQuota = \GO::config()->get_setting('file_storage_usage');
+			$currentQuota = (int) \GO::config()->get_setting('file_storage_usage', 0 ,0);
 			$enoughQuota = $currentQuota + $newBytes <= (\GO::config()->quota * 1024);
 		}
 		
@@ -396,7 +397,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 				$this->folder->quotaUser->calculatedDiskUsage($sizeDiff)->save(true); //user quota
 			}
 			if(GO::config()->quota>0) {
-				GO::config()->save_setting("file_storage_usage", GO::config()->get_setting('file_storage_usage')+$sizeDiff); //system quota
+				GO::config()->save_setting("file_storage_usage", (int) GO::config()->get_setting('file_storage_usage', 0 ,0) + $sizeDiff); //system quota
 			}
 		}
 
@@ -405,7 +406,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	private function _removeQuota(){
 		if(\GO::config()->quota>0){
 			\GO::debug("Removing quota: $this->size");
-			\GO::config()->save_setting("file_storage_usage", \GO::config()->get_setting('file_storage_usage')-$this->size);
+			\GO::config()->save_setting("file_storage_usage", (int) GO::config()->get_setting('file_storage_usage', 0 ,0) - $this->size);
 		}
 
 		if($this->folder->quotaUser){
@@ -789,17 +790,19 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		$storeParams->join(\GO\Base\Model\SearchCacheRecord::model()->tableName(), $joinSearchCacheCriteria, 'sc', 'INNER');
 
 
-		$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()
-							->addRawCondition('a.aclId', 'sc.aclId','=', false);
+		if(!go()->getAuthState()->isAdmin()) {
+			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()
+				->addRawCondition('a.aclId', 'sc.aclId', '=', false);
 
-		$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
-						->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id),"a", false);
+			$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
+				->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
-		$storeParams->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER');
+			$storeParams->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER');
 
-		$storeParams->criteria(\GO\Base\Db\FindCriteria::newInstance()
-								->addModel(Folder::model())
-								->mergeWith($aclWhereCriteria));
+			$storeParams->criteria(\GO\Base\Db\FindCriteria::newInstance()
+				->addModel(Folder::model())
+				->mergeWith($aclWhereCriteria));
+		}
 
 		$storeParams->group(array('t.id'))->order('mtime','DESC');
 
@@ -869,16 +872,16 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	}
 
 	/**
-	 * Returns this file as swift attachment
+	 * Returns this file as attachment
 	 * 
 	 * @param string $altName
-	 * @return Swift_Attachment
+	 * @return Attachment
 	 */
 	public function getAttachment($altName = null) {
 	
 		$fullPath = $this->getFsFile()->path();
 		
-		$attachment = \Swift_Attachment::fromPath($fullPath);
+		$attachment = Attachment::fromPath($fullPath);
 		
 		if($altName !== null){
 			$attachment->setFilename($altName);

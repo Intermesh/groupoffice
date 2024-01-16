@@ -124,7 +124,6 @@ go.smtp.AccountDialog = Ext.extend(go.form.Dialog, {
 				t("A message was sent successfully to {email}").replace('{email}', me.formPanel.getForm().findField('fromEmail').getValue())
 			);
 		}).catch(function(response) {
-			debugger;
 			var error = "<br /><br />" + (response.description || response.message);
 
 			Ext.MessageBox.alert(

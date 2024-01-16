@@ -1,10 +1,13 @@
 @use "sass:math";
 
+@function density($size) {
+	@return math.div($size, 160) * 62.5%
+}
 @function dp($width) {
-	@return math.floor(math.div(($width * $density), 16)) * .1px;
+	@return $width * .1rem;
 }
 @function sp($size) {
-	@return ceil(math.div(($size * $density) , 160) * $font-scale) *1px;
+	@return $size * $font-scale *.1rem;
 }
 
 %icon {

@@ -15,4 +15,9 @@ class Module extends core\Module {
 	{
 		return "Intermesh BV";
 	}
+
+	public function getDependencies(): array
+	{
+		return ['community/notes'];
+	}
 }

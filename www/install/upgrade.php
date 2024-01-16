@@ -33,9 +33,11 @@ try {
 		exit();
 	}
 
-	if(go()->getEnvironment()->hasIoncube() && !go()->getSettings()->licenseDenied && (empty(go()->getSettings()->license) || !License::isValid())) {
-		header("Location: license.php");
-		exit();
+	if(empty($_GET['skip_license'])) {
+		if (go()->getEnvironment()->hasIoncube() && !go()->getSettings()->licenseDenied && (empty(go()->getSettings()->license) || !License::isValid())) {
+			header("Location: license.php");
+			exit();
+		}
 	}
 
 	if(go()->getDatabase()->hasTable("studio_studio")) {

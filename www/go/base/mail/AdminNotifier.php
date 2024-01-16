@@ -4,6 +4,7 @@ namespace GO\Base\Mail;
 
 
 use go\core\ErrorHandler;
+use go\core\mail\Address;
 use Throwable;
 
 class AdminNotifier {
@@ -22,7 +23,7 @@ class AdminNotifier {
 
 			$message->setBody($body, 'text/plain');
 			$message->setFrom(\GO::config()->webmaster_email, \GO::config()->title);
-			$message->addTo(\GO::config()->webmaster_email, 'Webmaster');
+			$message->addTo(new Address(\GO::config()->webmaster_email, 'Webmaster'));
 
 			Mailer::newGoInstance()->send($message);
 		} catch(Throwable $e) {

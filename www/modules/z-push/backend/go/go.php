@@ -53,7 +53,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	}
 
 	public function GetBackend($folderid) {
-		ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetBackend($folderid)");
+		ZLog::Write(LOGLEVEL_DEBUG, "BackendGO->GetBackend($folderid)");
 		$root = strtok($folderid, '/');
 		if (isset($this->backends[$root])){
 			return $this->backends[$root];
@@ -404,7 +404,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
      */
     public function GetSupportedASVersion() {
 
-        return ZPush::ASV_14;
+        return ZPush::ASV_141;
 //        $version = ZPush::ASV_14;
 //        foreach ($this->backends as $i => $b) {
 //            $subversion = $this->backends[$i]->GetSupportedASVersion();
@@ -500,7 +500,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
      * @return boolean
      */
     public function TerminateSearch($pid) {
-        ZLog::Write(LOGLEVEL_DEBUG, "Combined->TerminateSearch()");
+        ZLog::Write(LOGLEVEL_DEBUG, "BackendGO->TerminateSearch()");
         foreach ($this->backends as $i => $b) {
             if ($this->backends[$i] instanceof ISearchProvider) {
                 $this->backends[$i]->TerminateSearch($pid);
@@ -518,7 +518,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
      * @return boolean
      */
     public function Disconnect() {
-        ZLog::Write(LOGLEVEL_DEBUG, "Combined->Disconnect()");
+        ZLog::Write(LOGLEVEL_DEBUG, "BackendGO->Disconnect()");
         foreach ($this->backends as $i => $b) {
             if ($this->backends[$i] instanceof ISearchProvider) {
                 $this->backends[$i]->Disconnect();
@@ -545,7 +545,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
                 }
             }
         }
-        ZLog::Write(LOGLEVEL_DEBUG, sprintf("Combined->getSearchBackend('%s') No support found!", $searchtype));
+        ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendGO->getSearchBackend('%s') No support found!", $searchtype));
 
         return false;
     }
@@ -602,38 +602,44 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 		$notifications = array();
 //		$stopat = time() + $timeout - 1;
-			foreach ($this->sinkfolders as $folder) {
-				
-				$f = $this->GetBackendFolder($folder);
-				$b = $this->GetBackend($folder);
-				if(!$b) {
-                    ZLog::Write(LOGLEVEL_DEBUG, "Backend not found for $folder");
-                    continue;
-                }
-				$newstate = $b->getNotification($f);
-				
-				ZLog::Write(LOGLEVEL_DEBUG, $folder.': '.$newstate);
-				
-				if (!isset($this->sinkstates[$folder])) {					
-					$this->sinkstates[$folder] = $newstate;
-				}		
-				
-				if ($this->sinkstates[$folder] != $newstate) {
-					$notifications[] = $folder;
-					$this->sinkstates[$folder] = $newstate;
-				}				
+		foreach ($this->sinkfolders as $folder) {
+
+			$f = $this->GetBackendFolder($folder);
+			$b = $this->GetBackend($folder);
+			if(!$b) {
+                  ZLog::Write(LOGLEVEL_DEBUG, "Backend not found for $folder");
+                  continue;
+              }
+			$newstate = $b->getNotification($f);
+
+			ZLog::Write(LOGLEVEL_DEBUG, $folder.': '.$newstate);
+
+			if (!isset($this->sinkstates[$folder])) {
+				$this->sinkstates[$folder] = $newstate;
 			}
-			
-			ZLog::Write(LOGLEVEL_DEBUG, "All sink folders checked");
-			
-			ZLog::Write(LOGLEVEL_DEBUG, "Closing DB connection");
-			\GO::unsetDbConnection();
-			
-			if (empty($notifications)){
-				
-				ZLog::Write(LOGLEVEL_DEBUG, "Sleeping ".$timeout." seconds");
-				sleep($timeout);
+
+			if ($this->sinkstates[$folder] != $newstate) {
+				$notifications[] = $folder;
+				$this->sinkstates[$folder] = $newstate;
 			}
+		}
+
+		ZLog::Write(LOGLEVEL_DEBUG, "All sink folders checked");
+
+		ZLog::Write(LOGLEVEL_DEBUG, "Closing DB connection: " . go()->getDbConnection()->getId());
+
+		go()->getDbConnection()->disconnect();
+		\go\core\db\Table::destroyInstances();
+		go()->getCache()->disableMemory();
+		gc_collect_cycles();
+
+		ZLog::Write(LOGLEVEL_DEBUG, "Memory: " . memory_get_usage());
+
+		if (empty($notifications)){
+
+			ZLog::Write(LOGLEVEL_DEBUG, "Sleeping ".$timeout." seconds");
+			sleep($timeout);
+		}
 		return $notifications;
 	}
 }

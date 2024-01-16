@@ -14,7 +14,7 @@ use go\core\orm\Query;
 
 class MultiSelect extends Select {
 	
-	private $optionsToSave;
+	protected $optionsToSave;
 	
 	protected function getFieldSQL() {
 		return false;
@@ -27,7 +27,13 @@ class MultiSelect extends Select {
 	protected function getTableDefinition() {
 		$fieldSet = FieldSet::findById($this->field->fieldSetId);
 		$entityType = EntityType::findByName($fieldSet->getEntity());
-		$table = $entityType->getClassName()::getMapping()->getPrimaryTable();
+		$cls = $entityType->getClassName();
+
+		if(is_a($cls, \GO\Base\Db\ActiveRecord::class, true)) {
+			$table = go()->getDatabase()->getTable($cls::model()->tableName());
+		} else {
+			$table = $cls::getMapping()->getPrimaryTable();
+		}
 		return $table;
 	}
 
@@ -54,9 +60,10 @@ class MultiSelect extends Select {
 		$tableName = $this->field->tableName();
 		$multiSelectTableName = $this->getMultiSelectTableName();
 		$entityColumn = $this->getTableDefinition()->getColumn('id');
+		$type = $entityColumn->dataType . ($entityColumn->unsigned?' UNSIGNED':'');
 
 		$sql = "CREATE TABLE IF NOT EXISTS `$multiSelectTableName` (
-			`id` $entityColumn->dataType NOT NULL,
+			`id` $type NOT NULL,
 			`optionId` int(11) NOT NULL,
 			PRIMARY KEY (`id`,`optionId`),
 			KEY `optionId` (`optionId`)
@@ -189,8 +196,8 @@ class MultiSelect extends Select {
 			$cls = $query->getModel();
 			$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
 			$joinAlias = $this->getJoinAlias();
-			$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id', 'left');
-
+			$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id', 'left')
+				->groupBy([$primaryTableAlias . '.id']);
 			if(isset($value[0]) && is_numeric($value[0])) {
 				//When field option ID is passed by a saved filter
 				$criteria->where($joinAlias. '.optionId', '=', $value);

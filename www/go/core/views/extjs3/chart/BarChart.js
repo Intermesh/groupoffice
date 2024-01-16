@@ -4,7 +4,7 @@ go.chart.BarChart = Ext.extend(go.chart.ChartComponent, {
 	 go.chart.BarChart.superclass.initComponent.call(this);
 	},
 
-	chartType: "Bar",
+	chartType: "bar",
 
 	/**
 	 * @var {Array}

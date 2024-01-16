@@ -9,7 +9,10 @@ use go\modules\community\multi_instance\model\Instance;
 use Throwable;
 
 class InstanceCron extends CronJob {
-	
+
+	/**
+	 * docker-compose exec -u www-data groupoffice ./www/cli.php core/System/runCron --name=InstanceCron --module=multi_instance --package=community
+	 */
 	public function run(CronJobSchedule $schedule) {
 		//The server manager calls cron via HTTP because it doesn't know the document root when running
 		//multiple versions of GO.v It passes ?exec=1 to make it run on the command line.

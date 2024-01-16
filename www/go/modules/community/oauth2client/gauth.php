@@ -18,30 +18,8 @@ $state = new State();
 //not possible with oauth flow.
 State::$CSRFcheck = false;
 
-$tokenStr = Request::get()->getQueryParam('token');
-if ($tokenStr) {
-	$tokenStrParts = explode(';', $tokenStr);
-	$accessToken = $tokenStrParts[0];
-
-	$token = Token::find()->where(['accessToken' => $accessToken])->single();
-	if ($token) {
-		$state->setToken($token);
-	} else {
-		\go\core\ErrorHandler::log("Gauth: Access token '" . $accessToken . "' not found!");
-	}
-}
-
-/**
- * Validate user's state
- */
-App::get()->setAuthState($state);
-if (!App::get()->getAuthState()->isAuthenticated()) {
-	Response::get()->setStatus(401, 'Unauthorized');
-	throw new \go\core\http\Exception(401);
-}
-
-
 $router = (new Router())
 	->addRoute('/authenticate\/([0-9]+)/', 'GET', Oauth2Client::class, 'auth')
 	->addRoute('/callback/', "GET", Oauth2Client::class, 'callback')
+	->addRoute('/openid\/([0-9]+)/', "GET", Oauth2Client::class, 'openid')
 	->run();

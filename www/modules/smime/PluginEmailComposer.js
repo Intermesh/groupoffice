@@ -25,7 +25,8 @@ GO.moduleManager.onModuleReady('email',function(){
 				text:t("Sign with SMIME", "smime"),
 				checked: false,
 				listeners : {
-					checkchange: function(check, checked) {	
+					checkchange: function(check, checked) {
+						debugger;
 						
 						this.sendParams['sign_smime'] = checked
 						? '1'
@@ -47,7 +48,6 @@ GO.moduleManager.onModuleReady('email',function(){
 			})]);
 		
 			this.on('afterShowAndLoad',function(){
-
 
 				if(!this.sendParams.encrypt_smime) {
 					this.sendParams.encrypt_smime = "0";
@@ -134,7 +134,7 @@ GO.moduleManager.onModuleReady('email',function(){
 			if(record.json.has_smime_cert && record.json.always_sign=="1"){
 				// Record has an smime cert and always sign is set to true
 				this.signCheck.setChecked(true);
-				this.sendParams['sign_smime'] ="1";	
+				this.sendParams['sign_smime'] ="1";
 			} else {
 				// Record does not have an smime cert
 				this.signCheck.setChecked(false);

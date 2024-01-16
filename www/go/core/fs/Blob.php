@@ -91,7 +91,7 @@ class Blob extends orm\Entity {
 	public $staleAt;
 	
 	private $tmpFile;
-	private $removeFile = true;
+	private $removeFile = false;
 
 	private $hardLink = false;
 
@@ -219,6 +219,7 @@ class Blob extends orm\Entity {
 
 		$blob->modifiedAt = $file->getModifiedAt();
 		$blob->hardLink = $hardLink;
+		$blob->removeFile = false;
 
 		return $blob;
 	}
@@ -300,7 +301,12 @@ class Blob extends orm\Entity {
 				if($this->removeFile) {
 					$tempFile->move(new File($this->path()));
 				} else if($this->hardLink) {
-					$tempFile->link(new File($this->path()));
+					try {
+						$tempFile->link(new File($this->path()));
+					} catch(Exception $e) {
+						//ignore
+						$tempFile->copy(new File($this->path()));
+					}
 				} else {
 					$tempFile->copy(new File($this->path()));					
 				}
@@ -329,7 +335,7 @@ class Blob extends orm\Entity {
 		$blobs = Blob::find()->mergeWith($query);
 
 		foreach($blobs as $blob) {
-			if($blob->id != go()->getSettings()->logoId) {
+			if($blob->id != go()->getSettings()->logoId && $blob->id != go()->getSettings()->logoIdDark) {
 				$ids[] = $blob->id;
 				$paths[] = $blob->path();
 			}
@@ -470,7 +476,7 @@ class Blob extends orm\Entity {
 	 * foreach($blobIds as $blobId) {
 	 *  $blob = \go\core\fs\Blob::findById($blobId);
 	 *
-	 *  $img = \Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
+	 *  $img = Attachment::fromPath($blob->getFile()->getPath());
 	 *  $img->setContentType($blob->type);
 	 *  $contentId = $this->embed($img);
 	 *  $body = \go\core\fs\Blob::replaceSrcInHtml($body, $blobId, $contentId);

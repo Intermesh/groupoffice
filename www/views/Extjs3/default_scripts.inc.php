@@ -183,26 +183,27 @@ if ($cacheFile->exists()) {
 			$bundleFile = new File($module->moduleManager->path(). 'views/goui/dist/Index.js');
 			if($bundleFile->exists()) {
 				$gouiScripts[] = $bundleFile;
-			} else {
-
-				if (!$scriptsFile || !file_exists($scriptsFile)) {
-					$scriptsFile = $modulePath . 'scripts.txt';
-					if (!file_exists($scriptsFile))
-						$scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
-
-					$prefix = "";
-				}
-				
-				if (file_exists($scriptsFile)) {
-					$data = file_get_contents($scriptsFile);
-					$lines = array_map('trim', explode("\n", $data));
-					foreach ($lines as $line) {
-						if (!empty($line)) {
-							$scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
-						}
-					}
-				}
 			}
+
+
+            if (!$scriptsFile || !file_exists($scriptsFile)) {
+                $scriptsFile = $modulePath . 'scripts.txt';
+                if (!file_exists($scriptsFile))
+                    $scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
+
+                $prefix = "";
+            }
+
+            if (file_exists($scriptsFile)) {
+                $data = file_get_contents($scriptsFile);
+                $lines = array_map('trim', explode("\n", $data));
+                foreach ($lines as $line) {
+                    if (!empty($line)) {
+                        $scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
+                    }
+                }
+            }
+
 		}
 	}
 

@@ -21,7 +21,8 @@ class Settings extends Controller {
 						->setBody(go()->t("Your settings are correct.\n\nBest regards,\n\nGroup-Office"));
 
 		$success = $message->send();
-		
-		Response::get()->addResponse(['success' => $success]);
+
+		$success ? Response::get()->addResponse(['success' => $success]) :
+			Response::get()->addError(['message' => $message->getMailer()->lastError()]);
 	}
 }

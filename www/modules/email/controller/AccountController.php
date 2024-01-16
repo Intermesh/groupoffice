@@ -27,25 +27,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 	}
 
 
-//	protected function actionTest($params){
-//
-//		\GO::$disableModelCache=true;
-//
-//		for($i=0;$i<1000;$i++){
-//
-//			echo $i."<br>";
-//			${"account".$i} = \GO\Email\Model\Account::model()->findSingle();
-//
-//			${"account".$i}->openImapConnection("INBOX");
-//		}
-//
-//
-//
-//	}
-
-//	protected function headers() {
-//		header('Content-Type: application/json; charset=UTF-8');
-//	}
 	protected function getStoreParams($params) {
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
@@ -58,6 +39,22 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 				'type' => 'INNER',
 				'criteria' => \GO\Base\Db\FindCriteria::newInstance()->addCondition('default', 1, '=', 'a')
 						));
+
+
+		if(isset($params['sort'] ) && $params['sort'] == 'user') {
+			$findParams->ignoreAdminGroup();
+			$findParams->joinModel(array(
+				'model' => 'GO\Email\Model\AccountSort',
+				'foreignField' => 'account_id', //defaults to primary key of the remote model
+				'localField' => 'id', //defaults to primary key of the model
+				'type' => 'LEFT',
+				'tableAlias'=>'s',
+				'criteria'=>  \GO\Base\Db\FindCriteria::newInstance()->addCondition('user_id', \GO::user()->id,'=','s')
+			));
+			$findParams->order('s.order', 'DESC');
+
+			unset($params['sort']);
+		}
 
 		return $findParams;
 	}
@@ -441,9 +438,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 					$node['iconCls'] .= 'ic-drafts';
 					$sortIndex = 2;
 					break;
-				case 'INBOX/Spam':
-				case 'INBOX.Spam':
-				case 'Spam':
+				case $mailbox->getAccount()->spam:
 					$node['iconCls'] .= 'ic-new-releases';
 					$sortIndex = 4;
 					break;
@@ -556,36 +551,65 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 
 		$move = !empty($params['move']);
 
-		foreach ($srcMessages as $srcMessageInfo) {
-			$srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
-			$srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
+		// This function is very inefficient because it essentially does a copy on each individual message, because it checks if it's between different accounts
+		// If we treat both cases differently, we can greatly speed things up
 
-			$targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
+		// We create two arrays. One for UIDs belonging to the same account, one for UIDs from different accounts
+		// This can probably be optimized further because now we lookup srcAccountModel / $targetAccountModel twice for the external case
+		$internalMove=[];
+    $externalMove=[];
 
-			if(!$targetAccountModel->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
+    foreach ($srcMessages as $srcMessageInfo) {
+      $srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
+
+      $targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
+
+      if(!$targetAccountModel->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
 				throw new \GO\Base\Exception\AccessDenied();
-			}
+      }
 
-			if($move && $targetAccountModel->id == $srcAccountModel->id) {
-				$conn = $srcAccountModel->openImapConnection( $srcMessageInfo->mailboxPath);
+      if($move && $targetAccountModel->id == $srcAccountModel->id) {
 
-				$conn->move([$srcImapMessage->uid],$params["targetMailboxPath"]);
+        $srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
 
-			} else {
-				$targetImapConnection = $targetAccountModel->openImapConnection($params["targetMailboxPath"]);
+        $internalMove[]=$srcImapMessage->uid;
+      } else {
+        $externalMove[]=$srcMessageInfo;
+      }
+    }
 
-				$flags = '';
+		// Move everything in one shot vs foreach move
+    if (is_array($internalMove) && count($internalMove)>0) {
+      $conn = $srcAccountModel->openImapConnection( $srcMessageInfo->mailboxPath);
 
-				if ($srcMessageInfo->seen)
+      $conn->move($internalMove,$params["targetMailboxPath"]);
+    }
+
+		// Different accounts, do it the slow way
+    if (is_array($externalMove) && count($externalMove)>0) {
+
+      foreach ($externalMove as $srcMessageInfo) {
+
+        $srcAccountModel = \GO\Email\Model\Account::model()->findByPk($srcMessageInfo->accountId);
+
+        $srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
+
+        $targetAccountModel = \GO\Email\Model\Account::model()->findByPk($params['targetAccountId']);
+
+        $targetImapConnection = $targetAccountModel->openImapConnection($params["targetMailboxPath"]);
+
+        $flags = '';
+
+        if ($srcMessageInfo->seen)
 					$flags = '\SEEN';
 
-				$targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
+        $targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
 
-				if ($move) {
+        if ($move) {
 					$srcImapMessage->delete();
-				}
-			}
-		}
+        }
+      }
+    }
 
 		return array('success'=>true);
 	}

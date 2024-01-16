@@ -189,7 +189,7 @@ CREATE TABLE `core_search` (
   `name` varchar(100) DEFAULT NULL,
   `description` varchar(190) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
-  `filter` VARCHAR(50) NULL DEFAULT NULL,
+  `filter` VARCHAR(190) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL,
   `rebuild` bool default false not null
@@ -537,7 +537,7 @@ ALTER TABLE `core_change_user_modseq`
 
 ALTER TABLE `core_cron_job`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `description` (`description`),
+  ADD UNIQUE KEY `name` (`name`),
   ADD KEY `moduleId` (`moduleId`);
 
 ALTER TABLE `core_customfields_field`
@@ -773,7 +773,8 @@ ALTER TABLE `core_customfields_select_option`
 
 ALTER TABLE `core_entity`
   ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
-ALTER TABLE `core_entity` ADD FOREIGN KEY (`defaultAclId`) REFERENCES `core_acl`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `core_entity`
+    ADD CONSTRAINT `core_entity_ibfk_2` FOREIGN KEY (`defaultAclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 ALTER TABLE `core_group`
   ADD CONSTRAINT `core_group_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
@@ -909,7 +910,7 @@ create table core_email_template
     constraint core_email_template_ibfk_2
         foreign key (moduleId) references core_module (id)
             on delete cascade
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 create index core_email_template_moduleId_key_index
     on core_email_template (moduleId, `key`);
@@ -1066,7 +1067,8 @@ CREATE TABLE `core_alert` (
     FOREIGN KEY (`userId`)
     REFERENCES `core_user` (`id`)
     ON DELETE cascade
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
     on core_alert (entityTypeId, entityId, tag, userId);
@@ -1113,7 +1115,7 @@ create table core_pdf_template
             on delete cascade,
     constraint core_pdf_template_ibfk_2
         foreign key (stationaryBlobId) references core_blob (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 create index core_pdf_template_key_index
     on core_pdf_template (moduleId, `key`);
@@ -1209,7 +1211,8 @@ CREATE TABLE `core_permission` (
       FOREIGN KEY (`groupId`)
           REFERENCES `core_group` (`id`)
           ON DELETE CASCADE
-          ON UPDATE NO ACTION);
+          ON UPDATE NO ACTION)
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 create index core_change_modSeq_entityTypeId_entityId_index
     on core_change (modSeq, entityTypeId, entityId);
@@ -1237,4 +1240,10 @@ create table core_import_mapping
     constraint core_import_mapping_core_entity_null_fk
         foreign key (entityTypeId) references core_entity (id)
             on delete cascade
-);
+)
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+create index core_search_filter_index
+    on core_search (filter);

@@ -62,7 +62,7 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 			var p = this.getParams(node);
 			
 			if(node.attributes.params) {
-				go.util.mergeObjects(p, node.attributes.params);
+				GO.util.mergeObjects(p, node.attributes.params);
 			}
 			
 			this.doRequest(p,callback,scope,{node:node});

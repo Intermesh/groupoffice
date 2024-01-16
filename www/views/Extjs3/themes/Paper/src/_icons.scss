@@ -166,6 +166,9 @@ define icons with:
 $btn-icon : (
 	btn-add : add,
 	btn-delete : delete,
+	btn-auto-delete: auto_delete,
+	btn-delete-sweep: delete_sweep,
+	btn-mark-email-read: mark_email_read,
 	btn-refresh : refresh,
 	btn-settings : settings,
 	btn-logout: exit_to_app,
@@ -230,6 +233,7 @@ $btn-icon : (
 	x-edit-bold: format_bold,
 	x-edit-italic: format_italic,
 	x-edit-underline: format_underlined,
+	x-edit-strikeThrough: format_strikethrough,
 	x-edit-increasefontsize: format_size,
 	x-edit-decreasefontsize: text_fields,
 	x-edit-forecolor: format_color_text,

@@ -102,7 +102,7 @@ class Odf {
 	 * @return odf
 	 */
 	public function setVars($key, $value, $encode = true) {
-			$value = $encode ? htmlspecialchars($value, ENT_COMPAT, 'UTF-8') : $value;
+			$value = $encode ? htmlspecialchars($value ?? "", ENT_COMPAT, 'UTF-8') : $value;
 			
 			//\GO::debug('ODF var: '.$key.'=>'.$value);
 			

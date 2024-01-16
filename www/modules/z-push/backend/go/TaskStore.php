@@ -15,7 +15,7 @@ class TaskStore extends Store {
 
 		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
 			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
 		$task = Task::findById($id);
@@ -23,14 +23,14 @@ class TaskStore extends Store {
 		if (!$task) {
 			return true;
 		} else if($task->getPermissionLevel() < Acl::LEVEL_DELETE){
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		} else {
 			try {
 				return Task::delete($task->primaryKeyValues());
 			} catch (Exception $e) {
 				ZLog::Write(LOGLEVEL_FATAL, 'Task::EXCEPTION ~~ ' .  $e->getMessage());
 				ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
-				throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+				throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 			}
 		}
 	}
@@ -56,7 +56,7 @@ class TaskStore extends Store {
 
 				return false;
 			} else if ($task->getPermissionLevel() < Acl::LEVEL_DELETE) {
-				throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+				throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 			}
 
 			$task->tasklistId = $newfolderid;
@@ -382,14 +382,19 @@ class TaskStore extends Store {
 		return $folders;
 	}
 
+	private $notificationStmt;
+
 	public function getNotification($folder = null) {
-		$record = Task::find()
-			->fetchMode(PDO::FETCH_ASSOC)
-			->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
-//						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
-//						->where(['s.userId' => go()->getUserId()])
-			->where('tasklistId','=',$folder)
-			->single();
+
+		$stmt = Task::find()
+				->fetchMode(PDO::FETCH_ASSOC)
+				->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
+				->where('tasklistId = :tasklistId')
+				->createStatement();
+
+		$stmt->bindValue(':tasklistId', $folder, PDO::PARAM_INT);
+		$stmt->execute();
+		$record = $stmt->fetch();
 
 		$newstate = $record ? 'M'.$record['modifiedAt'].':C'.$record['count'] : "M0:C0";
 

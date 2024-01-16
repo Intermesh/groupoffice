@@ -29,6 +29,9 @@ class ScopeRepository implements ScopeRepositoryInterface
             ],
 		        'openid' => [
 			          'description' => 'OpenID Connect support',
+		        ],
+		        'profile' => [
+			        'description' => 'Your full profile',
 		        ]
         ];
 

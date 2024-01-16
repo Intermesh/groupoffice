@@ -84,11 +84,10 @@ try {
 		$installer = go()->getInstaller();
 		$installer->install($admin);
 
-
-
-
-		\go\modules\community\test\Module::get()->install();
-
+		$success = \go\modules\community\test\Module::get()->install();
+		if(!$success) {
+			throw new Exception("Could not install test module");
+		}
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;
 		$modules = GO::modules()->getAvailableModules();
@@ -117,11 +116,11 @@ try {
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {
     echo "Running upgrade: ";
-	  $importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go66.sql';
+	  $importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go67.sql';
     echo "Running: " . $importCmd . "\n";
 	  system($importCmd);
 
-	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/go66data/* ' . $dataFolder->getPath();
+	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/go67data/* ' . $dataFolder->getPath();
 	  echo "Running: " . $copyCmd . "\n";
 	  system($copyCmd);
 
@@ -132,7 +131,11 @@ try {
 
     $mod = \go\modules\community\test\Module::get();
     if(!$mod->isInstalled(false)) {
-	    $mod->install();
+	    $success = $mod->install();
+
+			if(!$success) {
+				throw new Exception("Could not install test module");
+			}
     }
 
   } else {
@@ -141,6 +144,13 @@ try {
 	go()->rebuildCache();
 
 	go()->setAuthState(new State());
+
+
+	go()->getSettings()->systemEmail = 'admin@intermesh.localhost';
+	go()->getSettings()->smtpHost = 'mailserver';
+	go()->getSettings()->smtpPort = 25;
+	go()->getSettings()->smtpEncryption = null;
+	go()->getSettings()->save();
 
 } catch (Exception $e) {
 	echo $e;

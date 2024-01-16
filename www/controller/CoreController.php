@@ -15,6 +15,9 @@ use GO;
 use GO\Base\Language;
 use GO\Base\Util\Number;
 use GO\Base\Util\StringHelper;
+use go\core\ErrorHandler;
+use go\core\http\Client;
+use go\core\util\JSON;
 
 
 class CoreController extends \GO\Base\Controller\AbstractController {
@@ -90,7 +93,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$response['info']='<table>';
 		
 		foreach($info as $key=>$value)
-			$response['info'] .= '<tr><td>'.$key.':</td><td>'.$value.'</td></tr>';
+			$response['info'] .= '<tr><td>'.$key.':</td><td>'.(is_scalar($value) ? $value : var_export($value, true)).'</td></tr>';
 		
 		$response['info'].='</table>';
 		
@@ -764,12 +767,53 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$response['success']=true;
 		echo json_encode($response);
 	}
+
+	private function getLatestVersionNumber() {
+		$client = new Client();
+
+		$client->setHeader("Accept", "application/vnd.github+json");
+		$client->setHeader("X-GitHub-Api-Version", "2022-11-28");
+		$response = $client->get("https://api.github.com/repos/intermesh/groupoffice/releases");
+
+		if($response['status'] != 200) {
+			return false;
+		}
+		try {
+			$releases = JSON::decode($response['body']);
+
+			$currentVersion = go()->getVersion();
+			foreach ($releases as $release) {
+
+				if($release->prerelease) {
+					continue;
+				}
+
+				$version = substr($release->tag_name, 1);
+				if (version_compare($currentVersion, $version) == -1) {
+					$currentVersion = $version;
+				}
+			}
+
+			return $currentVersion;
+		} catch(\Throwable $e) {
+			ErrorHandler::logException($e);
+			return false;
+		}
+	}
 	
 	
 	protected function actionAbout($params){
 
+		$version = go()->getVersion();
+
+		$latestVersion = $this->getLatestVersionNumber();
+
+		if($latestVersion && $latestVersion != $version) {
+			$version .= ' <span class="success">('. go()->t('update available') .': '. $latestVersion . ')</span>';
+		}
+
 		$about = strtr(GO::t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved."),[
-			'{version}' => GO::config()->version,
+			'{version}' => $version,
 			'{current_year}' => date('Y'),
 			'{company_name}' => 'Group-Office by Intermesh B.V.',
 			'{product_name}' => GO::config()->product_name
@@ -778,7 +822,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		if(!go()->getAuthState()->isAdmin()) {
 			return [
 				'success' => true,
-				'data' => ['about' => strstr($about, '<br/>')] // cut off first line with version
+				'data' => ['about' => $about] // cut off first line with version
 			];
 		}
 
@@ -913,7 +957,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	 * @param string $email
 	 * @param string $subject
 	 * @param string $body
-	 * @param array $attachments Array like this: (The given className needs to implement the GO\Base\Mail\SwiftAttachableInterface)
+	 * @param array $attachments Array like this: (The given className needs to implement the GO\Base\Mail\AttachableInterface)
 	 *	array(
 	 *		array(
 	 *			'className'=>'GO\Files\Model\File',
@@ -948,10 +992,10 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 						$altName = $attachmentSpec['altName'];
 					}
 
-					$swiftAttachment = $record->getAttachment($altName);
+					$attachment = $record->getAttachment($altName);
 					
-					if($swiftAttachment !== false){
-						$systemMessage->attach($swiftAttachment);
+					if($attachment !== false){
+						$systemMessage->attach($attachment);
 					}
 				}
 			}			

@@ -5,6 +5,7 @@ use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\mail\Address as MailAddress;
 use go\core\model\Link;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
@@ -17,6 +18,7 @@ use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
+use go\modules\business\automation\action\Email;
 use go\modules\community\addressbook\convert\Spreadsheet;
 use go\modules\community\addressbook\convert\VCard;
 use function GO;
@@ -27,11 +29,9 @@ use go\core\model\Acl;
 use GO\Files\Model\Folder;
 
 /**
- * Contact model
+ * Class Contact
  *
- * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
- * @author Merijn Schering <mschering@intermesh.nl>
- * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
+ * Represents a contact entity.
  */
 
 class Contact extends AclItemEntity {
@@ -131,9 +131,9 @@ class Contact extends AclItemEntity {
 	public $notes;
 
 	/**
-	 * 
+	 *
 	 * @var bool
-	 */							
+	 */
 	public $isOrganization = false;
 	
 	/**
@@ -194,9 +194,10 @@ class Contact extends AclItemEntity {
 	public $vatReverseCharge = false;
 
 	/**
-	 * 
+	 * The debtor number.
+	 *
 	 * @var string
-	 */							
+	 */
 	public $debtorNumber;
 
 	/**
@@ -216,20 +217,23 @@ class Contact extends AclItemEntity {
 	 * @var int
 	 */
 	public $filesFolderId;
-	
+
 	/**
+	 * Holds an array of email addresses.
 	 *
 	 * @var EmailAddress[]
 	 */
 	 public $emailAddresses = [];
-	
+
 	/**
+	 * An array to hold phone numbers.
 	 *
 	 * @var PhoneNumber[]
 	 */
 	public $phoneNumbers = [];
-	
+
 	/**
+	 * Holds an array of dates.
 	 *
 	 * @var Date[];
 	 */
@@ -270,6 +274,14 @@ class Contact extends AclItemEntity {
 	 * @var boolean
 	 */
 	protected $starred = null;
+
+
+	/**
+	 * Indicates whether the contact has may receive newsletters
+	 *
+	 * @var bool $newsletterAllowed
+	 */
+	public bool $newsletterAllowed = true;
 
 	public function getStarred(): bool
 	{
@@ -471,15 +483,23 @@ class Contact extends AclItemEntity {
 											$criteria->andWhere('isOrganization', '=', (bool) $value);
 										})
 										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
-//
-//											if(!$query->isJoined('addressbook_email_address', 'e')) {
-//												$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
-//													->groupBy(['c.id']);
-//											}
-
 											$criteria->andWhere('c.id in (select contactId from addressbook_email_address)');
+										})
+										->add("hasPhoneNumbers", function(Criteria $criteria, $value, Query $query) {
+											$criteria->andWhere('c.id in (select contactId from addressbook_phone_number)');
+										})
+										->add("hasOrganizations", function(Criteria $criteria, $value, Query $query) {
 
-//											$criteria->andWhere('e.email', $value ? 'IS NOT' : 'IS', null);
+											$sub = Contact::find()
+												->selectSingleValue('org.id')
+												->tableAlias('org')
+												->where('isOrganization', '=', true)
+												->join('core_link', 'l',
+													'c.id=l.fromId AND org.id=l.toId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId(), 'INNER');
+
+
+											$criteria->andWhereExists($sub, empty($value));
+
 										})
 
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
@@ -594,7 +614,7 @@ class Contact extends AclItemEntity {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
 											}
 											
-											$criteria->where('adr.street', $comparator, $value);
+											$criteria->where('adr.address', $comparator, $value);
 										})
                     ->addText("zip", function(Criteria $criteria, $comparator, $value, Query $query) {
                       if(!$query->isJoined('addressbook_address', 'adr')) {
@@ -782,7 +802,7 @@ class Contact extends AclItemEntity {
 
 	private function generateUid(): string
 	{
-		$url = trim(go()->getSettings()->URL, '/');
+		$url = trim(go()->getSettings()->URL ?? "", '/');
 		$uid = substr($url, strpos($url, '://') + 3);
 		$uid = str_replace(['/', ':'], ['-', '-'], $uid );
 
@@ -882,8 +902,7 @@ class Contact extends AclItemEntity {
 	protected function internalValidate() {
 
 		if($this->isOrganization) {
-			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = null;
-			$this->lastName = $this->name;
+			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = $this->lastName = null;
 		} else if(empty($this->name) || (!$this->isModified(['name']) && $this->isModified(['firstName', 'middleName', 'lastName']))) {
 			$this->setNameFromParts();
 		}
@@ -1116,11 +1135,12 @@ class Contact extends AclItemEntity {
 	 * Find a birthday, calculate diff in years
 	 *
 	 * @return int
+	 * @throws Exception
 	 */
 	public function getAge(): int
 	{
 		$bday = $this->getBirthday();
-		if($bday === '') {
+		if (empty($bday)) {
 			return 0;
 		}
 		$date = new DateTime($bday);
@@ -1290,7 +1310,7 @@ class Contact extends AclItemEntity {
 		if(!isset($this->emailAddresses[0])) {
 			return false;
 		}
-		$message->setTo($this->emailAddresses[0]->email, $this->name);
+		$message->setTo(new MailAddress($this->emailAddresses[0]->email, $this->name));
 		return true;
 	}
 

@@ -4,9 +4,18 @@ go.print = function(tmpl, data) {
 
 	paper.innerHTML = Ext.isEmpty(data) ? tmpl : tmpl.apply(data);
 
-	Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-		Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
-	});
+	if(!Ext.isGecko) {
+		Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+			Ext.isSafari ? document.execCommand('print') : window.print();
+		});
+	} else {
+		// this is not needed in firefox and somehow it also fails to resolve the promises above.
+		window.print();
+	}
+
+	window.addEventListener("afterprint" , function(){
+		paper.innerHTML = "";
+	}, {once: true});
 
 };
 
@@ -211,7 +220,7 @@ go.util =  (function () {
 			var link = config.to;
 
 			if (config.name) {
-				link = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.to + '>';
+				link = '"' + go.util.addSlashes(config.name) + '" <' + config.to + '>';
 			}
 			const qp = [];
 			if(config.body) {
@@ -367,11 +376,6 @@ go.util =  (function () {
 		},
 
 		viewFile : function(url) {
-
-			// if(Ext.isSafari && window.navigator.standalone) {
-			// 	url = "filewrap.php?url=" + encodeURIComponent(url);
-			// }
-
 			const win = this.getDownloadTargetWindow();
 
 			if(!win) {
@@ -380,6 +384,8 @@ go.util =  (function () {
 			}
 			win.focus();
 			win.location.replace(url);
+
+			this.downloadTarget = undefined;
 
 		},
 

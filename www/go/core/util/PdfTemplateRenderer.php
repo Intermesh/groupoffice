@@ -91,6 +91,11 @@ class PdfTemplateRenderer extends PdfRenderer {
 
 	}
 
+	public function getParser(): TemplateParser
+	{
+		return $this->parser;
+	}
+
 	public function getTemplate(): PdfTemplate
 	{
 		return $this->template;
@@ -299,6 +304,7 @@ class PdfTemplateRenderer extends PdfRenderer {
 
 		$data = $this->previewMode ? $block->content : $this->parser->parse($block->content);
 
+//		$data = preg_replace("/<ul>.*<\/ul>/is", "<div style=\"border:1px solid red;padding:0;margin:0\">$0</div>", $data);
 		try {
 			$this->writeHTMLCell(
 				$block->width,

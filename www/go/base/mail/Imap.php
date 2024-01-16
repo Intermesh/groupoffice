@@ -39,9 +39,9 @@ class Imap extends ImapBodyStruct
 
 	var $selected_mailbox=false;
 
-	var $touched_folders =array();
-
 	var $delimiter=false;
+	// Store all search result UIDs
+	var $allUids = 0;
 
 	var $sort_count = 0;
 
@@ -191,6 +191,12 @@ class Imap extends ImapBodyStruct
 		return false;
 	}
 
+	protected $commands = [];
+	protected $responses = [];
+	protected $short_responses = [];
+
+	private $state = "";
+	private $capability;
 	/**
 	 * Handles authentication. You can optionally set
 	 * $this->starttls or $this->auth to CRAM-MD5
@@ -351,7 +357,7 @@ class Imap extends ImapBodyStruct
 
 	public function get_acl($mailbox){
 
-		$mailbox = $this->utf7_encode($this->_escape( $mailbox));
+		$mailbox = $this->addslashes($this->utf7_encode($mailbox));
 		$this->clean($mailbox, 'mailbox');
 
 		$command = "GETACL \"$mailbox\"\r\n";
@@ -374,7 +380,7 @@ class Imap extends ImapBodyStruct
 
 	public function set_acl($mailbox, $identifier, $permissions){
 
-		$mailbox = $this->utf7_encode($this->_escape( $mailbox));
+		$mailbox = $this->addslashes($this->utf7_encode($mailbox));
 		$this->clean($mailbox, 'mailbox');
 
 		$command = "SETACL \"$mailbox\" $identifier $permissions\r\n";
@@ -387,7 +393,7 @@ class Imap extends ImapBodyStruct
 	}
 
 	public function delete_acl($mailbox, $identifier){
-		$mailbox = $this->utf7_encode($this->_escape( $mailbox));
+		$mailbox = $this->addslashes($this->utf7_encode($mailbox));
 		$this->clean($mailbox, 'mailbox');
 
 		$command = "DELETEACL \"$mailbox\" $identifier\r\n";
@@ -685,7 +691,7 @@ class Imap extends ImapBodyStruct
 								$insideNamespace = false;
 
 								if(isset($namespace['name'])){
-									$namespace['name']=$this->utf7_decode(trim($namespace['name'], $namespace['delimiter']));
+									$namespace['name'] = $this->_unescape($this->utf7_decode(trim($namespace['name'], $namespace['delimiter'])));
 									$nss[] = $namespace;
 									$namespace = array('name' => null, 'delimiter' => null);
 								}
@@ -748,7 +754,7 @@ class Imap extends ImapBodyStruct
 			}
 			$flags = false;
 			$count = count($vals);
-			$folder = $this->utf7_decode($vals[($count - 1)]);
+			$folder = $this->_unescape($this->utf7_decode($vals[($count - 1)]));
 			$flag = false;
 			$delim_flag = false;
 			$parent = '';
@@ -798,7 +804,7 @@ class Imap extends ImapBodyStruct
 			if (!isset($folders[$folder]) && $folder) {
 				$folders[$folder] = array(
 								'delimiter' => $delim,
-								'name' => $this->utf7_decode($folder),
+								'name' => $folder,
 								'marked' => $marked,
 								'noselect' => $no_select,
 								'can_have_children' => $can_have_kids,
@@ -850,9 +856,6 @@ class Imap extends ImapBodyStruct
 		}
 		if($this->selected_mailbox && $this->selected_mailbox['name']==$mailbox_name) {
 			return true;
-		}
-		if(!in_array($mailbox_name, $this->touched_folders)) {
-			$this->touched_folders[] = $mailbox_name;
 		}
 
 		$box = $this->addslashes($this->utf7_encode($mailbox_name));
@@ -1035,11 +1038,15 @@ class Imap extends ImapBodyStruct
 				if (stristr($this->capability, 'ORDEREDSUBJECT')) {
 					$ret =  $this->thread_sort($sort, $filter);
 					$this->sort_count = $ret['total'];
+					// Store all search result UIDs
+					// Unsure how to get UIDs here
 					return $ret;
 				}
 				else {
 					$uids=$this->server_side_sort('ARRIVAL', false, $filter);
 					$this->sort_count = count($uids);
+					// Store all search result UIDs
+					$this->allUids = $uids;
 					return $uids;
 				}
 			}
@@ -1047,10 +1054,14 @@ class Imap extends ImapBodyStruct
 				if (stristr($this->capability, 'THREAD')) {
 					$ret = $this->thread_sort($sort, $filter);
 					$this->sort_count = $ret['total'];
+					// Store all search result UIDs
+					// Unsure how to get UIDs here
 					return $ret;
 				} else {
 					$uids=$this->server_side_sort('ARRIVAL', false, $filter);
 					$this->sort_count = count($uids);
+					// Store all search result UIDs
+					$this->allUids = $uids;
 					return $uids;
 				}
 			}
@@ -1060,6 +1071,9 @@ class Imap extends ImapBodyStruct
 				throw new \Exception("Sort error: " . $this->last_error());
             }
 			$this->sort_count = count($uids); // <-- BAD
+			// Unsure why the above has the BAD comment (?)
+			// Store all search result UIDs
+			$this->allUids = $uids;
 			return $uids;
 		}
 		else {
@@ -1068,6 +1082,8 @@ class Imap extends ImapBodyStruct
                 throw new \Exception("Sort error: " . $this->last_error());
             }
 			$this->sort_count = count($uids);
+			// Store all search result UIDs
+			$this->allUids = $uids;
 			return $uids;
 		}
 	}
@@ -2116,17 +2132,18 @@ class Imap extends ImapBodyStruct
 		}
 
 		foreach ($struct as $id => $vals) {
-			//if(!is_array($vals) || in_array($id, $skip_ids))
-			if(!is_array($vals))
+			if(!is_array($vals)) {
 				continue;
+			}
 
 			// Strict must be true as 2.1 == 2.10 if false
 			if(isset($vals['type']) && !in_array($id, $skip_ids, true)){
 				$vals['number'] = $id;
 
 				//sometimes NIL is returned from Dovecot?!?
-				if($vals['id']=='NIL')
-					$vals['id']='';
+				if($vals['id']=='NIL') {
+					$vals['id'] = '';
+				}
 
 				$attachments[]=$vals;
 			} elseif(isset($vals['subs'])) {
@@ -2394,6 +2411,9 @@ class Imap extends ImapBodyStruct
 		return $size;
 	}
 
+	private $message_part_size;
+	private $message_part_read;
+
 	private $readFullLiteral = false;
 
 	/**
@@ -2576,16 +2596,21 @@ class Imap extends ImapBodyStruct
 	 */
 	public function move(array $uids, $mailbox='INBOX', $expunge=true)
 	{
+		if(!$this->has_capability("MOVE")) {
+			// some servers don't support UID MOVE
+			if(!$this->copy($uids, $mailbox)) {
+				return false;
+			}
 
-		if(!in_array($mailbox, $this->touched_folders)) {
-			$this->touched_folders[]=$mailbox;
+			return $this->delete($uids);
 		}
 
-		if(!$this->copy($uids, $mailbox)) {
-			return false;
-		}
+		$this->clean($mailbox, 'mailbox');
 
-		return $this->delete($uids, $expunge);
+    $command = "UID MOVE %s \"".$this->addslashes($this->utf7_encode($mailbox))."\"\r\n";
+    $status = $this->_runInChunks($command, $uids);
+    return $status;
+
 	}
 
 	/**
@@ -2867,45 +2892,22 @@ class Imap extends ImapBodyStruct
 	 * Append a message to a mailbox
 	 *
 	 * @param string $mailbox
-	 * @param string|\Swift_Message $data
+	 * @param string|File $data
 	 * @param string $flags See set_message_flag
 	 * @return boolean
 	 */
 	public function append_message($mailbox, $data, $flags="") :bool
 	{
-		if($data instanceof \Swift_Message){
-			$tmpfile = \GO\Base\Fs\File::tempFile();
+		if ($data instanceof File) {
 
-			$is = new \Swift_ByteStream_FileByteStream($tmpfile->path(), true);
-			$data->toByteStream($is);
-
-			unset($data);
-			unset($is);
-
-			if(!$this->append_start($mailbox, $tmpfile->size(), $flags)) {
-				return false;
-			}
-
-			$fp = fopen($tmpfile->path(), 'r');
-
-			while($line = fgets($fp, 1024)){
-				if(!$this->append_feed($line)) {
-					return false;
-				}
-			}
-
-			fclose($fp);
-			$tmpfile->delete();
-		} else if ($data instanceof File) {
-
-			if(!$this->append_start($mailbox, $data->size(), $flags)) {
+			if (!$this->append_start($mailbox, $data->size(), $flags)) {
 				return false;
 			}
 
 			$fp = fopen($data->path(), 'r');
 
-			while($line = fgets($fp, 1024)){
-				if(!$this->append_feed($line)) {
+			while ($line = fgets($fp, 1024)) {
+				if (!$this->append_feed($line)) {
 					return false;
 				}
 			}
@@ -2913,6 +2915,7 @@ class Imap extends ImapBodyStruct
 			fclose($fp);
 
 		} else {
+
 			if(!$this->append_start($mailbox, strlen($data), $flags)) {
 				return false;
 			}

@@ -58,11 +58,6 @@ class Router {
 		if(!isset($requests)) {
 			$requests = Request::get()->getBody();
 		}
-		
-//		if(!is_array($body)) {
-//			return $this->error("urn:ietf:params:jmap:error:notRequest", 400, "The request parsed as JSON but did not match the type signature of the Request object.");
-//
-//		}
 
 		while($method = array_shift($requests)) {
 			$this->callMethod($method);
@@ -103,11 +98,27 @@ class Router {
 			}
 			
 		} catch (Throwable $e) {
+
+			if($e instanceof Exception) {
+				switch($e->getCode()) {
+					case 401:
+						$type = "unauthorized";
+						break;
+					case 403:
+						$type = "forbidden";
+						break;
+
+					default:
+						$type = "serverFail";
+				}
+			} else{
+				$type = lcfirst((new ReflectionClass($e))->getShortName());
+			}
 			// convert jmap classes to set error response
 			// https://jmap.io/spec-core.html#errors
 			$error = [
 				"message" => $e->getMessage(),
-				"type" => lcfirst((new ReflectionClass($e))->getShortName())
+				"type" => $type
 			];
 			
 			if(go()->getDebugger()->enabled) {

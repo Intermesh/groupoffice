@@ -19,8 +19,6 @@ GO.email.MessagesGrid = function(config){
 	config.paging=true;
 
 	config.hideMode='offsets';
-
-
 		
 		config.cm =  new Ext.grid.ColumnModel({
 		defaults:{
@@ -296,8 +294,13 @@ GO.email.MessagesGrid = function(config){
 				scope: this
 			},
 			this.composerButton = new Ext.Button({
-				iconCls: 'ic-drafts',
-				text: t("Compose", "email"),
+				iconCls: 'ic-edit',
+				desktop: {
+					text: t("Compose", "email"),
+				},
+				mobile: {
+					tooltip: t("Compose", "email"),
+				},
 				cls: 'primary',
 				handler: function () {
 					GO.email.showComposer({account_id: this.account_id});
@@ -311,6 +314,7 @@ GO.email.MessagesGrid = function(config){
 				},
 				scope: this
 			}), this.deleteButton = new Ext.Button({
+				hidden: GO.util.isMobileOrTablet(),
 				iconCls: 'ic-delete',
 				tooltip: t("Delete"),
 				handler: function () {
@@ -326,6 +330,45 @@ GO.email.MessagesGrid = function(config){
 				paramName: 'search',
 				hidden: config.hideSearch,
 				tools: [
+					this.moveAllButton = new Ext.Button({
+						iconCls: 'ic-move-to-inbox',
+						tooltip: t('Move all'),
+						disabled: true,
+						handler: function (b) {
+
+							Ext.MessageBox.confirm(t("Confirm move"), t("Are you sure you want to move all the emails from the search result? (" + GO.email.messagesGrid.store.reader.jsonData.allUids.length + " emails)"), function (btn) {
+								if (btn !== "yes") {
+									return;
+								}
+								this.showMoveMailToDialog();
+							}, this);
+
+						},
+						scope: this
+					}),
+					this.deleteAllButton = new Ext.Button({
+						iconCls: 'ic-delete-sweep',
+						tooltip: t('Delete all'),
+						disabled: true,
+						handler: function (b) {
+
+							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete all the emails from the search result? (" + GO.email.messagesGrid.store.reader.jsonData.allUids.length + " emails)"), function (btn) {
+								if (btn !== "yes") {
+									return;
+								}
+
+								delete GO.email.messagesGrid.store.baseParams['query'];
+								GO.email.messagesGrid.store.baseParams['delete_keys'] = Ext.encode(GO.email.messagesGrid.store.reader.jsonData.allUids);
+								//GO.email.messagesGrid.store.load();
+								this.searchField.reset();
+								this.searchField.back();
+								delete GO.email.messagesGrid.store.baseParams['delete_keys'];
+
+							}, this);
+
+						},
+						scope: this
+					}),
 					this.searchType,
 					this.searchTypeButton
 				],
@@ -333,8 +376,14 @@ GO.email.MessagesGrid = function(config){
 					search: function (me, v) {
 						config.store.baseParams['search'] = v;
 						config.store.load();
+
+						this.moveAllButton.setDisabled(false);
+						this.deleteAllButton.setDisabled(false);
 					},
 					reset: function () {
+						this.moveAllButton.setDisabled(true);
+						this.deleteAllButton.setDisabled(true);
+
 						this.searchDialog.hasSearch = false;
 						delete this.store.baseParams.query;
 						delete this.store.baseParams.search;
@@ -522,28 +571,38 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		}
 
 		return unseen + icons.map(function(i) {
-			return '<i class="icon c-secondary">' + i + '</i>';
+			return '<i class="icon '+(i!=='flag'?'c-secondary':'red')+'">' + i + '</i>';
 		}).join("");
 		
 	},
 
-	/* @deprecated
-	renderFlagged : function(value, p, record){
-
-		var str = '';
-
-		if(record.data['flagged']==1)
-		{
-			//str += '<img src=\"' + GOimages['flag'] +' \" style="display:block" />';
-			str += '<div class="go-icon btn-flag"></div>';
+	showMoveMailToDialog : function() {
+		if (!this._copyMailToDialog) {
+			this._copyMailToDialog = new GO.email.CopyMailToDialog({
+				move: true
+			});
+			this._copyMailToDialog.on('copy_email',function(){
+				this.searchField.reset();
+				this.searchField.back();
+			},this);
 		}
-		if(record.data['attachments'])
-		{
-			str += '<div class="go-icon btn-attach"></div>';
-		//str += '<img src=\"' + GOimages['attach'] +' \" style="display:block" />';
-		}
-		return str;
+		this._copyMailToDialog.move = true;
 
+		var allUids = GO.email.messagesGrid.store.reader.jsonData.allUids;
+		var selectedEmailMessages = [];
+		for (var i=0; i<allUids.length;i++) {
+			selectedEmailMessages.push({
+				data : {
+					account_id : GO.email.messagesGrid.store.baseParams.account_id,
+					mailbox : GO.email.messagesGrid.store.baseParams.mailbox,
+					uid : allUids[i],
+					seen: null,
+				}
+			});
+		}
+
+		this._copyMailToDialog.show(selectedEmailMessages);
 	}
-	 */
+
 });
+

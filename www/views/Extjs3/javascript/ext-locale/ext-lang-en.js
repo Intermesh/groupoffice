@@ -225,6 +225,11 @@ if(Ext.form.HtmlEditor){
         text: 'Underline the selected text.',
         cls: 'x-html-editor-tip'
       },
+	    strikeThrough : {
+		    title: 'Strike through',
+		    text: 'Strike through the selected text.',
+		    cls: 'x-html-editor-tip'
+	    },
       increasefontsize : {
         title: 'Grow Text',
         text: 'Increase the font size.',

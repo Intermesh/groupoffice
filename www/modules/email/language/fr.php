@@ -303,7 +303,7 @@ Administration -> Comptes de messagerie -> Double-cliquez sur votre compte -> On
   'No template' => 'Pas de modèle',
   'Ok' => 'Ok',
   'mailbox' => 'boîte mail',
-  'Email address succesfully added to contact' => 'Adresse email ajoutée avec succès au contact',
+  'Email address successfully added to contact' => 'Adresse email ajoutée avec succès au contact',
   'Contact' => 'Contact',
   'encryptionSettings' => 'Paramètres de cryptage',
   'folder' => 'dossier',

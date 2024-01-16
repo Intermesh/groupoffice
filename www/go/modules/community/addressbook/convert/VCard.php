@@ -33,6 +33,14 @@ use Sabre\VObject\Splitter\VCard as VCardSplitter;
  * When importing it also keeps the original vCard data.
  */
 class VCard extends AbstractConverter {
+	/**
+	 * @var File
+	 */
+	private $tempFile;
+	/**
+	 * @var resource
+	 */
+	private $fp;
 
 	public function __construct()
 	{
@@ -508,6 +516,11 @@ class VCard extends AbstractConverter {
 		foreach($types as $type) {
 
 			switch($type) {
+
+				// we don't have a way to store pref (yet). See https://github.com/Intermesh/groupoffice/issues/1042
+				case 'pref':
+					break;
+
 				case 'cell':
 					return 'mobile';
 

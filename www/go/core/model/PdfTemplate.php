@@ -126,7 +126,7 @@ class PdfTemplate extends Entity {
 
 
 	public $footerX = 0;
-	public $footerY = 20;
+	public $footerY = -10;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -171,6 +171,11 @@ class PdfTemplate extends Entity {
 
 		$template = isset($preferredLanguage) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
 		if (!$template) {
+
+			if($preferredLanguage != go()->getSettings()->language) {
+				return self::findByModule($package, $name, go()->getSettings()->language, $key);
+			}
+
 			$template = static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key])->single();
 		}
 

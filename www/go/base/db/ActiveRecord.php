@@ -53,6 +53,7 @@ use go\core\model\Link;
 use go\core\model\Module;
 use go\core\model\User;
 use go\core\model\UserDisplay;
+use go\core\orm\exception\SaveException;
 use go\core\orm\SearchableTrait;
 use go\core\util\StringUtil;
 use go\modules\community\comments\model\Comment;
@@ -1762,9 +1763,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	private function _appendAclJoin($findParams, $aclJoinProps){
 
 		$sql = "\nINNER JOIN core_acl_group ON (`".$aclJoinProps['table']."`.`".$aclJoinProps['attribute']."` = core_acl_group.aclId";
-		if(isset($findParams['permissionLevel']) && $findParams['permissionLevel']>\GO\Base\Model\Acl::READ_PERMISSION){
-			$sql .= " AND core_acl_group.level>=".intval($findParams['permissionLevel']);
-		}
+
+		$sql .= " AND core_acl_group.level>=".intval($findParams['permissionLevel'] ?? \GO\Base\Model\Acl::READ_PERMISSION);
 
 		$groupIds = \GO\Base\Model\User::getGroupIds($findParams['userId']);
 
@@ -1949,8 +1949,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		try{
 			$result = $this->getDbConnection()->query($sql);
-			$result->model=$this;
-			$result->findParams=$findParams;
+//			$result->model=$this;
+//			$result->findParams=$findParams;
 
 			$result->setFetchMode(PDO::FETCH_CLASS, $this->className(),array(false));
 
@@ -3748,8 +3748,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
 		$search->rebuild = false;
+		$search->cutPropertiesToColumnLength();
 		if(!$search->save()) {
-			throw new \Exception("Could not save search cache!");
+			throw new SaveException($search);
 		}
 
 		if(!$isNew) {
@@ -4290,29 +4291,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 	}
 
-//	/**
-//	 * Set the output mode for this model. The default value can be set globally
-//	 * too with ActiveRecord::$attributeOutputMode.
-//	 * It can be 'raw', 'formatted' or 'html'.
-//	 *
-//	 * @param type $mode
-//	 */
-//	public function setAttributeOutputMode($mode){
-//		if($mode!='raw' && $mode!='formatted' && $mode!='html')
-//			throw new \Exception("Invalid mode ".$mode." supplied to setAttributeOutputMode in ".$this->className());
-//
-//		$this->_attributeOutputMode=$mode;
-//	}
 
-//	/**
-//	 *Get the current attributeOutputmode
-//	 *
-//	 * @return string
-//	 */
-//	public function getAttributeOutputMode(){
-//
-//		return $this->_attributeOutputMode;
-//	}
 	/**
 	 * PHP getter magic method.
 	 * This method is overridden so that AR attributes can be accessed like properties.
@@ -4910,10 +4889,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(in_array("getCacheAttributes", $overriddenMethods)){
 			
 			echo "Processing ".static::class ."\n";
+
+			if(ob_get_level() > 0) ob_flush();
+			flush();
 			
 			$entityTypeId = static::entityType()->getId();
 
 			echo "Deleting old values\n";
+
+			if(ob_get_level() > 0) ob_flush();
+			flush();
 
 			$stmt = go()->getDbConnection()->delete('core_search', (new \go\core\orm\Query)
 				->where('entityTypeId', '=',$entityTypeId)
@@ -4922,6 +4907,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$stmt->execute();
 
 			echo "Deleted ". $stmt->rowCount() . " entries\n";
+
+			if(ob_get_level() > 0) ob_flush();
+			flush();
 
 			$start = 0;
 			$limit = 1000;
@@ -4945,6 +4933,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				while ($m = $stmt->fetch()) {
 				
 					try {
+						if(ob_get_level() > 0) ob_flush();
 						flush();
 						
 						if($m->cacheSearchRecord()) {
@@ -4965,7 +4954,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 
 						echo \go\core\ErrorHandler::logException($e);
-
+						if(ob_get_level() > 0) ob_flush();
+						flush();
 						$start++;
 					}
 				}
@@ -4975,6 +4965,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 			
 			echo "\nDone\n\n";
+
+			if(ob_get_level() > 0) ob_flush();
+			flush();
 			
 		}
 	}

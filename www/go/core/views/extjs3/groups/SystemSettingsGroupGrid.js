@@ -77,6 +77,14 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 			],
 
 		columns: [
+			{
+				id: 'id',
+				header: t('ID'),
+				width: dp(80),
+				hidden: true,
+				dataIndex: 'id',
+				sortable: true
+			},
 				{
 					id: 'name',
 					header: t('Name'),

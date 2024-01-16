@@ -61,7 +61,7 @@ class Url implements ArrayableInterface {
 		return $url;
 	}
 	
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		return (string) $this;
 	}

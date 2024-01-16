@@ -5,6 +5,8 @@ require ('../www/GO.php');
 go()->getDebugger()->output = true;
 go()->getDebugger()->enable(true);
 
+go()->setAuthState(new \go\core\auth\TemporaryState(1));
+
 $start = go()->getDebugger()->getMicroTime();
 //go()->getDbConnection()->beginTransaction();
 

@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\test\model;
 
+use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
@@ -11,6 +12,8 @@ use go\core\validate\ErrorCode;
  * 
  */
 class B extends A {
+
+	use CustomFieldsTrait;
 	
 	/**
 	 *

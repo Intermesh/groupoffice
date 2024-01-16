@@ -5,7 +5,6 @@ use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Criteria;
-use go\core\fs\Blob;
 use go\core\orm\Entity;
 use go\core\jmap\Entity as JmapEntity;
 use go\core\orm\EntityType;
@@ -21,7 +20,7 @@ use go\core\exception\Forbidden;
  * Is an Access Control List to restrict access to data.
  */
 class Acl extends Entity {
-	
+
 	const LEVEL_READ = 10;
 	const LEVEL_CREATE = 20;
 	const LEVEL_WRITE = 30;
@@ -254,7 +253,8 @@ class Acl extends Entity {
 	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @throws Forbidden
 	 */
-	public static function applyToQuery(Query $query, string $column, int $level = self::LEVEL_READ, int $userId = null, array $groups = null) {
+	public static function applyToQuery(Query $query, string $column, int $level = self::LEVEL_READ, int $userId = null, array $groups = null): void
+	{
 
 		if(!isset($userId)) {
 
@@ -275,25 +275,21 @@ class Acl extends Entity {
 		}
 
 		// WHERE in
-		 $subQuery = (new Query)
-		 				->select('aclId')
-		 				->from('core_acl_group', 'acl_g');
+		$subQuery = (new Query)
+		      ->select('aclId')
+		      ->from('core_acl_group', 'acl_g');
 
 
-		 if(isset($groups)) {
-		 	$subQuery->andWhere('acl_g.groupId', 'IN', $groups);
-		 } else {
-		 	$subQuery->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
-		 		->andWhere([
-		 			'acl_u.userId' => $userId
-		 					]);
-		 	}
-
-		 if($level != self::LEVEL_READ) {
-		 	$subQuery->andWhere('acl_g.level', '>=', $level);
-		 }
-
-		 $query->where($column, 'IN', $subQuery);
+		if(isset($groups)) {
+		$subQuery->andWhere('acl_g.groupId', 'IN', $groups);
+		} else {
+		$subQuery->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
+		  ->andWhere([
+		    'acl_u.userId' => $userId
+		        ]);
+		}
+		$subQuery->andWhere('acl_g.level', '>=', $level);
+		$query->where($column, 'IN', $subQuery);
 
 		//where exists
 		// $subQuery = (new Query)
@@ -333,13 +329,13 @@ class Acl extends Entity {
 		
 	}
 	
-	private static $permissionLevelCache = [];
+	private static array $permissionLevelCache = [];
 	
 	/**
 	 * Get the maximum permission level a user has for an ACL
 	 * 
 	 * @param int $aclId
-	 * @param int $userId
+	 * @param ?int $userId
 	 * @return int See the self::LEVEL_* constants
 	 */
 	public static function getUserPermissionLevel(int $aclId, ?int $userId): int
@@ -385,7 +381,8 @@ class Acl extends Entity {
 	/**
 	 * @return UserDisplay[]|Query
 	 */
-	public function findAuthorizedUsers() {
+	public function findAuthorizedUsers(): Query
+	{
 		return UserDisplay::find()
 			->join('core_user_group', 'ug', 'ug.userId = u.id')
 			->join('core_acl_group', 'ag', 'ag.groupId = ug.id')

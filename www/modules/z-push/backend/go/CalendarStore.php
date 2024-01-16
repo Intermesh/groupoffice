@@ -8,7 +8,7 @@ class CalendarStore extends Store {
 
 		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
 			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
 		try {
@@ -366,22 +366,22 @@ class CalendarStore extends Store {
 	private function importAllDayTime($time, $mstz) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goCalendar->importAllDayTime('.$time.', '.$mstz.') ' );
 
-		$tz = GoSyncUtils::tzidFromMSTZ($mstz, $time);
+		$phoneTZ = GoSyncUtils::tzidFromMSTZ($mstz, $time);
 
-		ZLog::Write(LOGLEVEL_DEBUG, $tz );
+		ZLog::Write(LOGLEVEL_DEBUG, $phoneTZ );
 
-		if(!$tz) {
-			$tz = $this->getDefaultTimeZone();
-			ZLog::Write(LOGLEVEL_DEBUG, "fall back to user timezone: " .$tz );
+		if(!$phoneTZ) {
+			$phoneTZ = $this->getDefaultTimeZone();
+			ZLog::Write(LOGLEVEL_DEBUG, "fall back to user timezone: " .$phoneTZ );
 		}
 
-		$dt = new \DateTime('@'.$time,new \DateTimeZone($tz));
-		$dt->setTimezone( new \DateTimeZone($this->getDefaultTimeZone()));
+		$phoneDT = new \DateTime('@'.$time,new \DateTimeZone("UTC"));
+		$phoneDT->setTimezone(new DateTimeZone($phoneTZ)); // now time should format as 0:00 hours
 		//$dt->setTime(0, 0);
 
-		$utc = new DateTime($dt->format('Y-m-d H:i:s'), new DateTimeZone("UTC"));
-		$newTime = $utc->format("U");
-
+		$goDT = new DateTime($phoneDT->format("Y-m-d H:i"), new \DateTimeZone($this->getDefaultTimeZone()));
+		$goDT->setTimezone(new \DateTimeZone("UTC")); // now create time in UTC.
+		$newTime = $goDT->format("U");
 
 		ZLog::Write(LOGLEVEL_DEBUG, date('c', $newTime) );
 

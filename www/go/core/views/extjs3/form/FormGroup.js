@@ -66,7 +66,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	// When mapKey is set we remember the keys of properties that are going to be deleted here
 	markDeleted: [],
 
-	startWithItem: false,
+	startWithItem: undefined,
 
 	required: false,
 
@@ -93,8 +93,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		this.itemCfg.isFormField = false;
 		this.markDeleted = [];
 		this.itemCfg.columnWidth = 1;
+		this.itemCfg.submit = false;
 
-		if(this.required) {
+		if(this.required && this.startWithItem === undefined) {
 			this.startWithItem = true;
 		}
 
@@ -121,7 +122,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			this.updateCls();
 		}, this);
 
+
+
 		go.form.FormGroup.superclass.initComponent.call(this);
+
+		if(this.value) {
+			this.setValue(this.value);
+		}
 	},
 
 	afterRender: function() {
@@ -473,7 +480,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 	
 	reset : function() {
-		this.setValue([]);
+		this.setValue(this.mapKey ? {} : []);
 		this.dirty = false;
 		if(this.startWithItem && this.items.getCount() == 0) {
 			this.addPanel(true);

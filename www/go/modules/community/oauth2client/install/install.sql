@@ -4,8 +4,12 @@ CREATE TABLE IF NOT EXISTS `oauth2client_oauth2client` (
     `defaultClientId` INT(11) UNSIGNED DEFAULT NULL,
     `clientId` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
     `clientSecret` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `projectId` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
+    `projectId` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+    openId bool default false
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+create index oauth2client_oauth2client_openId_index
+    on oauth2client_oauth2client (openId);
 
 ALTER TABLE `oauth2client_oauth2client`
     ADD KEY `defaultClientId` (`defaultClientId`);
@@ -47,3 +51,17 @@ ALTER TABLE `oauth2client_account`
 
 ALTER TABLE `oauth2client_account`
     ADD CONSTRAINT `oauth2client_account_ibfk_2` FOREIGN KEY (`accountId`) REFERENCES `em_accounts` (`id`) ON DELETE CASCADE;
+
+create table oauth2client_openid_user
+(
+    userId   int          not null
+        primary key,
+    clientId int unsigned not null,
+    constraint oauth2client_openid_user_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade,
+    constraint oauth2client_openid_user_oauth2client_oauth2client_id_fk
+        foreign key (clientId) references oauth2client_oauth2client (id)
+            on delete cascade
+);
+

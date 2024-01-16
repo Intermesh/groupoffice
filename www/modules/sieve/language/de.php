@@ -31,7 +31,7 @@ return array (
   'sender' => 'Absender',
   'recipient' => 'Empfänger',
   'size' => 'Größe',
-  'contains' => 'enhält',
+  'contains' => 'enthält',
   'doesn\'t contain' => 'enthält nicht',
   'is' => 'gleich',
   'doesn\'t equal' => 'ungleich',

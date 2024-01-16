@@ -48,7 +48,7 @@ return array (
   'Select one' => 'Maak een keuze',
   'Contact form' => 'Contactformulier',
   'No address book found with name \'%s\'.' => 'Geen adresboek gevonden met naam \'%s\'.',
-  'We have succesfully received your registration.' => 'Wij hebben uw registratie met succes ontvangen.',
+  'We have successfully received your registration.' => 'Wij hebben uw registratie met succes ontvangen.',
   'Current password' => 'Huidige wachtwoord',
   'Your password is expired' => 'Uw wachtwoord is verlopen',
   'You are required to change your password.' => 'U bent verplicht om uw wachtwoord te wijzigen.',

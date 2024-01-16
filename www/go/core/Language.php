@@ -44,10 +44,19 @@ class Language {
 	 */
 	public function getIsoCode(): string
 	{
-		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
-			$this->isoCode = $_GET['SET_LANGUAGE'];
-			$this->setCookie();
-			return $_GET['SET_LANGUAGE'];
+		if(isset($_GET['SET_LANGUAGE'])) {
+
+			if($_GET['SET_LANGUAGE'] == "") {
+
+				$this->unsetCookie();
+				unset($_GET['SET_LANGUAGE']);
+			} else if($this->hasLanguage($_GET['SET_LANGUAGE'])) {
+
+				$this->isoCode = $_GET['SET_LANGUAGE'];
+				$this->setCookie();
+				unset($_GET['SET_LANGUAGE']);
+				return $this->isoCode;
+			}
 		}
 
 		if(!isset($this->isoCode)) {
@@ -65,6 +74,11 @@ class Language {
 			$_COOKIE['GO_LANGUAGE'] = $this->isoCode;
 			setcookie("GO_LANGUAGE", $this->isoCode, time() + (10 * 365 * 24 * 60 * 60), "/", Request::get()->getHost(), Request::get()->isHttps(), true);
 		}
+	}
+
+	public function unsetCookie() {
+		unset($_COOKIE['GO_LANGUAGE']);
+		setcookie("GO_LANGUAGE", "", -1, "/", Request::get()->getHost(), Request::get()->isHttps(), true);
 	}
 
 

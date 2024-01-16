@@ -60,6 +60,6 @@ abstract class BaseAuthenticator implements JsonSerializable {
 	 *
 	 * @param string $username
 	 */
-	abstract public static function isAvailableFor(string $username);
+	abstract public static function isAvailableFor(string $username): bool;
 		
 }

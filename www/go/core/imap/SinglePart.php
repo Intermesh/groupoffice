@@ -254,13 +254,4 @@ class SinglePart extends Part{
 			return false;
 		}
 	}
-
-	
-	
-	public function toArray(array $properties = null): array
-	{
-		return parent::toArray($properties);
-	}
-	
-	
 }

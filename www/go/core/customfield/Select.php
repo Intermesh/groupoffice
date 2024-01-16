@@ -26,8 +26,34 @@ class Select extends Base {
 
 	private $options;
 
+	/**
+	 * @param array{name: string, foregroundColor: ?string, backgroundColor: ?string, renderMode: ?string, enabled: ?bool, children: ?array}[] $options
+	 *
+	 * @return void
+	 */
 	public function setOptions(array $options) {
 		$this->options = $options;
+
+
+	}
+
+	public function onCopy()
+	{
+		parent::onCopy();
+
+		if(isset($this->options)) {
+			$this->clearOptionIds($this->options);
+		}
+	}
+
+	private function clearOptionIds(array &$opts): void
+	{
+		foreach($opts as &$o) {
+			unset($o['id']);
+			if(!empty($o['children'])) {
+				$this->clearOptionIds($o['children']);
+			}
+		}
 	}
 
 	public function isModified(): bool

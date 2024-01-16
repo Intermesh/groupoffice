@@ -308,16 +308,17 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				levelData.push([this.levels[i],this.levelLabels[this.levels[i]]]);
 			}
 		}
-		
+
+		this.levelStore = new Ext.data.SimpleStore({
+			id:0,
+			fields : ['value', 'text'],
+			data : levelData
+		});
 
 		this.showLevel = (this.hideLevel) ? false : true;			
 
 		var permissionLevelConfig ={
-					store : new Ext.data.SimpleStore({
-						id:0,
-						fields : ['value', 'text'],
-						data : levelData
-					}),
+					store : this.levelStore,
 					valueField : 'value',
 					displayField : 'text',
 					mode : 'local',

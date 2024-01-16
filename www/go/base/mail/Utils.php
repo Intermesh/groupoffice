@@ -3,9 +3,11 @@
 
 namespace GO\Base\Mail;
 
+use go\core\mail\Util;
+
 class Utils{
 	public static function mimeHeaderDecode(?string $string, string $defaultCharset='UTF-8') : string {
-		return \go\core\imap\Utils::mimeHeaderDecode($string, $defaultCharset);
+		return Util::mimeHeaderDecode($string, $defaultCharset);
 	}
 	
 	

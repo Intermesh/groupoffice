@@ -388,7 +388,7 @@ Tento program je chráněn autorským zákonem a {product_name} licencí.<br />
   'Database' => 'Databáze',
   'Files' => 'Soubory',
   'If you leave {product_name} you will loose unsaved changes' => 'Pokud opustíte {product_name}, neuložené změny budou ztraceny',
-  'The data was saved succesfully' => 'Data byla v pořádku uložena',
+  'The data was saved successfully' => 'Data byla v pořádku uložena',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Klikněte na \'Přidat z počítače\' pro výběr souboru a/nebo složky z Vašeho počítače. Klikněte na \'Přidat z pošty\' pro přenos souborů z {product_name}. Okno bude automaticky zavřeno po kompletním přenosu.',
   'Click here to login to {product_name}' => 'Klikněte zde pro přihlášení do {product_name}',
   'Links' => 'Procházet odkazy',

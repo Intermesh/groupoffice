@@ -51,10 +51,10 @@ class Connection {
 				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
 				PDO::MYSQL_ATTR_INIT_COMMAND => "SET sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'",
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-				PDO::ATTR_PERSISTENT => false, //doesn't work with ATTR_STATEMENT_CLASS but should not have many benefits anyway
-				PDO::ATTR_STATEMENT_CLASS => [Statement::class],
+				PDO::ATTR_PERSISTENT => false, // Unit test on closing DB connection fails. We need this to work for long running processes
 				PDO::ATTR_EMULATE_PREPARES => false, //for native data types int, bool etc.
-				PDO::ATTR_STRINGIFY_FETCHES => false
+				PDO::ATTR_STRINGIFY_FETCHES => false,
+				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
 		];
 	}
 
@@ -116,7 +116,8 @@ class Connection {
 	  \go\core\App::get()->unsetDbConnection();
 	  sleep(10);
 	 */
-	public function disconnect() {
+	public function disconnect(): void
+	{
 		$this->pdo = null;
 
 		Property::clearCachedRelationStmts();
@@ -124,8 +125,15 @@ class Connection {
 		self::$cachedStatements = [];
 	}
 
-	private static $cachedStatements = [];
+	private static array $cachedStatements = [];
 
+	/**
+	 * Register a cached statement that will be unset when we want to disconnect from the database.
+	 * If you don't unset these statement the connection will be kept open.
+	 * @param string $name
+	 * @param Statement $statement
+	 * @return void
+	 */
 	public function cacheStatement(string $name, Statement $statement) {
 		self::$cachedStatements[$name] = $statement;
 	}
@@ -609,29 +617,22 @@ class Connection {
    * @return Statement
    * @throws PDOException
    */
-	public function createStatement(array $build): Statement
+	public function createStatement(array &$build): Statement
 	{
 		try {
 			if($this->debug) {
 				$build['start'] = go()->getDebugger()->getMicroTime();
 			}
 
-			$stmt = $this->getPDO()->prepare($build['sql']);
-			/**
-			 * @var Statement $stmt;
-			 */
+			$pdoStmt = $this->getPDO()->prepare($build['sql']);
+
+			$stmt = new Statement($pdoStmt);
 			$stmt->setBuild($build);
 
 			for ($i =0, $l = count($build['params']); $i < $l; $i++) {
-				// if (go()->getDebugger()->enabled && isset($p['value']) && !is_scalar($p['value'])) {
-				// 	throw new Exception("Invalid value " . var_export($p['value'], true));
-				// }
-
 				$stmt->bindValue($i + 1, $build['params'][$i]['value'], $build['params'][$i]['pdoType']);
 			}
-			/**
-			 * @var Statement $stmt;
-			 */
+
 			return $stmt;
 		} catch(PDOException $e) {
 			go()->error("Failed SQL: ". QueryBuilder::debugBuild($build));
@@ -640,4 +641,6 @@ class Connection {
 			throw $e;
 		}
 	}
+
+
 }

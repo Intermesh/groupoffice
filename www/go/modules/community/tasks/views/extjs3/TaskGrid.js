@@ -1,5 +1,4 @@
 go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
-	//autoExpandColumn: 'title',
 	// config options for stateful behavior
 	stateful: true,
 	stateId: 'tasks-grid-main',
@@ -40,7 +39,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				'timeBooked',
 				'permissionLevel'
 			],
-			entityStore: "Task",
+			entityStore: this.support ? "SupportTicket" : "Task",
 			sortInfo: this.support ? {
 					field: "modifiedAt",
 					direction: "DESC"
@@ -66,7 +65,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 
 			var wasComplete = record.json.progress == 'completed' || record.json.progress == 'cancelled';
 			this.getEl().mask(t("Saving..."));
-			go.Db.store("Task").set({update: {
+			go.Db.store(this.support ? "SupportTicket" : "Task").set({update: {
 				[record.data.id]: {progress: (!wasComplete ? 'completed' : 'needs-action')}}
 			}).finally(() => {
 				this.getEl().unmask();
@@ -121,7 +120,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(60),
 					renderer: function(value,m,rec) {
 						let v = "";
-						console.debug(rec.json);
 						if(rec.json.priority != 0) {
 							if (rec.json.priority < 5) {
 								v += '<i class="icon small orange">priority_high</i>';
@@ -151,7 +149,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					xtype:"datecolumn",
 					id: 'start',
 					dateOnly: true,
-					header: t('Start at'),
+					header: t('Start at', "tasks","community"),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'start',
@@ -162,14 +160,14 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					xtype:"datecolumn",
 					id: 'due',
 					dateOnly: true,
-					header: t('Due at'),
+					header: t('Due at', "tasks","community"),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'due',
 					renderer: startRenderer,
 					groupable: false
 				},{
-					header: t('Responsible'),
+					header: t('Responsible', "tasks", "community"),
 					width: dp(180),
 					sortable: true,
 					dataIndex: 'responsible',

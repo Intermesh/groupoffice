@@ -2,6 +2,7 @@
 
 namespace GO\Email\Model;
 
+use go\core\mail\Attachment;
 use go\core\model\Acl;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
@@ -105,7 +106,7 @@ class ImapMessage extends ComposerMessage {
 		if($searchIn=="all") {
 			foreach ($account->getRootMailboxes(false, true) as $mailbox) {
 			
-				//only search visable mailboxes not subscriptions
+				//only search visible mailboxes not subscriptions
 				if(!$mailbox->isVisible() || $mailbox->noselect)
 					continue;
 
@@ -598,6 +599,16 @@ class ImapMessage extends ComposerMessage {
 			}
 		}
 	}
+
+	public function createBlobsForAttachments($inlineOnly=false){
+		$atts = $this->getAttachments();
+
+		foreach($atts as $a){
+			if(!$inlineOnly || $a->isInline()){
+				$a->createBlob();
+			}
+		}
+	}
 	
 	
 	private $_imapAttachmentsLoaded=false;
@@ -620,11 +631,6 @@ class ImapMessage extends ComposerMessage {
 			$uniqueNames = array();
 			
 			foreach ($parts as $part) {
-				//ignore applefile's
-				//	Don't ignore it as it seems to be a valid attachment in some mails.
-//				if($part['subtype']=='applefile')
-//					continue;
-					
 				$a = new ImapMessageAttachment();
 				$a->setImapParams($this->account, $this->mailbox, $this->uid);
 				
@@ -645,7 +651,6 @@ class ImapMessage extends ComposerMessage {
 				} else {
 					$a->name = \GO\Base\Fs\File::stripInvalidChars(\GO\Base\Mail\Utils::mimeHeaderDecode($part['name']));
 					
-					//$extension = \GO\Base\Fs\File::getExtension($a->name);
 					if(!empty($part['filename'])){//} && empty($extension)){
 						$a->name = \GO\Base\Fs\File::stripInvalidChars(\GO\Base\Mail\Utils::mimeHeaderDecode($part['filename']));
 					}
@@ -786,29 +791,35 @@ class ImapMessage extends ComposerMessage {
 		}
 
 		$bIsPlain = !$this->_htmlParts['text_found'];
-		$swiftMsg = new \Swift_Message();
-		$swiftMsg->setTo($this->to->getAddresses());
-		$swiftMsg->setFrom($this->from->getAddresses());
-		$swiftMsg->setCc($this->cc->getAddresses());
-		$swiftMsg->setBcc($this->bcc->getAddresses());
-		$swiftMsg->setSubject($this->subject);
-		$swiftMsg->setDate(new DateTime($this->date));
+		$msg = new \go\core\mail\Message();
+		$msg->setTo(...$this->to->convertToNewApi());
+
+		$from = $this->from->convertToNewApi();
+		if(isset($from[0])) {
+			$msg->setFrom($from[0]->getEmail(), $from[0]->getName());
+		}
+		$msg->setCc(...$this->cc->convertToNewApi());
+		$msg->setBcc(...$this->bcc->convertToNewApi());
+		$msg->setSubject($this->subject);
+		$msg->setDate(new DateTime($this->date));
 
 		if(!$bIsPlain) {
-			$swiftMsg->addPart($this->getHtmlBody(), 'text/html');
+			$msg->setBody($this->getHtmlBody(), 'text/html');
 		} else {
-			$swiftMsg->addPart($this->getPlainBody(), 'text/plain');
+			$msg->setBody($this->getPlainBody(), 'text/plain');
 		}
 		while ($att = array_shift($atts)) {
 			if ($att->disposition == 'attachment' || empty($att->content_id)) {
 				$str = $this->addPartString($att, $bIsPlain);
-				$swiftMsg->addPart($str, ($bIsPlain ? 'text/plain' : 'text/html'));
+				$a = Attachment::fromString($str, "", ($bIsPlain ? 'text/plain' : 'text/html'), Attachment::ENCODING_7BIT);
+				$a->setId("");
+				$msg->embed($a);
 			}
 		}
-		$swiftMsg->setContentType("multipart/mixed");
+//		$msg->setContentType("multipart/mixed");
 
 
-		if(!$this->getImapConnection()->append_message($this->mailbox, $swiftMsg, '\Seen')) {
+		if(!$this->getImapConnection()->append_message($this->mailbox, $msg->toString(), '\Seen')) {
 			throw new \Exception("Failed to append new message");
 		}
 

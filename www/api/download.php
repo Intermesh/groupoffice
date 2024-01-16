@@ -106,12 +106,17 @@ try {
 
 	call_user_func_array([$c, $method], $parts);
 } catch(Exception $e) {
-	Response::get()->setContentType('text/plain');
+	require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
+
 	ErrorHandler::logException($e);
 	Response::get()->setStatus(500);
 	Response::get()->output($e->getMessage());
 
 	if(go()->getDebugger()->enabled) {
+		echo "<pre>";
 		go()->getDebugger()->printEntries();
+		echo "</pre>";
 	}
+
+	require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
 }

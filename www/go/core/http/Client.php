@@ -182,6 +182,8 @@ class Client {
 	/**
 	 * Download a URL to a file
 	 *
+	 * Be careful. Don't allow user input here because it can also download file:///etc/passwd for example!
+	 *
 	 * @param string $url
 	 * @param File $file
 	 * @return array

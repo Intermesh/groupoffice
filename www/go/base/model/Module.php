@@ -245,17 +245,8 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function getWarning(){
-//		if(!$this->moduleManager->appCentre() || $this->moduleManager->checkPermissionsWithLicense()){
 			return '';
-//		}else
-//		{
-//			return 'You have unlicensed users. Double click to buy more licenses.';
-//		}
 	}
-	
-//	public function getBuyEnabled(){
-//		return $this->moduleManager->appCentre() && \GO\Professional\License::moduleIsRestricted($this->id);
-//	}
 	
 	public function getSortOrderColumn() {
 		return 'sort_order';
@@ -334,9 +325,8 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	}
 	
 
-	protected function beforeDelete() {
-		
-		
+	protected function beforeDelete()
+	{
 		if($this->name=='modules'){
 			$this->setValidationError('delete', GO::t("The module \"Modules\" cannot be deleted!.", "modules"));
 		}
@@ -354,10 +344,11 @@ class Module extends \GO\Base\Db\ActiveRecord {
 			throw new \Exception(sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."),implode(', ',$dependentModuleNames)));
 		
 	}
-	
+
 	protected function afterDelete() {
-		if($this->moduleManager)
+		if($this->moduleManager) {
 			$this->moduleManager->uninstall();
+		}
 		
 		return parent::afterDelete();
 	}
@@ -369,20 +360,15 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function isAvailable(){
 		
-		if(!$this->enabled)
+		if(!$this->enabled) {
 			return false;
+		}
 		
 		if(!empty($this->package)) {
 			return $this->isAvailableJmap();
 		}
 		
 		$ucfirst = ucfirst($this->name);
-//		$moduleClassPath = $this->path.'/'.$ucfirst.'Module.php';
-//		
-//		if(!file_exists($moduleClassPath)){
-//			return false;
-//		}
-
 		$moduleClass = 'GO\\'.$ucfirst.'\\'.$ucfirst.'Module';
 
 		if(!class_exists($moduleClass)){
@@ -390,9 +376,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		}
 
 		$mod = new $moduleClass;
-		return $mod->isAvailable();	
-		
-		
+		return $mod->isAvailable();
 	}
 	
 	private function isAvailableJmap() {
@@ -412,12 +396,4 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	public function findByName($name) {
 		return $this->findSingleByAttributes(['name'=> $name, 'package' => null], (new \GO\Base\Db\FindParams())->ignoreAcl());
 	}
-
-//	protected function getName() {
-//		return \GO::t('name', $this->id);// isset($lang[$this->id]['name']) ? $lang[$this->id]['name'] : $this->id;
-//	}
-//
-//	protected function getDescription() {
-//		return \GO::t('description', $this->id);
-//	}
-	}
+}

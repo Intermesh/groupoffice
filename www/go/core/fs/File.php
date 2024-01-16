@@ -336,8 +336,9 @@ class File extends FileSystemObject {
 				if(!$r->hasHeader('Last-Modified')) {
 					$r->setModifiedAt($this->getModifiedAt());
 				}
+
 				if(!$r->hasHeader('Etag')) {
-					$r->setETag('"' . $this->getMd5Hash() . '"');
+					$r->setETag($this->getEtag());
 				}
 				$r->abortIfCached();
 			} else{
@@ -477,7 +478,7 @@ class File extends FileSystemObject {
 	 */
 	public function open(string $mode){
 		
-		//$this->create();
+		$this->create();
 		
 		return fopen($this->getPath(), $mode);
 	}
@@ -594,6 +595,11 @@ class File extends FileSystemObject {
    */
 	public function getMd5Hash() {
 		return md5_file($this->path);
+	}
+
+	public function getEtag(): string
+	{
+		return '"'.filemtime($this->path).'-'.fileinode($this->path).'"';
 	}
 
 	/**

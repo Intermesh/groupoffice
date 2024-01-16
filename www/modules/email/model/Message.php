@@ -83,12 +83,13 @@ abstract class Message extends \GO\Base\Model
 		$this->attributes['bcc'] = new \GO\Base\Mail\EmailRecipients($this->attributes['bcc']);
 		$this->attributes['from'] = new \GO\Base\Mail\EmailRecipients($this->attributes['from']);
 		$this->attributes['reply_to'] = new \GO\Base\Mail\EmailRecipients($this->attributes['reply_to']);
+		$this->attributes['disposition_notification_to'] = new \GO\Base\Mail\EmailRecipients($this->attributes['disposition_notification_to']);
 	}
 
 	/**
 	 * PHP getter magic method.
 	 * This method is overridden so that AR attributes can be accessed like properties.
-	 * @param StringHelper $name property name
+	 * @param string $name property name
 	 * @return mixed property value
 	 * @see getAttribute
 	 */
@@ -143,7 +144,7 @@ abstract class Message extends \GO\Base\Model
 		$this->attributes['cc'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['cc']));
 		$this->attributes['bcc'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['bcc']));
 		$this->attributes['from'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['from']));
-
+		$this->attributes['disposition_notification_to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['disposition_notification_to']));
 		//workaround for invalid from
 		if(!$this->attributes['from']->getAddress()) {
 			$this->attributes['from'] = new \GO\Base\Mail\EmailRecipients("unknown@unknown.domain");
@@ -212,7 +213,7 @@ abstract class Message extends \GO\Base\Model
 	 * Get the body in HTML format. If no HTML body was found the text version will
 	 * be converted to HTML.
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	abstract public function getHtmlBody();
 
@@ -220,14 +221,14 @@ abstract class Message extends \GO\Base\Model
 	 * Get the body in plain text format. If no plain text body was found the HTML version will
 	 * be converted to plain text.
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	abstract public function getPlainBody();
 
 	/**
 	 * Return the raw MIME source as string
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	abstract public function getSource();
 
@@ -338,7 +339,7 @@ abstract class Message extends \GO\Base\Model
 	 */
 	public function toOutputArray(?bool $html=true, ?bool $recipientsAsString=false, ?bool $noMaxBodySize=false, ?bool $useHtmlSpecialChars=true): array
 	{
-		$response['notification'] = $this->disposition_notification_to;
+		$response['notification'] = (string) $this->disposition_notification_to;
 
 		//seen is expensive because it can't be recovered from cache.
 		// We'll use the grid to check if a message was seen or not.

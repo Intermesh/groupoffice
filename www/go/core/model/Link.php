@@ -71,6 +71,12 @@ class Link extends AclItemEntity
 	
 	protected $aclId;
 
+
+	public static function loggable(): bool
+	{
+		return false;
+	}
+
 	/**
 	 * @throws Exception
 	 */
@@ -85,9 +91,6 @@ class Link extends AclItemEntity
 		}
 		return null;
 	}
-
-	protected $permissionLevel;
-	
 
 	/**
 	 * The id of the entity it links from

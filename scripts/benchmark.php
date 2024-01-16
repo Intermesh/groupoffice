@@ -1,5 +1,5 @@
 <?php
-require("../www/vendor/autoload.php");
+require(dirname(__DIR__)."/www/vendor/autoload.php");
 
 use go\core\App;
 

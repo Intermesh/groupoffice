@@ -46,6 +46,8 @@ class ZPush {
     const ASV_14 = "14.0";
     const ASV_141 = "14.1";
 
+		const ASV_161 = "16.1";
+
     /**
      * Command codes for base64 encoded requests (AS >= 12.1)
      */
@@ -68,6 +70,8 @@ class ZPush {
     const COMMAND_PROVISION = 20;
     const COMMAND_RESOLVERECIPIENTS = 21;
     const COMMAND_VALIDATECERT = 22;
+
+	const COMMAND_FIND = 23;
 
     // Deprecated commands
     const COMMAND_GETHIERARCHY = -1;
@@ -122,6 +126,7 @@ class ZPush {
                     self::COMMAND_VALIDATECERT      => array(self::ASV_1,  self::REQUESTHANDLER => "ValidateCert"),
                     self::COMMAND_PROVISION         => array(self::ASV_25, self::REQUESTHANDLER => "Provisioning",  self::UNAUTHENTICATED, self::UNPROVISIONED),
                     self::COMMAND_SEARCH            => array(self::ASV_1,  self::REQUESTHANDLER => "Search"),
+	                  self::COMMAND_FIND            => array(self::ASV_141,  self::REQUESTHANDLER => "Find"), //actually belongs to 16.1 but iphone uses it anyway
                     self::COMMAND_PING              => array(self::ASV_2,  self::REQUESTHANDLER => "Ping",          self::UNPROVISIONED),
                     self::COMMAND_NOTIFY            => array(self::ASV_1,  self::REQUESTHANDLER => "Notify"),                                           // deprecated & not implemented
                     self::COMMAND_ITEMOPERATIONS    => array(self::ASV_12, self::REQUESTHANDLER => "ItemOperations"),

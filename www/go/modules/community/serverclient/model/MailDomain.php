@@ -61,7 +61,7 @@ class MailDomain {
 		$result = json_decode($response['body']);	
 
 		if(!$result) {
-			throw new Exception("Could not create mailbox on postfixadmin module. " . $response);
+			throw new Exception("Could not create mailbox on postfixadmin module. " . $response['body']);
 		}
 
 		if (!$result->success)
@@ -97,7 +97,7 @@ class MailDomain {
 		$result = json_decode($response['body']);
 
 		if(!$result) {
-			throw new Exception("Could not create mailbox on postfixadmin module. " . $response);
+			throw new Exception("Could not create mailbox on postfixadmin module. " . $response['body']);
 		}
 
 		if(!$result->success)
@@ -163,6 +163,7 @@ class MailDomain {
 		$account->imap_allow_self_signed = GO::config()->serverclient_novalidate_cert ?? true;
 		$account->host = GO::config()->serverclient_host ?? "localhost";
 		$account->port = GO::config()->serverclient_port ?? 143;
+		$account->force_smtp_login = GO::config()->serverclient_force_smtp_login ?? false;
 
 		$username = explode('@', $user->username) [0];
 		$username.='@'.$domain;

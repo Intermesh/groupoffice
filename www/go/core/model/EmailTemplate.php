@@ -10,14 +10,13 @@ use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\fs\Folder;
 use go\core\jmap\Entity;
+use go\core\mail\Attachment;
 use go\core\mail\Message;
 use go\core\model\Module as ModuleModel;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\TemplateParser;
 use go\core\validate\ErrorCode;
-use Swift_Attachment;
-use Swift_EmbeddedFile;
 
 /**
  * E-mail template model
@@ -129,8 +128,17 @@ class EmailTemplate extends Entity
 	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?EmailTemplate {
 		$moduleModel = ModuleModel::findByName($package, $name);
 
+		if(!$moduleModel) {
+			return null;
+		}
+
 		$template = isset($preferredLanguage) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;
 		if (!$template) {
+
+			if($preferredLanguage != go()->getSettings()->language) {
+				return self::findByModule($package, $name, go()->getSettings()->language, $key);
+			}
+
 			$template = static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key])->single();
 		}
 
@@ -229,7 +237,7 @@ class EmailTemplate extends Entity
 		}
 	}
 
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		$array =  parent::toArray($properties);
 
@@ -255,15 +263,11 @@ class EmailTemplate extends Entity
 		$subject = $templateParser->parse($this->subject);
 		$body = $templateParser->parse($this->body);
 
-		$message->setSubject($subject)
-			->setBody($body, 'text/html');
-
 		foreach($this->attachments as $attachment) {
 			$blob = Blob::findById($attachment->blobId);
 
 			if($attachment->inline) {
-				$img = Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
-				$img->setContentType($blob->type);
+				$img = Attachment::fromBlob($blob);
 				$img->setFilename($attachment->name);
 				$contentId = $message->embed($img);
 
@@ -271,12 +275,14 @@ class EmailTemplate extends Entity
 			}
 
 			if($attachment->attachment) {
-				$a = Swift_Attachment::fromPath($blob->getFile()->getPath());
-				$a->setContentType($blob->type);
+				$a = Attachment::fromBlob($blob);
 				$a->setFilename($attachment->name);
 				$message->attach($a);
 			}
 		}
+
+		$message->setSubject($subject)
+			->setBody($body, 'text/html');
 
 		return $message;
 	}

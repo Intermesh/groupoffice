@@ -20,14 +20,14 @@ use go\core\model\Alert as CoreAlert;
 use go\core\model\CronJobSchedule;
 use go\core\model\Module;
 use Faker;
-
-
 use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
+use go\core\util\Cli;
 use go\core\util\DateTime;
 use go\core\util\JSON;
 use go\core\util\PdfRenderer;
+use go\modules\business\license\model\License;
 use go\modules\community\history\Module as HistoryModule;
 use JsonException;
 use function GO;
@@ -199,6 +199,13 @@ JSON;
 		date_default_timezone_set("UTC");
 		go()->getInstaller()->upgrade();
 
+		$this->clearCache();
+
+		echo "Done!\n";
+	}
+
+
+	public function clearCache() {
 		try {
 			$http = new Client();
 			$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
@@ -213,8 +220,6 @@ JSON;
 		} catch(Exception $e) {
 			echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "install/' in the browser.\n";
 		}
-
-		echo "Done!\n";
 	}
 
 
@@ -305,6 +310,34 @@ JSON;
 		return $unknown;
 	}
 
+	public function checkLicense() {
+		$key = go()->getSettings()->license;
+
+		if(empty($key)) {
+			echo "No license key installed\n";
+		}
+
+		echo "Key: " . $key ."\n\n";
+
+		$data = License::getLicenseData();
+
+		print_r($data);
+
+		echo "----\n";
+	}
+
+
+	public function setLicense($params) {
+		if(!isset($params['key'])) {
+			throw new \InvalidArgumentException("Parameter 'key' is required");
+		}
+
+		go()->getSettings()->license = $params['key'];
+		go()->getSettings()->save();
+
+		$this->checkLicense();
+	}
+
 
 	/**
 	 * Generates demo data
@@ -315,7 +348,7 @@ JSON;
 	 * ```
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo
 	 *
-	 * docker-compose exec --user www-data groupoffice-finance ./www/cli.php core/System/demo --package=business --module=catalog
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo --package=business --module=catalog
 	 * ```
 	 */
 	public function demo($params = []) {
@@ -375,25 +408,6 @@ JSON;
 	}
 
 
-	// public function checkAllBlobs() {
-	// 	$blobs = Blob::find()->execute();
-		
-	// 	echo "Processing: ".$blobs->rowCount() ." blobs\n";
-	// 	$staleCount = 0;
-	// 	foreach($blobs as $blob) {
-	// 		if($blob->setStaleIfUnused()) {
-	// 			echo 'D';
-	// 			$staleCount++;
-	// 		}else
-	// 		{
-	// 			echo '.';
-	// 		}
-	// 	}
-		
-	// 	echo "\n\nFound " . $staleCount ." stale blobs\n";
-	// }
-
-
 
 	/**
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/checkBlobs --delete
@@ -406,6 +420,8 @@ JSON;
 	}
 
 	/**
+	 * Make keys unsigned
+	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/convertInts
 	 *
 	 * @return void
@@ -509,5 +525,40 @@ JSON;
 		if($count != 1) {
 			throw new Exception($count. " Could not update ".$column->getTable()->getName().".". $column->name);
 		}
+	}
+
+
+	/**
+	 * Set password for user
+	 *
+	 * @throws SaveException
+	 * @throws Exception
+	 */
+	public function setPassword(array $params): void
+	{
+
+		$this->checkParams($params, ['username']);
+
+		$user = User::find()->where('username', '=', $params['username'])->single();
+
+		if(!$user) {
+			echo "User '" . $params['username'] ."' not found";
+			exit(1);
+		}
+
+		$password1 = Cli::prompt("Enter new password for user '" . $params['username'] . "':", true);
+		$password2 = Cli::prompt("Confirm new password:", true);
+
+		if($password2 !== $password1) {
+			echo "Passwords didn't match\n";
+			exit(1);
+		}
+
+		$user->setPassword($password1);
+		if(!$user->save()) {
+			throw new SaveException($user);
+		}
+
+		echo "Password changed successfully\n";
 	}
 }

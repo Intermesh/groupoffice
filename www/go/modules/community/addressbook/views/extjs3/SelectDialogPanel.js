@@ -185,9 +185,6 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				node.ui.checkbox.checked = true;
 				this.selectAddressbook(node.attributes.data.id, true);
 			} else { // treenode is group
-
-				this.addButton.setDisabled(false);
-
 				this.deselectNodes();
 				node.parentNode.ui.checkbox.checked = true;
 				this.selectAddressbook(node.parentNode.attributes.data.id, true);

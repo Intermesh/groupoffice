@@ -62,6 +62,10 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	 */
 	groupField: false,
 
+	allowNew: undefined,
+
+	createDialog: undefined,
+
 	// private
 	onSelect : function(record, index){
 		if(this.fireEvent('beforeselect', this, record, index) !== false){
@@ -150,9 +154,19 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			this.store.on("load", this.addCreateNewRecord, this);
 			this.on('beforeselect', function(combo, record, index) {
 				if(!record.data[this.valueField]) {
+
 					this.createNew(record).then(function() {
+
 						var record = combo.store.getAt(0);
 						combo.fireEvent('select', combo, record, 0);
+
+
+						// delay focus otherwise it will expand becuase store loads after creating new entity
+						setTimeout(() => {
+							combo.focus();
+						}, 100)
+
+						// combo.hasFocus = true;
 					});
 
 					//cancel select and fire it after create.
@@ -180,11 +194,46 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 		var recordData = {};
 		recordData[this.displayField] = text;
+		recordData[this.valueField] = null;
 		var record = new def(recordData);
 		this.store.insert(0, record);
 
 		if(this.store.getCount() > 1) {
 			this.select(0);
+		}
+	},
+
+	// private
+	assertValue : function(){
+
+		var val = this.getRawValue(),
+			rec;
+
+		if(this.valueField && Ext.isDefined(this.value)){
+			rec = this.findRecord(this.valueField, this.value);
+		}
+		if(!rec || rec.get(this.displayField) != val){
+			rec = this.findRecord(this.displayField, val);
+		}
+		//filter out create new record
+		if((!rec || rec.get(this.valueField)===null) && this.forceSelection){
+			if(val.length > 0 && val != this.emptyText){
+				this.el.dom.value = Ext.value(this.lastSelectionText, '');
+				this.applyEmptyText();
+			}else{
+				this.clearValue();
+			}
+		}else{
+			if(rec && this.valueField){
+				// onSelect may have already set the value and by doing so
+				// set the display field properly.  Let's not wipe out the
+				// valueField here by just sending the displayField.
+				if (this.value == val){
+					return;
+				}
+				val = rec.get(this.valueField || this.displayField);
+			}
+			this.setValue(val);
 		}
 	},
 
@@ -196,6 +245,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	createNew : function(record) {
 
 		const entity = record.data;
+		delete entity[this.valueField]; //remove -1 id.
 		if(Ext.isObject(this.allowNew)) {
 			Ext.apply(entity, this.allowNew);
 		}
@@ -211,13 +261,47 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		//Clear text input or it will recreate fake record.
 		this.setRawValue("");
 
-		return this.store.entityStore.save(entity).then((entity) => {
-			this.setValue(entity.id);
-			return this.setValuePromise;
-		}).catch((error) => {
-			GO.errorDialog.show(error.message);
-			return Promise.reject(error.message);
-		});
+		if(this.createDialog) {
+
+			this.hasFocus = false;
+
+			const dlg = new this.createDialog;
+			dlg.restoreFocusOnClose = false;
+			dlg.redirectOnSave = false;
+			dlg.setValues(entity);
+			dlg.show();
+
+			const p= new Promise((resolve, reject) => {
+
+				let saved = false;
+				dlg.on("save", () => {
+					saved = true;
+					this.setValue(dlg.currentId);
+					resolve(dlg.getValues());
+				}, {single: true})
+
+				dlg.on("close", () => {
+					if(!saved) {
+						this.reset();
+						reject();
+					}
+				}, {single: true})
+			})
+
+			return p.then(() => {
+				return this.setValuePromise;
+			})
+
+		} else {
+			return this.store.entityStore.save(entity).then((entity) => {
+
+				this.setValue(entity.id);
+				return this.setValuePromise;
+			}).catch((error) => {
+				GO.errorDialog.show(error.message);
+				return Promise.reject(error.message);
+			});
+		}
 	},
 	
 	resolveEntity : function(value) {

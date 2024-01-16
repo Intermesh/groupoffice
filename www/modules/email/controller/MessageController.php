@@ -15,16 +15,13 @@ use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
-use go\core\model\Acl as GoAcl;
+use go\core\mail\AddressList;
 use go\core\model\User;
-use go\core\util\StringUtil;
 use GO\Email\Model\Alias;
 use GO\Email\Model\Account;
 use GO\Email\Model\ImapMessage;
 use GO\Email\Model\Label;
-use GO\Email\Transport;
 use go\modules\community\addressbook\model\Contact;
-use go\modules\community\addressbook\model\Settings;
 
 
 class MessageController extends \GO\Base\Controller\AbstractController
@@ -78,11 +75,13 @@ class MessageController extends \GO\Base\Controller\AbstractController
 						$body
 						);
 		$message->setFrom($alias->email, $alias->name);
-		$toList = new \GO\Base\Mail\EmailRecipients($params['notification_to']);
-		$address=$toList->getAddress();
-		$message->setTo($address['email'], $address['personal']);
 
-		$mailer = Mailer::newGoInstance(\GO\Email\Transport::newGoInstance($account));
+		$toList = new AddressList($params['notification_to']);
+
+		$message->setTo(...$toList->toArray());
+
+		$mailer = Mailer::newGoInstance();
+		$mailer->setEmailAccount($account);
 		$response['success'] = $mailer->send($message);
 
 		return $response;
@@ -348,6 +347,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$response['total'] = $imap->sort_count;
+		
+		// Return all UIDs if we have a search query in case we need to perform actions on the entire set
+		if (!empty($query)) {
+			$response['allUids']=$imap->allUids;
+		}
 
 		$mailbox = new \GO\Email\Model\ImapMailbox($account, array('name'=>$params['mailbox']));
 		$mailbox->snoozeAlarm();
@@ -431,7 +435,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['success'] = $response['sendParams']['draft_uid'] > 0;
 		}
 
-		if(!$imap->append_message($account->drafts, $message, "\Seen")){
+		if(!$imap->append_message($account->drafts, $message->toString(), "\Seen")){
 			$response['success'] = false;
 			$response['feedback']=$imap->last_error();
 		}
@@ -462,9 +466,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path.$params['save_to_path']);
 
-		$fbs = new \Swift_ByteStream_FileByteStream($file->path(), true);
-
-		$message->toByteStream($fbs);
+		$file->putContents($message->toStream());
 
 		$response['success']=$file->exists();
 
@@ -565,10 +567,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 		$message->setFrom($alias->email, $alias->name);
 		
-		$mailer = Mailer::newGoInstance(Transport::newGoInstance($account));
+		$mailer = Mailer::newGoInstance();
+		$mailer->setEmailAccount($account);
 
-		$logger = new \Swift_Plugins_Loggers_ArrayLogger();
-		$mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
 
 		$this->fireEvent('beforesend', array(
 				&$this,
@@ -580,9 +581,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$params
 		));
 
-		$failedRecipients=array();	
 		
-		$success = $mailer->send($message, $failedRecipients);		
+		$success = $mailer->send($message);
+
+		if(!$success) {
+			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError();
+			throw new Exception($msg);
+		}
 
 		// Update "last mailed" time of the emailed contacts.
 		if ($success && GO::modules()->addressbook) {
@@ -637,7 +642,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$account->sent = $params['reply_mailbox'];
 		}
 
-		if ($recipientCount > count($failedRecipients)) {
+		if ($success) {
 			//if a sent items folder is set in the account then save it to the imap folder
 			// auto linking will happen on save to sent items
 			if(!$account->saveToSentItems($message, $params)){
@@ -653,19 +658,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$imap->delete(array($params['draft_uid']));
 		}
 		
-		if(count($failedRecipients)) {
-			$msg = GO::t("Failed to send to", "email").': '.implode(', ',$failedRecipients)."\n\n";
 
-			$logStr = $logger->dump();
-
-			preg_match('/<< 55[0-9] .*>>/s', $logStr, $matches);
-
-			if (isset($matches[0])) {
-				$logStr = trim(substr($matches[0], 2, -2));
-			}
-
-			throw new Exception($msg.$logStr);
-		}
 
 		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
 
@@ -1259,11 +1252,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new NotFound();
 		}
 
-		//workaround for gmail. It doesn't flag messages as seen automatically.
-//		if (!$imapMessage->seen && stripos($account->host, 'gmail') !== false)
-//			$imapMessage->getImapConnection()->set_message_flag(array($imapMessage->uid), "\Seen");
-
-		if(!empty($params['create_temporary_attachments'])) {
+		if(!empty($params['create_blobs'])) {
+			$imapMessage->createBlobsForAttachments();
+		} elseif(!empty($params['create_temporary_attachments'])) {
 			$imapMessage->createTempFilesForAttachments();
 		}
 
@@ -1322,7 +1313,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	
 	protected function _getSpamMoveMailboxName($mailUid,$mailboxName,$accountId)
 	{
-		if (strtolower($mailboxName)=='spam') {
+		$pattern = "/^(junk|spam)$/";
+		if (preg_match($pattern, strtolower($mailboxName))) {
 			return 1;
 		} else {
 			return 0;
@@ -1429,37 +1421,42 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if($vcalendar){
 			$vevent = $vcalendar->vevent[0];
 
-			$aliases = Alias::model()->find(
-				GO\Base\Db\FindParams::newInstance()
-					->select('email')
-					->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id' , $imapMessage->account->id))
-			)->fetchAll(\PDO::FETCH_COLUMN, 0);
 
-			// for case insensitive match
-			$aliases = array_map('strtolower', $aliases);
+			if($vcalendar->method == 'REQUEST') {
+				// If this is an invite request, we must be sure we know which of the participants is the current user.
+				// We do this by checking all mail aliases
+				$aliases = Alias::model()->find(
+					GO\Base\Db\FindParams::newInstance()
+						->select('email')
+						->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id', $imapMessage->account->id))
+				)->fetchAll(\PDO::FETCH_COLUMN, 0);
 
-			$emailFound = false;
-			if(isset($vevent->attendee)) {
-				foreach ($vevent->attendee as $vattendee) {
-					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
+				// for case insensitive match
+				$aliases = array_map('strtolower', $aliases);
+
+				$emailFound = false;
+				if (isset($vevent->attendee)) {
+					foreach ($vevent->attendee as $vattendee) {
+						$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
+						if (in_array($attendeeEmail, $aliases)) {
+							$emailFound = true;
+							$accountEmail = $attendeeEmail;
+						}
+					}
+				}
+
+				if (!$emailFound && isset($vevent->organizer)) {
+					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
 					if (in_array($attendeeEmail, $aliases)) {
 						$emailFound = true;
 						$accountEmail = $attendeeEmail;
 					}
 				}
-			}
 
-			if(!$emailFound && isset($vevent->organizer)) {
-				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
-				if (in_array($attendeeEmail, $aliases)) {
-					$emailFound = true;
-					$accountEmail = $attendeeEmail;
+				if (!$emailFound) {
+					$response['iCalendar']['feedback'] = GO::t("None of the participants match your e-mail aliases for this e-mail account.", "email");
+					return $response;
 				}
-			}
-
-			if(!$emailFound) {
-				$response['iCalendar']['feedback'] = GO::t("None of the participants match your e-mail aliases for this e-mail account.", "email");
-				return $response;
 			}
 
 			//is this an update for a specific recurrence?
@@ -1499,7 +1496,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['iCalendar']['invitation'] = array(
 					'uuid' => $uuid,
 					'email_sender' => $response['sender'],
-					'email' => $accountEmail,
+					'email' => $accountEmail ?? null,
 					//'event_declined' => $event && $event->status == 'DECLINED',
 					'event_id' => $event ? $event->id : 0,
 					'is_organizer'=>$event && $event->is_organizer,
@@ -2015,13 +2012,15 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 	protected function actionMoveToSpam(array $params)
 	{
-		
-		$accountModel = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
-				
-		$imap = $accountModel->openImapConnection($params['from_mailbox_name']);
-		
-		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : 'Spam';
-		
+
+		$account = Account::model()->findByPk($params['account_id']);
+		$imap = $account->openImapConnection($params['from_mailbox_name']);
+		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : $account->spam;
+
+		if (empty($spamFolder)) {
+			$spamFolder = 'Spam';
+		}
+
 		if(!$imap->get_status($spamFolder)){
 			$imap->create_folder($spamFolder);
 		}

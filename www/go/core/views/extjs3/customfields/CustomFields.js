@@ -89,20 +89,15 @@
 		 * @returns {Array}
 		 */
 		getFilters : function(entity) {
-			var defs = [], me = this, type;
-			
-			this.getFieldSets(entity).forEach(function(fs) {
-				me.getFields(fs.id).forEach(function(field) {					
-					type = me.getType(field.type);
-					if(!type) {
-						console.error("Custom field type " + field.type + " not found");
-						return;
-					}
-					var def = type.getFilter(field);
-					if(def) {
-						defs.push(def);
-					}
-				});
+			var defs = [];
+
+			this.getFieldsForEntity(entity).forEach((field) => {
+				const type = this.getType(field.type);
+				var def = type.getFilter(field);
+				if(def) {
+					defs.push(def);
+				}
+
 			});
 			return defs;
 		},
@@ -114,17 +109,16 @@
 		 * @returns {Array}
 		 */
 		getRelations : function(entity) {
-			var relations = {}, me = this, type;
-			
-			this.getFieldSets(entity).forEach(function(fs) {
-				me.getFields(fs.id).forEach(function(field) {					
-					type = me.getType(field.type);
-					if(!type) {
-						console.error("Custom field type " + field.type + " not found");
-						return;
-					}
-					Ext.apply(relations,  type.getRelations(field));
-				});
+			var relations = {};
+
+			this.getFieldsForEntity(entity).forEach((field) => {
+				const type = this.getType(field.type);
+				if(!type) {
+					console.error("Custom field type " + field.type + " not found");
+					return;
+				}
+				Ext.apply(relations,  type.getRelations(field));
+
 			});
 			return relations;
 		},
@@ -137,19 +131,12 @@
 		 */
 		getFieldDefinitions : function(entity) {
 			
-			var defs = [], me = this, type;
-			
-			this.getFieldSets(entity).forEach(function(fs) {
-				me.getFields(fs.id).forEach(function(field) {
-					type = me.getType(field.type);
-					if(!type) {
-						console.error("Custom field type " + field.type + " not found");
-						return;
-					}
-					var def = type.getFieldDefinition(field);
+			var defs = [];
 
-					defs.push(def);
-				});
+			this.getFieldsForEntity(entity).forEach((field) => {
+				const type = this.getType(field.type);
+				var def = type.getFieldDefinition(field);
+				defs.push(def);
 			});
 			return defs;
 		},
@@ -162,22 +149,42 @@
 		getColumns : function(entity) {
 			var cols = [], me = this, type;
 			
-			this.getFieldSets(entity).forEach(function(fs) {
-				me.getFields(fs.id).forEach(function(field) {
-					type = me.getType(field.type);
-					if(!type) {
-						console.error("Custom field type " + field.type + " not found");
-						return;
-					}
-					var col = type.getColumn(field);
+			this.getFieldsForEntity(entity).forEach((field) => {
+				const type = this.getType(field.type);
+				var col = type.getColumn(field);
 
-					if(col) {
-						cols.push(col);
-					}
-				});
+				if(col) {
+					cols.push(col);
+				}
 			});
 			return cols;
 		},
+
+		_entityFields: {},
+
+		getFieldsForEntity : function(entity) {
+			if(this._entityFields[entity]) {
+				return this._entityFields[entity];
+			}
+
+			this._entityFields[entity] = [];
+
+			this.getFieldSets(entity).forEach((fs) => {
+				this.getFields(fs.id).forEach( (field) => {
+					const type = this.getType(field.type);
+					if (!type) {
+						console.error(`Custom field type '${field.type}' for field with name '${field.databaseName}' for entity '${entity}' not found`);
+						return;
+					}
+
+					this._entityFields[entity].push(field);
+				})
+			});
+
+			return this._entityFields[entity];
+		},
+
+
 
 
 

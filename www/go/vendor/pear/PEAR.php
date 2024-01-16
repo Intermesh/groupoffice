@@ -33,8 +33,8 @@ define('PEAR_ERROR_CALLBACK',  16);
  */
 define('PEAR_ERROR_EXCEPTION', 32);
 /**#@-*/
-define('PEAR_ZE2', (function_exists('version_compare') &&
-                    version_compare(zend_version(), "2-dev", "ge")));
+//define('PEAR_ZE2', (function_exists('version_compare') &&
+//                    version_compare(zend_version(), "2-dev", "ge")));
 
 if (substr(PHP_OS, 0, 3) == 'WIN') {
     define('OS_WINDOWS', true);
@@ -207,24 +207,24 @@ class PEAR
     * You MUST use a reference, or they will not persist!
     *
     * @access public
-    * @param  StringHelper $class  The calling classname, to prevent clashes
-    * @param  StringHelper $var    The variable to retrieve.
+    * @param  string $class  The calling classname, to prevent clashes
+    * @param  string $var    The variable to retrieve.
     * @return mixed   A reference to the variable. If not set it will be
     *                 auto initialised to NULL.
     */
-    function &getStaticProperty($class, $var)
-    {
-        static $properties;
-        if (!isset($properties[$class])) {
-            $properties[$class] = array();
-        }
+	static function &getStaticProperty($class, $var)
+	{
+		static $properties;
+		if (!isset($properties[$class])) {
+			$properties[$class] = array();
+		}
 
-        if (!array_key_exists($var, $properties[$class])) {
-            $properties[$class][$var] = null;
-        }
+		if (!array_key_exists($var, $properties[$class])) {
+			$properties[$class][$var] = null;
+		}
 
-        return $properties[$class][$var];
-    }
+		return $properties[$class][$var];
+	}
 
     // }}}
     // {{{ registerShutdownFunc()
@@ -762,9 +762,9 @@ class PEAR
     // }}}
 }
 
-if (PEAR_ZE2) {
-    include_once 'PEAR5.php';
-}
+//if (PEAR_ZE2) {
+//    include_once 'PEAR5.php';
+//}
 
 // {{{ _PEAR_call_destructors()
 
@@ -775,11 +775,11 @@ function _PEAR_call_destructors()
         sizeof($_PEAR_destructor_object_list))
     {
         reset($_PEAR_destructor_object_list);
-        if (PEAR_ZE2) {
-            $destructLifoExists = PEAR5::getStaticProperty('PEAR', 'destructlifo');
-        } else {
+//        if (PEAR_ZE2) {
+//            $destructLifoExists = PEAR5::getStaticProperty('PEAR', 'destructlifo');
+//        } else {
             $destructLifoExists = PEAR::getStaticProperty('PEAR', 'destructlifo');
-        }
+//        }
 
         if ($destructLifoExists) {
             $_PEAR_destructor_object_list = array_reverse($_PEAR_destructor_object_list);
@@ -840,6 +840,8 @@ class PEAR_Error
     var $userinfo             = '';
     var $backtrace            = null;
 
+		private $callback;
+
     // }}}
     // {{{ constructor
 
@@ -874,11 +876,9 @@ class PEAR_Error
         $this->mode      = $mode;
         $this->userinfo  = $userinfo;
 
-        if (PEAR_ZE2) {
-            $skiptrace = PEAR5::getStaticProperty('PEAR_Error', 'skiptrace');
-        } else {
+
             $skiptrace = PEAR::getStaticProperty('PEAR_Error', 'skiptrace');
-        }
+
 
         if (!$skiptrace) {
             $this->backtrace = debug_backtrace();

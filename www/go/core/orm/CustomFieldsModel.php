@@ -65,7 +65,8 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	public function setValues($data): CustomFieldsModel
 	{
 		$old = $this->internalGetCustomFields();
-		$this->data = array_merge($old, $this->normalizeCustomFieldsInput($data, $this->returnAsText));
+		$new = $this->normalizeCustomFieldsInput($data, $this->returnAsText);
+		$this->data = array_merge($old, $new);
 
 		return $this;
 	}
@@ -345,7 +346,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	/**
 	 * @throws Exception
 	 */
-	public function toArray(array $properties = null): array
+	public function toArray(array $properties = null): array|null
 	{
 		$fn = $this->returnAsText ? 'dbToText' : 'dbToApi';
 		$record = $this->internalGetCustomFields();
@@ -436,8 +437,8 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	{
 		return $this->__isset($offset);
 	}
-	#[\ReturnTypeWillChange]
-	public function offsetGet($offset)
+
+	public function offsetGet($offset): mixed
 	{
 		return $this->__get($offset);
 	}
@@ -455,9 +456,8 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	/**
 	 * @throws Exception
 	 */
-	#[\ReturnTypeWillChange]
-	public function jsonSerialize()
+	public function jsonSerialize(): mixed
 	{
-		return $this->toArray();
+		return (object) $this->toArray();
 	}
 }

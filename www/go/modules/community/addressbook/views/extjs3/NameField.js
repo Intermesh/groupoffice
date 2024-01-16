@@ -12,7 +12,7 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 		this.on("focus", function () {
 			if (this.nameMenuEnabled) {
 				this.nameMenu.show(this.getEl());
-				this.buildFullName();
+				this.setFullName();
 			}
 		}, this);
 		
@@ -52,9 +52,10 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 			},
 			listeners: {
 				hide: function () {
-					this.buildFullName();
-//					this.jobTitle.focus();
-					this.focusNextEl();
+					if (this.nameMenuEnabled) {
+						this.setFullName();
+						this.focusNextEl();
+					}
 				},
 				afterrender: function (menu) {
 
@@ -113,9 +114,9 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 		}, this);
 	},
 	buildFullName: function () {
-		var  name =this.firstName.getValue(),
-						m = this.middleName.getValue(),
-						l = this.lastName.getValue();
+		let name = this.firstName.getValue(),
+			m = this.middleName.getValue(),
+			l = this.lastName.getValue();
 
 		if (m) {
 			name += " " + m;
@@ -123,6 +124,18 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 
 		if (l) {
 			name += " " + l;
+		}
+
+		return name;
+
+	},
+
+	setFullName: function () {
+		let name = this.buildFullName();
+
+		if(this.getValue() != "" && name == "") {
+			name = this.getValue();
+			this.lastName.setValue(name);
 		}
 
 		this.setValue(name);

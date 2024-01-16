@@ -2,9 +2,13 @@
 
 namespace go\core\model;
 
+use go\core\App;
+use go\core\db\Table;
 use go\core\event\EventEmitterTrait;
+use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\db\Query;
+use go\core\orm\Property;
 
 /**
  * Class PushDispatcher
@@ -26,34 +30,32 @@ class PushDispatcher
 	 */
 	const MAX_LIFE_TIME = 120;
 
-
 	/**
 	 * Interval in seconds between every check for changes to push
 	 */
-	const CHECK_INTERVAL = 10;
+	const CHECK_INTERVAL = 30;
 
 	private $map = [];
 	private $entityTypes = [];
 
-	public function __construct($types)
+	public function __construct(array $types = [])
 	{
 		//Hard code debug to false to prevent spamming of log.
 		go()->getDebugger()->enabled = false;
 
 		$query = new Query();
 
-		if(isset($types)) {
-			$entityNames = explode(",", $_GET['types']);
-			$query->where('e.clientName', 'IN', $entityNames);
+		if(!empty($types)) {
+			$query->where('e.clientName', 'IN', $types);
 		}
 
 		$entities = EntityType::findAll($query);
 		foreach($entities as $e) {
-			$this->map[$e->getName()] = $e->getClassName();
-			$this->entityTypes[$e->getId()] = $e->getName();
+			if(is_a($e->getClassName(), Entity::class, true)) {
+				$this->map[$e->getName()] = $e->getClassName();
+				$this->entityTypes[$e->getId()] = $e->getName();
+			}
 		}
-
-		$this->sendMessage('ping', []);
 	}
 
 	/**
@@ -76,10 +78,11 @@ class PushDispatcher
 	{
 		$state = [];
 		foreach ($this->map as $name => $cls) {
+			/** @var Entity $cls */
 			$cls::entityType()->clearCache();
 			$state[$name] = $cls::getState();
 		}
-		// sendMessage('ping', $state);
+
 		return $state;
 	}
 
@@ -98,10 +101,11 @@ class PushDispatcher
 	}
 
 	public function start(int $ping = 10) {
+
 		$sleeping = 0;
 		$changes = $this->checkChanges();
-
-		$start = time();
+		// send states on start so client can compare immediately
+		$this->sendMessage('state', $changes);
 		for($i = 0; $i < self::MAX_LIFE_TIME; $i += self::CHECK_INTERVAL) {
 			// break the loop if the client aborted the connection (closed the page)
 			if(connection_aborted()) {
@@ -124,11 +128,16 @@ class PushDispatcher
 
 			self::fireEvent(self::EVENT_INTERVAL, $this);
 
+			//disconnect and free up memory
+			go()->getDebugger()->debug("Closing DB connection: " . go()->getDbConnection()->getId());
 			go()->getDbConnection()->disconnect();
+			go()->getCache()->disableMemory();
+			Table::destroyInstances();
+			gc_collect_cycles();
 
 			$sleeping += self::CHECK_INTERVAL;
 
-            sleep(self::CHECK_INTERVAL);
+			sleep(self::CHECK_INTERVAL);
 		}
 	}
 }

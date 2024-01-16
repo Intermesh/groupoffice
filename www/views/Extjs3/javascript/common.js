@@ -24,8 +24,11 @@ Ext.namespace('GO.util');
 Ext.Ajax.on('requestexception', function(conn, response, options) {
 	if(response.isAbort) {
 		console.warn("Connection aborted", conn, response, options);
-	} else if(response.isTimeout) {
-		GO.errorDialog.show(t("The connection to the server timed out. Please check your internet connection."), t("Request error"));
+	} else if(response.isTimeout || response.status == 0) {
+		console.warn("Connection timeout", conn, response, options);
+		if(document.visibilityState === "visible") {
+			GO.errorDialog.show(t("The connection to the server timed out. Please check your internet connection."), t("Request error"));
+		}
 	} else
 	{
 		console.warn("Request exception", conn, response, options);
@@ -256,7 +259,10 @@ GO.request = function(config){
 			}
 			if(!success) {
 				if(response.isTimeout){
-					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+					console.warn("Connection timeout", response, options);
+					if(document.visibilityState === "visible") {
+						GO.errorDialog.show(t("The connection to the server timed out. Please check your internet connection."), t("Request error"));
+					}
 				}
 
 				if (config.fail) {
@@ -282,7 +288,7 @@ GO.request = function(config){
 			} else {
 				//the same happens in GO.data.JSonStore.
 				if(result.exportVariables){					
-					GO.util.mergeObjects(window, result.exportVariables);				
+					Object.assign(window, result.exportVariables);
 				}
 				
 				if(origSuccess) {
@@ -296,23 +302,24 @@ GO.request = function(config){
 	Ext.Ajax.request(p);
 }
 
-GO.util.mergeObjects = function(a, b) {
-    for(var item in b){
-        if(a[item]){
-            if(typeof b[item] === 'object' && !b[item].length){
-                GO.util.mergeObjects (a[item], b[item]);
-            } else {
-                if(typeof a[item] === 'object' || typeof b[item] === 'object') {
-                    a[item] = [].concat(a[item],b[item]);
-                } else {
-                    a[item] = [a[item],b[item]];  // assumes that merged members that are common should become an array.
-                }
-            }
-        } else {
-            a[item] = b[item];
-        }
-    }
-    return a;
+GO.util.mergeObjects = function(dst, src) {
+  for(let key in src) {
+    if (!src.hasOwnProperty(key)) continue;
+      if(dst[key]){
+          if(typeof src[key] === 'object' && !src[key].length && dst.hasOwnProperty(key)){
+              GO.util.mergeObjects (dst[key], src[key]);
+          } else {
+              if(typeof dst[key] === 'object' || typeof src[key] === 'object') {
+                  dst[key] = [].concat(dst[key],src[key]);
+              } else {
+                  dst[key] = [dst[key],src[key]];  // assumes that merged members that are common should become an array.
+              }
+          }
+      } else {
+          dst[key] = src[key];
+      }
+  }
+  return dst;
 }
 
 //Ext.Ajax.on('requestcomplete', function(){

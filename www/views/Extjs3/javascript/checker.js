@@ -18,7 +18,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 	
 	init : function(){
 
-		Ext.TaskMgr.start({
+		const task = Ext.TaskMgr.start({
 			run: this.checkForNotifications,
 			scope:this,
 			interval: GO.settings.config.checker_interval*1000
@@ -27,6 +27,16 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 		this.initReminders();
 
 		this.notifiedReminders = {};
+
+		window.addEventListener('offline', () => {
+			console.log("Stopping checker because we're offline")
+			Ext.TaskMgr.stop(task);
+		});
+
+		window.addEventListener('online', () => {
+			console.log("Starting checker because we're online")
+			Ext.TaskMgr.start(task);
+		})
 	},
 
 	initReminders: function() {

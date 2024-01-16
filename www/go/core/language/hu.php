@@ -461,7 +461,7 @@ Minden jog fenntartva.<br />
   'Database' => 'adatbázis',
   'Total' => 'Összesen',
   'If you leave {product_name} you will loose unsaved changes' => 'Ha elhagyod a webhelyet, elvesznek a mentetlen változtatásaid',
-  'The data was saved succesfully' => 'Az adatok mentése sikeres volt',
+  'The data was saved successfully' => 'Az adatok mentése sikeres volt',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Kattincs a \'Tallózás\' gombra, hogy kiválaszd a feltöltendő fájlokat vagy mappákat a számítógépedről. Kattincs a \'Feltöltés\' gombra, ha fel akarsz tölteni fájlokat. Az ablak automatikusan be fog csukódni, ha végzett a feltöltéssel.',
   'Click here to login to {product_name}' => 'Kattincs ide, ha be akarsz jelentkezni a {product_name}-ba',
   '{product_name} website' => '{product_name} weboldala',

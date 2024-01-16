@@ -29,9 +29,9 @@ class UserSettings extends Property {
 
 
 	/**
-	 * @var string
+	 * @var string 'allcontacts', 'starred', 'default', 'remember'
 	 */
-	public $startIn;
+	public $startIn = "allcontacts";
 
 	/**
 	 * Last selected item

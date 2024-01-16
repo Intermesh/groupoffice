@@ -1,64 +1,27 @@
-import {
-	btn,
-	checkboxselectcolumn,
-	column,
-	comp,
-	Component, menu,
-	router, searchbtn,
-	splitter,
-	t, Table,
-	TableColumn,
-	tbar
-} from "@intermesh/goui";
+import {btn, checkboxselectcolumn, column, comp, EntityID, menu, router, searchbtn, t, tbar} from "@intermesh/goui";
 
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
 import {NoteBookDialog} from "./NoteBookDialog";
-import {FilterCondition} from "@intermesh/groupoffice-core";
+import {FilterCondition, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 
 
-export class Main extends Component {
-
-	// class hbox devides screen in horizontal columns
+export class Main extends MainThreeColumnPanel {
 	private noteBookGrid!: NoteBookGrid;
 	private noteGrid!: NoteGrid;
-	readonly noteDetail!: NoteDetail;
+	protected east!: NoteDetail;
 
-	public constructor() {
-		super();
-
-		this.cls = "hbox fit";
-
-		const west = this.createWest();
-
-		this.noteDetail = new NoteDetail();
-
-		this.items.add(
-			west,
-			splitter({
-				stateId: "gouidemo-splitter-west",
-				resizeComponentPredicate: west
-			}),
-			this.createCenter(),
-			splitter({
-				stateId: "gouidemo-splitter-east",
-				resizeComponentPredicate: this.noteDetail
-			}),
-			this.noteDetail
-		);
+	constructor() {
+		super("goui-notes");
 
 		this.on("render", async () => {
-			const records = await this.noteBookGrid.store.load();
+			void this.noteBookGrid.store.load();
 			this.noteBookGrid.rowSelection!.selected = [0];
 		})
 	}
-
-
-
-	private createWest() {
-
+	protected createWest() {
 
 		return comp({
 				cls: "vbox",
@@ -79,7 +42,8 @@ export class Main extends Component {
 						const dlg = new NoteBookDialog();
 						dlg.show();
 					}
-				})
+				}),
+				this.showCenterButton()
 			),
 			comp({flex: 1, cls: "scroll"},
 	this.noteBookGrid = notebookgrid({
@@ -145,7 +109,7 @@ export class Main extends Component {
 		);
 	}
 
-	private createCenter() {
+	protected createCenter() {
 
 		this.noteGrid = new NoteGrid();
 
@@ -175,6 +139,7 @@ export class Main extends Component {
 			tbar({
 					cls: "border-bottom"
 				},
+				this.showWestButton(),
 				"->",
 				searchbtn({
 					listeners: {
@@ -192,9 +157,9 @@ export class Main extends Component {
 						const dlg = new NoteDialog();
 						const noteBookId = this.noteBookGrid.store.get(this.noteBookGrid.rowSelection!.selected[0])!.id;
 
-						dlg.form.setValues({
+						dlg.form.value = {
 							noteBookId: noteBookId
-						});
+						};
 						dlg.show();
 
 					}
@@ -209,8 +174,16 @@ export class Main extends Component {
 		)
 	}
 
-	public  showNote(noteId: string) {
-		this.noteDetail.load(noteId);
+	protected createEast(){
+		const d= new NoteDetail();
+		d.toolbar.items.insert(0, this.showCenterButton());
+		return d;
+	}
+
+
+	showNote(noteId: EntityID) {
+		void this.east.load(noteId);
+		this.activatePanel(this.east);
 	}
 
 }

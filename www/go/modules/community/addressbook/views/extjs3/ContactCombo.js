@@ -22,6 +22,8 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	isOrganization : false,
 	initComponent: function () {
 
+		this.createDialog = go.modules.community.addressbook.ContactDialog;
+
 		if(this.allowNew == undefined) {
 			this.allowNew = {
 				isOrganization: this.isOrganization,
@@ -50,6 +52,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 							return go.modules.community.addressbook.renderName(data);
 						}
 					},
+					"isOrganization",
 					"photoBlobId", {name: "addressbook", type: "relation"}, {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender', 'color'],
 				entityStore: "Contact",
 				sortInfo: {
@@ -102,6 +105,12 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 		go.modules.community.addressbook.ContactCombo.superclass.initComponent.call(this);
 
 	},
+
+	setIsOrganization: function(isOrganization) {
+		this.isOrganization = isOrganization;
+		this.getStore().setFilter("isOrganization", {isOrganization: isOrganization});
+		this.allowNew.isOrganization = isOrganization;
+	}
 
 	// setValue : function(v) {
 	// 	debugger;

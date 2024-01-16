@@ -348,7 +348,18 @@ abstract class Entity  extends OrmEntity {
    */
 	private static function changesQuery(Query $query, string $cls) {
 
-    $query->select($query->getTableAlias() . '.id AS entityId');
+		$primaryKeys = $cls::getPrimaryKey();
+
+		if(count($primaryKeys) == 1) {
+			$pkSelect = $query->getTableAlias() . '.id';
+		} else{
+
+			//PK Logic consistent with {@see Property::id()};
+			$alias = $query->getTableAlias();
+			$pkSelect = "CONCAT(" . $alias .'.' . implode( ', "-", '. $alias .'.', $primaryKeys) .')';
+		}
+
+    $query->select($pkSelect .' AS entityId');
 
     if(is_a($cls, AclItemEntity::class, true)) {
       $aclAlias = $cls::joinAclEntity($query);
@@ -749,8 +760,7 @@ abstract class Entity  extends OrmEntity {
 		return $result;
 	}
 
-	#[\ReturnTypeWillChange]
-	public function jsonSerialize()
+	public function jsonSerialize() : mixed
 	{
 		$arr = $this->toArray();
 		$arr['id'] = $this->id();

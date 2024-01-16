@@ -2,17 +2,16 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	title: t("Task"),
 	entityStore: "Task",
 	width: dp(800),
-	height: dp(600),
+	height: dp(800),
 	modal: false,
 	stateId: 'communityTasksTaskDialog',
 	role: "list",
-	support: null,
-	redirectOnSave: false,
+	redirectOnSave: true,
 	collapsible: true,
 
 	onReady: async function () {
 		if (this.currentId) {
-			const tl = await go.Db.store("TaskList").single(this.tasklistCombo.getValue());
+			const tl = await go.Db.store(this.support ? "SupportList" : "TaskList").single(this.tasklistCombo.getValue());
 			this.role = tl.role;
 			this.tasklistCombo.store.setFilter("role", {role: tl.role});
 		} else {
@@ -20,17 +19,19 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 
 
-		if(!this.currentId) {
+		if(!this.currentId) {//} && this.role == "support") {
 			this.commentComposer.show();
-			this.descriptionFieldset.hide();
+			if(this.role == "support") {
+				this.descriptionFieldset.hide();
+			}
 
 			this.commentComposer.editor.on("ctrlenter", () => {
 				this.submit();
 			})
 
 			this.on("submit", () => {
-				if(this.commentComposer.editor.isDirty())
-					this.commentComposer.save("Task", this.currentId);
+				if(this.commentComposer.editor.getValue() != "")
+					this.commentComposer.save("SupportTicket", this.currentId);
 			}, {single:true})
 		} else
 		{
@@ -40,10 +41,11 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	onSubmit : function() {
-
 		switch(this.role) {
 			case "support":
-				go.Router.goto("support/" + this.currentId);
+				if(this.redirectOnSave) {
+					go.Router.goto("support/" + this.currentId);
+				}
 				break;
 
 			case "board":
@@ -51,7 +53,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 				break;
 
 			default:
-				this.entityStore.entity.goto(this.currentId);
+				if(this.redirectOnSave) {
+					this.entityStore.entity.goto(this.currentId);
+				}
 				break;
 		}
 	},
@@ -59,6 +63,13 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	setLinkEntity: function (cfg) {
 
 		switch (cfg.entity) {
+			case 'Project3':
+				go.Db.store("ProjectBook").single(cfg.data.bookId).then((book) => {
+					if(book.tasklistId) {
+						this.tasklistCombo.setValue(book.tasklistId);
+					}
+				})
+				break;
 			case 'Project':
 			case "Contact":
 				this.formPanel.getForm().findField("title").setValue(cfg.data.name);
@@ -89,7 +100,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		delete categories.comboBox.lastQuery;
 
 
-		go.Db.store("Tasklist").single(val).then((tasklist) => {
+		go.Db.store(this.support ? "SupportList" : "Tasklist").single(val).then((tasklist) => {
 			this.responsibleCombo.store.setFilter("acl", {
 				aclId: tasklist.aclId,
 				aclPermissionLevel: go.permissionLevels.write
@@ -272,6 +283,15 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								hiddenName: 'createdBy',
 								allowBlank: false,
 								value: null
+							}),
+
+							this.ccField = new go.form.RecipientCombo({
+								fieldLabel : t("CC", "email"),
+								name : 'cc',
+								flex: 1,
+								hidden: this.role != "support",
+								disabled: this.role != "support",
+								value: ""
 							})
 						]
 
@@ -362,7 +382,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					,
 
 					{xtype: 'hidden', name: 'groupId'},
-					this.commentComposer = new go.modules.comments.ComposerFieldset(),
+
 
 					this.descriptionFieldset = new Ext.form.FieldSet({
 						xtype: "fieldset",
@@ -390,6 +410,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 							}
 						]
 					}),
+					this.commentComposer = new go.modules.comments.ComposerFieldset(),
 
 					{
 						xtype: "fieldset",

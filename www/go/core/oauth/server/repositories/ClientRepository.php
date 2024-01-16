@@ -23,6 +23,8 @@ class ClientRepository implements ClientRepositoryInterface
         if(!$client) {
         	go()->debug("Could not get client '" . $clientIdentifier . "'");
         }
+				
+				go()->debug($client->toArray());
 
         return $client;
     }

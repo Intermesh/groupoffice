@@ -5,7 +5,7 @@ namespace go\core\imap;
 use DateTime;
 use Exception;
 use go\core\data\Model;
-use go\core\mail\Recipient;
+use go\core\mail\Address;
 
 
 /**
@@ -70,7 +70,7 @@ class Message extends Model {
 	/**
 	 * The from address
 	 * 
-	 * @var Recipient 
+	 * @var Address
 	 */
 	public $from;
 
@@ -84,28 +84,28 @@ class Message extends Model {
 	/**
 	 * The to recipients
 	 * 
-	 * @var Recipient[] 
+	 * @var Address[]
 	 */
 	public $to;
 
 	/**
 	 * The cc recipients
 	 * 
-	 * @var Recipient[] 
+	 * @var Address[]
 	 */
 	public $cc;
 
 	/**
 	 * The bcc recipients
 	 * 
-	 * @var Recipient[] 
+	 * @var Address[]
 	 */
 	public $bcc;
 
 	/**
 	 * The to recipients
 	 * 
-	 * @var Recipient[] 
+	 * @var Address[]
 	 */
 	public $replyTo;
 
@@ -177,7 +177,7 @@ class Message extends Model {
 	/**
 	 * Send a notification to this address
 	 * 
-	 * @var Recipient 
+	 * @var Address
 	 */
 	public $dispositionNotificationTo;	
 	
@@ -375,12 +375,12 @@ class Message extends Model {
 		if (!isset($this->body)) {
 			
 //			var_dump($this->getStructure()->toArray());
-			if (empty($this->getStructure()->parts)) {
+			if (empty($this->getStructure()->getParts())) {
 				go()->debug("No body parts found in message!");
 				return false;
 			}			
 	
-			$this->body = $this->findBody($this->getStructure()->parts,$asHtml);
+			$this->body = $this->findBody($this->getStructure()->getParts(),$asHtml);
 			
 		}
 		

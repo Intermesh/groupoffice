@@ -5,6 +5,7 @@ namespace go\core\model;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\orm\Entity;
+use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
@@ -82,7 +83,7 @@ class FieldSet extends AclOwnerEntity {
 	 * @return array
 	 */
 	public function getFilter() {
-		return empty($this->filter) || $this->filter == '[]'  ? new \stdClass() : json_decode($this->filter, true);
+		return empty($this->filter) || $this->filter == '[]' || $this->filter == '{}' ? new \stdClass() : json_decode($this->filter, true);
 	}
 
 	protected function canCreate(): bool
@@ -90,8 +91,9 @@ class FieldSet extends AclOwnerEntity {
 		return go()->getAuthState()->isAdmin();
 	}
 	
-	public function setFilter($filter) {
-		$this->filter = json_encode($filter);
+	public function setFilter($filter): void
+	{
+		$this->filter = empty($filter) ? null : json_encode($filter);
 	}
 	
 	protected static function defineMapping(): Mapping
@@ -104,8 +106,13 @@ class FieldSet extends AclOwnerEntity {
 	public function getEntity() {
 		return $this->entity;
 	}
-	
-	public function setEntity($name) {
+
+	/**
+	 * Set the entity
+	 * @param string $name Entity name. eg. "User"
+	 * @return void
+	 */
+	public function setEntity(string $name) {
 		$this->entity = $name;
 		$e = \go\core\orm\EntityType::findByName($name);
 		$this->entityId = $e->getId();
@@ -145,12 +152,62 @@ class FieldSet extends AclOwnerEntity {
 	 * Find all fields for an entity
 	 * 
 	 * @param string $name
-	 * @return Query
+	 * @return Query|static[]
 	 */
 	public static function findByEntity(string $name) : Query {
 		$e = \go\core\orm\EntityType::findByName($name);
 		$entityTypeId = $e->getId();
 		return static::find()->where(['entityId' => $entityTypeId]);
+	}
+
+
+	/**
+	 * Copies field sets from one entity to another. Does not copy the data!
+	 *
+	 * @param class-string<Entity> $fromEntityCls
+	 * @param class-string<Entity> $toEntityCls
+	 * @return false|void
+	 * @throws SaveException
+	 */
+	public static function migrateCustomFields(string $fromEntityCls, string $toEntityCls) {
+
+		$fromEntityType = $fromEntityCls::entityType();
+		$toEntityType = $toEntityCls::entityType();
+
+		$count = \go\core\model\FieldSet::findByEntity($toEntityType->getName())->selectSingleValue("count(*)")->single();
+		if($count) {
+			echo "Custom fields for ". $toEntityType->getName()." already migrated\n";
+
+			return false;
+		}
+
+		echo "Migrating entity " . $toEntityType->getName() ."\n";
+
+		$fieldSets = \go\core\model\FieldSet::findByEntity($fromEntityType->getName());
+
+		foreach($fieldSets as $fieldSet) {
+
+			echo "Migrating fieldset " . $fieldSet->name . " (". $fieldSet->id .")\n";
+			$newFieldSet = $fieldSet->copy();
+			$newFieldSet->setEntity($toEntityType->getName());
+			if(!$newFieldSet->save()) {
+				throw new \go\core\orm\exception\SaveException($newFieldSet);
+			}
+
+			echo $newFieldSet->id ."\n";
+
+			$fields = \go\core\model\Field::find()->where('fieldSetId', '=', $fieldSet->id);
+			foreach($fields as $field) {
+				$newField = $field->copy();
+				$newField->fieldSetId = $newFieldSet->id;
+				if(!$newField->save()) {
+					throw new \go\core\orm\exception\SaveException($newField);
+				}
+			}
+		}
+
+		go()->rebuildCache();
+
 	}
 
 }

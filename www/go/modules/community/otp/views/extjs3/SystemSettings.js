@@ -17,7 +17,7 @@ go.modules.community.otp.AuthenticatorSystemSettingsFieldset = Ext.extend(Ext.fo
 			{
 				xtype:"box",
 				autoEl: "p",
-				html: t("Enforce two factor authentication for users in a specific group")
+				html: t("Enforce two factor authentication for users in a specific group", "otp", "community")
 			},
 			this.enforceForGroup = new go.groups.GroupComboReset({
 				submit: false,
@@ -29,7 +29,7 @@ go.modules.community.otp.AuthenticatorSystemSettingsFieldset = Ext.extend(Ext.fo
 			this.blockField = new Ext.form.Checkbox({
 				submit: false,
 				xtype: "checkbox",
-				boxLabel: t("Block Group-Office usage until setup is done"),
+				boxLabel: t("Block Group-Office usage until setup is done", "otp", "community"),
 				name: "block",
 				checked: go.Modules.get("community", "otp").settings.block,
 				listeners: {

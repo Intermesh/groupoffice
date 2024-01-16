@@ -345,7 +345,7 @@ Este programa é protegido por leis de copyright e pela licença do {product_nam
   'This {product_name} installation is using' => 'Esta instalação do {product_name} está utilizando',
   'Database' => 'Banco de dados',
   'If you leave {product_name} you will loose unsaved changes' => 'Se abandonar o {product_name} você irá perder as alterações não salvas',
-  'The data was saved succesfully' => 'Os dados foram salvos com sucesso',
+  'The data was saved successfully' => 'Os dados foram salvos com sucesso',
   'Click at \'Browse\' to select files and/or folders from your computer. Click at \'Upload\' to transfer the files to {product_name}. This window will automatically close when the transfer is completed.' => 'Clique em \'Procurar\' para selecionar arquivos ou pastas de seu computador. Clique em \'Enviar\' para transferir os arquivos para o {product_name}. Esta janela será fechada automaticamente quando a transferência estiver finalizada.',
   'Click here to login to {product_name}' => 'Clique aqui para acessar o {product_name}',
   '{product_name} website' => 'Site do {product_name}',

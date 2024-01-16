@@ -1,5 +1,5 @@
 go.chart.PieChart = Ext.extend(go.chart.ChartComponent, {
-	chartType: "Pie",
+	chartType: "pie",
 	// update: function(data){
 	//
 	// 	if(!this.chart) {

@@ -4,6 +4,8 @@ namespace GO\Email\Model;
 
 
 use GO\Base\Fs\File;
+use go\core\ErrorHandler;
+use GO\Base\Util\StringHelper;
 
 class SavedMessage extends ComposerMessage
 {
@@ -66,10 +68,11 @@ class SavedMessage extends ComposerMessage
 	{
 		$decoder = new \GO\Base\Mail\MimeDecode($mimeData);
 		$structure = $decoder->decode(array(
-				'include_bodies' => true,
-				'decode_headers' => true,
-				'decode_bodies' => true
-						));
+			'include_bodies' => true,
+			'decode_headers' => true,
+			'decode_bodies' => true,
+			'rfc_822bodies' => true
+		));
 		
 		if (!$structure)
 			throw new \Exception("Could not decode mime data:\n\n $mimeData");
@@ -84,8 +87,15 @@ class SavedMessage extends ComposerMessage
 		$attributes['cc'] = isset($structure->headers['cc']) && strpos($structure->headers['cc'], 'undisclosed') === false ? $structure->headers['cc'] : '';
 		$attributes['bcc'] = isset($structure->headers['bcc']) && strpos($structure->headers['bcc'], 'undisclosed') === false ? $structure->headers['bcc'] : '';		
 		$attributes['from'] = isset($structure->headers['from']) ? $structure->headers['from'] : '';
-		$attributes['date']=isset($structure->headers['date']) ? $structure->headers['date'] : null;
-		$attributes['udate']=isset($structure->headers['date']) ? strtotime($attributes['date']) : null;
+
+		$attributes['date'] = isset($structure->headers['date']) ? preg_replace('/\([^\)]*\)/', '', $structure->headers['date']) : date('c');
+		try {
+			$attributes['udate'] = strtotime($attributes['date']);
+		} catch (Exception $e) {
+			ErrorHandler::logException($e);
+			$attributes['udate'] = time();
+		}
+
 		$attributes['size']=strlen($mimeData);
 		
 		$attributes['message_id']=isset($structure->headers['message-id']) ? $structure->headers['message-id'] : "";

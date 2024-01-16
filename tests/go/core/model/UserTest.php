@@ -10,6 +10,14 @@ use go\core\util\ClassFinder;
 
 class UserTest extends \PHPUnit\Framework\TestCase
 {
+	public function testProps() {
+		$user = User::find()->single();
+
+		$props = $user->toArray();
+
+		$this->assertArrayHasKey('username', $props);
+	}
+
 	public function testCreate()
 	{
 		$user = new User();

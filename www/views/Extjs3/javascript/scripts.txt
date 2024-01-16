@@ -1,10 +1,4 @@
-views/Extjs3/javascript/vendor/chartist.js
-views/Extjs3/javascript/vendor/chartist-plugin-zoom.js
-views/Extjs3/javascript/vendor/chartist-plugin-tooltip.js
-views/Extjs3/javascript/vendor/chartist-plugin-threshold.js
-views/Extjs3/javascript/vendor/chartist-plugin-pointlabels.js
-views/Extjs3/javascript/vendor/chartist-plugin-fill-donut.js
-views/Extjs3/javascript/vendor/chartist-plugin-accessibility.js
+views/Extjs3/javascript/vendor/chart.js
 views/Extjs3/javascript/vendor/promise-polyfill.js
 views/Extjs3/javascript/vendor/purify.min.js
 

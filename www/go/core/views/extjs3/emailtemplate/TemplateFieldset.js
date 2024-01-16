@@ -1,6 +1,7 @@
 go.emailtemplate.TemplateFieldset = Ext.extend(Ext.form.FieldSet, {
 	xtype: 'fieldset',
 	layout: "border",
+	hideLanguage: false,
 
 	onAttach: function (htmleditor, blob, file, imgEl) {
 
@@ -26,7 +27,8 @@ go.emailtemplate.TemplateFieldset = Ext.extend(Ext.form.FieldSet, {
 			},
 			items: [
 				{
-					xtype: 'golanguagecombo'
+					xtype: 'golanguagecombo',
+					hidden: this.hideLanguage
 				}, {
 					xtype: 'textfield',
 					name: 'subject',

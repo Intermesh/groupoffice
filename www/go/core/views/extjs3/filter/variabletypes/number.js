@@ -1,5 +1,6 @@
-go.filter.variabletypes.number = Ext.extend(Ext.Panel, {
-	layout: "hbox",
+go.filter.variabletypes.number = Ext.extend(Ext.Container, {
+	layout: "form",
+	cls: "go-hbox condensed-form go-composite-field",
 	/**
 	 * Filter definition
 	 * {
@@ -37,7 +38,7 @@ go.filter.variabletypes.number = Ext.extend(Ext.Panel, {
 			editable: false,
 			selectOnFocus: true,
 			forceSelection: true,
-			width: dp(64)
+			width: dp(80)
 		});
 
 		this.valueField = new GO.form.NumberField({

@@ -12,7 +12,7 @@ class NoteStore extends Store {
 
 		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
 			ZLog::Write(LOGLEVEL_DEBUG, 'Deleting by sync is disabled in user settings');
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
 		try {
@@ -123,7 +123,7 @@ class NoteStore extends Store {
 			}
 
 			if(!$note->hasPermissionLevel(Acl::LEVEL_WRITE)) {
-				throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+				throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 			}
 
 			$note->content = "";
@@ -158,7 +158,7 @@ class NoteStore extends Store {
 			if(!$note->save()){
 				ZLog::Write(LOGLEVEL_WARN, 'ZPUSH2NOTE::Could not save ' . $note->id);
 				ZLog::Write(LOGLEVEL_WARN, var_export($note->getValidationErrors(), true));
-				throw new StatusException(SYNC_STATUS_SERVERERROR);
+				throw new StatusException("Could not save note", SYNC_STATUS_SERVERERROR);
 			}
 		} catch(Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, 'Note::EXCEPTION ~~ ' .  $e->getMessage());
@@ -263,17 +263,18 @@ class NoteStore extends Store {
 		return $folders;
 	}
 	
-	
 	public function getNotification($folder=null) {
-	
-		$record = Note::find()
-						->fetchMode(PDO::FETCH_ASSOC)
-						->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
-//						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
-//						->where(['s.userId' => go()->getUserId()])
-						->where('n.noteBookId','=',$folder)
-						->single();
-		
+		ZLog::Write(LOGLEVEL_DEBUG,'goNote->getNotification('.$folder.')');
+		$stmt = Note::find()
+				->fetchMode(PDO::FETCH_ASSOC)
+				->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
+				->where('n.noteBookId = :noteBookId')
+				->createStatement();
+
+		$stmt->bindValue(':noteBookId', $folder, PDO::PARAM_INT);
+		$stmt->execute();
+		$record = $stmt->fetch();
+
 		$newstate = 'M'.$record['modifiedAt'].':C'.$record['count'];
 		ZLog::Write(LOGLEVEL_DEBUG,'goNote->getNotification('.$folder.') State: '.$newstate);
 

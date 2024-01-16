@@ -2,28 +2,26 @@
 require('../vendor/autoload.php');
 
 use go\core\App;
+use go\core\ErrorHandler;
 use go\core\fs\File as FileAlias;
-use go\core\jmap\State;
 use go\core\http\Router;
+use go\core\jmap\State;
 use go\core\model\OauthUser as UserAlias;
-
 use go\core\oauth\server\AuthorizationServer;
 use go\core\oauth\server\grant\AuthCodeGrant;
 use go\core\oauth\server\repositories;
-
 use go\core\oauth\server\responsetypes\IdTokenResponse;
 use GuzzleHttp\Psr7\MessageTrait as MessageTraitAlias;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Stream as StreamAlias;
-
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Exception\OAuthServerException;
-
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
 use OpenIDConnectServer\ClaimExtractor;
 use Psr\Http\Message\ResponseInterface as ResponseInterfaceAlias;
+use function GuzzleHttp\json_encode;
 
 App::get();
 App::get()->setAuthState(new State());
@@ -100,6 +98,8 @@ class OAuthController {
 
 		$request = ServerRequest::fromGlobals();
 		$response = new Response();
+		
+		go()->debug($request->getQueryParams());
 
 		try {
 			// Validate the HTTP request and return an AuthorizationRequest object.
@@ -112,7 +112,7 @@ class OAuthController {
 				$_SESSION['authRequest'] = $authRequest;
 				$authRedirectUrl = $_SERVER['PHP_SELF'] . '/authorize';
 
-				$loginUrl = dirname($_SERVER['PHP_SELF'], 3) . '?authRedirectUrl=' . urlencode($authRedirectUrl);
+				$loginUrl = dirname($_SERVER['PHP_SELF'], 3) . '?oauthAuthorize=1';
 				return $response->withStatus(302)->withHeader('Location', $loginUrl);
 			}
 
@@ -131,9 +131,11 @@ class OAuthController {
 			// Return the HTTP redirect response
 			return $server->completeAuthorizationRequest($authRequest, $response);
 		} catch (OAuthServerException $exception) {
+			ErrorHandler::logException($exception);
 			return $exception->generateHttpResponse($response);
 		} catch (Exception $exception) {
-
+			
+			ErrorHandler::logException($e);
 
 			$body = new StreamAlias(fopen('php://temp', 'rb+'));
 			$body->write($exception->getMessage());
@@ -211,7 +213,7 @@ class OAuthController {
 	 * @return Response
 	 * @throws Exception
 	 */
-	public function userinfo(): Response
+	public function userinfo(): ResponseInterfaceAlias
 	{
 		$request = ServerRequest::fromGlobals();
 		$response = new Response();
@@ -228,8 +230,10 @@ class OAuthController {
 		try {
 			$request = $server->validateAuthenticatedRequest($request);
 		} catch (OAuthServerException $exception) {
+			ErrorHandler::logException($exception);
 			return $exception->generateHttpResponse($response);
 		} catch (Exception $exception) {
+			ErrorHandler::logException($exception);
 			return (new OAuthServerException($exception->getMessage(), 0, 'unknown_error', 500))
 				->generateHttpResponse($response);
 		}
@@ -264,10 +268,10 @@ class OAuthController {
 		try {
 			return $server->respondToAccessTokenRequest($request, $response);
 		} catch (OAuthServerException $exception) {
-			go()->debug($exception);
+			ErrorHandler::logException($exception);
 			return $exception->generateHttpResponse($response);
 		} catch (Exception $exception) {
-			go()->debug($exception);
+			ErrorHandler::logException($exception);
 			$body = new StreamAlias(fopen('php://temp', 'rb+'));
 			$body->write($exception->getMessage());
 
@@ -287,7 +291,7 @@ class OAuthController {
 		$signing_alg_values_supported = array('HS256', 'RS256');
 
 		$discovery = array(
-			'issuer' => $goUrl,
+			'issuer' => AuthorizationServer::getIssuer(),
 			'authorization_endpoint' => $endpointBase . '/authorize',
 			'token_endpoint' => $endpointBase . '/token',
 			'userinfo_endpoint' => $endpointBase . '/userinfo',
@@ -362,7 +366,7 @@ class OAuthController {
 				->withHeader('content-type', 'application/json; charset=UTF-8');
 		} catch (Exception $exception) {
 
-			go()->debug($exception);
+			ErrorHandler::logException($exception);
 			$body = new StreamAlias(fopen('php://temp', 'rb+'));
 			$body->write($exception->getMessage());
 

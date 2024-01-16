@@ -48,7 +48,11 @@ go.modules.community.oauth2client.ClientDialog = Ext.extend(go.form.Dialog, {
 					fieldLabel: t("API Project Id"),
 					anchor: '100%',
 					allowBlank: false
-				})
+				}), {
+					xtype: "checkbox",
+					name: "openId",
+					boxLabel: t("Use this connection for single signon with OpenID Connect")
+				}
 			]
 		}
 		];

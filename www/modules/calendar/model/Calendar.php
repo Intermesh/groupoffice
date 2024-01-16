@@ -4,6 +4,7 @@ namespace GO\Calendar\Model;
 
 use go\core\model\User;
 use go\modules\community\tasks\Module;
+use GO\Summary\SummaryModule;
 
 /**
  * Copyright Intermesh
@@ -226,7 +227,7 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 	public function getDefault(\GO\Base\Model\User $user, &$createdNew=false) {
 		$default = parent::getDefault($user, $createdNew);
 	
-		if($createdNew){
+		if($createdNew && SummaryModule::get()->isInstalled()){
 			$pt = new PortletCalendar();
 			$pt->user_id=$user->id;
 			$pt->calendar_id=$default->id;

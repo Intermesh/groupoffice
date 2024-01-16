@@ -58,8 +58,8 @@ class AliasController extends \GO\Base\Controller\AbstractModelController {
 			}else{
 				$defaultUserTemplateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
 				if(!$defaultUserTemplateModel){
-					$defaultUserTemplateModel= new \GO\Email\Model\DefaultTemplateForAccount();
-					$defaultUserTemplateModel->account_id = $model->account_id;
+					$defaultUserTemplateModel= new \GO\Email\Model\DefaultTemplate();
+					$defaultUserTemplateModel->user_id = \GO::user()->id;
 					$defaultUserTemplateModel->save();
 				}
 				$record['template_id']=$defaultUserTemplateModel->template_id;

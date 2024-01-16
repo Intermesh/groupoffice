@@ -9,6 +9,7 @@ use GO\Base\Util\HttpClient;
 use go\core\http\Exception;
 use GO\Smime\Model\Smime;
 use GO\Smime\Model\Certificate;
+use GO\Smime\SmimeModule;
 use http\Client;
 
 class CertificateController extends \GO\Base\Controller\AbstractModelController {
@@ -60,10 +61,8 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 		$cert = new Certificate();
 		$cert->cert = $certData;
 		$cert->account_id = $params['account_id'];
-		openssl_pkcs12_read($certData, $certs, $params['smime_password']);
-		if(!$certs) {
-			throw new \Exception(\GO::t("The SMIME password was incorrect.", "smime"));
-		}
+
+		$certs = SmimeModule::readPKCS12($certData, $params['smime_password']);
 		$data = openssl_x509_parse($certs['cert']);
 		if($data) {
 			$cert->serial = $data['serialNumber'];

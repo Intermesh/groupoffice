@@ -64,6 +64,8 @@ class Segment implements IteratorAggregate, Countable
      *
      * @return int
      */
+
+	#[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->children);
@@ -73,6 +75,8 @@ class Segment implements IteratorAggregate, Countable
      *
      * @return Iterator
      */
+
+	#[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new RecursiveIteratorIterator(new SegmentIterator($this->children), 1);

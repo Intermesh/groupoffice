@@ -43,7 +43,7 @@ GO.ErrorDialog = function(config) {
 
 Ext.extend(GO.ErrorDialog, GO.Window, {
 
-	show : function(error, title) {
+	show : function(error, title, html = false) {
 
 		console.error(error);
 		if(Ext.isString(error)) {
@@ -69,7 +69,10 @@ Ext.extend(GO.ErrorDialog, GO.Window, {
 		}
 		
 		this.setHeight(dp(120));
-		this.messagePanel.body.update(Ext.util.Format.nl2br(Ext.util.Format.htmlEncode(error)));
+		if(!html) {
+			error = Ext.util.Format.nl2br(Ext.util.Format.htmlEncode(error));
+		}
+		this.messagePanel.body.update(error);
 
 		GO.ErrorDialog.superclass.show.call(this);
 		

@@ -289,8 +289,8 @@ class StringHelper {
 	 * @param StringHelper $str
 	 * @return boolean
 	 */
-	public static function isUtf8($str){
-		return strlen($str) != strlen(\utf8_decode($str));
+	public static function isUtf8($str) : bool{
+		return strlen($str) != mb_strlen($str);
 	}
 
 	/**
@@ -396,10 +396,6 @@ class StringHelper {
 
 	public static function get_html_body($html) {
 		$to_removed_array = array ("'<html[^>]*>'si", "'</html>'si", "'<body[^>]*>'si", "'</body>'si", "'<head[^>]*>.*?</head>'si", "'<style[^>]*>.*?</style>'si", "'<object[^>]*>.*?</object>'si",);
-
-		//$html = str_replace("\r", "", $html);
-		//$html = str_replace("\n", "", $html);
-
 		$html = preg_replace($to_removed_array, '', $html);
 		return $html;
 
@@ -409,12 +405,13 @@ class StringHelper {
 	/**
 	 * Give it a full name and it tries to determine the First, Middle and Lastname
 	 *
-	 * @param	StringHelper $full_name A full name
+	 * @param	StringHelper $full_name A full name (default value empty string)
 	 * @access public
 	 * @return array array with keys first, middle and last
 	 */
 
 	public static function split_name($full_name) {
+		$full_name = $full_name ?? "";
 		if (strpos($full_name,',')) {
 			
 			$parts = explode(',',$full_name);
@@ -460,7 +457,6 @@ class StringHelper {
 	 */
 	public static function get_email_validation_regex() {
 		return \go\core\mail\Util::EMAIL_REGEX;
-		//return "/^[_a-z0-9\-+\&\']+(\.[_a-z0-9\-+\&\']+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*(\.[a-z]{2,100})$/i";
 	}
 
 
@@ -846,7 +842,7 @@ class StringHelper {
 	 */
 	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
 		//needed for very large strings when data is embedded in the html with an img tag
-		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
+		ini_set('pcre.backtrack_limit',  2000000 );
 
 
 		//remove strange white spaces in tags first
@@ -962,7 +958,14 @@ class StringHelper {
 	 * @param StringHelper $string String without emoticons
 	 * @return StringHelper String with emoticons
 	 */
-	public static function replaceEmoticons($string, $html = false) {		
+	public static function replaceEmoticons($string, $html = false) {
+
+		$len = strlen($string);
+
+		if($len > 1000000) {
+			//avoid problems on very large strings
+			return $string;
+		}
 		$emoticons = array(
 //				":@" => "angry.gif",
 //				":d" => "bigsmile.gif",
@@ -1030,6 +1033,9 @@ class StringHelper {
 	 */
 	public static function htmlReplace($search, $replacement, $html){
     $html = preg_replace_callback('/<[^>]*('.preg_quote($search).')[^>]*>/uis',array('GO\Base\Util\StringHelper', '_replaceInTags'), $html);
+		if($html === null) {
+			throw new \Exception(preg_last_error_msg());
+		}
     $html = preg_replace('/([^a-z0-9])'.preg_quote($search).'([^a-z0-9])/i',"\\1".$replacement."\\2", $html);
     
     //$html = str_ireplace($search, $replacement, $html);
