@@ -96,19 +96,20 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				dismissDelay: 0,
 				maxWidth: 500
 			});
-			
+
 			Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
 
 			go.User.authenticate().then((user) => {
-				me.on('render', function() {
+				me.on('render', function () {
 					me.fireEvent('boot', me);
-				}, me, {single:true});
+				}, me, {single: true});
 				me.onAuthentication(); // <- start Group-Office
 			}).catch((e) => {
 				console.warn(e);
 				me.fireEvent("boot", me);
 				go.Router.check();
 			})
+		});
 
 	},
 
