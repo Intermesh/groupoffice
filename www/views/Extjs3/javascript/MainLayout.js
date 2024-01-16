@@ -313,7 +313,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				go.Entities.init();
 
 				me.fireEvent('authenticated', this, go.User, password);
-				// window.groupofficeCore.client.fireAuth();
+
+				window.groupofficeCore.client.fireAuth();
 
 				me.renderUI();
 				Ext.getBody().unmask();
