@@ -5,11 +5,9 @@ namespace go\core;
 use Exception;
 use go\core\cache\None;
 use go\core\fs\File;
-use go\core\http\Response;
 use go\core\jmap\Request;
 use go\core\model\Module;
 use go\core\model\User;
-use go\modules\community\addressbook\model\Address;
 
 class Language {
 	/**

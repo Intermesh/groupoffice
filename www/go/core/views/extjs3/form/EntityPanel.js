@@ -88,6 +88,10 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		Ext.apply(v, this.getForm().getFieldValues(dirtyOnly));
 		return v;
 	},
+
+	isDirty : function() {
+		return this.getForm().isDirty();
+	},
 	
 	setValues : function(v, trackReset) {
 		var field, name;
@@ -123,10 +127,16 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		return this;
 	},
 
+	/**
+	 * Resets the form
+	 */
 	reset: function() {
 		this.currentId = null
 		this.entity = null;
 		this.getForm().reset();
+		// this.getForm().items.each(function(f){
+		// 	f.setValue(f.initialConfig.value);
+		// });
 	},
 
 	submit: function (cb, scope) {
@@ -229,6 +239,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		})
 
 	},
+
+
 
 	markServerValidationErrors : function(e, fieldPrefix) {
 		var firstError;

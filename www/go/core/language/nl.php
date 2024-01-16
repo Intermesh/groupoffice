@@ -1357,5 +1357,6 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
 	"Enable 2-Factor authentication for ActiveSync devices" => "Zet tweefactorauthenticatie aan voor ActiveSync apparaten",
 	"ActiveSync devices can connect by default." => "ActiveSync apparaten kunnen standaard koppelen",
 	"When disabled the administrator has to allow each new device manually" => "Indien deze optie uit staat, moet de beheerder ieder niew apparaat handmatig toestaan om te koppelen",
-	"Allow user registration requests by everyone. Be careful!" => "Sta verzoeken voor aanmelden gebruikers door iedereen toe. Wees voorzichtig!"
+	"Allow user registration requests by everyone. Be careful!" => "Sta verzoeken voor aanmelden gebruikers door iedereen toe. Wees voorzichtig!",
+	"Are you sure you want to close this window and discard your changes?" => "Weet u zeker dat u dit venster wilt sluiten en daarmee uw wijzigingen wilt verwerpen?"
 );

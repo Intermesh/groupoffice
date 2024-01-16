@@ -1609,4 +1609,5 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'The data was saved successfully' => 'Daten erfolgreich gespeichert',
   'Your message was sent successfully' => 'Ihre Nachricht wurde erfolgreich versendet',
   'Do you want to generate some fake demonstration data? This will take about one or two minutes to generate.' => 'Möchten Sie Dummy Daten generieren? Dieser Vorgang wird etwa ein oder zwei Minuten dauern.',
+	"Are you sure you want to close this window and discard your changes?" => "Bist du sicher, dass du dieses Fenster schließen und deine Änderungen verwerfen möchtest?"
 );
