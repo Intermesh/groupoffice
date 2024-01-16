@@ -512,7 +512,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	setValue: function (records) {
 
 		if(!records) {
-			records = [];
+			records = this.mapKey ? {} : [];
 		}
 		// this.dirty = true;
 		this.removeAll();

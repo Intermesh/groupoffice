@@ -75,8 +75,15 @@ go.form.DurationField = Ext.extend(Ext.form.CompositeField, {
 		this.supr().initComponent.call(this);
 	},
 
-	setValue(v) {
+	setValue: function(v) {
 		this.setSeconds(this.inMinutes ? v*60 : v);
+	},
+
+	isDirty : function() {
+		if(this.disabled || !this.rendered) {
+			return false;
+		}
+		return String(this.getValue()) !== String(this.originalValue);
 	},
 
 	setSeconds: function(seconds) {

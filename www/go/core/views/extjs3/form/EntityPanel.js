@@ -128,15 +128,15 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	},
 
 	/**
-	 * Resets the form to the configured state.
-	 * It does not reset to the form that kas loaded!
+	 * Resets the form
 	 */
 	reset: function() {
 		this.currentId = null
 		this.entity = null;
-		this.getForm().items.each(function(f){
-			f.setValue(f.initialConfig.value);
-		});
+		this.getForm().reset();
+		// this.getForm().items.each(function(f){
+		// 	f.setValue(f.initialConfig.value);
+		// });
 	},
 
 	submit: function (cb, scope) {
