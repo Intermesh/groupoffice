@@ -62,6 +62,10 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	 */
 	groupField: false,
 
+	allowNew: undefined,
+
+	createDialog: undefined,
+
 	// private
 	onSelect : function(record, index){
 		if(this.fireEvent('beforeselect', this, record, index) !== false){
@@ -150,9 +154,19 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			this.store.on("load", this.addCreateNewRecord, this);
 			this.on('beforeselect', function(combo, record, index) {
 				if(!record.data[this.valueField]) {
+
 					this.createNew(record).then(function() {
+
 						var record = combo.store.getAt(0);
 						combo.fireEvent('select', combo, record, 0);
+
+
+						// delay focus otherwise it will expand becuase store loads after creating new entity
+						setTimeout(() => {
+							combo.focus();
+						}, 100)
+
+						// combo.hasFocus = true;
 					});
 
 					//cancel select and fire it after create.
@@ -247,13 +261,47 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		//Clear text input or it will recreate fake record.
 		this.setRawValue("");
 
-		return this.store.entityStore.save(entity).then((entity) => {
-			this.setValue(entity.id);
-			return this.setValuePromise;
-		}).catch((error) => {
-			GO.errorDialog.show(error.message);
-			return Promise.reject(error.message);
-		});
+		if(this.createDialog) {
+
+			this.hasFocus = false;
+
+			const dlg = new this.createDialog;
+			dlg.restoreFocusOnClose = false;
+			dlg.redirectOnSave = false;
+			dlg.setValues(entity);
+			dlg.show();
+
+			const p= new Promise((resolve, reject) => {
+
+				let saved = false;
+				dlg.on("save", () => {
+					saved = true;
+					this.setValue(dlg.currentId);
+					resolve(dlg.getValues());
+				}, {single: true})
+
+				dlg.on("close", () => {
+					if(!saved) {
+						this.reset();
+						reject();
+					}
+				}, {single: true})
+			})
+
+			return p.then(() => {
+				return this.setValuePromise;
+			})
+
+		} else {
+			return this.store.entityStore.save(entity).then((entity) => {
+
+				this.setValue(entity.id);
+				return this.setValuePromise;
+			}).catch((error) => {
+				GO.errorDialog.show(error.message);
+				return Promise.reject(error.message);
+			});
+		}
 	},
 	
 	resolveEntity : function(value) {

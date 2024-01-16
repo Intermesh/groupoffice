@@ -123,7 +123,7 @@ go.AuthenticationManager = (function () {
 				this.logout.defer(500, this, [true]);
 			} else
 			{
-				go.browserStorage.deleteDatabase().then(function() {
+				window.GOUI.browserStoreConnection.deleteDatabase().then(function() {
 					Ext.Ajax.request({
 						url: go.AuthenticationManager.getAuthUrl(),
 						method: "DELETE",

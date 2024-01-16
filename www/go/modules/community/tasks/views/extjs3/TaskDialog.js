@@ -63,6 +63,13 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	setLinkEntity: function (cfg) {
 
 		switch (cfg.entity) {
+			case 'Project3':
+				go.Db.store("ProjectBook").single(cfg.data.bookId).then((book) => {
+					if(book.tasklistId) {
+						this.tasklistCombo.setValue(book.tasklistId);
+					}
+				})
+				break;
 			case 'Project':
 			case "Contact":
 				this.formPanel.getForm().findField("title").setValue(cfg.data.name);

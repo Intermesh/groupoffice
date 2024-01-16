@@ -93,6 +93,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		this.itemCfg.isFormField = false;
 		this.markDeleted = [];
 		this.itemCfg.columnWidth = 1;
+		this.itemCfg.submit = false;
 
 		if(this.required && this.startWithItem === undefined) {
 			this.startWithItem = true;
@@ -121,7 +122,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			this.updateCls();
 		}, this);
 
+
+
 		go.form.FormGroup.superclass.initComponent.call(this);
+
+		if(this.value) {
+			this.setValue(this.value);
+		}
 	},
 
 	afterRender: function() {
@@ -275,6 +282,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 		this.focusNewField(wrap);
 		//wrap.formField.focus();
+
+		this.dirty = true;
 
 		this.fireEvent("newitem", this, wrap);
 	},
@@ -454,10 +463,30 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		return this.name;
 	},
 
+
+	/**
+	 * Required for  resetting after loading a form
+	 */
+	setNotDirty : function() {
+
+		var fn = function (i) {
+			i.originalValue = i.getValue();
+			i.dirty = false;
+			if(i.setNotDirty) {
+				i.setNotDirty(false);
+			}
+		};
+		this.getAllFormFields().forEach(fn, this);
+	},
+
 	
 	isDirty: function () {
 		if(this.dirty) {
 			return true;
+		}
+
+		if(!this.items) {
+			return false;
 		}
 
 		var dirty = false;
@@ -481,7 +510,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 
 	setValue: function (records) {
-		this.dirty = true;
+
+		if(!records) {
+			records = this.mapKey ? {} : [];
+		}
+		// this.dirty = true;
 		this.removeAll();
 		if(records === null) return;
 		this.markDeleted = [];

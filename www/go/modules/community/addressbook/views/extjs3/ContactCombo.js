@@ -22,6 +22,8 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	isOrganization : false,
 	initComponent: function () {
 
+		this.createDialog = go.modules.community.addressbook.ContactDialog;
+
 		if(this.allowNew == undefined) {
 			this.allowNew = {
 				isOrganization: this.isOrganization,

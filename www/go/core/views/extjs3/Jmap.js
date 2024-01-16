@@ -168,54 +168,14 @@ go.Jmap = {
 
 	},
 
-
-
-
 	upload : function(file, cfg) {
-
 		go.Uploader.addFile(file, cfg);
 	},
 
 
-	/**
-	 * When SSE is disabled we'll poll the server for changes every 2 minutes.
-	 * This also keeps the token alive. Which expires in 30M.
-	 */
-	poll : function() {
-
-		if(this.pollInterval) {
-			console.log("Poll already running");
-		}
-		console.log("Start check for updates every 60s.");
-		const checkFn = function() {
-			go.Db.stores().forEach(function(store) {
-				store.getState().then(function(state) {
-					if (state)
-						store.getUpdates();
-				});
-			})
-
-		};
-		checkFn();
-		this.pollInterval = setInterval(checkFn, 60000);
-	},
-
-	pollInterval: undefined,
-	eventSource: undefined,
-
 	stopSse() {
-		console.log("Closing SSE");
-		if(this.pollInterval) {
-			clearInterval(this.pollInterval);
-			this.pollInterval = undefined
-		}
-
-		if(this.eventSource) {
-			this.eventSource.close();
-			this.eventSource = undefined;
-		}
+		window.groupofficeCore.client.stopSSE();
 	},
-	
 	/**
 	 * Initializes Server Sent Events via EventSource. This function is called in MainLayout.onAuthenticated()
 	 * 
@@ -224,120 +184,14 @@ go.Jmap = {
 	 * @returns {Boolean}
 	 */
 	sse : function() {
-		try {
-
-			if(!this.SSEEventsRegistered) {
-				this.registerSSEEvents();
-			}
-
-			if (!window.navigator.onLine){
-				console.log("SSE not stated because we're offline");
-				return false;
-			}
-
-			// if (document.visibilityState !== "visible") {
-			// 	console.log("SSE not stated because we're not visible");
-			// 	return false;
-			// }
-
-			if (!window.EventSource) {
-				console.debug("Browser doesn't support EventSource");
-				this.poll();
-				return false;
-			}
-			
-			if(!go.User.eventSourceUrl) {
-				console.debug("Server Sent Events (EventSource) is disabled on the server.");
-				this.poll();
-				return false;
-			}
-
-			if(this.eventSource) {
-				console.log("SSE already running");
-				return;
-			}
-
-			console.log("Starting SSE");
-			
-			//filter out legacy modules
-			var entities = go.Entities.getAll().filter(function(e) {
-				return e.package != "legacy";
-			});
-			
-			var url = go.User.eventSourceUrl + '?types=' + 
-							entities.column("name").join(',');
-			
-			this.eventSource = new EventSource(url), me = this;
-
-			this.eventSource.addEventListener('msg', function(e) {
-				go.Notifier.flyout({title:"New message",description: event.data, time: 5000});
-			});
-
-			this.eventSource.addEventListener('exception', function(e) {
-				console.error(e);
-			});
-
-			this.eventSource.addEventListener('state', function(e) {
-
-				var data = JSON.parse(e.data);
-
-				for(var entity in data) {
-					var store = go.Db.store(entity);
-					if(store) {
-						(function(store) {
-							store.getState().then(function(state) {
-								// console.warn(store.entity.name, state);
-								if(!state || state == data[store.entity.name]) {
-									//don't fetch updates if there's no state yet because it never was used in that case.
-									return;
-								}
-								
-								store.getUpdates().catch((e) => {
-									console.warn(e);
-									//ignore changes error, sync will reset on error
-								});
-							});
-						})(store);
-					}
-				}
-			}, false);
-
-
-
-		}
-		catch(e) {
-			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
-		}
-	},
-
-
-	registerSSEEvents: function() {
-
-		this.SSEEventsRegistered = true;
-
-		// window.addEventListener('beforeunload', () => {
-		// 	console.log("Closing SSE")
-		// 	go.Jmap.stopSse();
-		// });
-
-		window.addEventListener('offline', () => {
-			console.log("Closing SSE because we're offline")
-			go.Jmap.stopSse();
+		//filter out legacy modules
+		var entities = go.Entities.getAll().filter(function(e) {
+			return e.package != "legacy";
 		});
 
-		window.addEventListener('online', () => {
-			console.log("Starting SSE because we're online")
-			go.Jmap.sse();
-		});
-
-		// document.addEventListener("visibilitychange", (e) => {
-		// 	console.log("visibilitychange", document.visibilityState);
-		// 	if (document.visibilityState === "visible") {
-		// 	} else {
-		// 		go.Jmap.stopSse();
-		// 	}
-		// });
+		window.groupofficeCore.client.startSSE(entities.column("name"));
 	},
+
 
 	/**
 	 * 

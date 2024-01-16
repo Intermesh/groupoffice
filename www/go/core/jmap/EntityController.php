@@ -65,6 +65,29 @@ abstract class EntityController extends Controller {
 	 */
 	abstract protected function entityClass(): string;
 
+
+	/**
+	 * Find an entity and check permissions
+	 *
+	 * @template T
+	 * @param class-string<T> $cls
+	 * @param string $entityId
+	 * @return T
+	 * @throws Forbidden
+	 * @throws NotFound
+	 */
+	protected function findEntity(string $cls, string $entityId) : Entity {
+		$entity = $cls::findById($entityId);
+		if(!$entity) {
+			throw new NotFound();
+		}
+		if(!$entity->getPermissionLevel()) {
+			throw new Forbidden();
+		}
+
+		return $entity;
+	}
+
 	
 	/**
 	 * Creates a short name based on the class name.
@@ -851,7 +874,7 @@ abstract class EntityController extends Controller {
    */
 	private function updateEntities(array $update, ArrayObject $result) {
 		foreach ($update as $id => $properties) {
-			$id = (string) $id;
+//			$id = (string) $id;
 			if(empty($properties)) {
 				$properties = [];
 			}
@@ -917,7 +940,7 @@ abstract class EntityController extends Controller {
 
 		$doDestroy = [];
 		foreach ($destroy as $id) {
-			$id = (string) $id;
+//			$id = (string) $id;
 			$entity = $this->getEntity($id);
 			if (!$entity) {
 				$result['notDestroyed'][$id] = new SetError('notFound', go()->t("Item not found"));

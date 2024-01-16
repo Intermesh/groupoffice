@@ -169,9 +169,6 @@ GO.form.ColorField =  Ext.extend(function(config){
 			return true;
 		}
 		if(value.length<1) {
-			this.el.setStyle({
-				'background-color':'#FFFFFF'
-			});
 			if(!this.allowBlank) {
 				this.markInvalid(String.format(this.blankText, value));
 				return false;
@@ -192,7 +189,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 	},
 
 	getValue : function() {
-		return this.curColor;
+		return this.value;
     },
 	/**
    * Sets the value of the color field.  Format as hex value 'FFFFFF'

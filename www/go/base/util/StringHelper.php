@@ -842,7 +842,7 @@ class StringHelper {
 	 */
 	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
 		//needed for very large strings when data is embedded in the html with an img tag
-		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
+		ini_set('pcre.backtrack_limit',  2000000 );
 
 
 		//remove strange white spaces in tags first
@@ -958,7 +958,14 @@ class StringHelper {
 	 * @param StringHelper $string String without emoticons
 	 * @return StringHelper String with emoticons
 	 */
-	public static function replaceEmoticons($string, $html = false) {		
+	public static function replaceEmoticons($string, $html = false) {
+
+		$len = strlen($string);
+
+		if($len > 1000000) {
+			//avoid problems on very large strings
+			return $string;
+		}
 		$emoticons = array(
 //				":@" => "angry.gif",
 //				":d" => "bigsmile.gif",
@@ -1026,6 +1033,9 @@ class StringHelper {
 	 */
 	public static function htmlReplace($search, $replacement, $html){
     $html = preg_replace_callback('/<[^>]*('.preg_quote($search).')[^>]*>/uis',array('GO\Base\Util\StringHelper', '_replaceInTags'), $html);
+		if($html === null) {
+			throw new \Exception(preg_last_error_msg());
+		}
     $html = preg_replace('/([^a-z0-9])'.preg_quote($search).'([^a-z0-9])/i',"\\1".$replacement."\\2", $html);
     
     //$html = str_ireplace($search, $replacement, $html);

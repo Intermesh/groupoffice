@@ -35,7 +35,7 @@ class Address extends Model {
 	 */
 	public function getName(): ?string
 	{
-		return $this->name;
+		return $this->name ?? "";
 	}
 
 	public function __toString() {

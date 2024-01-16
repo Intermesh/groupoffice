@@ -273,6 +273,8 @@ class Authenticate {
 		Token::delete($token->primaryKeyValues());
 		Token::unsetCookie();
 
+		go()->getLanguage()->unsetCookie();
+
 		return true;
 	}
 

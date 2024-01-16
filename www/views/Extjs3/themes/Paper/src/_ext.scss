@@ -578,9 +578,9 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 			//background-color: $cDangerBg;
 		}
 
-		label.x-form-readonly-label {
-			background-color: color($bg, 'readonly');
-		}
+		//label.x-form-readonly-label {
+		//	background-color: color($bg, 'readonly');
+		//}
 	}
 
 
@@ -2440,7 +2440,7 @@ $menuScrollerSize : dp(4);
 	border-radius: $borderRadius;
 	overflow:hidden;
 	border: 1px solid color($fg, 'line');
-	form > div:not(.x-tab-panel) {
+	form > div:not(.x-tab-panel, .goui) {
 		background-color:color($bg,'background');
 	}
 	&-noborder, &-maximized{

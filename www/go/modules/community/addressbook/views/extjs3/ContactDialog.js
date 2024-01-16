@@ -233,6 +233,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						entityStore: "Contact",
 						displayField: "name",
 						valueField: 'id',
+						createDialog: go.modules.community.addressbook.ContactDialog,
 						allowNew: {
 							isOrganization: true,
 							addressBookId: go.User.addressBookSettings.defaultAddressBookId 

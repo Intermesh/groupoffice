@@ -73,6 +73,9 @@ class Mapping {
 	/**
 	 * Adds a table to the model
 	 *
+	 * Note: If two tables both have a primary key column with a distinct value the name must be different. If they share
+	 * the same ID it's possible to use the same name.
+	 *
 	 * @param string $name The table name
 	 * @param string|null $alias The table alias to use in the queries
 	 * @param array|null $keys [thiscol => targetcol] If null then it's assumed the key name is identical in

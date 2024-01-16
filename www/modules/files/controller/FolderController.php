@@ -754,7 +754,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$folder->checkFsSync();
 
 		//useful information for the view.
-		$response['path'] = $folder->path;
+		$response['path'] = htmlentities($folder->path);
 
 		//Show this page in thumbnails or list
 		$folderPreference = \GO\Files\Model\FolderPreference::model()->findByPk(array('user_id'=>\GO::user()->id,'folder_id'=>$folder->id));
@@ -984,7 +984,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
         
 	public function formatListRecord($record, $model) {
 
-		$record['path'] = $model->path;
+		$record['path'] = htmlspecialchars($model->path);
 
 		if ($model instanceof Folder) {
 			$record['type_id'] = 'd:' . $model->id;

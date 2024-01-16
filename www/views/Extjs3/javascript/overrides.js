@@ -251,6 +251,19 @@ Ext.override(Ext.form.BasicForm,{
 			this.doAction(submitAction, options);
 			return this;
 	},
+
+	/**
+	 * Sets all fields to "not" dirty.
+	 */
+	trackReset : function() {
+		this.items.each(i => {
+			i.originalValue = i.getValue();
+			i.dirty = false; //MS: for form group and possibly other components
+			if(i.setNotDirty) {
+				i.setNotDirty(false);
+			}
+		});
+	},
 	
 	setValuesOrig: Ext.form.BasicForm.prototype.setValues,
 	/**
@@ -1231,7 +1244,20 @@ Ext.override(Ext.form.Field, {
 		} else {
 			this.fieldLabel = label;
 		}
-	}		
+	},
+
+	//For GOUI compat
+	isModified: function() {
+		return this.isDirty();
+	},
+
+	trackReset: function() {
+		this.dirty = false;
+		this.originalValue = this.getValue();
+		if(this.setNotDirty) {
+			this.setNotDirty();
+		}
+	}
 });
 
 Ext.override(Ext.form.Hidden, {

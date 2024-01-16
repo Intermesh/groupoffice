@@ -293,7 +293,8 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			store: this.comboStore,
 			value:"",
 			collapseOnSelect: true, //Maybe false for selecting more options? But it's annoying in contact dialog
-			allowNew: this.allowNew
+			allowNew: this.allowNew,
+			createDialog: this.createDialog
 		});
 
 		delete this.fieldLabel;

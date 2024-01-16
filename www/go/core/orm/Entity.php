@@ -6,7 +6,6 @@ namespace go\core\orm;
 
 use Exception;
 use GO\Base\Db\ActiveRecord;
-use GO\Base\Exception\AccessDenied;
 use go\core\data\convert\AbstractConverter;
 use go\core\data\convert\Json;
 use go\core\db\Column;
@@ -18,13 +17,11 @@ use go\core\App;
 use go\core\db\Criteria;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
-use go\core\orm\go\core\exception\NotFound;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use GO\Files\Model\Folder;
-use PDO;
 use function go;
 use go\core\db\Query as DbQuery;
 use go\core\util\ArrayObject;
@@ -149,7 +146,17 @@ abstract class Entity extends Property {
 	 *
 	 * @param string[] $properties Specify the columns for optimal performance. You can also use the mapping to only fetch table columns Note::getMapping()->getColumnNames()
 	 * @param bool $readOnly Readonly has less overhead
-	 * @return static[]|Query
+	 * @return Query<$this>
+	 * @throws Exception
+	 * @example
+	 * ````
+	 * $note = Note::find()->where(['name' => 'Foo'])->single();
+	 *
+	 * ```
+	 *
+	 * For more details see the Criteria::where() function description
+	 *
+	 * @see Criteria::where()
 	 * @example
 	 * ````
 	 * $notes = Note::find()->where(['name' => 'Foo']);
@@ -162,15 +169,6 @@ abstract class Entity extends Property {
 	 *
 	 * For a single value do:
 	 *
-	 * @example
-	 * ````
-	 * $note = Note::find()->where(['name' => 'Foo'])->single();
-	 *
-	 * ```
-	 *
-	 * For more details see the Criteria::where() function description
-	 *
-	 * @see Criteria::where()
 	 */
 	public static final function find(array $properties = [], bool $readOnly = false) {
 		return static::internalFind($properties, $readOnly);
@@ -1242,10 +1240,9 @@ abstract class Entity extends Property {
 
 		switch($relation->type) {
 			case Relation::TYPE_MAP:
-				if(isset($entity->$name)) {
-					$this->$name = is_array($this->$name) ? array_replace($this->$name, $entity->$name) : $this->$name = $entity->$name;
-				}
+				$this->$name = is_array($this->$name) ? array_replace($this->$name, $entity->$name) : $entity->$name;
 				break;
+
 			case Relation::TYPE_HAS_ONE:
 
 				$copy = $entity->$name->toArray();
@@ -1264,7 +1261,7 @@ abstract class Entity extends Property {
 				break;
 
 			case Relation::TYPE_SCALAR:
-				$this->$name = array_unique(array_merge($this->$name, $entity->$name));
+				$this->$name = isset($this->$name) ? array_unique(array_merge($this->$name, $entity->$name)) : $entity->$name;
 				break;
 
 			case Relation::TYPE_ARRAY:

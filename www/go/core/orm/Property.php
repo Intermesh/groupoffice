@@ -638,11 +638,13 @@ abstract class Property extends Model {
 	/**
 	 * Get ID which is are the primary keys combined with a "-".
 	 *
-	 * @return string|null eg. "1" or with multiple keys: "1-2"
+	 * Note: if this logic ever changes it must be changed here too: {@see \go\core\jmap\Entity::changesQuery()}
+	 *
+	 * @return int|string|null eg. 1 or with multiple keys: "1-2"
 	 */
-	public function id() : ?string {
+	public function id() : string|int|null {
 		if(property_exists($this, 'id')) {
-			return isset($this->id) ? (string) $this->id : null;
+			return $this->id ?? null;
 		}
 		$keys = $this->primaryKeyValues();
 		if(empty($keys)) {
@@ -824,8 +826,9 @@ abstract class Property extends Model {
 	 * @param array $fetchProperties
 	 * @param bool $readOnly
 	 * @param Property|null $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
-	 * @return static[]|Query
+	 * @return Query<$this>
 	 * @noinspection PhpReturnDocTypeMismatchInspection
+	 * @throws Exception
 	 */
 	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null) {
 
@@ -954,7 +957,8 @@ abstract class Property extends Model {
 				}
 			}
 
-			//also select primary key values separately to check if tables were new when saving. They are stored in $this->primaryKeys when they go through the __set function.
+			//also select primary key values separately to check if tables were new when saving. They are stored in
+			// $this->primaryKeys when they go through the __set function.
 			if(!$readOnly) {
 				foreach($table->getPrimaryKey() as $pk) {
 					//$query->select("alias.id AS `alias.userId`");
@@ -1436,6 +1440,8 @@ abstract class Property extends Model {
 	private function saveRelatedArray(Relation $relation): bool
 	{
 
+
+
 		$modified = $this->getModified([$relation->name]);
 		if(empty($modified)) {
 			return true;
@@ -1469,6 +1475,8 @@ abstract class Property extends Model {
 
 			$this->applyRelationKeys($relation, $newProp);
 
+			// this is also done in {@see Property::patchArray()} but that is only done when settings the relation via {@see setValues()}
+			// when setting the objects directy it relies on this procedure:
 			if(isset($relation->orderBy)) {
 				$newProp->{$relation->orderBy} = $sortOrder++;
 			}
@@ -1559,7 +1567,8 @@ abstract class Property extends Model {
 	 * @param Property $model
 	 * @throws Exception
 	 */
-	private static function arrayContains(array $models, self $model) {
+	private static function arrayContains(array $models, self $model): bool
+	{
 		foreach($models as $m) {
 			if($m->equals($model)) {
 				return true;
@@ -2202,7 +2211,8 @@ abstract class Property extends Model {
 	 * @return mixed
 	 * @throws Exception
 	 */
-	protected function patchArray(Relation $relation, string $propName, ?array $value) {
+	protected function patchArray(Relation $relation, string $propName, ?array $value): mixed
+	{
 		$old = $this->$propName;
 		/** @var self[] $old */
 
@@ -2255,6 +2265,15 @@ abstract class Property extends Model {
 			}
 		}
 
+		// set sort order column defined in relation
+		// needs to be done before save because the order could be the only thing
+		// that has changed and relations need a modified property in order to be saved.
+		if(isset($relation->orderBy)) {
+			$sortOrder = 0;
+			foreach ($this->{$propName} as $newProp) {
+				$newProp->{$relation->orderBy} = $sortOrder++;
+			}
+		}
 
 		return $this->$propName;
 	}

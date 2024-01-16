@@ -92,10 +92,10 @@ class Task extends EntityController {
 	 * Used to show counter badge for support.
 	 *
 	 */
-	public function countMine():int{
+	public function countMine(): int
+	{
 
-
-			$defaultListId = go()->getAuthState()->getUser(['tasksSettings'])->tasksSettings->getDefaultTasklistId();
+		$defaultListId = go()->getAuthState()->getUser(['tasksSettings'])->tasksSettings->getDefaultTasklistId();
 
 		$query = model\Task::find(['id'])
 			->selectSingleValue("IFNULL(count(*), 0)")
@@ -103,6 +103,12 @@ class Task extends EntityController {
 				"tasklistId" => $defaultListId,
 				"complete" => false,
 				'due' => '< tomorrow'
+			])->filter([
+				"operator" => "OR",
+				"conditions" => [
+					["due" => '< tomorrow'],
+					["due" => null]
+				]
 			]);
 
 		$query->removeJoin("tasks_task_user");

@@ -1,3 +1,9 @@
+const GOUILinkDetail = Ext.extend(go.GOUIWrapper, {
+	load: function (id) {
+		this.comp.load(id);
+	}
+})
+
 go.links.LinkDetailWindow = Ext.extend(go.Window, {
   entity: "",
   layout: "fit",
@@ -11,7 +17,16 @@ go.links.LinkDetailWindow = Ext.extend(go.Window, {
 
     this.stateId = "go-link-detail-" + this.entity.name;
 
-    this.detailView = this.entity.links[0].linkDetail();
+		const dtl = this.entity.links[0].linkDetail();
+
+		if(dtl.getItemId) {
+			//native extjs comp
+			this.detailView = dtl;
+		} else {
+			//GOUI comp
+			this.detailView = new GOUILinkDetail({comp: dtl});
+		}
+
 
     this.tools = [{
       id: 'home',
@@ -48,3 +63,5 @@ go.links.LinkDetailWindow = Ext.extend(go.Window, {
     return this;
   }
 });
+
+

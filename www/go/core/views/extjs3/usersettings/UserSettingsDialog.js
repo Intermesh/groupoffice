@@ -424,7 +424,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		//reload group-office
 		if(this.currentUserId == go.User.id) {
-			document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
+			let url = BaseHref;
+			const langField = this.formPanel.getForm().findField('language');
+			if(langField.isDirty()) {
+				url += "?SET_LANGUAGE=" + langField.getValue();
+			}
+
+			document.location = url;
 		} else
 		{
 			this.close();

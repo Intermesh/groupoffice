@@ -80,11 +80,15 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * @returns {undefined}
 	 */
 	boot : async function() {
+
+		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
+		window.GOUI = await import(BaseHref + "views/goui/dist/goui/script/index.js");
+
 		var me = this;
 
 		// GOUI in ext , Warning: breaks old safari
-		// window.goui = await import(BaseHref + "views/goui/dist/goui/script/index.js");
-		// window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
+		window.goui = await import(BaseHref + "views/goui/dist/goui/script/index.js");
+		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
 
 		go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
@@ -92,20 +96,19 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				dismissDelay: 0,
 				maxWidth: 500
 			});
-			
+
 			Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
 
 			go.User.authenticate().then((user) => {
-				me.on('render', function() {
+				me.on('render', function () {
 					me.fireEvent('boot', me);
-				}, me, {single:true});
+				}, me, {single: true});
 				me.onAuthentication(); // <- start Group-Office
-			}).catch(() => {
+			}).catch((e) => {
+				console.warn(e);
 				me.fireEvent("boot", me);
 				go.Router.check();
 			})
-
-				
 		});
 
 	},
@@ -310,7 +313,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				go.Entities.init();
 
 				me.fireEvent('authenticated', this, go.User, password);
-				// window.groupofficeCore.client.fireAuth();
+
+				window.groupofficeCore.client.fireAuth();
 
 				me.renderUI();
 				Ext.getBody().unmask();

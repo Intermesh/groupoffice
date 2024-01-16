@@ -18,6 +18,8 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		// Needed for every non-GET request when using the access token as cookie.
 		Ext.Ajax.defaultHeaders['X-CSRF-Token'] = session.CSRFToken;
 
+		window.groupofficeCore.client.session = session;
+
 		this.capabilities = go.Jmap.capabilities = session.capabilities;
 		this.session = session;
 
@@ -141,7 +143,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 }));
 
 // Update go.User when it's edited
-Ext.onReady(function(){
+GO.mainLayout.on("authenticated", function(){
 	go.Db.store("User").on("changes", function(store, added, changed, deleted){
 		if(changed.indexOf(go.User.id) > -1) {
 			store.single(go.User.id).then((user) => {
