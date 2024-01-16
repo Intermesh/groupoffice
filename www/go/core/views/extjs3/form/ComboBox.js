@@ -158,9 +158,6 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 					this.createNew(record).then(function() {
 
 						var record = combo.store.getAt(0);
-
-						console.warn(record);
-						combo.fireEvent('beforeselect', combo, record, 0);
 						combo.fireEvent('select', combo, record, 0);
 
 
