@@ -1,8 +1,5 @@
-
-
-
+- Billing: Customer report is sortable
 - Core: Exclude User and Search from SSE Push because it caused performance problems
-
 - Core: Comment composer did not reset.
 - Core: System settings dialog validation for notifications panel
 
