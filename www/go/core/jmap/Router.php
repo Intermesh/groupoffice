@@ -4,6 +4,7 @@ namespace go\core\jmap;
 
 use Exception as CoreException;
 use go\core\ErrorHandler;
+use go\core\fs\File;
 use go\core\http\Exception;
 use go\core\jmap\exception\InvalidResultReference;
 use go\core\orm\EntityType;
@@ -30,7 +31,6 @@ use Throwable;
  * http://jmap.io/spec-core.html#making-an-api-request
  */
 class Router {
-
 //	public function error($type, $status, $detail) {
 //		$r = http\Response::get();
 //		$r->setStatus($status, $detail);
@@ -42,6 +42,10 @@ class Router {
 //		]);
 //		exit();
 //	}
+	/**
+	 * @var File
+	 */
+	private $logFile;
 
 	/**
 	 * Run the router
@@ -65,6 +69,16 @@ class Router {
 
 		Response::get()->sendHeaders();
 		Response::get()->output();
+	}
+
+	/**
+	 * Set file to log all requests to
+	 *
+	 * @param $filename
+	 * @return void
+	 */
+	public function setLogFile(string $filename) {
+		$this->logFile = new File($filename);
 	}
 
 	/**
@@ -209,6 +223,8 @@ class Router {
 		if($method == "Core/echo") {
 			return $params;
 		}
+		
+		$this->logAction($method, $params);
 
 		$controllerMethod = $this->findControllerAction($method);
 		$controller = new $controllerMethod[0];
@@ -312,6 +328,16 @@ class Router {
 		}
 
 		return $result;
+	}
+
+	private function logAction(string $method)
+	{
+		if(!isset($this->logFile)) {
+			return;
+		}
+
+		$line = '[' . date('Y-m-d H:i:s') . ']['.(go()->getUserId() ?? "-").']['.(Request::get()->getRemoteIpAddress() ?? "-").'] '.$method;
+		$this->logFile->putContents($line . "\n", FILE_APPEND);
 	}
 
 }
