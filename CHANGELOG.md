@@ -1,4 +1,5 @@
 - Core: Comment composer did not reset.
+- Core: System settings dialog validation for notifications panel
 
 15-01-2024: 6.8.29
 - Finance: Update VAT rates when changing book in document dialog
