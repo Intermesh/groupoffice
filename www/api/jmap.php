@@ -11,6 +11,11 @@ App::get()->setAuthState(new State());
 
 if(Request::get()->getMethod() === 'POST') {	
 	$router = new Router();
+
+	$conf = go()->getConfig();
+	if($conf['accessLog']) {
+		$router->setLogFile($conf['accessLog']);
+	}
 	$router->run();
 } elseif (Request::get()->getMethod() === 'GET') {
 	App::get()->getAuthState()->outputSession();
