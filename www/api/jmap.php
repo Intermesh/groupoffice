@@ -14,6 +14,10 @@ switch(Request::get()->getMethod() ) {
 
 	case 'POST':
 		$router = new Router();
+		$conf = go()->getConfig();
+		if(!empty($conf['accessLog'])) {
+			$router->setLogFile($conf['accessLog']);
+		}
 		$router->run();
 	break;
 

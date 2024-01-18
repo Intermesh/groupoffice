@@ -66,6 +66,10 @@ go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
 		},
 		scope);
 		
+	},
+
+	isValid() {
+		return this.form.isValid();
 	}
 
 	

@@ -192,7 +192,31 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		this.load();
 	},
 
-	submit : function(){		
+	isValid : function() {
+		let valid = true;
+
+		this.tabWithError = undefined;
+		this.tabPanel.items.each(function(tab) {
+			if(tab.rendered && tab.isValid && !tab.isValid()) {
+				valid = false;
+
+				if(!this.tabWithError) {
+					this.tabWithError = tab;
+				}
+			}
+		},this);
+
+		return valid;
+	},
+
+	submit : function(){
+
+
+		if(!this.isValid()) {
+			Ext.MessageBox.alert(t("Error"), 'You have errors in your form. The invalid fields are marked.');
+			this.tabWithError.show();
+			return;
+		}
 		
 		this.submitCount = 0;
 		// loop through child panels and call onSubmitStart function if available
