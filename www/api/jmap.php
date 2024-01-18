@@ -13,7 +13,7 @@ if(Request::get()->getMethod() === 'POST') {
 	$router = new Router();
 
 	$conf = go()->getConfig();
-	if($conf['accessLog']) {
+	if(!empty($conf['accessLog'])) {
 		$router->setLogFile($conf['accessLog']);
 	}
 	$router->run();
