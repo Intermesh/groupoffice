@@ -221,7 +221,8 @@ go.Jmap = {
 			
 			//filter out legacy modules
 			var entities = go.Entities.getAll().filter(function(e) {
-				return e.package != "legacy";
+				// Search and user get lots of updates. We only update them when needed,
+				return e.package != "legacy"  && e.name != "Search" && e.name != "User";
 			});
 			
 			var url = go.User.eventSourceUrl + '?types=' + 

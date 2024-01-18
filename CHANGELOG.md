@@ -1,3 +1,5 @@
+- Core: Exclude User and Search from SSE Push because it caused performance problems
+
 15-01-2024: 6.7.62
 - Calendar/summary/Core: Add user was broken when start module was not installed and calendar was installed
 - Billing: display profit % over costs (opposed to profit over sales)
@@ -326,6 +328,12 @@
 
 24-02-2023: 6.7.15
 - ActiveSync: Works on PHP 8.1 now and shows Group-Office homepage and manual on /ActiveSync-Server-ActiveSync
+
+
+--- 6.7
+
+- Core: Exclude User and Search from SSE Push because it caused performance problems
+
 
 11-12-2023: 6.6.181
 - Core: Better license check
