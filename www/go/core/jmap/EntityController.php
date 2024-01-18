@@ -524,6 +524,10 @@ abstract class EntityController extends Controller {
 
 		$query = $this->getGetQuery($p);
 
+		if(go()->getDebugger()->enabled) {
+			$result['query'] = (string) $query;
+		}
+
 		static::fireEvent(self::EVENT_BEFORE_GET, $this, $p, $query);
 
 		$unsorted = [];
