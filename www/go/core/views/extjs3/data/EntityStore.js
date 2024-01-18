@@ -365,14 +365,17 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		}
 
 		return Promise.all(proms).then(() => {
+
+			const options = {
+				method: this.entity.name + "/set",
+				params: params
+			};
+
 			if(cb) {
 				cb.call(scope || this, options, true, response);
 			}
 			return response;
 		});
-
-
-		//TODO Automatic state mis match??
 
 	},
 
