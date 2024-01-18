@@ -27,15 +27,19 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 							xtype: 'textfield',
 							name: 'systemEmail',
 							fieldLabel: t('System e-mail'),
+							allowBlank: false
 						}, {
 							xtype: 'textfield',
 							name: 'smtpHost',
 							fieldLabel: t('Hostname'),
+							value: "localhost",
+							allowBlank: false
 						}, {
 							xtype: 'numberfield',
 							name: 'smtpPort',
 							fieldLabel: t('Port'),
-							decimals: 0
+							decimals: 0,
+							value: 587
 						}, {
 							xtype: 'textfield',
 							name: 'smtpUsername',
@@ -80,7 +84,8 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 							xtype: 'numberfield',
 							name: 'smtpTimeout',
 							fieldLabel: t('Timeout (s)'),
-							decimals: 0
+							decimals: 0,
+							valye: 30
 						}
 					]
 				}]
