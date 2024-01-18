@@ -44,6 +44,7 @@ go.tools.SystemSettingsTools = Ext.extend(Ext.Panel,{
 			[t('Database check'),'', GO.url('maintenance/checkDatabase') ],
 			[t('Update search index'),'', GO.url('maintenance/buildSearchCache') ],
 			[t('Update search index (Complete rebuild)'),'', GO.url('maintenance/buildSearchCache', {"reset" : 1}) ],
+			[t('Rebuild principals'),'', GO.url('maintenance/buildPrincipals') ],
 			[t('Remove duplicate contacts and events'),'', GO.url('maintenance/removeDuplicates') ]
 		];
 		if(go.Modules.isAvailable(null,'files')) {

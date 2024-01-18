@@ -449,6 +449,14 @@ abstract class Entity extends Property {
 			}
 		}
 
+		//See \go\core\orm\PrincipalTrait;
+		if(method_exists($this, 'savePrincipal') && $this->isModified()) {
+			if(!$this->savePrincipal()) {
+				$this->setValidationError("principal", ErrorCode::INVALID_INPUT, "Could not save core_principal entry");
+				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -520,6 +528,14 @@ abstract class Entity extends Property {
 			//See \go\core\orm\SearchableTrait;
 			if(method_exists(static::class, 'deleteSearchAndLinks')) {
 				if(!static::deleteSearchAndLinks($query)) {				
+					go()->getDbConnection()->rollBack();
+					return false;
+				}
+			}
+
+			//See \go\core\orm\PrincipalTrait;
+			if(method_exists(static::class, 'deletePrincipal')) {
+				if(!static::deletePrincipal($query)) {
 					go()->getDbConnection()->rollBack();
 					return false;
 				}

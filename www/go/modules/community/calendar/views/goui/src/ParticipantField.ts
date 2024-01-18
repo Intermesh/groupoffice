@@ -113,13 +113,13 @@ export class ParticipantField extends Component {
 					style:{minWidth:'100%'},
 					headers: false,
 					store: datasourcestore({ // TODO: use Search/email but store doesn't support this yet
-						dataSource: jmapds('UserDisplay')
+						dataSource: jmapds('Principal')
 						//properties: ['id', 'displayName', 'email']
 					}),
 					columns: [
 						column({
-							id: "displayName",
-							renderer: (columnValue, record) => columnValue + `<br><small>${record.email}</small>`
+							id: "name",
+							renderer: (v, record) => v + `<br><small>${record.email}</small>`
 						})
 					]
 				})
@@ -138,21 +138,21 @@ export class ParticipantField extends Component {
 			kind: 'individual',
 			participationStatus:"accepted",
 			expectReply:false
-		}, go.User.id);
+		},'User-'+go.User.id);
 	}
 
-	addParticipant(user: any) {
+	addParticipant(principal: any) {
 		if(this.list.isEmpty()) {
 			this.addSelfAsOrganiser();
 		}
 		this.list.add({
-			email:user.email,
-			name: user.displayName || user.email,
+			email:principal.email,
+			name: principal.name || principal.email,
 			roles: {attendee:true},
-			scheduleAgent: user.id ? 'server' : 'server',
-			kind: 'individual',
+			scheduleAgent: principal.id ? 'server' : 'server',
+			kind: principal.type,
 			participationStatus:"needs-action",
 			expectReply:true
-		}, user.id || Math.round(Math.random()*1000)+1000);
+		}, principal.id || Math.round(Math.random()*1000)+1000);
 	}
 }

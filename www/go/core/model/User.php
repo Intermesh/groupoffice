@@ -28,6 +28,7 @@ use go\core\mail\Util;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\orm\PrincipalTrait;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
@@ -56,6 +57,7 @@ use go\modules\community\tasks\model\UserSettings as TasksUserSettings;
 class User extends AclItemEntity {
 	
 	use CustomFieldsTrait;
+	use PrincipalTrait;
 
 	const ID_SUPER_ADMIN = 1;
 
@@ -815,10 +817,6 @@ class User extends AclItemEntity {
 
 		$this->changeHomeDir();
 
-		if($this->isModified(['username', 'displayName', 'avatarId', 'email']) && !Installer::isInstalling()) {
-			UserDisplay::entityType()->changes([[$this->id, $this->findAclId(), 0]]);
-		}
-
 		if($this->isModified(['password'])) {
 			Token::destroyOtherSessons();
 		}
@@ -1386,5 +1384,25 @@ class User extends AclItemEntity {
 	protected static function aclEntityKeys(): array
 	{
 		return ['id' => 'isUserGroupFor'];
+	}
+
+	protected function principalAttrs(): array
+	{
+		return [
+			'name' => $this->displayName,
+			'description' => $this->username,
+			'email' => $this->email,
+			'timeZone' => $this->timezone,
+			'avatarId' => $this->avatarId
+		];
+	}
+
+	protected function isPrincipalModified() {
+		return $this->isModified(['displayName', 'email', 'username', 'timezone', 'avatarId']);
+	}
+
+	protected function principalType(): string
+	{
+		return Principal::Individual;
 	}
 }

@@ -257,25 +257,25 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			let creator = r.get("creator");
 			if(!creator) {
 				creator = {
-					displayName: t("Unknown user")
+					name: t("Unknown user")
 				};
 			}
 
 
 			let qtip = t('{author} wrote at {date}')
-				.replace('{author}', Ext.util.Format.htmlEncode(creator.displayName))
+				.replace('{author}', Ext.util.Format.htmlEncode(creator.name))
 				.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat));
 
 			let modifier = r.get("modifier");
 			if(!modifier) {
 				modifier = {
-					displayName: t("Unknown user")
+					name: t("Unknown user")
 				};
 			}
 			if(r.get('createdAt').getTime() != r.get('modifiedAt').getTime()) {
 
 				qtip += "\n" + t("Edited by {author} at {date}")
-					.replace('{author}', Ext.util.Format.htmlEncode(modifier.displayName))
+					.replace('{author}', Ext.util.Format.htmlEncode(modifier.name))
 					.replace('{date}', Ext.util.Format.date(r.get('modifiedAt'),go.User.dateTimeFormat));
 			}
 
@@ -290,7 +290,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				cls: 'photo '+mineCls
 			};
 
-			avatar.html = go.util.avatar(creator.displayName,creator.avatarId);
+			avatar.html = go.util.avatar(creator.name, creator.avatarId);
 
 			avatar.style = {
 				cursor: "pointer"

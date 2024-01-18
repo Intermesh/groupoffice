@@ -273,7 +273,7 @@
 			&.events {
 				position: absolute;
 			//	margin-left: dp(24); // week numbers
-				margin-top: dp(24); // day numbers
+				margin-top: dp(32); // day numbers
 				width: 100%;
 				overflow: hidden;
 				bottom: 0;
@@ -306,12 +306,15 @@
 		> sub { // weeknb
 			float:left;
 			text-align: center;
-			padding: 0 dp(2);
+			padding: 0 dp(6);
 			cursor: pointer;
-			color: $colorTextSecondary;
-			font-size: .8em;
-			max-width: dp(24);
-			font-weight: 300;
+			font-size: .7em;
+			//max-width: dp(24);
+			font-weight: 400;
+			margin:dp(4);
+			//color:$colorTextSecondary;
+			background-color: $colorSelectedRowInactive;
+			border-radius: 99px;
 		}
 		> em { // date number
 			font-weight: 500;
@@ -319,9 +322,9 @@
 			text-align: right;
 			font-size:1.2em;
 			display: block;
-			height: dp(24);
+			height: dp(32);
 			margin-right: dp(8);
-			line-height: dp(24);
+			line-height: dp(32);
 		}
 	}
 }

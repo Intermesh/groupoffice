@@ -16,6 +16,7 @@ use go\core\auth\TemporaryState;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\orm\EntityType;
+use go\core\orm\PrincipalTrait;
 use go\core\orm\SearchableTrait;
 use go\modules\community\history\Module;
 use PDOException;
@@ -199,6 +200,53 @@ class MaintenanceController extends AbstractController {
 			echo '<br /><br /><a href="'. GO::url('maintenance/removeDuplicates', array('delete'=>true, 'ignore_links' => true)).'">Click here to delete the newest duplicates marked in red also when they have links.</a>';
 		} else {
 			echo '<br /><br /><a href="'. GO::url('maintenance/removeDuplicates').'">Show all models.</a>';
+		}
+	}
+
+	protected function actionBuildPrincipals($params) {
+
+		if(!$this->isCli() && !GO::user()->isAdmin() && GO::router()->getControllerAction()!='upgrade')
+			throw new \GO\Base\Exception\AccessDenied();
+
+		go()->setAuthState(new TemporaryState(1));
+		\go\core\jmap\Entity::$trackChanges = false;
+		Module::$enabled = false;
+		if(!$this->lockAction()) {
+			exit("Already running!");
+		}
+		//speed things up
+		go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0");
+
+
+		if(!$this->isCli()){
+			echo '<pre>';
+		}
+//		if(!empty($params['reset'])) {
+//			echo "Resetting cache!\n";
+//			go()->getDbConnection()->exec("TRUNCATE core_principal");
+//		}
+
+		echo "Checking principal cache\n\n";
+		echo ".: Record cached, E: Error while occurred, S: Record skipped (probably normal)\n"
+			.    "==============================================================================\n\n";
+
+		$classFinder = new ClassFinder();
+		$entities = $classFinder->findByTrait(PrincipalTrait::class);
+
+		foreach ($entities as $cls) {
+			$cls::rebuildPrincipalForEntity();
+			echo "\nDone\n\n";
+		}
+
+		go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1");
+
+		echo "Resettings JMAP sync state\n";
+		go()->rebuildCache();
+
+		echo "\n\nAll done!\n\n";
+
+		if(!$this->isCli()){
+			echo '</pre>';
 		}
 	}
 	

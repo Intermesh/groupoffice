@@ -6,7 +6,7 @@
 		// emptyText: t("Please select..."),
 		pageSize: 50,
 		valueField: 'id',
-		displayField: 'displayName',
+		displayField: 'name',
 		triggerAction: 'all',
 		editable: true,
 		selectOnFocus: true,
@@ -14,16 +14,12 @@
 		allowBlank: false,
 		store: {
 			xtype: 'gostore',
-			fields: ['id', 'displayName', 'username', 'avatarId'],
-			entityStore: "UserDisplay",
+			fields: ['id', 'name', 'description', 'avatarId'],
+			entityStore: "Principal",
 			sortInfo: {
-				field: "displayName"
+				field: "name"
 			},
-			filter: {
-				default: {
-					showDisabled: false
-				}
-			}
+			filter: {entity: 'User'}
 		},
 		tpl: '<tpl for=".">\
 			<div class="x-combo-list-item">\
@@ -31,7 +27,7 @@
 					 <tpl if="!avatarId"><div class="avatar"></div></tpl>\
 					 <tpl if="avatarId"><div class="avatar" style="background-image:url({[go.Jmap.thumbUrl(values.avatarId, {w: 40, h: 40, zc: 1})]})"></div></tpl>\
 					 <div class="wrap">\
-						 <div>{displayName}</div><small>{username}</small>\
+						 <div>{name}</div><small>{description}</small>\
 					 </div>\
 				 </div>\
 			 </div>\

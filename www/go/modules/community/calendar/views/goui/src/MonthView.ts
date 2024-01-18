@@ -176,7 +176,7 @@ export class MonthView extends CalendarView {
 				row = E('ol',eventContainer);
 			for (i = 0; i < 7; i++) {
 				row.append(E('li',
-					i==0 ? E('sub',day.getWeekOfYear()).cls('weeknb')
+					i==0 ? E('sub','W '+day.getWeekOfYear()).cls('weeknb')
 						.on('click',e => this.fire('selectweek', this, weekStart))
 						.on('mousedown',e=>e.stopPropagation()):'',
 					E('em',day.format(day.getDate() === 1 ? 'j M' : 'j'))

@@ -140,7 +140,7 @@ go.users.SelectDialogPanel = Ext.extend(Ext.Panel, {
 
     this.grid.on('rowdblclick', function(grid, rowIndex, e){
       var r = grid.store.getAt(rowIndex);
-      this.fireEvent('selectsingle', this, r.data.displayName, r.data.email, r.data.id);
+      this.fireEvent('selectsingle', this, r.data.name, r.data.email, r.data.id);
     }, this);
 
 		// this.grid.getSelectionModel().on("selectionchange", function(sm) {

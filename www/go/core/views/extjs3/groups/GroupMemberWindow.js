@@ -9,8 +9,8 @@ go.groups.GroupMemberWindow = Ext.extend(go.Window, {
       store: new go.data.Store({
         fields: [
           'id',
-          'username',
-          'displayName',
+          'description',
+          'name',
           'avatarId'          
         ],
         filters: {
@@ -19,10 +19,10 @@ go.groups.GroupMemberWindow = Ext.extend(go.Window, {
           }
         },
         sortInfo: {
-          field: 'displayName',
+          field: 'name',
           direction: 'ASC'
         },
-        entityStore: "UserDisplay"
+        entityStore: "Principal"
       }),
 
       tbar: [
@@ -40,7 +40,7 @@ go.groups.GroupMemberWindow = Ext.extend(go.Window, {
           header: t('Name'),
           width: dp(200),
           sortable: false,
-          dataIndex: 'displayName',
+          dataIndex: 'name',
           renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
             var style = record.get('avatarId') ? 'background-image: url(' + go.Jmap.thumbUrl(record.get("avatarId"), {w: 40, h: 40, zc: 1}) + ')"' : "";
@@ -48,7 +48,7 @@ go.groups.GroupMemberWindow = Ext.extend(go.Window, {
             return '<div class="user"><div class="avatar" style="' + style + '"></div>' +
               '<div class="wrap">' +
               '<div class="displayName">' + value + '</div>' +
-              '<small class="username">' + Ext.util.Format.htmlEncode(record.get('username')) + '</small>' +
+              '<small class="username">' + Ext.util.Format.htmlEncode(record.get('description')) + '</small>' +
               '</div>' +
               '</div>';
           }

@@ -62,9 +62,9 @@ export abstract class CalendarView extends Component {
 
 		let time = [];
 		if(!e.showWithoutTime) {
-			time.push(E('b',item.start.format('G:i')));
+			time.push(item.start.format('G:i'));
 			if(item.dayLength > 1) {
-				time.push(E('b',item.end.format(' - G:i')));
+				time.push(item.end.format(' - G:i'));
 			}
 		}
 

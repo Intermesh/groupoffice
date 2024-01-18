@@ -7,11 +7,13 @@ use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\mail\Address as MailAddress;
 use go\core\model\Link;
+use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Entity;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\orm\PrincipalTrait;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\ArrayObject;
@@ -39,6 +41,8 @@ class Contact extends AclItemEntity {
 	use CustomFieldsTrait;
 	
 	use SearchableTrait;
+
+	use PrincipalTrait;
 
 	/**
 	 * 
@@ -1386,4 +1390,26 @@ class Contact extends AclItemEntity {
 	  parent::check();
   }
 
+	protected function principalAttrs(): array
+	{
+		$email = null;
+		if(isset($this->emailAddresses[0])) {
+			$email = $this->emailAddresses[0]->email;
+		}
+		return [
+			'name' => $this->name,
+			'email' => $email,
+			'avatarId' =>$this->photoBlobId,
+			'description' => go()->t($this->isOrganization?'Organization': 'Contact'). ' '. implode(' ', array_filter([$this->department,$this->jobTitle])),
+		];
+	}
+
+	protected function isPrincipalModified() {
+		return $this->isModified(['name', 'emailAddresses', 'photoBlobId','jobTitle', 'department','isOrganization','addressBookId']); // addressBookId for ACL
+	}
+
+	protected function principalType(): string
+	{
+		return Principal::Individual;
+	}
 }

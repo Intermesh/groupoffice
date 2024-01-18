@@ -38,7 +38,7 @@ export class CalendarDialog extends FormWindow {
 				// 	{text:t('Shared'), value: 'shared'}
 				// ]}),
 				combobox({
-					dataSource: jmapds("User"), displayProperty: 'displayName',
+					dataSource: jmapds("Principal"), displayProperty: 'name', filter: {entity: 'User'},
 					label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0'
 				}),
 				hr(),

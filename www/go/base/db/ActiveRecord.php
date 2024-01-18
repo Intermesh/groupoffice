@@ -52,7 +52,6 @@ use go\core\model\Alert;
 use go\core\model\Link;
 use go\core\model\Module;
 use go\core\model\User;
-use go\core\model\UserDisplay;
 use go\core\orm\exception\SaveException;
 use go\core\orm\SearchableTrait;
 use go\core\util\StringUtil;

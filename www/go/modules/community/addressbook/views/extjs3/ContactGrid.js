@@ -210,7 +210,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'creator',
 					renderer: function (v) {
-						return v ? v.displayName : "-";
+						return v ? v.name : "-";
 					}
 				},
 				{
@@ -220,7 +220,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'modifier',
 					renderer: function (v) {
-						return v ? v.displayName : "-";
+						return v ? v.name : "-";
 					}
 				}, {
 					hidden: this.enabledColumns.indexOf('jobTitle') == -1,

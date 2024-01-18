@@ -38,7 +38,7 @@ go.modules.community.bookmarks.ManageCategoriesGrid = Ext.extend(go.grid.GridPan
                 header: t("Owner"), 
                 dataIndex: 'creator',
                 renderer: function (v) {
-                    return v ? v.displayName : "-";
+                    return v ? v.name : "-";
                 },
                 sortable: false
             }		

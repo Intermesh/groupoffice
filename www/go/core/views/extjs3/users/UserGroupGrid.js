@@ -89,7 +89,7 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 						var user = record.get("user"),
 							style = user && user.avatarId ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("user").avatarId, {w: 40, h: 40, zc: 1}) + ')"' : "";
 
-						memberStr = record.get("users").column('displayName').join(", ");								
+						memberStr = record.get("users").column('name').join(", ");
 						var more = record.json._meta.users.total - store.fields.item('users').limit;
 						if(more > 0) {
 							memberStr += t(" and {count} more").replace('{count}', more);

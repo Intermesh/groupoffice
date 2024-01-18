@@ -2479,6 +2479,10 @@ abstract class Property extends Model {
 
 		$keysWithAlias = [];
 		foreach($keys as $key) {
+			if(str_contains($key, '.')) {
+				$keysWithAlias[] = $key; // alias already provided
+				continue;
+			}
 			/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 			$alias = static::getMapping()->getColumn($key)->table->getAlias();
 			$keysWithAlias[] = $alias . '.' . $key;

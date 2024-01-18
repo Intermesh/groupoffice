@@ -5,8 +5,8 @@ go.Modules.register('community', 'comments', {
 	entities: [{
 		name: "Comment",
 		relations: {
-			creator: {store: "UserDisplay", fk: "createdBy"},
-			modifier: {store: "UserDisplay", fk: "modifiedBy"},
+			creator: {store: "Principal", fk: "createdBy"},
+			modifier: {store: "Principal", fk: "modifiedBy"},
 			labels: {store: "CommentLabel", fk: "labels"}
 		},
 		links: [{
@@ -45,13 +45,13 @@ go.Modules.register('community', 'comments', {
 
 					let creator;
 					try {
-						creator = await go.Db.store("UserDisplay").single(alert.data.createdBy);
+						creator = await go.Db.store("Principal").single(alert.data.createdBy);
 					} catch (e) {
-						creator = {displayName: t("Unknown user")};
+						creator = {name: t("Unknown user")};
 					}
 
-					panelCfg.html = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}").replace("{creator}", creator.displayName) + "<br /><br /><i>"+alert.data.excerpt+"</i>";
-					panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}").replace("{creator}", creator.displayName) + "\n\n"+alert.data.excerpt;
+					panelCfg.html = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}").replace("{creator}", creator.name) + "<br /><br /><i>"+alert.data.excerpt+"</i>";
+					panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}").replace("{creator}", creator.name) + "\n\n"+alert.data.excerpt;
 					return panelCfg;
 
 				});

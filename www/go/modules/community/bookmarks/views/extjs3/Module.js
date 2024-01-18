@@ -9,7 +9,7 @@ go.Modules.register("community", "bookmarks", {
 	}, {
 		name: "BookmarksCategory",		
 		relations: {
-			creator: { store: "UserDisplay", fk: "createdBy"}
+			creator: { store: "Principal", fk: "createdBy"}
 		}
 	}],
 	

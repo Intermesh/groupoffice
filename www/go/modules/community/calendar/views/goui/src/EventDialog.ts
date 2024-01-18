@@ -37,8 +37,8 @@ export class EventDialog extends Window {
 	// width = 800
 	// height = 650
 	form: DataSourceForm
-	startTime: TextField
-	endTime: TextField
+	// startTime: TextField
+	// endTime: TextField
 
 	item?: CalendarItem
 	recurrenceId?: string
@@ -46,6 +46,7 @@ export class EventDialog extends Window {
 	store: JmapDataSource
 	submitBtn:Button
 	endDate: DateField
+	startDate: DateField
 	withoutTimeToggle: CheckboxField
 
 	attachments:MapField
@@ -57,8 +58,8 @@ export class EventDialog extends Window {
 		this.width = 440;
 		this.height = 820;
 		this.store = jmapds("CalendarEvent");
-		this.startTime = textfield({type:'time',value: '12:00', width: 128})
-		this.endTime = textfield({type:'time',value: '13:00', width: 128})
+		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
+		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
 		var recurrenceField = recurrencefield({name: 'recurrenceRule',flex:1});
 		var alertField = alertfield();
 		alertField.on('change', (_, newValue) => {
@@ -68,6 +69,8 @@ export class EventDialog extends Window {
 		const exceptionsBtn = btn({text:t('Exceptions'),width: 100, handler: b => {
 			this.openExceptionsDialog();
 		}});
+
+		const now = new DateTime();
 
 		this.items.add(this.form = datasourceform({
 				cls: 'scroll flow pad',
@@ -114,28 +117,22 @@ export class EventDialog extends Window {
 						const d = checked ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 						alertField.setDefaultLabel(d)
 					});
-					this.startTime.hidden = this.endTime.hidden = checked;
+					this.startDate.withTime = this.endDate.withTime = !checked;
 				}}
 			}),
-			comp({cls:'hbox'},
-				datefield({label: t('Start'), name:'start', flex:1, timeField: this.startTime,
-					listeners:{'setvalue': (me,v) => {
-						const date = me.getValueAsDateTime();
-						if(date){
-							// if(this.endDate.changed) {
-							// 	this.endDate.value = start.addDuration(this.item!.data.duration || 'P1H').format(this.outputFormat+'TH:i');
-							// }
-							recurrenceField.setStartDate(date);
-							this.endDate.minDate = date;
-						}
-					}}
-				}),
-				this.startTime
-			),
-			comp({cls:'hbox'},
-				this.endDate = datefield({label:t('End'), name: 'end', flex:1, timeField: this.endTime}),
-				this.endTime
-			),
+			this.startDate = datefield({label: t('Start'), name:'start', flex:1, defaultTime: now.format('H')+':00',
+				listeners:{'setvalue': (me,v) => {
+					const date = me.getValueAsDateTime();
+					if(date){
+						// if(this.endDate.changed) {
+						// 	this.endDate.value = start.addDuration(this.item!.data.duration || 'P1H').format(this.outputFormat+'TH:i');
+						// }
+						recurrenceField.setStartDate(date);
+						this.endDate.min = date.format('Y-m-d H:i');
+					}
+				}}
+			}),
+			this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00'}),
 			comp({cls:'hbox'},
 				recurrenceField,
 				exceptionsBtn,
