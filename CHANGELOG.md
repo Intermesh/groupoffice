@@ -1,3 +1,5 @@
+- Core: Exclude User and Search from SSE Push because it caused performance problems
+
 11-12-2023: 6.6.181
 - Core: Better license check
 - Projects: remove vestigial permissions panel
