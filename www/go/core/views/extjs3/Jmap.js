@@ -220,7 +220,10 @@ go.Jmap = {
 			console.debug("Starting SSE");
 			
 			//filter out legacy modules
-			var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
+			var entities = go.Entities.getAll().filter(function(e) {
+				// Search and user get lots of updates. We only update them when needed,
+				return e.package != "legacy"  && e.name != "Search" && e.name != "User";
+			});
 			
 			var url = go.User.eventSourceUrl + '?types=' + 
 							entities.column("name").join(',');

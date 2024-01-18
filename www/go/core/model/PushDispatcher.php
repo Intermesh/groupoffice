@@ -44,7 +44,18 @@ class PushDispatcher
 
 		if(isset($types)) {
 			$entityNames = explode(",", $_GET['types']);
+
+			// Search and user get lots of updates. We only update them when needed,
+			// On large systems getting the user updates caused very high load becuase it constantly changes.
+			// this lead to lots of User/changes calls per second while we almost never need the user entity to be up to date.
+			// only your own user when checking your account settings.
+			$entityNames = array_filter($entityNames, function($name) {
+				return $name != "User" && $name != "Search";
+			});
+
 			$query->where('e.clientName', 'IN', $entityNames);
+		} else {
+			$query->where('e.clientName', 'NOT IN', ['User', 'Search']);
 		}
 
 		$entities = EntityType::findAll($query);
