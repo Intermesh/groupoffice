@@ -230,8 +230,8 @@ export class EventDialog extends Window {
 	}
 
 	parseSavedData(data: any) {
-		const end = this.form.findField<DateField>('end')!.getValueAsDateTime()!,// DateTime.createFromFormat(data.end, 'Y-m-dTh:i'),
-			start = this.form.findField<DateField>('start')!.getValueAsDateTime()!;
+		const end = this.endDate.getValueAsDateTime()!,// DateTime.createFromFormat(data.end, 'Y-m-dTh:i'),
+			start = this.startDate.getValueAsDateTime()!;
 		if(this.form.value.showWithoutTime) {
 			end.setHours(0,0,0).addDays(1);
 			start.setHours(0,0,0);
@@ -253,8 +253,8 @@ export class EventDialog extends Window {
 		} else {
 			this.form.load(ev.data.id).then(() => {
 				if(ev.recurrenceId) {
-					this.form.findField('start')!.value = ev.start.format('Y-m-d\TH:i');
-					this.form.findField('end')!.value = ev.end.clone().addDays(ev.data.showWithoutTime? -1 : 0).format(ev.data.showWithoutTime ? 'Y-m-d' : 'c');
+					this.startDate.value = ev.start.format('Y-m-d\TH:i');
+					this.endDate.value = ev.end.clone().addDays(ev.data.showWithoutTime? -1 : 0).format(ev.data.showWithoutTime ? 'Y-m-d' : 'c');
 				}
 			});
 		}
