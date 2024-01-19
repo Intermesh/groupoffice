@@ -225,3 +225,8 @@ $updates['202301301230'][] = "alter table tasks_tasklist
                             on delete set null;";
 $updates['202305231613'][] = "ALTER TABLE `tasks_task` DROP FOREIGN KEY `tasks_task_core_acl_id_fk`;";
 $updates['202305231613'][] = "ALTER TABLE `tasks_task` DROP COLUMN `aclId`, DROP INDEX `tasks_task_core_acl_id_fk` ;";
+
+// Fix being able to delete the calendar module. because the tasklists acl's belonged to the TasklistCompat entity which belongs to Calendar
+$updates['202401191150'][] = "UPDATE core_acl a join core_entity e on a.entityTypeId = e.id 
+SET a.entityTypeId = (SELECT id FROM core_entity WHERE clientName = 'Tasklist')
+WHERE e.clientName = 'TasklistCompat';";
