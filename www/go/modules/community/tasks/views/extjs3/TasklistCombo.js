@@ -19,7 +19,7 @@
 			entityStore: "TaskList",
 			filters: {
 				permissionLevel: {
-					permissionLevel: go.permissionLevels.write
+					permissionLevel: go.permissionLevels.create
 				}
 			}
 		}
