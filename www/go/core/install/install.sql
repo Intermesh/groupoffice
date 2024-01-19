@@ -1262,7 +1262,7 @@ CREATE TABLE `core_principal`(
 	PRIMARY KEY (`id`),
 	INDEX `index_core_entity_id` ( `entityTypeId` ),
 	INDEX `index_core_blob_id` ( `avatarId` ),
-	CONSTRAINT `fk_calendar_calendar_core_acl1`
+	CONSTRAINT `fk_core_principal_core_acl1`
 		FOREIGN KEY (`aclId`)
 			REFERENCES `core_acl` (`id`),
 	CONSTRAINT `lnk_core_entity_core_principal` FOREIGN KEY ( `entityTypeId` )
