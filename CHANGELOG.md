@@ -1,3 +1,4 @@
+19s-01-2024: 6.8.30
 - Billing: Customer report is sortable
 - Core: Exclude User and Search from SSE Push because it caused performance problems
 - Core: Comment composer did not reset.
