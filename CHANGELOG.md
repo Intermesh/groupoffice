@@ -1,3 +1,5 @@
+19-01-2024: 6.7.63
+- Billing: bugfix profit %
 - Core: Exclude User and Search from SSE Push because it caused performance problems
 
 15-01-2024: 6.7.62
