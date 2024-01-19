@@ -66,7 +66,7 @@ class Search extends EntityController {
 				$query->select($selectQueryContact . ', "" as extra');
 			}
 
-			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.department as extra, c.photoBlobId';
+			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.photoBlobId, c.department as extra';
 
 			if($isEmailModuleAvailable && $optionEnabled == "1") {
 				$selectQuery .= ', em.last_mail_time AS priority';
