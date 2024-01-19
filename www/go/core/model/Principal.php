@@ -75,10 +75,7 @@ class Principal extends AclOwnerEntity
 				$query->join('core_entity', 'ett', 'ett.id = principal.entityTypeId');
 				$criteria->andWhere('ett.clientName', '=', $value);
 			})->add('permissionLevel', function(Criteria $criteria, $value, Query $query) {
-				if(!$query->isJoined('core_group', 'g')) {
-					$query->join('core_group', 'g', 'principal.id = g.isUserGroupFor');
-				}
-				Acl::applyToQuery($query, 'g.aclId', $value);
+				Acl::applyToQuery($query, 'principal.aclId', $value);
 			}, Acl::LEVEL_READ)
 //			->add('showDisabled', function (Criteria $criteria, $value){
 //				if($value === false) {

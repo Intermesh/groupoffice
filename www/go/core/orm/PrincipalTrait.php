@@ -1,10 +1,7 @@
 <?php
 namespace go\core\orm;
 
-use DateTime;
 use Exception;
-use go\core\db\Criteria;
-use go\core\db\Query as OrmQuery;
 use go\core\db\Statement;
 use go\core\ErrorHandler;
 use go\core\model\Principal;
@@ -12,18 +9,13 @@ use function go;
 
 trait PrincipalTrait {
 
-
-	public static $updatePrincipal = true;
-
-
-	
 	/**
 	 * Map of principal attrs to entity attrs eg.
 	 * [
 	 *   'email'=>$this->email,
-	 *   'name'=>$this->title,
+	 *   'name'=>$this->title, // required
+	 *   'description'=> 'Some string', // required
 	 *   'avatarId'=> $this->profilePictureBlobId,
-	 *   'description'=> 'Some string',
 	 *   'timeZone'=> null
 	 * ]
 	 * 
@@ -46,9 +38,6 @@ trait PrincipalTrait {
 	 */
 	public function savePrincipal(bool $checkExisting = true): bool
 	{
-
-
-
 		$principal = $checkExisting ?
 			Principal::find()
 				->where('entityTypeId','=', static::entityType()->getId())
@@ -61,13 +50,14 @@ trait PrincipalTrait {
 
 		if(!$principal) {
 			$principal = new Principal();
+			$principal->type = $this->principalType();
 			$principal->setEntityType(static::entityType(), $this->id);
 		}
 
 		foreach($this->principalAttrs() as $key => $value) {
 			$principal->{$key} = $value;
 		}
-		$principal->type = $this->principalType();
+
 		$principal->setAclId($this->findAclId());
 
 		$principal->cutPropertiesToColumnLength();
@@ -105,13 +95,13 @@ trait PrincipalTrait {
 	 * @return Statement
 	 * @throws Exception
 	 */
-	private static function queryMissingPrincipalCache(int $offset = 0): Statement
+	protected static function queryMissingPrincipals(int $offset = 0): Query
 	{
 		
 		$limit = 1000;
 
 
-		/* @var $query OrmQuery */
+		/* @var $query Query */
 		$query = static::find();
 		$query
 			->join("core_principal", "principal", "principal.entityId = ".$query->getTableAlias() . ".id AND principal.entityTypeId = " . static::entityType()->getId(), "LEFT")
@@ -119,7 +109,7 @@ trait PrincipalTrait {
 			->limit($limit)
 			->offset($offset);
 
-		return $query->execute();
+		return $query;
 	}
 
 	/**
@@ -130,7 +120,7 @@ trait PrincipalTrait {
 		echo $cls."\n";
 
 		if(ob_get_level() > 0) ob_flush();
-		flush();
+			flush();
 
 		echo "Deleting old principals\n";
 
@@ -140,14 +130,11 @@ trait PrincipalTrait {
 		);
 
 		$stmt->execute();
-
 		go()->getDbConnection()->exec("commit");
-
 		echo "Deleted ". $stmt->rowCount() . " entries\n";
 
 		//In small batches to keep memory low
-		$stmt = static::queryMissingPrincipalCache();
-		
+		$stmt = static::queryMissingPrincipals()->execute();
 		$offset = 0;
 		
 		//In small batches to keep memory low	
@@ -174,13 +161,10 @@ trait PrincipalTrait {
 			echo "\n";
 			go()->getDbConnection()->exec("commit");
 
-			$stmt = static::queryMissingPrincipalCache($offset);
+			$stmt = static::queryMissingPrincipals($offset)->execute();
 		}
-
 
 		go()->getDbConnection()->exec("commit");
 
-
 	}
-
 }

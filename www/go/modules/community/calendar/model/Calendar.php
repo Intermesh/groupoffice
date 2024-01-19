@@ -3,8 +3,10 @@ namespace go\modules\community\calendar\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
+use go\core\model\Principal;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\orm\PrincipalTrait;
 use go\core\orm\Query;
 
 /**
@@ -12,6 +14,10 @@ use go\core\orm\Query;
  *
  */
 class Calendar extends AclOwnerEntity {
+
+	use PrincipalTrait {
+		queryMissingPrincipals as protected traitMissingPrincipals;
+	}
 
 	/* Include In Availability */
 	const All = 'all';
@@ -140,5 +146,29 @@ class Calendar extends AclOwnerEntity {
 
 	public function shareesActAs() {
 		return $this->isOwner() ? 'self' : 'secretary';
+	}
+
+	protected function principalAttrs(): array {
+		$owner = Principal::findById($this->ownerId);
+		$email = !empty($owner) ? $owner->email : null;
+		return [
+			'name'=>$this->name,
+			'description' => $this->description,
+			'timeZone' => $this->timeZone,
+			'email' => $email
+		];
+	}
+
+	protected static function queryMissingPrincipals(int $offset = 0): Query {
+		return self::traitMissingPrincipals($offset)->andWhere('groupId', 'IS NOT', NULL);
+	}
+
+	protected function isPrincipalModified()
+	{
+		return $this->isModified(['name', 'description', 'timeZone', 'ownerId','groupId']);
+	}
+
+	protected function principalType(): string {
+		return Principal::Resource;
 	}
 }

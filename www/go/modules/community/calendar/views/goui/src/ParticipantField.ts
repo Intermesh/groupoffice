@@ -42,8 +42,6 @@ export class ParticipantField extends Component {
 		this.cls = 'participant-field';
 	}
 
-
-
 	protected internalRender() {
 		this.items.add(
 			this.list = mapfield({name: 'participants', cls:'goui-pit',
@@ -119,7 +117,7 @@ export class ParticipantField extends Component {
 					columns: [
 						column({
 							id: "name",
-							renderer: (v, record) => v + `<br><small>${record.email}</small>`
+							renderer: (v, record) => v + `<br><small>${record.email || record.description}</small>`
 						})
 					]
 				})
