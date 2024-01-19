@@ -1,5 +1,9 @@
 <?php
 return [
+	'mayChangeCalendars'=> 'Change Calendars',
+	'mayChangeCategories' => 'Change Categories',
+	'mayChangeResources' => 'Change Resource',
+
 	'newScheduleTitle' => 'Do you want to invite the participants?',
 	'newScheduleText' => 'You have created an event with participants. By saving this even an invite will be sent to notify the participants.',
 	'updateScheduleTitle' => 'Do you want to send an update to the participants?',

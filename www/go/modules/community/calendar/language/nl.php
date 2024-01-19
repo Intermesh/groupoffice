@@ -1,5 +1,9 @@
 <?php
 return [
+	'mayChangeCalendars'=> 'Wijzig Agenda\'s',
+	'mayChangeCategories' => 'Wijzig Categorieën',
+	'mayChangeResources' => 'Wijzig Faciliteiten',
+
 	'Accept' => 'Akkoord',
 	'Maybe' => 'Misschien',
 	'Decline' => 'Afwijzen',
@@ -12,6 +16,7 @@ return [
 	'Resources' => 'Faciliteiten',
 	'Resource' => 'Faciliteit',
 	'Organizer' => 'Organisator',
+	'Categories' => 'Categorieën',
 	'Calendars' => 'Agenda\'s',
 	// schedule massages
 	'newScheduleTitle' => 'Wil je de deelnemers uitnodigen?',

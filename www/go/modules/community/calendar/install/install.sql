@@ -37,16 +37,6 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
 			ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-ALTER TABLE `go_calendar`.`calendar_calendar`
-	ADD COLUMN `groupId` INT UNSIGNED NULL AFTER `timeZone`,
-	ADD INDEX `fk_calendar_calendar_calendar_resource_group_idx` (`groupId` ASC) VISIBLE;
-;
-ALTER TABLE `go_calendar`.`calendar_calendar`
-	ADD CONSTRAINT `fk_calendar_calendar_calendar_resource_group`
-		FOREIGN KEY (`groupId`)
-			REFERENCES `go_calendar`.`calendar_resource_group` (`id`)
-			ON DELETE RESTRICT
-			ON UPDATE NO ACTION;
 -- -----------------------------------------------------
 -- Table `calendar_calendar_user`
 -- -----------------------------------------------------
@@ -59,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `sortOrder` INT NOT NULL DEFAULT 0,
     `timeZone` VARCHAR(45) NULL,
     `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL,
+		`modSeq` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`, `userId`),
     CONSTRAINT `fk_calendar_calendar_user_calendar_calendar1`
     FOREIGN KEY (`id`)
