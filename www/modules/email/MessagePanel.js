@@ -128,59 +128,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			
 			'<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;" class="avatar" style="{[this.getAvatarStyle(values.contact)]}">{[this.getAvatarHtml(values.contact)]}</a>'+
 
-		'</div>';
-
-		if(go.Modules.isAvailable("legacy", "calendar")){
-
-			templateStr += '<tpl if="!GO.util.empty(values.iCalendar)">'+
-				'<tpl if="iCalendar.feedback">'+
-				'<div class="message-icalendar">'+
-
-				'<tpl if="!iCalendar.invitation">' +
-				'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
-				'{[values.iCalendar.feedback]}</div>'+
-				'</tpl>'+
-
-
-
-				'<tpl if="iCalendar.invitation">'+
-
-					'<tpl if="!GO.util.empty(iCalendar.invitation.is_processed)">'+
-						'<a id="em-icalendar-open-'+this.bodyId+'" class="go-model-icon-GO_Calendar_Model_Event normal-link" style="padding-left:20px;background-repeat:no-repeat;background-size: 16px 16px" class="go-model-icon-GO\\Calendar\\Model\\Event message-icalendar-icon">'+t("This message contains an appointment invitation that was already processed.", "email")+'</a>'+
-					'</tpl>'+
-					'<tpl if="iCalendar.invitation.is_invitation">'+
-
-								'<a id="em-icalendar-accept-invitation-'+this.bodyId+'" class="go-model-icon-GO_Calendar_Model_Event normal-link" style="padding-left:20px;background-repeat:no-repeat;background-size: 16px 16px" class="go-model-icon-GO\\Calendar\\Model\\Event message-icalendar-icon">'+t("Indicate whether you participate in this event", "calendar")+'</a>'+
-
-					'</tpl>'+
-
-					'<tpl if="iCalendar.invitation.is_cancellation">'+
-						'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
-						'{[values.iCalendar.feedback]}</div>'+
-						'<tpl if="iCalendar.invitation.event_id">'+
-							'<div class="message-icalendar-actions">'+
-								'<a class="normal-link" id="em-icalendar-delete-event-'+this.bodyId+'" >'+t("Delete Event", "email")+'</a>'+
-							'</div>'+
-						'</tpl>'+
-					'</tpl>'+
-
-					'<tpl if="iCalendar.invitation.is_update">'+
-						'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
-						'{[values.iCalendar.feedback]}</div>'+
-						'<tpl if="iCalendar.invitation.event_id">'+
-							'<div class="message-icalendar-actions">'+
-							'<a id="em-icalendar-open-'+this.bodyId+'" class="normal-link" style="padding-right:20px;" >'+t("Open Event", "email")+'</a>'+
-								'<a class="normal-link" id="em-icalendar-update-event-'+this.bodyId+'" >'+t("Update Event", "email")+'</a>'+
-								'</div>'+
-							'</tpl>'+
-					'</tpl>'+
-
-				'</tpl>'+
-				'<div style="clear:both"></div>'+
-				'</div>'+
-				'</tpl>'+
-				'</tpl>';
-		}
+		'</div><ul class="actions"></ul>';
 
 		templateStr += '<tpl if="values.isInSpamFolder==\'1\';">'+
 				'<div class="message-move">'+
@@ -320,11 +268,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		this.data=data;
 
-		if(data.iCalendar && this.icalendarFeedback){
-			data.iCalendar.feedback = this.icalendarFeedback;
-			delete this.icalendarFeedback;
-		}
-
 		data.mailbox=this.mailbox;
 
 		if(data.askPassword)
@@ -397,24 +340,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		this.data = data;
 
 		//remove old listeners
-		if(this.messageBodyEl)
-		{
-			this.messageBodyEl.removeAllListeners();
-		}
-		if(this.attachmentsEl)
-		{
-			this.attachmentsEl.removeAllListeners();
-		}
-
-		if(this.unblockEl)
-		{
-			this.unblockEl.removeAllListeners();
-		}
-
-		if(this.contactImageEl)
-		{
-			this.contactImageEl.removeAllListeners();
-		}
+		[this.messageBodyEl,
+			this.attachmentsEl,
+			this.unblockEl,
+			this.contactImageE].forEach(e => e && e.removeAllListeners());
 
 		this.template.overwrite(this.body, data);
 
@@ -435,47 +364,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				this.params.filterXSS='true';
 				this.params.unblock='true';
 				this.loadMessage();
-			}, this);
-		}
-
-		var acceptInvitationEl = Ext.get('em-icalendar-accept-invitation-'+this.bodyId);
-		if(acceptInvitationEl)
-		{
-			acceptInvitationEl.on('click', function()
-			{
-				this.processInvitation();
-			}, this);
-		}
-
-		var icalDeleteEventEl = Ext.get('em-icalendar-delete-event-'+this.bodyId);
-		if(icalDeleteEventEl)
-		{
-			icalDeleteEventEl.on('click', function()
-			{
-				this.processInvitation();
-			}, this);
-		}
-		var icalUpdateEventEl = Ext.get('em-icalendar-update-event-'+this.bodyId);
-		if(icalUpdateEventEl)
-		{
-			icalUpdateEventEl.on('click', function()
-			{
-				//this.processResponse();
-				this.processInvitation();
-			}, this);
-		}
-
-		var icalUpdateOpenEl = Ext.get('em-icalendar-open-'+this.bodyId);
-		if(icalUpdateOpenEl)
-		{
-			icalUpdateOpenEl.on('click', function()
-			{
-				if(this.data.iCalendar.invitation.is_organizer){
-					GO.calendar.showEventDialog({event_id:this.data.iCalendar.invitation.event_id})
-				}else
-				{
-					GO.email.showAttendanceWindow(this.data.iCalendar.invitation.event_id);
-				}
 			}, this);
 		}
 
@@ -510,6 +398,9 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			this.allAttachmentsMenuEl = Ext.get(this.bodyId);
 			this.allAttachmentsMenuEl.on('contextmenu', this.onImageContextMenu, this);
 		}
+
+		this.actions = this.body.dom.querySelector('ul.actions');
+		GO.email.handleITIP(this.actions, data); // function is defined in calendar module
 
 		this.body.scrollTo('top',0);
 
@@ -660,40 +551,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			var attachment = this.data.attachments[attachment_no];
 			this.fireEvent('attachmentClicked', attachment, this);
 		}
-	},
-
-
-
-	cal_id:0,
-	status_id:0,
-	created:false,
-	updated:false,
-	deleted:false,
-	declined:false,
-	processInvitation : function()
-	{
-//		this.status_id = status_id || 0;
-
-		GO.request({
-			url: 'calendar/event/acceptInvitation',
-			params: {
-//				status: this.status_id,
-				account_id: this.account_id,
-				mailbox: this.mailbox,
-				uid: this.uid
-			},
-			scope: this,
-			success: function(options, response, data)
-			{
-				this.icalendarFeedback = data.feedback;
-
-				if(data.attendance_event_id){
-					GO.email.showAttendanceWindow(data.attendance_event_id);
-				}
-
-				this.loadMessage();
-			}
-		});
 	}
 });
 

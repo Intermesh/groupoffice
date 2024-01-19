@@ -160,7 +160,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 			dataIndex: 'creator',
 			width:300,
 			renderer: function (v) {
-				return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
+				return v ? go.util.avatar(v.name,v.avatarId)+' '+v.name : "-";
 			}
 		},{
 			header: t('Changes'),

@@ -11,10 +11,10 @@ use go\core\db\Expression;
 
 /**
  * The AclEntity
- * 
+ *
  * Is an entity that has an "aclId" property. The ACL is used to restrict access
  * to the entity.
- * 
+ *
  * @see Acl
  */
 abstract class AclOwnerEntity extends AclEntity {
@@ -23,7 +23,7 @@ abstract class AclOwnerEntity extends AclEntity {
 
 	/**
 	 * The ID of the {@see Acl}
-	 * 
+	 *
 	 * @var int
 	 */
 	protected $aclId;
@@ -33,7 +33,7 @@ abstract class AclOwnerEntity extends AclEntity {
 
 	protected function internalSave(): bool
 	{
-		
+
 		if(!isset($this->{static::$aclColumnName})) {
 			$this->createAcl();
 		}
@@ -66,7 +66,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @throws Exception
 	 */
 	protected function createAcl() {
-		
+
 		// Copy the default one. When installing the default one can't be accessed yet.
 		// When ACL has been provided by the client don't copy the default.
 		if(isset($this->setAcl) || go()->getInstaller()->isInProgress()) {
@@ -82,7 +82,7 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		$this->setAclProps();
 
-		if(!$this->acl->save()) {	
+		if(!$this->acl->save()) {
 			throw new Exception("Could not create ACL");
 		}
 
@@ -141,7 +141,7 @@ abstract class AclOwnerEntity extends AclEntity {
 
 	/**
 	 * Get the permission level of the current user
-	 * 
+	 *
 	 * @return int
 	 */
 	protected function internalGetPermissionLevel() : int
@@ -198,7 +198,7 @@ abstract class AclOwnerEntity extends AclEntity {
 
 
 		Acl::applyToQuery($query, $tableAlias . '.' . static::$aclColumnName, $level, $userId, $groups);
-		
+
 		return $query;
 	}
 
@@ -219,7 +219,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		$firstTable = array_shift($tables);
 		return (new Query)->selectSingleValue(static::$aclColumnName)->distinct()->from($firstTable->getName());
 	}
-	
+
 	public function findAclId(): ?int {
 		return $this->{static::$aclColumnName};
 	}

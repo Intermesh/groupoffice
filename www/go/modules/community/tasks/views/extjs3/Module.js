@@ -5,7 +5,7 @@ go.Modules.register("community", "tasks", {
 		name: "TaskList",
 		relations: {
 			group: {store: "TaskListGrouping", fk: "groupingId"},
-			creator: {store: "UserDisplay", fk: "createdBy"},
+			creator: {store: "Principal", fk: "createdBy"},
 			groups: {name: 'Groups'}
 		}
 	}, {
@@ -49,9 +49,9 @@ go.Modules.register("community", "tasks", {
 			}
 		}],
 		relations: {
-			creator: {store: "UserDisplay", fk: "createdBy"},
-			modifier: {store: "UserDisplay", fk: "modifiedBy"},
-			responsible: {store: 'UserDisplay', fk: 'responsibleUserId'},
+			creator: {store: "Principal", fk: "createdBy"},
+			modifier: {store: "Principal", fk: "modifiedBy"},
+			responsible: {store: 'Principal', fk: 'responsibleUserId'},
 			tasklist: {store: 'TaskList', fk: 'tasklistId'},
 			categories: {store: "TaskCategory", fk: "categories"},
 		},
@@ -148,12 +148,12 @@ go.Modules.register("community", "tasks", {
 						alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg) => {
 							let assigner;
 							try {
-								assigner = await go.Db.store("UserDisplay").single(alert.data.assignedBy);
+								assigner = await go.Db.store("Principal").single(alert.data.assignedBy);
 							} catch (e) {
-								assigner = {displayName: t("Unknown user")};
+								assigner = {name: t("Unknown user")};
 							}
 
-							const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.displayName);
+							const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.name);
 							panelCfg.items = [{html: msg }];
 							panelCfg.notificationBody = msg;
 							return panelCfg;
@@ -166,12 +166,12 @@ go.Modules.register("community", "tasks", {
 
 							let creator;
 							try {
-								creator = await go.Db.store("UserDisplay").single(alert.data.createdBy);
+								creator = await go.Db.store("Principal").single(alert.data.createdBy);
 							} catch (e) {
-								creator = {displayName: t("Unknown user")};
+								creator = {name: t("Unknown user")};
 							}
 
-							const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("A new task was created in your list by {creator}").replace("{creator}", creator.displayName);
+							const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("A new task was created in your list by {creator}").replace("{creator}", creator.name);
 							panelCfg.items = [{html: msg}];
 							panelCfg.notificationBody = msg
 							return panelCfg;

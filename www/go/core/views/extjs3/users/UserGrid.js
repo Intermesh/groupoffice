@@ -4,13 +4,13 @@ go.users.UserGrid = Ext.extend(go.grid.GridPanel, {
 			store: new go.data.Store({
 				fields: [
 					'id',
-					'username',
-					'displayName',
+					'description',
+					'name',
 					'avatarId',
 					'email'
 				],
-				baseParams: {filter: {}},
-				entityStore: "UserDisplay"
+				baseParams: {filter: {entity:'User'}},
+				entityStore: "Principal"
 			}),
 
 			columns: [
@@ -19,8 +19,8 @@ go.users.UserGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Name'),
 					width: dp(200),
 					sortable: true,
-					dataIndex: 'displayName',
-					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
+					dataIndex: 'name',
+					renderer: function (value, metaData, record) {
 						var style = record.get('avatarId') ? 'background-image: url(' + go.Jmap.thumbUrl(record.get("avatarId"), {
 							w: 40,
 							h: 40,
@@ -30,7 +30,7 @@ go.users.UserGrid = Ext.extend(go.grid.GridPanel, {
 						return '<div class="user"><div class="avatar" style="' + style + '"></div>' +
 							'<div class="wrap">' +
 							'<div class="displayName">' + value + '</div>' +
-							'<small class="username">' + Ext.util.Format.htmlEncode(record.get('username')) + '</small>' +
+							'<small class="username">' + Ext.util.Format.htmlEncode(record.get('description')) + '</small>' +
 							'</div>' +
 							'</div>';
 					}

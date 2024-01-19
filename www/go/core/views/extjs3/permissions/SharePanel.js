@@ -132,7 +132,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 										style = user && user.avatarId ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("user").avatarId, {w: 40, h: 40, zc: 1}) + ')"' : "background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));";
 										html = user ? "" : '<i class="icon">group</i>';
 
-							let memberStr = record.get('users').column('displayName').join(", ");
+							let memberStr = record.get('users').column('name').join(", ");
 							var more = record.json._meta.users.total - store.fields.item('users').limit;
 							if(more > 0) {
 								memberStr += t(" and {count} more").replace('{count}', more);

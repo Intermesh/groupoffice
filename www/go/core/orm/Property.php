@@ -182,10 +182,11 @@ abstract class Property extends Model {
 		$m = static::getMapping();
 		foreach($record as $colName => $value) {
 
+
+
 			if(str_contains($colName, '.')) {
 				$this->setPrimaryKey($colName, $value);
 			} else {
-
 				$col = $m->getColumn($colName);
 				if($col) {
 					$value = $col->castFromDb($value);
@@ -759,11 +760,15 @@ abstract class Property extends Model {
 		}
 		//this is a primary key value. See buildSelect()
 		$alias = substr($name, 0, $pos);
-		$col = substr($name, $pos + 1);
+		$colName = substr($name, $pos + 1);
+		$column = static::getMapping()->getColumn($colName);
+		if($column) {
+			$value = $column->castFromDb($value);
+		}
 		if(!isset($this->primaryKeys[$alias])) {
 			$this->primaryKeys[$alias] = [];
 		}
-		$this->primaryKeys[$alias][$col] = $value;
+		$this->primaryKeys[$alias][$colName] = $value;
 
 		return true;
 	}
@@ -1026,7 +1031,7 @@ abstract class Property extends Model {
 		if(!empty($joinedTable->getConstantValues())) {
 			$on = Criteria::normalize($on)->andWhere($joinedTable->getConstantValues());
 		}
-		$query->join($joinedTable->getName(), $joinedTable->getAlias(), $on, "LEFT");
+		$query->join($joinedTable->getName(), $joinedTable->getAlias(), $on, $joinedTable->required ? 'INNER' : 'LEFT');
 	}
 
 	/**
@@ -1265,6 +1270,9 @@ abstract class Property extends Model {
 
 			if($bHasAI && !$aHasAI) {
 				return 1;
+			}
+			if($aHasAI && $bHasAI) {
+				return 1; // do B First as A is likely the primary table linking a data table
 			}
 
 			return 0;
@@ -2029,6 +2037,7 @@ abstract class Property extends Model {
 		switch ($column->dbType) {
 			case 'date':
 			case 'datetime':
+			case 'localdatetime':
 				if(!($value instanceof CoreDateTime) && !($value instanceof DateTimeImmutable)){
 					$this->setValidationError($column->name, ErrorCode::MALFORMED, "No date object given for date column");
 				}
@@ -2108,8 +2117,8 @@ abstract class Property extends Model {
 			case 'double':
 			case 'decimal':
 
+			case 'localdatetime':
 			case 'datetime':
-
 			case 'date':
 
 			case 'binary':
@@ -2328,13 +2337,12 @@ abstract class Property extends Model {
 			return [];
 		}
 
-		$values = explode("-", $id);
-
 		$cls = $relation->propertyName;
 
 		$pk = $cls::getPrimaryKey();
 
 		$diff = array_diff($pk, array_values($relation->keys));
+		$values = explode("-", $id, count($diff));
 
 		$id = [];
 		foreach($diff as $field) {
@@ -2471,6 +2479,10 @@ abstract class Property extends Model {
 
 		$keysWithAlias = [];
 		foreach($keys as $key) {
+			if(str_contains($key, '.')) {
+				$keysWithAlias[] = $key; // alias already provided
+				continue;
+			}
 			/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 			$alias = static::getMapping()->getColumn($key)->table->getAlias();
 			$keysWithAlias[] = $alias . '.' . $key;

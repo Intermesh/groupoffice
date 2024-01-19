@@ -59,7 +59,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				</p>\
 				<p class="s6">\
 					<label>'+t("Due at")+'</label><span>{[go.util.Format.date(values.due) || "-"]}</span><br><br>\
-					<tpl if="values.responsible"><label>'+t("Responsible")+'</label><span>{[go.util.avatar(values.responsible.displayName, values.responsible.avatarId)]} {[values.responsible.displayName]}</span><br><br></tpl>\
+					<tpl if="values.responsible"><label>'+t("Responsible")+'</label><span>{[go.util.avatar(values.responsible.name, values.responsible.avatarId)]} {[values.responsible.name]}</span><br><br></tpl>\
 				</p>\
 				<tpl if="values.percentComplete">\
 				<div class="s12 pad">\

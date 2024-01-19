@@ -532,7 +532,7 @@ class Module extends Entity {
 			return 0;
 		}
 
-		if($this->name == 'projects2' && $rights->mayFinance && !$rights->mayManage) { // a single exception for this compat method
+		if($this->name == 'projects2' && !empty($rights->mayFinance) && !$rights->mayManage) { // a single exception for this compat method
 			return 45;
 		}
 

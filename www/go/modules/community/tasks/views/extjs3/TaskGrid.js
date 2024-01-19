@@ -172,10 +172,10 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'responsible',
 					renderer: function(v) {
-						return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
+						return v ? go.util.avatar(v.name,v.avatarId)+' '+v.name : "-";
 					},
 					groupRenderer: function(v) {
-						return v ? v.displayName : "-";
+						return v ? v.name : "-";
 					},
 					groupable: true
 				},{
@@ -231,7 +231,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'creator',
 					renderer: function(v) {
-						return v ? v.displayName : "-";
+						return v ? v.name : "-";
 					},
 					hidden: !this.support,
 					groupable: true
@@ -253,7 +253,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'modifier',
 					renderer: function(v) {
-						return v ? v.displayName : "-";
+						return v ? v.name : "-";
 					},
 					hidden: true,
 					groupable: false

@@ -1,0 +1,507 @@
+@import '../../../../../../../views/goui/goui/style/_util.scss';
+@import '../../../../../../../views/goui/goui/style/_config.scss';
+
+%font-caption {
+	text-transform: uppercase;
+	font-weight: 600;
+	//font-size: 1em;
+	color: $colorBorder;
+	> em { // date number
+		font-style: normal;
+		margin: 0 dp(8);
+		padding: dp(4) 0;
+		display: inline-block;
+		font-size: 1.2em;
+		color: $colorText;
+		//border: 1px solid currentColor;
+	}
+}
+
+%event {
+	position: absolute;
+	cursor: pointer;
+	word-wrap: break-word;
+	overflow: hidden;
+	box-sizing: border-box;
+	border-radius: $borderRadius;
+	padding: dp(2) dp(6);
+	text-align: left;
+	user-select: none;
+	> em, > span {
+		color:$colorText;
+	}
+	> em {
+		text-overflow:ellipsis;
+		overflow:hidden;
+	}
+	> span {
+		text-align:right;
+		flex: 1 0 auto;
+		white-space: nowrap;
+		font-weight: 300;
+		font-size: .9em;
+	}
+	&::first-letter {
+		text-transform: capitalize;
+	}
+	&.new {
+		background-color: white !important;
+		border-width: 1px;
+		border-style: solid;
+	}
+	&.allday,&.multiday, dd > & {
+		background-color: color-mix(in srgb, currentColor 76%, transparent);
+		//background-color:currentcolor;
+		> i, > em {color:$colorTextSecondary;}
+
+	}
+	//&.multiday {
+	//	box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 76%, transparent);
+	//}
+	&.selected {
+		//filter: brightness(80%);
+		background-color: currentColor;
+		color:white;
+		> *, &:not(.allday)::before {color:white; }
+	}
+	&.declined {
+		text-decoration: line-through white;
+	}
+
+	&.tentative {
+		opacity: .6;
+	}
+
+
+	i {
+		font-size: inherit !important;
+		color: inherit;
+		min-height: dp(16);
+		height: dp(16);
+		width: dp(16);
+		min-width: dp(16);
+		margin-right:dp(4);
+	}
+}
+
+.yearview {
+	background-color: $colorBackground;
+	min-height: 560px;
+	height: 100%;
+	display:flex;
+	flex-wrap: wrap;
+	justify-items: center;
+	justify-content:space-evenly;
+	align-items: center;
+	> div {
+		min-width: 25%;
+	}
+
+	table {
+		color: $colorTextSecondary;
+		height: 100%;
+		width:100%;
+		margin: 0 auto;
+		max-width: 300px;
+		min-height: 210px;
+		min-width: 224px;
+		caption { // month name
+			cursor: pointer;
+			text-align: center;
+			//font-size: 1.2em;
+			padding-bottom: 0.8em;
+
+			&.current {
+				color: $colorPrimary;
+			}
+		}
+
+		th {
+			@extend %font-caption;
+			height: 20px;
+		}
+
+		td {
+			>span{cursor: pointer;}
+			&.today {
+				font-weight: 500;
+				color: $colorPrimary;
+			}
+
+			&.past {
+				opacity: .7;
+			}
+		}
+
+		td, th {
+			cursor: default;
+			position: relative;
+			text-align: center;
+			vertical-align: top;
+			overflow: hidden;
+
+			> div {
+				position: absolute;
+				top: 15px;
+				width: 100%;
+				height: 6px;
+				line-height: 6px;
+				text-align: center;
+
+				> p {
+					display: inline-block;
+					border-radius: 50%;
+					width: 6px;
+					height: 6px;
+					padding: 0;
+					margin: 0;
+					background-color: $colorPrimary;
+				}
+			}
+		}
+
+		td.weeknb {
+			cursor: pointer;
+			color: $colorTextSecondary;
+			//font-size: .9em;
+		}
+	}
+}
+
+.cal {
+	i.icon {
+		display:inline-block !important;
+	}
+	li {
+
+		&.today {
+			color: $colorPrimary;
+			> em {
+				font-weight: 600;
+				color:$colorPrimary;
+			}
+		}
+
+		&.past, &.other {
+			color: $colorTextSecondary;
+		}
+
+		&.other {
+			background-color: $colorBackgroundDarker;
+		}
+
+		// another month
+	}
+
+	.now { // the nowbar
+		position: absolute;
+		pointer-events: none;
+		left: dp(64);
+		right: 0;
+		z-index: 10;
+
+		> hr {
+			//background-color: $colorPrimary;
+			border-bottom: 1px dashed $colorPrimary;
+			height: 1.5px;
+			margin: 0;
+		}
+
+		> b { // dot
+			width: dp(12);
+			height: dp(12);
+			border-radius: 50%;
+			box-shadow: 0 0 0 2px $colorBackground;
+			left: 14.4%;
+			position: absolute;
+			display: block;
+			transform: translate(-50%, -50%);
+			background-color: $colorPrimary;
+		}
+
+		> span { // time display
+			margin-left: dp(-64);
+			background-color: $colorPrimary;
+			color: white;
+			height: dp(22);
+			line-height: dp(22);
+			font-size: .9em;
+			white-space: nowrap;
+			display: inline-block;
+			text-align: right;
+			padding-right: dp(16);
+			width: dp(64);
+			transform: translateY(-50%);
+			clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%);
+		}
+	}
+}
+
+.cal.month,.cal.split {
+	display: flex;
+	flex-direction: column;
+
+	ul { // header
+		@extend %font-caption;
+		//padding-left: dp(24); // for weeknbs
+		display: flex;;
+		//background-color: color($bg, 'status-bar');
+		height: dp(36);
+
+		> li { //weekdays
+			line-height: dp(40);
+			text-align: center;
+			padding-left: dp(8);
+			&.current {
+				color: $colorPrimary;
+			}
+		}
+	}
+
+	ol { // week row
+		background-color: $colorBackground;
+		display: flex;
+		flex: 1 0 0;
+		position: relative;
+		align-items: stretch;
+		border-top: 1px solid $colorLine;
+		user-select:none;
+		> li { // day
+			border-right: 1px solid $colorLine;
+			&:first-child,
+			&:last-child { border-right:0;}
+			&.events {
+				position: absolute;
+			//	margin-left: dp(24); // week numbers
+				margin-top: dp(32); // day numbers
+				width: 100%;
+				overflow: hidden;
+				bottom: 0;
+				top: 0;
+				pointer-events:none;
+				> div {
+					@extend %event;
+					display:flex;
+					align-items: center;
+					pointer-events: all;
+					&.continues {
+						border-bottom-left-radius: 0;
+						border-top-left-radius: 0;
+					}
+					> em {
+						white-space: nowrap;
+					}
+				}
+			}
+		}
+	}
+
+	li {
+		flex: 1 0 0;
+
+		&:focus {
+			outline: none;
+			box-shadow: none;
+		}
+		> sub { // weeknb
+			float:left;
+			text-align: center;
+			padding: 0 dp(6);
+			cursor: pointer;
+			font-size: .7em;
+			//max-width: dp(24);
+			font-weight: 400;
+			margin:dp(4);
+			//color:$colorTextSecondary;
+			background-color: $colorSelectedRowInactive;
+			border-radius: 99px;
+		}
+		> em { // date number
+			font-weight: 500;
+			font-style: normal;
+			text-align: right;
+			font-size:1.2em;
+			display: block;
+			height: dp(32);
+			margin-right: dp(8);
+			line-height: dp(32);
+		}
+	}
+}
+
+.cal.split {
+	ul {
+		padding-left:0;
+		> li {
+			&:first-child {
+				max-width: dp(140);
+			}
+		}
+	}
+	ol > li {
+		&:first-child {
+			max-width: dp(140);
+		}
+		&.events {
+			margin-left: dp(140);
+			margin-top:dp(4);
+			width: calc(100% - #{dp(140)});
+		}
+		&.cal-name {
+			color: $colorTextSecondary;
+			border-right: 1px solid $colorBorder;
+			font-size: .8em;
+			max-width: dp(140);
+			font-weight: 300;
+		}
+	}
+}
+
+$hourHeight: 7vh;
+$halfHour: 3.5vh;
+
+.cal.week {
+	height:100%;
+	display: flex;
+	flex-direction: column;
+	> ul li:first-child { // week-nb & all-day
+		//font-size: .9em;
+		justify-content: center;
+		min-height: dp(24);
+		text-align: center;
+		padding-top:dp(4);
+	}
+	.all-days { // container
+		position:relative;
+		min-height: dp(24);
+	}
+	> ul { //header + all-day
+		display: flex;
+		padding-right: 14px; // for scrollbar
+		max-height: dp(212); // x all-day events fit
+		border-bottom: 2px solid $colorBorder;
+		&:first-child { // header
+			> li {
+				@extend %font-caption;
+				padding: dp(4);
+			}
+		}
+		+ ul { // all-day only
+			background-color:var(--bg-base);
+		}
+
+		.event {
+			position:absolute;
+		}
+	}
+
+	> dl { // can have 7 dd for day columns
+		background-color: $colorBackground;
+		overflow-y: scroll;
+		position: relative;
+		display: flex;
+		flex-grow: 1000;
+
+		> dd { // day column
+			position: relative;
+			overflow: hidden;
+			height: 24*$hourHeight;
+			//max-height: 1680px;
+			background: linear-gradient(180deg, $colorLine 1px, transparent 1px) repeat-y;
+			background-size: 100% $hourHeight;
+			border-right: 1px solid $colorBorder;
+		}
+		> dt { // time display
+			position: initial;
+			background-size: 8px $hourHeight;
+			background-position: top right;
+			border-right: 0;
+
+			> em { //time
+				//&:first-child { height: dp(62);} // move all up 4 dp
+				font-style: normal;
+				display: block;
+				font-size: .8em;
+				height: $hourHeight;
+				//max-height: 70px; // 1680 / 24
+				color: $colorTextSecondary;
+				text-align: right;
+				padding: 0 dp(15) 0 0;
+				line-height: 0; // move text to top of box
+			}
+		}
+	}
+
+	li, dd, dt { // header / all-day
+		flex: 5 0 0;
+
+		&.weekend {
+			background-color: $colorButton;
+		}
+
+		&:first-child { // weeknr
+			max-width: dp(64);
+		}
+	}
+	dd > div, .all-days > div {
+		@extend %event;
+	}
+	dl dd > div {
+		left:0;
+		top:0;
+		position: absolute;
+		border-left: 3px solid rgba(0,0,0,.25);
+		border-top: 1px solid rgba(0,0,0,.25);
+		> em, > span, > i {
+			color: white;
+		}
+		> span { //time
+			display: inline-block;
+			float:right;
+		}
+		// handle bars
+		&:before, &:after {
+			content: '';
+			position: absolute;
+			left: 0;
+			right: 0;
+			height: 4px;
+			cursor: row-resize;
+		}
+		&:before {top: 0;}
+		&:after {bottom: 0;}
+	}
+}
+
+.check-list {
+	.control { width: 100%;}
+	li {
+		padding-left: 11px;
+	}
+	.goui-form-field .wrap menu.goui-toolbar {
+		border-left:0;
+	}
+}
+.goui.goui-toolbar.dense {
+	padding: 7px 3.5px 7px 11px !important;
+	> h3 {
+		flex: 1 !important;
+
+		~ button {
+			padding: 5.25px;
+			margin-right: 0;
+		}
+	}
+}
+
+.participant-field {
+	.goui-pit {
+		border-bottom: 0;
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+		padding-bottom: dp(8);
+	}
+	.goui-form-field .wrap {
+		margin-top: dp(-9);
+	}
+}

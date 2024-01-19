@@ -36,6 +36,12 @@ class MappedTable extends Table {
 	 * @var boolean 
 	 */
 	public $isUserTable = false;
+
+	/**
+	 * When true this will LEFT join when fetched and in the delete query
+	 * @var bool
+	 */
+	public $required = false;
 	
 	/**
 	 * Mapped table constructor

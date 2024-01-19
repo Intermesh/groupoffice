@@ -46,7 +46,7 @@ go.modules.community.tasks.ChooseTasklistGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'creator',
 					renderer: function(v) {
-						return v ? v.displayName : "-";
+						return v ? v.name : "-";
 					}
 				}
 			],

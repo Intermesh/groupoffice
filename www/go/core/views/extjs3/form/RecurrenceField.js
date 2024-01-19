@@ -104,7 +104,7 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
     },
 
     _day:function (){
-        return [null,'mo','tu','we','th','fr','sa','so'][this.startDate.format('N')];
+        return [null,'mo','tu','we','th','fr','sa','su'][this.startDate.format('N')];
     },
 
     onTriggerClick : function(){

@@ -50,13 +50,13 @@ class Module extends core\Module {
 	}
 
 
-	public function initListeners()
-	{
-		if(model\Module::isInstalled('legacy', 'projects2')) {
-			$prj = new Project();
-			$prj->addListener('beforedelete', self::class, 'onBeforeProjectDelete');
-		}
-	}
+//	public function initListeners()
+//	{
+//		if(model\Module::isInstalled('legacy', 'projects2')) {
+//			$prj = new Project();
+//			$prj->addListener('beforedelete', self::class, 'onBeforeProjectDelete');
+//		}
+//	}
 
 
 

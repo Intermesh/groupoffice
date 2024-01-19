@@ -129,11 +129,11 @@ class Mapping {
    * @param string[] $constantValues
    * @return Mapping
    */
-	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []): Mapping
+	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], $required = false): Mapping
 	{
 		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues);
 		$table->isUserTable = true;
-
+		$table->required = $required;
 		$this->hasUserTable = true;
 
 		if(!Table::getInstance($name)->getColumn('modSeq')) {

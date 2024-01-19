@@ -1,12 +1,12 @@
 go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 	title: t("Info"),
 	collapsible: true,
-	entityStore: "UserDisplay",
+	entityStore: "Principal",
 	cUserId: null,
 	mUserId: null,
 	tpl: new Ext.XTemplate('<div class="s6 pad"><div class="icons">\
 	<p>\
-		{[go.util.avatar(this.cUser.displayName,this.cUser.avatarId)]}\
+		{[go.util.avatar(this.cUser.name,this.cUser.avatarId)]}\
 		<span><tpl if="values.createdAt">{[go.util.Format.dateTime(values.createdAt)]}</tpl><tpl if="values.ctime">{ctime}</tpl></span>\
 		<label>'+t("Created")+'<label>\
 	</p>\
@@ -14,7 +14,7 @@ go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 	</div>\
 	<div class="s6 pad"><div class="icons">\
 	<p>\
-		{[go.util.avatar(this.mUser.displayName,this.mUser.avatarId)]}\
+		{[go.util.avatar(this.mUser.name,this.mUser.avatarId)]}\
 		<span><tpl if="values.modifiedAt">{[go.util.Format.dateTime(values.modifiedAt)]}</tpl><tpl if="values.mtime">{mtime}</tpl></span>\
 		<label>'+t("Modified")+'<label>\
 	</p>\
@@ -35,15 +35,15 @@ go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 		if(this.mUserId) {
 			ids.push(this.mUserId);	
 		}
-		this.tpl.cUser = {displayName: ''};
-		this.tpl.mUser = {displayName: ''};
+		this.tpl.cUser = {name: ''};
+		this.tpl.mUser = {name: ''};
 		
 		this.entityStore.get(ids, function(entities, notFoundIds) {
 			entities.forEach(function(e) {
-				if(e.id === this.cUserId) {
+				if(+e.id === this.cUserId) {
 					this.tpl.cUser = e;
 				}
-				if(e.id === this.mUserId) {
+				if(+e.id === this.mUserId) {
 					this.tpl.mUser = e;
 				}
 			}, this);

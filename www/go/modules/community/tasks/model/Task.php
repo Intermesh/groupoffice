@@ -15,9 +15,9 @@ use go\core\db\Criteria;
 use go\core\db\Expression;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
+use go\core\model\Principal;
 use go\core\model\User;
 use go\core\model\Module;
-use go\core\model\UserDisplay;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
@@ -300,8 +300,8 @@ class Task extends AclItemEntity {
 	{
 		$keywords = [$this->title, $this->description];
 		if($this->responsibleUserId) {
-			$rUser = UserDisplay::findById($this->responsibleUserId);
-			$keywords[] = $rUser->displayName;
+			$responsible = Principal::findById('User:'.$this->responsibleUserId);
+			$keywords[] = $responsible->name;
 		}
 		if($this->tasklistId) {
 			$tasklist = TaskList::findById($this->tasklistId);
@@ -309,9 +309,9 @@ class Task extends AclItemEntity {
 		}
 
 		if($this->createdBy) {
-			$creator = UserDisplay::findById($this->createdBy);
+			$creator = Principal::findById('User:'.$this->createdBy);
 			if($creator) {
-				$keywords[] = $creator->displayName;
+				$keywords[] = $creator->name;
 			}
 		}
 		return $keywords;

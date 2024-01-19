@@ -10,7 +10,7 @@ go.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
 			return e;
 			
 		}).filter(function(e){return e.isAclOwner;});
-		
+
 		this.store = new Ext.data.Store({
 			reader: new Ext.data.JsonReader({
 				fields: ['moduleId', 'name', 'title', 'module', "package", "customFields", "defaultAcl", "defaultsPanel", "moduleTitle"],

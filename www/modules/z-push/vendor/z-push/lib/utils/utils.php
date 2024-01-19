@@ -710,11 +710,8 @@ class Utils {
      * @access public
      * @return string
      */
-    public static function GetFormattedTime($timestamp = false) {
-        if (!$timestamp)
-            return @strftime("%d/%m/%Y %H:%M:%S");
-        else
-            return @strftime("%d/%m/%Y %H:%M:%S", $timestamp);
+    public static function GetFormattedTime($timestamp = null) {
+        return @date("d/m/Y H:i:s", $timestamp);
     }
 
 
