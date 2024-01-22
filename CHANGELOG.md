@@ -1,3 +1,5 @@
+- Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
+
 19-01-2024: 6.7.63
 - Billing: bugfix profit %
 - Core: Exclude User and Search from SSE Push because it caused performance problems
