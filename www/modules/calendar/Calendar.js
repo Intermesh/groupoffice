@@ -92,8 +92,8 @@ GO.calendar.formatQtip = function(data,verbose)
 	if (!GO.util.empty(data.resourced_calendar_name))
 		str += '<br />'+t("Resource used in", "calendar")+': '+Ext.util.Format.htmlEncode(data.resourced_calendar_name);
 	
-	return str;
-//	return Ext.util.Format.htmlEncode(str);
+	// return str;
+	return Ext.util.Format.htmlEncode(str);
 }
 
 GO.calendar.MainPanel = function(config){
