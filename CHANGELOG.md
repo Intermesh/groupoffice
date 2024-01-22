@@ -1,6 +1,7 @@
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
 - Finance: Add page breaks
 - Finance: Always set expiresat and move when date is modified
+- Finance: Drag rows to another group
 
 19s-01-2024: 6.8.30
 - Billing: Customer report is sortable
