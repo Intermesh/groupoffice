@@ -435,7 +435,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 				me.closeWithModifications = true;
 				me.close();
 			} else {
-				me.formPanel.trackReset();
+				me.formPanel.form.trackReset();
 			}
 
 			return serverId;
