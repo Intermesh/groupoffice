@@ -286,6 +286,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		this.dirty = true;
 
 		this.fireEvent("newitem", this, wrap);
+
+		return wrap;
 	},
 	
 	createNewItem : function(auto) {
