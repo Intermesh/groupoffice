@@ -1,4 +1,5 @@
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
+- Finance: Add page breaks
 
 19s-01-2024: 6.8.30
 - Billing: Customer report is sortable
