@@ -493,13 +493,13 @@ Ext.ux.form.HtmlEditor.Word = Ext.extend(Ext.util.Observable, {
     onRender: function() {
 
         this.cmp.getToolbar().add({
-            iconCls: 'x-edit-wordpaste',
+            iconCls: 'x-edit-removeFormat',
             /*pressed: true,*/
 						tabIndex:-1,
             handler: function(t){
                 //t.toggle(!t.pressed);
                 //this.wordPasteEnabled = !this.wordPasteEnabled;
-				this.cmp.setValue(this.fixWordPaste(this.cmp.getValue()));
+							this.cmp.setValue(this.fixWordPaste(this.cmp.getValue()));
             },
             scope: this,
 			overflowText:'Word paste',
