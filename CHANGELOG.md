@@ -1,6 +1,7 @@
 19-01-2024: 6.7.63
 - Billing: bugfix profit %
 - Core: Exclude User and Search from SSE Push because it caused performance problems
+- Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
 
 15-01-2024: 6.7.62
 - Calendar/summary/Core: Add user was broken when start module was not installed and calendar was installed

@@ -1354,11 +1354,11 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	public function toHtml() {
 		$html = '<table id="event-'.$this->uuid.'">' .
 						'<tr><td>' . \GO::t("Subject", "calendar") . ':</td>' .
-						'<td>' . $this->name . '</td></tr>';
+						'<td>' . htmlspecialchars($this->name) . '</td></tr>';
 		
 		if($this->calendar){
 			$html .= '<tr><td>' . \GO::t("Calendar", "calendar") . ':</td>' .
-						'<td>' . $this->calendar->name . '</td></tr>';
+						'<td>' . htmlspecialchars($this->calendar->name) . '</td></tr>';
 		}
 		
 		$html .= '<tr><td>' . \GO::t("Starts at", "calendar") . ':</td>' .
@@ -1403,8 +1403,8 @@ class Event extends \GO\Base\Db\ActiveRecord {
 						continue;
 					}
 
-					$html .= '<tr><td style="vertical-align:top">'.($field->name).'</td>'.
-										'<td>'.$cfRecord[$field->databaseName].'</td></tr>';
+					$html .= '<tr><td style="vertical-align:top">'.htmlspecialchars($field->name).'</td>'.
+										'<td>'.htmlspecialchars($cfRecord[$field->databaseName]).'</td></tr>';
 				}
 			}
 		}
@@ -1420,7 +1420,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 			$html .= '<tr><td colspan="3"><br /></td></tr>';
 			$html .= '<tr><td><b>'.\GO::t("Participant", "calendar").'</b></td><td><b>'.\GO::t("Status", "calendar").'</b></td><td><b>'.\GO::t("Organizer", "calendar").'</b></td></tr>';
 			while($participant = $stmt->fetch()){
-				$html .= '<tr><td>'.$participant->name.'&nbsp;</td><td>'.$participant->statusName.'&nbsp;</td><td>'.($participant->is_organizer ? \GO::t("Yes") : '').'</td></tr>';
+				$html .= '<tr><td>'.htmlspecialchars($participant->name).'&nbsp;</td><td>'.$participant->statusName.'&nbsp;</td><td>'.($participant->is_organizer ? \GO::t("Yes") : '').'</td></tr>';
 			}
 			$html .='</table>';
 		}
