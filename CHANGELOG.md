@@ -1,4 +1,5 @@
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
+- Finance: in payment and report, display currency as per book
 
 19-01-2024: 6.7.63
 - Billing: bugfix profit %
