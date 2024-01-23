@@ -217,7 +217,10 @@
 
 -- 6.8 --
 
+22-01-2024: 6.7.64
+
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
+- Finance: in payment and report, display currency as per book
 
 19-01-2024: 6.7.63
 - Billing: bugfix profit %
@@ -555,6 +558,7 @@
 
 
 --- 6.7
+22-01-2023: 6.6.182
 
 - Core: Exclude User and Search from SSE Push because it caused performance problems
 
