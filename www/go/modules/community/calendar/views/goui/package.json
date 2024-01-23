@@ -1,8 +1,14 @@
 {
   "type": "module",
+  "devDependencies": {
+    "concurrently": "latest",
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "latest"
+  },
   "scripts": {
     "start": "npm run start:sass & npm run start:esbuild",
-    "start:esbuild": "esbuild src/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist",
+    "start:esbuild": "npx esbuild src/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist",
     "start:sass": "npx sass --watch style:dist",
 
     "build": "npm run build:sass && npm run build:ts",
