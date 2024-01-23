@@ -70,6 +70,8 @@ trait PrincipalTrait {
 		$principal->type = $this->principalType();
 		$principal->setAclId($this->findAclId());
 
+		$principal->cutPropertiesToColumnLength();
+
 		$isNew = $principal->isNew();
 		if(!$principal->internalSave()) {
 			throw new Exception("Could not save principal cache: " . var_export($principal->getValidationErrors(), true));
