@@ -1,3 +1,4 @@
+23-01-2024: 6.8.31
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
 - Finance: Add page breaks
 - Finance: Always set expiresat and move when date is modified
@@ -5,7 +6,7 @@
 - Finance: Fixed invalid status filter when switching between books with custom statuses.
 - Core: Respect sort_order prop of module
 
-19s-01-2024: 6.8.30
+19-01-2024: 6.8.30
 - Billing: Customer report is sortable
 - Core: Exclude User and Search from SSE Push because it caused performance problems
 - Core: Comment composer did not reset.
