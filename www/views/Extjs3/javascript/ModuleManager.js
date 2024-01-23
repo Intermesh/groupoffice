@@ -179,24 +179,29 @@ GO.ModuleManager = Ext.extend(function(){
 	},
 	
 	getAllPanels : function(){
-		
-		var panels = [];
-		
-		for(var i=0, l = this.sortOrder.length;i<l;i++)
-		{
-			panels.push(this.getPanel(this.sortOrder[i]));	
-		}
-		return panels;
+		const p = Object.values(this.modulePanels);
+
+		p.sort((a, b) => {
+			return (a.sort_order ?? 0) - (b.sort_order ?? 0)
+		})
+
+		return p;
+
 	},
 
 	getAllPanelConfigs : function(){
-		var configs = [];
 
-		for(var i=0, l = this.sortOrder.length;i<l;i++)
-		{
-			configs.push(this.panelConfigs[this.sortOrder[i]]);
-		}
-		return configs;
+		let p = Object.values(this.panelConfigs);
+
+		p.sort((a, b) => {
+			// debugger;
+			const sortA = go.Modules.get(a.package, a.moduleName, ).sort_order;
+			const sortB = go.Modules.get(b.package, b.moduleName, ).sort_order;
+
+			return sortA - sortB
+		})
+		return p;
+
 	},
 	
 	userHasModule : function(module){

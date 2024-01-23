@@ -74,6 +74,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	 * Enable sorting by drag and drop
 	 */
 	sortable: false,
+
+	// if set then items can be dropped to other form fields with same group
+	ddGroup: null,
 	// /**
 	//  * If set then this property will be set with the sort order ASC
 	//  */
@@ -168,7 +171,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	initSortable : function() {
 		var me = this;
 		this.dropZone = new Ext.dd.DropZone(this.getEl(), {
-			ddGroup: "form-group-sortable-" + this.getId(),
+			ddGroup: this.ddGroup || "form-group-sortable-" + this.getId(),
 			getTargetFromEvent: function(e) {
 				return e.getTarget('.go-form-group-row');
 			},
@@ -202,12 +205,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 
 				var dropRow = Ext.getCmp(target.id);
-				var dragItem = me.items.itemAt(data.rowIndex);
+				var dragItem = data.sourceField.items.itemAt(data.rowIndex);
 
 				var v = dragItem.formField.getValue();
 
 				if(!e.altKey) {
-					me.remove(dragItem, true);
+					data.sourceField.remove(dragItem, true);
 					if (dropRow.rowIndex > data.dragIndex) {
 						dropRow.rowIndex--;
 					}
@@ -286,6 +289,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		this.dirty = true;
 
 		this.fireEvent("newitem", this, wrap);
+
+		return wrap;
 	},
 	
 	createNewItem : function(auto) {
@@ -434,6 +439,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				},
 				afterrender: function(cmp) {
 
+					const me = this;
+
 					cmp.dragZone = new Ext.dd.DragZone(cmp.getEl(), {
 						ddGroup: this.dropZone.ddGroup,
 						getDragData: function(e) {
@@ -443,6 +450,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 								d = sourceEl.cloneNode(true);
 								d.id = Ext.id();
 								return {
+									sourceField: me,
 									sourceEl: sourceEl,
 									repairXY: Ext.fly(sourceEl).getXY(),
 									ddel: d,

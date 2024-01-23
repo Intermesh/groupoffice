@@ -26,7 +26,7 @@
 						entityStore: this.initialConfig.role && this.initialConfig.role == "support" ? "SupportList" : "TaskList",
 						filters: {
 							permissionLevel: {
-								permissionLevel: go.permissionLevels.write
+								permissionLevel: go.permissionLevels.create
 							}
 						}
 					}

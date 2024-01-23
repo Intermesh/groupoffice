@@ -250,11 +250,11 @@ go.Modules = (function () {
 									// moduleMainPanel = new config.mainPanel[i]();
 									// console.error("DO SOMETHING ABOUT THIS HORRIBLE THING HERE :)");
 									// //todo GO.moduleManager is deprecated
-									GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:config.mainPanel[i].prototype.title, package: mod.package}, config.subMenuConfig);
+									GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:config.mainPanel[i].prototype.title, package: mod.package, sort_order:mod.sort_order}, config.subMenuConfig);
 								}
 							} else {
 								config.panelConfig.package = mod.package;
-
+								config.panelConfig.sort_order = mod.sort_order;
 								GO.moduleManager._addModule(mod.name, config.mainPanel, config.panelConfig, config.subMenuConfig);
 							}
 						}							
@@ -289,6 +289,7 @@ go.Modules = (function () {
 		},
 		
 		addPanel : function(panels) {
+
 			if(!Ext.isArray(panels)) {
 				panels = [panels];
 			}

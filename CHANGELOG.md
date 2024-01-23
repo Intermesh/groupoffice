@@ -1,3 +1,14 @@
+- Contracts: New option to bill in arrears
+
+23-01-2024: 6.8.31
+- Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
+- Finance: Add page breaks
+- Finance: Always set expiresat and move when date is modified
+- Finance: Drag rows to another group
+- Finance: Fixed invalid status filter when switching between books with custom statuses.
+- Core: Respect sort_order prop of module
+
+19-01-2024: 6.8.30
 - Billing: Customer report is sortable
 - Core: Exclude User and Search from SSE Push because it caused performance problems
 - Core: Comment composer did not reset.
@@ -210,7 +221,15 @@
 
 -- 6.8 --
 
+22-01-2024: 6.7.64
+
+- Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
+- Finance: in payment and report, display currency as per book
+
+19-01-2024: 6.7.63
+- Billing: bugfix profit %
 - Core: Exclude User and Search from SSE Push because it caused performance problems
+- Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
 
 15-01-2024: 6.7.62
 - Calendar/summary/Core: Add user was broken when start module was not installed and calendar was installed
@@ -543,6 +562,7 @@
 
 
 --- 6.7
+22-01-2023: 6.6.182
 
 - Core: Exclude User and Search from SSE Push because it caused performance problems
 
