@@ -3,6 +3,7 @@
 - Finance: Always set expiresat and move when date is modified
 - Finance: Drag rows to another group
 - Finance: Fixed invalid status filter when switching between books with custom statuses.
+- Core: Respect sort_order prop of module
 
 19s-01-2024: 6.8.30
 - Billing: Customer report is sortable
