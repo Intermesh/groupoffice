@@ -300,7 +300,7 @@ class Task extends AclItemEntity {
 	{
 		$keywords = [$this->title, $this->description];
 		if($this->responsibleUserId) {
-			$responsible = Principal::findById('User:'.$this->responsibleUserId);
+			$responsible = Principal::findById($this->responsibleUserId);
 			$keywords[] = $responsible->name;
 		}
 		if($this->tasklistId) {
@@ -309,7 +309,7 @@ class Task extends AclItemEntity {
 		}
 
 		if($this->createdBy) {
-			$creator = Principal::findById('User:'.$this->createdBy);
+			$creator = Principal::findById($this->createdBy);
 			if($creator) {
 				$keywords[] = $creator->name;
 			}
