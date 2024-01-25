@@ -6,6 +6,31 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 	collapsible: true,
 	initComponent: function() {
 
+		this.tbar = [
+			new Ext.Button({
+				text: t("Add"),
+				iconCls: "ic-add",
+				handler: function() {
+					const dv = this.detailView;
+
+					const dlg = new go.modules.community.tasks.TaskDialog({
+						role: this.support ? "support" : "list",
+						entityStore: this.support ? "SupportTicket" : "Task",
+					}), entity = dv.entity ? dv.entity : dv.entityStore.entity.name, entityId = dv.model_id ? dv.model_id : dv.currentId;
+
+					dlg.setLinkEntity({
+						entity: entity,
+						entityId: entityId,
+						data: this.detailView.data
+					})
+					dlg.createLinkButton.addLink(entity, entityId);
+					dlg.redirectOnSave = false;
+					dlg.show();
+				},
+				scope: this
+			})
+		]
+
 		this.view = new go.grid.GroupingView({
 			emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
 			totalDisplay: false,
