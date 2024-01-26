@@ -250,8 +250,8 @@ abstract class Module extends Singleton {
 	{
 		$this->checkDependenciesForUninstall();
 
-		$oldTC = core\jmap\Entity::$trackChanges;
-		core\jmap\Entity::$trackChanges = false;
+		$oldTC = Entity::$trackChanges;
+		Entity::$trackChanges = false;
 		$oldHist = \go\modules\community\history\Module::$enabled;
 		\go\modules\community\history\Module::$enabled = false;
 

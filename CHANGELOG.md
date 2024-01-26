@@ -1,3 +1,5 @@
+- Core: fix uninstall module
+
 22-01-2024: 6.7.64
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
 - Finance: in payment and report, display currency as per book
