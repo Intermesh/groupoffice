@@ -13,14 +13,14 @@ use LogicException;
  */
 class Criteria {
 	
-	protected $where = [];	
+	protected array $where = [];
 	
 	/**
 	 * Key value array of bind parameters.
 	 * 
 	 * @var array eg. ['paramTag' => ':someTag', 'value' => 'Some value', 'pdoType' => PDO::PARAM_STR]
 	 */
-	protected $bindParameters = [];
+	protected array $bindParameters = [];
 	
 	/**
 	 * Creates a new Criteria or Query object from different input:
@@ -164,7 +164,7 @@ class Criteria {
 	 * @param string|null $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * 
-	 * @return static
+	 * @return $this
 	 */
 	public function where($condition, string $comparisonOperator = null, $value = null): Criteria
 	{

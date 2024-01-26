@@ -302,7 +302,7 @@ abstract class Entity extends Property {
 	 * @param self|ActiveRecord $entity
 	 * @param array $properties
 	 * @param bool $readOnly
-	 * @return Query|static[]
+	 * @return Query<$this>
 	 * @throws Exception
 	 */
 	public static function findByLink($entity, array $properties = [], bool $readOnly = false) {
