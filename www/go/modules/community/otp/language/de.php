@@ -22,4 +22,5 @@ return array (
   'Your system administrator requires you to setup two factor authentication' => 'Ihr Systemadministrator verlangt von Ihnen die Einrichtung der Zwei-Faktor-Authentifizierung',
   'Setup later' => 'Später aufsetzen',
   'Reading from your clipboard isn\'t allowed' => 'Von der Zwischenablage zu lesen ist nicht erlaubt',
+  'Two Factor Authentication' => 'Zwei-Faktor-Authentifizierung',
 );

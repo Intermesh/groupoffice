@@ -83,7 +83,7 @@ return array (
   'Mail reminders' => 'E-Mail-Erinnerungen',
   'Download sample CSV' => 'Beispiel-CSV herunterladen',
   'You can import users using a CSV file. To know how the CSV file should be formatted, download the sample file.<br />The first line must contain the column names. The following fields are required for each user:<br /><br />username, password, first_name, last_name, email' => 'Sie können Benutzer mittels einer CSV-Datei importieren. Um die nötige Formatierung dieser Datei einzuhalten, laden Sie sich zum Vergleich bitte die Beispieldatei herunter.<br />Die erste Zeile muss die Spaltenbezeichnungen enthalten und für jeden neuen Benutzer müssen die folgenden Daten angegeben werden:<br /><br />username, password, first_name, last_name, E-Mail',
-  'Number format' => 'Währungsformat',
+  'Number format' => 'Nummernformat',
   'List separator' => 'Listentrennzeichen',
   'Text separator' => 'Texttrennzeichen',
   'WARNING!!! All of the user data including addressbooks, projects, calendars etc. will be deleted!' => 'WARNUNG!!! Alle Benutzerdaten inkl. Adressbüchern, Projekten, Kalendern, etc. werden unwiderruflich gelöscht!',
@@ -1609,5 +1609,13 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'The data was saved successfully' => 'Daten erfolgreich gespeichert',
   'Your message was sent successfully' => 'Ihre Nachricht wurde erfolgreich versendet',
   'Do you want to generate some fake demonstration data? This will take about one or two minutes to generate.' => 'Möchten Sie Dummy Daten generieren? Dieser Vorgang wird etwa ein oder zwei Minuten dauern.',
-	"Are you sure you want to close this window and discard your changes?" => "Bist du sicher, dass du dieses Fenster schließen und deine Änderungen verwerfen möchtest?"
+  'Are you sure you want to close this window and discard your changes?' => 'Bist du sicher, dass du dieses Fenster schließen und deine Änderungen verwerfen möchtest?',
+  'Enable 2-Factor authentication for ActiveSync devices' => 'Aktivieren der 2-Faktor-Authentifizierung für ActiveSync-Geräte',
+  'ActiveSync devices can connect by default.' => 'ActiveSync-Geräte können standardmäßig eine Verbindung herstellen.',
+  'When disabled the administrator has to allow each new device manually' => 'Wenn deaktiviert, muss der Administrator jedes neue Gerät manuell zulassen.',
+  'Allow user registration requests by everyone. Be careful!' => 'Benutzerregistrierungsanfragen von jedermann zulassen. Seien Sie vorsichtig!',
+  'Authenticators' => 'Authentifizierer',
+  'Unknown error' => 'Unbekannter Fehler',
+  'For page numbers use' => 'Für Seitennummern benutze',
+  'There were {count} errors:' => 'Es gab {count} Fehler:',
 );
