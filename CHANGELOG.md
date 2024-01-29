@@ -5,6 +5,7 @@
 - Billing: Vat reverse check incorrectly set on company when country was home country
 - Finance: Unit cost field in contract too
 - Tasks: Add task was broken when comments module was not installed
+- Support: Help module for customers didn't load
 
 23-01-2024: 6.8.31
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
