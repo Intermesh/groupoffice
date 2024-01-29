@@ -1,6 +1,7 @@
 - Contracts: New option to bill in arrears
 - Tasks: Add button in linked tasks
 - Core: Updated German translation
+- Core: Change delimiter for multiple values into | so it's less likely to be part of real names. Some compamy names have a , in them
 
 23-01-2024: 6.8.31
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability

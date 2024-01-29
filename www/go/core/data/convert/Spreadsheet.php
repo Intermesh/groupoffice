@@ -63,7 +63,7 @@ class Spreadsheet extends AbstractConverter {
 	 * 
 	 * @var string
 	 */
-	public static $multipleDelimiter = ',';
+	public static $multipleDelimiter = '|';
 
 	protected $delimiter = ',';
 
