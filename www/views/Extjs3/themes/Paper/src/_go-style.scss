@@ -1910,14 +1910,6 @@ table[id^="comments-ext"] b {
 		margin: dp(8) 0px;
 	}
 
-	p, span, div {
-		font-size: sp(16);
-		color: color($fg, 'text');
-		font-weight: $font-weight-r;
-		line-height: dp(24);
-//		background-color: white;
-	}
-
 	a:link, a:visited, a:active {
 		text-decoration: underline;
 		color: $cAnchor;
