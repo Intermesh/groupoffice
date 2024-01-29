@@ -30,6 +30,7 @@ return array (
     'home' => 'Privat',
     'mobile' => 'Mobil',
     'workmobile' => 'Arbeit Mobil',
+    'fax' => 'Fax',
     'workfax' => 'Arbeit Fax',
   ),
   'addressTypes' => 
@@ -148,4 +149,6 @@ return array (
   'Only link to the contacts from the address books below' => 'Nur auf Kontakte von folgenden Adressbüchern verlinken',
   'Add to group' => 'Zur Gruppe hinzufügen',
   'Delete %d items' => '%d Objekte löschen',
+  'Has phone numbers' => 'Hat Telefonnummern',
+  'Has organizations' => 'Hat Organisationen',
 );

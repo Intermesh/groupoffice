@@ -355,5 +355,8 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'None' => 'Ohne',
   'Failed to send the request to the server. Please check your internet connection.' => 'Die Anforderung konnte nicht an den Server gesendet werden. Bitte überprüfen Sie Ihre Internetverbindung.',
   'Email address succesfully added to contact' => 'Die E-Mail-Adresse wurde dem Kontakt erfolgreich hinzugefügt',
-	'' => '',
+  '' => '',
+  'Refresh token' => 'Token aktualisieren',
+  'Your token has possibly expired. A new window will be opened in which you can renew your token.' => 'Ihr Token ist möglicherweise abgelaufen. Es wird ein neues Fenster geöffnet, in dem Sie Ihren Token erneuern können.',
+  'Template group' => 'Vorlagengruppe',
 );

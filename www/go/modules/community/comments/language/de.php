@@ -13,4 +13,5 @@ return array (
   'Attach file' => 'Datei anhängen',
   'Scroll to top' => 'Nach oben scrollen',
   'You have an unsaved comment. Are you sure you want to discard the comment?' => 'Der Kommentar ist noch nicht gespeichert. Sind Sie sicher, dass Sie ihn verwerfen möchten?',
+  'Message' => 'Nachricht hochladen',
 );

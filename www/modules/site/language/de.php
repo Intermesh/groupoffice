@@ -57,4 +57,5 @@ return array (
   'Site Multifile' => 'Site Multidatei',
   'Base path' => 'Basispfad',
   'Medium' => 'Mittel',
+  'Info' => 'Änderungsverlauf',
 );
