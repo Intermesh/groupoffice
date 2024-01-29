@@ -1,3 +1,5 @@
+- Email: Fixed render issue
+
 22-01-2023: 6.6.182
 - Core: Exclude User and Search from SSE Push because it caused performance problems
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
