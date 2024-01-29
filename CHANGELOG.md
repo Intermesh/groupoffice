@@ -1,4 +1,5 @@
 - Core: fix uninstall module
+- Email: Fixed render issue
 
 22-01-2024: 6.7.64
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
