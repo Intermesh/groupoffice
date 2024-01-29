@@ -109,6 +109,12 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 						e.preventDefault(); //to prevent form submission
 						this.search();
 					}
+
+					if(e.getKey() == Ext.EventObject.ESC) {
+						e.preventDefault();
+						this.back();
+
+					}
 				},
 				scope: this
 			},
@@ -237,7 +243,8 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	 * 	 
 	 */
 	back : function(){
-		this.backButton.findParentByType('toolbar').setVisible(false);		
+		this.backButton.findParentByType('toolbar').setVisible(false);
+		this.focus();
 		this.fireEvent('close', this);		
 	},
 
@@ -258,7 +265,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			disabled: true,
 			handler: function (b) {
 				this.reset();
-				this.back(b);
+				this.back();
 			},
 			scope: this
 		}));
