@@ -1,7 +1,7 @@
 Group-Office groupware license
 ==============================
 
-Copyright (c) 2003-2019, Intermesh
+Copyright (c) 2003-2024, Intermesh
 All rights reserved.
 
 This program is protected by copyright law and the Group-Office license.
@@ -30,9 +30,9 @@ http://www.gnu.org/licenses/agpl.html
 
 Professional License
 ------------------------------------------------------------------------------------------
-Some modules are encrypted with Ioncube and require a license.
+Some modules are encrypted with SourceGuardian and require a license.
 
-https://www.group-office.com/license-agreement.html for the terms.
+See https://www.group-office.com/self-hosted-license-agreement for the terms.
 
 
 
@@ -42,4 +42,3 @@ Swift: LGPL 3.0 license /usr/share/common-licenses/LGPL
 TCPDF: LGPL 2.0 license /usr/share/common-licenses/LGPL
 ExtJS: GPL 3.0 license /usr/share/common-licenses/GPL
 SabreDAV BSD license
-PLupload OEM Proprietary license

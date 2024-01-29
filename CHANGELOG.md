@@ -2,6 +2,14 @@
 - Tasks: Add button in linked tasks
 - Core: Updated German translation
 - Core: Change delimiter for multiple values into | so it's less likely to be part of real names. Some compamy names have a , in them
+- Billing: Vat reverse check incorrectly set on company when country was home country
+- Finance: Unit cost field in contract too
+- Tasks: Add task was broken when comments module was not installed
+- Support: Help module for customers didn't load
+- Finance: Use currency in debtor statements
+- Files: Fixed error when pasting text into search field
+- Core: Use Escape button to exit search
+- Email: Fixed render issue
 
 23-01-2024: 6.8.31
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
