@@ -1,3 +1,4 @@
+29-01-2024: 6.8.32
 - Contracts: New option to bill in arrears
 - Tasks: Add button in linked tasks
 - Core: Updated German translation
