@@ -890,27 +890,29 @@ th {
 		return $v;
 	}
 
-	public static function sniffDelimiter(File $file) {
-		$fp = $file->open('r');
+	public static function sniffDelimiter(File $file): string
+	{
+		$delimiters = [',', ';', "\t"];
 
-		$delimiter = ',';
-		$enclosure = '"';
-
-		$headers = fgetcsv($fp, 0, $delimiter, $enclosure);
-		
-		if(!$headers || count($headers) == 1) {
-			$delimiter = ';' ;
-
-			$headers = fgetcsv($fp, 0, $delimiter, $enclosure);
-			fclose($fp);
-			if(!$headers || count($headers) == 1) {
-				throw new Exception("Unable to detect delimiter");
+		foreach ($delimiters as $delimiter) {
+			if(self::tryDelimiter($file, $delimiter)) {
+				return $delimiter;
 			}
-		} else{
-			fclose($fp);
 		}
 
-		return $delimiter;		
+		throw new Exception("Unable to detect delimiter");
+
+	}
+
+	private static function tryDelimiter(File $file, string $delimiter): bool
+	{
+		$fp = $file->open('r');
+		$headers = fgetcsv($fp, 0, $delimiter, '"');
+
+		$success = $headers && count($headers) > 1;
+		fclose($fp);
+
+		return $success;
 	}
 	
 	/**
