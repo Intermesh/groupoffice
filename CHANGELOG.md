@@ -8,6 +8,7 @@
 - Support: Help module for customers didn't load
 - Finance: Use currency in debtor statements
 - Files: Fixed error when pasting text into search field
+- Core: Use Escape button to exit search
 
 23-01-2024: 6.8.31
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
