@@ -314,7 +314,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 				me.fireEvent('authenticated', this, go.User, password);
 
-				window.groupofficeCore.client.fireAuth();
 
 				me.renderUI();
 				Ext.getBody().unmask();
