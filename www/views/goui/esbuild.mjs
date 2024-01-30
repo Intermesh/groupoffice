@@ -11,7 +11,7 @@ let importPathPlugin = {
 }
 
 const opts = {
-	entryPoints: ['goui/script/index.ts', 'groupoffice-core/script/index.ts', 'node_modules/chart.js/auto/auto.js'],
+	entryPoints: ['goui/script/index.ts', 'groupoffice-core/script/index.ts'],
 	bundle: true,
 	sourcemap: true,
 	format: "esm",
