@@ -1,5 +1,5 @@
 import {
-	autocomplete, btn, checkbox,
+	autocomplete, btn, Button, checkbox,
 	column,
 	comp,
 	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap,
@@ -10,6 +10,7 @@ import {
 	table
 } from "@intermesh/goui";
 import {jmapds, validateEmail} from "@intermesh/groupoffice-core";
+import {AvailabilityDialog} from "./AvailabilityDialog.js";
 
 interface Participant {
 	email:string
@@ -36,6 +37,7 @@ export class ParticipantField extends Component {
 	}
 
 	list!: MapField
+	btnFreeBusy!: Button
 
 	constructor() {
 		super();
@@ -122,13 +124,13 @@ export class ParticipantField extends Component {
 					]
 				})
 				//	listeners: {'blur' : (_,v) => {/*check if valid email, if so add to _.previous.add(participant);*/}}
-			}),
+			})
 		);
 
 		return super.internalRender();
 	}
 
-	addSelfAsOrganiser() {
+	private addSelfAsOrganiser() {
 		this.list.add({
 			email: go.User.email,
 			name: go.User.displayName,
@@ -136,7 +138,7 @@ export class ParticipantField extends Component {
 			kind: 'individual',
 			participationStatus:"accepted",
 			expectReply:false
-		},'User-'+go.User.id);
+		},go.User.id);
 	}
 
 	addParticipant(principal: any) {
@@ -151,6 +153,6 @@ export class ParticipantField extends Component {
 			kind: principal.type,
 			participationStatus:"needs-action",
 			expectReply:true
-		}, principal.id || Math.round(Math.random()*1000)+1000);
+		}, principal.id);
 	}
 }

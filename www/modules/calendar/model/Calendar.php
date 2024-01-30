@@ -258,7 +258,7 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 					)
 			);
 			
-			$free_busy[$min] = !empty($model) && $model->id!=$currentModelId ? 1 : 0;
+			$free_busy[$min] = !empty($model) && $model->id != $currentModelId ? 1 : 0;
 			
 		}
 		

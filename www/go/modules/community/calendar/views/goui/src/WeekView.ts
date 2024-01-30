@@ -117,7 +117,6 @@ export class WeekView extends CalendarView {
 		},
 		mouseUp = (e:MouseEvent) => {
 			this.el.un('mousemove', mouseMove);
-			window.removeEventListener('mouseup', mouseUp);
 
 			changed && ev.save(() => {
 				this.dayItems.shift()
@@ -158,7 +157,7 @@ export class WeekView extends CalendarView {
 						start: (new DateTime(target.dataset.day!)).setHours(0, anchor).format('c'),
 						title: 'New event',
 						duration: 'PT1H',
-						calendarId: '2',
+						calendarId: CalendarView.selectedCalendarId,
 						showWithoutTime: false
 					},
 					start = new DateTime(data.start),
@@ -167,9 +166,10 @@ export class WeekView extends CalendarView {
 				this.dayItems.unshift(ev);
 				this.updateItems(start.clone().setHours(0,0,0,0));
 				action = resize;
+				changed = true;
 				this.el.on('mousemove', mouseMove);
 			}
-			window.addEventListener('mouseup', mouseUp);
+			window.addEventListener('mouseup', mouseUp,{once:true});
 		});
 	}
 

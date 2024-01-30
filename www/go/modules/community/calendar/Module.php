@@ -3,6 +3,7 @@ namespace go\modules\community\calendar;
 
 use GO\Base\Exception\AccessDenied;
 use go\core;
+use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
 use go\modules\community\calendar\model\Settings;
@@ -31,6 +32,10 @@ class Module extends core\Module
 			'mayChangeCategories', // allows creating global  categories for everyone. Personal cats can always be created.
 			'mayChangeResources',
 		];
+	}
+
+	public static function getAvailability($id, $start, $end) {
+		return BusyPeriod::fetch($id, $start, $end);
 	}
 
 	public function downloadIcs($key) {

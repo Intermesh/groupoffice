@@ -14,7 +14,9 @@ import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {MonthView} from "./MonthView.js";
 
 export abstract class CalendarView extends Component {
-	
+
+	static selectedCalendarId: string
+
 	protected day: DateTime = new DateTime()
 	protected days: number = 1
 	protected firstDay?: DateTime

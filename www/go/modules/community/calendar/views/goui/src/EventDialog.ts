@@ -29,6 +29,7 @@ import {calendarStore, categoryStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
+import {AvailabilityDialog} from "./AvailabilityDialog.js";
 
 
 export class EventDialog extends Window {
@@ -50,6 +51,7 @@ export class EventDialog extends Window {
 	withoutTimeToggle: CheckboxField
 
 	attachments:MapField
+	btnFreeBusy: Button
 
 	private titleField: TextField
 	constructor() {
@@ -82,17 +84,20 @@ export class EventDialog extends Window {
 					},
 					'load': (_, data) => {
 						const start = new DateTime(data.start);
-						data.end = start.add(new DateInterval(data.duration)).addDays(data.showWithoutTime? -1 : 0).format(data.showWithoutTime ? 'Y-m-d' : 'c');
+						data.end = start.add(new DateInterval(data.duration))
+							.addDays(data.showWithoutTime? -1 : 0)
+							.format(data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s');
 						exceptionsBtn.hidden = !data.recurrenceOverrides;
 						//recurrenceField.setStartDate(start)
 					},
 					'save' : () => {this.close();}
 				}
 			},
-			this.titleField = textfield({placeholder: t('Enter a title, name or place'), name: 'title', flex: '0 1 60%' }),
+			this.titleField = textfield({placeholder: t('Enter a title, name or place'), name: 'title', flex: '0 1 60%'}),
 			select({
 				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',
-				store: calendarStore, valueField: 'id',
+				store: calendarStore,
+				valueField: 'id',
 				textRenderer: (r: any) => r.name,
 				listeners: {
 					'setvalue': (me, v) => {
@@ -139,11 +144,20 @@ export class EventDialog extends Window {
 			),
 			participantfield({
 				listeners: {'change': (_,v) => {
-					this.submitBtn.text = t((v && Object.keys(v).length) ? 'Send' : 'Save');
+					const count = (v && Object.keys(v).length);
+					this.submitBtn.text = t(count ? 'Send' : 'Save');
+					this.btnFreeBusy.hidden = !count;
 
-					console.log(v);
 				}}
 			}),
+			this.btnFreeBusy = btn({hidden: true,text:t('Check availability'), handler: () => {
+				const dlg = new AvailabilityDialog();
+				dlg.on('changetime', (_,s,e) => {
+					this.startDate.value = s.format('Y-m-dTH:i');
+					this.endDate.value = e.format('Y-m-dTH:i');
+				});
+				dlg.show(this.item, this.form.modified);
+			} }),
 			alertField,
 			textarea({name:'description', label: t('Description'), autoHeight: true}),
 			autocompletechips({

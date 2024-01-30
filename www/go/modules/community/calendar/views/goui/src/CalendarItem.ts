@@ -61,6 +61,7 @@ export class CalendarItem {
 		if(!obj.end) {
 			this.end = this.start.clone().add(new DateInterval(obj.data.duration!));
 		}
+		console.log(obj.data.calendarId);
 		this.cal = calendarStore.items.find((c:any) => c.id == obj.data.calendarId);
 
 		this.initStart = this.start.format('Y-m-d\TH:i:s');

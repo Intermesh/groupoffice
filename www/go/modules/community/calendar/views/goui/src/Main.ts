@@ -224,34 +224,37 @@ export class Main extends Component {
 
 	}
 
+	private inCalendars: {[key:string]:boolean} = {}
 	private buildCalendarFilter() {
 		return list({
 			store: calendarStore,
 			cls: 'check-list',
 			rowSelectionConfig: {
-				multiSelect: true,
+				multiSelect: false,
 				listeners: {
 					'selectionchange': (tableRowSelect) => {
-
-						const calendarIds = tableRowSelect.selected.map((index) => calendarStore.get(index)?.id);
-						if(calendarIds.length) {
-							Object.assign(this.eventStore.queryParams.filter ||= {}, {
-								inCalendars: calendarIds
-							});
-						} else {
-							delete this.eventStore.queryParams.filter?.inCalendars;
+						const calIds = tableRowSelect.selected.map((index) => calendarStore.get(index)?.id);
+						if(calIds[0]) {
+							// set default
+							CalendarView.selectedCalendarId = calIds[0];
 						}
 
-						//this.eventStore.load();
-						this.updateView();
 					}
 				}
 			},
-			listeners: {'render': me => { me.store.load() }},
+			listeners: {'render': me => {
+				me.store.on('load', (s,items)=> {
+					const index = s.findIndex(c => c.id == CalendarView.selectedCalendarId);
+					me.rowSelection!.selected = [index>0 ? index : 0];
+					this.inCalendars = items.reduce((obj, item) => ({ ...obj, [item.id]: item.isVisible }), {} as any);
+				});
+
+				me.store.load();
+			}},
 			renderer: (data, row, list, storeIndex) => {
-				if(data.isVisible && list.rowSelection) {
-					list.rowSelection.add(storeIndex);
-				}
+				// if(data.isVisible) {
+				// 	this.inCalendars[storeIndex] = true;
+				// }
 				return [checkbox({
 					color: '#' + data.color,
 					//style: 'padding: 0 8px',
@@ -259,16 +262,23 @@ export class Main extends Component {
 					label: data.name,
 					listeners: {
 						'render': (field) => {
-							field.el.addEventListener("mousedown", (ev) => {
+							field.input.addEventListener("mousedown", (ev) => {
 								ev.stopPropagation(); // stop lists row selector event
 							});
 						},
 						'change': (p, newValue) => {
-							if (newValue) {
-								list.rowSelection!.add(storeIndex);
+							this.inCalendars[data.id] = newValue;
+							const calendarIds = Object.keys(this.inCalendars).filter(key => this.inCalendars[key])
+							if(calendarIds.length) {
+								Object.assign(this.eventStore.queryParams.filter ||= {}, {
+									inCalendars: calendarIds
+								});
 							} else {
-								list.rowSelection!.remove(storeIndex);
+								delete this.eventStore.queryParams.filter?.inCalendars;
 							}
+							// FunctionUtil.buffer(1,() => {
+							 	this.updateView();
+							// })();
 							this.visibleChanges[data.id] = newValue;
 							this.saveSelectionChanges();
 						}
@@ -309,7 +319,7 @@ export class Main extends Component {
 					'selectionchange': (tableRowSelect) => {
 
 						const categoryIds = tableRowSelect.selected.map((index) => categoryStore.get(index)?.id);
-						debugger;
+
 						if(categoryIds.length) {
 							Object.assign(this.eventStore.queryParams.filter ||= {}, {
 								inCategories: categoryIds

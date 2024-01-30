@@ -29,6 +29,10 @@ trait PrincipalTrait {
 		return $this->isModified();
 	}
 
+	protected function isPrincipal() {
+		return true;
+	}
+
 	/**
 	 * Save entity to search cache
 	 *
@@ -38,6 +42,9 @@ trait PrincipalTrait {
 	 */
 	public function savePrincipal(bool $checkExisting = true): bool
 	{
+		if(!$this->isPrincipal()) {
+			return true;
+		}
 		$principal = $checkExisting ?
 			Principal::find()
 				->where('entityTypeId','=', static::entityType()->getId())

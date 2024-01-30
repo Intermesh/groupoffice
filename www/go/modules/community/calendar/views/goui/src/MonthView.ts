@@ -112,7 +112,7 @@ export class MonthView extends CalendarView {
 						start: day.dataset.date!,
 						title: 'New event',
 						duration: 'P1D',
-						calendarId: '2',
+						calendarId: CalendarView.selectedCalendarId,
 						showWithoutTime: true
 					},
 					start = (new DateTime(data.start+' 00:00:00.000')),
@@ -179,7 +179,7 @@ export class MonthView extends CalendarView {
 					i==0 ? E('sub','W '+day.getWeekOfYear()).cls('weeknb')
 						.on('click',e => this.fire('selectweek', this, weekStart))
 						.on('mousedown',e=>e.stopPropagation()):'',
-					E('em',day.format(day.getDate() === 1 ? 'j M' : 'j'))
+					E('em',day.format(day.getDate() === 1 ? 'j M' : 'd'))
 				).attr('data-date', day.format('Y-m-d'))
 				 .cls('today', day.format('Ymd') === now.format('Ymd'))
 				 .cls('past', day.format('Ymd') < now.format('Ymd'))

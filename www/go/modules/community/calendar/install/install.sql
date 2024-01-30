@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
 -- Table `calendar_participant`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_participant` (
-      `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `id` VARCHAR(60) NOT NULL,
       `eventId` INT UNSIGNED NOT NULL,
       `name` VARCHAR(45) NULL,
     `email` VARCHAR(45) NOT NULL,

@@ -37,7 +37,14 @@ class Principal extends EntityController {
 	}
 
 	public function getAvailability($params){
- 		// tpdp
+ 		if(Module::isInstalled('community', 'calendar')) {
+			 return \go\modules\community\calendar\Module::getAvailability(
+				 $params['id'],
+				 $params['start'],
+				 $params['end']
+			 );
+		}
+		 return ['list'=>[]]; // always empty
 	}
 
 }

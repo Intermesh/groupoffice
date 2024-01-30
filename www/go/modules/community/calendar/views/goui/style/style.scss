@@ -2,7 +2,7 @@
 @import '../../../../../../../views/goui/goui/style/_config.scss';
 
 %font-caption {
-	text-transform: uppercase;
+	//text-transform: uppercase;
 	font-weight: 600;
 	//font-size: 1em;
 	color: $colorBorder;
@@ -473,10 +473,108 @@ $halfHour: 3.5vh;
 	}
 }
 
+%avb-box {
+	position:absolute;
+	pointer-events:none;
+	border-radius: $borderRadius;
+	top:dp(8); bottom:dp(8);
+}
+.cal.availability {
+	position:relative;
+	ol {
+		display: flex; height: 4rem;
+		li:first-child {
+			padding: 0 dp(16);
+			width: dp(240);
+			+ li { // hour numbers
+				display:flex;
+				flex:1;
+				justify-content: center;
+				align-items: flex-end;
+				border-bottom: 1px solid $colorLine;
+			}
+		}
+
+	}
+	em {
+		@extend %font-caption;
+		width: 4.166%;  // 100% / 24
+		color:$colorTextSecondary;
+		text-align: center;
+		display:inline-block;
+		padding-top: dp(12);
+		padding-bottom:dp(4);
+	}
+	ul { // free and busy
+		overflow:visible;
+		position:absolute;
+		z-index:1;
+		bottom: 0;
+		top: dp(40);
+		left: dp(240);
+		right:0;
+		li {
+			@extend %avb-box;
+			// free blocks
+			background-color: color-mix(in srgb, var(--c-primary) 10%, transparent);
+			border: 2px dashed $colorPrimary;
+			width: 25%;
+		}
+		li.event { // selection
+			cursor: move;
+			left: -100%;
+			background-color: color-mix(in srgb, var(--c-primary) 60%, transparent);
+			border: 2px solid $colorPrimary;
+		}
+	}
+
+	.goui-avatar {float:left; margin-right: dp(16); }
+	h3,h4{ margin:0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;}
+	dl {
+		background-color: $colorBackgroundDarker;
+		display: flex;
+		min-height: dp(48);
+		position: relative;
+		align-items: stretch;
+		user-select: none;
+	}
+	dt {
+		width: dp(240);
+		padding:dp(16);
+		//border-right: 1px solid $colorBorder;
+		background-color: $colorBackground;
+	}
+	dd { // grid
+		flex:1;
+		position:relative;
+		padding: dp(8) 0;
+		background: linear-gradient(90deg, $colorLine 1px, transparent 1px) repeat-x;
+		background-size: 4.166% 100% ;
+		//border-bottom: 0.3px solid $colorLine;
+		div {
+			@extend %avb-box;
+			background-color: $colorLine;
+			width: 40px;
+			left: 60px;
+		}
+	}
+
+}
+
 .check-list {
 	.control { width: 100%;}
+	label {
+		pointer-events: none;
+		input, .goui-toolbar {pointer-events: all;}
+		input[style]:checked:before {
+			color:white !important;
+		}
+	}
 	li {
 		padding-left: 11px;
+		&.selected {
+			background-color: $colorSelectedRowInactive;
+		}
 	}
 	.goui-form-field .wrap menu.goui-toolbar {
 		border-left:0;
