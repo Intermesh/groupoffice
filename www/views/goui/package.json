@@ -6,6 +6,9 @@
     "typescript": "latest",
     "sass": "latest"
   },
+  "dependencies": {
+    "chart.js": "^4.4.1"
+  },
   "scripts": {
     "test": "mocha",
     "start": "npm run build:clean && npm run build:assets && npm run start:parallel",

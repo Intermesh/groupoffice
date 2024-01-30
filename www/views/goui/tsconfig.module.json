@@ -19,6 +19,20 @@
       "@intermesh/groupoffice-core": [
         "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
         "../../../../../../views/goui/dist/groupoffice-core/script/index.js"
+      ],
+
+      "@intermesh/business/*": [
+        "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
+        "../../../../../../go/modules/business/*/views/goui/dist/Index.js"
+      ],
+
+      "@intermesh/community/*": [
+        "../../../../../../go/modules/community/*/views/goui/dist/Index.d.ts",
+        "../../../../../../go/modules/community/*/views/goui/dist/Index.js"
+      ],
+      "chart.js": [
+        "../../../../../../views/goui/node_modules/chart.js/auto/auto.d.ts",
+        "../../../../../../views/goui/dist/node_modules/chart.js/auto/auto.js"
       ]
     }
   }
