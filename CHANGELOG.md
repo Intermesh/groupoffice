@@ -1,3 +1,5 @@
+- Core: fit password dialog to current layout style
+
 29-01-2024: 6.7.65
 - Core: fix uninstall module
 - Email: Fixed render issue
