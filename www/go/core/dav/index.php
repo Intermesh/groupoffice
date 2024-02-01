@@ -38,7 +38,7 @@ go()->getDebugger()->setRequestId("DAV " . ($_SERVER['REQUEST_METHOD'] ?? ""));
 $principalBackend = new PrincipalBackend();
 /* Initializing server with directory tree */
 $server = new Server([
-	new DAVACL\PrincipalCollection($principalBackend),
+	new go\core\dav\davacl\PrincipalCollection($principalBackend),
 	new CardDAV\AddressBookRoot($principalBackend, new CardDAVBackend()),
 	new CalDAV\CalendarRoot($principalBackend, new CalDAVBackend())
 ]);

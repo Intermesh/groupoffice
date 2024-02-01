@@ -4,17 +4,8 @@
 %font-caption {
 	//text-transform: uppercase;
 	font-weight: 600;
-	//font-size: 1em;
+	font-size: 1.2em;
 	color: $colorBorder;
-	> em { // date number
-		font-style: normal;
-		margin: 0 dp(8);
-		padding: dp(4) 0;
-		display: inline-block;
-		font-size: 1.2em;
-		color: $colorText;
-		//border: 1px solid currentColor;
-	}
 }
 
 %event {
@@ -24,6 +15,7 @@
 	overflow: hidden;
 	box-sizing: border-box;
 	border-radius: $borderRadius;
+	height:dp(28);
 	padding: dp(2) dp(6);
 	text-align: left;
 	user-select: none;
@@ -50,7 +42,7 @@
 		border-style: solid;
 	}
 	&.allday,&.multiday, dd > & {
-		background-color: color-mix(in srgb, currentColor 76%, transparent);
+		background-color: color-mix(in srgb, currentColor 56%, transparent);
 		//background-color:currentcolor;
 		> i, > em {color:$colorTextSecondary;}
 
@@ -88,6 +80,7 @@
 	background-color: $colorBackground;
 	min-height: 560px;
 	height: 100%;
+	overflow-y:auto;
 	display:flex;
 	flex-wrap: wrap;
 	justify-items: center;
@@ -243,15 +236,12 @@
 
 	ul { // header
 		@extend %font-caption;
-		//padding-left: dp(24); // for weeknbs
-		display: flex;;
-		//background-color: color($bg, 'status-bar');
-		height: dp(36);
-
+		display: flex;
+		height: dp(40);
+		align-items: center;
 		> li { //weekdays
-			line-height: dp(40);
-			text-align: center;
-			padding-left: dp(8);
+			text-align: right;
+			padding:0 dp(8);
 			&.current {
 				color: $colorPrimary;
 			}
@@ -357,8 +347,8 @@
 	}
 }
 
-$hourHeight: 7vh;
-$halfHour: 3.5vh;
+$hourHeight: 8vh;
+$halfHour: 4vh;
 
 .cal.week {
 	height:100%;
@@ -367,6 +357,7 @@ $halfHour: 3.5vh;
 	> ul li:first-child { // week-nb & all-day
 		//font-size: .9em;
 		justify-content: center;
+
 		min-height: dp(24);
 		text-align: center;
 		padding-top:dp(4);
@@ -377,17 +368,32 @@ $halfHour: 3.5vh;
 	}
 	> ul { //header + all-day
 		display: flex;
-		padding-right: 14px; // for scrollbar
+		scrollbar-gutter: stable;
+		overflow-y:auto;
+		//padding-right: 14px; // for scrollbar
 		max-height: dp(212); // x all-day events fit
 		border-bottom: 2px solid $colorBorder;
 		&:first-child { // header
+			//min-height: dp(68);
 			> li {
 				@extend %font-caption;
-				padding: dp(4);
+				text-align: center;
+				//padding: dp(4);
+				> em { // date number
+					font-style: normal;
+					margin: 0 auto;
+					padding: dp(8);
+					display: block; // not on mobile.
+					font-size: 1.3em;
+					color: $colorText;
+					//border: 1px solid currentColor;
+				}
 			}
 		}
 		+ ul { // all-day only
 			background-color:var(--bg-base);
+			flex-shrink: 0;
+			min-height:dp(32);
 		}
 
 		.event {
@@ -400,7 +406,7 @@ $halfHour: 3.5vh;
 		overflow-y: scroll;
 		position: relative;
 		display: flex;
-		flex-grow: 1000;
+		flex: 1;
 
 		> dd { // day column
 			position: relative;
@@ -410,6 +416,7 @@ $halfHour: 3.5vh;
 			background: linear-gradient(180deg, $colorLine 1px, transparent 1px) repeat-y;
 			background-size: 100% $hourHeight;
 			border-right: 1px solid $colorBorder;
+			&:last-child { border-right: 0;}
 		}
 		> dt { // time display
 			position: initial;
@@ -447,13 +454,10 @@ $halfHour: 3.5vh;
 		@extend %event;
 	}
 	dl dd > div {
-		left:0;
-		top:0;
 		position: absolute;
-		border-left: 3px solid rgba(0,0,0,.25);
-		border-top: 1px solid rgba(0,0,0,.25);
+		border-left: dp(6) solid currentColor;
 		> em, > span, > i {
-			color: white;
+			color: color-mix(in srgb, currentColor 36%, var(--fg-text));
 		}
 		> span { //time
 			display: inline-block;
@@ -497,7 +501,6 @@ $halfHour: 3.5vh;
 
 	}
 	em {
-		@extend %font-caption;
 		width: 4.166%;  // 100% / 24
 		color:$colorTextSecondary;
 		text-align: center;
@@ -506,7 +509,7 @@ $halfHour: 3.5vh;
 		padding-bottom:dp(4);
 	}
 	ul { // free and busy
-		overflow:visible;
+		overflow:hidden;
 		position:absolute;
 		z-index:1;
 		bottom: 0;
@@ -522,6 +525,7 @@ $halfHour: 3.5vh;
 		}
 		li.event { // selection
 			cursor: move;
+			pointer-events:all;
 			left: -100%;
 			background-color: color-mix(in srgb, var(--c-primary) 60%, transparent);
 			border: 2px solid $colorPrimary;
@@ -601,5 +605,19 @@ $halfHour: 3.5vh;
 	}
 	.goui-form-field .wrap {
 		margin-top: dp(-9);
+	}
+}
+
+@media only screen and (max-width: 845px) {
+	.cal.week > ul:first-child em {
+		display:inline-block !important;
+	}
+	.goui.hbox.tablet-cards > aside.active {
+		position:absolute;
+		inset:0;
+		z-index:1;
+		right: 14vw;
+		background-color: var(--bg-layer);
+		width: dp(280) !important;
 	}
 }

@@ -174,14 +174,15 @@ class ICalendarHelper {
 	 * @return string \Sabre\VObject\Property\ICalendar\Recur $rule
 	 */
 	static private function toRrule($event) {
-		$recurrenceRule = $event->getRecurrenceRule();
+		$recurrenceRule = json_decode($event->recurrenceRule);
 		$rule = [];
 		foreach(self::$ruleMap as $iKey => $jKey) {
 			if(!empty($recurrenceRule->{$jKey})) {
 				$val = $recurrenceRule->{$jKey};
 				if($jKey == 'until') {
 					if(strlen($val) > 10) { // with time
-						$dt = DateTime::createFromFormat('Y-m-d H:i:s', $val, $event->timeZone());
+						$tz = $event->timeZone ? new \DateTimeZone($event->timeZone) : null;;
+						$dt = DateTime::createFromFormat('Y-m-d H:i:s', $val, $tz);
 						$dt->setTimezone(new \DateTimeZone('UTC'));
 						$val = $dt->format('Ymd\THis\Z');
 					} else {
@@ -359,10 +360,9 @@ class ICalendarHelper {
 		return $props;
 	}
 
-	static public function makeRecurrenceIterator(CalendarEvent $event) {
+	static public function makeRecurrenceIterator($event) {
 		return new VObject\Recur\RRuleIterator(self::toRrule($event), $event->start);
 	}
-
 
 	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, $event) {
 		$parts = $rule->getParts();

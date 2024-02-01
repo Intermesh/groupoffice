@@ -4,6 +4,7 @@ namespace go\modules\community\calendar\model;
 
 use go\core\fs\Blob;
 use go\core\model\Acl;
+use go\core\model\User;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\modules\community\tasks\model\TaskList;
@@ -34,6 +35,8 @@ class CalDAVBackend extends AbstractBackend implements
 		$tz = new \GO\Base\VObject\VTimezone(); // same for each?
 		// using logged in user, but should use PrincipalUri
 		$calendars = Calendar::find()->where(['isSubscribed'=>1]);
+		$username = basename($principalUri);
+		$u = User::find(['id'])->where(['username'=>$username])->single();
 		foreach($calendars as $calendar) {
 
 			$uri = preg_replace('/[^\w-]*/', '', (strtolower(str_replace(' ', '-', $calendar->name)))).'-'.$calendar->id;
@@ -49,7 +52,7 @@ class CalDAVBackend extends AbstractBackend implements
 				'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
 				'{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set' => new CalDAV\Xml\Property\SupportedCalendarComponentSet(['VEVENT']),
 				// free when calendar does not belong to the user
-				'{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp' => new CalDAV\Xml\Property\ScheduleCalendarTransp($calendar->isOwned() ? 'opaque' : 'transparent'),
+				'{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp' => new CalDAV\Xml\Property\ScheduleCalendarTransp($calendar->ownerId == $u->id ? 'opaque' : 'transparent'),
 
 				'{http://calendarserver.org/ns/}getctag' => 'GroupOffice/calendar/'.self::VERSION.'/'.$calendar->highestItemModSeq(),
 				//'{http://calendarserver.org/ns/}subscribed-strip-todos' => '0',
@@ -151,7 +154,7 @@ class CalDAVBackend extends AbstractBackend implements
 		$etId = CalendarEvent::entityType()->getId();
 		$events = CalendarEvent::find(['id', 'modifiedAt', 'uid'])
 			->select(['cce.id as id','uid','eventdata.modifiedAt as modified','CONCAT(c.modSeq, "-", cu.modseq) as modseq'])
-			->join('core_change', 'c', 'c.entityId = cce.id AND c.entityTypeId = '.$etId)
+			->join('core_change', 'c', 'c.entityId = cce.id AND c.entityTypeId = '.$etId, 'LEFT')
 			->join('core_change_user', 'cu', 'cu.entityId = cce.id AND cu.userId = 1 AND cu.entityTypeId = '.$etId, 'LEFT')
 			//->join('core_blob', 'b','b.id = veventBlobId', 'LEFT')
 			->where(['calendarId' => $calendarId])

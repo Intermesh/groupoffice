@@ -90,9 +90,15 @@ export class AvailabilityDialog extends Window {
 			if(e.button !== 0) return;
 
 			pxPerSnap = el.offsetWidth / (1440 / SNAP);
-			offset = el.getBoundingClientRect().left;
+			offset = el.getBoundingClientRect().left
+			if(e.target == this.eventEl) {
+				offset += e.offsetX;
+			} else {
+				offset += (this.eventEl.offsetWidth/2)
+			}
 
 			el.on('mousemove', mouseMove);
+			mouseMove(e);
 			window.addEventListener('mouseup', mouseUp);
 		})
 	}
@@ -128,6 +134,7 @@ export class AvailabilityDialog extends Window {
 		// find open spaces that are at least duration< long
 
 		let startM = 0, endM;
+		this.busyPeriods.sort((a,b)=> a.start - b.start);
 		for(const current of this.busyPeriods) {
 			endM = current.start;
 			if(this.durationM <= endM-startM) {

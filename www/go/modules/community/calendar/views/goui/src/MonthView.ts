@@ -48,7 +48,7 @@ export class MonthView extends CalendarView {
 			endMonth.addDays(days);
 		} else { // take full month
 			this.start.setDate(1).setWeekDay(0);
-			endMonth.addMonths(1).setDate(0).setWeekDay(6).addDays(1);
+			endMonth.setDate(1).setWeekDay(0).addDays(6*7);
 			this.days = this.start.diff(endMonth).getTotalDays()!;
 		}
 
@@ -166,7 +166,7 @@ export class MonthView extends CalendarView {
 		this.el.style.height = '100%';
 		this.el.cls(['+cal','+month']);
 		this.el.append(E('ul',...Object.values(DateTime.dayNames).map((name,i) =>
-			E('li',name).cls('current', this.day.format('Ym') == now.format('Ym') && now.getWeekDay() == i)
+			E('li',name.substring(0,2)).cls('current', this.day.format('Ym') == now.format('Ym') && now.getWeekDay() == i)
 		))); // headers
 
 		this.weekRows = [];

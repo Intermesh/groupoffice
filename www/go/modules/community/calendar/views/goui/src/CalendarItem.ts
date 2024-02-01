@@ -310,29 +310,24 @@ export class CalendarItem {
 		} else if(this.isOverride) {
 			this.patchOccurrence(modified, onFinish);
 		} else {
-			const w = win({
+			const isFirstInSerie = this.data.start === this.recurrenceId,
+				w = win({
 					title: t('Do you want to edit a recurring event?'),
 					width:550,
 					modal: true,
 				},comp({cls: 'pad flow'},
 					comp({tagName:'i',cls:'icon',html:'recurring', width:100, style:{fontSize:'3em'}}),
 					comp({html: t('You will be editing a recurring event. Do you want to edit this occurrence only or all future occurrences?'), flex:1}),
-				),tbar({},btn({
+				),tbar({},'->',btn({
 						text: t('This event'),
 						cls:'primary',
 						handler: _b => { this.patchOccurrence(modified, onFinish); w.close(); }
 					}),btn({
-						text: t('This and future events'),
-						disabled: this.data.start === this.recurrenceId,
+						text: t(isFirstInSerie ? 'All events' : 'This and future events'), // save to series
 						handler: _b => {
-							this.patchThisAndFuture(modified, onFinish);
-							w.close();
-						}
-					}),'->',btn({
-						text: t('All events'), // save to series
-						handler: _b => {
-							delete modified.start;
-							const p = eventDS.update(this.data.id, modified);
+							const p = isFirstInSerie ?
+								eventDS.update(this.data.id, modified) :
+								this.patchThisAndFuture(modified);
 							if(onFinish) p.then(onFinish);
 							w.close();
 						}
@@ -370,12 +365,11 @@ export class CalendarItem {
 	/**
 	 * @see  https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-10.html#section-5.5
 	 */
-	private patchThisAndFuture(modified: any, onFinish?: (value: DefaultEntity) => DefaultEntity) {
+	private patchThisAndFuture(modified: any) {
 		//if(!ev.data.participants) { // is not scheduled ( split event)
 		// todo: add first and next relation in relatedTo property as per https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-11.html#name-splitting-an-event
 		const rule = structuredClone(this.data.recurrenceRule);
-		rule.until = this.start.addSeconds(-1).format('Y-m-d');
-		debugger;
+		rule.until = this.start.addDays(-1).format('Y-m-d'); // close current series yesterday
 		eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
 
 		const next = Object.assign({},
@@ -383,11 +377,7 @@ export class CalendarItem {
 			{start: this.recurrenceId!, id:null, uid:null},
 			modified
 		);
-		const p = eventDS.create(next); // create duplicate
-		if(onFinish) p.then(onFinish);
-		//} else {
-		// todo: find all occurrences and create exceptions that match the original until this one, Then change the original
-		//}
+		return eventDS.create(next); // create duplicate
 	}
 
 	private removeFutureEvents() {

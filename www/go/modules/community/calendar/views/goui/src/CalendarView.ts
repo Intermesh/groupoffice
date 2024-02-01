@@ -132,7 +132,7 @@ export abstract class CalendarView extends Component {
 		return 10;
 	}
 
-	protected ROWHEIGHT = 22;
+	protected ROWHEIGHT = 31;
 
 	// for full day view
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
@@ -151,7 +151,7 @@ export abstract class CalendarView extends Component {
 		return {
 			width: (width-.3).toFixed(2)+'%',
 			left : left.toFixed(2)+'%',
-			top: top.toFixed(2)+'px',
+			top: (top/10).toFixed(2)+'rem',
 			color: '#'+e.color
 		};// `color: #${e.color}; width: ${(width-.5).toFixed(2)}%; left:${left.toFixed(2)}%; top:${top.toFixed(2)}px;`;
 	}

@@ -63,7 +63,7 @@ export class Main extends Component {
 
 	constructor() {
 		super();
-		this.cls = 'hbox fit';
+		this.cls = 'hbox fit tablet-cards';
 		this.date = new DateTime();
 
 		jmapds('CalendarEvent');
@@ -101,6 +101,14 @@ export class Main extends Component {
 						style: {width: '100%'},
 						text: t('Create event'),
 						handler: _ => (new EventDialog()).show()
+					}),
+					btn({
+						cls: "for-medium-device",
+						title: t("Close"),
+						icon: "close",
+						handler: (button, ev) => {
+							this.west.el.cls('-active');
+						}
 					})
 				),
 				this.picker = datepicker({
@@ -171,17 +179,28 @@ export class Main extends Component {
 				stateId: "calendar-splitter-west",
 				resizeComponentPredicate: this.west
 			}),
-			comp({cls: 'vbox', flex: 1},
+			comp({cls: 'vbox active', flex: 1},
 				tbar({},
-
+					btn({cls: "for-medium-device", icon: "menu", handler: _ => {
+						this.west.el.cls('!active');
+					}}),
 					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px'}}),
 					//'->',
-					this.cardMenu = comp({cls: 'group', flex:'0 0 auto'},
+					this.cardMenu = comp({cls: 'group not-medium-device', flex:'0 0 auto'},
 						btn({icon: 'view_day', text: t('Day'), handler: b => this.routeTo('day', this.date)}),
 						btn({icon: 'view_week', text: t('Week'), handler: b => this.routeTo('week', this.date)}),
 						btn({icon: 'view_module', text: t('Month'), handler: b => this.routeTo('month', this.date)}),
 						btn({icon: 'view_module', text: t('Year'), handler: b => this.routeTo('year', this.date)}),
 						btn({icon: 'call_split', text: t('Split'), handler: b => this.setView('split')}),
+					),
+					btn({icon:'view_agenda',cls: 'for-medium-device', flex:'0 0 auto', menu:menu({},
+						btn({icon: 'view_day', text: t('Day'), handler: b => this.routeTo('day', this.date)}),
+						btn({icon: 'view_week', text: t('Week'), handler: b => this.routeTo('week', this.date)}),
+						btn({icon: 'view_module', text: t('Month'), handler: b => this.routeTo('month', this.date)}),
+						btn({icon: 'view_module', text: t('Year'), handler: b => this.routeTo('year', this.date)}),
+						btn({icon: 'call_split', text: t('Split'), handler: b => this.setView('split')}),
+					)},
+
 					),
 					//'->',
 					// comp({cls:'group'},
@@ -198,18 +217,18 @@ export class Main extends Component {
 						}),
 						btn({icon: 'keyboard_arrow_right', title: t('Next'), allowFastClick:true, handler: b => this.forward()}),
 					),
-					btn({
-						icon: 'print', menu: menu({expandLeft: true},
-							btn({icon: 'print', text: t('Print current view')}),
-							btn({icon: 'print', text: t('Print count per category')}),
-							//'-',
-							btn({icon: 'view_day', text: t('Day')}),
-							btn({icon: 'view_week', text: t('Week')}),
-							btn({icon: 'view_module', text: t('Month')})
-						)
-					}),
-					btn({icon:'more_vert', menu:menu({},
+					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({expandLeft: true},
 						btn({icon:'video_call',text:'Video meeting', handler: _ => {(new Settings()).show()}}),
+						btn({
+							icon: 'print', text:t('Print'), menu: menu({expandLeft: true},
+								btn({icon: 'print', text: t('Print current view')}),
+								btn({icon: 'print', text: t('Print count per category')}),
+								//'-',
+								btn({icon: 'view_day', text: t('Day')}),
+								btn({icon: 'view_week', text: t('Week')}),
+								btn({icon: 'view_module', text: t('Month')})
+							)
+						}),
 						btn({icon:'meeting_room', text:t('Resources'), handler: _ => {(new ResourcePanel()).show()}})
 					)})
 				),

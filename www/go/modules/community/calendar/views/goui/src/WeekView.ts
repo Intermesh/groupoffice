@@ -64,7 +64,7 @@ export class WeekView extends CalendarView {
 
 	private makeDraggable() {
 
-		const SNAP = 30; // minutes
+		const SNAP = 5; // minutes
 
 		let ev: CalendarDayItem,
 			changed: boolean,
@@ -117,7 +117,6 @@ export class WeekView extends CalendarView {
 		},
 		mouseUp = (e:MouseEvent) => {
 			this.el.un('mousemove', mouseMove);
-
 			changed && ev.save(() => {
 				this.dayItems.shift()
 				this.updateItems();
@@ -198,7 +197,6 @@ export class WeekView extends CalendarView {
 
 		this.viewModel = allDay.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
 		this.dayItems = withTime.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
-
 		this.updateFullDayItems();
 		this.updateItems();
 	}
@@ -218,7 +216,7 @@ export class WeekView extends CalendarView {
 		this.dayCols = {};
 		for (var i = 0; i < this.days; i++) {
 
-			heads.push(E('li',E('em',day.getDate()), day.format('l'))
+			heads.push(E('li',day.format('D'),E('em',day.getDate()))
 				.cls('past', day.format('Ymd') < now.format('Ymd'))
 				.cls('today', day.format('Ymd') === now.format('Ymd'))
 			);
@@ -231,9 +229,12 @@ export class WeekView extends CalendarView {
 			day.addDays(1); it=0;
 		}
 		if(showNowBar) {
-			const top = 24 * 7 / (60 * 24) * now.getMinuteOfDay(), // 1296 = TOTAL HEIGHT of DAY
+			const top = 7 / 60 * now.getMinuteOfDay(), // 1296 = TOTAL HEIGHT of DAY
 				left = 100 / this.days * (now.getWeekDay() - this.day.getWeekDay());
-			nowbar = E('div', E('hr'), E('b').attr('style', `left: ${left}%;`), E('span', now.format('G:i'))).cls('now').attr('style', `top:${top}vh;`)
+			nowbar = E('div', E('hr'),
+				E('b').attr('style', `left: ${left}%;`),
+				E('span', now.format('G:i'))
+			).cls('now').attr('style', `top:${top}vh;`)
 		}
 		let ol: HTMLElement;
 
@@ -252,7 +253,7 @@ export class WeekView extends CalendarView {
 			super.eventHtml(e).css(this.makestyle(e, this.day))
 		));
 		var lengths = Object.values(this.slots).map((i: any) => Object.keys(i).length);
-		this.alldayCtr.style.height = (Math.max(...lengths) * this.ROWHEIGHT)+'px';
+		this.alldayCtr.parentElement!.style.height = ((Math.max(...lengths,1) * this.ROWHEIGHT)/10)+'rem';
 	}
 
 	private updateItems(day?: DateTime) {
