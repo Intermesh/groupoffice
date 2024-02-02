@@ -1,5 +1,6 @@
 - Core: GOUI version updated to solve Help module not appearing
 - Don't recreate tasklist, calendar, address books etc. for disabled/archived users
+- Core: Colorfield didn't submit manually entered hex values anymore
 
 29-01-2024: 6.8.32
 - Contracts: New option to bill in arrears
