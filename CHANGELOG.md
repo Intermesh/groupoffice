@@ -1,4 +1,5 @@
 - Core: GOUI version updated to solve Help module not appearing
+- Don't recreate tasklist, calendar, address books etc. for disabled/archived users
 
 29-01-2024: 6.8.32
 - Contracts: New option to bill in arrears
