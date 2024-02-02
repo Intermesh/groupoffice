@@ -57,9 +57,13 @@ class UserSettings extends Property {
 		if(AddresBookModuleSettings::get()->createPersonalAddressBooks){
 			$addressBook = AddressBook::find()->where('createdBy', '=', $this->userId)->single();
 			if(!$addressBook) {
+				$user = User::findById($this->userId, ['displayName', 'enabled']);
+				if(!$user->enabled) {
+					return null;
+				}
 				$addressBook = new AddressBook();
 				$addressBook->createdBy = $this->userId;
-				$addressBook->name = User::findById($this->userId, ['displayName'])->displayName;
+				$addressBook->name = $user->displayName;
 				if(!$addressBook->save()) {
 					throw new SaveException($addressBook);
 				}

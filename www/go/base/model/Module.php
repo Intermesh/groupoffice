@@ -313,7 +313,9 @@ class Module extends \GO\Base\Db\ActiveRecord {
 			(new \GO\Base\Db\FindParams())
 				->join('core_user_group', 'u.id = ug.userId', 'ug')
 				->join('core_permission', 'p.groupId = ug.groupId', 'ug')
-				->getCriteria()->addRawCondition('p.moduleId = '.$this->id)
+				->getCriteria()
+				->addRawCondition('p.moduleId = '.$this->id)
+				->addCondition('u.enabled', '=', true)
 			);
 		
 
