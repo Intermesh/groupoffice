@@ -222,7 +222,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 				hex = null;
 			}
 			
-			this.curColor = hex;
+			this.value = hex;
 
 			this.dot.style.backgroundColor = hex ? '#' + hex : "transparent";
 
@@ -290,10 +290,11 @@ GO.form.ColorField =  Ext.extend(function(config){
 			}
 		}
 		let color = this.getValue();
+
+		this.menu.show(this.el, "tl-bl");
 		if(!go.util.empty(color)) {
 			this.menu.palette.select(color, true);
 		}
-		this.menu.show(this.el, "tl-bl");
 	}
 });
 
