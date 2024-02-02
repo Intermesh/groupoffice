@@ -14,11 +14,6 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 		this.addFolderButton.setDisabled(node.attributes.noinferiors);
 		
 		this.shareBtn.setVisible(this.hasAcl(node));
-
-	//		if (GO.settings.modules.email.write_permission) {
-	//			var node_id_type = node.attributes.id.substring(0,6);
-	//			this.items.get(5).setDisabled(node_id_type!='folder');
-	//		}
 	},
 	initComponent : function(){
 		
@@ -86,23 +81,6 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 								success: function(options, response, result)
 								{
 									this.treePanel.refresh(node.parentNode);
-									
-										//remove preloaded children otherwise it won't request the server
-//										delete node.parentNode.attributes.children;
-//
-//										var updateFolderName = function(){
-//											var node = this.treePanel.getNodeById('folder_'+this.folder_id);
-//											if(node){
-//												if(this.folder_id==node.attributes.folder_id){
-//													this.mailbox = node.attributes.mailbox;
-//													this.treePanel.getSelectionModel().select(node);
-//												}
-//											}
-//											this.el.unmask();
-//										}
-//										node.parentNode.reload(updateFolderName.createDelegate(this));
-										
-									
 								},
 								fail : function(response, options, result){
 									Ext.Msg.alert(t("Error"), result.feedback);
@@ -116,7 +94,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			},
 			scope:this
 		}),'-',	new Ext.menu.Item({
-//			iconCls: 'btn-delete',
+			iconCls: 'ic-check',
 			text:t("Mark as read", "email"),
 			cls: 'x-btn-text-icon',
 			scope:this,
@@ -190,7 +168,6 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 								}
 								GO.mainLayout.getModulePanel("email").updateFolderStatus(node.attributes.mailbox, 0);
 								this.treePanel.mainPanel.refresh(true);
-//								GO.mainLayout.getModulePanel("email").updateNotificationEl();
 							},
 							scope: this
 						});
@@ -294,8 +271,6 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 		}
 		
 		GO.email.MailboxContextMenu.superclass.initComponent.call(this);
-		
-
 	}
 }
 );
