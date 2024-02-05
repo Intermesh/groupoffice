@@ -2,6 +2,12 @@
 - Email: add icon to mailbox context menu
 - Tickets: Resize ticket dialog to new paper theme
 - Email: fix sorting problem for templates
+- Finance: Business module is available if you have the billing license only now
+- Billing: Fixed Customer report export
+- Holidays: Fixed difference in number in list and year info details
+- Holidays: Fixed missing years in selection
+- Holidays: Fixed bug where holiday credit was off when no end date was set
+- Core: $config['checkForUpdates'] added to disable update check
 
 29-01-2024: 6.7.65
 - Core: fix uninstall module
