@@ -1,3 +1,4 @@
+05-02-2023: 6.8.33
 - Core: GOUI version updated to solve Help module not appearing
 - Don't recreate tasklist, calendar, address books etc. for disabled/archived users
 - Core: Colorfield didn't submit manually entered hex values anymore
