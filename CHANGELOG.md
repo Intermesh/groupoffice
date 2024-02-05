@@ -2,6 +2,7 @@
 - Don't recreate tasklist, calendar, address books etc. for disabled/archived users
 - Core: Colorfield didn't submit manually entered hex values anymore
 - Finance: Business module is available if you have the billing license only now
+- Billing: Fixed Customer report export
 
 29-01-2024: 6.8.32
 - Contracts: New option to bill in arrears
