@@ -414,7 +414,7 @@ GO.email.EmailComposer = function(config) {
 				fields: ['id', 'name', 'group', 'text','template_id','checked','group_name', 'group_id'],
 			}),
 			groupField:'group_id',
-			remoteSort : true,
+			remoteSort : false,
 			remoteGroup:true
 		});
 		
@@ -516,8 +516,6 @@ GO.email.EmailComposer = function(config) {
 									template_id: "default_for_account"
 								});
 
-								
-								
 								this.fireEvent('load', this, records);
 								this.loaded = true;
 							}
@@ -547,11 +545,6 @@ GO.email.EmailComposer = function(config) {
 								var fromComboValue = this.fromCombo.getValue();
 								this.fromCombo.store.load();
 								this.fromCombo.setValue(fromComboValue);
-								
-								
-								
-								
-								
 							},
 							scope : this
 						}),

@@ -34,7 +34,8 @@ GO.email.TemplateGridPanel = Ext.extend(GO.grid.GridPanel,{
 				columns:[
 				{ 
 					header: 'name', 
-					dataIndex: 'text' 
+					dataIndex: 'text',
+					sortIndex: 'name'
 				},{
 					header: t('Group'),
 					dataIndex: 'group_id',
