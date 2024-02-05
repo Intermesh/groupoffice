@@ -8,6 +8,7 @@
 - Holidays: Fixed missing years in selection
 - Holidays: Fixed bug where holiday credit was off when no end date was set
 - Core: $config['checkForUpdates'] added to disable update check
+- Core: fix exception when trying to filter empty date range
 
 29-01-2024: 6.7.65
 - Core: fix uninstall module

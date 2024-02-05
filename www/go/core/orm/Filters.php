@@ -401,7 +401,7 @@ class Filters {
 	private function checkDateRange($value, bool $convertTimezone = true) {
 		//Operators >, <, =, !=,
 		//Range ..
-
+		$value = $value ?? "";
 		$parts = array_map('trim', explode('..', $value));
 		if(count($parts) > 2) {
 			throw new Exception("Invalid range. Only one .. allowed");
