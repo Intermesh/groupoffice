@@ -3,6 +3,7 @@
 - Core: Colorfield didn't submit manually entered hex values anymore
 - Finance: Business module is available if you have the billing license only now
 - Billing: Fixed Customer report export
+- Holidays: Fixed difference in number in list and year info details
 
 29-01-2024: 6.8.32
 - Contracts: New option to bill in arrears
