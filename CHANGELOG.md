@@ -10,6 +10,7 @@
 - Core / Finance: Fixed template condition on numbers starting with a 0.
 - Finance: Detect invoice number from payment import in csv and excel as well.
 - Finance: Also use amount paid to match documents when customer is found based on bank number
+- Files: Normalize UTF8 Form C folder name when uploading folders
 
 29-01-2024: 6.8.32
 - Contracts: New option to bill in arrears
