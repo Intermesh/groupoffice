@@ -491,22 +491,6 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		return $this->_parse($content, $attributes, $leaveEmptyTags);
 	}
 
-//	/**
-//	 * @return \GO\Email\Model\SavedMessage
-//	 */
-//	private function _getMessage(){
-//		if(!isset($this->_message)){
-//			
-//			//todo getFromMimeData
-//			$this->_message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($this->content);
-//
-//		}
-//		return $this->_message;
-//	}
-//	protected function getBody(){
-//		return $this->_getMessage()->getHtmlBody();
-//	}
-	
 	
 	/**
 	 * Replace the {link} tag with a div
