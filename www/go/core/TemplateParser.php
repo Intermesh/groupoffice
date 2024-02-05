@@ -962,9 +962,10 @@ class TemplateParser {
 			if($part == "") {
 				continue;
 			}
-			
+
+
 			if(
-							is_numeric($part) ||
+							(is_numeric($part) && substr($part, 0, 1) != "0") ||
 							$part == 'true' ||
 							$part == 'false' ||
 							$part == 'null' ||
