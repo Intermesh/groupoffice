@@ -732,19 +732,19 @@ th {
 	/**
    * @inheritDoc
    */
-	protected function importEntity() {
+	protected function importEntity() : ?Entity {
 
 		if(!isset($this->clientParams['mapping'])) {
 			throw new Exception("Mapping is required");
 		}
 		
 		if($this->recordIsEmpty($this->record)) {
-			return false;
+			return null;
 		}
 
 		$values = $this->convertRecordToProperties($this->record, $this->clientParams['mapping'], $this->getEntityMapping());
 		if(!$values) {
-			return false;
+			return null;
 		}
 
 		$entity = $this->createEntity($values);
@@ -760,7 +760,7 @@ th {
 		return $entity;
 	}
 
-	protected function createEntity( $values) {
+	protected function createEntity( $values) : Entity {
 
 		$entityClass = $this->entityClass;
 

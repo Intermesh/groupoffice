@@ -42,7 +42,7 @@ class Spreadsheet extends convert\Spreadsheet {
 	 *
 	 * @inheritDoc
 	 */
-	protected function importEntity()
+	protected function importEntity(): ?Entity
 	{
 		$contact = parent::importEntity();
 
@@ -53,7 +53,7 @@ class Spreadsheet extends convert\Spreadsheet {
 		return $contact->isOrganization == $this->organizations ? $contact : false;
 	}
 
-	protected function createEntity($values)
+	protected function createEntity($values) : Entity
 	{
 		if(isset($this->clientParams['values'])) {
 			$values = array_merge($values, $this->clientParams['values']);

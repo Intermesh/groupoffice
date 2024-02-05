@@ -1030,7 +1030,7 @@ END;
 	 * @access public
 	 * @return string
 	 */
-	public static function localize(?int $number = null, int $decimals = 2): string
+	public static function localizeNumber(?int $number = null, int $decimals = 2): string
 	{
 		if ($number === null) {
 			return "";
@@ -1050,7 +1050,7 @@ END;
 	 * @access public
 	 * @return float|null|bool
 	 */
-	public static function unlocalize(string $number = "")
+	public static function unlocalizeNumber(string $number = "")
 	{
 		if ($number == "") {
 			return null;
@@ -1058,7 +1058,7 @@ END;
 		$user = go()->getAuthState()->getUser(['thousandsSeparator', 'decimalSeparator']);
 
 		$ts = $user ? $user->thousandsSeparator : go()->getConfig()['default_thousands_separator'];
-		$ds = $user ? $user->decimalSeparator : GO()->getConfig()['default_decimal_separator'];
+		$ds = $user ? $user->decimalSeparator : go()->getConfig()['default_decimal_separator'];
 		$number = str_replace($ts, '', $number);
 		$number = str_replace($ds, '.', $number);
 
