@@ -1,5 +1,6 @@
 - Core: fit password dialog to current layout style
 - Email: add icon to mailbox context menu
+- Tickets: Resize ticket dialog to new paper theme
 
 29-01-2024: 6.7.65
 - Core: fix uninstall module
