@@ -8,6 +8,8 @@
 - Holidays: Fixed bug where holiday credit was off when no end date was set
 - Core: $config['checkForUpdates'] added to disable update check
 - Core / Finance: Fixed template condition on numbers starting with a 0.
+- Finance: Detect invoice number from payment import in csv and excel as well.
+- Finance: Also use amount paid to match documents when customer is found based on bank number
 
 29-01-2024: 6.8.32
 - Contracts: New option to bill in arrears
