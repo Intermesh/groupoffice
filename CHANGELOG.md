@@ -6,6 +6,7 @@
 - Holidays: Fixed difference in number in list and year info details
 - Holidays: Fixed missing years in selection
 - Holidays: Fixed bug where holiday credit was off when no end date was set
+- Core: $config['checkForUpdates'] added to disable update check
 
 29-01-2024: 6.8.32
 - Contracts: New option to bill in arrears
