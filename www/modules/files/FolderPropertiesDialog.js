@@ -134,13 +134,12 @@ GO.files.FolderPropertiesDialog = function(config){
 	});
 	
 	go.customfields.CustomFields.getFormFieldSets("Folder").forEach(function(fs) {
-		//console.log(fs);
 		if(fs.fieldSet.isTab) {
 			fs.title = null;
 			fs.collapsible = false;
 			var pnl = new Ext.Panel({
 				autoScroll: true,
-				hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+				hideMode: 'offsets', //Otherwise some form elements like date pickers render incorrectly.
 				title: fs.fieldSet.name,
 				items: [fs]
 			});
@@ -151,52 +150,7 @@ GO.files.FolderPropertiesDialog = function(config){
 		}
 	}, this);
 
-//	if(go.Modules.isAvailable("core", "customfields")){
-//		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
-//		
-//		this.recursivePanel = new Ext.Panel({
-//			region:'south',
-//			items: [
-//				{
-//					xtype: 'button',
-//					name: 'recursiveApplyCustomFieldCategories',
-//					text: 'Apply',
-//					listeners: {
-//						click: function() {
-//							this.formPanel.baseParams.recursiveApplyCustomFieldCategories = true;
-//							this.save();
-//							//this.formPanel.baseParams.recursiveApplyCustomFieldCategories = false;
-//						},
-//						scope:this
-//					}
-//				},{
-//					type:'displayfield',
-//					html: t("Apply these custom field settings to current folder and it's sub folders recursively", "files")
-//				}
-//			]
-//		});
-//
-//		this.disableCategoriesPanel.add(this.recursivePanel);
-//		
-//		
-//		this.tabPanel.add(this.disableCategoriesPanel);
-//		
-//		
-//		if(GO.customfields && GO.customfields.types["GO\\Files\\Model\\Folder"])
-//		{
-//			for(var i=0;i<GO.customfields.types["GO\\Files\\Model\\Folder"].panels.length;i++)
-//			{
-//				this.tabPanel.add(GO.customfields.types["GO\\Files\\Model\\Folder"].panels[i]);
-//			}
-//		}
-//	}
 
-//	if(go.Modules.isAvailable("legacy", "workflow"))
-//	{
-//		this.workflowPanel = new GO.workflow.FolderPropertiesPanel();
-//		this.tabPanel.insert(2,this.workflowPanel);
-//	}
-		
 	this.formPanel = new Ext.form.FormPanel(
 	{
 		waitMsgTarget:true,
@@ -241,8 +195,6 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 	parent_id : 0,
 	show : function(folder_id)
 	{
-		//this.folder_id = folder_id;
-		
 		this.setFolderId(folder_id);
 		
 		this.notifyCheckBox.removeListener('check',this.onNotifyChecked,this);
@@ -271,9 +223,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 				this.setPermission(action.result.data.is_someones_home_dir, action.result.data.permission_level, action.result.data.readonly);
 
 				this.tabPanel.setActiveTab(0);
-//				if(go.Modules.isAvailable("core", "customfields"))
-//					this.disableCategoriesPanel.setModel(folder_id,"GO\\Files\\model\\File");
-				
+
 				this.notifyCheckBox.addListener('check',this.onNotifyChecked,this);
 				
 				GO.dialog.TabbedFormDialog.prototype.setRemoteComboTexts.call(this, action);

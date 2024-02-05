@@ -47,9 +47,9 @@ GO.dialog.PasswordDialog = function(config){
 	//var logo = Ext.getBody().createChild({tag: 'div', cls: 'go-app-logo'});
 	
 	GO.dialog.PasswordDialog.superclass.constructor.call(this, {
-		layout: 'fit',				
-		width:400,
-		height:140,
+		layout: 'fit',
+		width: 640,
+		height: 180,
 		resizable: false,
 		modal:true,
 		closeAction:'hide',

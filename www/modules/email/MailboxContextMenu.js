@@ -14,11 +14,6 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 		this.addFolderButton.setDisabled(node.attributes.noinferiors);
 		
 		this.shareBtn.setVisible(this.hasAcl(node));
-
-	//		if (GO.settings.modules.email.write_permission) {
-	//			var node_id_type = node.attributes.id.substring(0,6);
-	//			this.items.get(5).setDisabled(node_id_type!='folder');
-	//		}
 	},
 	initComponent : function(){
 		
@@ -173,7 +168,6 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 								}
 								GO.mainLayout.getModulePanel("email").updateFolderStatus(node.attributes.mailbox, 0);
 								this.treePanel.mainPanel.refresh(true);
-//								GO.mainLayout.getModulePanel("email").updateNotificationEl();
 							},
 							scope: this
 						});
@@ -277,8 +271,6 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 		}
 		
 		GO.email.MailboxContextMenu.superclass.initComponent.call(this);
-		
-
 	}
 }
 );

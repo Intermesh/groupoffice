@@ -243,6 +243,20 @@
 
 -- 6.8 --
 
+- Core: fit password dialog to current layout style
+- Email: add icon to mailbox context menu
+- Tickets: Resize ticket dialog to new paper theme
+- Finance: Business module is available if you have the billing license only now
+- Billing: Fixed Customer report export
+- Holidays: Fixed difference in number in list and year info details
+- Holidays: Fixed missing years in selection
+- Holidays: Fixed bug where holiday credit was off when no end date was set
+- Core: $config['checkForUpdates'] added to disable update check
+
+29-01-2024: 6.7.65
+- Core: fix uninstall module
+- Email: Fixed render issue
+
 22-01-2024: 6.7.64
 
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
