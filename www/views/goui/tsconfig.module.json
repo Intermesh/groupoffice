@@ -9,7 +9,6 @@
     "esModuleInterop": true,
     "outDir": "./dist", //set this in the extended
     "baseUrl": ".", //set this in the extended too
-
     "paths": {
       "@intermesh/goui": [
         "../../../../../../views/goui/dist/goui/script/index.d.ts",
