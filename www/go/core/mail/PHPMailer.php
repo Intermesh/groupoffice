@@ -185,7 +185,7 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 		file_put_contents($file, $this->MIMEHeader . static::$LE . static::$LE . $this->MIMEBody);
 
 		//Workaround for PHP bug https://bugs.php.net/bug.php?id=69197
-		if (empty($this->sign_extracerts_file)) {
+		if (empty($this->smimeExtraCertsFile)) {
 			$sign = @openssl_pkcs7_sign(
 				$file,
 				$signed,
