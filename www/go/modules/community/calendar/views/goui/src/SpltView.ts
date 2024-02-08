@@ -8,22 +8,23 @@ export class SplitView extends CalendarView {
 	start!: DateTime
 	calRows: [string, HTMLElement][] = []
 	calViewModel : {[calId:string]: CalendarItem[]} = {}
-	baseCls = 'cal split month'
+	baseCls = 'cal split'
 
 	goto(day: DateTime, amount: number) {
 		if(!day) {
 			day = new DateTime();
 		}
-		if(day.format('Ymd') === this.day.format('Ymd') && this.days === amount)
-			return;
+
 
 		this.days = amount;
 		this.day = day.setHours(0,0,0,0);
 		this.start = this.day.clone().setWeekDay(0);
+		const end = this.start.clone().addDays(amount);
 
-		this.renderView();
+
 		// TODO : load store instead.
-		this.populateViewModel();
+		this.adapter.goto(this.start, end);
+
 		//this.store.filter('date', {after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00')}).fetch(0,500);
 
 
@@ -44,8 +45,9 @@ export class SplitView extends CalendarView {
 		for (let calendar of calendarStore) {
 			this.calViewModel[calendar.id] = [];
 		}
-		for (const e of this.store.items) {
-			this.calViewModel[e.calendarId].push(...CalendarItem.expand(e, this.start, viewEnd));
+		for (const e of this.adapter.items()) {
+			if(e.data.calendarId)
+				this.calViewModel[e.data.calendarId].push(e);
 		}
 		for(let calId in this.calViewModel) {
 			this.calViewModel[calId].sort((a,b) => a.start.date < b.start.date ? -1 : 1);
@@ -65,7 +67,7 @@ export class SplitView extends CalendarView {
 		const headDay = this.start.clone();
 		const headers=[];
 		for (i = 0; i < this.days; i++) {
-			headers.push(E('li', headDay.format(headDay.getDate() === 1 ? 'D j M' : 'D j')).cls('current', headDay.format('Ymd') == now.format('Ymd')));
+			headers.push(E('li', headDay.format('D'), E('em', headDay.format('j'))).cls('today', headDay.format('Ymd') == now.format('Ymd')));
 			headDay.addDays(1);
 		}
 		this.el.append(E('ul',E('li',t('Calendar')), ...headers)); // headers
@@ -75,8 +77,8 @@ export class SplitView extends CalendarView {
 			day = this.start.clone();
 			const eventContainer = E('li', ...this.drawCal(calendar.id)).cls('events'),
 				row = E('ol',
-					E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name),
-					eventContainer
+					eventContainer,
+					E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name)
 				);
 			for (i = 0; i < this.days; i++) {
 				row.append(E('li').attr('data-date', day.format('Y-m-d'))

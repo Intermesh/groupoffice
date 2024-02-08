@@ -18,6 +18,8 @@ return [
 	'Organizer' => 'Organisator',
 	'Categories' => 'Categorieën',
 	'Calendars' => 'Agenda\'s',
+	'New event' => 'Nieuwe afspraak',
+	'Full day' => 'Hele dag',
 	// schedule massages
 	'newScheduleTitle' => 'Wil je de deelnemers uitnodigen?',
 	'newScheduleText' => 'Je maakt een activiteit met deelnemers. Wanneer je deze opslaat zal een uitnodiging worden verstuurd om hen hiervan op de hoogte te brengen.',

@@ -2,15 +2,15 @@ import {
 	autocompletechips,
 	browser,
 	btn, Button,
-	checkbox, CheckboxField, checkboxselectcolumn, chips,
+	checkbox, CheckboxField, checkboxselectcolumn,
 	column,
-	comp, ContainerField, containerfield,
+	comp, containerfield,
 	DataSourceForm,
 	datasourceform, datasourcestore,
 	DateField,
 	datefield, DateInterval,
-	DateTime, displayfield,
-	Format, hr, MapField, mapfield, menu, Notifier, numberfield,
+	DateTime,
+	Format, MapField, mapfield, Notifier, numberfield,
 	radio,
 	recurrencefield,
 	select,
@@ -26,7 +26,7 @@ import {
 } from "@intermesh/goui";
 import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {calendarStore, categoryStore} from "./Index.js";
-import {ParticipantField, participantfield} from "./ParticipantField.js";
+import {participantfield} from "./ParticipantField.js";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {AvailabilityDialog} from "./AvailabilityDialog.js";
@@ -56,6 +56,8 @@ export class EventDialog extends Window {
 	private titleField: TextField
 	constructor() {
 		super();
+
+		const m = go.Modules.get('community','calendar');
 		this.title = t('New Event');
 		this.width = 440;
 		this.height = 820;
@@ -112,7 +114,9 @@ export class EventDialog extends Window {
 				}
 			}),
 			textfield({name: 'location',flex:1, label:t('Location')}),
-			btn({icon:'video_call', cls:'filled', width:50, handler(btn) { (btn.previousSibling() as TextField)!.value = 'link'}}),
+			btn({icon:'video_call', hidden: !m.settings.videoUri, cls:'filled', width:50, handler: async (btn) => {
+					(btn.previousSibling() as TextField)!.value = await this.createVideoLink(m.settings);
+			}}),
 			this.withoutTimeToggle = checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'),
 				listeners: {'setvalue':(_, checked) => {
 					alertField.fullDay = checked;
@@ -214,6 +218,25 @@ export class EventDialog extends Window {
 			this.submitBtn = btn({text:t('Save'), cls:'primary',handler: _ => this.submit()})
 		));
 
+	}
+
+	private b64UrlEncode(data:string) {
+		const base64 = btoa(data);
+		return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+	}
+
+	private async createVideoLink(s: any) {
+		const room = this.b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));
+		if(!s.videoJwtEnabled) {
+			return s.videoUri+room;
+		}
+		const id = s.videoJwtAppId,
+			head= this.b64UrlEncode(JSON.stringify({alg: 'HS256', typ: 'JWT'})),
+			load = this.b64UrlEncode(JSON.stringify({aud: id, iss: id, room})),
+			key = await crypto.subtle.importKey('raw', (new TextEncoder()).encode(s.videoJwtSecret),
+				{ name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
+			sign = await window.crypto.subtle.sign("HMAC", key, (new TextEncoder()).encode(`${head}.${load}`));
+		return  s.videoUri+room+'?jwt='+`${head}.${load}.${this.b64UrlEncode(String.fromCharCode(...new Uint8Array(sign)))}`;
 	}
 
 	private openExceptionsDialog() {

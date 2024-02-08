@@ -11,7 +11,7 @@ import {
 	DatePicker,
 	datepicker,
 	DateTime,
-	FunctionUtil, List,
+	FunctionUtil, hr, List,
 	list,
 	menu, router,
 	splitter,
@@ -28,13 +28,14 @@ import {SplitView} from "./SpltView.js";
 import {SubscribeWindow} from "./SubscribeWindow.js";
 import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
-import {CalendarEvent} from "./CalendarItem.js";
+import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {CategoryDialog} from "./CategoryDialog.js";
 import {Settings} from "./Settings.js";
 import {ResourcePanel} from "./ResourcesPanel.js";
+import {CalendarAdapter} from "./CalendarAdapter.js";
+import {ListView} from "./ListView.js";
 
-type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year';
-type ValidView = 'split' | 'merge';
+type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 
 export class Main extends Component {
 
@@ -49,12 +50,12 @@ export class Main extends Component {
 	date: DateTime
 
 	timeSpan: ValidTimeSpan = 'month'
-	viewType: ValidView = 'merge'
 
 	picker: DatePicker
 	spanAmount?: number = 31 // 2-7, 14, 21, 28
 
-	eventStore: DataSourceStore<JmapDataSource<CalendarEvent>>
+	//eventStore: DataSourceStore<JmapDataSource<CalendarEvent>>
+	private adapter = new CalendarAdapter()
 
 	private calendarList: List
 	private categoryList: List
@@ -66,19 +67,23 @@ export class Main extends Component {
 		this.cls = 'hbox fit tablet-cards';
 		this.date = new DateTime();
 
-		jmapds('CalendarEvent');
-		this.eventStore = datasourcestore({
-			dataSource:jmapds('CalendarEvent'),
-			listeners: {
-				'load': () => { (this.cards.items.get(this.cards.activeItem) as CalendarView)!.update() }
-			}
-			//properties: ['title', 'start','duration','calendarId','showWithoutTime','alerts','recurrenceRule','id'],
-		});
+		// jmapds('CalendarEvent');
+		// this.eventStore = datasourcestore({
+		// 	dataSource:jmapds('CalendarEvent'),
+		// 	listeners: {
+		// 		'load': () => { (this.cards.items.get(this.cards.activeItem) as CalendarView)!.update() }
+		// 	}
+		// 	//properties: ['title', 'start','duration','calendarId','showWithoutTime','alerts','recurrenceRule','id'],
+		// });
 
-		const weekView= new WeekView(this.eventStore),
-			monthView = new MonthView(this.eventStore),
-			yearView = new YearView(this.eventStore),
-			splitView = new SplitView(this.eventStore);
+		this.adapter.onLoad = () => { (this.cards.items.get(this.cards.activeItem) as CalendarView)!.update() };
+
+		const weekView= new WeekView(this.adapter),
+			monthView = new MonthView(this.adapter),
+			yearView = new YearView(this.adapter),
+			splitView = new SplitView(this.adapter),
+			listView = new ListView(this.adapter);
+
 		monthView.on('selectweek', (me, day) => {
 			this.routeTo('week', day);
 		});
@@ -112,6 +117,7 @@ export class Main extends Component {
 					})
 				),
 				this.picker = datepicker({
+					cls:'not-medium-device',
 					showWeekNbs: false,
 					enableRangeSelect: true,
 					withoutFooter: true,
@@ -157,6 +163,11 @@ export class Main extends Component {
 					btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}})
 				),
 				this.calendarList = this.buildCalendarFilter(),
+				comp({tagName:'ul', cls:'goui check-list'},
+					comp({tagName:'li'},this.birthdayCb),
+					comp({tagName:'li'},this.tasksCb),
+					comp({tagName:'li'},this.holidayCb),
+				),
 				tbar({cls: 'dense'},
 					comp({tagName: 'h3', html: 'Categories'}),
 					btn({
@@ -191,14 +202,16 @@ export class Main extends Component {
 						btn({icon: 'view_week', text: t('Week'), handler: b => this.routeTo('week', this.date)}),
 						btn({icon: 'view_module', text: t('Month'), handler: b => this.routeTo('month', this.date)}),
 						btn({icon: 'view_module', text: t('Year'), handler: b => this.routeTo('year', this.date)}),
-						btn({icon: 'call_split', text: t('Split'), handler: b => this.setView('split')}),
+						btn({icon: 'call_split', text: t('Split'), handler: b => this.routeTo('split-5', this.date)}),
+						btn({icon: 'list', text: t('List'), handler: b => this.routeTo('list', this.date)}),
 					),
 					btn({icon:'view_agenda',cls: 'for-medium-device', flex:'0 0 auto', menu:menu({},
 						btn({icon: 'view_day', text: t('Day'), handler: b => this.routeTo('day', this.date)}),
 						btn({icon: 'view_week', text: t('Week'), handler: b => this.routeTo('week', this.date)}),
 						btn({icon: 'view_module', text: t('Month'), handler: b => this.routeTo('month', this.date)}),
 						btn({icon: 'view_module', text: t('Year'), handler: b => this.routeTo('year', this.date)}),
-						btn({icon: 'call_split', text: t('Split'), handler: b => this.setView('split')}),
+						btn({icon: 'call_split', text: t('Split'), handler: b => this.routeTo('split-5', this.date)}),
+						btn({icon: 'list', text: t('List'), handler: b => this.routeTo('list', this.date)}),
 					)},
 
 					),
@@ -218,7 +231,7 @@ export class Main extends Component {
 						btn({icon: 'keyboard_arrow_right', title: t('Next'), allowFastClick:true, handler: b => this.forward()}),
 					),
 					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({expandLeft: true},
-						btn({icon:'video_call',text:'Video meeting', handler: _ => {(new Settings()).show()}}),
+						btn({icon:'video_call',text:'Video meeting', handler: _ => {(new Settings()).openLoad()}}),
 						btn({
 							icon: 'print', text:t('Print'), menu: menu({expandLeft: true},
 								btn({icon: 'print', text: t('Print current view')}),
@@ -236,12 +249,52 @@ export class Main extends Component {
 					weekView,
 					monthView,
 					yearView,
-					splitView
+					splitView,
+					listView
 				)
 			)
 		);
 
 	}
+
+	private birthdayCb = checkbox({
+		color: '#ff0000',
+		//style: 'padding: 0 8px',
+		value: this.adapter.byType('task').enabled,
+		label: t('Birthdays'),
+		listeners: {
+			'change': (_p, newValue) => {
+				this.adapter.byType('birthday').enabled = newValue;
+				this.updateView();
+			}
+		}
+	})
+
+	private tasksCb = checkbox({
+		color: '#0000ff',
+		//style: 'padding: 0 8px',
+		value: this.adapter.byType('task').enabled,
+		label: t('Tasks'),
+		listeners: {
+			'change': (_p, newValue) => {
+				this.adapter.byType('task').enabled = newValue;
+				this.updateView();
+			}
+		}
+	})
+
+	private holidayCb = checkbox({
+		color: '#00dd00',
+		//style: 'padding: 0 8px',
+		value: this.adapter.byType('holiday').enabled,
+		label: t('Holidays'),
+		listeners: {
+			'change': (_p, newValue) => {
+				this.adapter.byType('holiday').enabled = newValue;
+				this.updateView();
+			}
+		}
+	})
 
 	private inCalendars: {[key:string]:boolean} = {}
 	private buildCalendarFilter() {
@@ -286,14 +339,15 @@ export class Main extends Component {
 							});
 						},
 						'change': (p, newValue) => {
+							const store = this.adapter.storeByType('event');
 							this.inCalendars[data.id] = newValue;
 							const calendarIds = Object.keys(this.inCalendars).filter(key => this.inCalendars[key])
 							if(calendarIds.length) {
-								Object.assign(this.eventStore.queryParams.filter ||= {}, {
+								Object.assign(store.queryParams.filter ||= {}, {
 									inCalendars: calendarIds
 								});
 							} else {
-								delete this.eventStore.queryParams.filter?.inCalendars;
+								delete store.queryParams.filter?.inCalendars;
 							}
 							// FunctionUtil.buffer(1,() => {
 							 	this.updateView();
@@ -336,18 +390,17 @@ export class Main extends Component {
 				multiSelect: true,
 				listeners: {
 					'selectionchange': (tableRowSelect) => {
-
+						const store = this.adapter.storeByType('event');
 						const categoryIds = tableRowSelect.selected.map((index) => categoryStore.get(index)?.id);
 
 						if(categoryIds.length) {
-							Object.assign(this.eventStore.queryParams.filter ||= {}, {
+							Object.assign(store.queryParams.filter ||= {}, {
 								inCategories: categoryIds
 							});
 						} else {
-							delete this.eventStore.queryParams.filter?.inCategories;
+							delete store.queryParams.filter?.inCategories;
 						}
 
-						//this.eventStore.load();
 						this.updateView();
 					}
 				}
@@ -382,9 +435,6 @@ export class Main extends Component {
 								const dlg = new CategoryDialog();
 								await dlg.load(data.id);
 								dlg.show();
-							}}),
-							btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-								calendarStore.dataSource.update(data.id, {isSubscribed: false});
 							}})
 						)
 					})]
@@ -425,10 +475,12 @@ export class Main extends Component {
 				route += '-'+this.spanAmount;
 				this.date.addDays(value * this.spanAmount!);
 				break;
-			case 'week' :
+			case 'week':
+			case 'split':
 				this.date.addDays(value * 7);
 				break;
 			case 'month':
+			case 'list':
 				this.date.addMonths(value);
 				break;
 			case 'year':
@@ -446,12 +498,6 @@ export class Main extends Component {
 	setSpan(value: ValidTimeSpan, amount: number) {
 		this.timeSpan = value;
 		this.spanAmount = amount;
-		this.viewType = 'merge';
-		this.updateView();
-	}
-
-	setView(value: ValidView) {
-		this.viewType = value;
 		this.updateView();
 	}
 
@@ -463,13 +509,10 @@ export class Main extends Component {
 			'week': [0, 1],
 			'weeks': [1, -1],
 			'month': [1, 2],
-			'year': [2, 3]
+			'year': [2, 3],
+			'split': [3,4],
+			'list': [4,5]
 		})[this.timeSpan];
-
-		if (this.viewType === 'split') {
-			tabs[0] = 3; // use 3th tabpanel
-			tabs[1] = 4; // use last tabmenu item
-		}
 
 		this.cardMenu.items.forEach(i => i.el.cls('-active'));
 		this.cards.activeItem = tabs[0];
@@ -484,10 +527,12 @@ export class Main extends Component {
 				this.currentText.text = start.format('Y');
 				break;
 			case 'month':
+			case 'list':
 				this.spanAmount = undefined;
 				this.currentText.html = start.format('F ') + `<em> ${start.format('Y')}</em>`;
 				break;
 			case 'week':
+			case 'split':
 				start.setWeekDay(0);
 				this.currentText.html = start.format('F ') + `<em> ${start.format('Y')}</em>`;
 				break

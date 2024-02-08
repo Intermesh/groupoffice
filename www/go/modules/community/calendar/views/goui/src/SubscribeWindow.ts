@@ -7,7 +7,7 @@ export class SubscribeWindow extends Window {
 	constructor() {
 		super();
 		this.title = t('Subscribe to calendar');
-		this.height = 400;
+		this.height = 800;
 		const store = datasourcestore({
 			queryParams:{filter:{isSubscribed: false}},
 			dataSource:jmapds('Calendar')

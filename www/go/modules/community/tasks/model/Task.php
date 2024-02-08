@@ -375,6 +375,8 @@ class Task extends AclItemEntity {
 				$criteria->where('start',$comparator,$value);
 			})->addDateTime("due", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('due', $comparator, $value);
+			})->addDateTime("progressUpdated", function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('progressUpdated', $comparator, $value);
 			})->addNumber('percentComplete', function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('percentComplete', $comparator, $value);
 			})->add('complete', function(Criteria $criteria, $value) {
