@@ -733,7 +733,7 @@ abstract class Entity extends Property {
 	protected static function defineFilters(): Filters
 	{
 
-		$filters = new Filters();
+		$filters = new Filters(static::class);
 
 		$filters
 			->add("permissionLevelUserId", function() {
