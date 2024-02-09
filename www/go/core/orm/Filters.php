@@ -14,12 +14,27 @@ use go\core\util\DateTime;
  */
 class Filters {
 	
+	
 	private $filters = [];
 
 
 	const NO_DEFAULT = '__NO_DEFAULT__';
 
-	
+
+	/**
+	 * @var class-string<Entity>
+	 */
+	private string $entityCls;
+
+	/**
+	 * @param class-string<Entity> $entityCls
+	 */
+	public function __construct(string $entityCls)
+	{
+		$this->entityCls = $entityCls;
+	}
+
+
 	/**
 	 * Add generic filter function
 	 * 
@@ -48,16 +63,34 @@ class Filters {
 	 * ->add('businessId', function(Criteria  $c, $value) {
 	 *  $c->andWhere('businessId', $value);
 	 * });
+	 *
 	 * ```
+	 *
+	 * If the column is a date or datetime it will use {@link addDate())
+	 *
 	 * @param string $name
 	 * @return $this
 	 */
 	public function addColumn(string $name): Filters
 	{
-		return $this->add($name, function(Criteria  $c, $value) use ($name) {
-			$c->andWhere($name, '=', $value);
-		});
+		/**
+		 * @var class-string<Entity> $cls;
+		 */
+		$cls = $this->entityCls;
+
+		$col = $cls::getMapping()->getColumn($name);
+
+		if(in_array($col->dbType, ["localdatetime", "datetime", "date"])) {
+			return $this->addDate($name, function (Criteria $c, $comparator, $value) use ($name) {
+				$c->andWhere($name, $comparator, $value);
+			});
+		} else {
+			return $this->add($name, function (Criteria $c, $value) use ($name) {
+				$c->andWhere($name, '=', $value);
+			});
+		}
 	}
+
 
 	// private function validate(Query $query, array $filter) {
 	// 	$invalidFilters = array_diff(array_map('strtolower',array_keys($filter)), array_keys($this->filters));
