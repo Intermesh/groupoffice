@@ -52,14 +52,14 @@ export class MonthView extends CalendarView {
 			this.days = this.start.diff(endMonth).getTotalDays()!;
 		}
 
+		this.adapter.goto(this.start, endMonth);
 
-
-		Object.assign(this.store.queryParams.filter ||= {}, {
-			after: this.start.format('Y-m-d'),
-			before: endMonth.format('Y-m-d')
-		});
-
-		this.store.load()
+		// Object.assign(this.store.queryParams.filter ||= {}, {
+		// 	after: this.start.format('Y-m-d'),
+		// 	before: endMonth.format('Y-m-d')
+		// });
+		//
+		// this.store.load()
 
 		//this.dom.cls('+loading');
 		//this.store.filter('date', {after: day.format('Y-m-dT00:00:00'), before: end.format('Y-m-dT00:00:00')}).fetch(0,500);
@@ -146,13 +146,11 @@ export class MonthView extends CalendarView {
 
 	protected populateViewModel() {
 		this.clear()
-		const viewEnd = this.start.clone().addDays(this.days);
-		//console.log(this.start, viewEnd, this.days);
-		for (const e of this.store.items) {
-			this.viewModel.push(...CalendarItem.expand(e, this.start, viewEnd));
+
+		for(const item of this.adapter.items()) {
+			this.viewModel.push(item);
 		}
-		//this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
-		//console.log(this.viewModel);
+
 		this.updateItems()
 	}
 
@@ -196,6 +194,7 @@ export class MonthView extends CalendarView {
 	private updateItems() {
 		this.continues = [];
 		this.iterator = 0;
+
 		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		for(const [ws, container] of this.weekRows) {
 			container.append(...this.drawWeek(ws));

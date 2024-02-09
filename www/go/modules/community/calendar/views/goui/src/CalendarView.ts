@@ -1,17 +1,14 @@
 import {
 	btn,
-	comp,
-	Component, DataSourceStore,
-	datasourcestore,
+	Component,
 	DateTime,
 	E,
 	menu,
 	Recurrence,
 	t
 } from "@intermesh/goui";
-import {JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
-import {MonthView} from "./MonthView.js";
+import {CalendarAdapter} from "./CalendarAdapter.js";
 
 export abstract class CalendarView extends Component {
 
@@ -38,11 +35,11 @@ export abstract class CalendarView extends Component {
 	protected selected: CalendarItem[] = []
 	protected viewModel: CalendarItem[] = []
 
-	protected store: DataSourceStore<JmapDataSource<CalendarEvent>>
+	protected adapter: CalendarAdapter
 
-	constructor(store: DataSourceStore<JmapDataSource<CalendarEvent>>) {
+	constructor(adapter: CalendarAdapter) {
 		super();
-		this.store = store
+		this.adapter = adapter
 	}
 
 	update = (data?: any) => {
@@ -53,45 +50,35 @@ export abstract class CalendarView extends Component {
 	}
 
 	private current?: CalendarItem
-	protected eventHtml(item: CalendarItem) {
+	protected eventHtml(item: CalendarItem, div?:HTMLElement) {
 		const e = item.data;
-		const icons = []
-		if(!e.showWithoutTime && this instanceof MonthView) icons.push('fiber_manual_record') // the dot
-		if(e.recurrenceRule) icons.push('refresh');
-		if(e.links) icons.push('attachment');
-		if(e.alerts) icons.push('notifications');
-		if(!!e.participants) icons.push('group');
 
-		let time = [];
-		if(!e.showWithoutTime) {
-			time.push(item.start.format('G:i'));
-			if(item.dayLength > 1) {
-				time.push(item.end.format(' - G:i'));
+		if(!div) { // default
+			const time = E('span');
+			if(!e.showWithoutTime) {
+				time.append(item.start.format('G:i'));
+				if(item.dayLength > 1) {
+					time.append(item.end.format(' - G:i'));
+				}
 			}
+			div = E('div',
+				...this.eventIcons(e),
+				E('em', item.title || '('+t('Nameless')+')'),
+				time
+			)
 		}
-
-		return E('div',
-			...icons.map(i=>E('i',i).cls('icon')),
-			E('em', item.title || '('+t('Nameless')+')'),
-			E('span',  time[0]||'',time[1]||'')
-		).cls('allday',e.showWithoutTime)
+		return div.cls('allday',e.showWithoutTime)
 			.cls('declined', item.currentParticipant?.participationStatus === 'declined')
 			.cls('multiday', !e.showWithoutTime && item.dayLength > 1)
 			.attr('data-key', item.key || '_new_')
 			.attr('tabIndex', 0)
 			.on('click',(ev)=> {
-				// if not holdign ctrl or shift, deselect
+				// if not holding ctrl or shift, deselect
 				while(this.selected.length) {
 					Object.values(this.selected.shift()!.divs).forEach(el => el.cls('-selected'));
 				}
 				Object.values(item.divs).forEach(d => d.cls('+selected'));
 				this.selected.push(item);
-				//console.log(item);
-				// if(!ev.target.has('.moving')) {
-				// 	const dlg = new EventDialog();
-				// 	dlg.show();
-				// 	dlg.form.load(e.id);
-				// }
 			})
 			//.on('mousedown', ev => ev.stopPropagation()) /* when enabled cant drag event in monthview */
 			.on('contextmenu', ev => {
@@ -102,6 +89,16 @@ export abstract class CalendarView extends Component {
 			}).on('dblclick', ev => {
 				item.open();
 			});
+	}
+
+	private eventIcons(e: CalendarEvent) {
+		const icons = []
+		if(!e.showWithoutTime && !this.el.has('.week')) icons.push('fiber_manual_record') // the dot
+		if(e.recurrenceRule) icons.push('refresh');
+		if(e.links) icons.push('attachment');
+		if(e.alerts) icons.push('notifications');
+		if(!!e.participants) icons.push('group');
+		return icons.map(i=>E('i',i).cls('icon'));
 	}
 
 	protected clear() {

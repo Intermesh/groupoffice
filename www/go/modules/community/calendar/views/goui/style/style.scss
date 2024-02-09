@@ -88,6 +88,7 @@
 	align-items: center;
 	> div {
 		min-width: 25%;
+		padding: 0 dp(16);
 	}
 
 	table {
@@ -102,7 +103,7 @@
 			cursor: pointer;
 			text-align: center;
 			//font-size: 1.2em;
-			padding-bottom: 0.8em;
+			padding: dp(8) 0 dp(4);
 
 			&.current {
 				color: $colorPrimary;
@@ -230,7 +231,7 @@
 	}
 }
 
-.cal.month,.cal.split {
+.cal.month {
 	display: flex;
 	flex-direction: column;
 
@@ -242,46 +243,8 @@
 		> li { //weekdays
 			text-align: right;
 			padding:0 dp(8);
-			&.current {
+			&.today {
 				color: $colorPrimary;
-			}
-		}
-	}
-
-	ol { // week row
-		background-color: $colorBackground;
-		display: flex;
-		flex: 1 0 0;
-		position: relative;
-		align-items: stretch;
-		border-top: 1px solid $colorLine;
-		user-select:none;
-		> li { // day
-			border-right: 1px solid $colorLine;
-			&:first-child,
-			&:last-child { border-right:0;}
-			&.events {
-				position: absolute;
-			//	margin-left: dp(24); // week numbers
-				margin-top: dp(32); // day numbers
-				width: 100%;
-				overflow: hidden;
-				bottom: 0;
-				top: 0;
-				pointer-events:none;
-				> div {
-					@extend %event;
-					display:flex;
-					align-items: center;
-					pointer-events: all;
-					&.continues {
-						border-bottom-left-radius: 0;
-						border-top-left-radius: 0;
-					}
-					> em {
-						white-space: nowrap;
-					}
-				}
 			}
 		}
 	}
@@ -319,36 +282,70 @@
 	}
 }
 
-.cal.split {
-	ul {
-		padding-left:0;
-		> li {
-			&:first-child {
-				max-width: dp(140);
+.cal.month, .cal.split {
+	ol { // week row
+		background-color: $colorBackground;
+		display: flex;
+		flex: 1 0 0;
+		position: relative;
+		align-items: stretch;
+		border-top: 1px solid $colorLine;
+		user-select:none;
+		> li { // day
+			border-right: 1px solid $colorLine;
+			&:first-child,
+			&:last-child { border-right:0;}
+			&.events {
+				position: absolute;
+				//	margin-left: dp(24); // week numbers
+				margin-top: dp(32); // day numbers
+				width: 100%;
+				overflow: hidden;
+				bottom: 0;
+				top: 0;
+				pointer-events:none;
+				> div {
+					@extend %event;
+					display:flex;
+					align-items: center;
+					pointer-events: all;
+					&.continues {
+						border-bottom-left-radius: 0;
+						border-top-left-radius: 0;
+					}
+					> em {
+						white-space: nowrap;
+					}
+				}
 			}
-		}
-	}
-	ol > li {
-		&:first-child {
-			max-width: dp(140);
-		}
-		&.events {
-			margin-left: dp(140);
-			margin-top:dp(4);
-			width: calc(100% - #{dp(140)});
-		}
-		&.cal-name {
-			color: $colorTextSecondary;
-			border-right: 1px solid $colorBorder;
-			font-size: .8em;
-			max-width: dp(140);
-			font-weight: 300;
 		}
 	}
 }
 
 $hourHeight: 8vh;
 $halfHour: 4vh;
+
+%weekhead {
+	display: flex;
+	scrollbar-gutter: stable;
+	overflow-y:auto;
+	//padding-right: 14px; // for scrollbar
+	border-bottom: 2px solid $colorBorder;
+	> li {
+		@extend %font-caption;
+		text-align: center;
+		//padding: dp(4);
+		> em { // date number
+			font-style: normal;
+			margin: 0 auto;
+			padding: dp(8);
+			display: block; // not on mobile.
+			font-size: 1.3em;
+			color: $colorText;
+			//border: 1px solid currentColor;
+		}
+	}
+}
 
 .cal.week {
 	height:100%;
@@ -374,25 +371,12 @@ $halfHour: 4vh;
 		max-height: dp(212); // x all-day events fit
 		border-bottom: 2px solid $colorBorder;
 		&:first-child { // header
-			//min-height: dp(68);
-			> li {
-				@extend %font-caption;
-				text-align: center;
-				//padding: dp(4);
-				> em { // date number
-					font-style: normal;
-					margin: 0 auto;
-					padding: dp(8);
-					display: block; // not on mobile.
-					font-size: 1.3em;
-					color: $colorText;
-					//border: 1px solid currentColor;
-				}
-			}
+			@extend %weekhead;
 		}
 		+ ul { // all-day only
 			background-color:var(--bg-base);
 			flex-shrink: 0;
+			max-height: dp(212); // x all-day events fit
 			min-height:dp(32);
 		}
 
@@ -476,6 +460,86 @@ $halfHour: 4vh;
 		&:after {bottom: 0;}
 	}
 }
+
+.cal.split {
+	display: flex;
+	flex-direction: column;
+	ul {
+		@extend %weekhead;
+	}
+	li {
+		flex: 5 0 0;
+	}
+	ol > li {
+		&:nth-child(2) { // calendar name
+			max-width: dp(140);
+		}
+		&.events {
+			margin-left: dp(140);
+			margin-top:dp(4);
+			width: calc(100% - #{dp(140)});
+		}
+		&.cal-name {
+			color: $colorTextSecondary;
+			border-right: 1px solid $colorBorder;
+			font-size: .8em;
+			max-width: dp(140);
+			font-weight: 300;
+		}
+	}
+}
+
+.cal.list {
+	height:100%;
+	overflow-y:scroll;
+	list-style: none;
+	li {
+		width:100%;
+		overflow: hidden;
+		padding: dp(16);
+		border-bottom: 1px solid $colorLine;
+		&.empty {
+			padding:0 dp(16);
+			height: dp(26);
+		}
+		> h3 {
+			float:left;
+			> em {
+				font-size:1.4em;
+				margin-right:dp(8);
+				padding: 0 dp(4);
+			}
+		}
+		> div {
+			display:flex;
+			font-size: 1.1em;
+			flex-wrap: nowrap;
+			margin: dp(4) 0 dp(4) dp(144);
+			cursor: pointer;
+			word-wrap: break-word;
+			overflow: hidden;
+			box-sizing: border-box;
+			border-radius: $borderRadius;
+			min-height:dp(28);
+			padding: dp(4) dp(6);
+			user-select: none;
+			//border: 1px solid currentColor;
+			&.selected {
+				background-color: currentColor;
+				color:white;
+				> i {color:white;}
+			}
+			span {
+				color: $colorText;
+			}
+			span:first-of-type { // time
+				margin-left:dp(8);
+				width: dp(176);
+			}
+		}
+	}
+}
+
 
 %avb-box {
 	position:absolute;

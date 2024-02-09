@@ -661,11 +661,9 @@ class Contact extends AclItemEntity {
 											}
 
 											$date = $value->format(Column::DATE_FORMAT);
-											$now = new DateTime();
-											$year = $now->format("Y");
-											$nowStr = $now->format(Column::DATE_FORMAT);
+											$year = $value->format("Y");
 
-											$query->select("IF (STR_TO_DATE(CONCAT('$year', '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') >= '$nowStr', "
+											$query->select("IF (STR_TO_DATE(CONCAT('$year', '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') >= '$date', "
 												."STR_TO_DATE(CONCAT('$year', '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') , "
 												."STR_TO_DATE(CONCAT('$year' + 1,'/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e')) as upcomingBirthday", true);
 

@@ -7,14 +7,11 @@ import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
 	queryParams:{filter:{isSubscribed: true}},
-	//properties: ['id', 'name', 'color', 'isVisible', 'isSubscribed'],
 	sort: [{property:'sortOrder'}]
 });
 
 export const categoryStore = datasourcestore({
 	dataSource:jmapds('CalendarCategory'),
-	//queryParams:{filter:{isSubscribed: true}},
-	//properties: ['id', 'name', 'color', 'isVisible', 'isSubscribed'],
 	sort: [{property:'name'}]
 })
 
@@ -86,15 +83,18 @@ modules.register(  {
 			}).add(/^calendar\/month\/(\d{4}-\d{2}-\d{2})$/, (yearMonth) => {
 				modules.openMainPanel("calendar");
 				ui.goto(new DateTime(yearMonth)).setSpan("month", 31);
+			}).add(/^calendar\/list\/(\d{4}-\d{2}-\d{2})$/, (yearMonth) => {
+				modules.openMainPanel("calendar");
+				ui.goto(new DateTime(yearMonth)).setSpan("list", 31);
 			}).add(/^calendar\/week\/(\d{4}-\d{2}-\d{2})$/, (date) => {
 				modules.openMainPanel("calendar");
 				ui.goto(new DateTime(date)).setSpan("week", 7);
 			}).add(/^calendar\/day\/(\d{4}-\d{2}-\d{2})$/, (date) => {
 				modules.openMainPanel("calendar");
 				ui.goto(new DateTime(date)).setSpan("day", 1);
-			}).add(/^calendar\/(days|weeks)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, date) => {
+			}).add(/^calendar\/(days|weeks|split)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, date) => {
 				modules.openMainPanel("calendar");
-				ui.goto(new DateTime(date)).setSpan(span as 'days'|'weeks', Math.min(parseInt(amount),373));
+				ui.goto(new DateTime(date)).setSpan(span as 'days'|'weeks'|'split', Math.min(parseInt(amount),373));
 			});
 
 			modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => {

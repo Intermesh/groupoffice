@@ -1,0 +1,27 @@
+POST http://go.localhost:80/go/calendar/www/api/jmap.php HTTP/1.1
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: nl
+Authorization: Bearer 65b9090561297aeaecf72c1338fa2a1dfeed8b3eae637
+Cache-Control: no-cache
+Connection: keep-alive
+Content-Type: application/json
+Host: localhost
+Origin: http://localhost
+Pragma: no-cache
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+[
+  [
+    "community/calendar/holiday/fetch",
+    {
+      "set": "NL",
+      "lang": "nl",
+      "from": "2024-01-01",
+      "till": "2024-12-31"
+    },"test1"
+  ]
+]
+
+###

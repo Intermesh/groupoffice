@@ -36,8 +36,6 @@ if (!class_exists('GOHolidaysNl')) {
 			if($year % 5 ==0){
 				return date('Y-m-d',mktime(0,0,0,5,5,$year));
 			}
-			return ;
 		}
 	}
 }
-?>
