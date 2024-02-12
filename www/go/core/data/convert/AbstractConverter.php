@@ -186,7 +186,7 @@ abstract class AbstractConverter {
 				$entity = $this->importEntity();
 				
 				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
-				if($entity === false) {
+				if (is_null($entity)) {
 					$this->index++;
 					continue;
 				}			

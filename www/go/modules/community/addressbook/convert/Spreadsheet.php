@@ -47,10 +47,10 @@ class Spreadsheet extends convert\Spreadsheet {
 		$contact = parent::importEntity();
 
 		if(!$contact) {
-			return false;
+			return null;
 		}
 
-		return $contact->isOrganization == $this->organizations ? $contact : false;
+		return $contact->isOrganization == $this->organizations ? $contact : null;
 	}
 
 	protected function createEntity($values) : Entity

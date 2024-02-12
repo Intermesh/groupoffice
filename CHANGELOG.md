@@ -1,5 +1,6 @@
 - Finance: Don't find invoices that were already paid when importing payments
 - SMIME: Extra certificates were not incluced. Potential fix for issue #1113
+- Addressbook: bugfix import contacts
 
 05-02-2023: 6.8.33
 - Core: GOUI version updated to solve Help module not appearing
