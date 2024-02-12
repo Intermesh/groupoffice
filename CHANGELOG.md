@@ -1,3 +1,4 @@
+12-02-2024: 6.7.67
 - Core: fix $config['debug_usernames'] functionality
 
 05-02-2024: 6.7.66
