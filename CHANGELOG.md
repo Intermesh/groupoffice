@@ -1,3 +1,5 @@
+- Core: fix $config['debug_usernames'] functionality
+
 05-02-2024: 6.7.66
 - Core: fit password dialog to current layout style
 - Email: add icon to mailbox context menu

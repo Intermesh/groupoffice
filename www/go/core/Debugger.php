@@ -86,10 +86,24 @@ class Debugger {
 
 		if(!empty(go()->getConfig()['debug'])) {
 			$this->enable(go()->getConfig()['debug_log']);
-		} else if(!empty(go()->getConfig()['debug_usernames']) && is_array(go()->getConfig()['debug_usernames'])) {
-			if(go()->getAuthState() && ($user = go()->getAuthState()->getUser(['username'])) && in_array($user->username, go()->getConfig()['debug_usernames'])) {
-				$this->enable(go()->getConfig()['debug_log']);
+		} else if(!$this->enabled && !empty(go()->getConfig()['debug_usernames']) && is_array(go()->getConfig()['debug_usernames'])) {
+			if($a = go()->getAuthState()) {
+				$userId = $a->getUserId();
+				$stmt = go()->getDbConnection()->getPDO()
+					->prepare('SELECT `username` FROM `core_user` WHERE `id`=:id');
+				$stmt->bindParam(':id', $userId);
+				$stmt->execute();
+				while ($user = $stmt->fetch(\PDO::FETCH_OBJ)) {
+					if(in_array($user->username, go()->getConfig()['debug_usernames'])) {
+						$this->enable(go()->getConfig()['debug_log']);
+						break;
+					}
+				}
 			}
+			// This will trigger an infinite loop
+//			if(go()->getAuthState() && ($user = go()->getAuthState()->getUser(['username'])) && in_array($user->username, go()->getConfig()['debug_usernames'])) {
+//				$this->enable(go()->getConfig()['debug_log']);
+//			}
 		}
 	}
 
