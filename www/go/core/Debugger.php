@@ -88,6 +88,9 @@ class Debugger {
 			$this->enable(go()->getConfig()['debug_log']);
 		} else if(!$this->enabled && !empty(go()->getConfig()['debug_usernames']) && is_array(go()->getConfig()['debug_usernames'])) {
 			if($a = go()->getAuthState()) {
+				if( method_exists($a, "hasToken") && !$a->hasToken()) {
+					return;
+				}
 				$userId = $a->getUserId();
 				$stmt = go()->getDbConnection()->getPDO()
 					->prepare('SELECT `username` FROM `core_user` WHERE `id`=:id');
