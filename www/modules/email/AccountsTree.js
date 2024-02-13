@@ -318,9 +318,18 @@ Ext.extend(GO.email.AccountsTree, Ext.tree.TreePanel, {
 	
 	_nodeId : 0,
 	_errorNodes : [],
+
 	
 	enableStateSave : function(){
-		if(Ext.Ajax.isLoading(this.getLoader().transId)){
+
+		let isLoading = false;
+		this.getRootNode().childNodes.forEach((n) => {
+			if(n.isLoading()) {
+				isLoading = true;
+			}
+		})
+
+		if(isLoading){
 			this.enableStateSave.defer(100, this);
 			this.loadingDone=false;
 		}else
