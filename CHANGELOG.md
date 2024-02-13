@@ -4,6 +4,7 @@
 - E-mail: Don't use assistant anymore for opening attachments
 - Email: Fixed html toolbar not auto sized when switching from plain text to html in the composer
 - Email / Core : underline html editor toolbar
+- Newsletters: test message didn't work with e-mail account
 
 12-02-2024: 6.7.67
 - Core: fix $config['debug_usernames'] functionality
