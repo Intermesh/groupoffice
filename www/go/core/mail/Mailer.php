@@ -161,7 +161,7 @@ class Mailer {
 
 	public function lastError(): string
 	{
-		return $this->mail->ErrorInfo;
+		return isset($this->mail) ? $this->mail->ErrorInfo : "";
 	}
 
 	private function initTransport() {
