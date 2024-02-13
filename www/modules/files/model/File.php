@@ -870,6 +870,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 
 	}
 
+	public function isTempFile() {
+		return substr($this->path, 0, 4) == 'tmp/';
+	}
+
 	/**
 	 * Returns this file as swift attachment
 	 * 
