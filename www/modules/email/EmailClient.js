@@ -1234,11 +1234,6 @@ GO.email.openAttachment = function(attachment, panel, forceDownload) {
 					}
 
 				default:
-					if(Ext.isSafari || Ext.isGecko) {
-						// must be opened before any async processes happen
-						go.util.getDownloadTargetWindow();
-					}
-
 					if(go.Modules.isAvailable('legacy', 'files') && attachment.name.toLowerCase() != 'winmail.dat') {
 						return GO.files.openEmailAttachment(attachment, panel, false);
 					} else {
