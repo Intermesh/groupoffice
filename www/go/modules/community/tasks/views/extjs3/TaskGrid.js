@@ -69,6 +69,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				[record.data.id]: {progress: (!wasComplete ? 'completed' : 'needs-action')}}
 			}).finally(() => {
 				this.getEl().unmask();
+			}).catch(e => {
+				GO.errorDialog.show(e);
 			})
 
 		}, this);
