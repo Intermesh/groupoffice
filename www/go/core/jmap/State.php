@@ -93,6 +93,11 @@ class State extends AbstractState {
 	 */
 	private $token;
 
+	public function hasToken(): bool
+	{
+		return !!$this->token;
+	}
+
 	/**
 	 * Get the authorization token by reading the request header "Authorization"
 	 *
@@ -251,42 +256,6 @@ class State extends AbstractState {
 			}
 		}
 	}
-	
-//	private function clientSettings(): array
-//	{
-//		$user = GO::user();
-//		return [
-//			'state' => OldState::model()->getFullClientState($user->id)
-//			,'user_id' => $user->id
-//			,'avatarId' => $user->avatarId
-//			,'has_admin_permission' => $user->isAdmin()
-//			,'username' => $user->username
-//			,'displayName' => $user->displayName
-//			,'email' => $user->email
-//			,'thousands_separator' => $user->thousandsSeparator
-//			,'decimal_separator' => $user->decimalSeparator
-//			,'date_format' => $user->completeDateFormat
-//			,'time_format' => $user->timeFormat
-//			,'currency' => $user->currency
-//			,'lastlogin' => $user->getLastlogin()
-//			,'max_rows_list' => $user->max_rows_list
-//			,'timezone' => $user->timezone
-//			,'start_module' => $user->start_module
-//			,'theme' => $user->theme
-//			,'mute_sound' => $user->mute_sound
-//			,'mute_reminder_sound' => $user->mute_reminder_sound
-//			,'mute_new_mail_sound' => $user->mute_new_mail_sound
-//			,'popup_reminders' => $user->popup_reminders
-//			,'popup_emails' => $user->popup_emails
-//			,'show_smilies' => $user->show_smilies
-//			,'auto_punctuation' => $user->auto_punctuation
-//			,'first_weekday' => $user->firstWeekday
-//			,'sort_name' => $user->sort_name
-//			,'list_separator' => $user->listSeparator
-//			,'text_separator' => $user->textSeparator
-//			,'modules' => GO::view()->exportModules()
-//		];
-//	}
 
 	/**
 	 * Get the user ID

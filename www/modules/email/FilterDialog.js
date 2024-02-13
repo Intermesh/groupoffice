@@ -5,7 +5,7 @@ GO.email.FilterDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			titleField:'keyword',
 			title:t("Filter", "email"),			
 			formControllerUrl: 'email/filter',
-			height:200
+			height:dp(400)
 		});
 		
 		GO.email.FilterDialog.superclass.initComponent.call(this);	

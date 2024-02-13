@@ -263,7 +263,6 @@ search/SearchCombo.js
 search/SearchField.js
 
 modules/SystemSettingsModuleGrid.js
-modules/PermissionsWindow.js
 modules/GroupRights.js
 
 
