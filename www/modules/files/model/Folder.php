@@ -761,6 +761,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$userId = go()->getAuthState()->getUserId();
 		}
 
+		// see also File::isTempFile(). It relies on "tmp/"
+
 		$folder = $this->findByPath('tmp/' . $userId, true);
 		if(!$folder->acl_id || Acl::getUserPermissionLevel($folder->acl_id, $userId) != Acl::LEVEL_MANAGE) {
 			$folder->setNewAcl($userId);

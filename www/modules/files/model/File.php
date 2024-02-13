@@ -871,6 +871,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 	}
 
+	public function isTempFile() {
+		return substr($this->path, 0, 4) == 'tmp/';
+	}
+
 	/**
 	 * Returns this file as attachment
 	 * 
