@@ -1,3 +1,5 @@
+- Tickets: Fixed scrolling in new ticket message
+
 12-02-2024: 6.7.67
 - Core: fix $config['debug_usernames'] functionality
 
@@ -5,7 +7,6 @@
 - Core: fit password dialog to current layout style
 - Email: add icon to mailbox context menu
 - Tickets: Resize ticket dialog to new paper theme
-- Tickets: Fixed scrolling in new ticket message
 - Email: fix sorting problem for templates
 - Finance: Business module is available if you have the billing license only now
 - Billing: Fixed Customer report export
