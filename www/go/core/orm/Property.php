@@ -2559,7 +2559,12 @@ abstract class Property extends Model {
 			$col = static::getMapping()->getColumn($name);
 			if($col) {
 				if(!$col->autoIncrement) {
-					$copy->$name = $this->$name;
+					$v = $this->$name;
+					if(is_object($v)) {
+						$copy->$name = clone $v;
+					}	else {
+						$copy->$name = $v;
+					}
 				}
 			} else {
 				$rel = static::getMapping()->getRelation($name);
