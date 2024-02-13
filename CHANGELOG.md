@@ -1,4 +1,8 @@
 - Tasks/Core: Bug in copy() function where dates and other objects had reference to the source. This caused the task dates to change on recurrence.
+- E-mail: Don't use assistant anymore for opening attachments
+- Tickets: Fixed scrolling in new ticket message
+- Email: Larger add filter window
+- Core: fix $config['debug_usernames'] functionality
 
 12-02-2023: 6.8.34
 - Finance: Don't find invoices that were already paid when importing payments
