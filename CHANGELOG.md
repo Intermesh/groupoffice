@@ -5,6 +5,7 @@
 - Core: fix $config['debug_usernames'] functionality
 - Email: Fixed html toolbar not auto sized when switching from plain text to html in the composer
 - Email / Core : underline html editor toolbar
+- Newsletters: test message didn't work with e-mail account
 
 12-02-2023: 6.8.34
 - Finance: Don't find invoices that were already paid when importing payments
