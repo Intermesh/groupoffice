@@ -1,5 +1,7 @@
 - Tickets: Fixed scrolling in new ticket message
 - Email: Larger add filter window
+- Tasks/Core: Bug in copy() function where dates and other objects had reference to the source. This caused the task dates to change on recurrence.
+- E-mail: Don't use assistant anymore for opening attachments
 
 12-02-2024: 6.7.67
 - Core: fix $config['debug_usernames'] functionality
