@@ -309,6 +309,15 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 
 		if(!html)
 			this.textEditor.selectText(0,0);
+		else {
+			if(this.htmlEditor.initialized) {
+				this.htmlEditor.tb.doLayout();
+			} else {
+				this.htmlEditor.on("initialize", () =>{
+					this.htmlEditor.tb.doLayout();
+				});
+			}
+		}
 	},
 
 	setEditorHeight : function() {
