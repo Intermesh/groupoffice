@@ -1,4 +1,5 @@
 - Tickets: Fixed scrolling in new ticket message
+- Email: Larger add filter window
 
 12-02-2024: 6.7.67
 - Core: fix $config['debug_usernames'] functionality
