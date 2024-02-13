@@ -1,3 +1,5 @@
+- Tasks/Core: Bug in copy() function where dates and other objects had reference to the source. This caused the task dates to change on recurrence.
+
 12-02-2023: 6.8.34
 - Finance: Don't find invoices that were already paid when importing payments
 - SMIME: Extra certificates were not incluced. Potential fix for issue #1113
