@@ -43,7 +43,7 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 
 			$message = \GO\Base\Mail\Message::newInstance($subject)
 				->setFrom(\GO::user()->email, \GO::user()->name)
-				->addReplyTo(\GO::user()->email)
+				->setReplyTo(\GO::user()->email)
 				->addTo($to['email'], $to['personal']);
 
 			$mailer = $this->getUserMailer();
