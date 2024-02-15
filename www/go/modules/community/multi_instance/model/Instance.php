@@ -276,7 +276,6 @@ class Instance extends Entity {
 
 		$valuesToCopy = array (
 			0 => 'locale',
-			1 => 'primaryColorTransparent',
 			4 => 'language',
 			7 => 'smtpHost',
 			8 => 'smtpPort',
@@ -286,9 +285,9 @@ class Instance extends Entity {
 			15 => 'passwordMinLength',
 			16 => 'logoutWhenInactive',
 			19 => 'syncChangesMaxAge',
-			22 => 'primaryColor',
-			23 => 'secondaryColor',
-			24 => 'accentColor',
+//			22 => 'primaryColor',
+//			23 => 'secondaryColor',
+//			24 => 'accentColor',
 			26 => 'defaultTimezone',
 			27 => 'defaultDateFormat',
 			28 => 'defaultTimeFormat',
