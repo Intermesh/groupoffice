@@ -96,7 +96,9 @@ class Instance extends Entity {
 			})
 			->add('isTrial', function(Criteria $c, $value) {
 				$c->andWhere('isTrial', '=', $value);
-			});
+			})
+			->addColumn("adminEmail")
+			->addColumn("adminDisplayName");
 	}
 
 

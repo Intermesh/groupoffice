@@ -18,3 +18,7 @@ $updates["201811081350"][] = "INSERT INTO `core_cron_job` (`moduleId`, `descript
 $updates["201811081350"][] = "ALTER TABLE `multi_instance_instance` ADD `welcomeMessage` TEXT NULL DEFAULT NULL AFTER `enabled`;";
 
 $updates["201908191634"][] = "ALTER TABLE `multi_instance_instance` ADD `version` VARCHAR(50) NULL DEFAULT NULL AFTER `welcomeMessage`;";
+$updates["202402151542"][] = "alter table multi_instance_instance
+    modify adminDisplayName varchar(190) default '' not null;";
+$updates["202402151542"][] = "alter table multi_instance_instance
+    modify adminEmail varchar(190) default '' not null;";
