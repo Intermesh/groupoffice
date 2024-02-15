@@ -12,6 +12,9 @@
 - smime: Checkbox in email composer was sometimes not changable
 - smime: Sent item wasn't signed.
 - Calendar: User may only edit calendars when they have manage permissions
+- Automation: Added BCC for email actions
+- Multi instance: Added some filters to support follow up e-mails
+- Multi instance: Fixed installing welcome message
 
 12-02-2023: 6.8.34
 - Finance: Don't find invoices that were already paid when importing payments
