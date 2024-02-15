@@ -6,6 +6,7 @@
 - Email / Core : underline html editor toolbar
 - Newsletters: test message didn't work with e-mail account
 - Email: Sometimes tree could collapse without reason
+- Email: Fixed sorting and collapsing of e-mail template groups
 
 12-02-2024: 6.7.67
 - Core: fix $config['debug_usernames'] functionality
