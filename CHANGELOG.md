@@ -11,6 +11,7 @@
 - Caldav: Fixed: undefined method addReplyTo (Issue #1117)
 - smime: Checkbox in email composer was sometimes not changable
 - smime: Sent item wasn't signed.
+- Calendar: User may only edit calendars when they have manage permissions
 
 12-02-2023: 6.8.34
 - Finance: Don't find invoices that were already paid when importing payments
