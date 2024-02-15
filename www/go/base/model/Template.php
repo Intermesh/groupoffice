@@ -64,6 +64,19 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		return parent::model($className);
 	}
 
+	public function relations()
+	{
+		return [
+			'group' => array(
+	 				'type'=>self::BELONGS_TO,
+	 				'model'=>'GO\Base\Model\TemplateGroup',
+	 				'field'=>'group_id',
+	 				'labelAttribute'=>function($model){return $model->relation->name;} //this will automatically supply the label for a combobox in a JSON request.
+
+				)
+		];
+	}
+
 	public function getGroupName() {
 		$group = TemplateGroup::model()->findByPk($this->group_id);
 		return !empty($group) ? $group->name : '('.go()->t('None').')';

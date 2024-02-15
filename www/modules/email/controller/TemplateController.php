@@ -23,24 +23,28 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	protected function remoteComboFields() {
 		return array(
 				'user_name'=>'$model->user->name',
-			'group_id' => '$model->getGroupName()'
+			'group_id' => '$model->group->name'
 		);
 	}
 	
 	protected function getStoreParams($params) {
+
+		$findParams = \GO\Base\Db\FindParams::newInstance();
+		$findParams->joinRelation('group');
 		$params['type'] = 0;
 		if(isset($params['type'])){
-			$findParams = \GO\Base\Db\FindParams::newInstance();
+
 			
 			$findParams->getCriteria()->addCondition('type', $params['type']);
-			return $findParams;
+
 		}
-		
+		return $findParams;
 		//return parent::getStoreParams($params);
 	}
 	
 	protected function beforeStore(&$response, &$params, &$store) {
 		$store->setDefaultSortOrder('name');
+
 		return parent::beforeStore($response, $params, $store);
 	}
 
@@ -81,8 +85,8 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
 		$columnModel->formatColumn('user_name', '$model->user->name');
 		$columnModel->formatColumn('group_name', function($model) {
-			return $model->getGroupName();
-		});
+			return $model->group->name;
+		},[], ['group.name']);
 		return parent::formatColumns($columnModel);
 	}
 
