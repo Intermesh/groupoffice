@@ -8,6 +8,7 @@
 - Newsletters: test message didn't work with e-mail account
 - Email: Sometimes tree could collapse without reason
 - Email: Fixed sorting and collapsing of e-mail template groups
+- Caldav: Fixed: undefined method addReplyTo (Issue #1117)
 
 12-02-2023: 6.8.34
 - Finance: Don't find invoices that were already paid when importing payments
