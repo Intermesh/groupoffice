@@ -29,7 +29,7 @@ export class ListView extends CalendarView {
 	protected populateViewModel(): void {
 		this.clear()
 
-		for(const item of this.adapter.items()) {
+		for(const item of this.adapter.items) {
 			this.viewModel.push(item);
 		}
 

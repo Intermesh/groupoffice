@@ -111,6 +111,9 @@ class CalendarEvent extends AclItemEntity {
 	public $start;
 	protected $end; // cached to query later
 
+	public $utcStart;
+	public $utcEnd;
+
 	/**
 	 * The duration of the event (or the occurence)
 	 * (optional, default: PT0S)
@@ -243,6 +246,10 @@ class CalendarEvent extends AclItemEntity {
 			->where(['u.email' => $scheduleId, 'eventdata.uid'=>$uid])
 			->filter(['permissionLevel' => 25]); // rsvp
 
+	}
+
+	public function isPrivate(){
+		return $this->privacy === self::Private;
 	}
 
 	protected static function defineFilters(): Filters

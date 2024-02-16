@@ -45,7 +45,7 @@ export class SplitView extends CalendarView {
 		for (let calendar of calendarStore) {
 			this.calViewModel[calendar.id] = [];
 		}
-		for (const e of this.adapter.items()) {
+		for (const e of this.adapter.items) {
 			if(e.data.calendarId)
 				this.calViewModel[e.data.calendarId].push(e);
 		}

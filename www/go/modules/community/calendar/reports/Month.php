@@ -3,6 +3,7 @@
 namespace go\modules\community\calendar\reports;
 
 use go\modules\community\calendar\model\CalendarEvent;
+use \GO\Base\Util\Date;
 
 /**
  * Copyright Intermesh
@@ -25,8 +26,8 @@ class Month extends Calendar {
 	
 	private $right;
 	
-	protected function init() {
-		parent::init();
+	function normal() {
+		parent::normal();
 		$this->leftMargin = 10;
 		$this->footerY = 15;
 		$this->SetMargins($this->leftMargin, 41);
@@ -44,48 +45,46 @@ class Month extends Calendar {
 		
 		$this->Rect(10, 10, $this->right, 25,'DF', array(), array(240));
 		$this->SetFont(null, 'B',$this->fSizeLarge);
-		$this->Cell(100, 12, $this->months_long[date('n',$this->day)].date(' Y',$this->day), 0, 1);
-		
+		$this->Cell(100, 12, $this->months_long[$this->day->format('n')].$this->day->format(' Y'), 0, 1);
+
 		$this->drawCalendar($this->day, $this->right-100, 11, 45, 22);
-		$this->drawCalendar($this->day+(32*24*3600), $this->right-40, 11, 45, 22);
+		$this->drawCalendar((clone $this->day)->modify('next month'), $this->right-40, 11, 45, 22);
+
+//		$this->drawCalendar($this->day, $this->right-100, 11, 45, 22);
+//		$this->drawCalendar($this->day+(32*24*3600), $this->right-40, 11, 45, 22);
 	}
-	
-	/**
-	 * 
-	 * @param CalendarEvent[] $events
-	 */
+
 	public function render() { //$events
-		$this->events = $this->orderEvents($events);
+		//$this->events = $this->orderEvents($events);
 		$this->AddPage('L');
 		$this->SetFont(null,'',$this->fSizeSmall);
 
 		$this->drawEventCalendar();
 	}
-	
-	/**
-	 * The first date that is rendered in this calendar print
-	 * @return int UTC unixtimestamp
-	 */
-	private function getStartTime() {
-		$firstDayOfMonth = strtotime(date('Y-m-01', $this->day));
-		$wd = date('N',$firstDayOfMonth)-1;
-		return $firstDayOfMonth-$wd*24*3600;
+
+	protected function add($key, $instance) {
+		$itr = clone $instance->utcStart;
+		$end = min($this->end, $instance->utcEnd);
+		while($itr <= $end) {
+			$this->events[$itr->format('Ymd')][$key] = $instance;
+			$itr->modify('+1 day');
+		}
 	}
 	
 	/**
 	 * get week label
-	 * @param timestamp $date start of week
+	 * @param \DateTime $date start of week
 	 */
 	private function getWeekLabel($firstDay) {
-		$lastDay = $firstDay+6*24*3600;
-		$fmonth = (date('M',$firstDay)==date('M',$lastDay))?'':' '.$this->months_short[date('n',$firstDay)];
-		return date('j',$firstDay).$fmonth . ' - ' . date('j ',$lastDay).$this->months_short[date('n',$lastDay)];
+		$lastDay = (clone $firstDay)->modify('+6 days');
+		$fmonth = ($firstDay->format('M')==$lastDay->format('M'))?'':' '.$this->months_short[$firstDay->format('n')];
+		return $firstDay->format('j').$fmonth . ' - ' . $lastDay->format('j').$this->months_short[$lastDay->format('n')];
 	}
 	
 	private function getWeeksInMonth() {
-		$firstDayOfMonth = strtotime(date('Y-m-01', $this->day));
+		$firstDayOfMonth = strtotime($this->day->format('Y-m-01'));
 		$firstWeekDay = date('N',$firstDayOfMonth)-1;
-		$daysInMonth = date('t', $this->day);
+		$daysInMonth = $this->day->format('t');
 		return ceil(($daysInMonth+$firstWeekDay)/7);
 	}
 	
@@ -102,54 +101,54 @@ class Month extends Calendar {
 		}
 		$this->Ln();
 		
-		$day='';
+		//$day='';
 		$weeks = $this->getWeeksInMonth();
 		$dateh = 5;
 		$rowh = $h/$weeks;
 		$colw = $w/7;
-		$date = $this->getStartTime();
-		$month = date('M',$date);
+		$day = (clone $this->day);
 		for($r = 0; $r < $weeks; $r++){
 			//Draw vertical dates
 			$this->StartTransform();
 				$this->Rotate(90);
 				$this->Translate(-($rowh-9), 0);
-				$this->Cell(7,7, $this->getWeekLabel($date),0,0,'C');
+				$this->Cell(7,7, $this->getWeekLabel($day),0,0,'C');
 				$this->Rotate(-90);
 			$this->StopTransform();
 			
 			$this->setCellPaddings(1,1,0,0);
 			for($c=0;$c<7;$c++){ //toggle weekday
-				$coord = array($this->GetX(), $this->GetY());
+				$coord = [$this->GetX(), $this->GetY()];
 
 				$this->SetFont(null, 'B', $this->fSizeMedium-2);
-				$this->Cell($colw,5,date('j ',$date).$month, 1,0,'L',false,'',0,false,'T','T');
-				$month='';
-				$more=false;
+				$this->Cell($colw,5,$day->format($day->format('j') == 1 ? 'j M' : 'j'), 1,0,'L',false,'',0,false,'T','T');
 				$this->SetFont(null, '', $this->fSizeSmall);
-				if(date('M',$date)!=date('M',Date::date_add($date, 1))) {
-					$month = date('M',Date::date_add($date, 1));
-				}
+
 				$events = '';
-				if(date('M',$this->day)==date('M',$date)) {
-					$amount = 0;
-					if(isset($this->events[$date]['fd'])) {
+				$amount = 0;
+				if($this->day->format('M')===$day->format('M')) {
+
+					if(isset($this->events[$day->format('Ymd')])) {
 							
-						foreach($this->events[$date]['fd'] as $i => $event) { //full day
-							$events.='<br><font color="blue">'.substr($event->name,0,25).'</font>';
+						foreach($this->events[$day->format('Ymd')] as $event) { //full day
+							if($event->showWithoutTime) {
+								$events .= '<br><font color="blue">' . substr($event->title, 0, 25) . '</font>';
+							} else {
+								$events .= "<br>".$event->start->format('G:i') .'-'. $event->end()->format('G:i') .' '. substr($event->title,0,25);
+							}
 							$amount++;
 						}
 					}
-					$eventsMerge = $this->allEvents($date);
-					if(!empty($eventsMerge)) {
-						foreach($eventsMerge as $i => $event) { //part day
-							if($i+$amount>5) {
-								$more=true;
-								break;
-							}
-							$events.="<br>".date('G:i',$event->start_time) .'-'. date('G:i',$event->end_time) .' '. substr($event->name,0,25);
-						}
-					}
+//					$eventsMerge = $this->allEvents($day->format('Ymd'));
+//					if(!empty($eventsMerge)) {
+//						foreach($eventsMerge as $i => $event) { //part day
+//							if($i+$amount>5) {
+//								$more=true;
+//								break;
+//							}
+//
+//						}
+//					}
 						
 					$this->SetFillColor(255);
 				} else {
@@ -160,10 +159,10 @@ class Month extends Calendar {
 				//\GO::debug($events);
 				//$this->MultiCell($colw,$rowh-$dateh,$events, 1,'L',true,0,'','',true,0,true,true,$rowh-$dateh,'T',true);
 				//$this->writeHTMLCell($colw,$rowh-$dateh,$this->GetX(),$this->GetY(),  mb_convert_encoding($events,'UTF-8', 'UTF-8'), 1,0,true);
-				$this->DayCell($events, $colw, $rowh-$dateh, $coord[0], $coord[1]+$dateh,$more);
+				$this->DayCell($events, $colw, $rowh-$dateh, $coord[0], $coord[1]+$dateh,$amount>5);
 				
 				$this->SetXY($coord[0]+$colw,$coord[1]);
-				$date = \GO\Base\Util\Date::date_add($date, 1);
+				$day->modify('+1 day');
 			}
 			$this->SetXY($this->leftMargin,$this->GetY()+$rowh);
 			
@@ -171,17 +170,6 @@ class Month extends Calendar {
 		$this->SetXY(10,36);
 		$this->Cell($colw+7, $rowh*$weeks+6, '',1);
 
-	}
-	
-	private function allEvents($date) {
-		$allEvents = array();
-		if(isset($this->events[$date]['early']))
-			$allEvents = array_merge($allEvents, $this->events[$date]['early']);
-		if(isset($this->events[$date]['part']))
-			$allEvents = array_merge($allEvents, $this->events[$date]['part']);
-		if(isset($this->events[$date]['late']))
-			$allEvents = array_merge($allEvents, $this->events[$date]['late']);
-		return $allEvents;
 	}
 	
 	protected function DayCell($text, $width, $h, $x=null, $y=null, $more=false) {

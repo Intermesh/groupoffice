@@ -61,9 +61,8 @@ class BusyPeriod {
 		$list = [];
 		foreach($stmt as $period) {
 			if(!empty($period->recurrenceRule)) {
-
-				foreach(self::expand($period, $start, $end) as $rId => $item) {
-					$list[$period->eventId.'/'.$rId] = $item;
+				foreach(self::expand($period, $start, $end) as $rId => $instance) {
+					$list[$period->eventId.'/'.$rId] = $instance;
 				}
 
 			} else if(!empty($period->ownerId) || !empty($event->participantId)) {
@@ -78,26 +77,21 @@ class BusyPeriod {
 		];
 	}
 
-//	private function toUtc() {
-//		$dt = DateTime::createFromFormat('Y-m-d H:i:s', $val, $event->timeZone());
-//		$dt->setTimezone(new \DateTimeZone('UTC'));
-//	}
-
-	private static function expand($p, string $from, string $until) {
+	static function expand($p, string $from, string $until) {
 		$it = ICalendarHelper::makeRecurrenceIterator((object)[
-			'start'=>new DateTime($p->start),
-			'recurrenceRule'=>$p->recurrenceRule,
+			'start'=>new \DateTime($p->start),
+			'recurrenceRule'=>json_decode($p->recurrenceRule),
 			'timezone'=>$p->timeZone
 		]);
 		$it->fastForward(new DateTime($from));
-		if(!empty($p->lastOcurence)) {
+		if(!empty($p->lastOccurrence)) {
 			$until = min($until, $p->lastOccurrence);
 		}
 		$maxDate = new \DateTime($until);
 		while ($it->valid() && $it->current() < $maxDate) {
 			$recurrenceId = $it->current();
-			$period = new self($p);
-			$period->utcStart = $recurrenceId->format('Y-m-d H:i:s');
+			$instance = clone $p;
+			$instance->utcStart = $recurrenceId->format('Y-m-d H:i:s');
 			$o = @$p->recurrenceOverrides[$recurrenceId];
 			$duration = $p->duration;
 			if(isset($o)) {
@@ -106,20 +100,26 @@ class BusyPeriod {
 					continue;
 				}
 				if($o->start) {
-					$period->utcStart = $o->start;
+					$instance->utcStart = $o->start;
 				}
 				if($o->duration) {
 					$duration = $o->duration;
 				}
 			}
 
-			$end = new DateTime($period->utcStart);
+			$end = new DateTime($instance->utcStart);
 			$end->add(new \DateInterval($duration));
-			$period->utcEnd = $end->format('Y-m-d H:i:s');
+			$instance->utcEnd = $end->format('Y-m-d H:i:s');
 
-			yield $recurrenceId->format('Y-m-d\TH:i:s') => $period;
+			yield $recurrenceId->format('Y-m-d\TH:i:s') => $instance;
 			$it->next();
 		}
 	}
+//	private function toUtc() {
+//		$dt = DateTime::createFromFormat('Y-m-d H:i:s', $val, $event->timeZone());
+//		$dt->setTimezone(new \DateTimeZone('UTC'));
+//	}
+
+
 
 }

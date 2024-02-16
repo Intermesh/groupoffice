@@ -7,6 +7,8 @@
  */
 namespace go\modules\community\calendar\model;
 
+use go\core\util\DateTime;
+
 class RecurrenceRule {
 
 	const Yearly = 'yearly'; // not sure why spec doesn't use annualy
@@ -47,5 +49,43 @@ class RecurrenceRule {
 
 	/** @var string LocalDate */
 	public $until = null;
-	
+
+	static function expand(CalendarEvent $p, string $from, string $until) {
+		$it = ICalendarHelper::makeRecurrenceIterator((object)[
+			'start'=>$p->start,
+			'recurrenceRule'=> $p->getRecurrenceRule(),
+			'timezone'=>$p->timeZone
+		]);
+		$it->fastForward(new DateTime($from));
+		if(!empty($p->lastOccurrence)) {
+			$until = min($until, $p->lastOccurrence->format('Y-m-d'));
+		}
+		$maxDate = new \DateTime($until);
+		while ($it->valid() && $it->current() < $maxDate) {
+			$recurrenceId = $it->current();
+			$instance = clone $p;
+			$instance->utcStart = $recurrenceId;
+			$o = @$p->recurrenceOverrides[$recurrenceId];
+			$duration = $p->duration;
+			if(isset($o)) {
+				if($o->excluded) {
+					$it->next();
+					continue;
+				}
+				if($o->start) {
+					$instance->utcStart = new \DateTime($o->start);
+				}
+				if($o->duration) {
+					$duration = $o->duration;
+				}
+			}
+
+			$end = new DateTime($instance->utcStart);
+			$end->add(new \DateInterval($duration));
+			$instance->utcEnd = $end;
+
+			yield $recurrenceId->format('Y-m-d\TH:i:s') => $instance;
+			$it->next();
+		}
+	}
 }

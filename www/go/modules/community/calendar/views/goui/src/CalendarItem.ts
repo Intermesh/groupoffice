@@ -1,4 +1,16 @@
-import {BaseEntity, btn, comp, DateInterval, DateTime, DefaultEntity, Recurrence, t, tbar, win} from "@intermesh/goui";
+import {
+	BaseEntity,
+	btn,
+	comp,
+	DateInterval,
+	DateTime,
+	DefaultEntity,
+	E, MaterialIcon, menu,
+	Recurrence,
+	t,
+	tbar,
+	win
+} from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {EventDialog} from "./EventDialog.js";
@@ -24,10 +36,12 @@ const eventDS = jmapds('CalendarEvent');
 interface CalendarItemConfig {
 	key: string // id/recurrenceId
 	recurrenceId?:string
+	extraIcons?: MaterialIcon[]
 	data: Partial<CalendarEvent>
 	title?: string
 	start?: DateTime
 	end?: DateTime
+	open?:() => void
 	//color?: string
 }
 
@@ -44,6 +58,7 @@ export class CalendarItem {
 	title!: string
 	start!: DateTime
 	end!: DateTime
+	private extraIcons;
 	//color!: string
 
 	private initStart: string
@@ -69,7 +84,7 @@ export class CalendarItem {
 		if(!obj.title) {
 			this.title = obj.data.title!;
 		}
-
+		this.extraIcons = obj.extraIcons || [];
 		this.divs = {};
 	}
 
@@ -81,10 +96,9 @@ export class CalendarItem {
 		return this.isNew() || this.initStart !== this.start.format('Y-m-d\TH:i:s') || this.initEnd !== this.end.format('Y-m-d\TH:i:s');
 	}
 
-	static expand(e: CalendarEvent, from: DateTime, until: DateTime) : CalendarItem[] {
+	static *expand(e: CalendarEvent, from: DateTime, until: DateTime) : Generator<CalendarItem> {
 		const start = new DateTime(e.start),
-			end = start.clone().add(new DateInterval(e.duration)),
-			items = [];
+			end = start.clone().add(new DateInterval(e.duration));
 
 		if(e.recurrenceRule) {
 			const r = new Recurrence({dtstart: new Date(e.start), rule: e.recurrenceRule, ff: from.date});
@@ -98,7 +112,7 @@ export class CalendarItem {
 						// excluded
 					} else {
 						const overideStart = o.start ? new DateTime(o.start) : r.current.clone();
-						items.push(new CalendarItem({
+						yield new CalendarItem({
 							key: e.id + '/' + recurrenceId,
 							recurrenceId: recurrenceId,
 							start: overideStart,
@@ -106,16 +120,16 @@ export class CalendarItem {
 							end: (o.duration || o.start) ? overideStart.clone().add(new DateInterval(o.duration || e.duration)) : rEnd,
 							data: e
 							//color: o.color??null
-						}));
+						});
 					}
 				} else {
-					items.push(new CalendarItem({
+					yield new CalendarItem({
 						key: e.id + '/' + recurrenceId,
 						recurrenceId: recurrenceId,
 						start: r.current.clone(),
 						end: rEnd,
 						data: e
-					}));
+					});
 				}
 				if(!r.next()) {
 					break;
@@ -125,14 +139,13 @@ export class CalendarItem {
 				//} while(r.current.date < until.date && r.next())
 			}
 		} else if (end.date > from.date && start.date < until.date) {
-			items.push(new CalendarItem({
+			yield new CalendarItem({
 				key: e.id+"",
 				start,
 				end,
 				data:e
-			}));
+			});
 		}
-		return items;
 	}
 
 	remove() {
@@ -182,6 +195,19 @@ export class CalendarItem {
 	get dayLength() {
 		// 1 day + the distance in days between start and end. - 1 second of end = 00:00:00
 		return 1 + this.start.diff(this.end.clone().addSeconds(-1)).getTotalDays()!;
+	}
+
+	get icons() {
+		const e = this.data;
+		const icons = this.extraIcons;
+		if(e.recurrenceRule) icons.push('refresh');
+		if(e.links) icons.push('attachment');
+		if(e.alerts) icons.push('notifications');
+		if(!!e.participants) icons.push('group');
+		if(!icons.length && !e.showWithoutTime) {
+			icons.push('fiber_manual_record') // the dot
+		}
+		return icons.map(i=>E('i',i).cls('icon'));
 	}
 
 	save(onCancel: Function) {

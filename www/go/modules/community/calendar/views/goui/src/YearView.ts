@@ -42,7 +42,7 @@ export class YearView extends CalendarView {
 
 	protected populateViewModel() {
 		this.clear()
-		for(const item of this.adapter.items()){
+		for(const item of this.adapter.items){
 			this.viewModel.push(item);
 		}
 		this.renderView()
@@ -51,7 +51,6 @@ export class YearView extends CalendarView {
 	renderView() {
 		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		this.iterator = 0;
-		console.log(this.viewModel);
 		this.el.innerHTML = '';
 		let d = this.day.clone();
 		for(let m = 1; m <= 12; m++) {

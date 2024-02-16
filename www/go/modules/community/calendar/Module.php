@@ -3,6 +3,10 @@ namespace go\modules\community\calendar;
 
 use GO\Base\Exception\AccessDenied;
 use go\core;
+use go\core\model\User;
+use go\core\orm\Property;
+use go\modules\community\calendar\model\Calendar;
+use go\modules\community\calendar\model\Preferences;
 use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
@@ -38,6 +42,16 @@ class Module extends core\Module
 		return BusyPeriod::fetch($id, $start, $end);
 	}
 
+	public function defineListeners()
+	{
+		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+		//User::on(User::EVENT_BEFORE_DELETE, static::class, 'onUserDelete');
+	}
+	public static function onMap(core\orm\Mapping $mapping)
+	{
+		$mapping->addHasOne('calendarSettings', Preferences::class, ['id' => 'userId'], true);
+	}
+
 	public function downloadIcs($key) {
 		$ev = CalendarEvent::findById($key);
 
@@ -45,32 +59,87 @@ class Module extends core\Module
 		echo ICalendarHelper::toVObject($ev)->serialize();
 	}
 
-	public function pagePrint($type,$date, $calendars) {
-		$calendarIds = json_decode($calendars);
+	public function pagePrint($type,$date) {
+		go()->setAuthState(new core\jmap\State());
+		$calendarIds = Calendar::find()->selectSingleValue('calendar_calendar.id')
+			//->join('calendar_calendar_user', 'cu','cu.userId = '.go()->getUserId().' AND cu.calendarId = t.id')
+			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
+		//$calendarIds = json_decode($calendars);
 		switch($type) {
-			case 'week' : $this->printWeek($date, $calendarIds);
+			case 'day': $this->printDay(new \DateTime($date), $calendarIds);
+			case 'days': $this->printWeek($date, $calendarIds, 5);
+			case 'week' : $this->printWeek($date, $calendarIds, 7);
+			case 'month' : $this->printMonth(new \DateTime($date), $calendarIds, 7);
 		}
 	}
 
-	private function printWeek($date, $calendarIds){
+	private function printDay($start, $calendarIds){
 
-		$d = new \DateTime($date);
-		$d->modify('last Monday');
-		$end = (clone $d)->modify('+7 days');
+		$end = (clone $start)->modify('+1 days');
 
-		$report = new reports\Week();
+		$report = new reports\Day();
+		$report->day = $start;
+		$report->end = $end;
 		foreach($calendarIds as $id) {
 			$events = CalendarEvent::find()->filter([
 				'before'=>$end->format('Y-m-d'),
-				'after'=>$d->format('Y-m-d')
+				'after'=>$start->format('Y-m-d'),
+				'inCalendars'=>[$id]
 			])->all();
 
-			$report->day = $d;
+
 			$report->setEvents($events);
-			$report->render($date);
+			$report->render();
+			$report->calendarName = model\Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
+		}
+		$report->Output('day.pdf');
+	}
+
+	private function printWeek($date, $calendarIds, $span){
+
+		$start = (new \DateTime($date))->modify('last Monday');
+		$end = (clone $start)->modify('+'.$span.' days');
+
+		$report = new reports\Week();
+		$report->dayCount = $span;
+		$report->day = $start;
+		$report->end = $end;
+		foreach($calendarIds as $id) {
+			$events = CalendarEvent::find()->filter([
+				'before'=>$end->format('Y-m-d'),
+				'after'=>$start->format('Y-m-d'),
+				'inCalendars'=>[$id]
+			])->all();
+
+
+			$report->setEvents($events);
+			$report->render();
 			$report->calendarName = model\Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
 		$report->Output('week.pdf');
+	}
+
+	private function printMonth($date, $calendarIds) {
+		$start = (clone $date)->modify('first day of this month');
+		$end = (clone $start)->modify('+1 month');
+
+		$report = new reports\Month();
+		$report->day = $start;
+		$report->end = $end;
+		foreach($calendarIds as $id) {
+
+			$events = CalendarEvent::find()->filter([
+				'before'=>$end->format('Y-m-d'),
+				'after'=>$start->format('Y-m-d'),
+				'inCalendars'=>[$id]
+			])->all();
+
+
+			$report->setEvents($events);
+			$report->render();
+			$report->calendarName = model\Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
+		}
+		$report->Output('month.pdf');
 	}
 
 

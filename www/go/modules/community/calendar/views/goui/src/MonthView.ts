@@ -53,16 +53,6 @@ export class MonthView extends CalendarView {
 		}
 
 		this.adapter.goto(this.start, endMonth);
-
-		// Object.assign(this.store.queryParams.filter ||= {}, {
-		// 	after: this.start.format('Y-m-d'),
-		// 	before: endMonth.format('Y-m-d')
-		// });
-		//
-		// this.store.load()
-
-		//this.dom.cls('+loading');
-		//this.store.filter('date', {after: day.format('Y-m-dT00:00:00'), before: end.format('Y-m-dT00:00:00')}).fetch(0,500);
 	}
 
 	private makeDraggable(el: HTMLElement) {
@@ -147,7 +137,7 @@ export class MonthView extends CalendarView {
 	protected populateViewModel() {
 		this.clear()
 
-		for(const item of this.adapter.items()) {
+		for(const item of this.adapter.items) {
 			this.viewModel.push(item);
 		}
 

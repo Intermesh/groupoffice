@@ -7,7 +7,7 @@ import {
 	Recurrence,
 	t
 } from "@intermesh/goui";
-import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
+import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 
 export abstract class CalendarView extends Component {
@@ -62,15 +62,17 @@ export abstract class CalendarView extends Component {
 				}
 			}
 			div = E('div',
-				...this.eventIcons(e),
+				...item.icons,
 				E('em', item.title || '('+t('Nameless')+')'),
 				time
 			)
 		}
+		if(item.key) {
+			div.dataset.key = item.key;
+		}
 		return div.cls('allday',e.showWithoutTime)
 			.cls('declined', item.currentParticipant?.participationStatus === 'declined')
 			.cls('multiday', !e.showWithoutTime && item.dayLength > 1)
-			.attr('data-key', item.key || '_new_')
 			.attr('tabIndex', 0)
 			.on('click',(ev)=> {
 				// if not holding ctrl or shift, deselect
@@ -83,22 +85,13 @@ export abstract class CalendarView extends Component {
 			//.on('mousedown', ev => ev.stopPropagation()) /* when enabled cant drag event in monthview */
 			.on('contextmenu', ev => {
 				// todo: set id first
+				if(!item.key) return;
 				this.current = item;
 				this.contextMenu.showAt(ev);
 				ev.preventDefault();
 			}).on('dblclick', ev => {
 				item.open();
 			});
-	}
-
-	private eventIcons(e: CalendarEvent) {
-		const icons = []
-		if(!e.showWithoutTime && !this.el.has('.week')) icons.push('fiber_manual_record') // the dot
-		if(e.recurrenceRule) icons.push('refresh');
-		if(e.links) icons.push('attachment');
-		if(e.alerts) icons.push('notifications');
-		if(!!e.participants) icons.push('group');
-		return icons.map(i=>E('i',i).cls('icon'));
 	}
 
 	protected clear() {
@@ -129,28 +122,24 @@ export abstract class CalendarView extends Component {
 		return 10;
 	}
 
-	protected ROWHEIGHT = 31;
+	protected ROWHEIGHT = 3.1;
 
 	// for full day view
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
 		const day = weekstart.diff(e.start).getTotalDays()!,
 			pos = Math.max(0,day);
-		let length = e.dayLength;
-		//console.log(length, e.title,e.start.format('d-m-Y H:i:s'), e.end.format('d-m-Y H:i:s'));
-		// if(day < 0) {
-		// 	length+= day
-		// }
-		row = row ?? this.calcRow(pos, length);
 
-		const width = Math.min(14, length) * (100 / Math.min(this.days,7)),
+		row = row ?? this.calcRow(pos, e.dayLength);
+
+		const width = Math.min(14, e.dayLength) * (100 / Math.min(this.days,7)),
 			left = pos * (100 / Math.min(this.days,7)),
 			top = row * this.ROWHEIGHT;
 		return {
 			width: (width-.3).toFixed(2)+'%',
 			left : left.toFixed(2)+'%',
-			top: (top/10).toFixed(2)+'rem',
+			top: top.toFixed(2)+'rem',
 			color: '#'+e.color
-		};// `color: #${e.color}; width: ${(width-.5).toFixed(2)}%; left:${left.toFixed(2)}%; top:${top.toFixed(2)}px;`;
+		};
 	}
 
 	abstract renderView(): void;

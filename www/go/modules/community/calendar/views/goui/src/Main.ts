@@ -98,7 +98,7 @@ export class Main extends Component {
 		});
 
 		this.items.add(
-			this.west = comp({tagName: 'aside', width: 374},
+			this.west = comp({tagName: 'aside', width: 304},
 				tbar({},
 					btn({
 						icon: 'add',
@@ -237,15 +237,16 @@ export class Main extends Component {
 								btn({icon: 'print', text: t('Print current view')}),
 								btn({icon: 'print', text: t('Print count per category')}),
 								//'-',
-								btn({icon: 'view_day', text: t('Day')}),
-								btn({icon: 'view_week', text: t('Week')}),
-								btn({icon: 'view_module', text: t('Month')})
+								btn({icon: 'view_day', text: t('Day'), handler:() => { this.openPDF('day'); }}),
+								btn({icon: 'view_week', text: t('5 days'), handler:() => { this.openPDF('days'); }}),
+								btn({icon: 'view_week', text: t('Week'), handler:() => { this.openPDF('week'); }}),
+								btn({icon: 'view_module', text: t('Month'), handler:() => { this.openPDF('month'); }})
 							)
 						}),
-						btn({icon:'meeting_room', text:t('Resources'), handler: _ => {(new ResourcePanel()).show()}})
+						btn({icon:'meeting_room', text:t('Resources'), handler: _ => { (new ResourcePanel()).show()}})
 					)})
 				),
-				this.cards = cards({flex: 1},
+				this.cards = cards({flex: 1, activeItem:1},
 					weekView,
 					monthView,
 					yearView,
@@ -257,11 +258,13 @@ export class Main extends Component {
 
 	}
 
+	private openPDF(type:string) {
+		window.open(client.pageUrl('community/calendar/print/'+type+'/'+this.date.format('Y-m-d')));
+	}
+
 	private birthdayCb = checkbox({
-		color: '#ff0000',
-		//style: 'padding: 0 8px',
-		value: this.adapter.byType('task').enabled,
-		label: t('Birthdays'),
+		color: '#ff0000', label: t('Birthdays'),
+		value: this.adapter.byType('birthday').enabled,
 		listeners: {
 			'change': (_p, newValue) => {
 				this.adapter.byType('birthday').enabled = newValue;
@@ -271,10 +274,8 @@ export class Main extends Component {
 	})
 
 	private tasksCb = checkbox({
-		color: '#0000ff',
-		//style: 'padding: 0 8px',
+		color: '#0000ff', label: t('Tasks'),
 		value: this.adapter.byType('task').enabled,
-		label: t('Tasks'),
 		listeners: {
 			'change': (_p, newValue) => {
 				this.adapter.byType('task').enabled = newValue;
@@ -284,10 +285,8 @@ export class Main extends Component {
 	})
 
 	private holidayCb = checkbox({
-		color: '#00dd00',
-		//style: 'padding: 0 8px',
+		color: '#009900', label: t('Holidays'),
 		value: this.adapter.byType('holiday').enabled,
-		label: t('Holidays'),
 		listeners: {
 			'change': (_p, newValue) => {
 				this.adapter.byType('holiday').enabled = newValue;
@@ -339,7 +338,7 @@ export class Main extends Component {
 							});
 						},
 						'change': (p, newValue) => {
-							const store = this.adapter.storeByType('event');
+							const store = this.adapter.byType('event').store;
 							this.inCalendars[data.id] = newValue;
 							const calendarIds = Object.keys(this.inCalendars).filter(key => this.inCalendars[key])
 							if(calendarIds.length) {
@@ -390,7 +389,7 @@ export class Main extends Component {
 				multiSelect: true,
 				listeners: {
 					'selectionchange': (tableRowSelect) => {
-						const store = this.adapter.storeByType('event');
+						const store = this.adapter.byType('event').store;
 						const categoryIds = tableRowSelect.selected.map((index) => categoryStore.get(index)?.id);
 
 						if(categoryIds.length) {
@@ -475,8 +474,9 @@ export class Main extends Component {
 				route += '-'+this.spanAmount;
 				this.date.addDays(value * this.spanAmount!);
 				break;
-			case 'week':
 			case 'split':
+				route += '-'+this.spanAmount;
+			case 'week':
 				this.date.addDays(value * 7);
 				break;
 			case 'month':

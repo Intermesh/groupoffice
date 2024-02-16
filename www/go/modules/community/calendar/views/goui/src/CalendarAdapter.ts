@@ -10,23 +10,6 @@ interface CalendarProvider {
 }
 export class CalendarAdapter {
 
-	private birthdayStore = datasourcestore({
-		dataSource: jmapds('Contact')
-	});
-	private taskStore = datasourcestore({
-		dataSource: jmapds('Task')
-	});
-	private holidayStore = datasourcestore({
-		dataSource: jmapds('Holiday')
-	});
-	private eventStore: DataSourceStore<JmapDataSource<CalendarEvent>> = datasourcestore({
-		dataSource:jmapds('CalendarEvent')
-		// listeners: {
-		// 	'load': () => { (this.cards.items.get(this.cards.activeItem) as CalendarView)!.update() }
-		// }
-		//properties: ['title', 'start','duration','calendarId','showWithoutTime','alerts','recurrenceRule','id'],
-	});
-
 	private start!: DateTime
 	private end!: DateTime
 
@@ -43,7 +26,8 @@ export class CalendarAdapter {
 		}
 		Promise.all(promises).then(this.onLoad);
 	}
-	*items() {
+
+	private *generator() {
 		for(const type in this.providers) {
 			const p = this.providers[type];
 			if(!p.enabled) continue;
@@ -53,8 +37,8 @@ export class CalendarAdapter {
 		}
 	}
 
-	storeByType(type:string) {
-		return this.providers[type]?.store;
+	get items() {
+		return this.generator();
 	}
 
 	byType(type: string) {
@@ -64,7 +48,7 @@ export class CalendarAdapter {
 	private providers: {[type:string] : CalendarProvider} = {
 		'event': {
 			enabled: true,
-			store:this.eventStore,
+			store:datasourcestore({dataSource:jmapds('CalendarEvent'), listeners:{'load':()=>this.onLoad()}}),
 			*items(start:DateTime,end:DateTime) {
 				for (const e of this.store!.items) {
 					for(const item of CalendarItem.expand(e as CalendarEvent, start, end))
@@ -93,10 +77,8 @@ export class CalendarAdapter {
 				for(const o of this.list) {
 					const start = DateTime.createFromFormat(o.start,'Y-m-d')!;
 					yield new CalendarItem({
-						key: "holiday-" + o.start,
+						key: '',
 						start,
-						title: o.title,
-						//end: start.clone().addDays(1),
 						data: {
 							title: o.title,
 							color: '00dd00',
@@ -109,15 +91,14 @@ export class CalendarAdapter {
 		},
 		'task': {
 			enabled: true,
-			store: this.taskStore,
+			store: datasourcestore({dataSource: jmapds('Task')}),
 			*items(start:DateTime,end:DateTime) {
 				for(const t of this.store!.items) {
 					const start = DateTime.createFromFormat(t.start, 'Y-m-d');
 					yield new CalendarItem({
-						key: "task" + t.id,
+						key: t.id,
 						start,
-						title: t.title,
-						//end: start.clone().addDays(1),
+						extraIcons:['task_alt'],
 						data: {
 							title: t.title,
 							color: '0000ff',
@@ -139,15 +120,20 @@ export class CalendarAdapter {
 		},
 		'birthday': {
 			enabled: true,
-			store: this.birthdayStore,
+			store: datasourcestore({dataSource: jmapds('Contact')}),
 			*items(from:DateTime,end:DateTime) {
 				const sy= from.getYear();
 				for(const b of this.store.items) {
 					const start = DateTime.createFromFormat(b.birthday,'Y-m-d')!;
 					start.setYear(sy);
 					yield new CalendarItem({
-						key: "bday"+b.id,
+						key: "",
 						start,
+						open() {
+							const dlg = new go.modules.community.addressbook.ContactDetail();
+							dlg.open();
+						},
+						extraIcons: ['cake'],
 						data:{
 							title: b.name+'\'s Birthday',
 							color: 'ff0000',

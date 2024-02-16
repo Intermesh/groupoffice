@@ -196,7 +196,7 @@ export class WeekView extends CalendarView {
 		// 		withTime.push(...items as CalendarDayItem[]);
 		// 	}
 		// }
-		for(const item of this.adapter.items()) {
+		for(const item of this.adapter.items) {
 			if(item.data?.showWithoutTime) {
 				allDay.push(item);
 			} else {

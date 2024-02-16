@@ -77,7 +77,10 @@ modules.register(  {
 			}
 
 			const ui = new Main();
-			router.add(/^calendar\/year\/(\d{4}-\d{2}-\d{2})$/, (year) => {
+			router.add(/^calendar$/, () => {
+				modules.openMainPanel("calendar");
+				ui.goto(new DateTime()).setSpan("month", 31);
+			}).add(/^calendar\/year\/(\d{4}-\d{2}-\d{2})$/, (year) => {
 				modules.openMainPanel("calendar");
 				ui.goto(new DateTime(year)).setSpan("year", 365);
 			}).add(/^calendar\/month\/(\d{4}-\d{2}-\d{2})$/, (yearMonth) => {
