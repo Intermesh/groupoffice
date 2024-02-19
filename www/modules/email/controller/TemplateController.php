@@ -30,13 +30,10 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	protected function getStoreParams($params) {
 
 		$findParams = \GO\Base\Db\FindParams::newInstance();
-		$findParams->joinRelation('group');
+		$findParams->joinRelation('group', 'left');
 		$params['type'] = 0;
 		if(isset($params['type'])){
-
-			
 			$findParams->getCriteria()->addCondition('type', $params['type']);
-
 		}
 		return $findParams;
 		//return parent::getStoreParams($params);
