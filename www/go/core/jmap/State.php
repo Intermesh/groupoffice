@@ -10,7 +10,6 @@ use go\core\model\Module;
 use go\core\model\Token;
 use go\core\auth\State as AbstractState;
 use go\core\model\User;
-use PDO;
 use stdClass;
 
 class State extends AbstractState {
@@ -127,7 +126,7 @@ class State extends AbstractState {
 			
 			if(!$this->token) {
 				return false;
-			}		
+			}
 
 			if($this->token->isExpired()) {
 				try {

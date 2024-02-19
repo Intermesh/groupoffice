@@ -150,6 +150,16 @@ abstract class Entity extends Property {
 	 * @param string[] $properties Specify the columns for optimal performance. You can also use the mapping to only fetch table columns Note::getMapping()->getColumnNames()
 	 * @param bool $readOnly Readonly has less overhead
 	 * @return static[]|Query
+	 * @throws Exception
+	 * @example
+	 * ````
+	 * $note = Note::find()->where(['name' => 'Foo'])->single();
+	 *
+	 * ```
+	 *
+	 * For more details see the Criteria::where() function description
+	 *
+	 * @see Criteria::where()
 	 * @example
 	 * ````
 	 * $notes = Note::find()->where(['name' => 'Foo']);
@@ -162,15 +172,6 @@ abstract class Entity extends Property {
 	 *
 	 * For a single value do:
 	 *
-	 * @example
-	 * ````
-	 * $note = Note::find()->where(['name' => 'Foo'])->single();
-	 *
-	 * ```
-	 *
-	 * For more details see the Criteria::where() function description
-	 *
-	 * @see Criteria::where()
 	 */
 	public static final function find(array $properties = [], bool $readOnly = false) {
 		return static::internalFind($properties, $readOnly);
