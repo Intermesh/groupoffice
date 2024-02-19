@@ -57,7 +57,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes) {
 		$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($model->content, false);
 		$response['htmlbody'] = $message->getHtmlBody();
-		
+
 		parent::afterSubmit($response, $model, $params, $modifiedAttributes);
 	}
 	
