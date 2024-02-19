@@ -1,3 +1,5 @@
+- Automation: fix foreign key to allow deletion of automated jobs
+
 16-02-2023: 6.8.35
 - Tasks/Core: Bug in copy() function where dates and other objects had reference to the source. This caused the task dates to change on recurrence.
 - E-mail: Don't use assistant anymore for opening attachments
