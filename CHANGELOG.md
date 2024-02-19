@@ -1,3 +1,5 @@
+19-02-2024: 6.7.68
+- Core: fix $config['debug_usernames'] functionality even better!
 - Tickets: Fixed scrolling in new ticket message
 - Email: Larger add filter window
 - Tasks/Core: Bug in copy() function where dates and other objects had reference to the source. This caused the task dates to change on recurrence.
