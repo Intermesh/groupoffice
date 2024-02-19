@@ -1,4 +1,6 @@
 19-02-2023: 6.8.35
+- Core: Include password for import
+- Core: more button not visible on user management page
 - Automation: fix foreign key to allow deletion of automated jobs
 - Core: Search modules by package name
 - Tasks/Core: Bug in copy() function where dates and other objects had reference to the source. This caused the task dates to change on recurrence.
