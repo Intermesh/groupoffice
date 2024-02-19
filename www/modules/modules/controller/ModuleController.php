@@ -92,7 +92,7 @@ class ModuleController extends AbstractJsonController{
 				if(isset($params['isInstalled']) && $params['isInstalled'] == 'false' && !empty($model)) {
 					continue;
 				}
-				if(!empty($params['query']) && stripos($module->getName(),$params['query'])===false && stripos($module->getDescription(), $params['query'])===false) {
+				if(!empty($params['query']) && stripos($module->getPackage().' '.$module->getName(),$params['query'])===false && stripos($module->getDescription(), $params['query'])===false) {
 					continue;
 				}
 
@@ -127,7 +127,7 @@ class ModuleController extends AbstractJsonController{
 				if(isset($params['isInstalled']) && $params['isInstalled'] == 'false' && $model) {
 					continue;
 				}
-				if(!empty($params['query']) && stripos($module->localizedName(),$params['query'])===false && stripos($module->description(), $params['query'])===false) {
+				if(!empty($params['query']) && stripos($module->getPackage().' '.$module->localizedName(),$params['query'])===false && stripos($module->description(), $params['query'])===false) {
 					continue;
 				}
 
