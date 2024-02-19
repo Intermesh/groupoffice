@@ -239,9 +239,9 @@ abstract class AbstractConverter {
 	 * 
 	 * It uses the data stored in {@see nextImportRecord()} to create an entity and stores it.
 	 * 
-	 * When false is returned the result will be ignored. For example when you want to skip a CSV line because it's empty.
+	 * When null is returned the result will be ignored. For example when you want to skip a CSV line because it's empty.
 	 *
-	 * @return Entity|false
+	 * @return ?Entity
 	 */
 	abstract protected function importEntity();
 
