@@ -76,20 +76,9 @@ class GO{
 			
 		if (($module != 'base' && (!GO::modules()->isInstalled($module) || !GO::modules()->isAvailable($module))) || !class_exists($className)){
 			return false;
-		}else
-		{
+		} else {
 			return true;
 		}
-//			
-//		if(class_exists($className)){
-//			
-//			$clsParts = explode('\\',$className);
-//			
-//			if($clsParts[1] == 'Base' || GO::modules()->isInstalled(strtolower($clsParts[1])))
-//				return true;
-//		}
-//	
-//		return false;
 	}
 	
 	/**
@@ -230,7 +219,7 @@ class GO{
 	 * Close the database connection. Beware that all active PDO statements must be set to null too
 	 * in the current scope.
 	 * 
-	 * Wierd things happen when using fsockopen. This test case leaves the conneciton open. When removing the fputs call it seems to work.
+	 * Weird things happen when using fsockopen. This test case leaves the conneciton open. When removing the fputs call it seems to work.
 	 * 
 	 * 			
 	    \GO::session()->login('admin','admin');
@@ -302,7 +291,7 @@ class GO{
 		if(!isset(self::$_view)){
 			self::$_view = new $class();
 		}
-		return self::$_view;//isset(\GO::session()->values['view']) ? \GO::session()->values['view'] : \GO::config()->defaultView;
+		return self::$_view;
 	}
 
 	public static function setView($viewName){
@@ -363,20 +352,6 @@ class GO{
 	 */
 	public static function modules() {
 		if (!isset(self::$_modules)) {
-//			if(\GO::user()){
-//			
-//			Caching caused more problems than benefits
-//			
-//				if(isset(\GO::session()->values['modulesObject']) && !isset($GLOBALS['GO_CONFIG'])){
-//					self::$_modules=\GO::session()->values['modulesObject'];
-//				}else{
-//					self::$_modules=\GO::session()->values['modulesObject']=new \GO\Base\ModuleCollection();
-//				}
-//			}else
-//			{
-//				self::$_modules=new \GO\Base\ModuleCollection();
-//			}
-			
 			self::$_modules=new \GO\Base\ModuleCollection();
 		}
 		return self::$_modules;
@@ -409,9 +384,9 @@ class GO{
         if (!isset(self::$_cache)) {
             if(!GO::isInstalled()){
               self::$_cache=new \GO\Base\Cache\None();
-						}else{
-							self::$_cache = new \GO\Base\Cache\Apcu();
-						}
+			}else{
+				self::$_cache = new \GO\Base\Cache\Apcu();
+			}
         }
         return self::$_cache;
     }
@@ -436,8 +411,6 @@ class GO{
 			
 			if(isset($cacheKey)) {
 				self::$_config->cacheTime = time();
-
-				//apcu_store($cacheKey, self::$_config);
 			}
 
 			if(!empty(GO::session()->values['debug'])) {
@@ -465,9 +438,6 @@ class GO{
 	 */
 	public static function autoload($className) {
 		
-		//for namespaces
-//		$className = str_replace('\\', '_', $className);
-		
 		//Sometimes there's a leading \ in the $className and sometimes not.
 		//Might not be true for all php versions.		
 		$className = ltrim($className, '\\');
@@ -475,10 +445,7 @@ class GO{
 		if(isset(self::$_classes[$className])){
 			//don't use \GO::config()->root_path here because it might not be autoloaded yet causing an infite loop.
 			require(dirname(dirname(__FILE__)) . '/'.self::$_classes[$className]);
-		}else
-		{
-//			echo "Autoloading: ".$className."\n";
-			
+		} else {
 			$filePath = false;
 
 			if(substr($className,0,7)=='GO\\Base'){
@@ -500,7 +467,6 @@ class GO{
 				$filePath = \GO::config()->file_storage_path.'php/'.$location;	
 				
 			} else {
-				//$orgClassName = $className;
 				$forGO = substr($className,0,3)=='GO\\';
 
 				if ($forGO)
@@ -566,12 +532,6 @@ class GO{
 			throw new \Exception("Group-Office was already initialized");
 		}
 		self::$initialized=true;
-		
-		//register our custom error handler here
-//		set_error_handler(array('GO','errorHandler'));
-//		register_shutdown_function(array('GO','shutdown'));
-
-//   	spl_autoload_register(array('GO', 'autoload'));
 		
 		//Start session here. Important that it's called before \GO::config().
 		\GO::session();
@@ -748,8 +708,7 @@ class GO{
 		$errorMsg .= "----------------";
 		
 		\GO::debug($errorMsg);
-//		\GO::logError($errorMsg);	
-		
+
 		foreach(self::$_errorLogCallbacks as $callback){
 			call_user_func($callback, $errorMsg);
 		}
@@ -843,7 +802,7 @@ class GO{
 		 \GO::debug("Script running at [$id] for ".$time."ms");
 	}
 	/**
-	 * Write's to a debug log.
+	 * Writes to a debug log.
 	 *
 	 * @param string $text log entry
 	 */
@@ -937,12 +896,7 @@ class GO{
 	 * @return \GO\Base\Db\ActiveRecord
 	 */
 	public static function getModel($modelName){
-		//$modelName::model() does not work on php 5.2! That's why we use this function.
-		
-		//backwards compat
-		//$modelName = str_replace('_','\\', $modelName);
-		
-		if(!class_exists($modelName)){			
+		if(!class_exists($modelName)){
 
 			$entityType = \go\core\orm\EntityType::findByName($modelName);
 			
@@ -951,8 +905,7 @@ class GO{
 			}
 			
 			$modelName = $entityType->getClassName();
-			//return $modelName;
-		} 
+		}
 		
 
 		
@@ -975,8 +928,6 @@ class GO{
 	 */
 	public static function createExternalUrl($module, $function, $params,$toLoginDialog=false)
 	{
-		//$p = 'm='.urlencode($module).'&f='.urlencode($function).'&p='.urlencode(base64_encode(json_encode($params)));
-
 		if(\GO::config()->debug){
 			if(!preg_match('/[a-z]+/', $module))
 				throw new \Exception('$module param may only contain a-z characters.');
@@ -1026,8 +977,7 @@ class GO{
 
 		if(empty($path)){
 			$amp = 'index.php?';
-		}else
-		{
+		}else {
 			$url .= 'index.php?r='.$path;
 
 			$amp = $htmlspecialchars ? '&amp;' : '&';
@@ -1040,8 +990,7 @@ class GO{
 
 					$amp = $htmlspecialchars ? '&amp;' : '&';
 				}
-			}else
-			{
+			} else {
 				$url .= $amp.$params;
 			}
 		}

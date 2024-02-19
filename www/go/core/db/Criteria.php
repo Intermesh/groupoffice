@@ -175,7 +175,7 @@ class Criteria {
 	{
 		if(is_array($condition)) {
 
-			if(go()->getDebugger()->enabled && empty($condition)) {
+			if(empty($condition) && go()->getDebugger()->enabled) {
 				throw new LogicException("You can't pass an empty array as first where() argument");
 			}
 

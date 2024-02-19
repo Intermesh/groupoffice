@@ -331,7 +331,6 @@ abstract class Entity extends Property {
 
 		$this->isSaving = true;
 
-//		go()->debug(static::class.'::save()' . $this->id());
 		App::get()->getDbConnection()->beginTransaction();
 
 		try {
@@ -550,7 +549,6 @@ abstract class Entity extends Property {
 			return false;
 		}
 
-		//$this->isDeleting = false;
 		$this->isSaving = false;
 
 		return true;

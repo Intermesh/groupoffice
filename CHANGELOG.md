@@ -276,6 +276,8 @@
 
 -- 6.8 --
 
+19-02-2024: 6.7.68
+- Core: fix $config['debug_usernames'] functionality even better!
 - Tickets: Fixed scrolling in new ticket message
 - Email: Larger add filter window
 - Tasks/Core: Bug in copy() function where dates and other objects had reference to the source. This caused the task dates to change on recurrence.
@@ -284,6 +286,7 @@
 - Email / Core : underline html editor toolbar
 - Newsletters: test message didn't work with e-mail account
 - Email: Sometimes tree could collapse without reason
+- Email: Fixed sorting and collapsing of e-mail template groups
 
 12-02-2024: 6.7.67
 - Core: fix $config['debug_usernames'] functionality
