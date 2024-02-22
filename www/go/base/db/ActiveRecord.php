@@ -1222,7 +1222,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 *
 	 * @param FindParams $params
-	 * @return static ActiveStatement
+	 * @return static[]|ActiveStatement<$this>
 	 */
 	public function find($params=array()){
 

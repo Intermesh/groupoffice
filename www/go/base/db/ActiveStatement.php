@@ -24,6 +24,12 @@
 namespace GO\Base\Db;
 
 
+/**
+ * Query object for entities
+ *
+ * @template T
+ * @implements \IteratorAggregate<T>
+ */
 class ActiveStatement implements \IteratorAggregate {
 	
   /**
@@ -35,7 +41,7 @@ class ActiveStatement implements \IteratorAggregate {
 	
 	/**
 	 *
-	 * @var PDOStatement 
+	 * @var \PDOStatement
 	 */
 	public $stmt;
   
@@ -118,7 +124,7 @@ class ActiveStatement implements \IteratorAggregate {
 	/**
 	 * Fetch a model from the statement
 	 * 
-	 * @return ActiveRecord
+	 * @return T
 	 */
 	public function fetch($fetch_style=null){
 
@@ -132,7 +138,7 @@ class ActiveStatement implements \IteratorAggregate {
 	/**
 	 * Get all models from the find result
 	 * 
-	 * @return ActiveRecord[]
+	 * @return T[]
 	 */
 	public function fetchAll($fetch_style=null){
 		//for PHP 8 compat
@@ -204,7 +210,7 @@ class ActiveStatement implements \IteratorAggregate {
 	
 	/**
 	 * Making the activefinder iterable
-	 * @return \Traversable
+	 * @return \Traversable<T>
 	 */
 	public function getIterator(): \Traversable
 	{

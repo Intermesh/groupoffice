@@ -178,20 +178,30 @@ abstract class Entity extends Property {
 	/**
 	 * Find or create an entity
 	 *
-	 * @param string $id $businessId . "-" . $contactId
+	 * @param string $key $businessId . "-" . $contactId
+	 * @param string|null $keyField Field to search on. If null then findById() is used.
 	 * @param array $values Values to apply if it needs to be created.
 	 * @return static
-	 * @throws Exception
+	 * @throws SaveException
 	 */
-	public static function findOrCreate(string $id, array $values = []): Entity
+	public static function findOrCreate(string $key, string $keyField = null, array $values = []): Entity
 	{
-		$entity = static::findById($id);
+		if($keyField === null) {
+			$entity = static::findById($key);
+		} else {
+			$entity = static::find()->where($keyField, '=', $key)->single();
+		}
 		if($entity) {
 			return $entity;
 		}
 
 		$entity = new static();
-		$entity->setValues(static::idToPrimaryKeys($id));
+
+		if($keyField === null) {
+			$entity->setValues(static::idToPrimaryKeys($key));
+		} else {
+			$entity->$keyField = $key;
+		}
 		$entity->setValues($values);
 
 		if(!$entity->save()) {

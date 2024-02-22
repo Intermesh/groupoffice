@@ -591,7 +591,7 @@ class Link extends AclItemEntity
 	 * @return bool
 	 * @throws SaveException
 	 */
-	public static function copyTo($from, $to): bool
+	public static function copyTo($from, $to, bool $checkExisting = true): bool
 	{
 		go()->getDbConnection()->beginTransaction();
 		try {
@@ -599,8 +599,17 @@ class Link extends AclItemEntity
 				$copy = $link->copy();
 				$copy->fromEntityTypeId = $to::entityType()->getId();
 				$copy->fromId = $to->id;
-				if (!$copy->save()) {
-					throw new SaveException($copy);
+
+				if(!$checkExisting || !Link::find(['fromEntityTypeId'])->where([
+					'fromEntityTypeId' => $copy->fromEntityTypeId,
+					'fromId' => $copy->fromId,
+					'toEntityTypeId' => $copy->toEntityTypeId,
+					'toId' => $copy->toId,
+				])->single()) {
+
+					if (!$copy->save()) {
+						throw new SaveException($copy);
+					}
 				}
 			}
 		} catch(Exception $e) {
