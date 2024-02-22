@@ -1959,7 +1959,7 @@ $sub = $offset>0;
 					$this->setValidationRule('uuid', 'unique', array('calendar_id','start_time', 'exception_for_event_id'));
 				
 					
-				if(!$this->save()){	
+				if(!$this->save(true)){
 
 					if ($importExternal) {
 						$installationName = !empty(\GO::config()->title) ? \GO::config()->title : 'Group-Office';
@@ -2042,11 +2042,11 @@ The following is the error message:
 						$participant->user_id=$this->calendar->user_id;
 					}
 					
-					$participant->save();
+					$participant->save(true);
 				}else
 				{
 					$this->is_organizer=true;
-					$this->save();
+					$this->save(true);
 				}
 			}
 			
@@ -2083,7 +2083,7 @@ The following is the error message:
 				foreach ($exceptionEventsStmt as $exceptionEventModel) {
 					$exceptionEventModel->exception_for_event_id=$this->id;
 					
-					$exceptionEventModel->save();
+					$exceptionEventModel->save(true);
 					//TODO: This method only works when an exception takes place on the same day as the original occurence.
 					//We should store the RECURRENCE-ID value so we can find it later.
 					$this->addException($exceptionEventModel->start_time, $exceptionEventModel->id);
