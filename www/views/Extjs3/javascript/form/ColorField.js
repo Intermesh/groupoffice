@@ -155,13 +155,13 @@ GO.form.ColorField =  Ext.extend(function(config){
 	// These regexes limit input and validation to hex values
 	regex: /[a-f0-9]/i,
 
-	/**
-	 * @cfg {String} color
-	 * @private
-	 * A string hex value to be used as the default color.  Defaults
-	 * to 'FFFFFF' (white).
-	 */
-	curColor: 'FFFFFF',
+	// /**
+	//  * @cfg {String} color
+	//  * @private
+	//  * A string hex value to be used as the default color.  Defaults
+	//  * to 'FFFFFF' (white).
+	//  */
+	// curColor: 'FFFFFF',
 
 	// private
 	validateValue : function(value){
@@ -230,8 +230,15 @@ GO.form.ColorField =  Ext.extend(function(config){
 				this.el.setStyle({'text-indent': '-100px'});
 			}
 
-			if(this.menu && !GO.util.empty(this.curColor) && Ext.isDefined(this.colors) && this.colors.indexOf(this.curColor)>-1)
-				this.menu.palette.select(this.curColor);
+			if(this.menu && !GO.util.empty(this.value) && Ext.isDefined(this.colors) && this.colors.indexOf(this.value)>-1)
+				this.menu.palette.select(this.value);
+		}
+	},
+
+	onFocus : function() {
+		GO.form.ColorField.superclass.onFocus.call(this);
+		if(!this.showHexValue) {
+			this.trigger.focus();
 		}
 	},
 
@@ -283,7 +290,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 			});
 			
 			this.menu.palette.on('select', this.handleSelect, this );
-			this.menu.palette.value = this.curColor;
+			this.menu.palette.value = this.value;
 
 			if(this.colors) {
 				this.menu.palette.colors=this.colors;
