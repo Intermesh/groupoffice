@@ -1,6 +1,7 @@
 - Calendar: Fixed changing color for calendars and categories issue #1112
 - Calendar: Fixed: 6.8.34 bad translation german #1119
 - smime: fixed signing with attachments issue #1120
+- Caldav: fixed broken imip issue #1117
 
 19-02-2023: 6.8.35
 - Core: Include password for import

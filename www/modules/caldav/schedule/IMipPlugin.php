@@ -5,6 +5,7 @@ namespace GO\Caldav\Schedule;
 
 
 use go\core\ErrorHandler;
+use go\core\mail\AddressList;
 use go\core\model\Module;
 
 class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
@@ -38,8 +39,8 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 		}
 
 		try {
-			$recipients = new \GO\Base\Mail\EmailRecipients($to);
-			$to = $recipients->getAddress();
+			$recipients = new AddressList($to);
+			$to = $recipients[0];
 
 			$message = \GO\Base\Mail\Message::newInstance($subject)
 				->setFrom(\GO::user()->email, \GO::user()->name)
@@ -59,7 +60,7 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 
 			$mailer->send($message);
 		} catch(\Throwable $e) {
-			ErrorHandler::log("Error sending CalDAV IMip mail to " . implode("," , $to));
+			ErrorHandler::log("Error sending CalDAV IMip mail to " . $to);
 			ErrorHandler::logException($e);
 		}
 	}
