@@ -1,3 +1,5 @@
+- Calendar: Fixed changing color for calendars and categories issue #1112
+
 19-02-2023: 6.8.35
 - Core: Include password for import
 - Core: more button not visible on user management page
