@@ -312,16 +312,16 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			]).then(function(){
 				go.Entities.init();
 
-				me.fireEvent('authenticated', this, go.User, password);
-
-
-				me.renderUI();
-				Ext.getBody().unmask();
-				setTimeout(() => {
-					//give "authenticated" listeners above a change to add routes
-					me.addDefaultRoutes();
-					go.Router.check();
-				})
+				window.groupofficeCore.client.authenticate().then(() => {
+					me.fireEvent('authenticated', this, go.User, password);
+					me.renderUI();
+					Ext.getBody().unmask();
+					setTimeout(() => {
+						//give "authenticated" listeners above a change to add routes
+						me.addDefaultRoutes();
+						go.Router.check();
+					})
+				});
 			});
 		}).catch(function(error) {
 			// Ext.getBody().unmask();
