@@ -1,4 +1,65 @@
+- Calendar: Fixed changing color for calendars and categories issue #1112
+- Calendar: Fixed: 6.8.34 bad translation german #1119
+- smime: fixed signing with attachments issue #1120
+- Caldav: fixed broken imip issue #1117
+- Core: If ACL was empty it loaded default values for existing items in dialogs.
+
+19-02-2023: 6.8.35
+- Core: Include password for import
+- Core: more button not visible on user management page
+- Automation: fix foreign key to allow deletion of automated jobs
+- Core: Search modules by package name
+- Tasks/Core: Bug in copy() function where dates and other objects had reference to the source. This caused the task dates to change on recurrence.
+- E-mail: Don't use assistant anymore for opening attachments
+- Tickets: Fixed scrolling in new ticket message
+- Email: Larger add filter window
+- Core: fix $config['debug_usernames'] functionality
+- Email: Fixed html toolbar not auto sized when switching from plain text to html in the composer
+- Email / Core : underline html editor toolbar
+- Newsletters: test message didn't work with e-mail account
+- Email: Sometimes tree could collapse without reason
+- Email: Fixed sorting and collapsing of e-mail template groups
+- Caldav: Fixed: undefined method addReplyTo (Issue #1117)
+- smime: Checkbox in email composer was sometimes not changable
+- smime: Sent item wasn't signed.
+- Calendar: User may only edit calendars when they have manage permissions
+- Automation: Added BCC for email actions
+- Multi instance: Added some filters to support follow up e-mails
+- Multi instance: Fixed installing welcome message
+
+12-02-2023: 6.8.34
+- Finance: Don't find invoices that were already paid when importing payments
+- SMIME: Extra certificates were not incluced. Potential fix for issue #1113
+- Addressbook: bugfix import contacts
+
+05-02-2023: 6.8.33
+- Core: GOUI version updated to solve Help module not appearing
+- Don't recreate tasklist, calendar, address books etc. for disabled/archived users
+- Core: Colorfield didn't submit manually entered hex values anymore
+- Finance: Business module is available if you have the billing license only now
+- Billing: Fixed Customer report export
+- Holidays: Fixed difference in number in list and year info details
+- Holidays: Fixed missing years in selection
+- Holidays: Fixed bug where holiday credit was off when no end date was set
+- Core: $config['checkForUpdates'] added to disable update check
+- Core / Finance: Fixed template condition on numbers starting with a 0.
+- Finance: Detect invoice number from payment import in csv and excel as well.
+- Finance: Also use amount paid to match documents when customer is found based on bank number
+- Files: Normalize UTF8 Form C folder name when uploading folders
+
+29-01-2024: 6.8.32
 - Contracts: New option to bill in arrears
+- Tasks: Add button in linked tasks
+- Core: Updated German translation
+- Core: Change delimiter for multiple values into | so it's less likely to be part of real names. Some compamy names have a , in them
+- Billing: Vat reverse check incorrectly set on company when country was home country
+- Finance: Unit cost field in contract too
+- Tasks: Add task was broken when comments module was not installed
+- Support: Help module for customers didn't load
+- Finance: Use currency in debtor statements
+- Files: Fixed error when pasting text into search field
+- Core: Use Escape button to exit search
+- Email: Fixed render issue
 
 23-01-2024: 6.8.31
 - Calendar: Fixed JVN#63567545: Group Office contains a stored cross-site scripting vulnerability
@@ -220,6 +281,38 @@
 
 
 -- 6.8 --
+
+19-02-2024: 6.7.68
+- Core: fix $config['debug_usernames'] functionality even better!
+- Tickets: Fixed scrolling in new ticket message
+- Email: Larger add filter window
+- Tasks/Core: Bug in copy() function where dates and other objects had reference to the source. This caused the task dates to change on recurrence.
+- E-mail: Don't use assistant anymore for opening attachments
+- Email: Fixed html toolbar not auto sized when switching from plain text to html in the composer
+- Email / Core : underline html editor toolbar
+- Newsletters: test message didn't work with e-mail account
+- Email: Sometimes tree could collapse without reason
+- Email: Fixed sorting and collapsing of e-mail template groups
+
+12-02-2024: 6.7.67
+- Core: fix $config['debug_usernames'] functionality
+
+05-02-2024: 6.7.66
+- Core: fit password dialog to current layout style
+- Email: add icon to mailbox context menu
+- Tickets: Resize ticket dialog to new paper theme
+- Email: fix sorting problem for templates
+- Finance: Business module is available if you have the billing license only now
+- Billing: Fixed Customer report export
+- Holidays: Fixed difference in number in list and year info details
+- Holidays: Fixed missing years in selection
+- Holidays: Fixed bug where holiday credit was off when no end date was set
+- Core: $config['checkForUpdates'] added to disable update check
+- Core: fix exception when trying to filter empty date range
+
+29-01-2024: 6.7.65
+- Core: fix uninstall module
+- Email: Fixed render issue
 
 22-01-2024: 6.7.64
 

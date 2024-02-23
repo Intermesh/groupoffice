@@ -23,24 +23,24 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	protected function remoteComboFields() {
 		return array(
 				'user_name'=>'$model->user->name',
-			'group_id' => '$model->getGroupName()'
+			'group_id' => '$model->group->name'
 		);
 	}
-	
-	protected function getStoreParams($params) {
+
+	protected function getStoreParams($params)
+	{
+		$findParams = \GO\Base\Db\FindParams::newInstance();
+		$findParams->joinRelation('group', 'left');
 		$params['type'] = 0;
-		if(isset($params['type'])){
-			$findParams = \GO\Base\Db\FindParams::newInstance();
-			
+		if (isset($params['type'])) {
 			$findParams->getCriteria()->addCondition('type', $params['type']);
-			return $findParams;
 		}
-		
-		//return parent::getStoreParams($params);
+		return $findParams;
 	}
 	
 	protected function beforeStore(&$response, &$params, &$store) {
 		$store->setDefaultSortOrder('name');
+
 		return parent::beforeStore($response, $params, $store);
 	}
 
@@ -57,11 +57,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes) {
 		$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($model->content, false);
 		$response['htmlbody'] = $message->getHtmlBody();
-		
-		// reset the temp folder created by the core controller
-//		$tmpFolder = new \GO\Base\Fs\Folder(\GO::config()->tmpdir . 'uploadqueue');
-//		$tmpFolder->delete();
-		
+
 		parent::afterSubmit($response, $model, $params, $modifiedAttributes);
 	}
 	
@@ -81,8 +77,8 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
 		$columnModel->formatColumn('user_name', '$model->user->name');
 		$columnModel->formatColumn('group_name', function($model) {
-			return $model->getGroupName();
-		});
+			return $model->group->name;
+		},[], ['group.name']);
 		return parent::formatColumns($columnModel);
 	}
 
@@ -176,8 +172,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$stmt = \GO\Base\Model\Template::model()->find($findParams);
 		
 		$store = \GO\Base\Data\Store::newInstance(\GO\Base\Model\Template::model());		
-//		$store->getColumnModel()->setFormatRecordFunction(array($this, 'formatEmailSelectionRecord'));
-		
+
 		$store->setStatement($stmt);
 		
 		$response = $store->getData();

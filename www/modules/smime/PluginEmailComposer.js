@@ -26,8 +26,6 @@ GO.moduleManager.onModuleReady('email',function(){
 				checked: false,
 				listeners : {
 					checkchange: function(check, checked) {
-						debugger;
-						
 						this.sendParams['sign_smime'] = checked
 						? '1'
 						: '0';
@@ -57,8 +55,8 @@ GO.moduleManager.onModuleReady('email',function(){
 					this.sendParams.sign_smime = "0";
 				}
 
-				this.signCheck.setChecked(this.sendParams.sign_smime);
-				this.encryptCheck.setChecked(this.sendParams.encrypt_smime);
+				this.signCheck.setChecked(!go.util.empty(this.sendParams.sign_smime));
+				this.encryptCheck.setChecked(!go.util.empty(this.sendParams.encrypt_smime));
 
 				this.checkSmimeSupport();
 			}, this);

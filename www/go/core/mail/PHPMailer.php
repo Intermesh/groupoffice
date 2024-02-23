@@ -185,13 +185,13 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 		file_put_contents($file, $this->MIMEHeader . static::$LE . static::$LE . $this->MIMEBody);
 
 		//Workaround for PHP bug https://bugs.php.net/bug.php?id=69197
-		if (empty($this->sign_extracerts_file)) {
+		if (empty($this->smimeExtraCertsFile)) {
 			$sign = @openssl_pkcs7_sign(
 				$file,
 				$signed,
 				$this->smimeCertificate,
 				[$this->smimePrivateKey, $this->smimePassword],
-				[]
+				$this->smimeHeaders()
 			);
 		} else {
 			$sign = @openssl_pkcs7_sign(
@@ -199,7 +199,7 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 				$signed,
 				$this->smimeCertificate,
 				[$this->smimePrivateKey, $this->smimePassword],
-				[],
+				$this->smimeHeaders(),
 				PKCS7_DETACHED,
 				$this->smimeExtraCertsFile
 			);
@@ -212,9 +212,7 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 			//The message returned by openssl contains both headers and body, so need to split them up
 			$parts = explode("\n\n", $body, 2);
 
-			preg_match("/Content-Type:.*/", $parts[0], $matches);
-
-			$this->MIMEHeader = preg_replace("/Content-Type:(.*)/", $matches[0], $this->MIMEHeader);
+			$this->MIMEHeader = $parts[0];
 			$this->MIMEBody = $parts[1];
 		} else {
 			if(file_exists($signed)) {
@@ -225,13 +223,37 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 	}
 
 
+	private function smimeHeaders() {
+
+		$unfold = preg_replace("/".static::$LE."(\s+)/", '$1', $this->MIMEHeader);
+		$lines = explode(static::$LE, trim($unfold));
+
+		$headers = [];
+
+		foreach($lines as $line) {
+			$name = substr($line, 0, $pos = strpos($line, ':'));
+			$headers[$name] = trim(substr($line, $pos + 1));
+		}
+
+		unset($headers['Content-Transfer-Encoding'], $headers['Content-Type'], $headers['MIME-Version']);
+
+		return $headers;
+	}
+
+
 	private function doSmimeEncrypt() {
 		$file = tempnam(sys_get_temp_dir(), 'srcencrypt');
 		$encrypted = tempnam(sys_get_temp_dir(), 'srcencrypt');
 		file_put_contents($file, $this->MIMEHeader . static::$LE . static::$LE . $this->MIMEBody);
 
 
-		$encrypt = openssl_pkcs7_encrypt($file, $encrypted, $this->smimeEncryptRecipientCertificates, [],0, OPENSSL_CIPHER_AES_256_CBC);
+		$encrypt = openssl_pkcs7_encrypt(
+			$file,
+			$encrypted,
+			$this->smimeEncryptRecipientCertificates,
+			$this->smimeHeaders(),
+			0,
+			OPENSSL_CIPHER_AES_256_CBC);
 
 		unlink($file);
 		if ($encrypt) {
@@ -239,15 +261,10 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 			unlink($encrypted);
 			//The message returned by openssl contains both headers and body, so need to split them up
 			$parts = explode("\n\n", $body, 2);
-
-
-			preg_match("/Content-Type:.*/", $parts[0], $matches);
 			//fix header name bug in php
-			$matches[0] = str_replace('application/x-pkcs7','application/pkcs7', $matches[0]);
-			$this->MIMEHeader = preg_replace("/Content-Type:(.*)/", $matches[0], $this->MIMEHeader);
-			$this->MIMEHeader = preg_replace("/Content-Transfer-Encoding:(.*)/", "Content-Transfer-Encoding: base64", $this->MIMEHeader);
-
+			$this->MIMEHeader = str_replace('application/x-pkcs7','application/pkcs7', $parts[0]);
 			$this->MIMEBody = $parts[1];
+
 		} else {
 			if(file_exists($encrypted)) {
 				unlink($encrypted);

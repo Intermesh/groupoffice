@@ -18,7 +18,7 @@ return array (
   'Active' => 'aktiv',
   'Activate filterset' => 'Regelsatz aktivieren',
   'Filterset:' => 'Regelsatz:',
-  'Reply every x days' => 'Wiederhole alle x Tage',
+  'Reply every x days' => 'Wiederhole jede x Tage',
   'that meet the following criteria' => 'alle folgenden Bedingungen erfüllen',
   'that meet at least one of the following criteria' => 'eine der folgenden Bedingungen erfüllen',
   'all incoming emails' => 'alle Nachrichten',

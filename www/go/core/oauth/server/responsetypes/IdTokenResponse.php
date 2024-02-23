@@ -46,12 +46,22 @@ class IdTokenResponse extends BaseIdTokenResponse
 		    ->issuedBy(AuthorizationServer::getIssuer())
 		    ->issuedAt(new DateTimeImmutable())
 		    ->expiresAt($expiresAt)
-		    ->relatedTo($userEntity->getIdentifier());
+		    ->relatedTo($userEntity->getIdentifier())
+			->withClaim('nonce', $this->nonce) //nonce is supported by server
+			->withHeader('kid', $this->kid); //kid has to match pub key defined in certs
 
 
     }
 
+    /**
+     * @var string
+     */
     protected $nonce;
+
+    /**
+     * @var string
+     */
+    protected $kid;
 
     /**
      * Set nonce for id_token response, as it's required by OpenID Connect spec
@@ -62,6 +72,16 @@ class IdTokenResponse extends BaseIdTokenResponse
     {
         $this->nonce = $nonce;
     }
+
+    /**
+     * @param $kid
+     * @return void
+     */
+    public function setKid($kid)
+    {
+        $this->kid = $kid;
+    }
+
 
     /**
      * Reimplemented to:

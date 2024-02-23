@@ -806,10 +806,12 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 
 		$version = go()->getVersion();
 
-		$latestVersion = $this->getLatestVersionNumber();
+		if(go()->getConfig()['checkForUpdates']) {
+			$latestVersion = $this->getLatestVersionNumber();
 
-		if($latestVersion && $latestVersion != $version) {
-			$version .= ' <span class="success">('. go()->t('update available') .': '. $latestVersion . ')</span>';
+			if($latestVersion && $latestVersion != $version) {
+				$version .= ' <span class="success">('. go()->t('update available') .': '. $latestVersion . ')</span>';
+			}
 		}
 
 		$about = strtr(GO::t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved."),[

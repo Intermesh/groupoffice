@@ -1097,6 +1097,7 @@ button.filetype-pdf, button.filetype-doc {
 	&-buttons-ct {
 		position:relative;
 		height:dp(36);
+		margin-bottom: dp(8);
 	}
 	&-input-ct {
 		position:absolute;
@@ -2053,14 +2054,6 @@ table[id^="comments-ext"] b {
 		margin: dp(8) 0;
 	}
 
-	p, span, div {
-		font-size: sp(16);
-		//color: color($fg, 'text');
-		font-weight: $font-weight-r;
-		line-height: dp(24);
-//		background-color: white;
-	}
-
 	a:link, a:visited, a:active {
 		text-decoration: underline;
 		color: $cAnchor;
@@ -2506,7 +2499,7 @@ table[id^="comments-ext"] b {
 	}
 
 	h2 {
-		font-size: 1.5rem;
+		font-size: 2rem;
 		font-weight: 400;
 		letter-spacing: normal;
 		line-height: 2rem;
@@ -2521,8 +2514,8 @@ table[id^="comments-ext"] b {
 	label {
 		width: 80%;
 		margin-top: 4px;
-		margin-bottom: 8px;
-		font-size: .8rem;
+		margin-bottom: 0px;
+		font-size:1.2rem;
 		letter-spacing: 0.04em;
 		display: inline-block;
 		color: #666;
@@ -2874,7 +2867,7 @@ table[id^="comments-ext"] b {
 }
 
 .go-color-field {
-		padding-left: dp(40);
+		padding-left: dp(40) !important;
 
 }
 

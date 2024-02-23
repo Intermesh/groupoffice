@@ -282,24 +282,6 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 		);
 	},
 
-
-	// showPermissions: function(moduleId, pkg, acl_id) {
-	// 	let name = t('name', moduleId, pkg);
-	// 	if (!this.permissionsWin) {
-	// 		this.permissionsWin = new go.modules.PermissionsWindow();
-	// 		this.permissionsWin.on('hide', function() {
-	// 			// Loop through the recently installed modules, allowing the user to
-	// 			// set the permissions, module by module.
-	// 			if (this.installedModules && this.installedModules.length) {
-	// 				var r = this.installedModules.shift();
-	// 				debugger;
-	// 				this.permissionsWin.show(r.id,r.package, r.name, r.acl_id);
-	// 			}
-	// 		}, this);
-	// 	}
-	// 	this.permissionsWin.show(moduleId, pkg, name, acl_id);
-	// },
-
 	warningRenderer: function(name, cell, record) {
 		return record.data.warning != '' ?
 			'<div class="go-icon go-warning-msg" ext:qtip="' + Ext.util.Format.htmlEncode(record.data.warning) + '"></div>' : '';

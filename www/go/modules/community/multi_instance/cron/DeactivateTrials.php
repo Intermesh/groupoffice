@@ -14,7 +14,7 @@ class DeactivateTrials extends CronJob {
 						->selectSingleValue('id')
 						->where('isTrial', '=', true)
 						->andWhere('enabled', '=', true)
-						->andWhere('createdAt', '<', new DateTime("-60 days"))
+						->andWhere('createdAt', '<', new DateTime("-30 days"))
 						->all();
 
 		if(empty($expiredTrials)) {

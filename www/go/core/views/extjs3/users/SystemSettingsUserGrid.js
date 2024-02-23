@@ -135,20 +135,6 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					this.store.load();
 				},
 				scope:this
-			},{
-				text:t('Permissions'),
-				iconCls: 'ic-list',
-				handler: function() {
-					(new go.Window({
-						title: t('Permission overview'),
-						width:1000,
-						height: 600,
-						layout:'fit',
-						maximizable: true,
-						resizable:true,
-						items:[new go.permissions.AclOverviewGrid()]
-					})).show();
-				}
 			}, '->', {
 				xtype: 'tbsearch',
 				filters: [
@@ -156,13 +142,14 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				]
 			},{
 				iconCls: 'ic-add',
-				tooltip: t('Add'),
+				cls: "accent",
+				text: t('Add'),
 				disabled: !go.User.isAdmin,
 				handler: function (e, toolEl) {
 					var dlg = new go.users.CreateUserWizard();
 					dlg.show();
 				}
-			},{
+			},this.moreBtn = new Ext.Button({
 				disabled: !go.User.isAdmin,
 				iconCls: 'ic-more-vert',
 				menu: [
@@ -232,9 +219,27 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 							}
 						],
 						scope: this
+					},
+
+					'-',
+
+					{
+						text:t('Permissions overview'),
+						iconCls: 'ic-share',
+						handler: function() {
+							(new go.Window({
+								title: t('Permission overview'),
+								width:1000,
+								height: 600,
+								layout:'fit',
+								maximizable: true,
+								resizable:true,
+								items:[new go.permissions.AclOverviewGrid()]
+							})).show();
+						}
 					}
 				]
-			}],
+			})],
 			columns: cols.columns,
 			viewConfig: {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',

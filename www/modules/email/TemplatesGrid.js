@@ -48,7 +48,7 @@ GO.email.TemplatesGrid = function(config)
 			id: 'id',
 			fields: ['id', 'user_id', 'owner', 'name', 'type', 'acl_id','extension','group_name', 'group_id'],
 		}),
-		groupField:'group_id',
+		groupField:'group_name',
 		remoteSort:true,
 		remoteGroup:true
 	});
@@ -123,8 +123,7 @@ GO.email.TemplatesGrid = function(config)
 			dataIndex: 'name'
 		},{
 			header: t('Group'),
-			dataIndex: 'group_id',
-			renderer: (v,meta,rec) => rec.data.group_name
+			dataIndex: 'group_name'
 		}, {
 			header: t("Owner"),
 			dataIndex: 'owner' ,
@@ -136,7 +135,7 @@ GO.email.TemplatesGrid = function(config)
 
 	config.view = new Ext.grid.GroupingView({
 		showGroupName: false,
-		enableNoGroups:false, // REQUIRED!
+		//enableNoGroups:false, // REQUIRED!
 		hideGroupedColumn: true,
 		emptyText: t("No items to display"),
 		autoFill: true,

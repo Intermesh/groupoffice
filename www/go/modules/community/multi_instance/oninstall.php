@@ -21,5 +21,10 @@ if(!\go\core\Environment::get()->isCli()) {
 
 $instanceName = $argv[2];
 
-$instance = Instance::find()->where('hostname','=',$instanceName)->single();
-$instance->onInstall();
+try {
+	$instance = Instance::find()->where('hostname', '=', $instanceName)->single();
+	$instance->onInstall();
+} catch(Throwable $e) {
+	echo "Error: " . $e->getMessage() ."\n";
+	exit(1);
+}

@@ -18,4 +18,9 @@ namespace GO\Email\Controller;
 class TemplateGroupController extends \GO\Base\Controller\AbstractModelController
 {
 	protected $model = 'GO\Base\Model\TemplateGroup';
+
+	protected function beforeStore(&$response, &$params, &$store) {
+		$store->setDefaultSortOrder('name');
+		return parent::beforeStore($response, $params, $store);
+	}
 }

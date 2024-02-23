@@ -86,7 +86,7 @@ class Debugger {
 
 		if(!empty(go()->getConfig()['debug'])) {
 			$this->enable(go()->getConfig()['debug_log']);
-		} else if(!empty(go()->getConfig()['debug_usernames']) && is_array(go()->getConfig()['debug_usernames'])) {
+		} else if(!$this->enabled && !empty(go()->getConfig()['debug_usernames']) && is_array(go()->getConfig()['debug_usernames'])) {
 			if(go()->getAuthState() && ($user = go()->getAuthState()->getUser(['username'])) && in_array($user->username, go()->getConfig()['debug_usernames'])) {
 				$this->enable(go()->getConfig()['debug_log']);
 			}
@@ -145,8 +145,6 @@ class Debugger {
 		if(!$this->enabled) {
 			return 0;
 		}
-		// list ($usec, $sec) = explode(" ", microtime());
-		// return ((float) $usec + (float) $sec);
 		return microtime(true);
 	}	
 	
@@ -192,13 +190,9 @@ class Debugger {
 		}elseif(is_object($mixed) && method_exists($mixed, '__toString')) {
 			$mixed = (string) $mixed;
 		}
-		// elseif (!is_scalar($mixed)) {
-		// 	$mixed = print_r($mixed, true);
-		// }
-		
+
 		$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 7 + $traceBackSteps);
 		
-//		var_dump($bt);
 		$lastCaller = null;
 		$caller = array_shift($bt);
 		//can be called with \go\core\App::get()->debug(). We need to go one step back (no class for closure)
@@ -225,7 +219,6 @@ class Debugger {
 			$lastCaller['line'] = '[unknown line]';
 		}
 		
-		//$entry = "[" . $this->getTimeStamp() . "][" . $caller['class'] . ":".$lastCaller['line']."] " . $mixed;
 		if($writeFile) {
 			$this->writeLog($level, $mixed, $caller['class'], $lastCaller['line']);
 		}
@@ -309,7 +302,7 @@ class Debugger {
 	}
 
 	/**
-	 * Get the ellapsed time since the start of the request in milliseconds
+	 * Get the elapsed time since the start of the request in milliseconds
 	 * 
 	 * @return float milliseconds
 	 */

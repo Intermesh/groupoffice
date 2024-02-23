@@ -63,7 +63,7 @@ class Spreadsheet extends AbstractConverter {
 	 * 
 	 * @var string
 	 */
-	public static $multipleDelimiter = ',';
+	public static $multipleDelimiter = '|';
 
 	protected $delimiter = ',';
 
@@ -732,19 +732,19 @@ th {
 	/**
    * @inheritDoc
    */
-	protected function importEntity() {
+	protected function importEntity() : ?Entity {
 
 		if(!isset($this->clientParams['mapping'])) {
 			throw new Exception("Mapping is required");
 		}
 		
 		if($this->recordIsEmpty($this->record)) {
-			return false;
+			return null;
 		}
 
 		$values = $this->convertRecordToProperties($this->record, $this->clientParams['mapping'], $this->getEntityMapping());
 		if(!$values) {
-			return false;
+			return null;
 		}
 
 		$entity = $this->createEntity($values);
@@ -760,7 +760,7 @@ th {
 		return $entity;
 	}
 
-	protected function createEntity( $values) {
+	protected function createEntity( $values) : Entity {
 
 		$entityClass = $this->entityClass;
 
@@ -890,27 +890,29 @@ th {
 		return $v;
 	}
 
-	public static function sniffDelimiter(File $file) {
-		$fp = $file->open('r');
+	public static function sniffDelimiter(File $file): string
+	{
+		$delimiters = [',', ';', "\t"];
 
-		$delimiter = ',';
-		$enclosure = '"';
-
-		$headers = fgetcsv($fp, 0, $delimiter, $enclosure);
-		
-		if(!$headers || count($headers) == 1) {
-			$delimiter = ';' ;
-
-			$headers = fgetcsv($fp, 0, $delimiter, $enclosure);
-			fclose($fp);
-			if(!$headers || count($headers) == 1) {
-				throw new Exception("Unable to detect delimiter");
+		foreach ($delimiters as $delimiter) {
+			if(self::tryDelimiter($file, $delimiter)) {
+				return $delimiter;
 			}
-		} else{
-			fclose($fp);
 		}
 
-		return $delimiter;		
+		throw new Exception("Unable to detect delimiter");
+
+	}
+
+	private static function tryDelimiter(File $file, string $delimiter): bool
+	{
+		$fp = $file->open('r');
+		$headers = fgetcsv($fp, 0, $delimiter, '"');
+
+		$success = $headers && count($headers) > 1;
+		fclose($fp);
+
+		return $success;
 	}
 	
 	/**

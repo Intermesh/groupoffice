@@ -1924,7 +1924,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			this.writableCalendarsStore = new GO.data.JsonStore({
 				url: GO.url("calendar/calendar/store"),
 				baseParams: {
-					permissionLevel: GO.permissionLevels.write
+					permissionLevel: GO.permissionLevels.manage
 				},
 				fields:['id','name','user_name'],
 				remoteSort:true,

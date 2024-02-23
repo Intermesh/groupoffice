@@ -376,32 +376,14 @@ go.util =  (function () {
 		},
 
 		viewFile : function(url) {
-			const win = this.getDownloadTargetWindow();
 
-			if(!win) {
-				Ext.Msg.alert(t("Error"), t("Could not open a window. Please allow popup windows in your browser."))
-				return;
+			const win  = window.open(url);
+			if(!win || win.closed || typeof win.closed=='undefined') {
+				GO.errorDialog.show(t("Your browser is blocking a popup from {product_name}. Please disable the popup blocker for this site"))
 			}
-			win.focus();
-			win.location.replace(url);
-
-			this.downloadTarget = undefined;
 
 		},
 
-		getDownloadTargetWindow : function() {
-			try {
-				if (!this.downloadTarget || this.downloadTarget.closed || this.downloadTarget.location.href != "about:blank") {
-					this.downloadTarget = window.open("about:blank", "_blank");
-				}
-			} catch(e) {
-				// for firefox complaining about Uncaught DOMException: Permission denied to access property Symbol.toPrimitive on cross-origin object
-				// even though it is the same origin !?
-				this.downloadTarget = window.open("about:blank", "_blank");
-			}
-
-			return this.downloadTarget;
-		},
 
 		/**
 		 * Download an URL
@@ -409,11 +391,6 @@ go.util =  (function () {
 		 * @param {string} url
 		 */
 		downloadFile: function(url) {
-
-			// for safari and firefox. The popup must be made befor any async requests
-			if(go.util.downloadTarget)
-				go.util.downloadTarget.close();
-
 			if(!downloadFrame) {
 				var downloadFrame = document.createElement('a');
 				downloadFrame.target = '_blank';

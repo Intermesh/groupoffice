@@ -233,7 +233,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					} else {
 						onLoad();
 					}
-					if(this.value === null) {
+					if(!form.currentId) {
 						this.value = form.entityStore.entity.defaultAcl;
 					}
 				}

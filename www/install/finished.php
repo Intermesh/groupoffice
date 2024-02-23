@@ -12,7 +12,12 @@ require('header.php');
 if(go()->getConfig()['servermanager']) {
 	$cls = go()->getConfig()['cache'];
 	go()->setCache(new $cls);
-	exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.go()->getConfig()['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
+    $cmd = "php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.go()->getConfig()['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0];
+	exec($cmd, $output, $ret);
+
+    if($ret != 0) {
+        \go\core\ErrorHandler::log("Error after Multi instance install: " . $cmd ." " . implode("\n",$output));
+    }
 	Settings::flushCache();
     go()->rebuildCache();
 }

@@ -1339,6 +1339,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				if(isset($blob)) {
 					if(isset($blob->subfolder)) {
 						while($fname = array_shift($blob->subfolder)){
+
+							$fname = StringUtil::normalize($fname);
+
 							if($f = $destinationFolder->hasFolder($fname)) {
 								$destinationFolder = $f;
 							} else {

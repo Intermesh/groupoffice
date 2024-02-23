@@ -42,18 +42,18 @@ class Spreadsheet extends convert\Spreadsheet {
 	 *
 	 * @inheritDoc
 	 */
-	protected function importEntity()
+	protected function importEntity(): ?Entity
 	{
 		$contact = parent::importEntity();
 
 		if(!$contact) {
-			return false;
+			return null;
 		}
 
-		return $contact->isOrganization == $this->organizations ? $contact : false;
+		return $contact->isOrganization == $this->organizations ? $contact : null;
 	}
 
-	protected function createEntity($values)
+	protected function createEntity($values) : Entity
 	{
 		if(isset($this->clientParams['values'])) {
 			$values = array_merge($values, $this->clientParams['values']);

@@ -592,7 +592,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		color: $cDanger;
 	}
 	
-	&-focus, textarea.x-form-focus, &:focus-within {
+	&-focus, textarea.x-form-focus {
 		@extend .z2;
 		@include var(border-color, c-primary);
 	}
@@ -1849,7 +1849,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 .x-date {
 	&-picker {
 		padding: 0 dp(8);
-		width: dp(256);
+		width: dp(304);
       border-color: transparent;
 		> table, table.x-date-inner {
 			width: 100%;
@@ -2520,6 +2520,9 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	}
 }
 .x-html-editor-tb {
+
+	border-bottom: 1px solid color($fg, "line");
+
 	.x-toolbar {
 		height: dp(64);
 		background-color: transparent;

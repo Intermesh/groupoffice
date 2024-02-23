@@ -26,6 +26,10 @@ class Mailer {
 	private PHPMailer $mail;
 	private ?SmtpAccount $smtpAccount = null;
 	private ?Account $emailAccount = null;
+	/**
+	 * @var true
+	 */
+	private bool $sent = false;
 
 	/**
 	 * Create a new mail message
@@ -127,9 +131,14 @@ class Mailer {
 	 */
 	public function send(Message $message): bool
 	{
+		$message->setMailer($this);
 		$this->prepareMessage($message);
+		$success = !!$this->mail->send();
 
-		return !!$this->mail->send();
+		if($success) {
+			$this->sent = true;
+		}
+		return $success;
 	}
 
 
@@ -141,10 +150,13 @@ class Mailer {
 	 * @throws Exception
 	 */
 	public function toStream(Message $message) {
-		$this->prepareMessage($message);
 
-		$this->mail->preSend();
-		$mime =  $this->mail->getSentMIMEMessage();
+		if(!$this->sent) {
+			$this->prepareMessage($message);
+
+			$this->mail->preSend();
+		}
+		$mime = $this->mail->getSentMIMEMessage();
 
 		$stream = fopen('php://memory','r+');
 		fwrite($stream, $mime);
@@ -161,15 +173,18 @@ class Mailer {
 	 * @throws Exception
 	 */
 	public function toString(Message $message) :string {
-		$this->prepareMessage($message);
 
-		$this->mail->preSend();
+		if(!$this->sent) {
+			$this->prepareMessage($message);
+
+			$this->mail->preSend();
+		}
 		return $this->mail->getSentMIMEMessage();
 	}
 
 	public function lastError(): string
 	{
-		return $this->mail->ErrorInfo;
+		return isset($this->mail) ? $this->mail->ErrorInfo : "";
 	}
 
 	private function initTransport() {

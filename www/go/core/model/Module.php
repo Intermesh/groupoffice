@@ -117,20 +117,6 @@ class Module extends Entity {
 			go()->rebuildCache();
 		}
 
-		// TODO: do groups needs modules or can we set multiple module with new group permissions
-		//When module groups change the groups change too. Because the have a "modules" property.
-//		$aclChanges = $this->getAclChanges();
-//		if(!empty($aclChanges)) {
-//			Group::entityType()
-//				->changes(
-//					go()->getDbConnection()
-//						->select('id as entityId, aclId, "0" as destroyed')
-//						->from('core_group')
-//						->where('id', 'IN', array_keys($aclChanges)
-//					)
-//				);
-//		}
-		
 		return true;
 	}
 
