@@ -2,6 +2,7 @@
 - Calendar: Fixed: 6.8.34 bad translation german #1119
 - smime: fixed signing with attachments issue #1120
 - Caldav: fixed broken imip issue #1117
+- Core: If ACL was empty it loaded default values for existing items in dialogs.
 
 19-02-2023: 6.8.35
 - Core: Include password for import
