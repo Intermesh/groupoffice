@@ -205,6 +205,8 @@ class MaintenanceController extends AbstractController {
 
 	protected function actionBuildPrincipals($params) {
 
+		GO::session()->closeWriting();
+
 		if(!$this->isCli() && !GO::user()->isAdmin() && GO::router()->getControllerAction()!='upgrade')
 			throw new \GO\Base\Exception\AccessDenied();
 

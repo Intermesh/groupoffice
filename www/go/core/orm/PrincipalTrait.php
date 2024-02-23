@@ -74,10 +74,6 @@ trait PrincipalTrait {
 			throw new Exception("Could not save principal cache: " . var_export($principal->getValidationErrors(), true));
 		}
 
-		if(!$isNew) {
-			$principal->change(true);
-		}
-
 		return true;
 	}
 
