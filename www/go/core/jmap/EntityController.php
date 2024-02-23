@@ -80,26 +80,7 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();
 		return lcfirst(substr($cls, strrpos($cls, '\\') + 1));
 	}
-	
-//	/**
-//	 * Creates a short plural name
-//	 *
-//	 * @see getShortName()
-//	 *
-//	 * @return string
-//	 */
-//	protected function getShortPluralName(): string
-//	{
-//
-//		$shortName = $this->getShortName();
-//
-//		if(substr($shortName, -1) == 'y') {
-//			return substr($shortName, 0, -1) . 'ies';
-//		} else
-//		{
-//			return $shortName . 's';
-//		}
-//	}
+
 
 	/**
 	 * Querying readonly has a slight performance benefit
@@ -125,29 +106,11 @@ abstract class EntityController extends Controller {
 						->limit($params['limit'])
 						->offset($params['position']);
 
-//		if($params['calculateTotal']) {
-//			$query->calcFoundRows();
-//		}
-		
 		/* @var $query Query */
 
 		$sort = $this->transformSort($params['sort']);
 		
 		$cls::sort($query, $sort);
-
-		// MS: this messes up sort for invoices by date. Can't remember
-		// why this was needed before. I expect somthing to break with this removed!
-//		if(!empty($query->getGroupBy())) {
-//			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
-//			$keys = $cls::getPrimaryKey();
-//			$pkSort = [];
-//			foreach($keys as $key) {
-//				if(!isset($sort[$key])) {
-//					$pkSort[$key] = 'ASC';
-//				}
-//			}
-//			$query->orderBy($pkSort, true);
-//		}
 
 		$this->selectColumnsForQueryQuery($query);
 
@@ -205,9 +168,7 @@ abstract class EntityController extends Controller {
 		if ($params['limit'] < 0) {
 			throw new InvalidArguments("Limit MUST be positive");
 		}
-		//cap at max of 50
-		//$params['limit'] = min([$params['limit'], Capabilities::get()->maxObjectsInGet]);
-		
+
 		if(!isset($params['position'])) {
 			$params['position'] = 0;
 		}
@@ -533,38 +494,6 @@ abstract class EntityController extends Controller {
 		return $result;
 	}
 
-//	private function getEntityArray($id, $properties) {
-//		$e = $this->getEntity($id, $properties);
-//		if(!$e) {
-//			return false;
-//		}
-//
-//		return $e->toArray($properties);
-//	}
-
-	// Caching doesn't work because entities can contain user specific props like user tables and getPermissionLevel()
-//	private function getEntityArrayFromCache($id, $properties) {
-//		$key = $this->entityClass() . '-toArray-' . $id;
-//		$arr = go()->getCache()->get($key);
-//
-//		if(!$arr) {
-//			$e = $this->getEntity($id);
-//			if(!$e) {
-//				return false;
-//			} else {
-//				$arr = $e->toArray();
-//				$arr['id'] = $e->id();
-//				go()->getCache()->set($key, $arr);
-//			}
-//		}
-//
-//		if(!empty($properties)) {
-//			$arr = array_intersect_key($arr, array_flip($properties));
-//		}
-//
-//		return $arr;
-//	}
-	
 	/**
 	 * Takes the request arguments, validates them and fills it with defaults.
 	 * 
@@ -616,9 +545,6 @@ abstract class EntityController extends Controller {
 	public static $updatedEntitities = [];
 
 	public static function onEntitySave(Entity $entity) {
-
-		//$mod = array_map(function($mod) { return $mod[0];}, $entity->getModified()); //Get only modified values
-
 		//Server should sent modified only but it's hard to check with getters and setters. So we just send all.
 		if($entity->isNew()) {
 			static::$createdEntitities[$entity->id()] = $entity->toArray();
