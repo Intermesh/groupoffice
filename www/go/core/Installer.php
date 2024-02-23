@@ -4,6 +4,7 @@ namespace go\core;
 
 use Exception;
 use GO;
+use GO\Base\Db\ActiveRecord;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Mail\Message;
 use GO\Base\Model\Template;
@@ -11,23 +12,17 @@ use go\core\auth\Password;
 use go\core\auth\TemporaryState;
 use go\core\cache\None;
 use go\core\db\Query;
-use go\core\db\Table;
 use go\core\db\Utils;
-use go\core\event\Listeners;
 use go\core\fs\File;
-use go\core\jmap;
-use go\core\model;
+use go\core\model\Acl;
 use go\core\model\Group;
+use go\core\model\Module as GoCoreModule;
 use go\core\model\User;
 use go\core\orm\Entity;
-use go\core\orm\Property;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
 use PDO;
 use PDOException;
-use go\core\model\Module as GoCoreModule;
-use GO\Base\Db\ActiveRecord;
-use go\core\model\Acl;
 
 class Installer {
 	
@@ -542,14 +537,8 @@ class Installer {
 			$module->permissions[Group::ID_EVERYONE] = $everyone;
 			$module->save();
 		}
-//		$acl = $module->findAcl();
-//		if(!$acl->hasGroup(Group::ID_EVERYONE)) {
-//			$acl->addGroup(Group::ID_EVERYONE);
-//			$acl->save();
-//		}
 
 		$this->fireEvent(static::EVENT_UPGRADE);
-
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
@@ -557,7 +546,8 @@ class Installer {
 		self::$isUpgrading = false;
 
 		$this->enableGarbageCollection();
-        $this->enableDiskUsage();;
+		$this->enableDiskUsage();
+
 		echo "Done!\n";
 
 		ob_flush();

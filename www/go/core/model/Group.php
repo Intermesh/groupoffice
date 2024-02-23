@@ -171,14 +171,14 @@ class Group extends AclOwnerEntity {
 		go()->getDbConnection()->exec("INSERT IGNORE INTO core_user_group (SELECT " . self::ID_EVERYONE .", id from core_user)");
 
 		//share groups with themselves
-		$stmt = go()->getDbConnection()
-			->insertIgnore(
-				'core_acl_group',
-				go()->getDbConnection()->select('aclId, id, "' . Acl::LEVEL_READ .'"')->from("core_group"),
-				['aclId', 'groupId', 'level']
-			);
-
-		$stmt->execute();
+//		$stmt = go()->getDbConnection()
+//			->insertIgnore(
+//				'core_acl_group',
+//				go()->getDbConnection()->select('aclId, id, "' . Acl::LEVEL_READ .'"')->from("core_group"),
+//				['aclId', 'groupId', 'level']
+//			);
+//
+//		$stmt->execute();
 
 		return parent::check();
 	}
@@ -204,7 +204,8 @@ class Group extends AclOwnerEntity {
 		return go()->getAuthState()->isAdmin();
 	}
 	
-	private function setDefaultPermissions() {
+	private function setDefaultPermissions(): bool
+	{
 		$acl = $this->findAcl();
 		//Share group with itself. So members of this group can share with eachother.
 		if($this->id !== Group::ID_ADMINS) {
