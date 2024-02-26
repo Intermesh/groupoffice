@@ -1,3 +1,4 @@
+26-02-2024: 6.7.69
 - Core: Render label YesNo filter
 - LDAPAuthenticator: bugfix in synchronization
 - Core: Updated PL translations. Thank you Piotr!
