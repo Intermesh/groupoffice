@@ -8,6 +8,7 @@
 - Core: add $config['mailerDebugLevel'] to enable mail debugging
 - ActiveSync: Support Global Address List
 - Calendar: Fixed checkbox colors
+- Newsletters: Add contact variable in users lists so templates are compatible
 
 19-02-2023: 6.8.35
 - Core: Include password for import
