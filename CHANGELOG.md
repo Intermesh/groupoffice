@@ -74,6 +74,7 @@
 - Core: Exclude User and Search from SSE Push because it caused performance problems
 - Core: Comment composer did not reset.
 - Core: System settings dialog validation for notifications panel
+- Core: add `mailerDebugLevel` debug option to better debug mail connection problems
 
 15-01-2024: 6.8.29
 - Finance: Update VAT rates when changing book in document dialog
