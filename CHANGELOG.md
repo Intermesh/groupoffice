@@ -6,6 +6,7 @@
 - Core: Fixed white text on white background in some emails using color: windowtext;
 - Support: Fixed missing message when creating new ticket from GO
 - Core: add $config['mailerDebugLevel'] to enable mail debugging
+- ActiveSync: Support Global Address List
 
 19-02-2023: 6.8.35
 - Core: Include password for import
