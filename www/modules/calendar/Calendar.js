@@ -909,8 +909,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 		var store = this.getActivePanel().store;
 		
 		if(store.reader.jsonData.backgrounds){
-			
-			
 			var rowIndex;
 			
 			for(var cal_id in store.reader.jsonData.backgrounds){					
@@ -918,7 +916,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				if(rowIndex>-1){
 					var rowEl = Ext.get(view.getCell(rowIndex, 0));		
 					if(rowEl)
-						rowEl.applyStyles("color: #"+store.reader.jsonData.backgrounds[cal_id]);				
+						rowEl.first().first().applyStyles("background-color: #"+store.reader.jsonData.backgrounds[cal_id]);
 				}
 			}
 		}
