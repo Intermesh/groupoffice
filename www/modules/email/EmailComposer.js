@@ -523,7 +523,7 @@ GO.email.EmailComposer = function(config) {
 					});
 			
 			
-			if(this.templatesStore.totalLength > 1 ) {
+			if(this.templatesStore.totalLength > 10 ) {
 				 
 			if(!this.templateSelectionDialog) {
 				this.templateSelectionDialog = new GO.email.TemplateSelectionDialog({
