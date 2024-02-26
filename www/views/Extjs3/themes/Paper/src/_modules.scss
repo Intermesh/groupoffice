@@ -208,6 +208,10 @@ i.icon.em-low_priority {
 	}
 
 	.msg {
+		color-scheme: light;
+		* {
+			color-scheme: light;
+		}
 		padding: dp(16);
 
 		img {
