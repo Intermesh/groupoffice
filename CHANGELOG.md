@@ -7,6 +7,7 @@
 - Support: Fixed missing message when creating new ticket from GO
 - Core: add $config['mailerDebugLevel'] to enable mail debugging
 - ActiveSync: Support Global Address List
+- Calendar: Fixed checkbox colors
 
 19-02-2023: 6.8.35
 - Core: Include password for import
