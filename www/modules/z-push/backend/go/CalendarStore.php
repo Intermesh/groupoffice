@@ -34,7 +34,7 @@ class CalendarStore extends Store {
 				return true;
 			}
 		} catch (\Exception $e) {
-			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION DeleteMessage ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
 		}
@@ -59,7 +59,7 @@ class CalendarStore extends Store {
 			else
 				return false;
 		}  catch (\Exception $e) {
-			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION GetMessage ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
 		}
@@ -581,7 +581,7 @@ class CalendarStore extends Store {
 			
 			$id = $event->id;
 		} catch (\Exception $e) {
-			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ChangeMessage ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 		}
 
@@ -621,7 +621,7 @@ class CalendarStore extends Store {
 			// required for not duplicating events on iphone!
 			return $event->id . "";
 		} catch (\Exception $e) {
-			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION MoveMessage ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
 		}
@@ -795,7 +795,7 @@ class CalendarStore extends Store {
 
 			return $folder;
 		} catch(\Exception $e) {
-			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2CALENDAR::EXCEPTION GetFolder ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
 		}
