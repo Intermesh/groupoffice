@@ -2,6 +2,7 @@
 - LDAPAuthenticator: bugfix in synchronization
 - Core: Updated PL translations. Thank you Piotr!
 - Core: Fixed white text on white background in some emails using color: windowtext;
+- ActiveSync: Support Global Address List
 
 19-02-2024: 6.7.68
 - Core: fix $config['debug_usernames'] functionality even better!
