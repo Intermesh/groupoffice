@@ -5,6 +5,7 @@
 - ActiveSync: Support Global Address List
 - Email: fix templates list in 'My Account'
 - Calendar: Fixed checkbox colors
+- Templates: E-mail template grouping
 
 19-02-2024: 6.7.68
 - Core: fix $config['debug_usernames'] functionality even better!
