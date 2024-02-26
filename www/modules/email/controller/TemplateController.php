@@ -27,7 +27,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		);
 	}
 	
-	protected function getStoreParams(array $params)
+	protected function getStoreParams($params)
 	{
 		$findParams = \GO\Base\Db\FindParams::newInstance();
 		$findParams->joinRelation('group', 'LEFT');
