@@ -4,6 +4,7 @@
 - Caldav: fixed broken imip issue #1117
 - Core: If ACL was empty it loaded default values for existing items in dialogs.
 - Core: Fixed white text on white background in some emails using color: windowtext;
+- Support: Fixed missing message when creating new ticket from GO
 
 19-02-2023: 6.8.35
 - Core: Include password for import
