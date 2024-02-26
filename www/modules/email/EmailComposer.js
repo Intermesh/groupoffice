@@ -413,7 +413,7 @@ GO.email.EmailComposer = function(config) {
 				id: 'id',
 				fields: ['id', 'name', 'group', 'text','template_id','checked','group_name', 'group_id'],
 			}),
-			groupField:'group_id',
+			groupField:'group_name',
 			remoteSort : false,
 			remoteGroup:true
 		});
@@ -523,7 +523,7 @@ GO.email.EmailComposer = function(config) {
 					});
 			
 			
-			if(this.templatesStore.totalLength > 10 ) {
+			if(this.templatesStore.totalLength > 1 ) {
 				 
 			if(!this.templateSelectionDialog) {
 				this.templateSelectionDialog = new GO.email.TemplateSelectionDialog({

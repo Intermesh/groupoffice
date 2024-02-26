@@ -38,8 +38,7 @@ GO.email.TemplateGridPanel = Ext.extend(GO.grid.GridPanel,{
 					sortIndex: 'name'
 				},{
 					header: t('Group'),
-					dataIndex: 'group_id',
-					renderer: (v,meta,rec) => rec.data.group_name
+					dataIndex: 'group_name'
 				},
 				new GO.grid.RadioColumn({
 					id:'checked',
