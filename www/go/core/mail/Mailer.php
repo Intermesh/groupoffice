@@ -8,6 +8,7 @@ use go\modules\community\oauth2client\model\Oauth2Client;
 use League\OAuth2\Client\Provider\Google;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\OAuth;
+use PHPMailer\PHPMailer\SMTP;
 
 /**
  * Sends mail messages
@@ -182,6 +183,12 @@ class Mailer {
 	private function initTransport() {
 
 		$this->mail = new PHPMailer();
+		if(go()->getConfig()['mailerDebugLevel'] > 0) {
+			$this->mail->SMTPDebug = min(intval(go()->getConfig()['mailerDebugLevel']), SMTP::DEBUG_LOWLEVEL);
+			$this->mail->Debugoutput = function($msg, $level)  {
+				go()->debug($msg);
+			};
+		}
 		$this->mail->setSMTPInstance(new PHPMailerSMTP());
 		$this->mail->isSMTP();
 		$this->mail->SMTPAutoTLS = false;
