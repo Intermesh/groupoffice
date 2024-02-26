@@ -4,6 +4,7 @@
 - Core: Fixed white text on white background in some emails using color: windowtext;
 - ActiveSync: Support Global Address List
 - Email: fix templates list in 'My Account'
+- Calendar: Fixed checkbox colors
 
 19-02-2024: 6.7.68
 - Core: fix $config['debug_usernames'] functionality even better!
