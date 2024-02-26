@@ -272,8 +272,6 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 		this.getUpdatesPromise = this.getState().then((state) => {
 			
-			// console.log("getUpdates", this.entity.name, state);
-		
 			if(!state) {
 				console.info("No state yet so won't fetch updates");
 				if(cb) {
@@ -713,8 +711,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			if(op == 'create') {
 				if(response.created && id in response.created) {
 					return this.single(response.created[id].id);
-				} else
-				{
+				} else {
 					let msg = t("Failed to save");
 					if(response.notCreated && id in response.notCreated) {
 						msg = response.notCreated[id].description;
@@ -728,12 +725,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 					return Promise.reject({message: msg, response: response, error: response.notCreated[id] || null});
 				}
-			} else
-			{
+			} else {
 				if(response.updated && id in response.updated) {
 					return this.single(id);
-				} else
-				{
+				} else {
 					let msg = t("Failed to save");
 					if(response.notUpdated && id in response.notUpdated) {
 						msg = response.notUpdated[id].description;

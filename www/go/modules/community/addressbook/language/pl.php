@@ -5,7 +5,7 @@ return array (
   array (
     'work' => 'praca',
     'home' => 'dom',
-    'billing' => 'dane do faktury',
+    'billing' => 'do faktur',
   ),
   'Address books' => 'Książki adresowe',
   'Contact' => 'Kontakt',
@@ -98,10 +98,11 @@ return array (
   'LOB' => 'LOB',
   'phoneTypes' => 
   array (
-    'work' => 'Stacjonarny',
-    'home' => 'Stacjonarny biurowy',
-    'mobile' => 'Mobilny',
-    'workmobile' => 'Mobilny biurowy',
+    'work' => 'Praca',
+    'home' => 'Dom',
+    'mobile' => 'Komórka',
+    'workmobile' => 'Komórka służbowy',
+    'fax' => 'Fax',
     'workfax' => 'Fax biurowy',
   ),
   'Multiple Contacts' => 'Wiele kontaktów',
@@ -116,10 +117,12 @@ return array (
   'Is a user' => 'Jest użytkownikiem',
   'Is in a group' => 'Jest w grupie',
   'Has e-mail addresses' => 'Posiada adres e-mail',
-  'Are you sure that you would like to import this VCard?' => 'Czy na pewno chcesz zimportować tę V kartę',
+  'Are you sure that you would like to import this VCard?' => 'Czy na pewno chcesz zimportować Vcard?',
   'Could not find this user in the address book for you.' => 'Nie udało się znaleźć użytkownika w książce adresowej.',
   'Display options for address books' => 'Pokaż opcje książek adresowych',
   'Start in' => 'Rozpocznij w',
   'Last selected address book' => 'Ostatnio wybrana książka adresowa',
   'Sort name by' => 'Sortuj nazwę według',
+  'Has phone numbers' => 'Posiada nr tel.',
+  'Has organizations' => 'Jest w organizacji',
 );

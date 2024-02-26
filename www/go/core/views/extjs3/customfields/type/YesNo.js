@@ -79,10 +79,13 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 			multiple: true,
 			wildcards: false,
 			title: field.name,
-			options: [{
+			hideLabel: false,
+			customField: field,
+			options: [
+				/*{
 					value: null,
 					title: t("Unknown")
-			},{
+			},*/{
 					value: 1,
 					title: t("Yes")
 			},{
