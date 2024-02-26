@@ -5,7 +5,7 @@ use go\core\model\Acl;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
 
-class ContactStore extends Store {
+class ContactStore extends Store implements ISearchProvider {
 	
 	private $convertor;
 	public function __construct() {
@@ -323,4 +323,13 @@ class ContactStore extends Store {
 		return false;
 	}
 
+	public function TerminateSearch($pid)
+	{
+		return true;
+	}
+
+	public function Disconnect()
+	{
+		return true;
+	}
 }
