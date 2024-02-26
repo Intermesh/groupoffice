@@ -814,7 +814,7 @@ class StringHelper {
 				return $style;
 			}
 			$bodyEl = $bodyEls->item(0);
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			ErrorHandler::logException($e);
 			return $style;
 		}
