@@ -1634,6 +1634,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			//SQLSTATE[42S22]: Column not found: 1054 Unknown column 'progress' in 'order clause
 			if(strpos($msg, 'order clause')!==false && strpos($msg, 'Unknown column')!==false)
 			{
+				go()->error($msg);
 				$msg = GO::t("Sorry, you can't sort on that column. Please click on another column header in the grid for sorting.");
 			}
 
