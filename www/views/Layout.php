@@ -31,7 +31,8 @@ $lang = go()->getLanguage()->getIsoCode();
 	<meta name="apple-mobile-web-app-capable" content="no">
 	<meta name="apple-mobile-web-app-title" content="<?= $goTitle; ?>">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
-	<meta name="theme-color" content="<?= $primaryColor; ?>">
+	<meta name="theme-color" content="#202020" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="<?= $primaryColor; ?>" media="(prefers-color-scheme: light)">
 	<meta name="msapplication-TileColor" content="<?= $primaryColor; ?>">
 
 <?php if(!empty(GO::config()->favicon)): ?>
