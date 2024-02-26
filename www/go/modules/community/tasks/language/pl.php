@@ -65,4 +65,6 @@ return array (
   'Default tasklist' => 'Domyślna lista zadań',
   'Remember last selected tasklist' => 'Pamiętaj ostatnią zaznaczoną listę zadań',
   'Set today for start and due date when creating new tasks' => 'Ustal obecną datę jako datę rozpoczęcia i termin zakończenia podczas tworzenia nowych zadań',
+  'Unknown user' => 'Nieznany użytkownik',
+  'CC' => 'DW',
 );

@@ -21,7 +21,7 @@ return array (
   'Announcements' => 'Ogłoszenia',
   'name' => 'Podsumowanie',
   'description' => 'Podsumowanie informacji z różnych modułów',
-  'Start page' => 'Strona startowa',
+  'Start page' => 'Start',
   'webfeeds' => 'Strony sieciowe',
   'All users' => 'Wszyscy użytkownicy',
 );
