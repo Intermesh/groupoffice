@@ -48,6 +48,10 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 						if(me.value === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
 							document.body.classList.add('dark');
 						}
+
+						if(document.body.classList.contains("dark")) {
+							document.getElementsByTagName("meta")["theme-color"].content = "#202020";
+						}
 					}
 					}},
 				{xtype:'container', cls: 'go-theme-color', defaults: {

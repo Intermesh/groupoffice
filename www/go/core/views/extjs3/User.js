@@ -47,6 +47,9 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			this.checkForNewDevices(user);
 			document.body.classList.add(user.themeColorScheme);
 			changeTheme(prefersColorQuery);
+			if(document.body.classList.contains("dark")) {
+				document.getElementsByTagName("meta")["theme-color"].content = "#202020";
+			}
 
 			go.ActivityWatcher.activity();
 			go.ActivityWatcher.init(GO.settings.config.logoutWhenInactive);
