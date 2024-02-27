@@ -14,6 +14,11 @@ class ZpushadminModule extends \GO\Base\Module {
 		return array('sync');
 	}
 
+	public function adminModule()
+	{
+		return true;
+	}
+
 
 	public static function checkZPushVersion($versionToCompare) {
 		\GO::debug("Compare active z-push version with: " . $versionToCompare);
