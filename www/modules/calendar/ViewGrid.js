@@ -536,6 +536,10 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 
 	showContextMenu : function(e, event)
 	{
+		if(!event.event_id) {
+			e.stopEvent();
+			return;
+		}
 		if(!this.contextMenu)
 		{
 			this.contextMenu = new GO.calendar.ContextMenu();

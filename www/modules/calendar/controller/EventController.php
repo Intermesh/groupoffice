@@ -1045,7 +1045,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		ksort($response['results']);
 		
 		//Remove the index from the response array
-		$response['results']= array_values($response['results']);
+		$response['results'] = array_values($response['results']);
 
 		$response['success']=true;
 			
@@ -1073,14 +1073,14 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			->andWhere('date', "<=", new \DateTime($endTime));
 
 		foreach($dakStmt as $report) {
-			$end = (clone $report->date)->add(new \DateInterval('PT' . $report->duration . 'S'));
+			$end = (clone $report->date)->add(new \DateInterval('PT' . ($report->duration ?? 3600) . 'S'));
 
 			$response['results'][$this->_getIndex($response['results'], 'R'.$report->id)] = [
 				'id' => 'R'.$report->id,
 				//'link_count' => $task->countLinks(),
-				'name' =>  $report->description,
+				'name' =>  $report->description .' ('.($report->companyName ?? $report->contactName).')',
 				'description' => $report->contactName,
-				'time' => '00:00',
+				'time' => $report->date->format('H:i'),
 				'start_time' => $report->date->format('Y-m-d H:i'),
 				'end_time' => $end->format('Y-m-d H:i'),
 				'all_day_event' => 0,
