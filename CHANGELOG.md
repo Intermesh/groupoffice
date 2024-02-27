@@ -1,3 +1,6 @@
+27-02-2024: 6.7.71
+- Core: Bugfix in layout renderer
+
 27-02-2024: 6.7.70
 - Email: typo in templates controller
 
