@@ -1065,7 +1065,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 		$tasklistIds = $calendar->visible_tasklists->stmt->fetchAll(\PDO::FETCH_COLUMN, 1);
 
-		$this->_tasklists = [];
+		//$this->_tasklists = [];
 //		while($tasklist = $tasklists->fetch()){
 //			$lists[$tasklist->id] = $tasklist->name;
 //		}
