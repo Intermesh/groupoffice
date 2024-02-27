@@ -989,8 +989,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					
 				if(\GO::modules()->tasks && empty($params['events_only'])){
 					$response = $this->_getTaskResponseForPeriod($response,$calendar,$startTime,$endTime);
-				}				
-				
+				}
+				if(Module::isInstalled("udo", "forms")){
+					$response = $this->_getDakResponseForPeriod($response,$calendar,$startTime,$endTime);
+				}
+
 				$response = $this->_getEventResponseForPeriod($response,$calendar,$startTime,$endTime, $categories);
 				
 			} catch(\GO\Base\Exception\AccessDenied $e){
@@ -1056,6 +1059,40 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				&$store,
 				&$params));
 		
+		return $response;
+	}
+
+	private function _getDakResponseForPeriod($response,$calendar,$startTime,$endTime) {
+
+		if($calendar->name !== 'Dakmeldingen')
+			return $response;
+
+		$dakStmt = \go\modules\udo\forms\model\RoofReport::find()
+				->where('date', "IS NOT", null)
+			->andWhere('date', ">=", new \DateTime($startTime))
+			->andWhere('date', "<=", new \DateTime($endTime));
+
+		foreach($dakStmt as $report) {
+			$end = (clone $report->date)->add(new \DateInterval('PT' . $report->duration . 'S'));
+
+			$response['results'][$this->_getIndex($response['results'], 'R'.$report->id)] = [
+				'id' => 'R'.$report->id,
+				//'link_count' => $task->countLinks(),
+				'name' =>  $report->description,
+				'description' => $report->contactName,
+				'time' => '00:00',
+				'start_time' => $report->date->format('Y-m-d H:i'),
+				'end_time' => $end->format('Y-m-d H:i'),
+				'all_day_event' => 0,
+				'model_name' => 'go\modules\udo\forms\model\RoofReport', // compat for UI
+				'calendar_id' => $calendar->id, // Must be present to be able to show tasks in the calendar Views
+				'background'=>'FE5000',
+				//'day' => $dayValue,
+				'read_only' => true,
+				'report_id' => $report->id
+			];
+		}
+
 		return $response;
 	}
 
