@@ -1,3 +1,6 @@
+- Zpushadmin: Available for admins only by default
+- Carddav: Share carddav with internal on install
+
 26-02-2024: 6.8.36
 - Calendar: Fixed changing color for calendars and categories issue #1112
 - Calendar: Fixed: 6.8.34 bad translation german #1119
