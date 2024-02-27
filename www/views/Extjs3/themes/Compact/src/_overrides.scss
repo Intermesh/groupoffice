@@ -1,5 +1,5 @@
 .x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
-	background-color: color($bg, 'button');
+	background-color: var(--bg-button);
 	.x-btn-group & {
 	 border-radius: 0;
 	}
@@ -92,7 +92,7 @@
 }
 
 .cal-display-panel {
-  background-color: color($bg, 'card');
+  background-color: var(--bg-mid);
 }
 
 //html editor icons in outline set:

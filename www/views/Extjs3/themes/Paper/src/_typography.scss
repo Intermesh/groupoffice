@@ -17,12 +17,12 @@ $font-weight-l: 100;
 %font-caption { //Used as labels and grid headers
 	font-size: sp(15);
 	font-weight: $font-weight-r;
-	color: color($fg, 'secondary-text');
+	color: var(--fg-secondary-text);
 }
 
 %font-body1 {
 	font-size: sp(16);
-	color: color($fg, 'text');
+	color: var(--fg-text);
 	font-weight: $font-weight-r;
 	line-height: dp(24);
 	.primary & { color: white; }
@@ -47,27 +47,27 @@ $font-weight-l: 100;
 	font-size: sp(12);
 	line-height: sp(16);
 	font-weight: $font-weight-m;
-	color: color($fg, 'secondary-text');
+	color: var(--fg-secondary-text);
 }
 
 %font-subheading {
 	font-size: sp(16);
 	line-height: dp(24);
 	letter-spacing: 0.4px;
-	color: color($fg, 'text');
+	color: var(--fg-text);
 	font-weight: $font-weight-r;
 }
 
 %font-label {
 	font-size: sp(12);
 	line-height: dp(16);
-	color: color($fg, 'secondary-text');
+	color: var(--fg-secondary-text);
 	font-weight: $font-weight-r;
 }
 
 %font-subheading-dense {
 	font-size: sp(13);
-	color: color($fg, 'secondary-text');
+	color: var(--fg-secondary-text);
 	font-weight: $font-weight-r;
 }
 
@@ -76,7 +76,7 @@ $font-weight-l: 100;
   line-height: dp(24);
 	font-weight: $font-weight-r;
 	letter-spacing: 0.6px;
-	color: color($fg, 'base');
+	color: var(--fg-text);
 }
 
 %font-headline {
@@ -84,7 +84,7 @@ $font-weight-l: 100;
 	line-height: dp(32);
 	font-weight: $font-weight-r;
 	letter-spacing: 0.6px;
-	color: color($fg, 'base');
+	color: var(--fg-text);
 }
 
 %font-display1 {
@@ -92,5 +92,5 @@ $font-weight-l: 100;
 	line-height: dp(40);
 	font-weight: $font-weight-r;
 	letter-spacing: 0.6px;
-	color: color($fg, 'base');
+	color: var(--fg-text);
 }

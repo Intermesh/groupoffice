@@ -12,7 +12,7 @@
   position:absolute;
   width:100%;
   display:block;
-  border-top: 1px solid color($fg, 'line');
+  border-top: 1px solid var(--fg-line);
 }
 .go-addressbook-index-row:not(:first-child) {
   margin-top: dp(16);

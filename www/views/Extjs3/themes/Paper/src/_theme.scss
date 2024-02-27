@@ -49,16 +49,6 @@ $resourcePath: './' !default;
 	--c-accent: 		rgb(255, 114, 0);
 	--c-accent-tp: 	rgba(255,114,0, 0.16);
 
-	--hue-blue: #039BE5;
-	--hue-red:#E57373;
-	--hue-pink: #EC407A;
-	--hue-purple: #8E24AA;
-	--hue-cyan: #00ACC1;
-	--hue-green:#43A047;
-	--hue-orange: #FB8C00;
-	--hue-brown: #6D4C41;
-	--hue-yellow: #FDD170;
-	--hue-bluegrey: #607D8B;
 }
 
 @mixin dark-theme {
@@ -95,18 +85,8 @@ $resourcePath: './' !default;
 
 	--c-primary: #009BC9;
 	--c-primary-tp: #0277BD;
-	--c-header-bg: #202020;
+	--c-header-bg: #272727;
 
-	--hue-blue: #1976D2;
-	--hue-red:#E53935;
-	--hue-pink: #D81B60;
-	--hue-purple: #7B1FA2;
-	--hue-cyan: #0097A7;
-	--hue-green:#388E3C;
-	--hue-orange: #FF8F00;
-	--hue-brown: #6D4C41;
-	--hue-yellow: #F57F17;
-	--hue-bluegrey: #546E70;
 
 //from goui
 	--bg-focus: 		rgba(2, 119, 189, 0.16);

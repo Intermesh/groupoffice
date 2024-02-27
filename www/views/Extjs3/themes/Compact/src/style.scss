@@ -2,7 +2,12 @@
 @import '../../Paper/src/_compat';
 @import '../../Paper/src/_utils';
 @import 'config';
-@import 'theme';
+
+$resourcePath: '../Paper/';
+$font-scale: 1.1;
+@import '../../../../goui/groupoffice-core/style/theme';
+
+//@import 'theme';
 @import 'typography';
 @import '../../Paper/src/_styles';
 @import 'overrides';

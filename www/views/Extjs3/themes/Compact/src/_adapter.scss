@@ -7,7 +7,7 @@
       flex-grow:1;
       flex-shrink:1;
     }
-    outline: 1px solid color($fg, 'line');
+    outline: 1px solid var(--fg-line);
     flex-shrink:0;
     flex-grow:0;
     position:relative;
@@ -34,10 +34,10 @@
     top:0;
     height:100%;
     &:hover{
-      background-color: color($bg, 'hover');
+      background-color: var(--bg-hover);
     }
     &.moving {
-      background-color: color($fg, 'line');
+      background-color: var(--fg-line);
     }
   }
 }

@@ -5,7 +5,7 @@
 	//text-transform: uppercase;
 	font-weight: 600;
 	font-size: 1.2em;
-	color: $colorBorder;
+	color: $colorTextSecondary;
 }
 
 %event {
@@ -20,7 +20,7 @@
 	text-align: left;
 	user-select: none;
 	> em, > span {
-		color:$colorText;
+		color: $colorText;
 	}
 	> em {
 		text-overflow:ellipsis;
@@ -181,7 +181,7 @@
 		}
 
 		&.other {
-			background-color: $colorBackgroundDarker;
+			background-color: $surfaceLow;
 		}
 
 		// another month
@@ -237,6 +237,8 @@
 
 	ul { // header
 		@extend %font-caption;
+		background-color: $surfaceMid;
+		border-bottom: $borderWidth solid $colorBorder;
 		display: flex;
 		height: dp(40);
 		align-items: center;
@@ -266,7 +268,7 @@
 			font-weight: 400;
 			margin:dp(4);
 			//color:$colorTextSecondary;
-			background-color: $colorSelectedRowInactive;
+			background-color: $surfaceHighest;
 			border-radius: 99px;
 		}
 		> em { // date number
@@ -284,15 +286,15 @@
 
 .cal.month, .cal.split {
 	ol { // week row
-		background-color: $colorBackground;
+		background-color: $surfaceLowest;
 		display: flex;
 		flex: 1 0 0;
 		position: relative;
 		align-items: stretch;
-		border-top: 1px solid $colorLine;
+		border-top: 1px solid $colorDivider;
 		user-select:none;
 		> li { // day
-			border-right: 1px solid $colorLine;
+			border-right: 1px solid $colorDivider;
 			&:first-child,
 			&:last-child { border-right:0;}
 			&.events {
@@ -324,13 +326,15 @@
 
 $hourHeight: 8vh;
 $halfHour: 4vh;
+$timeMargin: dp(72);
 
 %weekhead {
 	display: flex;
 	scrollbar-gutter: stable;
+	align-items: center;
 	overflow-y:auto;
 	//padding-right: 14px; // for scrollbar
-	border-bottom: 2px solid $colorBorder;
+	border-bottom: 1px solid $colorBorder;
 	> li {
 		@extend %font-caption;
 		text-align: center;
@@ -352,32 +356,36 @@ $halfHour: 4vh;
 	display: flex;
 	flex-direction: column;
 	> ul li:first-child { // week-nb & all-day
-		//font-size: .9em;
-		justify-content: center;
-
+		font-size: .9em;
 		min-height: dp(24);
 		text-align: center;
 		padding-top:dp(4);
 	}
 	.all-days { // container
-		position:relative;
 		min-height: dp(24);
+		position:absolute;
+		left: $timeMargin;
+		right:0;
+		~ li {
+			border-right: 1px solid var(--fg-divider);
+		}
 	}
 	> ul { //header + all-day
 		display: flex;
 		scrollbar-gutter: stable;
 		overflow-y:auto;
-		//padding-right: 14px; // for scrollbar
 		max-height: dp(212); // x all-day events fit
 		border-bottom: 2px solid $colorBorder;
 		&:first-child { // header
 			@extend %weekhead;
 		}
 		+ ul { // all-day only
-			background-color:var(--bg-base);
+			position:relative;
+			background-color:$surfaceLowest;
 			flex-shrink: 0;
 			max-height: dp(212); // x all-day events fit
 			min-height:dp(32);
+			border-bottom: 2px solid $colorLine;
 		}
 
 		.event {
@@ -385,8 +393,8 @@ $halfHour: 4vh;
 		}
 	}
 
-	> dl { // can have 7 dd for day columns
-		background-color: $colorBackground;
+	> dl { // day columns container
+		background-color: $surfaceLowest;
 		overflow-y: scroll;
 		position: relative;
 		display: flex;
@@ -399,7 +407,7 @@ $halfHour: 4vh;
 			//max-height: 1680px;
 			background: linear-gradient(180deg, $colorLine 1px, transparent 1px) repeat-y;
 			background-size: 100% $hourHeight;
-			border-right: 1px solid $colorBorder;
+			border-right: 1px solid $colorDivider;
 			&:last-child { border-right: 0;}
 		}
 		> dt { // time display
@@ -422,16 +430,15 @@ $halfHour: 4vh;
 			}
 		}
 	}
-
 	li, dd, dt { // header / all-day
 		flex: 5 0 0;
 
 		&.weekend {
-			background-color: $colorButton;
+			background-color: $surfaceLow;
 		}
 
 		&:first-child { // weeknr
-			max-width: dp(64);
+			max-width: $timeMargin;
 		}
 	}
 	dd > div, .all-days > div {
@@ -460,37 +467,46 @@ $halfHour: 4vh;
 		&:after {bottom: 0;}
 	}
 }
+.cal.resizing {
+	cursor: row-resize;
+	dl dd > div {
+		pointer-events:none;
+		transition: height 84ms ease-out, top 84ms ease-out;
+	}
+}
 
 .cal.split {
 	display: flex;
 	flex-direction: column;
+	ol {
+		border-bottom: 1px solid $colorLine;
+	}
 	ul {
 		@extend %weekhead;
 	}
 	li {
 		flex: 5 0 0;
 	}
+	> div { // calendar name
+		padding: dp(4) dp(8);
+		//margin: 0 auto;
+		//color: $colorTextSecondary;
+		//background-color: $colorBackground;
+		//border-right: 1px solid $colorBorder;
+		//max-width: dp(160);
+		//font-weight: 300;
+	}
 	ol > li {
-		&:nth-child(2) { // calendar name
-			max-width: dp(140);
-		}
 		&.events {
-			margin-left: dp(140);
 			margin-top:dp(4);
-			width: calc(100% - #{dp(140)});
-		}
-		&.cal-name {
-			color: $colorTextSecondary;
-			border-right: 1px solid $colorBorder;
-			font-size: .8em;
-			max-width: dp(140);
-			font-weight: 300;
+			width: 100%;
 		}
 	}
 }
 
 .cal.list {
 	height:100%;
+	background-color: $surfaceLow;
 	overflow-y:scroll;
 	list-style: none;
 	li {
@@ -668,7 +684,6 @@ $halfHour: 4vh;
 		padding-bottom: dp(8);
 	}
 	.goui-form-field .wrap {
-		margin-top: dp(-9);
 	}
 }
 

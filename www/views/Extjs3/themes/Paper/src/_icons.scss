@@ -151,7 +151,7 @@ define icons with:
 	//@include var(color, c-primary);
 }
 .ux-row-action-item:hover {
-	color: color($fg, 'text');
+	color: var(--fg-text);
 	cursor: pointer;
 }
 @each $class, $icon in $tools {
@@ -1372,7 +1372,7 @@ $material-icons : (
 
 	//background-size: contain;
 	//background-repeat: no-repeat;
-	background-color: color($fg, 'icon');
+	background-color: var(--fg-icon);
 	mask-image: url(#{$resourcePath}img/icon/gender-male.svg);
 	-webkit-mask-image: url(#{$resourcePath}img/icon/gender-male.svg);
 }
@@ -1385,7 +1385,7 @@ $material-icons : (
 	//background-image: url(#{$resourcePath}img/icon/gender-female.svg);
 	//background-size: contain;
 	//background-repeat: no-repeat;
-	background-color: color($fg, 'icon');
+	background-color: var(--fg-icon);
 
 	mask-image: url(#{$resourcePath}img/icon/gender-female.svg);
 	-webkit-mask-image: url(#{$resourcePath}img/icon/gender-female.svg);
