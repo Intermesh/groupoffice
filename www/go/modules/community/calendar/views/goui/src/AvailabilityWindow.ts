@@ -5,28 +5,25 @@ import {
 	tbar,
 	comp,
 	h2,
-	list,
 	avatar,
-	store,
 	Window,
 	Component,
 	DateTime,
-	ComponentEventMap, ObservableListenerOpts, WindowEventMap
+	ObservableListenerOpts, WindowEventMap
 } from "@intermesh/goui";
 import {client, jmapds} from '@intermesh/groupoffice-core';
 import {CalendarItem} from "./CalendarItem.js";
-import {CalendarView} from "./CalendarView.js";
 
-export interface AvailabilityDialogEventMap<Type> extends WindowEventMap<Type> {
+export interface AvailabilityWindowEventMap<Type> extends WindowEventMap<Type> {
 	changetime: (me: Type, start: DateTime, end:DateTime) => void
 }
 
-export interface AvailabilityDialog extends Window {
-	on<K extends keyof AvailabilityDialogEventMap<this>, L extends Function>(eventName: K, listener: Partial<AvailabilityDialogEventMap<this>>[K], options?: ObservableListenerOpts): L;
-	fire<K extends keyof AvailabilityDialogEventMap<this>>(eventName: K, ...args: Parameters<AvailabilityDialogEventMap<any>[K]>): boolean
+export interface AvailabilityWindow extends Window {
+	on<K extends keyof AvailabilityWindowEventMap<this>, L extends Function>(eventName: K, listener: Partial<AvailabilityWindowEventMap<this>>[K], options?: ObservableListenerOpts): L;
+	fire<K extends keyof AvailabilityWindowEventMap<this>>(eventName: K, ...args: Parameters<AvailabilityWindowEventMap<any>[K]>): boolean
 }
 
-export class AvailabilityDialog extends Window {
+export class AvailabilityWindow extends Window {
 
 	date!: DateTime
 	dateCmp:Component
@@ -117,14 +114,14 @@ export class AvailabilityDialog extends Window {
 				let available = p.id == go.User.id ? 'Organizer' : 'Beschikbaar' ;
 				const mAvatar = avatar({cls:"",displayName: p.name, backgroundImage: p.avatarId ? client.downloadUrl(p.avatarId) : undefined});
 
-				this.scheduleContainers[p.id] = E('dd');
+				this.scheduleContainers[p.id!] = E('dd');
 				this.view.el.append(E('dl',
 					E('dt',
 						mAvatar.el,
 						E('h3',p.name),
 						E('h4',available)
 					),
-					this.scheduleContainers[p.id]
+					this.scheduleContainers[p.id!]
 				));
 			}
 		});

@@ -20,7 +20,7 @@ class ResourceGroupWindow extends FormWindow {
 	constructor() {
 		super('ResourceGroup');
 		this.title = t('Resource group');
-		this.width = 400
+		this.width = 500
 		this.height = 316;
 		this.generalTab.cls = 'flow pad';
 		this.generalTab.items.add(
@@ -54,7 +54,7 @@ class ResourceWindow extends FormWindow {
 		)
 	}
 }
-export class ResourcePanel extends Window {
+export class ResourcesWindow extends Window {
 
 	resourceTable: Table<DataSourceStore>
 	constructor() {
@@ -161,12 +161,12 @@ export class ResourcePanel extends Window {
 							rowdblclick:(list, storeIndex, row, ev) => {
 								const d = new ResourceWindow();
 								d.show();
-								void d.load(list.store.get(storeIndex)!.id);
+								void d.load(list.store.get(storeIndex)!.id!);
 							},
 
 							delete: async (tbl) => {
-								const ids = this.resourceTable!.rowSelection!.selected.map(index => this.resourceTable!.store.get(index)!.id);
-								await jmapds("Project3")
+								const ids = this.resourceTable!.rowSelection!.selected.map(index => this.resourceTable!.store.get(index)!.id!);
+								await jmapds("Resources")
 									.confirmDestroy(ids);
 							}
 						}

@@ -118,6 +118,7 @@ export class WeekView extends CalendarView {
 
 		},
 		mouseUp = (e:MouseEvent) => {
+			this.el.cls('-resizing');
 			this.el.un('mousemove', mouseMove);
 			changed && ev.save(() => {
 				this.dayItems.shift()
@@ -134,7 +135,7 @@ export class WeekView extends CalendarView {
 			pxPerSnap = li.offsetHeight / (1440 / SNAP); // 96 quarter-hours in a day
 			offset = li.getBoundingClientRect().top;
 			currDayEl = target.up('[data-day]')!;
-
+			this.el.cls('+resizing');
 			const event = target.up('div[data-key]');
 			if (event) { // MOVE
 				offset += e.offsetY;
@@ -149,6 +150,7 @@ export class WeekView extends CalendarView {
 					offset -= event.offsetHeight;
 				} else {
 					action = move;
+					this.el.cls('-resizing');
 				}
 				this.el.on('mousemove', mouseMove);
 			}
@@ -211,13 +213,13 @@ export class WeekView extends CalendarView {
 	}
 
 	renderView() {
+		const oldScrollTop = this.el.lastElementChild?.scrollTop;
 		this.el.innerHTML = ''; // clear
 		let now = new DateTime(),
-			it = 1, hour, e,
-			day = this.day.clone();
+			hour, day = this.day.clone();
 		//day.setWeekDay(0);
 
-		let heads = [], days = [], hours = [], showNowBar ,nowbar;
+		let heads = [], days = [],fullDays = [], hours = [], showNowBar ,nowbar;
 		for (hour = 1; hour < 24; hour++) {
 			hours.push(E('em', hour+':00'));
 		}
@@ -231,11 +233,12 @@ export class WeekView extends CalendarView {
 			);
 			const dayContainer = E('dd').cls('weekend',day.getDay()%6==0).attr('data-day', day.format('Y-m-d'));
 			this.dayCols[day.format('Ymd')] = dayContainer;
+			fullDays.push(E('li').cls('weekend',day.getDay()%6==0).attr('data-day', day.format('Y-m-d')))
 			days.push(dayContainer);
 			if(now.format('Ymd') === day.format('Ymd')) {
 				showNowBar = true;
 			}
-			day.addDays(1); it=0;
+			day.addDays(1);
 		}
 		if(showNowBar) {
 			const top = 7 / 60 * now.getMinuteOfDay(), // 1296 = TOTAL HEIGHT of DAY
@@ -248,11 +251,11 @@ export class WeekView extends CalendarView {
 		let ol: HTMLElement;
 
 		this.el.append(
-			E('ul',E('li',this.day.getWeekOfYear()), ...heads),
-			E('ul',E('li', t('All-day')), this.alldayCtr = E('li').cls('all-days')),
+			E('ul',E('li','Wk '+this.day.getWeekOfYear()), ...heads),
+			E('ul',E('li', t('All-day')), this.alldayCtr = E('li').cls('all-days'), ...fullDays),
 			ol = E('dl',E('dt', nowbar || '', E('em'), ...hours), ...days)
 		);
-		setTimeout(() => ol.scrollTop = ol.scrollHeight / 4); // = scroll 6hours down (1/4 of day)
+		setTimeout(() => ol.scrollTop = oldScrollTop || (ol.scrollHeight / 4)); // = scroll 6hours down (1/4 of day)
 	}
 
 	private updateFullDayItems() {

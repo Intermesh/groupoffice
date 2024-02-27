@@ -6,36 +6,32 @@ import {
 	checkbox,
 	comp,
 	Component,
-	DataSourceStore,
-	datasourcestore,
 	DatePicker,
 	datepicker,
 	DateTime,
-	FunctionUtil, hr, List,
+	FunctionUtil, List,
 	list,
 	menu, router,
 	splitter,
 	t,
 	tbar
 } from "@intermesh/goui";
-import {EventDialog} from "./EventDialog";
+import {EventWindow} from "./EventWindow.js";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
-import {calendarStore,categoryStore} from "./Index.js";
-import {CalendarDialog} from "./CalendarDialog.js";
+import {calendarStore, categoryStore, ValidTimeSpan} from "./Index.js";
+import {CalendarWindow} from "./CalendarWindow.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SpltView.js";
 import {SubscribeWindow} from "./SubscribeWindow.js";
-import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
+import {client} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
-import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
-import {CategoryDialog} from "./CategoryDialog.js";
+import {CategoryWindow} from "./CategoryWindow.js";
 import {Settings} from "./Settings.js";
-import {ResourcePanel} from "./ResourcesPanel.js";
+import {ResourcesWindow} from "./ResourcesWindow.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
-
-type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
+import {PreferencesWindow} from "./PreferencesWindow.js";
 
 export class Main extends Component {
 
@@ -98,17 +94,10 @@ export class Main extends Component {
 		});
 
 		this.items.add(
-			this.west = comp({tagName: 'aside', width: 304},
-				tbar({},
+			this.west = comp({tagName: 'aside', width: 304, cls:'scroll',style: {paddingTop:'1.2rem'}},
+				tbar({cls: "for-medium-device"},
+					'->',
 					btn({
-						icon: 'add',
-						cls: 'primary filled',
-						style: {width: '100%'},
-						text: t('Create event'),
-						handler: _ => (new EventDialog()).show()
-					}),
-					btn({
-						cls: "for-medium-device",
 						title: t("Close"),
 						icon: "close",
 						handler: (button, ev) => {
@@ -130,9 +119,10 @@ export class Main extends Component {
 							const days = Math.round((end!.clone().setHours(12).getTime() - start!.clone().setHours(12).getTime()) / 8.64e7) + 1;
 							this.date = start!;
 							if (days < 8) {
-								this.routeTo('days-'+days, this.date);
-								//this.setSpan('days', days);
+								let span = this.timeSpan == 'split' ? 'split' : 'days';
+								this.routeTo(span+'-'+days, this.date);
 							} else {
+
 								this.routeTo('weeks-'+days, this.date);
 								//this.setSpan('weeks', days);
 							}
@@ -140,51 +130,52 @@ export class Main extends Component {
 						}
 					}
 				}),
-				tbar({cls: 'dense'},
-					comp({tagName: 'h3', html: 'Calendars'}),
-					btn({
-						icon: 'add', menu: menu({},
-							btn({
-								text: t('Create calendar') + '…', handler: () => {
-									const dlg = new CalendarDialog();
-									dlg.form.create({});
-									dlg.show();
-								}
-							}),
-							btn({
-								text: t('Subscribe to calendar') + '…', handler: () => {
-									const d = new SubscribeWindow();
-									d.show();
-								}
-							}),
-							btn({text: t('Add calendar from link') + '…'})
-						)
-					}),
-					btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}})
-				),
-				this.calendarList = this.buildCalendarFilter(),
-				comp({tagName:'ul', cls:'goui check-list'},
-					comp({tagName:'li'},this.birthdayCb),
-					comp({tagName:'li'},this.tasksCb),
-					comp({tagName:'li'},this.holidayCb),
-				),
-				tbar({cls: 'dense'},
-					comp({tagName: 'h3', html: 'Categories'}),
-					btn({
-						icon: 'add', menu: menu({},
-							btn({
-								text: t('Create category') + '…', handler: () => {
-									const dlg = new CategoryDialog();
-									dlg.show();
-									dlg.form.create({});
+				comp({cls:'scroll'},
+					tbar({cls: 'dense'},
+						comp({tagName: 'h3', html: 'Calendars'}),
+						btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}}),
+						btn({
+							icon: 'more_vert', menu: menu({},
+								btn({
+									text: t('Create calendar') + '…', handler: () => {
+										const dlg = new CalendarWindow();
+										dlg.form.create({});
+										dlg.show();
+									}
+								}),
+								btn({
+									text: t('Subscribe to calendar') + '…', handler: () => {
+										const d = new SubscribeWindow();
+										d.show();
+									}
+								}),
+								btn({text: t('Add calendar from link') + '…'})
+							)
+						})
+					),
+					this.calendarList = this.buildCalendarFilter(),
+					comp({tagName:'ul', cls:'goui check-list'},
+						comp({tagName:'li'},this.birthdayCb),
+						comp({tagName:'li'},this.tasksCb),
+						comp({tagName:'li'},this.holidayCb),
+					),
+					tbar({cls: 'dense'},
+						comp({tagName: 'h3', html: 'Categories'}),
+						btn({
+							icon: 'add', menu: menu({},
+								btn({
+									text: t('Create category') + '…', handler: () => {
+										const dlg = new CategoryWindow();
+										dlg.show();
+										dlg.form.create({});
 
-								}
-							})
-						)
-					}),
-					btn({icon: 'done_all', handler: () => { this.categoryList.rowSelection!.selectAll();}})
-				),
-				this.categoryList = this.buildCategoryFilter()
+									}
+								})
+							)
+						})
+					),
+					this.categoryList = this.buildCategoryFilter()
+				)
 			),
 			splitter({
 				stateId: "calendar-splitter-west",
@@ -195,6 +186,11 @@ export class Main extends Component {
 					btn({cls: "for-medium-device", icon: "menu", handler: _ => {
 						this.west.el.cls('!active');
 					}}),
+					btn({
+						icon: 'add',
+						title: t('New event'),
+						handler: _ => (new EventWindow()).show()
+					}),
 					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px'}}),
 					//'->',
 					this.cardMenu = comp({cls: 'group not-medium-device', flex:'0 0 auto'},
@@ -212,15 +208,7 @@ export class Main extends Component {
 						btn({icon: 'view_module', text: t('Year'), handler: b => this.routeTo('year', this.date)}),
 						btn({icon: 'call_split', text: t('Split'), handler: b => this.routeTo('split-5', this.date)}),
 						btn({icon: 'list', text: t('List'), handler: b => this.routeTo('list', this.date)}),
-					)},
-
-					),
-					//'->',
-					// comp({cls:'group'},
-					// 	btn({icon:'call_merge', cls:'active', handler: b => this.setView('merge') }),
-					// 	btn({icon:'call_split', handler: b => this.setView('split')})
-					// ),
-					// '->',
+					)}),
 					comp({cls: 'group', flex: '1 1 50%', style:{justifyContent: 'end'}},
 						btn({icon: 'keyboard_arrow_left', title: t('Previous'), allowFastClick:true, handler: b => this.backward()}),
 						btn({
@@ -234,8 +222,12 @@ export class Main extends Component {
 						btn({icon:'video_call',text:'Video meeting', handler: _ => {(new Settings()).openLoad()}}),
 						btn({
 							icon: 'print', text:t('Print'), menu: menu({expandLeft: true},
-								btn({icon: 'print', text: t('Print current view')}),
-								btn({icon: 'print', text: t('Print count per category')}),
+								btn({icon: 'print', text: t('Current view'), handler:() => {
+									let view = this.timeSpan;
+									if(view in ['year', 'list', 'split']) {
+										view = 'month';
+									}
+									this.openPDF(view); }}),
 								//'-',
 								btn({icon: 'view_day', text: t('Day'), handler:() => { this.openPDF('day'); }}),
 								btn({icon: 'view_week', text: t('5 days'), handler:() => { this.openPDF('days'); }}),
@@ -243,7 +235,12 @@ export class Main extends Component {
 								btn({icon: 'view_module', text: t('Month'), handler:() => { this.openPDF('month'); }})
 							)
 						}),
-						btn({icon:'meeting_room', text:t('Resources'), handler: _ => { (new ResourcePanel()).show()}})
+						btn({icon:'meeting_room', text:t('Resources'), handler: _ => { (new ResourcesWindow()).show()}}),
+						btn({icon: 'settings', text: t('Preferences'), handler: _ => {
+							const d=new PreferencesWindow();
+							d.show();
+							d.load(go.User.id);
+						}})
 					)})
 				),
 				this.cards = cards({flex: 1, activeItem:1},
@@ -317,7 +314,7 @@ export class Main extends Component {
 				me.store.on('load', (s,items)=> {
 					const index = s.findIndex(c => c.id == CalendarView.selectedCalendarId);
 					me.rowSelection!.selected = [index>0 ? index : 0];
-					this.inCalendars = items.reduce((obj, item) => ({ ...obj, [item.id]: item.isVisible }), {} as any);
+					this.inCalendars = items.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
 				});
 
 				me.store.load();
@@ -358,7 +355,7 @@ export class Main extends Component {
 					buttons: [btn({
 						icon: 'more_horiz', menu: menu({},
 							btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: async _ => {
-									const dlg = new CalendarDialog();
+									const dlg = new CalendarWindow();
 									await dlg.load(data.id);
 									dlg.show();
 								}}),
@@ -431,7 +428,7 @@ export class Main extends Component {
 					buttons: [btn({
 						icon: 'more_horiz', menu: menu({},
 							btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: async _ => {
-								const dlg = new CategoryDialog();
+								const dlg = new CategoryWindow();
 								await dlg.load(data.id);
 								dlg.show();
 							}})
@@ -532,6 +529,8 @@ export class Main extends Component {
 				this.currentText.html = start.format('F ') + `<em> ${start.format('Y')}</em>`;
 				break;
 			case 'week':
+				this.spanAmount = 7;
+				// @fall-though intended
 			case 'split':
 				start.setWeekDay(0);
 				this.currentText.html = start.format('F ') + `<em> ${start.format('Y')}</em>`;
@@ -547,6 +546,7 @@ export class Main extends Component {
 				this.currentText.text = start.format('j M') + ' - ' + end.format('j M');
 				break;
 			case 'day':
+				this.spanAmount = 1;
 				this.currentText.text = this.date.format('j F');
 				break;
 		}

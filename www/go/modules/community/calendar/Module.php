@@ -49,7 +49,7 @@ class Module extends core\Module
 	}
 	public static function onMap(core\orm\Mapping $mapping)
 	{
-		$mapping->addHasOne('calendarSettings', Preferences::class, ['id' => 'userId'], true);
+		$mapping->addHasOne('calendarPreferences', Preferences::class, ['id' => 'userId'], true);
 	}
 
 	public function downloadIcs($key) {
@@ -66,10 +66,10 @@ class Module extends core\Module
 			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
 		//$calendarIds = json_decode($calendars);
 		switch($type) {
-			case 'day': $this->printDay(new \DateTime($date), $calendarIds);
-			case 'days': $this->printWeek($date, $calendarIds, 5);
-			case 'week' : $this->printWeek($date, $calendarIds, 7);
-			case 'month' : $this->printMonth(new \DateTime($date), $calendarIds, 7);
+			case 'day': $this->printDay(new \DateTime($date), $calendarIds); break;
+			case 'days': $this->printWeek($date, $calendarIds, 5);break;
+			case 'week' : $this->printWeek($date, $calendarIds, 7);break;
+			case 'month' : $this->printMonth(new \DateTime($date), $calendarIds);break;
 		}
 	}
 
@@ -97,7 +97,7 @@ class Module extends core\Module
 
 	private function printWeek($date, $calendarIds, $span){
 
-		$start = (new \DateTime($date))->modify('last Monday');
+		$start = (new \DateTime($date))->modify('Monday this week');
 		$end = (clone $start)->modify('+'.$span.' days');
 
 		$report = new reports\Week();

@@ -167,7 +167,7 @@ export class MonthView extends CalendarView {
 					i==0 ? E('sub','W '+day.getWeekOfYear()).cls('weeknb')
 						.on('click',e => this.fire('selectweek', this, weekStart))
 						.on('mousedown',e=>e.stopPropagation()):'',
-					E('em',day.format(day.getDate() === 1 ? 'j M' : 'd'))
+					E('em',day.format(day.getDate() === 1 ? 'j M' : 'j'))
 				).attr('data-date', day.format('Y-m-d'))
 				 .cls('today', day.format('Ymd') === now.format('Ymd'))
 				 .cls('past', day.format('Ymd') < now.format('Ymd'))

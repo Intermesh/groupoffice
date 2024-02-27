@@ -5,8 +5,7 @@ import {
 	checkbox, CheckboxField, checkboxselectcolumn,
 	column,
 	comp, containerfield,
-	DataSourceForm,
-	datasourceform, datasourcestore,
+	datasourcestore,
 	DateField,
 	datefield, DateInterval,
 	DateTime,
@@ -24,20 +23,19 @@ import {
 	win,
 	Window
 } from "@intermesh/goui";
-import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
+import {client, FormWindow, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {calendarStore, categoryStore} from "./Index.js";
 import {participantfield} from "./ParticipantField.js";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
-import {AvailabilityDialog} from "./AvailabilityDialog.js";
+import {AvailabilityWindow} from "./AvailabilityWindow.js";
 
 
-export class EventDialog extends Window {
+export class EventWindow extends FormWindow {
 
 	// title = t('New Event')
 	// width = 800
 	// height = 650
-	form: DataSourceForm
 	// startTime: TextField
 	// endTime: TextField
 
@@ -55,13 +53,13 @@ export class EventDialog extends Window {
 
 	private titleField: TextField
 	constructor() {
-		super();
+		super("CalendarEvent");
 
 		const m = go.Modules.get('community','calendar');
 		this.title = t('New Event');
 		this.width = 440;
 		this.height = 820;
-		this.store = jmapds("CalendarEvent");
+		this.store = this.form.dataSource as JmapDataSource; //jmapds("CalendarEvent");
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
 		var recurrenceField = recurrencefield({name: 'recurrenceRule',flex:1});
@@ -71,31 +69,29 @@ export class EventDialog extends Window {
 		});
 
 		const exceptionsBtn = btn({text:t('Exceptions'),width: 100, handler: b => {
-			this.openExceptionsDialog();
+			this.openExceptionsWindow();
 		}});
 
 		const now = new DateTime();
 
-		this.items.add(this.form = datasourceform({
-				cls: 'scroll flow pad',
-				flex:1,
-				dataSource: this.store,
-				listeners: {
-					'beforesave': (frm,data) => {
-						this.parseSavedData(data);
-					},
-					'load': (_, data) => {
-						const start = new DateTime(data.start);
-						data.end = start.add(new DateInterval(data.duration))
-							.addDays(data.showWithoutTime? -1 : 0)
-							.format(data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s');
-						exceptionsBtn.hidden = !data.recurrenceOverrides;
-						//recurrenceField.setStartDate(start)
-					},
-					'save' : () => {this.close();}
-				}
-			},
-			this.titleField = textfield({placeholder: t('Enter a title, name or place'), name: 'title', flex: '0 1 60%'}),
+		this.form.on('beforesave', (frm,data) => {
+			this.parseSavedData(data);
+		});
+		this.form.on('load', (_, data) => {
+			const start = new DateTime(data.start);
+			data.end = start.add(new DateInterval(data.duration))
+				.addDays(data.showWithoutTime? -1 : 0)
+				.format(data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s');
+			exceptionsBtn.hidden = !data.recurrenceOverrides;
+			//recurrenceField.setStartDate(start)
+		});
+		this.form.on('save', () => {this.close();});
+		this.generalTab.cls = 'flow fit scroll pad';
+
+		this.generalTab.items.add(
+			this.titleField = textfield({placeholder: t('Enter a title, name or place'), name: 'title', flex: '0 1 60%', listeners: {
+				'focus':()=> { this.titleField.input!.select();}
+			}}),
 			select({
 				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',
 				store: calendarStore,
@@ -113,11 +109,11 @@ export class EventDialog extends Window {
 					}
 				}
 			}),
-			textfield({name: 'location',flex:1, label:t('Location')}),
+			textfield({name: 'location',flex:1, label:t('Location'), style:{minWidth:'80%'}}),
 			btn({icon:'video_call', hidden: !m.settings.videoUri, cls:'filled', width:50, handler: async (btn) => {
 					(btn.previousSibling() as TextField)!.value = await this.createVideoLink(m.settings);
 			}}),
-			this.withoutTimeToggle = checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'),
+			this.withoutTimeToggle = checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'), style:{width:'auto'},
 				listeners: {'setvalue':(_, checked) => {
 					alertField.fullDay = checked;
 					alertField.drawOptions();
@@ -129,6 +125,7 @@ export class EventDialog extends Window {
 					this.startDate.withTime = this.endDate.withTime = !checked;
 				}}
 			}),
+			comp({}),
 			this.startDate = datefield({label: t('Start'), name:'start', flex:1, defaultTime: now.format('H')+':00',
 				listeners:{'setvalue': (me,v) => {
 					const date = me.getValueAsDateTime();
@@ -155,7 +152,7 @@ export class EventDialog extends Window {
 				}}
 			}),
 			this.btnFreeBusy = btn({hidden: true,text:t('Check availability'), handler: () => {
-				const dlg = new AvailabilityDialog();
+				const dlg = new AvailabilityWindow();
 				dlg.on('changetime', (_,s,e) => {
 					this.startDate.value = s.format('Y-m-dTH:i');
 					this.endDate.value = e.format('Y-m-dTH:i');
@@ -211,13 +208,15 @@ export class EventDialog extends Window {
 					);
 				}
 			})
-		),
-		tbar({cls: 'border-top'},
-			btn({icon:'attach_file', handler: _ => this.attachFile() }),
-			'->',
-			this.submitBtn = btn({text:t('Save'), cls:'primary',handler: _ => this.submit()})
-		));
+		);
 
+		this.bbar.items.clear().add(
+			btn({icon:'attach_file', handler: _ => this.attachFile() }),
+			comp({flex:1}),
+			this.submitBtn = btn({text:t('Save'), cls:'primary',handler: _ => this.submit()})
+		);
+
+		this.addCustomFields();
 	}
 
 	private b64UrlEncode(data:string) {
@@ -239,13 +238,13 @@ export class EventDialog extends Window {
 		return  s.videoUri+room+'?jwt='+`${head}.${load}.${this.b64UrlEncode(String.fromCharCode(...new Uint8Array(sign)))}`;
 	}
 
-	private openExceptionsDialog() {
+	private openExceptionsWindow() {
 		const o = this.form.value.recurrenceOverrides;
 		let d = [];
 		for(let recurrenceId in o) {
 			d.push({recurrenceId, excluded: o[recurrenceId]?.excluded})
 		}
-		const exceptionStore = store({items:d}),
+		const exceptionStore = store({data:d}),
 			exceptionView = win({
 				title: t('Exceptions'),
 				height:400,
@@ -282,13 +281,13 @@ export class EventDialog extends Window {
 		return data;
 	}
 
-	load(ev: CalendarItem) {
+	loadEvent(ev: CalendarItem) {
 		this.item = ev;
 		this.title = t(!ev.key ? 'New event' : 'Edit event');
 		if (!ev.key) {
 			this.form.create(ev.data);
 		} else {
-			this.form.load(ev.data.id).then(() => {
+			this.form.load(ev.data.id!).then(() => {
 				if(ev.recurrenceId) {
 					this.startDate.value = ev.start.format('Y-m-d\TH:i');
 					this.endDate.value = ev.end.clone().addDays(ev.data.showWithoutTime? -1 : 0).format(ev.data.showWithoutTime ? 'Y-m-d' : 'c');
@@ -296,7 +295,7 @@ export class EventDialog extends Window {
 			});
 		}
 		this.titleField.focus();
-		this.titleField.input!.select();
+
 	}
 
 	submit() {

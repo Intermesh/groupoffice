@@ -1,11 +1,11 @@
 import {
-	btn, Button,
+	btn,
 	comp, containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
-	DateTime, DisplayField, displayfield, Format, hr, mapfield, Notifier, numberfield, RecurrenceField,
+	DateTime, DisplayField, displayfield, Format, hr, mapfield, Notifier, RecurrenceField,
 	t,
-	tbar, textfield, Toolbar,
+	tbar, Toolbar,
 	Window
 } from "@intermesh/goui";
 import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
@@ -114,7 +114,7 @@ export class EventDetail extends Window {
 	}
 
 
-	load(ev: CalendarItem) {
+	loadEvent(ev: CalendarItem) {
 		this.item = ev;
 		this.title = t(!ev.key ? 'New event' : 'Edit event');
 		if (!ev.key) {

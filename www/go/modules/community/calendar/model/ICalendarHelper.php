@@ -174,7 +174,7 @@ class ICalendarHelper {
 	 * @return string \Sabre\VObject\Property\ICalendar\Recur $rule
 	 */
 	static private function toRrule($event) {
-		$recurrenceRule = $event->recurrenceRule;
+		$recurrenceRule = isset($event->recurrenceRule) ? $event->recurrenceRule :  $event->getRecurrenceRule();
 		$rule = [];
 		foreach(self::$ruleMap as $iKey => $jKey) {
 			if(!empty($recurrenceRule->{$jKey})) {
@@ -202,14 +202,6 @@ class ICalendarHelper {
 		}
 		return implode(';',$rule);
 	}
-
-
-
-
-
-
-
-
 
 	static function fromICal(string $data, $event = null) {
 	//	$vCalendar = VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING);

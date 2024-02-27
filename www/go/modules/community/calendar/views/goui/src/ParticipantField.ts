@@ -10,7 +10,7 @@ import {
 	table
 } from "@intermesh/goui";
 import {jmapds, validateEmail} from "@intermesh/groupoffice-core";
-import {AvailabilityDialog} from "./AvailabilityDialog.js";
+import {AvailabilityWindow} from "./AvailabilityWindow.js";
 
 interface Participant {
 	email:string

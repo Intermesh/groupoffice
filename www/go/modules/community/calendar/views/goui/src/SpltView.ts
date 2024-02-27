@@ -2,6 +2,7 @@ import {CalendarView} from "./CalendarView.js";
 import {DateTime, E, t} from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
 import {CalendarItem} from "./CalendarItem.js";
+import {CalendarAdapter} from "./CalendarAdapter.js";
 
 export class SplitView extends CalendarView {
 
@@ -10,24 +11,23 @@ export class SplitView extends CalendarView {
 	calViewModel : {[calId:string]: CalendarItem[]} = {}
 	baseCls = 'cal split'
 
-	goto(day: DateTime, amount: number) {
-		if(!day) {
-			day = new DateTime();
-		}
+	constructor(adapter: CalendarAdapter) {
+		super(adapter);
+		calendarStore.on('load', () => { if(this.el.innerHTML !== '') {
+			this.renderView()
+			this.updateItems();
+		} })
+	}
 
+	goto(day: DateTime, amount: number) {
+		day ||= new DateTime();
 
 		this.days = amount;
 		this.day = day.setHours(0,0,0,0);
 		this.start = this.day.clone().setWeekDay(0);
 		const end = this.start.clone().addDays(amount);
 
-
-		// TODO : load store instead.
 		this.adapter.goto(this.start, end);
-
-		//this.store.filter('date', {after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00')}).fetch(0,500);
-
-
 	}
 
 	protected clear() {
@@ -70,15 +70,16 @@ export class SplitView extends CalendarView {
 			headers.push(E('li', headDay.format('D'), E('em', headDay.format('j'))).cls('today', headDay.format('Ymd') == now.format('Ymd')));
 			headDay.addDays(1);
 		}
-		this.el.append(E('ul',E('li',t('Calendar')), ...headers)); // headers
+		this.el.append(E('ul', ...headers)); // headers
 
 		this.calRows = [];
 		for (let calendar of calendarStore) {
+			if(!calendar.isVisible) continue;
 			day = this.start.clone();
 			const eventContainer = E('li', ...this.drawCal(calendar.id)).cls('events'),
 				row = E('ol',
 					eventContainer,
-					E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name)
+					//E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name)
 				);
 			for (i = 0; i < this.days; i++) {
 				row.append(E('li').attr('data-date', day.format('Y-m-d'))
@@ -90,7 +91,7 @@ export class SplitView extends CalendarView {
 				//it++;
 			}
 			this.calRows.push([calendar.id, eventContainer]);
-			this.el.append(row);
+			this.el.append(E('div',E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name), row);
 		}
 
 	}
@@ -125,17 +126,6 @@ export class SplitView extends CalendarView {
 
 	iterator!: number
 
-
-	// protected drawEvent(e: CalendarDayItem, dayStart: DateTime, dd: HTMLElement) {
-	// 	const i = dayStart.format('Ymd')
-	// 	if(!e.divs[i]) {
-	// 		e.divs[i] = super.eventHtml(e);
-	// 	}
-	// 	if(!e.divs[i].isConnected)
-	// 		dd.append(e.divs[i]);
-	// 	return e.divs[i].css({color: '#'+e.color});
-	// }
-
 	drawEvent(e: CalendarItem, weekstart: DateTime) {
 		if(!e.divs[weekstart.format('YW')]) {
 			e.divs[weekstart.format('YW')] = super.eventHtml(e);
@@ -143,5 +133,4 @@ export class SplitView extends CalendarView {
 		return e.divs[weekstart.format('YW')]
 			.css(this.makestyle(e, weekstart))
 	}
-
 }

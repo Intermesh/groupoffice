@@ -190,6 +190,7 @@ class Day extends Week {
 		$this->Rect($x, $this->headerHeight+14.5*$this->rowHeight+2, $w, 30*$this->rowHeight/2, '',$this->thickBorder);
 
 		foreach($this->early as $event) {
+			if(!$event->showWithoutTime) continue; // don't show fullday here in day view
 			$this->SetX($x);
 			$this->MultiCell($w, $this->rowHeight - 3, $event->title, 1,'L');
 		}

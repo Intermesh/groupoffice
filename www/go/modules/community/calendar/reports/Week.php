@@ -113,10 +113,10 @@ class Week extends Calendar {
 			$x=$this->GetX();
 			$this->SetFont(null, 'B');
 			$this->Cell($width, $this->rowHeight-$minus, $day->format('d'), 1, 0);
-			$this->SetFont(null, '', $this->font_size-0.5);
+			$this->SetFont(null, '', $this->defaultFontSize-0.5);
 			$this->SetX($x+1);
 			$this->Cell($width, $this->rowHeight-$minus, $this->days_long[$day->format('N')-1], 0,0,'C');
-			$this->SetFont(null, '', $this->font_size);
+			$this->SetFont(null, '', $this->defaultFontSize);
 			$this->SetX($x);
 			$this->Cell($width, ($this->rowHeight*3)-$minus, '', 1, 0);
 		}
@@ -148,34 +148,42 @@ class Week extends Calendar {
 	}
 
 	private function drawEarly($w, $width, $left) {
+		$dayStart = (clone $this->day)->modify('+' . $w . ' days')->format('Ymd');
 		$this->SetDrawColorArray($this->eventLineColor);
 		$x=$w*$width+20;
 		$i=0;
-		foreach($this->early as $e) {
-			if($i>2) { //stop after 3 full day events (todo draw a triangle)
-				$this->Image(self::IMG_PATH.'arrow_down.png',$left+($w+1)*$width-4, 48+5*$i, 3,3, 'PNG');
-				break;
+		foreach($this->early as $event) {
+			if($this->dayCount == 1 && $event->showWithoutTime) continue; // don't show fullday here in day view
+			if ($event->utcStart->format('Ymd') <= $dayStart && $event->utcEnd->format('Ymd') >= $dayStart) {
+				if ($i > 2) { //stop after 3 full day events and draw a triangle
+					$this->Image(self::IMG_PATH . 'arrow_down.png', $left + ($w + 1) * $width - 4, 48 + 5 * $i, 3, 3, 'PNG');
+					break;
+				}
+				$this->SetXY($x, 48 + 5 * $i);
+				$time = $event->showWithoutTime ? '' : $event->utcStart->format('G:i') . ' - ' . $event->utcEnd->format('G:i') . ' ';
+				$this->EventCell($time . $event->title, $width, 5);
+				//$this->Cell($colWidth, 5 , $event->name, 1, 1, 'L', true);
+				$i++;
 			}
-			$this->SetXY($x, 48+5*$i);
-			$this->EventCell($e->title, $width, 5);
-			//$this->Cell($colWidth, 5 , $event->name, 1, 1, 'L', true);
-			$i++;
 		}
 	}
 
 	private function drawLate($w, $width, $left) {
+		$dayStart = (clone $this->day)->modify('+' . $w . ' days')->format('Ymd');
 		$this->SetDrawColorArray($this->lineStyle['color']);
 		$x = $left+($w+1)*$width- 4;
 		$this->SetXY($x ,$this->headerHeight+209);
-$i=0;
+		$i=0;
 		foreach($this->late as $event) {
-			if($i>2) { //stop after 3 full day events (todo draw a triangle)
-				$this->Image(self::IMG_PATH.'arrow_down.png',$left+($w+1)*$width-4, 252+$this->rowHeight*$i, 3,3, 'PNG');
-				break;
+			if ($event->utcStart->format('Ymd') <= $dayStart && $event->utcEnd->format('Ymd') >= $dayStart) {
+				if ($i > 2) { //stop after 3 full day events and draw a triangle
+					$this->Image(self::IMG_PATH . 'arrow_down.png', $left + ($w + 1) * $width - 4, 252 + $this->rowHeight * $i, 3, 3, 'PNG');
+					break;
+				}
+				$this->SetXY($left + $w * $width, 255 + $this->rowHeight * $i);
+				$this->EventCell($event->utcStart->format('G:i') . ' - ' . $event->utcEnd->format('G:i') . ' ' . $event->title, $width, $this->rowHeight);
+				$i++;
 			}
-			$this->SetXY($left+$w*$width ,255+$this->rowHeight*$i);
-			$this->EventCell($event->utcStart->format('G:i') .' - '. $event->utcEnd->format('G:i') .' '. $event->title, $width, $this->rowHeight);
-			$i++;
 		}
 	}
 
@@ -207,12 +215,14 @@ $i=0;
 		if (!empty($this->continues)) {
 			$this->calculateOverlap($this->continues, $dayStart);
 		}
+		$this->SetLineWidth(0.3);
 		while ($e = array_shift($this->continues)) {
 			$this->drawEvent($w*$width, $width, $e);
-			if ($e->end() > $end) {
+			if ($e->utcEnd > $end) {
 				$stillContinuing[] = $e; // push it back for next week
 			}
 		}
+		$this->SetLineWidth(0.1);
 		$this->continues = $stillContinuing;
 
 
@@ -236,7 +246,7 @@ $i=0;
 			break;
 		}
 		for ($i = $first; $i < count($events); $i++) {
-			$this->eventOptions[$events[$i]->id.'-'.$this->currentDay] = ['start'=>$events[$i]->start(), 'end'=>$events[$i]->end(), 'lanes'=>1]; // current item
+			$this->eventOptions[$events[$i]->id.'-'.$this->currentDay] = ['start'=>$events[$i]->utcStart, 'end'=>$events[$i]->utcEnd, 'lanes'=>1]; // current item
 			$a =& $this->eventOptions[$events[$i]->id.'-'.$this->currentDay];
 			$a['startM'] = $a['start']->format('Ymd') < $dayStart->format('Ymd') ? 0 : $this->getMinuteOfDay($a['start']);
 			$a['endM'] = $a['end']->format('Ymd') > $dayStart->format('Ymd') ? 1440 : $this->getMinuteOfDay($a['end']);

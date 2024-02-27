@@ -1,5 +1,10 @@
-go.modules.ModulePanel = Ext.extend(Ext.Panel, {
+go.modules.ModulePanel = Ext.extend(Ext.Container, {
 
+	title: '',
+	setTitle(title, _iconCls){
+		this.title = title;
+		return this;
+	},
 	/**
 	 * When the module name is routed. Eg. "notes" then this function is called.
 	 */

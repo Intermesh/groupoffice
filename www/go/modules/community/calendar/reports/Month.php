@@ -78,7 +78,7 @@ class Month extends Calendar {
 	private function getWeekLabel($firstDay) {
 		$lastDay = (clone $firstDay)->modify('+6 days');
 		$fmonth = ($firstDay->format('M')==$lastDay->format('M'))?'':' '.$this->months_short[$firstDay->format('n')];
-		return $firstDay->format('j').$fmonth . ' - ' . $lastDay->format('j').$this->months_short[$lastDay->format('n')];
+		return $firstDay->format('j').$fmonth . ' - ' . $lastDay->format('j').' '.$this->months_short[$lastDay->format('n')];
 	}
 	
 	private function getWeeksInMonth() {
@@ -106,7 +106,7 @@ class Month extends Calendar {
 		$dateh = 5;
 		$rowh = $h/$weeks;
 		$colw = $w/7;
-		$day = (clone $this->day);
+		$day = (clone $this->day)->modify('Monday this week');
 		for($r = 0; $r < $weeks; $r++){
 			//Draw vertical dates
 			$this->StartTransform();
@@ -130,7 +130,7 @@ class Month extends Calendar {
 
 					if(isset($this->events[$day->format('Ymd')])) {
 							
-						foreach($this->events[$day->format('Ymd')] as $event) { //full day
+						foreach($this->events[$day->format('Ymd')] as $event) {
 							if($event->showWithoutTime) {
 								$events .= '<br><font color="blue">' . substr($event->title, 0, 25) . '</font>';
 							} else {
@@ -139,26 +139,12 @@ class Month extends Calendar {
 							$amount++;
 						}
 					}
-//					$eventsMerge = $this->allEvents($day->format('Ymd'));
-//					if(!empty($eventsMerge)) {
-//						foreach($eventsMerge as $i => $event) { //part day
-//							if($i+$amount>5) {
-//								$more=true;
-//								break;
-//							}
-//
-//						}
-//					}
 						
 					$this->SetFillColor(255);
 				} else {
 					$this->SetFillColor(240);
 				}
-				//$this->SetXY($coord[0], $coord[1]+$dateh);
-				
-				//\GO::debug($events);
-				//$this->MultiCell($colw,$rowh-$dateh,$events, 1,'L',true,0,'','',true,0,true,true,$rowh-$dateh,'T',true);
-				//$this->writeHTMLCell($colw,$rowh-$dateh,$this->GetX(),$this->GetY(),  mb_convert_encoding($events,'UTF-8', 'UTF-8'), 1,0,true);
+
 				$this->DayCell($events, $colw, $rowh-$dateh, $coord[0], $coord[1]+$dateh,$amount>5);
 				
 				$this->SetXY($coord[0]+$colw,$coord[1]);
@@ -186,7 +172,8 @@ class Month extends Calendar {
 		if($more) {
 			$this->SetXY($x+($width-4),$y+($h-4));
 			$this->SetCellHeightRatio(1);
-			$this->Cell(3, 2, html_entity_decode("&#x25BC;"), 0, 0, 'R', true);
+			$this->Image(self::IMG_PATH . 'arrow_down.png', null,null, 3, 3, 'PNG');
+			//$this->Cell(3, 2, html_entity_decode("&#x25BC;"), 0, 0, 'R', true);
 		}
 		$this->SetCellHeightRatio(1.2);
 	}

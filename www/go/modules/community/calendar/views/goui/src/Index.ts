@@ -3,7 +3,10 @@ import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t, E, translate, DateTime} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
+import {EventWindow} from "./EventWindow.js";
+import {EventDetail} from "./EventDetail.js";
 
+export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
 	queryParams:{filter:{isSubscribed: true}},
@@ -30,7 +33,7 @@ function addEmailAction() {
 				}[msg.itip.method] || "Unable to process appointment information.";
 
 				if(msg.itip.method === 'REQUEST' && typeof event !== 'string') {
-					const item = new CalendarItem({data:event, key:event.id});
+					const item = new CalendarItem({data:event, key:event.id!});
 					btns.append(
 						E('div',
 							E('button', t("Accept")).cls('goui-button').on('click', _ => {item.updateParticipation('accepted');}),
@@ -60,12 +63,28 @@ function addEmailAction() {
 	}
 }
 
+
+
 modules.register(  {
 	package: "community",
 	name: "calendar",
-	entities: ["Calendar", "CalendarEvent"],
-	async init () {
-
+	entities: [
+		"Calendar",
+		{
+			name:"CalendarEvent",
+			filters: [
+				{name: 'text', type: "string", multiple: false, title: t("Query")},
+				{name: 'inCalendars', type: "string", multiple: true, title: t("Calendars")}
+			],
+			links: [{
+				iconCls: 'entity ic-event yellow',
+				linkWindow:(entity:string, entityId) => new EventWindow(),
+				linkDetail:() =>  new EventDetail()
+			}]
+		}
+	],
+	init () {
+		//const user = client.user;
 		translate.load(GO.lang.community.calendar, "community", "calendar");
 
 		addEmailAction();
@@ -75,30 +94,20 @@ modules.register(  {
 			if(!session.capabilities["go:community:calendar"]) {
 				return; // User has no access to this module
 			}
-
-			const ui = new Main();
+			const ui = new Main(),
+				nav = (span:ValidTimeSpan, amount: number, ymd?: string) => {
+					modules.openMainPanel("calendar");
+					ui.goto(new DateTime(ymd)).setSpan(span, amount);
+				};
 			router.add(/^calendar$/, () => {
-				modules.openMainPanel("calendar");
-				ui.goto(new DateTime()).setSpan("month", 31);
-			}).add(/^calendar\/year\/(\d{4}-\d{2}-\d{2})$/, (year) => {
-				modules.openMainPanel("calendar");
-				ui.goto(new DateTime(year)).setSpan("year", 365);
-			}).add(/^calendar\/month\/(\d{4}-\d{2}-\d{2})$/, (yearMonth) => {
-				modules.openMainPanel("calendar");
-				ui.goto(new DateTime(yearMonth)).setSpan("month", 31);
-			}).add(/^calendar\/list\/(\d{4}-\d{2}-\d{2})$/, (yearMonth) => {
-				modules.openMainPanel("calendar");
-				ui.goto(new DateTime(yearMonth)).setSpan("list", 31);
-			}).add(/^calendar\/week\/(\d{4}-\d{2}-\d{2})$/, (date) => {
-				modules.openMainPanel("calendar");
-				ui.goto(new DateTime(date)).setSpan("week", 7);
-			}).add(/^calendar\/day\/(\d{4}-\d{2}-\d{2})$/, (date) => {
-				modules.openMainPanel("calendar");
-				ui.goto(new DateTime(date)).setSpan("day", 1);
-			}).add(/^calendar\/(days|weeks|split)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, date) => {
-				modules.openMainPanel("calendar");
-				ui.goto(new DateTime(date)).setSpan(span as 'days'|'weeks'|'split', Math.min(parseInt(amount),373));
-			});
+					nav('month', 0); // client.user.calendarPreferences.startView ||
+				}) // default
+				.add(/^calendar\/(month|list|week|day|year)\/(\d{4}-\d{2}-\d{2})$/, (span, ymd) => {
+					nav(span as ValidTimeSpan, 0, ymd);
+				})
+				.add(/^calendar\/(days|weeks|split)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, ymd) => {
+					nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
+				});
 
 			modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => {
 				return ui;

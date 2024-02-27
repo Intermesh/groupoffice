@@ -5,7 +5,7 @@ import {
 	DateInterval,
 	DateTime,
 	DefaultEntity,
-	E, MaterialIcon, menu,
+	E, EntityID, MaterialIcon, menu,
 	Recurrence,
 	t,
 	tbar,
@@ -13,10 +13,11 @@ import {
 } from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
 import {client, jmapds} from "@intermesh/groupoffice-core";
-import {EventDialog} from "./EventDialog.js";
+import {EventWindow} from "./EventWindow.js";
 import {EventDetail} from "./EventDetail.js";
 
 export interface CalendarEvent extends BaseEntity {
+	id: EntityID
 	recurrenceRule?: any
 	recurrenceOverrides?: any
 	links?: any
@@ -229,17 +230,19 @@ export class CalendarItem {
 	open(onCancel?: Function) {
 		//if (!ev.data.id) {
 
-		const dlg = !this.isOwner ? new EventDetail() :  new EventDialog();
-		dlg.on('close', () => {
-			// cancel ?
-			onCancel && onCancel();
-			// did we save then show loading circle instead
-			if(!this.key) // new
-				Object.values(this.divs).forEach(d => d.remove());
+		const dlg = !this.isOwner ? new EventDetail() : new EventWindow();
+		if(dlg instanceof EventWindow) {
+			dlg.on('close', () => {
+				// cancel ?
+				onCancel && onCancel();
+				// did we save then show loading circle instead
+				if (!this.key) // new
+					Object.values(this.divs).forEach(d => d.remove());
 
-		})
+			})
+		}
 		dlg.show();
-		dlg.load(this);
+		dlg.loadEvent(this);
 	}
 
 	downloadIcs(){

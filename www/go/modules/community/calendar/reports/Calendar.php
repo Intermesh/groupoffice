@@ -19,7 +19,7 @@ use go\modules\community\calendar\model\RecurrenceRule;
 
 
 abstract class Calendar extends \go\core\util\PdfRenderer {
-	const IMG_PATH = '../modules/calendar/themes/Default/images/pdf/';
+	const IMG_PATH = '../go/modules/community/calendar/reports/assets/';
 	protected $fSizeLarge = 24;
 	protected $fSizeMedium = 9;
 	protected $fSizeSmall = 8;
@@ -41,8 +41,6 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 	protected $months_long= array();
 	
 	public $calendarName;
-	public $font_size = 10;
-	public $font = 'dejavusans';
 	
 	/**
 	 *
@@ -58,24 +56,11 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 	protected $events = [];
 	protected $early = [];
 	protected $late = [];
-	
-	function normal() {
-		$this->setImageScale(PDF_IMAGE_SCALE_RATIO);
 
-		$this->SetDrawColor(125,165, 65);
-		$this->SetFillColor(248, 248, 248);
-		$this->SetTextColor(0,0,0);
+	public function __construct($orientation = 'P', $unit = 'mm', $size = 'A4') {
+		$this->defaultFont = 'helvetica';
+		parent::__construct($orientation, $unit, $size);
 
-		$this->getAliasNbPages();
-
-		$this->setJPEGQuality(100);
-		$this->SetMargins(30,60,30);
-
-		$this->SetFont($this->font, '', $this->font_size);
-
-		parent::normal();
-
-		$this->font_size--;
 		$this->setCellPaddings(1,1,0,1);
 		$this->days_long = go()->t("full_days");
 		$this->months_short = go()->t("short_months");
@@ -117,7 +102,7 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 					$this->add($rId.'-'.$event->id, $instance);
 				}
 			} else {
-				$event->utcStart = $event->start;
+				$event->utcStart = $event->start();
 				$event->utcEnd = $event->end();
 				$this->add($event->start()->format('Y-m-d\TH:i:s').'-'.$event->id, $event);
 			}
@@ -180,10 +165,10 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		//$x2 = $this->GetX();
 		//$this->SetX($x);
 
-		$this->SetFont(null, 'B', $this->font_size+5);
+		$this->SetFont(null, 'B', $this->defaultFontSize+5);
 		$this->SetX($this->leftMargin-6);
 		$this->MultiCell($this->timeCol+2, 10, $hour, 0, 'R',false,0);
-		$this->SetFont(null, '', $this->font_size);
+		$this->SetFont(null, '', $this->defaultFontSize);
 		$this->SetX($left+$this->leftMargin-5);
 		$this->MultiCell($this->leftMargin, 10,'00',0,'L',false,0);
 
@@ -198,7 +183,7 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		$x = $o['pos'] * $colWidth / $o['lanes'];
 		$x+=$startx;
 		$width = $colWidth / $o['lanes'];
-		
+
 		//$this->SetXY(25 +$x,($this->rowHeight / 2) * $start);
 		//$this->Cell($width - 0.3, ($this->rowHeight / 2) * $length, '', 1, 1, 'L', true);
 		$mx =  $this->leftMargin+$this->timeCol+$x;
@@ -225,7 +210,7 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 			$this->Image(self::IMG_PATH.'reminder.png',$this->GetX()-$icons, $iconY, 3,3, 'PNG');//bell
 		}
 		if($event->isPrivate()) {
-			$this->Image('../modules/calendar/themes/Default/images/16x16/private.png',$this->GetX()-$icons, $iconY, 3,3, 'PNG'); //lock
+			$this->Image(self::IMG_PATH.'private.png',$this->GetX()-$icons, $iconY, 3,3, 'PNG'); //lock
 		}
 		
 	}
@@ -236,7 +221,7 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		if($y===null)
 			$y=$this->GetY();
 		$width = min($width,135-13);
-		$this->Rect($x+0.3, $y, $width - 0.6, $h, 'DF',array(),array('color'=>255));
+		$this->Rect($x+0.3, $y, $width - 0.6, $h, 'DF',[],['color'=>255]);
 		$this->StartTransform(); //will clip text in the Rectangle on the next line
 		$this->Rect($x, $y, $width - 0.3, $h, 'CEO');
 		$this->WriteHtmlCell($width - 0.3, $h,$x, $y, $text, 0,0,false,true,'L');
