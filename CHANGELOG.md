@@ -1,4 +1,5 @@
 - Email: Fixed render issue
+- Leavedays: fix issue with disapproval reason not being sent
 
 22-01-2023: 6.6.182
 - Core: Exclude User and Search from SSE Push because it caused performance problems
