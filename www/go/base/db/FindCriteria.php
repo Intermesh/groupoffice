@@ -225,9 +225,6 @@ class FindCriteria {
 		if(!is_array($values))
 			throw new \Exception("ERROR: Value for addInCondition must be an array");
 		
-//		if(!count($value))
-//			throw new \Exception("ERROR: Value for addInCondition can't be empty");
-		
 		if(!count($values))
 				return $this;
 		
