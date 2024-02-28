@@ -1,3 +1,5 @@
+- Timeregistration2: display of employee combo must depend on module rights instead of vestigial older permission level
+
 27-02-2024: 6.7.71
 - Core: Bugfix in layout renderer
 
