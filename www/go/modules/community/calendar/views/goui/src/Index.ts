@@ -19,7 +19,6 @@ export const categoryStore = datasourcestore({
 })
 
 function addEmailAction() {
-
 	if(GO.email) {
 
 		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string}} ) => {
@@ -74,7 +73,29 @@ modules.register(  {
 			name:"CalendarEvent",
 			filters: [
 				{name: 'text', type: "string", multiple: false, title: t("Query")},
-				{name: 'inCalendars', type: "string", multiple: true, title: t("Calendars")}
+				{name: 'calendarId', type: 'go.form.ComboBox', typeConfig: {
+						fieldLabel: t("Calendar"),
+						hiddenName: 'calendarId',
+						anchor: '100%',
+						emptyText: t("Please select..."),
+						pageSize: 50,
+						valueField: 'id',
+						displayField: 'name',
+						triggerAction: 'all',
+						editable: true,
+						selectOnFocus: true,
+						forceSelection: true,
+						store: {
+							xtype: "gostore",
+							fields: ['id', 'name'],
+							entityStore: "Calendar",
+							filters: {
+								default: {
+									permissionLevel: go.permissionLevels.write
+								}
+							}
+						}
+					}, multiple: true, title: t("Calendars")}
 			],
 			links: [{
 				iconCls: 'entity ic-event yellow',

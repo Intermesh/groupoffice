@@ -269,6 +269,9 @@ class CalendarEvent extends AclItemEntity {
 						->groupBy(['cce.id']);
 				}
 			},[])
+			->add('calendarid', function(Criteria $criteria, $value) {
+				$criteria->andWhere('cce.calendarId', '=', $value);
+			})
 			->addDate('after', function(Criteria $crit, $comparator, $value) {
 				$crit->where((new Criteria())->where('lastOccurrence', '>', $value)->orWhere('lastOccurrence', 'IS', null));
 			})

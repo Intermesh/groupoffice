@@ -646,6 +646,7 @@ $timeMargin: dp(72);
 }
 
 .check-list {
+	padding-bottom: dp(16);
 	.control { width: 100%;}
 	label {
 		pointer-events: none;

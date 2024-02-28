@@ -24,7 +24,7 @@ import {CalendarWindow} from "./CalendarWindow.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SpltView.js";
 import {SubscribeWindow} from "./SubscribeWindow.js";
-import {client} from "@intermesh/groupoffice-core";
+import {client, filterpanel} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
 import {Settings} from "./Settings.js";
@@ -160,7 +160,7 @@ export class Main extends Component {
 						comp({tagName:'li'},this.holidayCb),
 					),
 					tbar({cls: 'dense'},
-						comp({tagName: 'h3', html: 'Categories'}),
+						comp({tagName: 'h3', style:{color:'var(--fg-secondairy-text)'}, html: 'Categories'}),
 						btn({
 							icon: 'add', menu: menu({},
 								btn({
@@ -174,7 +174,11 @@ export class Main extends Component {
 							)
 						})
 					),
-					this.categoryList = this.buildCategoryFilter()
+					this.categoryList = this.buildCategoryFilter(),
+					filterpanel({
+						entityName: "CalendarEvent",
+						store: this.adapter!.byType('event').store
+					})
 				)
 			),
 			splitter({

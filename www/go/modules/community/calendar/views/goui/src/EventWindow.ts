@@ -300,9 +300,8 @@ export class EventWindow extends FormWindow {
 
 	submit() {
 		if(this.item!.isRecurring) {
-			this.item!.patch(this.parseSavedData(this.form.modified), v => {
+			this.item!.patch(this.parseSavedData(this.form.modified), () => {
 				this.close();
-				return v;
 			});
 		} else {
 			this.item!.confirmScheduleMessage(this.parseSavedData(this.form.modified), () => {

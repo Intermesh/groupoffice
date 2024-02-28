@@ -211,14 +211,14 @@ export class CalendarItem {
 		return icons.map(i=>E('i',i).cls('icon'));
 	}
 
-	save(onCancel: Function) {
+	save(onCancel: () => void) {
 		const f = this.data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s';
 		const start = this.start.format(f),
 			duration = this.start.diff(this.end).toIso8601();
 
 		if (this.isTimeModified()) {
 			if(this.data.id) {
-				this.patch({start, duration}); // quick save
+				this.patch({start, duration},undefined, onCancel); // quick save
 			} else {
 				this.data.start = start;
 				this.data.duration = duration;
@@ -328,7 +328,7 @@ export class CalendarItem {
 		}
 	}
 
-	patch(modified: any, onFinish?: (value:DefaultEntity) => DefaultEntity) {
+	patch(modified: any, onFinish?: () => void, onCancel?: () => void) {
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(modified, () => {
 				eventDS.update(this.data.id, modified); // await?
@@ -341,8 +341,9 @@ export class CalendarItem {
 					title: t('Do you want to edit a recurring event?'),
 					width:550,
 					modal: true,
+					listeners: {userclosed: () => { if(onCancel) onCancel();  }}
 				},comp({cls: 'pad flow'},
-					comp({tagName:'i',cls:'icon',html:'recurring', width:100, style:{fontSize:'3em'}}),
+					comp({tagName:'i',cls:'icon',html:'event_repeat', width:100, style:{fontSize:'3em'}}),
 					comp({html: t('You will be editing a recurring event. Do you want to edit this occurrence only or all future occurrences?'), flex:1}),
 				),tbar({},'->',btn({
 						text: t('This event'),
@@ -366,7 +367,7 @@ export class CalendarItem {
 
 	private static overridableProperties = ['start', 'duration', 'title', 'freeBusyStatus', 'participants','location','alerts', 'description']
 
-	private patchOccurrence(modified: any, onFinish?: (value: DefaultEntity) => DefaultEntity) {
+	private patchOccurrence(modified: any, onFinish?: () => void) {
 		this.data.recurrenceOverrides ??= {};
 		for(const prop in modified) {
 			if(!CalendarItem.overridableProperties.includes(prop)) delete modified[prop]; // remove properties that can not be overridden

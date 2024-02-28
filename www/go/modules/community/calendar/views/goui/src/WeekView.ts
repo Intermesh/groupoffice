@@ -121,8 +121,9 @@ export class WeekView extends CalendarView {
 			this.el.cls('-resizing');
 			this.el.un('mousemove', mouseMove);
 			changed && ev.save(() => {
-				this.dayItems.shift()
-				this.updateItems();
+				//this.dayItems.shift()
+				this.populateViewModel();
+				//this.updateItems();
 			});
 		};
 
