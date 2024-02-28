@@ -52,7 +52,7 @@ class Holiday {
 		$year = $from->format('Y');
 		self::$lang = $lang;
 		self::$names = \json_decode(file_get_contents($dir.'names.json'))->names;
-		$file = $dir.'countries/'.$set.'.json';
+		$file = $dir.'countries/'.strtolower($set).'.json';
 		$data = \json_decode(file_get_contents($file));
 
 		if(!$data || !$data->holidays || !$data->holidays->$set || !is_object($data->holidays->$set->days))
