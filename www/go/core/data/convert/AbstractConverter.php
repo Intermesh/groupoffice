@@ -173,10 +173,10 @@ abstract class AbstractConverter {
 		}
 	}
 
-	private function notifyEnd() {
+	private function notifyEnd(int $count, int $errorCount) {
 		$this->alert->setData([
-				'title' => go()->t("Import in progress"),
-				'body' => go()->t("The import was finished")
+				'title' => go()->t("Import finished"),
+				'body' => go()->t("Imported") . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount
 			]
 		);
 		if (!$this->alert->save()) {
@@ -299,7 +299,7 @@ abstract class AbstractConverter {
 
 		$this->finishImport();
 
-		$this->notifyEnd();
+		$this->notifyEnd($response['count'], count($response['errors']));
 		
 		return $response;
 	}

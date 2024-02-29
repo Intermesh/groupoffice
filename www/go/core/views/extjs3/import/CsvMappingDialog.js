@@ -515,12 +515,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 						Ext.MessageBox.alert(t("Error"), response.message);
 					}
 				} else {
-					var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
-					if(response.errors && response.errors.length) {
-						msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
-					}
-						
-					Ext.MessageBox.alert(t("Success"), msg);
+					Ext.MessageBox.alert(t("Success"), t("Importing is in progress in the background. You will be kept informed about progress via notifications."));
 
 					go.Db.store(this.entity).getUpdates();
 				}
