@@ -561,4 +561,33 @@ JSON;
 
 		echo "Password changed successfully\n";
 	}
+
+
+
+	public function import(array $params) {
+
+
+		$importParams = JSON::decode($params['importParams'], true);
+
+
+		$blob = Blob::findById($importParams['blobId']);
+
+		$cls = $params['entityCls'];
+
+		$extension = (new File($blob->name))->getExtension();
+		$converter = $cls::findConverter($extension);
+
+		if($extension == 'csv') {
+			$file = $blob->getFile()->copy(File::tempFile($extension));
+			$file->convertToUtf8();
+		} else{
+			$file = $blob->getFile();
+		}
+
+		$response = $converter->importFile($file, $importParams);
+
+		if(!$response) {
+			throw new Exception("Invalid response from import converter");
+		}
+	}
 }

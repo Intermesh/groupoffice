@@ -714,7 +714,7 @@ th {
 				if(\PhpOffice\PhpSpreadsheet\Shared\Date::isDateTime($cell)) {
 					$v = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($cell->getValue());
 				} else{
-					$v = $cell->getValue();
+					$v = (string) $cell->getValue();
 				}
 
 				$cells[] = $v;

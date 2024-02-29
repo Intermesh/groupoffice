@@ -37,6 +37,21 @@ class Spreadsheet extends convert\Spreadsheet {
 		}
 	}
 
+	protected function initImport(File $file): void
+	{
+		//if there's no mapping to name or isOrganization then there's no need for two import passes
+		if(!$this->isOrganizationsMapped()) {
+			$this->organizations = false;
+		}
+		parent::initImport($file);
+	}
+
+	private function isOrganizationsMapped() {
+		return (isset($this->clientParams['mapping']['name']) && $this->clientParams['mapping']['name']['csvIndex'] > -1 )||
+			(isset($this->clientParams['mapping']['isOrganization']) && $this->clientParams['mapping']['isOrganization']['csvIndex'] > -1);
+
+	}
+
 	/**
 	 * Override that skips contacts on the first run and imports them in the second
 	 *

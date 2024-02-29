@@ -174,49 +174,56 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		go.import.CsvMappingDialog.superclass.initComponent.call(this);
 
 		this.fieldLabelsToAliases();
+
+
+		this.on("render", () => {
+
+		this.getEl().mask(t("Loading..."));
 		
-		
-		go.Jmap.request({
-			method: this.entity + '/importCSVMapping',
-			params: {
-				blobId: this.blobId
-			},
-			callback: function(options, success, response) {
-				
-				if(!success) {
-					GO.errorDialog.show(response.message);
-					return;
-				}
+			go.Jmap.request({
+				method: this.entity + '/importCSVMapping',
+				params: {
+					blobId: this.blobId
+				},
+				callback: function(options, success, response) {
 
-				try {
-					this.csvStore = this.createCsvHeaderStore(response.csvHeaders);
-					this.csvHeaders = response.csvHeaders;
+					this.getEl().unmask();
 
-					this.fieldSet.add(this.createMappingFields(response.goHeaders, this.fields));
-
-					if (response.columnMapping) { // mapping found!
-						this.foundId = response.id;
-						this.formPanel.form.setValues(response.columnMapping);
-						this.formPanel.form.setValues({updateBy: response.updateBy});
-					} else { // columns unknown, generate
-						var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
-						this.foundId = 0;
-						this.newProfileRecord = new this.csvMappings.store.recordType({
-							name: this.fileName,
-							columnMapping: v,
-							id: 'new'
-						}, 'new');
-						Ext.apply(v, this.findAliases());
-						this.formPanel.form.setValues(v);
+					if(!success) {
+						GO.errorDialog.show(response.message);
+						return;
 					}
 
-					this.doLayout();
-				}catch(e) {
-					GO.errorDialog.show(t("Sorry, an unknown error occurred."));
-				}
-			},
-			scope: this
-		});
+					try {
+						this.csvStore = this.createCsvHeaderStore(response.csvHeaders);
+						this.csvHeaders = response.csvHeaders;
+
+						this.fieldSet.add(this.createMappingFields(response.goHeaders, this.fields));
+
+						if (response.columnMapping) { // mapping found!
+							this.foundId = response.id;
+							this.formPanel.form.setValues(response.columnMapping);
+							this.formPanel.form.setValues({updateBy: response.updateBy});
+						} else { // columns unknown, generate
+							var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
+							this.foundId = 0;
+							this.newProfileRecord = new this.csvMappings.store.recordType({
+								name: this.fileName,
+								columnMapping: v,
+								id: 'new'
+							}, 'new');
+							Ext.apply(v, this.findAliases());
+							this.formPanel.form.setValues(v);
+						}
+
+						this.doLayout();
+					}catch(e) {
+						GO.errorDialog.show(t("Sorry, an unknown error occurred."));
+					}
+				},
+				scope: this
+			});
+		})
 	},
 
 	copyTo(name) {

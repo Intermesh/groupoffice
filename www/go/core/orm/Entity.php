@@ -22,6 +22,7 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use GO\Files\Model\Folder;
+use InvalidArgumentException;
 use function go;
 use go\core\db\Query as DbQuery;
 use go\core\util\ArrayObject;
@@ -1175,6 +1176,24 @@ abstract class Entity extends Property {
 	public static function converters(): array
 	{
 		return [Json::class];
+	}
+
+
+	/**
+	 * Find a converter for exporting or importing
+	 *
+	 * @param string $extension
+	 * @return AbstractConverter
+	 */
+	public static function findConverter(string $extension): AbstractConverter
+	{
+		foreach(static::converters() as $converter) {
+			if($converter::supportsExtension($extension)) {
+				return new $converter($extension, static::class);
+			}
+		}
+
+		throw new InvalidArgumentException("Converter for file extension '" . $extension .'" is not found');
 	}
 
 	/**

@@ -21,6 +21,8 @@ use go\core\model\ImportMapping;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use go\core\util\BackgroundProcess;
+use go\core\util\JSON;
 use go\core\util\Lock;
 use InvalidArgumentException;
 use PDO;
@@ -1003,35 +1005,46 @@ abstract class EntityController extends Controller {
 	protected function defaultImport(array $params): ArrayObject
 	{
 
-		ini_set('max_execution_time', 10 * 60);
-		
-		$params = $this->paramsImport($params);
-		
-		$blob = Blob::findById($params['blobId']);	
+		$params = ['importParams' => JSON::encode($params)];
+		$params['userId'] = go()->getUserId();
+		$params['entityCls'] = $this->entityClass();
 
-		$extension = (new File($blob->name))->getExtension();
-		$converter = $this->findConverter($extension);
+		$p = new BackgroundProcess("core/System/import", $params);
+		$pid = $p->run();
 
-		if($extension == 'csv') {
-			$file = $blob->getFile()->copy(File::tempFile($extension));
-			$file->convertToUtf8();
-		} else{
-			$file = $blob->getFile();
-		}
-
-		$response = $converter->importFile($file, $params->getArray());
+		return new ArrayObject(['pid' => $pid, 'output' => $p->getOutput()]);
 		
-		if(!$response) {
-			throw new Exception("Invalid response from import converter");
-		}
-		
-		return new ArrayObject($response);
+//		$params = $this->paramsImport($params);
+//
+//		$blob = Blob::findById($params['blobId']);
+//
+//		$cls = $this->entityClass();
+//
+//		$extension = (new File($blob->name))->getExtension();
+//		$converter = $cls::findConverter($extension);
+//
+//		if($extension == 'csv') {
+//			$file = $blob->getFile()->copy(File::tempFile($extension));
+//			$file->convertToUtf8();
+//		} else{
+//			$file = $blob->getFile();
+//		}
+//
+//		$response = $converter->importFile($file, $params->getArray());
+//
+//		if(!$response) {
+//			throw new Exception("Invalid response from import converter");
+//		}
+//
+//		return new ArrayObject($response);
 	}
 
 
 	protected function defaultExportColumns($params): ArrayObject
 	{
-		$converter = $this->findConverter($params['extension']);
+		$cls = $this->entityClass();
+
+		$converter = $cls::findConverter($params['extension']);
 
 		$mapping = $converter->getEntityMapping();
 		if(isset($mapping['customFields'])) {
@@ -1069,7 +1082,9 @@ abstract class EntityController extends Controller {
 				$file = $blob->getFile();
 			}
 
-			$converter = $this->findConverter($extension);
+			$cls = $this->entityClass();
+
+			$converter = $cls::findConverter($extension);
 
 			$response['goHeaders'] = $converter->getEntityMapping();
 			$response['csvHeaders'] = $converter->getCsvHeaders($file);
@@ -1096,24 +1111,6 @@ abstract class EntityController extends Controller {
 		return new ArrayObject($response);
 	}
 
-	/**
-	 * Find a convertor for exporting or importing
-	 *
-	 * @param string $extension
-	 * @return AbstractConverter
-	 */
-	private function findConverter(string $extension): AbstractConverter
-	{
-		
-		$cls = $this->entityClass();		
-		foreach($cls::converters() as $converter) {
-			if($converter::supportsExtension($extension)) {
-				return new $converter($extension, $this->entityClass());
-			}
-		}
-		
-		throw new InvalidArgumentException("Converter for file extension '" . $extension .'" is not found');
-	}
 
   /**
    * Standard export function
@@ -1135,8 +1132,10 @@ abstract class EntityController extends Controller {
 		}
 		
 		$params = $this->paramsExport($params);
+
+		$cls = $this->entityClass();
 		
-		$convertor = $this->findConverter($params['extension']);
+		$convertor = $cls::findConverter($params['extension']);
 				
 		$entities = $this->getGetQuery($params);
 
