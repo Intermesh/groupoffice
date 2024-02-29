@@ -1074,7 +1074,9 @@ abstract class EntityController extends Controller {
 			$response['goHeaders'] = $converter->getEntityMapping();
 			$response['csvHeaders'] = $converter->getCsvHeaders($file);
 
-			$checkSum = md5(implode(',', array_map("trim", $response['csvHeaders'])));
+			$checkSum = md5(implode(',', array_map(function($v) {
+				return $v ? trim($v) : "";
+			}, $response['csvHeaders'])));
 			$entityClass = $this->entityClass();
 			$mapping = ImportMapping::findByChecksum($entityClass::entityType()->getId(), $checkSum);
 		} else if(!empty($params['id'])) {

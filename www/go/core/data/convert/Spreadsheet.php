@@ -109,6 +109,8 @@ class Spreadsheet extends AbstractConverter {
 	 * @var RowIterator
 	 */
 	protected $spreadsheetRowIterator;
+	private array $highest;
+
 
 	/**
 	 * @inheritDoc
@@ -639,6 +641,8 @@ th {
 			$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
 			$this->spreadsheet = $reader->load($file->getPath());
 			$this->spreadsheet->setActiveSheetIndex(0);
+
+			$this->highest = $this->spreadsheet->getActiveSheet()->getHighestRowAndColumn();
 			$this->spreadsheetRowIterator = $this->spreadsheet->getActiveSheet()->getRowIterator();
 		}
 
@@ -703,7 +707,7 @@ th {
 				return false;
 			}
 
-			$cellIterator = $row->getCellIterator();
+			$cellIterator = $row->getCellIterator('A', $this->highest['column']);
 			$cellIterator->setIterateOnlyExistingCells(FALSE); // This loops through all cells,
 			$cells = [];
 			foreach ($cellIterator as $cell) {

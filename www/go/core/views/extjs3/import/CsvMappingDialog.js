@@ -184,31 +184,36 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			callback: function(options, success, response) {
 				
 				if(!success) {
-					Ext.MessageBox.alert(t("Error"), response.message);
+					GO.errorDialog.show(response.message);
 					return;
 				}
-				this.csvStore = this.createCsvHeaderStore(response.csvHeaders);
-				this.csvHeaders = response.csvHeaders;
 
-				this.fieldSet.add(this.createMappingFields(response.goHeaders, this.fields));
+				try {
+					this.csvStore = this.createCsvHeaderStore(response.csvHeaders);
+					this.csvHeaders = response.csvHeaders;
 
-				if(response.columnMapping) { // mapping found!
-					this.foundId = response.id;
-					this.formPanel.form.setValues(response.columnMapping);
-					this.formPanel.form.setValues({updateBy: response.updateBy});
-				} else { // columns unknown, generate
-					var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
-					this.foundId = 0;
-					this.newProfileRecord = new this.csvMappings.store.recordType({
-						name: this.fileName,
-						columnMapping:v,
-						id:'new'
-					},'new');
-					Ext.apply(v, this.findAliases());
-					this.formPanel.form.setValues(v);
+					this.fieldSet.add(this.createMappingFields(response.goHeaders, this.fields));
+
+					if (response.columnMapping) { // mapping found!
+						this.foundId = response.id;
+						this.formPanel.form.setValues(response.columnMapping);
+						this.formPanel.form.setValues({updateBy: response.updateBy});
+					} else { // columns unknown, generate
+						var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
+						this.foundId = 0;
+						this.newProfileRecord = new this.csvMappings.store.recordType({
+							name: this.fileName,
+							columnMapping: v,
+							id: 'new'
+						}, 'new');
+						Ext.apply(v, this.findAliases());
+						this.formPanel.form.setValues(v);
+					}
+
+					this.doLayout();
+				}catch(e) {
+					GO.errorDialog.show(t("Sorry, an unknown error occurred."));
 				}
-				
-				this.doLayout();
 			},
 			scope: this
 		});
@@ -273,7 +278,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 
 		for(var a in this.aliases) {
 			var index = this.csvHeaders.findIndex(function(h) {
-				return h.toLowerCase() == a.toLowerCase();
+				return h && a && h.toLowerCase() == a.toLowerCase();
 			});
 			if(index == -1) {
 				continue;
@@ -332,7 +337,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 						part = parent ? parent + "." + part : part;
 
 						var headerIndex = this.csvHeaders.findIndex(function (csvH) {
-							return csvH.toLowerCase().indexOf(part.toLowerCase()) == 0;
+							return csvH && csvH.toLowerCase().indexOf(part.toLowerCase()) == 0;
 						});
 
 						if (headerIndex == -1) {
@@ -358,6 +363,9 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	findSingleCsvIndex : function(h, parent) {
 		var csvIndex = -2;
 		var storeIndex = this.csvStore.findBy(function(r) {
+			if(!r.data.name) {
+				return false;
+			}
 			var csvHeader = r.data.name.toLowerCase().replace(/[_\-\s]/g, '');
 			var goHeader = (parent ? parent + "." + h.name : h.name).toLowerCase().replace(/[_\-\s]/g, '');
 
