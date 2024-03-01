@@ -358,7 +358,7 @@
 				});
 			}
 
-			//this.notificationArea.ownerCt.getLayout()['east'].slideOut();
+			this.notificationArea.ownerCt.getLayout()['east'].slideOut();
 			this.notificationArea.doLayout(true);
 		},
 
@@ -370,7 +370,7 @@
 		},
 
 		hideNotifications : function() {
-			//this.notificationArea.ownerCt.getLayout()['east'].slideIn();
+			this.notificationArea.ownerCt.getLayout()['east'].slideIn();
 			// this.notificationArea.doLayout();
 		},
 		/**
