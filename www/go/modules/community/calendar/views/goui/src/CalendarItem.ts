@@ -188,6 +188,10 @@ export class CalendarItem {
 		return (this.recurrenceId && this.data.recurrenceOverrides && this.recurrenceId in this.data.recurrenceOverrides);
 	}
 
+	get isDeclined() {
+		return this.currentParticipant?.participationStatus === 'declined';
+	}
+
 	get color() {
 		return this.data.color || this.cal?.color || '356772';
 	}

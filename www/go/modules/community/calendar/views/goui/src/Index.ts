@@ -121,7 +121,7 @@ modules.register(  {
 					ui.goto(new DateTime(ymd)).setSpan(span, amount);
 				};
 			router.add(/^calendar$/, () => {
-					nav('month', 0); // client.user.calendarPreferences.startView ||
+					nav(client.user.calendarPreferences.startView || 'month', 0);
 				}) // default
 				.add(/^calendar\/(month|list|week|day|year)\/(\d{4}-\d{2}-\d{2})$/, (span, ymd) => {
 					nav(span as ValidTimeSpan, 0, ymd);

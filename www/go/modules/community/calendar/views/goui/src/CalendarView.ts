@@ -9,6 +9,7 @@ import {
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
+import {client} from "@intermesh/groupoffice-core";
 
 export abstract class CalendarView extends Component {
 
@@ -39,6 +40,7 @@ export abstract class CalendarView extends Component {
 
 	constructor(adapter: CalendarAdapter) {
 		super();
+		CalendarView.selectedCalendarId = client.user.calendarPreferences.defaultCalendarId; // default
 		this.adapter = adapter
 	}
 
@@ -71,7 +73,7 @@ export abstract class CalendarView extends Component {
 			div.dataset.key = item.key;
 		}
 		return div.cls('allday',e.showWithoutTime)
-			.cls('declined', item.currentParticipant?.participationStatus === 'declined')
+			.cls('declined', item.isDeclined)
 			.cls('multiday', !e.showWithoutTime && item.dayLength > 1)
 			.attr('tabIndex', 0)
 			.on('click',(ev)=> {

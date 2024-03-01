@@ -23,6 +23,8 @@ class Category extends Entity {
 	/** @var int could be NULL for global categories */
 	public $ownerId;
 
+	public $color;
+
 	/** @var int when not null this category is only visible when the tasklist is selected (no ACL checking allowed)  */
 	public $calendarId;
 

@@ -20,6 +20,9 @@ export class CalendarWindow extends FormWindow {
 			this.title = t(this.currentId ? 'Edit calendar' : 'Create calendar');
 		})
 
+		const alertField =alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events with time')}),
+			fdAlertField = alertfield({name: 'defaultAlertsWithoutTime',isForDefault:true, fullDay:true, label:t('Events without time (Full-day)')});
+
 		this.generalTab.items.add(
 			comp({cls:'flow pad'},
 				textfield({name: 'name', label: t('Name'), flex:1}),
@@ -34,11 +37,13 @@ export class CalendarWindow extends FormWindow {
 					label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0', clearable:true
 				}),
 				comp({tagName:'h3',flex:'1 0 100%',text:t('Default notifications') }),
-				alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events with time')}),
-				alertfield({name: 'defaultAlertsWithoutTime',isForDefault:true, fullDay:true, label:t('Events without time (Full-day)')})
+				alertField, fdAlertField
 				//unsubscribeBtn
 			),
 		);
+
+		alertField.drawOptions();
+		fdAlertField.drawOptions();
 
 		// this.form.on('load', (me, data) => {
 		// 	unsubscribeBtn.hidden = !data.id;

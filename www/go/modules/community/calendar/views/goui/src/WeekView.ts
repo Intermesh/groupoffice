@@ -1,6 +1,7 @@
 import {CalendarView} from "./CalendarView.js";
 import {DateTime, E, t} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
+import {client} from "@intermesh/groupoffice-core";
 
 class CalendarDayItem extends CalendarItem {
 	pos!: number
@@ -66,9 +67,8 @@ export class WeekView extends CalendarView {
 
 	private makeDraggable() {
 
-		const SNAP = 5; // minutes
-
 		let ev: CalendarDayItem,
+			SNAP = client.user.calendarPreferences.weekViewGridSnap,
 			changed: boolean,
 			offset: number,
 			last:number,
@@ -128,6 +128,7 @@ export class WeekView extends CalendarView {
 		};
 
 		this.el.on('mousedown', (e: MouseEvent) => {
+			SNAP = client.user.calendarPreferences.weekViewGridSnap;
 			changed = false;
 			if (e.button !== 0) return;
 
@@ -160,7 +161,7 @@ export class WeekView extends CalendarView {
 				const data = {
 						start: (new DateTime(target.dataset.day!)).setHours(0, anchor).format('c'),
 						title: 'New event',
-						duration: 'PT1H',
+						duration: client.user.calendarPreferences.defaultDuration ?? "P1H",
 						calendarId: CalendarView.selectedCalendarId,
 						showWithoutTime: false
 					},

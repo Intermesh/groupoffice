@@ -669,7 +669,8 @@ $timeMargin: dp(72);
 	padding: 7px 3.5px 7px 11px !important;
 	> h3 {
 		flex: 1 !important;
-
+		color: $colorTextSecondary;
+		font-size:.9em;
 		~ button {
 			padding: 5.25px;
 			margin-right: 0;
@@ -698,6 +699,7 @@ $timeMargin: dp(72);
 		z-index:1;
 		right: 14vw;
 		background-color: var(--bg-layer);
+		backdrop-filter: blur(20px);
 		width: dp(280) !important;
 	}
 }

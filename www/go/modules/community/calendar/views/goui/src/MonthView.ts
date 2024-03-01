@@ -2,6 +2,7 @@ import {CalendarView} from "./CalendarView.js";
 import {ComponentEventMap, createComponent, DateInterval, DateTime, ObservableListenerOpts} from "@intermesh/goui";
 import {E} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
+import {client} from "@intermesh/groupoffice-core";
 
 // add selectweek event
 
@@ -60,13 +61,21 @@ export class MonthView extends CalendarView {
 			till: HTMLElement,
 			last: HTMLElement,
 			anchor: HTMLElement,
+			currentH = (new DateTime).format('H'),
 			ev: CalendarItem,
 			action: (day:HTMLElement) => void;
 
 		const create = (day: HTMLElement) => {
 			[from, till] = (anchor.compareDocumentPosition(day) & 0x02) ? [day,anchor] : [anchor,day];
-			ev.start = new DateTime(from.dataset.date!+' 00:00:00.000');
-			ev.end = new DateTime(till.dataset.date!+' 00:00:00.000').addDays(1);
+			ev.data.showWithoutTime = from !== till;
+			if(ev.data.showWithoutTime) {
+				ev.start = new DateTime(from.dataset.date!+' 00:00:00.000');
+				ev.end = new DateTime(till.dataset.date!+' 00:00:00.000').addDays(1);
+			} else {
+				const time = ' '+currentH+':00:00.000';
+				ev.start = new DateTime(from.dataset.date!+time);
+				ev.end = new DateTime(till.dataset.date!+time).add(new DateInterval(ev.data.duration));
+			}
 		},
 		move = (day:HTMLElement) => {
 			let [y,m,d] = day.dataset.date!.split('-').map(Number);
@@ -98,16 +107,17 @@ export class MonthView extends CalendarView {
 			if(e.button !== 0) return;
 			const day = e.target.up('li[data-date]');
 			if(day) {
+				const dd = client.user.calendarPreferences.defaultDuration,
+					startStr = day.dataset.date! + (dd ? (new DateTime).format(' H:00:00.000') : ' 00:00:00.000');
 				const data = {
-						start: day.dataset.date!,
+						start: startStr,
 						title: 'New event',
-						duration: 'P1D',
+						duration: dd ?? 'P1D',
 						calendarId: CalendarView.selectedCalendarId,
-						showWithoutTime: true
+						showWithoutTime: !dd
 					},
-					start = (new DateTime(data.start+' 00:00:00.000')),
-					end = start.clone().addDays(1);
-				ev = new CalendarItem({start, end, data, key: ''});
+					start = (new DateTime(data.start));
+				ev = new CalendarItem({start, data, key: ''});
 				this.viewModel.unshift(ev);
 				this.updateItems();
 				//this.drawEvent(ev, weekStart);
@@ -164,7 +174,7 @@ export class MonthView extends CalendarView {
 				row = E('ol',eventContainer);
 			for (i = 0; i < 7; i++) {
 				row.append(E('li',
-					i==0 ? E('sub','W '+day.getWeekOfYear()).cls('weeknb')
+					(i==0 && client.user.calendarPreferences.showWeekNumbers) ? E('sub','W '+day.getWeekOfYear()).cls('weeknb')
 						.on('click',e => this.fire('selectweek', this, weekStart))
 						.on('mousedown',e=>e.stopPropagation()):'',
 					E('em',day.format(day.getDate() === 1 ? 'j M' : 'j'))
@@ -180,6 +190,7 @@ export class MonthView extends CalendarView {
 			this.el.append(row);
 		}
 	}
+
 
 	private updateItems() {
 		this.continues = [];

@@ -1,6 +1,7 @@
 import {CalendarView} from "./CalendarView.js";
 import {ComponentEventMap, DateTime, E, ObservableListenerOpts} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
+import {client} from "@intermesh/groupoffice-core";
 
 export interface YearViewEventMap<Type> extends ComponentEventMap<Type> {
 
@@ -86,9 +87,11 @@ export class YearView extends CalendarView {
 				const weekDay = day.clone();
 				row = E('tr');
 				//if(+day.format('m') === m) {
+				if(client.user.calendarPreferences.showWeekNumbers) {
 					row.append(E('td', weekDay.getWeekOfYear()).cls('weeknb').on('click', ev => {
 						this.fire('weekclick', this, weekDay);
 					}))
+				}
 
 				rows.push(row);
 			}

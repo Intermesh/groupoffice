@@ -17,10 +17,10 @@ class Preferences extends Property
 	public $useTimeZones = 0;
 
 	/** @var bool If true, shows week number in calendar. */
-	public $showWeekNumbers = 1;
+	public $showWeekNumbers;
 
 	/** @var bool If true, show events that you have RSVPed "no" to */
-	public $showDeclined = 1;
+	public $showDeclined;
 
 	/** @var bool Show birthdays on the calendar */
 	public $birthdaysAreVisible = 0;

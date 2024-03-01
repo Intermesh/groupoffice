@@ -34,7 +34,7 @@ class CalDAVBackend extends AbstractBackend implements
 		$result = [];
 		$tz = new \GO\Base\VObject\VTimezone(); // same for each?
 		// using logged in user, but should use PrincipalUri
-		$calendars = Calendar::find()->where(['isSubscribed'=>1]);
+		$calendars = Calendar::find()->where(['isSubscribed'=>1, 'groupId'=>null]);
 		$username = basename($principalUri);
 		$u = User::find(['id'])->where(['username'=>$username])->single();
 		foreach($calendars as $calendar) {

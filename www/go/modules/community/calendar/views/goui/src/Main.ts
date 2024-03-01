@@ -1,6 +1,6 @@
 import {
 	browser,
-	btn,
+	btn, Button,
 	CardContainer,
 	cards,
 	checkbox,
@@ -24,7 +24,7 @@ import {CalendarWindow} from "./CalendarWindow.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SpltView.js";
 import {SubscribeWindow} from "./SubscribeWindow.js";
-import {client, filterpanel} from "@intermesh/groupoffice-core";
+import {client, filterpanel, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
 import {Settings} from "./Settings.js";
@@ -45,7 +45,8 @@ export class Main extends Component {
 
 	date: DateTime
 
-	timeSpan: ValidTimeSpan = 'month'
+	timeSpan: ValidTimeSpan
+	printCurrentBtn: Button
 
 	picker: DatePicker
 	spanAmount?: number = 31 // 2-7, 14, 21, 28
@@ -61,7 +62,6 @@ export class Main extends Component {
 	constructor() {
 		super();
 		this.cls = 'hbox fit tablet-cards';
-		this.date = new DateTime();
 
 		// jmapds('CalendarEvent');
 		// this.eventStore = datasourcestore({
@@ -107,7 +107,7 @@ export class Main extends Component {
 				),
 				this.picker = datepicker({
 					cls:'not-medium-device',
-					showWeekNbs: false,
+					showWeekNbs: false, // Wk nbs in datepicker are broken // client.user.calendarPreferences.showWeekNumbers,
 					enableRangeSelect: true,
 					withoutFooter: true,
 					listeners: {
@@ -160,7 +160,7 @@ export class Main extends Component {
 						comp({tagName:'li'},this.holidayCb),
 					),
 					tbar({cls: 'dense'},
-						comp({tagName: 'h3', style:{color:'var(--fg-secondairy-text)'}, html: 'Categories'}),
+						comp({tagName: 'h3', html: 'Categories'}),
 						btn({
 							icon: 'add', menu: menu({},
 								btn({
@@ -195,7 +195,7 @@ export class Main extends Component {
 						title: t('New event'),
 						handler: _ => (new EventWindow()).show()
 					}),
-					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px'}}),
+					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '2em'}}),
 					//'->',
 					this.cardMenu = comp({cls: 'group not-medium-device', flex:'0 0 auto'},
 						btn({icon: 'view_day', text: t('Day'), handler: b => this.routeTo('day', this.date)}),
@@ -226,12 +226,12 @@ export class Main extends Component {
 						btn({icon:'video_call',text:'Video meeting', handler: _ => {(new Settings()).openLoad()}}),
 						btn({
 							icon: 'print', text:t('Print'), menu: menu({expandLeft: true},
-								btn({icon: 'print', text: t('Current view'), handler:() => {
+								this.printCurrentBtn = btn({icon: 'print', text: t('Current view'), handler:() => {
 									let view = this.timeSpan;
-									if(view in ['year', 'list', 'split']) {
-										view = 'month';
+									if(['day', 'week', 'month'].includes(view)) {
+										this.openPDF(view);
 									}
-									this.openPDF(view); }}),
+								}}),
 								//'-',
 								btn({icon: 'view_day', text: t('Day'), handler:() => { this.openPDF('day'); }}),
 								btn({icon: 'view_week', text: t('5 days'), handler:() => { this.openPDF('days'); }}),
@@ -256,7 +256,9 @@ export class Main extends Component {
 				)
 			)
 		);
-
+		this.timeSpan = client.user.calendarPreferences.startView || 'month';
+		this.date = new DateTime();
+		this.on('render', () => {this.updateView();});
 	}
 
 	private openPDF(type:string) {
@@ -268,8 +270,7 @@ export class Main extends Component {
 		value: this.adapter.byType('birthday').enabled,
 		listeners: {
 			'change': (_p, newValue) => {
-				this.adapter.byType('birthday').enabled = newValue;
-				this.updateView();
+				this.adapterVisible('birthday', newValue);
 			}
 		}
 	})
@@ -279,8 +280,7 @@ export class Main extends Component {
 		value: this.adapter.byType('task').enabled,
 		listeners: {
 			'change': (_p, newValue) => {
-				this.adapter.byType('task').enabled = newValue;
-				this.updateView();
+				this.adapterVisible('task', newValue);
 			}
 		}
 	})
@@ -290,10 +290,23 @@ export class Main extends Component {
 		value: this.adapter.byType('holiday').enabled,
 		listeners: {
 			'change': (_p, newValue) => {
-				this.adapter.byType('holiday').enabled = newValue;
-				this.updateView();
+				this.adapterVisible('holiday', newValue);
 			}
 		}
+	})
+
+	private adapterVisible(name:string,enabled:boolean) {
+		this.adapter.byType(name).enabled = enabled;
+		jmapds('User').update(client.user.id, {calendarPreferences: {[name+'sAreVisible']: enabled}});
+		this.updateView();
+	}
+
+	private saveAdapterVisbility = FunctionUtil.buffer(2000, () => {
+		//save isVisible
+		for(const id in this.visibleChanges) {
+			calendarStore.dataSource.update(id, {isVisible:this.visibleChanges[id]});
+		}
+		this.visibleChanges = {};
 	})
 
 	private inCalendars: {[key:string]:boolean} = {}
@@ -306,11 +319,9 @@ export class Main extends Component {
 				listeners: {
 					'selectionchange': (tableRowSelect) => {
 						const calIds = tableRowSelect.selected.map((index) => calendarStore.get(index)?.id);
-						if(calIds[0]) {
-							// set default
+						if (calIds[0]) {
 							CalendarView.selectedCalendarId = calIds[0];
 						}
-
 					}
 				}
 			},
@@ -383,50 +394,46 @@ export class Main extends Component {
 	}
 
 	private buildCategoryFilter() {
+		const selected: any = {},
+			selectionChange = () => {
+				const store = this.adapter.byType('event').store;
+				const categoryIds = Object.keys(selected);
+
+				if(categoryIds.length) {
+					Object.assign(store.queryParams.filter ||= {}, {
+						inCategories: categoryIds
+					});
+				} else {
+					delete store.queryParams.filter?.inCategories;
+				}
+				this.updateView();
+			};
 		return list({
 			store: categoryStore,
 			cls: 'check-list',
-			rowSelectionConfig: {
-				multiSelect: true,
-				listeners: {
-					'selectionchange': (tableRowSelect) => {
-						const store = this.adapter.byType('event').store;
-						const categoryIds = tableRowSelect.selected.map((index) => categoryStore.get(index)?.id);
-
-						if(categoryIds.length) {
-							Object.assign(store.queryParams.filter ||= {}, {
-								inCategories: categoryIds
-							});
-						} else {
-							delete store.queryParams.filter?.inCategories;
-						}
-
-						this.updateView();
-					}
-				}
-			},
 			listeners: {'render': me => { me.store.load() }},
-			renderer: (data, row, list, storeIndex) => {
+			renderer: (data, row) => {
 				// if(data.isVisible && list.rowSelection) {
 				// 	list.rowSelection.add(storeIndex);
 				// }
 				return [checkbox({
-					//color: '#' + data.color,
+					color: '#' + data.color,
 					//style: 'padding: 0 8px',
 					//value: data.isVisible,
 					label: data.name,
 					listeners: {
-						'render': (field) => {
-							field.el.addEventListener("mousedown", (ev) => {
-								ev.stopPropagation(); // stop lists row selector event
-							});
-						},
+						// 'render': (field) => {
+						// 	field.el.addEventListener("mousedown", (ev) => {
+						// 		ev.stopPropagation(); // stop lists row selector event
+						// 	});
+						// },
 						'change': (p, newValue) => {
 							if (newValue) {
-								list.rowSelection!.add(storeIndex);
+								selected[data.id] = true;
 							} else {
-								list.rowSelection!.remove(storeIndex);
+								delete selected[data.id];
 							}
+							selectionChange();
 						}
 					},
 					buttons: [btn({
@@ -498,6 +505,7 @@ export class Main extends Component {
 
 	setSpan(value: ValidTimeSpan, amount: number) {
 		this.timeSpan = value;
+		this.printCurrentBtn.disabled = !['day', 'week', 'month'].includes(value);
 		this.spanAmount = amount;
 		this.updateView();
 	}

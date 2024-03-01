@@ -16,12 +16,10 @@ import {
 	store,
 	t,
 	table,
-	tbar,
 	textarea,
 	textfield,
 	TextField,
 	win,
-	Window
 } from "@intermesh/goui";
 import {client, FormWindow, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {calendarStore, categoryStore} from "./Index.js";
@@ -109,7 +107,9 @@ export class EventWindow extends FormWindow {
 					}
 				}
 			}),
-			textfield({name: 'location',flex:1, label:t('Location'), style:{minWidth:'80%'}}),
+			textfield({name: 'location',flex:1, label:t('Location'), style:{minWidth:'80%'},
+				buttons:[btn({icon: 'open_in_browser', handler: (me, who)=>{window.open(me.parent!.parent!.value)}})]
+			}),
 			btn({icon:'video_call', hidden: !m.settings.videoUri, cls:'filled', width:50, handler: async (btn) => {
 					(btn.previousSibling() as TextField)!.value = await this.createVideoLink(m.settings);
 			}}),

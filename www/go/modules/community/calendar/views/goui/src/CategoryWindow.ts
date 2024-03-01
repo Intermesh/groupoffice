@@ -1,5 +1,5 @@
 import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
-import {checkbox, combobox, comp, t, textfield} from "@intermesh/goui";
+import {checkbox, colorfield, combobox, comp, t, textfield} from "@intermesh/goui";
 
 export class CategoryWindow extends FormWindow {
 
@@ -18,7 +18,8 @@ export class CategoryWindow extends FormWindow {
 
 		this.generalTab.items.add(
 			comp({cls:'flow pad'},
-				textfield({name: 'name', label: t('Name'), required:true}),
+				textfield({name: 'name', label: t('Name'), required:true, flex:1}),
+				colorfield({name: 'color', label: t('Color'), width: 100}),
 				combobox({
 					label: t('Calendar'), name: 'calendarId',
 					placeholder:t("All"),

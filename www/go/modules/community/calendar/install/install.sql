@@ -322,6 +322,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_location` (
 CREATE TABLE IF NOT EXISTS `calendar_category` (
 	`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL,
+	`color` VARCHAR(21) NULL DEFAULT NULL,
 	`ownerId` INT(11) NULL,
 	`calendarId` INT(11) UNSIGNED NULL,
 	PRIMARY KEY (`id`),
@@ -367,6 +368,7 @@ CREATE TABLE calendar_preferences (
 	autoUpdateInvitations TINYINT(1) DEFAULT 0 NOT NULL,
 	autoAddInvitations    TINYINT(1) DEFAULT 0 NOT NULL,
 	showDeclined          TINYINT(1) DEFAULT 1 NOT NULL,
+	showWeekNumbers				TINYINT(1) DEFAULT 1 NOT NULL,
 	birthdaysAreVisible   TINYINT(1) DEFAULT 0 NOT NULL,
 	tasksAreVisible       TINYINT(1) DEFAULT 0 NOT NULL,
 	holidaysAreVisible    TINYINT(1)  DEFAULT 0 NOT NULL,
