@@ -43,7 +43,7 @@ class CalendarEvent extends AclItemEntity {
 	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
 		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
 
-	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale', 'showWithoutTime',
+	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
 		'createdBy','modifiedBy', 'lastOccurrence', 'eventId'];
 

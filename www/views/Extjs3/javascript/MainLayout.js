@@ -909,6 +909,14 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.welcome();
 
+		screen.orientation.addEventListener("change", (event) => {
+			const w = screen.width,
+				h = screen.height;
+			setTimeout(()=>{
+				GO.viewport.fireResize(w, h);
+			},600);
+		});
+
 		this.handleBrowserOnlineOffline();
 		// Start in 5s to give the browser some time to boot other requests.
 		setTimeout(function() {

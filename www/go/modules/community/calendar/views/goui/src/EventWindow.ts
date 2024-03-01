@@ -108,7 +108,8 @@ export class EventWindow extends FormWindow {
 				}
 			}),
 			textfield({name: 'location',flex:1, label:t('Location'), style:{minWidth:'80%'},
-				buttons:[btn({icon: 'open_in_browser', handler: (me, who)=>{window.open(me.parent!.parent!.value)}})]
+				listeners: {'setvalue': (me,v) => { me.buttons![0].hidden = !/^https?:\/\//.test(v); }},
+				buttons:[btn({hidden:true,icon: 'open_in_browser', handler: (me)=>{window.open(me.parent!.parent!.value)}})]
 			}),
 			btn({icon:'video_call', hidden: !m.settings.videoUri, cls:'filled', width:50, handler: async (btn) => {
 					(btn.previousSibling() as TextField)!.value = await this.createVideoLink(m.settings);

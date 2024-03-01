@@ -73,7 +73,7 @@ export class YearView extends CalendarView {
 					this.fire('monthclick', this, monthDay)
 				});
 
-		const header = E('tr',E('td'));
+		const header = E('tr', client.user.calendarPreferences.showWeekNumbers ?E('td') : '');
 		for(let i=0;i < 7;i++) {
 			header.append(E('th',Object.values(DateTime.dayNames)[i][0]))
 		}

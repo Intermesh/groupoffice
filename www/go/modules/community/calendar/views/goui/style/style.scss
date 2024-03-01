@@ -25,10 +25,10 @@
 	> em {
 		text-overflow:ellipsis;
 		overflow:hidden;
+		flex: 1 0 auto;
 	}
 	> span {
 		text-align:right;
-		flex: 1 0 auto;
 		white-space: nowrap;
 		font-weight: 300;
 		font-size: .9em;
@@ -78,27 +78,32 @@
 
 .yearview {
 	background-color: $colorBackground;
-	min-height: 560px;
+	//min-height: 560px;
+	border-top: $borderWidth solid $colorBorder;
 	height: 100%;
-	overflow-y:auto;
+	overflow-y:scroll;
 	display:flex;
+	gap:dp(16);
 	flex-wrap: wrap;
 	justify-items: center;
 	justify-content:space-evenly;
+	flex:1;
 	align-items: center;
 	> div {
-		min-width: 25%;
-		padding: 0 dp(16);
+		flex:1 1 24%;
+		min-width: dp(200);
+		//min-height: dp(240);
+		//min-width: 25%;
+		//padding: 0 dp(16);
 	}
 
 	table {
 		color: $colorTextSecondary;
 		height: 100%;
+		min-height: dp(210);
+		max-width: dp(340);
 		width:100%;
 		margin: 0 auto;
-		max-width: 300px;
-		min-height: 210px;
-		min-width: 224px;
 		caption { // month name
 			cursor: pointer;
 			text-align: center;
@@ -249,15 +254,20 @@
 				color: $colorPrimary;
 			}
 		}
+		+ ol {border-top:0;}
 	}
 
 	li {
 		flex: 1 0 0;
-
+		//z-index:1;
 		&:focus {
 			outline: none;
 			box-shadow: none;
 		}
+		//&[data-date] {
+		//	position:relative;
+		//	z-index:0;
+		//}
 		> sub { // weeknb
 			float:left;
 			text-align: center;
@@ -266,16 +276,17 @@
 			font-size: .7em;
 			//max-width: dp(24);
 			font-weight: 400;
-			margin:dp(4);
+			margin:dp(4) 0 dp(4) dp(4);
 			//color:$colorTextSecondary;
 			background-color: $surfaceHighest;
 			border-radius: 99px;
 		}
 		> em { // date number
+			// position:absolute;
 			font-weight: 500;
 			font-style: normal;
 			text-align: right;
-			font-size:1.2em;
+			//font-size:1.1em;
 			display: block;
 			height: dp(32);
 			margin-right: dp(8);
@@ -700,6 +711,7 @@ $timeMargin: dp(72);
 		right: 14vw;
 		background-color: var(--bg-layer);
 		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
 		width: dp(280) !important;
 	}
 }

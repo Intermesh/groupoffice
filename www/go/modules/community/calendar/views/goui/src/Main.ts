@@ -191,11 +191,12 @@ export class Main extends Component {
 						this.west.el.cls('!active');
 					}}),
 					btn({
+						cls: 'not-medium-device',
 						icon: 'add',
 						title: t('New event'),
 						handler: _ => (new EventWindow()).show()
 					}),
-					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '2em'}}),
+					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '1.8em'}}),
 					//'->',
 					this.cardMenu = comp({cls: 'group not-medium-device', flex:'0 0 auto'},
 						btn({icon: 'view_day', text: t('Day'), handler: b => this.routeTo('day', this.date)}),
