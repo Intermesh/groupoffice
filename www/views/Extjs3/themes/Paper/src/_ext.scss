@@ -289,7 +289,7 @@
 	width: dp(22);
 	height:dp(22);
 	background-color: var(--bg-input);
-	border: 1px solid var(--fg-textbox-line);
+	border: 1px solid var(--fg-outline);
 	border-radius: dp(4);
 	&:before { // tick
 		content: '';
@@ -373,7 +373,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	transition: border-color 100ms linear, box-shadow 225ms linear;
 	border-radius: dp(4);
 	background-color:var(--bg-input);
-	border: 1px solid var(--fg-track);
+	border: 1px solid var(--fg-outline);
 	display: inline-block;
 	padding: dp(6) dp(8);
 }
@@ -439,7 +439,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 		+ .x-form-twin-triggers, + .x-form-trigger {
 			border-radius: 0;
-			border-left: 1px solid var(--fg-track);
+			border-left: 1px solid var(--fg-outline);
 		}
 		
 		&[readonly] {
@@ -460,7 +460,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	&-duration, &-text, textarea.x-form-field, &-time {
 		@extend %font-data;
 		background-color:var(--bg-input);
-		border: 1px solid var(--fg-track);
+		border: 1px solid var(--fg-outline);
 		display: inline-block;
 		padding: dp(11) dp(16);
 
@@ -523,7 +523,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	&-radio-group {
 		padding: dp(4) dp(16);
 		overflow: visible;
-		border: 1px solid var(--fg-track);;
+		border: 1px solid var(--fg-outline);;
 		background-color: var(--bg-input);
 		overflow:visible;
 	}
@@ -2511,7 +2511,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 // HTML
 .x-html-editor-wrap {
 	border-radius: dp(10);
-	border:1px solid var(--fg-track);
+	border:1px solid var(--fg-outline);
 	background-color:var(--bg-input);
 
 	iframe {
@@ -2736,7 +2736,7 @@ $resizerSize : dp(3);
 	overflow:visible;
 	.x-slider-inner {
 		top: dp(24);
-		background-color: var(--fg-track);
+		background-color: var(--fg-outline);
 		border-radius: $borderRadius;
 		height: dp(2);
 	}
@@ -2763,7 +2763,7 @@ $resizerSize : dp(3);
 	}
 }
 input[value="0"] + .x-slider .x-slider-thumb {
-	border-color: var(--fg-track);
+	border-color: var(--fg-outline);
 	background-color: white; 
 }
 
