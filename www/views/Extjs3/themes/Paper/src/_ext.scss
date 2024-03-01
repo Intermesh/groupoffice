@@ -22,7 +22,7 @@
 }
 
 .ext-el-mask {
-	background-color: var(--fg-text);
+	background-color: var(--bg-dim);
 	&-msg { // replace with loading bar
 		@extend .x-mask-loading;
 	}

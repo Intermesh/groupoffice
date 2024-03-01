@@ -22,7 +22,7 @@ html {
 	}
 }
 body {
-	background-color: var(--bg-header-bg);
+	background-color: var(--c-header-bg);
 	//background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(239,166,76,1) 0%, rgba(245,184,184,1) 100.2% );
 }
 
@@ -716,13 +716,13 @@ a {
 }
 .notifications {
 	padding: dp(4);
-	background-color: var(--bg-header-bg);
+	background-color: var(--c-header-bg);
 	i.entity::before{margin-top: dp(-22);}
 }
 .notificationArea {
 	//higher than window 9003 and lower than menu's 15000
 	z-index: 10000 !important;
-	background-color: var(--bg-header-bg);
+	background-color: var(--c-header-bg);
 	.x-panel-header,.x-panel-header-text {
 		border-top:0; color:white;
 		.x-tool:hover {
@@ -927,10 +927,10 @@ button {
 
 }
 hr {
-	height: 1px;
 	border:0;
 	margin: dp(15) 0 dp(16) 0;
-	background-color: var(--fg-line);
+	color: var(--fg-divider);
+	border-top: 1px solid currentColor;
 }
 #go-logged-in-as {
 	text-align:center;
