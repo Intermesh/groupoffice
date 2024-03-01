@@ -1,0 +1,181 @@
+{
+  "holidays": {
+    "BE": {
+      "names": {
+        "fr": "Belgique",
+        "nl": "België",
+        "de": "Belgien",
+        "en": "Belgium"
+      },
+      "dayoff": "sunday",
+      "zones": [
+        "Europe/Brussels"
+      ],
+      "langs": [
+        "fr",
+        "nl",
+        "de"
+      ],
+      "days": {
+        "01-01": {
+          "_name": "01-01"
+        },
+        "01-06": {
+          "_name": "01-06",
+          "name": {
+            "de": "Erscheinung des Herrn"
+          },
+          "type": "observance"
+        },
+        "02-14": {
+          "_name": "02-14",
+          "type": "observance"
+        },
+        "easter": {
+          "_name": "easter",
+          "type": "observance"
+        },
+        "easter 1": {
+          "_name": "easter 1"
+        },
+        "05-01": {
+          "_name": "05-01"
+        },
+        "2nd sunday in May": {
+          "_name": "Mothers Day",
+          "type": "observance"
+        },
+        "easter 39": {
+          "_name": "easter 39"
+        },
+        "easter 49": {
+          "_name": "easter 49",
+          "type": "observance"
+        },
+        "easter 50": {
+          "_name": "easter 50"
+        },
+        "07-21": {
+          "_name": "National Holiday"
+        },
+        "08-15": {
+          "_name": "08-15"
+        },
+        "11-01": {
+          "_name": "11-01"
+        },
+        "11-02": {
+          "_name": "11-02",
+          "type": "observance"
+        },
+        "11-11": {
+          "name": {
+            "de": "Waffenstillstand",
+            "fr": "Armistice",
+            "nl": "Wapenstilstand"
+          }
+        },
+        "11-15": {
+          "name": {
+            "nl": "Koningsdag",
+            "fr": "Fête du Roi",
+            "de": "Festtag des Königs"
+          },
+          "type": "observance"
+        },
+        "12-06": {
+          "_name": "12-06",
+          "type": "observance"
+        },
+        "12-25": {
+          "_name": "12-25"
+        }
+      },
+      "states": {
+        "BRU": {
+          "name": "Bruxelles",
+          "langs": [
+            "fr",
+            "nl"
+          ],
+          "days": {
+            "05-08": {
+              "name": {
+                "nl": "Feest van de Iris",
+                "fr": "Fête de l'Iris"
+              },
+              "type": "observance"
+            }
+          }
+        },
+        "DE": {
+          "name": "Deutschsprachige Gemeinschaft",
+          "langs": [
+            "de"
+          ],
+          "days": {
+            "11-15": {
+              "name": {
+                "de": "Tag der Deutschsprachigen Gemeinschaft",
+                "fr": "Jour de la Communauté Germanophone",
+                "nl": "Feestdag van de Duitstalige Gemeenschap"
+              },
+              "type": "observance"
+            }
+          }
+        },
+        "VLG": {
+          "name": "Vlaamse Gemeenschap",
+          "langs": [
+            "nl"
+          ],
+          "days": {
+            "07-11": {
+              "name": {
+                "de": "Festtag der Wallonischen Region",
+                "fr": "Fête de la Région wallonne",
+                "nl": "Feestdag van de Vlaamse Gemeenschap"
+              },
+              "type": "observance"
+            },
+            "11-02": {
+              "_name": "11-02",
+              "type": "observance",
+              "note": "day-off for employees of the flemish government"
+            },
+            "11-15": {
+              "name": {
+                "nl": "Koningsdag",
+                "fr": "Fête du Roi",
+                "de": "Festtag des Königs"
+              },
+              "type": "observance",
+              "note": "day-off for employees of the flemish government"
+            },
+            "12-26": {
+              "_name": "12-26",
+              "type": "observance",
+              "note": "day-off for employees of the flemish government"
+            }
+          }
+        },
+        "WAL": {
+          "name": "Communauté française",
+          "langs": [
+            "fr"
+          ],
+          "days": {
+            "09-27": {
+              "name": {
+                "de": "Tag der Französischsprachigen Gemeinschaft",
+                "fr": "La fête de la communauté française",
+                "nl": "Feestdag van de Franse Gemeenschap"
+              },
+              "type": "observance"
+            }
+          }
+        }
+      }
+    }
+  }
+}

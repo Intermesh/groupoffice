@@ -1,0 +1,233 @@
+{
+  "holidays": {
+    "GB": {
+      "names": {
+        "en": "United Kingdom"
+      },
+      "dayoff": "sunday",
+      "zones": [
+        "Europe/London"
+      ],
+      "langs": [
+        "en"
+      ],
+      "days": {
+        "01-01": {
+          "_name": "01-01"
+        },
+        "substitutes 01-01 if sunday then next monday": {
+          "substitute": true,
+          "_name": "01-01"
+        },
+        "substitutes 01-01 if saturday then next monday": {
+          "substitute": true,
+          "_name": "01-01"
+        },
+        "easter -21": {
+          "_name": "Mothers Day",
+          "type": "observance"
+        },
+        "easter -2": {
+          "_name": "easter -2"
+        },
+        "easter": {
+          "_name": "easter",
+          "type": "observance"
+        },
+        "easter 1": {
+          "_name": "easter 1"
+        },
+        "1st monday in May": {
+          "name": {
+            "en": "Early May bank holiday"
+          },
+          "disable": [
+            "2020-05-04"
+          ]
+        },
+        "1st monday before 06-01": {
+          "name": {
+            "en": "Spring bank holiday"
+          },
+          "disable": [
+            "2022-05-30"
+          ],
+          "enable": [
+            "2022-06-02"
+          ]
+        },
+        "12-25": {
+          "_name": "12-25"
+        },
+        "substitutes 12-25 if saturday then next monday if sunday then next tuesday": {
+          "substitute": true,
+          "_name": "12-25"
+        },
+        "12-26": {
+          "_name": "12-26"
+        },
+        "substitutes 12-26 if saturday then next monday if sunday then next tuesday": {
+          "substitute": true,
+          "_name": "12-26"
+        },
+        "2012-06-05": {
+          "name": {
+            "en": "Queen’s Diamond Jubilee"
+          }
+        },
+        "2020-05-08": {
+          "name": {
+            "en": "Early May bank holiday (VE day)"
+          }
+        },
+        "2022-06-03": {
+          "name": {
+            "en": "Queen’s Platinum Jubilee"
+          }
+        },
+        "2022-09-19": {
+          "name": {
+            "en": "Queen Elizabeth's Funeral Day"
+          }
+        },
+        "2023-05-08": {
+          "name": {
+            "en": "King Charles III's Coronation"
+          }
+        },
+        "3rd sunday in June": {
+          "_name": "Fathers Day",
+          "type": "observance"
+        }
+      },
+      "states": {
+        "ALD": {
+          "name": "Alderney",
+          "zones": [
+            "Europe/Guernsey"
+          ],
+          "days": {
+            "12-15": {
+              "name": {
+                "en": "Homecoming Day"
+              }
+            }
+          }
+        },
+        "ENG": {
+          "name": "England",
+          "days": {
+            "1st monday before 09-01": {
+              "name": {
+                "en": "Summer bank holiday"
+              }
+            }
+          }
+        },
+        "NIR": {
+          "name": "Northern Ireland",
+          "zones": [
+            "Europe/Belfast"
+          ],
+          "days": {
+            "03-17": {
+              "name": {
+                "en": "St Patrick's Day"
+              }
+            },
+            "substitutes 03-17 if saturday then next monday": {
+              "substitute": true,
+              "name": {
+                "en": "St Patrick's Day"
+              }
+            },
+            "substitutes 03-17 if sunday then next monday": {
+              "substitute": true,
+              "name": {
+                "en": "St Patrick's Day"
+              }
+            },
+            "07-12": {
+              "name": {
+                "en": "Battle of the Boyne, Orangemen’s Day"
+              }
+            },
+            "substitutes 07-12 if saturday then next monday": {
+              "substitute": true,
+              "name": {
+                "en": "Battle of the Boyne"
+              }
+            },
+            "substitutes 07-12 if sunday then next monday": {
+              "substitute": true,
+              "name": {
+                "en": "Battle of the Boyne"
+              }
+            },
+            "1st monday before 09-01": {
+              "name": {
+                "en": "Summer bank holiday"
+              }
+            }
+          }
+        },
+        "SCT": {
+          "name": "Scotland",
+          "days": {
+            "substitutes 01-01 if sunday then next monday": false,
+            "substitutes 01-01 if saturday then next monday": false,
+            "substitutes 01-01 if saturday then next tuesday": {
+              "substitute": true,
+              "_name": "01-01"
+            },
+            "substitutes 01-01 if sunday then next tuesday": {
+              "substitute": true,
+              "_name": "01-01"
+            },
+            "01-02": {
+              "name": {
+                "en": "January 2nd"
+              }
+            },
+            "substitutes 01-02 if saturday then next monday": {
+              "substitute": true,
+              "name": {
+                "en": "January 2nd"
+              }
+            },
+            "substitutes 01-02 if sunday then next monday": {
+              "substitute": true,
+              "name": {
+                "en": "January 2nd"
+              }
+            },
+            "easter 1": {
+              "_name": "easter 1"
+            },
+            "1st monday in August": {
+              "name": {
+                "en": "Summer bank holiday"
+              }
+            },
+            "11-30": {
+              "name": {
+                "en": "St Andrew’s Day"
+              }
+            }
+          }
+        },
+        "WLS": {
+          "name": "Wales",
+          "days": {
+            "1st monday before 09-01": {
+              "name": {
+                "en": "Summer bank holiday"
+              }
+            }
+          },
+          "regions": {}
+        }
+      }
+    }
+  }
+}

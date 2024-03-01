@@ -1,0 +1,103 @@
+{
+  "holidays": {
+    "MD": {
+      "names": {
+        "ro": "Republica Moldova",
+        "en": "Moldova"
+      },
+      "langs": [
+        "ro"
+      ],
+      "zones": [
+        "Europe/Chisinau"
+      ],
+      "dayoff": "sunday",
+      "days": {
+        "01-01": {
+          "_name": "01-01"
+        },
+        "julian 12-25 P2D": {
+          "_name": "julian 12-25",
+          "name": {
+            "ro": "Craciun pe Rit Vechi"
+          }
+        },
+        "03-08": {
+          "_name": "03-08"
+        },
+        "orthodox": {
+          "_name": "easter"
+        },
+        "orthodox 1": {
+          "_name": "easter 1"
+        },
+        "orthodox 8": {
+          "name": {
+            "ro": "Paştele Blăjinilor",
+            "en": "Memorial Day"
+          }
+        },
+        "05-01": {
+          "_name": "05-01"
+        },
+        "05-09": {
+          "name": {
+            "ro": "Ziua Victoriei",
+            "en": "Victory Day"
+          }
+        },
+        "08-27": {
+          "_name": "Independence Day"
+        },
+        "08-31": {
+          "name": {
+            "ro": "Limba noastră",
+            "en": "National Language Day"
+          }
+        },
+        "1st saturday in October P2D": {
+          "name": {
+            "ro": "Ziua vinului",
+            "en": "Wine Day"
+          },
+          "type": "observance",
+          "active": [
+            {
+              "from": 2013
+            }
+          ]
+        },
+        "12-25": {
+          "_name": "12-25",
+          "name": {
+            "ro": "Craciun pe stil Nou"
+          }
+        }
+      },
+      "states": {
+        "CA": {
+          "name": "Cahul",
+          "days": {
+            "11-21": {
+              "name": {
+                "ro": "Ziua Cahul",
+                "en": "Cahul Day"
+              }
+            }
+          }
+        },
+        "CU": {
+          "name": "Chișinău",
+          "days": {
+            "10-14": {
+              "name": {
+                "ro": "Ziua capitalului",
+                "en": "Capital's Day"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
