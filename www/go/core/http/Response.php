@@ -379,7 +379,7 @@ class Response extends Singleton{
 				try {
 					$data = JSON::encode($data, $this->jsonOptions);
 
-				} catch(CoreException $e) {
+				} catch(\Throwable $e) {
 					$error = new ProblemDetails(SetError::ERROR_SERVER_FAIL, 500, $e->getMessage());
 					$data = JSON::encode($error, $this->jsonOptions);
 				}
