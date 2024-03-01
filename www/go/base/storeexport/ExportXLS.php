@@ -1,8 +1,8 @@
 <?php
-
-namespace GO\Base\Export;
-
-
+/**
+ * @depcreated or at least never used as per 6.8
+ */
+namespace GO\Base\Storeexport;
 
 /*
  * Copyright Intermesh BV.
@@ -14,6 +14,10 @@ namespace GO\Base\Export;
  *
  */
 
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 /**
  * XLS Output stream.
  * 
@@ -24,16 +28,26 @@ class ExportXLS extends AbstractExport {
 	public static $name = "XLS (Excel)";
 	public static $useOrientation = false;
 
+	private $_sheet;
+
+	/** @var int */
+	private $excel_row;
+
+	/**
+	 * @var Spreadsheet
+	 */
+	private $phpExcel;
+
 	private function _sendHeaders() {
 		header('Content-Disposition: attachment; filename="' . $this->title . '.xls"');
 		header('Content-Type: text/x-msexcel; charset=UTF-8');
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function _setupExcel() {
-		// Include PHPExcel
-		require_once \GO::config()->root_path.'go/vendor/PHPExcel/PHPExcel.php';
-		// Create new PHPExcel object
-		$this->phpExcel = new PHPExcel();
+		$this->phpExcel = new Spreadsheet();
 
 		// Set document properties
 		$this->phpExcel->getProperties()->setCreator(\GO::config()->product_name)
@@ -67,9 +81,13 @@ class ExportXLS extends AbstractExport {
 			$col++;
 		}
 		$this->excel_row++;
-		//fputcsv($this->_fp, $data, \GO::user()->list_separator, \GO::user()->text_separator);
 	}
 
+	/**
+	 * @throws Exception
+	 * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+	 * @throws \Exception
+	 */
 	public function output() {
 		$this->_sendHeaders();
 
@@ -89,9 +107,8 @@ class ExportXLS extends AbstractExport {
 		}
 
 		// Hack to write contents of file to string
-		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, 'Excel5');
-		//$tmpFilename = tempnam('./temp', 'tmp');
-		
+		$writer = IOFactory::createWriter($this->phpExcel, 'Xls');
+
 		$file = \GO\Base\Fs\File::tempFile();
 		$writer->save($file->path());
 		

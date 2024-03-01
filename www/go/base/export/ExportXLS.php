@@ -1,16 +1,22 @@
 <?php
 namespace GO\Base\Export;
 
-use PHPExcel;
-use PHPExcel_IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Exception;
 
-class ExportXLS extends AbstractExport {
+class ExportXLS extends AbstractExport
+{
 
 	public static $showInView = true;
 	public static $name = "XLS (Excel)";
 	public static $useOrientation = false;
 
 	private $_lines = array();
+	private $_sheet;
+	private $excel_row;
+
+	private $phpExcel;
 	
 	private function _sendHeaders() {
 		header('Content-Disposition: attachment; filename="' . $this->title . '.xls"');
@@ -18,10 +24,7 @@ class ExportXLS extends AbstractExport {
 	}
 
 	private function _setupExcel() {
-		// Include PHPExcel
-		//require_once \GO::config()->root_path.'go/vendor/PHPExcel/PHPExcel.php';
-		// Create new PHPExcel object
-		$this->phpExcel = new PHPExcel();
+		$this->phpExcel = new Spreadsheet();
 
 		// Set document properties
 		$this->phpExcel->getProperties()->setCreator(\GO::config()->product_name)
@@ -55,9 +58,12 @@ class ExportXLS extends AbstractExport {
 			$col++;
 		}
 		$this->excel_row++;
-		//fputcsv($this->_fp, $data, \GO::user()->list_separator, \GO::user()->text_separator);
 	}
 
+	/**
+	 * @throws Exception
+	 * @throws \Exception
+	 */
 	public function output() {
 		$this->_sendHeaders();
 
@@ -77,10 +83,9 @@ class ExportXLS extends AbstractExport {
 				
 				$this->_write($headers);
 				// End of workaround
-				
-				//$this->_write(array_values($this->getLabels()));
-			}else
+			} else {
 				$this->_write(array_keys($this->getLabels()));
+			}
 		}
 		
 		while($record = $this->store->nextRecord()){
@@ -97,9 +102,8 @@ class ExportXLS extends AbstractExport {
 		}
 
 		// Hack to write contents of file to string
-		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, 'Excel5');
-		//$tmpFilename = tempnam('./temp', 'tmp');
-		
+		$writer = IOFactory::createWriter($this->phpExcel, 'Xls');
+
 		$file = \GO\Base\Fs\File::tempFile();
 		$writer->save($file->path());
 		

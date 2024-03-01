@@ -21,7 +21,6 @@
     "ext-json": "*",
     "ext-openssl": "*",
     "michelf/php-markdown": "@stable",
-    "phpoffice/phpexcel": "^1.8",
     "tecnickcom/tcpdf": "@stable",
     "dragonmantank/cron-expression": "@stable",
     "setasign/fpdi": "@stable",
