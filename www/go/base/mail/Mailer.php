@@ -46,7 +46,6 @@ class Mailer extends \go\core\mail\Mailer
 			throw new \Exception("E-mail sending is disabled!");
 		}
 		
-		
 		if(\GO::config()->debug){
 			$getTo = $message->getTo();
 

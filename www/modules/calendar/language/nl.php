@@ -247,4 +247,5 @@ Het volgende is de foutmelding:
   'description' => 'Agenda module; Iedere gebruiker kan afspraken toevoegen, bewerken of verwijderen. Ook kunnen afspraken van andere gebruikers worden ingezien en als het nodig is aangepast worden.',
   'Calendar' => 'Agenda',
   'Status' => 'Status',
+	'Cancelled' => "Geannuleerd"
 );

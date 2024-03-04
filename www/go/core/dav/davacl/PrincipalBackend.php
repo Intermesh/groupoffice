@@ -27,9 +27,11 @@ use Sabre\DAVACL\PrincipalBackend\AbstractBackend;
 
 class PrincipalBackend extends AbstractBackend {
 
+	private array $users;
+
 	private function modelToDAVUser(User $user) {
 
-		$data = array(
+		return array(
 				'id' => $user->id,
 				'uri' => 'principals/' . $user->username,
 				'{DAV:}displayname' => $user->displayName,
@@ -38,8 +40,6 @@ class PrincipalBackend extends AbstractBackend {
 				'{urn:ietf:params:xml:ns:caldav}schedule-inbox-URL' => new Href('principals/' . $user->username . '/inbox'),
 				'{urn:ietf:params:xml:ns:caldav}schedule-outbox-URL' => new Href('principals/' . $user->username . '/outbox')
 		);
-
-		return $data;
 	}
 
 	/**
@@ -97,7 +97,7 @@ class PrincipalBackend extends AbstractBackend {
 
 		$user = User::find(['id', 'username', 'displayName', 'email'])->where('username', '=', $username)->single();
 		if (!$user) {
-			return false;
+			return;
 		} elseif (isset($pathParts[2])) {
 			return array(
 					'uri' => $path,

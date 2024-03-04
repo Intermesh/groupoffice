@@ -10,6 +10,8 @@ use go\core\model\Module;
 
 class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 
+	private \Sabre\VObject\ITip\Message $itipMessage;
+
 	public function __construct($senderEmail=null) {
 		if($senderEmail === null)
 			$senderEmail = \GO::config()->webmaster_email;
@@ -39,6 +41,21 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 		}
 
 		try {
+			go()->getLanguage()->setLanguage(go()->getAuthState()->getUser(['language'])->language);
+
+			$summary = $this->itipMessage->message->VEVENT->SUMMARY;
+			switch (strtoupper($this->itipMessage->method)) {
+				case 'REPLY':
+					$subject = 'Re: '.$summary;
+					break;
+				case 'REQUEST':
+					$subject = go()->t('Invitation', 'legacy','calendar') .': '.$summary;
+					break;
+				case 'CANCEL':
+					$subject = go()->t('Cancelled', 'legacy','calendar').': '.$summary;
+					break;
+			}
+
 			$recipients = new AddressList($to);
 			$to = $recipients[0];
 
