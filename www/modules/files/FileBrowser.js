@@ -641,7 +641,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	config.keys=[{
 		ctrl:true,
 		key: Ext.EventObject.C,
-		fn:function(){
+		fn:function(key, e){
 			if(e.target.tagName == "INPUT") {
 				return;
 			}
@@ -652,7 +652,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	},{
 		ctrl:true,
 		key: Ext.EventObject.X,
-		fn:function(){
+		fn:function(key,e){
 			if(e.target.tagName == "INPUT") {
 				return;
 			}

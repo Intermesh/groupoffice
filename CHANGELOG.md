@@ -1,3 +1,4 @@
+- Files: minor bugfix copy / paste with keypresses
 - Zpushadmin: Available for admins only by default
 - Carddav: Share carddav with internal on install
 - Support: Export broken
