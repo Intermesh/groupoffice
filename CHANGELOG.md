@@ -2,6 +2,7 @@
 - Billing: fix numeric queries for e.g. products or order numbers
 - Core: fix PHP compatibility error in legacy user class
 - Addressbook: Street filter used old column and returned unexpected results
+- Core: Fixed parsing address list with lots of quotes. Issue #1073.
 
 27-02-2024: 6.7.71
 - Core: Bugfix in layout renderer
