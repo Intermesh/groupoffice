@@ -125,7 +125,7 @@ class AddressList implements ArrayAccess, Countable {
 	/**
 	 * Bool to check if a string is quoted or not
 	 */
-	private bool $inQuotedString = false;
+	private string|bool $inQuotedString = false;
 
 	/**
 	 * Add single address
