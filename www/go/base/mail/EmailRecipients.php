@@ -196,7 +196,7 @@ class EmailRecipients{
 	/**
 	* Bool to check if a string is quoted or not
 	*
-	* @var     bool
+	* @var     bool|string
 	* @access  private
 	*/
 	private $_quote = false;
