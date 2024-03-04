@@ -393,10 +393,13 @@
 
 
 --- 6.7
+04-03-2024: 6.6.183
+- Email: Fixed render issue
+- Leavedays: fix issue with disapproval reason not being sent
+- Core: Fixed parsing address list with lots of quotes. Issue #1073.
+
 22-01-2023: 6.6.182
-
 - Core: Exclude User and Search from SSE Push because it caused performance problems
-
 
 11-12-2023: 6.6.181
 - Core: Better license check
