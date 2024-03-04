@@ -47,7 +47,7 @@ go.ActivityWatcher = (function() {
 			var now = Math.floor(Date.now() / 1000);
 
 			var secondsSinceLastActivity = now - localStorage.getItem('lastActivity');
-			//console.log(secondsSinceLastActivity + ' seconds since the user was last active');
+
 			//if the user has been inactive or idle for longer
 			//then the seconds specified in maxInactivity
 			if(secondsSinceLastActivity > this.maxInactivity){

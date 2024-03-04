@@ -1,3 +1,4 @@
+04-03-2024: 6.6.183
 - Email: Fixed render issue
 - Leavedays: fix issue with disapproval reason not being sent
 - Core: Fixed parsing address list with lots of quotes. Issue #1073.
