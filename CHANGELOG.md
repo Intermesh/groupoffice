@@ -1,5 +1,6 @@
 - Timeregistration2: display of employee combo must depend on module rights instead of vestigial older permission level
 - Billing: fix numeric queries for e.g. products or order numbers
+- Core: fix PHP compatibility error in legacy user class
 
 27-02-2024: 6.7.71
 - Core: Bugfix in layout renderer
