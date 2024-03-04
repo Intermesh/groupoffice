@@ -3,6 +3,7 @@
 - Support: Export broken
 - Core: update old dependency for spreadsheet export
 - Support: Customer got notification of private comment
+- Tasks: fix date render bug in tasks grid
 
 26-02-2024: 6.8.36
 - Calendar: Fixed changing color for calendars and categories issue #1112
