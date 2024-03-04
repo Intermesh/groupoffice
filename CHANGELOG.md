@@ -1,4 +1,4 @@
-
+- Email: Resize folder subscribtion dialog to current theme
 - Core: Fix bug in module selection in user profile
 - Files: minor bugfix copy / paste with keypresses
 - Zpushadmin: Available for admins only by default
