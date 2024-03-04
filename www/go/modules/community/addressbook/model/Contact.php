@@ -609,6 +609,15 @@ class Contact extends AclItemEntity {
 											
 											$criteria->where('adr.city', $comparator, $value);
 										})
+										->addText("address", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_address', 'adr')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
+											}
+
+											$criteria->where('adr.address', $comparator, $value);
+										})
+
+										//Street is deprecated. Alias for "address"
 										->addText("street", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_address', 'adr')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");

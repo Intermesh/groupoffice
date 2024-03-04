@@ -167,7 +167,12 @@ go.Modules.register("community", "addressbook", {
 				type: "string",
 				multiple: true
 			}, {
-				name: 'street',
+				name: 'address',
+				title: t("Address"),
+				type: "string",
+				multiple: true
+			}, {
+				name: 'street', //deprecated. Alias for "address"
 				title: t("Street"),
 				type: "string",
 				multiple: true

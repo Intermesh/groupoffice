@@ -1805,6 +1805,13 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			case "GO\\Adressbook\\Model\\Contact":
 				go.Router.goto("contact/" + event['contact_id']);
 			break;
+
+			case 'go\\modules\\udo\\forms\\model\\RoofReport':
+				const dlg = new go.modules.udo.forms.DakmeldingDialog(),
+					rid = event.id.substring(1);
+				dlg.load(rid);
+				dlg.show();
+				break;
 			
 			case "GO\\Calendar\\Model\\Event":
 				if(event.permission_level<GO.permissionLevels.write) {
