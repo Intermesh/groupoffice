@@ -15,10 +15,12 @@ $separator = ';';
 $enclosure = '"';
 
 //tokens generated using https://imapsync.lamiral.info/oauth2/oauth2_office365/README.txt
-$oauthAccessToken1 = "./oauth2_office365/tokens/oauth2_tokens_mailuser@uxample.nl.txt";
+//$oauthAccessToken1 = "./oauth2_office365/tokens/oauth2_tokens_mailuser@uxample.nl.txt";
 
 // Target IMAP host using regular auth
-$targetHost = 'imap.group-office.com';
+$targetHost = 'target.imap.local';
+
+$sourceHost = 'source.imap.local';
 
 $fp = fopen($source, "r");
 
@@ -39,11 +41,20 @@ while($record = fgetcsv($fp,null, $separator, $enclosure)) {
 	$user2 = $record[2];
 	$pass2 = $record[3];
 
-	$cmd = 'imapsync --syncinternaldates --office1 ' .
-		'--oauthaccesstoken1 '.escapeshellarg($oauthAccessToken1).' ' .
-		'--user1 ' . escapeshellarg($user1) . ' --password1 '.escapeshellarg($pass1).' ' .
+	$cmd = 'imapsync --syncinternaldates ';
+
+	if(!empty($oauthAccessToken1)) {
+		$cmd .= '--oauthaccesstoken1 '.escapeshellarg($oauthAccessToken1).' ';
+		$cmd .= '--office1 ';
+	}
+
+	if(isset($sourceHost)) {
+		$cmd .= ' --host1 '. escapeshellarg($sourceHost).' ';
+	}
+
+	$cmd .= '--user1 ' . escapeshellarg($user1) . ' --password1 '.escapeshellarg($pass1).' ' .
 		'--host2 ' . escapeshellarg($targetHost ). ' --tls2 --user2 ' . escapeshellarg($user2) . ' --password2 ' . escapeshellarg($pass2). ' ' .
-		'--subscribe --allowsizemismatch --nofoldersizes ' .
+		'--subscribeall --allowsizemismatch --nofoldersizes ' .
 		'--sep1 / --sep2 . --regextrans2 "s,/,_,g"';
 
 	echo $cmd . "\n";
