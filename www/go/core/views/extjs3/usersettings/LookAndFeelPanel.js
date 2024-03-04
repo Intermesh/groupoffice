@@ -13,13 +13,13 @@
 go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 
 	initComponent: function () {
-		
-		var panels = GO.moduleManager.getAllPanels(), data = [];
-		
+		const panels = GO.moduleManager.getAllPanelConfigs();
+		let data = [];
+
 		panels.forEach(function(p){
 			data.push([p.moduleName, p.title]);
 		});
-		var moduleStore = new Ext.data.ArrayStore({
+		const moduleStore = new Ext.data.ArrayStore({
 			fields: ['id', 'name'],
 			idField: 'id',
 			data: data
