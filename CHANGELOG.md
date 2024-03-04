@@ -7,6 +7,7 @@
 - Support: Customer got notification of private comment
 - Tasks: fix date render bug in tasks grid
 - Core: Sabre dav upgrade to 4.5.1
+- CalDAV: CalDAV-Event creates duplicate events in web-GUI #1132
 
 26-02-2024: 6.8.36
 - Calendar: Fixed changing color for calendars and categories issue #1112
