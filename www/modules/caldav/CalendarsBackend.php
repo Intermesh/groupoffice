@@ -317,7 +317,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 */
 	public function getCalendarObjects($calendarId)
 	{
-		\GO::debug("c:getCalendarObjects($calendarId)");
+//		\GO::debug("c:getCalendarObjects($calendarId)");
 		$log = '';
 		//weird bug?
 		if(!\GO::user()) {
@@ -405,7 +405,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 				foreach ($tasks as $task) {
 					$data = $this->fromBlob($task);
-					$log .= " $task->id, ".$task->getUri()." \n";
+//					$log .= " $task->id, ".$task->getUri()." \n";
 					$objects[] = array(
 						'uri' => $task->getUri(),
 						'calendardata' => $data,
@@ -418,7 +418,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			}
 		}
 
-		\GO::debug($objects);
+//		\GO::debug($objects);
 
 		return $objects;
 	}
@@ -503,7 +503,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 		if ($event) {
 
-			\GO::debug('Found event '.$objectUri);
+//			\GO::debug('Found event '.$objectUri);
 			$data = ($event->mtime==$event->client_mtime && !empty($event->data)) ? $event->data : $this->exportCalendarEvent($event);
 			//\GO::debug($event->mtime==$event->client_mtime ? "Returning client data (mtime)" : "Returning server data (mtime)");
 //			\GO::debug($data);
@@ -526,7 +526,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			$task = $this->getTaskByUri($objectUri, $calendarId);
 
 			if ($task) {
-				\GO::debug('Found task '.$objectUri);
+//				\GO::debug('Found task '.$objectUri);
 				$data = $this->fromBlob($task);
 
 				$object = array(
@@ -557,27 +557,30 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	public function createCalendarObject($calendarId, $objectUri, $calendarData) {
 
 		\GO::debug("createCalendarObject($calendarId,$objectUri,[data)");
-		//\GO::debug($calendarData);
+		\GO::debug($calendarData);
 
 		try{
 
+
+			$vcalendar = \GO\Base\VObject\Reader::read($calendarData);
+
+			\GO::debug((string) $vcalendar->uid);
 			$file = new \GO\Base\Fs\File($objectUri);
-			$uuid = $file->nameWithoutExtension();
 
 			if(strpos($calendarData, 'VEVENT')!==false){
 
 				\GO::debug('item is an event');
 
-				$vcalendar = \GO\Base\VObject\Reader::read($calendarData);
 				$event=false;
 				foreach($vcalendar->vevent as $vevent) {
+					$uuid = (string) $vevent->uid;
+
 					$recurrenceDate=false;
 					$recurrence = $vevent->select('recurrence-id');
 					if(count($recurrence)){
 						$firstMatch = array_shift($recurrence);
 						$recurrenceDate=intval($firstMatch->getDateTime()->format('U'));
 					}
-
 
 					//Lookup existing events. TB may create an event by e-mail invitation that is not yet synced to TB.
 					$event = \GO\Calendar\Model\Event::model()->findByUuid($uuid, 0, $calendarId, $recurrenceDate);
@@ -603,7 +606,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 			} else { // VTODO
 				$calendar = Calendar::model()->findByPk($calendarId);
-				$vcalendar = \GO\Base\VObject\Reader::read($calendarData);
 				$parser = new VCalendar();
 				$task = $parser->vtodoToTask($vcalendar, $calendar->tasklist_id);
 				$task->setUri($objectUri);

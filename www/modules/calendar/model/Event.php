@@ -597,6 +597,8 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	protected function beforeSave() {
 		
 		GO::debug("#### EVENT BEFORE SAVE ####");
+
+		go()->getDebugger()->debugCalledFrom();
 		
 		if($this->rrule != ""){			
 			$rrule = new \GO\Base\Util\Icalendar\Rrule();
