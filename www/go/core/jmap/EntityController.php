@@ -8,6 +8,7 @@ use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\fs\File;
+use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
 use go\core\App;
@@ -936,6 +937,7 @@ abstract class EntityController extends Controller {
 	}
 
 
+
   /**
    * Handles the Foo entity's getFooUpdates command
    *
@@ -947,7 +949,7 @@ abstract class EntityController extends Controller {
 	protected function defaultChanges(array $params): ArrayObject
 	{
 		$p = $this->paramsGetUpdates($params);	
-		$cls = $this->entityClass();		
+		$cls = $this->entityClass();
 		
 		$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);
 

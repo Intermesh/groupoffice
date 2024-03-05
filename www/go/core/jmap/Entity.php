@@ -71,7 +71,7 @@ abstract class Entity  extends OrmEntity {
 		
 		$state .= static::getMapping()->hasUserTable  ? static::entityType()->getHighestUserModSeq() : "0";		
 
-		return $state;
+		return self::appendCacheCleared($state);
 	}
 
   /**
@@ -499,6 +499,8 @@ abstract class Entity  extends OrmEntity {
 	 */
 	protected static function parseState(string $state): array
 	{
+		$state = static::checkCacheCleared($state);
+
 		return array_map(function($s) {
 			
 			$modSeqAndOffset = explode("|", $s);
@@ -520,6 +522,20 @@ abstract class Entity  extends OrmEntity {
 		return implode(":", array_map(function($s) {	
 			return $s['modSeq'] . '|' . $s['offset'];			
 		},$stateArray));
+	}
+
+
+	private static function checkCacheCleared(string $state) : string {
+		$firstColon = strpos($state, ":");
+		if($firstColon === false || substr($state, 0, $firstColon) != go()->getSettings()->cacheClearedAt) {
+			throw new CannotCalculateChanges("Resync required");
+		}
+
+		return substr($state, $firstColon + 1);
+	}
+
+	private static function appendCacheCleared(string $state) : string {
+		return go()->getSettings()->cacheClearedAt . ':' . $state;
 	}
 
 
