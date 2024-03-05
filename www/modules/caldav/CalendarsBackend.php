@@ -14,6 +14,7 @@
  */
 
 namespace GO\Caldav;
+use GO\Calendar\Model\Event;
 use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\orm\exception\SaveException;
@@ -516,7 +517,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				'size' => strlen($data),
 				'component' => 'vevent'
 			);
-			//\GO::debug($object);
+			\GO::debug($object);
 			return $object;
 		}
 		else {
@@ -708,12 +709,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 				CaldavModule::saveEvent($event, $davEvent, $vcalendar->serialize());
 
-
-				$touched_event_ids=array($event->id);
-
-
-
-
 				if(count($exceptionVEvents)) {
 
 					foreach($exceptionVEvents as $exceptionVEvent){
@@ -730,12 +725,19 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 							return false;
 
 
-						\GO::debug("Creating exception for date: ".$recurrenceDate);
-						$exceptionEvent= $event->createExceptionEvent($recurrenceDate, array(), true);
+						$existing = Event::model()->findByUuid($exceptionVEvent->uid, 0, $calendarId, $recurrenceDate);
 
-						$exceptionEvent->importVObject($exceptionVEvent);
+						if(!$existing) {
+							\GO::debug("Creating exception for date: ".$recurrenceDate);
 
-						$touched_event_ids[]=$exceptionEvent->id;
+
+							$exceptionEvent= $event->createExceptionEvent($recurrenceDate, array(), true);
+
+							$exceptionEvent->importVObject($exceptionVEvent);
+						} else {
+							\GO::debug("Exception already exists for date: ".$recurrenceDate);
+
+						}
 
 					}
 				}

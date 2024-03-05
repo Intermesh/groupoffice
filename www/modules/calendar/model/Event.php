@@ -443,48 +443,51 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		$freeBusyInstalled = \GO::modules()->isInstalled("freebusypermissions");
 		
 		foreach($stmt as $event){
-			
+
 			if($freeBusyInstalled && !$event->calendar->checkPermissionlevel(\GO\Base\Model\Acl::WRITE_PERMISSION) && !\GO\Freebusypermissions\FreebusypermissionsModule::hasFreebusyAccess(\GO::user()->id, $event->calendar->user_id)) {
 				//no permission to update
 				continue;
 			}
-			
+
 			//workaround for old events that don't have the exception ID set. In this case
 			//getRelatedParticipantEvents fails. This won't happen with new events
 			if(!$event->isRecurring())
 				continue;
-			
-			\GO::debug("Creating exception for related participant event ".$event->name." (".$event->id.") ".date('c', $exceptionDate));
-			
-			$exceptionEvent = $event->getExceptionEvent($exceptionDate);
-			$exceptionEvent->dontSendEmails = $dontSendEmails;
-			$exceptionEvent->setAttributes($attributes);
-			if(!$exceptionEvent->save())
-				throw new \Exception("Could not create exception: ".var_export($exceptionEvent->getValidationErrors(), true));
-			
 
-			$event->copyLinks($exceptionEvent);
-			
-			$event->addException($exceptionDate, $exceptionEvent->id);
 
+			$existing = Event::model()->findByUuid($event->uuid, 0, $event->calendar_id, $exceptionDate);
+
+			if(!$existing) {
+				\GO::debug("Creating exception for related participant event ".$event->name." (".$event->id.") ".date('c', $exceptionDate));
+
+				$exceptionEvent = $event->getExceptionEvent($exceptionDate);
+				$exceptionEvent->dontSendEmails = $dontSendEmails;
+				$exceptionEvent->setAttributes($attributes);
+				if (!$exceptionEvent->save())
+					throw new \Exception("Could not create exception: " . var_export($exceptionEvent->getValidationErrors(), true));
+
+
+				$event->copyLinks($exceptionEvent);
+				$event->addException($exceptionDate, $exceptionEvent->id);
 			
-			
-			
-			
-			
-			$event->duplicateRelation('participants', $exceptionEvent, array('dontCreateEvent' => true));
-			
-			
-			if(!$event->isResource() && $event->is_organizer){
-				$stmt = $event->resources();		
-				foreach($stmt as $resource){
-					$resources[]=$resource;
+				$event->duplicateRelation('participants', $exceptionEvent, array('dontCreateEvent' => true));
+
+
+				if(!$event->isResource() && $event->is_organizer){
+					$stmt = $event->resources();
+					foreach($stmt as $resource){
+						$resources[]=$resource;
+					}
+					$resourceExceptionEvent = $exceptionEvent;
 				}
-				$resourceExceptionEvent = $exceptionEvent;
+
+				if($event->id==$this->id)
+					$returnEvent=$exceptionEvent;
+
+			} else{
+				\GO::debug("NOT Creating exception for related participant event ".$event->name." (".$event->id.") ".date('c', $exceptionDate));
+
 			}
-			
-			if($event->id==$this->id)
-				$returnEvent=$exceptionEvent;
 		}
 		
 		foreach($resources as $resource){
@@ -1657,7 +1660,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 				$event->save(true);
 			}
 
-			$c->add($event->toVObject('REQUEST', false, $recurrenceTime));
+			$c->add($event->toVObject('REQUEST', false));
 		}
 
 
@@ -2236,7 +2239,7 @@ The following is the error message:
 	 */
 	public function createCopyForParticipant(Participant $participant){
 
-		\GO::debug("Creating event copy for ".$participant->name);
+		\GO::debug("createCopyForParticipant ".$participant->name);
 		
 		//create event in participant's default calendar if the current user has the permission to do that
 		$calendar = $participant->getDefaultCalendar();
