@@ -1,3 +1,4 @@
+05-03-2024: 6.8.37
 - Email: Resize folder subscribtion dialog to current theme
 - Core: Fix bug in module selection in user profile
 - Files: minor bugfix copy / paste with keypresses
