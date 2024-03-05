@@ -1,3 +1,5 @@
+- Core: Report if sourceguardian is not installed when setting license key
+
 05-03-2024: 6.8.37
 - Email: Resize folder subscribtion dialog to current theme
 - Core: Fix bug in module selection in user profile
